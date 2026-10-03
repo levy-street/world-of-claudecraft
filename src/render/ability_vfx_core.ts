@@ -1,3 +1,4 @@
+import { DEFEATED_AURA_ID } from '../sim/graveyard_shift/shift_end_marks';
 import type { PhysicalChoreography } from './ability_vfx/physical_choreography_core';
 // Pure planning core for the per-ability spell VFX system: turns an authored
 // AbilityVfxSpec (src/render/ability_vfx_specs.ts) plus the render-budget vfx
@@ -648,6 +649,8 @@ export function wornCcBand(
     const rem = a.remaining ?? 1;
     if (rem <= 0) continue;
     let type: CcBandType | null = null;
+    // A defeated Graveyard Shift Morthen lies in the death pose: no stun stars.
+    if (a.id === DEFEATED_AURA_ID) continue;
     if (a.kind === 'stun') type = 'stun';
     else if (a.kind === 'root') type = 'root';
     else if (

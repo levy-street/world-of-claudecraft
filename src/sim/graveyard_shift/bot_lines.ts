@@ -12,7 +12,8 @@ export type BotSayTrigger =
   | 'corpseRun'
   | 'returned'
   | 'giveUp'
-  | 'partyWins';
+  | 'partyWins'
+  | 'loot';
 
 export interface BotLine {
   readonly id: string;
@@ -79,11 +80,19 @@ export const BOT_LINES: Readonly<Record<BotSayTrigger, readonly BotLine[]>> = {
     line('giveUp', 'betterRotation', 'the boss had a better rotation than me'),
     line('giveUp', 'sameTime', 'same time tomorrow?'),
   ],
+  loot: [],
   partyWins: [
     line('partyWins', 'firstTry', 'WE DID IT, first try'),
     line('partyWins', 'respect', 'the boss almost had us, respect'),
   ],
 };
+
+// After a loss the party stands over Morthen and does what parties do. Said in
+// order, by whoever is standing (outro.ts times them).
+export const LOOT_LINES: readonly BotLine[] = [
+  line('loot', 'whoNeeds', 'ok who needs the trousers'),
+  line('loot', 'need', 'NEED. I need them'),
+];
 
 export function botLineAllowed(l: BotLine, role: BotRole): boolean {
   return (l.by === undefined || l.by === role) && l.notBy !== role;

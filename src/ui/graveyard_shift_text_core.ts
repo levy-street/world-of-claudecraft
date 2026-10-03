@@ -7,8 +7,9 @@
 
 import { adventurerMarkerAura } from '../sim/graveyard_shift/hostility';
 import { MORTHEN_KIT, soloEffect } from '../sim/graveyard_shift/kit';
-import { morthenIdentityAura } from '../sim/graveyard_shift/morthen_identity';
-import type { AbilityDef, AbilityEffect } from '../sim/types';
+import { hasMorthenIdentity, morthenIdentityAura } from '../sim/graveyard_shift/morthen_identity';
+import { DEFEATED_AURA_NAME } from '../sim/graveyard_shift/shift_end_marks';
+import type { AbilityDef, AbilityEffect, Entity } from '../sim/types';
 import { formatNumber, type InterpolationValues, type TranslationKey, t } from './i18n';
 
 interface KitText {
@@ -64,6 +65,7 @@ export function graveyardShiftAbilityNameFromSource(name: string): string | null
  *  (which carries its ability's English name). Null for every other aura. */
 export function graveyardShiftAuraName(name: string): string | null {
   if (name === IDENTITY_AURA_NAME) return t(IDENTITY_AURA_KEY);
+  if (name === DEFEATED_AURA_NAME) return t('devCommand.graveyardShift.defeatedAura');
   if (name === ADVENTURER_AURA_NAME) return t(ADVENTURER_AURA_KEY);
   return graveyardShiftAbilityNameFromSource(name);
 }
@@ -130,4 +132,18 @@ export function graveyardShiftAbilityDescription(id: string): string | null {
   const text = def ? KIT_TEXT[id] : undefined;
   if (!def || !text) return null;
   return t(text.description, descriptionValues(def));
+}
+
+// A boss shows no level to the players facing it, so while the identity lasts
+// the player's own frame reads the boss skull's "??" instead of a number.
+export const BOSS_LEVEL_TEXT = '??';
+
+/** The level text the player's own frame shows: "??" while Morthen. */
+export function playerFrameLevelText(p: Pick<Entity, 'auras' | 'level'>): string {
+  return hasMorthenIdentity(p) ? BOSS_LEVEL_TEXT : String(p.level);
+}
+
+/** The name the player's own frame shows: Morthen's while the identity lasts. */
+export function playerFrameName(p: Pick<Entity, 'auras' | 'name'>): string {
+  return hasMorthenIdentity(p) ? t(IDENTITY_AURA_KEY) : p.name;
 }

@@ -4,6 +4,7 @@ import { graveyardShiftRunFor } from '../src/sim/graveyard_shift';
 import { CORPSE_RELEASE_TICKS, CORPSE_RETURN_TICKS } from '../src/sim/graveyard_shift/corpse_run';
 import { isGraveyardShiftAdventurer } from '../src/sim/graveyard_shift/hostility';
 import { GRAVEYARD_SHIFT_DUNGEON_ID } from '../src/sim/graveyard_shift/run_layout';
+import { isGraveyardShiftStaffExit } from '../src/sim/graveyard_shift/shift_end_marks';
 import { instanceOriginOf } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
 import { RES_HP_FRACTION } from '../src/sim/spirit';
@@ -138,14 +139,23 @@ describe('Graveyard Shift corpse run', () => {
     for (const e of others) expect(e.dead).toBe(false);
     for (const e of others.slice(0, -1)) kill(sim, e);
     sim.tick();
-    expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).not.toBeNull();
+    expect(run.outro).toBeNull();
     kill(sim, others[others.length - 1]);
     const events = sim.tick();
     const goodbye = said(events, 'devCommand.graveyardShift.say.giveUp');
     expect(goodbye).toHaveLength(1);
     expect(goodbye[0].fromPid).toBe(tank.id);
+    // The quitter walks out and the Staff Exit opens: the shift is won.
+    expect(run.outro?.kind).toBe('won');
+    expect(sim.ctx.players.has(tank.id)).toBe(false);
+    const exit = sim.entities.get(run.outro!.portalId!)!;
+    expect(isGraveyardShiftStaffExit(exit)).toBe(true);
+    sim.player.pos = sim.ctx.groundPos(exit.pos.x, exit.pos.z);
+    sim.player.prevPos = { ...sim.player.pos };
+    (sim as any).rebucket(sim.player);
+    const end = sim.tick();
     expect(
-      events.some(
+      end.some(
         (ev) => ev.type === 'log' && (ev as any).text === '[dev] Graveyard Shift ended (won).',
       ),
     ).toBe(true);

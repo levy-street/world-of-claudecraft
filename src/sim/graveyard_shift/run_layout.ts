@@ -31,6 +31,10 @@ export const GRAVEYARD_SHIFT_ALLY_SPOTS: readonly { x: number; z: number }[] = [
   { x: 3, z: 90 },
 ];
 
+// The Staff Exit a won shift opens, behind the throne dais (r 9.5 around z 96)
+// and short of the nave's end wall (z 112).
+export const GRAVEYARD_SHIFT_STAFF_EXIT = { x: 0, z: 107 } as const;
+
 // Where a run hands its owner back outside: the borrowed dungeon's own exit
 // drop (its authored leaveOffset, else the door's default four yards out), the
 // same point leaveDungeon walks a leaver to.

@@ -9,7 +9,13 @@ import { Rng } from '../rng';
 import { SAY_RANGE } from '../sim';
 import type { SimContext } from '../sim_context';
 import { dist2d, type Entity, TICK_RATE } from '../types';
-import { BOT_LINES, type BotLine, type BotSayTrigger, botLineAllowed } from './bot_lines';
+import {
+  BOT_LINES,
+  type BotLine,
+  type BotSayTrigger,
+  botLineAllowed,
+  LOOT_LINES,
+} from './bot_lines';
 import { releasingNow } from './corpse_run';
 import {
   type GraveyardShiftBot,
@@ -29,6 +35,8 @@ export const BOT_SAY_HEALER_OOM_FRACTION = 0.15;
 // health fraction under the second threshold.
 export const BOT_SAY_WIPE_DEAD = 2;
 export const BOT_SAY_WIPE_HP_FRACTION = 0.35;
+// The gloat over a defeated Morthen: one loot line every this many ticks.
+export const BOT_SAY_LOOT_INTERVAL_TICKS = 2 * TICK_RATE;
 
 interface PendingSay {
   readonly trigger: BotSayTrigger;
@@ -48,6 +56,7 @@ export interface BotSayState {
   healerLow: boolean;
   wipeThreat: boolean;
   outcomeSaid: boolean;
+  lastSpeakerPid: number | null;
   readonly pending: PendingSay[];
 }
 
@@ -67,6 +76,7 @@ export function freshBotSayState(runSeed: number): BotSayState {
     healerLow: false,
     wipeThreat: false,
     outcomeSaid: false,
+    lastSpeakerPid: null,
     pending: [],
   };
 }
@@ -85,6 +95,10 @@ export function updateGraveyardShiftSay(ctx: SimContext, run: GraveyardShiftRun)
     speak(ctx, run, state, 'partyWins', true);
     return;
   }
+  if (run.outro?.kind === 'lost') {
+    sayLootLine(ctx, run, state);
+    return;
+  }
   observe(ctx, run, state, now);
   for (let i = state.pending.length - 1; i >= 0; i--) {
     if (now > state.pending[i].expiresTick) state.pending.splice(i, 1);
@@ -97,6 +111,26 @@ export function updateGraveyardShiftSay(ctx: SimContext, run: GraveyardShiftRun)
       return;
     }
   }
+}
+
+// The loot lines, in order, one per interval after the outro opens, each from
+// a living adventurer other than the last voice when there is one.
+function sayLootLine(ctx: SimContext, run: GraveyardShiftRun, state: BotSayState): void {
+  const outro = run.outro;
+  if (!outro) return;
+  const elapsed = ctx.tickCount - outro.startedTick;
+  const index = elapsed / BOT_SAY_LOOT_INTERVAL_TICKS - 1;
+  if (!Number.isInteger(index) || index < 0 || index >= LOOT_LINES.length) return;
+  const speakers = run.bots
+    .map((bot) => ctx.entities.get(bot.pid))
+    .filter((e): e is Entity => living(e));
+  if (speakers.length === 0) return;
+  const fresh = speakers.filter((e) => e.id !== state.lastSpeakerPid);
+  const pool = fresh.length > 0 ? fresh : speakers;
+  const speaker = pool[state.rng.int(0, pool.length - 1)];
+  state.lastTick = ctx.tickCount;
+  state.lastSpeakerPid = speaker.id;
+  emitBotSay(ctx, speaker, LOOT_LINES[index]);
 }
 
 function queue(state: BotSayState, trigger: BotSayTrigger, now: number, speakerPid?: number): void {
@@ -182,6 +216,7 @@ function speak(
   state.used.add(said.id);
   state.lastTick = now;
   state.botLastTick.set(pick.bot.pid, now);
+  state.lastSpeakerPid = pick.bot.pid;
   emitBotSay(ctx, pick.e, said);
   return true;
 }

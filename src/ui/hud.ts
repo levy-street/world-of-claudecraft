@@ -328,6 +328,7 @@ import { gatherRareEventFeedback } from './gather_rare_event_feedback';
 import { gatherToolTooltipLines } from './gather_tool_tooltip';
 import { generalChatQuotaView } from './general_chat_quota_view';
 import { craftedLineKey, grantItemToken, grantQtyText } from './grant_line_view';
+import { playerFrameLevelText } from './graveyard_shift_text_core';
 import { decideGuildMotdLine } from './guild_motd_login';
 import {
   healLandingFloatTextKey,
@@ -4656,7 +4657,7 @@ export class Hud {
   private lastPlayerFrameMaxHp = Number.NaN;
   private lastPlayerFrameResource = Number.NaN;
   private lastPlayerFrameMaxResource = Number.NaN;
-  private lastPlayerFrameLevel = Number.NaN;
+  private lastPlayerFrameLevel = '';
   private readonly targetFrameDescriptor: UnitFrameDescriptor = {
     ...ABSENT_TARGET_DESCRIPTOR,
   };
@@ -8840,9 +8841,9 @@ export class Hud {
       this.lastPlayerFrameMaxResource = p.maxResource;
       playerFrame.resText = unitFrameCurrentMaxText(Math.round(p.resource), p.maxResource);
     }
-    if (p.level !== this.lastPlayerFrameLevel) {
-      this.lastPlayerFrameLevel = p.level;
-      playerFrame.levelText = String(p.level);
+    if (playerFrameLevelText(p) !== this.lastPlayerFrameLevel) {
+      this.lastPlayerFrameLevel = playerFrameLevelText(p);
+      playerFrame.levelText = this.lastPlayerFrameLevel;
     }
     playerFrame.name = p.name;
     // SELF reads its worn border from the deeds facet, not the entity wire
@@ -17987,7 +17988,6 @@ export class Hud {
     return this.sim.actionBarReadOnly;
   }
 
-  /** The Graveyard Shift kit the pad bar shows while Morthen (a possess bar). */
   crossHotbarOverride(): CrossHotbarLayout | null {
     return morthenCrossHotbarOverride(this.sim.player);
   }

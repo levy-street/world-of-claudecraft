@@ -35,6 +35,16 @@ export interface GraveyardShiftBot {
   returning: boolean;
 }
 
+// The scene a shift ends on (outro.ts), once the fight is decided.
+export interface GraveyardShiftOutro {
+  readonly kind: 'lost' | 'won';
+  readonly startedTick: number;
+  // The Staff Exit's ground object on a win, once it stands.
+  portalId: number | null;
+  // Set when the owner steps through the Staff Exit.
+  leaving: boolean;
+}
+
 export interface GraveyardShiftRun {
   readonly ownerPid: number;
   // The claimed slot's partyKey, distinct from every instanceKeyFor key so
@@ -61,6 +71,8 @@ export interface GraveyardShiftRun {
   // Set by a mid-tick decision (a command or, later, a lethal hit); the run tick
   // tears down, never the code path that decided.
   pendingOutcome: GraveyardShiftOutcome | null;
+  // The closing scene, null while the fight is on.
+  outro: GraveyardShiftOutro | null;
   // The adventurers' say-line state (bot_say.ts), created on its first tick.
   say?: BotSayState;
 }

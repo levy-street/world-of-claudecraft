@@ -14,6 +14,7 @@ import {
   updateGraveyardShiftSay,
 } from '../src/sim/graveyard_shift/bot_say';
 import type { GraveyardShiftRun } from '../src/sim/graveyard_shift/run_state';
+import { LOSS_OUTRO_TICKS } from '../src/sim/graveyard_shift/shift_end_marks';
 import { SAY_RANGE, Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
 import { type TranslationKey, t } from '../src/ui/i18n';
@@ -195,7 +196,7 @@ describe('Graveyard Shift say lines (run)', () => {
     expect(heard.map((h) => triggerOf(h.ev))).toEqual(['notice']);
   });
 
-  it('Morthen losing makes a living bot say a win line before the teardown', () => {
+  it('Morthen losing makes a living bot say a win line, then the loot lines, before the teardown', () => {
     const { sim, run } = shiftSim();
     runTicks(sim, 2);
     // A lethal blow on Morthen is clamped and sets the loss.
@@ -211,8 +212,12 @@ describe('Graveyard Shift say lines (run)', () => {
     );
     expect(run.pendingOutcome).toBe('lost');
     const heard = heardBy(runTicks(sim, 3), sim.playerId);
-    expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).toBeNull();
+    // The defeat scene plays: the win line comes first, the run is still on.
+    expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).toBe(run);
     expect(heard.map((h) => triggerOf(h.ev))).toEqual(['partyWins']);
+    const rest = heardBy(runTicks(sim, LOSS_OUTRO_TICKS), sim.playerId);
+    expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).toBeNull();
+    expect(rest.map((h) => triggerOf(h.ev))).toEqual(['loot', 'loot']);
   });
 
   it('Morthen dying outright (the /dev kill path) also makes the party cheer', () => {

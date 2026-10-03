@@ -3,10 +3,15 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { morthenIdentityAura } from '../src/sim/graveyard_shift/morthen_identity';
+import { defeatedAura } from '../src/sim/graveyard_shift/outro';
+import { LOSS_OUTRO_TICKS, STAFF_EXIT_NAME } from '../src/sim/graveyard_shift/shift_end_marks';
 import { Sim } from '../src/sim/sim';
 import type { Aura, Entity } from '../src/sim/types';
-import { MORTHEN_HINT_MS } from '../src/ui/hud/vehicle/morthen_hint_view';
+import { TICK_RATE } from '../src/sim/types';
+import { MORTHEN_FADE_IN_MS } from '../src/ui/hud/vehicle/morthen_fade_view';
+import { MORTHEN_CORPSE_CHECK_MS, MORTHEN_HINT_MS } from '../src/ui/hud/vehicle/morthen_hint_view';
 import {
+  MORTHEN_FADE_CLASS,
   MORTHEN_SHIFT_BODY_CLASS,
   MorthenShiftController,
 } from '../src/ui/hud/vehicle/morthen_shift_controller';
@@ -27,6 +32,8 @@ function fakeWorld(identity: boolean) {
     id: 1,
     auras: (identity ? [morthenIdentityAura(1)] : []) as Aura[],
     resource: 0,
+    level: 10,
+    name: 'Mat',
     pos: { x: 0, y: 0, z: 0 },
   } as unknown as Entity;
   return { vehicleSession: null, player, entities: new Map<number, Entity>([[1, player]]) };
@@ -103,6 +110,63 @@ describe('Morthen shift state', () => {
     shift.update();
     expect(showHint).toHaveBeenCalledTimes(3);
     expect(showHint.mock.calls[2][0]).toMatch(/^Sexton's Chain/);
+  });
+});
+
+describe('Morthen shift: the frame name, the fade and the way out', () => {
+  it("names the player frame after Morthen on shift and gives the player's name back after", () => {
+    document.body.innerHTML = '<div id="pf-name">Mat</div>';
+    const world = fakeWorld(false);
+    const { shift } = makeShift(world);
+    const name = document.getElementById('pf-name')!;
+    shift.update();
+    expect(name.textContent).toBe('Mat');
+    world.player.auras.push(morthenIdentityAura(1));
+    shift.update();
+    expect(name.textContent).toBe('Morthen the Gravecaller');
+    world.player.auras.length = 0;
+    shift.update();
+    expect(name.textContent).toBe('Mat');
+  });
+
+  it('fades to black over the end of a defeat and lifts once it is over', () => {
+    const world = fakeWorld(true);
+    let now = 1000;
+    const { shift } = makeShift(world, () => now);
+    const veil = document.querySelector<HTMLElement>(`.${MORTHEN_FADE_CLASS}`)!;
+    expect(veil.getAttribute('aria-hidden')).toBe('true');
+    shift.update();
+    expect(veil.style.opacity).toBe('0.00');
+    world.player.auras.push(defeatedAura(1));
+    shift.update();
+    expect(veil.style.opacity).toBe('0.00');
+    now += (LOSS_OUTRO_TICKS / TICK_RATE) * 1000;
+    shift.update();
+    expect(veil.style.opacity).toBe('1.00');
+    // The teardown strips both auras: the veil outlives the identity and lifts.
+    world.player.auras.length = 0;
+    shift.update();
+    expect(veil.style.opacity).toBe('1.00');
+    now += MORTHEN_FADE_IN_MS;
+    shift.update();
+    expect(veil.style.opacity).toBe('0.00');
+  });
+
+  it('writes the Staff Exit tip once the way out stands', () => {
+    const world = fakeWorld(true);
+    let now = 1000;
+    const { shift, showHint } = makeShift(world, () => now);
+    shift.update();
+    world.entities.set(99, {
+      id: 99,
+      templateId: 'dungeon_exit',
+      name: STAFF_EXIT_NAME,
+    } as unknown as Entity);
+    now += MORTHEN_CORPSE_CHECK_MS;
+    shift.update();
+    expect(showHint).toHaveBeenLastCalledWith(
+      'Shift over. The Staff Exit behind the throne takes you home.',
+    );
   });
 });
 

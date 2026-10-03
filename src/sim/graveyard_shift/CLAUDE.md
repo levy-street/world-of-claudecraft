@@ -98,6 +98,19 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
   brain; it announces its return once within say range. One corpse run each: a
   second death is final. A whole-party wipe in round one is not a win: they all run
   back together. A raised corpse leaves with its owner (`raisedCorpseIds` forgets it).
+- **The ending is played in the Crypt** (`outro.ts`, markers in the pure leaf
+  `shift_end_marks.ts` the renderer, HUD and dungeon exit import). A loss holds
+  `LOSS_OUTRO_TICKS`: Morthen wears the Defeated aura (a `stun`-kind lockout pushed
+  past his CC immunity; the client poses the living body dead through the Impaled
+  effect bit, draws no stun band, and fades to black over the last
+  `LOSS_FADE_TICKS`), never really dies, the party stands down and says its two
+  loot lines, the allies are dismissed, then the teardown. A win removes whoever
+  is still standing, sets the allies passive and opens the Staff Exit (a stock
+  `dungeon_exit` object named `STAFF_EXIT_NAME`, in the slot's `objectIds` so
+  freeing the slot removes it) behind the throne; walking into it, or the F-interact
+  `leaveDungeon` (intercepted by `graveyardShiftTakesExit` before the stock teleport,
+  which would read as abandoning the run), ends the run as a win, and so does
+  `WON_OUTRO_MAX_TICKS` or leaving the claim any other way.
 - **Win, loss, stall:** every adventurer fallen for good (or gone) wins, and so does
   the give-up: the last one standing with nobody left who can come back says a
   goodbye line and leaves; a lethal blow on
@@ -251,6 +264,8 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
 | `hostility.ts` | pure leaf: the adventurer marker and the Morthen-versus-adventurer pair rule |
 | `death_intercept.ts` | the lethal-blow clamp `dealDamage` calls |
 | `corpse_run.ts` | the corpse run: release, the walk back in at the entrance, one run each, the give-up and the wipe rules |
+| `outro.ts` | the closing scenes: the lost shift's Defeated scene, the won shift's Staff Exit, when each ends |
+| `shift_end_marks.ts` | pure leaf: the Defeated aura id, the Staff Exit name and predicates, the outro timings, the `leaveDungeon` intercept |
 | `run_allies.ts` | the two skeleton allies: spawn, engage stance, Dread on death, dismissal |
 | `bot_brain.ts` | pure leaf: reaction, interrupt, kick-chance and control rules, ranges, triage, target scoring, seeds |
 | `bot_driver.ts` | the per-tick party driver through the real player verbs |

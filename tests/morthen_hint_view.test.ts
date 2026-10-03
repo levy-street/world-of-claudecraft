@@ -14,26 +14,26 @@ const never = () => false;
 describe('Morthen hint line', () => {
   it("opens with Sexton's Chain and holds it for the hint duration", () => {
     const hints = createMorthenHints();
-    expect(hints.tick(0, 0, never)).toBe('chain');
-    expect(hints.tick(MORTHEN_HINT_MS - 1, 0, never)).toBe('chain');
-    expect(hints.tick(MORTHEN_HINT_MS, 0, never)).toBeNull();
+    expect(hints.tick(0, 0, never, never)).toBe('chain');
+    expect(hints.tick(MORTHEN_HINT_MS - 1, 0, never, never)).toBe('chain');
+    expect(hints.tick(MORTHEN_HINT_MS, 0, never, never)).toBeNull();
   });
 
   it('offers Shadow Pulse the first time the Dread pays for it, never below', () => {
     const hints = createMorthenHints();
-    hints.tick(0, 0, never);
-    expect(hints.tick(MORTHEN_HINT_MS, 24, never)).toBeNull();
-    expect(hints.tick(MORTHEN_HINT_MS + 1, 25, never)).toBe('pulse');
+    hints.tick(0, 0, never, never);
+    expect(hints.tick(MORTHEN_HINT_MS, 24, never, never)).toBeNull();
+    expect(hints.tick(MORTHEN_HINT_MS + 1, 25, never, never)).toBe('pulse');
     // Spent and earned again: the line never comes back in the same shift.
-    expect(hints.tick(3 * MORTHEN_HINT_MS, 0, never)).toBeNull();
-    expect(hints.tick(4 * MORTHEN_HINT_MS, 30, never)).toBeNull();
+    expect(hints.tick(3 * MORTHEN_HINT_MS, 0, never, never)).toBeNull();
+    expect(hints.tick(4 * MORTHEN_HINT_MS, 30, never, never)).toBeNull();
   });
 
   it('queues a line behind the one on screen instead of replacing it', () => {
     const hints = createMorthenHints();
-    expect(hints.tick(0, 40, never)).toBe('chain');
-    expect(hints.tick(1000, 40, never)).toBe('chain');
-    expect(hints.tick(MORTHEN_HINT_MS, 40, never)).toBe('pulse');
+    expect(hints.tick(0, 40, never, never)).toBe('chain');
+    expect(hints.tick(1000, 40, never, never)).toBe('chain');
+    expect(hints.tick(MORTHEN_HINT_MS, 40, never, never)).toBe('pulse');
   });
 
   it('offers Raise the Fallen once a corpse is in reach, scanning at most every check interval', () => {
@@ -44,25 +44,38 @@ describe('Morthen hint line', () => {
       scans++;
       return corpse;
     };
-    hints.tick(0, 0, scan);
-    hints.tick(10, 0, scan);
-    hints.tick(MORTHEN_CORPSE_CHECK_MS - 1, 0, scan);
+    hints.tick(0, 0, scan, never);
+    hints.tick(10, 0, scan, never);
+    hints.tick(MORTHEN_CORPSE_CHECK_MS - 1, 0, scan, never);
     expect(scans).toBe(1);
     corpse = true;
-    hints.tick(MORTHEN_CORPSE_CHECK_MS, 0, scan);
+    hints.tick(MORTHEN_CORPSE_CHECK_MS, 0, scan, never);
     expect(scans).toBe(2);
-    expect(hints.tick(MORTHEN_HINT_MS, 0, scan)).toBe('raise');
+    expect(hints.tick(MORTHEN_HINT_MS, 0, scan, never)).toBe('raise');
     // Queued: the scan stops for the rest of the shift.
-    hints.tick(MORTHEN_HINT_MS + 10 * MORTHEN_CORPSE_CHECK_MS, 0, scan);
+    hints.tick(MORTHEN_HINT_MS + 10 * MORTHEN_CORPSE_CHECK_MS, 0, scan, never);
     expect(scans).toBe(2);
+  });
+
+  it('the Staff Exit line jumps the queue and replaces the line on screen', () => {
+    const hints = createMorthenHints();
+    expect(hints.tick(0, 40, never, never)).toBe('chain');
+    expect(hints.tick(MORTHEN_CORPSE_CHECK_MS, 40, never, () => true)).toBe('exit');
+    // Offered once: the queued Pulse line follows after its hold.
+    expect(hints.tick(MORTHEN_CORPSE_CHECK_MS + MORTHEN_HINT_MS, 40, never, () => true)).toBe(
+      'pulse',
+    );
+    expect(
+      hints.tick(MORTHEN_CORPSE_CHECK_MS + 3 * MORTHEN_HINT_MS, 40, never, () => true),
+    ).toBeNull();
   });
 
   it('a new shift shows every line again', () => {
     const hints = createMorthenHints();
-    hints.tick(0, 40, never);
-    hints.tick(MORTHEN_HINT_MS, 40, never);
+    hints.tick(0, 40, never, never);
+    hints.tick(MORTHEN_HINT_MS, 40, never, never);
     hints.reset();
-    expect(hints.tick(100_000, 0, never)).toBe('chain');
+    expect(hints.tick(100_000, 0, never, never)).toBe('chain');
   });
 });
 
@@ -100,7 +113,8 @@ describe('Morthen hint text', () => {
     );
     expect(morthenHintText('pulse')).toMatch(/^Shadow Pulse is ready/);
     expect(morthenHintText('raise')).toMatch(/^Raise the Fallen/);
-    for (const id of ['chain', 'pulse', 'raise'] as const) {
+    expect(morthenHintText('exit')).toMatch(/Staff Exit/);
+    for (const id of ['chain', 'pulse', 'raise', 'exit'] as const) {
       expect(morthenHintText(id)).not.toMatch(/devCommand|\{/);
     }
   });

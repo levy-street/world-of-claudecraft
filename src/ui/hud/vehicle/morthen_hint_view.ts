@@ -2,33 +2,37 @@
 // ability, shown once per shift at the moment the ability becomes useful (the
 // first playtest found the kit unreadable from tooltips alone). Sexton's Chain
 // on arrival, Shadow Pulse the first time the Dread pays for it, Raise the
-// Fallen the first time a corpse lies within its reach. One line at a time,
+// Fallen the first time a corpse lies within its reach, and the Staff Exit
+// once a won shift opens it. One line at a time,
 // at most one per MORTHEN_HINT_MS, later ones queued. The shift controller
 // writes each line to the chat log as a tip, which every surface (desktop,
 // touch, pad) already shows.
 
 import { MORTHEN_KIT } from '../../../sim/graveyard_shift/kit';
+import { isGraveyardShiftStaffExit } from '../../../sim/graveyard_shift/shift_end_marks';
 import type { Entity } from '../../../sim/types';
 import { dist2d } from '../../../sim/types';
 import { type TranslationKey, t } from '../../i18n';
 
-export type MorthenHintId = 'chain' | 'pulse' | 'raise';
+export type MorthenHintId = 'chain' | 'pulse' | 'raise' | 'exit';
 
 export const MORTHEN_HINT_MS = 9000;
-// The corpse scan walks every entity, so it runs at most this often, and only
-// until the Raise the Fallen line has been queued.
+// The corpse and Staff Exit scans walk every entity, so they run at most this
+// often, and only until both lines have been queued.
 export const MORTHEN_CORPSE_CHECK_MS = 500;
 
 const HINT_ABILITY: Readonly<Record<MorthenHintId, string>> = {
   chain: 'gshift_sextons_chain',
   pulse: 'gshift_shadow_pulse',
   raise: 'gshift_raise_fallen',
+  exit: '',
 };
 
 const HINT_KEY: Readonly<Record<MorthenHintId, TranslationKey>> = {
   chain: 'devCommand.graveyardShift.hints.chain',
   pulse: 'devCommand.graveyardShift.hints.pulse',
   raise: 'devCommand.graveyardShift.hints.raise',
+  exit: 'devCommand.graveyardShift.hints.exit',
 };
 
 const PULSE = MORTHEN_KIT.find((def) => def.id === HINT_ABILITY.pulse) ?? null;
@@ -71,12 +75,24 @@ export function createMorthenHints() {
   }
   return {
     /** The hint to show this frame, or null. Positional so a frame allocates nothing. */
-    tick(nowMs: number, dread: number, corpseInReach: () => boolean): MorthenHintId | null {
+    tick(
+      nowMs: number,
+      dread: number,
+      corpseInReach: () => boolean,
+      staffExitStanding: () => boolean,
+    ): MorthenHintId | null {
       offer('chain');
       if (PULSE && dread >= PULSE.cost) offer('pulse');
-      if (!seen.has('raise') && nowMs - corpseCheckedAt >= MORTHEN_CORPSE_CHECK_MS) {
+      const scanDue = nowMs - corpseCheckedAt >= MORTHEN_CORPSE_CHECK_MS;
+      if (scanDue && (!seen.has('raise') || !seen.has('exit'))) {
         corpseCheckedAt = nowMs;
-        if (corpseInReach()) offer('raise');
+        if (!seen.has('raise') && corpseInReach()) offer('raise');
+        // The way out jumps the queue: the shift is over, nothing else matters.
+        if (!seen.has('exit') && staffExitStanding()) {
+          seen.add('exit');
+          queued.unshift('exit');
+          current = null;
+        }
       }
       if (current !== null && nowMs - shownAt >= MORTHEN_HINT_MS) current = null;
       if (current === null && queued.length > 0) {
@@ -93,4 +109,12 @@ export function createMorthenHints() {
       corpseCheckedAt = Number.NEGATIVE_INFINITY;
     },
   };
+}
+
+/** The won shift's Staff Exit stands in the player's world. */
+export function morthenStaffExitStanding(
+  entities: Iterable<Pick<Entity, 'templateId' | 'name'>>,
+): boolean {
+  for (const e of entities) if (isGraveyardShiftStaffExit(e)) return true;
+  return false;
 }

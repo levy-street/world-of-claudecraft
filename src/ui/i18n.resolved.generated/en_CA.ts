@@ -212,6 +212,8 @@ export const en_CA: EnTranslations = {
     },
     "graveyardShift": {
       "identityAura": "Morthen the Gravecaller",
+      "defeatedAura": "Defeated",
+      "staffExit": "Staff Exit",
       "adventurerAura": "Adventurer",
       "resource": "Dread",
       "errors": {
@@ -235,7 +237,8 @@ export const en_CA: EnTranslations = {
       "hints": {
         "chain": "Sexton's Chain: pick one of them and drag them to you. The healer is a fine start.",
         "pulse": "Shadow Pulse is ready: a heavy blast around you, best with them up close. They can interrupt it. They will try.",
-        "raise": "Raise the Fallen: a body lies near. Every corpse is a colleague. Even theirs."
+        "raise": "Raise the Fallen: a body lies near. Every corpse is a colleague. Even theirs.",
+        "exit": "Shift over. The Staff Exit behind the throne takes you home."
       },
       "say": {
         "notice": {
@@ -277,6 +280,10 @@ export const en_CA: EnTranslations = {
           "ggBoss": "gg boss, honestly that was sick",
           "betterRotation": "the boss had a better rotation than me",
           "sameTime": "same time tomorrow?"
+        },
+        "loot": {
+          "whoNeeds": "ok who needs the trousers",
+          "need": "NEED. I need them"
         },
         "partyWins": {
           "firstTry": "WE DID IT, first try",

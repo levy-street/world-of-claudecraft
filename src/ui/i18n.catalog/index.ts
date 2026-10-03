@@ -238,6 +238,8 @@ export const en = {
     // prototype; the strings move to a player namespace when the mode ships.
     graveyardShift: {
       identityAura: 'Morthen the Gravecaller',
+      defeatedAura: 'Defeated',
+      staffExit: 'Staff Exit',
       adventurerAura: 'Adventurer',
       resource: 'Dread',
       errors: {
@@ -268,6 +270,7 @@ export const en = {
         pulse:
           'Shadow Pulse is ready: a heavy blast around you, best with them up close. They can interrupt it. They will try.',
         raise: 'Raise the Fallen: a body lies near. Every corpse is a colleague. Even theirs.',
+        exit: 'Shift over. The Staff Exit behind the throne takes you home.',
       },
       // The adventurers' say lines (src/sim/graveyard_shift/bot_lines.ts).
       say: {
@@ -310,6 +313,10 @@ export const en = {
           ggBoss: 'gg boss, honestly that was sick',
           betterRotation: 'the boss had a better rotation than me',
           sameTime: 'same time tomorrow?',
+        },
+        loot: {
+          whoNeeds: 'ok who needs the trousers',
+          need: 'NEED. I need them',
         },
         partyWins: {
           firstTry: 'WE DID IT, first try',

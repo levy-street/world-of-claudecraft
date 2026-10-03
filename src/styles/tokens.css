@@ -1167,6 +1167,8 @@
     --color-aura-overlay-frost: #54d9ff;
     /* Aura countdown sweeps retain the shipped translucent ink mask. */
     --color-aura-overlay-timer-mask: rgb(0 0 0 / 62%);
+    /* The Graveyard Shift's closing fade is a plain blackout. */
+    --color-gshift-fade: #000;
     /* The death veil keeps the world visible beneath a hostile red wash. */
     --death-overlay-veil: radial-gradient(
       ellipse at center,

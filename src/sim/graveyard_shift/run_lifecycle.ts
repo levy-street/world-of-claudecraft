@@ -31,6 +31,7 @@ import { updateGraveyardShiftBots } from './bot_driver';
 import { sayGraveyardShiftGiveUp, updateGraveyardShiftSay } from './bot_say';
 import { partyGivesUp, partyWiped, updateGraveyardShiftCorpseRuns } from './corpse_run';
 import { applyMorthenIdentity, removeMorthenIdentity } from './morthen_transform';
+import { graveyardShiftOutroEnd, startLossOutro, startWonOutro } from './outro';
 import {
   dismissGraveyardShiftAllies,
   spawnGraveyardShiftAllies,
@@ -125,6 +126,7 @@ export function startGraveyardShift(ctx: SimContext, pid: number): string | null
     raisedCorpseIds: new Set(),
     engaged: false,
     pendingOutcome: null,
+    outro: null,
   };
   ctx.graveyardShiftRuns.set(pid, run);
   spawnGraveyardShiftParty(ctx, run);
@@ -191,10 +193,17 @@ export function updateGraveyardShift(ctx: SimContext): void {
   for (const run of [...ctx.graveyardShiftRuns.values()]) {
     updateGraveyardShiftSay(ctx, run);
     const p = ctx.entities.get(run.ownerPid);
+    const outroEnd = graveyardShiftOutroEnd(ctx, run);
     if (!p || !ctx.players.has(run.ownerPid)) endGraveyardShift(ctx, run, 'aborted');
-    else if (run.pendingOutcome) endGraveyardShift(ctx, run, run.pendingOutcome);
-    else if (p.dead) endGraveyardShift(ctx, run, 'lost');
-    else if (run.slot.partyKey !== run.key || !instanceClaimHolds(run.slot, p.pos)) {
+    else if (outroEnd) endGraveyardShift(ctx, run, outroEnd);
+    else if (run.pendingOutcome === 'lost' && !run.outro) startLossOutro(ctx, run);
+    else if (run.pendingOutcome && run.pendingOutcome !== 'lost') {
+      endGraveyardShift(ctx, run, run.pendingOutcome);
+    } else if (p.dead) endGraveyardShift(ctx, run, 'lost');
+    else if (run.outro) {
+      // A won owner who gets out some other way has still finished the shift.
+      if (!instanceClaimHolds(run.slot, p.pos)) endGraveyardShift(ctx, run, run.outro.kind);
+    } else if (run.slot.partyKey !== run.key || !instanceClaimHolds(run.slot, p.pos)) {
       endGraveyardShift(ctx, run, 'aborted');
     } else if (ctx.partyOf(run.ownerPid)) endGraveyardShift(ctx, run, 'aborted');
     else if (ctx.tickCount - run.startedTick >= GRAVEYARD_SHIFT_MAX_SECONDS * TICK_RATE) {
@@ -202,10 +211,10 @@ export function updateGraveyardShift(ctx: SimContext): void {
     } else {
       pruneStrayBots(ctx, run);
       updateGraveyardShiftCorpseRuns(ctx, run);
-      if (partyWiped(ctx, run)) endGraveyardShift(ctx, run, 'won');
+      if (partyWiped(ctx, run)) startWonOutro(ctx, run);
       else if (partyGivesUp(ctx, run)) {
         sayGraveyardShiftGiveUp(ctx, run);
-        endGraveyardShift(ctx, run, 'won');
+        startWonOutro(ctx, run);
       } else {
         updateGraveyardShiftAllies(ctx, run);
         updateGraveyardShiftBots(ctx, run);

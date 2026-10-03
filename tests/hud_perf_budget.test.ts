@@ -573,8 +573,14 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.className': 16 },
     reflowAllow: {},
   },
-  // The Graveyard Shift state: one facet-routed body class, nothing else.
-  { file: 'hud/vehicle/morthen_shift_controller.ts', allow: {}, reflowAllow: {} },
+  // The Graveyard Shift state: the fade veil's class and aria-hidden are stamped
+  // once at construction; every update write (body class, veil opacity, the
+  // player frame name) goes through the shared facet.
+  {
+    file: 'hud/vehicle/morthen_shift_controller.ts',
+    allow: { '.className': 1, '.setAttribute': 1 },
+    reflowAllow: {},
+  },
   // Both writes are build-time. The .className is the base class stamped on a tick
   // as it is MINTED into the pool (the pool only grows to the high-water tick
   // count), and the .setAttribute is the one aria-hidden on the ring root in

@@ -10,6 +10,10 @@ import {
 } from '../src/sim/graveyard_shift/hostility';
 import { morthenIdentityAura } from '../src/sim/graveyard_shift/morthen_identity';
 import { GRAVEYARD_SHIFT_PARTY } from '../src/sim/graveyard_shift/run_party';
+import {
+  isGraveyardShiftStaffExit,
+  LOSS_OUTRO_TICKS,
+} from '../src/sim/graveyard_shift/shift_end_marks';
 import { instanceClaimHolds } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
@@ -45,6 +49,13 @@ function lethal(sim: Sim, source: Entity | null, target: Entity) {
 
 function logs(events: { type: string; text?: string }[]): string[] {
   return events.flatMap((ev) => (ev.type === 'log' && ev.text ? [ev.text] : []));
+}
+
+function walkInto(sim: Sim, target: Entity) {
+  const p = sim.player;
+  p.pos = sim.ctx.groundPos(target.pos.x, target.pos.z);
+  p.prevPos = { ...p.pos };
+  (sim as any).rebucket(p);
 }
 
 function bare(id: number, auras: Entity['auras']): Entity {
@@ -131,7 +142,7 @@ describe('Graveyard Shift adventurers', () => {
     expect(tally()).toEqual(before);
   });
 
-  it('killing every adventurer twice wins: the party is cleared and the owner walks out', () => {
+  it('killing every adventurer twice wins: the Staff Exit opens and the owner walks out', () => {
     const sim = shiftSim();
     const run = start(sim);
     const pids = run.bots.map((b) => b.pid);
@@ -143,6 +154,13 @@ describe('Graveyard Shift adventurers', () => {
     sim.tick();
     for (const pid of pids) expect(sim.entities.get(pid)!.dead).toBe(false);
     for (const pid of pids) lethal(sim, sim.player, sim.entities.get(pid)!);
+    // The second wipe opens the Staff Exit rather than sending anyone home.
+    expect(logs(sim.tick())).not.toContain('[dev] Graveyard Shift ended (won).');
+    expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).toBe(run);
+    expect(run.outro?.kind).toBe('won');
+    const exit = sim.entities.get(run.outro!.portalId!)!;
+    expect(isGraveyardShiftStaffExit(exit)).toBe(true);
+    walkInto(sim, exit);
     const events = sim.tick();
     expect(logs(events)).toContain('[dev] Graveyard Shift ended (won).');
     expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).toBeNull();
@@ -155,16 +173,21 @@ describe('Graveyard Shift adventurers', () => {
 
   it('a lethal blow from any source clamps to 1 hp, never kills, and loses the run', () => {
     const sim = shiftSim();
-    start(sim);
+    const run = start(sim);
     const deaths = meta(sim).counters.deaths;
     lethal(sim, null, sim.player);
     expect(sim.player.dead).toBe(false);
     expect(sim.player.hp).toBe(1);
     lethal(sim, null, sim.player);
     expect(sim.player.hp).toBe(1);
+    // The defeat plays out in the Crypt first.
     const events = sim.tick();
+    expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).toBe(run);
+    expect(run.outro?.kind).toBe('lost');
+    for (let i = 0; i < LOSS_OUTRO_TICKS; i++) events.push(...sim.tick());
     expect(events.some((ev) => ev.type === 'playerDeath')).toBe(false);
     expect(logs(events)).toContain('[dev] Graveyard Shift ended (lost).');
+    expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).toBeNull();
     expect(sim.player.dead).toBe(false);
     expect(meta(sim).counters.deaths).toBe(deaths);
     const p = sim.player;
@@ -176,10 +199,14 @@ describe('Graveyard Shift adventurers', () => {
     const run = start(sim);
     for (const bot of run.bots) lethal(sim, sim.player, sim.entities.get(bot.pid)!);
     lethal(sim, null, sim.player);
-    expect(logs(sim.tick())).toContain('[dev] Graveyard Shift ended (lost).');
+    const events = sim.tick();
+    expect(run.outro?.kind).toBe('lost');
+    for (let i = 0; i < LOSS_OUTRO_TICKS; i++) events.push(...sim.tick());
+    expect(logs(events)).toContain('[dev] Graveyard Shift ended (lost).');
+    expect(logs(events)).not.toContain('[dev] Graveyard Shift ended (won).');
   });
 
-  it('an adventurer that leaves the chamber leaves the run; the last one leaving ends it', () => {
+  it('an adventurer that leaves the chamber leaves the run; the last one leaving wins it', () => {
     const sim = shiftSim();
     const run = start(sim);
     const [first, ...rest] = run.bots.map((b) => b.pid);
@@ -188,7 +215,11 @@ describe('Graveyard Shift adventurers', () => {
     expect(run.bots.map((b) => b.pid)).toEqual(rest);
     expect(sim.ctx.players.has(first)).toBe(false);
     for (const pid of rest) sim.entities.get(pid)!.pos = sim.ctx.groundPos(30, 30);
-    expect(logs(sim.tick())).toContain('[dev] Graveyard Shift ended (won).');
+    // Nobody left to fight: the Staff Exit opens.
+    expect(logs(sim.tick())).not.toContain('[dev] Graveyard Shift ended (won).');
+    expect(run.bots).toEqual([]);
+    expect(run.outro?.kind).toBe('won');
+    expect(isGraveyardShiftStaffExit(sim.entities.get(run.outro!.portalId!))).toBe(true);
   });
 
   it('a shift nobody finishes ends on the timeout', () => {

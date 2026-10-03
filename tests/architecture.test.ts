@@ -250,6 +250,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/vehicle/cannon_tactics_view.ts',
   // The Graveyard Shift hint line, and the kit's display text and borrowed icons.
   'src/ui/hud/vehicle/morthen_hint_view.ts',
+  'src/ui/hud/vehicle/morthen_fade_view.ts',
   'src/ui/hud/action_bar/action_bar_override_core.ts',
   'src/ui/graveyard_shift_text_core.ts',
   'src/ui/graveyard_shift_icons_core.ts',
