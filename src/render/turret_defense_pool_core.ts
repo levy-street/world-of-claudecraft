@@ -32,6 +32,7 @@ export function turretRigPlan(
       templateId: fireAndFlyRigId(kind.templateId, plan.scenarioId),
     })),
     waves: plan.waves,
+    overlap: plan.overlap,
   };
 }
 
@@ -47,20 +48,27 @@ function templateCountsPerWave(plan: TurretPlanInput): Map<string, number>[] {
 }
 
 /**
- * Rigs per template: the most of it any wave spawns, plus the previous wave's
- * of the same template, its corpses and on an overlapping mission its living
- * tail, still there while the next wave spawns. A living monster finding every
- * rig of its template taken takes a corpse's, else draws its stand-in: the rare
- * tail older than the previous wave, or a corpse lying on past a short wave.
+ * Rigs per template: the most of it any wave spawns, plus the more of two holdovers: the
+ * previous wave's of the same template (its corpses, which give their rigs up to the
+ * living), or on an overlapping mission the living tail older waves carried in, at most
+ * the overlap and at most what earlier waves spawned of it. A tail can skip a wave (a
+ * pack leader that outlives the next wave), so the tail is counted over every earlier
+ * wave, not the previous one alone. A living monster finding every rig of its template
+ * taken takes a corpse's; only a corpse is ever left to its stand-in.
  */
 export function turretRigCapacities(plan: TurretPlanInput): Map<string, number> {
   const perWave = templateCountsPerWave(plan);
+  const overlap = plan.overlap ?? 0;
   const capacities = new Map<string, number>();
+  const spawnedBefore = new Map<string, number>();
   perWave.forEach((counts, w) => {
     for (const [id, count] of counts) {
-      const carried = w > 0 ? (perWave[w - 1].get(id) ?? 0) : 0;
-      capacities.set(id, Math.max(capacities.get(id) ?? 0, count + carried));
+      const corpses = w > 0 ? (perWave[w - 1].get(id) ?? 0) : 0;
+      const tail = Math.min(overlap, spawnedBefore.get(id) ?? 0);
+      const need = count + Math.max(corpses, tail);
+      capacities.set(id, Math.max(capacities.get(id) ?? 0, need));
     }
+    for (const [id, count] of counts) spawnedBefore.set(id, (spawnedBefore.get(id) ?? 0) + count);
   });
   return capacities;
 }
