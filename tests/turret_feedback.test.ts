@@ -40,37 +40,42 @@ describe('the turret feedback ring', () => {
     // of its own), a bomblet of every frag shell a run holds, its resupplies included (each
     // frag lands one a tick),
     // the Shockwave's front and every barrel its cap lets stand blasting on one tick, each then
-    // a launch and a kill per body of its widest wave, every barrel lit once, and per knock a
-    // bowled, launch and kill; a seat's actions between two ticks add a shot and a slam, and
-    // the blast that clears the wave adds its clear and the resupply or the end after it.
+    // a launch and a kill per living body of its widest wave (plus, on an overlapping
+    // mission, the previous waves' living it carries), every barrel lit once, and per knock
+    // a bowled, launch and kill; a seat's actions between two ticks add a shot and a slam,
+    // and the blast that clears the wave adds its clear and the resupply or the end after
+    // it, or on an overlapping mission the resupply, the next wave's start and its kegs.
     const bursts = FIRE_AND_FLY_SCENARIOS.map((scenario) => {
       const plan = resolveTurretPlan(scenario);
-      const widest = Math.max(...plan.waves.map((wave) => wave.spawns.length));
+      const carried = plan.overlap ?? 0;
+      const widest = Math.max(...plan.waves.map((wave) => wave.spawns.length)) + carried;
       const cap = Math.max(
         ...plan.waves.map((wave) => wave.barrels.cap ?? TURRET_EXPLOSIVE_BARREL.cap),
       );
       const front = plan.arsenal.shockwave > 0 ? 1 : 0;
       const frags = turretChargesGiven(plan, plan.resupplyWaves.length).fragmentation;
       const blasts = shells + frags + front + cap;
-      const burst = blasts * (1 + widest * 2) + shells + cap + widest * 3 + 1 + front + 2;
+      const ending = carried > 0 ? 3 : 2;
+      const burst = blasts * (1 + widest * 2) + shells + cap + widest * 3 + 1 + front + ending;
       return [scenario.boardKey, burst] as const;
     });
-    // The Pack's 28-monster waves set the bound beside its seven resupplied frags; the
-    // Veterans' Test's 25-monster finale, The Powder Store's 12 standing kegs and The
-    // Deluge's 24-monster waves come next.
+    // The Powder Store's 63-monster finale through 12 standing kegs sets the bound; The
+    // Pack's 54 beside its seven resupplied frags and The Deluge's 60 come next. Since the
+    // missions' finales grew (lot N2d) the most one tick has recorded in a measured run is
+    // 58 entries, far under any of these.
     expect(Object.fromEntries(bursts)).toEqual({
       introduction: 342,
       standard: 357,
       hard: 750,
-      pack: 950,
-      giants: 213,
-      deluge: 721,
-      brittle: 402,
-      powder: 726,
+      pack: 1908,
+      giants: 781,
+      deluge: 1853,
+      brittle: 1267,
+      powder: 2877,
     });
     const burst = Math.max(...bursts.map(([, n]) => n));
     expect(TURRET_FEEDBACK_LIMIT).toBeGreaterThanOrEqual(burst);
-    expect(TURRET_FEEDBACK_LIMIT).toBe(950);
+    expect(TURRET_FEEDBACK_LIMIT).toBe(2877);
     const ring: TurretFeedback[] = [];
     recordTurretFeedback(
       ring,

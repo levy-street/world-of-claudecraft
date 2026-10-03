@@ -25,6 +25,7 @@ import {
   turretChargesGiven,
   turretChargesLeft,
   turretMedalBarsValid,
+  turretOverlapValid,
   turretResupplyWavesValid,
   turretScenarioIdValid,
 } from '../sim/minigames/turret_defense_plan';
@@ -57,8 +58,9 @@ export type TurretSeatState = Omit<TurretSessionView, 'feedback'>;
 
 // Bounds on a forged payload, far above the content (a mission wave spawns a few dozen
 // monsters, a keg cap is at most the plan's barrel limit, at most 2 shells fly at once).
-// The plan's are the resolver's own limits, so every plan the server resolves decodes.
-const MAX_MONSTERS = 256;
+// The plan's are the resolver's own limits, so every plan the server resolves decodes; the
+// field holds the widest wave, its predecessor's corpses and an overlapping mission's tail.
+const MAX_MONSTERS = 2 * TURRET_PLAN_LIMITS.spawnsPerWave + TURRET_PLAN_LIMITS.overlap;
 const MAX_SHOTS = 32;
 const MAX_BARRELS = 64;
 const MAX_HITS = 256;
@@ -493,6 +495,7 @@ const plan = shape<TurretPlan>({
     flyerKeep: num,
     lyingHeight: num,
   }),
+  overlap: optional(within(1, LIMITS.overlap)),
 });
 
 /**
@@ -516,6 +519,7 @@ export function decodeTurretPlan(value: unknown): TurretPlan | null {
   if (decoded === BAD || decoded.waves.length === 0) return null;
   if (!turretMedalBarsValid(decoded.medals, decoded.integrity)) return null;
   if (!turretResupplyWavesValid(decoded.resupplyWaves, decoded.waves.length)) return null;
+  if (!turretOverlapValid(decoded.overlap, decoded.waves)) return null;
   const kinds = decoded.kinds.length;
   for (const wave of decoded.waves) if (wave.spawns.some((kind) => kind >= kinds)) return null;
   return deepFreeze(decoded);

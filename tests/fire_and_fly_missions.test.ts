@@ -110,14 +110,26 @@ describe('the mission table', () => {
     },
   );
 
+  it('runs every mission on one eight-wave curve, overlapping, its last two waves the largest', () => {
+    for (const mission of TURRET_MISSIONS) {
+      const spawns = spawnsOf(mission);
+      expect(spawns).toHaveLength(8);
+      expect([2, 3]).toContain(mission.overlap);
+      const last = Math.min(spawns[6], spawns[7]);
+      for (const n of spawns.slice(0, 6)) expect(n).toBeLessThan(last);
+      expect(spawns[7]).toBeGreaterThanOrEqual(spawns[6]);
+      expect(spawns[0]).toBeLessThanOrEqual(Math.min(...spawns.slice(1)));
+    }
+  });
+
   it('sends The Pack in tight packs of twelve or more, each setting off at once from a narrow side', () => {
     for (const wave of TURRET_MISSION_PACK.waves) {
       const arrival = wave.arrival;
       expect(['burst', 'flanks']).toContain(arrival?.kind);
       if (arrival?.kind === 'burst') expect(arrival.groupSize).toBeGreaterThanOrEqual(12);
       if (arrival?.kind === 'flanks') {
-        expect(arrival.count).toBe(2);
-        expect(wave.entries.reduce((n, e) => n + e.count, 0) / 2).toBeGreaterThanOrEqual(12);
+        const total = wave.entries.reduce((n, e) => n + e.count, 0);
+        expect(total / arrival.count).toBeGreaterThanOrEqual(12);
       }
       if (arrival?.kind === 'burst' || arrival?.kind === 'flanks')
         expect(arrival.widthTurn).toBeLessThanOrEqual(0.05);
@@ -128,18 +140,24 @@ describe('the mission table', () => {
     );
   });
 
-  it('sends two packs of fourteen a few seconds apart, then two packs at once from opposite sides, never slower wave on wave', () => {
+  it('sends one pack, then two apart, then two and three at once, never slower wave on wave', () => {
     const waves = TURRET_MISSION_PACK.waves;
-    for (const wave of waves.slice(0, 3)) {
+    expect(waves[0].arrival).toMatchObject({ kind: 'burst', groupSize: 14 });
+    expect(spawnsOf(TURRET_MISSION_PACK)[0]).toBe(14);
+    for (const wave of waves.slice(1, 3)) {
       expect(wave.arrival).toMatchObject({ kind: 'burst', groupSize: 14 });
       if (wave.arrival?.kind !== 'burst') continue;
       expect(wave.arrival.groupGapTicks).toBeGreaterThanOrEqual(40);
       expect(wave.entries.reduce((n, e) => n + e.count, 0)).toBe(28);
     }
-    for (const wave of waves.slice(3)) {
-      expect(wave.arrival).toMatchObject({ kind: 'flanks', count: 2 });
-      expect(wave.entries.reduce((n, e) => n + e.count, 0)).toBe(24);
-    }
+    expect(waves.slice(3).map((w) => w.arrival)).toEqual([
+      { kind: 'flanks', count: 2, widthTurn: 0.03 },
+      { kind: 'flanks', count: 2, widthTurn: 0.03 },
+      { kind: 'flanks', count: 3, widthTurn: 0.03 },
+      { kind: 'flanks', count: 3, widthTurn: 0.03 },
+      { kind: 'flanks', count: 3, widthTurn: 0.03 },
+    ]);
+    expect(spawnsOf(TURRET_MISSION_PACK).slice(6)).toEqual([48, 54]);
     const fastest = waves.map((w) => Math.max(...w.entries.map((e) => e.speedScale ?? 1)));
     for (const speed of fastest) expect(speed).toBeGreaterThan(2);
     for (let i = 1; i < fastest.length; i++)
@@ -149,20 +167,29 @@ describe('the mission table', () => {
       for (const entry of wave.entries) expect(entry.hpScale).toBeUndefined();
   });
 
-  it('makes Heavy Tread few, large or huge, slower and tougher than their templates', () => {
+  it('makes Heavy Tread large or huge and tough, slow through the climb, then colossi from everywhere', () => {
     const plan = resolveTurretPlan(TURRET_MISSION_GIANTS);
-    for (const kind of plan.kinds) {
-      expect(['large', 'huge']).toContain(kind.sizeClass);
-      expect(kind.marchSpeed).toBeLessThan(
-        MOBS[kind.templateId].moveSpeed * TURRET_TIMING.marchFactor,
-      );
-    }
+    for (const kind of plan.kinds) expect(['large', 'huge']).toContain(kind.sizeClass);
     for (const wave of TURRET_MISSION_GIANTS.waves)
       for (const entry of wave.entries) expect(entry.hpScale).toBeGreaterThan(1);
-    expect(spawnsOf(TURRET_MISSION_GIANTS).reduce((a, b) => a + b)).toBeLessThan(40);
+    for (const wave of TURRET_MISSION_GIANTS.waves.slice(0, 5))
+      for (const entry of wave.entries) expect(entry.speedScale).toBeLessThan(1);
+    const colossi = TURRET_MISSION_GIANTS.waves.slice(5);
+    let pace = 1;
+    for (const wave of colossi) {
+      expect(wave.arrival).toBeUndefined();
+      for (const entry of wave.entries) {
+        expect(['frostmane_yeti', 'idol_guardian']).toContain(entry.templateId);
+        expect(entry.speedScale).toBeGreaterThan(1);
+      }
+      const fastest = Math.max(...wave.entries.map((e) => e.speedScale ?? 1));
+      expect(fastest).toBeGreaterThan(pace);
+      pace = fastest;
+    }
+    expect(spawnsOf(TURRET_MISSION_GIANTS).slice(5)).toEqual([12, 18, 26]);
   });
 
-  it('makes The Deluge dozens of small monsters, all faster than their templates', () => {
+  it('makes The Deluge dozens of small monsters from everywhere, every wave bigger and quicker', () => {
     const plan = resolveTurretPlan(TURRET_MISSION_DELUGE);
     for (const kind of plan.kinds) {
       expect(kind.sizeClass).toBe('small');
@@ -170,8 +197,18 @@ describe('the mission table', () => {
         MOBS[kind.templateId].moveSpeed * TURRET_TIMING.marchFactor,
       );
     }
-    expect(Math.min(...spawnsOf(TURRET_MISSION_DELUGE))).toBeGreaterThanOrEqual(14);
-    expect(spawnsOf(TURRET_MISSION_DELUGE).reduce((a, b) => a + b)).toBeGreaterThanOrEqual(100);
+    const spawns = spawnsOf(TURRET_MISSION_DELUGE);
+    expect(Math.min(...spawns)).toBeGreaterThanOrEqual(14);
+    expect(spawns.reduce((a, b) => a + b)).toBeGreaterThanOrEqual(100);
+    const waves = TURRET_MISSION_DELUGE.waves;
+    for (let i = 1; i < waves.length; i++) {
+      expect(spawns[i]).toBeGreaterThan(spawns[i - 1]);
+      expect(waves[i].entries[0].speedScale ?? 1).toBeGreaterThan(
+        waves[i - 1].entries[0].speedScale ?? 1,
+      );
+      expect(waves[i].gapMaxTicks).toBeLessThanOrEqual(waves[i - 1].gapMaxTicks);
+    }
+    for (const wave of waves) expect(wave.arrival).toBeUndefined();
   });
 
   it('gives The Cracked Tower 10 tower points and no large or huge monster', () => {
@@ -185,20 +222,23 @@ describe('the mission table', () => {
     });
   });
 
-  it("puts twice Standard's kegs on The Powder Store's lanes, sided waves, a cap of 12", () => {
+  it("puts twice the kegs on The Powder Store's lanes, sided waves, a cap of 12 the finale fills", () => {
     const plan = resolveTurretPlan(TURRET_MISSION_POWDER);
-    const standard = resolveTurretPlan(TURRET_SCENARIO_STANDARD);
     plan.waves.forEach((wave, i) => {
       expect(wave.barrels).toEqual({
-        ...standard.waves[i].barrels,
-        count: standard.waves[i].barrels.count * 2,
+        ...TURRET_MISSION_POWDER.waves[i].barrels,
+        count: TURRET_MISSION_POWDER.waves[i].barrels.count * 2,
         placement: 'lanes',
         cap: 12,
       });
       expect(wave.arrival.kind).not.toBe('ring');
-      expect(wave.spawns).toEqual(standard.waves[i].spawns.length ? wave.spawns : []);
     });
-    expect(plan.kinds).toEqual(standard.kinds);
+    expect(plan.waves.slice(6).map((w) => w.barrels.count)).toEqual([12, 12]);
+    expect(plan.waves.slice(5).map((w) => w.arrival)).toEqual([
+      { kind: 'flanks', count: 3, widthTurn: 0.06 },
+      { kind: 'flanks', count: 3, widthTurn: 0.06 },
+      { kind: 'flanks', count: 3, widthTurn: 0.06 },
+    ]);
   });
 
   it('names the largest keg cap of every resolved plan, above the default one', () => {

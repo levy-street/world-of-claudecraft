@@ -17,7 +17,8 @@
 // fifth of its runs bare and over half with it, nearly all the gold lost in the last
 // wave; the 0.8 s aimers never gold, and the 1 s aimer wins with silver or bronze,
 // losing about one run in ten bare and none with that policy. The armed figures hold
-// for those policies only.
+// for those policies only. The pause between waves went from 5 s to 2 s (lot N2d)
+// without moving any of them past the noise of 24 seeds.
 
 import { DT, type TurretScenarioDef } from '../types';
 import { TURRET_MISSIONS } from './fire_and_fly_missions';

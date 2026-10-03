@@ -438,6 +438,7 @@ describe('spawn lanes', () => {
       const seen = new Set<number>();
       for (let t = START + 1; t <= INTRO_END + 20 * 20; t++) {
         tickTurretDefense(state, t, flat);
+        if (state.wave > 0) break;
         for (const m of state.monsters) {
           if (seen.has(m.id) || m.seg.kind !== 'march') continue;
           seen.add(m.id);
@@ -907,9 +908,11 @@ describe('full runs with barrels', () => {
   // Digests of Standard runs with barrels and bowling on, taken on the engine before
   // arrival sectors: every spawn of these runs has barrels standing, so each bearing
   // goes through the lane walk the sectors rewrote, and Standard must replay it exactly.
+  // Re-taken for the 2 s pause between waves (the 5 s one replayed the old digests
+  // bf47cb63 and 3736426a on the overlap engine).
   it.each([
-    [42, 'flat', flat, 1140, 'bf47cb63'],
-    [21, 'hills', hills, 1134, '3736426a'],
+    [42, 'flat', flat, 1140, '396030bf'],
+    [21, 'hills', hills, 1134, '92b30c4e'],
   ] as const)(
     'replays the spawn bearings beside the barrels of a seed %i %s run exactly',
     (seed, _n, probe, count, digest) => {

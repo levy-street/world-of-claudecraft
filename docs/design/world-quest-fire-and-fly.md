@@ -97,6 +97,21 @@ are the game's own monsters, living only inside this mini-game.
   in-run draw is a stateless private one (`turretDraw` in
   `src/sim/minigames/turret_defense_rng.ts`, the camp private rng pattern), keyed
   by stream and site.
+- **Waves and the pause.** A wave ends once every monster of it has spawned and
+  none lives, then a 2 s pause (`TURRET_TIMING.betweenTicks`) before the next. A
+  mission's plan carries an overlap (`overlap` on the scenario, 2 or 3; absent on
+  the trials): once a wave has spawned every monster and that many or fewer still
+  live on the field (any wave's), the next wave sets off on that tick, with no
+  clear and no pause, and the wave's resupply comes with it. The last wave never
+  overlaps: the run is won once every monster is down. Every wave but the last
+  must spawn more monsters than the overlap, or it would launch the next on its own
+  last spawn (the resolver and the plan decoder refuse it). The wave banner of an
+  overlapping launch carries the resupply line, except the final wave's, which keeps
+  its "Final wave" line (no mission resupplies after its second-to-last wave); the
+  cleared banner shows only for a wave cleared outright. Pinned by
+  `tests/turret_wave_overlap.test.ts` and `tests/turret_scenarios.test.ts`; the
+  online mirror and its decoder bounds by `tests/turret_session_wire.test.ts` and
+  `tests/turret_online_round_trip.test.ts`.
 - **Feedback.** Engine events land in a sequence-numbered ring on the seat
   (`src/sim/minigames/turret_feedback.ts`, `TURRET_FEEDBACK_LIMIT`) and in an
   owner-scoped `turretDefense` SimEvent; the HUD, renderer and sound read new
@@ -355,8 +370,8 @@ charge has no socket, no key and no banner mention.
 | Recruit's Trial | 0 | 0 | the cannon and the kegs only |
 | Standing Watch | 4 | 0 | brings in the Shockwave |
 | Veterans' Test | 2 | 4 | brings in the fragmentation shell, beside fewer Shockwaves |
-| The Pack | 0 | 5 | packs of twelve to fourteen, two at once at the end: a fragmentation shell into a pack at the foot |
-| Heavy Tread | 4 | 1 | giants reaching the tower together |
+| The Pack | 0 | 5 | packs of twelve to eighteen, three at once at the end: a fragmentation shell into a pack at the foot |
+| Heavy Tread | 4 | 1 | giants reaching the tower together, then colossi from everywhere |
 | The Deluge | 3 | 2 | swarms from everywhere |
 | The Cracked Tower | 3 | 1 | 10 tower points: no strike may land |
 | The Powder Store | 1 | 3 | keg lanes and groups |
@@ -369,7 +384,8 @@ the resupplies less the charges spent (`turretChargesGiven`, `turretChargesLeft`
 `src/sim/minigames/turret_charges.ts`), the same count on the server, in the online
 mirror (the `tut` stats key, bounded by the decoder against the plan's resupply waves)
 and in the own-shot ledger's click-time charges. A `resupply` feedback entry puts
-"Resupply: +1 ..." under the cleared wave's banner. Pinned by
+"Resupply: +1 ..." under the cleared wave's banner, or under the next wave's when a
+mission's waves overlap (but not under the final wave's). Pinned by
 `tests/turret_defense_engine.test.ts`, `tests/turret_session_wire.test.ts`,
 `tests/turret_online_round_trip.test.ts` and `tests/turret_own_shot_core.test.ts`.
 
@@ -380,19 +396,38 @@ Standing Watch, Heavy Tread, The Deluge, The Cracked Tower and The Powder Store 
 the aimers firing 0.8 s after each reload, and for the 1 s aimer in Standing Watch,
 Heavy Tread, The Cracked Tower and The Powder Store, not in The Deluge.
 
-The Veterans' Test and The Pack are set against the quickest aimer (0.4 s after each
-reload) with a sharper policy, the best scripted stand-in for a good player: a
+The Veterans' Test and the missions are set against the quickest aimer (0.4 s after
+each reload) with a sharper policy, the best scripted stand-in for a good player: a
 Shockwave once 3 windups are seen, a frag on the pack about to strike once several
 packs close in at once. That aimer golds the Veterans' Test about a fifth of its runs
 bare and over half with the weapons, nearly all the gold lost in the last wave, where
 the giants arrive with a charge of armoured dead from three sides; slower aimers
 never gold it, and the 1 s aimer wins with silver or bronze, losing about one run in
-ten bare. It golds The Pack about three runs in ten bare and about half with its
-frags (a frag strikes about 10 monsters on average with the plain policy); nobody
-slower golds it, and the 1 s aimer mostly wins with bronze. Both towers take 150
-points so a mauled run stays winnable, the gold bars still letting 3 and 1 points go.
-The clean aimer still golds every trial and mission (`tests/turret_scenarios.test.ts`,
-`tests/fire_and_fly_missions.test.ts`).
+ten bare.
+
+### The missions
+
+Every mission runs eight waves on one curve: a warm-up, a fast climb, then the last
+two or three waves pushing its idea to the extreme, overlapping as above (lot N2d).
+Against the good-player stand-in (96 seeds, and 96 held-out seeds as a check) each
+golds about a third of its runs with its weapons and about half as often without,
+the gold lost almost only in the last two waves; it loses The Pack and The Cracked
+Tower about one run in ten and the other three about never. Players firing 0.8 s
+after each reload lose most runs of The Pack and The Cracked Tower, about half of
+Heavy Tread's and a third to a half of The Powder Store's with the weapons, and at
+1 s only The Deluge stays winnable, with the weapons.
+
+| Mission | Tower, gold bar | Overlap | The last waves |
+|---|---|---|---|
+| The Pack | 80, keep 80 percent | 3 | three packs of sixteen, then of eighteen, at once from three sides at four times their pace, Old Greyjaws among the last |
+| Heavy Tread | 100, keep 99 percent | 2 | yetis from everywhere, 12 then 18 then 20 with 6 guardians, two to three times their pace |
+| The Deluge | 100, keep 94 percent | 3 | 48 then 60 small monsters from everywhere at three and a half and four times their pace |
+| The Cracked Tower | 10, untouched | 2 | 32 then 44 armoured dead from everywhere at two and a half times their pace |
+| The Powder Store | 100, keep 99 percent | 3 | 48 then 63 monsters from three sides charging down twelve kegs a wave, giants among the last |
+
+The Pack's finale is built to break through, so its gold keeps four fifths of an
+80-point tower rather than all of it. The clean aimer still golds every trial and
+mission (`tests/turret_scenarios.test.ts`, `tests/fire_and_fly_missions.test.ts`).
 
 - **Shockwave** (`src/sim/minigames/turret_shockwave.ts`, tuning
   `TURRET_SHOCKWAVE` in `src/sim/content/turret_defense.ts`). The tower slams and a

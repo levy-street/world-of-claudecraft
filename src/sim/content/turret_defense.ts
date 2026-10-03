@@ -243,7 +243,7 @@ export const TURRET_ARENA = {
 
 export const TURRET_TIMING = {
   introTicks: ticks(3),
-  betweenTicks: ticks(5),
+  betweenTicks: ticks(2),
   /** March speed = template moveSpeed x marchFactor. */
   marchFactor: 0.55,
   windupTicks: ticks(1.5),

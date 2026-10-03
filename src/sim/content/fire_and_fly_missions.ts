@@ -2,19 +2,23 @@
 // day (fire_and_fly_recruitment.ts unlocks them), each built around one idea and
 // carrying the weapon that idea asks for. Every number here is a first value:
 // mini-game tuning, not classic-era formulas. A tuning change after boards open mints
-// a new board version. Measured with the scripted aimers of the scenarios file (12
-// seeds each, The Pack 24 and 96): the clean aimer golds every mission bare; with the
-// weapons, the 0.8 s aimer's gold rate rises on The Cracked Tower and The Powder Store
-// (by about half its runs), Heavy Tread and The Deluge (a quarter to a third), and the
-// 1 s aimer's from none or one to most runs on Heavy Tread and The Cracked Tower, while
-// it gains nothing on The Deluge. The Pack is measured against the good-player policy
-// of the scenarios file: the 0.4 s aimer golds about three runs in ten bare and about
-// half with its frags, nobody slower golds, and the 1 s aimer mostly wins with bronze.
+// a new board version. Each runs eight waves on one curve: a warm-up, a fast climb,
+// then the last two or three waves pushing its idea to the extreme, and its next wave
+// sets off while the last two or three monsters of the current one still stand. They
+// are tuned against the good-player policy of the scenarios file at a 0.4 s pace (96
+// seeds): it golds about a third of its runs on each, losing that gold almost only in
+// the last two waves, and it loses The Pack and The Cracked Tower about one run in ten;
+// without the weapons it golds about half as often. Players firing 0.8 s after each
+// reload lose most runs of The Pack and The Cracked Tower, about half of Heavy Tread's
+// and a third to a half of The Powder Store's with the weapons; at 1 s only The Deluge
+// stays winnable, with the weapons.
 
 import { DT, type TurretScenarioDef } from '../types';
 import { TURRET_BARREL_RING } from './turret_defense';
 
 const ticks = (seconds: number): number => Math.round(seconds / DT);
+const gap = (min: number, max: number) =>
+  ({ gapMinTicks: ticks(min), gapMaxTicks: ticks(max) }) as const;
 
 /**
  * Every mission is resupplied as its third and fifth waves end, and a won one scores the
@@ -23,104 +27,127 @@ const ticks = (seconds: number): number => Math.round(seconds / DT);
 const MISSION_SUPPLY = { resupplyAfterWaves: [3, 5], unusedChargeBonus: true } as const;
 const KEGS = (count: number) => ({ count, ...TURRET_BARREL_RING });
 
-/** A pack's members walk nearly in each other's steps. */
-const PACK_GAP = { gapMinTicks: ticks(0.15), gapMaxTicks: ticks(0.25) } as const;
 /** The Pack's packs set off at once: their members a tick or two apart. */
 const HUNT_GAP = { gapMinTicks: 1, gapMaxTicks: 2 } as const;
 const packs = (groupSize: number, gapSeconds: number) =>
   ({ kind: 'burst', groupSize, groupGapTicks: ticks(gapSeconds), widthTurn: 0.03 }) as const;
-/** Two packs at once, from opposite sides of the tower. */
-const TWO_AT_ONCE = { kind: 'flanks', count: 2, widthTurn: 0.03 } as const;
+/** Packs at once, from evenly spaced sides of the tower. */
+const AT_ONCE = (count: 2 | 3) => ({ kind: 'flanks', count, widthTurn: 0.03 }) as const;
 
 /**
  * Many monsters, always in tight packs of a dozen or more, far quicker than their
- * templates. The first three waves send two packs of fourteen a few seconds apart, each
- * from its own side; the last three send two packs of twelve at once from opposite sides,
- * each a notch faster and tougher than the last, beasts with an alpha or two among them.
- * A shell throws a pack and the throws scatter it; a frag on a pack at the foot of the
- * tower strikes most of it. The tower takes 150 points, gold still letting one go, so a
- * run the packs maul stays winnable.
+ * templates. One pack, then two a few seconds apart, then two and three at once from
+ * evenly spaced sides, each wave faster and tougher, beasts with an alpha or two among
+ * them, until three packs of sixteen and of eighteen close on the tower together, with
+ * two and three Old Greyjaws among the last. A frag on a pack at the tower's foot strikes
+ * most of it. The finale is meant to break through: gold keeps four fifths of an
+ * 80-point tower.
  */
 export const TURRET_MISSION_PACK: TurretScenarioDef = {
   id: 'fire_and_fly_pack',
   boardKey: 'pack',
-  integrity: 150,
-  medals: { gold: { minIntegrityShare: 0.99 }, silver: { minIntegrityShare: 0.6 } },
+  integrity: 80,
+  medals: { gold: { minIntegrityShare: 0.8 }, silver: { minIntegrityShare: 0.4 } },
   arsenal: { fragmentation: 5 },
   supply: MISSION_SUPPLY,
+  overlap: 3,
   waves: [
     {
-      entries: [{ templateId: 'forest_wolf', count: 28, level: 2, speedScale: 2.4 }],
+      entries: [{ templateId: 'forest_wolf', count: 14, level: 2, speedScale: 2.4 }],
       coreDamage: 45,
       ...HUNT_GAP,
       barrels: KEGS(3),
-      arrival: packs(14, 4),
+      arrival: packs(14, 0),
     },
     {
       entries: [
         { templateId: 'forest_wolf', count: 14, level: 2, speedScale: 2.4 },
         { templateId: 'wild_boar', count: 14, level: 3, speedScale: 2.4 },
       ],
-      coreDamage: 44,
+      coreDamage: 52,
       ...HUNT_GAP,
       barrels: KEGS(3),
-      arrival: packs(14, 3),
+      arrival: packs(14, 4),
     },
     {
       entries: [
         { templateId: 'webwood_spider', count: 11, level: 4, speedScale: 2.6 },
         { templateId: 'vale_bandit', count: 17, level: 5, speedScale: 2.6 },
       ],
-      coreDamage: 62,
+      coreDamage: 71,
       ...HUNT_GAP,
       barrels: KEGS(4),
-      arrival: packs(14, 3),
+      arrival: packs(14, 2),
     },
     {
       entries: [
-        { templateId: 'tunnel_rat', count: 14, level: 6, speedScale: 3.2 },
-        { templateId: 'vale_bandit', count: 7, level: 5, speedScale: 3.2 },
-        { templateId: 'fen_troll', count: 3, level: 11, speedScale: 2.85 },
+        { templateId: 'tunnel_rat', count: 14, level: 6, speedScale: 3 },
+        { templateId: 'vale_bandit', count: 8, level: 5, speedScale: 3 },
+        { templateId: 'fen_troll', count: 2, level: 12, speedScale: 2.65 },
       ],
-      coreDamage: 48,
+      coreDamage: 89,
       ...HUNT_GAP,
       barrels: KEGS(4),
-      arrival: TWO_AT_ONCE,
+      arrival: AT_ONCE(2),
     },
     {
       entries: [
+        { templateId: 'deeprock_kobold', count: 12, level: 15, speedScale: 3.2 },
+        { templateId: 'boneclad_revenant', count: 10, level: 19, speedScale: 3.2 },
+        { templateId: 'thornpeak_ogre', count: 2, level: 16, speedScale: 2.85 },
+      ],
+      coreDamage: 261,
+      ...HUNT_GAP,
+      barrels: KEGS(5),
+      arrival: AT_ONCE(2),
+    },
+    {
+      entries: [
+        { templateId: 'boneclad_revenant', count: 21, level: 19, speedScale: 3.4 },
         { templateId: 'deeprock_kobold', count: 12, level: 15, speedScale: 3.4 },
-        { templateId: 'boneclad_revenant', count: 10, level: 19, speedScale: 3.4 },
-        { templateId: 'thornpeak_ogre', count: 2, level: 16, speedScale: 3.05 },
+        { templateId: 'frostmane_yeti', count: 3, level: 20, speedScale: 3.05 },
       ],
-      coreDamage: 149,
+      coreDamage: 245,
       ...HUNT_GAP,
       barrels: KEGS(5),
-      arrival: TWO_AT_ONCE,
+      arrival: AT_ONCE(3),
     },
     {
       entries: [
-        { templateId: 'boneclad_revenant', count: 14, level: 19, speedScale: 3.6 },
-        { templateId: 'deeprock_kobold', count: 7, level: 15, speedScale: 3.6 },
-        { templateId: 'frostmane_yeti', count: 3, level: 20, speedScale: 3.25 },
+        { templateId: 'tunnel_rat', count: 23, level: 6, speedScale: 4 },
+        { templateId: 'vale_bandit', count: 22, level: 5, speedScale: 4 },
+        { templateId: 'thornpeak_ogre', count: 3, level: 16, speedScale: 3.65 },
       ],
-      coreDamage: 148,
+      coreDamage: 47,
       ...HUNT_GAP,
       barrels: KEGS(5),
-      arrival: TWO_AT_ONCE,
+      arrival: AT_ONCE(3),
+    },
+    {
+      entries: [
+        { templateId: 'boneclad_revenant', count: 29, level: 19, speedScale: 4.4 },
+        { templateId: 'deeprock_kobold', count: 19, level: 15, speedScale: 4.4 },
+        { templateId: 'frostmane_yeti', count: 6, level: 20, speedScale: 4.05 },
+      ],
+      coreDamage: 145,
+      ...HUNT_GAP,
+      barrels: KEGS(5),
+      arrival: AT_ONCE(3),
     },
   ],
 };
 
-const GIANT_GAP = { gapMinTicks: ticks(1), gapMaxTicks: ticks(1.8) } as const;
-const SLOW = 0.9;
+/** Heavy Tread's walkers: slower than their templates, a little tougher. */
+const TREAD = 0.9;
+/** Its colossi: the yetis and the guardians of the last three waves, tougher still. */
+const COLOSSUS_HP = 1.25;
 
 /**
- * Few monsters, every one large or huge, slow and very tough: it takes many shells each,
- * and they come close behind each other, so several reach the tower together and the
- * Shockwave is what throws them back. Toughness was cut by a fifth (floored above each
- * template's own) and the shells hit 15 percent softer, so a run by an aimer firing 1 s
- * after each reload lasts about five minutes.
+ * Only large and huge monsters, every one tougher than its template. They walk in slowly
+ * through the climb, from one side, two flanks or three, so several reach the tower
+ * together and the Shockwave throws them back; then the colossi come from everywhere and
+ * keep coming: a dozen yetis at twice their pace, eighteen quicker still, then twenty with
+ * six guardians all but at once.
  */
 export const TURRET_MISSION_GIANTS: TurretScenarioDef = {
   id: 'fire_and_fly_giants',
@@ -129,151 +156,191 @@ export const TURRET_MISSION_GIANTS: TurretScenarioDef = {
   medals: { gold: { minIntegrityShare: 0.99 }, silver: { minIntegrityShare: 0.6 } },
   arsenal: { shockwave: 4, fragmentation: 1 },
   supply: MISSION_SUPPLY,
+  overlap: 2,
   waves: [
     {
-      entries: [{ templateId: 'fen_troll', count: 4, level: 11, hpScale: 1.05, speedScale: SLOW }],
-      coreDamage: 85,
-      ...GIANT_GAP,
+      entries: [{ templateId: 'fen_troll', count: 3, level: 11, hpScale: 1.05, speedScale: TREAD }],
+      coreDamage: 95,
+      ...gap(1, 1.8),
       barrels: KEGS(3),
       arrival: { kind: 'arc', widthTurn: 0.3 },
     },
     {
-      entries: [
-        { templateId: 'fen_troll', count: 4, level: 12, hpScale: 1.16, speedScale: SLOW },
-        { templateId: 'thornpeak_ogre', count: 2, level: 15, hpScale: 1.16, speedScale: SLOW },
-      ],
-      coreDamage: 94,
-      ...GIANT_GAP,
+      entries: [{ templateId: 'fen_troll', count: 4, level: 12, hpScale: 1.1, speedScale: TREAD }],
+      coreDamage: 100,
+      ...gap(0.8, 1.4),
       barrels: KEGS(3),
       arrival: { kind: 'flanks', count: 2, widthTurn: 0.14 },
     },
     {
       entries: [
-        { templateId: 'thornpeak_ogre', count: 5, level: 16, hpScale: 1.28, speedScale: SLOW },
-        { templateId: 'fen_troll', count: 2, level: 12, hpScale: 1.28, speedScale: SLOW },
+        { templateId: 'thornpeak_ogre', count: 4, level: 16, hpScale: 1.1, speedScale: TREAD },
+        { templateId: 'fen_troll', count: 2, level: 12, hpScale: 1.1, speedScale: TREAD },
       ],
-      coreDamage: 111,
-      ...GIANT_GAP,
+      coreDamage: 120,
+      ...gap(0.6, 1.2),
       barrels: KEGS(4),
       arrival: { kind: 'flanks', count: 3, widthTurn: 0.1 },
     },
     {
       entries: [
-        { templateId: 'thornpeak_ogre', count: 4, level: 16, hpScale: 1.28, speedScale: SLOW },
-        { templateId: 'frostmane_yeti', count: 2, level: 19, hpScale: 1.05, speedScale: SLOW },
+        { templateId: 'thornpeak_ogre', count: 4, level: 16, hpScale: 1.1, speedScale: TREAD },
+        { templateId: 'frostmane_yeti', count: 2, level: 19, hpScale: 1.05, speedScale: TREAD },
       ],
-      coreDamage: 153,
-      ...GIANT_GAP,
+      coreDamage: 160,
+      ...gap(0.5, 1),
       barrels: KEGS(4),
-      arrival: { kind: 'arc', widthTurn: 0.35 },
-    },
-    {
-      entries: [
-        { templateId: 'thornpeak_ogre', count: 4, level: 16, hpScale: 1.4, speedScale: SLOW },
-        { templateId: 'frostmane_yeti', count: 3, level: 20, hpScale: 1.16, speedScale: SLOW },
-      ],
-      coreDamage: 187,
-      ...GIANT_GAP,
-      barrels: KEGS(5),
       arrival: { kind: 'flanks', count: 2, widthTurn: 0.12 },
     },
     {
       entries: [
-        { templateId: 'thornpeak_ogre', count: 3, level: 16, hpScale: 1.6, speedScale: SLOW },
-        { templateId: 'frostmane_yeti', count: 3, level: 20, hpScale: 1.28, speedScale: SLOW },
-        {
-          templateId: 'idol_guardian',
-          count: 1,
-          level: 20,
-          bossLast: true,
-          hpScale: 1.28,
-          speedScale: SLOW,
-        },
+        { templateId: 'thornpeak_ogre', count: 3, level: 16, hpScale: 1.1, speedScale: TREAD },
+        { templateId: 'frostmane_yeti', count: 4, level: 20, hpScale: 1.05, speedScale: TREAD },
       ],
-      coreDamage: 221,
-      ...GIANT_GAP,
+      coreDamage: 200,
+      ...gap(0.3, 0.6),
       barrels: KEGS(5),
       arrival: { kind: 'flanks', count: 3, widthTurn: 0.1 },
+    },
+    {
+      entries: [
+        { templateId: 'frostmane_yeti', count: 12, level: 20, hpScale: COLOSSUS_HP, speedScale: 2 },
+      ],
+      coreDamage: 240,
+      ...gap(0.2, 0.4),
+      barrels: KEGS(5),
+    },
+    {
+      entries: [
+        {
+          templateId: 'frostmane_yeti',
+          count: 18,
+          level: 20,
+          hpScale: COLOSSUS_HP,
+          speedScale: 2.6,
+        },
+      ],
+      coreDamage: 260,
+      ...gap(0.1, 0.2),
+      barrels: KEGS(5),
+    },
+    {
+      entries: [
+        {
+          templateId: 'frostmane_yeti',
+          count: 20,
+          level: 20,
+          hpScale: COLOSSUS_HP,
+          speedScale: 2.9,
+        },
+        { templateId: 'idol_guardian', count: 6, level: 20, hpScale: COLOSSUS_HP, speedScale: 2.6 },
+      ],
+      coreDamage: 280,
+      ...gap(0.05, 0.1),
+      barrels: KEGS(5),
     },
   ],
 };
 
-const SWARM_GAP = { gapMinTicks: ticks(0.3), gapMaxTicks: ticks(0.6) } as const;
-const FAST = 1.6;
 const FRAIL = 0.8;
 
 /**
- * Dozens of small, fast monsters from everywhere. Consecutive waves change templates,
- * so a template's rigs never have to cover two full waves at once.
+ * Dozens of small, fast monsters from everywhere, never the same template two waves
+ * running so its rigs never cover two full waves at once. Each wave is bigger, quicker and
+ * closer-spaced than the last, the shells a little softer, until the last two pour in
+ * forty-eight and sixty at three and four times their templates' pace: an unbroken swarm.
  */
 export const TURRET_MISSION_DELUGE: TurretScenarioDef = {
   id: 'fire_and_fly_deluge',
   boardKey: 'deluge',
   integrity: 100,
-  medals: { gold: { minIntegrityShare: 0.9 }, silver: { minIntegrityShare: 0.5 } },
+  medals: { gold: { minIntegrityShare: 0.94 }, silver: { minIntegrityShare: 0.5 } },
   arsenal: { shockwave: 3, fragmentation: 2 },
   supply: MISSION_SUPPLY,
+  overlap: 3,
   waves: [
     {
-      entries: [{ templateId: 'forest_wolf', count: 14, level: 2, speedScale: FAST }],
+      entries: [{ templateId: 'forest_wolf', count: 16, level: 2, speedScale: 1.6 }],
       coreDamage: 60,
-      ...SWARM_GAP,
+      ...gap(0.3, 0.6),
       barrels: KEGS(3),
     },
     {
       entries: [
-        { templateId: 'wild_boar', count: 8, level: 3, speedScale: FAST, hpScale: FRAIL },
-        { templateId: 'webwood_spider', count: 8, level: 3, speedScale: FAST, hpScale: FRAIL },
+        { templateId: 'wild_boar', count: 10, level: 3, speedScale: 1.7, hpScale: FRAIL },
+        { templateId: 'webwood_spider', count: 10, level: 3, speedScale: 1.7, hpScale: FRAIL },
       ],
-      coreDamage: 64,
-      ...SWARM_GAP,
+      coreDamage: 56,
+      ...gap(0.25, 0.5),
       barrels: KEGS(3),
     },
     {
       entries: [
-        { templateId: 'forest_wolf', count: 10, level: 2, speedScale: FAST },
-        { templateId: 'tunnel_rat', count: 8, level: 5, speedScale: FAST, hpScale: FRAIL },
+        { templateId: 'forest_wolf', count: 12, level: 2, speedScale: 1.8 },
+        { templateId: 'tunnel_rat', count: 12, level: 5, speedScale: 1.8, hpScale: FRAIL },
       ],
-      coreDamage: 84,
-      ...SWARM_GAP,
+      coreDamage: 60,
+      ...gap(0.2, 0.4),
       barrels: KEGS(4),
     },
     {
       entries: [
-        { templateId: 'wild_boar', count: 10, level: 3, speedScale: FAST },
-        { templateId: 'webwood_spider', count: 10, level: 4, speedScale: FAST, hpScale: FRAIL },
+        { templateId: 'wild_boar', count: 14, level: 3, speedScale: 2 },
+        { templateId: 'webwood_spider', count: 14, level: 4, speedScale: 2, hpScale: FRAIL },
       ],
-      coreDamage: 100,
-      ...SWARM_GAP,
+      coreDamage: 60,
+      ...gap(0.15, 0.35),
       barrels: KEGS(4),
     },
     {
       entries: [
-        { templateId: 'tunnel_rat', count: 12, level: 6, speedScale: FAST, hpScale: FRAIL },
-        { templateId: 'forest_wolf', count: 10, level: 2, speedScale: FAST },
+        { templateId: 'tunnel_rat', count: 18, level: 6, speedScale: 2.2, hpScale: FRAIL },
+        { templateId: 'forest_wolf', count: 18, level: 2, speedScale: 2.2 },
       ],
-      coreDamage: 110,
-      ...SWARM_GAP,
+      coreDamage: 60,
+      ...gap(0.1, 0.25),
       barrels: KEGS(5),
     },
     {
       entries: [
-        { templateId: 'webwood_spider', count: 12, level: 4, speedScale: FAST },
-        { templateId: 'wild_boar', count: 12, level: 3, speedScale: FAST },
+        { templateId: 'webwood_spider', count: 22, level: 4, speedScale: 3 },
+        { templateId: 'wild_boar', count: 22, level: 3, speedScale: 3 },
       ],
-      coreDamage: 120,
-      ...SWARM_GAP,
+      coreDamage: 55,
+      ...gap(0.08, 0.18),
+      barrels: KEGS(5),
+    },
+    {
+      entries: [
+        { templateId: 'forest_wolf', count: 26, level: 2, speedScale: 3.6 },
+        { templateId: 'tunnel_rat', count: 22, level: 6, speedScale: 3.6, hpScale: FRAIL },
+      ],
+      coreDamage: 50,
+      ...gap(0.06, 0.14),
+      barrels: KEGS(5),
+    },
+    {
+      entries: [
+        { templateId: 'webwood_spider', count: 26, level: 4, speedScale: 4.2 },
+        { templateId: 'wild_boar', count: 24, level: 3, speedScale: 4.2 },
+        { templateId: 'forest_wolf', count: 10, level: 2, speedScale: 4.2 },
+      ],
+      coreDamage: 45,
+      ...gap(0.05, 0.12),
       barrels: KEGS(5),
     },
   ],
 };
 
-const STEADY_GAP = { gapMinTicks: ticks(0.9), gapMaxTicks: ticks(1.7) } as const;
+const STEADY_GAP = gap(0.9, 1.7);
 
 /**
  * The tower holds only 10 points: a small monster's strike costs 1 or 2 of them, a
  * medium's up to 4, so every monster must fall before it winds up. No large or huge
- * one comes: a single full-health strike of theirs would end the run.
+ * one comes: a single full-health strike of theirs would end the run. The fodder walks in
+ * at its own pace, then the armoured dead come quicker from two and three flanks, and the
+ * last two waves send thirty-two and forty-four of them from everywhere at two and a half
+ * times their pace, hardly a breath between them.
  */
 export const TURRET_MISSION_BRITTLE: TurretScenarioDef = {
   id: 'fire_and_fly_brittle',
@@ -282,6 +349,7 @@ export const TURRET_MISSION_BRITTLE: TurretScenarioDef = {
   medals: { gold: { minIntegrityShare: 1 }, silver: { minIntegrityShare: 0.6 } },
   arsenal: { shockwave: 3, fragmentation: 1 },
   supply: MISSION_SUPPLY,
+  overlap: 2,
   waves: [
     {
       entries: [{ templateId: 'forest_wolf', count: 8, level: 2 }],
@@ -295,7 +363,7 @@ export const TURRET_MISSION_BRITTLE: TurretScenarioDef = {
         { templateId: 'wild_boar', count: 6, level: 3 },
       ],
       coreDamage: 64,
-      ...STEADY_GAP,
+      ...gap(0.8, 1.5),
       barrels: KEGS(3),
     },
     {
@@ -304,43 +372,70 @@ export const TURRET_MISSION_BRITTLE: TurretScenarioDef = {
         { templateId: 'webwood_spider', count: 6, level: 4 },
       ],
       coreDamage: 84,
-      ...STEADY_GAP,
+      ...gap(0.7, 1.3),
       barrels: KEGS(4),
     },
     {
       entries: [
         { templateId: 'tunnel_rat', count: 8, level: 6 },
-        { templateId: 'vale_bandit', count: 6, level: 5 },
+        { templateId: 'vale_bandit', count: 8, level: 5 },
       ],
       coreDamage: 100,
-      ...STEADY_GAP,
+      ...gap(0.6, 1.1),
       barrels: KEGS(4),
+      arrival: { kind: 'flanks', count: 2, widthTurn: 0.14 },
     },
     {
       entries: [
-        { templateId: 'deeprock_kobold', count: 8, level: 15 },
+        { templateId: 'deeprock_kobold', count: 10, level: 15 },
         { templateId: 'boneclad_revenant', count: 4, level: 19 },
       ],
       coreDamage: 130,
-      ...STEADY_GAP,
+      ...gap(0.5, 0.9),
+      barrels: KEGS(5),
+      arrival: { kind: 'flanks', count: 3, widthTurn: 0.1 },
+    },
+    {
+      entries: [
+        { templateId: 'boneclad_revenant', count: 8, level: 19, speedScale: 1.3 },
+        { templateId: 'deeprock_kobold', count: 8, level: 15, speedScale: 1.3 },
+      ],
+      coreDamage: 160,
+      ...gap(0.35, 0.7),
+      barrels: KEGS(5),
+      arrival: { kind: 'flanks', count: 3, widthTurn: 0.1 },
+    },
+    {
+      entries: [
+        { templateId: 'boneclad_revenant', count: 20, level: 19, speedScale: 2.3 },
+        { templateId: 'deeprock_kobold', count: 12, level: 15, speedScale: 2.3 },
+      ],
+      coreDamage: 170,
+      ...gap(0.1, 0.25),
       barrels: KEGS(5),
     },
     {
       entries: [
-        { templateId: 'boneclad_revenant', count: 8, level: 19 },
-        { templateId: 'deeprock_kobold', count: 6, level: 15 },
+        { templateId: 'boneclad_revenant', count: 26, level: 19, speedScale: 2.8 },
+        { templateId: 'deeprock_kobold', count: 18, level: 15, speedScale: 2.8 },
       ],
       coreDamage: 180,
-      ...STEADY_GAP,
+      ...gap(0.08, 0.2),
       barrels: KEGS(5),
     },
   ],
 };
 
+/** Inside a pack, the members follow each other closely. */
+const PACK_GAP = gap(0.15, 0.25);
+const RUSH_GAP = { gapMinTicks: 1, gapMaxTicks: 2 } as const;
+
 /**
- * Standard's six waves, arriving from one side, two flanks or in packs, with twice the
- * kegs placed on the sides the monsters come through: a keg shot as a group passes
- * clears it. The cap lets a whole wave's kegs stand beside the ones still intact.
+ * Twice the kegs on the sides the monsters come through, and a cap that lets a whole
+ * wave's stand beside the ones still intact: a keg shot as a group passes clears it. The
+ * waves arrive from one side, two flanks, in packs, then all at once from three sides,
+ * growing and quickening, until the last two charge down twelve kegs each: forty-eight
+ * then sixty-three monsters, the giants among the last.
  */
 export const TURRET_MISSION_POWDER: TurretScenarioDef = {
   id: 'fire_and_fly_powder',
@@ -350,6 +445,7 @@ export const TURRET_MISSION_POWDER: TurretScenarioDef = {
   arsenal: { shockwave: 1, fragmentation: 3 },
   supply: MISSION_SUPPLY,
   kegs: { placement: 'lanes', countScale: 2, cap: 12 },
+  overlap: 3,
   waves: [
     {
       entries: [{ templateId: 'forest_wolf', count: 8, level: 2 }],
@@ -380,35 +476,58 @@ export const TURRET_MISSION_POWDER: TurretScenarioDef = {
     },
     {
       entries: [
-        { templateId: 'tunnel_rat', count: 8, level: 6 },
-        { templateId: 'fen_troll', count: 4, level: 11 },
+        { templateId: 'tunnel_rat', count: 8, level: 6, speedScale: 1.2 },
+        { templateId: 'fen_troll', count: 4, level: 11, speedScale: 1.1 },
       ],
       coreDamage: 100,
-      ...STEADY_GAP,
+      ...gap(0.6, 1.2),
       barrels: KEGS(4),
       arrival: { kind: 'flanks', count: 3, widthTurn: 0.14 },
     },
     {
       entries: [
-        { templateId: 'deeprock_kobold', count: 8, level: 15 },
-        { templateId: 'thornpeak_ogre', count: 4, level: 16 },
-        { templateId: 'boneclad_revenant', count: 4, level: 19 },
+        { templateId: 'deeprock_kobold', count: 10, level: 15, speedScale: 1.3 },
+        { templateId: 'thornpeak_ogre', count: 4, level: 16, speedScale: 1.2 },
+        { templateId: 'boneclad_revenant', count: 4, level: 19, speedScale: 1.3 },
       ],
       coreDamage: 130,
-      ...STEADY_GAP,
+      ...PACK_GAP,
       barrels: KEGS(5),
-      arrival: { kind: 'arc', widthTurn: 0.35 },
+      arrival: { kind: 'burst', groupSize: 6, groupGapTicks: ticks(2), widthTurn: 0.08 },
     },
     {
       entries: [
-        { templateId: 'boneclad_revenant', count: 6, level: 19 },
-        { templateId: 'frostmane_yeti', count: 2, level: 20 },
-        { templateId: 'idol_guardian', count: 1, level: 20, bossLast: true },
+        { templateId: 'boneclad_revenant', count: 14, level: 19, speedScale: 2.4 },
+        { templateId: 'deeprock_kobold', count: 12, level: 15, speedScale: 2.4 },
+        { templateId: 'thornpeak_ogre', count: 6, level: 16, speedScale: 2 },
+      ],
+      coreDamage: 160,
+      ...RUSH_GAP,
+      barrels: KEGS(5),
+      arrival: { kind: 'flanks', count: 3, widthTurn: 0.06 },
+    },
+    {
+      entries: [
+        { templateId: 'boneclad_revenant', count: 24, level: 19, speedScale: 3 },
+        { templateId: 'deeprock_kobold', count: 18, level: 15, speedScale: 3 },
+        { templateId: 'fen_troll', count: 6, level: 12, speedScale: 2.6 },
+      ],
+      coreDamage: 180,
+      ...RUSH_GAP,
+      barrels: KEGS(6),
+      arrival: { kind: 'flanks', count: 3, widthTurn: 0.06 },
+    },
+    {
+      entries: [
+        { templateId: 'boneclad_revenant', count: 32, level: 19, speedScale: 3.3 },
+        { templateId: 'deeprock_kobold', count: 22, level: 15, speedScale: 3.3 },
+        { templateId: 'frostmane_yeti', count: 6, level: 20, speedScale: 2.8 },
+        { templateId: 'idol_guardian', count: 3, level: 20, speedScale: 2.6 },
       ],
       coreDamage: 220,
-      ...PACK_GAP,
-      barrels: KEGS(5),
-      arrival: { kind: 'burst', groupSize: 3, groupGapTicks: ticks(3), widthTurn: 0.08 },
+      ...RUSH_GAP,
+      barrels: KEGS(6),
+      arrival: { kind: 'flanks', count: 3, widthTurn: 0.06 },
     },
   ],
 };

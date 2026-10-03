@@ -16,6 +16,8 @@ import { type TurretFeedback, turretFeedbackSince } from '../sim/minigames/turre
 export interface TurretPlanInput {
   readonly kinds: readonly { readonly templateId: string }[];
   readonly waves: readonly { readonly spawns: readonly number[] }[];
+  /** A mission's overlap: the most living a wave may carry into the next. */
+  readonly overlap?: number;
 }
 
 /**
@@ -46,9 +48,10 @@ function templateCountsPerWave(plan: TurretPlanInput): Map<string, number>[] {
 
 /**
  * Rigs per template: the most of it any wave spawns, plus the previous wave's
- * of the same template, whose corpses can still lie there while the next wave
- * spawns. A wave never clears with a living monster, and an older corpse has
- * sunk long before a whole wave and its break have passed.
+ * of the same template, its corpses and on an overlapping mission its living
+ * tail, still there while the next wave spawns. A living monster finding every
+ * rig of its template taken takes a corpse's, else draws its stand-in: the rare
+ * tail older than the previous wave, or a corpse lying on past a short wave.
  */
 export function turretRigCapacities(plan: TurretPlanInput): Map<string, number> {
   const perWave = templateCountsPerWave(plan);
@@ -62,11 +65,16 @@ export function turretRigCapacities(plan: TurretPlanInput): Map<string, number> 
   return capacities;
 }
 
-/** Marker bodies (stand-in, health bar, strike ring): every body a wave and its predecessor can field. */
+/**
+ * Marker bodies (stand-in, health bar, strike ring): every body a wave and its predecessor
+ * can field, plus on an overlapping plan the living an older wave carried into the
+ * predecessor. Only a corpse can be left out (a still older one, lying on past a short
+ * wave and the pause): it gives its body up to a living monster (TurretSlotBook).
+ */
 export function turretBodyCapacity(plan: TurretPlanInput): number {
   let most = 0;
   plan.waves.forEach((wave, w) => {
-    const carried = w > 0 ? plan.waves[w - 1].spawns.length : 0;
+    const carried = w > 0 ? plan.waves[w - 1].spawns.length + (plan.overlap ?? 0) : 0;
     most = Math.max(most, wave.spawns.length + carried);
   });
   return most;
@@ -136,7 +144,8 @@ export function turretRunResidencyOver(seated: boolean, playerX: number | null):
  * Which rig and which marker body each monster holds. Assignments stick to the
  * monster id; a monster only ever takes a READY rig (the rest draw their
  * stand-in), and a living monster may take a ready rig from a corpse of its
- * template when none is free. A slot whose monster left the view is released.
+ * template, or any corpse's marker body, when none is free. A slot whose monster
+ * left the view is released.
  */
 export class TurretSlotBook {
   readonly rigTemplate: string[] = [];
@@ -146,6 +155,7 @@ export class TurretSlotBook {
   private readonly rigLiving: boolean[] = [];
   private readonly rigStamp: number[] = [];
   private readonly bodyStamp: number[] = [];
+  private readonly bodyLiving: boolean[] = [];
   private readonly rigById = new Map<number, number>();
   private readonly bodyById = new Map<number, number>();
   private frame = 0;
@@ -168,6 +178,7 @@ export class TurretSlotBook {
     while (this.bodyId.length < count) {
       this.bodyId.push(null);
       this.bodyStamp.push(0);
+      this.bodyLiving.push(false);
     }
   }
 
@@ -195,6 +206,7 @@ export class TurretSlotBook {
     this.rigLiving.length = 0;
     this.rigStamp.length = 0;
     this.bodyStamp.length = 0;
+    this.bodyLiving.length = 0;
     this.rigById.clear();
     this.bodyById.clear();
   }
@@ -203,7 +215,10 @@ export class TurretSlotBook {
     const frame = ++this.frame;
     for (const m of monsters) {
       const body = this.bodyById.get(m.id);
-      if (body !== undefined) this.bodyStamp[body] = frame;
+      if (body !== undefined) {
+        this.bodyStamp[body] = frame;
+        this.bodyLiving[body] = m.hp > 0;
+      }
       const rig = this.rigById.get(m.id);
       if (rig !== undefined) {
         this.rigStamp[rig] = frame;
@@ -228,18 +243,22 @@ export class TurretSlotBook {
       const living = pass === 0;
       for (const m of monsters) {
         if (m.hp > 0 !== living) continue;
-        if (!this.bodyById.has(m.id)) this.takeBody(m.id, frame);
+        if (!this.bodyById.has(m.id)) this.takeBody(m.id, frame, living);
         if (!this.rigById.has(m.id)) this.takeRig(m, templateOf(m.kind), frame, living);
       }
     }
   }
 
-  private takeBody(id: number, frame: number): void {
-    const free = this.bodyId.indexOf(null);
-    if (free < 0) return;
-    this.bodyId[free] = id;
-    this.bodyStamp[free] = frame;
-    this.bodyById.set(id, free);
+  private takeBody(id: number, frame: number, living: boolean): void {
+    let slot = this.bodyId.indexOf(null);
+    if (slot < 0 && living) slot = this.bodyLiving.indexOf(false);
+    if (slot < 0) return;
+    const evicted = this.bodyId[slot];
+    if (evicted !== null) this.bodyById.delete(evicted);
+    this.bodyId[slot] = id;
+    this.bodyStamp[slot] = frame;
+    this.bodyLiving[slot] = living;
+    this.bodyById.set(id, slot);
   }
 
   private takeRig(m: TurretMonsterRef, templateId: string, frame: number, living: boolean): void {

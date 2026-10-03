@@ -1146,7 +1146,10 @@ describe('the feedback ring', { timeout: FULL_RUN_TIMEOUT_MS }, () => {
     for (let i = 0; i < emitted.length; i++) expect(consumed[i].event).toBe(emitted[i]);
     expect(emitted.filter((e) => e.type === 'waveCleared')).toHaveLength(6);
     expect(longest).toBeLessThanOrEqual(TURRET_FEEDBACK_LIMIT);
-    expect(world.turretSession!.feedback).toHaveLength(TURRET_FEEDBACK_LIMIT);
+    // A Standard run fills the ring sized for the missions' finales only part way.
+    expect(world.turretSession!.feedback).toHaveLength(
+      Math.min(TURRET_FEEDBACK_LIMIT, emitted.length),
+    );
     expect(world.turretSession!.feedback.at(-1)?.seq).toBe(emitted.length);
   });
 });

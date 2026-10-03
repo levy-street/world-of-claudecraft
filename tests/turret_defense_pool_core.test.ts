@@ -14,14 +14,25 @@ import {
   FIRE_AND_FLY_DUNGEON_DEFS,
   FIRE_AND_FLY_DUNGEON_ID,
 } from '../src/sim/content/fire_and_fly_arena';
+import { TURRET_MISSIONS } from '../src/sim/content/fire_and_fly_missions';
+import { FIRE_AND_FLY_SCENARIOS } from '../src/sim/content/fire_and_fly_scenarios';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
-import type { TurretEvent } from '../src/sim/minigames/turret_defense';
+import { positionAt, type ThrowProbe } from '../src/sim/minigames/thrown_body';
+import {
+  createTurretDefense,
+  fireTurret,
+  type TurretDefenseState,
+  type TurretEvent,
+  tickTurretDefense,
+} from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import {
   recordTurretFeedback,
   TURRET_FEEDBACK_LIMIT,
   type TurretFeedback,
 } from '../src/sim/minigames/turret_feedback';
+
+const flat: ThrowProbe = { ground: () => 0, water: () => null };
 
 // kinds: 0 wolf, 1 boar, 2 bandit
 const plan = {
@@ -71,6 +82,58 @@ describe('Fire and Fly rig pool capacity', () => {
     });
   });
 
+  it("adds an overlapping plan's carried living to the bodies, never to the rigs", () => {
+    const overlapping = { ...plan, overlap: 3 };
+    expect(turretBodyCapacity(overlapping)).toBe(turretBodyCapacity(plan) + 3);
+    expect(turretRigCapacities(overlapping)).toEqual(turretRigCapacities(plan));
+  });
+
+  it.each(FIRE_AND_FLY_SCENARIOS.map((s) => [s.boardKey, s] as const))(
+    'gives %s a body for every monster a wave and its predecessor field, and the tail it carries',
+    (_key, scenario) => {
+      const real = resolveTurretPlan(scenario);
+      const bodies = turretBodyCapacity(real);
+      real.waves.forEach((wave, w) => {
+        const carried = w > 0 ? real.waves[w - 1].spawns.length + (real.overlap ?? 0) : 0;
+        expect(bodies).toBeGreaterThanOrEqual(wave.spawns.length + carried);
+      });
+    },
+  );
+
+  it.each(TURRET_MISSIONS.map((m) => [m.boardKey, m] as const))(
+    'fields at most a wave plus the overlap living on %s, each holding a body from the slot book',
+    (_key, mission) => {
+      const real = resolveTurretPlan(mission);
+      const bound = Math.max(...real.waves.map((w) => w.spawns.length)) + (real.overlap ?? 0);
+      // A nearest-first aimer, then one firing every 0.8 s, which leaves the longer tails.
+      for (const [seed, cadence] of [
+        [5, 1],
+        [6, 16],
+      ]) {
+        const state = createTurretDefense(real, { x: 0, z: 0 }, seed, 1000);
+        // Only as many bodies as the living can number: the corpses have to give theirs up.
+        const book = new TurretSlotBook();
+        book.growBodies(bound);
+        let most = 0;
+        for (let t = 1001; t < 1000 + 20 * 60 * 10; t++) {
+          if (state.phase === 'won' || state.phase === 'lost') break;
+          tickTurretDefense(state, t, flat);
+          const living = state.monsters.filter((m) => m.hp > 0);
+          most = Math.max(most, living.length);
+          book.assign(state.monsters, (kind) => real.kinds[kind].templateId);
+          for (const m of living) expect(book.bodyOf(m.id), `tick ${t}`).toBeGreaterThanOrEqual(0);
+          if (t >= state.readyTick && t % cadence === 0) {
+            const target = nearestLive(state, t);
+            if (target) fireTurret(state, t, target.x, target.z, flat);
+          }
+        }
+        expect(most).toBeLessThanOrEqual(bound);
+        expect(turretBodyCapacity(real)).toBeGreaterThanOrEqual(most);
+      }
+    },
+    60_000,
+  );
+
   it('builds the current wave first, then the next, later waves, and the previous one last', () => {
     expect(turretBuildOrder(plan, 0)).toEqual(['wolf', 'boar', 'bandit']);
     expect(turretBuildOrder(plan, 2)).toEqual(['bandit', 'boar', 'wolf']);
@@ -90,6 +153,21 @@ describe('Fire and Fly rig pool capacity', () => {
     expect([...turretUrgentTemplates(plan, 3)]).toEqual(['boar']);
   });
 });
+
+function nearestLive(state: TurretDefenseState, tick: number): { x: number; z: number } | null {
+  let best: { x: number; z: number } | null = null;
+  let bestD = Number.POSITIVE_INFINITY;
+  for (const m of state.monsters) {
+    if (m.hp <= 0) continue;
+    const p = positionAt(m.seg, tick, flat);
+    const d = Math.hypot(p.x - state.cx, p.z - state.cz);
+    if (d < bestD) {
+      bestD = d;
+      best = p;
+    }
+  }
+  return best;
+}
 
 const templateOf = (kind: number) => plan.kinds[kind].templateId;
 
@@ -147,6 +225,27 @@ describe('Fire and Fly slot book', () => {
     book.assign([late, corpse, living], templateOf);
     expect(book.rigOf(2)).toBe(0);
     expect(book.rigOf(3)).toBe(-1);
+  });
+
+  it("gives a living monster a corpse's marker body when none is free, never the other way", () => {
+    const book = bookWith([], 2);
+    const corpses = [
+      { id: 1, kind: 0, hp: 0 },
+      { id: 2, kind: 0, hp: 0 },
+    ];
+    book.assign(corpses, templateOf);
+    expect([book.bodyOf(1), book.bodyOf(2)]).toEqual([0, 1]);
+    const living = { id: 3, kind: 0, hp: 10 };
+    book.assign([...corpses, living], templateOf);
+    expect(book.bodyOf(3)).toBe(0);
+    expect([book.bodyOf(1), book.bodyOf(2)]).toEqual([-1, 1]);
+    // A corpse finding every body held by the living goes without one.
+    const more = { id: 4, kind: 0, hp: 10 };
+    book.assign([corpses[0], corpses[1], living, more], templateOf);
+    expect([book.bodyOf(3), book.bodyOf(4)]).toEqual([0, 1]);
+    expect([book.bodyOf(1), book.bodyOf(2)]).toEqual([-1, -1]);
+    book.assign([{ id: 5, kind: 0, hp: 0 }, living, more], templateOf);
+    expect(book.bodyOf(5)).toBe(-1);
   });
 
   it('lets a living monster take the rig of a holder that died since it was assigned', () => {

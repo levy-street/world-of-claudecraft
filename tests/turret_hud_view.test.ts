@@ -624,6 +624,25 @@ describe('the turret feedback cursor', () => {
     });
   });
 
+  it("carries an overlapping mission's resupply under the next wave's banner, the final wave's line first", () => {
+    const launched = (wave: number) => {
+      const session = seat(START, resolveTurretPlan(TURRET_MISSION_DELUGE));
+      const cursor = new TurretFeedbackCursor();
+      push(
+        session,
+        START + 60,
+        { type: 'resupply', wave: wave - 1, shockwave: 1, fragmentation: 1 },
+        { type: 'waveStart', wave, count: 20 },
+      );
+      return cursor.consume(turretSessionView(session));
+    };
+    expect(launched(3)).toEqual({
+      text: 'Wave 4 of 8',
+      subtext: 'Resupply: +1 Shockwave, +1 Fragmentation Shell',
+    });
+    expect(launched(7)?.subtext).toBe('Final wave');
+  });
+
   it("scores a won mission's charges kept on their own row, none on a loss, and counts the resupplies as given", () => {
     const session = seat(START, resolveTurretPlan(TURRET_MISSION_DELUGE));
     session.defense.phase = 'won';

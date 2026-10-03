@@ -573,7 +573,7 @@ export function tickTurretDefense(
     explodeDueBarrels(state, tick, world, events);
   }
   advanceMonsters(state, tick, world, events, false);
-  if (state.phase === 'wave') checkWaveCleared(state, tick, events);
+  if (state.phase === 'wave') checkWaveCleared(state, tick, world, events);
   return events;
 }
 
@@ -1147,13 +1147,26 @@ function splash(state: TurretDefenseState, m: TurretMonster, p: Vec3, events: Tu
   m.state = 'gone';
 }
 
-function checkWaveCleared(state: TurretDefenseState, tick: number, events: TurretEvent[]): void {
+/**
+ * A wave ends once every monster of it has spawned and none lives (the last wave's end is
+ * the win), then the pause; on a plan with an overlap, the next wave sets off on the tick
+ * the living fall to it, its resupply given on that tick with no clear and no pause. That
+ * tick's spawns have already run, so the launched wave's first monster appears on the next.
+ */
+function checkWaveCleared(
+  state: TurretDefenseState,
+  tick: number,
+  probe: ThrowProbe,
+  events: TurretEvent[],
+): void {
   const wave = currentWave(state);
   if (wave && state.spawnCursor < wave.spawns.length) return;
-  if (state.monsters.some((m) => m.hp > 0)) return;
-  events.push({ type: 'waveCleared', wave: state.wave });
+  const living = state.monsters.reduce((n, m) => (m.hp > 0 ? n + 1 : n), 0);
+  const last = state.wave >= state.plan.waves.length - 1;
+  if (living > 0 && (last || living > (state.plan.overlap ?? 0))) return;
+  if (living === 0) events.push({ type: 'waveCleared', wave: state.wave });
   bump(state);
-  if (state.wave >= state.plan.waves.length - 1) {
+  if (last) {
     win(state, events);
     return;
   }
@@ -1164,7 +1177,8 @@ function checkWaveCleared(state: TurretDefenseState, tick: number, events: Turre
       events.push({ type: 'resupply', wave: state.wave, ...grant });
   }
   state.phase = 'between';
-  state.phaseEndTick = tick + TURRET_TIMING.betweenTicks;
+  state.phaseEndTick = tick + (living > 0 ? 0 : TURRET_TIMING.betweenTicks);
+  if (living > 0) startWave(state, tick, probe, events);
 }
 
 function win(state: TurretDefenseState, events: TurretEvent[]): void {

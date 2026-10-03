@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { TURRET_MISSIONS } from '../src/sim/content/fire_and_fly_missions';
 import {
   TURRET_DEFAULT_SCENARIO,
   TURRET_SCENARIO_HARD,
@@ -400,9 +401,32 @@ describe('resolving a scenario into a plan', () => {
       { waves: [wolves(4, pack(2, LIMITS.groupGapTicks + 1))] },
       /bad burst arrival/,
     ],
+    ['an overlap of no monster', { overlap: 0 }, /bad overlap/],
+    ['a fractional overlap', { overlap: 1.5 }, /bad overlap/],
+    ['an overlap past the wire limit', { overlap: LIMITS.overlap + 1 }, /bad overlap/],
+    [
+      'an overlap a wave before the last cannot exceed',
+      { waves: [wolves(4), wolves(3), wolves(5)], overlap: 3 },
+      /overlap not below a wave/,
+    ],
   ] as const)('refuses %s', (_name, override, message) => {
     const def = { ...scenario([wolves(1)]), ...override } as TurretScenarioDef;
     expect(() => resolveTurretPlan(def)).toThrow(message);
+  });
+
+  it('carries an overlap only where the scenario sets one: every mission, no trial', () => {
+    for (const trial of TURRET_SCENARIOS) {
+      expect(trial.overlap).toBeUndefined();
+      expect('overlap' in resolveTurretPlan(trial)).toBe(false);
+    }
+    for (const mission of TURRET_MISSIONS) {
+      expect([2, 3]).toContain(mission.overlap);
+      expect(resolveTurretPlan(mission).overlap).toBe(mission.overlap);
+    }
+    expect(resolveTurretPlan({ ...scenario([wolves(1)]), overlap: LIMITS.overlap }).overlap).toBe(
+      LIMITS.overlap,
+    );
+    expect(resolveTurretPlan({ ...scenario([wolves(4), wolves(1)]), overlap: 3 }).overlap).toBe(3);
   });
 
   it('keeps the bowling rule a parameter', () => {

@@ -644,10 +644,11 @@ describe('the toggle', () => {
   // event (throws, bounces, kills, waves) replays them exactly. Before the grazing
   // rule, rim hits relaunched a body lying past the maximum range hundreds of times.
   // The barrels came after these digests: the runs place none, so the engine the
-  // barrels were added to still replays them untouched.
+  // barrels were added to still replays them untouched. Re-taken for the 2 s pause
+  // between waves (the 5 s one replayed 313311f2 and 268bf16a on the overlap engine).
   it.each([
-    ['flat', 42, flat, 1116, '313311f2'],
-    ['hills', 21, hills, 1111, '268bf16a'],
+    ['flat', 42, flat, 1116, '5cc9ef9a'],
+    ['hills', 21, hills, 1111, 'c49469bf'],
   ] as const)(
     'turned off, a %s full run replays the bowling-free engine exactly',
     (_name, seed, probe, count, digest) => {

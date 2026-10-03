@@ -13,6 +13,7 @@ import {
   TURRET_SEAT_WIRE_KEYS,
   type TurretSeatState,
 } from '../src/net/turret_session_wire';
+import { TURRET_MISSIONS } from '../src/sim/content/fire_and_fly_missions';
 import {
   TURRET_SCENARIO_HARD,
   TURRET_SCENARIO_STANDARD,
@@ -305,6 +306,14 @@ describe('the turret plan key', () => {
     ['a fractional resupply wave', (p: Wire) => (p.resupplyWaves = [1.5])],
     ['a missing resupply list', (p: Wire) => delete p.resupplyWaves],
     ['a charge bonus that is not a flag', (p: Wire) => (p.chargeBonus = 1)],
+    ['an overlap of no monster', (p: Wire) => (p.overlap = 0)],
+    ['a fractional overlap', (p: Wire) => (p.overlap = 2.5)],
+    ['an overlap past the plan limit', (p: Wire) => (p.overlap = TURRET_PLAN_LIMITS.overlap + 1)],
+    ['an overlap that is not a number', (p: Wire) => (p.overlap = '3')],
+    [
+      'an overlap a wave before the last cannot exceed',
+      (p: Wire) => (p.overlap = p.waves[0].spawns.length),
+    ],
   ])('rejects %s', (_, forge) => {
     const forged = wire(resolveTurretPlan());
     forge(forged);
@@ -313,6 +322,19 @@ describe('the turret plan key', () => {
 
   it('reads null as no plan', () => {
     expect(decodeTurretPlan(null)).toBeNull();
+  });
+
+  it("round-trips every mission's overlap, up to the plan limit, and reads none as none", () => {
+    for (const mission of TURRET_MISSIONS) {
+      const resolved = resolveTurretPlan(mission);
+      expect(decodeTurretPlan(wire(resolved))).toEqual(resolved);
+      expect(decodeTurretPlan(wire(resolved))?.overlap).toBe(mission.overlap);
+    }
+    const widest = wire(resolveTurretPlan());
+    widest.overlap = TURRET_PLAN_LIMITS.overlap;
+    for (const wave of widest.waves) wave.spawns = Array(TURRET_PLAN_LIMITS.overlap + 1).fill(0);
+    expect(decodeTurretPlan(widest)?.overlap).toBe(TURRET_PLAN_LIMITS.overlap);
+    expect(decodeTurretPlan(wire(resolveTurretPlan()))).not.toHaveProperty('overlap');
   });
 });
 
@@ -447,7 +469,11 @@ describe('the turret seat key', () => {
     ['a list where a record goes', (s: Wire) => (s.defense.stats = [])],
     [
       'oversized monsters',
-      (s: Wire) => (s.defense.monsters = Array.from({ length: 257 }, () => s.defense.monsters[0])),
+      (s: Wire) =>
+        (s.defense.monsters = Array.from(
+          { length: 2 * TURRET_PLAN_LIMITS.spawnsPerWave + TURRET_PLAN_LIMITS.overlap + 1 },
+          () => s.defense.monsters[0],
+        )),
     ],
     [
       'oversized barrels',
@@ -458,6 +484,14 @@ describe('the turret seat key', () => {
     const forged = wire(seatOf(midWave()));
     forge(forged);
     expect(decodeTurretSeat(forged, plan)).toBeNull();
+  });
+
+  it("decodes a field of the widest wave, its predecessor's corpses and the overlap's tail", () => {
+    const field = wire(seatOf(midWave()));
+    const model = field.defense.monsters[0];
+    const most = 2 * TURRET_PLAN_LIMITS.spawnsPerWave + TURRET_PLAN_LIMITS.overlap;
+    field.defense.monsters = Array.from({ length: most }, (_, id) => ({ ...model, id }));
+    expect(decodeTurretSeat(field, plan)?.defense.monsters).toHaveLength(most);
   });
 
   it.each([

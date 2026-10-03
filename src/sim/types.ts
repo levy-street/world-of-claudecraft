@@ -10356,6 +10356,12 @@ export interface TurretScenarioDef {
   supply?: TurretSupplyDef;
   /** Absent: every wave's barrels as authored, placed evenly around the circle. */
   kegs?: TurretKegsDef;
+  /**
+   * Missions only. Once a wave has spawned every monster and this many or fewer still live
+   * on the field (any wave's), the next wave sets off at once, with no pause and no clear.
+   * Absent: each wave is cleared, then the pause before the next.
+   */
+  overlap?: number;
 }
 
 export interface VehicleStationDef {

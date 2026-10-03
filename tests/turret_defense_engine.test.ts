@@ -1306,7 +1306,7 @@ describe('full scripted runs', () => {
     expect(r.waves).toHaveLength(6);
     expect(r.waves.every((w) => w.cleared > w.start)).toBe(true);
     for (let i = 1; i < r.waves.length; i++) {
-      expect(r.waves[i].start - r.waves[i - 1].cleared).toBe(100);
+      expect(r.waves[i].start - r.waves[i - 1].cleared).toBe(TURRET_TIMING.betweenTicks);
     }
     expect(r.state.stats.kills).toBe(
       resolveTurretPlan().waves.reduce((n, w) => n + w.spawns.length, 0),

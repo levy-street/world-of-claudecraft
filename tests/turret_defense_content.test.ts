@@ -163,7 +163,7 @@ describe('tuning constants in ticks and yards', () => {
   it('converts the authored seconds to 20 Hz ticks', () => {
     expect(TURRET_TIMING).toMatchObject({
       introTicks: 60,
-      betweenTicks: 100,
+      betweenTicks: 40,
       windupTicks: 30,
       downTicks: 16,
       riseTicks: 12,

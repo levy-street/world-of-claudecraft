@@ -476,12 +476,17 @@ export class TurretFeedbackCursor {
     if (!session) return null;
     let banner: TurretBanner | null = null;
     let rank = 0;
+    let resupply: Extract<TurretEvent, { type: 'resupply' }> | null = null;
     for (const entry of this.reader.read(session)) {
+      if (entry.event.type === 'resupply') resupply = entry.event;
       const entryRank = BANNER_RANK[entry.event.type] ?? 0;
       if (entryRank === 0 || entryRank < rank) continue;
       banner = bannerFor(entry.event, session, keys);
       rank = entryRank;
     }
+    // A mission's overlapping wave sets off on its resupply's tick, with no clear between.
+    if (banner && resupply && rank === BANNER_RANK.waveStart && !banner.subtext)
+      banner.subtext = turretResupplyLine(resupply);
     return banner;
   }
 }
