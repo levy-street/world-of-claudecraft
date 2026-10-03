@@ -575,7 +575,12 @@ A hill has three moments, each announced to the whole realm:
 2. **The rise** (`hillRiseLine`), `HILL_WARNING_SECONDS` (15 minutes) after the
    warning. The contest and the payouts run from here.
 3. **The fall** (`hillFallenLine`), `HILL_DURATION_SECONDS` (30 minutes) after
-   the rise. Banked seconds short of a payout are lost with it.
+   the rise. Banked seconds short of a payout are lost with it. The final
+   standings follow (see below).
+
+While the hill stands, every `HILL_NOTICE_SECONDS` (five minutes; owner spec
+2026-09-29) after the rise the realm hears where it still stands and when it
+falls (`hillStillStandsLine`), followed by the hold standings.
 
 The realm's `WORLD_PVP_DISABLED` switch turns the hill off with the rest of
 world PvP. A realm that slept through whole windows plans the current one.
@@ -604,6 +609,31 @@ every 197.73 seconds. A full uncontested event pays exactly 388 honor per holder
 the same as the former 45-minute event. A capture resets the ramp and accruals;
 stepping out pauses personal accrual without erasing it. No diminishing returns
 apply to hill presence rewards.
+
+The hold ranking (`src/sim/pvp/hill_ranking.ts`, owner spec 2026-09-29): every
+group that takes the hill opens a record (`ActiveHill.holds`) that banks each
+pass it holds the hill WITH A MEMBER STANDING INSIDE (a group that walks away
+keeps the hill until beaten but banks no rank, so an empty hill on a quiet realm
+cannot be won from afar), summed across every separate hold of the same stand,
+and banks each member's own seconds inside while it held. A party is named by
+its leader, a lone player by their own name. The standings (`hillRanking`,
+longest first, a tie in first-held order, `HILL_RANKING_SHOWN` deep, each hold
+in whole minutes rounded up, `hillRankLine`) are announced with each five-minute
+reminder and once more after the fall line. When the hill falls on its own or
+through `/dev hill end`, every player who stood inside for
+`HILL_VAULT_MIN_INSIDE_SECONDS` (a minute) for the group that held it longest
+(every group tied at the top, `hillVaultPayees`, each player once) and is still
+in the realm and in that group earns one win on the Weekly Vault's PvP row
+(`recordWeeklyPvpWin`, capped at the row's five, the same credit a rated
+battleground or ranked arena win gives) and is told (`HILL_VAULT_LINE`, only
+when the row actually moved). Requiring membership at the fall caps the payees
+at a party's size: a player cycled through the party cannot carry a point away.
+Unlike a developer-ended battleground, `/dev hill end` does pay: it is the test
+lever for this award, on dev realms only. The credit is injected by the host
+(`HillVaultCredit`: the Sim passes it into `updateHill`, the dev arm into
+`endHillNow`) because the vault module reaches `entity.ts`, which imports the
+pvp barrel. A realm switched off mid-stand drops the hill silently: no
+standings, no credit.
 
 The readout (`IWorld.hillInfo`, the `hill` self key) carries the geometry, the
 phase, the holder from the viewer's seat, whether the viewer counts

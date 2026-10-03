@@ -170,6 +170,7 @@ ratings.
   `hillTimes` from a window and a warning offset, `hillMinutesUntil`) and the
   circle test. No ctx, no rng, no clock. Every tuning literal (`HILL_RADIUS`,
   `HILL_WINDOW_SECONDS`, `HILL_WARNING_SECONDS`, `HILL_DURATION_SECONDS`,
+  `HILL_NOTICE_SECONDS`,
   `HILL_CAPTURE_SECONDS`, `HILL_ACCRUAL_SECONDS`, the payout ramp `hillHonorPerPayout` with `HILL_RAMP_STEP_SECONDS` and `HILL_RAMP_MAX_HONOR`) lives
   here and the copy resolves from it. Hills last 30 minutes; payout and ramp
   intervals are compressed by 29/44 to preserve 388 Honor for a full uncontested
@@ -192,6 +193,18 @@ ratings.
   and during the warning for the map markers), the
   `/hill` readout line, and the notice lines the client matcher re-localizes
   (`hillWarningLine`, `hillRiseLine`, `hillFallenLine` with the zone name,
-  `HILL_TAKEN_LINE`, `HILL_LOST_LINE`). The realm switch
-  (`ctx.worldPvpDisabled`) drops a standing hill and announces none. Pinned by
-  `tests/hill.test.ts` and `tests/hill_rules.test.ts`.
+  `HILL_TAKEN_LINE`, `HILL_LOST_LINE`, `hillStillStandsLine`, `hillRankLine`,
+  `HILL_VAULT_LINE`). While risen it re-announces the hill every
+  `HILL_NOTICE_SECONDS` with the hold standings; the fall (`fallHill`, shared by
+  the schedule and `/dev hill end`) announces the final standings and pays the
+  longest hold's holders one Weekly Vault PvP win through the host-injected
+  `HillVaultCredit` (`updateHill(ctx, credit)`, `endHillNow(ctx, credit)`): this
+  barrel must never import `weekly_rewards.ts`, which reaches `entity.ts`. The
+  realm switch (`ctx.worldPvpDisabled`) drops a standing hill and announces none
+  (no standings, no credit). Pinned by `tests/hill.test.ts`,
+  `tests/hill_rules.test.ts` and `tests/hill_ranking.test.ts`.
+- `hill_ranking.ts` owns the PURE hold ranking over the per-group records on
+  `ActiveHill.holds` (`HillHoldRecord`: seconds held over the whole stand, the
+  leader's or lone player's name, the payees): `hillRanking` (longest first,
+  first-held order on a tie), `hillLongestHolds` (every group tied at the top)
+  and `hillVaultPayees` (their holders, each once). No ctx, no rng, no clock.

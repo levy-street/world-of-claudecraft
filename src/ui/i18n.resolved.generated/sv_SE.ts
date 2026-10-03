@@ -438,7 +438,9 @@ export const sv_SE: EnTranslations = {
         "worldOne": "{count} världsuppdrag slutfört",
         "worldMany": "{count} världsuppdrag slutförda",
         "pvpOne": "{count} bedömd match vunnen",
-        "pvpMany": "{count} bedömda matcher vunna"
+        "pvpMany": "{count} bedömda matcher vunna",
+        "pvpWinOne": "{count} PvP Win",
+        "pvpWinMany": "{count} PvP Wins"
       },
       "requiredTask": {
         "raidOne": "Rensa {count} raid-möte",
@@ -448,7 +450,9 @@ export const sv_SE: EnTranslations = {
         "worldOne": "Slutför {count} världsuppdrag",
         "worldMany": "Slutför {count} världsuppdrag",
         "pvpOne": "Vinna {count} bedömd match",
-        "pvpMany": "Vinna {count} bedömda matcher"
+        "pvpMany": "Vinna {count} bedömda matcher",
+        "pvpWinOne": "Earn {count} PvP Win",
+        "pvpWinMany": "Earn {count} PvP Wins"
       },
       "readyWeeks": "Oinsamlade veckor: {count}. Hävda den äldsta slutförda veckan först.",
       "claimLastWeek": "Hävda förra veckans belöning",
@@ -8362,6 +8366,7 @@ export const sv_SE: EnTranslations = {
       "hillBody": "Varannan timme dyker en kulle upp i Drakländerna, Frostslöjans vidder eller Bärnstensfallet. Riket får en varning femton minuter i förväg och cirkeln markeras på öppen mark. Kullen är aktiv i trettio minuter. När du går in i den aktiva cirkeln aktiveras din flagga för världs-PvP enligt de vanliga nivåreglerna, även för raidmedlemmar. Gruppen med flest behöriga spelare i cirkeln tar kullen efter en minut med obruten majoritet; en ensam spelare räknas som en grupp på en, men raidmedlemmar och spelare under nivåkravet för PvP kan varken inta kullen eller tjäna Ära från den. Varje innehavare som står i cirkeln tjänar Ära i ökande takt. Utbetalningarna sker oftare och ökar snabbare, så att den totala Äran från det tidigare evenemanget på fyrtiofem minuter bevaras. När kullen byter innehavare börjar ökningen om från början. Din flagga förblir aktiv när du lämnar cirkeln; /pvp off använder den vanliga fördröjningen på fem minuter och kan inte slutföras på en aktiv kulle eller under strid. Kullens stapel visar kontroll, spelarantal och erövringsförlopp; /hill anger dess plats.",
       "limitsBodyHour": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
       "hillBodyRamp": "Varannan timme dyker en kulle upp i Drakländerna, Frostslöjans vidder eller Bärnstensfallet. Riket får en varning femton minuter i förväg och cirkeln markeras på öppen mark. Kullen är aktiv i trettio minuter. När du går in i den aktiva cirkeln aktiveras din flagga för världs-PvP enligt de vanliga nivåreglerna, även för raidmedlemmar. Gruppen med flest behöriga spelare i cirkeln tar kullen efter en minut med obruten majoritet; en ensam spelare räknas som en grupp på en, men raidmedlemmar och spelare under nivåkravet för PvP kan varken inta kullen eller tjäna Ära från den. Varje innehavare som står i cirkeln tjänar Ära i ökande takt. Utbetalningarna sker oftare och ökar snabbare, så att den totala Äran från det tidigare evenemanget på fyrtiofem minuter bevaras. När kullen byter innehavare börjar ökningen om från början. Din flagga förblir aktiv när du lämnar cirkeln; /pvp off använder den vanliga fördröjningen på fem minuter och kan inte slutföras på en aktiv kulle eller under strid. Kullens stapel visar kontroll, spelarantal och erövringsförlopp; /hill anger dess plats.",
+      "hillBodyRanked": "Every two hours, a hill rises in the Drakelands, the Frostveil Reach or the Amberfall. The realm receives a fifteen-minute warning, and the circle is marked on open ground. The hill stays active for thirty minutes. Entering the active circle raises your World PvP flag under the normal level rules, including for raid members. The party with the most eligible players inside takes the hill after a minute of unbroken majority; a lone player counts as a party of one, but raid members and players below the PvP level requirement cannot capture or earn hill Honor. Each holder standing inside earns Honor at an increasing rate. Payouts and their ramp are faster, preserving the total Honor of the former forty-five-minute event. A change of holder restarts the ramp. Every five minutes while the hill stands, the realm hears its location and the groups ranked by time held. When the hill falls, each player who stood inside for at least a minute for the longest-holding group, and is still in that group, earns one win toward the Weekly Vault PvP row. Leaving the circle keeps your flag up; /pvp off uses the normal five-minute delay and cannot finish inside an active hill or during combat. The hill bar shows control, numbers and capture progress; /hill reports its location.",
       "limitsBodyRaids": "Att besegra samma spelare igen och igen betalar mindre varje gång och snart ingenting, och din räkning mot den spelaren börjar bara igen ungefär en timme efter den första av dessa dödningar, så att läger en offer är aldrig värt väntan. Ett mål långt under din nivå betalar ingenting alls. Slagfält och Arenor kör sina egna regler medan du är inne i dem, och de betalar mer Ära än den öppna världen, så världens PvP är den långsammare vägen till samma leverantör. Raid tjänar ingenting från världsdödningar: en raid-medlem tar ingen Ära eller guld och krymper inte någon annans andel, så slå som ett parti för att bli betald."
     },
     "thornhollowPage": {

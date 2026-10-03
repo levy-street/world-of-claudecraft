@@ -649,6 +649,13 @@ const baseEnTable = {
   'hill.readoutYou': 'The hill stands in {zone}: your group holds it. It falls in {minutes}.',
   'hill.readoutOther': 'The hill stands in {zone}: another group holds it. It falls in {minutes}.',
   'hill.readoutUnheld': 'The hill stands in {zone}: nobody holds it. It falls in {minutes}.',
+  // The standing hill's reminder every five minutes, the hold standings (a
+  // party by its leader's name, a lone player by their own) and the Weekly
+  // Vault point for the longest hold (src/sim/pvp/hill.ts, hill_ranking.ts).
+  'hill.stillStands': 'The hill still stands in {zone}: it falls in {minutes}.',
+  'hill.rankGroup': "Hill ranking #{rank}: {name}'s group, held {minutes}.",
+  'hill.rankSolo': 'Hill ranking #{rank}: {name}, held {minutes}.',
+  'hill.vaultPoint': 'Your group held the hill longest: +1 PvP progress toward the Weekly Vault.',
   // The aid refusal (WORLD_PVP_AID_REFUSED_LINE, voiced by
   // src/sim/combat/casting_lifecycle.ts): placeholder-free, EXACT-mapped too.
   'worldPvp.aidRefused': 'You cannot aid a World PvP enemy: invite them to your party first.',
@@ -21568,6 +21575,29 @@ const RULES: Rule[] = [
   {
     re: /^The hill stands in (.+): nobody holds it\. It falls in (\d+) minutes?\.$/,
     build: (m) => tSim('hill.readoutUnheld', { zone: locZone(m[1]), minutes: hillMinutes(m[2]) }),
+  },
+  {
+    re: /^The hill still stands in (.+): it falls in (\d+) minutes?\.$/,
+    build: (m) => tSim('hill.stillStands', { zone: locZone(m[1]), minutes: hillMinutes(m[2]) }),
+  },
+  // The group shape first: a lone player's name never ends in "'s group".
+  {
+    re: /^Hill ranking #(\d+): (.+)'s group, held (\d+) minutes?\.$/,
+    build: (m) =>
+      tSim('hill.rankGroup', {
+        rank: formatNumber(Number(m[1])),
+        name: m[2],
+        minutes: hillMinutes(m[3]),
+      }),
+  },
+  {
+    re: /^Hill ranking #(\d+): (.+), held (\d+) minutes?\.$/,
+    build: (m) =>
+      tSim('hill.rankSolo', {
+        rank: formatNumber(Number(m[1])),
+        name: m[2],
+        minutes: hillMinutes(m[3]),
+      }),
   },
 ];
 

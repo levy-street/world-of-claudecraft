@@ -36,7 +36,11 @@ content and equipment tiers:
   previous raid tier (Nythraxis, item level 29), ungated by raid kills and with no
   Heroic rung, filtered to what the character's class can wear.
 - PvP: 1, 3 and 5 ranked arena or rated battleground wins. Practice matches,
-  developer-ended battlegrounds and forfeits do not count.
+  developer-ended battlegrounds and forfeits do not count. King of the Hill also
+  counts one win for every player who stood inside for at least a minute for the
+  group that held the hill longest, and is still in that group when it falls
+  (`docs/design/warfare.md`, King of the Hill). The row reads "PvP Wins" for
+  that reason.
 
 The window shows actual candidates with quality, item level and tooltips; current
 progress and exact eligible loot pools remain below. New rolls exclude every item

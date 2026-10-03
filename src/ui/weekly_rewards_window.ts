@@ -177,15 +177,17 @@ export class WeeklyRewardsTab {
             heroicRemaining,
           }) => {
             const art = earned ? (difficulty === 'heroic' ? 'heroic' : 'normal') : 'closed';
+            // The PvP row counts King of the Hill holds as well as rated wins.
+            const task = row.category === 'pvp' ? 'pvpWin' : row.category;
             const label = !row.available
               ? t('hudChrome.weeklyRewards.unavailable')
               : earned
                 ? t(
-                    `hudChrome.weeklyRewards.completedTask.${row.category}${threshold === 1 ? 'One' : 'Many'}`,
+                    `hudChrome.weeklyRewards.completedTask.${task}${threshold === 1 ? 'One' : 'Many'}`,
                     { count: formatNumber(threshold) },
                   )
                 : t(
-                    `hudChrome.weeklyRewards.requiredTask.${row.category}${threshold === 1 ? 'One' : 'Many'}`,
+                    `hudChrome.weeklyRewards.requiredTask.${task}${threshold === 1 ? 'One' : 'Many'}`,
                     {
                       count: formatNumber(threshold),
                     },

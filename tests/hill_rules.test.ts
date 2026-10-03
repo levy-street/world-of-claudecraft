@@ -9,10 +9,12 @@ import {
   HILL_DURATION_SECONDS,
   HILL_FIRST_WINDOW_AT_SECONDS,
   HILL_LATEST_WARN_OFFSET_SECONDS,
+  HILL_NOTICE_SECONDS,
   HILL_RADIUS,
   HILL_RAMP_MAX_HONOR,
   HILL_RAMP_STEP_HONOR,
   HILL_RAMP_STEP_SECONDS,
+  HILL_VAULT_MIN_INSIDE_SECONDS,
   HILL_WARNING_SECONDS,
   HILL_WINDOW_SECONDS,
   type HillSpotProbe,
@@ -43,6 +45,10 @@ describe('the tuning literals the copy and the docs quote', () => {
     expect(HILL_RAMP_STEP_SECONDS).toBeCloseTo((300 * 29) / 44);
     expect(HILL_RAMP_STEP_HONOR).toBe(2);
     expect(HILL_RAMP_MAX_HONOR).toBe(12);
+    // Owner spec 2026-09-29: the realm is reminded every five minutes, and the
+    // Weekly Vault point needs a full minute inside.
+    expect(HILL_NOTICE_SECONDS).toBe(5 * 60);
+    expect(HILL_VAULT_MIN_INSIDE_SECONDS).toBe(60);
   });
 });
 

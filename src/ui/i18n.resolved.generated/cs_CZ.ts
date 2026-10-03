@@ -438,7 +438,9 @@ export const cs_CZ: EnTranslations = {
         "worldOne": "{count} dokončený světový úkol",
         "worldMany": "{count} dokončených světových úkolů",
         "pvpOne": "{count} vyhraný hodnocený zápas",
-        "pvpMany": "{count} vyhraných hodnocených zápasů"
+        "pvpMany": "{count} vyhraných hodnocených zápasů",
+        "pvpWinOne": "{count} PvP Win",
+        "pvpWinMany": "{count} PvP Wins"
       },
       "requiredTask": {
         "raidOne": "Vyčisti {count} raidový souboj",
@@ -448,7 +450,9 @@ export const cs_CZ: EnTranslations = {
         "worldOne": "Dokonči {count} světový úkol",
         "worldMany": "Dokonči {count} světových úkolů",
         "pvpOne": "Vyhraj {count} hodnocený zápas",
-        "pvpMany": "Vyhraj {count} hodnocených zápasů"
+        "pvpMany": "Vyhraj {count} hodnocených zápasů",
+        "pvpWinOne": "Earn {count} PvP Win",
+        "pvpWinMany": "Earn {count} PvP Wins"
       },
       "readyWeeks": "Nevyzvednuté týdny: {count}. Nejdřív vyzvedni nejstarší dokončený týden.",
       "claimLastWeek": "Vyzvednout odměnu z minulého týdne",
@@ -8362,6 +8366,7 @@ export const cs_CZ: EnTranslations = {
       "hillBody": "Každé dvě hodiny se v Dračích zemích, Kraji Mrazivého závoje nebo Jantarovém pádu objeví kopec. Říše dostane varování patnáct minut předem a kruh je vyznačen na otevřeném prostranství. Kopec zůstává aktivní třicet minut. Vstup do aktivního kruhu zapne příznak světového PvP podle běžných pravidel úrovně, a to i členům nájezdu. Skupina s největším počtem způsobilých hráčů uvnitř získá kopec po minutě nepřerušené převahy; samotný hráč se počítá jako jednočlenná skupina, ale členové nájezdu a hráči pod požadovanou úrovní pro PvP nemohou kopec obsadit ani získávat Čest z kopce. Každý držitel uvnitř získává Čest stále rychleji. Odměny přicházejí častěji a jejich výše roste rychleji, takže celková Čest zůstává stejná jako při dřívější pětačtyřicetiminutové události. Změna držitele spustí růst odměn od začátku. Po opuštění kruhu zůstává příznak zapnutý; /pvp off používá běžnou pětiminutovou prodlevu a nemůže doběhnout uvnitř aktivního kopce ani během boje. Lišta kopce ukazuje držitele, počty hráčů a postup obsazování; /hill oznámí jeho polohu.",
       "limitsBodyHour": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
       "hillBodyRamp": "Každé dvě hodiny se v Dračích zemích, Kraji Mrazivého závoje nebo Jantarovém pádu objeví kopec. Říše dostane varování patnáct minut předem a kruh je vyznačen na otevřeném prostranství. Kopec zůstává aktivní třicet minut. Vstup do aktivního kruhu zapne příznak světového PvP podle běžných pravidel úrovně, a to i členům nájezdu. Skupina s největším počtem způsobilých hráčů uvnitř získá kopec po minutě nepřerušené převahy; samotný hráč se počítá jako jednočlenná skupina, ale členové nájezdu a hráči pod požadovanou úrovní pro PvP nemohou kopec obsadit ani získávat Čest z kopce. Každý držitel uvnitř získává Čest stále rychleji. Odměny přicházejí častěji a jejich výše roste rychleji, takže celková Čest zůstává stejná jako při dřívější pětačtyřicetiminutové události. Změna držitele spustí růst odměn od začátku. Po opuštění kruhu zůstává příznak zapnutý; /pvp off používá běžnou pětiminutovou prodlevu a nemůže doběhnout uvnitř aktivního kopce ani během boje. Lišta kopce ukazuje držitele, počty hráčů a postup obsazování; /hill oznámí jeho polohu.",
+      "hillBodyRanked": "Every two hours, a hill rises in the Drakelands, the Frostveil Reach or the Amberfall. The realm receives a fifteen-minute warning, and the circle is marked on open ground. The hill stays active for thirty minutes. Entering the active circle raises your World PvP flag under the normal level rules, including for raid members. The party with the most eligible players inside takes the hill after a minute of unbroken majority; a lone player counts as a party of one, but raid members and players below the PvP level requirement cannot capture or earn hill Honor. Each holder standing inside earns Honor at an increasing rate. Payouts and their ramp are faster, preserving the total Honor of the former forty-five-minute event. A change of holder restarts the ramp. Every five minutes while the hill stands, the realm hears its location and the groups ranked by time held. When the hill falls, each player who stood inside for at least a minute for the longest-holding group, and is still in that group, earns one win toward the Weekly Vault PvP row. Leaving the circle keeps your flag up; /pvp off uses the normal five-minute delay and cannot finish inside an active hill or during combat. The hill bar shows control, numbers and capture progress; /hill reports its location.",
       "limitsBodyRaids": "Porážení stejného hráče znovu a znovu vyplácí pokaždé méně a brzy nic, a tvůj počet proti tomu hráči se resetuje až zhruba hodinu po prvním z těch zabití, takže čekání na jedné oběti se nikdy nevyplatí. Cíl hluboko pod tvou úrovní nevyplatí vůbec nic. Bojiště a Arény se řídí vlastními pravidly, dokud jsi uvnitř, a vyplácí víc Cti než otevřený svět, takže světové PvP je pomalejší cesta ke stejnému obchodníkovi. Výpravy nezískávají ze světových zabití nic: člen výpravy nedostane žádnou Čest ani zlato a nezmenší podíl nikoho jiného, takže boj jako skupina se vyplatí."
     },
     "thornhollowPage": {

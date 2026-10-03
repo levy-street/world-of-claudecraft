@@ -2834,6 +2834,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '같은 플레이어를 거듭 쓰러뜨리면 보상은 매번 줄어 곧 사라지며, 그 플레이어에 대한 계수는 첫 처치로부터 약 한 시간이 지나야 비로소 다시 시작되므로 한 사람만 노리고 기다릴 값어치는 없습니다. 당신보다 훨씬 낮은 레벨의 대상은 아무것도 주지 않습니다. 전장과 투기장 안에서는 각자의 규칙이 적용되고 열린 세계보다 더 많은 명예를 주므로, 월드 PvP는 같은 상인에게 가는 느린 길입니다.',
   'guide.worldPvpPage.hillBodyRamp':
     '2시간마다 드레이크랜드, 서리장막 봉우리, 호박빛 가을터 중 한 곳에 언덕이 등장합니다. 서버 전체에 15분 전 예고가 전달되고 탁 트인 땅에 원이 표시됩니다. 언덕은 30분 동안 활성화됩니다. 활성 원에 들어가면 공격대원을 포함해 일반 레벨 규칙에 따라 월드 PvP 깃발이 올라갑니다. 원 안의 참여 자격을 갖춘 인원이 가장 많은 파티가 1분 동안 계속 우세를 유지하면 언덕을 점령합니다. 혼자 있는 플레이어는 1인 파티로 보지만, 공격대원과 PvP 필요 레벨 미만인 플레이어는 점령하거나 언덕 명예를 받을 수 없습니다. 점령 파티의 원 안에 있는 각 구성원은 점점 빠른 속도로 명예를 얻습니다. 지급 주기와 보상 증가 속도가 빨라져 기존 45분 이벤트의 총 명예량을 유지합니다. 점령 주체가 바뀌면 보상 증가가 처음부터 시작됩니다. 원을 나가도 깃발은 유지됩니다. /pvp off는 일반적인 5분 대기를 사용하며 활성 언덕 안이나 전투 중에는 완료되지 않습니다. 언덕 막대는 점령 주체, 인원수와 점령 진행도를 보여 주며 /hill은 위치를 알려 줍니다.',
+  'guide.worldPvpPage.hillBodyRanked':
+    '2시간마다 드레이크랜드, 서리장막 봉우리, 호박빛 가을터 중 한 곳에 언덕이 등장합니다. 서버 전체에 15분 전 예고가 전달되고 탁 트인 땅에 원이 표시됩니다. 언덕은 30분 동안 활성화됩니다. 활성 원에 들어가면 공격대원을 포함해 일반 레벨 규칙에 따라 월드 PvP 깃발이 올라갑니다. 원 안의 참여 자격을 갖춘 인원이 가장 많은 파티가 1분 동안 계속 우세를 유지하면 언덕을 점령합니다. 혼자 있는 플레이어는 1인 파티로 보지만, 공격대원과 PvP 필요 레벨 미만인 플레이어는 점령하거나 언덕 명예를 받을 수 없습니다. 점령 파티의 원 안에 있는 각 구성원은 점점 빠른 속도로 명예를 얻고, 점령 주체가 바뀌면 보상 증가가 처음부터 시작됩니다. 언덕이 활성화된 동안 5분마다 위치와 각 그룹의 점령 시간 순위가 서버 전체에 알려집니다. 언덕이 끝나면 총 점령 시간이 가장 긴 그룹에 속하며 그 그룹이 점령한 동안 원 안에 적어도 1분간 서 있었고 종료 시에도 그룹에 남아 있는 플레이어는 주간 금고의 PvP 진행도에 1승을 얻습니다. 원을 나가도 깃발은 유지됩니다. /pvp off는 일반적인 5분 대기를 사용하며 활성 언덕 안이나 전투 중에는 완료되지 않습니다. 언덕 막대는 점령 주체, 인원수와 점령 진행도를 보여 주며 /hill은 위치를 알려 줍니다.',
   'guide.worldPvpPage.limitsBodyRaids':
     '같은 플레이어를 거듭 쓰러뜨리면 보상은 매번 줄어 곧 사라지며, 그 플레이어에 대한 계수는 첫 처치로부터 약 한 시간이 지나야 비로소 다시 시작되므로 한 사람만 노리고 기다릴 값어치는 없습니다. 당신보다 훨씬 낮은 레벨의 대상은 아무것도 주지 않습니다. 전장과 투기장 안에서는 각자의 규칙이 적용되고 열린 세계보다 더 많은 명예를 주므로, 월드 PvP는 같은 상인에게 가는 느린 길입니다. 공격대는 월드 처치에서 아무것도 얻지 못합니다. 공격대원은 명예도 골드도 받지 않으며 다른 사람의 몫도 줄이지 않으니, 보상을 받으려면 파티로 싸우세요.',
   'guide.worldPvpPage.hillHeading': '언덕의 왕',
@@ -19409,6 +19411,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.completedTask.worldMany': '전역 퀘스트 {count}개 완료',
   'hudChrome.weeklyRewards.completedTask.pvpOne': '평점전 {count}승',
   'hudChrome.weeklyRewards.completedTask.pvpMany': '평점전 {count}승',
+  'hudChrome.weeklyRewards.completedTask.pvpWinOne': 'PvP {count}승',
+  'hudChrome.weeklyRewards.completedTask.pvpWinMany': 'PvP {count}승',
   'hudChrome.weeklyRewards.requiredTask.raidOne': '공격대 우두머리 {count}명을 처치하세요',
   'hudChrome.weeklyRewards.requiredTask.raidMany': '공격대 우두머리 {count}명을 처치하세요',
   'hudChrome.weeklyRewards.requiredTask.dungeonOne': '던전을 {count}회 완료하세요',
@@ -19417,6 +19421,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.requiredTask.worldMany': '전역 퀘스트를 {count}개 완료하세요',
   'hudChrome.weeklyRewards.requiredTask.pvpOne': '평점전에서 {count}승을 거두세요',
   'hudChrome.weeklyRewards.requiredTask.pvpMany': '평점전에서 {count}승을 거두세요',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinOne': 'PvP에서 {count}승을 거두세요',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinMany': 'PvP에서 {count}승을 거두세요',
   'hudChrome.weeklyRewards.readyWeeks':
     '받지 않은 주: {count}. 완료된 가장 오래된 주부터 받으세요.',
   'hudChrome.weeklyRewards.claimLastWeek': '지난주 보상 받기',

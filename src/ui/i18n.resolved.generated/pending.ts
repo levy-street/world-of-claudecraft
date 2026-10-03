@@ -23,7 +23,12 @@ export const pending: Record<string, readonly string[]> = {
     "guide.footer.guideGamesLikeDiablo",
     "guide.footer.guideGamesLikeWow",
     "guide.footer.guideNew",
-    "guide.footer.guidesLabel"
+    "guide.footer.guidesLabel",
+    "guide.worldPvpPage.hillBodyRanked",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne"
   ],
   "es_ES": [
     "footer.guideBest",
@@ -39,7 +44,12 @@ export const pending: Record<string, readonly string[]> = {
     "guide.footer.guideGamesLikeDiablo",
     "guide.footer.guideGamesLikeWow",
     "guide.footer.guideNew",
-    "guide.footer.guidesLabel"
+    "guide.footer.guidesLabel",
+    "guide.worldPvpPage.hillBodyRanked",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne"
   ],
   "fr_FR": [
     "footer.guideBest",
@@ -55,7 +65,12 @@ export const pending: Record<string, readonly string[]> = {
     "guide.footer.guideGamesLikeDiablo",
     "guide.footer.guideGamesLikeWow",
     "guide.footer.guideNew",
-    "guide.footer.guidesLabel"
+    "guide.footer.guidesLabel",
+    "guide.worldPvpPage.hillBodyRanked",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne"
   ],
   "fr_CA": [
     "footer.guideBest",
@@ -71,7 +86,12 @@ export const pending: Record<string, readonly string[]> = {
     "guide.footer.guideGamesLikeDiablo",
     "guide.footer.guideGamesLikeWow",
     "guide.footer.guideNew",
-    "guide.footer.guidesLabel"
+    "guide.footer.guidesLabel",
+    "guide.worldPvpPage.hillBodyRanked",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne"
   ],
   "en_CA": [],
   "it_IT": [
@@ -88,7 +108,12 @@ export const pending: Record<string, readonly string[]> = {
     "guide.footer.guideGamesLikeDiablo",
     "guide.footer.guideGamesLikeWow",
     "guide.footer.guideNew",
-    "guide.footer.guidesLabel"
+    "guide.footer.guidesLabel",
+    "guide.worldPvpPage.hillBodyRanked",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne"
   ],
   "de_DE": [
     "footer.guideBest",
@@ -104,7 +129,12 @@ export const pending: Record<string, readonly string[]> = {
     "guide.footer.guideGamesLikeDiablo",
     "guide.footer.guideGamesLikeWow",
     "guide.footer.guideNew",
-    "guide.footer.guidesLabel"
+    "guide.footer.guidesLabel",
+    "guide.worldPvpPage.hillBodyRanked",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne"
   ],
   "zh_CN": [
     "footer.guideBest",
@@ -152,7 +182,12 @@ export const pending: Record<string, readonly string[]> = {
     "guide.footer.guideGamesLikeDiablo",
     "guide.footer.guideGamesLikeWow",
     "guide.footer.guideNew",
-    "guide.footer.guidesLabel"
+    "guide.footer.guidesLabel",
+    "guide.worldPvpPage.hillBodyRanked",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne"
   ],
   "ru_RU": [
     "footer.guideBest",
@@ -176,7 +211,12 @@ export const pending: Record<string, readonly string[]> = {
     "guide.footer.guideGamesLikeDiablo",
     "guide.footer.guideGamesLikeWow",
     "guide.footer.guideNew",
-    "guide.footer.guidesLabel"
+    "guide.footer.guidesLabel",
+    "guide.worldPvpPage.hillBodyRanked",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne"
   ],
   "nl_NL": [
     "footer.guideBest",
@@ -192,7 +232,12 @@ export const pending: Record<string, readonly string[]> = {
     "guide.footer.guideGamesLikeDiablo",
     "guide.footer.guideGamesLikeWow",
     "guide.footer.guideNew",
-    "guide.footer.guidesLabel"
+    "guide.footer.guidesLabel",
+    "guide.worldPvpPage.hillBodyRanked",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne"
   ],
   "pl_PL": [
     "footer.guideBest",
@@ -208,7 +253,12 @@ export const pending: Record<string, readonly string[]> = {
     "guide.footer.guideGamesLikeDiablo",
     "guide.footer.guideGamesLikeWow",
     "guide.footer.guideNew",
-    "guide.footer.guidesLabel"
+    "guide.footer.guidesLabel",
+    "guide.worldPvpPage.hillBodyRanked",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne"
   ],
   "id_ID": [
     "footer.guideBest",
@@ -224,7 +274,12 @@ export const pending: Record<string, readonly string[]> = {
     "guide.footer.guideGamesLikeDiablo",
     "guide.footer.guideGamesLikeWow",
     "guide.footer.guideNew",
-    "guide.footer.guidesLabel"
+    "guide.footer.guidesLabel",
+    "guide.worldPvpPage.hillBodyRanked",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne"
   ],
   "tr_TR": [
     "footer.guideBest",
@@ -240,7 +295,12 @@ export const pending: Record<string, readonly string[]> = {
     "guide.footer.guideGamesLikeDiablo",
     "guide.footer.guideGamesLikeWow",
     "guide.footer.guideNew",
-    "guide.footer.guidesLabel"
+    "guide.footer.guidesLabel",
+    "guide.worldPvpPage.hillBodyRanked",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne"
   ],
   "sv_SE": [
     "footer.guideBest",
@@ -256,7 +316,12 @@ export const pending: Record<string, readonly string[]> = {
     "guide.footer.guideGamesLikeDiablo",
     "guide.footer.guideGamesLikeWow",
     "guide.footer.guideNew",
-    "guide.footer.guidesLabel"
+    "guide.footer.guidesLabel",
+    "guide.worldPvpPage.hillBodyRanked",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne"
   ],
   "vi_VN": [
     "footer.guideBest",
@@ -272,7 +337,12 @@ export const pending: Record<string, readonly string[]> = {
     "guide.footer.guideGamesLikeDiablo",
     "guide.footer.guideGamesLikeWow",
     "guide.footer.guideNew",
-    "guide.footer.guidesLabel"
+    "guide.footer.guidesLabel",
+    "guide.worldPvpPage.hillBodyRanked",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne"
   ],
   "da_DK": [
     "footer.guideBest",
@@ -288,6 +358,11 @@ export const pending: Record<string, readonly string[]> = {
     "guide.footer.guideGamesLikeDiablo",
     "guide.footer.guideGamesLikeWow",
     "guide.footer.guideNew",
-    "guide.footer.guidesLabel"
+    "guide.footer.guidesLabel",
+    "guide.worldPvpPage.hillBodyRanked",
+    "hudChrome.weeklyRewards.completedTask.pvpWinMany",
+    "hudChrome.weeklyRewards.completedTask.pvpWinOne",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinMany",
+    "hudChrome.weeklyRewards.requiredTask.pvpWinOne"
   ]
 };
