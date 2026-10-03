@@ -38,6 +38,7 @@ import {
   primaryDamageTooltipRange,
 } from './dawnreaver_damage_tooltip_core';
 import { type AbilitySpecNoteField, tEntity, tEntityOptional } from './entity_i18n';
+import { graveyardShiftAbilityDescription } from './graveyard_shift_text_core';
 import { formatNumber, type InterpolationValues, t } from './i18n';
 
 /** The tooltip's number format for every ability figure (damage, seconds, costs). */
@@ -268,6 +269,9 @@ export function abilityDisplayDescription(
   auraOverride?: { kind: string; value: number },
   spec?: string | null,
 ): string {
+  // Graveyard Shift's kit is not in ABILITIES and has no entity description row.
+  const graveyardShift = graveyardShiftAbilityDescription(res.def.id);
+  if (graveyardShift !== null) return graveyardShift;
   const buff = auraOverride ? auraBuffDisplayValue(auraOverride) : abilityBuffValue(res);
   const duration = abilityDurationValue(res);
   const hourglass = abilityTemporalHourglassValues(res);

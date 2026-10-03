@@ -103,27 +103,31 @@
       background: Highlight;
     }
   }
-  body.wearing-shadow-cloak
-    :is(
-      #actionbar,
-      #actionbar2,
-      #actionbar3,
-      #cross-hotbar,
-      #stancebar,
-      #petbar,
-      #mobile-action-ring,
-      #mobile-action-radial,
-      #mobile-consumable-strip,
-      #mobile-stance-radial,
-      #mobile-combat-controls
-    ) {
+  /* The cloak and the Graveyard Shift's Morthen bar both stand in for every
+     player bar; their own bar shows in its place (src/ui/hud/vehicle). */
+  body:is(.wearing-shadow-cloak, .morthen-shift)
+  :is(
+    #actionbar,
+    #actionbar2,
+    #actionbar3,
+    #cross-hotbar,
+    #stancebar,
+    #petbar,
+    #mobile-action-ring,
+    #mobile-action-radial,
+    #mobile-consumable-strip,
+    #mobile-stance-radial,
+    #mobile-combat-controls
+  ) {
     display: none !important;
   }
-  .vehicle-bar.shadow-action-bar {
+  .vehicle-bar.shadow-action-bar,
+  .vehicle-bar.morthen-action-bar {
     grid-template-columns: 1fr;
     width: min(420px, calc(100% - 24px));
   }
-  .vehicle-bar.shadow-action-bar > * {
+  .vehicle-bar.shadow-action-bar > *,
+  .vehicle-bar.morthen-action-bar > * {
     grid-column: 1 / -1;
   }
   .vehicle-bar.shadow-action-bar .vehicle-integrity {

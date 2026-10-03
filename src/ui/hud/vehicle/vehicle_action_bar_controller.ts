@@ -1,6 +1,7 @@
 import { forgeChooseSlot, forgeControlsActive } from '../../../game/forge_controls';
 import type { GamepadKind } from '../../../game/gamepad_map';
 import { gliderControlsActive } from '../../../game/glider_controls';
+import { type MorthenControlWorld, morthenControlsActive } from '../../../game/morthen_controls';
 import { sfx } from '../../../game/sfx';
 import {
   type ShadowControlWorld,
@@ -22,6 +23,7 @@ import { CannonFeedbackCursor } from './cannon_feedback_core';
 import { cannonTacticsHint } from './cannon_tactics_view';
 import { ForgeActionBarController, type ForgeBarWorld } from './forge_action_bar_controller';
 import { createGliderActionBarView, gliderBoostDescription } from './glider_action_bar_view';
+import { MorthenActionBarController } from './morthen_action_bar_controller';
 import { ShadowActionBarController } from './shadow_action_bar_controller';
 import { createVehicleActionBarView } from './vehicle_action_bar_view';
 import { vehicleActionTooltip } from './vehicle_action_tooltip';
@@ -29,7 +31,7 @@ import { VEHICLE_ACTION_SLOTS, VehicleAimCore } from './vehicle_aim_core';
 
 interface VehicleBarDeps {
   world: IWorldVehicles &
-    Partial<ShadowControlWorld & ForgeBarWorld> & {
+    Partial<ShadowControlWorld & ForgeBarWorld & MorthenControlWorld> & {
       boostWorldQuestGlider?(): void;
     };
   writers: PainterHostWriters;
@@ -72,6 +74,7 @@ export class VehicleActionBarController {
   private gliderMode: boolean | null = null;
   private readonly shadow: ShadowActionBarController | null;
   private readonly forge: ForgeActionBarController | null;
+  private readonly morthen: MorthenActionBarController | null;
 
   constructor(private readonly deps: VehicleBarDeps) {
     this.shadow =
@@ -99,6 +102,21 @@ export class VehicleActionBarController {
             deps.attachTooltip,
             deps.consumePeek,
             deps.padKind,
+          )
+        : null;
+    this.morthen =
+      deps.world.player &&
+      deps.world.entities &&
+      deps.world.castAbility &&
+      deps.world.startAutoAttack &&
+      deps.world.stopAutoAttack
+        ? new MorthenActionBarController(
+            deps.world as MorthenControlWorld,
+            deps.writers,
+            deps.keyLabel,
+            deps.cancelOnEnter,
+            deps.attachTooltip,
+            deps.consumePeek,
           )
         : null;
     this.aim = new VehicleAimCore(deps.world, () => {
@@ -203,6 +221,10 @@ export class VehicleActionBarController {
   }
 
   chooseSlot(slot: number): void {
+    if (this.morthen && morthenControlsActive(this.deps.world)) {
+      this.morthen.chooseSlot(slot);
+      return;
+    }
     if (this.gliderActive()) {
       const glider = this.deps.world.worldQuestLog?.get(GLIDER_QUEST_ID)?.glider;
       if (glider?.phase !== 'flying') return;
@@ -234,6 +256,7 @@ export class VehicleActionBarController {
   }
 
   update(): void {
+    this.morthen?.update();
     this.shadow?.update();
     this.forge?.update();
     const session = this.deps.world.vehicleSession;
@@ -325,11 +348,13 @@ export class VehicleActionBarController {
 
   static blocksPlayerActions(
     world: Pick<IWorldVehicles, 'vehicleSession'> &
-      Partial<Pick<ShadowControlWorld, 'worldQuestLog'>>,
+      Partial<Pick<ShadowControlWorld, 'worldQuestLog'>> &
+      Parameters<typeof morthenControlsActive>[0],
   ): boolean {
     const worldQuestLog = world.worldQuestLog;
     return (
       !!world.vehicleSession ||
+      morthenControlsActive(world) ||
       (!!worldQuestLog &&
         (gliderControlsActive({ worldQuestLog }) ||
           shadowControlsActive({ worldQuestLog }) ||

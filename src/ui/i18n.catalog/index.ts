@@ -234,6 +234,33 @@ export const en = {
       },
       hillend: { label: 'End hill', description: 'Make the current hill fall now.' },
     },
+    // Graveyard Shift, reachable only through /dev graveyardshift while it is a
+    // prototype; the strings move to a player namespace when the mode ships.
+    graveyardShift: {
+      identityAura: 'Morthen the Gravecaller',
+      abilities: {
+        gravecall: {
+          name: 'Gravecall',
+          description:
+            'Hurl a bolt of grave shadow at your target for {min} to {max} Shadow damage.',
+        },
+        shadowPulse: {
+          name: 'Shadow Pulse',
+          description:
+            'Release a pulse of shadow that deals {min} to {max} Shadow damage to each enemy within {radius} yards in your line of sight. Each enemy hit is knocked back {distance} yards and slowed by {slow} for {slowSeconds} sec.',
+        },
+        sextonsChain: {
+          name: "Sexton's Chain",
+          description:
+            'Drag your target to within {stop} yards of you and slow it by {slow} for {slowSeconds} sec. A spell it is casting is interrupted and that school is locked for {lockout} sec, and the target is silenced for {silence} sec.',
+        },
+        barrowShroud: {
+          name: 'Barrow Shroud',
+          description:
+            'Wrap yourself in grave mist, reducing all damage you take by {pct} for {seconds} sec. Usable during the global cooldown, and does not trigger it.',
+        },
+      },
+    },
   },
   game: gameStrings,
   hudChrome: hudChromeStrings,

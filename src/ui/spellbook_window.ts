@@ -55,9 +55,10 @@ import { ABILITIES, CLASSES } from '../sim/data';
 import type { ResolvedAbility } from '../sim/sim';
 import type { AbilityDef } from '../sim/types';
 import type { IWorld } from '../world_api';
+import { abilityDisplayName } from './ability_display_name';
 import { DeferredDragRender } from './deferred_drag_render';
 import { markDialogRoot } from './dialog_root';
-import { classDisplayName, tEntity } from './entity_i18n';
+import { classDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import {
   encodeHotbarAction,
@@ -777,7 +778,7 @@ export class SpellbookWindow {
   }
 
   private abilityName(def: AbilityDef): string {
-    return tEntity({ kind: 'ability', id: def.id, field: 'name' });
+    return abilityDisplayName(def);
   }
 
   private formatAbilityNumber(value: number): string {
