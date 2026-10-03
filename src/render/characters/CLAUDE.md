@@ -232,9 +232,8 @@ so the outgoing body keeps drawing until the new rig links (the `ENTITY_GATE_STA
 row for that call site). In a private Graveyard Shift slot the real Morthen never
 spawns, so nothing warms `skel_boss` beforehand; a headless offline tour across
 `/dev graveyardshift start` and `end` recorded no `live-program` and no `gate-timeout`
-event, because the rig links no program the player bodies on screen have not already
-linked. Re-measure (and stage it the `interior_encounter_prewarm.ts` way) if the rig
-gains a material of its own.
+event: the rig links at most one new program, and it rides the gate. Re-measure (and
+stage it the `interior_encounter_prewarm.ts` way) if the rig gains a material of its own.
 
 ## Animation
 - `AnimState` (the renderer-derived input) and `BaseState`
