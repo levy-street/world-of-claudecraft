@@ -12,14 +12,17 @@ export const DREAD_MAX = 100;
 // One Dread per 20 damage dealt, any school, swing or spell, rounded to a whole
 // point per hit so the pool stays an integer: the frame text (rounded) then
 // never shows a cost the cast refuses, and no float drift leaves a pool a hair
-// under a cost. Rounding to nearest keeps the average rate. Rate check: the
-// template swing (41 to 65 every 2.6 sec) and Gravecall (20 to 32 every 6 sec)
-// deal about 24 damage a second before mitigation, so about 1.2 Dread a second,
-// and Gravecall's own grant (GRAVECALL_DREAD every 6 sec) adds about 1.7 more.
-// Steady hitting therefore funds a 30 Dread Shadow Pulse every 10 to 12 sec,
-// a little slower against armor or with misses.
+// under a cost. Rounding to nearest keeps the average rate. Rate check, with
+// the solo damage multiplier (morthen_profile.ts): the swing (82 to 130 every
+// 2.6 sec) and Gravecall (40 to 64 every 6 sec) deal about 49 damage a second
+// before mitigation, so about 2.4 Dread a second, and Gravecall's own grant
+// (GRAVECALL_DREAD every 6 sec) adds about 1.7 more: a 30 Dread Shadow Pulse
+// every 7 to 8 sec of steady hitting, a little slower against armor or misses.
 export const DREAD_PER_DAMAGE = 1 / 20;
 export const GRAVECALL_DREAD = 10;
+// One of Morthen's allies falling close to him feeds his Dread (concept rule).
+export const ALLY_DEATH_DREAD = 15;
+export const ALLY_DEATH_DREAD_RADIUS = 20;
 
 // The whole Dread one hit of `amount` damage earns.
 export function dreadForHit(amount: number): number {

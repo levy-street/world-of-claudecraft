@@ -16,7 +16,6 @@ export interface BotBrainState {
   readonly steer: BotSteer;
   goalId: number | null;
   seenCast: string | null;
-  seenRemaining: number;
   kickAt: number | null;
   healTargetId: number | null;
   healAt: number;
@@ -45,6 +44,8 @@ export interface GraveyardShiftRun {
   readonly seed: number;
   // The adventurer party, in roster order (spawn order is fixed).
   readonly bots: GraveyardShiftBot[];
+  // Morthen's living skeleton allies (run_allies.ts), in spawn order.
+  readonly allyIds: number[];
   // The party has noticed Morthen (he came close or landed a hit).
   engaged: boolean;
   // Set by a mid-tick decision (a command or, later, a lethal hit); the run tick

@@ -66,12 +66,12 @@ function think(
   boss: Entity,
 ): void {
   const b = bot.brain;
-  // Stimulus: Morthen starts a cast (a new spell, or the bar refilling). Each
-  // interrupter schedules its reaction.
+  // Stimulus: Morthen starts a cast. Each interrupter schedules its reaction. A
+  // pushed-back bar (damage delays the cast) is the same cast, not a new one;
+  // the kit's casts all sit on cooldowns, so a recast always follows a gap.
   const casting = boss.castingAbility;
-  const freshCast = !!casting && (casting !== b.seenCast || boss.castRemaining > b.seenRemaining);
+  const freshCast = !!casting && casting !== b.seenCast;
   b.seenCast = casting;
-  b.seenRemaining = casting ? boss.castRemaining : 0;
   if (freshCast) b.kickAt = ctx.tickCount + reactionDelayTicks(b.rng);
   else if (!casting) b.kickAt = null;
   const target = chooseTarget(ctx, run, bot, e, boss);
@@ -97,7 +97,7 @@ function chooseTarget(
     id: enemy.id,
     hpFrac: enemy.maxHp > 0 ? enemy.hp / enemy.maxHp : 0,
     // The tank leads: it assists nobody and peels a minion off the healer.
-    isAssist: bot.role === 'tank' ? isOnHealer(ctx, run, enemy) : enemy.id === tankTarget,
+    isAssist: bot.role === 'tank' ? isOnHealer(run, enemy) : enemy.id === tankTarget,
     attackingMe: enemy.targetId === e.id || enemy.aggroTargetId === e.id,
     isCurrent: enemy.id === e.targetId,
     isMinion: enemy.id !== boss.id,
@@ -106,7 +106,7 @@ function chooseTarget(
   return pick ? (ctx.entities.get(pick.id) ?? null) : null;
 }
 
-function isOnHealer(ctx: SimContext, run: GraveyardShiftRun, enemy: Entity): boolean {
+function isOnHealer(run: GraveyardShiftRun, enemy: Entity): boolean {
   const healer = run.bots.find((bot) => bot.role === 'healer');
   if (!healer) return false;
   return enemy.targetId === healer.pid || enemy.aggroTargetId === healer.pid;
@@ -130,7 +130,7 @@ function thinkTank(
   target: Entity | null,
 ): void {
   if (!target) return;
-  if (kickReady(ctx, bot, boss) && tryCast(ctx, bot, e, 'pummel', boss)) return;
+  if (kickReady(ctx, bot, boss) && kick(ctx, bot, e, 'pummel', boss)) return;
   if (target.id !== boss.id && tryCast(ctx, bot, e, 'taunt', target)) return;
   if (dist2d(e.pos, target.pos) <= MELEE_RANGE && !e.autoAttack) ctx.startAutoAttack(bot.pid);
   const sunders = target.auras.find((a) => a.kind === 'sunder')?.stacks ?? 0;
@@ -145,7 +145,7 @@ function thinkDps(
   boss: Entity,
   target: Entity | null,
 ): void {
-  if (kickReady(ctx, bot, boss) && tryCast(ctx, bot, e, 'counterspell', boss)) return;
+  if (kickReady(ctx, bot, boss) && kick(ctx, bot, e, 'counterspell', boss)) return;
   if (!target || e.castingAbility) return;
   if (tryCast(ctx, bot, e, 'fire_blast', target)) return;
   const filler = bot.brain.rng.chance(0.5) ? 'frostbolt' : 'fireball';
@@ -199,6 +199,27 @@ function kickReady(ctx: SimContext, bot: GraveyardShiftBot, boss: Entity): boole
     ctx.tickCount >= b.kickAt &&
     interruptAllowed(boss.castTotal, boss.castRemaining)
   );
+}
+
+// A player switches to the caster and stops their own cast to land a kick: drop
+// the cast in progress, then interrupt, when the interrupt is otherwise castable.
+function kick(
+  ctx: SimContext,
+  bot: GraveyardShiftBot,
+  e: Entity,
+  abilityId: string,
+  boss: Entity,
+): boolean {
+  // The verbs strike the current target: switch to the caster first.
+  if (e.targetId !== boss.id) ctx.targetEntity(boss.id, bot.pid);
+  if (e.castingAbility) {
+    const res = ctx.resolvedAbility(abilityId, bot.pid);
+    const reach = res && res.def.range > 0 ? res.def.range : MELEE_RANGE;
+    const ready = !!res && (e.cooldowns.get(res.cooldownId ?? abilityId) ?? 0) <= 0;
+    if (!ready || e.resource < (res?.cost ?? 0) || dist2d(e.pos, boss.pos) > reach) return false;
+    ctx.cancelCast(e);
+  }
+  return tryCast(ctx, bot, e, abilityId, boss);
 }
 
 // Casts only what a player in this spot could cast right now, so the real path

@@ -56,7 +56,6 @@ export function spawnGraveyardShiftParty(ctx: SimContext, run: GraveyardShiftRun
         steer: freshBotSteer(),
         goalId: null,
         seenCast: null,
-        seenRemaining: 0,
         kickAt: null,
         healTargetId: null,
         healAt: 0,

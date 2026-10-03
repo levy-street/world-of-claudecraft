@@ -5,7 +5,8 @@ party of adventurer bots. Concept and lot plan live outside the repo while this 
 a prototype; this directory is built lot by lot. Today: the RUN SHELL (enter,
 exit, survive every exit), the MORTHEN IDENTITY (the owner becomes Morthen in
 the sim, on his own Dread bar: `dread.ts`), the ADVENTURER PARTY (three bots,
-hostility, win and loss) and the PARTY BRAIN (the bots fight like a pickup group).
+hostility, win and loss), the PARTY BRAIN (the bots fight like a pickup group)
+and Morthen's SKELETON ALLIES.
 
 ## Contract
 - **Offline only while a prototype.** `canStartGraveyardShift` refuses unless
@@ -99,6 +100,9 @@ hostility, win and loss) and the PARTY BRAIN (the bots fight like a pickup group
   `moveInput`), pre-checking cooldown, GCD, resource, range and sight so the real
   path never refuses. The party waits idle until Morthen comes within
   `PARTY_ENGAGE_RADIUS` or lands a hit.
+- **Kicks:** a bot switches its target to Morthen and drops its own cast to land
+  an interrupt (the verbs strike the current target); a pushed-back cast bar is
+  the same cast, not a new stimulus.
 - **Roles:** tank (pummel a cast after the reaction delay, taunt a minion off the
   healer, sunder to 3, Reaver Strike, auto-attack in melee), healer (shield,
   renew, lesser heal on the triage pick after a reaction delay, smite when all are
@@ -123,6 +127,19 @@ hostility, win and loss) and the PARTY BRAIN (the bots fight like a pickup group
 - **Not persisted.** Offline only; `persistedResource` would write a warrior's Dread
   as rage and a mana class's stale `savedMana` (pinned in `tests/dread_resource.test.ts`),
   a step of its own (save override, client mirror).
+
+## Skeleton allies
+- **Two temporary necromancy skeletons** (`run_allies.ts`, `necromancy_skeletal_warrior`
+  through `summonUndead`, dominion bypassed) rise at Morthen's sides at his level.
+  Owned by him (so the hostility rule resolves them to Morthen), never his pet (no pet
+  slot, no pet save), dismissed by the teardown.
+- **Passive until the party engages**, then the pet AI's aggressive stance: an
+  aggressive pet would pick the waiting party from across the chamber and start the
+  fight on its own. Pet commands stay locked while Morthen (no Hold or Attack yet).
+- **An ally falling within `ALLY_DEATH_DREAD_RADIUS` of Morthen feeds his Dread**
+  (`ALLY_DEATH_DREAD`, once per ally), the concept's second Dread source.
+- The party treats them as adds: the tank taunts one off the healer, and damage
+  dealers may tunnel on them (the exploitable flaw).
 
 ## Known limits of the shell (each owned by a later lot)
 - **A non-damage death still runs `handleDeath`** (death counter, deeds death
@@ -154,6 +171,7 @@ hostility, win and loss) and the PARTY BRAIN (the bots fight like a pickup group
 | `run_party.ts` | the fixed party, its spawn after the identity and its removal |
 | `hostility.ts` | pure leaf: the adventurer marker and the Morthen-versus-adventurer pair rule |
 | `death_intercept.ts` | the lethal-blow clamp `dealDamage` calls |
+| `run_allies.ts` | the two skeleton allies: spawn, engage stance, Dread on death, dismissal |
 | `bot_brain.ts` | pure leaf: reaction, interrupt and control rules, triage, target scoring, seeds |
 | `bot_driver.ts` | the per-tick party driver through the real player verbs |
 | `dread.ts` | pure leaf: the Dread rate, the damage hook, the carry rule |

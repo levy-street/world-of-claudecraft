@@ -27,7 +27,6 @@ import {
   type Entity,
   emptyMoveInput,
   MELEE_RANGE,
-  normAngle,
   type PlayerClass,
   steadyAngleTo,
 } from '../types';

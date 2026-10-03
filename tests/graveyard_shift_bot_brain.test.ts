@@ -118,7 +118,9 @@ describe('Graveyard Shift party in a real fight', () => {
     const before = run.bots.map((b) => ({ ...sim.entities.get(b.pid)!.pos }));
     runTicks(sim, 60);
     expect(run.engaged).toBe(false);
-    run.bots.forEach((b, i) => expect(sim.entities.get(b.pid)!.pos).toEqual(before[i]));
+    run.bots.forEach((b, i) => {
+      expect(sim.entities.get(b.pid)!.pos).toEqual(before[i]);
+    });
   });
 
   it('engages: the tank closes to melee, the casters cast at Morthen', () => {
@@ -128,10 +130,10 @@ describe('Graveyard Shift party in a real fight', () => {
     runTicks(sim, 20 * 8);
     expect(run.engaged).toBe(true);
     const tank = bot(sim, run, 'tank');
-    expect(Math.hypot(tank.pos.x - sim.player.pos.x, tank.pos.z - sim.player.pos.z)).toBeLessThan(
-      6,
-    );
-    expect(tank.targetId).toBe(sim.playerId);
+    // The tank picks Morthen or one of his skeletons (adds first) and closes to melee.
+    expect([sim.playerId, ...run.allyIds]).toContain(tank.targetId);
+    const target = sim.entities.get(tank.targetId!)!;
+    expect(Math.hypot(tank.pos.x - target.pos.x, tank.pos.z - target.pos.z)).toBeLessThan(6);
     expect(sim.player.hp).toBeLessThan(hp0);
   });
 

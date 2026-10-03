@@ -29,6 +29,11 @@ import { wispMazeActionsLocked } from '../wisp_maze_action_lock';
 import { graveyardShiftRunSeed } from './bot_brain';
 import { updateGraveyardShiftBots } from './bot_driver';
 import { applyMorthenIdentity, removeMorthenIdentity } from './morthen_transform';
+import {
+  dismissGraveyardShiftAllies,
+  spawnGraveyardShiftAllies,
+  updateGraveyardShiftAllies,
+} from './run_allies';
 import { GRAVEYARD_SHIFT_ARRIVAL, graveyardShiftDoorDrop } from './run_layout';
 import { removeGraveyardShiftParty, spawnGraveyardShiftParty } from './run_party';
 import { claimGraveyardShiftSlot, releaseGraveyardShiftSlot } from './run_slot';
@@ -113,11 +118,13 @@ export function startGraveyardShift(ctx: SimContext, pid: number): string | null
     startedTick: ctx.tickCount,
     seed: graveyardShiftRunSeed(ctx.cfg.seed, ctx.tickCount, pid),
     bots: [],
+    allyIds: [],
     engaged: false,
     pendingOutcome: null,
   };
   ctx.graveyardShiftRuns.set(pid, run);
   spawnGraveyardShiftParty(ctx, run);
+  spawnGraveyardShiftAllies(ctx, run, p);
   return null;
 }
 
@@ -133,6 +140,7 @@ export function endGraveyardShift(
 ): void {
   ctx.graveyardShiftRuns.delete(run.ownerPid);
   removeGraveyardShiftParty(ctx, run);
+  dismissGraveyardShiftAllies(ctx, run);
   const p = ctx.entities.get(run.ownerPid);
   const meta = ctx.players.get(run.ownerPid);
   if (p && meta) {
@@ -191,6 +199,7 @@ export function updateGraveyardShift(ctx: SimContext): void {
       if (run.bots.every((bot) => ctx.entities.get(bot.pid)?.dead !== false)) {
         endGraveyardShift(ctx, run, 'won');
       } else {
+        updateGraveyardShiftAllies(ctx, run);
         updateGraveyardShiftBots(ctx, run);
       }
     }

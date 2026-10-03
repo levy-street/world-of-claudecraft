@@ -23,6 +23,12 @@ export const GRAVEYARD_SHIFT_BOT_SPOTS: readonly { x: number; z: number }[] = [
   { x: 6, z: 72 },
 ];
 
+// Morthen's two skeleton allies rise at his sides on arrival.
+export const GRAVEYARD_SHIFT_ALLY_SPOTS: readonly { x: number; z: number }[] = [
+  { x: -3, z: 90 },
+  { x: 3, z: 90 },
+];
+
 // Where a run hands its owner back outside: the borrowed dungeon's own exit
 // drop (its authored leaveOffset, else the door's default four yards out), the
 // same point leaveDungeon walks a leaver to.
