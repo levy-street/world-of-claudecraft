@@ -123,6 +123,16 @@ describe('the mission table', () => {
     );
   });
 
+  it("sends two packs of ten from the second wave of The Pack, the second on the first one's heels, faster than their templates", () => {
+    for (const wave of TURRET_MISSION_PACK.waves.slice(1)) {
+      expect(wave.arrival).toMatchObject({ kind: 'burst', groupSize: 10 });
+      if (wave.arrival?.kind !== 'burst') continue;
+      expect(wave.arrival.groupGapTicks).toBeLessThanOrEqual(10);
+      expect(wave.entries.reduce((n, e) => n + e.count, 0)).toBe(20);
+      for (const entry of wave.entries) expect(entry.speedScale).toBeGreaterThan(1);
+    }
+  });
+
   it('makes Heavy Tread few, large or huge, slower and tougher than their templates', () => {
     const plan = resolveTurretPlan(TURRET_MISSION_GIANTS);
     for (const kind of plan.kinds) {

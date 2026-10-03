@@ -2,7 +2,7 @@
 // a plan by src/sim/minigames/turret_defense_plan.ts. Standard is the original run
 // (TURRET_WAVES and 100 tower points) and must replay it exactly. Every wave, shell
 // damage, medal bar and arsenal here is mini-game tuning, not a classic-era formula. A
-// tuning change after boards open mints a new board version. The trials teach one
+// tuning change after boards open mints a new board version. The trials bring in one
 // weapon each: the Recruit's Trial the cannon alone, Standing Watch the Shockwave,
 // the Veterans' Test the fragmentation shell. Measured with scripted aimers on the
 // arena ground, up to 3 yd off, firing a set delay after each reload, bare or with a
@@ -11,11 +11,12 @@
 // Trial golds aimers within 0.8 s and gives one at 1 s mostly silver, 2 s silver or
 // bronze, never a loss; Standing Watch's gold goes from about half to three quarters
 // of the 0.8 s aimers' runs and from none to about half of the 1 s aimer's with the
-// Shockwave; the Veterans' Test golds only the aimers within 0.4 s, armed or not, gives
-// the 0.8 s aimers silver or bronze (a few more silvers armed, from the Shockwaves: the
-// fragmentation shell alone does not help these aimers), and loses a third or more of
-// the runs of every aimer at 1 s or slower, armed or not. The armed figures hold for
-// that policy only.
+// Shockwave; the Veterans' Test golds nearly every run of the 0.4 s aimer, bare or
+// armed, and the 0.8 s aimers about a fifth of their runs bare, three fifths armed:
+// the Shockwave alone does as much (the rushes), the fragmentation shell alone a little
+// (also in the rushes: the packs cost little even bare), and the 1 s aimer gets silver
+// or bronze, gold rarely and only with a weapon. The armed figures hold for that policy
+// only.
 
 import { DT, type TurretScenarioDef } from '../types';
 import { TURRET_MISSIONS } from './fire_and_fly_missions';
@@ -27,8 +28,11 @@ const ticks = (seconds: number): number => Math.round(seconds / DT);
 const INTRO_GAP = { gapMinTicks: ticks(1.4), gapMaxTicks: ticks(2.4) } as const;
 const HARD_GAP = { gapMinTicks: ticks(0.4), gapMaxTicks: ticks(0.8) } as const;
 /** Inside a pack, the members follow each other closely. */
-const PACK_GAP = { gapMinTicks: ticks(0.2), gapMaxTicks: ticks(0.4) } as const;
+const PACK_GAP = { gapMinTicks: ticks(0.15), gapMaxTicks: ticks(0.25) } as const;
+/** A rush: every side's monsters set off together. */
+const RUSH_GAP = { gapMinTicks: ticks(0.05), gapMaxTicks: ticks(0.1) } as const;
 const HARD_HP = 1.8;
+const BRUTE_HP = 1.4;
 
 /**
  * Three short waves of the smallest monsters on the whole ring, with room for mistakes:
@@ -87,14 +91,10 @@ export const TURRET_SCENARIO_STANDARD: TurretScenarioDef = {
 };
 
 /**
- * Standard's six waves made meaner: tougher monsters (80 percent more health from the
- * second wave), more of them and far more of the large and huge ones, faster spawns,
- * and arrivals from pincers or in packs more often than from one side, so the cannon
- * has to swing. The last three waves' shells hit a tenth to a fifth softer than
- * Standard's and gold lets only 3 points go, so it stays the hardest trial: gold is for
- * the fastest gunners, and the Shockwaves turn a few of the next ones' bronzes into
- * silvers. The kegs
- * stay as many as Standard's.
+ * Standard's six waves made meaner: tight fast packs, a rush on three sides at once
+ * (the Shockwave's), a stream from one side, a second rush, then the giant at the end.
+ * The fodder takes 80 percent more health, the large ones 40, and the kegs stay as many
+ * as Standard's.
  */
 export const TURRET_SCENARIO_HARD: TurretScenarioDef = {
   id: 'fire_and_fly_hard',
@@ -106,8 +106,8 @@ export const TURRET_SCENARIO_HARD: TurretScenarioDef = {
   waves: [
     {
       entries: [
-        { templateId: 'forest_wolf', count: 10, level: 2 },
-        { templateId: 'wild_boar', count: 6, level: 3 },
+        { templateId: 'forest_wolf', count: 12, level: 2 },
+        { templateId: 'wild_boar', count: 8, level: 3 },
       ],
       coreDamage: 60,
       ...HARD_GAP,
@@ -116,59 +116,63 @@ export const TURRET_SCENARIO_HARD: TurretScenarioDef = {
     },
     {
       entries: [
-        { templateId: 'wild_boar', count: 7, level: 3, hpScale: HARD_HP },
-        { templateId: 'vale_bandit', count: 7, level: 5, hpScale: HARD_HP },
-        { templateId: 'fen_troll', count: 2, level: 11, hpScale: HARD_HP },
+        { templateId: 'webwood_spider', count: 10, level: 4, hpScale: HARD_HP, speedScale: 1.5 },
+        { templateId: 'vale_bandit', count: 8, level: 5, hpScale: HARD_HP, speedScale: 1.5 },
+        { templateId: 'fen_troll', count: 2, level: 11, hpScale: BRUTE_HP },
       ],
-      coreDamage: 64,
-      ...HARD_GAP,
-      barrels: { count: 3, ...TURRET_BARREL_RING },
-      arrival: { kind: 'arc', widthTurn: 0.3 },
-    },
-    {
-      entries: [
-        { templateId: 'webwood_spider', count: 10, level: 4, hpScale: HARD_HP },
-        { templateId: 'fen_troll', count: 6, level: 11, hpScale: HARD_HP },
-      ],
-      coreDamage: 84,
+      coreDamage: 110,
       ...PACK_GAP,
-      barrels: { count: 4, ...TURRET_BARREL_RING },
-      arrival: { kind: 'burst', groupSize: 5, groupGapTicks: ticks(2.5), widthTurn: 0.06 },
+      barrels: { count: 3, ...TURRET_BARREL_RING },
+      arrival: { kind: 'burst', groupSize: 10, groupGapTicks: ticks(0.4), widthTurn: 0.04 },
     },
     {
       entries: [
-        { templateId: 'tunnel_rat', count: 9, level: 6, hpScale: HARD_HP },
-        { templateId: 'fen_troll', count: 6, level: 12, hpScale: HARD_HP },
-        { templateId: 'thornpeak_ogre', count: 2, level: 16, hpScale: HARD_HP },
+        { templateId: 'vale_bandit', count: 12, level: 5, hpScale: HARD_HP, speedScale: 1.5 },
+        { templateId: 'fen_troll', count: 6, level: 11, hpScale: BRUTE_HP, speedScale: 1.3 },
       ],
-      coreDamage: 90,
-      ...HARD_GAP,
+      coreDamage: 130,
+      ...RUSH_GAP,
       barrels: { count: 4, ...TURRET_BARREL_RING },
       arrival: { kind: 'flanks', count: 3, widthTurn: 0.1 },
     },
     {
       entries: [
-        { templateId: 'deeprock_kobold', count: 7, level: 15, hpScale: HARD_HP },
-        { templateId: 'thornpeak_ogre', count: 5, level: 16, hpScale: HARD_HP },
-        { templateId: 'boneclad_revenant', count: 5, level: 19, hpScale: HARD_HP },
-        { templateId: 'frostmane_yeti', count: 1, level: 20, hpScale: HARD_HP },
+        { templateId: 'tunnel_rat', count: 20, level: 6, hpScale: HARD_HP, speedScale: 1.5 },
+        { templateId: 'fen_troll', count: 4, level: 12, hpScale: BRUTE_HP, speedScale: 1.2 },
       ],
-      coreDamage: 111,
-      ...HARD_GAP,
+      coreDamage: 160,
+      ...PACK_GAP,
+      barrels: { count: 4, ...TURRET_BARREL_RING },
+      arrival: { kind: 'arc', widthTurn: 0.1 },
+    },
+    {
+      entries: [
+        { templateId: 'deeprock_kobold', count: 9, level: 15, hpScale: HARD_HP, speedScale: 1.5 },
+        { templateId: 'thornpeak_ogre', count: 6, level: 16, hpScale: BRUTE_HP, speedScale: 1.3 },
+      ],
+      coreDamage: 330,
+      ...RUSH_GAP,
       barrels: { count: 5, ...TURRET_BARREL_RING },
-      arrival: { kind: 'flanks', count: 2, widthTurn: 0.12 },
+      arrival: { kind: 'flanks', count: 3, widthTurn: 0.1 },
     },
     {
       entries: [
         { templateId: 'boneclad_revenant', count: 7, level: 19, hpScale: HARD_HP },
-        { templateId: 'thornpeak_ogre', count: 5, level: 16, hpScale: HARD_HP },
-        { templateId: 'frostmane_yeti', count: 3, level: 20, hpScale: HARD_HP },
-        { templateId: 'idol_guardian', count: 1, level: 20, bossLast: true, hpScale: HARD_HP },
+        { templateId: 'thornpeak_ogre', count: 6, level: 16, hpScale: BRUTE_HP },
+        { templateId: 'frostmane_yeti', count: 3, level: 20, hpScale: HARD_HP, speedScale: 0.65 },
+        {
+          templateId: 'idol_guardian',
+          count: 1,
+          level: 20,
+          bossLast: true,
+          hpScale: HARD_HP,
+          speedScale: 0.65,
+        },
       ],
-      coreDamage: 176,
+      coreDamage: 360,
       ...PACK_GAP,
       barrels: { count: 5, ...TURRET_BARREL_RING },
-      arrival: { kind: 'burst', groupSize: 4, groupGapTicks: ticks(3), widthTurn: 0.08 },
+      arrival: { kind: 'burst', groupSize: 4, groupGapTicks: ticks(5), widthTurn: 0.08 },
     },
   ],
 };

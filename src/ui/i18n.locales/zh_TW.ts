@@ -18340,7 +18340,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.fireAndFly.brief.hard':
     '這是我讓老兵們經受的圍攻，過了這關我才會把砲台交給他們。六波敵人，比正式值守更強悍，大塊頭更多，來得更密，同時從兩三個方向或成群撲來。最後一波，那個巨物又會出現。',
   'questUi.worldQuest.fireAndFly.brief.pack':
-    '野外的野獸成群狩獵，這些也一樣。六波敵人，每波都一簇一簇地從同一個方向撲來：先是狼和野豬，然後是塗著彩繪的部落獵手和他們的野獸，最後是一頭大如乾草車的灰狼。',
+    '野外的野獸成群狩獵，這些也一樣。六波敵人，緊湊的獸群每次兩群，一群緊跟著另一群撲來：先是狼和野豬，然後是塗著彩繪的部落獵手和他們的野獸，最後是一頭大如乾草車的灰狼。',
   'questUi.worldQuest.fireAndFly.brief.giants':
     '這次來的不多，但個個都是龐然大物：青銅哨衛、熔岩巨獸和活岩巨像，步履遲緩，極難放倒。六波敵人，只要有一個衝到塔下，那一擊就像城牆倒塌。',
   'questUi.worldQuest.fireAndFly.brief.deluge':

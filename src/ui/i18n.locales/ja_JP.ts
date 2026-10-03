@@ -19281,7 +19281,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.fireAndFly.brief.hard':
     '砲台を任せる前に古参兵に課す包囲戦だ。六つの波は本番の見張りより手強く、大物が多く、間を置かずに二方向か三方向から同時に、あるいは固まった群れで来る。最後の波には、あの巨体がまた現れる。',
   'questUi.worldQuest.fireAndFly.brief.pack':
-    '野生の獣は群れで狩るが、こいつらも同じだ。六つの波、どれも一方向からひと塊ずつやって来る。始めは狼と猪、次に化粧を施した部族の狩人とその獣たち、そして最後には荷車ほどもある灰色の狼だ。',
+    '野生の獣は群れで狩るが、こいつらも同じだ。六つの波、固まった群れが二つずつ、間を置かずに続けてやって来る。始めは狼と猪、次に化粧を施した部族の狩人とその獣たち、そして最後には荷車ほどもある灰色の狼だ。',
   'questUi.worldQuest.fireAndFly.brief.giants':
     '今回は数こそ少ないが、どれも巨体だ。青銅の番兵、溶岩の怪物、生きた岩の巨人、足は遅いが、倒すのは至難の業だ。六つの波、一体でも塔にたどり着けば、その一撃は崩れ落ちる城壁のようだ。',
   'questUi.worldQuest.fireAndFly.brief.deluge':

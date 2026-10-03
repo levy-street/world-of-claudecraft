@@ -125,7 +125,7 @@ sides must agree on.
 |---|---|---|
 | Recruit's Trial | `TURRET_SCENARIO_INTRODUCTION` | a few short waves of the smallest monsters from the whole ring, slow spawns, a sturdier tower |
 | Standing Watch | `TURRET_SCENARIO_STANDARD` | the original run (`TURRET_WAVES`), from wolves up to a final guardian; the default trial |
-| Veterans' Test | `TURRET_SCENARIO_HARD` | Standing Watch made meaner: tougher and more numerous monsters, faster spawns, more large ones, and arrivals in patterns |
+| Veterans' Test | `TURRET_SCENARIO_HARD` | Standing Watch made meaner: tight fast packs, two rushes on three sides at once, a stream from one side, then the giant; tougher and more numerous monsters, more large ones |
 
 Arrival patterns (`src/sim/minigames/turret_arrival.ts`) pick which bearings of
 the spawn ring a monster comes through: the whole ring, one arc, two or three
@@ -330,7 +330,7 @@ charge has no socket, no key and no banner mention.
 | Recruit's Trial | 0 | 0 | the cannon and the kegs only |
 | Standing Watch | 4 | 0 | brings in the Shockwave |
 | Veterans' Test | 2 | 4 | brings in the fragmentation shell, beside fewer Shockwaves |
-| The Pack | 0 | 5 | tight packs: a fragmentation shell into each |
+| The Pack | 0 | 5 | two fast packs of ten close together: a fragmentation shell into each |
 | Heavy Tread | 4 | 1 | giants reaching the tower together |
 | The Deluge | 3 | 2 | swarms from everywhere |
 | The Cracked Tower | 3 | 1 | 10 tower points: no strike may land |
@@ -352,12 +352,19 @@ The waves, shell damage and medal bars were set with scripted aimers and one pla
 weapon policy (recorded at the top of the scenarios and missions files; the armed
 figures hold for that policy only). With the weapons, gold comes more often in
 Standing Watch and every mission for the aimers firing 0.8 s after each reload, and
-for the 1 s aimer in Standing Watch, Heavy Tread, The Cracked Tower and The Powder
-Store, not in The Pack or The Deluge. The Veterans' Test stays the hardest trial:
-gold for the fastest gunners only, armed or not; the Shockwaves turn a few of the
-0.8 s aimers' bronzes into silvers, the fragmentation shell alone does not help
-them, and it does not yet make gold need both weapons. The clean aimer still golds
-every mission (`tests/fire_and_fly_missions.test.ts`).
+for the 1 s aimer in Standing Watch, Heavy Tread, The Cracked Tower, The Powder Store
+and The Pack, not in The Deluge. In The Pack the fragmentation shell lifts the 0.8 s
+aimers from about two fifths to three quarters of their runs at gold and the 1 s
+aimer from almost none to a third. The Veterans' Test stays the hardest trial: the
+0.8 s aimers gold a fifth of their runs bare and three fifths armed, the Shockwave
+alone doing about as much (its rushes on three sides at once) and the fragmentation
+shell alone a little, in the same rushes (its tight packs cost little even bare). So
+gold does not yet need both weapons: below the 0.4 s pace the Shockwave alone is
+enough, and the 0.4 s aimer golds nearly every run bare. It is no longer a
+trial the slower aimers lose: the 1 s aimer never does bare, the 1.2 s one in 3 runs
+of 24 bare and none armed. The clean aimer still golds every
+trial and mission (`tests/turret_scenarios.test.ts`,
+`tests/fire_and_fly_missions.test.ts`).
 
 - **Shockwave** (`src/sim/minigames/turret_shockwave.ts`, tuning
   `TURRET_SHOCKWAVE` in `src/sim/content/turret_defense.ts`). The tower slams and a

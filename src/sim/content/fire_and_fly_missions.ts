@@ -3,11 +3,12 @@
 // carrying the weapon that idea asks for. Every number here is a first value:
 // mini-game tuning, not classic-era formulas. A tuning change after boards open mints
 // a new board version. Measured with the scripted aimers of the scenarios file (12
-// seeds each): the clean aimer golds every mission bare; with the weapons, the 0.8 s
-// aimer's gold rate rises on every mission (by about half its runs on The Cracked
-// Tower and The Powder Store, a quarter on Heavy Tread, The Deluge and The Pack), and
-// the 1 s aimer's from none or one to most runs on Heavy Tread and The Cracked Tower,
-// while it gains nothing on The Pack or The Deluge.
+// seeds each, The Pack 24): the clean aimer golds every mission bare; with the
+// weapons, the 0.8 s aimer's gold rate rises on every mission (by about half its runs
+// on The Cracked Tower and The Powder Store, a quarter to a third on Heavy Tread, The
+// Deluge and The Pack), and the 1 s aimer's from none or one to most runs on Heavy
+// Tread and The Cracked Tower and to a third on The Pack, while it gains nothing on
+// The Deluge.
 
 import { DT, type TurretScenarioDef } from '../types';
 import { TURRET_BARREL_RING } from './turret_defense';
@@ -26,7 +27,12 @@ const PACK_GAP = { gapMinTicks: ticks(0.15), gapMaxTicks: ticks(0.25) } as const
 const pack = (groupSize: number, gapSeconds: number) =>
   ({ kind: 'burst', groupSize, groupGapTicks: ticks(gapSeconds), widthTurn: 0.03 }) as const;
 
-/** Many monsters, always in tight packs: one well placed shell throws a whole pack. */
+/**
+ * Many monsters, always in tight packs. After a first wave of small packs, two packs of
+ * ten come from their own sides, the second setting off 0.4 s after the first one's last
+ * member, quicker than their templates, each member taking one or two shells: a shell throws a pack and the throws scatter
+ * it, so a pack the cannon only throws keeps coming back while the next one closes in.
+ */
 export const TURRET_MISSION_PACK: TurretScenarioDef = {
   id: 'fire_and_fly_pack',
   boardKey: 'pack',
@@ -44,56 +50,56 @@ export const TURRET_MISSION_PACK: TurretScenarioDef = {
     },
     {
       entries: [
-        { templateId: 'forest_wolf', count: 8, level: 2 },
-        { templateId: 'wild_boar', count: 8, level: 3 },
+        { templateId: 'forest_wolf', count: 10, level: 2, speedScale: 1.7 },
+        { templateId: 'wild_boar', count: 10, level: 3, speedScale: 1.7 },
       ],
-      coreDamage: 64,
+      coreDamage: 45,
       ...PACK_GAP,
       barrels: KEGS(3),
-      arrival: pack(8, 4),
+      arrival: pack(10, 0.4),
     },
     {
       entries: [
-        { templateId: 'webwood_spider', count: 9, level: 4 },
-        { templateId: 'vale_bandit', count: 9, level: 5 },
+        { templateId: 'webwood_spider', count: 8, level: 4, speedScale: 1.65 },
+        { templateId: 'vale_bandit', count: 12, level: 5, speedScale: 1.65 },
       ],
-      coreDamage: 84,
+      coreDamage: 70,
       ...PACK_GAP,
       barrels: KEGS(4),
-      arrival: pack(9, 4.5),
+      arrival: pack(10, 0.4),
     },
     {
       entries: [
-        { templateId: 'tunnel_rat', count: 12, level: 6 },
-        { templateId: 'vale_bandit', count: 6, level: 5 },
-        { templateId: 'fen_troll', count: 2, level: 11 },
+        { templateId: 'tunnel_rat', count: 12, level: 6, speedScale: 1.65 },
+        { templateId: 'vale_bandit', count: 6, level: 5, speedScale: 1.65 },
+        { templateId: 'fen_troll', count: 2, level: 11, speedScale: 1.3 },
       ],
-      coreDamage: 100,
+      coreDamage: 90,
       ...PACK_GAP,
       barrels: KEGS(4),
-      arrival: pack(10, 5),
+      arrival: pack(10, 0.4),
     },
     {
       entries: [
-        { templateId: 'deeprock_kobold', count: 10, level: 15 },
-        { templateId: 'boneclad_revenant', count: 6, level: 19 },
-        { templateId: 'thornpeak_ogre', count: 2, level: 16 },
+        { templateId: 'deeprock_kobold', count: 10, level: 15, speedScale: 1.6 },
+        { templateId: 'boneclad_revenant', count: 8, level: 19, speedScale: 1.6 },
+        { templateId: 'thornpeak_ogre', count: 2, level: 16, speedScale: 1.3 },
       ],
-      coreDamage: 130,
+      coreDamage: 290,
       ...PACK_GAP,
       barrels: KEGS(5),
-      arrival: pack(6, 5),
+      arrival: pack(10, 0.4),
     },
     {
       entries: [
-        { templateId: 'boneclad_revenant', count: 10, level: 19 },
-        { templateId: 'deeprock_kobold', count: 6, level: 15 },
-        { templateId: 'frostmane_yeti', count: 2, level: 20 },
+        { templateId: 'boneclad_revenant', count: 12, level: 19, speedScale: 1.6 },
+        { templateId: 'deeprock_kobold', count: 6, level: 15, speedScale: 1.6 },
+        { templateId: 'frostmane_yeti', count: 2, level: 20, speedScale: 1.2 },
       ],
-      coreDamage: 220,
+      coreDamage: 320,
       ...PACK_GAP,
       barrels: KEGS(5),
-      arrival: pack(6, 5),
+      arrival: pack(10, 0.4),
     },
   ],
 };

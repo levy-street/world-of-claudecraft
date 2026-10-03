@@ -180,6 +180,17 @@ describe('the scenario table', () => {
     expect(hard.waves[0].gapMaxTicks).toBeLessThan(TURRET_WAVES[0].gapMaxTicks);
   });
 
+  it('gives Hard tight packs, two rushes on three sides at once, the giant last', () => {
+    const [, packs, rush, , lastRush, last] = TURRET_SCENARIO_HARD.waves;
+    expect(packs.arrival).toMatchObject({ kind: 'burst', groupSize: 10 });
+    expect(packs.gapMaxTicks).toBeLessThanOrEqual(5);
+    for (const wave of [rush, lastRush]) {
+      expect(wave.arrival).toMatchObject({ kind: 'flanks', count: 3 });
+      expect(wave.gapMaxTicks).toBeLessThanOrEqual(2);
+    }
+    expect(last.entries.at(-1)).toMatchObject({ templateId: 'idol_guardian', bossLast: true });
+  });
+
   it("keeps Hard's kegs wave by wave as many as Standard's: they were barely used", () => {
     expect(TURRET_SCENARIO_HARD.waves.map((w) => w.barrels)).toEqual(
       TURRET_WAVES.map((w) => w.barrels),
@@ -667,11 +678,19 @@ describe('full runs of every scenario with the scripted aimers', () => {
     }
   });
 
-  it('orders the three by length for the same aimer: Introduction, Standard, Hard', () => {
+  // The Veterans' Test is the hardest by its medals, not its length: its rushes end
+  // sooner than Standard's steady waves, so the two last about as long. The 2 to 4 minute
+  // band is the design's for a 1 s aimer; this sloppy one fires sooner, so its runs are a
+  // little shorter.
+  it('keeps Introduction the shortest and the other two within 2 to 4 minutes for the same aimer', () => {
     const [intro, standard, hard] = TURRET_SCENARIOS.map(
       (s) => fullRun(s, 42, hills, aimSloppily).seconds,
     );
     expect(intro).toBeLessThan(standard);
-    expect(standard).toBeLessThan(hard);
+    expect(intro).toBeLessThan(hard);
+    for (const seconds of [standard, hard]) {
+      expect(seconds).toBeGreaterThan(120);
+      expect(seconds).toBeLessThan(240);
+    }
   });
 });

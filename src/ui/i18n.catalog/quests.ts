@@ -371,7 +371,7 @@ const questStringsEn = {
           standard:
             'This is the watch my crews stand on the walls every night. Six waves from every side, opening with wolves and boars and climbing through bandits and trolls to ogres, the walking dead and hulks of living stone, and the last one closes on something far bigger than the rest.',
           hard: 'The siege I put the old hands through before I trust them with a battery. Six waves, tougher than the Standing Watch and heavier on the big brutes, arriving closer together from two or three sides at once or in tight packs. The last one ends on the giant again.',
-          pack: 'In the wild they hunt in packs, and so do these. Six waves, each one coming in tight bunches from one side at a time: wolves and boars first, then painted tribal hunters with their beasts, and at the very end a grey wolf the size of a hay cart.',
+          pack: "In the wild they hunt in packs, and so do these. Six waves of tight bunches, two packs at a time hard on each other's heels: wolves and boars first, then painted tribal hunters with their beasts, and at the very end a grey wolf the size of a hay cart.",
           giants:
             'Not many of them this time, but every one is huge: bronze sentinels, brutes of molten rock and colossi of living stone, slow on their feet and very hard to bring down. Six waves, and when one of them reaches the tower it hits like a falling wall.',
           deluge:

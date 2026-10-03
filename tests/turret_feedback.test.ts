@@ -56,11 +56,11 @@ describe('the turret feedback ring', () => {
       return [scenario.boardKey, burst] as const;
     });
     // The Powder Store's 12 standing kegs set the bound beside its resupplied frags; The
-    // Deluge's 24-monster waves come next.
+    // Deluge's and the Veterans' Test's 24-monster waves come next.
     expect(Object.fromEntries(bursts)).toEqual({
       introduction: 342,
       standard: 357,
-      hard: 547,
+      hard: 721,
       pack: 686,
       giants: 213,
       deluge: 721,
