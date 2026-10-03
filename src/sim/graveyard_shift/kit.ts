@@ -8,7 +8,8 @@
 // and mage abilities, never on warrior ones.
 
 import type { KnownAbility } from '../content/classes';
-import type { AbilityDef } from '../types';
+import type { AbilityDef, AbilityEffect } from '../types';
+import { MORTHEN_SOLO_DAMAGE_MULT } from './morthen_profile';
 
 export const MORTHEN_KIT: readonly AbilityDef[] = [
   {
@@ -83,6 +84,20 @@ export const MORTHEN_KIT: readonly AbilityDef[] = [
   },
 ];
 
+// The authored numbers above are the template's; the known list carries them
+// through the solo damage multiplier (morthen_profile.ts), so what lands, the
+// tooltips and the bar all read the resolved effects.
+function soloEffect(effect: AbilityEffect): AbilityEffect {
+  if (effect.type === 'directDamage' || effect.type === 'aoeDamage') {
+    return {
+      ...effect,
+      min: effect.min * MORTHEN_SOLO_DAMAGE_MULT,
+      max: effect.max * MORTHEN_SOLO_DAMAGE_MULT,
+    };
+  }
+  return effect;
+}
+
 export function morthenKitKnown(): KnownAbility[] {
   return MORTHEN_KIT.map((def) => ({
     def,
@@ -90,7 +105,7 @@ export function morthenKitKnown(): KnownAbility[] {
     cost: def.cost,
     castTime: def.castTime,
     cooldown: def.cooldown,
-    effects: def.effects,
+    effects: def.effects.map(soloEffect),
     threatFlat: 0,
     threatMult: 1,
     bonusCharges: 0,

@@ -121,10 +121,10 @@ describe('Graveyard Shift Morthen identity', () => {
     const p = sim.player;
     expect(hasMorthenIdentity(p)).toBe(true);
     expect(p.level).toBe(10);
-    expect(p.maxHp).toBe(1191);
-    expect(p.hp).toBe(1191);
+    expect(p.maxHp).toBe(3573);
+    expect(p.hp).toBe(3573);
     expect(p.stats.armor).toBe(234);
-    expect(p.weapon).toEqual({ min: 41, max: 65, speed: 2.6 });
+    expect(p.weapon).toEqual({ min: 82, max: 130, speed: 2.6 });
     expect(p.attackPower).toBe(0);
     expect(p.offhandWeapon).toBeNull();
     expect(p.stats.pvpOffense).toBe(0);
@@ -137,16 +137,32 @@ describe('Graveyard Shift Morthen identity', () => {
     expect(meta(sim).known.map((k: any) => k.def.id)).toEqual(KIT_IDS);
   });
 
+  it('the kit lands at the solo damage multiplier over the template numbers', () => {
+    const sim = shiftSim('warrior');
+    start(sim);
+    const effects = (id: string) => meta(sim).known.find((k: any) => k.def.id === id).effects;
+    expect(effects('gshift_gravecall')[0]).toMatchObject({
+      type: 'directDamage',
+      min: 40,
+      max: 64,
+    });
+    expect(effects('gshift_shadow_pulse')[0]).toMatchObject({
+      type: 'aoeDamage',
+      min: 24,
+      max: 36,
+    });
+  });
+
   it('the profile survives a stat recalc from a buff landing and expiring', () => {
     const sim = shiftSim('warrior');
     start(sim);
     const p = sim.player;
     (sim as any).applyAura(p, { ...foreignAura('buff_str', p.id), value: 50, remaining: 0.2 });
-    expect(p.maxHp).toBe(1191);
+    expect(p.maxHp).toBe(3573);
     for (let i = 0; i < 10; i++) sim.tick();
     expect(p.auras.some((a) => a.id === 'test_buff_str')).toBe(false);
-    expect(p.maxHp).toBe(1191);
-    expect(p.weapon).toEqual({ min: 41, max: 65, speed: 2.6 });
+    expect(p.maxHp).toBe(3573);
+    expect(p.weapon).toEqual({ min: 82, max: 130, speed: 2.6 });
   });
 
   it('the real class kit is uncastable and the morthen kit casts', () => {
@@ -243,7 +259,7 @@ describe('Graveyard Shift Morthen identity', () => {
     start(sim);
     sim.chat('/dev mounts');
     expect(sim.player.level).toBe(10);
-    expect(sim.player.maxHp).toBe(1191);
+    expect(sim.player.maxHp).toBe(3573);
     end(sim);
     expect(sim.player.level).toBe(12);
     expect(meta(sim).lifetimeXp).toBe(lifetimeXp);
@@ -300,8 +316,8 @@ describe('Graveyard Shift Morthen identity', () => {
     });
     (sim as any).applyAura(p, { ...foreignAura('buff_sta', p.id), value: 50, remaining: 30 });
     (sim as any).applyAura(p, { ...foreignAura('buff_str', p.id), value: 50, remaining: 30 });
-    expect(p.maxHp).toBe(1191);
-    expect(p.hp).toBe(1191);
+    expect(p.maxHp).toBe(3573);
+    expect(p.hp).toBe(3573);
     expect(p.attackPower).toBe(0);
     expect(p.stats.str).toBe(0);
   });
@@ -311,7 +327,7 @@ describe('Graveyard Shift Morthen identity', () => {
     start(sim);
     for (let i = 0; i < 20 * 60; i++) sim.tick();
     expect(hasMorthenIdentity(sim.player)).toBe(true);
-    expect(sim.player.maxHp).toBe(1191);
+    expect(sim.player.maxHp).toBe(3573);
   });
 
   it.each([false, true])(

@@ -9,6 +9,13 @@ import type { Entity } from '../types';
 
 export const MORTHEN_TEMPLATE_ID = 'morthen';
 
+// One player against a party: the template is tuned to lose to five players, and
+// on its raw numbers Morthen fell in 30 to 43 sec to the three-bot party without
+// killing anyone (headless probe, 2026-10-03). Owner decision: scale the boss,
+// not the party, and tune from the first playtest.
+export const MORTHEN_SOLO_HP_MULT = 3;
+export const MORTHEN_SOLO_DAMAGE_MULT = 2;
+
 // The level the owner is pinned to for the run (the template's own level).
 export function morthenLevel(): number {
   return MOBS[MORTHEN_TEMPLATE_ID].maxLevel;
@@ -19,9 +26,13 @@ export function morthenLevel(): number {
 export function applyMorthenProfile(e: Entity, prevHp: number, prevMaxHp: number): void {
   const base = mobBaseStats(MOBS[MORTHEN_TEMPLATE_ID], e.level);
   const hpFrac = prevMaxHp > 0 ? prevHp / prevMaxHp : 1;
-  e.maxHp = base.maxHp;
-  e.hp = e.dead ? 0 : Math.max(1, Math.round(base.maxHp * hpFrac));
-  e.weapon = base.weapon;
+  e.maxHp = base.maxHp * MORTHEN_SOLO_HP_MULT;
+  e.hp = e.dead ? 0 : Math.max(1, Math.round(e.maxHp * hpFrac));
+  e.weapon = {
+    min: base.weapon.min * MORTHEN_SOLO_DAMAGE_MULT,
+    max: base.weapon.max * MORTHEN_SOLO_DAMAGE_MULT,
+    speed: base.weapon.speed,
+  };
   e.offhandWeapon = null;
   e.dualWielding = false;
   // A mob carries no primary stats and the entity defaults for every derived
