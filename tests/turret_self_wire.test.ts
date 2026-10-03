@@ -146,7 +146,7 @@ describe('the turret self keys', () => {
     expect(JSON.parse(planJson)).toEqual(plan);
     const wire = JSON.parse(stateJson);
     expect(wire).not.toHaveProperty('feedback');
-    const cursors = ['spawnCursor', 'nextSpawnTick', 'nextShotId', 'nextMonsterId', 'nextBarrelId'];
+    const cursors = ['spawning', 'nextShotId', 'nextMonsterId', 'nextBarrelId'];
     for (const key of ['plan', 'seed', 'tick', ...cursors])
       expect(wire.defense).not.toHaveProperty(key);
     expect(wire.defense.monsters.length).toBeGreaterThan(0);

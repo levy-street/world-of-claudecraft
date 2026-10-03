@@ -1,8 +1,7 @@
 // Fire and Fly's missions (src/sim/content/fire_and_fly_missions.ts) and the knobs
-// they added to the plan: a march speed scale per entry, and a scenario's kegs (a
-// count scale, a standing cap, and placement on the arrival lanes). Absent knobs keep
-// every trial's plan and run exactly (the Standard digests in turret_scenarios and
-// turret_defense_engine stay pinned).
+// they added to the plan: a march speed scale per entry, and a wave's kegs (a random lot's
+// count, a standing cap, and placement on the arrival lanes). Absent knobs keep every
+// trial's plan and run exactly (the digests in turret_wave_groups_digest stay pinned).
 import { describe, expect, it } from 'vitest';
 import { decodeTurretPlan } from '../src/net/turret_session_wire';
 import {
@@ -31,7 +30,6 @@ import {
   fireAndFlyScoreboardInfo,
 } from '../src/sim/fire_and_fly_scoreboards';
 import { positionAt, type ThrowProbe } from '../src/sim/minigames/thrown_body';
-import { turretWaveLanes } from '../src/sim/minigames/turret_arrival';
 import { placeTurretBarrels } from '../src/sim/minigames/turret_barrels';
 import {
   createTurretDefense,
@@ -44,14 +42,46 @@ import {
   TURRET_PLAN_LIMITS,
   turretChargesGiven,
 } from '../src/sim/minigames/turret_defense_plan';
+import { turretGroupStart } from '../src/sim/minigames/turret_group_plan';
+import { placeTurretFieldKegs } from '../src/sim/minigames/turret_keg_lots';
 import { TURRET_POINTS } from '../src/sim/minigames/turret_result';
-import type { TurretScenarioDef } from '../src/sim/types';
+import { turretWaveLanes } from '../src/sim/minigames/turret_wave_groups';
+import type {
+  TurretGroupDef,
+  TurretKegLotDef,
+  TurretScenarioDef,
+  TurretWaveDef,
+} from '../src/sim/types';
 
 const TAU = Math.PI * 2;
 const START = 1000;
 const flat: ThrowProbe = { ground: () => 0, water: () => null };
+const entriesOf = (wave: TurretWaveDef) => wave.groups.flatMap((g) => g.entries);
 const spawnsOf = (s: TurretScenarioDef) =>
-  s.waves.map((wave) => wave.entries.reduce((n, e) => n + e.count, 0));
+  s.waves.map((wave) => entriesOf(wave).reduce((n, e) => n + e.count, 0));
+type PackDef = Extract<TurretGroupDef, { brick: 'pack' }>;
+const packsOf = (wave: TurretWaveDef) =>
+  wave.groups.filter((g): g is PackDef => g.brick === 'pack');
+/** A one-group wave's walking group (or small group), its gap band and sides. */
+function walkersOf(wave: TurretWaveDef) {
+  expect(wave.groups).toHaveLength(1);
+  const g = wave.groups[0];
+  if (g.brick !== 'walkers' && g.brick !== 'smallGroup') throw new Error(`a ${g.brick} wave`);
+  return g;
+}
+/** A one-group wave's sides: its walkers', bunches, or the ring. */
+function sidesOf(wave: TurretWaveDef): string {
+  const g = walkersOf(wave);
+  return g.brick === 'smallGroup' ? 'bunches' : (g.sides?.kind ?? 'ring');
+}
+/** A wave's one random keg lot, or none. */
+function ringLot(wave: { readonly kegs?: readonly TurretKegLotDef[] }) {
+  const lots = wave.kegs ?? [];
+  expect(lots.length).toBeLessThanOrEqual(1);
+  const lot = lots[0];
+  if (lot && lot.mode !== 'random') throw new Error(`a ${lot.mode} lot`);
+  return lot;
+}
 
 /** Signed angle from `b` to `a`, in (-PI, PI]. */
 function angleOff(a: number, b: number): number {
@@ -100,7 +130,7 @@ describe('the mission table', () => {
       expect(plan.resupplyWaves).toEqual([2, 4, 6]);
       expect(plan.chargeBonus).toBe(true);
       for (const wave of mission.waves) {
-        for (const entry of wave.entries) {
+        for (const entry of entriesOf(wave)) {
           const template = MOBS[entry.templateId];
           expect(TURRET_TEMPLATE_SIZES[entry.templateId], entry.templateId).toBeDefined();
           expect(entry.level).toBeGreaterThanOrEqual(template.minLevel);
@@ -130,45 +160,44 @@ describe('the mission table', () => {
     // foot now strikes in 0.8 s, so fewer of them, the last two waves in smaller packs.
     const r3 = [10, 14, 24, 24, 24, 36, 48, 54];
     for (const [i, n] of spawnsOf(TURRET_MISSION_PACK).entries()) expect(n).toBeLessThan(r3[i]);
-    expect(waves.map((w) => w.hunt?.packs.length)).toEqual([1, 1, 2, 2, 2, 3, 4, 4]);
-    expect(waves.map((w) => (w.hunt?.holdTicks ?? 0) / 20)).toEqual([6, 6, 4, 4, 4, 3, 2, 2]);
+    expect(waves.map((w) => packsOf(w).length)).toEqual([1, 1, 2, 2, 2, 3, 4, 4]);
     for (const [i, wave] of waves.entries()) {
+      const packs = packsOf(wave);
+      // One hold per wave, from 6 s down to 2 s.
+      const hold = [6, 6, 4, 4, 4, 3, 2, 2][i];
+      for (const p of packs) expect(p.holdTicks / 20).toBe(hold);
       // Far enough out that a front keg a dozen yards ahead still stands off the tower foot.
       const band = i < 6 ? [30, 36] : [30, 33];
-      expect([wave.hunt?.minRadius, wave.hunt?.maxRadius]).toEqual(band);
-      expect(wave.barrels.count).toBe(0);
-      expect(wave.arrival).toBeUndefined();
-      const scouts = wave.entries.filter((e) => e.role === 'scout');
-      const perPack = scouts.reduce((n, e) => n + e.count, 0) / (wave.hunt?.packs.length ?? 1);
+      for (const p of packs) expect([p.minRadius, p.maxRadius]).toEqual(band);
+      // A hunt wave lays its kegs on its packs' paths, none on the ring.
+      for (const lot of wave.kegs ?? []) expect(lot.mode).toBe('path');
+      // Every group a pack but the finale's sprint group, last.
+      const sprint = wave.groups.filter((g) => g.brick === 'sprint');
+      expect(sprint).toHaveLength(i === 7 ? 1 : 0);
+      expect(packs.length + sprint.length).toBe(wave.groups.length);
+      const scouts = entriesOf(wave).filter((e) => e.role === 'scout');
+      const perPack = scouts.reduce((n, e) => n + e.count, 0) / packs.length;
       expect(perPack).toBe(i === 0 ? 0 : 2);
       // The last three waves: a tenth quicker to rally and run, never tougher than the
       // template (lot R5: the owner's playtest found the sponges a chore).
       const late = i >= 5 ? 1.1 : 1;
-      for (const entry of wave.entries) {
-        const [min, max] =
-          entry.role === 'scout' ? [2.2, 2.6] : entry.role === 'sprint' ? [2.4, 2.4] : [1, 1.35];
-        expect(entry.speedScale).toBeCloseTo(min * late, 12);
-        expect(entry.speedScaleMax ?? entry.speedScale).toBeCloseTo(max * late, 12);
-        expect(entry.hpScale).toBeUndefined();
+      for (const group of wave.groups) {
+        for (const entry of group.entries) {
+          const [min, max] =
+            entry.role === 'scout' ? [2.2, 2.6] : group.brick === 'sprint' ? [2.4, 2.4] : [1, 1.35];
+          expect(entry.speedScale).toBeCloseTo(min * late, 12);
+          expect(entry.speedScaleMax ?? entry.speedScale).toBeCloseTo(max * late, 12);
+          expect(entry.hpScale).toBeUndefined();
+        }
       }
-      for (const p of wave.hunt?.packs ?? []) {
+      for (const p of packs) {
         expect(p.advanceScale).toBeGreaterThanOrEqual(1.1);
         expect(p.advanceScale).toBeLessThanOrEqual(1.35);
       }
     }
-    // The finale alone carries a sprint group; the first wave teaches the rally with a front keg.
-    expect(waves.map((w) => w.entries.some((e) => e.role === 'sprint'))).toEqual([
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      true,
-    ]);
-    expect(waves[0].hunt?.packs[0].kegs).toEqual([{ placement: 'rally-front' }]);
-    expect(plan.waves.every((w) => w.hunt !== undefined)).toBe(true);
+    // The first wave teaches the rally with a front keg.
+    expect(waves[0].kegs).toEqual([{ mode: 'path', group: 0, placement: 'front' }]);
+    expect(plan.waves.every((w) => w.groups.some((g) => g.brick === 'pack'))).toBe(true);
   });
 
   it("fells The Pack's members in two core hits at most and its leaders in a handful, every wave", () => {
@@ -177,7 +206,11 @@ describe('the mission table', () => {
     const plan = resolveTurretPlan(TURRET_MISSION_PACK);
     const most = { member: 0, leader: 0 };
     for (const [w, wave] of plan.waves.entries()) {
-      const leaders = new Set(wave.hunt?.packs.map((p) => wave.spawns[p.leader]));
+      const leaders = new Set(
+        wave.groups.flatMap((g, i) =>
+          g.brick === 'pack' ? [wave.spawns[turretGroupStart(wave, i) + g.leader]] : [],
+        ),
+      );
       for (const kind of new Set(wave.spawns)) {
         const hits = Math.ceil(plan.kinds[kind].maxHp / wave.coreDamage);
         const role = leaders.has(kind) ? 'leader' : 'member';
@@ -207,17 +240,19 @@ describe('the mission table', () => {
       }
     }
     for (const [w, wave] of plan.waves.entries()) {
-      for (const [p, pack] of (wave.hunt?.packs ?? []).entries()) {
-        const gatherers = wave.spawns.filter(
-          (kind, i) => wave.hunt?.groups[i] === p && plan.kinds[kind].role !== 'scout',
-        );
+      for (const [g, pack] of wave.groups.entries()) {
+        if (pack.brick !== 'pack') continue;
+        const start = turretGroupStart(wave, g);
+        const gatherers = wave.spawns
+          .slice(start, start + pack.count)
+          .filter((kind) => plan.kinds[kind].role !== 'scout');
         const slowest = Math.min(
           ...gatherers.map(
             (k) => MOBS[plan.kinds[k].templateId].moveSpeed * TURRET_TIMING.marchFactor,
           ),
         );
-        const def = TURRET_MISSION_PACK.waves[w].hunt?.packs[p];
-        expect(pack.pace).toBeCloseTo(slowest * (def?.advanceScale ?? 0), 12);
+        const def = TURRET_MISSION_PACK.waves[w].groups[g] as PackDef;
+        expect(pack.pace).toBeCloseTo(slowest * def.advanceScale, 12);
         // A walk: never past 1.35 times the slowest template's march.
         expect(pack.pace).toBeLessThanOrEqual(slowest * 1.35 + 1e-9);
       }
@@ -228,18 +263,18 @@ describe('the mission table', () => {
     const plan = resolveTurretPlan(TURRET_MISSION_GIANTS);
     for (const kind of plan.kinds) expect(['large', 'huge']).toContain(kind.sizeClass);
     for (const wave of TURRET_MISSION_GIANTS.waves)
-      for (const entry of wave.entries) expect(entry.hpScale).toBeGreaterThan(1);
+      for (const entry of entriesOf(wave)) expect(entry.hpScale).toBeGreaterThan(1);
     for (const wave of TURRET_MISSION_GIANTS.waves.slice(0, 5))
-      for (const entry of wave.entries) expect(entry.speedScale).toBeLessThan(1);
+      for (const entry of entriesOf(wave)) expect(entry.speedScale).toBeLessThan(1);
     const colossi = TURRET_MISSION_GIANTS.waves.slice(5);
     let pace = 1;
     for (const wave of colossi) {
-      expect(wave.arrival).toBeUndefined();
-      for (const entry of wave.entries) {
+      expect(sidesOf(wave)).toBe('ring');
+      for (const entry of entriesOf(wave)) {
         expect(['frostmane_yeti', 'idol_guardian']).toContain(entry.templateId);
         expect(entry.speedScale).toBeGreaterThan(1);
       }
-      const fastest = Math.max(...wave.entries.map((e) => e.speedScale ?? 1));
+      const fastest = Math.max(...entriesOf(wave).map((e) => e.speedScale ?? 1));
       expect(fastest).toBeGreaterThan(pace);
       pace = fastest;
     }
@@ -260,12 +295,14 @@ describe('the mission table', () => {
     const waves = TURRET_MISSION_DELUGE.waves;
     for (let i = 1; i < waves.length; i++) {
       expect(spawns[i]).toBeGreaterThan(spawns[i - 1]);
-      expect(waves[i].entries[0].speedScale ?? 1).toBeGreaterThan(
-        waves[i - 1].entries[0].speedScale ?? 1,
+      expect(entriesOf(waves[i])[0].speedScale ?? 1).toBeGreaterThan(
+        entriesOf(waves[i - 1])[0].speedScale ?? 1,
       );
-      expect(waves[i].gapMaxTicks).toBeLessThanOrEqual(waves[i - 1].gapMaxTicks);
+      expect(walkersOf(waves[i]).gapMaxTicks).toBeLessThanOrEqual(
+        walkersOf(waves[i - 1]).gapMaxTicks,
+      );
     }
-    for (const wave of waves) expect(wave.arrival).toBeUndefined();
+    for (const wave of waves) expect(sidesOf(wave)).toBe('ring');
   });
 
   it('gives The Cracked Tower 7 tower points and no large or huge monster', () => {
@@ -281,26 +318,30 @@ describe('the mission table', () => {
 
   it("puts twice the kegs on The Powder Store's lanes, sided waves, a cap of 12 the finale fills", () => {
     const plan = resolveTurretPlan(TURRET_MISSION_POWDER);
+    // Each wave lays twice the kegs of the Standing Watch wave its size, on its lanes.
+    expect(TURRET_MISSION_POWDER.waves.map((w) => ringLot(w)?.count)).toEqual([
+      6, 6, 8, 8, 10, 10, 12, 12,
+    ]);
     plan.waves.forEach((wave, i) => {
-      expect(wave.barrels).toEqual({
-        ...TURRET_MISSION_POWDER.waves[i].barrels,
-        count: TURRET_MISSION_POWDER.waves[i].barrels.count * 2,
-        placement: 'lanes',
-        cap: 12,
+      expect(ringLot(wave)).toMatchObject({
+        mode: 'random',
+        minRadius: 16,
+        maxRadius: 30,
+        lanes: true,
       });
-      expect(wave.arrival.kind).not.toBe('ring');
+      expect(wave.kegCap).toBe(12);
+      expect(sidesOf(TURRET_MISSION_POWDER.waves[i])).not.toBe('ring');
     });
-    expect(plan.waves.slice(6).map((w) => w.barrels.count)).toEqual([12, 12]);
-    expect(plan.waves.slice(5).map((w) => w.arrival)).toEqual([
-      { kind: 'flanks', count: 3, widthTurn: 0.06 },
-      { kind: 'flanks', count: 3, widthTurn: 0.06 },
-      { kind: 'flanks', count: 3, widthTurn: 0.06 },
+    expect(TURRET_MISSION_POWDER.waves.slice(5).map((w) => walkersOf(w))).toMatchObject([
+      { sides: { kind: 'flanks', count: 3, widthTurn: 0.06 } },
+      { sides: { kind: 'flanks', count: 3, widthTurn: 0.06 } },
+      { sides: { kind: 'flanks', count: 3, widthTurn: 0.06 } },
     ]);
   });
 
   it('names the largest keg cap of every resolved plan, above the default one', () => {
     const caps = FIRE_AND_FLY_SCENARIOS.flatMap((s) =>
-      resolveTurretPlan(s).waves.map((w) => w.barrels.cap ?? TURRET_EXPLOSIVE_BARREL.cap),
+      resolveTurretPlan(s).waves.map((w) => w.kegCap ?? TURRET_EXPLOSIVE_BARREL.cap),
     );
     expect(FIRE_AND_FLY_MAX_KEG_CAP).toBe(Math.max(...caps));
     expect(FIRE_AND_FLY_MAX_KEG_CAP).toBe(12);
@@ -311,10 +352,12 @@ describe('the plan knobs', () => {
   it('scales an entry march speed as a kind of its own, and keeps the unscaled speed exact', () => {
     const wolf = { templateId: 'forest_wolf', count: 2, level: 2 };
     const base = TURRET_SCENARIO_STANDARD.waves[0];
+    const walking = (entries: TurretGroupDef['entries']): TurretWaveDef => ({
+      ...base,
+      groups: [{ brick: 'walkers', entries, gapMinTicks: 1, gapMaxTicks: 2 }],
+    });
     const plan = resolveTurretPlan(
-      variant({
-        waves: [{ ...base, entries: [wolf, { ...wolf, speedScale: 1.5 }, { ...wolf }] }],
-      }),
+      variant({ waves: [walking([wolf, { ...wolf, speedScale: 1.5 }, { ...wolf }])] }),
     );
     expect(plan.kinds).toHaveLength(2);
     const speed = MOBS.forest_wolf.moveSpeed * TURRET_TIMING.marchFactor;
@@ -322,38 +365,51 @@ describe('the plan knobs', () => {
     expect(plan.kinds[1].marchSpeed).toBeCloseTo(speed * 1.5, 12);
     for (const bad of [0, -1, Number.NaN, Number.POSITIVE_INFINITY]) {
       expect(() =>
-        resolveTurretPlan(
-          variant({ waves: [{ ...base, entries: [{ ...wolf, speedScale: bad }] }] }),
-        ),
+        resolveTurretPlan(variant({ waves: [walking([{ ...wolf, speedScale: bad }])] })),
       ).toThrow(/speed scale/);
     }
   });
 
-  it('scales, caps and places the kegs, refusing values past the plan limits', () => {
-    const scaled = resolveTurretPlan(variant({ kegs: { countScale: 1.5, cap: 9 } }));
-    const standard = resolveTurretPlan(TURRET_SCENARIO_STANDARD);
-    scaled.waves.forEach((wave, i) => {
-      expect(wave.barrels.count).toBe(Math.round(standard.waves[i].barrels.count * 1.5));
-      expect(wave.barrels.cap).toBe(9);
-      expect(wave.barrels.placement).toBeUndefined();
-    });
-    const tooMany = { countScale: TURRET_PLAN_LIMITS.barrels };
-    expect(() => resolveTurretPlan(variant({ kegs: tooMany }))).toThrow(/too many kegs/);
+  it('caps and places the kegs, refusing values past the plan limits', () => {
+    const lots = (kegs: TurretKegLotDef[], kegCap?: number) =>
+      variant({
+        waves: TURRET_SCENARIO_STANDARD.waves.map((w) => ({
+          ...w,
+          kegs,
+          ...(kegCap !== undefined ? { kegCap } : {}),
+        })),
+      });
+    const ring = { mode: 'random', count: 4, minRadius: 16, maxRadius: 30 } as const;
+    const capped = resolveTurretPlan(lots([ring, { mode: 'crown', count: 3 }], 9));
+    for (const wave of capped.waves) {
+      expect(wave.kegs).toEqual([ring, { mode: 'crown', count: 3 }]);
+      expect(wave.kegCap).toBe(9);
+    }
+    const tooMany = { ...ring, count: TURRET_PLAN_LIMITS.barrels / 2 + 1 };
+    expect(() => resolveTurretPlan(lots([tooMany, tooMany]))).toThrow(/bad kegs/);
     for (const cap of [0, 1.5, TURRET_PLAN_LIMITS.barrels + 1])
-      expect(() => resolveTurretPlan(variant({ kegs: { cap } }))).toThrow(/keg cap/);
-    expect(() => resolveTurretPlan(variant({ kegs: { countScale: 0 } }))).toThrow(/count scale/);
-    expect(() =>
-      resolveTurretPlan(variant({ kegs: { placement: 'road' as unknown as 'lanes' } })),
-    ).toThrow(/placement/);
+      expect(() => resolveTurretPlan(lots([ring], cap))).toThrow(/keg cap/);
+    for (const lot of [
+      { ...ring, count: 0 },
+      { ...ring, minRadius: 30, maxRadius: 16 },
+      { ...ring, lanes: false as unknown as true },
+      { mode: 'scatter', count: 2 } as unknown as TurretKegLotDef,
+      // Standing Watch's walkers come from the whole ring: no route a path keg can stand on.
+      { mode: 'path', group: 0, placement: 'front' } as const,
+      { mode: 'path', group: 3, placement: 'front' } as const,
+    ])
+      expect(() => resolveTurretPlan(lots([lot]))).toThrow(/bad kegs/);
     // A forged plan past the limits never decodes.
     const wire = JSON.parse(JSON.stringify(resolveTurretPlan(TURRET_MISSION_POWDER)));
     expect(decodeTurretPlan(wire)).not.toBeNull();
-    for (const barrels of [
-      { ...wire.waves[0].barrels, cap: TURRET_PLAN_LIMITS.barrels + 1 },
-      { ...wire.waves[0].barrels, placement: 'ring' },
-      { ...wire.waves[0].barrels, count: TURRET_PLAN_LIMITS.barrels + 1 },
+    for (const edit of [
+      { kegCap: TURRET_PLAN_LIMITS.barrels + 1 },
+      { kegs: [{ ...wire.waves[0].kegs[0], lanes: 'ring' }] },
+      { kegs: [{ ...wire.waves[0].kegs[0], count: TURRET_PLAN_LIMITS.barrels + 1 }] },
+      { kegs: [{ ...wire.waves[0].kegs[0], mode: 'scatter' }] },
+      { kegs: [{ mode: 'path', group: 1, placement: 'front' }, ...wire.waves[0].kegs] },
     ]) {
-      const forged = { ...wire, waves: [{ ...wire.waves[0], barrels }, ...wire.waves.slice(1)] };
+      const forged = { ...wire, waves: [{ ...wire.waves[0], ...edit }, ...wire.waves.slice(1)] };
       expect(decodeTurretPlan(forged)).toBeNull();
     }
   });
@@ -366,9 +422,9 @@ describe('the plan knobs', () => {
         state.wave = w;
         const lanes = turretWaveLanes(state, w, wave)!;
         expect(lanes.length).toBeGreaterThan(0);
-        const placed = placeTurretBarrels(state, wave.barrels, START, flat);
+        const placed = placeTurretFieldKegs(state, wave, START, flat);
         expect(placed.length).toBeGreaterThan(0);
-        expect(placed.length).toBeLessThanOrEqual(wave.barrels.count);
+        expect(placed.length).toBeLessThanOrEqual(ringLot(wave)?.count ?? 0);
         for (const [i, barrel] of placed.entries()) {
           const bearing = Math.atan2(barrel.x, barrel.z);
           const inSome = lanes.some(
@@ -389,16 +445,20 @@ describe('the plan knobs', () => {
       TURRET_EXPLOSIVE_BARREL.cap,
     );
     const capped = createTurretDefense(plan, { x: 0, z: 0 }, 5, START);
-    expect(placeTurretBarrels(capped, { ...def, cap: 3 }, START, flat)).toHaveLength(3);
-    expect(placeTurretBarrels(capped, { ...def, cap: 3 }, START, flat)).toEqual([]);
+    expect(placeTurretBarrels(capped, def, START, flat, { cap: 3 })).toHaveLength(3);
+    expect(placeTurretBarrels(capped, def, START, flat, { cap: 3 })).toEqual([]);
   });
 
   it('draws the evenly spread kegs of a ring wave exactly as before, lanes or not', () => {
     const plan = resolveTurretPlan(TURRET_SCENARIO_STANDARD);
     const a = createTurretDefense(plan, { x: 0, z: 0 }, 9, START);
     const b = createTurretDefense(plan, { x: 0, z: 0 }, 9, START);
-    const def = plan.waves[2].barrels;
-    expect(placeTurretBarrels(b, { ...def, placement: 'lanes' }, START, flat)).toEqual(
+    const def = ringLot(plan.waves[2])!;
+    a.wave = 2;
+    b.wave = 2;
+    const lanes = turretWaveLanes(b, 2, plan.waves[2]);
+    expect(lanes).toBeNull();
+    expect(placeTurretBarrels(b, def, START, flat, { lanes })).toEqual(
       placeTurretBarrels(a, def, START, flat),
     );
   });

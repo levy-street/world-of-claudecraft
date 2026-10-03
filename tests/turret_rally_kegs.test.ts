@@ -1,8 +1,8 @@
-// Fire and Fly placed kegs (src/sim/minigames/turret_rally_kegs.ts): a hunt wave lays its
-// kegs at its own rallies, on the advance path or at its rim, or on the advance axis at a set
-// distance from the tower, by the barrels' own clear-spot rules and under the keg cap. No keg
-// blast reaches a member standing at its rally, and none stands nearer the tower than the
-// keg ring's inner edge.
+// Fire and Fly path kegs on a pack's route (src/sim/minigames/turret_rally_kegs.ts, laid by
+// turret_keg_lots.ts): a pack's kegs stand at its own rally, on the advance path or at its
+// rim, or on the advance axis at a set distance from the tower, by the barrels' own
+// clear-spot rules and under the keg cap. No keg blast reaches a member standing at its
+// rally, and none stands nearer the tower than the keg ring's inner edge.
 import { describe, expect, it } from 'vitest';
 import { TURRET_MISSION_PACK } from '../src/sim/content/fire_and_fly_missions';
 import {
@@ -17,17 +17,15 @@ import {
   tickTurretDefense,
 } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
+import { placeTurretPathKegs } from '../src/sim/minigames/turret_keg_lots';
 import {
   openTurretRallies,
+  turretPackSize,
   turretRallyPack,
   turretRallyReach,
   turretRallySlot,
 } from '../src/sim/minigames/turret_rally';
-import {
-  placeTurretRallyKegs,
-  turretRallyKegBand,
-  turretRallyKegSpot,
-} from '../src/sim/minigames/turret_rally_kegs';
+import { turretRallyKegBand, turretRallyKegSpot } from '../src/sim/minigames/turret_rally_kegs';
 
 const flat: ThrowProbe = { ground: () => 0, water: () => null };
 
@@ -64,15 +62,7 @@ describe('a rally keg spot', () => {
     expect([TURRET_RALLY.axisOffsetMin, TURRET_RALLY.axisOffsetMax]).toEqual([2.5, 3]);
     for (const depth of [0, 0.5, 0.999]) {
       for (const side of [0.01, 0.3, 0.49, 0.5, 0.8, 0.99]) {
-        const spot = turretRallyKegSpot(
-          { placement: 'rally-front' },
-          rally,
-          0,
-          0,
-          side,
-          depth,
-          reach,
-        );
+        const spot = turretRallyKegSpot({ placement: 'front' }, rally, 0, 0, side, depth, reach);
         const f = frame(rally, spot);
         expect(f.along).toBeGreaterThanOrEqual(TURRET_RALLY.frontMin - 1e-9);
         expect(f.along).toBeLessThanOrEqual(TURRET_RALLY.frontMax + 1e-9);
@@ -90,7 +80,7 @@ describe('a rally keg spot', () => {
     for (const side of [0.1, 0.9]) {
       const f = frame(
         rally,
-        turretRallyKegSpot({ placement: 'rally-side' }, rally, 0, 0, side, 0.3, reach),
+        turretRallyKegSpot({ placement: 'side' }, rally, 0, 0, side, 0.3, reach),
       );
       expect(f.along).toBeGreaterThanOrEqual(TURRET_RALLY.frontMin - 1e-9);
       expect(Math.abs(f.across)).toBeGreaterThanOrEqual(TURRET_RALLY.sideOffsetMin - 1e-9);
@@ -113,7 +103,7 @@ describe('a rally keg spot', () => {
   it('gives way so that a keg blast never reaches a member standing at the rally', () => {
     for (const size of [1, 8, 12, 18, 24]) {
       const r = turretRallyReach(size);
-      for (const placement of ['rally-front', 'rally-side'] as const) {
+      for (const placement of ['front', 'side'] as const) {
         for (const side of [0.01, 0.25, 0.75, 0.99]) {
           const spot = turretRallyKegSpot({ placement }, rally, 0, 0, side, 0, r);
           expect(nearestStanding(rally, size, spot)).toBeGreaterThanOrEqual(
@@ -154,15 +144,15 @@ describe("a hunt wave's kegs", () => {
         const state = createTurretDefense(plan, { x: 0, z: 0 }, seed, 0);
         state.wave = w;
         const rallies = openTurretRallies(state, wave);
-        const placed = placeTurretRallyKegs(state, wave, rallies, 0, flat);
-        const kegs = wave.hunt!.packs.reduce((n, p) => n + p.kegs.length, 0);
+        const placed = placeTurretPathKegs(state, wave, 0, flat);
+        const kegs = wave.kegs.length;
         expect(placed.length, `wave ${w + 1} seed ${seed}`).toBe(kegs);
         for (const keg of placed) {
           expect(Math.hypot(keg.x, keg.z)).toBeGreaterThanOrEqual(
             TURRET_BARREL_RING.minRadius - 1e-9,
           );
           for (const rally of rallies) {
-            const size = wave.hunt!.groups.filter((g) => g === turretRallyPack(rally.id)).length;
+            const size = turretPackSize(wave, turretRallyPack(rally.id));
             expect(
               nearestStanding(rally, size, keg),
               `wave ${w + 1} seed ${seed}`,
@@ -195,7 +185,7 @@ describe("a hunt wave's kegs", () => {
       });
       const [rally] = openTurretRallies(state, wave);
       runs++;
-      const size = wave.hunt!.groups.filter((g) => g === 0).length;
+      const size = turretPackSize(wave, 0);
       if (nearestStanding(rally, size, state.barrels[0]) >= TURRET_EXPLOSIVE_BARREL.blastRadius)
         clear++;
     }
@@ -208,12 +198,13 @@ describe("a hunt wave's kegs", () => {
     full.wave = 4;
     for (let i = 0; i < TURRET_EXPLOSIVE_BARREL.cap; i++)
       full.barrels.push({ id: 100 + i, x: 200 + 10 * i, y: 0, z: 200, litTick: -1, blowTick: -1 });
-    expect(placeTurretRallyKegs(full, wave, openTurretRallies(full, wave), 0, flat)).toEqual([]);
+    openTurretRallies(full, wave);
+    expect(placeTurretPathKegs(full, wave, 0, flat)).toEqual([]);
     const a = createTurretDefense(plan, { x: 0, z: 0 }, 3, 0);
     const b = createTurretDefense(plan, { x: 0, z: 0 }, 3, 0);
     a.wave = b.wave = 4;
-    expect(placeTurretRallyKegs(a, wave, openTurretRallies(a, wave), 0, flat)).toEqual(
-      placeTurretRallyKegs(b, wave, openTurretRallies(b, wave), 0, flat),
-    );
+    openTurretRallies(a, wave);
+    openTurretRallies(b, wave);
+    expect(placeTurretPathKegs(a, wave, 0, flat)).toEqual(placeTurretPathKegs(b, wave, 0, flat));
   });
 });

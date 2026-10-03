@@ -1219,11 +1219,17 @@ describe('Fire and Fly monsters on screen', () => {
       supply: undefined,
       waves: [
         {
-          ...TURRET_MISSION_PACK.waves[0],
-          hunt: undefined,
-          entries: [
-            { templateId: 'forest_wolf', count: 3, level: 2 },
-            { templateId: 'wild_boar', count: 3, level: 2 },
+          coreDamage: TURRET_MISSION_PACK.waves[0].coreDamage,
+          groups: [
+            {
+              brick: 'walkers',
+              entries: [
+                { templateId: 'forest_wolf', count: 3, level: 2 },
+                { templateId: 'wild_boar', count: 3, level: 2 },
+              ],
+              gapMinTicks: 1,
+              gapMaxTicks: 2,
+            },
           ],
         },
       ],

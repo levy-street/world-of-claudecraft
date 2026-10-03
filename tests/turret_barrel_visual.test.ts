@@ -148,7 +148,7 @@ describe('the barrel visual', () => {
   });
 
   it("draws every keg The Powder Store stands at once, past the trials' cap", async () => {
-    expect(FIRE_AND_FLY_MAX_KEG_CAP).toBe(TURRET_MISSION_POWDER.kegs?.cap);
+    expect(FIRE_AND_FLY_MAX_KEG_CAP).toBe(TURRET_MISSION_POWDER.waves[0].kegCap);
     expect(FIRE_AND_FLY_MAX_KEG_CAP).toBeGreaterThan(TURRET_EXPLOSIVE_BARREL.cap);
     const { visual } = await built();
     const kegs = Array.from({ length: FIRE_AND_FLY_MAX_KEG_CAP }, (_, i) =>

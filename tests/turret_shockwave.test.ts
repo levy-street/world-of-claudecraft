@@ -35,13 +35,17 @@ import {
   turretShockwaveFront,
 } from '../src/sim/minigames/turret_shockwave';
 import type { TurretSizeClass } from '../src/sim/types';
+import {
+  holdTurretSpawns,
+  releaseTurretSpawns,
+  turretSpawned,
+  walkersWavePlan,
+} from './helpers/turret_wave_plan';
 
 const flat: ThrowProbe = { ground: () => 0, water: () => null };
 const START = 1000;
 const INTRO_END = START + TURRET_TIMING.introTicks;
-const HELD_BACK = Number.MAX_SAFE_INTEGER;
 const CORE = 80;
-const NO_BARRELS = { count: 0, minRadius: 0, maxRadius: 0 };
 const ROLL = TURRET_SHOCKWAVE.rollTicks;
 
 function kind(size: TurretSizeClass, maxHp: number): TurretKind {
@@ -65,14 +69,10 @@ function plan(k: TurretKind, count: number, shockwave = 2): TurretPlan {
     chargeBonus: false,
     kinds: [k],
     waves: [
-      {
-        spawns: Array.from({ length: count }, () => 0),
-        coreDamage: CORE,
-        gapMinTicks: 16,
-        gapMaxTicks: 32,
-        barrels: NO_BARRELS,
-        arrival: { kind: 'ring' },
-      },
+      walkersWavePlan(
+        Array.from({ length: count }, () => 0),
+        { coreDamage: CORE, gapMinTicks: 16, gapMaxTicks: 32 },
+      ),
     ],
     bowling: { ...TURRET_BOWLING, enabled: false },
   };
@@ -92,11 +92,11 @@ function ofType<T extends TurretEvent['type']>(events: readonly TurretEvent[], t
 function field(k: TurretKind, count: number, shockwave = 2, seed = 7) {
   const state = createTurretDefense(plan(k, count, shockwave), { x: 0, z: 0 }, seed, START);
   run(state, INTRO_END);
-  while (state.spawnCursor < count) {
-    state.nextSpawnTick = 0;
+  while (turretSpawned(state) < count) {
+    releaseTurretSpawns(state);
     run(state, state.tick + 1);
   }
-  state.nextSpawnTick = HELD_BACK;
+  holdTurretSpawns(state);
   for (const m of state.monsters) lay(state, m, 200 + m.id * 10, 200);
   return { state, ms: [...state.monsters] };
 }
@@ -284,7 +284,7 @@ describe('the slam', () => {
   it('cancels a windup: the striker is thrown, the tower keeps its points', () => {
     const state = createTurretDefense(plan(kind('large', 5000), 1), { x: 0, z: 0 }, 7, START);
     run(state, INTRO_END);
-    state.nextSpawnTick = HELD_BACK;
+    holdTurretSpawns(state);
     const m = state.monsters[0];
     while (m.state !== 'windup') run(state, state.tick + 1);
     const strike = Math.ceil(m.seg.end);
@@ -318,7 +318,7 @@ describe('the slam', () => {
       for (const [before, breaches] of arms) {
         const state = createTurretDefense(plan(kind(size, 5000), 1), { x: 0, z: 0 }, 7, START);
         run(state, INTRO_END);
-        state.nextSpawnTick = HELD_BACK;
+        holdTurretSpawns(state);
         const m = state.monsters[0];
         while (m.state !== 'windup') run(state, state.tick + 1);
         const strike = Math.ceil(m.seg.end);
@@ -457,7 +457,7 @@ describe('charges and the rearm', () => {
   it('keeps a lost run frozen: the ring in progress is dropped', () => {
     const state = createTurretDefense(plan(kind('huge', 5000), 1), { x: 0, z: 0 }, 7, START);
     run(state, INTRO_END);
-    state.nextSpawnTick = HELD_BACK;
+    holdTurretSpawns(state);
     const m = state.monsters[0];
     while (m.state !== 'windup') run(state, state.tick + 1);
     state.integrity = 1;

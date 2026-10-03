@@ -8,10 +8,12 @@ import { FIRE_AND_FLY_TOWER } from '../fire_and_fly_field';
 import {
   DT,
   type TurretBowlingDef,
+  type TurretKegLotDef,
   type TurretMedalBars,
   type TurretSizeClass,
   type TurretSizeDef,
   type TurretWaveDef,
+  type TurretWaveEntry,
 } from '../types';
 
 const ticks = (seconds: number): number => Math.round(seconds / DT);
@@ -44,66 +46,69 @@ const PACE = 1.7;
 /** Inside the march, well clear of the tower's foot and of the 46 yd spawn ring. */
 export const TURRET_BARREL_RING = { minRadius: 16, maxRadius: 30 } as const;
 
+/** A wave's keg lots: `count` kegs spread around the keg ring band (none for 0); `lanes` on its sides. */
+export function turretKegRing(count: number, lanes?: 'lanes'): readonly TurretKegLotDef[] {
+  if (count <= 0) return [];
+  return [{ mode: 'random', count, ...TURRET_BARREL_RING, ...(lanes ? { lanes: true } : {}) }];
+}
+
+/** Standing Watch's waves: one group of walkers from the whole ring. */
+function ringWave(
+  entries: readonly TurretWaveEntry[],
+  coreDamage: number,
+  kegs: number,
+): TurretWaveDef {
+  return {
+    groups: [{ brick: 'walkers', entries, gapMinTicks: GAP_MIN, gapMaxTicks: GAP_MAX }],
+    coreDamage,
+    kegs: turretKegRing(kegs),
+  };
+}
+
 export const TURRET_WAVES: readonly TurretWaveDef[] = [
-  {
-    entries: [{ templateId: 'forest_wolf', count: 11, level: 2, speedScale: PACE }],
-    coreDamage: 75,
-    gapMinTicks: GAP_MIN,
-    gapMaxTicks: GAP_MAX,
-    barrels: { count: 3, ...TURRET_BARREL_RING },
-  },
-  {
-    entries: [
+  ringWave([{ templateId: 'forest_wolf', count: 11, level: 2, speedScale: PACE }], 75, 3),
+  ringWave(
+    [
       { templateId: 'forest_wolf', count: 8, level: 2, speedScale: PACE },
       { templateId: 'wild_boar', count: 8, level: 3, speedScale: PACE },
     ],
-    coreDamage: 80,
-    gapMinTicks: GAP_MIN,
-    gapMaxTicks: GAP_MAX,
-    barrels: { count: 3, ...TURRET_BARREL_RING },
-  },
-  {
-    entries: [
+    80,
+    3,
+  ),
+  ringWave(
+    [
       { templateId: 'vale_bandit', count: 11, level: 5, speedScale: PACE },
       { templateId: 'webwood_spider', count: 8, level: 4, speedScale: PACE },
     ],
-    coreDamage: 105,
-    gapMinTicks: GAP_MIN,
-    gapMaxTicks: GAP_MAX,
-    barrels: { count: 4, ...TURRET_BARREL_RING },
-  },
-  {
-    entries: [
+    105,
+    4,
+  ),
+  ringWave(
+    [
       { templateId: 'tunnel_rat', count: 11, level: 6, speedScale: PACE },
       { templateId: 'fen_troll', count: 6, level: 11, speedScale: PACE },
     ],
-    coreDamage: 125,
-    gapMinTicks: GAP_MIN,
-    gapMaxTicks: GAP_MAX,
-    barrels: { count: 4, ...TURRET_BARREL_RING },
-  },
-  {
-    entries: [
+    125,
+    4,
+  ),
+  ringWave(
+    [
       { templateId: 'deeprock_kobold', count: 11, level: 15, speedScale: PACE },
       { templateId: 'thornpeak_ogre', count: 6, level: 16, speedScale: PACE },
       { templateId: 'boneclad_revenant', count: 6, level: 19, speedScale: PACE },
     ],
-    coreDamage: 163,
-    gapMinTicks: GAP_MIN,
-    gapMaxTicks: GAP_MAX,
-    barrels: { count: 5, ...TURRET_BARREL_RING },
-  },
-  {
-    entries: [
+    163,
+    5,
+  ),
+  ringWave(
+    [
       { templateId: 'boneclad_revenant', count: 8, level: 19, speedScale: PACE },
       { templateId: 'frostmane_yeti', count: 3, level: 20, speedScale: PACE },
       { templateId: 'idol_guardian', count: 1, level: 20, speedScale: PACE, bossLast: true },
     ],
-    coreDamage: 275,
-    gapMinTicks: GAP_MIN,
-    gapMaxTicks: GAP_MAX,
-    barrels: { count: 5, ...TURRET_BARREL_RING },
-  },
+    275,
+    5,
+  ),
 ];
 
 export const TURRET_WEAPON = {
@@ -311,6 +316,33 @@ export const TURRET_RALLY = {
    */
   kegClearance: TURRET_EXPLOSIVE_BARREL.blastRadius - TURRET_EXPLOSIVE_BARREL.radius,
 } as const;
+
+/**
+ * Surgers (minigames/turret_surgers.ts) set off away from the action: its bearing is the
+ * centre of the busiest of `sectors` equal sectors around the tower, each living monster in
+ * one weighing from `ringWeight` at the spawn ring to `footWeight` at the tower's foot,
+ * linearly in its distance (a marcher's time to strike is linear in its distance, so the
+ * weight ranks the sides by how soon they strike, a crowd at the foot outweighing the same
+ * crowd at the ring three to one). Each bunch's side wanders up to `jitterTurn` either way.
+ */
+export const TURRET_SURGERS = {
+  sectors: 8,
+  ringWeight: 1,
+  footWeight: 3,
+  jitterTurn: 0.02,
+} as const;
+
+/**
+ * The tower crown's kegs (minigames/turret_keg_lots.ts), just beyond the Shockwave's 12 yd
+ * reach. The slam lights no keg, but a thrown body striking one faster than the bowling
+ * minimum does. Measured on flat ground (probe g1/ff_crown_band.mts, a slam on bodies at
+ * the foot, a keg stood on each body's own line): a medium body lights it from 13.15 yd
+ * out (its feet come under a keg's top at 12.2 yd), a large one at any distance from 11
+ * to 15, a huge one out to 13.55 (it is fast only to 11.9; its 1.7 yd contact reach does
+ * the rest); a small one flies over everything to 17.5. This band is where a medium,
+ * large or huge body a slam throws at a crown keg lights it.
+ */
+export const TURRET_KEG_CROWN = { minRadius: 13.2, maxRadius: 13.5 } as const;
 
 export const TURRET_PHYSICS = {
   /** Gameplay gravity (yd/s^2), snappier than the player's. */

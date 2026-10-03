@@ -24,6 +24,7 @@ import {
 } from '../src/sim/minigames/turret_result';
 import { turretSessionView } from '../src/sim/turret_defense_session';
 import type { TurretScenarioDef, TurretSession } from '../src/sim/types';
+import { markTurretWaveSpawned } from './helpers/turret_wave_plan';
 
 const START = 1000;
 const flat: ThrowProbe = { ground: () => 0, water: () => null };
@@ -230,11 +231,15 @@ describe('the result at the end of a run', () => {
     medals: { gold: { minIntegrityShare: 0.8 }, silver: { minIntegrityShare: 0.4 } },
     waves: [
       {
-        entries: [{ templateId: 'forest_wolf', count: 6, level: 2 }],
+        groups: [
+          {
+            brick: 'walkers',
+            entries: [{ templateId: 'forest_wolf', count: 6, level: 2 }],
+            gapMinTicks: 16,
+            gapMaxTicks: 32,
+          },
+        ],
         coreDamage: 60,
-        gapMinTicks: 16,
-        gapMaxTicks: 32,
-        barrels: { count: 0, minRadius: 0, maxRadius: 0 },
       },
     ],
   };
@@ -274,7 +279,7 @@ describe('the result at the end of a run', () => {
     // Every wave cleared with nobody spawned: the plan's last wave ends the run.
     state.phase = 'wave';
     state.wave = plan.waves.length - 1;
-    state.spawnCursor = plan.waves[state.wave].spawns.length;
+    markTurretWaveSpawned(state);
     state.integrity = 66;
     const events = tickTurretDefense(state, START + TURRET_TIMING.introTicks, flat);
     expect(state.phase).toBe('won');

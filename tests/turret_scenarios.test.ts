@@ -39,8 +39,19 @@ import {
   type TurretPlan,
 } from '../src/sim/minigames/turret_defense_plan';
 import { TURRET_STREAM, turretDraw } from '../src/sim/minigames/turret_defense_rng';
+import {
+  TURRET_GROUP_LIMITS,
+  type TurretArrivalPlan,
+  type TurretGroupPlan,
+} from '../src/sim/minigames/turret_group_plan';
 import { turretResult } from '../src/sim/minigames/turret_result';
-import type { TurretArrivalDef, TurretScenarioDef, TurretWaveDef } from '../src/sim/types';
+import type {
+  TurretGroupDef,
+  TurretScenarioDef,
+  TurretSidesDef,
+  TurretWaveDef,
+  TurretWaveEntry,
+} from '../src/sim/types';
 
 const TAU = Math.PI * 2;
 const START = 1000;
@@ -50,7 +61,6 @@ const hills: ThrowProbe = {
   ground: (x, z) => 2 * Math.sin(x * 0.11) + 1.5 * Math.cos(z * 0.13) + 0.04 * x,
   water: () => null,
 };
-const NO_BARRELS = { count: 0, minRadius: 0, maxRadius: 0 };
 
 function fnv(text: string): string {
   let h = 0x811c9dc5;
@@ -70,15 +80,62 @@ function scenario(waves: TurretWaveDef[], integrity = 100): TurretScenarioDef {
   return { ...TURRET_SCENARIO_STANDARD, id: 'test_scenario', boardKey: 'test', waves, integrity };
 }
 
-function wolves(count: number, arrival?: TurretArrivalDef): TurretWaveDef {
-  return {
-    entries: [{ templateId: 'forest_wolf', count, level: 2 }],
-    coreDamage: 60,
-    gapMinTicks: 16,
-    gapMaxTicks: 32,
-    barrels: NO_BARRELS,
-    ...(arrival ? { arrival } : {}),
-  };
+const WOLF: TurretWaveEntry = { templateId: 'forest_wolf', count: 1, level: 2 };
+
+/** A wave of one group: walkers from the sides given (absent, the ring), or bunches. */
+function wave(
+  entries: readonly TurretWaveEntry[],
+  arrival?: TurretArrivalPlan,
+  gaps = { gapMinTicks: 16, gapMaxTicks: 32 },
+): TurretWaveDef {
+  const group: TurretGroupDef =
+    arrival?.kind === 'bunches'
+      ? {
+          brick: 'smallGroup',
+          entries,
+          size: arrival.size,
+          bunchGapTicks: arrival.bunchGapTicks,
+          widthTurn: arrival.widthTurn,
+          ...gaps,
+        }
+      : { brick: 'walkers', entries, ...gaps, ...(arrival ? { sides: arrival } : {}) };
+  return { groups: [group], coreDamage: 60 };
+}
+
+function wolves(count: number, arrival?: TurretArrivalPlan): TurretWaveDef {
+  return wave([{ ...WOLF, count }], arrival);
+}
+
+/** A wave's entries, every group's. */
+function entriesOf(w: TurretWaveDef): TurretWaveEntry[] {
+  return w.groups.flatMap((g) => g.entries);
+}
+
+/** The one group of a single-group wave. */
+function only(w: TurretWaveDef): TurretGroupDef {
+  expect(w.groups).toHaveLength(1);
+  return w.groups[0];
+}
+
+/** A one-group wave's spawn gap band. */
+function gapsOf(w: TurretWaveDef): { gapMinTicks: number; gapMaxTicks: number } {
+  const g = only(w);
+  if (!('gapMinTicks' in g)) throw new Error('a group with no gap band');
+  return g;
+}
+
+/** How a one-group wave's monsters arrive: its sides' kind, or bunches. */
+function arrivalOf(w: TurretWaveDef): string {
+  const g = only(w);
+  if (g.brick === 'smallGroup') return 'bunches';
+  if (g.brick !== 'walkers') return g.brick;
+  return g.sides?.kind ?? 'ring';
+}
+
+/** The walking group of a resolved one-group wave. */
+function walking(group: TurretGroupPlan) {
+  if (group.brick !== 'walkers') throw new Error('not walkers');
+  return group;
 }
 
 function sectorOf(...args: Parameters<typeof turretArrivalSector>): TurretBearingSector {
@@ -165,8 +222,8 @@ describe('the scenario table', () => {
   it('keeps Standard the original run: the same wave table and the common tower', () => {
     expect(TURRET_SCENARIO_STANDARD.waves).toBe(TURRET_WAVES);
     expect(TURRET_SCENARIO_STANDARD.integrity).toBe(TURRET_TOWER_POINTS);
-    for (const wave of TURRET_WAVES) expect(wave.arrival).toBeUndefined();
-    for (const e of TURRET_WAVES.flatMap((w) => w.entries)) expect(e.hpScale).toBeUndefined();
+    for (const w of TURRET_WAVES) expect(arrivalOf(w)).toBe('ring');
+    for (const e of TURRET_WAVES.flatMap(entriesOf)) expect(e.hpScale).toBeUndefined();
   });
 
   it('makes Introduction a gentle climb of small monsters at their own pace, on the same tower', () => {
@@ -175,14 +232,14 @@ describe('the scenario table', () => {
     // One tower for every trial since lot R5b: the waves carry the difficulty.
     expect(intro.integrity).toBe(TURRET_SCENARIO_STANDARD.integrity);
     // Its first wave spaces its spawns wider than Standing Watch's, then they close up.
-    expect(intro.waves[0].gapMinTicks).toBeGreaterThan(TURRET_WAVES[0].gapMinTicks);
-    const sizes = intro.waves.map((w) => w.entries.reduce((n, e) => n + e.count, 0));
+    expect(gapsOf(intro.waves[0]).gapMinTicks).toBeGreaterThan(gapsOf(TURRET_WAVES[0]).gapMinTicks);
+    const sizes = intro.waves.map((w) => entriesOf(w).reduce((n, e) => n + e.count, 0));
     for (const [w, wave] of intro.waves.entries()) {
       // The load climbs a step a wave, the only fall being the grouped wave past the kegs.
-      if (w > 0 && wave.arrival?.kind !== 'burst')
+      if (w > 0 && arrivalOf(wave) !== 'bunches')
         expect(sizes[w]).toBeGreaterThanOrEqual(sizes[w - 1]);
-      expect(wave.gapMinTicks).toBeLessThanOrEqual(intro.waves[0].gapMinTicks);
-      for (const e of wave.entries) {
+      expect(gapsOf(wave).gapMinTicks).toBeLessThanOrEqual(gapsOf(intro.waves[0]).gapMinTicks);
+      for (const e of entriesOf(wave)) {
         expect(TURRET_TEMPLATE_SIZES[e.templateId]).toBe('small');
         expect(e.hpScale).toBeUndefined();
         // No monster runs faster than its template: the cannon is learnt, not raced.
@@ -195,15 +252,13 @@ describe('the scenario table', () => {
 
   it('makes Hard use every arrival pattern, tougher monsters and more of the large ones', () => {
     const hard = TURRET_SCENARIO_HARD;
-    expect(new Set(hard.waves.map((w) => w.arrival?.kind))).toEqual(
-      new Set(['arc', 'flanks', 'burst']),
-    );
-    expect(hard.waves.filter((w) => w.arrival?.kind !== 'arc').length).toBeGreaterThan(4);
-    const beforeLast = hard.waves.slice(0, -1).flatMap((w) => w.entries);
+    expect(new Set(hard.waves.map(arrivalOf))).toEqual(new Set(['arc', 'flanks', 'bunches']));
+    expect(hard.waves.filter((w) => arrivalOf(w) !== 'arc').length).toBeGreaterThan(4);
+    const beforeLast = hard.waves.slice(0, -1).flatMap(entriesOf);
     expect(Math.max(...beforeLast.map((e) => e.hpScale ?? 1))).toBe(1.8);
     const count = (s: TurretScenarioDef, sizes: readonly string[]) =>
       s.waves
-        .flatMap((w) => w.entries)
+        .flatMap(entriesOf)
         .filter((e) => sizes.includes(TURRET_TEMPLATE_SIZES[e.templateId]))
         .reduce((n, e) => n + e.count, 0);
     const all = ['small', 'medium', 'large', 'huge'];
@@ -213,24 +268,24 @@ describe('the scenario table', () => {
     expect(count(hard, all)).toBeGreaterThan(count(std, all));
     expect(count(hard, ['large', 'huge'])).toBeGreaterThan(count(std, ['large', 'huge']));
     expect(count(hard, ['huge'])).toBe(count(std, ['huge']));
-    expect(hard.waves[0].gapMinTicks).toBeLessThan(TURRET_WAVES[0].gapMinTicks);
-    expect(hard.waves[0].gapMaxTicks).toBeLessThan(TURRET_WAVES[0].gapMaxTicks);
+    expect(gapsOf(hard.waves[0]).gapMinTicks).toBeLessThan(gapsOf(TURRET_WAVES[0]).gapMinTicks);
+    expect(gapsOf(hard.waves[0]).gapMaxTicks).toBeLessThan(gapsOf(TURRET_WAVES[0]).gapMaxTicks);
   });
 
   it('gives Hard tight packs, two rushes on three sides at once, then the giants run down by a charge', () => {
     const [, packs, rush, , lastRush, last] = TURRET_SCENARIO_HARD.waves;
-    expect(packs.arrival).toMatchObject({ kind: 'burst', groupSize: 10 });
-    expect(packs.gapMaxTicks).toBeLessThanOrEqual(5);
+    expect(only(packs)).toMatchObject({ brick: 'smallGroup', size: 10 });
+    expect(gapsOf(packs).gapMaxTicks).toBeLessThanOrEqual(5);
     for (const wave of [rush, lastRush]) {
-      expect(wave.arrival).toMatchObject({ kind: 'flanks', count: 3 });
-      expect(wave.gapMaxTicks).toBeLessThanOrEqual(2);
+      expect(only(wave)).toMatchObject({ sides: { kind: 'flanks', count: 3 } });
+      expect(gapsOf(wave).gapMaxTicks).toBeLessThanOrEqual(2);
     }
     // The giants set off first; the charge spawns after them from three sides, quicker.
     // Eighteen of them since the one medal rule, and no sponge (lot R5b).
-    expect(last.arrival).toMatchObject({ kind: 'flanks', count: 3 });
-    const giants = last.entries.filter((e) => TURRET_TEMPLATE_SIZES[e.templateId] === 'huge');
+    expect(only(last)).toMatchObject({ sides: { kind: 'flanks', count: 3 } });
+    const giants = entriesOf(last).filter((e) => TURRET_TEMPLATE_SIZES[e.templateId] === 'huge');
     expect(giants.map((e) => e.templateId).sort()).toEqual(['frostmane_yeti', 'idol_guardian']);
-    const charge = last.entries.at(-1)!;
+    const charge = entriesOf(last).at(-1)!;
     expect(charge).toMatchObject({ templateId: 'boneclad_revenant', bossLast: true });
     expect(charge.count).toBe(19);
     for (const giant of giants) {
@@ -253,9 +308,7 @@ describe('the scenario table', () => {
   });
 
   it("keeps Hard's kegs wave by wave as many as Standard's: they were barely used", () => {
-    expect(TURRET_SCENARIO_HARD.waves.map((w) => w.barrels)).toEqual(
-      TURRET_WAVES.map((w) => w.barrels),
-    );
+    expect(TURRET_SCENARIO_HARD.waves.map((w) => w.kegs)).toEqual(TURRET_WAVES.map((w) => w.kegs));
   });
 });
 
@@ -266,11 +319,25 @@ describe('resolving a scenario into a plan', () => {
     expect(plan.scenarioId).toBe('fire_and_fly_standard');
     expect(plan.integrity).toBe(70);
     expect(plan.arsenal).toEqual({ shockwave: 8, fragmentation: 0 });
-    for (const wave of plan.waves) expect(wave.arrival).toEqual({ kind: 'ring' });
+    for (const w of plan.waves) expect(walking(w.groups[0]).sides).toEqual({ kind: 'ring' });
     // The resolved plan, byte for byte: lot R4 retuned the table for the 0.8 s strike, lot
     // R5b for the one medal rule (two fifths more monsters at a pace of 1.7, spawns 0.6 to
-    // 1.2 s apart).
-    const before = { kinds: plan.kinds, waves: plan.waves.map(({ arrival, ...w }) => w) };
+    // 1.2 s apart). Lot G1 laid the same numbers out as groups and keg lots: projected back
+    // onto the wave shape before it, they hash as they did.
+    const waves = plan.waves.map((w) => {
+      const group = walking(w.groups[0]);
+      const lot = w.kegs[0];
+      if (w.groups.length !== 1 || w.kegs.length !== 1 || lot.mode !== 'random')
+        throw new Error('not a ring wave');
+      return {
+        spawns: w.spawns,
+        coreDamage: w.coreDamage,
+        gapMinTicks: group.gapMinTicks,
+        gapMaxTicks: group.gapMaxTicks,
+        barrels: { count: lot.count, minRadius: lot.minRadius, maxRadius: lot.maxRadius },
+      };
+    });
+    const before = { kinds: plan.kinds, waves };
     expect(fnv(JSON.stringify({ ...before, bowling: plan.bowling }))).toBe('63a02a17');
   });
 
@@ -285,11 +352,19 @@ describe('resolving a scenario into a plan', () => {
       expect(plan.chargeBonus).toBe(false);
       expect(plan.waves).toHaveLength(s.waves.length);
       expect(Object.isFrozen(plan.arsenal)).toBe(true);
-      expect(Object.isFrozen(plan.waves[0].arrival)).toBe(true);
-      plan.waves.forEach((wave, i) => {
-        expect(wave.arrival).toEqual(s.waves[i].arrival ?? { kind: 'ring' });
-        expect(wave.arrival).not.toBe(s.waves[i].arrival);
-        expect(wave.spawns).toHaveLength(s.waves[i].entries.reduce((n, e) => n + e.count, 0));
+      expect(Object.isFrozen(plan.waves[0].groups[0])).toBe(true);
+      plan.waves.forEach((w, i) => {
+        expect(w.groups).toHaveLength(s.waves[i].groups.length);
+        w.groups.forEach((group, g) => {
+          const def = s.waves[i].groups[g];
+          expect(group.count).toBe(def.entries.reduce((n, e) => n + e.count, 0));
+          if (group.brick === 'walkers' && def.brick === 'walkers') {
+            expect(group.sides).toEqual(def.sides ?? { kind: 'ring' });
+            expect(group.sides).not.toBe(def.sides);
+          }
+        });
+        expect(w.spawns).toHaveLength(entriesOf(s.waves[i]).reduce((n, e) => n + e.count, 0));
+        expect(w.kegs).toEqual(s.waves[i].kegs ?? []);
       });
     },
   );
@@ -345,14 +420,11 @@ describe('resolving a scenario into a plan', () => {
 
   it('scales health by the entry, rounded, as a kind of its own', () => {
     const waves = [
-      {
-        ...wolves(0),
-        entries: [
-          { templateId: 'fen_troll', count: 1, level: 11 },
-          { templateId: 'fen_troll', count: 1, level: 11, hpScale: 1.4 },
-          { templateId: 'fen_troll', count: 1, level: 11, hpScale: 1 },
-        ],
-      },
+      wave([
+        { templateId: 'fen_troll', count: 1, level: 11 },
+        { templateId: 'fen_troll', count: 1, level: 11, hpScale: 1.4 },
+        { templateId: 'fen_troll', count: 1, level: 11, hpScale: 1 },
+      ]),
     ];
     const plan = resolveTurretPlan(scenario(waves));
     const base = mobMaxHp(MOBS.fen_troll, 11);
@@ -368,20 +440,36 @@ describe('resolving a scenario into a plan', () => {
     ['a zero health scale', { hpScale: 0 }, /bad health scale/],
     ['a non-finite health scale', { hpScale: Number.NaN }, /bad health scale/],
   ])('refuses %s', (_name, extra, message) => {
-    const waves = [{ ...wolves(1), entries: [{ ...wolves(1).entries[0], ...extra }] }];
+    const waves = [wave([{ ...WOLF, ...extra }])];
     expect(() => resolveTurretPlan(scenario(waves))).toThrow(message);
   });
 
   it.each([
-    ['an empty arc', { kind: 'arc', widthTurn: 0 }],
-    ['an arc wider than the ring', { kind: 'arc', widthTurn: 1.5 }],
-    ['four flanks', { kind: 'flanks', count: 4, widthTurn: 0.1 }],
-    ['an empty pack', { kind: 'burst', groupSize: 0, groupGapTicks: 20, widthTurn: 0.1 }],
-    ['a fractional pause', { kind: 'burst', groupSize: 3, groupGapTicks: 2.5, widthTurn: 0.1 }],
-    ['an unknown pattern', { kind: 'spiral' }],
-  ])('refuses %s', (_name, arrival) => {
-    const waves = [wolves(4, arrival as unknown as TurretArrivalDef)];
-    expect(() => resolveTurretPlan(scenario(waves))).toThrow(/bad \w+ arrival in test_scenario/);
+    ['an empty arc', { kind: 'arc', widthTurn: 0 }, /bad walkers in test_scenario/],
+    ['an arc wider than the ring', { kind: 'arc', widthTurn: 1.5 }, /bad walkers/],
+    ['four flanks', { kind: 'flanks', count: 4, widthTurn: 0.1 }, /bad walkers/],
+    ['an unknown pattern', { kind: 'spiral' }, /bad walkers/],
+    [
+      'an empty bunch',
+      { kind: 'bunches', size: 0, bunchGapTicks: 20, widthTurn: 0.1 },
+      /bad small group/,
+    ],
+    [
+      'a fractional pause',
+      { kind: 'bunches', size: 3, bunchGapTicks: 2.5, widthTurn: 0.1 },
+      /bad small group/,
+    ],
+  ])('refuses %s', (_name, arrival, message) => {
+    const waves = [wolves(4, arrival as unknown as TurretArrivalPlan)];
+    expect(() => resolveTurretPlan(scenario(waves))).toThrow(message);
+  });
+
+  it('refuses a gap band upside down, a group with no monster and a wave with no group', () => {
+    const upside = [wave([{ ...WOLF, count: 3 }], undefined, { gapMinTicks: 9, gapMaxTicks: 3 })];
+    expect(() => resolveTurretPlan(scenario(upside))).toThrow(/bad walkers/);
+    expect(() => resolveTurretPlan(scenario([wolves(0)]))).toThrow(/empty or oversized group/);
+    const none = [{ groups: [], coreDamage: 60 }];
+    expect(() => resolveTurretPlan(scenario(none))).toThrow(/bad group count/);
   });
 
   it('refuses a tower with no points or fractional ones', () => {
@@ -390,10 +478,10 @@ describe('resolving a scenario into a plan', () => {
   });
 
   const LIMITS = TURRET_PLAN_LIMITS;
-  const pack = (groupSize: number, groupGapTicks: number): TurretArrivalDef => ({
-    kind: 'burst',
-    groupSize,
-    groupGapTicks,
+  const pack = (size: number, bunchGapTicks: number): TurretArrivalPlan => ({
+    kind: 'bunches',
+    size,
+    bunchGapTicks,
     widthTurn: 0.1,
   });
   // The online client's plan decoder rejects each of these: the server must never seat one.
@@ -413,33 +501,85 @@ describe('resolving a scenario into a plan', () => {
     ],
     [
       'a wave spawning more than the wire carries',
-      { waves: [wolves(LIMITS.spawnsPerWave + 1)] },
+      {
+        waves: [
+          {
+            groups: [0, 1].map(() => wolves(LIMITS.spawnsPerWave / 2 + 1).groups[0]),
+            coreDamage: 60,
+          },
+        ],
+      },
       /too many spawns/,
+    ],
+    [
+      'a group spawning more than the wire carries',
+      { waves: [wolves(LIMITS.spawnsPerWave + 1)] },
+      /empty or oversized group/,
     ],
     [
       'more monster kinds than the wire carries',
       {
         waves: [
-          {
-            ...wolves(0),
-            entries: Array.from({ length: LIMITS.kinds + 1 }, (_, i) => ({
-              ...wolves(1).entries[0],
-              hpScale: 1 + i / 100,
-            })),
-          },
+          wave(
+            Array.from({ length: LIMITS.kinds + 1 }, (_, i) => ({ ...WOLF, hpScale: 1 + i / 100 })),
+          ),
         ],
       },
       /too many monster kinds/,
     ],
     [
-      'a pack larger than the wire carries',
+      'a bunch larger than the wire carries',
       { waves: [wolves(4, pack(LIMITS.spawnsPerWave + 1, 20))] },
-      /bad burst arrival/,
+      /bad small group/,
     ],
     [
       'a pause longer than the wire carries',
-      { waves: [wolves(4, pack(2, LIMITS.groupGapTicks + 1))] },
-      /bad burst arrival/,
+      { waves: [wolves(4, pack(2, TURRET_GROUP_LIMITS.delayTicks + 1))] },
+      /bad small group/,
+    ],
+    [
+      'more groups than the wire carries',
+      {
+        waves: [
+          {
+            groups: Array.from(
+              { length: TURRET_GROUP_LIMITS.groups + 1 },
+              () => wolves(1).groups[0],
+            ),
+            coreDamage: 60,
+          },
+        ],
+      },
+      /bad group count/,
+    ],
+    [
+      'a delay longer than the wire carries',
+      {
+        waves: [
+          {
+            groups: [{ ...wolves(1).groups[0], delayTicks: TURRET_GROUP_LIMITS.delayTicks + 1 }],
+            coreDamage: 60,
+          },
+        ],
+      },
+      /bad group delay/,
+    ],
+    [
+      'more kegs than the wire carries',
+      {
+        waves: [
+          {
+            ...wolves(1),
+            kegs: [{ mode: 'random', count: LIMITS.barrels + 1, minRadius: 16, maxRadius: 30 }],
+          },
+        ],
+      },
+      /bad kegs/,
+    ],
+    [
+      'a keg cap past the wire',
+      { waves: [{ ...wolves(1), kegCap: LIMITS.barrels + 1 }] },
+      /bad keg cap/,
     ],
   ] as const)('refuses %s', (_name, override, message) => {
     const def = { ...scenario([wolves(1)]), ...override } as TurretScenarioDef;
@@ -493,30 +633,30 @@ describe('arrival sectors', () => {
     }
   });
 
-  it('gives each pack of a burst its own side and a pause after its last member', () => {
-    const burst = { kind: 'burst', groupSize: 3, groupGapTicks: 70, widthTurn: 0.05 } as const;
+  it('gives each bunch of a small group its own side and a pause after its last member', () => {
+    const burst = { kind: 'bunches', size: 3, bunchGapTicks: 70, widthTurn: 0.05 } as const;
     const packOf = (i: number) => sectorOf({ seed: 5 }, 0, burst, i);
     expect(packOf(1)).toEqual(packOf(0));
     expect(packOf(2)).toEqual(packOf(0));
     expect(packOf(3)).not.toEqual(packOf(0));
     expect(packOf(5)).toEqual(packOf(3));
-    const wave = resolveTurretPlan(scenario([wolves(9, burst)])).waves[0];
-    expect(turretArrivalGap({ seed: 5 }, wave, 2, 3)).toBe(70);
-    expect(turretArrivalGap({ seed: 5 }, wave, 5, 6)).toBe(70);
+    const group = walking(resolveTurretPlan(scenario([wolves(9, burst)])).waves[0].groups[0]);
+    expect(turretArrivalGap({ seed: 5 }, group, 2, 3)).toBe(70);
+    expect(turretArrivalGap({ seed: 5 }, group, 5, 6)).toBe(70);
     for (const index of [0, 1, 3, 4]) {
-      const gap = turretArrivalGap({ seed: 5 }, wave, index, index + 1);
+      const gap = turretArrivalGap({ seed: 5 }, group, index, index + 1);
       expect(gap).toBeGreaterThanOrEqual(16);
       expect(gap).toBeLessThanOrEqual(32);
     }
   });
 
   it('keeps the ring gap draw exactly the one the engine always drew', () => {
-    const wave = resolveTurretPlan().waves[0];
+    const group = walking(resolveTurretPlan().waves[0].groups[0]);
     for (let id = 1; id < 40; id++) {
       const draw = turretDraw({ seed: 3 }, TURRET_STREAM.spawnGap, id);
-      const span = wave.gapMaxTicks - wave.gapMinTicks + 1;
-      expect(turretArrivalGap({ seed: 3 }, wave, id - 1, id)).toBe(
-        wave.gapMinTicks + Math.floor(draw * span),
+      const span = group.gapMaxTicks - group.gapMinTicks + 1;
+      expect(turretArrivalGap({ seed: 3 }, group, id - 1, id)).toBe(
+        group.gapMinTicks + Math.floor(draw * span),
       );
     }
   });
@@ -555,10 +695,10 @@ describe('arrival bearings on the field', () => {
     });
   });
 
-  it('brings a burst wave as packs: close in time and side, a pause between packs', () => {
-    const arrival = { kind: 'burst', groupSize: 4, groupGapTicks: 60, widthTurn: 0.05 } as const;
-    const wave = { ...wolves(12, arrival), gapMinTicks: 4, gapMaxTicks: 8 };
-    const plan = resolveTurretPlan(scenario([wave]));
+  it('brings a small group wave as bunches: close in time and side, a pause between bunches', () => {
+    const arrival = { kind: 'bunches', size: 4, bunchGapTicks: 60, widthTurn: 0.05 } as const;
+    const bunched = wave([{ ...WOLF, count: 12 }], arrival, { gapMinTicks: 4, gapMaxTicks: 8 });
+    const plan = resolveTurretPlan(scenario([bunched]));
     const { seen } = spawns(plan, 6);
     for (let i = 1; i < seen.length; i++) {
       const gap = seen[i].tick - seen[i - 1].tick;

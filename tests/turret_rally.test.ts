@@ -19,47 +19,71 @@ import {
 } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import { turretRallyId, turretRallySlot } from '../src/sim/minigames/turret_rally';
-import type {
-  TurretHuntDef,
-  TurretPackDef,
-  TurretScenarioDef,
-  TurretWaveEntry,
-} from '../src/sim/types';
+import type { TurretGroupDef, TurretScenarioDef, TurretWaveEntry } from '../src/sim/types';
 
 const flat: ThrowProbe = { ground: () => 0, water: () => null };
 const START = 0;
 const WOLF_MARCH = MOBS.forest_wolf.moveSpeed * TURRET_TIMING.marchFactor;
 const MUSTER = { speedScale: 1, speedScaleMax: 1.35 } as const;
 const SCOUT = { role: 'scout', speedScale: 2.2, speedScaleMax: 2.6 } as const;
-const PACK: TurretPackDef = { advanceScale: 1.2, kegs: [], delayTicks: 0 };
+const PACK = { advanceScale: 1.2, delayTicks: 0 } as const;
 
+/** An entry of a hunt wave: its pack (absent with a sprint role, which runs in the sprint group). */
+type HuntEntry = Omit<TurretWaveEntry, 'role'> & { pack?: number; role?: 'scout' | 'sprint' };
+
+interface HuntOptions {
+  packs: readonly { advanceScale: number; delayTicks: number }[];
+  minRadius: number;
+  maxRadius: number;
+  holdTicks: number;
+  spreadTicks: number;
+  widthTurn: number;
+  sprintDelayTicks: number;
+}
+
+/** One hunt wave: each pack a group of its entries with the shared rally knobs, the sprint group last. */
 function scenario(
-  entries: TurretWaveEntry[],
-  hunt: Partial<TurretHuntDef> = {},
+  entries: HuntEntry[],
+  options: Partial<HuntOptions> = {},
   coreDamage = 1,
 ): TurretScenarioDef {
+  const hunt: HuntOptions = {
+    packs: [PACK],
+    minRadius: 28,
+    maxRadius: 28,
+    holdTicks: 400,
+    spreadTicks: 20,
+    widthTurn: 0.05,
+    sprintDelayTicks: 0,
+    ...options,
+  };
+  const plain = ({ pack: _pack, role, ...entry }: HuntEntry): TurretWaveEntry =>
+    role === 'scout' ? { ...entry, role } : entry;
+  const groups: TurretGroupDef[] = hunt.packs.map((pack, p) => ({
+    brick: 'pack',
+    entries: entries.filter((e) => e.pack === p).map(plain),
+    minRadius: hunt.minRadius,
+    maxRadius: hunt.maxRadius,
+    holdTicks: hunt.holdTicks,
+    spreadTicks: hunt.spreadTicks,
+    widthTurn: hunt.widthTurn,
+    advanceScale: pack.advanceScale,
+    delayTicks: pack.delayTicks,
+  }));
+  const sprint = entries.filter((e) => e.role === 'sprint').map(plain);
+  if (sprint.length)
+    groups.push({
+      brick: 'sprint',
+      entries: sprint,
+      spreadTicks: hunt.spreadTicks,
+      widthTurn: hunt.widthTurn,
+      delayTicks: hunt.sprintDelayTicks,
+    });
   return {
     ...TURRET_SCENARIO_STANDARD,
     id: 'test_hunt',
     boardKey: 'test',
-    waves: [
-      {
-        entries,
-        coreDamage,
-        gapMinTicks: 1,
-        gapMaxTicks: 2,
-        barrels: { count: 0, minRadius: 16, maxRadius: 30 },
-        hunt: {
-          packs: [PACK],
-          minRadius: 28,
-          maxRadius: 28,
-          holdTicks: 400,
-          spreadTicks: 20,
-          widthTurn: 0.05,
-          ...hunt,
-        },
-      },
-    ],
+    waves: [{ groups, coreDamage }],
   };
 }
 
@@ -437,7 +461,10 @@ describe('a whole hunt', () => {
     const a = trace(17);
     expect(a.at(-1)).toBe('won');
     expect(a.filter((line) => line.includes('"rallyCue"')).length).toBe(
-      TURRET_MISSION_PACK.waves.reduce((n, w) => n + (w.hunt?.packs.length ?? 0), 0),
+      TURRET_MISSION_PACK.waves.reduce(
+        (n, w) => n + w.groups.filter((g) => g.brick === 'pack').length,
+        0,
+      ),
     );
     expect(trace(17)).toEqual(a);
     expect(trace(18)).not.toEqual(a);

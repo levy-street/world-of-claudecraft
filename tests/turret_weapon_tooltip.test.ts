@@ -32,6 +32,12 @@ import {
   turretWeaponTooltip,
 } from '../src/ui/hud/vehicle/turret_weapon_tooltip';
 import { setLanguage } from '../src/ui/i18n';
+import {
+  holdTurretSpawns,
+  releaseTurretSpawns,
+  turretSpawned,
+  walkersWavePlan,
+} from './helpers/turret_wave_plan';
 
 const flat: ThrowProbe = { ground: () => 0, water: () => null };
 const START = 1000;
@@ -54,14 +60,9 @@ function plan(coreDamage: number, ...later: number[]): TurretPlan {
     resupplyWaves: [],
     chargeBonus: false,
     kinds: [KIND],
-    waves: [coreDamage, ...later].map((damage) => ({
-      spawns: [0],
-      coreDamage: damage,
-      gapMinTicks: 16,
-      gapMaxTicks: 32,
-      barrels: { count: 0, minRadius: 0, maxRadius: 0 },
-      arrival: { kind: 'ring' as const },
-    })),
+    waves: [coreDamage, ...later].map((damage) =>
+      walkersWavePlan([0], { coreDamage: damage, gapMinTicks: 16, gapMaxTicks: 32 }),
+    ),
     bowling: { ...TURRET_BOWLING, enabled: false },
   };
 }
@@ -80,11 +81,11 @@ function field(
 ): { state: TurretDefenseState; m: TurretMonster } {
   const state = createTurretDefense(plan(coreDamage), { x: 0, z: 0 }, 7, START);
   run(state, START + TURRET_TIMING.introTicks);
-  while (state.spawnCursor < 1) {
-    state.nextSpawnTick = 0;
+  while (turretSpawned(state) < 1) {
+    releaseTurretSpawns(state);
     run(state, state.tick + 1);
   }
-  state.nextSpawnTick = Number.MAX_SAFE_INTEGER;
+  holdTurretSpawns(state);
   const m = state.monsters[0];
   m.state = 'down';
   m.seg = stillSegment(state.tick, 100000, { x, y: 0, z });

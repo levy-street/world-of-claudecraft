@@ -1,4 +1,4 @@
-// Fire and Fly hunts, the engine half: a hunt wave's packs gather at rallies in the field,
+// Fire and Fly hunts, the engine half: a wave's pack groups gather at rallies in the field,
 // then advance together. A member walks in from its pack's side to its own place in a disc
 // around the rally (`muster`) and stands there (`hold`). Once every living member stands,
 // or once the hold timer since the first gathering member's arrival runs out (scouts, the
@@ -15,9 +15,15 @@ import { TURRET_EXPLOSIVE_BARREL, TURRET_RALLY } from '../content/turret_defense
 import { groundOr, marchSegment, positionAt, stillSegment, type ThrowProbe } from './thrown_body';
 import type { TurretBearingSector } from './turret_barrels';
 import type { TurretDefenseState, TurretEvent, TurretMonster } from './turret_defense';
-import { type TurretWavePlan, turretStrikeDistance } from './turret_defense_plan';
+import { turretStrikeDistance } from './turret_defense_plan';
 import { TURRET_STREAM, type TurretDrawSource, turretDraw } from './turret_defense_rng';
-import { TURRET_HUNT_LIMITS, type TurretHuntPlan } from './turret_hunt_plan';
+import {
+  type TurretWavePlan,
+  turretPackCount,
+  turretPackGroup,
+  turretPackLeaderKind,
+} from './turret_group_plan';
+import { TURRET_HUNT_LIMITS } from './turret_hunt_plan';
 import { turretPaceOf } from './turret_pace';
 
 const TAU = Math.PI * 2;
@@ -96,28 +102,24 @@ function sideBearing(run: TurretDrawSource, wave: number, packs: number, group: 
   return base + ((group + jitter * SIDE_JITTER) / packs) * TAU;
 }
 
-/** The arc a hunt wave's spawn comes through: its pack's side, or the sprint group's. */
+/** The arc a pack group's spawn (`g`) comes through, or the sprint group's: its side's. */
 export function turretHuntSector(
   run: TurretDrawSource,
-  wave: number,
-  hunt: TurretHuntPlan,
-  index: number,
+  waveIndex: number,
+  wave: TurretWavePlan,
+  g: number,
 ): TurretBearingSector {
-  const center = sideBearing(run, wave, hunt.packs.length, hunt.groups[index]);
-  const width = hunt.widthTurn * TAU;
+  const group = wave.groups[g];
+  const pack = group.brick === 'pack' ? group.pack : -1;
+  const center = sideBearing(run, waveIndex, turretPackCount(wave), pack);
+  const width = (group.brick === 'pack' || group.brick === 'sprint' ? group.widthTurn : 0) * TAU;
   return { from: center - width / 2, width };
 }
 
-/** Ticks from a hunt wave's `index`-th spawn to its next one (the plan's schedule). */
-export function turretHuntGap(hunt: TurretHuntPlan, index: number): number {
-  return index + 1 < hunt.ticks.length ? hunt.ticks[index + 1] - hunt.ticks[index] : 0;
-}
-
-/** Members pack `pack` of a hunt gathers: its spawns in the plan. */
-export function turretPackSize(hunt: TurretHuntPlan, pack: number): number {
-  let n = 0;
-  for (const g of hunt.groups) if (g === pack) n++;
-  return n;
+/** Members pack `pack` of a wave gathers: its group's count. */
+export function turretPackSize(wave: TurretWavePlan, pack: number): number {
+  const g = turretPackGroup(wave, pack);
+  return g < 0 ? 0 : wave.groups[g].count;
 }
 
 /** How far the nearest standing keg stands outside the gathering disc plus the clearance (yd). */
@@ -130,19 +132,21 @@ function rallyRoom(state: TurretDefenseState, x: number, z: number, reach: numbe
 
 /**
  * Opens the current wave's rallies at its start, one per pack: on the pack's side, at a
- * drawn distance in the band, redrawn while the gathering disc would cover a standing keg
+ * drawn distance in its band, redrawn while the gathering disc would cover a standing keg
  * (the draw that leaves the most room stands). Returns the ones opened, in pack order.
  */
 export function openTurretRallies(state: TurretDefenseState, wave: TurretWavePlan): TurretRally[] {
-  const hunt = wave.hunt;
-  if (!hunt) return [];
+  const packs = turretPackCount(wave);
+  if (!packs) return [];
   state.rallies ??= [];
   const rallies = state.rallies;
   const opened: TurretRally[] = [];
   const tries = TURRET_RALLY.placementTries;
-  hunt.packs.forEach((pack, p) => {
-    const bearing = sideBearing(state, state.wave, hunt.packs.length, p);
-    const reach = turretRallyReach(turretPackSize(hunt, p));
+  for (const group of wave.groups) {
+    if (group.brick !== 'pack') continue;
+    const p = group.pack;
+    const bearing = sideBearing(state, state.wave, packs, p);
+    const reach = turretRallyReach(group.count);
     let x = state.cx;
     let z = state.cz;
     let best = Number.NEGATIVE_INFINITY;
@@ -151,7 +155,7 @@ export function openTurretRallies(state: TurretDefenseState, wave: TurretWavePla
       for (let attempt = 0; attempt < tries; attempt++) {
         const key = p * tries + attempt;
         const u = turretDraw(state, TURRET_STREAM.rallyRadius, state.wave, key);
-        const r = hunt.minRadius + u * (hunt.maxRadius - hunt.minRadius);
+        const r = group.minRadius + u * (group.maxRadius - group.minRadius);
         const tx = state.cx + Math.sin(bearing + turn * TAU) * r;
         const tz = state.cz + Math.cos(bearing + turn * TAU) * r;
         const room = rallyRoom(state, tx, tz, reach);
@@ -166,8 +170,8 @@ export function openTurretRallies(state: TurretDefenseState, wave: TurretWavePla
       id: turretRallyId(state.wave, p),
       x,
       z,
-      pace: pack.pace,
-      holdTicks: hunt.holdTicks,
+      pace: group.pace,
+      holdTicks: group.holdTicks,
       leader: -1,
       firstArrivalTick: -1,
       cueTick: -1,
@@ -175,7 +179,7 @@ export function openTurretRallies(state: TurretDefenseState, wave: TurretWavePla
     };
     rallies.push(rally);
     opened.push(rally);
-  });
+  }
   return opened;
 }
 
@@ -225,32 +229,31 @@ function musterTo(
 }
 
 /**
- * A hunt wave's new monster, already on the field with a march to the tower at its own
- * pace: a pack member turns to its place at its pack's rally (and takes the lead when it
- * is the pack's leader); one whose pack already left goes for the tower at the pack's pace
- * (a scout at its own); a sprint group's keeps its march.
+ * A pack group's new monster (group `g`, its `index`-th), already on the field with a march
+ * to the tower at its own pace: it turns to its place at its pack's rally (and takes the lead
+ * when it is the pack's leader); one whose pack already left goes for the tower at the pack's
+ * pace (a scout at its own). Any other group's keeps its march.
  */
 export function joinTurretHunt(
   state: TurretDefenseState,
   m: TurretMonster,
-  hunt: TurretHuntPlan,
+  wave: TurretWavePlan,
+  g: number,
   index: number,
   tick: number,
 ): void {
-  const pack = hunt.groups[index];
-  if (pack < 0) return;
-  const rally = rallyById(state, turretRallyId(state.wave, pack));
+  const group = wave.groups[g];
+  if (group.brick !== 'pack') return;
+  const rally = rallyById(state, turretRallyId(state.wave, group.pack));
   const p = { x: m.seg.x, y: m.seg.y, z: m.seg.z };
   if (!rally) {
-    if (state.plan.kinds[m.kind].role !== 'scout') m.pace = hunt.packs[pack].pace;
+    if (state.plan.kinds[m.kind].role !== 'scout') m.pace = group.pace;
     marchIn(state, m, tick, p);
     return;
   }
-  let slot = 0;
-  for (let i = 0; i < index; i++) if (hunt.groups[i] === pack) slot++;
   m.rally = rally.id;
-  m.slot = slot;
-  if (index === hunt.packs[pack].leader) rally.leader = m.id;
+  m.slot = index;
+  if (index === group.leader) rally.leader = m.id;
   musterTo(state, m, rally, tick, p);
 }
 
@@ -340,20 +343,20 @@ export function departTurretRallies(
   for (const rally of due) dropRally(state, rally, tick, probe);
 }
 
-/** Every member of the rally's pack spawned: its wave is behind, or its last spawn is. */
+/** Every member of the rally's pack spawned: its wave is behind, or its group's last spawn is. */
 function allSpawned(state: TurretDefenseState, rally: TurretRally): boolean {
-  const wave = Math.floor(rally.id / TURRET_HUNT_LIMITS.packs);
-  if (wave < state.wave) return true;
-  const hunt = state.plan.waves[wave]?.hunt;
-  const pack = hunt?.packs[turretRallyPack(rally.id)];
-  return !pack || state.spawnCursor > pack.last;
+  const waveIndex = Math.floor(rally.id / TURRET_HUNT_LIMITS.packs);
+  if (waveIndex < state.wave) return true;
+  const wave = state.plan.waves[waveIndex];
+  const g = wave ? turretPackGroup(wave, turretRallyPack(rally.id)) : -1;
+  if (g < 0) return true;
+  return (state.spawning[g]?.cursor ?? 0) >= wave.groups[g].count;
 }
 
 /** The plan kind of the rally's leader: only a monster of that kind may cry in its place. */
 function leaderKindOf(state: TurretDefenseState, rally: TurretRally): number {
   const wave = state.plan.waves[Math.floor(rally.id / TURRET_HUNT_LIMITS.packs)];
-  const pack = wave?.hunt?.packs[turretRallyPack(rally.id)];
-  return pack ? (wave.spawns[pack.leader] ?? -1) : -1;
+  return wave ? turretPackLeaderKind(wave, turretPackGroup(wave, turretRallyPack(rally.id))) : -1;
 }
 
 /** A cue now would leave too close to another rally's departure. */

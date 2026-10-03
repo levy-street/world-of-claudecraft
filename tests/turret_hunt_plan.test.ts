@@ -1,226 +1,213 @@
-// Fire and Fly hunts, the plan half (src/sim/minigames/turret_hunt_plan.ts) and the speed
-// spread (turret_pace.ts): a hunt wave resolved into its packs, schedule, paces and leaders,
-// the client decoder refusing a forged one, and each monster's own pace drawn once by id.
+// Fire and Fly hunts, the plan half (src/sim/minigames/turret_hunt_plan.ts with the group
+// resolver, turret_group_plan.ts) and the speed spread (turret_pace.ts): a wave's pack and
+// sprint groups resolved into their schedules, paces and leaders, the client decoder
+// refusing a forged one, and each monster's own pace drawn once by id.
 import { describe, expect, it } from 'vitest';
 import { decodeTurretPlan } from '../src/net/turret_session_wire';
 import { TURRET_MISSION_PACK } from '../src/sim/content/fire_and_fly_missions';
 import { TURRET_SCENARIO_STANDARD } from '../src/sim/content/fire_and_fly_scenarios';
 import { TURRET_TIMING } from '../src/sim/content/turret_defense';
 import { MOBS } from '../src/sim/data';
-import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
-import { TURRET_HUNT_LIMITS, turretHuntPlanValid } from '../src/sim/minigames/turret_hunt_plan';
+import { resolveTurretPlan, TURRET_PLAN_LIMITS } from '../src/sim/minigames/turret_defense_plan';
+import {
+  turretGroupStart,
+  turretSpreadTick,
+  turretWavePlanValid,
+} from '../src/sim/minigames/turret_group_plan';
+import { TURRET_HUNT_LIMITS } from '../src/sim/minigames/turret_hunt_plan';
 import { turretDrawPace } from '../src/sim/minigames/turret_pace';
-import type { TurretHuntDef, TurretScenarioDef, TurretWaveEntry } from '../src/sim/types';
+import type {
+  TurretGroupDef,
+  TurretKegLotDef,
+  TurretScenarioDef,
+  TurretWaveEntry,
+} from '../src/sim/types';
 
 const march = (templateId: string) => MOBS[templateId].moveSpeed * TURRET_TIMING.marchFactor;
 
+type PackDef = Extract<TurretGroupDef, { brick: 'pack' }>;
+
+function packGroup(entries: TurretWaveEntry[], extra: Partial<PackDef> = {}): TurretGroupDef {
+  return {
+    brick: 'pack',
+    entries,
+    minRadius: 26,
+    maxRadius: 34,
+    holdTicks: 80,
+    spreadTicks: 40,
+    widthTurn: 0.1,
+    advanceScale: 1.2,
+    ...extra,
+  };
+}
+
 function scenario(
-  entries: TurretWaveEntry[],
-  hunt: Partial<TurretHuntDef> = {},
+  groups: TurretGroupDef[],
+  kegs: TurretKegLotDef[] = [{ mode: 'path', group: 0, placement: 'front' }],
 ): TurretScenarioDef {
   return {
     ...TURRET_SCENARIO_STANDARD,
     id: 'test_hunt',
     boardKey: 'test',
-    waves: [
-      {
-        entries,
-        coreDamage: 10,
-        gapMinTicks: 1,
-        gapMaxTicks: 2,
-        barrels: { count: 0, minRadius: 16, maxRadius: 30 },
-        hunt: {
-          packs: [
-            { advanceScale: 1.2, kegs: [{ placement: 'rally-front' }], delayTicks: 0 },
-            { advanceScale: 1.1, kegs: [], delayTicks: 30 },
-          ],
-          minRadius: 26,
-          maxRadius: 34,
-          holdTicks: 80,
-          spreadTicks: 40,
-          widthTurn: 0.1,
-          sprintDelayTicks: 10,
-          ...hunt,
-        },
-      },
-    ],
+    waves: [{ groups, coreDamage: 10, kegs }],
   };
 }
 
-const ENTRIES: TurretWaveEntry[] = [
-  { templateId: 'forest_wolf', count: 3, level: 2, pack: 0 },
-  { templateId: 'boneclad_revenant', count: 2, level: 19, pack: 0, leads: true },
-  { templateId: 'forest_wolf', count: 1, level: 2, pack: 0, role: 'scout', speedScale: 2.2 },
-  { templateId: 'wild_boar', count: 4, level: 3, pack: 1 },
-  { templateId: 'tunnel_rat', count: 2, level: 6, role: 'sprint', speedScale: 2.4 },
+const PACK_0: TurretWaveEntry[] = [
+  { templateId: 'forest_wolf', count: 3, level: 2 },
+  { templateId: 'boneclad_revenant', count: 2, level: 19, leads: true },
+  { templateId: 'forest_wolf', count: 1, level: 2, role: 'scout', speedScale: 2.2 },
+];
+const PACK_1: TurretWaveEntry[] = [{ templateId: 'wild_boar', count: 4, level: 3 }];
+const SPRINT: TurretGroupDef = {
+  brick: 'sprint',
+  entries: [{ templateId: 'tunnel_rat', count: 2, level: 6, speedScale: 2.4 }],
+  spreadTicks: 40,
+  widthTurn: 0.1,
+  delayTicks: 10,
+};
+const GROUPS: TurretGroupDef[] = [
+  packGroup(PACK_0),
+  packGroup(PACK_1, { advanceScale: 1.1, delayTicks: 30 }),
+  SPRINT,
 ];
 
 describe('a hunt wave in the plan', () => {
-  it('schedules every pack from its delay over the window, the sprint group on its own', () => {
-    const plan = resolveTurretPlan(scenario(ENTRIES));
+  it('schedules every pack from its delay over its window, the sprint group on its own', () => {
+    const plan = resolveTurretPlan(scenario(GROUPS));
     const wave = plan.waves[0];
-    const hunt = wave.hunt!;
     expect(wave.spawns).toHaveLength(12);
-    expect(hunt.groups.filter((g) => g === 0)).toHaveLength(6);
-    expect(hunt.groups.filter((g) => g === 1)).toHaveLength(4);
-    expect(hunt.groups.filter((g) => g === -1)).toHaveLength(2);
-    for (let i = 1; i < hunt.ticks.length; i++)
-      expect(hunt.ticks[i]).toBeGreaterThanOrEqual(hunt.ticks[i - 1]);
-    const ticksOf = (g: number) => hunt.ticks.filter((_, i) => hunt.groups[i] === g);
+    expect(wave.groups.map((g) => [g.brick, g.count, g.delayTicks])).toEqual([
+      ['pack', 6, 0],
+      ['pack', 4, 30],
+      ['sprint', 2, 10],
+    ]);
+    const ticksOf = (g: number) => {
+      const group = wave.groups[g];
+      if (group.brick !== 'pack' && group.brick !== 'sprint') throw new Error('not spread');
+      return Array.from(
+        { length: group.count },
+        (_, j) => group.delayTicks + turretSpreadTick(group.spreadTicks, group.count, j),
+      );
+    };
     expect(ticksOf(0)).toEqual([0, 6, 13, 20, 26, 33]);
     expect(ticksOf(1)).toEqual([30, 40, 50, 60]);
-    expect(ticksOf(-1)).toEqual([10, 30]);
-    // A sprint kind exactly where the group is -1; the kinds keep each role and band apart.
-    for (const [i, kind] of wave.spawns.entries())
-      expect(plan.kinds[kind].role === 'sprint').toBe(hunt.groups[i] === -1);
-    expect(
-      turretHuntPlanValid(
-        hunt,
-        wave.spawns,
-        plan.kinds.map((k) => k.role),
-      ),
-    ).toBe(true);
+    expect(ticksOf(2)).toEqual([10, 30]);
+    // A sprint kind exactly in the sprint group; the kinds keep each role and band apart.
+    wave.groups.forEach((group, g) => {
+      const start = turretGroupStart(wave, g);
+      for (const kind of wave.spawns.slice(start, start + group.count))
+        expect(plan.kinds[kind].role === 'sprint').toBe(group.brick === 'sprint');
+    });
+    const roles = plan.kinds.map((k) => k.role);
+    expect(turretWavePlanValid(wave, roles, TURRET_PLAN_LIMITS.barrels)).toBe(true);
     expect(decodeTurretPlan(JSON.parse(JSON.stringify(plan)))).toEqual(plan);
   });
 
   it("paces each pack's advance from its slowest gathering member, and names its leader", () => {
-    const plan = resolveTurretPlan(scenario(ENTRIES));
-    const hunt = plan.waves[0].hunt!;
+    const plan = resolveTurretPlan(scenario(GROUPS));
+    const [first, second] = plan.waves[0].groups;
+    if (first.brick !== 'pack' || second.brick !== 'pack') throw new Error('not packs');
     // The revenant is the slowest of pack 0 (the wolf scout does not count); the boars pace pack 1.
-    expect(hunt.packs[0].pace).toBeCloseTo(march('boneclad_revenant') * 1.2, 12);
-    expect(hunt.packs[1].pace).toBeCloseTo(march('wild_boar') * 1.1, 12);
-    const leader = plan.waves[0].spawns[hunt.packs[0].leader];
+    expect(first.pace).toBeCloseTo(march('boneclad_revenant') * 1.2, 12);
+    expect(second.pace).toBeCloseTo(march('wild_boar') * 1.1, 12);
+    expect([first.pack, second.pack]).toEqual([0, 1]);
+    const leader = plan.waves[0].spawns[first.leader];
     expect(plan.kinds[leader].templateId).toBe('boneclad_revenant');
-    expect(hunt.groups[hunt.packs[0].leader]).toBe(0);
     // No leading entry: the pack's first spawn leads.
-    expect(hunt.packs[1].leader).toBe(hunt.groups.indexOf(1));
-    for (const [p, pack] of hunt.packs.entries())
-      expect(pack.last).toBe(hunt.groups.lastIndexOf(p));
-    expect(hunt.packs[0].kegs).toEqual([{ placement: 'rally-front' }]);
+    expect(second.leader).toBe(0);
+    expect(plan.waves[0].kegs).toEqual([{ mode: 'path', group: 0, placement: 'front' }]);
   });
 
   it('refuses a hunt the engine cannot play', () => {
-    const bad =
-      (entries: TurretWaveEntry[], hunt: Partial<TurretHuntDef> = {}) =>
-      () =>
-        resolveTurretPlan(scenario(entries, hunt));
+    const bad = (groups: TurretGroupDef[], kegs?: TurretKegLotDef[]) => () =>
+      resolveTurretPlan(scenario(groups, kegs));
     const wolf = { templateId: 'forest_wolf', count: 2, level: 2 };
-    expect(bad([{ ...wolf }, { ...wolf, pack: 1 }])).toThrow(/no pack/);
+    expect(bad([packGroup([{ ...wolf, count: 0 }])])).toThrow(/empty/);
     expect(
       bad([
-        { ...wolf, pack: 0 },
-        { ...wolf, pack: 1 },
-        { ...wolf, pack: 2 },
-      ]),
-    ).toThrow(/no pack/);
-    expect(bad([{ ...wolf, pack: 0 }])).toThrow(/empty pack/);
-    expect(
-      bad([
-        { ...wolf, pack: 0, leads: true },
-        { ...wolf, pack: 0, leads: true },
-        { ...wolf, pack: 1 },
+        packGroup([
+          { ...wolf, leads: true },
+          { ...wolf, leads: true },
+        ]),
       ]),
     ).toThrow(/two leading/);
-    expect(
-      bad([
-        { ...wolf, pack: 0 },
-        { ...wolf, pack: 1 },
-        { ...wolf, role: 'sprint', pack: 0 },
-      ]),
-    ).toThrow(/sprint entry in a pack/);
-    expect(
-      bad(
-        [
-          { ...wolf, pack: 0 },
-          { ...wolf, pack: 1 },
-          { ...wolf, role: 'sprint' },
-        ],
-        {
-          sprintDelayTicks: undefined,
-        },
-      ),
-    ).toThrow(/sprint group with no delay/);
+    expect(bad([{ ...SPRINT }], [])).toThrow(/sprint group with no pack/);
+    expect(bad([packGroup([{ ...wolf, bossLast: true }])])).toThrow(/boss-last/);
     for (const band of [
       { minRadius: 1, maxRadius: 30 },
       { minRadius: 30, maxRadius: 20 },
       { minRadius: 26, maxRadius: 60 },
     ])
-      expect(
-        bad(
-          [
-            { ...wolf, pack: 0 },
-            { ...wolf, pack: 1 },
-          ],
-          band,
-        ),
-      ).toThrow(/rally band/);
+      expect(bad([packGroup([wolf], band)])).toThrow(/rally band/);
     expect(
-      bad(
-        [
-          { ...wolf, pack: 0 },
-          { ...wolf, pack: 1 },
-        ],
-        {
-          packs: [
-            { advanceScale: 1, kegs: [{ placement: 'axis', fromTower: 80 }], delayTicks: 0 },
-            { advanceScale: 1, kegs: [], delayTicks: 0 },
-          ],
-        },
-      ),
-    ).toThrow(/rally kegs/);
+      bad([packGroup([wolf])], [{ mode: 'path', group: 0, placement: 'axis', fromTower: 80 }]),
+    ).toThrow(/bad kegs/);
     expect(
-      bad([{ ...wolf, pack: 0 }], {
-        packs: Array.from({ length: TURRET_HUNT_LIMITS.packs + 1 }, () => ({
-          advanceScale: 1,
-          kegs: [],
-          delayTicks: 0,
-        })),
-      }),
-    ).toThrow(/pack count/);
-    // Roles and packs belong to hunts only.
+      bad(Array.from({ length: TURRET_HUNT_LIMITS.packs + 1 }, () => packGroup([wolf]))),
+    ).toThrow(/too many packs/);
+    // Scouts and leaders belong to packs only, a sprint group's included.
     const plain = { ...TURRET_SCENARIO_STANDARD, id: 'test_plain', boardKey: 'test' };
     for (const entry of [
       { ...wolf, role: 'scout' as const },
-      { ...wolf, pack: 0 },
       { ...wolf, leads: true },
     ]) {
-      const waves = [{ ...plain.waves[0], entries: [entry] }];
-      expect(() => resolveTurretPlan({ ...plain, waves })).toThrow(/outside a hunt/);
+      for (const group of [
+        { brick: 'walkers' as const, entries: [entry], gapMinTicks: 1, gapMaxTicks: 2 },
+        { ...SPRINT, entries: [entry] },
+      ]) {
+        const waves = [{ ...plain.waves[0], groups: [packGroup([wolf]), group] }];
+        expect(() => resolveTurretPlan({ ...plain, waves })).toThrow(/outside a pack/);
+      }
     }
     const band = { ...wolf, speedScale: 1.2, speedScaleMax: 1.1 };
     expect(() =>
-      resolveTurretPlan({ ...plain, waves: [{ ...plain.waves[0], entries: [band] }] }),
+      resolveTurretPlan({
+        ...plain,
+        waves: [
+          {
+            ...plain.waves[0],
+            groups: [{ brick: 'walkers', entries: [band], gapMinTicks: 1, gapMaxTicks: 2 }],
+          },
+        ],
+      }),
     ).toThrow(/speed band/);
   });
 
   it('never decodes a forged hunt', () => {
     const plan = JSON.parse(JSON.stringify(resolveTurretPlan(TURRET_MISSION_PACK)));
     expect(decodeTurretPlan(plan)).not.toBeNull();
-    const forge = (edit: (hunt: Record<string, unknown>) => void) => {
+    const forge = (wave: number, edit: (w: Record<string, unknown>) => void) => {
       const copy = JSON.parse(JSON.stringify(plan));
-      edit(copy.waves[2].hunt);
+      edit(copy.waves[wave]);
       return decodeTurretPlan(copy);
     };
+    type G = Record<string, unknown>;
+    const groups = (w: Record<string, unknown>) => w.groups as G[];
+    for (const edit of [
+      (w: G) => (groups(w)[0].count = (groups(w)[0].count as number) + 1),
+      (w: G) => (w.spawns as number[]).pop(),
+      (w: G) => (groups(w)[0].leader = 99),
+      (w: G) => (groups(w)[1].pack = 0),
+      (w: G) => (groups(w)[0].pace = -1),
+      (w: G) => (groups(w)[0].maxRadius = 90),
+      (w: G) => (groups(w)[0].widthTurn = 2),
+      (w: G) => (groups(w)[0].brick = 'herd'),
+      (w: G) => ((w.kegs as G[])[0].group = 5),
+      (w: G) => ((w.kegs as G[])[0].placement = 'ring'),
+      (w: G) => ((w.kegs as G[])[0].mode = 'scatter'),
+      (w: G) => (w.kegCap = 0),
+    ])
+      expect(forge(2, edit)).toBeNull();
+    // A sprint kind spawned inside a pack, or a sprint group with no pack, is no plan the resolver makes.
     const sprintKind = plan.kinds.findIndex((k: { role?: string }) => k.role === 'sprint');
     expect(sprintKind).toBeGreaterThanOrEqual(0);
-    for (const edit of [
-      (h: Record<string, unknown>) => (h.groups as number[]).pop(),
-      (h: Record<string, unknown>) => (h.ticks as number[]).reverse(),
-      (h: Record<string, unknown>) => ((h.groups as number[])[0] = 5),
-      (h: Record<string, unknown>) =>
-        ((h.packs as { leader: number }[])[0].leader = (h.groups as number[]).indexOf(1)),
-      (h: Record<string, unknown>) => ((h.packs as { last: number }[])[1].last = 0),
-      (h: Record<string, unknown>) => ((h.packs as { pace: number }[])[0].pace = -1),
-      (h: Record<string, unknown>) =>
-        ((h.packs as { kegs: unknown[] }[])[0].kegs = [{ placement: 'ring' }]),
-      (h: Record<string, unknown>) => (h.maxRadius = 90),
-      (h: Record<string, unknown>) => (h.widthTurn = 2),
-    ])
-      expect(forge(edit)).toBeNull();
-    // A sprint kind spawned inside a pack is not a plan the resolver makes.
-    const copy = JSON.parse(JSON.stringify(plan));
-    copy.waves[2].spawns[0] = sprintKind;
-    expect(decodeTurretPlan(copy)).toBeNull();
+    expect(forge(7, (w) => ((w.spawns as number[])[0] = sprintKind))).toBeNull();
+    expect(
+      forge(7, (w) => {
+        for (const g of groups(w)) if (g.brick === 'pack') g.brick = 'sprint';
+      }),
+    ).toBeNull();
     const bandless = JSON.parse(JSON.stringify(plan));
     bandless.kinds[0].marchSpeedMax = bandless.kinds[0].marchSpeed / 2;
     expect(decodeTurretPlan(bandless)).toBeNull();
@@ -251,9 +238,16 @@ describe('the speed spread', () => {
       waves: [
         {
           ...TURRET_SCENARIO_STANDARD.waves[0],
-          entries: [
-            { templateId: 'forest_wolf', count: 2, level: 2 },
-            { templateId: 'forest_wolf', count: 2, level: 2, speedScaleMax: 1.35 },
+          groups: [
+            {
+              brick: 'walkers',
+              entries: [
+                { templateId: 'forest_wolf', count: 2, level: 2 },
+                { templateId: 'forest_wolf', count: 2, level: 2, speedScaleMax: 1.35 },
+              ],
+              gapMinTicks: 1,
+              gapMaxTicks: 2,
+            },
           ],
         },
       ],

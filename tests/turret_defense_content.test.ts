@@ -17,10 +17,12 @@ import { MOBS } from '../src/sim/data';
 import { createMob, mobMaxHp } from '../src/sim/entity';
 import { FIRE_AND_FLY_TOWER } from '../src/sim/fire_and_fly_field';
 import { resolveTurretPlan, turretSpawnOrder } from '../src/sim/minigames/turret_defense_plan';
+import type { TurretWaveDef } from '../src/sim/types';
 
 const plan = resolveTurretPlan();
 const allWaves = TURRET_SCENARIOS.flatMap((scenario) => scenario.waves);
-const templateIds = [...new Set(allWaves.flatMap((w) => w.entries.map((e) => e.templateId)))];
+const entriesOf = (w: TurretWaveDef) => w.groups.flatMap((g) => g.entries);
+const templateIds = [...new Set(allWaves.flatMap((w) => entriesOf(w).map((e) => e.templateId)))];
 
 function hitsToKill(wave: number, templateId: string): number {
   const k = plan.kinds.find(
@@ -42,7 +44,7 @@ describe('wave table against the real templates', () => {
 
   it('keeps every level inside its template level range, in every scenario', () => {
     for (const wave of allWaves) {
-      for (const e of wave.entries) {
+      for (const e of entriesOf(wave)) {
         const t = MOBS[e.templateId];
         expect(e.level, e.templateId).toBeGreaterThanOrEqual(t.minLevel);
         expect(e.level, e.templateId).toBeLessThanOrEqual(t.maxLevel);
@@ -83,7 +85,7 @@ describe('wave table against the real templates', () => {
 
   it('matches the six-wave composition, weakest first, with the guardian spawning last', () => {
     const composition = TURRET_WAVES.map((w) =>
-      w.entries.map((e) => `${e.templateId}x${e.count}@${e.level}`),
+      entriesOf(w).map((e) => `${e.templateId}x${e.count}@${e.level}`),
     );
     expect(composition).toEqual([
       ['forest_wolfx11@2'],
@@ -106,11 +108,15 @@ describe('wave table against the real templates', () => {
       ...TURRET_SCENARIO_STANDARD,
       waves: [
         {
-          entries: [{ templateId, count: 1, level: 2 }],
+          groups: [
+            {
+              brick: 'walkers' as const,
+              entries: [{ templateId, count: 1, level: 2 }],
+              gapMinTicks: 1,
+              gapMaxTicks: 1,
+            },
+          ],
           coreDamage: 1,
-          gapMinTicks: 1,
-          gapMaxTicks: 1,
-          barrels: { count: 0, minRadius: 0, maxRadius: 0 },
         },
       ],
     });
@@ -137,7 +143,7 @@ describe('wave table against the real templates', () => {
     ]);
     expect(order).toEqual([0, 1, 0, 0, 1, 0, 2]);
     plan.waves.forEach((wave, i) => {
-      for (const e of TURRET_WAVES[i].entries) {
+      for (const e of entriesOf(TURRET_WAVES[i])) {
         const n = wave.spawns.filter(
           (k) => plan.kinds[k].templateId === e.templateId && plan.kinds[k].level === e.level,
         ).length;
@@ -176,7 +182,8 @@ describe('tuning constants in ticks and yards', () => {
     expect(TURRET_TIMING).not.toHaveProperty('betweenTicks');
     expect(TURRET_WEAPON.cooldownTicks).toBe(9);
     expect([TURRET_WEAPON.minFlightTicks, TURRET_WEAPON.maxFlightTicks]).toEqual([4, 18]);
-    for (const w of TURRET_WAVES) expect([w.gapMinTicks, w.gapMaxTicks]).toEqual([12, 24]);
+    for (const w of TURRET_WAVES)
+      expect(w.groups).toMatchObject([{ brick: 'walkers', gapMinTicks: 12, gapMaxTicks: 24 }]);
   });
 
   it('pins the arena, the tower body and the blast geometry', () => {

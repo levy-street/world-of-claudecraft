@@ -78,8 +78,7 @@ type TurretMonsterBookkeeping = 'airSince' | 'throwX' | 'throwZ' | 'throwOpen' |
 // The rolling Shockwave and the landing bomblets too: their feedback entries carry the
 // ring's start and the bomblets' whole schedule, so a reader draws them from the ring.
 type TurretDefenseBookkeeping =
-  | 'spawnCursor'
-  | 'nextSpawnTick'
+  | 'spawning'
   | 'nextShotId'
   | 'nextMonsterId'
   | 'nextBarrelId'
@@ -442,8 +441,7 @@ function cloneView(session: TurretSession): TurretSessionView {
     tick: _clock,
     seed: _seed,
     runKey: _runKey,
-    spawnCursor: _cursor,
-    nextSpawnTick: _nextSpawn,
+    spawning: _spawning,
     nextShotId: _nextShot,
     nextMonsterId: _nextMonster,
     nextBarrelId: _nextBarrel,

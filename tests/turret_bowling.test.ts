@@ -35,6 +35,12 @@ import {
   type TurretPlan,
 } from '../src/sim/minigames/turret_defense_plan';
 import type { TurretBowlingDef, TurretSizeClass, Vec3 } from '../src/sim/types';
+import {
+  holdTurretSpawns,
+  releaseTurretSpawns,
+  turretSpawned,
+  walkersWavePlan,
+} from './helpers/turret_wave_plan';
 
 const flat: ThrowProbe = { ground: () => 0, water: () => null };
 const hills: ThrowProbe = {
@@ -42,9 +48,7 @@ const hills: ThrowProbe = {
   water: () => null,
 };
 const START = 1000;
-const HELD_BACK = Number.MAX_SAFE_INTEGER;
 const OFF: TurretBowlingDef = { ...TURRET_BOWLING, enabled: false };
-const NO_BARRELS = { count: 0, minRadius: 0, maxRadius: 0 };
 const CORE = 60;
 const KNOCK_DAMAGE = Math.max(1, Math.round(CORE * TURRET_BOWLING.damageShare));
 
@@ -73,14 +77,7 @@ function plan(
     resupplyWaves: [],
     chargeBonus: false,
     kinds,
-    waves: cores.map((coreDamage) => ({
-      spawns,
-      coreDamage,
-      gapMinTicks: 16,
-      gapMaxTicks: 32,
-      barrels: NO_BARRELS,
-      arrival: { kind: 'ring' },
-    })),
+    waves: cores.map((coreDamage) => walkersWavePlan(spawns, { coreDamage })),
     bowling,
   };
 }
@@ -111,11 +108,11 @@ function scene(
     START,
   );
   run(state, START + TURRET_TIMING.introTicks);
-  while (state.spawnCursor < sizes.length) {
-    state.nextSpawnTick = 0;
+  while (turretSpawned(state) < sizes.length) {
+    releaseTurretSpawns(state);
     run(state, state.tick + 1);
   }
-  state.nextSpawnTick = HELD_BACK;
+  holdTurretSpawns(state);
   for (const m of state.monsters) park(state, m);
   return { state, ms: [...state.monsters] };
 }
@@ -654,7 +651,7 @@ describe('the toggle', () => {
   ] as const)(
     'turned off, a %s full run replays the bowling-free engine exactly',
     (_name, seed, probe, count, digest) => {
-      const barrelFree = TURRET_WAVES.map((wave) => ({ ...wave, barrels: NO_BARRELS }));
+      const barrelFree = TURRET_WAVES.map((wave) => ({ ...wave, kegs: [] }));
       const scenario = { ...TURRET_SCENARIO_STANDARD, waves: barrelFree };
       const r = fullRun(seed, resolveTurretPlan(scenario, undefined, OFF), probe, aimNearest);
       const text = r.trace.map((s) => JSON.stringify(JSON.parse(s), dropLaterFields)).join('\n');

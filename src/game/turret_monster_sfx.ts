@@ -9,6 +9,7 @@ import { fireAndFlyLookTemplate } from '../sim/content/fire_and_fly_looks';
 import { TURRET_BOWLING, TURRET_PHYSICS, TURRET_WEAPON } from '../sim/content/turret_defense';
 import type { TurretEvent } from '../sim/minigames/turret_defense';
 import type { TurretPlan } from '../sim/minigames/turret_defense_plan';
+import { turretPackLeaderKind } from '../sim/minigames/turret_group_plan';
 import type { TurretSizeClass } from '../sim/types';
 import type { TurretSessionView } from '../world_api/vehicles';
 import type { TurretSfxCue } from './turret_defense_sfx';
@@ -97,7 +98,10 @@ export function turretRallyCueKey(
 function leaderKinds(plan: TurretPlan): Set<number> {
   const kinds = new Set<number>();
   for (const wave of plan.waves)
-    for (const pack of wave.hunt?.packs ?? []) kinds.add(wave.spawns[pack.leader]);
+    wave.groups.forEach((_, g) => {
+      const kind = turretPackLeaderKind(wave, g);
+      if (kind >= 0) kinds.add(kind);
+    });
   return kinds;
 }
 

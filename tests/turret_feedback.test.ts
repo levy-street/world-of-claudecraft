@@ -48,15 +48,13 @@ describe('the turret feedback ring', () => {
     const bursts = FIRE_AND_FLY_SCENARIOS.map((scenario) => {
       const plan = resolveTurretPlan(scenario);
       const widest = Math.max(...plan.waves.map((wave) => wave.spawns.length));
-      const cap = Math.max(
-        ...plan.waves.map((wave) => wave.barrels.cap ?? TURRET_EXPLOSIVE_BARREL.cap),
-      );
+      const cap = Math.max(...plan.waves.map((wave) => wave.kegCap ?? TURRET_EXPLOSIVE_BARREL.cap));
       const front = plan.arsenal.shockwave > 0 ? 1 : 0;
       const frags = turretChargesGiven(plan, plan.resupplyWaves.length).fragmentation;
       const blasts = shells + frags + front + cap;
       const ending = plan.waves.length > 1 ? 4 : 2;
       // A hunt's departure cue: rallies leave half a second apart, so at most one cue a tick.
-      const cue = plan.waves.some((wave) => wave.hunt) ? 1 : 0;
+      const cue = plan.waves.some((wave) => wave.groups.some((g) => g.brick === 'pack')) ? 1 : 0;
       const burst =
         blasts * (1 + widest * 2) + shells + cap + widest * 3 + 1 + front + ending + cue;
       return [scenario.boardKey, burst] as const;

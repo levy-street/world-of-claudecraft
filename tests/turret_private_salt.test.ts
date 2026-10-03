@@ -27,6 +27,7 @@ import { turretSessionView } from '../src/sim/turret_defense_session';
 import type { PrivateSalt, TurretSession, WorldContent } from '../src/sim/types';
 import { WORLD_SEED } from '../src/sim/world_seed';
 import { turretStateWireJson } from './helpers/turret_seat_wire';
+import { TURRET_BRICKS_SCENARIO } from './helpers/turret_wave_plan';
 
 const drawLog = vi.hoisted(() => [] as { stream: number; runKey?: TurretRunKey }[]);
 
@@ -176,8 +177,9 @@ describe('a salted run', () => {
   it('keys every engine draw site with the run key, on every stream', () => {
     drawLog.length = 0;
     const { state } = run(42, SALT, resolveTurretPlan(TURRET_SCENARIO_HARD), 12000, true);
-    // A hunt's rallies, kegs and paces draw on their own streams.
+    // A hunt's rallies, kegs and paces draw on their own streams; surgers and route kegs too.
     run(42, SALT, resolveTurretPlan(TURRET_MISSION_PACK), 1200, true);
+    run(42, SALT, resolveTurretPlan(TURRET_BRICKS_SCENARIO), 1200, true);
     const key = state.runKey;
     expect(key).toBeDefined();
     expect(new Set(drawLog.map((d) => d.stream))).toEqual(new Set(Object.values(TURRET_STREAM)));

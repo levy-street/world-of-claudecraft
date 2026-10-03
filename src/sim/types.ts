@@ -10267,7 +10267,7 @@ export interface TurretWaveEntry {
   count: number;
   /** Inside the template's own minLevel..maxLevel. */
   level: number;
-  /** Spawns after every other entry of the wave. */
+  /** Spawns after every other entry of its group (walkers and the bricks built on them only). */
   bossLast?: boolean;
   /** Multiplies the template's health (absent: 1). */
   hpScale?: number;
@@ -10278,102 +10278,126 @@ export interface TurretWaveEntry {
    * scale of its template's march speed (minigames/turret_pace.ts).
    */
   speedScaleMax?: number;
-  /** A hunt wave only: the pack (index into the wave's `hunt.packs`) these monsters gather with. */
-  pack?: number;
-  /** A hunt wave only: absent, a member that gathers and advances with its pack. */
-  role?: TurretWaveRole;
+  /** A pack's member only: it gathers with the pack and breaks out at its own pace at the departure. */
+  role?: 'scout';
   /**
-   * Its pack's leader: the first of these monsters gives the departure cue; fallen, the first
-   * living monster of its kind cries in its place, and with none left the cue is silent.
+   * A pack's member only: the pack's leader is the first of these monsters, who gives the
+   * departure cue; fallen, the first living monster of its kind cries in its place, and with
+   * none left the cue is silent.
    */
   leads?: boolean;
 }
 /**
- * A hunt's roles (minigames/turret_rally.ts): a scout gathers with its pack and breaks
- * out at its own pace at the departure; a sprint group never gathers and runs straight in.
+ * A monster kind's role (minigames/turret_rally.ts): a scout gathers with its pack and breaks
+ * out at its own pace at the departure; a sprint group's (the `sprint` brick) never gathers
+ * and runs straight in.
  */
 export type TurretWaveRole = 'scout' | 'sprint';
-/** A keg laid for a pack's rally (minigames/turret_rally_kegs.ts). */
-export type TurretRallyKegDef =
-  /** On the advance axis, a few yards tower-side of the rally, just off the axis. */
-  | { placement: 'rally-front' }
-  /** Beside the rally, at the gathering pack's rim. */
-  | { placement: 'rally-side' }
-  /** On the advance axis this far from the tower (yd), as far off the axis as the front keg. */
-  | { placement: 'axis'; fromTower: number };
-export interface TurretPackDef {
-  /** The advance's pace: this scale of the slowest gathering member's template march speed. */
-  advanceScale: number;
-  kegs: readonly TurretRallyKegDef[];
-  /** Ticks from the wave's start to the pack's first spawn. */
-  delayTicks: number;
-}
-/**
- * A hunt wave: its monsters come as packs, each walking in from its own side to a rally
- * in the field, then advancing together once its leader gives the cue.
- */
-export interface TurretHuntDef {
-  packs: readonly TurretPackDef[];
-  /** The rallies' distance band from the tower (yd). */
-  minRadius: number;
-  maxRadius: number;
-  /** Ticks from a rally's first arrival to its cue, at the latest. */
-  holdTicks: number;
-  /** Ticks over which a pack's members (and the sprint group) spawn. */
-  spreadTicks: number;
-  /** The arc a pack (and the sprint group) spawns over, as a share of a turn. */
-  widthTurn: number;
-  /** Ticks from the wave's start to the sprint group's first spawn (its entries' role 'sprint'). */
-  sprintDelayTicks?: number;
-}
-/** The explosive barrels a wave's start adds on a ring around the turret (count 0: none). */
-export interface TurretBarrelWaveDef {
-  count: number;
-  minRadius: number;
-  maxRadius: number;
-  /**
-   * 'lanes': inside the sides the wave's monsters arrive through, so they march past
-   * them; absent, spread evenly around the whole circle.
-   */
-  placement?: 'lanes';
-  /** Barrels standing at once, this wave's included (absent: TURRET_EXPLOSIVE_BARREL.cap). */
-  cap?: number;
-}
-/** A scenario's kegs, applied to every wave's barrels when the plan is resolved. */
-export interface TurretKegsDef {
-  placement?: 'lanes';
-  /** Multiplies each wave's count, rounded (absent: 1). */
-  countScale?: number;
-  cap?: number;
-}
-/**
- * Where a wave's monsters come from around the spawn ring. Widths are shares of a
- * full turn; every centre is a private draw per wave (per pack for a burst), so a
- * run keeps its sides secret and a replay of the same seed keeps them.
- */
-export type TurretArrivalDef =
+/** Where walkers come from around the spawn ring; widths are shares of a full turn. */
+export type TurretSidesDef =
   /** Anywhere on the ring. */
   | { kind: 'ring' }
   /** One side. */
   | { kind: 'arc'; widthTurn: number }
-  /** Two or three sides evenly apart, the wave's monsters taking them in turn. */
-  | { kind: 'flanks'; count: 2 | 3; widthTurn: number }
-  /**
-   * Packs of `groupSize` from one side each: inside a pack the wave's own gap,
-   * between packs `groupGapTicks`.
-   */
-  | { kind: 'burst'; groupSize: number; groupGapTicks: number; widthTurn: number };
-export interface TurretWaveDef {
-  entries: readonly TurretWaveEntry[];
-  /** Damage of a core hit. */
-  coreDamage: number;
+  /** Two or three sides evenly apart, the group's monsters taking them in turn. */
+  | { kind: 'flanks'; count: 2 | 3; widthTurn: number };
+/** The spawn gap band of a group whose monsters come one at a time (ticks, drawn per monster). */
+export interface TurretGapDef {
   gapMinTicks: number;
   gapMaxTicks: number;
-  barrels: TurretBarrelWaveDef;
-  /** Absent: the whole ring. A hunt wave's monsters come from its packs' sides instead. */
-  arrival?: TurretArrivalDef;
-  /** Its monsters gather at rallies before they advance (every entry names its pack or sprints). */
-  hunt?: TurretHuntDef;
+}
+/**
+ * A wave's group: its monsters and how they come (its brick, minigames/turret_wave_groups.ts).
+ * Every side is a private draw per wave and group, so a run keeps its sides secret and a
+ * replay of the same seed keeps them.
+ */
+export type TurretBrickDef =
+  /** Single monsters at intervals from the ring, one side, or two or three (absent: the ring). */
+  | ({ brick: 'walkers'; sides?: TurretSidesDef } & TurretGapDef)
+  /**
+   * Bunches of `size` close together, each from its own side: inside a bunch the gap band,
+   * between bunches `bunchGapTicks`.
+   */
+  | ({ brick: 'smallGroup'; size: number; bunchGapTicks: number; widthTurn: number } & TurretGapDef)
+  /**
+   * A pack: its members spawn spread over `spreadTicks` on an arc of its side, walk to a rally
+   * drawn in the band, stand there until its leader's cue (all of them standing, or `holdTicks`
+   * after the first gathering arrival), then advance on the tower at one pace, `advanceScale`
+   * of its slowest gathering member's template march (minigames/turret_rally.ts). The packs of
+   * a wave take sides evenly apart.
+   */
+  | {
+      brick: 'pack';
+      minRadius: number;
+      maxRadius: number;
+      holdTicks: number;
+      spreadTicks: number;
+      widthTurn: number;
+      advanceScale: number;
+    }
+  /**
+   * A pack wave's sprint group: spawned spread over `spreadTicks` from the side between the
+   * wave's first two packs, it never gathers and runs straight in.
+   */
+  | { brick: 'sprint'; spreadTicks: number; widthTurn: number }
+  /**
+   * Surgers (minigames/turret_surgers.ts): `sides` bunches of fast monsters that set off away
+   * from the action, the bunches evenly apart from it (one: opposite), each on an arc of
+   * `widthTurn`; its monsters take the bunches in turn, one spawn gap apart.
+   */
+  | ({ brick: 'surgers'; sides: number; widthTurn: number } & TurretGapDef)
+  /**
+   * The big one: a large or huge monster, alone or with an escort, from one side; its entries
+   * interleave like any group's (`bossLast` holds it to the end).
+   */
+  | ({ brick: 'bigOne'; widthTurn: number } & TurretGapDef)
+  /** A surge: many fast monsters in a short time from one side or two. */
+  | ({ brick: 'surge'; sides: 1 | 2; widthTurn: number } & TurretGapDef);
+export type TurretGroupDef = TurretBrickDef & {
+  entries: readonly TurretWaveEntry[];
+  /**
+   * Ticks from the wave's first spawn tick (its start, or the tick after the clear on a
+   * chained wave) to the group's first spawn (absent: 0).
+   */
+  delayTicks?: number;
+};
+/**
+ * A wave's kegs (minigames/turret_keg_lots.ts), every lot placed at the wave's start, never
+ * mid-combat; a keg that finds no clear spot is left out, and the kegs standing never pass
+ * the wave's cap.
+ */
+export type TurretKegLotDef =
+  /**
+   * Spread evenly around the field at a drawn distance in the band; `lanes`: inside the sides
+   * the wave's groups come through, in turn.
+   */
+  | { mode: 'random'; count: number; minRadius: number; maxRadius: number; lanes?: true }
+  /** Just beyond the Shockwave's reach, where the bodies a slam throws come down. */
+  | { mode: 'crown'; count: number }
+  /**
+   * On the route of the wave's `group` (its side drawn at the wave's start; never a surger's):
+   * a pack's 12 to 16 yd tower-side of its rally, any other group's at a drawn distance from
+   * the tower between `minRadius` and `maxRadius` (absent: the keg ring band; never on a
+   * pack, whose band its rally sets), just off the axis ('front') or at the column's rim
+   * ('side'), or just off the axis at `fromTower` yd ('axis'); never within a keg blast of a
+   * pack gathering at its rally.
+   */
+  | {
+      mode: 'path';
+      group: number;
+      placement: 'front' | 'side';
+      minRadius?: number;
+      maxRadius?: number;
+    }
+  | { mode: 'path'; group: number; placement: 'axis'; fromTower: number };
+export interface TurretWaveDef {
+  /** In order: a group's index names it (a path keg lot's `group`) and orders a tick's spawns. */
+  groups: readonly TurretGroupDef[];
+  /** Damage of a core hit. */
+  coreDamage: number;
+  kegs?: readonly TurretKegLotDef[];
+  /** Kegs standing at once, this wave's included (absent: TURRET_EXPLOSIVE_BARREL.cap). */
+  kegCap?: number;
 }
 /** A medal's bar at the end of a won run: bronze is any win. */
 export interface TurretMedalBar {
@@ -10408,8 +10432,6 @@ export interface TurretScenarioDef {
   medals: TurretMedalBars;
   arsenal?: TurretArsenalDef;
   supply?: TurretSupplyDef;
-  /** Absent: every wave's barrels as authored, placed evenly around the circle. */
-  kegs?: TurretKegsDef;
 }
 
 export interface VehicleStationDef {

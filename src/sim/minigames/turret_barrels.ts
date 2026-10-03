@@ -1,5 +1,5 @@
 // Fire and Fly explosive barrels, the half the engine (turret_defense.ts) drives:
-// a wave's barrels placed on a ring around the turret, the spawn bearings that
+// a keg lot's barrels placed on a ring around the turret, the spawn bearings that
 // keep every marcher's lane clear of them, the barrels as round colliders a
 // thrown body bounces off, what lights one (a blast reaching it, a fast body
 // touching it), the fuse that blows it and the blast it makes. The blast itself
@@ -7,7 +7,6 @@
 // stateless draws only, no clock.
 
 import { TURRET_EXPLOSIVE_BARREL, TURRET_PHYSICS, TURRET_WEAPON } from '../content/turret_defense';
-import type { TurretBarrelWaveDef } from '../types';
 import {
   groundOr,
   horizontalAt,
@@ -19,7 +18,6 @@ import {
   type ThrowProbe,
   velocityAt,
 } from './thrown_body';
-import { turretWaveLanes } from './turret_arrival';
 import type { TurretBlast, TurretDefenseState, TurretEvent } from './turret_defense';
 import { TURRET_STREAM, turretDraw } from './turret_defense_rng';
 
@@ -168,40 +166,68 @@ export function turretBarrelSpotClear(
   return true;
 }
 
-/** The wave's arrival sides when its barrels go on the lanes, else null (spread evenly). */
-function barrelLanes(
+/** Stands a new unlit barrel at (x, z) on the ground there. Returns it. */
+export function standTurretBarrel(
   state: TurretDefenseState,
-  def: Readonly<TurretBarrelWaveDef>,
-): TurretBearingSector[] | null {
-  const plan = state.plan.waves[state.wave];
-  return def.placement === 'lanes' && plan ? turretWaveLanes(state, state.wave, plan) : null;
+  x: number,
+  z: number,
+  probe: ThrowProbe,
+): TurretBarrel {
+  const barrel: TurretBarrel = {
+    id: state.nextBarrelId++,
+    x,
+    y: groundOr(probe, x, z, 0),
+    z,
+    litTick: -1,
+    blowTick: -1,
+  };
+  state.barrels.push(barrel);
+  return barrel;
+}
+
+/** A ring of kegs: how many, at a drawn distance in the band (yd from the tower's centre). */
+export interface TurretKegRing {
+  readonly count: number;
+  readonly minRadius: number;
+  readonly maxRadius: number;
+}
+
+export interface TurretKegRingOptions {
+  /** The sides the barrels take in turn, each at a drawn bearing inside it; absent, spread evenly. */
+  readonly lanes?: readonly TurretBearingSector[] | null;
+  /** The lot's draw keys start here (a wave's first lot at 0). */
+  readonly keyBase?: number;
+  /** Barrels standing at once, these included (absent: TURRET_EXPLOSIVE_BARREL.cap). */
+  readonly cap?: number;
 }
 
 /**
- * Adds a wave's barrels: bearings spread evenly around the circle from a drawn
+ * Adds a ring of barrels: bearings spread evenly around the circle from a drawn
  * offset, each wandering inside its share, at a drawn distance in the ring; on
- * the lanes, the barrels take the wave's arrival sides in turn, each at a drawn
- * bearing inside its side. A barrel that finds no clear spot in its draws is
- * left out, and the barrels standing never pass the cap. Returns the ones placed.
+ * lanes, the barrels take the sides in turn, each at a drawn bearing inside its
+ * side. A barrel that finds no clear spot in its draws is left out, and the
+ * barrels standing never pass the cap. Returns the ones placed.
  */
 export function placeTurretBarrels(
   state: TurretDefenseState,
-  def: Readonly<TurretBarrelWaveDef>,
+  ring: TurretKegRing,
   tick: number,
   probe: ThrowProbe,
+  options: TurretKegRingOptions = {},
 ): TurretBarrel[] {
   const placed: TurretBarrel[] = [];
-  const cap = def.cap ?? TURRET_EXPLOSIVE_BARREL.cap;
-  const count = Math.min(def.count, cap - state.barrels.length);
+  const cap = options.cap ?? TURRET_EXPLOSIVE_BARREL.cap;
+  const count = Math.min(ring.count, cap - state.barrels.length);
   if (!(count > 0)) return placed;
   const { wave } = state;
+  const base = options.keyBase ?? 0;
   const tries = TURRET_EXPLOSIVE_BARREL.placementTries;
-  const offset = turretDraw(state, TURRET_STREAM.barrelBearing, wave, 0) * TAU;
+  const offset = turretDraw(state, TURRET_STREAM.barrelBearing, wave, base) * TAU;
   const sector = TAU / count;
-  const lanes = barrelLanes(state, def);
+  const lanes = options.lanes?.length ? options.lanes : null;
   for (let i = 0; i < count; i++) {
     for (let attempt = 0; attempt < tries; attempt++) {
-      const key = 1 + i * tries + attempt;
+      const key = base + 1 + i * tries + attempt;
       const wander = attempt === 0 ? TURRET_EXPLOSIVE_BARREL.bearingJitter : 0.5;
       const draw = turretDraw(state, TURRET_STREAM.barrelBearing, wave, key);
       const lane = lanes?.[i % lanes.length];
@@ -209,21 +235,13 @@ export function placeTurretBarrels(
         ? lane.from + draw * lane.width
         : offset + (i + 0.5 + (draw * 2 - 1) * wander) * sector;
       const r =
-        def.minRadius +
-        turretDraw(state, TURRET_STREAM.barrelRadius, wave, key) * (def.maxRadius - def.minRadius);
+        ring.minRadius +
+        turretDraw(state, TURRET_STREAM.barrelRadius, wave, key) *
+          (ring.maxRadius - ring.minRadius);
       const x = state.cx + Math.sin(bearing) * r;
       const z = state.cz + Math.cos(bearing) * r;
       if (!turretBarrelSpotClear(state, x, z, tick, probe)) continue;
-      const barrel = {
-        id: state.nextBarrelId++,
-        x,
-        y: groundOr(probe, x, z, 0),
-        z,
-        litTick: -1,
-        blowTick: -1,
-      };
-      state.barrels.push(barrel);
-      placed.push(barrel);
+      placed.push(standTurretBarrel(state, x, z, probe));
       break;
     }
   }

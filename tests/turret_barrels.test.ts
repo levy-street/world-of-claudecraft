@@ -41,7 +41,14 @@ import {
   type TurretPlan,
 } from '../src/sim/minigames/turret_defense_plan';
 import { TURRET_STREAM, turretDraw } from '../src/sim/minigames/turret_defense_rng';
-import type { TurretBarrelWaveDef, TurretSizeClass } from '../src/sim/types';
+import type { TurretWavePlan } from '../src/sim/minigames/turret_group_plan';
+import type { TurretSizeClass } from '../src/sim/types';
+import {
+  holdTurretSpawns,
+  releaseTurretSpawns,
+  turretSpawned,
+  walkersWavePlan,
+} from './helpers/turret_wave_plan';
 
 const flat: ThrowProbe = { ground: () => 0, water: () => null };
 const hills: ThrowProbe = {
@@ -50,9 +57,7 @@ const hills: ThrowProbe = {
 };
 const START = 1000;
 const INTRO_END = START + TURRET_TIMING.introTicks;
-const HELD_BACK = Number.MAX_SAFE_INTEGER;
 const TAU = Math.PI * 2;
-const NO_BARRELS: TurretBarrelWaveDef = { count: 0, minRadius: 0, maxRadius: 0 };
 const CORE = 60;
 /** Where a barrel's collider meets a small body's: the two radii. */
 const SMALL_REACH = TURRET_EXPLOSIVE_BARREL.radius + TURRET_SIZE_CLASSES.small.radius;
@@ -68,7 +73,14 @@ function kind(size: TurretSizeClass, maxHp: number, marchSpeed = 4.4): TurretKin
   };
 }
 
-function plan(kinds: TurretKind[], spawns: number[][], barrels = NO_BARRELS): TurretPlan {
+/** A wave's ring of kegs: its one random lot. */
+function ringOf(wave: TurretWavePlan) {
+  const lot = wave.kegs[0];
+  if (wave.kegs.length !== 1 || lot.mode !== 'random') throw new Error('not a ring wave');
+  return lot;
+}
+
+function plan(kinds: TurretKind[], spawns: number[][]): TurretPlan {
   return {
     scenarioId: 'test',
     integrity: 100,
@@ -77,14 +89,7 @@ function plan(kinds: TurretKind[], spawns: number[][], barrels = NO_BARRELS): Tu
     resupplyWaves: [],
     chargeBonus: false,
     kinds,
-    waves: spawns.map((s) => ({
-      spawns: s,
-      coreDamage: CORE,
-      gapMinTicks: 16,
-      gapMaxTicks: 32,
-      barrels,
-      arrival: { kind: 'ring' },
-    })),
+    waves: spawns.map((s) => walkersWavePlan(s, { coreDamage: CORE })),
     bowling: { ...TURRET_BOWLING, enabled: false },
   };
 }
@@ -126,11 +131,11 @@ function field(k: TurretKind, count: number, seed = 7) {
     START,
   );
   run(state, INTRO_END);
-  while (state.spawnCursor < count) {
-    state.nextSpawnTick = 0;
+  while (turretSpawned(state) < count) {
+    releaseTurretSpawns(state);
     run(state, state.tick + 1);
   }
-  state.nextSpawnTick = HELD_BACK;
+  holdTurretSpawns(state);
   for (const m of state.monsters) pin(state, m, 200 + m.id * 10, 200);
   return { state, ms: [...state.monsters] };
 }
@@ -242,7 +247,7 @@ describe('placement', () => {
     expect(events.map((e) => e.type).slice(0, 2)).toEqual(['waveStart', 'barrelsPlaced']);
     const placed = ofType(events, 'barrelsPlaced');
     expect(placed).toHaveLength(1);
-    const def = p.waves[0].barrels;
+    const def = ringOf(p.waves[0]);
     expect(placed[0].barrels).toHaveLength(def.count);
     expect(state.barrels.map(({ id, x, y, z }) => ({ id, x, y, z }))).toEqual(placed[0].barrels);
     const bearings: number[] = [];
@@ -277,9 +282,9 @@ describe('placement', () => {
     const state = createTurretDefense(p, { x: 0, z: 0 }, 5, START);
     const place = (wave: number) => {
       state.wave = wave;
-      return placeTurretBarrels(state, p.waves[wave].barrels, START, flat);
+      return placeTurretBarrels(state, ringOf(p.waves[wave]), START, flat);
     };
-    expect(p.waves.map((w) => w.barrels.count)).toEqual([3, 3, 4, 4, 5, 5]);
+    expect(p.waves.map((w) => ringOf(w).count)).toEqual([3, 3, 4, 4, 5, 5]);
     expect(TURRET_EXPLOSIVE_BARREL.cap).toBe(6);
     const first = place(0);
     expect(first).toHaveLength(3);
@@ -301,7 +306,7 @@ describe('placement', () => {
     const spots = (seed: number, wave: number) => {
       const state = createTurretDefense(p, { x: 0, z: 0 }, seed, START);
       state.wave = wave;
-      return placeTurretBarrels(state, p.waves[wave].barrels, START, flat);
+      return placeTurretBarrels(state, ringOf(p.waves[wave]), START, flat);
     };
     expect(spots(3, 0)).toEqual(spots(3, 0));
     expect(spots(3, 0)).not.toEqual(spots(4, 0));
@@ -330,7 +335,7 @@ describe('placement', () => {
     const place = (seed: number, wave: number, probe: ThrowProbe) => {
       const state = createTurretDefense(p, { x: 0, z: 0 }, seed, START);
       state.wave = wave;
-      return placeTurretBarrels(state, p.waves[wave].barrels, START, probe);
+      return placeTurretBarrels(state, ringOf(p.waves[wave]), START, probe);
     };
     const pond: ThrowProbe = { ground: () => 0, water: (x) => (x > 0 ? 0.6 : null) };
     const sunk: ThrowProbe = { ground: () => 0, water: () => -5 };
@@ -350,7 +355,7 @@ describe('placement', () => {
     const [tower, ...rest] = fireAndFlyColliders(0);
     expect(tower).toMatchObject({ type: 'circle', x: 0, z: 0 });
     const widest = Math.max(...Object.values(TURRET_SIZE_CLASSES).map((s) => s.radius));
-    for (const { barrels } of resolveTurretPlan().waves) {
+    for (const barrels of resolveTurretPlan().waves.map(ringOf)) {
       expect(barrels.minRadius - TURRET_EXPLOSIVE_BARREL.radius).toBeGreaterThan(
         tower.type === 'circle' ? tower.r : Number.POSITIVE_INFINITY,
       );
@@ -862,7 +867,7 @@ describe('the barrel blast', () => {
     const big = kind('large', 400);
     const state = createTurretDefense(plan([big], [[0, 0]]), { x: 0, z: 0 }, 7, START);
     run(state, INTRO_END);
-    state.nextSpawnTick = HELD_BACK;
+    holdTurretSpawns(state);
     const m = state.monsters[0];
     while (m.state !== 'windup') run(state, state.tick + 1);
     state.integrity = 3;

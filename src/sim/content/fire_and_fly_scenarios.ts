@@ -26,11 +26,11 @@
 import { DT, type TurretScenarioDef } from '../types';
 import { TURRET_MISSIONS } from './fire_and_fly_missions';
 import {
-  TURRET_BARREL_RING,
   TURRET_EXPLOSIVE_BARREL,
   TURRET_MEDALS,
   TURRET_TOWER_POINTS,
   TURRET_WAVES,
+  turretKegRing,
 } from './turret_defense';
 
 const ticks = (seconds: number): number => Math.round(seconds / DT);
@@ -63,70 +63,107 @@ export const TURRET_SCENARIO_INTRODUCTION: TurretScenarioDef = {
   // The cannon and the kegs only: the weapons come one per trial after it.
   waves: [
     {
-      entries: [{ templateId: 'forest_wolf', count: 4, level: 1 }],
+      groups: [
+        {
+          brick: 'walkers',
+          entries: [{ templateId: 'forest_wolf', count: 4, level: 1 }],
+          ...INTRO_GAP,
+        },
+      ],
       coreDamage: 60,
-      ...INTRO_GAP,
-      barrels: { count: 2, ...TURRET_BARREL_RING },
+      kegs: turretKegRing(2),
     },
     {
-      entries: [{ templateId: 'forest_wolf', count: 6, level: 1 }],
+      groups: [
+        {
+          brick: 'walkers',
+          entries: [{ templateId: 'forest_wolf', count: 6, level: 1 }],
+          gapMinTicks: ticks(1.6),
+          gapMaxTicks: ticks(2.4),
+        },
+      ],
       coreDamage: 60,
-      gapMinTicks: ticks(1.6),
-      gapMaxTicks: ticks(2.4),
-      barrels: { count: 2, ...TURRET_BARREL_RING },
+      kegs: turretKegRing(2),
     },
     {
-      entries: [
-        { templateId: 'wild_boar', count: 5, level: 2 },
-        { templateId: 'forest_wolf', count: 3, level: 2 },
+      groups: [
+        {
+          brick: 'walkers',
+          entries: [
+            { templateId: 'wild_boar', count: 5, level: 2 },
+            { templateId: 'forest_wolf', count: 3, level: 2 },
+          ],
+          gapMinTicks: ticks(1.4),
+          gapMaxTicks: ticks(2),
+        },
       ],
       coreDamage: 36,
-      gapMinTicks: ticks(1.4),
-      gapMaxTicks: ticks(2),
-      barrels: { count: 2, ...TURRET_BARREL_RING },
+      kegs: turretKegRing(2),
     },
     {
-      entries: [
-        { templateId: 'forest_wolf', count: 5, level: 2 },
-        { templateId: 'wild_boar', count: 5, level: 3 },
+      groups: [
+        {
+          brick: 'walkers',
+          sides: { kind: 'flanks', count: 2, widthTurn: 0.14 },
+          entries: [
+            { templateId: 'forest_wolf', count: 5, level: 2 },
+            { templateId: 'wild_boar', count: 5, level: 3 },
+          ],
+          gapMinTicks: ticks(1.2),
+          gapMaxTicks: ticks(1.8),
+        },
       ],
       coreDamage: 36,
-      gapMinTicks: ticks(1.2),
-      gapMaxTicks: ticks(1.8),
-      barrels: { count: 2, ...TURRET_BARREL_RING },
-      arrival: { kind: 'flanks', count: 2, widthTurn: 0.14 },
+      kegs: turretKegRing(2),
     },
     {
-      entries: [
-        { templateId: 'wild_boar', count: 6, level: 3 },
-        { templateId: 'forest_wolf', count: 4, level: 2 },
+      groups: [
+        {
+          brick: 'smallGroup',
+          size: 5,
+          bunchGapTicks: ticks(6),
+          widthTurn: 0.04,
+          entries: [
+            { templateId: 'wild_boar', count: 6, level: 3 },
+            { templateId: 'forest_wolf', count: 4, level: 2 },
+          ],
+          gapMinTicks: ticks(0.3),
+          gapMaxTicks: ticks(0.5),
+        },
       ],
       coreDamage: 38,
-      gapMinTicks: ticks(0.3),
-      gapMaxTicks: ticks(0.5),
-      barrels: { count: 3, ...TURRET_BARREL_RING, placement: 'lanes' },
-      arrival: { kind: 'burst', groupSize: 5, groupGapTicks: ticks(6), widthTurn: 0.04 },
+      kegs: turretKegRing(3, 'lanes'),
     },
     {
-      entries: [
-        { templateId: 'tunnel_rat', count: 8, level: 4 },
-        { templateId: 'webwood_spider', count: 7, level: 3 },
+      groups: [
+        {
+          brick: 'walkers',
+          entries: [
+            { templateId: 'tunnel_rat', count: 8, level: 4 },
+            { templateId: 'webwood_spider', count: 7, level: 3 },
+          ],
+          gapMinTicks: ticks(0.85),
+          gapMaxTicks: ticks(1.3),
+        },
       ],
       coreDamage: 40,
-      gapMinTicks: ticks(0.85),
-      gapMaxTicks: ticks(1.3),
-      barrels: { count: 2, ...TURRET_BARREL_RING },
+      kegs: turretKegRing(2),
     },
     {
-      entries: [
-        { templateId: 'tunnel_rat', count: 10, level: 4 },
-        { templateId: 'webwood_spider', count: 10, level: 3 },
+      groups: [
+        {
+          brick: 'walkers',
+          sides: { kind: 'flanks', count: 3, widthTurn: 0.14 },
+          entries: [
+            { templateId: 'tunnel_rat', count: 10, level: 4 },
+            { templateId: 'webwood_spider', count: 10, level: 3 },
+          ],
+          gapMinTicks: ticks(0.7),
+          gapMaxTicks: ticks(1.05),
+        },
       ],
       coreDamage: 40,
-      gapMinTicks: ticks(0.7),
-      gapMaxTicks: ticks(1.05),
-      barrels: { count: 3, ...TURRET_BARREL_RING },
-      arrival: { kind: 'flanks', count: 3, widthTurn: 0.14 },
+      kegs: turretKegRing(3),
     },
   ],
 };
@@ -161,55 +198,100 @@ export const TURRET_SCENARIO_HARD: TurretScenarioDef = {
   supply: { resupplyAfterWaves: [4, 5], unusedChargeBonus: false },
   waves: [
     {
-      entries: [
-        { templateId: 'forest_wolf', count: 12, level: 2 },
-        { templateId: 'wild_boar', count: 8, level: 3 },
+      groups: [
+        {
+          brick: 'walkers',
+          sides: { kind: 'flanks', count: 2, widthTurn: 0.14 },
+          entries: [
+            { templateId: 'forest_wolf', count: 12, level: 2 },
+            { templateId: 'wild_boar', count: 8, level: 3 },
+          ],
+          ...HARD_GAP,
+        },
       ],
       coreDamage: 60,
-      ...HARD_GAP,
-      barrels: { count: 3, ...TURRET_BARREL_RING },
-      arrival: { kind: 'flanks', count: 2, widthTurn: 0.14 },
+      kegs: turretKegRing(3),
     },
     {
-      entries: [
-        { templateId: 'webwood_spider', count: 10, level: 4, hpScale: HARD_HP, speedScale: 1.5 },
-        { templateId: 'vale_bandit', count: 8, level: 5, hpScale: HARD_HP, speedScale: 1.5 },
-        { templateId: 'fen_troll', count: 2, level: 11, hpScale: BRUTE_HP },
+      groups: [
+        {
+          brick: 'smallGroup',
+          size: 10,
+          bunchGapTicks: ticks(0.4),
+          widthTurn: 0.04,
+          entries: [
+            {
+              templateId: 'webwood_spider',
+              count: 10,
+              level: 4,
+              hpScale: HARD_HP,
+              speedScale: 1.5,
+            },
+            { templateId: 'vale_bandit', count: 8, level: 5, hpScale: HARD_HP, speedScale: 1.5 },
+            { templateId: 'fen_troll', count: 2, level: 11, hpScale: BRUTE_HP },
+          ],
+          ...PACK_GAP,
+        },
       ],
       coreDamage: 110,
-      ...PACK_GAP,
-      barrels: { count: 3, ...TURRET_BARREL_RING },
-      arrival: { kind: 'burst', groupSize: 10, groupGapTicks: ticks(0.4), widthTurn: 0.04 },
+      kegs: turretKegRing(3),
     },
     {
-      entries: [
-        { templateId: 'vale_bandit', count: 12, level: 5, hpScale: HARD_HP, speedScale: 1.5 },
-        { templateId: 'fen_troll', count: 6, level: 11, hpScale: BRUTE_HP, speedScale: 1.3 },
+      groups: [
+        {
+          brick: 'walkers',
+          sides: { kind: 'flanks', count: 3, widthTurn: 0.1 },
+          entries: [
+            { templateId: 'vale_bandit', count: 12, level: 5, hpScale: HARD_HP, speedScale: 1.5 },
+            { templateId: 'fen_troll', count: 6, level: 11, hpScale: BRUTE_HP, speedScale: 1.3 },
+          ],
+          ...RUSH_GAP,
+        },
       ],
       coreDamage: 130,
-      ...RUSH_GAP,
-      barrels: { count: 4, ...TURRET_BARREL_RING },
-      arrival: { kind: 'flanks', count: 3, widthTurn: 0.1 },
+      kegs: turretKegRing(4),
     },
     {
-      entries: [
-        { templateId: 'tunnel_rat', count: 20, level: 6, hpScale: HARD_HP, speedScale: 1.5 },
-        { templateId: 'fen_troll', count: 4, level: 12, hpScale: BRUTE_HP, speedScale: 1.2 },
+      groups: [
+        {
+          brick: 'walkers',
+          sides: { kind: 'arc', widthTurn: 0.1 },
+          entries: [
+            { templateId: 'tunnel_rat', count: 20, level: 6, hpScale: HARD_HP, speedScale: 1.5 },
+            { templateId: 'fen_troll', count: 4, level: 12, hpScale: BRUTE_HP, speedScale: 1.2 },
+          ],
+          ...PACK_GAP,
+        },
       ],
       coreDamage: 160,
-      ...PACK_GAP,
-      barrels: { count: 4, ...TURRET_BARREL_RING },
-      arrival: { kind: 'arc', widthTurn: 0.1 },
+      kegs: turretKegRing(4),
     },
     {
-      entries: [
-        { templateId: 'deeprock_kobold', count: 9, level: 15, hpScale: HARD_HP, speedScale: 1.5 },
-        { templateId: 'thornpeak_ogre', count: 6, level: 16, hpScale: BRUTE_HP, speedScale: 1.3 },
+      groups: [
+        {
+          brick: 'walkers',
+          sides: { kind: 'flanks', count: 3, widthTurn: 0.1 },
+          entries: [
+            {
+              templateId: 'deeprock_kobold',
+              count: 9,
+              level: 15,
+              hpScale: HARD_HP,
+              speedScale: 1.5,
+            },
+            {
+              templateId: 'thornpeak_ogre',
+              count: 6,
+              level: 16,
+              hpScale: BRUTE_HP,
+              speedScale: 1.3,
+            },
+          ],
+          ...RUSH_GAP,
+        },
       ],
       coreDamage: 330,
-      ...RUSH_GAP,
-      barrels: { count: 5, ...TURRET_BARREL_RING },
-      arrival: { kind: 'flanks', count: 3, widthTurn: 0.1 },
+      kegs: turretKegRing(5),
     },
     {
       // The giants set off first, a little quicker than their templates; the charge
@@ -217,23 +299,40 @@ export const TURRET_SCENARIO_HARD: TurretScenarioDef = {
       // sponge: a charger falls to three good shells, a giant to five or six; the charge
       // is many (19 at 2.4 times their pace) so the cannon alone lets several through,
       // while the Shockwave and frags saved for this wave turn most of it back.
-      entries: [
-        { templateId: 'frostmane_yeti', count: 3, level: 20, hpScale: GIANT_HP, speedScale: 1.15 },
-        { templateId: 'idol_guardian', count: 1, level: 20, hpScale: GIANT_HP, speedScale: 1.15 },
+      groups: [
         {
-          templateId: 'boneclad_revenant',
-          count: 19,
-          level: 19,
-          bossLast: true,
-          hpScale: CHARGER_HP,
-          speedScale: 2.4,
+          brick: 'walkers',
+          sides: { kind: 'flanks', count: 3, widthTurn: 0.1 },
+          entries: [
+            {
+              templateId: 'frostmane_yeti',
+              count: 3,
+              level: 20,
+              hpScale: GIANT_HP,
+              speedScale: 1.15,
+            },
+            {
+              templateId: 'idol_guardian',
+              count: 1,
+              level: 20,
+              hpScale: GIANT_HP,
+              speedScale: 1.15,
+            },
+            {
+              templateId: 'boneclad_revenant',
+              count: 19,
+              level: 19,
+              bossLast: true,
+              hpScale: CHARGER_HP,
+              speedScale: 2.4,
+            },
+          ],
+          gapMinTicks: 3,
+          gapMaxTicks: 7,
         },
       ],
       coreDamage: 360,
-      gapMinTicks: 3,
-      gapMaxTicks: 7,
-      barrels: { count: 5, ...TURRET_BARREL_RING },
-      arrival: { kind: 'flanks', count: 3, widthTurn: 0.1 },
+      kegs: turretKegRing(5),
     },
   ],
 };
@@ -256,9 +355,7 @@ export const TURRET_DEFAULT_SCENARIO = TURRET_SCENARIO_STANDARD;
 /** The most kegs any scenario lets stand at once: the render pools are sized to it. */
 export const FIRE_AND_FLY_MAX_KEG_CAP = Math.max(
   ...FIRE_AND_FLY_SCENARIOS.flatMap((scenario) =>
-    scenario.waves.map(
-      (wave) => scenario.kegs?.cap ?? wave.barrels.cap ?? TURRET_EXPLOSIVE_BARREL.cap,
-    ),
+    scenario.waves.map((wave) => wave.kegCap ?? TURRET_EXPLOSIVE_BARREL.cap),
   ),
 );
 

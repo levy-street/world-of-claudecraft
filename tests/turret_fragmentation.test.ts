@@ -29,15 +29,19 @@ import {
   writeTurretFragStar,
 } from '../src/sim/minigames/turret_fragmentation';
 import type { PrivateSalt, TurretSizeClass } from '../src/sim/types';
+import {
+  holdTurretSpawns,
+  releaseTurretSpawns,
+  turretSpawned,
+  walkersWavePlan,
+} from './helpers/turret_wave_plan';
 
 const flat: ThrowProbe = { ground: () => 0, water: () => null };
 const tilted: ThrowProbe = { ground: (x, z) => 0.1 * x - 0.05 * z, water: () => null };
 const START = 1000;
 const INTRO_END = START + TURRET_TIMING.introTicks;
-const HELD_BACK = Number.MAX_SAFE_INTEGER;
 const CORE = 80;
 const TAU = Math.PI * 2;
-const NO_BARRELS = { count: 0, minRadius: 0, maxRadius: 0 };
 
 function kind(size: TurretSizeClass, maxHp: number): TurretKind {
   return {
@@ -60,14 +64,10 @@ function plan(k: TurretKind, count: number, fragmentation = 3): TurretPlan {
     chargeBonus: false,
     kinds: [k],
     waves: [
-      {
-        spawns: Array.from({ length: count }, () => 0),
-        coreDamage: CORE,
-        gapMinTicks: 16,
-        gapMaxTicks: 32,
-        barrels: NO_BARRELS,
-        arrival: { kind: 'ring' },
-      },
+      walkersWavePlan(
+        Array.from({ length: count }, () => 0),
+        { coreDamage: CORE, gapMinTicks: 16, gapMaxTicks: 32 },
+      ),
     ],
     bowling: { ...TURRET_BOWLING, enabled: false },
   };
@@ -97,11 +97,11 @@ function ofType<T extends TurretEvent['type']>(events: readonly TurretEvent[], t
 function field(k: TurretKind, count: number, fragmentation = 3, seed = 7) {
   const state = createTurretDefense(plan(k, count, fragmentation), { x: 0, z: 0 }, seed, START);
   run(state, INTRO_END);
-  while (state.spawnCursor < count) {
-    state.nextSpawnTick = 0;
+  while (turretSpawned(state) < count) {
+    releaseTurretSpawns(state);
     run(state, state.tick + 1);
   }
-  state.nextSpawnTick = HELD_BACK;
+  holdTurretSpawns(state);
   for (const m of state.monsters) lay(state, m, 200 + m.id * 10, 200);
   return { state, ms: [...state.monsters] };
 }
@@ -178,7 +178,7 @@ describe('the star', () => {
       const p = plan(kind('small', 5000), 1);
       const state = createTurretDefense(p, { x: 0, z: 0 }, seed, START, withSalt);
       run(state, INTRO_END);
-      state.nextSpawnTick = HELD_BACK;
+      holdTurretSpawns(state);
       const out = fireFrag(state, 15, -12);
       return ofType(run(state, out.ok ? out.shot.impactTick : 0), 'fragBurst')[0].bomblets;
     });
@@ -421,7 +421,7 @@ describe('the burst and the bomblets', () => {
   it('keeps a lost run frozen: bomblets still to land are dropped', () => {
     const state = createTurretDefense(plan(kind('huge', 5000), 1), { x: 0, z: 0 }, 7, START);
     run(state, INTRO_END);
-    state.nextSpawnTick = HELD_BACK;
+    holdTurretSpawns(state);
     const m = state.monsters[0];
     while (m.state !== 'windup') run(state, state.tick + 1);
     state.integrity = 1;

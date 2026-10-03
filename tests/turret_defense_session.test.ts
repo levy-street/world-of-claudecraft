@@ -1025,7 +1025,7 @@ describe('the IWorld read', () => {
     const view = sim.turretSession!;
     const live = turretSeat(sim).defense;
     expect(live.monsters.length).toBeGreaterThan(0);
-    const cursors = ['spawnCursor', 'nextSpawnTick', 'nextShotId', 'nextMonsterId', 'nextBarrelId'];
+    const cursors = ['spawning', 'nextShotId', 'nextMonsterId', 'nextBarrelId'];
     for (const key of ['tick', 'seed', ...cursors]) {
       expect(live).toHaveProperty(key);
       expect(view.defense).not.toHaveProperty(key);

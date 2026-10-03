@@ -15,6 +15,7 @@ import { fireAndFlyLookTemplate } from '../src/sim/content/fire_and_fly_looks';
 import { TURRET_MISSION_PACK } from '../src/sim/content/fire_and_fly_missions';
 import type { TurretEvent } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
+import { turretPackLeaderKind } from '../src/sim/minigames/turret_group_plan';
 import type { TurretSessionView } from '../src/sim/turret_defense_session';
 import { mobVoiceCue } from '../src/ui/combat_sfx';
 
@@ -62,21 +63,24 @@ const LEADERS: readonly (readonly [string, string, string | null])[][] = [
 describe("The Pack's departure cue", () => {
   it("cries each wave's named leader's own aggro clip, every one shipped", () => {
     const table = plan.waves.map((wave) =>
-      wave.hunt!.packs.map((pack) => {
-        const kind = wave.spawns[pack.leader];
+      wave.groups.flatMap((_, g) => {
+        const kind = turretPackLeaderKind(wave, g);
+        if (kind < 0) return [];
         const templateId = plan.kinds[kind].templateId;
         return [
-          templateId,
-          fireAndFlyLookTemplate(templateId, plan.scenarioId),
-          turretRallyCueKey(plan, kind, shipped),
-        ] as const;
+          [
+            templateId,
+            fireAndFlyLookTemplate(templateId, plan.scenarioId),
+            turretRallyCueKey(plan, kind, shipped),
+          ] as const,
+        ];
       }),
     );
     expect(table).toEqual(LEADERS);
     // Every leader is named by its content (a leading entry), and every clip exists.
     for (const wave of TURRET_MISSION_PACK.waves)
-      for (const p of wave.hunt!.packs.keys())
-        expect(wave.entries.filter((e) => e.pack === p && e.leads)).toHaveLength(1);
+      for (const group of wave.groups)
+        if (group.brick === 'pack') expect(group.entries.filter((e) => e.leads)).toHaveLength(1);
     for (const [, , key] of LEADERS.flat()) expect(Object.hasOwn(SFX_CLIPS, key!)).toBe(true);
   });
 

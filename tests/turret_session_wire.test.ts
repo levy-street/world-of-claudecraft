@@ -34,14 +34,23 @@ import {
   turretChargesLeft,
 } from '../src/sim/minigames/turret_defense_plan';
 import { TURRET_BOMBLETS } from '../src/sim/minigames/turret_fragmentation';
+import { TURRET_GROUP_LIMITS } from '../src/sim/minigames/turret_group_plan';
 import { TURRET_BONUS_CAP, TURRET_POINTS, turretResult } from '../src/sim/minigames/turret_result';
 import { Sim } from '../src/sim/sim';
 import { type TurretSessionView, turretSessionView } from '../src/sim/turret_defense_session';
-import type { SimEvent, TurretSession, TurretWaveDef, WorldContent } from '../src/sim/types';
+import type {
+  SimEvent,
+  TurretGroupDef,
+  TurretSession,
+  TurretWaveDef,
+  TurretWaveEntry,
+  WorldContent,
+} from '../src/sim/types';
 import { turretSessionFor } from '../src/sim/vehicles';
 import { groundHeight } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 import { turretSeatKeys, turretStateWireJson } from './helpers/turret_seat_wire';
+import { TURRET_BRICKS_SCENARIO } from './helpers/turret_wave_plan';
 
 const ground = { ground: (x: number, z: number) => groundHeight(x, z, WORLD_SEED) };
 const EMPTY_WORLD: WorldContent = { ...BUILTIN_WORLD, camps: [], npcs: {}, groundObjects: [] };
@@ -172,32 +181,37 @@ describe('the turret plan key', () => {
       // Only the Veterans' Test is resupplied (after its fifth wave), and no trial scores charges.
       expect(decoded?.resupplyWaves).toEqual(_key === 'hard' ? [3, 4] : []);
       expect(decoded?.chargeBonus).toBe(false);
-      expect(decoded?.waves.map((w) => w.arrival)).toEqual(
-        scenario.waves.map((w) => w.arrival ?? { kind: 'ring' }),
+      expect(decoded?.waves.map((w) => [w.groups, w.kegs])).toEqual(
+        resolved.waves.map((w) => [w.groups, w.kegs]),
       );
-      expect(Object.isFrozen(decoded!.waves[0].arrival)).toBe(true);
+      expect(Object.isFrozen(decoded!.waves[0].groups[0])).toBe(true);
     },
   );
 
   it('decodes a plan the resolver builds at every one of its limits', () => {
     const L = TURRET_PLAN_LIMITS;
     const wolf = { templateId: 'forest_wolf', count: 1, level: 2 };
-    const wave = (entries: TurretWaveDef['entries'], arrival?: TurretWaveDef['arrival']) => ({
-      entries,
-      coreDamage: 60,
-      gapMinTicks: 16,
-      gapMaxTicks: 32,
-      barrels: { count: 0, minRadius: 0, maxRadius: 0 },
-      ...(arrival ? { arrival } : {}),
-    });
+    const G = TURRET_GROUP_LIMITS;
+    const wave = (entries: TurretWaveEntry[], group: Partial<TurretGroupDef> = {}): TurretWaveDef =>
+      ({
+        groups: [{ brick: 'walkers', entries, gapMinTicks: 16, gapMaxTicks: 32, ...group }],
+        coreDamage: 60,
+      }) as TurretWaveDef;
     const kinds = Array.from({ length: L.kinds }, (_, i) => ({ ...wolf, hpScale: 1 + i / 100 }));
     const crowd = { ...wolf, count: L.spawnsPerWave };
     const pack = {
-      kind: 'burst',
-      groupSize: L.spawnsPerWave,
-      groupGapTicks: L.groupGapTicks,
+      brick: 'smallGroup',
+      size: L.spawnsPerWave,
+      bunchGapTicks: G.delayTicks,
       widthTurn: 1,
+      delayTicks: G.delayTicks,
     } as const;
+    const grouped: TurretWaveDef = {
+      groups: Array.from({ length: G.groups }, () => wave([wolf]).groups[0]),
+      coreDamage: 60,
+      kegs: Array.from({ length: G.kegLots }, () => ({ mode: 'crown', count: 1 }) as const),
+      kegCap: L.barrels,
+    };
     const resolved = resolveTurretPlan({
       ...TURRET_SCENARIO_STANDARD,
       id: 'z'.repeat(L.scenarioIdLength),
@@ -206,7 +220,8 @@ describe('the turret plan key', () => {
       waves: [
         wave(kinds),
         wave([crowd], pack),
-        ...Array.from({ length: L.waves - 2 }, () => wave([wolf])),
+        grouped,
+        ...Array.from({ length: L.waves - 3 }, () => wave([wolf])),
       ],
     });
     expect(resolved.kinds).toHaveLength(L.kinds);
@@ -234,31 +249,69 @@ describe('the turret plan key', () => {
   });
 
   it.each([
-    ['an unknown arrival', (p: Wire) => (p.waves[0].arrival = { kind: 'spiral' })],
-    ['a missing arrival', (p: Wire) => delete p.waves[0].arrival],
+    ['an unknown side', (p: Wire) => (p.waves[0].groups[0].sides = { kind: 'spiral' })],
+    ['missing sides', (p: Wire) => delete p.waves[0].groups[0].sides],
     [
       'four flanks',
-      (p: Wire) => (p.waves[1].arrival = { kind: 'flanks', count: 4, widthTurn: 0.1 }),
+      (p: Wire) => (p.waves[2].groups[0].sides = { kind: 'flanks', count: 4, widthTurn: 0.1 }),
     ],
-    ['an empty arc', (p: Wire) => (p.waves[0].arrival = { kind: 'arc', widthTurn: 0 })],
+    ['an empty arc', (p: Wire) => (p.waves[0].groups[0].sides = { kind: 'arc', widthTurn: 0 })],
     [
       'an arc past a full turn',
-      (p: Wire) => (p.waves[0].arrival = { kind: 'arc', widthTurn: 1.01 }),
+      (p: Wire) => (p.waves[0].groups[0].sides = { kind: 'arc', widthTurn: 1.01 }),
     ],
     [
-      'an empty pack',
+      'an empty bunch',
       (p: Wire) =>
-        (p.waves[0].arrival = { kind: 'burst', groupSize: 0, groupGapTicks: 20, widthTurn: 0.1 }),
+        (p.waves[0].groups[0].sides = {
+          kind: 'bunches',
+          size: 0,
+          bunchGapTicks: 20,
+          widthTurn: 0.1,
+        }),
     ],
     [
       'a fractional pause',
       (p: Wire) =>
-        (p.waves[0].arrival = { kind: 'burst', groupSize: 2, groupGapTicks: 1.5, widthTurn: 0.1 }),
+        (p.waves[0].groups[0].sides = {
+          kind: 'bunches',
+          size: 2,
+          bunchGapTicks: 1.5,
+          widthTurn: 0.1,
+        }),
     ],
     [
       'an endless pause',
       (p: Wire) =>
-        (p.waves[0].arrival = { kind: 'burst', groupSize: 2, groupGapTicks: 1e6, widthTurn: 0.1 }),
+        (p.waves[0].groups[0].sides = {
+          kind: 'bunches',
+          size: 2,
+          bunchGapTicks: 1e6,
+          widthTurn: 0.1,
+        }),
+    ],
+    ['an unknown brick', (p: Wire) => (p.waves[0].groups[0].brick = 'herd')],
+    ['a missing group', (p: Wire) => (p.waves[0].groups = [])],
+    ['a group short of its spawns', (p: Wire) => (p.waves[0].groups[0].count -= 1)],
+    ['an endless delay', (p: Wire) => (p.waves[0].groups[0].delayTicks = 1e6)],
+    ['a gap band upside down', (p: Wire) => (p.waves[0].groups[0].gapMinTicks = 1000)],
+    ['an unknown keg lot', (p: Wire) => (p.waves[0].kegs = [{ mode: 'scatter', count: 2 }])],
+    ['an empty crown', (p: Wire) => (p.waves[0].kegs = [{ mode: 'crown', count: 0 }])],
+    [
+      'a path keg on a ring',
+      (p: Wire) => {
+        p.waves[0].groups[0].sides = { kind: 'ring' };
+        p.waves[0].kegs = [{ mode: 'path', group: 0, placement: 'front' }];
+      },
+    ],
+    [
+      'a path keg on no group',
+      (p: Wire) => (p.waves[0].kegs = [{ mode: 'path', group: 7, placement: 'side' }]),
+    ],
+    [
+      'a path keg past the field',
+      (p: Wire) =>
+        (p.waves[0].kegs = [{ mode: 'path', group: 0, placement: 'axis', fromTower: 90 }]),
     ],
     ['no tower points', (p: Wire) => (p.integrity = 0)],
     ['fractional tower points', (p: Wire) => (p.integrity = 99.5)],
@@ -303,7 +356,10 @@ describe('the turret plan key', () => {
     ['an empty template id', (p: Wire) => (p.kinds[0].templateId = '')],
     ['an oversized template id', (p: Wire) => (p.kinds[0].templateId = 'x'.repeat(65))],
     ['a missing bowling rule', (p: Wire) => delete p.bowling.enabled],
-    ['a non-finite gap', (p: Wire) => (p.waves[0].gapMinTicks = Number.POSITIVE_INFINITY)],
+    [
+      'a non-finite gap',
+      (p: Wire) => (p.waves[0].groups[0].gapMinTicks = Number.POSITIVE_INFINITY),
+    ],
     ['oversized kinds', (p: Wire) => (p.kinds = Array.from({ length: 65 }, () => p.kinds[0]))],
     ['resupply waves out of order', (p: Wire) => (p.resupplyWaves = [4, 2])],
     ['a resupply wave twice', (p: Wire) => (p.resupplyWaves = [2, 2])],
@@ -313,6 +369,47 @@ describe('the turret plan key', () => {
     ['a charge bonus that is not a flag', (p: Wire) => (p.chargeBonus = 1)],
   ])('rejects %s', (_, forge) => {
     const forged = wire(resolveTurretPlan());
+    forge(forged);
+    expect(decodeTurretPlan(forged)).toBeNull();
+  });
+
+  it('decodes the plan of every brick and keg mode as resolved', () => {
+    const plan = resolveTurretPlan(TURRET_BRICKS_SCENARIO);
+    expect(decodeTurretPlan(wire(plan))).toEqual(plan);
+  });
+
+  it.each([
+    ['surgers that do not split evenly', (p: Wire) => (p.waves[1].groups[4].sides = 4)],
+    ['surgers from past eight sides', (p: Wire) => (p.waves[0].groups[1].sides = 9)],
+    [
+      'a path keg on surgers',
+      (p: Wire) => p.waves[1].kegs.push({ mode: 'path', group: 4, placement: 'front' }),
+    ],
+    [
+      'lots laying more kegs than the field holds',
+      (p: Wire) =>
+        (p.waves[0].kegs = [
+          { mode: 'crown', count: 20 },
+          { mode: 'crown', count: 20 },
+        ]),
+    ],
+    [
+      'more path kegs on one group than it takes',
+      (p: Wire) =>
+        (p.waves[0].kegs = Array.from({ length: 4 }, () => ({
+          mode: 'path',
+          group: 0,
+          placement: 'side',
+        }))),
+    ],
+    [
+      "a distance band on a pack's path keg",
+      (p: Wire) => Object.assign(p.waves[1].kegs[0], { minRadius: 20, maxRadius: 26 }),
+    ],
+    ['a path keg band upside down', (p: Wire) => (p.waves[1].kegs[1].minRadius = 30)],
+    ['a path keg band with one end', (p: Wire) => delete p.waves[1].kegs[1].maxRadius],
+  ])('rejects %s', (_, forge) => {
+    const forged = wire(resolveTurretPlan(TURRET_BRICKS_SCENARIO));
     forge(forged);
     expect(decodeTurretPlan(forged)).toBeNull();
   });
@@ -434,7 +531,12 @@ describe('the turret seat key', () => {
 
   it("drops the engine bookkeeping an older server's seat still carries", () => {
     const forged = wire(seatOf(midWave()));
-    Object.assign(forged.defense, { spawnCursor: 2, nextShotId: 9, nextBarrelId: 3 });
+    Object.assign(forged.defense, {
+      spawnCursor: 2,
+      spawning: [{ cursor: 1, nextTick: 9 }],
+      nextShotId: 9,
+      nextBarrelId: 3,
+    });
     Object.assign(forged.defense.monsters[0], { airSince: -1, throwOpen: false, knocked: [] });
     const decoded = decodeTurretSeat(forged, plan)!;
     expect(decoded).toEqual(seatOf(midWave()));

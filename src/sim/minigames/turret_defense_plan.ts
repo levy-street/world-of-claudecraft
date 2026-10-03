@@ -1,9 +1,10 @@
 // Resolves a Fire and Fly scenario against the real mob templates into a plan of
 // plain numbers the engine reads: the tower's points, health from the shared mob
 // formula (times the entry's scale), march speed from the template's own speed,
-// size-class physics per kind, a fixed spawn order and an arrival pattern per
-// wave. The plan reaches the client once per seat, so anything a scenario varies
-// lives here, never in a constant both sides would have to agree on.
+// size-class physics per kind, and each wave's groups (turret_group_plan.ts: a fixed
+// spawn order and a brick per group) and keg lots. The plan reaches the client once per
+// seat, so anything a scenario varies lives here, never in a constant both sides would
+// have to agree on.
 
 import { TURRET_DEFAULT_SCENARIO } from '../content/fire_and_fly_scenarios';
 import {
@@ -18,21 +19,30 @@ import { deepFreeze } from '../deep_freeze';
 import { mobMaxHp } from '../entity';
 import type {
   MobTemplate,
-  TurretArrivalDef,
-  TurretBarrelWaveDef,
   TurretBowlingDef,
-  TurretKegsDef,
   TurretMedalBars,
   TurretScenarioDef,
   TurretSizeClass,
+  TurretWaveDef,
   TurretWaveEntry,
   TurretWaveRole,
 } from '../types';
 import { type TurretArsenal, turretChargesGiven } from './turret_charges';
-import { resolveTurretHunt, TURRET_HUNT_LIMITS, type TurretHuntPlan } from './turret_hunt_plan';
+import {
+  resolveTurretGroups,
+  type TurretWavePlan,
+  turretKegLotsValid,
+  turretWavePlanValid,
+} from './turret_group_plan';
+import { TURRET_HUNT_LIMITS } from './turret_hunt_plan';
 import { turretMedalBarPoints } from './turret_result';
 
 export { type TurretArsenal, turretChargesGiven, turretChargesLeft } from './turret_charges';
+export {
+  type TurretGroupPlan,
+  type TurretWavePlan,
+  turretSpawnOrder,
+} from './turret_group_plan';
 
 export interface TurretKind {
   readonly templateId: string;
@@ -53,18 +63,6 @@ export interface TurretKind {
 /** How far from the tower's centre a monster of `kind` stops to strike (yd). */
 export function turretStrikeDistance(kind: Pick<TurretKind, 'radius'>): number {
   return TURRET_ARENA.breachRadius + kind.radius;
-}
-
-export interface TurretWavePlan {
-  /** Kind indices in spawn order. */
-  readonly spawns: readonly number[];
-  readonly coreDamage: number;
-  readonly gapMinTicks: number;
-  readonly gapMaxTicks: number;
-  readonly barrels: Readonly<TurretBarrelWaveDef>;
-  readonly arrival: Readonly<TurretArrivalDef>;
-  /** A hunt wave's packs: its monsters gather at rallies before they advance. */
-  readonly hunt?: TurretHuntPlan;
 }
 
 /**
@@ -101,25 +99,6 @@ export interface TurretPlan {
 }
 
 /**
- * Entry indices in spawn order: the ordinary entries interleaved evenly across
- * the wave (each entry's i-th monster at (i + 0.5) / count, ties in entry
- * order), then the boss-last entries.
- */
-export function turretSpawnOrder(entries: readonly TurretWaveEntry[]): number[] {
-  const slots: { at: number; entry: number }[] = [];
-  entries.forEach((e, entry) => {
-    if (e.bossLast) return;
-    for (let i = 0; i < e.count; i++) slots.push({ at: (i + 0.5) / e.count, entry });
-  });
-  slots.sort((a, b) => a.at - b.at || a.entry - b.entry);
-  const order = slots.map((s) => s.entry);
-  entries.forEach((e, entry) => {
-    if (e.bossLast) for (let i = 0; i < e.count; i++) order.push(entry);
-  });
-  return order;
-}
-
-/**
  * The most a plan may carry. The online client's `turp` decoder rejects a plan past
  * any of these (and the seat shows no HUD), so the resolver refuses to build one.
  */
@@ -130,7 +109,6 @@ export const TURRET_PLAN_LIMITS = {
   spawnsPerWave: 256,
   integrity: 100_000,
   charges: 99,
-  groupGapTicks: 20 * 60,
   barrels: 24,
   packs: TURRET_HUNT_LIMITS.packs,
 } as const;
@@ -142,10 +120,6 @@ export function turretScenarioIdValid(id: string): boolean {
 
 function intWithin(value: number, min: number, max: number): boolean {
   return Number.isSafeInteger(value) && value >= min && value <= max;
-}
-
-function validWidth(widthTurn: number): boolean {
-  return Number.isFinite(widthTurn) && widthTurn > 0 && widthTurn <= 1;
 }
 
 /**
@@ -176,47 +150,34 @@ export function turretResupplyWavesValid(waves: readonly number[], waveCount: nu
   );
 }
 
-function resolveArrival(
-  arrival: TurretArrivalDef | undefined,
+function resolveWave(
+  wave: Readonly<TurretWaveDef>,
+  kindOf: (entry: TurretWaveEntry, role: TurretWaveRole | undefined) => number,
+  mobs: Readonly<Record<string, MobTemplate>>,
   scenarioId: string,
-): TurretArrivalDef {
-  if (!arrival) return { kind: 'ring' };
-  const valid =
-    arrival.kind === 'ring' ||
-    (arrival.kind === 'arc' && validWidth(arrival.widthTurn)) ||
-    (arrival.kind === 'flanks' &&
-      (arrival.count === 2 || arrival.count === 3) &&
-      validWidth(arrival.widthTurn)) ||
-    (arrival.kind === 'burst' &&
-      intWithin(arrival.groupSize, 1, TURRET_PLAN_LIMITS.spawnsPerWave) &&
-      intWithin(arrival.groupGapTicks, 0, TURRET_PLAN_LIMITS.groupGapTicks) &&
-      validWidth(arrival.widthTurn));
-  if (!valid) throw new Error(`turret plan: bad ${arrival.kind} arrival in ${scenarioId}`);
-  return { ...arrival };
-}
-
-function resolveBarrels(
-  barrels: Readonly<TurretBarrelWaveDef>,
-  kegs: Readonly<TurretKegsDef> | undefined,
-  scenarioId: string,
-): TurretBarrelWaveDef {
-  const scale = kegs?.countScale ?? 1;
-  if (!Number.isFinite(scale) || scale <= 0)
-    throw new Error(`turret plan: bad keg count scale in ${scenarioId}`);
-  const count = Math.round(barrels.count * scale);
-  if (!intWithin(count, 0, TURRET_PLAN_LIMITS.barrels))
-    throw new Error(`turret plan: too many kegs in a wave of ${scenarioId}`);
-  const cap = kegs?.cap ?? barrels.cap;
-  if (cap !== undefined && !intWithin(cap, 1, TURRET_PLAN_LIMITS.barrels))
+): TurretWavePlan {
+  const limits = TURRET_PLAN_LIMITS;
+  const { spawns, groups } = resolveTurretGroups(
+    wave.groups,
+    kindOf,
+    mobs,
+    scenarioId,
+    limits.spawnsPerWave,
+  );
+  if (spawns.length > limits.spawnsPerWave)
+    throw new Error(`turret plan: too many spawns in a wave of ${scenarioId}`);
+  const kegs = (wave.kegs ?? []).map((lot) => ({ ...lot }));
+  if (!turretKegLotsValid(kegs, { groups }, limits.barrels))
+    throw new Error(`turret plan: bad kegs in a wave of ${scenarioId}`);
+  const cap = wave.kegCap;
+  if (cap !== undefined && !(Number.isSafeInteger(cap) && cap >= 1 && cap <= limits.barrels))
     throw new Error(`turret plan: bad keg cap in ${scenarioId}`);
-  const placement = kegs?.placement ?? barrels.placement;
-  if (placement !== undefined && placement !== 'lanes')
-    throw new Error(`turret plan: bad keg placement in ${scenarioId}`);
   return {
-    ...barrels,
-    count,
-    ...(placement ? { placement } : {}),
-    ...(cap !== undefined ? { cap } : {}),
+    spawns,
+    coreDamage: wave.coreDamage,
+    groups,
+    kegs,
+    ...(cap !== undefined ? { kegCap: cap } : {}),
   };
 }
 
@@ -247,7 +208,7 @@ export function resolveTurretPlan(
     throw new Error(`turret plan: bad resupply waves in ${scenario.id}`);
   const kinds: TurretKind[] = [];
   const kindIndex = new Map<string, number>();
-  const kindOf = (entry: TurretWaveEntry): number => {
+  const kindOf = (entry: TurretWaveEntry, role: TurretWaveRole | undefined): number => {
     const scale = entry.hpScale ?? 1;
     if (!Number.isFinite(scale) || scale <= 0)
       throw new Error(`turret plan: bad health scale for ${entry.templateId}`);
@@ -257,9 +218,6 @@ export function resolveTurretPlan(
     const speedMax = entry.speedScaleMax;
     if (speedMax !== undefined && !(Number.isFinite(speedMax) && speedMax >= speed))
       throw new Error(`turret plan: bad speed band for ${entry.templateId}`);
-    const role = entry.role;
-    if (role !== undefined && role !== 'scout' && role !== 'sprint')
-      throw new Error(`turret plan: bad role for ${entry.templateId}`);
     const scaled = `${scale === 1 ? '' : `x${scale}`}${speed === 1 ? '' : `s${speed}`}`;
     const banded = `${speedMax === undefined ? '' : `~${speedMax}`}${role ? `:${role}` : ''}`;
     const key = `${entry.templateId}@${entry.level}${scaled}${banded}`;
@@ -289,27 +247,12 @@ export function resolveTurretPlan(
     kindIndex.set(key, kinds.length - 1);
     return kinds.length - 1;
   };
-  const planned = scenario.waves.map((wave) => {
-    const entryKinds = wave.entries.map(kindOf);
-    const hunt = wave.hunt ? resolveTurretHunt(wave.hunt, wave.entries, mobs, scenario.id) : null;
-    if (!hunt && wave.entries.some((e) => e.role || e.pack !== undefined || e.leads))
-      throw new Error(`turret plan: a hunt role outside a hunt in ${scenario.id}`);
-    const order = hunt ? hunt.order : turretSpawnOrder(wave.entries);
-    const spawns = order.map((entry) => entryKinds[entry]);
-    if (spawns.length > limits.spawnsPerWave)
-      throw new Error(`turret plan: too many spawns in a wave of ${scenario.id}`);
-    return {
-      spawns,
-      coreDamage: wave.coreDamage,
-      gapMinTicks: wave.gapMinTicks,
-      gapMaxTicks: wave.gapMaxTicks,
-      barrels: resolveBarrels(wave.barrels, scenario.kegs, scenario.id),
-      arrival: resolveArrival(wave.arrival, scenario.id),
-      ...(hunt ? { hunt: hunt.hunt } : {}),
-    };
-  });
+  const planned = scenario.waves.map((wave) => resolveWave(wave, kindOf, mobs, scenario.id));
   if (kinds.length > limits.kinds)
     throw new Error(`turret plan: too many monster kinds in ${scenario.id}`);
+  const roles = kinds.map((kind) => kind.role);
+  if (!planned.every((wave) => turretWavePlanValid(wave, roles, limits.barrels)))
+    throw new Error(`turret plan: an unplayable wave in ${scenario.id}`);
   return deepFreeze({
     scenarioId: scenario.id,
     integrity: scenario.integrity,

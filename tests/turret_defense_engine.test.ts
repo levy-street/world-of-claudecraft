@@ -41,6 +41,12 @@ import { turretSessionSeed } from '../src/sim/minigames/turret_defense_rng';
 import { turretResult } from '../src/sim/minigames/turret_result';
 import { Rng } from '../src/sim/rng';
 import { DT, type TurretSizeClass } from '../src/sim/types';
+import {
+  holdTurretSpawns,
+  releaseTurretSpawns,
+  turretSpawned,
+  walkersWavePlan,
+} from './helpers/turret_wave_plan';
 
 const flat: ThrowProbe = { ground: () => 0, water: () => null };
 const hills: ThrowProbe = {
@@ -53,8 +59,6 @@ const lakeBeyond = (z0: number, depth = 2): ThrowProbe => ({
 });
 const START = 1000;
 const INTRO_END = START + TURRET_TIMING.introTicks;
-const HELD_BACK = Number.MAX_SAFE_INTEGER;
-const NO_BARRELS = { count: 0, minRadius: 0, maxRadius: 0 };
 
 function kind(size: TurretSizeClass, maxHp: number, marchSpeed = 4.4): TurretKind {
   const s = TURRET_SIZE_CLASSES[size];
@@ -80,14 +84,9 @@ function plan(kinds: TurretKind[], spawns: number[][], coreDamage = 60): TurretP
     resupplyWaves: [],
     chargeBonus: false,
     kinds,
-    waves: spawns.map((s) => ({
-      spawns: s,
-      coreDamage,
-      gapMinTicks: 16,
-      gapMaxTicks: 32,
-      barrels: NO_BARRELS,
-      arrival: { kind: 'ring' },
-    })),
+    waves: spawns.map((s) =>
+      walkersWavePlan(s, { coreDamage: coreDamage, gapMinTicks: 16, gapMaxTicks: 32 }),
+    ),
     bowling: { ...TURRET_BOWLING, enabled: false },
   };
 }
@@ -102,7 +101,7 @@ function run(state: TurretDefenseState, toTick: number, probe = flat): TurretEve
 function oneMonster(k: TurretKind, seed = 7): { state: TurretDefenseState; m: TurretMonster } {
   const state = createTurretDefense(plan([k], [[0, 0]]), { x: 0, z: 0 }, seed, START);
   run(state, INTRO_END);
-  state.nextSpawnTick = HELD_BACK;
+  holdTurretSpawns(state);
   return { state, m: state.monsters[0] };
 }
 
@@ -120,8 +119,8 @@ function pin(
 
 function spawnAll(state: TurretDefenseState): void {
   const wave = state.plan.waves[state.wave];
-  while (state.spawnCursor < wave.spawns.length) {
-    state.nextSpawnTick = 0;
+  while (turretSpawned(state) < wave.spawns.length) {
+    releaseTurretSpawns(state);
     run(state, state.tick + 1);
   }
 }
@@ -273,7 +272,7 @@ describe('phases and spawns', () => {
     state.phaseEndTick = START + 1;
     const spawned: number[] = [];
     const ids = new Set<number>();
-    for (let t = START + 1; t <= START + 20 * 30 && state.spawnCursor < 12; t++) {
+    for (let t = START + 1; t <= START + 20 * 30 && turretSpawned(state) < 12; t++) {
       tickTurretDefense(state, t, flat);
       for (const m of state.monsters) {
         if (ids.has(m.id)) continue;
@@ -392,7 +391,7 @@ describe('the shot', () => {
     run(state, state.tick + 1);
     expect(state.wave).toBe(5);
     const m = state.monsters[0];
-    state.nextSpawnTick = HELD_BACK;
+    holdTurretSpawns(state);
     expect(m.hp).toBe(480);
     pin(state, m, 0, 20);
     state.readyTick = 0;
@@ -1108,7 +1107,7 @@ describe('the breach', () => {
   function atWindup(k: TurretKind, spawns = [0, 0], kinds = [k]) {
     const state = createTurretDefense(plan(kinds, [spawns]), { x: 0, z: 0 }, 7, START);
     run(state, INTRO_END);
-    state.nextSpawnTick = HELD_BACK;
+    holdTurretSpawns(state);
     const m = state.monsters[0];
     let t = state.tick;
     while (m.state !== 'windup' && t < START + 20 * 60) run(state, ++t);
@@ -1272,7 +1271,7 @@ describe('determinism and plain data', () => {
     const beforeWindup = walker.state.rev;
     expect(run(walker.state, arrive).map((e) => e.type)).toEqual(['windupStart']);
     expect(walker.state.rev).toBeGreaterThan(beforeWindup);
-    walker.state.nextSpawnTick = walker.state.tick + 1;
+    for (const group of walker.state.spawning) group.nextTick = walker.state.tick + 1;
     const beforeSpawn = walker.state.rev;
     expect(run(walker.state, walker.state.tick + 1)).toEqual([]);
     expect(walker.state.monsters).toHaveLength(2);

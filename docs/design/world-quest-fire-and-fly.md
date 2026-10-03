@@ -77,13 +77,14 @@ are the game's own monsters, living only inside this mini-game.
   `TURRET_BOWLING`): a body flying fast and low, corpses included, knocks over
   the grounded monsters it crosses, each pair once per flight.
 - **Kegs** (`src/sim/minigames/turret_barrels.ts`, tuned by
-  `TURRET_EXPLOSIVE_BARREL`): each wave stands powder kegs on a ring inside the
-  march, with every lane kept clear of them. A blast or a fast thrown body lights
+  `TURRET_EXPLOSIVE_BARREL`; laid lot by lot by `turret_keg_lots.ts`, see Bricks):
+  each wave stands powder kegs inside the march at its start, with every lane kept
+  clear of them. A blast or a fast thrown body lights
   one; it blows after a short fuse with a bigger blast on the shell's rules, so a
   chain reads as a ripple.
-- **Hunts** (`hunt` on a wave; plan half `src/sim/minigames/turret_hunt_plan.ts`,
-  engine half `turret_rally.ts`, tuned by `TURRET_RALLY`). A hunt wave comes as
-  packs. Each pack's members spawn over a short window on an arc of the pack's own
+- **Hunts** (the `pack` and `sprint` bricks; plan half
+  `src/sim/minigames/turret_hunt_plan.ts`, engine half `turret_rally.ts`, tuned by
+  `TURRET_RALLY`). A hunt wave comes as packs. Each pack's members spawn over a short window on an arc of the pack's own
   side and walk (`muster`) to their own place in a disc around a rally point in the
   field (drawn per pack in the wave's distance band, no draw for the places), then
   stand there facing the tower (`hold`). The pack's leader cries once every living
@@ -94,27 +95,27 @@ are the game's own monsters, living only inside this mini-game.
   rallies leave within `departGapTicks` of each other (a cue waits until its
   departure is clear). A member thrown while its pack gathers gets up and walks back
   to its place; one not standing there at the departure (flying, down, walking in
-  or back, or spawned after it) goes for the tower alone at the pack's pace. Roles
-  on an entry (`role`): a `scout` gathers and breaks out at its own pace at the
+  or back, or spawned after it) goes for the tower alone at the pack's pace. A pack's
+  entry may be a `scout` (`role`): it gathers and breaks out at its own pace at the
   departure; a `sprint` group never gathers and runs straight in. Speed spread
   (`speedScaleMax` on an entry, `turret_pace.ts`): each monster draws its own pace
   in its kind's band once at its spawn, on a stream keyed by its id, and carries it.
   There is no rally marker of any kind: the standing pack and the cry are the
   telegraph. A rally record lives only while its pack gathers; every new draw rides
   its own stream, so no existing draw moved and the trials replay exactly.
-- **Placed kegs** (`src/sim/minigames/turret_rally_kegs.ts`). A hunt wave lays its
-  kegs at its own rallies instead of on the ring: `rally-front` on the advance path
-  12 to 16 yd tower-side of the rally and 2.5 to 3 yd off the axis (the column
-  brushes past it), `rally-side` on the same stretch 5 to 6 yd off the axis (at the
-  column's rim), `axis` just off the advance axis at a set distance from the tower;
+- **Placed kegs** (`src/sim/minigames/turret_rally_kegs.ts`, a `path` keg lot on a
+  pack). A hunt wave lays its kegs at its own rallies instead of on the ring:
+  `front` on the advance path 12 to 16 yd tower-side of the rally and 2.5 to 3 yd off
+  the axis (the column brushes past it), `side` on the same stretch 5 to 6 yd off the
+  axis (at the column's rim), `axis` just off the advance axis at a set distance from
+  the tower;
   each by the barrels' own clear-spot rules and under the keg cap. A front or side
   keg's stretch gives way (`turretRallyKegBand`) so that its blast never reaches a
   member standing at the rally (the keg blast radius plus the gathering disc), and so
   that it stands no nearer the tower than the keg ring's inner edge
   (`TURRET_RALLY.towerMin`); a rally keeps that same blast reach from any keg left
   standing by an earlier wave (`kegClearance`, the draw leaving the most room kept
-  when none clears). Pinned by `tests/turret_rally_kegs.test.ts`. Every other wave
-  keeps the ring and the lanes.
+  when none clears). Pinned by `tests/turret_rally_kegs.test.ts`.
 - **The strike.** A monster reaching the tower winds up once (a red ring under
   it) for `TURRET_TIMING.windupTicks`, 0.8 s, the same for every trial and mission
   so a player always knows how long a monster at the foot gives them (1.5 s before
@@ -164,8 +165,94 @@ Every tuning constant named above (`TURRET_SIZE_CLASSES`, `TURRET_WEAPON`,
 Engine suites: `tests/turret_defense_engine.test.ts`, `tests/thrown_body.test.ts`,
 `tests/turret_bowling.test.ts`, `tests/turret_barrels.test.ts`,
 `tests/turret_feedback.test.ts`, `tests/turret_defense_session.test.ts`,
-`tests/turret_rally.test.ts`, `tests/turret_hunt_plan.test.ts` and
-`tests/turret_rally_kegs.test.ts`.
+`tests/turret_rally.test.ts`, `tests/turret_hunt_plan.test.ts`,
+`tests/turret_rally_kegs.test.ts` and `tests/turret_wave_groups.test.ts`; every
+scenario's replay is pinned by `tests/turret_wave_groups_digest.test.ts`.
+
+## Bricks
+
+A wave is an ordered list of groups (`TurretWaveDef.groups`), plus its shell damage and
+its keg lots. Each group holds its monsters (`entries`: templates, counts, levels,
+health and speed scales, a pace band), a start delay (`delayTicks`: the rhythm of lulls,
+peaks and surprises) and one brick, the way it comes.
+Every group spawns on its own clock: its first monster on the wave's first spawn tick
+plus its delay, the next ones at its brick's own gaps, and a tick's spawns are taken
+group by group in the wave's order. The plan resolver (`turret_group_plan.ts`) turns
+each brick into the numbers the engine and the client read; the engine only dispatches
+(`turret_wave_groups.ts`). Every side is a private draw keyed by the wave and the group,
+so a run keeps its sides secret and a replay of the same seed keeps them. The level's
+own mechanic is meant as an accent among classic waves, not the whole of them.
+
+- **Walkers** (`walkers`): single monsters at intervals (`gapMinTicks` to
+  `gapMaxTicks`, drawn per monster), from anywhere on the ring (no `sides`), one side
+  (`arc`, `widthTurn`) or two or three sides evenly apart (`flanks`, `count`,
+  `widthTurn`), the group taking the sides in turn.
+- **Small group** (`smallGroup`): bunches of `size` monsters close together (the gap
+  band inside a bunch), each bunch from its own side (`widthTurn`), `bunchGapTicks`
+  between bunches.
+- **Pack** (`pack`): the hunt above. The members spawn over `spreadTicks` on an arc of
+  `widthTurn` on the pack's side, gather at a rally drawn between `minRadius` and
+  `maxRadius`, wait for their last member or `holdTicks` after the first arrival, and
+  advance at `advanceScale` of their slowest gathering member's march. The packs of a
+  wave take sides evenly apart. A pack wave may add a **sprint group** (`sprint`):
+  spawned over `spreadTicks` from the side between its first two packs, it never
+  gathers and runs straight in.
+- **Surgers** (`surgers`, `turret_surgers.ts`): `sides` bunches of fast monsters that
+  set off away from the action and run straight in. The action is read once, as the
+  group's first monster spawns: the circle in eight sectors, each scored by its living
+  monsters, each weighing 1 at the spawn ring rising linearly to 3 at the tower's foot
+  (a marcher's time to strike is linear in its distance, so the weight ranks the sides by
+  how soon they strike); the best sector's centre wins, the lower sector on a tie, and
+  with nobody alive a private draw. The bunches take the bearings `k` steps of a turn
+  over `sides + 1` from the action (one: opposite; three: a quarter, a half, three
+  quarters; four: fifths), each wandering up to `TURRET_SURGERS.jitterTurn` by its own
+  draw, the monsters taking the bunches in turn at the gap band. From every side
+  including the action's is not a surger: it is walkers on the ring. When kegs block
+  every bearing of a bunch's arc, its monster comes through any clear bearing of the
+  ring, as every arc does, so a narrow surger arc beside a lane keg can let one in
+  through the action's own side.
+- **The big one** (`bigOne`): a large or huge monster, alone or with an escort, slow
+  and visible from far, from one side (`widthTurn`) at the gap band. A named shape on
+  the walkers machinery (the resolver refuses one with no large or huge monster), and
+  a hook for later rules. Its entries interleave like any group's; `bossLast` holds
+  the big monster to the end.
+- **Surge** (`surge`): many fast monsters in a short time from one side or two
+  (`sides`, `widthTurn`, a tight gap band): a named shape on the walkers machinery.
+
+"Fast" in the surgers and the surge is the content's to set (the entries' `speedScale`
+and templates): the resolver checks their shape, not their speed.
+
+Kegs come as lots on the wave (`kegs`), every lot placed at the wave's start, never
+mid-combat, under the wave's cap (`kegCap`, absent `TURRET_EXPLOSIVE_BARREL.cap`);
+a keg that finds no clear spot is left out:
+
+- **Random** (`random`): `count` kegs spread evenly around the field at a drawn
+  distance between `minRadius` and `maxRadius`; with `lanes`, inside the sides the
+  wave's groups come through, in turn.
+- **Tower crown** (`crown`): `count` kegs on a ring just beyond the Shockwave's 12 yd
+  reach (`TURRET_KEG_CROWN`, 13.2 to 13.5 yd), where the bodies a slam throws come down.
+  The slam lights no keg itself, but a thrown body striking one faster than the
+  bowling minimum does: measured on flat ground with a keg on each body's own line (a
+  slam throws a little off the radial line), a medium body lights it from 13.15 yd out
+  (its feet come under a keg's top at 12.2), a large one anywhere from 11 to 15 yd, a
+  huge one out to 13.55 (fast only to 11.9, its contact reach does the rest); a small
+  one flies over everything to 17.5 yd. So a slam on a crowd at the foot throws it
+  onto the crown kegs. A slam lights a crown keg only when a body flies its way: the
+  kegs are few and the throws spread, so most slams light some, not all.
+- **Path** (`path`, `group`, `placement`): on the route of one group of the wave, its
+  side drawn at the wave's start: a pack's by its rally (above), any other group's on
+  its side's axis at a drawn distance from the tower between the lot's `minRadius` and
+  `maxRadius` (absent: the keg ring band; a pack's lot takes none, its rally sets the
+  stretch), `front` 2.5 to 3 yd off the axis, `side` 5 to 6 yd off it, or `axis` at
+  `fromTower` yd; the `k`-th path keg of a group with several sides takes its `k`-th
+  side. Never on a surger (its side waits for the
+  action), and never where its blast reaches a pack gathering at its rally.
+
+The random, crown and path kegs are laid in that order: the field lots, then the
+wave's rallies open clear of them, then the path lots. Pinned by
+`tests/turret_wave_groups.test.ts` (synthetic plans: no shipped scenario uses surgers
+or the crown and route kegs yet) and, online, by the bricks run in
+`tests/turret_online_round_trip.test.ts`.
 
 ## The trials
 
@@ -173,8 +260,8 @@ A trial is a `TurretScenarioDef` in `src/sim/content/fire_and_fly_scenarios.ts`,
 resolved against the real templates into a deep-frozen plan by
 `resolveTurretPlan` (`src/sim/minigames/turret_defense_plan.ts`): the tower's
 points, the medal bars, health from the shared mob formula times the entry's
-scale, march speed from the template's own speed, per-kind physics, a fixed
-spawn order and an arrival pattern per wave. The plan reaches the client once per
+scale, march speed from the template's own speed, per-kind physics, and each wave's
+groups and keg lots (see Bricks). The plan reaches the client once per
 seat, so anything a trial varies lives in the plan, never in a constant both
 sides must agree on.
 
@@ -184,10 +271,10 @@ sides must agree on.
 | Standing Watch | `TURRET_SCENARIO_STANDARD` | the original run (`TURRET_WAVES`), from wolves up to a final guardian; the default trial |
 | Veterans' Test | `TURRET_SCENARIO_HARD` | Standing Watch made meaner: tight fast packs, two rushes on three sides at once, a stream from one side, then the giants walking in with a charge of armoured dead running at their heels from three sides; tougher and more numerous monsters, more large ones, and a last charge of eighteen armoured dead, three good shells each |
 
-Arrival patterns (`src/sim/minigames/turret_arrival.ts`) pick which bearings of
-the spawn ring a monster comes through: the whole ring, one arc, two or three
-flanks, or bursts of packs from their own side. The kegs' lane rule applies
-inside the chosen sector. Every value is mini-game tuning to settle by playtest,
+The trials use walkers and small groups only (`src/sim/minigames/turret_arrival.ts`
+picks which bearings of the spawn ring a monster comes through: the whole ring, one
+arc, two or three flanks, or bunches from their own side). The kegs' lane rule
+applies inside the chosen sector. Every value is mini-game tuning to settle by playtest,
 not a classic-era formula. Pinned by `tests/turret_scenarios.test.ts` and
 `tests/turret_defense_content.test.ts`.
 

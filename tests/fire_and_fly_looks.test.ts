@@ -22,7 +22,7 @@ const modelOf = (templateId: string): string | undefined =>
 const fielded = (scenarioId: string): Set<string> =>
   new Set(
     FIRE_AND_FLY_SCENARIOS.find((s) => s.id === scenarioId)?.waves.flatMap((w) =>
-      w.entries.map((e) => e.templateId),
+      w.groups.flatMap((g) => g.entries.map((e) => e.templateId)),
     ),
   );
 

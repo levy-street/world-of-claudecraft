@@ -31,11 +31,13 @@ import {
 import type { TurretFeedback } from '../sim/minigames/turret_feedback';
 import { TURRET_BOMBLETS, type TurretBombletSpot } from '../sim/minigames/turret_fragmentation';
 import {
-  TURRET_HUNT_LIMITS,
-  type TurretHuntPackPlan,
-  type TurretHuntPlan,
-  turretHuntPlanValid,
-} from '../sim/minigames/turret_hunt_plan';
+  TURRET_GROUP_LIMITS,
+  type TurretArrivalPlan,
+  type TurretGroupPlan,
+  turretPackGroup,
+  turretWavePlanValid,
+} from '../sim/minigames/turret_group_plan';
+import { TURRET_HUNT_LIMITS } from '../sim/minigames/turret_hunt_plan';
 import type { TurretRally } from '../sim/minigames/turret_rally';
 import {
   TURRET_BONUS_CAP,
@@ -51,12 +53,10 @@ import type {
   TurretSessionView,
 } from '../sim/turret_defense_session';
 import type {
-  TurretArrivalDef,
-  TurretBarrelWaveDef,
   TurretBowlingDef,
+  TurretKegLotDef,
   TurretMedalBar,
   TurretMedalBars,
-  TurretRallyKegDef,
   Vec3,
 } from '../sim/types';
 
@@ -126,6 +126,7 @@ const within =
 const turn: Dec<number> = (v) =>
   num(v) !== BAD && (v as number) > 0 && (v as number) <= 1 ? (v as number) : BAD;
 const flankCount: Dec<2 | 3> = (v) => (v === 2 || v === 3 ? v : BAD);
+const yes: Dec<true> = (v) => (v === true ? v : BAD);
 /** A share of a whole: above 0, at most 1. */
 const share: Dec<number> = turn;
 const scenarioId: Dec<string> = (v) =>
@@ -191,11 +192,11 @@ const eventArm = <K extends TurretEvent['type']>(spec: Arm<TurretEvent, 'type', 
   shape<Extract<TurretEvent, { type: K }>>(spec);
 const segmentArm = <K extends MotionSegment['kind']>(spec: Arm<MotionSegment, 'kind', K>) =>
   shape<Extract<MotionSegment, { kind: K }>>(spec);
-const arrivalArm = <K extends TurretArrivalDef['kind']>(spec: Arm<TurretArrivalDef, 'kind', K>) =>
-  shape<Extract<TurretArrivalDef, { kind: K }>>(spec);
-const kegArm = <K extends TurretRallyKegDef['placement']>(
-  spec: Arm<TurretRallyKegDef, 'placement', K>,
-) => shape<Extract<TurretRallyKegDef, { placement: K }>>(spec);
+const arrivalArm = <K extends TurretArrivalPlan['kind']>(spec: Arm<TurretArrivalPlan, 'kind', K>) =>
+  shape<Extract<TurretArrivalPlan, { kind: K }>>(spec);
+const groupArm = <K extends TurretGroupPlan['brick']>(spec: Arm<TurretGroupPlan, 'brick', K>) =>
+  shape<Extract<TurretGroupPlan, { brick: K }>>(spec);
+type PathLot = Extract<TurretKegLotDef, { mode: 'path' }>;
 
 const at = { x: num, y: num, z: num };
 const vec3 = shape<Vec3>(at);
@@ -469,42 +470,90 @@ const defense = shape<Omit<TurretDefenseView, 'plan'>>({
 
 const seat = shape({ origin: vec3, defense, waveCount: count, monstersLeft: count });
 
-const arrival = tagged<TurretArrivalDef, 'kind'>('kind', {
+const delay = within(0, TURRET_GROUP_LIMITS.delayTicks);
+const groupCount = within(1, LIMITS.spawnsPerWave);
+const arrival = tagged<TurretArrivalPlan, 'kind'>('kind', {
   ring: arrivalArm({ kind: lit('ring') }),
   arc: arrivalArm({ kind: lit('arc'), widthTurn: turn }),
   flanks: arrivalArm({ kind: lit('flanks'), count: flankCount, widthTurn: turn }),
-  burst: arrivalArm({
-    kind: lit('burst'),
-    groupSize: within(1, LIMITS.spawnsPerWave),
-    groupGapTicks: within(0, LIMITS.groupGapTicks),
+  bunches: arrivalArm({
+    kind: lit('bunches'),
+    size: within(1, LIMITS.spawnsPerWave),
+    bunchGapTicks: delay,
     widthTurn: turn,
   }),
 });
 
 const medalBar = shape<TurretMedalBar>({ minIntegrityShare: share });
 
-const rallyKeg = tagged<TurretRallyKegDef, 'placement'>('placement', {
-  'rally-front': kegArm({ placement: lit('rally-front') }),
-  'rally-side': kegArm({ placement: lit('rally-side') }),
-  axis: kegArm({ placement: lit('axis'), fromTower: positive }),
+const group = tagged<TurretGroupPlan, 'brick'>('brick', {
+  walkers: groupArm({
+    brick: lit('walkers'),
+    sides: arrival,
+    gapMinTicks: delay,
+    gapMaxTicks: delay,
+    count: groupCount,
+    delayTicks: delay,
+  }),
+  pack: groupArm({
+    brick: lit('pack'),
+    pack: within(0, LIMITS.packs - 1),
+    pace: positive,
+    leader: within(0, LIMITS.spawnsPerWave - 1),
+    minRadius: positive,
+    maxRadius: positive,
+    holdTicks: within(0, TURRET_HUNT_LIMITS.windowTicks),
+    spreadTicks: within(0, TURRET_HUNT_LIMITS.windowTicks),
+    widthTurn: turn,
+    count: groupCount,
+    delayTicks: delay,
+  }),
+  sprint: groupArm({
+    brick: lit('sprint'),
+    spreadTicks: delay,
+    widthTurn: turn,
+    count: groupCount,
+    delayTicks: delay,
+  }),
+  surgers: groupArm({
+    brick: lit('surgers'),
+    sides: within(1, TURRET_GROUP_LIMITS.surgerSides),
+    widthTurn: turn,
+    gapMinTicks: delay,
+    gapMaxTicks: delay,
+    count: groupCount,
+    delayTicks: delay,
+  }),
 });
 
-const huntPlan = shape<TurretHuntPlan>({
-  packs: list(
-    LIMITS.packs,
-    shape<TurretHuntPackPlan>({
-      pace: positive,
-      kegs: list(LIMITS.barrels, rallyKeg),
-      leader: within(0, LIMITS.spawnsPerWave - 1),
-      last: within(0, LIMITS.spawnsPerWave - 1),
-    }),
-  ),
-  groups: list(LIMITS.spawnsPerWave, within(-1, LIMITS.packs - 1)),
-  ticks: list(LIMITS.spawnsPerWave, within(0, 2 * TURRET_HUNT_LIMITS.windowTicks)),
-  minRadius: positive,
-  maxRadius: positive,
-  holdTicks: within(0, TURRET_HUNT_LIMITS.windowTicks),
-  widthTurn: turn,
+const kegCount = within(1, LIMITS.barrels);
+const lotGroup = within(0, TURRET_GROUP_LIMITS.groups - 1);
+const alongLot = shape<Extract<PathLot, { placement: 'front' | 'side' }>>({
+  mode: lit('path'),
+  group: lotGroup,
+  placement: oneOf('front', 'side'),
+  minRadius: optional(nonNegative),
+  maxRadius: optional(nonNegative),
+});
+const axisLot = shape<Extract<PathLot, { placement: 'axis' }>>({
+  mode: lit('path'),
+  group: lotGroup,
+  placement: lit('axis'),
+  fromTower: positive,
+});
+const kegLot = tagged<TurretKegLotDef, 'mode'>('mode', {
+  random: shape<Extract<TurretKegLotDef, { mode: 'random' }>>({
+    mode: lit('random'),
+    count: kegCount,
+    minRadius: nonNegative,
+    maxRadius: nonNegative,
+    lanes: optional(yes),
+  }),
+  crown: shape<Extract<TurretKegLotDef, { mode: 'crown' }>>({
+    mode: lit('crown'),
+    count: kegCount,
+  }),
+  path: (v) => (record(v) && v.placement === 'axis' ? axisLot(v) : alongLot(v)),
 });
 
 const plan = shape<TurretPlan>({
@@ -538,17 +587,9 @@ const plan = shape<TurretPlan>({
     shape<TurretWavePlan>({
       spawns: list(LIMITS.spawnsPerWave, count),
       coreDamage: num,
-      gapMinTicks: count,
-      gapMaxTicks: count,
-      barrels: shape<TurretBarrelWaveDef>({
-        count: within(0, LIMITS.barrels),
-        minRadius: num,
-        maxRadius: num,
-        placement: optional(lit('lanes')),
-        cap: optional(within(1, LIMITS.barrels)),
-      }),
-      arrival,
-      hunt: optional(huntPlan),
+      groups: list(TURRET_GROUP_LIMITS.groups, group),
+      kegs: list(TURRET_GROUP_LIMITS.kegLots, kegLot),
+      kegCap: optional(within(1, LIMITS.barrels)),
     }),
   ),
   bowling: shape<TurretBowlingDef>({
@@ -589,9 +630,8 @@ export function decodeTurretPlan(value: unknown): TurretPlan | null {
   for (const kind of decoded.kinds)
     if (kind.marchSpeedMax !== undefined && kind.marchSpeedMax < kind.marchSpeed) return null;
   const roles = decoded.kinds.map((kind) => kind.role);
-  for (const wave of decoded.waves) {
-    if (wave.hunt ? !turretHuntPlanValid(wave.hunt, wave.spawns, roles) : false) return null;
-  }
+  for (const wave of decoded.waves)
+    if (!turretWavePlanValid(wave, roles, LIMITS.barrels)) return null;
   return deepFreeze(decoded);
 }
 
@@ -725,9 +765,10 @@ function ralliesConsistent(
   if (ids.size !== rallies.length) return false;
   for (const r of rallies) {
     const wave = Math.floor(r.id / LIMITS.packs);
-    const pack = turretPlan.waves[wave]?.hunt?.packs[r.id % LIMITS.packs];
-    if (wave > defense.wave || !pack) return false;
-    if (r.holdTicks !== turretPlan.waves[wave].hunt?.holdTicks) return false;
+    const planned = turretPlan.waves[wave];
+    const pack = planned ? planned.groups[turretPackGroup(planned, r.id % LIMITS.packs)] : null;
+    if (wave > defense.wave || pack?.brick !== 'pack') return false;
+    if (r.holdTicks !== pack.holdTicks) return false;
     if (Math.abs(r.pace - pack.pace) > PACE_ROUNDING) return false;
   }
   return defense.monsters.every((m) =>

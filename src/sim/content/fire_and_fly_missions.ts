@@ -17,12 +17,15 @@
 
 import {
   DT,
-  type TurretHuntDef,
-  type TurretPackDef,
-  type TurretRallyKegDef,
+  type TurretGapDef,
+  type TurretGroupDef,
+  type TurretKegLotDef,
   type TurretScenarioDef,
+  type TurretSidesDef,
+  type TurretWaveDef,
+  type TurretWaveEntry,
 } from '../types';
-import { TURRET_BARREL_RING, TURRET_MEDALS, TURRET_TOWER_POINTS } from './turret_defense';
+import { TURRET_MEDALS, TURRET_TOWER_POINTS, turretKegRing } from './turret_defense';
 
 const ticks = (seconds: number): number => Math.round(seconds / DT);
 const gap = (min: number, max: number) =>
@@ -34,14 +37,37 @@ const gap = (min: number, max: number) =>
  * its signature, the weapon its idea asks for.
  */
 const MISSION_SUPPLY = { resupplyAfterWaves: [3, 5, 7], unusedChargeBonus: true } as const;
-const KEGS = (count: number) => ({ count, ...TURRET_BARREL_RING });
+const KEGS = (count: number) => turretKegRing(count);
+
+/** One group of walkers: from the whole ring, or from the sides given. */
+const walkers = (
+  entries: readonly TurretWaveEntry[],
+  gaps: TurretGapDef,
+  sides?: TurretSidesDef,
+): TurretGroupDef => ({ brick: 'walkers', entries, ...gaps, ...(sides ? { sides } : {}) });
+
+/** Bunches of `size` from a side each, `bunchGap` (s) between bunches. */
+const bunches = (
+  entries: readonly TurretWaveEntry[],
+  gaps: TurretGapDef,
+  size: number,
+  bunchGap: number,
+  widthTurn: number,
+): TurretGroupDef => ({
+  brick: 'smallGroup',
+  entries,
+  ...gaps,
+  size,
+  bunchGapTicks: ticks(bunchGap),
+  widthTurn,
+});
 
 /** A member's own pace on its way to its rally: from its template's to a third quicker. */
 const MUSTER = { speedScale: 1, speedScaleMax: 1.35 } as const;
 /** Light, quick monsters that gather with the pack and break out at the departure. */
 const SCOUT = { role: 'scout', speedScale: 2.2, speedScaleMax: 2.6 } as const;
-/** The wave-8 pincer: a group that never gathers and runs straight in. */
-const SPRINT = { role: 'sprint', speedScale: 2.4 } as const;
+/** The wave-8 pincer: a sprint group's monsters, that never gather and run straight in. */
+const SPRINT = { speedScale: 2.4 } as const;
 /**
  * The last three waves: every monster a tenth quicker to its rally or the tower, never
  * tougher than its template. Their difficulty is in the packs, not in the health.
@@ -54,39 +80,71 @@ const late = <T extends { speedScale: number; speedScaleMax?: number }>(role: T)
 });
 const MUSTER_LATE = late(MUSTER);
 const SCOUT_LATE = late(SCOUT);
-const FRONT = { placement: 'rally-front' } as const;
-const SIDE = { placement: 'rally-side' } as const;
-/** A hunt wave lays its kegs at its rallies, none on the ring. */
-const RALLY_KEGS_ONLY = KEGS(0);
-/** A hunt wave's packs: each its advance scale, its kegs and its delay (s) from the wave's start. */
-const pack = (advanceScale: number, kegs: readonly TurretRallyKegDef[], delay = 0) => ({
-  advanceScale,
-  kegs,
-  delayTicks: ticks(delay),
-});
-/** The gathering: members spawn over 2 s on an arc of the pack's side, then walk to its rally. */
-const hunt = (
-  packs: readonly TurretPackDef[],
+type PathPlacement = 'front' | 'side';
+const FRONT: PathPlacement = 'front';
+const SIDE: PathPlacement = 'side';
+
+/** A hunt wave's pack: its members, its advance scale, the kegs on its path and its delay (s). */
+interface PackSpec {
+  entries: readonly TurretWaveEntry[];
+  advanceScale: number;
+  kegs: readonly PathPlacement[];
+  delay: number;
+}
+const pack = (
+  entries: readonly TurretWaveEntry[],
+  advanceScale: number,
+  kegs: readonly PathPlacement[],
+  delay = 0,
+): PackSpec => ({ entries, advanceScale, kegs, delay });
+
+/** The gathering: members spawn over 2 s on an arc of their pack's side, then walk to its rally. */
+const SPREAD = ticks(2);
+const WIDTH = 0.1;
+
+/**
+ * A hunt wave: its packs in order, each gathering at a rally in the band and waiting up to
+ * `holdSeconds` for its last member, the kegs on their paths, then a sprint group (if any)
+ * setting off `sprint.delay` s in. A hunt wave lays its kegs on its packs' paths, none on
+ * the ring.
+ */
+function huntWave(
+  coreDamage: number,
   band: readonly [number, number],
   holdSeconds: number,
-  sprintDelay?: number,
-): TurretHuntDef => ({
-  packs,
-  minRadius: band[0],
-  maxRadius: band[1],
-  holdTicks: ticks(holdSeconds),
-  spreadTicks: ticks(2),
-  widthTurn: 0.1,
-  ...(sprintDelay !== undefined ? { sprintDelayTicks: ticks(sprintDelay) } : {}),
-});
+  packs: readonly PackSpec[],
+  sprint?: { entries: readonly TurretWaveEntry[]; delay: number },
+): TurretWaveDef {
+  const groups: TurretGroupDef[] = packs.map((p) => ({
+    brick: 'pack',
+    entries: p.entries,
+    minRadius: band[0],
+    maxRadius: band[1],
+    holdTicks: ticks(holdSeconds),
+    spreadTicks: SPREAD,
+    widthTurn: WIDTH,
+    advanceScale: p.advanceScale,
+    ...(p.delay ? { delayTicks: ticks(p.delay) } : {}),
+  }));
+  if (sprint)
+    groups.push({
+      brick: 'sprint',
+      entries: sprint.entries,
+      spreadTicks: SPREAD,
+      widthTurn: WIDTH,
+      delayTicks: ticks(sprint.delay),
+    });
+  const kegs: TurretKegLotDef[] = packs.flatMap((p, group) =>
+    p.kegs.map((placement) => ({ mode: 'path' as const, group, placement })),
+  );
+  return { groups, coreDamage, kegs };
+}
 /**
  * The rally bands: far enough that a front keg, a dozen yards and more tower-side of its
  * rally, still stands outside the keg ring's inner edge.
  */
 const FIELD = [30, 36] as const;
 const CLOSE = [30, 33] as const;
-/** Gaps between spawns are the hunt's schedule; these stand unused. */
-const HUNT_GAP = { gapMinTicks: 1, gapMaxTicks: 2 } as const;
 
 /**
  * The hunt. Each wave comes as packs: the members walk in dispersed from their pack's
@@ -112,114 +170,150 @@ export const TURRET_MISSION_PACK: TurretScenarioDef = {
   arsenal: { shockwave: 1, fragmentation: 5 },
   supply: MISSION_SUPPLY,
   waves: [
-    {
-      entries: [{ templateId: 'forest_wolf', count: 8, level: 2, ...MUSTER, pack: 0, leads: true }],
-      coreDamage: 45,
-      ...HUNT_GAP,
-      barrels: RALLY_KEGS_ONLY,
-      hunt: hunt([pack(1.1, [FRONT])], FIELD, 6),
-    },
-    {
-      entries: [
-        { templateId: 'forest_wolf', count: 5, level: 2, ...MUSTER, pack: 0, leads: true },
-        { templateId: 'wild_boar', count: 4, level: 3, ...MUSTER, pack: 0 },
-        { templateId: 'forest_wolf', count: 2, level: 2, ...SCOUT, pack: 0 },
-      ],
-      coreDamage: 52,
-      ...HUNT_GAP,
-      barrels: RALLY_KEGS_ONLY,
-      hunt: hunt([pack(1.15, [FRONT])], FIELD, 6),
-    },
-    {
-      entries: [0, 1].flatMap((p) => [
-        { templateId: 'webwood_spider', count: 3, level: 4, ...MUSTER, pack: p, leads: true },
-        { templateId: 'vale_bandit', count: 4, level: 5, ...MUSTER, pack: p },
-        { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT, pack: p },
+    huntWave(45, FIELD, 6, [
+      pack([{ templateId: 'forest_wolf', count: 8, level: 2, ...MUSTER, leads: true }], 1.1, [
+        FRONT,
       ]),
-      coreDamage: 71,
-      ...HUNT_GAP,
-      barrels: RALLY_KEGS_ONLY,
-      hunt: hunt([pack(1.2, [FRONT]), pack(1.2, [SIDE], 7)], FIELD, 4),
-    },
-    {
-      entries: [0, 1].flatMap((p) => [
-        { templateId: 'tunnel_rat', count: 5, level: 6, ...MUSTER, pack: p },
-        { templateId: 'vale_bandit', count: 2, level: 5, ...MUSTER, pack: p },
-        { templateId: 'fen_troll', count: 1, level: 12, ...MUSTER, pack: p, leads: true },
-        { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT, pack: p },
-      ]),
-      coreDamage: 89,
-      ...HUNT_GAP,
-      barrels: RALLY_KEGS_ONLY,
-      hunt: hunt([pack(1.2, [FRONT]), pack(1.2, [], 0.5)], FIELD, 4),
-    },
-    {
-      entries: [0, 1].flatMap((p) => [
-        { templateId: 'deeprock_kobold', count: 3, level: 15, ...MUSTER, pack: p },
-        { templateId: 'boneclad_revenant', count: 4, level: 19, ...MUSTER, pack: p },
-        { templateId: 'thornpeak_ogre', count: 1, level: 16, ...MUSTER, pack: p, leads: true },
-        { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT, pack: p },
-      ]),
-      coreDamage: 261,
-      ...HUNT_GAP,
-      barrels: RALLY_KEGS_ONLY,
-      hunt: hunt([pack(1.25, [FRONT]), pack(1.25, [FRONT], 2)], FIELD, 4),
-    },
-    {
-      entries: [0, 1, 2].flatMap((p) => [
-        { templateId: 'boneclad_revenant', count: 3, level: 19, ...MUSTER_LATE, pack: p },
-        { templateId: 'deeprock_kobold', count: 2, level: 15, ...MUSTER_LATE, pack: p },
-        { templateId: 'frostmane_yeti', count: 1, level: 19, ...MUSTER_LATE, pack: p, leads: true },
-        { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT_LATE, pack: p },
-      ]),
-      coreDamage: 256,
-      ...HUNT_GAP,
-      barrels: RALLY_KEGS_ONLY,
-      hunt: hunt([pack(1.25, [FRONT]), pack(1.25, [SIDE], 3), pack(1.25, [], 6)], FIELD, 3),
-    },
-    {
-      entries: [0, 1, 2, 3].flatMap((p) => [
-        { templateId: 'tunnel_rat', count: 2, level: 6, ...MUSTER_LATE, pack: p },
-        { templateId: 'vale_bandit', count: 2, level: 5, ...MUSTER_LATE, pack: p },
-        { templateId: 'thornpeak_ogre', count: 1, level: 16, ...MUSTER_LATE, pack: p, leads: true },
-        { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT_LATE, pack: p },
-      ]),
-      coreDamage: 96,
-      ...HUNT_GAP,
-      barrels: RALLY_KEGS_ONLY,
-      hunt: hunt(
-        [pack(1.3, [FRONT]), pack(1.3, [FRONT], 1.5), pack(1.3, [], 3), pack(1.3, [SIDE], 4.5)],
-        CLOSE,
-        2,
+    ]),
+    huntWave(52, FIELD, 6, [
+      pack(
+        [
+          { templateId: 'forest_wolf', count: 5, level: 2, ...MUSTER, leads: true },
+          { templateId: 'wild_boar', count: 4, level: 3, ...MUSTER },
+          { templateId: 'forest_wolf', count: 2, level: 2, ...SCOUT },
+        ],
+        1.15,
+        [FRONT],
       ),
-    },
-    {
-      entries: [
-        ...[0, 1, 2, 3].flatMap((p) => [
-          { templateId: 'boneclad_revenant', count: 2, level: 19, ...MUSTER_LATE, pack: p },
-          { templateId: 'deeprock_kobold', count: 2, level: 15, ...MUSTER_LATE, pack: p },
-          {
-            templateId: 'frostmane_yeti',
-            count: 1,
-            level: 19,
-            ...MUSTER_LATE,
-            pack: p,
-            leads: true,
-          },
-          { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT_LATE, pack: p },
-        ]),
-        { templateId: 'tunnel_rat', count: 6, level: 6, ...late(SPRINT) },
-      ],
-      coreDamage: 256,
-      ...HUNT_GAP,
-      barrels: RALLY_KEGS_ONLY,
-      hunt: hunt(
-        [pack(1.35, [FRONT]), pack(1.35, [SIDE], 1), pack(1.35, [], 2), pack(1.35, [FRONT], 3)],
-        CLOSE,
-        2,
-        3,
+    ]),
+    huntWave(
+      71,
+      FIELD,
+      4,
+      [0, 1].map((p) =>
+        pack(
+          [
+            { templateId: 'webwood_spider', count: 3, level: 4, ...MUSTER, leads: true },
+            { templateId: 'vale_bandit', count: 4, level: 5, ...MUSTER },
+            { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT },
+          ],
+          1.2,
+          [p === 0 ? FRONT : SIDE],
+          p === 0 ? 0 : 7,
+        ),
       ),
-    },
+    ),
+    huntWave(
+      89,
+      FIELD,
+      4,
+      [0, 1].map((p) =>
+        pack(
+          [
+            { templateId: 'tunnel_rat', count: 5, level: 6, ...MUSTER },
+            { templateId: 'vale_bandit', count: 2, level: 5, ...MUSTER },
+            { templateId: 'fen_troll', count: 1, level: 12, ...MUSTER, leads: true },
+            { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT },
+          ],
+          1.2,
+          p === 0 ? [FRONT] : [],
+          p === 0 ? 0 : 0.5,
+        ),
+      ),
+    ),
+    huntWave(
+      261,
+      FIELD,
+      4,
+      [0, 1].map((p) =>
+        pack(
+          [
+            { templateId: 'deeprock_kobold', count: 3, level: 15, ...MUSTER },
+            { templateId: 'boneclad_revenant', count: 4, level: 19, ...MUSTER },
+            { templateId: 'thornpeak_ogre', count: 1, level: 16, ...MUSTER, leads: true },
+            { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT },
+          ],
+          1.25,
+          [FRONT],
+          p === 0 ? 0 : 2,
+        ),
+      ),
+    ),
+    huntWave(
+      256,
+      FIELD,
+      3,
+      (
+        [
+          [[FRONT], 0],
+          [[SIDE], 3],
+          [[], 6],
+        ] as const
+      ).map(([kegs, delay]) =>
+        pack(
+          [
+            { templateId: 'boneclad_revenant', count: 3, level: 19, ...MUSTER_LATE },
+            { templateId: 'deeprock_kobold', count: 2, level: 15, ...MUSTER_LATE },
+            { templateId: 'frostmane_yeti', count: 1, level: 19, ...MUSTER_LATE, leads: true },
+            { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT_LATE },
+          ],
+          1.25,
+          kegs,
+          delay,
+        ),
+      ),
+    ),
+    huntWave(
+      96,
+      CLOSE,
+      2,
+      (
+        [
+          [[FRONT], 0],
+          [[FRONT], 1.5],
+          [[], 3],
+          [[SIDE], 4.5],
+        ] as const
+      ).map(([kegs, delay]) =>
+        pack(
+          [
+            { templateId: 'tunnel_rat', count: 2, level: 6, ...MUSTER_LATE },
+            { templateId: 'vale_bandit', count: 2, level: 5, ...MUSTER_LATE },
+            { templateId: 'thornpeak_ogre', count: 1, level: 16, ...MUSTER_LATE, leads: true },
+            { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT_LATE },
+          ],
+          1.3,
+          kegs,
+          delay,
+        ),
+      ),
+    ),
+    huntWave(
+      256,
+      CLOSE,
+      2,
+      (
+        [
+          [[FRONT], 0],
+          [[SIDE], 1],
+          [[], 2],
+          [[FRONT], 3],
+        ] as const
+      ).map(([kegs, delay]) =>
+        pack(
+          [
+            { templateId: 'boneclad_revenant', count: 2, level: 19, ...MUSTER_LATE },
+            { templateId: 'deeprock_kobold', count: 2, level: 15, ...MUSTER_LATE },
+            { templateId: 'frostmane_yeti', count: 1, level: 19, ...MUSTER_LATE, leads: true },
+            { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT_LATE },
+          ],
+          1.35,
+          kegs,
+          delay,
+        ),
+      ),
+      { entries: [{ templateId: 'tunnel_rat', count: 6, level: 6, ...late(SPRINT) }], delay: 3 },
+    ),
   ],
 };
 
@@ -244,85 +338,129 @@ export const TURRET_MISSION_GIANTS: TurretScenarioDef = {
   supply: MISSION_SUPPLY,
   waves: [
     {
-      entries: [{ templateId: 'fen_troll', count: 3, level: 11, hpScale: 1.05, speedScale: TREAD }],
+      groups: [
+        walkers(
+          [{ templateId: 'fen_troll', count: 3, level: 11, hpScale: 1.05, speedScale: TREAD }],
+          gap(1, 1.8),
+          { kind: 'arc', widthTurn: 0.3 },
+        ),
+      ],
       coreDamage: 95,
-      ...gap(1, 1.8),
-      barrels: KEGS(3),
-      arrival: { kind: 'arc', widthTurn: 0.3 },
+      kegs: KEGS(3),
     },
     {
-      entries: [{ templateId: 'fen_troll', count: 4, level: 12, hpScale: 1.1, speedScale: TREAD }],
+      groups: [
+        walkers(
+          [{ templateId: 'fen_troll', count: 4, level: 12, hpScale: 1.1, speedScale: TREAD }],
+          gap(0.8, 1.4),
+          { kind: 'flanks', count: 2, widthTurn: 0.14 },
+        ),
+      ],
       coreDamage: 100,
-      ...gap(0.8, 1.4),
-      barrels: KEGS(3),
-      arrival: { kind: 'flanks', count: 2, widthTurn: 0.14 },
+      kegs: KEGS(3),
     },
     {
-      entries: [
-        { templateId: 'thornpeak_ogre', count: 4, level: 16, hpScale: 1.1, speedScale: TREAD },
-        { templateId: 'fen_troll', count: 2, level: 12, hpScale: 1.1, speedScale: TREAD },
+      groups: [
+        walkers(
+          [
+            { templateId: 'thornpeak_ogre', count: 4, level: 16, hpScale: 1.1, speedScale: TREAD },
+            { templateId: 'fen_troll', count: 2, level: 12, hpScale: 1.1, speedScale: TREAD },
+          ],
+          gap(0.6, 1.2),
+          { kind: 'flanks', count: 3, widthTurn: 0.1 },
+        ),
       ],
       coreDamage: 120,
-      ...gap(0.6, 1.2),
-      barrels: KEGS(4),
-      arrival: { kind: 'flanks', count: 3, widthTurn: 0.1 },
+      kegs: KEGS(4),
     },
     {
-      entries: [
-        { templateId: 'thornpeak_ogre', count: 4, level: 16, hpScale: 1.1, speedScale: TREAD },
-        { templateId: 'frostmane_yeti', count: 2, level: 19, hpScale: 1.05, speedScale: TREAD },
+      groups: [
+        walkers(
+          [
+            { templateId: 'thornpeak_ogre', count: 4, level: 16, hpScale: 1.1, speedScale: TREAD },
+            { templateId: 'frostmane_yeti', count: 2, level: 19, hpScale: 1.05, speedScale: TREAD },
+          ],
+          gap(0.5, 1),
+          { kind: 'flanks', count: 2, widthTurn: 0.12 },
+        ),
       ],
       coreDamage: 160,
-      ...gap(0.5, 1),
-      barrels: KEGS(4),
-      arrival: { kind: 'flanks', count: 2, widthTurn: 0.12 },
+      kegs: KEGS(4),
     },
     {
-      entries: [
-        { templateId: 'thornpeak_ogre', count: 3, level: 16, hpScale: 1.1, speedScale: TREAD },
-        { templateId: 'frostmane_yeti', count: 4, level: 20, hpScale: 1.05, speedScale: TREAD },
+      groups: [
+        walkers(
+          [
+            { templateId: 'thornpeak_ogre', count: 3, level: 16, hpScale: 1.1, speedScale: TREAD },
+            { templateId: 'frostmane_yeti', count: 4, level: 20, hpScale: 1.05, speedScale: TREAD },
+          ],
+          gap(0.3, 0.6),
+          { kind: 'flanks', count: 3, widthTurn: 0.1 },
+        ),
       ],
       coreDamage: 200,
-      ...gap(0.3, 0.6),
-      barrels: KEGS(5),
-      arrival: { kind: 'flanks', count: 3, widthTurn: 0.1 },
+      kegs: KEGS(5),
     },
     {
-      entries: [
-        { templateId: 'frostmane_yeti', count: 12, level: 20, hpScale: COLOSSUS_HP, speedScale: 2 },
+      groups: [
+        walkers(
+          [
+            {
+              templateId: 'frostmane_yeti',
+              count: 12,
+              level: 20,
+              hpScale: COLOSSUS_HP,
+              speedScale: 2,
+            },
+          ],
+          gap(0.2, 0.4),
+        ),
       ],
       coreDamage: 240,
-      ...gap(0.2, 0.4),
-      barrels: KEGS(5),
+      kegs: KEGS(5),
     },
     {
-      entries: [
-        {
-          templateId: 'frostmane_yeti',
-          count: 18,
-          level: 20,
-          hpScale: COLOSSUS_HP,
-          speedScale: 2.6,
-        },
+      groups: [
+        walkers(
+          [
+            {
+              templateId: 'frostmane_yeti',
+              count: 18,
+              level: 20,
+              hpScale: COLOSSUS_HP,
+              speedScale: 2.6,
+            },
+          ],
+          gap(0.1, 0.2),
+        ),
       ],
       coreDamage: 260,
-      ...gap(0.1, 0.2),
-      barrels: KEGS(5),
+      kegs: KEGS(5),
     },
     {
-      entries: [
-        {
-          templateId: 'frostmane_yeti',
-          count: 20,
-          level: 20,
-          hpScale: COLOSSUS_HP,
-          speedScale: 2.9,
-        },
-        { templateId: 'idol_guardian', count: 6, level: 20, hpScale: COLOSSUS_HP, speedScale: 2.6 },
+      groups: [
+        walkers(
+          [
+            {
+              templateId: 'frostmane_yeti',
+              count: 20,
+              level: 20,
+              hpScale: COLOSSUS_HP,
+              speedScale: 2.9,
+            },
+            {
+              templateId: 'idol_guardian',
+              count: 6,
+              level: 20,
+              hpScale: COLOSSUS_HP,
+              speedScale: 2.6,
+            },
+          ],
+          gap(0.05, 0.1),
+        ),
       ],
       coreDamage: 280,
-      ...gap(0.05, 0.1),
-      barrels: KEGS(5),
+      kegs: KEGS(5),
     },
   ],
 };
@@ -344,74 +482,106 @@ export const TURRET_MISSION_DELUGE: TurretScenarioDef = {
   supply: MISSION_SUPPLY,
   waves: [
     {
-      entries: [{ templateId: 'forest_wolf', count: 16, level: 2, speedScale: 1.6 }],
+      groups: [
+        walkers(
+          [{ templateId: 'forest_wolf', count: 16, level: 2, speedScale: 1.6 }],
+          gap(0.3, 0.6),
+        ),
+      ],
       coreDamage: 60,
-      ...gap(0.3, 0.6),
-      barrels: KEGS(3),
+      kegs: KEGS(3),
     },
     {
-      entries: [
-        { templateId: 'wild_boar', count: 10, level: 3, speedScale: 1.7, hpScale: FRAIL },
-        { templateId: 'webwood_spider', count: 10, level: 3, speedScale: 1.7, hpScale: FRAIL },
+      groups: [
+        walkers(
+          [
+            { templateId: 'wild_boar', count: 10, level: 3, speedScale: 1.7, hpScale: FRAIL },
+            { templateId: 'webwood_spider', count: 10, level: 3, speedScale: 1.7, hpScale: FRAIL },
+          ],
+          gap(0.25, 0.5),
+        ),
       ],
       coreDamage: 56,
-      ...gap(0.25, 0.5),
-      barrels: KEGS(3),
+      kegs: KEGS(3),
     },
     {
-      entries: [
-        { templateId: 'forest_wolf', count: 12, level: 2, speedScale: 1.8 },
-        { templateId: 'tunnel_rat', count: 12, level: 5, speedScale: 1.8, hpScale: FRAIL },
+      groups: [
+        walkers(
+          [
+            { templateId: 'forest_wolf', count: 12, level: 2, speedScale: 1.8 },
+            { templateId: 'tunnel_rat', count: 12, level: 5, speedScale: 1.8, hpScale: FRAIL },
+          ],
+          gap(0.2, 0.4),
+        ),
       ],
       coreDamage: 60,
-      ...gap(0.2, 0.4),
-      barrels: KEGS(4),
+      kegs: KEGS(4),
     },
     {
-      entries: [
-        { templateId: 'wild_boar', count: 14, level: 3, speedScale: 2 },
-        { templateId: 'webwood_spider', count: 14, level: 4, speedScale: 2, hpScale: FRAIL },
+      groups: [
+        walkers(
+          [
+            { templateId: 'wild_boar', count: 14, level: 3, speedScale: 2 },
+            { templateId: 'webwood_spider', count: 14, level: 4, speedScale: 2, hpScale: FRAIL },
+          ],
+          gap(0.15, 0.35),
+        ),
       ],
       coreDamage: 60,
-      ...gap(0.15, 0.35),
-      barrels: KEGS(4),
+      kegs: KEGS(4),
     },
     {
-      entries: [
-        { templateId: 'tunnel_rat', count: 18, level: 6, speedScale: 2.2, hpScale: FRAIL },
-        { templateId: 'forest_wolf', count: 18, level: 2, speedScale: 2.2 },
+      groups: [
+        walkers(
+          [
+            { templateId: 'tunnel_rat', count: 18, level: 6, speedScale: 2.2, hpScale: FRAIL },
+            { templateId: 'forest_wolf', count: 18, level: 2, speedScale: 2.2 },
+          ],
+          gap(0.1, 0.25),
+        ),
       ],
       coreDamage: 60,
-      ...gap(0.1, 0.25),
-      barrels: KEGS(5),
+      kegs: KEGS(5),
     },
     {
-      entries: [
-        { templateId: 'webwood_spider', count: 22, level: 4, speedScale: 3 },
-        { templateId: 'wild_boar', count: 22, level: 3, speedScale: 3 },
+      groups: [
+        walkers(
+          [
+            { templateId: 'webwood_spider', count: 22, level: 4, speedScale: 3 },
+            { templateId: 'wild_boar', count: 22, level: 3, speedScale: 3 },
+          ],
+          gap(0.08, 0.18),
+        ),
       ],
       coreDamage: 55,
-      ...gap(0.08, 0.18),
-      barrels: KEGS(5),
+      kegs: KEGS(5),
     },
     {
-      entries: [
-        { templateId: 'forest_wolf', count: 26, level: 2, speedScale: 3.6 },
-        { templateId: 'tunnel_rat', count: 22, level: 6, speedScale: 3.6, hpScale: FRAIL },
+      groups: [
+        walkers(
+          [
+            { templateId: 'forest_wolf', count: 26, level: 2, speedScale: 3.6 },
+            { templateId: 'tunnel_rat', count: 22, level: 6, speedScale: 3.6, hpScale: FRAIL },
+          ],
+          gap(0.06, 0.14),
+        ),
       ],
       coreDamage: 50,
-      ...gap(0.06, 0.14),
-      barrels: KEGS(5),
+      kegs: KEGS(5),
     },
     {
-      entries: [
-        { templateId: 'webwood_spider', count: 26, level: 4, speedScale: 4.2 },
-        { templateId: 'wild_boar', count: 24, level: 3, speedScale: 4.2 },
-        { templateId: 'forest_wolf', count: 10, level: 2, speedScale: 4.2 },
+      groups: [
+        walkers(
+          [
+            { templateId: 'webwood_spider', count: 26, level: 4, speedScale: 4.2 },
+            { templateId: 'wild_boar', count: 24, level: 3, speedScale: 4.2 },
+            { templateId: 'forest_wolf', count: 10, level: 2, speedScale: 4.2 },
+          ],
+          gap(0.05, 0.12),
+        ),
       ],
       coreDamage: 45,
-      ...gap(0.05, 0.12),
-      barrels: KEGS(5),
+      kegs: KEGS(5),
     },
   ],
 };
@@ -435,76 +605,103 @@ export const TURRET_MISSION_BRITTLE: TurretScenarioDef = {
   supply: MISSION_SUPPLY,
   waves: [
     {
-      entries: [{ templateId: 'forest_wolf', count: 8, level: 2 }],
+      groups: [walkers([{ templateId: 'forest_wolf', count: 8, level: 2 }], STEADY_GAP)],
       coreDamage: 60,
-      ...STEADY_GAP,
-      barrels: KEGS(3),
+      kegs: KEGS(3),
     },
     {
-      entries: [
-        { templateId: 'forest_wolf', count: 6, level: 2 },
-        { templateId: 'wild_boar', count: 6, level: 3 },
+      groups: [
+        walkers(
+          [
+            { templateId: 'forest_wolf', count: 6, level: 2 },
+            { templateId: 'wild_boar', count: 6, level: 3 },
+          ],
+          gap(0.8, 1.5),
+        ),
       ],
       coreDamage: 64,
-      ...gap(0.8, 1.5),
-      barrels: KEGS(3),
+      kegs: KEGS(3),
     },
     {
-      entries: [
-        { templateId: 'vale_bandit', count: 8, level: 5 },
-        { templateId: 'webwood_spider', count: 6, level: 4 },
+      groups: [
+        walkers(
+          [
+            { templateId: 'vale_bandit', count: 8, level: 5 },
+            { templateId: 'webwood_spider', count: 6, level: 4 },
+          ],
+          gap(0.7, 1.3),
+        ),
       ],
       coreDamage: 84,
-      ...gap(0.7, 1.3),
-      barrels: KEGS(4),
+      kegs: KEGS(4),
     },
     {
-      entries: [
-        { templateId: 'tunnel_rat', count: 8, level: 6 },
-        { templateId: 'vale_bandit', count: 8, level: 5 },
+      groups: [
+        walkers(
+          [
+            { templateId: 'tunnel_rat', count: 8, level: 6 },
+            { templateId: 'vale_bandit', count: 8, level: 5 },
+          ],
+          gap(0.6, 1.1),
+          { kind: 'flanks', count: 2, widthTurn: 0.14 },
+        ),
       ],
       coreDamage: 100,
-      ...gap(0.6, 1.1),
-      barrels: KEGS(4),
-      arrival: { kind: 'flanks', count: 2, widthTurn: 0.14 },
+      kegs: KEGS(4),
     },
     {
-      entries: [
-        { templateId: 'deeprock_kobold', count: 10, level: 15 },
-        { templateId: 'boneclad_revenant', count: 4, level: 19 },
+      groups: [
+        walkers(
+          [
+            { templateId: 'deeprock_kobold', count: 10, level: 15 },
+            { templateId: 'boneclad_revenant', count: 4, level: 19 },
+          ],
+          gap(0.5, 0.9),
+          { kind: 'flanks', count: 3, widthTurn: 0.1 },
+        ),
       ],
       coreDamage: 130,
-      ...gap(0.5, 0.9),
-      barrels: KEGS(5),
-      arrival: { kind: 'flanks', count: 3, widthTurn: 0.1 },
+      kegs: KEGS(5),
     },
     {
-      entries: [
-        { templateId: 'boneclad_revenant', count: 8, level: 19, speedScale: 1.3 },
-        { templateId: 'deeprock_kobold', count: 8, level: 15, speedScale: 1.3 },
+      groups: [
+        walkers(
+          [
+            { templateId: 'boneclad_revenant', count: 8, level: 19, speedScale: 1.3 },
+            { templateId: 'deeprock_kobold', count: 8, level: 15, speedScale: 1.3 },
+          ],
+          gap(0.35, 0.7),
+          { kind: 'flanks', count: 3, widthTurn: 0.1 },
+        ),
       ],
       coreDamage: 160,
-      ...gap(0.35, 0.7),
-      barrels: KEGS(5),
-      arrival: { kind: 'flanks', count: 3, widthTurn: 0.1 },
+      kegs: KEGS(5),
     },
     {
-      entries: [
-        { templateId: 'boneclad_revenant', count: 20, level: 19, speedScale: 2.3 },
-        { templateId: 'deeprock_kobold', count: 12, level: 15, speedScale: 2.3 },
+      groups: [
+        walkers(
+          [
+            { templateId: 'boneclad_revenant', count: 20, level: 19, speedScale: 2.3 },
+            { templateId: 'deeprock_kobold', count: 12, level: 15, speedScale: 2.3 },
+          ],
+          gap(0.1, 0.25),
+        ),
       ],
       coreDamage: 170,
-      ...gap(0.1, 0.25),
-      barrels: KEGS(5),
+      kegs: KEGS(5),
     },
     {
-      entries: [
-        { templateId: 'boneclad_revenant', count: 26, level: 19, speedScale: 2.8 },
-        { templateId: 'deeprock_kobold', count: 18, level: 15, speedScale: 2.8 },
+      groups: [
+        walkers(
+          [
+            { templateId: 'boneclad_revenant', count: 26, level: 19, speedScale: 2.8 },
+            { templateId: 'deeprock_kobold', count: 18, level: 15, speedScale: 2.8 },
+          ],
+          gap(0.08, 0.2),
+        ),
       ],
       coreDamage: 180,
-      ...gap(0.08, 0.2),
-      barrels: KEGS(5),
+      kegs: KEGS(5),
     },
   ],
 };
@@ -512,6 +709,12 @@ export const TURRET_MISSION_BRITTLE: TurretScenarioDef = {
 /** Inside a pack, the members follow each other closely. */
 const PACK_GAP = gap(0.15, 0.25);
 const RUSH_GAP = { gapMinTicks: 1, gapMaxTicks: 2 } as const;
+/**
+ * Twice the kegs on the sides the monsters come through, and a cap that lets a whole wave's
+ * stand beside the ones still intact.
+ */
+const POWDER_CAP = 12;
+const POWDER_KEGS = (count: number) => turretKegRing(2 * count, 'lanes');
 
 /**
  * Twice the kegs on the sides the monsters come through, and a cap that lets a whole
@@ -527,89 +730,131 @@ export const TURRET_MISSION_POWDER: TurretScenarioDef = {
   medals: TURRET_MEDALS,
   arsenal: { shockwave: 1, fragmentation: 3 },
   supply: MISSION_SUPPLY,
-  kegs: { placement: 'lanes', countScale: 2, cap: 12 },
   waves: [
     {
-      entries: [{ templateId: 'forest_wolf', count: 8, level: 2 }],
+      groups: [
+        walkers([{ templateId: 'forest_wolf', count: 8, level: 2 }], STEADY_GAP, {
+          kind: 'arc',
+          widthTurn: 0.3,
+        }),
+      ],
       coreDamage: 60,
-      ...STEADY_GAP,
-      barrels: KEGS(3),
-      arrival: { kind: 'arc', widthTurn: 0.3 },
+      kegs: POWDER_KEGS(3),
+      kegCap: POWDER_CAP,
     },
     {
-      entries: [
-        { templateId: 'forest_wolf', count: 6, level: 2 },
-        { templateId: 'wild_boar', count: 6, level: 3 },
+      groups: [
+        walkers(
+          [
+            { templateId: 'forest_wolf', count: 6, level: 2 },
+            { templateId: 'wild_boar', count: 6, level: 3 },
+          ],
+          STEADY_GAP,
+          { kind: 'flanks', count: 2, widthTurn: 0.2 },
+        ),
       ],
       coreDamage: 64,
-      ...STEADY_GAP,
-      barrels: KEGS(3),
-      arrival: { kind: 'flanks', count: 2, widthTurn: 0.2 },
+      kegs: POWDER_KEGS(3),
+      kegCap: POWDER_CAP,
     },
     {
-      entries: [
-        { templateId: 'vale_bandit', count: 8, level: 5 },
-        { templateId: 'webwood_spider', count: 6, level: 4 },
+      groups: [
+        bunches(
+          [
+            { templateId: 'vale_bandit', count: 8, level: 5 },
+            { templateId: 'webwood_spider', count: 6, level: 4 },
+          ],
+          PACK_GAP,
+          5,
+          3,
+          0.08,
+        ),
       ],
       coreDamage: 84,
-      ...PACK_GAP,
-      barrels: KEGS(4),
-      arrival: { kind: 'burst', groupSize: 5, groupGapTicks: ticks(3), widthTurn: 0.08 },
+      kegs: POWDER_KEGS(4),
+      kegCap: POWDER_CAP,
     },
     {
-      entries: [
-        { templateId: 'tunnel_rat', count: 8, level: 6, speedScale: 1.2 },
-        { templateId: 'fen_troll', count: 4, level: 11, speedScale: 1.1 },
+      groups: [
+        walkers(
+          [
+            { templateId: 'tunnel_rat', count: 8, level: 6, speedScale: 1.2 },
+            { templateId: 'fen_troll', count: 4, level: 11, speedScale: 1.1 },
+          ],
+          gap(0.6, 1.2),
+          { kind: 'flanks', count: 3, widthTurn: 0.14 },
+        ),
       ],
       coreDamage: 100,
-      ...gap(0.6, 1.2),
-      barrels: KEGS(4),
-      arrival: { kind: 'flanks', count: 3, widthTurn: 0.14 },
+      kegs: POWDER_KEGS(4),
+      kegCap: POWDER_CAP,
     },
     {
-      entries: [
-        { templateId: 'deeprock_kobold', count: 10, level: 15, speedScale: 1.3 },
-        { templateId: 'thornpeak_ogre', count: 4, level: 16, speedScale: 1.2 },
-        { templateId: 'boneclad_revenant', count: 4, level: 19, speedScale: 1.3 },
+      groups: [
+        bunches(
+          [
+            { templateId: 'deeprock_kobold', count: 10, level: 15, speedScale: 1.3 },
+            { templateId: 'thornpeak_ogre', count: 4, level: 16, speedScale: 1.2 },
+            { templateId: 'boneclad_revenant', count: 4, level: 19, speedScale: 1.3 },
+          ],
+          PACK_GAP,
+          6,
+          2,
+          0.08,
+        ),
       ],
       coreDamage: 130,
-      ...PACK_GAP,
-      barrels: KEGS(5),
-      arrival: { kind: 'burst', groupSize: 6, groupGapTicks: ticks(2), widthTurn: 0.08 },
+      kegs: POWDER_KEGS(5),
+      kegCap: POWDER_CAP,
     },
     {
-      entries: [
-        { templateId: 'boneclad_revenant', count: 14, level: 19, speedScale: 2.4 },
-        { templateId: 'deeprock_kobold', count: 12, level: 15, speedScale: 2.4 },
-        { templateId: 'thornpeak_ogre', count: 6, level: 16, speedScale: 2 },
+      groups: [
+        walkers(
+          [
+            { templateId: 'boneclad_revenant', count: 14, level: 19, speedScale: 2.4 },
+            { templateId: 'deeprock_kobold', count: 12, level: 15, speedScale: 2.4 },
+            { templateId: 'thornpeak_ogre', count: 6, level: 16, speedScale: 2 },
+          ],
+          RUSH_GAP,
+          { kind: 'flanks', count: 3, widthTurn: 0.06 },
+        ),
       ],
       coreDamage: 160,
-      ...RUSH_GAP,
-      barrels: KEGS(5),
-      arrival: { kind: 'flanks', count: 3, widthTurn: 0.06 },
+      kegs: POWDER_KEGS(5),
+      kegCap: POWDER_CAP,
     },
     {
-      entries: [
-        { templateId: 'boneclad_revenant', count: 24, level: 19, speedScale: 3 },
-        { templateId: 'deeprock_kobold', count: 18, level: 15, speedScale: 3 },
-        { templateId: 'fen_troll', count: 6, level: 12, speedScale: 2.6 },
+      groups: [
+        walkers(
+          [
+            { templateId: 'boneclad_revenant', count: 24, level: 19, speedScale: 3 },
+            { templateId: 'deeprock_kobold', count: 18, level: 15, speedScale: 3 },
+            { templateId: 'fen_troll', count: 6, level: 12, speedScale: 2.6 },
+          ],
+          RUSH_GAP,
+          { kind: 'flanks', count: 3, widthTurn: 0.06 },
+        ),
       ],
       coreDamage: 180,
-      ...RUSH_GAP,
-      barrels: KEGS(6),
-      arrival: { kind: 'flanks', count: 3, widthTurn: 0.06 },
+      kegs: POWDER_KEGS(6),
+      kegCap: POWDER_CAP,
     },
     {
-      entries: [
-        { templateId: 'boneclad_revenant', count: 32, level: 19, speedScale: 3.3 },
-        { templateId: 'deeprock_kobold', count: 22, level: 15, speedScale: 3.3 },
-        { templateId: 'frostmane_yeti', count: 6, level: 20, speedScale: 2.8 },
-        { templateId: 'idol_guardian', count: 3, level: 20, speedScale: 2.6 },
+      groups: [
+        walkers(
+          [
+            { templateId: 'boneclad_revenant', count: 32, level: 19, speedScale: 3.3 },
+            { templateId: 'deeprock_kobold', count: 22, level: 15, speedScale: 3.3 },
+            { templateId: 'frostmane_yeti', count: 6, level: 20, speedScale: 2.8 },
+            { templateId: 'idol_guardian', count: 3, level: 20, speedScale: 2.6 },
+          ],
+          RUSH_GAP,
+          { kind: 'flanks', count: 3, widthTurn: 0.06 },
+        ),
       ],
       coreDamage: 220,
-      ...RUSH_GAP,
-      barrels: KEGS(6),
-      arrival: { kind: 'flanks', count: 3, widthTurn: 0.06 },
+      kegs: POWDER_KEGS(6),
+      kegCap: POWDER_CAP,
     },
   ],
 };

@@ -21,11 +21,11 @@ import {
   type TurretPlan,
   turretResupplyAfter,
 } from '../src/sim/minigames/turret_defense_plan';
+import { holdTurretSpawns, turretSpawned, walkersWavePlan } from './helpers/turret_wave_plan';
 
 const flat: ThrowProbe = { ground: () => 0, water: () => null };
 const START = 1000;
 const INTRO_END = START + TURRET_TIMING.introTicks;
-const NO_BARRELS = { count: 0, minRadius: 0, maxRadius: 0 };
 const WOLF: TurretKind = {
   templateId: 'forest_wolf',
   level: 2,
@@ -45,14 +45,12 @@ function plan(sizes: number[]): TurretPlan {
     resupplyWaves: [0, 1],
     chargeBonus: false,
     kinds: [WOLF],
-    waves: sizes.map((n) => ({
-      spawns: Array.from({ length: n }, () => 0),
-      coreDamage: 60,
-      gapMinTicks: 1,
-      gapMaxTicks: 1,
-      barrels: NO_BARRELS,
-      arrival: { kind: 'ring' },
-    })),
+    waves: sizes.map((n) =>
+      walkersWavePlan(
+        Array.from({ length: n }, () => 0),
+        { coreDamage: 60, gapMinTicks: 1, gapMaxTicks: 1 },
+      ),
+    ),
     bowling: { ...TURRET_BOWLING, enabled: false },
   };
 }
@@ -65,7 +63,10 @@ function run(state: TurretDefenseState, toTick: number): TurretEvent[] {
 
 /** Every monster of the current wave out on the field (a lost run freezes, so it stops there). */
 function spawnAll(state: TurretDefenseState): void {
-  while (state.phase !== 'lost' && state.spawnCursor < state.plan.waves[state.wave].spawns.length)
+  while (
+    state.phase !== 'lost' &&
+    turretSpawned(state) < state.plan.waves[state.wave].spawns.length
+  )
     run(state, state.tick + 1);
   expect(state.phase).not.toBe('lost');
 }
@@ -108,17 +109,18 @@ describe('waves chained on the clear', () => {
       { type: 'resupply', wave: 0, shockwave: 1, fragmentation: 0 },
       { type: 'waveStart', wave: 1, count: 2 },
     ]);
-    expect([state.wave, state.phase, state.spawnCursor, state.nextSpawnTick]).toEqual([
+    // Its groups' clocks start on the first tick its spawns can run: the next one.
+    expect([state.wave, state.phase, turretSpawned(state), state.spawning]).toEqual([
       1,
       'wave',
       0,
-      at,
+      [{ cursor: 0, nextTick: at + 1 }],
     ]);
     expect(state.stats.resupplies).toBe(1);
     // The clear tick's spawns already ran: the new wave's first monster walks in on the next,
     // beside the cleared wave's corpses, which keep lying for their usual time.
     run(state, at + 1);
-    expect([state.spawnCursor, living(state)]).toEqual([1, 1]);
+    expect([turretSpawned(state), living(state)]).toEqual([1, 1]);
     expect(state.monsters.filter((m) => m.state === 'dead')).toHaveLength(3);
     run(state, at + TURRET_TIMING.corpseTicks);
     expect(state.monsters.filter((m) => m.state === 'dead')).toHaveLength(0);
@@ -127,7 +129,7 @@ describe('waves chained on the clear', () => {
   it("waits for the wave's last spawn, however few still live", () => {
     const state = createTurretDefense(plan([4, 3]), { x: 0, z: 0 }, 5, START);
     run(state, INTRO_END);
-    state.nextSpawnTick = Number.MAX_SAFE_INTEGER;
+    holdTurretSpawns(state);
     kill(state, living(state));
     expect(types(run(state, state.tick + 20))).toEqual([]);
     expect([state.wave, state.phase]).toEqual([0, 'wave']);
@@ -197,16 +199,16 @@ describe('waves chained on the clear', () => {
         expect(rest).toEqual(rest.length ? ['barrelsPlaced'] : []);
         kegged += rest.length;
         expect([state.wave, state.phase]).toEqual([wave + 1, 'wave']);
-        const first = Math.max(at + 1, at + (next.hunt?.ticks[0] ?? 0));
-        expect(state.nextSpawnTick).toBe(at + (next.hunt?.ticks[0] ?? 0));
+        const first = at + 1 + Math.min(...next.groups.map((g) => g.delayTicks));
+        expect(state.spawning.map((g) => g.nextTick)).toEqual(
+          next.groups.map((g) => at + 1 + g.delayTicks),
+        );
         run(state, first - 1);
-        expect(state.spawnCursor).toBe(0);
+        expect(turretSpawned(state)).toBe(0);
         run(state, first);
-        expect(state.spawnCursor).toBeGreaterThan(0);
+        expect(turretSpawned(state)).toBeGreaterThan(0);
       }
-      const laysKegs = resolved.waves
-        .slice(1)
-        .some((w) => w.barrels.count > 0 || w.hunt?.packs.some((p) => p.kegs.length > 0));
+      const laysKegs = resolved.waves.slice(1).some((w) => w.kegs.length > 0);
       expect(kegged > 0).toBe(laysKegs);
     },
   );

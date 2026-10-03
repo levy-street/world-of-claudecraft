@@ -26,11 +26,13 @@ import {
 import { turretResult } from '../src/sim/minigames/turret_result';
 import { Sim } from '../src/sim/sim';
 import type { TurretDefenseView, TurretSessionView } from '../src/sim/turret_defense_session';
-import type { SimEvent, TurretSession, WorldContent } from '../src/sim/types';
+import { seatTurret } from '../src/sim/turret_defense_session';
+import type { SimEvent, TurretScenarioDef, TurretSession, WorldContent } from '../src/sim/types';
 import { turretClockFor, turretSessionFor } from '../src/sim/vehicles';
 import { groundHeight } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 import { TurretFeedbackReader } from '../src/ui/hud/vehicle/turret_feedback_reader_core';
+import { TURRET_BRICKS_SCENARIO } from './helpers/turret_wave_plan';
 
 const RUN_BOUND = 20 * 60 * 8;
 // The seat state's bytes per second (its key family, each key's `,"key":` counted; lot H4),
@@ -226,12 +228,13 @@ function inReach(defense: TurretDefenseView, tick: number): boolean {
  * while any remain, and a Shockwave whenever a body stands inside the reach and it has
  * rearmed.
  */
-function playOnline(command: string, aim = true, armed = false) {
+function playOnline(command: string | TurretScenarioDef, aim = true, armed = false) {
   const { sim, pid } = serverPlayer();
   const client = new WireClient(sim, pid);
   const sent: Record<string, string> = {};
   const before = { ...sim.entities.get(pid)!.pos };
-  sim.chat(command, pid);
+  if (typeof command === 'string') sim.chat(command, pid);
+  else expect(seatTurret(sim.ctx, pid, command)).toBeNull();
   expect(sim.meta(pid)?.vehicle?.kind).toBe('turret');
 
   let priorTruth: TurretSessionView | null = null;
@@ -470,6 +473,25 @@ describe('Fire and Fly online: the socket-free round trip', () => {
     expect(seat.waveCount).toBe(scenario.waves.length);
   });
 
+  it('mirrors every tick of a won run of every brick and keg mode: surgers, a pack, a sprint group, a small group, a big one, a surge, random, lane, crown and route kegs', () => {
+    const { client, chained, phases, routed, rallied, states } = playOnline(TURRET_BRICKS_SCENARIO);
+    expect(phases).toEqual(new Set(['intro', 'wave', 'won']));
+    expect(chained).toEqual(TURRET_BRICKS_SCENARIO.waves.slice(1).map(() => 0));
+    // The pack's rally and its gathering members crossed the wire like the rest of the seat.
+    expect(rallied).toBeGreaterThan(0);
+    expect(states.has('muster')).toBe(true);
+    expect(routed.has('barrelsPlaced')).toBe(true);
+    const plan = client.turretSession!.defense.plan;
+    expect(plan).toEqual(resolveTurretPlan(TURRET_BRICKS_SCENARIO));
+    const bricks = new Set(plan.waves.flatMap((w) => w.groups.map((g) => g.brick)));
+    expect(bricks).toEqual(new Set(['walkers', 'pack', 'surgers', 'sprint']));
+    const lots = new Set(plan.waves.flatMap((w) => w.kegs.map((k) => k.mode)));
+    expect(lots).toEqual(new Set(['random', 'crown', 'path']));
+    const kegs = plan.waves.flatMap((w) => w.kegs);
+    expect(kegs.some((k) => k.mode === 'random' && k.lanes)).toBe(true);
+    expect(kegs.some((k) => k.mode === 'path' && k.placement !== 'axis' && k.minRadius)).toBe(true);
+  }, 60_000);
+
   it.each(TURRET_MISSIONS.map((s) => [s.boardKey, s] as const))(
     'mirrors every tick of a won %s mission, its plan and its chained waves carried to the client',
     (key, mission) => {
@@ -479,7 +501,7 @@ describe('Fire and Fly online: the socket-free round trip', () => {
       expect(seatBytesPerSecond).toBeLessThan(SEAT_BYTES_PER_SECOND_BY_MISSION[key]);
       // The hunt's rallies, gathering states and departure cues crossed the wire, mirrored
       // every tick like the rest of the seat.
-      const hunts = mission.waves.some((w) => w.hunt);
+      const hunts = mission.waves.some((w) => w.groups.some((g) => g.brick === 'pack'));
       expect(rallied > 0).toBe(hunts);
       expect(states.has('muster') && states.has('hold')).toBe(hunts);
       expect(routed.has('rallyCue')).toBe(hunts);
@@ -491,8 +513,8 @@ describe('Fire and Fly online: the socket-free round trip', () => {
       expect(seat.defense.plan).not.toHaveProperty('overlap');
       expect(seat.defense.phase).toBe('won');
       expect(seat.defense.plan.scenarioId).toBe(mission.id);
-      expect(seat.defense.plan.waves.map((w) => w.barrels)).toEqual(
-        resolveTurretPlan(mission).waves.map((w) => w.barrels),
+      expect(seat.defense.plan.waves.map((w) => [w.groups, w.kegs, w.kegCap])).toEqual(
+        resolveTurretPlan(mission).waves.map((w) => [w.groups, w.kegs, w.kegCap]),
       );
     },
     // A mission's won run lasts minutes of play.
