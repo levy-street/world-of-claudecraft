@@ -4,7 +4,7 @@
 // its key does nothing). Charges are the
 // ones the player should see (the mirror's, less the played clicks still waiting,
 // from the own-shot ledger); a socket is ready only when a click now would be
-// played, so the intro, the pauses between waves, an empty weapon, the Shockwave's
+// played, so the intro, an empty weapon, the Shockwave's
 // rearm and the cannon's reload all read as not ready. The Shockwave's rearm draws
 // the bar's cooldown sweep; the fragmentation shell shows its armed state; the
 // Shockwave pulses gold while enough strikes are due at the tower (fewer in the

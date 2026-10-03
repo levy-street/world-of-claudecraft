@@ -251,7 +251,7 @@ describe('firing a frag shell', () => {
       reason: 'ended',
     });
   });
-  it.each(['intro', 'between'] as const)(
+  it.each(['intro'] as const)(
     'refuses in the %s (D50), before the aim, the charges and the reload, spending nothing',
     (phase) => {
       const { state } = field(kind('small', 5000), 1, 1);

@@ -25,7 +25,6 @@ import {
   turretChargesGiven,
   turretChargesLeft,
   turretMedalBarsValid,
-  turretOverlapValid,
   turretResupplyWavesValid,
   turretScenarioIdValid,
 } from '../sim/minigames/turret_defense_plan';
@@ -66,12 +65,15 @@ export type TurretSeatState = Omit<TurretSessionView, 'feedback'>;
 
 // Bounds on a forged payload, far above the content (a mission wave spawns a few dozen
 // monsters, a keg cap is at most the plan's barrel limit, at most 2 shells fly at once).
-// The plan's are the resolver's own limits, so every plan the server resolves decodes; the
-// field holds the widest wave, its predecessor's corpses and an overlapping mission's tail.
-const MAX_MONSTERS = 2 * TURRET_PLAN_LIMITS.spawnsPerWave + TURRET_PLAN_LIMITS.overlap;
+// The plan's are the resolver's own limits, so every plan the server resolves decodes. The
+// field holds the current wave and the corpses still lying from those before it: usually one
+// wave's, more only when a wave falls within a corpse's linger, so this field bound is a
+// content margin, not a derived limit.
+const MAX_MONSTERS = 2 * TURRET_PLAN_LIMITS.spawnsPerWave;
 const MAX_SHOTS = 32;
-// A rally stays open only while a living member of its pack gathers.
-const MAX_RALLIES = 2 * TURRET_PLAN_LIMITS.packs + TURRET_PLAN_LIMITS.overlap;
+// A rally stays open only while a living member of its pack gathers, or until the departure
+// its cry set: a cleared wave's cued pack can still be due as the next wave's rallies open.
+const MAX_RALLIES = 2 * TURRET_PLAN_LIMITS.packs;
 const MAX_RALLY_ID = TURRET_PLAN_LIMITS.waves * TURRET_PLAN_LIMITS.packs - 1;
 const MAX_BARRELS = 64;
 const MAX_HITS = 256;
@@ -449,7 +451,7 @@ const defense = shape<Omit<TurretDefenseView, 'plan'>>({
   cz: num,
   startTick: tick,
   rev: count,
-  phase: oneOf('intro', 'wave', 'between', 'won', 'lost'),
+  phase: oneOf('intro', 'wave', 'won', 'lost'),
   phaseEndTick: tick,
   wave: count,
   integrity: num,
@@ -559,7 +561,6 @@ const plan = shape<TurretPlan>({
     flyerKeep: num,
     lyingHeight: num,
   }),
-  overlap: optional(within(1, LIMITS.overlap)),
 });
 
 /**
@@ -583,7 +584,6 @@ export function decodeTurretPlan(value: unknown): TurretPlan | null {
   if (decoded === BAD || decoded.waves.length === 0) return null;
   if (!turretMedalBarsValid(decoded.medals, decoded.integrity)) return null;
   if (!turretResupplyWavesValid(decoded.resupplyWaves, decoded.waves.length)) return null;
-  if (!turretOverlapValid(decoded.overlap, decoded.waves)) return null;
   const kinds = decoded.kinds.length;
   for (const wave of decoded.waves) if (wave.spawns.some((kind) => kind >= kinds)) return null;
   for (const kind of decoded.kinds)
@@ -596,13 +596,11 @@ export function decodeTurretPlan(value: unknown): TurretPlan | null {
 }
 
 /**
- * The resupplies a run has had where it stands: one per resupply wave already behind
- * it, the current wave's too once it is cleared (the pause after it, or the win).
+ * The resupplies a run has had where it stands: one per resupply wave already behind it
+ * (a clear grants its resupply on the tick the next wave starts; the last wave has none).
  */
 function resupplyCount(defense: Omit<TurretDefenseView, 'plan'>, turretPlan: TurretPlan): number {
-  const { phase, wave } = defense;
-  const cleared = phase === 'between' || phase === 'won';
-  return turretPlan.resupplyWaves.filter((at) => at < wave || (cleared && at === wave)).length;
+  return turretPlan.resupplyWaves.filter((at) => at < defense.wave).length;
 }
 
 /**

@@ -157,7 +157,7 @@ describe('an ended seat leaves on its own', { timeout: TIMEOUT_MS }, () => {
     session.defense.integrity = 1e6;
     tickTo(sim, session.defense.startTick + TURRET_TIMING.endedSeatTicks + 100);
     expect(seat(meta)).toBe(session);
-    expect(['wave', 'between']).toContain(session.defense.phase);
+    expect(session.defense.phase).toBe('wave');
     expect(sim.tickCount).toBeGreaterThan(session.defense.phaseEndTick);
     expect(turretSeatExpired(session, sim.tickCount + 1e6)).toBe(false);
   });

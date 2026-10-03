@@ -40,22 +40,21 @@ describe('the turret feedback ring', () => {
     // of its own), a bomblet of every frag shell a run holds, its resupplies included (each
     // frag lands one a tick),
     // the Shockwave's front and every barrel its cap lets stand blasting on one tick, each then
-    // a launch and a kill per living body of its widest wave (plus, on an overlapping
-    // mission, the previous waves' living it carries), every barrel lit once, and per knock
-    // a bowled, launch and kill; a seat's actions between two ticks add a shot and a slam,
-    // and the blast that clears the wave adds its clear and the resupply or the end after
-    // it, or on an overlapping mission the resupply, the next wave's start and its kegs.
+    // a launch and a kill per living body of its widest wave (every living monster is the
+    // current wave's: the next one starts only once it is cleared), every barrel lit once,
+    // and per knock a bowled, launch and kill; a seat's actions between two ticks add a shot
+    // and a slam, and the blast that clears the wave adds its clear, then the end, or the
+    // resupply, the next wave's start and its kegs, all on that tick.
     const bursts = FIRE_AND_FLY_SCENARIOS.map((scenario) => {
       const plan = resolveTurretPlan(scenario);
-      const carried = plan.overlap ?? 0;
-      const widest = Math.max(...plan.waves.map((wave) => wave.spawns.length)) + carried;
+      const widest = Math.max(...plan.waves.map((wave) => wave.spawns.length));
       const cap = Math.max(
         ...plan.waves.map((wave) => wave.barrels.cap ?? TURRET_EXPLOSIVE_BARREL.cap),
       );
       const front = plan.arsenal.shockwave > 0 ? 1 : 0;
       const frags = turretChargesGiven(plan, plan.resupplyWaves.length).fragmentation;
       const blasts = shells + frags + front + cap;
-      const ending = carried > 0 ? 3 : 2;
+      const ending = plan.waves.length > 1 ? 4 : 2;
       // A hunt's departure cue: rallies leave half a second apart, so at most one cue a tick.
       const cue = plan.waves.some((wave) => wave.hunt) ? 1 : 0;
       const burst =
@@ -63,22 +62,23 @@ describe('the turret feedback ring', () => {
       return [scenario.boardKey, burst] as const;
     });
     // The Powder Store's 63-monster finale through 12 standing kegs, with a third resupply's
-    // frag (lot R4), sets the bound; The Deluge's 60 and The Pack's 39 beside its eight frags
-    // come next. Since the missions' finales grew (lot N2d) the most one tick has recorded in
-    // a measured run is 58 entries, far under any of these.
+    // frag (lot R4), sets the bound; The Deluge's 60 and The Pack's 34 beside its eight frags
+    // come next. With no overlap (lot R5) the living are one wave's, and a clear adds its wave's
+    // start and kegs on the same tick. The most one tick has recorded in a measured run is 58
+    // entries (lot N2d), 41 in lot R5b's measured runs, far under any of these.
     expect(Object.fromEntries(bursts)).toEqual({
-      introduction: 342,
-      standard: 357,
-      hard: 770,
-      pack: 1499,
-      giants: 838,
-      deluge: 1980,
-      brittle: 1360,
-      powder: 3010,
+      introduction: 515,
+      standard: 506,
+      hard: 772,
+      pack: 1220,
+      giants: 781,
+      deluge: 1888,
+      brittle: 1303,
+      powder: 2876,
     });
     const burst = Math.max(...bursts.map(([, n]) => n));
     expect(TURRET_FEEDBACK_LIMIT).toBeGreaterThanOrEqual(burst);
-    expect(TURRET_FEEDBACK_LIMIT).toBe(3010);
+    expect(TURRET_FEEDBACK_LIMIT).toBe(2876);
     const ring: TurretFeedback[] = [];
     recordTurretFeedback(
       ring,

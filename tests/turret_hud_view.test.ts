@@ -123,16 +123,16 @@ describe('the turret HUD view', () => {
     expect(frame.integrityNow).toBe(String(intro.integrity));
     expect(frame.integrityText).toBe(`${intro.integrity}/${intro.integrity}`);
     expect(frame.integrity).toBe(1);
-    session.defense.integrity = 30;
+    session.defense.integrity = 20;
     session.defense.rev++;
     const hurt = view.tick(turretSessionView(session), START);
-    expect(hurt.integrity).toBeCloseTo(30 / intro.integrity, 12);
-    expect(hurt.integrityText).toBe(`30/${intro.integrity}`);
+    expect(hurt.integrity).toBeCloseTo(20 / intro.integrity, 12);
+    expect(hurt.integrityText).toBe(`20/${intro.integrity}`);
     expect(hurt.low).toBe(true);
     session.defense.phase = 'lost';
     session.defense.rev++;
     const ended = view.tick(turretSessionView(session), START);
-    expect(ended.result?.rows[TURRET_RESULT_ROWS - 1].value).toBe(`30/${intro.integrity}`);
+    expect(ended.result?.rows[TURRET_RESULT_ROWS - 1].value).toBe(`20/${intro.integrity}`);
   });
 
   it('names the seat, its rail and its Leave and Replay buttons in the tower wording', () => {
@@ -183,16 +183,6 @@ describe('the turret HUD view', () => {
     );
     expect(frame.integrity).toBeCloseTo(0.2);
     expect(frame.low).toBe(true);
-  });
-
-  it('counts down to the next wave between waves, without repeating the cleared banner', () => {
-    const session = seat();
-    session.defense.phase = 'between';
-    session.defense.wave = 1;
-    session.defense.phaseEndTick = START + 4 * TICK_RATE;
-    const frame = new TurretHudView().tick(turretSessionView(session), START + 1);
-    expect(frame.slot).toBe('Next wave in 4 sec');
-    expect(frame.wave).toBe('Wave 2/6');
   });
 
   it('builds the result card with every stat, the final tower, the medal and the points', () => {
@@ -341,9 +331,6 @@ describe('the turret HUD view', () => {
   it('shows no countdown without a clock to count from', () => {
     const intro = seat();
     expect(new TurretHudView().tick(turretSessionView(intro), null).slot).toBe('');
-    const between = seat();
-    between.defense.phase = 'between';
-    expect(new TurretHudView().tick(turretSessionView(between), null).slot).toBe('');
   });
 
   it('reuses one frame and one result card, rebuilt only when the view or the second changes', () => {
@@ -435,13 +422,12 @@ describe('the turret HUD live line', () => {
     const killed = view.tick(at(session, { monstersLeft: 7 }), START + 80);
     expect(killed.slot).toBe('Monsters left: 7');
     expect(killed.announce).toBe('Wave 1 of 6');
-    session.defense.phase = 'between';
-    session.defense.phaseEndTick = START + 100 + 5 * TICK_RATE;
+    // The next wave sets off on the clear's tick: no countdown, its own line at once.
+    session.defense.wave = 1;
     session.defense.rev++;
-    expect(view.tick(turretSessionView(session), START + 100).announce).toBe('Next wave in 5 sec');
-    expect(view.tick(turretSessionView(session), START + 100 + TICK_RATE).announce).toBe(
-      'Next wave in 5 sec',
-    );
+    const next = view.tick(at(session, { monstersLeft: 9 }), START + 100);
+    expect(next.announce).toBe('Wave 2 of 6');
+    expect(next.slot).toBe('Monsters left: 9');
     session.defense.phase = 'lost';
     session.defense.rev++;
     expect(view.tick(turretSessionView(session), START + 200).announce).toBe(
@@ -630,7 +616,7 @@ describe('the turret feedback cursor', () => {
     });
   });
 
-  it("puts the Veterans' Test's one resupply on wave 5's cleared banner, as the engine batches it", () => {
+  it("puts the Veterans' Test's one resupply under its final wave's banner, as the engine batches it", () => {
     // The real engine, a clean nearest-first aimer, to the tick wave 5 (index 4) clears.
     const plan = resolveTurretPlan(TURRET_SCENARIO_HARD);
     const engine = createTurretDefense(plan, { x: 0, z: 0 }, 3, START);
@@ -653,26 +639,30 @@ describe('the turret feedback cursor', () => {
       }
       if (best) fireTurret(engine, t, best.x, best.z, flat);
     }
-    expect(batch.filter((e) => e.type === 'waveCleared' || e.type === 'resupply')).toEqual([
+    // Wave 6 sets off on the tick wave 5 is cleared, so the clear's own banner gives way to it.
+    const phases = ['waveCleared', 'resupply', 'waveStart'];
+    expect(batch.filter((e) => phases.includes(e.type))).toEqual([
       { type: 'waveCleared', wave: 4 },
       { type: 'resupply', wave: 4, shockwave: 1, fragmentation: 1 },
+      { type: 'waveStart', wave: 5, count: plan.waves[5].spawns.length },
     ]);
     expect(engine.stats.resupplies).toBe(1);
     const session = seat(START, plan);
     push(session, START + 60, ...batch);
     expect(new TurretFeedbackCursor().consume(turretSessionView(session))).toEqual({
-      text: 'Wave 5 cleared',
-      subtext: 'Resupply: +1 Shockwave, +1 Fragmentation Shell',
+      text: 'Wave 6 of 6',
+      subtext: ['Final wave', 'Resupply: +1 Shockwave, +1 Fragmentation Shell'],
     });
   });
 
-  it("carries an overlapping mission's resupply under the next wave's banner, the final wave's line first", () => {
+  it("carries a mission's resupply under the next wave's banner, the final wave's line first", () => {
     const launched = (wave: number) => {
       const session = seat(START, resolveTurretPlan(TURRET_MISSION_DELUGE));
       const cursor = new TurretFeedbackCursor();
       push(
         session,
         START + 60,
+        { type: 'waveCleared', wave: wave - 1 },
         { type: 'resupply', wave: wave - 1, shockwave: 1, fragmentation: 1 },
         { type: 'waveStart', wave, count: 20 },
       );
@@ -686,6 +676,23 @@ describe('the turret feedback cursor', () => {
     expect(launched(7)).toEqual({
       text: 'Wave 8 of 8',
       subtext: ['Final wave', 'Resupply: +1 Shockwave, +1 Fragmentation Shell'],
+    });
+  });
+
+  it("never hangs an earlier clear's resupply on a later wave's banner from the same batch", () => {
+    // A hidden tab reads several ticks at once: wave 3's clear resupplied, wave 4's did not.
+    const session = seat(START, resolveTurretPlan(TURRET_MISSION_DELUGE));
+    push(
+      session,
+      START + 60,
+      { type: 'waveCleared', wave: 2 },
+      { type: 'resupply', wave: 2, shockwave: 1, fragmentation: 1 },
+      { type: 'waveStart', wave: 3, count: 20 },
+      { type: 'waveCleared', wave: 3 },
+      { type: 'waveStart', wave: 4, count: 20 },
+    );
+    expect(new TurretFeedbackCursor().consume(turretSessionView(session))).toEqual({
+      text: 'Wave 5 of 8',
     });
   });
 

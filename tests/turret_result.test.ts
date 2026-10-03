@@ -49,10 +49,11 @@ describe('the medal bars of each scenario', () => {
         turretMedalBarPoints(plan.medals.silver.minIntegrityShare, plan.integrity),
       ];
     });
+    // One tower and one medal rule for every trial since lot R5b.
     expect(bars).toEqual([
-      ['introduction', 148, 128],
-      ['standard', 99, 60],
-      ['hard', 197, 120],
+      ['introduction', 95, 60],
+      ['standard', 95, 60],
+      ['hard', 95, 60],
     ]);
     expect(turretMedalBarPoints(0.9, 100)).toBe(90);
     expect(turretMedalBarPoints(0.901, 100)).toBe(91);
@@ -77,8 +78,8 @@ describe('the medal bars of each scenario', () => {
 
   it('scales with the tower: the same shares ask for more points of a bigger tower', () => {
     const big = resolveTurretPlan({ ...TURRET_SCENARIO_STANDARD, integrity: 400 });
-    expect(turretResult(big, final('won', 396)).medal).toBe('gold');
-    expect(turretResult(big, final('won', 395)).medal).toBe('silver');
+    expect(turretResult(big, final('won', 380)).medal).toBe('gold');
+    expect(turretResult(big, final('won', 379)).medal).toBe('silver');
     expect(turretResult(big, final('won', 239)).medal).toBe('bronze');
   });
 });
@@ -89,7 +90,7 @@ describe('a run with no medal', () => {
     const lost = turretResult(plan, final('lost', 0, { kills: 40 }));
     expect(lost).toMatchObject({ won: false, medal: null });
     expect(lost.points).toBe(40 * TURRET_POINTS.kill);
-    for (const phase of ['intro', 'wave', 'between', 'lost'] as const) {
+    for (const phase of ['intro', 'wave', 'lost'] as const) {
       expect(turretResult(plan, final(phase, plan.integrity)).medal).toBeNull();
       expect(turretResult(plan, final(phase, plan.integrity)).won).toBe(false);
     }
@@ -266,7 +267,7 @@ describe('the result at the end of a run', () => {
     state.phase = 'wave';
     state.wave = plan.waves.length - 1;
     state.spawnCursor = plan.waves[state.wave].spawns.length;
-    state.integrity = 126;
+    state.integrity = 94;
     const events = tickTurretDefense(state, START + TURRET_TIMING.introTicks, flat);
     expect(state.phase).toBe('won');
     expect(state.result).toMatchObject({ won: true, medal: 'silver' });

@@ -56,8 +56,7 @@ monsters are not sim mobs, never enter shared combat, and are invisible to other
 players. Their stats and models come from the real templates in `MOBS`, so they
 are the game's own monsters, living only inside this mini-game.
 
-- `src/sim/minigames/turret_defense.ts`: phases (intro, wave, between, won,
-  lost), spawning, the march, the wind-up and strike, the shot and its blast.
+- `src/sim/minigames/turret_defense.ts`: phases (intro, wave, won, lost), spawning, the march, the wind-up and strike, the shot and its blast.
   State is plain JSON-safe data; the seat (`src/sim/turret_defense_session.ts`,
   the `turret` kind of `PlayerMeta.vehicle` dispatched from `vehicles.ts`) drives
   it once per tick and publishes a view cloned once per engine revision.
@@ -136,21 +135,23 @@ are the game's own monsters, living only inside this mini-game.
   in-run draw is a stateless private one (`turretDraw` in
   `src/sim/minigames/turret_defense_rng.ts`, the camp private rng pattern), keyed
   by stream and site.
-- **Waves and the pause.** A wave ends once every monster of it has spawned and
-  none lives, then a 2 s pause (`TURRET_TIMING.betweenTicks`) before the next. A
-  mission's plan carries an overlap (`overlap` on the scenario, 2 or 3; absent on
-  the trials): once a wave has spawned every monster and that many or fewer still
-  live on the field (any wave's), the next wave sets off on that tick, with no
-  clear and no pause, and the wave's resupply comes with it. The last wave never
-  overlaps: the run is won once every monster is down. Every wave but the last
-  must spawn more monsters than the overlap, or it would launch the next on its own
-  last spawn (the resolver and the plan decoder refuse it). The wave banner of an
-  overlapping launch carries the resupply line, under the "Final wave" line on the
-  final wave's (the seventh wave's resupply sets it off); the cleared banner shows
-  only for a wave cleared outright. Pinned by
-  `tests/turret_wave_overlap.test.ts` and `tests/turret_scenarios.test.ts`; the
-  online mirror and its decoder bounds by `tests/turret_session_wire.test.ts` and
-  `tests/turret_online_round_trip.test.ts`.
+- **Waves, chained.** A wave ends once every monster of it has spawned and none
+  lives, and the next sets off on that same tick, with no pause, in every trial and
+  every mission: its resupply comes first, its kegs are laid at once, and its first
+  monster walks in from the forest on the next tick while the cleared wave's corpses
+  keep lying for their usual time. No living monster ever carries into a weaker wave
+  (a shell deals the current wave's damage), and the player never has two waves'
+  kegs and monsters on the field at once. On screen, the clear's tick shows the next
+  wave's banner, with the resupply line under it (under the "Final wave" line on the
+  final wave's), and the strip counts the new wave's monsters at once: there is no
+  pause phase and no "Next wave in" countdown between waves any more. The "Wave N
+  cleared" banner no longer shows (every clear lands with the next wave's start or the
+  run's end, which outrank it), and a resupply line rides only the banner of the wave
+  it set off, even when one read spans several ticks. The last wave's clear is the
+  win. Pinned by `tests/turret_wave_chain.test.ts` and
+  `tests/turret_scenarios.test.ts` (no scenario, plan or limit carries an overlap,
+  and no pause); the online mirror by `tests/turret_online_round_trip.test.ts`
+  (every wave moves on straight from the last, nothing of it still living).
 - **Feedback.** Engine events land in a sequence-numbered ring on the seat
   (`src/sim/minigames/turret_feedback.ts`, `TURRET_FEEDBACK_LIMIT`) and in an
   owner-scoped `turretDefense` SimEvent; the HUD, renderer and sound read new
@@ -179,9 +180,9 @@ sides must agree on.
 
 | Trial | Scenario | Shape |
 |---|---|---|
-| Recruit's Trial | `TURRET_SCENARIO_INTRODUCTION` | a few short waves of the smallest monsters from the whole ring, slow spawns, a sturdier tower |
+| Recruit's Trial | `TURRET_SCENARIO_INTRODUCTION` | three short waves of the smallest monsters running in from the whole ring, the spawns closing up wave by wave |
 | Standing Watch | `TURRET_SCENARIO_STANDARD` | the original run (`TURRET_WAVES`), from wolves up to a final guardian; the default trial |
-| Veterans' Test | `TURRET_SCENARIO_HARD` | Standing Watch made meaner: tight fast packs, two rushes on three sides at once, a stream from one side, then the giants walking in with a charge of armoured dead running at their heels from three sides; tougher and more numerous monsters, more large ones, a 200-point tower |
+| Veterans' Test | `TURRET_SCENARIO_HARD` | Standing Watch made meaner: tight fast packs, two rushes on three sides at once, a stream from one side, then the giants walking in with a charge of armoured dead running at their heels from three sides; tougher and more numerous monsters, more large ones, and a last charge of eighteen armoured dead, three good shells each |
 
 Arrival patterns (`src/sim/minigames/turret_arrival.ts`) pick which bearings of
 the spawn ring a monster comes through: the whole ring, one arc, two or three
@@ -195,8 +196,12 @@ not a classic-era formula. Pinned by `tests/turret_scenarios.test.ts` and
 `turretResult` (`src/sim/minigames/turret_result.ts`) scores a finished run:
 
 - **Medal** from the share of the tower's points still standing: bronze for any
-  win, silver and gold at the trial's own bars (`medals` on the scenario), none
-  for a loss.
+  win, silver and gold at the scenario's bars (`medals` on the scenario), none for
+  a loss. Since lot R5b every trial and mission holds a 100-point tower
+  (`TURRET_TOWER_POINTS`) under one rule (`TURRET_MEDALS`): gold while it keeps 95
+  percent, silver 60. The Cracked Tower keeps its 10 points (its idea) and gold for
+  a tower nothing struck. The difficulty is in the waves, never in the bars; pinned
+  by `tests/turret_scenarios.test.ts`.
 - **Points** (`TURRET_POINTS`) rank runs holding the same medal: a share per
   kill, a larger share per tower point kept, and a small bonus for keg kills and
   monsters bowled over. The bonus is capped below one tower point
@@ -377,7 +382,7 @@ Pinned by `tests/turret_session_wire.test.ts`, `tests/turret_self_wire.test.ts`,
   voice); with none left the cue is silent. The leader of each pack of The Pack
   and the exact clip it cries are pinned in `tests/turret_rally_cue_voice.test.ts`.
 - The seat HUD (`src/ui/hud/vehicle/`): a status strip at the top (the wave,
-  monsters left, the next wave's countdown), a tower integrity rail at the bottom,
+  monsters left, the intro's countdown), a tower integrity rail at the bottom,
   wave banners, damage numbers, a red screen-edge flash on a strike, and the result
   card. The trial's name labels the minimap and heads the result card
   (`src/ui/fire_and_fly_trial_view.ts`). The player frame and the XP rail hide
@@ -421,7 +426,7 @@ charge has no socket, no key and no banner mention.
 | Scenario | Shockwaves | Fragmentation shells | Why |
 |---|---|---|---|
 | Recruit's Trial | 0 | 0 | the cannon and the kegs only |
-| Standing Watch | 4 | 0 | brings in the Shockwave |
+| Standing Watch | 8 | 0 | brings in the Shockwave, enough of it to carry a slower gunner |
 | Veterans' Test | 2 | 4 | brings in the fragmentation shell, beside fewer Shockwaves |
 | The Pack | 0 | 5 | packs gathering at rallies in the field: a fragmentation shell into a standing pack |
 | Heavy Tread | 4 | 1 | giants reaching the tower together, then colossi from everywhere |
@@ -438,68 +443,75 @@ the resupplies less the charges spent (`turretChargesGiven`, `turretChargesLeft`
 `src/sim/minigames/turret_charges.ts`), the same count on the server, in the online
 mirror (the `tut` stats key, bounded by the decoder against the plan's resupply waves)
 and in the own-shot ledger's click-time charges. A `resupply` feedback entry puts
-"Resupply: +1 ..." under the cleared wave's banner, or under the next wave's when a
-mission's waves overlap (on the final wave's, under its "Final wave" line). Pinned by
+"Resupply: +1 ..." under the next wave's banner, which sets off on the clear's tick
+(on the final wave's, under its "Final wave" line). Pinned by
 `tests/turret_defense_engine.test.ts`, `tests/turret_session_wire.test.ts`,
 `tests/turret_online_round_trip.test.ts` and `tests/turret_own_shot_core.test.ts`.
 
 The waves, shell damage and medal bars were set with scripted aimers and one plain
 weapon policy (recorded at the top of the scenarios and missions files; the armed
-figures hold for that policy only). With the 0.8 s strike (lot R4) the trials walk a
-little slower, space their spawns out and hit harder: the Recruit's Trial still golds
-the aimers firing within 0.8 s of each reload, and Standing Watch's gold goes from
-about half of the 0.8 s aimers' runs bare to three quarters with the Shockwave.
+figures hold for that policy only), then (lot R4) with a field-aware stand-in for a
+good player: shells led onto the strike due first (scouts, stragglers, anything
+reaching the wall), a keg shot as a group passes it, a frag on a standing or tight pack
+with no keg on its path (a pack whose path a keg covers is left to gather), a Shockwave
+once two strikes are due (one in the last wave, or a lone strike the cannon cannot
+answer while charges outnumber the waves left), two frags kept for the last two waves.
+It picks its shot from the exact current field; a control picks from the field as it
+stood 0.4 s earlier. Since lot R5b the content is calibrated on the exact view (the
+owner plays at least that well) and the late one is reported beside it.
 
-Since lot R4 the human stand-in is a field-aware scripted policy: shells led onto the
-strike due first
-(scouts, stragglers, anything reaching the wall), a keg shot as a group passes it, a
-frag on a standing or tight pack with no keg on its path (a pack whose path a keg
-covers is left to gather), a Shockwave once two strikes are due (one in the last
-wave, or a lone strike the cannon cannot answer while charges outnumber the waves
-left), two frags kept for the last two waves. The quickest aimer (0.4 s after each
-reload) playing that way golds the Veterans' Test about half its runs (46 and 57
-percent on 96 tuning and 96 held-out seeds) and under a tenth bare, nearly all the
-gold lost in the last wave, where the giants arrive with a ten-strong charge of
-armoured dead from three sides; slower aimers never gold it, and the 1 s aimer wins
-with silver or bronze, losing about one run in ten bare and none playing the field.
-The earlier stand-in (a Shockwave at 3 windups, a frag once several packs close in)
-golds it two to three runs in ten, with or without its crowd gate and whether it
-slams on windups or on strikes due. Every field-aware figure here is an upper bound:
-the stand-in picks its shot from the exact current field, and a control that picks
-from the field as it stood 0.4 s earlier golds less (the Veterans' Test 22 and 33
-percent, The Pack 13 and 6 percent, same seeds).
+No monster is a sponge (lot R5b): each wave's shell damage is matched to its monsters'
+health, so a few good shells fell anything but a giant, and the trials got harder
+through their waves alone. With the quickest stand-in (0.4 s after each reload,
+reading the exact field), on 96 tuning and 96 held-out seeds:
+
+- **Recruit's Trial**: gold about three runs in five (61 and 65 percent); every aimer up
+  to 1 s wins every run, the 1 s one with silver or bronze. Its monsters run in at
+  1.87 times their templates' march, half again as many as before, the spawns 0.45 to
+  1.25 s apart.
+- **Standing Watch**: gold nearly every run (98 percent), short of the 40 to 50 percent
+  asked: every harder draft that brought it there also took the 1 s player's win away
+  (that player must win it to reach the Veterans' Test), so the 1 s target was kept: the
+  same stand-in at 1 s wins about three runs in four with the Shockwave (eight of them
+  now). Two fifths more monsters at a pace of 1.7, spawns 0.6 to 1.2 s apart.
+- **Veterans' Test**: gold about a third (39 and 33 percent), 5 percent bare, the gold
+  lost in the last wave, where the giants (five or six good shells each) arrive with a
+  charge of eighteen armoured dead (three each) at 2.4 times their pace. A 1 s player
+  now loses most runs.
 
 ### The missions
 
 Every mission runs eight waves on one curve: a warm-up, a fast climb, then the last
-two or three waves pushing its idea to the extreme, overlapping as above (lot N2d).
-The Pack is tuned (lot R4) against the field-aware stand-in at 0.4 s: it wins about
-four runs in five and golds a quarter to a third (31 and 24 percent on 96 tuning and
-96 held-out seeds), the gold lost in the last three waves, the points going to pack
-members that advanced together (about three fifths) and stragglers (the rest), none
-to scouts. The tower's foot still takes about half of that player's shells (48
-percent within 8 yd, 37 at the 1.5 s strike): the foot fight is not gone, it costs
-points. Players firing 0.8 s or 1 s after each reload lose every Pack run: at a
-0.8 s strike their reload cycle no longer answers a monster at the foot. The other
-four missions were set (lot N2d) for the 1.5 s strike and are far harder at 0.8 s
-until their own redesign: that stand-in no longer golds any of them, and loses about
-half of Heavy Tread's runs and every Cracked Tower run.
+two or three waves pushing its idea to the extreme, each wave setting off on the tick
+the one before is cleared (lot R5; the overlap of lot N2d is gone). The Pack (lot R5b)
+follows the owner's playtest of R4 first: no sponge (a member falls to two good
+shells, a leader to five or six, matched by each wave's shell damage), and few
+monsters at the tower's foot in the last two waves (the most at once, median over the
+runs, 3 to 5; up to 8), the difficulty coming from four packs gathering, advancing past their
+kegs and loosing scouts at once. Under those limits the quickest stand-in golds it
+about nine runs in ten (88 and 91 percent on 96 tuning and 96 held-out seeds; 72 and
+81 reading the field late) and never loses: every draft that cost it its gold did so
+by piling monsters at the foot. A 0.8 s player wins with silver or bronze, a 1 s
+player loses nearly half its runs. The other four missions were set (lot N2d) for
+the 1.5 s strike and are far harder at 0.8 s until their own redesign: that stand-in
+golds none of them and loses most Heavy Tread and every Cracked Tower run.
 
-| Mission | Tower, gold bar | Overlap | The last waves |
-|---|---|---|---|
-| The Pack | 55, keep half | 3 | three packs gathering from three sides, the hold shorter, every monster twice and more as tough, scouts breaking out at each departure; the last with Old Greyjaws and a sprint group that never gathers |
-| Heavy Tread | 100, keep 99 percent | 2 | yetis from everywhere, 12 then 18 then 20 with 6 guardians, two to three times their pace |
-| The Deluge | 100, keep 94 percent | 3 | 48 then 60 small monsters from everywhere at three and a half and four times their pace |
-| The Cracked Tower | 10, untouched | 2 | 32 then 44 armoured dead from everywhere at two and a half times their pace |
-| The Powder Store | 100, keep 99 percent | 3 | 48 then 63 monsters from three sides charging down twelve kegs a wave, giants among the last |
+| Mission | Tower, gold bar | The last waves |
+|---|---|---|
+| The Pack | 100, keep 95 percent | three then four packs gathering from every side, the hold shorter, scouts breaking out at each departure; the last with Old Greyjaws and a sprint group that never gathers |
+| Heavy Tread | 100, keep 95 percent | yetis from everywhere, 12 then 18 then 20 with 6 guardians, two to three times their pace |
+| The Deluge | 100, keep 95 percent | 48 then 60 small monsters from everywhere at three and a half and four times their pace |
+| The Cracked Tower | 10, untouched | 32 then 44 armoured dead from everywhere at two and a half times their pace |
+| The Powder Store | 100, keep 95 percent | 48 then 63 monsters from three sides charging down twelve kegs a wave, giants among the last |
 
-The Pack (lot R4): one pack of 8, then scouts, then two and three packs whose
-gathering windows close as the hold timer shortens from 6 s to 2.5 s, 182 monsters
-in all (234 in the R3 draft), the last three waves 2.2 times as tough and a tenth
-quicker to their rallies; a keg on the path of most packs, at the rim of some, and
-none before the clean pack that earns the frag; rallies 30 to 36 yd out (30 to 33 in
-the last two waves) so the keg stands clear of the tower foot. The clean aimer still
-wins every trial and mission and golds all but The Powder Store on the pinned seed
+The Pack: one pack of 8, then scouts, then two, three and four packs whose gathering
+windows close as the hold timer shortens from 6 s to 2 s, 163 monsters in all (234 in
+the R3 draft), the last three waves a tenth quicker to their rallies and no tougher
+than their templates; a pack advances at a walk, at most 1.35 times its slowest
+member's march (1.3 before lot R5b, raised for the finale's quicker last pack); a keg on the path of most packs, at the rim of some, and none
+before the clean pack that earns the frag; rallies 30 to 36 yd out (30 to 33 in the
+last two waves) so the keg stands clear of the tower foot. The clean aimer wins every
+trial and mission and golds every mission on the pinned seed
 (`tests/turret_scenarios.test.ts`, `tests/fire_and_fly_missions.test.ts`).
 
 - **Shockwave** (`src/sim/minigames/turret_shockwave.ts`, tuning

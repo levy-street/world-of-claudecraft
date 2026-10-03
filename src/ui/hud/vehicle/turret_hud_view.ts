@@ -112,26 +112,22 @@ export interface TurretBanner {
 }
 
 /**
- * Whole seconds left in a counted phase: the intro, the pause between waves, and an
- * ended run's last half minute before the seat leaves on its own. Null outside one or
- * without a clock to count from.
+ * Whole seconds left in a counted phase: the intro, and an ended run's last half minute
+ * before the seat leaves on its own. Null outside one or without a clock to count from.
  */
 function countdownSeconds(session: TurretSessionView, clock: number | null): number | null {
   const { phase, phaseEndTick } = session.defense;
   if (clock === null) return null;
   const secondsTo = (tick: number) => Math.max(0, Math.ceil((tick - clock) / TICK_RATE));
-  if (phase === 'intro' || phase === 'between') return secondsTo(phaseEndTick);
+  if (phase === 'intro') return secondsTo(phaseEndTick);
   if (phase !== 'won' && phase !== 'lost') return null;
   const seconds = secondsTo(phaseEndTick + TURRET_TIMING.endedSeatTicks);
   return seconds <= TURRET_LEAVING_COUNTDOWN_SECONDS ? seconds : null;
 }
 
-function countdownLine(session: TurretSessionView, seconds: number | null): string {
+function countdownLine(seconds: number | null): string {
   if (seconds === null) return '';
-  const values = { seconds: formatNumber(seconds) };
-  const key =
-    session.defense.phase === 'intro' ? 'hudChrome.turret.firstWave' : 'hudChrome.turret.nextWave';
-  return t(key, values);
+  return t('hudChrome.turret.firstWave', { seconds: formatNumber(seconds) });
 }
 
 function waveBannerText(wave: number, waveCount: number): string {
@@ -158,7 +154,7 @@ function phaseAnnouncement(session: TurretSessionView, seconds: number | null): 
   const { phase, wave } = session.defense;
   if (phase === 'wave') return waveBannerText(wave, session.waveCount);
   if (phase === 'won' || phase === 'lost') return endAnnouncement(session);
-  return countdownLine(session, seconds);
+  return countdownLine(seconds);
 }
 
 /** How many integrity alerts `share` has crossed. */
@@ -372,7 +368,7 @@ export class TurretHudView {
         ? t('hudChrome.turret.left', { count: formatNumber(session.monstersLeft) })
         : ended
           ? ''
-          : countdownLine(session, seconds);
+          : countdownLine(seconds);
     frame.integrity = value / max;
     frame.integrityFill = String(frame.integrity);
     frame.integrityNow = String(value);
@@ -478,16 +474,18 @@ export class TurretFeedbackCursor {
     let banner: TurretBanner | null = null;
     let rank = 0;
     let resupply: Extract<TurretEvent, { type: 'resupply' }> | null = null;
+    let started = -1;
     for (const entry of this.reader.read(session)) {
       if (entry.event.type === 'resupply') resupply = entry.event;
       const entryRank = BANNER_RANK[entry.event.type] ?? 0;
       if (entryRank === 0 || entryRank < rank) continue;
       banner = bannerFor(entry.event, session, keys);
       rank = entryRank;
+      started = entry.event.type === 'waveStart' ? entry.event.wave : -1;
     }
-    // A mission's overlapping wave sets off on its resupply's tick, with no clear between;
-    // the final wave keeps its own line above the resupply's.
-    if (banner && resupply && rank === BANNER_RANK.waveStart) {
+    // The next wave sets off on its clear's tick: its banner carries that clear's resupply
+    // line (never an earlier clear's from the same batch), the final wave's own line above.
+    if (banner && resupply && started >= 0 && resupply.wave === started - 1) {
       const line = turretResupplyLine(resupply);
       banner.subtext = typeof banner.subtext === 'string' ? [banner.subtext, line] : line;
     }

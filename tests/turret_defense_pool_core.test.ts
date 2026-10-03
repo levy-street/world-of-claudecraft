@@ -82,65 +82,56 @@ describe('Fire and Fly rig pool capacity', () => {
     });
   });
 
-  it("adds an overlapping plan's carried living to the bodies and the tail to the rigs", () => {
-    const overlapping = { ...plan, overlap: 3 };
-    expect(turretBodyCapacity(overlapping)).toBe(turretBodyCapacity(plan) + 3);
-    // The boars of the second wave can outlive the bandits' wave into the last one.
-    expect(Object.fromEntries(turretRigCapacities(overlapping))).toEqual({
-      wolf: 5,
-      boar: 3,
-      bandit: 2,
-    });
-    const kinds = [{ templateId: 'wolf' }];
-    const dressed = turretRigPlan({
-      scenarioId: 'fire_and_fly_pack',
-      kinds,
-      waves: [],
-      overlap: 3,
-    });
-    expect(dressed.overlap).toBe(3);
+  it('carries no tail: a rig plan is its kinds and its waves, nothing older than the previous wave', () => {
+    const dressed = turretRigPlan({ scenarioId: 'fire_and_fly_pack', ...plan });
+    expect(Object.keys(dressed).sort()).toEqual(['kinds', 'waves']);
+    // The boars of the second wave are corpses before the bandits' wave starts: the last
+    // wave's boar needs one rig beside them, never a third.
+    expect(turretRigCapacities(dressed).get('boar')).toBe(2);
   });
 
   it.each(FIRE_AND_FLY_SCENARIOS.map((s) => [s.boardKey, s] as const))(
-    'gives %s a rig for every monster of a wave plus the tail older waves may carry',
+    "gives %s a rig for every monster of a wave plus the previous wave's corpses of it",
     (_key, scenario) => {
-      const resolved = resolveTurretPlan(scenario);
-      const real = turretRigPlan(resolved);
+      const real = turretRigPlan(resolveTurretPlan(scenario));
       const capacities = turretRigCapacities(real);
-      const before = new Map<string, number>();
-      for (const wave of real.waves) {
-        const counts = new Map<string, number>();
+      const counts = real.waves.map((wave) => {
+        const per = new Map<string, number>();
         for (const k of wave.spawns) {
           const id = real.kinds[k].templateId;
-          counts.set(id, (counts.get(id) ?? 0) + 1);
+          per.set(id, (per.get(id) ?? 0) + 1);
         }
-        for (const [id, count] of counts) {
-          const tail = Math.min(resolved.overlap ?? 0, before.get(id) ?? 0);
-          expect(capacities.get(id), id).toBeGreaterThanOrEqual(count + tail);
+        return per;
+      });
+      const exact = new Map<string, number>();
+      counts.forEach((per, w) => {
+        for (const [id, count] of per) {
+          const need = count + (w > 0 ? (counts[w - 1].get(id) ?? 0) : 0);
+          exact.set(id, Math.max(exact.get(id) ?? 0, need));
         }
-        for (const [id, count] of counts) before.set(id, (before.get(id) ?? 0) + count);
-      }
+      });
+      expect(Object.fromEntries(capacities)).toEqual(Object.fromEntries(exact));
     },
   );
 
   it.each(FIRE_AND_FLY_SCENARIOS.map((s) => [s.boardKey, s] as const))(
-    'gives %s a body for every monster a wave and its predecessor field, and the tail it carries',
+    "gives %s a body for every monster of a wave and its predecessor's corpses, no more",
     (_key, scenario) => {
       const real = resolveTurretPlan(scenario);
-      const bodies = turretBodyCapacity(real);
-      real.waves.forEach((wave, w) => {
-        const carried = w > 0 ? real.waves[w - 1].spawns.length + (real.overlap ?? 0) : 0;
-        expect(bodies).toBeGreaterThanOrEqual(wave.spawns.length + carried);
-      });
+      const fields = real.waves.map(
+        (wave, w) => wave.spawns.length + (w > 0 ? real.waves[w - 1].spawns.length : 0),
+      );
+      expect(turretBodyCapacity(real)).toBe(Math.max(...fields));
     },
   );
 
   it.each(TURRET_MISSIONS.map((m) => [m.boardKey, m] as const))(
-    'fields at most a wave plus the overlap living on %s, each holding a body and a rig',
+    "fields at most a wave's living on %s, each holding a body and a rig",
     (_key, mission) => {
       const real = resolveTurretPlan(mission);
-      const bound = Math.max(...real.waves.map((w) => w.spawns.length)) + (real.overlap ?? 0);
-      // A nearest-first aimer, then one firing every 0.8 s, which leaves the longer tails.
+      const bound = Math.max(...real.waves.map((w) => w.spawns.length));
+      // A nearest-first aimer, then one firing every 0.8 s, which leaves more corpses lying
+      // as the next wave walks in.
       for (const [seed, cadence] of [
         [5, 1],
         [6, 16],

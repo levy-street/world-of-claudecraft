@@ -89,7 +89,7 @@ import {
 
 export { turretStrikeDistance } from './turret_defense_plan';
 
-export type TurretPhase = 'intro' | 'wave' | 'between' | 'won' | 'lost';
+export type TurretPhase = 'intro' | 'wave' | 'won' | 'lost';
 
 export type TurretMonsterState =
   | 'march'
@@ -588,7 +588,7 @@ export function tickTurretDefense(
   if (!(tick > state.tick) || state.phase === 'lost') return events;
   state.tick = tick;
   const world = withTurretBody(state, probe);
-  if ((state.phase === 'intro' || state.phase === 'between') && tick >= state.phaseEndTick) {
+  if (state.phase === 'intro' && tick >= state.phaseEndTick) {
     startWave(state, tick, world, events);
   }
   // Knocks along the segments as they stood, then on the pairs this tick's
@@ -654,13 +654,8 @@ function startWave(
   probe: ThrowProbe,
   events: TurretEvent[],
 ): void {
-  if (state.phase === 'between') state.wave++;
-  const wave = currentWave(state);
+  const wave = state.plan.waves[state.wave];
   bump(state);
-  if (!wave) {
-    win(state, events);
-    return;
-  }
   state.phase = 'wave';
   state.spawnCursor = 0;
   state.nextSpawnTick = tick + (wave.hunt?.ticks[0] ?? 0);
@@ -1188,9 +1183,8 @@ function splash(state: TurretDefenseState, m: TurretMonster, p: Vec3, events: Tu
 
 /**
  * A wave ends once every monster of it has spawned and none lives (the last wave's end is
- * the win), then the pause; on a plan with an overlap, the next wave sets off on the tick
- * the living fall to it, its resupply given on that tick with no clear and no pause. That
- * tick's spawns have already run, so the launched wave's first monster appears on the next.
+ * the win); the next wave sets off on that tick, its resupply given first, with no pause.
+ * That tick's spawns have already run, so its first monster appears on the next.
  */
 function checkWaveCleared(
   state: TurretDefenseState,
@@ -1200,12 +1194,10 @@ function checkWaveCleared(
 ): void {
   const wave = currentWave(state);
   if (wave && state.spawnCursor < wave.spawns.length) return;
-  const living = state.monsters.reduce((n, m) => (m.hp > 0 ? n + 1 : n), 0);
-  const last = state.wave >= state.plan.waves.length - 1;
-  if (living > 0 && (last || living > (state.plan.overlap ?? 0))) return;
-  if (living === 0) events.push({ type: 'waveCleared', wave: state.wave });
+  if (state.monsters.some((m) => m.hp > 0)) return;
+  events.push({ type: 'waveCleared', wave: state.wave });
   bump(state);
-  if (last) {
+  if (state.wave >= state.plan.waves.length - 1) {
     win(state, events);
     return;
   }
@@ -1215,9 +1207,8 @@ function checkWaveCleared(
     if (grant.shockwave + grant.fragmentation > 0)
       events.push({ type: 'resupply', wave: state.wave, ...grant });
   }
-  state.phase = 'between';
-  state.phaseEndTick = tick + (living > 0 ? 0 : TURRET_TIMING.betweenTicks);
-  if (living > 0) startWave(state, tick, probe, events);
+  state.wave++;
+  startWave(state, tick, probe, events);
 }
 
 function win(state: TurretDefenseState, events: TurretEvent[]): void {

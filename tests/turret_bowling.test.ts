@@ -646,10 +646,11 @@ describe('the toggle', () => {
   // The barrels came after these digests: the runs place none, so the engine the
   // barrels were added to still replays them untouched. Re-taken for the 2 s pause
   // between waves (the 5 s one replayed 313311f2 and 268bf16a on the overlap engine),
-  // then for the 0.8 s strike and Standard's retune (lot R4).
+  // then for the 0.8 s strike and Standard's retune (lot R4), then for the waves chained
+  // with no pause and Standard's retune for the one medal rule (lot R5b).
   it.each([
-    ['flat', 42, flat, 997, 'ec3b65da'],
-    ['hills', 21, hills, 964, 'f37489d7'],
+    ['flat', 42, flat, 1345, '85d9796d'],
+    ['hills', 21, hills, 1294, '3acff943'],
   ] as const)(
     'turned off, a %s full run replays the bowling-free engine exactly',
     (_name, seed, probe, count, digest) => {
@@ -679,12 +680,16 @@ describe('full runs with bowling', () => {
     expect(r.state.integrity).toBeGreaterThan(50);
   });
 
+  // On an unbreakable tower: since the one medal rule (lot R5b) this looser aimer cannot hold
+  // Standing Watch's 100 points bare, and the knocks through a whole run are what is pinned.
+  const unbreakable = () => resolveTurretPlan({ ...TURRET_SCENARIO_STANDARD, integrity: 10_000 });
+
   it('a slower, looser aimer wins while bodies knock others over through the run', () => {
     for (const [seed, probe] of [
       [42, flat],
       [21, hills],
     ] as const) {
-      const r = fullRun(seed, resolveTurretPlan(), probe, aimLoosely);
+      const r = fullRun(seed, unbreakable(), probe, aimLoosely);
       expect(r.state.phase).toBe('won');
       const knocks = r.trace.filter((s) => s.startsWith('{"type":"bowled"'));
       expect(knocks.length).toBe(r.state.stats.bowled);
@@ -697,8 +702,8 @@ describe('full runs with bowling', () => {
   });
 
   it('replays byte-identically, knocks included', () => {
-    const a = fullRun(99, resolveTurretPlan(), hills, aimLoosely);
-    const b = fullRun(99, resolveTurretPlan(), hills, aimLoosely);
+    const a = fullRun(99, unbreakable(), hills, aimLoosely);
+    const b = fullRun(99, unbreakable(), hills, aimLoosely);
     expect(a.state.phase).toBe('won');
     expect(a.state.stats.bowled).toBeGreaterThan(0);
     expect(JSON.stringify(a.state)).toBe(JSON.stringify(b.state));

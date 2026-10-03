@@ -10,9 +10,11 @@ import {
 import {
   TURRET_BOWLING,
   TURRET_EXPLOSIVE_BARREL,
+  TURRET_MEDALS,
   TURRET_SIZE_CLASSES,
   TURRET_TEMPLATE_SIZES,
   TURRET_TIMING,
+  TURRET_TOWER_POINTS,
   TURRET_WAVES,
 } from '../src/sim/content/turret_defense';
 import { MOBS } from '../src/sim/data';
@@ -115,7 +117,7 @@ function spawns(plan: TurretPlan, seed: number, setup?: (s: TurretDefenseState) 
  */
 const TRIAL_ARSENALS: Record<string, { shockwave: number; fragmentation: number }> = {
   introduction: { shockwave: 0, fragmentation: 0 },
-  standard: { shockwave: 4, fragmentation: 0 },
+  standard: { shockwave: 8, fragmentation: 0 },
   hard: { shockwave: 2, fragmentation: 4 },
 };
 
@@ -139,6 +141,26 @@ describe('the scenario table', () => {
     }
   });
 
+  it('gives every trial and mission a 100-point tower and the one medal rule, The Cracked Tower its own', () => {
+    // Lot R5b: the difficulty is in the waves, never in the tower or the bars.
+    expect(TURRET_TOWER_POINTS).toBe(100);
+    expect(TURRET_MEDALS).toEqual({
+      gold: { minIntegrityShare: 0.95 },
+      silver: { minIntegrityShare: 0.6 },
+    });
+    for (const def of [...TURRET_SCENARIOS, ...TURRET_MISSIONS]) {
+      const plan = resolveTurretPlan(def);
+      if (def.boardKey === 'brittle') {
+        // Its 10 points are its identity: gold is a tower nothing struck.
+        expect([plan.integrity, plan.medals.gold.minIntegrityShare]).toEqual([10, 1]);
+        expect(plan.medals.silver).toEqual(TURRET_MEDALS.silver);
+        continue;
+      }
+      expect(plan.integrity, def.id).toBe(100);
+      expect(plan.medals, def.id).toEqual(TURRET_MEDALS);
+    }
+  });
+
   it('keeps Standard the original run: the same wave table and 100 tower points', () => {
     expect(TURRET_SCENARIO_STANDARD.waves).toBe(TURRET_WAVES);
     expect(TURRET_SCENARIO_STANDARD.integrity).toBe(100);
@@ -146,13 +168,15 @@ describe('the scenario table', () => {
     for (const e of TURRET_WAVES.flatMap((w) => w.entries)) expect(e.hpScale).toBeUndefined();
   });
 
-  it('makes Introduction short, small, on the whole ring, with more tower points', () => {
+  it('makes Introduction short, small, on the whole ring, on the same tower', () => {
     const intro = TURRET_SCENARIO_INTRODUCTION;
     expect(intro.waves).toHaveLength(3);
-    expect(intro.integrity).toBeGreaterThan(TURRET_SCENARIO_STANDARD.integrity);
+    // One tower for every trial since lot R5b: the waves carry the difficulty.
+    expect(intro.integrity).toBe(TURRET_SCENARIO_STANDARD.integrity);
+    // Its first wave spaces its spawns wider than Standing Watch's, then they close up.
+    expect(intro.waves[0].gapMinTicks).toBeGreaterThan(TURRET_WAVES[0].gapMinTicks);
     for (const wave of intro.waves) {
       expect(wave.arrival).toBeUndefined();
-      expect(wave.gapMinTicks).toBeGreaterThan(TURRET_WAVES[0].gapMinTicks);
       for (const e of wave.entries) {
         expect(TURRET_TEMPLATE_SIZES[e.templateId]).toBe('small');
         expect(e.hpScale).toBeUndefined();
@@ -160,7 +184,7 @@ describe('the scenario table', () => {
     }
     const count = (s: TurretScenarioDef) =>
       s.waves.reduce((n, w) => n + w.entries.reduce((m, e) => m + e.count, 0), 0);
-    expect(count(intro)).toBeLessThan(count(TURRET_SCENARIO_STANDARD) / 2);
+    expect(count(intro)).toBeLessThanOrEqual(count(TURRET_SCENARIO_STANDARD) / 2);
   });
 
   it('makes Hard use every arrival pattern, tougher monsters and more of the large ones', () => {
@@ -178,11 +202,11 @@ describe('the scenario table', () => {
         .reduce((n, e) => n + e.count, 0);
     const all = ['small', 'medium', 'large', 'huge'];
     const std = TURRET_SCENARIO_STANDARD;
-    expect(count(hard, all)).toBeGreaterThanOrEqual(count(std, all) * 1.3);
-    expect(count(hard, ['large', 'huge'])).toBeGreaterThanOrEqual(
-      count(std, ['large', 'huge']) * 2,
-    );
-    expect(count(hard, ['huge'])).toBeGreaterThan(count(std, ['huge']));
+    // Standing Watch grew by about two fifths for the one medal rule (lot R5b): the
+    // Veterans' Test still fields more monsters, more of them large, as many giants.
+    expect(count(hard, all)).toBeGreaterThan(count(std, all));
+    expect(count(hard, ['large', 'huge'])).toBeGreaterThan(count(std, ['large', 'huge']));
+    expect(count(hard, ['huge'])).toBe(count(std, ['huge']));
     expect(hard.waves[0].gapMinTicks).toBeLessThan(TURRET_WAVES[0].gapMinTicks);
     expect(hard.waves[0].gapMaxTicks).toBeLessThan(TURRET_WAVES[0].gapMaxTicks);
   });
@@ -195,14 +219,14 @@ describe('the scenario table', () => {
       expect(wave.arrival).toMatchObject({ kind: 'flanks', count: 3 });
       expect(wave.gapMaxTicks).toBeLessThanOrEqual(2);
     }
-    // The giants set off first; the charge spawns after them from three sides, quicker and
-    // about as tough. Ten of them since a monster at the foot strikes in 0.8 s (lot R4).
+    // The giants set off first; the charge spawns after them from three sides, quicker.
+    // Eighteen of them since the one medal rule, and no sponge (lot R5b).
     expect(last.arrival).toMatchObject({ kind: 'flanks', count: 3 });
     const giants = last.entries.filter((e) => TURRET_TEMPLATE_SIZES[e.templateId] === 'huge');
     expect(giants.map((e) => e.templateId).sort()).toEqual(['frostmane_yeti', 'idol_guardian']);
     const charge = last.entries.at(-1)!;
     expect(charge).toMatchObject({ templateId: 'boneclad_revenant', bossLast: true });
-    expect(charge.count).toBe(10);
+    expect(charge.count).toBe(18);
     for (const giant of giants) {
       expect(giant.bossLast).toBeUndefined();
       expect(charge.speedScale!).toBeGreaterThan(1.5 * giant.speedScale!);
@@ -213,9 +237,13 @@ describe('the scenario table', () => {
     const giantCount = giants.reduce((n, e) => n + e.count, 0);
     expect(lastPlan.spawns.slice(0, giantCount).every(huge)).toBe(true);
     expect(lastPlan.spawns.slice(giantCount).some(huge)).toBe(false);
-    const hp = (kind: number) => plan.kinds[kind].maxHp;
-    const yeti = lastPlan.spawns.find(huge)!;
-    expect(hp(lastPlan.spawns.at(-1)!)).toBeGreaterThan(hp(yeti));
+    // Good shells to fell each: a charger three, a giant five or six.
+    const shells = (kind: number) => Math.ceil(plan.kinds[kind].maxHp / lastPlan.coreDamage);
+    expect(shells(lastPlan.spawns.at(-1)!)).toBe(3);
+    for (const kind of lastPlan.spawns.filter(huge)) {
+      expect(shells(kind)).toBeGreaterThanOrEqual(5);
+      expect(shells(kind)).toBeLessThanOrEqual(6);
+    }
   });
 
   it("keeps Hard's kegs wave by wave as many as Standard's: they were barely used", () => {
@@ -231,12 +259,13 @@ describe('resolving a scenario into a plan', () => {
     expect(resolveTurretPlan(TURRET_SCENARIO_STANDARD)).toEqual(plan);
     expect(plan.scenarioId).toBe('fire_and_fly_standard');
     expect(plan.integrity).toBe(100);
-    expect(plan.arsenal).toEqual({ shockwave: 4, fragmentation: 0 });
+    expect(plan.arsenal).toEqual({ shockwave: 8, fragmentation: 0 });
     for (const wave of plan.waves) expect(wave.arrival).toEqual({ kind: 'ring' });
-    // The resolved plan, byte for byte: lot R4 retuned the table for the 0.8 s strike
-    // (spawns half again as far apart, a pace of 0.85, shells a quarter harder).
+    // The resolved plan, byte for byte: lot R4 retuned the table for the 0.8 s strike, lot
+    // R5b for the one medal rule (two fifths more monsters at a pace of 1.7, spawns 0.6 to
+    // 1.2 s apart).
     const before = { kinds: plan.kinds, waves: plan.waves.map(({ arrival, ...w }) => w) };
-    expect(fnv(JSON.stringify({ ...before, bowling: plan.bowling }))).toBe('076f0d92');
+    expect(fnv(JSON.stringify({ ...before, bowling: plan.bowling }))).toBe('63a02a17');
   });
 
   it.each(TURRET_SCENARIOS.map((s) => [s.boardKey, s] as const))(
@@ -324,7 +353,7 @@ describe('resolving a scenario into a plan', () => {
     expect(plan.waves[0].spawns).toEqual([0, 1, 0]);
     const hard = resolveTurretPlan(TURRET_SCENARIO_HARD);
     const yeti = hard.kinds.find((k) => k.templateId === 'frostmane_yeti') as TurretKind;
-    expect(yeti.maxHp).toBe(Math.round(mobMaxHp(MOBS.frostmane_yeti, 20) * 1.8));
+    expect(yeti.maxHp).toBe(Math.round(mobMaxHp(MOBS.frostmane_yeti, 20) * 1.1));
     expect(yeti.breachValue).toBe(TURRET_SIZE_CLASSES.huge.breachValue);
   });
 
@@ -405,32 +434,18 @@ describe('resolving a scenario into a plan', () => {
       { waves: [wolves(4, pack(2, LIMITS.groupGapTicks + 1))] },
       /bad burst arrival/,
     ],
-    ['an overlap of no monster', { overlap: 0 }, /bad overlap/],
-    ['a fractional overlap', { overlap: 1.5 }, /bad overlap/],
-    ['an overlap past the wire limit', { overlap: LIMITS.overlap + 1 }, /bad overlap/],
-    [
-      'an overlap a wave before the last cannot exceed',
-      { waves: [wolves(4), wolves(3), wolves(5)], overlap: 3 },
-      /overlap not below a wave/,
-    ],
   ] as const)('refuses %s', (_name, override, message) => {
     const def = { ...scenario([wolves(1)]), ...override } as TurretScenarioDef;
     expect(() => resolveTurretPlan(def)).toThrow(message);
   });
 
-  it('carries an overlap only where the scenario sets one: every mission, no trial', () => {
-    for (const trial of TURRET_SCENARIOS) {
-      expect(trial.overlap).toBeUndefined();
-      expect('overlap' in resolveTurretPlan(trial)).toBe(false);
+  it('chains every wave of every trial and mission: no overlap knob, no pause', () => {
+    for (const def of [...TURRET_SCENARIOS, ...TURRET_MISSIONS]) {
+      expect(def, def.id).not.toHaveProperty('overlap');
+      expect(resolveTurretPlan(def), def.id).not.toHaveProperty('overlap');
     }
-    for (const mission of TURRET_MISSIONS) {
-      expect([2, 3]).toContain(mission.overlap);
-      expect(resolveTurretPlan(mission).overlap).toBe(mission.overlap);
-    }
-    expect(resolveTurretPlan({ ...scenario([wolves(1)]), overlap: LIMITS.overlap }).overlap).toBe(
-      LIMITS.overlap,
-    );
-    expect(resolveTurretPlan({ ...scenario([wolves(4), wolves(1)]), overlap: 3 }).overlap).toBe(3);
+    expect(LIMITS).not.toHaveProperty('overlap');
+    expect(TURRET_TIMING).not.toHaveProperty('betweenTicks');
   });
 
   it('keeps the bowling rule a parameter', () => {
@@ -688,22 +703,31 @@ function fullRun(s: TurretScenarioDef, seed: number, probe: ThrowProbe, aim: Aim
 }
 
 describe('full runs of every scenario with the scripted aimers', () => {
+  // Standing Watch is won bare by the clean aimer only since the one medal rule (lot R5b):
+  // a sloppy one needs the Shockwave there, so it is held to a consistent end.
   it.each([
-    ['introduction', TURRET_SCENARIO_INTRODUCTION],
-    ['standard', TURRET_SCENARIO_STANDARD],
-  ] as const)('%s is won by both aimers, every monster killed or struck', (_key, s) => {
-    for (const [probe, aim] of [
-      [flat, aimNearest],
-      [hills, aimSloppily],
-    ] as const) {
-      const r = fullRun(s, 42, probe, aim);
-      expect(r.state.phase).toBe('won');
-      expect(r.state.wave).toBe(s.waves.length - 1);
-      expect(r.state.stats.kills + r.state.stats.breaches).toBe(r.monsters);
-      expect(r.state.integrity).toBe(s.integrity - r.state.stats.pointsLost);
-      expect(r.state.result).toEqual(turretResult(r.plan, r.state));
-    }
-  });
+    ['introduction', TURRET_SCENARIO_INTRODUCTION, true],
+    ['standard', TURRET_SCENARIO_STANDARD, false],
+  ] as const)(
+    '%s is won by the aimers it must be, every monster killed or struck',
+    (_key, s, both) => {
+      for (const [probe, aim, mustWin] of [
+        [flat, aimNearest, true],
+        [hills, aimSloppily, both],
+      ] as const) {
+        const r = fullRun(s, 42, probe, aim);
+        if (!mustWin && r.state.phase === 'lost') {
+          expect(r.state.integrity).toBe(0);
+          continue;
+        }
+        expect(r.state.phase).toBe('won');
+        expect(r.state.wave).toBe(s.waves.length - 1);
+        expect(r.state.stats.kills + r.state.stats.breaches).toBe(r.monsters);
+        expect(r.state.integrity).toBe(s.integrity - r.state.stats.pointsLost);
+        expect(r.state.result).toEqual(turretResult(r.plan, r.state));
+      }
+    },
+  );
 
   it.each(TURRET_SCENARIOS.map((s) => [s.boardKey, s] as const))(
     'medals the clean nearest-first aimer gold on %s',
@@ -714,7 +738,7 @@ describe('full runs of every scenario with the scripted aimers', () => {
 
   it('keeps gold out of reach of an aimer firing 1.2 s after each reload on Standard', () => {
     const r = fullRun(TURRET_SCENARIO_STANDARD, 42, hills, aimSlowly);
-    expect(r.state.phase).toBe('won');
+    expect(['won', 'lost']).toContain(r.state.phase);
     expect(r.state.result?.medal).not.toBe('gold');
   });
 

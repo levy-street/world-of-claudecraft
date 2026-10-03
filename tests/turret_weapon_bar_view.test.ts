@@ -35,7 +35,7 @@ afterEach(() => setLanguage('en'));
 const START = 500;
 const CENTER = { x: 0, z: 0 };
 
-function seat(phase: 'intro' | 'wave' | 'between' | 'won' = 'wave'): TurretSession {
+function seat(phase: 'intro' | 'wave' | 'won' = 'wave'): TurretSession {
   const session: TurretSession = {
     kind: 'turret',
     origin: { x: 0, y: 0, z: 0 },
@@ -115,11 +115,9 @@ describe('the turret weapon sockets view', () => {
   });
 
   it('reads both sockets as not ready outside a wave, charges still shown', () => {
-    for (const phase of ['intro', 'between'] as const) {
-      const state = tick(new TurretWeaponBarView(), turretSessionView(seat(phase)));
-      expect(state.slots.map((s) => s.usable)).toEqual([false, false]);
-      expect(state.slots.map((s) => s.count)).toEqual(['2', '3']);
-    }
+    const intro = tick(new TurretWeaponBarView(), turretSessionView(seat('intro')));
+    expect(intro.slots.map((s) => s.usable)).toEqual([false, false]);
+    expect(intro.slots.map((s) => s.count)).toEqual(['2', '3']);
     const rearming = seat();
     rearming.defense.shockReadyTick = START + 10;
     rearming.defense.rev++;
@@ -232,7 +230,7 @@ describe('the turret weapon sockets view', () => {
     const [shock] = tick(view, turretSessionView(rearming)).slots;
     expect(shock.usable).toBe(false);
     expect(shock.procGlow).toBe(false);
-    expect(tick(view, turretSessionView(windingUp(seat('between'), 3))).slots[0].procGlow).toBe(
+    expect(tick(view, turretSessionView(windingUp(seat('intro'), 3))).slots[0].procGlow).toBe(
       false,
     );
   });

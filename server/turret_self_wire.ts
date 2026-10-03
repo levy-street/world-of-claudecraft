@@ -143,10 +143,10 @@ export function emitTurretSelfKeys(
   // already holds (a reference compare each). A rebuild happens once per engine revision of
   // a seated player (an aim drag moves it every tick) and costs about 1.3 times one
   // stringify of the whole state, every monster stringified apart and each new part
-  // compared by content with the prior one. Content-bounded per seated player: at most two
-  // consecutive waves' monsters (a corpse lingers `corpseTicks`, as long as the pause
-  // between waves), the barrel cap and the shells in flight. The plan rides first so a new
-  // seat's keys decode together.
+  // compared by content with the prior one. Content-bounded per seated player: in practice
+  // the current wave's monsters and the corpses lying `corpseTicks` from those before it
+  // (one wave's, more only after a clear that quick), the barrel cap and the shells in
+  // flight. The plan rides first so a new seat's keys decode together.
   maybeRaw('turp', session ? turretPlanWireJson(session.defense.plan) : 'null');
   if (!session) {
     maybeRaw(TURRET_SEAT_KEYS[0], 'null');

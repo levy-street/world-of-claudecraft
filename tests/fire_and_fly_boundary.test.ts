@@ -107,21 +107,30 @@ describe('the forest-edge boundary in full runs', () => {
     ),
   );
 
+  const bounces = new Map<string, number>();
+
   it.each(TURRET_SCENARIOS.map((s) => [s.boardKey, s] as const))(
     'never carries a body past the wall on %s, whatever the aimer',
-    (_key, scenario) => {
-      let bounces = 0;
+    (key, scenario) => {
+      let edge = 0;
       for (const [, aim] of AIMERS) {
         for (const seed of [42, 7]) {
           const r = farthestRun(scenario, seed, aim);
           expect(['won', 'lost']).toContain(r.state.phase);
           expect(r.farthestEdge).toBeLessThanOrEqual(FIRE_AND_FLY_WALL_REACH + 1e-6);
           expect(r.farthestEdge).toBeLessThan(secondRow);
-          bounces += r.edgeBounces;
+          edge += r.edgeBounces;
         }
       }
-      // The boundary is live: bodies do reach it and bounce back.
-      expect(bounces).toBeGreaterThan(0);
+      bounces.set(key, edge);
     },
   );
+
+  // The boundary is live: bodies do reach it and bounce back. Since the trials' waves came
+  // quicker for the one medal rule (lot R5b), a short Standing Watch run may not throw one
+  // that far, so the trials are counted together.
+  it('bounces bodies off the wall across the trials', () => {
+    expect(bounces.size).toBe(TURRET_SCENARIOS.length);
+    expect([...bounces.values()].reduce((a, b) => a + b, 0)).toBeGreaterThan(0);
+  });
 });

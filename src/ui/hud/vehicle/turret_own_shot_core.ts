@@ -16,7 +16,7 @@
 // mark of its own kind (it shares the cannon's reload and its `fired` entry says
 // so); a Shockwave is a mark on its own clock (its rearm), confirmed by its
 // `shockwave` entry. Both also need a charge the waiting marks leave, and a wave:
-// the server refuses them silently in the intro and between waves.
+// the server refuses them silently in the intro.
 //
 // Every tick is IWorld.turretClock's (the last server tick the client has seen), so
 // the window and the lead measure server time as the client sees it; offline the

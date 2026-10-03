@@ -35,46 +35,45 @@ import { TurretFeedbackReader } from '../src/ui/hud/vehicle/turret_feedback_read
 const RUN_BOUND = 20 * 60 * 8;
 // The seat state's bytes per second (its key family, each key's `,"key":` counted; lot H4),
 // pinned about 10 percent over the measured won runs on this seed against silent growth: only
-// the keys a revision moved resend, so a crowd costs little and Standing Watch and the
-// introduction sit near 2.1 KB/s since lot R4 (the revision, the aim and the stats move every
-// shot). Before the split the whole state rode one key: 14.9 KB/s here, 53.2 on the Veterans'
-// Test and 61.9 on The Pack.
-const SEAT_BYTES_PER_SECOND_CEILING = 2_350;
-// Per trial: the introduction about 2.1 KB/s, the Veterans' Test about 4.8 (lot R4: a ten-strong
-// charge in its last wave; 6.7 with 21).
+// the keys a revision moved resend, so a crowd costs little. Standing Watch sits near 3.6 KB/s
+// since lot R5b (two fifths more monsters at twice the pace in shorter runs, the revision, the
+// aim and the stats moving every shot). Before the split the whole state rode one key: 14.9
+// KB/s here, 53.2 on the Veterans' Test and 61.9 on The Pack.
+const SEAT_BYTES_PER_SECOND_CEILING = 3_950;
+// Per trial (lot R5b): the introduction about 3.9 KB/s (half again as many monsters, quicker),
+// the Veterans' Test about 5.7 (an eighteen-strong charge in its last wave).
 const SEAT_BYTES_PER_SECOND_BY_TRIAL: Record<string, number> = {
-  introduction: 2_350,
-  hard: 5_250,
+  introduction: 4_300,
+  hard: 6_300,
 };
-// Per mission, re-measured with lot R4's 0.8 s strike and third resupply: The Deluge about
-// 13.2 KB/s, the highest (276 monsters, the last 60), The Powder Store 11.8 (207, the last 63),
-// The Pack 9.0 (182 monsters gathering at rallies; 12.7 with lot R3's 234), Heavy Tread 7.9
-// (82 colossi), The Cracked Tower 6.7 to 6.9 (156).
+// Per mission, re-measured with the waves chained on their clear (lot R5) and The Pack of lot
+// R5b: The Deluge about 12.0 KB/s, the highest (276 monsters, the last 60), The Powder Store
+// 10.3 (207, the last 63), The Pack 6.9 (163 monsters gathering at rallies; 12.7 with lot R3's
+// 234), Heavy Tread 7.2 (82 colossi), The Cracked Tower 6.3 to 6.4 (156).
 const SEAT_BYTES_PER_SECOND_BY_MISSION: Record<string, number> = {
-  pack: 9_900,
-  giants: 8_750,
-  deluge: 14_550,
-  brittle: 7_600,
-  powder: 12_950,
+  pack: 7_600,
+  giants: 7_900,
+  deluge: 13_200,
+  brittle: 7_050,
+  powder: 11_350,
 };
 // Every run's worst one-second window of the seat state (a sliding 20-tick sum, one full resend
 // of a mid-run resume included), against the re-decision line of BANDWIDTH_OPINION.md (a seat's
 // worst second past a walking crowd's, 153 KB with the self record's base). Measured on this
-// seed since lot R4: The Deluge 62.8 KB, The Powder Store 60.3, The Cracked Tower 38.4, The Pack
-// 30.9 (46.1 with lot R3's draft), Heavy Tread 28.4, the Veterans' Test 16.5, every other
-// scenario under 6 (lot H4: 17.8 KB at most; before the split: 124 to 128 KB). The ceiling sits
-// about 10 percent over the worst any measured run reached, not this seed's: the H4 probe (no
-// resume) over the world seed and Sim seeds 1 to 8, bare and armed, peaks at 75.8 (The Deluge,
-// world seed) and 72.5 (The Powder Store), as before lot R4. A content lot that crosses it has
-// to say so and re-measure.
-const SEAT_WORST_SECOND_CEILING = 84_000;
+// seed since lot R5b: The Powder Store 61.8 KB, The Deluge 58.8, The Cracked Tower 35.3, Heavy
+// Tread 25.4, The Pack 17.9, the Veterans' Test 14.0, every other scenario under 8 (lot H4:
+// 17.8 KB at most; before the split: 124 to 128 KB). The ceiling sits about 10 percent over the
+// worst any measured run reached, not this seed's: the H4 probe (no resume) over the world seed
+// and Sim seeds 1 to 8, bare and armed, peaks at 72.7 (The Deluge, a Sim seed) and 72.1 (The
+// Powder Store, world seed, armed). A content lot that crosses it has to say so and re-measure.
+const SEAT_WORST_SECOND_CEILING = 80_000;
 // The same window over everything the seat adds to its player's socket: the state keys, the
 // plan's `turp` and the seat's own events (the bomblets and the feedback entries). Measured on
-// this seed: The Deluge 88.5 KB, The Powder Store 84.9, The Pack 46.8 (63.9 with lot R3's
-// draft); the probe's peak is 105.2 (The Deluge, world seed), then 100.6 (The Deluge, a Sim
+// this seed: The Deluge 86.4 KB, The Powder Store 85.7, The Pack 28.4 (63.9 with lot R3's
+// draft); the probe's peak is 102.2 (The Deluge, a Sim seed), then 98.8 (The Powder Store, world
 // seed, armed). With the self record's base about 12 KB more, the ceiling stays under the
-// 153 KB line (about 128 KB).
-const SEAT_WIRE_WORST_SECOND_CEILING = 116_000;
+// 153 KB line (about 125 KB).
+const SEAT_WIRE_WORST_SECOND_CEILING = 112_500;
 const DRIFT_BOUND_YD = 0.005;
 const FORGED_PID = 987_654;
 const ground = { ground: (x: number, z: number) => groundHeight(x, z, WORLD_SEED) };
@@ -244,7 +243,8 @@ function playOnline(command: string, aim = true, armed = false) {
   let identical = 0;
   let phase = '';
   let priorWave = 0;
-  const overlapped: number[] = [];
+  const chained: number[] = [];
+  const phases = new Set<string>();
   let ticks = 0;
   const bytes: Record<string, number> = {};
   const seatPerTick: number[] = [];
@@ -329,13 +329,15 @@ function playOnline(command: string, aim = true, armed = false) {
       drift[kind] = Math.max(drift[kind], segmentDrift(m.seg, exact));
       drawn[kind]++;
     }
-    // An overlapping mission's next wave: the client's wave moves on with its living tail.
-    if (view.defense.wave > priorWave && phase === 'wave' && view.defense.phase === 'wave') {
-      const tail = view.defense.monsters.filter((m) => m.hp > 0).length;
-      if (tail > 0) overlapped.push(tail);
+    // The next wave sets off on its clear's tick: the client's wave moves on straight from
+    // one wave to the next, nothing of the cleared wave still living.
+    if (view.defense.wave > priorWave) {
+      expect([phase, view.defense.phase]).toEqual(['wave', 'wave']);
+      chained.push(view.defense.monsters.filter((m) => m.hp > 0).length);
     }
     priorWave = view.defense.wave;
     phase = view.defense.phase;
+    phases.add(phase);
     const clock = client.turretClock!;
     const left = turretChargesLeft(view.defense);
     const live = view.defense.phase === 'wave';
@@ -386,7 +388,8 @@ function playOnline(command: string, aim = true, armed = false) {
     shots,
     slams,
     routed,
-    overlapped,
+    chained,
+    phases,
     rallied,
     states,
     seatBytesPerSecond: seatBytes(bytes) / (ticks / 20),
@@ -395,11 +398,14 @@ function playOnline(command: string, aim = true, armed = false) {
 
 describe('Fire and Fly online: the socket-free round trip', () => {
   it('mirrors the authoritative seat within the wire rounding every tick of a won run, then clears on leave', () => {
-    const { sim, pid, client, sent, before, shots, seatBytesPerSecond } = playOnline('/dev turret');
+    const { sim, pid, client, sent, before, shots, seatBytesPerSecond, chained, phases } =
+      playOnline('/dev turret');
     expect(shots).toBeGreaterThan(50);
-    // Only the moved keys of the state per revision, pruned and rounded: 2.4 KB/s over this
-    // run (14.9 as one key, 23.7 before the pruning); a later lot that grows it fails here.
+    // Only the moved keys of the state per revision, pruned and rounded: about 3.6 KB/s over
+    // this run (14.9 as one key, 23.7 before the pruning); a later lot that grows it fails here.
     expect(seatBytesPerSecond).toBeLessThan(SEAT_BYTES_PER_SECOND_CEILING);
+    expect(chained).toEqual(TURRET_DEFAULT_SCENARIO.waves.slice(1).map(() => 0));
+    expect(phases).toEqual(new Set(['intro', 'wave', 'won']));
     const ring = client.turretSession!.feedback;
     expect(ring.map((f) => f.seq)).toEqual(ring.map((_, i) => ring[0].seq + i));
 
@@ -454,9 +460,10 @@ describe('Fire and Fly online: the socket-free round trip', () => {
   it.each(
     TURRET_SCENARIOS.filter((s) => s !== TURRET_DEFAULT_SCENARIO).map((s) => [s.boardKey, s]),
   )('mirrors every tick of a won %s run, its plan carried to the client', (key, scenario) => {
-    const { client, seatBytesPerSecond, overlapped } = playOnline(`/dev turret ${key}`);
+    const { client, seatBytesPerSecond, chained, phases } = playOnline(`/dev turret ${key}`);
     expect(seatBytesPerSecond).toBeLessThan(SEAT_BYTES_PER_SECOND_BY_TRIAL[key]);
-    expect(overlapped).toEqual([]);
+    expect(chained).toEqual(scenario.waves.slice(1).map(() => 0));
+    expect(phases).toEqual(new Set(['intro', 'wave', 'won']));
     const seat = client.turretSession!;
     expect(seat.defense.plan.scenarioId).toBe(scenario.id);
     expect(seat.defense.plan.integrity).toBe(scenario.integrity);
@@ -464,9 +471,9 @@ describe('Fire and Fly online: the socket-free round trip', () => {
   });
 
   it.each(TURRET_MISSIONS.map((s) => [s.boardKey, s] as const))(
-    'mirrors every tick of a won %s mission, its plan and its overlapping waves carried to the client',
+    'mirrors every tick of a won %s mission, its plan and its chained waves carried to the client',
     (key, mission) => {
-      const { client, seatBytesPerSecond, overlapped, rallied, states, routed } = playOnline(
+      const { client, seatBytesPerSecond, chained, phases, rallied, states, routed } = playOnline(
         `/dev turret ${key}`,
       );
       expect(seatBytesPerSecond).toBeLessThan(SEAT_BYTES_PER_SECOND_BY_MISSION[key]);
@@ -476,19 +483,19 @@ describe('Fire and Fly online: the socket-free round trip', () => {
       expect(rallied > 0).toBe(hunts);
       expect(states.has('muster') && states.has('hold')).toBe(hunts);
       expect(routed.has('rallyCue')).toBe(hunts);
-      // Each wave the clean aimer did not clear outright set off beside a tail of at most
-      // the overlap, and the client's wave counter moved on with the server's.
-      expect(overlapped.length).toBeGreaterThan(0);
-      for (const tail of overlapped) expect(tail).toBeLessThanOrEqual(mission.overlap ?? 0);
+      // Every wave set off on the tick the one before was cleared, with no pause and no
+      // living tail, and the client's wave counter moved on with the server's.
+      expect(chained).toEqual(mission.waves.slice(1).map(() => 0));
+      expect(phases).toEqual(new Set(['intro', 'wave', 'won']));
       const seat = client.turretSession!;
-      expect(seat.defense.plan.overlap).toBe(mission.overlap);
+      expect(seat.defense.plan).not.toHaveProperty('overlap');
       expect(seat.defense.phase).toBe('won');
       expect(seat.defense.plan.scenarioId).toBe(mission.id);
       expect(seat.defense.plan.waves.map((w) => w.barrels)).toEqual(
         resolveTurretPlan(mission).waves.map((w) => w.barrels),
       );
     },
-    // The Pack's won run lasts over four minutes of play since its tougher finale (lot R4).
+    // A mission's won run lasts minutes of play.
     60_000,
   );
 

@@ -244,7 +244,7 @@ it('writes nothing on unchanged frames, announces each wave once, and never spea
       'New weapon: the Shockwave, on 1. It slams the tower and throws back every monster at its foot.',
   });
   expect(text('.turret-strip-wave')).toBe('Wave 1/6');
-  expect(text('.turret-strip-slot')).toBe('Monsters left: 8');
+  expect(text('.turret-strip-slot')).toBe('Monsters left: 11');
   expect(live().textContent).toBe('Wave 1 of 6');
   world.turretSession = { ...turretSessionView(session), monstersLeft: 7 };
   bar.update();

@@ -3,16 +3,17 @@
 // carrying the weapon that idea asks for. Every number here is a first value:
 // mini-game tuning, not classic-era formulas. A tuning change after boards open mints
 // a new board version. Each runs eight waves on one curve: a warm-up, a fast climb,
-// then the last two or three waves pushing its idea to the extreme, and its next wave
-// sets off while the last two or three monsters of the current one still stand. The
-// Pack is tuned against the field-aware policy of the scenarios file at a 0.4 s pace
-// (24 tuning and 96 held-out seeds): it wins about four runs in five and golds about a
-// quarter to a third, losing that gold in the last three waves; players firing 0.8 s or
-// 1 s after each reload lose every run. The other four were tuned (lot N2d) for a strike
-// 1.5 s after a monster reaches the tower; at the 0.8 s strike of lot R4 they are far
-// harder until their own redesign: that policy no longer golds Heavy Tread, The Deluge,
-// The Cracked Tower or The Powder Store, and loses about half of Heavy Tread's runs and
-// every Cracked Tower run.
+// then the last two or three waves pushing its idea to the extreme, each wave setting
+// off on the tick the one before is cleared. Every tower holds 100 points (The Cracked
+// Tower's 10 are its idea) under one medal rule (turret_defense.ts). The Pack is set (lot
+// R5b) against the field-aware policy of the scenarios file at a 0.4 s pace: a member
+// falls to two good shells, a leader to five or six, and at the worst moment of a run
+// three to five monsters stand at the tower's foot (median; up to eight); that player golds
+// about nine runs in ten reading the field exactly and three to four in five reading it
+// 0.4 s late (a few points lost in the last two waves), while a 0.8 s player wins with
+// silver or bronze and a 1 s player loses nearly half its runs. The other four were tuned (lot N2d) for a strike 1.5 s after a monster
+// reaches the tower; at the 0.8 s strike of lot R4 they are far harder until their own
+// redesign.
 
 import {
   DT,
@@ -21,7 +22,7 @@ import {
   type TurretRallyKegDef,
   type TurretScenarioDef,
 } from '../types';
-import { TURRET_BARREL_RING } from './turret_defense';
+import { TURRET_BARREL_RING, TURRET_MEDALS, TURRET_TOWER_POINTS } from './turret_defense';
 
 const ticks = (seconds: number): number => Math.round(seconds / DT);
 const gap = (min: number, max: number) =>
@@ -41,14 +42,15 @@ const MUSTER = { speedScale: 1, speedScaleMax: 1.35 } as const;
 const SCOUT = { role: 'scout', speedScale: 2.2, speedScaleMax: 2.6 } as const;
 /** The wave-8 pincer: a group that never gathers and runs straight in. */
 const SPRINT = { role: 'sprint', speedScale: 2.4 } as const;
-/** The last three waves: every monster tougher, and a tenth quicker to its rally or the tower. */
-const TOUGH = 2.2;
+/**
+ * The last three waves: every monster a tenth quicker to its rally or the tower, never
+ * tougher than its template. Their difficulty is in the packs, not in the health.
+ */
 const LATE = 1.1;
 const late = <T extends { speedScale: number; speedScaleMax?: number }>(role: T) => ({
   ...role,
   speedScale: role.speedScale * LATE,
   ...(role.speedScaleMax !== undefined ? { speedScaleMax: role.speedScaleMax * LATE } : {}),
-  hpScale: TOUGH,
 });
 const MUSTER_LATE = late(MUSTER);
 const SCOUT_LATE = late(SCOUT);
@@ -96,16 +98,18 @@ const HUNT_GAP = { gapMinTicks: 1, gapMaxTicks: 2 } as const;
  * three, the gathering windows closing as the hold timer shortens from 6 s to 2.5 s; the
  * finale adds a sprint group that never gathers. A monster at the tower's foot strikes
  * fast, so the hunt is won in the field: the keg as a pack walks past it, the frag on a
- * pack standing clear of any keg, the shells on the scouts.
+ * pack standing clear of any keg, the shells on the scouts. No monster is tougher than its
+ * template: each wave's shell damage, matched to its members' health, fells a member in
+ * two good hits and a leader in five or six, so the last two waves are four packs at
+ * once, not a crowd of sponges at the tower's foot.
  */
 export const TURRET_MISSION_PACK: TurretScenarioDef = {
   id: 'fire_and_fly_pack',
   boardKey: 'pack',
-  integrity: 55,
-  medals: { gold: { minIntegrityShare: 0.5 }, silver: { minIntegrityShare: 0.2 } },
+  integrity: TURRET_TOWER_POINTS,
+  medals: TURRET_MEDALS,
   arsenal: { fragmentation: 5 },
   supply: MISSION_SUPPLY,
-  overlap: 3,
   waves: [
     {
       entries: [{ templateId: 'forest_wolf', count: 8, level: 2, ...MUSTER, pack: 0, leads: true }],
@@ -162,49 +166,58 @@ export const TURRET_MISSION_PACK: TurretScenarioDef = {
     },
     {
       entries: [0, 1, 2].flatMap((p) => [
-        { templateId: 'boneclad_revenant', count: 4, level: 19, ...MUSTER_LATE, pack: p },
-        { templateId: 'deeprock_kobold', count: 3, level: 15, ...MUSTER_LATE, pack: p },
-        { templateId: 'frostmane_yeti', count: 1, level: 20, ...MUSTER_LATE, pack: p, leads: true },
+        { templateId: 'boneclad_revenant', count: 3, level: 19, ...MUSTER_LATE, pack: p },
+        { templateId: 'deeprock_kobold', count: 2, level: 15, ...MUSTER_LATE, pack: p },
+        { templateId: 'frostmane_yeti', count: 1, level: 19, ...MUSTER_LATE, pack: p, leads: true },
         { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT_LATE, pack: p },
       ]),
-      coreDamage: 245,
+      coreDamage: 256,
       ...HUNT_GAP,
       barrels: RALLY_KEGS_ONLY,
       hunt: hunt([pack(1.25, [FRONT]), pack(1.25, [SIDE], 3), pack(1.25, [], 6)], FIELD, 3),
     },
     {
-      entries: [0, 1, 2].flatMap((p) => [
-        { templateId: 'tunnel_rat', count: 4, level: 6, ...MUSTER_LATE, pack: p },
-        { templateId: 'vale_bandit', count: 4, level: 5, ...MUSTER_LATE, pack: p },
+      entries: [0, 1, 2, 3].flatMap((p) => [
+        { templateId: 'tunnel_rat', count: 2, level: 6, ...MUSTER_LATE, pack: p },
+        { templateId: 'vale_bandit', count: 2, level: 5, ...MUSTER_LATE, pack: p },
         { templateId: 'thornpeak_ogre', count: 1, level: 16, ...MUSTER_LATE, pack: p, leads: true },
-        { templateId: 'tunnel_rat', count: 3, level: 6, ...SCOUT_LATE, pack: p },
+        { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT_LATE, pack: p },
       ]),
-      coreDamage: 47,
+      coreDamage: 96,
       ...HUNT_GAP,
       barrels: RALLY_KEGS_ONLY,
-      hunt: hunt([pack(1.3, [FRONT]), pack(1.3, [FRONT], 1.5), pack(1.3, [], 3)], CLOSE, 2.5),
+      hunt: hunt(
+        [pack(1.3, [FRONT]), pack(1.3, [FRONT], 1.5), pack(1.3, [], 3), pack(1.3, [SIDE], 4.5)],
+        CLOSE,
+        2,
+      ),
     },
     {
       entries: [
-        ...[0, 1, 2].flatMap((p) => [
-          { templateId: 'boneclad_revenant', count: 4, level: 19, ...MUSTER_LATE, pack: p },
-          { templateId: 'deeprock_kobold', count: 3, level: 15, ...MUSTER_LATE, pack: p },
+        ...[0, 1, 2, 3].flatMap((p) => [
+          { templateId: 'boneclad_revenant', count: 2, level: 19, ...MUSTER_LATE, pack: p },
+          { templateId: 'deeprock_kobold', count: 2, level: 15, ...MUSTER_LATE, pack: p },
           {
             templateId: 'frostmane_yeti',
             count: 1,
-            level: 20,
+            level: 19,
             ...MUSTER_LATE,
             pack: p,
             leads: true,
           },
-          { templateId: 'tunnel_rat', count: 3, level: 6, ...SCOUT_LATE, pack: p },
+          { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT_LATE, pack: p },
         ]),
         { templateId: 'tunnel_rat', count: 6, level: 6, ...late(SPRINT) },
       ],
-      coreDamage: 145,
+      coreDamage: 256,
       ...HUNT_GAP,
       barrels: RALLY_KEGS_ONLY,
-      hunt: hunt([pack(1.3, [FRONT]), pack(1.3, [SIDE], 1), pack(1.3, [], 2)], CLOSE, 2.5, 3),
+      hunt: hunt(
+        [pack(1.35, [FRONT]), pack(1.35, [SIDE], 1), pack(1.35, [], 2), pack(1.35, [FRONT], 3)],
+        CLOSE,
+        2,
+        3,
+      ),
     },
   ],
 };
@@ -224,11 +237,10 @@ const COLOSSUS_HP = 1.25;
 export const TURRET_MISSION_GIANTS: TurretScenarioDef = {
   id: 'fire_and_fly_giants',
   boardKey: 'giants',
-  integrity: 100,
-  medals: { gold: { minIntegrityShare: 0.99 }, silver: { minIntegrityShare: 0.6 } },
+  integrity: TURRET_TOWER_POINTS,
+  medals: TURRET_MEDALS,
   arsenal: { shockwave: 4, fragmentation: 1 },
   supply: MISSION_SUPPLY,
-  overlap: 2,
   waves: [
     {
       entries: [{ templateId: 'fen_troll', count: 3, level: 11, hpScale: 1.05, speedScale: TREAD }],
@@ -325,11 +337,10 @@ const FRAIL = 0.8;
 export const TURRET_MISSION_DELUGE: TurretScenarioDef = {
   id: 'fire_and_fly_deluge',
   boardKey: 'deluge',
-  integrity: 100,
-  medals: { gold: { minIntegrityShare: 0.94 }, silver: { minIntegrityShare: 0.5 } },
+  integrity: TURRET_TOWER_POINTS,
+  medals: TURRET_MEDALS,
   arsenal: { shockwave: 3, fragmentation: 2 },
   supply: MISSION_SUPPLY,
-  overlap: 3,
   waves: [
     {
       entries: [{ templateId: 'forest_wolf', count: 16, level: 2, speedScale: 1.6 }],
@@ -418,10 +429,9 @@ export const TURRET_MISSION_BRITTLE: TurretScenarioDef = {
   id: 'fire_and_fly_brittle',
   boardKey: 'brittle',
   integrity: 10,
-  medals: { gold: { minIntegrityShare: 1 }, silver: { minIntegrityShare: 0.6 } },
+  medals: { gold: { minIntegrityShare: 1 }, silver: TURRET_MEDALS.silver },
   arsenal: { shockwave: 3, fragmentation: 1 },
   supply: MISSION_SUPPLY,
-  overlap: 2,
   waves: [
     {
       entries: [{ templateId: 'forest_wolf', count: 8, level: 2 }],
@@ -512,12 +522,11 @@ const RUSH_GAP = { gapMinTicks: 1, gapMaxTicks: 2 } as const;
 export const TURRET_MISSION_POWDER: TurretScenarioDef = {
   id: 'fire_and_fly_powder',
   boardKey: 'powder',
-  integrity: 100,
-  medals: { gold: { minIntegrityShare: 0.99 }, silver: { minIntegrityShare: 0.6 } },
+  integrity: TURRET_TOWER_POINTS,
+  medals: TURRET_MEDALS,
   arsenal: { shockwave: 1, fragmentation: 3 },
   supply: MISSION_SUPPLY,
   kegs: { placement: 'lanes', countScale: 2, cap: 12 },
-  overlap: 3,
   waves: [
     {
       entries: [{ templateId: 'forest_wolf', count: 8, level: 2 }],

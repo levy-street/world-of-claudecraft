@@ -49,8 +49,10 @@ const LEADERS: readonly (readonly [string, string, string | null])[][] = [
     ['thornpeak_ogre', 'rift_thornback', 'mob_beast_aggro'],
     ['thornpeak_ogre', 'rift_thornback', 'mob_beast_aggro'],
     ['thornpeak_ogre', 'rift_thornback', 'mob_beast_aggro'],
+    ['thornpeak_ogre', 'rift_thornback', 'mob_beast_aggro'],
   ],
   [
+    ['frostmane_yeti', 'old_greyjaw', 'mob_beast_wolf_aggro'],
     ['frostmane_yeti', 'old_greyjaw', 'mob_beast_wolf_aggro'],
     ['frostmane_yeti', 'old_greyjaw', 'mob_beast_wolf_aggro'],
     ['frostmane_yeti', 'old_greyjaw', 'mob_beast_wolf_aggro'],

@@ -2,12 +2,13 @@
 // src/sim/minigames/turret_defense.ts; the wave plan resolver
 // (src/sim/minigames/turret_defense_plan.ts) reads the templates from MOBS.
 // TURRET_WAVES is the Standard scenario's table (fire_and_fly_scenarios.ts), retuned for the
-// 0.8 s strike (lot R4).
+// 0.8 s strike (lot R4), then for the 100-point tower and the 95 percent gold (lot R5b).
 
 import { FIRE_AND_FLY_TOWER } from '../fire_and_fly_field';
 import {
   DT,
   type TurretBowlingDef,
+  type TurretMedalBars,
   type TurretSizeClass,
   type TurretSizeDef,
   type TurretWaveDef,
@@ -36,16 +37,16 @@ export const TURRET_TEMPLATE_SIZES: Readonly<Record<string, TurretSizeClass>> = 
   idol_guardian: 'huge',
 };
 
-const GAP_MIN = ticks(1.2);
-const GAP_MAX = ticks(2.4);
-/** Standing Watch's monsters walk a little slower than their templates. */
-const PACE = 0.85;
+const GAP_MIN = ticks(0.6);
+const GAP_MAX = ticks(1.2);
+/** Standing Watch's monsters come at 1.7 times their templates' march. */
+const PACE = 1.7;
 /** Inside the march, well clear of the tower's foot and of the 46 yd spawn ring. */
 export const TURRET_BARREL_RING = { minRadius: 16, maxRadius: 30 } as const;
 
 export const TURRET_WAVES: readonly TurretWaveDef[] = [
   {
-    entries: [{ templateId: 'forest_wolf', count: 8, level: 2, speedScale: PACE }],
+    entries: [{ templateId: 'forest_wolf', count: 11, level: 2, speedScale: PACE }],
     coreDamage: 75,
     gapMinTicks: GAP_MIN,
     gapMaxTicks: GAP_MAX,
@@ -53,8 +54,8 @@ export const TURRET_WAVES: readonly TurretWaveDef[] = [
   },
   {
     entries: [
-      { templateId: 'forest_wolf', count: 6, level: 2, speedScale: PACE },
-      { templateId: 'wild_boar', count: 6, level: 3, speedScale: PACE },
+      { templateId: 'forest_wolf', count: 8, level: 2, speedScale: PACE },
+      { templateId: 'wild_boar', count: 8, level: 3, speedScale: PACE },
     ],
     coreDamage: 80,
     gapMinTicks: GAP_MIN,
@@ -63,8 +64,8 @@ export const TURRET_WAVES: readonly TurretWaveDef[] = [
   },
   {
     entries: [
-      { templateId: 'vale_bandit', count: 8, level: 5, speedScale: PACE },
-      { templateId: 'webwood_spider', count: 6, level: 4, speedScale: PACE },
+      { templateId: 'vale_bandit', count: 11, level: 5, speedScale: PACE },
+      { templateId: 'webwood_spider', count: 8, level: 4, speedScale: PACE },
     ],
     coreDamage: 105,
     gapMinTicks: GAP_MIN,
@@ -73,8 +74,8 @@ export const TURRET_WAVES: readonly TurretWaveDef[] = [
   },
   {
     entries: [
-      { templateId: 'tunnel_rat', count: 8, level: 6, speedScale: PACE },
-      { templateId: 'fen_troll', count: 4, level: 11, speedScale: PACE },
+      { templateId: 'tunnel_rat', count: 11, level: 6, speedScale: PACE },
+      { templateId: 'fen_troll', count: 6, level: 11, speedScale: PACE },
     ],
     coreDamage: 125,
     gapMinTicks: GAP_MIN,
@@ -83,9 +84,9 @@ export const TURRET_WAVES: readonly TurretWaveDef[] = [
   },
   {
     entries: [
-      { templateId: 'deeprock_kobold', count: 8, level: 15, speedScale: PACE },
-      { templateId: 'thornpeak_ogre', count: 4, level: 16, speedScale: PACE },
-      { templateId: 'boneclad_revenant', count: 4, level: 19, speedScale: PACE },
+      { templateId: 'deeprock_kobold', count: 11, level: 15, speedScale: PACE },
+      { templateId: 'thornpeak_ogre', count: 6, level: 16, speedScale: PACE },
+      { templateId: 'boneclad_revenant', count: 6, level: 19, speedScale: PACE },
     ],
     coreDamage: 163,
     gapMinTicks: GAP_MIN,
@@ -94,8 +95,8 @@ export const TURRET_WAVES: readonly TurretWaveDef[] = [
   },
   {
     entries: [
-      { templateId: 'boneclad_revenant', count: 6, level: 19, speedScale: PACE },
-      { templateId: 'frostmane_yeti', count: 2, level: 20, speedScale: PACE },
+      { templateId: 'boneclad_revenant', count: 8, level: 19, speedScale: PACE },
+      { templateId: 'frostmane_yeti', count: 3, level: 20, speedScale: PACE },
       { templateId: 'idol_guardian', count: 1, level: 20, speedScale: PACE, bossLast: true },
     ],
     coreDamage: 275,
@@ -244,9 +245,23 @@ export const TURRET_ARENA = {
   turretHeight: FIRE_AND_FLY_TOWER.topY,
 } as const;
 
+/**
+ * Every scenario's tower holds this many points, trials and missions alike (The Cracked
+ * Tower's 10 are its identity): the difficulty is in the waves, never in the tower.
+ */
+export const TURRET_TOWER_POINTS = 100;
+
+/**
+ * One medal rule everywhere: gold while the tower keeps 95 percent of its points, silver
+ * 60, bronze while it stands (The Cracked Tower keeps gold for a tower untouched).
+ */
+export const TURRET_MEDALS: Readonly<TurretMedalBars> = {
+  gold: { minIntegrityShare: 0.95 },
+  silver: { minIntegrityShare: 0.6 },
+};
+
 export const TURRET_TIMING = {
   introTicks: ticks(3),
-  betweenTicks: ticks(2),
   /** March speed = template moveSpeed x marchFactor. */
   marchFactor: 0.55,
   /**

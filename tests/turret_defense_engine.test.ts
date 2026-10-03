@@ -237,12 +237,12 @@ describe('phases and spawns', () => {
     expect(run(state, INTRO_END - 1)).toEqual([]);
     expect(state.phase).toBe('intro');
     const events = run(state, INTRO_END);
-    expect(events[0]).toEqual({ type: 'waveStart', wave: 0, count: 8 });
+    expect(events[0]).toEqual({ type: 'waveStart', wave: 0, count: 11 });
     expect(state.phase).toBe('wave');
     expect(state.monsters).toHaveLength(1);
   });
 
-  it('spawns on the 46 yd ring every 1.2 to 2.4 s, in plan order, with varying gaps', () => {
+  it('spawns on the 46 yd ring every 0.6 to 1.2 s, in plan order, with varying gaps', () => {
     const p = resolveTurretPlan();
     const state = createTurretDefense(p, { x: 5, z: -3 }, 11, START);
     const seen: { id: number; tick: number; kind: number }[] = [];
@@ -255,13 +255,13 @@ describe('phases and spawns', () => {
         expect(Math.hypot(origin.x - 5, origin.z + 3)).toBeCloseTo(TURRET_ARENA.spawnRadius, 9);
       }
     }
-    const wave1 = seen.slice(0, 8);
+    const wave1 = seen.slice(0, 11);
     expect(wave1.map((s) => s.kind)).toEqual(p.waves[0].spawns);
     const gaps = wave1.slice(1).map((s, i) => s.tick - wave1[i].tick);
-    expect(gaps).toHaveLength(7);
+    expect(gaps).toHaveLength(10);
     for (const gap of gaps) {
-      expect(gap).toBeGreaterThanOrEqual(24);
-      expect(gap).toBeLessThanOrEqual(48);
+      expect(gap).toBeGreaterThanOrEqual(12);
+      expect(gap).toBeLessThanOrEqual(24);
     }
     expect(new Set(gaps).size).toBeGreaterThan(1);
   });
@@ -269,12 +269,11 @@ describe('phases and spawns', () => {
   it('spawns the real sixth wave in plan order with the guardian last', () => {
     const p = resolveTurretPlan();
     const state = createTurretDefense(p, { x: 0, z: 0 }, 13, START);
-    state.phase = 'between';
-    state.wave = 4;
+    state.wave = 5;
     state.phaseEndTick = START + 1;
     const spawned: number[] = [];
     const ids = new Set<number>();
-    for (let t = START + 1; t <= START + 20 * 30 && state.spawnCursor < 9; t++) {
+    for (let t = START + 1; t <= START + 20 * 30 && state.spawnCursor < 12; t++) {
       tickTurretDefense(state, t, flat);
       for (const m of state.monsters) {
         if (ids.has(m.id)) continue;
@@ -360,7 +359,7 @@ describe('the shot', () => {
     }
   });
 
-  it('allows practice shots in the intro and between waves', () => {
+  it('allows practice shots in the intro, and shots on the clear as the next wave walks in', () => {
     const intro = createTurretDefense(resolveTurretPlan(), { x: 0, z: 0 }, 3, START);
     expect(fireTurret(intro, START, 10, 10, flat).ok).toBe(true);
     const state = createTurretDefense(
@@ -374,7 +373,11 @@ describe('the shot', () => {
     pin(state, m, 0, 20);
     const shot = fireAt(state, 0, 20);
     run(state, shot.impactTick);
-    expect(state.phase).toBe('between');
+    expect([state.phase, state.wave, state.monsters.filter((x) => x.hp > 0)]).toEqual([
+      'wave',
+      1,
+      [],
+    ]);
     run(state, state.readyTick);
     expect(fireTurret(state, state.tick, 5, 5, flat).ok).toBe(true);
   });
@@ -383,8 +386,8 @@ describe('the shot', () => {
     const p = resolveTurretPlan();
     const state = createTurretDefense(p, { x: 0, z: 0 }, 3, START);
     expect(fireAt(state, 10, 0).damage).toBe(75);
-    state.phase = 'between';
-    state.wave = 4;
+    state.phase = 'intro';
+    state.wave = 5;
     state.phaseEndTick = state.tick + 1;
     run(state, state.tick + 1);
     expect(state.wave).toBe(5);
@@ -1306,7 +1309,7 @@ describe('full scripted runs', () => {
     expect(r.waves).toHaveLength(6);
     expect(r.waves.every((w) => w.cleared > w.start)).toBe(true);
     for (let i = 1; i < r.waves.length; i++) {
-      expect(r.waves[i].start - r.waves[i - 1].cleared).toBe(TURRET_TIMING.betweenTicks);
+      expect(r.waves[i].start).toBe(r.waves[i - 1].cleared);
     }
     expect(r.state.stats.kills).toBe(
       resolveTurretPlan().waves.reduce((n, w) => n + w.spawns.length, 0),
@@ -1353,13 +1356,20 @@ describe("a mission's resupply", () => {
     const state = resupplied({ shockwave: 2, fragmentation: 0 }, [0]);
     const events = clearWave(state);
     const types = events.map((e) => e.type);
-    expect(types.slice(types.indexOf('waveCleared'))).toEqual(['waveCleared', 'resupply']);
-    expect(events.at(-1)).toEqual({ type: 'resupply', wave: 0, shockwave: 1, fragmentation: 0 });
+    expect(types.slice(types.indexOf('waveCleared'))).toEqual([
+      'waveCleared',
+      'resupply',
+      'waveStart',
+    ]);
+    expect(events.find((e) => e.type === 'resupply')).toEqual({
+      type: 'resupply',
+      wave: 0,
+      shockwave: 1,
+      fragmentation: 0,
+    });
     expect(state.stats.resupplies).toBe(1);
-    expect(state.phase).toBe('between');
+    expect([state.phase, state.wave]).toEqual(['wave', 1]);
     expect(turretChargesLeft(state)).toEqual({ shockwave: 3, fragmentation: 0 });
-    run(state, state.phaseEndTick);
-    expect(state.wave).toBe(1);
     expect(clearWave(state).some((e) => e.type === 'resupply')).toBe(false);
     expect(state.stats.resupplies).toBe(1);
   });
@@ -1367,9 +1377,13 @@ describe("a mission's resupply", () => {
   it('resupplies both weapons together, and neither on a plan with no resupply wave', () => {
     const both = resupplied({ shockwave: 1, fragmentation: 3 }, [0, 1]);
     clearWave(both);
-    run(both, both.phaseEndTick);
     const second = clearWave(both);
-    expect(second.at(-1)).toEqual({ type: 'resupply', wave: 1, shockwave: 1, fragmentation: 1 });
+    expect(second.find((e) => e.type === 'resupply')).toEqual({
+      type: 'resupply',
+      wave: 1,
+      shockwave: 1,
+      fragmentation: 1,
+    });
     expect(turretChargesGiven(both.plan, both.stats.resupplies)).toEqual({
       shockwave: 3,
       fragmentation: 5,

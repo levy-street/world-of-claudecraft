@@ -363,11 +363,11 @@ describe('the turret aim core with the limited weapons', () => {
   });
 
   it('dims the armed reticle by the fragmentation rules, not the shell ones', () => {
-    // Between waves a shell still fires, a fragmentation shell does not.
+    // Outside a wave a shell still fires, a fragmentation shell does not.
     const session = waveSeat();
     const { world, aim } = rig(session);
     aim.toggleFrag();
-    session.defense.phase = 'between';
+    session.defense.phase = 'intro';
     session.defense.phaseEndTick = START + 200;
     session.defense.rev++;
     world.turretSession = turretSessionView(session);
@@ -493,13 +493,13 @@ describe('the turret aim core with the limited weapons', () => {
       weapon: 'frag',
     });
     expect(aim.fragArmed).toBe(false);
-    // The pause between waves: neither weapon is sent, nothing is spent.
+    // Outside a wave (the intro): neither weapon is sent, nothing is spent.
     const live = (sim.meta(sim.playerId)!.vehicle as TurretSession).defense;
-    live.phase = 'between';
+    live.phase = 'intro';
     live.phaseEndTick = sim.tickCount + 200;
     live.rev++;
     for (let i = 0; i < REARM_TICKS + TURRET_WEAPON.cooldownTicks; i++) sim.tick();
-    expect(sim.turretSession!.defense.phase).toBe('between');
+    expect(sim.turretSession!.defense.phase).toBe('intro');
     const seen = sim.turretSession!.feedback.length;
     expect(aim.fireShockwave()).toBe(false);
     expect(aim.toggleFrag()).toBe(true);

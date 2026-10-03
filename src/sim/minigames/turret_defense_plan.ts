@@ -98,11 +98,6 @@ export interface TurretPlan {
   readonly kinds: readonly TurretKind[];
   readonly waves: readonly TurretWavePlan[];
   readonly bowling: Readonly<TurretBowlingDef>;
-  /**
-   * A mission's overlap: once a wave has spawned every monster and at most this many live,
-   * the next wave sets off at once. Absent: each wave is cleared, then the pause.
-   */
-  readonly overlap?: number;
 }
 
 /**
@@ -137,7 +132,6 @@ export const TURRET_PLAN_LIMITS = {
   charges: 99,
   groupGapTicks: 20 * 60,
   barrels: 24,
-  overlap: 16,
   packs: TURRET_HUNT_LIMITS.packs,
 } as const;
 
@@ -180,17 +174,6 @@ export function turretResupplyWavesValid(waves: readonly number[], waveCount: nu
   return waves.every(
     (wave, i) => intWithin(wave, 0, waveCount - 2) && (i === 0 || wave > waves[i - 1]),
   );
-}
-
-/**
- * Every wave but the last spawns more monsters than the overlap: a smaller one would launch
- * the next on its own last spawn, chaining waves before a shot is fired.
- */
-export function turretOverlapValid(
-  overlap: number | undefined,
-  waves: readonly { readonly spawns: readonly number[] }[],
-): boolean {
-  return waves.slice(0, -1).every((wave) => wave.spawns.length > (overlap ?? 0));
 }
 
 function resolveArrival(
@@ -259,8 +242,6 @@ export function resolveTurretPlan(
     throw new Error(`turret plan: bad fragmentation charges in ${scenario.id}`);
   if (!intWithin(scenario.waves.length, 1, limits.waves))
     throw new Error(`turret plan: bad wave count in ${scenario.id}`);
-  if (scenario.overlap !== undefined && !intWithin(scenario.overlap, 1, limits.overlap))
-    throw new Error(`turret plan: bad overlap in ${scenario.id}`);
   const resupplyWaves = (scenario.supply?.resupplyAfterWaves ?? []).map((wave) => wave - 1);
   if (!turretResupplyWavesValid(resupplyWaves, scenario.waves.length))
     throw new Error(`turret plan: bad resupply waves in ${scenario.id}`);
@@ -329,8 +310,6 @@ export function resolveTurretPlan(
   });
   if (kinds.length > limits.kinds)
     throw new Error(`turret plan: too many monster kinds in ${scenario.id}`);
-  if (!turretOverlapValid(scenario.overlap, planned))
-    throw new Error(`turret plan: overlap not below a wave in ${scenario.id}`);
   return deepFreeze({
     scenarioId: scenario.id,
     integrity: scenario.integrity,
@@ -344,6 +323,5 @@ export function resolveTurretPlan(
     kinds,
     waves: planned,
     bowling: { ...bowling },
-    ...(scenario.overlap !== undefined ? { overlap: scenario.overlap } : {}),
   });
 }

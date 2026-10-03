@@ -324,11 +324,11 @@ describe('the own-shot ledger with the limited weapons', () => {
   it("counts a mission's resupplies in the charges a click sees, and never a weapon it lacks", () => {
     const shots = new TurretOwnShotLedger();
     const spent = { arsenal: { shockwave: 1, fragmentation: 0 }, shockwaves: 1 };
-    const empty = armory({ ...spent, phase: 'between', phaseEndTick: 100 });
+    const empty = armory({ ...spent, phase: 'intro', phaseEndTick: 100 });
     expect(shots.chargesLeft(empty, 90, 'shock')).toBe(0);
     expect(shots.classify(empty, 90, 'shock')).toBe('free');
     // The wave's end resupplied it: one Shockwave more, still no fragmentation shell.
-    const resupplied = armory({ ...spent, resupplies: 1, phase: 'between', phaseEndTick: 100 });
+    const resupplied = armory({ ...spent, resupplies: 1, phase: 'wave' });
     expect(shots.chargesLeft(resupplied, 95, 'shock')).toBe(1);
     expect(shots.chargesLeft(resupplied, 95, 'frag')).toBe(0);
     const wave = armory({ ...spent, resupplies: 1, phase: 'wave' });
@@ -351,8 +351,7 @@ describe('the own-shot ledger with the limited weapons', () => {
       arsenal,
       frags: 1,
       resupplies: 1,
-      phase: 'between',
-      phaseEndTick: 400,
+      phase: 'wave',
     });
     expect(shots.chargesLeft(cleared, 201, 'frag')).toBe(1);
     const late = 200 + shots.confirmWindow + 1;
@@ -367,14 +366,12 @@ describe('the own-shot ledger with the limited weapons', () => {
     expect(shots.canMark(armory(), 200, 'shock')).toBe(true);
     expect(shots.canMark(armory(), 200, 'frag')).toBe(true);
     // The server refuses both silently outside a wave, so a charge is never spent there.
-    for (const phase of ['intro', 'between'] as const) {
-      const lull = armory({ phase, phaseEndTick: 260 });
-      expect(shots.canMark(lull, 200, 'shock')).toBe(false);
-      expect(shots.canMark(lull, 200, 'frag')).toBe(false);
-      expect(shots.classify(lull, 200, 'frag')).toBe('free');
-      // A shell still fires between waves.
-      expect(shots.canMark(lull, 200)).toBe(true);
-    }
+    const lull = armory({ phase: 'intro', phaseEndTick: 260 });
+    expect(shots.canMark(lull, 200, 'shock')).toBe(false);
+    expect(shots.canMark(lull, 200, 'frag')).toBe(false);
+    expect(shots.classify(lull, 200, 'frag')).toBe('free');
+    // A shell still fires outside a wave.
+    expect(shots.canMark(lull, 200)).toBe(true);
     // No charge left: never played, never held.
     const empty = armory({ shockwaves: 2, frags: 3 });
     expect(shots.classify(empty, 200, 'shock')).toBe('free');

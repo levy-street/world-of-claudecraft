@@ -111,11 +111,10 @@ describe('the mission table', () => {
     },
   );
 
-  it('runs every mission on one eight-wave curve, overlapping, its last two waves the largest', () => {
+  it('runs every mission on one eight-wave curve, its last two waves the largest', () => {
     for (const mission of TURRET_MISSIONS) {
       const spawns = spawnsOf(mission);
       expect(spawns).toHaveLength(8);
-      expect([2, 3]).toContain(mission.overlap);
       const last = Math.min(spawns[6], spawns[7]);
       for (const n of spawns.slice(0, 6)) expect(n).toBeLessThan(last);
       expect(spawns[7]).toBeGreaterThanOrEqual(spawns[6]);
@@ -126,13 +125,13 @@ describe('the mission table', () => {
   it('hunts The Pack in packs that gather at rallies, one wave by one, fewer than the R3 draft', () => {
     const waves = TURRET_MISSION_PACK.waves;
     const plan = resolveTurretPlan(TURRET_MISSION_PACK);
-    expect(spawnsOf(TURRET_MISSION_PACK)).toEqual([8, 11, 18, 20, 20, 30, 36, 39]);
+    expect(spawnsOf(TURRET_MISSION_PACK)).toEqual([8, 11, 18, 20, 20, 24, 28, 34]);
     // Under the R3 draft wave by wave (10, 14, 24, 24, 24, 36, 48, 54): a monster at the
-    // foot now strikes in 0.8 s, so fewer of them, the last three waves tougher.
+    // foot now strikes in 0.8 s, so fewer of them, the last two waves in smaller packs.
     const r3 = [10, 14, 24, 24, 24, 36, 48, 54];
     for (const [i, n] of spawnsOf(TURRET_MISSION_PACK).entries()) expect(n).toBeLessThan(r3[i]);
-    expect(waves.map((w) => w.hunt?.packs.length)).toEqual([1, 1, 2, 2, 2, 3, 3, 3]);
-    expect(waves.map((w) => (w.hunt?.holdTicks ?? 0) / 20)).toEqual([6, 6, 4, 4, 4, 3, 2.5, 2.5]);
+    expect(waves.map((w) => w.hunt?.packs.length)).toEqual([1, 1, 2, 2, 2, 3, 4, 4]);
+    expect(waves.map((w) => (w.hunt?.holdTicks ?? 0) / 20)).toEqual([6, 6, 4, 4, 4, 3, 2, 2]);
     for (const [i, wave] of waves.entries()) {
       // Far enough out that a front keg a dozen yards ahead still stands off the tower foot.
       const band = i < 6 ? [30, 36] : [30, 33];
@@ -141,19 +140,20 @@ describe('the mission table', () => {
       expect(wave.arrival).toBeUndefined();
       const scouts = wave.entries.filter((e) => e.role === 'scout');
       const perPack = scouts.reduce((n, e) => n + e.count, 0) / (wave.hunt?.packs.length ?? 1);
-      expect(perPack).toBe(i === 0 ? 0 : i < 6 ? 2 : 3);
-      // The last three waves: twice and more as tough, a tenth quicker to rally and run.
+      expect(perPack).toBe(i === 0 ? 0 : 2);
+      // The last three waves: a tenth quicker to rally and run, never tougher than the
+      // template (lot R5: the owner's playtest found the sponges a chore).
       const late = i >= 5 ? 1.1 : 1;
       for (const entry of wave.entries) {
         const [min, max] =
           entry.role === 'scout' ? [2.2, 2.6] : entry.role === 'sprint' ? [2.4, 2.4] : [1, 1.35];
         expect(entry.speedScale).toBeCloseTo(min * late, 12);
         expect(entry.speedScaleMax ?? entry.speedScale).toBeCloseTo(max * late, 12);
-        expect(entry.hpScale).toBe(i >= 5 ? 2.2 : undefined);
+        expect(entry.hpScale).toBeUndefined();
       }
       for (const p of wave.hunt?.packs ?? []) {
         expect(p.advanceScale).toBeGreaterThanOrEqual(1.1);
-        expect(p.advanceScale).toBeLessThanOrEqual(1.3);
+        expect(p.advanceScale).toBeLessThanOrEqual(1.35);
       }
     }
     // The finale alone carries a sprint group; the first wave teaches the rally with a front keg.
@@ -169,6 +169,25 @@ describe('the mission table', () => {
     ]);
     expect(waves[0].hunt?.packs[0].kegs).toEqual([{ placement: 'rally-front' }]);
     expect(plan.waves.every((w) => w.hunt !== undefined)).toBe(true);
+  });
+
+  it("fells The Pack's members in two core hits at most and its leaders in a handful, every wave", () => {
+    // Lots R5 and R5b, the owner's playtest: no sponge that is thrown back and walks in again
+    // and again. Each wave's shell damage is matched to its members' health.
+    const plan = resolveTurretPlan(TURRET_MISSION_PACK);
+    const most = { member: 0, leader: 0 };
+    for (const [w, wave] of plan.waves.entries()) {
+      const leaders = new Set(wave.hunt?.packs.map((p) => wave.spawns[p.leader]));
+      for (const kind of new Set(wave.spawns)) {
+        const hits = Math.ceil(plan.kinds[kind].maxHp / wave.coreDamage);
+        const role = leaders.has(kind) ? 'leader' : 'member';
+        expect(hits, `wave ${w + 1} ${plan.kinds[kind].templateId}`).toBeLessThanOrEqual(
+          role === 'leader' ? 6 : 2,
+        );
+        most[role] = Math.max(most[role], hits);
+      }
+    }
+    expect(most).toEqual({ member: 2, leader: 6 });
   });
 
   it('paces The Pack at a walk: members to the rally, one advance per pack, scouts at a run', () => {
@@ -199,8 +218,8 @@ describe('the mission table', () => {
         );
         const def = TURRET_MISSION_PACK.waves[w].hunt?.packs[p];
         expect(pack.pace).toBeCloseTo(slowest * (def?.advanceScale ?? 0), 12);
-        // A walk: never past 1.3 times the slowest template's march.
-        expect(pack.pace).toBeLessThanOrEqual(slowest * 1.3 + 1e-9);
+        // A walk: never past 1.35 times the slowest template's march.
+        expect(pack.pace).toBeLessThanOrEqual(slowest * 1.35 + 1e-9);
       }
     }
   });
@@ -415,15 +434,16 @@ function aimedRun(mission: TurretScenarioDef, seed: number) {
 }
 
 /**
- * The clean nearest-first aimer's medal on seed 42. Since a monster at the foot strikes in
- * 0.8 s (lot R4), The Powder Store, not retuned yet, costs it gold on this seed: it still wins.
+ * The clean nearest-first aimer's medal on seed 42: gold everywhere under the one medal
+ * rule (lot R5b, gold keeps 95 percent of the tower), which lets Heavy Tread and The Powder
+ * Store keep the gold the 0.8 s strike and the chained waves had cost them on this seed.
  */
 const CLEAN_MEDAL: Record<string, 'gold' | 'silver'> = {
   pack: 'gold',
   giants: 'gold',
   deluge: 'gold',
   brittle: 'gold',
-  powder: 'silver',
+  powder: 'gold',
 };
 
 describe('full mission runs', () => {

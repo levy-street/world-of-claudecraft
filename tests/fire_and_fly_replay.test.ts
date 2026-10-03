@@ -159,7 +159,7 @@ describe('Replay refusals are silent', () => {
     const before = seat(meta);
     const draws: number[] = [];
     sim.ctx.rng.setObserver((value) => draws.push(value));
-    for (const phase of ['intro', 'wave', 'between'] as const) {
+    for (const phase of ['intro', 'wave'] as const) {
       before.defense.phase = phase;
       expect(replay(sim)).toBe(false);
     }

@@ -311,14 +311,6 @@ describe('the turret plan key', () => {
     ['a fractional resupply wave', (p: Wire) => (p.resupplyWaves = [1.5])],
     ['a missing resupply list', (p: Wire) => delete p.resupplyWaves],
     ['a charge bonus that is not a flag', (p: Wire) => (p.chargeBonus = 1)],
-    ['an overlap of no monster', (p: Wire) => (p.overlap = 0)],
-    ['a fractional overlap', (p: Wire) => (p.overlap = 2.5)],
-    ['an overlap past the plan limit', (p: Wire) => (p.overlap = TURRET_PLAN_LIMITS.overlap + 1)],
-    ['an overlap that is not a number', (p: Wire) => (p.overlap = '3')],
-    [
-      'an overlap a wave before the last cannot exceed',
-      (p: Wire) => (p.overlap = p.waves[0].spawns.length),
-    ],
   ])('rejects %s', (_, forge) => {
     const forged = wire(resolveTurretPlan());
     forge(forged);
@@ -329,17 +321,16 @@ describe('the turret plan key', () => {
     expect(decodeTurretPlan(null)).toBeNull();
   });
 
-  it("round-trips every mission's overlap, up to the plan limit, and reads none as none", () => {
+  it('round-trips every mission and carries no overlap, dropping one a payload forges', () => {
     for (const mission of TURRET_MISSIONS) {
       const resolved = resolveTurretPlan(mission);
       expect(decodeTurretPlan(wire(resolved))).toEqual(resolved);
-      expect(decodeTurretPlan(wire(resolved))?.overlap).toBe(mission.overlap);
     }
-    const widest = wire(resolveTurretPlan());
-    widest.overlap = TURRET_PLAN_LIMITS.overlap;
-    for (const wave of widest.waves) wave.spawns = Array(TURRET_PLAN_LIMITS.overlap + 1).fill(0);
-    expect(decodeTurretPlan(widest)?.overlap).toBe(TURRET_PLAN_LIMITS.overlap);
-    expect(decodeTurretPlan(wire(resolveTurretPlan()))).not.toHaveProperty('overlap');
+    const forged = wire(resolveTurretPlan(TURRET_MISSIONS[0]));
+    forged.overlap = 3;
+    const decoded = decodeTurretPlan(forged);
+    expect(decoded).toEqual(resolveTurretPlan(TURRET_MISSIONS[0]));
+    expect(decoded).not.toHaveProperty('overlap');
   });
 });
 
@@ -477,7 +468,7 @@ describe('the turret seat key', () => {
       'oversized monsters',
       (s: Wire) =>
         (s.defense.monsters = Array.from(
-          { length: 2 * TURRET_PLAN_LIMITS.spawnsPerWave + TURRET_PLAN_LIMITS.overlap + 1 },
+          { length: 2 * TURRET_PLAN_LIMITS.spawnsPerWave + 1 },
           () => s.defense.monsters[0],
         )),
     ],
@@ -492,10 +483,10 @@ describe('the turret seat key', () => {
     expect(decodeTurretSeat(forged, plan)).toBeNull();
   });
 
-  it("decodes a field of the widest wave, its predecessor's corpses and the overlap's tail", () => {
+  it("decodes a field of the widest wave and its predecessor's corpses", () => {
     const field = wire(seatOf(midWave()));
     const model = field.defense.monsters[0];
-    const most = 2 * TURRET_PLAN_LIMITS.spawnsPerWave + TURRET_PLAN_LIMITS.overlap;
+    const most = 2 * TURRET_PLAN_LIMITS.spawnsPerWave;
     field.defense.monsters = Array.from({ length: most }, (_, id) => ({ ...model, id }));
     expect(decodeTurretSeat(field, plan)?.defense.monsters).toHaveLength(most);
   });
@@ -643,7 +634,7 @@ describe('the turret seat key', () => {
     forged.defense.result.medal = 'bronze';
     expect(decodeTurretSeat(forged, plan)).toBeNull();
     const running = wire(seatOf(lost.revisions.at(-1)!.view));
-    running.defense.phase = 'between';
+    running.defense.phase = 'wave';
     expect(decodeTurretSeat(running, plan)).toBeNull();
   });
 

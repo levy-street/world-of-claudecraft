@@ -16,8 +16,6 @@ import { type TurretFeedback, turretFeedbackSince } from '../sim/minigames/turre
 export interface TurretPlanInput {
   readonly kinds: readonly { readonly templateId: string }[];
   readonly waves: readonly { readonly spawns: readonly number[] }[];
-  /** A mission's overlap: the most living a wave may carry into the next. */
-  readonly overlap?: number;
 }
 
 /**
@@ -32,7 +30,6 @@ export function turretRigPlan(
       templateId: fireAndFlyRigId(kind.templateId, plan.scenarioId),
     })),
     waves: plan.waves,
-    overlap: plan.overlap,
   };
 }
 
@@ -48,42 +45,33 @@ function templateCountsPerWave(plan: TurretPlanInput): Map<string, number>[] {
 }
 
 /**
- * Rigs per template: the most of it any wave spawns, plus the more of two holdovers: the
- * previous wave's of the same template (its corpses, which give their rigs up to the
- * living), or on an overlapping mission the living tail older waves carried in, at most
- * the overlap and at most what earlier waves spawned of it. A tail can skip a wave (a
- * pack leader that outlives the next wave), so the tail is counted over every earlier
- * wave, not the previous one alone. A living monster finding every rig of its template
- * taken takes a corpse's; only a corpse is ever left to its stand-in.
+ * Rigs per template: the most of it any wave spawns plus the previous wave's of the same
+ * template. A wave starts on the tick the previous one is cleared, so every monster of
+ * the previous wave is a corpse still lying as it walks in; a living monster finding every
+ * rig of its template taken takes a corpse's, so only a corpse is ever left to its stand-in.
  */
 export function turretRigCapacities(plan: TurretPlanInput): Map<string, number> {
   const perWave = templateCountsPerWave(plan);
-  const overlap = plan.overlap ?? 0;
   const capacities = new Map<string, number>();
-  const spawnedBefore = new Map<string, number>();
   perWave.forEach((counts, w) => {
     for (const [id, count] of counts) {
       const corpses = w > 0 ? (perWave[w - 1].get(id) ?? 0) : 0;
-      const tail = Math.min(overlap, spawnedBefore.get(id) ?? 0);
-      const need = count + Math.max(corpses, tail);
-      capacities.set(id, Math.max(capacities.get(id) ?? 0, need));
+      capacities.set(id, Math.max(capacities.get(id) ?? 0, count + corpses));
     }
-    for (const [id, count] of counts) spawnedBefore.set(id, (spawnedBefore.get(id) ?? 0) + count);
   });
   return capacities;
 }
 
 /**
- * Marker bodies (stand-in, health bar, strike ring): every body a wave and its predecessor
- * can field, plus on an overlapping plan the living an older wave carried into the
- * predecessor. Only a corpse can be left out (a still older one, lying on past a short
- * wave and the pause): it gives its body up to a living monster (TurretSlotBook).
+ * Marker bodies (stand-in, health bar, strike ring): every body a wave and its predecessor's
+ * corpses can field. Only a corpse can be left out (a still older one, lying on past a wave
+ * cleared within a corpse's linger): it gives its body up to a living monster (TurretSlotBook).
  */
 export function turretBodyCapacity(plan: TurretPlanInput): number {
   let most = 0;
   plan.waves.forEach((wave, w) => {
-    const carried = w > 0 ? plan.waves[w - 1].spawns.length + (plan.overlap ?? 0) : 0;
-    most = Math.max(most, wave.spawns.length + carried);
+    const corpses = w > 0 ? plan.waves[w - 1].spawns.length : 0;
+    most = Math.max(most, wave.spawns.length + corpses);
   });
   return most;
 }

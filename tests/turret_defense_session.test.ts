@@ -1060,13 +1060,13 @@ describe('the IWorld read', () => {
     expect(sim.turretSession!.monstersLeft).toBe(plan.waves[0].spawns.length);
     let kills = 0;
     let breaches = 0;
-    for (let i = 0; i < 20 * 60 && live().phase === 'wave'; i++) {
+    for (let i = 0; i < 20 * 60 && live().wave === 0; i++) {
       for (const e of turretEvents(sim.tick())) {
         if (e.event.type === 'killed') kills++;
         if (e.event.type === 'breach') breaches++;
       }
       const view = sim.turretSession!;
-      if (view.defense.phase === 'wave') {
+      if (view.defense.wave === 0) {
         expect(view.monstersLeft).toBe(plan.waves[0].spawns.length - kills - breaches);
       }
       aimOnce(sim);
@@ -1075,8 +1075,12 @@ describe('the IWorld read', () => {
     }
     expect(kills).toBeGreaterThan(0);
     expect(kills + breaches).toBe(plan.waves[0].spawns.length);
-    expect(sim.turretSession!.defense.phase).toBe('between');
-    expect(sim.turretSession!.monstersLeft).toBe(0);
+    // The next wave set off on the clear's tick: none of it has spawned yet.
+    expect([sim.turretSession!.defense.phase, sim.turretSession!.defense.wave]).toEqual([
+      'wave',
+      1,
+    ]);
+    expect(sim.turretSession!.monstersLeft).toBe(plan.waves[1].spawns.length);
     expect(sim.turretSession!.defense.stats.kills).toBe(kills);
   });
 
@@ -1561,8 +1565,11 @@ describe('a headless run in the arena', { timeout: FULL_RUN_TIMEOUT_MS }, () => 
   it('a looser aimer throws bodies into others on the arena ground, run after run', () => {
     const probe = turretWorldProbe(WORLD_SEED);
     const center = instanceOrigin(ARENA_INDEX, 0);
+    // On an unbreakable tower: since the one medal rule (lot R5b) this bare 0.8 s aimer
+    // cannot hold Standing Watch's 100 points, and the knock rate is what is pinned here.
+    const unbreakable = resolveTurretPlan({ ...TURRET_DEFAULT_SCENARIO, integrity: 10_000 });
     for (const seed of [42, 21, 99]) {
-      const state = createTurretDefense(resolveTurretPlan(), center, seed, 0);
+      const state = createTurretDefense(unbreakable, center, seed, 0);
       let launches = 0;
       for (let t = 1; t <= RUN_BOUND && state.phase !== 'won' && state.phase !== 'lost'; t++) {
         for (const e of tickTurretDefense(state, t, probe)) if (e.type === 'launched') launches++;

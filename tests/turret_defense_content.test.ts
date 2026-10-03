@@ -67,16 +67,16 @@ describe('wave table against the real templates', () => {
   });
 
   it('marches at the template speed times the march factor and its pace, with size-class physics', () => {
-    // Standing Watch walks at 0.85 of the march since the 0.8 s strike (lot R4).
+    // Standing Watch comes at 1.7 times the march since the one medal rule (lot R5b).
     for (const k of plan.kinds) {
       expect(k.marchSpeed).toBeCloseTo(
-        MOBS[k.templateId].moveSpeed * TURRET_TIMING.marchFactor * 0.85,
+        MOBS[k.templateId].moveSpeed * TURRET_TIMING.marchFactor * 1.7,
         12,
       );
       expect(k).toMatchObject(TURRET_SIZE_CLASSES[TURRET_TEMPLATE_SIZES[k.templateId]]);
     }
     expect(plan.kinds.find((k) => k.templateId === 'forest_wolf')?.marchSpeed).toBeCloseTo(
-      3.74,
+      7.48,
       12,
     );
   });
@@ -86,12 +86,12 @@ describe('wave table against the real templates', () => {
       w.entries.map((e) => `${e.templateId}x${e.count}@${e.level}`),
     );
     expect(composition).toEqual([
-      ['forest_wolfx8@2'],
-      ['forest_wolfx6@2', 'wild_boarx6@3'],
-      ['vale_banditx8@5', 'webwood_spiderx6@4'],
-      ['tunnel_ratx8@6', 'fen_trollx4@11'],
-      ['deeprock_koboldx8@15', 'thornpeak_ogrex4@16', 'boneclad_revenantx4@19'],
-      ['boneclad_revenantx6@19', 'frostmane_yetix2@20', 'idol_guardianx1@20'],
+      ['forest_wolfx11@2'],
+      ['forest_wolfx8@2', 'wild_boarx8@3'],
+      ['vale_banditx11@5', 'webwood_spiderx8@4'],
+      ['tunnel_ratx11@6', 'fen_trollx6@11'],
+      ['deeprock_koboldx11@15', 'thornpeak_ogrex6@16', 'boneclad_revenantx6@19'],
+      ['boneclad_revenantx8@19', 'frostmane_yetix3@20', 'idol_guardianx1@20'],
     ]);
     const last = plan.waves[5].spawns;
     expect(plan.kinds[last[last.length - 1]].templateId).toBe('idol_guardian');
@@ -167,15 +167,16 @@ describe('tuning constants in ticks and yards', () => {
   it('converts the authored seconds to 20 Hz ticks', () => {
     expect(TURRET_TIMING).toMatchObject({
       introTicks: 60,
-      betweenTicks: 40,
       windupTicks: 16,
       downTicks: 16,
       riseTicks: 12,
       corpseTicks: 100,
     });
+    // No pause between waves: the next one sets off on the clear's tick.
+    expect(TURRET_TIMING).not.toHaveProperty('betweenTicks');
     expect(TURRET_WEAPON.cooldownTicks).toBe(9);
     expect([TURRET_WEAPON.minFlightTicks, TURRET_WEAPON.maxFlightTicks]).toEqual([4, 18]);
-    for (const w of TURRET_WAVES) expect([w.gapMinTicks, w.gapMaxTicks]).toEqual([24, 48]);
+    for (const w of TURRET_WAVES) expect([w.gapMinTicks, w.gapMaxTicks]).toEqual([12, 24]);
   });
 
   it('pins the arena, the tower body and the blast geometry', () => {

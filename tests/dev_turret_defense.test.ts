@@ -92,10 +92,10 @@ describe('/dev turret', () => {
   });
 
   it.each([
-    ['introduction', 'introduction', 150],
-    ['hard', 'hard', 200],
-    ['HARD', 'hard', 200],
-    ['fire_and_fly_introduction', 'introduction', 150],
+    ['introduction', 'introduction', 100],
+    ['hard', 'hard', 100],
+    ['HARD', 'hard', 100],
+    ['fire_and_fly_introduction', 'introduction', 100],
   ])('runs the scenario named by /dev turret %s', (word, key, integrity) => {
     const { sim } = rig();
     const scenario = TURRET_SCENARIOS.find((s) => s.boardKey === key)!;
