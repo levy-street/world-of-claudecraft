@@ -576,7 +576,12 @@ export class GamepadManager {
       !groundAimActive &&
       ((cur[GP.LB] && !this.prevPressed[GP.LB] && cur[GP.Y]) ||
         (cur[GP.Y] && !this.prevPressed[GP.Y] && cur[GP.LB]));
-    if (editChord && this.crossHotbar && !this.cb.isTemporaryBarActive?.()) {
+    if (
+      editChord &&
+      this.crossHotbar &&
+      !this.cb.isTemporaryBarActive?.() &&
+      !this.crossHotbarBindings?.overridden()
+    ) {
       chordButton = cur[GP.Y] && !this.prevPressed[GP.Y] ? GP.Y : GP.LB;
       this.toggleCrossHotbarEdit();
     }

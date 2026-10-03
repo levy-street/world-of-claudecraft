@@ -22,11 +22,14 @@ import {
   captureActionBarLayout,
   planActionBarRestore,
 } from './action_bar_layout_sync';
+import { type ActionBarOverride, overrideActionForSlot } from './action_bar_override_core';
 import {
   actionForAttackSlot,
   attackSlotStorageKey,
   buildDefaultFormBar,
   clearHotbarSlot,
+  type FreedAttackSlotAbility,
+  freedAttackSlotDisplayAbility,
   type HotbarAction,
   isAbilityActionBarEligible,
   parseHotbarActions,
@@ -50,6 +53,9 @@ import { isUsableTrinketId } from './trinket_slot_core';
 export { ACTION_BAR_ABILITY_SLOTS } from './action_bar_layout_core';
 
 export type HotbarForm = 'normal' | 'bear' | 'cat' | 'cat_stealth' | 'stealth';
+
+// Module-scope (created once, not per frame): the freed Attack slot's def lookup.
+const abilityDefLookup = (id: string) => ABILITIES[id];
 
 const FORM_TOGGLE_IDS = new Set(['bear_form', 'cat_form', 'travel_form']);
 // Buttons that seed onto EVERY form kit bar:
@@ -78,6 +84,10 @@ export interface ActionBarControllerDeps {
   showAttackButton(): boolean;
   // A broader owner-presentation hold, including the first snapshot after reconnect.
   readOnly?(): boolean;
+  // A temporary kit the bar shows instead of the saved layout (action_bar_override_core):
+  // read LIVE at every slot read; while one is active every mutator freezes, as
+  // when spectating, so nothing of the kit reaches storage or the server.
+  override?(): ActionBarOverride | null;
   // The input-surface profile this controller arranges (the desktop keyboard
   // row or the touch ring), read LIVE like every sibling dep because the
   // Interface Mode setting can flip the surface mid-session (syncProfile follows
@@ -141,10 +151,13 @@ export class ActionBarController {
   constructor(private readonly deps: ActionBarControllerDeps) {
     // A reconnect can be read-only after the spectate label has cleared.
     // Compose both live signals without changing the caller's dependency bag.
-    if (deps.readOnly) {
+    if (deps.readOnly || deps.override) {
       this.deps = {
         ...deps,
-        spectating: () => deps.readOnly?.() === true || deps.spectating?.() === true,
+        spectating: () =>
+          deps.readOnly?.() === true ||
+          deps.spectating?.() === true ||
+          (deps.override?.() ?? null) !== null,
       };
     }
     this.activeProfile = this.resolveProfile();
@@ -588,15 +601,44 @@ export class ActionBarController {
     );
   }
 
+  /** True while a temporary kit stands in for the saved layout. */
+  get overridden(): boolean {
+    return (this.deps.override?.() ?? null) !== null;
+  }
+
   isAttackSlotFixed(): boolean {
-    return this.deps.showAttackButton();
+    return this.overridden || this.deps.showAttackButton();
   }
 
   actionForSlot(barSlot: number): HotbarAction {
+    const override = this.deps.override?.() ?? null;
+    if (override) return overrideActionForSlot(override, barSlot);
     if (barSlot === 0) {
       return actionForAttackSlot(this.isAttackSlotFixed(), this.attackActionState);
     }
     return this.actionState[barSlot - 1] ?? null;
+  }
+
+  // Slot 0's display-only fallback (freedAttackSlotDisplayAbility): memoized by
+  // action id, the same "diff a stable key, reuse the reference" idiom the hot
+  // painters use (action_bar_painter's lastIcon, unit_portrait_painter's imgCache),
+  // so the per-frame ability() accessor never allocates a fresh object while
+  // the freed slot's assignment is unchanged (ActionBarSlotDescriptor's own
+  // no-per-frame-allocation contract).
+  private freedAttackSlotAbilityCache: { id: string; ability: FreedAttackSlotAbility } | null =
+    null;
+  freedAttackSlotAbility(): FreedAttackSlotAbility | null {
+    const action = this.actionForSlot(0);
+    const id = action?.type === 'ability' ? action.id : null;
+    if (id === null) {
+      this.freedAttackSlotAbilityCache = null;
+      return null;
+    }
+    if (this.freedAttackSlotAbilityCache?.id !== id) {
+      const ability = freedAttackSlotDisplayAbility(action, abilityDefLookup);
+      this.freedAttackSlotAbilityCache = ability ? { id, ability } : null;
+    }
+    return this.freedAttackSlotAbilityCache?.ability ?? null;
   }
 
   saveActions(): void {

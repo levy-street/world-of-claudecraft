@@ -4,18 +4,20 @@ Reusable personal-vehicle chrome, composed by Hud through IWorld and shared writ
 The aim and view cores own no DOM or authoritative outcomes. The controller uses
 the existing ActionBarPainter family and never changes saved normal action bars.
 Exit and session loss clear local aim. No independent frame loop or storage.
-The shadow, forge and Morthen (Graveyard Shift) bars are sub-controllers the vehicle
-controller composes: each owns its root, and the static blocksPlayerActions routes the
-slot keys to the one that is active. Morthen keys on the identity aura alone; its
-bar also carries a hint row (`morthen_hint_view.ts`): one line per kit ability, once
-per shift, when the ability first becomes useful.
+The shadow and forge bars are sub-controllers the vehicle controller composes: each
+owns its root, and the static blocksPlayerActions routes the slot keys to the one that
+is active.
 
-## Known limits of the Morthen bar (prototype)
-- **Keyboard and mouse only.** The kit is reachable through the slot keys and button
-  clicks; gamepad (cross hotbar) and touch (the mobile action ring and radials) players
-  cannot cast it while Morthen, because the hide rule removes those surfaces and nothing
-  routes them to this bar. Owner decision for the dev-gated prototype; it must be fixed
-  before the mode ships.
+The Graveyard Shift owns NO bar: Morthen's kit rides the normal action bar, touch ring
+and cross hotbar as a possess-bar override (`src/game/morthen_controls.ts`, read by
+`ActionBarController` and `CrossHotbarBindings`, both of which freeze their writers
+while it is on). `morthen_shift_controller.ts`, composed here only because this
+controller already runs every frame, keys on the identity aura: it stamps the
+`morthen-shift` body class (the extra rows, stances, pets and consumables stand down),
+asks the pad bar to re-show its resting row on each flip, and shows each kit hint line
+(`morthen_hint_view.ts`, once per shift) through the HUD banner.
+
+## Known limits of the Graveyard Shift HUD (prototype)
 - **The character sheet paperdoll and the unit-frame portraits show the player's own
   body** during a run (both read the authored look): only the world rig swaps to Morthen
   (`src/render/characters/identity_body_core.ts`).

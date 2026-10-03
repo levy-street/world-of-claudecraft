@@ -19,6 +19,7 @@ import { ABILITIES, ITEMS } from '../sim/data';
 import { crestIconUrl } from './crest_icon_art';
 import { currencyImageUrl } from './currency_art';
 import { DEED_IMAGE_IDS } from './deed_image_ids';
+import { graveyardShiftIconId } from './graveyard_shift_icons_core';
 import { professionImageUrl } from './hud/professions/profession_art';
 import { MOB_AURA_IMAGE_IDS } from './mob_aura_icon_art';
 import { PET_ACTION_IMAGE_IDS } from './pet_action_icons';
@@ -5819,7 +5820,12 @@ export function renderProceduralIconPng(
 // Returns the icon URL for an ability/item/aura/crest id: committed painted art when registered,
 // otherwise a cached procedural PNG data URL. Both forms work as an <img src> or CSS
 // background-image.
-export function iconDataUrl(kind: IconKind, id: string, size: number = DEFAULT_ICON_SIZE): string {
+export function iconDataUrl(
+  kind: IconKind,
+  rawId: string,
+  size: number = DEFAULT_ICON_SIZE,
+): string {
+  const id = kind === 'ability' ? graveyardShiftIconId(rawId) : rawId;
   const staticUrl = staticIconUrl(kind, id);
   if (staticUrl) return staticUrl;
   const key = `${kind}|${id}|${size}`;

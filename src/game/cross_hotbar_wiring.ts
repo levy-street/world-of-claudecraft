@@ -14,6 +14,7 @@ import {
   CROSS_HOTBAR_TRIGGERS,
   type CrossHotbarAction,
   type CrossHotbarLayer,
+  type CrossHotbarLayout,
 } from './cross_hotbar';
 import { CrossHotbarBindings } from './cross_hotbar_bindings';
 import { type GamepadBindingEntry, labelForGamepadAction } from './gamepad_bindings';
@@ -48,6 +49,9 @@ export interface CrossHotbarOverlayHost {
   crossHotbarReadOnly?(): boolean;
   /** The bar's arrange surface, or null before the overlay exists. */
   crossHotbarEdit(): CrossHotbarEditSurface | null;
+  /** A temporary kit the bar shows and casts instead of the stored layout, or
+   *  null (CrossHotbarBindings.setOverride). */
+  crossHotbarOverride?(): CrossHotbarLayout | null;
 }
 
 /** What arranging needs off the live bar: which cell is focused, and a place to
@@ -97,6 +101,9 @@ export interface CrossHotbarPanelHooks {
   /** Offer a cell to any newly learned ability. Called where the action bar does
    *  its own auto-place, so both bars react to a level-up on the same beat. */
   syncCrossHotbarKnown(abilityIds: readonly string[]): void;
+  /** Re-show the resting bar after its contents changed outside a trigger hold
+   *  (a temporary kit coming or going). */
+  refreshCrossHotbar(): void;
   crossHotbarSets(): readonly (readonly CrossHotbarAction[])[];
   bindCrossHotbar(set: number, position: number, action: CrossHotbarAction): void;
   resetCrossHotbar(): void;
@@ -298,8 +305,11 @@ export function createCrossHotbar(
   layout: CrossHotbarPadLayout,
 ): CrossHotbarWiring {
   const bindings = new CrossHotbarBindings(scope);
+  bindings.setOverride(() => host().crossHotbarOverride?.() ?? null);
   let enabled = true;
+  let lastPad: CrossHotbarPadState | null = null;
   const syncPadMode = (pad: CrossHotbarPadState): void => {
+    lastPad = pad;
     const on = enabled && pad.isConnected();
     applyPadModeClass(on);
     const ui = host();
@@ -348,6 +358,9 @@ export function createCrossHotbar(
     },
     hooks: {
       syncCrossHotbarKnown: (abilityIds) => bindings.syncKnown(abilityIds),
+      refreshCrossHotbar: () => {
+        if (lastPad) syncPadMode(lastPad);
+      },
       crossHotbarSets: () => bindings.all(),
       bindCrossHotbar: (set, position, action) => bindings.bind(set, position, action),
       resetCrossHotbar: () => bindings.reset(),

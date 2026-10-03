@@ -537,7 +537,11 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 18081 and the
     // branch 18235; the two sides' additions compose to 18093 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 18093,
+    // LOWERED 18093 -> 18073 by the Graveyard Shift possess-bar override: the
+    // freed Attack slot's display memo moved into ActionBarController beside the
+    // slot read it wraps, making room for the override's two hooks. Extract,
+    // then lower. Exact count, zero slack.
+    ceiling: 18073,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

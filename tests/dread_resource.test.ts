@@ -16,11 +16,6 @@ import { persistedResource } from '../src/sim/serialize_resource';
 import { Sim } from '../src/sim/sim';
 import type { Aura, Entity, PlayerClass, SimEvent } from '../src/sim/types';
 import { resourceDisplayName } from '../src/ui/ability_tooltip_lines';
-import {
-  createMorthenActionBarView,
-  type MorthenBarPlayer,
-  morthenSlotTooltipHtml,
-} from '../src/ui/hud/vehicle/morthen_action_bar_view';
 import { lowResourceView } from '../src/ui/low_resource';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
@@ -326,27 +321,5 @@ describe('Dread on the HUD', () => {
     expect(lowResourceView({ resource: 1, maxResource: 100, resourceType: 'dread' }).active).toBe(
       false,
     );
-  });
-
-  it('paints an unaffordable kit slot unusable and prices it in the tooltip', () => {
-    const player = (resource: number): MorthenBarPlayer => ({
-      dead: false,
-      autoAttack: false,
-      gcdRemaining: 0,
-      cooldowns: new Map<string, number>(),
-      pos: { x: 0, y: 0, z: 0 },
-      resource,
-    });
-    const view = createMorthenActionBarView();
-    const keys = (slot: number) => `${slot + 1}`;
-    const short = view.tick(player(24), null, keys).slots.map((slot) => slot.usable);
-    // Attack, Chain (no target), Pulse (24 < 25), Raise the Fallen (free, no
-    // target needed).
-    expect(short).toEqual([true, false, false, true]);
-    const paid = view.tick(player(25), null, keys).slots.map((slot) => slot.usable);
-    expect(paid).toEqual([true, false, true, true]);
-    expect(morthenSlotTooltipHtml(2)).toMatch(/tt-stat">25 Dread/);
-    expect(morthenSlotTooltipHtml(1)).not.toMatch(/tt-stat">[^<]*Dread/);
-    expect(morthenSlotTooltipHtml(3)).not.toMatch(/tt-stat">[^<]*Dread/);
   });
 });

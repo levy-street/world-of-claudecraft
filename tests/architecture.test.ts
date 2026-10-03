@@ -248,10 +248,11 @@ const UI_PURE_CORES = [
   'src/ui/hud/vehicle/glider_action_bar_view.ts',
   'src/ui/hud/vehicle/cannon_feedback_core.ts',
   'src/ui/hud/vehicle/cannon_tactics_view.ts',
-  // The Graveyard Shift bar's slots, tooltip and hint line, and the kit's display text.
-  'src/ui/hud/vehicle/morthen_action_bar_view.ts',
+  // The Graveyard Shift hint line, and the kit's display text and borrowed icons.
   'src/ui/hud/vehicle/morthen_hint_view.ts',
+  'src/ui/hud/action_bar/action_bar_override_core.ts',
   'src/ui/graveyard_shift_text_core.ts',
+  'src/ui/graveyard_shift_icons_core.ts',
   'src/ui/map_entity_disclosure_core.ts',
   'src/ui/map_navigation_landmarks_core.ts',
   'src/ui/map_marker_profile_core.ts',
@@ -2668,7 +2669,7 @@ const UI_DOM_MODULES = [
   'src/ui/hud/treasure/treasure_map_window.ts',
   'src/ui/hud/vehicle/shadow_action_bar_controller.ts',
   'src/ui/hud/vehicle/forge_action_bar_controller.ts',
-  'src/ui/hud/vehicle/morthen_action_bar_controller.ts',
+  'src/ui/hud/vehicle/morthen_shift_controller.ts',
   'src/ui/account_portal_dom.ts',
   'src/ui/appearance_customizer.ts',
   // Owns browser state on purpose: it mints the reticle tick ring's root and

@@ -198,8 +198,6 @@ const UI_ROOT_TOUCHERS: Record<string, string> = {
     'the forge minigame action bar, shown only while a forging attempt runs (transient, activity-scoped)',
   'src/ui/hud/vehicle/shadow_action_bar_controller.ts':
     'the shadow infiltration action bar, shown only while the cloak is active (transient, activity-scoped)',
-  'src/ui/hud/vehicle/morthen_action_bar_controller.ts':
-    'the Graveyard Shift Morthen bar, shown only while the player holds the Morthen identity (transient, activity-scoped)',
   'src/ui/world_quest_puzzle_window.ts':
     'the world-quest puzzle window (a .window, window_drag governs it; closeManagedWindow closes it), minted at runtime like perfecting_window.ts',
   'src/ui/hud/vehicle/vehicle_action_bar_controller.ts':

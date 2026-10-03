@@ -788,12 +788,6 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
   // reach stood until this ruling and is now one classification among many.
   {
     file: 'hud.ts',
-    memos: ['freedAttackSlotAbilityCache'],
-    reason:
-      'Caches the authored ability definition by action id for the freed Attack slot. It contains content identity and mechanical values, not resolved locale strings; the tooltip and action-bar consumers resolve ability display text from that definition when painting.',
-  },
-  {
-    file: 'hud.ts',
     memos: ['lastPlayerFrameHpMode'],
     reason:
       'The health-text setting is one arm of the same OR gate as lastPlayerFrameHp and lastPlayerFrameMaxHp. relocalizeCoordinatorMemos already clears those two values to NaN, forcing unitFrameHealthText to resolve its numbers in the new locale even when the setting is unchanged.',
@@ -1676,7 +1670,9 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // 37 on the merged tree: both pairs above are present.
       // 38 at the release/v0.43.0 merge into feature/world-quests: the forge
       // action bar's numeric world-quest clock memo.
-    ).toBe(38);
+      // 37: the freed Attack slot's ability-definition memo left hud.ts for
+      // ActionBarController, which emits no text and so holds no gate.
+    ).toBe(37);
   });
 
   it('gives every relocalize() in src/ui a caller in the fan-out', () => {

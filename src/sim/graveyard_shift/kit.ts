@@ -101,15 +101,3 @@ export function morthenKitKnown(): KnownAbility[] {
     bonusCharges: 0,
   }));
 }
-
-// The bar layout lives with the kit so the HUD bar (src/ui/hud/vehicle) and the
-// slot router (src/game/morthen_controls.ts) share it without game reaching into ui.
-export const MORTHEN_ATTACK_SLOT = 0;
-
-/** The bar layout: null is the Attack toggle, then the kit in order. */
-export const MORTHEN_BAR_SLOTS: readonly (AbilityDef | null)[] = [null, ...MORTHEN_KIT];
-
-/** The kit ability a slot casts, or null for the Attack slot and any slot past the bar. */
-export function morthenSlotAbility(slot: number): AbilityDef | null {
-  return MORTHEN_BAR_SLOTS[slot] ?? null;
-}

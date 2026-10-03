@@ -262,14 +262,12 @@ export const en = {
         },
       },
       // One line per kit ability, shown once per shift when it becomes useful
-      // (src/ui/hud/vehicle/morthen_hint_view.ts). {key} is the slot's key label.
+      // (src/ui/hud/vehicle/morthen_hint_view.ts), through the HUD banner.
       hints: {
-        chain:
-          "[{key}] Sexton's Chain: pick one of them and drag them to you. The healer is a fine start.",
+        chain: "Sexton's Chain: pick one of them and drag them to you. The healer is a fine start.",
         pulse:
-          '[{key}] Shadow Pulse is ready: a heavy blast around you, best with them up close. They can interrupt it. They will try.',
-        raise:
-          '[{key}] Raise the Fallen: a body lies near. Every corpse is a colleague. Even theirs.',
+          'Shadow Pulse is ready: a heavy blast around you, best with them up close. They can interrupt it. They will try.',
+        raise: 'Raise the Fallen: a body lies near. Every corpse is a colleague. Even theirs.',
       },
       // The adventurers' say lines (src/sim/graveyard_shift/bot_lines.ts).
       say: {

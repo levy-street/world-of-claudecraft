@@ -71,8 +71,10 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
   read by `visualKeyFor` and `createCharacterVisual`); the authored look is never
   composed. The swap rides the renderer's gated base-visual replace. Body size
   stays the player's (1.0), the real boss is drawn at its template scale.
-- **Real action bar frozen:** `Sim.actionBarReadOnly` is true while the offline
-  primary holds the identity, so the HUD never prunes or saves the real bar.
+- **The kit rides the real bars:** the client shows it on the normal action bar,
+  touch ring and cross hotbar as a possess-bar override (`src/game/morthen_controls.ts`);
+  both layouts freeze their writers while it is on, and `Sim.actionBarReadOnly` is also
+  true while the offline primary holds the identity, so nothing prunes or saves them.
 
 ## The adventurer party
 - **Real players with no client** (`run_party.ts`): `ctx.addPlayer` (bot join,

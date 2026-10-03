@@ -3,10 +3,11 @@
 // first playtest found the kit unreadable from tooltips alone). Sexton's Chain
 // on arrival, Shadow Pulse the first time the Dread pays for it, Raise the
 // Fallen the first time a corpse lies within its reach. One line at a time,
-// each held for MORTHEN_HINT_MS, later ones queued. The controller paints the
-// text into the vehicle bar's hint row.
+// each held for MORTHEN_HINT_MS, later ones queued. The shift controller shows
+// each line through the HUD banner, which every surface (desktop, touch, pad)
+// already reads.
 
-import { MORTHEN_BAR_SLOTS } from '../../../sim/graveyard_shift/kit';
+import { MORTHEN_KIT } from '../../../sim/graveyard_shift/kit';
 import type { Entity } from '../../../sim/types';
 import { dist2d } from '../../../sim/types';
 import { type TranslationKey, t } from '../../i18n';
@@ -30,19 +31,14 @@ const HINT_KEY: Readonly<Record<MorthenHintId, TranslationKey>> = {
   raise: 'devCommand.graveyardShift.hints.raise',
 };
 
-const PULSE = MORTHEN_BAR_SLOTS.find((def) => def?.id === HINT_ABILITY.pulse) ?? null;
-const RAISE = MORTHEN_BAR_SLOTS.find((def) => def?.id === HINT_ABILITY.raise) ?? null;
+const PULSE = MORTHEN_KIT.find((def) => def.id === HINT_ABILITY.pulse) ?? null;
+const RAISE = MORTHEN_KIT.find((def) => def.id === HINT_ABILITY.raise) ?? null;
 const RAISE_EFFECT = RAISE?.effects.find((effect) => effect.type === 'gshiftRaiseFallen');
 const RAISE_RADIUS = RAISE_EFFECT?.type === 'gshiftRaiseFallen' ? RAISE_EFFECT.radius : 0;
 
-/** The bar slot a hint's ability sits in, for its key label. */
-export function morthenHintSlot(id: MorthenHintId): number {
-  return MORTHEN_BAR_SLOTS.findIndex((def) => def?.id === HINT_ABILITY[id]);
-}
-
-/** The hint line with the slot's key label, localized. */
-export function morthenHintText(id: MorthenHintId, keyLabel: (slot: number) => string): string {
-  return t(HINT_KEY[id], { key: keyLabel(morthenHintSlot(id)) });
+/** The hint line, localized. */
+export function morthenHintText(id: MorthenHintId): string {
+  return t(HINT_KEY[id]);
 }
 
 export type MorthenCorpseCandidate = Pick<Entity, 'id' | 'dead' | 'kind' | 'ownerId' | 'pos'>;

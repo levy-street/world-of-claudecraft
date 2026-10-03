@@ -233,9 +233,9 @@ export const ru_RU: EnTranslations = {
         }
       },
       "hints": {
-        "chain": "[{key}] Sexton's Chain: pick one of them and drag them to you. The healer is a fine start.",
-        "pulse": "[{key}] Shadow Pulse is ready: a heavy blast around you, best with them up close. They can interrupt it. They will try.",
-        "raise": "[{key}] Raise the Fallen: a body lies near. Every corpse is a colleague. Even theirs."
+        "chain": "Sexton's Chain: pick one of them and drag them to you. The healer is a fine start.",
+        "pulse": "Shadow Pulse is ready: a heavy blast around you, best with them up close. They can interrupt it. They will try.",
+        "raise": "Raise the Fallen: a body lies near. Every corpse is a colleague. Even theirs."
       },
       "say": {
         "notice": {

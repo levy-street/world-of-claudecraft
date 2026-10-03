@@ -5,7 +5,6 @@ import {
   MORTHEN_HINT_MS,
   type MorthenCorpseCandidate,
   morthenCorpseInReach,
-  morthenHintSlot,
   morthenHintText,
 } from '../src/ui/hud/vehicle/morthen_hint_view';
 import { setLanguage } from '../src/ui/i18n';
@@ -94,19 +93,15 @@ describe('Morthen corpse reach', () => {
 });
 
 describe('Morthen hint text', () => {
-  it('names the key of the slot the ability sits in, localized, never a raw key', () => {
+  it('reads each line from the catalog, localized, never a raw key', () => {
     setLanguage('en');
-    expect(morthenHintSlot('chain')).toBe(1);
-    expect(morthenHintSlot('pulse')).toBe(2);
-    expect(morthenHintSlot('raise')).toBe(3);
-    const label = (slot: number) => `K${slot}`;
-    expect(morthenHintText('chain', label)).toBe(
-      "[K1] Sexton's Chain: pick one of them and drag them to you. The healer is a fine start.",
+    expect(morthenHintText('chain')).toBe(
+      "Sexton's Chain: pick one of them and drag them to you. The healer is a fine start.",
     );
-    expect(morthenHintText('pulse', label)).toMatch(/^\[K2\] Shadow Pulse is ready/);
-    expect(morthenHintText('raise', label)).toMatch(/^\[K3\] Raise the Fallen/);
+    expect(morthenHintText('pulse')).toMatch(/^Shadow Pulse is ready/);
+    expect(morthenHintText('raise')).toMatch(/^Raise the Fallen/);
     for (const id of ['chain', 'pulse', 'raise'] as const) {
-      expect(morthenHintText(id, label)).not.toMatch(/devCommand|\{key\}/);
+      expect(morthenHintText(id)).not.toMatch(/devCommand|\{/);
     }
   });
 });

@@ -573,13 +573,8 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.className': 16 },
     reflowAllow: {},
   },
-  // Construction-only class assignments (root, title, hint row, slot row, six per
-  // slot); every update write goes through the shared facet.
-  {
-    file: 'hud/vehicle/morthen_action_bar_controller.ts',
-    allow: { '.className': 11 },
-    reflowAllow: {},
-  },
+  // The Graveyard Shift state: one facet-routed body class, nothing else.
+  { file: 'hud/vehicle/morthen_shift_controller.ts', allow: {}, reflowAllow: {} },
   // Both writes are build-time. The .className is the base class stamped on a tick
   // as it is MINTED into the pool (the pool only grows to the high-water tick
   // count), and the .setAttribute is the one aria-hidden on the ring root in

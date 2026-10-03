@@ -103,31 +103,45 @@
       background: Highlight;
     }
   }
-  /* The cloak and the Graveyard Shift's Morthen bar both stand in for every
-     player bar; their own bar shows in its place (src/ui/hud/vehicle). */
-  body:is(.wearing-shadow-cloak, .morthen-shift)
+  body.wearing-shadow-cloak
+    :is(
+      #actionbar,
+      #actionbar2,
+      #actionbar3,
+      #cross-hotbar,
+      #stancebar,
+      #petbar,
+      #mobile-action-ring,
+      #mobile-action-radial,
+      #mobile-consumable-strip,
+      #mobile-stance-radial,
+      #mobile-combat-controls
+    ) {
+    display: none !important;
+  }
+  /* The Graveyard Shift's Morthen kit rides the normal action bar, touch ring
+     and cross hotbar (a possess-bar override, src/game/morthen_controls.ts):
+     only what Morthen cannot use stands down (the extra rows, which read empty,
+     stances, pets, consumables and the ring's page flip). */
+  body.morthen-shift
   :is(
-    #actionbar,
     #actionbar2,
     #actionbar3,
-    #cross-hotbar,
     #stancebar,
     #petbar,
-    #mobile-action-ring,
-    #mobile-action-radial,
     #mobile-consumable-strip,
+    #mobile-consumable-seat,
     #mobile-stance-radial,
-    #mobile-combat-controls
+    #mobile-stance-anchor,
+    #mobile-action-page-toggle
   ) {
     display: none !important;
   }
-  .vehicle-bar.shadow-action-bar,
-  .vehicle-bar.morthen-action-bar {
+  .vehicle-bar.shadow-action-bar {
     grid-template-columns: 1fr;
     width: min(420px, calc(100% - 24px));
   }
-  .vehicle-bar.shadow-action-bar > *,
-  .vehicle-bar.morthen-action-bar > * {
+  .vehicle-bar.shadow-action-bar > * {
     grid-column: 1 / -1;
   }
   .vehicle-bar.shadow-action-bar .vehicle-integrity {

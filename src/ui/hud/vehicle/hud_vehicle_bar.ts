@@ -1,4 +1,5 @@
-// The HUD's cannon action bar, built from the Hud's own members on first use.
+// The HUD's cannon action bar (and the shadow, forge and Graveyard Shift states it
+// composes), built from the Hud's own members on first use.
 // Hud members are private, so the factory takes the Hud untyped; the members it
 // reads are welded to hud.ts in tests/hud_vehicle_bar.test.ts. Every closure reads
 // the Hud live, as the inline construction did.
@@ -14,7 +15,7 @@ interface VehicleBarHost {
   writerFacet: VehicleBarDeps['writers'];
   keybinds: { primaryLabel(action: string): string };
   optionsHooks: {
-    gamepad: { kind(): GamepadKind };
+    gamepad: { kind(): GamepadKind; refreshCrossHotbar?(): void };
     gliderPitchHold?(value: -1 | 0 | 1): void;
   } | null;
   peekGuard: { consume(): boolean };
@@ -22,6 +23,14 @@ interface VehicleBarHost {
   playerGroundAim: VehicleBarDeps['cancelOnEnter'][number];
   empowerHold: VehicleBarDeps['cancelOnEnter'][number];
   attachTooltip(element: HTMLElement, html: () => string): void;
+  showBanner(
+    text: string,
+    motion?: boolean,
+    decorativeIconUrl?: string,
+    variant?: 'default',
+    subtext?: string,
+    durationMs?: number,
+  ): unknown;
 }
 
 export function createHudVehicleBar(hud: object): VehicleActionBarController {
@@ -36,5 +45,8 @@ export function createHudVehicleBar(hud: object): VehicleActionBarController {
     cancelOnEnter: [h.playerGroundAim, h.empowerHold],
     attachTooltip: (element, html) => h.attachTooltip(element, html),
     gliderPitchHold: (value) => h.optionsHooks?.gliderPitchHold?.(value),
+    showBanner: (text, durationMs) =>
+      h.showBanner(text, true, undefined, 'default', undefined, durationMs),
+    refreshPadBar: () => h.optionsHooks?.gamepad.refreshCrossHotbar?.(),
   });
 }
