@@ -573,11 +573,11 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.className': 16 },
     reflowAllow: {},
   },
-  // Construction-only class assignments (root, title, slot row, six per slot);
-  // every update write goes through the shared facet.
+  // Construction-only class assignments (root, title, hint row, slot row, six per
+  // slot); every update write goes through the shared facet.
   {
     file: 'hud/vehicle/morthen_action_bar_controller.ts',
-    allow: { '.className': 10 },
+    allow: { '.className': 11 },
     reflowAllow: {},
   },
   // Both writes are build-time. The .className is the base class stamped on a tick

@@ -18,7 +18,9 @@ import type { GraveyardShiftBot, GraveyardShiftRun } from './run_state';
 
 export type GraveyardShiftRole = BotRole;
 
-// Fixed prototype composition (names IP-checked with the concept).
+// Fixed prototype composition, the concept's classic five (names IP-checked
+// with the concept). The mage stays the first damage dealer: tests find it by
+// role.
 export const GRAVEYARD_SHIFT_PARTY: readonly {
   role: GraveyardShiftRole;
   cls: PlayerClass;
@@ -27,6 +29,8 @@ export const GRAVEYARD_SHIFT_PARTY: readonly {
   { role: 'tank', cls: 'warrior', name: 'Bulwarkbro' },
   { role: 'healer', cls: 'priest', name: 'Mendolyn' },
   { role: 'dps', cls: 'mage', name: 'Pyrotechnic' },
+  { role: 'dps', cls: 'hunter', name: 'Arrowsmith' },
+  { role: 'dps', cls: 'rogue', name: 'Stabbyjoe' },
 ];
 
 // The party fights at Morthen's level.
@@ -51,6 +55,7 @@ export function spawnGraveyardShiftParty(ctx: SimContext, run: GraveyardShiftRun
     const bot: GraveyardShiftBot = {
       pid,
       role: member.role,
+      cls: member.cls,
       brain: {
         rng: new Rng(botSeed(run.seed, index)),
         steer: freshBotSteer(),

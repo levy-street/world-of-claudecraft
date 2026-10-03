@@ -3,60 +3,21 @@
 // catalog (ui/graveyard_shift_text_core.ts), with the resolved numbers. Mode-local AbilityDefs: never
 // in ABILITIES (no icon, wiki or catalog obligations while the run is a dev
 // prototype); casting resolves them through meta.known like any ability. Built
-// only from existing effect kinds. Numbers come from the shipped `morthen`
-// template where it has one; the rest are first-playtest values to tune. Costs
-// are Dread (dread.ts): Gravecall builds it, Shadow Pulse and Barrow Shroud
-// spend it, Sexton's Chain is free. `class: 'warrior'` is a neutral carrier
+// only from existing effect kinds plus Raise the Fallen's own. Three buttons,
+// one idea each (first playtest: five were too many to learn mid-fight): the
+// Chain picks a victim, the Pulse is the heavy hit the party tries to kick,
+// Raise the Fallen turns their dead against them. Numbers come from the shipped
+// `morthen` template where it has one; the rest are playtest values to tune.
+// Only the Pulse costs Dread (dread.ts). `class: 'warrior'` is a neutral carrier
 // (the clockwork_shock_bomb precedent): the class-keyed hooks key on warlock
 // and mage abilities, never on warrior ones.
 
 import type { KnownAbility } from '../content/classes';
 import type { AbilityDef, AbilityEffect } from '../types';
-import { GRAVECALL_DREAD } from './dread';
+import { SHADOW_PULSE_DREAD } from './dread';
 import { MORTHEN_SOLO_DAMAGE_MULT } from './morthen_profile';
 
 export const MORTHEN_KIT: readonly AbilityDef[] = [
-  {
-    // Half of the template's melee swing (41 to 65 at level 10 elite).
-    id: 'gshift_gravecall',
-    name: 'Gravecall',
-    class: 'warrior',
-    learnLevel: 1,
-    cost: 0,
-    castTime: 0,
-    cooldown: 6,
-    range: 20,
-    school: 'shadow',
-    requiresTarget: true,
-    effects: [
-      { type: 'directDamage', min: 20, max: 32, spellPowerCoeff: 0 },
-      { type: 'gainResource', amount: GRAVECALL_DREAD },
-      { type: 'gshiftMark', maxStacks: 3, duration: 15 },
-    ],
-    description: `Hurls a bolt of grave shadow at the target, marks it for the barrow and generates ${GRAVECALL_DREAD} Dread.`,
-  },
-  {
-    // The template's Shadow Pulse (12 to 18 damage, 12 yards, every 10 sec) as a
-    // 2 sec cast the party can interrupt, plus the concept's knockback.
-    id: 'gshift_shadow_pulse',
-    name: 'Shadow Pulse',
-    class: 'warrior',
-    learnLevel: 1,
-    cost: 30,
-    castTime: 2,
-    cooldown: 10,
-    range: 0,
-    school: 'shadow',
-    requiresTarget: false,
-    effects: [
-      // The marks burst first, each adding its share before the blast.
-      { type: 'gshiftMarkBurst', bonusPerStack: 8, radius: 12 },
-      { type: 'aoeDamage', min: 12, max: 18, radius: 12 },
-      { type: 'aoeKnockback', radius: 12, distance: 8, dazeMult: 0.7, dazeDuration: 3 },
-    ],
-    description:
-      'After 2 sec, a pulse of shadow bursts the barrow marks of nearby enemies, damages them and hurls them back.',
-  },
   {
     // The paladin pull's travel numbers, plus a short silence and a kick.
     id: 'gshift_sextons_chain',
@@ -77,20 +38,23 @@ export const MORTHEN_KIT: readonly AbilityDef[] = [
     description: 'Drags the target to you, interrupts its spellcasting and silences it for 2 sec.',
   },
   {
-    // Physical school so one kick on a shadow spell never locks it out.
-    id: 'gshift_barrow_shroud',
-    name: 'Barrow Shroud',
+    // The template's Shadow Pulse (12 to 18 damage, 12 yards, every 10 sec) as a
+    // 2 sec cast the party can interrupt, plus the concept's knockback.
+    id: 'gshift_shadow_pulse',
+    name: 'Shadow Pulse',
     class: 'warrior',
     learnLevel: 1,
-    cost: 40,
-    castTime: 0,
-    cooldown: 45,
+    cost: SHADOW_PULSE_DREAD,
+    castTime: 2,
+    cooldown: 10,
     range: 0,
-    school: 'physical',
+    school: 'shadow',
     requiresTarget: false,
-    offGcd: true,
-    effects: [{ type: 'selfBuff', kind: 'shield_wall', value: 0.6, duration: 6 }],
-    description: 'Wraps you in grave mist, reducing damage taken by 60% for 6 sec.',
+    effects: [
+      { type: 'aoeDamage', min: 12, max: 18, radius: 12 },
+      { type: 'aoeKnockback', radius: 12, distance: 8, dazeMult: 0.7, dazeDuration: 3 },
+    ],
+    description: 'After 2 sec, a pulse of shadow damages every nearby enemy and hurls them back.',
   },
   {
     // The concept's fun engine: kill the healer, raise the healer.
@@ -114,9 +78,6 @@ export const MORTHEN_KIT: readonly AbilityDef[] = [
 // through the solo damage multiplier (morthen_profile.ts), so what lands, the
 // tooltips and the bar all read the resolved effects.
 export function soloEffect(effect: AbilityEffect): AbilityEffect {
-  if (effect.type === 'gshiftMarkBurst') {
-    return { ...effect, bonusPerStack: effect.bonusPerStack * MORTHEN_SOLO_DAMAGE_MULT };
-  }
   if (effect.type === 'directDamage' || effect.type === 'aoeDamage') {
     return {
       ...effect,

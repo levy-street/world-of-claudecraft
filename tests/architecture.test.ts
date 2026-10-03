@@ -248,8 +248,9 @@ const UI_PURE_CORES = [
   'src/ui/hud/vehicle/glider_action_bar_view.ts',
   'src/ui/hud/vehicle/cannon_feedback_core.ts',
   'src/ui/hud/vehicle/cannon_tactics_view.ts',
-  // The Graveyard Shift bar's slots and tooltip, and the kit's display text.
+  // The Graveyard Shift bar's slots, tooltip and hint line, and the kit's display text.
   'src/ui/hud/vehicle/morthen_action_bar_view.ts',
+  'src/ui/hud/vehicle/morthen_hint_view.ts',
   'src/ui/graveyard_shift_text_core.ts',
   'src/ui/map_entity_disclosure_core.ts',
   'src/ui/map_navigation_landmarks_core.ts',

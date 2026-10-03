@@ -238,7 +238,6 @@ export const en = {
     // prototype; the strings move to a player namespace when the mode ships.
     graveyardShift: {
       identityAura: 'Morthen the Gravecaller',
-      markAura: 'Marked for the Barrow',
       adventurerAura: 'Adventurer',
       resource: 'Dread',
       errors: {
@@ -246,15 +245,10 @@ export const en = {
         noCorpse: 'There is no corpse to raise.',
       },
       abilities: {
-        gravecall: {
-          name: 'Gravecall',
-          description:
-            'Hurl a bolt of grave shadow at your target for {min} to {max} Shadow damage and mark it for the barrow for {markSeconds} sec, stacking up to {marks} marks. Generates {dread} Dread.',
-        },
         shadowPulse: {
           name: 'Shadow Pulse',
           description:
-            'Release a pulse of shadow that deals {min} to {max} Shadow damage to each enemy within {radius} yards in your line of sight, plus {perMark} Shadow damage for each barrow mark it carries, consuming the marks. Each enemy hit is knocked back {distance} yards and slowed by {slow} for {slowSeconds} sec.',
+            'Release a pulse of shadow that deals {min} to {max} Shadow damage to each enemy within {radius} yards in your line of sight. Each enemy hit is knocked back {distance} yards and slowed by {slow} for {slowSeconds} sec.',
         },
         sextonsChain: {
           name: "Sexton's Chain",
@@ -266,11 +260,16 @@ export const en = {
           description:
             'Raise the nearest corpse within {radius} yards as a skeleton that fights for you for {seconds} sec. Each corpse rises only once.',
         },
-        barrowShroud: {
-          name: 'Barrow Shroud',
-          description:
-            'Wrap yourself in grave mist, reducing all damage you take by {pct} for {seconds} sec. Usable during the global cooldown, and does not trigger it.',
-        },
+      },
+      // One line per kit ability, shown once per shift when it becomes useful
+      // (src/ui/hud/vehicle/morthen_hint_view.ts). {key} is the slot's key label.
+      hints: {
+        chain:
+          "[{key}] Sexton's Chain: pick one of them and drag them to you. The healer is a fine start.",
+        pulse:
+          '[{key}] Shadow Pulse is ready: a heavy blast around you, best with them up close. They can interrupt it. They will try.',
+        raise:
+          '[{key}] Raise the Fallen: a body lies near. Every corpse is a colleague. Even theirs.',
       },
       // The adventurers' say lines (src/sim/graveyard_shift/bot_lines.ts).
       say: {

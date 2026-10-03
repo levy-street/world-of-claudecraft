@@ -67,13 +67,7 @@ function statLine(sim: Sim) {
   };
 }
 
-const KIT_IDS = [
-  'gshift_gravecall',
-  'gshift_shadow_pulse',
-  'gshift_sextons_chain',
-  'gshift_barrow_shroud',
-  'gshift_raise_fallen',
-];
+const KIT_IDS = ['gshift_sextons_chain', 'gshift_shadow_pulse', 'gshift_raise_fallen'];
 
 // A frozen level-10 wolf `dz` yards down the nave in front of Morthen, targeted.
 function frozenWolfAhead(sim: Sim, dz: number) {
@@ -122,8 +116,8 @@ describe('Graveyard Shift Morthen identity', () => {
     const p = sim.player;
     expect(hasMorthenIdentity(p)).toBe(true);
     expect(p.level).toBe(10);
-    expect(p.maxHp).toBe(3573);
-    expect(p.hp).toBe(3573);
+    expect(p.maxHp).toBe(2382);
+    expect(p.hp).toBe(2382);
     expect(p.stats.armor).toBe(234);
     expect(p.weapon).toEqual({ min: 82, max: 130, speed: 2.6 });
     expect(p.attackPower).toBe(0);
@@ -145,9 +139,9 @@ describe('Graveyard Shift Morthen identity', () => {
       meta(sim)
         .known.find((k: any) => k.def.id === id)
         .effects.find((e: any) => e.type === type);
-    expect(effect('gshift_gravecall', 'directDamage')).toMatchObject({ min: 40, max: 64 });
     expect(effect('gshift_shadow_pulse', 'aoeDamage')).toMatchObject({ min: 24, max: 36 });
-    expect(effect('gshift_shadow_pulse', 'gshiftMarkBurst')).toMatchObject({ bonusPerStack: 16 });
+    // The knockback carries no damage, so the multiplier leaves it as authored.
+    expect(effect('gshift_shadow_pulse', 'aoeKnockback')).toMatchObject({ distance: 8 });
   });
 
   it('the profile survives a stat recalc from a buff landing and expiring', () => {
@@ -155,10 +149,10 @@ describe('Graveyard Shift Morthen identity', () => {
     start(sim);
     const p = sim.player;
     (sim as any).applyAura(p, { ...foreignAura('buff_str', p.id), value: 50, remaining: 0.2 });
-    expect(p.maxHp).toBe(3573);
+    expect(p.maxHp).toBe(2382);
     for (let i = 0; i < 10; i++) sim.tick();
     expect(p.auras.some((a) => a.id === 'test_buff_str')).toBe(false);
-    expect(p.maxHp).toBe(3573);
+    expect(p.maxHp).toBe(2382);
     expect(p.weapon).toEqual({ min: 82, max: 130, speed: 2.6 });
   });
 
@@ -170,10 +164,26 @@ describe('Graveyard Shift Morthen identity', () => {
       sim.events.some((e) => e.type === 'error' && e.text === 'You do not know that ability.'),
     ).toBe(true);
     sim.player.resource = 100;
-    sim.castAbility('gshift_barrow_shroud');
-    expect(sim.player.auras.some((a) => a.kind === 'shield_wall' && a.value === 0.6)).toBe(true);
     sim.castAbility('gshift_shadow_pulse');
     expect(sim.player.castingAbility).toBe('gshift_shadow_pulse');
+  });
+
+  it('never has a cast pushed back by the hits it takes; the real character does', () => {
+    const sim = shiftSim('warrior');
+    start(sim);
+    const wolf = frozenWolfAhead(sim, 2);
+    const p = sim.player;
+    expect(p.castPushbackReduction).toBe(1);
+    p.resource = p.maxResource;
+    sim.castAbility('gshift_shadow_pulse');
+    const before = p.castRemaining;
+    for (let i = 0; i < 5; i++) {
+      (sim as any).dealDamage(wolf, p, 10, false, 'physical', null, 'hit', true);
+    }
+    expect(p.castingAbility).toBe('gshift_shadow_pulse');
+    expect(p.castRemaining).toBe(before);
+    end(sim);
+    expect(p.castPushbackReduction).toBe(0);
   });
 
   it('runs the kit on the standard global cooldown whatever the real class', () => {
@@ -258,7 +268,7 @@ describe('Graveyard Shift Morthen identity', () => {
     start(sim);
     sim.chat('/dev mounts');
     expect(sim.player.level).toBe(10);
-    expect(sim.player.maxHp).toBe(3573);
+    expect(sim.player.maxHp).toBe(2382);
     end(sim);
     expect(sim.player.level).toBe(12);
     expect(meta(sim).lifetimeXp).toBe(lifetimeXp);
@@ -315,8 +325,8 @@ describe('Graveyard Shift Morthen identity', () => {
     });
     (sim as any).applyAura(p, { ...foreignAura('buff_sta', p.id), value: 50, remaining: 30 });
     (sim as any).applyAura(p, { ...foreignAura('buff_str', p.id), value: 50, remaining: 30 });
-    expect(p.maxHp).toBe(3573);
-    expect(p.hp).toBe(3573);
+    expect(p.maxHp).toBe(2382);
+    expect(p.hp).toBe(2382);
     expect(p.attackPower).toBe(0);
     expect(p.stats.str).toBe(0);
   });
@@ -326,7 +336,7 @@ describe('Graveyard Shift Morthen identity', () => {
     start(sim);
     for (let i = 0; i < 20 * 60; i++) sim.tick();
     expect(hasMorthenIdentity(sim.player)).toBe(true);
-    expect(sim.player.maxHp).toBe(3573);
+    expect(sim.player.maxHp).toBe(2382);
   });
 
   it.each([false, true])(
@@ -450,14 +460,28 @@ describe('Graveyard Shift Morthen identity', () => {
     expect(sim.player.level).toBe(12);
   });
 
-  it('a kit bolt still in flight at the exit never lands', () => {
+  it("drops the owner's projectiles still in flight at the exit, and only those", () => {
     const sim = shiftSim('warrior');
     start(sim);
     const wolf = frozenWolfAhead(sim, 15);
-    sim.castAbility('gshift_gravecall');
-    expect(sim.ctx.pendingProjectiles.length).toBeGreaterThan(0);
+    const landed: number[] = [];
+    const fizzled: number[] = [];
+    // The owner's bolt starts far off, the wolf's on its target: only the second
+    // would land before the run's teardown tick could matter.
+    const bolt = (sourceId: number, at: { x: number; z: number }) => ({
+      x: at.x,
+      z: at.z,
+      sourceId,
+      targetId: wolf.id,
+      ttl: 5,
+      resolve: () => landed.push(sourceId),
+      fizzle: () => fizzled.push(sourceId),
+    });
+    // A bolt from someone else (the wolf) keeps flying and lands.
+    sim.ctx.pendingProjectiles.push(bolt(sim.playerId, { x: 0, z: 0 }), bolt(wolf.id, wolf.pos));
     end(sim);
+    expect(fizzled).toEqual([sim.playerId]);
     for (let i = 0; i < 40; i++) sim.tick();
-    expect(wolf.hp).toBe(wolf.maxHp);
+    expect(landed).toEqual([wolf.id]);
   });
 });

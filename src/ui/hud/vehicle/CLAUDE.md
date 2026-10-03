@@ -6,7 +6,9 @@ the existing ActionBarPainter family and never changes saved normal action bars.
 Exit and session loss clear local aim. No independent frame loop or storage.
 The shadow, forge and Morthen (Graveyard Shift) bars are sub-controllers the vehicle
 controller composes: each owns its root, and the static blocksPlayerActions routes the
-slot keys to the one that is active. Morthen keys on the identity aura alone.
+slot keys to the one that is active. Morthen keys on the identity aura alone; its
+bar also carries a hint row (`morthen_hint_view.ts`): one line per kit ability, once
+per shift, when the ability first becomes useful.
 
 ## Known limits of the Morthen bar (prototype)
 - **Keyboard and mouse only.** The kit is reachable through the slot keys and button

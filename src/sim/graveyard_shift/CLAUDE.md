@@ -4,10 +4,10 @@ The player covers Morthen's shift in a private copy of the Hollow Crypt against 
 party of adventurer bots. Concept and lot plan live outside the repo while this is
 a prototype; this directory is built lot by lot. Today: the RUN SHELL (enter,
 exit, survive every exit), the MORTHEN IDENTITY (the owner becomes Morthen in
-the sim, on his own Dread bar: `dread.ts`), the ADVENTURER PARTY (three bots,
+the sim, on his own Dread bar: `dread.ts`), the ADVENTURER PARTY (five bots,
 hostility, win and loss), the PARTY BRAIN (the bots fight like a pickup group)
-Morthen's SKELETON ALLIES, the KIT EFFECTS (barrow marks, Raise the Fallen) and the
-SAY LINES (the living bots talk aloud, heard only up close).
+Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
+(the living bots talk aloud, heard only up close).
 
 ## Contract
 - **Offline only while a prototype.** `canStartGraveyardShift` refuses unless
@@ -44,11 +44,16 @@ SAY LINES (the living bots talk aloud, heard only up close).
   `sim.ts` and the lock sites can import it without a cycle).
 - **Stats:** `recalcPlayerStats` re-enters over no gear and no talents, then
   `applyMorthenProfile` lays the `morthen` template on top through `mobBaseStats`
-  (the createMob formula), then the solo multipliers (`MORTHEN_SOLO_HP_MULT` x3,
-  `MORTHEN_SOLO_DAMAGE_MULT` x2 on the weapon and the kit's damage): 3573 hp, 82 to
-  130 at 2.6 sec, 234 armor at level 10. The raw template lost to the party in
-  under 45 sec without a kill; the multipliers are the playtest's tuning knobs.
-  Every recalc path (buff, expiry, equip) therefore lands on the same numbers.
+  (the createMob formula), then the solo multipliers (`MORTHEN_SOLO_HP_MULT` x2,
+  `MORTHEN_SOLO_DAMAGE_MULT` x2 on the weapon and the kit's damage): 2382 hp, 82 to
+  130 at 2.6 sec, 234 armor at level 10. Tuned after the first playtest against the
+  party of five on a headless probe: standing still, hitting only the tank or
+  pressing buttons at random lose; a sharp scripted player wins with a median
+  quarter of his health left. Every recalc path (buff, expiry, equip) therefore
+  lands on the same numbers.
+- **No cast pushback:** the profile sets `castPushbackReduction` to 1, as for a
+  boss. The classic player pushback is uncapped per hit, so five adventurers
+  landing hits kept Shadow Pulse from ever finishing; kicks still cut it.
 - **Level and talents:** the real level and `talentMods` are parked on the run
   (`MorthenParked`); the owner is pinned to the template's level with
   `emptyModifiers()`. Removal runs BEFORE the teardown's clean slate and pool
@@ -73,7 +78,9 @@ SAY LINES (the living bots talk aloud, heard only up close).
 - **Real players with no client** (`run_party.ts`): `ctx.addPlayer` (bot join,
   greeting already sent), level 10, placed in Morthen's chamber in line of sight
   (owner decision for the prototype), in a fixed roster order: warrior tank
-  Bulwarkbro, priest healer Mendolyn, mage Pyrotechnic. No `PlayerMeta` flag (never
+  Bulwarkbro, priest healer Mendolyn, mage Pyrotechnic, hunter Arrowsmith, rogue
+  Stabbyjoe (the concept's classic five; the hunter's pet waits for a later step).
+  No `PlayerMeta` flag (never
   `isDevBot`) and never a `characterId`; membership is the run's roster plus the
   permanent `gshift_adventurer` marker aura.
 - **Hostility** (`hostility.ts`): one pure pair rule on the two entities' auras,
@@ -101,15 +108,21 @@ SAY LINES (the living bots talk aloud, heard only up close).
   `moveInput`), pre-checking cooldown, GCD, resource, range and sight so the real
   path never refuses. The party waits idle until Morthen comes within
   `PARTY_ENGAGE_RADIUS` or lands a hit.
-- **Kicks:** a bot whose interrupt is ready, affordable and in reach switches its
-  target to Morthen and drops its own cast to land it (the verbs strike the current
-  target); a pushed-back cast bar is the same cast, not a new stimulus.
+- **Kicks:** each kicker rolls once per fresh cast whether it notices it at all
+  (`BOT_KICK`: tank 45, rogue 30, mage 20 percent; the hunter never presses Counter
+  Shot). With every kicker going for every cast, no Pulse ever landed. A bot that
+  notices waits out its reaction delay, then, if its interrupt is ready,
+  affordable and in reach, switches its target to Morthen and drops its own cast to
+  land it (the verbs strike the current target); a pushed-back cast bar is the same
+  cast, not a new stimulus.
 - **Roles,** built from what the bots really know at level 10: tank (pummel a cast
   after the reaction delay, taunt a minion off the healer, Battle Shout when it is
   missing, Reaver Strike, auto-attack in melee), healer (shield, renew, lesser heal
   on the triage pick after a reaction delay; Shadow Word: Pain, Mind Blast and
   smite on Morthen when everyone is healthy), mage (counterspell a cast, then
-  Frostbolt or Fireball). Control spells they know (Charge's stun, Psychic Scream,
+  Frostbolt or Fireball), hunter (Auto Shot from range, Serpent Sting kept up,
+  Arcane Shot, Raptor Strike inside the dead zone), rogue (kick a cast, Sinister
+  Strike, Eviscerate at four combo points, in melee). Control spells they know (Charge's stun, Psychic Scream,
   Polymorph, Frost Nova) are filtered out by the fairness rule.
 - **Never into a refusal:** the driver skips a cast while silenced or school-locked
   (Sexton's Chain) and only switches to Morthen for a kick that can go out.
@@ -125,9 +138,9 @@ SAY LINES (the living bots talk aloud, heard only up close).
   restore puts the exact real value back.
 - **Earned** from every hit landed (`dreadFromDamageDealt`, called from the
   rage-from-damage hook in `combat/damage.ts`, rate `DREAD_PER_DAMAGE` rounded to a
-  whole point per hit so the pool stays an integer) and from
-  Gravecall's `gainResource`. **Spent** by Shadow Pulse (30) and Barrow Shroud (40)
-  through the ordinary cost path; a short cast is refused with "Not enough Dread!"
+  whole point per hit so the pool stays an integer) and from allies falling
+  nearby. **Spent** by Shadow Pulse (`SHADOW_PULSE_DREAD`) through the ordinary cost
+  path; a short cast is refused with "Not enough Dread!"
   (both cost checks in `casting_lifecycle.ts`), re-localized by
   `error_text_i18n_core.ts` into a `devCommand.graveyardShift.*` key.
 - **Not persisted.** Offline only; `persistedResource` would write a warrior's Dread
@@ -148,19 +161,20 @@ SAY LINES (the living bots talk aloud, heard only up close).
   dealers may tunnel on them (the exploitable flaw).
 
 ## Kit effects
-- **Three effect kinds of their own** (`gshiftMark`, `gshiftMarkBurst`,
-  `gshiftRaiseFallen` in the `AbilityEffect` union), reached from
-  `combat/effect_dispatch.ts` by one-line delegations into `kit_effects.ts`.
-- **Barrow mark:** Gravecall stacks a `gshift_mark` aura on its target (up to 3,
-  refreshed each hit). **Burst:** Shadow Pulse first deals a bonus per mark to every
-  marked enemy it reaches and strips the marks, then its own blast lands.
+- **Three buttons, one idea each** (`kit.ts`; the first playtest found five too many
+  to learn mid-fight): Sexton's Chain picks a victim (pull, kick, silence), Shadow
+  Pulse is the heavy blast the party tries to kick, Raise the Fallen turns their
+  dead against them. The HUD teaches each with one hint line when it first becomes
+  useful (`src/ui/hud/vehicle/morthen_hint_view.ts`).
+- **One effect kind of its own** (`gshiftRaiseFallen` in the `AbilityEffect` union),
+  reached from `combat/effect_dispatch.ts` by a one-line delegation into
+  `kit_effects.ts`.
 - **Raise the Fallen:** the nearest corpse within reach that the run has not raised
   (a fallen adventurer or any dead creature) rises as a temporary skeleton owned by
   Morthen (aggressive, tracked with the allies). With nothing to raise, castAbility
   refuses before the cooldown through `graveyardShiftCastError` (both cast paths,
   beside the necromancy check), re-localized by the client error matcher.
-- The solo multiplier scales the burst bonus too (`soloEffect`), and the tooltips
-  read the resolved effects, so the bar shows what lands.
+- The tooltips read the resolved effects (`soloEffect`), so the bar shows what lands.
 
 ## The say lines
 - **Local only** (`bot_say.ts`): a LIVING adventurer speaks a keyed line on the
@@ -219,15 +233,15 @@ SAY LINES (the living bots talk aloud, heard only up close).
 | `morthen_identity.ts` | pure leaf: the identity aura, `hasMorthenIdentity`, the bare gear sentinels, `morthenBlocksAura` |
 | `morthen_profile.ts` | `applyMorthenProfile` and the pinned level, from the `morthen` template |
 | `morthen_transform.ts` | `applyMorthenIdentity` / `removeMorthenIdentity`, `knownAbilitiesFor` |
-| `kit.ts` | the mode-local kit `AbilityDef`s, their `KnownAbility` list and the bar's slot layout |
+| `kit.ts` | the three mode-local kit `AbilityDef`s, their `KnownAbility` list and the bar's slot layout |
 | `run_party.ts` | the fixed party, its spawn after the identity and its removal |
 | `hostility.ts` | pure leaf: the adventurer marker and the Morthen-versus-adventurer pair rule |
 | `death_intercept.ts` | the lethal-blow clamp `dealDamage` calls |
 | `run_allies.ts` | the two skeleton allies: spawn, engage stance, Dread on death, dismissal |
-| `bot_brain.ts` | pure leaf: reaction, interrupt and control rules, triage, target scoring, seeds |
+| `bot_brain.ts` | pure leaf: reaction, interrupt, kick-chance and control rules, ranges, triage, target scoring, seeds |
 | `bot_driver.ts` | the per-tick party driver through the real player verbs |
 | `dread.ts` | pure leaf: the Dread rate, the damage hook, the carry rule |
-| `kit_effects.ts` | the barrow mark, the mark burst, Raise the Fallen and its cast refusal |
+| `kit_effects.ts` | Raise the Fallen and its cast refusal |
 | `bot_lines.ts` | pure leaf: the say pools per trigger (line id, catalog key, English, role limits) |
 | `bot_say.ts` | the say observer: triggers, pacing, the private say Rng, the pid-routed emit |
 | `run_lifecycle.ts` | `canStartGraveyardShift`, `startGraveyardShift`, `endGraveyardShift`, `updateGraveyardShift` (the one tick entry, called just before the delve runs) |

@@ -6,6 +6,7 @@ import type { BotSteer } from '../bots/steer';
 import type { Rng } from '../rng';
 import type { ArenaReturnPools, InstanceSlot } from '../sim';
 import type { SimContext } from '../sim_context';
+import type { PlayerClass } from '../types';
 import type { BotSayState } from './bot_say';
 import type { MorthenParked } from './morthen_transform';
 
@@ -25,6 +26,7 @@ export interface BotBrainState {
 export interface GraveyardShiftBot {
   readonly pid: number;
   readonly role: 'tank' | 'healer' | 'dps';
+  readonly cls: PlayerClass;
   readonly brain: BotBrainState;
 }
 

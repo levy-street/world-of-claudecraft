@@ -10,11 +10,14 @@ import { carriedDread, DREAD_MAX } from './dread';
 
 export const MORTHEN_TEMPLATE_ID = 'morthen';
 
-// One player against a party: the template is tuned to lose to five players, and
-// on its raw numbers Morthen fell in 30 to 43 sec to the three-bot party without
-// killing anyone (headless probe, 2026-10-03). Owner decision: scale the boss,
-// not the party, and tune from the first playtest.
-export const MORTHEN_SOLO_HP_MULT = 3;
+// One player against a party: the template is tuned to lose to five players.
+// Owner decision: scale the boss, not the party. Tuned after the first playtest
+// (three bots and x3 health felt far too easy) against the full party of five,
+// on a headless probe over five seeds (2026-10-03): standing still, hitting
+// only the tank, or pressing buttons at random all lose; a sharp scripted
+// player (Chain the healer, Pulse into the melee, raise the dead) wins with a
+// median quarter of his health left.
+export const MORTHEN_SOLO_HP_MULT = 2;
 export const MORTHEN_SOLO_DAMAGE_MULT = 2;
 
 // The level the owner is pinned to for the run (the template's own level).
@@ -69,4 +72,8 @@ export function applyMorthenProfile(
   e.dodgeChance = 0.05;
   e.blockChance = 0;
   e.blockValue = 0;
+  // A boss's cast is never pushed back: with five adventurers landing hits, the
+  // classic player pushback (uncapped per hit) kept Shadow Pulse from ever
+  // finishing. Kicks still cut it.
+  e.castPushbackReduction = 1;
 }

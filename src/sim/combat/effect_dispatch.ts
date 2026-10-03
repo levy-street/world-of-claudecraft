@@ -28,7 +28,7 @@ import { dawnreaverDamageMultiplier } from '../dawnreaver_damage';
 import { logCascadeCast, recordCascadeInitial } from '../dev/cascade_playtest';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
-import { applyBarrowMark, burstBarrowMarks, raiseTheFallen } from '../graveyard_shift/kit_effects';
+import { raiseTheFallen } from '../graveyard_shift/kit_effects';
 import { incapacitateDrCategory } from '../incapacitate_dr';
 import { SCRIPTED_INTERRUPTIBLE_CHANNELS } from '../mob/healer_channel';
 import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
@@ -1668,12 +1668,6 @@ export function runEffects(
         });
         break;
       }
-      case 'gshiftMark':
-        applyBarrowMark(ctx, p, target, eff.maxStacks, eff.duration);
-        break;
-      case 'gshiftMarkBurst':
-        burstBarrowMarks(ctx, p, ability, eff.bonusPerStack, eff.radius);
-        break;
       case 'gshiftRaiseFallen':
         raiseTheFallen(ctx, p, eff.radius, eff.duration);
         break;

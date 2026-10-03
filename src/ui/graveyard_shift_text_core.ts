@@ -7,7 +7,6 @@
 
 import { adventurerMarkerAura } from '../sim/graveyard_shift/hostility';
 import { MORTHEN_KIT, soloEffect } from '../sim/graveyard_shift/kit';
-import { BARROW_MARK_NAME } from '../sim/graveyard_shift/kit_effects';
 import { morthenIdentityAura } from '../sim/graveyard_shift/morthen_identity';
 import type { AbilityDef, AbilityEffect } from '../sim/types';
 import { formatNumber, type InterpolationValues, type TranslationKey, t } from './i18n';
@@ -18,10 +17,6 @@ interface KitText {
 }
 
 const KIT_TEXT: Readonly<Record<string, KitText>> = {
-  gshift_gravecall: {
-    name: 'devCommand.graveyardShift.abilities.gravecall.name',
-    description: 'devCommand.graveyardShift.abilities.gravecall.description',
-  },
   gshift_shadow_pulse: {
     name: 'devCommand.graveyardShift.abilities.shadowPulse.name',
     description: 'devCommand.graveyardShift.abilities.shadowPulse.description',
@@ -30,17 +25,12 @@ const KIT_TEXT: Readonly<Record<string, KitText>> = {
     name: 'devCommand.graveyardShift.abilities.sextonsChain.name',
     description: 'devCommand.graveyardShift.abilities.sextonsChain.description',
   },
-  gshift_barrow_shroud: {
-    name: 'devCommand.graveyardShift.abilities.barrowShroud.name',
-    description: 'devCommand.graveyardShift.abilities.barrowShroud.description',
-  },
   gshift_raise_fallen: {
     name: 'devCommand.graveyardShift.abilities.raiseFallen.name',
     description: 'devCommand.graveyardShift.abilities.raiseFallen.description',
   },
 };
 
-const MARK_AURA_KEY: TranslationKey = 'devCommand.graveyardShift.markAura';
 const ADVENTURER_AURA_KEY: TranslationKey = 'devCommand.graveyardShift.adventurerAura';
 const ADVENTURER_AURA_NAME = adventurerMarkerAura(0).name;
 
@@ -74,7 +64,6 @@ export function graveyardShiftAbilityNameFromSource(name: string): string | null
  *  (which carries its ability's English name). Null for every other aura. */
 export function graveyardShiftAuraName(name: string): string | null {
   if (name === IDENTITY_AURA_NAME) return t(IDENTITY_AURA_KEY);
-  if (name === BARROW_MARK_NAME) return t(MARK_AURA_KEY);
   if (name === ADVENTURER_AURA_NAME) return t(ADVENTURER_AURA_KEY);
   return graveyardShiftAbilityNameFromSource(name);
 }
@@ -104,23 +93,12 @@ function slowPercent(speedMult: number | undefined): string {
 
 function descriptionValues(def: AbilityDef): InterpolationValues {
   switch (def.id) {
-    case 'gshift_gravecall': {
-      const hit = effectOf(def, 'directDamage');
-      return {
-        min: amount(hit?.min),
-        max: amount(hit?.max),
-        dread: amount(effectOf(def, 'gainResource')?.amount),
-        marks: amount(effectOf(def, 'gshiftMark')?.maxStacks),
-        markSeconds: amount(effectOf(def, 'gshiftMark')?.duration),
-      };
-    }
     case 'gshift_shadow_pulse': {
       const blast = effectOf(def, 'aoeDamage');
       const push = effectOf(def, 'aoeKnockback');
       return {
         min: amount(blast?.min),
         max: amount(blast?.max),
-        perMark: amount(effectOf(def, 'gshiftMarkBurst')?.bonusPerStack),
         radius: amount(blast?.radius),
         distance: amount(push?.distance),
         slow: slowPercent(push?.dazeMult),
@@ -140,10 +118,6 @@ function descriptionValues(def: AbilityDef): InterpolationValues {
     case 'gshift_raise_fallen': {
       const raise = effectOf(def, 'gshiftRaiseFallen');
       return { radius: amount(raise?.radius), seconds: amount(raise?.duration) };
-    }
-    case 'gshift_barrow_shroud': {
-      const shroud = effectOf(def, 'selfBuff');
-      return { pct: percent(shroud?.value), seconds: amount(shroud?.duration) };
     }
     default:
       return {};

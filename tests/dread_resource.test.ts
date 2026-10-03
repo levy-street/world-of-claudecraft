@@ -1,6 +1,6 @@
-// Morthen's Dread bar on a Graveyard Shift run: built by dealing damage and by
-// Gravecall, spent by Shadow Pulse and Barrow Shroud, capped at 100, carried
-// across every stat recalc, and handed back as the real resource on exit.
+// Morthen's Dread bar on a Graveyard Shift run: built by dealing damage, spent
+// by Shadow Pulse (the kit's only cost), capped at 100, carried across every
+// stat recalc, and handed back as the real resource on exit.
 import { describe, expect, it } from 'vitest';
 import { graveyardShiftRunFor } from '../src/sim/graveyard_shift';
 import {
@@ -9,7 +9,7 @@ import {
   DREAD_PER_DAMAGE,
   dreadForHit,
   dreadFromDamageDealt,
-  GRAVECALL_DREAD,
+  SHADOW_PULSE_DREAD,
 } from '../src/sim/graveyard_shift/dread';
 import { MORTHEN_KIT } from '../src/sim/graveyard_shift/kit';
 import { persistedResource } from '../src/sim/serialize_resource';
@@ -99,11 +99,16 @@ function strBuff(sourceId: number, remaining: number): Aura {
 const kitCost = (id: string) => MORTHEN_KIT.find((def) => def.id === id)!.cost;
 
 describe('Dread: the bar Morthen fights on', () => {
-  it('pins the kit costs: Pulse 30, Shroud 40, Gravecall and the Chain free', () => {
-    expect(kitCost('gshift_shadow_pulse')).toBe(30);
-    expect(kitCost('gshift_barrow_shroud')).toBe(40);
-    expect(kitCost('gshift_gravecall')).toBe(0);
+  it('pins the kit costs: Pulse 25, the Chain and Raise the Fallen free', () => {
+    expect(SHADOW_PULSE_DREAD).toBe(25);
+    expect(kitCost('gshift_shadow_pulse')).toBe(SHADOW_PULSE_DREAD);
     expect(kitCost('gshift_sextons_chain')).toBe(0);
+    expect(kitCost('gshift_raise_fallen')).toBe(0);
+    expect(MORTHEN_KIT.map((def) => def.id)).toEqual([
+      'gshift_sextons_chain',
+      'gshift_shadow_pulse',
+      'gshift_raise_fallen',
+    ]);
   });
 
   it.each(['warrior', 'mage'] as const)(
@@ -138,13 +143,13 @@ describe('Dread: the bar Morthen fights on', () => {
   });
 
   it('never holds a fractional pool the frame would round up to a refused cost', () => {
-    // Ten 59-damage hits: a fractional pool would sit at 29.5, read "30" on the
-    // frame, and refuse the 30 Dread Pulse. Whole points per hit make it 30.
+    // Five 98-damage hits: a fractional pool would sit at 24.5, read "25" on the
+    // frame, and refuse the 25 Dread Pulse. Whole points per hit make it 25.
     const sim = shiftSim('warrior');
     start(sim);
     const wolf = frozenWolfAhead(sim, 2);
-    for (let i = 0; i < 10; i++) hitWolf(sim, wolf, 59);
-    expect(sim.player.resource).toBe(30);
+    for (let i = 0; i < 5; i++) hitWolf(sim, wolf, 98);
+    expect(sim.player.resource).toBe(25);
     sim.castAbility('gshift_shadow_pulse');
     expect(errors(sim)).not.toContain('Not enough Dread!');
     expect(sim.player.castingAbility).toBe('gshift_shadow_pulse');
@@ -173,62 +178,39 @@ describe('Dread: the bar Morthen fights on', () => {
     expect(sim.player.resource).toBe(before);
   });
 
-  it('Gravecall grants its Dread on top of the Dread its own hit earns', () => {
-    const sim = shiftSim('warrior');
-    start(sim);
-    const wolf = frozenWolfAhead(sim, 6);
-    const dealtBefore = meta(sim).counters.damageDealt;
-    sim.castAbility('gshift_gravecall');
-    for (let i = 0; i < 40; i++) sim.tick();
-    const dealt = meta(sim).counters.damageDealt - dealtBefore;
-    expect(wolf.hp).toBeLessThan(wolf.maxHp);
-    expect(dealt).toBeGreaterThanOrEqual(20);
-    expect(sim.player.resource).toBe(GRAVECALL_DREAD + dreadForHit(dealt));
-  });
-
-  it('Gravecall states the grant it really gives', () => {
-    const gravecall = MORTHEN_KIT.find((def) => def.id === 'gshift_gravecall')!;
-    expect(gravecall.description).toContain(`generates ${GRAVECALL_DREAD} Dread`);
-  });
-
-  it('Barrow Shroud spends 40 and Shadow Pulse spends 30', () => {
+  it('Shadow Pulse spends its 25 Dread when it lands, not when it starts', () => {
     const sim = shiftSim('warrior');
     start(sim);
     sim.player.resource = 100;
-    sim.castAbility('gshift_barrow_shroud');
-    expect(sim.player.auras.some((a) => a.kind === 'shield_wall')).toBe(true);
-    expect(sim.player.resource).toBe(60);
     sim.castAbility('gshift_shadow_pulse');
     expect(sim.player.castingAbility).toBe('gshift_shadow_pulse');
+    expect(sim.player.resource).toBe(100);
     for (let i = 0; i < 20 * 3 && sim.player.castingAbility; i++) sim.tick();
     expect(sim.player.castingAbility).toBeNull();
     expect(sim.player.cooldowns.get('gshift_shadow_pulse') ?? 0).toBeGreaterThan(0);
-    expect(sim.player.resource).toBe(30);
+    expect(sim.player.resource).toBe(75);
   });
 
   it('refuses a cast it cannot pay with "Not enough Dread!" and spends nothing', () => {
     const sim = shiftSim('warrior');
     start(sim);
-    sim.player.resource = 29;
+    sim.player.resource = 24;
     sim.castAbility('gshift_shadow_pulse');
     expect(sim.player.castingAbility).toBeNull();
     expect(errors(sim)).toContain('Not enough Dread!');
     expect(errors(sim)).not.toContain('Not enough mana!');
-    sim.player.resource = 39;
-    sim.castAbility('gshift_barrow_shroud');
-    expect(sim.player.auras.some((a) => a.kind === 'shield_wall')).toBe(false);
-    expect(sim.player.resource).toBe(39);
-    expect(sim.player.cooldowns.has('gshift_barrow_shroud')).toBe(false);
+    expect(sim.player.resource).toBe(24);
+    expect(sim.player.cooldowns.has('gshift_shadow_pulse')).toBe(false);
   });
 
   it('refuses a Pulse whose Dread drained mid-cast, with the same message', () => {
     const sim = shiftSim('warrior');
     start(sim);
-    sim.player.resource = 30;
+    sim.player.resource = 25;
     sim.castAbility('gshift_shadow_pulse');
     expect(sim.player.castingAbility).toBe('gshift_shadow_pulse');
-    // Nothing drains Dread today (a Shroud is refused mid-cast); the commit-time
-    // check is the guard for any future drain.
+    // Nothing drains Dread today; the commit-time check is the guard for any
+    // future drain.
     sim.player.resource = 20;
     const seen: string[] = [];
     for (let i = 0; i < 20 * 3 && sim.player.castingAbility; i++) {
@@ -247,8 +229,7 @@ describe('Dread: the bar Morthen fights on', () => {
     sim.player.resource = 95;
     hitWolf(sim, wolf, 5000);
     expect(sim.player.resource).toBe(DREAD_MAX);
-    sim.castAbility('gshift_gravecall');
-    for (let i = 0; i < 40; i++) sim.tick();
+    hitWolf(sim, wolf, 200);
     expect(sim.player.resource).toBe(DREAD_MAX);
   });
 
@@ -358,15 +339,14 @@ describe('Dread on the HUD', () => {
     });
     const view = createMorthenActionBarView();
     const keys = (slot: number) => `${slot + 1}`;
-    const short = view.tick(player(29), null, keys).slots.map((slot) => slot.usable);
-    // Attack, Gravecall (no target), Pulse (29 < 30), Chain (no target), Shroud (29 < 40),
-    // Raise the Fallen (free, no target needed).
-    expect(short).toEqual([true, false, false, false, false, true]);
-    const paid = view.tick(player(40), null, keys).slots.map((slot) => slot.usable);
-    expect(paid).toEqual([true, false, true, false, true, true]);
-    expect(morthenSlotTooltipHtml(2)).toContain('30 Dread');
-    expect(morthenSlotTooltipHtml(4)).toContain('40 Dread');
-    expect(morthenSlotTooltipHtml(2)).toMatch(/tt-stat">30 Dread/);
+    const short = view.tick(player(24), null, keys).slots.map((slot) => slot.usable);
+    // Attack, Chain (no target), Pulse (24 < 25), Raise the Fallen (free, no
+    // target needed).
+    expect(short).toEqual([true, false, false, true]);
+    const paid = view.tick(player(25), null, keys).slots.map((slot) => slot.usable);
+    expect(paid).toEqual([true, false, true, true]);
+    expect(morthenSlotTooltipHtml(2)).toMatch(/tt-stat">25 Dread/);
     expect(morthenSlotTooltipHtml(1)).not.toMatch(/tt-stat">[^<]*Dread/);
+    expect(morthenSlotTooltipHtml(3)).not.toMatch(/tt-stat">[^<]*Dread/);
   });
 });

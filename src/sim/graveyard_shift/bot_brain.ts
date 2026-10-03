@@ -5,7 +5,7 @@
 // Randomness comes only from each bot's private Rng.
 
 import type { Rng } from '../rng';
-import type { AbilityDef } from '../types';
+import type { AbilityDef, PlayerClass } from '../types';
 
 // A bot thinks five times a second, its decisions staggered across the party.
 export const BOT_THINK_INTERVAL_TICKS = 4;
@@ -20,8 +20,28 @@ export const PARTY_ENGAGE_RADIUS = 12;
 
 export type BotRole = 'tank' | 'healer' | 'dps';
 
-// Where each role wants to stand from its target (the tank in melee).
-export const ROLE_RANGE: Record<BotRole, number> = { tank: 2.5, healer: 18, dps: 22 };
+// Where each bot wants to stand from its target: the tank and the rogue in
+// melee, the casters and the hunter at range.
+const MELEE_RANGE_GOAL = 2.5;
+export const ROLE_RANGE: Record<BotRole, number> = { tank: MELEE_RANGE_GOAL, healer: 18, dps: 22 };
+export function botRange(role: BotRole, cls: PlayerClass): number {
+  return cls === 'rogue' ? MELEE_RANGE_GOAL : ROLE_RANGE[role];
+}
+
+// The interrupt each class reaches for at level 10, and how often a pickup
+// player of that class notices a given cast and goes for it (the rest of the
+// time it is busy with its own buttons). The tank is the party's kicker; the
+// hunter has Counter Shot but plays the pickup hunter who never presses it.
+export const BOT_KICK: Partial<Record<PlayerClass, { ability: string; chance: number }>> = {
+  warrior: { ability: 'pummel', chance: 0.45 },
+  rogue: { ability: 'kick', chance: 0.3 },
+  mage: { ability: 'counterspell', chance: 0.2 },
+};
+
+export function willKick(cls: PlayerClass, rng: Rng): boolean {
+  const kick = BOT_KICK[cls];
+  return kick !== undefined && rng.chance(kick.chance);
+}
 
 export function reactionDelayTicks(rng: Rng): number {
   return rng.int(BOT_REACTION_MIN_TICKS, BOT_REACTION_MAX_TICKS);

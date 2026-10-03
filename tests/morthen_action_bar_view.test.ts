@@ -44,10 +44,8 @@ describe('morthen action bar view', () => {
   it('lays out Attack then the kit in MORTHEN_KIT order', () => {
     expect(MORTHEN_BAR_SLOTS.map((def) => def?.id ?? 'attack')).toEqual([
       'attack',
-      'gshift_gravecall',
-      'gshift_shadow_pulse',
       'gshift_sextons_chain',
-      'gshift_barrow_shroud',
+      'gshift_shadow_pulse',
       'gshift_raise_fallen',
     ]);
     const state = createMorthenActionBarView().tick(player(), null, keys);
@@ -56,41 +54,31 @@ describe('morthen action bar view', () => {
       'ability',
       'ability',
       'ability',
-      'ability',
-      'ability',
     ]);
     expect(state.slots.slice(1).map((slot) => slot.abilityId)).toEqual(
       MORTHEN_KIT.map((def) => def.id),
     );
     expect(morthenSlotAbility(0)).toBeNull();
-    expect(morthenSlotAbility(6)).toBeNull();
+    expect(morthenSlotAbility(4)).toBeNull();
   });
 
   it('labels every slot with its key and a localized name, never a raw id', () => {
     const state = createMorthenActionBarView().tick(player(), null, keys);
-    expect(state.slots.map((slot) => slot.keybindLabel)).toEqual([
-      'K1',
-      'K2',
-      'K3',
-      'K4',
-      'K5',
-      'K6',
-    ]);
+    expect(state.slots.map((slot) => slot.keybindLabel)).toEqual(['K1', 'K2', 'K3', 'K4']);
     expect(state.slots[0].ariaLabel).toBe('Action slot 1: Attack');
-    expect(state.slots[1].ariaLabel).toBe('Action slot 2: Gravecall');
-    expect(state.slots[3].ariaLabel).toBe("Action slot 4: Sexton's Chain");
+    expect(state.slots[1].ariaLabel).toBe("Action slot 2: Sexton's Chain");
+    expect(state.slots[2].ariaLabel).toBe('Action slot 3: Shadow Pulse');
+    expect(state.slots[3].ariaLabel).toBe('Action slot 4: Raise the Fallen');
     for (const slot of state.slots) expect(slot.ariaLabel).not.toMatch(/gshift_/);
-    expect(state.slots[1].ariaDescription).toContain('40 to 64 Shadow damage');
+    expect(state.slots[2].ariaDescription).toContain('24 to 36 Shadow damage');
   });
 
   it('borrows shipped ability icons for the kit and the Attack art for slot 0', () => {
     const state = createMorthenActionBarView().tick(player(), null, keys);
     expect(state.slots.map((slot) => slot.iconKey)).toEqual([
       'attack',
-      'shadow_bolt',
-      'psychic_scream',
       'oath_chain',
-      'shellskin',
+      'psychic_scream',
       'raise_skeletal_warrior',
     ]);
   });
@@ -101,50 +89,52 @@ describe('morthen action bar view', () => {
       null,
       keys,
     );
-    const chain = state.slots[3];
+    const chain = state.slots[1];
     expect(chain.cooldownRemaining).toBe(9);
     expect(chain.cooldownTotal).toBe(18);
     expect(chain.cooldownPercent).toBe(50);
     expect(chain.cdText).toBe('9');
-    expect(state.slots[1].cooldownPercent).toBe(0);
+    expect(state.slots[2].cooldownPercent).toBe(0);
   });
 
-  it('sweeps the global cooldown on GCD abilities but not on Barrow Shroud', () => {
+  it('sweeps the global cooldown on every kit ability but never on Attack', () => {
+    expect(MORTHEN_KIT.every((def) => !def.offGcd)).toBe(true);
     const state = createMorthenActionBarView().tick(player({ gcdRemaining: 0.75 }), null, keys);
-    const [attack, gravecall, pulse, chain, shroud] = state.slots;
-    expect(gravecall.cooldownTotal).toBe(GCD);
-    expect(gravecall.cooldownPercent).toBe(50);
-    expect(gravecall.cdText).toBe('');
-    expect(pulse.cooldownPercent).toBe(50);
-    expect(chain.cooldownPercent).toBe(50);
-    expect(shroud.cooldownPercent).toBe(0);
+    const [attack, ...kit] = state.slots;
+    for (const slot of kit) {
+      expect(slot.cooldownTotal).toBe(GCD);
+      expect(slot.cooldownPercent).toBe(50);
+      expect(slot.cdText).toBe('');
+    }
     expect(attack.cooldownPercent).toBe(0);
   });
 
   it('keeps the longer of the cooldown and the GCD', () => {
     const state = createMorthenActionBarView().tick(
-      player({ gcdRemaining: 1, cooldowns: new Map([['gshift_gravecall', 3]]) }),
+      player({ gcdRemaining: 1, cooldowns: new Map([['gshift_raise_fallen', 7.5]]) }),
       null,
       keys,
     );
-    expect(state.slots[1].cooldownRemaining).toBe(3);
-    expect(state.slots[1].cooldownPercent).toBe(50);
+    expect(state.slots[3].cooldownRemaining).toBe(7.5);
+    expect(state.slots[3].cooldownPercent).toBe(50);
   });
 
   it('greys targeted abilities without a living target and tints them out of range', () => {
     const view = createMorthenActionBarView();
     let state = view.tick(player(), null, keys);
     expect(state.slots[1].usable).toBe(false);
-    expect(state.slots[3].usable).toBe(false);
     expect(state.slots[2].usable).toBe(true);
-    expect(state.slots[4].usable).toBe(true);
+    expect(state.slots[3].usable).toBe(true);
 
-    state = view.tick(player(), target(22), keys);
+    state = view.tick(player(), target(30), keys);
     expect(state.slots[1].usable).toBe(true);
     expect(state.slots[1].outOfRange).toBe(true);
-    expect(state.slots[3].outOfRange).toBe(false);
-    expect(state.slots[0].outOfRange).toBe(true);
     expect(state.slots[2].outOfRange).toBe(false);
+    expect(state.slots[3].outOfRange).toBe(false);
+
+    state = view.tick(player(), target(22), keys);
+    expect(state.slots[1].outOfRange).toBe(false);
+    expect(state.slots[0].outOfRange).toBe(true);
 
     state = view.tick(player(), target(4), keys);
     expect(state.slots[0].outOfRange).toBe(false);
@@ -195,17 +185,19 @@ describe('morthen action bar view', () => {
     expect(pulse).toContain('10 sec cooldown');
     expect(pulse).toContain('24 to 36 Shadow damage');
     expect(pulse).not.toContain('yd range');
-    const gravecall = morthenSlotTooltipHtml(1);
-    expect(gravecall).toContain('Instant');
-    expect(gravecall).toContain('20');
+    expect(pulse).not.toContain('barrow');
     expect(morthenSlotTooltipHtml(2, 1)).toContain('1 sec cast');
-    const chain = morthenSlotTooltipHtml(3);
+    const chain = morthenSlotTooltipHtml(1);
     expect(chain).toContain('Chain</div>');
+    expect(chain).toContain('Instant');
     expect(chain).toContain('25 yd range');
     expect(chain).toContain('silenced for 2 sec');
-    expect(morthenSlotTooltipHtml(4)).toContain('reducing all damage you take by 60% for 6 sec');
+    const raise = morthenSlotTooltipHtml(3);
+    expect(raise).toContain('15 sec cooldown');
+    expect(raise).toContain('within 20 yards');
+    expect(raise).toContain('for 20 sec');
     expect(morthenSlotTooltipHtml(0)).toContain('Attack');
-    for (let slot = 0; slot < 5; slot++)
+    for (let slot = 0; slot < 4; slot++)
       expect(morthenSlotTooltipHtml(slot)).not.toMatch(/gshift_/);
   });
 });
@@ -230,12 +222,12 @@ describe('morthen slot routing', () => {
     expect(morthenControlsActive({})).toBe(false);
   });
 
-  it('casts the kit by id from slots 1 to 5', () => {
+  it('casts the kit by id from slots 1 to 3', () => {
     const w = world(true);
-    for (let slot = 1; slot <= 5; slot++) morthenChooseSlot(w, slot);
+    for (let slot = 1; slot <= 3; slot++) morthenChooseSlot(w, slot);
     expect(w.castAbility.mock.calls.map(([id]) => id)).toEqual(MORTHEN_KIT.map((def) => def.id));
-    morthenChooseSlot(w, 6);
-    expect(w.castAbility).toHaveBeenCalledTimes(5);
+    morthenChooseSlot(w, 4);
+    expect(w.castAbility).toHaveBeenCalledTimes(3);
   });
 
   it('toggles auto-attack from slot 0', () => {

@@ -130,10 +130,9 @@ describe('Graveyard Shift say lines (run)', () => {
     expect(heardBy(heard, sim.playerId)).toEqual([]);
   });
 
-  it('dead bots never speak: with two down only the survivor talks', () => {
+  it('dead bots never speak: with four down only the survivor talks', () => {
     const { sim, run } = shiftSim();
-    kill(sim, botEntity(sim, run, 'dps'));
-    kill(sim, botEntity(sim, run, 'healer'));
+    for (const bot of run.bots) if (bot.role !== 'tank') kill(sim, sim.entities.get(bot.pid)!);
     const heard = heardBy(runTicks(sim, BOT_SAY_BOT_COOLDOWN_TICKS + 20), sim.playerId);
     const tank = botEntity(sim, run, 'tank');
     expect(heard.map((h) => triggerOf(h.ev))).toEqual(['death', 'wipeThreat']);

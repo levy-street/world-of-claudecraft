@@ -66,7 +66,20 @@ describe('Graveyard Shift adventurers', () => {
   it('fields the fixed party at level 10 in the chamber, as plain unflagged players', () => {
     const sim = shiftSim();
     const run = start(sim);
-    expect(run.bots.map((b) => b.role)).toEqual(['tank', 'healer', 'dps']);
+    expect(run.bots.map((b) => [b.role, b.cls])).toEqual([
+      ['tank', 'warrior'],
+      ['healer', 'priest'],
+      ['dps', 'mage'],
+      ['dps', 'hunter'],
+      ['dps', 'rogue'],
+    ]);
+    expect(GRAVEYARD_SHIFT_PARTY.map((member) => member.name)).toEqual([
+      'Bulwarkbro',
+      'Mendolyn',
+      'Pyrotechnic',
+      'Arrowsmith',
+      'Stabbyjoe',
+    ]);
     run.bots.forEach((bot, i) => {
       const e = sim.entities.get(bot.pid)!;
       const m = meta(sim, bot.pid);

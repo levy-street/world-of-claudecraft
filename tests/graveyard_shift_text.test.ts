@@ -20,10 +20,8 @@ import {
 } from '../src/ui/graveyard_shift_text_core';
 
 const NAMES: Record<string, string> = {
-  gshift_gravecall: 'Gravecall',
-  gshift_shadow_pulse: 'Shadow Pulse',
   gshift_sextons_chain: "Sexton's Chain",
-  gshift_barrow_shroud: 'Barrow Shroud',
+  gshift_shadow_pulse: 'Shadow Pulse',
   gshift_raise_fallen: 'Raise the Fallen',
 };
 
@@ -68,24 +66,23 @@ describe('Graveyard Shift display text', () => {
     expect(graveyardShiftAuraName(identity.name)).toBe('Morthen the Gravecaller');
     expect(auraDisplayNameFromSource(identity.name)).toBe('Morthen the Gravecaller');
     expect(auraDisplayNameForHud(identity.name, null)).toBe('Morthen the Gravecaller');
-    expect(auraDisplayNameForHud('Barrow Shroud', null)).toBe('Barrow Shroud');
-    expect(graveyardShiftAuraName('Barrow Shroud')).toBe('Barrow Shroud');
+    // The Chain's silence and slow, and the Pulse's daze, carry their ability's name.
+    expect(auraDisplayNameForHud("Sexton's Chain", null)).toBe("Sexton's Chain");
+    expect(graveyardShiftAuraName("Sexton's Chain")).toBe("Sexton's Chain");
+    expect(graveyardShiftAuraName('Shadow Pulse')).toBe('Shadow Pulse');
     expect(graveyardShiftAuraName('Fortitude')).toBeNull();
+    // The retired kit names no longer resolve through this module.
+    expect(graveyardShiftAuraName('Marked for the Barrow')).toBeNull();
+    expect(graveyardShiftAuraName('Barrow Shroud')).toBeNull();
   });
 
   it('describes each kit ability with the numbers its effects carry', () => {
     const text = (id: string) => graveyardShiftAbilityDescription(id)!;
-    expect(text('gshift_gravecall')).toBe(
-      'Hurl a bolt of grave shadow at your target for 40 to 64 Shadow damage and mark it for the barrow for 15 sec, stacking up to 3 marks. Generates 10 Dread.',
-    );
     expect(text('gshift_shadow_pulse')).toBe(
-      'Release a pulse of shadow that deals 24 to 36 Shadow damage to each enemy within 12 yards in your line of sight, plus 16 Shadow damage for each barrow mark it carries, consuming the marks. Each enemy hit is knocked back 8 yards and slowed by 30% for 3 sec.',
+      'Release a pulse of shadow that deals 24 to 36 Shadow damage to each enemy within 12 yards in your line of sight. Each enemy hit is knocked back 8 yards and slowed by 30% for 3 sec.',
     );
     expect(text('gshift_sextons_chain')).toBe(
       'Drag your target to within 3 yards of you and slow it by 50% for 2 sec. A spell it is casting is interrupted and that school is locked for 2 sec, and the target is silenced for 2 sec.',
-    );
-    expect(text('gshift_barrow_shroud')).toBe(
-      'Wrap yourself in grave mist, reducing all damage you take by 60% for 6 sec. Usable during the global cooldown, and does not trigger it.',
     );
     expect(text('gshift_raise_fallen')).toBe(
       'Raise the nearest corpse within 20 yards as a skeleton that fights for you for 20 sec. Each corpse rises only once.',
@@ -94,13 +91,16 @@ describe('Graveyard Shift display text', () => {
   });
 
   it('reads the numbers live from the kit, not from the copy', () => {
-    const def = kitDef('gshift_gravecall');
-    const hit = def.effects[0] as { min: number; max: number };
+    const def = kitDef('gshift_shadow_pulse');
+    const hit = def.effects.find((effect) => effect.type === 'aoeDamage') as {
+      min: number;
+      max: number;
+    };
     const { min, max } = hit;
-    hit.min = 21;
-    hit.max = 33;
+    hit.min = 13;
+    hit.max = 19;
     try {
-      expect(graveyardShiftAbilityDescription(def.id)).toContain('42 to 66 Shadow damage');
+      expect(graveyardShiftAbilityDescription(def.id)).toContain('26 to 38 Shadow damage');
     } finally {
       hit.min = min;
       hit.max = max;

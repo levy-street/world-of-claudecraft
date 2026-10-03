@@ -43,11 +43,13 @@ describe('Graveyard Shift names under the pseudo-locale', () => {
     expect(PSEUDO.identityAura).not.toBe(identity);
     expect(auraDisplayNameFromSource(identity)).toBe(PSEUDO.identityAura);
     expect(auraDisplayNameForHud(identity, null)).toBe(PSEUDO.identityAura);
-    expect(auraDisplayNameForHud('Barrow Shroud', null)).toBe(PSEUDO.abilities.barrowShroud.name);
+    expect(auraDisplayNameForHud("Sexton's Chain", null)).toBe(PSEUDO.abilities.sextonsChain.name);
   });
 
   it('keys combat-event names and cast-bar ids for the kit', () => {
-    expect(abilityDisplayNameFromSource('Gravecall')).toBe(PSEUDO.abilities.gravecall.name);
+    expect(abilityDisplayNameFromSource('Raise the Fallen')).toBe(
+      PSEUDO.abilities.raiseFallen.name,
+    );
     expect(abilityDisplayNameFromSource("Sexton's Chain")).toBe(PSEUDO.abilities.sextonsChain.name);
     expect(castDisplayName('gshift_shadow_pulse')).toBe(PSEUDO.abilities.shadowPulse.name);
   });

@@ -55,8 +55,8 @@ describe('Graveyard Shift run shell', () => {
     expect(run!.slot.partyKey).toBe(`gshift:${sim.playerId}`);
     expect(dungeonAt(sim.player.pos.x)?.id).toBe('hollow_crypt');
     expect(sim.player.facing).toBeCloseTo(Math.PI);
-    // The only spawns are the three adventurers, in roster order.
-    expect(run!.bots.map((b) => b.pid)).toEqual([nextIdBefore, nextIdBefore + 1, nextIdBefore + 2]);
+    // The only spawns are the five adventurers, in roster order.
+    expect(run!.bots.map((b) => b.pid)).toEqual([0, 1, 2, 3, 4].map((i) => nextIdBefore + i));
     expect(run!.slot.mobIds).toEqual([]);
   });
 

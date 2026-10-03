@@ -1,6 +1,6 @@
 // Pure view core for the Graveyard Shift bar: while the player holds the Morthen
-// identity, six slots replace the action bar. Slot 0 toggles auto-attack, slots
-// 1 to 5 are the mode-local kit in MORTHEN_KIT order, so the default keys 1 to 6
+// identity, four slots replace the action bar. Slot 0 toggles auto-attack, slots
+// 1 to 3 are the mode-local kit in MORTHEN_KIT order, so the default keys 1 to 4
 // drive them. The state array is allocated once and mutated in place each tick
 // (the action-bar family's allocation contract); the controller paints it through
 // ActionBarPainter.
@@ -19,10 +19,8 @@ import { type ActionBarState, makeSlotState } from '../action_bar/action_bar_vie
 
 /** Icon art borrowed from shipped abilities until the kit gets its own. */
 const KIT_ICON_KEYS: Readonly<Record<string, string>> = {
-  gshift_gravecall: 'shadow_bolt',
   gshift_shadow_pulse: 'psychic_scream',
   gshift_sextons_chain: 'oath_chain',
-  gshift_barrow_shroud: 'shellskin',
   gshift_raise_fallen: 'raise_skeletal_warrior',
 };
 export const MORTHEN_ATTACK_ICON_KEY = 'attack';

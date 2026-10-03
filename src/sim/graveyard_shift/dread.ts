@@ -1,8 +1,8 @@
 // Dread, Morthen's resource on a Graveyard Shift run: 0 to 100, starts empty,
 // never regenerates or decays (updateRegen has no 'dread' arm). It is earned by
 // dealing damage (the rage-from-damage-dealt hook in combat/damage.ts calls
-// dreadFromDamageDealt) and by Gravecall's gainResource effect, and spent by
-// Shadow Pulse and Barrow Shroud through the ordinary cost path. A pure leaf:
+// dreadFromDamageDealt) and by allies falling nearby, and spent by Shadow
+// Pulse through the ordinary cost path. A pure leaf:
 // combat/damage.ts and the profile import it without a cycle. Draws no rng.
 
 import type { Entity, ResourceType } from '../types';
@@ -13,13 +13,11 @@ export const DREAD_MAX = 100;
 // point per hit so the pool stays an integer: the frame text (rounded) then
 // never shows a cost the cast refuses, and no float drift leaves a pool a hair
 // under a cost. Rounding to nearest keeps the average rate. Rate check, with
-// the solo damage multiplier (morthen_profile.ts): the swing (82 to 130 every
-// 2.6 sec) and Gravecall (40 to 64 every 6 sec) deal about 49 damage a second
-// before mitigation, so about 2.4 Dread a second, and Gravecall's own grant
-// (GRAVECALL_DREAD every 6 sec) adds about 1.7 more: a 30 Dread Shadow Pulse
-// every 7 to 8 sec of steady hitting, a little slower against armor or misses.
+// the solo damage multiplier (morthen_profile.ts): the swing alone earns about
+// 5 Dread a hit, so a Pulse every four or five swings of steady melee, which
+// is what keeps Morthen in the party's face rather than kiting.
 export const DREAD_PER_DAMAGE = 1 / 20;
-export const GRAVECALL_DREAD = 10;
+export const SHADOW_PULSE_DREAD = 25;
 // One of Morthen's allies falling close to him feeds his Dread (concept rule).
 export const ALLY_DEATH_DREAD = 15;
 export const ALLY_DEATH_DREAD_RADIUS = 20;

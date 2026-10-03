@@ -164,7 +164,7 @@ export function endGraveyardShift(
   releaseGraveyardShiftSlot(ctx, run.slot, run.key);
 }
 
-// A kit bolt still in flight must not land from the restored real character.
+// Anything Morthen still has in flight must not land from the restored real character.
 function fizzleProjectilesFrom(ctx: SimContext, pid: number): void {
   const retained = ctx.pendingProjectiles.filter((proj) => proj.sourceId !== pid);
   if (retained.length === ctx.pendingProjectiles.length) return;

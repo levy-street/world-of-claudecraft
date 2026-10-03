@@ -12,15 +12,16 @@ import { angleTo, dist2d, type Entity, MELEE_RANGE, steadyAngleTo } from '../typ
 import {
   BOT_THINK_INTERVAL_TICKS,
   type BotRole,
+  botRange,
   type HealCandidate,
   interruptAllowed,
   isControlAbility,
   PARTY_ENGAGE_RADIUS,
   pickHealTarget,
   pickTarget,
-  ROLE_RANGE,
   reactionDelayTicks,
   type TargetCandidate,
+  willKick,
 } from './bot_brain';
 import type { GraveyardShiftBot, GraveyardShiftRun } from './run_state';
 
@@ -67,20 +68,24 @@ function think(
   boss: Entity,
 ): void {
   const b = bot.brain;
-  // Stimulus: Morthen starts a cast. Each interrupter schedules its reaction. A
-  // pushed-back bar (damage delays the cast) is the same cast, not a new one;
-  // the kit's casts all sit on cooldowns, so a recast always follows a gap.
+  // Stimulus: Morthen starts a cast. Each interrupter that notices it schedules
+  // its reaction. A pushed-back bar (damage delays the cast) is the same cast,
+  // not a new one; the kit's casts all sit on cooldowns, so a recast always
+  // follows a gap.
   const casting = boss.castingAbility;
   const freshCast = !!casting && casting !== b.seenCast;
   b.seenCast = casting;
-  if (freshCast) b.kickAt = ctx.tickCount + reactionDelayTicks(b.rng);
-  else if (!casting) b.kickAt = null;
+  if (freshCast) {
+    b.kickAt = willKick(bot.cls, b.rng) ? ctx.tickCount + reactionDelayTicks(b.rng) : null;
+  } else if (!casting) b.kickAt = null;
   const target = chooseTarget(ctx, run, bot, e, boss);
   b.goalId =
     bot.role === 'healer' ? (healerAnchor(ctx, run, e)?.id ?? boss.id) : (target?.id ?? null);
   if (target && e.targetId !== target.id) ctx.targetEntity(target.id, bot.pid);
   if (bot.role === 'healer') thinkHealer(ctx, run, bot, e, boss);
   else if (bot.role === 'tank') thinkTank(ctx, bot, e, boss, target);
+  else if (bot.cls === 'rogue') thinkRogue(ctx, bot, e, boss, target);
+  else if (bot.cls === 'hunter') thinkHunter(ctx, bot, e, target);
   else thinkDps(ctx, bot, e, boss, target);
 }
 
@@ -151,6 +156,41 @@ function thinkDps(
   if (!target || e.castingAbility) return;
   const filler = bot.brain.rng.chance(0.5) ? 'frostbolt' : 'fireball';
   tryCast(ctx, bot, e, filler, target);
+}
+
+// The rogue builds combo points with Sinister Strike and spends four or more
+// on Eviscerate, swinging in melee between.
+function thinkRogue(
+  ctx: SimContext,
+  bot: GraveyardShiftBot,
+  e: Entity,
+  boss: Entity,
+  target: Entity | null,
+): void {
+  if (kickReady(ctx, bot, boss) && kick(ctx, bot, e, 'kick', boss)) return;
+  if (!target) return;
+  if (dist2d(e.pos, target.pos) <= MELEE_RANGE && !e.autoAttack) ctx.startAutoAttack(bot.pid);
+  if (e.comboPoints >= 4 && tryCast(ctx, bot, e, 'eviscerate', target)) return;
+  tryCast(ctx, bot, e, 'sinister_strike', target);
+}
+
+// The hunter shoots from range: Auto Shot, Serpent Sting kept up, Arcane Shot on
+// cooldown, and Raptor Strike when something gets inside the dead zone.
+function thinkHunter(
+  ctx: SimContext,
+  bot: GraveyardShiftBot,
+  e: Entity,
+  target: Entity | null,
+): void {
+  if (!target) return;
+  if (!e.autoAttack) ctx.startAutoAttack(bot.pid);
+  if (dist2d(e.pos, target.pos) <= MELEE_RANGE) {
+    tryCast(ctx, bot, e, 'raptor_strike', target);
+    return;
+  }
+  const stung = target.auras.some((a) => a.id === 'serpent_sting' && a.sourceId === e.id);
+  if (!stung && tryCast(ctx, bot, e, 'serpent_sting', target)) return;
+  tryCast(ctx, bot, e, 'arcane_shot', target);
 }
 
 function thinkHealer(
@@ -269,7 +309,7 @@ function move(
     input.forward = false;
     return;
   }
-  const want = ROLE_RANGE[bot.role];
+  const want = botRange(bot.role, bot.cls);
   const far = dist2d(e.pos, goal.pos) > want;
   if (far || !ctx.hasLineOfSight(e, goal)) {
     input.forward = true;

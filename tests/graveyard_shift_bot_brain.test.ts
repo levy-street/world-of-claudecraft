@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { ABILITIES } from '../src/sim/data';
 import { graveyardShiftRunFor } from '../src/sim/graveyard_shift';
 import {
+  BOT_KICK,
   BOT_REACTION_MAX_TICKS,
   BOT_REACTION_MIN_TICKS,
   BOT_THINK_INTERVAL_TICKS,
+  botRange,
   botSeed,
   graveyardShiftRunSeed,
   interruptAllowed,
@@ -12,6 +14,7 @@ import {
   pickHealTarget,
   pickTarget,
   reactionDelayTicks,
+  willKick,
 } from '../src/sim/graveyard_shift/bot_brain';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
@@ -169,7 +172,7 @@ describe('Graveyard Shift party in a real fight', () => {
     expect(sim.player.auras.some((a) => a.kind === 'lockout')).toBe(true);
   });
 
-  it('every interrupter waits out a reaction delay after it perceives the cast', () => {
+  it('every kicker that goes for the cast waits out a reaction delay; others never do', () => {
     const { sim, run } = shiftSim();
     engage(sim, run);
     runTicks(sim, 40);
@@ -185,8 +188,10 @@ describe('Graveyard Shift party in a real fight', () => {
         }
       }
     }
-    expect(seen.size).toBe(run.bots.length);
-    for (const delay of seen.values()) {
+    expect(seen.size).toBeGreaterThan(0);
+    for (const [pid, delay] of seen) {
+      const bot = run.bots.find((b) => b.pid === pid)!;
+      expect(BOT_KICK[bot.cls]).toBeDefined();
       expect(delay).toBeGreaterThanOrEqual(BOT_REACTION_MIN_TICKS - BOT_THINK_INTERVAL_TICKS);
     }
     expect(Math.min(...seen.values())).toBeGreaterThan(0);
@@ -254,5 +259,54 @@ describe('Graveyard Shift party in a real fight', () => {
     runTicks(sim, 40);
     const after = [...(sim as any).players.get(healer.id).deedsEarned.keys()];
     expect(after.filter((id: string) => !earned.has(id))).toEqual([]);
+  });
+});
+
+describe('Graveyard Shift kick discipline and reach (pure)', () => {
+  it('only the warrior, the rogue and the mage carry an interrupt, the tank most eager', () => {
+    expect(BOT_KICK.warrior?.ability).toBe('pummel');
+    expect(BOT_KICK.rogue?.ability).toBe('kick');
+    expect(BOT_KICK.mage?.ability).toBe('counterspell');
+    expect(BOT_KICK.hunter).toBeUndefined();
+    expect(BOT_KICK.priest).toBeUndefined();
+    const chance = (cls: 'warrior' | 'rogue' | 'mage') => BOT_KICK[cls]!.chance;
+    expect(chance('warrior')).toBeGreaterThan(chance('rogue'));
+    expect(chance('rogue')).toBeGreaterThan(chance('mage'));
+    expect(chance('mage')).toBeGreaterThan(0);
+    expect(chance('warrior')).toBeLessThan(1);
+  });
+
+  it('a hunter or a priest never kicks and draws nothing from its stream', () => {
+    for (const cls of ['hunter', 'priest'] as const) {
+      const rng = new Rng(7);
+      const twin = new Rng(7);
+      for (let i = 0; i < 200; i++) expect(willKick(cls, rng)).toBe(false);
+      expect(rng.next()).toBe(twin.next());
+    }
+  });
+
+  it.each(['warrior', 'rogue', 'mage'] as const)(
+    'a %s rolls its own kick chance on its private stream',
+    (cls) => {
+      const rng = new Rng(11);
+      const twin = new Rng(11);
+      const p = BOT_KICK[cls]!.chance;
+      let kicks = 0;
+      const n = 4000;
+      for (let i = 0; i < n; i++) {
+        const kicked = willKick(cls, rng);
+        expect(kicked).toBe(twin.chance(p));
+        if (kicked) kicks++;
+      }
+      expect(Math.abs(kicks / n - p)).toBeLessThan(0.03);
+    },
+  );
+
+  it('the rogue fights in melee beside the tank; the hunter and mage stay at range', () => {
+    expect(botRange('tank', 'warrior')).toBe(botRange('dps', 'rogue'));
+    expect(botRange('dps', 'rogue')).toBeLessThan(3);
+    expect(botRange('dps', 'hunter')).toBe(22);
+    expect(botRange('dps', 'mage')).toBe(22);
+    expect(botRange('healer', 'priest')).toBe(18);
   });
 });

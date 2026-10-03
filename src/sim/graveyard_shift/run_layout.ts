@@ -15,12 +15,14 @@ export const GRAVEYARD_SHIFT_ARRIVAL = { x: 0, z: 92, facing: Math.PI } as const
 // The prototype party waits inside Morthen's chamber, in line of sight of the
 // arrival point (owner decision: the concept's "busy in the next room" opening
 // comes with the final version). Ordered by roster index: spawn order is fixed.
-// They stand 18 to 22 yards out, past the party's engage radius, so they wait
+// They stand 16 to 22 yards out, past the party's engage radius, so they wait
 // until Morthen walks up to them or hits one.
 export const GRAVEYARD_SHIFT_BOT_SPOTS: readonly { x: number; z: number }[] = [
   { x: -3, z: 74 },
   { x: 2, z: 70 },
   { x: 6, z: 72 },
+  { x: -6, z: 71 },
+  { x: 3, z: 76 },
 ];
 
 // Morthen's two skeleton allies rise at his sides on arrival.

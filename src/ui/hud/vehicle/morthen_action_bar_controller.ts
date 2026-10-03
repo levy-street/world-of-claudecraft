@@ -1,4 +1,4 @@
-// The Graveyard Shift bar: while the player holds the Morthen identity, six
+// The Graveyard Shift bar: while the player holds the Morthen identity, four
 // slots (Attack plus the kit) stand in for the action, stance and pet bars, which
 // the morthen-shift body class hides. Same family as the cloak bar: the pure view
 // core (morthen_action_bar_view.ts) painted through the PainterHost writers, the
@@ -17,13 +17,25 @@ import { iconDataUrl } from '../../icons';
 import type { PainterHostWriters } from '../../painter_host';
 import { ActionBarPainter, type ActionBarSlotElements } from '../action_bar/action_bar_painter';
 import { createMorthenActionBarView, morthenSlotTooltipHtml } from './morthen_action_bar_view';
+import {
+  createMorthenHints,
+  type MorthenHintId,
+  morthenCorpseInReach,
+  morthenHintText,
+} from './morthen_hint_view';
 
 export const MORTHEN_SHIFT_BODY_CLASS = 'morthen-shift';
 
 export class MorthenActionBarController {
   private readonly root = document.createElement('section');
   private readonly title = document.createElement('div');
+  private readonly hint = document.createElement('div');
   private readonly view = createMorthenActionBarView();
+  private readonly hints = createMorthenHints();
+  private hintId: MorthenHintId | null = null;
+  private hintRevision = -1;
+  private readonly corpseInReach = (): boolean =>
+    morthenCorpseInReach(this.world.entities.values(), this.world.player);
   private readonly painter: ActionBarPainter;
   private active = false;
   private titleRevision = -1;
@@ -34,10 +46,13 @@ export class MorthenActionBarController {
     private readonly cancelOnEnter: readonly { cancel(): void }[],
     attachTooltip: (element: HTMLElement, html: () => string) => void,
     consumePeek: () => boolean,
+    private readonly now: () => number = () => performance.now(),
   ) {
     this.root.id = 'morthen-action-bar';
     this.root.className = 'vehicle-bar morthen-action-bar';
     this.title.className = 'vehicle-bar-title';
+    this.hint.className = 'vehicle-bar-hint';
+    writers.setDisplay(this.hint, 'none');
     const bar = document.createElement('div');
     bar.className = 'vehicle-action-slots';
     const slots: ActionBarSlotElements[] = MORTHEN_BAR_SLOTS.map((_, index) => {
@@ -69,7 +84,7 @@ export class MorthenActionBarController {
       { container: bar, slots },
       (key) => `url(${iconDataUrl('ability', key, 56)})`,
     );
-    this.root.append(this.title, bar);
+    this.root.append(this.title, this.hint, bar);
     writers.setDisplay(this.root, 'none');
     document.getElementById('ui')?.append(this.root);
   }
@@ -83,6 +98,7 @@ export class MorthenActionBarController {
     if (active !== this.active) {
       this.active = active;
       if (active) for (const controller of this.cancelOnEnter) controller.cancel();
+      else this.hints.reset();
       this.writers.toggleClass(document.body, MORTHEN_SHIFT_BODY_CLASS, active);
       this.writers.setDisplay(this.root, active ? 'grid' : 'none');
     }
@@ -94,8 +110,19 @@ export class MorthenActionBarController {
       this.writers.setText(this.title, t('devCommand.graveyardShift.identityAura'));
     }
     const player = this.world.player;
+    this.paintHint(player, revision);
     const target =
       player.targetId === null ? null : (this.world.entities.get(player.targetId) ?? null);
     this.painter.paint(this.view.tick(player, target, this.keyLabel));
+  }
+
+  // Repaints only when the line changes or the language does.
+  private paintHint(player: MorthenControlWorld['player'], revision: number): void {
+    const id = this.hints.tick(this.now(), player.resource, this.corpseInReach);
+    if (id === this.hintId && revision === this.hintRevision) return;
+    this.hintId = id;
+    this.hintRevision = revision;
+    this.writers.setDisplay(this.hint, id === null ? 'none' : 'block');
+    if (id !== null) this.writers.setText(this.hint, morthenHintText(id, this.keyLabel));
   }
 }
