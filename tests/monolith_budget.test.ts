@@ -1207,7 +1207,10 @@ const MONOLITHS: MonolithRow[] = [
     // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
-    ceiling: 11642,
+    // Lowered for the Ice Block crowd-control guard: the predicates moved to
+    // src/sim/combat/ice_block_guard.ts; the residual is the import and the
+    // isControlAura delegate the ctx binding keeps. Exact count, zero slack.
+    ceiling: 11630,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

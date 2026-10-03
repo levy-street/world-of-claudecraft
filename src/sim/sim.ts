@@ -124,6 +124,11 @@ import { advanceHeroicLeap, heroicLeapPlacementPreview } from './combat/heroic_l
 import { clearFieldcraftState } from './combat/hunter_fieldcraft';
 import { clearPacklordState } from './combat/hunter_packlord';
 import { clearHunterTalentState, hunterPetDamageMultiplier } from './combat/hunter_shared';
+import {
+  isControlAuraKind,
+  isIceBlockCrowdControlAura,
+  isIceBlocked,
+} from './combat/ice_block_guard';
 import { tickNaturesFury } from './combat/natures_fury';
 import { clearOssuaryMarks, despawnTemporaryNecromancyUndead } from './combat/necromancy';
 import { tryGrantSolarReprisal } from './combat/paladin_solar_reprisal';
@@ -5339,7 +5344,7 @@ export class Sim {
       isControlAura: sim.isControlAura.bind(sim),
       applyRootAura: sim.applyRootAura.bind(sim),
       applyKnockback: sim.applyKnockback.bind(sim),
-      isIceBlocked: sim.isIceBlocked.bind(sim),
+      isIceBlocked,
       diminishedCrowdControlDuration: sim.diminishedCrowdControlDuration.bind(sim),
       hostilesInRadius: sim.hostilesInRadius.bind(sim),
       friendliesInRadius: sim.friendliesInRadius.bind(sim),
@@ -6294,23 +6299,7 @@ export class Sim {
     return !!template && (template.canSwim === true || template.family === 'mudfin');
   }
   private isControlAura(kind: AuraKind): boolean {
-    return kind === 'stun' || kind === 'root' || kind === 'incapacitate' || kind === 'polymorph';
-  }
-  private isIceBlockCrowdControlAura(kind: AuraKind): boolean {
-    return (
-      this.isControlAura(kind) ||
-      kind === 'silence' ||
-      kind === 'blind' ||
-      kind === 'disarm' ||
-      kind === 'slow' ||
-      kind === 'lockout' ||
-      kind === 'tongues'
-    );
-  }
-  private isIceBlocked(target: Entity): boolean {
-    return target.auras.some(
-      (existing) => existing.id === 'ice_block' && existing.kind === 'stasis',
-    );
+    return isControlAuraKind(kind);
   }
   // Nythraxis CC-immunity predicates moved to encounters/nythraxis.ts (N1); Sim keeps
   // thin delegates because the hot applyAura immunity path reads them via this.X.
@@ -6910,8 +6899,8 @@ export class Sim {
       return;
     }
     if (
-      this.isIceBlocked(target) &&
-      this.isIceBlockCrowdControlAura(aura.kind) &&
+      isIceBlocked(target) &&
+      isIceBlockCrowdControlAura(aura.kind) &&
       aura.sourceId !== target.id &&
       !isUnbreakableControlAura(aura)
     )
