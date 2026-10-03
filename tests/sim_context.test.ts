@@ -369,6 +369,7 @@ function makeFakeHost() {
     nextBgProposalId: 1,
     nextBgMatchId: 1,
     delveRuns: [],
+    graveyardShiftRuns: new Map(),
     delvePetStash: new Map(),
     utcDay: '',
     resetDay: '',

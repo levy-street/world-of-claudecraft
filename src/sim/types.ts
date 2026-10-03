@@ -9012,6 +9012,10 @@ export interface SimConfig {
   playerName?: string;
   noPlayer?: boolean; // multiplayer server: start with an empty world and addPlayer() later
   devCommands?: boolean; // local dev: /dev level|tp|give chat cheats
+  // True only for the browser's offline world (src/game/offline_world_config.ts):
+  // no character persistence and no ClientWorld mirror. Modes that rewrite the
+  // character for their duration (the Graveyard Shift prototype) gate on it.
+  offlineHost?: boolean;
   worldPvpDisabled?: boolean; // realm kill switch for the /pvp flag (server env WORLD_PVP_DISABLED=1)
   lockoutNowMs?: () => number; // host wall-clock for persisted raid lockouts
   // Live server: schedule the first world-boss rise at boot instead of one

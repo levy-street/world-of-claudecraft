@@ -272,6 +272,7 @@ import * as escortMod from './escort';
 import { initEscorts as initEscortsImpl, updateEscorts as updateEscortsImpl } from './escort';
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
+import * as gshiftMod from './graveyard_shift';
 import * as groundAoeReadouts from './ground_aoe_readouts';
 import type { GuildBankState, GuildMembership } from './guild_bank';
 import * as guildBankMod from './guild_bank';
@@ -2041,6 +2042,7 @@ export class Sim {
   escortRuns = new Map<string, EscortRunState>();
   // delve instances (separate slot pool from dungeons)
   delveRuns: DelveRun[] = [];
+  readonly graveyardShiftRuns = new Map<number, gshiftMod.GraveyardShiftRun>();
   private delvePetStash = new Map<number, PetState>();
   // Real-world UTC day ('YYYY-MM-DD') for the delve daily reset (FR-5.1). The sim
   // core must stay deterministic, so it never reads the wall clock itself: the host
@@ -2219,6 +2221,7 @@ export class Sim {
       autoEquip: cfg.autoEquip ?? false,
       playerName: cfg.playerName ?? 'Adventurer',
       devCommands: this.devCommands,
+      offlineHost: cfg.offlineHost ?? false,
       worldPvpDisabled: this.worldPvpDisabled,
       worldBossAtBoot: cfg.worldBossAtBoot ?? false,
       riftPortals: cfg.riftPortals ?? false,
@@ -5247,6 +5250,7 @@ export class Sim {
       // The engaged pass output (combat/engaged_combat.ts), cleared and refilled
       // in place each tick; the /combat readout reads it instead of re-walking.
       engagedPids: sim.engagedPids,
+      graveyardShiftRuns: sim.graveyardShiftRuns,
       // Offline Fiesta practice-bot roster (fiesta_bots.ts mutates it in place);
       // the deeds real-bout gate reads it through the seam.
       get fiestaBotPids() {
@@ -6133,6 +6137,7 @@ export class Sim {
     // Escort runs walk their NPC + watch ambush waves (rng-free; src/sim/escort.ts).
     updateEscortsImpl(this.ctx);
     lap?.('instances');
+    gshiftMod.updateGraveyardShift(this.ctx);
     this.updateDelveRuns();
     lap?.('delves');
     // Thornhollow Fields' ACTIVE phase draws ZERO rng (queue-order matchmaking,

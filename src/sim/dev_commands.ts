@@ -7,6 +7,7 @@ import { DUNGEONS, getActiveWorldContent, ITEMS, MOBS, NPCS, WORLD_QUESTS_BY_ID 
 import { equipBestInSlotForDev } from './dev/bis_gear';
 import { displacePlayerForDev } from './dev/dev_displace';
 import { handleFerryDevChat } from './dev/ferry_dev';
+import { handleGraveyardShiftDevChat } from './dev/graveyard_shift_dev';
 import { handleDevHoardTravel } from './dev/hoard_travel';
 import { devTownList, resolveDevTown } from './dev/town_teleport';
 import { prepareWeeklyVaultPlaytest } from './dev/weekly_vault_playtest';
@@ -177,6 +178,7 @@ export function handleDevChat(
     return null;
   }
   if (handleFerryDevChat(ctx, raw, pid)) return null; // /dev ferry (dev/ferry_dev.ts)
+  if (handleGraveyardShiftDevChat(ctx, raw, pid)) return null; // dev/graveyard_shift_dev.ts
   const levelMatch = /^\/(?:dev\s+level|devlevel)\s+(\d+)\s*$/i.exec(raw);
   if (levelMatch) {
     const level = Number(levelMatch[1]);
@@ -1384,7 +1386,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev wq [name], /dev salvage, /dev clue [hunt <huntId>|solve|casket], /dev map [rarity|site|coin], /dev caravan, /dev calligraphy, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill, /dev hill [zone] | warn [zone] [seconds] | rise | end | next',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev wq [name], /dev salvage, /dev clue [hunt <huntId>|solve|casket], /dev map [rarity|site|coin], /dev caravan, /dev calligraphy, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill, /dev graveyardshift [start|end|status], /dev hill [zone] | warn [zone] [seconds] | rise | end | next',
     );
     return null;
   }

@@ -20,6 +20,7 @@ export function offlineWorldConfig(options: {
     playerClass: options.playerClass,
     playerName: options.name,
     devCommands: options.devCommands,
+    offlineHost: true,
     // Editor play-test maps opt out of the live world's entry features.
     riftPortals: options.world === undefined,
     compulsoryTutorial: options.world === undefined,

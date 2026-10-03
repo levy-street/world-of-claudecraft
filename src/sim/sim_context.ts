@@ -18,6 +18,7 @@ import type { LetterDef } from './content/letters';
 import type { TalentModifiers } from './content/talents';
 import type { DeedRuntime } from './deeds';
 import type { DelayedEvent, GroundAoE } from './entity_roster';
+import type { GraveyardShiftRun } from './graveyard_shift/run_state';
 import type { GuildBankState } from './guild_bank';
 import type { InventoryGrantOptions } from './inventory_grant';
 import type { PendingLootRoll } from './loot/loot_roll';
@@ -302,6 +303,9 @@ export interface SimContextPrimitives {
   // (P1b also consumes delvePetStash; it is the same I2a-declared field, not re-added.
   // P1b's nextId dedupes with I1's declaration above.)
   readonly delveRuns: DelveRun[];
+  // Graveyard Shift runs by owner pid (graveyard_shift/); the Map identity is
+  // constant for the Sim's life, so a plain live view.
+  readonly graveyardShiftRuns: Map<number, GraveyardShiftRun>;
   readonly delvePetStash: Map<number, PetState>;
   // Host-supplied UTC calendar day ('' = unknown). A CALENDAR DATE, used to stamp
   // when something happened (the Book of Deeds earn date). For "has the daily
@@ -1492,6 +1496,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get delveRuns() {
       return host.delveRuns;
+    },
+    get graveyardShiftRuns() {
+      return host.graveyardShiftRuns;
     },
     get delvePetStash() {
       return host.delvePetStash;
