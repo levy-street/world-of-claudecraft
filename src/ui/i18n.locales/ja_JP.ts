@@ -18939,6 +18939,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.turretArsenal.resupplyFrag': '補給：榴散弾 {frag}',
   'hudChrome.turretArsenal.resupplyRule':
     'ウェーブ {waves} の終わりに、この任務の各兵器のチャージが一つ増える。',
+  'hudChrome.turretArsenal.resupplyRuleOnce':
+    'ウェーブ {wave} の終わりに、各兵器のチャージが一つ増える。',
   'hudChrome.turretArsenal.bonusRule':
     '任務に勝利すると、未使用のチャージ一つにつき{points}ポイント。',
   'hudChrome.turretArsenal.pointsCharges': '残したチャージ（{count}）',

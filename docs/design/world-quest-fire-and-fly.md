@@ -82,6 +82,33 @@ are the game's own monsters, living only inside this mini-game.
   march, with every lane kept clear of them. A blast or a fast thrown body lights
   one; it blows after a short fuse with a bigger blast on the shell's rules, so a
   chain reads as a ripple.
+- **Hunts** (`hunt` on a wave; plan half `src/sim/minigames/turret_hunt_plan.ts`,
+  engine half `turret_rally.ts`, tuned by `TURRET_RALLY`). A hunt wave comes as
+  packs. Each pack's members spawn over a short window on an arc of the pack's own
+  side and walk (`muster`) to their own place in a disc around a rally point in the
+  field (drawn per pack in the wave's distance band, no draw for the places), then
+  stand there facing the tower (`hold`). The pack's leader cries once every living
+  member stands, or once the hold timer since the first gathering member's arrival
+  runs out (scouts, the quickest, arrive ahead and wait without starting it); the
+  pack leaves exactly `TURRET_RALLY.cueLeadTicks` (1 s) later, every member at one
+  advance pace (a scale of its slowest gathering member's template), and no two
+  rallies leave within `departGapTicks` of each other (a cue waits until its
+  departure is clear). A member thrown while its pack gathers gets up and walks back
+  to its place; one not standing there at the departure (flying, down, walking in
+  or back, or spawned after it) goes for the tower alone at the pack's pace. Roles
+  on an entry (`role`): a `scout` gathers and breaks out at its own pace at the
+  departure; a `sprint` group never gathers and runs straight in. Speed spread
+  (`speedScaleMax` on an entry, `turret_pace.ts`): each monster draws its own pace
+  in its kind's band once at its spawn, on a stream keyed by its id, and carries it.
+  There is no rally marker of any kind: the standing pack and the cry are the
+  telegraph. A rally record lives only while its pack gathers; every new draw rides
+  its own stream, so no existing draw moved and the trials replay exactly.
+- **Placed kegs** (`src/sim/minigames/turret_rally_kegs.ts`). A hunt wave lays its
+  kegs at its own rallies instead of on the ring: `rally-front` on the advance axis
+  5 to 7 yd tower-side of the rally and 1.5 yd off the axis, `rally-side` 8 yd
+  beside it, `axis` on the advance axis at a set distance from the tower; each by
+  the barrels' own clear-spot rules and under the keg cap. Every other wave keeps
+  the ring and the lanes.
 - **The strike.** A monster reaching the tower winds up once (a red ring under
   it). A shot during the wind-up throws it back at no cost. A completed wind-up
   strikes once and the monster vanishes, costing `turretBreachPoints`: its size
@@ -123,7 +150,9 @@ Every tuning constant named above (`TURRET_SIZE_CLASSES`, `TURRET_WEAPON`,
 
 Engine suites: `tests/turret_defense_engine.test.ts`, `tests/thrown_body.test.ts`,
 `tests/turret_bowling.test.ts`, `tests/turret_barrels.test.ts`,
-`tests/turret_feedback.test.ts`, `tests/turret_defense_session.test.ts`.
+`tests/turret_feedback.test.ts`, `tests/turret_defense_session.test.ts`,
+`tests/turret_rally.test.ts`, `tests/turret_hunt_plan.test.ts` and
+`tests/turret_rally_kegs.test.ts`.
 
 ## The trials
 
@@ -277,7 +306,12 @@ The server runs the one shared engine; the client only draws it.
   the monsters in the engine's ascending id order) before the seat decoder; a
   partial or inconsistent family (a cleared key beside live ones, a bucket count
   out of range, a monster in the wrong bucket, an id twice) fails closed like an
-  unreadable seat. The offline and RL hosts read the `Sim` directly and never see
+  unreadable seat. A hunt's open rallies ride `tur` (`rallies`, absent with none),
+  and a gathering member's record carries its pace, rally and place, so the client
+  forecast (`src/render/turret_motion_forecast_core.ts`) plans each gathering leg,
+  stand, departure and walk back as the engine does (within the wire's rounding
+  online); the decoder refuses a member whose rally is not open and a rally whose
+  pace or hold differs from its plan. The offline and RL hosts read the `Sim` directly and never see
   these keys. The feedback ring is rebuilt on the client from the `turretDefense`
   events (`src/net/turret_feedback_mirror.ts`). Every decoder re-validates
   untrusted JSON and rejects a malformed value whole.
@@ -322,7 +356,14 @@ Pinned by `tests/turret_session_wire.test.ts`, `tests/turret_self_wire.test.ts`,
   (`src/render/cannon_shell_visuals.ts`, `cannon_puff_core.ts`); kegs are the hex
   kit barrel with a painted stencil bomb (`src/render/turret_barrel_visual.ts`).
 - Sounds (`src/game/turret_defense_sfx.ts`, `turret_monster_sfx.ts`) ride the SFX
-  manifest pipeline; the seat plays the shared cannon track, softer.
+  manifest pipeline; the seat plays the shared cannon track, softer. A hunt's
+  departure cue (the `rallyCue` entry, one per departure, a second ahead of it) is
+  the leader's own aggro cry, placed at the rally and resolved through the same
+  per-template voice lookup as the monsters' hurt and death cries, on the look it
+  wears; a look with no such clip stays silent, never another creature's voice. A
+  fallen leader's cry passes only to a living member of its own kind (the same
+  voice); with none left the cue is silent. The leader of each pack of The Pack
+  and the exact clip it cries are pinned in `tests/turret_rally_cue_voice.test.ts`.
 - The seat HUD (`src/ui/hud/vehicle/`): a status strip at the top (the wave,
   monsters left, the next wave's countdown), a tower integrity rail at the bottom,
   wave banners, damage numbers, a red screen-edge flash on a strike, and the result
@@ -370,14 +411,15 @@ charge has no socket, no key and no banner mention.
 | Recruit's Trial | 0 | 0 | the cannon and the kegs only |
 | Standing Watch | 4 | 0 | brings in the Shockwave |
 | Veterans' Test | 2 | 4 | brings in the fragmentation shell, beside fewer Shockwaves |
-| The Pack | 0 | 5 | packs of twelve to eighteen, three at once at the end: a fragmentation shell into a pack at the foot |
+| The Pack | 0 | 5 | packs gathering at rallies in the field: a fragmentation shell into a standing pack |
 | Heavy Tread | 4 | 1 | giants reaching the tower together, then colossi from everywhere |
 | The Deluge | 3 | 2 | swarms from everywhere |
 | The Cracked Tower | 3 | 1 | 10 tower points: no strike may land |
 | The Powder Store | 1 | 3 | keg lanes and groups |
 
-**Resupply** (missions only, `supply` on the scenario): as a mission's third and
-fifth waves end, every weapon its arsenal holds gains one charge
+**Resupply** (`supply` on the scenario): as a mission's third and fifth waves end,
+and as the Veterans' Test's fifth wave ends (its only resupply, with no bonus for
+charges left), every weapon its arsenal holds gains one charge
 (`turretResupplyAfter`); a weapon it starts without never gets any. The run counts
 its resupplies in its stats (`resupplies`), so the charges left are the arsenal plus
 the resupplies less the charges spent (`turretChargesGiven`, `turretChargesLeft` in
@@ -400,10 +442,12 @@ The Veterans' Test and the missions are set against the quickest aimer (0.4 s af
 each reload) with a sharper policy, the best scripted stand-in for a good player: a
 Shockwave once 3 windups are seen, a frag on the pack about to strike once several
 packs close in at once. That aimer golds the Veterans' Test about a fifth of its runs
-bare and over half with the weapons, nearly all the gold lost in the last wave, where
-the giants arrive with a charge of armoured dead from three sides; slower aimers
-never gold it, and the 1 s aimer wins with silver or bronze, losing about one run in
-ten bare.
+bare and, since its resupply after wave 5 (lot R3), about seven in ten with the
+weapons (about half before), nearly all the gold lost in the last wave, where the
+giants arrive with a charge of armoured dead from three sides; slower aimers never
+gold it, and the 1 s aimer wins with silver or bronze, losing about one run in ten
+bare. Gold for that aimer now sits well past half: the next tuning adds chargers to
+the last wave rather than move the bar.
 
 ### The missions
 
@@ -411,22 +455,26 @@ Every mission runs eight waves on one curve: a warm-up, a fast climb, then the l
 two or three waves pushing its idea to the extreme, overlapping as above (lot N2d).
 Against the good-player stand-in (96 seeds, and 96 held-out seeds as a check) each
 golds about a third of its runs with its weapons and about half as often without,
-the gold lost almost only in the last two waves; it loses The Pack and The Cracked
-Tower about one run in ten and the other three about never. Players firing 0.8 s
+the gold lost almost only in the last two waves; it loses The Cracked Tower about one
+run in ten and the other three about never. The Pack is the exception since its hunt
+(lot R3): a first draft at a walking pace, which that stand-in golds nearly every run;
+it is tuned next with a probe arm that plays the field. Players firing 0.8 s
 after each reload lose most runs of The Pack and The Cracked Tower, about half of
 Heavy Tread's and a third to a half of The Powder Store's with the weapons, and at
 1 s only The Deluge stays winnable, with the weapons.
 
 | Mission | Tower, gold bar | Overlap | The last waves |
 |---|---|---|---|
-| The Pack | 80, keep 80 percent | 3 | three packs of sixteen, then of eighteen, at once from three sides at four times their pace, Old Greyjaws among the last |
+| The Pack | 80, keep 80 percent | 3 | three packs gathering from three sides, rallies nearer and the hold shorter, scouts breaking out at each departure; the last with Old Greyjaws and a sprint group that never gathers |
 | Heavy Tread | 100, keep 99 percent | 2 | yetis from everywhere, 12 then 18 then 20 with 6 guardians, two to three times their pace |
 | The Deluge | 100, keep 94 percent | 3 | 48 then 60 small monsters from everywhere at three and a half and four times their pace |
 | The Cracked Tower | 10, untouched | 2 | 32 then 44 armoured dead from everywhere at two and a half times their pace |
 | The Powder Store | 100, keep 99 percent | 3 | 48 then 63 monsters from three sides charging down twelve kegs a wave, giants among the last |
 
-The Pack's finale is built to break through, so its gold keeps four fifths of an
-80-point tower rather than all of it. The clean aimer still golds every trial and
+The Pack's tower and bars are N2d's, kept for its first hunt draft: one pack, then
+scouts, then two and three packs whose gathering windows close as the hold timer
+shortens from 6 s to 2.5 s and the last rallies stand nearer, a keg laid in front of
+most rallies, beside some, and none before the clean pack that earns the frag. The clean aimer still golds every trial and
 mission (`tests/turret_scenarios.test.ts`, `tests/fire_and_fly_missions.test.ts`).
 
 - **Shockwave** (`src/sim/minigames/turret_shockwave.ts`, tuning

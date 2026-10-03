@@ -143,7 +143,7 @@ export function turretSpawnBearing(
 }
 
 /** Dry, free of every barrel by the spacing, and of every body still on the field. */
-function clearSpot(
+export function turretBarrelSpotClear(
   state: TurretDefenseState,
   x: number,
   z: number,
@@ -213,7 +213,7 @@ export function placeTurretBarrels(
         turretDraw(state, TURRET_STREAM.barrelRadius, wave, key) * (def.maxRadius - def.minRadius);
       const x = state.cx + Math.sin(bearing) * r;
       const z = state.cz + Math.cos(bearing) * r;
-      if (!clearSpot(state, x, z, tick, probe)) continue;
+      if (!turretBarrelSpotClear(state, x, z, tick, probe)) continue;
       const barrel = {
         id: state.nextBarrelId++,
         x,

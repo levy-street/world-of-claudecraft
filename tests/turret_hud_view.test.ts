@@ -12,7 +12,13 @@ import {
   TURRET_SCENARIO_STANDARD,
 } from '../src/sim/content/fire_and_fly_scenarios';
 import { TURRET_TIMING } from '../src/sim/content/turret_defense';
-import { createTurretDefense, type TurretEvent } from '../src/sim/minigames/turret_defense';
+import { positionAt } from '../src/sim/minigames/thrown_body';
+import {
+  createTurretDefense,
+  fireTurret,
+  type TurretEvent,
+  tickTurretDefense,
+} from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan, type TurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import { recordTurretFeedback, TURRET_FEEDBACK_LIMIT } from '../src/sim/minigames/turret_feedback';
 import { turretResult } from '../src/sim/minigames/turret_result';
@@ -621,6 +627,42 @@ describe('the turret feedback cursor', () => {
     expect(resupplied(0, 1)).toEqual({
       text: 'Wave 3 cleared',
       subtext: 'Resupply: +1 Fragmentation Shell',
+    });
+  });
+
+  it("puts the Veterans' Test's one resupply on wave 5's cleared banner, as the engine batches it", () => {
+    // The real engine, a clean nearest-first aimer, to the tick wave 5 (index 4) clears.
+    const plan = resolveTurretPlan(TURRET_SCENARIO_HARD);
+    const engine = createTurretDefense(plan, { x: 0, z: 0 }, 3, START);
+    const flat = { ground: () => 0, water: () => null };
+    let batch: TurretEvent[] = [];
+    for (let t = START + 1; t < START + 20 * 600 && !batch.length; t++) {
+      const events = tickTurretDefense(engine, t, flat);
+      if (events.some((e) => e.type === 'resupply')) batch = events;
+      if (t < engine.readyTick) continue;
+      let best: { x: number; z: number } | null = null;
+      let bestD = Number.POSITIVE_INFINITY;
+      for (const m of engine.monsters) {
+        if (m.hp <= 0) continue;
+        const p = positionAt(m.seg, t, flat);
+        const d = Math.hypot(p.x, p.z);
+        if (d < bestD) {
+          bestD = d;
+          best = p;
+        }
+      }
+      if (best) fireTurret(engine, t, best.x, best.z, flat);
+    }
+    expect(batch.filter((e) => e.type === 'waveCleared' || e.type === 'resupply')).toEqual([
+      { type: 'waveCleared', wave: 4 },
+      { type: 'resupply', wave: 4, shockwave: 1, fragmentation: 1 },
+    ]);
+    expect(engine.stats.resupplies).toBe(1);
+    const session = seat(START, plan);
+    push(session, START + 60, ...batch);
+    expect(new TurretFeedbackCursor().consume(turretSessionView(session))).toEqual({
+      text: 'Wave 5 cleared',
+      subtext: 'Resupply: +1 Shockwave, +1 Fragmentation Shell',
     });
   });
 

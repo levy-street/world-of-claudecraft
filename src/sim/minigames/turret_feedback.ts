@@ -10,8 +10,8 @@ import type { TurretEvent } from './turret_defense';
 // (or their frag bursts), a bomblet of every frag shell a run holds (resupplies included), the
 // Shockwave's front and every barrel the keg cap lets stand blowing through the widest wave
 // and the living an overlapping mission carries into it, each blast pushing its own event
-// first, then a launch and a kill per body, a barrel lit by each, plus knocks and the wave
-// clear with its resupply or end (the derivation per plan is pinned in
+// first, then a launch and a kill per body, a barrel lit by each, plus knocks, a hunt's
+// departure cue, and the wave clear with its resupply or end (the derivation per plan is pinned in
 // tests/turret_feedback.test.ts); a smaller ring drops a blast before any reader sees it,
 // and with it the blast's damage numbers, sound and visual.
 export const TURRET_FEEDBACK_LIMIT = 2877;

@@ -46,12 +46,12 @@ const SEAT_BYTES_PER_SECOND_BY_TRIAL: Record<string, number> = {
   introduction: 2_900,
   hard: 7_400,
 };
-// Per mission, since lot N2d's eight-wave curves with their crowded finales: The Pack about
-// 17.2 KB/s, the highest (256 monsters, its last two waves 48 and 54 at once from three
-// sides), The Deluge 13.9 (276, the last 60), The Powder Store 11.7 (207, the last 63),
-// Heavy Tread 7.9 (82 colossi), The Cracked Tower 6.7 (156).
+// Per mission, since lot N2d's eight-wave curves with their crowded finales: The Deluge about
+// 13.9 KB/s, the highest (276 monsters, the last 60), The Pack 12.7 since its hunt (lot R3: 234
+// monsters gathering at rallies and advancing at a walk; 17.2 at a run before), The Powder
+// Store 11.7 (207, the last 63), Heavy Tread 7.9 (82 colossi), The Cracked Tower 6.7 (156).
 const SEAT_BYTES_PER_SECOND_BY_MISSION: Record<string, number> = {
-  pack: 18_950,
+  pack: 14_000,
   giants: 8_750,
   deluge: 15_300,
   brittle: 7_450,
@@ -60,8 +60,9 @@ const SEAT_BYTES_PER_SECOND_BY_MISSION: Record<string, number> = {
 // Every run's worst one-second window of the seat state (a sliding 20-tick sum, one full resend
 // of a mid-run resume included), against the re-decision line of BANDWIDTH_OPINION.md (a seat's
 // worst second past a walking crowd's, 153 KB with the self record's base). Measured on this
-// seed since lot N2d: The Pack 65.5 KB, The Deluge 64.4, The Powder Store 60.3, The Cracked
-// Tower 37.8, Heavy Tread 28.4, the Veterans' Test 17.6, every other scenario under 6 (lot
+// seed since lot N2d: The Deluge 64.4 KB, The Powder Store 60.3, The Pack 46.1 (65.5 before its
+// hunt, lot R3), The Cracked Tower 37.8, Heavy Tread 28.4, the Veterans' Test 17.6, every other
+// scenario under 6 (lot
 // H4: 17.8 KB at most; before the split: 124 to 128 KB). The ceiling sits about 10 percent
 // over the worst any measured run reached, not this seed's: the H4 probe (no resume) over the
 // world seed and Sim seeds 1 to 8, bare and armed, peaks at 75.8 (The Deluge, world seed) and
@@ -69,7 +70,8 @@ const SEAT_BYTES_PER_SECOND_BY_MISSION: Record<string, number> = {
 const SEAT_WORST_SECOND_CEILING = 84_000;
 // The same window over everything the seat adds to its player's socket: the state keys, the
 // plan's `turp` and the seat's own events (the bomblets and the feedback entries). Measured on
-// this seed: The Pack 92.5 KB, The Deluge 89.5, The Powder Store 84.9; the probe's peak is
+// this seed: The Deluge 89.5 KB, The Powder Store 84.9, The Pack 63.9 (92.5 before its hunt);
+// the probe's peak is
 // 105.2 (The Deluge, world seed), then 101.7 (The Deluge, Sim seed 4). With the self record's
 // base about 12 KB more, the ceiling stays under the 153 KB line (about 128 KB).
 const SEAT_WIRE_WORST_SECOND_CEILING = 116_000;
@@ -253,6 +255,8 @@ function playOnline(command: string, aim = true, armed = false) {
   const drift = { march: 0, fly: 0, skid: 0 };
   const drawn = { march: 0, fly: 0, skid: 0 };
   const drawnSegments = new Set<string>();
+  let rallied = 0;
+  const states = new Set<string>();
   for (let i = 0; i < RUN_BOUND && phase !== 'won' && phase !== 'lost'; i++) {
     const events = sim.tick();
     ticks++;
@@ -315,7 +319,9 @@ function playOnline(command: string, aim = true, armed = false) {
       expect(turretChargesLeft(view.defense)).toEqual(turretChargesLeft(authoritative.defense));
       expect(view.defense.shockReadyTick).toBe(authoritative.defense.shockReadyTick);
     }
+    if (view.defense.rallies?.length) rallied++;
     for (const [index, m] of view.defense.monsters.entries()) {
+      states.add(m.state);
       const kind = m.seg.kind;
       if (kind === 'still' || drawnSegments.has(`${m.id}:${m.seg.start}`)) continue;
       drawnSegments.add(`${m.id}:${m.seg.start}`);
@@ -381,6 +387,8 @@ function playOnline(command: string, aim = true, armed = false) {
     slams,
     routed,
     overlapped,
+    rallied,
+    states,
     seatBytesPerSecond: seatBytes(bytes) / (ticks / 20),
   };
 }
@@ -458,8 +466,16 @@ describe('Fire and Fly online: the socket-free round trip', () => {
   it.each(TURRET_MISSIONS.map((s) => [s.boardKey, s] as const))(
     'mirrors every tick of a won %s mission, its plan and its overlapping waves carried to the client',
     (key, mission) => {
-      const { client, seatBytesPerSecond, overlapped } = playOnline(`/dev turret ${key}`);
+      const { client, seatBytesPerSecond, overlapped, rallied, states, routed } = playOnline(
+        `/dev turret ${key}`,
+      );
       expect(seatBytesPerSecond).toBeLessThan(SEAT_BYTES_PER_SECOND_BY_MISSION[key]);
+      // The hunt's rallies, gathering states and departure cues crossed the wire, mirrored
+      // every tick like the rest of the seat.
+      const hunts = mission.waves.some((w) => w.hunt);
+      expect(rallied > 0).toBe(hunts);
+      expect(states.has('muster') && states.has('hold')).toBe(hunts);
+      expect(routed.has('rallyCue')).toBe(hunts);
       // Each wave the clean aimer did not clear outright set off beside a tail of at most
       // the overlap, and the client's wave counter moved on with the server's.
       expect(overlapped.length).toBeGreaterThan(0);

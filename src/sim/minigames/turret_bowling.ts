@@ -25,7 +25,14 @@ import type {
 } from './turret_defense';
 
 /** Grounded, living states a flyer can knock over (corpses on the ground never move). */
-const KNOCKABLE: ReadonlySet<TurretMonsterState> = new Set(['march', 'windup', 'down', 'rise']);
+const KNOCKABLE: ReadonlySet<TurretMonsterState> = new Set([
+  'march',
+  'muster',
+  'hold',
+  'windup',
+  'down',
+  'rise',
+]);
 
 /**
  * A backstop only: a knock turns a knockable body into a flyer and nothing lands

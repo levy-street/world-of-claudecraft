@@ -85,6 +85,7 @@ export class TurretDisplayClock {
   }
 }
 
+/** `hold` here freezes the body as it is; the monster STATE `hold` (standing at a rally) poses upright. */
 export type TurretAttitudeTarget = 'tumble' | 'lie' | 'upright' | 'hold';
 
 /** The fields of an engine monster (or its read-only view) a pose reads. */
@@ -248,6 +249,7 @@ export function turretMonsterPoseInto(
   out.health = m.maxHp > 0 ? Math.min(1, Math.max(0, m.hp / m.maxHp)) : 0;
   switch (m.state) {
     case 'march':
+    case 'muster':
       if (seg.kind === 'march') {
         if (seg.dx !== 0 || seg.dz !== 0) out.yaw = Math.atan2(seg.dx, seg.dz);
         out.moving = !frozen && seg.speed > 0 && tick < seg.end;
@@ -299,6 +301,13 @@ export function turretMonsterPoseInto(
       break;
     case 'down':
       out.attitude = 'lie';
+      break;
+    case 'hold':
+      if (center) {
+        const dx = center.cx - out.x;
+        const dz = center.cz - out.z;
+        if (dx !== 0 || dz !== 0) out.yaw = Math.atan2(dx, dz);
+      }
       break;
     case 'rise':
       out.easeSeconds = length * DT;

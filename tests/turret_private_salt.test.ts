@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { emitTurretSelfKeys, turretPlanWireJson } from '../server/turret_self_wire';
+import { TURRET_MISSION_PACK } from '../src/sim/content/fire_and_fly_missions';
 import { TURRET_SCENARIO_HARD } from '../src/sim/content/fire_and_fly_scenarios';
 import { BUILTIN_WORLD } from '../src/sim/data';
 import { horizontalAt, type ThrowProbe } from '../src/sim/minigames/thrown_body';
@@ -175,6 +176,8 @@ describe('a salted run', () => {
   it('keys every engine draw site with the run key, on every stream', () => {
     drawLog.length = 0;
     const { state } = run(42, SALT, resolveTurretPlan(TURRET_SCENARIO_HARD), 12000, true);
+    // A hunt's rallies, kegs and paces draw on their own streams.
+    run(42, SALT, resolveTurretPlan(TURRET_MISSION_PACK), 1200, true);
     const key = state.runKey;
     expect(key).toBeDefined();
     expect(new Set(drawLog.map((d) => d.stream))).toEqual(new Set(Object.values(TURRET_STREAM)));

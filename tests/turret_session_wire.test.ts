@@ -13,7 +13,7 @@ import {
   TURRET_SEAT_WIRE_KEYS,
   type TurretSeatState,
 } from '../src/net/turret_session_wire';
-import { TURRET_MISSIONS } from '../src/sim/content/fire_and_fly_missions';
+import { TURRET_MISSION_PACK, TURRET_MISSIONS } from '../src/sim/content/fire_and_fly_missions';
 import {
   TURRET_SCENARIO_HARD,
   TURRET_SCENARIO_STANDARD,
@@ -22,7 +22,11 @@ import {
 import { TURRET_ARENA, TURRET_SHOCKWAVE } from '../src/sim/content/turret_defense';
 import { BUILTIN_WORLD } from '../src/sim/data';
 import { positionAt } from '../src/sim/minigames/thrown_body';
-import type { TurretEvent } from '../src/sim/minigames/turret_defense';
+import {
+  createTurretDefense,
+  type TurretEvent,
+  tickTurretDefense,
+} from '../src/sim/minigames/turret_defense';
 import {
   resolveTurretPlan,
   TURRET_PLAN_LIMITS,
@@ -32,7 +36,7 @@ import {
 import { TURRET_BOMBLETS } from '../src/sim/minigames/turret_fragmentation';
 import { TURRET_BONUS_CAP, TURRET_POINTS, turretResult } from '../src/sim/minigames/turret_result';
 import { Sim } from '../src/sim/sim';
-import type { TurretSessionView } from '../src/sim/turret_defense_session';
+import { type TurretSessionView, turretSessionView } from '../src/sim/turret_defense_session';
 import type { SimEvent, TurretSession, TurretWaveDef, WorldContent } from '../src/sim/types';
 import { turretSessionFor } from '../src/sim/vehicles';
 import { groundHeight } from '../src/sim/world';
@@ -165,7 +169,8 @@ describe('the turret plan key', () => {
         shockwave: scenario.arsenal?.shockwave ?? 0,
         fragmentation: scenario.arsenal?.fragmentation ?? 0,
       });
-      expect(decoded?.resupplyWaves).toEqual([]);
+      // Only the Veterans' Test is resupplied (after its fifth wave), and no trial scores charges.
+      expect(decoded?.resupplyWaves).toEqual(_key === 'hard' ? [4] : []);
       expect(decoded?.chargeBonus).toBe(false);
       expect(decoded?.waves.map((w) => w.arrival)).toEqual(
         scenario.waves.map((w) => w.arrival ?? { kind: 'ring' }),
@@ -976,5 +981,91 @@ describe('the turretDefense event', () => {
     expect(decodeTurretFeedback(wire(entry))).not.toBeNull();
     forge(entry);
     expect(decodeTurretFeedback(entry)).toBeNull();
+  });
+});
+
+describe('a hunt on the wire', () => {
+  /** The Pack mid-gathering: a rally open, members walking in and standing, one cue given. */
+  function gathering(): { view: TurretSessionView; cue: TurretEvent } {
+    const plan = resolveTurretPlan(TURRET_MISSION_PACK);
+    const defense = createTurretDefense(plan, { x: 0, z: 0 }, 4, 0);
+    const flat = { ground: () => 0, water: () => null };
+    let cue: TurretEvent | null = null;
+    for (let t = 1; t < 2000 && !cue; t++) {
+      cue = tickTurretDefense(defense, t, flat).find((e) => e.type === 'rallyCue') ?? null;
+    }
+    const session: TurretSession = {
+      kind: 'turret',
+      origin: { x: 0, y: 0, z: 0 },
+      defense,
+      priorMountKey: '',
+      returnTo: { x: 0, y: 0, z: 0, facing: 0 },
+      feedback: [],
+      nextFeedbackSeq: 1,
+    };
+    return { view: turretSessionView(session), cue: cue! };
+  }
+
+  function decoded(seat: unknown) {
+    const plan = decodeTurretPlan(
+      JSON.parse(turretPlanWireJson(resolveTurretPlan(TURRET_MISSION_PACK))),
+    )!;
+    return decodeTurretSeat(assembleTurretSeatWire(turretSeatKeys(seat)), plan);
+  }
+
+  it('carries the open rallies and every gathering member, its pace, rally and place', () => {
+    const { view } = gathering();
+    expect(view.defense.rallies?.length).toBe(1);
+    expect(view.defense.monsters.every((m) => m.rally !== undefined && m.slot !== undefined)).toBe(
+      true,
+    );
+    expect(view.defense.monsters.every((m) => m.state === 'hold')).toBe(true);
+    const seat = decoded(view);
+    expect(seat).not.toBeNull();
+    expect(rounded(seat)).toEqual(rounded(seatOf(view)));
+    // A pace rides at a march's precision: the forecast plans the next leg with it.
+    const m = view.defense.monsters[0];
+    expect(seat!.defense.monsters[0].pace).toBeCloseTo(m.pace!, 5);
+  });
+
+  it('refuses rallies and gathering members that do not hold together', () => {
+    const { view } = gathering();
+    const forge = (edit: (seat: Wire) => void) => {
+      const seat = wire(seatOf(view));
+      edit(seat);
+      return decoded(seat);
+    };
+    expect(forge(() => {})).not.toBeNull();
+    for (const edit of [
+      (s: Wire) => (s.defense.monsters[0].rally = 9),
+      (s: Wire) => delete s.defense.monsters[0].rally,
+      (s: Wire) => delete s.defense.monsters[0].slot,
+      (s: Wire) => s.defense.rallies.push({ ...s.defense.rallies[0] }),
+      (s: Wire) => (s.defense.rallies[0].id = 8 * 7),
+      (s: Wire) => (s.defense.rallies[0].id = 5),
+      (s: Wire) => (s.defense.rallies[0].pace = 0),
+      (s: Wire) => (s.defense.rallies[0].pace += 0.5),
+      (s: Wire) => (s.defense.rallies[0].holdTicks += 1),
+      (s: Wire) => (s.defense.rallies[0].cueTick += 0.5),
+      (s: Wire) => (s.defense.rallies[0].departTick = 1e6 + 0.25),
+      (s: Wire) => (s.defense.monsters[0].pace = -2),
+      (s: Wire) => (s.defense.monsters[0].state = 'gather'),
+      (s: Wire) => (s.defense.rallies = 'none'),
+    ])
+      expect(forge(edit)).toBeNull();
+  });
+
+  it('carries the departure cue as a feedback entry, bounded', () => {
+    const { cue } = gathering();
+    expect(cue).toMatchObject({ type: 'rallyCue', rally: 0 });
+    const entry = { seq: 4, tick: 99, event: cue };
+    expect(decodeTurretFeedback(wire(entry))).toEqual(entry);
+    for (const forged of [
+      { ...cue, rally: -1 },
+      { ...cue, rally: TURRET_PLAN_LIMITS.waves * TURRET_PLAN_LIMITS.packs },
+      { ...cue, id: -2 },
+      { ...cue, departTick: Number.NaN },
+    ])
+      expect(decodeTurretFeedback({ ...entry, event: forged })).toBeNull();
   });
 });

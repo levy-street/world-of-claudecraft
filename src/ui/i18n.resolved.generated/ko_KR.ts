@@ -563,6 +563,7 @@ export const ko_KR: EnTranslations = {
       "resupplyShock": "보급: 충격파 {shock}",
       "resupplyFrag": "보급: 파편탄 {frag}",
       "resupplyRule": "{waves}번째 웨이브가 끝나면 이 임무의 각 무기 충전이 하나씩 늘어납니다.",
+      "resupplyRuleOnce": "{wave}번째 웨이브가 끝나면 각 무기 충전이 하나씩 늘어납니다.",
       "bonusRule": "임무에서 승리하면 쓰지 않고 남긴 충전 하나당 {points}점을 얻습니다.",
       "pointsCharges": "남긴 충전 ({count})"
     },

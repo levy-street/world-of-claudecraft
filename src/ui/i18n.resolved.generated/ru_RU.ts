@@ -563,6 +563,7 @@ export const ru_RU: EnTranslations = {
       "resupplyShock": "Пополнение: ударная волна {shock}",
       "resupplyFrag": "Пополнение: осколочный снаряд {frag}",
       "resupplyRule": "В конце волн {waves} каждое оружие задания получает ещё один заряд.",
+      "resupplyRuleOnce": "В конце волны {wave} каждое оружие получает ещё один заряд.",
       "bonusRule": "Победа в задании приносит {points} очков за каждый неиспользованный заряд.",
       "pointsCharges": "Сохранённые заряды ({count})"
     },

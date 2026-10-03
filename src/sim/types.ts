@@ -10273,6 +10273,58 @@ export interface TurretWaveEntry {
   hpScale?: number;
   /** Multiplies the template's march speed (absent: 1). */
   speedScale?: number;
+  /**
+   * With it, each monster draws its own pace between `speedScale` (absent: 1) and this
+   * scale of its template's march speed (minigames/turret_pace.ts).
+   */
+  speedScaleMax?: number;
+  /** A hunt wave only: the pack (index into the wave's `hunt.packs`) these monsters gather with. */
+  pack?: number;
+  /** A hunt wave only: absent, a member that gathers and advances with its pack. */
+  role?: TurretWaveRole;
+  /**
+   * Its pack's leader: the first of these monsters gives the departure cue; fallen, the first
+   * living monster of its kind cries in its place, and with none left the cue is silent.
+   */
+  leads?: boolean;
+}
+/**
+ * A hunt's roles (minigames/turret_rally.ts): a scout gathers with its pack and breaks
+ * out at its own pace at the departure; a sprint group never gathers and runs straight in.
+ */
+export type TurretWaveRole = 'scout' | 'sprint';
+/** A keg laid for a pack's rally (minigames/turret_rally_kegs.ts). */
+export type TurretRallyKegDef =
+  /** On the advance axis, a few yards tower-side of the rally, just off the axis. */
+  | { placement: 'rally-front' }
+  /** Beside the rally, at the gathering pack's rim. */
+  | { placement: 'rally-side' }
+  /** On the advance axis this far from the tower (yd), as far off the axis as the front keg. */
+  | { placement: 'axis'; fromTower: number };
+export interface TurretPackDef {
+  /** The advance's pace: this scale of the slowest gathering member's template march speed. */
+  advanceScale: number;
+  kegs: readonly TurretRallyKegDef[];
+  /** Ticks from the wave's start to the pack's first spawn. */
+  delayTicks: number;
+}
+/**
+ * A hunt wave: its monsters come as packs, each walking in from its own side to a rally
+ * in the field, then advancing together once its leader gives the cue.
+ */
+export interface TurretHuntDef {
+  packs: readonly TurretPackDef[];
+  /** The rallies' distance band from the tower (yd). */
+  minRadius: number;
+  maxRadius: number;
+  /** Ticks from a rally's first arrival to its cue, at the latest. */
+  holdTicks: number;
+  /** Ticks over which a pack's members (and the sprint group) spawn. */
+  spreadTicks: number;
+  /** The arc a pack (and the sprint group) spawns over, as a share of a turn. */
+  widthTurn: number;
+  /** Ticks from the wave's start to the sprint group's first spawn (its entries' role 'sprint'). */
+  sprintDelayTicks?: number;
 }
 /** The explosive barrels a wave's start adds on a ring around the turret (count 0: none). */
 export interface TurretBarrelWaveDef {
@@ -10318,8 +10370,10 @@ export interface TurretWaveDef {
   gapMinTicks: number;
   gapMaxTicks: number;
   barrels: TurretBarrelWaveDef;
-  /** Absent: the whole ring. */
+  /** Absent: the whole ring. A hunt wave's monsters come from its packs' sides instead. */
   arrival?: TurretArrivalDef;
+  /** Its monsters gather at rallies before they advance (every entry names its pack or sprints). */
+  hunt?: TurretHuntDef;
 }
 /** A medal's bar at the end of a won run: bronze is any win. */
 export interface TurretMedalBar {
@@ -10335,7 +10389,7 @@ export interface TurretArsenalDef {
   shockwave?: number;
   fragmentation?: number;
 }
-/** A mission's supply (absent on the trials: no resupply, no bonus). */
+/** A run's supply: every mission's, and the Veterans' Test's resupply (absent: none, no bonus). */
 export interface TurretSupplyDef {
   /** Waves (from 1) whose end gives one charge more of every weapon the arsenal holds. */
   resupplyAfterWaves: readonly number[];

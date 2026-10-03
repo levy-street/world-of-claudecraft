@@ -1220,6 +1220,7 @@ describe('Fire and Fly monsters on screen', () => {
       waves: [
         {
           ...TURRET_MISSION_PACK.waves[0],
+          hunt: undefined,
           entries: [
             { templateId: 'forest_wolf', count: 3, level: 2 },
             { templateId: 'wild_boar', count: 3, level: 2 },

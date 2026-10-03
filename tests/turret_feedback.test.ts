@@ -56,7 +56,10 @@ describe('the turret feedback ring', () => {
       const frags = turretChargesGiven(plan, plan.resupplyWaves.length).fragmentation;
       const blasts = shells + frags + front + cap;
       const ending = carried > 0 ? 3 : 2;
-      const burst = blasts * (1 + widest * 2) + shells + cap + widest * 3 + 1 + front + ending;
+      // A hunt's departure cue: rallies leave half a second apart, so at most one cue a tick.
+      const cue = plan.waves.some((wave) => wave.hunt) ? 1 : 0;
+      const burst =
+        blasts * (1 + widest * 2) + shells + cap + widest * 3 + 1 + front + ending + cue;
       return [scenario.boardKey, burst] as const;
     });
     // The Powder Store's 63-monster finale through 12 standing kegs sets the bound; The
@@ -66,8 +69,8 @@ describe('the turret feedback ring', () => {
     expect(Object.fromEntries(bursts)).toEqual({
       introduction: 342,
       standard: 357,
-      hard: 750,
-      pack: 1908,
+      hard: 801,
+      pack: 1909,
       giants: 781,
       deluge: 1853,
       brittle: 1267,

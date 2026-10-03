@@ -129,7 +129,10 @@ describe('the scenario table', () => {
     expect(TURRET_DEFAULT_SCENARIO).toBe(TURRET_SCENARIO_STANDARD);
     for (const s of TURRET_SCENARIOS) {
       expect(s.boardKey).toMatch(/^[a-z]+$/);
-      expect(s.supply).toBeUndefined();
+      // Only the Veterans' Test is resupplied, once, after its fifth wave, with no bonus.
+      if (s === TURRET_SCENARIO_HARD)
+        expect(s.supply).toEqual({ resupplyAfterWaves: [5], unusedChargeBonus: false });
+      else expect(s.supply).toBeUndefined();
       expect(s.medals.silver.minIntegrityShare).toBeGreaterThan(0);
       expect(s.medals.silver.minIntegrityShare).toBeLessThan(s.medals.gold.minIntegrityShare);
       expect(s.medals.gold.minIntegrityShare).toBeLessThanOrEqual(1);
@@ -242,7 +245,7 @@ describe('resolving a scenario into a plan', () => {
       expect(plan.scenarioId).toBe(s.id);
       expect(plan.integrity).toBe(s.integrity);
       expect(plan.arsenal).toEqual(TRIAL_ARSENALS[key]);
-      expect(plan.resupplyWaves).toEqual([]);
+      expect(plan.resupplyWaves).toEqual(key === 'hard' ? [4] : []);
       expect(plan.chargeBonus).toBe(false);
       expect(plan.waves).toHaveLength(s.waves.length);
       expect(Object.isFrozen(plan.arsenal)).toBe(true);

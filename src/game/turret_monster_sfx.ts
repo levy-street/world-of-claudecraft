@@ -1,5 +1,7 @@
 // Fire and Fly monster sounds: a hurt cry when a live monster is thrown, its death
-// cry on a kill, a thump per bounce or landing, and a heavy knock per bowled body.
+// cry on a kill, a thump per bounce or landing, a heavy knock per bowled body, and a
+// hunt's departure cue: the crying member's own aggro cry at its rally, through the same
+// per-template voice lookup as the other cries, silent when its look has none.
 // Each kind of sound keeps one channel: of the candidates a frame offers, only the
 // strongest plays, and only once the channel's gap has passed, so a wave landing
 // at once is one thump and a blast through a pack is one cry.
@@ -21,7 +23,7 @@ export const TURRET_VOICE_REPEAT_MS = 1000;
 export const TURRET_THUMP_GAP_MS = 90;
 export const TURRET_KNOCK_GAP_MS = 90;
 
-export type TurretVoiceAction = 'hurt' | 'death';
+export type TurretVoiceAction = 'hurt' | 'death' | 'aggro';
 /** A template's clip for a cry, or null when it has none. */
 export type TurretVoiceCue = (templateId: string, action: TurretVoiceAction) => string | null;
 
@@ -40,6 +42,7 @@ const KNOCK_GAIN_MIN = 0.5;
 const KNOCK_GAIN_MAX = 1;
 const HURT_GAIN = 0.8;
 const DEATH_GAIN = 1;
+const CUE_GAIN = 1;
 const DEATH_RANK = 2;
 const HURT_RANK = 1;
 
@@ -77,6 +80,27 @@ export function turretThumpSound(size: TurretSizeClass): {
   return THUMPS[size];
 }
 
+/**
+ * The departure cue a member of kind `kind` cries: its look's own aggro cry, null when the
+ * look has none (the cue is then silent, never another creature's voice).
+ */
+export function turretRallyCueKey(
+  plan: TurretPlan,
+  kind: number,
+  voiceCue: TurretVoiceCue,
+): string | null {
+  const templateId = plan.kinds[kind]?.templateId;
+  return templateId ? voiceCue(fireAndFlyLookTemplate(templateId, plan.scenarioId), 'aggro') : null;
+}
+
+/** The kinds that lead a hunt's pack: only one of a leader's kind ever gives a departure cue. */
+function leaderKinds(plan: TurretPlan): Set<number> {
+  const kinds = new Set<number>();
+  for (const wave of plan.waves)
+    for (const pack of wave.hunt?.packs ?? []) kinds.add(wave.spawns[pack.leader]);
+  return kinds;
+}
+
 /** Every cry the plan's monsters can make, once each. */
 export function turretVoiceKeys(plan: TurretPlan, voiceCue: TurretVoiceCue): string[] {
   const keys = new Set<string>();
@@ -85,6 +109,10 @@ export function turretVoiceKeys(plan: TurretPlan, voiceCue: TurretVoiceCue): str
       const key = voiceCue(fireAndFlyLookTemplate(kind.templateId, plan.scenarioId), action);
       if (key) keys.add(key);
     }
+  }
+  for (const kind of leaderKinds(plan)) {
+    const key = turretRallyCueKey(plan, kind, voiceCue);
+    if (key) keys.add(key);
   }
   return [...keys];
 }
@@ -139,6 +167,8 @@ export class TurretMonsterSfx {
   private readonly voice = channel(TURRET_VOICE_GAP_MS);
   private readonly thump = channel(TURRET_THUMP_GAP_MS);
   private readonly knock = channel(TURRET_KNOCK_GAP_MS);
+  /** Every departure cue a frame offers plays: a hitch can deliver two departures at once. */
+  private readonly cues: TurretSfxCue[] = [];
   private readonly lastCry = new Map<number, number>();
   private readonly dead = new Set<number>();
   /** Monster id to plan kind, kept after the engine drops a body (a drowned one, say). */
@@ -151,6 +181,7 @@ export class TurretMonsterSfx {
     this.lastCry.clear();
     this.dead.clear();
     this.kinds.clear();
+    this.cues.length = 0;
     for (const ch of [this.voice, this.thump, this.knock]) {
       ch.pending = false;
       ch.lastAt = Number.NEGATIVE_INFINITY;
@@ -183,6 +214,15 @@ export class TurretMonsterSfx {
         if (cue) place(cue, TURRET_KNOCK_SFX, event, gain, 1);
         return;
       }
+      case 'rallyCue': {
+        const kind = event.id >= 0 ? this.kindIndexOf(session, event.id) : null;
+        const key =
+          kind === null ? null : turretRallyCueKey(session.defense.plan, kind, this.voiceCue);
+        if (!key) return;
+        const { x, y, z } = event;
+        this.cues.push({ key, x, y, z, gain: CUE_GAIN, rate: 1, jitter: true });
+        return;
+      }
     }
   }
 
@@ -194,6 +234,8 @@ export class TurretMonsterSfx {
     }
     if (this.release(this.thump, now)) play(this.thump.cue);
     if (this.release(this.knock, now)) play(this.knock.cue);
+    for (const cue of this.cues) play(cue);
+    this.cues.length = 0;
   }
 
   private release(ch: Channel, now: number): boolean {
@@ -204,7 +246,7 @@ export class TurretMonsterSfx {
     return true;
   }
 
-  private kindOf(session: TurretSessionView, id: number): TurretPlan['kinds'][number] | null {
+  private kindIndexOf(session: TurretSessionView, id: number): number | null {
     let index = this.kinds.get(id);
     if (index === undefined) {
       const monster = session.defense.monsters.find((m) => m.id === id);
@@ -212,7 +254,12 @@ export class TurretMonsterSfx {
       index = monster.kind;
       this.kinds.set(id, index);
     }
-    return session.defense.plan.kinds[index] ?? null;
+    return index;
+  }
+
+  private kindOf(session: TurretSessionView, id: number): TurretPlan['kinds'][number] | null {
+    const index = this.kindIndexOf(session, id);
+    return index === null ? null : (session.defense.plan.kinds[index] ?? null);
   }
 
   private offerCry(

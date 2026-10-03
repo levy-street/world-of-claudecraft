@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { turretWireNumber } from '../server/turret_self_wire';
 import {
   newTurretMonsterPose,
   type TurretMonsterInput,
@@ -8,8 +9,10 @@ import {
   TURRET_BLEND_MAX,
   TURRET_BLEND_SECONDS,
   TURRET_FORECAST_STEPS,
+  type TurretForecastInput,
   TurretMotionForecast,
 } from '../src/render/turret_motion_forecast_core';
+import { TURRET_MISSION_PACK } from '../src/sim/content/fire_and_fly_missions';
 import { TURRET_SCENARIO_STANDARD } from '../src/sim/content/fire_and_fly_scenarios';
 import {
   TURRET_ARENA,
@@ -21,6 +24,7 @@ import { MOBS } from '../src/sim/data';
 import {
   type FlySegment,
   type MotionSegment,
+  marchSegment,
   planFlight,
   positionAt,
   resolveFlightEnd,
@@ -35,6 +39,7 @@ import {
   tickTurretDefense,
 } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
+import { turretRallySlot } from '../src/sim/minigames/turret_rally';
 import { DT } from '../src/sim/types';
 
 const flat: ThrowProbe = { ground: () => 0, water: () => null };
@@ -44,8 +49,8 @@ const center = { cx: 0, cz: 0 };
 function body(
   state: TurretMonsterState,
   seg: MotionSegment,
-  over: Partial<TurretMonsterInput> = {},
-): TurretMonsterInput {
+  over: Partial<TurretForecastInput> = {},
+): TurretForecastInput {
   return { id: 3, hp: 40, maxHp: 100, state, seg, facing: 0.3, ...over };
 }
 
@@ -313,5 +318,216 @@ describe('Fire and Fly bodies drawn between engine ticks', () => {
     expect(holdThenJumps(carried.steps)).toBe(0);
     const cap = 32 * (DT / 3) * 1.2;
     for (const step of carried.steps) expect(step).toBeLessThanOrEqual(cap);
+  });
+});
+
+describe('a hunt forecast', () => {
+  /**
+   * Plays The Pack's first waves with a shell into a gathering rally every five seconds, and
+   * at every engine transition of a gathering body checks that the forecast, resolved from
+   * the record and rallies of the tick before (`read` as the client gets them), already stood
+   * on the segment the engine then started: same state, same place, same speed, and the same
+   * end, a walk or stand the departure will cut already cut there. Returns the worst gaps.
+   */
+  function followThePack(read: <T>(value: T) => T) {
+    const plan = resolveTurretPlan(TURRET_MISSION_PACK, MOBS, {
+      ...TURRET_BOWLING,
+      enabled: false,
+    });
+    const state = createTurretDefense(plan, { x: 0, z: 0 }, 9, 0);
+    const seen: Record<string, number> = {};
+    const worst = { place: 0, tick: 0 };
+    for (let t = 0; t < 20 * 60 && state.wave < 3; t++) {
+      const before = new Map(state.monsters.map((m) => [m.id, read(structuredClone(m))]));
+      const rallies = read(structuredClone(state.rallies ?? []));
+      const center = { cx: 0, cz: 0, rallies };
+      if (t % 100 === 0 && t >= state.readyTick) {
+        const holder = state.monsters.find((m) => m.state === 'hold' && m.hp > 0);
+        if (holder) {
+          const p = positionAt(holder.seg, t, flat);
+          fireTurret(state, t, p.x + 1.5, p.z, flat);
+        }
+      }
+      tickTurretDefense(state, t + 1, flat);
+      for (const m of state.monsters) {
+        const was = before.get(m.id);
+        if (!was || !(m.seg.start > t) || !(m.seg.start <= t + 1)) continue;
+        if (!['muster', 'hold', 'rise'].includes(was.state)) continue;
+        if (!['muster', 'hold', 'march'].includes(m.state)) continue;
+        const kind = plan.kinds[m.kind];
+        const f = new TurretMotionForecast().resolve(
+          was,
+          kind,
+          center,
+          t + 1.5,
+          flat,
+          TURRET_PHYSICS,
+        );
+        expect(f.state, `${was.state} to ${m.state}`).toBe(m.state);
+        expect(f.seg.kind).toBe(m.seg.kind);
+        const depart = rallies.find((r) => r.id === m.rally)?.departTick ?? -1;
+        const cut = m.state !== 'march' && depart >= m.seg.start && depart < m.seg.end;
+        const end = cut ? depart : m.seg.end;
+        worst.tick = Math.max(
+          worst.tick,
+          Math.abs(f.seg.start - m.seg.start),
+          Math.abs(f.seg.end - end),
+        );
+        for (const at of [t + 1.5, t + 10]) {
+          if (at > end) continue;
+          const a = positionAt(f.seg, at, flat);
+          const b = positionAt(m.seg, at, flat);
+          worst.place = Math.max(worst.place, Math.hypot(a.x - b.x, a.z - b.z));
+        }
+        const key = `${was.state}>${m.state}`;
+        seen[key] = (seen[key] ?? 0) + 1;
+      }
+    }
+    expect(seen['muster>hold']).toBeGreaterThan(20);
+    expect(seen['hold>march']).toBeGreaterThan(10);
+    expect(seen['rise>muster']).toBeGreaterThan(0);
+    // Stragglers: caught walking in, or back on their feet, when their pack left.
+    expect((seen['muster>march'] ?? 0) + (seen['rise>march'] ?? 0)).toBeGreaterThan(0);
+    return worst;
+  }
+
+  it('starts every gathering leg, stand, departure and walk back exactly where the engine does', () => {
+    const worst = followThePack((value) => value);
+    expect(worst.place).toBeLessThan(1e-9);
+    expect(worst.tick).toBeLessThan(1e-9);
+  });
+
+  it('stays within the wire rounding when it reads the seat online', () => {
+    const online = <T>(value: T): T => JSON.parse(JSON.stringify(value, turretWireNumber));
+    const worst = followThePack(online);
+    // The seat's own bound (positions to the millimetre); a leg's end tick moves by the
+    // rounded distance over the pace, a few thousandths of a tick.
+    expect(worst.place).toBeLessThan(1e-3);
+    expect(worst.tick).toBeLessThan(5e-3);
+  });
+
+  it('holds a stand the engine has not ended, then leaves on the departure the cue set', () => {
+    const rally = {
+      id: 0,
+      x: 0,
+      z: 30,
+      pace: 5,
+      holdTicks: 120,
+      leader: 1,
+      firstArrivalTick: 100,
+      cueTick: -1,
+      departTick: -1,
+    };
+    const at = { x: 0.5, y: 0, z: 30 };
+    const hold = body('hold', stillSegment(110, 140 - 110, at), { rally: 0, slot: 2, pace: 4.2 });
+    const scoutKind = { ...kind, role: 'scout' as const };
+    const f = new TurretMotionForecast();
+    // Past the bound with no cue known: it stands, never a guess at the departure.
+    f.resolve(hold, kind, { ...center, rallies: [rally] }, 150, flat, TURRET_PHYSICS);
+    expect(f.state).toBe('hold');
+    // The cue lands: the stand is cut at the departure and the pack's pace takes over.
+    const cued = { ...rally, cueTick: 105, departTick: 125 };
+    f.resolve(hold, kind, { ...center, rallies: [cued] }, 130, flat, TURRET_PHYSICS);
+    expect(f.state).toBe('march');
+    expect(f.seg.start).toBe(125);
+    expect(f.seg.kind === 'march' && f.seg.speed).toBe(5);
+    // A scout breaks out at its own pace.
+    const s = new TurretMotionForecast().resolve(
+      hold,
+      scoutKind,
+      { ...center, rallies: [cued] },
+      130,
+      flat,
+      TURRET_PHYSICS,
+    );
+    expect(s.seg.kind === 'march' && s.seg.speed).toBe(4.2);
+  });
+
+  it('cuts a walk back it planned in the same frame at the departure, as the engine does', () => {
+    const rally = {
+      id: 0,
+      x: 0,
+      z: 30,
+      pace: 5,
+      holdTicks: 120,
+      leader: 1,
+      firstArrivalTick: 60,
+      cueTick: 85,
+      departTick: 105,
+    };
+    const from = { x: 12, y: 0, z: 30 };
+    const rise = body('rise', stillSegment(90, 10, from), { rally: 0, slot: 0, pace: 4 });
+    // Back on its feet at 100 and walking to its place when its pack leaves at 105: one frame
+    // at 110 covers both, so the body already marches from where the walk stood at 105.
+    const f = new TurretMotionForecast().resolve(
+      rise,
+      kind,
+      { ...center, rallies: [rally] },
+      110,
+      flat,
+      TURRET_PHYSICS,
+    );
+    expect(f.state).toBe('march');
+    expect(f.seg.start).toBe(105);
+    expect(f.seg.kind === 'march' && f.seg.speed).toBe(5);
+    const slot = turretRallySlot(rally, 0, 0, 0);
+    const walk = marchSegment(100, from.x, from.y, from.z, slot.x, slot.z, 4, 0);
+    const a = positionAt(f.seg, 105, flat);
+    const b = positionAt(walk, 105, flat);
+    expect(Math.hypot(a.x - b.x, a.z - b.z)).toBeLessThan(1e-9);
+  });
+});
+
+describe('a hunt pose', () => {
+  it('walks a gathering member like a marcher, and stands a holder facing the tower', () => {
+    const pose = newTurretMonsterPose();
+    const walk = body('muster', {
+      kind: 'march',
+      start: 0,
+      end: 40,
+      x: 10,
+      y: 0,
+      z: 40,
+      dx: 0,
+      dz: -1,
+      speed: 5,
+    });
+    turretMonsterPoseInto(pose, walk, { mass: 1 }, 10, flat, false, center);
+    expect(pose.moving).toBe(true);
+    expect(pose.speed).toBe(5);
+    expect(pose.yaw).toBeCloseTo(Math.PI, 12);
+    expect(pose.attitude).toBe('upright');
+    const stand = body('hold', stillSegment(0, 40, { x: 10, y: 0, z: 30 }), { facing: 2 });
+    turretMonsterPoseInto(pose, stand, { mass: 1 }, 10, flat, false, center);
+    expect(pose.moving).toBe(false);
+    expect(pose.speed).toBe(0);
+    expect(pose.yaw).toBeCloseTo(Math.atan2(-10, -30), 12);
+    expect(pose.attitude).toBe('upright');
+    expect(pose.windup).toBe(-1);
+  });
+
+  it('keeps a holder its own facing with no tower to turn to, and freezes both states when lost', () => {
+    const pose = newTurretMonsterPose();
+    const stand = body('hold', stillSegment(0, 40, { x: 10, y: 0, z: 30 }), { facing: 2 });
+    turretMonsterPoseInto(pose, stand, { mass: 1 }, 10, flat, false, null);
+    expect(pose.yaw).toBe(2);
+    expect(pose.moving).toBe(false);
+    turretMonsterPoseInto(pose, stand, { mass: 1 }, 10, flat, true, center);
+    expect(pose.attitude).toBe('hold');
+    const walk = body('muster', {
+      kind: 'march',
+      start: 0,
+      end: 40,
+      x: 10,
+      y: 0,
+      z: 40,
+      dx: 0,
+      dz: -1,
+      speed: 5,
+    });
+    turretMonsterPoseInto(pose, walk, { mass: 1 }, 10, flat, true, center);
+    expect(pose.moving).toBe(false);
+    expect(pose.speed).toBe(0);
+    expect(pose.attitude).toBe('hold');
   });
 });

@@ -32,6 +32,13 @@ import {
 import type { TurretFeedback } from '../sim/minigames/turret_feedback';
 import { TURRET_BOMBLETS, type TurretBombletSpot } from '../sim/minigames/turret_fragmentation';
 import {
+  TURRET_HUNT_LIMITS,
+  type TurretHuntPackPlan,
+  type TurretHuntPlan,
+  turretHuntPlanValid,
+} from '../sim/minigames/turret_hunt_plan';
+import type { TurretRally } from '../sim/minigames/turret_rally';
+import {
   TURRET_BONUS_CAP,
   TURRET_POINTS,
   type TurretMedal,
@@ -50,6 +57,7 @@ import type {
   TurretBowlingDef,
   TurretMedalBar,
   TurretMedalBars,
+  TurretRallyKegDef,
   Vec3,
 } from '../sim/types';
 
@@ -62,6 +70,9 @@ export type TurretSeatState = Omit<TurretSessionView, 'feedback'>;
 // field holds the widest wave, its predecessor's corpses and an overlapping mission's tail.
 const MAX_MONSTERS = 2 * TURRET_PLAN_LIMITS.spawnsPerWave + TURRET_PLAN_LIMITS.overlap;
 const MAX_SHOTS = 32;
+// A rally stays open only while a living member of its pack gathers.
+const MAX_RALLIES = 2 * TURRET_PLAN_LIMITS.packs + TURRET_PLAN_LIMITS.overlap;
+const MAX_RALLY_ID = TURRET_PLAN_LIMITS.waves * TURRET_PLAN_LIMITS.packs - 1;
 const MAX_BARRELS = 64;
 const MAX_HITS = 256;
 const MAX_TEMPLATE_ID = 64;
@@ -180,6 +191,9 @@ const segmentArm = <K extends MotionSegment['kind']>(spec: Arm<MotionSegment, 'k
   shape<Extract<MotionSegment, { kind: K }>>(spec);
 const arrivalArm = <K extends TurretArrivalDef['kind']>(spec: Arm<TurretArrivalDef, 'kind', K>) =>
   shape<Extract<TurretArrivalDef, { kind: K }>>(spec);
+const kegArm = <K extends TurretRallyKegDef['placement']>(
+  spec: Arm<TurretRallyKegDef, 'placement', K>,
+) => shape<Extract<TurretRallyKegDef, { placement: K }>>(spec);
 
 const at = { x: num, y: num, z: num };
 const vec3 = shape<Vec3>(at);
@@ -293,6 +307,13 @@ const turretEvent = tagged<TurretEvent, 'type'>('type', {
   breach: eventArm({ type: lit('breach'), id: count, points: num, integrity: num, ...at }),
   vanished: eventArm({ type: lit('vanished'), id: count, ...at }),
   waveStart: eventArm({ type: lit('waveStart'), wave: count, count }),
+  rallyCue: eventArm({
+    type: lit('rallyCue'),
+    rally: within(0, MAX_RALLY_ID),
+    id: int(-1),
+    ...at,
+    departTick: wholeTick,
+  }),
   barrelsPlaced: eventArm({
     type: lit('barrelsPlaced'),
     barrels: list(MAX_BARRELS, shape<TurretBarrelSpot>({ id: count, ...at })),
@@ -391,9 +412,24 @@ const monster = shape<TurretMonsterView>({
   kind: count,
   hp: nonNegative,
   maxHp: positive,
-  state: oneOf('march', 'windup', 'fly', 'skid', 'down', 'rise', 'dead', 'gone'),
+  state: oneOf('march', 'muster', 'hold', 'windup', 'fly', 'skid', 'down', 'rise', 'dead', 'gone'),
   seg: segment,
   facing: num,
+  pace: optional(positive),
+  rally: optional(within(0, MAX_RALLY_ID)),
+  slot: optional(within(0, LIMITS.spawnsPerWave - 1)),
+});
+
+const rally = shape<TurretRally>({
+  id: within(0, MAX_RALLY_ID),
+  x: num,
+  z: num,
+  pace: positive,
+  holdTicks: within(0, TURRET_HUNT_LIMITS.windowTicks),
+  leader: int(-1),
+  firstArrivalTick: int(-1),
+  cueTick: int(-1),
+  departTick: int(-1),
 });
 
 const shot = shape<TurretShot>({
@@ -424,6 +460,7 @@ const defense = shape<Omit<TurretDefenseView, 'plan'>>({
   shots: list(MAX_SHOTS, shot),
   monsters: list(MAX_MONSTERS, monster),
   barrels: list(MAX_BARRELS, barrel),
+  rallies: optional(list(MAX_RALLIES, rally)),
   stats,
   result: optional(result),
 });
@@ -443,6 +480,30 @@ const arrival = tagged<TurretArrivalDef, 'kind'>('kind', {
 });
 
 const medalBar = shape<TurretMedalBar>({ minIntegrityShare: share });
+
+const rallyKeg = tagged<TurretRallyKegDef, 'placement'>('placement', {
+  'rally-front': kegArm({ placement: lit('rally-front') }),
+  'rally-side': kegArm({ placement: lit('rally-side') }),
+  axis: kegArm({ placement: lit('axis'), fromTower: positive }),
+});
+
+const huntPlan = shape<TurretHuntPlan>({
+  packs: list(
+    LIMITS.packs,
+    shape<TurretHuntPackPlan>({
+      pace: positive,
+      kegs: list(LIMITS.barrels, rallyKeg),
+      leader: within(0, LIMITS.spawnsPerWave - 1),
+      last: within(0, LIMITS.spawnsPerWave - 1),
+    }),
+  ),
+  groups: list(LIMITS.spawnsPerWave, within(-1, LIMITS.packs - 1)),
+  ticks: list(LIMITS.spawnsPerWave, within(0, 2 * TURRET_HUNT_LIMITS.windowTicks)),
+  minRadius: positive,
+  maxRadius: positive,
+  holdTicks: within(0, TURRET_HUNT_LIMITS.windowTicks),
+  widthTurn: turn,
+});
 
 const plan = shape<TurretPlan>({
   scenarioId,
@@ -466,6 +527,8 @@ const plan = shape<TurretPlan>({
       radius: positive,
       breachValue: nonNegative,
       height: positive,
+      role: optional(oneOf('scout', 'sprint')),
+      marchSpeedMax: optional(nonNegative),
     }),
   ),
   waves: list(
@@ -483,6 +546,7 @@ const plan = shape<TurretPlan>({
         cap: optional(within(1, LIMITS.barrels)),
       }),
       arrival,
+      hunt: optional(huntPlan),
     }),
   ),
   bowling: shape<TurretBowlingDef>({
@@ -522,6 +586,12 @@ export function decodeTurretPlan(value: unknown): TurretPlan | null {
   if (!turretOverlapValid(decoded.overlap, decoded.waves)) return null;
   const kinds = decoded.kinds.length;
   for (const wave of decoded.waves) if (wave.spawns.some((kind) => kind >= kinds)) return null;
+  for (const kind of decoded.kinds)
+    if (kind.marchSpeedMax !== undefined && kind.marchSpeedMax < kind.marchSpeed) return null;
+  const roles = decoded.kinds.map((kind) => kind.role);
+  for (const wave of decoded.waves) {
+    if (wave.hunt ? !turretHuntPlanValid(wave.hunt, wave.spawns, roles) : false) return null;
+  }
   return deepFreeze(decoded);
 }
 
@@ -640,6 +710,33 @@ export function assembleTurretSeatWire(parts: Readonly<Record<string, unknown>>)
   };
 }
 
+/** A pace rides the wire to 5 decimals (server/turret_self_wire.ts). */
+const PACE_ROUNDING = 1e-5;
+
+/**
+ * The rallies against the monsters: each id once, from a hunt wave's pack at most the
+ * current wave with that pack's pace and the wave's hold, and every gathering member's
+ * rally open, its place with it.
+ */
+function ralliesConsistent(
+  defense: Omit<TurretDefenseView, 'plan'>,
+  turretPlan: TurretPlan,
+): boolean {
+  const rallies = defense.rallies ?? [];
+  const ids = new Set(rallies.map((r) => r.id));
+  if (ids.size !== rallies.length) return false;
+  for (const r of rallies) {
+    const wave = Math.floor(r.id / LIMITS.packs);
+    const pack = turretPlan.waves[wave]?.hunt?.packs[r.id % LIMITS.packs];
+    if (wave > defense.wave || !pack) return false;
+    if (r.holdTicks !== turretPlan.waves[wave].hunt?.holdTicks) return false;
+    if (Math.abs(r.pace - pack.pace) > PACE_ROUNDING) return false;
+  }
+  return defense.monsters.every((m) =>
+    m.rally === undefined ? m.slot === undefined : m.slot !== undefined && ids.has(m.rally),
+  );
+}
+
 /** The seat state against its plan (the family joined back): the seat minus its feedback ring, or null. */
 export function decodeTurretSeat(value: unknown, turretPlan: TurretPlan): TurretSeatState | null {
   const decoded = seat(value);
@@ -649,6 +746,7 @@ export function decodeTurretSeat(value: unknown, turretPlan: TurretPlan): Turret
   const ended = phase === 'won' || phase === 'lost';
   if (
     !armsConsistent(decoded.defense, turretPlan) ||
+    !ralliesConsistent(decoded.defense, turretPlan) ||
     !chargesScored(decoded.defense, turretPlan) ||
     decoded.waveCount !== waves.length ||
     decoded.defense.wave >= waves.length ||

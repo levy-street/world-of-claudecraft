@@ -13803,6 +13803,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.turretArsenal.resupplyBoth'
   | 'hudChrome.turretArsenal.resupplyFrag'
   | 'hudChrome.turretArsenal.resupplyRule'
+  | 'hudChrome.turretArsenal.resupplyRuleOnce'
   | 'hudChrome.turretArsenal.resupplyShock'
   | 'hudChrome.turretArsenal.shockHint'
   | 'hudChrome.turretArsenal.shockHintTouch'

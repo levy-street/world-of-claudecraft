@@ -85,10 +85,13 @@ export function turretWeaponDescription(weapon: TurretWeaponKind, coreDamage: nu
 /** What a run's plan adds to every weapon: when it resupplies, and what a charge left scores. */
 export type TurretSupplyPlan = Pick<TurretPlan, 'resupplyWaves' | 'chargeBonus'>;
 
-/** The plan's supply rules, one line each; empty on a trial. */
+/** The plan's supply rules, one line each: a mission's, or the Veterans' Test's one resupply. */
 export function turretSupplyLines(plan: TurretSupplyPlan): string[] {
   const lines: string[] = [];
-  if (plan.resupplyWaves.length > 0) {
+  if (plan.resupplyWaves.length === 1) {
+    const wave = formatNumber(plan.resupplyWaves[0] + 1);
+    lines.push(t('hudChrome.turretArsenal.resupplyRuleOnce', { wave }));
+  } else if (plan.resupplyWaves.length > 1) {
     const waves = formatList(plan.resupplyWaves.map((wave) => formatNumber(wave + 1)));
     lines.push(t('hudChrome.turretArsenal.resupplyRule', { waves }));
   }

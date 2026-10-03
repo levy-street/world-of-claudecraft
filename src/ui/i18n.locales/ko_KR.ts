@@ -18896,6 +18896,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.turretArsenal.resupplyFrag': '보급: 파편탄 {frag}',
   'hudChrome.turretArsenal.resupplyRule':
     '{waves}번째 웨이브가 끝나면 이 임무의 각 무기 충전이 하나씩 늘어납니다.',
+  'hudChrome.turretArsenal.resupplyRuleOnce':
+    '{wave}번째 웨이브가 끝나면 각 무기 충전이 하나씩 늘어납니다.',
   'hudChrome.turretArsenal.bonusRule':
     '임무에서 승리하면 쓰지 않고 남긴 충전 하나당 {points}점을 얻습니다.',
   'hudChrome.turretArsenal.pointsCharges': '남긴 충전 ({count})',

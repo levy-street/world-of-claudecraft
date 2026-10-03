@@ -49,6 +49,7 @@ import {
   type TurretPlan,
   turretChargesLeft,
   turretResupplyAfter,
+  turretStrikeDistance,
 } from './turret_defense_plan';
 import { TURRET_STREAM, type TurretRunKey, turretDraw, turretRunKey } from './turret_defense_rng';
 import {
@@ -59,6 +60,20 @@ import {
   turretBombletBlast,
   turretFragBomblets,
 } from './turret_fragmentation';
+import { turretDrawPace } from './turret_pace';
+import {
+  arriveTurretRally,
+  cueTurretRallies,
+  departTurretRallies,
+  holdOnTurretRally,
+  joinTurretHunt,
+  openTurretRallies,
+  riseTurretMonster,
+  type TurretRally,
+  turretHuntGap,
+  turretHuntSector,
+} from './turret_rally';
+import { placeTurretRallyKegs } from './turret_rally_kegs';
 import {
   type TurretMedal,
   type TurretPointsBreakdown,
@@ -72,10 +87,16 @@ import {
   turretShockwaveTargets,
 } from './turret_shockwave';
 
+export { turretStrikeDistance } from './turret_defense_plan';
+
 export type TurretPhase = 'intro' | 'wave' | 'between' | 'won' | 'lost';
 
 export type TurretMonsterState =
   | 'march'
+  /** A hunt's member walking to its place at its pack's rally (minigames/turret_rally.ts). */
+  | 'muster'
+  /** Standing at its place until its pack leaves. */
+  | 'hold'
   | 'windup'
   | 'fly'
   | 'skid'
@@ -106,6 +127,11 @@ export interface TurretMonster {
   throwOpen: boolean;
   /** Ids this body met in its current flight (bowling): each pair knocks at most once per flight. */
   knocked: number[];
+  /** Its own pace (yd/s) for its march legs when not its kind's: a drawn spread, or its pack's advance. */
+  pace?: number;
+  /** The rally its pack gathers at (its id) and its place there; both dropped when the pack leaves. */
+  rally?: number;
+  slot?: number;
 }
 
 export interface TurretShot {
@@ -186,6 +212,8 @@ export interface TurretDefenseState {
   monsters: TurretMonster[];
   /** The standing explosive barrels, lit ones included, in the order they were placed. */
   barrels: TurretBarrel[];
+  /** A hunt's rallies still gathering, in the order they opened; absent before a hunt's first. */
+  rallies?: TurretRally[];
   stats: TurretStats;
   /** The medal and points, set once the run ends (deep-frozen: views share it). */
   result: TurretResult | null;
@@ -315,6 +343,16 @@ export type TurretEvent =
     }
   | { type: 'vanished'; id: number; x: number; y: number; z: number }
   | { type: 'waveStart'; wave: number; count: number }
+  /** A pack's leader cries at its rally (`id`, -1 with none living): the pack leaves at `departTick`. */
+  | {
+      type: 'rallyCue';
+      rally: number;
+      id: number;
+      x: number;
+      y: number;
+      z: number;
+      departTick: number;
+    }
   | { type: 'barrelsPlaced'; barrels: TurretBarrelSpot[] }
   | { type: 'barrelLit'; id: number; x: number; y: number; z: number; fuseTicks: number }
   | { type: 'barrelExploded'; id: number; x: number; y: number; z: number; hits: TurretHit[] }
@@ -404,10 +442,6 @@ export function turretMonstersLeft(state: TurretDefenseState): number {
   let left = wave ? wave.spawns.length - state.spawnCursor : 0;
   for (const m of state.monsters) if (m.hp > 0) left++;
   return left;
-}
-
-export function turretStrikeDistance(kind: TurretKind): number {
-  return TURRET_ARENA.breachRadius + kind.radius;
 }
 
 /** An aim held inside the weapon's reach band: the point, its unit bearing and its range. */
@@ -560,6 +594,7 @@ export function tickTurretDefense(
   // Knocks along the segments as they stood, then on the pairs this tick's
   // transitions renewed (a bounce is the lowest, likeliest moment to knock).
   resolveTurretBowling(state, tick - 1, tick, Number.NEGATIVE_INFINITY, world, events);
+  departTurretRallies(state, tick, world);
   if (state.phase === 'wave') spawnDue(state, tick, world);
   // Bodies catch up to this tick before the shells land (a juggle must not add the
   // velocity of a flight that already touched down), but a completing windup waits:
@@ -573,6 +608,7 @@ export function tickTurretDefense(
     explodeDueBarrels(state, tick, world, events);
   }
   advanceMonsters(state, tick, world, events, false);
+  if (!isLost(state)) cueTurretRallies(state, tick, world, events);
   if (state.phase === 'wave') checkWaveCleared(state, tick, world, events);
   return events;
 }
@@ -627,9 +663,11 @@ function startWave(
   }
   state.phase = 'wave';
   state.spawnCursor = 0;
-  state.nextSpawnTick = tick;
+  state.nextSpawnTick = tick + (wave.hunt?.ticks[0] ?? 0);
   events.push({ type: 'waveStart', wave: state.wave, count: wave.spawns.length });
   const placed = placeTurretBarrels(state, wave.barrels, tick, probe);
+  if (wave.hunt)
+    placed.push(...placeTurretRallyKegs(state, wave, openTurretRallies(state, wave), tick, probe));
   if (placed.length) {
     events.push({
       type: 'barrelsPlaced',
@@ -646,16 +684,21 @@ function spawnDue(state: TurretDefenseState, tick: number, probe: ThrowProbe): v
     const kindIndex = wave.spawns[index];
     const kind = state.plan.kinds[kindIndex];
     const id = state.nextMonsterId++;
+    const hunt = wave.hunt;
+    const pace = turretDrawPace(state, kind, id);
     const angle = turretSpawnBearing(
       state,
       turretDraw(state, TURRET_STREAM.spawnAngle, id),
       kind.radius,
-      turretArrivalSector(state, state.wave, wave.arrival, index),
+      hunt
+        ? turretHuntSector(state, state.wave, hunt, index)
+        : turretArrivalSector(state, state.wave, wave.arrival, index),
     );
     const x = state.cx + Math.sin(angle) * TURRET_ARENA.spawnRadius;
     const z = state.cz + Math.cos(angle) * TURRET_ARENA.spawnRadius;
-    state.nextSpawnTick = tick + turretArrivalGap(state, wave, index, id);
-    state.monsters.push({
+    state.nextSpawnTick =
+      tick + (hunt ? turretHuntGap(hunt, index) : turretArrivalGap(state, wave, index, id));
+    const m: TurretMonster = {
       id,
       kind: kindIndex,
       hp: kind.maxHp,
@@ -668,7 +711,7 @@ function spawnDue(state: TurretDefenseState, tick: number, probe: ThrowProbe): v
         z,
         state.cx,
         state.cz,
-        kind.marchSpeed,
+        pace ?? kind.marchSpeed,
         turretStrikeDistance(kind),
       ),
       facing: facingToward(x, z, state.cx, state.cz),
@@ -677,7 +720,10 @@ function spawnDue(state: TurretDefenseState, tick: number, probe: ThrowProbe): v
       throwZ: z,
       throwOpen: false,
       knocked: [],
-    });
+      ...(pace !== undefined ? { pace } : {}),
+    };
+    if (hunt) joinTurretHunt(state, m, hunt, index, tick);
+    state.monsters.push(m);
     bump(state);
   }
 }
@@ -963,6 +1009,12 @@ function transition(
   const kind = state.plan.kinds[m.kind];
   const at = m.seg.end;
   switch (m.state) {
+    case 'muster':
+      arriveTurretRally(state, m, at, probe);
+      return;
+    case 'hold':
+      holdOnTurretRally(state, m, at, probe);
+      return;
     case 'march': {
       const p = positionAt(m.seg, at, probe);
       m.state = 'windup';
@@ -1016,22 +1068,9 @@ function transition(
       m.state = 'rise';
       m.seg = stillSegment(at, TURRET_TIMING.riseTicks, positionAt(m.seg, at, probe));
       return;
-    case 'rise': {
-      const p = positionAt(m.seg, at, probe);
-      m.state = 'march';
-      m.seg = marchSegment(
-        at,
-        p.x,
-        p.y,
-        p.z,
-        state.cx,
-        state.cz,
-        kind.marchSpeed,
-        turretStrikeDistance(kind),
-      );
-      m.facing = facingToward(p.x, p.z, state.cx, state.cz);
+    case 'rise':
+      riseTurretMonster(state, m, at, positionAt(m.seg, at, probe));
       return;
-    }
     case 'dead':
       m.state = 'gone';
       return;

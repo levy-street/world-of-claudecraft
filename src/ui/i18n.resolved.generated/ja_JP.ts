@@ -563,6 +563,7 @@ export const ja_JP: EnTranslations = {
       "resupplyShock": "補給：衝撃波 {shock}",
       "resupplyFrag": "補給：榴散弾 {frag}",
       "resupplyRule": "ウェーブ {waves} の終わりに、この任務の各兵器のチャージが一つ増える。",
+      "resupplyRuleOnce": "ウェーブ {wave} の終わりに、各兵器のチャージが一つ増える。",
       "bonusRule": "任務に勝利すると、未使用のチャージ一つにつき{points}ポイント。",
       "pointsCharges": "残したチャージ（{count}）"
     },

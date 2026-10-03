@@ -563,6 +563,7 @@ export const zh_CN: EnTranslations = {
       "resupplyShock": "补给：冲击波 {shock}",
       "resupplyFrag": "补给：破片弹 {frag}",
       "resupplyRule": "第 {waves} 波结束时，本任务的每种武器各增加一次次数。",
+      "resupplyRuleOnce": "第 {wave} 波结束时，每种武器各增加一次次数。",
       "bonusRule": "赢下任务时，每剩余一次未用次数得 {points} 分。",
       "pointsCharges": "保留次数（{count}）"
     },

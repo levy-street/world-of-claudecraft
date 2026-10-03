@@ -7,6 +7,7 @@
 
 import { TURRET_DEFAULT_SCENARIO } from '../content/fire_and_fly_scenarios';
 import {
+  TURRET_ARENA,
   TURRET_BOWLING,
   TURRET_SIZE_CLASSES,
   TURRET_TEMPLATE_SIZES,
@@ -25,8 +26,10 @@ import type {
   TurretScenarioDef,
   TurretSizeClass,
   TurretWaveEntry,
+  TurretWaveRole,
 } from '../types';
 import { type TurretArsenal, turretChargesGiven } from './turret_charges';
+import { resolveTurretHunt, TURRET_HUNT_LIMITS, type TurretHuntPlan } from './turret_hunt_plan';
 import { turretMedalBarPoints } from './turret_result';
 
 export { type TurretArsenal, turretChargesGiven, turretChargesLeft } from './turret_charges';
@@ -41,6 +44,15 @@ export interface TurretKind {
   readonly radius: number;
   readonly breachValue: number;
   readonly height: number;
+  /** A hunt role (minigames/turret_rally.ts); absent on a plain marcher or a pack member. */
+  readonly role?: TurretWaveRole;
+  /** With it, each monster draws its own pace from marchSpeed to this (minigames/turret_pace.ts). */
+  readonly marchSpeedMax?: number;
+}
+
+/** How far from the tower's centre a monster of `kind` stops to strike (yd). */
+export function turretStrikeDistance(kind: Pick<TurretKind, 'radius'>): number {
+  return TURRET_ARENA.breachRadius + kind.radius;
 }
 
 export interface TurretWavePlan {
@@ -51,6 +63,8 @@ export interface TurretWavePlan {
   readonly gapMaxTicks: number;
   readonly barrels: Readonly<TurretBarrelWaveDef>;
   readonly arrival: Readonly<TurretArrivalDef>;
+  /** A hunt wave's packs: its monsters gather at rallies before they advance. */
+  readonly hunt?: TurretHuntPlan;
 }
 
 /**
@@ -77,7 +91,7 @@ export interface TurretPlan {
   /** The medal bars, as shares of `integrity` kept at a win (turret_result.ts). */
   readonly medals: Readonly<TurretMedalBars>;
   readonly arsenal: TurretArsenal;
-  /** Waves (from 0) whose end resupplies the arsenal, ascending; none on a trial. */
+  /** Waves (from 0) whose end resupplies the arsenal, ascending; on a trial, only the Veterans' Test's. */
   readonly resupplyWaves: readonly number[];
   /** A won run scores its unused charges (turret_result.ts). */
   readonly chargeBonus: boolean;
@@ -124,6 +138,7 @@ export const TURRET_PLAN_LIMITS = {
   groupGapTicks: 20 * 60,
   barrels: 24,
   overlap: 16,
+  packs: TURRET_HUNT_LIMITS.packs,
 } as const;
 
 /** Lowercase letters, digits and underscores, at most the id length. */
@@ -258,8 +273,15 @@ export function resolveTurretPlan(
     const speed = entry.speedScale ?? 1;
     if (!Number.isFinite(speed) || speed <= 0)
       throw new Error(`turret plan: bad speed scale for ${entry.templateId}`);
+    const speedMax = entry.speedScaleMax;
+    if (speedMax !== undefined && !(Number.isFinite(speedMax) && speedMax >= speed))
+      throw new Error(`turret plan: bad speed band for ${entry.templateId}`);
+    const role = entry.role;
+    if (role !== undefined && role !== 'scout' && role !== 'sprint')
+      throw new Error(`turret plan: bad role for ${entry.templateId}`);
     const scaled = `${scale === 1 ? '' : `x${scale}`}${speed === 1 ? '' : `s${speed}`}`;
-    const key = `${entry.templateId}@${entry.level}${scaled}`;
+    const banded = `${speedMax === undefined ? '' : `~${speedMax}`}${role ? `:${role}` : ''}`;
+    const key = `${entry.templateId}@${entry.level}${scaled}${banded}`;
     const known = kindIndex.get(key);
     if (known !== undefined) return known;
     const template = mobs[entry.templateId];
@@ -278,13 +300,21 @@ export function resolveTurretPlan(
       radius: size.radius,
       breachValue: size.breachValue,
       height: size.height,
+      ...(role ? { role } : {}),
+      ...(speedMax !== undefined
+        ? { marchSpeedMax: template.moveSpeed * TURRET_TIMING.marchFactor * speedMax }
+        : {}),
     });
     kindIndex.set(key, kinds.length - 1);
     return kinds.length - 1;
   };
   const planned = scenario.waves.map((wave) => {
     const entryKinds = wave.entries.map(kindOf);
-    const spawns = turretSpawnOrder(wave.entries).map((entry) => entryKinds[entry]);
+    const hunt = wave.hunt ? resolveTurretHunt(wave.hunt, wave.entries, mobs, scenario.id) : null;
+    if (!hunt && wave.entries.some((e) => e.role || e.pack !== undefined || e.leads))
+      throw new Error(`turret plan: a hunt role outside a hunt in ${scenario.id}`);
+    const order = hunt ? hunt.order : turretSpawnOrder(wave.entries);
+    const spawns = order.map((entry) => entryKinds[entry]);
     if (spawns.length > limits.spawnsPerWave)
       throw new Error(`turret plan: too many spawns in a wave of ${scenario.id}`);
     return {
@@ -294,6 +324,7 @@ export function resolveTurretPlan(
       gapMaxTicks: wave.gapMaxTicks,
       barrels: resolveBarrels(wave.barrels, scenario.kegs, scenario.id),
       arrival: resolveArrival(wave.arrival, scenario.id),
+      ...(hunt ? { hunt: hunt.hunt } : {}),
     };
   });
   if (kinds.length > limits.kinds)

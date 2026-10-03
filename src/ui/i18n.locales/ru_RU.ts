@@ -19267,6 +19267,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.turretArsenal.resupplyFrag': 'Пополнение: осколочный снаряд {frag}',
   'hudChrome.turretArsenal.resupplyRule':
     'В конце волн {waves} каждое оружие задания получает ещё один заряд.',
+  'hudChrome.turretArsenal.resupplyRuleOnce':
+    'В конце волны {wave} каждое оружие получает ещё один заряд.',
   'hudChrome.turretArsenal.bonusRule':
     'Победа в задании приносит {points} очков за каждый неиспользованный заряд.',
   'hudChrome.turretArsenal.pointsCharges': 'Сохранённые заряды ({count})',

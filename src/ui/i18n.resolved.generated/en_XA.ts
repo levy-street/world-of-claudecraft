@@ -563,6 +563,7 @@ export const en_XA: EnTranslations = {
       "resupplyShock": "[Ŕéšúþþļý: {shock} Šĥóçķŵáʋé]",
       "resupplyFrag": "[Ŕéšúþþļý: {frag} Ƒŕáĝɱéñţáţíóñ Šĥéļļ]",
       "resupplyRule": "[Éáçĥ ŵéáþóñ óƒ ţĥé ɱíššíóñ ĝáíñš óñé çĥáŕĝé áš ŵáʋéš {waves} éñð.]",
+      "resupplyRuleOnce": "[Éáçĥ ŵéáþóñ ĝáíñš óñé çĥáŕĝé áš ŵáʋé {wave} éñðš.]",
       "bonusRule": "[Á ŵóñ ɱíššíóñ šçóŕéš {points} þóíñţš ƒóŕ éáçĥ çĥáŕĝé ļéƒţ úñúšéð.]",
       "pointsCharges": "[Çĥáŕĝéš ķéþţ ({count})]"
     },

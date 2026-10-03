@@ -18020,6 +18020,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.turretArsenal.resupplyShock': '補給：衝擊波 {shock}',
   'hudChrome.turretArsenal.resupplyFrag': '補給：破片彈 {frag}',
   'hudChrome.turretArsenal.resupplyRule': '第 {waves} 波結束時，本任務的每種武器各增加一次次數。',
+  'hudChrome.turretArsenal.resupplyRuleOnce': '第 {wave} 波結束時，每種武器各增加一次次數。',
   'hudChrome.turretArsenal.bonusRule': '贏下任務時，每剩餘一次未用次數得 {points} 分。',
   'hudChrome.turretArsenal.pointsCharges': '保留次數（{count}）',
   'hudChrome.turret.integrity': '塔樓耐久',

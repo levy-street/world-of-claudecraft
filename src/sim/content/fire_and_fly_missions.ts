@@ -7,13 +7,21 @@
 // sets off while the last two or three monsters of the current one still stand. They
 // are tuned against the good-player policy of the scenarios file at a 0.4 s pace (96
 // seeds): it golds about a third of its runs on each, losing that gold almost only in
-// the last two waves, and it loses The Pack and The Cracked Tower about one run in ten;
-// without the weapons it golds about half as often. Players firing 0.8 s after each
-// reload lose most runs of The Pack and The Cracked Tower, about half of Heavy Tread's
-// and a third to a half of The Powder Store's with the weapons; at 1 s only The Deluge
-// stays winnable, with the weapons.
+// the last two waves, and it loses The Cracked Tower about one run in ten; without the
+// weapons it golds about half as often. Players firing 0.8 s after each reload lose most
+// runs of The Cracked Tower, about half of Heavy Tread's and a third to a half of The
+// Powder Store's with the weapons; at 1 s, of those four only The Deluge stays winnable,
+// with the weapons. The Pack's hunt is a first draft (24 seeds): that policy golds
+// nearly every run, the 0.8 s players mostly take silver, and the 1 s players lose half
+// to three quarters of their runs.
 
-import { DT, type TurretScenarioDef } from '../types';
+import {
+  DT,
+  type TurretHuntDef,
+  type TurretPackDef,
+  type TurretRallyKegDef,
+  type TurretScenarioDef,
+} from '../types';
 import { TURRET_BARREL_RING } from './turret_defense';
 
 const ticks = (seconds: number): number => Math.round(seconds / DT);
@@ -27,21 +35,53 @@ const gap = (min: number, max: number) =>
 const MISSION_SUPPLY = { resupplyAfterWaves: [3, 5], unusedChargeBonus: true } as const;
 const KEGS = (count: number) => ({ count, ...TURRET_BARREL_RING });
 
-/** The Pack's packs set off at once: their members a tick or two apart. */
+/** A member's own pace on its way to its rally: from its template's to a third quicker. */
+const MUSTER = { speedScale: 1, speedScaleMax: 1.35 } as const;
+/** Light, quick monsters that gather with the pack and break out at the departure. */
+const SCOUT = { role: 'scout', speedScale: 2.2, speedScaleMax: 2.6 } as const;
+/** The wave-8 pincer: a group that never gathers and runs straight in. */
+const SPRINT = { role: 'sprint', speedScale: 2.4 } as const;
+const FRONT = { placement: 'rally-front' } as const;
+const SIDE = { placement: 'rally-side' } as const;
+/** A hunt wave lays its kegs at its rallies, none on the ring. */
+const RALLY_KEGS_ONLY = KEGS(0);
+/** A hunt wave's packs: each its advance scale, its kegs and its delay (s) from the wave's start. */
+const pack = (advanceScale: number, kegs: readonly TurretRallyKegDef[], delay = 0) => ({
+  advanceScale,
+  kegs,
+  delayTicks: ticks(delay),
+});
+/** The gathering: members spawn over 2 s on an arc of the pack's side, then walk to its rally. */
+const hunt = (
+  packs: readonly TurretPackDef[],
+  band: readonly [number, number],
+  holdSeconds: number,
+  sprintDelay?: number,
+): TurretHuntDef => ({
+  packs,
+  minRadius: band[0],
+  maxRadius: band[1],
+  holdTicks: ticks(holdSeconds),
+  spreadTicks: ticks(2),
+  widthTurn: 0.1,
+  ...(sprintDelay !== undefined ? { sprintDelayTicks: ticks(sprintDelay) } : {}),
+});
+const FIELD = [26, 34] as const;
+const CLOSE = [22, 28] as const;
+/** Gaps between spawns are the hunt's schedule; these stand unused. */
 const HUNT_GAP = { gapMinTicks: 1, gapMaxTicks: 2 } as const;
-const packs = (groupSize: number, gapSeconds: number) =>
-  ({ kind: 'burst', groupSize, groupGapTicks: ticks(gapSeconds), widthTurn: 0.03 }) as const;
-/** Packs at once, from evenly spaced sides of the tower. */
-const AT_ONCE = (count: 2 | 3) => ({ kind: 'flanks', count, widthTurn: 0.03 }) as const;
 
 /**
- * Many monsters, always in tight packs of a dozen or more, far quicker than their
- * templates. One pack, then two a few seconds apart, then two and three at once from
- * evenly spaced sides, each wave faster and tougher, beasts with an alpha or two among
- * them, until three packs of sixteen and of eighteen close on the tower together, with
- * two and three Old Greyjaws among the last. A frag on a pack at the tower's foot strikes
- * most of it. The finale is meant to break through: gold keeps four fifths of an
- * 80-point tower.
+ * The hunt. Each wave comes as packs: the members walk in dispersed from their pack's
+ * side, each at its own pace, to a rally in the field, and stand there; once all of them
+ * stand (or the hold timer since the first arrival runs out) the leader cries and, a
+ * second later, the pack advances on the tower together at one walking pace, past the keg
+ * laid in front of its rally, while its scouts break out at a run. The rallies carry no
+ * marker: the standing pack and the cry are the telegraph. One pack, then scouts, then two
+ * packs and three, the gathering windows closing as the hold timer shortens from 6 s to
+ * 2.5 s and the last rallies stand nearer; the finale adds a sprint group that never
+ * gathers. The frag is the weapon for a standing pack; the keg for an advance. A first
+ * draft, measured winnable; the field-aware tuning comes next.
  */
 export const TURRET_MISSION_PACK: TurretScenarioDef = {
   id: 'fire_and_fly_pack',
@@ -53,86 +93,105 @@ export const TURRET_MISSION_PACK: TurretScenarioDef = {
   overlap: 3,
   waves: [
     {
-      entries: [{ templateId: 'forest_wolf', count: 14, level: 2, speedScale: 2.4 }],
+      entries: [
+        { templateId: 'forest_wolf', count: 10, level: 2, ...MUSTER, pack: 0, leads: true },
+      ],
       coreDamage: 45,
       ...HUNT_GAP,
-      barrels: KEGS(3),
-      arrival: packs(14, 0),
+      barrels: RALLY_KEGS_ONLY,
+      hunt: hunt([pack(1.1, [FRONT])], FIELD, 6),
     },
     {
       entries: [
-        { templateId: 'forest_wolf', count: 14, level: 2, speedScale: 2.4 },
-        { templateId: 'wild_boar', count: 14, level: 3, speedScale: 2.4 },
+        { templateId: 'forest_wolf', count: 6, level: 2, ...MUSTER, pack: 0, leads: true },
+        { templateId: 'wild_boar', count: 6, level: 3, ...MUSTER, pack: 0 },
+        { templateId: 'forest_wolf', count: 2, level: 2, ...SCOUT, pack: 0 },
       ],
       coreDamage: 52,
       ...HUNT_GAP,
-      barrels: KEGS(3),
-      arrival: packs(14, 4),
+      barrels: RALLY_KEGS_ONLY,
+      hunt: hunt([pack(1.15, [FRONT])], FIELD, 6),
     },
     {
       entries: [
-        { templateId: 'webwood_spider', count: 11, level: 4, speedScale: 2.6 },
-        { templateId: 'vale_bandit', count: 17, level: 5, speedScale: 2.6 },
+        { templateId: 'webwood_spider', count: 5, level: 4, ...MUSTER, pack: 0, leads: true },
+        { templateId: 'vale_bandit', count: 5, level: 5, ...MUSTER, pack: 0 },
+        { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT, pack: 0 },
+        { templateId: 'webwood_spider', count: 5, level: 4, ...MUSTER, pack: 1, leads: true },
+        { templateId: 'vale_bandit', count: 5, level: 5, ...MUSTER, pack: 1 },
+        { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT, pack: 1 },
       ],
       coreDamage: 71,
       ...HUNT_GAP,
-      barrels: KEGS(4),
-      arrival: packs(14, 2),
+      barrels: RALLY_KEGS_ONLY,
+      hunt: hunt([pack(1.2, [FRONT]), pack(1.2, [SIDE], 7)], FIELD, 4),
     },
     {
-      entries: [
-        { templateId: 'tunnel_rat', count: 14, level: 6, speedScale: 3 },
-        { templateId: 'vale_bandit', count: 8, level: 5, speedScale: 3 },
-        { templateId: 'fen_troll', count: 2, level: 12, speedScale: 2.65 },
-      ],
+      entries: [0, 1].flatMap((p) => [
+        { templateId: 'tunnel_rat', count: 6, level: 6, ...MUSTER, pack: p },
+        { templateId: 'vale_bandit', count: 3, level: 5, ...MUSTER, pack: p },
+        { templateId: 'fen_troll', count: 1, level: 12, ...MUSTER, pack: p, leads: true },
+        { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT, pack: p },
+      ]),
       coreDamage: 89,
       ...HUNT_GAP,
-      barrels: KEGS(4),
-      arrival: AT_ONCE(2),
+      barrels: RALLY_KEGS_ONLY,
+      hunt: hunt([pack(1.2, [FRONT]), pack(1.2, [], 0.5)], FIELD, 4),
     },
     {
-      entries: [
-        { templateId: 'deeprock_kobold', count: 12, level: 15, speedScale: 3.2 },
-        { templateId: 'boneclad_revenant', count: 10, level: 19, speedScale: 3.2 },
-        { templateId: 'thornpeak_ogre', count: 2, level: 16, speedScale: 2.85 },
-      ],
+      entries: [0, 1].flatMap((p) => [
+        { templateId: 'deeprock_kobold', count: 4, level: 15, ...MUSTER, pack: p },
+        { templateId: 'boneclad_revenant', count: 5, level: 19, ...MUSTER, pack: p },
+        { templateId: 'thornpeak_ogre', count: 1, level: 16, ...MUSTER, pack: p, leads: true },
+        { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT, pack: p },
+      ]),
       coreDamage: 261,
       ...HUNT_GAP,
-      barrels: KEGS(5),
-      arrival: AT_ONCE(2),
+      barrels: RALLY_KEGS_ONLY,
+      hunt: hunt(
+        [pack(1.25, [FRONT, { placement: 'axis', fromTower: 14 }]), pack(1.25, [FRONT], 2)],
+        FIELD,
+        4,
+      ),
     },
     {
-      entries: [
-        { templateId: 'boneclad_revenant', count: 21, level: 19, speedScale: 3.4 },
-        { templateId: 'deeprock_kobold', count: 12, level: 15, speedScale: 3.4 },
-        { templateId: 'frostmane_yeti', count: 3, level: 20, speedScale: 3.05 },
-      ],
+      entries: [0, 1, 2].flatMap((p) => [
+        { templateId: 'boneclad_revenant', count: 5, level: 19, ...MUSTER, pack: p },
+        { templateId: 'deeprock_kobold', count: 4, level: 15, ...MUSTER, pack: p },
+        { templateId: 'frostmane_yeti', count: 1, level: 20, ...MUSTER, pack: p, leads: true },
+        { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT, pack: p },
+      ]),
       coreDamage: 245,
       ...HUNT_GAP,
-      barrels: KEGS(5),
-      arrival: AT_ONCE(3),
+      barrels: RALLY_KEGS_ONLY,
+      hunt: hunt([pack(1.25, [FRONT]), pack(1.25, [SIDE], 3), pack(1.25, [], 6)], FIELD, 3),
     },
     {
-      entries: [
-        { templateId: 'tunnel_rat', count: 23, level: 6, speedScale: 4 },
-        { templateId: 'vale_bandit', count: 22, level: 5, speedScale: 4 },
-        { templateId: 'thornpeak_ogre', count: 3, level: 16, speedScale: 3.65 },
-      ],
+      entries: [0, 1, 2].flatMap((p) => [
+        { templateId: 'tunnel_rat', count: 6, level: 6, ...MUSTER, pack: p },
+        { templateId: 'vale_bandit', count: 6, level: 5, ...MUSTER, pack: p },
+        { templateId: 'thornpeak_ogre', count: 1, level: 16, ...MUSTER, pack: p, leads: true },
+        { templateId: 'tunnel_rat', count: 3, level: 6, ...SCOUT, pack: p },
+      ]),
       coreDamage: 47,
       ...HUNT_GAP,
-      barrels: KEGS(5),
-      arrival: AT_ONCE(3),
+      barrels: RALLY_KEGS_ONLY,
+      hunt: hunt([pack(1.3, [FRONT]), pack(1.3, [FRONT], 1.5), pack(1.3, [], 3)], CLOSE, 2.5),
     },
     {
       entries: [
-        { templateId: 'boneclad_revenant', count: 29, level: 19, speedScale: 4.4 },
-        { templateId: 'deeprock_kobold', count: 19, level: 15, speedScale: 4.4 },
-        { templateId: 'frostmane_yeti', count: 6, level: 20, speedScale: 4.05 },
+        ...[0, 1, 2].flatMap((p) => [
+          { templateId: 'boneclad_revenant', count: 6, level: 19, ...MUSTER, pack: p },
+          { templateId: 'deeprock_kobold', count: 4, level: 15, ...MUSTER, pack: p },
+          { templateId: 'frostmane_yeti', count: 2, level: 20, ...MUSTER, pack: p, leads: true },
+          { templateId: 'tunnel_rat', count: 3, level: 6, ...SCOUT, pack: p },
+        ]),
+        { templateId: 'tunnel_rat', count: 9, level: 6, ...SPRINT },
       ],
       coreDamage: 145,
       ...HUNT_GAP,
-      barrels: KEGS(5),
-      arrival: AT_ONCE(3),
+      barrels: RALLY_KEGS_ONLY,
+      hunt: hunt([pack(1.3, [FRONT]), pack(1.3, [SIDE], 1), pack(1.3, [], 2)], CLOSE, 2.5, 3),
     },
   ],
 };

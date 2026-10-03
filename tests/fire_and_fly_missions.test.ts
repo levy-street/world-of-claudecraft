@@ -122,49 +122,79 @@ describe('the mission table', () => {
     }
   });
 
-  it('sends The Pack in tight packs of twelve or more, each setting off at once from a narrow side', () => {
-    for (const wave of TURRET_MISSION_PACK.waves) {
-      const arrival = wave.arrival;
-      expect(['burst', 'flanks']).toContain(arrival?.kind);
-      if (arrival?.kind === 'burst') expect(arrival.groupSize).toBeGreaterThanOrEqual(12);
-      if (arrival?.kind === 'flanks') {
-        const total = wave.entries.reduce((n, e) => n + e.count, 0);
-        expect(total / arrival.count).toBeGreaterThanOrEqual(12);
+  it('hunts The Pack in packs that gather at rallies, one wave by one, its counts within N2d', () => {
+    const waves = TURRET_MISSION_PACK.waves;
+    const plan = resolveTurretPlan(TURRET_MISSION_PACK);
+    expect(spawnsOf(TURRET_MISSION_PACK)).toEqual([10, 14, 24, 24, 24, 36, 48, 54]);
+    // At or under the N2d curve wave by wave (14, 28, 28, 24, 24, 36, 48, 54).
+    const n2d = [14, 28, 28, 24, 24, 36, 48, 54];
+    for (const [i, n] of spawnsOf(TURRET_MISSION_PACK).entries())
+      expect(n).toBeLessThanOrEqual(n2d[i]);
+    expect(waves.map((w) => w.hunt?.packs.length)).toEqual([1, 1, 2, 2, 2, 3, 3, 3]);
+    expect(waves.map((w) => (w.hunt?.holdTicks ?? 0) / 20)).toEqual([6, 6, 4, 4, 4, 3, 2.5, 2.5]);
+    for (const [i, wave] of waves.entries()) {
+      const band = i < 6 ? [26, 34] : [22, 28];
+      expect([wave.hunt?.minRadius, wave.hunt?.maxRadius]).toEqual(band);
+      expect(wave.barrels.count).toBe(0);
+      expect(wave.arrival).toBeUndefined();
+      const scouts = wave.entries.filter((e) => e.role === 'scout');
+      const perPack = scouts.reduce((n, e) => n + e.count, 0) / (wave.hunt?.packs.length ?? 1);
+      expect(perPack).toBe(i === 0 ? 0 : i < 6 ? 2 : 3);
+      for (const entry of wave.entries) {
+        const [min, max] =
+          entry.role === 'scout' ? [2.2, 2.6] : entry.role === 'sprint' ? [2.4, 2.4] : [1, 1.35];
+        expect(entry.speedScale).toBe(min);
+        expect(entry.speedScaleMax ?? entry.speedScale).toBe(max);
+        expect(entry.hpScale).toBeUndefined();
       }
-      if (arrival?.kind === 'burst' || arrival?.kind === 'flanks')
-        expect(arrival.widthTurn).toBeLessThanOrEqual(0.05);
-      expect(wave.gapMaxTicks).toBeLessThanOrEqual(2);
+      for (const p of wave.hunt?.packs ?? []) {
+        expect(p.advanceScale).toBeGreaterThanOrEqual(1.1);
+        expect(p.advanceScale).toBeLessThanOrEqual(1.3);
+      }
     }
-    expect(spawnsOf(TURRET_MISSION_PACK).reduce((a, b) => a + b)).toBeGreaterThan(
-      1.5 * spawnsOf(TURRET_SCENARIO_STANDARD).reduce((a, b) => a + b),
-    );
+    // The finale alone carries a sprint group; the first wave teaches the rally with a front keg.
+    expect(waves.map((w) => w.entries.some((e) => e.role === 'sprint'))).toEqual([
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+    ]);
+    expect(waves[0].hunt?.packs[0].kegs).toEqual([{ placement: 'rally-front' }]);
+    expect(plan.waves.every((w) => w.hunt !== undefined)).toBe(true);
   });
 
-  it('sends one pack, then two apart, then two and three at once, never slower wave on wave', () => {
-    const waves = TURRET_MISSION_PACK.waves;
-    expect(waves[0].arrival).toMatchObject({ kind: 'burst', groupSize: 14 });
-    expect(spawnsOf(TURRET_MISSION_PACK)[0]).toBe(14);
-    for (const wave of waves.slice(1, 3)) {
-      expect(wave.arrival).toMatchObject({ kind: 'burst', groupSize: 14 });
-      if (wave.arrival?.kind !== 'burst') continue;
-      expect(wave.arrival.groupGapTicks).toBeGreaterThanOrEqual(40);
-      expect(wave.entries.reduce((n, e) => n + e.count, 0)).toBe(28);
+  it('paces The Pack at a walk: members to the rally, one advance per pack, scouts at a run', () => {
+    const plan = resolveTurretPlan(TURRET_MISSION_PACK);
+    for (const kind of plan.kinds) {
+      const base = MOBS[kind.templateId].moveSpeed * TURRET_TIMING.marchFactor;
+      const top = (kind.marchSpeedMax ?? kind.marchSpeed) / base;
+      if (kind.role === 'scout') expect([kind.marchSpeed / base, top]).toEqual([2.2, 2.6]);
+      else if (kind.role === 'sprint') expect(kind.marchSpeed / base).toBeCloseTo(2.4, 12);
+      else {
+        expect(kind.marchSpeed / base).toBeCloseTo(1, 12);
+        expect(top).toBeCloseTo(1.35, 12);
+      }
     }
-    expect(waves.slice(3).map((w) => w.arrival)).toEqual([
-      { kind: 'flanks', count: 2, widthTurn: 0.03 },
-      { kind: 'flanks', count: 2, widthTurn: 0.03 },
-      { kind: 'flanks', count: 3, widthTurn: 0.03 },
-      { kind: 'flanks', count: 3, widthTurn: 0.03 },
-      { kind: 'flanks', count: 3, widthTurn: 0.03 },
-    ]);
-    expect(spawnsOf(TURRET_MISSION_PACK).slice(6)).toEqual([48, 54]);
-    const fastest = waves.map((w) => Math.max(...w.entries.map((e) => e.speedScale ?? 1)));
-    for (const speed of fastest) expect(speed).toBeGreaterThan(2);
-    for (let i = 1; i < fastest.length; i++)
-      expect(fastest[i]).toBeGreaterThanOrEqual(fastest[i - 1]);
-    for (let i = 3; i < fastest.length; i++) expect(fastest[i]).toBeGreaterThan(fastest[i - 1]);
-    for (const wave of waves)
-      for (const entry of wave.entries) expect(entry.hpScale).toBeUndefined();
+    for (const [w, wave] of plan.waves.entries()) {
+      for (const [p, pack] of (wave.hunt?.packs ?? []).entries()) {
+        const gatherers = wave.spawns.filter(
+          (kind, i) => wave.hunt?.groups[i] === p && plan.kinds[kind].role !== 'scout',
+        );
+        const slowest = Math.min(
+          ...gatherers.map(
+            (k) => MOBS[plan.kinds[k].templateId].moveSpeed * TURRET_TIMING.marchFactor,
+          ),
+        );
+        const def = TURRET_MISSION_PACK.waves[w].hunt?.packs[p];
+        expect(pack.pace).toBeCloseTo(slowest * (def?.advanceScale ?? 0), 12);
+        // A walk: never past 1.3 times the slowest template's march.
+        expect(pack.pace).toBeLessThanOrEqual(slowest * 1.3 + 1e-9);
+      }
+    }
   });
 
   it('makes Heavy Tread large or huge and tough, slow through the climb, then colossi from everywhere', () => {

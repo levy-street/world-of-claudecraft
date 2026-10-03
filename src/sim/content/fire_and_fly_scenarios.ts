@@ -110,6 +110,9 @@ export const TURRET_SCENARIO_HARD: TurretScenarioDef = {
   medals: { gold: { minIntegrityShare: 0.98 }, silver: { minIntegrityShare: 0.6 } },
   // It brings in the fragmentation shell beside fewer Shockwaves.
   arsenal: { shockwave: 2, fragmentation: 4 },
+  // One Shockwave and one frag more as the fifth wave ends, so every gunner meets the
+  // last charge with a tool for the giants and the dead; no bonus for charges left.
+  supply: { resupplyAfterWaves: [5], unusedChargeBonus: false },
   waves: [
     {
       entries: [

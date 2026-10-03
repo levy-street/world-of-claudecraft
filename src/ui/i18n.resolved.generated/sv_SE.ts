@@ -563,6 +563,7 @@ export const sv_SE: EnTranslations = {
       "resupplyShock": "Resupply: {shock} Shockwave",
       "resupplyFrag": "Resupply: {frag} Fragmentation Shell",
       "resupplyRule": "Each weapon of the mission gains one charge as waves {waves} end.",
+      "resupplyRuleOnce": "Each weapon gains one charge as wave {wave} ends.",
       "bonusRule": "A won mission scores {points} points for each charge left unused.",
       "pointsCharges": "Charges kept ({count})"
     },

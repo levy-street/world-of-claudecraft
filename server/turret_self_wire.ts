@@ -42,8 +42,9 @@ export const TURRET_SEAT_KEYS: readonly string[] = [
 const stateParts = new WeakMap<TurretSession, { rev: number; tick: number; parts: string[] }>();
 const planJson = new WeakMap<TurretPlan, string>();
 
-// A march multiplies its direction and its speed by the length of the walk.
-const FINE_KEYS: ReadonlySet<string> = new Set(['dx', 'dz', 'speed']);
+// A march multiplies its direction and its speed by the length of the walk; a pace becomes
+// the speed of the next one.
+const FINE_KEYS: ReadonlySet<string> = new Set(['dx', 'dz', 'speed', 'pace']);
 // The result card formats these itself: rounding them first could flip its last digit.
 const EXACT_KEYS: ReadonlySet<string> = new Set([
   'longestThrow',
@@ -52,7 +53,7 @@ const EXACT_KEYS: ReadonlySet<string> = new Set([
 
 /**
  * The state replacer: a non-integer to 3 decimals (positions to the millimetre, speeds to
- * 1 mm/s, contact ticks to 50 microseconds), a march's direction and speed to 5, the result
+ * 1 mm/s, contact ticks to 50 microseconds), a march's direction and speed and a pace to 5, the result
  * card's distance and airtime exact; ids, ticks and counts stay exact. The client reads the
  * rounded seat: the online view equals the authoritative one within 1e-3. The half step
  * stays under the 1e-3 the renderer allows when it matches a contact to the segment that

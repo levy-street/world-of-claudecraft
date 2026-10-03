@@ -254,6 +254,29 @@ export const TURRET_TIMING = {
   endedSeatTicks: ticks(120),
 } as const;
 
+/**
+ * The hunt's rallies (minigames/turret_rally.ts): no marker, the standing pack and its
+ * leader's cry are the only telegraph. First values, to tune by playtest.
+ */
+export const TURRET_RALLY = {
+  /** The pack leaves this long after its leader's cry. */
+  cueLeadTicks: ticks(1),
+  /** No two rallies leave closer together than this: a cue waits until its departure is clear. */
+  departGapTicks: ticks(0.5),
+  /** The gathering disc: slot n stands slotSpacing * sqrt(n + 0.5) yd from the rally point. */
+  slotSpacing: 0.95,
+  /** A front keg: this far tower-side of the rally (yd, drawn in the band), this far off the axis. */
+  frontMin: 5,
+  frontMax: 7,
+  axisOffset: 1.5,
+  /** A side keg: this far to the side of the rally (yd). */
+  sideOffset: 8,
+  /** Draws a rally gets at a point clear of the standing kegs before it keeps its last. */
+  placementTries: 6,
+  /** Room (yd) a rally keeps between its gathering disc and a standing keg. */
+  kegClearance: 1.5,
+} as const;
+
 export const TURRET_PHYSICS = {
   /** Gameplay gravity (yd/s^2), snappier than the player's. */
   gravity: 30,

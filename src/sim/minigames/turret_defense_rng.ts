@@ -18,6 +18,10 @@ export const TURRET_STREAM = {
   arrivalSide: 7,
   shockwaveThrow: 8,
   bombletThrow: 9,
+  pace: 10,
+  rallySide: 11,
+  rallyRadius: 12,
+  rallyKeg: 13,
 } as const;
 
 /** 64 bits derived once per run from the salt and the seed; never on any view or wire. */

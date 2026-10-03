@@ -453,6 +453,7 @@ function cloneView(session: TurretSession): TurretSessionView {
     shots,
     monsters,
     barrels,
+    rallies,
     stats,
     result,
     ...scalars
@@ -466,6 +467,7 @@ function cloneView(session: TurretSession): TurretSessionView {
       shots: shots.map((shot) => ({ ...shot })),
       monsters: monsters.map(monsterView),
       barrels: barrels.map((barrel) => ({ ...barrel })),
+      ...(rallies?.length ? { rallies: rallies.map((rally) => ({ ...rally })) } : {}),
       stats: { ...stats },
     },
     waveCount: plan.waves.length,
