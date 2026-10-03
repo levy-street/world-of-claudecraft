@@ -3078,6 +3078,9 @@ a.guide-poi:hover {
 .guide-prof-src {
   display: block;
 }
+.guide-prof-src + .guide-prof-src {
+  margin-top: 0.35em;
+}
 .guide-prof-formula-src {
   display: block;
   font-size: 0.85em;
