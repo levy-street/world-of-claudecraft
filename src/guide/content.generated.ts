@@ -143,6 +143,9 @@ export interface GuideProfRecipe {
   tier: number;
   station: string | null;
   acquisition: 'trainer' | 'drop' | 'vendor' | 'dropAndVendor' | 'known';
+  /** Where the teaching pattern drops (by kind) and which quartermasters sell
+   *  it. Absent for trainer and known rows, and for a drop row no table carries. */
+  sources?: GuideProfTeachingSources;
   feeCopper: number;
   materials: GuideProfMaterial[];
   output: { name: string; count: number; quality: string };
@@ -294,6 +297,8 @@ export interface GuideProfEnchanting {
     skillReq: number;
     perfectedOnly: boolean;
     requiresFormula: boolean;
+    /** Where the formula comes from, when one is required. */
+    formulaSources?: GuideProfTeachingSources;
     hasDescription: boolean;
     reagents: GuideProfMaterial[];
     bonus: { stat: string; value: number }[];
@@ -359,6 +364,76 @@ export interface GuideProfProvisioningRung {
 export interface GuideProfProvisioning {
   lines: GuideProfProvisioningLine[];
   ladder: GuideProfProvisioningRung[];
+}
+
+/** Where an item drops, by kind only: the wiki never names an instance or boss. */
+export type GuideProfDropPlace = 'world' | 'dungeon' | 'heroic' | 'raid' | 'rift';
+
+/** One quartermaster that sells an item. A faction row with a null factionId is
+ *  sold by every faction quartermaster against the best standing. */
+export type GuideProfOffer =
+  | { kind: 'heroic'; marks: number }
+  | { kind: 'crucible'; sigilId: string }
+  | { kind: 'faction'; factionId: string | null; tier: string; marks: number };
+
+export interface GuideProfTeachingSources {
+  drops: GuideProfDropPlace[];
+  offers: GuideProfOffer[];
+}
+
+/** One creature, by name, and the zone it is found in. */
+export interface GuideProfCreatureRef { name: string; zone: string; }
+
+/** One way to get a crafting material. Zone, creature and NPC names are baked
+ *  English proper nouns; profession and craft ids localize client-side. */
+export type GuideProfMaterialSource =
+  | {
+      kind: 'node';
+      profession: string;
+      zones: { zone: string; nodeTier: number }[];
+      fineToolTier?: number;
+    }
+  | {
+      kind: 'corpse';
+      creatures: GuideProfCreatureRef[];
+      more: number;
+      eliteZones?: string[];
+    }
+  | { kind: 'specimen'; baseItemId: string }
+  | { kind: 'farm'; skill: number; hoeTier: number; growMinutes: number; fine: boolean }
+  | { kind: 'fishing'; zones: { zone: string; proficiency: number; rodTier: number }[] }
+  | { kind: 'vendor'; priceCopper: number; vendors: { npcId: string; name: string }[] }
+  | { kind: 'crafted'; crafts: string[] }
+  | { kind: 'drop'; creatures: GuideProfCreatureRef[]; more: number }
+  | { kind: 'eliteDrop'; zones: string[] }
+  | { kind: 'instanced'; places: GuideProfDropPlace[] }
+  | { kind: 'questDrop'; places: GuideProfDropPlace[] }
+  | { kind: 'quartermaster'; offers: GuideProfOffer[] }
+  | { kind: 'disenchant' }
+  | { kind: 'salvage' }
+  | { kind: 'bossCredit'; min: number; max: number; riftA: number; riftS: number };
+
+export interface GuideProfMaterialRow {
+  itemId: string;
+  name: string;
+  quality: string;
+  /** Craft ids whose recipe or enchant bills use this material, in ring order. */
+  usedBy: string[];
+  sources: GuideProfMaterialSource[];
+}
+
+/** Where one standing overworld NPC is. A town NPC carries no yards/direction;
+ *  an NPC outside town carries the distance (to the nearest 10 yards) and the
+ *  compass point from the zone's town. */
+export interface GuideNpcLocation {
+  id: string;
+  name: string;
+  title: string;
+  zoneId: string;
+  zone: string;
+  town: string;
+  yards?: number;
+  direction?: string;
 }
 
 export const GUIDE_CLASSES: GuideClassInfo[] = [
@@ -9260,6 +9335,15 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 5,
         "station": "toolworks",
         "acquisition": "vendor",
+        "sources": {
+          "drops": [],
+          "offers": [
+            {
+              "kind": "heroic",
+              "marks": 16
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -9341,6 +9425,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "toolworks",
         "acquisition": "drop",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": []
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -9384,6 +9474,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "toolworks",
         "acquisition": "drop",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": []
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -9427,6 +9523,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "toolworks",
         "acquisition": "drop",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": []
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -9673,6 +9775,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 1,
         "station": "toolworks",
         "acquisition": "drop",
+        "sources": {
+          "drops": [],
+          "offers": [
+            {
+              "kind": "faction",
+              "factionId": "automatons",
+              "tier": "proven",
+              "marks": 50
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -10203,6 +10316,15 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "apothecary",
         "acquisition": "vendor",
+        "sources": {
+          "drops": [],
+          "offers": [
+            {
+              "kind": "heroic",
+              "marks": 12
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -10256,6 +10378,15 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "apothecary",
         "acquisition": "vendor",
+        "sources": {
+          "drops": [],
+          "offers": [
+            {
+              "kind": "heroic",
+              "marks": 12
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -10309,6 +10440,15 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "apothecary",
         "acquisition": "vendor",
+        "sources": {
+          "drops": [],
+          "offers": [
+            {
+              "kind": "heroic",
+              "marks": 12
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -10362,6 +10502,15 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 5,
         "station": "apothecary",
         "acquisition": "vendor",
+        "sources": {
+          "drops": [],
+          "offers": [
+            {
+              "kind": "heroic",
+              "marks": 16
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -10486,6 +10635,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 1,
         "station": "apothecary",
         "acquisition": "drop",
+        "sources": {
+          "drops": [],
+          "offers": [
+            {
+              "kind": "faction",
+              "factionId": "church_order",
+              "tier": "proven",
+              "marks": 50
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -10519,6 +10679,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 1,
         "station": "apothecary",
         "acquisition": "drop",
+        "sources": {
+          "drops": [],
+          "offers": [
+            {
+              "kind": "faction",
+              "factionId": "rift_watch",
+              "tier": "proven",
+              "marks": 50
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -11100,6 +11271,15 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "kitchens",
         "acquisition": "vendor",
+        "sources": {
+          "drops": [],
+          "offers": [
+            {
+              "kind": "heroic",
+              "marks": 12
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -11170,6 +11350,15 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "kitchens",
         "acquisition": "vendor",
+        "sources": {
+          "drops": [],
+          "offers": [
+            {
+              "kind": "heroic",
+              "marks": 12
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -11240,6 +11429,15 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "kitchens",
         "acquisition": "vendor",
+        "sources": {
+          "drops": [],
+          "offers": [
+            {
+              "kind": "heroic",
+              "marks": 12
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -11310,6 +11508,15 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 5,
         "station": "kitchens",
         "acquisition": "vendor",
+        "sources": {
+          "drops": [],
+          "offers": [
+            {
+              "kind": "heroic",
+              "marks": 16
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -11373,6 +11580,15 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 3,
         "station": "kitchens",
         "acquisition": "vendor",
+        "sources": {
+          "drops": [],
+          "offers": [
+            {
+              "kind": "heroic",
+              "marks": 12
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -11417,6 +11633,15 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "kitchens",
         "acquisition": "vendor",
+        "sources": {
+          "drops": [],
+          "offers": [
+            {
+              "kind": "heroic",
+              "marks": 12
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -11466,6 +11691,15 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 5,
         "station": "kitchens",
         "acquisition": "vendor",
+        "sources": {
+          "drops": [],
+          "offers": [
+            {
+              "kind": "heroic",
+              "marks": 16
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -11545,6 +11779,15 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 5,
         "station": "kitchens",
         "acquisition": "vendor",
+        "sources": {
+          "drops": [],
+          "offers": [
+            {
+              "kind": "heroic",
+              "marks": 16
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -11624,6 +11867,15 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 5,
         "station": "kitchens",
         "acquisition": "vendor",
+        "sources": {
+          "drops": [],
+          "offers": [
+            {
+              "kind": "heroic",
+              "marks": 16
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -11913,6 +12165,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 3,
         "station": "kitchens",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "heroic"
+          ],
+          "offers": [
+            {
+              "kind": "heroic",
+              "marks": 12
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -11967,6 +12230,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "kitchens",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "rift"
+          ],
+          "offers": [
+            {
+              "kind": "heroic",
+              "marks": 12
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -12021,6 +12295,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "kitchens",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "rift"
+          ],
+          "offers": [
+            {
+              "kind": "heroic",
+              "marks": 12
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -12170,6 +12455,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 3,
         "station": "kitchens",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "heroic"
+          ],
+          "offers": [
+            {
+              "kind": "heroic",
+              "marks": 12
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -12215,6 +12511,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "kitchens",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "rift"
+          ],
+          "offers": [
+            {
+              "kind": "heroic",
+              "marks": 12
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -12260,6 +12567,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "kitchens",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "heroic",
+              "marks": 12
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -12848,6 +13166,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "tannery",
         "acquisition": "drop",
+        "sources": {
+          "drops": [
+            "rift"
+          ],
+          "offers": []
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -12891,6 +13215,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "tannery",
         "acquisition": "drop",
+        "sources": {
+          "drops": [
+            "rift"
+          ],
+          "offers": []
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -12934,6 +13264,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "tannery",
         "acquisition": "drop",
+        "sources": {
+          "drops": [
+            "rift"
+          ],
+          "offers": []
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -13149,6 +13485,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "tannery",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -13187,6 +13534,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "tannery",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -13225,6 +13583,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "tannery",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -13263,6 +13632,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "tannery",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -13301,6 +13681,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "tannery",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -13339,6 +13730,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "tannery",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -13377,6 +13779,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "tannery",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -13415,6 +13828,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "tannery",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -13453,6 +13877,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "tannery",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -13491,6 +13926,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "tannery",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -13529,6 +13975,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "tannery",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -13567,6 +14024,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "tannery",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -13605,6 +14073,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "tannery",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -13643,6 +14122,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "tannery",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -13681,6 +14171,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "tannery",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -13719,6 +14220,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 1,
         "station": "tannery",
         "acquisition": "drop",
+        "sources": {
+          "drops": [],
+          "offers": [
+            {
+              "kind": "faction",
+              "factionId": "rift_watch",
+              "tier": "proven",
+              "marks": 50
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -14458,6 +14970,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "loom",
         "acquisition": "drop",
+        "sources": {
+          "drops": [
+            "rift"
+          ],
+          "offers": []
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -14501,6 +15019,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "loom",
         "acquisition": "drop",
+        "sources": {
+          "drops": [
+            "rift"
+          ],
+          "offers": []
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -14544,6 +15068,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "loom",
         "acquisition": "drop",
+        "sources": {
+          "drops": [
+            "rift"
+          ],
+          "offers": []
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -14587,6 +15117,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "loom",
         "acquisition": "drop",
+        "sources": {
+          "drops": [
+            "rift"
+          ],
+          "offers": []
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -14668,6 +15204,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "loom",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -14706,6 +15253,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "loom",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -14744,6 +15302,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "loom",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -14782,6 +15351,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "loom",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -14820,6 +15400,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "loom",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -14858,6 +15449,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "loom",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -15250,6 +15852,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "apothecary",
         "acquisition": "drop",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": []
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -15841,6 +16449,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "forge",
         "acquisition": "drop",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": []
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -15884,6 +16498,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "forge",
         "acquisition": "drop",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": []
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -15927,6 +16547,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "forge",
         "acquisition": "drop",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": []
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -16467,6 +17093,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "forge",
         "acquisition": "drop",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": []
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -16510,6 +17142,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "forge",
         "acquisition": "drop",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": []
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -16553,6 +17191,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "forge",
         "acquisition": "drop",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": []
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -16677,6 +17321,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 1,
         "station": "forge",
         "acquisition": "drop",
+        "sources": {
+          "drops": [],
+          "offers": [
+            {
+              "kind": "faction",
+              "factionId": "automatons",
+              "tier": "proven",
+              "marks": 50
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -17278,6 +17933,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "forge",
         "acquisition": "drop",
+        "sources": {
+          "drops": [
+            "rift"
+          ],
+          "offers": []
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -17321,6 +17982,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "forge",
         "acquisition": "drop",
+        "sources": {
+          "drops": [
+            "rift"
+          ],
+          "offers": []
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -17364,6 +18031,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "forge",
         "acquisition": "drop",
+        "sources": {
+          "drops": [
+            "rift"
+          ],
+          "offers": []
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -17407,6 +18080,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "forge",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -17445,6 +18129,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "forge",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -17483,6 +18178,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "forge",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -17521,6 +18227,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "forge",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -17559,6 +18276,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "forge",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -17597,6 +18325,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "forge",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -17635,6 +18374,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "forge",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -17673,6 +18423,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "forge",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -17711,6 +18472,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "forge",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -17749,6 +18521,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "forge",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -17787,6 +18570,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "forge",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -17825,6 +18619,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "tier": 4,
         "station": "forge",
         "acquisition": "dropAndVendor",
+        "sources": {
+          "drops": [
+            "raid"
+          ],
+          "offers": [
+            {
+              "kind": "crucible",
+              "sigilId": "lastflame_core"
+            }
+          ]
+        },
         "feeCopper": 0,
         "materials": [
           {
@@ -19530,6 +20335,17 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "skillReq": 100,
       "perfectedOnly": false,
       "requiresFormula": true,
+      "formulaSources": {
+        "drops": [
+          "raid"
+        ],
+        "offers": [
+          {
+            "kind": "crucible",
+            "sigilId": "lastflame_core"
+          }
+        ]
+      },
       "hasDescription": true,
       "reagents": [
         {
@@ -20716,6 +21532,17 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "skillReq": 40,
       "perfectedOnly": false,
       "requiresFormula": true,
+      "formulaSources": {
+        "drops": [],
+        "offers": [
+          {
+            "kind": "faction",
+            "factionId": "church_order",
+            "tier": "proven",
+            "marks": 50
+          }
+        ]
+      },
       "hasDescription": false,
       "reagents": [
         {
@@ -20743,6 +21570,17 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "skillReq": 40,
       "perfectedOnly": false,
       "requiresFormula": true,
+      "formulaSources": {
+        "drops": [],
+        "offers": [
+          {
+            "kind": "faction",
+            "factionId": "rift_watch",
+            "tier": "proven",
+            "marks": 50
+          }
+        ]
+      },
       "hasDescription": false,
       "reagents": [
         {
@@ -20770,6 +21608,17 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "skillReq": 40,
       "perfectedOnly": false,
       "requiresFormula": true,
+      "formulaSources": {
+        "drops": [],
+        "offers": [
+          {
+            "kind": "faction",
+            "factionId": "automatons",
+            "tier": "proven",
+            "marks": 50
+          }
+        ]
+      },
       "hasDescription": false,
       "reagents": [
         {
@@ -20797,6 +21646,17 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "skillReq": 100,
       "perfectedOnly": false,
       "requiresFormula": true,
+      "formulaSources": {
+        "drops": [],
+        "offers": [
+          {
+            "kind": "faction",
+            "factionId": "rift_watch",
+            "tier": "proven",
+            "marks": 50
+          }
+        ]
+      },
       "hasDescription": true,
       "reagents": [
         {
@@ -20819,6 +21679,17 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "skillReq": 100,
       "perfectedOnly": false,
       "requiresFormula": true,
+      "formulaSources": {
+        "drops": [],
+        "offers": [
+          {
+            "kind": "faction",
+            "factionId": "church_order",
+            "tier": "proven",
+            "marks": 50
+          }
+        ]
+      },
       "hasDescription": true,
       "reagents": [
         {
@@ -20846,6 +21717,17 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "skillReq": 100,
       "perfectedOnly": false,
       "requiresFormula": true,
+      "formulaSources": {
+        "drops": [],
+        "offers": [
+          {
+            "kind": "faction",
+            "factionId": "church_order",
+            "tier": "proven",
+            "marks": 50
+          }
+        ]
+      },
       "hasDescription": true,
       "reagents": [
         {
@@ -20873,6 +21755,17 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "skillReq": 100,
       "perfectedOnly": false,
       "requiresFormula": true,
+      "formulaSources": {
+        "drops": [],
+        "offers": [
+          {
+            "kind": "faction",
+            "factionId": "automatons",
+            "tier": "proven",
+            "marks": 50
+          }
+        ]
+      },
       "hasDescription": true,
       "reagents": [
         {
@@ -21365,6 +22258,3957 @@ export const GUIDE_PROF_PROVISIONING: GuideProfProvisioning = {
   ]
 };
 
+export const GUIDE_PROF_MATERIALS: GuideProfMaterialRow[] = [
+  {
+    "itemId": "ashwood_axe",
+    "name": "Ashwood Axe",
+    "quality": "rare",
+    "usedBy": [
+      "engineering"
+    ],
+    "sources": [
+      {
+        "kind": "crafted",
+        "crafts": [
+          "engineering"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "ashwood_log",
+    "name": "Ashwood Log",
+    "quality": "common",
+    "usedBy": [
+      "engineering",
+      "cooking",
+      "weaponcrafting"
+    ],
+    "sources": [
+      {
+        "kind": "node",
+        "profession": "logging",
+        "zones": [
+          {
+            "zone": "The Farshore",
+            "nodeTier": 1
+          },
+          {
+            "zone": "Mirefen Marsh",
+            "nodeTier": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "bog_beet",
+    "name": "Bog Beet",
+    "quality": "common",
+    "usedBy": [
+      "alchemy",
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "farm",
+        "skill": 25,
+        "hoeTier": 2,
+        "growMinutes": 135,
+        "fine": false
+      }
+    ]
+  },
+  {
+    "itemId": "bone_fragments",
+    "name": "Bone Fragments",
+    "quality": "common",
+    "usedBy": [
+      "weaponcrafting",
+      "armorcrafting"
+    ],
+    "sources": [
+      {
+        "kind": "drop",
+        "creatures": [
+          {
+            "name": "Ashbone Raider",
+            "zone": "The Drakelands"
+          },
+          {
+            "name": "Ashbone Warcaller",
+            "zone": "The Drakelands"
+          },
+          {
+            "name": "Barrow Wight",
+            "zone": "The Nightbloom"
+          },
+          {
+            "name": "Boneclad Revenant",
+            "zone": "Thornpeak Heights"
+          },
+          {
+            "name": "Drowned Dead",
+            "zone": "Mirefen Marsh"
+          },
+          {
+            "name": "Drowned Deckhand",
+            "zone": "The Galecrest"
+          }
+        ],
+        "more": 1
+      },
+      {
+        "kind": "eliteDrop",
+        "zones": [
+          "Eastbrook Vale",
+          "Mirefen Marsh",
+          "The Galecrest",
+          "The Nightbloom",
+          "The Wraithwood",
+          "Thornpeak Heights"
+        ]
+      },
+      {
+        "kind": "instanced",
+        "places": [
+          "dungeon"
+        ]
+      },
+      {
+        "kind": "salvage"
+      }
+    ]
+  },
+  {
+    "itemId": "bronze_hoe",
+    "name": "Bronze Hoe",
+    "quality": "common",
+    "usedBy": [
+      "engineering"
+    ],
+    "sources": [
+      {
+        "kind": "crafted",
+        "crafts": [
+          "engineering"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "brook_carrot",
+    "name": "Brook Carrot",
+    "quality": "common",
+    "usedBy": [
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "farm",
+        "skill": 0,
+        "hoeTier": 1,
+        "growMinutes": 35,
+        "fine": false
+      },
+      {
+        "kind": "vendor",
+        "priceCopper": 16,
+        "vendors": [
+          {
+            "npcId": "farmer_jessica",
+            "name": "Farmer Jessica"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "arcane_dust",
+    "name": "Chime Dust",
+    "quality": "common",
+    "usedBy": [
+      "engineering",
+      "inscription",
+      "enchanting",
+      "jewelcrafting"
+    ],
+    "sources": [
+      {
+        "kind": "disenchant"
+      }
+    ]
+  },
+  {
+    "itemId": "arcane_essence",
+    "name": "Chime Essence",
+    "quality": "uncommon",
+    "usedBy": [
+      "inscription",
+      "enchanting",
+      "jewelcrafting"
+    ],
+    "sources": [
+      {
+        "kind": "disenchant"
+      }
+    ]
+  },
+  {
+    "itemId": "arcane_shard",
+    "name": "Chime Shard",
+    "quality": "rare",
+    "usedBy": [
+      "enchanting"
+    ],
+    "sources": [
+      {
+        "kind": "disenchant"
+      }
+    ]
+  },
+  {
+    "itemId": "cogwheel_blank",
+    "name": "Cogwheel Blank",
+    "quality": "common",
+    "usedBy": [
+      "engineering"
+    ],
+    "sources": [
+      {
+        "kind": "crafted",
+        "crafts": [
+          "engineering"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "cooking_salt",
+    "name": "Cooking Salt",
+    "quality": "common",
+    "usedBy": [
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "vendor",
+        "priceCopper": 8,
+        "vendors": [
+          {
+            "npcId": "cook_marlow",
+            "name": "Cook Marlow"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "copper_ore",
+    "name": "Copper Ore",
+    "quality": "common",
+    "usedBy": [
+      "engineering",
+      "jewelcrafting",
+      "weaponcrafting",
+      "armorcrafting"
+    ],
+    "sources": [
+      {
+        "kind": "node",
+        "profession": "mining",
+        "zones": [
+          {
+            "zone": "Eastbrook Vale",
+            "nodeTier": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "lastflame_core",
+    "name": "Core of the Last Flame",
+    "quality": "epic",
+    "usedBy": [
+      "leatherworking",
+      "tailoring",
+      "enchanting",
+      "weaponcrafting",
+      "armorcrafting"
+    ],
+    "sources": [
+      {
+        "kind": "instanced",
+        "places": [
+          "raid"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "cracked_ogre_tusk",
+    "name": "Cracked Ogre Tusk",
+    "quality": "common",
+    "usedBy": [
+      "weaponcrafting"
+    ],
+    "sources": [
+      {
+        "kind": "eliteDrop",
+        "zones": [
+          "Thornpeak Heights"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "wolf_fang",
+    "name": "Cracked Wolf Fang",
+    "quality": "common",
+    "usedBy": [
+      "weaponcrafting",
+      "armorcrafting"
+    ],
+    "sources": [
+      {
+        "kind": "corpse",
+        "creatures": [
+          {
+            "name": "Dragonkin Broodguard",
+            "zone": "The Drakelands"
+          },
+          {
+            "name": "Dune Troll",
+            "zone": "The Drakelands"
+          },
+          {
+            "name": "Forest Wolf",
+            "zone": "Eastbrook Vale"
+          },
+          {
+            "name": "Gloam Fox",
+            "zone": "The Amberfall"
+          },
+          {
+            "name": "Gloam Strider",
+            "zone": "The Nightbloom"
+          },
+          {
+            "name": "Snowdrift Wolf",
+            "zone": "The Frostveil Reach"
+          }
+        ],
+        "more": 3,
+        "eliteZones": [
+          "The Drakelands",
+          "The Frostveil Reach",
+          "Thornpeak Heights"
+        ]
+      },
+      {
+        "kind": "drop",
+        "creatures": [
+          {
+            "name": "Forest Wolf",
+            "zone": "Eastbrook Vale"
+          },
+          {
+            "name": "Old Greyjaw",
+            "zone": "Eastbrook Vale"
+          }
+        ],
+        "more": 0
+      }
+    ]
+  },
+  {
+    "itemId": "cracked_wyrm_scale",
+    "name": "Cracked Wyrm Scale",
+    "quality": "common",
+    "usedBy": [
+      "leatherworking"
+    ],
+    "sources": [
+      {
+        "kind": "instanced",
+        "places": [
+          "dungeon"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "curved_tusk",
+    "name": "Curved Tusk",
+    "quality": "common",
+    "usedBy": [
+      "weaponcrafting"
+    ],
+    "sources": [
+      {
+        "kind": "corpse",
+        "creatures": [
+          {
+            "name": "Mirefen Troll",
+            "zone": "Mirefen Marsh"
+          },
+          {
+            "name": "Gilded Stag",
+            "zone": "The Amberfall"
+          },
+          {
+            "name": "Moonfleece Grazer",
+            "zone": "The Nightbloom"
+          },
+          {
+            "name": "Moor Ram",
+            "zone": "The Galecrest"
+          },
+          {
+            "name": "Thicket Boar",
+            "zone": "The Palmreach"
+          },
+          {
+            "name": "Thornpeak Ogre",
+            "zone": "Thornpeak Heights"
+          }
+        ],
+        "more": 3,
+        "eliteZones": [
+          "The Farshore",
+          "The Veiled Hollow",
+          "Thornpeak Heights"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "duskforged_billet",
+    "name": "Duskforged Billet",
+    "quality": "common",
+    "usedBy": [
+      "weaponcrafting"
+    ],
+    "sources": [
+      {
+        "kind": "crafted",
+        "crafts": [
+          "weaponcrafting"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "emberwing_cinderscale",
+    "name": "Emberwing Cinderscale",
+    "quality": "common",
+    "usedBy": [
+      "leatherworking"
+    ],
+    "sources": [
+      {
+        "kind": "eliteDrop",
+        "zones": [
+          "Thornpeak Heights"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "evergarden_greens",
+    "name": "Evergarden Greens",
+    "quality": "common",
+    "usedBy": [
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "farm",
+        "skill": 75,
+        "hoeTier": 4,
+        "growMinutes": 630,
+        "fine": false
+      }
+    ]
+  },
+  {
+    "itemId": "evergarden_pumpkin",
+    "name": "Evergarden Pumpkin",
+    "quality": "common",
+    "usedBy": [
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "farm",
+        "skill": 75,
+        "hoeTier": 4,
+        "growMinutes": 645,
+        "fine": false
+      }
+    ]
+  },
+  {
+    "itemId": "fine_ashwood_log",
+    "name": "Fine Ashwood Log",
+    "quality": "common",
+    "usedBy": [
+      "engineering"
+    ],
+    "sources": [
+      {
+        "kind": "node",
+        "profession": "logging",
+        "zones": [
+          {
+            "zone": "Mirefen Marsh",
+            "nodeTier": 2
+          }
+        ],
+        "fineToolTier": 3
+      }
+    ]
+  },
+  {
+    "itemId": "fine_bog_beet",
+    "name": "Fine Bog Beet",
+    "quality": "common",
+    "usedBy": [
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "farm",
+        "skill": 25,
+        "hoeTier": 2,
+        "growMinutes": 135,
+        "fine": true
+      }
+    ]
+  },
+  {
+    "itemId": "fine_brook_carrot",
+    "name": "Fine Brook Carrot",
+    "quality": "common",
+    "usedBy": [
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "farm",
+        "skill": 0,
+        "hoeTier": 1,
+        "growMinutes": 35,
+        "fine": true
+      }
+    ]
+  },
+  {
+    "itemId": "fine_evergarden_greens",
+    "name": "Fine Evergarden Greens",
+    "quality": "common",
+    "usedBy": [
+      "engineering",
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "farm",
+        "skill": 75,
+        "hoeTier": 4,
+        "growMinutes": 630,
+        "fine": true
+      }
+    ]
+  },
+  {
+    "itemId": "fine_evergarden_pumpkin",
+    "name": "Fine Evergarden Pumpkin",
+    "quality": "common",
+    "usedBy": [
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "farm",
+        "skill": 75,
+        "hoeTier": 4,
+        "growMinutes": 645,
+        "fine": true
+      }
+    ]
+  },
+  {
+    "itemId": "fine_frost_gourd",
+    "name": "Fine Frost Gourd",
+    "quality": "common",
+    "usedBy": [
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "farm",
+        "skill": 50,
+        "hoeTier": 3,
+        "growMinutes": 270,
+        "fine": true
+      }
+    ]
+  },
+  {
+    "itemId": "fine_frost_lentils",
+    "name": "Fine Frost Lentils",
+    "quality": "common",
+    "usedBy": [
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "farm",
+        "skill": 50,
+        "hoeTier": 3,
+        "growMinutes": 260,
+        "fine": true
+      }
+    ]
+  },
+  {
+    "itemId": "fine_gilded_sunmelon",
+    "name": "Fine Gilded Sunmelon",
+    "quality": "common",
+    "usedBy": [
+      "alchemy",
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "farm",
+        "skill": 75,
+        "hoeTier": 4,
+        "growMinutes": 600,
+        "fine": true
+      }
+    ]
+  },
+  {
+    "itemId": "fine_gilded_yam",
+    "name": "Fine Gilded Yam",
+    "quality": "common",
+    "usedBy": [
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "farm",
+        "skill": 75,
+        "hoeTier": 4,
+        "growMinutes": 615,
+        "fine": true
+      }
+    ]
+  },
+  {
+    "itemId": "fine_goldleaf_herb",
+    "name": "Fine Goldleaf Herb",
+    "quality": "common",
+    "usedBy": [
+      "engineering"
+    ],
+    "sources": [
+      {
+        "kind": "node",
+        "profession": "herbalism",
+        "zones": [
+          {
+            "zone": "Mirefen Marsh",
+            "nodeTier": 2
+          }
+        ],
+        "fineToolTier": 3
+      }
+    ]
+  },
+  {
+    "itemId": "fine_highland_barley",
+    "name": "Fine Highland Barley",
+    "quality": "common",
+    "usedBy": [
+      "engineering"
+    ],
+    "sources": [
+      {
+        "kind": "farm",
+        "skill": 50,
+        "hoeTier": 3,
+        "growMinutes": 240,
+        "fine": true
+      }
+    ]
+  },
+  {
+    "itemId": "fine_elderwood_log",
+    "name": "Fine Highpine Log",
+    "quality": "common",
+    "usedBy": [
+      "engineering",
+      "weaponcrafting",
+      "armorcrafting"
+    ],
+    "sources": [
+      {
+        "kind": "node",
+        "profession": "logging",
+        "zones": [
+          {
+            "zone": "Thornpeak Heights",
+            "nodeTier": 3
+          }
+        ],
+        "fineToolTier": 4
+      }
+    ]
+  },
+  {
+    "itemId": "fine_iron_ore",
+    "name": "Fine Iron Ore",
+    "quality": "common",
+    "usedBy": [
+      "engineering"
+    ],
+    "sources": [
+      {
+        "kind": "node",
+        "profession": "mining",
+        "zones": [
+          {
+            "zone": "Mirefen Marsh",
+            "nodeTier": 2
+          }
+        ],
+        "fineToolTier": 3
+      }
+    ]
+  },
+  {
+    "itemId": "fine_marsh_rice",
+    "name": "Fine Marsh Rice",
+    "quality": "common",
+    "usedBy": [
+      "engineering"
+    ],
+    "sources": [
+      {
+        "kind": "farm",
+        "skill": 25,
+        "hoeTier": 2,
+        "growMinutes": 130,
+        "fine": true
+      }
+    ]
+  },
+  {
+    "itemId": "fine_thorium_ore",
+    "name": "Fine Osmium Ore",
+    "quality": "common",
+    "usedBy": [
+      "engineering",
+      "weaponcrafting",
+      "armorcrafting"
+    ],
+    "sources": [
+      {
+        "kind": "node",
+        "profession": "mining",
+        "zones": [
+          {
+            "zone": "Thornpeak Heights",
+            "nodeTier": 3
+          }
+        ],
+        "fineToolTier": 4
+      }
+    ]
+  },
+  {
+    "itemId": "fine_sunpetal_herb",
+    "name": "Fine Sunpetal Herb",
+    "quality": "common",
+    "usedBy": [
+      "engineering"
+    ],
+    "sources": [
+      {
+        "kind": "node",
+        "profession": "herbalism",
+        "zones": [
+          {
+            "zone": "Thornpeak Heights",
+            "nodeTier": 3
+          }
+        ],
+        "fineToolTier": 4
+      }
+    ]
+  },
+  {
+    "itemId": "fine_thornpeak_cabbage",
+    "name": "Fine Thornpeak Cabbage",
+    "quality": "common",
+    "usedBy": [
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "farm",
+        "skill": 50,
+        "hoeTier": 3,
+        "growMinutes": 250,
+        "fine": true
+      }
+    ]
+  },
+  {
+    "itemId": "fine_vale_wheat",
+    "name": "Fine Vale Wheat",
+    "quality": "common",
+    "usedBy": [
+      "engineering"
+    ],
+    "sources": [
+      {
+        "kind": "farm",
+        "skill": 0,
+        "hoeTier": 1,
+        "growMinutes": 45,
+        "fine": true
+      }
+    ]
+  },
+  {
+    "itemId": "forgefathers_ember",
+    "name": "Forgefather's Ember",
+    "quality": "epic",
+    "usedBy": [
+      "weaponcrafting"
+    ],
+    "sources": [
+      {
+        "kind": "questDrop",
+        "places": [
+          "raid"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "forgefold_plating",
+    "name": "Forgefold Plating",
+    "quality": "common",
+    "usedBy": [
+      "armorcrafting"
+    ],
+    "sources": [
+      {
+        "kind": "crafted",
+        "crafts": [
+          "armorcrafting"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "frost_gourd",
+    "name": "Frost Gourd",
+    "quality": "common",
+    "usedBy": [
+      "alchemy",
+      "cooking",
+      "inscription"
+    ],
+    "sources": [
+      {
+        "kind": "farm",
+        "skill": 50,
+        "hoeTier": 3,
+        "growMinutes": 270,
+        "fine": false
+      }
+    ]
+  },
+  {
+    "itemId": "frost_lentils",
+    "name": "Frost Lentils",
+    "quality": "common",
+    "usedBy": [
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "farm",
+        "skill": 50,
+        "hoeTier": 3,
+        "growMinutes": 260,
+        "fine": false
+      }
+    ]
+  },
+  {
+    "itemId": "game_meat",
+    "name": "Game Meat",
+    "quality": "common",
+    "usedBy": [
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "corpse",
+        "creatures": [
+          {
+            "name": "Bog Bloat",
+            "zone": "Mirefen Marsh"
+          },
+          {
+            "name": "Gilded Stag",
+            "zone": "The Amberfall"
+          },
+          {
+            "name": "Mire Prowler",
+            "zone": "Mirefen Marsh"
+          },
+          {
+            "name": "Moonfleece Grazer",
+            "zone": "The Nightbloom"
+          },
+          {
+            "name": "Moor Ram",
+            "zone": "The Galecrest"
+          },
+          {
+            "name": "Ridge Stalker",
+            "zone": "Thornpeak Heights"
+          }
+        ],
+        "more": 9,
+        "eliteZones": [
+          "The Frostveil Reach"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "garden_hoe",
+    "name": "Garden Hoe",
+    "quality": "common",
+    "usedBy": [
+      "engineering"
+    ],
+    "sources": [
+      {
+        "kind": "vendor",
+        "priceCopper": 20,
+        "vendors": [
+          {
+            "npcId": "farmer_jessica",
+            "name": "Farmer Jessica"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "gilded_sunmelon",
+    "name": "Gilded Sunmelon",
+    "quality": "common",
+    "usedBy": [
+      "alchemy",
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "farm",
+        "skill": 75,
+        "hoeTier": 4,
+        "growMinutes": 600,
+        "fine": false
+      }
+    ]
+  },
+  {
+    "itemId": "gilded_yam",
+    "name": "Gilded Yam",
+    "quality": "common",
+    "usedBy": [
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "farm",
+        "skill": 75,
+        "hoeTier": 4,
+        "growMinutes": 615,
+        "fine": false
+      }
+    ]
+  },
+  {
+    "itemId": "glass_vial",
+    "name": "Glass Vial",
+    "quality": "common",
+    "usedBy": [
+      "alchemy",
+      "inscription"
+    ],
+    "sources": [
+      {
+        "kind": "vendor",
+        "priceCopper": 12,
+        "vendors": [
+          {
+            "npcId": "alchemist_verane",
+            "name": "Alchemist Verane"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "arcanite_bar",
+    "name": "Glyphsteel Bar",
+    "quality": "common",
+    "usedBy": [
+      "engineering",
+      "weaponcrafting",
+      "armorcrafting"
+    ],
+    "sources": [
+      {
+        "kind": "vendor",
+        "priceCopper": 160,
+        "vendors": [
+          {
+            "npcId": "quartermaster_bree",
+            "name": "Quartermaster Bree"
+          },
+          {
+            "npcId": "tinker_gizzel",
+            "name": "Tinker Gizzel"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "goldleaf_herb",
+    "name": "Goldleaf Herb",
+    "quality": "common",
+    "usedBy": [
+      "alchemy",
+      "cooking",
+      "tailoring",
+      "inscription"
+    ],
+    "sources": [
+      {
+        "kind": "node",
+        "profession": "herbalism",
+        "zones": [
+          {
+            "zone": "The Farshore",
+            "nodeTier": 1
+          },
+          {
+            "zone": "Mirefen Marsh",
+            "nodeTier": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "goldleaf_sickle",
+    "name": "Goldleaf Sickle",
+    "quality": "rare",
+    "usedBy": [
+      "engineering"
+    ],
+    "sources": [
+      {
+        "kind": "crafted",
+        "crafts": [
+          "engineering"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "tallow_candle",
+    "name": "Greasy Tallow Lump",
+    "quality": "common",
+    "usedBy": [
+      "alchemy"
+    ],
+    "sources": [
+      {
+        "kind": "drop",
+        "creatures": [
+          {
+            "name": "Deeprock Digger",
+            "zone": "Eastbrook Vale"
+          },
+          {
+            "name": "Deeprock Tunneler",
+            "zone": "Thornpeak Heights"
+          },
+          {
+            "name": "Gravecaller Cultist",
+            "zone": "Mirefen Marsh"
+          },
+          {
+            "name": "Gravecaller Mender",
+            "zone": "Mirefen Marsh"
+          }
+        ],
+        "more": 0
+      },
+      {
+        "kind": "eliteDrop",
+        "zones": [
+          "Eastbrook Vale",
+          "Mirefen Marsh"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "highland_barley",
+    "name": "Highland Barley",
+    "quality": "common",
+    "usedBy": [
+      "alchemy",
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "farm",
+        "skill": 50,
+        "hoeTier": 3,
+        "growMinutes": 240,
+        "fine": false
+      }
+    ]
+  },
+  {
+    "itemId": "elderwood_log",
+    "name": "Highpine Log",
+    "quality": "common",
+    "usedBy": [
+      "weaponcrafting"
+    ],
+    "sources": [
+      {
+        "kind": "node",
+        "profession": "logging",
+        "zones": [
+          {
+            "zone": "The Amberfall",
+            "nodeTier": 1
+          },
+          {
+            "zone": "The Drakelands",
+            "nodeTier": 1
+          },
+          {
+            "zone": "The Evergarden",
+            "nodeTier": 1
+          },
+          {
+            "zone": "The Frostveil Reach",
+            "nodeTier": 1
+          },
+          {
+            "zone": "The Galecrest",
+            "nodeTier": 1
+          },
+          {
+            "zone": "The Nightbloom",
+            "nodeTier": 1
+          },
+          {
+            "zone": "The Palmreach",
+            "nodeTier": 1
+          },
+          {
+            "zone": "Thornpeak Heights",
+            "nodeTier": 1
+          },
+          {
+            "zone": "The Veiled Hollow",
+            "nodeTier": 1
+          },
+          {
+            "zone": "The Willowfen",
+            "nodeTier": 1
+          },
+          {
+            "zone": "The Wraithwood",
+            "nodeTier": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "homespun_cloth",
+    "name": "Homespun Cloth",
+    "quality": "common",
+    "usedBy": [
+      "leatherworking",
+      "tailoring"
+    ],
+    "sources": [
+      {
+        "kind": "corpse",
+        "creatures": [
+          {
+            "name": "Gravecaller Cultist",
+            "zone": "Mirefen Marsh"
+          },
+          {
+            "name": "Gravecaller Summoner",
+            "zone": "Mirefen Marsh"
+          },
+          {
+            "name": "Dawnhold Knight",
+            "zone": "The Evergarden"
+          },
+          {
+            "name": "Vale Bandit",
+            "zone": "Eastbrook Vale"
+          },
+          {
+            "name": "Broodsworn Necromancer",
+            "zone": "Thornpeak Heights"
+          },
+          {
+            "name": "Broodsworn Zealot",
+            "zone": "Thornpeak Heights"
+          }
+        ],
+        "more": 0,
+        "eliteZones": [
+          "Thornpeak Heights"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "iron_ore",
+    "name": "Iron Ore",
+    "quality": "common",
+    "usedBy": [
+      "engineering",
+      "leatherworking",
+      "jewelcrafting",
+      "weaponcrafting",
+      "armorcrafting"
+    ],
+    "sources": [
+      {
+        "kind": "node",
+        "profession": "mining",
+        "zones": [
+          {
+            "zone": "The Farshore",
+            "nodeTier": 1
+          },
+          {
+            "zone": "Mirefen Marsh",
+            "nodeTier": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "ironbark_axe",
+    "name": "Ironbark Axe",
+    "quality": "uncommon",
+    "usedBy": [
+      "engineering"
+    ],
+    "sources": [
+      {
+        "kind": "vendor",
+        "priceCopper": 400,
+        "vendors": [
+          {
+            "npcId": "quartermaster_bree",
+            "name": "Quartermaster Bree"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "ironbark_log",
+    "name": "Ironbark Log",
+    "quality": "common",
+    "usedBy": [
+      "weaponcrafting"
+    ],
+    "sources": [
+      {
+        "kind": "node",
+        "profession": "logging",
+        "zones": [
+          {
+            "zone": "Eastbrook Vale",
+            "nodeTier": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "linen_scrap",
+    "name": "Linen Scrap",
+    "quality": "common",
+    "usedBy": [
+      "alchemy",
+      "tailoring"
+    ],
+    "sources": [
+      {
+        "kind": "drop",
+        "creatures": [
+          {
+            "name": "Broodsworn Necromancer",
+            "zone": "Thornpeak Heights"
+          },
+          {
+            "name": "Dawnhold Knight",
+            "zone": "The Evergarden"
+          },
+          {
+            "name": "Deeprock Digger",
+            "zone": "Eastbrook Vale"
+          },
+          {
+            "name": "Downs Bandit",
+            "zone": "The Galecrest"
+          },
+          {
+            "name": "Gravecaller Cultist",
+            "zone": "Mirefen Marsh"
+          },
+          {
+            "name": "Mudfin Skulker",
+            "zone": "Eastbrook Vale"
+          }
+        ],
+        "more": 2
+      },
+      {
+        "kind": "eliteDrop",
+        "zones": [
+          "Eastbrook Vale"
+        ]
+      },
+      {
+        "kind": "instanced",
+        "places": [
+          "dungeon"
+        ]
+      },
+      {
+        "kind": "salvage"
+      }
+    ]
+  },
+  {
+    "itemId": "lucent_reagent",
+    "name": "Lucent Reagent",
+    "quality": "common",
+    "usedBy": [
+      "enchanting"
+    ],
+    "sources": [
+      {
+        "kind": "crafted",
+        "crafts": [
+          "enchanting"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "marsh_rice",
+    "name": "Marsh Rice",
+    "quality": "common",
+    "usedBy": [
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "farm",
+        "skill": 25,
+        "hoeTier": 2,
+        "growMinutes": 130,
+        "fine": false
+      }
+    ]
+  },
+  {
+    "itemId": "old_cragmaws_pelt",
+    "name": "Old Cragmaw's Pelt",
+    "quality": "common",
+    "usedBy": [
+      "leatherworking"
+    ],
+    "sources": [
+      {
+        "kind": "eliteDrop",
+        "zones": [
+          "Thornpeak Heights"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "osmium_hoe",
+    "name": "Osmium Hoe",
+    "quality": "rare",
+    "usedBy": [
+      "engineering"
+    ],
+    "sources": [
+      {
+        "kind": "crafted",
+        "crafts": [
+          "engineering"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "thorium_mining_pick",
+    "name": "Osmium Mining Pick",
+    "quality": "rare",
+    "usedBy": [
+      "engineering"
+    ],
+    "sources": [
+      {
+        "kind": "crafted",
+        "crafts": [
+          "engineering"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "thorium_ore",
+    "name": "Osmium Ore",
+    "quality": "common",
+    "usedBy": [
+      "engineering",
+      "leatherworking",
+      "jewelcrafting",
+      "weaponcrafting",
+      "armorcrafting"
+    ],
+    "sources": [
+      {
+        "kind": "node",
+        "profession": "mining",
+        "zones": [
+          {
+            "zone": "The Amberfall",
+            "nodeTier": 1
+          },
+          {
+            "zone": "The Drakelands",
+            "nodeTier": 1
+          },
+          {
+            "zone": "The Evergarden",
+            "nodeTier": 1
+          },
+          {
+            "zone": "The Frostveil Reach",
+            "nodeTier": 1
+          },
+          {
+            "zone": "The Galecrest",
+            "nodeTier": 1
+          },
+          {
+            "zone": "The Nightbloom",
+            "nodeTier": 1
+          },
+          {
+            "zone": "The Palmreach",
+            "nodeTier": 1
+          },
+          {
+            "zone": "Thornpeak Heights",
+            "nodeTier": 1
+          },
+          {
+            "zone": "The Veiled Hollow",
+            "nodeTier": 1
+          },
+          {
+            "zone": "The Willowfen",
+            "nodeTier": 1
+          },
+          {
+            "zone": "The Wraithwood",
+            "nodeTier": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "precision_chassis",
+    "name": "Precision Chassis",
+    "quality": "common",
+    "usedBy": [
+      "engineering"
+    ],
+    "sources": [
+      {
+        "kind": "crafted",
+        "crafts": [
+          "engineering"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "prime_cut",
+    "name": "Prime Cut",
+    "quality": "rare",
+    "usedBy": [
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "specimen",
+        "baseItemId": "game_meat"
+      }
+    ]
+  },
+  {
+    "itemId": "prismglass_setting",
+    "name": "Prismglass Setting",
+    "quality": "common",
+    "usedBy": [
+      "jewelcrafting"
+    ],
+    "sources": [
+      {
+        "kind": "crafted",
+        "crafts": [
+          "jewelcrafting"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "pristine_claw",
+    "name": "Pristine Claw",
+    "quality": "rare",
+    "usedBy": [
+      "leatherworking"
+    ],
+    "sources": [
+      {
+        "kind": "specimen",
+        "baseItemId": "sharp_claw"
+      }
+    ]
+  },
+  {
+    "itemId": "pristine_hide",
+    "name": "Pristine Hide",
+    "quality": "rare",
+    "usedBy": [
+      "leatherworking"
+    ],
+    "sources": [
+      {
+        "kind": "specimen",
+        "baseItemId": "rough_hide"
+      }
+    ]
+  },
+  {
+    "itemId": "pristine_silk",
+    "name": "Pristine Silk",
+    "quality": "rare",
+    "usedBy": [
+      "tailoring"
+    ],
+    "sources": [
+      {
+        "kind": "specimen",
+        "baseItemId": "spider_silk"
+      }
+    ]
+  },
+  {
+    "itemId": "pristine_venom_gland",
+    "name": "Pristine Venom Gland",
+    "quality": "rare",
+    "usedBy": [
+      "alchemy"
+    ],
+    "sources": [
+      {
+        "kind": "specimen",
+        "baseItemId": "venom_gland"
+      }
+    ]
+  },
+  {
+    "itemId": "quickening_catalyst",
+    "name": "Quickening Catalyst",
+    "quality": "common",
+    "usedBy": [
+      "engineering",
+      "alchemy",
+      "cooking",
+      "leatherworking",
+      "tailoring",
+      "inscription",
+      "enchanting",
+      "jewelcrafting",
+      "weaponcrafting",
+      "armorcrafting"
+    ],
+    "sources": [
+      {
+        "kind": "crafted",
+        "crafts": [
+          "alchemy"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "raw_bog_eel",
+    "name": "Raw Bog Eel",
+    "quality": "common",
+    "usedBy": [
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "fishing",
+        "zones": [
+          {
+            "zone": "Mirefen Marsh",
+            "proficiency": 0,
+            "rodTier": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "raw_deepbarb_catfish",
+    "name": "Raw Deepbarb Catfish",
+    "quality": "common",
+    "usedBy": [
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "fishing",
+        "zones": [
+          {
+            "zone": "The Amberfall",
+            "proficiency": 200,
+            "rodTier": 4
+          },
+          {
+            "zone": "The Drakelands",
+            "proficiency": 200,
+            "rodTier": 4
+          },
+          {
+            "zone": "Eastbrook Vale",
+            "proficiency": 200,
+            "rodTier": 4
+          },
+          {
+            "zone": "The Evergarden",
+            "proficiency": 200,
+            "rodTier": 4
+          },
+          {
+            "zone": "The Farshore",
+            "proficiency": 200,
+            "rodTier": 4
+          },
+          {
+            "zone": "The Frostveil Reach",
+            "proficiency": 200,
+            "rodTier": 4
+          },
+          {
+            "zone": "The Galecrest",
+            "proficiency": 200,
+            "rodTier": 4
+          },
+          {
+            "zone": "Mirefen Marsh",
+            "proficiency": 200,
+            "rodTier": 4
+          },
+          {
+            "zone": "The Nightbloom",
+            "proficiency": 200,
+            "rodTier": 4
+          },
+          {
+            "zone": "The Palmreach",
+            "proficiency": 200,
+            "rodTier": 4
+          },
+          {
+            "zone": "Thornpeak Heights",
+            "proficiency": 200,
+            "rodTier": 4
+          },
+          {
+            "zone": "The Veiled Hollow",
+            "proficiency": 200,
+            "rodTier": 4
+          },
+          {
+            "zone": "The Willowfen",
+            "proficiency": 200,
+            "rodTier": 4
+          },
+          {
+            "zone": "The Wraithwood",
+            "proficiency": 200,
+            "rodTier": 4
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "raw_frostgill_trout",
+    "name": "Raw Frostgill Trout",
+    "quality": "common",
+    "usedBy": [
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "fishing",
+        "zones": [
+          {
+            "zone": "Thornpeak Heights",
+            "proficiency": 0,
+            "rodTier": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "raw_hollowgill_sturgeon",
+    "name": "Raw Hollowgill Sturgeon",
+    "quality": "common",
+    "usedBy": [
+      "engineering",
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "fishing",
+        "zones": [
+          {
+            "zone": "The Amberfall",
+            "proficiency": 200,
+            "rodTier": 5
+          },
+          {
+            "zone": "The Drakelands",
+            "proficiency": 200,
+            "rodTier": 5
+          },
+          {
+            "zone": "Eastbrook Vale",
+            "proficiency": 200,
+            "rodTier": 5
+          },
+          {
+            "zone": "The Evergarden",
+            "proficiency": 200,
+            "rodTier": 5
+          },
+          {
+            "zone": "The Farshore",
+            "proficiency": 200,
+            "rodTier": 5
+          },
+          {
+            "zone": "The Frostveil Reach",
+            "proficiency": 200,
+            "rodTier": 5
+          },
+          {
+            "zone": "The Galecrest",
+            "proficiency": 200,
+            "rodTier": 5
+          },
+          {
+            "zone": "Mirefen Marsh",
+            "proficiency": 200,
+            "rodTier": 5
+          },
+          {
+            "zone": "The Nightbloom",
+            "proficiency": 200,
+            "rodTier": 5
+          },
+          {
+            "zone": "The Palmreach",
+            "proficiency": 200,
+            "rodTier": 5
+          },
+          {
+            "zone": "Thornpeak Heights",
+            "proficiency": 200,
+            "rodTier": 5
+          },
+          {
+            "zone": "The Veiled Hollow",
+            "proficiency": 200,
+            "rodTier": 5
+          },
+          {
+            "zone": "The Willowfen",
+            "proficiency": 200,
+            "rodTier": 5
+          },
+          {
+            "zone": "The Wraithwood",
+            "proficiency": 200,
+            "rodTier": 5
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "raw_marsh_pike",
+    "name": "Raw Marsh Pike",
+    "quality": "common",
+    "usedBy": [
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "fishing",
+        "zones": [
+          {
+            "zone": "Mirefen Marsh",
+            "proficiency": 0,
+            "rodTier": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "raw_mirror_trout",
+    "name": "Raw Mirror Trout",
+    "quality": "common",
+    "usedBy": [
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "fishing",
+        "zones": [
+          {
+            "zone": "The Amberfall",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "The Drakelands",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "Eastbrook Vale",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "The Evergarden",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "The Farshore",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "The Frostveil Reach",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "The Galecrest",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "The Nightbloom",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "The Palmreach",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "The Veiled Hollow",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "The Willowfen",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "The Wraithwood",
+            "proficiency": 0,
+            "rodTier": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "raw_river_perch",
+    "name": "Raw River Perch",
+    "quality": "common",
+    "usedBy": [
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "fishing",
+        "zones": [
+          {
+            "zone": "The Amberfall",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "The Drakelands",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "Eastbrook Vale",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "The Evergarden",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "The Farshore",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "The Frostveil Reach",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "The Galecrest",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "The Nightbloom",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "The Palmreach",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "The Veiled Hollow",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "The Willowfen",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "The Wraithwood",
+            "proficiency": 0,
+            "rodTier": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "raw_stonescale_carp",
+    "name": "Raw Slatefin Carp",
+    "quality": "common",
+    "usedBy": [
+      "engineering",
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "fishing",
+        "zones": [
+          {
+            "zone": "Thornpeak Heights",
+            "proficiency": 0,
+            "rodTier": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "raw_stillmere_salmon",
+    "name": "Raw Stillmere Salmon",
+    "quality": "common",
+    "usedBy": [
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "fishing",
+        "zones": [
+          {
+            "zone": "The Amberfall",
+            "proficiency": 200,
+            "rodTier": 6
+          },
+          {
+            "zone": "The Drakelands",
+            "proficiency": 200,
+            "rodTier": 6
+          },
+          {
+            "zone": "Eastbrook Vale",
+            "proficiency": 200,
+            "rodTier": 6
+          },
+          {
+            "zone": "The Evergarden",
+            "proficiency": 200,
+            "rodTier": 6
+          },
+          {
+            "zone": "The Farshore",
+            "proficiency": 200,
+            "rodTier": 6
+          },
+          {
+            "zone": "The Frostveil Reach",
+            "proficiency": 200,
+            "rodTier": 6
+          },
+          {
+            "zone": "The Galecrest",
+            "proficiency": 200,
+            "rodTier": 6
+          },
+          {
+            "zone": "Mirefen Marsh",
+            "proficiency": 200,
+            "rodTier": 6
+          },
+          {
+            "zone": "The Nightbloom",
+            "proficiency": 200,
+            "rodTier": 6
+          },
+          {
+            "zone": "The Palmreach",
+            "proficiency": 200,
+            "rodTier": 6
+          },
+          {
+            "zone": "Thornpeak Heights",
+            "proficiency": 200,
+            "rodTier": 6
+          },
+          {
+            "zone": "The Veiled Hollow",
+            "proficiency": 200,
+            "rodTier": 6
+          },
+          {
+            "zone": "The Willowfen",
+            "proficiency": 200,
+            "rodTier": 6
+          },
+          {
+            "zone": "The Wraithwood",
+            "proficiency": 200,
+            "rodTier": 6
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "bandit_bandana",
+    "name": "Red Bandana",
+    "quality": "common",
+    "usedBy": [
+      "tailoring"
+    ],
+    "sources": [
+      {
+        "kind": "drop",
+        "creatures": [
+          {
+            "name": "Downs Bandit",
+            "zone": "The Galecrest"
+          },
+          {
+            "name": "Vale Bandit",
+            "zone": "Eastbrook Vale"
+          },
+          {
+            "name": "Wreckfield Thief",
+            "zone": "The Galecrest"
+          }
+        ],
+        "more": 0
+      },
+      {
+        "kind": "eliteDrop",
+        "zones": [
+          "Eastbrook Vale"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "resonant_hide",
+    "name": "Resonant Hide",
+    "quality": "rare",
+    "usedBy": [
+      "enchanting"
+    ],
+    "sources": [
+      {
+        "kind": "disenchant"
+      }
+    ]
+  },
+  {
+    "itemId": "resonant_links",
+    "name": "Resonant Links",
+    "quality": "rare",
+    "usedBy": [
+      "enchanting"
+    ],
+    "sources": [
+      {
+        "kind": "disenchant"
+      }
+    ]
+  },
+  {
+    "itemId": "resonant_steel",
+    "name": "Resonant Steel",
+    "quality": "rare",
+    "usedBy": [
+      "enchanting"
+    ],
+    "sources": [
+      {
+        "kind": "disenchant"
+      }
+    ]
+  },
+  {
+    "itemId": "resonant_thread",
+    "name": "Resonant Thread",
+    "quality": "rare",
+    "usedBy": [
+      "tailoring",
+      "enchanting"
+    ],
+    "sources": [
+      {
+        "kind": "disenchant"
+      }
+    ]
+  },
+  {
+    "itemId": "resonant_timber",
+    "name": "Resonant Timber",
+    "quality": "rare",
+    "usedBy": [
+      "enchanting"
+    ],
+    "sources": [
+      {
+        "kind": "disenchant"
+      }
+    ]
+  },
+  {
+    "itemId": "rough_hide",
+    "name": "Rough Hide",
+    "quality": "common",
+    "usedBy": [
+      "leatherworking",
+      "weaponcrafting",
+      "armorcrafting"
+    ],
+    "sources": [
+      {
+        "kind": "corpse",
+        "creatures": [
+          {
+            "name": "Bog Bloat",
+            "zone": "Mirefen Marsh"
+          },
+          {
+            "name": "Bogtoad",
+            "zone": "The Willowfen"
+          },
+          {
+            "name": "Deepfen Snapper",
+            "zone": "Mirefen Marsh"
+          },
+          {
+            "name": "Dragonkin Broodguard",
+            "zone": "The Drakelands"
+          },
+          {
+            "name": "Dune Troll",
+            "zone": "The Drakelands"
+          },
+          {
+            "name": "Forest Wolf",
+            "zone": "Eastbrook Vale"
+          }
+        ],
+        "more": 19,
+        "eliteZones": [
+          "The Drakelands",
+          "The Frostveil Reach",
+          "Thornpeak Heights"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "sablewax_vellum",
+    "name": "Sablewax Vellum",
+    "quality": "common",
+    "usedBy": [
+      "inscription"
+    ],
+    "sources": [
+      {
+        "kind": "crafted",
+        "crafts": [
+          "inscription"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "seasoned_stock",
+    "name": "Seasoned Stock",
+    "quality": "common",
+    "usedBy": [
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "crafted",
+        "crafts": [
+          "cooking"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "sharp_claw",
+    "name": "Sharp Claw",
+    "quality": "common",
+    "usedBy": [
+      "leatherworking"
+    ],
+    "sources": [
+      {
+        "kind": "corpse",
+        "creatures": [
+          {
+            "name": "Dragonkin Broodguard",
+            "zone": "The Drakelands"
+          },
+          {
+            "name": "Mirefen Troll",
+            "zone": "Mirefen Marsh"
+          },
+          {
+            "name": "Gloam Fox",
+            "zone": "The Amberfall"
+          },
+          {
+            "name": "Mire Prowler",
+            "zone": "Mirefen Marsh"
+          },
+          {
+            "name": "Ridge Stalker",
+            "zone": "Thornpeak Heights"
+          },
+          {
+            "name": "Old Greyjaw",
+            "zone": "Eastbrook Vale"
+          }
+        ],
+        "more": 1,
+        "eliteZones": [
+          "Thornpeak Heights"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "silverleaf_herb",
+    "name": "Sheenleaf Herb",
+    "quality": "common",
+    "usedBy": [
+      "alchemy",
+      "cooking",
+      "tailoring",
+      "inscription"
+    ],
+    "sources": [
+      {
+        "kind": "node",
+        "profession": "herbalism",
+        "zones": [
+          {
+            "zone": "Eastbrook Vale",
+            "nodeTier": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "silverleaf_sickle",
+    "name": "Sheenleaf Sickle",
+    "quality": "uncommon",
+    "usedBy": [
+      "engineering"
+    ],
+    "sources": [
+      {
+        "kind": "vendor",
+        "priceCopper": 400,
+        "vendors": [
+          {
+            "npcId": "quartermaster_bree",
+            "name": "Quartermaster Bree"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "silverstream_fishing_rod",
+    "name": "Silverstream Fishing Rod",
+    "quality": "uncommon",
+    "usedBy": [
+      "engineering"
+    ],
+    "sources": [
+      {
+        "kind": "vendor",
+        "priceCopper": 150,
+        "vendors": [
+          {
+            "npcId": "quartermaster_bree",
+            "name": "Quartermaster Bree"
+          },
+          {
+            "npcId": "trader_wilkes",
+            "name": "Trader Wilkes"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "skysilver_hoe",
+    "name": "Skysilver Hoe",
+    "quality": "uncommon",
+    "usedBy": [
+      "engineering"
+    ],
+    "sources": [
+      {
+        "kind": "crafted",
+        "crafts": [
+          "engineering"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "mithril_mining_pick",
+    "name": "Skysilver Mining Pick",
+    "quality": "uncommon",
+    "usedBy": [
+      "engineering"
+    ],
+    "sources": [
+      {
+        "kind": "vendor",
+        "priceCopper": 400,
+        "vendors": [
+          {
+            "npcId": "quartermaster_bree",
+            "name": "Quartermaster Bree"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "mudfin_scale",
+    "name": "Slimy Mudfin Scale",
+    "quality": "common",
+    "usedBy": [
+      "leatherworking"
+    ],
+    "sources": [
+      {
+        "kind": "corpse",
+        "creatures": [
+          {
+            "name": "Bogtoad",
+            "zone": "The Willowfen"
+          },
+          {
+            "name": "Deepfen Snapper",
+            "zone": "Mirefen Marsh"
+          },
+          {
+            "name": "Glimmermere Wader",
+            "zone": "Thornpeak Heights"
+          },
+          {
+            "name": "Mudfin Skulker",
+            "zone": "Eastbrook Vale"
+          },
+          {
+            "name": "Shoal Scuttler",
+            "zone": "The Galecrest"
+          },
+          {
+            "name": "Tide Scuttler",
+            "zone": "The Palmreach"
+          }
+        ],
+        "more": 0
+      },
+      {
+        "kind": "drop",
+        "creatures": [
+          {
+            "name": "Deepfen Snapper",
+            "zone": "Mirefen Marsh"
+          },
+          {
+            "name": "Mere Lurker",
+            "zone": "The Amberfall"
+          },
+          {
+            "name": "Mudfin Skulker",
+            "zone": "Eastbrook Vale"
+          }
+        ],
+        "more": 0
+      },
+      {
+        "kind": "eliteDrop",
+        "zones": [
+          "Mirefen Marsh",
+          "The Amberfall"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "smithing_flux",
+    "name": "Smithing Flux",
+    "quality": "common",
+    "usedBy": [
+      "engineering",
+      "jewelcrafting",
+      "weaponcrafting",
+      "armorcrafting"
+    ],
+    "sources": [
+      {
+        "kind": "vendor",
+        "priceCopper": 20,
+        "vendors": [
+          {
+            "npcId": "forgemistress_darva",
+            "name": "Forgemistress Darva"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "spider_silk",
+    "name": "Spider Silk",
+    "quality": "common",
+    "usedBy": [
+      "leatherworking",
+      "tailoring"
+    ],
+    "sources": [
+      {
+        "kind": "corpse",
+        "creatures": [
+          {
+            "name": "Canopy Weaver",
+            "zone": "The Palmreach"
+          },
+          {
+            "name": "Mirefen Widow",
+            "zone": "Mirefen Marsh"
+          },
+          {
+            "name": "Sableweb Lurker",
+            "zone": "Eastbrook Vale"
+          },
+          {
+            "name": "Widowsilk Spinner",
+            "zone": "The Wraithwood"
+          }
+        ],
+        "more": 0,
+        "eliteZones": [
+          "Mirefen Marsh"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "spool_of_thread",
+    "name": "Spool of Thread",
+    "quality": "common",
+    "usedBy": [
+      "leatherworking",
+      "tailoring"
+    ],
+    "sources": [
+      {
+        "kind": "vendor",
+        "priceCopper": 12,
+        "vendors": [
+          {
+            "npcId": "weaver_ottilie",
+            "name": "Weaver Ottilie"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "stormreel_fishing_rod",
+    "name": "Stormreel Fishing Rod",
+    "quality": "rare",
+    "usedBy": [
+      "engineering"
+    ],
+    "sources": [
+      {
+        "kind": "crafted",
+        "crafts": [
+          "engineering"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "glimmerfin_koi",
+    "name": "Sunglint Koi",
+    "quality": "uncommon",
+    "usedBy": [
+      "engineering"
+    ],
+    "sources": [
+      {
+        "kind": "fishing",
+        "zones": [
+          {
+            "zone": "The Amberfall",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "The Drakelands",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "Eastbrook Vale",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "The Evergarden",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "The Farshore",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "The Frostveil Reach",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "The Galecrest",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "Mirefen Marsh",
+            "proficiency": 0,
+            "rodTier": 2
+          },
+          {
+            "zone": "The Nightbloom",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "The Palmreach",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "Thornpeak Heights",
+            "proficiency": 0,
+            "rodTier": 3
+          },
+          {
+            "zone": "The Veiled Hollow",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "The Willowfen",
+            "proficiency": 0,
+            "rodTier": 1
+          },
+          {
+            "zone": "The Wraithwood",
+            "proficiency": 0,
+            "rodTier": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "sunpetal_herb",
+    "name": "Sunpetal Herb",
+    "quality": "common",
+    "usedBy": [
+      "alchemy",
+      "cooking",
+      "tailoring",
+      "inscription"
+    ],
+    "sources": [
+      {
+        "kind": "node",
+        "profession": "herbalism",
+        "zones": [
+          {
+            "zone": "The Amberfall",
+            "nodeTier": 1
+          },
+          {
+            "zone": "The Drakelands",
+            "nodeTier": 1
+          },
+          {
+            "zone": "The Evergarden",
+            "nodeTier": 1
+          },
+          {
+            "zone": "The Frostveil Reach",
+            "nodeTier": 1
+          },
+          {
+            "zone": "The Galecrest",
+            "nodeTier": 1
+          },
+          {
+            "zone": "The Nightbloom",
+            "nodeTier": 1
+          },
+          {
+            "zone": "The Palmreach",
+            "nodeTier": 1
+          },
+          {
+            "zone": "Thornpeak Heights",
+            "nodeTier": 1
+          },
+          {
+            "zone": "The Veiled Hollow",
+            "nodeTier": 1
+          },
+          {
+            "zone": "The Willowfen",
+            "nodeTier": 1
+          },
+          {
+            "zone": "The Wraithwood",
+            "nodeTier": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "sunspun_bolt",
+    "name": "Sunspun Bolt",
+    "quality": "common",
+    "usedBy": [
+      "tailoring"
+    ],
+    "sources": [
+      {
+        "kind": "crafted",
+        "crafts": [
+          "tailoring"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "tanning_agent",
+    "name": "Tanning Agent",
+    "quality": "common",
+    "usedBy": [
+      "leatherworking"
+    ],
+    "sources": [
+      {
+        "kind": "vendor",
+        "priceCopper": 16,
+        "vendors": [
+          {
+            "npcId": "tanner_hesk",
+            "name": "Tanner Hesk"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "thornpeak_cabbage",
+    "name": "Thornpeak Cabbage",
+    "quality": "common",
+    "usedBy": [
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "farm",
+        "skill": 50,
+        "hoeTier": 3,
+        "growMinutes": 250,
+        "fine": false
+      }
+    ]
+  },
+  {
+    "itemId": "tidewrought_fishing_rod",
+    "name": "Tidewrought Fishing Rod",
+    "quality": "epic",
+    "usedBy": [
+      "engineering"
+    ],
+    "sources": [
+      {
+        "kind": "crafted",
+        "crafts": [
+          "engineering"
+        ]
+      }
+    ]
+  },
+  {
+    "itemId": "spider_leg",
+    "name": "Twitching Spider Leg",
+    "quality": "common",
+    "usedBy": [
+      "alchemy",
+      "cooking",
+      "leatherworking",
+      "tailoring"
+    ],
+    "sources": [
+      {
+        "kind": "drop",
+        "creatures": [
+          {
+            "name": "Canopy Weaver",
+            "zone": "The Palmreach"
+          },
+          {
+            "name": "Mirefen Widow",
+            "zone": "Mirefen Marsh"
+          },
+          {
+            "name": "Sableweb Lurker",
+            "zone": "Eastbrook Vale"
+          },
+          {
+            "name": "Widowsilk Spinner",
+            "zone": "The Wraithwood"
+          }
+        ],
+        "more": 0
+      },
+      {
+        "kind": "eliteDrop",
+        "zones": [
+          "Mirefen Marsh"
+        ]
+      },
+      {
+        "kind": "instanced",
+        "places": [
+          "dungeon"
+        ]
+      },
+      {
+        "kind": "salvage"
+      }
+    ]
+  },
+  {
+    "itemId": "vale_wheat",
+    "name": "Vale Wheat",
+    "quality": "common",
+    "usedBy": [
+      "alchemy",
+      "cooking"
+    ],
+    "sources": [
+      {
+        "kind": "farm",
+        "skill": 0,
+        "hoeTier": 1,
+        "growMinutes": 45,
+        "fine": false
+      }
+    ]
+  },
+  {
+    "itemId": "venom_gland",
+    "name": "Venom Gland",
+    "quality": "common",
+    "usedBy": [
+      "alchemy"
+    ],
+    "sources": [
+      {
+        "kind": "corpse",
+        "creatures": [
+          {
+            "name": "Bogtoad",
+            "zone": "The Willowfen"
+          },
+          {
+            "name": "Canopy Weaver",
+            "zone": "The Palmreach"
+          },
+          {
+            "name": "Mirefen Widow",
+            "zone": "Mirefen Marsh"
+          },
+          {
+            "name": "Sableweb Lurker",
+            "zone": "Eastbrook Vale"
+          },
+          {
+            "name": "Widowsilk Spinner",
+            "zone": "The Wraithwood"
+          },
+          {
+            "name": "Sethrael the Palecoil",
+            "zone": "Thornpeak Heights"
+          }
+        ],
+        "more": 0
+      }
+    ]
+  },
+  {
+    "itemId": "wyrmfall_core",
+    "name": "Wyrmfall Core",
+    "quality": "rare",
+    "usedBy": [
+      "engineering",
+      "alchemy",
+      "cooking",
+      "leatherworking",
+      "tailoring",
+      "inscription",
+      "jewelcrafting",
+      "weaponcrafting",
+      "armorcrafting"
+    ],
+    "sources": [
+      {
+        "kind": "quartermaster",
+        "offers": [
+          {
+            "kind": "heroic",
+            "marks": 12
+          }
+        ]
+      },
+      {
+        "kind": "bossCredit",
+        "min": 1,
+        "max": 3,
+        "riftA": 1,
+        "riftS": 2
+      }
+    ]
+  },
+  {
+    "itemId": "wyrmhide_cording",
+    "name": "Wyrmhide Cording",
+    "quality": "common",
+    "usedBy": [
+      "leatherworking"
+    ],
+    "sources": [
+      {
+        "kind": "crafted",
+        "crafts": [
+          "leatherworking"
+        ]
+      }
+    ]
+  }
+];
+
+export const GUIDE_NPCS: GuideNpcLocation[] = [
+  {
+    "id": "apothecary_lin",
+    "name": "Apothecary Lin",
+    "title": "Herbalist",
+    "zoneId": "eastbrook_vale",
+    "zone": "Eastbrook Vale",
+    "town": "Eastbrook"
+  },
+  {
+    "id": "bursar_fernando",
+    "name": "Bursar Fernando",
+    "title": "The Gilded Strongbox",
+    "zoneId": "eastbrook_vale",
+    "zone": "Eastbrook Vale",
+    "town": "Eastbrook"
+  },
+  {
+    "id": "farmer_jessica",
+    "name": "Farmer Jessica",
+    "title": "Allotment Keeper",
+    "zoneId": "eastbrook_vale",
+    "zone": "Eastbrook Vale",
+    "town": "Eastbrook"
+  },
+  {
+    "id": "fisherman_brandt",
+    "name": "Fisherman Brandt",
+    "title": "Old Salt",
+    "zoneId": "eastbrook_vale",
+    "zone": "Eastbrook Vale",
+    "town": "Eastbrook"
+  },
+  {
+    "id": "foreman_odell",
+    "name": "Foreman Odell",
+    "title": "Mine Foreman",
+    "zoneId": "eastbrook_vale",
+    "zone": "Eastbrook Vale",
+    "town": "Eastbrook"
+  },
+  {
+    "id": "forgemistress_darva",
+    "name": "Forgemistress Darva",
+    "title": "Master of the Forge",
+    "zoneId": "eastbrook_vale",
+    "zone": "Eastbrook Vale",
+    "town": "Eastbrook"
+  },
+  {
+    "id": "marshal_redbrook",
+    "name": "Marshal Redbrook",
+    "title": "Town Marshal",
+    "zoneId": "eastbrook_vale",
+    "zone": "Eastbrook Vale",
+    "town": "Eastbrook"
+  },
+  {
+    "id": "smith_haldren",
+    "name": "Smith Haldren",
+    "title": "Armorer & Weaponsmith",
+    "zoneId": "eastbrook_vale",
+    "zone": "Eastbrook Vale",
+    "town": "Eastbrook"
+  },
+  {
+    "id": "npc_wq_taskmaster",
+    "name": "Taskmaster Kaelen",
+    "title": "World Quest Taskmaster",
+    "zoneId": "eastbrook_vale",
+    "zone": "Eastbrook Vale",
+    "town": "Eastbrook"
+  },
+  {
+    "id": "the_merchant",
+    "name": "The Merchant",
+    "title": "Keeper of the World Market",
+    "zoneId": "eastbrook_vale",
+    "zone": "Eastbrook Vale",
+    "town": "Eastbrook"
+  },
+  {
+    "id": "tinker_gizzel",
+    "name": "Tinker Gizzel",
+    "title": "Master of the Toolworks",
+    "zoneId": "eastbrook_vale",
+    "zone": "Eastbrook Vale",
+    "town": "Eastbrook"
+  },
+  {
+    "id": "trader_wilkes",
+    "name": "Trader Wilkes",
+    "title": "Provisioner",
+    "zoneId": "eastbrook_vale",
+    "zone": "Eastbrook Vale",
+    "town": "Eastbrook"
+  },
+  {
+    "id": "brother_aldric",
+    "name": "Brother Aldric",
+    "title": "Priest of the Vale",
+    "zoneId": "eastbrook_vale",
+    "zone": "Eastbrook Vale",
+    "town": "Eastbrook",
+    "yards": 30,
+    "direction": "NW"
+  },
+  {
+    "id": "card_master",
+    "name": "Card Master",
+    "title": "Dealer of Chance",
+    "zoneId": "eastbrook_vale",
+    "zone": "Eastbrook Vale",
+    "town": "Eastbrook",
+    "yards": 30,
+    "direction": "W"
+  },
+  {
+    "id": "cook_marlow",
+    "name": "Cook Marlow",
+    "title": "Master of the Kitchens",
+    "zoneId": "eastbrook_vale",
+    "zone": "Eastbrook Vale",
+    "town": "Eastbrook",
+    "yards": 30,
+    "direction": "E"
+  },
+  {
+    "id": "chronicler_saul",
+    "name": "Saul the Chronicler",
+    "title": "The Vale Chronicle",
+    "zoneId": "eastbrook_vale",
+    "zone": "Eastbrook Vale",
+    "town": "Eastbrook",
+    "yards": 30,
+    "direction": "NW"
+  },
+  {
+    "id": "npc_church_order_quartermaster",
+    "name": "Templar Althea",
+    "title": "Church Order Quartermaster",
+    "zoneId": "eastbrook_vale",
+    "zone": "Eastbrook Vale",
+    "town": "Eastbrook",
+    "yards": 30,
+    "direction": "NW"
+  },
+  {
+    "id": "weaver_ottilie",
+    "name": "Weaver Ottilie",
+    "title": "Master of the Loom",
+    "zoneId": "eastbrook_vale",
+    "zone": "Eastbrook Vale",
+    "town": "Eastbrook",
+    "yards": 30,
+    "direction": "SE"
+  },
+  {
+    "id": "weekly_emissary",
+    "name": "Cham Pete",
+    "title": "Emissary",
+    "zoneId": "eastbrook_vale",
+    "zone": "Eastbrook Vale",
+    "town": "Eastbrook",
+    "yards": 40,
+    "direction": "E"
+  },
+  {
+    "id": "fury",
+    "name": "FURY",
+    "title": "Honor Quartermaster",
+    "zoneId": "eastbrook_vale",
+    "zone": "Eastbrook Vale",
+    "town": "Eastbrook",
+    "yards": 40,
+    "direction": "NW"
+  },
+  {
+    "id": "wayfarer_bryn",
+    "name": "Wayfarer Bryn",
+    "title": "Harbor Guide",
+    "zoneId": "eastbrook_vale",
+    "zone": "Eastbrook Vale",
+    "town": "Eastbrook",
+    "yards": 100,
+    "direction": "N"
+  },
+  {
+    "id": "brother_halven",
+    "name": "Brother Halven",
+    "title": "Reliquary Keeper",
+    "zoneId": "eastbrook_vale",
+    "zone": "Eastbrook Vale",
+    "town": "Eastbrook",
+    "yards": 240,
+    "direction": "NE"
+  },
+  {
+    "id": "brother_aldric_fen",
+    "name": "Brother Aldric",
+    "title": "Priest of the Vale",
+    "zoneId": "mirefen_marsh",
+    "zone": "Mirefen Marsh",
+    "town": "Fenbridge"
+  },
+  {
+    "id": "bursar_petra_vell",
+    "name": "Bursar Petra Vell",
+    "title": "The Gilded Strongbox",
+    "zoneId": "mirefen_marsh",
+    "zone": "Mirefen Marsh",
+    "town": "Fenbridge"
+  },
+  {
+    "id": "chronicler_osric_fenn",
+    "name": "Chronicler Osric Fenn",
+    "title": "The Marsh Chronicle",
+    "zoneId": "mirefen_marsh",
+    "zone": "Mirefen Marsh",
+    "town": "Fenbridge"
+  },
+  {
+    "id": "herbalist_yara",
+    "name": "Herbalist Yara",
+    "title": "Herbalist",
+    "zoneId": "mirefen_marsh",
+    "zone": "Mirefen Marsh",
+    "town": "Fenbridge"
+  },
+  {
+    "id": "provisioner_hale",
+    "name": "Provisioner Hale",
+    "title": "Provisioner",
+    "zoneId": "mirefen_marsh",
+    "zone": "Mirefen Marsh",
+    "town": "Fenbridge"
+  },
+  {
+    "id": "scout_maren",
+    "name": "Scout Maren",
+    "title": "Marshal's Scout",
+    "zoneId": "mirefen_marsh",
+    "zone": "Mirefen Marsh",
+    "town": "Fenbridge"
+  },
+  {
+    "id": "tanner_hesk",
+    "name": "Tanner Hesk",
+    "title": "Master of the Tannery",
+    "zoneId": "mirefen_marsh",
+    "zone": "Mirefen Marsh",
+    "town": "Fenbridge"
+  },
+  {
+    "id": "warden_fenwick",
+    "name": "Warden Fenwick",
+    "title": "Warden of Fenbridge",
+    "zoneId": "mirefen_marsh",
+    "zone": "Mirefen Marsh",
+    "town": "Fenbridge"
+  },
+  {
+    "id": "farmer_teasel",
+    "name": "Farmer Teasel",
+    "title": "Fen Paddy Farmer",
+    "zoneId": "mirefen_marsh",
+    "zone": "Mirefen Marsh",
+    "town": "Fenbridge",
+    "yards": 40,
+    "direction": "NE"
+  },
+  {
+    "id": "brother_halven_marsh",
+    "name": "Brother Halven",
+    "title": "Reliquary Keeper",
+    "zoneId": "mirefen_marsh",
+    "zone": "Mirefen Marsh",
+    "town": "Fenbridge",
+    "yards": 230,
+    "direction": "NE"
+  },
+  {
+    "id": "alchemist_verane",
+    "name": "Alchemist Verane",
+    "title": "Master of the Apothecary",
+    "zoneId": "thornpeak_heights",
+    "zone": "Thornpeak Heights",
+    "town": "Highwatch"
+  },
+  {
+    "id": "armorer_hode",
+    "name": "Armorer Hode",
+    "title": "Master Armorer",
+    "zoneId": "thornpeak_heights",
+    "zone": "Thornpeak Heights",
+    "town": "Highwatch"
+  },
+  {
+    "id": "auctioneer_voss",
+    "name": "Auctioneer Voss",
+    "title": "Keeper of the World Market",
+    "zoneId": "thornpeak_heights",
+    "zone": "Thornpeak Heights",
+    "town": "Highwatch"
+  },
+  {
+    "id": "brother_aldric_highwatch",
+    "name": "Brother Aldric",
+    "title": "Priest of the Vale",
+    "zoneId": "thornpeak_heights",
+    "zone": "Thornpeak Heights",
+    "town": "Highwatch"
+  },
+  {
+    "id": "bursar_aldous_crane",
+    "name": "Bursar Aldous Crane",
+    "title": "The Gilded Strongbox",
+    "zoneId": "thornpeak_heights",
+    "zone": "Thornpeak Heights",
+    "town": "Highwatch"
+  },
+  {
+    "id": "captain_thessaly",
+    "name": "Captain Thessaly",
+    "title": "Highwatch Captain",
+    "zoneId": "thornpeak_heights",
+    "zone": "Thornpeak Heights",
+    "town": "Highwatch"
+  },
+  {
+    "id": "chronicler_edda_hartwell",
+    "name": "Chronicler Zenzie",
+    "title": "The Peaks Chronicle",
+    "zoneId": "thornpeak_heights",
+    "zone": "Thornpeak Heights",
+    "town": "Highwatch"
+  },
+  {
+    "id": "loremaster_caddis",
+    "name": "Loremaster Caddis",
+    "title": "Loremaster",
+    "zoneId": "thornpeak_heights",
+    "zone": "Thornpeak Heights",
+    "town": "Highwatch"
+  },
+  {
+    "id": "quartermaster_bree",
+    "name": "Quartermaster Bree",
+    "title": "Highwatch Quartermaster",
+    "zoneId": "thornpeak_heights",
+    "zone": "Thornpeak Heights",
+    "town": "Highwatch"
+  },
+  {
+    "id": "heroic_quartermaster",
+    "name": "Quartermaster Vex",
+    "title": "Heroic Quartermaster",
+    "zoneId": "thornpeak_heights",
+    "zone": "Thornpeak Heights",
+    "town": "Highwatch"
+  },
+  {
+    "id": "scout_maren_highwatch",
+    "name": "Scout Maren",
+    "title": "Marshal's Scout",
+    "zoneId": "thornpeak_heights",
+    "zone": "Thornpeak Heights",
+    "town": "Highwatch"
+  },
+  {
+    "id": "warmarshal_draven_kole",
+    "name": "Warmarshal Draven Kole",
+    "title": "Master of the Warfare Stores",
+    "zoneId": "thornpeak_heights",
+    "zone": "Thornpeak Heights",
+    "town": "Highwatch"
+  },
+  {
+    "id": "farmer_hollis",
+    "name": "Farmer Hollis",
+    "title": "Highwatch Terrace Farmer",
+    "zoneId": "thornpeak_heights",
+    "zone": "Thornpeak Heights",
+    "town": "Highwatch",
+    "yards": 40,
+    "direction": "NE"
+  },
+  {
+    "id": "tidewatcher_ondrel",
+    "name": "Ondrel Vane",
+    "title": "Tidewatcher",
+    "zoneId": "thornpeak_heights",
+    "zone": "Thornpeak Heights",
+    "town": "Highwatch",
+    "yards": 140,
+    "direction": "NE"
+  },
+  {
+    "id": "archivist_tullo",
+    "name": "Archivist Tullo",
+    "title": "Reader of Stones",
+    "zoneId": "veiled_hollow",
+    "zone": "The Veiled Hollow",
+    "town": "Eldershine"
+  },
+  {
+    "id": "keeper_saelwyn",
+    "name": "Keeper Saelwyn",
+    "title": "Keeper of the Hollow",
+    "zoneId": "veiled_hollow",
+    "zone": "The Veiled Hollow",
+    "town": "Eldershine"
+  },
+  {
+    "id": "loremother_bryn",
+    "name": "Loremother Bryn",
+    "title": "Voice of the Shrine",
+    "zoneId": "veiled_hollow",
+    "zone": "The Veiled Hollow",
+    "town": "Eldershine"
+  },
+  {
+    "id": "provisioner_fenna",
+    "name": "Provisioner Fenna",
+    "title": "Eldershine Provisioner",
+    "zoneId": "veiled_hollow",
+    "zone": "The Veiled Hollow",
+    "town": "Eldershine"
+  },
+  {
+    "id": "wardsmith_orun",
+    "name": "Wardsmith Orun",
+    "title": "Keeper of the Old Forges",
+    "zoneId": "veiled_hollow",
+    "zone": "The Veiled Hollow",
+    "town": "Eldershine"
+  },
+  {
+    "id": "huntsman_deral",
+    "name": "Huntsman Deral",
+    "title": "Warden of the Herds",
+    "zoneId": "veiled_hollow",
+    "zone": "The Veiled Hollow",
+    "town": "Eldershine",
+    "yards": 90,
+    "direction": "NW"
+  },
+  {
+    "id": "npc_automaton_quartermaster",
+    "name": "Artificer Tobrin",
+    "title": "Automaton Requisitioner",
+    "zoneId": "drakelands",
+    "zone": "The Drakelands",
+    "town": "Wyrmwatch"
+  },
+  {
+    "id": "gatecaptain_brannoc",
+    "name": "Gatecaptain Brannoc",
+    "title": "Commander of Wyrmwatch",
+    "zoneId": "drakelands",
+    "zone": "The Drakelands",
+    "town": "Wyrmwatch"
+  },
+  {
+    "id": "quartermaster_sela",
+    "name": "Quartermaster Sela",
+    "title": "Keeper of the Garrison Stores",
+    "zoneId": "drakelands",
+    "zone": "The Drakelands",
+    "town": "Wyrmwatch"
+  },
+  {
+    "id": "scout_yerrin",
+    "name": "Scout Yerrin",
+    "title": "Far-Dune Watcher",
+    "zoneId": "drakelands",
+    "zone": "The Drakelands",
+    "town": "Wyrmwatch",
+    "yards": 220,
+    "direction": "NW"
+  },
+  {
+    "id": "crucible_quartermaster",
+    "name": "Quartermaster Bronn Emberward",
+    "title": "Crucible Quartermaster",
+    "zoneId": "drakelands",
+    "zone": "The Drakelands",
+    "town": "Wyrmwatch",
+    "yards": 350,
+    "direction": "N"
+  },
+  {
+    "id": "hearthkeeper_maeve",
+    "name": "Hearthkeeper Maeve",
+    "title": "Keeper of the Hearth-Lodge",
+    "zoneId": "frostveil",
+    "zone": "The Frostveil Reach",
+    "town": "Icemantle"
+  },
+  {
+    "id": "warden_kaldra",
+    "name": "Warden Kaldra",
+    "title": "Warden of Icemantle",
+    "zoneId": "frostveil",
+    "zone": "The Frostveil Reach",
+    "town": "Icemantle"
+  },
+  {
+    "id": "scout_einna",
+    "name": "Scout Einna",
+    "title": "Snowline Scout",
+    "zoneId": "frostveil",
+    "zone": "The Frostveil Reach",
+    "town": "Icemantle",
+    "yards": 60,
+    "direction": "S"
+  },
+  {
+    "id": "aurorist_veyla",
+    "name": "Aurorist Veyla",
+    "title": "Reader of the Lights",
+    "zoneId": "frostveil",
+    "zone": "The Frostveil Reach",
+    "town": "Icemantle",
+    "yards": 190,
+    "direction": "N"
+  },
+  {
+    "id": "trapper_brosk",
+    "name": "Trapper Brosk",
+    "title": "Shiverfen Trapper",
+    "zoneId": "frostveil",
+    "zone": "The Frostveil Reach",
+    "town": "Icemantle",
+    "yards": 190,
+    "direction": "N"
+  },
+  {
+    "id": "reeve_ottoline",
+    "name": "Reeve Ottoline",
+    "title": "Reeve of Lanternmere",
+    "zoneId": "amberfall",
+    "zone": "The Amberfall",
+    "town": "Lanternmere"
+  },
+  {
+    "id": "ferrymaster_caddow",
+    "name": "Ferrymaster Caddow",
+    "title": "Keeper of the Lantern Ferries",
+    "zoneId": "amberfall",
+    "zone": "The Amberfall",
+    "town": "Lanternmere",
+    "yards": 30,
+    "direction": "N"
+  },
+  {
+    "id": "orchardist_pomeline",
+    "name": "Orchardist Pomeline",
+    "title": "Keeper of the Gilded Rows",
+    "zoneId": "amberfall",
+    "zone": "The Amberfall",
+    "town": "Lanternmere",
+    "yards": 100,
+    "direction": "SE"
+  },
+  {
+    "id": "waywatcher_sorrel",
+    "name": "Waywatcher Sorrel",
+    "title": "Watcher of the Goldmelt",
+    "zoneId": "amberfall",
+    "zone": "The Amberfall",
+    "town": "Lanternmere",
+    "yards": 230,
+    "direction": "S"
+  },
+  {
+    "id": "bridgewright_alden",
+    "name": "Bridgewright Alden",
+    "title": "Master of the Fenway",
+    "zoneId": "willowfen",
+    "zone": "The Willowfen",
+    "town": "Bridgemere"
+  },
+  {
+    "id": "netter_maris",
+    "name": "Netter Maris",
+    "title": "Eel-Netter of Bridgemere",
+    "zoneId": "willowfen",
+    "zone": "The Willowfen",
+    "town": "Bridgemere"
+  },
+  {
+    "id": "mother_sedge",
+    "name": "Mother Sedge",
+    "title": "Fen-Witch of Willowweep",
+    "zoneId": "willowfen",
+    "zone": "The Willowfen",
+    "town": "Bridgemere",
+    "yards": 100,
+    "direction": "NE"
+  },
+  {
+    "id": "waykeeper_pell",
+    "name": "Waykeeper Pell",
+    "title": "Keeper of the Amberfen Steps",
+    "zoneId": "willowfen",
+    "zone": "The Willowfen",
+    "town": "Bridgemere",
+    "yards": 150,
+    "direction": "S"
+  },
+  {
+    "id": "lira_dewsong",
+    "name": "Lira Dewsong",
+    "title": "Night-Gardener of Moonrest",
+    "zoneId": "nightbloom",
+    "zone": "The Nightbloom",
+    "town": "Moonrest"
+  },
+  {
+    "id": "weaver_amelle",
+    "name": "Weaver Amelle",
+    "title": "Moonfleece Weaver",
+    "zoneId": "nightbloom",
+    "zone": "The Nightbloom",
+    "town": "Moonrest"
+  },
+  {
+    "id": "lamplighter_sorrel",
+    "name": "Lamplighter Sorrel",
+    "title": "Keeper of the Nightgate",
+    "zoneId": "nightbloom",
+    "zone": "The Nightbloom",
+    "town": "Moonrest",
+    "yards": 140,
+    "direction": "S"
+  },
+  {
+    "id": "astronomer_cassian",
+    "name": "Astronomer Cassian",
+    "title": "Watcher at the Vigil",
+    "zoneId": "nightbloom",
+    "zone": "The Nightbloom",
+    "town": "Moonrest",
+    "yards": 160,
+    "direction": "NW"
+  },
+  {
+    "id": "sexton_marrow",
+    "name": "Sexton Marrow",
+    "title": "Sexton of Gibbetmere",
+    "zoneId": "wraithwood",
+    "zone": "The Wraithwood",
+    "town": "Gibbetmere"
+  },
+  {
+    "id": "widow_tansy",
+    "name": "Widow Tansy",
+    "title": "Candlewright of Gibbetmere",
+    "zoneId": "wraithwood",
+    "zone": "The Wraithwood",
+    "town": "Gibbetmere"
+  },
+  {
+    "id": "lampman_cobb",
+    "name": "Lampman Cobb",
+    "title": "Keeper of the Crowgate Lanterns",
+    "zoneId": "wraithwood",
+    "zone": "The Wraithwood",
+    "town": "Gibbetmere",
+    "yards": 150,
+    "direction": "S"
+  },
+  {
+    "id": "vicar_creel",
+    "name": "Vicar Creel",
+    "title": "Last Vicar of the Mournstone",
+    "zoneId": "wraithwood",
+    "zone": "The Wraithwood",
+    "town": "Gibbetmere",
+    "yards": 190,
+    "direction": "N"
+  },
+  {
+    "id": "pearlmother_isha",
+    "name": "Pearl-Mother Isha",
+    "title": "Elder of the Divers",
+    "zoneId": "palmreach",
+    "zone": "The Palmreach",
+    "town": "Drifthaven"
+  },
+  {
+    "id": "npc_rift_watch_quartermaster",
+    "name": "Quartermaster Vaelen",
+    "title": "Rift Watch Provisioner",
+    "zoneId": "palmreach",
+    "zone": "The Palmreach",
+    "town": "Drifthaven"
+  },
+  {
+    "id": "salvage_boss_ryna",
+    "name": "Salvage-Boss Ryna",
+    "title": "Mistress of the Wreck Line",
+    "zoneId": "palmreach",
+    "zone": "The Palmreach",
+    "town": "Drifthaven"
+  },
+  {
+    "id": "strandwatcher_pell",
+    "name": "Strandwatcher Pell",
+    "title": "Watcher of the Tanglemouth",
+    "zoneId": "palmreach",
+    "zone": "The Palmreach",
+    "town": "Drifthaven",
+    "yards": 150,
+    "direction": "SE"
+  },
+  {
+    "id": "hermit_okku",
+    "name": "Okrim",
+    "title": "The Man Who Went In",
+    "zoneId": "palmreach",
+    "zone": "The Palmreach",
+    "town": "Drifthaven",
+    "yards": 270,
+    "direction": "N"
+  },
+  {
+    "id": "head_gardener_amaranth",
+    "name": "Head Gardener Amaranth",
+    "title": "Head Gardener of the Evergarden",
+    "zoneId": "evergarden",
+    "zone": "The Evergarden",
+    "town": "Hedgewick"
+  },
+  {
+    "id": "wickmother_sorrel",
+    "name": "Wickmother Sorrel",
+    "title": "Keeper of the Hedgewick Inn",
+    "zoneId": "evergarden",
+    "zone": "The Evergarden",
+    "town": "Hedgewick"
+  },
+  {
+    "id": "farmer_verbena",
+    "name": "Farmer Verbena",
+    "title": "Parterre Gardener",
+    "zoneId": "evergarden",
+    "zone": "The Evergarden",
+    "town": "Hedgewick",
+    "yards": 60,
+    "direction": "NW"
+  },
+  {
+    "id": "gatewarden_pell",
+    "name": "Gatewarden Pell",
+    "title": "Keeper of the Garden Gate",
+    "zoneId": "evergarden",
+    "zone": "The Evergarden",
+    "town": "Hedgewick",
+    "yards": 120,
+    "direction": "SW"
+  },
+  {
+    "id": "gardener_yew",
+    "name": "Gardener Yew",
+    "title": "The Last Gardener",
+    "zoneId": "evergarden",
+    "zone": "The Evergarden",
+    "town": "Hedgewick",
+    "yards": 350,
+    "direction": "N"
+  },
+  {
+    "id": "harbormaster_odile",
+    "name": "Harbormaster Odile",
+    "title": "Harbormaster of Wickharbor",
+    "zoneId": "galecrest",
+    "zone": "The Galecrest",
+    "town": "Wickharbor"
+  },
+  {
+    "id": "keeper_bram",
+    "name": "Keeper Bram",
+    "title": "Keeper of the Old Beacon",
+    "zoneId": "galecrest",
+    "zone": "The Galecrest",
+    "town": "Wickharbor",
+    "yards": 100,
+    "direction": "SW"
+  },
+  {
+    "id": "watcher_maren",
+    "name": "Watcher Maren",
+    "title": "The Windway Watch",
+    "zoneId": "galecrest",
+    "zone": "The Galecrest",
+    "town": "Wickharbor",
+    "yards": 240,
+    "direction": "E"
+  },
+  {
+    "id": "stablemaster_marla",
+    "name": "Marla Hitchen",
+    "title": "Stablemaster",
+    "zoneId": "galecrest",
+    "zone": "The Galecrest",
+    "town": "Wickharbor",
+    "yards": 250,
+    "direction": "N"
+  },
+  {
+    "id": "salvager_edda",
+    "name": "Salvager Edda",
+    "title": "Wreckfield Salvager",
+    "zoneId": "galecrest",
+    "zone": "The Galecrest",
+    "town": "Wickharbor",
+    "yards": 280,
+    "direction": "N"
+  },
+  {
+    "id": "fisher_nell",
+    "name": "Frightened Nell",
+    "title": "Gullhaven Fisher",
+    "zoneId": "farshore_isle",
+    "zone": "The Farshore",
+    "town": "Gullhaven"
+  },
+  {
+    "id": "mender_saul",
+    "name": "Mender Saul",
+    "title": "Field Surgeon",
+    "zoneId": "farshore_isle",
+    "zone": "The Farshore",
+    "town": "Gullhaven"
+  },
+  {
+    "id": "quartermaster_edda",
+    "name": "Quartermaster Edda",
+    "title": "Redoubt Armorer",
+    "zoneId": "farshore_isle",
+    "zone": "The Farshore",
+    "town": "Gullhaven"
+  },
+  {
+    "id": "warden_coalfast",
+    "name": "Warden Coalfast",
+    "title": "Redoubt Commander",
+    "zoneId": "farshore_isle",
+    "zone": "The Farshore",
+    "town": "Gullhaven"
+  },
+  {
+    "id": "bellkeeper_tam",
+    "name": "Bellkeeper Tam",
+    "title": "Watchbell Keeper",
+    "zoneId": "farshore_isle",
+    "zone": "The Farshore",
+    "town": "Gullhaven",
+    "yards": 70,
+    "direction": "SE"
+  },
+  {
+    "id": "riftwright_maelis",
+    "name": "Riftwright Maelis",
+    "title": "Rift Forgemaster",
+    "zoneId": "farshore_isle",
+    "zone": "The Farshore",
+    "town": "Gullhaven",
+    "yards": 90,
+    "direction": "SW"
+  },
+  {
+    "id": "riftwatch_ollun",
+    "name": "Riftwatch Ollun",
+    "title": "Breach Scholar",
+    "zoneId": "farshore_isle",
+    "zone": "The Farshore",
+    "town": "Gullhaven",
+    "yards": 100,
+    "direction": "SW"
+  },
+  {
+    "id": "instructor_maren",
+    "name": "Instructor Maren",
+    "title": "Proving Master",
+    "zoneId": "proving_shore",
+    "zone": "The Proving Shore",
+    "town": "Dawnrest Camp"
+  },
+  {
+    "id": "quartermaster_finch",
+    "name": "Quartermaster Finch",
+    "title": "Camp Outfitter",
+    "zoneId": "proving_shore",
+    "zone": "The Proving Shore",
+    "town": "Dawnrest Camp"
+  },
+  {
+    "id": "bursar_wick",
+    "name": "Bursar Wick",
+    "title": "The Gilded Strongbox",
+    "zoneId": "proving_shore",
+    "zone": "The Proving Shore",
+    "town": "Dawnrest Camp",
+    "yards": 30,
+    "direction": "E"
+  },
+  {
+    "id": "ferryman_odo",
+    "name": "Ferryman Odo",
+    "title": "Keeper of the Crossing",
+    "zoneId": "proving_shore",
+    "zone": "The Proving Shore",
+    "town": "Dawnrest Camp",
+    "yards": 60,
+    "direction": "S"
+  },
+  {
+    "id": "warden_tam",
+    "name": "Warden Tam",
+    "title": "Keeper of the Gauntlet",
+    "zoneId": "proving_shore",
+    "zone": "The Proving Shore",
+    "town": "Dawnrest Camp",
+    "yards": 70,
+    "direction": "S"
+  },
+  {
+    "id": "drillmaster_rook",
+    "name": "Drillmaster Rook",
+    "title": "Yard Master",
+    "zoneId": "proving_shore",
+    "zone": "The Proving Shore",
+    "town": "Dawnrest Camp",
+    "yards": 80,
+    "direction": "SE"
+  },
+  {
+    "id": "overseer_pell",
+    "name": "Overseer Pell",
+    "title": "Gauntlet Overseer",
+    "zoneId": "proving_shore",
+    "zone": "The Proving Shore",
+    "town": "Dawnrest Camp",
+    "yards": 90,
+    "direction": "SE"
+  },
+  {
+    "id": "tidewarden_nel",
+    "name": "Tidewarden Nel",
+    "title": "Keeper of the Strand",
+    "zoneId": "proving_shore",
+    "zone": "The Proving Shore",
+    "town": "Dawnrest Camp",
+    "yards": 90,
+    "direction": "SE"
+  }
+];
+
 export const GUIDE_PROF_PAGES: string[] = [
   "engineering",
   "alchemy",
@@ -21383,7 +26227,8 @@ export const GUIDE_PROF_PAGES: string[] = [
   "farming",
   "economy",
   "faq",
-  "provisioning"
+  "provisioning",
+  "materials"
 ];
 
 export const GUIDE_MODELS: Record<string, GuideModelSpec> = {

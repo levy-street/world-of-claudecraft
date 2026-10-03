@@ -154,6 +154,15 @@ export const GUIDE_ROUTES: GuideRoute[] = [
     descKey: 'guide.factionsPage.intro',
   },
   {
+    // Filed under the world group: it answers "where is this person", the
+    // question the zone pages and the map leave open.
+    id: 'npcs',
+    sub: 'npcs',
+    navKey: 'guide.nav.npcs',
+    group: 'world',
+    descKey: 'guide.npcsPage.intro',
+  },
+  {
     id: 'dungeons',
     sub: 'dungeons',
     navKey: 'guide.nav.dungeons',

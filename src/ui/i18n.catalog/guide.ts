@@ -37,6 +37,7 @@ export const guideStrings = {
     world: 'World',
     quests: 'Quests',
     factions: 'Factions & Standing',
+    npcs: 'NPC Locations',
     dungeons: 'Dungeons & Raids',
     delves: 'Delves',
     rifts: 'Rifts',
@@ -136,6 +137,10 @@ export const guideStrings = {
     // Reliquary term of the glossary reliquaryName row in every locale.
     typeReliquaryPage: 'Reliquary Page',
     typeRelic: 'Relic',
+    // A crafting material row on the Materials page, and an NPC row on the NPC
+    // Locations page.
+    typeMaterial: 'Material',
+    typeNpc: 'NPC',
   },
 
   // Home / overview landing.
@@ -2371,6 +2376,21 @@ export const guideStrings = {
   // names, roles, hubs, the six tier names and each faction's titles, the quartermasters,
   // and where standing is read; no thresholds, per-quest amounts, item stats, prices, or
   // level numbers (src/sim/factions.ts, src/sim/content/faction_vendors.ts).
+  // NPC Locations (/wiki/npcs): where every standing overworld NPC is, generated
+  // from the live NPC table. Directions use the HUD compass strip's own N / NE / E
+  // abbreviations (hudChrome.compass.*), so the page and the compass agree.
+  npcsPage: {
+    heading: 'NPC Locations',
+    intro:
+      'Where every trainer, vendor, quartermaster, and quest giver in the open world stands. Each entry names the town, or how far to walk from it and in which compass direction.',
+    colNpc: 'NPC',
+    colRole: 'Role',
+    colWhere: 'Where',
+    inTown: 'In {town}',
+    awayFmt: '{yards} yd {direction} of {town}',
+    eventNote:
+      'NPCs that appear only for a world quest, an encounter, or a quest step are not listed here, and neither is anyone inside a dungeon or raid.',
+  },
   factionsPage: {
     heading: 'Factions and Standing',
     intro:
@@ -2979,6 +2999,53 @@ export const guideStrings = {
     // endgame content AND sell on the marks counter, so the row has to name
     // both or it sends a reader to one and hides the other.
     sourceDropAndVendor: 'From a found pattern, or the Heroic Quartermaster',
+    // WHERE a pattern or formula comes from (scripts/wiki/acquisition_sources.mjs):
+    // one line per drop place and per quartermaster, replacing the bare "found"
+    // and the blanket "Heroic Quartermaster" for every pattern row whose sources
+    // the tables name. Instanced places by kind only (the spoiler policy).
+    sourceDropWorld: 'Drops in the open world',
+    sourceDropDungeon: 'Drops in dungeons',
+    sourceDropHeroic: 'Drops in Heroic dungeons',
+    sourceDropRaid: 'Drops in a raid',
+    sourceDropRift: 'Drops in rifts',
+    sourceCrucible: 'Sold by the Crucible Quartermaster for {item}',
+    sourceFaction: 'Sold by the {faction} quartermaster at {tier} standing',
+    sourceAllied: 'Sold by any faction quartermaster at {tier} standing',
+    // The Materials page (/wiki/professions/materials): every material a bill
+    // asks for and where it comes from, generated from the live tables.
+    mat: {
+      title: 'Materials',
+      intro:
+        'Every material a recipe or enchant asks for, and where to get it. The list is read straight off the live game, so it never falls behind a patch.',
+      colUsedBy: 'Used by',
+      colWhere: 'Where to get it',
+      nodeFmt: '{profession} nodes in {zones}',
+      nodeZoneFmt: '{zone} (tier {tier})',
+      nodeFine: 'The fine grade needs a tier {tier} tool',
+      corpseFmt: 'Harvested from {creatures}',
+      creatureFmt: '{name} ({zone})',
+      moreFmt: '{count} more',
+      corpseElite: 'Harvested from elite creatures in {zones}',
+      // A premium specimen has no carrier of its own: it comes only with a
+      // rare-or-better harvest of its base material ({base} links to that row).
+      specimenFmt: 'A bonus on rare or better harvests of {base}',
+      farmFmt: 'Grown on a farm plot: Farming {skill}, tier {tier} hoe, {minutes} min to grow',
+      farmFine: 'A fine harvest of the same crop',
+      fishingFmt: 'Fished in {zones}',
+      fishingZoneFmt: '{zone} (Fishing {skill}, tier {tier} rod)',
+      vendorFmt: 'Sold by {vendors} for {price}',
+      craftedFmt: 'Crafted with {crafts}',
+      dropFmt: 'Drops from {creatures}',
+      eliteDropFmt: 'Drops from elite creatures in {zones}',
+      // A loot row that drops only while its quest is active; {source} is one of
+      // the sourceDrop* lines above ("Drops in a raid").
+      questOnlyFmt: '{source}, only while on its quest',
+      disenchant: 'Disenchanting',
+      salvage: 'Salvaging',
+      bossCreditFmt:
+        '{min} to {max} from each Heroic dungeon or raid final boss, once a day per boss and difficulty',
+      riftCreditFmt: 'Rift first clears: {a} at rank A, {s} at rank S, once a day',
+    },
     gainFmt: '{reduced} / {minimal} / {zero}',
     // A gain boundary above the craft's enforced maxSkill cap is unreachable,
     // so the cell says so rather than printing a skill number no player can

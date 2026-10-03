@@ -201,6 +201,7 @@ import {
   type SupportedLanguage,
   setLanguage,
   supportedLanguages,
+  type TranslationKey,
   t,
 } from '../src/ui/i18n';
 import { guideStrings } from '../src/ui/i18n.catalog/guide';
@@ -1932,6 +1933,10 @@ describe('Guide professions generated content accuracy', () => {
       // boon values the craft page's effect sub-lines compose. Shape-pinned
       // in its own accuracy arm below.
       'effect',
+      // Where the teaching pattern drops (by kind) and who sells it
+      // (scripts/wiki/acquisition_sources.mjs); pinned in
+      // tests/guide_prof_materials.test.ts.
+      'sources',
     ]);
     for (const c of GUIDE_PROF_CRAFTS) {
       for (const k of Object.keys(c)) {
@@ -3633,6 +3638,8 @@ describe('Guide professions pages and routes', () => {
       // a narrative across professions rather than one profession's reference,
       // which is why it sits with these two rather than deriving from a craft.
       'provisioning',
+      // The materials reference: where every crafting material comes from.
+      'materials',
     ]);
   });
 
@@ -4011,43 +4018,35 @@ describe('Guide professions pages and routes', () => {
       armor.match(
         new RegExp(`<tr[^>]*>(?:(?!</tr>)[\\s\\S])*${name}(?:(?!</tr>)[\\s\\S])*</tr>`),
       )?.[0] ?? '';
-    expect(armorRowFor('Forgefold Legguards'), 'apex row renders the drop source string').toContain(
-      t('guide.profPages.sourceDrop'),
+    // The apex gear pattern drops in rifts and nobody sells it, so its cell
+    // names the rifts and no quartermaster.
+    const apexRow = armorRowFor('Forgefold Legguards');
+    expect(apexRow, 'apex row names where the pattern drops').toContain(
+      t('guide.profPages.sourceDropRift'),
     );
-    expect(armorRowFor('Forgefold Legguards')).not.toContain(t('guide.profPages.sourceKnown'));
-    // ...and it is really the DROP-ONLY string, not the both-channel one. The
-    // toContain above cannot tell them apart on its own: sourceDrop is a proper
-    // PREFIX of sourceDropAndVendor, so a generator that labelled every drop row
-    // as both would satisfy it. This is the arm that says which.
-    expect(
-      armorRowFor('Forgefold Legguards'),
-      'a drop-only row must not claim the marks counter too',
-    ).not.toContain(t('guide.profPages.sourceDropAndVendor'));
+    expect(apexRow).not.toContain(t('guide.profPages.sourceKnown'));
+    expect(apexRow, 'a drop-only row must not claim a quartermaster').not.toContain(
+      t('guide.profPages.sourceVendor'),
+    );
     // The RENDERED source cell for the VENDOR channel (phase 11): the eight
-    // APEX_CONSUMABLE patterns are sold by the Heroic Quartermaster, so the
-    // generator maps their drop-acquisition rows to 'vendor' and sourceCell
-    // must route them to the vendor string, never the drop or known arms (a
-    // mapping that fell through to 'drop' would stay green under the
-    // data-level corpus pin alone). Same row-scoped idiom as the armor pin;
-    // the armor drop pin above stays as the drop channel's own contrast.
+    // APEX_CONSUMABLE patterns are sold by the Heroic Quartermaster and no table
+    // drops them, so the cell names the quartermaster and no drop place.
     const alch = professionsPage.render(ctx(['alchemy']));
     const alchRowFor = (name: string): string =>
       alch.match(
         new RegExp(`<tr[^>]*>(?:(?!</tr>)[\\s\\S])*${name}(?:(?!</tr>)[\\s\\S])*</tr>`),
       )?.[0] ?? '';
-    expect(
-      alchRowFor('Ironhusk Flask'),
-      'vendor-sold pattern row renders the quartermaster source string',
-    ).toContain(t('guide.profPages.sourceVendor'));
-    expect(alchRowFor('Ironhusk Flask')).not.toContain(t('guide.profPages.sourceDrop'));
-    expect(alchRowFor('Ironhusk Flask')).not.toContain(t('guide.profPages.sourceKnown'));
-    // The RENDERED source cell for BOTH channels at once (phase 11f), the
-    // third case and the one with a real player cost: every farming pattern
-    // is in a drop table AND on the marks counter, and until this phase the
-    // generator's vendor arm won outright, so the wiki would have told a
-    // reader "Sold by the Heroic Quartermaster" about a recipe that also
-    // drops off the raid and they would never have looked in the raid. The
-    // row must name both, and must not fall back to either single string.
+    const flaskRow = alchRowFor('Ironhusk Flask');
+    expect(flaskRow, 'vendor-sold pattern row names the quartermaster').toContain(
+      t('guide.profPages.sourceVendor'),
+    );
+    for (const place of ['World', 'Dungeon', 'Heroic', 'Raid', 'Rift'] as const) {
+      expect(flaskRow).not.toContain(t(`guide.profPages.sourceDrop${place}`));
+    }
+    expect(flaskRow).not.toContain(t('guide.profPages.sourceKnown'));
+    // BOTH channels at once (phase 11f): every farming pattern drops AND sells
+    // on the marks counter, so the row must name a drop place AND the
+    // quartermaster, or it sends a reader to one and hides the other.
     const cooking = professionsPage.render(ctx(['cooking']));
     const cookingRowFor = (name: string): string =>
       cooking.match(
@@ -4055,27 +4054,28 @@ describe('Guide professions pages and routes', () => {
       )?.[0] ?? '';
     const feastRow = cookingRowFor('Harvest Feast');
     expect(feastRow, 'the both-channel row must render at all').not.toBe('');
-    expect(feastRow, 'a pattern that drops AND sells names both channels').toContain(
-      t('guide.profPages.sourceDropAndVendor'),
+    expect(feastRow, 'a pattern that drops AND sells names the quartermaster').toContain(
+      t('guide.profPages.sourceVendor'),
     );
+    expect(
+      ['Dungeon', 'Heroic', 'Raid', 'Rift'].some((place) =>
+        feastRow.includes(t(`guide.profPages.sourceDrop${place}` as TranslationKey)),
+      ),
+      'a pattern that drops AND sells names where it drops',
+    ).toBe(true);
     expect(feastRow).not.toContain(t('guide.profPages.sourceKnown'));
     expect(feastRow).not.toContain(t('guide.profPages.sourceTrainerFree'));
-    // And the three source strings really are distinct, so the arm above
-    // cannot be satisfied by a string that merely contains another.
-    expect(
-      new Set([
-        t('guide.profPages.sourceDrop'),
-        t('guide.profPages.sourceVendor'),
-        t('guide.profPages.sourceDropAndVendor'),
-      ]).size,
-    ).toBe(3);
     // A held trainer row on the SAME page is the contrast: the cooking page
     // renders both channels, so a sourceCell that collapsed every farm row to
     // one string would fail here rather than looking consistent.
     const bannockRow = cookingRowFor('Highwatch Barley Bannock');
     expect(bannockRow, 'the on-ramp row must render').not.toBe('');
-    expect(bannockRow).not.toContain(t('guide.profPages.sourceDropAndVendor'));
+    expect(bannockRow).not.toContain(t('guide.profPages.sourceVendor'));
     expect(bannockRow).not.toContain(t('guide.profPages.sourceDrop'));
+    expect(bannockRow).not.toContain(t('guide.profPages.sourceDropAndVendor'));
+    for (const place of ['World', 'Dungeon', 'Heroic', 'Raid', 'Rift'] as const) {
+      expect(bannockRow).not.toContain(t(`guide.profPages.sourceDrop${place}`));
+    }
     // The enchanting route rides the craft module with its own sections.
     const ench = professionsPage.render(ctx(['enchanting']));
     expect(ench).toContain('Weapon Etching: Runed Edge');

@@ -55,6 +55,11 @@ export declare function patternItemIdFor(resultItemId: string): string;
 
 export declare function patternChannelSets(tables: PatternChannelTables): PatternChannelSets;
 
+export declare function patternIdsForRecipe(
+  recipe: PatternRecipeDef,
+  sets: PatternChannelSets,
+): readonly string[] | Set<string>;
+
 export declare function dropTaughtRecipe(
   recipe: PatternRecipeDef,
   sets: PatternChannelSets,

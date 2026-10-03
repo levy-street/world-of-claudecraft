@@ -19978,4 +19978,56 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Время применения Хватких корней сокращается на 0,5 сек.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'После применения Хватких корней вы можете произносить заклинания на ходу, а ваша скорость передвижения повышается на 20% на 4 сек. Срабатывает не чаще одного раза в 20 сек.',
+  // Guide: NPC Locations, the Materials page, and named pattern sources.
+  'guide.nav.npcs': 'Где найти NPC',
+  'guide.search.typeMaterial': 'Материал',
+  'guide.search.typeNpc': 'NPC',
+  'guide.profPages.sourceDropWorld': 'Добывается в открытом мире',
+  'guide.profPages.sourceDropDungeon': 'Добывается в подземельях',
+  'guide.profPages.sourceDropHeroic': 'Добывается в героических подземельях',
+  'guide.profPages.sourceDropRaid': 'Добывается в рейде',
+  'guide.profPages.sourceDropRift': 'Добывается в разломах',
+  'guide.profPages.sourceCrucible': 'Продаётся у интенданта Горнила за {item}',
+  'guide.profPages.sourceFaction':
+    'Продаётся у интенданта фракции «{faction}» при репутации «{tier}»',
+  'guide.profPages.sourceAllied': 'Продаётся у интенданта любой фракции при репутации «{tier}»',
+  'guide.profPages.mat.title': 'Материалы',
+  'guide.profPages.mat.intro':
+    'Все материалы, которые требуются рецептам и чарам, и где их достать. Список берётся прямо из данных игры, поэтому он никогда не отстаёт от обновлений.',
+  'guide.profPages.mat.colUsedBy': 'Используется в',
+  'guide.profPages.mat.colWhere': 'Где достать',
+  'guide.profPages.mat.nodeFmt': '{profession}: узлы в зонах {zones}',
+  'guide.profPages.mat.nodeZoneFmt': '{zone} (уровень {tier})',
+  'guide.profPages.mat.nodeFine': 'Для отборного качества нужен инструмент уровня {tier}',
+  'guide.profPages.mat.corpseFmt': 'Снимается с существ: {creatures}',
+  'guide.profPages.mat.creatureFmt': '{name} ({zone})',
+  'guide.profPages.mat.moreFmt': 'ещё {count}',
+  'guide.profPages.mat.specimenFmt': 'Бонус при редкой или лучшей добыче: {base}',
+  'guide.profPages.mat.corpseElite': 'Снимается с элитных существ в зонах {zones}',
+  'guide.profPages.mat.farmFmt':
+    'Выращивается на грядке: земледелие {skill}, мотыга уровня {tier}, созревает за {minutes} мин',
+  'guide.profPages.mat.farmFine': 'Отборный урожай той же культуры',
+  'guide.profPages.mat.fishingFmt': 'Ловится в зонах {zones}',
+  'guide.profPages.mat.fishingZoneFmt': '{zone} (рыбалка {skill}, удочка уровня {tier})',
+  'guide.profPages.mat.vendorFmt': 'Продают: {vendors}, цена {price}',
+  'guide.profPages.mat.craftedFmt': 'Создаётся профессиями: {crafts}',
+  'guide.profPages.mat.dropFmt': 'Добывается с существ: {creatures}',
+  'guide.profPages.mat.eliteDropFmt': 'Добывается с элитных существ в зонах {zones}',
+  'guide.profPages.mat.questOnlyFmt': '{source}, только во время его задания',
+  'guide.profPages.mat.disenchant': 'Распыление',
+  'guide.profPages.mat.salvage': 'Разборка',
+  'guide.profPages.mat.bossCreditFmt':
+    'От {min} до {max} с каждого последнего босса героического подземелья или рейда, раз в день для каждого босса и сложности',
+  'guide.profPages.mat.riftCreditFmt':
+    'Первое прохождение разлома: {a} за ранг A, {s} за ранг S, раз в день',
+  'guide.npcsPage.heading': 'Где найти NPC',
+  'guide.npcsPage.intro':
+    'Где стоит каждый наставник, торговец, интендант и выдающий задания в открытом мире. Для каждого указан город или расстояние от него и направление по компасу.',
+  'guide.npcsPage.colNpc': 'NPC',
+  'guide.npcsPage.colRole': 'Роль',
+  'guide.npcsPage.colWhere': 'Где',
+  'guide.npcsPage.inTown': 'В городе {town}',
+  'guide.npcsPage.awayFmt': '{yards} ярд. на {direction} от {town}',
+  'guide.npcsPage.eventNote':
+    'Здесь нет NPC, которые появляются только во время мирового задания, боя с боссом или на определённом этапе задания, а также NPC внутри подземелий и рейдов.',
 };

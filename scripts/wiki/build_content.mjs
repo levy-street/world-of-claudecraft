@@ -14,9 +14,23 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import * as esbuild from 'esbuild';
+import {
+  buildSourceIndex,
+  dropPlacesFor,
+  eliteZonesFor,
+  isWithheldCarrier,
+  namedDroppersFor,
+  offersFor,
+  questDropPlacesFor,
+  teachingSources,
+} from './acquisition_sources.mjs';
 import { assertFamiliesKnown } from './family_guard.mjs';
 import { stillUrl } from './still_key.mjs';
-import { patternChannelSets, recipeAcquisitionChannel } from './vendor_channel.mjs';
+import {
+  patternChannelSets,
+  patternIdsForRecipe,
+  recipeAcquisitionChannel,
+} from './vendor_channel.mjs';
 
 const root = process.cwd();
 // Output-path plumbing. The bare invocation writes the committed file, byte for
@@ -43,7 +57,16 @@ const entrySource = `
   export { CLASSES, ABILITIES } from './src/sim/content/classes.ts';
   export { TALENTS } from './src/sim/content/talents.ts';
   export { ALL_CLASSES, CONSUME_DURATION, DT, FISHING_SESSION_CAP_SEC } from './src/sim/types.ts';
-  export { ZONES, DUNGEONS, MOBS, CAMPS, DELVE_LIST, NPCS, ITEMS, QUESTS, zoneAt } from './src/sim/data.ts';
+  export {
+    ZONES, DUNGEONS, MOBS, CAMPS, DELVE_LIST, NPCS, ITEMS, QUESTS, zoneAt,
+    zoneContaining, dungeonAt, isDelvePos, isRiftPos, DUNGEON_X_THRESHOLD,
+  } from './src/sim/data.ts';
+  export { materialSourceInfo } from './src/sim/professions/gathering_source_locations.ts';
+  export { FACTION_VENDOR_GATES } from './src/sim/content/faction_vendors.ts';
+  export {
+    WYRMFALL_CORE_ITEM_ID, WYRMFALL_BOSS_MIN, WYRMFALL_BOSS_MAX, WYRMFALL_RIFT_COUNT,
+  } from './src/sim/professions/masterwrought_materials.ts';
+  export { bearingDegrees, headingLabel } from './src/ui/compass.ts';
   export { WARLOCK_PET_MOBS } from './src/sim/content/warlock_pets.ts';
   export { DELVE_COMPANIONS, DELVE_AFFIXES } from './src/sim/content/delves/index.ts';
   export { DELVE_SHOPS } from './src/sim/content/delves/shop.ts';
@@ -67,7 +90,9 @@ const entrySource = `
   export { ALL_RECIPES } from './src/sim/content/recipes.ts';
   export { gatheringSupplyByFamily, CORPSE_HARVEST_FAMILY } from './src/sim/professions/gathering_supply.ts';
   export { HEROIC_VENDOR_STOCK } from './src/sim/content/heroic_vendor.ts';
-  export { CRUCIBLE_VENDOR_STOCK } from './src/sim/content/ignivar_loot.ts';
+  export {
+    CRUCIBLE_VENDOR_STOCK, CRUCIBLE_VENDOR_NPC_ID, CRUCIBLE_VENDOR_ENTRANCE_POS,
+  } from './src/sim/content/ignivar_loot.ts';
   export { HEROIC_BOSS_LOOT } from './src/sim/content/heroic_loot.ts';
   export { RIFT_PATTERN_ITEM_IDS, FARM_RIFT_DROP_ITEM_IDS } from './src/sim/rift/progression.ts';
   export { ENCHANTS } from './src/sim/content/enchants.ts';
@@ -130,6 +155,19 @@ const built = await esbuild.build({
 const dataUrl = `data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString('base64')}`;
 const {
   zoneAt,
+  zoneContaining,
+  dungeonAt,
+  isDelvePos,
+  isRiftPos,
+  DUNGEON_X_THRESHOLD,
+  materialSourceInfo,
+  FACTION_VENDOR_GATES,
+  WYRMFALL_CORE_ITEM_ID,
+  WYRMFALL_BOSS_MIN,
+  WYRMFALL_BOSS_MAX,
+  WYRMFALL_RIFT_COUNT,
+  bearingDegrees,
+  headingLabel,
   CLASSES,
   ABILITIES,
   TALENTS,
@@ -181,6 +219,8 @@ const {
   gatheringSupplyByFamily,
   HEROIC_VENDOR_STOCK,
   CRUCIBLE_VENDOR_STOCK,
+  CRUCIBLE_VENDOR_NPC_ID,
+  CRUCIBLE_VENDOR_ENTRANCE_POS,
   HEROIC_BOSS_LOOT,
   RIFT_PATTERN_ITEM_IDS,
   FARM_RIFT_DROP_ITEM_IDS,
@@ -788,6 +828,44 @@ const patternChannels = patternChannelSets({
   heroicVendorStock: [...HEROIC_VENDOR_STOCK, ...CRUCIBLE_VENDOR_STOCK],
 });
 
+// WHERE each channel above actually is (scripts/wiki/acquisition_sources.mjs):
+// the drop places by kind and the quartermasters by name, so a Source cell can
+// say "Drops in rifts" or "Crucible Quartermaster" instead of only "found".
+// A mob counts as an overworld source only through a camp strictly inside an
+// authored zone and off the instance plane, the same predicate the in-game
+// gathering source panel uses (src/sim/professions/gathering_source_locations.ts).
+// Every instance room counts, guideVisible false included: that flag keeps a
+// room's boss and room names off the wiki, and an instanced source is emitted by
+// KIND only ("Drops in a raid"), so no name can ride out through it. Leaving the
+// Crucible rooms out made its two raid-only materials read as having no source.
+const isInstancePlaneX = (x) =>
+  x > DUNGEON_X_THRESHOLD || dungeonAt(x) !== null || isDelvePos(x) || isRiftPos(x);
+const overworldZoneNamesByMob = new Map();
+for (const camp of CAMPS) {
+  if (isInstancePlaneX(camp.center.x)) continue;
+  const zone = zoneContaining(camp.center.x, camp.center.z);
+  if (!zone) continue;
+  const names = overworldZoneNamesByMob.get(camp.mobId) ?? new Set();
+  names.add(zone.name);
+  overworldZoneNamesByMob.set(camp.mobId, names);
+}
+const sourceIndex = buildSourceIndex({
+  mobs: MOBS,
+  dungeons: Object.values(DUNGEONS),
+  overworldZonesOfMob: (mobId) => [...(overworldZoneNamesByMob.get(mobId) ?? [])].sort(),
+  heroicBossLoot: HEROIC_BOSS_LOOT,
+  riftItemIds: [...RIFT_PATTERN_ITEM_IDS, ...FARM_RIFT_DROP_ITEM_IDS],
+  heroicVendorStock: HEROIC_VENDOR_STOCK,
+  crucibleVendorStock: CRUCIBLE_VENDOR_STOCK,
+  factionVendorGates: FACTION_VENDOR_GATES,
+});
+// The teaching sources of a recipe row whose channel is a pattern (drop,
+// vendor, or both). Trainer and known rows have no pattern to find.
+const recipeTeachingSources = (r, acquisition) =>
+  acquisition === 'trainer' || acquisition === 'known'
+    ? null
+    : teachingSources([...patternIdsForRecipe(r, patternChannels)], sourceIndex);
+
 // Consumable effect facts for a recipe's output item, straight from the live
 // def (the C10 effect-prose gap): the foodHp restore and the well-fed boon as
 // VALUES the craft page composes through its guide.profPages.effect*
@@ -846,6 +924,8 @@ const consumableEffect = (itemId) => {
 
 const profRecipeRow = (r) => {
   const effect = consumableEffect(r.resultItemId);
+  const acquisition = recipeAcquisitionChannel(r, patternChannels);
+  const sources = recipeTeachingSources(r, acquisition);
   return {
     id: r.id,
     name: itemName(r.resultItemId),
@@ -856,7 +936,10 @@ const profRecipeRow = (r) => {
     // claiming "Known from the start", and the vendor-sold slice of them says
     // 'vendor' (see vendor_channel.mjs): the wiki row must never misstate the
     // acquisition.
-    acquisition: recipeAcquisitionChannel(r, patternChannels),
+    acquisition,
+    // Where the pattern drops (by kind) and which quartermasters sell it, so the
+    // Source cell names the place. Absent for trainer and known rows.
+    ...(sources ? { sources } : {}),
     feeCopper: r.acquisition?.includes('trainer') ? trainingFeeFor(r) : 0,
     // The bill carries the item ID as well as the English name: the craft
     // page's materials cell interpolated `name` straight into a t() format
@@ -1210,6 +1293,15 @@ const enchantTier = (e) =>
       : e.reagents.some((g) => typedSecondaryIds.has(g.itemId))
         ? 'runed'
         : 'base';
+const formulaItemIdsByEnchant = new Map();
+for (const [itemId, item] of Object.entries(ITEMS)) {
+  if (item.kind !== 'recipe' || !item.teachesEnchantId) continue;
+  const ids = formulaItemIdsByEnchant.get(item.teachesEnchantId) ?? [];
+  ids.push(itemId);
+  formulaItemIdsByEnchant.set(item.teachesEnchantId, ids);
+}
+const formulaSourcesFor = (enchantId) =>
+  teachingSources(formulaItemIdsByEnchant.get(enchantId) ?? [], sourceIndex);
 const profEnchanting = {
   disenchantByQuality: Object.entries(DISENCHANT_MATERIAL_BY_QUALITY).map(([quality, m]) => ({
     quality,
@@ -1239,6 +1331,11 @@ const profEnchanting = {
     skillReq: e.skillReq ?? 0,
     perfectedOnly: e.requiresPerfected === true,
     requiresFormula: e.acquisition === 'drop',
+    // Where the formula comes from (the recipe Source cell's derivation, run on
+    // the formula items that teach this enchant). Absent when none is needed.
+    ...(e.acquisition === 'drop' && formulaSourcesFor(e.id)
+      ? { formulaSources: formulaSourcesFor(e.id) }
+      : {}),
     hasDescription: typeof e.description === 'string',
     // Same shape and the same reason as a recipe's `materials` above: the
     // enchant table rides the craft page's one materials cell, so the id is
@@ -1332,6 +1429,8 @@ const profPages = [
   // the two above, because it is a narrative across professions rather than
   // one profession's own reference.
   'provisioning',
+  // The materials reference: where every crafting material comes from.
+  'materials',
 ];
 
 // ---------------------------------------------------------------------------
@@ -1391,6 +1490,223 @@ const provisioningLadder = [...provisioningLadderMap.entries()]
   }));
 
 const profProvisioning = { lines: provisioningLines, ladder: provisioningLadder };
+
+// ---------------------------------------------------------------- materials
+// The Materials reference (/wiki/professions/materials): every crafting
+// material a recipe or enchant bill asks for, with where to get it. The craft
+// pages listed every bill but never said where many of those materials come
+// from, which is the question players actually ask. Every channel is derived:
+// the gathered half from the same materialSourceInfo authority the in-game
+// source panel reads, the rest from the vendor, recipe, loot, and quartermaster
+// tables through acquisition_sources.mjs. Spoiler policy as there: instanced
+// drops by kind only, and an elite or boss carrier by its zone only.
+const MATERIAL_EXAMPLE_CAP = 6;
+const zoneNameById = (zoneId) => zoneById(zoneId)?.name ?? zoneId;
+const ringIndex = (craftId) => {
+  const at = CRAFT_RING.findIndex((c) => c.id === craftId);
+  return at < 0 ? CRAFT_RING.length : at;
+};
+const materialUsers = new Map();
+const noteMaterialUser = (itemId, craftId) => {
+  const crafts = materialUsers.get(itemId) ?? new Set();
+  crafts.add(craftId);
+  materialUsers.set(itemId, crafts);
+};
+for (const r of ALL_RECIPES) for (const g of r.reagents) noteMaterialUser(g.itemId, r.professionId);
+for (const e of Object.values(ENCHANTS)) {
+  for (const g of e.reagents) noteMaterialUser(g.itemId, 'enchanting');
+}
+// The two weapon secondaries have no table of their own (disenchant_reagents.ts
+// picks between them inline by weapon family), so they are named here exactly as
+// the enchanting emit above names them for its typed-secondaries table.
+const disenchantOutputIds = new Set([
+  ...Object.values(DISENCHANT_MATERIAL_BY_QUALITY),
+  ...Object.values(ARMOR_SECONDARY_BY_TYPE),
+  'resonant_steel',
+  'resonant_timber',
+]);
+const salvageOutputIds = new Set(Object.values(SALVAGE_MATERIAL_BY_QUALITY));
+const isUnnamedCarrier = (mobId) => isWithheldCarrier(MOBS[mobId]);
+
+const gatheredSource = (itemId) => {
+  const info = materialSourceInfo(itemId);
+  if (info.kind === 'node') {
+    return {
+      kind: 'node',
+      profession: NODE_HARVEST_TABLE[info.nodeType].professionId,
+      zones: info.zones.map((z) => ({ zone: zoneNameById(z.zoneId), nodeTier: z.minimumNodeTier })),
+      ...(info.isFineGrade ? { fineToolTier: info.fineGatherTier + 1 } : {}),
+    };
+  }
+  // A premium specimen (Pristine Hide and kin) has no carrier of its own: it
+  // comes only as a bonus on a rare-or-better harvest of its base material, so
+  // the row says that and points at the base row, never a creature list that
+  // reads like a guaranteed harvest.
+  if (info.kind === 'corpse' && info.conditionalOnBaseItemId) {
+    return { kind: 'specimen', baseItemId: info.conditionalOnBaseItemId };
+  }
+  if (info.kind === 'corpse') {
+    const named = [];
+    const eliteZones = new Set();
+    for (const ex of info.examples) {
+      if (ex.questGated) continue;
+      if (isUnnamedCarrier(ex.mobId)) {
+        eliteZones.add(zoneNameById(ex.zoneId));
+        continue;
+      }
+      named.push({ name: MOBS[ex.mobId]?.name ?? ex.mobId, zone: zoneNameById(ex.zoneId) });
+    }
+    return {
+      kind: 'corpse',
+      creatures: named.slice(0, MATERIAL_EXAMPLE_CAP),
+      more: Math.max(0, named.length - MATERIAL_EXAMPLE_CAP),
+      ...(eliteZones.size ? { eliteZones: [...eliteZones].sort() } : {}),
+    };
+  }
+  if (info.kind === 'farm') {
+    return {
+      kind: 'farm',
+      skill: info.minimumFarmingSkill,
+      hoeTier: info.requiredHoeTier,
+      growMinutes: Math.round(info.growDurationMs / 60000),
+      fine: info.isFineGrade,
+    };
+  }
+  if (info.kind === 'fishing') {
+    return {
+      kind: 'fishing',
+      zones: [...info.zones]
+        .sort(
+          (a, b) => a.minimumProficiency - b.minimumProficiency || a.zoneId.localeCompare(b.zoneId),
+        )
+        .map((z) => ({
+          zone: zoneNameById(z.zoneId),
+          proficiency: z.minimumProficiency,
+          rodTier: z.minimumRodTier,
+        })),
+    };
+  }
+  return null;
+};
+
+const materialRow = (itemId) => {
+  const def = ITEMS[itemId];
+  if (!def) throw new Error(`materials emit references unknown item id: ${itemId}`);
+  const sources = [];
+  const gathered = gatheredSource(itemId);
+  if (gathered) sources.push(gathered);
+  const vendors = Object.values(NPCS)
+    .filter((n) => !n.devVendor && n.vendorItems?.includes(itemId))
+    .map((n) => ({ npcId: n.id, name: n.name }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+  if (vendors.length) sources.push({ kind: 'vendor', priceCopper: def.buyValue ?? 0, vendors });
+  const crafts = [
+    ...new Set(ALL_RECIPES.filter((r) => r.resultItemId === itemId).map((r) => r.professionId)),
+  ].sort((a, b) => ringIndex(a) - ringIndex(b));
+  if (crafts.length) sources.push({ kind: 'crafted', crafts });
+  const droppers = namedDroppersFor(itemId, sourceIndex);
+  if (droppers.length) {
+    sources.push({
+      kind: 'drop',
+      creatures: droppers.slice(0, MATERIAL_EXAMPLE_CAP),
+      more: Math.max(0, droppers.length - MATERIAL_EXAMPLE_CAP),
+    });
+  }
+  const eliteZones = eliteZonesFor(itemId, sourceIndex);
+  if (eliteZones.length) sources.push({ kind: 'eliteDrop', zones: eliteZones });
+  const instanced = dropPlacesFor(itemId, sourceIndex).filter((p) => p !== 'world');
+  if (instanced.length) sources.push({ kind: 'instanced', places: instanced });
+  const questOnly = questDropPlacesFor(itemId, sourceIndex);
+  if (questOnly.length) sources.push({ kind: 'questDrop', places: questOnly });
+  const offers = offersFor(itemId, sourceIndex);
+  if (offers.length) sources.push({ kind: 'quartermaster', offers });
+  if (disenchantOutputIds.has(itemId)) sources.push({ kind: 'disenchant' });
+  if (salvageOutputIds.has(itemId)) sources.push({ kind: 'salvage' });
+  if (itemId === WYRMFALL_CORE_ITEM_ID) {
+    sources.push({
+      kind: 'bossCredit',
+      min: WYRMFALL_BOSS_MIN,
+      max: WYRMFALL_BOSS_MAX,
+      riftA: WYRMFALL_RIFT_COUNT.A ?? 0,
+      riftS: WYRMFALL_RIFT_COUNT.S ?? 0,
+    });
+  }
+  return {
+    itemId,
+    name: def.name,
+    quality: def.quality ?? 'common',
+    usedBy: [...materialUsers.get(itemId)].sort((a, b) => ringIndex(a) - ringIndex(b)),
+    sources,
+  };
+};
+const profMaterials = [...materialUsers.keys()]
+  .map(materialRow)
+  .sort((a, b) => a.name.localeCompare(b.name));
+
+// ---------------------------------------------------------------- npc directory
+// Where to find every standing overworld NPC (/wiki/npcs). Players have no
+// coordinate readout, so a location is the town and zone, or the distance and
+// compass point from the zone's town, in the same N / NE / E abbreviations the
+// HUD compass strip shows. A dynamic NPC is spawned by its owning system, so
+// its def position is not always where it stands (several sit at the origin
+// until placed, and the world quest casts exist only while their quest runs).
+// The one exception is a dynamic SERVICE NPC (a vendor, quartermaster, or the
+// weekly emissary) with a real in-zone def position: those are spawned at
+// that position at world start (the WARFARE quartermaster, FURY in the
+// Eastbrook layout, the emissary), and they are what players look for. The
+// Crucible Quartermaster is the other exception: his def sits at the origin and
+// the Sim places him at CRUCIBLE_VENDOR_ENTRANCE_POS at world start, so that is
+// where the directory places him too. NPC names and titles are baked English
+// proper nouns (the GUIDE_PROF_STATIONS master precedent).
+const NPC_DISTANCE_STEP_YD = 10;
+const NPC_POSITION_OVERRIDES = { [CRUCIBLE_VENDOR_NPC_ID]: CRUCIBLE_VENDOR_ENTRANCE_POS };
+const npcStandingPos = (n) => NPC_POSITION_OVERRIDES[n.id] ?? n.pos;
+const isServiceNpc = (n) =>
+  Boolean(n.vendorItems?.length || n.warfareVendor || n.heroicVendor || n.weeklyEmissary);
+const isListedNpc = (n) => {
+  const pos = npcStandingPos(n);
+  return (
+    !n.devVendor &&
+    !isInstancePlaneX(pos.x) &&
+    (!n.dynamic ||
+      n.id in NPC_POSITION_OVERRIDES ||
+      (isServiceNpc(n) && (pos.x !== 0 || pos.z !== 0)))
+  );
+};
+const npcDirectory = Object.values(NPCS)
+  .filter(isListedNpc)
+  .map((n) => {
+    const pos = npcStandingPos(n);
+    const zone = zoneContaining(pos.x, pos.z);
+    if (!zone) return null;
+    const dx = pos.x - zone.hub.x;
+    const dz = pos.z - zone.hub.z;
+    const distance = Math.hypot(dx, dz);
+    const inTown = distance <= zone.hub.radius;
+    return {
+      id: n.id,
+      name: n.name,
+      title: n.title,
+      zoneId: zone.id,
+      zone: zone.name,
+      town: zone.hub.name,
+      ...(inTown
+        ? {}
+        : {
+            yards: Math.max(
+              NPC_DISTANCE_STEP_YD,
+              Math.round(distance / NPC_DISTANCE_STEP_YD) * NPC_DISTANCE_STEP_YD,
+            ),
+            direction: headingLabel(bearingDegrees(Math.atan2(dx, dz))),
+          }),
+    };
+  })
+  .filter(Boolean)
+  .sort((a, b) => {
+    const za = ZONES.findIndex((z) => z.id === a.zoneId);
+    const zb = ZONES.findIndex((z) => z.id === b.zoneId);
+    return za - zb || (a.yards ?? 0) - (b.yards ?? 0) || a.name.localeCompare(b.name);
+  });
 
 const header = `// GENERATED by scripts/wiki/build_content.mjs from src/sim/content. Do not edit by hand.
 // Regenerate with \`npm run wiki:content\`; tests/guide.test.ts checks it stays fresh.
@@ -1537,6 +1853,9 @@ export interface GuideProfRecipe {
   tier: number;
   station: string | null;
   acquisition: 'trainer' | 'drop' | 'vendor' | 'dropAndVendor' | 'known';
+  /** Where the teaching pattern drops (by kind) and which quartermasters sell
+   *  it. Absent for trainer and known rows, and for a drop row no table carries. */
+  sources?: GuideProfTeachingSources;
   feeCopper: number;
   materials: GuideProfMaterial[];
   output: { name: string; count: number; quality: string };
@@ -1688,6 +2007,8 @@ export interface GuideProfEnchanting {
     skillReq: number;
     perfectedOnly: boolean;
     requiresFormula: boolean;
+    /** Where the formula comes from, when one is required. */
+    formulaSources?: GuideProfTeachingSources;
     hasDescription: boolean;
     reagents: GuideProfMaterial[];
     bonus: { stat: string; value: number }[];
@@ -1754,6 +2075,76 @@ export interface GuideProfProvisioning {
   lines: GuideProfProvisioningLine[];
   ladder: GuideProfProvisioningRung[];
 }
+
+/** Where an item drops, by kind only: the wiki never names an instance or boss. */
+export type GuideProfDropPlace = 'world' | 'dungeon' | 'heroic' | 'raid' | 'rift';
+
+/** One quartermaster that sells an item. A faction row with a null factionId is
+ *  sold by every faction quartermaster against the best standing. */
+export type GuideProfOffer =
+  | { kind: 'heroic'; marks: number }
+  | { kind: 'crucible'; sigilId: string }
+  | { kind: 'faction'; factionId: string | null; tier: string; marks: number };
+
+export interface GuideProfTeachingSources {
+  drops: GuideProfDropPlace[];
+  offers: GuideProfOffer[];
+}
+
+/** One creature, by name, and the zone it is found in. */
+export interface GuideProfCreatureRef { name: string; zone: string; }
+
+/** One way to get a crafting material. Zone, creature and NPC names are baked
+ *  English proper nouns; profession and craft ids localize client-side. */
+export type GuideProfMaterialSource =
+  | {
+      kind: 'node';
+      profession: string;
+      zones: { zone: string; nodeTier: number }[];
+      fineToolTier?: number;
+    }
+  | {
+      kind: 'corpse';
+      creatures: GuideProfCreatureRef[];
+      more: number;
+      eliteZones?: string[];
+    }
+  | { kind: 'specimen'; baseItemId: string }
+  | { kind: 'farm'; skill: number; hoeTier: number; growMinutes: number; fine: boolean }
+  | { kind: 'fishing'; zones: { zone: string; proficiency: number; rodTier: number }[] }
+  | { kind: 'vendor'; priceCopper: number; vendors: { npcId: string; name: string }[] }
+  | { kind: 'crafted'; crafts: string[] }
+  | { kind: 'drop'; creatures: GuideProfCreatureRef[]; more: number }
+  | { kind: 'eliteDrop'; zones: string[] }
+  | { kind: 'instanced'; places: GuideProfDropPlace[] }
+  | { kind: 'questDrop'; places: GuideProfDropPlace[] }
+  | { kind: 'quartermaster'; offers: GuideProfOffer[] }
+  | { kind: 'disenchant' }
+  | { kind: 'salvage' }
+  | { kind: 'bossCredit'; min: number; max: number; riftA: number; riftS: number };
+
+export interface GuideProfMaterialRow {
+  itemId: string;
+  name: string;
+  quality: string;
+  /** Craft ids whose recipe or enchant bills use this material, in ring order. */
+  usedBy: string[];
+  sources: GuideProfMaterialSource[];
+}
+
+/** Where one standing overworld NPC is. A town NPC carries no yards/direction;
+ *  an NPC outside town carries the distance (to the nearest 10 yards) and the
+ *  compass point from the zone's town. */
+export interface GuideNpcLocation {
+  id: string;
+  name: string;
+  title: string;
+  zoneId: string;
+  zone: string;
+  town: string;
+  yards?: number;
+  direction?: string;
+}
 `;
 
 const generated = [
@@ -1777,6 +2168,8 @@ const generated = [
   `\nexport const GUIDE_PROF_ECONOMY: GuideProfEconomy = ${JSON.stringify(profEconomy, null, 2)};\n`,
   `\nexport const GUIDE_PROF_STATIONS: GuideProfStations = ${JSON.stringify(profStationsOut, null, 2)};\n`,
   `\nexport const GUIDE_PROF_PROVISIONING: GuideProfProvisioning = ${JSON.stringify(profProvisioning, null, 2)};\n`,
+  `\nexport const GUIDE_PROF_MATERIALS: GuideProfMaterialRow[] = ${JSON.stringify(profMaterials, null, 2)};\n`,
+  `\nexport const GUIDE_NPCS: GuideNpcLocation[] = ${JSON.stringify(npcDirectory, null, 2)};\n`,
   `\nexport const GUIDE_PROF_PAGES: string[] = ${JSON.stringify(profPages, null, 2)};\n`,
   `\nexport const GUIDE_MODELS: Record<string, GuideModelSpec> = ${JSON.stringify(MODELS, null, 2)};\n`,
 ].join('');

@@ -72,7 +72,10 @@ export function patternChannelSets({
   return { dropped, vendor, patternsByRecipe };
 }
 
-function patternIdsForRecipe(recipe, sets) {
+/** Every teaching item id for one recipe: its manuals when the item table names
+ *  them, else the pattern_<output> convention. Exported for the source-detail
+ *  arm (acquisition_sources.mjs), so both read one mapping. */
+export function patternIdsForRecipe(recipe, sets) {
   return sets.patternsByRecipe?.get(recipe.id) ?? [patternItemIdFor(recipe.resultItemId)];
 }
 

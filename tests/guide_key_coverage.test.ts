@@ -82,6 +82,16 @@ function inertContext2d(): CanvasRenderingContext2D {
  * this list cannot be used to park a key that has quietly become dead.
  */
 const LIVE_OFF_SWEEP_KEYS: string[] = [
+  // Recipe Source cell arms current content never selects (src/guide/pages/
+  // professions_craft.ts). Every pattern row now carries named sources, so the two
+  // bare channel strings are the fallback for a drop row no table carries; no
+  // pattern drops in the open world today; and no allied (any-faction)
+  // quartermaster row sells a pattern. Live defensive code, not retired copy.
+  'guide.profPages.sourceDrop',
+  'guide.profPages.sourceDropAndVendor',
+  'guide.profPages.sourceDropWorld',
+  'guide.profPages.sourceAllied',
+
   // The ring's content-empty card copy: every live seat has content since the
   // Masterwrought phase 06 inscription catalog, so the branch that renders it
   // (ringCards in src/guide/pages/professions.ts) is unreachable from the

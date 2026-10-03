@@ -12,14 +12,18 @@ import {
   GUIDE_DELVES,
   GUIDE_DUNGEONS,
   GUIDE_FAMILIES,
+  GUIDE_NPCS,
   GUIDE_PROF_CRAFTS,
   GUIDE_PROF_GATHERING,
+  GUIDE_PROF_MATERIALS,
   GUIDE_RELIQUARY,
   GUIDE_ZONES,
 } from './content.generated';
 import { GLOSSARY_TERMS } from './pages/glossary';
-import { craftLabel } from './pages/professions_craft';
+import { npcTitleKey } from './pages/npcs';
+import { craftLabel, itemNameKey } from './pages/professions_craft';
 import { gatheringLabel } from './pages/professions_gathering';
+import { materialAnchor, npcAnchor } from './pages/professions_materials';
 import { GUIDE_ROUTES, hrefFor } from './routes';
 
 export interface SearchEntry {
@@ -60,6 +64,29 @@ export function buildIndex(): SearchEntry[] {
   }
   add(t('guide.profPages.econ.title'), t('guide.search.typePage'), hrefFor('professions/economy'));
   add(t('guide.profPages.faq.title'), t('guide.search.typePage'), hrefFor('professions/faq'));
+  add(t('guide.profPages.mat.title'), t('guide.search.typePage'), hrefFor('professions/materials'));
+  // Every crafting material lands on its own Materials row ("where do I get
+  // Glyphsteel Bar" is the question the page exists for). The localized name
+  // is the label; the English source name rides the haystack so an English
+  // name typed on a translated page still finds it.
+  for (const m of GUIDE_PROF_MATERIALS) {
+    add(
+      t(itemNameKey(m.itemId)),
+      t('guide.search.typeMaterial'),
+      `${hrefFor('professions/materials')}#${materialAnchor(m.itemId)}`,
+      m.name,
+    );
+  }
+  // Every listed NPC lands on its NPC Locations row; the title and zone ride
+  // the haystack so "quartermaster" or a zone name finds them too.
+  for (const n of GUIDE_NPCS) {
+    add(
+      n.name,
+      t('guide.search.typeNpc'),
+      `${hrefFor('npcs')}#${npcAnchor(n.id)}`,
+      `${t(npcTitleKey(n.id))} ${n.title} ${n.zone} ${n.town}`,
+    );
+  }
   for (const c of GUIDE_CLASSES) {
     const cls = t(`classes.${c.id}` as TranslationKey);
     add(
