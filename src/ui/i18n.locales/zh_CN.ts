@@ -18322,7 +18322,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.fireAndFly.scenarios.standard': '正式值守',
   'questUi.worldQuest.fireAndFly.scenarios.hard': '老兵考验',
   'questUi.worldQuest.fireAndFly.scenarios.pack': '兽群',
-  'questUi.worldQuest.fireAndFly.scenarios.giants': '沉重步伐',
   'questUi.worldQuest.fireAndFly.scenarios.deluge': '洪流',
   'questUi.worldQuest.fireAndFly.scenarios.brittle': '裂塔',
   'questUi.worldQuest.fireAndFly.scenarios.powder': '火药库',
@@ -18334,8 +18333,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '这是工匠作坊里造出过的最具毁灭性的武器：破片弹。它稍微慢了点，可一旦炸开，周围什么都站不住。每个炮手在名字写进炮手名册之前，都得先掌握它。',
   'questUi.worldQuest.fireAndFly.brief.pack':
     '我们的防线快被冲垮了！它们成群而来，一群比一群凶悍，连城墙上都听得见它们的嚎叫。帮我们把它们打回去，别让它们冲上城墙！',
-  'questUi.worldQuest.fireAndFly.brief.giants':
-    '从黎明起大地就在颤抖：青铜、熔岩和岩石铸成的巨像正从山上走下来。它们很慢，但什么也挡不住它们，一旦冲到塔下，塔撑不了多久。我就靠你了。',
   'questUi.worldQuest.fireAndFly.brief.deluge':
     '少说也有上百只：狼、野猪、蜘蛛和掘地者，一股小兽的洪流从四面八方涌来。它退去时别信它：它总会卷土重来，更加凶猛，后面还有更大的家伙蹚水而来。',
   'questUi.worldQuest.fireAndFly.brief.brittle':

@@ -1,4 +1,4 @@
-// Fire and Fly missions, data only: the five runs a recruited gunner can take any
+// Fire and Fly missions, data only: the four runs a recruited gunner can take any
 // day (fire_and_fly_recruitment.ts unlocks them), each built around one idea and
 // carrying the weapon that idea asks for. Every number here is a first value:
 // mini-game tuning, not classic-era formulas. A tuning change after boards open mints
@@ -11,7 +11,7 @@
 // three to five monsters stand at the tower's foot (median; up to eight); that player golds
 // about nine runs in ten reading the field exactly and three to four in five reading it
 // 0.4 s late (a few points lost in the last two waves), while a 0.8 s player wins with
-// silver or bronze and a 1 s player loses nearly half its runs. The other four were tuned (lot N2d) for a strike 1.5 s after a monster
+// silver or bronze and a 1 s player loses nearly half its runs. The other three were tuned (lot N2d) for a strike 1.5 s after a monster
 // reaches the tower; at the 0.8 s strike of lot R4 they are far harder until their own
 // redesign.
 
@@ -319,154 +319,6 @@ export const TURRET_MISSION_PACK: TurretScenarioDef = {
       ),
       { entries: [{ templateId: 'tunnel_rat', count: 6, level: 6, ...late(SPRINT) }], delay: 3 },
     ),
-  ],
-};
-
-/** Heavy Tread's walkers: slower than their templates, a little tougher. */
-const TREAD = 0.9;
-/** Its colossi: the yetis and the guardians of the last three waves, tougher still. */
-const COLOSSUS_HP = 1.25;
-
-/**
- * Only large and huge monsters, every one tougher than its template. They walk in slowly
- * through the climb, from one side, two flanks or three, so several reach the tower
- * together and the Shockwave throws them back; then the colossi come from everywhere and
- * keep coming: a dozen yetis at twice their pace, eighteen quicker still, then twenty with
- * six guardians all but at once.
- */
-export const TURRET_MISSION_GIANTS: TurretScenarioDef = {
-  id: 'fire_and_fly_giants',
-  boardKey: 'giants',
-  integrity: TURRET_TOWER_POINTS,
-  medals: TURRET_MEDALS,
-  arsenal: { shockwave: 4, fragmentation: 1 },
-  supply: MISSION_SUPPLY,
-  waves: [
-    {
-      groups: [
-        walkers(
-          [{ templateId: 'fen_troll', count: 3, level: 11, hpScale: 1.05, speedScale: TREAD }],
-          gap(1, 1.8),
-          { kind: 'arc', widthTurn: 0.3 },
-        ),
-      ],
-      coreDamage: 95,
-      kegs: KEGS(3),
-    },
-    {
-      groups: [
-        walkers(
-          [{ templateId: 'fen_troll', count: 4, level: 12, hpScale: 1.1, speedScale: TREAD }],
-          gap(0.8, 1.4),
-          { kind: 'flanks', count: 2, widthTurn: 0.14 },
-        ),
-      ],
-      coreDamage: 100,
-      kegs: KEGS(3),
-    },
-    {
-      groups: [
-        walkers(
-          [
-            { templateId: 'thornpeak_ogre', count: 4, level: 16, hpScale: 1.1, speedScale: TREAD },
-            { templateId: 'fen_troll', count: 2, level: 12, hpScale: 1.1, speedScale: TREAD },
-          ],
-          gap(0.6, 1.2),
-          { kind: 'flanks', count: 3, widthTurn: 0.1 },
-        ),
-      ],
-      coreDamage: 120,
-      kegs: KEGS(4),
-    },
-    {
-      groups: [
-        walkers(
-          [
-            { templateId: 'thornpeak_ogre', count: 4, level: 16, hpScale: 1.1, speedScale: TREAD },
-            { templateId: 'frostmane_yeti', count: 2, level: 19, hpScale: 1.05, speedScale: TREAD },
-          ],
-          gap(0.5, 1),
-          { kind: 'flanks', count: 2, widthTurn: 0.12 },
-        ),
-      ],
-      coreDamage: 160,
-      kegs: KEGS(4),
-    },
-    {
-      groups: [
-        walkers(
-          [
-            { templateId: 'thornpeak_ogre', count: 3, level: 16, hpScale: 1.1, speedScale: TREAD },
-            { templateId: 'frostmane_yeti', count: 4, level: 20, hpScale: 1.05, speedScale: TREAD },
-          ],
-          gap(0.3, 0.6),
-          { kind: 'flanks', count: 3, widthTurn: 0.1 },
-        ),
-      ],
-      coreDamage: 200,
-      kegs: KEGS(5),
-    },
-    {
-      groups: [
-        walkers(
-          [
-            {
-              templateId: 'frostmane_yeti',
-              count: 12,
-              level: 20,
-              hpScale: COLOSSUS_HP,
-              speedScale: 2,
-            },
-          ],
-          gap(0.2, 0.4),
-        ),
-      ],
-      coreDamage: 240,
-      kegs: KEGS(5),
-    },
-    {
-      groups: [
-        walkers(
-          [
-            {
-              templateId: 'frostmane_yeti',
-              count: 18,
-              level: 20,
-              hpScale: COLOSSUS_HP,
-              speedScale: 2.6,
-            },
-          ],
-          gap(0.1, 0.2),
-        ),
-      ],
-      coreDamage: 260,
-      kegs: KEGS(5),
-    },
-    {
-      groups: [
-        walkers(
-          [
-            {
-              templateId: 'frostmane_yeti',
-              count: 20,
-              level: 20,
-              hpScale: COLOSSUS_HP,
-              speedScale: 2.9,
-            },
-            {
-              templateId: 'idol_guardian',
-              count: 6,
-              level: 20,
-              hpScale: COLOSSUS_HP,
-              speedScale: 2.6,
-            },
-          ],
-          gap(0.05, 0.1),
-        ),
-      ],
-      coreDamage: 280,
-      kegs: KEGS(5),
-    },
   ],
 };
 
@@ -1017,7 +869,6 @@ export const TURRET_MISSION_POWDER: TurretScenarioDef = {
 /** In the order Master Gunner Alder offers them. */
 export const TURRET_MISSIONS: readonly TurretScenarioDef[] = [
   TURRET_MISSION_PACK,
-  TURRET_MISSION_GIANTS,
   TURRET_MISSION_DELUGE,
   TURRET_MISSION_BRITTLE,
   TURRET_MISSION_POWDER,

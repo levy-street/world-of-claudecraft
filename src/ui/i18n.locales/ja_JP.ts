@@ -19272,7 +19272,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.fireAndFly.scenarios.standard': '本番の見張り',
   'questUi.worldQuest.fireAndFly.scenarios.hard': '古参兵の試験',
   'questUi.worldQuest.fireAndFly.scenarios.pack': '群れ',
-  'questUi.worldQuest.fireAndFly.scenarios.giants': '重い足音',
   'questUi.worldQuest.fireAndFly.scenarios.deluge': '大洪水',
   'questUi.worldQuest.fireAndFly.scenarios.brittle': 'ひび割れた塔',
   'questUi.worldQuest.fireAndFly.scenarios.powder': '火薬庫',
@@ -19284,8 +19283,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '工匠たちの工房から生まれた中で最も破壊的な兵器、榴散弾だ。少々のろいが、炸裂すれば周りに立っているものは何も残らん。砲手の名簿に名を載せる前に、誰もがこれを使いこなさねばならん。',
   'questUi.worldQuest.fireAndFly.brief.pack':
     'われらの砦が呑まれかけている！奴らは群れで来る、それも群れごとに凶暴さを増してな。城壁の上まで遠吠えが聞こえてくる。乗り越えられる前に、奴らを押し返すのに手を貸してくれ！',
-  'questUi.worldQuest.fireAndFly.brief.giants':
-    '夜明けから大地が揺れている。青銅と溶岩と石の巨像どもが丘を下ってくるのだ。動きは鈍いが何ものにも止められず、塔までたどり着かれたら長くはもたん。頼りにしているぞ。',
   'questUi.worldQuest.fireAndFly.brief.deluge':
     '百匹は下らん、いやそれ以上だ。狼、猪、蜘蛛、穴掘りども、小さな獣の大波があらゆる方向から押し寄せてくる。引いたと思っても油断するな、必ずもっと強く戻ってくるし、その後ろからもっとでかい奴が迫ってくる。',
   'questUi.worldQuest.fireAndFly.brief.brittle':

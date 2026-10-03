@@ -19239,7 +19239,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.fireAndFly.scenarios.standard': '정식 경계 근무',
   'questUi.worldQuest.fireAndFly.scenarios.hard': '고참병의 시험',
   'questUi.worldQuest.fireAndFly.scenarios.pack': '무리',
-  'questUi.worldQuest.fireAndFly.scenarios.giants': '무거운 발걸음',
   'questUi.worldQuest.fireAndFly.scenarios.deluge': '대홍수',
   'questUi.worldQuest.fireAndFly.scenarios.brittle': '금 간 탑',
   'questUi.worldQuest.fireAndFly.scenarios.powder': '화약고',
@@ -19251,8 +19250,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '장인들의 공방에서 나온 가장 파괴적인 무기, 파편탄일세. 조금 느리긴 해도, 터지면 주변에 서 있는 건 아무것도 남지 않지. 포수 명부에 이름을 올리기 전에 모든 포수는 이걸 다룰 줄 알아야 하네.',
   'questUi.worldQuest.fireAndFly.brief.pack':
     '우리 요새가 밀려드는 놈들에게 집어삼켜지고 있네! 놈들은 무리 지어 오는데, 무리마다 앞선 무리보다 더 사납지. 성벽 위에서도 놈들의 울부짖음이 들린다네. 성벽을 넘어오기 전에 놈들을 밀어내도록 도와주게!',
-  'questUi.worldQuest.fireAndFly.brief.giants':
-    '새벽부터 땅이 흔들리고 있네. 청동과 용암과 바위로 된 거상들이 언덕을 내려오고 있지. 느리긴 해도 무엇으로도 막을 수 없고, 탑에 닿기라도 하면 오래 버티지 못할 걸세. 자네만 믿겠네.',
   'questUi.worldQuest.fireAndFly.brief.deluge':
     '족히 백은 넘는 놈들이네. 늑대, 멧돼지, 거미, 굴착꾼까지, 작은 짐승들의 물결이 사방에서 밀려든다네. 물러난다고 믿지 말게, 언제나 더 거세게 돌아오고, 그 뒤로 더 큰 놈이 헤치고 다가오니.',
   'questUi.worldQuest.fireAndFly.brief.brittle':

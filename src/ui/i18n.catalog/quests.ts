@@ -358,7 +358,6 @@ const questStringsEn = {
           standard: 'Standing Watch',
           hard: "Veterans' Test",
           pack: 'The Pack',
-          giants: 'Heavy Tread',
           deluge: 'The Deluge',
           brittle: 'The Cracked Tower',
           powder: 'The Powder Store',
@@ -373,8 +372,6 @@ const questStringsEn = {
             'One cannon is not always enough. Every tower keeps an ace up its sleeve, the Shockwave, which sweeps away whatever crowds at the foot of the walls. Tonight you learn to use it, and above all to pick your moment.',
           hard: "Here is the most destructive weapon ever to leave the artificers' workshop: the Fragmentation Shell. It is a little slow, but when it bursts, nothing around it is left standing. Every gunner must master it before their name goes on the gunners' roll.",
           pack: 'Our fortifications are being overrun! They come in packs, each one fiercer than the last, and you can hear them howling from the ramparts. Help us drive them back before they break over the walls!',
-          giants:
-            'The ground has been shaking since dawn: colossi of bronze, of lava and of stone are coming down from the hills. They are slow, but nothing stops them, and if they reach the tower it will not stand for long. I am counting on you.',
           deluge:
             'There must be a hundred of them and more: wolves, boars, spiders and tunnelers, a tide of small beasts pouring in from every side. When it ebbs, do not trust it: it always comes back stronger, and something bigger is wading in behind.',
           brittle:

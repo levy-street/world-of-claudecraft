@@ -371,7 +371,6 @@ export const FIRE_AND_FLY_SCORE_VERSIONS: Readonly<Record<string, number>> = {
   standard: 2,
   hard: 2,
   pack: 1,
-  giants: 1,
   deluge: 1,
   brittle: 1,
   powder: 1,

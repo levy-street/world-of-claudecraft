@@ -3,7 +3,6 @@ import { turretPlanWireJson } from '../server/turret_self_wire';
 import { decodeTurretPlan, decodeTurretSeat } from '../src/net/turret_session_wire';
 import {
   TURRET_MISSION_DELUGE,
-  TURRET_MISSION_GIANTS,
   TURRET_MISSION_PACK,
 } from '../src/sim/content/fire_and_fly_missions';
 import {
@@ -584,7 +583,7 @@ describe('the turret feedback cursor', () => {
     expect(banner(fragOnly, touch)).toBe(
       'Blast the monsters before they reach the tower. Tap the socket for a Fragmentation Shell.',
     );
-    const shockOnly = plan({ ...TURRET_MISSION_GIANTS, arsenal: { shockwave: 2 } });
+    const shockOnly = plan({ ...TURRET_MISSION_DELUGE, arsenal: { shockwave: 2 } });
     expect(banner(shockOnly, pad)).toBe(
       'Blast the monsters before they reach the tower. Y: Shockwave.',
     );

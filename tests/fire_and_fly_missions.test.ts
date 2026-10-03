@@ -7,7 +7,6 @@ import { decodeTurretPlan } from '../src/net/turret_session_wire';
 import {
   TURRET_MISSION_BRITTLE,
   TURRET_MISSION_DELUGE,
-  TURRET_MISSION_GIANTS,
   TURRET_MISSION_PACK,
   TURRET_MISSION_POWDER,
   TURRET_MISSIONS,
@@ -95,17 +94,15 @@ function variant(over: Partial<TurretScenarioDef>): TurretScenarioDef {
 /** Each mission's signature weapon: the one its idea asks for, in charges at the start. */
 const MISSION_ARSENALS: Record<string, { shockwave: number; fragmentation: number }> = {
   pack: { shockwave: 1, fragmentation: 5 },
-  giants: { shockwave: 4, fragmentation: 1 },
   deluge: { shockwave: 3, fragmentation: 2 },
   brittle: { shockwave: 3, fragmentation: 1 },
   powder: { shockwave: 1, fragmentation: 3 },
 };
 
 describe('the mission table', () => {
-  it('offers five missions after the trials, with frozen ids, board keys and one version each', () => {
+  it('offers four missions after the trials, with frozen ids, board keys and one version each', () => {
     expect(TURRET_MISSIONS.map((m) => [m.id, m.boardKey])).toEqual([
       ['fire_and_fly_pack', 'pack'],
-      ['fire_and_fly_giants', 'giants'],
       ['fire_and_fly_deluge', 'deluge'],
       ['fire_and_fly_brittle', 'brittle'],
       ['fire_and_fly_powder', 'powder'],
@@ -257,28 +254,6 @@ describe('the mission table', () => {
         expect(pack.pace).toBeLessThanOrEqual(slowest * 1.35 + 1e-9);
       }
     }
-  });
-
-  it('makes Heavy Tread large or huge and tough, slow through the climb, then colossi from everywhere', () => {
-    const plan = resolveTurretPlan(TURRET_MISSION_GIANTS);
-    for (const kind of plan.kinds) expect(['large', 'huge']).toContain(kind.sizeClass);
-    for (const wave of TURRET_MISSION_GIANTS.waves)
-      for (const entry of entriesOf(wave)) expect(entry.hpScale).toBeGreaterThan(1);
-    for (const wave of TURRET_MISSION_GIANTS.waves.slice(0, 5))
-      for (const entry of entriesOf(wave)) expect(entry.speedScale).toBeLessThan(1);
-    const colossi = TURRET_MISSION_GIANTS.waves.slice(5);
-    let pace = 1;
-    for (const wave of colossi) {
-      expect(sidesOf(wave)).toBe('ring');
-      for (const entry of entriesOf(wave)) {
-        expect(['frostmane_yeti', 'idol_guardian']).toContain(entry.templateId);
-        expect(entry.speedScale).toBeGreaterThan(1);
-      }
-      const fastest = Math.max(...entriesOf(wave).map((e) => e.speedScale ?? 1));
-      expect(fastest).toBeGreaterThan(pace);
-      pace = fastest;
-    }
-    expect(spawnsOf(TURRET_MISSION_GIANTS).slice(5)).toEqual([12, 18, 26]);
   });
 
   it('makes The Deluge a tide of small beasts, quicker than any mission, with surges and surprises', () => {
@@ -507,12 +482,11 @@ function aimedRun(mission: TurretScenarioDef, seed: number) {
 
 /**
  * The clean nearest-first aimer's medal on seed 42: gold everywhere under the one medal
- * rule (lot R5b, gold keeps 95 percent of the tower), which lets Heavy Tread and The Powder
- * Store keep the gold the 0.8 s strike and the chained waves had cost them on this seed.
+ * rule (lot R5b, gold keeps 95 percent of the tower), which lets The Powder Store keep the
+ * gold the 0.8 s strike and the chained waves had cost it on this seed.
  */
 const CLEAN_MEDAL: Record<string, 'gold' | 'silver'> = {
   pack: 'gold',
-  giants: 'gold',
   deluge: 'gold',
   brittle: 'gold',
   powder: 'gold',

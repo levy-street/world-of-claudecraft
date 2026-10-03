@@ -300,7 +300,7 @@ describe('your best', () => {
 });
 
 describe("Fire and Fly's groups: trials, missions, Mastery", () => {
-  const MISSION = 'fire_and_fly_giants_v1_lifetime';
+  const MISSION = 'fire_and_fly_deluge_v1_lifetime';
   const MASTERY = FIRE_AND_FLY_MASTERY_BOARD_ID;
   const RECRUITED = { trialsWon: 3, recruited: true };
 
@@ -352,7 +352,6 @@ describe("Fire and Fly's groups: trials, missions, Mastery", () => {
     );
     expect(view.cards.map((c) => c.label)).toEqual([
       'The Pack: All time',
-      'Heavy Tread: All time',
       'The Deluge: All time',
       'The Cracked Tower: All time',
       'The Powder Store: All time',
@@ -364,7 +363,7 @@ describe("Fire and Fly's groups: trials, missions, Mastery", () => {
     expect(view.columns.medal).toBe('Medal');
     expect(view.start).toEqual({
       questId: FIRE_AND_FLY_QUEST_ID,
-      courseId: 'fire_and_fly_giants',
+      courseId: 'fire_and_fly_deluge',
       label: 'Take this mission',
     });
     const offline = buildWorldQuestLadderView(
@@ -377,8 +376,8 @@ describe("Fire and Fly's groups: trials, missions, Mastery", () => {
 
   it('shows the Mastery as one board of stars and points, with no start button', () => {
     const leaders: WorldQuestLeaderboardEntry[] = [
-      { rank: 1, name: 'Ace', medal: null, metric: 120_000, stars: 13 },
-      { rank: 2, name: 'Bea', medal: null, metric: 150_000, stars: 12 },
+      { rank: 1, name: 'Ace', medal: null, metric: 120_000, stars: 12 },
+      { rank: 2, name: 'Bea', medal: null, metric: 150_000, stars: 11 },
       { rank: 3, name: 'Cy', medal: null, metric: 9_000, stars: 1 },
       { rank: 4, name: 'Hero1', medal: null, metric: 8_000, stars: 1 },
     ];
@@ -400,8 +399,8 @@ describe("Fire and Fly's groups: trials, missions, Mastery", () => {
     expect(view.start).toBeNull();
     const byPlace = [...view.podium].sort((a, b) => a.place - b.place);
     expect(byPlace.map((slot) => [slot.name, slot.medalText, slot.metricText])).toEqual([
-      ['Ace', '13 stars', '120,000'],
-      ['Bea', '12 stars', '150,000'],
+      ['Ace', '12 stars', '120,000'],
+      ['Bea', '11 stars', '150,000'],
       ['Cy', '1 star', '9,000'],
     ]);
     expect(view.podium.every((slot) => slot.medalArt === null)).toBe(true);
@@ -427,7 +426,7 @@ describe("Fire and Fly's groups: trials, missions, Mastery", () => {
       expect.objectContaining({ courseId: 'fire_and_fly_standard' }),
     );
     expect(start(MISSION, { trialsWon: 2, recruited: false })).toBeNull();
-    expect(start(MISSION, RECRUITED)?.courseId).toBe('fire_and_fly_giants');
+    expect(start(MISSION, RECRUITED)?.courseId).toBe('fire_and_fly_deluge');
     expect(buildWorldQuestLadderView(MISSION, { kind: 'loading' }, '').start).toBeNull();
     expect(start('glider_valleys_v2_lifetime')).toEqual(
       expect.objectContaining({

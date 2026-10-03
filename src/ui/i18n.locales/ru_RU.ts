@@ -19617,7 +19617,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.fireAndFly.scenarios.standard': 'Настоящий дозор',
   'questUi.worldQuest.fireAndFly.scenarios.hard': 'Проверка ветеранов',
   'questUi.worldQuest.fireAndFly.scenarios.pack': 'Стая',
-  'questUi.worldQuest.fireAndFly.scenarios.giants': 'Тяжёлая поступь',
   'questUi.worldQuest.fireAndFly.scenarios.deluge': 'Потоп',
   'questUi.worldQuest.fireAndFly.scenarios.brittle': 'Треснувшая башня',
   'questUi.worldQuest.fireAndFly.scenarios.powder': 'Пороховой склад',
@@ -19629,8 +19628,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Вот самое разрушительное оружие, какое когда-либо выходило из мастерской оружейников: Осколочный снаряд. Он немного медлителен, но когда разрывается, вокруг ничто не устоит. Каждый канонир должен освоить его, прежде чем его имя впишут в список канониров.',
   'questUi.worldQuest.fireAndFly.brief.pack':
     'Наши укрепления захлёстывает! Они идут стаями, и каждая стая свирепее предыдущей, а их вой слышно даже на стенах. Помоги нам отбросить их, пока они не перехлестнули через стены!',
-  'questUi.worldQuest.fireAndFly.brief.giants':
-    'С рассвета дрожит земля: с холмов спускаются колоссы из бронзы, из лавы и из камня. Они медлительны, но их ничто не остановит, и если они дойдут до башни, долго она не простоит. Я на тебя рассчитываю.',
   'questUi.worldQuest.fireAndFly.brief.deluge':
     'Их сотня, а то и больше: волки, кабаны, пауки и проходчики, целый прилив мелкого зверья накатывает со всех сторон. Когда он отступает, не верь ему: он всегда возвращается сильнее, а следом бредёт кто-то покрупнее.',
   'questUi.worldQuest.fireAndFly.brief.brittle':

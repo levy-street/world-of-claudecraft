@@ -30,7 +30,7 @@ const board = (id: string): WorldQuestScoreboard => {
 };
 
 describe('scoreboard catalog', () => {
-  it('names medal boards, six timed course boards, six trial, five mission and one Mastery board backed by real quest records', () => {
+  it('names medal boards, six timed course boards, six trial, four mission and one Mastery board backed by real quest records', () => {
     expect(WORLD_QUEST_SCOREBOARDS.map((b) => b.questId)).toEqual([
       NORTH_WATCH_CANNON.questId,
       LAST_KEEP_CANNON.questId,
@@ -38,7 +38,7 @@ describe('scoreboard catalog', () => {
       GLIDER_QUEST_ID,
       FORGE_QUEST_ID,
       ...Array(6).fill(GLIDER_QUEST_ID),
-      ...Array(6 + 5 + 1).fill(FIRE_AND_FLY_QUEST_ID),
+      ...Array(6 + 4 + 1).fill(FIRE_AND_FLY_QUEST_ID),
     ]);
     for (const b of WORLD_QUEST_SCOREBOARDS) expect(WORLD_QUESTS_BY_ID[b.questId]).toBeDefined();
     expect(new Set(WORLD_QUEST_SCOREBOARDS.map((b) => b.id)).size).toBe(

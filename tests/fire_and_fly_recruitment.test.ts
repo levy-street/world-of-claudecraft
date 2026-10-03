@@ -48,7 +48,7 @@ const DAY = '2026-09-06';
 const LOCKED = 'Master Gunner Alder has not cleared you for that yet.';
 const [INTRO, STANDARD, HARD] = TURRET_SCENARIOS.map((s) => s.id);
 const PACK = TURRET_MISSIONS[0].id;
-const GIANTS = TURRET_MISSIONS[1].id;
+const DELUGE = TURRET_MISSIONS[1].id;
 
 function atTheGate(): { sim: Sim; meta: PlayerMeta } {
   const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', devCommands: true });
@@ -293,7 +293,7 @@ describe('the day reward and the mission scores', () => {
     const { sim, meta } = recruited();
     pick(sim, TURRET_SCENARIO_INTRODUCTION.id);
     expect(done(winSeat(sim, meta))).toBe(1);
-    pick(sim, GIANTS);
+    pick(sim, DELUGE);
     expect(seated(meta)?.worldQuest?.practice).toBe(true);
     expect(done(winSeat(sim, meta))).toBe(0);
   });
@@ -328,18 +328,18 @@ describe('the day reward and the mission scores', () => {
       expect.objectContaining({ stars: 3, points: packPoints, missions: 1 }),
     ]);
     // A second mission adds to the sum; a trial never touches it.
-    pick(sim, GIANTS);
+    pick(sim, DELUGE);
     const second = winSeat(sim, meta, 0.6);
-    const giants = meta.fireAndFlyRecords.fire_and_fly_giants_v1_lifetime;
-    expect(giants.medal).toBe('silver');
+    const deluge = meta.fireAndFlyRecords.fire_and_fly_deluge_v1_lifetime;
+    expect(deluge.medal).toBe('silver');
     expect(second.filter((e) => e.type === 'worldQuestMastery')).toEqual([
-      expect.objectContaining({ stars: 5, points: packPoints + giants.metric, missions: 2 }),
+      expect.objectContaining({ stars: 5, points: packPoints + deluge.metric, missions: 2 }),
     ]);
     pick(sim, STANDARD);
     expect(winSeat(sim, meta).filter((e) => e.type === 'worldQuestMastery')).toEqual([]);
     expect(fireAndFlyMastery(meta.fireAndFlyRecords)).toEqual({
       stars: 5,
-      points: packPoints + giants.metric,
+      points: packPoints + deluge.metric,
       missions: 2,
     });
   });
@@ -350,7 +350,6 @@ describe('the day reward and the mission scores', () => {
     expect(FIRE_AND_FLY_MASTERY_BOARD_ID).toBe('fire_and_fly_mastery_v1_lifetime');
     expect(FIRE_AND_FLY_SCOREBOARD_MISSIONS.map((m) => `${m.key}_v${m.version}`)).toEqual([
       'pack_v1',
-      'giants_v1',
       'deluge_v1',
       'brittle_v1',
       'powder_v1',

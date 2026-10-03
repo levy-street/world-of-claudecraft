@@ -549,7 +549,6 @@ charge has no socket, no key and no banner mention.
 | Standing Watch | 8 | 0 | brings in the Shockwave, enough of it to carry a slower gunner |
 | Veterans' Test | 2 | 4 | brings in the fragmentation shell, beside fewer Shockwaves |
 | The Pack | 0 | 5 | packs gathering at rallies in the field: a fragmentation shell into a standing pack |
-| Heavy Tread | 4 | 1 | giants reaching the tower together, then colossi from everywhere |
 | The Deluge | 3 | 2 | swarms from everywhere |
 | The Cracked Tower | 3 | 1 | 10 tower points: no strike may land |
 | The Powder Store | 1 | 3 | keg lanes and groups |
@@ -601,6 +600,9 @@ reading the exact field), on 96 tuning and 96 held-out seeds:
 
 ### The missions
 
+Four missions: a fifth, Heavy Tread, was dropped by the owner's call on 2026-10-04,
+because a mission built on colossi fights the rules "big monsters rare, no sponges".
+
 Every mission runs eight waves on one curve: a warm-up, a fast climb, then the last
 two or three waves pushing its idea to the extreme, each wave setting off on the tick
 the one before is cleared (lot R5; the overlap of lot N2d is gone). The Pack (lot R5b)
@@ -612,14 +614,13 @@ kegs and loosing scouts at once. Under those limits the quickest stand-in golds 
 about nine runs in ten (88 and 91 percent on 96 tuning and 96 held-out seeds; 72 and
 81 reading the field late) and never loses: every draft that cost it its gold did so
 by piling monsters at the foot. A 0.8 s player wins with silver or bronze, a 1 s
-player loses nearly half its runs. The other four missions were set (lot N2d) for
+player loses nearly half its runs. The other three missions were set (lot N2d) for
 the 1.5 s strike and are far harder at 0.8 s until their own redesign: that stand-in
-golds none of them and loses most Heavy Tread and every Cracked Tower run.
+golds none of them and loses every Cracked Tower run.
 
 | Mission | Tower, gold bar | The last waves |
 |---|---|---|
 | The Pack | 100, keep 95 percent | three then four packs gathering from every side, the hold shorter, scouts breaking out at each departure; the last with Old Greyjaws and a sprint group that never gathers |
-| Heavy Tread | 100, keep 95 percent | yetis from everywhere, 12 then 18 then 20 with 6 guardians, two to three times their pace |
 | The Deluge | 100, keep 95 percent | 48 then 60 small monsters from everywhere at three and a half and four times their pace |
 | The Cracked Tower | 10, untouched | 32 then 44 armoured dead from everywhere at two and a half times their pace |
 | The Powder Store | 100, keep 95 percent | 48 then 63 monsters from three sides charging down twelve kegs a wave, giants among the last |

@@ -51,10 +51,9 @@ const SEAT_BYTES_PER_SECOND_BY_TRIAL: Record<string, number> = {
 // Per mission, re-measured with the waves chained on their clear (lot R5) and The Pack of lot
 // R5b: The Deluge about 12.0 KB/s, the highest (276 monsters, the last 60), The Powder Store
 // 10.3 (207, the last 63), The Pack 6.9 (163 monsters gathering at rallies; 12.7 with lot R3's
-// 234), Heavy Tread 7.2 (82 colossi), The Cracked Tower 6.3 to 6.4 (156).
+// 234), The Cracked Tower 6.3 to 6.4 (156).
 const SEAT_BYTES_PER_SECOND_BY_MISSION: Record<string, number> = {
   pack: 7_600,
-  giants: 7_900,
   deluge: 13_200,
   brittle: 7_050,
   powder: 11_350,
@@ -62,8 +61,8 @@ const SEAT_BYTES_PER_SECOND_BY_MISSION: Record<string, number> = {
 // Every run's worst one-second window of the seat state (a sliding 20-tick sum, one full resend
 // of a mid-run resume included), against the re-decision line of BANDWIDTH_OPINION.md (a seat's
 // worst second past a walking crowd's, 153 KB with the self record's base). Measured on this
-// seed since lot R5b: The Powder Store 61.8 KB, The Deluge 58.8, The Cracked Tower 35.3, Heavy
-// Tread 25.4, The Pack 17.9, the Veterans' Test 14.0, every other scenario under 8 (lot H4:
+// seed since lot R5b: The Powder Store 61.8 KB, The Deluge 58.8, The Cracked Tower 35.3, The
+// Pack 17.9, the Veterans' Test 14.0, every other scenario under 8 (lot H4:
 // 17.8 KB at most; before the split: 124 to 128 KB). The ceiling sits about 10 percent over the
 // worst any measured run reached, not this seed's: the H4 probe (no resume) over the world seed
 // and Sim seeds 1 to 8, bare and armed, peaks at 72.7 (The Deluge, a Sim seed) and 72.1 (The

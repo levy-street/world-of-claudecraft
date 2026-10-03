@@ -124,7 +124,7 @@ describe('world quest rankings window', () => {
       Promise.resolve(
         board.startsWith('fire_and_fly_mastery')
           ? ladderPage(board, {
-              leaders: [{ rank: 1, name: 'Ace', medal: null, metric: 120_000, stars: 13 }],
+              leaders: [{ rank: 1, name: 'Ace', medal: null, metric: 120_000, stars: 12 }],
               total: 1,
               self: null,
             })
@@ -151,7 +151,7 @@ describe('world quest rankings window', () => {
       50,
       'Ari',
     );
-    expect(r.el.querySelectorAll('.wql-card')).toHaveLength(5);
+    expect(r.el.querySelectorAll('.wql-card')).toHaveLength(4);
     expect(document.activeElement?.textContent).toBe('Missions');
     const start = r.el.querySelector('[data-wql-start]') as HTMLButtonElement;
     expect(start.textContent).toBe('Take this mission');
@@ -166,7 +166,7 @@ describe('world quest rankings window', () => {
     expect(r.el.querySelectorAll('.wql-card')).toHaveLength(1);
     expect(r.el.querySelector('[data-wql-start]')).toBeNull();
     expect(r.el.querySelector('.wql-board-title')?.textContent).toBe("Gunner's Mastery");
-    expect(r.el.querySelector('.lbp-slot .wql-medal')?.textContent).toBe('13 stars');
+    expect(r.el.querySelector('.lbp-slot .wql-medal')?.textContent).toBe('12 stars');
     groups()[1].click();
     await flush();
     (r.el.querySelector('[data-wql-start]') as HTMLButtonElement).click();
@@ -179,7 +179,7 @@ describe('world quest rankings window', () => {
     const r = rig(undefined, { trialsWon: 1, recruited: false });
     r.window.open('fire_and_fly_pack_v1_lifetime');
     await flush();
-    expect(r.el.querySelectorAll('.wql-card')).toHaveLength(5);
+    expect(r.el.querySelectorAll('.wql-card')).toHaveLength(4);
     expect(r.el.querySelector('[data-wql-start]')).toBeNull();
     r.window.open('fire_and_fly_standard_v2_daily');
     await flush();

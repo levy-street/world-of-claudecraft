@@ -69,7 +69,6 @@ describe('the turret feedback ring', () => {
       standard: 506,
       hard: 821,
       pack: 1290,
-      giants: 781,
       deluge: 1021,
       brittle: 1303,
       powder: 2876,

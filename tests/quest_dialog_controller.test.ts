@@ -1148,7 +1148,6 @@ describe("Master Gunner Alder's Gunnery Board", () => {
       'Standing Watch',
       "Veterans' Test",
       'The Pack',
-      'Heavy Tread',
       'The Deluge',
       'The Cracked Tower',
       'The Powder Store',
@@ -1198,14 +1197,14 @@ describe("Master Gunner Alder's Gunnery Board", () => {
     const first = row(h.element, (el) => el.dataset.gbRow === 'fire_and_fly_pack');
     press(first, 'ArrowDown');
     const next = row(h.element, (el) => el.getAttribute('aria-selected') === 'true');
-    expect(next.dataset.gbRow).toBe('fire_and_fly_giants');
+    expect(next.dataset.gbRow).toBe('fire_and_fly_deluge');
     expect(document.activeElement).toBe(next);
     expect(action(h.element).textContent).toBe('Practice');
     press(next, 'Enter');
     window.removeEventListener('keydown', seen);
     expect(seen).not.toHaveBeenCalled();
     expect(h.startWorldQuestActivity).toHaveBeenCalledWith(FIRE_AND_FLY_QUEST_ID, {
-      courseId: 'fire_and_fly_giants',
+      courseId: 'fire_and_fly_deluge',
     });
   });
 
@@ -1218,12 +1217,12 @@ describe("Master Gunner Alder's Gunnery Board", () => {
     const packRow = row(h.element, (el) => el.dataset.gbRow === 'fire_and_fly_pack');
     expect(packRow.querySelector('.gb-medal-gold')?.getAttribute('title')).toBe('Gold medal');
     expect(h.element.querySelector('.gb-mastery')?.textContent).toBe(
-      "Gunner's Mastery: 3 of 15 stars",
+      "Gunner's Mastery: 3 of 12 stars",
     );
     // The pack has its medal: the board opens on the first mission without one.
     expect(
       rows(h.element).find((row) => row.getAttribute('aria-selected') === 'true')?.dataset.gbRow,
-    ).toBe('fire_and_fly_giants');
+    ).toBe('fire_and_fly_deluge');
     rows(h.element)
       .find((row) => row.dataset.gbRow === 'fire_and_fly_pack')
       ?.click();

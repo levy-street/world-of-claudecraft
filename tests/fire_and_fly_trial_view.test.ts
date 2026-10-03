@@ -5,7 +5,6 @@ import { FIRE_AND_FLY_DUNGEON_ID } from '../src/sim/content/fire_and_fly_arena';
 import {
   TURRET_MISSION_BRITTLE,
   TURRET_MISSION_DELUGE,
-  TURRET_MISSION_GIANTS,
   TURRET_MISSION_PACK,
   TURRET_MISSION_POWDER,
   TURRET_MISSIONS,
@@ -53,7 +52,6 @@ const TRIALS = [
 
 const MISSIONS = [
   [TURRET_MISSION_PACK, 'The Pack'],
-  [TURRET_MISSION_GIANTS, 'Heavy Tread'],
   [TURRET_MISSION_DELUGE, 'The Deluge'],
   [TURRET_MISSION_BRITTLE, 'The Cracked Tower'],
   [TURRET_MISSION_POWDER, 'The Powder Store'],

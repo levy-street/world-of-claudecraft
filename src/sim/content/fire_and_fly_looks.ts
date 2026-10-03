@@ -19,11 +19,6 @@ export const FIRE_AND_FLY_SCENARIO_LOOKS: Readonly<
     thornpeak_ogre: 'rift_thornback',
     frostmane_yeti: 'old_greyjaw',
   },
-  // Colossi of stone and fire.
-  fire_and_fly_giants: {
-    fen_troll: 'ignivar_crucible_warden',
-    thornpeak_ogre: 'rift_magma_brute',
-  },
   // A flood of tunnelers to blast, each as light as the digger it stands in for.
   fire_and_fly_deluge: { tunnel_rat: 'deeprock_kobold' },
   // The dead rise against a cracked tower, shadow hounds at their heels.

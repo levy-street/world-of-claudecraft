@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { TURRET_MISSION_GIANTS } from '../src/sim/content/fire_and_fly_missions';
+import { TURRET_MISSION_DELUGE } from '../src/sim/content/fire_and_fly_missions';
 import {
   TURRET_SCENARIO_HARD,
   TURRET_SCENARIO_INTRODUCTION,
@@ -167,7 +167,7 @@ describe('the points', () => {
 });
 
 describe("a won mission's unused charges", () => {
-  const mission = resolveTurretPlan(TURRET_MISSION_GIANTS);
+  const mission = resolveTurretPlan(TURRET_MISSION_DELUGE);
   const trial = resolveTurretPlan(TURRET_SCENARIO_HARD);
 
   it('scores three kills per charge, under a third of a tower point', () => {
@@ -176,17 +176,17 @@ describe("a won mission's unused charges", () => {
   });
 
   it('adds every charge left, the resupplies included, as its own term', () => {
-    expect(mission.arsenal).toEqual({ shockwave: 4, fragmentation: 1 });
-    // Both resupplies came: 6 Shockwaves and 3 frags given, 2 and 1 spent.
+    expect(mission.arsenal).toEqual({ shockwave: 3, fragmentation: 2 });
+    // Both resupplies came: 5 Shockwaves and 4 frags given, 2 and 1 spent.
     const stats = { kills: 30, shockwaves: 2, frags: 1, resupplies: 2 };
     const r = turretResult(mission, final('won', mission.integrity, stats));
-    expect(r.breakdown.charges).toBe((4 + 2) * TURRET_POINTS.unusedCharge);
+    expect(r.breakdown.charges).toBe((3 + 3) * TURRET_POINTS.unusedCharge);
     expect(r.points).toBe(
       30 * TURRET_POINTS.kill + mission.integrity * TURRET_POINTS.integrity + 360,
     );
     const none = turretResult(
       mission,
-      final('won', mission.integrity, { ...stats, shockwaves: 6, frags: 3 }),
+      final('won', mission.integrity, { ...stats, shockwaves: 5, frags: 4 }),
     );
     expect(none.breakdown.charges).toBe(0);
   });

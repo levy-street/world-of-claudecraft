@@ -84,7 +84,6 @@ describe('the trial boards', () => {
       ['fire_and_fly_hard_v2_daily', 'trials'],
       ['fire_and_fly_hard_v2_lifetime', 'trials'],
       ['fire_and_fly_pack_v1_lifetime', 'missions'],
-      ['fire_and_fly_giants_v1_lifetime', 'missions'],
       ['fire_and_fly_deluge_v1_lifetime', 'missions'],
       ['fire_and_fly_brittle_v1_lifetime', 'missions'],
       ['fire_and_fly_powder_v1_lifetime', 'missions'],
@@ -231,16 +230,16 @@ describe('the offline records', () => {
 
 describe('the missions and the Mastery offline', () => {
   const PACK = TURRET_MISSIONS[0];
-  const GIANTS = TURRET_MISSIONS[1];
+  const DELUGE = TURRET_MISSIONS[1];
   const PACK_BOARD = 'fire_and_fly_pack_v1_lifetime';
 
   it('bounds a Mastery row by a gold and the most points on every mission', () => {
-    expect(FIRE_AND_FLY_MASTERY_MAX_STARS).toBe(15);
-    expect(FIRE_AND_FLY_MASTERY_MAX_POINTS).toBe(5 * FIRE_AND_FLY_MAX_POINTS);
+    expect(FIRE_AND_FLY_MASTERY_MAX_STARS).toBe(12);
+    expect(FIRE_AND_FLY_MASTERY_MAX_POINTS).toBe(4 * FIRE_AND_FLY_MAX_POINTS);
     expect(fireAndFlyMasteryValid(0, 0)).toBe(true);
-    expect(fireAndFlyMasteryValid(15, FIRE_AND_FLY_MASTERY_MAX_POINTS)).toBe(true);
+    expect(fireAndFlyMasteryValid(12, FIRE_AND_FLY_MASTERY_MAX_POINTS)).toBe(true);
     for (const [stars, points] of [
-      [16, 10],
+      [13, 10],
       [-1, 10],
       [2.5, 10],
       ['3', 10],
@@ -280,7 +279,7 @@ describe('the missions and the Mastery offline', () => {
       personal: true,
     });
     recordPersonalFireAndFlyScore(records, PACK.id, '2026-09-23', 'gold', 20_000);
-    recordPersonalFireAndFlyScore(records, GIANTS.id, '2026-09-23', 'bronze', 9_000);
+    recordPersonalFireAndFlyScore(records, DELUGE.id, '2026-09-23', 'bronze', 9_000);
     recordPersonalFireAndFlyScore(records, INTRO, '2026-09-23', 'gold', 40_000);
     const page = personalWorldQuestLeaderboard(
       player,

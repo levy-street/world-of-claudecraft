@@ -31,10 +31,6 @@ export const FIRE_AND_FLY_TRIAL_TEXT: Readonly<
     name: 'questUi.worldQuest.fireAndFly.scenarios.pack',
     brief: 'questUi.worldQuest.fireAndFly.brief.pack',
   },
-  giants: {
-    name: 'questUi.worldQuest.fireAndFly.scenarios.giants',
-    brief: 'questUi.worldQuest.fireAndFly.brief.giants',
-  },
   deluge: {
     name: 'questUi.worldQuest.fireAndFly.scenarios.deluge',
     brief: 'questUi.worldQuest.fireAndFly.brief.deluge',

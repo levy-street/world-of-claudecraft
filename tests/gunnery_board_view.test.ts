@@ -39,7 +39,7 @@ const TWO_WON: FireAndFlyRecruitment = { trialsWon: 2, recruited: false };
 const RECRUITED: FireAndFlyRecruitment = { trialsWon: TURRET_SCENARIOS.length, recruited: true };
 const NO_BESTS: ReadonlyMap<string, GunneryBest> = new Map();
 
-const [PACK, GIANTS, DELUGE, BRITTLE, POWDER] = TURRET_MISSIONS;
+const [PACK, DELUGE, BRITTLE, POWDER] = TURRET_MISSIONS;
 
 function input(overrides: Partial<GunneryBoardInput> = {}): GunneryBoardInput {
   return {
@@ -67,7 +67,7 @@ beforeEach(() => setLanguage('en'));
 afterEach(() => setLanguage('en'));
 
 describe('the Gunnery Board rows', () => {
-  it('lists the three trials under Recruitment and the five missions under Missions, in order', () => {
+  it('lists the three trials under Recruitment and the four missions under Missions, in order', () => {
     const view = buildGunneryBoardView(input());
     expect(view.sections.map((s) => s.title)).toEqual(['Recruitment', 'Missions']);
     expect(view.sections[0].rows.map((r) => r.scenarioId)).toEqual(
@@ -75,7 +75,6 @@ describe('the Gunnery Board rows', () => {
     );
     expect(view.sections[1].rows.map((r) => r.name)).toEqual([
       'The Pack',
-      'Heavy Tread',
       'The Deluge',
       'The Cracked Tower',
       'The Powder Store',
@@ -99,7 +98,6 @@ describe('the Gunnery Board rows', () => {
       'silver',
       'gold',
       'gold',
-      null,
       'bronze',
       null,
       null,
@@ -109,14 +107,13 @@ describe('the Gunnery Board rows', () => {
       'medal',
       'medal',
       'medal',
-      'open',
       'medal',
       'open',
       'open',
     ]);
     expect(rows[1].stateText).toBe('Silver medal');
     expect(rows[0].medalArt).toBe('/ui/world-quests/leaderboard/medal_gold.webp');
-    expect(rows[4].medalArt).toBeNull();
+    expect(rows[5].medalArt).toBeNull();
   });
 
   it('marks a trial the recruitment won but no ladder row names as won, medal unknown', () => {
@@ -145,12 +142,12 @@ describe('the default selection', () => {
   });
 
   it('opens on the first open scenario without a medal', () => {
-    expect(gunneryBoardDefaultSelection(RECRUITED, MIXED)).toBe(GIANTS.id);
+    expect(gunneryBoardDefaultSelection(RECRUITED, MIXED)).toBe(BRITTLE.id);
   });
 
   it('then on the first one without gold, then on the first open one', () => {
     const allMedalled = new Map(MIXED);
-    for (const mission of [GIANTS, BRITTLE, POWDER])
+    for (const mission of [BRITTLE, POWDER])
       allMedalled.set(mission.id, { medal: 'gold', points: 1 });
     expect(gunneryBoardDefaultSelection(RECRUITED, allMedalled)).toBe(TURRET_SCENARIOS[1].id);
     const allGold = new Map(
@@ -217,7 +214,7 @@ describe('the detail panel', () => {
     expect(won.detail.bestText).toBe('Gold medal, 20,900 points');
     expect(won.detail.bestMedal).toBe('gold');
     const none = buildGunneryBoardView(
-      input({ recruitment: RECRUITED, bests: MIXED, selectedId: GIANTS.id }),
+      input({ recruitment: RECRUITED, bests: MIXED, selectedId: BRITTLE.id }),
     );
     expect(none.detail.bestText).toBe('Not played yet');
     expect(none.detail.bestMedalArt).toBeNull();
@@ -230,14 +227,14 @@ describe('the detail panel', () => {
     expect(collected.rewardCollected).toBe(true);
   });
 
-  it('gives a brief to all eight scenarios, each its own', () => {
+  it('gives a brief to all seven scenarios, each its own', () => {
     const briefs = FIRE_AND_FLY_SCENARIOS.map((s) => {
       const key = gunneryBriefKey(s.boardKey);
       expect(key).not.toBeNull();
       return key ? t(key) : '';
     });
-    expect(briefs).toHaveLength(8);
-    expect(new Set(briefs).size).toBe(8);
+    expect(briefs).toHaveLength(7);
+    expect(new Set(briefs).size).toBe(7);
     for (const brief of briefs) {
       const sentences = brief.split(/[.!?](\s|$)/).filter((part) => part.trim().length > 1);
       expect(sentences.length).toBeGreaterThanOrEqual(2);
@@ -247,7 +244,7 @@ describe('the detail panel', () => {
     expect(view.detail.brief).toBe(t('questUi.worldQuest.fireAndFly.brief.brittle'));
     expect(view.detail.kicker).toBe('Mission');
   });
-  it("gives the five missions Alder's plea, each its own, never a wave count", () => {
+  it("gives the four missions Alder's plea, each its own, never a wave count", () => {
     const briefs = TURRET_MISSIONS.map((mission) => {
       const key = gunneryBriefKey(mission.boardKey);
       expect(key).not.toBeNull();
@@ -369,9 +366,9 @@ describe('the header', () => {
     expect(fresh.masteryText).toBeNull();
     const recruited = buildGunneryBoardView(input({ recruitment: RECRUITED, bests: MIXED }));
     expect(recruited.recruitmentText).toBe('Recruited');
-    expect(recruited.masteryText).toBe("Gunner's Mastery: 4 of 15 stars");
+    expect(recruited.masteryText).toBe("Gunner's Mastery: 4 of 12 stars");
     expect(buildGunneryBoardView(input({ recruitment: RECRUITED })).masteryText).toBe(
-      "Gunner's Mastery: 0 of 15 stars",
+      "Gunner's Mastery: 0 of 12 stars",
     );
   });
 
@@ -430,7 +427,7 @@ describe('the same input, the same board', () => {
         }),
       );
     const offline = board(sim);
-    expect(offline.masteryText).toBe("Gunner's Mastery: 4 of 15 stars");
+    expect(offline.masteryText).toBe("Gunner's Mastery: 4 of 12 stars");
     expect(board(client)).toEqual(offline);
   });
 
