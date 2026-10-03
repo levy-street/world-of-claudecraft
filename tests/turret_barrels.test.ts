@@ -909,10 +909,11 @@ describe('full runs with barrels', () => {
   // arrival sectors: every spawn of these runs has barrels standing, so each bearing
   // goes through the lane walk the sectors rewrote, and Standard must replay it exactly.
   // Re-taken for the 2 s pause between waves (the 5 s one replayed the old digests
-  // bf47cb63 and 3736426a on the overlap engine).
+  // bf47cb63 and 3736426a on the overlap engine), then for the 0.8 s strike and Standard's
+  // retune (lot R4), the hills run on seed 7: on seed 21 a few spawns now find no barrel up.
   it.each([
-    [42, 'flat', flat, 1140, '396030bf'],
-    [21, 'hills', hills, 1134, '92b30c4e'],
+    [42, 'flat', flat, 1054, 'ef7c75ba'],
+    [7, 'hills', hills, 999, '12a1a152'],
   ] as const)(
     'replays the spawn bearings beside the barrels of a seed %i %s run exactly',
     (seed, _n, probe, count, digest) => {

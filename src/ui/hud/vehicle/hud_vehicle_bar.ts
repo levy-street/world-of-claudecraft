@@ -29,7 +29,7 @@ interface VehicleBarHost {
     motion?: boolean,
     icon?: string,
     variant?: 'default',
-    subtext?: string,
+    subtext?: string | string[],
     durationMs?: number,
     source?: 'turret',
   ): unknown;

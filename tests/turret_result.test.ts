@@ -52,7 +52,7 @@ describe('the medal bars of each scenario', () => {
     expect(bars).toEqual([
       ['introduction', 148, 128],
       ['standard', 99, 60],
-      ['hard', 147, 90],
+      ['hard', 197, 120],
     ]);
     expect(turretMedalBarPoints(0.9, 100)).toBe(90);
     expect(turretMedalBarPoints(0.901, 100)).toBe(91);

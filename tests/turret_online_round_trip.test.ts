@@ -36,44 +36,44 @@ const RUN_BOUND = 20 * 60 * 8;
 // The seat state's bytes per second (its key family, each key's `,"key":` counted; lot H4),
 // pinned about 10 percent over the measured won runs on this seed against silent growth: only
 // the keys a revision moved resend, so a crowd costs little and Standing Watch and the
-// introduction sit near 2.7 KB/s (the revision, the aim and the stats move every shot; the
-// 2 s pause of lot N2d packs the same bytes in a shorter run). Before the split the whole
-// state rode one key: 14.9 KB/s here, 53.2 on the Veterans' Test and 61.9 on The Pack.
-const SEAT_BYTES_PER_SECOND_CEILING = 2_950;
-// Per trial: the introduction about 2.6 KB/s, the Veterans' Test about 6.7 (122 monsters, its
-// last wave 25 at once).
+// introduction sit near 2.1 KB/s since lot R4 (the revision, the aim and the stats move every
+// shot). Before the split the whole state rode one key: 14.9 KB/s here, 53.2 on the Veterans'
+// Test and 61.9 on The Pack.
+const SEAT_BYTES_PER_SECOND_CEILING = 2_350;
+// Per trial: the introduction about 2.1 KB/s, the Veterans' Test about 4.8 (lot R4: a ten-strong
+// charge in its last wave; 6.7 with 21).
 const SEAT_BYTES_PER_SECOND_BY_TRIAL: Record<string, number> = {
-  introduction: 2_900,
-  hard: 7_400,
+  introduction: 2_350,
+  hard: 5_250,
 };
-// Per mission, since lot N2d's eight-wave curves with their crowded finales: The Deluge about
-// 13.9 KB/s, the highest (276 monsters, the last 60), The Pack 12.7 since its hunt (lot R3: 234
-// monsters gathering at rallies and advancing at a walk; 17.2 at a run before), The Powder
-// Store 11.7 (207, the last 63), Heavy Tread 7.9 (82 colossi), The Cracked Tower 6.7 (156).
+// Per mission, re-measured with lot R4's 0.8 s strike and third resupply: The Deluge about
+// 13.2 KB/s, the highest (276 monsters, the last 60), The Powder Store 11.8 (207, the last 63),
+// The Pack 9.0 (182 monsters gathering at rallies; 12.7 with lot R3's 234), Heavy Tread 7.9
+// (82 colossi), The Cracked Tower 6.7 to 6.9 (156).
 const SEAT_BYTES_PER_SECOND_BY_MISSION: Record<string, number> = {
-  pack: 14_000,
+  pack: 9_900,
   giants: 8_750,
-  deluge: 15_300,
-  brittle: 7_450,
-  powder: 12_900,
+  deluge: 14_550,
+  brittle: 7_600,
+  powder: 12_950,
 };
 // Every run's worst one-second window of the seat state (a sliding 20-tick sum, one full resend
 // of a mid-run resume included), against the re-decision line of BANDWIDTH_OPINION.md (a seat's
 // worst second past a walking crowd's, 153 KB with the self record's base). Measured on this
-// seed since lot N2d: The Deluge 64.4 KB, The Powder Store 60.3, The Pack 46.1 (65.5 before its
-// hunt, lot R3), The Cracked Tower 37.8, Heavy Tread 28.4, the Veterans' Test 17.6, every other
-// scenario under 6 (lot
-// H4: 17.8 KB at most; before the split: 124 to 128 KB). The ceiling sits about 10 percent
-// over the worst any measured run reached, not this seed's: the H4 probe (no resume) over the
-// world seed and Sim seeds 1 to 8, bare and armed, peaks at 75.8 (The Deluge, world seed) and
-// 72.5 (The Powder Store). A content lot that crosses it has to say so and re-measure.
+// seed since lot R4: The Deluge 62.8 KB, The Powder Store 60.3, The Cracked Tower 38.4, The Pack
+// 30.9 (46.1 with lot R3's draft), Heavy Tread 28.4, the Veterans' Test 16.5, every other
+// scenario under 6 (lot H4: 17.8 KB at most; before the split: 124 to 128 KB). The ceiling sits
+// about 10 percent over the worst any measured run reached, not this seed's: the H4 probe (no
+// resume) over the world seed and Sim seeds 1 to 8, bare and armed, peaks at 75.8 (The Deluge,
+// world seed) and 72.5 (The Powder Store), as before lot R4. A content lot that crosses it has
+// to say so and re-measure.
 const SEAT_WORST_SECOND_CEILING = 84_000;
 // The same window over everything the seat adds to its player's socket: the state keys, the
 // plan's `turp` and the seat's own events (the bomblets and the feedback entries). Measured on
-// this seed: The Deluge 89.5 KB, The Powder Store 84.9, The Pack 63.9 (92.5 before its hunt);
-// the probe's peak is
-// 105.2 (The Deluge, world seed), then 101.7 (The Deluge, Sim seed 4). With the self record's
-// base about 12 KB more, the ceiling stays under the 153 KB line (about 128 KB).
+// this seed: The Deluge 88.5 KB, The Powder Store 84.9, The Pack 46.8 (63.9 with lot R3's
+// draft); the probe's peak is 105.2 (The Deluge, world seed), then 100.6 (The Deluge, a Sim
+// seed, armed). With the self record's base about 12 KB more, the ceiling stays under the
+// 153 KB line (about 128 KB).
 const SEAT_WIRE_WORST_SECOND_CEILING = 116_000;
 const DRIFT_BOUND_YD = 0.005;
 const FORGED_PID = 987_654;
@@ -414,7 +414,7 @@ describe('Fire and Fly online: the socket-free round trip', () => {
   });
 
   it("mirrors every tick of a won mission that spends its limited weapons: charges, resupplies, rearm and every weapon's entries", () => {
-    // The Cracked Tower gives both weapons and resupplies them after waves 3 and 5.
+    // The Cracked Tower gives both weapons and resupplies them after waves 3, 5 and 7.
     const { sim, pid, client, slams, routed, seatBytesPerSecond } = playOnline(
       '/dev turret brittle',
       true,
@@ -425,8 +425,8 @@ describe('Fire and Fly online: the socket-free round trip', () => {
     expect(truth.defense.stats.resupplies).toBe(plan.resupplyWaves.length);
     const given = turretChargesGiven(plan, truth.defense.stats.resupplies);
     expect(given).toEqual({
-      shockwave: plan.arsenal.shockwave + 2,
-      fragmentation: plan.arsenal.fragmentation + 2,
+      shockwave: plan.arsenal.shockwave + 3,
+      fragmentation: plan.arsenal.fragmentation + 3,
     });
     expect(truth.defense.stats.frags).toBe(given.fragmentation);
     expect(truth.defense.stats.shockwaves).toBe(given.shockwave);
@@ -488,6 +488,8 @@ describe('Fire and Fly online: the socket-free round trip', () => {
         resolveTurretPlan(mission).waves.map((w) => w.barrels),
       );
     },
+    // The Pack's won run lasts over four minutes of play since its tougher finale (lot R4).
+    60_000,
   );
 
   it("carries the instructor's locks, the recruitment and a mission's score through the wire", () => {

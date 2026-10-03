@@ -242,7 +242,7 @@ describe('phases and spawns', () => {
     expect(state.monsters).toHaveLength(1);
   });
 
-  it('spawns on the 46 yd ring every 0.8 to 1.6 s, in plan order, with varying gaps', () => {
+  it('spawns on the 46 yd ring every 1.2 to 2.4 s, in plan order, with varying gaps', () => {
     const p = resolveTurretPlan();
     const state = createTurretDefense(p, { x: 5, z: -3 }, 11, START);
     const seen: { id: number; tick: number; kind: number }[] = [];
@@ -260,8 +260,8 @@ describe('phases and spawns', () => {
     const gaps = wave1.slice(1).map((s, i) => s.tick - wave1[i].tick);
     expect(gaps).toHaveLength(7);
     for (const gap of gaps) {
-      expect(gap).toBeGreaterThanOrEqual(16);
-      expect(gap).toBeLessThanOrEqual(32);
+      expect(gap).toBeGreaterThanOrEqual(24);
+      expect(gap).toBeLessThanOrEqual(48);
     }
     expect(new Set(gaps).size).toBeGreaterThan(1);
   });
@@ -379,10 +379,10 @@ describe('the shot', () => {
     expect(fireTurret(state, state.tick, 5, 5, flat).ok).toBe(true);
   });
 
-  it('carries the current wave core damage (wave 6 hits for 220, an intro shot for 60)', () => {
+  it('carries the current wave core damage (wave 6 hits for 275, an opening shot for 75)', () => {
     const p = resolveTurretPlan();
     const state = createTurretDefense(p, { x: 0, z: 0 }, 3, START);
-    expect(fireAt(state, 10, 0).damage).toBe(60);
+    expect(fireAt(state, 10, 0).damage).toBe(75);
     state.phase = 'between';
     state.wave = 4;
     state.phaseEndTick = state.tick + 1;
@@ -394,14 +394,14 @@ describe('the shot', () => {
     pin(state, m, 0, 20);
     state.readyTick = 0;
     const shot = fireAt(state, 0, 20);
-    expect(shot.damage).toBe(220);
+    expect(shot.damage).toBe(275);
     const impact = run(state, shot.impactTick).find(
       (e) => e.type === 'impact' && e.shotId === shot.id,
     );
     expect(impact?.type === 'impact' && impact.hits).toEqual([
-      { id: m.id, falloff: 1, damage: 220, x: 0, y: 0, z: 20 },
+      { id: m.id, falloff: 1, damage: 275, x: 0, y: 0, z: 20 },
     ]);
-    expect(m.hp).toBe(480 - 220);
+    expect(m.hp).toBe(480 - 275);
   });
 
   it('clamps the aim to 2..60 yd along the aim direction, 360 degrees', () => {

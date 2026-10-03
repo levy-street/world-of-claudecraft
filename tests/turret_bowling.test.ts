@@ -645,10 +645,11 @@ describe('the toggle', () => {
   // rule, rim hits relaunched a body lying past the maximum range hundreds of times.
   // The barrels came after these digests: the runs place none, so the engine the
   // barrels were added to still replays them untouched. Re-taken for the 2 s pause
-  // between waves (the 5 s one replayed 313311f2 and 268bf16a on the overlap engine).
+  // between waves (the 5 s one replayed 313311f2 and 268bf16a on the overlap engine),
+  // then for the 0.8 s strike and Standard's retune (lot R4).
   it.each([
-    ['flat', 42, flat, 1116, '5cc9ef9a'],
-    ['hills', 21, hills, 1111, 'c49469bf'],
+    ['flat', 42, flat, 997, 'ec3b65da'],
+    ['hills', 21, hills, 964, 'f37489d7'],
   ] as const)(
     'turned off, a %s full run replays the bowling-free engine exactly',
     (_name, seed, probe, count, digest) => {
@@ -687,7 +688,8 @@ describe('full runs with bowling', () => {
       expect(r.state.phase).toBe('won');
       const knocks = r.trace.filter((s) => s.startsWith('{"type":"bowled"'));
       expect(knocks.length).toBe(r.state.stats.bowled);
-      expect(r.state.stats.bowled).toBeGreaterThanOrEqual(5);
+      // Shells a quarter harder since lot R4 leave fewer bodies to throw: a few knocks still.
+      expect(r.state.stats.bowled).toBeGreaterThanOrEqual(4);
       // About one launch in ten knocks a body over; far more reads as chaos, not bowling.
       const launches = r.trace.filter((s) => s.startsWith('{"type":"launched"')).length;
       expect(r.state.stats.bowled).toBeLessThanOrEqual(0.15 * launches);

@@ -107,7 +107,8 @@ export interface TurretHudFrame {
 
 export interface TurretBanner {
   text: string;
-  subtext?: string;
+  /** One line, or several stacked (the final wave's line above its resupply's). */
+  subtext?: string | string[];
 }
 
 /**
@@ -484,9 +485,12 @@ export class TurretFeedbackCursor {
       banner = bannerFor(entry.event, session, keys);
       rank = entryRank;
     }
-    // A mission's overlapping wave sets off on its resupply's tick, with no clear between.
-    if (banner && resupply && rank === BANNER_RANK.waveStart && !banner.subtext)
-      banner.subtext = turretResupplyLine(resupply);
+    // A mission's overlapping wave sets off on its resupply's tick, with no clear between;
+    // the final wave keeps its own line above the resupply's.
+    if (banner && resupply && rank === BANNER_RANK.waveStart) {
+      const line = turretResupplyLine(resupply);
+      banner.subtext = typeof banner.subtext === 'string' ? [banner.subtext, line] : line;
+    }
     return banner;
   }
 }

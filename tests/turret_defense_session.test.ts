@@ -1572,7 +1572,8 @@ describe('a headless run in the arena', { timeout: FULL_RUN_TIMEOUT_MS }, () => 
         fireTurret(state, t, target.x + off(7919), target.z + off(104729), probe);
       }
       expect(state.phase).toBe('won');
-      expect(state.stats.bowled).toBeGreaterThanOrEqual(10);
+      // Shells a quarter harder since lot R4 leave fewer bodies to throw (4 to 10 here).
+      expect(state.stats.bowled).toBeGreaterThanOrEqual(4);
       expect(state.stats.bowled).toBeLessThanOrEqual(0.15 * launches);
     }
   });

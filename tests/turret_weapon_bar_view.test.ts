@@ -8,19 +8,21 @@ import {
   TURRET_SCENARIO_INTRODUCTION,
   TURRET_SCENARIO_STANDARD,
 } from '../src/sim/content/fire_and_fly_scenarios';
-import { TURRET_SHOCKWAVE, TURRET_WEAPON } from '../src/sim/content/turret_defense';
-import { stillSegment } from '../src/sim/minigames/thrown_body';
+import { TURRET_SHOCKWAVE, TURRET_TIMING, TURRET_WEAPON } from '../src/sim/content/turret_defense';
+import { marchSegment, stillSegment } from '../src/sim/minigames/thrown_body';
 import { createTurretDefense } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import { turretSessionView } from '../src/sim/turret_defense_session';
-import type { TurretSession } from '../src/sim/types';
+import { DT, type TurretSession } from '../src/sim/types';
 import { TurretOwnShotLedger } from '../src/ui/hud/vehicle/turret_own_shot_core';
 import {
+  TURRET_SHOCK_NUDGE_LEAD_TICKS,
   TURRET_SHOCK_NUDGE_WINDUPS,
   TURRET_SHOCK_NUDGE_WINDUPS_LEARNING,
   TURRET_WEAPON_ICONS,
   TurretWeaponBarView,
   turretShockNudgeWindups,
+  turretStrikesDue,
   turretWeaponInArsenal,
 } from '../src/ui/hud/vehicle/turret_weapon_bar_view';
 import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
@@ -241,6 +243,29 @@ describe('the turret weapon sockets view', () => {
     session.defense.monsters[2].hp = 0;
     session.defense.rev++;
     expect(tick(view, turretSessionView(session)).slots[0].procGlow).toBe(false);
+  });
+
+  it('counts a monster walking in to strike within the lead as a strike due, as the clock moves', () => {
+    // Two windups and one walker whose strike lands TURRET_SHOCK_NUDGE_LEAD_TICKS after it
+    // reaches the wall plus its windup: the 0.8 s strike leaves the pulse its old lead.
+    const session = windingUp(seat(), 3);
+    const arrive = START + 40;
+    session.defense.monsters[2] = {
+      ...session.defense.monsters[2],
+      state: 'march',
+      seg: marchSegment(START, 0, 0, 20, 0, 0, 20 / ((arrive - START) * DT), 0),
+    };
+    session.defense.rev++;
+    const strike = session.defense.monsters[2].seg.end + TURRET_TIMING.windupTicks;
+    const due = strike - TURRET_SHOCK_NUDGE_LEAD_TICKS;
+    const view = turretSessionView(session);
+    expect(turretStrikesDue(view, due - 1)).toBe(2);
+    expect(turretStrikesDue(view, due)).toBe(3);
+    expect(turretStrikesDue(view, null)).toBe(2);
+    const bar = new TurretWeaponBarView();
+    expect(tick(bar, view, due - 1).slots[0].procGlow).toBe(false);
+    expect(tick(bar, view, due).slots[0].procGlow).toBe(true);
+    expect(TURRET_SHOCK_NUDGE_LEAD_TICKS).toBeGreaterThan(TURRET_TIMING.windupTicks);
   });
 
   it('pulses off the online mirror too, on and off as the seat key moves', () => {

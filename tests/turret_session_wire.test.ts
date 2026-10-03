@@ -73,7 +73,7 @@ interface Run {
 
 /**
  * A whole seat on the server, aimed at the monster nearest the tower, or left to breach;
- * armed, it plays The Powder Store (both weapons, resupplied after waves 3 and 5), fires
+ * armed, it plays The Powder Store (both weapons, resupplied after waves 3, 5 and 7), fires
  * its frag shells first and slams whenever a body stands inside the reach.
  */
 function playRun(aim: boolean, armed = false): Run {
@@ -383,7 +383,7 @@ describe('the turret seat key', () => {
 
   it("round-trips a mission's resupplies: the granted count, its entries, the charges after", () => {
     const armedPlan = decodeTurretPlan(JSON.parse(turretPlanWireJson(armed.session.defense.plan)))!;
-    expect(armedPlan.resupplyWaves).toEqual([2, 4]);
+    expect(armedPlan.resupplyWaves).toEqual([2, 4, 6]);
     expect(armedPlan.chargeBonus).toBe(true);
     const counts = new Set<number>();
     for (const { view, json } of armed.revisions) {
@@ -391,11 +391,12 @@ describe('the turret seat key', () => {
       expect(decoded.defense.stats.resupplies).toBe(view.defense.stats.resupplies);
       counts.add(decoded.defense.stats.resupplies);
     }
-    expect([...counts].sort()).toEqual([0, 1, 2]);
+    expect([...counts].sort()).toEqual([0, 1, 2, 3]);
     const entries = armed.events.filter((e) => e.event.type === 'resupply');
     expect(entries.map((e) => e.event)).toEqual([
       { type: 'resupply', wave: 2, shockwave: 1, fragmentation: 1 },
       { type: 'resupply', wave: 4, shockwave: 1, fragmentation: 1 },
+      { type: 'resupply', wave: 6, shockwave: 1, fragmentation: 1 },
     ]);
     for (const entry of entries) {
       expect(decodeTurretFeedback(wire(entry))).toEqual({

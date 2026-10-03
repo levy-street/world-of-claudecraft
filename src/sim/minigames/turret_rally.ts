@@ -25,6 +25,8 @@ const TAU = Math.PI * 2;
 const GOLDEN = Math.PI * (3 - Math.sqrt(5));
 /** How far apart (as a share of a turn, either side) a pack's side may wander off the even spread. */
 const SIDE_JITTER = 0.08;
+/** Turns (shares of a turn) a rally tries off its side's bearing when a standing keg covers every draw on it. */
+const RALLY_TURNS = [0, 0.04, -0.04, 0.08, -0.08] as const;
 
 export interface TurretRally {
   /** wave * TURRET_HUNT_LIMITS.packs + pack. */
@@ -111,22 +113,25 @@ export function turretHuntGap(hunt: TurretHuntPlan, index: number): number {
   return index + 1 < hunt.ticks.length ? hunt.ticks[index + 1] - hunt.ticks[index] : 0;
 }
 
-function membersOf(hunt: TurretHuntPlan, pack: number): number {
+/** Members pack `pack` of a hunt gathers: its spawns in the plan. */
+export function turretPackSize(hunt: TurretHuntPlan, pack: number): number {
   let n = 0;
   for (const g of hunt.groups) if (g === pack) n++;
   return n;
 }
 
-/** Clear of every standing keg by the gathering disc plus the clearance. */
-function rallyClear(state: TurretDefenseState, x: number, z: number, reach: number): boolean {
+/** How far the nearest standing keg stands outside the gathering disc plus the clearance (yd). */
+function rallyRoom(state: TurretDefenseState, x: number, z: number, reach: number): number {
   const room = reach + TURRET_RALLY.kegClearance + TURRET_EXPLOSIVE_BARREL.radius;
-  return state.barrels.every((b) => Math.hypot(b.x - x, b.z - z) >= room);
+  let least = Number.POSITIVE_INFINITY;
+  for (const b of state.barrels) least = Math.min(least, Math.hypot(b.x - x, b.z - z) - room);
+  return least;
 }
 
 /**
  * Opens the current wave's rallies at its start, one per pack: on the pack's side, at a
  * drawn distance in the band, redrawn while the gathering disc would cover a standing keg
- * (the last draw stands). Returns the ones opened, in pack order.
+ * (the draw that leaves the most room stands). Returns the ones opened, in pack order.
  */
 export function openTurretRallies(state: TurretDefenseState, wave: TurretWavePlan): TurretRally[] {
   const hunt = wave.hunt;
@@ -137,16 +142,25 @@ export function openTurretRallies(state: TurretDefenseState, wave: TurretWavePla
   const tries = TURRET_RALLY.placementTries;
   hunt.packs.forEach((pack, p) => {
     const bearing = sideBearing(state, state.wave, hunt.packs.length, p);
-    const reach = turretRallyReach(membersOf(hunt, p));
+    const reach = turretRallyReach(turretPackSize(hunt, p));
     let x = state.cx;
     let z = state.cz;
-    for (let attempt = 0; attempt < tries; attempt++) {
-      const key = p * tries + attempt;
-      const u = turretDraw(state, TURRET_STREAM.rallyRadius, state.wave, key);
-      const r = hunt.minRadius + u * (hunt.maxRadius - hunt.minRadius);
-      x = state.cx + Math.sin(bearing) * r;
-      z = state.cz + Math.cos(bearing) * r;
-      if (rallyClear(state, x, z, reach)) break;
+    let best = Number.NEGATIVE_INFINITY;
+    // The side's own bearing first, then turned a little either way, the same draws each.
+    search: for (const turn of RALLY_TURNS) {
+      for (let attempt = 0; attempt < tries; attempt++) {
+        const key = p * tries + attempt;
+        const u = turretDraw(state, TURRET_STREAM.rallyRadius, state.wave, key);
+        const r = hunt.minRadius + u * (hunt.maxRadius - hunt.minRadius);
+        const tx = state.cx + Math.sin(bearing + turn * TAU) * r;
+        const tz = state.cz + Math.cos(bearing + turn * TAU) * r;
+        const room = rallyRoom(state, tx, tz, reach);
+        if (room <= best) continue;
+        best = room;
+        x = tx;
+        z = tz;
+        if (room >= 0) break search;
+      }
     }
     const rally: TurretRally = {
       id: turretRallyId(state.wave, p),

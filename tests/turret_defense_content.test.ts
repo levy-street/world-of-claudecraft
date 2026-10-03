@@ -66,15 +66,19 @@ describe('wave table against the real templates', () => {
     });
   });
 
-  it('marches at the template speed times the march factor, with size-class physics', () => {
+  it('marches at the template speed times the march factor and its pace, with size-class physics', () => {
+    // Standing Watch walks at 0.85 of the march since the 0.8 s strike (lot R4).
     for (const k of plan.kinds) {
       expect(k.marchSpeed).toBeCloseTo(
-        MOBS[k.templateId].moveSpeed * TURRET_TIMING.marchFactor,
+        MOBS[k.templateId].moveSpeed * TURRET_TIMING.marchFactor * 0.85,
         12,
       );
       expect(k).toMatchObject(TURRET_SIZE_CLASSES[TURRET_TEMPLATE_SIZES[k.templateId]]);
     }
-    expect(plan.kinds.find((k) => k.templateId === 'forest_wolf')?.marchSpeed).toBeCloseTo(4.4, 12);
+    expect(plan.kinds.find((k) => k.templateId === 'forest_wolf')?.marchSpeed).toBeCloseTo(
+      3.74,
+      12,
+    );
   });
 
   it('matches the six-wave composition, weakest first, with the guardian spawning last', () => {
@@ -149,9 +153,9 @@ describe('core-hit tuning intent (hits to kill, from the real template health)',
     [2, 'vale_bandit', 2, 2],
     [3, 'fen_troll', 3, 3],
     [4, 'thornpeak_ogre', 3, 4],
-    [5, 'boneclad_revenant', 3, 3],
+    [5, 'boneclad_revenant', 2, 3],
     [5, 'frostmane_yeti', 6, 8],
-    [5, 'idol_guardian', 8, 10],
+    [5, 'idol_guardian', 7, 10],
   ] as const)('wave %i %s dies in %i to %i core hits', (wave, id, min, max) => {
     const n = hitsToKill(wave, id);
     expect(n).toBeGreaterThanOrEqual(min);
@@ -164,14 +168,14 @@ describe('tuning constants in ticks and yards', () => {
     expect(TURRET_TIMING).toMatchObject({
       introTicks: 60,
       betweenTicks: 40,
-      windupTicks: 30,
+      windupTicks: 16,
       downTicks: 16,
       riseTicks: 12,
       corpseTicks: 100,
     });
     expect(TURRET_WEAPON.cooldownTicks).toBe(9);
     expect([TURRET_WEAPON.minFlightTicks, TURRET_WEAPON.maxFlightTicks]).toEqual([4, 18]);
-    for (const w of TURRET_WAVES) expect([w.gapMinTicks, w.gapMaxTicks]).toEqual([16, 32]);
+    for (const w of TURRET_WAVES) expect([w.gapMinTicks, w.gapMaxTicks]).toEqual([24, 48]);
   });
 
   it('pins the arena, the tower body and the blast geometry', () => {

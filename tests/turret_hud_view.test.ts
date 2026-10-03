@@ -682,7 +682,11 @@ describe('the turret feedback cursor', () => {
       text: 'Wave 4 of 8',
       subtext: 'Resupply: +1 Shockwave, +1 Fragmentation Shell',
     });
-    expect(launched(7)?.subtext).toBe('Final wave');
+    // The seventh wave's resupply sets the last one off: both lines, the final wave's first.
+    expect(launched(7)).toEqual({
+      text: 'Wave 8 of 8',
+      subtext: ['Final wave', 'Resupply: +1 Shockwave, +1 Fragmentation Shell'],
+    });
   });
 
   it("scores a won mission's charges kept on their own row, none on a loss, and counts the resupplies as given", () => {

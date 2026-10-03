@@ -56,7 +56,7 @@ export const TURRET_WEAPON_FRAGS = 4;
  * Frag shells whose blasts linger on the ground at once: a blast holds longer than a
  * reload, so every frag shell a run holds can (its resupplies included).
  */
-export const TURRET_WEAPON_LINGERING_FRAGS = 7;
+export const TURRET_WEAPON_LINGERING_FRAGS = 8;
 
 /** Blasts the cannon keeps on the ground at once: the shells' own, a whole keg chain's, and every lingering frag's airburst and bomblets. */
 export const TURRET_WEAPON_IMPACTS =

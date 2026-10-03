@@ -335,9 +335,12 @@ describe('a hunt forecast', () => {
       enabled: false,
     });
     const state = createTurretDefense(plan, { x: 0, z: 0 }, 9, 0);
+    // A tower that never falls: the sparse shooting here would lose it, and a lost run
+    // freezes every body, which is no gathering leg.
+    state.integrity = 1e6;
     const seen: Record<string, number> = {};
     const worst = { place: 0, tick: 0 };
-    for (let t = 0; t < 20 * 60 && state.wave < 3; t++) {
+    for (let t = 0; t < 20 * 90 && state.wave < 4; t++) {
       const before = new Map(state.monsters.map((m) => [m.id, read(structuredClone(m))]));
       const rallies = read(structuredClone(state.rallies ?? []));
       const center = { cx: 0, cz: 0, rallies };

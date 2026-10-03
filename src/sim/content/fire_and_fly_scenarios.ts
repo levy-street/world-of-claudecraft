@@ -1,24 +1,26 @@
 // Fire and Fly scenarios, data only: the difficulties a run can take, resolved into
 // a plan by src/sim/minigames/turret_defense_plan.ts. Standard is the original run
-// (TURRET_WAVES and 100 tower points) and must replay it exactly. Every wave, shell
-// damage, medal bar and arsenal here is mini-game tuning, not a classic-era formula. A
-// tuning change after boards open mints a new board version. The trials bring in one
-// weapon each: the Recruit's Trial the cannon alone, Standing Watch the Shockwave,
-// the Veterans' Test the fragmentation shell. Measured with scripted aimers on the
-// arena ground, up to 3 yd off, firing a set delay after each reload, bare or with a
-// plain weapon policy (a Shockwave at the HUD's nudge or once a pending strike costs 5
-// percent of the tower, a frag on a group of 4 coming within 30 yd): the Recruit's
-// Trial golds aimers within 0.8 s and gives one at 1 s mostly silver, 2 s silver or
-// bronze, never a loss; Standing Watch's gold goes from about half to three quarters
-// of the 0.8 s aimers' runs and from none to about half of the 1 s aimer's with the
-// Shockwave. The Veterans' Test is measured against a sharper policy too, the best
-// scripted stand-in for a good player (a Shockwave at 3 windups, a frag on the pack
-// about to strike once several close in at once): the 0.4 s aimer golds about a
-// fifth of its runs bare and over half with it, nearly all the gold lost in the last
-// wave; the 0.8 s aimers never gold, and the 1 s aimer wins with silver or bronze,
-// losing about one run in ten bare and none with that policy. The armed figures hold
-// for those policies only. The pause between waves went from 5 s to 2 s (lot N2d)
-// without moving any of them past the noise of 24 seeds.
+// (TURRET_WAVES and 100 tower points), retuned once for the 0.8 s strike. Every wave,
+// shell damage, medal bar and arsenal here is mini-game tuning, not a classic-era
+// formula. A tuning change after boards open mints a new board version. The trials
+// bring in one weapon each: the Recruit's Trial the cannon alone, Standing Watch the
+// Shockwave, the Veterans' Test the fragmentation shell. Measured with scripted aimers
+// on the arena ground, up to 3 yd off, firing a set delay after each reload, bare or
+// with a plain weapon policy (a Shockwave at the HUD's nudge or once a pending strike
+// costs 5 percent of the tower, a frag on a group of 4 coming within 30 yd), and with
+// a field-aware one, the stand-in for a good player (shells led onto the strike that
+// comes first, a keg as a group passes it, a frag on a pack standing clear of any
+// keg, a Shockwave at 2 strikes due): the Recruit's Trial golds aimers within 0.8 s
+// and gives one at 1 s mostly silver, 2 s silver or bronze, never a loss; Standing
+// Watch's gold goes from about half the 0.8 s aimers' runs bare to three quarters
+// with the Shockwave, and a 1 s aimer golds about a third of its runs playing the
+// field, one in twelve with the plain policy (short of the half it was tuned to), none
+// bare. The Veterans' Test: the 0.4 s aimer golds about half its runs with the
+// field-aware policy and under a tenth bare, nearly all the gold lost in the last wave;
+// the 0.8 s aimers never gold, and the 1 s aimer wins with silver or bronze, losing
+// about one run in ten bare and none playing the field. Since a monster at the foot
+// strikes 0.8 s after it gets there (1.5 s before lot R4), the trials walk a little
+// slower, space their spawns out and hit harder to stay on these marks.
 
 import { DT, type TurretScenarioDef } from '../types';
 import { TURRET_MISSIONS } from './fire_and_fly_missions';
@@ -27,7 +29,9 @@ import { TURRET_BARREL_RING, TURRET_EXPLOSIVE_BARREL, TURRET_WAVES } from './tur
 const ticks = (seconds: number): number => Math.round(seconds / DT);
 
 /** The first wave's slow spawns: time to aim each one. */
-const INTRO_GAP = { gapMinTicks: ticks(1.4), gapMaxTicks: ticks(2.4) } as const;
+const INTRO_GAP = { gapMinTicks: ticks(2.1), gapMaxTicks: ticks(3.6) } as const;
+/** The trial's monsters walk a little slower than their templates: a recruit's pace. */
+const INTRO_PACE = 0.85;
 const HARD_GAP = { gapMinTicks: ticks(0.4), gapMaxTicks: ticks(0.8) } as const;
 /** Inside a pack, the members follow each other closely. */
 const PACK_GAP = { gapMinTicks: ticks(0.15), gapMaxTicks: ticks(0.25) } as const;
@@ -39,9 +43,9 @@ const BRUTE_HP = 1.4;
 const CHARGER_HP = 6.2;
 
 /**
- * Three short waves of the smallest monsters on the whole ring, with room for mistakes:
- * one shell fells a first-wave wolf, then each monster takes two, and the spawns quicken
- * to about Standing Watch's pace over shorter waves.
+ * Three short waves of the smallest monsters on the whole ring, walking at a recruit's
+ * pace, with room for mistakes: one shell fells a first-wave wolf, then each monster
+ * takes two, and the spawns quicken to about Standing Watch's pace over shorter waves.
  */
 export const TURRET_SCENARIO_INTRODUCTION: TurretScenarioDef = {
   id: 'fire_and_fly_introduction',
@@ -54,29 +58,29 @@ export const TURRET_SCENARIO_INTRODUCTION: TurretScenarioDef = {
   // The cannon and the kegs only: the weapons come one per trial after it.
   waves: [
     {
-      entries: [{ templateId: 'forest_wolf', count: 5, level: 1 }],
-      coreDamage: 60,
+      entries: [{ templateId: 'forest_wolf', count: 5, level: 1, speedScale: INTRO_PACE }],
+      coreDamage: 78,
       ...INTRO_GAP,
       barrels: { count: 2, ...TURRET_BARREL_RING },
     },
     {
       entries: [
-        { templateId: 'wild_boar', count: 6, level: 3 },
-        { templateId: 'forest_wolf', count: 4, level: 2 },
+        { templateId: 'wild_boar', count: 6, level: 3, speedScale: INTRO_PACE },
+        { templateId: 'forest_wolf', count: 4, level: 2, speedScale: INTRO_PACE },
       ],
-      coreDamage: 36,
-      gapMinTicks: ticks(0.9),
-      gapMaxTicks: ticks(1.5),
+      coreDamage: 47,
+      gapMinTicks: ticks(1.35),
+      gapMaxTicks: ticks(2.25),
       barrels: { count: 2, ...TURRET_BARREL_RING },
     },
     {
       entries: [
-        { templateId: 'tunnel_rat', count: 9, level: 4 },
-        { templateId: 'webwood_spider', count: 8, level: 3 },
+        { templateId: 'tunnel_rat', count: 9, level: 4, speedScale: INTRO_PACE },
+        { templateId: 'webwood_spider', count: 8, level: 3, speedScale: INTRO_PACE },
       ],
-      coreDamage: 40,
-      gapMinTicks: ticks(0.85),
-      gapMaxTicks: ticks(1.25),
+      coreDamage: 52,
+      gapMinTicks: ticks(1.3),
+      gapMaxTicks: ticks(1.9),
       barrels: { count: 2, ...TURRET_BARREL_RING },
     },
   ],
@@ -87,7 +91,9 @@ export const TURRET_SCENARIO_STANDARD: TurretScenarioDef = {
   boardKey: 'standard',
   integrity: 100,
   // Gold lets one point go: the Shockwave's cancelled strikes are what keep it for the
-  // aimers firing 0.8 to 1 s after each reload (TURRET_WAVES stay the original run).
+  // aimers firing 0.8 to 1 s after each reload (TURRET_WAVES are the original run, at a
+  // pace of 0.85, spawns half again as far apart and shells a quarter harder since the
+  // 0.8 s strike).
   medals: { gold: { minIntegrityShare: 0.99 }, silver: { minIntegrityShare: 0.6 } },
   // It brings in the Shockwave, generously so it can be tried freely.
   arsenal: { shockwave: 4 },
@@ -105,9 +111,10 @@ export const TURRET_SCENARIO_HARD: TurretScenarioDef = {
   id: 'fire_and_fly_hard',
   boardKey: 'hard',
   // A sturdier tower than the other trials: gold still lets 3 points go, but a run the
-  // last wave mauls stays winnable, so the recruitment it closes stays open.
-  integrity: 150,
-  medals: { gold: { minIntegrityShare: 0.98 }, silver: { minIntegrityShare: 0.6 } },
+  // last wave mauls stays winnable, so the recruitment it closes stays open (200 points
+  // since the 0.8 s strike, so a 1 s aimer still wins about nine runs in ten).
+  integrity: 200,
+  medals: { gold: { minIntegrityShare: 0.985 }, silver: { minIntegrityShare: 0.6 } },
   // It brings in the fragmentation shell beside fewer Shockwaves.
   arsenal: { shockwave: 2, fragmentation: 4 },
   // One Shockwave and one frag more as the fifth wave ends, so every gunner meets the
@@ -170,16 +177,17 @@ export const TURRET_SCENARIO_HARD: TurretScenarioDef = {
       // spawns behind them and runs them down, so both reach the tower together. Each
       // charger is nearly as tough as a giant: the cannon alone lets one through in most
       // runs, while the Shockwave and frags saved for this wave turn most charges back.
+      // Ten of them at 1.8 times their pace since the 0.8 s strike (21 at 3.2 before).
       entries: [
         { templateId: 'frostmane_yeti', count: 3, level: 20, hpScale: HARD_HP, speedScale: 1.15 },
         { templateId: 'idol_guardian', count: 1, level: 20, hpScale: HARD_HP, speedScale: 1.15 },
         {
           templateId: 'boneclad_revenant',
-          count: 21,
+          count: 10,
           level: 19,
           bossLast: true,
           hpScale: CHARGER_HP,
-          speedScale: 3.2,
+          speedScale: 1.8,
         },
       ],
       coreDamage: 360,

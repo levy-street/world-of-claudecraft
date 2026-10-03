@@ -1,7 +1,8 @@
 // Fire and Fly (turret defense POC) tuning, data only. The engine is
 // src/sim/minigames/turret_defense.ts; the wave plan resolver
 // (src/sim/minigames/turret_defense_plan.ts) reads the templates from MOBS.
-// TURRET_WAVES is the Standard scenario's table (fire_and_fly_scenarios.ts).
+// TURRET_WAVES is the Standard scenario's table (fire_and_fly_scenarios.ts), retuned for the
+// 0.8 s strike (lot R4).
 
 import { FIRE_AND_FLY_TOWER } from '../fire_and_fly_field';
 import {
@@ -35,67 +36,69 @@ export const TURRET_TEMPLATE_SIZES: Readonly<Record<string, TurretSizeClass>> = 
   idol_guardian: 'huge',
 };
 
-const GAP_MIN = ticks(0.8);
-const GAP_MAX = ticks(1.6);
+const GAP_MIN = ticks(1.2);
+const GAP_MAX = ticks(2.4);
+/** Standing Watch's monsters walk a little slower than their templates. */
+const PACE = 0.85;
 /** Inside the march, well clear of the tower's foot and of the 46 yd spawn ring. */
 export const TURRET_BARREL_RING = { minRadius: 16, maxRadius: 30 } as const;
 
 export const TURRET_WAVES: readonly TurretWaveDef[] = [
   {
-    entries: [{ templateId: 'forest_wolf', count: 8, level: 2 }],
-    coreDamage: 60,
+    entries: [{ templateId: 'forest_wolf', count: 8, level: 2, speedScale: PACE }],
+    coreDamage: 75,
     gapMinTicks: GAP_MIN,
     gapMaxTicks: GAP_MAX,
     barrels: { count: 3, ...TURRET_BARREL_RING },
   },
   {
     entries: [
-      { templateId: 'forest_wolf', count: 6, level: 2 },
-      { templateId: 'wild_boar', count: 6, level: 3 },
+      { templateId: 'forest_wolf', count: 6, level: 2, speedScale: PACE },
+      { templateId: 'wild_boar', count: 6, level: 3, speedScale: PACE },
     ],
-    coreDamage: 64,
+    coreDamage: 80,
     gapMinTicks: GAP_MIN,
     gapMaxTicks: GAP_MAX,
     barrels: { count: 3, ...TURRET_BARREL_RING },
   },
   {
     entries: [
-      { templateId: 'vale_bandit', count: 8, level: 5 },
-      { templateId: 'webwood_spider', count: 6, level: 4 },
+      { templateId: 'vale_bandit', count: 8, level: 5, speedScale: PACE },
+      { templateId: 'webwood_spider', count: 6, level: 4, speedScale: PACE },
     ],
-    coreDamage: 84,
+    coreDamage: 105,
     gapMinTicks: GAP_MIN,
     gapMaxTicks: GAP_MAX,
     barrels: { count: 4, ...TURRET_BARREL_RING },
   },
   {
     entries: [
-      { templateId: 'tunnel_rat', count: 8, level: 6 },
-      { templateId: 'fen_troll', count: 4, level: 11 },
+      { templateId: 'tunnel_rat', count: 8, level: 6, speedScale: PACE },
+      { templateId: 'fen_troll', count: 4, level: 11, speedScale: PACE },
     ],
-    coreDamage: 100,
+    coreDamage: 125,
     gapMinTicks: GAP_MIN,
     gapMaxTicks: GAP_MAX,
     barrels: { count: 4, ...TURRET_BARREL_RING },
   },
   {
     entries: [
-      { templateId: 'deeprock_kobold', count: 8, level: 15 },
-      { templateId: 'thornpeak_ogre', count: 4, level: 16 },
-      { templateId: 'boneclad_revenant', count: 4, level: 19 },
+      { templateId: 'deeprock_kobold', count: 8, level: 15, speedScale: PACE },
+      { templateId: 'thornpeak_ogre', count: 4, level: 16, speedScale: PACE },
+      { templateId: 'boneclad_revenant', count: 4, level: 19, speedScale: PACE },
     ],
-    coreDamage: 130,
+    coreDamage: 163,
     gapMinTicks: GAP_MIN,
     gapMaxTicks: GAP_MAX,
     barrels: { count: 5, ...TURRET_BARREL_RING },
   },
   {
     entries: [
-      { templateId: 'boneclad_revenant', count: 6, level: 19 },
-      { templateId: 'frostmane_yeti', count: 2, level: 20 },
-      { templateId: 'idol_guardian', count: 1, level: 20, bossLast: true },
+      { templateId: 'boneclad_revenant', count: 6, level: 19, speedScale: PACE },
+      { templateId: 'frostmane_yeti', count: 2, level: 20, speedScale: PACE },
+      { templateId: 'idol_guardian', count: 1, level: 20, speedScale: PACE, bossLast: true },
     ],
-    coreDamage: 220,
+    coreDamage: 275,
     gapMinTicks: GAP_MIN,
     gapMaxTicks: GAP_MAX,
     barrels: { count: 5, ...TURRET_BARREL_RING },
@@ -246,7 +249,11 @@ export const TURRET_TIMING = {
   betweenTicks: ticks(2),
   /** March speed = template moveSpeed x marchFactor. */
   marchFactor: 0.55,
-  windupTicks: ticks(1.5),
+  /**
+   * A monster at the tower's wall strikes this long after it gets there: one value for every
+   * scenario, so a player always knows how long a monster at the foot gives them.
+   */
+  windupTicks: ticks(0.8),
   downTicks: ticks(0.8),
   riseTicks: ticks(0.6),
   corpseTicks: ticks(5),
@@ -265,16 +272,28 @@ export const TURRET_RALLY = {
   departGapTicks: ticks(0.5),
   /** The gathering disc: slot n stands slotSpacing * sqrt(n + 0.5) yd from the rally point. */
   slotSpacing: 0.95,
-  /** A front keg: this far tower-side of the rally (yd, drawn in the band), this far off the axis. */
-  frontMin: 5,
-  frontMax: 7,
-  axisOffset: 1.5,
-  /** A side keg: this far to the side of the rally (yd). */
-  sideOffset: 8,
+  /**
+   * A front keg: this far tower-side of the rally on the advance path (yd, drawn in the
+   * band), and this far off the axis (drawn in its band), so the column brushes past it.
+   * The band gives way so that no keg blast reaches a member standing at the rally, and so
+   * that the keg stands no nearer the tower than the keg ring's inner edge.
+   */
+  frontMin: 12,
+  frontMax: 16,
+  axisOffsetMin: 2.5,
+  axisOffsetMax: 3,
+  /** A side keg: on the same stretch of path, this far off the axis, at the column's rim. */
+  sideOffsetMin: 5,
+  sideOffsetMax: 6,
+  /** The nearest a placed keg stands to the tower: the keg ring's inner edge. */
+  towerMin: TURRET_BARREL_RING.minRadius,
   /** Draws a rally gets at a point clear of the standing kegs before it keeps its last. */
   placementTries: 6,
-  /** Room (yd) a rally keeps between its gathering disc and a standing keg. */
-  kegClearance: 1.5,
+  /**
+   * Room (yd) a rally keeps between its gathering disc and a standing keg: past a keg
+   * blast's reach, so a keg left from an earlier wave never covers a gathering pack.
+   */
+  kegClearance: TURRET_EXPLOSIVE_BARREL.blastRadius - TURRET_EXPLOSIVE_BARREL.radius,
 } as const;
 
 export const TURRET_PHYSICS = {

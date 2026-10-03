@@ -259,7 +259,7 @@ it("adds a mission's resupply waves and points per charge left to each tooltip",
   seatIn(seat('wave', resolveTurretPlan(TURRET_MISSION_DELUGE)));
   for (const socket of sockets()) {
     const html = tooltips.get(socket)!();
-    expect(html).toContain('Each weapon of the mission gains one charge as waves 3 and 5 end.');
+    expect(html).toContain('Each weapon of the mission gains one charge as waves 3, 5, and 7 end.');
     expect(html).toContain('A won mission scores 60 points for each charge left unused.');
   }
   // The Veterans' Test's one resupply, with no mission wording and no score for charges left.

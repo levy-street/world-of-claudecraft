@@ -7,9 +7,9 @@
 // played, so the intro, the pauses between waves, an empty weapon, the Shockwave's
 // rearm and the cannon's reload all read as not ready. The Shockwave's rearm draws
 // the bar's cooldown sweep; the fragmentation shell shows its armed state; the
-// Shockwave pulses gold while enough monsters wind up at the tower (fewer in the
+// Shockwave pulses gold while enough strikes are due at the tower (fewer in the
 // trial that brings it in). Pure: no DOM.
-import { TURRET_SHOCKWAVE } from '../../../sim/content/turret_defense';
+import { TURRET_SHOCKWAVE, TURRET_TIMING } from '../../../sim/content/turret_defense';
 import type { TurretArsenal, TurretPlan } from '../../../sim/minigames/turret_defense_plan';
 import { TICK_RATE } from '../../../sim/types';
 import type { TurretSessionView } from '../../../world_api/vehicles';
@@ -26,8 +26,14 @@ import {
 
 /** Bar slot per weapon: key 1 slams, key 2 arms. */
 export const TURRET_WEAPON_SLOTS: readonly TurretWeaponKind[] = ['shock', 'frag'];
-/** Monsters winding up a strike at once that make the Shockwave socket pulse. */
+/** Strikes due at once that make the Shockwave socket pulse. */
 export const TURRET_SHOCK_NUDGE_WINDUPS = 3;
+/**
+ * A strike is due once a monster winds up, or walks in to land one within this many ticks:
+ * the pulse comes as early before each strike as a 1.5 s windup alone gave it, whatever
+ * the windup's length.
+ */
+export const TURRET_SHOCK_NUDGE_LEAD_TICKS = Math.round(1.5 * TICK_RATE);
 /** The trial that brings in the Shockwave is where it is learned: it pulses sooner there. */
 export const TURRET_SHOCK_NUDGE_WINDUPS_LEARNING = 2;
 
@@ -57,9 +63,20 @@ export interface TurretWeaponBarInput {
   keycap(slot: number): string;
 }
 
-function windups(session: TurretSessionView): number {
+/** Living monsters winding up, plus those whose walk ends in a strike within the lead. */
+export function turretStrikesDue(session: TurretSessionView, clock: number | null): number {
   let count = 0;
-  for (const m of session.defense.monsters) if (m.state === 'windup' && m.hp > 0) count++;
+  for (const m of session.defense.monsters) {
+    if (!(m.hp > 0)) continue;
+    if (m.state === 'windup') count++;
+    else if (
+      clock !== null &&
+      m.state === 'march' &&
+      m.seg.kind === 'march' &&
+      m.seg.end + TURRET_TIMING.windupTicks - clock <= TURRET_SHOCK_NUDGE_LEAD_TICKS
+    )
+      count++;
+  }
   return count;
 }
 
@@ -71,6 +88,7 @@ export class TurretWeaponBarView {
   private readonly charges: number[] = TURRET_WEAPON_SLOTS.map(() => 0);
   private readonly present: boolean[] = TURRET_WEAPON_SLOTS.map(() => false);
   private windupSession: TurretSessionView | null = null;
+  private windupClock: number | null = null;
   private windupCount = 0;
   private nudgeWindups = TURRET_SHOCK_NUDGE_WINDUPS;
   /** What each slot's text was last built from, so an unchanged frame formats nothing. */
@@ -109,10 +127,12 @@ export class TurretWeaponBarView {
     const inWave = session.defense.phase === 'wave';
     const coreDamage = turretWaveCoreDamage(session);
     const revision = getI18nRevision();
-    if (session !== this.windupSession) {
+    if (session !== this.windupSession || clock !== this.windupClock) {
+      if (session !== this.windupSession)
+        this.nudgeWindups = turretShockNudgeWindups(session.defense.plan);
       this.windupSession = session;
-      this.windupCount = windups(session);
-      this.nudgeWindups = turretShockNudgeWindups(session.defense.plan);
+      this.windupClock = clock;
+      this.windupCount = turretStrikesDue(session, clock);
     }
     for (let i = 0; i < TURRET_WEAPON_SLOTS.length; i++) {
       const weapon = TURRET_WEAPON_SLOTS[i];

@@ -195,17 +195,17 @@ describe('the scenario table', () => {
       expect(wave.arrival).toMatchObject({ kind: 'flanks', count: 3 });
       expect(wave.gapMaxTicks).toBeLessThanOrEqual(2);
     }
-    // The giants set off first; the charge spawns after them from three sides, several
-    // times their pace and about as tough, so both reach the tower together.
+    // The giants set off first; the charge spawns after them from three sides, quicker and
+    // about as tough. Ten of them since a monster at the foot strikes in 0.8 s (lot R4).
     expect(last.arrival).toMatchObject({ kind: 'flanks', count: 3 });
     const giants = last.entries.filter((e) => TURRET_TEMPLATE_SIZES[e.templateId] === 'huge');
     expect(giants.map((e) => e.templateId).sort()).toEqual(['frostmane_yeti', 'idol_guardian']);
     const charge = last.entries.at(-1)!;
     expect(charge).toMatchObject({ templateId: 'boneclad_revenant', bossLast: true });
-    expect(charge.count).toBeGreaterThan(15);
+    expect(charge.count).toBe(10);
     for (const giant of giants) {
       expect(giant.bossLast).toBeUndefined();
-      expect(charge.speedScale!).toBeGreaterThan(2.5 * giant.speedScale!);
+      expect(charge.speedScale!).toBeGreaterThan(1.5 * giant.speedScale!);
     }
     const plan = resolveTurretPlan(TURRET_SCENARIO_HARD);
     const lastPlan = plan.waves.at(-1)!;
@@ -226,16 +226,17 @@ describe('the scenario table', () => {
 });
 
 describe('resolving a scenario into a plan', () => {
-  it('resolves Standard (the default) to the plan the original table resolved to', () => {
+  it('resolves Standard (the default) to the plan its table resolves to', () => {
     const plan = resolveTurretPlan();
     expect(resolveTurretPlan(TURRET_SCENARIO_STANDARD)).toEqual(plan);
     expect(plan.scenarioId).toBe('fire_and_fly_standard');
     expect(plan.integrity).toBe(100);
     expect(plan.arsenal).toEqual({ shockwave: 4, fragmentation: 0 });
     for (const wave of plan.waves) expect(wave.arrival).toEqual({ kind: 'ring' });
-    // The resolved plan as the resolver built it before scenarios, byte for byte.
+    // The resolved plan, byte for byte: lot R4 retuned the table for the 0.8 s strike
+    // (spawns half again as far apart, a pace of 0.85, shells a quarter harder).
     const before = { kinds: plan.kinds, waves: plan.waves.map(({ arrival, ...w }) => w) };
-    expect(fnv(JSON.stringify({ ...before, bowling: plan.bowling }))).toBe('25a6e680');
+    expect(fnv(JSON.stringify({ ...before, bowling: plan.bowling }))).toBe('076f0d92');
   });
 
   it.each(TURRET_SCENARIOS.map((s) => [s.boardKey, s] as const))(
@@ -491,7 +492,10 @@ describe('arrival sectors', () => {
     const wave = resolveTurretPlan().waves[0];
     for (let id = 1; id < 40; id++) {
       const draw = turretDraw({ seed: 3 }, TURRET_STREAM.spawnGap, id);
-      expect(turretArrivalGap({ seed: 3 }, wave, id - 1, id)).toBe(16 + Math.floor(draw * 17));
+      const span = wave.gapMaxTicks - wave.gapMinTicks + 1;
+      expect(turretArrivalGap({ seed: 3 }, wave, id - 1, id)).toBe(
+        wave.gapMinTicks + Math.floor(draw * span),
+      );
     }
   });
 });
