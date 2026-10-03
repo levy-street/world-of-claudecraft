@@ -44,12 +44,12 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
   `sim.ts` and the lock sites can import it without a cycle).
 - **Stats:** `recalcPlayerStats` re-enters over no gear and no talents, then
   `applyMorthenProfile` lays the `morthen` template on top through `mobBaseStats`
-  (the createMob formula), then the solo multipliers (`MORTHEN_SOLO_HP_MULT` x2,
-  `MORTHEN_SOLO_DAMAGE_MULT` x2 on the weapon and the kit's damage): 2382 hp, 82 to
-  130 at 2.6 sec, 234 armor at level 10. Tuned after the first playtest against the
-  party of five on a headless probe: standing still, hitting only the tank or
-  pressing buttons at random lose; a sharp scripted player wins with a median
-  quarter of his health left. Every recalc path (buff, expiry, equip) therefore
+  (the createMob formula), then the solo multipliers (`MORTHEN_SOLO_HP_MULT` x2.5,
+  rounded to a whole point, `MORTHEN_SOLO_DAMAGE_MULT` x2 on the weapon and the
+  kit's damage): 2978 hp, 82 to 130 at 2.6 sec, 234 armor at level 10. Tuned on a
+  headless probe against the party of five and its corpse run: standing still,
+  hitting only the tank or pressing buttons at random lose; a sharp scripted player
+  wins four shifts in five with a median quarter of his health left. Every recalc path (buff, expiry, equip) therefore
   lands on the same numbers.
 - **No cast pushback:** the profile sets `castPushbackReduction` to 1, as for a
   boss. The classic player pushback is uncapped per hit, so five adventurers
@@ -91,7 +91,16 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
   honor or stake is paid), and the client reads the same rule in
   `pvp_hostile_core.ts` (red names, hostile frame) and `game/interactions.ts`
   (attack cursor, right-click attack).
-- **Win, loss, stall:** every adventurer dead (or gone) wins; a lethal blow on
+- **Corpse run** (`corpse_run.ts`): a fallen adventurer lies silent, releases after
+  `CORPSE_RELEASE_TICKS` (the living call it out; the body stays raisable), and
+  after `CORPSE_RETURN_TICKS` walks back in alive at the Crypt entrance with the
+  instance re-entry pools (`RES_HP_FRACTION`), its marker aura back on and a fresh
+  brain; it announces its return once within say range. One corpse run each: a
+  second death is final. A whole-party wipe in round one is not a win: they all run
+  back together. A raised corpse leaves with its owner (`raisedCorpseIds` forgets it).
+- **Win, loss, stall:** every adventurer fallen for good (or gone) wins, and so does
+  the give-up: the last one standing with nobody left who can come back says a
+  goodbye line and leaves; a lethal blow on
   Morthen from any source is clamped to 1 hp by `death_intercept.ts` (called from
   `dealDamage`) and loses, and a loss beats a same-tick wipe; an adventurer that
   leaves the claim is removed from the run; a shift nobody finishes ends after
@@ -187,7 +196,10 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
   `localizeChatBody`, so player-authored say (no key) stays verbatim.
 - **Observed state, never a timer:** the `engaged` flip (notice), an adventurer
   going down (death), the healer under 15 percent mana (oom), two down or the
-  living party under 35 percent average health (wipe threat), each on its edge;
+  living party under 35 percent average health (wipe threat), a fallen one's
+  release (corpse run, said by a survivor), a returner coming into earshot
+  (returned, said by that returner only), each on its edge; the give-up line is
+  said by the last one standing on the tick the teardown runs;
   a loss (`pendingOutcome` 'lost' or a dead owner) makes a living bot say a win
   line on the tick the teardown runs, ahead of it in the run loop. That line
   reaches the chat log only: the teardown removes the speaker before the HUD
@@ -220,8 +232,7 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
   after the first playtest whether to fold aura deltas over the template.
 - **Open after the prototype:** the bots never form a party (their party buffs land
   on themselves only); the nameplate title and the greyed gear window wait for the
-  content step; the concept's "party gives up" lines need the corpse run, which the
-  prototype does not have; only the ferry counts as a transport refusal; the Raise
+  content step; only the ferry counts as a transport refusal; the Raise
   the Fallen slot lights up with no corpse in reach (the cast is refused cleanly);
   `hasMorthenIdentity` is an aura scan on the swing, proc and recalc paths of every
   host, cheap and accepted rather than gated on a run existing.
@@ -239,6 +250,7 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
 | `run_party.ts` | the fixed party, its spawn after the identity and its removal |
 | `hostility.ts` | pure leaf: the adventurer marker and the Morthen-versus-adventurer pair rule |
 | `death_intercept.ts` | the lethal-blow clamp `dealDamage` calls |
+| `corpse_run.ts` | the corpse run: release, the walk back in at the entrance, one run each, the give-up and the wipe rules |
 | `run_allies.ts` | the two skeleton allies: spawn, engage stance, Dread on death, dismissal |
 | `bot_brain.ts` | pure leaf: reaction, interrupt, kick-chance and control rules, ranges, triage, target scoring, seeds |
 | `bot_driver.ts` | the per-tick party driver through the real player verbs |

@@ -5,6 +5,7 @@
 // the Hud live, as the inline construction did.
 import type { GamepadKind } from '../../../game/gamepad_map';
 import { keyCapLabel } from '../../../game/keybinds';
+import { HUD_LOG } from '../../hud_tones';
 import { VehicleActionBarController } from './vehicle_action_bar_controller';
 
 type VehicleBarDeps = ConstructorParameters<typeof VehicleActionBarController>[0];
@@ -23,14 +24,7 @@ interface VehicleBarHost {
   playerGroundAim: VehicleBarDeps['cancelOnEnter'][number];
   empowerHold: VehicleBarDeps['cancelOnEnter'][number];
   attachTooltip(element: HTMLElement, html: () => string): void;
-  showBanner(
-    text: string,
-    motion?: boolean,
-    decorativeIconUrl?: string,
-    variant?: 'default',
-    subtext?: string,
-    durationMs?: number,
-  ): unknown;
+  log(text: string, color?: string): void;
 }
 
 export function createHudVehicleBar(hud: object): VehicleActionBarController {
@@ -45,8 +39,7 @@ export function createHudVehicleBar(hud: object): VehicleActionBarController {
     cancelOnEnter: [h.playerGroundAim, h.empowerHold],
     attachTooltip: (element, html) => h.attachTooltip(element, html),
     gliderPitchHold: (value) => h.optionsHooks?.gliderPitchHold?.(value),
-    showBanner: (text, durationMs) =>
-      h.showBanner(text, true, undefined, 'default', undefined, durationMs),
+    logTip: (text) => h.log(text, HUD_LOG.TIP),
     refreshPadBar: () => h.optionsHooks?.gamepad.refreshCrossHotbar?.(),
   });
 }

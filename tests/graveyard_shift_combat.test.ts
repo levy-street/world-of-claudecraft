@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { activePvpOpponentIds, isAttackableEntity } from '../src/game/interactions';
 import { CRYPT_DOOR_POS, dungeonAt } from '../src/sim/data';
 import { graveyardShiftRunFor } from '../src/sim/graveyard_shift';
+import { CORPSE_RETURN_TICKS } from '../src/sim/graveyard_shift/corpse_run';
 import {
   adventurerMarkerAura,
   graveyardShiftPairHostile,
@@ -130,10 +131,17 @@ describe('Graveyard Shift adventurers', () => {
     expect(tally()).toEqual(before);
   });
 
-  it('killing every adventurer wins: the party is cleared and the owner walks out', () => {
+  it('killing every adventurer twice wins: the party is cleared and the owner walks out', () => {
     const sim = shiftSim();
     const run = start(sim);
     const pids = run.bots.map((b) => b.pid);
+    for (const pid of pids) lethal(sim, sim.player, sim.entities.get(pid)!);
+    // A wipe in round one is not the end: they all run back together.
+    for (let i = 0; i < CORPSE_RETURN_TICKS; i++) {
+      expect(logs(sim.tick())).not.toContain('[dev] Graveyard Shift ended (won).');
+    }
+    sim.tick();
+    for (const pid of pids) expect(sim.entities.get(pid)!.dead).toBe(false);
     for (const pid of pids) lethal(sim, sim.player, sim.entities.get(pid)!);
     const events = sim.tick();
     expect(logs(events)).toContain('[dev] Graveyard Shift ended (won).');

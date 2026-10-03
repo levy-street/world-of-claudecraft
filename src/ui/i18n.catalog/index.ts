@@ -262,7 +262,7 @@ export const en = {
         },
       },
       // One line per kit ability, shown once per shift when it becomes useful
-      // (src/ui/hud/vehicle/morthen_hint_view.ts), through the HUD banner.
+      // (src/ui/hud/vehicle/morthen_hint_view.ts), as chat log tips.
       hints: {
         chain: "Sexton's Chain: pick one of them and drag them to you. The healer is a fine start.",
         pulse:
@@ -293,6 +293,23 @@ export const en = {
           popEverything: 'pop everything. POP EVERYTHING',
           wedding: "who's been saving a cooldown for their wedding",
           blamePet: "if we wipe I'm blaming the pet",
+        },
+        corpseRun: {
+          runningBack: "they're running back, hold on",
+          kiteHim: '30 sec, kite him',
+          stayAlive: 'just stay alive, just stay alive',
+        },
+        returned: {
+          roundTwo: 'ok round 2, for real this time',
+          tactics: "who has the boss's tactics?",
+          guideOnTheWay: 'I watched a guide on the way',
+          gearRed: "my gear is red, whatever, let's go",
+        },
+        giveUp: {
+          gn: "ok I'm out, gn",
+          ggBoss: 'gg boss, honestly that was sick',
+          betterRotation: 'the boss had a better rotation than me',
+          sameTime: 'same time tomorrow?',
         },
         partyWins: {
           firstTry: 'WE DID IT, first try',

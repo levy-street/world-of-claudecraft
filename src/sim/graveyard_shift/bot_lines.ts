@@ -4,7 +4,15 @@
 
 import type { BotRole } from './bot_brain';
 
-export type BotSayTrigger = 'notice' | 'death' | 'healerOom' | 'wipeThreat' | 'partyWins';
+export type BotSayTrigger =
+  | 'notice'
+  | 'death'
+  | 'healerOom'
+  | 'wipeThreat'
+  | 'corpseRun'
+  | 'returned'
+  | 'giveUp'
+  | 'partyWins';
 
 export interface BotLine {
   readonly id: string;
@@ -53,6 +61,23 @@ export const BOT_LINES: Readonly<Record<BotSayTrigger, readonly BotLine[]>> = {
     line('wipeThreat', 'popEverything', 'pop everything. POP EVERYTHING'),
     line('wipeThreat', 'wedding', "who's been saving a cooldown for their wedding"),
     line('wipeThreat', 'blamePet', "if we wipe I'm blaming the pet"),
+  ],
+  corpseRun: [
+    line('corpseRun', 'runningBack', "they're running back, hold on"),
+    line('corpseRun', 'kiteHim', '30 sec, kite him'),
+    line('corpseRun', 'stayAlive', 'just stay alive, just stay alive'),
+  ],
+  returned: [
+    line('returned', 'roundTwo', 'ok round 2, for real this time'),
+    line('returned', 'tactics', "who has the boss's tactics?"),
+    line('returned', 'guideOnTheWay', 'I watched a guide on the way'),
+    line('returned', 'gearRed', "my gear is red, whatever, let's go"),
+  ],
+  giveUp: [
+    line('giveUp', 'gn', "ok I'm out, gn"),
+    line('giveUp', 'ggBoss', 'gg boss, honestly that was sick'),
+    line('giveUp', 'betterRotation', 'the boss had a better rotation than me'),
+    line('giveUp', 'sameTime', 'same time tomorrow?'),
   ],
   partyWins: [
     line('partyWins', 'firstTry', 'WE DID IT, first try'),

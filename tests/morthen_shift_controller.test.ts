@@ -74,7 +74,7 @@ describe('Morthen shift state', () => {
     expect(refreshPadBar).toHaveBeenCalledTimes(2);
   });
 
-  it("shows the Sexton's Chain hint once through the banner, held for the hint duration", () => {
+  it("writes the Sexton's Chain hint once, not on every frame", () => {
     const world = fakeWorld(true);
     const { shift, showHint } = makeShift(world);
     shift.update();
@@ -82,7 +82,6 @@ describe('Morthen shift state', () => {
     expect(showHint).toHaveBeenCalledTimes(1);
     expect(showHint).toHaveBeenCalledWith(
       "Sexton's Chain: pick one of them and drag them to you. The healer is a fine start.",
-      MORTHEN_HINT_MS,
     );
   });
 
@@ -108,7 +107,7 @@ describe('Morthen shift state', () => {
 });
 
 describe('Morthen shift inside the vehicle bar family, on a real offline run', () => {
-  it('forwards the hint to the banner dep and leaves slot presses to the action bar', () => {
+  it('forwards the hint to the chat-log tip dep and leaves slot presses to the action bar', () => {
     const sim = new Sim({
       seed: 42,
       playerClass: 'mage',
@@ -119,7 +118,7 @@ describe('Morthen shift inside the vehicle bar family, on a real offline run', (
     });
     sim.setPlayerLevel(10);
     document.body.innerHTML = '<div id="ui"></div>';
-    const showBanner = vi.fn();
+    const logTip = vi.fn();
     const refreshPadBar = vi.fn();
     const bar = new VehicleActionBarController({
       world: sim as unknown as ConstructorParameters<typeof VehicleActionBarController>[0]['world'],
@@ -128,17 +127,14 @@ describe('Morthen shift inside the vehicle bar family, on a real offline run', (
       consumePeek: () => false,
       cancelOnEnter: [],
       attachTooltip: () => {},
-      showBanner,
+      logTip,
       refreshPadBar,
     });
     sim.chat('/dev graveyardshift start');
     bar.update();
     expect(VehicleActionBarController.blocksPlayerActions(sim)).toBe(false);
     expect(document.body.classList.contains(MORTHEN_SHIFT_BODY_CLASS)).toBe(true);
-    expect(showBanner).toHaveBeenCalledWith(
-      expect.stringMatching(/^Sexton's Chain/),
-      MORTHEN_HINT_MS,
-    );
+    expect(logTip).toHaveBeenCalledWith(expect.stringMatching(/^Sexton's Chain/));
     expect(refreshPadBar).toHaveBeenCalledTimes(1);
     expect(document.getElementById('morthen-action-bar')).toBeNull();
     sim.chat('/dev graveyardshift end');

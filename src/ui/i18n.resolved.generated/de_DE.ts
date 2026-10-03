@@ -261,6 +261,23 @@ export const de_DE: EnTranslations = {
           "wedding": "who's been saving a cooldown for their wedding",
           "blamePet": "if we wipe I'm blaming the pet"
         },
+        "corpseRun": {
+          "runningBack": "they're running back, hold on",
+          "kiteHim": "30 sec, kite him",
+          "stayAlive": "just stay alive, just stay alive"
+        },
+        "returned": {
+          "roundTwo": "ok round 2, for real this time",
+          "tactics": "who has the boss's tactics?",
+          "guideOnTheWay": "I watched a guide on the way",
+          "gearRed": "my gear is red, whatever, let's go"
+        },
+        "giveUp": {
+          "gn": "ok I'm out, gn",
+          "ggBoss": "gg boss, honestly that was sick",
+          "betterRotation": "the boss had a better rotation than me",
+          "sameTime": "same time tomorrow?"
+        },
         "partyWins": {
           "firstTry": "WE DID IT, first try",
           "respect": "the boss almost had us, respect"

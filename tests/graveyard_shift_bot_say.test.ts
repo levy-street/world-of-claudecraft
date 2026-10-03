@@ -125,9 +125,10 @@ describe('Graveyard Shift say lines (run)', () => {
     kill(sim, botEntity(sim, run, 'dps'));
     const heard = runTicks(sim, 40);
     expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).toBe(run);
-    // The line was spoken (a bot heard it) but never reached Morthen.
-    expect(heard.length).toBeGreaterThan(0);
-    expect(heardBy(heard, sim.playerId)).toEqual([]);
+    // The line was spoken (the run records it) but never reached Morthen, and
+    // no adventurer, living or fallen, got a copy either.
+    expect(run.say?.used.size ?? 0).toBeGreaterThan(0);
+    expect(heard).toEqual([]);
   });
 
   it('dead bots never speak: with four down only the survivor talks', () => {

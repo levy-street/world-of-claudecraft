@@ -10,8 +10,12 @@ import { SAY_RANGE } from '../sim';
 import type { SimContext } from '../sim_context';
 import { dist2d, type Entity, TICK_RATE } from '../types';
 import { BOT_LINES, type BotLine, type BotSayTrigger, botLineAllowed } from './bot_lines';
-import { isGraveyardShiftAdventurer } from './hostility';
-import type { GraveyardShiftBot, GraveyardShiftRun } from './run_state';
+import { releasingNow } from './corpse_run';
+import {
+  type GraveyardShiftBot,
+  type GraveyardShiftRun,
+  isGraveyardShiftBotPid,
+} from './run_state';
 
 // One line every 3 sec across the party, and 10 sec between two lines of a bot.
 export const BOT_SAY_GLOBAL_COOLDOWN_TICKS = 3 * TICK_RATE;
@@ -29,6 +33,8 @@ export const BOT_SAY_WIPE_HP_FRACTION = 0.35;
 interface PendingSay {
   readonly trigger: BotSayTrigger;
   readonly expiresTick: number;
+  // Only this adventurer may say it (a returner announcing its own arrival).
+  readonly speakerPid?: number;
 }
 
 // Session-only say state, created on the run's first say tick.
@@ -85,21 +91,38 @@ export function updateGraveyardShiftSay(ctx: SimContext, run: GraveyardShiftRun)
   }
   if (now - state.lastTick < BOT_SAY_GLOBAL_COOLDOWN_TICKS) return;
   for (let i = 0; i < state.pending.length; i++) {
-    if (speak(ctx, run, state, state.pending[i].trigger, false)) {
+    const pending = state.pending[i];
+    if (speak(ctx, run, state, pending.trigger, false, pending.speakerPid)) {
       state.pending.splice(i, 1);
       return;
     }
   }
 }
 
-function queue(state: BotSayState, trigger: BotSayTrigger, now: number): void {
-  if (state.pending.some((p) => p.trigger === trigger)) return;
-  state.pending.push({ trigger, expiresTick: now + BOT_SAY_PENDING_TICKS });
+function queue(state: BotSayState, trigger: BotSayTrigger, now: number, speakerPid?: number): void {
+  if (state.pending.some((p) => p.trigger === trigger && p.speakerPid === speakerPid)) return;
+  state.pending.push({ trigger, expiresTick: now + BOT_SAY_PENDING_TICKS, speakerPid });
+}
+
+// The last adventurer standing says its goodbye before it leaves (the closing
+// line: the teardown follows on the same tick, so it skips the cooldowns).
+export function sayGraveyardShiftGiveUp(ctx: SimContext, run: GraveyardShiftRun): void {
+  run.say ??= freshBotSayState(run.seed);
+  speak(ctx, run, run.say, 'giveUp', true);
 }
 
 function observe(ctx: SimContext, run: GraveyardShiftRun, state: BotSayState, now: number): void {
   if (run.engaged && !state.sawEngaged) queue(state, 'notice', now);
   state.sawEngaged = run.engaged;
+  if (releasingNow(ctx, run)) queue(state, 'corpseRun', now);
+  const boss = ctx.entities.get(run.ownerPid);
+  for (const bot of run.bots) {
+    const e = ctx.entities.get(bot.pid);
+    if (!bot.returning || !living(e) || !boss) continue;
+    if (dist2d(e.pos, boss.pos) > SAY_RANGE) continue;
+    bot.returning = false;
+    queue(state, 'returned', now, bot.pid);
+  }
   let dead = 0;
   let hpSum = 0;
   let alive = 0;
@@ -137,12 +160,13 @@ function speak(
   state: BotSayState,
   trigger: BotSayTrigger,
   ignoreCooldowns: boolean,
+  speakerPid?: number,
 ): boolean {
   const now = ctx.tickCount;
   const candidates: { bot: GraveyardShiftBot; e: Entity; lines: BotLine[] }[] = [];
   for (const bot of run.bots) {
     const e = ctx.entities.get(bot.pid);
-    if (!living(e)) continue;
+    if (!living(e) || (speakerPid !== undefined && bot.pid !== speakerPid)) continue;
     const last = state.botLastTick.get(bot.pid);
     if (!ignoreCooldowns && last !== undefined && now - last < BOT_SAY_BOT_COOLDOWN_TICKS) {
       continue;
@@ -165,8 +189,11 @@ function speak(
 function emitBotSay(ctx: SimContext, speaker: Entity, said: BotLine): void {
   for (const meta of ctx.players.values()) {
     const p = ctx.entities.get(meta.entityId);
-    // The party's own members need no copy: they are client-less.
-    if (!p || isGraveyardShiftAdventurer(p) || dist2d(p.pos, speaker.pos) > SAY_RANGE) continue;
+    // The party's own members need no copy: they are client-less. Keyed on the
+    // roster, not the marker aura, which a death strips.
+    if (!p || isGraveyardShiftBotPid(ctx, p.id) || dist2d(p.pos, speaker.pos) > SAY_RANGE) {
+      continue;
+    }
     ctx.emit({
       type: 'chat',
       fromPid: speaker.id,

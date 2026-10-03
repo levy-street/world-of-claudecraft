@@ -28,6 +28,11 @@ export interface GraveyardShiftBot {
   readonly role: 'tank' | 'healer' | 'dps';
   readonly cls: PlayerClass;
   readonly brain: BotBrainState;
+  // The corpse run (corpse_run.ts): deaths so far, the tick of the current
+  // death (null while standing), and walking back in, not yet heard arriving.
+  deaths: number;
+  diedTick: number | null;
+  returning: boolean;
 }
 
 export interface GraveyardShiftRun {

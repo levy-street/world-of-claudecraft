@@ -15,7 +15,7 @@ while it is on). `morthen_shift_controller.ts`, composed here only because this
 controller already runs every frame, keys on the identity aura: it stamps the
 `morthen-shift` body class (the extra rows, stances, pets and consumables stand down),
 asks the pad bar to re-show its resting row on each flip, and shows each kit hint line
-(`morthen_hint_view.ts`, once per shift) through the HUD banner.
+(`morthen_hint_view.ts`, once per shift) to the chat log as tips.
 
 ## Known limits of the Graveyard Shift HUD (prototype)
 - **The character sheet paperdoll and the unit-frame portraits show the player's own

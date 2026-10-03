@@ -3,15 +3,14 @@
 // possess-bar override, src/game/morthen_controls.ts), so this owns no bar: it
 // stamps the morthen-shift body class (the bars Morthen has no use for stand
 // down), cancels a ground aim or empowered hold carried in, asks the pad bar to
-// re-show its resting row when the kit comes or goes, and shows each kit hint
-// line (morthen_hint_view.ts) through the HUD banner.
+// re-show its resting row when the kit comes or goes, and writes each kit hint
+// line (morthen_hint_view.ts) to the chat log as a tip.
 
 import { morthenControlsActive } from '../../../game/morthen_controls';
 import type { IWorld } from '../../../world_api';
 import type { PainterHostWriters } from '../../painter_host';
 import {
   createMorthenHints,
-  MORTHEN_HINT_MS,
   type MorthenHintId,
   morthenCorpseInReach,
   morthenHintText,
@@ -25,7 +24,7 @@ export interface MorthenShiftDeps {
   world: MorthenShiftWorld;
   writers: PainterHostWriters;
   cancelOnEnter: readonly { cancel(): void }[];
-  showHint(text: string, durationMs: number): void;
+  showHint(text: string): void;
   refreshPadBar(): void;
   now?(): number;
 }
@@ -56,6 +55,6 @@ export class MorthenShiftController {
     const id = this.hints.tick(now, this.deps.world.player.resource, this.corpseInReach);
     if (id === this.hintId) return;
     this.hintId = id;
-    if (id !== null) this.deps.showHint(morthenHintText(id), MORTHEN_HINT_MS);
+    if (id !== null) this.deps.showHint(morthenHintText(id));
   }
 }

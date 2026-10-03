@@ -3,9 +3,9 @@
 // first playtest found the kit unreadable from tooltips alone). Sexton's Chain
 // on arrival, Shadow Pulse the first time the Dread pays for it, Raise the
 // Fallen the first time a corpse lies within its reach. One line at a time,
-// each held for MORTHEN_HINT_MS, later ones queued. The shift controller shows
-// each line through the HUD banner, which every surface (desktop, touch, pad)
-// already reads.
+// at most one per MORTHEN_HINT_MS, later ones queued. The shift controller
+// writes each line to the chat log as a tip, which every surface (desktop,
+// touch, pad) already shows.
 
 import { MORTHEN_KIT } from '../../../sim/graveyard_shift/kit';
 import type { Entity } from '../../../sim/types';

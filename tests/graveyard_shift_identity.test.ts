@@ -116,8 +116,8 @@ describe('Graveyard Shift Morthen identity', () => {
     const p = sim.player;
     expect(hasMorthenIdentity(p)).toBe(true);
     expect(p.level).toBe(10);
-    expect(p.maxHp).toBe(2382);
-    expect(p.hp).toBe(2382);
+    expect(p.maxHp).toBe(2978);
+    expect(p.hp).toBe(2978);
     expect(p.stats.armor).toBe(234);
     expect(p.weapon).toEqual({ min: 82, max: 130, speed: 2.6 });
     expect(p.attackPower).toBe(0);
@@ -149,10 +149,10 @@ describe('Graveyard Shift Morthen identity', () => {
     start(sim);
     const p = sim.player;
     (sim as any).applyAura(p, { ...foreignAura('buff_str', p.id), value: 50, remaining: 0.2 });
-    expect(p.maxHp).toBe(2382);
+    expect(p.maxHp).toBe(2978);
     for (let i = 0; i < 10; i++) sim.tick();
     expect(p.auras.some((a) => a.id === 'test_buff_str')).toBe(false);
-    expect(p.maxHp).toBe(2382);
+    expect(p.maxHp).toBe(2978);
     expect(p.weapon).toEqual({ min: 82, max: 130, speed: 2.6 });
   });
 
@@ -268,7 +268,7 @@ describe('Graveyard Shift Morthen identity', () => {
     start(sim);
     sim.chat('/dev mounts');
     expect(sim.player.level).toBe(10);
-    expect(sim.player.maxHp).toBe(2382);
+    expect(sim.player.maxHp).toBe(2978);
     end(sim);
     expect(sim.player.level).toBe(12);
     expect(meta(sim).lifetimeXp).toBe(lifetimeXp);
@@ -325,8 +325,8 @@ describe('Graveyard Shift Morthen identity', () => {
     });
     (sim as any).applyAura(p, { ...foreignAura('buff_sta', p.id), value: 50, remaining: 30 });
     (sim as any).applyAura(p, { ...foreignAura('buff_str', p.id), value: 50, remaining: 30 });
-    expect(p.maxHp).toBe(2382);
-    expect(p.hp).toBe(2382);
+    expect(p.maxHp).toBe(2978);
+    expect(p.hp).toBe(2978);
     expect(p.attackPower).toBe(0);
     expect(p.stats.str).toBe(0);
   });
@@ -336,7 +336,7 @@ describe('Graveyard Shift Morthen identity', () => {
     start(sim);
     for (let i = 0; i < 20 * 60; i++) sim.tick();
     expect(hasMorthenIdentity(sim.player)).toBe(true);
-    expect(sim.player.maxHp).toBe(2382);
+    expect(sim.player.maxHp).toBe(2978);
   });
 
   it.each([false, true])(

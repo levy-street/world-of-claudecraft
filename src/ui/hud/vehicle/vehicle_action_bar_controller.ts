@@ -47,8 +47,8 @@ interface VehicleBarDeps {
   /** Flight bar Climb/Dive slots: a held pointer pins the glider pitch (+1 climb,
    *  -1 dive) until release; 0 hands control back to the camera. */
   gliderPitchHold?(value: -1 | 0 | 1): void;
-  /** The Graveyard Shift hint lines ride the HUD banner. */
-  showBanner?(text: string, durationMs: number): void;
+  /** The Graveyard Shift hint lines land in the chat log as tips. */
+  logTip?(text: string): void;
   /** Re-show the pad's resting cross hotbar (the Morthen kit came or went). */
   refreshPadBar?(): void;
 }
@@ -113,7 +113,7 @@ export class VehicleActionBarController {
             world: deps.world as MorthenShiftWorld,
             writers: deps.writers,
             cancelOnEnter: deps.cancelOnEnter,
-            showHint: (text, durationMs) => deps.showBanner?.(text, durationMs),
+            showHint: (text) => deps.logTip?.(text),
             refreshPadBar: () => deps.refreshPadBar?.(),
           })
         : null;

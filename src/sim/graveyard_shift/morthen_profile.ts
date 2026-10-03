@@ -11,13 +11,12 @@ import { carriedDread, DREAD_MAX } from './dread';
 export const MORTHEN_TEMPLATE_ID = 'morthen';
 
 // One player against a party: the template is tuned to lose to five players.
-// Owner decision: scale the boss, not the party. Tuned after the first playtest
-// (three bots and x3 health felt far too easy) against the full party of five,
-// on a headless probe over five seeds (2026-10-03): standing still, hitting
-// only the tank, or pressing buttons at random all lose; a sharp scripted
-// player (Chain the healer, Pulse into the melee, raise the dead) wins with a
-// median quarter of his health left.
-export const MORTHEN_SOLO_HP_MULT = 2;
+// Owner decision: scale the boss, not the party. Tuned on a headless probe over
+// five seeds against the full party of five and its corpse run (2026-10-04):
+// standing still, hitting only the tank, or pressing buttons at random all
+// lose; a sharp scripted player (Chain the healer, Pulse into the melee, raise
+// the dead) wins four shifts in five, with a median quarter of his health left.
+export const MORTHEN_SOLO_HP_MULT = 2.5;
 export const MORTHEN_SOLO_DAMAGE_MULT = 2;
 
 // The level the owner is pinned to for the run (the template's own level).
@@ -38,7 +37,7 @@ export function applyMorthenProfile(
 ): void {
   const base = mobBaseStats(MOBS[MORTHEN_TEMPLATE_ID], e.level);
   const hpFrac = prevMaxHp > 0 ? prevHp / prevMaxHp : 1;
-  e.maxHp = base.maxHp * MORTHEN_SOLO_HP_MULT;
+  e.maxHp = Math.round(base.maxHp * MORTHEN_SOLO_HP_MULT);
   e.hp = e.dead ? 0 : Math.max(1, Math.round(e.maxHp * hpFrac));
   e.weapon = {
     min: base.weapon.min * MORTHEN_SOLO_DAMAGE_MULT,

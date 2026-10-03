@@ -65,6 +65,9 @@ export function spawnGraveyardShiftParty(ctx: SimContext, run: GraveyardShiftRun
         healTargetId: null,
         healAt: 0,
       },
+      deaths: 0,
+      diedTick: null,
+      returning: false,
     };
     run.bots.push(bot);
   });

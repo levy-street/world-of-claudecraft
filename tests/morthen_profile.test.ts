@@ -27,7 +27,8 @@ describe('Morthen profile (pure)', () => {
     const e = owner();
     applyMorthenProfile(e, 200, 400, 'rage', 0);
     const base = mobBaseStats(MOBS.morthen, morthenLevel());
-    expect(e.maxHp).toBe(base.maxHp * MORTHEN_SOLO_HP_MULT);
+    expect(e.maxHp).toBe(Math.round(base.maxHp * MORTHEN_SOLO_HP_MULT));
+    expect(Number.isInteger(e.maxHp)).toBe(true);
     expect(e.weapon).toEqual({
       min: base.weapon.min * MORTHEN_SOLO_DAMAGE_MULT,
       max: base.weapon.max * MORTHEN_SOLO_DAMAGE_MULT,

@@ -28,7 +28,8 @@ import { TICK_RATE } from '../types';
 import { wispMazeActionsLocked } from '../wisp_maze_action_lock';
 import { graveyardShiftRunSeed } from './bot_brain';
 import { updateGraveyardShiftBots } from './bot_driver';
-import { updateGraveyardShiftSay } from './bot_say';
+import { sayGraveyardShiftGiveUp, updateGraveyardShiftSay } from './bot_say';
+import { partyGivesUp, partyWiped, updateGraveyardShiftCorpseRuns } from './corpse_run';
 import { applyMorthenIdentity, removeMorthenIdentity } from './morthen_transform';
 import {
   dismissGraveyardShiftAllies,
@@ -200,7 +201,10 @@ export function updateGraveyardShift(ctx: SimContext): void {
       endGraveyardShift(ctx, run, 'aborted');
     } else {
       pruneStrayBots(ctx, run);
-      if (run.bots.every((bot) => ctx.entities.get(bot.pid)?.dead !== false)) {
+      updateGraveyardShiftCorpseRuns(ctx, run);
+      if (partyWiped(ctx, run)) endGraveyardShift(ctx, run, 'won');
+      else if (partyGivesUp(ctx, run)) {
+        sayGraveyardShiftGiveUp(ctx, run);
         endGraveyardShift(ctx, run, 'won');
       } else {
         updateGraveyardShiftAllies(ctx, run);
