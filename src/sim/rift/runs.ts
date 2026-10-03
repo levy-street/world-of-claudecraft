@@ -23,6 +23,7 @@ import {
 } from '../data';
 import { layoutColliders } from '../dungeon_layout';
 import { createGroundObject, createMob } from '../entity';
+import { gliderActionsLocked } from '../glider_action_lock';
 import type { LootTier } from '../lockpick';
 import { RIFT_MECHANIC_SPACING_SEC } from '../mob/mechanic_spacing';
 import {
@@ -30,9 +31,11 @@ import {
   grantRiftClearEmbers,
 } from '../professions/masterwrought_materials';
 import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
+import { shadowActionsLocked } from '../shadow_action_lock';
 import type { SimContext } from '../sim_context';
 import { mayEnterVaultPortal, vaultForPortal, vaultScaledTuning } from '../treasure_vault';
 import { DT, dist2d, type Entity, type SimEvent, type Vec3 } from '../types';
+import { wispMazeActionsLocked } from '../wisp_maze_action_lock';
 import { isInWaterBody } from '../world';
 import { riftFx } from './fx';
 import { tickHoardAddCasts } from './hoard_add_casts';
@@ -630,6 +633,18 @@ export function enterRift(
       r.e.riftDeniedAt = ctx.time;
       ctx.error(r.meta.entityId, 'All rifts are unstable right now. Try again soon.');
     }
+    return;
+  }
+  // A live world quest trial (wisp maze, shadow, glider) owns the player's
+  // movement, so a portal on its route must never pull them out mid-run. Walk-in
+  // and click both pass the portal, so this one gate covers both; no error line,
+  // since the trial already fills the screen and walk-in would repeat it.
+  if (
+    portal &&
+    (wispMazeActionsLocked(r.meta.worldQuestLog) ||
+      shadowActionsLocked(r.meta.worldQuestLog) ||
+      gliderActionsLocked(r.meta.worldQuestLog))
+  ) {
     return;
   }
   // A treasure vault is private: only the map's owner and their party may

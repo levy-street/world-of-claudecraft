@@ -17,6 +17,8 @@
 // zone loses nothing) and pays a share of the honor pool to everyone who
 // worked for it: the killing blow, everyone who damaged the victim inside the
 // assist window, and every healer who kept one of those damagers standing.
+// When the killing blow is flagged too, its gold share DROPS on the body with
+// the victim's trophy skull instead (world_pvp_spoils.ts).
 // Healing, shielding or buffing a flagged player who is in a world fight
 // raises the caster's own flag first (the classic rule), so nobody can carry a
 // fight from behind a flag they do not wear. The books that remember who hit,
@@ -38,6 +40,7 @@
 // the server, and the headless env resolve every flag and every kill
 // identically.
 
+import { zoneContaining } from '../data';
 import { formatMoney } from '../format_money';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -60,6 +63,7 @@ import {
   worldPvpStake,
   worldPvpVictimIsGrey,
 } from './world_pvp_rules';
+import { placeWorldPvpSpoils, sweepWorldPvpSpoils, worldPvpSpoilsLine } from './world_pvp_spoils';
 import { worldPvpZonePolicyAt } from './world_pvp_zones';
 
 /** The authoritative per-character flag state (PlayerMeta.worldPvp). */
@@ -121,6 +125,12 @@ export interface WorldPvpBooks {
    *  enter/leave notices fire once per crossing. Rows of players who left the
    *  world are dropped. */
   zoneOf: Map<number, WorldPvpZonePolicy>;
+  /** victim pid -> killer pid for every body holding World PvP spoils
+   *  (world_pvp_spoils.ts): the killing blow's gold and the victim's skull,
+   *  waiting to be looted. A row leaves the moment the body is settled
+   *  (release, revive, or the zone pass noticing it stood up or left), so it
+   *  is bounded by the flagged players lying dead with spoils right now. */
+  spoils: Map<number, number>;
   /** The earliest pending disarm (sim time), Infinity when nobody is switching
    *  off: the per-tick pass is skipped entirely until then, so a realm with no
    *  countdown running pays one comparison per tick, not a roster walk. */
@@ -141,6 +151,7 @@ export function newWorldPvpBooks(): WorldPvpBooks {
     paidDeaths: new Set(),
     killsByPair: new Map(),
     zoneOf: new Map(),
+    spoils: new Map(),
     nextDisarmAt: Number.POSITIVE_INFINITY,
     zonePassTick: Number.NEGATIVE_INFINITY,
     sweptAtTick: 0,
@@ -198,6 +209,28 @@ function playerOf(ctx: SimContext, pid: number): { e: Entity; meta: PlayerMeta }
 
 function notice(ctx: SimContext, pid: number, text: string, color = NOTICE_COLOR): void {
   ctx.emit({ type: 'log', text, color, pid });
+}
+
+/** The server-only kill-feed record (SimEvent 'worldPvpKill'): once per paid
+ *  death, both resolution arms. No pid, no rng, no text: the server resolves
+ *  the zone name and the Discord bot writes the line. */
+function emitKillFeed(
+  ctx: SimContext,
+  killer: Entity,
+  victim: Entity,
+  assists: number,
+  copper: number,
+): void {
+  ctx.emit({
+    type: 'worldPvpKill',
+    killerName: killer.name,
+    victimName: victim.name,
+    killerLevel: killer.level,
+    victimLevel: victim.level,
+    zoneId: zoneContaining(victim.pos.x, victim.pos.z)?.id ?? null,
+    assists,
+    copper,
+  });
 }
 
 /** The disarm delay in whole minutes, for the notice line. */
@@ -373,6 +406,9 @@ export function updateWorldPvp(ctx: SimContext): void {
     // WARFARE Vitality rides this pass but not the world switch: battlegrounds
     // and arenas grant it on a realm with world PvP turned off too.
     updatePvpVitality(ctx);
+    // Spoils ride the zone pass but not the world switch either: a body that
+    // dropped spoils before an operator flipped the switch still settles.
+    sweepWorldPvpSpoils(ctx);
     if (!ctx.worldPvpDisabled) noticeZoneChanges(ctx, books);
   }
   if (ctx.tickCount - books.sweptAtTick >= SWEEP_TICKS) {
@@ -386,6 +422,13 @@ export function updateWorldPvp(ctx: SimContext): void {
 function inInstancedPvp(ctx: SimContext, pid: number): boolean {
   if (ctx.bgMatches.get(pid)?.state === 'active') return true;
   return ctx.arenaMatches.get(pid)?.state === 'active';
+}
+
+/** A player manning a world-quest cannon (src/sim/vehicles.ts) is frozen at the
+ *  station with no class actions, and entering combat ends the session: letting
+ *  the world arm reach them would only eject a defender who cannot fight back. */
+function inWorldQuestVehicle(ctx: SimContext, pid: number): boolean {
+  return !!ctx.players.get(pid)?.vehicle;
 }
 
 /** Two players mid-duel are under the duel's rules: a consensual duel fought
@@ -405,10 +448,11 @@ function inSameParty(ctx: SimContext, a: number, b: number): boolean {
 /**
  * The open-world hostility arm isHostileTo consults for two PLAYERS (the
  * coordinator resolves a pet to its owner first). Neither jailed (the jail has
- * its own brawl rule), neither in a live battleground or arena, not mid-duel
- * with each other, the realm's kill switch clear, and then the pure pair rule
- * over the two flags and the two zone policies (world_pvp_rules.ts
- * worldPvpPairHostile). Symmetric. Reads the ground live (rectangle scans
+ * its own brawl rule), neither in a live battleground or arena, neither manning
+ * a world-quest cannon, not mid-duel with each other, the realm's kill switch
+ * clear, and then the pure pair rule over the two flags and the two zone
+ * policies (world_pvp_rules.ts worldPvpPairHostile). Symmetric. Reads the
+ * ground live (rectangle scans
  * over the zone table) rather than the zone pass's cache, so a player who
  * just crossed a line, teleported or was towed is judged where they stand.
  * The early returns before the second scan are each implied by the pure
@@ -424,6 +468,7 @@ export function isWorldPvpHostile(ctx: SimContext, attacker: Entity, target: Ent
   if (attacker.id === target.id || ctx.worldPvpDisabled) return false;
   if (attacker.jailed || target.jailed) return false;
   if (inInstancedPvp(ctx, attacker.id) || inInstancedPvp(ctx, target.id)) return false;
+  if (inWorldQuestVehicle(ctx, attacker.id) || inWorldQuestVehicle(ctx, target.id)) return false;
   if (inActiveDuelTogether(ctx, attacker.id, target.id)) return false;
   const sameParty = inSameParty(ctx, attacker.id, target.id);
   if (worldPvpPairExempt(attacker, target, sameParty)) return false;
@@ -680,6 +725,9 @@ export function worldPvpOnPlayerDeath(
   const n = contributors.length;
   if (n === 0) {
     notice(ctx, victim.id, worldPvpDefeatLine(killerPlayer.name, 0, 1), DEFEATED_COLOR);
+    // Still a kill for the feed: nobody earned (grey victim, fully decayed
+    // pair, an oversized group), but the killing blow landed.
+    emitKillFeed(ctx, killerPlayer, victim, 0, 0);
     return;
   }
   const gold = worldPvpSplit(victim.pvpFlag ? worldPvpStake(victimMeta.copper) : 0, n);
@@ -693,13 +741,26 @@ export function worldPvpOnPlayerDeath(
     const honorShare = Math.floor((honor.share + (isKiller ? honor.killerBonus : 0)) * c.mult);
     notePairKill(ctx, c.meta, victimMeta);
     ensureState(c.meta).kills++;
-    c.meta.copper += goldShare;
     taken += goldShare;
-    notice(ctx, c.e.id, worldPvpKillLine(victim.name, goldShare, n));
+    if (isKiller && victim.pvpFlag && c.e.pvpFlag) {
+      // Both flagged: the killing blow's share DROPS on the body beside the
+      // victim's skull (world_pvp_spoils.ts), to be looted like any corpse.
+      placeWorldPvpSpoils(ctx, victim, c.e, goldShare);
+      notice(ctx, c.e.id, worldPvpKillLine(victim.name, 0, n));
+      notice(ctx, c.e.id, worldPvpSpoilsLine(victim.name));
+    } else {
+      c.meta.copper += goldShare;
+      notice(ctx, c.e.id, worldPvpKillLine(victim.name, goldShare, n));
+    }
     grantHonor(ctx, c.meta, honorShare, isKiller ? 'world_kill' : 'world_assist');
   }
   victimMeta.copper = Math.max(0, victimMeta.copper - taken);
   notice(ctx, victim.id, worldPvpDefeatLine(killerPlayer.name, taken, n), DEFEATED_COLOR);
+  // The killing blow may itself be excluded from the pool (grey, decayed), so
+  // assists count every credited contributor who is NOT the killer.
+  let assists = 0;
+  for (const c of contributors) if (c.e.id !== killerPlayer.id) assists++;
+  emitKillFeed(ctx, killerPlayer, victim, assists, taken);
 }
 
 /** The IWorld readout for the World PvP tab and the target/nameplate cores.

@@ -809,8 +809,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.record': '戦績：撃破{kills}、死亡{deaths}',
   'hudChrome.worldPvp.repeatLine':
     '同じプレイヤーを繰り返し倒すと、2回目は{second}、3回目は{third}、以降は何も得られません。カウントは最初の撃破から{reset}後にリセットされます。',
+  'hudChrome.worldPvp.skullName': '{name}の頭蓋骨',
   'hudChrome.worldPvp.splitLine':
     '純粋な1対1なら報酬を独占できます。加勢した仲間とそのヒーラーは分配します。',
+  'hudChrome.worldPvp.spoilsLine':
+    '双方がフラグを立てている場合、とどめを刺した者の取り分の金貨が敗者の頭蓋骨と共に遺体に落ちます。',
   'hudChrome.worldPvp.stakeLine': '敗者は所持金の{percent}か{cap}のうち、少ない方を支払います。',
   'hudChrome.worldPvp.statusDisarming':
     'フラグは{time}後、または現在の戦闘が終わり次第下がります。',
@@ -2031,6 +2034,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'デイリー報酬への参加はあと{remaining}禁止されています。解除日時: {until}。理由: {reason}',
   'hudChrome.keybinds.discord': 'Discord',
   'hudChrome.spectate.banner': '{name}を観戦中',
+  'hudChrome.realmMotd.line': '本日のお知らせ：{text}',
+  'hudChrome.realmMotd.updated': '本日のお知らせを更新しました。',
+  'hudChrome.realmMotd.cleared': '本日のお知らせを削除しました。',
+  'hudChrome.realmMotd.none': '本日のお知らせは設定されていません。',
+  'hudChrome.realmMotd.usage': '使い方：/motd "<メッセージ>" で設定、/motd clear で削除します。',
+  'hudChrome.realmMotd.tooLong': '本日のお知らせは最大{max}文字です。',
+  'hudChrome.realmMotd.saveFailed':
+    '本日のお知らせを保存できませんでした。サーバーを再起動すると失われます。',
   'hudChrome.readyCheck.prompt': '{name} が準備確認を開始しました。準備はいいですか？',
   'hudChrome.readyCheck.ready': '準備完了',
   'hudChrome.readyCheck.notReady': '準備未完了',
@@ -2826,6 +2837,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '同じプレイヤーを繰り返し倒すと報酬は毎回減り、すぐにゼロになります。そのプレイヤーに対するカウントは最初の撃破からおよそ1時間後にようやく元に戻るため、一人を狙い続けて待つ価値はありません。自分よりはるかに低いレベルの相手からは何も得られません。バトルグラウンドとアリーナの中では独自のルールが適用され、オープンワールドより多くの名誉を支払うため、ワールドPvPは同じ商人へ向かう遠回りの道です。',
   'guide.worldPvpPage.hillBodyRamp':
     '3時間に1度、予測できない時刻に、無差別戦闘地帯のいずれかに15分後に丘が現れることがレルム全体に告知され、丘が立つ円が開けた土地に示されます。丘は現れてから45分間立ち続け、その後消えます。円の中に立つプレイヤーが最も多いパーティが丘を争い、1分間途切れずに多数を保てば丘はそのパーティのものになります。単独のプレイヤーは一人のパーティとして数えますが、レイドのメンバーは一切数えられません。パーティが丘を占拠している間、円の中に立つそのメンバーは毎分名誉を得て、同じパーティが占拠し続けるほど1分ごとの名誉は増えていきます。満員のパーティが誰にも争われずに丘が立っている間ずっと占拠し続けると、バトルグラウンドの勝利およそ3回分の名誉になります。丘の持ち主が変わると、新しい持ち主の積み上げは最初から始まります。フィールド上部のバーが、誰が占拠しているか、あなた側と相手の人数、そして争奪の時計を表示します。チャットで /hill と入力すると丘の場所が分かります。',
+  'guide.worldPvpPage.hillBodyRanked':
+    '3時間に1度、無差別戦闘地帯のいずれかに丘が現れます。丘が立っている間は5分ごとに、その場所と各グループの占拠時間ランキングがレルム全体に告知されます。丘が消えると、合計占拠時間が最も長いグループに属し、そのグループの占拠中に円内に1分以上立っており、終了時にも同じグループに残っているプレイヤーは、週間宝物庫のPvP進捗に1勝を獲得します。',
   'guide.worldPvpPage.limitsBodyRaids':
     '同じプレイヤーを繰り返し倒すと報酬は毎回減り、すぐにゼロになります。そのプレイヤーに対するカウントは最初の撃破からおよそ1時間後にようやく元に戻るため、一人を狙い続けて待つ価値はありません。自分よりはるかに低いレベルの相手からは何も得られません。バトルグラウンドとアリーナの中では独自のルールが適用され、オープンワールドより多くの名誉を支払うため、ワールドPvPは同じ商人へ向かう遠回りの道です。レイドはワールドでの撃破から何も得られません。レイドのメンバーは名誉もゴールドも受け取らず、他の人の取り分も減らさないため、報酬を得るにはパーティで戦いましょう。',
   'guide.worldPvpPage.hillHeading': '丘の王',
@@ -3126,6 +3139,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.confirmVendorSellMinQuality': '確認する売却品質の下限',
   'hudChrome.options.confirmVendorSellMinQualityNote':
     'この品質未満のアイテムはワンクリックで売却されます。誤って売却したアイテムは商人から買い戻せます。',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    'この品質未満のアイテムはワンクリックで売却されます。誤って売却したアイテムは商人から買い戻せますが、署名のない灰色アイテムは除きます。',
   'hudChrome.options.showSecondaryActionBar': 'セカンダリアクションバーを表示',
   'hudChrome.options.showThirdActionBar': '3本目のアクションバーを表示',
   'hudChrome.options.hideUnusedActionSlots': '未使用のアクションスロットを非表示',
@@ -4702,6 +4717,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.vendor.sellJunkAria': '{price}ですべての不要品を売却',
   'itemUi.vendor.sellJunkHint':
     'クエストアイテムを除くバッグ内のすべての灰色アイテムを売却します。',
+  'itemUi.vendor.sellJunkNoBuyback':
+    '署名のない灰色アイテムは買い戻しリストに入らないため、売却は取り消せません。',
   'itemUi.market.title': 'ワールドマーケット',
   'itemUi.market.subtitle': '商人の取引所',
   'itemUi.market.close': '市場を閉じる',
@@ -5232,6 +5249,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.name': '裂爪',
   'entities.abilities.claw.description':
     '敵を引っかき、武器ダメージに {damage} を加えたダメージを与えます。コンボポイントを1獲得します。キャットフォーム専用。',
+  'entities.abilities.scratch.name': 'スクラッチ',
+  'entities.abilities.scratch.description':
+    '6ヤード以内の周囲の対象を引っかき、武器ダメージに {damage} を加えたダメージを与えます。命中した対象1体ごとにコンボポイントを1獲得します。範囲内のステルス中の敵を暴きます。キャットフォーム専用。',
   'entities.abilities.ferocious_bite.name': '血噛み',
   'entities.abilities.ferocious_bite.description':
     '{damage}を与えるフィニッシュムーブです。キャットフォーム専用。',
@@ -9004,6 +9024,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'コインは世界全体の潤滑油です。装備や物資、旅の道具を買い、プレイヤー間でやり取りされます。これらはすべて遊んでいるだけで身につくので、このページはお金がどこから来てどこへ行くのかを示す地図だと思ってください。',
   'guide.economy.junkBody':
     '使い道のないドロップ品も、どの商人にでも売れます。バッグがいっぱいになる前に、町を通るたびに空にしましょう。商人の「売却」タブには、粗悪品の半端物をまとめて一括で売れるワンクリックのボタンまで用意されています。本当に価値のないがらくたは、場所を空けるためにそのまま捨てることもできます。',
+  'guide.economy.junkBodyFinal':
+    '使い道のないドロップ品も、どの商人にでも売れます。バッグがいっぱいになる前に、町を通るたびに空にしましょう。商人の「売却」タブには、粗悪品の半端物をまとめて一括で売れるワンクリックのボタンまで用意されています。本当に価値のないがらくたは、場所を空けるためにそのまま捨てることもできます。こうして売った署名のない灰色アイテムは買い戻しリストに入らないので、押す前に残したい物がないか確かめましょう。',
   'guide.economy.junkTitle': 'がらくたの整理',
   'guide.economy.mailBody':
     'どの拠点の町にも、ワタリガラスを彫った柱が立っています。レルムの手紙配達、レイヴンポストのメールボックスです。その前に立てば、オンラインの友人にも長くオフラインの相手にも、名前を指定してどのキャラクターへも手紙を書け、わずかな郵送料でコインや品物を手紙に添えられます。ワタリガラスが飛ぶには少し時間がかかります。届くと、封筒の印が受取人に何かが待っていると知らせてくれます。',
@@ -13612,6 +13634,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showUtilityModes': 'ステルスと移動形態を含める',
   'hudChrome.options.showFriendlyTrack': '味方へのバフを表示',
   'hudChrome.options.showShieldTrack': '自分のシールドを表示',
+  'hudChrome.options.classicCombatText': 'クラシック戦闘テキスト',
   'hudChrome.options.stickyTarget': '地面クリックでターゲットを維持',
   'hudChrome.options.showNameplateDots': 'ネームプレートに自分のデバフを表示',
   'hudChrome.options.nameplateDotScale': 'ネームプレートのデバフ表示サイズ',
@@ -15670,6 +15693,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.paperdoll.hideHelmAria': '兜を隠す',
   'hudChrome.paperdoll.showHelmAria': '兜を表示',
   'hudChrome.options.waterRipples': '水面の波紋（航跡）',
+  'hudChrome.options.spellEffects': '呪文エフェクト',
   'hudChrome.options.actionCam': 'アクションカメラ',
   'hudChrome.options.actionCamShoulder': 'アクションカメラの肩',
   'hudChrome.options.actionCamShoulderLeft': '左 {pct}',
@@ -15735,6 +15759,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '皮膚を冷えた鉱滓のように10秒間硬化させ、受けるすべてのダメージを25%減少させる。',
   'entities.abilities.cinderhide.name': '燼皮',
   'entities.abilities.claw.specNote_feral': '命中した攻撃ごとに古き血を1蓄える（最大3）。',
+  'entities.abilities.scratch.specNote_feral': '命中した攻撃ごとに古き血を1蓄える（最大3）。',
   'entities.abilities.cold_focus.description':
     '12秒間、精密射撃がより多くの集中値を生成し、引き絞りの速度が上がって消費も減ります。（冷眼のシグネチャ）',
   'entities.abilities.cold_focus.name': '冷徹集中',
@@ -16788,6 +16813,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifExtraBars':
     '2段目のアクションバーを表示し、2段目をオンにすると3段目も現れます。段が隠れているあいだも、スロットはキー割り当てから使えます。',
   'guide.settingsPage.ifFctScale': 'ターゲットから浮かび上がるダメージと回復の数字の大きさです。',
+  'guide.settingsPage.ifClassicCombatText':
+    'まっすぐ上昇する白と淡い金色のシンプルなダメージ数字に戻します。オフ（デフォルト）のままにすると、数字がより目立って左右に広がり、クリティカルや特に大きなヒットが輝きます。',
   'guide.settingsPage.ifFramesIntro':
     '自分のフレーム、ターゲットフレーム、そしてパーティのレイアウト全体です。パーティのまとまりには大きさ、幅、高さ、間隔、列数のスライダーもあるので、レイド用のグリッドを画面に合わせられます。タブの最下部にあるリセットボタンで、すべてのフレームを元の位置に戻せます。',
   'guide.settingsPage.ifGeneralIntro':
@@ -16885,6 +16912,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '世界が遠くまでどこまで描かれてから霞んでいくかです。自分で動かすまでは、各プリセットが値を決めてくれます。',
   'guide.settingsPage.rowWaterQuality':
     '湖、川、大海原の表現です。平板で軽いものから、完全に反射するものまで選べます。',
+  'guide.settingsPage.rowSpellEffects':
+    'プレイヤーとそのペットが放つ呪文の光、火花、飛翔体、着弾時の炸裂です（自分のものも含みます）。オフにすると画面が落ち着き、大人数の戦闘で数フレーム稼げます。敵が放つものはすべて表示されたままで、離れるべき範囲を示すリング、スタン・恐怖・移動不能状態の対象の頭上マーカー、すべての詠唱バーも残ります。',
   'guide.settingsPage.rowWaterRipples':
     '泳いでいるときに背後へ広がる航跡と波紋です。初期設定はオフで、実際にフレームを食う唯一の水面エフェクトです。水しぶきや泡はどちらの設定でも影響を受けません。',
   'guide.settingsPage.valueUltraOrInsane': 'ウルトラ、すべてを求めるなら極限',
@@ -18320,6 +18349,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   // Intentional gathering PR2: material provenance and source controls (M16 fills).
   'hudChrome.materialStackSelectionUnavailable': 'この素材の選択は利用できなくなりました。',
   'hudChrome.itemTooltip.materialSourceGatherer': '{count} × {name}が採集',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × {name}から奪取',
   'hudChrome.itemTooltip.materialSourceGathererSigned': '{count} × {name}が採集、{signer}が署名',
   'hudChrome.itemTooltip.materialSourceUnrecorded': '{count} × 採集者の記録なし',
   'hudChrome.itemTooltip.materialSourceUnrecordedSigned':
@@ -18515,6 +18545,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.rift_watchers_band.name': '裂け目の監視者の指輪',
   'entities.items.rift_surveyors_satchel.name': '裂け目測量士の鞄',
   'entities.items.emissary_cache.name': '使者の宝箱',
+  'entities.items.pvp_trophy_skull.name': '戦利品の頭蓋骨',
   'entities.npcs.weekly_emissary.name': 'チャム・ピート',
   'entities.npcs.weekly_emissary.title': '使者',
   'entities.npcs.weekly_emissary.greeting':

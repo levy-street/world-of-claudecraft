@@ -271,6 +271,7 @@ export const TALENT_ABILITIES_V2_B = {
     range: 0,
     school: 'physical',
     requiresTarget: false,
+    offGcd: true,
     usableInForm: true,
     effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 70, duration: 15 }],
     description: 'Increases attack power by 70 for 15 sec. (Druid talent)',

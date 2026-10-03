@@ -63,9 +63,19 @@ Answer each question OF THE DIFF with a path and stable symbol, never a guess.
 
 1. **Where is the GPU work prepared?** For every new material or texture a live frame can first
    reach, name its prewarm manifest twin or the gate covering its first appearance
-   (`compileGate`, `attachSceneGroupGated` in `gated_scene_attach.ts`, a reveal gate). Check
-   every variant: tier substitution, skinning, instancing, morphs, shadow depth, dye or
-   colorway, texture-slot presence, and light-count conditions. Flag a post-boot bare
+   (`compileGate`, `attachSceneGroupGated` in `gated_scene_attach.ts`, a reveal gate). Then ask
+   whether that home is the right one. Boot preparation is for what is common: what most players
+   meet early, or what can appear with no warning. Before accepting a new boot entry, look for a
+   more relevant in-game trigger (entering a zone, approaching a place, accepting a quest, an
+   event announcement, equipping an item); the trigger must fire early enough for the
+   preparation to finish before the first draw, and must also cover a player who logs in already
+   on the spot. A boot preparation step that can be dropped must be able to catch up completely
+   later, program linking included, not only its texture uploads. The preparation must produce
+   exactly the program the live draw uses, for every graphics tier and every variant: tier
+   substitution, a per-object material clone, transparency, sides, a fade or other shader hook,
+   skinning, instancing, morphs, shadow depth, dye or colorway, texture-slot presence, and
+   light-count conditions. Ask for a test that compares the prepared programs with the drawn
+   ones. Flag a post-boot bare
    `scene.add` of a group carrying new materials, a module-scope cache filled on first cast
    that is not registered in `ABILITY_MATERIAL_SOURCES`, a visible program-key mutation, a
    bare `Material.clone()` of a patched material (it must go through `cloneMaterialWithHooks`
@@ -84,17 +94,29 @@ Answer each question OF THE DIFF with a path and stable symbol, never a guess.
    every value is a distinct program and only the first one was prewarmed; a kit or loader
    conversion whose `material.name` can come out empty (`props.ts` names `${kit}:${surface}`);
    a builder that returns a group of bare `new THREE.*Material(` meshes to a caller that
-   `scene.add`s it after boot; a gate whose `attach-watchdog` or `gate-timeout` reveals the
-   group ungated, so the programs link at the reveal; a material minted per cast or per wave
-   and disposed when the effect ends (three refcounts programs AND shader stages: the last
-   dispose frees both, so the next identical cast relinks; the fix is a never-disposed anchor
-   or pool staged by the manifest, `groundFireAoeMaterials` in `ignivar_fire_vfx.ts` is the
-   shape); a per-instance material pool kept in class fields, which the lazy-cache sweep
+   `scene.add`s it after boot; a gate that does not cover what it shows (a gate only protects
+   what exists when it runs, and only if it waits for proof), meaning a material built or added
+   to the gated group after the gate ran, a commit on the `attach-watchdog` or `gate-timeout`
+   alone instead of the gate's readiness proof, or a wait on the readiness of another family
+   than the one the change's own programs are linked in, so the programs link at the reveal; a
+   recurring effect whose material is minted per cast or per wave and disposed when the effect
+   ends (three refcounts programs AND shader stages: disposing the last material of a program,
+   custom shaders included, frees both, so the next identical cast relinks; the fix is one
+   shared material that is never disposed, an anchor or pool staged by the manifest,
+   `groundFireAoeMaterials` in `ignivar_fire_vfx.ts` is the shape); a per-instance material
+   pool kept in class fields, which the lazy-cache sweep
    (`tests/ability_material_prewarm_sweep.test.ts`) cannot see, so it needs a stand-in
    registered by hand (`buildRingOfFrostStandIn`); an encounter visual attached by a sync
    loop when the boss is already active at arrival, before the interior's encounter prewarm
    has run (the forge meter in `varkhul_forge_beam_visual.ts` takes the compile gate for
-   this). Every new material must carry a
+   this); a translucent or effect look on a character rig (a released spirit, stealth, a
+   form, an encounter mark) drawn as a transparent or tinted clone of the rig's own
+   materials instead of through the shared spirit veil family and a palette
+   (`characters/ghost_veil.ts`, the tuples pinned by `tests/spirit_veil_census.test.ts`): a
+   clone per material and per look is a new program for every armour piece, earring or far
+   mesh a crowd brings, so it links live, while a new look is new palette values (uniforms),
+   never a new material (`tests/character_effect_twin_guard.test.ts` fails on a transparent
+   clone of a character material). Every new material must carry a
    `name` (module and role): three names a program after `material.name`, and the fleet
    `live-program` label is that name or a raw cache key nobody can map back to a file. An
    unnamed new material is SHOULD-FIX. All of this is verified by READING the diff: trace
@@ -118,7 +140,10 @@ Answer each question OF THE DIFF with a path and stable symbol, never a guess.
    that renderer's first `render()`, and carry a teardown story (`trackWebGLContext`,
    `context_release.ts`) because live contexts are capped per GPU process. New work must use
    the existing queue, lane, admission budget, label kind, and stand-in. No bespoke idle loop,
-   fourth gate, tuned wall clock, per-frame Three.js allocation, or unbounded traversal. Check
+   fourth gate, tuned wall clock, per-frame Three.js allocation, or unbounded traversal. No
+   synchronous GPU read during play, even batched or inside background work (a pixel readback,
+   a program, shader, or uniform query outside the lanes' link-completion poll): each one stalls
+   the frame that issues it, so read what the engine already keeps on the JavaScript side. Check
    `tests/render_light_census_pin.test.ts`, `tests/point_light_budget.test.ts`,
    `tests/shader_debug_flag.test.ts`, `tests/background_gpu_queue.test.ts`, and
    `tests/gpu_prep_admission.test.ts` where applicable.

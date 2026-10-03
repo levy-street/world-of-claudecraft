@@ -524,6 +524,8 @@ export const guideStrings = {
     rowTouchLookSpeed:
       'The same thing for swipe-look, and it only appears when you are on a touchscreen.',
     rowFullscreen: 'Fills the whole screen with the game.',
+    rowSpellEffects:
+      'The glow, sparks, projectiles, and impact bursts of spells that players and their pets cast, yours included. Switch it off for a calmer screen or a few extra frames in big group fights. Everything an enemy casts still shows, and so do the rings that mark an area to step out of, the markers over stunned, feared, or rooted targets, and every cast bar.',
     rowWaterRipples:
       'Wakes and ripples that spread out behind you as you swim. Off by default, and the one water effect that costs real frames; splashes and bubbles are unaffected either way.',
     rowOverflowXp:
@@ -612,6 +614,8 @@ export const guideStrings = {
     ifStickyTarget:
       'Keeps your current target when you click on empty ground, instead of clearing it.',
     ifFctScale: 'The size of the damage and healing numbers that float off your target.',
+    ifClassicCombatText:
+      'Brings back the plain white and pale gold damage numbers that rise straight up. Leave it off (the default) for bolder numbers that fan out to the sides, with critical and unusually big hits that flare.',
     ifExtraBars:
       'Reveals a second action bar row, and a third once the second is on. The slots stay reachable by their keybinds even while the rows are hidden.',
     ifHideUnused: 'Hides empty action slots so only the buttons you actually use are drawn.',
@@ -2324,6 +2328,11 @@ export const guideStrings = {
     // limitsBodyHour gains the raid rule (world_pvp_rules.ts worldPvpGroupEarns).
     hillBodyRamp:
       'Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.',
+    // Successor (2026-09-29): the hill is re-announced every five minutes with
+    // the hold standings, and pays the longest-holding group a Weekly Vault PvP
+    // win (hill_ranking.ts).
+    hillBodyRanked:
+      'Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, everyone who stood inside for at least a minute for the group that held it longest in total, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.',
     limitsBodyRaids:
       "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor. Raids earn nothing from world kills: a raid member takes no Honor or gold and does not shrink anyone else's share, so fight as a party to be paid.",
   },
@@ -3688,6 +3697,11 @@ export const guideStrings = {
     junkTitle: 'Clearing out junk',
     junkBody:
       "Drops you have no use for still sell to any merchant with a shop of their own, so empty your bags whenever you pass through town rather than letting them fill up. The merchant's window even keeps a one-click Sell Junk button that sells every Poor-quality oddment at once. Truly worthless odds and ends can also be discarded outright to make room.",
+    // Successor of junkBody (retired in scripts/i18n_retired_keys.mjs): plain
+    // gray junk no longer records a buyback row (items.ts skipsVendorBuyback),
+    // so the Sell Junk sweep is final and the page says so.
+    junkBodyFinal:
+      "Drops you have no use for still sell to any merchant with a shop of their own, so empty your bags whenever you pass through town rather than letting them fill up. The merchant's window even keeps a one-click Sell Junk button that sells every Poor-quality oddment at once. Truly worthless odds and ends can also be discarded outright to make room. Unsigned gray items sold that way skip the buyback list, so check for anything you meant to keep before you press it.",
 
     // Direct player-to-player trading.
     tradeTitle: 'Trading with other players',

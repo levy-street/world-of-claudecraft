@@ -138,7 +138,9 @@ const MOONTIDE_BUILDER_IDS = new Set(['wrath', 'starfire', 'moonseed']);
 // its parked strike actually rolls through ctx.meleeSwing (combat/
 // druid_lunge.ts). A Lunge that ends short strikes nothing and so banks
 // nothing, exactly as it awards no combo point. The OLD_BLOOD_STAGES cap of 3
-// holds for both through addStage.
+// holds for both through addStage. Scratch (combat/druid_scratch.ts) banks
+// once per LANDED swing through the same meleeSwing hook, so a sweep that
+// lands on three enemies fills the bank in one press.
 const OLD_BLOOD_STRIKE_IDS = new Set([
   'claw',
   'rake',
@@ -146,6 +148,7 @@ const OLD_BLOOD_STRIKE_IDS = new Set([
   'ferocious_bite',
   'maul',
   'swipe',
+  'scratch',
   'pounce',
   'lunge',
 ]);

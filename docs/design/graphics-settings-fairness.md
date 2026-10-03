@@ -217,6 +217,49 @@ COSMETIC (may be tiered down on lower presets):
   device policy (`gfxAaPolicy`) plus the Anti-Aliasing dial, never of the frame-budget
   governor, so it cannot vary between two players standing in the same spot.
 
+- The canvas resolution of the harbor route plates on the iOS memory profile
+  (`harborRouteMarkerPlateCanvasSize` in `src/render/harbor_route_marker_core.ts`). The
+  destination name a player reads to choose a ferry is ACTIONABLE, so it is painted on every
+  tier and every profile; what the iOS memory profile sheds is the resolution it is painted
+  at, half each side, to keep canvas and texture memory under the WebKit page ceiling. Every
+  paint metric (the keyline, the lift under the ink, the fit loop's font floor and step)
+  scales with the canvas (`harborRouteMarkerPlatePaint`), so the lettering fills the same
+  share of the plate and a long localized name shrinks exactly as far on both sizes. On a
+  phone the plate covers fewer render pixels than the half-size canvas at any ordinary
+  reading distance, so what the player sees does not change; on a large iPad close up the
+  name is magnified and softer, never smaller, hidden or clipped. The size is a pure function
+  of the STATIC platform profile (`GFX.iosMemoryProfile`), like the anti-aliasing arm above,
+  never of a preset or the frame-budget governor.
+
+- The Spell Effects option (Graphics, Display card; `src/render/spell_effects_switch.ts`). A
+  player preference rather than a tier knob, held to the same rule. Off drops the cosmetic
+  spell visuals whose CASTER is on the player side (a player, or a pet with an `ownerId`),
+  the viewer's own included: the ability painter's cast, travel, impact and linger
+  compositions, the per-entity holds those casters caused (windup orbs, buff orbits,
+  shells, ground discs, a player's DoT marks on a mob), the pooled spell particles, the
+  class spell visuals outside both, and the spell light pulses. Everything a mob, boss or
+  other creature casts keeps drawing on every setting, because an enemy effect is often
+  the in-world read of a mechanic (a bomber's fuse flash, the beam showing which add heals
+  the boss, a death-throes warning nova, a breath cone). An effect is attributed to the
+  event that caused it, not the body it lands on (`enterSpellEvent` in the renderer's
+  event dispatch). An effect with no attributable caster always draws, so a gap can only
+  show too much: that covers events that name no caster and spell cues whose ability no
+  player class owns (an encounter mechanic that names the player it resolves on, such as
+  the hoard boss's soul catch, is not that player's spell). Per-frame holds are attributed
+  by their own caster (`spellEffectsMutedBy`, an aura's `sourceId`), so a boss's mark on a
+  raider (the Soul Rend sparkle) and an enemy's debuff on a player keep drawing. For a
+  muted caster the painter takes its refused-cast arm (`refusedTelegraphs`,
+  `areaTelegraph`), so the terrain-draped area ring and the rig's windup clip survive,
+  including the ring on every pulse of a lingering zone, which is the footprint a player
+  chooses to stand in or leave once its particles are gone; the hard-crowd-control band
+  and the taunt attention mark are held over every body whoever cast them. A muted
+  player's own proc, ward and queued-swing cues go too; the HUD buff icons and action bar
+  carry the same state. Cast bars, nameplates, floating combat text and every HUD read never consult
+  the option. The shared pooled emitters that also carry non-spell reads (a delve shrine's
+  sequence pulse via `src/render/world_cue_fx.ts`, a lit wardstone, a minigame power-up,
+  melee hit sparks) never consult it either; spell call sites use gated twins
+  (`Vfx.spellNova` and siblings). Pinned by `tests/spell_effects_switch.test.ts`.
+
 The test for any new tier knob: if a knob hides or delays something a player READS AND REACTS
 TO, it is not allowed. If it only reduces visual richness or redraw smoothness, it is fine.
 
@@ -595,6 +638,27 @@ a cosmetic ease on the tiers that chose it, the same one the reduced-motion sett
 already removes, and never a hidden entity.
 The choice reads the static preset or the player's own dial, never the FPS governor.
 
+### A context restore holds the 3D view for at most 3 s (2026-09-27)
+
+When the browser loses the WebGL context and gives it back in place, three rebuilds every
+program, texture and render target at its next use. Drawn as is, the first frame after the
+restore linked everything on screen at once: the whole page froze, HUD and input included
+(2.3 s on an RTX 3090, 3.3 s in a traced AMD session). The restore host
+(`src/render/context_restore.ts`) now withholds only the world draw while the visible scene
+links off the main thread, through the same `worldDrawHeld` seam the blocking arrival uses
+(`src/game/presentation_gate.ts`), with a small "Restoring graphics" note over the view.
+
+Why it is fair: it is not a tier knob and never reads the FPS governor; a browser context
+restore triggers it, identically on every preset and online or offline. The canvas was
+already blank for the whole loss before it. The hold ends when the visible set is linked
+or at `CONTEXT_RESTORE_HOLD_MAX_MS` (3 s, the offline arrival bound), and that bound is
+read at every query (`src/render/context_restore_hold.ts`), so a release that never ran
+cannot extend it. During the hold the sim, the network, input and the whole HUD stay live:
+unit, party and target frames, cast bars, auras, and the nameplates, which the renderer
+still updates with the world draw skipped. The alternative it replaces froze all of those.
+Pinned by `tests/context_restore.test.ts` (the bound, the release on a second loss) and
+`tests/presentation_gate.test.ts` (the hold as a second owner the arrival cannot release).
+
 ## Enforcing guards
 
 - `tests/auras_painter.test.ts`: a debuff past the buff cap still renders; an all-debuff bar
@@ -783,6 +847,12 @@ The choice reads the static preset or the player's own dial, never the FPS gover
   a held world draw and a hidden desktop shell. `tests/frame_cadence_fairness.test.ts`: the
   limit is never an input of the HUD tier resolvers, and the tier resolvers are never an
   input of the limit.
+- `tests/harbor_route_marker_core.test.ts` + `tests/harbor_route_marker_render.test.ts`: the
+  harbor route plate canvas per memory profile, read from the real per-tier profile settings
+  (full size with the authored metrics off the iOS profile, half size with every metric
+  halved on it and on its tight rung), the fit loop equal to the pre-profile loop at full
+  size, and, through the painter's recorded 2D calls, the destination name painted on every
+  tier on both sizes.
 
 ## Resolved: negative-value stat-sap auras now classify as debuffs in both worlds
 

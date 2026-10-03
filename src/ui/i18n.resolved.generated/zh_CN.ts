@@ -438,7 +438,9 @@ export const zh_CN: EnTranslations = {
         "worldOne": "已完成{count}个世界任务",
         "worldMany": "已完成{count}个世界任务",
         "pvpOne": "已赢得{count}场评级比赛",
-        "pvpMany": "已赢得{count}场评级比赛"
+        "pvpMany": "已赢得{count}场评级比赛",
+        "pvpWinOne": "{count} PvP Win",
+        "pvpWinMany": "{count} PvP Wins"
       },
       "requiredTask": {
         "raidOne": "击败{count}个团队副本首领",
@@ -448,7 +450,9 @@ export const zh_CN: EnTranslations = {
         "worldOne": "完成{count}个世界任务",
         "worldMany": "完成{count}个世界任务",
         "pvpOne": "赢得{count}场评级比赛",
-        "pvpMany": "赢得{count}场评级比赛"
+        "pvpMany": "赢得{count}场评级比赛",
+        "pvpWinOne": "Earn {count} PvP Win",
+        "pvpWinMany": "Earn {count} PvP Wins"
       },
       "readyWeeks": "未领取的周次：{count}。请先领取最早完成的那一周。",
       "claimLastWeek": "领取上周的奖励",
@@ -570,6 +574,15 @@ export const zh_CN: EnTranslations = {
     "spectate": {
       "banner": "正在观察 {name}"
     },
+    "realmMotd": {
+      "line": "今日消息：{text}",
+      "updated": "今日消息已更新。",
+      "cleared": "今日消息已清除。",
+      "none": "当前未设置今日消息。",
+      "usage": "用法：/motd \"<消息>\" 设置今日消息，/motd clear 将其清除。",
+      "tooLong": "今日消息最多 {max} 个字符。",
+      "saveFailed": "今日消息未能保存，服务器重启后将会丢失。"
+    },
     "readyCheck": {
       "title": "就绪确认",
       "close": "关闭",
@@ -608,6 +621,9 @@ export const zh_CN: EnTranslations = {
       "keeperConfirmSparedBody": "确定吗？灵魂医者会在此复活你。你还不到10级，所以这次复活后遗症不会削弱你。",
       "healerConfirmAccept": "复活",
       "healerConfirmCancel": "取消"
+    },
+    "graphicsRestore": {
+      "note": "Restoring graphics"
     },
     "wiki": {
       "confirmTitle": "打开维基？",
@@ -2231,6 +2247,7 @@ export const zh_CN: EnTranslations = {
       "confirmVendorSellNote": "关闭后，出售物品只需单击即可完成，不再确认；如果背包格位发生变化，可能会卖错物品。",
       "confirmVendorSellMinQuality": "确认出售的最低品质",
       "confirmVendorSellMinQualityNote": "低于此品质的物品单击即可出售；误售的物品仍可从商人处回购。",
+      "confirmVendorSellMinQualityNoteGray": "低于此品质的物品单击即可出售。误售的物品可从商人处回购，未署名的灰色物品除外。",
       "itemLevelLine": "物品等级 {level}",
       "itemScoreLine": "评分 {score}",
       "showSecondaryActionBar": "显示副动作条",
@@ -2251,7 +2268,9 @@ export const zh_CN: EnTranslations = {
       "showUtilityModes": "包含潜行与旅行形态",
       "showFriendlyTrack": "显示我给队友的增益",
       "showShieldTrack": "显示我的护盾",
+      "classicCombatText": "经典战斗文字",
       "waterRipples": "水面涟漪（尾波）",
+      "spellEffects": "法术特效",
       "actionCam": "动作镜头",
       "actionCamShoulder": "动作镜头肩位",
       "actionCamShoulderLeft": "左 {pct}",
@@ -2802,6 +2821,8 @@ export const zh_CN: EnTranslations = {
       "markLine": "在那里攻击未开启旗帜的玩家会升起你自己的旗帜；攻击已开启旗帜的玩家则永远不会。",
       "aidLine": "在世界战斗中为一名已开启旗帜的玩家治疗、上护盾或增益，会升起你自己的旗帜。",
       "stakeLine": "败者支付 {cap} 或其钱袋 {percent} 中较少的一项。",
+      "spoilsLine": "双方都开启 PvP 时，致命一击者的金币会与败者的头骨一同掉落在尸体上。",
+      "skullName": "{name}的头骨",
       "noStakeLine": "在自由混战地带被击杀的未开启旗帜玩家不会损失金币。",
       "noTakeLine": "未开启旗帜的战斗者同样不会获得金币：金币只在两名已开启旗帜的玩家之间转移。",
       "honorLine": "每次击杀获得 {honor} 点荣誉，由所有出力者平分。",
@@ -4436,6 +4457,7 @@ export const zh_CN: EnTranslations = {
       "perfectedBadge": "臻至完美",
       "perfectingRank": "完美化：第{rank}阶，共{ranks}阶",
       "materialSourceGatherer": "{count} × 由{name}采集",
+      "trophySkullSource": "{count} × 取自{name}",
       "materialSourceGathererSigned": "{count} × 由{name}采集，由{signer}签名",
       "materialSourceUnrecorded": "{count} × 未记录采集者",
       "materialSourceUnrecordedSigned": "{count} × 未记录采集者，由{name}签名",
@@ -5714,7 +5736,9 @@ export const zh_CN: EnTranslations = {
     },
     "pattern": {
       "teaches": "使用：教你制作{item}。",
-      "teachesEnchant": "使用：教你如何施加{enchant}。"
+      "teachesEnchant": "使用：教你如何施加{enchant}。",
+      "reagents": "{label} {list}",
+      "reagent": "{name} x{count}"
     },
     "unbind": {
       "title": "解绑：{name}",
@@ -7313,6 +7337,7 @@ export const zh_CN: EnTranslations = {
       "rowCameraSpeed": "用鼠标环顾四周时，镜头转动得有多快。",
       "rowTouchLookSpeed": "滑动视角的同一项设置，只有在触屏设备上才会出现。",
       "rowFullscreen": "让游戏铺满整个屏幕。",
+      "rowSpellEffects": "玩家及其宠物施放的法术光芒、火花、飞行弹道和命中爆发，也包括你自己的。关闭后画面更清爽，大型团队战斗中也能多挤出几帧。敌人施放的一切仍会显示，提示你离开区域的范围圈、被昏迷、恐惧或定身目标头顶的标记，以及所有施法条也都会保留。",
       "rowWaterRipples": "游泳时在你身后荡开的尾迹与涟漪。默认关闭，也是唯一一项真会吃帧数的水效；无论开关，水花和气泡都不受影响。",
       "rowOverflowXp": "在满级之后，你的经验条是继续用溢出经验填充，还是改为显示经典的满级静态文字。",
       "rowInterfaceMode": "你用的是桌面界面，还是屏幕上的触控操作。“自动”会读取你的设备，你也可以强制指定其中一种：带键盘的平板可以用桌面布局，触屏笔记本也可以用触控操作。",
@@ -7365,6 +7390,7 @@ export const zh_CN: EnTranslations = {
       "ifMouseoverCast": "让治疗或友方法术落在你鼠标悬停的那个队伍框体上，而不改变你当前的目标。",
       "ifStickyTarget": "点击空地时保留当前目标，而不是把它清空。",
       "ifFctScale": "从目标身上飘出的伤害与治疗数字的大小。",
+      "ifClassicCombatText": "恢复为直线上升的纯白色与淡金色伤害数字。保持关闭（默认）时，数字更醒目并向两侧散开，暴击和格外大的伤害会闪耀。",
       "ifExtraBars": "显示第二排动作条，开启第二排之后还能再开第三排。即使这些排处于隐藏状态，其中的格子依然可以用快捷键触发。",
       "ifHideUnused": "隐藏空的动作格，只绘制你真正会用到的按钮。",
       "ifLockBars": "锁定你的技能栏，免得不小心把技能从格子里拖出来。",
@@ -8324,6 +8350,7 @@ export const zh_CN: EnTranslations = {
       "hillBody": "每三小时，会在无法预料的时刻向全领域发出通告：十五分钟后，某个自由混战地带将升起一座山丘，它所在的圆圈会预先在开阔地上标出。山丘升起后会屹立四十五分钟，然后消失。圈内站着玩家最多的小队争夺这座山丘，连续保持人数优势一分钟后，山丘便归他们所有；单独一人算作一支一人小队，但团队成员完全不计入人数。一支小队占据山丘期间，站在圈内的每名成员每分钟都会获得少量荣誉，因此一支满员小队在山丘屹立的全程不受争夺地占据它，所获荣誉略少于一场战场胜利。场地上方的横条会显示谁在占据、你方与对方的人数以及争夺计时；在聊天中输入 /hill 可以得知它的位置。",
       "limitsBodyHour": "反复击败同一名玩家，每次的收益都会减少并很快归零，而你对那名玩家的计数要在首次击杀约一小时之后才会重新开始，所以蹲守同一个目标永远不值得等待。远低于你等级的目标不会带来任何收益。在战场和竞技场内部适用它们自己的规则，而且它们提供的荣誉比开放世界更多，因此世界 PvP 是通往同一位商人的较慢道路。",
       "hillBodyRamp": "每三小时，会在无法预料的时刻向全领域发出通告：十五分钟后，某个自由混战地带将升起一座山丘，它所在的圆圈会预先在开阔地上标出。山丘升起后会屹立四十五分钟，然后消失。圈内站着玩家最多的小队争夺这座山丘，连续保持人数优势一分钟后，山丘便归他们所有；单独一人算作一支一人小队，但团队成员完全不计入人数。一支小队占据山丘期间，站在圈内的每名成员每分钟都会获得荣誉，同一支小队占据得越久，每分钟获得的荣誉就越多。一支满员小队在山丘屹立的全程不受争夺地占据它，所获荣誉约相当于三场战场胜利。山丘易手时，新的占据者从头开始累积。场地上方的横条会显示谁在占据、你方与对方的人数以及争夺计时；在聊天中输入 /hill 可以得知它的位置。",
+      "hillBodyRanked": "每三小时，某个自由混战地带会出现一座山丘。山丘存在期间，每五分钟全领域都会收到它的位置以及各队伍占据时长的排名。山丘消失时，占据总时长最长的队伍成员会为每周宝库的 PvP 进度获得一场胜利，前提是该玩家在本队占据期间曾在圆圈内站满至少一分钟，并且结束时仍留在该队伍中。",
       "limitsBodyRaids": "反复击败同一名玩家，每次的收益都会减少并很快归零，而你对那名玩家的计数要在首次击杀约一小时之后才会重新开始，所以蹲守同一个目标永远不值得等待。远低于你等级的目标不会带来任何收益。在战场和竞技场内部适用它们自己的规则，而且它们提供的荣誉比开放世界更多，因此世界 PvP 是通往同一位商人的较慢道路。团队无法从世界击杀中获得任何收益：团队成员既得不到荣誉也得不到金币，也不会减少其他人的份额，所以想获得报酬就以小队身份作战。"
     },
     "thornhollowPage": {
@@ -9020,6 +9047,7 @@ export const zh_CN: EnTranslations = {
       "buyingBody": "与商人交谈并选择浏览他的货物，他的商店便会打开，分为三个标签页：浏览、出售和买回。浏览页陈列着他的全部存货，只要付得起钱就归你。出售页列出你背包中他愿意收购的物品，而出售一件带有自身随机品质的物品时会先请你确认，这样一件珍视的物品就绝不会因失误而溜走。若你卖掉了让自己后悔的东西，买回标签页会保留你近期的售出记录，让你能按当初卖出的价钱把它们买回来。",
       "junkTitle": "清理废品",
       "junkBody": "你用不上的掉落物依然能卖给任何商人，所以每次路过城镇都顺手清空背包，别让它们堆满。商人的出售标签页甚至有一个一键按钮，可以一次性卖掉所有劣质品质的零碎物品。真正毫无价值的零碎杂物也可以直接丢弃以腾出空间。",
+      "junkBodyFinal": "你用不上的掉落物依然能卖给任何商人，所以每次路过城镇都顺手清空背包，别让它们堆满。商人的出售标签页甚至有一个一键按钮，可以一次性卖掉所有劣质品质的零碎物品。真正毫无价值的零碎杂物也可以直接丢弃以腾出空间。这样卖出的未署名灰色物品不会进入回购列表，所以按下之前请确认没有想留下的东西。",
       "tradeTitle": "与其他玩家交易",
       "tradeBody": "你可以与站在身旁的任何人面对面交易。双方将物品与钱币放入一个共享窗口，唯有两人都确认后才会完成交换，因此谁也不会吃亏。这是把掉落物递给朋友或敲定一笔买卖最简单的方式。",
       "mailTitle": "渡鸦邮驿",
@@ -12848,7 +12876,8 @@ export const zh_CN: EnTranslations = {
       "sellQuantityCancel": "取消",
       "sellJunk": "出售杂物",
       "sellJunkAria": "以 {price} 出售所有杂物",
-      "sellJunkHint": "出售背包中除任务物品外的所有灰色物品。"
+      "sellJunkHint": "出售背包中除任务物品外的所有灰色物品。",
+      "sellJunkNoBuyback": "未署名的灰色物品不会进入回购列表，因此出售后无法撤销。"
     },
     "market": {
       "title": "世界市场",
@@ -13982,6 +14011,11 @@ export const zh_CN: EnTranslations = {
       "claw": {
         "name": "裂爪",
         "description": "用利爪攻击敌人，造成武器伤害加 {damage}。奖励 1 个连击点。仅限豹形态。",
+        "specNote_feral": "每次命中累积1层古血（最多3层）。"
+      },
+      "scratch": {
+        "name": "抓挠",
+        "description": "抓挠 6 码内的附近目标，造成武器伤害加 {damage}。每命中一个目标奖励 1 个连击点。使范围内潜行的敌人现形。仅限豹形态。",
         "specNote_feral": "每次命中累积1层古血（最多3层）。"
       },
       "ferocious_bite": {
@@ -18933,6 +18967,9 @@ export const zh_CN: EnTranslations = {
       },
       "emissary_cache": {
         "name": "使者的宝箱"
+      },
+      "pvp_trophy_skull": {
+        "name": "战利品头骨"
       },
       "clue_scroll": {
         "name": "线索卷轴"

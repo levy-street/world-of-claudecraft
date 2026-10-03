@@ -24,9 +24,8 @@
 // without a refetch.
 
 import * as THREE from 'three';
-import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { WATER_LEVEL } from '../sim/world';
-import { loadGltf } from './assets/loader';
+import { type LoadedGltf, loadGltf } from './assets/loader';
 import { GFX, type GfxTier } from './gfx';
 import {
   addToBucket,
@@ -61,7 +60,7 @@ export interface TieredVertexColourModel {
    *  prewarm (props.ts). Empty until the model has been built. */
   prewarmParts(): readonly VertexColourPart[];
   /** Hand a parsed GLB to the preload slot (Node tests have no fetch path). */
-  setLoadedGltfForTest(gltf: GLTF | null): void;
+  setLoadedGltfForTest(gltf: LoadedGltf | null): void;
 }
 
 /** The one converter every tiered model draws through (cleared by any model's reset: the
@@ -71,7 +70,7 @@ const materials = vertexColourMaterialConverter();
 export function tieredVertexColourModel(
   spec: TieredVertexColourModelSpec,
 ): TieredVertexColourModel {
-  let loaded: GLTF | null = null;
+  let loaded: LoadedGltf | null = null;
   let loadTask: Promise<void> | null = null;
   /** Kept parts merged into one geometry per material, in the model's frame, by
    *  `effectsTier|standard`: a preset change converts anew. */
@@ -84,7 +83,7 @@ export function tieredVertexColourModel(
     lastParts = [];
   }
 
-  function buildTemplate(gltf: GLTF, keep: readonly string[]): VertexColourPart[] {
+  function buildTemplate(gltf: LoadedGltf, keep: readonly string[]): VertexColourPart[] {
     // loader cache results are immutable: read a clone
     const root = gltf.scene.clone(true);
     root.updateMatrixWorld(true);
@@ -107,7 +106,7 @@ export function tieredVertexColourModel(
     return mergeVertexColourBuckets(buckets);
   }
 
-  function templateFor(gltf: GLTF): VertexColourPart[] {
+  function templateFor(gltf: LoadedGltf): VertexColourPart[] {
     const key = `${GFX.effectsTier}|${GFX.standardMaterials ? 's' : 'l'}`;
     let template = templates.get(key);
     if (!template) {
@@ -157,7 +156,7 @@ export function tieredVertexColourModel(
     prewarmParts(): readonly VertexColourPart[] {
       return lastParts;
     },
-    setLoadedGltfForTest(gltf: GLTF | null): void {
+    setLoadedGltfForTest(gltf: LoadedGltf | null): void {
       loaded = gltf;
       reset();
     },

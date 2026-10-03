@@ -182,6 +182,7 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
     abilities: {
       maul: { dmgPct: 0.35 },
       claw: { dmgPct: 0.15 },
+      scratch: { dmgPct: 0.15 },
       swipe: { dmgPct: 0.2 },
     },
   },

@@ -1239,13 +1239,10 @@ describe('isHotbarItemId: Field Kit (Intentional Gathering, use.type harvestPref
     expect(controller.isHotbarItemId('field_kit')).toBe(true);
   });
 
-  it('preserves the recipe/consumable-pattern exclusion: a one-shot recipe pattern stays unplaceable', () => {
+  it('admits consumable recipe patterns alongside the field kit', () => {
     const { controller } = makeHarness('warrior', [], []);
-    // Guard the guard: the exclusion below must fail on a widened
-    // isHotbarItemId, never pass because the content id quietly stopped
-    // existing or stopped being kind:'recipe'.
     expect(ITEMS.pattern_spiritweld_girdle?.kind).toBe('recipe');
-    expect(controller.isHotbarItemId('pattern_spiritweld_girdle')).toBe(false);
+    expect(controller.isHotbarItemId('pattern_spiritweld_girdle')).toBe(true);
   });
 
   it('routes a field kit drag through the assignable-action path like a gathering tool', () => {

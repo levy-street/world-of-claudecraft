@@ -54,6 +54,27 @@ ratings.
   dungeon, delve, arena or battleground floor. Pure and host-agnostic: the sim's
   hostility arm, the nameplate colour and the target frame read the same verdict
   for the same coordinates.
+- `world_pvp_spoils.ts` owns the World PvP DROP: when the victim and the
+  killing blow are both flagged, the kill resolution in `world_pvp.ts` hands the
+  blow's gold share to `placeWorldPvpSpoils`, which puts it on the victim's body
+  beside a `pvp_trophy_skull`, tapped to the killer so the ordinary corpse
+  loot path takes it. The skull is a PROVENANCE-TRACKED stack
+  (`world_pvp_trophy.ts`, fed to the material registry as
+  `trophyMaterialItemIds`): every skull shares one bag stack, and each unit
+  carries its victim as a material-source bucket (`worldPvpSkullSources`, the
+  victim's gatherer identity plus the name they died under), so the counts ride
+  every bank, mail, trade and market path materials already ride. The client
+  lists the buckets as "2 x Taken from Bet" and names a single-victim stack
+  "<name>'s Skull" (`src/ui/item_copy_name_core.ts`). `settleWorldPvpSpoils`
+  pays anything unlooted to the killer (or refunds the gold to the victim when
+  the killer is gone) the moment the body stops being one: `spirit.ts` calls it
+  on release and on every revive, and the zone pass sweeps any other exit
+  (`sweepWorldPvpSpoils`). The books row is `WorldPvpBooks.spoils` (victim pid
+  -> killer pid), bounded by the flagged players lying dead with spoils. It must
+  not import `bags.ts` (that module loads the material tables at import time,
+  before the content they derive from); the room check is `ctx.canAddItem`.
+  `world_pvp_trophy.ts` is a dependency-free leaf for the same reason: the
+  material registry evaluates it before most of the sim loads.
 - `world_pvp.ts` owns the World PvP SYSTEM behind the `SimContext` seam: the
   flag state (`PlayerMeta.worldPvp`, absent until first raised; `Entity.pvpFlag`
   is its display mirror and the ONLY writer is this module, the away.ts
@@ -78,7 +99,10 @@ ratings.
   (stake + honor pool, integer copper and integer honor, zero rng, paid exactly
   once per death; gold is staked by a FLAGGED victim and taken by FLAGGED
   contributors only; two players mid-duel with each other are the duel's
-  business, never the world's), the IWorld readout
+  business, never the world's), the server-only `worldPvpKill` record each paid
+  death fires for the Discord kill feed (both resolution arms, a no-earner kill
+  included; no pid, no text, no rng; `server/event_frame.ts` strips it from
+  client frames), the IWorld readout
   (`worldPvpInfoFor`, whole-second countdown so the self wire elides it), the
   `/pvp` chat arms' entry points, and the persisted record (`savedWorldPvpFields`
   / `loadWorldPvpState`, the countdown stored as remaining seconds and
@@ -134,6 +158,7 @@ ratings.
   `hillTimes` from a window and a warning offset, `hillMinutesUntil`) and the
   circle test. No ctx, no rng, no clock. Every tuning literal (`HILL_RADIUS`,
   `HILL_WINDOW_SECONDS`, `HILL_WARNING_SECONDS`, `HILL_DURATION_SECONDS`,
+  `HILL_NOTICE_SECONDS`,
   `HILL_CAPTURE_SECONDS`, `HILL_ACCRUAL_SECONDS`, the payout ramp `hillHonorPerPayout` with `HILL_RAMP_STEP_SECONDS` and `HILL_RAMP_MAX_HONOR`) lives
   here and the copy resolves from it.
 - `hill.ts` owns the SYSTEM behind the `SimContext` seam: the session state as
@@ -146,12 +171,26 @@ ratings.
   in the attempt number so a retry searches new ground), the `/dev hill` test
   levers (`spawnHillNow`, `riseHillNow`, `endHillNow`, `warnNextHillNow`; their
   argument grammar is the pure `hill_dev.ts`), the once-a-second `updateHill` pass (the
-  phases warning, risen, fallen, each announced to the realm; then, only while
+  phases warning, risen, fallen, each announced to the realm, with the server-only
+  `hillAnnounced` twin for the Discord PvP channel beside each line: no text, no pid,
+  times relative to the announcement; then, only while
   risen, presence by party, contest, payouts through `grantHonor` with reason
   `hill_hold`), the readout (`hillInfoFor`, live fields only for a viewer in the
   hill's zone while it is risen, so the self wire elides it elsewhere), the
   `/hill` readout line, and the notice lines the client matcher re-localizes
   (`hillWarningLine`, `hillRiseLine`, `hillFallenLine` with the zone name,
-  `HILL_TAKEN_LINE`, `HILL_LOST_LINE`). The realm switch
-  (`ctx.worldPvpDisabled`) drops a standing hill and announces none. Pinned by
-  `tests/hill.test.ts` and `tests/hill_rules.test.ts`.
+  `HILL_TAKEN_LINE`, `HILL_LOST_LINE`, `hillStillStandsLine`, `hillRankLine`,
+  `HILL_VAULT_LINE`). While risen it re-announces the hill every
+  `HILL_NOTICE_SECONDS` with the hold standings; the fall (`fallHill`, shared by
+  the schedule and `/dev hill end`) announces the final standings and pays the
+  longest hold's holders one Weekly Vault PvP win through the host-injected
+  `HillVaultCredit` (`updateHill(ctx, credit)`, `endHillNow(ctx, credit)`): this
+  barrel must never import `weekly_rewards.ts`, which reaches `entity.ts`. The
+  realm switch (`ctx.worldPvpDisabled`) drops a standing hill and announces none
+  (no standings, no credit). Pinned by `tests/hill.test.ts`,
+  `tests/hill_rules.test.ts` and `tests/hill_ranking.test.ts`.
+- `hill_ranking.ts` owns the PURE hold ranking over the per-group records on
+  `ActiveHill.holds` (`HillHoldRecord`: seconds held over the whole stand, the
+  leader's or lone player's name, the payees): `hillRanking` (longest first,
+  first-held order on a tie), `hillLongestHolds` (every group tied at the top)
+  and `hillVaultPayees` (their holders, each once). No ctx, no rng, no clock.

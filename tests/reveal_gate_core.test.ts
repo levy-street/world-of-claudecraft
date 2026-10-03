@@ -276,3 +276,28 @@ describe('reveal gate core imminent holds', () => {
     expect(gate.heldImminentKeys()).toBe(0);
   });
 });
+
+describe('reveal gate core after a WebGL context restore', () => {
+  it('forgets every key, warm or still compiling, so the next consult compiles again', () => {
+    const requested: string[] = [];
+    const gate = createRevealGateCore((key) => requested.push(key));
+    const root = {};
+    gate.allow('warm');
+    gate.noteRoots('warm', [root]);
+    gate.settleRoot('warm', root);
+    expect(gate.state('warm')).toBe('warm');
+    const half = {};
+    gate.allow('linking');
+    gate.noteRoots('linking', [half, {}]);
+    gate.settleRoot('linking', half);
+    expect(gate.rootReady('linking', half)).toBe(true);
+    expect(gate.reset()).toBe(2);
+    expect(gate.state('warm')).toBe('cold');
+    expect(gate.state('linking')).toBe('cold');
+    // A root settled on the lost context is not ready on the restored one.
+    expect(gate.rootReady('linking', half)).toBe(false);
+    expect(gate.allow('warm')).toBe(false);
+    expect(gate.allow('linking')).toBe(false);
+    expect(requested).toEqual(['warm', 'linking', 'warm', 'linking']);
+  });
+});

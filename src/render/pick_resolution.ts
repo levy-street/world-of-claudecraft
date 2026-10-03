@@ -1,9 +1,10 @@
+import { isLootableBody } from '../sim/corpse_loot_state';
 import type { Entity } from '../sim/types';
 
 type PickEntity = Pick<Entity, 'id' | 'kind' | 'dead' | 'lootable'>;
 
 function lootableCorpse(e: PickEntity): boolean {
-  return e.kind === 'mob' && e.dead && e.lootable;
+  return isLootableBody(e);
 }
 
 // A live, selectable creature: a mob or player still standing. Excludes

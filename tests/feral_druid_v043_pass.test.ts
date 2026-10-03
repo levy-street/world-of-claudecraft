@@ -2,7 +2,8 @@
 //   1. every melee attack a feral druid makes reaches 1 yd further
 //   2. Slinkstrike and Lunge each bank 1 Old Blood (cap 3)
 //   3. Nature's Boon: a landed autoattack has a 1-in-15 chance to arm one free
-//      Wildbloom (any form) OR Oakhide (Bruin only) for 10 sec, 25% stronger
+//      Wildbloom (any form, 50% stronger) OR Oakhide (Bruin only, 25%
+//      stronger) for 10 sec
 //   4. Savage Mending is a Bruin AND Cat button
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
@@ -22,6 +23,7 @@ import {
   NATURES_BOON_DURATION,
   NATURES_BOON_ID,
   NATURES_BOON_POWER,
+  NATURES_BOON_WILDBLOOM_POWER,
   naturesBoonArmedFor,
   naturesBoonFormAllows,
   naturesBoonOnAutoAttack,
@@ -174,7 +176,7 @@ describe('1. Wildfang reach: +1 yd on melee attacks', () => {
 
   it('leaves every non-melee range alone, Lunge and Slinkstrike included', () => {
     expect(ABILITIES.lunge.range).toBe(25);
-    expect(ABILITIES.pounce.range).toBe(8);
+    expect(ABILITIES.pounce.range).toBe(25);
     expect(feralMeleeReachBonus(FERAL, ABILITIES.lunge.range)).toBe(0);
     expect(feralMeleeReachBonus(FERAL, ABILITIES.pounce.range)).toBe(0);
     expect(feralMeleeReachBonus(FERAL, MELEE_RANGE + 1)).toBe(0);
@@ -280,6 +282,7 @@ describe("3. Nature's Boon", () => {
     expect(NATURES_BOON_CHANCE).toBeCloseTo(1 / 15, 10);
     expect(NATURES_BOON_DURATION).toBe(10);
     expect(NATURES_BOON_POWER).toBe(1.25);
+    expect(NATURES_BOON_WILDBLOOM_POWER).toBe(1.5);
     expect([...NATURES_BOON_ABILITIES].sort()).toEqual(['barkskin', 'rejuvenation']);
   });
 
@@ -292,7 +295,12 @@ describe("3. Nature's Boon", () => {
     expect(text).toContain(`Reaches ${FERAL_MELEE_REACH_BONUS} yd further`);
     expect(text).toContain(`about every ${Math.round(1 / NATURES_BOON_CHANCE)} sec`);
     expect(text).toContain(`for ${NATURES_BOON_DURATION} sec`);
-    expect(text).toContain(`${Math.round((NATURES_BOON_POWER - 1) * 100)}% stronger`);
+    expect(text).toContain(
+      `Wildbloom castable in any form and ${Math.round((NATURES_BOON_WILDBLOOM_POWER - 1) * 100)}% stronger`,
+    );
+    expect(text).toContain(
+      `Oakhide in Bruin Form and ${Math.round((NATURES_BOON_POWER - 1) * 100)}% stronger`,
+    );
   });
 
   it('recognizes an armed window for either spell and nothing else', () => {
@@ -974,12 +982,12 @@ describe('12. Oakhide rides the window, in Bruin Form only', () => {
   });
 });
 
-describe('13. An armed window makes its spell 25% stronger', () => {
+describe('13. An armed window makes its spell stronger (Wildbloom 50%, Oakhide 25%)', () => {
   // Both arms run at a GEARED heal power, deliberately: the hot arm adds a
   // Spell Power rider on top of the authored base, and a multiplier that only
-  // reached the base would read as 25% at zero heal power and shrink as gear
-  // grew (a level-20 rig with no heal power cannot tell the two apart). The
-  // printed 25% has to reach the whole tick.
+  // reached the base would read as the full bonus at zero heal power and
+  // shrink as gear grew (a level-20 rig with no heal power cannot tell the two
+  // apart). The printed bonus has to reach the whole tick.
   // Heal power is DERIVED (entity.ts recalcPlayerStats: Intellect times the
   // per-point rate, plus gear) and recalculated on the way through a cast, so a
   // value pushed onto the entity does not survive; a feral druid's own leather
@@ -1001,7 +1009,7 @@ describe('13. An armed window makes its spell 25% stronger', () => {
     return { sim, player };
   }
 
-  it('scales Wildbloom by a quarter, Spell Power rider included', () => {
+  it('scales Wildbloom by half, Spell Power rider included', () => {
     const plain = gearedRig();
     plain.sim.castAbility('rejuvenation');
     plain.sim.tick();
@@ -1021,8 +1029,8 @@ describe('13. An armed window makes its spell 25% stronger', () => {
     expect(boonTick).toBeGreaterThan(plainTick);
     // The rider is most of the tick at this heal power, so a base-only scale
     // would land near 1.05 here; the band is one rounding step wide.
-    expect(boonTick / plainTick).toBeCloseTo(NATURES_BOON_POWER, 1);
-    expect(boonTick).toBe(Math.round(plainTick * NATURES_BOON_POWER));
+    expect(boonTick / plainTick).toBeCloseTo(NATURES_BOON_WILDBLOOM_POWER, 1);
+    expect(boonTick).toBe(Math.round(plainTick * NATURES_BOON_WILDBLOOM_POWER));
   });
 
   it('scales Oakhide in Bruin Form, and leaves an unempowered one alone', () => {

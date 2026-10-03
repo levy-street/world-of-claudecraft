@@ -87,6 +87,7 @@ export function worldPvpBodyHtml(view: WorldPvpWindowView): string {
       cap: formatMoney(stakes.stakeCapCopper),
       percent: pct(stakes.stakePercent),
     }),
+    t('hudChrome.worldPvp.spoilsLine'),
     t('hudChrome.worldPvp.noStakeLine'),
     t('hudChrome.worldPvp.noTakeLine'),
     t('hudChrome.worldPvp.honorLine', { honor: num(stakes.killHonor) }),

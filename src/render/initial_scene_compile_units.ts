@@ -257,3 +257,49 @@ export function buildInitialSceneCompileUnits(
     },
   );
 }
+
+export interface SceneRestoreCompileUnitOptions {
+  scene: THREE.Scene;
+  /** 'visible' collects what the camera can draw now (traverseVisible);
+   *  'resident' everything else attached to the scene, hidden subtrees
+   *  included (pooled effects, gate twins, culled decor). */
+  reach: 'visible' | 'resident';
+  playerX: number;
+  playerZ: number;
+  batchSize: number;
+  /** Shared by both reaches of one restore pass, so the resident pass never
+   *  links a root or a program the visible pass already covered. */
+  sharedDedupe: InitialSceneCompileDedupe;
+  compileColor: (root: THREE.Object3D) => Promise<unknown>;
+  compileShadow: (root: THREE.Object3D) => Promise<unknown>;
+  tail?: InitialSceneCompileTail;
+}
+
+/**
+ * The world-entry compile shape for a WebGL context restore: every material
+ * root of the live scene, nearest the player first, program-content deduped,
+ * each root through the colour and shadow arms and the optional tail. The
+ * restore has no staged catalog to walk (the scene IS what the restored
+ * context must link again), so the only choice is the reach.
+ */
+export function buildSceneRestoreCompileUnits(
+  options: SceneRestoreCompileUnitOptions,
+): PrewarmResumeUnit[] {
+  const roots = orderRootsByDistanceSq(
+    compileRoots(options.scene.children, options.reach === 'visible'),
+    (root) => compileRootDistanceSq(root, options.playerX, options.playerZ),
+  );
+  return buildPrewarmCompileUnits(
+    [{ id: `context-restore-${options.reach}`, roots }],
+    async (root) => {
+      await options.compileColor(root);
+      await options.compileShadow(root);
+      if (options.tail) await runInitialSceneCompileTail(options.tail, root);
+    },
+    {
+      dedupeKeys: programContentKeys,
+      sharedDedupe: options.sharedDedupe,
+      batchSize: options.batchSize,
+    },
+  );
+}

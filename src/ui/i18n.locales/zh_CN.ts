@@ -780,7 +780,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.record': '战绩：{kills} 杀，{deaths} 死',
   'hudChrome.worldPvp.repeatLine':
     '重复击杀同一名玩家，收益依次为 {second}、{third}，此后归零；计数会在首次击杀 {reset} 后清零。',
+  'hudChrome.worldPvp.skullName': '{name}的头骨',
   'hudChrome.worldPvp.splitLine': '干净的一对一可独得全部奖励；助战者和治疗者共同分享。',
+  'hudChrome.worldPvp.spoilsLine':
+    '双方都开启 PvP 时，致命一击者的金币会与败者的头骨一同掉落在尸体上。',
   'hudChrome.worldPvp.stakeLine': '败者支付 {cap} 或其钱袋 {percent} 中较少的一项。',
   'hudChrome.worldPvp.statusDisarming': '你的旗帜将在 {time} 后降下，或在当前战斗结束时降下。',
   'hudChrome.worldPvp.statusOff': '你的 PvP 旗帜已降下。你无法在开放世界中攻击他人或被攻击。',
@@ -1960,6 +1963,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '您还将被禁止参加每日奖励 {remaining}。恢复时间：{until}。原因：{reason}',
   'hudChrome.keybinds.discord': 'Discord',
   'hudChrome.spectate.banner': '正在观察 {name}',
+  'hudChrome.realmMotd.line': '今日消息：{text}',
+  'hudChrome.realmMotd.updated': '今日消息已更新。',
+  'hudChrome.realmMotd.cleared': '今日消息已清除。',
+  'hudChrome.realmMotd.none': '当前未设置今日消息。',
+  'hudChrome.realmMotd.usage': '用法：/motd "<消息>" 设置今日消息，/motd clear 将其清除。',
+  'hudChrome.realmMotd.tooLong': '今日消息最多 {max} 个字符。',
+  'hudChrome.realmMotd.saveFailed': '今日消息未能保存，服务器重启后将会丢失。',
   'hudChrome.readyCheck.prompt': '{name} 发起了准备确认。你准备好了吗？',
   'hudChrome.readyCheck.ready': '准备就绪',
   'hudChrome.readyCheck.notReady': '未准备',
@@ -2723,6 +2733,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '反复击败同一名玩家，每次的收益都会减少并很快归零，而你对那名玩家的计数要在首次击杀约一小时之后才会重新开始，所以蹲守同一个目标永远不值得等待。远低于你等级的目标不会带来任何收益。在战场和竞技场内部适用它们自己的规则，而且它们提供的荣誉比开放世界更多，因此世界 PvP 是通往同一位商人的较慢道路。',
   'guide.worldPvpPage.hillBodyRamp':
     '每三小时，会在无法预料的时刻向全领域发出通告：十五分钟后，某个自由混战地带将升起一座山丘，它所在的圆圈会预先在开阔地上标出。山丘升起后会屹立四十五分钟，然后消失。圈内站着玩家最多的小队争夺这座山丘，连续保持人数优势一分钟后，山丘便归他们所有；单独一人算作一支一人小队，但团队成员完全不计入人数。一支小队占据山丘期间，站在圈内的每名成员每分钟都会获得荣誉，同一支小队占据得越久，每分钟获得的荣誉就越多。一支满员小队在山丘屹立的全程不受争夺地占据它，所获荣誉约相当于三场战场胜利。山丘易手时，新的占据者从头开始累积。场地上方的横条会显示谁在占据、你方与对方的人数以及争夺计时；在聊天中输入 /hill 可以得知它的位置。',
+  'guide.worldPvpPage.hillBodyRanked':
+    '每三小时，某个自由混战地带会出现一座山丘。山丘存在期间，每五分钟全领域都会收到它的位置以及各队伍占据时长的排名。山丘消失时，占据总时长最长的队伍成员会为每周宝库的 PvP 进度获得一场胜利，前提是该玩家在本队占据期间曾在圆圈内站满至少一分钟，并且结束时仍留在该队伍中。',
   'guide.worldPvpPage.limitsBodyRaids':
     '反复击败同一名玩家，每次的收益都会减少并很快归零，而你对那名玩家的计数要在首次击杀约一小时之后才会重新开始，所以蹲守同一个目标永远不值得等待。远低于你等级的目标不会带来任何收益。在战场和竞技场内部适用它们自己的规则，而且它们提供的荣誉比开放世界更多，因此世界 PvP 是通往同一位商人的较慢道路。团队无法从世界击杀中获得任何收益：团队成员既得不到荣誉也得不到金币，也不会减少其他人的份额，所以想获得报酬就以小队身份作战。',
   'guide.worldPvpPage.hillHeading': '山丘之王',
@@ -3010,6 +3022,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.confirmVendorSellMinQuality': '确认出售的最低品质',
   'hudChrome.options.confirmVendorSellMinQualityNote':
     '低于此品质的物品单击即可出售；误售的物品仍可从商人处回购。',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    '低于此品质的物品单击即可出售。误售的物品可从商人处回购，未署名的灰色物品除外。',
   'hudChrome.options.showSecondaryActionBar': '显示副动作条',
   'hudChrome.options.showThirdActionBar': '显示第三动作条',
   'hudChrome.options.hideUnusedActionSlots': '隐藏未使用的动作栏位',
@@ -4507,6 +4521,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.vendor.sellJunk': '出售杂物',
   'itemUi.vendor.sellJunkAria': '以 {price} 出售所有杂物',
   'itemUi.vendor.sellJunkHint': '出售背包中除任务物品外的所有灰色物品。',
+  'itemUi.vendor.sellJunkNoBuyback': '未署名的灰色物品不会进入回购列表，因此出售后无法撤销。',
   'itemUi.market.title': '世界市场',
   'itemUi.market.subtitle': '商人的交易所',
   'itemUi.market.close': '关闭市场',
@@ -5016,6 +5031,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.name': '裂爪',
   'entities.abilities.claw.description':
     '用利爪攻击敌人，造成武器伤害加 {damage}。奖励 1 个连击点。仅限豹形态。',
+  'entities.abilities.scratch.name': '抓挠',
+  'entities.abilities.scratch.description':
+    '抓挠 6 码内的附近目标，造成武器伤害加 {damage}。每命中一个目标奖励 1 个连击点。使范围内潜行的敌人现形。仅限豹形态。',
   'entities.abilities.ferocious_bite.name': '血噬',
   'entities.abilities.ferocious_bite.description': '终结技，造成 {damage}。仅限豹形态。',
   'entities.abilities.swipe.name': '横扫利爪',
@@ -8641,6 +8659,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '钱币让整个世界运转：它能购买你的装备、补给与旅行用具，还能在玩家之间易手。这一切只需游玩便能逐渐到手，所以不妨把本页看作一张地图，标明你的钱从何而来、又向何处去。',
   'guide.economy.junkBody':
     '你用不上的掉落物依然能卖给任何商人，所以每次路过城镇都顺手清空背包，别让它们堆满。商人的出售标签页甚至有一个一键按钮，可以一次性卖掉所有劣质品质的零碎物品。真正毫无价值的零碎杂物也可以直接丢弃以腾出空间。',
+  'guide.economy.junkBodyFinal':
+    '你用不上的掉落物依然能卖给任何商人，所以每次路过城镇都顺手清空背包，别让它们堆满。商人的出售标签页甚至有一个一键按钮，可以一次性卖掉所有劣质品质的零碎物品。真正毫无价值的零碎杂物也可以直接丢弃以腾出空间。这样卖出的未署名灰色物品不会进入回购列表，所以按下之前请确认没有想留下的东西。',
   'guide.economy.junkTitle': '清理废品',
   'guide.economy.mailBody':
     '每座主城都立着一根雕成渡鸦的石柱：那是渡鸦邮驿的邮箱，这个王国的信件服务。站在柱旁，便可按名字写信给任何角色，无论对方在线还是久未登录，并支付少许邮资，在信中附上钱币或货物。渡鸦要飞上一小段时间；当它降落时，一个信封指示标会提醒收件人有东西在等着。',
@@ -12951,6 +12971,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showUtilityModes': '包含潜行与旅行形态',
   'hudChrome.options.showFriendlyTrack': '显示我给队友的增益',
   'hudChrome.options.showShieldTrack': '显示我的护盾',
+  'hudChrome.options.classicCombatText': '经典战斗文字',
   'hudChrome.options.stickyTarget': '点击地面时保留目标',
   'hudChrome.options.showNameplateDots': '在姓名板上显示我的减益',
   'hudChrome.options.nameplateDotScale': '姓名板减益图标大小',
@@ -14936,6 +14957,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.paperdoll.hideHelmAria': '隐藏头盔',
   'hudChrome.paperdoll.showHelmAria': '显示头盔',
   'hudChrome.options.waterRipples': '水面涟漪（尾波）',
+  'hudChrome.options.spellEffects': '法术特效',
   'hudChrome.options.actionCam': '动作镜头',
   'hudChrome.options.actionCamShoulder': '动作镜头肩位',
   'hudChrome.options.actionCamShoulderLeft': '左 {pct}',
@@ -14998,6 +15020,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '使皮肤硬化为冷却的熔渣，持续10秒，受到的所有伤害降低25%。',
   'entities.abilities.cinderhide.name': '熔渣皮肤',
   'entities.abilities.claw.specNote_feral': '每次命中累积1层古血（最多3层）。',
+  'entities.abilities.scratch.specNote_feral': '每次命中累积1层古血（最多3层）。',
   'entities.abilities.cold_focus.description':
     '持续 12 秒，审慎射击产生更多集中值，蓄力长射的速度更快、消耗更低。（冷视招牌技能）',
   'entities.abilities.cold_focus.name': '冷静专注',
@@ -16002,6 +16025,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifExtraBars':
     '显示第二排动作条，开启第二排之后还能再开第三排。即使这些排处于隐藏状态，其中的格子依然可以用快捷键触发。',
   'guide.settingsPage.ifFctScale': '从目标身上飘出的伤害与治疗数字的大小。',
+  'guide.settingsPage.ifClassicCombatText':
+    '恢复为直线上升的纯白色与淡金色伤害数字。保持关闭（默认）时，数字更醒目并向两侧散开，暴击和格外大的伤害会闪耀。',
   'guide.settingsPage.ifFramesIntro':
     '你自己的框体、你的目标框体，以及整个队伍布局。队伍那一组还带有缩放、宽度、高度、间距和列数滑块，方便把团队网格塞进你的屏幕；标签页底部的“重置”按钮会把每一个框体放回最初的位置。',
   'guide.settingsPage.ifGeneralIntro':
@@ -16085,6 +16110,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.rowViewDistance':
     '世界在淡出之前能向远处绘制多远。每个预设都会替你设好，直到你自己动它为止。',
   'guide.settingsPage.rowWaterQuality': '湖泊、河流和外海如何着色，从平坦省性能一直到完全反射。',
+  'guide.settingsPage.rowSpellEffects':
+    '玩家及其宠物施放的法术光芒、火花、飞行弹道和命中爆发，也包括你自己的。关闭后画面更清爽，大型团队战斗中也能多挤出几帧。敌人施放的一切仍会显示，提示你离开区域的范围圈、被昏迷、恐惧或定身目标头顶的标记，以及所有施法条也都会保留。',
   'guide.settingsPage.rowWaterRipples':
     '游泳时在你身后荡开的尾迹与涟漪。默认关闭，也是唯一一项真会吃帧数的水效；无论开关，水花和气泡都不受影响。',
   'guide.settingsPage.valueUltraOrInsane': '“超高”，想要全都要就选“极致”',
@@ -17423,6 +17450,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   // Intentional gathering PR2: material provenance and source controls (M16 fills).
   'hudChrome.materialStackSelectionUnavailable': '该素材选择已失效。',
   'hudChrome.itemTooltip.materialSourceGatherer': '{count} × 由{name}采集',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × 取自{name}',
   'hudChrome.itemTooltip.materialSourceGathererSigned': '{count} × 由{name}采集，由{signer}签名',
   'hudChrome.itemTooltip.materialSourceUnrecorded': '{count} × 未记录采集者',
   'hudChrome.itemTooltip.materialSourceUnrecordedSigned': '{count} × 未记录采集者，由{name}签名',
@@ -17610,6 +17638,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.rift_watchers_band.name': '裂隙守望者指环',
   'entities.items.rift_surveyors_satchel.name': '裂隙勘测员挎包',
   'entities.items.emissary_cache.name': '使者的宝箱',
+  'entities.items.pvp_trophy_skull.name': '战利品头骨',
   'entities.npcs.weekly_emissary.name': '查姆·皮特',
   'entities.npcs.weekly_emissary.title': '使者',
   'entities.npcs.weekly_emissary.greeting':

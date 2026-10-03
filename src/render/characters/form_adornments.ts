@@ -8,13 +8,14 @@
 //   gloamveil_veil.ts        the veil and burning eyes (THREE)
 //
 // A set's FIRST mount on this rig rides the visual's injected compile gate
-// (the renderer's gateSwapFlagOnCompile, the same one that stages the tint's
-// transparent clones): the pieces mount hidden and show once their programs
+// (the renderer's gateSwapFlagOnCompile, the same one that stages an unlinked
+// veil tuple): the pieces mount hidden and show once their programs
 // have linked, while the tinted body stands in. The boot prewarm
 // (ABILITY_MATERIAL_SOURCES) normally links them long before, so the hold is a
 // frame; it is what covers a constrained device whose manifest deferred that
 // entry to the resume lane. Hidden pieces hide only themselves.
 import type * as THREE from 'three';
+import { registerContextRestoreReset } from '../context_restore_registry';
 import {
   type AdornmentBody,
   createMoonwingPose,
@@ -62,7 +63,16 @@ export class FormAdornments {
     private readonly model: THREE.Object3D,
     private readonly body: AdornmentBody,
     private readonly gate: () => FarBakeGate | null,
-  ) {}
+  ) {
+    registerContextRestoreReset('form-adornments', this, (owner) => owner.forgetContext());
+  }
+
+  /** A WebGL context restore: the sets this rig linked were linked on the
+   *  lost context, so the next mount holds behind the gate again. */
+  forgetContext(): void {
+    this.moonwingLinked = false;
+    this.veilLinked = false;
+  }
 
   /** Mount, unmount, or hide the pieces for the current form and ghost flags.
    *  Idempotent: the caller forwards only edges, but a repeat is a no-op. */

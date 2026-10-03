@@ -6,6 +6,7 @@ import {
   ModerationService,
   type ModerationSession,
 } from '../server/moderation_service';
+import type { RealmMotdCommand } from '../server/realm_motd';
 
 type Session = ModerationSession;
 
@@ -44,6 +45,7 @@ function setup(opts: { actor: Session; sessions?: Session[] }) {
   const jailed: { moderator: Session; target: Session; minutes: number }[] = [];
   const unjailed: { moderator: Session; target: Session }[] = [];
   const jailedPids = new Set<number>();
+  const realmMotdCalls: { actor: Session; command: RealmMotdCommand }[] = [];
   const recordAction = vi.fn<ModerationAudit['recordAction']>(async () => {});
   const mute = vi.fn<ModerationAudit['mute']>(async () => {});
   const ban = vi.fn<ModerationAudit['ban']>(async () => {});
@@ -73,6 +75,7 @@ function setup(opts: { actor: Session; sessions?: Session[] }) {
       jailedPids.delete(target.pid);
       unjailed.push({ moderator, target });
     },
+    realmMotd: (actor, command) => realmMotdCalls.push({ actor, command }),
   };
 
   const service = new ModerationService(host, { recordAction, mute, ban, suspend, forceRename });
@@ -91,6 +94,7 @@ function setup(opts: { actor: Session; sessions?: Session[] }) {
     jailed,
     unjailed,
     jailedPids,
+    realmMotdCalls,
     recordAction,
     mute,
     ban,
@@ -290,10 +294,39 @@ describe('ModerationService', () => {
     expect(actContext.unspectated).toEqual([]);
   });
 
+  it('routes /motd to the realm message only for holders of realm.motd', () => {
+    const motdAdmin = admin(1, 11, ['realm.motd']);
+    const moderator = admin(2, 22, ['moderation.act', 'moderation.spectate']);
+    const motdContext = setup({ actor: motdAdmin });
+    const moderatorContext = setup({ actor: moderator });
+
+    expect(motdContext.service.handleChatCommand(motdAdmin, '/motd "Welcome back!"')).toBe(true);
+    expect(motdContext.realmMotdCalls).toEqual([
+      { actor: motdAdmin, command: { op: 'set', text: 'Welcome back!' } },
+    ]);
+    expect(motdContext.notices).toEqual([]);
+
+    // A moderator without the grant is refused explicitly, and the realm
+    // message is never touched.
+    expect(moderatorContext.service.handleChatCommand(moderator, '/motd "Hijacked"')).toBe(true);
+    expect(moderatorContext.realmMotdCalls).toEqual([]);
+    expect(moderatorContext.notices.map((notice) => notice.text)).toEqual([
+      "You don't have permission to do that.",
+    ]);
+
+    // realm.motd alone reaches no other staff command.
+    expect(motdContext.service.handleChatCommand(motdAdmin, '/kick "Nobody" test')).toBe(true);
+    expect(motdContext.recordAction).not.toHaveBeenCalled();
+    expect(motdContext.notices.map((notice) => notice.text)).toEqual([
+      "You don't have permission to do that.",
+    ]);
+  });
+
   it('gates the dispatch attempt on the moderation permissions', () => {
     expect(canAttemptModerationCommands(admin(1, 11))).toBe(true);
     expect(canAttemptModerationCommands(admin(1, 11, ['moderation.act']))).toBe(true);
     expect(canAttemptModerationCommands(admin(1, 11, ['moderation.spectate']))).toBe(true);
+    expect(canAttemptModerationCommands(admin(1, 11, ['realm.motd']))).toBe(true);
     expect(canAttemptModerationCommands(admin(1, 11, ['botdetector.read']))).toBe(false);
     expect(canAttemptModerationCommands(player(1, 11))).toBe(false);
   });

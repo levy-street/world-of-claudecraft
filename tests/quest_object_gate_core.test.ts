@@ -83,8 +83,35 @@ describe('makeQuestObjectGate', () => {
     });
     expect(gate(piece, new Map())).toBe(true);
     expect(gate(lastPiece, new Map())).toBe(false);
-    worldQuestLog.get('wq_farshore_salvage')!.state = 'completed';
+    const salvageProgress = worldQuestLog.get('wq_farshore_salvage');
+    if (!salvageProgress) throw new Error('missing salvage progress');
+    salvageProgress.state = 'completed';
     expect(gate(lastPiece, new Map())).toBe(true);
+  });
+
+  it('admits a reconnected owner vault portal through the character resolver', () => {
+    const portal = {
+      ...crate(),
+      id: 42,
+      templateId: 'hoard_entrance',
+      objectItemId: null,
+      lootable: true,
+      vaultOwnerPid: 10,
+      vaultOwnerCharacterId: 701,
+    };
+    const worldQuestLog = new Map<string, WorldQuestProgress>();
+    const world = {
+      playerId: 20,
+      partyInfo: null,
+      characterId: 701,
+      worldQuestCycle: worldQuestCycleForResetDay('2026-09-04'),
+      worldQuestLog,
+    };
+
+    expect(makeQuestObjectGate({}, { ...world, characterId: undefined })(portal, new Map())).toBe(
+      true,
+    );
+    expect(makeQuestObjectGate({}, world)(portal, new Map())).toBe(false);
   });
 });
 

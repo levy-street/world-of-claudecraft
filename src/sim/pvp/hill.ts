@@ -6,7 +6,13 @@
 // a HILL_RADIUS circle on dry, open ground, clear of the water, the hub
 // settlement and every collider, wholly inside its zone, and it stands for
 // HILL_DURATION_SECONDS before it falls. Each phase change is announced to the
-// whole realm. Everyone standing in that zone is already hostile to every
+// whole realm, and while it stands the realm is reminded where it is every
+// HILL_NOTICE_SECONDS, with the hold standings (hill_ranking.ts). When it falls
+// the final standings are announced and every player who stood inside for the
+// group that held it longest earns a point toward the Weekly Vault's PvP row,
+// through the credit the host injects (`HillVaultCredit`: the vault module
+// reaches entity.ts, which imports this barrel, so it is never imported here).
+// Everyone standing in that zone is already hostile to every
 // stranger there (the free-for-all arm of world_pvp.ts), so the hill needs no
 // flag of its own.
 //
@@ -42,14 +48,22 @@ import { Rng } from '../rng';
 import type { SimContext } from '../sim_context';
 import type { ZoneDef } from '../types';
 import {
+  HILL_RANKING_SHOWN,
+  type HillHoldRecord,
+  hillRanking,
+  hillVaultPayees,
+} from './hill_ranking';
+import {
   HILL_ACCRUAL_SECONDS,
   HILL_CAPTURE_SECONDS,
   HILL_DURATION_SECONDS,
   HILL_EDGE_MARGIN,
   HILL_HUB_MARGIN,
   HILL_LATEST_WARN_OFFSET_SECONDS,
+  HILL_NOTICE_SECONDS,
   HILL_RADIUS,
   HILL_SPAWN_ATTEMPTS,
+  HILL_VAULT_MIN_INSIDE_SECONDS,
   HILL_WARNING_SECONDS,
   type HillSpotProbe,
   type HillTimes,
@@ -97,7 +111,23 @@ export interface ActiveHill extends HillTimes {
   heldSeconds: number;
   /** Honor paid out by this hill so far (the readout and the tests). */
   honorPaid: number;
+  /** group key -> that group's total hold this stand (hill_ranking.ts),
+   *  in the order the groups first held it. */
+  holds: Map<string, HillHoldRecord>;
+  /** When the next realm reminder and standings sound while risen. */
+  nextNoticeAt: number;
 }
+
+/** The Weekly Vault's PvP credit for one player, injected by the host (the Sim
+ *  passes weekly_rewards.ts recordWeeklyPvpWin) because this barrel must not
+ *  import the vault module (the cycle through entity.ts). True when the row
+ *  actually moved (false at its weekly cap), so the notice never lies. */
+export type HillVaultCredit = (ctx: SimContext, pid: number) => boolean;
+
+/** No Weekly Vault credit: the default for a caller that drives the hill
+ *  without a vault (a unit test stepping `updateHill` directly). The Sim always
+ *  passes the real credit, so production never falls back to this. */
+export const NO_HILL_VAULT_CREDIT: HillVaultCredit = () => false;
 
 /** The Sim-owned session state, exposed on SimContext as a live view. */
 export interface HillState {
@@ -146,6 +176,20 @@ export function hillFallenLine(zoneName: string): string {
 }
 export const HILL_TAKEN_LINE = 'Your group holds the hill.';
 export const HILL_LOST_LINE = 'Another group has taken the hill.';
+/** The reminder every HILL_NOTICE_SECONDS while the hill stands. */
+export function hillStillStandsLine(zoneName: string, minutes: number): string {
+  return `The hill still stands in ${zoneName}: it falls in ${minutesPhrase(minutes)}.`;
+}
+/** One place of the standings: a party by its leader's name, a lone player by
+ *  their own; the hold in whole minutes, rounded up like every hill figure. */
+export function hillRankLine(rank: number, record: HillHoldRecord): string {
+  const who = record.party ? `${record.name}'s group` : record.name;
+  const minutes = hillMinutesUntil(record.seconds, 0);
+  return `Hill ranking #${rank}: ${who}, held ${minutesPhrase(minutes)}.`;
+}
+/** Told to each player the longest hold pays when the hill falls. */
+export const HILL_VAULT_LINE =
+  'Your group held the hill longest: +1 PvP progress toward the Weekly Vault.';
 
 function hillRng(ctx: SimContext, ordinal: number, salt: number): Rng {
   return new Rng((ctx.cfg.seed ^ Math.imul(ordinal + 1, 0x7f4a7c15) ^ salt) >>> 0);
@@ -210,6 +254,15 @@ function announcePhase(
   } else {
     announce(ctx, hillFallenLine(name), RISE_COLOR);
   }
+  // The server-only twin of the line above for the Discord PvP feed: no
+  // text, no pid, times relative to now (types.ts 'hillAnnounced').
+  ctx.emit({
+    type: 'hillAnnounced',
+    phase: what,
+    zoneId: hill.zoneId,
+    secondsUntilRise: Math.max(0, hill.risesAt - ctx.time),
+    secondsUntilFall: Math.max(0, hill.closesAt - ctx.time),
+  });
 }
 
 /**
@@ -250,6 +303,8 @@ export function spawnHill(
     accrual: new Map(),
     heldSeconds: 0,
     honorPaid: 0,
+    holds: new Map(),
+    nextNoticeAt: times.risesAt + HILL_NOTICE_SECONDS,
   };
   ctx.hillState.active = hill;
   announcePhase(ctx, hill, phase === 'warning' ? 'warning' : 'risen');
@@ -287,28 +342,65 @@ export function riseHillNow(ctx: SimContext): ActiveHill | null {
   if (!hill || hill.phase !== 'warning') return null;
   hill.risesAt = ctx.time;
   hill.closesAt = ctx.time + HILL_DURATION_SECONDS;
+  hill.nextNoticeAt = ctx.time + HILL_NOTICE_SECONDS;
   hill.phase = 'active';
   announcePhase(ctx, hill, 'risen');
   return hill;
 }
 
-/** End the announced or standing hill now, with the realm's fall line. Null
- *  when there is none. */
-export function endHillNow(ctx: SimContext): ActiveHill | null {
+/** End the announced or standing hill now, exactly as if its time had come:
+ *  the realm's fall line, the final standings and the longest hold's Weekly
+ *  Vault credit. Null when there is none. */
+export function endHillNow(
+  ctx: SimContext,
+  credit: HillVaultCredit = NO_HILL_VAULT_CREDIT,
+): ActiveHill | null {
   const hill = ctx.hillState.active;
   if (!hill) return null;
+  fallHill(ctx, hill, credit);
+  return hill;
+}
+
+/** Tell the realm the standings, longest hold first, HILL_RANKING_SHOWN deep;
+ *  nothing when nobody has held the hill yet. */
+function announceRanking(ctx: SimContext, hill: ActiveHill): void {
+  const ranked = hillRanking(hill.holds.values()).slice(0, HILL_RANKING_SHOWN);
+  for (const [i, record] of ranked.entries()) {
+    announce(ctx, hillRankLine(i + 1, record), RISE_COLOR);
+  }
+}
+
+/** The hill falls: the fall line, the final standings, and one Weekly Vault
+ *  PvP point to every player who stood inside for HILL_VAULT_MIN_INSIDE_SECONDS
+ *  for the group that held it longest (every group tied at the top) and is
+ *  still in the realm and in that group now. */
+function fallHill(ctx: SimContext, hill: ActiveHill, credit: HillVaultCredit): void {
   ctx.hillState.active = null;
   announcePhase(ctx, hill, 'fallen');
-  return hill;
+  announceRanking(ctx, hill);
+  const stillInGroup = (pid: number, key: string): boolean => {
+    const meta = ctx.players.get(pid);
+    return !!meta && !meta.leaving && hillGroupKey(pid, ctx.partyOf(pid)) === key;
+  };
+  for (const pid of hillVaultPayees(
+    hill.holds.values(),
+    HILL_VAULT_MIN_INSIDE_SECONDS,
+    stillInGroup,
+  )) {
+    if (credit(ctx, pid)) notice(ctx, pid, HILL_VAULT_LINE);
+  }
 }
 
 /** Run the real schedule now: the next window's hill is warned of at once (its
  *  own zone and spot, the full warning), and that window is spent, exactly as
  *  if its random moment had come. Ends any hill that stands first. Null when no
  *  spot was found this attempt (the schedule then retries it on its own). */
-export function warnNextHillNow(ctx: SimContext): ActiveHill | null {
+export function warnNextHillNow(
+  ctx: SimContext,
+  credit: HillVaultCredit = NO_HILL_VAULT_CREDIT,
+): ActiveHill | null {
   const state = ctx.hillState;
-  if (state.active) endHillNow(ctx);
+  if (state.active) endHillNow(ctx, credit);
   const current = hillWindowAt(ctx.time);
   if (state.window < current) state.window = current;
   const risesAt = ctx.time + HILL_WARNING_SECONDS;
@@ -332,17 +424,24 @@ export function warnNextHillNow(ctx: SimContext): ActiveHill | null {
  *  keeps its full warning and stand. A failed spot retries a minute on with a
  *  fresh salt; a window whose planned stand has passed before any warning is
  *  skipped. */
-function updateSchedule(ctx: SimContext): void {
+function updateSchedule(ctx: SimContext, credit: HillVaultCredit): void {
   const state = ctx.hillState;
   const hill = state.active;
   if (hill) {
     if (ctx.time >= hill.closesAt) {
-      state.active = null;
-      announcePhase(ctx, hill, 'fallen');
+      fallHill(ctx, hill, credit);
     } else {
       if (hill.phase === 'warning' && ctx.time >= hill.risesAt) {
         hill.phase = 'active';
         announcePhase(ctx, hill, 'risen');
+      } else if (hill.phase === 'active' && ctx.time >= hill.nextNoticeAt) {
+        hill.nextNoticeAt += HILL_NOTICE_SECONDS;
+        announce(
+          ctx,
+          hillStillStandsLine(zoneName(hill.zoneId), hillMinutesUntil(hill.closesAt, ctx.time)),
+          RISE_COLOR,
+        );
+        announceRanking(ctx, hill);
       }
       return;
     }
@@ -416,6 +515,15 @@ function updateContest(ctx: SimContext, hill: ActiveHill, dt: number): void {
   hill.contest = 0;
   hill.accrual.clear();
   hill.heldSeconds = 0;
+  if (!hill.holds.has(challenger)) {
+    hill.holds.set(challenger, {
+      key: challenger,
+      seconds: 0,
+      name: '',
+      party: challenger.startsWith('party:'),
+      holders: new Map(),
+    });
+  }
   for (const [pid, key] of hill.insideKeys) {
     if (key === challenger) notice(ctx, pid, HILL_TAKEN_LINE);
     else if (key === ousted) notice(ctx, pid, HILL_LOST_LINE);
@@ -431,6 +539,7 @@ function payHolders(ctx: SimContext, hill: ActiveHill, dt: number): void {
   const holder = hill.holder;
   if (holder === null) return;
   hill.heldSeconds += dt;
+  recordHold(ctx, hill, holder, dt);
   const amount = hillHonorPerPayout(hill.heldSeconds);
   for (const pid of hill.accrual.keys()) {
     if (!ctx.players.has(pid) || hillGroupKey(pid, ctx.partyOf(pid)) !== holder) {
@@ -451,13 +560,35 @@ function payHolders(ctx: SimContext, hill: ActiveHill, dt: number): void {
   }
 }
 
+/** The ranking's books: the holding group banks this pass only while a
+ *  member stands inside (a group that walks away still holds the hill, but
+ *  an empty hold earns no rank), and every member inside banks their own
+ *  second toward the Weekly Vault point; the name follows the party's leader,
+ *  read while a member is inside to ask the party. */
+function recordHold(ctx: SimContext, hill: ActiveHill, holder: string, dt: number): void {
+  const record = hill.holds.get(holder);
+  if (!record) return;
+  let occupied = false;
+  for (const [pid, key] of hill.insideKeys) {
+    if (key !== holder) continue;
+    occupied = true;
+    record.holders.set(pid, (record.holders.get(pid) ?? 0) + dt);
+    const leader = record.party ? (ctx.partyOf(pid)?.leader ?? pid) : pid;
+    const name = ctx.entities.get(leader)?.name ?? ctx.entities.get(pid)?.name;
+    if (name) record.name = name;
+  }
+  if (occupied) record.seconds += dt;
+}
+
 /**
  * Per-tick entry (the sim's hill lap): once a second run the schedule, then,
  * while a hill stands risen, the presence pass, the contest clock and the
  * payouts. Draws no rng from the world stream. A realm whose World PvP switch
- * is set never announces a hill and drops a standing one silently.
+ * is set never announces a hill and drops a standing one silently (no
+ * standings, no Weekly Vault credit). `credit` is the host's Weekly Vault PvP
+ * credit for the longest hold when a hill falls (HillVaultCredit).
  */
-export function updateHill(ctx: SimContext): void {
+export function updateHill(ctx: SimContext, credit: HillVaultCredit = NO_HILL_VAULT_CREDIT): void {
   const state = ctx.hillState;
   if (ctx.tickCount - state.passTick < PASS_TICKS) return;
   state.passTick = ctx.tickCount;
@@ -465,7 +596,7 @@ export function updateHill(ctx: SimContext): void {
     state.active = null;
     return;
   }
-  updateSchedule(ctx);
+  updateSchedule(ctx, credit);
   const live = state.active;
   if (!live || live.phase !== 'active') return;
   const dt = PASS_TICKS * (1 / 20);

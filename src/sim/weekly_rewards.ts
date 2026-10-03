@@ -345,11 +345,15 @@ export function recordWeeklyWorldQuest(ctx: SimContext, pid: number): void {
   const state = stateFor(ctx, meta);
   state.world = Math.min(8, state.world + 1);
 }
-export function recordWeeklyPvpWin(ctx: SimContext, pid: number): void {
+/** One PvP win on the vault row; true when the row moved (false at its cap of
+ *  five, or for a missing or leaving player), so a caller's notice never lies. */
+export function recordWeeklyPvpWin(ctx: SimContext, pid: number): boolean {
   const meta = ctx.players.get(pid);
-  if (!meta || meta.leaving) return;
+  if (!meta || meta.leaving) return false;
   const state = stateFor(ctx, meta);
+  const before = state.pvp;
   state.pvp = Math.min(5, state.pvp + 1);
+  return state.pvp > before;
 }
 export function recordWeeklyBossKill(
   ctx: SimContext,

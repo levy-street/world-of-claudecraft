@@ -2039,6 +2039,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Rendclaw"
       },
       {
+        "id": "scratch",
+        "name": "Scratch"
+      },
+      {
         "id": "regrowth",
         "name": "Second Bloom"
       },
@@ -6004,6 +6008,14 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "exploration",
     "renown": 5,
     "feat": false
+  },
+  {
+    "id": "prog_titan",
+    "name": "Titan",
+    "category": "progression",
+    "renown": 50,
+    "feat": false,
+    "rewardTitle": "Titan"
   }
 ];
 
@@ -7365,6 +7377,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "title",
         "name": "Treasure Hunter"
+      },
+      {
+        "kind": "title",
+        "name": "Titan"
       }
     ]
   },

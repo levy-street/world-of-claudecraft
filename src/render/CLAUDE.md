@@ -97,6 +97,13 @@ Everything else is a sibling module in one of these families:
   gap), and `software_renderer.ts` (the SINGLE source of truth for detecting a
   software rasterizer from the adapter string; `gfx.ts`, `perf_doctor.ts`, and
   `perf_reporter.ts` all consume it so the detectors cannot drift).
+  An in-place loss and restore is `context_restore.ts` (pure half
+  `context_restore_core.ts`): every "this GPU work is done" record registers its reset
+  or re-bake in `context_restore_registry.ts` next to the record (the source scan in
+  `tests/context_restore_registry.test.ts` fails a new record with no answer), a link
+  that straddles a loss is linked again (`context_generation.ts`, read by the compile
+  arms), and the world draw is held for at most `CONTEXT_RESTORE_HOLD_MAX_MS` while
+  the visible set links (`context_restore_hold.ts`).
 - `view_create_retry.ts`: bounded cooldown state for fail-soft character builds
   in per-frame paths, including required targets, form swaps, and visual-key
   swaps (`tests/view_create_retry.test.ts`).
@@ -196,13 +203,26 @@ cadence logic of its own. Narrow helpers:
   parsed-GLB contract test, and its own thin `src/render/<asset>.ts` adapter
   (exemplars: `banker_chest.ts`, `eastbrook_grand_armoury.ts`, `noticeboard.ts`).
 ## Asset loading (`assets/`)
-`loader.ts` (`loadGltf`/`loadTexture`/`loadKtx2Texture`, one parse per URL) plus these
-rules, all CI-enforced:
+`loader.ts` (`loadGltf`/`loadTexture`/`loadKtx2Texture`, one parse per URL, plus
+`loadBitmapTexture`, the `loadTexture` twin that decodes off the main thread for a large
+sheet whose upload would otherwise pay the decode; a caller that keeps such a texture
+releases its bitmap after upload through `bitmap_sheet_release.ts`) plus these rules, all
+CI-enforced:
 - **Cache results are IMMUTABLE: clone before mutating.** `releaseGltf(url)` drops
   the cache entry after geometry is extracted.
+- **A loaded GLB carries no parser.** `loadGltf` resolves a `LoadedGltf` (the GLTF
+  minus `parser`): the parser held a copy of the binary chunk and every bufferView,
+  embedded images included, for as long as the GLTF stayed cached. Data only the
+  parser has is extracted in the loader's post-parse hooks, before the drop
+  (`tests/gltf_parser_release.test.ts` pins the drop and bans `src/` readers).
 - **Never `dispose()` a shared GLB-cache texture that may still be drawn.** With the
   KTX2 mip release (`assets/ktx2_mip_release.ts`) its CPU data is full-shape stubs and
   its restore source drops on dispose, so a later re-upload renders black.
+- **iPhones keep character-side KTX2 mips at or under 512.** `assets/ktx2_mip_cap.ts`
+  trims the chains of GLBs under `KTX2_MIP_CAP_MODEL_ROOTS` and of the skin atlases in
+  the loader's parse resolve chains, before any upload, on the iOS memory profile of a
+  phone-class user agent only (iPads, Android and desktop keep full chains). A capped
+  root must stay exempt from the mip release; both pinned by `tests/ktx2_mip_cap.test.ts`.
 - **`preload.ts` is the boot gate, and it has TWO lanes.** `startGame` awaits
   `assetsReady()` either way, so `build*()` still reads resolved assets
   synchronously; the lanes differ only in WHEN the fetch starts. A new module-load
@@ -224,6 +244,19 @@ rules, all CI-enforced:
   superset of EVERY tier's placement set or world entry crashes with "asset not
   preloaded" (the v0.16.0 P0; see the comment in `characters/manifest.ts` and
   `tests/render_asset_preload.test.ts`).
+- **A deferred thunk may skip its load on one profile only when every consumer
+  awaits it.** The Drakelands kit (the ember prop GLBs and the Ignivar templates)
+  resolves at once on the iOS memory profile (`drakelands_kit_lane_core.ts`
+  `drakelandsKitBootThunk`) and loads on approach instead: the zone prepare
+  awaits `drakelands_kit_lane.ts` before it builds the ember features, and the
+  build refuses to run until every template was attempted and settled (the
+  fortress is collider-backed in the sim, so a build that outran its loads would
+  leave those pieces invisible but solid; a template that still fails after the
+  loader's retries is skipped for the session, as at boot). The raid dressing
+  awaits the templates itself, and the visible-zone lane holds the zone out of
+  its one-at-a-time queue until the kit is resident. A synchronous `build*()`
+  reader never gets this exception. Pinned by `tests/drakelands_kit_lane.test.ts`
+  and `tests/drakelands_kit_renderer_seam.test.ts`.
 - **Every asset under `public/` must be in the media manifest** (regenerate via
   `node scripts/build_media_manifest.mjs generate`, automatic in `npm run build`).
   `tests/render_glb_replacement_assets.test.ts` fails on a GLB missing from
@@ -586,19 +619,15 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   `gate-timeout` gpu-prep event under the `preview-open` key and draws anyway.
 - **A program only ONE encounter can reach warms at that interior's attach,
   never in the boot manifest** (`interior_encounter_prewarm.ts` spec +
-  `_pass.ts` + `_host.ts`, kill switch `?encounterPrewarm=0`). The Nythraxis
-  tenant is Soul Rend: its mark clones every marked body's materials
-  `transparent` with `depthWrite = false`, which three keys as a NEW program per
-  body AND per mesh SHAPE, so the first mark linked ~32 programs inside one
-  frame. Two halves, because neither covers the other: a CATALOG (class rigs,
-  VFX weapon skins) and the LIVE looks in the room, since real players carry dye
-  and jewel variants no default rig has. Three rules the measurements paid for:
-  the stand-in must be SKINNED (a `PlaneGeometry` proxy links a different
-  variant and changes nothing), the clone materials are kept alive and never
-  disposed (three releases the program with the last material), and BOTH the
-  build and the compile drain across idle slots, per body, chained, because a
-  raid arrives together and independent idle waits otherwise resolve in one idle
-  period and concatenate into a single long task.
+  `_pass.ts` + `_host.ts`, kill switch `?encounterPrewarm=0`): the mechanic
+  visuals an encounter builds lazily in live combat (Varkhul's and Ignivar's
+  sets, the Nythraxis floor telegraphs). The built visuals are kept alive and
+  never disposed (three releases the program with the last material), and the
+  builds drain across idle slots before the compile, because built in one loop
+  they land on the attach frame. Nythraxis' Soul Rend mark used to be this
+  module's biggest tenant (a lit transparent clone per marked body, catalog and
+  live arm); it now draws the spirit veil, whose family the boot manifest
+  links, so it needs nothing here.
   Warm nothing whose cost you have not measured: Brother Aldric was in this
   spec until an A/B from a start zone that had never compiled his model showed
   his spawn linking ZERO programs (the player bodies on screen already carry
@@ -859,8 +888,9 @@ GPU work signs. Each rule names its seam and its guard.
   The cast-VFX gate (`cast_vfx_readiness_core.ts`,
   `cast_vfx_prewarm.ts`) is the same idea one level up, PER CAST and per
   program FAMILY (`cast_vfx_family.ts`: the engine every class draws, the
-  Warrior kit): one ready bit per family, and a cast draws its whole
-  composition or nothing on the mask of the families it draws from
+  Warrior kit, the Crucible trinket relics, which no cast waits on and whose
+  cosmetic holds wait on their own bit): one ready bit per family, and a cast
+  draws its whole composition or nothing on the mask of the families it draws from
   (`ability_vfx/cast_requirements.ts`: the engine, plus the kit for a Warrior
   appearance and no other class), decided at its first entry point and kept
   for the rest of that cast (`ability_vfx/cast_admission_core.ts`), while a
@@ -888,10 +918,11 @@ GPU work signs. Each rule names its seam and its guard.
   Because those two draw through a closed gate, their programs (the band's
   overlay cloud, the ring) link and are proved in their own deadline-exempt
   boot entry, `vfx.cast-first-reads` (`castVfxFirstReadsEntry`), with the Vfx
-  particle cloud, ahead of `vfx.ability-primitives`; dropped past the hard
-  deadline or skipped on the minimal manifest, it resumes as program debt ahead
-  of the primitives, whose units run engine, then kit, first
-  (`tests/cast_vfx_first_reads.test.ts`).
+  particle cloud and the Last Flame Lantern's light (drawn with no readiness
+  check, `AbilityVfx.firstReadDrawables`), ahead of `vfx.ability-primitives`;
+  dropped past the hard deadline or skipped on the minimal manifest, it resumes
+  as program debt ahead of the primitives, whose units run engine, then kit,
+  then relic, first (`tests/cast_vfx_first_reads.test.ts`).
 - **Verify, do not assert.** `?perf`, then `__game.renderer.perfStats().gpuPrep`: the
   budget snapshot, the event ring (`live-program`, `gate-timeout`, `reveal-watchdog`,
   `reveal-soft-deadline`, `submit-stop`, `attach-watchdog`, `touch-unproven` (programs a

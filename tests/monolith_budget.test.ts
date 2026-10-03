@@ -995,7 +995,32 @@ const MONOLITHS: MonolithRow[] = [
     // RE-PINNED 12687 -> 12688 at the second release merge into the same branch,
     // after PR 3847 landed on the release (its renderer.ts wiring adds one line;
     // the release pin stays 12684): wc -l on the merged tree. Exact count, zero slack.
-    ceiling: 12688,
+    // On the veil branch, 12684 -> 12606: every translucent look moved onto the spirit
+    // veil (the per-entity ghost-look decision into ghost_style_core.ts),
+    // deleting the lit twin group's slot and manifest entry, the local self
+    // warm and the Nythraxis Soul Rend live arm. Exact count, zero slack.
+    // HELD at 12614 by the integrated WebGL context restore plus spirit-veil
+    // merge: the restore lifecycle composes with the veil deletions, measured
+    // with wc -l on the merged tree. Exact count, zero slack.
+    // RE-PINNED 12614 -> 12615 in the v0.45.0 release batch: trinket relics
+    // share the cast-VFX first-read roots with context-restore relink, while
+    // the spirit-veil branch's renderer deletion and the restore branch's
+    // lifecycle wiring still compose in one file. The helper was compressed
+    // after formatting; wc -l on the resolved tree measures 12615. Exact
+    // count, zero slack.
+    // RE-PINNED 12615 -> 12642 in the v0.45.0 release batch after restoring
+    // PR #4241's self-spirit prewarm wiring that the first conflict pass left
+    // half-applied (context-restore kept the hook but the renderer had lost the
+    // prewarmer field/observe call). The helper modules and tests are extracted;
+    // these are the renderer's remaining call sites. Exact count, zero slack.
+    // LOWERED 12642 -> 12637 by PR #4282 on top of that integrated v0.45
+    // batch: the Drakelands kit lane adds the approach prefetch while moving
+    // the visible-zone recheck cadence into zone_streaming.ts. Exact count,
+    // zero slack.
+    // LOWERED 12637 -> 12625 by PR #4279 on top of the v0.45 candidate:
+    // Spell Effects keeps the event-scope wrapper while extracting world cue
+    // arms from renderer.ts. Exact count, zero slack.
+    ceiling: 12625,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1689,7 +1714,11 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 9827 and the
     // branch 9965; the two sides' additions compose to 9840 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 9840,
+    // LOWERED 9840 -> 9838 by the realm message of the day change: its state,
+    // persistence and fan-out live in server/realm_motd.ts, and the moderation
+    // target lookup moved to server/session_by_name.ts, so the wiring landed as
+    // a net shrink. Exact count, zero slack.
+    ceiling: 9838,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

@@ -109,8 +109,13 @@ describe('the presentation gate threading in main.ts frame()', () => {
     // The gate input is the module's factory (its holdWorldDraw is what the
     // blocking arrival chain receives), never a literal: pinned on the
     // declaration slice, not anywhere in the file.
+    // Its second owner is the context restore hold, read live (never a
+    // snapshot boolean), so a restore's bounded hold ORs with the arrival's.
     expect(flat(stripLineComments(declarationText('gateInput')))).toBe(
-      'gateInput = newPresentationGateInput(DESKTOP_APP)',
+      'gateInput = newPresentationGateInput(DESKTOP_APP, contextRestoreDrawHeld)',
+    );
+    expect(sourceText).toContain(
+      "import { contextRestoreDrawHeld } from './render/context_restore_hold';",
     );
     // And the hold is handed to the ARRIVAL WARMUP itself. Scoped to that call
     // expression: a whole-file match would pass on the property surviving in

@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { STABLE_PADDOCK } from '../sim/content/mounts';
 import {
@@ -23,7 +22,7 @@ import {
   WATER_LEVEL,
   zoneBiomeAt,
 } from '../sim/world';
-import { loadGltf, releaseGltf } from './assets/loader';
+import { type LoadedGltf, loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { attachBiomeHaze } from './biome_haze_field';
 import { applyCanopyDetail } from './canopy_detail';
@@ -273,7 +272,7 @@ const collapseRoleForUrl = (url: string): CollapseRole =>
       : 'plain';
 
 // kick off fetches at import; buildFoliage assumes the cache is populated
-const loadedModels = new Map<string, GLTF>();
+const loadedModels = new Map<string, LoadedGltf>();
 const extractedParts = new Map<string, ModelPart[]>();
 const foliageLoadTasks = new Map<string, Promise<void>>();
 

@@ -152,7 +152,7 @@ describe('CharacterVisual form adornments', () => {
       visual.setShadow(true);
       visual.setWeapon('bogoak_staff');
       onKit();
-      visual.setGhost(true, 'stealth');
+      visual.setGhost(true, 'stealth-rogue');
       onKit();
       visual.dispose();
     }
@@ -165,7 +165,7 @@ describe('CharacterVisual form adornments', () => {
       (name) => visual.root.getObjectByName(name) as THREE.Object3D,
     );
     expect(roots.every((root) => root.visible)).toBe(true);
-    for (const style of ['stealth', 'spirit'] as const) {
+    for (const style of ['stealth-rogue', 'stealth-other', 'spirit'] as const) {
       visual.setGhost(true, style);
       expect(roots.some((root) => root.visible)).toBe(false);
       visual.setGhost(false);
@@ -187,8 +187,8 @@ describe('CharacterVisual form adornments', () => {
   it('holds the first mount behind the injected compile gate', () => {
     const visual = new CharacterVisual('player_druid', 0xffffff, 0);
     const settles: (() => void)[] = [];
-    // The Moonwing tint stages its transparent clones through the same gate;
-    // count only what the adornments hand it.
+    // A Moonwing veil tuple the boot family has not linked stages through the
+    // same gate; count only what the adornments hand it.
     visual.setFarBakeGate((target, settle) => {
       if (target.name.startsWith('moonwing_')) settles.push(() => settle());
     });

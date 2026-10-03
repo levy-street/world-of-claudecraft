@@ -49,6 +49,7 @@ import { ABILITIES } from '../src/sim/data';
 import type { AbilityDef } from '../src/sim/types';
 import { EmpowerHold } from '../src/ui/empower_hold_core';
 import { Hud } from '../src/ui/hud';
+import { ActionBarController } from '../src/ui/hud/action_bar/action_bar_controller';
 import { ACTION_BAR_ABILITY_SLOTS } from '../src/ui/hud/action_bar/action_bar_layout_core';
 import { tSim } from '../src/ui/sim_i18n';
 import { isStanceBarAbilityGroup } from '../src/ui/stance_bar_view';
@@ -123,6 +124,44 @@ function makeHud(
   hud.renderBags = vi.fn();
   return hud;
 }
+
+describe('consumable item shortcuts use the real placement gate', () => {
+  it.each([
+    'lesser_healing_potion',
+    'stormjar',
+    'silverleaf_scroll',
+    'ironhusk_flask',
+    'harvest_feast',
+    'emissary_cache',
+    'dense_sharpening_stone',
+    'pattern_spiritweld_girdle',
+  ])('activates %s from a regular slot and a controller-only binding', (id) => {
+    const controller = new ActionBarController({
+      storage: { getItem: () => null, setItem: () => {}, removeItem: () => {} },
+      playerClass: 'warrior',
+      playerName: 'ItemShortcutTester',
+      playerLevel: () => 1,
+      talentSpec: () => null,
+      knownAbilityIds: () => [],
+      hasAura: () => false,
+      showAttackButton: () => true,
+    });
+    controller.replaceActions([{ type: 'item', id }]);
+    const hud = makeHud();
+    hud.actionBarController = controller;
+    Object.assign(hud, { isGroundAimActive: () => false });
+
+    Hud.prototype.castSlot.call(hud as unknown as Hud, 1);
+    expect(hud.sim.useItem).toHaveBeenCalledExactlyOnceWith(id);
+    expect(hud.flashActionSlot).toHaveBeenCalledExactlyOnceWith(1);
+
+    hud.sim.useItem.mockClear();
+    controller.replaceActions([]);
+    hud.castCrossHotbarAction({ type: 'item', id });
+    expect(hud.sim.useItem).toHaveBeenCalledExactlyOnceWith(id);
+    expect(hud.showError).not.toHaveBeenCalled();
+  });
+});
 
 describe('Hud cross hotbar hold routing', () => {
   it('routes an on-bar press through pressSlot at the last bar slot', () => {

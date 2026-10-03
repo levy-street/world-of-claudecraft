@@ -1,4 +1,4 @@
-// The Warrior kit's textures (nine baked sheets, one 4096px, three contact
+// The Warrior kit's textures (eight baked sheets, one 4096px, three contact
 // sheets, three material maps, the fragment GLB) decode to well over 150 MB of
 // RGBA. They are loaded ON DEMAND, once per page, when the active kit is
 // requested (a local Warrior at entry, or the first remote Warrior the painter
@@ -14,6 +14,7 @@ vi.mock('../src/render/assets/loader', async () => {
   const THREE = await import('three');
   return {
     loadTexture: vi.fn(async () => new THREE.Texture()),
+    loadBitmapTexture: vi.fn(async () => new THREE.Texture()),
     loadKtx2Texture: vi.fn(async () => new THREE.Texture()),
     loadGltf: vi.fn(async () => {
       const mesh = new THREE.Mesh(new THREE.BufferGeometry());
@@ -47,23 +48,28 @@ import {
   type AbilityVfxEntityState,
 } from '../src/render/ability_vfx/painter';
 import {
+  BAKED_URLS,
+  type BakedKind,
   bakedTexture,
   ensureWarriorKitAssets,
   productionAssetInternalsForTest,
   warriorBloodTexture,
   warriorKitAssetsState,
   warriorPressureTexture,
+  warriorRockTexture,
   warriorSteelTexture,
 } from '../src/render/ability_vfx/production_assets';
 import * as loader from '../src/render/assets/loader';
 
 const loadTexture = vi.mocked(loader.loadTexture);
+const loadBitmapTexture = vi.mocked(loader.loadBitmapTexture);
 const loadKtx2Texture = vi.mocked(loader.loadKtx2Texture);
 
 beforeEach(() => {
   productionAssetInternalsForTest.reset();
   contactAssetInternalsForTest.reset();
   loadTexture.mockClear();
+  loadBitmapTexture.mockClear();
   loadKtx2Texture.mockClear();
 });
 afterEach(() => vi.restoreAllMocks());
@@ -73,6 +79,7 @@ describe('ensureWarriorKitAssets', () => {
     await expect(ensureWarriorKitAssets(true)).resolves.toBe(false);
     expect(warriorKitAssetsState()).toBe('declined');
     expect(loadTexture).not.toHaveBeenCalled();
+    expect(loadBitmapTexture).not.toHaveBeenCalled();
     expect(loadKtx2Texture).not.toHaveBeenCalled();
     expect(bakedTexture('smoke')).toBeNull();
     expect(warriorSteelTexture()).toBeNull();
@@ -85,8 +92,10 @@ describe('ensureWarriorKitAssets', () => {
     expect(ensureWarriorKitAssets(false)).toBe(first);
     await expect(first).resolves.toBe(true);
     expect(warriorKitAssetsState()).toBe('ready');
-    // eight WebP baked sheets plus pressure, blood, steel and rock
-    expect(loadTexture).toHaveBeenCalledTimes(12);
+    // seven WebP baked sheets plus pressure, blood, steel and rock, every one
+    // decoded off the main thread (the image path decodes inside the upload)
+    expect(loadBitmapTexture).toHaveBeenCalledTimes(11);
+    expect(loadTexture).not.toHaveBeenCalled();
     // the KTX2 crush sheet plus the three contact sheets
     expect(loadKtx2Texture).toHaveBeenCalledTimes(4);
     for (const kind of [
@@ -98,7 +107,6 @@ describe('ensureWarriorKitAssets', () => {
       'warrior_bite',
       'warrior_shear',
       'warrior_crush',
-      'shockwave',
     ] as const) {
       expect(bakedTexture(kind), kind).not.toBeNull();
     }
@@ -106,7 +114,37 @@ describe('ensureWarriorKitAssets', () => {
     expect(contactTexture('contact_crush')).not.toBeNull();
     expect(contactTexture('contact_pierce')).not.toBeNull();
     await ensureWarriorKitAssets(false);
-    expect(loadTexture).toHaveBeenCalledTimes(12);
+    expect(loadBitmapTexture).toHaveBeenCalledTimes(11);
+  });
+
+  it('releases each image sheet once uploaded, and decodes them again for a rebuilt renderer', async () => {
+    const bitmaps: { width: number; height: number; close: () => void }[] = [];
+    loadBitmapTexture.mockImplementation(async () => {
+      const image = { width: 4, height: 4, close: vi.fn() };
+      bitmaps.push(image);
+      return new THREE.Texture(image as never);
+    });
+    await ensureWarriorKitAssets(false);
+    const sheets = [
+      ...Object.keys(BAKED_URLS).map((kind) => bakedTexture(kind as BakedKind)),
+      warriorPressureTexture(),
+      warriorBloodTexture(),
+      warriorSteelTexture(),
+      warriorRockTexture(),
+    ].filter((texture) => texture && bitmaps.includes(texture.image as never)) as THREE.Texture[];
+    expect(sheets).toHaveLength(11);
+    // The first renderer uploads every sheet: three calls onUpdate after each.
+    for (const texture of sheets) texture.onUpdate?.(texture);
+    for (const image of bitmaps) expect(image.close).toHaveBeenCalledTimes(1);
+    expect(sheets.every((texture) => bitmaps.includes(texture.image as never))).toBe(false);
+    // A rebuilt renderer's kit asks again before its recipe uploads anything.
+    await expect(ensureWarriorKitAssets(false)).resolves.toBe(true);
+    expect(loadBitmapTexture).toHaveBeenCalledTimes(22);
+    for (const texture of sheets) {
+      expect(bitmaps.slice(11)).toContain(texture.image);
+      expect(texture.source.dataReady).toBe(true);
+    }
+    loadBitmapTexture.mockImplementation(async () => new THREE.Texture());
   });
 
   it('keeps a mip chain on the WebP sheets and leaves the KTX2 and data maps alone', async () => {

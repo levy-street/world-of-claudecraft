@@ -33,6 +33,6 @@ through `IWorld.hillInfo`), behind the `index.ts` barrel:
   counts through `formatNumber`. The numbers the copy quotes resolve from
   `src/sim/pvp/hill_rules.ts`, never literals.
 - The circle itself is drawn by the renderer (`src/render/hill_ring.ts`; still
-  and faint while announced); the `/hill` chat readout and the warning, rise
-  and fall announcements come from the sim through the matcher
-  (`src/ui/sim_i18n.ts`, `hill.*`).
+  and faint while announced); the `/hill` chat readout and the warning, rise,
+  five-minute reminder, standings, fall and Weekly Vault announcements come
+  from the sim through the matcher (`src/ui/sim_i18n.ts`, `hill.*`).

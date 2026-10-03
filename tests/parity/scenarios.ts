@@ -4559,7 +4559,7 @@ function marketRoundTrip(): Scenario {
 // that returns the old piece to the bags via addItemSilent + recalcPlayerStats),
 // unequipItem (piece back to bags + recalc), useItem (food/drink sit, potion heal +
 // cooldown, elixir aura), discardItem, sellItem (vendorInRange gate + recordVendorBuyback
-// + meta.copper payout), sellAllJunk (bulk gray sweep + per-stack buyback record), and
+// + meta.copper payout), sellAllJunk (bulk gray sweep; plain grays record no buyback), and
 // buyBackItem (meta.copper spend + addItemSilent + onInventoryChangedForQuests). Pins
 // copper / inventory / equipment / vendorBuyback in samplePlayerMeta so the W2 move stays
 // byte-identical. None of these commands draw rng, so the draw-order log must be UNCHANGED
@@ -4575,7 +4575,7 @@ function inventoryVendor(): Scenario {
       'useItem food/drink (sit + eating/drinking slot), potion (heal + cooldown), elixir (applyAura)',
       'discardItem: removeItem the discarded count',
       'sellItem: vendorInRange gate + recordVendorBuyback + meta.copper payout',
-      'sellAllJunk: bulk gray sweep, per-stack buyback record, one summary line',
+      'sellAllJunk: bulk gray sweep, plain grays skip buyback, one summary line',
       'buyBackItem: meta.copper spend + addItemSilent + onInventoryChangedForQuests',
     ],
     build: () => new Sim({ seed: 5150, playerClass: 'warrior', noPlayer: true }),
@@ -4638,7 +4638,7 @@ function inventoryVendor(): Scenario {
       sim.sellItem('wolf_fang', 1, buyer);
       rec.snapshot('sold');
 
-      // 7) bulk-sell the remaining gray (sellAllJunk: one summary line + per-stack buyback).
+      // 7) bulk-sell the remaining gray (sellAllJunk: one summary line; plain grays skip buyback).
       // bandit_bandana was the fodder here until phase 11l promoted it to a
       // common trophy reagent; soggy_moccasin keeps the junk-sold beat live.
       sim.addItem('soggy_moccasin', 1, buyer);

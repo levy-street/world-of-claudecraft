@@ -69,10 +69,14 @@ export function entityViewCandidatePriority(entity: Entity, player: Entity, d2: 
   // bg_flag/bg_rune are always lootable:false (bg_flag_interact.ts) but a
   // carried flag's position is actionable info that must never lag behind on
   // a saturated view pool (the graphics-fairness invariant), so they keep the
-  // same priority tier an ordinary lootable object gets.
+  // same priority tier an ordinary lootable object gets. The planted Dawn
+  // Battle Standard reuses the flag body and is never lootable either.
   if (
     entity.kind === 'object' &&
-    (entity.lootable || isPersistentPortalObject(entity) || entity.templateId?.startsWith('bg_'))
+    (entity.lootable ||
+      isPersistentPortalObject(entity) ||
+      entity.templateId?.startsWith('bg_') ||
+      entity.templateId === 'dawn_battle_standard')
   )
     return 2;
   if (entity.kind === 'player') return 3;

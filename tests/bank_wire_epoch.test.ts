@@ -89,7 +89,7 @@ type _PerfectingKeysAreNew = AssertNever<
 >;
 
 describe('wire compatibility epoch', () => {
-  it('fences older item formats out at the epoch-45 handshake', () => {
+  it('fences older item formats and gate colliders out at the epoch-46 handshake', () => {
     // The runtime epoch pin: the world handshake version that fences older
     // snapshot shapes out before any snapshot is admitted. The three frozen
     // fixtures above carry the per-epoch rationale: bank storage (10) added
@@ -120,9 +120,12 @@ describe('wire compatibility epoch', () => {
     // (the scheduled ferry whose deck exists only where it lies docked) composed
     // with the branch's 44, so an epoch-44 client (which draws the ship moored
     // forever) and an epoch-30 client (no world-quest wire) are both fenced out.
-    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(45);
+    // Epoch 46 moves Wildheart gate collision onto the visible stone feet;
+    // epoch-45 clients would keep predicting blockers on empty grass.
+    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(46);
     expect(ONLINE_WORLD_AUTH_TYPE).toBe(`auth-world-${ONLINE_WORLD_LAYOUT_VERSION}`);
-    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-45');
+    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-46');
+    expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-45');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-44');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-42');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-43');

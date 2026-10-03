@@ -377,7 +377,8 @@ export function renderVendorWindow(
   sellJunk.addEventListener('click', () => deps.onSellJunk());
   deps.attachTooltip(
     sellJunk,
-    () => `<div class="tt-sub">${esc(t('itemUi.vendor.sellJunkHint'))}</div>`,
+    () =>
+      `<div class="tt-sub">${esc(t('itemUi.vendor.sellJunkHint'))}</div><div class="tt-sub">${esc(t('itemUi.vendor.sellJunkNoBuyback'))}</div>`,
   );
   el.appendChild(sellJunk);
 

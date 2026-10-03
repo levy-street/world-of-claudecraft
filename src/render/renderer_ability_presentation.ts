@@ -6,13 +6,14 @@ import { resumeActiveAbilityKit } from './ability_vfx/active_kit_prewarm';
 import type { AbilityVfxDeps } from './ability_vfx/painter';
 import { isLivingWarriorAttentionSource } from './ability_vfx/warrior_attention_core';
 import { preparedAbilityAudio, type SpatialAudioSink } from './audio_sink';
-import { CAST_VFX_ENGINE } from './cast_vfx_family';
+import { CAST_VFX_RELIC } from './cast_vfx_family';
 import type { CastVfxReadiness } from './cast_vfx_readiness_core';
 import type { CharacterVisual } from './characters/visual';
 import { createOnrushArrivalHandler } from './characters/warrior_rush_pose';
 import { impactContact } from './impact_contact';
 import type { LightPulses } from './light_pulses';
 import type { EntityView } from './renderer';
+import { bindSpellEffectsWorld, spellEffectsEnabled } from './spell_effects_switch';
 import { TrinketRelics } from './trinket_relics';
 import type { Vfx } from './vfx';
 import type { VfxAnchorResolver } from './vfx_anchor';
@@ -47,6 +48,9 @@ interface PresentationHost {
 /** Existing painter wiring and Warrior equipment/contact reads share one owner.
  * World lookup stays live across world replacement; simulation is never mutated. */
 export function createRendererAbilityPresentation(h: PresentationHost) {
+  // The Spell Effects option judges each effect by its caster, looked up in
+  // the live world (a world replacement is picked up on the next lookup).
+  bindSpellEffectsWorld((id) => h.world().entities.get(id));
   const visual = (id: number) => {
     const view = h.views.get(id);
     return view ? h.visual(view) : null;
@@ -94,9 +98,10 @@ export function createRendererAbilityPresentation(h: PresentationHost) {
     ground: (x, z) => h.ground(x, z),
     vfx: h.vfx,
     time: () => h.time(),
-    // The relics are engine-family programs: ready once the cast gate has
-    // linked that family (the release's per-family cast admission).
-    ready: () => h.castGate.ready(CAST_VFX_ENGINE),
+    // The family trinket_relics.ts tags every relic drawable with. Every
+    // relic belongs to a player's trinket, so a closed Spell Effects option
+    // holds them all after the family itself is linked.
+    ready: () => spellEffectsEnabled() && h.castGate.ready(CAST_VFX_RELIC),
   });
   const painter = new AbilityVfx(
     {

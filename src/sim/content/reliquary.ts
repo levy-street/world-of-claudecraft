@@ -457,6 +457,9 @@ export const RELIQUARY_HORIZON_TITLES = [
   // The Clue Scroll tenth-casket title (world quests, Stage 3): Treasure
   // Hunter pages here per the locked titles-page rule.
   'exp_clue_ten_caskets',
+  // The sixth lifetime-XP rung (10,000,000 lifetime experience): Titan
+  // pages here per the locked titles-page rule.
+  'prog_titan',
 ] as const;
 
 // Profession lifetime mark ids (Phase 7). Prefer existing visited namespaces

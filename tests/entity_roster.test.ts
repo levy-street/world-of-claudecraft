@@ -160,6 +160,7 @@ function makeCtx() {
       recentDamage: new Map(),
       recentSupport: new Map(),
       paidDeaths: new Set(),
+      spoils: new Map(),
       killsByPair: new Map(),
       zoneOf: new Map(),
       nextDisarmAt: Number.POSITIVE_INFINITY,

@@ -12,7 +12,6 @@
 // assetsReady() left an unrelated preload failure anywhere on the site
 // permanently blanking it on a cold, first-visit cache.
 import * as THREE from 'three';
-import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import {
@@ -21,13 +20,14 @@ import {
 } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { retryDelayMs as gltfRetryDelayMs } from '../assets/load_retry';
-import { loadGltf, loadKtx2Texture, loadTexture } from '../assets/loader';
+import { type LoadedGltf, loadGltf, loadKtx2Texture, loadTexture } from '../assets/loader';
 import { registerPreload } from '../assets/preload';
 import { recordBuildSpan, timeBuildSpan } from '../build_spans';
 import { addRimGlow, EMISSIVE_GLOW, GFX, type GfxSettings } from '../gfx';
 import { applyRiggedWornDetail, applySurfaceDetail } from '../worn_stone';
 import { type ArmorDyeSpec, attachArmorDye } from './armor_dye';
 import { backGripFor } from './back_grips';
+import { composedVariantBounds, composedVariantEvictions } from './composed_variant_residency_core';
 import { dequantizeAttribute } from './dequantize_attribute';
 import { coalesceFarBakeGroups, farBakeGroupRanges } from './far_bake_groups_core';
 import { padMissingUv } from './far_bake_uv_pad';
@@ -97,6 +97,12 @@ import {
   createPaladinTemplarsVerdictClip,
   PALADIN_TEMPLARS_VERDICT_CLIP,
 } from './paladin_templars_verdict_clip';
+import {
+  characterStreamPlan,
+  RiftBodyLanes,
+  RiftBodyStreamTrigger,
+  type RiftBodyStreamWorld,
+} from './rift_body_stream_core';
 import { animatedNodeNames, mergeSkinnedParts } from './rig_merge';
 import { shareRigSkeleton } from './rig_shared_skeleton';
 import { attachSharedDepthMaterials, clearSharedDepthMaterials } from './shadow_depth_materials';
@@ -552,7 +558,7 @@ function resolveBone(root: THREE.Object3D, name: string): THREE.Object3D | null 
 // Preload
 // ---------------------------------------------------------------------------
 
-const gltfByUrl = new Map<string, GLTF>();
+const gltfByUrl = new Map<string, LoadedGltf>();
 
 function assetUrl(url: string): string {
   return visualAssetUrlForGraphics(url, GFX.standardMaterials);
@@ -565,8 +571,9 @@ function assetUrl(url: string): string {
 // world entry crashes (the character-side twin of the v0.16.0 props P0).
 const allPreloadUrls = characterPreloadUrls(false);
 
-// Every iOS WebKit host carves the mob bodies out of the boot gate and STREAMS
-// them after first frame instead. They are the
+// Every iOS WebKit host carves the mob bodies (rift_body_stream_core.ts
+// STREAMED_BODY_URL_PREFIXES) out of the boot gate and STREAMS them after first
+// frame instead. They are the
 // heaviest character content (creature + skeleton-family GLBs with embedded
 // 1024-class atlases; 47 files, and by far the largest share of the decoded
 // character residency) and nothing on the launcher, the character-select
@@ -580,7 +587,9 @@ const allPreloadUrls = characterPreloadUrls(false);
 // and click target do not exist. Weapons and NPC bodies also stay in the gate:
 // the char-select preview builds CharacterVisual DIRECTLY (not through the
 // fail-soft factory), so a missing held-weapon GLB there would throw.
-const STREAMED_URL_PREFIXES = ['models/creatures/', 'models/chars/enemies/'];
+// The Rift-only share of those bodies does not ride the post-entry stream at
+// all: it waits for a reachable Rift or Buried Hoard (rift_body_stream_core.ts,
+// the lanes, their pacing, the trigger and why).
 // Armory weapon-SKIN models stay out of the gate too (64 of the 78 weapon
 // files), but remain on demand instead of joining the bulk post-entry stream.
 // They are cosmetic replacements for base weapons that always stay in the
@@ -595,17 +604,11 @@ const streamedSkinUrls = new Set(weaponSkinModelUrls());
 export function isWeaponSkinModelUrl(url: string): boolean {
   return streamedSkinUrls.has(url);
 }
-function streamedCharacterUrlsFor(profile: Readonly<GfxSettings>): string[] {
-  return allPreloadUrls.filter(
-    (url) =>
-      streamedSkinUrls.has(url) ||
-      (profile.iosMemoryProfile && STREAMED_URL_PREFIXES.some((prefix) => url.includes(prefix))),
-  );
+function streamPlanFor(profile: Readonly<GfxSettings>) {
+  return characterStreamPlan(allPreloadUrls, streamedSkinUrls, profile.iosMemoryProfile);
 }
-function postEntryStreamUrlsFor(urls: readonly string[]): string[] {
-  return urls.filter((url) => STREAMED_URL_PREFIXES.some((prefix) => url.includes(prefix)));
-}
-let streamedUrls = streamedCharacterUrlsFor(GFX);
+const initialStreamPlan = streamPlanFor(GFX);
+let streamedUrls = initialStreamPlan.streamed;
 let streamedUrlSet = new Set(streamedUrls);
 const lazyOnDemandUrls = new Set(
   Object.values(VISUALS).flatMap((def) =>
@@ -614,7 +617,7 @@ const lazyOnDemandUrls = new Set(
       : [],
   ),
 );
-let postEntryStreamUrls = postEntryStreamUrlsFor(streamedUrls);
+let postEntryStreamUrls = initialStreamPlan.postEntry;
 const preloadUrls = allPreloadUrls.filter((url) => !streamedUrlSet.has(url));
 const characterLoadTasks = new Map<string, Promise<void>>();
 type CharacterAssetReadyListener = (url: string) => void;
@@ -703,6 +706,28 @@ export function startStreamedCharacterPreloads(): number {
   return postEntryStreamUrls.length;
 }
 
+// The Rift-only bodies ride their own paced lanes (rift_body_stream_core.ts has
+// the class, the pacing and the trigger); every other profile's lanes are empty.
+const riftLanes = new RiftBodyLanes({
+  fetch: prepareCharacterUrl,
+  postEntryStarted: () => streamedStarted,
+  onLaneStart: (lane, count) => {
+    console.info(`[entry-guard] streaming ${count} ${lane} character assets`);
+  },
+});
+riftLanes.setUrls(initialStreamPlan.rift, initialStreamPlan.hoard);
+const riftTrigger = new RiftBodyStreamTrigger(riftLanes);
+
+/**
+ * Poll the Rift lanes once per frame (the client loop, src/main.ts). A body
+ * fetched here still reaches the screen through the live compile gate at its
+ * first view, and a view that asks early re-arms its own fetch through the
+ * build-miss path (resolvedGltf), like every streamed body.
+ */
+export function pollRiftCharacterStream(world: RiftBodyStreamWorld): void {
+  riftTrigger.update(world);
+}
+
 // Skin textures: player alternate body atlases, loaded sRGB + flipY=false so
 // they line up with the glTF-embedded UVs. These load on every tier so skin
 // selection previews and cosmetics keep distinct colours even on low graphics.
@@ -757,7 +782,8 @@ if (eagerSkinAtlases) {
 
 /** Prepare character sources and cosmetic atlases selected by an explicit target profile. */
 export async function prepareCharacterProfileAssets(target: Readonly<GfxSettings>): Promise<void> {
-  const nextStreamedUrls = streamedCharacterUrlsFor(target);
+  const nextPlan = streamPlanFor(target);
+  const nextStreamedUrls = nextPlan.streamed;
   const nextStreamedSet = new Set(nextStreamedUrls);
   const requiredGltf = manifestUrlsForGraphics(target.standardMaterials).filter(
     (url) => !nextStreamedSet.has(url),
@@ -767,7 +793,8 @@ export async function prepareCharacterProfileAssets(target: Readonly<GfxSettings
   if (nextSignature !== streamedUrls.join('|')) streamedStarted = false;
   streamedUrls = nextStreamedUrls;
   streamedUrlSet = nextStreamedSet;
-  postEntryStreamUrls = postEntryStreamUrlsFor(nextStreamedUrls);
+  postEntryStreamUrls = nextPlan.postEntry;
+  riftLanes.setUrls(nextPlan.rift, nextPlan.hoard);
 }
 
 /** Resolve once every boot-time character GLB + skin atlas is cached, retrying
@@ -956,7 +983,7 @@ export function characterResidencySources(): { parsedScenes: THREE.Object3D[] } 
   return { parsedScenes: [...gltfByUrl.values()].map((g) => g.scene) };
 }
 
-function resolvedGltf(url: string): GLTF {
+function resolvedGltf(url: string): LoadedGltf {
   const resolvedUrl = assetUrl(url);
   const g = gltfByUrl.get(resolvedUrl);
   if (!g) {
@@ -1033,6 +1060,10 @@ interface ModularVariant {
   /** Baked idle-pose far LOD for this part set, minted on first far-band
    *  entry. Shares the entry's lifetime (see evictModularVariants). */
   far: ModularFarBake | null;
+  /** When a character was last composed from this part set or stopped being
+   *  drawn from it (`variantSeenSeq`): the recency the iOS idle bound evicts
+   *  by, least recently seen first (composed_variant_residency_core.ts). */
+  seenAt: number;
 }
 
 // BOUNDED AND REFCOUNTED, and it used to be neither.
@@ -1052,12 +1083,18 @@ interface ModularVariant {
 // CharacterVisual.dispose, and only entries with NO live clone are eligible.
 // When every entry is live the cache is allowed past the cap rather than
 // breaking a body on screen: the bound is on garbage, not on the crowd.
+//
+// WHICH idle entries go, and how many may stay, is composed_variant_residency_
+// core.ts: the total cap on every profile, plus an idle bound on the iOS memory
+// profile, where the looks a session walked past are what the WebContent
+// process runs out of.
 const modularVariantCache = new Map<string, ModularVariant>();
-/** Retained clones over the cap keep their variant; only idle ones are dropped. */
-const MODULAR_VARIANT_CACHE_MAX = 96;
 /** Dev-only tripwire on live (unevictable) variants: the one growth the cap
  *  cannot bound, and the signal that a release site was missed. */
 const MODULAR_VARIANT_WARN_AT = 128;
+/** The recency clock of the cache: a sequence, not a time, stamped whenever a
+ *  part set is composed from or goes idle. */
+let variantSeenSeq = 0;
 
 /** The cache key for a composed part set: the GLB plus the picked node names. */
 function modularVariantKey(url: string, names: readonly string[]): string {
@@ -1123,14 +1160,18 @@ export function sourceGeometries(url: string): Set<THREE.BufferGeometry> {
   return owned;
 }
 
-/** Drop idle variants, least-recently-used first, until the cache is back under
- *  the cap. Map iteration is insertion order and every hit re-inserts, so the
- *  head is the least recently composed. */
+/** Drop the idle variants the profile's bounds say to drop
+ *  (composedVariantEvictions): past the total cap in cache order (Map
+ *  iteration is insertion order and every hit re-inserts, so the head is the
+ *  least recently composed), and on the iOS profile past the idle bound, least
+ *  recently seen first. The bounds are read off the live GFX profile. */
 function evictModularVariants(): void {
-  if (modularVariantCache.size <= MODULAR_VARIANT_CACHE_MAX) return;
-  for (const [key, entry] of modularVariantCache) {
-    if (modularVariantCache.size <= MODULAR_VARIANT_CACHE_MAX) break;
-    if (entry.refs > 0) continue;
+  const bounds = composedVariantBounds(GFX);
+  for (const key of composedVariantEvictions(modularVariantCache, bounds)) {
+    const entry = modularVariantCache.get(key);
+    // The core never names an entry with a live clone; this is the line before
+    // a dispose that would blank a body on screen, so it checks, not trusts.
+    if (!entry || entry.refs > 0) continue;
     modularVariantCache.delete(key);
     // Now provably unreferenced, so the buffers this variant MINTED can go
     // back: dropping the map entry alone would leak them (three.js frees a
@@ -1145,7 +1186,7 @@ function evictModularVariants(): void {
   }
   if (import.meta.env?.DEV && modularVariantCache.size >= MODULAR_VARIANT_WARN_AT) {
     console.warn(
-      `[modular] ${modularVariantCache.size} composed variants live at once (cap ${MODULAR_VARIANT_CACHE_MAX}); every one is still on screen`,
+      `[modular] ${modularVariantCache.size} composed variants live at once (cap ${bounds.maxTotal}); every one is still on screen`,
     );
   }
 }
@@ -1162,8 +1203,13 @@ export function releaseModularVariant(root: THREE.Object3D): void {
   entry.refs--;
   // Sweeping only on a miss leaves a cache that went over the cap while every
   // entry was live sitting there forever if it then only ever hits. Going idle
-  // is the other moment eviction can make progress, so take it.
-  if (entry.refs === 0) evictModularVariants();
+  // is the other moment eviction can make progress, so take it. Going idle is
+  // also the last time anyone SAW this look, the recency the idle bound keeps:
+  // stamped first, so this sweep treats it as the newest idle entry.
+  if (entry.refs === 0) {
+    entry.seenAt = ++variantSeenSeq;
+    evictModularVariants();
+  }
 }
 
 /** Composed-body cache occupancy, for the crowd-perf probe on `window.__game`:
@@ -1183,8 +1229,16 @@ function modularVariant(url: string, names: readonly string[]): ModularVariant {
     // re-insert so the eviction sweep above reads insertion order as recency
     modularVariantCache.delete(key);
     modularVariantCache.set(key, hit);
+    hit.seenAt = ++variantSeenSeq;
     return hit;
   }
+  // The miss is the whole compose (clone of the part library, prune, merge,
+  // rebind): its own ledger kind, so what a look costs when it is seen for the
+  // first time, or again after an eviction, reads apart from the map hits the
+  // `view-part:assemble:variant` span also counts. For a live candidate it
+  // usually runs BEFORE the view build (the look-pieces head lookup), so
+  // `view:composed` alone never showed it.
+  const composeStarted = performance.now();
   const root = cloneSkinned(resolvedGltf(url).scene);
   const keep = new Set(names);
   const drop: THREE.Object3D[] = [];
@@ -1220,6 +1274,9 @@ function modularVariant(url: string, names: readonly string[]): ModularVariant {
   // must leave alone.
   shareRigSkeleton(root, { preferCanonical: isComposedHead });
   primeSkinnedSortSpheres(root);
+  // The clock stops here, before the sweep: the kind prices composing a look,
+  // not freeing the ones the sweep evicts to make room.
+  recordBuildSpan('view-part:variant-compose', performance.now() - composeStarted, composeStarted);
   // Sweep BEFORE inserting, never after. The new entry is born at refs 0 and
   // the caller only retains it once this returns, so a sweep run after the
   // insert reaches the newest entry last, finds it unreferenced, and disposes
@@ -1227,7 +1284,7 @@ function modularVariant(url: string, names: readonly string[]): ModularVariant {
   // root, the far bake writes to an orphaned entry forever, and the release
   // finds nothing. Trimming first cannot see it at all.
   evictModularVariants();
-  const entry: ModularVariant = { root, url, refs: 0, far: null };
+  const entry: ModularVariant = { root, url, refs: 0, far: null, seenAt: ++variantSeenSeq };
   modularVariantCache.set(key, entry);
   return entry;
 }

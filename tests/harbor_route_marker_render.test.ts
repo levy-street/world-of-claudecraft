@@ -4,7 +4,14 @@ import { MeshoptDecoder } from 'meshoptimizer';
 import * as THREE from 'three';
 import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
-import { activateGfxProfile, GFX, type GfxTier, getActiveGfxProfile } from '../src/render/gfx';
+import {
+  activateGfxProfile,
+  GFX,
+  type GfxSettings,
+  type GfxTier,
+  getActiveGfxProfile,
+  gfxInternalsForTest,
+} from '../src/render/gfx';
 import {
   buildHarborRouteMarker,
   buildHarborRouteMarkers,
@@ -18,8 +25,9 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 // The harbor route marker painter (src/render/harbor_route_markers.ts) over the
 // shipped GLB: which parts each graphics tier really draws, the two destination
 // planes (never mirrored, standing proud of the board), the plate read from the
-// model's anchor, and a repaint (language switch, web font) that uploads a
-// texture without touching a material, so no program ever relinks.
+// model's anchor, a repaint (language switch, web font) that uploads a texture
+// without touching a material, so no program ever relinks, and the plate canvas
+// the live memory profile paints (its size and metrics from the core).
 
 const internals = harborRouteMarkerInternalsForTest;
 const GLB = path.join(__dirname, '..', 'public', internals.assetUrl.replace(/^\//, ''));
@@ -43,19 +51,44 @@ let gltf: GLTF;
 const originalProfile = getActiveGfxProfile();
 const realDocument = (globalThis as { document?: unknown }).document;
 
-/** A 2D context that records nothing: the painter only needs its calls to exist. */
-function fakeContext(): unknown {
+/** One call or property write on a plate's 2D context. */
+interface PaintCall {
+  op: string;
+  args: unknown[];
+}
+interface FakeCanvas {
+  width: number;
+  height: number;
+  paintLog: PaintCall[];
+  getContext(): unknown;
+}
+
+/** A 2D context that logs every call and property write, and measures a name
+ *  0.6 font px wide per letter at the font last set. */
+function fakeContext(log: PaintCall[]): unknown {
+  let fontPx = 10;
   return new Proxy(
     {},
     {
       get(_t, key) {
-        if (key === 'measureText') return (s: string) => ({ width: s.length * 40 });
+        if (key === 'measureText') return (s: string) => ({ width: s.length * fontPx * 0.6 });
         if (key === 'createLinearGradient') return () => ({ addColorStop() {} });
-        return () => undefined;
+        return (...args: unknown[]) => {
+          log.push({ op: String(key), args });
+        };
       },
-      set: () => true,
+      set(_t, key, value) {
+        if (key === 'font') fontPx = Number(/(\d+(?:\.\d+)?)px/.exec(String(value))?.[1]);
+        log.push({ op: `${String(key)}=`, args: [value] });
+        return true;
+      },
     },
   );
+}
+
+function fakeCanvas(): FakeCanvas {
+  const paintLog: PaintCall[] = [];
+  return { width: 0, height: 0, paintLog, getContext: () => fakeContext(paintLog) };
 }
 
 function withTier(tier: GfxTier): void {
@@ -84,7 +117,7 @@ beforeAll(async () => {
   const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
   gltf = await new Promise<GLTF>((resolve, reject) => loader.parse(ab, '', resolve, reject));
   (globalThis as { document?: unknown }).document = {
-    createElement: () => ({ width: 0, height: 0, getContext: () => fakeContext() }),
+    createElement: fakeCanvas,
     addEventListener() {},
   };
   internals.clearPlatesForTest();
@@ -245,5 +278,110 @@ describe('harbor route marker painter: repaint and prewarm', () => {
       if (plate) expect([...warmed].some((w) => (w as THREE.MeshStandardMaterial).map)).toBe(true);
       else expect(warmed.has(m)).toBe(true);
     }
+  });
+});
+
+describe('harbor route marker painter: the plate canvas per memory profile', () => {
+  /** A fresh plate for the Drakelands berth's destination under `settings`. */
+  function paintedPlate(settings: GfxSettings): FakeCanvas {
+    activateGfxProfile({ ...originalProfile, settings });
+    internals.setLoadedGltfForTest(gltf);
+    internals.clearPlatesForTest();
+    const sign = buildHarborRouteMarker(HARBOR_ROUTE_MARKERS[2], WORLD_SEED);
+    const text = sign.children.find((c) => c.name === 'DestinationText') as THREE.Mesh;
+    const map = (text.material as THREE.MeshStandardMaterial).map as THREE.CanvasTexture;
+    return map.image as unknown as FakeCanvas;
+  }
+  const calls = (canvas: FakeCanvas, op: string) =>
+    canvas.paintLog.filter((c) => c.op === op).map((c) => c.args);
+
+  afterAll(() => internals.clearPlatesForTest());
+
+  it('paints 1024x340 with the authored metrics off the iOS memory profile', () => {
+    for (const hints of [undefined, { platform: 'android' as const }]) {
+      const canvas = paintedPlate(gfxInternalsForTest.settingsFor('high', hints));
+      const at = JSON.stringify(hints ?? null);
+      expect([canvas.width, canvas.height], at).toEqual([1024, 340]);
+      expect(calls(canvas, 'lineWidth='), at).toEqual([[6]]);
+      expect(calls(canvas, 'strokeRect'), at).toEqual([[22, 22, 980, 296]]);
+      // the lift then the ink, both squeezed to the same text box
+      const [lift, ink] = calls(canvas, 'fillText');
+      expect(lift.slice(1), at).toEqual([514, 173, 1024 * 0.9]);
+      expect(ink.slice(1), at).toEqual([512, 170, 1024 * 0.9]);
+      // "The Drakelands" fits from 211 px down in steps of 4
+      const fonts = calls(canvas, 'font=').map(([f]) => Number(/(\d+)px/.exec(String(f))?.[1]));
+      expect(fonts[0], at).toBe(211);
+      expect(fonts[1] - fonts[0], at).toBe(-4);
+      expect(fonts.at(-1), at).toBe(107);
+    }
+  });
+
+  it('paints 512x170 with every metric halved on the iOS memory profile, tight rung included', () => {
+    for (const hints of [
+      { platform: 'ios' as const },
+      { platform: 'ios' as const, tightMemory: true },
+    ]) {
+      const canvas = paintedPlate(gfxInternalsForTest.settingsFor('high', hints));
+      const at = JSON.stringify(hints);
+      expect([canvas.width, canvas.height], at).toEqual([512, 170]);
+      expect(calls(canvas, 'lineWidth='), at).toEqual([[3]]);
+      expect(calls(canvas, 'strokeRect'), at).toEqual([[11, 11, 490, 148]]);
+      const [lift, ink] = calls(canvas, 'fillText');
+      expect(lift.slice(1), at).toEqual([257, 86.5, 512 * 0.9]);
+      expect(ink.slice(1), at).toEqual([256, 85, 512 * 0.9]);
+      // the same name fits the same share of the plate: half the font, steps of 2
+      const fonts = calls(canvas, 'font=').map(([f]) => Number(/(\d+)px/.exec(String(f))?.[1]));
+      expect(fonts[0], at).toBe(105);
+      expect(fonts[1] - fonts[0], at).toBe(-2);
+      expect(fonts.at(-1), at).toBe(53);
+    }
+  });
+
+  it('paints the name on every tier on the iOS memory profile, at the half size', () => {
+    for (const tier of ['low', 'medium', 'high', 'ultra', 'insane'] as const) {
+      for (const hints of [
+        { platform: 'ios' as const },
+        { platform: 'ios' as const, tightMemory: true },
+      ]) {
+        const canvas = paintedPlate(gfxInternalsForTest.settingsFor(tier, hints));
+        const at = `${tier} ${JSON.stringify(hints)}`;
+        expect([canvas.width, canvas.height], at).toEqual([512, 170]);
+        // the lift and the ink, both carrying the destination name
+        const fills = calls(canvas, 'fillText');
+        expect(fills, at).toHaveLength(2);
+        for (const [text] of fills)
+          expect(text, at).toBe(internals.destinationLabel(HARBOR_ROUTE_MARKERS[2].destination));
+      }
+    }
+  });
+
+  it('keeps the texture settings on both sizes', () => {
+    for (const hints of [undefined, { platform: 'ios' as const }]) {
+      paintedPlate(gfxInternalsForTest.settingsFor('high', hints));
+      const sign = buildHarborRouteMarker(HARBOR_ROUTE_MARKERS[2], WORLD_SEED);
+      const text = sign.children.find((c) => c.name === 'DestinationText') as THREE.Mesh;
+      const map = (text.material as THREE.MeshStandardMaterial).map as THREE.CanvasTexture;
+      const at = JSON.stringify(hints ?? null);
+      expect(map.colorSpace, at).toBe(THREE.SRGBColorSpace);
+      expect(map.generateMipmaps, at).toBe(true);
+      expect(map.minFilter, at).toBe(THREE.LinearMipmapLinearFilter);
+      expect(map.anisotropy, at).toBe(4);
+    }
+  });
+
+  it('takes the canvas size and every paint metric from the core, never its own literals', () => {
+    const painter = readFileSync(
+      path.join(__dirname, '../src/render/harbor_route_markers.ts'),
+      'utf8',
+    );
+    expect(painter).toContain('harborRouteMarkerPlateCanvasSize(GFX)');
+    expect(painter).toContain('harborRouteMarkerPlatePaint(h)');
+    expect(painter).toContain('harborRouteMarkerPlateFontPx(');
+    const paint = painter.slice(
+      painter.indexOf('function paintPlate('),
+      painter.indexOf('function repaintAll('),
+    );
+    expect(paint).not.toMatch(/lineWidth = \d|strokeRect\(\d|[-+] \d+,|size -= |> \d/);
+    expect(painter).not.toMatch(/\b(1024|340|512|170)\b/);
   });
 });

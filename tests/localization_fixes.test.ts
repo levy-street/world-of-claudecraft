@@ -1556,6 +1556,7 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     'server/character_blob_size.ts',
     'server/character_save_statement.ts',
     'server/admin_market_metrics.ts',
+    'server/realm_motd.ts',
   ]
     .map((file) => fs.readFileSync(path.resolve(process.cwd(), file), 'utf8'))
     .join('\n');

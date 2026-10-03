@@ -200,6 +200,31 @@ describe('resolveNearbyInteractionCandidate', () => {
     expect(Object.keys(candidate ?? {}).sort()).toEqual(['entity', 'id', 'kind']);
   });
 
+  it('keeps a reconnected owner vault portal interactable through the character resolver', () => {
+    const portal = entity({
+      id: 2,
+      kind: 'object',
+      templateId: 'hoard_entrance',
+      name: 'Treasure Vault',
+      lootable: true,
+      vaultOwnerPid: 10,
+      vaultOwnerCharacterId: 701,
+    });
+    const { world } = scan([portal]);
+    world.playerId = 20;
+    world.player.id = 20;
+    const worldWithResolver = world as typeof world & {
+      characterId?: number;
+    };
+
+    expect(resolveNearbyInteractionCandidate(world)).toBeNull();
+    worldWithResolver.characterId = 701;
+    expect(resolveNearbyInteractionCandidate(worldWithResolver)).toMatchObject({
+      kind: 'object',
+      id: 2,
+    });
+  });
+
   it('carries the bed id, which is content and not an entity id', () => {
     const { world } = scan([], BED_PATCH);
     const candidate = resolveNearbyInteractionCandidate(world);

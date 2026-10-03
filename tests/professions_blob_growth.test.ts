@@ -2442,7 +2442,17 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // itemsDiscovered (+2,889), the hoardGoblinKills counter (+26), and the 32
         // hoard gear reliquary.firstFind rows plus the conquerors_buried_hoards page
         // (+1,761), Blaine's itemization; MEASURED on the 2026-09-28 merged tree.
-        4711,
+        4711 +
+        // Plus 42 for the World PvP trophy skull: `"pvp_trophy_skull",` in
+        // deedStats.itemsDiscovered (+19; the deedStats row below moves by the
+        // same 19) and, because the skull is a provenance-tracked material, its
+        // row in the Materials Vault stock this fixture fills to every
+        // material's ceiling (+23). MEASURED on this tree.
+        42 +
+        // Plus 26 for the sixth lifetime-XP rung: prog_titan in the deeds row
+        // (10 characters of id plus 16 bytes of quoting, colon, date and comma),
+        // earned by this maximal fixture. MEASURED (77,204 to 77,230).
+        26,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2484,11 +2494,12 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       knownRecipes: 411,
       // deeds 672 -> 708 and deedStats 5,861 -> 5,979 at the fourth
       // release/v0.44.0 base merge: the ferry deed and its four visit marks
-      // (the +154 above).
-      deeds: 743,
+      // (the +154 above). deeds 743 -> 769 with prog_titan (the +26 above).
+      deeds: 769,
       // deedStats +4,648 and reliquary +8,848 at the second release/v0.44.0 base
       // merge: Warfare Season 2's 139 item ids (the 13,496 attributed above).
-      deedStats: 9427,
+      // +19 for the World PvP trophy skull id (attributed above).
+      deedStats: 9446,
       reliquary: 11501,
     });
     // Removing field_kit AND the Bramblehide release content reproduces the
@@ -2526,7 +2537,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // ferry deed and its visit marks, which this counterfactual keeps).
       // 226,238 -> 231,729 at the 2026-09-28 Buried Hoards merge (+5,491: the
       // +247 knownRecipes, +533 and +4,711 attributed above, all kept here).
-    ).toBe(231729);
+      // +42 for the World PvP trophy skull (deedStats id and Materials Vault row),
+      // which this counterfactual keeps.
+      // 231,729 -> 231,755 with prog_titan in the deeds row (+26, kept here).
+    ).toBe(231797);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2554,7 +2568,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 214,207 -> 227,703 at the second release/v0.44.0 base merge (+13,496).
       // 227,703 -> 227,857 at the fourth release/v0.44.0 base merge (+154).
       // 227,857 -> 233,348 at the 2026-09-28 Buried Hoards merge (+5,491, kept).
-    ).toBe(233348);
+      // +42 for the World PvP trophy skull, which this baseline keeps.
+      // 233,348 -> 233,374 with prog_titan in the deeds row (+26, kept).
+    ).toBe(233416);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2645,8 +2661,19 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // attributed in the growth equation above; no container or ceiling changed
     // shape. Floor at measurement minus 380, edge at measurement plus one:
     // 232980..233361.
-    expect(bytes, reMint).toBeGreaterThan(232980);
-    expect(bytes, reMint).toBeLessThan(233361);
+    // RE-BASED with the World PvP trophy skull: 233,402 bytes, up 42 from
+    // 233,360 (its deedStats id +19 and its Materials Vault stock row +23, both
+    // attributed in the growth equation above). Floor at measurement minus 380,
+    // edge at measurement plus one: 233022..233403.
+    // RE-BASED for the sixth lifetime-XP rung: 233,386 bytes, up 26 from
+    // 233,360: prog_titan in the deeds row (10 characters of id plus 16 bytes
+    // of quoting, colon, date and comma), attributed in the growth equation
+    // above; no container or ceiling changed shape. Floor at measurement minus
+    // 380, edge at measurement plus one: 233006..233387.
+    // Together they measure 233,428 bytes. Floor at measurement minus 380, edge
+    // at measurement plus one: 233048..233429.
+    expect(bytes, reMint).toBeGreaterThan(233048);
+    expect(bytes, reMint).toBeLessThan(233429);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

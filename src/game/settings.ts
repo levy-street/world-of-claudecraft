@@ -456,6 +456,13 @@ export const BOOL_SETTINGS = {
   // an accessibility choice, never a graphics-tier knob. Read live by the
   // renderer (setHazardPaletteMode) plus a body class hook (interface_body_classes.ts).
   colorblindMode: { def: false },
+  // off by default: Classic Combat Text. The default floating combat text is the
+  // vivid look (outgoing spell damage in its school's colour, a heavier outline,
+  // numbers that fan out sideways, and a louder crit and big-hit emphasis). On
+  // restores the shipped classic look: white auto-attacks and gold abilities
+  // rising straight up. Purely presentational: both show every number; mirrored
+  // onto a body class (interface_body_classes.ts) the FCT painter reads.
+  classicCombatText: { def: false },
   // off by default: an opt-in frosted-glass blur behind HUD panels & windows.
   // Off keeps the classic crisp look (and zero GPU cost); on softens the world
   // showing through translucent frames.
@@ -625,6 +632,14 @@ export const BOOL_SETTINGS = {
   // passes per frame, so the player who wants the quietest water gets it as
   // an opt-in rather than an opt-out.
   waterRipples: { def: false },
+  // on by default: the spell visual effects players and their pets cast in
+  // the 3D world (cast glows, projectiles, impacts, lingers, buff orbits and
+  // shells). Off is a preference for a calmer or cheaper screen that never
+  // hides a read a player acts on: every enemy effect, area telegraph rings,
+  // hard crowd-control bands, windup animations, cast bars and the HUD all
+  // stay. render/spell_effects_switch.ts owns the split; main.ts pushes the
+  // value there (render never reads here).
+  spellEffects: { def: true },
   // off by default: the over-the-shoulder Action Cam (render/action_cam_core.ts).
   // A camera framing preference like the FOV slider; it never changes zoom or
   // hides anything, and the side lives in actionCamShoulder.

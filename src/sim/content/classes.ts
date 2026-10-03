@@ -600,6 +600,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'prowl',
       'rake',
       'claw',
+      'scratch',
       'regrowth',
       'ferocious_bite',
       'barkskin',
@@ -6711,6 +6712,42 @@ export const ABILITIES: Record<string, AbilityDef> = {
       feral: 'Each hit that lands adds 1 Old Blood (max 3).',
     },
   },
+  scratch: {
+    id: 'scratch',
+    name: 'Scratch',
+    class: 'druid',
+    // The Cat Form sweep builder: Rendclaw's damage profile (the same flat
+    // bonus per rank, the same Wildfang baseline row in spec_baselines.ts) and
+    // Rendclaw's price, baseline for every druid, but every enemy within 6 yd
+    // takes its own swing (combat/druid_scratch.ts), each landed hit paying a
+    // combo point. Usable with nobody in reach: the sweep still goes off and
+    // spots any stealthed enemy inside it. Learned at 8, the first ding past
+    // the early-curve cap (tests/early_ability_curve.test.ts: levels 4 to 7
+    // already teach two core actives each).
+    learnLevel: 8,
+    cost: 45,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    awardsCombo: 1,
+    requiresForm: 'cat',
+    effects: [{ type: 'weaponStrike', bonus: 25, sweepRadius: 6 }],
+    ranks: [
+      {
+        rank: 2,
+        level: 18,
+        cost: 45,
+        effects: [{ type: 'weaponStrike', bonus: 55, sweepRadius: 6 }],
+      },
+    ],
+    description:
+      'Scratch through nearby targets within 6 yards for weapon damage plus $d. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.',
+    specNotes: {
+      feral: 'Each hit that lands adds 1 Old Blood (max 3).',
+    },
+  },
   ferocious_bite: {
     id: 'ferocious_bite',
     name: 'Gorebite',
@@ -6963,7 +7000,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 50,
     castTime: 0,
     cooldown: 0,
-    range: 8,
+    // 0 to 25 yd: the stealth opener reaches from range, so the cat can open
+    // on a target without first creeping to melee.
+    range: 25,
+    minRange: 0,
     school: 'physical',
     requiresTarget: true,
     awardsCombo: 1,
@@ -7066,6 +7106,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'physical',
     requiresTarget: false,
+    // A burst-window button pressed alongside the rotation, not instead of it.
+    offGcd: true,
     requiresForm: 'cat',
     effects: [
       { type: 'selfBuff', kind: 'buff_ap', value: 40, duration: 6 },

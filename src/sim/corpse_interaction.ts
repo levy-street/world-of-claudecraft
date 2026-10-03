@@ -1,4 +1,5 @@
 import {
+  bodyPoolSharedWithParty,
   corpseHarvestClaimOpen,
   corpseHasOrdinaryLootFor,
   corpseSharedLootRightsFor,
@@ -32,12 +33,17 @@ export function corpseInteractionAvailability(
   entityId: number,
   honorFfa: boolean,
 ): CorpseInteractionAvailability {
-  if (!corpseCanInteract(mob)) {
+  // A World PvP body holding spoils (pvp/world_pvp_spoils.ts) opens like a corpse
+  // for its loot; corpseCanInteract itself stays the mob-only harvest gate.
+  const playerBody =
+    mob.kind === 'player' && mob.dead && !corpseHasDecayed(mob.dead, mob.corpseTimer);
+  if (!corpseCanInteract(mob) && !playerBody) {
     return { harvestable: false, hasLootRights: false, hasLoot: false, canInteract: false };
   }
 
   const harvestable = corpseHarvestClaimOpen(mob.templateId, mob.harvestClaimedBy);
-  const tapperParty = mob.tappedById !== null ? ctx.partyOf(mob.tappedById) : null;
+  const tapperParty =
+    mob.tappedById !== null && bodyPoolSharedWithParty(mob) ? ctx.partyOf(mob.tappedById) : null;
   const shared = corpseSharedLootRightsFor(
     entityId,
     mob.tappedById,

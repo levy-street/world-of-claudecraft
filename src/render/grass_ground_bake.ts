@@ -17,6 +17,8 @@
 
 import * as THREE from 'three';
 import { clusterGeometry, mulberry32 } from './blade_grass';
+import { rendererDisposed } from './context_generation';
+import { registerContextRestoreRebake } from './context_restore_registry';
 import {
   GRASS_BAKE_CLUSTER_JITTER,
   GRASS_BAKE_PATCH_YARDS,
@@ -38,6 +40,16 @@ export interface GrassGroundBake {
 // the same constructor). Null when baking was skipped (dev flag, headless).
 let activeBake: GrassGroundBake | null = null;
 
+/** What a bake needs to be drawn again into its own target. */
+interface GrassBakeSource {
+  renderer: THREE.WebGLRenderer;
+  seed: number;
+  target: THREE.WebGLRenderTarget;
+}
+
+// Keyed by the bake, so a source lives exactly as long as its bake.
+const bakeSources = new WeakMap<GrassGroundBake, GrassBakeSource>();
+
 export function setGrassGroundBake(bake: GrassGroundBake | null): void {
   activeBake = bake;
 }
@@ -54,15 +66,15 @@ function hash(i: number, j: number, k: number): number {
 }
 
 /**
- * Render the bake. `renderer` must be the live WebGLRenderer; state (render
- * target, tone mapping) is saved and restored around the offscreen pass.
+ * Draw the bake into `rt`. `renderer` must be the live WebGLRenderer; state
+ * (render target, tone mapping) is saved and restored around the pass.
  */
-export function bakeGrassGroundTexture(
+function drawGrassBake(
   renderer: THREE.WebGLRenderer,
   seed: number,
-): GrassGroundBake {
+  rt: THREE.WebGLRenderTarget,
+): void {
   const patch = GRASS_BAKE_PATCH_YARDS;
-  const size = GRASS_BAKE_TEXTURE_SIZE;
 
   // Cluster field over the patch at the CARPET's own density (0.46-yard
   // cells) and the carpet's own size formula, so the strokes are the real
@@ -144,6 +156,28 @@ export function bakeGrassGroundTexture(
   cam.up.set(0, 0, -1);
   cam.lookAt(0, 0, 0);
 
+  const prevTarget = renderer.getRenderTarget();
+  const prevToneMapping = renderer.toneMapping;
+  // Albedo-space bake: tone mapping belongs to the lit frame, not the map.
+  renderer.toneMapping = THREE.NoToneMapping;
+  try {
+    renderer.setRenderTarget(rt);
+    renderer.render(scene, cam);
+  } finally {
+    renderer.setRenderTarget(prevTarget);
+    renderer.toneMapping = prevToneMapping;
+    geo.dispose();
+    mat.dispose();
+    im.dispose();
+  }
+}
+
+/** Render the bake into a fresh mipped target and measure its mean. */
+export function bakeGrassGroundTexture(
+  renderer: THREE.WebGLRenderer,
+  seed: number,
+): GrassGroundBake {
+  const size = GRASS_BAKE_TEXTURE_SIZE;
   const rt = new THREE.WebGLRenderTarget(size, size, {
     format: THREE.RGBAFormat,
     type: THREE.UnsignedByteType,
@@ -157,12 +191,7 @@ export function bakeGrassGroundTexture(
   });
   rt.texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
 
-  const prevTarget = renderer.getRenderTarget();
-  const prevToneMapping = renderer.toneMapping;
-  // Albedo-space bake: tone mapping belongs to the lit frame, not the map.
-  renderer.toneMapping = THREE.NoToneMapping;
-  renderer.setRenderTarget(rt);
-  renderer.render(scene, cam);
+  drawGrassBake(renderer, seed, rt);
 
   // Per-channel mean via one full readback (a few milliseconds, once per
   // session): the measured distant appearance the band blades sink toward.
@@ -179,11 +208,17 @@ export function bakeGrassGroundTexture(
   const inv = 1 / (size * size * 255);
   const mean: [number, number, number] = [r * inv, g * inv, b * inv];
 
-  renderer.setRenderTarget(prevTarget);
-  renderer.toneMapping = prevToneMapping;
-  geo.dispose();
-  mat.dispose();
-  im.dispose();
+  const bake: GrassGroundBake = { texture: rt.texture, mean };
+  bakeSources.set(bake, { renderer, seed, target: rt });
+  registerContextRestoreRebake('grass-ground-bake', bake, rebakeGrassGround);
+  return bake;
+}
 
-  return { texture: rt.texture, mean };
+/** A WebGL context restore gives the target back empty: every terrain tile
+ *  sampling it would paint its grass black until the next session. The seed
+ *  is the same, so the strokes and their measured mean are too. */
+function rebakeGrassGround(bake: GrassGroundBake): void {
+  const source = bakeSources.get(bake);
+  if (!source || bake !== activeBake || rendererDisposed(source.renderer)) return;
+  drawGrassBake(source.renderer, source.seed, source.target);
 }

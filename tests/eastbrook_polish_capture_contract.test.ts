@@ -700,7 +700,27 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '164b585f770570b773faa8e35c466bcd4ab2840a6572507aa9528bc52572cbc5';
+  // Re-minted for the integrated WebGL context restore, spirit-veil, and
+  // trinket relics merge: the merged renderer and view-priority leaves match
+  // no parent. No capture was retaken.
+  // Re-minted after formatting the merged renderer helper: same content path,
+  // new renderer bytes. No capture was retaken.
+  // Re-minted after compressing that helper for the monolith ratchet: same
+  // content path, new renderer bytes. No capture was retaken.
+  // Re-minted for the GLTF parser release (the LoadedGltf type swap in mailbox.ts and
+  // noticeboard.ts). No capture was retaken.
+  // Re-minted for the integrated v0.45 batch plus GLTF parser release: the
+  // merged renderer, view-priority, mailbox, and noticeboard leaves compose in
+  // one tree. No capture was retaken.
+  // Re-minted for PR #4282 on top of that integrated v0.45 batch: the
+  // Drakelands kit lane moves renderer and zone-streaming leaves. No capture
+  // was retaken.
+  // Re-minted for PR #4279 on top of the v0.45 candidate: Spell Effects
+  // moves the renderer leaf and extracts world cue spell gating. No capture
+  // was retaken.
+  // Re-minted for the v0.45 release batch after entity-view policy moved.
+  // No capture was retaken.
+  '68d48dd165e6d7e304df2356d3a4d7c5ab3d998a9eb643b8d258198e5a33693b';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

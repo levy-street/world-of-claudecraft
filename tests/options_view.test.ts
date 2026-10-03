@@ -244,6 +244,8 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
       'cameraFov',
       'fullscreen',
       'weather',
+      // Spell Effects is the other "calm the screen" switch beside Weather.
+      'spellEffects',
       // The wake/ripple field is a GPU cost, so it sits with Weather in the
       // Display card rather than with the HUD comfort toggles.
       'waterRipples',
@@ -881,7 +883,7 @@ const GENERAL_KEYS = [
   'confirmVendorSell',
   'note:hudChrome.options.confirmVendorSellNote',
   'confirmVendorSellMinQuality',
-  'note:hudChrome.options.confirmVendorSellMinQualityNote',
+  'note:hudChrome.options.confirmVendorSellMinQualityNoteGray',
 ];
 const FRAMES_KEYS = [
   'mouseoverCast',
@@ -929,6 +931,7 @@ const COMBAT_KEYS = [
   'showFriendlyTrack',
   'showShieldTrack',
   'fctScale',
+  'classicCombatText',
 ];
 const INTERFACE_KEYS_BY_TAB: Record<InterfaceTab, string[]> = {
   general: GENERAL_KEYS,
@@ -1050,7 +1053,7 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       { control: 'note', textKey: 'hudChrome.options.confirmVendorSellNote', category: 'general' },
       {
         control: 'note',
-        textKey: 'hudChrome.options.confirmVendorSellMinQualityNote',
+        textKey: 'hudChrome.options.confirmVendorSellMinQualityNoteGray',
         category: 'general',
       },
       { control: 'note', textKey: 'hudChrome.options.forceHighPerfGpuNote', category: 'general' },
@@ -1620,6 +1623,7 @@ describe('options_view: the desktop display-mode picker replaces the fullscreen 
       'cameraFov',
       'displayMode',
       'weather',
+      'spellEffects',
       'waterRipples',
       'showOverflowXp',
     ]);
@@ -1675,6 +1679,7 @@ describe('options_view: the desktop display-mode picker replaces the fullscreen 
         'cameraFov',
         'fullscreen',
         'weather',
+        'spellEffects',
         'waterRipples',
         'showOverflowXp',
       ]);

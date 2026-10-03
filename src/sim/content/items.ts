@@ -3001,6 +3001,21 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'poor',
     sellValue: 8,
   },
+  // World PvP trophy (src/sim/pvp/world_pvp_spoils.ts): the killing blow of a
+  // flagged-vs-flagged world kill loots the loser's skull from their body. All
+  // skulls share one stack that records whose each one is, the way a gathered
+  // material records its gatherer (src/sim/pvp/world_pvp_trophy.ts). A keepsake
+  // with no vendor price, so camping an alt for skulls can never mint gold.
+  pvp_trophy_skull: {
+    id: 'pvp_trophy_skull',
+    name: 'Trophy Skull',
+    kind: 'junk',
+    // Common, not grey: a provenance-tracked stack is a material, and grey
+    // trash is never one (tests/material_taxonomy.test.ts).
+    quality: 'common',
+    noVendorSell: true,
+    sellValue: 0,
+  },
   // Vendor food nerf (11n-D-13): was ABOVE crafted pan_seared_perch 90 (a
   // negative margin); 90 / 1.10, bottom tercile, floored; crafted margin
   // +11.1 percent.

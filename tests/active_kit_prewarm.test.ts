@@ -1,7 +1,7 @@
-import { readdirSync, readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { expect, it, vi } from 'vitest';
 import {
+  ACTIVE_KIT_RETRY_DELAYS_MS,
   ACTIVE_WARRIOR_CRESTS,
   activeKitPrewarmEntry,
   cancelActiveAbilityKit,
@@ -24,6 +24,7 @@ import { WarriorPowerForms } from '../src/render/ability_vfx/warrior_power_forms
 import { WarriorSpiritHammers } from '../src/render/ability_vfx/warrior_spirit_hammers';
 import { setArrivalCover } from '../src/render/arrival_cover';
 import { createBackgroundGpuQueue, GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
+import { runContextRestoreResets } from '../src/render/context_restore_registry';
 import { createGpuPrepAdmission } from '../src/render/gpu_prep_admission';
 import { createGpuPrepBudget } from '../src/render/gpu_prep_budget_core';
 import type { PrewarmResumeUnit } from '../src/render/prewarm_resume';
@@ -56,7 +57,6 @@ function fixture(cls = 'warrior') {
   const shear = new THREE.Texture();
   const crush = new THREE.Texture();
   const smoke = new THREE.Texture();
-  const shockwave = new THREE.Texture();
   const shoutDust = new THREE.Texture();
   const baked: Record<BakedKind, THREE.Texture> = {
     smoke,
@@ -67,7 +67,6 @@ function fixture(cls = 'warrior') {
     warrior_bite: bite,
     warrior_shear: shear,
     warrior_crush: crush,
-    shockwave,
   };
   vi.spyOn(assets, 'bakedTexture').mockImplementation((kind) => baked[kind] ?? null);
   const contacts: Record<ContactSheet, THREE.Texture> = {
@@ -108,7 +107,6 @@ function fixture(cls = 'warrior') {
     shear,
     crush,
     smoke,
-    shockwave,
     shoutDust,
     baked,
     contacts,
@@ -127,8 +125,7 @@ function fixture(cls = 'warrior') {
       bite.dispose();
       shear.dispose();
       crush.dispose();
-      for (const sheet of [smoke, shockwave, shoutDust, ...Object.values(contacts)])
-        sheet.dispose();
+      for (const sheet of [smoke, shoutDust, ...Object.values(contacts)]) sheet.dispose();
       vi.restoreAllMocks();
     },
   };
@@ -168,7 +165,6 @@ it('registers without GPU work and resumes only the twenty-seven selected Warrio
     expect(f.upload).toHaveBeenNthCalledWith(13, f.bite);
     expect(f.upload).toHaveBeenNthCalledWith(14, f.shear);
     expect(f.upload).toHaveBeenNthCalledWith(15, f.crush);
-    expect(f.upload).not.toHaveBeenCalledWith(f.shockwave);
     expect(f.crush).not.toBe(f.shear);
     expect(f.host.draw).toHaveBeenCalledTimes(27);
     // The full, ordered 27-name crest list (20 authored kinds + the 7
@@ -221,14 +217,14 @@ it('uploads every sheet the Warrior kit draws before a geometry unit runs', asyn
   // the generic smoke and dust layers (baked_impact_layers.ts) as well as its
   // signature sheets. They all land with the kit's demand load, after the boot
   // warm-up ran, so a sheet the recipe does not upload is uploaded by the
-  // first cast that draws it, in a live frame. The loaded shockwave sheet is
-  // drawn only by the boot-window prewarmSpawn, never by a cast.
+  // first cast that draws it, in a live frame. The kit loads no sheet it
+  // does not upload: a decoded sheet nothing draws is only wasted memory.
   const f = fixture();
   try {
     await ensureActiveAbilityKit(f.scene);
     const uploaded = new Set(f.upload.mock.calls.map(([texture]) => texture));
     for (const kind of Object.keys(BAKED_URLS) as BakedKind[])
-      expect(uploaded.has(assets.bakedTexture(kind)), kind).toBe(kind !== 'shockwave');
+      expect(uploaded.has(assets.bakedTexture(kind)), kind).toBe(true);
     for (const kind of CONTACT_SHEETS)
       expect(uploaded.has(contact.contactTexture(kind)), kind).toBe(true);
     for (const texture of [f.blood, f.steel, f.texture, f.rock])
@@ -240,25 +236,6 @@ it('uploads every sheet the Warrior kit draws before a geometry unit runs', asyn
   } finally {
     f.close();
   }
-});
-
-it('leaves out only the shockwave sheet, which no cast draws', () => {
-  // The recipe skips the loaded shockwave sheet because its one drawer is the
-  // boot-window prewarmSpawn, behind the curtain. A cast that starts drawing
-  // it must move it into the recipe, or its first draw uploads it live.
-  const root = new URL('../src/render/', import.meta.url);
-  const drawers: string[] = [];
-  for (const file of readdirSync(root, { recursive: true, encoding: 'utf8' })) {
-    if (!file.endsWith('.ts')) continue;
-    const source = readFileSync(new URL(file, root), 'utf8');
-    for (const match of source.matchAll(/(?:bakedAt|spawn)\??\.?\(\s*'shockwave'/g))
-      drawers.push(`${file}:${source.slice(0, match.index).split('\n').length}`);
-  }
-  expect(drawers).toHaveLength(1);
-  expect(drawers[0]).toMatch(/^ability_vfx\/fx\.ts:/);
-  const fx = readFileSync(new URL('ability_vfx/fx.ts', root), 'utf8');
-  const spawn = fx.slice(fx.indexOf('  prewarmSpawn('), fx.indexOf('  prewarmSpawn(') + 600);
-  expect(spawn).toContain("this.bakedAt('shockwave'");
 });
 
 it.each(CONTACT_SHEETS)('keeps the kit cold when the %s sheet is missing', async (kind) => {
@@ -641,5 +618,195 @@ it('waits out a loading cover instead of freezing it, then paces its uploads', a
     setArrivalCover(false);
     await queue.shutdown();
     f.close();
+  }
+});
+
+it('a WebGL context restore mid-recipe forgets what ran and runs the whole recipe again once the old run stops', async () => {
+  const f = fixture();
+  try {
+    let release!: () => void;
+    const hold = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    let calls = 0;
+    f.queue.run.mockImplementation(async (work: PrewarmResumeUnit['run']) => {
+      calls++;
+      // The third unit is still queued when the context comes back.
+      if (calls === 3) await hold;
+      await work();
+    });
+    const first = ensureActiveAbilityKit(f.scene);
+    for (let i = 0; i < 50; i++) await Promise.resolve();
+    expect(f.upload).toHaveBeenCalledTimes(2);
+    runContextRestoreResets();
+    expect(f.entry.progress().done).toBe(0);
+    release();
+    await first;
+    // The run that started on the lost context records nothing past the
+    // restore; the rerun then does the whole recipe on the restored one.
+    await vi.waitFor(() => expect(f.entry.progress().trimmed).toBe(false));
+    const planned = f.entry.progress().planned;
+    expect(f.entry.progress().done).toBe(planned);
+    expect(f.prep.ready('blood_cut')).toBe(true);
+  } finally {
+    f.close();
+  }
+});
+
+async function settle(): Promise<void> {
+  for (let i = 0; i < 500; i++) await Promise.resolve();
+}
+
+it('asks again after a failed preparation for a remote Warrior sighting, paying only the unpaid work', async () => {
+  vi.useFakeTimers();
+  const f = fixture('mage');
+  try {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    f.host.compile.mockRejectedValueOnce(new Error('driver link failed'));
+    // The painter's first sighting of a remote Warrior, on a Mage's renderer.
+    resumeActiveAbilityKit(f.scene, undefined, 'warrior');
+    await settle();
+    expect(f.upload).toHaveBeenCalledTimes(15);
+    expect(f.prep.ready('blood_cut')).toBe(false);
+    await vi.advanceTimersByTimeAsync(ACTIVE_KIT_RETRY_DELAYS_MS[0] - 1);
+    await settle();
+    expect(f.prep.ready('blood_cut')).toBe(false);
+    await vi.advanceTimersByTimeAsync(1);
+    await settle();
+    for (const kind of ACTIVE_WARRIOR_CRESTS) expect(f.prep.ready(kind), kind).toBe(true);
+    expect(f.upload).toHaveBeenCalledTimes(15);
+    expect(vi.getTimerCount()).toBe(0);
+  } finally {
+    f.close();
+    vi.useRealTimers();
+  }
+});
+
+it('asks again after a failed demand load of the kit assets', async () => {
+  vi.useFakeTimers();
+  const f = fixture();
+  try {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const load = vi.fn<() => Promise<boolean>>();
+    load.mockRejectedValueOnce(new Error('offline')).mockResolvedValue(true);
+    activeKitPrewarmEntry(f.scene, 'warrior', {
+      queue: f.queue as unknown as Pick<
+        import('../src/render/background_gpu_queue').BackgroundGpuQueue,
+        'run'
+      >,
+      assets: load,
+      geometry: (kinds) => f.prep.units(f.host, kinds),
+      texture: f.upload,
+    });
+    resumeActiveAbilityKit(f.scene);
+    await settle();
+    expect(load).toHaveBeenCalledTimes(1);
+    expect(f.upload).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(ACTIVE_KIT_RETRY_DELAYS_MS[0]);
+    await settle();
+    expect(load).toHaveBeenCalledTimes(2);
+    expect(f.upload).toHaveBeenCalledTimes(15);
+    expect(f.prep.ready('blood_cut')).toBe(true);
+  } finally {
+    f.close();
+    vi.useRealTimers();
+  }
+});
+
+it('gives up after its bounded retries with one final warning, and schedules nothing more', async () => {
+  vi.useFakeTimers();
+  const f = fixture();
+  try {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    f.host.compile.mockRejectedValue(new Error('driver link failed'));
+    resumeActiveAbilityKit(f.scene);
+    await settle();
+    for (const delay of ACTIVE_KIT_RETRY_DELAYS_MS) {
+      expect(vi.getTimerCount()).toBe(1);
+      await vi.advanceTimersByTimeAsync(delay);
+      await settle();
+    }
+    expect(f.host.compile).toHaveBeenCalledTimes(1 + ACTIVE_KIT_RETRY_DELAYS_MS.length);
+    expect(vi.getTimerCount()).toBe(0);
+    const final = warn.mock.calls.filter(([message]) => String(message).includes('gave up'));
+    expect(final).toHaveLength(1);
+    expect(warn).toHaveBeenCalledTimes(1 + ACTIVE_KIT_RETRY_DELAYS_MS.length);
+    await vi.advanceTimersByTimeAsync(10 * Math.max(...ACTIVE_KIT_RETRY_DELAYS_MS));
+    await settle();
+    expect(f.host.compile).toHaveBeenCalledTimes(1 + ACTIVE_KIT_RETRY_DELAYS_MS.length);
+  } finally {
+    f.close();
+    vi.useRealTimers();
+  }
+});
+
+it('waits five, thirty, then a hundred and twenty seconds between attempts', () => {
+  expect(ACTIVE_KIT_RETRY_DELAYS_MS).toEqual([5_000, 30_000, 120_000]);
+});
+
+it('schedules one retry when two requests joined the attempt that failed', async () => {
+  vi.useFakeTimers();
+  const f = fixture();
+  try {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    f.host.compile.mockRejectedValue(new Error('driver link failed'));
+    // A local Warrior's entry and a remote sighting both join one attempt.
+    resumeActiveAbilityKit(f.scene);
+    resumeActiveAbilityKit(f.scene, undefined, 'warrior');
+    await settle();
+    expect(vi.getTimerCount()).toBe(1);
+    for (const delay of ACTIVE_KIT_RETRY_DELAYS_MS) {
+      await vi.advanceTimersByTimeAsync(delay);
+      await settle();
+    }
+    expect(f.host.compile).toHaveBeenCalledTimes(1 + ACTIVE_KIT_RETRY_DELAYS_MS.length);
+    expect(warn.mock.calls.filter(([message]) => String(message).includes('gave up'))).toHaveLength(
+      1,
+    );
+    expect(vi.getTimerCount()).toBe(0);
+  } finally {
+    f.close();
+    vi.useRealTimers();
+  }
+});
+
+it('keeps one pending retry however often the kit is asked for meanwhile', async () => {
+  vi.useFakeTimers();
+  const f = fixture();
+  try {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    f.host.compile.mockRejectedValue(new Error('driver link failed'));
+    resumeActiveAbilityKit(f.scene);
+    await settle();
+    expect(vi.getTimerCount()).toBe(1);
+    for (let i = 0; i < 3; i++) {
+      resumeActiveAbilityKit(f.scene);
+      await settle();
+    }
+    expect(vi.getTimerCount()).toBe(1);
+    expect(f.host.compile).toHaveBeenCalledTimes(1);
+  } finally {
+    f.close();
+    vi.useRealTimers();
+  }
+});
+
+it('drops a pending retry when the renderer retires the preparation', async () => {
+  vi.useFakeTimers();
+  const f = fixture();
+  try {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    f.host.compile.mockRejectedValueOnce(new Error('driver link failed'));
+    resumeActiveAbilityKit(f.scene);
+    await settle();
+    expect(vi.getTimerCount()).toBe(1);
+    cancelActiveAbilityKit(f.scene);
+    expect(vi.getTimerCount()).toBe(0);
+    await vi.advanceTimersByTimeAsync(10 * Math.max(...ACTIVE_KIT_RETRY_DELAYS_MS));
+    await settle();
+    expect(f.host.compile).toHaveBeenCalledTimes(1);
+  } finally {
+    f.close();
+    vi.useRealTimers();
   }
 });

@@ -172,6 +172,33 @@ describe('the schedule and the announcements', () => {
     expect(sim.hillInfoFor(a)).toBeNull();
   });
 
+  it('each announced phase also fires one server-only hillAnnounced, times relative, no pid', () => {
+    const sim = world();
+    const plan = hillPlanFor(sim.ctx, 0);
+    const calls = (seen: SimEvent[]) =>
+      seen.filter(
+        (e): e is Extract<SimEvent, { type: 'hillAnnounced' }> => e.type === 'hillAnnounced',
+      );
+    jumpTo(sim, plan.warnAt - 1);
+    const warned = calls(tickSeconds(sim, 2));
+    const hill = sim.hillState.active!;
+    expect(warned).toHaveLength(1);
+    const w = warned[0];
+    expect([w.phase, w.zoneId, 'pid' in w]).toEqual(['warning', hill.zoneId, false]);
+    // Relative to the moment of the warning: the full warning, then the stand.
+    expect(w.secondsUntilRise).toBeCloseTo(HILL_WARNING_SECONDS, 0);
+    expect(w.secondsUntilFall).toBeCloseTo(HILL_WARNING_SECONDS + HILL_DURATION_SECONDS, 0);
+
+    jumpTo(sim, plan.risesAt - 1);
+    const risen = calls(tickSeconds(sim, 2));
+    expect(risen.map((e) => [e.phase, e.secondsUntilRise])).toEqual([['risen', 0]]);
+    expect(risen[0].secondsUntilFall).toBeCloseTo(HILL_DURATION_SECONDS, 0);
+
+    jumpTo(sim, plan.closesAt - 1);
+    const fallen = calls(tickSeconds(sim, 2));
+    expect(fallen.map((e) => [e.phase, e.secondsUntilFall])).toEqual([['fallen', 0]]);
+  });
+
   it('nobody can contest the hill while it is only announced', () => {
     const sim = world();
     const a = addPlayer(sim, 'Aleph');

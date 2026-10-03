@@ -52,6 +52,7 @@ describe('describeFct: determinism (same input -> same output)', () => {
       anchor: { x: 10, y: 2 + FCT_ANCHOR_HEAD_OFFSET, z: -3 },
       jitterOffset: 0.37 * FCT_JITTER_RANGE - FCT_JITTER_RANGE / 2,
       ttlMs: FCT_TTL_MS,
+      outgoing: false,
     });
   });
 
@@ -257,5 +258,35 @@ describe('blockFctAmountText: the shield-block floater keeps the incoming/outgoi
   it('leaves an outgoing block unsigned, matching the damage-done floater convention', () => {
     expect(blockFctAmountText(12, false, false)).toBe('12');
     expect(blockFctAmountText(12, true, false)).toBe('12!');
+  });
+});
+
+describe('describeFct: the outgoing flag the vivid fan-out keys on', () => {
+  it('keeps outgoing hits on the shipped auto / ability colour tokens (no per-school colour)', () => {
+    for (const kind of ['damage-done-ability', 'damage-done-auto'] as const) {
+      expect(describeFct(makeEvent({ kind }), 0.5).colorToken).toBe(kind);
+    }
+  });
+
+  it('flags exactly the outgoing damage kinds as outgoing', () => {
+    const outgoing: FctKind[] = ['damage-done-ability', 'damage-done-auto', 'damage-done-block'];
+    const all: FctKind[] = [
+      ...outgoing,
+      'miss',
+      'dodge',
+      'resist',
+      'evade',
+      'damage-taken',
+      'damage-taken-block',
+      'absorb',
+      'heal',
+      'xp',
+      'rested-xp',
+      'honor',
+      'self-note',
+    ];
+    for (const kind of all) {
+      expect(describeFct(makeEvent({ kind }), 0.5).outgoing).toBe(outgoing.includes(kind));
+    }
   });
 });

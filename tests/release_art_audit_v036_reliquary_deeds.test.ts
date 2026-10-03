@@ -250,6 +250,8 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       // The release's Eastbrook ferry round trip rides the deed_cat_exploration crest
       // until its commissioned art lands (docs/design/deeds.md, Icons).
       'exp_harbor_to_harbor',
+      // The sixth lifetime-XP rung rides the deed_cat_progression crest the same way.
+      'prog_titan',
     ]);
     // RE-PINNED at this merge of release/v0.42.0 into feature/masterwrought:
     // 300 live (counted directly off the resolved src/sim/content/deeds.ts
@@ -261,8 +263,9 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     // ledger above, so the painted count holds at 289.
     // 318 with the release's ferry round trip, the pending ledger's last row,
     // so the painted count still holds at 289. 319 with the Buried Hoards Coinsack
-    // catch (2026-09-28 merge), also pending: still 289 painted.
-    expect(DEED_ORDER).toHaveLength(319);
+    // catch (2026-09-28 merge), also pending: still 289 painted. 320 with the
+    // sixth lifetime-XP rung (prog_titan), also pending: still 289 painted.
+    expect(DEED_ORDER).toHaveLength(320);
     expect(DEED_IMAGE_IDS.size).toBe(289);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(

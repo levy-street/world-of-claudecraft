@@ -1241,6 +1241,12 @@ const classAbilityNamesEn = {
         { feral: 'Each hit that lands adds 1 Old Blood (max 3).' },
       ],
       [
+        'scratch',
+        'Scratch',
+        'Scratch through nearby targets within 6 yards for weapon damage plus {damage}. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.',
+        { feral: 'Each hit that lands adds 1 Old Blood (max 3).' },
+      ],
+      [
         'ferocious_bite',
         'Gorebite',
         'Finishing move that causes {damage}. Cat Form only.',

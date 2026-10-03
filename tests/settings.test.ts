@@ -83,6 +83,15 @@ describe('Settings', () => {
     expect(new Settings().get('cameraZoom')).toBe(8);
   });
 
+  it('defaults Spell Effects on and remembers turning it off', () => {
+    // On out of the box: the option only ever removes presentation, and a
+    // player opts into the calmer screen.
+    expect(new Settings().get('spellEffects')).toBe(true);
+    expect(new Settings().set('spellEffects', false)).toBe(false);
+    expect(new Settings().get('spellEffects')).toBe(false);
+    expect(JSON.parse(localStorage.getItem('woc_settings') ?? '{}').spellEffects).toBe(false);
+  });
+
   it('persists the controller glyph family with Auto as the default', () => {
     const settings = new Settings();
 

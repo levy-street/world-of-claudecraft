@@ -721,6 +721,19 @@ Exact-phrase and coined-token searches against the major game wikis.
 | Cocoon / Cocooned | Vysska's cast and the wrapped player's stun | KEEP. Single common English words. |
 | Draining Silk | her feeding's damage line | KEEP. No match. |
 
+### The sixth lifetime-XP rung: Titan (web-verified 2026-10-01)
+
+Scope: `prog_titan`, the 10,000,000 lifetime-XP deed and its title reward,
+both displayed as "Titan". Method per the standing bar: quoted exact-phrase
+search for "Titan" as a title or achievement across WoW, RuneScape, GW2, FFXIV
+and ESO. No game ships "Titan" alone as a player title; the nearest hit is
+WoW's "Herald of the Titans", a different full name. Titan is shared Greek
+myth vocabulary used across many unrelated properties, and in this repo it
+only appears inside the Fury talent name "Titan's Grip", a different role.
+Verdict: GENERIC. Earlier candidates: "Immortal" and "Undying" were rejected
+as WoW's Naxxramas titles; "Timeless" (also GENERIC) was replaced by the
+owner's pick before shipping.
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

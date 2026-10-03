@@ -1,9 +1,10 @@
 import * as THREE from 'three';
+import type { WarriorKitSurface } from './warrior_kit_surface';
 
 /** The rage crown is a moving blood flame, not red metal. One prepared program
  * serves every instance; shared uniforms and fixed geometry stay allocation-free. */
 export function animateWarriorRage(
-  material: THREE.MeshStandardMaterial,
+  material: WarriorKitSurface,
   time: { value: number },
   motion: { value: number },
 ): void {
@@ -13,8 +14,14 @@ export function animateWarriorRage(
   material.depthWrite = false;
   // Emitted light composes independently of instance submission order.
   material.blending = THREE.AdditiveBlending;
-  material.roughness = 1;
-  material.metalness = 0;
+  if (material instanceof THREE.MeshStandardMaterial) {
+    material.roughness = 1;
+    material.metalness = 0;
+  } else {
+    // The flame is non-metal on the standard tiers, so the matched Lambert
+    // diffuse keeps the unscaled base colour.
+    material.color.set(0xffffff);
+  }
   material.emissiveIntensity = 1.6;
   material.onBeforeCompile = (shader, renderer) => {
     previous(shader, renderer);

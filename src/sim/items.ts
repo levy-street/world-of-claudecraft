@@ -1531,6 +1531,26 @@ function vendorInRange(ctx: SimContext, p: Entity): boolean {
   );
 }
 
+// Whether a sold unit stays out of the buyback list. Plain Poor-quality (gray)
+// junk is worthless fodder the player sells in bulk; recording it let one Sell
+// Junk sweep evict every real sale from the VENDOR_BUYBACK_LIMIT rows. A gray
+// unit that carries anything the row would preserve (an instance payload such
+// as a signature, a crafted recipe id, or a material composition) is not
+// fungible fodder, so it still gets a row and buys back intact.
+export function skipsVendorBuyback(
+  def: ItemDef | undefined,
+  instance: ItemInstancePayload | undefined,
+  craftedRecipeId?: string,
+  materialSources?: MaterialComposition,
+): boolean {
+  return (
+    def?.quality === 'poor' &&
+    instance === undefined &&
+    craftedRecipeId === undefined &&
+    materialSources === undefined
+  );
+}
+
 // `instance` carries the payload of the sold copies (absent for a plain
 // fungible sale). A row is a merge target only when its stored payload
 // matches under canStackInstancePayloads, exactly the identical-payload
@@ -1546,6 +1566,9 @@ function vendorInRange(ctx: SimContext, p: Entity): boolean {
 // descriptors gains one unit rather than being rewritten, and the recency and
 // limit rules are untouched: the merged row still moves to the front and the
 // list still pops past VENDOR_BUYBACK_LIMIT.
+//
+// Plain gray junk never takes a row (see skipsVendorBuyback), so a Sell Junk
+// sweep cannot push the player's real sales off the end of the list.
 function recordVendorBuyback(
   meta: PlayerMeta,
   itemId: string,
@@ -1554,6 +1577,7 @@ function recordVendorBuyback(
   craftedRecipeId?: string,
   materialSources?: MaterialComposition,
 ): void {
+  if (skipsVendorBuyback(ITEMS[itemId], instance, craftedRecipeId, materialSources)) return;
   const existingIndex = meta.vendorBuyback.findIndex(
     (s) =>
       s.itemId === itemId &&
@@ -1781,8 +1805,9 @@ export function junkSellableSlot(
 
 // Bulk-sell every gray (poor-quality) item in the bags in one action, applying the
 // same rules as the per-item sellItem path: quest items and noVendorSell items are
-// left untouched and each sold stack is recorded for buyback. One summary loot line
-// is emitted instead of one per stack.
+// left untouched, and only instanced copies are recorded for buyback (plain gray
+// junk never fills the list, see skipsVendorBuyback). One summary loot line is
+// emitted instead of one per stack.
 export function sellAllJunk(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;

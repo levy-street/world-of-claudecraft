@@ -27,7 +27,6 @@ import {
   ensureMakeupGeometry,
   hasMakeupGeometry,
   hasMakeupTexture,
-  MAKEUP_TEX_SIZE,
   makeupKeyOf,
   makeupTextureFromData,
   makeupTextureRows,
@@ -42,10 +41,10 @@ import {
   wearsFaceDecal,
 } from './modular';
 import {
-  DECAL_TEX_SIZE,
   decalKey,
   decalTextureFromData,
   decalTextureRows,
+  decalTextureSizes,
   ensureDecalGeometry,
   hasDecalGeometry,
   hasDecalTexture,
@@ -128,6 +127,7 @@ async function runTextureBands(
 
 function stubbleTexturePiece(sel: StubbleSelection): LookPiece {
   const key = decalKey(sel);
+  const size = decalTextureSizes().stubble;
   return {
     key: `stubble:${key}`,
     start: (queue, priority) =>
@@ -136,8 +136,8 @@ function stubbleTexturePiece(sel: StubbleSelection): LookPiece {
         priority,
         STUBBLE_BAND_LABEL,
         key,
-        DECAL_TEX_SIZE,
-        (out, rowStart, rowEnd) => decalTextureRows(sel, out, rowStart, rowEnd, DECAL_TEX_SIZE),
+        size,
+        (out, rowStart, rowEnd) => decalTextureRows(sel, out, rowStart, rowEnd, size),
         (data) => decalTextureFromData(sel, data),
       ),
   };
@@ -145,6 +145,7 @@ function stubbleTexturePiece(sel: StubbleSelection): LookPiece {
 
 function makeupTexturePiece(sel: Pick<MakeupSelection, 'blush' | 'eyeshadow'>): LookPiece {
   const key = makeupKeyOf(sel);
+  const size = decalTextureSizes().makeup;
   return {
     key: `makeup:${key}`,
     start: (queue, priority) =>
@@ -153,8 +154,8 @@ function makeupTexturePiece(sel: Pick<MakeupSelection, 'blush' | 'eyeshadow'>): 
         priority,
         MAKEUP_BAND_LABEL,
         key,
-        MAKEUP_TEX_SIZE,
-        (out, rowStart, rowEnd) => makeupTextureRows(sel, out, rowStart, rowEnd, MAKEUP_TEX_SIZE),
+        size,
+        (out, rowStart, rowEnd) => makeupTextureRows(sel, out, rowStart, rowEnd, size),
         (data) => makeupTextureFromData(sel, data),
       ),
   };

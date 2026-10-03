@@ -11,6 +11,18 @@ import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { GFX } from '../gfx';
 import { applyTextureAnisotropy } from '../texture_anisotropy';
+import {
+  BITMAP_DECODE_OPTIONS,
+  browserDecodesImageBitmap,
+  fetchImageBlob,
+} from './image_bitmap_decode';
+import {
+  capCompressedMips,
+  capGltfKtx2Mips,
+  isIosPhoneUserAgent,
+  type Ktx2MipCapProfile,
+  ktx2MipCapFor,
+} from './ktx2_mip_cap';
 import { classifyGltfKtx2Textures, dismissKtx2Source } from './ktx2_mip_release';
 import { ktx2Loader } from './ktx2_support';
 import { MAX_LOAD_ATTEMPTS, retryDelayMs } from './load_retry';
@@ -18,9 +30,14 @@ import { assetUrl } from './media';
 import { assetLoadStarted, recordAssetLoad } from './stats';
 import { neutralizeGltfTransmission } from './transmission_neutralize';
 
+/** A parsed GLB as every consumer receives it: the GLTF minus its parser,
+ *  which loadGltf drops once the post-parse hooks have run (dropGltfParser). */
+export type LoadedGltf = Omit<GLTF, 'parser'>;
+
 let gltfLoader: GLTFLoader | null = null;
-const gltfCache = new Map<string, Promise<GLTF>>();
+const gltfCache = new Map<string, Promise<LoadedGltf>>();
 const texCache = new Map<string, Promise<THREE.Texture>>();
+const bitmapTexCache = new Map<string, Promise<THREE.Texture>>();
 const ktx2TexCache = new Map<string, Promise<THREE.CompressedTexture>>();
 
 interface AssetQueue {
@@ -38,6 +55,13 @@ function constrainedBrowser(): boolean {
 }
 
 const constrained = constrainedBrowser();
+// The iPhone mip cap's gate (ktx2_mip_cap.ts), settled once at load from the
+// same user agent GFX.iosMemoryProfile reads, so a graphics rebuild cannot flip
+// it between two parses of the same texture family.
+const ktx2MipCapProfile: Ktx2MipCapProfile = {
+  iosMemoryProfile: GFX.iosMemoryProfile,
+  iosPhone: isIosPhoneUserAgent(typeof navigator !== 'undefined' ? navigator.userAgent : undefined),
+};
 const gltfQueue: AssetQueue = { active: 0, limit: constrained ? 2 : 4, pending: [] };
 const textureQueue: AssetQueue = { active: 0, limit: constrained ? 3 : 6, pending: [] };
 // Single-slot lane for the few very large textures (the biome sky domes, about
@@ -132,6 +156,19 @@ function polishGltfTextures(gltf: GLTF): void {
   });
 }
 
+// The parser is the only path from a cached GLTF to a copy of the whole binary
+// chunk, the bufferView promise cache (embedded image slices included) and the
+// parsed JSON. Nothing drawn needs it after parse: vertex, index and animation
+// arrays view their own decoded bufferViews, and a texture re-uploads (context
+// restore included) from its image, its mip chain, or the KTX2 restore source
+// that ktx2_mip_release keeps as its own copy. Every consumer shares this one
+// object, so deleting in place frees it for all of them. Pinned, with a ban on
+// src/ readers, by tests/gltf_parser_release.test.ts.
+function dropGltfParser(gltf: GLTF): LoadedGltf {
+  delete (gltf as { parser?: unknown }).parser;
+  return gltf;
+}
+
 // asset fetch start/settle so a device console shows exactly how far through the
 // preload set a WebContent kill lands and which asset preceded it (the iPhone 17
 // Pro entry-kill investigation: WebContent died at 1.54 GB resident mid-decode
@@ -167,7 +204,7 @@ function diagSettle(seq: number, kind: string, resolved: string, ok: boolean): v
 
 /** Load + parse a .glb once; subsequent calls share the same parsed scene.
  *  Consumers must treat the result as immutable — clone before mutating. */
-export function loadGltf(url: string): Promise<GLTF> {
+export function loadGltf(url: string): Promise<LoadedGltf> {
   const resolved = assetUrl(url);
   let p = gltfCache.get(resolved);
   if (!p) {
@@ -196,13 +233,17 @@ export function loadGltf(url: string): Promise<GLTF> {
         polishGltfTextures(gltf);
         // Transmissive materials become translucent (transmission_neutralize.ts).
         neutralizeGltfTransmission(gltf);
+        // iPhone only: character-side roots keep their mips at or under 512.
+        // Before classification and before any consumer, so before any upload.
+        const mipCap = ktx2MipCapFor(resolved, ktx2MipCapProfile);
+        if (mipCap !== null) capGltfKtx2Mips(gltf, mipCap);
         // Classify every KTX2 texture for post-upload mip release (world-only
         // categories) or source dismissal (everything a preview/portrait/armory
         // renderer can also upload). Runs here, in the parse's own resolve
         // chain, so classification always precedes the first GPU upload.
         classifyGltfKtx2Textures(gltf, resolved);
         recordAssetLoad('gltf', resolved, startedAt);
-        return gltf;
+        return dropGltfParser(gltf);
       },
       (err: unknown) => {
         recordAssetLoad('gltf', resolved, startedAt, true);
@@ -291,6 +332,58 @@ export function loadTexture(
   return p;
 }
 
+/** A plain image texture decoded off the main thread (image_bitmap_decode.ts),
+ *  for large sheets whose upload would otherwise pay the decode in a live
+ *  frame. Uploads the same texels as loadTexture, whose path it falls back to
+ *  outside Chromium or when the decode is refused. Each call past a settled
+ *  one fetches and decodes again. An ImageBitmap pins its decoded RGBA until
+ *  closed, so a caller that keeps the texture past its upload releases it
+ *  (bitmap_sheet_release.ts). */
+export function loadBitmapTexture(
+  url: string,
+  opts: { srgb?: boolean } = {},
+): Promise<THREE.Texture> {
+  if (!browserDecodesImageBitmap()) return loadTexture(url, opts);
+  const resolved = assetUrl(url);
+  const key = `${resolved}|${opts.srgb ? 's' : 'l'}`;
+  let p = bitmapTexCache.get(key);
+  if (!p) {
+    const startedAt = assetLoadStarted();
+    p = scheduleLoad(textureQueue, () => {
+      const seq = diagStart('bitmap', resolved);
+      return withRetry(() => fetchImageBlob(resolved))
+        .then((blob) => createImageBitmap(blob, BITMAP_DECODE_OPTIONS))
+        .then(
+          (bitmap) => {
+            diagSettle(seq, 'bitmap', resolved, true);
+            const texture = new THREE.Texture(bitmap);
+            texture.flipY = false;
+            if (opts.srgb) texture.colorSpace = THREE.SRGBColorSpace;
+            texture.needsUpdate = true;
+            recordAssetLoad('texture', resolved, startedAt);
+            return texture;
+          },
+          (err: unknown) => {
+            diagSettle(seq, 'bitmap', resolved, false);
+            throw err;
+          },
+        );
+    }).catch(() => {
+      if (loadDiagEnabled()) console.info(`[load-diag] bitmap decode declined: ${resolved}`);
+      return loadTexture(url, opts);
+    });
+    // Joins a load in flight only: a settled texture may have released its
+    // bitmap (bitmap_sheet_release.ts), so a later request decodes afresh.
+    const pending = p;
+    const settle = () => {
+      if (bitmapTexCache.get(key) === pending) bitmapTexCache.delete(key);
+    };
+    p.then(settle, settle);
+    bitmapTexCache.set(key, p);
+  }
+  return p;
+}
+
 /** One normalization for a KTX2 request's cache key, shared by
  *  loadKtx2Texture and releaseKtx2Texture so the pair can never disagree on
  *  which entry a release drops. */
@@ -342,6 +435,9 @@ export function loadKtx2Texture(
     }).then(
       (tex) => {
         if (opts.repeat) tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+        // iPhone only: the skin atlases keep their mips at or under 512.
+        const mipCap = ktx2MipCapFor(resolved, ktx2MipCapProfile);
+        if (mipCap !== null) capCompressedMips(tex, mipCap);
         // Standalone KTX2 atlases (character skins) draw in the character
         // preview, portrait and armory renderers too, so their CPU mip chains
         // must stay resident: dismiss the stashed restore source, never arm.

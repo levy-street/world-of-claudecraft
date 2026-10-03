@@ -172,6 +172,14 @@ const advancedLowMixSeed = async (page) => {
   );
 };
 
+// The standing lowest preset, plus the Spell Effects switch at the value a
+// variant names (the option is new, so a base checkout ignores the key).
+const spellEffectsSeed = (on) => async (page) => {
+  await page.evaluateOnNewDocument(
+    `try { const k = 'woc_settings'; const s = JSON.parse(localStorage.getItem(k) || '{}'); s.graphicsPreset = 1; s.graphicsDefaultApplied = true; s.spellEffects = ${on}; localStorage.setItem(k, JSON.stringify(s)); } catch {}`,
+  );
+};
+
 // Controller layout evidence needs the cross hotbar enabled, PlayStation glyphs,
 // and the reported remap already staged: Cross jumps while Triangle is unbound.
 // The Frame Rate Limit row at 30, on the standing lowest preset, so its status
@@ -4514,6 +4522,129 @@ export const TARGETS = [
         { timeout: 30000, polling: 300 },
       );
       return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'graphics-options-spell-effects',
+    label: 'Graphics options panel (Display card, Spell Effects row)',
+    when: ['render/spell_effects_switch'],
+    variants: [
+      { key: 'desktop', beforeLoad: lowGraphicsSeed },
+      { key: 'mobile', mobile: true, beforeLoad: lowGraphicsSeed },
+    ],
+    async capture(page) {
+      await dismissArrivalGreeting(page);
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const hud = window.__game?.hud;
+        if (!hud) return;
+        const win = document.querySelector('#options-menu');
+        if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
+        hud.toggleOptionsMenu();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="graphics"]')?.click();
+      });
+      const open = await pollForSize(page, '#options-menu .set-rows');
+      if (!open) return {};
+      // On a base without the row the Weather row beside it is the "before".
+      await page.evaluate(() => {
+        const row =
+          document.querySelector('[data-focus-key="spellEffects"]') ??
+          document.querySelector('[data-focus-key^="spellEffects"]') ??
+          document.querySelector('[data-focus-key^="weather"]');
+        row?.scrollIntoView({ block: 'center' });
+      });
+      await wait(300);
+      return { clip: '#options-menu' };
+    },
+  },
+  {
+    key: 'spell-effects-in-world',
+    label: 'The same scripted spell volley with Spell Effects on and off',
+    when: ['render/spell_effects_switch'],
+    variants: [
+      { key: 'on', beforeLoad: spellEffectsSeed(true) },
+      { key: 'off', beforeLoad: spellEffectsSeed(false) },
+    ],
+    async capture(page) {
+      await dismissArrivalGreeting(page);
+      // One identical event stream on both variants, all cast by the player:
+      // projectiles, a beam and a nova from the generic arm, a spec'd Fireball
+      // through the ability painter, and an aimed blast whose area ring must
+      // survive the option.
+      // Refired on a short interval so a slow software rasterizer still
+      // catches the volley mid-flight when the runner shoots.
+      await page.evaluate(() => {
+        const g = window.__game;
+        const r = g?.renderer;
+        const sim = g?.sim;
+        if (!r || !sim) return;
+        const pid = sim.playerId;
+        const me = sim.entities.get(pid);
+        let target = null;
+        let best = Infinity;
+        for (const e of sim.entities.values()) {
+          if (e.id === pid || e.dead || !r.views?.get?.(e.id)) continue;
+          const d = Math.hypot(e.pos.x - me.pos.x, e.pos.z - me.pos.z);
+          if (d > 2 && d < best) {
+            best = d;
+            target = e;
+          }
+        }
+        const tid = target?.id ?? pid;
+        const fire = () => {
+          r.handleEvent({
+            type: 'spellfx',
+            sourceId: pid,
+            targetId: tid,
+            school: 'fire',
+            fx: 'projectile',
+          });
+          r.handleEvent({
+            type: 'spellfx',
+            sourceId: pid,
+            targetId: tid,
+            school: 'arcane',
+            fx: 'beam',
+          });
+          r.handleEvent({
+            type: 'spellfx',
+            sourceId: pid,
+            targetId: tid,
+            school: 'fire',
+            fx: 'heavyBolt',
+            ability: 'fireball',
+          });
+          r.handleEvent({
+            type: 'spellfx',
+            sourceId: pid,
+            targetId: tid,
+            school: 'frost',
+            fx: 'nova',
+          });
+          r.handleEvent({
+            type: 'spellfx',
+            sourceId: pid,
+            targetId: pid,
+            school: 'holy',
+            fx: 'procSurge',
+          });
+          r.handleEvent({
+            type: 'spellfxAt',
+            sourceId: pid,
+            x: me.pos.x + 3,
+            z: me.pos.z + 3,
+            school: 'fire',
+            fx: 'burst',
+            radius: 4,
+          });
+        };
+        fire();
+        // Left running: the runner's screenshot lands after this returns, and
+        // each variant boots its own page.
+        setInterval(fire, 150);
+      });
+      await wait(1600);
+      return {};
     },
   },
   {

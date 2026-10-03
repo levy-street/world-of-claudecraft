@@ -1908,7 +1908,7 @@ export function castAbility(
     return;
   }
   p.castTargetId = target?.id ?? null;
-  // Nature's Boon makes its spell 25% stronger. Scaled on a COPY here, BEFORE
+  // Nature's Boon makes its spell stronger (Wildbloom 50%, Oakhide 25%). Scaled on a COPY here, BEFORE
   // the block below spends the window: the instant arm consumes the aura and
   // only then calls applyAbility, so a multiplier read any later is always 1.
   res = scaleNaturesBoonPower(p, res);
@@ -2238,7 +2238,7 @@ function scaleNaturesBoonPower(p: Entity, res: ResolvedAbility): ResolvedAbility
   const effects = res.effects.map((eff) => {
     // A heal or a HoT is NOT scaled here: those sites add a Spell Power rider
     // on top of the authored base, so scaling the base alone would deliver
-    // less than the printed 25% at any real heal power. They take the whole
+    // less than the printed bonus at any real heal power. They take the whole
     // multiplier in runEffects instead, through the cast-scoped heal multiplier
     // that `naturesBoonPower` below feeds (the Stonehearth 2pc shape).
     if (eff.type === 'heal' || eff.type === 'hot') return eff;

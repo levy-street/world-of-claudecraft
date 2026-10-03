@@ -1449,6 +1449,7 @@ empty or non-positive value, so an unset key is always safe and a blank line in
 | `DISCORD_TEST_CHANNEL_ID` | unset | One-time "bot online" startup announcement, and the last-resort fallback channel for relay and activity posts. |
 | `DISCORD_RELAY_CHANNEL_ID` | falls back to the test channel | Where in-game "!" community posts land. With neither this nor the test channel set, drained relay items are DROPPED after a once-per-channel notice, so set one before opening the feature to players. |
 | `DISCORD_ACTIVITY_CHANNEL_ID` | falls back to relay, then test | Where the significant-activity feed lands. Same drop rule as relay. |
+| `DISCORD_PVP_FEED_CHANNEL_ID` | unset (no fallback) | The World PvP kill feed, plus the King of the Hill spawn calls (a card when a hill is announced, with a live countdown, and another when it rises). Kills: every resolved `/pvp` kill as one line, batched into digest posts (`PVP_FEED_LINES_PER_POST` lines each, `bot/logic.ts`), names only (nobody is pinged). Deliberately has no fallback so kill volume never spills into the relay or activity channel. With it unset, drained kills are DROPPED after a once-per-channel notice, which is the off switch. |
 | `DISCORD_DAILY_REWARDS_CHANNEL_ID` | unset | Daily-rewards top-10 winner posts. Unlike relay and activity, an unset channel drops nothing: a winner day is marked on the server only after its post lands, so it is re-served until it can be announced. |
 
 **Behavior:**

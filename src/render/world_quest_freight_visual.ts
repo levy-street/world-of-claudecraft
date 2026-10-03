@@ -1,8 +1,7 @@
 import * as THREE from 'three';
-import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import { EASTBROOK_FREIGHT_CARAVAN_MOB_ID } from '../sim/content/world_quests';
-import { loadGltf } from './assets/loader';
+import { type LoadedGltf, loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 import { buildCaravanDriver } from './world_quest_caravan_driver';
@@ -13,7 +12,7 @@ const FREIGHT_ASSET_URLS = Object.freeze({
   crate: '/models/quest/supply_crate.glb',
 });
 
-const gltfByUrl = new Map<string, GLTF>();
+const gltfByUrl = new Map<string, LoadedGltf>();
 let freightWagonTemplate: THREE.Group | null = null;
 
 if (typeof window !== 'undefined') {
@@ -216,7 +215,7 @@ export function buildMovingWorldQuestFreightWagon(
 
 export const worldQuestFreightVisualInternalsForTest = {
   assetUrls: FREIGHT_ASSET_URLS,
-  setGltf(url: string, gltf: GLTF): void {
+  setGltf(url: string, gltf: LoadedGltf): void {
     gltfByUrl.set(url, gltf);
   },
   reset(): void {

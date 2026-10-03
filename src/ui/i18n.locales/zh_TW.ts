@@ -780,8 +780,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.record': '戰績：擊殺 {kills}，陣亡 {deaths}',
   'hudChrome.worldPvp.repeatLine':
     '重複擊殺同一名玩家時，第二次獲得 {second}，第三次獲得 {third}，之後不再獲得任何獎勵；計數會在首次擊殺後 {reset} 清除。',
+  'hudChrome.worldPvp.skullName': '{name}的頭骨',
   'hudChrome.worldPvp.splitLine':
     '乾淨的一對一可獨得全部獎勵；有人幫忙時則由助攻者與其治療者平分。',
+  'hudChrome.worldPvp.spoilsLine':
+    '雙方都開啟 PvP 時，致命一擊者的金幣會與敗者的頭骨一同掉落在屍體上。',
   'hudChrome.worldPvp.stakeLine': '敗者需支付 {cap} 或其錢袋的 {percent}，以較低者為準。',
   'hudChrome.worldPvp.statusDisarming': '你的旗幟將於 {time} 後降下，或在目前戰鬥結束時降下。',
   'hudChrome.worldPvp.statusOff': '你的 PvP 旗幟已降下。你無法在開放世界中攻擊或被攻擊。',
@@ -1960,6 +1963,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '您還將被禁止參加每日獎勵 {remaining}。恢復時間：{until}。原因：{reason}',
   'hudChrome.keybinds.discord': 'Discord',
   'hudChrome.spectate.banner': '正在觀察 {name}',
+  'hudChrome.realmMotd.line': '今日訊息：{text}',
+  'hudChrome.realmMotd.updated': '今日訊息已更新。',
+  'hudChrome.realmMotd.cleared': '今日訊息已清除。',
+  'hudChrome.realmMotd.none': '目前未設定今日訊息。',
+  'hudChrome.realmMotd.usage': '用法：/motd "<訊息>" 設定今日訊息，/motd clear 將其清除。',
+  'hudChrome.realmMotd.tooLong': '今日訊息最多 {max} 個字元。',
+  'hudChrome.realmMotd.saveFailed': '今日訊息未能儲存，伺服器重新啟動後將會遺失。',
   'hudChrome.readyCheck.prompt': '{name} 發起了準備確認。你準備好了嗎？',
   'hudChrome.readyCheck.ready': '準備就緒',
   'hudChrome.readyCheck.notReady': '未準備',
@@ -2724,6 +2734,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '反覆擊敗同一名玩家，每次的收益都會減少並很快歸零，而你對那名玩家的計數要在首次擊殺約一小時之後才會重新開始，所以蹲守同一個目標永遠不值得等待。遠低於你等級的目標不會帶來任何收益。在戰場和競技場內部適用它們自己的規則，而且它們提供的榮譽比開放世界更多，因此世界 PvP 是通往同一位商人的較慢道路。',
   'guide.worldPvpPage.hillBodyRamp':
     '每三小時，會在無法預料的時刻向全伺服器發出通告：十五分鐘後，某個自由混戰地帶將升起一座山丘，它所在的圓圈會預先在開闊地上標出。山丘升起後會屹立四十五分鐘，然後消失。圈內站著玩家最多的隊伍爭奪這座山丘，連續保持人數優勢一分鐘後，山丘便歸他們所有；單獨一人算作一支一人隊伍，但團隊成員完全不計入人數。一支隊伍佔據山丘期間，站在圈內的每名成員每分鐘都會獲得榮譽，同一支隊伍佔據得越久，每分鐘獲得的榮譽就越多。一支滿員隊伍在山丘屹立的全程不受爭奪地佔據它，所獲榮譽約相當於三場戰場勝利。山丘易手時，新的佔據者從頭開始累積。場地上方的橫條會顯示誰在佔據、你方與對方的人數以及爭奪計時；在聊天中輸入 /hill 可以得知它的位置。',
+  'guide.worldPvpPage.hillBodyRanked':
+    '每三小時，某個自由混戰地帶會出現一座山丘。山丘存在期間，每五分鐘全伺服器都會收到它的位置以及各隊伍佔據時長的排名。山丘消失時，佔據總時長最長的隊伍成員會為每週寶庫的 PvP 進度獲得一場勝利，前提是該玩家在本隊佔據期間曾在圓圈內站滿至少一分鐘，並且結束時仍留在該隊伍中。',
   'guide.worldPvpPage.limitsBodyRaids':
     '反覆擊敗同一名玩家，每次的收益都會減少並很快歸零，而你對那名玩家的計數要在首次擊殺約一小時之後才會重新開始，所以蹲守同一個目標永遠不值得等待。遠低於你等級的目標不會帶來任何收益。在戰場和競技場內部適用它們自己的規則，而且它們提供的榮譽比開放世界更多，因此世界 PvP 是通往同一位商人的較慢道路。團隊無法從世界擊殺中獲得任何收益：團隊成員既得不到榮譽也得不到金幣，也不會減少其他人的份額，所以想獲得報酬就以隊伍身分作戰。',
   'guide.worldPvpPage.hillHeading': '山丘之王',
@@ -3012,6 +3024,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.confirmVendorSellMinQuality': '確認出售的最低品質',
   'hudChrome.options.confirmVendorSellMinQualityNote':
     '低於此品質的物品單擊即可出售；誤售的物品仍可從商人處買回。',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    '低於此品質的物品單擊即可出售。誤售的物品可從商人處買回，未署名的灰色物品除外。',
   'hudChrome.options.showSecondaryActionBar': '顯示副動作列',
   'hudChrome.options.showThirdActionBar': '顯示第三動作列',
   'hudChrome.options.hideUnusedActionSlots': '隱藏未使用的動作欄位',
@@ -4509,6 +4523,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.vendor.sellJunk': '出售雜物',
   'itemUi.vendor.sellJunkAria': '以 {price} 出售所有雜物',
   'itemUi.vendor.sellJunkHint': '出售背包中除任務物品外的所有灰色物品。',
+  'itemUi.vendor.sellJunkNoBuyback': '未署名的灰色物品不會進入回購列表，因此出售後無法撤銷。',
   'itemUi.market.title': '世界市場',
   'itemUi.market.subtitle': '商人的交易所',
   'itemUi.market.close': '關閉市場',
@@ -5018,6 +5033,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.name': '裂爪',
   'entities.abilities.claw.description':
     '用利爪攻擊敵人，造成武器傷害加 {damage}。獎勵 1 個連擊點。僅限貓形態。',
+  'entities.abilities.scratch.name': '抓撓',
+  'entities.abilities.scratch.description':
+    '抓撓 6 碼內的附近目標，造成武器傷害加 {damage}。每命中一個目標獎勵 1 個連擊點。使範圍內潛行的敵人現形。僅限貓形態。',
   'entities.abilities.ferocious_bite.name': '血噬',
   'entities.abilities.ferocious_bite.description': '終結技，造成 {damage}。僅限貓形態。',
   'entities.abilities.swipe.name': '橫掃利爪',
@@ -8642,6 +8660,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '錢幣是整個世界的潤滑劑：它能購買你的裝備、補給與旅行用品，並在玩家之間易手。這一切只要遊玩就能自然取得，所以不妨把這一頁當成一張地圖，看看你的錢從何處來、又往何處去。',
   'guide.economy.junkBody':
     '你用不上的掉落物仍能賣給任何商人，因此每當你經過城鎮時就清空背包，別讓它們塞滿。商人的出售分頁甚至備有一個一鍵按鈕，能一次賣出所有粗劣品質的雜物。真正一文不值的零碎雜物也可以直接丟棄以騰出空間。',
+  'guide.economy.junkBodyFinal':
+    '你用不上的掉落物仍能賣給任何商人，因此每當你經過城鎮時就清空背包，別讓它們塞滿。商人的出售分頁甚至備有一個一鍵按鈕，能一次賣出所有粗劣品質的雜物。真正一文不值的零碎雜物也可以直接丟棄以騰出空間。這樣賣出的未署名灰色物品不會進入回購列表，所以按下之前請確認沒有想留下的東西。',
   'guide.economy.junkTitle': '清理雜物',
   'guide.economy.mailTitle': '渡鴉郵驛',
   'guide.economy.mailBody':
@@ -12952,6 +12972,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showUtilityModes': '包含潛行與旅行形態',
   'hudChrome.options.showFriendlyTrack': '顯示我給隊友的增益',
   'hudChrome.options.showShieldTrack': '顯示我的護盾',
+  'hudChrome.options.classicCombatText': '經典戰鬥文字',
   'hudChrome.options.stickyTarget': '點擊地面時保留目標',
   'hudChrome.options.showNameplateDots': '在名條上顯示我的減益',
   'hudChrome.options.nameplateDotScale': '名條減益圖示大小',
@@ -14940,6 +14961,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.paperdoll.hideHelmAria': '隱藏頭盔',
   'hudChrome.paperdoll.showHelmAria': '顯示頭盔',
   'hudChrome.options.waterRipples': '水面漣漪（尾波）',
+  'hudChrome.options.spellEffects': '法術特效',
   'hudChrome.options.actionCam': '動作鏡頭',
   'hudChrome.options.actionCamShoulder': '動作鏡頭肩位',
   'hudChrome.options.actionCamShoulderLeft': '左 {pct}',
@@ -15002,6 +15024,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '使皮膚硬化為冷卻的熔渣，持續10秒，受到的所有傷害降低25%。',
   'entities.abilities.cinderhide.name': '熔渣皮膚',
   'entities.abilities.claw.specNote_feral': '每次命中的攻擊累積 1 層古血（最多 3 層）。',
+  'entities.abilities.scratch.specNote_feral': '每次命中的攻擊累積 1 層古血（最多 3 層）。',
   'entities.abilities.cold_focus.description':
     '持續 12 秒，審慎射擊產生更多集中值，蓄力長射的速度更快、消耗更低。（冷視招牌技能）',
   'entities.abilities.cold_focus.name': '冷靜專注',
@@ -16007,6 +16030,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifExtraBars':
     '顯示第二排動作列，開了第二排之後還能再開第三排。即使整排隱藏著，那些格子依然可以用快捷鍵使用。',
   'guide.settingsPage.ifFctScale': '從目標身上飄起的傷害與治療數字的大小。',
+  'guide.settingsPage.ifClassicCombatText':
+    '恢復為直線上升的純白色與淡金色傷害數字。保持關閉（預設）時，數字更醒目並向兩側散開，致命一擊和格外大的傷害會閃耀。',
   'guide.settingsPage.ifFramesIntro':
     '你自己的框、目標框，以及整個隊伍的排列方式。隊伍區塊還帶有縮放、寬度、高度、間距與欄數的滑桿，好讓團隊格線放得進你的螢幕，而分頁底部的「重設」按鈕會把每一個框都放回原位。',
   'guide.settingsPage.ifGeneralIntro':
@@ -16091,6 +16116,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.rowViewDistance':
     '世界在淡出之前會被繪製到多遠。每個預設都會替你設定好，直到你自己動它為止。',
   'guide.settingsPage.rowWaterQuality': '湖泊、河流與外海的著色方式，從平坦省效能到完全反射。',
+  'guide.settingsPage.rowSpellEffects':
+    '玩家及其寵物施放的法術光芒、火花、飛行彈道與命中爆發，也包括你自己的。關閉後畫面更清爽，大型團隊戰鬥中也能多擠出幾幀。敵人施放的一切仍會顯示，提示你離開區域的範圍圈、被昏迷、恐懼或定身目標頭上的標記，以及每一條施法條也都會保留。',
   'guide.settingsPage.rowWaterRipples':
     '你游泳時在身後擴散開來的尾波與漣漪。預設關閉，也是唯一一項真的會吃掉幀數的水面效果；無論怎麼設定，水花與氣泡都不受影響。',
   'guide.settingsPage.valueUltraOrInsane': '「超高」，若你想要全部拉滿就選「極致」',
@@ -17431,6 +17458,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   // Intentional gathering PR2: material provenance and source controls (M16 fills).
   'hudChrome.materialStackSelectionUnavailable': '此素材選擇已失效。',
   'hudChrome.itemTooltip.materialSourceGatherer': '{count} × 由{name}採集',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × 取自{name}',
   'hudChrome.itemTooltip.materialSourceGathererSigned': '{count} × 由{name}採集，由{signer}簽名',
   'hudChrome.itemTooltip.materialSourceUnrecorded': '{count} × 未記錄採集者',
   'hudChrome.itemTooltip.materialSourceUnrecordedSigned': '{count} × 未記錄採集者，由{name}簽名',
@@ -17618,6 +17646,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.rift_watchers_band.name': '裂隙守望者指環',
   'entities.items.rift_surveyors_satchel.name': '裂隙勘測員挎包',
   'entities.items.emissary_cache.name': '使者的寶箱',
+  'entities.items.pvp_trophy_skull.name': '戰利品頭骨',
   'entities.npcs.weekly_emissary.name': '查姆·皮特',
   'entities.npcs.weekly_emissary.title': '使者',
   'entities.npcs.weekly_emissary.greeting':

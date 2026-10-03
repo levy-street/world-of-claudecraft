@@ -1373,6 +1373,7 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
 // one tree. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
+  // Re-minted for the release/v0.44.0 merge into the WebGL context restore. No capture was retaken.
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
@@ -1394,7 +1395,27 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '3703e50946207ae92ff2b46d1e14673cca6c363993661222a778c5f11d56f6ce';
+  // Re-minted for the integrated WebGL context restore, spirit-veil, and
+  // trinket relics merge: the merged renderer and view-priority leaves match
+  // no parent. No capture was retaken.
+  // Re-minted after formatting the merged renderer helper: same content path,
+  // new renderer bytes. No capture was retaken.
+  // Re-minted after compressing that helper for the monolith ratchet: same
+  // content path, new renderer bytes. No capture was retaken.
+  // Re-minted for the GLTF parser release (the LoadedGltf type swap in mailbox.ts and
+  // noticeboard.ts). No capture was retaken.
+  // Re-minted for the integrated v0.45 batch plus GLTF parser release: the
+  // merged renderer, view-priority, mailbox, and noticeboard leaves compose in
+  // one tree. No capture was retaken.
+  // Re-minted for PR #4282 on top of that integrated v0.45 batch: the
+  // Drakelands kit lane moves renderer and zone-streaming leaves. No capture
+  // was retaken.
+  // Re-minted for PR #4279 on top of the v0.45 candidate: Spell Effects
+  // moves the renderer leaf and extracts world cue spell gating. No capture
+  // was retaken.
+  // Re-minted for the v0.45 release batch after entity-view policy moved.
+  // No capture was retaken.
+  '8cfdd156514577ab604c3c5edeb34f7460960816f565a8a3b8364f40ff2f2a27';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1417,7 +1438,27 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '164b585f770570b773faa8e35c466bcd4ab2840a6572507aa9528bc52572cbc5';
+  // Re-minted for the integrated WebGL context restore, spirit-veil, and
+  // trinket relics merge: the merged renderer and view-priority leaves match
+  // no parent. No capture was retaken.
+  // Re-minted after formatting the merged renderer helper: same content path,
+  // new renderer bytes. No capture was retaken.
+  // Re-minted after compressing that helper for the monolith ratchet: same
+  // content path, new renderer bytes. No capture was retaken.
+  // Re-minted for the GLTF parser release (the LoadedGltf type swap in mailbox.ts and
+  // noticeboard.ts). No capture was retaken.
+  // Re-minted for the integrated v0.45 batch plus GLTF parser release: the
+  // merged renderer, view-priority, mailbox, and noticeboard leaves compose in
+  // one tree. No capture was retaken.
+  // Re-minted for PR #4282 on top of that integrated v0.45 batch: the
+  // Drakelands kit lane moves renderer and zone-streaming leaves. No capture
+  // was retaken.
+  // Re-minted for PR #4279 on top of the v0.45 candidate: Spell Effects
+  // moves the renderer leaf and extracts world cue spell gating. No capture
+  // was retaken.
+  // Re-minted for the v0.45 release batch after entity-view policy moved.
+  // No capture was retaken.
+  '68d48dd165e6d7e304df2356d3a4d7c5ab3d998a9eb643b8d258198e5a33693b';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2800,7 +2841,25 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // LAST again over the re-swept evidence. No capture was retaken.
       // release/v0.44.0 base merge into PR 4193: recomputed LAST again over the
       // re-swept evidence. No capture was retaken.
-    ).toBe('55abc96a5aead82eb4096d7915be530c7731d95d07bbc9b1181704092cff1db3');
+      // Integrated WebGL context restore, spirit-veil, and trinket relics merge:
+      // recomputed LAST again over the re-swept evidence. No capture was retaken.
+      // Formatter-only renderer helper wrap after the integrated merge:
+      // recomputed LAST again over the re-swept evidence. No capture was retaken.
+      // Helper compression for the monolith ratchet: recomputed LAST again
+      // over the re-swept evidence. No capture was retaken.
+      // GLTF parser release (LoadedGltf type swap): recomputed LAST again over the
+      // re-swept evidence. No capture was retaken.
+      // Integrated v0.45 batch plus GLTF parser release: recomputed LAST again
+      // over the re-swept evidence. No capture was retaken.
+      // PR #4282 Drakelands kit lane on top of that integrated v0.45 batch:
+      // recomputed LAST again over the re-swept evidence. No capture was
+      // retaken.
+      // PR #4279 Spell Effects option on top of the v0.45 candidate:
+      // recomputed LAST again over the re-swept evidence. No capture was
+      // retaken.
+      // v0.45 release batch entity-view policy move: recomputed LAST over the
+      // re-swept evidence. No capture was retaken.
+    ).toBe('82e7531cb7c5813cbafba4633f8e39b040cb9091ba21d43fd8f2d5ba2418336f');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

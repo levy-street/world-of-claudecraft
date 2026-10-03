@@ -46,7 +46,8 @@ vi.mock('../server/db', () => ({
   heartbeatCharacterLeases: vi.fn(async () => {}),
 }));
 
-import { GameServer } from '../server/game';
+import { GameServer, wireEntity } from '../server/game';
+import { WORLD_PVP_SKULL_ITEM_ID } from '../src/sim/pvp';
 import { WORLD_PVP_TOGGLE_COOLDOWN } from '../src/sim/pvp/world_pvp';
 import type { Entity } from '../src/sim/types';
 
@@ -101,5 +102,81 @@ describe('world pvp server dispatch', () => {
     (sim as unknown as { time: number }).time += WORLD_PVP_TOGGLE_COOLDOWN + 1;
     dispatch(server, session, { cmd: 'chat', text: '/pvp' });
     expect(sim.worldPvpInfoFor(session.pid)!.disarmRemaining).toBe(300);
+  });
+});
+
+// The online half of the World PvP spoils (src/sim/pvp/world_pvp_spoils.ts): a
+// flagged-vs-flagged kill on the authoritative server puts the killing blow's
+// gold and the victim's skull on the body, the body's loot list rides the
+// entity wire (so the killer's client can open it), and the ordinary `loot`
+// command takes both. This is the regression pin for "gold is not dropping on
+// player kills" online.
+describe('world pvp spoils over the wire', () => {
+  function joinAs(server: GameServer, id: number, name: string) {
+    const session = server.join(
+      { readyState: 1, send: () => {} } as never,
+      id,
+      id,
+      name,
+      'warrior',
+      null,
+    );
+    if ('error' in session) throw new Error(session.error);
+    const sim = server.sim;
+    sim.setPlayerLevel(20, session.pid);
+    const p = sim.entities.get(session.pid) as Entity;
+    p.hp = p.maxHp;
+    // Contested ground (thornpeak_heights open ground): the mutual-flag rule.
+    p.pos = { x: 60 + (id % 2) * 2, y: p.pos.y, z: 700 };
+    p.prevPos = { ...p.pos };
+    return { session, p };
+  }
+
+  it('drops the gold and the skull on the body, sends the loot list, and the loot command takes it', () => {
+    const server = new GameServer();
+    const sim = server.sim;
+    const killer = joinAs(server, 201, 'Aleph');
+    const victim = joinAs(server, 202, 'Bet');
+    dispatch(server, killer.session, { cmd: 'pvp_flag', on: true });
+    dispatch(server, victim.session, { cmd: 'pvp_flag', on: true });
+    expect(killer.p.pvpFlag).toBe(true);
+    expect(victim.p.pvpFlag).toBe(true);
+    sim.meta(killer.session.pid)!.copper = 0;
+    sim.meta(victim.session.pid)!.copper = 20_000;
+    sim.ctx.dealDamage(killer.p, victim.p, victim.p.hp + 1_000, false, 'physical', 'Slam', 'hit');
+    expect(victim.p.dead).toBe(true);
+
+    const wire = wireEntity(victim.p);
+    expect(wire.loot).toBe(1);
+    expect(wire.tap).toBe(killer.session.pid);
+    expect(wire.lootList).toEqual({
+      copper: 2_000,
+      items: [
+        {
+          itemId: WORLD_PVP_SKULL_ITEM_ID,
+          count: 1,
+          materialSources: [
+            {
+              source: { gatherer: { kind: 'character', id: 202, name: 'Bet' } },
+              count: 1,
+            },
+          ],
+          personalFor: [killer.session.pid],
+        },
+      ],
+    });
+
+    dispatch(server, killer.session, { cmd: 'loot', id: victim.session.pid });
+    expect(sim.meta(killer.session.pid)!.copper).toBe(2_000);
+    expect(sim.meta(victim.session.pid)!.copper).toBe(18_000);
+    const skull = sim
+      .meta(killer.session.pid)!
+      .inventory.find((s) => s.itemId === WORLD_PVP_SKULL_ITEM_ID);
+    // One shared skull stack; its source bucket names the victim by character id.
+    expect(skull?.instance).toBeUndefined();
+    expect(skull?.materialSources).toEqual([
+      { source: { gatherer: { kind: 'character', id: 202, name: 'Bet' } }, count: 1 },
+    ]);
+    expect(wireEntity(victim.p).lootList).toBeUndefined();
   });
 });

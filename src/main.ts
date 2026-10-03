@@ -351,6 +351,7 @@ import {
   charactersReady,
   ensureCharacterUrl,
   modularCacheStats,
+  pollRiftCharacterStream,
   preloadMechAssets,
   startStreamedCharacterPreloads,
 } from './render/characters/assets';
@@ -378,6 +379,7 @@ import {
 import { attachContextRecoveryHandlers } from './render/context_loss_recovery';
 import { type RecycledRendererContext, recycleWebGL2Context } from './render/context_recycle';
 import { installWebGLContextRelease } from './render/context_release';
+import { contextRestoreDrawHeld } from './render/context_restore_hold';
 import {
   activateGfxProfile,
   captureGfxCapabilities,
@@ -394,6 +396,7 @@ import type { Renderer } from './render/renderer';
 import { hasAuthoritativeSelfPositionDiscontinuity } from './render/self_motion';
 import { MovementPredictionPipeline } from './render/self_prediction';
 import { ensureSkyAssetsAt, navigatorSaveData } from './render/sky';
+import { setSpellEffectsEnabled } from './render/spell_effects_switch';
 import { ARRIVAL_NEIGHBOR_STREAM_RADIUS } from './render/zone_streaming';
 import { desktopBridge } from './runtime';
 import { breathFraction, stepBreathUsedSeconds } from './sim/breath';
@@ -502,6 +505,7 @@ import {
   attachGatherNodeHoverTooltip,
   gatherNodeToolGateFor,
 } from './ui/gather_node_tooltip_controller';
+import { installGraphicsRestoreNote } from './ui/graphics_restore_note_controller';
 import { loadHighscoresInto } from './ui/highscore_board';
 import { type ClaudiumHooks, Hud } from './ui/hud';
 import { resolveActionBarVisibility } from './ui/hud/action_bar/action_bar_visibility_core';
@@ -1462,6 +1466,7 @@ async function startGame(
       stuckMessage: t('loading.rendererContextLost'),
     }),
   );
+  installGraphicsRestoreNote(document.getElementById('ui') ?? document.body);
   // The probe was armed before the locale/asset awaits above; mark that the await
   // window ended and the synchronous scene build is what runs next.
   entryDiagnostics.checkpoint('scene-build-start', baseEntryDiagnostics());
@@ -1504,6 +1509,7 @@ async function startGame(
     renderer.showPlayerNameplates = settings.get('showPlayerNameplates');
     setNameplateDotScale(settings.nameplateDotRenderScale());
     renderer.setWaterRipples(settings.get('waterRipples'));
+    setSpellEffectsEnabled(settings.get('spellEffects'));
     // Dev-only: ?targetcone=1 draws the Tab-target front cone on the ground in
     // front of the player, for tuning the targeting angle/radius (tab_target.ts).
     if (import.meta.env.DEV && new URLSearchParams(location.search).get('targetcone') === '1') {
@@ -2384,6 +2390,12 @@ async function startGame(
       // The wake height field lives renderer-side (render modules never read
       // the settings store), so the flip is pushed rather than read live.
       renderer.setWaterRipples(settings.set('waterRipples', !!value));
+      return;
+    }
+    if (key === 'spellEffects') {
+      // Module state (render/spell_effects_switch.ts), so it outlives a
+      // renderer rebuild; the painters read it at their entry points.
+      setSpellEffectsEnabled(settings.set('spellEffects', !!value));
       return;
     }
     if (key === 'partyFrameShowAbsorbs') {
@@ -4193,7 +4205,7 @@ async function startGame(
   // Reused across frames: the rAF hot path must not allocate (the frame
   // allocation guard polices the loop body), and the gate reads it
   // synchronously before returning a shared frozen decision.
-  const gateInput = newPresentationGateInput(DESKTOP_APP);
+  const gateInput = newPresentationGateInput(DESKTOP_APP, contextRestoreDrawHeld);
   function frame(now: number): void {
     if (armFrameAndSkip(frame, now, gateInput)) return;
     // The desktop shell keeps rAF running while hidden (backgroundThrottling is
@@ -4209,6 +4221,7 @@ async function startGame(
     }
     maybeWarmCurrentZone();
     maybeWarmFerryDestination();
+    pollRiftCharacterStream(world);
     const elapsedFrameDt = (now - last) / 1000;
     let frameDt = elapsedFrameDt;
     last = now;

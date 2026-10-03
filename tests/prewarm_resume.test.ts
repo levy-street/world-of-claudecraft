@@ -519,7 +519,14 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(resumeStart).toBeGreaterThan(-1);
     expect(runStart).toBeGreaterThan(resumeStart);
     expect(unitsSlice).toContain('buildInitialSceneCompileUnits({');
-    expect(compileUnitsSource.match(/buildPrewarmCompileUnits\(/g)).toHaveLength(1);
+    // One unit builder per lane: the boot lane's, and the context restore's
+    // own (its units are distance-ordered and carry no resume filter).
+    expect(compileUnitsSource.match(/buildPrewarmCompileUnits\(/g)).toHaveLength(2);
+    const bootBuilder = compileUnitsSource.slice(
+      compileUnitsSource.indexOf('export function buildInitialSceneCompileUnits('),
+      compileUnitsSource.indexOf('export function buildSceneRestoreCompileUnits('),
+    );
+    expect(bootBuilder.match(/buildPrewarmCompileUnits\(/g)).toHaveLength(1);
     // The resume lane must exclude groups whose units were already submitted
     // off-thread (resuming them would double-submit every unit).
     expect(resumeSlice).toContain(

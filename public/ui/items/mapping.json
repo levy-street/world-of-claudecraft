@@ -148,6 +148,17 @@
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
+      "itemId": "pvp_trophy_skull",
+      "name": "Trophy Skull",
+      "sourcePack": "project-authored (derived composition)",
+      "sourceFile": "Authored SVG trophy mount (vignette, wooden heater plaque, brass studs, crimson ribbon) composed with Sharp around a mirrored, scaled, feathered crop of public/ui/items/restless_skull.webp by scripts/generate_pvp_trophy_skull_icon.mjs; deterministic, no image model at this step",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "reference": "public/ui/items/restless_skull.webp (batch quest-objective-dedupe-zone-quest-items-2026-08-04, OpenAI gpt-image-2)",
+      "referenceRole": "skull subject crop inside the new trophy composition",
+      "shippingSha256": "c6b0806f392d85e5a0c48276eb4b0564191731ab6daedc3225a675ec7c883010"
+    },
+    {
       "itemId": "game_meat",
       "name": "Game Meat",
       "sourcePack": "woc_professions_art",

@@ -57,6 +57,7 @@
 import * as THREE from 'three';
 import { arrivalCoverActive } from './arrival_cover';
 import { GPU_WORK_PRIORITY } from './background_gpu_queue';
+import { registerContextRestoreReset } from './context_restore_registry';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { OCCLUDER_FADE_ALPHA } from './occluder_fade_core';
 import {
@@ -137,6 +138,9 @@ export function installOccluderFadeGate(host: RevealCompileHost): void {
     const twin = twins.get(key);
     return twin ? [twin] : [];
   });
+  // The gate's warm keys reset with every reveal gate; an escalation belongs
+  // to a request of the dead context, so the next edge may escalate again.
+  registerContextRestoreReset('occluder-fade-gate', gate, () => escalated.clear());
 }
 
 /** The renderer's teardown drops the gate and its twins with the context

@@ -194,9 +194,7 @@ const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
   'src/render/ability_vfx/spirits.ts',
   'src/render/vfx.ts',
   // Warrior kit volumes (crest fans, rupture masses, impact volumes): depth-tested
-  // 3D shapes on fixed orders 4 and 5. The one flat kind (the baked shockwave)
-  // rides the same pooled slots on order 5, under every player and encounter
-  // rung, so a boss telegraph still paints over it.
+  // 3D shapes on fixed orders 4 and 5.
   'src/render/ability_vfx/baked_impact_layers.ts',
   'src/render/ability_vfx/signature_crests.ts',
   // vertical or body-anchored class VFX
@@ -641,6 +639,7 @@ describe('floor VFX ladder (end to end on the real builders)', () => {
   });
 
   it("puts a boss sigil flare or a mob windup rune on the encounter band and the mage's own Rune of Power on the player band", () => {
+    const fills: number[] = [];
     const runeOrders = (spawn: RuneCircleSpawn): number[] => {
       const scene = new THREE.Scene();
       const fx = new MageGroundFx(scene, () => 0, vi.fn());
@@ -648,12 +647,14 @@ describe('floor VFX ladder (end to end on the real builders)', () => {
       const rune = scene.getObjectByName('mage-rune-power');
       expect(rune).toBeDefined();
       const orders: number[] = [];
+      fills.length = 0;
       (rune as THREE.Object3D).traverse((object) => {
         // the terrain-draped inscription (rings, spokes, glow); the orbiting
-        // motes are airborne spheres and deliberately outside the ladder
-        if (isRenderable(object) && object.name.startsWith('mage-rune-power-')) {
-          orders.push(object.renderOrder);
-        }
+        // motes are airborne spheres and deliberately outside the ladder. A mob
+        // windup's danger fill is checked on its own below.
+        if (!isRenderable(object) || !object.name.startsWith('mage-rune-power-')) return;
+        if (object.name === 'mage-rune-power-danger-fill') fills.push(object.renderOrder);
+        else orders.push(object.renderOrder);
       });
       expect(orders.length).toBeGreaterThan(3);
       return orders;
@@ -669,6 +670,7 @@ describe('floor VFX ladder (end to end on the real builders)', () => {
       school: 'arcane',
       ability: 'rune_of_power',
     });
+    expect(fills).toHaveLength(0);
     const sigil = runeOrders({
       x: 0,
       z: 0,
@@ -677,8 +679,14 @@ describe('floor VFX ladder (end to end on the real builders)', () => {
       school: 'arcane',
       ability: NYTHRAXIS_SIGIL_CAST_ID,
     });
+    expect(fills).toHaveLength(0);
     // a rift mob's stomp or pulse windup arrives with a school and no ability
     const windup = runeOrders({ x: 0, z: 0, radius: 5, duration: 3, school: 'fire' });
+    // Only the windup washes its whole blast disc, on the encounter band and
+    // UNDER every stroke of the inscription.
+    expect(fills).toHaveLength(1);
+    expect(floorVfxLayerOf(fills[0])).toBe('encounter');
+    expect(fills[0]).toBeLessThan(Math.min(...windup));
     for (const order of own) expect(floorVfxLayerOf(order), `own ${order}`).toBe('player');
     for (const order of sigil) expect(floorVfxLayerOf(order), `sigil ${order}`).toBe('encounter');
     for (const order of windup) expect(floorVfxLayerOf(order), `windup ${order}`).toBe('encounter');

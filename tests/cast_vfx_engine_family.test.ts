@@ -7,11 +7,11 @@
 //
 // Every drawable the engine builds belongs to a named pool, and every pool is
 // named in exactly one table: ENGINE, KIT or NO_DRAWABLE. The kit joins the
-// gate because several of its pieces draw with no readiness check of their
-// own (the baked layers' non-strict kinds, the solid fragments, the crests
-// outside their authored kinds), so the gate is their only protection. A pool
-// added to the engine without a row fails the attribution case; a row whose
-// pool does not tag its drawables fails the membership case.
+// gate so a Warrior cast waits for the whole kit rather than showing part of
+// it; each kit pool's own readiness checks are pinned in
+// tests/cast_vfx_spawn_gate.test.ts. A pool added to the engine without a row
+// fails the attribution case; a row whose pool does not tag its drawables
+// fails the membership case.
 
 import * as THREE from 'three';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
@@ -48,6 +48,7 @@ import { UmbralAnchorMarker } from '../src/render/umbral_anchor_marker';
 import { Vfx } from '../src/render/vfx';
 import { createVfxAnchor } from '../src/render/vfx_anchor';
 import { buildCastVfxBasicStandIns } from '../src/render/vfx_basic_materials';
+import { objectsHeldBy } from './helpers/cast_vfx_headless';
 import { drawsUnder, threeProgramKeys } from './helpers/three_program_keys';
 
 /** Engine pools (AbilityVfxFx fields) and the distinct programs each draws. */
@@ -65,12 +66,12 @@ const ENGINE: Record<string, number> = {
 const CLOUD_PROGRAMS = 1;
 /** The Warrior kit's pools (AbilityVfxFx fields) and the distinct programs of
  *  their OWN each draws, the Fury states' embedded engine ribbon aside. The
- *  pools share programs (one vertex-colour emissive instanced standard
- *  material program is drawn by the guards, the hammers, the power forms and
- *  the Fury states alike), so the kit's distinct total is KIT_PROGRAMS, not
- *  the sum. The solid fragments build their batches only from fragment
- *  geometry resident at construction: none on the first renderer of a page,
- *  FRAGMENT_PROGRAMS on a renderer rebuilt after the kit loaded. */
+ *  pools share programs (one vertex-colour emissive instanced surface program
+ *  is drawn by the guards, the hammers, the power forms and the Fury states
+ *  alike), so the kit's distinct total is KIT_PROGRAMS, not the sum. The solid
+ *  fragments hold their program on a boot stand-in from construction; the
+ *  batches their kit geometry builds (at once on a renderer rebuilt after the
+ *  kit loaded) draw that same program and add none. */
 const KIT: Record<string, number> = {
   crests: 1,
   guards: 1,
@@ -78,14 +79,14 @@ const KIT: Record<string, number> = {
   spiritHammers: 1,
   furyStates: 2,
   baked: 1,
-  fragments: 0,
+  fragments: 1,
 };
-const KIT_PROGRAMS = 6;
-const FRAGMENT_PROGRAMS = 1;
-/** The gate set, pinned: the engine's 10 plus the kit's 6. The pools read no
- *  graphics tier, so it is the same on every tier and detail level (the
- *  composition cases below). */
-const GATE_TOTAL = 16;
+const KIT_PROGRAMS = 7;
+/** The gate set, pinned: the engine's 10 plus the kit's 7. The tier picks the
+ *  kit surfaces' material family, never how many programs they share, so it
+ *  is the same count on every tier and detail level (the composition cases
+ *  below). */
+const GATE_TOTAL = 17;
 /** Pools that build no drawable of their own at construction (the spirit
  *  holders are material-less; each puppet runs its own compile gate). */
 const NO_DRAWABLE = ['spirits'] as const;
@@ -123,38 +124,6 @@ function installCanvasStub(): void {
     removeEventListener: noop,
   });
   vi.stubGlobal('document', { createElement: canvas, createElementNS: canvas });
-}
-
-/** Every Object3D a pool instance reaches through its own fields (slots,
- *  arrays, nested records), stopping at the scene and the camera it was
- *  handed. The attribution a drawable gets is the pool that holds it. */
-function objectsHeldBy(pool: unknown): Set<THREE.Object3D> {
-  const held = new Set<THREE.Object3D>();
-  const visited = new Set<unknown>();
-  const visit = (value: unknown, depth: number): void => {
-    if (value === null || typeof value !== 'object' || visited.has(value)) return;
-    visited.add(value);
-    const object = value as THREE.Object3D & { isScene?: boolean; isCamera?: boolean };
-    if (object.isObject3D) {
-      if (object.isScene || object.isCamera) return;
-      object.traverse((child) => held.add(child));
-      return;
-    }
-    if (depth === 0 || ArrayBuffer.isView(value)) return;
-    const record = value as {
-      isMaterial?: boolean;
-      isTexture?: boolean;
-      isBufferGeometry?: boolean;
-    };
-    if (record.isMaterial || record.isTexture || record.isBufferGeometry) return;
-    const entries =
-      value instanceof Map || value instanceof Set
-        ? [...value.values()]
-        : Object.values(value as Record<string, unknown>);
-    for (const entry of entries) visit(entry, depth - 1);
-  };
-  visit(pool, 5);
-  return held;
 }
 
 function engineScene(options: { fragments?: boolean } = {}) {
@@ -206,7 +175,6 @@ const isVfx = (draw: Draw) => draw.object.userData.renderCategory === 'vfx';
 const inGate = (object: THREE.Object3D) => inCastVfxEngine(object) || inCastVfxKit(object);
 const ENGINE_POOLS = Object.keys(ENGINE);
 const KIT_POOLS = Object.keys(KIT);
-const kitTotal = (fragments: boolean) => KIT_PROGRAMS + (fragments ? FRAGMENT_PROGRAMS : 0);
 const engineTotal = Object.values(ENGINE).reduce((sum, n) => sum + n, CLOUD_PROGRAMS);
 
 afterEach(() => {
@@ -231,9 +199,7 @@ for (const fragments of [false, true]) {
       }
       const drawing = new Set(h.built.map((draw) => h.owners.get(draw.object)?.[0]));
       for (const pool of ENGINE_POOLS) expect(drawing.has(pool), pool).toBe(true);
-      for (const pool of KIT_POOLS) {
-        expect(drawing.has(pool), pool).toBe(pool !== 'fragments' || fragments);
-      }
+      for (const pool of KIT_POOLS) expect(drawing.has(pool), pool).toBe(true);
       for (const pool of NO_DRAWABLE) expect(drawing.has(pool), pool).toBe(false);
     });
 
@@ -283,19 +249,18 @@ for (const fragments of [false, true]) {
         const own = [...signaturesOf(h.drawsOf([pool]).filter(isVfx))].filter(
           (signature) => !engineSignatures.has(signature),
         );
-        const expected = pool === 'fragments' && fragments ? FRAGMENT_PROGRAMS : programs;
-        expect(own.length, `${pool} programs`).toBe(expected);
+        expect(own.length, `${pool} programs`).toBe(programs);
       }
       const kitOwn = [...signaturesOf(h.drawsOf(KIT_POOLS).filter(isVfx))].filter(
         (signature) => !engineSignatures.has(signature),
       );
-      expect(kitOwn).toHaveLength(kitTotal(fragments));
+      expect(kitOwn).toHaveLength(KIT_PROGRAMS);
       const gatedDraws = [
         ...h.drawsOf([...ENGINE_POOLS, ...KIT_POOLS]).filter(isVfx),
         { object: h.cloud, material: h.cloud.material as THREE.Material },
       ];
-      const total = engineTotal + kitTotal(fragments);
-      expect(total).toBe(GATE_TOTAL + (fragments ? FRAGMENT_PROGRAMS : 0));
+      const total = engineTotal + KIT_PROGRAMS;
+      expect(total).toBe(GATE_TOTAL);
       const gated = abilityVfxGateMaterials(h.scene);
       expect(gated).toHaveLength(total);
       expect(signaturesOf(gatedDraws).size).toBe(total);
@@ -320,11 +285,13 @@ for (const fragments of [false, true]) {
 
     it('splits the representatives by family, and the scene gate reads each on its own', () => {
       const byFamily = abilityVfxFamilyMaterials(h.scene);
-      expect([...byFamily.keys()]).toEqual(['engine', 'kit']);
+      expect([...byFamily.keys()]).toEqual(['engine', 'kit', 'relic']);
+      // The trinket relics are no engine pool: their family is empty here.
+      expect(byFamily.get('relic')).toEqual([]);
       const engine = byFamily.get('engine') ?? [];
       const kit = byFamily.get('kit') ?? [];
       expect(engine).toHaveLength(engineTotal);
-      expect(kit).toHaveLength(kitTotal(fragments));
+      expect(kit).toHaveLength(KIT_PROGRAMS);
       const engineMaterials = new Set<THREE.Material>([
         ...h.drawsOf(ENGINE_POOLS).map((draw) => draw.material),
         h.cloud.material as THREE.Material,
@@ -342,7 +309,8 @@ for (const fragments of [false, true]) {
       const readiness = createSceneCastVfxReadiness(h.scene, webgl, () => 0);
       expect(readiness.snapshot().families.map((family) => [family.id, family.pending])).toEqual([
         ['engine', engineTotal],
-        ['kit', kitTotal(fragments)],
+        ['kit', KIT_PROGRAMS],
+        ['relic', 0],
       ]);
     });
 
@@ -354,7 +322,7 @@ for (const fragments of [false, true]) {
         inCastVfxEngine(target.object) ? 0 : inCastVfxKit(target.object) ? 1 : 2,
       );
       expect(families.filter((family) => family === 0)).toHaveLength(engineTotal);
-      expect(families.filter((family) => family === 1)).toHaveLength(kitTotal(fragments));
+      expect(families.filter((family) => family === 1)).toHaveLength(KIT_PROGRAMS);
       expect(families.filter((family) => family === 2).length).toBeGreaterThan(0);
       expect(families).toEqual([...families].sort((a, b) => a - b));
     });

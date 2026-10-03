@@ -112,9 +112,23 @@ export function enterVehicle(ctx: SimContext, stationId: string, pid?: number): 
 
 export function leaveVehicle(ctx: SimContext, pid?: number): void {
   const resolved = ctx.resolve(pid);
-  if (!resolved?.meta.vehicle) return;
+  const session = resolved?.meta.vehicle;
+  if (!resolved || !session) return;
+  // Endless play ends however the defender leaves (the exit button, an
+  // ejection, a logout): the waves held are the score, so the ladder row posts
+  // here once. A breached line already posted it in tickVehicle ('failed').
+  if (session.encounter.endless && session.encounter.phase !== 'failed')
+    postEndlessRun(ctx, resolved.meta.entityId, session);
   resolved.meta.vehicle = null;
   resolved.meta.wireRev++;
+}
+
+function postEndlessRun(ctx: SimContext, pid: number, session: VehicleSession): void {
+  const station = vehicleStationById(session.stationId);
+  if (!station) return;
+  const result = cannonResult(session.encounter);
+  ctx.emit({ type: 'cannonResult', pid, ...result });
+  emitWorldQuestScore(ctx, pid, station.questId, result.medal, result.wavesCleared ?? 0);
 }
 
 function remainsAtStation(player: Entity, session: VehicleSession): boolean {
@@ -177,8 +191,9 @@ export function tickVehicle(ctx: SimContext, meta: PlayerMeta, player: Entity): 
   } else if (session.encounter.phase === 'failed') {
     const fall = cannonResult(session.encounter);
     ctx.emit({ type: 'cannonResult', pid: meta.entityId, ...fall });
-    // Only a breached ENDLESS line is a ladder row: the medal was earned at the
-    // victory, and the waves held past it are what the board ranks.
+    // A breached ENDLESS line is a ladder row (any other exit from endless play
+    // posts its row in leaveVehicle): the medal was earned at the victory, and
+    // the waves held past it are what the board ranks.
     if (session.encounter.endless)
       emitWorldQuestScore(ctx, meta.entityId, station.questId, fall.medal, fall.wavesCleared ?? 0);
     // The encounter's local clock freezes at failure; retry uses the live Sim clock.

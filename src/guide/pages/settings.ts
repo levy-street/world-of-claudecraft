@@ -257,6 +257,12 @@ const SETTING_ROWS: SettingRow[] = [
     impact: 'light',
   },
   {
+    setting: 'hudChrome.options.spellEffects',
+    where: [GFX, 'hudChrome.options.gfxSectionDisplay'],
+    body: 'guide.settingsPage.rowSpellEffects',
+    impact: 'moderate',
+  },
+  {
     setting: 'hudChrome.options.waterRipples',
     where: [GFX, 'hudChrome.options.gfxSectionDisplay'],
     body: 'guide.settingsPage.rowWaterRipples',
@@ -435,6 +441,10 @@ const INTERFACE_TABS: InterfaceTabBlock[] = [
       { setting: 'hudChrome.options.mouseoverCast', body: 'guide.settingsPage.ifMouseoverCast' },
       { setting: 'hudChrome.options.stickyTarget', body: 'guide.settingsPage.ifStickyTarget' },
       { setting: 'hud.options.fctScale', body: 'guide.settingsPage.ifFctScale' },
+      {
+        setting: 'hudChrome.options.classicCombatText',
+        body: 'guide.settingsPage.ifClassicCombatText',
+      },
       {
         setting: 'hudChrome.options.showSecondaryActionBar',
         body: 'guide.settingsPage.ifExtraBars',

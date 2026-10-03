@@ -131,6 +131,7 @@ import {
   druidMarrowbreakUsesGuard,
   resolveDruidOverbloom,
 } from './druid_engines';
+import { resolveWeaponSweep } from './druid_scratch';
 import { consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { exclusiveAuraConflicts } from './exclusive_aura';
@@ -654,6 +655,21 @@ export function runEffects(
         break;
       }
       case 'weaponStrike': {
+        // Sweep variant (Scratch): every nearby hostile, combo per landed hit.
+        if (eff.sweepRadius !== undefined) {
+          const landed = resolveWeaponSweep(ctx, p, ability, eff.sweepRadius, eff.bonus, {
+            weaponMult: eff.weaponMult,
+            primaryDamageMult,
+            threatFlat: res.threatFlat,
+            threatMult: res.threatMult,
+            critBonus: mods.abilities[ability.id]?.critPct ?? 0,
+            comboPerHit: ability.awardsCombo ? ability.awardsCombo + setComboBonus : 0,
+            forceCrit: sureCrit,
+          });
+          if (landed > 0 && ability.awardsCombo) comboAwarded = true;
+          if (landed > 0 && sureCrit) sureCritRolled = true;
+          break;
+        }
         if (!target) break;
         const strikeTarget = target;
         let dawnEchoWeaponAmount = 0;
