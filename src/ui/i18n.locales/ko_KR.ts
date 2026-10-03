@@ -19600,4 +19600,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '옭아매는 뿌리의 시전 시간이 0.5초 감소합니다.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '옭아매는 뿌리를 시전하면 이동 중에도 시전할 수 있고 이동 속도가 4초 동안 20% 증가합니다. 20초에 한 번만 발동합니다.',
+  'entities.letters.world_quest_reward.sender': '까마귀 우편국',
+  'entities.letters.world_quest_reward.subject': '전역 퀘스트 보상',
+  'entities.letters.world_quest_reward.body':
+    '이 전역 퀘스트 보상을 획득했을 때 가방이 가득 차 있어서 까마귀가 이곳으로 배달했습니다. 공간을 비운 뒤 아무 까마귀 석주에서나 받으세요.\n\n- 까마귀 우편국',
+  'questUi.logs.worldQuestRewardMailed':
+    '가방이 가득 찼습니다. 보상이 우편함으로 발송되었습니다: {items}.',
 };

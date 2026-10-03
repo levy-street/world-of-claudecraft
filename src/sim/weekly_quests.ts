@@ -30,6 +30,7 @@ import { DAILY_LOCKOUT_RAID_ROOMS, WEEKLY_LOCKOUT_RAID_ROOMS } from './instances
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { Entity, WeeklyQuestProgress } from './types';
+import { grantWorldQuestRewardItems } from './world_quest_reward_mail';
 import { civilDayNumber } from './world_quest_rotation';
 
 const EPOCH_DAY = civilDayNumber(WEEKLY_QUEST_EPOCH_DAY) as number;
@@ -189,7 +190,11 @@ export function creditWeeklyQuest(ctx: SimContext, meta: PlayerMeta, kind: Weekl
   const copper = weeklyQuestRewardCopper(player?.level ?? 1);
   meta.copper += copper;
   ctx.emit({ type: 'loot', text: `You receive ${formatMoney(copper)}.`, pid: meta.entityId });
-  ctx.addItem(WEEKLY_QUEST_REWARD.cacheItemId, WEEKLY_QUEST_REWARD.cacheCount, meta.entityId);
+  // Paid once per week: a cache the full bags cannot hold is posted to the
+  // Ravenpost rather than forced past the bag capacity.
+  grantWorldQuestRewardItems(ctx, meta, [
+    { itemId: WEEKLY_QUEST_REWARD.cacheItemId, count: WEEKLY_QUEST_REWARD.cacheCount },
+  ]);
   ctx.emit({ type: 'worldQuestWeeklyDone', questId: quest.id, pid: meta.entityId });
 }
 

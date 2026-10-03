@@ -12671,6 +12671,7 @@ export const de_DE: EnTranslations = {
       "clueCasketOpened": "Die Truhe enthält {money} und {items}.",
       "treasureMapEarned": "Alle Weltquests des Tages sind erledigt: du hast {map} gefunden.",
       "treasureMapLost": "Alle Weltquests des Tages sind erledigt, aber dein Rucksack hat keinen Platz für die Schatzkarte.",
+      "worldQuestRewardMailed": "Your bags are full. Your reward was sent to your mailbox: {items}.",
       "treasureMapRead": "Du studierst {map}. Das X liegt irgendwo in {zone}.",
       "treasureMapUpgraded": "Die Karte wird mit feinerer Tinte neu gezeichnet: sie ist jetzt {map}.",
       "treasureVaultOpened": "Der Boden weicht. Ein vergrabener Schatz liegt offen vor dir.",
@@ -23946,6 +23947,11 @@ export const de_DE: EnTranslations = {
         "sender": "Die Rabenpflicht",
         "subject": "Deine Tresor-Belohnung",
         "body": "Der Tresor wurde geleert, aber dein Anteil wurde nicht aus der Kiste eingesammelt. Die Raben haben ihn dir hier gebracht, zusammen mit den Waren und Münzen, die du verdient hast.\n\n- Die Rabenpflicht"
+      },
+      "world_quest_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your world quest reward",
+        "body": "Your bags were full when you earned this world quest reward, so the ravens have brought it to you here instead. Make some room and collect it from any raven pillar.\n\n- The Ravenpost"
       }
     },
     "itemSets": {

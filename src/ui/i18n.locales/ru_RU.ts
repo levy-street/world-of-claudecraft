@@ -19978,4 +19978,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Время применения Хватких корней сокращается на 0,5 сек.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'После применения Хватких корней вы можете произносить заклинания на ходу, а ваша скорость передвижения повышается на 20% на 4 сек. Срабатывает не чаще одного раза в 20 сек.',
+  'entities.letters.world_quest_reward.sender': 'Воронья почта',
+  'entities.letters.world_quest_reward.subject': 'Ваша награда за локальное задание',
+  'entities.letters.world_quest_reward.body':
+    'Когда вы получили эту награду за локальное задание, ваши сумки были полны, поэтому вороны доставили её сюда. Освободите место и заберите её у любого вороньего столба.\n\n- Воронья почта',
+  'questUi.logs.worldQuestRewardMailed':
+    'Ваши сумки полны. Награда отправлена в почтовый ящик: {items}.',
 };

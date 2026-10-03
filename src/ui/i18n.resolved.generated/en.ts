@@ -12671,6 +12671,7 @@ export const en: EnTranslations = {
       "clueCasketOpened": "The casket holds {money} and {items}.",
       "treasureMapEarned": "Every world quest of the day is done: you found a {map}.",
       "treasureMapLost": "Every world quest of the day is done, but your bags have no room for the treasure map.",
+      "worldQuestRewardMailed": "Your bags are full. Your reward was sent to your mailbox: {items}.",
       "treasureMapRead": "You study the {map}. The X lies somewhere in {zone}.",
       "treasureMapUpgraded": "The map is redrawn in finer ink: it is now a {map}.",
       "treasureVaultOpened": "The ground gives way. A buried hoard lies open before you.",
@@ -23946,6 +23947,11 @@ export const en: EnTranslations = {
         "sender": "The Ravenpost",
         "subject": "Your vault reward",
         "body": "The vault was cleared, but your share was not collected from the chest. The ravens have brought it to you here, with the goods and coin you earned attached.\n\n- The Ravenpost"
+      },
+      "world_quest_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your world quest reward",
+        "body": "Your bags were full when you earned this world quest reward, so the ravens have brought it to you here instead. Make some room and collect it from any raven pillar.\n\n- The Ravenpost"
       }
     },
     "itemSets": {

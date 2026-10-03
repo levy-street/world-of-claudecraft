@@ -12671,6 +12671,7 @@ export const ja_JP: EnTranslations = {
       "clueCasketOpened": "宝箱には{money}と{items}が入っていた。",
       "treasureMapEarned": "本日のワールドクエストをすべて達成：{map}を見つけました。",
       "treasureMapLost": "本日のワールドクエストをすべて達成しましたが、宝の地図を入れるバッグの空きがありません。",
+      "worldQuestRewardMailed": "バッグがいっぱいです。報酬はメールボックスに送られました: {items}。",
       "treasureMapRead": "{map}を調べた。X印は{zone}のどこかにある。",
       "treasureMapUpgraded": "地図がより上質なインクで描き直された：今や{map}だ。",
       "treasureVaultOpened": "地面が崩れ落ちた。目の前に埋もれた財宝が口を開けている。",
@@ -23946,6 +23947,11 @@ export const ja_JP: EnTranslations = {
         "sender": "カラス便",
         "subject": "宝物庫の報酬",
         "body": "宝物庫は攻略されましたが、あなたの取り分は宝箱から受け取られていません。獲得した品とお金をカラス便がお届けします。\n\n- カラス便"
+      },
+      "world_quest_reward": {
+        "sender": "カラス便",
+        "subject": "ワールドクエストの報酬",
+        "body": "このワールドクエストの報酬を獲得したとき、バッグがいっぱいでした。そのため、カラスがここまで届けました。空きを作ってから、どのワタリガラスの石柱でも受け取れます。\n\n- カラス便"
       }
     },
     "itemSets": {

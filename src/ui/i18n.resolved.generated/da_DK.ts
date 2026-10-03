@@ -12671,6 +12671,7 @@ export const da_DK: EnTranslations = {
       "clueCasketOpened": "Kisten holder {money} og {items}.",
       "treasureMapEarned": "Hver verdensopgave på dagen er udført: du fandt en {map}.",
       "treasureMapLost": "Hver verdensopgave på dagen er udført, men dine tasker har ingen plads til skattekortet.",
+      "worldQuestRewardMailed": "Your bags are full. Your reward was sent to your mailbox: {items}.",
       "treasureMapRead": "Du studerer {map}. X'et ligger et eller andet sted i {zone}.",
       "treasureMapUpgraded": "Kortet tegnes på finere blæk: det er nu en {map}.",
       "treasureVaultOpened": "Jorden giver efter. Et begravet skattkammer ligger åbent foran dig.",
@@ -23946,6 +23947,11 @@ export const da_DK: EnTranslations = {
         "sender": "Ravenposten",
         "subject": "Din hoard-belønning",
         "body": "Hvælvingen blev ryddet, men din andel blev ikke samlet fra kisten. Ravnene har bragt det til dig her, med de varer og mønter, du tjente, vedlagt.\n\n- Ravenposten"
+      },
+      "world_quest_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your world quest reward",
+        "body": "Your bags were full when you earned this world quest reward, so the ravens have brought it to you here instead. Make some room and collect it from any raven pillar.\n\n- The Ravenpost"
       }
     },
     "itemSets": {

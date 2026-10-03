@@ -12671,6 +12671,7 @@ export const pl_PL: EnTranslations = {
       "clueCasketOpened": "Skrzynia zawiera {money} i {items}.",
       "treasureMapEarned": "Każde zadanie światowe dnia jest ukończone: znalazłeś {map}.",
       "treasureMapLost": "Każde zadanie światowe dnia jest ukończone, ale twoje torby nie mają miejsca na mapę skarbu.",
+      "worldQuestRewardMailed": "Your bags are full. Your reward was sent to your mailbox: {items}.",
       "treasureMapRead": "Studiujesz {map}. X leży gdzieś w {zone}.",
       "treasureMapUpgraded": "Mapa jest przerysowana w lepszym atramencie: jest teraz {map}.",
       "treasureVaultOpened": "Grunt się rozchodzi. Zakopane skarby leżą przed tobą.",
@@ -23946,6 +23947,11 @@ export const pl_PL: EnTranslations = {
         "sender": "Krucze Poczty",
         "subject": "Twoja nagroda ze skarbnicy",
         "body": "Skarbiec został czyszczony, ale twój udział nie został zebrany ze skrzyni. Kruki przyniosły go do ciebie tutaj, razem z dobrami i monetami, które zarabiłeś.\n\n- Krucze Poczty"
+      },
+      "world_quest_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your world quest reward",
+        "body": "Your bags were full when you earned this world quest reward, so the ravens have brought it to you here instead. Make some room and collect it from any raven pillar.\n\n- The Ravenpost"
       }
     },
     "itemSets": {

@@ -19617,4 +19617,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_balance.bonus2': '絡み根の詠唱時間が0.5秒短縮される。',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '絡み根を詠唱すると、移動しながら詠唱でき、移動速度が4秒間20%上昇する。20秒に1回しか発生しない。',
+  'entities.letters.world_quest_reward.sender': 'カラス便',
+  'entities.letters.world_quest_reward.subject': 'ワールドクエストの報酬',
+  'entities.letters.world_quest_reward.body':
+    'このワールドクエストの報酬を獲得したとき、バッグがいっぱいでした。そのため、カラスがここまで届けました。空きを作ってから、どのワタリガラスの石柱でも受け取れます。\n\n- カラス便',
+  'questUi.logs.worldQuestRewardMailed':
+    'バッグがいっぱいです。報酬はメールボックスに送られました: {items}。',
 };

@@ -12671,6 +12671,7 @@ export const id_ID: EnTranslations = {
       "clueCasketOpened": "Peti memuat {money} dan {items}.",
       "treasureMapEarned": "Setiap misi dunia hari ini selesai: Anda menemukan {map}.",
       "treasureMapLost": "Setiap misi dunia hari ini selesai, tetapi tas Anda penuh. Peta ini dijatuhkan.",
+      "worldQuestRewardMailed": "Your bags are full. Your reward was sent to your mailbox: {items}.",
       "treasureMapRead": "Anda mempelajari {map}. X terletak di suatu tempat di {zone}.",
       "treasureMapUpgraded": "Peta digambar ulang dalam tinta yang lebih halus: peta ini sekarang {map}.",
       "treasureVaultOpened": "Tanah bergerak. Harta karun yang terkubur terletak terbuka di depan Anda.",
@@ -23946,6 +23947,11 @@ export const id_ID: EnTranslations = {
         "sender": "Pos Gagak",
         "subject": "Hadiah lemari besi Anda",
         "body": "Lemari besi dibersihkan, tetapi bagian Anda tidak diambil dari peti. Burung gagak telah membawanya ke Anda di sini, dengan barang dan koin yang Anda peroleh.\n\n- Pos Gagak"
+      },
+      "world_quest_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your world quest reward",
+        "body": "Your bags were full when you earned this world quest reward, so the ravens have brought it to you here instead. Make some room and collect it from any raven pillar.\n\n- The Ravenpost"
       }
     },
     "itemSets": {

@@ -12671,6 +12671,7 @@ export const it_IT: EnTranslations = {
       "clueCasketOpened": "Il cofanetto contiene {money} e {items}.",
       "treasureMapEarned": "Tutte le missioni mondiali del giorno sono completate: hai trovato una {map}.",
       "treasureMapLost": "Tutte le missioni mondiali del giorno sono completate, ma la tua borsa non ha spazio per la mappa del tesoro.",
+      "worldQuestRewardMailed": "Your bags are full. Your reward was sent to your mailbox: {items}.",
       "treasureMapRead": "Studi la {map}. La X si trova da qualche parte in {zone}.",
       "treasureMapUpgraded": "La mappa è ridisegnata con inchiostro più fine: è ora una {map}.",
       "treasureVaultOpened": "Il terreno cede. Un tesoro sepolto si apre davanti a te.",
@@ -23946,6 +23947,11 @@ export const it_IT: EnTranslations = {
         "sender": "Il Servizio del Corvo",
         "subject": "La tua ricompensa da volta",
         "body": "La volta è stata sgomberata, ma la tua parte non è stata riscossa dal forziere. I corvi te l'hanno portata qui, insieme alle merci e alle monete che hai guadagnato.\n\n- Il Servizio del Corvo"
+      },
+      "world_quest_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your world quest reward",
+        "body": "Your bags were full when you earned this world quest reward, so the ravens have brought it to you here instead. Make some room and collect it from any raven pillar.\n\n- The Ravenpost"
       }
     },
     "itemSets": {

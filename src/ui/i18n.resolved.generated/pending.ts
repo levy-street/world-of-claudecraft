@@ -9,25 +9,100 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
+    "questUi.logs.worldQuestRewardMailed"
+  ],
+  "es_ES": [
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
+    "questUi.logs.worldQuestRewardMailed"
+  ],
+  "fr_FR": [
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
+    "questUi.logs.worldQuestRewardMailed"
+  ],
+  "fr_CA": [
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
+    "questUi.logs.worldQuestRewardMailed"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
+    "questUi.logs.worldQuestRewardMailed"
+  ],
+  "de_DE": [
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
+    "questUi.logs.worldQuestRewardMailed"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
+    "questUi.logs.worldQuestRewardMailed"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
+    "questUi.logs.worldQuestRewardMailed"
+  ],
+  "nl_NL": [
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
+    "questUi.logs.worldQuestRewardMailed"
+  ],
+  "pl_PL": [
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
+    "questUi.logs.worldQuestRewardMailed"
+  ],
+  "id_ID": [
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
+    "questUi.logs.worldQuestRewardMailed"
+  ],
+  "tr_TR": [
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
+    "questUi.logs.worldQuestRewardMailed"
+  ],
+  "sv_SE": [
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
+    "questUi.logs.worldQuestRewardMailed"
+  ],
+  "vi_VN": [
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
+    "questUi.logs.worldQuestRewardMailed"
+  ],
+  "da_DK": [
+    "entities.letters.world_quest_reward.body",
+    "entities.letters.world_quest_reward.sender",
+    "entities.letters.world_quest_reward.subject",
+    "questUi.logs.worldQuestRewardMailed"
+  ]
 };

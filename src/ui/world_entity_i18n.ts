@@ -744,6 +744,9 @@ const LETTER_IDS = [
   'woc_market_return',
   'woc_market_sold',
   'hoard_vault_reward',
+  // The full-bags world quest reward delivery (WORLD_QUEST_REWARD_LETTER in
+  // src/sim/content/letters.ts).
+  'world_quest_reward',
 ] as const;
 
 type MobId = (typeof MOB_IDS)[number];

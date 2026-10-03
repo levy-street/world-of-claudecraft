@@ -1,4 +1,3 @@
-import { bagPools, bagsFullError, canAddItem } from './bags';
 import { maybeAwardClueScroll, updateClueHunt } from './clue_scrolls';
 import { WORLD_QUEST_CALLIGRAPHY_ID } from './content/world_quest_calligraphy';
 import { FORGE_QUEST_ID } from './content/world_quest_forging';
@@ -107,6 +106,7 @@ import {
   worldQuestPuzzleInitialRotations,
 } from './world_quest_puzzle';
 import { playerActiveWorldQuests } from './world_quest_reroll';
+import { grantWorldQuestRewardItems, type WorldQuestRewardItem } from './world_quest_reward_mail';
 import {
   activeWorldQuestsForCycle,
   normalizeWorldQuestCycle,
@@ -600,17 +600,16 @@ export function awardWorldQuest(ctx: SimContext, meta: PlayerMeta, quest: WorldQ
       pid: meta.entityId,
     });
   }
+  // The quest's fixed extra, then the day's piece. Capacity is a caller
+  // pre-check for addItem (bags.ts addStacked): an item the bags cannot hold
+  // is posted to the Ravenpost instead, because the quest completes once per
+  // cycle and there is no second turn-in to defer to.
+  const rewardItems: WorldQuestRewardItem[] = [];
   const extra = quest.reward?.extraItem;
-  if (extra) ctx.addItem(extra.itemId, extra.count, meta.entityId);
+  if (extra) rewardItems.push({ itemId: extra.itemId, count: extra.count });
   const dailyItemId = worldQuestItemRewardForQuest(meta.worldQuestCycle, quest, meta.cls, level);
-  if (dailyItemId) {
-    // Capacity is a caller pre-check for addItem (bags.ts addStacked). A full
-    // bag loses the day's piece and says so, the Clue Scroll's rule: the quest
-    // completes once per cycle, so there is no second turn-in to defer to.
-    if (canAddItem(meta.inventory, bagPools(meta.bags), dailyItemId, 1))
-      ctx.addItem(dailyItemId, 1, meta.entityId);
-    else bagsFullError(ctx, meta.entityId, dailyItemId);
-  }
+  if (dailyItemId) rewardItems.push({ itemId: dailyItemId, count: 1 });
+  grantWorldQuestRewardItems(ctx, meta, rewardItems);
 
   const factionId = worldQuestFaction(quest);
   const standingAward = worldQuestStandingReward(quest, level);

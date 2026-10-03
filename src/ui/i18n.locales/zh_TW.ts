@@ -18662,4 +18662,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_balance.bonus2': '纏縛根鬚的施法時間縮短0.5秒。',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '施放纏縛根鬚後，你可以在移動中施法，並使移動速度提高20%，持續4秒。每20秒最多觸發一次。',
+  'entities.letters.world_quest_reward.sender': '渡鴉郵局',
+  'entities.letters.world_quest_reward.subject': '你的世界任務獎勵',
+  'entities.letters.world_quest_reward.body':
+    '你獲得這份世界任務獎勵時背包已滿，所以渡鴉把它送到了這裡。騰出空間後，可在任意渡鴉石柱領取。\n\n- 渡鴉郵局',
+  'questUi.logs.worldQuestRewardMailed': '你的背包已滿。獎勵已寄送到你的郵箱：{items}。',
 };

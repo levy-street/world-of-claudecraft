@@ -18644,4 +18644,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_balance.bonus2': '缠缚根须的施法时间缩短0.5秒。',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '施放缠缚根须后，你可以在移动中施法，并使移动速度提高20%，持续4秒。每20秒最多触发一次。',
+  'entities.letters.world_quest_reward.sender': '渡鸦邮局',
+  'entities.letters.world_quest_reward.subject': '你的世界任务奖励',
+  'entities.letters.world_quest_reward.body':
+    '你获得这份世界任务奖励时背包已满，所以渡鸦把它送到了这里。腾出空间后，可在任意渡鸦石柱领取。\n\n- 渡鸦邮局',
+  'questUi.logs.worldQuestRewardMailed': '你的背包已满。奖励已寄送到你的邮箱：{items}。',
 };

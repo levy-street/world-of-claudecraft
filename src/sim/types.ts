@@ -6972,7 +6972,12 @@ export type SimEvent = { pid?: number } & (
   // Treasure maps and vaults (src/sim/treasure_vault.ts). The sim emits ids
   // only; the client resolves the prose and opens the map window on a read.
   | { type: 'treasureMapEarned'; rarity: TreasureMapRarity }
+  /** Retired: the slate's map now waits in the mailbox when the bags are full
+   *  (worldQuestRewardMailed). Kept so the client case and its key still resolve. */
   | { type: 'treasureMapLost' }
+  /** World quest reward items that did not fit in the bags and were posted to
+   *  the Ravenpost instead (src/sim/world_quest_reward_mail.ts). Ids only. */
+  | { type: 'worldQuestRewardMailed'; itemIds: string[] }
   | { type: 'treasureMapRead'; rarity: TreasureMapRarity; siteId: string; fresh: boolean }
   | { type: 'treasureMapUpgraded'; rarity: TreasureMapRarity; inks: number }
   | { type: 'treasureVaultOpened'; rarity: TreasureMapRarity }

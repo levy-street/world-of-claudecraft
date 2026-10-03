@@ -12671,6 +12671,7 @@ export const sv_SE: EnTranslations = {
       "clueCasketOpened": "Kissan innehåller {money} och {items}.",
       "treasureMapEarned": "Alla världsuppdrag för dagen är klara: du hittade en {map}.",
       "treasureMapLost": "Alla världsuppdrag för dagen är klara, men dina väskor har ingen plats för skattkarta.",
+      "worldQuestRewardMailed": "Your bags are full. Your reward was sent to your mailbox: {items}.",
       "treasureMapRead": "Du studerar {map}. X ligger någonstans i {zone}.",
       "treasureMapUpgraded": "Kartan är omtecknad i finare bläck: det är nu en {map}.",
       "treasureVaultOpened": "Marken ger vika. En begravd skatt ligger öppen framför dig.",
@@ -23946,6 +23947,11 @@ export const sv_SE: EnTranslations = {
         "sender": "Ravenposten",
         "subject": "Din valvbelöning",
         "body": "Valvet rensades, men din andel samkades inte från kistan. Korparna har bragt det till dig här, med de varor och mynt du tjänade bifogade.\n\n- Ravenposten"
+      },
+      "world_quest_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your world quest reward",
+        "body": "Your bags were full when you earned this world quest reward, so the ravens have brought it to you here instead. Make some room and collect it from any raven pillar.\n\n- The Ravenpost"
       }
     },
     "itemSets": {

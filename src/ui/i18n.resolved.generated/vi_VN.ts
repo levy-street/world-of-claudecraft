@@ -12671,6 +12671,7 @@ export const vi_VN: EnTranslations = {
       "clueCasketOpened": "Hộp chứa {money} và {items}.",
       "treasureMapEarned": "Mọi nhiệm vụ thế giới hôm nay đã xong: bạn đã tìm thấy một {map}.",
       "treasureMapLost": "Bạn đã mất một bản đồ kho.",
+      "worldQuestRewardMailed": "Your bags are full. Your reward was sent to your mailbox: {items}.",
       "treasureMapRead": "Bạn nghiên cứu {map}. X nằm ở đâu đó trong {zone}.",
       "treasureMapUpgraded": "Bản đồ được vẽ lại bằng mực tốt hơn: nó hiện là một {map}.",
       "treasureVaultOpened": "Bạn đã mở kho.",
@@ -23946,6 +23947,11 @@ export const vi_VN: EnTranslations = {
         "sender": "Bưu Điện Quạ",
         "subject": "Phần thưởng kho báu của bạn",
         "body": "Kho báu đã bị phá, nhưng phần của bạn không được lấy ra từ hộp. Những chỉ quạ đã mang nó đến cho bạn ở đây, với hàng hóa và tiền bạc bạn kiếm được.\n\n- Bưu Điện Quạ"
+      },
+      "world_quest_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your world quest reward",
+        "body": "Your bags were full when you earned this world quest reward, so the ravens have brought it to you here instead. Make some room and collect it from any raven pillar.\n\n- The Ravenpost"
       }
     },
     "itemSets": {

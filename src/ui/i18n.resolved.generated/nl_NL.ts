@@ -12671,6 +12671,7 @@ export const nl_NL: EnTranslations = {
       "clueCasketOpened": "De kist bevat {money} en {items}.",
       "treasureMapEarned": "Elke wereldquest van de dag is klaar: je vond een {map}.",
       "treasureMapLost": "Elke wereldquest van de dag is klaar, maar je tassen hebben geen plaats voor de schattkaart.",
+      "worldQuestRewardMailed": "Your bags are full. Your reward was sent to your mailbox: {items}.",
       "treasureMapRead": "Je bestudeert de {map}. De X ligt ergens in {zone}.",
       "treasureMapUpgraded": "De kaart is opnieuw getekend in fijnere inkt: het is nu een {map}.",
       "treasureVaultOpened": "De grond geeft mee. Een begraven schat ligt voor je open.",
@@ -23946,6 +23947,11 @@ export const nl_NL: EnTranslations = {
         "sender": "De Ravenpost",
         "subject": "Je kluis beloningen",
         "body": "De kluis werd leeggeroofd, maar je aandeel werd niet uit de kist gehaald. De raven hebben het hier voor je gebracht, samen met de goederen en munten die je hebt verdiend.\n\n- De Ravenpost"
+      },
+      "world_quest_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your world quest reward",
+        "body": "Your bags were full when you earned this world quest reward, so the ravens have brought it to you here instead. Make some room and collect it from any raven pillar.\n\n- The Ravenpost"
       }
     },
     "itemSets": {

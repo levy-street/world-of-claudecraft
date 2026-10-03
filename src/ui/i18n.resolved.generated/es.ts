@@ -12671,6 +12671,7 @@ export const es: EnTranslations = {
       "clueCasketOpened": "El cofre contiene {money} y {items}.",
       "treasureMapEarned": "Todas las misiones de mundo del día están hechas: has encontrado un {map}.",
       "treasureMapLost": "Todas las misiones de mundo del día están hechas, pero no tienes sitio en las bolsas para el mapa del tesoro.",
+      "worldQuestRewardMailed": "Your bags are full. Your reward was sent to your mailbox: {items}.",
       "treasureMapRead": "Estudias el {map}. La X está en algún lugar de {zone}.",
       "treasureMapUpgraded": "El mapa se ha redibujado con tinta más fina: ahora es un {map}.",
       "treasureVaultOpened": "El suelo cede. Un tesoro enterrado se abre ante ti.",
@@ -23946,6 +23947,11 @@ export const es: EnTranslations = {
         "sender": "El Correo del Cuervo",
         "subject": "Tu recompensa del cofre",
         "body": "La cámara fue despejada, pero no recogiste tu parte del cofre. Los cuervos te la han traído aquí, con los bienes y las monedas que ganaste adjuntos.\n\n- El Correo del Cuervo"
+      },
+      "world_quest_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your world quest reward",
+        "body": "Your bags were full when you earned this world quest reward, so the ravens have brought it to you here instead. Make some room and collect it from any raven pillar.\n\n- The Ravenpost"
       }
     },
     "itemSets": {

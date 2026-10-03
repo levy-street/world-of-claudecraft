@@ -12671,6 +12671,7 @@ export const tr_TR: EnTranslations = {
       "clueCasketOpened": "Sandık {money} ve {items} tutuyor.",
       "treasureMapEarned": "Günün tüm dünya görevleri yapılmıştır: bir {map} buldun.",
       "treasureMapLost": "Günün tüm dünya görevleri tamamlanmıştır, ancak çantanızda hazine haritası için yer yok.",
+      "worldQuestRewardMailed": "Your bags are full. Your reward was sent to your mailbox: {items}.",
       "treasureMapRead": "{map} haritasını inceliyor. X {zone} içinde bir yerde.",
       "treasureMapUpgraded": "Harita daha güzel mürekkeple yeniden çizilmiştir: şimdi bir {map}.",
       "treasureVaultOpened": "Zemin çöküyor. Gizli bir hazine açık halde seni karşılıyor.",
@@ -23946,6 +23947,11 @@ export const tr_TR: EnTranslations = {
         "sender": "Karga Postahanesi",
         "subject": "Kasa ödülün",
         "body": "Kasa temizlendi, ama senin payan sandıktan toplanmadı. Kargalar bunu sana buraya getirdiler, kazandığın mallar ve parayla beraber.\n\n- Karga Postahanesi"
+      },
+      "world_quest_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your world quest reward",
+        "body": "Your bags were full when you earned this world quest reward, so the ravens have brought it to you here instead. Make some room and collect it from any raven pillar.\n\n- The Ravenpost"
       }
     },
     "itemSets": {

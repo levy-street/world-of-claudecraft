@@ -12671,6 +12671,7 @@ export const fr_CA: EnTranslations = {
       "clueCasketOpened": "Le coffret contient {money} et {items}.",
       "treasureMapEarned": "Toutes les quêtes mondiales du jour sont complétées : vous avez trouvé une {map}.",
       "treasureMapLost": "Toutes les quêtes mondiales du jour sont complétées, mais votre inventaire n'a pas de place pour la carte au trésor.",
+      "worldQuestRewardMailed": "Your bags are full. Your reward was sent to your mailbox: {items}.",
       "treasureMapRead": "Vous étudiez la {map}. Le X se trouve quelque part dans {zone}.",
       "treasureMapUpgraded": "La carte est redessinée avec une encre plus fine : c'est désormais une {map}.",
       "treasureVaultOpened": "Le sol cède. Un butin enfoui s'ouvre devant vous.",
@@ -23946,6 +23947,11 @@ export const fr_CA: EnTranslations = {
         "sender": "La Posternoire",
         "subject": "Votre récompense du coffre",
         "body": "Le coffre a été vidé, mais votre part n'a pas été collectée du coffre. Les corbeaux l'ont amenée jusqu'à vous ici, avec les biens et les pièces que vous avez gagnés."
+      },
+      "world_quest_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your world quest reward",
+        "body": "Your bags were full when you earned this world quest reward, so the ravens have brought it to you here instead. Make some room and collect it from any raven pillar.\n\n- The Ravenpost"
       }
     },
     "itemSets": {

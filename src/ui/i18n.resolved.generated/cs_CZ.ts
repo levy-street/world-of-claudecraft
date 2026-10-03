@@ -12671,6 +12671,7 @@ export const cs_CZ: EnTranslations = {
       "clueCasketOpened": "Truhlička obsahuje {money} a {items}.",
       "treasureMapEarned": "Každý světový úkol dne je hotov: našel jsi {map}.",
       "treasureMapLost": "Každý světový úkol dne je hotov, ale tvé tašky nemají místo pro mapu pokladu.",
+      "worldQuestRewardMailed": "Your bags are full. Your reward was sent to your mailbox: {items}.",
       "treasureMapRead": "Studiuješ {map}. X leží někde v {zone}.",
       "treasureMapUpgraded": "Mapa je překreslena v jemnějším inkoustu: teď je to {map}.",
       "treasureVaultOpened": "Zem se propadá. Pohřbený poklad leží otevřený před tebou.",
@@ -23946,6 +23947,11 @@ export const cs_CZ: EnTranslations = {
         "sender": "Vranobuzná Pošta",
         "subject": "Tvá odměna z trezoru",
         "body": "Trezor byl vyváznut, ale tvůj podíl se nevyzvedl ze schránky. Vrané ho přinesly sem tobě, spolu se zbožím a mincemi, které si zasloužíš.\n\n- Vranobuzná Pošta"
+      },
+      "world_quest_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your world quest reward",
+        "body": "Your bags were full when you earned this world quest reward, so the ravens have brought it to you here instead. Make some room and collect it from any raven pillar.\n\n- The Ravenpost"
       }
     },
     "itemSets": {

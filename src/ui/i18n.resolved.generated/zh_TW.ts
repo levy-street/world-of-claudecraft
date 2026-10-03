@@ -12671,6 +12671,7 @@ export const zh_TW: EnTranslations = {
       "clueCasketOpened": "寶箱中有{money}和{items}。",
       "treasureMapEarned": "今日所有世界任務均已完成：你找到了一張{map}。",
       "treasureMapLost": "今日所有世界任務均已完成，但你的背包沒有空間放藏寶圖。",
+      "worldQuestRewardMailed": "你的背包已滿。獎勵已寄送到你的郵箱：{items}。",
       "treasureMapRead": "你研究了{map}。X 標記位於{zone}的某處。",
       "treasureMapUpgraded": "地圖以更精細的墨水重繪：現在它是一張{map}。",
       "treasureVaultOpened": "地面塌陷。一處埋藏的寶藏在你面前敞開。",
@@ -23946,6 +23947,11 @@ export const zh_TW: EnTranslations = {
         "sender": "渡鴉郵局",
         "subject": "你的寶藏獎勵",
         "body": "寶藏已被攻克，但你沒有從寶箱領取自己的那份獎勵。渡鴉已將你獲得的物品和金幣送到這裡。\n\n- 渡鴉郵局"
+      },
+      "world_quest_reward": {
+        "sender": "渡鴉郵局",
+        "subject": "你的世界任務獎勵",
+        "body": "你獲得這份世界任務獎勵時背包已滿，所以渡鴉把它送到了這裡。騰出空間後，可在任意渡鴉石柱領取。\n\n- 渡鴉郵局"
       }
     },
     "itemSets": {

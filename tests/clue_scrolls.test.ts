@@ -21,6 +21,7 @@ import {
   treasureCasketCopper,
 } from '../src/sim/clue_casket';
 import {
+  advanceClueHunt,
   CLUE_HUNT_STANDING,
   CLUE_HUNT_TEST_POOL,
   clueHuntFaction,
@@ -38,6 +39,7 @@ import {
   TREASURE_CASKET_ITEM_ID,
 } from '../src/sim/content/clue_hunts';
 import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
+import { WORLD_QUEST_REWARD_LETTER } from '../src/sim/content/letters';
 import { TREASURE_MAP_ITEM_IDS, TREASURE_MAP_RARITIES } from '../src/sim/content/treasure_maps';
 import { WORLD_QUESTS_BY_ID } from '../src/sim/content/world_quests';
 import { ITEMS } from '../src/sim/data';
@@ -408,19 +410,40 @@ describe('the slate entitlement (creditWorldQuest completion arm)', () => {
     expect(meta.clueScrollCycle).toBe('');
   });
 
-  it('full bags lose the map for the day (the cycle is still marked)', () => {
+  it('full bags post the map to the Ravenpost (the cycle is still marked)', () => {
     const sim = slateSim(20);
     const meta = metaOf(sim);
     fillBags(sim);
+    const inventoryBefore = meta.inventory.length;
     sim.drainEvents();
     const evs = completeThornpeak(sim);
     expect(mapsHeld(sim)).toBe(0);
+    expect(meta.inventory.length).toBe(inventoryBefore);
     expect(meta.clueScrollCycle).toBe(meta.worldQuestCycle);
-    expect(ofType(evs, 'treasureMapLost')).toHaveLength(1);
-    expect(ofType(evs, 'treasureMapEarned')).toHaveLength(0);
-    // And the loss is final: nothing pays later in the same cycle.
+    expect(ofType(evs, 'treasureMapLost')).toHaveLength(0);
+    const earned = ofType(evs, 'treasureMapEarned');
+    expect(earned).toHaveLength(1);
+    const mapId = TREASURE_MAP_ITEM_IDS[earned[0].rarity];
+    // The quest's own bundle may mail its day piece first (the full bags meet
+    // it too); the map is always the LAST mailed grant, on its own notice.
+    const mailedEvs = ofType(evs, 'worldQuestRewardMailed');
+    expect(mailedEvs.at(-1)).toEqual({
+      type: 'worldQuestRewardMailed',
+      itemIds: [mapId],
+      pid: sim.playerId,
+    });
+    const rewardLetters = () =>
+      sim.postOffice.mail.filter((m) => m.letterId === WORLD_QUEST_REWARD_LETTER.letterId);
+    expect(rewardLetters()).toHaveLength(mailedEvs.length);
+    expect(
+      rewardLetters()
+        .at(-1)
+        ?.items.map((slot) => [slot.itemId, slot.count]),
+    ).toEqual([[mapId, 1]]);
+    // Once per cycle still holds: nothing pays (or mails) again the same day.
     maybeAwardClueScroll(sim.ctx, meta, sim.player);
-    expect(sim.drainEvents().filter((ev) => ev.type.startsWith('treasureMap'))).toHaveLength(0);
+    expect(sim.drainEvents()).toHaveLength(0);
+    expect(rewardLetters()).toHaveLength(mailedEvs.length);
   });
 });
 
@@ -649,6 +672,30 @@ describe('the deliver step (Sim.talkToNpc)', () => {
 });
 
 describe('the dig step (using the scroll on the spot)', () => {
+  it('posts the casket to the Ravenpost when the last step lands on full bags', () => {
+    const sim = huntSim();
+    const meta = metaOf(sim);
+    startHunt(sim);
+    advanceTo(sim, 4);
+    fillBags(sim);
+    const inventoryBefore = meta.inventory.length;
+    sim.drainEvents();
+    advanceClueHunt(sim.ctx, meta);
+    const evs = sim.drainEvents();
+    expect(meta.clueHunt).toBeNull();
+    expect(sim.countItem(TREASURE_CASKET_ITEM_ID)).toBe(0);
+    expect(meta.inventory.length).toBe(inventoryBefore);
+    expect(ofType(evs, 'worldQuestRewardMailed')).toEqual([
+      { type: 'worldQuestRewardMailed', itemIds: [TREASURE_CASKET_ITEM_ID], pid: sim.playerId },
+    ]);
+    expect(
+      sim.postOffice.mail
+        .filter((m) => m.letterId === WORLD_QUEST_REWARD_LETTER.letterId)
+        .map((m) => m.items.map((slot) => [slot.itemId, slot.count])),
+    ).toEqual([[[TREASURE_CASKET_ITEM_ID, 1]]]);
+    expect(ofType(evs, 'clueHuntDone')).toHaveLength(1);
+  });
+
   it('refuses off the spot, keeps the scroll on a dig, and the last step hands the casket', () => {
     const sim = huntSim();
     const meta = metaOf(sim);

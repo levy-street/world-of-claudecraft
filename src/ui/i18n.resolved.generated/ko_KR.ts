@@ -12671,6 +12671,7 @@ export const ko_KR: EnTranslations = {
       "clueCasketOpened": "보물 상자에는 {money}과(와) {items}이(가) 들어 있었습니다.",
       "treasureMapEarned": "오늘의 전역 퀘스트를 모두 완료했습니다: {map}을(를) 발견했습니다.",
       "treasureMapLost": "오늘의 전역 퀘스트를 모두 완료했지만 가방에 보물 지도를 넣을 공간이 없습니다.",
+      "worldQuestRewardMailed": "가방이 가득 찼습니다. 보상이 우편함으로 발송되었습니다: {items}.",
       "treasureMapRead": "{map}을(를) 살펴봅니다. X 표시는 {zone} 어딘가에 있습니다.",
       "treasureMapUpgraded": "지도가 더 고운 잉크로 다시 그려졌습니다: 이제 {map}입니다.",
       "treasureVaultOpened": "땅이 꺼집니다. 묻힌 보물이 눈앞에 열려 있습니다.",
@@ -23946,6 +23947,11 @@ export const ko_KR: EnTranslations = {
         "sender": "까마귀 우편국",
         "subject": "보물 창고 보상",
         "body": "보물 창고가 공략되었지만 보물 상자에서 당신의 몫을 받지 않았습니다. 획득한 물품과 동전을 까마귀가 이곳으로 배달했습니다.\n\n- 까마귀 우편국"
+      },
+      "world_quest_reward": {
+        "sender": "까마귀 우편국",
+        "subject": "전역 퀘스트 보상",
+        "body": "이 전역 퀘스트 보상을 획득했을 때 가방이 가득 차 있어서 까마귀가 이곳으로 배달했습니다. 공간을 비운 뒤 아무 까마귀 석주에서나 받으세요.\n\n- 까마귀 우편국"
       }
     },
     "itemSets": {
