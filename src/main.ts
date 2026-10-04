@@ -244,6 +244,7 @@ import {
   TURNSTILE_SITEKEY,
   turnstileToken,
 } from './game/turnstile_gate';
+import * as turretControls from './game/turret_controls';
 import { loadingCurtainFadeMs, resolveUiEffectsProfile } from './game/ui_effects_profile';
 import { feedSimCalendar } from './game/utc_day';
 import { voice } from './game/voice';
@@ -1889,8 +1890,9 @@ async function startGame(
             // can never be rebound away, so it is the guaranteed way out.
             if (interfaceVisibility.show()) break;
             if (hud.cancelGroundAim()) break;
-            // close the topmost panel; if nothing was open, open the game menu
-            if (!hud.closeAll()) hud.toggleOptionsMenu();
+            // close the topmost panel; if nothing was open, leave the turret or open the game menu
+            if (!hud.closeAll() && !turretControls.leaveTurretOnEscape(world))
+              hud.toggleOptionsMenu();
             break;
         }
       },
@@ -2016,6 +2018,7 @@ async function startGame(
       return music.enabled;
     },
     onRecenterCamera: () => input.recenterCameraBehind(world.player.facing),
+    stickTurnsView: () => turretControls.turretSeated(world),
     onGroundAimMove: (x, y) => {
       if (!hud.isGroundAimActive()) return false;
       hud.updateGroundAimPoint(renderer.groundPoint(x, y, world.player.pos.y));
@@ -2023,6 +2026,11 @@ async function startGame(
     },
     onGroundAimTap: (x, y) => {
       if (!hud.isGroundAimActive()) return false;
+      // The seat fires at the reticle shown: the stick may have turned the view under a still finger.
+      if (turretControls.turretSeated(world)) {
+        hud.commitGroundAimAt();
+        return true;
+      }
       const point = renderer.groundPoint(x, y, world.player.pos.y);
       if (point) hud.commitGroundAimAt(point);
       return true;
@@ -2099,7 +2107,7 @@ async function startGame(
     if (id === 'escape') {
       if (interfaceVisibility.show()) return;
       if (hud.cancelGroundAim()) return;
-      if (!hud.closeAll()) hud.toggleOptionsMenu();
+      if (!hud.closeAll() && !turretControls.leaveTurretOnEscape(world)) hud.toggleOptionsMenu();
       return;
     }
     if (!canUseGameKeysNow()) return; // suppress play actions while a modal/chat is up
@@ -3848,6 +3856,7 @@ async function startGame(
     riftFloor: null,
   };
   function updateCamera(frameDt: number, interpFacing: number): void {
+    input.camYaw += turretControls.turretLookYaw(world, input, frameDt);
     const mi = input.readMoveInput();
     const clickMoving = !!input.clickMoveTarget && !input.suspendMovement && !movementFrozen();
     // When click-to-move ends, the player's facing snaps from the (camera-lagging)
@@ -3876,7 +3885,8 @@ async function startGame(
       mouselook: input.isMouselookActive(),
       moving: cameraFollowShouldSettle(mi, clickMoving),
       clickMoving,
-      cameraDriven: input.isMouseCameraMode() && cameraMoveActive(),
+      cameraDriven:
+        turretControls.turretSeated(world) || (input.isMouseCameraMode() && cameraMoveActive()),
       orbiting: input.leftDown && input.isCameraDragActive(),
     });
     input.camYaw = next.camYaw;
@@ -4126,6 +4136,8 @@ async function startGame(
   });
 
   function renderFacingOverride(): number | null {
+    if (turretControls.turretSeated(world))
+      return turretControls.turretRenderFacing(world, hud.groundAimReticle());
     if (glider.gliderControlsActive(world)) return glider.gliderCameraFacing(input);
     // A ghost (dead && ghost) is not movement-frozen and keeps camera-driven
     // facing; only a corpse-bound dead player loses it, so pass movementFrozen().

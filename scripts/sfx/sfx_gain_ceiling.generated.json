@@ -777,6 +777,50 @@
       }
     ]
   },
+  "impact_groundshaker": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "impact_groundshaker.mp3",
+        "sha256": "47c7e49397c4c5fe86a02a063bae90fa38f3113af0ca69e0a7bb5815103a0473",
+        "size": 74648,
+        "peakDb": -7.2
+      }
+    ]
+  },
+  "impact_groundshaker_frag_bomblet": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "impact_groundshaker_frag_bomblet.mp3",
+        "sha256": "3b60df4fa43312f7d3cc9e04530612685faf84de95bce6f10899d5d199a70ed4",
+        "size": 11954,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "impact_groundshaker_frag_burst": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "impact_groundshaker_frag_burst.mp3",
+        "sha256": "64248189f3e3779f24257649edbbf3ad3e95aabd65f5e2a1bc5a65f5494f0e29",
+        "size": 25747,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "impact_groundshaker_frag_tail": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "impact_groundshaker_frag_tail.mp3",
+        "sha256": "67e9d788d5363a66ac277c02e76594208520a3c6014d0a224a8680136f7388bd",
+        "size": 47063,
+        "peakDb": -7.2
+      }
+    ]
+  },
   "impact_holy": {
     "ceilingDb": 6.5,
     "tracks": [
@@ -4681,6 +4725,29 @@
         "sha256": "6a4a6ae384a76c77b14ec8f8926b20659dfa9545969dbca62bc16f7ce453ff69",
         "size": 40167,
         "peakDb": -6.9
+      }
+    ]
+  },
+  "proj_groundshaker": {
+    "ceilingDb": 4.5,
+    "tracks": [
+      {
+        "filename": "proj_groundshaker_1.mp3",
+        "sha256": "c75e12d6bf89b7feb95ef9a2b886655ce8ade2e04e18e6a2b79d337ba30ea0f0",
+        "size": 65871,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "proj_groundshaker_2.mp3",
+        "sha256": "725ced04cdc54b91309af4df59518c7ffbb286d04d393cf48a00a6aa8f760f7b",
+        "size": 64617,
+        "peakDb": -6.1
+      },
+      {
+        "filename": "proj_groundshaker_3.mp3",
+        "sha256": "7493d239cec4ae039e2d6be2f9d88587b8c7500b0d7e4f4e95382804462c7ac4",
+        "size": 61483,
+        "peakDb": -5.5
       }
     ]
   },

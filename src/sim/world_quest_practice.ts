@@ -10,6 +10,7 @@ export function isReplayableWorldQuest(quest: WorldQuestDef): boolean {
     'shadow',
     'puzzle',
     'match3',
+    'turret',
   ].includes(quest.objective.type);
 }
 

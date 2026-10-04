@@ -136,6 +136,17 @@ export function applyWorldQuestReroll(
   meta.wireRev++;
 }
 
+/** The live check: the player's level (20 when absent) against today's or the dev cycle. */
+export function canRerollWorldQuestNow(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  questId: string,
+): CanRerollResult {
+  const level = ctx.entities.get(meta.entityId)?.level ?? 20;
+  const cycle = meta.devWorldQuestCycle ?? ctx.currentWorldQuestRotation().cycle;
+  return canRerollWorldQuest(meta, questId, cycle, level);
+}
+
 /** Execute a world quest reroll in the live simulation. */
 export function rerollWorldQuest(ctx: SimContext, meta: PlayerMeta, questId: string): boolean {
   const player = ctx.entities.get(meta.entityId);

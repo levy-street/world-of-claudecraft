@@ -2,6 +2,10 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  FIRE_AND_FLY_NPC_DEF,
+  FIRE_AND_FLY_QUEST_ID,
+} from '../src/sim/content/world_quest_fire_and_fly';
+import {
   INVESTIGATION_CLUES,
   INVESTIGATION_NPC_IDS,
   INVESTIGATION_NPCS,
@@ -9,6 +13,7 @@ import {
 } from '../src/sim/content/world_quest_investigation';
 import { DELVES, ITEMS, NPCS, QUESTS, STATIONS } from '../src/sim/data';
 import { CHRONICLER_TEMPLATE_IDS } from '../src/sim/deeds';
+import { fireAndFlyScoreboardId } from '../src/sim/fire_and_fly_scoreboards';
 import type { Entity } from '../src/sim/types';
 import { WEEKLY_KEEPER_ENTITY_ID, WEEKLY_KEEPER_ID } from '../src/sim/weekly_rewards';
 import { craftNameText } from '../src/ui/char_window';
@@ -1059,6 +1064,198 @@ describe('investigation quest dialogue', () => {
     h.controller.open(entity.id);
     progress.investigation.mobId = 500;
     h.controller.refreshIfChanged();
+    expect(h.controller.isOpen).toBe(false);
+  });
+});
+
+describe("Master Gunner Alder's Gunnery Board", () => {
+  function alderHarness(
+    recruitment: { trialsWon: number; recruited: boolean },
+    state: 'active' | 'completed' = 'active',
+    fireAndFlyRecords: IWorld['fireAndFlyRecords'] = {},
+  ) {
+    const worldQuestLeaderboard = vi.fn();
+    const startWorldQuestActivity = vi.fn();
+    const h = harness(
+      npc(77, FIRE_AND_FLY_NPC_DEF.id),
+      'available',
+      {},
+      {
+        player: { id: 1, name: 'Ari', level: 20, dead: false, pos: { x: 0, y: 0, z: 0 } },
+        worldQuestLog: new Map([
+          [FIRE_AND_FLY_QUEST_ID, { questId: FIRE_AND_FLY_QUEST_ID, count: 0, state }],
+        ]),
+        fireAndFlyRecruitment: recruitment,
+        fireAndFlyRecords,
+        startWorldQuestActivity,
+        worldQuestLeaderboard,
+      },
+    );
+    h.controller.open(77);
+    return { ...h, startWorldQuestActivity, worldQuestLeaderboard };
+  }
+  const rows = (root: HTMLElement) => [...root.querySelectorAll<HTMLElement>('[data-gb-row]')];
+  const action = (root: HTMLElement) =>
+    root.querySelector<HTMLButtonElement>('[data-gb-take]') as HTMLButtonElement;
+  const row = (root: HTMLElement, match: (el: HTMLElement) => boolean) => {
+    const found = rows(root).find(match);
+    if (!found) throw new Error('row not painted');
+    return found;
+  };
+  const press = (el: HTMLElement, key: string) =>
+    el.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
+
+  it("greets with the recruitment's line on the board and plays that line's clip", () => {
+    const alder = FIRE_AND_FLY_NPC_DEF.id;
+    const greeting = (root: HTMLElement) => root.querySelector('.gb-greeting')?.textContent;
+    const fresh = alderHarness({ trialsWon: 0, recruited: false });
+    expect(fresh.voice.play).toHaveBeenCalledWith(`greeting__${alder}`);
+    expect(greeting(fresh.element)).toBe(
+      `"${t('entities.npcs.fire_and_fly_instructor.greeting')}"`,
+    );
+    const underWay = alderHarness({ trialsWon: 2, recruited: false });
+    expect(underWay.voice.play).toHaveBeenCalledWith(`greeting__${alder}__trials`);
+    expect(greeting(underWay.element)).toBe(
+      `"${t('questUi.worldQuest.fireAndFly.greeting.trials')}"`,
+    );
+    const recruited = alderHarness({ trialsWon: 3, recruited: true });
+    expect(recruited.voice.play).toHaveBeenCalledWith(`greeting__${alder}__recruited`);
+    expect(recruited.voice.play).toHaveBeenCalledTimes(1);
+    expect(greeting(recruited.element)).toBe(
+      `"${t('questUi.worldQuest.fireAndFly.greeting.recruited')}"`,
+    );
+  });
+
+  it('keeps the shown greeting and its clip on one stage when the board cannot open', () => {
+    const h = alderHarness({ trialsWon: 3, recruited: true });
+    h.controller.close();
+    (h.world.player as { dead: boolean }).dead = true;
+    h.voice.play.mockClear();
+    h.controller.open(77);
+    expect(h.element.querySelector('[data-gb-row]')).toBeNull();
+    expect(h.element.querySelector('.qd-text')?.textContent).toBe(
+      `"${t('questUi.worldQuest.fireAndFly.greeting.recruited')}"`,
+    );
+    expect(h.voice.play).toHaveBeenCalledWith(`greeting__${FIRE_AND_FLY_NPC_DEF.id}__recruited`);
+  });
+
+  it('paints the board instead of listing the scenarios as start buttons', () => {
+    const h = alderHarness({ trialsWon: 1, recruited: false });
+    expect(h.element.querySelector('#quest-dialog-title')?.textContent).toBe('Gunnery Board');
+    expect(h.element.querySelectorAll('[data-start-wq], [data-difficulty]')).toHaveLength(0);
+    expect(rows(h.element).map((row) => row.querySelector('.gb-row-name')?.textContent)).toEqual([
+      "Recruit's Trial",
+      'Standing Watch',
+      "Veterans' Test",
+      'The Pack',
+      'The Deluge',
+      'The Cracked Tower',
+      'The Powder Store',
+    ]);
+    expect(h.element.querySelectorAll('[data-gb-take]')).toHaveLength(1);
+    expect(h.element.textContent?.match(/practice run/gi) ?? []).toHaveLength(0);
+    expect(h.element.getAttribute('role')).toBe('dialog');
+    expect(h.element.getAttribute('aria-labelledby')).toBe('quest-dialog-title');
+  });
+
+  it('opens on the next trial, and a locked pick disables the action with its reason', () => {
+    const h = alderHarness({ trialsWon: 1, recruited: false });
+    const selected = rows(h.element).filter((row) => row.getAttribute('aria-selected') === 'true');
+    expect(selected.map((row) => row.dataset.gbRow)).toEqual(['fire_and_fly_standard']);
+    expect(selected[0].tabIndex).toBe(0);
+    rows(h.element)[3].click();
+    expect(action(h.element).disabled).toBe(true);
+    expect(action(h.element).getAttribute('aria-describedby')).toBe('gb-locked');
+    expect(h.element.querySelector('#gb-locked')?.textContent).toBe(
+      "Win the Veterans' Test to be recruited and open the missions.",
+    );
+    // In the foot, right above the button it disables: a phone pins the foot, so the
+    // reason is never left below the fold of the scrolling brief.
+    expect(h.element.querySelector('.gb-foot > #gb-locked + [data-gb-take]')).not.toBeNull();
+    action(h.element).click();
+    expect(h.startWorldQuestActivity).not.toHaveBeenCalled();
+  });
+
+  it("takes the picked mission through the instructor's start command", () => {
+    const h = alderHarness({ trialsWon: 3, recruited: true });
+    rows(h.element)
+      .find((row) => row.dataset.gbRow === 'fire_and_fly_powder')
+      ?.click();
+    expect(action(h.element).textContent).toBe('Take the mission');
+    action(h.element).click();
+    expect(h.targetEntity).toHaveBeenCalledWith(77);
+    expect(h.startWorldQuestActivity).toHaveBeenCalledWith(FIRE_AND_FLY_QUEST_ID, {
+      courseId: 'fire_and_fly_powder',
+    });
+    expect(h.controller.isOpen).toBe(false);
+  });
+
+  it('moves the pick with the arrows, keeps them from the game, and takes it on Enter', () => {
+    const h = alderHarness({ trialsWon: 3, recruited: true }, 'completed');
+    const seen = vi.fn();
+    window.addEventListener('keydown', seen);
+    const first = row(h.element, (el) => el.dataset.gbRow === 'fire_and_fly_pack');
+    press(first, 'ArrowDown');
+    const next = row(h.element, (el) => el.getAttribute('aria-selected') === 'true');
+    expect(next.dataset.gbRow).toBe('fire_and_fly_deluge');
+    expect(document.activeElement).toBe(next);
+    expect(action(h.element).textContent).toBe('Practice');
+    press(next, 'Enter');
+    window.removeEventListener('keydown', seen);
+    expect(seen).not.toHaveBeenCalled();
+    expect(h.startWorldQuestActivity).toHaveBeenCalledWith(FIRE_AND_FLY_QUEST_ID, {
+      courseId: 'fire_and_fly_deluge',
+    });
+  });
+
+  it("paints the medals from the character's own records, with no ladder request", () => {
+    const pack = fireAndFlyScoreboardId('fire_and_fly_pack', 'lifetime') as string;
+    const h = alderHarness({ trialsWon: 3, recruited: true }, 'active', {
+      [pack]: { metric: 20_900, medal: 'gold', day: '2030-01-01' },
+    });
+    expect(h.worldQuestLeaderboard).not.toHaveBeenCalled();
+    const packRow = row(h.element, (el) => el.dataset.gbRow === 'fire_and_fly_pack');
+    expect(packRow.querySelector('.gb-medal-gold')?.getAttribute('title')).toBe('Gold medal');
+    expect(h.element.querySelector('.gb-mastery')?.textContent).toBe(
+      "Gunner's Mastery: 3 of 12 stars",
+    );
+    // The pack has its medal: the board opens on the first mission without one.
+    expect(
+      rows(h.element).find((row) => row.getAttribute('aria-selected') === 'true')?.dataset.gbRow,
+    ).toBe('fire_and_fly_deluge');
+    rows(h.element)
+      .find((row) => row.dataset.gbRow === 'fire_and_fly_pack')
+      ?.click();
+    expect(h.element.querySelector('.gb-fact-best dd')?.textContent).toBe(
+      'Gold medal, 20,900 points',
+    );
+  });
+
+  it('keeps focus on the close button across a quest-event repaint', () => {
+    const h = alderHarness({ trialsWon: 3, recruited: true });
+    h.element.querySelector<HTMLButtonElement>('[data-close]')?.focus();
+    h.controller.refresh();
+    expect(document.activeElement).toBe(h.element.querySelector('[data-close]'));
+  });
+
+  it('keeps the pick across a quest-event repaint and drops it on a fresh open', () => {
+    const h = alderHarness({ trialsWon: 3, recruited: true });
+    rows(h.element)
+      .find((row) => row.dataset.gbRow === 'fire_and_fly_deluge')
+      ?.click();
+    h.controller.refresh();
+    const picked = () =>
+      rows(h.element).find((row) => row.getAttribute('aria-selected') === 'true')?.dataset.gbRow;
+    expect(picked()).toBe('fire_and_fly_deluge');
+    h.controller.close();
+    h.controller.open(77);
+    expect(picked()).toBe('fire_and_fly_pack');
+  });
+
+  it('closes from its own close button', () => {
+    const h = alderHarness({ trialsWon: 0, recruited: false });
+    rows(h.element)[1].click();
+    h.element.querySelector<HTMLButtonElement>('[data-close]')?.click();
     expect(h.controller.isOpen).toBe(false);
   });
 });

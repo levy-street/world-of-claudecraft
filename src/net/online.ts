@@ -1873,7 +1873,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     // any new transport can accept input; the next capable snapshot re-arms it.
     this.petSpecialCommandsSupported = false;
     this.worldInteractionRequests?.reset();
-    this.vehicleSession = null;
+    this.clearVehicleMirrors();
     if (this.sessionEnded) return;
     // A pending reconnect timer means this close is a duplicate signal of the
     // SAME physical drop: on the zombie-socket path the visibility handler
@@ -1913,7 +1913,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
 
   private endSession(): void {
-    this.vehicleSession = null;
+    this.clearVehicleMirrors();
     // Flush a pending layout save BEFORE teardown, while the socket is still open
     // and `connected` is still true: close() calls this before ws.close() and
     // sendLogout() calls it before the logout frame, so the final edit is not
@@ -2407,7 +2407,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this.applyRiftStateEvent(ev as SimEvent);
         this.applyRiftDeathZoneSpawnEvent(ev as SimEvent);
         this.applyRiftDeathZoneClearEvent(ev as SimEvent);
-        this.hoardBossCueMirror?.apply(ev as SimEvent);
+        this.applyQuestWorldEvent(ev as SimEvent);
         this.applyMasterworkEvent(ev as SimEvent);
         this.applyDisenchantResultEvent(ev as SimEvent);
         this.applyEnchantResultEvent(ev as SimEvent);
@@ -3200,7 +3200,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this.accountCosmetics = normalizeAccountCosmetics(s.cosmetics);
         this.cosmeticsChanged = true;
       }
-      this.applyQuestSelfSnapshot(s, timerWire.time);
+      this.applyQuestSelfSnapshot(s, timerWire.time, snap.tick);
       if (s.lockouts !== undefined) this.selfLockouts = s.lockouts as Record<string, number>;
       // IWorldMounts self-decode: mntOwn is delta-guarded (omitted keeps the prior
       // mirror). The owned collection is mirrored VERBATIM (no horse prepend): the

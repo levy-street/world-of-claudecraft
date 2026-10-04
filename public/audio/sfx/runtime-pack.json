@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "1c37ba84139d045212abe58aeb360e2941b67dbf9566af8363cba67bd611f586",
-  "catalogHash": "a3b920124b582aa93294d8b6b200532b1d1f0df056b45517fd11f20d0c09ab47",
+  "bundleId": "d16d20b81e011cdc623915e9aa59c45210d84b1ae21fb223b285497d06737791",
+  "catalogHash": "9ecc855bc0dd744c93d35f14362bac0d21295545b8e5e9fde24a0343b12e77db",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -1010,6 +1010,54 @@
         }
       ],
       "gain": 1.698244,
+      "playbackRate": 1
+    },
+    "impact_groundshaker": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/impact_groundshaker.mp3?v=47c7e49397c4",
+          "bytes": 74648,
+          "sha256": "47c7e49397c4c5fe86a02a063bae90fa38f3113af0ca69e0a7bb5815103a0473"
+        }
+      ],
+      "gain": 1.778279,
+      "playbackRate": 1
+    },
+    "impact_groundshaker_frag_bomblet": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/impact_groundshaker_frag_bomblet.mp3?v=3b60df4fa433",
+          "bytes": 11954,
+          "sha256": "3b60df4fa43312f7d3cc9e04530612685faf84de95bce6f10899d5d199a70ed4"
+        }
+      ],
+      "gain": 1.071519,
+      "playbackRate": 1
+    },
+    "impact_groundshaker_frag_burst": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/impact_groundshaker_frag_burst.mp3?v=64248189f3e3",
+          "bytes": 25747,
+          "sha256": "64248189f3e3779f24257649edbbf3ad3e95aabd65f5e2a1bc5a65f5494f0e29"
+        }
+      ],
+      "gain": 1.348963,
+      "playbackRate": 1
+    },
+    "impact_groundshaker_frag_tail": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/impact_groundshaker_frag_tail.mp3?v=67e9d788d536",
+          "bytes": 47063,
+          "sha256": "67e9d788d5363a66ac277c02e76594208520a3c6014d0a224a8680136f7388bd"
+        }
+      ],
+      "gain": 0.851138,
       "playbackRate": 1
     },
     "impact_holy": {
@@ -5145,6 +5193,30 @@
       ],
       "gain": 1.717908,
       "playbackRate": 1
+    },
+    "proj_groundshaker": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/proj_groundshaker_1.mp3?v=c75e12d6bf89",
+          "bytes": 65871,
+          "sha256": "c75e12d6bf89b7feb95ef9a2b886655ce8ade2e04e18e6a2b79d337ba30ea0f0"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/proj_groundshaker_2.mp3?v=725ced04cdc5",
+          "bytes": 64617,
+          "sha256": "725ced04cdc54b91309af4df59518c7ffbb286d04d393cf48a00a6aa8f760f7b"
+        },
+        {
+          "id": "3",
+          "url": "/audio/sfx/proj_groundshaker_3.mp3?v=7493d239cec4",
+          "bytes": 61483,
+          "sha256": "7493d239cec4ae039e2d6be2f9d88587b8c7500b0d7e4f4e95382804462c7ac4"
+        }
+      ],
+      "gain": 1.678804,
+      "playbackRate": 0.6
     },
     "proj_holy": {
       "variants": [

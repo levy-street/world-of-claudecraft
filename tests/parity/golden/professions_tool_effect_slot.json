@@ -23,7 +23,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "316057a2",
+      "state": "468e69be",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -78,6 +78,8 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {},
           "gliderRecords": {},
           "harvestPreference": {
@@ -180,7 +182,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "2c6217d0",
+      "state": "c0f33fc0",
       "events": "e187a4aa",
       "rng": {
         "draws": 0,
@@ -240,6 +242,8 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {
             "mining": 70
           },
@@ -357,7 +361,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 1011,
-      "state": "f99ccbc3",
+      "state": "746ce8c7",
       "events": "aee01af1",
       "rng": {
         "draws": 2,
@@ -435,6 +439,8 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {
             "mining": 70.5
           },
@@ -569,7 +575,7 @@
       "tick": 53,
       "time": 2.65,
       "nextId": 1011,
-      "state": "e0b14aa0",
+      "state": "06b9fcf0",
       "events": "42c312ff",
       "rng": {
         "draws": 2,
@@ -647,6 +653,8 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {
             "mining": 70.5
           },
@@ -781,7 +789,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 1011,
-      "state": "eefc9942",
+      "state": "e78c339a",
       "events": "a697a68f",
       "rng": {
         "draws": 2,
@@ -859,6 +867,8 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {
             "mining": 70.5
           },
@@ -993,7 +1003,7 @@
       "tick": 106,
       "time": 5.3,
       "nextId": 1011,
-      "state": "50041231",
+      "state": "fd7c57e1",
       "events": "42b19fc7",
       "rng": {
         "draws": 4,
@@ -1072,6 +1082,8 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {
             "mining": 70.75
           },
@@ -1219,7 +1231,7 @@
       "tick": 157,
       "time": 7.85,
       "nextId": 1011,
-      "state": "63bd80f9",
+      "state": "f0d428f5",
       "events": "e2f51219",
       "rng": {
         "draws": 6,
@@ -1299,6 +1311,8 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {
             "mining": 71.25
           },
@@ -1453,7 +1467,7 @@
       "tick": 159,
       "time": 7.95,
       "nextId": 1011,
-      "state": "07a7f924",
+      "state": "137fd458",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -1533,6 +1547,8 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gatheringProficiency": {
             "mining": 71.25
           },

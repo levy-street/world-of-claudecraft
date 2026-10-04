@@ -14067,6 +14067,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.dawnhold_castle.enterText':
     '花の香り漂うドーンホールド城の暖かな広間へ足を踏み入れた。',
   'entities.dungeons.dawnhold_castle.leaveText': '日差しあふれる庭園の芝生へと戻った。',
+  'entities.dungeons.fire_and_fly_arena.enterText':
+    '古い砲塔を登った。木々の向こうで、森がざわめき始める。',
+  'entities.dungeons.fire_and_fly_arena.leaveText': '塔を降り、闘技場を後にした。',
   'entities.items.wildheart_tuskblade.name': 'ワイルドハートの牙大剣',
   'entities.items.wildheart_hexwood_staff.name': '盆地の呪木杖',
   'entities.items.wildheart_fangknife.name': 'ズルガーの牙小刀',
@@ -18915,6 +18918,115 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'クールダウン：{cooldown}秒。{flight}秒後に着弾。全弾種で{recovery}秒の回復時間を共有する。',
   'hudChrome.vehicle.shotRules':
     '印のついた範囲内を狙う。マナ消費なし。ダメージは装備やタレントの影響を受けない。',
+  'hudChrome.turretArsenal.introShock':
+    '新兵器：衝撃波（{shockKey}）。塔を打ち鳴らし、足元のモンスターをすべて吹き飛ばす。',
+  'hudChrome.turretArsenal.introShockTouch':
+    '新兵器：衝撃波。ソケットをタップすると、塔の足元のモンスターをすべて吹き飛ばす。',
+  'hudChrome.turretArsenal.introFrag':
+    '新兵器：榴散弾（{fragKey}）。装填してから群れに撃つと、その頭上で子弾に炸裂する。',
+  'hudChrome.turretArsenal.introFragTouch':
+    '新兵器：榴散弾。ソケットをタップして装填し、群れをタップすると、その頭上で子弾に炸裂する。',
+  'hudChrome.turretArsenal.shockHint':
+    '塔にたどり着く前にモンスターを吹き飛ばせ。{shockKey}：衝撃波。',
+  'hudChrome.turretArsenal.shockHintTouch':
+    '塔にたどり着く前にモンスターを吹き飛ばせ。ソケットをタップして衝撃波を使う。',
+  'hudChrome.turretArsenal.fragHint':
+    '塔にたどり着く前にモンスターを吹き飛ばせ。{fragKey}：榴散弾。',
+  'hudChrome.turretArsenal.fragHintTouch':
+    '塔にたどり着く前にモンスターを吹き飛ばせ。ソケットをタップして榴散弾を使う。',
+  'hudChrome.turretArsenal.resupplyBoth': '補給：衝撃波 {shock}、榴散弾 {frag}',
+  'hudChrome.turretArsenal.resupplyShock': '補給：衝撃波 {shock}',
+  'hudChrome.turretArsenal.resupplyFrag': '補給：榴散弾 {frag}',
+  'hudChrome.turretArsenal.resupplyRule':
+    'ウェーブ {waves} の終わりに、各兵器のチャージが一つ増える。',
+  'hudChrome.turretArsenal.resupplyRuleOnce':
+    'ウェーブ {wave} の終わりに、各兵器のチャージが一つ増える。',
+  'hudChrome.turretArsenal.bonusRule':
+    '任務に勝利すると、未使用のチャージ一つにつき{points}ポイント。',
+  'hudChrome.turretArsenal.pointsCharges': '残したチャージ（{count}）',
+  'hudChrome.turret.integrity': '塔の耐久度',
+  'hudChrome.turret.integrityBelow': '塔の耐久度が {percent} を下回った',
+  'hudChrome.turret.tower': '塔',
+  'hudChrome.turret.left': '残りのモンスター：{count}',
+  'hudChrome.turret.firstWave': '最初のウェーブまで {seconds} 秒',
+  'hudChrome.turret.hint': '塔にたどり着く前にモンスターを吹き飛ばせ',
+  'hudChrome.turret.finalWave': '最終ウェーブ',
+  'hudChrome.turret.clearedBanner': 'ウェーブ {wave} 撃退',
+  'hudChrome.turret.victory': '勝利！',
+  'hudChrome.turret.defeat': '塔が陥落した',
+  'hudChrome.turret.statKills': '撃破数',
+  'hudChrome.turret.statShots': '発射数',
+  'hudChrome.turret.statAccuracy': '命中率',
+  'hudChrome.turret.statThrow': '最長の吹き飛ばし',
+  'hudChrome.turret.statAirtime': '最長の滞空時間',
+  'hudChrome.turret.statYards': '{yards} ヤード',
+  'hudChrome.turret.statSeconds': '{seconds} 秒',
+  'hudChrome.turret.medalGold': 'ゴールドメダル',
+  'hudChrome.turret.medalSilver': 'シルバーメダル',
+  'hudChrome.turret.medalBronze': 'ブロンズメダル',
+  'hudChrome.turret.noMedal': 'メダルなし',
+  'hudChrome.turret.pointsKills': '撃破（{count}）',
+  'hudChrome.turret.pointsTower': '塔の残り耐久（{points}）',
+  'hudChrome.turret.pointsKegKills': '火薬樽での撃破（{count}）',
+  'hudChrome.turret.pointsBowled': 'なぎ倒し（{count}）',
+  'hudChrome.turret.pointsTotal': '合計ポイント',
+  'hudChrome.turret.leave': '塔を降りる',
+  'hudChrome.turret.leaveShort': '降りる',
+  'hudChrome.turret.replay': 'もう一度',
+  'hudChrome.turret.replayHint':
+    '塔の上で同じ試練にもう一度挑む。本日の報酬を受け取った後の再挑戦では、報酬は得られない。',
+  'hudChrome.turret.replayHintMission':
+    '塔の上で同じ任務にもう一度挑む。本日の報酬を受け取った後の再挑戦では、報酬は得られない。',
+  'hudChrome.turret.leavingIn': 'あと {seconds} 秒で塔を降ります',
+  'hudChrome.turret.recruitedBanner': '入隊！',
+  'hudChrome.turret.recruitedLine':
+    '{name}：「門の砲兵隊へようこそ、砲手。これからは私の任務を任せる。」',
+  'hudChrome.turret.weapons': '塔の兵装',
+  'hudChrome.turret.shockwave': '衝撃波',
+  'hudChrome.turret.shockwaveTip':
+    '塔を叩きつける：輪が塔の壁から {reach} ヤード先まで {seconds} 秒で広がる。輪が届いた地上のモンスターはすべて塔から吹き飛ばされ、溜め中の攻撃は止まる。塔から {core} ヤード以内では {damage} ダメージ、その先では減少する。空中のモンスターは輪を越える。',
+  'hudChrome.turret.shockwaveRules': '使用後 {seconds} 秒で再使用可能。ウェーブ中のみ使える。',
+  'hudChrome.turret.frag': '榴散弾',
+  'hudChrome.turret.fragTip':
+    '装填してから、通常の砲弾と同じく地面に撃つ。狙った地点の上空で {count} 個の子弾に分裂する：1 個は狙った地点に、{outer} 個はその周囲 {radius} ヤードの円に落ちる。各子弾は {blast} ヤード以内に最大 {damage} ダメージを与え、当たったモンスターを吹き飛ばし、火薬樽に火をつける。',
+  'hudChrome.turret.fragRules':
+    '大砲の装填時間を使う。もう一度装填するかキャンセルすると、チャージを消費せずにしまう。ウェーブ中のみ使える。',
+  'hudChrome.turret.chargesLeft': '残りチャージ：{count}',
+  'hudChrome.turret.weaponsHint':
+    '塔にたどり着く前にモンスターを吹き飛ばせ。{shockKey}：衝撃波。{fragKey}：榴散弾。',
+  'hudChrome.turret.weaponsHintTouch':
+    '塔にたどり着く前にモンスターを吹き飛ばせ。ソケットをタップして衝撃波か榴散弾を使う。',
+  'hudChrome.turret.statShockwaves': '衝撃波',
+  'hudChrome.turret.statFrags': '榴散弾',
+  'hudChrome.gunneryBoard.title': '砲術掲示板',
+  'hudChrome.gunneryBoard.listLabel': '試練と任務',
+  'hudChrome.gunneryBoard.trials': '入隊試験',
+  'hudChrome.gunneryBoard.missions': '任務',
+  'hudChrome.gunneryBoard.trialKicker': '試練',
+  'hudChrome.gunneryBoard.missionKicker': '任務',
+  'hudChrome.gunneryBoard.recruitProgress': '合格した試練：{won}/{total}',
+  'hudChrome.gunneryBoard.recruited': '入隊済み',
+  'hudChrome.gunneryBoard.mastery': '砲手の熟達：{stars}/{max}つ星',
+  'hudChrome.gunneryBoard.won': '合格済み',
+  'hudChrome.gunneryBoard.notWon': '未獲得',
+  'hudChrome.gunneryBoard.locked': 'ロック中',
+  'hudChrome.gunneryBoard.arsenal': '兵装',
+  'hudChrome.gunneryBoard.charges': '{weapon}×{count}',
+  'hudChrome.gunneryBoard.gold': '金',
+  'hudChrome.gunneryBoard.goldBar': '塔の{percent}を守る',
+  'hudChrome.gunneryBoard.waves': '波の数',
+  'hudChrome.gunneryBoard.best': '自己ベスト',
+  'hudChrome.gunneryBoard.bestRun': '{medal}、{points}点',
+  'hudChrome.gunneryBoard.notPlayed': '未挑戦',
+  'hudChrome.gunneryBoard.reward': '本日の報酬',
+  'hudChrome.gunneryBoard.rewardAvailable': '受け取り可能',
+  'hudChrome.gunneryBoard.rewardCollected': '受け取り済み：練習のみ',
+  'hudChrome.gunneryBoard.takeTrial': '試練を受ける',
+  'hudChrome.gunneryBoard.takeMission': '任務を受ける',
+  'hudChrome.gunneryBoard.practice': '練習',
+  'hudChrome.gunneryBoard.actionAria': '{action}：{name}',
+  'hudChrome.gunneryBoard.lockedTrial': '{previous}に合格するとこの試練が解放されます。',
+  'hudChrome.gunneryBoard.lockedMission': '{name}に合格すると入隊し、任務が解放されます。',
   'hudChrome.leaderboard.tabWorldQuests': 'ワールドクエスト',
   'hudChrome.leaderboard.wqBoardsLabel': 'ワールドクエストのスコアボード',
   'hudChrome.leaderboard.wqMedal': 'メダル',
@@ -19151,6 +19263,39 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.glider.score': 'スコア：{score}。',
   'questUi.worldQuest.glider.medals.silver': '銀',
   'questUi.worldQuest.glider.medals.bronze': '銅',
+  'questUi.worldQuest.fireAndFly.title': '砲手の試練',
+  'questUi.worldQuest.fireAndFly.objective': 'ひとつの試練のすべての波を耐え、自分の塔を守り抜く',
+  'questUi.worldQuest.fireAndFly.ready': '砲術長アルダーに話しかけて試練を受ける。',
+  'questUi.worldQuest.fireAndFly.complete': '試練合格！砲術長アルダーに話しかけると練習できます。',
+  'questUi.worldQuest.fireAndFly.scenarios.introduction': '新兵の試練',
+  'questUi.worldQuest.fireAndFly.scenarios.standard': '本番の見張り',
+  'questUi.worldQuest.fireAndFly.scenarios.hard': '古参兵の試験',
+  'questUi.worldQuest.fireAndFly.scenarios.pack': '群れ',
+  'questUi.worldQuest.fireAndFly.scenarios.deluge': '大洪水',
+  'questUi.worldQuest.fireAndFly.scenarios.brittle': 'ひび割れた塔',
+  'questUi.worldQuest.fireAndFly.scenarios.powder': '火薬庫',
+  'questUi.worldQuest.fireAndFly.brief.introduction':
+    'お前が今度の新兵か？これがお前の大砲だ。気難しい婆さんだが、約束の場に遅れたことは一度もない。森から獣が何匹か出てくる。狙ったものに当てられるところを見せてみろ。',
+  'questUi.worldQuest.fireAndFly.brief.standard':
+    '大砲一門でいつも足りるとは限らん。どの塔にも奥の手が隠してある。城壁の足元に群がるものを一掃する衝撃波だ。今夜はその使い方を、何よりも使いどころの見極め方を覚えてもらう。',
+  'questUi.worldQuest.fireAndFly.brief.hard':
+    '工匠たちの工房から生まれた中で最も破壊的な兵器、榴散弾だ。少々のろいが、炸裂すれば周りに立っているものは何も残らん。砲手の名簿に名を載せる前に、誰もがこれを使いこなさねばならん。',
+  'questUi.worldQuest.fireAndFly.brief.pack':
+    'われらの砦が呑まれかけている！奴らは群れで来る、それも群れごとに凶暴さを増してな。城壁の上まで遠吠えが聞こえてくる。乗り越えられる前に、奴らを押し返すのに手を貸してくれ！',
+  'questUi.worldQuest.fireAndFly.brief.deluge':
+    '百匹は下らん、いやそれ以上だ。狼、猪、蜘蛛、穴掘りども、小さな獣の大波があらゆる方向から押し寄せてくる。引いたと思っても油断するな、必ずもっと強く戻ってくるし、その後ろからもっとでかい奴が迫ってくる。',
+  'questUi.worldQuest.fireAndFly.brief.brittle':
+    'あの古い塔は前の季節にひどい一撃を食らい、ひびはついに塞がらなかった。今宵、死者どもが蘇り、塔へと押し寄せてくる。せいぜい七発で崩れ落ちる。こちら側に残された最後の砦だ、守り抜いてくれ。',
+  'questUi.worldQuest.fireAndFly.brief.powder':
+    '火薬庫はもう満杯でな、いつもの倍の樽を外に積むしかなかった。それも奴らの通り道のど真ん中にだ。そこへ火薬の匂いに誘われて、鍛冶場の魔物どもがやって来る。熱くなるぞ、砲手。',
+  'questUi.worldQuest.fireAndFly.greeting.trials':
+    'なかなか様になってきたな、新兵。あといくつか試練をこなせば、砲手の名簿にお前の名を載せてやろう。',
+  'questUi.worldQuest.fireAndFly.greeting.recruited':
+    'また来たか、砲手！城壁は今まで以上にお前を必要としている。お前の大砲を待っている任務もいくつかあるぞ。',
+  'entities.npcs.fire_and_fly_instructor.name': '砲術長アルダー',
+  'entities.npcs.fire_and_fly_instructor.title': '砲術隊の募集係',
+  'entities.npcs.fire_and_fly_instructor.greeting':
+    '城壁には守備隊が割ける以上の守り手が必要だ。だから募集している。大砲を任せる前に、自分の塔を守り抜けるところを見せてもらおう。試練を受けて、魔物が城壁に届く前に吹き飛ばせ。',
   'questUi.worldQuest.traceShape.diamond': 'ひし形',
   'questUi.worldQuest.traceShape.pentagon': '五角形',
   'questUi.worldQuest.traceShape.arrow': '矢のルーン',
@@ -19492,6 +19637,34 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.leaderboard.gliderRankings': '滑空コース記録',
   'hudChrome.leaderboard.gliderRules':
     '全ての輪を通過し、最速で完走した飛行が勝利します。日間記録はサーバーのリセット時に更新されます。記録の反映には最大30秒かかります。',
+  'hudChrome.leaderboard.fireAndFlyDaily': '{trial}：今日',
+  'hudChrome.leaderboard.fireAndFlyLifetime': '{trial}：通算',
+  'hudChrome.leaderboard.fireAndFlyStart': 'この試練を受ける',
+  'hudChrome.leaderboard.fireAndFlyRankings': '砲手の記録',
+  'hudChrome.leaderboard.fireAndFlyPersonalRules':
+    'このキャラクターに保存されたオフライン記録です。最も良いメダルが上位となり、次に最高スコアで順位が決まります。日間記録は毎日リセットされます。',
+  'hudChrome.leaderboard.fireAndFlyRules':
+    '最も良いメダルが上位となり、次に最高スコアで順位が決まります。練習を含め、勝利した試練はすべて記録されます。日間記録はサーバーのリセット時に更新されます。記録の反映には最大30秒かかります。',
+  'hudChrome.leaderboard.fireAndFlyGroupsLabel': '砲手の記録の分類',
+  'hudChrome.leaderboard.fireAndFlyGroups.trials': '試練',
+  'hudChrome.leaderboard.fireAndFlyGroups.missions': '任務',
+  'hudChrome.leaderboard.fireAndFlyGroups.mastery': '熟達',
+  'hudChrome.leaderboard.fireAndFlyMissionStart': 'この任務を受ける',
+  'hudChrome.leaderboard.fireAndFlyMissionRules':
+    '最も良いメダルが上位となり、次に最高スコアで順位が決まります。練習を含め、勝利した任務はすべて記録されます。記録の反映には最大30秒かかります。',
+  'hudChrome.leaderboard.fireAndFlyMissionPersonalRules':
+    'このキャラクターに保存されたオフライン記録です。最も良いメダルが上位となり、次に最高スコアで順位が決まります。',
+  'hudChrome.leaderboard.fireAndFlyMastery': '砲手の熟達',
+  'hudChrome.leaderboard.fireAndFlyMasteryRules':
+    '各任務の最も良いメダルを星に換算して合計します（金3、銀2、銅1）。星の多い順、次に合計スコアで順位が決まります。記録の反映には最大30秒かかります。',
+  'hudChrome.leaderboard.fireAndFlyMasteryPersonalRules':
+    'このキャラクターに保存されたオフラインの熟達です。各任務の最も良いメダルを星に換算して合計し（金3、銀2、銅1）、次に合計スコアで比べます。',
+  'hudChrome.leaderboard.wqStars': '星',
+  'hudChrome.wqLadder.rankedByStars': '星の数順、次に最高スコア',
+  'hudChrome.plurals.fireAndFlyStars.one': '星{count}',
+  'hudChrome.plurals.fireAndFlyStars.few': '星{count}',
+  'hudChrome.plurals.fireAndFlyStars.many': '星{count}',
+  'hudChrome.plurals.fireAndFlyStars.other': '星{count}',
   'hudChrome.framePresets.apply': '適用',
   'hudChrome.focusTargets.showEmpty': '空のフォーカスフレームを表示',
   'hudChrome.focusTargets.assignHint':

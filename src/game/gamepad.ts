@@ -87,6 +87,9 @@ export interface GamepadCallbacks {
   onGroundAimCommit?(): void;
   onGroundAimSnap?(direction: 1 | -1): void;
   cancelGroundAim?(): void;
+  // A seat's own button (the Fire and Fly weapon sockets), asked before the saved
+  // bindings while a ground aim is up; true when the seat took the press.
+  onSeatButton?(button: number): boolean;
   // Current local-player health, for rumble-on-damage. Optional.
   getPlayerHealth?(): number;
   // A pad connected or disconnected, so the detected brand (and thus the button
@@ -532,6 +535,7 @@ export class GamepadManager {
           this.dispatch(idx);
           continue;
         }
+        if (this.cb.onSeatButton?.(idx)) continue;
         if (idx === GP.DPAD_LEFT) {
           this.cb.onGroundAimSnap?.(-1);
           continue;

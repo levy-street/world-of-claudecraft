@@ -57,6 +57,10 @@ export function isSfxMobExtensionKey(key) {
 }
 
 export function preloadForSfx(key) {
+  // The Fire and Fly cannon's blast and its frag shell's layers are combat by name but only ever
+  // heard from the turret seat, which preloads them at the commitment; a startup fetch would
+  // charge every player for them.
+  if (key.startsWith('impact_groundshaker')) return 'lazy';
   const category = categoryForSfx(key);
   if (
     category === 'ui' ||

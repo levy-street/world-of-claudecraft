@@ -4,8 +4,10 @@
 // touches again. The one parameter is the perfLap hook, which must stay a
 // game.ts closure because it reads the GameServer's live tick-profiler state.
 
+import { randomBytes } from 'node:crypto';
 import {
   PLAYER_INTEREST_DROP_RADIUS,
+  type PrivateSalt,
   type SimConfig,
   type VaultConsumptionAdmission,
 } from '../src/sim/types';
@@ -13,6 +15,12 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 import { nextRaidResetMs, nextWeeklyRaidResetMs } from './raid_reset';
 import { REALM_RESET_TIME_ZONE } from './realm';
 import { STORAGE_PRICES } from './storage_prices';
+
+/** 64 bits from the OS CSPRNG, fresh at every boot (a seated run never outlives one). */
+export function freshPrivateSalt(): PrivateSalt {
+  const bytes = randomBytes(8);
+  return [bytes.readUInt32LE(0), bytes.readUInt32LE(4)];
+}
 
 // The admission is REQUIRED, deliberately, even though SimConfig's own field
 // is optional (offline Sim constructions omit it and run inert): this seam is
@@ -69,5 +77,8 @@ export function buildRealmSimConfig(
     // Boot-time construction input: the optional STORAGE_PRICES env override
     // (server/storage_prices.ts), resolved once by the Sim ctor.
     storagePrices: STORAGE_PRICES,
+    // Keys the private mini-game draws so a client cannot rebuild a run from the
+    // public world seed (SimConfig.privateSalt); it never leaves this process.
+    privateSalt: freshPrivateSalt(),
   };
 }

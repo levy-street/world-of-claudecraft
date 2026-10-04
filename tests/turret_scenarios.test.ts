@@ -1,0 +1,919 @@
+import { describe, expect, it } from 'vitest';
+import { TURRET_MISSIONS } from '../src/sim/content/fire_and_fly_missions';
+import {
+  TURRET_DEFAULT_SCENARIO,
+  TURRET_SCENARIO_HARD,
+  TURRET_SCENARIO_INTRODUCTION,
+  TURRET_SCENARIO_STANDARD,
+  TURRET_SCENARIOS,
+} from '../src/sim/content/fire_and_fly_scenarios';
+import {
+  TURRET_BOWLING,
+  TURRET_EXPLOSIVE_BARREL,
+  TURRET_MEDALS,
+  TURRET_SIZE_CLASSES,
+  TURRET_TEMPLATE_SIZES,
+  TURRET_TIMING,
+  TURRET_TOWER_POINTS,
+  TURRET_WAVES,
+} from '../src/sim/content/turret_defense';
+import { MOBS } from '../src/sim/data';
+import { mobMaxHp } from '../src/sim/entity';
+import { positionAt, type ThrowProbe } from '../src/sim/minigames/thrown_body';
+import { turretArrivalGap, turretArrivalSector } from '../src/sim/minigames/turret_arrival';
+import {
+  type TurretBearingSector,
+  turretFreeBearing,
+  turretSpawnBearing,
+} from '../src/sim/minigames/turret_barrels';
+import {
+  createTurretDefense,
+  fireTurret,
+  type TurretDefenseState,
+  tickTurretDefense,
+} from '../src/sim/minigames/turret_defense';
+import {
+  resolveTurretPlan,
+  TURRET_PLAN_LIMITS,
+  type TurretKind,
+  type TurretPlan,
+} from '../src/sim/minigames/turret_defense_plan';
+import { TURRET_STREAM, turretDraw } from '../src/sim/minigames/turret_defense_rng';
+import {
+  TURRET_GROUP_LIMITS,
+  type TurretArrivalPlan,
+  type TurretGroupPlan,
+} from '../src/sim/minigames/turret_group_plan';
+import { turretResult } from '../src/sim/minigames/turret_result';
+import type {
+  TurretGroupDef,
+  TurretScenarioDef,
+  TurretSidesDef,
+  TurretWaveDef,
+  TurretWaveEntry,
+} from '../src/sim/types';
+
+const TAU = Math.PI * 2;
+const START = 1000;
+const INTRO_END = START + TURRET_TIMING.introTicks;
+const flat: ThrowProbe = { ground: () => 0, water: () => null };
+const hills: ThrowProbe = {
+  ground: (x, z) => 2 * Math.sin(x * 0.11) + 1.5 * Math.cos(z * 0.13) + 0.04 * x,
+  water: () => null,
+};
+
+function fnv(text: string): string {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    h = (h ^ text.charCodeAt(i)) >>> 0;
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h.toString(16).padStart(8, '0');
+}
+
+/** Signed angle from `b` to `a`, in (-PI, PI]. */
+function angleOff(a: number, b: number): number {
+  return ((((a - b + Math.PI) % TAU) + TAU) % TAU) - Math.PI;
+}
+
+function scenario(waves: TurretWaveDef[], integrity = 100): TurretScenarioDef {
+  return { ...TURRET_SCENARIO_STANDARD, id: 'test_scenario', boardKey: 'test', waves, integrity };
+}
+
+const WOLF: TurretWaveEntry = { templateId: 'forest_wolf', count: 1, level: 2 };
+
+/** A wave of one group: walkers from the sides given (absent, the ring), or bunches. */
+function wave(
+  entries: readonly TurretWaveEntry[],
+  arrival?: TurretArrivalPlan,
+  gaps = { gapMinTicks: 16, gapMaxTicks: 32 },
+): TurretWaveDef {
+  const group: TurretGroupDef =
+    arrival?.kind === 'bunches'
+      ? {
+          brick: 'smallGroup',
+          entries,
+          size: arrival.size,
+          bunchGapTicks: arrival.bunchGapTicks,
+          widthTurn: arrival.widthTurn,
+          ...gaps,
+        }
+      : { brick: 'walkers', entries, ...gaps, ...(arrival ? { sides: arrival } : {}) };
+  return { groups: [group], coreDamage: 60 };
+}
+
+function wolves(count: number, arrival?: TurretArrivalPlan): TurretWaveDef {
+  return wave([{ ...WOLF, count }], arrival);
+}
+
+/** A wave's entries, every group's. */
+function entriesOf(w: TurretWaveDef): TurretWaveEntry[] {
+  return w.groups.flatMap((g) => g.entries);
+}
+
+/** The one group of a single-group wave. */
+function only(w: TurretWaveDef): TurretGroupDef {
+  expect(w.groups).toHaveLength(1);
+  return w.groups[0];
+}
+
+/** A one-group wave's spawn gap band. */
+function gapsOf(w: TurretWaveDef): { gapMinTicks: number; gapMaxTicks: number } {
+  const g = only(w);
+  if (!('gapMinTicks' in g)) throw new Error('a group with no gap band');
+  return g;
+}
+
+/** How a one-group wave's monsters arrive: its sides' kind, or bunches. */
+function arrivalOf(w: TurretWaveDef): string {
+  const g = only(w);
+  if (g.brick === 'smallGroup') return 'bunches';
+  if (g.brick !== 'walkers') return g.brick;
+  return g.sides?.kind ?? 'ring';
+}
+
+/** The walking group of a resolved one-group wave. */
+function walking(group: TurretGroupPlan) {
+  if (group.brick !== 'walkers') throw new Error('not walkers');
+  return group;
+}
+
+function sectorOf(...args: Parameters<typeof turretArrivalSector>): TurretBearingSector {
+  const sector = turretArrivalSector(...args);
+  if (!sector) throw new Error('expected an arrival sector');
+  return sector;
+}
+
+interface Spawn {
+  id: number;
+  tick: number;
+  bearing: number;
+}
+
+/** Runs the first wave unshot until every monster spawned; each spawn's tick and bearing. */
+function spawns(plan: TurretPlan, seed: number, setup?: (s: TurretDefenseState) => void) {
+  const state = createTurretDefense(plan, { x: 0, z: 0 }, seed, START);
+  const seen: Spawn[] = [];
+  const total = plan.waves[0].spawns.length;
+  for (let t = START + 1; seen.length < total && t < INTRO_END + 20 * 120; t++) {
+    if (t === INTRO_END && setup) setup(state);
+    tickTurretDefense(state, t, flat);
+    for (const m of state.monsters) {
+      if (seen.some((s) => s.id === m.id)) continue;
+      const { x, z } = m.seg;
+      seen.push({ id: m.id, tick: t, bearing: Math.atan2(x, z) });
+    }
+  }
+  expect(seen).toHaveLength(total);
+  return { state, seen };
+}
+
+/**
+ * One weapon brought in per trial, generously the first time: the cannon and the kegs
+ * alone, then the Shockwave, then the fragmentation shell beside fewer Shockwaves.
+ */
+const TRIAL_ARSENALS: Record<string, { shockwave: number; fragmentation: number }> = {
+  introduction: { shockwave: 0, fragmentation: 0 },
+  standard: { shockwave: 8, fragmentation: 0 },
+  hard: { shockwave: 2, fragmentation: 4 },
+};
+
+describe('the scenario table', () => {
+  it('offers Introduction, Standard and Hard, with frozen unique ids and board keys', () => {
+    expect(TURRET_SCENARIOS.map((s) => [s.id, s.boardKey])).toEqual([
+      ['fire_and_fly_introduction', 'introduction'],
+      ['fire_and_fly_standard', 'standard'],
+      ['fire_and_fly_hard', 'hard'],
+    ]);
+    expect(TURRET_DEFAULT_SCENARIO).toBe(TURRET_SCENARIO_STANDARD);
+    for (const s of TURRET_SCENARIOS) {
+      expect(s.boardKey).toMatch(/^[a-z]+$/);
+      // Only the Veterans' Test is resupplied, after its fourth and fifth waves, with no bonus.
+      if (s === TURRET_SCENARIO_HARD)
+        expect(s.supply).toEqual({ resupplyAfterWaves: [4, 5], unusedChargeBonus: false });
+      else expect(s.supply).toBeUndefined();
+      expect(s.medals.silver.minIntegrityShare).toBeGreaterThan(0);
+      expect(s.medals.silver.minIntegrityShare).toBeLessThan(s.medals.gold.minIntegrityShare);
+      expect(s.medals.gold.minIntegrityShare).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('gives every trial and mission a 70-point tower and the one medal rule, The Cracked Tower its own', () => {
+    // Lot R5b: the difficulty is in the waves, never in the tower or the bars; 70 points
+    // since the playtest that found a crowd at the tower's foot carried no threat.
+    expect(TURRET_TOWER_POINTS).toBe(70);
+    expect(TURRET_MEDALS).toEqual({
+      gold: { minIntegrityShare: 0.95 },
+      silver: { minIntegrityShare: 0.6 },
+    });
+    for (const def of [...TURRET_SCENARIOS, ...TURRET_MISSIONS]) {
+      const plan = resolveTurretPlan(def);
+      if (def.boardKey === 'brittle') {
+        // Its 7 points are its identity: gold is a tower nothing struck.
+        expect([plan.integrity, plan.medals.gold.minIntegrityShare]).toEqual([7, 1]);
+        expect(plan.medals.silver).toEqual(TURRET_MEDALS.silver);
+        continue;
+      }
+      expect(plan.integrity, def.id).toBe(70);
+      expect(plan.medals, def.id).toEqual(TURRET_MEDALS);
+    }
+  });
+
+  it('keeps Standard the original run: the same wave table and the common tower', () => {
+    expect(TURRET_SCENARIO_STANDARD.waves).toBe(TURRET_WAVES);
+    expect(TURRET_SCENARIO_STANDARD.integrity).toBe(TURRET_TOWER_POINTS);
+    for (const w of TURRET_WAVES) expect(arrivalOf(w)).toBe('ring');
+    for (const e of TURRET_WAVES.flatMap(entriesOf)) expect(e.hpScale).toBeUndefined();
+  });
+
+  it('makes Introduction a gentle climb of small monsters at their own pace, on the same tower', () => {
+    const intro = TURRET_SCENARIO_INTRODUCTION;
+    expect(intro.waves).toHaveLength(7);
+    // One tower for every trial since lot R5b: the waves carry the difficulty.
+    expect(intro.integrity).toBe(TURRET_SCENARIO_STANDARD.integrity);
+    // Its first wave spaces its spawns wider than Standing Watch's, then they close up.
+    expect(gapsOf(intro.waves[0]).gapMinTicks).toBeGreaterThan(gapsOf(TURRET_WAVES[0]).gapMinTicks);
+    const sizes = intro.waves.map((w) => entriesOf(w).reduce((n, e) => n + e.count, 0));
+    for (const [w, wave] of intro.waves.entries()) {
+      // The load climbs a step a wave, the only fall being the grouped wave past the kegs.
+      if (w > 0 && arrivalOf(wave) !== 'bunches')
+        expect(sizes[w]).toBeGreaterThanOrEqual(sizes[w - 1]);
+      expect(gapsOf(wave).gapMinTicks).toBeLessThanOrEqual(gapsOf(intro.waves[0]).gapMinTicks);
+      for (const e of entriesOf(wave)) {
+        expect(TURRET_TEMPLATE_SIZES[e.templateId]).toBe('small');
+        expect(e.hpScale).toBeUndefined();
+        // No monster runs faster than its template: the cannon is learnt, not raced.
+        expect(e.speedScale ?? 1).toBeLessThanOrEqual(1);
+      }
+    }
+    expect(Math.max(...sizes)).toBe(sizes.at(-1));
+    expect(sizes[0]).toBeLessThanOrEqual(4);
+  });
+
+  it('makes Hard use every arrival pattern, tougher monsters and more of the large ones', () => {
+    const hard = TURRET_SCENARIO_HARD;
+    expect(new Set(hard.waves.map(arrivalOf))).toEqual(new Set(['arc', 'flanks', 'bunches']));
+    expect(hard.waves.filter((w) => arrivalOf(w) !== 'arc').length).toBeGreaterThan(4);
+    const beforeLast = hard.waves.slice(0, -1).flatMap(entriesOf);
+    expect(Math.max(...beforeLast.map((e) => e.hpScale ?? 1))).toBe(1.8);
+    const count = (s: TurretScenarioDef, sizes: readonly string[]) =>
+      s.waves
+        .flatMap(entriesOf)
+        .filter((e) => sizes.includes(TURRET_TEMPLATE_SIZES[e.templateId]))
+        .reduce((n, e) => n + e.count, 0);
+    const all = ['small', 'medium', 'large', 'huge'];
+    const std = TURRET_SCENARIO_STANDARD;
+    // Standing Watch grew by about two fifths for the one medal rule (lot R5b): the
+    // Veterans' Test still fields more monsters, more of them large, as many giants.
+    expect(count(hard, all)).toBeGreaterThan(count(std, all));
+    expect(count(hard, ['large', 'huge'])).toBeGreaterThan(count(std, ['large', 'huge']));
+    expect(count(hard, ['huge'])).toBe(count(std, ['huge']));
+    expect(gapsOf(hard.waves[0]).gapMinTicks).toBeLessThan(gapsOf(TURRET_WAVES[0]).gapMinTicks);
+    expect(gapsOf(hard.waves[0]).gapMaxTicks).toBeLessThan(gapsOf(TURRET_WAVES[0]).gapMaxTicks);
+  });
+
+  it('gives Hard tight packs, two rushes on three sides at once, then the giants run down by a charge', () => {
+    const [, packs, rush, , lastRush, last] = TURRET_SCENARIO_HARD.waves;
+    expect(only(packs)).toMatchObject({ brick: 'smallGroup', size: 10 });
+    expect(gapsOf(packs).gapMaxTicks).toBeLessThanOrEqual(5);
+    for (const wave of [rush, lastRush]) {
+      expect(only(wave)).toMatchObject({ sides: { kind: 'flanks', count: 3 } });
+      expect(gapsOf(wave).gapMaxTicks).toBeLessThanOrEqual(2);
+    }
+    // The giants set off first; the charge spawns after them from three sides, quicker.
+    // Eighteen of them since the one medal rule, and no sponge (lot R5b).
+    expect(only(last)).toMatchObject({ sides: { kind: 'flanks', count: 3 } });
+    const giants = entriesOf(last).filter((e) => TURRET_TEMPLATE_SIZES[e.templateId] === 'huge');
+    expect(giants.map((e) => e.templateId).sort()).toEqual(['frostmane_yeti', 'idol_guardian']);
+    const charge = entriesOf(last).at(-1)!;
+    expect(charge).toMatchObject({ templateId: 'boneclad_revenant', bossLast: true });
+    expect(charge.count).toBe(19);
+    for (const giant of giants) {
+      expect(giant.bossLast).toBeUndefined();
+      expect(charge.speedScale!).toBeGreaterThan(1.5 * giant.speedScale!);
+    }
+    const plan = resolveTurretPlan(TURRET_SCENARIO_HARD);
+    const lastPlan = plan.waves.at(-1)!;
+    const huge = (kind: number) => plan.kinds[kind].sizeClass === 'huge';
+    const giantCount = giants.reduce((n, e) => n + e.count, 0);
+    expect(lastPlan.spawns.slice(0, giantCount).every(huge)).toBe(true);
+    expect(lastPlan.spawns.slice(giantCount).some(huge)).toBe(false);
+    // Good shells to fell each: a charger three, a giant five or six.
+    const shells = (kind: number) => Math.ceil(plan.kinds[kind].maxHp / lastPlan.coreDamage);
+    expect(shells(lastPlan.spawns.at(-1)!)).toBe(3);
+    for (const kind of lastPlan.spawns.filter(huge)) {
+      expect(shells(kind)).toBeGreaterThanOrEqual(5);
+      expect(shells(kind)).toBeLessThanOrEqual(6);
+    }
+  });
+
+  it("keeps Hard's kegs wave by wave as many as Standard's: they were barely used", () => {
+    expect(TURRET_SCENARIO_HARD.waves.map((w) => w.kegs)).toEqual(TURRET_WAVES.map((w) => w.kegs));
+  });
+});
+
+describe('resolving a scenario into a plan', () => {
+  it('resolves Standard (the default) to the plan its table resolves to', () => {
+    const plan = resolveTurretPlan();
+    expect(resolveTurretPlan(TURRET_SCENARIO_STANDARD)).toEqual(plan);
+    expect(plan.scenarioId).toBe('fire_and_fly_standard');
+    expect(plan.integrity).toBe(70);
+    expect(plan.arsenal).toEqual({ shockwave: 8, fragmentation: 0 });
+    for (const w of plan.waves) expect(walking(w.groups[0]).sides).toEqual({ kind: 'ring' });
+    // The resolved plan, byte for byte: lot R4 retuned the table for the 0.8 s strike, lot
+    // R5b for the one medal rule (two fifths more monsters at a pace of 1.7, spawns 0.6 to
+    // 1.2 s apart). Lot G1 laid the same numbers out as groups and keg lots: projected back
+    // onto the wave shape before it, they hash as they did.
+    const waves = plan.waves.map((w) => {
+      const group = walking(w.groups[0]);
+      const lot = w.kegs[0];
+      if (w.groups.length !== 1 || w.kegs.length !== 1 || lot.mode !== 'random')
+        throw new Error('not a ring wave');
+      return {
+        spawns: w.spawns,
+        coreDamage: w.coreDamage,
+        gapMinTicks: group.gapMinTicks,
+        gapMaxTicks: group.gapMaxTicks,
+        barrels: { count: lot.count, minRadius: lot.minRadius, maxRadius: lot.maxRadius },
+      };
+    });
+    const before = { kinds: plan.kinds, waves };
+    expect(fnv(JSON.stringify({ ...before, bowling: plan.bowling }))).toBe('63a02a17');
+  });
+
+  it.each(TURRET_SCENARIOS.map((s) => [s.boardKey, s] as const))(
+    'carries %s: its id, tower points and the arsenal it brings in, deep-frozen',
+    (key, s) => {
+      const plan = resolveTurretPlan(s);
+      expect(plan.scenarioId).toBe(s.id);
+      expect(plan.integrity).toBe(s.integrity);
+      expect(plan.arsenal).toEqual(TRIAL_ARSENALS[key]);
+      expect(plan.resupplyWaves).toEqual(key === 'hard' ? [3, 4] : []);
+      expect(plan.chargeBonus).toBe(false);
+      expect(plan.waves).toHaveLength(s.waves.length);
+      expect(Object.isFrozen(plan.arsenal)).toBe(true);
+      expect(Object.isFrozen(plan.waves[0].groups[0])).toBe(true);
+      plan.waves.forEach((w, i) => {
+        expect(w.groups).toHaveLength(s.waves[i].groups.length);
+        w.groups.forEach((group, g) => {
+          const def = s.waves[i].groups[g];
+          expect(group.count).toBe(def.entries.reduce((n, e) => n + e.count, 0));
+          if (group.brick === 'walkers' && def.brick === 'walkers') {
+            expect(group.sides).toEqual(def.sides ?? { kind: 'ring' });
+            expect(group.sides).not.toBe(def.sides);
+          }
+        });
+        expect(w.spawns).toHaveLength(entriesOf(s.waves[i]).reduce((n, e) => n + e.count, 0));
+        expect(w.kegs).toEqual(s.waves[i].kegs ?? []);
+      });
+    },
+  );
+
+  it('carries the medal bars, and refuses bars that are not silver under gold within the tower', () => {
+    for (const s of TURRET_SCENARIOS) expect(resolveTurretPlan(s).medals).toEqual(s.medals);
+    const plan = resolveTurretPlan();
+    expect(plan.medals).not.toBe(TURRET_SCENARIO_STANDARD.medals);
+    expect(Object.isFrozen(plan.medals.gold)).toBe(true);
+    const bars = (gold: number, silver: number) => () =>
+      resolveTurretPlan({
+        ...TURRET_SCENARIO_STANDARD,
+        medals: { gold: { minIntegrityShare: gold }, silver: { minIntegrityShare: silver } },
+      });
+    // Silver one whole point under gold, the closest the bars may stand.
+    expect(bars(1, 0.98)).not.toThrow();
+    for (const [gold, silver] of [
+      [0.6, 0.6],
+      [0.5, 0.6],
+      [1.1, 0.6],
+      [0.9, 0],
+      [0.9, -0.2],
+      [Number.NaN, 0.5],
+    ]) {
+      expect(bars(gold, silver)).toThrow(/bad medal bars/);
+    }
+  });
+
+  it('refuses bars that leave a medal out of reach once rounded to whole tower points', () => {
+    const bars = (integrity: number, gold: number, silver: number) => () =>
+      resolveTurretPlan({
+        ...TURRET_SCENARIO_STANDARD,
+        integrity,
+        medals: { gold: { minIntegrityShare: gold }, silver: { minIntegrityShare: silver } },
+      });
+    expect(bars(3, 0.9, 0.6)).not.toThrow();
+    // Gold and silver at the same whole point: no win is silver.
+    expect(bars(10, 0.95, 0.91)).toThrow(/bad medal bars/);
+    expect(bars(2, 0.9, 0.6)).toThrow(/bad medal bars/);
+    // Silver at a win's last point: no win is bronze.
+    expect(bars(100, 0.9, 0.01)).toThrow(/bad medal bars/);
+    expect(bars(1, 1, 0.5)).toThrow(/bad medal bars/);
+  });
+
+  it('carries a scenario arsenal, absent charges as 0', () => {
+    const plan = resolveTurretPlan({ ...TURRET_SCENARIO_STANDARD, arsenal: { shockwave: 3 } });
+    expect(plan.arsenal).toEqual({ shockwave: 3, fragmentation: 0 });
+    expect(resolveTurretPlan({ ...TURRET_SCENARIO_STANDARD, arsenal: undefined }).arsenal).toEqual({
+      shockwave: 0,
+      fragmentation: 0,
+    });
+  });
+
+  it('scales health by the entry, rounded, as a kind of its own', () => {
+    const waves = [
+      wave([
+        { templateId: 'fen_troll', count: 1, level: 11 },
+        { templateId: 'fen_troll', count: 1, level: 11, hpScale: 1.4 },
+        { templateId: 'fen_troll', count: 1, level: 11, hpScale: 1 },
+      ]),
+    ];
+    const plan = resolveTurretPlan(scenario(waves));
+    const base = mobMaxHp(MOBS.fen_troll, 11);
+    expect(plan.kinds.map((k) => k.maxHp)).toEqual([base, Math.round(base * 1.4)]);
+    expect(plan.waves[0].spawns).toEqual([0, 1, 0]);
+    const hard = resolveTurretPlan(TURRET_SCENARIO_HARD);
+    const yeti = hard.kinds.find((k) => k.templateId === 'frostmane_yeti') as TurretKind;
+    expect(yeti.maxHp).toBe(Math.round(mobMaxHp(MOBS.frostmane_yeti, 20) * 1.1));
+    expect(yeti.breachValue).toBe(TURRET_SIZE_CLASSES.huge.breachValue);
+  });
+
+  it.each([
+    ['a zero health scale', { hpScale: 0 }, /bad health scale/],
+    ['a non-finite health scale', { hpScale: Number.NaN }, /bad health scale/],
+  ])('refuses %s', (_name, extra, message) => {
+    const waves = [wave([{ ...WOLF, ...extra }])];
+    expect(() => resolveTurretPlan(scenario(waves))).toThrow(message);
+  });
+
+  it.each([
+    ['an empty arc', { kind: 'arc', widthTurn: 0 }, /bad walkers in test_scenario/],
+    ['an arc wider than the ring', { kind: 'arc', widthTurn: 1.5 }, /bad walkers/],
+    ['four flanks', { kind: 'flanks', count: 4, widthTurn: 0.1 }, /bad walkers/],
+    ['an unknown pattern', { kind: 'spiral' }, /bad walkers/],
+    [
+      'an empty bunch',
+      { kind: 'bunches', size: 0, bunchGapTicks: 20, widthTurn: 0.1 },
+      /bad small group/,
+    ],
+    [
+      'a fractional pause',
+      { kind: 'bunches', size: 3, bunchGapTicks: 2.5, widthTurn: 0.1 },
+      /bad small group/,
+    ],
+  ])('refuses %s', (_name, arrival, message) => {
+    const waves = [wolves(4, arrival as unknown as TurretArrivalPlan)];
+    expect(() => resolveTurretPlan(scenario(waves))).toThrow(message);
+  });
+
+  it('refuses a gap band upside down, a group with no monster and a wave with no group', () => {
+    const upside = [wave([{ ...WOLF, count: 3 }], undefined, { gapMinTicks: 9, gapMaxTicks: 3 })];
+    expect(() => resolveTurretPlan(scenario(upside))).toThrow(/bad walkers/);
+    expect(() => resolveTurretPlan(scenario([wolves(0)]))).toThrow(/empty or oversized group/);
+    const none = [{ groups: [], coreDamage: 60 }];
+    expect(() => resolveTurretPlan(scenario(none))).toThrow(/bad group count/);
+  });
+
+  it('refuses a tower with no points or fractional ones', () => {
+    expect(() => resolveTurretPlan(scenario([wolves(1)], 0))).toThrow(/bad integrity/);
+    expect(() => resolveTurretPlan(scenario([wolves(1)], 12.5))).toThrow(/bad integrity/);
+  });
+
+  const LIMITS = TURRET_PLAN_LIMITS;
+  const pack = (size: number, bunchGapTicks: number): TurretArrivalPlan => ({
+    kind: 'bunches',
+    size,
+    bunchGapTicks,
+    widthTurn: 0.1,
+  });
+  // The online client's plan decoder rejects each of these: the server must never seat one.
+  it.each([
+    ['an id out of the wire alphabet', { id: 'Hard <b>' }, /bad scenario id/],
+    ['an oversized id', { id: 'x'.repeat(LIMITS.scenarioIdLength + 1) }, /bad scenario id/],
+    ['more tower points than the wire carries', { integrity: LIMITS.integrity + 1 }, /integrity/],
+    ['negative charges', { arsenal: { shockwave: -1 } }, /bad shockwave charges/],
+    ['fractional charges', { arsenal: { fragmentation: 1.5 } }, /bad fragmentation charges/],
+    ['non-finite charges', { arsenal: { shockwave: Number.NaN } }, /bad shockwave charges/],
+    ['too many charges', { arsenal: { fragmentation: LIMITS.charges + 1 } }, /fragmentation/],
+    ['no wave', { waves: [] }, /bad wave count/],
+    [
+      'more waves than the wire carries',
+      { waves: Array.from({ length: LIMITS.waves + 1 }, () => wolves(1)) },
+      /bad wave count/,
+    ],
+    [
+      'a wave spawning more than the wire carries',
+      {
+        waves: [
+          {
+            groups: [0, 1].map(() => wolves(LIMITS.spawnsPerWave / 2 + 1).groups[0]),
+            coreDamage: 60,
+          },
+        ],
+      },
+      /too many spawns/,
+    ],
+    [
+      'a group spawning more than the wire carries',
+      { waves: [wolves(LIMITS.spawnsPerWave + 1)] },
+      /empty or oversized group/,
+    ],
+    [
+      'more monster kinds than the wire carries',
+      {
+        waves: [
+          wave(
+            Array.from({ length: LIMITS.kinds + 1 }, (_, i) => ({ ...WOLF, hpScale: 1 + i / 100 })),
+          ),
+        ],
+      },
+      /too many monster kinds/,
+    ],
+    [
+      'a bunch larger than the wire carries',
+      { waves: [wolves(4, pack(LIMITS.spawnsPerWave + 1, 20))] },
+      /bad small group/,
+    ],
+    [
+      'a pause longer than the wire carries',
+      { waves: [wolves(4, pack(2, TURRET_GROUP_LIMITS.delayTicks + 1))] },
+      /bad small group/,
+    ],
+    [
+      'more groups than the wire carries',
+      {
+        waves: [
+          {
+            groups: Array.from(
+              { length: TURRET_GROUP_LIMITS.groups + 1 },
+              () => wolves(1).groups[0],
+            ),
+            coreDamage: 60,
+          },
+        ],
+      },
+      /bad group count/,
+    ],
+    [
+      'a delay longer than the wire carries',
+      {
+        waves: [
+          {
+            groups: [{ ...wolves(1).groups[0], delayTicks: TURRET_GROUP_LIMITS.delayTicks + 1 }],
+            coreDamage: 60,
+          },
+        ],
+      },
+      /bad group delay/,
+    ],
+    [
+      'more kegs than the wire carries',
+      {
+        waves: [
+          {
+            ...wolves(1),
+            kegs: [{ mode: 'random', count: LIMITS.barrels + 1, minRadius: 16, maxRadius: 30 }],
+          },
+        ],
+      },
+      /bad kegs/,
+    ],
+    [
+      'a keg cap past the wire',
+      { waves: [{ ...wolves(1), kegCap: LIMITS.barrels + 1 }] },
+      /bad keg cap/,
+    ],
+  ] as const)('refuses %s', (_name, override, message) => {
+    const def = { ...scenario([wolves(1)]), ...override } as TurretScenarioDef;
+    expect(() => resolveTurretPlan(def)).toThrow(message);
+  });
+
+  it('chains every wave of every trial and mission: no overlap knob, no pause', () => {
+    for (const def of [...TURRET_SCENARIOS, ...TURRET_MISSIONS]) {
+      expect(def, def.id).not.toHaveProperty('overlap');
+      expect(resolveTurretPlan(def), def.id).not.toHaveProperty('overlap');
+    }
+    expect(LIMITS).not.toHaveProperty('overlap');
+    expect(TURRET_TIMING).not.toHaveProperty('betweenTicks');
+  });
+
+  it('keeps the bowling rule a parameter', () => {
+    const off = resolveTurretPlan(TURRET_SCENARIO_HARD, MOBS, {
+      ...TURRET_BOWLING,
+      enabled: false,
+    });
+    expect(off.bowling.enabled).toBe(false);
+    expect(off.waves).toEqual(resolveTurretPlan(TURRET_SCENARIO_HARD).waves);
+  });
+});
+
+describe('arrival sectors', () => {
+  it('opens no sector on the ring, and one drawn side per wave for an arc', () => {
+    expect(turretArrivalSector({ seed: 9 }, 0, { kind: 'ring' }, 3)).toBeNull();
+    const arc = { kind: 'arc', widthTurn: 0.25 } as const;
+    const w = sectorOf({ seed: 9 }, 2, arc, 0);
+    expect(w.width).toBeCloseTo(TAU / 4, 12);
+    const side = turretDraw({ seed: 9 }, TURRET_STREAM.arrivalSide, 2, 0) * TAU;
+    expect(w.from + w.width / 2).toBeCloseTo(side, 12);
+    expect(turretArrivalSector({ seed: 9 }, 2, arc, 7)).toEqual(w);
+    expect(turretArrivalSector({ seed: 10 }, 2, arc, 0)).not.toEqual(w);
+    expect(turretArrivalSector({ seed: 9 }, 3, arc, 0)).not.toEqual(w);
+  });
+
+  it('turns flanks evenly apart, the wave taking them in turn', () => {
+    for (const count of [2, 3] as const) {
+      const flanks = { kind: 'flanks', count, widthTurn: 0.1 } as const;
+      const centers = [0, 1, 2, 3, 4, 5].map((i) => {
+        const w = sectorOf({ seed: 4 }, 1, flanks, i);
+        return w.from + w.width / 2;
+      });
+      for (let i = 0; i < centers.length; i++) {
+        expect(angleOff(centers[i], centers[i % count])).toBeCloseTo(0, 9);
+        expect(angleOff(centers[(i + 1) % centers.length], centers[i])).not.toBeCloseTo(0, 3);
+      }
+      expect(Math.abs(angleOff(centers[1], centers[0]))).toBeCloseTo(TAU / count, 9);
+    }
+  });
+
+  it('gives each bunch of a small group its own side and a pause after its last member', () => {
+    const burst = { kind: 'bunches', size: 3, bunchGapTicks: 70, widthTurn: 0.05 } as const;
+    const packOf = (i: number) => sectorOf({ seed: 5 }, 0, burst, i);
+    expect(packOf(1)).toEqual(packOf(0));
+    expect(packOf(2)).toEqual(packOf(0));
+    expect(packOf(3)).not.toEqual(packOf(0));
+    expect(packOf(5)).toEqual(packOf(3));
+    const group = walking(resolveTurretPlan(scenario([wolves(9, burst)])).waves[0].groups[0]);
+    expect(turretArrivalGap({ seed: 5 }, group, 2, 3)).toBe(70);
+    expect(turretArrivalGap({ seed: 5 }, group, 5, 6)).toBe(70);
+    for (const index of [0, 1, 3, 4]) {
+      const gap = turretArrivalGap({ seed: 5 }, group, index, index + 1);
+      expect(gap).toBeGreaterThanOrEqual(16);
+      expect(gap).toBeLessThanOrEqual(32);
+    }
+  });
+
+  it('keeps the ring gap draw exactly the one the engine always drew', () => {
+    const group = walking(resolveTurretPlan().waves[0].groups[0]);
+    for (let id = 1; id < 40; id++) {
+      const draw = turretDraw({ seed: 3 }, TURRET_STREAM.spawnGap, id);
+      const span = group.gapMaxTicks - group.gapMinTicks + 1;
+      expect(turretArrivalGap({ seed: 3 }, group, id - 1, id)).toBe(
+        group.gapMinTicks + Math.floor(draw * span),
+      );
+    }
+  });
+});
+
+describe('arrival bearings on the field', () => {
+  it('spreads a ring wave all around', () => {
+    const plan = resolveTurretPlan(scenario([wolves(40)]));
+    const { seen } = spawns(plan, 3);
+    const quarters = new Set(seen.map((s) => Math.floor(((s.bearing + TAU) % TAU) / (TAU / 4))));
+    expect(quarters.size).toBe(4);
+  });
+
+  it('brings an arc wave through its one side, across the whole width', () => {
+    const arrival = { kind: 'arc', widthTurn: 0.2 } as const;
+    const plan = resolveTurretPlan(scenario([wolves(24, arrival)]));
+    for (const seed of [1, 2, 3]) {
+      const { seen } = spawns(plan, seed);
+      const sector = sectorOf({ seed }, 0, arrival, 0);
+      const mid = sector.from + sector.width / 2;
+      const offs = seen.map((s) => angleOff(s.bearing, mid));
+      for (const off of offs) expect(Math.abs(off)).toBeLessThanOrEqual(sector.width / 2 + 1e-9);
+      expect(Math.max(...offs) - Math.min(...offs)).toBeGreaterThan(sector.width * 0.6);
+    }
+  });
+
+  it('brings a flanks wave through its sides in turn', () => {
+    const arrival = { kind: 'flanks', count: 3, widthTurn: 0.08 } as const;
+    const plan = resolveTurretPlan(scenario([wolves(12, arrival)]));
+    const { seen } = spawns(plan, 8);
+    seen.forEach((s, i) => {
+      const w = sectorOf({ seed: 8 }, 0, arrival, i);
+      expect(Math.abs(angleOff(s.bearing, w.from + w.width / 2))).toBeLessThanOrEqual(
+        w.width / 2 + 1e-9,
+      );
+    });
+  });
+
+  it('brings a small group wave as bunches: close in time and side, a pause between bunches', () => {
+    const arrival = { kind: 'bunches', size: 4, bunchGapTicks: 60, widthTurn: 0.05 } as const;
+    const bunched = wave([{ ...WOLF, count: 12 }], arrival, { gapMinTicks: 4, gapMaxTicks: 8 });
+    const plan = resolveTurretPlan(scenario([bunched]));
+    const { seen } = spawns(plan, 6);
+    for (let i = 1; i < seen.length; i++) {
+      const gap = seen[i].tick - seen[i - 1].tick;
+      if (i % 4 === 0) expect(gap).toBe(60);
+      else expect(gap).toBeGreaterThanOrEqual(4);
+      if (i % 4 !== 0) expect(gap).toBeLessThanOrEqual(8);
+      const w = sectorOf({ seed: 6 }, 0, arrival, i);
+      expect(Math.abs(angleOff(seen[i].bearing, w.from + w.width / 2))).toBeLessThanOrEqual(
+        w.width / 2 + 1e-9,
+      );
+    }
+  });
+
+  it('replays the same bearings from the same seed, and other sides from another', () => {
+    const plan = resolveTurretPlan(TURRET_SCENARIO_HARD);
+    const a = spawns(plan, 17).seen;
+    const b = spawns(plan, 17).seen;
+    const c = spawns(plan, 18).seen;
+    expect(b).toEqual(a);
+    expect(c.map((s) => s.bearing)).not.toEqual(a.map((s) => s.bearing));
+  });
+
+  it('keeps every lane of a one-sided wave clear of the standing barrels', () => {
+    const arrival = { kind: 'arc', widthTurn: 0.3 } as const;
+    const plan = resolveTurretPlan(scenario([wolves(30, arrival)]));
+    const radius = plan.kinds[0].radius;
+    const reach = TURRET_EXPLOSIVE_BARREL.radius + radius + TURRET_EXPLOSIVE_BARREL.laneMargin;
+    for (const seed of [2, 5, 11]) {
+      const sector = sectorOf({ seed }, 0, arrival, 0);
+      const mid = sector.from + sector.width / 2;
+      const { state, seen } = spawns(plan, seed, (s) => {
+        for (const [i, off] of [-0.3, 0, 0.25].entries()) {
+          const at = mid + off;
+          s.barrels.push({
+            id: 100 + i,
+            x: Math.sin(at) * 20,
+            y: 0,
+            z: Math.cos(at) * 20,
+            litTick: -1,
+            blowTick: -1,
+          });
+        }
+      });
+      for (const s of seen) {
+        expect(Math.abs(angleOff(s.bearing, mid))).toBeLessThanOrEqual(sector.width / 2 + 1e-9);
+        for (const b of state.barrels) {
+          const d = Math.hypot(b.x, b.z);
+          expect(Math.abs(angleOff(s.bearing, Math.atan2(b.x, b.z)))).toBeGreaterThanOrEqual(
+            Math.asin(reach / d) - 1e-9,
+          );
+        }
+      }
+    }
+  });
+
+  it('falls back to the whole ring free of barrels when they close the sector', () => {
+    const arcs = [{ center: 1, half: 0.2 }];
+    expect(turretFreeBearing(0.5, arcs, { from: 0.9, width: 0.2 })).toBe(
+      turretFreeBearing(0.5, arcs),
+    );
+    expect(turretFreeBearing(0.5, [], { from: 0.9, width: 0.2 })).toBeCloseTo(1, 12);
+    // An arc outside the sector changes nothing inside it; one across its edge trims it.
+    expect(turretFreeBearing(0.25, [{ center: 3, half: 0.1 }], { from: 0, width: 1 })).toBe(0.25);
+    expect(turretFreeBearing(0, [{ center: 0, half: 0.1 }], { from: 0, width: 1 })).toBeCloseTo(
+      0.1,
+      12,
+    );
+  });
+
+  it('draws no bearing inside a sector when no barrel stands', () => {
+    const state = createTurretDefense(resolveTurretPlan(), { x: 0, z: 0 }, 1, START);
+    expect(turretSpawnBearing(state, 0.5, 0.6, { from: 1, width: 0.4 })).toBeCloseTo(1.2, 12);
+    expect(turretSpawnBearing(state, 0.5, 0.6)).toBe(0.5 * TAU);
+  });
+});
+
+describe('the tower points come from the plan', () => {
+  it('starts each scenario at its own integrity and loses when it runs out', () => {
+    for (const s of TURRET_SCENARIOS) {
+      const plan = resolveTurretPlan(s);
+      expect(createTurretDefense(plan, { x: 0, z: 0 }, 1, START).integrity).toBe(s.integrity);
+    }
+    const plan = resolveTurretPlan(scenario([wolves(6)], 5));
+    const state = createTurretDefense(plan, { x: 0, z: 0 }, 4, START);
+    for (let t = START + 1; t < START + 20 * 120 && state.phase !== 'lost'; t++) {
+      tickTurretDefense(state, t, flat);
+    }
+    expect(state.phase).toBe('lost');
+    expect(state.integrity).toBe(0);
+    expect(state.stats.breaches).toBe(3);
+    expect(state.stats.pointsLost).toBe(6);
+  });
+});
+
+type Aim = (
+  state: TurretDefenseState,
+  tick: number,
+  probe: ThrowProbe,
+) => { x: number; z: number } | null;
+
+function nearestLive(state: TurretDefenseState, tick: number, probe: ThrowProbe) {
+  let best: { x: number; z: number } | null = null;
+  let bestD = Number.POSITIVE_INFINITY;
+  for (const m of state.monsters) {
+    if (m.hp <= 0) continue;
+    const p = positionAt(m.seg, tick, probe);
+    const d = Math.hypot(p.x - state.cx, p.z - state.cz);
+    if (d < bestD) {
+      bestD = d;
+      best = p;
+    }
+  }
+  return best;
+}
+
+const aimNearest: Aim = (state, tick, probe) =>
+  tick >= state.readyTick ? nearestLive(state, tick, probe) : null;
+
+/** `delay` ticks after each reload, up to 3 yd off the nearest monster. */
+const aimLate =
+  (delay: number): Aim =>
+  (state, tick, probe) => {
+    if (tick < state.readyTick + delay) return null;
+    const p = nearestLive(state, tick, probe);
+    if (!p) return null;
+    return {
+      x: p.x + ((tick * 7919) % 600) / 100 - 3,
+      z: p.z + ((tick * 104729) % 600) / 100 - 3,
+    };
+  };
+
+/** At most every 1.2 s, up to 3 yd off the nearest monster: nearer a person than the other. */
+const aimSloppily = aimLate(15);
+/** 1.2 s after each reload, up to 3 yd off: slower than a clean hand. */
+const aimSlowly = aimLate(24);
+
+function fullRun(s: TurretScenarioDef, seed: number, probe: ThrowProbe, aim: Aim) {
+  const plan = resolveTurretPlan(s);
+  const state = createTurretDefense(plan, { x: 0, z: 0 }, seed, START);
+  let t = START;
+  while (t < START + 20 * 60 * 10 && state.phase !== 'won' && state.phase !== 'lost') {
+    t++;
+    tickTurretDefense(state, t, probe);
+    const target = aim(state, t, probe);
+    if (target) fireTurret(state, t, target.x, target.z, probe);
+  }
+  const monsters = plan.waves.reduce((n, w) => n + w.spawns.length, 0);
+  return { plan, state, seconds: (t - START) / 20, monsters };
+}
+
+describe('full runs of every scenario with the scripted aimers', () => {
+  // Standing Watch is won bare by the clean aimer only since the one medal rule (lot R5b):
+  // a sloppy one needs the Shockwave there, so it is held to a consistent end.
+  it.each([
+    ['introduction', TURRET_SCENARIO_INTRODUCTION, true],
+    ['standard', TURRET_SCENARIO_STANDARD, false],
+  ] as const)(
+    '%s is won by the aimers it must be, every monster killed or struck',
+    (_key, s, both) => {
+      for (const [probe, aim, mustWin] of [
+        [flat, aimNearest, true],
+        [hills, aimSloppily, both],
+      ] as const) {
+        const r = fullRun(s, 42, probe, aim);
+        if (!mustWin && r.state.phase === 'lost') {
+          expect(r.state.integrity).toBe(0);
+          continue;
+        }
+        expect(r.state.phase).toBe('won');
+        expect(r.state.wave).toBe(s.waves.length - 1);
+        expect(r.state.stats.kills + r.state.stats.breaches).toBe(r.monsters);
+        expect(r.state.integrity).toBe(s.integrity - r.state.stats.pointsLost);
+        expect(r.state.result).toEqual(turretResult(r.plan, r.state));
+      }
+    },
+  );
+
+  it.each(TURRET_SCENARIOS.map((s) => [s.boardKey, s] as const))(
+    'medals the clean nearest-first aimer gold on %s',
+    (_key, s) => {
+      expect(fullRun(s, 42, flat, aimNearest).state.result?.medal).toBe('gold');
+    },
+  );
+
+  it('keeps gold out of reach of an aimer firing 1.2 s after each reload on Standard', () => {
+    const r = fullRun(TURRET_SCENARIO_STANDARD, 42, hills, aimSlowly);
+    expect(['won', 'lost']).toContain(r.state.phase);
+    expect(r.state.result?.medal).not.toBe('gold');
+  });
+
+  it('Hard runs to an end with both aimers, its numbers consistent', () => {
+    for (const [probe, aim] of [
+      [flat, aimNearest],
+      [hills, aimSloppily],
+    ] as const) {
+      const r = fullRun(TURRET_SCENARIO_HARD, 42, probe, aim);
+      expect(['won', 'lost']).toContain(r.state.phase);
+      expect(r.state.integrity).toBe(
+        Math.max(0, TURRET_SCENARIO_HARD.integrity - r.state.stats.pointsLost),
+      );
+      if (r.state.phase === 'won') {
+        expect(r.state.stats.kills + r.state.stats.breaches).toBe(r.monsters);
+      }
+    }
+  });
+
+  // The Veterans' Test is the hardest by its medals, not its length, and the Recruit's
+  // Trial climbs over seven gentle waves rather than three quick ones. The 2 to 4 minute
+  // band is the design's for a 1 s aimer; this sloppy one fires sooner, so its runs are a
+  // little shorter.
+  it('keeps every trial within 2 to 4 minutes for the same aimer', () => {
+    for (const s of TURRET_SCENARIOS) {
+      const seconds = fullRun(s, 42, hills, aimSloppily).seconds;
+      expect(seconds, s.boardKey).toBeGreaterThan(120);
+      expect(seconds, s.boardKey).toBeLessThan(240);
+    }
+  });
+});

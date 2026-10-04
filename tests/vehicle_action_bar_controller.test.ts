@@ -7,6 +7,7 @@ import { createForgeWorkshop } from '../src/sim/minigames/forge_workshop';
 import { applyGliderBoost } from '../src/sim/minigames/glider_boost';
 import { createGliderFlightState } from '../src/sim/minigames/glider_flight';
 import type { Entity, VehicleSession, WorldQuestProgress } from '../src/sim/types';
+import { TURRET_SEATED_CLASS } from '../src/ui/hud/vehicle/turret_hud_controller';
 import {
   GLIDER_PITCH_TAP_MS,
   VehicleActionBarController,
@@ -26,6 +27,8 @@ it('uses slot 1 for flight boost only, shows cooldown and restores the bar after
   const glider = createGliderFlightState();
   const world = {
     vehicleSession: null as VehicleSession | null,
+    turretSession: null,
+    turretClock: null,
     worldQuestLog: new Map<string, WorldQuestProgress>([
       [
         GLIDER_QUEST_ID,
@@ -133,6 +136,8 @@ it('elides unchanged frames, routes all three buttons, and restores normal contr
   document.body.append(ui);
   const world = {
     vehicleSession: null as VehicleSession | null,
+    turretSession: null,
+    turretClock: null,
     enterVehicle: vi.fn(),
     useVehicleAction: vi.fn(),
     leaveVehicle: vi.fn(() => {
@@ -171,6 +176,8 @@ it('elides unchanged frames, routes all three buttons, and restores normal contr
   controller.update();
   expect(cancel).toHaveBeenCalledTimes(1);
   expect(document.body.classList.contains('operating-vehicle')).toBe(true);
+  // The cannon keeps its player-frame lift and XP rail: only the turret seat hides them.
+  expect(document.body.classList.contains(TURRET_SEATED_CLASS)).toBe(false);
   expect(document.querySelector('.vehicle-bar-title')!.textContent).toBe('North Watch Cannon');
   world.vehicleSession.stationId = 'last_keep_cannon';
   controller.update();
@@ -256,6 +263,8 @@ it('shows the forge workshop panel as a centred overlay outside the managed wind
   };
   const world = {
     vehicleSession: null as VehicleSession | null,
+    turretSession: null,
+    turretClock: null,
     player: { dead: false } as Entity,
     pickUpObject: vi.fn(),
     worldQuestTime: 0,

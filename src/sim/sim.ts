@@ -46,7 +46,7 @@ import type { TreasureMapProgress } from './content/treasure_maps';
 import type { FactionId } from './factions';
 import type { ItemCopyAnchor } from './item_copy_anchor';
 import * as treasureVaultMod from './treasure_vault';
-import type { CannonActionId, CannonPoint, VehicleSession } from './types';
+import type { CannonPoint, VehicleActionId, VehicleSeat, VehicleSession } from './types';
 import * as vehicleMod from './vehicles';
 
 export type { CharacterState, PetState } from './character_state';
@@ -298,6 +298,7 @@ import { applyKnockback as applyKnockbackImpl } from './knockback';
 import {
   type DeedsLeaderboardPage,
   type DevLeaderboardPage,
+  emptyDailyRewardLeaderboardPage,
   type GuildLeaderboardPage,
   type GuildRosterInfo,
   LEADERBOARD_PAGE_SIZE,
@@ -693,6 +694,7 @@ import {
 } from './talent_save_migration';
 import * as ferryMod from './transport_ferry';
 import type { TransportFerryView } from './transport_schedule';
+import { turretSavePosition } from './turret_save_position';
 import { updateAbilityDrill } from './tutorial/ability_drill';
 import { updateGauntletRuns } from './tutorial/gauntlet_run';
 import { updateTutorialGreeting } from './tutorial/greeting';
@@ -715,7 +717,6 @@ export type { MarketSave } from './market';
 
 import { updateBreath } from './breath';
 import { updateSwimFatigue } from './fatigue';
-import { personalGliderLeaderboard as gliderRecordsPage } from './glider_personal_records';
 import { spawnStaticWorldObjects } from './ground_object_spawns';
 import { chainPullInstanceOnBossAggro } from './instances/boss_chain_pull';
 import { buyCrucibleVendorItem as buyCrucibleVendorItemImpl } from './instances/crucible_vendor';
@@ -784,6 +785,7 @@ import * as weeklyQuestMod from './weekly_quests';
 import * as questActivity from './world_quest_activity';
 import { worldQuestCreditBindings } from './world_quest_context';
 import { dropWorldQuestDeliveryCargoForPlayer } from './world_quest_delivery';
+import { personalWorldQuestLeaderboard as wqRecordsPage } from './world_quest_personal_records';
 import * as worldQuestState from './world_quest_state';
 import { savedWorldQuestState } from './world_quest_state';
 import * as worldQuestMod from './world_quests';
@@ -1357,7 +1359,7 @@ export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState {
   // persisted: src/sim/mount_race.ts owns the rules. Strictly per-player, so
   // simultaneous racers never share or contend on anything.
   mountRace?: MountRaceSession | null;
-  vehicle?: VehicleSession | null;
+  vehicle?: VehicleSeat | null;
   vehicleRetryAtTick?: number;
   // Optional QoL preference (issue #1358): when true, every target-switch
   // selector in targeting.ts (targetEntity, tabTarget, targetNearestEnemy,
@@ -2227,10 +2229,10 @@ export class Sim {
       raidResetMs: cfg.raidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_RAID_LOCKOUT_MS),
       weeklyRaidResetMs:
         cfg.weeklyRaidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_WEEKLY_RAID_LOCKOUT_MS),
-      // Carried through so the renderer (which reaches the Sim as IWorld) can read
-      // the same custom world via sim.cfg.world. Undefined for the built-in world.
+      // Carried through for the renderer (it reads sim.cfg.world); unset when built in.
       world: cfg.world,
       perfLap: cfg.perfLap,
+      privateSalt: cfg.privateSalt,
       idleMobTickRadius: cfg.idleMobTickRadius ?? 0,
     };
     const activeWorldContent = getActiveWorldContent();
@@ -3882,8 +3884,7 @@ export class Sim {
         e.resource,
         e.savedMana,
       ),
-      pos: ferryMod.ferrySavePosition(e), // never the sea: a ride saves the destination pier
-      facing: e.facing,
+      ...turretSavePosition(meta.vehicle, e), // pos and facing: never the arena, never the sea
       // Death state: a released spirit resumes its corpse run on relog, and a
       // dead-but-unreleased corpse auto-releases on load (see addPlayer).
       dead: e.dead,
@@ -4208,13 +4209,19 @@ export class Sim {
   get vehicleSession(): VehicleSession | null {
     return this.vehicleSessionFor(this.primaryId);
   }
+  get turretSession(): vehicleMod.TurretSessionView | null {
+    return vehicleMod.turretSessionFor(this.ctx, this.primaryId);
+  }
+  get turretClock(): number | null {
+    return vehicleMod.turretClockFor(this.ctx, this.primaryId);
+  }
   vehicleSessionFor(pid?: number): VehicleSession | null {
     return vehicleMod.vehicleSessionFor(this.ctx, pid);
   }
   enterVehicle(stationId: string, pid?: number): boolean {
     return vehicleMod.enterVehicle(this.ctx, stationId, pid);
   }
-  useVehicleAction(action: CannonActionId, point: CannonPoint, pid?: number): boolean {
+  useVehicleAction(action: VehicleActionId, point: CannonPoint, pid?: number): boolean {
     return vehicleMod.useVehicleAction(this.ctx, action, point, pid);
   }
   leaveVehicle(pid?: number): void {
@@ -4598,14 +4605,7 @@ export class Sim {
     page = 0,
     pageSize = LEADERBOARD_PAGE_SIZE,
   ): Promise<DailyRewardLeaderboardPage> {
-    return Promise.resolve({
-      day: '1970-01-01',
-      leaders: [],
-      page: Math.max(0, Math.floor(page)),
-      pageCount: 1,
-      total: 0,
-      pageSize,
-    });
+    return Promise.resolve(emptyDailyRewardLeaderboardPage(page, pageSize));
   }
   async spinDailyReward(): Promise<DailyRewardSpinResult> {
     const status = await this.dailyRewards();
@@ -4657,13 +4657,16 @@ export class Sim {
   get treasureMap(): Readonly<TreasureMapProgress> | null {
     return this.primary.treasureMap;
   }
+  get fireAndFlyRecruitment() {
+    return this.primary.fireAndFlyRecruitment;
+  }
+  get fireAndFlyRecords() {
+    return this.primary.fireAndFlyRecords;
+  }
   canRerollWorldQuest(questId: string, pid?: number): { canReroll: boolean; reason?: string } {
     const meta = pid !== undefined ? this.players.get(pid) : this.primary;
     if (!meta) return { canReroll: false, reason: 'Player not found.' };
-    const player = this.entities.get(meta.entityId);
-    const level = player?.level ?? 20;
-    const cycle = meta.devWorldQuestCycle ?? this.ctx.currentWorldQuestRotation().cycle;
-    return worldQuestMod.canRerollWorldQuest(meta, questId, cycle, level);
+    return worldQuestMod.canRerollWorldQuestNow(this.ctx, meta, questId);
   }
   rerollWorldQuest(questId: string, pid?: number): boolean {
     const meta = pid !== undefined ? this.players.get(pid) : this.primary;
@@ -8975,7 +8978,7 @@ export class Sim {
     return this.ctx.weeklyRaidResetMs(this.ctx.lockoutNowMs());
   }
   worldQuestLeaderboard(board: string, page = 0, pageSize = LEADERBOARD_PAGE_SIZE) {
-    return Promise.resolve(gliderRecordsPage(this.primary, board, this.resetDay, page, pageSize));
+    return Promise.resolve(wqRecordsPage(this.primary, board, this.resetDay, page, pageSize));
   }
   rotateWorldQuestPuzzleTile(questId: string, tileIndex: number, pid?: number): void {
     worldQuestMod.rotateWorldQuestPuzzleTile(this.ctx, questId, tileIndex, pid);

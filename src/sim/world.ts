@@ -32,7 +32,6 @@ import { dawnholdPadTarget, dawnholdPadWeight } from './dawnhold_layout';
 import { dockSurfaceHeight, onHarborPlanks } from './deck_surfaces';
 import { isExcludedDecoration } from './decoration_exclusions';
 import { dungeonFloorLift } from './dungeon_floor';
-import { dawnholdKeepLiftAt, lastKeepLiftAt } from './dungeon_layout';
 import { applyEastbrookVaultPad } from './eastbrook_vault_terrain';
 import {
   EMBER_FLAT_POOLS,
@@ -44,6 +43,7 @@ import {
 import { applyFarshoreShipwreckShore } from './farshore_shipwreck_shore';
 import { GALE_DECK_FREEBOARD } from './gale_harbor';
 import { applyGliderApproachPath } from './glider_approach_path';
+import { interiorGroundLift } from './interior_ground_lift';
 import { applyKeepSitePad, keepSitePadWeight } from './keep_site';
 import { reachDeckClear, reachDeckSurface } from './reach_decks';
 import { fbm2, hash2, noise2 } from './rng';
@@ -67,7 +67,6 @@ import { cragLayer, highlandMask, reliefBase, ridged2, warpedCoords } from './te
 import { applyGardenwalkWestPass, applyThornpeakPocketGrade } from './thornpeak_walk_grades';
 import type { BiomeId, HeightStamp, ZoneDef } from './types';
 import { overworldWalkSurface } from './walk_lifts';
-import { wildheartFieldHeight } from './wildheart_field';
 import { applyWispMazePad } from './wisp_maze_ground';
 
 // Terrain is a pure function of (x, z, seed): both the sim (ground clamping)
@@ -3830,23 +3829,12 @@ export function groundHeight(x: number, z: number, seed: number): number {
   }
   if (x > DUNGEON_X_THRESHOLD) {
     const dungeon = dungeonAt(x);
-    if (dungeon?.interior === 'wildheart') {
+    // The open fields and the authored-lift keeps stand on their own floor
+    // (interior_ground_lift.ts); what you climb is what you stand on.
+    const lift = dungeon && interiorGroundLift(dungeon.interior);
+    if (dungeon && lift) {
       const origin = instanceOrigin(dungeon.index, instanceSlotForZ(z));
-      return DUNGEON_FLOOR_Y + wildheartFieldHeight(x - origin.x, z - origin.z);
-    }
-    if (dungeon?.interior === 'lastkeep') {
-      // The Last Keep's authored rooms carry per-room lifts (door ramps
-      // become stairs); the renderer builds risers and stairs from the same
-      // authoredLiftAt field, so what you climb is what you stand on.
-      const origin = instanceOrigin(dungeon.index, instanceSlotForZ(z));
-      return DUNGEON_FLOOR_Y + lastKeepLiftAt(x - origin.x, z - origin.z);
-    }
-    if (dungeon?.interior === 'dawnhold') {
-      // Dawnhold Castle's interior rides the same authored-lift idiom as the
-      // Last Keep: the solar story and its stair ramps come from the shared
-      // room plan (src/sim/dungeon_layout.ts).
-      const origin = instanceOrigin(dungeon.index, instanceSlotForZ(z));
-      return DUNGEON_FLOOR_Y + dawnholdKeepLiftAt(x - origin.x, z - origin.z);
+      return DUNGEON_FLOOR_Y + lift(x - origin.x, z - origin.z);
     }
     // Every other interior is the flat room floor plus the raised boss dais
     // where its room plan stacks one (dungeon_floor.ts).

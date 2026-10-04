@@ -387,6 +387,20 @@ describe('mobile window layout CSS', () => {
     );
   });
 
+  it('floors the Gunnery Board rows at 40px under any coarse pointer, tablets included', () => {
+    // Each row is a tap target. The short-phone block in hud.mobile.css never reaches a
+    // touch tablet, so the floor keys on the pointer.
+    const components = readFileSync(
+      new URL('../src/styles/components.css', import.meta.url),
+      'utf8',
+    )
+      .replace(/\r\n/g, '\n')
+      .replace(/\/\*[\s\S]*?\*\//g, '');
+    expect(components).toMatch(
+      /@media \(pointer: coarse\) \{\s*#quest-dialog \.gb-row \{[^}]*min-height: 40px;/,
+    );
+  });
+
   it('clips the mobile action-page indicator instead of wrapping a locale-widened label (#2975)', () => {
     // hudChrome.mobile.actionPageIndicator's English value is a bare digit, but
     // a locale can translate it into a real word (ja_JP appends "ページ"). Without

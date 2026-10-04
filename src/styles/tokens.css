@@ -1171,6 +1171,14 @@
       rgb(64 0 0 / 47%) 0%,
       rgb(48 0 0 / 73%) 100%
     );
+    /* The red screen edge shared by the low-health vignette and the Fire and Fly
+       hit flash (#turret-hit-vignette), so a strike reads as the same danger. */
+    --low-health-veil: radial-gradient(
+      ellipse at center,
+      rgb(120 0 0 / 0%) 42%,
+      rgb(150 0 0 / 35%) 74%,
+      rgb(190 0 0 / 85%) 100%
+    );
     /* Mana warnings retain their dynamic cool halo and inner glint. */
     --shadow-low-resource-mana:
       0 0 5px 1px rgb(150 205 255 / var(--lr-opacity)), inset 0 0 4px rgb(220 240 255 / 90%);

@@ -11,6 +11,8 @@ import type { RealmBuilderHonour } from './content/realm_builders';
 import type { TreasureMapRarity } from './content/treasure_maps';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { GliderFlightResult, GliderFlightState } from './minigames/glider_flight';
+import type { TurretDefenseState, TurretEvent } from './minigames/turret_defense';
+import type { TurretFeedback } from './minigames/turret_feedback';
 import type { WispMazeState } from './minigames/wisp_maze';
 import type { FishingCatchBand } from './professions/fishing_bands';
 import type { HarvestYield } from './professions/harvest_yields';
@@ -4177,7 +4179,8 @@ export interface DungeonDef {
     | 'ignivar_depths'
     | 'wildheart'
     | 'lastkeep'
-    | 'dawnhold';
+    | 'dawnhold'
+    | 'fire_and_fly';
   /**
    * What dresses this dungeon's wall-side obstacle slots (matches the render
    * variant): coffins get one standable lid, cargo splits into the crate
@@ -4880,6 +4883,8 @@ export type WorldQuestObjective =
   | { type: 'shadow'; instructorNpcId: string }
   | { type: 'forging'; instructorNpcId: string }
   | { type: 'wisp_maze'; instructorNpcId: string }
+  /** Fire and Fly: the instructor seats the player in their own arena (turret_defense_session.ts). */
+  | { type: 'turret'; instructorNpcId: string }
   | { type: 'vehicle'; stationId: string }
   | {
       type: 'tracing';
@@ -6926,6 +6931,10 @@ export type SimEvent = { pid?: number } & (
    *  wording under questUi.worldQuest.banner.<banner>). */
   | { type: 'worldQuestBanner'; banner: WorldQuestBannerId }
   | ({ type: 'cannonResult' } & CannonResult)
+  /** One Fire and Fly engine event for the seated owner, as plain data, with the
+   *  feedback ring entry it was recorded as (turret_feedback.ts): an online mirror
+   *  rebuilds the ring from these. */
+  | { type: 'turretDefense'; pid: number; seq: number; tick: number; event: TurretEvent }
   /** One finished scoreboard attempt (src/sim/world_quest_scoreboards.ts); the
    *  server keeps the character's best row per board. */
   | {
@@ -6934,6 +6943,16 @@ export type SimEvent = { pid?: number } & (
       medal: WorldQuestMedal | null;
       metric: number;
       resetDay?: string;
+    }
+  /** A character's Gunner's Mastery moved (src/sim/fire_and_fly_score.ts): the sum of
+   *  their best mission medals and of those runs' points, the whole row of the one
+   *  Mastery board, never a single run. */
+  | {
+      type: 'worldQuestMastery';
+      board: string;
+      stars: number;
+      points: number;
+      missions: number;
     }
   | {
       type: 'worldQuestProgress';
@@ -9089,7 +9108,16 @@ export interface SimConfig {
   // Secondary players a host adds later carry their OWN id through
   // addPlayer({ localGathererIdentity }); this field never covers them.
   gathererIdentity?: LocalGathererIdentity;
+  // A host secret keying the private mini-game draws (turret_defense_rng.ts), so a
+  // client cannot rebuild a run from the world seed and a few observed draws. Only
+  // the authoritative server sets it, from a secure random source at boot; offline
+  // and headless omit it and key the draws by the run seed alone. The sim never
+  // generates it and never puts it on a view, a wire key, a save or a log.
+  privateSalt?: PrivateSalt;
 }
+
+/** 64 secret bits as two uint32 lanes (see SimConfig.privateSalt). */
+export type PrivateSalt = readonly [number, number];
 
 export function emptyMoveInput(): MoveInput {
   return {
@@ -10204,6 +10232,237 @@ export interface CannonEncounterState {
   victoryMedal?: CannonResult['medal'];
 }
 
+/** Fire and Fly (turret defense) content shapes; data in content/turret_defense.ts. */
+export type TurretSizeClass = 'small' | 'medium' | 'large' | 'huge';
+export interface TurretSizeDef {
+  /** Divides a throw by mass ** TURRET_WEAPON.massExponent: the heavier, the shorter it flies. */
+  mass: number;
+  /** Turret points a full-health strike costs (scaled by remaining health). */
+  breachValue: number;
+  /** Body radius (yd) for the strike distance and swept collider tests. */
+  radius: number;
+  /** Standing height (yd): a flying body whose feet pass below it knocks this one over. */
+  height: number;
+}
+/** A fast, low flying body (a corpse included) knocks the grounded monsters it passes through. */
+export interface TurretBowlingDef {
+  enabled: boolean;
+  /** A flyer knocks only while moving faster than this across (yd/s). */
+  minSpeed: number;
+  /** Contact reach as a multiple of the two body radii summed. */
+  reachScale: number;
+  /** Share of the flyer's horizontal velocity the struck body takes, times sqrt(flyer mass / struck mass). */
+  transfer: number;
+  /** Upward launch of the struck body (yd/s), over sqrt(its mass). */
+  pop: number;
+  /** Knock damage as a share of the wave's core damage (at least 1). */
+  damageShare: number;
+  /** Share of its horizontal speed a flyer keeps through each knock. */
+  flyerKeep: number;
+  /** A lying body's top as a share of its standing height. */
+  lyingHeight: number;
+}
+export interface TurretWaveEntry {
+  templateId: string;
+  count: number;
+  /** Inside the template's own minLevel..maxLevel. */
+  level: number;
+  /** Spawns after every other entry of its group (walkers and the bricks built on them only). */
+  bossLast?: boolean;
+  /** Multiplies the template's health (absent: 1). */
+  hpScale?: number;
+  /** Multiplies the template's march speed (absent: 1). */
+  speedScale?: number;
+  /**
+   * With it, each monster draws its own pace between `speedScale` (absent: 1) and this
+   * scale of its template's march speed (minigames/turret_pace.ts).
+   */
+  speedScaleMax?: number;
+  /** A pack's member only: it gathers with the pack and breaks out at its own pace at the departure. */
+  role?: 'scout';
+  /**
+   * A pack's member only: the pack's leader is the first of these monsters, who gives the
+   * departure cue; fallen, the first living monster of its kind cries in its place, and with
+   * none left the cue is silent.
+   */
+  leads?: boolean;
+}
+/**
+ * A monster kind's role (minigames/turret_rally.ts): a scout gathers with its pack and breaks
+ * out at its own pace at the departure; a sprint group's (the `sprint` brick) never gathers
+ * and runs straight in.
+ */
+export type TurretWaveRole = 'scout' | 'sprint';
+/** Where walkers come from around the spawn ring; widths are shares of a full turn. */
+export type TurretSidesDef =
+  /** Anywhere on the ring. */
+  | { kind: 'ring' }
+  /** One side. */
+  | { kind: 'arc'; widthTurn: number }
+  /** Two or three sides evenly apart, the group's monsters taking them in turn. */
+  | { kind: 'flanks'; count: 2 | 3; widthTurn: number };
+/** The spawn gap band of a group whose monsters come one at a time (ticks, drawn per monster). */
+export interface TurretGapDef {
+  gapMinTicks: number;
+  gapMaxTicks: number;
+}
+/**
+ * A wave's group: its monsters and how they come (its brick, minigames/turret_wave_groups.ts).
+ * Every side is a private draw per wave and group, so a run keeps its sides secret and a
+ * replay of the same seed keeps them.
+ */
+export type TurretBrickDef =
+  /** Single monsters at intervals from the ring, one side, or two or three (absent: the ring). */
+  | ({ brick: 'walkers'; sides?: TurretSidesDef } & TurretGapDef)
+  /**
+   * Bunches of `size` close together, each from its own side: inside a bunch the gap band,
+   * between bunches `bunchGapTicks`.
+   */
+  | ({ brick: 'smallGroup'; size: number; bunchGapTicks: number; widthTurn: number } & TurretGapDef)
+  /**
+   * A pack: its members spawn spread over `spreadTicks` on an arc of its side, walk to a rally
+   * drawn in the band, stand there until its leader's cue (all of them standing, or `holdTicks`
+   * after the first gathering arrival), then advance on the tower at one pace, `advanceScale`
+   * of its slowest gathering member's template march (minigames/turret_rally.ts). The packs of
+   * a wave take sides evenly apart.
+   */
+  | {
+      brick: 'pack';
+      minRadius: number;
+      maxRadius: number;
+      holdTicks: number;
+      spreadTicks: number;
+      widthTurn: number;
+      advanceScale: number;
+    }
+  /**
+   * A pack wave's sprint group: spawned spread over `spreadTicks` from the side between the
+   * wave's first two packs, it never gathers and runs straight in.
+   */
+  | { brick: 'sprint'; spreadTicks: number; widthTurn: number }
+  /**
+   * Surgers (minigames/turret_surgers.ts): `sides` bunches of fast monsters that set off away
+   * from the action, the bunches evenly apart from it (one: opposite), each on an arc of
+   * `widthTurn`; its monsters take the bunches in turn, one spawn gap apart.
+   */
+  | ({ brick: 'surgers'; sides: number; widthTurn: number } & TurretGapDef)
+  /**
+   * The big one: a large or huge monster, alone or with an escort, from one side; its entries
+   * interleave like any group's (`bossLast` holds it to the end).
+   */
+  | ({ brick: 'bigOne'; widthTurn: number } & TurretGapDef)
+  /** A surge: many fast monsters in a short time from one side or two. */
+  | ({ brick: 'surge'; sides: 1 | 2; widthTurn: number } & TurretGapDef);
+export type TurretGroupDef = TurretBrickDef & {
+  entries: readonly TurretWaveEntry[];
+  /**
+   * Ticks from the wave's first spawn tick (its start, or the tick after the clear on a
+   * chained wave) to the group's first spawn (absent: 0).
+   */
+  delayTicks?: number;
+};
+/** The bodies a crown lot is laid for: small ones, or medium, large and huge ones. */
+export type TurretCrownSize = 'small' | 'large';
+/**
+ * A lot's kegs in tight clusters (minigames/turret_keg_clusters.ts): `cluster` kegs 1.5 to
+ * 2 yd apart around one spot, so lighting one sets off the rest; `clusters` of the lot's
+ * spots, the first ones, come as clusters (absent: all). Each keg counts against the cap.
+ */
+export interface TurretKegClusterDef {
+  cluster?: 2 | 3;
+  clusters?: number;
+}
+/**
+ * A wave's kegs (minigames/turret_keg_lots.ts), every lot placed at the wave's start, never
+ * mid-combat; a keg that finds no clear spot is left out, and the kegs standing never pass
+ * the wave's cap. A spaced lot (`spaced`, every crown lot, every lot with clusters) stands
+ * each keg or cluster out of chain reach of every other keg standing, and every lot laid
+ * after it keeps its kegs as far from them (TURRET_KEG_SPACING.isolated).
+ */
+export type TurretKegLotDef =
+  /**
+   * `count` spots spread evenly around the field at a drawn distance in the band; `lanes`:
+   * inside the sides the wave's groups come through, in turn.
+   */
+  | ({
+      mode: 'random';
+      count: number;
+      minRadius: number;
+      maxRadius: number;
+      lanes?: true;
+      spaced?: true;
+    } & TurretKegClusterDef)
+  /** `count` spots in the band where a slam's thrown bodies of `size` come down. */
+  | ({ mode: 'crown'; count: number; size: TurretCrownSize } & TurretKegClusterDef)
+  /**
+   * On the route of the wave's `group` (its side drawn at the wave's start; never a surger's):
+   * a pack's 12 to 16 yd tower-side of its rally, any other group's at a drawn distance from
+   * the tower between `minRadius` and `maxRadius` (absent: the keg ring band; never on a
+   * pack, whose band its rally sets), just off the axis ('front') or at the column's rim
+   * ('side'), or just off the axis at `fromTower` yd ('axis'); never within a keg blast of a
+   * pack gathering at its rally.
+   */
+  | {
+      mode: 'path';
+      group: number;
+      placement: 'front' | 'side';
+      minRadius?: number;
+      maxRadius?: number;
+      spaced?: true;
+      cluster?: 2 | 3;
+    }
+  | {
+      mode: 'path';
+      group: number;
+      placement: 'axis';
+      fromTower: number;
+      spaced?: true;
+      cluster?: 2 | 3;
+    };
+export interface TurretWaveDef {
+  /** In order: a group's index names it (a path keg lot's `group`) and orders a tick's spawns. */
+  groups: readonly TurretGroupDef[];
+  /** Damage of a core hit. */
+  coreDamage: number;
+  kegs?: readonly TurretKegLotDef[];
+  /** Kegs standing at once, this wave's included (absent: TURRET_EXPLOSIVE_BARREL.cap). */
+  kegCap?: number;
+}
+/** A medal's bar at the end of a won run: bronze is any win. */
+export interface TurretMedalBar {
+  /** The share of the scenario's tower points still standing, above 0 and at most 1. */
+  minIntegrityShare: number;
+}
+export interface TurretMedalBars {
+  gold: TurretMedalBar;
+  silver: TurretMedalBar;
+}
+/** Limited-weapon charges per run (absent or 0: none). */
+export interface TurretArsenalDef {
+  shockwave?: number;
+  fragmentation?: number;
+}
+/** A run's supply: every mission's, and the Veterans' Test's resupply (absent: none, no bonus). */
+export interface TurretSupplyDef {
+  /** Waves (from 1) whose end gives one charge more of every weapon the arsenal holds. */
+  resupplyAfterWaves: readonly number[];
+  /** A won run scores every charge it leaves unused (minigames/turret_result.ts). */
+  unusedChargeBonus: boolean;
+}
+/** One Fire and Fly scenario (a difficulty); data in content/fire_and_fly_scenarios.ts. */
+export interface TurretScenarioDef {
+  /** Frozen and player-invisible. */
+  id: string;
+  /** Frozen short key for board ids: fire_and_fly_<key>_v<version>_<period>. */
+  boardKey: string;
+  waves: readonly TurretWaveDef[];
+  /** Tower points at the start. */
+  integrity: number;
+  medals: TurretMedalBars;
+  arsenal?: TurretArsenalDef;
+  supply?: TurretSupplyDef;
+}
+
 export interface VehicleStationDef {
   id: string;
   entityId: number;
@@ -10221,3 +10480,52 @@ export interface VehicleSession {
   origin: Vec3;
   encounter: CannonEncounterState;
 }
+
+/** Where a player stood, and faced, before a seat moved them away. */
+export interface TurretReturnPoint {
+  x: number;
+  y: number;
+  z: number;
+  facing: number;
+}
+
+/** The Fire and Fly seat on the tower roof of the player's own arena
+ *  (src/sim/turret_defense_session.ts). Never included in character saves. */
+export interface TurretSession {
+  kind: 'turret';
+  /** The player's feet on the roof; the tower (the engine's center) stands under it. */
+  origin: Vec3;
+  defense: TurretDefenseState;
+  /** The mount ridden before the seat ('' on foot), restored on leave while alive and still held. */
+  priorMountKey: string;
+  /** Leaving the seat also leaves the arena, back exactly here. */
+  returnTo: TurretReturnPoint;
+  /** The newest engine events, oldest first (minigames/turret_feedback.ts). */
+  feedback: TurretFeedback[];
+  nextFeedbackSeq: number;
+  /** The owner's pet waits in the pet stash for the seat, handed back as it ends. */
+  petParked?: boolean;
+  /** The world quest run this seat is, captured when the instructor seated it; absent on a dev seat. */
+  worldQuest?: TurretWorldQuestRun;
+}
+
+/** Which world quest row a Fire and Fly seat answers to, fixed at the seat. */
+export interface TurretWorldQuestRun {
+  questId: string;
+  /** The character's world quest cycle at the seat; a run from another day never pays. */
+  cycle: string;
+  /** A replay after the day's reward: it never pays and never credits. */
+  practice: boolean;
+  /** Set once the won run's score went to the ladders (fire_and_fly_score.ts). */
+  scored?: boolean;
+}
+
+/** What `PlayerMeta.vehicle` holds: every seat gate keys on its presence, not its kind. */
+export type VehicleSeat = VehicleSession | TurretSession;
+
+export type VehicleActionId =
+  | CannonActionId
+  | 'turret_fire'
+  | 'turret_replay'
+  | 'turret_shockwave'
+  | 'turret_frag';

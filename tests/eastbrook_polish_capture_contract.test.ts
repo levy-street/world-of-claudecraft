@@ -700,7 +700,11 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '164b585f770570b773faa8e35c466bcd4ab2840a6572507aa9528bc52572cbc5';
+  // Re-minted for Fire and Fly: the renderer leaf moved (sky painters extracted, the turret
+  // host line). No capture was retaken.
+  // Re-minted for Fire and Fly's fragmentation landing marks (the renderer leaf moved).
+  // No capture was retaken.
+  'acc900b43bf565a4613c43234f6fb750e3d5b4e6136babab65e8364556aa3a6a';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

@@ -823,6 +823,235 @@
     font-size: 13px;
     margin: 8px 0 4px;
   }
+  /* Master Gunner Alder's Gunnery Board (src/ui/hud/quest/gunnery_board_window.ts), painted
+     into the quest dialog: the trials and missions in a well on the left, the picked one's
+     brief and facts on the right, its one action at the foot of the detail. */
+  #quest-dialog:has(> .gb) {
+    width: min(780px, calc(var(--app-vw, 100vw) / var(--window-scale) - 24px));
+  }
+  #quest-dialog .gb-head {
+    gap: var(--spacing-sm);
+  }
+  #quest-dialog .gb-heading {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-width: 0;
+  }
+  #quest-dialog .gb-speaker {
+    margin-left: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #quest-dialog .gb-progress {
+    display: flex;
+    flex: none;
+    gap: 6px;
+  }
+  /* The head carries the progress chips, so the close button takes its place in the row
+     instead of floating over their end. */
+  #quest-dialog .gb-head > .x-btn {
+    position: static;
+    flex: none;
+    transform: none;
+  }
+  #quest-dialog .gb-chip {
+    font-family: var(--font-ui);
+    letter-spacing: 0;
+    text-shadow: none;
+  }
+  #quest-dialog .gb-greeting {
+    margin: 8px 2px 10px;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--color-text-secondary);
+  }
+  #quest-dialog .gb-split {
+    display: grid;
+    grid-template-columns: minmax(200px, 240px) minmax(0, 1fr);
+    gap: 12px;
+    align-items: stretch;
+  }
+  #quest-dialog .gb-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px;
+  }
+  #quest-dialog .gb-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  #quest-dialog .gb-group-title {
+    margin: 6px 6px 2px;
+    font-family: var(--title-font);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  #quest-dialog .gb-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 32px;
+    padding: 4px 8px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-light);
+    font-size: 13px;
+    cursor: pointer;
+  }
+  /* The touch floor keys on the pointer, not on the short-phone block, so a touch tablet's
+     rows reach it too. */
+  @media (pointer: coarse) {
+    #quest-dialog .gb-row {
+      min-height: 40px;
+    }
+  }
+  #quest-dialog .gb-row:hover {
+    background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  }
+  #quest-dialog .gb-row.is-on {
+    border-color: var(--color-accent);
+    background: color-mix(in srgb, var(--color-accent) 20%, transparent);
+  }
+  #quest-dialog .gb-row:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  #quest-dialog .gb-row-locked .gb-row-name {
+    color: var(--color-text-muted);
+  }
+  #quest-dialog .gb-row-name {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  #quest-dialog .gb-medal {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1px solid var(--gb-tint, var(--color-ranking-control-border));
+    background-color: var(--color-wq-ranking-art-ground);
+    background-image:
+      var(--gb-medal, none),
+      linear-gradient(
+        160deg,
+        var(--gb-tint, var(--color-ranking-control-border)),
+        var(--color-wq-ranking-art-violet)
+      );
+    background-position: center;
+    background-size: cover;
+  }
+  #quest-dialog .gb-medal-gold {
+    --gb-tint: var(--color-wq-ranking-gilt);
+  }
+  #quest-dialog .gb-medal-silver {
+    --gb-tint: var(--color-ranking-place-second);
+  }
+  #quest-dialog .gb-medal-bronze {
+    --gb-tint: var(--color-ranking-place-third);
+  }
+  #quest-dialog .gb-dash {
+    flex: none;
+    width: 10px;
+    height: 2px;
+    margin-inline: 4px;
+    background: var(--color-text-faint);
+  }
+  #quest-dialog .gb-lock,
+  #quest-dialog .gb-won {
+    display: inline-flex;
+    flex: none;
+    color: var(--color-text-faint);
+  }
+  #quest-dialog .gb-won {
+    color: var(--color-accent);
+  }
+  #quest-dialog .gb-lock .ui-icon,
+  #quest-dialog .gb-won .ui-icon,
+  #quest-dialog .gb-locked .ui-icon {
+    width: 13px;
+    height: 13px;
+  }
+  #quest-dialog .gb-detail {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 10px 12px;
+  }
+  #quest-dialog .gb-kicker {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+  #quest-dialog .gb-name {
+    margin: 2px 0 6px;
+    font-family: var(--title-font);
+    font-size: 18px;
+    font-weight: normal;
+    color: var(--gold);
+  }
+  #quest-dialog .gb-brief {
+    margin: 0 0 10px;
+    font-family: var(--font-serif);
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--color-text-light);
+  }
+  #quest-dialog .gb-facts {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 5px 12px;
+    margin: 0;
+    font-size: 12px;
+  }
+  #quest-dialog .gb-fact {
+    display: contents;
+  }
+  #quest-dialog .gb-fact dt {
+    color: var(--color-text-muted);
+  }
+  #quest-dialog .gb-fact dd {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    color: var(--color-text-light);
+  }
+  #quest-dialog .gb-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  #quest-dialog .gb-weapon.is-empty {
+    opacity: 0.55;
+  }
+  #quest-dialog .gb-fact-reward.is-collected dd {
+    color: var(--color-text-muted);
+  }
+  #quest-dialog .gb-locked {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 0 8px;
+    font-size: 12px;
+    color: var(--color-warning);
+  }
+  #quest-dialog .gb-foot {
+    margin-top: auto;
+    padding-top: 12px;
+  }
+  #quest-dialog .gb-action {
+    width: 100%;
+  }
   .qd-obj {
     font-size: 12px;
     color: var(--color-text-muted);
@@ -4800,6 +5029,18 @@
     grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: clamp(6px, 1cqw, 16px);
     flex: none;
+  }
+  #world-quest-leaderboard-window .wql-cards:has(> .wql-card:last-child:nth-child(5)) {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+  body:not(.mobile-touch) #world-quest-leaderboard-window .wql-cards:has(> .wql-card:only-child) {
+    grid-template-columns: minmax(0, 1fr);
+    width: calc((100% - 5 * clamp(6px, 1cqw, 16px)) / 6);
+    margin-inline: auto;
+  }
+  #world-quest-leaderboard-window .wql-groups {
+    flex: none;
+    margin-bottom: 6px;
   }
   #world-quest-leaderboard-window .wql-card {
     display: grid;

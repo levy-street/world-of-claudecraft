@@ -34,7 +34,6 @@
 // to a color, never the resolved color.
 
 import type { GatheringProfessionId } from '../sim/content/professions';
-import { GLIDER_NPC_DEF } from '../sim/content/world_quest_glider';
 import { corpseIndicatorFor } from '../sim/corpse_loot_state';
 import { GATHER_NODES, isBgPos, isDelvePos, isYumiMazePos, QUESTS, zoneAt } from '../sim/data';
 import { NODE_HARVEST_TABLE } from '../sim/professions/gathering';
@@ -64,6 +63,7 @@ import {
   mapMarkerSemanticLayer,
 } from './map_marker_semantics_core';
 import { STABLE_MAP_NAVIGATION_LANDMARKS } from './map_navigation_landmarks_core';
+import { worldQuestInstructorAnchor } from './world_quest_marker_anchor';
 
 // The painter clips the 162px minimap two pixels inside the canvas. Visibility
 // is footprint-aware: a painted square must fit its full half-diagonal inside
@@ -730,13 +730,13 @@ export function createMinimapMarkers(): MinimapMarkers {
         if (p.level < quest.minLevel) continue;
         const progress = world.worldQuestLog.get(quest.id);
         if (progress?.state === 'completed') continue;
-        const isGlider = quest.objective.type === 'glider';
-        const position = isGlider ? GLIDER_NPC_DEF.pos : quest.area;
+        const anchor = worldQuestInstructorAnchor(quest);
+        const position = anchor ?? quest.area;
         const dx = -(position.x - p.pos.x) * pxPerYard;
         const dz = -(position.z - p.pos.z) * pxPerYard;
         const distance = Math.hypot(dx, dz);
         const rim = minimapSafeCenterRadius(S, worldQuestClearance);
-        if (distance > rim + (isGlider ? 0 : quest.area.radius) * pxPerYard) continue;
+        if (distance > rim + (anchor ? 0 : quest.area.radius) * pxPerYard) continue;
         const scale = distance > rim ? rim / distance : 1;
         markers.push({
           kind: 'world-quest',

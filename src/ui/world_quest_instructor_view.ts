@@ -6,8 +6,8 @@ import { GLIDER_APPRENTICE_NPC_DEF, GLIDER_QUEST_ID } from '../sim/content/world
 import { ESCORTS, NPCS, WORLD_QUESTS, WORLD_QUESTS_BY_ID } from '../sim/data';
 import type { Entity } from '../sim/types';
 import {
+  type ActivityChoice,
   WORLD_QUEST_DIFFICULTIES,
-  type WorldQuestDifficulty,
   worldQuestOffersDifficulty,
 } from '../sim/world_quest_activity';
 import { isReplayableWorldQuest } from '../sim/world_quest_practice';
@@ -27,11 +27,17 @@ export interface WorldQuestInstructorDialogView {
   completed: boolean;
   buttonLabel: string;
   hint?: string;
-  /** Present when the activity offers a difficulty pick: one start button per
-   *  entry replaces the single start button. Order is the display order. */
-  difficulties?: readonly { difficulty: WorldQuestDifficulty; label: string }[];
+  /** Present when the activity offers a pick (the maze's difficulty): one start
+   *  button per entry replaces the single start button. Order is the display
+   *  order; `key` is the choice's stable data key. */
+  difficulties?: readonly { difficulty: ActivityChoice; key: string; label: string }[];
+  /** True when the pick is Fire and Fly's: the dialog paints Alder's Gunnery Board
+   *  (src/ui/hud/quest/gunnery_board_window.ts) instead of start buttons. */
+  gunneryBoard?: boolean;
   questId?: string;
 }
+
+type InstructorWorld = Pick<IWorld, 'worldQuestLog' | 'player'>;
 
 function difficultyChoices(
   questId: string,
@@ -39,6 +45,7 @@ function difficultyChoices(
   if (!worldQuestOffersDifficulty(questId)) return undefined;
   return WORLD_QUEST_DIFFICULTIES.map((difficulty) => ({
     difficulty,
+    key: difficulty,
     label: t(
       difficulty === 'hard'
         ? 'questUi.worldQuest.wispMaze.startHard'
@@ -73,7 +80,7 @@ export function isWorldQuestInstructorOrEscort(target: Entity): boolean {
 }
 
 export function worldQuestInstructorDialog(
-  world: Pick<IWorld, 'worldQuestLog' | 'player'>,
+  world: InstructorWorld,
   target: Entity,
 ): WorldQuestInstructorDialogView | null {
   if (!isWorldQuestInstructorOrEscort(target)) return null;
@@ -161,7 +168,8 @@ export function worldQuestInstructorDialog(
       (progress?.wispMaze && !progress.wispMaze.paused && progress.wispMaze.phase !== 'won'))
   )
     canStart = false;
-  const difficulties = canStart ? difficultyChoices(questId) : undefined;
+  const gunneryBoard = canStart && quest.objective.type === 'turret';
+  const difficulties = canStart && !gunneryBoard ? difficultyChoices(questId) : undefined;
   return {
     speakerName,
     speakerTitle,
@@ -175,5 +183,6 @@ export function worldQuestInstructorDialog(
     hint,
     questId,
     ...(difficulties ? { difficulties } : {}),
+    ...(gunneryBoard ? { gunneryBoard } : {}),
   };
 }

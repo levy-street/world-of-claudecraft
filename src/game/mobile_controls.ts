@@ -182,6 +182,9 @@ export interface MobileControlCallbacks {
   /** Commit an active ground-target spell when the finger is released. Returns
    * true when targeting consumed the gesture, so it cannot also recenter camera. */
   onGroundAimTap(x: number, y: number): boolean;
+  /** True while the move stick turns the view instead (the Fire and Fly seat, where
+   * movement is locked): its push never latches autorun there. */
+  stickTurnsView?(): boolean;
 }
 
 /**
@@ -883,6 +886,14 @@ export class MobileControls {
     // radius while the input throw above used the rendered one.
     this.moveStick.style.transform = `translate(${(x * this.moveStickRadius * 0.46).toFixed(1)}px, ${(y * this.moveStickRadius * 0.46).toFixed(1)}px)`;
     const move = mapJoystickVector(x, y, this.moveDeadzone);
+    if (this.callbacks.stickTurnsView?.()) {
+      // The seat reads the stick's sideways push as a turn; a push up must not leave
+      // autorun latched for the moment the player stands up.
+      this.moveAutorunLocked = false;
+      this.input.setTouchMove(move);
+      this.syncMoveAutorunTarget('hidden');
+      return;
+    }
     const inAutorunTarget = isMoveAutorunPush(rawY);
     if (this.moveAutorunLocked && inAutorunTarget) {
       this.input.clearTouchMove();

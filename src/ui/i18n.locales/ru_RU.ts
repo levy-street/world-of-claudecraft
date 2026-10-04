@@ -14298,6 +14298,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Вы входите в теплые, напоенные ароматом цветов залы Замка Рассвета.',
   'entities.dungeons.dawnhold_castle.leaveText':
     'Вы возвращаетесь на залитую солнцем садовую лужайку.',
+  'entities.dungeons.fire_and_fly_arena.enterText':
+    'Вы поднимаетесь на старую пушечную башню. За деревьями начинает шевелиться лес.',
+  'entities.dungeons.fire_and_fly_arena.leaveText': 'Вы спускаетесь с башни и покидаете арену.',
   'entities.items.wildheart_tuskblade.name': 'Клыкастый клинок Дикого Сердца',
   'entities.items.wildheart_hexwood_staff.name': 'Посох колдовского дерева из Котловины',
   'entities.items.wildheart_fangknife.name': 'Клыковый нож Зулгара',
@@ -19242,6 +19245,118 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Восстановление: {cooldown} сек. Попадание через {flight} сек. Общее восстановление всех выстрелов: {recovery} сек.',
   'hudChrome.vehicle.shotRules':
     'Цельтесь внутри отмеченного поля. Не расходует ману. Урон не зависит от снаряжения и талантов.',
+  'hudChrome.turretArsenal.introShock':
+    'Новое оружие: ударная волна, клавиша {shockKey}. Башня содрогается и отбрасывает всех монстров у своего подножия.',
+  'hudChrome.turretArsenal.introShockTouch':
+    'Новое оружие: ударная волна. Коснитесь её ячейки, чтобы отбросить всех монстров у подножия башни.',
+  'hudChrome.turretArsenal.introFrag':
+    'Новое оружие: осколочный снаряд, клавиша {fragKey}. Зарядите его и стреляйте по группе: он разорвётся над ней на мелкие бомбы.',
+  'hudChrome.turretArsenal.introFragTouch':
+    'Новое оружие: осколочный снаряд. Коснитесь его ячейки, чтобы зарядить, затем коснитесь группы: он разорвётся над ней на мелкие бомбы.',
+  'hudChrome.turretArsenal.shockHint':
+    'Взрывайте монстров, пока они не добрались до башни. {shockKey}: ударная волна.',
+  'hudChrome.turretArsenal.shockHintTouch':
+    'Взрывайте монстров, пока они не добрались до башни. Коснитесь ячейки, чтобы применить ударную волну.',
+  'hudChrome.turretArsenal.fragHint':
+    'Взрывайте монстров, пока они не добрались до башни. {fragKey}: осколочный снаряд.',
+  'hudChrome.turretArsenal.fragHintTouch':
+    'Взрывайте монстров, пока они не добрались до башни. Коснитесь ячейки, чтобы применить осколочный снаряд.',
+  'hudChrome.turretArsenal.resupplyBoth':
+    'Пополнение: ударная волна {shock}, осколочный снаряд {frag}',
+  'hudChrome.turretArsenal.resupplyShock': 'Пополнение: ударная волна {shock}',
+  'hudChrome.turretArsenal.resupplyFrag': 'Пополнение: осколочный снаряд {frag}',
+  'hudChrome.turretArsenal.resupplyRule':
+    'В конце волн {waves} каждое оружие получает ещё один заряд.',
+  'hudChrome.turretArsenal.resupplyRuleOnce':
+    'В конце волны {wave} каждое оружие получает ещё один заряд.',
+  'hudChrome.turretArsenal.bonusRule':
+    'Победа в задании приносит {points} очков за каждый неиспользованный заряд.',
+  'hudChrome.turretArsenal.pointsCharges': 'Сохранённые заряды ({count})',
+  'hudChrome.turret.integrity': 'Прочность башни',
+  'hudChrome.turret.integrityBelow': 'Прочность башни ниже {percent}',
+  'hudChrome.turret.tower': 'Башня',
+  'hudChrome.turret.left': 'Осталось монстров: {count}',
+  'hudChrome.turret.firstWave': 'Первая волна через {seconds} сек.',
+  'hudChrome.turret.hint': 'Взрывайте монстров, пока они не добрались до башни',
+  'hudChrome.turret.finalWave': 'Последняя волна',
+  'hudChrome.turret.clearedBanner': 'Волна {wave} отбита',
+  'hudChrome.turret.victory': 'Победа!',
+  'hudChrome.turret.defeat': 'Башня пала',
+  'hudChrome.turret.statKills': 'Убито',
+  'hudChrome.turret.statShots': 'Выстрелов',
+  'hudChrome.turret.statAccuracy': 'Точность',
+  'hudChrome.turret.statThrow': 'Самый дальний бросок',
+  'hudChrome.turret.statAirtime': 'Самый долгий полёт',
+  'hudChrome.turret.statYards': '{yards} ярд.',
+  'hudChrome.turret.statSeconds': '{seconds} сек.',
+  'hudChrome.turret.medalGold': 'Золотая медаль',
+  'hudChrome.turret.medalSilver': 'Серебряная медаль',
+  'hudChrome.turret.medalBronze': 'Бронзовая медаль',
+  'hudChrome.turret.noMedal': 'Без медали',
+  'hudChrome.turret.pointsKills': 'Убито ({count})',
+  'hudChrome.turret.pointsTower': 'Сохранность башни ({points})',
+  'hudChrome.turret.pointsKegKills': 'Убито бочками ({count})',
+  'hudChrome.turret.pointsBowled': 'Сбито с ног ({count})',
+  'hudChrome.turret.pointsTotal': 'Всего очков',
+  'hudChrome.turret.leave': 'Покинуть башню',
+  'hudChrome.turret.leaveShort': 'Покинуть',
+  'hudChrome.turret.replay': 'Ещё раз',
+  'hudChrome.turret.replayHint':
+    'Пройти то же испытание ещё раз, не покидая башни. После получения сегодняшней награды повтор больше не награждается.',
+  'hudChrome.turret.replayHintMission':
+    'Пройти то же задание ещё раз, не покидая башни. После получения сегодняшней награды повтор больше не награждается.',
+  'hudChrome.turret.leavingIn': 'Вы покинете башню через {seconds} сек.',
+  'hudChrome.turret.recruitedBanner': 'Вы в расчёте!',
+  'hudChrome.turret.recruitedLine':
+    '{name}: «Добро пожаловать в расчёт ворот, канонир. Мои задания теперь открыты для вас.»',
+  'hudChrome.turret.weapons': 'Оружие башни',
+  'hudChrome.turret.shockwave': 'Ударная волна',
+  'hudChrome.turret.shockwaveTip':
+    'Удар башней: кольцо за {seconds} сек. расходится от её стены на {reach} ярд. Каждый монстр на земле, которого оно достигает, отбрасывается от башни, что прерывает удар, который он ещё готовит, и получает {damage} ед. урона в пределах {core} ярд. от башни, дальше меньше. Монстры в воздухе пролетают над кольцом.',
+  'hudChrome.turret.shockwaveRules':
+    'Снова готова через {seconds} сек. после применения. Работает только во время волны.',
+  'hudChrome.turret.frag': 'Осколочный снаряд',
+  'hudChrome.turret.fragTip':
+    'Зарядите его, затем стреляйте по земле, как обычным снарядом. Над точкой прицеливания он разрывается на {count} суббоеприпасов: один падает в точку, {outer} ложатся кольцом радиусом {radius} ярд. вокруг неё. Каждый наносит до {damage} ед. урона в пределах {blast} ярд., отбрасывает задетых монстров и поджигает бочки.',
+  'hudChrome.turret.fragRules':
+    'Использует перезарядку пушки. Повторная зарядка или отмена убирает его без траты заряда. Работает только во время волны.',
+  'hudChrome.turret.chargesLeft': 'Осталось зарядов: {count}',
+  'hudChrome.turret.weaponsHint':
+    'Взрывайте монстров, пока они не добрались до башни. {shockKey}: ударная волна. {fragKey}: осколочный снаряд.',
+  'hudChrome.turret.weaponsHintTouch':
+    'Взрывайте монстров, пока они не добрались до башни. Коснитесь ячейки, чтобы применить ударную волну или осколочный снаряд.',
+  'hudChrome.turret.statShockwaves': 'Ударные волны',
+  'hudChrome.turret.statFrags': 'Осколочные снаряды',
+  'hudChrome.gunneryBoard.title': 'Доска канониров',
+  'hudChrome.gunneryBoard.listLabel': 'Испытания и задания',
+  'hudChrome.gunneryBoard.trials': 'Набор',
+  'hudChrome.gunneryBoard.missions': 'Задания',
+  'hudChrome.gunneryBoard.trialKicker': 'Испытание',
+  'hudChrome.gunneryBoard.missionKicker': 'Задание',
+  'hudChrome.gunneryBoard.recruitProgress': 'Пройдено испытаний: {won} из {total}',
+  'hudChrome.gunneryBoard.recruited': 'В расчёте',
+  'hudChrome.gunneryBoard.mastery': 'Мастерство канонира: {stars} из {max} звёзд',
+  'hudChrome.gunneryBoard.won': 'Пройдено',
+  'hudChrome.gunneryBoard.notWon': 'Ещё не пройдено',
+  'hudChrome.gunneryBoard.locked': 'Закрыто',
+  'hudChrome.gunneryBoard.arsenal': 'Арсенал',
+  'hudChrome.gunneryBoard.charges': '{weapon} ×{count}',
+  'hudChrome.gunneryBoard.gold': 'Золото',
+  'hudChrome.gunneryBoard.goldBar': 'Сохранить {percent} башни',
+  'hudChrome.gunneryBoard.waves': 'Волны',
+  'hudChrome.gunneryBoard.best': 'Ваш рекорд',
+  'hudChrome.gunneryBoard.bestRun': '{medal}, очков: {points}',
+  'hudChrome.gunneryBoard.notPlayed': 'Ещё не сыграно',
+  'hudChrome.gunneryBoard.reward': 'Награда за сегодня',
+  'hudChrome.gunneryBoard.rewardAvailable': 'Доступна',
+  'hudChrome.gunneryBoard.rewardCollected': 'Получена: только тренировка',
+  'hudChrome.gunneryBoard.takeTrial': 'Пройти испытание',
+  'hudChrome.gunneryBoard.takeMission': 'Взяться за задание',
+  'hudChrome.gunneryBoard.practice': 'Тренировка',
+  'hudChrome.gunneryBoard.actionAria': '{action}: {name}',
+  'hudChrome.gunneryBoard.lockedTrial': 'Пройдите «{previous}», чтобы открыть это испытание.',
+  'hudChrome.gunneryBoard.lockedMission':
+    'Пройдите «{name}», чтобы вступить в расчёт и открыть задания.',
   'hudChrome.leaderboard.tabWorldQuests': 'Локальные задания',
   'hudChrome.leaderboard.wqBoardsLabel': 'Таблицы рекордов локальных заданий',
   'hudChrome.leaderboard.wqMedal': 'Медаль',
@@ -19490,6 +19605,42 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.glider.score': 'Счёт: {score}.',
   'questUi.worldQuest.glider.medals.silver': 'Серебро',
   'questUi.worldQuest.glider.medals.bronze': 'Бронза',
+  'questUi.worldQuest.fireAndFly.title': 'Испытания канонира',
+  'questUi.worldQuest.fireAndFly.objective':
+    'Удержите собственную башню до конца всех волн одного испытания',
+  'questUi.worldQuest.fireAndFly.ready':
+    'Поговорите с мастером-канониром Олдером, чтобы пройти испытание.',
+  'questUi.worldQuest.fireAndFly.complete':
+    'Испытание пройдено! Поговорите с мастером-канониром Олдером, чтобы потренироваться.',
+  'questUi.worldQuest.fireAndFly.scenarios.introduction': 'Испытание новобранца',
+  'questUi.worldQuest.fireAndFly.scenarios.standard': 'Настоящий дозор',
+  'questUi.worldQuest.fireAndFly.scenarios.hard': 'Проверка ветеранов',
+  'questUi.worldQuest.fireAndFly.scenarios.pack': 'Стая',
+  'questUi.worldQuest.fireAndFly.scenarios.deluge': 'Потоп',
+  'questUi.worldQuest.fireAndFly.scenarios.brittle': 'Треснувшая башня',
+  'questUi.worldQuest.fireAndFly.scenarios.powder': 'Пороховой склад',
+  'questUi.worldQuest.fireAndFly.brief.introduction':
+    'Так это ты, новобранец? Вот твоя пушка: старушка с норовом, но ни одного свидания она ещё не пропустила. Сейчас из леса выйдет кое-какое зверьё, так покажи мне, что умеешь попадать туда, куда целишься.',
+  'questUi.worldQuest.fireAndFly.brief.standard':
+    'Одной пушки хватает не всегда. В каждой башне припрятан козырь, Ударная волна, что сметает всё, что толпится у подножия стен. Этой ночью ты научишься ею пользоваться, а главное, выбирать для неё момент.',
+  'questUi.worldQuest.fireAndFly.brief.hard':
+    'Вот самое разрушительное оружие, какое когда-либо выходило из мастерской оружейников: Осколочный снаряд. Он немного медлителен, но когда разрывается, вокруг ничто не устоит. Каждый канонир должен освоить его, прежде чем его имя впишут в список канониров.',
+  'questUi.worldQuest.fireAndFly.brief.pack':
+    'Наши укрепления захлёстывает! Они идут стаями, и каждая стая свирепее предыдущей, а их вой слышно даже на стенах. Помоги нам отбросить их, пока они не перехлестнули через стены!',
+  'questUi.worldQuest.fireAndFly.brief.deluge':
+    'Их сотня, а то и больше: волки, кабаны, пауки и проходчики, целый прилив мелкого зверья накатывает со всех сторон. Когда он отступает, не верь ему: он всегда возвращается сильнее, а следом бредёт кто-то покрупнее.',
+  'questUi.worldQuest.fireAndFly.brief.brittle':
+    'Старая башня в прошлом сезоне получила страшный удар, и трещина так и не сошлась. Этой ночью мертвецы поднялись и идут на неё: от силы семь ударов, и она рухнет. На этой стороне у нас больше ничего не осталось, так что удержи её.',
+  'questUi.worldQuest.fireAndFly.brief.powder':
+    'Пороховой склад ломится, так что мне пришлось составить снаружи вдвое больше бочонков, прямо у них на пути. И вот явились порождения кузни, их приманил запах пороха. Будет жарко, канонир.',
+  'questUi.worldQuest.fireAndFly.greeting.trials':
+    'А ты делаешь успехи, новобранец. Ещё несколько испытаний, и я впишу твоё имя в список канониров.',
+  'questUi.worldQuest.fireAndFly.greeting.recruited':
+    'Снова здесь, канонир! Ты нужен стенам как никогда, и у меня есть несколько заданий, которые только и ждут твоей пушки.',
+  'entities.npcs.fire_and_fly_instructor.name': 'Мастер-канонир Олдер',
+  'entities.npcs.fire_and_fly_instructor.title': 'Вербовщик канониров',
+  'entities.npcs.fire_and_fly_instructor.greeting':
+    'Валам нужно больше защитников, чем может выделить гарнизон, поэтому я набираю новых. Прежде чем доверить кому-то пушку, я хочу увидеть, как он удержит собственную башню. Пройдите испытание: отбрасывайте чудовищ взрывами, пока они не добрались до ваших стен.',
   'questUi.worldQuest.traceShape.diamond': 'Ромб',
   'questUi.worldQuest.traceShape.pentagon': 'Пятиугольник',
   'questUi.worldQuest.traceShape.arrow': 'Руна стрелы',
@@ -19835,6 +19986,34 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.leaderboard.gliderRankings': 'Рекорды полётов',
   'hudChrome.leaderboard.gliderRules':
     'Побеждает самое быстрое полное прохождение. Пройдите все кольца. Дневные рекорды сбрасываются вместе с миром. Рекорды обновляются в течение 30 секунд.',
+  'hudChrome.leaderboard.fireAndFlyDaily': '{trial}: сегодня',
+  'hudChrome.leaderboard.fireAndFlyLifetime': '{trial}: за всё время',
+  'hudChrome.leaderboard.fireAndFlyStart': 'Пройти это испытание',
+  'hudChrome.leaderboard.fireAndFlyRankings': 'Рекорды канонира',
+  'hudChrome.leaderboard.fireAndFlyPersonalRules':
+    'Ваши офлайн-рекорды, сохранённые с этим персонажем. Сначала решает лучшая медаль, затем наибольший счёт. Дневные рекорды сбрасываются каждый день.',
+  'hudChrome.leaderboard.fireAndFlyRules':
+    'Сначала решает лучшая медаль, затем наибольший счёт. Засчитывается каждое выигранное испытание, включая тренировочные. Дневные рекорды сбрасываются вместе с миром. Рекорды обновляются в течение 30 секунд.',
+  'hudChrome.leaderboard.fireAndFlyGroupsLabel': 'Разделы рекордов канонира',
+  'hudChrome.leaderboard.fireAndFlyGroups.trials': 'Испытания',
+  'hudChrome.leaderboard.fireAndFlyGroups.missions': 'Задания',
+  'hudChrome.leaderboard.fireAndFlyGroups.mastery': 'Мастерство',
+  'hudChrome.leaderboard.fireAndFlyMissionStart': 'Взяться за задание',
+  'hudChrome.leaderboard.fireAndFlyMissionRules':
+    'Сначала решает лучшая медаль, затем наибольший счёт. Засчитывается каждое выигранное задание, включая тренировочные. Рекорды обновляются в течение 30 секунд.',
+  'hudChrome.leaderboard.fireAndFlyMissionPersonalRules':
+    'Ваши офлайн-рекорды, сохранённые с этим персонажем. Сначала решает лучшая медаль, затем наибольший счёт.',
+  'hudChrome.leaderboard.fireAndFlyMastery': 'Мастерство канонира',
+  'hudChrome.leaderboard.fireAndFlyMasteryRules':
+    'Лучшие медали за каждое задание складываются в звёзды: золото 3, серебро 2, бронза 1. Сначала решает число звёзд, затем общий счёт. Рекорды обновляются в течение 30 секунд.',
+  'hudChrome.leaderboard.fireAndFlyMasteryPersonalRules':
+    'Ваше офлайн-мастерство, сохранённое с этим персонажем: лучшие медали за каждое задание складываются в звёзды (золото 3, серебро 2, бронза 1), затем учитывается общий счёт.',
+  'hudChrome.leaderboard.wqStars': 'Звёзды',
+  'hudChrome.wqLadder.rankedByStars': 'По звёздам, затем по наибольшему счёту',
+  'hudChrome.plurals.fireAndFlyStars.one': '{count} звезда',
+  'hudChrome.plurals.fireAndFlyStars.few': '{count} звезды',
+  'hudChrome.plurals.fireAndFlyStars.many': '{count} звёзд',
+  'hudChrome.plurals.fireAndFlyStars.other': '{count} звезды',
   'hudChrome.framePresets.apply': 'Применить',
   'hudChrome.focusTargets.showEmpty': 'Показывать пустые рамки фокуса',
   'hudChrome.focusTargets.assignHint': 'Выберите цель. Нажмите {key} или кнопку «{button}».',

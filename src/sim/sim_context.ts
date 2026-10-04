@@ -106,9 +106,10 @@ export type RuntimeSimConfig = Required<
     | 'storagePrices'
     | 'vaultConsumptionAdmission'
     | 'gathererIdentity'
+    | 'privateSalt'
   >
 > &
-  Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds'> & {
+  Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds' | 'privateSalt'> & {
     vaultOpenNeedsSave?: boolean;
     vaultRewardNeedsSave?: boolean;
   };

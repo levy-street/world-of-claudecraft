@@ -56,6 +56,7 @@ import { gameMetricsCounters } from '../server/http/game_signals';
 import { consumeMovementFramesV2 } from '../server/movement_input_timeline_v2';
 import { updateMovementOverrideEpochs } from '../server/movement_override_epoch';
 import { KeyedSerialWriteAborted } from '../server/serial_writer';
+import { TURRET_SEAT_KEYS, turretWireNumber } from '../server/turret_self_wire';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import { EMPTY_MST_CRAFTS } from '../src/net/crafting_wire';
 import { ClientWorld } from '../src/net/online';
@@ -76,8 +77,10 @@ import { NORTH_WATCH_CANNON } from '../src/sim/content/vehicle_stations';
 import { BUILTIN_WORLD, DELVES, GATHER_NODES, ITEMS, MOBS, WORLD_QUESTS } from '../src/sim/data';
 import { IGNIVAR_JUDGMENT_CAST_ID } from '../src/sim/encounters/ignivar';
 import { createGroundObject, createMob } from '../src/sim/entity';
+import { fireAndFlyScoreboardId } from '../src/sim/fire_and_fly_scoreboards';
 import { emptySaleLog } from '../src/sim/market_sale_log';
 import { createCannonEncounter } from '../src/sim/minigames/cannon_encounter';
+import { positionAt } from '../src/sim/minigames/thrown_body';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
 import { petOf, serializePet, summonPet } from '../src/sim/pet/pet_commands';
 import { livePlaytimeSeconds } from '../src/sim/playtime';
@@ -85,6 +88,7 @@ import { spawnHillNow } from '../src/sim/pvp';
 import { interactObjectCreditKey } from '../src/sim/quests/interact_object_credit';
 import { noteRelicItemFind, noteRelicObtain } from '../src/sim/reliquary';
 import { Sim } from '../src/sim/sim';
+import { seatTurret } from '../src/sim/turret_defense_session';
 import {
   type Aura,
   DT,
@@ -97,6 +101,7 @@ import {
   VARKHUL_SHARED_PYRE_AURA_ID,
   VARKHUL_SHARED_PYRE_NAME,
 } from '../src/sim/varkhul_shared_pyre';
+import { turretSessionFor } from '../src/sim/vehicles';
 import { terrainHeight } from '../src/sim/world';
 import { WORLD_BOSSES, worldBossLockoutId } from '../src/sim/world_boss';
 import { onMobKilledForWorldQuests, worldQuestCycleForResetDay } from '../src/sim/world_quests';
@@ -5729,6 +5734,8 @@ const ALL_DELTA_KEYS = [
   'equip',
   'fac',
   'facCur',
+  'ffr',
+  'ffrec',
   'fplot',
   'ggoal',
   'gprof',
@@ -5780,6 +5787,45 @@ const ALL_DELTA_KEYS = [
   'tmap',
   'trade',
   'tslot',
+  'tu0',
+  'tu1',
+  'tu10',
+  'tu11',
+  'tu12',
+  'tu13',
+  'tu14',
+  'tu15',
+  'tu16',
+  'tu17',
+  'tu18',
+  'tu19',
+  'tu2',
+  'tu20',
+  'tu21',
+  'tu22',
+  'tu23',
+  'tu24',
+  'tu25',
+  'tu26',
+  'tu27',
+  'tu28',
+  'tu29',
+  'tu3',
+  'tu30',
+  'tu31',
+  'tu4',
+  'tu5',
+  'tu6',
+  'tu7',
+  'tu8',
+  'tu9',
+  'tua',
+  'tub',
+  'tur',
+  'turp',
+  'tus',
+  'tut',
+  'tuv',
   'vault',
   'vehicle',
   'wba',
@@ -5820,7 +5866,12 @@ const CAPABILITY_DELTA_KEYS = ['auras', 'de'] as const;
  *  `de` is capability-only (CAPABILITY_DELTA_KEYS above). `auras` stays dense:
  *  a legacy session gets it on the base self record and a stable-wire session
  *  gets the first-send delta. */
-const DENSE_DELTA_KEYS = ALL_DELTA_KEYS.filter((key) => key !== 'app' && key !== 'de');
+// The Fire and Fly seat family past its seat key reaches only a session that sat: a session
+// that never did gets `turp` and `tur` as nulls and nothing else of the family.
+const TURRET_SEATED_ONLY_KEYS: readonly string[] = TURRET_SEAT_KEYS.slice(1);
+const DENSE_DELTA_KEYS = ALL_DELTA_KEYS.filter(
+  (key) => key !== 'app' && key !== 'de' && !TURRET_SEATED_ONLY_KEYS.includes(key),
+);
 
 // The terse wire key -> IWorld member name rename map, in sorted order. The wire
 // string IS the protocol (contract #4): a terse key renamed on one side passes tsc
@@ -5867,6 +5918,8 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   equip: 'equipment',
   fac: 'factions',
   facCur: 'factionCurrencies',
+  ffr: 'fireAndFlyRecruitment',
+  ffrec: 'fireAndFlyRecords',
   fplot: 'myFarmPlots',
   ggoal: 'gatheringGoal',
   gprof: 'gatheringProficiency',
@@ -5910,6 +5963,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   tfpend: 'townFocusPending',
   tmap: 'treasureMap',
   tslot: 'toolEffectSlots',
+  tur: 'turretSession',
   vault: 'vaultInfo',
   vehicle: 'vehicleSession',
   weeklyRewards: 'weeklyRewardInfo',
@@ -5926,6 +5980,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
 // Year ~2223 in epoch ms. Beats selfWireJson's `until > Date.now()` lockout
 // filter without a wall-clock read in test scaffolding.
 const FAR_FUTURE_MS = 8_000_000_000_000;
+const FF_PACK_BOARD = fireAndFlyScoreboardId('fire_and_fly_pack', 'lifetime') as string;
 
 // Dirty every one of the registered `maybe()` delta fields with a distinguishable,
 // non-default value so the round-trip + no-op-omission assertions are meaningful
@@ -6052,6 +6107,10 @@ function dirtyEveryDeltaField(): {
   meta.clueHunt = { huntId: CLUE_HUNTS[0].id, step: 1 };
   meta.factionCurrencies = { rift_watch: 17, church_order: 29, automatons: 41 };
   meta.treasureMap = { rarity: 'epic', siteId: TREASURE_SITES[0].id, seed: 78123 };
+  meta.fireAndFlyRecruitment = { trialsWon: 2, recruited: false };
+  meta.fireAndFlyRecords = {
+    [FF_PACK_BOARD]: { metric: 20_900, medal: 'gold', day: '2026-08-31' },
+  };
   server.sim.worldQuestExpiresAtMs = FAR_FUTURE_MS;
   meta.worldQuestLog.set('wq_eastbrook_bandits', {
     questId: 'wq_eastbrook_bandits',
@@ -6496,6 +6555,11 @@ describe('full self-state snapshot delta fixture', () => {
         expect(snap.self, 'self.de sent to a legacy session').not.toHaveProperty(key);
         continue;
       }
+      // The Fire and Fly seat family past its seat key reaches only a seated session.
+      if (TURRET_SEATED_ONLY_KEYS.includes(key)) {
+        expect(snap.self, `self.${key} reaches only a seated session`).not.toHaveProperty(key);
+        continue;
+      }
       expect(snap.self, `self.${key} missing from first snapshot`).toHaveProperty(key);
       // each was dirtied to a non-default value, so none rides the wire as null
       // EXCEPT cvault: this harness player carries a live delve run (the drun
@@ -6505,8 +6569,16 @@ describe('full self-state snapshot delta fixture', () => {
       // design. Its non-null arrival (and the by-reference mirror) is pinned
       // in tests/vault_wire.test.ts instead.
       // This fixture stands at a different banker; the weekly keeper gate stays closed.
-      if (key === 'cvault' || key === 'weeklyRewards') {
-        expect(snap.self[key], 'self.cvault must arrive as the explicit gated null').toBeNull();
+      // The Fire and Fly keys share meta.vehicle with the cannon seat this fixture holds,
+      // so `turp` and `tur` arrive as explicit nulls; their seated arrival is pinned in the
+      // Fire and Fly round trip below.
+      if (
+        key === 'cvault' ||
+        key === 'weeklyRewards' ||
+        key === 'turp' ||
+        key === TURRET_SEAT_KEYS[0]
+      ) {
+        expect(snap.self[key], `self.${key} must arrive as the explicit null`).toBeNull();
         continue;
       }
       expect(snap.self[key], `self.${key} arrived null`).not.toBeNull();
@@ -6522,6 +6594,10 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.factionCurrencies).toEqual({ rift_watch: 17, church_order: 29, automatons: 41 });
     expect(client.treasureMap).toEqual({ rarity: 'epic', siteId: TREASURE_SITES[0].id });
     expect(lastSnap(fc.sent).self.tmap).not.toHaveProperty('seed');
+    expect(client.fireAndFlyRecruitment).toEqual({ trialsWon: 2, recruited: false });
+    expect(client.fireAndFlyRecords).toEqual({
+      [FF_PACK_BOARD]: { metric: 20_900, medal: 'gold', day: '2026-08-31' },
+    });
 
     // --- fields that decode onto the player ENTITY (client.player), not the client ---
     expect(client.player.cooldowns.get('heroic_strike')).toBe(5); // cds -> e.cooldowns
@@ -7115,6 +7191,90 @@ describe('full self-state snapshot delta fixture', () => {
   });
 });
 
+describe('Fire and Fly seat over the wire (GameServer to ClientWorld)', () => {
+  const rounded = (value: unknown): unknown => JSON.parse(JSON.stringify(value, turretWireNumber));
+
+  it('mirrors the seat, its plan and its event-built ring to the owner only, then clears it', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 71, 'Gunner');
+    const fcOther = fakeWs();
+    joinServer(server, fcOther, 72, 'Onlooker', 'mage');
+    const client = bareClient(session.pid);
+    const pid = session.pid;
+    const feed = (): void => {
+      for (const frame of fc.sent) {
+        if (frame.t === 'events') feedEventFrame(client, frame);
+        else if (frame.t === 'snap') (client as any).applySnapshot(frame);
+      }
+      fc.sent.length = 0;
+    };
+    const step = (): void => {
+      (server as any).routeEvents(server.sim.tick());
+      broadcast(server);
+      feed();
+    };
+    broadcast(server);
+    feed();
+    expect(client.turretSession).toBeNull();
+
+    expect(seatTurret(server.sim.ctx, pid)).toBeNull();
+    let fired = false;
+    for (let i = 0; i < 240; i++) {
+      step();
+      const truth = turretSessionFor(server.sim.ctx, pid);
+      expect(rounded(client.turretSession && { ...client.turretSession, feedback: [] })).toEqual(
+        rounded(truth && { ...truth, feedback: [] }),
+      );
+      expect(client.turretSession?.feedback).toEqual(truth?.feedback);
+      expect(client.turretClock).toBe(server.sim.tickCount);
+      const view = client.turretSession!;
+      const target = view.defense.monsters.find((m) => m.hp > 0);
+      if (fired || !target || server.sim.tickCount < view.defense.readyTick) continue;
+      const at = positionAt(target.seg, server.sim.tickCount, {
+        ground: (x, z) => terrainHeight(x, z, server.sim.cfg.seed),
+      });
+      server.handleMessage(
+        session,
+        JSON.stringify({
+          t: 'cmd',
+          cmd: 'vehicle_action',
+          action: 'turret_fire',
+          x: at.x,
+          z: at.z,
+        }),
+      );
+      fired = true;
+      // A loop pass that runs no tick still broadcasts: the shot's fired entry has not
+      // routed yet, so the state must not show the shot ahead of it.
+      const shots = view.defense.stats.shots;
+      broadcast(server);
+      feed();
+      expect(client.turretSession!.defense.stats.shots).toBe(shots);
+      expect(client.turretSession!.feedback.some((f) => f.event.type === 'fired')).toBe(false);
+    }
+    expect(fired).toBe(true);
+    const ring = client.turretSession!.feedback;
+    expect(ring.some((f) => f.event.type === 'fired')).toBe(true);
+    expect(ring.some((f) => f.event.type === 'waveStart')).toBe(true);
+
+    const onlooker = fcOther.sent.flatMap((frame) => [
+      ...(frame.t === 'events' ? frame.list : []).filter(
+        (ev: SimEvent) => ev.type === 'turretDefense',
+      ),
+      ...(frame.t === 'snap'
+        ? ['turp', ...TURRET_SEAT_KEYS].map((key) => frame.self?.[key]).filter((v) => v != null)
+        : []),
+    ]);
+    expect(onlooker).toEqual([]);
+
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'vehicle_leave' }));
+    step();
+    expect(client.turretSession).toBeNull();
+    expect(client.turretClock).toBeNull();
+  });
+});
+
 describe('gather node cooldown wire round trip (ncd)', () => {
   it('flips a node from not-ready back to ready once the server-side cooldown clears', () => {
     const server = new GameServer();
@@ -7151,7 +7311,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 113 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 154 unique keys in sorted order', () => {
     // 109 plus the release batch's pending Town Focus and Spell Crit core keys.
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
@@ -7209,8 +7369,13 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The release batch's pending Town Focus and the Spell Crit sheet cell's
     // shared crit core scb (server/self_scalar_wire.ts), at the third
     // release/v0.44.0 base merge, for 111.
-    expect(ALL_DELTA_KEYS).toHaveLength(113);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(113);
+    // The Fire and Fly seat's state and plan keys tur and turp
+    // (server/turret_self_wire.ts), for 115, its recruitment key ffr, for 116,
+    // and the character's own records ffrec, for 117. The seat state then splits
+    // into its key family (tur plus tuv, tua, tus, tub, tut and the 32 monster
+    // buckets tu0 to tu31), for 154.
+    expect(ALL_DELTA_KEYS).toHaveLength(154);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(154);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7316,6 +7481,14 @@ describe('delta-key contract pins (anti-drift)', () => {
     const re = new RegExp(DELTA_CALL.source, 'g');
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
+    // The Fire and Fly seat state family is emitted by computed name over its exported key
+    // list (32 monster buckets have no literal call each), so the list joins the scrape, and
+    // the emitter is pinned to emit exactly that list.
+    expect(src).toContain('maybeRaw(TURRET_SEAT_KEYS[i], parts[i])');
+    for (const key of TURRET_SEAT_KEYS) {
+      expect(scraped.has(key), `${key} also emitted by a literal call`).toBe(false);
+      scraped.add(key);
+    }
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
     expect(scraped.has('app')).toBe(true); // the maybeRaw calls ARE captured by the widened regex
     expect(scraped.has('dfb')).toBe(true); // incl. the multi-line maybeRaw('dfb', ...) form
@@ -7380,7 +7553,10 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The Weekly Vault's weeklyRewards self key (PR 4052) makes 107.
     // The World PvP readout wpvp and the King of the Hill readout hill make 109.
     // The release batch's pending Town Focus and Spell Crit core keys make 111.
-    expect(scraped.size).toBe(113);
+    // The Fire and Fly seat's tur and turp (server/turret_self_wire.ts) make 115, and
+    // its recruitment ffr (server/quest_snapshot_wire.ts) 116, and its records ffrec 117.
+    // The seat state's key family (37 keys beside tur) makes 154.
+    expect(scraped.size).toBe(154);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

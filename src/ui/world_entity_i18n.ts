@@ -271,6 +271,7 @@ const MOB_IDS = [
 const NPC_IDS = [
   'glider_instructor',
   'glider_apprentice',
+  'fire_and_fly_instructor',
   'shadow_cloak_scout',
   'shadow_guard_north',
   'shadow_guard_south',
@@ -688,6 +689,7 @@ const DUNGEON_IDS = [
   'wildheart_basin',
   'the_last_keep',
   'dawnhold_castle',
+  'fire_and_fly_arena',
 ] as const;
 const DELVE_IDS = ['collapsed_reliquary', 'drowned_litany'] as const;
 // Ravenpost authored letters (src/sim/content/letters.ts): the welcome letter

@@ -4,10 +4,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   MINIGAME_MUSIC_URLS,
   type MinigameTrack,
+  resolveActiveMinigameLevel,
   resolveActiveMinigameTrack,
+  TURRET_MUSIC_LEVEL,
 } from '../src/game/minigame_music';
 import { minigameLayerFor } from '../src/game/minigame_music_layer';
-import { MusicDirector } from '../src/game/music';
+import { syncMinigameMusic } from '../src/game/minigame_music_sync';
+import { MusicDirector, music } from '../src/game/music';
 import type { WorldQuestProgress } from '../src/sim/types';
 
 class FakeParam {
@@ -141,6 +144,13 @@ describe('resolveActiveMinigameTrack', () => {
       vehicleSession: { stationId: 'cannon_01' },
     });
     expect(track).toBe('cannon');
+  });
+
+  it('plays the cannon track while seated in the Fire and Fly turret', () => {
+    expect(
+      resolveActiveMinigameTrack({ vehicleSession: null, turretSession: { waveCount: 6 } }),
+    ).toBe('cannon');
+    expect(resolveActiveMinigameTrack({ vehicleSession: null, turretSession: null })).toBeNull();
   });
 
   it('resolves glider slalom flight to glider track', () => {
@@ -315,6 +325,45 @@ describe('resolveActiveMinigameTrack', () => {
   });
 });
 
+describe('syncMinigameMusic', () => {
+  it('hands the Fire and Fly seat to the resolver, which plays the cannon track', () => {
+    const set = vi.spyOn(minigameLayerFor(music), 'set').mockImplementation(() => {});
+    try {
+      const world = {
+        worldQuestLog: new Map<string, WorldQuestProgress>(),
+        vehicleSession: null,
+        turretSession: { waveCount: 6 },
+        entities: new Map(),
+      } as unknown as Parameters<typeof syncMinigameMusic>[0];
+      syncMinigameMusic(world, { x: 0, z: 0 }, null);
+      expect(set).toHaveBeenLastCalledWith('cannon', TURRET_MUSIC_LEVEL);
+    } finally {
+      set.mockRestore();
+    }
+  });
+});
+
+describe('resolveActiveMinigameLevel', () => {
+  it('plays the turret seat softer, under its shots and blasts', () => {
+    expect(TURRET_MUSIC_LEVEL).toBeGreaterThan(0);
+    expect(TURRET_MUSIC_LEVEL).toBeLessThan(1);
+    expect(resolveActiveMinigameLevel({ turretSession: { waveCount: 6 } })).toBe(
+      TURRET_MUSIC_LEVEL,
+    );
+  });
+
+  it('keeps every other activity, the release cannon included, at the full mix', () => {
+    expect(resolveActiveMinigameLevel({})).toBe(1);
+    expect(resolveActiveMinigameLevel({ vehicleSession: { stationId: 'x' } })).toBe(1);
+    expect(
+      resolveActiveMinigameLevel({
+        activePuzzleQuestId: 'wq_palmreach_confections',
+        turretSession: {},
+      }),
+    ).toBe(1);
+  });
+});
+
 describe('MusicDirector minigame track playback and ducking', () => {
   let director: MusicDirector;
 
@@ -381,6 +430,17 @@ describe('MusicDirector minigame track playback and ducking', () => {
     expect(minigameLayerFor(director).active).toBeNull();
     expect(minigameLayerFor(director).streamsByTrack.forge?.target).toBe(0);
     expect(internals(director).zoneStreams.vale?.target).toBe(1);
+  });
+
+  it('plays a track at the level it is handed, and follows a level change on the same track', () => {
+    director.update('vale', false);
+    minigameLayerFor(director).set('cannon', TURRET_MUSIC_LEVEL);
+    const cannonStream = minigameLayerFor(director).streamsByTrack.cannon;
+    expect(cannonStream?.target).toBe(TURRET_MUSIC_LEVEL);
+    expect(internals(director).zoneStreams.vale?.target).toBe(0);
+
+    minigameLayerFor(director).set('cannon');
+    expect(cannonStream?.target).toBe(1);
   });
 
   it('smoothly transitions between two different minigames', () => {

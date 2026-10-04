@@ -30,7 +30,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "30bab540",
+      "state": "750e74a4",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -84,6 +84,8 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gathererIdentity": {
             "id": 101,
             "kind": "character"
@@ -163,6 +165,8 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gathererIdentity": {
             "id": 102,
             "kind": "character"
@@ -405,7 +409,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "93085858",
+      "state": "a4ed32f0",
       "events": "31e5d163",
       "rng": {
         "draws": 8,
@@ -463,6 +467,8 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gathererIdentity": {
             "id": 101,
             "kind": "character"
@@ -559,6 +565,8 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gathererIdentity": {
             "id": 102,
             "kind": "character"
@@ -802,7 +810,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "93085858",
+      "state": "a4ed32f0",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -860,6 +868,8 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gathererIdentity": {
             "id": 101,
             "kind": "character"
@@ -956,6 +966,8 @@
           "equipmentInstance": {},
           "factionCurrencies": {},
           "factions": {},
+          "fireAndFlyRecords": {},
+          "fireAndFlyRecruitment": {},
           "gathererIdentity": {
             "id": 102,
             "kind": "character"

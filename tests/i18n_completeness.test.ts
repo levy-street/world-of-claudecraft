@@ -514,6 +514,8 @@ describe('i18n CLDR pluralization', () => {
       'commissionMasterworks',
       'deedsRetroSummary',
       'finderPartySize',
+      // The Gunner's Mastery row's stars on the Fire and Fly rankings.
+      'fireAndFlyStars',
       // The signpost guild board's live count line (guild board categories).
       'guildBoardShown',
       'guildMembers',

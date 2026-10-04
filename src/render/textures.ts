@@ -236,7 +236,9 @@ export function flowerTuftTexture(
   const c = document.createElement('canvas');
   c.width = S;
   c.height = S;
-  const ctx = c.getContext('2d')!;
+  // Read back once for the mip bleed: a GPU-backed canvas would stall that
+  // readback behind whatever the GPU is drawing.
+  const ctx = c.getContext('2d', { willReadFrequently: true })!;
   ctx.clearRect(0, 0, S, S);
 
   // balanced mode cycles the kinds list so every colour is guaranteed a
@@ -372,7 +374,8 @@ export function grassTuftTexture(blades = 18): THREE.Texture {
   const c = document.createElement('canvas');
   c.width = S;
   c.height = S;
-  const ctx = c.getContext('2d')!;
+  // CPU-backed for the one readback below, as in flowerTuftTexture.
+  const ctx = c.getContext('2d', { willReadFrequently: true })!;
   ctx.clearRect(0, 0, S, S);
 
   const blade = (x: number, h: number, sway: number, w: number, light: number): void => {

@@ -344,6 +344,51 @@ const questStringsEn = {
         score: 'Score: {score}.',
         medals: { gold: 'Gold', silver: 'Silver', bronze: 'Bronze' },
       },
+      // Fire and Fly at the Evergarden gate: Master Gunner Alder recruits defenders
+      // for the ramparts and tests each one first. The trials are the scenarios.
+      fireAndFly: {
+        title: "The Gunner's Trials",
+        objective: 'Hold a tower of your own through every wave of one trial',
+        ready: 'Speak to Master Gunner Alder to take a trial.',
+        complete: 'Tower held! Speak to Master Gunner Alder to practice.',
+        // The trials, then the missions a recruit takes for the gate (named in
+        // docs/design/naming-audit.md).
+        scenarios: {
+          introduction: "Recruit's Trial",
+          standard: 'Standing Watch',
+          hard: "Veterans' Test",
+          pack: 'The Pack',
+          deluge: 'The Deluge',
+          brittle: 'The Cracked Tower',
+          powder: 'The Powder Store',
+        },
+        // Alder's brief for each, on the Gunnery Board: a trial's sets the scene and
+        // names what it teaches, a mission's tells the situation and makes a plea (naming
+        // the beasts is fine); never advice, never wave counts.
+        brief: {
+          introduction:
+            'So you are the new recruit? Here is your cannon: a temperamental old lady, but she has never once missed an appointment. A few beasts are about to come out of the woods, so show me you can hit what you aim at.',
+          standard:
+            'One cannon is not always enough. Every tower keeps an ace up its sleeve, the Shockwave, which sweeps away whatever crowds at the foot of the walls. Tonight you learn to use it, and above all to pick your moment.',
+          hard: "Here is the most destructive weapon ever to leave the artificers' workshop: the Fragmentation Shell. It is a little slow, but when it bursts, nothing around it is left standing. Every gunner must master it before their name goes on the gunners' roll.",
+          pack: 'Our fortifications are being overrun! They come in packs, each one fiercer than the last, and you can hear them howling from the ramparts. Help us drive them back before they break over the walls!',
+          deluge:
+            'There must be a hundred of them and more: wolves, boars, spiders and tunnelers, a tide of small beasts pouring in from every side. When it ebbs, do not trust it: it always comes back stronger, and something bigger is wading in behind.',
+          brittle:
+            'The old tower took a terrible blow last season, and the crack never closed. Tonight the dead have risen and march on it: seven blows at most, and down it comes. It is all we have left on this side, so keep it standing.',
+          powder:
+            'The powder store is bursting, so I had to stack twice the kegs outside, right across their path. And now the creatures of the forge are coming, drawn by the smell of the powder. Things are about to get hot, gunner.',
+        },
+        // Alder's greeting once a trial is won, then once recruited; before that, his
+        // NPC greeting. Spoken too: the voice line catalog (scripts/voices/extra_lines.mjs)
+        // must keep the same English.
+        greeting: {
+          trials:
+            "You are coming along, recruit. A few more trials and I will put your name on the gunners' roll.",
+          recruited:
+            'Back again, gunner! The ramparts need you more than ever, and I have a few missions here just waiting for your cannon.',
+        },
+      },
       calligraphyTitle: 'Arcane Calligraphy',
       traceOutline: 'Trace the outline with your footsteps',
       traceRoundInstruction: 'Round {round} of {total}: {shape}. {instruction}',

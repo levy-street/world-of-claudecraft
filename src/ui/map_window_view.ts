@@ -17,7 +17,6 @@
 // the painter needs to resolve their localized text, never the resolved string.
 
 import type { GatheringProfessionId } from '../sim/content/professions';
-import { GLIDER_NPC_DEF } from '../sim/content/world_quest_glider';
 import {
   DUNGEON_LIST,
   GATHER_NODES,
@@ -69,6 +68,7 @@ import {
   type MapAtlasFilters,
   type MapAtlasRoute,
 } from './map_sidebar_view';
+import { worldQuestInstructorAnchor } from './world_quest_marker_anchor';
 
 // World-map zoom band. zoom 1 = the whole current zone framed square;
 // MAP_MAX_ZOOM is a close local view. The view scales uniformly between the two,
@@ -1077,17 +1077,17 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     if (quest.zoneId !== zone.id || playerLevel < quest.minLevel) continue;
     const progress = world.worldQuestLog?.get(quest.id);
     if (progress?.state === 'completed') continue;
-    const isGlider = quest.objective.type === 'glider';
-    const position = isGlider ? GLIDER_NPC_DEF.pos : quest.area;
+    const anchor = worldQuestInstructorAnchor(quest);
+    const position = anchor ?? quest.area;
     if (!inView(position.x, position.z)) continue;
     const { mx, my } = toMap(position.x, position.z);
     worldQuests.push({
       questId: quest.id,
       mx,
       my,
-      radius: isGlider ? 0 : (quest.area.radius / spanX) * S,
+      radius: anchor ? 0 : (quest.area.radius / spanX) * S,
       state: progress?.state === 'active' ? 'active' : 'available',
-      areaVisible: !isGlider && input.selectedWorldQuestId === quest.id,
+      areaVisible: !anchor && input.selectedWorldQuestId === quest.id,
     });
   }
 

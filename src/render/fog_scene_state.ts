@@ -11,6 +11,7 @@
 // settled); this module owns the resolution and the settled preset values.
 import { dungeonAt, isArenaPos, isBgPos, isDelvePos, isYumiMazePos } from '../sim/data';
 import { waterLevelAt } from '../sim/world';
+import { FIRE_AND_FLY_INTERIOR } from './fire_and_fly_arena_core';
 import { applyIgnivarRaidFog, ignivarRaidFogStateForInterior } from './ignivar_raid_environment';
 import type { FogSceneState } from './interior_light_rig';
 
@@ -49,6 +50,7 @@ export function resolveFogScene(
   // Wildheart is an OPEN-AIR jungle caldera, not a closed room: it keeps the
   // sky dome and the daylight rig and only swaps in its own field haze.
   const inWildheartField = interior === 'wildheart';
+  const inFireAndFly = interior === FIRE_AND_FLY_INTERIOR;
   const inLastKeep = interior === 'lastkeep';
   const inDawnhold = interior === 'dawnhold';
   const desired: FogSceneState = inDelve
@@ -65,15 +67,17 @@ export function resolveFogScene(
               ? ignivarRaidFogState
               : inWildheartField
                 ? 'wildheartField'
-                : inLastKeep
-                  ? 'lastkeep'
-                  : inDawnhold
-                    ? 'dawnhold'
-                    : inside
-                      ? 'dungeon'
-                      : camY < waterLevelAt(cam.x, cam.z, seed) - 0.05
-                        ? 'underwater'
-                        : 'outdoor';
+                : inFireAndFly
+                  ? 'fireAndFly'
+                  : inLastKeep
+                    ? 'lastkeep'
+                    : inDawnhold
+                      ? 'dawnhold'
+                      : inside
+                        ? 'dungeon'
+                        : camY < waterLevelAt(cam.x, cam.z, seed) - 0.05
+                          ? 'underwater'
+                          : 'outdoor';
   return { interior, desired };
 }
 
@@ -115,6 +119,12 @@ export function applyFogScenePreset(
     fog.color.setHex(0x8ca786);
     fog.near = 105;
     fog.far = 430;
+  } else if (desired === 'fireAndFly') {
+    // Golden-hour air: a warm haze that leaves the whole clearing and the
+    // tree ring crisp and melts the wooded hills beyond into amber light.
+    fog.color.setHex(0xceb07c);
+    fog.near = 55;
+    fog.far = 280;
   } else if (desired === 'lastkeep') {
     // The Last Keep: a warm hearth-lit haze pushed well back, so its
     // grand three-story halls read golden and inhabited instead of

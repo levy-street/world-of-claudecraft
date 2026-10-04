@@ -147,12 +147,29 @@ export function forceDismount(ctx: SimContext, e: Entity): void {
   if (meta) recalcFor(ctx, e, meta);
 }
 
+/** Whether the player may keep riding `key`: owned reins, or the lesson steed during its lesson. */
+export function mountRideAllowed(meta: PlayerMeta, key: string): boolean {
+  return mountOwned(meta, key) || trainingSummon(meta, key);
+}
+
+/** Restores the mount a vehicle seat took ('' on foot) with no summon channel, stripping
+ *  forms first like a real summon. Only the seat module calls it and it decides what may
+ *  be restored; every other mount path refuses while seated. */
+export function applySeatMount(ctx: SimContext, e: Entity, key: string): void {
+  if (key) cancelFormsAndGhostWolf(ctx, e);
+  e.mountKey = key;
+  e.mountCastRemaining = 0;
+  e.mountCastKey = '';
+  const meta = ctx.players.get(e.id);
+  if (meta) recalcFor(ctx, e, meta);
+}
+
 /** Put an active riding-lesson player straight onto the training Valorsteed.
  *  Used by the start-platform flow, which replaces the old Marla button and
  *  therefore needs the race click to lend the lesson mount immediately. */
 export function forceTrainingMount(ctx: SimContext, e: Entity): boolean {
   const meta = ctx.players.get(e.id);
-  if (meta?.mountTraining?.state !== 'IN_PROGRESS') return false;
+  if (meta?.mountTraining?.state !== 'IN_PROGRESS' || meta.vehicle) return false;
   // Defense in depth for the whole-match ban: the race start platform is in the
   // open world and a seated fighter cannot stand on it, but this is the one
   // path that APPLIES a mount with no summon channel to gate, so it asks too.
@@ -253,6 +270,7 @@ export function summonMountItem(ctx: SimContext, pid: number, key: string): bool
   const e = ctx.entities.get(pid);
   if (!meta || !e) return false;
   if (
+    meta.vehicle ||
     wispMazeActionsLocked(meta.worldQuestLog) ||
     shadowActionsLocked(meta.worldQuestLog) ||
     gliderActionsLocked(meta.worldQuestLog)
@@ -327,6 +345,7 @@ export function toggleMount(ctx: SimContext, pid: number): boolean {
   const e = ctx.entities.get(pid);
   if (!meta || !e) return false;
   if (
+    meta.vehicle ||
     wispMazeActionsLocked(meta.worldQuestLog) ||
     shadowActionsLocked(meta.worldQuestLog) ||
     gliderActionsLocked(meta.worldQuestLog)
@@ -421,8 +440,7 @@ export function updateMountTransition(ctx: SimContext, e: Entity, swimming: bool
     e.mountKey &&
     meta &&
     ctx.tickCount % MOUNT_OWNERSHIP_REVALIDATE_TICKS === e.id % MOUNT_OWNERSHIP_REVALIDATE_TICKS &&
-    !mountOwned(meta, e.mountKey) &&
-    !trainingSummon(meta, e.mountKey)
+    !mountRideAllowed(meta, e.mountKey)
   ) {
     forceDismount(ctx, e);
     return;

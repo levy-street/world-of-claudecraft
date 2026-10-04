@@ -721,6 +721,37 @@ Exact-phrase and coined-token searches against the major game wikis.
 | Cocoon / Cocooned | Vysska's cast and the wrapped player's stun | KEEP. Single common English words. |
 | Draining Silk | her feeding's damage line | KEEP. No match. |
 
+### Fire and Fly world quest at the Evergarden gate (web-verified 2026-09-30)
+
+Scope: the proper nouns the Fire and Fly world quest adds (the mini-game's name,
+the instructor, the quest, its three trials, the first-win deed, the rankings
+window's title, the two limited weapons, and the five missions and the Mastery board
+of the recruitment). Quoted exact-phrase searches plus game-wiki searches (WoW,
+RuneScape, FFXIV, GW2, ESO, Diablo, Path of Exile). None of these is a coined
+token; every one is ordinary English, so the check is for a distinctive full name
+in the same role.
+
+| Name | Where | Verdict |
+|---|---|---|
+| Fire and Fly | the mini-game, its arena's display name (`fire_and_fly_arena`) and the seat HUD's title | KEEP, borderline. No game by that exact name (re-searched 2026-09-30); the nearest are "Fly & Fire" (a small free web game, words reversed), the Atari 2600 "Fire Fly" and several "Firefly" puns. Generic words, no coined token. |
+| Master Gunner Alder | the instructor NPC (`fire_and_fly_instructor`) | KEEP. No match. "Master gunner" is a real artillery rank used across games; the nearest game character is Guild Wars 2's "Master Gunner Adil", a different name. Alder is a tree and a common name. |
+| Gunnery Recruiter | his title | KEEP. No match. Plain descriptive English. |
+| The Gunner's Trials | the world quest's title | KEEP. No match for the phrase; nearest is Final Fantasy X-2's "Gunner's Gauntlet" minigame, different wording. |
+| Recruit's Trial | the Introduction scenario | KEEP. No match as a quest or activity name; plain English. Nearest is Path of Exile's "Aspirant's Trial", different wording. |
+| Standing Watch | the Standard scenario | KEEP. No match; a naval and military idiom. |
+| Veterans' Test | the Hard scenario | KEEP. No match; nearest are Destiny's "Veteran's Tour" and several quests named "The Veteran", different wording. |
+| The Gunner's Oath | the first-win deed (`exp_gunners_oath`) | KEEP. No match as an achievement or quest. |
+| Gunner's records | the rankings window title over the trials', missions' and Mastery ladders (`hudChrome.leaderboard.fireAndFlyRankings`; was "Gunner's trial records" before the missions joined it), opened from the noticeboard beside Alder; its group switch is labelled "Gunner's record groups" (`fireAndFlyGroupsLabel`, screen readers only) | KEEP. Generic descriptive English with no distinctive coined token, in the shape of the glider's "Glider course records"; the earlier exact-phrase check of "Gunner's trial records" found no game. |
+| Shockwave | the tower's limited area weapon (`hudChrome.turret.shockwave`), added after the audit above; web-checked 2026-09-30 | KEEP, borderline. A dictionary word and one of the most common ability names in games: World of Warcraft's warrior talent, Path of Exile's "Shockwave Support", Warframe's "Rippling Shockwave" and many more share it, so it is generic, not a name distinctive to one game. The mechanic differs too (a rolling ground front that shoves, no stun). |
+| Fragmentation Shell | the tower's limited burst shot (`hudChrome.turret.frag`), added after the audit above; web-checked 2026-09-30 | KEEP. No game ability by that exact name; it is the real artillery term. Nearest are Guild Wars 2's "Fragmentation Shot" and PoE's "Kinetic Bolt of Fragmentation", different wording. |
+| The Rampart Trials, Rampart Recruiter, Sworn to the Ramparts | REJECTED before shipping | No exact match, but "Rampart" is also Atari's 1990 cannon-and-castle defense game, the same genre and theme as this activity, so the word was dropped from every proper noun (it stays in lowercase prose, "the ramparts"). |
+| The Pack | the first mission (`fire_and_fly_pack`, monsters in tight packs) | KEEP. Plain English; web-checked 2026-09-30: no game mission or quest by that name in the same role (the exact phrase finds a tabletop RPG and many unrelated uses). |
+| Heavy Tread | a mission removed before shipping (`fire_and_fly_giants`, few large and huge monsters; dropped on 2026-10-04) | UNUSED. No match as a quest, mission, level or achievement (web-checked 2026-09-30). Chosen over the working title "The Colossi", REJECTED before shipping: "the colossi" is the defining noun of Shadow of the Colossus, whose whole game is beating giant creatures, the same role. |
+| The Deluge | the second mission (`fire_and_fly_deluge`, dozens of small fast monsters) | KEEP, borderline. A dictionary word used across many properties: Horizon Forbidden West's side quest "The Deluge" (a mudslide rescue) and XCOM: Enemy Within's mission "Deluge" (a dam), different roles. Shared vocabulary, no coined token. |
+| The Cracked Tower | the third mission (`fire_and_fly_brittle`, a 7-point tower) | KEEP. No match (web-checked 2026-09-30); nearest are Towerborne's "The Cracked Pillar" and Diablo II's "The Forgotten Tower", different wording. Chosen over the working title "The Last Rampart", REJECTED before shipping by the Rampart rule above, and over "The Last Wall", an itch.io wave-defense game of that name. |
+| The Powder Store | the fourth mission (`fire_and_fly_powder`, twice the kegs on the lanes) | KEEP. No match as a quest or mission (web-checked 2026-09-30); nearest are Saints Row: The Third's "Powder" gun shop and WoW's quest "Powder Play", different wording. |
+| Gunner's Mastery | the one lifetime board summing a character's best mission medals; web-checked 2026-09-30 | KEEP. No board, achievement or skill by that exact name; nearest is Etrian Mystery Dungeon's "Gun Mastery", a passive skill of its Gunner class, different wording and role. Descriptive English in the shape of the trials' names. |
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

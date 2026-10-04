@@ -37,8 +37,9 @@ the Hud drives with its own timers). Two behavior classes:
 
 ## Interactions kept honest
 
-- `clearUnstuckBanner` purges queued unstuck entries and, when it clears
-  the live banner, advances the queue so a waiting celebration still
+- `clearSourceBanner(source)` purges the queued entries of one source (the
+  unstuck line, the Fire and Fly seat's banners on a Replay) and, when it
+  clears the live banner, advances the queue so a waiting celebration still
   shows.
 - `hideBannerImmediately` is an ambient TAKEOVER (the mount-race
   countdown claiming the slot), not a reset: it rides `hideLive`, which

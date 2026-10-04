@@ -9,6 +9,7 @@ import type {
 import { FARSHORE_SALVAGE_PLACEMENTS } from './farshore_shipwreck_layout';
 import { WORLD_QUEST_CANNON, WORLD_QUEST_LAST_KEEP_CANNON } from './vehicle_stations';
 import { WORLD_QUEST_CALLIGRAPHY_QUEST } from './world_quest_calligraphy';
+import { WORLD_QUEST_FIRE_AND_FLY } from './world_quest_fire_and_fly';
 import { WORLD_QUEST_FORGING } from './world_quest_forging';
 import { WORLD_QUEST_GLIDER } from './world_quest_glider';
 import { WORLD_QUEST_INVESTIGATION } from './world_quest_investigation';
@@ -647,6 +648,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
   WORLD_QUEST_INVESTIGATION,
   WORLD_QUEST_GLIDER,
   WORLD_QUEST_SHADOW,
+  WORLD_QUEST_FIRE_AND_FLY,
 ];
 
 export const WORLD_QUESTS_BY_ID: Readonly<Record<string, WorldQuestDef>> = Object.fromEntries(

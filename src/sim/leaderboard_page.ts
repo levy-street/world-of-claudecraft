@@ -1,4 +1,5 @@
 import type {
+  DailyRewardLeaderboardPage,
   DeedsLeaderboardEntry,
   DeedsLeaderboardSelf,
   DevLeaderboardEntry,
@@ -130,4 +131,20 @@ export function paginateDeedsLeaderboard(
   requestedPageSize: number = LEADERBOARD_PAGE_SIZE,
 ): DeedsLeaderboardPage {
   return paginateRanked(entries, requestedPage, requestedPageSize);
+}
+
+// The offline world's daily-reward board: the reward is an account-level server
+// readout the sim cannot model, so it is always empty at the requested page.
+export function emptyDailyRewardLeaderboardPage(
+  page: number,
+  pageSize: number,
+): DailyRewardLeaderboardPage {
+  return {
+    day: '1970-01-01',
+    leaders: [],
+    page: Math.max(0, Math.floor(page)),
+    pageCount: 1,
+    total: 0,
+    pageSize,
+  };
 }

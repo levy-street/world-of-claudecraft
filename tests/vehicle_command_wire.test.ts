@@ -29,12 +29,76 @@ describe('vehicle command authority boundary', () => {
     expect(sim.leaveVehicle).toHaveBeenCalledWith(7);
   });
 
+  it('routes the turret shot for the authenticated player only, its aim point and nothing else', () => {
+    const sim = { enterVehicle: vi.fn(), useVehicleAction: vi.fn(), leaveVehicle: vi.fn() };
+    dispatchVehicleCommand(sim, 7, {
+      cmd: 'vehicle_action',
+      action: 'turret_fire',
+      x: 1,
+      z: -2.5,
+      pid: 99,
+      damage: 999999,
+      readyTick: 0,
+    });
+    expect(sim.useVehicleAction).toHaveBeenCalledExactlyOnceWith(
+      'turret_fire',
+      { x: 1, z: -2.5 },
+      7,
+    );
+  });
+
+  it('routes Replay as a seat action on the same command, for the authenticated player only', () => {
+    const sim = { enterVehicle: vi.fn(), useVehicleAction: vi.fn(), leaveVehicle: vi.fn() };
+    dispatchVehicleCommand(sim, 7, {
+      cmd: 'vehicle_action',
+      action: 'turret_replay',
+      x: 0,
+      z: 0,
+      pid: 99,
+      seed: 1234,
+    });
+    expect(sim.useVehicleAction).toHaveBeenCalledExactlyOnceWith(
+      'turret_replay',
+      { x: 0, z: 0 },
+      7,
+    );
+  });
+
+  it.each(['turret_shockwave', 'turret_frag'] as const)(
+    'routes the %s weapon for the authenticated player only, its point and nothing else',
+    (action) => {
+      const sim = { enterVehicle: vi.fn(), useVehicleAction: vi.fn(), leaveVehicle: vi.fn() };
+      dispatchVehicleCommand(sim, 7, {
+        cmd: 'vehicle_action',
+        action,
+        x: 4,
+        z: -9,
+        pid: 99,
+        charges: 99,
+        readyTick: 0,
+      });
+      expect(sim.useVehicleAction).toHaveBeenCalledExactlyOnceWith(action, { x: 4, z: -9 }, 7);
+    },
+  );
+
   it.each([
+    { cmd: 'vehicle_action', action: 'turret_shockwave' },
+    { cmd: 'vehicle_action', action: 'turret_shockwave', x: 0, z: Number.NaN },
+    { cmd: 'vehicle_action', action: 'turret_frag', x: 1, z: Infinity },
+    { cmd: 'vehicle_action', action: 'turret_frag', x: '1', z: 2 },
+    { cmd: 'vehicle_action', action: 'turret_Frag', x: 1, z: 2 },
+    { cmd: 'vehicle_action', action: 'turret_replay', x: 0 },
+    { cmd: 'vehicle_action', action: 'turret_Replay', x: 0, z: 0 },
+    { cmd: 'vehicle_replay', x: 0, z: 0 },
     { cmd: 'vehicle_enter', station: '__proto__' },
     { cmd: 'vehicle_action', action: 'constructor', x: 1, z: 2 },
     { cmd: 'vehicle_action', action: 'cannonball', x: NaN, z: 2 },
     { cmd: 'vehicle_action', action: 'cannonball', x: 1, z: Infinity },
     { cmd: 'vehicle_action', action: 'cannonball', x: '1', z: 2 },
+    { cmd: 'vehicle_action', action: 'turret_fire', x: NaN, z: 2 },
+    { cmd: 'vehicle_action', action: 'turret_fire', x: 1 },
+    { cmd: 'vehicle_action', action: 'turret_fire', x: 1, z: [2] },
+    { cmd: 'vehicle_action', action: 'Turret_fire', x: 1, z: 2 },
     { cmd: 'vehicle_win' },
   ])('drops malformed or forged commands: %j', (msg) => {
     const sim = { enterVehicle: vi.fn(), useVehicleAction: vi.fn(), leaveVehicle: vi.fn() };

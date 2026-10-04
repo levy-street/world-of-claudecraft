@@ -14030,6 +14030,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.dawnhold_castle.enterText':
     '꽃향기 가득한 던홀드 성의 따뜻한 홀 안으로 들어섭니다.',
   'entities.dungeons.dawnhold_castle.leaveText': '햇살 가득한 정원 잔디밭으로 다시 나옵니다.',
+  'entities.dungeons.fire_and_fly_arena.enterText':
+    '낡은 대포 탑에 오릅니다. 나무들 너머로 숲이 술렁이기 시작합니다.',
+  'entities.dungeons.fire_and_fly_arena.leaveText': '탑에서 내려와 투기장을 뒤로합니다.',
   'entities.items.wildheart_tuskblade.name': '야생심장 엄니대검',
   'entities.items.wildheart_hexwood_staff.name': '분지의 사술나무 지팡이',
   'entities.items.wildheart_fangknife.name': '줄가르의 송곳니칼',
@@ -18874,6 +18877,114 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '재사용 대기시간: {cooldown}초. {flight}초 후 착탄. 모든 포격이 {recovery}초의 회복 시간을 공유합니다.',
   'hudChrome.vehicle.shotRules':
     '표시된 구역 안을 조준하세요. 마나 소모 없음. 피해는 장비나 특성의 영향을 받지 않습니다.',
+  'hudChrome.turretArsenal.introShock':
+    '새 무기: 충격파, {shockKey}. 탑을 내리쳐 탑 발치의 몬스터를 모두 날려 버립니다.',
+  'hudChrome.turretArsenal.introShockTouch':
+    '새 무기: 충격파. 소켓을 눌러 탑 발치의 몬스터를 모두 날려 버리세요.',
+  'hudChrome.turretArsenal.introFrag':
+    '새 무기: 파편탄, {fragKey}. 장전한 뒤 무리를 향해 쏘면 그 위에서 자탄으로 터집니다.',
+  'hudChrome.turretArsenal.introFragTouch':
+    '새 무기: 파편탄. 소켓을 눌러 장전한 뒤 무리를 누르면 그 위에서 자탄으로 터집니다.',
+  'hudChrome.turretArsenal.shockHint': '몬스터가 탑에 닿기 전에 날려 버리세요. {shockKey}: 충격파.',
+  'hudChrome.turretArsenal.shockHintTouch':
+    '몬스터가 탑에 닿기 전에 날려 버리세요. 소켓을 눌러 충격파를 사용하세요.',
+  'hudChrome.turretArsenal.fragHint': '몬스터가 탑에 닿기 전에 날려 버리세요. {fragKey}: 파편탄.',
+  'hudChrome.turretArsenal.fragHintTouch':
+    '몬스터가 탑에 닿기 전에 날려 버리세요. 소켓을 눌러 파편탄을 사용하세요.',
+  'hudChrome.turretArsenal.resupplyBoth': '보급: 충격파 {shock}, 파편탄 {frag}',
+  'hudChrome.turretArsenal.resupplyShock': '보급: 충격파 {shock}',
+  'hudChrome.turretArsenal.resupplyFrag': '보급: 파편탄 {frag}',
+  'hudChrome.turretArsenal.resupplyRule':
+    '{waves}번째 웨이브가 끝나면 각 무기 충전이 하나씩 늘어납니다.',
+  'hudChrome.turretArsenal.resupplyRuleOnce':
+    '{wave}번째 웨이브가 끝나면 각 무기 충전이 하나씩 늘어납니다.',
+  'hudChrome.turretArsenal.bonusRule':
+    '임무에서 승리하면 쓰지 않고 남긴 충전 하나당 {points}점을 얻습니다.',
+  'hudChrome.turretArsenal.pointsCharges': '남긴 충전 ({count})',
+  'hudChrome.turret.integrity': '탑 내구도',
+  'hudChrome.turret.integrityBelow': '탑 내구도 {percent} 미만',
+  'hudChrome.turret.tower': '탑',
+  'hudChrome.turret.left': '남은 몬스터: {count}',
+  'hudChrome.turret.firstWave': '첫 번째 웨이브까지 {seconds}초',
+  'hudChrome.turret.hint': '몬스터가 탑에 닿기 전에 날려 버리세요',
+  'hudChrome.turret.finalWave': '마지막 웨이브',
+  'hudChrome.turret.clearedBanner': '{wave}번째 웨이브 격퇴',
+  'hudChrome.turret.victory': '승리!',
+  'hudChrome.turret.defeat': '탑이 함락되었습니다',
+  'hudChrome.turret.statKills': '처치',
+  'hudChrome.turret.statShots': '발사 횟수',
+  'hudChrome.turret.statAccuracy': '명중률',
+  'hudChrome.turret.statThrow': '최장 날리기 거리',
+  'hudChrome.turret.statAirtime': '최장 체공 시간',
+  'hudChrome.turret.statYards': '{yards}야드',
+  'hudChrome.turret.statSeconds': '{seconds}초',
+  'hudChrome.turret.medalGold': '금메달',
+  'hudChrome.turret.medalSilver': '은메달',
+  'hudChrome.turret.medalBronze': '동메달',
+  'hudChrome.turret.noMedal': '메달 없음',
+  'hudChrome.turret.pointsKills': '처치 ({count})',
+  'hudChrome.turret.pointsTower': '남은 탑 내구도 ({points})',
+  'hudChrome.turret.pointsKegKills': '화약통 처치 ({count})',
+  'hudChrome.turret.pointsBowled': '넘어뜨리기 ({count})',
+  'hudChrome.turret.pointsTotal': '총점',
+  'hudChrome.turret.leave': '탑에서 내려가기',
+  'hudChrome.turret.leaveShort': '내려가기',
+  'hudChrome.turret.replay': '다시 하기',
+  'hudChrome.turret.replayHint':
+    '탑 위에서 같은 시련에 다시 도전하기. 오늘의 보상을 받은 뒤에는 다시 도전해도 보상이 없습니다.',
+  'hudChrome.turret.replayHintMission':
+    '탑 위에서 같은 임무에 다시 도전하기. 오늘의 보상을 받은 뒤에는 다시 도전해도 보상이 없습니다.',
+  'hudChrome.turret.leavingIn': '{seconds}초 후 탑에서 내려갑니다',
+  'hudChrome.turret.recruitedBanner': '입대!',
+  'hudChrome.turret.recruitedLine':
+    '{name}: "성문 포병대에 온 것을 환영하네, 포수. 이제 내 임무를 맡기겠네."',
+  'hudChrome.turret.weapons': '탑 무기',
+  'hudChrome.turret.shockwave': '충격파',
+  'hudChrome.turret.shockwaveTip':
+    '탑을 내리칩니다. 고리가 탑의 벽에서 {reach}야드까지 {seconds}초 동안 퍼져 나갑니다. 고리에 닿은 지상의 몬스터는 모두 탑에서 멀리 날아가고 준비 중인 공격이 멈추며, 탑에서 {core}야드 이내에서는 {damage}의 피해를 입고 그 너머에서는 피해가 줄어듭니다. 공중의 몬스터는 고리를 넘어갑니다.',
+  'hudChrome.turret.shockwaveRules':
+    '사용 후 {seconds}초 뒤에 다시 준비됩니다. 웨이브 중에만 사용할 수 있습니다.',
+  'hudChrome.turret.frag': '파편탄',
+  'hudChrome.turret.fragTip':
+    '장전한 뒤 일반 포탄처럼 지면에 발사합니다. 조준 지점 위에서 {count}개의 자탄으로 터집니다. 하나는 조준 지점에, {outer}개는 그 주위 {radius}야드의 원에 떨어집니다. 각 자탄은 {blast}야드 이내에 최대 {damage}의 피해를 주고, 맞은 몬스터를 날려 보내며, 화약통에 불을 붙입니다.',
+  'hudChrome.turret.fragRules':
+    '대포의 재장전 시간을 사용합니다. 다시 장전하거나 취소하면 충전을 소모하지 않고 해제합니다. 웨이브 중에만 사용할 수 있습니다.',
+  'hudChrome.turret.chargesLeft': '남은 충전: {count}',
+  'hudChrome.turret.weaponsHint':
+    '몬스터가 탑에 닿기 전에 날려 버리세요. {shockKey}: 충격파. {fragKey}: 파편탄.',
+  'hudChrome.turret.weaponsHintTouch':
+    '몬스터가 탑에 닿기 전에 날려 버리세요. 소켓을 눌러 충격파나 파편탄을 사용하세요.',
+  'hudChrome.turret.statShockwaves': '충격파',
+  'hudChrome.turret.statFrags': '파편탄',
+  'hudChrome.gunneryBoard.title': '포술 게시판',
+  'hudChrome.gunneryBoard.listLabel': '시련과 임무',
+  'hudChrome.gunneryBoard.trials': '입대 시험',
+  'hudChrome.gunneryBoard.missions': '임무',
+  'hudChrome.gunneryBoard.trialKicker': '시련',
+  'hudChrome.gunneryBoard.missionKicker': '임무',
+  'hudChrome.gunneryBoard.recruitProgress': '통과한 시련: {won}/{total}',
+  'hudChrome.gunneryBoard.recruited': '입대 완료',
+  'hudChrome.gunneryBoard.mastery': '포수의 숙련: 별 {stars}/{max}개',
+  'hudChrome.gunneryBoard.won': '승리함',
+  'hudChrome.gunneryBoard.notWon': '아직 승리하지 못함',
+  'hudChrome.gunneryBoard.locked': '잠김',
+  'hudChrome.gunneryBoard.arsenal': '무장',
+  'hudChrome.gunneryBoard.charges': '{weapon} ×{count}',
+  'hudChrome.gunneryBoard.gold': '금',
+  'hudChrome.gunneryBoard.goldBar': '탑을 {percent} 지키기',
+  'hudChrome.gunneryBoard.waves': '웨이브',
+  'hudChrome.gunneryBoard.best': '최고 기록',
+  'hudChrome.gunneryBoard.bestRun': '{medal}, {points}점',
+  'hudChrome.gunneryBoard.notPlayed': '아직 도전하지 않음',
+  'hudChrome.gunneryBoard.reward': '오늘의 보상',
+  'hudChrome.gunneryBoard.rewardAvailable': '받을 수 있음',
+  'hudChrome.gunneryBoard.rewardCollected': '받음: 연습만 가능',
+  'hudChrome.gunneryBoard.takeTrial': '시련 도전',
+  'hudChrome.gunneryBoard.takeMission': '임무 도전',
+  'hudChrome.gunneryBoard.practice': '연습',
+  'hudChrome.gunneryBoard.actionAria': '{action}: {name}',
+  'hudChrome.gunneryBoard.lockedTrial': '{previous}을(를) 통과하면 이 시련이 열립니다.',
+  'hudChrome.gunneryBoard.lockedMission': '{name}을(를) 통과하면 입대하고 임무가 열립니다.',
   'hudChrome.leaderboard.tabWorldQuests': '전역 퀘스트',
   'hudChrome.leaderboard.wqBoardsLabel': '전역 퀘스트 점수판',
   'hudChrome.leaderboard.wqMedal': '메달',
@@ -19117,6 +19228,41 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.glider.score': '점수: {score}.',
   'questUi.worldQuest.glider.medals.silver': '은',
   'questUi.worldQuest.glider.medals.bronze': '동',
+  'questUi.worldQuest.fireAndFly.title': '포수의 시련',
+  'questUi.worldQuest.fireAndFly.objective':
+    '시련 하나의 모든 공격 파도를 견디며 자신의 탑을 지키기',
+  'questUi.worldQuest.fireAndFly.ready': '포술장 올더에게 말을 걸어 시련을 받으세요.',
+  'questUi.worldQuest.fireAndFly.complete':
+    '시련 통과! 포술장 올더에게 말을 걸면 연습할 수 있습니다.',
+  'questUi.worldQuest.fireAndFly.scenarios.introduction': '신병의 시련',
+  'questUi.worldQuest.fireAndFly.scenarios.standard': '정식 경계 근무',
+  'questUi.worldQuest.fireAndFly.scenarios.hard': '고참병의 시험',
+  'questUi.worldQuest.fireAndFly.scenarios.pack': '무리',
+  'questUi.worldQuest.fireAndFly.scenarios.deluge': '대홍수',
+  'questUi.worldQuest.fireAndFly.scenarios.brittle': '금 간 탑',
+  'questUi.worldQuest.fireAndFly.scenarios.powder': '화약고',
+  'questUi.worldQuest.fireAndFly.brief.introduction':
+    '자네가 이번 신병인가? 이게 자네 대포일세. 성미 까다로운 노부인이지만, 약속을 어긴 적은 한 번도 없지. 숲에서 짐승 몇 마리가 나올 걸세. 노린 것을 맞힐 줄 안다는 걸 보여 주게.',
+  'questUi.worldQuest.fireAndFly.brief.standard':
+    '대포 하나로 늘 충분한 건 아니지. 탑마다 비장의 한 수가 숨어 있네. 성벽 발치에 몰려드는 것은 무엇이든 쓸어 버리는 충격파일세. 오늘 밤 자네는 그걸 쓰는 법을, 무엇보다 때를 고르는 법을 배우게 될 걸세.',
+  'questUi.worldQuest.fireAndFly.brief.hard':
+    '장인들의 공방에서 나온 가장 파괴적인 무기, 파편탄일세. 조금 느리긴 해도, 터지면 주변에 서 있는 건 아무것도 남지 않지. 포수 명부에 이름을 올리기 전에 모든 포수는 이걸 다룰 줄 알아야 하네.',
+  'questUi.worldQuest.fireAndFly.brief.pack':
+    '우리 요새가 밀려드는 놈들에게 집어삼켜지고 있네! 놈들은 무리 지어 오는데, 무리마다 앞선 무리보다 더 사납지. 성벽 위에서도 놈들의 울부짖음이 들린다네. 성벽을 넘어오기 전에 놈들을 밀어내도록 도와주게!',
+  'questUi.worldQuest.fireAndFly.brief.deluge':
+    '족히 백은 넘는 놈들이네. 늑대, 멧돼지, 거미, 굴착꾼까지, 작은 짐승들의 물결이 사방에서 밀려든다네. 물러난다고 믿지 말게, 언제나 더 거세게 돌아오고, 그 뒤로 더 큰 놈이 헤치고 다가오니.',
+  'questUi.worldQuest.fireAndFly.brief.brittle':
+    '그 낡은 탑은 지난 철에 끔찍한 일격을 맞았고, 금은 끝내 아물지 않았네. 오늘 밤 망자들이 일어나 탑으로 진군해 오지. 많아야 일곱 번 맞으면 무너질 걸세. 이쪽에 남은 건 그 탑뿐이니, 지켜 주게.',
+  'questUi.worldQuest.fireAndFly.brief.powder':
+    '화약고가 넘쳐나서, 평소의 두 배나 되는 화약통을 밖에, 그것도 놈들이 지나는 길 한복판에 쌓아 둘 수밖에 없었네. 그런데 화약 냄새에 이끌려 대장간의 괴물들이 몰려오고 있지. 뜨거워질 걸세, 포수.',
+  'questUi.worldQuest.fireAndFly.greeting.trials':
+    '제법 늘었군, 신병. 시련 몇 개만 더 넘기면 포수 명부에 자네 이름을 올려 주지.',
+  'questUi.worldQuest.fireAndFly.greeting.recruited':
+    '다시 왔군, 포수! 성벽엔 그 어느 때보다 자네가 필요하네. 자네 대포만 기다리는 임무도 몇 가지 있다네.',
+  'entities.npcs.fire_and_fly_instructor.name': '포술장 올더',
+  'entities.npcs.fire_and_fly_instructor.title': '포병 모집관',
+  'entities.npcs.fire_and_fly_instructor.greeting':
+    '성벽에는 수비대가 내줄 수 있는 것보다 더 많은 수비병이 필요해서 모집하고 있네. 누구에게든 대포를 맡기기 전에, 자기 탑을 지켜 내는 모습을 보고 싶군. 시련을 받게: 괴물들이 성벽에 닿기 전에 날려 버리게.',
   'questUi.worldQuest.traceShape.diamond': '마름모',
   'questUi.worldQuest.traceShape.pentagon': '오각형',
   'questUi.worldQuest.traceShape.arrow': '화살 룬',
@@ -19458,6 +19604,34 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.leaderboard.gliderRankings': '활공 코스 기록',
   'hudChrome.leaderboard.gliderRules':
     '모든 고리를 통과한 완주 기록 중 가장 빠른 시간이 승리합니다. 일일 기록은 서버 초기화 때 갱신됩니다. 기록은 30초 이내에 반영됩니다.',
+  'hudChrome.leaderboard.fireAndFlyDaily': '{trial}: 오늘',
+  'hudChrome.leaderboard.fireAndFlyLifetime': '{trial}: 전체 기간',
+  'hudChrome.leaderboard.fireAndFlyStart': '이 시련 도전',
+  'hudChrome.leaderboard.fireAndFlyRankings': '포수의 기록',
+  'hudChrome.leaderboard.fireAndFlyPersonalRules':
+    '이 캐릭터에 저장된 오프라인 기록입니다. 가장 좋은 메달이 먼저, 그다음 가장 높은 점수 순으로 순위가 정해집니다. 일일 기록은 매일 초기화됩니다.',
+  'hudChrome.leaderboard.fireAndFlyRules':
+    '가장 좋은 메달이 먼저, 그다음 가장 높은 점수 순으로 순위가 정해집니다. 연습을 포함해 승리한 모든 시련이 기록됩니다. 일일 기록은 서버 초기화 때 갱신됩니다. 기록은 30초 이내에 반영됩니다.',
+  'hudChrome.leaderboard.fireAndFlyGroupsLabel': '포수 기록 분류',
+  'hudChrome.leaderboard.fireAndFlyGroups.trials': '시련',
+  'hudChrome.leaderboard.fireAndFlyGroups.missions': '임무',
+  'hudChrome.leaderboard.fireAndFlyGroups.mastery': '숙련',
+  'hudChrome.leaderboard.fireAndFlyMissionStart': '이 임무 도전',
+  'hudChrome.leaderboard.fireAndFlyMissionRules':
+    '가장 좋은 메달이 먼저, 그다음 가장 높은 점수 순으로 순위가 정해집니다. 연습을 포함해 승리한 모든 임무가 기록됩니다. 기록은 30초 이내에 반영됩니다.',
+  'hudChrome.leaderboard.fireAndFlyMissionPersonalRules':
+    '이 캐릭터에 저장된 오프라인 기록입니다. 가장 좋은 메달이 먼저, 그다음 가장 높은 점수 순으로 순위가 정해집니다.',
+  'hudChrome.leaderboard.fireAndFlyMastery': '포수의 숙련',
+  'hudChrome.leaderboard.fireAndFlyMasteryRules':
+    '각 임무의 가장 좋은 메달을 별로 환산해 합산합니다: 금 3, 은 2, 동 1. 별이 많은 순, 그다음 총점 순으로 순위가 정해집니다. 기록은 30초 이내에 반영됩니다.',
+  'hudChrome.leaderboard.fireAndFlyMasteryPersonalRules':
+    '이 캐릭터에 저장된 오프라인 숙련입니다. 각 임무의 가장 좋은 메달을 별로 환산해 합산하고(금 3, 은 2, 동 1), 그다음 총점으로 비교합니다.',
+  'hudChrome.leaderboard.wqStars': '별',
+  'hudChrome.wqLadder.rankedByStars': '별 순, 그다음 최고 점수',
+  'hudChrome.plurals.fireAndFlyStars.one': '별 {count}개',
+  'hudChrome.plurals.fireAndFlyStars.few': '별 {count}개',
+  'hudChrome.plurals.fireAndFlyStars.many': '별 {count}개',
+  'hudChrome.plurals.fireAndFlyStars.other': '별 {count}개',
   'hudChrome.framePresets.apply': '적용',
   'hudChrome.focusTargets.showEmpty': '빈 주시 대상 프레임 표시',
   'hudChrome.focusTargets.assignHint':

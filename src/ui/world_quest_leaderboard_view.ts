@@ -2,10 +2,24 @@
 // are named, what one row's number means (waves held, seconds, or points) and
 // how it formats, the medal cell, and the whole rankings window model (the
 // board cards, the top-three podium, the rest of the ladder, the viewer's
-// pinned best, and the loading / error / empty states). DOM-free; the painter
+// pinned best, and the loading / error / empty states), plus Fire and Fly's
+// group switch (trials, missions, Mastery). DOM-free; the painter
 // (world_quest_leaderboard_window.ts) renders exactly what this shapes, and
 // the legacy chip tab in leaderboard_window.ts still reads the row helpers.
 
+import { FIRE_AND_FLY_QUEST_ID } from '../sim/content/world_quest_fire_and_fly';
+import { GLIDER_QUEST_ID } from '../sim/content/world_quest_glider';
+import {
+  type FireAndFlyRecruitment,
+  fireAndFlyScenarioUnlocked,
+  freshFireAndFlyRecruitment,
+} from '../sim/fire_and_fly_recruitment';
+import {
+  FIRE_AND_FLY_BOARD_GROUPS,
+  type FireAndFlyBoardGroup,
+  fireAndFlyBoardGroup,
+  fireAndFlyScoreboardInfo,
+} from '../sim/fire_and_fly_scoreboards';
 import { gliderScoreboardInfo } from '../sim/glider_scoreboards';
 import {
   WORLD_QUEST_SCOREBOARDS,
@@ -15,11 +29,110 @@ import {
   worldQuestScoreboard,
 } from '../sim/world_quest_scoreboards';
 import type { WorldQuestLeaderboardEntry, WorldQuestLeaderboardPage } from '../world_api';
-import { formatNumber, t } from './i18n';
+import { fireAndFlyTrialName } from './fire_and_fly_trial_view';
+import { formatNumber, type TranslationKey, t, tPlural } from './i18n';
 import { type PodiumSlot, podiumSplit } from './leaderboard_podium_view';
 import { worldQuestDisplayName } from './world_quest_view';
 
+/** Which ladders a window shows together: the glider's courses, Fire and Fly's
+ *  boards, or the quest-wide boards of every other medal world quest. */
+export type WorldQuestBoardFamily = 'quests' | 'glider' | 'fireAndFly';
+
+export function worldQuestBoardFamily(boardId: string): WorldQuestBoardFamily {
+  if (gliderScoreboardInfo(boardId)) return 'glider';
+  if (fireAndFlyBoardGroup(boardId)) return 'fireAndFly';
+  return 'quests';
+}
+
+/** The boards shown beside `active`: its family's, and within Fire and Fly its group's. */
+function siblingBoards(active: string): WorldQuestScoreboard[] {
+  const family = worldQuestBoardFamily(active);
+  const group = fireAndFlyBoardGroup(active);
+  return WORLD_QUEST_SCOREBOARDS.filter(
+    (board) =>
+      worldQuestBoardFamily(board.id) === family && fireAndFlyBoardGroup(board.id) === group,
+  );
+}
+
+const GROUP_LABEL: Record<FireAndFlyBoardGroup, TranslationKey> = {
+  trials: 'hudChrome.leaderboard.fireAndFlyGroups.trials',
+  missions: 'hudChrome.leaderboard.fireAndFlyGroups.missions',
+  mastery: 'hudChrome.leaderboard.fireAndFlyGroups.mastery',
+};
+
+export interface WorldQuestBoardGroupView {
+  group: FireAndFlyBoardGroup;
+  label: string;
+  /** The board a pick opens: the active one inside its own group, else the group's first. */
+  board: WorldQuestScoreboardId;
+  active: boolean;
+}
+
+/** Fire and Fly's group switch, in the instructor's order; empty for every other family. */
+export function worldQuestBoardGroups(active: WorldQuestScoreboardId): WorldQuestBoardGroupView[] {
+  const current = fireAndFlyBoardGroup(active);
+  if (!current) return [];
+  return FIRE_AND_FLY_BOARD_GROUPS.flatMap((group) => {
+    const first = WORLD_QUEST_SCOREBOARDS.find((board) => fireAndFlyBoardGroup(board.id) === group);
+    if (!first) return [];
+    return [
+      {
+        group,
+        label: t(GROUP_LABEL[group]),
+        board: group === current ? active : first.id,
+        active: group === current,
+      },
+    ];
+  });
+}
+
+function isMastery(board: WorldQuestScoreboard): boolean {
+  return fireAndFlyBoardGroup(board.id) === 'mastery';
+}
+
+const FAMILY_TITLE: Record<WorldQuestBoardFamily, TranslationKey> = {
+  quests: 'hudChrome.wqLadder.title',
+  glider: 'hudChrome.leaderboard.gliderRankings',
+  fireAndFly: 'hudChrome.leaderboard.fireAndFlyRankings',
+};
+
+const GROUP_RULES: Record<FireAndFlyBoardGroup, [TranslationKey, TranslationKey]> = {
+  trials: [
+    'hudChrome.leaderboard.fireAndFlyRules',
+    'hudChrome.leaderboard.fireAndFlyPersonalRules',
+  ],
+  missions: [
+    'hudChrome.leaderboard.fireAndFlyMissionRules',
+    'hudChrome.leaderboard.fireAndFlyMissionPersonalRules',
+  ],
+  mastery: [
+    'hudChrome.leaderboard.fireAndFlyMasteryRules',
+    'hudChrome.leaderboard.fireAndFlyMasteryPersonalRules',
+  ],
+};
+
+function familySubtitle(boardId: string, personal: boolean): TranslationKey {
+  if (worldQuestBoardFamily(boardId) === 'glider')
+    return personal
+      ? 'hudChrome.leaderboard.gliderPersonalRules'
+      : 'hudChrome.leaderboard.gliderRules';
+  const group = fireAndFlyBoardGroup(boardId);
+  if (group) return GROUP_RULES[group][personal ? 1 : 0];
+  return 'hudChrome.wqLadder.subtitle';
+}
+
 export function worldQuestBoardLabel(board: WorldQuestScoreboard): string {
+  if (isMastery(board)) return t('hudChrome.leaderboard.fireAndFlyMastery');
+  const trial = fireAndFlyScoreboardInfo(board.id);
+  if (trial) {
+    const name = fireAndFlyTrialName(trial.scenarioId) ?? worldQuestDisplayName(board.questId);
+    return t(
+      trial.period === 'daily'
+        ? 'hudChrome.leaderboard.fireAndFlyDaily'
+        : 'hudChrome.leaderboard.fireAndFlyLifetime',
+      { trial: name },
+    );
+  }
   const glider = gliderScoreboardInfo(board.id);
   if (!glider) return worldQuestDisplayName(board.questId);
   const course = t(`hudChrome.leaderboard.gliderCourseNames.${glider.key}`);
@@ -39,9 +152,7 @@ export interface WorldQuestBoardChip {
 
 /** The board selector strip above the rows: one chip per scoreboard. */
 export function worldQuestBoardChips(active: WorldQuestScoreboardId): WorldQuestBoardChip[] {
-  return WORLD_QUEST_SCOREBOARDS.filter(
-    (board) => !!gliderScoreboardInfo(board.id) === !!gliderScoreboardInfo(active),
-  ).map((board) => ({
+  return siblingBoards(active).map((board) => ({
     id: board.id,
     label: worldQuestBoardLabel(board),
     active: board.id === active,
@@ -79,6 +190,14 @@ export function worldQuestMedalText(medal: WorldQuestMedal | null): string {
     : t('hudChrome.leaderboard.wqNoMedal');
 }
 
+/** The medal column's text: the medal, or on the Mastery the stars it sums. */
+function medalCellText(board: WorldQuestScoreboard, entry: WorldQuestLeaderboardEntry): string {
+  if (!isMastery(board)) return worldQuestMedalText(entry.medal);
+  const stars = entry.stars;
+  if (stars === undefined) return worldQuestMedalText(null);
+  return tPlural('hudChrome.plurals.fireAndFlyStars', stars, { count: whole(stars) });
+}
+
 export interface WorldQuestLeaderboardRowView {
   rank: string;
   name: string;
@@ -98,7 +217,7 @@ export function worldQuestLeaderboardRow(
     rank: formatNumber(entry.rank, { maximumFractionDigits: 0 }),
     name: entry.name,
     medal: entry.medal,
-    medalText: worldQuestMedalText(entry.medal),
+    medalText: medalCellText(board, entry),
     metricText: worldQuestMetricText(board, entry.metric),
     me: entry.name === viewerName,
   };
@@ -123,8 +242,15 @@ export function resolveWorldQuestBoard(id: string): WorldQuestScoreboard {
  *  the dev server injects CSS inline, which is why it only broke once deployed. */
 export const WORLD_QUEST_LADDER_ART_DIR = '/ui/world-quests/leaderboard';
 
+/** A family of per-period ladders shares one piece of art. */
+const FAMILY_ART: Record<Exclude<WorldQuestBoardFamily, 'quests'>, string> = {
+  glider: 'slalom',
+  fireAndFly: 'barricade',
+};
+
 export function worldQuestBoardArt(boardId: string): string {
-  return `${WORLD_QUEST_LADDER_ART_DIR}/${gliderScoreboardInfo(boardId) ? 'slalom' : boardId}.webp`;
+  const family = worldQuestBoardFamily(boardId);
+  return `${WORLD_QUEST_LADDER_ART_DIR}/${family === 'quests' ? boardId : FAMILY_ART[family]}.webp`;
 }
 
 export function worldQuestMedalArt(medal: WorldQuestMedal): string {
@@ -189,12 +315,24 @@ export type WorldQuestLadderInput =
   | { kind: 'error' }
   | { kind: 'page'; page: WorldQuestLeaderboardPage };
 
+/** The button that takes the selected course, trial or mission: what it starts and its label. */
+export interface WorldQuestLadderStartView {
+  questId: string;
+  courseId: string;
+  label: string;
+}
+
 export interface WorldQuestLadderView {
   title: string;
   subtitle: string;
   closeLabel: string;
+  groupsLabel: string;
+  /** Fire and Fly's group switch; empty for every other family. */
+  groups: WorldQuestBoardGroupView[];
   boardsLabel: string;
   cards: WorldQuestLadderCardView[];
+  /** Null on a board with nothing to take, or a trial or mission the character has not unlocked. */
+  start: WorldQuestLadderStartView | null;
   boardId: WorldQuestScoreboardId;
   boardTitle: string;
   boardRule: string;
@@ -214,11 +352,9 @@ export interface WorldQuestLadderView {
   pager: WorldQuestLadderPagerView | null;
 }
 
-/** The board cards: one per scoreboard, in scoreboard order. */
+/** The board cards: one per scoreboard of the active family (and group), in scoreboard order. */
 export function worldQuestLadderCards(active: WorldQuestScoreboardId): WorldQuestLadderCardView[] {
-  return WORLD_QUEST_SCOREBOARDS.filter(
-    (board) => !!gliderScoreboardInfo(board.id) === !!gliderScoreboardInfo(active),
-  ).map((board) => ({
+  return siblingBoards(active).map((board) => ({
     id: board.id,
     label: worldQuestBoardLabel(board),
     metricHeader: worldQuestMetricHeader(board),
@@ -227,8 +363,33 @@ export function worldQuestLadderCards(active: WorldQuestScoreboardId): WorldQues
   }));
 }
 
+function startView(
+  board: WorldQuestScoreboard,
+  recruitment: Readonly<FireAndFlyRecruitment>,
+): WorldQuestLadderStartView | null {
+  const course = gliderScoreboardInfo(board.id);
+  if (course)
+    return {
+      questId: GLIDER_QUEST_ID,
+      courseId: course.courseId,
+      label: t('hudChrome.leaderboard.gliderStart'),
+    };
+  const scenario = fireAndFlyScoreboardInfo(board.id);
+  if (!scenario || !fireAndFlyScenarioUnlocked(recruitment, scenario.scenarioId)) return null;
+  return {
+    questId: FIRE_AND_FLY_QUEST_ID,
+    courseId: scenario.scenarioId,
+    label: t(
+      scenario.kind === 'mission'
+        ? 'hudChrome.leaderboard.fireAndFlyMissionStart'
+        : 'hudChrome.leaderboard.fireAndFlyStart',
+    ),
+  };
+}
+
 /** How the board orders its rows, as the player reads it. */
 export function worldQuestBoardRule(board: WorldQuestScoreboard): string {
+  if (isMastery(board)) return t('hudChrome.wqLadder.rankedByStars');
   return board.primary === 'metric'
     ? t(`hudChrome.wqLadder.rankedBy.${board.metric}`)
     : t(`hudChrome.wqLadder.rankedByMedal.${board.metric}`);
@@ -267,7 +428,7 @@ function podiumSlot(
     rank: slot.rankText,
     name: entry.name,
     medal: entry.medal,
-    medalText: worldQuestMedalText(entry.medal),
+    medalText: medalCellText(board, entry),
     medalArt: entry.medal ? worldQuestMedalArt(entry.medal) : null,
     metricText: worldQuestMetricText(board, entry.metric),
     me: sameName(entry.name, viewerName),
@@ -305,36 +466,31 @@ function selfView(
     rankText: t('hudChrome.wqLadder.selfRank', { rank: whole(entry.rank) }),
     name: entry.name,
     medal: entry.medal,
-    medalText: worldQuestMedalText(entry.medal),
+    medalText: medalCellText(board, entry),
     medalArt: entry.medal ? worldQuestMedalArt(entry.medal) : null,
     metricText: worldQuestMetricText(board, entry.metric),
   };
 }
 
-/** The whole rankings window for one board and one fetch state. */
+/** The whole rankings window for one board and one fetch state; `recruitment` gates the start button. */
 export function buildWorldQuestLadderView(
   boardId: string,
   input: WorldQuestLadderInput,
   viewerName: string,
+  recruitment: Readonly<FireAndFlyRecruitment> = freshFireAndFlyRecruitment(),
 ): WorldQuestLadderView {
   const board = resolveWorldQuestBoard(boardId);
   const metric = worldQuestMetricHeader(board);
+  const family = worldQuestBoardFamily(board.id);
   const base: WorldQuestLadderView = {
-    title: t(
-      gliderScoreboardInfo(board.id)
-        ? 'hudChrome.leaderboard.gliderRankings'
-        : 'hudChrome.wqLadder.title',
-    ),
-    subtitle: t(
-      gliderScoreboardInfo(board.id)
-        ? input.kind === 'page' && input.page.personal
-          ? 'hudChrome.leaderboard.gliderPersonalRules'
-          : 'hudChrome.leaderboard.gliderRules'
-        : 'hudChrome.wqLadder.subtitle',
-    ),
+    title: t(FAMILY_TITLE[family]),
+    subtitle: t(familySubtitle(board.id, input.kind === 'page' && !!input.page.personal)),
     closeLabel: t('hudChrome.wqLadder.close'),
+    groupsLabel: t('hudChrome.leaderboard.fireAndFlyGroupsLabel'),
+    groups: worldQuestBoardGroups(board.id),
     boardsLabel: t('hudChrome.leaderboard.wqBoardsLabel'),
     cards: worldQuestLadderCards(board.id),
+    start: startView(board, recruitment),
     boardId: board.id,
     boardTitle: worldQuestBoardLabel(board),
     boardRule: worldQuestBoardRule(board),
@@ -347,7 +503,9 @@ export function buildWorldQuestLadderView(
     columns: {
       rank: t('game.leaderboard.rank'),
       name: t('game.leaderboard.name'),
-      medal: t('hudChrome.leaderboard.wqMedal'),
+      medal: t(
+        isMastery(board) ? 'hudChrome.leaderboard.wqStars' : 'hudChrome.leaderboard.wqMedal',
+      ),
       metric,
     },
     youLabel: t('game.leaderboard.you'),

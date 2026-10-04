@@ -3,6 +3,7 @@
 import { describe, expect, it } from 'vitest';
 import { LAST_KEEP_CANNON, NORTH_WATCH_CANNON } from '../src/sim/content/vehicle_stations';
 import { WORLD_QUEST_CALLIGRAPHY_ID } from '../src/sim/content/world_quest_calligraphy';
+import { FIRE_AND_FLY_QUEST_ID } from '../src/sim/content/world_quest_fire_and_fly';
 import { FORGE_QUEST_ID } from '../src/sim/content/world_quest_forging';
 import { GLIDER_QUEST_ID } from '../src/sim/content/world_quest_glider';
 import { WORLD_QUESTS_BY_ID } from '../src/sim/data';
@@ -29,7 +30,7 @@ const board = (id: string): WorldQuestScoreboard => {
 };
 
 describe('scoreboard catalog', () => {
-  it('names medal boards and six timed course boards backed by real quest records', () => {
+  it('names medal boards, six timed course boards, six trial, four mission and one Mastery board backed by real quest records', () => {
     expect(WORLD_QUEST_SCOREBOARDS.map((b) => b.questId)).toEqual([
       NORTH_WATCH_CANNON.questId,
       LAST_KEEP_CANNON.questId,
@@ -37,6 +38,7 @@ describe('scoreboard catalog', () => {
       GLIDER_QUEST_ID,
       FORGE_QUEST_ID,
       ...Array(6).fill(GLIDER_QUEST_ID),
+      ...Array(6 + 4 + 1).fill(FIRE_AND_FLY_QUEST_ID),
     ]);
     for (const b of WORLD_QUEST_SCOREBOARDS) expect(WORLD_QUESTS_BY_ID[b.questId]).toBeDefined();
     expect(new Set(WORLD_QUEST_SCOREBOARDS.map((b) => b.id)).size).toBe(

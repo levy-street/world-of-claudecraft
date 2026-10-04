@@ -52,9 +52,25 @@ export interface ActiveMinigameEntity {
 export interface ActiveMinigameMusicInput {
   worldQuestLog?: ReadonlyMap<string, WorldQuestProgress>;
   vehicleSession?: { stationId?: string } | null;
+  /** The Fire and Fly seat shares the cannon's track. */
+  turretSession?: unknown;
   activePuzzleQuestId?: string | null;
   playerPos?: { x: number; z: number };
   entities?: Iterable<ActiveMinigameEntity>;
+}
+
+/**
+ * The Fire and Fly seat plays the cannon's track this much softer, under its shots and blasts:
+ * the file measures -10.7 LUFS integrated, and 0.61 (-4.3 dB) brings it to about -15 LUFS, the
+ * loudness of the zone music.
+ */
+export const TURRET_MUSIC_LEVEL = 0.61;
+
+/** The level the resolved track plays at: the turret seat's softer mix, full for every other activity. */
+export function resolveActiveMinigameLevel(input: ActiveMinigameMusicInput): number {
+  return !input.activePuzzleQuestId && !input.vehicleSession && input.turretSession
+    ? TURRET_MUSIC_LEVEL
+    : 1;
 }
 
 /** Resolves which minigame music track (if any) should override the ambient score. */
@@ -67,8 +83,8 @@ export function resolveActiveMinigameTrack(input: ActiveMinigameMusicInput): Min
     return 'puzzle';
   }
 
-  // 2. Cannon vehicle session
-  if (input.vehicleSession) {
+  // 2. Cannon vehicle session, or the Fire and Fly turret
+  if (input.vehicleSession || input.turretSession) {
     return 'cannon';
   }
 

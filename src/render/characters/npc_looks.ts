@@ -146,6 +146,25 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     worn: kit('ranger'),
     props: 'none',
   },
+  // Master Gunner Alder of the Evergarden gate: powder-grey crop and mutton
+  // chops, a weathered face, the gate watch's verdigris plate, his ramming hammer.
+  fire_and_fly_instructor: {
+    app: {
+      gender: 'male',
+      hair: 'crewcut',
+      beard: 'mutton',
+      brows: 'bushy',
+      eyeShape: 'narrow',
+      ...hair(30, 0.08, 0.42),
+      ...skin(22, 0.45, 0.46),
+      ...eyes(32, 0.45, 0.32),
+      mouth: 'frown',
+      face: face({ jaw: 0.25, brow: 0.2, chin: 0.1 }),
+      outfit: 'verdigris',
+    },
+    worn: kit('knight', { arms: null }),
+    props: 'hammer',
+  },
   // Keeper Liora: the Evergarden maze warden, mossy and unhurried.
   wisp_maze_keeper: {
     app: {

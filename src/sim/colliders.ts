@@ -27,7 +27,6 @@ import {
   BG_SLOT_COUNT,
   BUILTIN_WORLD,
   battlegroundOrigin,
-  DUNGEON_FLOOR_Y,
   DUNGEON_X_THRESHOLD,
   DUNGEONS,
   defaultDelveModules,
@@ -68,14 +67,7 @@ import { type DelveModuleId, delveModuleColliders } from './delve_layout';
 import { isLitanyModuleId, litanyModuleLosColliders } from './delve_litany_layout';
 import { dungeonDoorJambColliders } from './dungeon_door_jambs';
 import { dungeonInstanceAt, INTERIOR_LAYOUTS } from './dungeon_floor';
-import {
-  ARENA_LAYOUT,
-  CRYPT_LAYOUT,
-  DAWNHOLD_LAYOUT,
-  DROWNED_COURT_LAYOUT,
-  LASTKEEP_LAYOUT,
-  layoutColliders,
-} from './dungeon_layout';
+import { ARENA_LAYOUT, DROWNED_COURT_LAYOUT, layoutColliders } from './dungeon_layout';
 import { emberLilySpots } from './ember_lilies';
 import { fenWillowSpots, hollowWillowSpots } from './fen_willows';
 import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
@@ -118,7 +110,6 @@ import { STREETLAMP_COLLIDER_RADIUS, STREETLAMP_FIXTURE_HEIGHT } from './streetl
 import { townPropPlacements } from './town_props';
 import { transportBerthColliders, transportGatesClosedAtBuild } from './transport_gates';
 import type { WorldContent } from './types';
-import { WILDHEART_COLLIDERS } from './wildheart_field';
 import {
   crossesSealedBorder,
   farshorePalmSpots,
@@ -1352,16 +1343,6 @@ function bandSlotColliders(): Collider[] {
   return out;
 }
 
-// The Last Keep: an authored room-graph interior, so its walls (minus
-// doorways) and decor footprints all derive from the one shared layout,
-// exactly like the rift citadel floors (layoutColliders routes through
-// authoredColliders). Seated on DUNGEON_FLOOR_Y like every derived interior
-// set below, so its standable tops read in the same frame.
-const LASTKEEP_COLLIDERS: Collider[] = layoutColliders(LASTKEEP_LAYOUT, undefined, DUNGEON_FLOOR_Y);
-// Dawnhold Castle: the Evergarden garden palace, same authored room-graph
-// derivation as The Last Keep (walls minus doorways plus decor footprints).
-const DAWNHOLD_COLLIDERS: Collider[] = layoutColliders(DAWNHOLD_LAYOUT, undefined, DUNGEON_FLOOR_Y);
-
 // Arena slots host fixed maps by slot parity (EVEN = Coliseum, ODD = Drowned
 // Court; see ARENA_MAPS in dungeon_layout.ts). Both sets are built once at
 // module load, so per-slot collision stays fully static. Exported for the
@@ -1370,20 +1351,10 @@ export function arenaCollidersForSlot(slot: number): Collider[] {
   return ((slot % 2) + 2) % 2 === 1 ? DROWNED_COURT_COLLIDERS : ARENA_COLLIDERS;
 }
 
-// Interiors whose collision is NOT derived from an INTERIOR_LAYOUTS room plan:
-// Wildheart is an open field (walls plus prop specs) and the Last Keep is an
-// authored room graph. Both are static, so they short-circuit the per-dungeon
-// derivation below rather than falling back to the crypt plan.
-const STATIC_INTERIOR_COLLIDERS: Record<string, Collider[]> = {
-  wildheart: WILDHEART_COLLIDERS,
-  lastkeep: LASTKEEP_COLLIDERS,
-  dawnhold: DAWNHOLD_COLLIDERS,
-};
-
-// Per-dungeon interior sets: assembly extracted to interior_collider_sets.ts
-// (which also appends the Ignivar authored dressing-prop colliders).
+// Per-dungeon interior sets, the static open-field and authored-graph sets
+// included: assembly extracted to interior_collider_sets.ts.
 function interiorCollidersFor(dungeonId: string | null, interior: string): Collider[] {
-  return derivedInteriorColliders(dungeonId, interior, STATIC_INTERIOR_COLLIDERS);
+  return derivedInteriorColliders(dungeonId, interior);
 }
 
 // ---------------------------------------------------------------------------

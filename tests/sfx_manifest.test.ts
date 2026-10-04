@@ -164,7 +164,7 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps release mount/UI cues, Warrior recordings, and hoard cues in one 393-key inventory', () => {
+  it('keeps release mount/UI cues, Warrior recordings, hoard and cannon cues in one 398-key inventory', () => {
     // Combine the release farming/crafting cues with the candidate mount cues.
     // Release inventory: 319 total, 92 UI, 34 mount. A mount may share
     // player footfalls or have several cues, so this is not a mount count.
@@ -178,9 +178,18 @@ describe('buildManifest', () => {
     // it calls at the apex of a jump. Mount cues 34 -> 40; UI is unchanged.
     // The six Buried Hoard cues (the entrance open/hum pair and the four
     // tide-wave boss cues) bring that total to 393 (release/v0.44.0 merge
-    // into feature/buried-hoards).
+    // into feature/buried-hoards). 395 adds the Groundshaker cannon's report and
+    // shell blast (proj_groundshaker, impact_groundshaker) for Fire and Fly. 398 adds
+    // its fragmentation shell's three layers (burst, bomblet, tail).
     const keys = new Set(SFX.map((entry) => entry.key));
-    expect(keys.size).toBe(393);
+    expect(keys.size).toBe(398);
+    expect(keys.has('proj_groundshaker')).toBe(true);
+    expect(keys.has('impact_groundshaker')).toBe(true);
+    expect([...keys].filter((key) => key.startsWith('impact_groundshaker_frag_')).sort()).toEqual([
+      'impact_groundshaker_frag_bomblet',
+      'impact_groundshaker_frag_burst',
+      'impact_groundshaker_frag_tail',
+    ]);
     expect([...keys].filter((key) => key.startsWith('hoard_')).sort()).toEqual([
       'hoard_entrance_hum',
       'hoard_entrance_open',
@@ -290,7 +299,7 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(393);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(398);
     expect([...SFX_FIXED_CATALOG_KEYS].sort()).toEqual([...keys].sort());
   });
 });

@@ -9,8 +9,10 @@ import {
   type PublicTraceWorld,
 } from '../src/sim/world_quest_trace_public';
 import { worldQuestProgressForWire } from '../src/sim/world_quest_trace_wire';
+import { emitTurretSelfKeys } from './turret_self_wire';
 
 type EmitSelfKey = (key: string, value: unknown) => void;
+type EmitRawSelfKey = (key: string, serialized: string) => void;
 
 export type { PublicTraceCandidate };
 
@@ -22,6 +24,8 @@ export function emitActivitySelfKeys(
   sim: Sim,
   meta: PlayerMeta,
   pid: number,
+  maybeRaw: EmitRawSelfKey,
+  sent: Readonly<Record<string, string>>,
 ): void {
   // Riding skill: persisted, so the client knows whether to show the riding
   // trainer UI without waiting on a mount/select command to fail. Wire key
@@ -33,6 +37,7 @@ export function emitActivitySelfKeys(
   emit('mntLesson', sim.mountLessonActiveFor(pid));
   emit('mntRace', sim.mountRaceViewFor(pid));
   emit('vehicle', sim.vehicleSessionFor(pid));
+  emitTurretSelfKeys(maybeRaw, meta, sim.tickCount, sent);
   // Book of Deeds: the Renown total and the two selected cosmetic ids
   // (title and nameplate border), cheap scalars diffed per tick (grants land
   // from sim sites that never mark this session dirty, and neither cosmetic
@@ -99,6 +104,13 @@ export function emitQuestSelfKeys(emit: EmitSelfKey, sim: Sim, meta: PlayerMeta)
     'tmap',
     meta.treasureMap ? { rarity: meta.treasureMap.rarity, siteId: meta.treasureMap.siteId } : null,
   );
+  // Fire and Fly's recruitment: a won trial bumps wireRev, so the heavy gate re-diffs it.
+  emit('ffr', meta.fireAndFlyRecruitment);
+  // Its records: bounded by the content table FIRE_AND_FLY_SCOREBOARD_SCENARIOS (two rows
+  // per trial, one per mission; sanitizeFireAndFlyRecords drops any other board on load,
+  // and recordPersonalFireAndFlyScore only writes fireAndFlyScoreboardId boards); a scored
+  // run emits a worldQuest* event, which marks the session heavy dirty.
+  emit('ffrec', meta.fireAndFlyRecords);
   emit('wqrr', meta.worldQuestRerollCycle);
   emit('wqrep', meta.worldQuestReplacements ?? {});
   emit('wkq', meta.weeklyQuest);

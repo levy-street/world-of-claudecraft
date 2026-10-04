@@ -17,6 +17,8 @@
 // leaderboard is purely cold: it paints on open and on a page change, never from
 // hud.update()'s per-frame path.
 
+import { TURRET_DEFAULT_SCENARIO } from '../sim/content/fire_and_fly_scenarios';
+import { fireAndFlyScoreboardId } from '../sim/fire_and_fly_scoreboards';
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type {
   DailyRewardLeaderboardPage,
@@ -136,6 +138,12 @@ export class LeaderboardWindow {
 
   openGliderRankings(): void {
     this.worldQuestRankings()?.open('glider_downs_v2_daily');
+  }
+
+  /** Fire and Fly's ladders, opened on the default trial's daily board. */
+  openFireAndFlyRankings(): void {
+    const board = fireAndFlyScoreboardId(TURRET_DEFAULT_SCENARIO.id, 'daily');
+    if (board) this.worldQuestRankings()?.open(board);
   }
 
   private worldQuestRankings(): WorldQuestLeaderboardWindow | null {

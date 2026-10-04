@@ -13,6 +13,7 @@ import {
   type PickInteractionWorld,
 } from './interactions';
 import { nextSnapPoint, reticleStickDelta } from './pad_ground_aim';
+import { turretPadWeaponSlot } from './turret_controls';
 
 interface GroundAimHudFacet {
   pressSlot?(slot: number): void;
@@ -28,6 +29,7 @@ interface GroundAimHudFacet {
     school: string;
     dimmed: boolean;
     blocked: boolean;
+    landing?: readonly { x: number; z: number }[] | null;
   } | null;
 }
 
@@ -54,6 +56,7 @@ export function padGroundAimCallbacks(deps: PadGroundAimWiringDeps): {
   onGroundAimStick: (x: number, y: number, dt: number) => void;
   onGroundAimCommit: () => void;
   onGroundAimSnap: (direction: 1 | -1) => void;
+  onSeatButton: (button: number) => boolean;
 } {
   return {
     isTemporaryBarActive: () => {
@@ -74,6 +77,12 @@ export function padGroundAimCallbacks(deps: PadGroundAimWiringDeps): {
       deps.hud.nudgeGroundAimPoint(delta.dx, delta.dz);
     },
     onGroundAimCommit: () => deps.hud.commitGroundAimAt(),
+    onSeatButton: (button) => {
+      const slot = turretPadWeaponSlot(deps.world(), button);
+      if (slot === null) return false;
+      deps.hud.pressSlot?.(slot);
+      return true;
+    },
     onGroundAimSnap: (direction) => {
       const range = deps.hud.groundAimAbilityRange();
       if (range === null) return;
@@ -120,6 +129,7 @@ export interface GroundAimReticleSyncDeps {
       school: string;
       dimmed: boolean;
       blocked: boolean;
+      landing?: readonly { x: number; z: number }[] | null;
     } | null,
   ) => void;
 }
@@ -153,6 +163,7 @@ export function syncGroundAimReticleFrame(deps: GroundAimReticleSyncDeps): void 
           school: reticle.school,
           dimmed: reticle.dimmed,
           blocked: reticle.blocked,
+          landing: reticle.landing,
         }
       : null,
   );

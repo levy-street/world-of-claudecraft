@@ -36,6 +36,8 @@ import { isWarfareVendorNpc } from '../vendor/warfare_vendor_view';
 import { clueStepRowFor, clueStepRowSig } from './clue_step_row_view';
 import { clueReplyKey, clueTalkFor } from './clue_talk_row_core';
 import { gossipMenuIsEmpty } from './gossip_menu';
+import { greetingVoiceKey, npcGreeting } from './gunnery_board_view';
+import { GunneryBoardWindow } from './gunnery_board_window';
 import { masterCraftTarget } from './master_craft_core';
 import { PROF_INTRO_QUEST_ID, professionIntroHintVisible } from './prof_intro_hint_core';
 
@@ -132,8 +134,16 @@ export class QuestDialogController {
   private openedAt = 0;
   private voiceNpcId: number | null = null;
   private openState = false;
+  private readonly gunneryBoard: GunneryBoardWindow;
+  private gunneryStart: { npcId: number; questId: string } | null = null;
 
-  constructor(private readonly deps: QuestDialogControllerDeps) {}
+  constructor(private readonly deps: QuestDialogControllerDeps) {
+    this.gunneryBoard = new GunneryBoardWindow({
+      world: () => this.deps.world(),
+      start: (scenarioId) => this.startGunnery(scenarioId),
+      close: () => this.close(),
+    });
+  }
 
   get isOpen(): boolean {
     return this.openState;
@@ -169,7 +179,8 @@ export class QuestDialogController {
     this.openedAt = this.deps.now();
     this.ensureFocusTrap();
     this.deps.closeTransient();
-    this.deps.voice.play(`greeting__${npc.templateId}`);
+    this.gunneryBoard.reset();
+    this.deps.voice.play(greetingVoiceKey(npc.templateId, world));
     this.voiceNpcId = npc.id;
     this.renderGossip(npc);
   }
@@ -229,6 +240,7 @@ export class QuestDialogController {
 
   close(restoreFocus = true): void {
     this.deps.element.style.display = 'none';
+    this.gunneryBoard.reset();
     this.npcId = null;
     this.clueReplyOpen = false;
     this.detailQuestId = null;
@@ -890,13 +902,26 @@ export class QuestDialogController {
     if (!view) return false;
     this.npcId = npc.id;
     this.detailQuestId = null;
+    if (view.gunneryBoard && view.questId) {
+      this.gunneryStart = { npcId: npc.id, questId: view.questId };
+      this.deps.element.style.display = 'block';
+      this.gunneryBoard.paint(this.deps.element, {
+        speakerName: view.speakerName,
+        speakerTitle: view.speakerTitle,
+        greeting: view.greeting,
+        rewardCollected: view.completed,
+      });
+      return true;
+    }
+    this.gunneryBoard.reset();
     markDialogRoot(this.deps.element, { labelledBy: 'quest-dialog-title' });
     const subtitle = view.speakerTitle
       ? `<span class="quest-muted"> &lt;${esc(view.speakerTitle)}&gt;</span>`
       : '';
     let html = `<div class="panel-title"><span id="quest-dialog-title">${esc(view.speakerName)}${subtitle}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
-    if (view.greeting) {
-      html += `<div class="qd-text">"${esc(view.greeting)}"</div>`;
+    const greeting = npcGreeting(npc.templateId, world, view.greeting);
+    if (greeting) {
+      html += `<div class="qd-text">"${esc(greeting)}"</div>`;
     }
     if (view.questTitle) {
       html += `<div class="qd-sub">${esc(view.questTitle)}</div>`;
@@ -912,17 +937,18 @@ export class QuestDialogController {
       // One button per profile; the pick travels as its own command so the
       // server starts the kernel with that profile after its own revalidation.
       const questId = view.questId;
-      for (const choice of view.difficulties) {
+      const startButton = (choice: (typeof view.difficulties)[number]) => {
         const button = this.makeButton(choice.label);
         button.dataset.startWq = String(npc.id);
-        button.dataset.difficulty = choice.difficulty;
+        button.dataset.difficulty = choice.key;
         button.addEventListener('click', () => {
           this.close();
           this.deps.world().targetEntity(npc.id);
           this.deps.world().startWorldQuestActivity(questId, choice.difficulty);
         });
         this.deps.element.appendChild(button);
-      }
+      };
+      for (const choice of view.difficulties) startButton(choice);
     } else if (view.canStart) {
       const button = this.makeButton(view.buttonLabel);
       button.dataset.startWq = String(npc.id);
@@ -936,6 +962,15 @@ export class QuestDialogController {
     this.bindClose();
     this.showAndFocus();
     return true;
+  }
+
+  /** The Gunnery Board's one action: the same start command the dialog's buttons send. */
+  private startGunnery(scenarioId: string): void {
+    const from = this.gunneryStart;
+    if (!from) return;
+    this.close();
+    this.deps.world().targetEntity(from.npcId);
+    this.deps.world().startWorldQuestActivity(from.questId, { courseId: scenarioId });
   }
 
   /** The NPC's answer to a solved clue talk or delivery, then back to the gossip

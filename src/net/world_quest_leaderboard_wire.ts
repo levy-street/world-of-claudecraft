@@ -15,12 +15,19 @@ const MEDALS: ReadonlySet<string> = new Set<WorldQuestMedal>(['bronze', 'silver'
 /** One ladder row off the wire, or null when any field is missing or mistyped. */
 export function parseWorldQuestLeaderboardEntry(raw: unknown): WorldQuestLeaderboardEntry | null {
   if (!raw || typeof raw !== 'object') return null;
-  const { rank, name, medal, metric } = raw as Record<string, unknown>;
+  const { rank, name, medal, metric, stars } = raw as Record<string, unknown>;
   if (typeof rank !== 'number' || !Number.isFinite(rank) || rank < 1) return null;
   if (typeof name !== 'string' || name === '') return null;
   if (typeof metric !== 'number' || !Number.isFinite(metric)) return null;
   if (medal !== null && (typeof medal !== 'string' || !MEDALS.has(medal))) return null;
-  return { rank, name, medal: medal as WorldQuestMedal | null, metric };
+  const entry: WorldQuestLeaderboardEntry = {
+    rank,
+    name,
+    medal: medal as WorldQuestMedal | null,
+    metric,
+  };
+  if (typeof stars === 'number' && Number.isSafeInteger(stars) && stars >= 0) entry.stars = stars;
+  return entry;
 }
 
 export async function fetchWorldQuestLeaderboard(

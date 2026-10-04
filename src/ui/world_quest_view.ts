@@ -29,6 +29,7 @@ export function worldQuestDisplayName(questId: string): string {
   if (quest.objective.type === 'forging') return t('questUi.worldQuest.forge.title');
   if (quest.objective.type === 'wisp_maze') return t('questUi.worldQuest.wispMaze.title');
   if (quest.objective.type === 'glider') return t('questUi.worldQuest.glider.title');
+  if (quest.objective.type === 'turret') return t('questUi.worldQuest.fireAndFly.title');
   if (quest.objective.type === 'investigation') return t('questUi.worldQuest.investigation.title');
   if (quest.objective.type === 'tracing') return t('questUi.worldQuest.calligraphyTitle');
   return t('questUi.worldQuest.title', {
@@ -52,6 +53,7 @@ export function worldQuestObjectiveLabel(questId: string): string {
   if (quest.objective.type === 'forging') return t('questUi.worldQuest.forge.objective');
   if (quest.objective.type === 'wisp_maze') return t('questUi.worldQuest.wispMaze.objective');
   if (quest.objective.type === 'glider') return t('questUi.worldQuest.glider.objective');
+  if (quest.objective.type === 'turret') return t('questUi.worldQuest.fireAndFly.objective');
   if (quest.objective.type === 'investigation')
     return t('questUi.worldQuest.investigation.objective');
   if (quest.objective.type === 'tracing') return t('questUi.worldQuest.traceOutline');

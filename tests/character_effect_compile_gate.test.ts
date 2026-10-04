@@ -1,7 +1,10 @@
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import type { AnimState } from '../src/render/characters/anim_state';
-import type { CharacterVisual } from '../src/render/characters/visual';
+import { SURFACE_RESPONSE_PROGRAM } from '../src/render/characters/surface_response';
+import type { CharacterVisual, CharacterVisualOptions } from '../src/render/characters/visual';
 import type { Entity } from '../src/sim/types';
 
 // A rig goes translucent (stealth, the spirit run, Shadowform, Moonkin) by
@@ -135,7 +138,7 @@ function scratchOf(visual: CharacterVisual): THREE.Group | null {
 
 type GateCall = { target: THREE.Object3D; settle: () => void };
 
-async function makeVisual(): Promise<CharacterVisual> {
+async function makeVisual(opts?: CharacterVisualOptions): Promise<CharacterVisual> {
   vi.resetModules();
   vi.doMock('../src/render/assets/loader', () => ({
     loadGltf: vi.fn(() => Promise.resolve(stubGltf())),
@@ -146,8 +149,15 @@ async function makeVisual(): Promise<CharacterVisual> {
   }));
   const { preloadTrainingDummyAssets } = await import('../src/render/characters/assets');
   await preloadTrainingDummyAssets();
-  const { createCharacterVisual } = await import('../src/render/characters/index');
-  const visual = createCharacterVisual(dummyEntity);
+  let visual: CharacterVisual | null;
+  if (opts) {
+    const { CharacterVisual: Visual } = await import('../src/render/characters/visual');
+    const { visualKeyFor } = await import('../src/render/characters/manifest');
+    visual = new Visual(visualKeyFor(dummyEntity), 0xffffff, 0, null, null, null, null, opts);
+  } else {
+    const { createCharacterVisual } = await import('../src/render/characters/index');
+    visual = createCharacterVisual(dummyEntity);
+  }
   if (!visual) throw new Error('test harness failed to build a CharacterVisual');
   visual.update(FRAME, anim(), true);
   return visual;
@@ -373,5 +383,210 @@ describe('a transparent character effect swaps in only once its programs are lin
     expect(scratch.parent).toBeNull();
     // A settle landing after the teardown is inert.
     expect(() => gateCalls[0].settle()).not.toThrow();
+  });
+});
+
+// The element response (a scorch, a frost rime) is its own program per rig
+// material shape. A host that knows a rig will be struck links it as the rig is
+// built, so the first trigger swaps in on the frame it lands instead of staging
+// a link on a combat frame (Fire and Fly's mid-wave hitches).
+describe('an element response linked ahead of its first trigger', () => {
+  const responding = (visual: CharacterVisual): boolean =>
+    rigMaterials(visual).every((material) => material.userData[SURFACE_RESPONSE_PROGRAM] === true);
+
+  it('links the clones hidden on the rig and far twins, and the first trigger after swaps at once', async () => {
+    const visual = await makeVisual();
+    const gateCalls: GateCall[] = [];
+    visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
+    const before = rigMaterials(visual);
+
+    const ready = visual.prepareElementResponse();
+    expect(gateCalls).toHaveLength(1);
+    const scratch = gateCalls[0].target as THREE.Group;
+    expect(scratch.name).toBe('character_element_response_scratch');
+    expect(scratch.visible).toBe(false);
+    expect(scratch.parent).not.toBeNull();
+    const twins = scratch.children as THREE.Mesh[];
+    const kinds = sourceIsSkinnedByGeometry(visual);
+    // Every source an effect would clone, the far mesh included, each on its own kind.
+    expect(new Set(twins.map((twin) => twin.geometry))).toEqual(new Set(kinds.keys()));
+    for (const twin of twins) {
+      expect(twin.visible).toBe(false);
+      expect((twin.material as THREE.Material).userData[SURFACE_RESPONSE_PROGRAM]).toBe(true);
+      expect(kinds.get(twin.geometry)).toBe((twin as THREE.SkinnedMesh).isSkinnedMesh === true);
+    }
+    const farMesh = (visual as unknown as { farMesh: THREE.Mesh | null }).farMesh;
+    expect(farMesh).not.toBeNull();
+    expect(twins.some((twin) => twin.geometry === farMesh?.geometry)).toBe(true);
+    // Nothing shows: the rig keeps its own materials.
+    expect(rigMaterials(visual)).toEqual(before);
+
+    gateCalls[0].settle();
+    await expect(ready).resolves.toBe(true);
+    expect(scratch.parent).toBeNull();
+    expect(rigMaterials(visual)).toEqual(before);
+
+    visual.respondToElement('fire', 0.8);
+    expect(responding(visual)).toBe(true);
+    expect(gateCalls).toHaveLength(1);
+    expect(scratchOf(visual)).toBeNull();
+    await expect(visual.prepareElementResponse()).resolves.toBe(true);
+    expect(gateCalls).toHaveLength(1);
+    visual.dispose();
+  });
+
+  it('links only the rig twins on a visual built with no far LOD, and still swaps at once', async () => {
+    const visual = await makeVisual({ farLod: false });
+    const gateCalls: GateCall[] = [];
+    visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
+    expect((visual as unknown as { farMesh: THREE.Mesh | null }).farMesh).toBeNull();
+
+    const ready = visual.prepareElementResponse();
+    expect(gateCalls).toHaveLength(1);
+    const twins = gateCalls[0].target.children as THREE.Mesh[];
+    expect(new Set(twins.map((twin) => twin.geometry))).toEqual(
+      new Set(sourceIsSkinnedByGeometry(visual).keys()),
+    );
+    gateCalls[0].settle();
+    await expect(ready).resolves.toBe(true);
+
+    visual.respondToElement('fire', 0.8);
+    expect(responding(visual)).toBe(true);
+    expect(gateCalls).toHaveLength(1);
+    expect(scratchOf(visual)).toBeNull();
+    visual.dispose();
+  });
+
+  it('detaches a stage still in flight when a new compile gate is installed', async () => {
+    const visual = await makeVisual();
+    const gateCalls: GateCall[] = [];
+    visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
+    const ready = visual.prepareElementResponse();
+    const scratch = gateCalls[0].target;
+    expect(scratch.parent).not.toBeNull();
+    visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
+    expect(scratch.parent).toBeNull();
+    gateCalls[0].settle();
+    await expect(ready).resolves.toBe(false);
+    visual.dispose();
+  });
+
+  it('records the clones linked with no gate call when a rig of the same shape linked them', async () => {
+    const visual = await makeVisual();
+    const gateCalls: GateCall[] = [];
+    visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
+    await expect(visual.prepareElementResponse({ linked: true })).resolves.toBe(true);
+    visual.respondToElement('fire', 0.8);
+    expect(responding(visual)).toBe(true);
+    expect(gateCalls).toHaveLength(0);
+    visual.dispose();
+  });
+
+  it('still stages on the first trigger of a rig never prepared', async () => {
+    const visual = await makeVisual();
+    const gateCalls: GateCall[] = [];
+    visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
+    const before = rigMaterials(visual);
+    visual.respondToElement('fire', 0.8);
+    expect(gateCalls).toHaveLength(1);
+    expect(gateCalls[0].target.name).toBe('character_effect_compile_scratch');
+    expect(rigMaterials(visual)).toEqual(before);
+    visual.dispose();
+  });
+
+  it('settles a stage outlived by its visual as not linked, its scratch already detached', async () => {
+    const visual = await makeVisual();
+    const gateCalls: GateCall[] = [];
+    visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
+    const ready = visual.prepareElementResponse();
+    const scratch = gateCalls[0].target;
+    visual.dispose();
+    expect(scratch.parent).toBeNull();
+    expect(() => gateCalls[0].settle()).not.toThrow();
+    await expect(ready).resolves.toBe(false);
+  });
+
+  it('prepares nothing with no gate, and never throws on a gate that rejects', async () => {
+    const bare = await makeVisual();
+    await expect(bare.prepareElementResponse()).resolves.toBe(false);
+    bare.respondToElement('fire', 0.8);
+    expect(responding(bare)).toBe(true);
+    bare.dispose();
+
+    const visual = await makeVisual();
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    visual.setFarBakeGate(() => {
+      throw new Error('compile gate rejected');
+    });
+    await expect(visual.prepareElementResponse()).resolves.toBe(false);
+    expect(warn).toHaveBeenCalled();
+    expect(
+      (visual as unknown as { elementResponseScratch: THREE.Group | null }).elementResponseScratch,
+    ).toBeNull();
+    warn.mockRestore();
+    visual.dispose();
+  });
+});
+
+// A host that never draws a far LOD (the Fire and Fly arena) builds its rigs with
+// none, so the gate that walks the rig at its attach links no far program. The
+// far mesh is the one representation such a rig could otherwise show unlinked:
+// with none built, setFar keeps the articulated rig, whatever calls it.
+describe('a visual built with no far LOD', () => {
+  const farNodes = (visual: CharacterVisual): string[] => {
+    const names: string[] = [];
+    visual.root.traverse((object) => {
+      if (/^character_(far_mesh|far_wrap|shadow_proxy)$/.test(object.name)) names.push(object.name);
+    });
+    return names;
+  };
+  const modelShown = (visual: CharacterVisual): boolean =>
+    (visual as unknown as { modelWrap: THREE.Group }).modelWrap.visible;
+
+  it('carries no far mesh for its gate to link, where a default visual still does', async () => {
+    const plain = await makeVisual();
+    expect(farNodes(plain)).toContain('character_far_mesh');
+    plain.dispose();
+
+    const visual = await makeVisual({ farLod: false });
+    expect(farNodes(visual)).toEqual([]);
+    visual.dispose();
+  });
+
+  it('keeps drawing the articulated rig on a far crossing, before and after a pool re-acquire', async () => {
+    const visual = await makeVisual({ farLod: false });
+    const gateCalls: GateCall[] = [];
+    visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
+    visual.setProxyShadow(true);
+    for (let pass = 0; pass < 2; pass++) {
+      visual.setFar(true);
+      visual.update(FRAME, anim(), true);
+      expect(visual.isFar).toBe(true);
+      expect(modelShown(visual)).toBe(true);
+      expect(visual.displayedFarBody).toBeNull();
+      expect(farNodes(visual)).toEqual([]);
+      visual.setFar(false);
+      visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
+    }
+    expect(gateCalls).toHaveLength(0);
+    visual.dispose();
+  });
+
+  it('is asked for by the Fire and Fly rigs only', () => {
+    const users: string[] = [];
+    const walk = (dir: string): void => {
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const path = join(dir, entry.name);
+        if (entry.isDirectory()) walk(path);
+        else if (
+          /\.ts$/.test(entry.name) &&
+          /\bfarLod\b\s*[:,}]/.test(readFileSync(path, 'utf8'))
+        ) {
+          users.push(path.split('\\').join('/'));
+        }
+      }
+    };
+    walk('src');
+    expect(users).toEqual(['src/render/turret_defense_visual.ts']);
   });
 });
