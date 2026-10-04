@@ -147,8 +147,9 @@ const CLOSE = [30, 33] as const;
  * laid on its path, while its scouts break out at a run. The rallies carry no marker: the
  * standing pack and the cry are the telegraph. One pack, then scouts, then two packs and
  * three, the gathering windows closing as the hold timer shortens from 6 s to 2.5 s; between
- * the packs, a few walkers and quick wolves surging in away from the fight, the finale's
- * quick stalkers from two sides. A monster at the tower's foot strikes
+ * the packs, a few walkers, quick wolves surging in away from the fight, quick stalkers
+ * sprinting in between two packs' sides in the fourth and sixth waves, and the finale's quick
+ * stalkers surging in from two sides. A monster at the tower's foot strikes
  * fast, so the hunt is won in the field: the keg as a pack walks past it, the frag on a
  * pack standing clear of any keg, the shells on the scouts. No monster is tougher than its
  * template: each wave's shell damage, matched to its members' health, fells a member in
@@ -168,6 +169,14 @@ const packSurgers = (count: number, sides: number, delay: number): TurretGroupDe
   sides,
   widthTurn: 0.04,
   ...gap(0.4, 0.8),
+  delayTicks: ticks(delay),
+});
+/** A sprint between the first two packs' sides: quick stalkers that never gather, running straight in. */
+const packSprint = (count: number, delay: number): TurretGroupDef => ({
+  brick: 'sprint',
+  entries: [{ templateId: 'tunnel_rat', count, level: 6, ...PACK_SURGE }],
+  spreadTicks: SPREAD,
+  widthTurn: WIDTH,
   delayTicks: ticks(delay),
 });
 const packWalkers = (entries: readonly TurretWaveEntry[], delay: number): TurretGroupDef => ({
@@ -223,23 +232,26 @@ export const TURRET_MISSION_PACK: TurretScenarioDef = {
       ),
       packSurgers(1, 1, 11),
     ),
-    huntWave(
-      89,
-      FIELD,
-      4,
-      [0, 1].map((p) =>
-        pack(
-          [
-            { templateId: 'tunnel_rat', count: 5, level: 6, ...MUSTER },
-            { templateId: 'vale_bandit', count: 2, level: 5, ...MUSTER },
-            { templateId: 'fen_troll', count: 1, level: 12, ...MUSTER, leads: true },
-            { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT },
-          ],
-          1.2,
-          p === 0 ? [FRONT] : [],
-          p === 0 ? 0 : 0.5,
+    plus(
+      huntWave(
+        89,
+        FIELD,
+        4,
+        [0, 1].map((p) =>
+          pack(
+            [
+              { templateId: 'tunnel_rat', count: 5, level: 6, ...MUSTER },
+              { templateId: 'vale_bandit', count: 2, level: 5, ...MUSTER },
+              { templateId: 'fen_troll', count: 1, level: 12, ...MUSTER, leads: true },
+              { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT },
+            ],
+            1.2,
+            p === 0 ? [FRONT] : [],
+            p === 0 ? 0 : 0.5,
+          ),
         ),
       ),
+      packSprint(2, 7),
     ),
     plus(
       huntWave(
@@ -288,7 +300,7 @@ export const TURRET_MISSION_PACK: TurretScenarioDef = {
           ),
         ),
       ),
-      packSurgers(2, 1, 8),
+      packSprint(2, 8),
     ),
     huntWave(
       96,
@@ -807,7 +819,8 @@ export const TURRET_MISSION_BRITTLE: TurretScenarioDef = {
  * brute). Varied waves of walkers, small groups and packs, kegs on their paths and in
  * clusters, a crown where the Shockwave throws the small ones; two strong moments where the
  * kegs stand close in the lanes and go up in chains (the fourth wave and the last), and the
- * brute as the one big monster, with a keg on its road. No sponge: a forge creature falls to
+ * brute as the one big monster, with a keg on its road. Emberkin surge in from sides away
+ * from the fight in most waves, so the kegs are never the whole answer. No sponge: a forge creature falls to
  * two or three good shells, the brute to a handful.
  */
 const POWDER_CAP = 12;
@@ -818,7 +831,7 @@ const powderField = (count: number): TurretKegLotDef => ({
   ...TURRET_BARREL_RING,
   lanes: true,
 });
-const FORGE = { speedScale: 1, speedScaleMax: 1.25 } as const;
+const FORGE = { speedScale: 1.1, speedScaleMax: 1.35 } as const;
 const EMBER_SCOUT = { role: 'scout', speedScale: 2, speedScaleMax: 2.3 } as const;
 const EMBER_RUN = { speedScale: 2, speedScaleMax: 2.3 } as const;
 const forgePack = (entries: readonly TurretWaveEntry[], delay: number): TurretGroupDef => ({
@@ -844,7 +857,7 @@ export const TURRET_MISSION_POWDER: TurretScenarioDef = {
     {
       // Emberkin walking in from one side, kegs waiting for them.
       groups: [
-        walkers([{ templateId: 'tunnel_rat', count: 8, level: 4, ...FORGE }], gap(1, 1.5), {
+        walkers([{ templateId: 'tunnel_rat', count: 10, level: 4, ...FORGE }], gap(1, 1.5), {
           kind: 'arc',
           widthTurn: 0.25,
         }),
@@ -867,6 +880,7 @@ export const TURRET_MISSION_POWDER: TurretScenarioDef = {
           ),
           delayTicks: ticks(5),
         },
+        surgers([{ templateId: 'tunnel_rat', count: 1, level: 4, ...EMBER_RUN }], 1, 11),
       ],
       coreDamage: 60,
       kegs: [front(1, 2), powderField(6)],
@@ -883,6 +897,7 @@ export const TURRET_MISSION_POWDER: TurretScenarioDef = {
           ],
           3,
         ),
+        surgers([{ templateId: 'tunnel_rat', count: 2, level: 4, ...EMBER_RUN }], 2, 9),
       ],
       coreDamage: 130,
       kegs: [front(1, 3), powderField(6)],
@@ -894,8 +909,8 @@ export const TURRET_MISSION_POWDER: TurretScenarioDef = {
       groups: [
         walkers(
           [
-            { templateId: 'tunnel_rat', count: 8, level: 4, ...FORGE },
-            { templateId: 'vale_bandit', count: 6, level: 5, ...FORGE },
+            { templateId: 'tunnel_rat', count: 10, level: 4, ...FORGE },
+            { templateId: 'vale_bandit', count: 7, level: 5, ...FORGE },
           ],
           gap(0.7, 1.1),
           { kind: 'flanks', count: 2, widthTurn: 0.12 },
@@ -914,6 +929,15 @@ export const TURRET_MISSION_POWDER: TurretScenarioDef = {
           gap(1.2, 1.8),
         ),
         surgers([{ templateId: 'tunnel_rat', count: 2, level: 4, ...EMBER_RUN }], 2, 8),
+        {
+          // The lull breaks: a knot of emberkin rushing in from one side, never gathering.
+          brick: 'surge',
+          sides: 1,
+          widthTurn: 0.06,
+          entries: [{ templateId: 'tunnel_rat', count: 6, level: 4, ...EMBER_RUN }],
+          ...gap(0.2, 0.35),
+          delayTicks: ticks(13),
+        },
       ],
       coreDamage: 70,
       kegs: [smallCrown(2), powderField(6)],
@@ -932,6 +956,17 @@ export const TURRET_MISSION_POWDER: TurretScenarioDef = {
           5,
           0.06,
         ),
+        surgers([{ templateId: 'tunnel_rat', count: 2, level: 4, ...EMBER_RUN }], 2, 6),
+        {
+          ...bunches(
+            [{ templateId: 'tunnel_rat', count: 4, level: 4, ...EMBER_RUN }],
+            gap(0.15, 0.3),
+            4,
+            1,
+            0.05,
+          ),
+          delayTicks: ticks(12),
+        },
       ],
       coreDamage: 200,
       kegs: [front(0, 3), powderField(7)],
@@ -954,6 +989,7 @@ export const TURRET_MISSION_POWDER: TurretScenarioDef = {
           ],
           delayTicks: ticks(6),
         },
+        surgers([{ templateId: 'tunnel_rat', count: 2, level: 4, ...EMBER_RUN }], 2, 6),
         surgers([{ templateId: 'tunnel_rat', count: 1, level: 4, ...EMBER_RUN }], 1, 12),
       ],
       coreDamage: 140,
@@ -989,7 +1025,9 @@ export const TURRET_MISSION_POWDER: TurretScenarioDef = {
           ),
           delayTicks: ticks(10),
         },
+        surgers([{ templateId: 'tunnel_rat', count: 2, level: 4, ...EMBER_RUN }], 2, 6),
         surgers([{ templateId: 'tunnel_rat', count: 2, level: 4, ...EMBER_RUN }], 2, 14),
+        surgers([{ templateId: 'tunnel_rat', count: 3, level: 4, ...EMBER_RUN }], 3, 20),
       ],
       coreDamage: 200,
       kegs: [front(0, 3), front(1, 3), powderField(10)],

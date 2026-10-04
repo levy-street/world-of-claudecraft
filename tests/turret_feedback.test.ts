@@ -59,9 +59,8 @@ describe('the turret feedback ring', () => {
         blasts * (1 + widest * 2) + shells + cap + widest * 3 + 1 + front + ending + cue;
       return [scenario.boardKey, burst] as const;
     });
-    // The Powder Store's 63-monster finale through 12 standing kegs, with a third resupply's
-    // frag (lot R4), sets the bound; The Deluge's 60 and The Pack's 34 beside its eight frags
-    // come next. With no overlap (lot R5) the living are one wave's, and a clear adds its wave's
+    // The Powder Store's widest wave through its 12 standing kegs and its frags sets the
+    // bound; The Pack's 34 beside its eight frags comes next. With no overlap (lot R5) the living are one wave's, and a clear adds its wave's
     // start and kegs on the same tick. The most one tick has recorded in a measured run is 58
     // entries (lot N2d), 41 in lot R5b's measured runs, far under any of these.
     expect(Object.fromEntries(bursts)).toEqual({
@@ -71,11 +70,11 @@ describe('the turret feedback ring', () => {
       pack: 1290,
       deluge: 1021,
       brittle: 840,
-      powder: 1212,
+      powder: 1437,
     });
     const burst = Math.max(...bursts.map(([, n]) => n));
     expect(TURRET_FEEDBACK_LIMIT).toBeGreaterThanOrEqual(burst);
-    expect(TURRET_FEEDBACK_LIMIT).toBe(1290);
+    expect(TURRET_FEEDBACK_LIMIT).toBe(1437);
     const ring: TurretFeedback[] = [];
     recordTurretFeedback(
       ring,

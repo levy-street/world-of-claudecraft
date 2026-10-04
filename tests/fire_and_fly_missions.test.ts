@@ -149,10 +149,10 @@ describe('the mission table', () => {
     }
   });
 
-  it('hunts The Pack in packs that gather at rallies, with walkers and surgers between them', () => {
+  it('hunts The Pack in packs that gather at rallies, with walkers, surgers and sprints between them', () => {
     const waves = TURRET_MISSION_PACK.waves;
     const plan = resolveTurretPlan(TURRET_MISSION_PACK);
-    expect(spawnsOf(TURRET_MISSION_PACK)).toEqual([8, 14, 19, 20, 26, 26, 28, 34]);
+    expect(spawnsOf(TURRET_MISSION_PACK)).toEqual([8, 14, 19, 22, 26, 26, 28, 34]);
     expect(waves.map((w) => packsOf(w).length)).toEqual([1, 1, 2, 2, 2, 3, 4, 4]);
     // Between the packs, a few walkers and quick monsters surging in away from the fight.
     expect(
@@ -161,9 +161,9 @@ describe('the mission table', () => {
       [],
       ['walkers'],
       ['surgers'],
-      [],
+      ['sprint'],
       ['walkers', 'surgers'],
-      ['surgers'],
+      ['sprint'],
       [],
       ['surgers'],
     ]);
