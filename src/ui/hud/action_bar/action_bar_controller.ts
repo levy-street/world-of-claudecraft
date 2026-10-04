@@ -564,7 +564,14 @@ export class ActionBarController {
       item?.kind === 'mount' ||
       item?.use?.type === 'fishing' ||
       item?.use?.type === 'gatherTool' ||
-      item?.use?.type === 'harvestPreference'
+      item?.use?.type === 'harvestPreference' ||
+      item?.use?.type === 'dawnStandard' ||
+      item?.use?.type === 'riftGlider' ||
+      item?.use?.type === 'targetDummy' ||
+      item?.use?.type === 'shockBomb' ||
+      item?.use?.type === 'alliedHearthstone' ||
+      item?.use?.type === 'sharpeningStone' ||
+      item?.use?.type === 'armorKit'
     );
   }
 

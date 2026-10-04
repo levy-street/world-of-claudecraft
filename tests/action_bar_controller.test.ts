@@ -1299,6 +1299,29 @@ describe('isHotbarItemId: elixirs are placeable like potions', () => {
   });
 });
 
+describe('isHotbarItemId: allied faction rewards, toys, and usable tools (#4244)', () => {
+  it('admits faction rewards, banner, and glider to the hotbar', () => {
+    const { controller } = makeHarness('warrior', [], []);
+    const factionToolIds = [
+      'dawn_battle_standard',
+      'rift_feather_glider',
+      'clockwork_target_dummy',
+      'clockwork_shock_bomb',
+      'allied_hearthstone',
+      'dense_sharpening_stone',
+      'reinforced_armor_kit',
+    ];
+    for (const id of factionToolIds) {
+      expect(controller.isHotbarItemId(id), `${id} should be hotbar placeable`).toBe(true);
+      expect(
+        controller.isAssignableAction({ type: 'item', id }),
+        `${id} should be assignable action`,
+      ).toBe(true);
+      expect(controller.keepsStoredItemId(id), `${id} should keep stored item id`).toBe(true);
+    }
+  });
+});
+
 describe('ActionBarController per-spec action bar memory and talent choice swaps', () => {
   it('switches between specs and remembers action bar layout per spec', () => {
     const storage = new MemoryStorage();

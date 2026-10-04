@@ -74,7 +74,11 @@ export function mobEffectiveMeleeRange(mob: Entity): number {
 }
 
 export function tryMobMeleeSwingInRange(ctx: SimContext, mob: Entity, target: Entity): boolean {
-  if (dist2d(mob.pos, target.pos) > mobEffectiveMeleeRange(mob)) {
+  const meleeReach = mobEffectiveMeleeRange(mob);
+  if (
+    Math.abs(mob.pos.y - target.pos.y) > Math.max(4, meleeReach) ||
+    dist2d(mob.pos, target.pos) > meleeReach
+  ) {
     mob.autoAttack = false;
     return false;
   }

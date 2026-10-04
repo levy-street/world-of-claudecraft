@@ -134,7 +134,6 @@ export function useRiftFeatherGlider(ctx: SimContext, p: Entity, meta: PlayerMet
     value: 1,
     sourceId: p.id,
     school: 'physical',
-    breaksOnDamage: true,
   });
 
   meta.riftGliderReadyAt = ctx.time + 120; // 2 min cooldown

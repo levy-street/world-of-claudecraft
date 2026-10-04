@@ -3,6 +3,7 @@ import { attuneAlliedHearthstone, DAWN_STANDARD_RADIUS } from '../src/sim/conten
 import { FACTION_HUB_LANDINGS } from '../src/sim/content/faction_vendors';
 import { DUNGEON_X_THRESHOLD, ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { tryMobMeleeSwingInRange } from '../src/sim/mob/combat_profile';
 import { Sim } from '../src/sim/sim';
 
 describe('Allied Faction World Quest Rewards & Toys', () => {
@@ -179,6 +180,37 @@ describe('Allied Faction World Quest Rewards & Toys', () => {
       sim.player.inCombat = true;
       sim.tick();
       expect(sim.player.auras.some((a) => a.id === 'rift_feather_glider')).toBe(false);
+    });
+
+    it('exempts gliding players from mob aggro scans and blocks ground mob melee swings in the air (#4244)', () => {
+      const sim = new Sim({ seed: 104, playerClass: 'rogue', autoEquip: false });
+      sim.addItem('rift_feather_glider', 1);
+
+      // Position player in the air directly above a spawn point
+      sim.player.pos = { x: 100, y: 15, z: 100 };
+      sim.player.onGround = false;
+
+      sim.useItem('rift_feather_glider');
+      const gliderAura = sim.player.auras.find((a) => a.id === 'rift_feather_glider');
+      expect(gliderAura).toBeDefined();
+      expect(gliderAura?.breaksOnDamage).toBeFalsy();
+
+      // Spawn a hostile mob directly underneath on the ground
+      const mob = createMob(99999, MOBS.forest_wolf, 20, { x: 100, y: 0, z: 100 });
+      sim.addEntity(mob);
+
+      // Mob idle aggro scan must ignore the airborne glider
+      sim.tick();
+      expect(mob.aggroTargetId).toBeNull();
+      expect(sim.player.inCombat).toBe(false);
+      expect(sim.player.auras.some((a) => a.id === 'rift_feather_glider')).toBe(true);
+
+      // Melee reach check: mob on ground cannot swing at target 15yd in the air
+      expect(tryMobMeleeSwingInRange(sim.ctx, mob, sim.player)).toBe(false);
+
+      // But when target is grounded within normal melee reach, swing is permitted
+      sim.player.pos = { x: 100, y: 1, z: 100 };
+      expect(tryMobMeleeSwingInRange(sim.ctx, mob, sim.player)).toBe(true);
     });
   });
 
