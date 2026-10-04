@@ -286,6 +286,18 @@ it('leaves with the run: hidden on the result card and off the seat', () => {
   expect(row().style.display).toBe('none');
 });
 
+// The seat can end mid-run with no Leave press (a mob pulls the player into combat, death,
+// a reconnect): the row must go with the seat, or it stays over the move stick.
+it.each(['intro', 'wave'] as const)('leaves with a seat that ends in the %s', (phase) => {
+  const { world, bar, seatIn } = rig();
+  seatIn(seat(phase));
+  expect(row().style.display).toBe('');
+  world.turretSession = null;
+  world.turretClock = null;
+  bar.update();
+  expect(row().style.display).toBe('none');
+});
+
 it('turret_weapon_bar_painter carries no literal colour or px value: tokens and classes only', () => {
   const code = readFileSync(
     join(process.cwd(), 'src/ui/hud/vehicle/turret_weapon_bar_painter.ts'),

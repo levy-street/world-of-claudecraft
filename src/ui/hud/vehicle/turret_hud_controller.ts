@@ -150,6 +150,8 @@ export class TurretHudController {
       this.view.reset();
       if (seated) for (const controller of this.cancelOnEnter) controller.cancel();
       this.painter.show(seated);
+      // A seated frame decides the row below; the frame that drops the seat must hide it here.
+      if (!seated) this.weapons.show(false);
       writers.toggleClass(document.body, TURRET_SEATED_CLASS, seated);
     }
     const phase = session?.defense.phase;
