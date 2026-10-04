@@ -2,18 +2,18 @@
 // day (fire_and_fly_recruitment.ts unlocks them), each built around one idea and
 // carrying the weapon that idea asks for. Every number here is a first value:
 // mini-game tuning, not classic-era formulas. A tuning change after boards open mints
-// a new board version. Each runs eight waves on one curve: a warm-up, a fast climb,
-// then the last two or three waves pushing its idea to the extreme, each wave setting
-// off on the tick the one before is cleared. Every tower holds 70 points (The Cracked
-// Tower's 7 are its idea) under one medal rule (turret_defense.ts). The Pack is set (lot
-// R5b) against the field-aware policy of the scenarios file at a 0.4 s pace: a member
-// falls to two good shells, a leader to five or six, and at the worst moment of a run
-// three to five monsters stand at the tower's foot (median; up to eight); that player golds
-// about nine runs in ten reading the field exactly and three to four in five reading it
-// 0.4 s late (a few points lost in the last two waves), while a 0.8 s player wins with
-// silver or bronze and a 1 s player loses nearly half its runs. The other three were tuned (lot N2d) for a strike 1.5 s after a monster
-// reaches the tower; at the 0.8 s strike of lot R4 they are far harder until their own
-// redesign.
+// a new board version. Each runs eight varied waves composed from the bricks, each
+// setting off on the tick the one before is cleared: walkers, small groups, packs and
+// monsters surging in away from the fight, the mission's idea an accent plus one or two
+// strong moments (The Pack's packs gathering at rallies, The Deluge's quick small
+// beasts, The Cracked Tower's dead with shadow hounds surging in, The Powder Store's
+// powder fields). Every mission keeps the same rules: no sponge, few monsters at the
+// tower's foot at once, big monsters rare, the tension from surprise and rhythm rather
+// than crowds, and charges enough for the finale without saving them. Every tower holds
+// 70 points (The Cracked Tower's 7 are its idea) under one medal rule (turret_defense.ts).
+// The scripted stand-ins see the whole field, so a surge cannot surprise them: the
+// surprise is judged in play, and the measures guard the rules
+// (docs/design/world-quest-fire-and-fly.md, "The missions").
 
 import {
   DT,

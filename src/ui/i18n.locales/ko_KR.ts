@@ -18906,7 +18906,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.turret.tower': '탑',
   'hudChrome.turret.left': '남은 몬스터: {count}',
   'hudChrome.turret.firstWave': '첫 번째 웨이브까지 {seconds}초',
-  'hudChrome.turret.nextWave': '다음 웨이브까지 {seconds}초',
   'hudChrome.turret.hint': '몬스터가 탑에 닿기 전에 날려 버리세요',
   'hudChrome.turret.finalWave': '마지막 웨이브',
   'hudChrome.turret.clearedBanner': '{wave}번째 웨이브 격퇴',

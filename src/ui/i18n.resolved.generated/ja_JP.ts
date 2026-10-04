@@ -576,7 +576,6 @@ export const ja_JP: EnTranslations = {
       "wave": "Wave {wave}/{total}",
       "left": "残りのモンスター：{count}",
       "firstWave": "最初のウェーブまで {seconds} 秒",
-      "nextWave": "次のウェーブまで {seconds} 秒",
       "hint": "塔にたどり着く前にモンスターを吹き飛ばせ",
       "waveBanner": "Wave {wave} of {total}",
       "finalWave": "最終ウェーブ",

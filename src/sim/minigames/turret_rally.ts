@@ -7,7 +7,7 @@
 // scouts break out at their own. A member thrown while the pack gathers gets up and walks
 // back to its place; one not standing there at the departure goes for the tower alone at
 // the pack's pace. A sprint group never gathers. The rally record lives only while its pack
-// gathers: at the departure every member drops it. No marker of any kind: the standing pack
+// gathers: at the departure, or once none of the pack lives, every member drops it. No marker of any kind: the standing pack
 // and the cue are the telegraph. Pure: private stateless draws only, every leg an existing
 // march or still segment.
 
@@ -369,12 +369,19 @@ function departureCrowded(state: TurretDefenseState, rally: TurretRally, depart:
   );
 }
 
+function anyLiving(state: TurretDefenseState, rally: TurretRally): boolean {
+  for (const m of state.monsters) if (m.rally === rally.id && m.hp > 0) return true;
+  return false;
+}
+
 /**
  * The cues due this tick: a gathering rally whose living members all stand at it (every
  * one spawned), or whose hold timer ran out since its first arrival, cues now unless its
  * departure would crowd another's. The leader cries; fallen, the first living member of its
  * own kind cries in its place (the same voice), and with none the cue is silent (`id` -1).
- * A pack with no one left living closes. Runs after the bodies moved.
+ * A pack with no one left living closes, cued or not, so a wiped pack waiting on its
+ * departure never holds the next wave's keg spots or crowds a cue. Runs after the bodies
+ * moved.
  */
 export function cueTurretRallies(
   state: TurretDefenseState,
@@ -382,6 +389,10 @@ export function cueTurretRallies(
   probe: ThrowProbe,
   events: TurretEvent[],
 ): void {
+  for (const rally of state.rallies ?? []) {
+    if (rally.cueTick >= 0 && !anyLiving(state, rally) && allSpawned(state, rally))
+      dropRally(state, rally, tick, probe);
+  }
   const open = state.rallies?.filter((r) => r.cueTick < 0);
   if (!open?.length) return;
   for (const rally of open) {

@@ -141,9 +141,12 @@ export function emitTurretSelfKeys(
   const session = meta.vehicle?.kind === 'turret' ? meta.vehicle : null;
   // Per pass, a seated session pays a memo hit and the family's 38 diffs of strings it
   // already holds (a reference compare each). A rebuild happens once per engine revision of
-  // a seated player (an aim drag moves it every tick) and costs about 1.3 times one
+  // a seated player, which monster transitions, spawns and impacts move (about every other
+  // tick in a busy mission; aiming alone never does), and costs about 1.3 times one
   // stringify of the whole state, every monster stringified apart and each new part
-  // compared by content with the prior one. Content-bounded per seated player: in practice
+  // compared by content with the prior one: measured at about 34 to 38 microseconds mean
+  // per rebuild over whole won runs of The Deluge and The Powder Store (dev machine, up to
+  // 18 monsters on the field at once). Content-bounded per seated player: in practice
   // the current wave's monsters and the corpses lying `corpseTicks` from those before it
   // (one wave's, more only after a clear that quick), the barrel cap and the shells in
   // flight. The plan rides first so a new seat's keys decode together.

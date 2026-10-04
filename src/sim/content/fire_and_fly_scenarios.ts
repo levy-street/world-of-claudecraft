@@ -12,7 +12,7 @@
 // comes first, a keg as a group passes it, a frag on a pack standing clear of any
 // keg, a Shockwave at 2 strikes due), which reads the field exactly, and the same policy
 // reading it 0.4 s late. Every trial's tower holds 70 points under the one medal rule
-// (gold keeps 95 percent, silver 60), so the waves carry the difficulty (lot R5b): a
+// (gold keeps 95 percent, silver 60), so the waves carry the difficulty: a
 // player firing 0.4 s after each reload golds the Recruit's Trial
 // every run (a school, not a test: everyone up to 2 s wins it, with silver at 1 s); Standing
 // Watch nearly always (its gold target of about half is set aside: every wave set that
@@ -360,11 +360,13 @@ export const FIRE_AND_FLY_MAX_KEG_CAP = Math.max(
 );
 
 /**
- * Each scenario's scoreboard version, by board key (fire_and_fly_scoreboards.ts). Any
- * tuning change of a trial or a mission (its waves, health, speed, arrivals, kegs,
- * integrity, medal bars or arsenal, or the points in minigames/turret_result.ts, which
- * move every one) must raise its version, so runs under the old and the new tuning never
- * share a ladder. Trials' version 2: the arsenal.
+ * Each scenario's scoreboard version, by board key (fire_and_fly_scoreboards.ts). Once the
+ * boards are open to players, any tuning change of a trial or a mission (its waves, health,
+ * speed, arrivals, kegs, integrity, medal bars or arsenal, or the points in
+ * minigames/turret_result.ts, which move every one) must raise its version, so runs under
+ * the old and the new tuning never share a ladder. Until the boards open no run has been
+ * ranked, so a retune or a removed mission keeps the versions as they are. Trials'
+ * version 2: the arsenal.
  */
 export const FIRE_AND_FLY_SCORE_VERSIONS: Readonly<Record<string, number>> = {
   introduction: 2,
@@ -378,7 +380,8 @@ export const FIRE_AND_FLY_SCORE_VERSIONS: Readonly<Record<string, number>> = {
 
 /**
  * The Gunner's Mastery board's version (fire_and_fly_scoreboards.ts). It sums the
- * missions' current bests, so raise it whenever any mission's version above changes or a
- * mission is added or removed; never lower it, or an old board id comes back.
+ * missions' current bests, so once the boards are open, raise it whenever any mission's
+ * version above changes or a mission is added or removed; never lower it, or an old board
+ * id comes back. Until the boards open, a retune or a removed mission keeps it.
  */
 export const FIRE_AND_FLY_MASTERY_VERSION = 1;

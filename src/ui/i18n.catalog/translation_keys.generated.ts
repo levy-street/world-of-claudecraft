@@ -13759,7 +13759,6 @@ export type TranslationKeyFlat =
   | 'hudChrome.turret.medalBronze'
   | 'hudChrome.turret.medalGold'
   | 'hudChrome.turret.medalSilver'
-  | 'hudChrome.turret.nextWave'
   | 'hudChrome.turret.noMedal'
   | 'hudChrome.turret.pointsBowled'
   | 'hudChrome.turret.pointsKegKills'

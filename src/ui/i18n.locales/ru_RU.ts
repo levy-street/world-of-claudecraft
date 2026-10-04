@@ -19277,7 +19277,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.turret.tower': 'Башня',
   'hudChrome.turret.left': 'Осталось монстров: {count}',
   'hudChrome.turret.firstWave': 'Первая волна через {seconds} сек.',
-  'hudChrome.turret.nextWave': 'Следующая волна через {seconds} сек.',
   'hudChrome.turret.hint': 'Взрывайте монстров, пока они не добрались до башни',
   'hudChrome.turret.finalWave': 'Последняя волна',
   'hudChrome.turret.clearedBanner': 'Волна {wave} отбита',

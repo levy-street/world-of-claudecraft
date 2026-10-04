@@ -906,6 +906,13 @@
     font-size: 13px;
     cursor: pointer;
   }
+  /* The touch floor keys on the pointer, not on the short-phone block, so a touch tablet's
+     rows reach it too. */
+  @media (pointer: coarse) {
+    #quest-dialog .gb-row {
+      min-height: 40px;
+    }
+  }
   #quest-dialog .gb-row:hover {
     background: color-mix(in srgb, var(--color-accent) 10%, transparent);
   }

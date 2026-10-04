@@ -576,7 +576,6 @@ export const zh_TW: EnTranslations = {
       "wave": "Wave {wave}/{total}",
       "left": "剩餘怪物：{count}",
       "firstWave": "第一波將在 {seconds} 秒後到來",
-      "nextWave": "下一波將在 {seconds} 秒後到來",
       "hint": "在怪物抵達塔樓前將牠們炸飛",
       "waveBanner": "Wave {wave} of {total}",
       "finalWave": "最後一波",

@@ -204,7 +204,10 @@ export class TurretMotionForecast implements TurretForecastInput {
 
   private rallyOf(center: TurretForecastCenter): Readonly<TurretRally> | undefined {
     const id = this.rally;
-    return id === undefined ? undefined : center.rallies?.find((r) => r.id === id);
+    const rallies = center.rallies;
+    if (id === undefined || !rallies) return undefined;
+    for (let i = 0; i < rallies.length; i++) if (rallies[i].id === id) return rallies[i];
+    return undefined;
   }
 
   /** The pace of a leg to the tower: a departed pack's (a scout keeps its own), else its own. */

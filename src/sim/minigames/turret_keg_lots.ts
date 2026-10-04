@@ -25,7 +25,7 @@ import { placeTurretRallyKeg, type TurretPathKeg, turretClearOfRallies } from '.
 import { turretGroupLanes, turretWaveLanes } from './turret_wave_groups';
 
 /** A lot's draw keys start at its index times this, past the most keys a lot can use. */
-const LOT_KEYS = 1024;
+export const LOT_KEYS = 1024;
 
 /** The wave's kegs standing at once, its own included. */
 function capOf(wave: TurretWavePlan): number {

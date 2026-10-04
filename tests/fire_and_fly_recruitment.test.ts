@@ -345,8 +345,9 @@ describe('the day reward and the mission scores', () => {
   });
 
   it('pins the Mastery board id to the missions and their versions it was cut for', () => {
-    // A failure here means a mission was retuned, added or removed: raise
-    // FIRE_AND_FLY_MASTERY_VERSION, then move both pins together.
+    // A failure here means a mission was retuned, added or removed. Once the boards are
+    // open, raise FIRE_AND_FLY_MASTERY_VERSION and move both pins together; until then the
+    // versions stay and only the mission list pin moves.
     expect(FIRE_AND_FLY_MASTERY_BOARD_ID).toBe('fire_and_fly_mastery_v1_lifetime');
     expect(FIRE_AND_FLY_SCOREBOARD_MISSIONS.map((m) => `${m.key}_v${m.version}`)).toEqual([
       'pack_v1',

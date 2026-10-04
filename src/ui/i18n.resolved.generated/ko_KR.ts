@@ -576,7 +576,6 @@ export const ko_KR: EnTranslations = {
       "wave": "Wave {wave}/{total}",
       "left": "남은 몬스터: {count}",
       "firstWave": "첫 번째 웨이브까지 {seconds}초",
-      "nextWave": "다음 웨이브까지 {seconds}초",
       "hint": "몬스터가 탑에 닿기 전에 날려 버리세요",
       "waveBanner": "Wave {wave} of {total}",
       "finalWave": "마지막 웨이브",

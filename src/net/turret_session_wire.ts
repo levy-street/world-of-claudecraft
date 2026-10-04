@@ -71,8 +71,8 @@ export type TurretSeatState = Omit<TurretSessionView, 'feedback'>;
 // content margin, not a derived limit.
 const MAX_MONSTERS = 2 * TURRET_PLAN_LIMITS.spawnsPerWave;
 const MAX_SHOTS = 32;
-// A rally stays open only while a living member of its pack gathers, or until the departure
-// its cry set: a cleared wave's cued pack can still be due as the next wave's rallies open.
+// A rally stays open only while a living member of its pack gathers or waits on the departure
+// its cry set, so the field holds one wave's at most; twice that is a margin.
 const MAX_RALLIES = 2 * TURRET_PLAN_LIMITS.packs;
 const MAX_RALLY_ID = TURRET_PLAN_LIMITS.waves * TURRET_PLAN_LIMITS.packs - 1;
 const MAX_BARRELS = 64;

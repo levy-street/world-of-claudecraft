@@ -15,7 +15,7 @@ import { TICK_RATE } from '../../../sim/types';
 import type { TurretSessionView } from '../../../world_api/vehicles';
 import { formatNumber, getI18nRevision, t } from '../../i18n';
 import { type ActionBarState, makeSlotState } from '../action_bar/action_bar_view';
-import { turretIntroducedWeapon } from './turret_arsenal_banner';
+import { turretIntroducedWeapon } from './turret_arsenal_banner_core';
 import type { TurretOwnShotLedger } from './turret_own_shot_core';
 import {
   type TurretWeaponKind,

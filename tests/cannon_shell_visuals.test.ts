@@ -643,6 +643,26 @@ describe('cannon shell visuals', () => {
     visuals.dispose();
   });
 
+  it('draws only the live blast after a volley has aged out, never up to where the volley reached', () => {
+    const pool = 40;
+    const visuals = new CannonShellVisuals({
+      blastRadius: RADIUS,
+      groundAt: () => 0,
+      impacts: pool,
+    });
+    visuals.prepare(new THREE.Scene());
+    for (let i = 0; i < 30; i++) visuals.impact({ ...landed, shotId: i + 1 }, 0.1, false);
+    visuals.update(160, 0.3);
+    expect(drawn(visuals, 'chunk')).toBe(30 * CANNON_CHUNKS_PER_IMPACT);
+    const later = 0.1 + CANNON_BLAST.life + 1;
+    visuals.update(200, later);
+    expect(drawn(visuals, 'chunk')).toBe(0);
+    visuals.impact({ ...landed, shotId: 31 }, later, false);
+    visuals.update(201, later + 0.2);
+    expect(drawn(visuals, 'chunk')).toBe(CANNON_CHUNKS_PER_IMPACT);
+    visuals.dispose();
+  });
+
   it('holds no shot pool until prepared, so a player never seated pays for none', () => {
     // Every player builds the turret visual at boot; only the one who sits
     // in it needs the pools of launched puffs and frames.

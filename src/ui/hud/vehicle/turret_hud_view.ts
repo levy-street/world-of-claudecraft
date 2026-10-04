@@ -10,7 +10,7 @@ import {
   type TurretWeaponKeys,
   turretFirstWaveHint,
   turretResupplyLine,
-} from './turret_arsenal_banner';
+} from './turret_arsenal_banner_core';
 import { TurretFeedbackReader } from './turret_feedback_reader_core';
 
 /** Below this share of the bar, the rail turns to its danger colour. */
@@ -32,7 +32,7 @@ export const TURRET_POINT_ROWS = 6;
 /** The result card counts down the seat's own leave over its last this many seconds. */
 export const TURRET_LEAVING_COUNTDOWN_SECONDS = 30;
 
-export type { TurretWeaponKeys } from './turret_arsenal_banner';
+export type { TurretWeaponKeys } from './turret_arsenal_banner_core';
 
 const MEDAL_KEYS = {
   gold: 'hudChrome.turret.medalGold',

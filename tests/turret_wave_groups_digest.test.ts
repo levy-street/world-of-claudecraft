@@ -17,7 +17,7 @@ import type { PrivateSalt } from '../src/sim/types';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 // Replay digests of every scenario, pinned on the engine before waves became groups of
-// bricks (lot G1, at 41b240ead3): the events of every tick and the whole engine state at
+// bricks (at 41b240ead3): the events of every tick and the whole engine state at
 // every revision, on the real arena ground, for several seeds and two aimers. The rewrite of
 // the scenarios in the new format must replay them byte for byte.
 
@@ -172,10 +172,16 @@ const DIGESTS: Readonly<Record<string, string>> = {
   'pack/1/nearest/plain': 'won:7:70:1f086ae3',
   'pack/3/slow/plain': 'won:7:54:3901ed51',
   'pack/4/slow/salted': 'won:7:31:62c718c9',
-  'pack/5/armed/plain': 'won:7:70:8498425c',
+  // Re-taken when a wiped pack's cued rally began to close at once instead of at its
+  // departure: the events, bodies and kegs replay byte for byte; only the rally record, the
+  // dead members' rally fields and one revision move inside the cue's one-second lead.
+  'pack/5/armed/plain': 'won:7:70:e73578bb',
   'pack/9/armed/salted': 'won:7:70:774a4ea8',
   // Re-taken when The Powder Store was recomposed from varied bricks (its content changed).
-  'powder/1/nearest/plain': 'won:7:70:6ae2e656',
+  // Re-taken when a wiped pack's cued rally began to close at once instead of at its
+  // departure: the events, bodies and kegs replay byte for byte; only the rally record, the
+  // dead members' rally fields and one revision move inside the cue's one-second lead.
+  'powder/1/nearest/plain': 'won:7:70:50b024a6',
   'powder/3/slow/plain': 'won:7:68:cf53cc6a',
   'powder/4/slow/salted': 'won:7:61:2a3b6836',
   'powder/5/armed/plain': 'won:7:70:bbd9a239',

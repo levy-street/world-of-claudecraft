@@ -18020,7 +18020,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.turret.tower': '塔楼',
   'hudChrome.turret.left': '剩余怪物：{count}',
   'hudChrome.turret.firstWave': '第一波将在 {seconds} 秒后到来',
-  'hudChrome.turret.nextWave': '下一波将在 {seconds} 秒后到来',
   'hudChrome.turret.hint': '在怪物抵达塔楼前将它们炸飞',
   'hudChrome.turret.finalWave': '最后一波',
   'hudChrome.turret.clearedBanner': '第 {wave} 波已清除',

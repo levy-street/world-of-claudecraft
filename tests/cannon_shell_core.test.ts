@@ -147,6 +147,32 @@ describe('cannon shell arc', () => {
   });
 });
 
+describe('cannon impact slots', () => {
+  const blast = (timeline: CannonShotTimeline, shotId: number, time: number) =>
+    timeline.impact({ shotId, x: 5, y: 0, z: 5 }, time, FULL, 6, 1, flat);
+
+  it('takes the lowest free slot, so a lone blast after a volley sits at the front', () => {
+    const timeline = new CannonShotTimeline(40);
+    for (let i = 0; i < 30; i++) expect(blast(timeline, i + 1, 0.1)).toBe(i);
+    // The renderer frees a slot once its blast has aged out.
+    for (const slot of timeline.impacts) slot.active = false;
+    expect(blast(timeline, 31, 5)).toBe(0);
+    expect(blast(timeline, 32, 5)).toBe(1);
+    timeline.impacts[0].active = false;
+    expect(timeline.airburst(33, 0, 10, 0, 5, { smoke: 1, sparks: 1 })).toBe(0);
+  });
+
+  it('takes over the oldest blast once every slot is live', () => {
+    const timeline = new CannonShotTimeline(4);
+    blast(timeline, 1, 0.4);
+    blast(timeline, 2, 0.2);
+    blast(timeline, 3, 0.1);
+    blast(timeline, 4, 0.3);
+    expect(blast(timeline, 5, 1)).toBe(2);
+    expect(blast(timeline, 6, 1)).toBe(1);
+  });
+});
+
 describe('cannon shell wake', () => {
   const run = () => {
     const timeline = new CannonShotTimeline();

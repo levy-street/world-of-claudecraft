@@ -18949,7 +18949,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.turret.tower': '塔',
   'hudChrome.turret.left': '残りのモンスター：{count}',
   'hudChrome.turret.firstWave': '最初のウェーブまで {seconds} 秒',
-  'hudChrome.turret.nextWave': '次のウェーブまで {seconds} 秒',
   'hudChrome.turret.hint': '塔にたどり着く前にモンスターを吹き飛ばせ',
   'hudChrome.turret.finalWave': '最終ウェーブ',
   'hudChrome.turret.clearedBanner': 'ウェーブ {wave} 撃退',

@@ -576,7 +576,6 @@ export const vi_VN: EnTranslations = {
       "wave": "Wave {wave}/{total}",
       "left": "Monsters left: {count}",
       "firstWave": "First wave in {seconds} sec",
-      "nextWave": "Next wave in {seconds} sec",
       "hint": "Blast the monsters before they reach the tower",
       "waveBanner": "Wave {wave} of {total}",
       "finalWave": "Final wave",

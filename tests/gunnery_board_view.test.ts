@@ -17,6 +17,7 @@ import { fireAndFlyScoreboardId } from '../src/sim/fire_and_fly_scoreboards';
 import { Sim } from '../src/sim/sim';
 import type { TurretArsenalDef } from '../src/sim/types';
 import { WORLD_SEED } from '../src/sim/world_seed';
+import { FIRE_AND_FLY_TRIAL_TEXT } from '../src/ui/fire_and_fly_trial_view';
 import {
   buildGunneryBoardView,
   type GunneryBest,
@@ -356,6 +357,42 @@ describe('the one action', () => {
       "Win the Veterans' Test to be recruited and open the missions.",
     );
     expect(mission.detail.bestText).toBe('Not played yet');
+  });
+
+  /** Runs `body` with `boardKey`'s board text gone, as a scenario added without it would be. */
+  function withoutBoardText(boardKey: string, body: () => void): void {
+    const text = FIRE_AND_FLY_TRIAL_TEXT as Record<
+      string,
+      (typeof FIRE_AND_FLY_TRIAL_TEXT)[string]
+    >;
+    const saved = text[boardKey];
+    delete text[boardKey];
+    try {
+      body();
+    } finally {
+      text[boardKey] = saved;
+    }
+  }
+
+  it('is disabled by the lock itself, even with no text to say what opens it', () => {
+    // Standing Watch is locked for a fresh recruit; with no name for the trial before it
+    // there is no reason to show, and the action must still be refused.
+    withoutBoardText(TURRET_SCENARIO_INTRODUCTION.boardKey, () => {
+      const detail = buildGunneryBoardView(input({ selectedId: TURRET_SCENARIOS[1].id })).detail;
+      expect(detail.lockedReason).toBeNull();
+      expect(detail.actionDisabled).toBe(true);
+    });
+  });
+
+  it('never shows a raw board key as the heading of a scenario without board text', () => {
+    withoutBoardText(PACK.boardKey, () => {
+      const detail = buildGunneryBoardView(
+        input({ recruitment: RECRUITED, selectedId: PACK.id }),
+      ).detail;
+      expect(detail.name).not.toBe(PACK.boardKey);
+      expect(detail.name).toBe(t('hudChrome.turret.title'));
+      expect(detail.actionAria).not.toContain(PACK.boardKey);
+    });
   });
 });
 

@@ -155,7 +155,6 @@ export const hudChromeStrings = {
     wave: 'Wave {wave}/{total}',
     left: 'Monsters left: {count}',
     firstWave: 'First wave in {seconds} sec',
-    nextWave: 'Next wave in {seconds} sec',
     // The first wave's banner subtext: the goal, in words that hold for every input.
     hint: 'Blast the monsters before they reach the tower',
     waveBanner: 'Wave {wave} of {total}',
@@ -221,7 +220,7 @@ export const hudChromeStrings = {
     statFrags: 'Fragmentation Shells',
     statUsed: '{used}/{given}',
     // The pop over a fragmentation shell's burst when its bomblets struck {count} distinct
-    // monsters (four or more): a multiplier, like a combo counter.
+    // monsters (six or more, TURRET_MULTI_HIT_MIN): a multiplier, like a combo counter.
     fragMultiHit: 'x{count}',
   },
   // Master Gunner Alder's Gunnery Board (src/ui/hud/quest/gunnery_board_*): the trials

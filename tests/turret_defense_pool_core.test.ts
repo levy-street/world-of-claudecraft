@@ -82,6 +82,29 @@ describe('Fire and Fly rig pool capacity', () => {
     });
   });
 
+  it("pins each scenario's rig total and marker bodies, so growing a pool is a decision", () => {
+    // Every rig is a whole skinned character built on seat. Raising any of these numbers
+    // (a mission edit buys rigs silently) needs a heap and GPU memory check on a low-end
+    // GPU first: an integrated GPU and an iOS device at the deepest wave.
+    const sizes = Object.fromEntries(
+      FIRE_AND_FLY_SCENARIOS.map((scenario) => {
+        const rigPlan = turretRigPlan(resolveTurretPlan(scenario));
+        let rigs = 0;
+        for (const count of turretRigCapacities(rigPlan).values()) rigs += count;
+        return [scenario.boardKey, { rigs, bodies: turretBodyCapacity(rigPlan) }];
+      }),
+    );
+    expect(sizes).toEqual({
+      introduction: { rigs: 56, bodies: 35 },
+      standard: { rigs: 98, bodies: 40 },
+      hard: { rigs: 118, bodies: 42 },
+      pack: { rigs: 109, bodies: 62 },
+      deluge: { rigs: 64, bodies: 51 },
+      brittle: { rigs: 57, bodies: 43 },
+      powder: { rigs: 56, bodies: 46 },
+    });
+  });
+
   it('carries no tail: a rig plan is its kinds and its waves, nothing older than the previous wave', () => {
     const dressed = turretRigPlan({ scenarioId: 'fire_and_fly_pack', ...plan });
     expect(Object.keys(dressed).sort()).toEqual(['kinds', 'waves']);

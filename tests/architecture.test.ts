@@ -255,6 +255,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/vehicle/cannon_tactics_view.ts',
   'src/ui/hud/vehicle/turret_aim_core.ts',
   'src/ui/hud/vehicle/turret_hud_view.ts',
+  'src/ui/hud/vehicle/turret_arsenal_banner_core.ts',
   'src/ui/hud/vehicle/turret_feedback_reader_core.ts',
   'src/ui/hud/vehicle/turret_damage_numbers_core.ts',
   'src/ui/hud/vehicle/turret_hit_feedback_core.ts',

@@ -576,7 +576,6 @@ export const ru_RU: EnTranslations = {
       "wave": "Wave {wave}/{total}",
       "left": "Осталось монстров: {count}",
       "firstWave": "Первая волна через {seconds} сек.",
-      "nextWave": "Следующая волна через {seconds} сек.",
       "hint": "Взрывайте монстров, пока они не добрались до башни",
       "waveBanner": "Wave {wave} of {total}",
       "finalWave": "Последняя волна",

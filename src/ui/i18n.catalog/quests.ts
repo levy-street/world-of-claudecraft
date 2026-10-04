@@ -363,8 +363,8 @@ const questStringsEn = {
           powder: 'The Powder Store',
         },
         // Alder's brief for each, on the Gunnery Board: a trial's sets the scene and
-        // names what it teaches, a mission's tells the situation and makes a plea;
-        // never a list of monsters, never advice.
+        // names what it teaches, a mission's tells the situation and makes a plea (naming
+        // the beasts is fine); never advice, never wave counts.
         brief: {
           introduction:
             'So you are the new recruit? Here is your cannon: a temperamental old lady, but she has never once missed an appointment. A few beasts are about to come out of the woods, so show me you can hit what you aim at.',

@@ -258,13 +258,7 @@ export function gunneryBoardStep(currentId: string, key: string): string | null 
   return next === null ? null : all[next].scenario.id;
 }
 
-function lockedReason(
-  group: GunneryBoardGroup,
-  index: number,
-  recruitment: Readonly<FireAndFlyRecruitment>,
-  scenario: Scenario,
-): string | null {
-  if (fireAndFlyScenarioUnlocked(recruitment, scenario.id)) return null;
+function lockedReason(group: GunneryBoardGroup, index: number): string | null {
   if (group === 'trials') {
     const previous = TURRET_SCENARIOS[index - 1];
     const name = previous ? fireAndFlyTrialName(previous.id) : null;
@@ -309,10 +303,11 @@ function detailFor(
   scenario: Scenario,
   input: GunneryBoardInput,
 ): GunneryBoardDetail {
-  const name = fireAndFlyTrialName(scenario.id) ?? scenario.boardKey;
+  const name = fireAndFlyTrialName(scenario.id) ?? t('hudChrome.turret.title');
   const briefKey = gunneryBriefKey(scenario.boardKey);
-  const reason = lockedReason(group, index, input.recruitment, scenario);
-  const best = reason === null ? input.bests.get(scenario.id) : undefined;
+  const unlocked = fireAndFlyScenarioUnlocked(input.recruitment, scenario.id);
+  const reason = unlocked ? null : lockedReason(group, index);
+  const best = unlocked ? input.bests.get(scenario.id) : undefined;
   const bestText = best
     ? t('hudChrome.gunneryBoard.bestRun', {
         medal: t(MEDAL_NAME[best.medal]),
@@ -368,7 +363,7 @@ function detailFor(
     lockedReason: reason,
     actionLabel,
     actionAria: t('hudChrome.gunneryBoard.actionAria', { action: actionLabel, name }),
-    actionDisabled: reason !== null,
+    actionDisabled: !unlocked,
   };
 }
 

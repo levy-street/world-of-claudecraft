@@ -576,7 +576,6 @@ export const en_XA: EnTranslations = {
       "wave": "[Ŵáʋé {wave}/{total}]",
       "left": "[Ɱóñšţéŕš ļéƒţ: {count}]",
       "firstWave": "[Ƒíŕšţ ŵáʋé íñ {seconds} šéç]",
-      "nextWave": "[Ñéẋţ ŵáʋé íñ {seconds} šéç]",
       "hint": "[Ɓļášţ ţĥé ɱóñšţéŕš ƀéƒóŕé ţĥéý ŕéáçĥ ţĥé ţóŵéŕ]",
       "waveBanner": "[Ŵáʋé {wave} óƒ {total}]",
       "finalWave": "[Ƒíñáļ ŵáʋé]",

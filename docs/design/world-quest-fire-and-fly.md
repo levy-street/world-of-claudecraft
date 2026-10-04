@@ -119,7 +119,7 @@ are the game's own monsters, living only inside this mini-game.
 - **The strike.** A monster reaching the tower winds up once (a red ring under
   it) for `TURRET_TIMING.windupTicks`, 0.8 s, the same for every trial and mission
   so a player always knows how long a monster at the foot gives them (1.5 s before
-  lot R4). A shot during the wind-up throws it back at no cost. A completed wind-up
+  the strike was shortened). A shot during the wind-up throws it back at no cost. A completed wind-up
   strikes once and the monster vanishes, costing `turretBreachPoints`: its size
   class's breach value scaled by its remaining health, at least one point. Raw
   monster health is never the cost. Every reader of the wind-up follows its
@@ -302,7 +302,7 @@ sides must agree on.
 |---|---|---|
 | Recruit's Trial | `TURRET_SCENARIO_INTRODUCTION` | three short waves of the smallest monsters running in from the whole ring, the spawns closing up wave by wave |
 | Standing Watch | `TURRET_SCENARIO_STANDARD` | the original run (`TURRET_WAVES`), from wolves up to a final guardian; the default trial |
-| Veterans' Test | `TURRET_SCENARIO_HARD` | Standing Watch made meaner: tight fast packs, two rushes on three sides at once, a stream from one side, then the giants walking in with a charge of armoured dead running at their heels from three sides; tougher and more numerous monsters, more large ones, and a last charge of eighteen armoured dead, three good shells each |
+| Veterans' Test | `TURRET_SCENARIO_HARD` | Standing Watch made meaner: tight fast packs, two rushes on three sides at once, a stream from one side, then the giants walking in with a charge of armoured dead running at their heels from three sides; tougher and more numerous monsters, more large ones, and a last charge of nineteen armoured dead, three good shells each |
 
 The trials use walkers and small groups only (`src/sim/minigames/turret_arrival.ts`
 picks which bearings of the spawn ring a monster comes through: the whole ring, one
@@ -318,7 +318,7 @@ not a classic-era formula. Pinned by `tests/turret_scenarios.test.ts` and
 - **Medal** from the share of the tower's points still standing: bronze for any
   win, silver and gold at the scenario's bars (`medals` on the scenario), none for
   a loss. Every trial and mission holds a 70-point tower (`TURRET_TOWER_POINTS`, 100
-  in lot R5b, 70 after the playtest that found the tower's foot carried no threat) under one rule (`TURRET_MEDALS`): gold while it keeps 95
+  when the one medal rule came in, 70 after the playtest that found the tower's foot carried no threat) under one rule (`TURRET_MEDALS`): gold while it keeps 95
   percent, silver 60. The Cracked Tower keeps its 7 points (its idea) and gold for
   a tower nothing struck. The difficulty is in the waves, never in the bars; pinned
   by `tests/turret_scenarios.test.ts`.
@@ -373,12 +373,17 @@ and `tests/dev_turret_defense.test.ts`.
 
 ## The boards
 
-Each trial has a daily and a lifetime ladder, ranked by medal first, then points;
-there is no quest-wide board (`src/sim/fire_and_fly_scoreboards.ts`). Board ids
-carry the trial's score version (`FIRE_AND_FLY_SCORE_VERSIONS` in
-`src/sim/content/fire_and_fly_scenarios.ts`): any tuning
-change of a trial, or of the points, raises its version so runs under the old and
-new tuning never share a ladder.
+Each trial has a daily and a lifetime ladder and each mission a lifetime one, ranked by
+medal first, then points, and the Gunner's Mastery board ranks each character's summed
+mission bests (`src/sim/fire_and_fly_scoreboards.ts`). Board ids
+carry the scenario's score version (`FIRE_AND_FLY_SCORE_VERSIONS` in
+`src/sim/content/fire_and_fly_scenarios.ts`), and the Gunner's Mastery board
+carries `FIRE_AND_FLY_MASTERY_VERSION`. Versions move only once the boards are open
+to players: from then on, any tuning change of a trial or a mission, or of the
+points, raises its
+version (and a mission retuned, added or removed raises the Mastery's) so runs under
+the old and new tuning never share a ladder. Before the boards open no run has been
+ranked, so a retune or a removed mission keeps the versions as they are.
 
 - A won run seated by the instructor for today's row reports its score once
   (`reportFireAndFlyScore` in `src/sim/fire_and_fly_score.ts`); practice runs
@@ -569,17 +574,18 @@ and in the own-shot ledger's click-time charges. A `resupply` feedback entry put
 
 The waves, shell damage and medal bars were set with scripted aimers and one plain
 weapon policy (recorded at the top of the scenarios and missions files; the armed
-figures hold for that policy only), then (lot R4) with a field-aware stand-in for a
+figures hold for that policy only), then, once the strike was shortened to 0.8 s, with a
+field-aware stand-in for a
 good player: shells led onto the strike due first (scouts, stragglers, anything
 reaching the wall), a keg shot as a group passes it, a frag on a standing or tight pack
 with no keg on its path (a pack whose path a keg covers is left to gather), a Shockwave
 once two strikes are due (one in the last wave, or a lone strike the cannon cannot
 answer while charges outnumber the waves left), two frags kept for the last two waves.
 It picks its shot from the exact current field; a control picks from the field as it
-stood 0.4 s earlier. Since lot R5b the content is calibrated on the exact view (the
+stood 0.4 s earlier. Since the one medal rule the content is calibrated on the exact view (the
 owner plays at least that well) and the late one is reported beside it.
 
-No monster is a sponge (lot R5b): each wave's shell damage is matched to its monsters'
+No monster is a sponge (since the one medal rule): each wave's shell damage is matched to its monsters'
 health, so a few good shells fell anything but a giant, and the trials got harder
 through their waves alone. With the quickest stand-in (0.4 s after each reload,
 reading the exact field), on 96 tuning and 96 held-out seeds:
@@ -595,7 +601,7 @@ reading the exact field), on 96 tuning and 96 held-out seeds:
   now). Two fifths more monsters at a pace of 1.7, spawns 0.6 to 1.2 s apart.
 - **Veterans' Test**: gold about a third (39 and 33 percent), 5 percent bare, the gold
   lost in the last wave, where the giants (five or six good shells each) arrive with a
-  charge of eighteen armoured dead (three each) at 2.4 times their pace. A 1 s player
+  charge of nineteen armoured dead (three each) at 2.4 times their pace. A 1 s player
   now loses most runs.
 
 ### The missions
@@ -655,7 +661,7 @@ seed (`tests/turret_scenarios.test.ts`, `tests/fire_and_fly_missions.test.ts`).
   (`TURRET_SHOCK_NUDGE_LEAD_TICKS`), so the 0.8 s strike leaves the pulse the lead
   the 1.5 s one gave it (`turret_weapon_bar_view.ts`, reusing the action-bar painter). The first wave's
   banner presents the weapon a trial brings in with its key, or names the keys of
-  the weapons a mission gives (`turret_arsenal_banner.ts`); the tooltips add a
+  the weapons a mission gives (`turret_arsenal_banner_core.ts`); the tooltips add a
   mission's resupply waves and points per charge kept. Pinned by
   `tests/turret_weapon_bar_view.test.ts`, `tests/turret_weapon_sockets.test.ts` and
   `tests/turret_weapon_tooltip.test.ts`.

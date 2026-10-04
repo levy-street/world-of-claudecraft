@@ -677,12 +677,12 @@ export class CannonShotTimeline {
   lastScorch = -1;
   private nextShell = 0;
   private nextMuzzle = 0;
-  private nextImpact = 0;
   private nextScorch = 0;
 
   /**
-   * `impactPool` blasts stay on the ground at once; the next one takes over the
-   * oldest. A shell whose flight is over waits at its blast point for its impact
+   * `impactPool` blasts stay on the ground at once; the next one takes the lowest
+   * free slot, so the chunks drawn reach only as far as the live blasts do, or over
+   * the oldest when none is free. A shell whose flight is over waits at its blast point for its impact
    * for up to `holdTicks` (an own one once adopted), for a display tick that runs
    * ahead of the clock bringing the impact.
    */
@@ -702,6 +702,16 @@ export class CannonShotTimeline {
       puffCount: 0,
       puffs: Array.from({ length: CANNON_BLAST_PUFFS }, newCannonPuff),
     }));
+  }
+
+  private takeImpact(): number {
+    const impacts = this.impacts;
+    let oldest = 0;
+    for (let i = 0; i < impacts.length; i++) {
+      if (!impacts[i].active) return i;
+      if (impacts[i].at < impacts[oldest].at) oldest = i;
+    }
+    return oldest;
   }
 
   clear(): void {
@@ -904,8 +914,7 @@ export class CannonShotTimeline {
     ground: (x: number, z: number) => number,
   ): number {
     this.land(shot.shotId);
-    const index = this.nextImpact;
-    this.nextImpact = (index + 1) % this.impacts.length;
+    const index = this.takeImpact();
     const slot = this.impacts[index];
     slot.active = true;
     slot.x = shot.x;
@@ -981,8 +990,7 @@ export class CannonShotTimeline {
     counts: Readonly<CannonAirburstCounts>,
   ): number {
     this.land(shotId);
-    const index = this.nextImpact;
-    this.nextImpact = (index + 1) % this.impacts.length;
+    const index = this.takeImpact();
     const slot = this.impacts[index];
     slot.active = true;
     slot.x = x;

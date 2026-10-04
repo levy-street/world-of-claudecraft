@@ -2,7 +2,7 @@
 // src/sim/minigames/turret_defense.ts; the wave plan resolver
 // (src/sim/minigames/turret_defense_plan.ts) reads the templates from MOBS.
 // TURRET_WAVES is the Standard scenario's table (fire_and_fly_scenarios.ts), retuned for the
-// 0.8 s strike (lot R4), then for the 100-point tower and the 95 percent gold (lot R5b).
+// 0.8 s strike, then for the one medal rule (one tower for every trial, gold at 95 percent).
 
 import { FIRE_AND_FLY_TOWER } from '../fire_and_fly_field';
 import {

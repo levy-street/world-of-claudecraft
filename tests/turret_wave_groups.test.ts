@@ -29,6 +29,7 @@ import {
 } from '../src/sim/minigames/turret_defense';
 import {
   resolveTurretPlan,
+  TURRET_PLAN_LIMITS,
   type TurretKind,
   type TurretPlan,
 } from '../src/sim/minigames/turret_defense_plan';
@@ -39,6 +40,7 @@ import {
   type TurretWavePlan,
 } from '../src/sim/minigames/turret_group_plan';
 import {
+  LOT_KEYS,
   placeTurretFieldKegs,
   placeTurretPathKegs,
   turretRouteKegSpot,
@@ -726,5 +728,22 @@ describe('keg lots', () => {
       }
     }
     expect(placed).toBeGreaterThan(24);
+  });
+});
+
+describe('the draw-key strides', () => {
+  // Lots and groups key their draws from `index * stride`; a stride shorter than the keys
+  // one lot or group can use would make two of them share draws, silently correlated.
+  it('leave every keg lot its own keys under the plan limits', () => {
+    const tries = TURRET_EXPLOSIVE_BARREL.placementTries;
+    // A random or crown lot: its offset draw, then each of its kegs' tries.
+    expect(1 + TURRET_PLAN_LIMITS.barrels * tries).toBeLessThanOrEqual(LOT_KEYS);
+    // A route keg: a side and a depth draw per try.
+    expect(2 * tries).toBeLessThanOrEqual(LOT_KEYS);
+  });
+
+  it("leave every group's sides their own keys under the plan limits", () => {
+    // The group's own side, then one per bunch, and a bunch may be a single spawn.
+    expect(1 + TURRET_PLAN_LIMITS.spawnsPerWave).toBeLessThanOrEqual(TURRET_GROUP_LIMITS.sideKeys);
   });
 });

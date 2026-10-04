@@ -8,7 +8,7 @@ import { TURRET_MISSION_PACK } from '../src/sim/content/fire_and_fly_missions';
 import { TURRET_SCENARIO_STANDARD } from '../src/sim/content/fire_and_fly_scenarios';
 import { TURRET_ARENA, TURRET_RALLY, TURRET_TIMING } from '../src/sim/content/turret_defense';
 import { MOBS } from '../src/sim/data';
-import { positionAt, type ThrowProbe } from '../src/sim/minigames/thrown_body';
+import { positionAt, stillSegment, type ThrowProbe } from '../src/sim/minigames/thrown_body';
 import {
   createTurretDefense,
   fireTurret,
@@ -19,6 +19,7 @@ import {
 } from '../src/sim/minigames/turret_defense';
 import { resolveTurretPlan } from '../src/sim/minigames/turret_defense_plan';
 import { turretRallyId, turretRallySlot } from '../src/sim/minigames/turret_rally';
+import { turretClearOfRallies } from '../src/sim/minigames/turret_rally_kegs';
 import type { TurretGroupDef, TurretScenarioDef, TurretWaveEntry } from '../src/sim/types';
 
 const flat: ThrowProbe = { ground: () => 0, water: () => null };
@@ -403,6 +404,77 @@ describe('a rally', () => {
       );
       for (const cue of [a, b]) expect(cue.departTick - cue.tick).toBe(TURRET_RALLY.cueLeadTicks);
     }
+  });
+});
+
+describe('a wiped pack', () => {
+  /** Lays every living monster down dead where it stands, as a blast's rest would. */
+  function wipe(run: Run): void {
+    for (const m of run.state.monsters) {
+      if (m.hp <= 0) continue;
+      m.hp = 0;
+      m.state = 'dead';
+      m.seg = stillSegment(run.tick, TURRET_TIMING.corpseTicks, pos(m, run.tick));
+    }
+  }
+
+  it('closes a cued rally once none of its members lives, before the next wave opens', () => {
+    const hunt = scenario(
+      [{ templateId: 'forest_wolf', count: 3, level: 2, ...MUSTER, pack: 0, leads: true }],
+      { spreadTicks: 0 },
+      100_000,
+    );
+    const def: TurretScenarioDef = {
+      ...hunt,
+      waves: [
+        hunt.waves[0],
+        {
+          groups: [
+            {
+              brick: 'walkers',
+              entries: [{ templateId: 'forest_wolf', count: 2, level: 2, speedScale: 1 }],
+              gapMinTicks: 20,
+              gapMaxTicks: 20,
+            },
+          ],
+          coreDamage: 100_000,
+        },
+      ],
+    };
+    const run = start(def);
+    until(run, () => cues(run).length > 0);
+    const [cue] = cues(run);
+    const rally = run.state.rallies!.find((r) => r.id === cue.rally)!;
+    expect(run.tick).toBeLessThan(cue.departTick);
+    // Wiped inside the cue's lead: the wave clears on the next tick and the next one opens.
+    wipe(run);
+    step(run);
+    expect(run.tick).toBeLessThan(cue.departTick);
+    expect(run.state.wave).toBe(1);
+    // The dead pack's gathering disc no longer holds the next wave's keg spots or cues.
+    expect(run.state.rallies ?? []).toEqual([]);
+    expect(turretClearOfRallies(run.state, rally.x, rally.z)).toBe(true);
+  });
+
+  it('keeps a cued rally while one member lives, until its departure', () => {
+    const run = start(
+      scenario(
+        [{ templateId: 'forest_wolf', count: 3, level: 2, ...MUSTER, pack: 0, leads: true }],
+        { spreadTicks: 0 },
+        100_000,
+      ),
+    );
+    until(run, () => cues(run).length > 0);
+    const [cue] = cues(run);
+    const survivor = run.state.monsters[run.state.monsters.length - 1];
+    const hp = survivor.hp;
+    wipe(run);
+    survivor.hp = hp;
+    survivor.state = 'hold';
+    step(run);
+    expect(run.state.rallies?.map((r) => r.id)).toEqual([cue.rally]);
+    until(run, () => run.tick === cue.departTick);
+    expect(run.state.rallies ?? []).toEqual([]);
   });
 });
 
