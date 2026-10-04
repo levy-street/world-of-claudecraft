@@ -71,11 +71,11 @@ describe('the turret feedback ring', () => {
       pack: 1290,
       deluge: 1021,
       brittle: 695,
-      powder: 2876,
+      powder: 1212,
     });
     const burst = Math.max(...bursts.map(([, n]) => n));
     expect(TURRET_FEEDBACK_LIMIT).toBeGreaterThanOrEqual(burst);
-    expect(TURRET_FEEDBACK_LIMIT).toBe(2876);
+    expect(TURRET_FEEDBACK_LIMIT).toBe(1290);
     const ring: TurretFeedback[] = [];
     recordTurretFeedback(
       ring,

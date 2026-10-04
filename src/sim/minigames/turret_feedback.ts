@@ -14,7 +14,7 @@ import type { TurretEvent } from './turret_defense';
 // wave's start and its kegs, or the end (the derivation per plan is pinned in
 // tests/turret_feedback.test.ts); a smaller ring drops a blast before any reader sees it,
 // and with it the blast's damage numbers, sound and visual.
-export const TURRET_FEEDBACK_LIMIT = 2876;
+export const TURRET_FEEDBACK_LIMIT = 1290;
 
 export interface TurretFeedback {
   /** 1 for a seat's first event, then +1 per event; restarts with every new seat. */

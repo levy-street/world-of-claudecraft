@@ -755,23 +755,38 @@ export const TURRET_MISSION_BRITTLE: TurretScenarioDef = {
   ],
 };
 
-/** Inside a pack, the members follow each other closely. */
-const PACK_GAP = gap(0.15, 0.25);
-const RUSH_GAP = { gapMinTicks: 1, gapMaxTicks: 2 } as const;
 /**
- * Twice the kegs on the sides the monsters come through, and a cap that lets a whole wave's
- * stand beside the ones still intact.
+ * The powder store overflows: more kegs than anywhere, laid on purpose, and the forge's own
+ * coming for them (emberkin, cinder artificers, coinsack scurriers, ember fiends, a magma
+ * brute). Varied waves of walkers, small groups and packs, kegs on their paths and in
+ * clusters, a crown where the Shockwave throws the small ones; two strong moments where the
+ * kegs stand close in the lanes and go up in chains (the fourth wave and the last), and the
+ * brute as the one big monster, with a keg on its road. No sponge: a forge creature falls to
+ * two or three good shells, the brute to a handful.
  */
 const POWDER_CAP = 12;
-const POWDER_KEGS = (count: number) => turretKegRing(2 * count, 'lanes');
+/** A powder field: kegs in the lanes, close enough to chain (no spacing). */
+const powderField = (count: number): TurretKegLotDef => ({
+  mode: 'random',
+  count,
+  ...TURRET_BARREL_RING,
+  lanes: true,
+});
+const FORGE = { speedScale: 1, speedScaleMax: 1.25 } as const;
+const EMBER_SCOUT = { role: 'scout', speedScale: 2, speedScaleMax: 2.3 } as const;
+const EMBER_RUN = { speedScale: 2, speedScaleMax: 2.3 } as const;
+const forgePack = (entries: readonly TurretWaveEntry[], delay: number): TurretGroupDef => ({
+  brick: 'pack',
+  minRadius: 30,
+  maxRadius: 36,
+  holdTicks: ticks(4),
+  spreadTicks: ticks(2),
+  widthTurn: 0.1,
+  advanceScale: 1.1,
+  entries,
+  delayTicks: ticks(delay),
+});
 
-/**
- * Twice the kegs on the sides the monsters come through, and a cap that lets a whole
- * wave's stand beside the ones still intact: a keg shot as a group passes clears it. The
- * waves arrive from one side, two flanks, in packs, then all at once from three sides,
- * growing and quickening, until the last two charge down twelve kegs each: forty-eight
- * then sixty-three monsters, the giants among the last.
- */
 export const TURRET_MISSION_POWDER: TurretScenarioDef = {
   id: 'fire_and_fly_powder',
   boardKey: 'powder',
@@ -781,128 +796,154 @@ export const TURRET_MISSION_POWDER: TurretScenarioDef = {
   supply: MISSION_SUPPLY,
   waves: [
     {
+      // Emberkin walking in from one side, kegs waiting for them.
       groups: [
-        walkers([{ templateId: 'forest_wolf', count: 8, level: 2 }], STEADY_GAP, {
+        walkers([{ templateId: 'tunnel_rat', count: 8, level: 4, ...FORGE }], gap(1, 1.5), {
           kind: 'arc',
-          widthTurn: 0.3,
+          widthTurn: 0.25,
         }),
       ],
       coreDamage: 60,
-      kegs: POWDER_KEGS(3),
+      kegs: [front(0), spaced(2)],
       kegCap: POWDER_CAP,
     },
     {
+      // Scurriers walking, then two bunches of emberkin past a pair of kegs.
       groups: [
-        walkers(
-          [
-            { templateId: 'forest_wolf', count: 6, level: 2 },
-            { templateId: 'wild_boar', count: 6, level: 3 },
-          ],
-          STEADY_GAP,
-          { kind: 'flanks', count: 2, widthTurn: 0.2 },
-        ),
+        walkers([{ templateId: 'vale_bandit', count: 6, level: 4, ...FORGE }], gap(1, 1.5)),
+        {
+          ...bunches(
+            [{ templateId: 'tunnel_rat', count: 8, level: 4, speedScale: 1.3 }],
+            gap(0.2, 0.35),
+            4,
+            5,
+            0.06,
+          ),
+          delayTicks: ticks(5),
+        },
       ],
-      coreDamage: 64,
-      kegs: POWDER_KEGS(3),
+      coreDamage: 60,
+      kegs: [front(1, 2), spaced(2)],
       kegCap: POWDER_CAP,
     },
     {
+      // Cinder artificers gathering as a pack, emberkin running ahead, a cluster on their road.
       groups: [
-        bunches(
+        walkers([{ templateId: 'tunnel_rat', count: 4, level: 4, ...FORGE }], gap(1, 1.4)),
+        forgePack(
           [
-            { templateId: 'vale_bandit', count: 8, level: 5 },
-            { templateId: 'webwood_spider', count: 6, level: 4 },
+            { templateId: 'deeprock_kobold', count: 6, level: 14, ...MUSTER, leads: true },
+            { templateId: 'tunnel_rat', count: 2, level: 4, ...EMBER_SCOUT },
           ],
-          PACK_GAP,
-          5,
           3,
-          0.08,
-        ),
-      ],
-      coreDamage: 84,
-      kegs: POWDER_KEGS(4),
-      kegCap: POWDER_CAP,
-    },
-    {
-      groups: [
-        walkers(
-          [
-            { templateId: 'tunnel_rat', count: 8, level: 6, speedScale: 1.2 },
-            { templateId: 'fen_troll', count: 4, level: 11, speedScale: 1.1 },
-          ],
-          gap(0.6, 1.2),
-          { kind: 'flanks', count: 3, widthTurn: 0.14 },
-        ),
-      ],
-      coreDamage: 100,
-      kegs: POWDER_KEGS(4),
-      kegCap: POWDER_CAP,
-    },
-    {
-      groups: [
-        bunches(
-          [
-            { templateId: 'deeprock_kobold', count: 10, level: 15, speedScale: 1.3 },
-            { templateId: 'thornpeak_ogre', count: 4, level: 16, speedScale: 1.2 },
-            { templateId: 'boneclad_revenant', count: 4, level: 19, speedScale: 1.3 },
-          ],
-          PACK_GAP,
-          6,
-          2,
-          0.08,
         ),
       ],
       coreDamage: 130,
-      kegs: POWDER_KEGS(5),
+      kegs: [front(1, 3), spaced(1)],
       kegCap: POWDER_CAP,
     },
     {
+      // The first powder field: kegs packed in the lanes, the forge's own walking through from
+      // two sides, an emberkin surging in from behind.
       groups: [
         walkers(
           [
-            { templateId: 'boneclad_revenant', count: 14, level: 19, speedScale: 2.4 },
-            { templateId: 'deeprock_kobold', count: 12, level: 15, speedScale: 2.4 },
-            { templateId: 'thornpeak_ogre', count: 6, level: 16, speedScale: 2 },
+            { templateId: 'tunnel_rat', count: 8, level: 4, ...FORGE },
+            { templateId: 'vale_bandit', count: 6, level: 5, ...FORGE },
           ],
-          RUSH_GAP,
-          { kind: 'flanks', count: 3, widthTurn: 0.06 },
+          gap(0.7, 1.1),
+          { kind: 'flanks', count: 2, widthTurn: 0.12 },
         ),
+        surgers([{ templateId: 'tunnel_rat', count: 1, level: 4, ...EMBER_RUN }], 1, 9),
       ],
-      coreDamage: 160,
-      kegs: POWDER_KEGS(5),
+      coreDamage: 70,
+      kegs: [powderField(6)],
       kegCap: POWDER_CAP,
     },
     {
+      // A lull: scurriers walking slowly, two emberkin surging in, a crown for the Shockwave.
       groups: [
         walkers(
-          [
-            { templateId: 'boneclad_revenant', count: 24, level: 19, speedScale: 3 },
-            { templateId: 'deeprock_kobold', count: 18, level: 15, speedScale: 3 },
-            { templateId: 'fen_troll', count: 6, level: 12, speedScale: 2.6 },
-          ],
-          RUSH_GAP,
-          { kind: 'flanks', count: 3, widthTurn: 0.06 },
+          [{ templateId: 'vale_bandit', count: 6, level: 5, speedScale: 0.9 }],
+          gap(1.2, 1.8),
         ),
+        surgers([{ templateId: 'tunnel_rat', count: 2, level: 4, ...EMBER_RUN }], 2, 8),
       ],
-      coreDamage: 180,
-      kegs: POWDER_KEGS(6),
+      coreDamage: 70,
+      kegs: [smallCrown(2), spaced(1)],
       kegCap: POWDER_CAP,
     },
     {
+      // Ember fiends and emberkin in small groups from three sides, one after another.
       groups: [
-        walkers(
+        bunches(
           [
-            { templateId: 'boneclad_revenant', count: 32, level: 19, speedScale: 3.3 },
-            { templateId: 'deeprock_kobold', count: 22, level: 15, speedScale: 3.3 },
-            { templateId: 'frostmane_yeti', count: 6, level: 20, speedScale: 2.8 },
-            { templateId: 'idol_guardian', count: 3, level: 20, speedScale: 2.6 },
+            { templateId: 'boneclad_revenant', count: 6, level: 18, ...FORGE },
+            { templateId: 'tunnel_rat', count: 6, level: 4, ...FORGE },
           ],
-          RUSH_GAP,
-          { kind: 'flanks', count: 3, widthTurn: 0.06 },
+          gap(0.3, 0.5),
+          4,
+          5,
+          0.06,
         ),
       ],
-      coreDamage: 220,
-      kegs: POWDER_KEGS(6),
+      coreDamage: 200,
+      kegs: [front(0, 2), spaced(2)],
+      kegCap: POWDER_CAP,
+    },
+    {
+      // The magma brute walks in with its escort, a keg on its road; emberkin around.
+      groups: [
+        walkers(
+          [{ templateId: 'tunnel_rat', count: 8, level: 4, speedScale: 1.3, speedScaleMax: 1.6 }],
+          gap(0.7, 1.1),
+        ),
+        {
+          brick: 'bigOne',
+          widthTurn: 0.05,
+          ...gap(0.4, 0.7),
+          entries: [
+            { templateId: 'thornpeak_ogre', count: 1, level: 15, bossLast: true },
+            { templateId: 'vale_bandit', count: 3, level: 5, ...FORGE },
+          ],
+          delayTicks: ticks(6),
+        },
+        surgers([{ templateId: 'tunnel_rat', count: 1, level: 4, ...EMBER_RUN }], 1, 12),
+      ],
+      coreDamage: 140,
+      kegs: [{ mode: 'path', group: 1, placement: 'axis', fromTower: 18, spaced: true }, spaced(2)],
+      kegCap: POWDER_CAP,
+    },
+    {
+      // The last powder field: two packs of the forge gathering, kegs packed in the lanes and a
+      // cluster on each road, emberkin surging in.
+      groups: [
+        forgePack(
+          [
+            { templateId: 'deeprock_kobold', count: 5, level: 14, ...MUSTER, leads: true },
+            { templateId: 'tunnel_rat', count: 2, level: 4, ...EMBER_SCOUT },
+          ],
+          0,
+        ),
+        forgePack(
+          [
+            { templateId: 'boneclad_revenant', count: 4, level: 18, ...MUSTER, leads: true },
+            { templateId: 'vale_bandit', count: 3, level: 5, ...MUSTER },
+            { templateId: 'tunnel_rat', count: 2, level: 4, ...EMBER_SCOUT },
+          ],
+          4,
+        ),
+        {
+          ...walkers(
+            [{ templateId: 'tunnel_rat', count: 8, level: 4, speedScale: 1.3, speedScaleMax: 1.6 }],
+            gap(0.6, 0.9),
+          ),
+          delayTicks: ticks(10),
+        },
+        surgers([{ templateId: 'tunnel_rat', count: 2, level: 4, ...EMBER_RUN }], 2, 14),
+      ],
+      coreDamage: 200,
+      kegs: [front(0, 2), front(1, 2), powderField(4)],
       kegCap: POWDER_CAP,
     },
   ],

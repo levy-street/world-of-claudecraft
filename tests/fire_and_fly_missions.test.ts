@@ -324,27 +324,36 @@ describe('the mission table', () => {
     });
   });
 
-  it("puts twice the kegs on The Powder Store's lanes, sided waves, a cap of 12 the finale fills", () => {
+  it('lays The Powder Store with kegs on purpose: paths, clusters, a crown, two powder fields', () => {
     const plan = resolveTurretPlan(TURRET_MISSION_POWDER);
-    // Each wave lays twice the kegs of the Standing Watch wave its size, on its lanes.
-    expect(TURRET_MISSION_POWDER.waves.map((w) => ringLot(w)?.count)).toEqual([
-      6, 6, 8, 8, 10, 10, 12, 12,
-    ]);
-    plan.waves.forEach((wave, i) => {
-      expect(ringLot(wave)).toMatchObject({
-        mode: 'random',
-        minRadius: 16,
-        maxRadius: 30,
-        lanes: true,
-      });
-      expect(wave.kegCap).toBe(12);
-      expect(sidesOf(TURRET_MISSION_POWDER.waves[i])).not.toBe('ring');
+    const waves = TURRET_MISSION_POWDER.waves;
+    const bricks = new Set(waves.flatMap((w) => w.groups.map((g) => g.brick)));
+    for (const b of ['walkers', 'smallGroup', 'pack', 'surgers', 'bigOne'] as const)
+      expect(bricks.has(b), b).toBe(true);
+    for (const wave of plan.waves) expect(wave.kegCap).toBe(12);
+    const lots = waves.flatMap((w) => w.kegs ?? []);
+    expect(lots.some((l) => l.mode === 'path')).toBe(true);
+    expect(lots.some((l) => l.mode === 'crown' && l.size === 'small')).toBe(true);
+    expect(lots.some((l) => 'cluster' in l && l.cluster !== undefined)).toBe(true);
+    // The two strong moments: kegs packed in the lanes, unspaced so they chain, in the fourth
+    // wave and the last.
+    const fields = waves.map((w) =>
+      (w.kegs ?? []).some((l) => l.mode === 'random' && l.lanes === true && !l.spaced),
+    );
+    expect(fields).toEqual([false, false, false, true, false, false, false, true]);
+    // The magma brute is the one big monster, with a keg on its road.
+    const big = plan.kinds.filter((k) => k.sizeClass === 'large' || k.sizeClass === 'huge');
+    expect(big.map((k) => k.templateId)).toEqual(['thornpeak_ogre']);
+    const bigWave = waves.findIndex((w) => w.groups.some((g) => g.brick === 'bigOne'));
+    const bigGroup = waves[bigWave].groups.findIndex((g) => g.brick === 'bigOne');
+    expect((waves[bigWave].kegs ?? []).some((l) => l.mode === 'path' && l.group === bigGroup)).toBe(
+      true,
+    );
+    // No sponge: a forge creature falls to three good shells at most, the brute too.
+    plan.waves.forEach((wave) => {
+      for (const kind of new Set(wave.spawns))
+        expect(Math.ceil(plan.kinds[kind].maxHp / wave.coreDamage)).toBeLessThanOrEqual(3);
     });
-    expect(TURRET_MISSION_POWDER.waves.slice(5).map((w) => walkersOf(w))).toMatchObject([
-      { sides: { kind: 'flanks', count: 3, widthTurn: 0.06 } },
-      { sides: { kind: 'flanks', count: 3, widthTurn: 0.06 } },
-      { sides: { kind: 'flanks', count: 3, widthTurn: 0.06 } },
-    ]);
   });
 
   it('names the largest keg cap of every resolved plan, above the default one', () => {
@@ -408,7 +417,9 @@ describe('the plan knobs', () => {
     ])
       expect(() => resolveTurretPlan(lots([lot]))).toThrow(/bad kegs/);
     // A forged plan past the limits never decodes.
-    const wire = JSON.parse(JSON.stringify(resolveTurretPlan(TURRET_MISSION_POWDER)));
+    // The Powder Store's first powder field: one lane lot on flanked walkers.
+    const field = variant({ waves: [TURRET_MISSION_POWDER.waves[3]], arsenal: undefined });
+    const wire = JSON.parse(JSON.stringify(resolveTurretPlan(field)));
     expect(decodeTurretPlan(wire)).not.toBeNull();
     for (const edit of [
       { kegCap: TURRET_PLAN_LIMITS.barrels + 1 },
@@ -423,7 +434,19 @@ describe('the plan knobs', () => {
   });
 
   it('places lane kegs inside the wave arrival sides, each side in turn', () => {
-    const plan = resolveTurretPlan(TURRET_MISSION_POWDER);
+    // The Powder Store's first powder field as a one-wave plan's only lot, then the same lot on
+    // walkers from three flanks and from two.
+    const field = TURRET_MISSION_POWDER.waves[3];
+    const flanked = (count: 2 | 3) => ({
+      ...field,
+      groups: [
+        {
+          ...field.groups[0],
+          sides: { kind: 'flanks', count, widthTurn: 0.06 },
+        } as TurretWaveDef['groups'][number],
+      ],
+    });
+    const plan = resolveTurretPlan(variant({ waves: [field, flanked(3), flanked(2)] }));
     for (const seed of [3, 8, 21]) {
       for (const [w, wave] of plan.waves.entries()) {
         const state = createTurretDefense(plan, { x: 0, z: 0 }, seed, START);

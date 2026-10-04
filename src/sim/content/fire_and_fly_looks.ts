@@ -34,7 +34,6 @@ export const FIRE_AND_FLY_SCENARIO_LOOKS: Readonly<
     deeprock_kobold: 'ignivar_cinder_artificer',
     vale_bandit: 'hoard_coinsack_scurrier',
     boneclad_revenant: 'rift_ember_fiend',
-    fen_troll: 'ignivar_crucible_warden',
     thornpeak_ogre: 'rift_magma_brute',
   },
 };
