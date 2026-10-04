@@ -605,7 +605,7 @@ const STEADY_GAP = gap(0.9, 1.7);
  * most often while the player watches a procession gather. No sponge: a medium dead falls
  * to two or three good shells.
  */
-const DEAD = { speedScale: 0.9, speedScaleMax: 1.05 } as const;
+const DEAD = { speedScale: 1, speedScaleMax: 1.15 } as const;
 const HOUND = { speedScale: 1.6, speedScaleMax: 1.9 } as const;
 const HOUND_RUN = { speedScale: 2, speedScaleMax: 2.3 } as const;
 const HOUND_SCOUT = { role: 'scout', speedScale: 2, speedScaleMax: 2.3 } as const;
@@ -734,8 +734,8 @@ export const TURRET_MISSION_BRITTLE: TurretScenarioDef = {
           ],
           gap(0.9, 1.4),
         ),
-        surgers([{ templateId: 'wild_boar', count: 3, level: 2, ...HOUND_RUN }], 3, 7),
-        surgers([{ templateId: 'wild_boar', count: 1, level: 2, ...HOUND_RUN }], 1, 14),
+        surgers([{ templateId: 'wild_boar', count: 3, level: 2, ...HOUND_RUN }], 3, 6),
+        surgers([{ templateId: 'wild_boar', count: 2, level: 2, ...HOUND_RUN }], 2, 12),
       ],
       coreDamage: 160,
       kegs: [spaced(1, 3)],
@@ -763,8 +763,9 @@ export const TURRET_MISSION_BRITTLE: TurretScenarioDef = {
           ...walkers([{ templateId: 'tunnel_rat', count: 6, level: 4, ...DEAD }], gap(0.9, 1.3)),
           delayTicks: ticks(10),
         },
-        surgers([{ templateId: 'wild_boar', count: 2, level: 2, ...HOUND_RUN }], 2, 7),
-        surgers([{ templateId: 'wild_boar', count: 3, level: 2, ...HOUND_RUN }], 3, 15),
+        surgers([{ templateId: 'wild_boar', count: 2, level: 2, ...HOUND_RUN }], 2, 6),
+        surgers([{ templateId: 'wild_boar', count: 3, level: 2, ...HOUND_RUN }], 3, 12),
+        surgers([{ templateId: 'wild_boar', count: 2, level: 2, ...HOUND_RUN }], 2, 18),
       ],
       coreDamage: 200,
       kegs: [front(0), front(1)],
@@ -773,7 +774,8 @@ export const TURRET_MISSION_BRITTLE: TurretScenarioDef = {
 };
 
 /**
- * The powder store overflows: more kegs than anywhere, laid on purpose, and the forge's own
+ * The powder store overflows: kegs everywhere, every wave laying a powder field in the lanes
+ * the monsters walk (close enough to chain) beside clusters on their roads, and the forge's own
  * coming for them (emberkin, cinder artificers, coinsack scurriers, ember fiends, a magma
  * brute). Varied waves of walkers, small groups and packs, kegs on their paths and in
  * clusters, a crown where the Shockwave throws the small ones; two strong moments where the
@@ -821,7 +823,7 @@ export const TURRET_MISSION_POWDER: TurretScenarioDef = {
         }),
       ],
       coreDamage: 60,
-      kegs: [front(0), spaced(2)],
+      kegs: [front(0, 2), powderField(6)],
       kegCap: POWDER_CAP,
     },
     {
@@ -840,7 +842,7 @@ export const TURRET_MISSION_POWDER: TurretScenarioDef = {
         },
       ],
       coreDamage: 60,
-      kegs: [front(1, 2), spaced(2)],
+      kegs: [front(1, 2), powderField(6)],
       kegCap: POWDER_CAP,
     },
     {
@@ -856,7 +858,7 @@ export const TURRET_MISSION_POWDER: TurretScenarioDef = {
         ),
       ],
       coreDamage: 130,
-      kegs: [front(1, 3), spaced(1)],
+      kegs: [front(1, 3), powderField(6)],
       kegCap: POWDER_CAP,
     },
     {
@@ -874,7 +876,7 @@ export const TURRET_MISSION_POWDER: TurretScenarioDef = {
         surgers([{ templateId: 'tunnel_rat', count: 1, level: 4, ...EMBER_RUN }], 1, 9),
       ],
       coreDamage: 70,
-      kegs: [powderField(6)],
+      kegs: [powderField(10)],
       kegCap: POWDER_CAP,
     },
     {
@@ -887,7 +889,7 @@ export const TURRET_MISSION_POWDER: TurretScenarioDef = {
         surgers([{ templateId: 'tunnel_rat', count: 2, level: 4, ...EMBER_RUN }], 2, 8),
       ],
       coreDamage: 70,
-      kegs: [smallCrown(2), spaced(1)],
+      kegs: [smallCrown(2), powderField(6)],
       kegCap: POWDER_CAP,
     },
     {
@@ -905,7 +907,7 @@ export const TURRET_MISSION_POWDER: TurretScenarioDef = {
         ),
       ],
       coreDamage: 200,
-      kegs: [front(0, 2), spaced(2)],
+      kegs: [front(0, 3), powderField(7)],
       kegCap: POWDER_CAP,
     },
     {
@@ -928,7 +930,10 @@ export const TURRET_MISSION_POWDER: TurretScenarioDef = {
         surgers([{ templateId: 'tunnel_rat', count: 1, level: 4, ...EMBER_RUN }], 1, 12),
       ],
       coreDamage: 140,
-      kegs: [{ mode: 'path', group: 1, placement: 'axis', fromTower: 18, spaced: true }, spaced(2)],
+      kegs: [
+        { mode: 'path', group: 1, placement: 'axis', fromTower: 18, cluster: 2 },
+        powderField(7),
+      ],
       kegCap: POWDER_CAP,
     },
     {
@@ -960,7 +965,7 @@ export const TURRET_MISSION_POWDER: TurretScenarioDef = {
         surgers([{ templateId: 'tunnel_rat', count: 2, level: 4, ...EMBER_RUN }], 2, 14),
       ],
       coreDamage: 200,
-      kegs: [front(0, 2), front(1, 2), powderField(4)],
+      kegs: [front(0, 3), front(1, 3), powderField(10)],
       kegCap: POWDER_CAP,
     },
   ],

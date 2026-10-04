@@ -335,12 +335,17 @@ describe('the mission table', () => {
     expect(lots.some((l) => l.mode === 'path')).toBe(true);
     expect(lots.some((l) => l.mode === 'crown' && l.size === 'small')).toBe(true);
     expect(lots.some((l) => 'cluster' in l && l.cluster !== undefined)).toBe(true);
-    // The two strong moments: kegs packed in the lanes, unspaced so they chain, in the fourth
-    // wave and the last.
+    // Kegs everywhere: every wave lays a powder field in the lanes, unspaced so it chains,
+    // and the two strong moments (the fourth wave and the last) lay the largest.
     const fields = waves.map((w) =>
-      (w.kegs ?? []).some((l) => l.mode === 'random' && l.lanes === true && !l.spaced),
+      (w.kegs ?? []).reduce(
+        (n, l) => n + (l.mode === 'random' && l.lanes === true && !l.spaced ? l.count : 0),
+        0,
+      ),
     );
-    expect(fields).toEqual([false, false, false, true, false, false, false, true]);
+    for (const n of fields) expect(n).toBeGreaterThanOrEqual(6);
+    expect(Math.max(...fields)).toBe(fields[3]);
+    expect(fields[7]).toBe(fields[3]);
     // The magma brute is the one big monster, with a keg on its road.
     const big = plan.kinds.filter((k) => k.sizeClass === 'large' || k.sizeClass === 'huge');
     expect(big.map((k) => k.templateId)).toEqual(['thornpeak_ogre']);

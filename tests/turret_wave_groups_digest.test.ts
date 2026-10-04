@@ -148,11 +148,11 @@ const RUNS: readonly [number, number, Aimer, boolean][] = FIRE_AND_FLY_SCENARIOS
 
 const DIGESTS: Readonly<Record<string, string>> = {
   // Re-taken when The Cracked Tower was recomposed from varied bricks (its content changed).
-  'brittle/1/nearest/plain': 'won:7:7:2d89b03d',
-  'brittle/3/slow/plain': 'won:7:7:478d09ce',
-  'brittle/4/slow/salted': 'won:7:7:1016bbc1',
-  'brittle/5/armed/plain': 'won:7:7:958a3d05',
-  'brittle/9/armed/salted': 'won:7:7:0b14faac',
+  'brittle/1/nearest/plain': 'won:7:7:805d5365',
+  'brittle/3/slow/plain': 'won:7:7:955fe0a7',
+  'brittle/4/slow/salted': 'won:7:7:ca90750d',
+  'brittle/5/armed/plain': 'won:7:7:0d414505',
+  'brittle/9/armed/salted': 'won:7:7:d22d94cd',
   // Re-taken when The Deluge was recomposed from varied bricks (its content changed).
   'deluge/1/nearest/plain': 'won:7:70:098bfd5a',
   'deluge/3/slow/plain': 'won:7:53:21192485',
@@ -175,11 +175,11 @@ const DIGESTS: Readonly<Record<string, string>> = {
   'pack/5/armed/plain': 'won:7:70:503a5e08',
   'pack/9/armed/salted': 'won:7:70:49fbc0f0',
   // Re-taken when The Powder Store was recomposed from varied bricks (its content changed).
-  'powder/1/nearest/plain': 'won:7:70:be9762cc',
-  'powder/3/slow/plain': 'won:7:69:9d36b270',
-  'powder/4/slow/salted': 'won:7:66:6b5068bb',
-  'powder/5/armed/plain': 'won:7:70:ba57b25e',
-  'powder/9/armed/salted': 'won:7:70:5c168e43',
+  'powder/1/nearest/plain': 'won:7:70:166ea2ae',
+  'powder/3/slow/plain': 'won:7:68:e5fbfae0',
+  'powder/4/slow/salted': 'won:7:70:8b2a3b3c',
+  'powder/5/armed/plain': 'won:7:70:95e48cd5',
+  'powder/9/armed/salted': 'won:7:70:b1cb98a1',
   'standard/1/nearest/plain': 'won:5:70:b7244f0c',
   'standard/3/slow/plain': 'won:5:20:5ff497b4',
   'standard/4/slow/salted': 'won:5:30:53b2e732',
