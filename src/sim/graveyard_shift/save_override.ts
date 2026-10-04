@@ -13,6 +13,7 @@ import { cloneAllocation } from '../content/talents';
 import { serializeCooldowns } from '../cooldown_persist';
 import { RESURRECTION_SICKNESS_ID, UNSTUCK_SICKNESS_ID } from '../resurrection';
 import type { SimContext } from '../sim_context';
+import { restoreCooldownsPreservingUnstuck } from '../unstuck_cooldown';
 import { GRAVE_POS, graveReturnSpot } from './grave_entry';
 import { graveyardShiftDoorDrop } from './run_layout';
 
@@ -21,8 +22,8 @@ export function graveyardShiftSaveState(
   pid: number,
   state: CharacterState,
 ): CharacterState {
-  const run = ctx.graveyardShiftRuns.get(pid);
-  const e = ctx.entities.get(pid);
+  const run = ctx.graveyardShiftRuns.size > 0 ? ctx.graveyardShiftRuns.get(pid) : undefined;
+  const e = run ? ctx.entities.get(pid) : undefined;
   if (!run || !e) return state;
   const { pools } = run;
   // A grave shift ends in front of the grave, a dev one at the Crypt door.
@@ -35,8 +36,10 @@ export function graveyardShiftSaveState(
     talents: cloneAllocation(run.parked.talents),
     hp: pools.hp,
     resource: run.savedResource,
+    // The carried-in cooldowns, plus any unstuck timer the run opened (the
+    // teardown's own restore rule), so a mid-run save sheds nothing.
     cooldowns: serializeCooldowns(
-      pools.cooldowns,
+      restoreCooldownsPreservingUnstuck(e.cooldowns, pools.cooldowns),
       e.potionCooldownUntil,
       ctx.time,
       pools.abilityCharges,

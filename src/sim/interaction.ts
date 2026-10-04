@@ -521,7 +521,7 @@ export function interact(
       }
       // Tibbs' dialogue sends its [Take the shift] as a targeted interact.
       if (isTibbs(target)) {
-        acceptGraveyardShiftFromTibbs(ctx, p.id);
+        acceptGraveyardShiftFromTibbs(ctx, p.id, target.id);
         return;
       }
       if (talkToWeeklyKeeper(ctx, target, p)) return;

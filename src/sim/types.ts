@@ -6739,8 +6739,6 @@ export interface PendingResurrection {
 
 export type DamageEventKind = 'hit' | 'miss' | 'dodge' | 'parry' | 'block' | 'resist' | 'evade';
 
-// `pid` (when present) marks a personal event that should only be delivered to
-// that player entity's owner; events without pid are world-visible.
 /** Tibbs' end-of-shift report: who went home, who was saved, the pay. */
 export interface GraveyardShiftReport {
   outcome: 'won' | 'lost';
@@ -6749,6 +6747,8 @@ export interface GraveyardShiftReport {
   copper: number;
 }
 
+// `pid` (when present) marks a personal event that should only be delivered to
+// that player entity's owner; events without pid are world-visible.
 export type SimEvent = { pid?: number } & (
   | {
       type: 'damage';

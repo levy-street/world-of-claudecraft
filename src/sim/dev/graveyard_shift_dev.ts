@@ -1,7 +1,7 @@
-// /dev graveyardshift: the Graveyard Shift prototype's only entry point while it
-// is being built (ALLOW_DEV_COMMANDS or the offline dev client only: reached
-// through the ctx.devCommands gate like every /dev branch, and the run itself
-// also refuses any host that is not the offline world).
+// /dev graveyardshift: the Graveyard Shift's playtest shortcut, skipping the grave
+// and Tibbs (ALLOW_DEV_COMMANDS or the offline dev client only: reached through
+// the ctx.devCommands gate like every /dev branch, and the run start refuses a
+// dev entry without dev commands too).
 //
 //   /dev graveyardshift [start]   cover Morthen's shift in a private Crypt
 //   /dev graveyardshift end       end the shift and walk out to the Crypt door

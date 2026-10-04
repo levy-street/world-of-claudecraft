@@ -174,9 +174,9 @@ export function startGraveyardShift(
 
 // The targeted interact on Tibbs: the player took the shift. A refusal (a
 // party, a fight, a queue) is one Tibbs line rather than a dev message.
-export function acceptGraveyardShiftFromTibbs(ctx: SimContext, pid: number): void {
-  // Only the player who woke him holds his offer: their own Tibbs must be up.
-  if (!tibbsFor(ctx, pid)) return;
+export function acceptGraveyardShiftFromTibbs(ctx: SimContext, pid: number, tibbsId: number): void {
+  // Only the player who woke him holds his offer: the Tibbs answered must be theirs.
+  if (tibbsFor(ctx, pid)?.id !== tibbsId) return;
   // Won once is won: Tibbs is still up for his report, but the shift is closed.
   if (!graveyardShiftEligibleFor(ctx, pid)) {
     tibbsSay(ctx, pid, 'covered');
@@ -241,7 +241,12 @@ export function endGraveyardShift(
  *  win (the deed and the pay are already granted); anything else aborts. */
 export function graveyardShiftResolveLeave(ctx: SimContext, pid: number): void {
   const run = ctx.graveyardShiftRuns.get(pid);
-  if (run) endGraveyardShift(ctx, run, run.outro?.kind === 'won' ? 'won' : 'aborted', true);
+  if (!run) return;
+  // The outcome the next tick would have reached: a won scene stays won, a loss
+  // already decided (the lethal-blow clamp, the lost scene) stays lost.
+  const lost = run.pendingOutcome === 'lost' || run.outro?.kind === 'lost';
+  const outcome = run.outro?.kind === 'won' ? 'won' : lost ? 'lost' : 'aborted';
+  endGraveyardShift(ctx, run, outcome, true);
 }
 
 // Anything Morthen still has in flight must not land from the restored real character.
@@ -279,8 +284,11 @@ export function updateGraveyardShift(ctx: SimContext): void {
     else if (run.pendingOutcome === 'lost' && !run.outro) startLossOutro(ctx, run);
     else if (run.pendingOutcome && run.pendingOutcome !== 'lost') {
       endGraveyardShift(ctx, run, run.pendingOutcome);
-    } else if (p.dead) endGraveyardShift(ctx, run, 'lost');
-    else if (run.outro) {
+    } else if (p.dead) {
+      // A won fight stays won (its deed and pay are granted): a stray hit in the
+      // won scene cannot turn it into a loss.
+      endGraveyardShift(ctx, run, run.outro?.kind === 'won' ? 'won' : 'lost');
+    } else if (run.outro) {
       // A won owner who gets out some other way has still finished the shift.
       if (!instanceClaimHolds(run.slot, p.pos)) endGraveyardShift(ctx, run, run.outro.kind);
     } else if (run.slot.partyKey !== run.key || !instanceClaimHolds(run.slot, p.pos)) {

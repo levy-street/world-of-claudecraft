@@ -2,7 +2,7 @@
 // out of game.ts: a run is a parenthesis, so it closes before the host saves or
 // moves the player (src/sim/graveyard_shift/CLAUDE.md). The sim owns the rules;
 // this only says when to apply them.
-import { graveyardShiftResolveLeave, hasMorthenIdentity } from '../src/sim/graveyard_shift';
+import { graveyardShiftResolveLeave } from '../src/sim/graveyard_shift';
 import { graveyardShiftObservable } from '../src/sim/graveyard_shift/grave_staging';
 import type { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
@@ -26,13 +26,6 @@ export function resolveModesBeforeLeaveSave(sim: Sim, pid: number): void {
   // Thornhollow Fields: the leaver's recorded loss and rating delta are in the
   // persisted state.
   sim.bgResolveDesertion(pid);
-}
-
-/** A hotbar layout upload is refused while Morthen's kit stands in for the bar:
- *  the client freezes its writers, and the server never stores a layout the
- *  real character did not choose. */
-export function hotbarLayoutSaveAllowed(sim: Sim, pid: number): boolean {
-  return !hasMorthenIdentity(sim.entities.get(pid));
 }
 
 /** The snapshot filter's arm for the mode's private entities: the grave reaches

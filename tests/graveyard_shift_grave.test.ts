@@ -78,8 +78,7 @@ const tibbsLines = (events: SimEvent[]) =>
   events
     .filter(
       (ev): ev is Extract<SimEvent, { type: 'chat' }> =>
-        ev.type === 'chat' &&
-        ev.textKey?.startsWith('graveyardShift.tibbs.say.') === true,
+        ev.type === 'chat' && ev.textKey?.startsWith('graveyardShift.tibbs.say.') === true,
     )
     .map((ev) => ev.textKey?.replace('graveyardShift.tibbs.say.', ''));
 
@@ -529,7 +528,7 @@ describe('the end of a grave shift', () => {
     const sim = graveSim();
     wakeTibbs(sim);
     const other = sim.addPlayer('mage', 'Passerby');
-    acceptGraveyardShiftFromTibbs(sim.ctx, other);
+    acceptGraveyardShiftFromTibbs(sim.ctx, other, tibbsId(sim));
     const events = sim.tick();
     expect(graveyardShiftRunFor(sim.ctx, other)).toBeNull();
     expect(tibbsLines(events)).toEqual([]);

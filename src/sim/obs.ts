@@ -10,6 +10,7 @@ import { canUseForbiddenReflection } from './combat/warlock_talents';
 import { noticeboardDefByEntityId } from './content/noticeboards';
 import { corpseInteractionAvailability } from './corpse_interaction';
 import { CLASSES, ITEMS, QUEST_ORDER, QUESTS, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from './data';
+import { isGraveyardShiftGrave } from './graveyard_shift/grave_entry';
 import {
   ASCENSION_CHARGES,
   ASCENSION_DURATION,
@@ -312,11 +313,13 @@ export function encodeObs(sim: Sim): number[] {
     }
     // The Realm Builder monument is an honour roll, not a pickup: nothing an
     // agent can gain from it, and as a permanent object in the middle of the
-    // square it would otherwise shadow the mailbox in this slot.
+    // square it would otherwise shadow the mailbox in this slot. The Graveyard
+    // Shift grave, permanent on a shared host, is skipped for the same reason.
     if (
       e.kind === 'object' &&
       e.lootable &&
       e.templateId !== REALM_BUILDER_MONUMENT_TEMPLATE_ID &&
+      !isGraveyardShiftGrave(e) &&
       d2 < bestObjectD2
     ) {
       const noticeboardDef = noticeboardDefByEntityId(sim.noticeboardDefinitions, e.id);

@@ -6834,7 +6834,7 @@ export class GameServer {
       // crashing the session), merges the named profile into the session's
       // document, and persists it via the per-character FIFO save queue.
       case 'save_hotbar_layout':
-        if (gshift.hotbarLayoutSaveAllowed(sim, pid)) this.hotbarLayouts.save(session, msg);
+        this.hotbarLayouts.save(session, msg);
         break;
       // Skin-select event lock-in. The Sim re-validates the skin against the
       // rank it rolled and consumes the event token; a forged claim no-ops.

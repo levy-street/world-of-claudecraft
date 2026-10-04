@@ -6,7 +6,9 @@
 // targeted interact on Tibbs, the decline is client side.
 import { BOSS_FOR_A_DAY_DEED_ID, TIBBS_NPC_ID } from '../../../sim/graveyard_shift/grave_entry';
 import type { Entity, GraveyardShiftReport } from '../../../sim/types';
-import { type TranslationKey, t } from '../../i18n';
+import { formatNumber, type TranslationKey, t } from '../../i18n';
+
+const COUNT_FORMAT = { maximumFractionDigits: 0 } as const;
 
 const FIRST_MEETING: readonly TranslationKey[] = [
   'graveyardShift.tibbs.offer.intro1',
@@ -42,7 +44,10 @@ export function tibbsOfferDialog(
   if (report?.outcome === 'won') {
     return {
       lines: [
-        t('graveyardShift.tibbs.say.report', { sent: report.sent, saved: report.saved }),
+        t('graveyardShift.tibbs.say.report', {
+          sent: formatNumber(report.sent, COUNT_FORMAT),
+          saved: formatNumber(report.saved, COUNT_FORMAT),
+        }),
         t('graveyardShift.tibbs.say.payout'),
       ],
       quoted: false,
@@ -63,10 +68,7 @@ export function tibbsOfferDialog(
   return {
     lines:
       report?.outcome === 'lost'
-        ? [
-            t('graveyardShift.tibbs.say.consolation'),
-            t('graveyardShift.tibbs.say.anotherShift'),
-          ]
+        ? [t('graveyardShift.tibbs.say.consolation'), t('graveyardShift.tibbs.say.anotherShift')]
         : FIRST_MEETING.map((key) => t(key)),
     quoted: false,
     rewardCopper: 0,

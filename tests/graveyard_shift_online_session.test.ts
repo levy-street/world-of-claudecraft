@@ -1,8 +1,7 @@
 // The Graveyard Shift on the authoritative server: a run is a parenthesis, so
 // every way out of the session closes it BEFORE the host saves or moves the
 // player (server/graveyard_shift_session.ts): a dropped connection, a logout,
-// a jail sentence. A won scene keeps its win. A hotbar layout upload is
-// refused while Morthen's kit stands in for the bar.
+// a jail sentence. A won scene keeps its win.
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../server/db', () => ({
@@ -133,17 +132,5 @@ describe('a Graveyard Shift run on the server', () => {
     expect(graveyardShiftRunFor(sim.ctx, session.pid)).toBeNull();
     expect(hasMorthenIdentity(sim.entities.get(session.pid))).toBe(false);
     expect(atGrave(session.jailed!.returnPos)).toBe(true);
-  });
-
-  it('refuses a hotbar layout upload while the kit stands in, accepts it after', () => {
-    const { server, sim, session } = onShift('Arranger', 305);
-    const save = vi.spyOn(server.hotbarLayouts, 'save');
-    const upload = JSON.stringify({ t: 'cmd', cmd: 'save_hotbar_layout', layout: {} });
-    server.handleMessage(session, upload);
-    expect(save).not.toHaveBeenCalled();
-    sim.ctx.graveyardShiftRuns.get(session.pid)!.pendingOutcome = 'aborted';
-    sim.tick();
-    server.handleMessage(session, upload);
-    expect(save).toHaveBeenCalledTimes(1);
   });
 });
