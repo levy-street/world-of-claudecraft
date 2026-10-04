@@ -15,6 +15,7 @@ import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects'
 import { updateWorldSpeech } from '../src/render/world_speech';
 import {
   GRAVE_ENTITY_ID,
+  GRAVE_INTERACT_RADIUS,
   GRAVE_ITEM_ID,
   GRAVE_POS,
   GRAVE_WHISPER_RADIUS,
@@ -69,7 +70,9 @@ describe('the grave whisper', () => {
   });
 
   it('whispers again on each return past the re-arm radius, never inside the cooldown', () => {
-    expect(GRAVE_WHISPER_REARM_RADIUS).toBe(20);
+    expect(GRAVE_WHISPER_RADIUS).toBe(6);
+    expect(GRAVE_WHISPER_RADIUS).toBe(GRAVE_INTERACT_RADIUS);
+    expect(GRAVE_WHISPER_REARM_RADIUS).toBe(12);
     expect(GRAVE_WHISPER_COOLDOWN_MS).toBe(30_000);
     const state = freshGraveWhisperState();
     expect(graveWhisperDue(GRAVE_POS, at(3), state, 0)).toBe(true);

@@ -9,7 +9,7 @@ import { GRAVE_WHISPER_RADIUS } from '../sim/graveyard_shift/grave_entry';
 
 type Pos = { readonly x: number; readonly z: number };
 
-export const GRAVE_WHISPER_REARM_RADIUS = 20;
+export const GRAVE_WHISPER_REARM_RADIUS = 12;
 export const GRAVE_WHISPER_COOLDOWN_MS = 30_000;
 
 export interface GraveWhisperState {

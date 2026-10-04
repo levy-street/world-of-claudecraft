@@ -18,8 +18,9 @@ export const TIBBS_ENTITY_ID = 2_147_200_002;
 export const TIBBS_NPC_ID = 'tibbs';
 // Tibbs stands beside his grave, facing the player's usual approach (south).
 export const TIBBS_OFFSET = { x: 1.6, z: -1.2 } as const;
-// The grave whispers to an eligible player who comes this close (client side).
-export const GRAVE_WHISPER_RADIUS = 12;
+// The grave whispers to an eligible player who comes this close (client side):
+// the interact reach, so the whisper comes once a touch would answer (owner pick).
+export const GRAVE_WHISPER_RADIUS = 6;
 // The grave answers an interaction from this close.
 export const GRAVE_INTERACT_RADIUS = 6;
 // Tibbs goes back down once the player walks this far off, or after this long.
