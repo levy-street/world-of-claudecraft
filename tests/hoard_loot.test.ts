@@ -287,6 +287,12 @@ describe('rollHoardBossDrop', () => {
 });
 
 describe('the payout', () => {
+  it('uses the agreed mount odds for each map rarity', () => {
+    expect(RARITIES.map((rarity) => VAULT_PAYOUTS[rarity].mountChance)).toEqual([
+      0.0025, 0.005, 0.0075, 0.01,
+    ]);
+  });
+
   it('publishes the agreed odds: owner 10, 30, 50 and 100 percent, guests well below', () => {
     expect(RARITIES.map((rarity) => VAULT_PAYOUTS[rarity].gearChance)).toEqual([0.1, 0.3, 0.5, 1]);
     expect(VAULT_GUEST_GEAR_CHANCE).toEqual({ common: 0.05, rare: 0.1, epic: 0.2, legendary: 0.4 });

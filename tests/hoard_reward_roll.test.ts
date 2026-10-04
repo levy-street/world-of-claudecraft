@@ -24,6 +24,27 @@ function scriptedRng(ints: number[], chances: boolean[]) {
 }
 
 describe('rollHoardReward', () => {
+  it.each([
+    ['common', 0.0025],
+    ['rare', 0.005],
+    ['epic', 0.0075],
+    ['legendary', 0.01],
+  ] as const)('rolls the %s mount chance from the chest', (rarity, mountChance) => {
+    const script = scriptedRng([0], [false, false, false, false]);
+    rollHoardReward(script.rng, {
+      rarity,
+      cls: 'hunter',
+      level: 20,
+      owner: true,
+      guestCapped: false,
+      mountOwned: false,
+    });
+    expect(script.calls.filter(([kind]) => kind === 'chance').at(-2)).toEqual([
+      'chance',
+      mountChance,
+    ]);
+  });
+
   it('preserves the owners full payout and exact draw order', () => {
     const script = scriptedRng([1, 0], [true, true, true, true, true]);
     const reward = rollHoardReward(script.rng, {
