@@ -45,6 +45,25 @@ describe('the adventurer bots on a shared realm', () => {
     expect(sim.ctx.graveyardShiftRuns.botPids.size).toBe(0);
   });
 
+  it('forget a bot that strays out of the claim, mid-run', () => {
+    const sim = realm();
+    shiftFor(sim, sim.playerId);
+    const run = graveyardShiftRunFor(sim.ctx, sim.playerId)!;
+    const stray = run.bots[4].pid;
+    const e = sim.entities.get(stray)!;
+    // The Crypt door outside, far from the slot.
+    e.pos = sim.ctx.groundPos(80, 90);
+    e.prevPos = { ...e.pos };
+    sim.ctx.rebucket(e);
+    sim.tick();
+    expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).toBe(run);
+    expect(run.bots.map((b) => b.pid)).not.toContain(stray);
+    expect(run.bots).toHaveLength(4);
+    expect(isGraveyardShiftBotPid(sim.ctx, stray)).toBe(false);
+    expect(sim.ctx.graveyardShiftRuns.botPids.size).toBe(4);
+    expect(sim.ctx.players.has(stray)).toBe(false);
+  });
+
   it('cannot be found by name: whispers and lookups reach real players only', () => {
     const sim = realm();
     const other = sim.addPlayer('mage', 'Bystander');
@@ -76,6 +95,45 @@ describe('the adventurer bots on a shared realm', () => {
     expect(sim.ctx.partyInvites.has(bot)).toBe(false);
     expect(sim.ctx.tradeInvites.has(bot)).toBe(false);
     expect(sim.ctx.duelInvites.has(bot)).toBe(false);
+    // The same calls on real players on the very same spot go through: the bot
+    // guard, not the place, is what refused them (one target each, as a pending
+    // invite of one kind blocks the others).
+    const reals = ['Partner', 'Trader', 'Duelist'].map((name) => {
+      const pid = sim.addPlayer('rogue', name);
+      const e = sim.entities.get(pid)!;
+      e.pos = { ...botE.pos };
+      return pid;
+    });
+    sim.partyInvite(reals[0], other);
+    sim.tradeRequest(reals[1], other);
+    sim.duelRequest(reals[2], other);
+    expect(sim.ctx.partyInvites.get(reals[0])?.fromPid).toBe(other);
+    expect(sim.ctx.tradeInvites.get(reals[1])?.fromPid).toBe(other);
+    expect(sim.ctx.duelInvites.get(reals[2])?.fromPid).toBe(other);
+  });
+
+  it('cannot be inspected, invited or followed by name through chat commands', () => {
+    const sim = realm();
+    const other = sim.addPlayer('mage', 'Bystander');
+    shiftFor(sim, sim.playerId);
+    const errorsOf = (line: string) => {
+      sim.drainEvents();
+      sim.chat(line, other);
+      return sim
+        .drainEvents()
+        .filter((ev): ev is Extract<SimEvent, { type: 'error' }> => ev.type === 'error')
+        .filter((ev) => ev.pid === other)
+        .map((ev) => ev.text);
+    };
+    const missing = ["There is no player named 'Bulwarkbro' online."];
+    expect(errorsOf('/inspect Bulwarkbro')).toEqual(missing);
+    expect(errorsOf('/invite Bulwarkbro')).toEqual(missing);
+    expect(sim.ctx.partyInvites.size).toBe(0);
+    expect(errorsOf('/follow Bulwarkbro')).toEqual(missing);
+    expect(sim.entities.get(other)!.followTargetId).toBeNull();
+    // A real player is found by the same commands.
+    sim.addPlayer('rogue', 'Realone');
+    expect(errorsOf('/inspect Realone')[0]).toMatch(/^Realone: Level /);
   });
 
   it('speak to the run owner alone, even with someone else standing beside them', () => {

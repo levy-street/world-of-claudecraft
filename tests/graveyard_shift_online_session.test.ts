@@ -92,7 +92,30 @@ describe('a Graveyard Shift run on the server', () => {
     const { server, sim, session } = onShift('Leaver', 302);
     vi.mocked(saveCharacterState).mockClear();
     vi.mocked(saveCharacterAndMarketState).mockClear();
-    await server.leave(session, 'logout');
+    // What the live world looked like at the moment the save was called.
+    const atSave: { runOver: boolean; present: boolean; morthen: boolean }[] = [];
+    const record = async () => {
+      const e = sim.entities.get(session.pid);
+      atSave.push({
+        runOver: graveyardShiftRunFor(sim.ctx, session.pid) === null,
+        present: e !== undefined,
+        morthen: hasMorthenIdentity(e),
+      });
+      return true;
+    };
+    const plain = vi.mocked(saveCharacterState);
+    const market = vi.mocked(saveCharacterAndMarketState);
+    const plainImpl = plain.getMockImplementation();
+    const marketImpl = market.getMockImplementation();
+    plain.mockImplementation(record);
+    market.mockImplementation(record);
+    try {
+      await server.leave(session, 'logout');
+    } finally {
+      if (plainImpl) plain.mockImplementation(plainImpl);
+      if (marketImpl) market.mockImplementation(marketImpl);
+    }
+    expect(atSave).toEqual([{ runOver: true, present: true, morthen: false }]);
     expect(graveyardShiftRunFor(sim.ctx, session.pid)).toBeNull();
     const saved = lastSavedState();
     expect(saved.level).toBe(15);
@@ -123,6 +146,7 @@ describe('a Graveyard Shift run on the server', () => {
     const saved = lastSavedState();
     expect(saved.copper - copperBefore).toBe(2000);
     expect(meta.deedsEarned.has(BOSS_FOR_A_DAY_DEED_ID)).toBe(true);
+    expect(saved.deeds?.[BOSS_FOR_A_DAY_DEED_ID]).toBeDefined();
     expect(saved.level).toBe(15);
   });
 

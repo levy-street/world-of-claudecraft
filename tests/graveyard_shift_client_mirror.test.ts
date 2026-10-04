@@ -9,9 +9,14 @@ import {
 } from '../src/net/ability_presentation';
 import { ClientWorld } from '../src/net/online';
 import { emptyAllocation } from '../src/sim/content/talents';
+import { SHADOW_PULSE_DREAD } from '../src/sim/graveyard_shift/dread';
 import { MORTHEN_KIT } from '../src/sim/graveyard_shift/kit';
 import { morthenIdentityAura } from '../src/sim/graveyard_shift/morthen_identity';
+import { knownAbilitiesFor } from '../src/sim/graveyard_shift/morthen_transform';
+import { startGraveyardShift } from '../src/sim/graveyard_shift/run_lifecycle';
+import { Sim } from '../src/sim/sim';
 import type { Aura } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const KIT_IDS = MORTHEN_KIT.map((def) => def.id);
 const state = () => ({
@@ -40,6 +45,28 @@ describe('the client ability presentation', () => {
     expect(clientActionBarReadOnly(null, false, morthen)).toBe(true);
     expect(clientActionBarReadOnly('Someone', false, plain)).toBe(true);
     expect(clientActionBarReadOnly(null, true, plain)).toBe(true);
+  });
+});
+
+describe('the client known list against the sim', () => {
+  it('is the sim known list for a Morthen entity, ability for ability', () => {
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      devCommands: true,
+      offlineHost: true,
+      world: EMPTY_TEST_WORLD,
+    });
+    sim.setPlayerLevel(15);
+    expect(startGraveyardShift(sim.ctx, sim.playerId, 'dev')).toBeNull();
+    const e = sim.player;
+    const meta = sim.ctx.players.get(sim.playerId)!;
+    const simKnown = knownAbilitiesFor(meta, e);
+    expect(simKnown.map((k) => k.def.id)).toEqual(KIT_IDS);
+    const client = buildClientAbilityPresentation('warrior', e, state(), null, []);
+    expect(client.known).toEqual(simKnown);
+    // The sim and the client resolve the same Pulse cost.
+    expect(sim.resolvedAbility('gshift_shadow_pulse')?.cost).toBe(SHADOW_PULSE_DREAD);
   });
 });
 
@@ -114,6 +141,10 @@ describe('a ClientWorld fed a Morthen self snapshot', () => {
     expect(client.known.map((k: { def: { id: string } }) => k.def.id)).toEqual(KIT_IDS);
     const pulse = client.resolvedAbility('gshift_shadow_pulse');
     expect(pulse?.def.id).toBe('gshift_shadow_pulse');
+    // Its cost is Dread, spent from the Dread bar the self snapshot carries.
+    expect(SHADOW_PULSE_DREAD).toBe(25);
+    expect(pulse?.cost).toBe(SHADOW_PULSE_DREAD);
+    expect(client.player.resourceType).toBe('dread');
     expect(client.actionBarReadOnly).toBe(true);
   });
 });

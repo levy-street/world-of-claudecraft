@@ -217,4 +217,23 @@ describe("Tibbs' shift offer", () => {
     controller.updateProximity();
     expect(element.style.display).not.toBe('block');
   });
+
+  it('a report that lands before his entity opens as the report once he arrives', () => {
+    const { controller, element, world, tibbs } = harness(
+      new Map([['hid_boss_for_a_day', '2026-10-04']]),
+    );
+    world.entities.delete(TIBBS_ENTITY_ID);
+    controller.openWhenPresent(TIBBS_ENTITY_ID, {
+      outcome: 'won',
+      sent: 10,
+      saved: 2,
+      copper: 2000,
+    });
+    expect(element.style.display).not.toBe('block');
+    world.entities.set(TIBBS_ENTITY_ID, tibbs);
+    controller.updateProximity();
+    expect(element.style.display).toBe('block');
+    expect(element.querySelector('[data-gshift-reward] [data-copper]')?.textContent).toBe('2000');
+    expect(element.querySelector('.qd-text')?.textContent).toContain('Adventurers sent home: 10.');
+  });
 });

@@ -80,6 +80,8 @@ describe('the Graveyard Shift on the server, end to end', () => {
     expect(sim.entities.has(GRAVE_ENTITY_ID)).toBe(true);
     expect(seenIds(fcA).has(GRAVE_ENTITY_ID)).toBe(true);
     expect(seenIds(fcB).has(GRAVE_ENTITY_ID)).toBe(false);
+    // B does receive snapshots of that very spot: A, standing beside them.
+    expect(seenIds(fcB).has(a.pid)).toBe(true);
 
     // A touches it: their own Tibbs rises, offered to them alone.
     cmd(server, a, { cmd: 'pickup', id: GRAVE_ENTITY_ID });
@@ -89,6 +91,8 @@ describe('the Graveyard Shift on the server, end to end', () => {
     expect(tibbs).toBeDefined();
     expect(seenIds(fcA).has(tibbs.id)).toBe(true);
     expect(seenIds(fcB).has(tibbs.id)).toBe(false);
+    const latestB = fcB.sent.filter((m: any) => m.t === 'snap').at(-1);
+    expect(latestB.ents.some((e: any) => e.id === a.pid)).toBe(true);
     expect(sentText(fcA)).toContain('"graveyardShiftOffer"');
     expect(sentText(fcB)).not.toContain('"graveyardShiftOffer"');
     // B cannot raise one at an invisible grave.
@@ -140,9 +144,11 @@ describe('the Graveyard Shift on the server, end to end', () => {
     const saved = sim.serializeCharacter(a.pid)!;
     expect(saved.level).toBe(15);
     expect(saved.copper - copperBefore).toBe(2000);
+    expect(saved.deeds?.[BOSS_FOR_A_DAY_DEED_ID]).toBeDefined();
     const fresh = new Sim({ seed: 3, playerClass: 'warrior', noPlayer: true });
     const pid = fresh.addPlayer('warrior', 'Reloaded', { state: saved });
     expect(fresh.entities.get(pid)!.level).toBe(15);
     expect(hasMorthenIdentity(fresh.entities.get(pid))).toBe(false);
+    expect(fresh.ctx.players.get(pid)!.deedsEarned.has(BOSS_FOR_A_DAY_DEED_ID)).toBe(true);
   });
 });
