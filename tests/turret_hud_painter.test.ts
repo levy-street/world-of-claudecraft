@@ -182,6 +182,11 @@ describe('the turret HUD painter', () => {
     ]);
     leave.click();
     expect(onLeave).toHaveBeenCalledTimes(1);
+    // A second finger (the stick's thumb already down) gets no click from the browser.
+    const init = { bubbles: true, pointerId: 7, pointerType: 'touch', isPrimary: false };
+    leave.dispatchEvent(new PointerEvent('pointerdown', init));
+    leave.dispatchEvent(new PointerEvent('pointerup', init));
+    expect(onLeave).toHaveBeenCalledTimes(2);
   });
 
   it('offers Replay beside Leave only on the ended card, written once, and hides it for the replayed run', () => {
@@ -209,6 +214,10 @@ describe('the turret HUD painter', () => {
     expect(writes).not.toHaveBeenCalled();
     replay.click();
     expect(onReplay).toHaveBeenCalledTimes(1);
+    const init = { bubbles: true, pointerId: 7, pointerType: 'touch', isPrimary: false };
+    replay.dispatchEvent(new PointerEvent('pointerdown', init));
+    replay.dispatchEvent(new PointerEvent('pointerup', init));
+    expect(onReplay).toHaveBeenCalledTimes(2);
     expect(onLeave).not.toHaveBeenCalled();
 
     // The replayed run: a new seat in its intro, the strip back and Replay gone.

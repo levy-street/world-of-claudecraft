@@ -190,6 +190,22 @@ it('lets go of the focus a press gave the socket, so its tooltip never stays ove
   expect(document.activeElement).not.toBe(sockets()[0]);
 });
 
+/** A touch tap by a finger that is not the first one down: browsers send it no click. */
+const secondFingerTap = (button: HTMLElement) => {
+  const init = { bubbles: true, pointerId: 7, pointerType: 'touch', isPrimary: false };
+  button.dispatchEvent(new PointerEvent('pointerdown', init));
+  button.dispatchEvent(new PointerEvent('pointerup', init));
+};
+
+it('fires a socket from a second finger, with the stick or the aim already held', () => {
+  const { world, seatIn } = rig();
+  seatIn(seat());
+  sockets()[0].focus();
+  secondFingerTap(sockets()[0]);
+  expect(world.useVehicleAction).toHaveBeenCalledWith('turret_shockwave', { x: 0, z: 0 });
+  expect(document.activeElement).not.toBe(sockets()[0]);
+});
+
 it('keeps the focus a keyboard press activates the socket from', () => {
   const { world, seatIn } = rig();
   seatIn(seat());

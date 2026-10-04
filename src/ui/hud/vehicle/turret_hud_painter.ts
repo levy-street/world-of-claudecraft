@@ -11,6 +11,7 @@
 // spares only such children.
 import type { TurretMedal } from '../../../sim/minigames/turret_result';
 import type { PainterHostWriters } from '../../painter_host';
+import { bindTouchTap } from '../../touch_tap';
 import { TURRET_POINT_ROWS, TURRET_RESULT_ROWS, type TurretHudFrame } from './turret_hud_view';
 
 export const TURRET_HUD_ID = 'turret-hud';
@@ -110,8 +111,9 @@ export class TurretHudPainter {
     writers.setAttr(this.value, 'aria-hidden', 'true');
     this.leave.append(this.leaveLabel, this.keycap);
     this.replay.append(this.replayLabel);
-    this.leave.addEventListener('click', onLeave);
-    this.replay.addEventListener('click', onReplay);
+    // Per finger: the move stick's thumb is down while the other hand taps these.
+    bindTouchTap(this.leave, () => onLeave());
+    bindTouchTap(this.replay, () => onReplay());
     const divider = el('div', 'ui-divider');
     writers.setAttr(divider, 'aria-hidden', 'true');
     writers.setAttr(this.pointsDivider, 'aria-hidden', 'true');

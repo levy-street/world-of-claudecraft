@@ -1,10 +1,11 @@
 // The Fire and Fly weapon sockets: two ActionBarPainter sockets (the vehicle bar
-// family) above the tower rail, or in the move stick's corner on touch. Frames come
+// family) above the tower rail, or in the action ring's corner on touch. Frames come
 // from TurretWeaponBarView and every write goes through the shared facet. The row
 // itself is pointer-inert; each socket takes the pointer and stops its press there,
 // so a tap on a socket never also reaches the ground behind it as a shot.
 import { iconDataUrl } from '../../icons';
 import type { PainterHostWriters } from '../../painter_host';
+import { bindTouchTap } from '../../touch_tap';
 import { ActionBarPainter, type ActionBarSlotElements } from '../action_bar/action_bar_painter';
 import type { ActionBarState } from '../action_bar/action_bar_view';
 import { TURRET_WEAPON_SLOTS } from './turret_weapon_bar_view';
@@ -47,10 +48,11 @@ export class TurretWeaponBarPainter {
       const rechargeOverlay = el('span', 'recharge-overlay');
       btn.append(label, countEl, keybindEl, cdOverlay, cdText, rechargeOverlay);
       btn.addEventListener('pointerdown', (event) => event.stopPropagation());
-      btn.addEventListener('click', (event) => {
-        event.stopPropagation();
-        onPress(index, event.detail > 0);
-      });
+      btn.addEventListener('click', (event) => event.stopPropagation());
+      // Per finger, so a socket fires while the other thumb holds the stick or aims.
+      bindTouchTap(btn, (event) =>
+        onPress(index, event.type === 'pointerup' || (event as MouseEvent).detail > 0),
+      );
       if (attachTooltip && tooltip) attachTooltip(btn, () => tooltip(index));
       buttons.push(btn);
       this.root.append(btn);
