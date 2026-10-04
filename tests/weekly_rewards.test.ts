@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { decodeWeeklyRewardInfo } from '../src/net/weekly_rewards_wire';
 import { nextWeeklyRaidResetMs } from '../src/reset_calendar';
 import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
 import { BUILTIN_WORLD, ITEMS, MOBS, NPCS } from '../src/sim/data';
@@ -313,16 +314,18 @@ describe('weekly vault choices', () => {
           pool,
           group: pool.split('_')[0],
           maximum: pool.startsWith('raid')
-            ? unlocks.filter((tier) => tier >= (pool.endsWith('_heroic') ? 2 : 1)).length
+            ? unlocks.some((tier) => tier >= (pool.endsWith('_heroic') ? 2 : 1))
+              ? 3
+              : 0
             : 3,
           ids: weeklyLootPool(pool, cls, unlocks),
         })).filter((pool) => pool.ids.length);
         for (const pool of pools) {
-          // Cover this pool's maximum earned slots plus overlapping items that
-          // other pools could consume first. Raid caps follow unlocked bosses.
+          // Repeated clears can earn three raid slots from one unlocked boss.
+          // Cover those slots plus overlapping items other pools could consume.
           let needed = pool.maximum;
           for (const group of new Set(pools.map((other) => other.group))) {
-            const maximum = group === 'raid' ? unlocks.filter(Boolean).length : 3;
+            const maximum = 3;
             const competing = new Set(
               pools
                 .filter((other) => other.group === group && other !== pool)
@@ -350,6 +353,24 @@ describe('weekly vault choices', () => {
           );
         }
       }
+  });
+
+  it.each(ALL_CLASSES)('can open three raid rewards from repeat Nythraxis clears as %s', (cls) => {
+    const { sim, pid, meta, player, setNow } = make(42, true, cls);
+    player.level = 30;
+    const state = emptyWeeklyRewards(WEEK);
+    state.raids = [2, 0, 0];
+    state.raidClears = [2, 1, 1];
+    state.raidUnlocks = [2, 0, 0];
+    state.bossUnlocks = { nythraxis_scourge_of_thornpeak: 2 };
+    meta.weeklyRewards = state;
+    advanceWeeklyRewards(state, WEEK, (n) => n + WEEK);
+    setNow(WEEK);
+    const batch = state.vaults[0];
+    expect(batch.choices.map((choice) => choice.pool)).toEqual(['raid', 'raid', 'raid_heroic']);
+    for (let i = 0; i < batch.choices.length; i++) openSelected(sim, `${WEEK}:${i}`, pid);
+    expect(batch.choices.every((choice) => choice.itemId !== undefined)).toBe(true);
+    expect(new Set(batch.choices.map((choice) => choice.itemId)).size).toBe(3);
   });
 
   it('can claim a Rogue heroic raid reward after class filtering exhausts another slot', () => {
@@ -431,6 +452,7 @@ describe('weekly vault choices', () => {
     const { sim, pid, meta, setNow } = make();
     meta.weeklyRewards = emptyWeeklyRewards(2000);
     meta.weeklyRewards.raids = [1, 0, 0];
+    meta.weeklyRewards.raidClears = [1];
     meta.weeklyRewards.raidUnlocks = [1, 0, 0];
     setNow(2000);
     weeklyRewardInfoFor(sim.ctx, pid);
@@ -497,6 +519,7 @@ describe('weekly vault choices', () => {
   it('uses the best difficulty at each milestone and caps rows at three choices', () => {
     const state = emptyWeeklyRewards(WEEK);
     state.raids = [2, 1, 2];
+    state.raidClears = [2, 2, 1];
     state.dungeons = [2, 2, 2, 1, 1, 1, 1, 1];
     state.world = 4;
     state.pvp = 3;
@@ -619,6 +642,7 @@ describe('weekly vault choices', () => {
     };
     const state = sanitizeWeeklyRewards(raw)!;
     expect(state.raids).toEqual([2, 0, 0]);
+    expect(state.raidClears).toEqual([2]);
     expect(state.dungeons).toHaveLength(8);
     expect(state.world).toBe(8);
     expect(state.claimSequence).toBe(0);
@@ -628,7 +652,42 @@ describe('weekly vault choices', () => {
     expect(state.resetAtMs).toBe(WEEK * 2);
     expect(state.overflowed).toBe(true);
     expect(state.raids).toEqual([0, 0, 0]);
+    expect(state.raidClears).toEqual([]);
     expect(sanitizeWeeklyRewards([])).toBeUndefined();
+  });
+  it('migrates old raid progress and bounds saved repeat clears without changing boss unlocks', () => {
+    const legacy = sanitizeWeeklyRewards({ raids: [0, 2, 1] })!;
+    expect(legacy.raidClears).toEqual([2, 1]);
+    expect(legacy.raidUnlocks).toEqual([0, 2, 1]);
+
+    const repeats = sanitizeWeeklyRewards({
+      raids: [2, 0, 0],
+      raidUnlocks: [2, 0, 0],
+      raidClears: [1, 2, 1, 2, 2, 2],
+    })!;
+    expect(repeats.raidClears).toEqual([2, 2, 2]);
+    expect(repeats.raids).toEqual([2, 0, 0]);
+    expect(repeats.raidUnlocks).toEqual([2, 0, 0]);
+    expect(earnedWeeklyRolls(repeats).slice(0, 2)).toEqual([0, 3]);
+  });
+  it('keeps repeat raid clears through a character save and load', () => {
+    const { sim, pid, meta } = make();
+    const state = emptyWeeklyRewards(WEEK);
+    state.raids = [2, 0, 0];
+    state.raidClears = [2, 1, 1];
+    state.raidUnlocks = [2, 0, 0];
+    meta.weeklyRewards = state;
+    const onlineInfo = decodeWeeklyRewardInfo(
+      JSON.parse(JSON.stringify(weeklyRewardInfoFor(sim.ctx, pid))),
+    );
+    expect(onlineInfo?.state.raidClears).toEqual([2, 1, 1]);
+    const saved = sim.serializeCharacter(pid)!;
+    expect(saved.weeklyRewards!.raidClears).toEqual([2, 1, 1]);
+    const restoredPid = sim.addPlayer('mage', 'Restored', { state: saved });
+    expect(sim.players.get(restoredPid)!.weeklyRewards!.raidClears).toEqual([2, 1, 1]);
+    expect(earnedWeeklyRolls(sim.players.get(restoredPid)!.weeklyRewards!).slice(0, 2)).toEqual([
+      2, 1,
+    ]);
   });
   it('unlocks raid pools only at the defeated difficulty and fills every pool for a class', () => {
     expect(weeklyLootPool('raid', 'mage', [0, 0, 0])).toEqual([]);
@@ -695,7 +754,7 @@ describe('weekly vault choices', () => {
 
 describe('weekly activity completion hooks', () => {
   it.each(['nythraxis_boss_arena', 'ignivar_raid_arena', 'ignivar_inner_crucible'])(
-    'credits and upgrades the unique raid boss in %s',
+    'credits every raid clear in %s and keeps the best boss loot unlock',
     (dungeonId) => {
       const { sim, pid, meta, player } = make();
       const partyIds = [
@@ -716,7 +775,9 @@ describe('weekly activity completion hooks', () => {
       inst.enteredBy = new Set([pid, partyIds[1], partyIds[3]]);
       sim.instances.push(inst);
       sim.players.get(partyIds[3])!.leaving = true;
-      for (const difficulty of ['normal', 'heroic'] as const) {
+      for (const [clear, difficulty] of (
+        ['normal', 'normal', 'heroic', 'heroic'] as const
+      ).entries()) {
         inst.difficulty = difficulty;
         const template = MOBS[HEROIC_DUNGEON_TUNING[dungeonId].finalBossId];
         const boss = createMob(
@@ -735,11 +796,23 @@ describe('weekly activity completion hooks', () => {
         sim.ctx.dealDamage(player, boss, boss.hp * 100, false, 'physical', null, 'hit');
         if (difficulty === 'normal' && dungeonId !== 'nythraxis_boss_arena')
           expect(meta.raidLockouts.get(dungeonId)).toBe(meta.weeklyRewards!.resetAtMs);
+        expect(meta.weeklyRewards!.raidClears).toEqual(
+          [[1], [1, 1], [2, 1, 1], [2, 2, 1]][clear],
+        );
         expect(meta.weeklyRewards!.raids.filter(Boolean)).toEqual([
           difficulty === 'heroic' ? 2 : 1,
         ]);
+        expect(meta.weeklyRewards!.raidUnlocks.filter(Boolean)).toEqual([
+          difficulty === 'heroic' ? 2 : 1,
+        ]);
+        expect(earnedWeeklyRolls(meta.weeklyRewards!).slice(0, 2)).toEqual(
+          [[1, 0], [2, 0], [2, 1], [1, 2]][clear],
+        );
         expect(sim.players.get(partyIds[1])!.weeklyRewards!.raids).toEqual(
           meta.weeklyRewards!.raids,
+        );
+        expect(sim.players.get(partyIds[1])!.weeklyRewards!.raidClears).toEqual(
+          meta.weeklyRewards!.raidClears,
         );
         // Since the release's kill-share re-cut (6b52803ae14: inside a claimed
         // instance the whole claim footprint shares the kill, so the lockout
@@ -748,6 +821,9 @@ describe('weekly activity completion hooks', () => {
         // is leaving stays out.
         expect(sim.players.get(partyIds[2])!.weeklyRewards!.raids).toEqual(
           meta.weeklyRewards!.raids,
+        );
+        expect(sim.players.get(partyIds[2])!.weeklyRewards!.raidClears).toEqual(
+          meta.weeklyRewards!.raidClears,
         );
         expect(sim.players.get(partyIds[3])!.weeklyRewards).toBeUndefined();
       }

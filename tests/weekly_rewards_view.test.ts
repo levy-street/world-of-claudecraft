@@ -3,10 +3,37 @@ import { earnedWeeklyRolls, emptyWeeklyRewards } from '../src/sim/weekly_rewards
 import { buildWeeklyRewardsView, weeklyCountdown } from '../src/ui/weekly_rewards_view';
 
 describe('weekly reward presentation', () => {
+  it('shows two Normal and one Heroic clear of the same raid as three milestones', () => {
+    const state = emptyWeeklyRewards();
+    state.raids = [2, 0, 0];
+    state.raidClears = [2, 1, 1];
+    state.raidUnlocks = [2, 0, 0];
+    state.bossUnlocks = { nythraxis_scourge_of_thornpeak: 2 };
+    const raid = buildWeeklyRewardsView(
+      {
+        playerLevel: 20,
+        state,
+        nowMs: 0,
+        canClaim: true,
+        worldQuestsAvailable: false,
+        readyWeeks: 0,
+      },
+      'mage',
+    )[0];
+    expect(raid.progress).toBe(3);
+    expect(raid.milestones.map((m) => [m.completed, m.difficulty])).toEqual([
+      [true, 'heroic'],
+      [true, 'normal'],
+      [true, 'normal'],
+    ]);
+    expect(earnedWeeklyRolls(state).slice(0, 2)).toEqual([2, 1]);
+  });
+
   it('keeps the four requested rows ordered and follows the world row availability flag', () => {
     const state = emptyWeeklyRewards(604800000);
     state.raidUnlocks = [1, 0, 0];
     state.raids = [1, 0, 0];
+    state.raidClears = [1];
     state.bossUnlocks = { nythraxis_scourge_of_thornpeak: 1 };
     state.world = 2;
     const rows = buildWeeklyRewardsView(
@@ -50,6 +77,7 @@ describe('weekly reward presentation', () => {
     for (let raidMask = 0; raidMask < 27; raidMask++) {
       const state = emptyWeeklyRewards();
       state.raids = [raidMask % 3, Math.floor(raidMask / 3) % 3, Math.floor(raidMask / 9)];
+      state.raidClears = state.raids.filter(Boolean).sort((a, b) => b - a);
       cases.push(state);
     }
     for (let completed = 0; completed <= 8; completed++) {

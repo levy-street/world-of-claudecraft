@@ -760,7 +760,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1020,
-      "state": "445286af",
+      "state": "413b6c91",
       "events": "3b126ae3",
       "rng": {
         "draws": 14,
@@ -955,6 +955,9 @@
             "bossUnlocks": {
               "nythraxis_scourge_of_thornpeak": 2
             },
+            "raidClears": [
+              2
+            ],
             "raidUnlocks": [
               2,
               0,
@@ -1152,6 +1155,9 @@
             "bossUnlocks": {
               "nythraxis_scourge_of_thornpeak": 2
             },
+            "raidClears": [
+              2
+            ],
             "raidUnlocks": [
               2,
               0,
@@ -1349,6 +1355,9 @@
             "bossUnlocks": {
               "nythraxis_scourge_of_thornpeak": 2
             },
+            "raidClears": [
+              2
+            ],
             "raidUnlocks": [
               2,
               0,
@@ -1546,6 +1555,9 @@
             "bossUnlocks": {
               "nythraxis_scourge_of_thornpeak": 2
             },
+            "raidClears": [
+              2
+            ],
             "raidUnlocks": [
               2,
               0,
@@ -1743,6 +1755,9 @@
             "bossUnlocks": {
               "nythraxis_scourge_of_thornpeak": 2
             },
+            "raidClears": [
+              2
+            ],
             "raidUnlocks": [
               2,
               0,
@@ -2120,7 +2135,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1020,
-      "state": "445286af",
+      "state": "413b6c91",
       "events": "741638a5",
       "rng": {
         "draws": 14,
@@ -2315,6 +2330,9 @@
             "bossUnlocks": {
               "nythraxis_scourge_of_thornpeak": 2
             },
+            "raidClears": [
+              2
+            ],
             "raidUnlocks": [
               2,
               0,
@@ -2512,6 +2530,9 @@
             "bossUnlocks": {
               "nythraxis_scourge_of_thornpeak": 2
             },
+            "raidClears": [
+              2
+            ],
             "raidUnlocks": [
               2,
               0,
@@ -2709,6 +2730,9 @@
             "bossUnlocks": {
               "nythraxis_scourge_of_thornpeak": 2
             },
+            "raidClears": [
+              2
+            ],
             "raidUnlocks": [
               2,
               0,
@@ -2906,6 +2930,9 @@
             "bossUnlocks": {
               "nythraxis_scourge_of_thornpeak": 2
             },
+            "raidClears": [
+              2
+            ],
             "raidUnlocks": [
               2,
               0,
@@ -3103,6 +3130,9 @@
             "bossUnlocks": {
               "nythraxis_scourge_of_thornpeak": 2
             },
+            "raidClears": [
+              2
+            ],
             "raidUnlocks": [
               2,
               0,

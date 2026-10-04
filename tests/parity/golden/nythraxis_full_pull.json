@@ -17577,7 +17577,7 @@
       "tick": 1248,
       "time": 62.4,
       "nextId": 1023,
-      "state": "06b01ec7",
+      "state": "05358ff6",
       "events": "31ced149",
       "rng": {
         "draws": 10867,
@@ -17765,6 +17765,9 @@
             "bossUnlocks": {
               "nythraxis_scourge_of_thornpeak": 1
             },
+            "raidClears": [
+              1
+            ],
             "raidUnlocks": [
               1,
               0,
@@ -17958,6 +17961,9 @@
             "bossUnlocks": {
               "nythraxis_scourge_of_thornpeak": 1
             },
+            "raidClears": [
+              1
+            ],
             "raidUnlocks": [
               1,
               0,
@@ -18151,6 +18157,9 @@
             "bossUnlocks": {
               "nythraxis_scourge_of_thornpeak": 1
             },
+            "raidClears": [
+              1
+            ],
             "raidUnlocks": [
               1,
               0,
@@ -18344,6 +18353,9 @@
             "bossUnlocks": {
               "nythraxis_scourge_of_thornpeak": 1
             },
+            "raidClears": [
+              1
+            ],
             "raidUnlocks": [
               1,
               0,
@@ -18537,6 +18549,9 @@
             "bossUnlocks": {
               "nythraxis_scourge_of_thornpeak": 1
             },
+            "raidClears": [
+              1
+            ],
             "raidUnlocks": [
               1,
               0,
@@ -19197,7 +19212,7 @@
       "tick": 1250,
       "time": 62.5,
       "nextId": 1023,
-      "state": "37ec1cae",
+      "state": "9347ce55",
       "events": "741638a5",
       "rng": {
         "draws": 10902,
@@ -19208,7 +19223,7 @@
       "tick": 1260,
       "time": 63,
       "nextId": 1023,
-      "state": "ba7dcb0f",
+      "state": "6f26f04e",
       "events": "741638a5",
       "rng": {
         "draws": 10989,
@@ -19219,7 +19234,7 @@
       "tick": 1270,
       "time": 63.5,
       "nextId": 1023,
-      "state": "aca20380",
+      "state": "57dfc24b",
       "events": "741638a5",
       "rng": {
         "draws": 11048,
@@ -19230,7 +19245,7 @@
       "tick": 1280,
       "time": 64,
       "nextId": 1023,
-      "state": "8fa612fa",
+      "state": "b7f2e101",
       "events": "741638a5",
       "rng": {
         "draws": 11143,
@@ -19241,7 +19256,7 @@
       "tick": 1290,
       "time": 64.5,
       "nextId": 1023,
-      "state": "2f89cc71",
+      "state": "2e67e2d4",
       "events": "741638a5",
       "rng": {
         "draws": 11238,
@@ -19252,7 +19267,7 @@
       "tick": 1300,
       "time": 65,
       "nextId": 1023,
-      "state": "46573015",
+      "state": "167415e8",
       "events": "741638a5",
       "rng": {
         "draws": 11323,
@@ -19263,7 +19278,7 @@
       "tick": 1308,
       "time": 65.4,
       "nextId": 1023,
-      "state": "b88bdd6f",
+      "state": "515e846e",
       "events": "73c8d5ba",
       "rng": {
         "draws": 11409,
@@ -19451,6 +19466,9 @@
             "bossUnlocks": {
               "nythraxis_scourge_of_thornpeak": 1
             },
+            "raidClears": [
+              1
+            ],
             "raidUnlocks": [
               1,
               0,
@@ -19644,6 +19662,9 @@
             "bossUnlocks": {
               "nythraxis_scourge_of_thornpeak": 1
             },
+            "raidClears": [
+              1
+            ],
             "raidUnlocks": [
               1,
               0,
@@ -19837,6 +19858,9 @@
             "bossUnlocks": {
               "nythraxis_scourge_of_thornpeak": 1
             },
+            "raidClears": [
+              1
+            ],
             "raidUnlocks": [
               1,
               0,
@@ -20030,6 +20054,9 @@
             "bossUnlocks": {
               "nythraxis_scourge_of_thornpeak": 1
             },
+            "raidClears": [
+              1
+            ],
             "raidUnlocks": [
               1,
               0,
@@ -20223,6 +20250,9 @@
             "bossUnlocks": {
               "nythraxis_scourge_of_thornpeak": 1
             },
+            "raidClears": [
+              1
+            ],
             "raidUnlocks": [
               1,
               0,

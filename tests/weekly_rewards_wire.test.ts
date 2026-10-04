@@ -58,6 +58,9 @@ describe('weekly reward wire', () => {
       worldQuestsAvailable: false,
       readyWeeks: 0,
     };
+    info.state.raids = [2, 0, 0];
+    info.state.raidClears = [2, 1, 1];
+    info.state.raidUnlocks = [2, 0, 0];
     expect(decodeWeeklyRewardInfo(JSON.parse(JSON.stringify(info)))).toEqual(info);
     expect(decodeWeeklyRewardInfo({ ...info, nowMs: NaN })).toBeNull();
     expect(decodeWeeklyRewardInfo({ ...info, canClaim: 'yes' })).toBeNull();

@@ -29,8 +29,8 @@ export const weeklyRewardStrings = {
   heroicUpgradeOne: '{count} more Heroic dungeon clear to upgrade',
   heroicUpgradeMany: '{count} more Heroic dungeon clears to upgrade',
   completedTask: {
-    raidOne: '{count} Raid Encounter Cleared',
-    raidMany: '{count} Raid Encounters Cleared',
+    raidOne: '{count} Raid Clear',
+    raidMany: '{count} Raid Clears',
     dungeonOne: '{count} Dungeon Cleared',
     dungeonMany: '{count} Dungeons Cleared',
     worldOne: '{count} World Quest Completed',
@@ -39,8 +39,8 @@ export const weeklyRewardStrings = {
     pvpMany: '{count} Rated Matches Won',
   },
   requiredTask: {
-    raidOne: 'Clear {count} Raid Encounter',
-    raidMany: 'Clear {count} Raid Encounters',
+    raidOne: 'Complete {count} Raid Clear',
+    raidMany: 'Complete {count} Raid Clears',
     dungeonOne: 'Clear {count} Dungeon',
     dungeonMany: 'Clear {count} Dungeons',
     worldOne: 'Complete {count} World Quest',
@@ -87,7 +87,7 @@ export const weeklyRewardStrings = {
   worldUnavailable: 'World quest rewards will become available when rotating world quests arrive.',
   category: { raid: 'Raids', dungeon: 'Dungeons', world: 'World Quests', pvp: 'PvP' },
   task: {
-    raid: 'Defeat different raid encounters. Each encounter counts once; a Heroic clear upgrades its credit.',
+    raid: 'Every raid clear counts, including repeat encounters. Your best clears set each reward difficulty.',
     dungeon:
       'Complete dungeons. Your best clears determine the reward difficulty at each milestone.',
     world: 'Complete rotating world quests. Story quests do not count.',
