@@ -47,7 +47,12 @@ export class TurretWeaponBarPainter {
       const cdText = el('span', 'cdtext ui-socket-cd-text');
       const rechargeOverlay = el('span', 'recharge-overlay');
       btn.append(label, countEl, keybindEl, cdOverlay, cdText, rechargeOverlay);
-      btn.addEventListener('pointerdown', (event) => event.stopPropagation());
+      btn.addEventListener('pointerdown', (event) => {
+        event.stopPropagation();
+        // The touch tap fires on pointerup, before the browser's compatibility mousedown
+        // would focus the socket and so show its tooltip over the field; this skips it.
+        if (event.pointerType === 'touch') event.preventDefault();
+      });
       btn.addEventListener('click', (event) => event.stopPropagation());
       // Per finger, so a socket fires while the other thumb holds the stick or aims.
       bindTouchTap(btn, (event) =>

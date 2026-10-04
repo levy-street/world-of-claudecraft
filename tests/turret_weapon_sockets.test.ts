@@ -206,6 +206,18 @@ it('fires a socket from a second finger, with the stick or the aim already held'
   expect(document.activeElement).not.toBe(sockets()[0]);
 });
 
+it('cancels a touch press so the browser never focuses the socket after its tap', () => {
+  const { seatIn } = rig();
+  seatIn(seat());
+  const press = (pointerType: string) => {
+    const event = new PointerEvent('pointerdown', { bubbles: true, cancelable: true, pointerType });
+    sockets()[0].dispatchEvent(event);
+    return event.defaultPrevented;
+  };
+  expect(press('touch')).toBe(true);
+  expect(press('mouse')).toBe(false);
+});
+
 it('keeps the focus a keyboard press activates the socket from', () => {
   const { world, seatIn } = rig();
   seatIn(seat());
