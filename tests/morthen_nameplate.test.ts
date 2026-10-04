@@ -2,7 +2,7 @@
 
 // A player covering Morthen's shift (the Graveyard Shift) wears the boss's
 // overhead plate, the owner's own plate included: Morthen's name, the boss
-// frame and elite mark, the "??" level, and none of the player's own lines.
+// frame and elite mark, his "10+" level, and none of the player's own lines.
 // The plate turns with the body, on the very next pass, full or not. The
 // harness is tests/nameplate_pvp_tag.test.ts's.
 
@@ -152,8 +152,10 @@ describe("the Morthen player's overhead plate", () => {
     expect(state.name).toBe('Morthen the Gravecaller');
     expect(state.frame).toBe('boss');
     expect(state.marker).toBe('\u25c6');
-    expect(state.level).toBe('??');
-    expect(state.levelColor).toBe('#ff4444');
+    // The real Morthen's plate level: his level with the elite mark, conned
+    // against the viewer (the owner's own plate: same level, yellow).
+    expect(state.level).toBe('10+');
+    expect(state.levelColor).toBe('#ffe97a');
     expect(state.nameColor).toBe('#fff');
     expect(state.hpVisible).toBe(true);
     // None of the player's own lines.

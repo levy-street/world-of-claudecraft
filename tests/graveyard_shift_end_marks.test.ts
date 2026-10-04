@@ -21,7 +21,6 @@ import {
 } from '../src/sim/graveyard_shift/shift_end_marks';
 import type { Aura, Entity } from '../src/sim/types';
 import {
-  BOSS_LEVEL_TEXT,
   graveyardShiftAuraName,
   playerFrameLevelText,
   playerFrameName,
@@ -72,7 +71,7 @@ describe('the Staff Exit label', () => {
 });
 
 describe("the player's own frame while Morthen", () => {
-  it("reads Morthen's name and the boss skull, and the player's own off shift", () => {
+  it("reads Morthen's name and his elite level, and the player's own off shift", () => {
     setLanguage('en');
     const off = { auras: [] as Aura[], level: 14, name: 'Mat' } as unknown as Entity;
     const on = {
@@ -82,8 +81,7 @@ describe("the player's own frame while Morthen", () => {
     } as unknown as Entity;
     expect(playerFrameLevelText(off)).toBe('14');
     expect(playerFrameName(off)).toBe('Mat');
-    expect(playerFrameLevelText(on)).toBe(BOSS_LEVEL_TEXT);
-    expect(BOSS_LEVEL_TEXT).toBe('??');
+    expect(playerFrameLevelText(on)).toBe('10+');
     expect(playerFrameName(on)).toBe('Morthen the Gravecaller');
   });
 });

@@ -630,7 +630,7 @@ export class NameplatePainter {
       // is the hostile-to-me verdict on top of it.
       state.pvpFlag = entity.pvpFlag === true;
       if (isMorthenPlate(entity)) {
-        applyMorthenNameplate(state, entity);
+        applyMorthenNameplate(state, entity, player.level);
         return;
       }
       const pvpTag = state.pvpFlag ? `<${t('hudChrome.nameplate.pvpTag')}> ` : '';

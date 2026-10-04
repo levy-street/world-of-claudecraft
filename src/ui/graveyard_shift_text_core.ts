@@ -134,13 +134,17 @@ export function graveyardShiftAbilityDescription(id: string): string | null {
   return t(text.description, descriptionValues(def));
 }
 
-// A boss shows no level to the players facing it, so while the identity lasts
-// the player's own frame reads the boss skull's "??" instead of a number.
-export const BOSS_LEVEL_TEXT = '??';
+// While the identity lasts the player reads as the boss the way his mob plate
+// does: his level with the elite mark ("10+"), the same key as that plate.
+export function bossLevelText(level: number): string {
+  return t('hudChrome.nameplate.mobEliteLevel', {
+    level: formatNumber(level, { maximumFractionDigits: 0 }),
+  });
+}
 
-/** The level text the player's own frame shows: "??" while Morthen. */
+/** The level text the player's own frame shows: the boss's ("10+") while Morthen. */
 export function playerFrameLevelText(p: Pick<Entity, 'auras' | 'level'>): string {
-  return hasMorthenIdentity(p) ? BOSS_LEVEL_TEXT : String(p.level);
+  return hasMorthenIdentity(p) ? bossLevelText(p.level) : String(p.level);
 }
 
 /** The name the player's own frame shows: Morthen's while the identity lasts. */
