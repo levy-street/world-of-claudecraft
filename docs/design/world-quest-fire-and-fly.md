@@ -548,10 +548,10 @@ charge has no socket, no key and no banner mention.
 | Recruit's Trial | 0 | 0 | the cannon and the kegs only |
 | Standing Watch | 8 | 0 | brings in the Shockwave, enough of it to carry a slower gunner |
 | Veterans' Test | 2 | 4 | brings in the fragmentation shell, beside fewer Shockwaves |
-| The Pack | 0 | 5 | packs gathering at rallies in the field: a fragmentation shell into a standing pack |
-| The Deluge | 3 | 2 | swarms from everywhere |
-| The Cracked Tower | 3 | 1 | 10 tower points: no strike may land |
-| The Powder Store | 1 | 3 | keg lanes and groups |
+| The Pack | 1 | 5 | packs gathering at rallies in the field: a fragmentation shell into a standing pack |
+| The Deluge | 3 | 2 | a tide of small, quick beasts with two surges |
+| The Cracked Tower | 3 | 1 | 7 tower points: no strike may land |
+| The Powder Store | 1 | 3 | kegs everywhere: powder fields in the lanes, clusters on the roads |
 
 **Resupply** (`supply` on the scenario): as a mission's third, fifth and seventh waves
 end (so its finale always starts with charges), and as the Veterans' Test's fifth wave ends (its only resupply, with no bonus for
@@ -603,37 +603,27 @@ reading the exact field), on 96 tuning and 96 held-out seeds:
 Four missions: a fifth, Heavy Tread, was dropped by the owner's call on 2026-10-04,
 because a mission built on colossi fights the rules "big monsters rare, no sponges".
 
-Every mission runs eight waves on one curve: a warm-up, a fast climb, then the last
-two or three waves pushing its idea to the extreme, each wave setting off on the tick
-the one before is cleared (lot R5; the overlap of lot N2d is gone). The Pack (lot R5b)
-follows the owner's playtest of R4 first: no sponge (a member falls to two good
-shells, a leader to five or six, matched by each wave's shell damage), and few
-monsters at the tower's foot in the last two waves (the most at once, median over the
-runs, 3 to 5; up to 8), the difficulty coming from four packs gathering, advancing past their
-kegs and loosing scouts at once. Under those limits the quickest stand-in golds it
-about nine runs in ten (88 and 91 percent on 96 tuning and 96 held-out seeds; 72 and
-81 reading the field late) and never loses: every draft that cost it its gold did so
-by piling monsters at the foot. A 0.8 s player wins with silver or bronze, a 1 s
-player loses nearly half its runs. The other three missions were set (lot N2d) for
-the 1.5 s strike and are far harder at 0.8 s until their own redesign: that stand-in
-golds none of them and loses every Cracked Tower run.
+Every mission runs eight varied waves composed from the bricks (see "Bricks"), each
+wave setting off on the tick the one before is cleared. Since the owner's playtests of
+2026-10-03 and 2026-10-04 a mission is no longer one mechanic repeated: its waves mix
+walkers, small groups, packs and monsters surging in away from the fight, and its own
+idea is an accent plus one or two strong moments. The rules every mission keeps: no
+sponge (a small monster falls to one or two good shells, a medium one to two or three,
+the one big monster to a handful), few monsters at the tower's foot at once, big
+monsters rare, the tension from surprise and rhythm rather than crowds, and charges
+enough for the finale without counting on a player who saves them. The scripted
+stand-ins see the whole field at once, so a surge cannot surprise them: the surprise
+is judged in play, and the measures guard the rules above.
 
-| Mission | Tower, gold bar | The last waves |
+| Mission | Tower, gold | Accent and strong moments |
 |---|---|---|
-| The Pack | 100, keep 95 percent | three then four packs gathering from every side, the hold shorter, scouts breaking out at each departure; the last with Old Greyjaws and a sprint group that never gathers |
-| The Deluge | 100, keep 95 percent | 48 then 60 small monsters from everywhere at three and a half and four times their pace |
-| The Cracked Tower | 10, untouched | 32 then 44 armoured dead from everywhere at two and a half times their pace |
-| The Powder Store | 100, keep 95 percent | 48 then 63 monsters from three sides charging down twelve kegs a wave, giants among the last |
+| The Pack | 70, keep 95 percent | packs gathering at rallies (a keg on their road, scouts breaking out at the leader's cry), walkers and quick wolves between them; the last two waves four packs at once, the finale's quick stalkers surging in from two sides |
+| The Deluge | 70, keep 95 percent | small beasts, about half quicker than their templates; a surge from one side in the fourth wave and from two in the last; a Fen Troll with its escort as the one big monster |
+| The Cracked Tower | 7, untouched | the dead (bones, acolytes, shamblers, revenants) with shadow hounds surging in again and again, most often while a procession gathers; a procession of shamblers in the fourth wave, two in the last; no large monster |
+| The Powder Store | 70, keep 95 percent | a powder field in the lanes every wave (unspaced, so it chains) beside clusters on the monsters' roads and a crown for the Shockwave; the largest fields in the fourth wave and the last; a magma brute with a keg on its road as the one big monster |
 
-The Pack: one pack of 8, then scouts, then two, three and four packs whose gathering
-windows close as the hold timer shortens from 6 s to 2 s, 163 monsters in all (234 in
-the R3 draft), the last three waves a tenth quicker to their rallies and no tougher
-than their templates; a pack advances at a walk, at most 1.35 times its slowest
-member's march (1.3 before lot R5b, raised for the finale's quicker last pack); a keg on the path of most packs, at the rim of some, and none
-before the clean pack that earns the frag; rallies 30 to 36 yd out (30 to 33 in the
-last two waves) so the keg stands clear of the tower foot. The clean aimer wins every
-trial and mission and golds every mission on the pinned seed
-(`tests/turret_scenarios.test.ts`, `tests/fire_and_fly_missions.test.ts`).
+The clean aimer wins every trial and mission and golds every mission on the pinned
+seed (`tests/turret_scenarios.test.ts`, `tests/fire_and_fly_missions.test.ts`).
 
 - **Shockwave** (`src/sim/minigames/turret_shockwave.ts`, tuning
   `TURRET_SHOCKWAVE` in `src/sim/content/turret_defense.ts`). The tower slams and a
