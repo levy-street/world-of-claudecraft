@@ -12,11 +12,13 @@ const FIRST_MEETING: readonly TranslationKey[] = [
   'devCommand.graveyardShift.tibbs.offer.intro1',
   'devCommand.graveyardShift.tibbs.offer.intro2',
   'devCommand.graveyardShift.tibbs.offer.intro3',
-  'devCommand.graveyardShift.tibbs.offer.intro4',
 ];
 
 export interface TibbsOfferView {
   readonly lines: readonly string[];
+  /** A spoken line wears quotes like an NPC greeting; his pitch reads as one
+   *  speech in paragraphs, like a quest text. */
+  readonly quoted: boolean;
   /** Null once the shift is won: there is nothing left to offer. */
   readonly acceptLabel: string | null;
   readonly declineLabel: string;
@@ -35,12 +37,14 @@ export function tibbsOfferDialog(
   if (deedsEarned.has(BOSS_FOR_A_DAY_DEED_ID)) {
     return {
       lines: [t('devCommand.graveyardShift.tibbs.say.covered')],
+      quoted: true,
       acceptLabel: null,
       declineLabel: t('questUi.dialog.continue'),
     };
   }
   return {
     lines: FIRST_MEETING.map((key) => t(key)),
+    quoted: false,
     acceptLabel: t('devCommand.graveyardShift.tibbs.offer.accept'),
     declineLabel: t('devCommand.graveyardShift.tibbs.offer.decline'),
   };

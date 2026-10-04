@@ -1072,7 +1072,6 @@ export type TranslationKeyFlat =
   | 'devCommand.graveyardShift.tibbs.offer.intro1'
   | 'devCommand.graveyardShift.tibbs.offer.intro2'
   | 'devCommand.graveyardShift.tibbs.offer.intro3'
-  | 'devCommand.graveyardShift.tibbs.offer.intro4'
   | 'devCommand.graveyardShift.tibbs.say.accept'
   | 'devCommand.graveyardShift.tibbs.say.anotherShift'
   | 'devCommand.graveyardShift.tibbs.say.busy'

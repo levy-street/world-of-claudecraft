@@ -4,7 +4,12 @@
 import { describe, expect, it, vi } from 'vitest';
 import { visualKeyFor } from '../src/render/characters/manifest';
 import { objectDisplayName } from '../src/render/entity_labels';
-import { graveWhisperDue } from '../src/render/grave_whisper_core';
+import {
+  freshGraveWhisperState,
+  GRAVE_WHISPER_COOLDOWN_MS,
+  GRAVE_WHISPER_REARM_RADIUS,
+  graveWhisperDue,
+} from '../src/render/grave_whisper_core';
 import { lootGlint } from '../src/render/ground_object_glint_core';
 import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects';
 import { updateWorldSpeech } from '../src/render/world_speech';
@@ -51,15 +56,42 @@ describe('the grave body', () => {
 });
 
 describe('the grave whisper', () => {
-  it('fires within its radius, never beyond, never twice, never without the grave', () => {
-    const at = (d: number) => ({ x: GRAVE_POS.x + d, z: GRAVE_POS.z });
-    expect(graveWhisperDue(GRAVE_POS, at(GRAVE_WHISPER_RADIUS), false)).toBe(true);
-    expect(graveWhisperDue(GRAVE_POS, at(GRAVE_WHISPER_RADIUS + 0.5), false)).toBe(false);
-    expect(graveWhisperDue(GRAVE_POS, at(1), true)).toBe(false);
-    expect(graveWhisperDue(null, at(1), false)).toBe(false);
+  const at = (d: number) => ({ x: GRAVE_POS.x + d, z: GRAVE_POS.z });
+
+  it('fires within its radius, never beyond, never without the grave', () => {
+    expect(graveWhisperDue(GRAVE_POS, at(GRAVE_WHISPER_RADIUS), freshGraveWhisperState(), 0)).toBe(
+      true,
+    );
+    expect(
+      graveWhisperDue(GRAVE_POS, at(GRAVE_WHISPER_RADIUS + 0.5), freshGraveWhisperState(), 0),
+    ).toBe(false);
+    expect(graveWhisperDue(null, at(1), freshGraveWhisperState(), 0)).toBe(false);
   });
 
-  it('shows one bubble over the grave per session, in the player language', () => {
+  it('whispers again on each return past the re-arm radius, never inside the cooldown', () => {
+    expect(GRAVE_WHISPER_REARM_RADIUS).toBe(20);
+    expect(GRAVE_WHISPER_COOLDOWN_MS).toBe(30_000);
+    const state = freshGraveWhisperState();
+    expect(graveWhisperDue(GRAVE_POS, at(3), state, 0)).toBe(true);
+    // Lingering, or stepping out short of the re-arm radius, says nothing more.
+    expect(graveWhisperDue(GRAVE_POS, at(3), state, 60_000)).toBe(false);
+    expect(graveWhisperDue(GRAVE_POS, at(GRAVE_WHISPER_REARM_RADIUS - 1), state, 61_000)).toBe(
+      false,
+    );
+    expect(graveWhisperDue(GRAVE_POS, at(3), state, 62_000)).toBe(false);
+    // Walk off and come back: a fresh whisper.
+    expect(graveWhisperDue(GRAVE_POS, at(GRAVE_WHISPER_REARM_RADIUS + 1), state, 63_000)).toBe(
+      false,
+    );
+    expect(graveWhisperDue(GRAVE_POS, at(3), state, 64_000)).toBe(true);
+    // Back again within the cooldown: held until it runs out, then said once.
+    graveWhisperDue(GRAVE_POS, at(GRAVE_WHISPER_REARM_RADIUS + 1), state, 70_000);
+    expect(graveWhisperDue(GRAVE_POS, at(3), state, 80_000)).toBe(false);
+    expect(graveWhisperDue(GRAVE_POS, at(3), state, 94_000)).toBe(true);
+    expect(graveWhisperDue(GRAVE_POS, at(3), state, 200_000)).toBe(false);
+  });
+
+  it('shows one bubble over the grave per approach, in the player language', () => {
     setLanguage('en');
     const host = { showChatBubble: vi.fn() };
     const player = { pos: { x: GRAVE_POS.x + 30, y: 0, z: GRAVE_POS.z } };
@@ -68,17 +100,23 @@ describe('the grave whisper', () => {
       entities: new Map([[GRAVE_ENTITY_ID, grave]]),
       player,
     } as unknown as Pick<IWorld, 'worldQuestLog' | 'entities' | 'player'>;
-    updateWorldSpeech(world, host);
+    updateWorldSpeech(world, host, 0);
     expect(host.showChatBubble).not.toHaveBeenCalled();
     player.pos.x = GRAVE_POS.x + 3;
-    updateWorldSpeech(world, host);
-    updateWorldSpeech(world, host);
+    updateWorldSpeech(world, host, 1_000);
+    updateWorldSpeech(world, host, 2_000);
     expect(host.showChatBubble).toHaveBeenCalledTimes(1);
     expect(host.showChatBubble.mock.calls[0][0]).toBe(GRAVE_ENTITY_ID);
     expect(host.showChatBubble.mock.calls[0][1]).toBe('Psst. Down here.');
-    // A new renderer session whispers again.
+    // Missed it: walk off and come back for another.
+    player.pos.x = GRAVE_POS.x + 30;
+    updateWorldSpeech(world, host, 40_000);
+    player.pos.x = GRAVE_POS.x + 3;
+    updateWorldSpeech(world, host, 41_000);
+    expect(host.showChatBubble).toHaveBeenCalledTimes(2);
+    // A new renderer session keeps its own state.
     const next = { showChatBubble: vi.fn() };
-    updateWorldSpeech(world, next);
+    updateWorldSpeech(world, next, 41_500);
     expect(next.showChatBubble).toHaveBeenCalledTimes(1);
   });
 });
@@ -90,13 +128,15 @@ describe('Tibbs', () => {
     ).toBe('skel_minion');
   });
 
-  it('pitches the shift in full every time before the win', () => {
+  it('pitches the shift in full every time before the win, as one unquoted speech', () => {
     setLanguage('en');
     const npc = { kind: 'npc', templateId: TIBBS_NPC_ID } as Entity;
     const offer = tibbsOfferDialog(npc, new Set<string>())!;
-    expect(offer.lines).toHaveLength(4);
-    expect(offer.lines[0]).toMatch(/^Ah\. You heard me\. Tibbs\./);
-    expect(offer.lines[3]).toMatch(/^Simple job\./);
+    expect(offer.lines).toHaveLength(3);
+    expect(offer.lines[0]).toMatch(/^Ah, you heard me\. Name's Tibbs\./);
+    expect(offer.lines[1]).toMatch(/four thousand eight hundred times this week/);
+    expect(offer.lines[2]).toMatch(/They will never notice the difference\. Well\. They will\.$/);
+    expect(offer.quoted).toBe(false);
     expect(offer.acceptLabel).toBe('Take the shift');
     expect(offer.declineLabel).toBe('Not today');
     expect(tibbsOfferDialog({ kind: 'npc', templateId: 'x' } as Entity, new Set())).toBeNull();
@@ -111,6 +151,7 @@ describe('Tibbs', () => {
       'Your shift is covered. Morthen is back at work, and he says thank you.',
     ]);
     expect(offer.acceptLabel).toBeNull();
+    expect(offer.quoted).toBe(true);
     expect(offer.declineLabel).toBe('Continue');
   });
 

@@ -7,7 +7,11 @@ import type { ChatBubbleStyle } from '../ui/chat_bubble_style';
 import { t } from '../ui/i18n';
 import type { IWorld } from '../world_api';
 import { updateForgeSpeech } from './forge_speech';
-import { graveWhisperDue } from './grave_whisper_core';
+import {
+  freshGraveWhisperState,
+  type GraveWhisperState,
+  graveWhisperDue,
+} from './grave_whisper_core';
 
 interface SpeechHost {
   showChatBubble(
@@ -18,20 +22,25 @@ interface SpeechHost {
   ): void;
 }
 
-// The grave whispers once per renderer session.
-const whispered = new WeakSet<SpeechHost>();
+// Each renderer session keeps its own whisper state (grave_whisper_core.ts).
+const whisperStates = new WeakMap<SpeechHost, GraveWhisperState>();
 const GRAVE_WHISPER_TTL_SEC = 4;
 
 export function updateWorldSpeech(
   world: Pick<IWorld, 'worldQuestLog' | 'entities' | 'player'>,
   host: SpeechHost,
+  nowMs = performance.now(),
 ): void {
   updateForgeSpeech(world, host);
   // No grave (the common case, and a world still loading) reads nothing else.
   const grave = world.entities.get(GRAVE_ENTITY_ID);
   if (!grave || !world.player) return;
-  if (!graveWhisperDue(grave.pos, world.player.pos, whispered.has(host))) return;
-  whispered.add(host);
+  let state = whisperStates.get(host);
+  if (!state) {
+    state = freshGraveWhisperState();
+    whisperStates.set(host, state);
+  }
+  if (!graveWhisperDue(grave.pos, world.player.pos, state, nowMs)) return;
   host.showChatBubble(
     GRAVE_ENTITY_ID,
     t('devCommand.graveyardShift.tibbs.whisper'),

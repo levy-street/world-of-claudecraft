@@ -951,7 +951,7 @@ export class QuestDialogController {
     // No gossip rows here: keep the row-signature watch from repainting it.
     this.lastIntroHintVisible = null;
     this.clueReplyOpen = false;
-    this.paintTibbs(npc, view.lines);
+    this.paintTibbs(npc, view.lines, view.quoted);
     // The shift won: his closing line and a way out, nothing to accept.
     if (view.acceptLabel === null) {
       const done = this.makeButton(view.declineLabel);
@@ -973,7 +973,7 @@ export class QuestDialogController {
     decline.addEventListener('click', () => {
       // Held like a clue reply: a quest event must not repaint the offer over it.
       this.clueReplyOpen = true;
-      this.paintTibbs(npc, [tibbsDeclineLine()]);
+      this.paintTibbs(npc, [tibbsDeclineLine()], true);
       const done = this.makeButton(t('questUi.dialog.continue'));
       done.addEventListener('click', () => this.close());
       this.deps.element.appendChild(done);
@@ -986,12 +986,13 @@ export class QuestDialogController {
     return true;
   }
 
-  private paintTibbs(npc: Entity, lines: readonly string[]): void {
+  private paintTibbs(npc: Entity, lines: readonly string[], quoted: boolean): void {
     markDialogRoot(this.deps.element, { labelledBy: 'quest-dialog-title' });
     const name = this.deps.text.npcName(npc.templateId);
     const title = this.deps.text.npcTitle(npc.templateId);
     let html = `<div class="panel-title ui-win-head"><span class="ui-win-title" id="quest-dialog-title">${esc(name)}<span class="quest-muted ui-win-sub"> &lt;${esc(title)}&gt;</span></span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
-    for (const line of lines) html += `<div class="qd-text">"${esc(line)}"</div>`;
+    const quote = quoted ? '"' : '';
+    for (const line of lines) html += `<div class="qd-text">${quote}${esc(line)}${quote}</div>`;
     this.deps.element.innerHTML = html;
   }
 

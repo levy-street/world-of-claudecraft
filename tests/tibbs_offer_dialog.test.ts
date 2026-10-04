@@ -102,8 +102,10 @@ describe("Tibbs' shift offer", () => {
     expect(element.querySelector('#quest-dialog-title')?.textContent).toContain('Tibbs');
     expect(element.querySelector('#quest-dialog-title')?.textContent).toContain('Mob Union Rep');
     const lines = [...element.querySelectorAll('.qd-text')].map((el) => el.textContent);
-    expect(lines).toHaveLength(4);
+    expect(lines).toHaveLength(3);
     expect(lines[1]).toContain('four thousand eight hundred times');
+    // One speech in paragraphs, not a stack of quoted lines.
+    expect(lines.some((line) => line?.includes('"'))).toBe(false);
     expect(element.querySelector('[data-gshift-accept]')?.textContent).toBe('Take the shift');
     expect(element.querySelector('[data-gshift-decline]')?.textContent).toBe('Not today');
   });
@@ -143,7 +145,9 @@ describe("Tibbs' shift offer", () => {
     controller.open(TIBBS_ENTITY_ID);
     const lines = [...element.querySelectorAll('.qd-text')].map((el) => el.textContent);
     expect(lines).toHaveLength(1);
-    expect(lines[0]).toContain('Your shift is covered.');
+    expect(lines[0]).toBe(
+      '"Your shift is covered. Morthen is back at work, and he says thank you."',
+    );
     expect(element.querySelector('[data-gshift-accept]')).toBeNull();
     const buttons = [...element.querySelectorAll<HTMLButtonElement>('button.btn')];
     expect(buttons.map((b) => b.textContent)).toEqual(['Continue']);

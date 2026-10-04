@@ -244,10 +244,9 @@ export const de_DE: EnTranslations = {
       "tibbs": {
         "whisper": "Psst. Down here.",
         "offer": {
-          "intro1": "Ah. You heard me. Tibbs. Mob union rep. You have met our members. Mostly with an axe.",
-          "intro2": "Morthen has been killed four thousand eight hundred times this week. For trousers.",
-          "intro3": "Union rules say he gets a day off. Nobody wants to cover his shift. Except, I am hoping, you.",
-          "intro4": "Simple job. You are the boss. Adventurers come in. You stop them. They will not notice the difference. Well. They will.",
+          "intro1": "Ah, you heard me. Name's Tibbs. I speak for the monsters of this crypt, the ones you keep meeting at the wrong end of an axe.",
+          "intro2": "Our boss, Morthen, has been killed four thousand eight hundred times this week. Always for the same pair of trousers. Union rules say he has earned a day off, and nobody will cover his shift.",
+          "intro3": "Nobody except you, I hope. It is a simple job: you play the boss. A party of adventurers is already inside. Stop them. They will never notice the difference. Well. They will.",
           "accept": "Take the shift",
           "decline": "Not today"
         },
