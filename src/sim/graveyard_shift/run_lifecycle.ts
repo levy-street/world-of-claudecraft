@@ -30,6 +30,7 @@ import { wispMazeActionsLocked } from '../wisp_maze_action_lock';
 import { graveyardShiftRunSeed } from './bot_brain';
 import { updateGraveyardShiftBots } from './bot_driver';
 import { sayGraveyardShiftGiveUp, updateGraveyardShiftSay } from './bot_say';
+import { restoreCarriedAuras, snapshotCarriedAuras } from './carried_auras';
 import { partyGivesUp, partyWiped, updateGraveyardShiftCorpseRuns } from './corpse_run';
 import { GRAVEYARD_SHIFT_MIN_LEVEL } from './grave_entry';
 import {
@@ -123,6 +124,7 @@ export function startGraveyardShift(
   if (!slot) return 'Every crypt is busy. Try again soon.';
   const p = r.e;
   const pools = snapshotArenaReturnPools(p);
+  const carriedAuras = snapshotCarriedAuras(p);
   const savedResource = persistedResource(
     CLASSES[r.meta.cls].resourceType,
     p.resourceType,
@@ -150,6 +152,7 @@ export function startGraveyardShift(
     key,
     slot,
     pools,
+    carriedAuras,
     savedResource,
     petStowed: !stashedBefore && ctx.delvePetStash.has(pid),
     parked,
@@ -220,6 +223,8 @@ export function endGraveyardShift(
       revivePlayerAt(ctx, run.ownerPid, ctx.groundPos(door.x, door.z), 1);
     }
     readyArenaFighter(ctx, p, { clearPrep: true });
+    // The carried auras first, so the pools clamp to the maximum they raise.
+    restoreCarriedAuras(ctx, p, run.carriedAuras);
     restoreArenaReturnPools(ctx, p, run.pools);
     if (instanceClaimHolds(run.slot, p.pos)) leaveDungeon(ctx, run.ownerPid);
     if (run.petStowed) restorePetFromDelveStash(ctx, run.ownerPid);

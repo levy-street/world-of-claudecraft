@@ -6,7 +6,7 @@ import type { BotSteer } from '../bots/steer';
 import type { Rng } from '../rng';
 import type { ArenaReturnPools, InstanceSlot } from '../sim';
 import type { SimContext } from '../sim_context';
-import type { PlayerClass } from '../types';
+import type { Aura, PlayerClass } from '../types';
 import type { BotSayState } from './bot_say';
 import type { MorthenParked } from './morthen_transform';
 
@@ -56,6 +56,8 @@ export interface GraveyardShiftRun {
   readonly slot: InstanceSlot;
   // What the owner carried in, handed back on every exit (arena parenthesis).
   readonly pools: ArenaReturnPools;
+  // The auras carried in (carried_auras.ts), frozen, handed back on every exit.
+  readonly carriedAuras: readonly Aura[];
   // The real resource as a save persists it (persistedResource at the start), so
   // a save mid-run writes it rather than the Dread pool (save_override.ts).
   readonly savedResource: number;

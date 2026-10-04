@@ -76,9 +76,11 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
   snapshot (`snapshotArenaReturnPools`) goes back, the stowed pet returns (Morthen
   cannot summon one on shift), the slot is freed. A dead owner,
   corpse or released ghost, is revived at the Crypt door drop. It is an
-  arena-style CLEAN SLATE, not an exact restore: auras carried in (buffs, food,
-  flasks) are shed and not given back, as in every arena-shaped mode (owner
-  decision for the prototype; the shipped version should restore them). A path
+  arena-style clean slate on the way in, and the auras carried in come BACK on
+  the way out (`carried_auras.ts`, owner decision): buffs, food and flasks are
+  not lost, a penalty is not shed by starting a shift and leaving at once, and
+  their timers are frozen for the run like the pools. Forms, stances, stealth
+  and crowd control are not carried; the sicknesses come back through the pools. A path
   that decides mid-tick (the dev `end`, later a lethal hit) only sets
   `pendingOutcome`; `updateGraveyardShift` tears down on the next tick.
   Exits nobody announces (a teleport, a logout, a death, a party) are caught by the
@@ -340,6 +342,7 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
 | `grave_entry.ts` | pure leaf: the grave and Tibbs ids and spots, the eligibility rule, the deed id |
 | `grave_staging.ts` | the grave spawn, Tibbs' rise, offer, lines and dismissal, the end of a grave shift |
 | `save_override.ts` | what a save taken mid-run writes: the owner's real character (`graveyardShiftSaveState`) |
+| `carried_auras.ts` | the auras carried into a run: snapshot at the start, handed back on every exit |
 | `run_lifecycle.ts` | `canStartGraveyardShift`, `startGraveyardShift`, `endGraveyardShift`, `updateGraveyardShift` (the one tick entry, called just before the delve runs) |
 | `index.ts` | the public barrel |
 
