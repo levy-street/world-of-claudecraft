@@ -10,6 +10,7 @@
 import { NPCS } from '../data';
 import { grantDeed } from '../deeds';
 import { createGroundObject, createNpc } from '../entity';
+import { formatMoney } from '../format_money';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { settleTeleportArrival } from '../teleport_arrival';
@@ -20,6 +21,7 @@ import {
   GRAVE_INTERACT_RADIUS,
   GRAVE_ITEM_ID,
   GRAVE_POS,
+  GRAVEYARD_SHIFT_PAYOUT_COPPER,
   graveReturnSpot,
   isGraveyardShiftEligible,
   TIBBS_ENTITY_ID,
@@ -33,19 +35,12 @@ import type { GraveyardShiftOutcome, GraveyardShiftRun } from './run_state';
 
 const GRAVE_NAME = 'Glowing Grave';
 const SAY_KEY = 'devCommand.graveyardShift.tibbs.say';
-// Tibbs' second line after a shift follows the first by this long.
-export const TIBBS_FOLLOW_UP_SECONDS = 4;
 
 // English fallbacks for Tibbs' keyed lines (the client renders the catalog).
 const TIBBS_LINES = {
   accept: 'Wonderful. Mind the bones on the way down. Some of them are colleagues.',
   busy: 'Come back when you are not so busy. Union rules.',
-  report:
-    'Shift report! Adventurers sent home: {sent}. Colleagues saved: {saved}. Trousers not handed out: 1.',
-  payout: "Good job and thank you for your help, adventurer. Here's your payout.",
   covered: 'Your shift is covered. Morthen is back at work, and he says thank you.',
-  consolation: 'Do not worry. They kill us every day. Welcome to the job.',
-  anotherShift: 'Another shift? They certainly will.',
 } as const;
 export type TibbsLine = keyof typeof TIBBS_LINES;
 
@@ -96,40 +91,19 @@ export function ensureGraveyardShiftGrave(ctx: SimContext): void {
 }
 
 /** Tibbs speaks aloud, heard by one player (his say line and bubble). */
-export function tibbsSay(
-  ctx: SimContext,
-  pid: number,
-  line: TibbsLine,
-  values?: Record<string, string | number>,
-  delaySeconds = 0,
-): void {
+export function tibbsSay(ctx: SimContext, pid: number, line: TibbsLine): void {
   const tibbs = ctx.entities.get(TIBBS_ENTITY_ID);
   if (!tibbs) return;
-  let text: string = TIBBS_LINES[line];
-  for (const [k, v] of Object.entries(values ?? {})) text = text.replace(`{${k}}`, String(v));
-  const event = {
-    type: 'chat' as const,
+  ctx.emit({
+    type: 'chat',
     fromPid: tibbs.id,
     from: tibbs.name,
-    text,
+    text: TIBBS_LINES[line],
     textKey: `${SAY_KEY}.${line}`,
-    textValues: values,
-    channel: 'say' as const,
+    channel: 'say',
     entityId: tibbs.id,
     pid,
-  };
-  if (delaySeconds <= 0) ctx.emit(event);
-  // A follow-up line waits its turn (the first bubble stays readable), and is
-  // dropped if Tibbs went back down meanwhile, even if he has risen again since
-  // (same stable id): the line belongs to the scene it was queued in.
-  else {
-    const raisedAt = tibbs.gshiftSummonedTick;
-    ctx.delayedEvents.push({
-      at: ctx.time + delaySeconds,
-      event,
-      guard: () => ctx.entities.get(TIBBS_ENTITY_ID)?.gshiftSummonedTick === raisedAt,
-    });
-  }
+  });
 }
 
 /** Tibbs climbs out of his grave beside it, facing whoever called him. */
@@ -194,8 +168,9 @@ export function updateGraveyardShiftGrave(ctx: SimContext): void {
 }
 
 // A grave shift hands its owner back in front of the grave, where Tibbs waits
-// with his report (win) or his consolation (loss). An aborted shift says
-// nothing. Runs after the identity and the pools are restored.
+// with his report and the pay (win) or his consolation and a fresh offer
+// (loss), in the client's NPC dialog. An aborted shift says nothing. Runs
+// after the identity and the pools are restored.
 export function endShiftAtGrave(
   ctx: SimContext,
   run: GraveyardShiftRun,
@@ -214,12 +189,22 @@ export function endShiftAtGrave(
   settleTeleportArrival(p);
   if (outcome === 'aborted') return;
   if (!raiseTibbs(ctx, p)) return;
-  if (outcome === 'won') {
-    tibbsSay(ctx, p.id, 'report', report);
-    grantDeed(ctx, meta, BOSS_FOR_A_DAY_DEED_ID);
-    tibbsSay(ctx, p.id, 'payout', undefined, TIBBS_FOLLOW_UP_SECONDS);
-  } else {
-    tibbsSay(ctx, p.id, 'consolation');
-    tibbsSay(ctx, p.id, 'anotherShift', undefined, TIBBS_FOLLOW_UP_SECONDS);
+  // Paid on arrival, so closing his dialog early loses nothing (a win comes once).
+  const copper = outcome === 'won' ? GRAVEYARD_SHIFT_PAYOUT_COPPER : 0;
+  if (copper > 0) {
+    meta.copper += copper;
+    ctx.emit({ type: 'loot', text: `You receive ${formatMoney(copper)}.`, pid: p.id });
   }
+  ctx.emit({
+    type: 'graveyardShiftOffer',
+    npcId: TIBBS_ENTITY_ID,
+    pid: p.id,
+    report: { outcome, sent: report.sent, saved: report.saved, copper },
+  });
+}
+
+/** The deed for a won grave shift, granted the moment the fight is won. */
+export function grantBossForADay(ctx: SimContext, run: GraveyardShiftRun): void {
+  const meta = ctx.players.get(run.ownerPid);
+  if (run.entry === 'grave' && meta) grantDeed(ctx, meta, BOSS_FOR_A_DAY_DEED_ID);
 }

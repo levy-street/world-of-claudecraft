@@ -286,6 +286,7 @@ export const en = {
             'Nobody except you, I hope. It is a simple job: you play the boss. A party of adventurers is already inside. Stop them. They will never notice the difference. Well. They will.',
           accept: 'Take the shift',
           decline: 'Not today',
+          thanks: 'Thanks, Tibbs',
         },
         say: {
           accept: 'Wonderful. Mind the bones on the way down. Some of them are colleagues.',

@@ -36,6 +36,9 @@ export const GRAVEYARD_SHIFT_UNLOCK_QUEST = 'q_hollow';
 // The cosmetic reward for the won shift (secret until earned). Owner decision:
 // the shift can be won ONCE, so holding the deed closes the grave for good.
 export const BOSS_FOR_A_DAY_DEED_ID = 'hid_boss_for_a_day';
+// Tibbs' pay for the won shift (owner pick): a level-15 quest's money (their
+// median is 19 silver), paid once since the shift is won once.
+export const GRAVEYARD_SHIFT_PAYOUT_COPPER = 2000;
 
 export interface GraveyardShiftEligibilityInput {
   readonly level: number;

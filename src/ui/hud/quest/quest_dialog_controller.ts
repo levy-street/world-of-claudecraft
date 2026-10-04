@@ -4,7 +4,13 @@ import { CHRONICLER_TEMPLATE_IDS } from '../../../sim/deeds';
 import { craftsForPairTarget } from '../../../sim/professions/archetype';
 import { professionQuestSelectionTargets } from '../../../sim/quests/profession_quest_effects';
 import { npcQuestMarkerKind, type QuestMarkerKind } from '../../../sim/quests/quest_marker_kind';
-import { dist2d, type Entity, type ItemDef, questObjectiveRequired } from '../../../sim/types';
+import {
+  dist2d,
+  type Entity,
+  type GraveyardShiftReport,
+  type ItemDef,
+  questObjectiveRequired,
+} from '../../../sim/types';
 import { WEEKLY_KEEPER_ID } from '../../../sim/weekly_rewards';
 import type { IWorld } from '../../../world_api';
 import { archetypeTitleText, craftNameText } from '../../char_window';
@@ -124,6 +130,8 @@ export class QuestDialogController {
   // tick-threshold crossing, with NO quest event to repaint through).
   private lastIntroHintVisible: boolean | null = null;
   private clueReplyOpen = false;
+  // Tibbs' end-of-shift report while his dialog shows it (cleared on close).
+  private tibbsReport: GraveyardShiftReport | null = null;
   private lastGossipRowSig: string | null = null;
   // The Clue Scroll row's staleness signature (clue_step_row_view.ts): the row reads
   // LIVE hunt state, so it joins the refreshIfChanged watch (a step can advance
@@ -140,7 +148,8 @@ export class QuestDialogController {
     return this.openState;
   }
 
-  open(npcId: number): void {
+  open(npcId: number, tibbsReport?: GraveyardShiftReport): void {
+    this.tibbsReport = tibbsReport ?? null;
     const world = this.deps.world();
     const npc = world.entities.get(npcId);
     if (
@@ -232,6 +241,7 @@ export class QuestDialogController {
     this.deps.element.style.display = 'none';
     this.npcId = null;
     this.clueReplyOpen = false;
+    this.tibbsReport = null;
     this.detailQuestId = null;
     this.investigationSig = null;
     this.lastIntroHintVisible = null;
@@ -944,14 +954,14 @@ export class QuestDialogController {
    *  shift (the sim's targeted interact on him starts the run) or Not today
    *  (his answer, then the dialog closes). */
   private renderTibbsOffer(npc: Entity): boolean {
-    const view = tibbsOfferDialog(npc, this.deps.world().deedsEarned);
+    const view = tibbsOfferDialog(npc, this.deps.world().deedsEarned, this.tibbsReport);
     if (!view) return false;
     this.npcId = npc.id;
     this.detailQuestId = null;
     // No gossip rows here: keep the row-signature watch from repainting it.
     this.lastIntroHintVisible = null;
     this.clueReplyOpen = false;
-    this.paintTibbs(npc, view.lines, view.quoted);
+    this.paintTibbs(npc, view.lines, view.quoted, view.rewardCopper);
     // The shift won: his closing line and a way out, nothing to accept.
     if (view.acceptLabel === null) {
       const done = this.makeButton(view.declineLabel);
@@ -973,7 +983,7 @@ export class QuestDialogController {
     decline.addEventListener('click', () => {
       // Held like a clue reply: a quest event must not repaint the offer over it.
       this.clueReplyOpen = true;
-      this.paintTibbs(npc, [tibbsDeclineLine()], true);
+      this.paintTibbs(npc, [tibbsDeclineLine()], true, 0);
       const done = this.makeButton(t('questUi.dialog.continue'));
       done.addEventListener('click', () => this.close());
       this.deps.element.appendChild(done);
@@ -986,13 +996,22 @@ export class QuestDialogController {
     return true;
   }
 
-  private paintTibbs(npc: Entity, lines: readonly string[], quoted: boolean): void {
+  private paintTibbs(
+    npc: Entity,
+    lines: readonly string[],
+    quoted: boolean,
+    rewardCopper: number,
+  ): void {
     markDialogRoot(this.deps.element, { labelledBy: 'quest-dialog-title' });
     const name = this.deps.text.npcName(npc.templateId);
     const title = this.deps.text.npcTitle(npc.templateId);
     let html = `<div class="panel-title ui-win-head"><span class="ui-win-title" id="quest-dialog-title">${esc(name)}<span class="quest-muted ui-win-sub"> &lt;${esc(title)}&gt;</span></span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
     const quote = quoted ? '"' : '';
     for (const line of lines) html += `<div class="qd-text">${quote}${esc(line)}${quote}</div>`;
+    if (rewardCopper > 0) {
+      html += `<div class="qd-sub">${esc(t('questUi.detail.rewards'))}</div>`;
+      html += `<div class="qd-obj" data-gshift-reward>${this.deps.text.money(rewardCopper)}</div>`;
+    }
     this.deps.element.innerHTML = html;
   }
 

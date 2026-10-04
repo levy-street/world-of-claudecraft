@@ -68,7 +68,7 @@ function harness(deedsEarned = new Map<string, string>()) {
       number: String,
       progress: (label) => label,
       suggestedPlayers: () => '',
-      money: String,
+      money: (copper) => `<span data-copper>${copper}</span>`,
     },
     openFocusTrap: () => trap,
     closeTransient: noop,
@@ -154,5 +154,42 @@ describe("Tibbs' shift offer", () => {
     buttons[0].click();
     expect(interact).not.toHaveBeenCalled();
     expect(element.style.display).not.toBe('block');
+  });
+
+  it('opens his win report with the pay under it and one way out', () => {
+    const { controller, element, interact } = harness(
+      new Map([['hid_boss_for_a_day', '2026-10-04']]),
+    );
+    controller.open(TIBBS_ENTITY_ID, { outcome: 'won', sent: 10, saved: 2, copper: 2000 });
+    const lines = [...element.querySelectorAll('.qd-text')].map((el) => el.textContent);
+    expect(lines).toEqual([
+      'Shift report! Adventurers sent home: 10. Colleagues saved: 2. Trousers not handed out: 1.',
+      "Good job and thank you for your help, adventurer. Here's your payout.",
+    ]);
+    expect(element.querySelector('[data-gshift-reward] [data-copper]')?.textContent).toBe('2000');
+    expect(element.querySelector('[data-gshift-accept]')).toBeNull();
+    const buttons = [...element.querySelectorAll<HTMLButtonElement>('button.btn')];
+    expect(buttons.map((b) => b.textContent)).toEqual(['Thanks, Tibbs']);
+    buttons[0].click();
+    expect(interact).not.toHaveBeenCalled();
+    expect(element.style.display).not.toBe('block');
+    // Talked to again later, the report is gone: the closing line only.
+    controller.open(TIBBS_ENTITY_ID);
+    expect(element.querySelector('[data-gshift-reward]')).toBeNull();
+    expect(element.querySelector('.qd-text')?.textContent).toContain('Your shift is covered.');
+  });
+
+  it('after a loss he consoles and offers the shift again', () => {
+    const { controller, element, targetEntity, interact } = harness();
+    controller.open(TIBBS_ENTITY_ID, { outcome: 'lost', sent: 3, saved: 0, copper: 0 });
+    const lines = [...element.querySelectorAll('.qd-text')].map((el) => el.textContent);
+    expect(lines).toEqual([
+      'Do not worry. They kill us every day. Welcome to the job.',
+      'Another shift? They certainly will.',
+    ]);
+    expect(element.querySelector('[data-gshift-reward]')).toBeNull();
+    element.querySelector<HTMLButtonElement>('[data-gshift-accept]')!.click();
+    expect(targetEntity).toHaveBeenCalledWith(TIBBS_ENTITY_ID);
+    expect(interact).toHaveBeenCalledOnce();
   });
 });

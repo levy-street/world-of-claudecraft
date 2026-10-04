@@ -6741,6 +6741,14 @@ export type DamageEventKind = 'hit' | 'miss' | 'dodge' | 'parry' | 'block' | 're
 
 // `pid` (when present) marks a personal event that should only be delivered to
 // that player entity's owner; events without pid are world-visible.
+/** Tibbs' end-of-shift report: who went home, who was saved, the pay. */
+export interface GraveyardShiftReport {
+  outcome: 'won' | 'lost';
+  sent: number;
+  saved: number;
+  copper: number;
+}
+
 export type SimEvent = { pid?: number } & (
   | {
       type: 'damage';
@@ -7143,8 +7151,9 @@ export type SimEvent = { pid?: number } & (
     }
   | { type: 'worldQuestInvestigationDialogue'; targetId: number }
   // Graveyard Shift: Tibbs has climbed out of his grave and offers the shift
-  // (graveyard_shift/grave_staging.ts); the client opens his dialogue.
-  | { type: 'graveyardShiftOffer'; npcId: number }
+  // (graveyard_shift/grave_staging.ts); the client opens his dialogue. At the
+  // end of a grave shift it carries his report (the pay is already paid).
+  | { type: 'graveyardShiftOffer'; npcId: number; report?: GraveyardShiftReport }
   // `boardId` is the authored NoticeboardDef id (every board shares one
   // templateId), so the client can tell the Proving Shore's recruits' signpost
   // from a town board and open the guild board on its default view.

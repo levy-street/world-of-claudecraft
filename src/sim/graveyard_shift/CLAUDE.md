@@ -31,13 +31,17 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
   client's dialogue sends [Take the shift] as a targeted interact on Tibbs
   (`acceptGraveyardShiftFromTibbs`, honoured only from the player who woke him and
   re-checking eligibility, so a stale dialog after the win gets his 'covered' line;
-  a refusal is one keyed Tibbs line). His delayed follow-up line belongs to the
-  raise it was queued in (`gshiftSummonedTick`), never to a later one. After a won
-  shift his dialog shows only that closing line. Tibbs goes
-  back down when his caller walks off, starts the shift or leaves him idle. A grave
-  shift (`run.entry`) ends back in front of the grave with Tibbs' keyed report (win,
-  with the hidden `hid_boss_for_a_day` deed on the first one) or consolation (loss),
-  the follow-up line delayed so both bubbles read; an aborted one says nothing.
+  a refusal is one keyed Tibbs line). After a won shift his dialog shows only
+  his closing line. Tibbs goes
+  back down when his caller walks off, starts the shift or leaves him idle. A won
+  grave shift grants the hidden `hid_boss_for_a_day` deed the moment the fight is
+  won (`startWonOutro`, so its banner and sound mark the end of the fight). A grave
+  shift (`run.entry`) ends back in front of the grave: Tibbs rises and a
+  `graveyardShiftOffer` event carrying his report opens his NPC dialog (no say
+  bubbles): on a win the counts and `GRAVEYARD_SHIFT_PAYOUT_COPPER` (20 silver,
+  paid on arrival, so closing the dialog loses nothing), on a loss his
+  consolation and a fresh offer; an aborted one says nothing. A `/dev` shift
+  pays nothing and grants no deed.
 - **State on Sim.** Runs live in `Sim.graveyardShiftRuns` (owner pid to run),
   exposed as the `ctx.graveyardShiftRuns` live view. Modules here hold functions.
 - **Zero shared rng from this module.** Nothing here calls `ctx.rng`: starting

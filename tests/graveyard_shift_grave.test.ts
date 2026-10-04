@@ -11,6 +11,7 @@ import {
   GRAVE_INTERACT_RADIUS,
   GRAVE_ITEM_ID,
   GRAVE_POS,
+  GRAVEYARD_SHIFT_PAYOUT_COPPER,
   graveReturnSpot,
   TIBBS_ENTITY_ID,
   TIBBS_IDLE_SECONDS,
@@ -18,10 +19,7 @@ import {
   TIBBS_NPC_ID,
   tibbsSpot,
 } from '../src/sim/graveyard_shift/grave_entry';
-import {
-  graveyardShiftEligibleFor,
-  TIBBS_FOLLOW_UP_SECONDS,
-} from '../src/sim/graveyard_shift/grave_staging';
+import { graveyardShiftEligibleFor } from '../src/sim/graveyard_shift/grave_staging';
 import {
   acceptGraveyardShiftFromTibbs,
   endGraveyardShift,
@@ -107,23 +105,27 @@ function lethal(sim: Sim, target: Entity) {
   );
 }
 
-// Kill the party twice (one corpse run each) and walk out through the Staff Exit.
-function winShift(sim: Sim): { events: SimEvent[]; followUp: SimEvent[]; saved: number } {
+// Kill the party twice (one corpse run each), then walk out through the Staff
+// Exit. `won` is the tick the fight is won, `events` the tick the shift ends.
+function winShift(sim: Sim): { won: SimEvent[]; events: SimEvent[]; saved: number } {
   const run = graveyardShiftRunFor(sim.ctx, sim.playerId)!;
   for (const b of run.bots) lethal(sim, sim.entities.get(b.pid)!);
   ticks(sim, CORPSE_RETURN_TICKS + 1);
   for (const b of run.bots) lethal(sim, sim.entities.get(b.pid)!);
-  sim.tick();
+  const won = sim.tick();
   expect(run.outro?.kind).toBe('won');
   const saved = run.allyIds.filter((id) => sim.entities.get(id)?.dead === false).length;
   const exit = sim.entities.get(run.outro!.portalId!)!;
   place(sim, sim.player, exit.pos.x, exit.pos.z);
   const events = sim.tick();
   expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).toBeNull();
-  // Tibbs' second line waits its turn, so the first bubble stays readable.
-  const followUp = ticks(sim, TIBBS_FOLLOW_UP_SECONDS * TICK_RATE + 2);
-  return { events, followUp, saved };
+  return { won, events, saved };
 }
+
+const offerOf = (events: SimEvent[]) =>
+  events.find((ev) => ev.type === 'graveyardShiftOffer') as
+    | Extract<SimEvent, { type: 'graveyardShiftOffer' }>
+    | undefined;
 
 const atGrave = (sim: Sim) => {
   const spot = graveReturnSpot();
@@ -297,27 +299,66 @@ describe('Tibbs', () => {
 });
 
 describe('the end of a grave shift', () => {
-  it('a win sets the owner down at the grave, Tibbs reports and pays out the deed', () => {
+  it('the deed lands the moment the fight is won, still in the Crypt', () => {
     const sim = graveSim();
     takeShift(sim);
     const meta = meta0(sim);
     expect(meta.deedsEarned.has(BOSS_FOR_A_DAY_DEED_ID)).toBe(false);
-    const { events, followUp, saved } = winShift(sim);
+    const { won } = winShift(sim);
+    const unlock = won.find((ev) => ev.type === 'deedUnlocked') as
+      | Extract<SimEvent, { type: 'deedUnlocked' }>
+      | undefined;
+    expect(unlock?.deedId).toBe('hid_boss_for_a_day');
+    expect(meta.deedsEarned.has(BOSS_FOR_A_DAY_DEED_ID)).toBe(true);
+  });
+
+  it('a win sets the owner down at the grave, pays 20 silver and opens his report', () => {
+    expect(GRAVEYARD_SHIFT_PAYOUT_COPPER).toBe(2000);
+    const sim = graveSim();
+    takeShift(sim);
+    const meta = meta0(sim);
+    const copperBefore = meta.copper;
+    const { events, saved } = winShift(sim);
     expect(atGrave(sim)).toBe(true);
     expect(sim.entities.has(TIBBS_ENTITY_ID)).toBe(true);
-    expect(tibbsLines(events)).toEqual(['report']);
-    expect(tibbsLines(followUp)).toEqual(['payout']);
-    const report = events.find(
-      (ev) => ev.type === 'chat' && ev.textKey === 'devCommand.graveyardShift.tibbs.say.report',
-    ) as Extract<SimEvent, { type: 'chat' }>;
-    // Five adventurers, each killed twice.
-    expect(report.textValues).toEqual({ sent: 10, saved });
-    expect(meta.deedsEarned.has(BOSS_FOR_A_DAY_DEED_ID)).toBe(true);
+    expect(meta.copper - copperBefore).toBe(2000);
+    expect(
+      events.some(
+        (ev) => ev.type === 'loot' && ev.pid === sim.playerId && ev.text === 'You receive 20s.',
+      ),
+    ).toBe(true);
+    // His report opens in the NPC dialog, never as bubbles. Five adventurers,
+    // each killed twice.
+    const offer = offerOf(events);
+    expect(offer?.npcId).toBe(TIBBS_ENTITY_ID);
+    expect(offer?.pid).toBe(sim.playerId);
+    expect(offer?.report).toEqual({ outcome: 'won', sent: 10, saved, copper: 2000 });
+    expect(tibbsLines(events)).toEqual([]);
     // The dev channel's end line is for /dev shifts only.
     const logs = events
       .filter((ev) => ev.type === 'log')
       .map((ev) => (ev as { text: string }).text);
     expect(logs.some((text) => text.startsWith('[dev]'))).toBe(false);
+  });
+
+  it('a dev-entry win pays nothing and grants no deed', () => {
+    const sim = graveSim({ devCommands: true });
+    sim.chat('/dev graveyardshift start');
+    const meta = meta0(sim);
+    const copperBefore = meta.copper;
+    const run = graveyardShiftRunFor(sim.ctx, sim.playerId)!;
+    for (const b of run.bots) lethal(sim, sim.entities.get(b.pid)!);
+    ticks(sim, CORPSE_RETURN_TICKS + 1);
+    for (const b of run.bots) lethal(sim, sim.entities.get(b.pid)!);
+    sim.tick();
+    expect(run.outro?.kind).toBe('won');
+    expect(meta.deedsEarned.has(BOSS_FOR_A_DAY_DEED_ID)).toBe(false);
+    const exit = sim.entities.get(run.outro!.portalId!)!;
+    place(sim, sim.player, exit.pos.x, exit.pos.z);
+    const events = ticks(sim, 2);
+    expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).toBeNull();
+    expect(meta.copper).toBe(copperBefore);
+    expect(offerOf(events)).toBeUndefined();
   });
 
   it('after the win the grave sinks once Tibbs goes down, and never comes back', () => {
@@ -350,9 +391,10 @@ describe('the end of a grave shift', () => {
     expect(tibbsLines(events)).toEqual(['covered']);
   });
 
-  it('a loss sets the owner down at the grave with a consolation and no deed', () => {
+  it('a loss sets the owner down at the grave with his consolation, no pay and no deed', () => {
     const sim = graveSim();
     takeShift(sim);
+    const copperBefore = meta0(sim).copper;
     (sim as any).dealDamage(
       null,
       sim.player,
@@ -366,10 +408,14 @@ describe('the end of a grave shift', () => {
     const events = ticks(sim, LOSS_OUTRO_TICKS + 2);
     expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).toBeNull();
     expect(atGrave(sim)).toBe(true);
-    expect(tibbsLines(events)).toEqual(['consolation']);
-    const followUp = ticks(sim, TIBBS_FOLLOW_UP_SECONDS * TICK_RATE + 2);
-    expect(tibbsLines(followUp)).toEqual(['anotherShift']);
+    expect(offerOf(events)?.report).toMatchObject({ outcome: 'lost', sent: 0, copper: 0 });
+    expect(tibbsLines(events)).toEqual([]);
+    expect(meta0(sim).copper).toBe(copperBefore);
     expect(meta0(sim).deedsEarned.has(BOSS_FOR_A_DAY_DEED_ID)).toBe(false);
+    // He offers again: [Take the shift] from his dialog starts a new one.
+    sim.targetEntity(TIBBS_ENTITY_ID);
+    sim.interact();
+    expect(graveyardShiftRunFor(sim.ctx, sim.playerId)?.entry).toBe('grave');
   });
 
   it('lands settled at the grave: no fall carried over from the Crypt', () => {
@@ -386,32 +432,6 @@ describe('the end of a grave shift', () => {
     expect(p.jumping).toBe(false);
     expect(p.onGround).toBe(true);
     expect(p.fallStartY).toBe(p.pos.y);
-  });
-
-  it("drops a queued follow-up line when Tibbs went down and rose again (it was the old scene's)", () => {
-    const sim = graveSim();
-    takeShift(sim);
-    (sim as any).dealDamage(
-      null,
-      sim.player,
-      sim.player.maxHp + 50,
-      false,
-      'physical',
-      null,
-      'hit',
-      true,
-    );
-    ticks(sim, LOSS_OUTRO_TICKS + 2);
-    // Walk off (he goes down), come straight back and wake him for a fresh offer.
-    place(sim, sim.player, GRAVE_POS.x, GRAVE_POS.z - TIBBS_LEAVE_RADIUS - 5);
-    sim.tick();
-    expect(sim.entities.has(TIBBS_ENTITY_ID)).toBe(false);
-    const spot = graveReturnSpot();
-    place(sim, sim.player, spot.x, spot.z);
-    sim.pickUpObject(GRAVE_ENTITY_ID);
-    const events = ticks(sim, TIBBS_FOLLOW_UP_SECONDS * TICK_RATE + 2);
-    expect(sim.entities.has(TIBBS_ENTITY_ID)).toBe(true);
-    expect(tibbsLines(events)).not.toContain('anotherShift');
   });
 
   it('holds his offer for the player who woke him only', () => {

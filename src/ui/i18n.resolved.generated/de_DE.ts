@@ -248,7 +248,8 @@ export const de_DE: EnTranslations = {
           "intro2": "Our boss, Morthen, has been killed four thousand eight hundred times this week. Always for the same pair of trousers. Union rules say he has earned a day off, and nobody will cover his shift.",
           "intro3": "Nobody except you, I hope. It is a simple job: you play the boss. A party of adventurers is already inside. Stop them. They will never notice the difference. Well. They will.",
           "accept": "Take the shift",
-          "decline": "Not today"
+          "decline": "Not today",
+          "thanks": "Thanks, Tibbs"
         },
         "say": {
           "accept": "Wonderful. Mind the bones on the way down. Some of them are colleagues.",

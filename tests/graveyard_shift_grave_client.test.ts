@@ -170,7 +170,11 @@ describe('Tibbs', () => {
       pid: 1,
     } as SimEvent;
     expect(applyQuestEventPresentation(hud, ev)).toBe(true);
-    expect(hud.questDialog.open).toHaveBeenCalledWith(TIBBS_ENTITY_ID);
+    expect(hud.questDialog.open).toHaveBeenCalledWith(TIBBS_ENTITY_ID, undefined);
     expect(hud.log).not.toHaveBeenCalled();
+    // At the end of a grave shift the event carries his report into the dialog.
+    const report = { outcome: 'won' as const, sent: 10, saved: 2, copper: 2000 };
+    applyQuestEventPresentation(hud, { ...ev, report } as SimEvent);
+    expect(hud.questDialog.open).toHaveBeenLastCalledWith(TIBBS_ENTITY_ID, report);
   });
 });
