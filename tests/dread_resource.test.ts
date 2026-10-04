@@ -19,7 +19,7 @@ import { resourceDisplayName } from '../src/ui/ability_tooltip_lines';
 import { lowResourceView } from '../src/ui/low_resource';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
-function shiftSim(cls: PlayerClass = 'warrior', level = 10) {
+function shiftSim(cls: PlayerClass = 'warrior', level = 15) {
   const sim = new Sim({
     seed: 42,
     playerClass: cls,

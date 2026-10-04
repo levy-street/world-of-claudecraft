@@ -180,7 +180,7 @@ describe('Morthen shift inside the vehicle bar family, on a real offline run', (
       offlineHost: true,
       world: EMPTY_TEST_WORLD,
     });
-    sim.setPlayerLevel(10);
+    sim.setPlayerLevel(15);
     document.body.innerHTML = '<div id="ui"></div>';
     const logTip = vi.fn();
     const refreshPadBar = vi.fn();

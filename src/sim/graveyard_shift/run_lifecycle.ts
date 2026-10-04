@@ -135,6 +135,7 @@ export function startGraveyardShift(
     seed: graveyardShiftRunSeed(ctx.cfg.seed, ctx.tickCount, pid),
     bots: [],
     allyIds: [],
+    corpseIds: [],
     raisedCorpseIds: new Set(),
     engaged: false,
     pendingOutcome: null,

@@ -8,7 +8,7 @@ import { Sim } from '../src/sim/sim';
 import type { Aura, PlayerClass } from '../src/sim/types';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
-function shiftSim(cls: PlayerClass = 'warrior', level = 10) {
+function shiftSim(cls: PlayerClass = 'warrior', level = 15) {
   const sim = new Sim({
     seed: 42,
     playerClass: cls,
@@ -101,15 +101,15 @@ function hitPlayer(sim: Sim, amount: number) {
 
 describe('Graveyard Shift Morthen identity', () => {
   it.each([
-    ['warrior', 10],
+    ['warrior', 15],
     ['mage', 20],
     ['rogue', 15],
     ['hunter', 20],
-    ['druid', 14],
-    ['paladin', 12],
+    ['druid', 17],
+    ['paladin', 16],
     ['priest', 18],
     ['shaman', 16],
-    ['warlock', 11],
+    ['warlock', 19],
   ] as const)('a level %s %i owner fights with the morthen template numbers', (cls, level) => {
     const sim = shiftSim(cls, level);
     start(sim);
@@ -263,14 +263,14 @@ describe('Graveyard Shift Morthen identity', () => {
   });
 
   it('no dev path changes the level on shift (/dev mounts levels to 20 off shift)', () => {
-    const sim = shiftSim('warrior', 12);
+    const sim = shiftSim('warrior', 16);
     const lifetimeXp = meta(sim).lifetimeXp;
     start(sim);
     sim.chat('/dev mounts');
     expect(sim.player.level).toBe(10);
     expect(sim.player.maxHp).toBe(2978);
     end(sim);
-    expect(sim.player.level).toBe(12);
+    expect(sim.player.level).toBe(16);
     expect(meta(sim).lifetimeXp).toBe(lifetimeXp);
   });
 
@@ -381,7 +381,7 @@ describe('Graveyard Shift Morthen identity', () => {
   });
 
   it.each([
-    ['warrior', 10, null],
+    ['warrior', 15, null],
     ['mage', 20, null],
     ['warrior', 20, 'arms'],
   ] as const)('exit hands back the real %s %i (spec %s) exactly', (cls, level, spec) => {
@@ -452,12 +452,12 @@ describe('Graveyard Shift Morthen identity', () => {
   });
 
   it('refuses /dev level on shift so the exit restores the true level', () => {
-    const sim = shiftSim('warrior', 12);
+    const sim = shiftSim('warrior', 16);
     start(sim);
     sim.chat('/dev level 18');
     expect(sim.player.level).toBe(10);
     end(sim);
-    expect(sim.player.level).toBe(12);
+    expect(sim.player.level).toBe(16);
   });
 
   it("drops the owner's projectiles still in flight at the exit, and only those", () => {

@@ -22,7 +22,7 @@ function shiftSim(
     offlineHost: opts.offlineHost ?? true,
     world: opts.fullWorld ? undefined : EMPTY_TEST_WORLD,
   });
-  sim.setPlayerLevel(10);
+  sim.setPlayerLevel(15);
   return sim;
 }
 
@@ -80,15 +80,15 @@ describe('Graveyard Shift run shell', () => {
     expect(logs(sim, events)).toContain('[dev] Graveyard Shift ended (aborted).');
   });
 
-  it('refuses outside the offline world, below level 10, in a party, or twice', () => {
+  it('refuses outside the offline world, below level 15, in a party, or twice', () => {
     const online = shiftSim({ offlineHost: false });
     expect(start(online)).toBeNull();
     expect(logs(online)).toContain('[dev] Graveyard Shift runs offline only.');
 
     const low = shiftSim();
-    low.setPlayerLevel(9);
+    low.setPlayerLevel(14);
     expect(start(low)).toBeNull();
-    expect(logs(low)).toContain('[dev] You must be level 10 to cover a shift.');
+    expect(logs(low)).toContain('[dev] You must be level 15 to cover a shift.');
 
     const grouped = shiftSim();
     const friend = grouped.addPlayer('priest', 'Friend');
@@ -229,7 +229,7 @@ describe('Graveyard Shift run shell', () => {
   it('a removed owner drops the run and frees the slot', () => {
     const sim = shiftSim();
     const owner = sim.addPlayer('mage', 'Owner');
-    sim.setPlayerLevel(10, owner);
+    sim.setPlayerLevel(15, owner);
     const run = start(sim, owner)!;
     expect(run).not.toBeNull();
     sim.removePlayer(owner);

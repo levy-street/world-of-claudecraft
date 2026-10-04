@@ -7143,9 +7143,8 @@ export type SimEvent = { pid?: number } & (
     }
   | { type: 'worldQuestInvestigationDialogue'; targetId: number }
   // Graveyard Shift: Tibbs has climbed out of his grave and offers the shift
-  // (graveyard_shift/grave_staging.ts); the client opens his dialogue. `returning`
-  // is a character that has covered a shift before (the later-meeting line).
-  | { type: 'graveyardShiftOffer'; npcId: number; returning: boolean }
+  // (graveyard_shift/grave_staging.ts); the client opens his dialogue.
+  | { type: 'graveyardShiftOffer'; npcId: number }
   // `boardId` is the authored NoticeboardDef id (every board shares one
   // templateId), so the client can tell the Proving Shore's recruits' signpost
   // from a town board and open the guild board on its default view.

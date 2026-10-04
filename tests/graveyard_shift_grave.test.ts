@@ -41,7 +41,7 @@ function graveSim(opts: Opts = {}) {
     offlineHost: opts.offlineHost ?? true,
     world: EMPTY_TEST_WORLD,
   });
-  sim.setPlayerLevel(opts.level ?? 10);
+  sim.setPlayerLevel(opts.level ?? 15);
   const meta = meta0(sim);
   if (opts.deed ?? true) meta.deedsEarned.set('dgn_hollow_crypt', '2026-10-01');
   if (opts.quest) meta.questsDone.add('q_hollow');
@@ -124,10 +124,19 @@ const atGrave = (sim: Sim) => {
 
 describe('the grave', () => {
   it('is absent for an ineligible offline player', () => {
-    for (const opts of [{ level: 9 }, { level: 10, deed: false }] satisfies Opts[]) {
+    for (const opts of [{ level: 14 }, { level: 15, deed: false }] satisfies Opts[]) {
       const sim = graveSim(opts);
       ticks(sim, 3);
       expect(sim.entities.has(GRAVE_ENTITY_ID), JSON.stringify(opts)).toBe(false);
+    }
+  });
+
+  it('never stands for a player who already won the shift (it can be won once)', () => {
+    for (const quest of [false, true]) {
+      const sim = graveSim({ quest });
+      meta0(sim).deedsEarned.set(BOSS_FOR_A_DAY_DEED_ID, '2026-10-01');
+      ticks(sim, 3);
+      expect(sim.entities.has(GRAVE_ENTITY_ID), `quest ${quest}`).toBe(false);
     }
   });
 
@@ -150,10 +159,10 @@ describe('the grave', () => {
   });
 
   it('appears once the player becomes eligible mid-session', () => {
-    const sim = graveSim({ level: 9 });
+    const sim = graveSim({ level: 14 });
     sim.tick();
     expect(sim.entities.has(GRAVE_ENTITY_ID)).toBe(false);
-    sim.setPlayerLevel(10);
+    sim.setPlayerLevel(15);
     sim.tick();
     expect(sim.entities.has(GRAVE_ENTITY_ID)).toBe(true);
   });
@@ -185,18 +194,8 @@ describe('Tibbs', () => {
     expect(Math.hypot(tibbs.pos.x - spot.x, tibbs.pos.z - spot.z)).toBeLessThan(0.01);
     const offers = events.filter((ev) => ev.type === 'graveyardShiftOffer');
     expect(offers).toEqual([
-      { type: 'graveyardShiftOffer', npcId: TIBBS_ENTITY_ID, returning: false, pid: sim.playerId },
+      { type: 'graveyardShiftOffer', npcId: TIBBS_ENTITY_ID, pid: sim.playerId },
     ]);
-  });
-
-  it('greets a character who has covered a shift before as returning', () => {
-    const sim = graveSim();
-    meta0(sim).deedsEarned.set(BOSS_FOR_A_DAY_DEED_ID, '2026-10-01');
-    const events = wakeTibbs(sim);
-    const offer = events.find((ev) => ev.type === 'graveyardShiftOffer') as
-      | Extract<SimEvent, { type: 'graveyardShiftOffer' }>
-      | undefined;
-    expect(offer?.returning).toBe(true);
   });
 
   it('stays down when the grave is touched from too far away', () => {
@@ -224,6 +223,9 @@ describe('Tibbs', () => {
     expect(accept?.pid).toBe(sim.playerId);
     // He goes back down once the shift has begun.
     expect(sim.entities.has(TIBBS_ENTITY_ID)).toBe(false);
+    // The grave stays for the way back, though Morthen reads as level 10 on shift.
+    ticks(sim, 20 * 10);
+    expect(sim.entities.has(GRAVE_ENTITY_ID)).toBe(true);
   });
 
   it('answers a busy player with one line and starts nothing', () => {
@@ -284,17 +286,21 @@ describe('the end of a grave shift', () => {
     expect(meta.deedsEarned.has(BOSS_FOR_A_DAY_DEED_ID)).toBe(true);
   });
 
-  it('a second win admires the overtime and grants nothing new', () => {
+  it('after the win the grave sinks once Tibbs goes down, and never comes back', () => {
     const sim = graveSim();
     takeShift(sim);
     winShift(sim);
-    const meta = meta0(sim);
-    const earned = meta.deedsEarned.size;
+    // Tibbs still stands for his report: the grave waits for him.
+    expect(sim.entities.has(GRAVE_ENTITY_ID)).toBe(true);
     dismissAndWait(sim);
-    takeShift(sim);
-    const { events, followUp } = winShift(sim);
-    expect(tibbsLines([...events, ...followUp])).toEqual(['report', 'overtime']);
-    expect(meta.deedsEarned.size).toBe(earned);
+    expect(sim.entities.has(GRAVE_ENTITY_ID)).toBe(false);
+    ticks(sim, 20 * 5);
+    expect(sim.entities.has(GRAVE_ENTITY_ID)).toBe(false);
+    // Nothing left to touch: no Tibbs, no offer.
+    sim.pickUpObject(GRAVE_ENTITY_ID);
+    const events = sim.tick();
+    expect(sim.entities.has(TIBBS_ENTITY_ID)).toBe(false);
+    expect(events.some((ev) => ev.type === 'graveyardShiftOffer')).toBe(false);
   });
 
   it('a loss sets the owner down at the grave with a consolation and no deed', () => {

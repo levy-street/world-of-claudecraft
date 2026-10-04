@@ -24,12 +24,15 @@ export const GRAVE_INTERACT_RADIUS = 6;
 export const TIBBS_LEAVE_RADIUS = 20;
 export const TIBBS_IDLE_SECONDS = 90;
 
-export const GRAVEYARD_SHIFT_MIN_LEVEL = 10;
+// Owner decision: a level 15 character, five levels past the Crypt, comes back
+// to cover the shift.
+export const GRAVEYARD_SHIFT_MIN_LEVEL = 15;
 // Having killed Morthen once: the Cryptbreaker deed, or, for a character older
 // than the Book of Deeds, the Crypt's own quest turned in.
 export const GRAVEYARD_SHIFT_UNLOCK_DEED = 'dgn_hollow_crypt';
 export const GRAVEYARD_SHIFT_UNLOCK_QUEST = 'q_hollow';
-// The cosmetic reward for a first won shift (secret until earned).
+// The cosmetic reward for the won shift (secret until earned). Owner decision:
+// the shift can be won ONCE, so holding the deed closes the grave for good.
 export const BOSS_FOR_A_DAY_DEED_ID = 'hid_boss_for_a_day';
 
 export interface GraveyardShiftEligibilityInput {
@@ -38,10 +41,12 @@ export interface GraveyardShiftEligibilityInput {
   readonly questsDone: { has(id: string): boolean };
 }
 
-/** Whether the grave glows and answers for this character. */
+/** Whether the grave stands and answers for this character: level 15, Morthen
+ *  killed once, and the shift not yet won. */
 export function isGraveyardShiftEligible(p: GraveyardShiftEligibilityInput): boolean {
   return (
     p.level >= GRAVEYARD_SHIFT_MIN_LEVEL &&
+    !p.deedsEarned.has(BOSS_FOR_A_DAY_DEED_ID) &&
     (p.deedsEarned.has(GRAVEYARD_SHIFT_UNLOCK_DEED) ||
       p.questsDone.has(GRAVEYARD_SHIFT_UNLOCK_QUEST))
   );

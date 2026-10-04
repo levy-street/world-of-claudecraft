@@ -944,7 +944,7 @@ export class QuestDialogController {
    *  shift (the sim's targeted interact on him starts the run) or Not today
    *  (his answer, then the dialog closes). */
   private renderTibbsOffer(npc: Entity): boolean {
-    const view = tibbsOfferDialog(this.deps.world(), npc);
+    const view = tibbsOfferDialog(npc);
     if (!view) return false;
     this.npcId = npc.id;
     this.detailQuestId = null;

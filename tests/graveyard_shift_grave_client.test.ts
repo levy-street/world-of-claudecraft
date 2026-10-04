@@ -9,7 +9,6 @@ import { lootGlint } from '../src/render/ground_object_glint_core';
 import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects';
 import { updateWorldSpeech } from '../src/render/world_speech';
 import {
-  BOSS_FOR_A_DAY_DEED_ID,
   GRAVE_ENTITY_ID,
   GRAVE_ITEM_ID,
   GRAVE_POS,
@@ -91,24 +90,16 @@ describe('Tibbs', () => {
     ).toBe('skel_minion');
   });
 
-  it('pitches the shift in full on a first meeting, briefly to a returning character', () => {
+  it('pitches the shift in full every time (it can be won once)', () => {
     setLanguage('en');
     const npc = { kind: 'npc', templateId: TIBBS_NPC_ID } as Entity;
-    const first = tibbsOfferDialog({ deedsEarned: new Map() }, npc)!;
-    expect(first.lines).toHaveLength(4);
-    expect(first.lines[0]).toMatch(/^Ah\. You heard me\. Tibbs\./);
-    expect(first.acceptLabel).toBe('Take the shift');
-    expect(first.declineLabel).toBe('Not today');
-    const again = tibbsOfferDialog(
-      { deedsEarned: new Map([[BOSS_FOR_A_DAY_DEED_ID, '2026-10-04']]) },
-      npc,
-    )!;
-    expect(again.lines).toEqual([
-      'Morthen is off again. Bad back. Well. Bad spine. Cover for him?',
-    ]);
-    expect(
-      tibbsOfferDialog({ deedsEarned: new Map() }, { kind: 'npc', templateId: 'x' } as Entity),
-    ).toBeNull();
+    const offer = tibbsOfferDialog(npc)!;
+    expect(offer.lines).toHaveLength(4);
+    expect(offer.lines[0]).toMatch(/^Ah\. You heard me\. Tibbs\./);
+    expect(offer.lines[3]).toMatch(/^Simple job\./);
+    expect(offer.acceptLabel).toBe('Take the shift');
+    expect(offer.declineLabel).toBe('Not today');
+    expect(tibbsOfferDialog({ kind: 'npc', templateId: 'x' } as Entity)).toBeNull();
     expect(tibbsDeclineLine()).toBe('Fair. Nobody reads the job description either.');
   });
 
@@ -124,7 +115,6 @@ describe('Tibbs', () => {
     const ev = {
       type: 'graveyardShiftOffer',
       npcId: TIBBS_ENTITY_ID,
-      returning: false,
       pid: 1,
     } as SimEvent;
     expect(applyQuestEventPresentation(hud, ev)).toBe(true);

@@ -25,6 +25,29 @@ export const GRAVEYARD_SHIFT_BOT_SPOTS: readonly { x: number; z: number }[] = [
   { x: 3, z: 76 },
 ];
 
+// The shift's opening (run_opening.ts): the last pack of the party's clear,
+// Morthen's own colleagues, already fighting it in the room before his
+// chamber, and the monsters the party killed on the way in, lying where the
+// Crypt's own spawn list placed them (crypt_shambler and hollow_acolyte rows
+// short of the widows' room).
+export const GRAVEYARD_SHIFT_PACK: readonly { templateId: string; x: number; z: number }[] = [
+  { templateId: 'crypt_shambler', x: -2, z: 71 },
+  { templateId: 'crypt_shambler', x: 2, z: 72 },
+  { templateId: 'hollow_acolyte', x: 0, z: 74 },
+];
+export const GRAVEYARD_SHIFT_CLEARED_CORPSES: readonly {
+  templateId: string;
+  x: number;
+  z: number;
+}[] = [
+  { templateId: 'crypt_shambler', x: -3, z: 18 },
+  { templateId: 'crypt_shambler', x: 3, z: 19 },
+  { templateId: 'crypt_shambler', x: -9, z: 38 },
+  { templateId: 'hollow_acolyte', x: -5, z: 39 },
+  { templateId: 'crypt_shambler', x: 9, z: 54 },
+  { templateId: 'hollow_acolyte', x: 5, z: 55 },
+];
+
 // Morthen's two skeleton allies rise at his sides on arrival.
 export const GRAVEYARD_SHIFT_ALLY_SPOTS: readonly { x: number; z: number }[] = [
   { x: -3, z: 90 },

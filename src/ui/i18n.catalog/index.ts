@@ -286,7 +286,6 @@ export const en = {
             'Union rules say he gets a day off. Nobody wants to cover his shift. Except, I am hoping, you.',
           intro4:
             'Simple job. You are the boss. Adventurers come in. You stop them. They will not notice the difference. Well. They will.',
-          returning: 'Morthen is off again. Bad back. Well. Bad spine. Cover for him?',
           accept: 'Take the shift',
           decline: 'Not today',
         },
@@ -297,7 +296,6 @@ export const en = {
           report:
             'Shift report! Adventurers sent home: {sent}. Colleagues saved: {saved}. Trousers not handed out: 1.',
           payout: "Good job and thank you for your help, adventurer. Here's your payout.",
-          overtime: 'The union admires the overtime.',
           consolation: 'Do not worry. They kill us every day. Welcome to the job.',
           anotherShift: 'Another shift? They certainly will.',
         },

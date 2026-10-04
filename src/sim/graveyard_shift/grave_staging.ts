@@ -2,8 +2,8 @@
 // by the Hollow Crypt (spawned only while the offline player is eligible, so an
 // ineligible player simply has no grave), Tibbs the union rep who climbs out of
 // it when the grave is touched and offers the shift, and the end of every grave
-// shift back in front of him, with his report and, on a first win, the Boss for
-// a Day deed. Tibbs' summoner and summon tick ride his own entity. The run start
+// shift back in front of him, with his report and, on the win (the shift can be
+// won once), the Boss for a Day deed. Tibbs' summoner and summon tick ride his own entity. The run start
 // itself stays in run_lifecycle.ts (which calls in here); nothing here imports
 // it. Draws no rng.
 
@@ -42,35 +42,41 @@ const TIBBS_LINES = {
   report:
     'Shift report! Adventurers sent home: {sent}. Colleagues saved: {saved}. Trousers not handed out: 1.',
   payout: "Good job and thank you for your help, adventurer. Here's your payout.",
-  overtime: 'The union admires the overtime.',
   consolation: 'Do not worry. They kill us every day. Welcome to the job.',
   anotherShift: 'Another shift? They certainly will.',
 } as const;
 export type TibbsLine = keyof typeof TIBBS_LINES;
 
+// A run owner is pinned to Morthen's level: the real one is parked on the run.
 function eligibleMeta(ctx: SimContext, meta: PlayerMeta): boolean {
   const e = ctx.entities.get(meta.entityId);
+  const parkedLevel = ctx.graveyardShiftRuns.get(meta.entityId)?.parked.level;
   return (
     !!e &&
     isGraveyardShiftEligible({
-      level: e.level,
+      level: parkedLevel ?? e.level,
       deedsEarned: meta.deedsEarned,
       questsDone: meta.questsDone,
     })
   );
 }
 
-/** The grave stands once an offline player is eligible. Every tick, cheap. */
+function anyEligible(ctx: SimContext): boolean {
+  for (const meta of ctx.players.values()) if (eligibleMeta(ctx, meta)) return true;
+  return false;
+}
+
+/** The grave stands while an offline player is eligible, and sinks back once
+ *  nobody is (the shift won) as soon as Tibbs has gone down. Every tick, cheap. */
 export function ensureGraveyardShiftGrave(ctx: SimContext): void {
-  if (!ctx.cfg.offlineHost || ctx.entities.has(GRAVE_ENTITY_ID)) return;
-  let anyEligible = false;
-  for (const meta of ctx.players.values()) {
-    if (eligibleMeta(ctx, meta)) {
-      anyEligible = true;
-      break;
-    }
+  if (!ctx.cfg.offlineHost) return;
+  if (ctx.entities.has(GRAVE_ENTITY_ID)) {
+    // Never mid-shift: the shift ends back at this grave.
+    const quiet = !ctx.entities.has(TIBBS_ENTITY_ID) && ctx.graveyardShiftRuns.size === 0;
+    if (quiet && !anyEligible(ctx)) ctx.dropEntity(GRAVE_ENTITY_ID);
+    return;
   }
-  if (!anyEligible) return;
+  if (!anyEligible(ctx)) return;
   const grave = createGroundObject(
     GRAVE_ENTITY_ID,
     GRAVE_ITEM_ID,
@@ -154,12 +160,7 @@ export function touchGraveyardShiftGrave(ctx: SimContext, p: Entity, meta: Playe
   if (!withinGrave(p.pos, GRAVE_INTERACT_RADIUS)) return false;
   const tibbs = raiseTibbs(ctx, p);
   if (!tibbs) return false;
-  ctx.emit({
-    type: 'graveyardShiftOffer',
-    npcId: tibbs.id,
-    returning: meta.deedsEarned.has(BOSS_FOR_A_DAY_DEED_ID),
-    pid: p.id,
-  });
+  ctx.emit({ type: 'graveyardShiftOffer', npcId: tibbs.id, pid: p.id });
   return true;
 }
 
@@ -203,8 +204,8 @@ export function endShiftAtGrave(
   if (!raiseTibbs(ctx, p)) return;
   if (outcome === 'won') {
     tibbsSay(ctx, p.id, 'report', report);
-    const firstWin = grantDeed(ctx, meta, BOSS_FOR_A_DAY_DEED_ID);
-    tibbsSay(ctx, p.id, firstWin ? 'payout' : 'overtime', undefined, TIBBS_FOLLOW_UP_SECONDS);
+    grantDeed(ctx, meta, BOSS_FOR_A_DAY_DEED_ID);
+    tibbsSay(ctx, p.id, 'payout', undefined, TIBBS_FOLLOW_UP_SECONDS);
   } else {
     tibbsSay(ctx, p.id, 'consolation');
     tibbsSay(ctx, p.id, 'anotherShift', undefined, TIBBS_FOLLOW_UP_SECONDS);

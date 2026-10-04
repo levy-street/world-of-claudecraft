@@ -73,7 +73,7 @@ function shiftSim() {
     offlineHost: true,
     world: EMPTY_TEST_WORLD,
   });
-  sim.setPlayerLevel(10);
+  sim.setPlayerLevel(15);
   return sim;
 }
 

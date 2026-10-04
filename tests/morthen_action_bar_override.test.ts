@@ -152,7 +152,7 @@ describe('the kit on the real bar view', () => {
       offlineHost: true,
       world: EMPTY_TEST_WORLD,
     });
-    sim.setPlayerLevel(10);
+    sim.setPlayerLevel(15);
     sim.chat('/dev graveyardshift start');
     const override = morthenActionBarOverride(sim.player)!;
     const view = createActionBarView(

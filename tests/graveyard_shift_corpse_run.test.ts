@@ -19,7 +19,7 @@ function shiftSim() {
     offlineHost: true,
     world: EMPTY_TEST_WORLD,
   });
-  sim.setPlayerLevel(10);
+  sim.setPlayerLevel(15);
   sim.chat('/dev graveyardshift start');
   const run = graveyardShiftRunFor(sim.ctx, sim.playerId)!;
   expect(run).not.toBeNull();
