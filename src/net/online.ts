@@ -192,7 +192,7 @@ import type {
   PerfectingInfoView,
   SalvageResultView,
 } from '../world_api/professions';
-import { buildClientAbilityPresentation } from './ability_presentation';
+import { buildClientAbilityPresentation, clientActionBarReadOnly } from './ability_presentation';
 import { normalizeAccountCosmetics } from './account_cosmetics_wire';
 import { ActionBarLayoutUploader } from './action_bar_upload';
 import { anchorFields } from './anchor_fields';
@@ -1189,7 +1189,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   private readonly ownPlayerClass: PlayerClass;
   spectating: string | null = null;
   get actionBarReadOnly(): boolean {
-    return this.spectating !== null || this.spectateFacingPending === true;
+    return clientActionBarReadOnly(this.spectating, this.spectateFacingPending, this.player);
   }
   moveInput: MoveInput = emptyMoveInput();
   known: ResolvedAbility[] = [];
@@ -3221,7 +3221,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       const arena = s.arena !== undefined ? s.arena : this.arenaInfo;
       const presentation = buildClientAbilityPresentation(
         this.cfg.playerClass,
-        e.level,
+        e,
         this,
         s.tal,
         arena?.match?.fiesta?.augments ?? [],
