@@ -43,6 +43,7 @@ export class MorthenShiftController {
   private readonly veil = document.createElement('div');
   private readonly frameName = document.getElementById('pf-name');
   private active = false;
+  private lastOpacity = Number.NaN;
   private hintId: MorthenHintId | null = null;
   private nameRevision = -1;
   private readonly corpseInReach = (): boolean =>
@@ -61,7 +62,10 @@ export class MorthenShiftController {
     const now = this.deps.now?.() ?? performance.now();
     // The fade outlives the identity: it lifts after the teardown sent us home.
     const opacity = this.fade.tick(now, isGraveyardShiftDefeated(player));
-    this.deps.writers.setStyleProp(this.veil, 'opacity', opacity.toFixed(2));
+    if (opacity !== this.lastOpacity) {
+      this.lastOpacity = opacity;
+      this.deps.writers.setStyleProp(this.veil, 'opacity', opacity.toFixed(2));
+    }
     const active = morthenControlsActive(this.deps.world);
     if (active !== this.active) {
       this.active = active;

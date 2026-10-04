@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { CROSS_HOTBAR_EXPANDED_SET, CROSS_HOTBAR_PRIMARY_SET } from '../src/game/cross_hotbar';
+import {
+  CROSS_HOTBAR_EXPANDED_SET,
+  CROSS_HOTBAR_PRIMARY_SET,
+  defaultCrossHotbarLayout,
+} from '../src/game/cross_hotbar';
 import { CrossHotbarBindings } from '../src/game/cross_hotbar_bindings';
 import {
   cancelPadFocus,
@@ -2049,6 +2053,19 @@ describe('GamepadManager cross hotbar', () => {
       h.press(GP.A);
       h.press();
       expect(h.xhb.setActions(0)[3]).toEqual({ type: 'ability', id: 'a3' });
+    });
+
+    it("leaves arrange mode when Morthen's kit takes the bar over, and will not reopen", () => {
+      const h = setupCrossHotbar(true);
+      enterEdit(h);
+      expect(h.onCrossHotbarEdit).toHaveBeenLastCalledWith(true, null, null);
+      const kit = defaultCrossHotbarLayout();
+      h.xhb.setOverride(() => kit);
+      h.press();
+      expect(h.onCrossHotbarEdit).toHaveBeenLastCalledWith(false, null, null);
+      h.onCrossHotbarEdit.mockClear();
+      enterEdit(h);
+      expect(h.onCrossHotbarEdit).not.toHaveBeenCalled();
     });
 
     it('leaves arrange mode when the pad is stopped', () => {

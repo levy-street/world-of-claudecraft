@@ -944,7 +944,7 @@ export class QuestDialogController {
    *  shift (the sim's targeted interact on him starts the run) or Not today
    *  (his answer, then the dialog closes). */
   private renderTibbsOffer(npc: Entity): boolean {
-    const view = tibbsOfferDialog(npc);
+    const view = tibbsOfferDialog(npc, this.deps.world().deedsEarned);
     if (!view) return false;
     this.npcId = npc.id;
     this.detailQuestId = null;
@@ -952,6 +952,15 @@ export class QuestDialogController {
     this.lastIntroHintVisible = null;
     this.clueReplyOpen = false;
     this.paintTibbs(npc, view.lines);
+    // The shift won: his closing line and a way out, nothing to accept.
+    if (view.acceptLabel === null) {
+      const done = this.makeButton(view.declineLabel);
+      done.addEventListener('click', () => this.close());
+      this.deps.element.appendChild(done);
+      this.bindClose();
+      this.showAndFocus();
+      return true;
+    }
     const accept = this.makeButton(view.acceptLabel);
     accept.dataset.gshiftAccept = String(npc.id);
     accept.addEventListener('click', () => {

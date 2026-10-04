@@ -18,7 +18,7 @@ import type { IWorld } from '../src/world_api';
   }
 };
 
-function harness() {
+function harness(deedsEarned = new Map<string, string>()) {
   setLanguage('en');
   document.body.innerHTML = '';
   const element = document.createElement('div');
@@ -40,7 +40,7 @@ function harness() {
     player: { name: 'Ari', pos: { x: 0, y: 0, z: 0 } },
     questLog: new Map(),
     questsDone: new Set<string>(),
-    deedsEarned: new Map<string, string>(),
+    deedsEarned,
     clueHunt: null,
     targetEntity,
     interact,
@@ -133,6 +133,22 @@ describe("Tibbs' shift offer", () => {
     const buttons = [...element.querySelectorAll<HTMLButtonElement>('button.btn')];
     expect(buttons).toHaveLength(1);
     buttons[0].click();
+    expect(element.style.display).not.toBe('block');
+  });
+
+  it('after the win he only says the shift is covered: no Take the shift, Continue closes', () => {
+    const { controller, element, interact } = harness(
+      new Map([['hid_boss_for_a_day', '2026-10-04']]),
+    );
+    controller.open(TIBBS_ENTITY_ID);
+    const lines = [...element.querySelectorAll('.qd-text')].map((el) => el.textContent);
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).toContain('Your shift is covered.');
+    expect(element.querySelector('[data-gshift-accept]')).toBeNull();
+    const buttons = [...element.querySelectorAll<HTMLButtonElement>('button.btn')];
+    expect(buttons.map((b) => b.textContent)).toEqual(['Continue']);
+    buttons[0].click();
+    expect(interact).not.toHaveBeenCalled();
     expect(element.style.display).not.toBe('block');
   });
 });

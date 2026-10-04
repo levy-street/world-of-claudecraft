@@ -576,12 +576,10 @@ export class GamepadManager {
       !groundAimActive &&
       ((cur[GP.LB] && !this.prevPressed[GP.LB] && cur[GP.Y]) ||
         (cur[GP.Y] && !this.prevPressed[GP.Y] && cur[GP.LB]));
-    if (
-      editChord &&
-      this.crossHotbar &&
-      !this.cb.isTemporaryBarActive?.() &&
-      !this.crossHotbarBindings?.overridden()
-    ) {
+    // Morthen's kit took the bar over mid-arrange: nothing there can be bound.
+    const overridden = this.crossHotbarBindings?.overridden() ?? false;
+    if (overridden) this.releaseCrossHotbarEdit();
+    if (editChord && this.crossHotbar && !this.cb.isTemporaryBarActive?.() && !overridden) {
       chordButton = cur[GP.Y] && !this.prevPressed[GP.Y] ? GP.Y : GP.LB;
       this.toggleCrossHotbarEdit();
     }

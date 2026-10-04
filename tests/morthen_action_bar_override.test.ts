@@ -1,6 +1,9 @@
 // The Graveyard Shift kit rides the NORMAL action bar and the pad's cross
 // hotbar as a possess-bar override: every surface shows and casts it, and the
 // player's own saved layouts never change.
+
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CROSS_HOTBAR_ATTACK_ID, CROSS_HOTBAR_PRIMARY_SET } from '../src/game/cross_hotbar';
 import { CrossHotbarBindings } from '../src/game/cross_hotbar_bindings';
@@ -241,5 +244,23 @@ describe('the cross hotbar under the override', () => {
       type: 'ability',
       id: 'fireball',
     });
+  });
+});
+
+describe('the bar editors under the override', () => {
+  // Every desktop drag, drop and clear and the touch bar editor ask the HUD's one
+  // lock predicate; while the kit stands in, an edit would land on the hidden
+  // saved bar and be refused, so the lock holds them all shut.
+  it("lock every action bar edit gesture while Morthen's kit is shown", () => {
+    const hud = readFileSync(fileURLToPath(new URL('../src/ui/hud.ts', import.meta.url)), 'utf8');
+    const body = hud.match(/private actionBarsLocked\(\): boolean \{([^}]*)\}/)?.[1] ?? '';
+    expect(body).toContain('this.crossHotbarOverride()');
+    expect(body).toContain("settings.get('lockActionBars')");
+    expect(hud).toMatch(
+      /crossHotbarOverride\(\): CrossHotbarLayout \| null \{\s*return morthenCrossHotbarOverride\(this\.sim\.player\);/,
+    );
+    const gestures = [...hud.matchAll(/isActionBarEditAllowed\(([^,]+),/g)].map((m) => m[1]);
+    expect(gestures.length).toBeGreaterThan(4);
+    expect(new Set(gestures)).toEqual(new Set(['this.actionBarsLocked()']));
   });
 });

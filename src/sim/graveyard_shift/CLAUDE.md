@@ -11,19 +11,29 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
 
 ## Contract
 - **Offline only while a prototype.** `canStartGraveyardShift` refuses unless
-  `ctx.cfg.offlineHost` (set only by `src/game/offline_world_config.ts`); the dev
-  entry also needs `ctx.devCommands`. A server would autosave the run's state over
+  `ctx.cfg.offlineHost` (set only by `src/game/offline_world_config.ts`, and the
+  offline world itself is offered in dev builds only: `src/game/offline_mode_gate.ts`,
+  so no production player can reach the grave yet); the dev entry also needs
+  `ctx.devCommands`. A server would autosave the run's state over
   the real character. Lifting this gate is a step of its own (save override, client
-  mirror, a per-viewer grave gate).
+  mirror, a per-viewer grave gate), and so is moving the mode's player-visible
+  strings (grave and Staff Exit labels, Tibbs, hints, say lines) out of
+  `devCommand.graveyardShift.*` into a player namespace with their non-Latin fills:
+  the M16 guard skips `devCommand.` keys, which is only right while the mode is a
+  dev-gated prototype.
 - **Two ways in.** `/dev graveyardshift` (`src/sim/dev/graveyard_shift_dev.ts`,
   dev-channel English with a `[dev]` prefix) and the grave (`grave_entry.ts`, the
   pure leaf the renderer and client share, and `grave_staging.ts`): on the offline
-  host the Weathered Grave by the Hollow Crypt spawns only while the player is
-  eligible (level 10 and Cryptbreaker or the Crypt quest), so an ineligible player
+  host the Glowing Grave by the Hollow Crypt spawns only while the player is
+  eligible (level 15, Cryptbreaker or the Crypt quest, and the shift not yet won: it can be won once), so an ineligible player
   simply has no grave; touching it raises Tibbs <Mob Union Rep> (a dynamic NPC on a
   stable id, his caller and tick on his entity) and emits `graveyardShiftOffer`; the
   client's dialogue sends [Take the shift] as a targeted interact on Tibbs
-  (`acceptGraveyardShiftFromTibbs`; a refusal is one keyed Tibbs line). Tibbs goes
+  (`acceptGraveyardShiftFromTibbs`, honoured only from the player who woke him and
+  re-checking eligibility, so a stale dialog after the win gets his 'covered' line;
+  a refusal is one keyed Tibbs line). His delayed follow-up line belongs to the
+  raise it was queued in (`gshiftSummonedTick`), never to a later one. After a won
+  shift his dialog shows only that closing line. Tibbs goes
   back down when his caller walks off, starts the shift or leaves him idle. A grave
   shift (`run.entry`) ends back in front of the grave with Tibbs' keyed report (win,
   with the hidden `hid_boss_for_a_day` deed on the first one) or consolation (loss),

@@ -7596,7 +7596,7 @@ export class Hud {
   }
 
   private actionBarsLocked(): boolean {
-    return Boolean(this.optionsHooks?.settings.get('lockActionBars'));
+    return !!this.crossHotbarOverride() || !!this.optionsHooks?.settings.get('lockActionBars');
   }
 
   private buildActionBar(): void {

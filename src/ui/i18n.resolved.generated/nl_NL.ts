@@ -240,7 +240,7 @@ export const nl_NL: EnTranslations = {
         "raise": "Raise the Fallen: a body lies near. Every corpse is a colleague. Even theirs.",
         "exit": "Shift over. The Staff Exit behind the throne takes you home."
       },
-      "graveName": "Weathered Grave",
+      "graveName": "Glowing Grave",
       "tibbs": {
         "whisper": "Psst. Down here.",
         "offer": {
@@ -257,6 +257,7 @@ export const nl_NL: EnTranslations = {
           "busy": "Come back when you are not so busy. Union rules.",
           "report": "Shift report! Adventurers sent home: {sent}. Colleagues saved: {saved}. Trousers not handed out: 1.",
           "payout": "Good job and thank you for your help, adventurer. Here's your payout.",
+          "covered": "Your shift is covered. Morthen is back at work, and he says thank you.",
           "consolation": "Do not worry. They kill us every day. Welcome to the job.",
           "anotherShift": "Another shift? They certainly will."
         }

@@ -46,7 +46,7 @@ describe('the grave body', () => {
 
   it('reads its own name', () => {
     setLanguage('en');
-    expect(objectDisplayName(grave)).toBe('Weathered Grave');
+    expect(objectDisplayName(grave)).toBe('Glowing Grave');
   });
 });
 
@@ -90,17 +90,28 @@ describe('Tibbs', () => {
     ).toBe('skel_minion');
   });
 
-  it('pitches the shift in full every time (it can be won once)', () => {
+  it('pitches the shift in full every time before the win', () => {
     setLanguage('en');
     const npc = { kind: 'npc', templateId: TIBBS_NPC_ID } as Entity;
-    const offer = tibbsOfferDialog(npc)!;
+    const offer = tibbsOfferDialog(npc, new Set<string>())!;
     expect(offer.lines).toHaveLength(4);
     expect(offer.lines[0]).toMatch(/^Ah\. You heard me\. Tibbs\./);
     expect(offer.lines[3]).toMatch(/^Simple job\./);
     expect(offer.acceptLabel).toBe('Take the shift');
     expect(offer.declineLabel).toBe('Not today');
-    expect(tibbsOfferDialog({ kind: 'npc', templateId: 'x' } as Entity)).toBeNull();
+    expect(tibbsOfferDialog({ kind: 'npc', templateId: 'x' } as Entity, new Set())).toBeNull();
     expect(tibbsDeclineLine()).toBe('Fair. Nobody reads the job description either.');
+  });
+
+  it('offers nothing once the shift is won: one closing line, no accept button', () => {
+    setLanguage('en');
+    const npc = { kind: 'npc', templateId: TIBBS_NPC_ID } as Entity;
+    const offer = tibbsOfferDialog(npc, new Set(['hid_boss_for_a_day']))!;
+    expect(offer.lines).toEqual([
+      'Your shift is covered. Morthen is back at work, and he says thank you.',
+    ]);
+    expect(offer.acceptLabel).toBeNull();
+    expect(offer.declineLabel).toBe('Continue');
   });
 
   it("his offer event opens the quest dialog on him and stops the HUD's switch", () => {

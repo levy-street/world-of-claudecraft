@@ -274,7 +274,7 @@ export const en = {
       },
       // The way in (src/sim/graveyard_shift/grave_entry.ts, grave_staging.ts):
       // the grave, its whisper, and Tibbs the union rep.
-      graveName: 'Weathered Grave',
+      graveName: 'Glowing Grave',
       tibbs: {
         whisper: 'Psst. Down here.',
         offer: {
@@ -296,6 +296,7 @@ export const en = {
           report:
             'Shift report! Adventurers sent home: {sent}. Colleagues saved: {saved}. Trousers not handed out: 1.',
           payout: "Good job and thank you for your help, adventurer. Here's your payout.",
+          covered: 'Your shift is covered. Morthen is back at work, and he says thank you.',
           consolation: 'Do not worry. They kill us every day. Welcome to the job.',
           anotherShift: 'Another shift? They certainly will.',
         },

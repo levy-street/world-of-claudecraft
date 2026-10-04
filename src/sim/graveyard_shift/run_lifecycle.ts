@@ -30,8 +30,13 @@ import { graveyardShiftRunSeed } from './bot_brain';
 import { updateGraveyardShiftBots } from './bot_driver';
 import { sayGraveyardShiftGiveUp, updateGraveyardShiftSay } from './bot_say';
 import { partyGivesUp, partyWiped, updateGraveyardShiftCorpseRuns } from './corpse_run';
-import { GRAVEYARD_SHIFT_MIN_LEVEL } from './grave_entry';
-import { endShiftAtGrave, tibbsSay, updateGraveyardShiftGrave } from './grave_staging';
+import { GRAVEYARD_SHIFT_MIN_LEVEL, TIBBS_ENTITY_ID } from './grave_entry';
+import {
+  endShiftAtGrave,
+  graveyardShiftEligibleFor,
+  tibbsSay,
+  updateGraveyardShiftGrave,
+} from './grave_staging';
 import { applyMorthenIdentity, removeMorthenIdentity } from './morthen_transform';
 import { graveyardShiftOutroEnd, startLossOutro, startWonOutro } from './outro';
 import {
@@ -154,12 +159,18 @@ export function startGraveyardShift(
 // The targeted interact on Tibbs: the player took the shift. A refusal (a
 // party, a fight, a queue) is one Tibbs line rather than a dev message.
 export function acceptGraveyardShiftFromTibbs(ctx: SimContext, pid: number): void {
+  // Only the player who woke him holds his offer.
+  if (ctx.entities.get(TIBBS_ENTITY_ID)?.gshiftSummonerPid !== pid) return;
+  // Won once is won: Tibbs is still up for his report, but the shift is closed.
+  if (!graveyardShiftEligibleFor(ctx, pid)) {
+    tibbsSay(ctx, pid, 'covered');
+    return;
+  }
   if (canStartGraveyardShift(ctx, pid, 'grave') !== null) {
     tibbsSay(ctx, pid, 'busy');
     return;
   }
-  tibbsSay(ctx, pid, 'accept');
-  if (startGraveyardShift(ctx, pid, 'grave') !== null) tibbsSay(ctx, pid, 'busy');
+  tibbsSay(ctx, pid, startGraveyardShift(ctx, pid, 'grave') === null ? 'accept' : 'busy');
 }
 
 // Hands the real character back and frees the slot. Inside the claim the owner
@@ -196,7 +207,13 @@ export function endGraveyardShift(
     if (instanceClaimHolds(run.slot, p.pos)) leaveDungeon(ctx, run.ownerPid);
     if (run.petStowed) restorePetFromDelveStash(ctx, run.ownerPid);
     if (!died) ctx.emit({ type: 'respawn', pid: run.ownerPid });
-    ctx.emit({ type: 'log', text: `[dev] Graveyard Shift ended (${outcome}).`, pid: run.ownerPid });
+    if (run.entry === 'dev') {
+      ctx.emit({
+        type: 'log',
+        text: `[dev] Graveyard Shift ended (${outcome}).`,
+        pid: run.ownerPid,
+      });
+    }
   }
   releaseGraveyardShiftSlot(ctx, run.slot, run.key);
   if (run.entry === 'grave') endShiftAtGrave(ctx, run, outcome, report);

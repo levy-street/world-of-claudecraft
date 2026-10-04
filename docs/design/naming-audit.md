@@ -721,6 +721,24 @@ Exact-phrase and coined-token searches against the major game wikis.
 | Cocoon / Cocooned | Vysska's cast and the wrapped player's stun | KEEP. Single common English words. |
 | Draining Silk | her feeding's damage line | KEEP. No match. |
 
+### Graveyard Shift (web-verified 2026-10-04)
+
+Exact-phrase and coined-token searches against the major game wikis.
+
+| Name | Where | Verdict |
+|---|---|---|
+| Weathered Grave | REJECTED before shipping | The classic Duskwood grave that starts "The Weathered Grave" quest in World of Warcraft: the same words on the same kind of object (a grave that opens a story). Generic English, but too close in this game's genre. |
+| Glowing Grave | the grave by the Hollow Crypt | KEEP. No match as a game object or quest; plain descriptive English (the grave glows for an eligible player only). |
+| Tibbs | the union rep NPC | KEEP. A common English surname; no game character of note. |
+| Mob Union Rep | Tibbs' title | KEEP. No match. |
+| Staff Exit | the won shift's portal | KEEP. No match in any game; plain English for a service door. |
+| Boss for a Day | the hidden deed | KEEP. A common English idiom. One match, a small itch.io party game of that title: a game name, not a deed or achievement, and the phrase is everyday speech. |
+| Bulwarkbro, Mendolyn, Pyrotechnic, Arrowsmith, Stabbyjoe | the adventurer bots | KEEP. Joke coinages and common words. "Arrowsmith" is a real surname and an English trade word (Hearthstone's two-word "Arrow Smith" card shares only that); no match for the other coinages. |
+| Sexton's Chain | Morthen's pull | KEEP. No match. |
+| Shadow Pulse | Morthen's blast | KEEP. Plain descriptive English used across many games, distinctive to none. |
+| Raise the Fallen | Morthen's corpse raise | KEEP. No exact match as an ability; near forms ("Revive the Fallen" in Pillars of Eternity 2, "Rise of the Fallen" in The Elder Scrolls Online) share only common words. |
+| Dread | Morthen's resource | KEEP. A single common English word. |
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

@@ -1077,6 +1077,7 @@ export type TranslationKeyFlat =
   | 'devCommand.graveyardShift.tibbs.say.anotherShift'
   | 'devCommand.graveyardShift.tibbs.say.busy'
   | 'devCommand.graveyardShift.tibbs.say.consolation'
+  | 'devCommand.graveyardShift.tibbs.say.covered'
   | 'devCommand.graveyardShift.tibbs.say.decline'
   | 'devCommand.graveyardShift.tibbs.say.payout'
   | 'devCommand.graveyardShift.tibbs.say.report'

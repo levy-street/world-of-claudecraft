@@ -10,7 +10,9 @@ import type { Vec3 } from '../types';
 // Crypt's door (80, 90) (owner's pick).
 export const GRAVE_ITEM_ID = 'gshift_grave';
 export const GRAVE_POS = { x: 84, z: 111 } as const;
-// Stable ids, clear of the sequential roster and of every other stable band.
+// Stable ids, clear of the sequential roster and of every other stable band:
+// inside the stable ground-object range (types.ts), above the Farshore band
+// (2_147_100_xxx). Both are dropped and re-added with the same id on purpose.
 export const GRAVE_ENTITY_ID = 2_147_200_001;
 export const TIBBS_ENTITY_ID = 2_147_200_002;
 export const TIBBS_NPC_ID = 'tibbs';

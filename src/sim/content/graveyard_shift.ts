@@ -3,15 +3,18 @@
 // on demand, so he is `dynamic`: the Sim ctor never surface-places him). Names
 // IP-checked with the concept (Tibbs, Mob Union Rep: clear).
 
-import { GRAVE_POS, TIBBS_NPC_ID, TIBBS_OFFSET } from '../graveyard_shift/grave_entry';
+import { TIBBS_NPC_ID } from '../graveyard_shift/grave_entry';
 import type { NpcDef } from '../types';
 
 export const TIBBS_NPC_DEF: NpcDef = {
   id: TIBBS_NPC_ID,
   name: 'Tibbs',
   title: 'Mob Union Rep',
-  // Where he stands when he is up, beside his grave.
-  pos: { x: GRAVE_POS.x + TIBBS_OFFSET.x, z: GRAVE_POS.z + TIBBS_OFFSET.z },
+  // Placeholder, the Spirit Healer's own: never surface-placed (dynamic), he
+  // rises beside his grave (grave_entry.ts tibbsSpot). Shared with that
+  // placeholder so the NPC-spot readers (the furniture collider veto, the map
+  // and wiki tooling) see no new point near the secret grave.
+  pos: { x: 0, z: 0 },
   facing: Math.PI,
   // Old bone, a little yellowed.
   color: 0xd8cfb4,

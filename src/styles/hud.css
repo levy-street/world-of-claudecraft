@@ -169,6 +169,8 @@
     background: var(--color-gshift-fade);
     opacity: 0;
     pointer-events: none;
+    /* A fade to black stays black under a light high-contrast theme. */
+    forced-color-adjust: none;
   }
   .vehicle-bar.shadow-action-bar {
     grid-template-columns: 1fr;

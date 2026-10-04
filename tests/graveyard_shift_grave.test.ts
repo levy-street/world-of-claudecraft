@@ -18,7 +18,11 @@ import {
   tibbsSpot,
 } from '../src/sim/graveyard_shift/grave_entry';
 import { TIBBS_FOLLOW_UP_SECONDS } from '../src/sim/graveyard_shift/grave_staging';
-import { startGraveyardShift } from '../src/sim/graveyard_shift/run_lifecycle';
+import {
+  acceptGraveyardShiftFromTibbs,
+  endGraveyardShift,
+  startGraveyardShift,
+} from '../src/sim/graveyard_shift/run_lifecycle';
 import { LOSS_OUTRO_TICKS } from '../src/sim/graveyard_shift/shift_end_marks';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
@@ -284,6 +288,11 @@ describe('the end of a grave shift', () => {
     // Five adventurers, each killed twice.
     expect(report.textValues).toEqual({ sent: 10, saved });
     expect(meta.deedsEarned.has(BOSS_FOR_A_DAY_DEED_ID)).toBe(true);
+    // The dev channel's end line is for /dev shifts only.
+    const logs = events
+      .filter((ev) => ev.type === 'log')
+      .map((ev) => (ev as { text: string }).text);
+    expect(logs.some((text) => text.startsWith('[dev]'))).toBe(false);
   });
 
   it('after the win the grave sinks once Tibbs goes down, and never comes back', () => {
@@ -301,6 +310,19 @@ describe('the end of a grave shift', () => {
     const events = sim.tick();
     expect(sim.entities.has(TIBBS_ENTITY_ID)).toBe(false);
     expect(events.some((ev) => ev.type === 'graveyardShiftOffer')).toBe(false);
+  });
+
+  it('a second shift is refused after the win: Tibbs says it is covered and starts nothing', () => {
+    const sim = graveSim();
+    takeShift(sim);
+    winShift(sim);
+    // Tibbs still stands for his report; [Take the shift] from a stale dialog.
+    expect(sim.entities.has(TIBBS_ENTITY_ID)).toBe(true);
+    sim.targetEntity(TIBBS_ENTITY_ID);
+    sim.interact();
+    const events = sim.tick();
+    expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).toBeNull();
+    expect(tibbsLines(events)).toEqual(['covered']);
   });
 
   it('a loss sets the owner down at the grave with a consolation and no deed', () => {
@@ -323,6 +345,58 @@ describe('the end of a grave shift', () => {
     const followUp = ticks(sim, TIBBS_FOLLOW_UP_SECONDS * TICK_RATE + 2);
     expect(tibbsLines(followUp)).toEqual(['anotherShift']);
     expect(meta0(sim).deedsEarned.has(BOSS_FOR_A_DAY_DEED_ID)).toBe(false);
+  });
+
+  it('lands settled at the grave: no fall carried over from the Crypt', () => {
+    const sim = graveSim();
+    takeShift(sim);
+    const p = sim.player;
+    p.onGround = false;
+    p.jumping = true;
+    p.vy = -12;
+    p.fallStartY = p.pos.y + 40;
+    endGraveyardShift(sim.ctx, graveyardShiftRunFor(sim.ctx, sim.playerId)!, 'aborted');
+    expect(atGrave(sim)).toBe(true);
+    expect(p.vy).toBe(0);
+    expect(p.jumping).toBe(false);
+    expect(p.onGround).toBe(true);
+    expect(p.fallStartY).toBe(p.pos.y);
+  });
+
+  it("drops a queued follow-up line when Tibbs went down and rose again (it was the old scene's)", () => {
+    const sim = graveSim();
+    takeShift(sim);
+    (sim as any).dealDamage(
+      null,
+      sim.player,
+      sim.player.maxHp + 50,
+      false,
+      'physical',
+      null,
+      'hit',
+      true,
+    );
+    ticks(sim, LOSS_OUTRO_TICKS + 2);
+    // Walk off (he goes down), come straight back and wake him for a fresh offer.
+    place(sim, sim.player, GRAVE_POS.x, GRAVE_POS.z - TIBBS_LEAVE_RADIUS - 5);
+    sim.tick();
+    expect(sim.entities.has(TIBBS_ENTITY_ID)).toBe(false);
+    const spot = graveReturnSpot();
+    place(sim, sim.player, spot.x, spot.z);
+    sim.pickUpObject(GRAVE_ENTITY_ID);
+    const events = ticks(sim, TIBBS_FOLLOW_UP_SECONDS * TICK_RATE + 2);
+    expect(sim.entities.has(TIBBS_ENTITY_ID)).toBe(true);
+    expect(tibbsLines(events)).not.toContain('anotherShift');
+  });
+
+  it('holds his offer for the player who woke him only', () => {
+    const sim = graveSim();
+    wakeTibbs(sim);
+    const other = sim.addPlayer('mage', 'Passerby');
+    acceptGraveyardShiftFromTibbs(sim.ctx, other);
+    const events = sim.tick();
+    expect(graveyardShiftRunFor(sim.ctx, other)).toBeNull();
+    expect(tibbsLines(events)).toEqual([]);
   });
 
   it('an aborted grave shift sets the owner down at the grave and Tibbs says nothing', () => {

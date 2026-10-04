@@ -25,6 +25,7 @@ await writeFile(
   sourcePath,
   `
 import { ABILITIES, CLASSES, DUNGEON_LIST, ITEMS, MOBS, NPCS, QUEST_ORDER, QUESTS, ZONES } from '../../src/sim/data';
+import { TIBBS_NPC_ID } from '../../src/sim/graveyard_shift/grave_entry';
 
 const css = ${JSON.stringify(css)};
 const pages = [];
@@ -102,7 +103,9 @@ for (const [id, cls] of Object.entries(CLASSES)) titleBy.class.set(id, unique(cl
 for (const [id, ability] of visibleAbilities) titleBy.ability.set(id, unique(ability.name + ' (Ability)', usedTitles));
 for (const zone of ZONES) titleBy.zone.set(zone.id, unique(zone.name, usedTitles));
 for (const dungeon of DUNGEON_LIST) titleBy.dungeon.set(dungeon.id, unique(dungeon.name, usedTitles));
-for (const [id, npc] of Object.entries(NPCS)) titleBy.npc.set(id, unique(npc.name + ' (NPC)', usedTitles));
+// Tibbs (the Graveyard Shift's union rep) is a secret: no page, no link.
+const publicNpcs = Object.entries(NPCS).filter(([id]) => id !== TIBBS_NPC_ID);
+for (const [id, npc] of publicNpcs) titleBy.npc.set(id, unique(npc.name + ' (NPC)', usedTitles));
 for (const [id, quest] of Object.entries(QUESTS)) titleBy.quest.set(id, unique(quest.name, usedTitles));
 for (const [id, mob] of Object.entries(MOBS)) titleBy.mob.set(id, unique(mob.name + ' (Mob)', usedTitles));
 for (const [id, item] of Object.entries(ITEMS)) titleBy.item.set(id, unique(item.name, usedTitles));
@@ -215,7 +218,7 @@ const portals = [
   ['Zones', ZONES.map((z) => titleBy.zone.get(z.id))],
   ['Classes', Object.keys(CLASSES).map((id) => titleBy.class.get(id))],
   ['Dungeons', DUNGEON_LIST.map((d) => titleBy.dungeon.get(d.id))],
-  ['NPCs', Object.keys(NPCS).map((id) => titleBy.npc.get(id))],
+  ['NPCs', publicNpcs.map(([id]) => titleBy.npc.get(id))],
   ['Quests', QUEST_ORDER.map((id) => titleBy.quest.get(id)).filter(Boolean)],
   ['Mobs', Object.keys(MOBS).map((id) => titleBy.mob.get(id))],
   ['Items', Object.keys(ITEMS).map((id) => titleBy.item.get(id))],
@@ -227,7 +230,7 @@ for (const [portal, titles] of portals) {
 }
 
 for (const zone of ZONES) {
-  const npcs = Object.entries(NPCS).filter(([, npc]) => npc.pos.z >= zone.zMin && npc.pos.z < zone.zMax).map(([id]) => titleBy.npc.get(id));
+  const npcs = publicNpcs.filter(([, npc]) => npc.pos.z >= zone.zMin && npc.pos.z < zone.zMax).map(([id]) => titleBy.npc.get(id));
   const quests = Object.keys(QUESTS).filter((id) => zoneForQuest(id) === zone.name).map((id) => titleBy.quest.get(id));
   add(titleBy.zone.get(zone.id), section('Overview', zone.welcome) + section('Facts', table([
     ['Level range', zone.levelRange[0] + '-' + zone.levelRange[1]], ['Hub', zone.hub.name], ['Biome', zone.biome], ['Graveyard', zone.graveyard.x + ', ' + zone.graveyard.z],
@@ -248,7 +251,7 @@ for (const dungeon of DUNGEON_LIST) {
   ])) + section('Bosses', bullets(bosses.map((mob) => link(titleBy.mob.get(mob.id), mob.name)))) + section('Spawn list', bullets(dungeon.spawns.map((spawn) => link(titleBy.mob.get(spawn.mobId), MOBS[spawn.mobId]?.name ?? spawn.mobId) + ' at ' + spawn.x + ', ' + spawn.z))), ['Dungeons']);
 }
 
-for (const [id, npc] of Object.entries(NPCS)) {
+for (const [id, npc] of publicNpcs) {
   add(titleBy.npc.get(id), section('Greeting', npc.greeting) + section('Facts', table([
     ['Title', npc.title ?? 'NPC'], ['Position', npc.pos.x + ', ' + npc.pos.z], ['Quest count', String(npc.questIds?.length ?? 0)], ['Vendor', npc.vendorItems?.length ? 'Yes' : npc.market ? 'World Market' : 'No'],
   ])) + (npc.questIds?.length ? section('Quests', bullets(npc.questIds.map((qid) => link(titleBy.quest.get(qid), QUESTS[qid]?.name ?? qid)))) : '') + (npc.vendorItems?.length ? section('Vendor stock', bullets(npc.vendorItems.map((itemId) => link(titleBy.item.get(itemId), ITEMS[itemId]?.name ?? itemId)))) : ''), ['NPCs']);

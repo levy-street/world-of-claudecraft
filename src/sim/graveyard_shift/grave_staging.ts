@@ -12,6 +12,7 @@ import { grantDeed } from '../deeds';
 import { createGroundObject, createNpc } from '../entity';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
+import { settleTeleportArrival } from '../teleport_arrival';
 import { dist2d, type Entity, TICK_RATE } from '../types';
 import {
   BOSS_FOR_A_DAY_DEED_ID,
@@ -30,7 +31,7 @@ import {
 } from './grave_entry';
 import type { GraveyardShiftOutcome, GraveyardShiftRun } from './run_state';
 
-const GRAVE_NAME = 'Weathered Grave';
+const GRAVE_NAME = 'Glowing Grave';
 const SAY_KEY = 'devCommand.graveyardShift.tibbs.say';
 // Tibbs' second line after a shift follows the first by this long.
 export const TIBBS_FOLLOW_UP_SECONDS = 4;
@@ -42,6 +43,7 @@ const TIBBS_LINES = {
   report:
     'Shift report! Adventurers sent home: {sent}. Colleagues saved: {saved}. Trousers not handed out: 1.',
   payout: "Good job and thank you for your help, adventurer. Here's your payout.",
+  covered: 'Your shift is covered. Morthen is back at work, and he says thank you.',
   consolation: 'Do not worry. They kill us every day. Welcome to the job.',
   anotherShift: 'Another shift? They certainly will.',
 } as const;
@@ -64,6 +66,13 @@ function eligibleMeta(ctx: SimContext, meta: PlayerMeta): boolean {
 function anyEligible(ctx: SimContext): boolean {
   for (const meta of ctx.players.values()) if (eligibleMeta(ctx, meta)) return true;
   return false;
+}
+
+/** Whether this player may take the shift from Tibbs (the same rule as the
+ *  grave: a won shift closes it, though Tibbs stays up a while for his report). */
+export function graveyardShiftEligibleFor(ctx: SimContext, pid: number): boolean {
+  const meta = ctx.players.get(pid);
+  return !!meta && eligibleMeta(ctx, meta);
 }
 
 /** The grave stands while an offline player is eligible, and sinks back once
@@ -111,12 +120,14 @@ export function tibbsSay(
   };
   if (delaySeconds <= 0) ctx.emit(event);
   // A follow-up line waits its turn (the first bubble stays readable), and is
-  // dropped if Tibbs went back down meanwhile.
+  // dropped if Tibbs went back down meanwhile, even if he has risen again since
+  // (same stable id): the line belongs to the scene it was queued in.
   else {
+    const raisedAt = tibbs.gshiftSummonedTick;
     ctx.delayedEvents.push({
       at: ctx.time + delaySeconds,
       event,
-      guard: () => ctx.entities.has(TIBBS_ENTITY_ID),
+      guard: () => ctx.entities.get(TIBBS_ENTITY_ID)?.gshiftSummonedTick === raisedAt,
     });
   }
 }
@@ -200,6 +211,7 @@ export function endShiftAtGrave(
   ctx.rebucket(p);
   p.facing = Math.atan2(GRAVE_POS.x - spot.x, GRAVE_POS.z - spot.z);
   p.prevFacing = p.facing;
+  settleTeleportArrival(p);
   if (outcome === 'aborted') return;
   if (!raiseTibbs(ctx, p)) return;
   if (outcome === 'won') {
