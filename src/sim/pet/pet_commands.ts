@@ -1,4 +1,5 @@
 import { gliderActionsLocked } from '../glider_action_lock';
+import { hasMorthenIdentity } from '../graveyard_shift/morthen_identity';
 import { shadowActionsLocked } from '../shadow_action_lock';
 // Pet commands & lifecycle (P1b), extracted from the Sim monolith.
 //
@@ -111,6 +112,7 @@ function petCommandBlockedByControl(ctx: SimContext, owner: Entity): boolean {
   )
     return true;
   if (ctx.players.get(owner.id)?.vehicle) return true;
+  if (hasMorthenIdentity(owner)) return true;
   if (!hasUnbreakableMovementLock(owner)) return false;
   ctx.error(owner.id, 'You are stunned.');
   return true;

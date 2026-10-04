@@ -6,6 +6,8 @@
 
 import type { HarborRouteMarkerDestination } from '../sim/content/harbor_route_markers';
 import { IGNIVAR_LORE_OBJECTS } from '../sim/content/ignivar_raid_lore';
+import { isGraveyardShiftGrave } from '../sim/graveyard_shift/grave_entry';
+import { isGraveyardShiftStaffExit } from '../sim/graveyard_shift/shift_end_marks';
 import { type Entity, REALM_BUILDER_MONUMENT_TEMPLATE_ID } from '../sim/types';
 import { investigationObjectLabel } from '../ui/entity_display_core';
 import { dungeonDisplayName, poiMarkLabel, tEntity, zoneDisplayName } from '../ui/entity_i18n';
@@ -92,6 +94,8 @@ export function objectDisplayName(entity: Entity): string {
   if (entity.templateId === 'delve_bell_rope' || entity.templateId === 'delve_bell_rope_pulled') {
     return t('delveUi.object.bell_rope');
   }
+  if (isGraveyardShiftStaffExit(entity)) return t('graveyardShift.staffExit');
+  if (isGraveyardShiftGrave(entity)) return t('graveyardShift.graveName');
   if (
     (entity.templateId === 'dungeon_door' || entity.templateId === 'dungeon_exit') &&
     entity.dungeonId

@@ -59,6 +59,7 @@ import {
 } from '../hoard_boss_gestures_core';
 import type { LocoGaitThresholds } from '../locomotion';
 import { VARKHUL_FORGING_STRIKE_TIMESCALE } from '../varkhul_forge_hammer';
+import { identityBodyTemplateFor } from './identity_body_core';
 import { NPC_PROP_SET_IDS, type NpcPropSet } from './npc_looks';
 
 export interface EmoteClipSpec {
@@ -4767,6 +4768,9 @@ const FAMILY_KEYS: Record<string, string> = {
 };
 
 const NPC_KEYS: Record<string, string> = {
+  // Tibbs, the Graveyard Shift's union rep: a friendly skeleton who climbs out of
+  // his grave (npc_looks.ts keepsFixedRig keeps him off the composed bodies).
+  tibbs: 'skel_minion',
   infiltrator_captain: 'npc_knight',
   infiltrator_nella: 'npc_knight',
   infiltrator_orin: 'npc_knight',
@@ -4827,17 +4831,23 @@ const NPC_KEYS: Record<string, string> = {
   huntsman_deral: 'npc_scout',
 };
 
+function mobVisualKey(templateId: string): string {
+  const override = MOB_KEYS[templateId];
+  if (override) return override;
+  const family = MOBS[templateId]?.family;
+  return (family && FAMILY_KEYS[family]) || 'mob_bandit';
+}
+
 export function visualKeyFor(e: Entity): string {
   if (e.kind === 'player') {
+    // A borrowed creature identity (the Graveyard Shift's Morthen) is a whole
+    // replacement body, so it wins over the mech and the class rig.
+    const body = identityBodyTemplateFor(e);
+    if (body) return mobVisualKey(body);
     if (isMechWearer(e)) return 'player_mech';
     return VISUALS[`player_${e.templateId}`] ? `player_${e.templateId}` : 'player_warrior';
   }
-  if (e.kind === 'mob') {
-    const override = MOB_KEYS[e.templateId];
-    if (override) return override;
-    const family = MOBS[e.templateId]?.family;
-    return (family && FAMILY_KEYS[family]) || 'mob_bandit';
-  }
+  if (e.kind === 'mob') return mobVisualKey(e.templateId);
   // npcs — Brother Aldric recurs in every hub under suffixed ids
   if (e.templateId.startsWith('brother_aldric')) return 'npc_aldric';
   return NPC_KEYS[e.templateId] ?? 'npc_villager';

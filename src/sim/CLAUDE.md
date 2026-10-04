@@ -126,6 +126,7 @@ plausibly covers means the table needs a new row in the same change.
 | `rift/` | the procedural Rift subsystem: `runs.ts` (run lifecycle: enter/descend/exit, floor gates, level-20 gate, Heroic Mark rewards) + `portals.ts` (the ranked C/B/A/S world-portal scheduler), `rift_gen.ts` (the pure deterministic floor generator every host calls identically) + `authored.ts` (hand-authored room-graph floors; one wall-derivation source for collision and render) + `style.ts` (the theme-to-`InteriorStyle` leaf the generator and the authored floors share), `ranks.ts` (the ONE place baseLevel becomes rank-driven difficulty; every consumer derives the same rank), `progression.ts` (rift gear + deterministic forge ops; per-copy state on `ItemInstancePayload`, static defs stay the combat-safe shell), `persistence.ts` (versioned shared-event projection; runtime instance slots deliberately not saved), `race.ts` (the atomic first-clear claim on a shared `RiftEvent`), `loot_pools.ts` (rank loot pools reuse the tier's existing tables), `upgrade.ts` + `upgrader_draft.ts` (data-only Dungeon Upgrader artifacts, local draft as the AI-service fallback), `entry_clearance.ts` (the interior half of never-aggro-on-entry for GENERATED floors), `rift_lockpick.ts` (the giga-boss cache on the shared `lockpick.ts` engine + the delve lockpick wire). Content side: `content/rift/`; design: `docs/design/rift-portals.md` |
 | `instances/difficulty.ts` + `instances/heroic_vendor.ts` | heroic dungeons: tuning + `dungeonDifficulty`/`setDungeonDifficulty`, `awardHeroicMarks` and kill lockouts; the Heroic Quartermaster marks vendor |
 | `delves/runs.ts` | delve run lifecycle (`updateDelveRuns`, modules, rewards, shop) |
+| `graveyard_shift/` (`index.ts` barrel) | the Graveyard Shift side adventure (play Morthen against adventurer bots), on every host (offline and the server): the grave and Tibbs way in plus a `/dev` entry, the Morthen identity on the real bars, the bot party, the outros; private Crypt slot claim, arena-pools parenthesis, one teardown for every exit, no shared rng drawn by the module itself; see its `CLAUDE.md` |
 | `delves/lockpick_controller.ts` | the lockpick session machine |
 | `delves/companion.ts` | `updateDelveCompanion` |
 | `delves/drowned_litany_boss.ts` / `_rite.ts` / `_rooms.ts` | The Drowned Litany delve: room puzzles, the Sister Nhalia boss, the Rite finale (difficulty knobs in `delves/rite_tuning.ts`, shared with the HUD popup) |
@@ -204,9 +205,10 @@ those rather than a roster here. The ones whose CONTRACT you cannot infer from t
   `readyArenaFighter`'s `clearPrep` arm and by a Fiesta down, and reached from every
   `readyArenaFighter(..., { clearPrep: true })` site and every call of its
   `resetForArena` wrapper, so every instanced match's seat and end wipes: arena,
-  Fiesta, Protect Yumi, Thornhollow Fields (the Vale Cup's seat and teardown were
-  the fifth until it retired with release/v0.41.0); the three caller sets are
-  pinned in `tests/resurrection.test.ts`).
+  Fiesta, Protect Yumi, Thornhollow Fields, plus the Graveyard Shift run's seat
+  and teardown (the Vale Cup's seat and teardown were a fifth mode until it
+  retired with release/v0.41.0); the three caller sets are pinned in
+  `tests/resurrection.test.ts`).
 - `ride_height.ts`: the waterline ride height slope gating reads for wading and
   swimming bodies (gating on the RAW lakebed height reads an uneven bed as a wall of
   cliffs and sticks waders in shore pockets).

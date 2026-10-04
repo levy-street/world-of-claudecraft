@@ -364,7 +364,6 @@ import {
   setFoliageShadowVolume,
 } from './foliage';
 import { activeFarFieldPolicy } from './foliage_impostor';
-import { updateForgeSpeech } from './forge_speech';
 import { roundMs, summarizeMs } from './frame_ms_stats_core';
 import { type FramePresentHost, presentFrame } from './frame_present';
 import {
@@ -643,7 +642,7 @@ import {
   syncQuestCaravanView,
 } from './quest_entity_presentation';
 import { makeQuestObjectGate, type QuestObjectGateOptions } from './quest_object_gate_core';
-import { buildGroundQuestObject, farshoreSalvagePrewarmPlan } from './quest_objects';
+import { buildGroundQuestObject, farshoreSalvagePrewarmPlan, lootGlint } from './quest_objects';
 import {
   disposeRaidEncounterVisuals,
   raidEncounterBypassesCharacterCulling,
@@ -854,6 +853,7 @@ import { createRendererWebGL, type WebGLPowerPreference } from './webgl_context_
 import { buildWorldAmbientSources, footstepSurfaceAt } from './world_audio';
 import { WorldGuidance } from './world_guidance';
 import { syncWorldQuestCarryView, type WorldQuestCarryViewState } from './world_quest_carry_visual';
+import { updateWorldSpeech } from './world_speech';
 import { surfaceDetailPrewarmTextures } from './worn_stone';
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
 import { YumiTeamMarkers } from './yumi_team_markers';
@@ -7981,7 +7981,7 @@ export class Renderer {
       height = result.object.height;
       if (result.reused) body.rotation.y = groundQuestObjectYaw(e.objectItemId ?? '', e.id);
       objectMesh = body;
-      if (!e.objectItemId?.startsWith('forge_')) {
+      if (lootGlint(e.objectItemId)) {
         if (!this.sparkleMat) {
           this.sparkleMat = markSharedMaterial(
             new THREE.SpriteMaterial({
@@ -12393,7 +12393,7 @@ export class Renderer {
   }
 
   private updateChatBubbles(): void {
-    updateForgeSpeech(this.sim, this);
+    updateWorldSpeech(this.sim, this);
     if (this.chatBubbles.size === 0) return;
     const { width: w, height: h } = this.viewport;
     const now = performance.now();

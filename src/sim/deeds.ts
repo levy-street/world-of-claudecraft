@@ -33,6 +33,8 @@ import { GATHERING_PROFESSION_IDS } from './content/professions';
 import { pointsSpent } from './content/talents';
 import { ITEMS, MOBS, zoneAt } from './data';
 import { canWearDevBadgeTitle, devBadgeTitleTier } from './dev_badge_titles';
+import { hasMorthenIdentity } from './graveyard_shift/morthen_identity';
+import { isGraveyardShiftBotPid } from './graveyard_shift/run_state';
 import { LAUNCH_PAPERDOLL_SLOTS } from './launch_paperdoll_slots';
 import {
   accountReliquaryOwnership,
@@ -1296,6 +1298,12 @@ export function updateDeeds(ctx: SimContext): void {
     // Entity.level UP for a low-level player and must never satisfy level
     // deeds; the restore site re-marks the player dirty on bout exit.
     if (meta.fiestaRestore) continue;
+    // A Graveyard Shift run pins the owner at Morthen's level the same way. Keyed
+    // on the run, not the aura: a death or clean slate can shed the aura a tick
+    // before the teardown hands the real level back.
+    if (ctx.graveyardShiftRuns.has(pid)) continue;
+    // Nor do its adventurer bots earn deeds (client-less, removed at the end).
+    if (ctx.graveyardShiftRuns.size > 0 && isGraveyardShiftBotPid(ctx, pid)) continue;
     evaluateDeedsKeyed(ctx, meta, e, keySnapshots[i]);
     // Grants re-mark the player dirty (manual-site semantics); the in-pass
     // fixpoint already resolved everything, so drop the redundant mark.
@@ -1576,6 +1584,7 @@ export function onDamageDealtForDeeds(
   crit: boolean,
   kind: DamageEventKind,
 ): void {
+  if (hasMorthenIdentity(source)) return;
   if (source.kind === 'player' && source.id !== target.id) {
     const meta = ctx.players.get(source.id);
     if (meta) {
@@ -1775,6 +1784,8 @@ export function onMobKillCreditForDeeds(
   credited: PlayerMeta,
   eligible: PlayerMeta[],
 ): void {
+  // Morthen's kills are not the real character's deeds (Graveyard Shift).
+  if (hasMorthenIdentity(ctx.entities.get(credited.entityId))) return;
   const tmpl = MOBS[mob.templateId];
   // A shared kill credits XP, quest progress, and loot to every eligible
   // party member (damage.ts), not just the tapper: the lifetime kills

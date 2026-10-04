@@ -1,4 +1,5 @@
 import { buildBenisonPrayer, consumeBenisonPrayers } from './priest/benison_dawnweave';
+
 // Effect dispatch (C4b): the per-effect switch that fans a RESOLVED ability's
 // `effects[]` into damage, auras, CC, threat, combo, pets, healing, ground-AoE,
 // charge, and stat-recalc. Lifted verbatim out of the 17.5k-line `Sim` monolith
@@ -27,6 +28,7 @@ import { dawnreaverDamageMultiplier } from '../dawnreaver_damage';
 import { logCascadeCast, recordCascadeInitial } from '../dev/cascade_playtest';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
+import { raiseTheFallen } from '../graveyard_shift/kit_effects';
 import { incapacitateDrCategory } from '../incapacitate_dr';
 import { SCRIPTED_INTERRUPTIBLE_CHANNELS } from '../mob/healer_channel';
 import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
@@ -1666,6 +1668,9 @@ export function runEffects(
         });
         break;
       }
+      case 'gshiftRaiseFallen':
+        raiseTheFallen(ctx, p, eff.radius, eff.duration);
+        break;
       case 'interrupt': {
         // Non-spell casts (fishing/gather) are interrupt-immune. The Demon
         // Heal channel is deliberately NOT folded in: it stays interruptible.

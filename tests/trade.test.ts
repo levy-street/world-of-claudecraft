@@ -9,6 +9,7 @@ import { join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import * as bagsMod from '../src/sim/bags';
 import { ITEMS } from '../src/sim/data';
+import { GraveyardShiftBook } from '../src/sim/graveyard_shift/run_state';
 import type { MaterialComposition } from '../src/sim/material_sources';
 import * as questCredit from '../src/sim/quests/quest_credit';
 import type { SimContext } from '../src/sim/sim_context';
@@ -73,6 +74,7 @@ function makeTradeCtx() {
       bag(pid!).set(itemId, Math.max(0, (bag(pid!).get(itemId) ?? 0) - count)),
     removeFungibleItem: (itemId: string, count: number, pid?: number) =>
       bag(pid!).set(itemId, Math.max(0, (bag(pid!).get(itemId) ?? 0) - count)),
+    graveyardShiftRuns: new GraveyardShiftBook(),
   } as unknown as SimContext;
   function addPlayer(pid: number, name: string, x: number, copper: number) {
     // inventory/bags are the real PlayerMeta fields the capacity gate reads at
@@ -319,6 +321,7 @@ describe('trade module (direct, no Sim)', () => {
         }
         return removed;
       },
+      graveyardShiftRuns: new GraveyardShiftBook(),
     } as unknown as SimContext;
     return { ctx, players, events };
   }

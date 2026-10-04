@@ -248,6 +248,13 @@ const UI_PURE_CORES = [
   'src/ui/hud/vehicle/glider_action_bar_view.ts',
   'src/ui/hud/vehicle/cannon_feedback_core.ts',
   'src/ui/hud/vehicle/cannon_tactics_view.ts',
+  // The Graveyard Shift hint line, and the kit's display text and borrowed icons.
+  'src/ui/hud/vehicle/morthen_hint_view.ts',
+  'src/ui/hud/vehicle/morthen_fade_view.ts',
+  'src/ui/hud/quest/tibbs_offer_view.ts',
+  'src/ui/hud/action_bar/action_bar_override_core.ts',
+  'src/ui/graveyard_shift_text_core.ts',
+  'src/ui/graveyard_shift_icons_core.ts',
   'src/ui/map_entity_disclosure_core.ts',
   'src/ui/map_navigation_landmarks_core.ts',
   'src/ui/map_marker_profile_core.ts',
@@ -793,6 +800,10 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
   'src/render/action_cam_core.ts',
+  // The Graveyard Shift grave: no loot glint, and its once-per-session whisper.
+  'src/render/ground_object_glint_core.ts',
+  'src/render/grave_whisper_core.ts',
+  'src/render/morthen_nameplate_core.ts',
   'src/render/ambience_state_core.ts',
   'src/render/ability_vfx/cast_admission_core.ts',
   'src/render/ability_vfx/physical_choreography_core.ts',
@@ -1109,6 +1120,7 @@ const RENDER_PURE_CORES = [
   'src/render/characters/morph_union_core.ts',
   'src/render/characters/tinted_material_cache_core.ts',
   'src/render/characters/weapon_attack_style_core.ts',
+  'src/render/characters/identity_body_core.ts',
 ].map((rel) => join(repoRoot, rel));
 
 // Bare-named pure cores: registered cores (from UI_PURE_CORES + RENDER_PURE_CORES)
@@ -2663,6 +2675,7 @@ const UI_DOM_MODULES = [
   'src/ui/hud/treasure/treasure_map_window.ts',
   'src/ui/hud/vehicle/shadow_action_bar_controller.ts',
   'src/ui/hud/vehicle/forge_action_bar_controller.ts',
+  'src/ui/hud/vehicle/morthen_shift_controller.ts',
   'src/ui/account_portal_dom.ts',
   'src/ui/appearance_customizer.ts',
   // Owns browser state on purpose: it mints the reticle tick ring's root and

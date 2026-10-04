@@ -16,6 +16,7 @@
 
 import { ENCHANTS } from '../content/enchants';
 import { ITEMS } from '../data';
+import { hasMorthenIdentity } from '../graveyard_shift/morthen_identity';
 import { meetsLevelRequirement } from '../item_level_req';
 import type { SimContext } from '../sim_context';
 import { duelJustEndedBetween } from '../social/duel';
@@ -34,6 +35,8 @@ export function runWeaponProcs(
   weaponItemId?: string | null,
   meleeHand?: 'mainhand' | 'offhand',
 ): void {
+  // Morthen swings the template weapon: no real enchant or legendary proc rolls.
+  if (hasMorthenIdentity(wielder)) return;
   // A worn trinket's on-hit passives ride every weapon hit (combat/trinkets.ts).
   if (trigger === 'weaponHit') runTrinketTrigger(ctx, wielder, target, 'weaponHit');
   // Which hand's weapon rolled procs. `undefined` = not specified: fall back to

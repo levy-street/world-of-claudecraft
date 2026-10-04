@@ -6949,6 +6949,112 @@ export const ja_JP: EnTranslations = {
       }
     }
   },
+  "graveyardShift": {
+    "identityAura": "墓呼びのモーセン",
+    "defeatedAura": "敗北",
+    "staffExit": "従業員出口",
+    "adventurerAura": "冒険者",
+    "resource": "戦慄",
+    "errors": {
+      "notEnoughDread": "戦慄が足りません！",
+      "noCorpse": "蘇らせる死体がありません。"
+    },
+    "abilities": {
+      "shadowPulse": {
+        "name": "影の波動",
+        "description": "影の波動を放ち、視界内の{radius}ヤード以内にいる敵それぞれに{min}から{max}の影ダメージを与えます。命中した敵はそれぞれ{distance}ヤード吹き飛ばされ、{slowSeconds}秒間移動速度が{slow}低下します。"
+      },
+      "sextonsChain": {
+        "name": "墓守の鎖",
+        "description": "対象を自分から{stop}ヤード以内まで引き寄せ、{slowSeconds}秒間移動速度を{slow}低下させます。詠唱中の呪文は中断されてその系統が{lockout}秒間封じられ、対象は{silence}秒間沈黙します。"
+      },
+      "raiseFallen": {
+        "name": "倒れし者の蘇生",
+        "description": "{radius}ヤード以内で最も近い死体をスケルトンとして蘇らせ、{seconds}秒間自分のために戦わせます。各死体は一度しか蘇りません。"
+      }
+    },
+    "hints": {
+      "chain": "墓守の鎖：一人選んで引き寄せましょう。まずはヒーラーがおすすめです。",
+      "pulse": "影の波動が使用可能：周囲への強烈な一撃で、敵が近くにいるほど効果的です。詠唱は妨害されることがあります。彼らは狙ってきます。",
+      "raise": "倒れし者の蘇生：近くに亡骸があります。死体はみな同僚です。彼らのものでさえ。",
+      "exit": "シフト終了。玉座の裏の従業員出口から帰れます。"
+    },
+    "graveName": "光る墓",
+    "tibbs": {
+      "whisper": "しっ。こっちだ、下だよ。",
+      "offer": {
+        "intro1": "おっと、聞こえたか。名前はティブスだ。この墓所のモンスターたちの代表をしている。君がいつも斧を振り下ろす先で出会う連中さ。",
+        "intro2": "うちのボスのモーセンは、今週だけで四千八百回も倒されている。いつも同じズボン一本のためにね。組合規定では一日休む権利があるんだが、誰もシフトを代わってくれない。",
+        "intro3": "君以外は、だといいんだが。簡単な仕事さ。君がボスを演じる。冒険者のパーティーがもう中に入っている。止めてくれ。違いには絶対気づかないよ。まあ。気づくだろうね。",
+        "accept": "シフトを引き受ける",
+        "decline": "今日はやめておく",
+        "thanks": "ありがとう、ティブス"
+      },
+      "say": {
+        "accept": "素晴らしい。下りる途中の骨に気をつけてくれ。同僚も混じってるからね。",
+        "decline": "もっともだ。職務内容なんて誰も読まないしな。",
+        "busy": "手が空いたらまた来てくれ。組合規定でね。",
+        "report": "シフト報告！帰宅させた冒険者：{sent}。救った同僚：{saved}。渡さずに済んだズボン：1。",
+        "payout": "よくやってくれた、手伝ってくれてありがとう、冒険者。これが報酬だ。",
+        "covered": "シフトの穴は埋まったよ。モーセンは仕事に戻った。君にありがとうと言ってたよ。",
+        "consolation": "気にするな。奴らは毎日我々を倒すんだ。この仕事へようこそ。",
+        "anotherShift": "もう一シフト？奴らは間違いなく来るよ。"
+      }
+    },
+    "say": {
+      "clearing": {
+        "lastPull": "おけ、ラスト1パック倒したらボスで寝る",
+        "stayAway": "みんなボスには近づかないで",
+        "speedUp": "10分で落ちるから急げる？",
+        "howsMana": "ヒラさんMPどう？"
+      },
+      "notice": {
+        "pulledEarly": "ボス早釣り？？",
+        "whoPulled": "誰が釣った！！",
+        "boredWaiting": "ボス待ちくたびれて来た？"
+      },
+      "death": {
+        "rip": "南無",
+        "healerHealer": "ヒラ？？ ヒラさん！！？？",
+        "lag": "ラグ。今のはラグ。みんな見たよね"
+      },
+      "healerOom": {
+        "oom": "MP切れ",
+        "emotionalSupport": "もう気持ちだけで回復してる"
+      },
+      "wipeThreat": {
+        "popEverything": "CD全部吐いて。全部吐いて！！",
+        "wedding": "結婚式のためにCD温存してるの誰",
+        "goingBadly": "これはやばい"
+      },
+      "corpseRun": {
+        "runningBack": "今走って戻ってきてる、耐えて",
+        "kiteHim": "ぐるぐる引き回しとけばいい",
+        "holdHim": "戻ってくるまで抑えといて"
+      },
+      "returned": {
+        "roundTwo": "おけ2回戦、今度こそ本気",
+        "imBack": "ただいま、何かあった？",
+        "knowHisMoves": "おけ、もう動き覚えた",
+        "revengeTime": "リベンジの時間"
+      },
+      "giveUp": {
+        "gn": "おけ落ちます、おやすみ",
+        "ggBoss": "gg ボス、正直すごかった",
+        "betterRotation": "ボスの方が回しうまかったわ",
+        "sameTime": "明日同じ時間？"
+      },
+      "loot": {
+        "whoNeeds": "おけ、ズボン欲しい人",
+        "need": "ニード！！"
+      },
+      "partyWins": {
+        "easy": "楽勝",
+        "gg": "gg",
+        "toldYouEasy": "だから楽勝って言ったじゃん"
+      }
+    }
+  },
   "guide": {
     "brand": "World of ClaudeCraft",
     "brandShort": "ClaudeCraft",
@@ -20890,6 +20996,11 @@ export const ja_JP: EnTranslations = {
         "name": "教練官ヘイル",
         "title": "波止場の稽古師範",
         "greeting": "後ろのダミーは打ち返しもしなければ倒れもしない、{className}。大事なのは記録だ。お前が当てた一撃は残らずダメージメーターが数えてくれる。あれを標的にしてメーターを開け、あとは俺が教えてやる。"
+      },
+      "tibbs": {
+        "name": "ティブス",
+        "title": "モンスター組合代表",
+        "greeting": "ティブスだ。モンスター組合の代表だよ。骨に気をつけてくれ、同僚もいるんでね。"
       },
       "tidewatcher_ondrel": {
         "name": "オンドレル・ヴェイン",

@@ -28,6 +28,8 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   weaponStrike: 'damage',
   directDamage: 'damage',
   interrupt: 'other',
+  // Graveyard Shift's Raise the Fallen (graveyard_shift/kit_effects.ts) is utility.
+  gshiftRaiseFallen: 'other',
   dispel: 'other',
   // Silence locks the school but does not break on damage, so it never blocks the engage.
   silence: 'other',

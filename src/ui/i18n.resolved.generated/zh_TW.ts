@@ -6949,6 +6949,112 @@ export const zh_TW: EnTranslations = {
       }
     }
   },
+  "graveyardShift": {
+    "identityAura": "喚墓者莫森",
+    "defeatedAura": "已被擊敗",
+    "staffExit": "員工出口",
+    "adventurerAura": "冒險者",
+    "resource": "恐懼",
+    "errors": {
+      "notEnoughDread": "恐懼不足！",
+      "noCorpse": "沒有可供喚起的屍體。"
+    },
+    "abilities": {
+      "shadowPulse": {
+        "name": "暗影脈衝",
+        "description": "釋放一道暗影脈衝，對視線內 {radius} 碼範圍內的每個敵人造成 {min} 到 {max} 點暗影傷害。每個被擊中的敵人會被擊退 {distance} 碼，並被緩速 {slow}，持續 {slowSeconds} 秒。"
+      },
+      "sextonsChain": {
+        "name": "守墓人之鏈",
+        "description": "將你的目標拖到距你 {stop} 碼以內，並使其緩速 {slow}，持續 {slowSeconds} 秒。打斷其正在施放的法術，並使該系法術鎖定 {lockout} 秒，同時使目標沉默 {silence} 秒。"
+      },
+      "raiseFallen": {
+        "name": "喚起亡者",
+        "description": "將 {radius} 碼內最近的一具屍體喚起為骷髏，為你作戰 {seconds} 秒。每具屍體只能被喚起一次。"
+      }
+    },
+    "hints": {
+      "chain": "守墓人之鏈：挑一個拖到你身邊。補師是個不錯的開始。",
+      "pulse": "暗影脈衝已就緒：在你周圍造成一次猛烈爆發，敵人貼近時效果最好。他們可以打斷它。他們會試的。",
+      "raise": "喚起亡者：附近躺著一具屍體。每具屍體都是同事。連他們的也是。",
+      "exit": "下班了。王座後方的員工出口會帶你回家。"
+    },
+    "graveName": "發光的墳墓",
+    "tibbs": {
+      "whisper": "噓，這裡，下面。",
+      "offer": {
+        "intro1": "啊，你聽見了。我叫提布斯。我代表這座墓穴裡的怪物發言，也就是總在你斧下碰面的那些傢伙。",
+        "intro2": "我們的老闆莫森這週已經被殺了四千八百次。每次都是為了同一條褲子。按工會規定，他該休一天假了，可沒人願意替他代班。",
+        "intro3": "但願你是個例外。工作很簡單：你來扮演首領。一隊冒險者已經進來了。阻止他們。他們絕不會發現有什麼不同。嗯。他們會發現的。",
+        "accept": "接下這個班",
+        "decline": "今天不行",
+        "thanks": "謝謝，提布斯"
+      },
+      "say": {
+        "accept": "太好了。下去的路上小心腳下的骨頭，有些是同事。",
+        "decline": "也對。反正也沒人看工作說明。",
+        "busy": "等你沒那麼忙了再來吧。工會規定。",
+        "report": "值班報告！送回家的冒險者：{sent}。救下的同事：{saved}。沒發出去的褲子：1。",
+        "payout": "幹得好，感謝你的幫忙，冒險者。這是你的報酬。",
+        "covered": "這個班已經有人頂上了。莫森回來上班了，他說謝謝你。",
+        "consolation": "別擔心。他們每天都殺我們。歡迎入行。",
+        "anotherShift": "再來一班？他們肯定會再來的。"
+      }
+    },
+    "say": {
+      "clearing": {
+        "lastPull": "ok最後一波，然後BOSS，然後睡覺",
+        "stayAway": "大家離BOSS遠一點",
+        "speedUp": "10分鐘後要下了，可以快點嗎",
+        "howsMana": "補師魔力還夠嗎"
+      },
+      "notice": {
+        "pulledEarly": "BOSS提早開了??",
+        "whoPulled": "誰拉的！！！",
+        "boredWaiting": "BOSS是等到不耐煩了嗎"
+      },
+      "death": {
+        "rip": "倒了",
+        "healerHealer": "補師?? 補師！！",
+        "lag": "LAG。剛剛是LAG。大家都有看到"
+      },
+      "healerOom": {
+        "oom": "沒魔了",
+        "emotionalSupport": "我現在純靠精神支持在補了"
+      },
+      "wipeThreat": {
+        "popEverything": "全開。大招全部交出來！！",
+        "wedding": "誰的大招是留著結婚用的",
+        "goingBadly": "情況不妙"
+      },
+      "corpseRun": {
+        "runningBack": "他們在跑屍了，撐住",
+        "kiteHim": "繞圈風箏他就好",
+        "holdHim": "拖住他等他們回來"
+      },
+      "returned": {
+        "roundTwo": "ok第二輪，這次來真的",
+        "imBack": "我回來了，錯過什麼了嗎",
+        "knowHisMoves": "ok我摸清他的招式了",
+        "revengeTime": "復仇時間"
+      },
+      "giveUp": {
+        "gn": "ok我先下了，晚安",
+        "ggBoss": "gg BOSS，說真的超猛",
+        "betterRotation": "這BOSS的輸出循環比我還順",
+        "sameTime": "明天老時間？"
+      },
+      "loot": {
+        "whoNeeds": "ok誰需要這條褲子",
+        "need": "需求！！"
+      },
+      "partyWins": {
+        "easy": "EZ",
+        "gg": "gg",
+        "toldYouEasy": "早就說他很簡單了"
+      }
+    }
+  },
   "guide": {
     "brand": "World of ClaudeCraft",
     "brandShort": "ClaudeCraft",
@@ -20890,6 +20996,11 @@ export const zh_TW: EnTranslations = {
         "name": "操練官黑爾",
         "title": "碼頭陪練師",
         "greeting": "我身後那具假人從不還手，也永遠打不倒，{className}。真正重要的是帳目：你的傷害統計會記下你落在它身上的每一擊。把它設為目標，打開傷害統計視窗，剩下的交給我來教你。"
+      },
+      "tibbs": {
+        "name": "提布斯",
+        "title": "怪物工會代表",
+        "greeting": "提布斯，怪物工會代表。小心腳下的骨頭，有些是我的同事。"
       },
       "tidewatcher_ondrel": {
         "name": "翁德瑞爾·韋恩",

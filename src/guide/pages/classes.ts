@@ -241,6 +241,8 @@ const RESOURCE_NAME_KEYS: Record<ResourceType, TranslationKey> = {
   mana: 'guide.resourceName.mana',
   energy: 'guide.resourceName.energy',
   focus: 'guide.resourceName.focus',
+  // No class runs on Dread (Morthen's Graveyard Shift bar); the map is total.
+  dread: 'graveyardShift.resource',
 };
 
 function factsHtml(c: GuideClassInfo): string {

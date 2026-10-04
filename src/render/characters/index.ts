@@ -6,6 +6,7 @@ import { type Entity, isMechWearer, type PlayerClass } from '../../sim/types';
 import { logAssetMissOnce } from './asset_miss_log';
 import { type AssembleOptions, modularHeadFor } from './assets';
 import { type CharacterFormKey, characterFormAssetKey } from './form_visual_selection_core';
+import { identityBodyColorFor, identityBodyTemplateFor } from './identity_body_core';
 import { composedLookPiecesFor, type LookPieceQueue, type LookPieces } from './look_pieces';
 import {
   mechHeldWeaponOverride,
@@ -54,11 +55,19 @@ export function setModularLookProvider(fn: ((e: Entity) => ModularLook | null) |
   modularLookProvider = fn;
 }
 
+// A borrowed creature identity (identity_body_core.ts) replaces the whole body,
+// so the provider is never asked: no composed parts, and the renderer's helm and
+// redesign arms, which recompose only when a look answers, stay quiet.
+function providedLook(e: Entity): ModularLook | null {
+  if (identityBodyTemplateFor(e)) return null;
+  return modularLookProvider?.(e) ?? null;
+}
+
 /** The look an entity composes with, or null if it keeps its fixed class rig.
  *  The same answer the visual factory uses, exposed so the UI can draw a
  *  PORTRAIT of the composed character instead of a generic class one. */
 export function modularLookFor(e: Entity): ModularLook | null {
-  return modularLookProvider?.(e) ?? null;
+  return providedLook(e);
 }
 
 /** The composed-body visual key for an entity the look provider claimed: the
@@ -79,7 +88,7 @@ export function modularKeyFor(e: Entity): string {
  *  keeps a fixed rig. */
 function composedLookOf(e: Entity): { def: VisualDef; look: ModularLook } | null {
   if (isMechWearer(e)) return null;
-  const look = modularLookProvider?.(e) ?? null;
+  const look = providedLook(e);
   if (!look) return null;
   return { def: VISUALS[modularKeyFor(e)], look };
 }
@@ -121,7 +130,10 @@ export function createCharacterVisual(
   // Shapeshift forms are their own model and never compose, and neither does a
   // Combat Mech wearer: the mech is a whole replacement body, so the cosmetic
   // must win over the authored look (composing over it hid a purchased skin).
-  const look = formKey || isMechWearer(e) ? null : (modularLookProvider?.(e) ?? null);
+  const look = formKey || isMechWearer(e) ? null : providedLook(e);
+  // An identity body takes the creature's own colour and default skin, as a
+  // spawned copy of that creature would.
+  const body = formKey ? null : identityBodyTemplateFor(e);
   const key = formKey
     ? characterFormAssetKey(formKey, e.auras)
     : look
@@ -140,8 +152,8 @@ export function createCharacterVisual(
     // directly (previews) keeps a light that lights immediately.
     const visual = new CharacterVisual(
       key,
-      e.color,
-      formKey ? 0 : (e.skin ?? 0),
+      body ? identityBodyColorFor(body, e.color) : e.color,
+      formKey || body ? 0 : (e.skin ?? 0),
       formKey ? null : e.mainhandItemId,
       weaponOverride,
       formKey ? null : e.offhandItemId,

@@ -119,6 +119,59 @@
     ) {
     display: none !important;
   }
+  /* The Graveyard Shift's Morthen kit rides the normal action bar, touch ring
+     and cross hotbar (a possess-bar override, src/game/morthen_controls.ts):
+     only what Morthen cannot use stands down (the extra rows, which read empty,
+     stances, pets, consumables and the ring's page flip). */
+  body.morthen-shift
+  :is(
+    #actionbar2,
+    #actionbar3,
+    #stancebar,
+    #petbar,
+    #mobile-consumable-strip,
+    #mobile-consumable-seat,
+    #mobile-stance-radial,
+    #mobile-stance-anchor,
+    #mobile-action-page-toggle
+  ) {
+    display: none !important;
+  }
+  /* Morthen's own frame wears the boss rank the target frame gives the real
+     one: the dragon emblem over the portrait and the level chip below it. */
+  body.morthen-shift #player-frame > .portrait-wrap::before {
+    content: "";
+    position: absolute;
+    inset: -15px;
+    z-index: 2;
+    background: url("/ui/ranks/elite-dragon-frame.webp") center / contain no-repeat;
+    pointer-events: none;
+  }
+  body.morthen-shift #player-frame > .portrait-wrap .portrait {
+    border-color: transparent;
+    outline: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  body.morthen-shift #player-frame .level-chip {
+    left: 50%;
+    right: auto;
+    bottom: -7px;
+    transform: translateX(-50%);
+    z-index: 4;
+  }
+  /* The lost shift's fade to black (morthen_shift_controller.ts drives the
+     opacity); never takes a pointer. */
+  .gshift-fade {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    background: var(--color-gshift-fade);
+    opacity: 0;
+    pointer-events: none;
+    /* A fade to black stays black under a light high-contrast theme. */
+    forced-color-adjust: none;
+  }
   .vehicle-bar.shadow-action-bar {
     grid-template-columns: 1fr;
     width: min(420px, calc(100% - 24px));
@@ -3354,6 +3407,9 @@
   }
   .focus {
     --bar-color: var(--color-focus);
+  }
+  .dread {
+    --bar-color: var(--color-dread);
   }
   /* Damage-absorb shield overlay (Power Word: Shield, Ice Barrier, …): a hatched
      translucent segment laid over the health bar, extending past current health. */

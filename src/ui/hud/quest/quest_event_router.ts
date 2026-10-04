@@ -4,7 +4,7 @@
 // private, so the router takes the Hud untyped; the members it reads are welded
 // to hud.ts in tests/quest_event_router.test.ts.
 import { sfx } from '../../../game/sfx';
-import type { SimEvent } from '../../../sim/types';
+import type { GraveyardShiftReport, SimEvent } from '../../../sim/types';
 import { HUD_LOG } from '../../hud_tones';
 import { t } from '../../i18n';
 import { type QuestEventPresentation, questEventPresentation } from '../../quest_event_view';
@@ -23,7 +23,11 @@ interface QuestEventHost {
     source?: null,
     bannerClass?: 'deed',
   ): unknown;
-  questDialog: { refresh(): void };
+  questDialog: {
+    refresh(): void;
+    open(npcId: number): void;
+    openWhenPresent(npcId: number, tibbsReport?: GraveyardShiftReport): void;
+  };
   worldQuestPuzzleWindow: { applyEventPresentation(presentation: QuestEventPresentation): void };
   treasureMapWindow: { open(): void; refresh(): void };
 }
@@ -32,6 +36,12 @@ interface QuestEventHost {
  *  so the HUD's per-event switch skips it. */
 export function applyQuestEventPresentation(hud: object, ev: SimEvent): boolean {
   const h = hud as QuestEventHost;
+  // Tibbs climbed out of his grave: his offer, or his end-of-shift report,
+  // opens in the quest dialog.
+  if (ev.type === 'graveyardShiftOffer') {
+    h.questDialog.openWhenPresent(ev.npcId, ev.report);
+    return true;
+  }
   // A read treasure map opens its parchment (a re-read has no log line, so
   // this runs before the presentation check); an upgrade or a dig repaints it.
   if (ev.type === 'treasureMapRead') h.treasureMapWindow.open();

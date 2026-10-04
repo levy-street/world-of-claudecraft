@@ -1073,6 +1073,8 @@ export const VOICE_PROMPTS = [
 // Recurring NPC records → the base voice that speaks for them. gen_npc_lines.mjs
 // consults this so every Aldric/Maren/Halven zone variant reuses one designed voice.
 export const VOICE_ALIAS = {
+  // Tibbs, the Graveyard Shift's union rep, borrows the gravedigger's dry voice.
+  tibbs: 'gravedigger_mosley',
   glider_instructor: 'trader_wilkes',
   glider_apprentice: 'apprentice_wren',
   // Valerie borrows the existing scout performance for this covert operation.

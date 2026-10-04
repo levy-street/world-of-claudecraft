@@ -28,6 +28,9 @@ import * as deedsMod from '../deeds';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
+import { graveyardShiftLethalClamp } from '../graveyard_shift/death_intercept';
+import { dreadFromDamageDealt } from '../graveyard_shift/dread';
+import { hasMorthenIdentity } from '../graveyard_shift/morthen_identity';
 import { emitIgnivarRaidNarrativeOnDeath } from '../ignivar_raid_lore';
 import {
   claimedInstanceForMob,
@@ -812,6 +815,8 @@ export function dealDamage(
     }
   }
 
+  amount = graveyardShiftLethalClamp(ctx, target, amount);
+
   // Fiesta takedowns score a point and put the victim on a (growing) respawn
   // timer instead of permanently eliminating them — the party never stops.
   const match = target.kind === 'player' ? ctx.arenaMatches.get(target.id) : undefined;
@@ -1223,6 +1228,8 @@ export function dealDamage(
           baseRage * (isWarrior ? talentMult * rageGenAuraMult(source) * seasonedCrit : 1),
       );
     }
+    // Morthen's Dread (Graveyard Shift) fills from every hit he lands.
+    dreadFromDamageDealt(source, amount);
   }
   if (target.kind === 'player') {
     const meta = ctx.players.get(target.id);
@@ -1913,7 +1920,8 @@ export function grantXp(
   opts?: { fromKill?: boolean },
 ): void {
   const p = ctx.entities.get(meta.entityId);
-  if (!p || amount <= 0) return;
+  // A Graveyard Shift run is a parenthesis: Morthen earns the real character no XP.
+  if (!p || amount <= 0 || hasMorthenIdentity(p)) return;
   // Rested XP bonus: the classic-era rule only doubles KILL xp (not quests), and
   // never past the cap (no level bar to advance). The bonus equals the rested
   // amount drawn down, so the effective award is up to 2x while the pool lasts.

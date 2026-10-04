@@ -9,10 +9,18 @@
 import { ABILITIES } from '../sim/data';
 import type { AbilityDef } from '../sim/types';
 import { tEntity } from './entity_i18n';
+import {
+  graveyardShiftAbilityName,
+  graveyardShiftAbilityNameFromSource,
+} from './graveyard_shift_text_core';
 import { localizeSimAuraName } from './sim_i18n';
 
 export function abilityDisplayName(def: AbilityDef): string {
-  return tEntity({ kind: 'ability', id: def.id, field: 'name' });
+  // Graveyard Shift's mode-local kit is not in ABILITIES, so the entity catalog
+  // would hand back the raw id.
+  return (
+    graveyardShiftAbilityName(def.id) ?? tEntity({ kind: 'ability', id: def.id, field: 'name' })
+  );
 }
 
 /** Localize an ability by the English NAME a combat event carries, not its id. */
@@ -21,5 +29,7 @@ export function abilityDisplayNameFromSource(name: string): string {
   if (ability) return abilityDisplayName(ability);
   // Boss/mob mechanic names (War Stomp, etc.) surface as a damage-log ability label but
   // are not in ABILITIES; route them through the shared sim aura/mechanic localizer.
-  return localizeSimAuraName(name) ?? name;
+  // The Graveyard Shift kit comes after it, so a name the localizer already knows
+  // keeps its own key and the kit only fills the gap.
+  return localizeSimAuraName(name) ?? graveyardShiftAbilityNameFromSource(name) ?? name;
 }

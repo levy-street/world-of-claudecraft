@@ -74,6 +74,7 @@ describe('unitResourceClass: the power-type discriminator (folds the inline tern
     expect(unitResourceClass('rage')).toBe('rage');
     expect(unitResourceClass('energy')).toBe('energy');
     expect(unitResourceClass('mana')).toBe('mana');
+    expect(unitResourceClass('dread')).toBe('dread');
   });
 
   it('maps null to mana (the player ternary default branch) and none to none', () => {

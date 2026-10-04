@@ -3,6 +3,7 @@
 // (boss-flagged template) or a trash segment; per-tick observation only closes
 // them (boss death, boss reset/wipe, trash quiet, slot vacancy). One active
 // fight per slot at a time; a boss pull during trash closes the trash segment.
+import { isGraveyardShiftRunKey } from '../../src/sim/graveyard_shift/run_state';
 import { IGNIVAR_RAID_ROOM_IDS } from '../../src/sim/ignivar_raid_ids';
 import type { FightParticipant, Surface } from './contract';
 import { OpenFight, type PendingClose } from './fights';
@@ -36,6 +37,8 @@ export class DungeonSegmenter {
     if (!host.surfaceEnabled('dungeon') && !host.surfaceEnabled('raid')) return;
     const seen = new Set<string>();
     for (const view of host.sim.instances) {
+      // A Graveyard Shift run borrows a Crypt slot: it is not a dungeon run.
+      if (isGraveyardShiftRunKey(view.partyKey)) continue;
       const slotKey = `${view.dungeonId}#${view.slot}`;
       seen.add(slotKey);
       const state = this.slots.get(slotKey);

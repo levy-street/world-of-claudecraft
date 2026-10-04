@@ -5,6 +5,7 @@
 
 import { isTrinketCooldownKey } from '../content/trinkets';
 import { ABILITIES } from '../data';
+import { morthenBlocksAura } from '../graveyard_shift/morthen_identity';
 import type { Aura, Entity } from '../types';
 import { isUnstuckSystemCooldown } from '../unstuck_cooldown';
 import { veilboundMarchBlocksAura } from './paladin_veilbound_march';
@@ -15,7 +16,11 @@ export { onTrinketAvoidance } from './trinkets';
 /** Whether one of a player's own guards keeps this aura off them: the paladin's
  *  Veilbound March (roots and slows) or the Mooring Stone (every control). */
 export function playerAuraGuarded(target: Entity, aura: Aura): boolean {
-  return veilboundMarchBlocksAura(target, aura) || mooringBlocksAura(target, aura);
+  return (
+    veilboundMarchBlocksAura(target, aura) ||
+    mooringBlocksAura(target, aura) ||
+    morthenBlocksAura(target, aura)
+  );
 }
 
 /** Whether a saved cooldown id is one a relog restores: an ability's, the unstuck

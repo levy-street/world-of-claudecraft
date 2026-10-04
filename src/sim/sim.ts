@@ -124,6 +124,11 @@ import { advanceHeroicLeap, heroicLeapPlacementPreview } from './combat/heroic_l
 import { clearFieldcraftState } from './combat/hunter_fieldcraft';
 import { clearPacklordState } from './combat/hunter_packlord';
 import { clearHunterTalentState, hunterPetDamageMultiplier } from './combat/hunter_shared';
+import {
+  isControlAuraKind,
+  isIceBlockCrowdControlAura,
+  isIceBlocked,
+} from './combat/ice_block_guard';
 import { tickNaturesFury } from './combat/natures_fury';
 import { clearOssuaryMarks, despawnTemporaryNecromancyUndead } from './combat/necromancy';
 import { tryGrantSolarReprisal } from './combat/paladin_solar_reprisal';
@@ -205,7 +210,6 @@ import type { DelveShopGate, DelveShopOffer } from './data';
 import {
   ABILITIES,
   ALL_RECIPES,
-  abilitiesKnownAt,
   arenaOrigin,
   CLASSES,
   DELVE_COMPANIONS,
@@ -272,6 +276,7 @@ import * as escortMod from './escort';
 import { initEscorts as initEscortsImpl, updateEscorts as updateEscortsImpl } from './escort';
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
+import * as gshiftMod from './graveyard_shift';
 import * as groundAoeReadouts from './ground_aoe_readouts';
 import type { GuildBankState, GuildMembership } from './guild_bank';
 import * as guildBankMod from './guild_bank';
@@ -2041,6 +2046,7 @@ export class Sim {
   escortRuns = new Map<string, EscortRunState>();
   // delve instances (separate slot pool from dungeons)
   delveRuns: DelveRun[] = [];
+  readonly graveyardShiftRuns = new gshiftMod.GraveyardShiftBook();
   private delvePetStash = new Map<number, PetState>();
   // Real-world UTC day ('YYYY-MM-DD') for the delve daily reset (FR-5.1). The sim
   // core must stay deterministic, so it never reads the wall clock itself: the host
@@ -2219,6 +2225,7 @@ export class Sim {
       autoEquip: cfg.autoEquip ?? false,
       playerName: cfg.playerName ?? 'Adventurer',
       devCommands: this.devCommands,
+      offlineHost: cfg.offlineHost ?? false,
       worldPvpDisabled: this.worldPvpDisabled,
       worldBossAtBoot: cfg.worldBossAtBoot ?? false,
       riftPortals: cfg.riftPortals ?? false,
@@ -4084,7 +4091,8 @@ export class Sim {
       ...materialGathererIdentitySaveFragment(meta.gathererIdentity),
     };
     // Expired party-trade markers retire at this persistence boundary, never by tick sweep.
-    return sanitizeRemovedZone1Content(retirePartyTradeOnSave(state, this.lockoutNowMs())).state;
+    const saved = gshiftMod.graveyardShiftSaveState(this.ctx, pid, state);
+    return sanitizeRemovedZone1Content(retirePartyTradeOnSave(saved, this.lockoutNowMs())).state;
   }
 
   /** Set a player's appearance skin (meta + entity). Bounded; the renderer
@@ -5247,6 +5255,7 @@ export class Sim {
       // The engaged pass output (combat/engaged_combat.ts), cleared and refilled
       // in place each tick; the /combat readout reads it instead of re-walking.
       engagedPids: sim.engagedPids,
+      graveyardShiftRuns: sim.graveyardShiftRuns,
       // Offline Fiesta practice-bot roster (fiesta_bots.ts mutates it in place);
       // the deeds real-bout gate reads it through the seam.
       get fiestaBotPids() {
@@ -5335,7 +5344,7 @@ export class Sim {
       isControlAura: sim.isControlAura.bind(sim),
       applyRootAura: sim.applyRootAura.bind(sim),
       applyKnockback: sim.applyKnockback.bind(sim),
-      isIceBlocked: sim.isIceBlocked.bind(sim),
+      isIceBlocked,
       diminishedCrowdControlDuration: sim.diminishedCrowdControlDuration.bind(sim),
       hostilesInRadius: sim.hostilesInRadius.bind(sim),
       friendliesInRadius: sim.friendliesInRadius.bind(sim),
@@ -5615,6 +5624,8 @@ export class Sim {
       notice: sim.notice.bind(sim),
       // Dev-only test-dummy spawner backing "/dev bot <name>" in social/chat.ts.
       spawnDevBot: sim.spawnDevBot.bind(sim),
+      addPlayer: sim.addPlayer.bind(sim),
+      removePlayer: sim.removePlayer.bind(sim),
       spawnDevVendor: sim.spawnDevVendor.bind(sim),
       startCascadePlaytest: sim.startCascadePlaytest.bind(sim),
       startDevSandbox: sim.startDevSandbox.bind(sim),
@@ -5685,7 +5696,7 @@ export class Sim {
     // shared known-list builder, so ClientWorld's recomputed list matches.)
     // questsDone gates quest-earned abilities (paladin recall_the_fallen); it is
     // restored before this runs at load, so a returning character keeps them.
-    meta.known = abilitiesKnownAt(meta.cls, e.level, meta.talentMods, meta.questsDone);
+    meta.known = gshiftMod.knownAbilitiesFor(meta, e);
     if (announce) {
       for (const k of meta.known) {
         const prev = before.get(k.def.id);
@@ -5782,7 +5793,7 @@ export class Sim {
   // Dev/test convenience: jump a player to a level (learns abilities, recalcs stats).
   setPlayerLevel(level: number, pid?: number): void {
     const r = this.resolve(pid);
-    if (!r) return;
+    if (!r || gshiftMod.hasMorthenIdentity(r.e)) return;
     r.e.level = Math.max(1, Math.min(MAX_LEVEL, level));
     // Keep lifetimeXp consistent with the level so post-cap progression starts
     // from a sane baseline (virtualLevel never falls below the real level). Only
@@ -6133,6 +6144,7 @@ export class Sim {
     // Escort runs walk their NPC + watch ambush waves (rng-free; src/sim/escort.ts).
     updateEscortsImpl(this.ctx);
     lap?.('instances');
+    gshiftMod.updateGraveyardShift(this.ctx);
     this.updateDelveRuns();
     lap?.('delves');
     // Thornhollow Fields' ACTIVE phase draws ZERO rng (queue-order matchmaking,
@@ -6289,23 +6301,7 @@ export class Sim {
     return !!template && (template.canSwim === true || template.family === 'mudfin');
   }
   private isControlAura(kind: AuraKind): boolean {
-    return kind === 'stun' || kind === 'root' || kind === 'incapacitate' || kind === 'polymorph';
-  }
-  private isIceBlockCrowdControlAura(kind: AuraKind): boolean {
-    return (
-      this.isControlAura(kind) ||
-      kind === 'silence' ||
-      kind === 'blind' ||
-      kind === 'disarm' ||
-      kind === 'slow' ||
-      kind === 'lockout' ||
-      kind === 'tongues'
-    );
-  }
-  private isIceBlocked(target: Entity): boolean {
-    return target.auras.some(
-      (existing) => existing.id === 'ice_block' && existing.kind === 'stasis',
-    );
+    return isControlAuraKind(kind);
   }
   // Nythraxis CC-immunity predicates moved to encounters/nythraxis.ts (N1); Sim keeps
   // thin delegates because the hot applyAura immunity path reads them via this.X.
@@ -6905,8 +6901,8 @@ export class Sim {
       return;
     }
     if (
-      this.isIceBlocked(target) &&
-      this.isIceBlockCrowdControlAura(aura.kind) &&
+      isIceBlocked(target) &&
+      isIceBlockCrowdControlAura(aura.kind) &&
       aura.sourceId !== target.id &&
       !isUnbreakableControlAura(aura)
     )
@@ -9135,6 +9131,7 @@ export class Sim {
       if (bg && bg.state === 'active' && this.bgMatches.get(target.id) === bg) {
         return bgMod.bgTeamOf(bg, attackerPlayer.id) !== bgMod.bgTeamOf(bg, target.id);
       }
+      if (gshiftMod.shiftPairHostile(this.graveyardShiftRuns, attackerPlayer, target)) return true;
       if (worldPvpMod.isWorldPvpHostile(this.ctx, attackerPlayer, target)) return true;
       // The jail brawl: prisoners are hostile to each other, always (pets
       // resolve to their owner via pvpController above, so a prisoner's pet
@@ -9464,7 +9461,10 @@ export class Sim {
   accountAdmin = true;
   // Offline play never spectates: this session is always its own viewer.
   readonly spectating: string | null = null;
-  readonly actionBarReadOnly = false;
+  // A Graveyard Shift run's foreign kit must never reseed the real bar.
+  get actionBarReadOnly(): boolean {
+    return gshiftMod.hasMorthenIdentity(this.entities.get(this.primaryId));
+  }
   socialInfo: null = null;
   friendAdd(_name: string): void {}
   friendRemove(_name: string): void {}

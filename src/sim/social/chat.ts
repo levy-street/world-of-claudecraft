@@ -21,6 +21,7 @@ import { CLASSES, zoneAt } from '../data';
 import * as deedsMod from '../deeds';
 import { handleDevChat } from '../dev_commands';
 import { graveyardReadout } from '../entity_roster';
+import { isGraveyardShiftBotPid } from '../graveyard_shift/run_state';
 import { livePlaytimeSeconds } from '../playtime';
 import { hillReadoutLine, setWorldPvpFlag, toggleWorldPvpFlag } from '../pvp';
 import {
@@ -295,6 +296,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     const ciMatches: PlayerMeta[] = [];
     const wanted = targetName.toLowerCase();
     for (const meta of ctx.players.values()) {
+      if (isGraveyardShiftBotPid(ctx, meta.entityId)) continue;
       if (meta.name === targetName) {
         target = meta;
         break;
@@ -336,6 +338,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     const ciMatches: PlayerMeta[] = [];
     const wanted = targetName.toLowerCase();
     for (const meta of ctx.players.values()) {
+      if (isGraveyardShiftBotPid(ctx, meta.entityId)) continue;
       if (meta.name === targetName) {
         target = meta;
         break;
@@ -396,6 +399,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
       const wanted = nameArg.toLowerCase();
       const ci: PlayerMeta[] = [];
       for (const meta of ctx.players.values()) {
+        if (isGraveyardShiftBotPid(ctx, meta.entityId)) continue;
         if (meta.name === nameArg) {
           target = meta;
           break;
@@ -1065,6 +1069,7 @@ export function resolveWhisperTarget(
   if (!trimmed) return null;
   const matches: { target: PlayerMeta; message: string; exactCase: boolean }[] = [];
   for (const target of ctx.players.values()) {
+    if (isGraveyardShiftBotPid(ctx, target.entityId)) continue;
     const exactMessage = whisperMessageForName(trimmed, target.name, true);
     if (exactMessage !== null) {
       matches.push({ target, message: exactMessage, exactCase: true });
@@ -1093,6 +1098,7 @@ export function findPlayerByName(ctx: SimContext, name: string): PlayerMeta | nu
   const wanted = name.toLowerCase();
   const ci: PlayerMeta[] = [];
   for (const meta of ctx.players.values()) {
+    if (isGraveyardShiftBotPid(ctx, meta.entityId)) continue;
     if (meta.name === name) return meta;
     if (meta.name.toLowerCase() === wanted) ci.push(meta);
   }

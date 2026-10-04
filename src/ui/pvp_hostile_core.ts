@@ -20,6 +20,7 @@
 // no jail brawl, no warden arm, and a pet resolves to its owner in the callers
 // (the renderer's isOwnedPetHostile), never here.
 
+import { graveyardShiftPairHostile } from '../sim/graveyard_shift/hostility';
 import { worldPvpPairHostile } from '../sim/pvp/world_pvp_rules';
 import { worldPvpZonePolicyAt } from '../sim/pvp/world_pvp_zones';
 import type { Entity } from '../sim/types';
@@ -38,6 +39,10 @@ export type PvpHostileWorld = Pick<
 export function isPvpHostilePlayer(world: PvpHostileWorld, target: Entity): boolean {
   if (target.kind !== 'player' || target.dead || target.id === world.playerId) return false;
   if (isPvpHostileTarget(target.id, world.duelInfo, world.arenaInfo, world.bgInfo)) return true;
+  // Graveyard Shift: Morthen and the run's adventurers, read off their auras
+  // with the sim's own pair rule (graveyard_shift/hostility.ts).
+  const viewer = world.entities.get(world.playerId);
+  if (viewer && graveyardShiftPairHostile(viewer, target)) return true;
   // Inside a live battleground or arena the sim's world arm is off for both
   // sides (they are under that mode's rules), so the client verdict must be
   // too: a flagged teammate is never red.

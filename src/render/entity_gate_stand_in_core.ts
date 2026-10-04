@@ -171,7 +171,8 @@ export const ENTITY_GATE_STAND_INS: readonly EntityGateStandIn[] = [
     gate: 'gateSwapFlagOnCompile',
     file: 'src/render/renderer.ts',
     callSite: 'this.gateSwapFlagOnCompile(next.root, () => {',
-    hides: 'the replacement base rig after a race or mech swap',
+    hides:
+      'the replacement base rig after a race or mech swap, or when a player takes on or sheds a borrowed creature identity (the Graveyard Shift Morthen body, characters/identity_body_core.ts)',
     standIn: 'the outgoing base rig, kept attached until the gate settles',
   },
   {

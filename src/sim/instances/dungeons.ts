@@ -31,6 +31,7 @@ import {
 import { clearIgnivarEncounterAuras } from '../encounters/ignivar';
 import { clearVarkhulEncounterAuras } from '../encounters/varkhul';
 import { createGroundObject, createMob, createNpc } from '../entity';
+import { graveyardShiftTakesExit } from '../graveyard_shift/shift_end_marks';
 import { updateIgnivarForgeLift } from '../ignivar_forge_lift';
 import {
   IGNIVAR_LIFT_ROOM_ID,
@@ -791,6 +792,8 @@ export function leaveDungeon(ctx: SimContext, pid?: number): boolean {
   // A fresh corpse cannot move, but a released ghost crossing the nested Nythraxis
   // approach must be able to backtrack outside if its arena claim becomes unavailable.
   if (!r || (r.e.dead && !r.e.ghost)) return false;
+  // A won Graveyard Shift's way out ends the run as a win (graveyard_shift/shift_end_marks.ts).
+  if (graveyardShiftTakesExit(ctx, r.meta.entityId)) return true;
   const p = r.e;
   // not inside any instance: nothing to leave (no DUNGEON_LIST[0] fallback —
   // that silently teleported outdoor callers to the Hollow Crypt door)

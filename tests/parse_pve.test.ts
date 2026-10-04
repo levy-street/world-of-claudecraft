@@ -445,6 +445,30 @@ describe('BossCastSynthesizer via ParseRecorder', () => {
   });
 });
 
+describe('DungeonSegmenter and the Graveyard Shift', () => {
+  test('a run borrowing a Crypt slot opens no dungeon fight', () => {
+    const sim = fakeSim();
+    seedDungeon(sim, { partyKey: 'gshift:5' });
+    const { recorder, records } = makeRecorder(sim);
+    sim.tickCount = 10;
+    recorder.observe([]);
+    sim.tickCount = 11;
+    recorder.observe([dmg(5, 500, 120)]);
+    expect(records.some((r) => r.t === 'fight_open')).toBe(false);
+  });
+
+  test('the same blow in a party-claimed slot does open one', () => {
+    const sim = fakeSim();
+    seedDungeon(sim, { partyKey: 'party:5' });
+    const { recorder, records } = makeRecorder(sim);
+    sim.tickCount = 10;
+    recorder.observe([]);
+    sim.tickCount = 11;
+    recorder.observe([dmg(5, 500, 120)]);
+    expect(records.some((r) => r.t === 'fight_open')).toBe(true);
+  });
+});
+
 describe('DungeonSegmenter remaining arms', () => {
   test('slot vacancy closes an open trash segment as abandon', () => {
     const sim = fakeSim();

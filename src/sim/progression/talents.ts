@@ -67,6 +67,7 @@ import {
 } from '../content/talents';
 import { ABILITIES, MOBS } from '../data';
 import { recalcPlayerStats } from '../entity';
+import { hasMorthenIdentity } from '../graveyard_shift/morthen_identity';
 import { itemCopyPin } from '../item_copy_ref';
 import { equipItem as equipItemImpl } from '../items';
 import { buildGearSet, planGearSwap, type SavedGearSet, wornAsBagSlot } from '../loadout_gear';
@@ -216,6 +217,7 @@ function normalizeAbilityCharges(
  *  bonuses from its own equipment mirror. */
 export function refreshModsForEquipmentChange(ctx: SimContext, meta: PlayerMeta): void {
   const e = ctx.entities.get(meta.entityId);
+  if (hasMorthenIdentity(e)) return;
   const previousMods = meta.talentMods;
   const previousChargeCaps = new Map(
     meta.known.map((ability) => [ability.def.id, ability.charges ?? 1] as const),
@@ -404,6 +406,9 @@ function commitTalentAllocation(
   alloc: TalentAllocation,
   successText: string | null,
 ): boolean {
+  // A Graveyard Shift run parks the real talent modifiers: no build change
+  // may land while the owner is Morthen (dev-only prototype, silent refusal).
+  if (hasMorthenIdentity(player)) return false;
   const lock = talentLockReason(ctx, player);
   if (lock) {
     ctx.error(player.id, lock);
@@ -602,7 +607,9 @@ export function saveTalentLoadout(
   const pid = typeof pidOrAlloc === 'number' ? pidOrAlloc : undefined;
   const alloc = typeof pidOrAlloc === 'object' ? pidOrAlloc : allocMaybe;
   const r = ctx.resolve(pid);
-  if (!r) return -1;
+  // On a Graveyard Shift run meta.talents is the parked empty build: saving it
+  // would overwrite a real loadout (silent while dev-gated).
+  if (!r || hasMorthenIdentity(r.e)) return -1;
   const revisionBeforeMutation = r.meta.wireRev;
   const clean = name.toString().trim().slice(0, 24);
   if (!clean) {

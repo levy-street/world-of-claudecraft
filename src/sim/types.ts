@@ -338,7 +338,8 @@ export const ALL_CLASSES: PlayerClass[] = [
   'warlock',
   'druid',
 ];
-export type ResourceType = 'rage' | 'mana' | 'energy' | 'focus';
+// 'dread' is Morthen's bar on a Graveyard Shift run (graveyard_shift/dread.ts).
+export type ResourceType = 'rage' | 'mana' | 'energy' | 'focus' | 'dread';
 export const OVERHEAD_EMOTE_IDS = [
   'wave',
   'laugh',
@@ -488,6 +489,10 @@ export type AuraKind =
   // Warlock Metamorphosis: a temporary demon transform (cosmetic scale + tint in render,
   // its damage/haste bonuses ride separate buff auras).
   | 'form_metamorph'
+  // Graveyard Shift: the run owner is Morthen (graveyard_shift/morthen_identity.ts).
+  | 'form_morthen'
+  // Graveyard Shift: a pure marker on the run's adventurer bots (graveyard_shift/hostility.ts).
+  | 'gshift_adventurer'
   // Feral (cat form): Energy regeneration multiplier while active (value = fraction, 1 = +100%).
   | 'buff_energyregen'
   | 'stealth'
@@ -3090,6 +3095,8 @@ export type AbilityEffect =
   // rageOnInterrupt: rage minted when a cast is ACTUALLY cut (Pummel's
   // incentive design), scaled like ability-granted rage; never on a whiff.
   | { type: 'interrupt'; lockout: number; rageOnInterrupt?: number }
+  // Graveyard Shift's Raise the Fallen (graveyard_shift/kit_effects.ts).
+  | { type: 'gshiftRaiseFallen'; radius: number; duration: number }
   | {
       type: 'chainDamage';
       min: number;
@@ -5634,6 +5641,10 @@ export interface Entity extends ClientMirroredEntityFields {
   forcedTargetTimer: number; // seconds left on the forced-attack window
   shuffleTargetTimer?: number; // seconds until a special AI may reroll its preferred target
   ownerId: number | null; // controlled pets: owning player's entity id (null = wild)
+  // Graveyard Shift's Tibbs (graveyard_shift/grave_staging.ts): who called him up
+  // out of his grave, and on which tick; unset on every other entity.
+  gshiftSummonerPid?: number;
+  gshiftSummonedTick?: number;
   petMode: PetMode; // hunter pet behavior stance
   petTauntTimer: number; // controlled pet Growl cooldown
   petSkillTimer?: number; // independent cooldown for a pet template's signature skill
@@ -6728,6 +6739,14 @@ export interface PendingResurrection {
 
 export type DamageEventKind = 'hit' | 'miss' | 'dodge' | 'parry' | 'block' | 'resist' | 'evade';
 
+/** Tibbs' end-of-shift report: who went home, who was saved, the pay. */
+export interface GraveyardShiftReport {
+  outcome: 'won' | 'lost';
+  sent: number;
+  saved: number;
+  copper: number;
+}
+
 // `pid` (when present) marks a personal event that should only be delivered to
 // that player entity's owner; events without pid are world-visible.
 export type SimEvent = { pid?: number } & (
@@ -7131,6 +7150,10 @@ export type SimEvent = { pid?: number } & (
       past: readonly RealmBuilderHonour[];
     }
   | { type: 'worldQuestInvestigationDialogue'; targetId: number }
+  // Graveyard Shift: Tibbs has climbed out of his grave and offers the shift
+  // (graveyard_shift/grave_staging.ts); the client opens his dialogue. At the
+  // end of a grave shift it carries his report (the pay is already paid).
+  | { type: 'graveyardShiftOffer'; npcId: number; report?: GraveyardShiftReport }
   // `boardId` is the authored NoticeboardDef id (every board shares one
   // templateId), so the client can tell the Proving Shore's recruits' signpost
   // from a town board and open the guild board on its default view.
@@ -9012,6 +9035,10 @@ export interface SimConfig {
   playerName?: string;
   noPlayer?: boolean; // multiplayer server: start with an empty world and addPlayer() later
   devCommands?: boolean; // local dev: /dev level|tp|give chat cheats
+  // True only for the browser's offline world (src/game/offline_world_config.ts):
+  // no character persistence and no ClientWorld mirror. Modes that rewrite the
+  // character for their duration (the Graveyard Shift prototype) gate on it.
+  offlineHost?: boolean;
   worldPvpDisabled?: boolean; // realm kill switch for the /pvp flag (server env WORLD_PVP_DISABLED=1)
   lockoutNowMs?: () => number; // host wall-clock for persisted raid lockouts
   // Live server: schedule the first world-boss rise at boot instead of one

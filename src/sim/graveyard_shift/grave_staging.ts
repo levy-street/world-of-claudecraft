@@ -1,0 +1,247 @@
+// The Graveyard Shift's way in and out: the glowing grave by the Hollow Crypt,
+// Tibbs the union rep who climbs out of it when the grave is touched and offers
+// the shift, and the end of every grave shift back in front of him, with his
+// report and, on the win (the shift can be won once), the Boss for a Day deed.
+// Only an eligible player has a grave: the offline host spawns it while its
+// player is eligible; a shared host keeps one grave and shows it per viewer
+// (graveyardShiftObservable, which the server's snapshot filter calls). Every
+// player raises a Tibbs of their own, visible to them alone, tracked on the run
+// book (summoner and summon tick on his entity). The run start itself stays in
+// run_lifecycle.ts (which calls in here); nothing here imports it. Draws no rng.
+
+import { NPCS } from '../data';
+import { grantDeed } from '../deeds';
+import { createGroundObject, createNpc } from '../entity';
+import { formatMoney } from '../format_money';
+import type { PlayerMeta } from '../sim';
+import type { SimContext } from '../sim_context';
+import { settleTeleportArrival } from '../teleport_arrival';
+import { dist2d, type Entity, TICK_RATE } from '../types';
+import {
+  BOSS_FOR_A_DAY_DEED_ID,
+  GRAVE_ENTITY_ID,
+  GRAVE_INTERACT_RADIUS,
+  GRAVE_ITEM_ID,
+  GRAVE_POS,
+  GRAVEYARD_SHIFT_PAYOUT_COPPER,
+  graveReturnSpot,
+  isGraveyardShiftEligible,
+  TIBBS_IDLE_SECONDS,
+  TIBBS_LEAVE_RADIUS,
+  TIBBS_NPC_ID,
+  tibbsSpot,
+  withinGrave,
+} from './grave_entry';
+import type { GraveyardShiftOutcome, GraveyardShiftRun } from './run_state';
+
+const GRAVE_NAME = 'Glowing Grave';
+const SAY_KEY = 'graveyardShift.tibbs.say';
+
+// English fallbacks for Tibbs' keyed lines (the client renders the catalog).
+export const TIBBS_LINES = {
+  accept: 'Wonderful. Mind the bones on the way down. Some of them are colleagues.',
+  busy: 'Come back when you are not so busy. Union rules.',
+  covered: 'Your shift is covered. Morthen is back at work, and he says thank you.',
+} as const;
+export type TibbsLine = keyof typeof TIBBS_LINES;
+
+// A run owner is pinned to Morthen's level: the real one is parked on the run.
+function eligibleMeta(ctx: SimContext, meta: PlayerMeta): boolean {
+  const e = ctx.entities.get(meta.entityId);
+  const parkedLevel = ctx.graveyardShiftRuns.get(meta.entityId)?.parked.level;
+  return (
+    !!e &&
+    isGraveyardShiftEligible({
+      level: parkedLevel ?? e.level,
+      deedsEarned: meta.deedsEarned,
+      questsDone: meta.questsDone,
+    })
+  );
+}
+
+function anyEligible(ctx: SimContext): boolean {
+  for (const meta of ctx.players.values()) if (eligibleMeta(ctx, meta)) return true;
+  return false;
+}
+
+/** Whether this player may take the shift from Tibbs (the same rule as the
+ *  grave: a won shift closes it, though Tibbs stays up a while for his report). */
+export function graveyardShiftEligibleFor(ctx: SimContext, pid: number): boolean {
+  const meta = ctx.players.get(pid);
+  return !!meta && eligibleMeta(ctx, meta);
+}
+
+/** The grave. Offline it stands while the player is eligible and sinks back
+ *  once they are not (the shift won) as soon as no Tibbs is up. A shared host
+ *  keeps one grave for good and shows it per viewer, so its tick is O(1). */
+export function ensureGraveyardShiftGrave(ctx: SimContext): void {
+  const book = ctx.graveyardShiftRuns;
+  if (ctx.entities.has(GRAVE_ENTITY_ID)) {
+    if (!ctx.cfg.offlineHost) return;
+    // Never mid-shift: the shift ends back at this grave.
+    const quiet = book.tibbs.size === 0 && book.size === 0;
+    if (quiet && !anyEligible(ctx)) ctx.dropEntity(GRAVE_ENTITY_ID);
+    return;
+  }
+  if (ctx.cfg.offlineHost && !anyEligible(ctx)) return;
+  const grave = createGroundObject(
+    GRAVE_ENTITY_ID,
+    GRAVE_ITEM_ID,
+    GRAVE_NAME,
+    ctx.groundPos(GRAVE_POS.x, GRAVE_POS.z),
+  );
+  ctx.addEntity(grave);
+}
+
+/** Whether this viewer may see this entity: the grave only to an eligible
+ *  player, a Tibbs only to the player who woke him; everything else, yes. The
+ *  server's snapshot filter calls it per viewer and entity, so it stays O(1). */
+export function graveyardShiftObservable(ctx: SimContext, viewer: Entity, e: Entity): boolean {
+  if (e.id === GRAVE_ENTITY_ID) return graveyardShiftEligibleFor(ctx, viewer.id);
+  if (e.kind === 'npc' && e.templateId === TIBBS_NPC_ID) return e.gshiftSummonerPid === viewer.id;
+  return true;
+}
+
+/** The Tibbs this player woke, if he is up. */
+export function tibbsFor(ctx: SimContext, pid: number): Entity | undefined {
+  const id = ctx.graveyardShiftRuns.tibbs.get(pid);
+  return id === undefined ? undefined : ctx.entities.get(id);
+}
+
+/** Tibbs speaks aloud, heard by one player (his say line and bubble). */
+export function tibbsSay(ctx: SimContext, pid: number, line: TibbsLine): void {
+  const tibbs = tibbsFor(ctx, pid);
+  if (!tibbs) return;
+  ctx.emit({
+    type: 'chat',
+    fromPid: tibbs.id,
+    from: tibbs.name,
+    text: TIBBS_LINES[line],
+    textKey: `${SAY_KEY}.${line}`,
+    channel: 'say',
+    entityId: tibbs.id,
+    pid,
+  });
+}
+
+/** The caller's own Tibbs climbs out of his grave beside it, facing them. */
+function raiseTibbs(ctx: SimContext, summoner: Entity): Entity | null {
+  const existing = tibbsFor(ctx, summoner.id);
+  if (existing) {
+    existing.gshiftSummonedTick = ctx.tickCount;
+    return existing;
+  }
+  const def = NPCS[TIBBS_NPC_ID];
+  if (!def) return null;
+  const spot = tibbsSpot();
+  const tibbs = createNpc(ctx.nextId++, def, ctx.groundPos(spot.x, spot.z));
+  tibbs.facing = Math.atan2(summoner.pos.x - spot.x, summoner.pos.z - spot.z);
+  tibbs.prevFacing = tibbs.facing;
+  tibbs.gshiftSummonerPid = summoner.id;
+  tibbs.gshiftSummonedTick = ctx.tickCount;
+  ctx.addEntity(tibbs);
+  ctx.graveyardShiftRuns.tibbs.set(summoner.id, tibbs.id);
+  // The dust he climbs out of, for his caller only.
+  ctx.emit({
+    type: 'spellfxAt',
+    x: spot.x,
+    z: spot.z,
+    school: 'shadow',
+    fx: 'nova',
+    pid: summoner.id,
+  });
+  return tibbs;
+}
+
+/** A player's Tibbs goes back down (and is no longer anyone's target). */
+export function dismissTibbs(ctx: SimContext, summonerPid: number): void {
+  const book = ctx.graveyardShiftRuns;
+  const id = book.tibbs.get(summonerPid);
+  if (id === undefined) return;
+  book.tibbs.delete(summonerPid);
+  const summoner = ctx.entities.get(summonerPid);
+  if (summoner?.targetId === id) summoner.targetId = null;
+  if (ctx.entities.has(id)) ctx.dropEntity(id);
+}
+
+// pickUpObject's branch for the grave. An ineligible toucher gets nothing: the
+// grave is just a grave (and online they never even see it).
+export function touchGraveyardShiftGrave(ctx: SimContext, p: Entity, meta: PlayerMeta): boolean {
+  if (!eligibleMeta(ctx, meta)) return false;
+  if (!withinGrave(p.pos, GRAVE_INTERACT_RADIUS)) return false;
+  const tibbs = raiseTibbs(ctx, p);
+  if (!tibbs) return false;
+  ctx.emit({ type: 'graveyardShiftOffer', npcId: tibbs.id, pid: p.id });
+  return true;
+}
+
+/** Whether a targeted interact on this entity is an answer to Tibbs' offer. */
+export function isTibbs(e: Entity | undefined): boolean {
+  return e?.kind === 'npc' && e.templateId === TIBBS_NPC_ID;
+}
+
+// Each Tibbs goes back down once his caller walks off, sits down to a shift, or
+// leaves him standing too long; the grave appears once someone qualifies. Bounded
+// by the Tibbs actually up, never by the realm's population.
+export function updateGraveyardShiftGrave(ctx: SimContext): void {
+  ensureGraveyardShiftGrave(ctx);
+  const book = ctx.graveyardShiftRuns;
+  if (book.tibbs.size === 0) return;
+  // A dismissal deletes only the current entry, which Map iteration allows.
+  for (const [summonerPid, id] of book.tibbs) {
+    const tibbs = ctx.entities.get(id);
+    const caller = ctx.entities.get(summonerPid);
+    const idle =
+      !tibbs || ctx.tickCount - (tibbs.gshiftSummonedTick ?? 0) >= TIBBS_IDLE_SECONDS * TICK_RATE;
+    if (!tibbs || !caller || book.has(summonerPid) || idle) dismissTibbs(ctx, summonerPid);
+    else if (dist2d(caller.pos, tibbs.pos) > TIBBS_LEAVE_RADIUS) dismissTibbs(ctx, summonerPid);
+  }
+}
+
+// A grave shift hands its owner back in front of the grave, where Tibbs waits
+// with his report and the pay (win) or his consolation and a fresh offer
+// (loss), in the client's NPC dialog. An aborted shift says nothing. Runs
+// after the identity and the pools are restored.
+export function endShiftAtGrave(
+  ctx: SimContext,
+  run: GraveyardShiftRun,
+  outcome: GraveyardShiftOutcome,
+  report: { sent: number; saved: number },
+  leaving = false,
+): void {
+  const p = ctx.entities.get(run.ownerPid);
+  const meta = ctx.players.get(run.ownerPid);
+  if (!p || !meta || p.dead) return;
+  const spot = graveReturnSpot();
+  p.pos = ctx.groundPos(spot.x, spot.z);
+  p.prevPos = { ...p.pos };
+  ctx.rebucket(p);
+  p.facing = Math.atan2(GRAVE_POS.x - spot.x, GRAVE_POS.z - spot.z);
+  p.prevFacing = p.facing;
+  settleTeleportArrival(p);
+  // Tibbs pays as he gives his report (owner decision): back at the grave, never
+  // in the Crypt. A leaver of a won shift (logout, a dropped connection, jail) is
+  // paid all the same, just without the scene.
+  const copper = outcome === 'won' ? GRAVEYARD_SHIFT_PAYOUT_COPPER : 0;
+  if (copper > 0) {
+    meta.copper += copper;
+    ctx.emit({ type: 'loot', text: `You receive ${formatMoney(copper)}.`, pid: p.id });
+  }
+  // A leaver gets no Tibbs: nobody to talk to.
+  if (outcome === 'aborted' || leaving) return;
+  const tibbs = raiseTibbs(ctx, p);
+  if (!tibbs) return;
+  ctx.emit({
+    type: 'graveyardShiftOffer',
+    npcId: tibbs.id,
+    pid: p.id,
+    report: { outcome, sent: report.sent, saved: report.saved, copper },
+  });
+}
+
+/** The deed for a won grave shift, the moment the fight is won: its banner and
+ *  sound mark the end of the fight (Tibbs pays later, at the grave). */
+export function grantBossForADay(ctx: SimContext, run: GraveyardShiftRun): void {
+  const meta = ctx.players.get(run.ownerPid);
+  if (run.entry === 'grave' && meta) grantDeed(ctx, meta, BOSS_FOR_A_DAY_DEED_ID);
+}

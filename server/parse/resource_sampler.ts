@@ -39,7 +39,9 @@ export const MAX_SAMPLED_MOBS = 8;
 export const RESOURCE_TYPE_CODES = { mana: 1, rage: 2, energy: 3, focus: 4 } as const;
 
 export function resourceTypeCode(type: RecorderEntityView['resourceType']): number {
-  if (type === undefined || type === null) return 0;
+  // Dread is Morthen's bar on an offline-only Graveyard Shift run: it never
+  // reaches a server fight and has no wire code, so it reads as no pool.
+  if (type === undefined || type === null || type === 'dread') return 0;
   return RESOURCE_TYPE_CODES[type] ?? 0;
 }
 

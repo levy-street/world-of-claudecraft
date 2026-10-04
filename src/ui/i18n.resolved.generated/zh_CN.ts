@@ -6949,6 +6949,112 @@ export const zh_CN: EnTranslations = {
       }
     }
   },
+  "graveyardShift": {
+    "identityAura": "唤墓者莫森",
+    "defeatedAura": "已被击败",
+    "staffExit": "员工出口",
+    "adventurerAura": "冒险者",
+    "resource": "恐惧",
+    "errors": {
+      "notEnoughDread": "恐惧不足！",
+      "noCorpse": "没有可供唤起的尸体。"
+    },
+    "abilities": {
+      "shadowPulse": {
+        "name": "暗影脉冲",
+        "description": "释放一道暗影脉冲，对视线内 {radius} 码范围内的每个敌人造成 {min} 到 {max} 点暗影伤害。每个被击中的敌人会被击退 {distance} 码，并被减速 {slow}，持续 {slowSeconds} 秒。"
+      },
+      "sextonsChain": {
+        "name": "守墓人之链",
+        "description": "将你的目标拖到距你 {stop} 码以内，并使其减速 {slow}，持续 {slowSeconds} 秒。打断其正在施放的法术，并使该系法术锁定 {lockout} 秒，同时使目标沉默 {silence} 秒。"
+      },
+      "raiseFallen": {
+        "name": "唤起亡者",
+        "description": "将 {radius} 码内最近的一具尸体唤起为骷髅，为你作战 {seconds} 秒。每具尸体只能被唤起一次。"
+      }
+    },
+    "hints": {
+      "chain": "守墓人之链：挑一个拖到你身边。治疗者是个不错的开始。",
+      "pulse": "暗影脉冲已就绪：在你周围造成一次猛烈爆发，敌人贴近时效果最好。他们可以打断它。他们会试的。",
+      "raise": "唤起亡者：附近躺着一具尸体。每具尸体都是同事。连他们的也是。",
+      "exit": "下班了。王座后面的员工出口会带你回家。"
+    },
+    "graveName": "发光的坟墓",
+    "tibbs": {
+      "whisper": "嘘，这儿，下面。",
+      "offer": {
+        "intro1": "啊，你听见了。我叫蒂布斯。我代表这座墓穴里的怪物说话，也就是总在你斧下碰面的那些家伙。",
+        "intro2": "我们的老板莫森这周已经被杀了四千八百次。每次都是为了同一条裤子。按工会规定，他该休一天假了，可没人愿意替他顶班。",
+        "intro3": "但愿你是个例外。活儿很简单：你来扮演首领。一队冒险者已经进来了。阻止他们。他们绝不会发现有什么不同。嗯。他们会发现的。",
+        "accept": "接下这个班",
+        "decline": "今天不行",
+        "thanks": "谢谢，蒂布斯"
+      },
+      "say": {
+        "accept": "太好了。下去的路上小心脚下的骨头，有些是同事。",
+        "decline": "也对。反正也没人看岗位说明。",
+        "busy": "等你没那么忙了再来吧。工会规定。",
+        "report": "值班报告！送回家的冒险者：{sent}。救下的同事：{saved}。没发出去的裤子：1。",
+        "payout": "干得好，感谢你的帮助，冒险者。这是你的报酬。",
+        "covered": "这个班已经有人顶上了。莫森回来上班了，他说谢谢你。",
+        "consolation": "别担心。他们每天都杀我们。欢迎入职。",
+        "anotherShift": "再来一班？他们肯定会再来的。"
+      }
+    },
+    "say": {
+      "clearing": {
+        "lastPull": "ok最后一波，然后BOSS，然后睡觉",
+        "stayAway": "大家离BOSS远点",
+        "speedUp": "10分钟后得走，能快点吗",
+        "howsMana": "奶妈蓝还够吗"
+      },
+      "notice": {
+        "pulledEarly": "BOSS提前开了??",
+        "whoPulled": "谁开的怪！！！",
+        "boredWaiting": "BOSS是等得不耐烦了吗"
+      },
+      "death": {
+        "rip": "凉了",
+        "healerHealer": "奶妈?? 奶妈！！",
+        "lag": "卡了。刚才是卡了。大家都看见了"
+      },
+      "healerOom": {
+        "oom": "没蓝了",
+        "emotionalSupport": "我现在纯靠精神支持在奶了"
+      },
+      "wipeThreat": {
+        "popEverything": "全开。大招全交！！",
+        "wedding": "谁的大招是留着结婚用的",
+        "goingBadly": "情况不妙啊"
+      },
+      "corpseRun": {
+        "runningBack": "他们在跑尸了，顶住",
+        "kiteHim": "绕圈放风筝就行",
+        "holdHim": "拖住他等他们回来"
+      },
+      "returned": {
+        "roundTwo": "ok第二轮，这次来真的",
+        "imBack": "我回来了，错过啥了吗",
+        "knowHisMoves": "ok我摸清他的套路了",
+        "revengeTime": "复仇时间"
+      },
+      "giveUp": {
+        "gn": "ok我撤了，晚安",
+        "ggBoss": "gg BOSS，说真的太强了",
+        "betterRotation": "这BOSS的输出循环比我还好",
+        "sameTime": "明天老时间？"
+      },
+      "loot": {
+        "whoNeeds": "ok谁需要这条裤子",
+        "need": "需求！！"
+      },
+      "partyWins": {
+        "easy": "EZ",
+        "gg": "gg",
+        "toldYouEasy": "早说了他很简单"
+      }
+    }
+  },
   "guide": {
     "brand": "World of ClaudeCraft",
     "brandShort": "ClaudeCraft",
@@ -20890,6 +20996,11 @@ export const zh_CN: EnTranslations = {
         "name": "操练官黑尔",
         "title": "码头陪练师",
         "greeting": "我身后那具假人从不还手，也永远打不倒，{className}。真正重要的是账目：你的伤害统计会记下你落在它身上的每一击。把它设为目标，打开伤害统计窗口，剩下的交给我来教你。"
+      },
+      "tibbs": {
+        "name": "蒂布斯",
+        "title": "怪物工会代表",
+        "greeting": "蒂布斯，怪物工会代表。小心脚下的骨头，有些是我的同事。"
       },
       "tidewatcher_ondrel": {
         "name": "翁德雷尔·凡恩",

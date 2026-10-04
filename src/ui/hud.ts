@@ -1,6 +1,6 @@
 import { audio } from '../game/audio';
 import { corpseLootAvailabilityInWorld } from '../game/corpse_loot_availability';
-import { CROSS_HOTBAR_ATTACK_ID } from '../game/cross_hotbar';
+import { CROSS_HOTBAR_ATTACK_ID, type CrossHotbarLayout } from '../game/cross_hotbar';
 import { syncDeathControllerHints } from '../game/death_controller_hint';
 import { farmPressTarget } from '../game/farm_press_target_core';
 import type { GamepadKind } from '../game/gamepad_map';
@@ -9,6 +9,7 @@ import { InstanceMusicController, type InstanceMusicDecision } from '../game/ins
 import { bindActionLabel, type Keybinds, keyCapLabel } from '../game/keybinds';
 import { trackMetaPixel } from '../game/meta_pixel';
 import { syncMinigameMusic } from '../game/minigame_music_sync';
+import { morthenActionBarOverride, morthenCrossHotbarOverride } from '../game/morthen_controls';
 import { music } from '../game/music';
 import {
   type BoolSettingKey,
@@ -327,6 +328,7 @@ import { gatherRareEventFeedback } from './gather_rare_event_feedback';
 import { gatherToolTooltipLines } from './gather_tool_tooltip';
 import { generalChatQuotaView } from './general_chat_quota_view';
 import { craftedLineKey, grantItemToken, grantQtyText } from './grant_line_view';
+import { playerFrameLevelText } from './graveyard_shift_text_core';
 import { decideGuildMotdLine } from './guild_motd_login';
 import {
   healLandingFloatTextKey,
@@ -392,8 +394,6 @@ import {
   assignAttackSlotAction,
   attackDragDisposition,
   clearHotbarSlot,
-  type FreedAttackSlotAbility,
-  freedAttackSlotDisplayAbility,
   type HotbarAction,
   isAbilityActionBarEligible,
   loadoutKnownAbilityIds,
@@ -1261,10 +1261,6 @@ const CHEAT_DEATH_SAVE_TEXT = 'Cheat Death saves you!';
 function curatorRankDisplayName(rank: number): string {
   return t(curatorRankNameKey(rank), { rank: formatNumber(rank) });
 }
-
-// Module-scope (created once, not per frame): freedAttackSlotAbility's abilityDef
-// callback into freedAttackSlotDisplayAbility.
-const abilityDefLookup = (id: string) => ABILITIES[id];
 
 export class Hud {
   // Ability slots across three rows: 1..11 primary, 12..22 secondary, and
@@ -2320,6 +2316,7 @@ export class Hud {
     });
     this.actionBarController = new ActionBarController({
       readOnly: () => this.sim.actionBarReadOnly,
+      override: () => morthenActionBarOverride(this.sim.player),
       storage: localStorage,
       playerClass: this.sim.cfg.playerClass,
       playerName: this.sim.player.name,
@@ -4660,7 +4657,7 @@ export class Hud {
   private lastPlayerFrameMaxHp = Number.NaN;
   private lastPlayerFrameResource = Number.NaN;
   private lastPlayerFrameMaxResource = Number.NaN;
-  private lastPlayerFrameLevel = Number.NaN;
+  private lastPlayerFrameLevel = '';
   private readonly targetFrameDescriptor: UnitFrameDescriptor = {
     ...ABSENT_TARGET_DESCRIPTOR,
   };
@@ -7234,28 +7231,6 @@ export class Hud {
     return this.sim.resolvedAbility(action.id);
   }
 
-  // Slot 0's display-only fallback (freedAttackSlotDisplayAbility): memoized by
-  // action id, the same "diff a stable key, reuse the reference" idiom the hot
-  // painters use (action_bar_painter's lastIcon, unit_portrait_painter's imgCache),
-  // so the per-frame ability() accessor below never allocates a fresh object while
-  // the freed slot's assignment is unchanged (ActionBarSlotDescriptor's own
-  // no-per-frame-allocation contract).
-  private freedAttackSlotAbilityCache: { id: string; ability: FreedAttackSlotAbility } | null =
-    null;
-  private freedAttackSlotAbility(): FreedAttackSlotAbility | null {
-    const action = this.actionForSlot(0);
-    const id = action?.type === 'ability' ? action.id : null;
-    if (id === null) {
-      this.freedAttackSlotAbilityCache = null;
-      return null;
-    }
-    if (this.freedAttackSlotAbilityCache?.id !== id) {
-      const ability = freedAttackSlotDisplayAbility(action, abilityDefLookup);
-      this.freedAttackSlotAbilityCache = ability ? { id, ability } : null;
-    }
-    return this.freedAttackSlotAbilityCache?.ability ?? null;
-  }
-
   private itemForSlot(barSlot: number): ItemDef | null {
     const action = this.actionForSlot(barSlot);
     return action?.type === 'item' ? (ITEMS[action.id] ?? null) : null;
@@ -7504,7 +7479,7 @@ export class Hud {
           }
         }
         this.flashActionSlot(barSlot);
-      } else if (barSlot === 0 && this.freedAttackSlotAbility()) {
+      } else if (barSlot === 0 && this.actionBarController.freedAttackSlotAbility()) {
         this.showError(t('abilityUi.tooltip.unavailable'));
       }
     } else if (action?.type === 'item' && this.isHotbarItemId(action.id)) {
@@ -7537,7 +7512,7 @@ export class Hud {
   }
 
   private currentMobileActionPage(): number {
-    return clampMobilePage(this.mobileActionPage);
+    return this.actionBarController.overridden ? 0 : clampMobilePage(this.mobileActionPage);
   }
 
   private mobileSourceSlotForButton(
@@ -7621,7 +7596,7 @@ export class Hud {
   }
 
   private actionBarsLocked(): boolean {
-    return Boolean(this.optionsHooks?.settings.get('lockActionBars'));
+    return !!this.crossHotbarOverride() || !!this.optionsHooks?.settings.get('lockActionBars');
   }
 
   private buildActionBar(): void {
@@ -7693,7 +7668,7 @@ export class Hud {
         const known = this.abilityForSlot(slot);
         const clearHint = `<div class="tt-sub">${esc(t('abilityUi.actionBar.clearHint'))}</div>`;
         if (known) return this.abilityTooltip(known) + clearHint;
-        const freed = slot === 0 && this.freedAttackSlotAbility();
+        const freed = slot === 0 && this.actionBarController.freedAttackSlotAbility();
         if (freed)
           return `<div class="tt-title">${esc(abilityDisplayName(freed.def))}</div><div class="tt-sub">${esc(t('abilityUi.tooltip.unavailable'))}</div>${clearHint}`;
         const item = this.itemForSlot(slot);
@@ -7913,7 +7888,8 @@ export class Hud {
             ability: () =>
               i === 0 && this.attackSlotIsAttack()
                 ? null
-                : (this.abilityForSlot(i) ?? (i === 0 ? this.freedAttackSlotAbility() : null)),
+                : (this.abilityForSlot(i) ??
+                  (i === 0 ? this.actionBarController.freedAttackSlotAbility() : null)),
             item: () => this.itemForSlot(i),
             keybindLabel: () => keyCapLabel(this.keybinds.primaryLabel(slotKey)),
           };
@@ -8865,9 +8841,9 @@ export class Hud {
       this.lastPlayerFrameMaxResource = p.maxResource;
       playerFrame.resText = unitFrameCurrentMaxText(Math.round(p.resource), p.maxResource);
     }
-    if (p.level !== this.lastPlayerFrameLevel) {
-      this.lastPlayerFrameLevel = p.level;
-      playerFrame.levelText = String(p.level);
+    if (playerFrameLevelText(p) !== this.lastPlayerFrameLevel) {
+      this.lastPlayerFrameLevel = playerFrameLevelText(p);
+      playerFrame.levelText = this.lastPlayerFrameLevel;
     }
     playerFrame.name = p.name;
     // SELF reads its worn border from the deeds facet, not the entity wire
@@ -12433,7 +12409,7 @@ export class Hud {
             default:
               this.chatLogFrom(
                 ev.from,
-                ev.text,
+                localizeChatBody(ev),
                 CHAT_TEMPLATE_KEYS.say,
                 'say',
                 ev.fromPid,
@@ -12455,7 +12431,7 @@ export class Hud {
             const visibleText =
               ev.channel === 'yell'
                 ? localizeAuthoredYellText(ev.text, bubbleSpeaker?.kind, ev.classId)
-                : ev.text;
+                : localizeChatBody(ev);
             const masked = this.maskChat(this.chatLinkPlainText(visibleText));
             const bubble = ev.channel === 'emote' ? `${ev.from} ${masked}` : masked;
             this.renderer.showChatBubble(bubbleSpeakerId, bubble, bubbleStyle);
@@ -18010,6 +17986,10 @@ export class Hud {
   /** The owner kit is still rebuilding during a reconnect. */
   crossHotbarReadOnly(): boolean {
     return this.sim.actionBarReadOnly;
+  }
+
+  crossHotbarOverride(): CrossHotbarLayout | null {
+    return morthenCrossHotbarOverride(this.sim.player);
   }
 
   /** Open or close the controller cross hotbar (the pad's held-trigger bar). */

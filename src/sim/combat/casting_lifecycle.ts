@@ -1,5 +1,7 @@
 import { BENISON_4PC_WHISPER_HEAL_BONUS } from '../content/ignivar_set_bonuses';
 import { gliderActionsLocked } from '../glider_action_lock';
+import { graveyardShiftCastError } from '../graveyard_shift/kit_effects';
+import { hasMorthenIdentity } from '../graveyard_shift/morthen_identity';
 import { shadowActionsLocked } from '../shadow_action_lock';
 import { BENISON_WHISPER_AURA_ID } from './priest/benison_dawnweave';
 // Player cast lifecycle, extracted from the Sim monolith (C4a).
@@ -74,6 +76,7 @@ import {
   FACING_HOLD_DIST,
   FISHING_CAST_ID,
   GATHER_CAST_ID,
+  GCD,
   isFormAuraKind,
   isNonSpellCast,
   MELEE_ARC,
@@ -1198,7 +1201,8 @@ export function castAbility(
     ctx.error(p.id, 'Not enough Soul Fragments!');
     return;
   }
-  const necromancyError = necromancyCastError(ctx, p, ability, aim);
+  const necromancyError =
+    necromancyCastError(ctx, p, ability, aim) ?? graveyardShiftCastError(ctx, p, ability);
   if (necromancyError) {
     ctx.error(p.id, necromancyError);
     return;
@@ -1295,7 +1299,9 @@ export function castAbility(
               ? 'Not enough energy!'
               : p.resourceType === 'focus'
                 ? 'Not enough Focus!'
-                : 'Not enough mana!',
+                : p.resourceType === 'dread'
+                  ? 'Not enough Dread!'
+                  : 'Not enough mana!',
     );
     return;
   }
@@ -1801,7 +1807,9 @@ export function castAbility(
   // so gear/Bloodlust/Temporal Acceleration haste speeds the whole rotation, not just
   // cast bars. spellHasteMult is 1 for anyone without spell haste, so their GCD is
   // unchanged.
-  const gcd = Math.max(MIN_GCD, ctx.playerGcdFor(meta.cls) / spellHasteMult(p));
+  // Morthen's kit runs on the standard GCD whatever the run owner's real class.
+  const baseGcd = hasMorthenIdentity(p) ? GCD : ctx.playerGcdFor(meta.cls);
+  const gcd = Math.max(MIN_GCD, baseGcd / spellHasteMult(p));
   // A channel keeps its duration, so it must not eat a next_cast_instant charge.
   let consumedInstantAura: Aura | null = null;
   if (
@@ -2926,7 +2934,8 @@ function applyAbility(
     ctx.error(p.id, 'Not enough Soul Fragments!');
     return;
   }
-  const necromancyError = necromancyCastError(ctx, p, ability);
+  const necromancyError =
+    necromancyCastError(ctx, p, ability) ?? graveyardShiftCastError(ctx, p, ability);
   if (necromancyError) {
     ctx.error(p.id, necromancyError);
     return;
@@ -2945,7 +2954,12 @@ function applyAbility(
       ? Math.ceil(shamanAdjustedCost * paladinManaCostMultiplier(p))
       : shamanAdjustedCost;
   if (p.resource < payableCost && !canCastFree && !togglingOff && !formShiftKind(p, ability)) {
-    ctx.error(p.id, `Not enough ${p.resourceType ?? 'resource'}!`);
+    ctx.error(
+      p.id,
+      p.resourceType === 'dread'
+        ? 'Not enough Dread!'
+        : `Not enough ${p.resourceType ?? 'resource'}!`,
+    );
     return;
   }
   if (canCastFree && !togglingOff && consumeFreeCostFor(ctx, p, ability.id)) {

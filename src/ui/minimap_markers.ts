@@ -37,6 +37,7 @@ import type { GatheringProfessionId } from '../sim/content/professions';
 import { GLIDER_NPC_DEF } from '../sim/content/world_quest_glider';
 import { corpseIndicatorFor } from '../sim/corpse_loot_state';
 import { GATHER_NODES, isBgPos, isDelvePos, isYumiMazePos, QUESTS, zoneAt } from '../sim/data';
+import { isGraveyardShiftGrave } from '../sim/graveyard_shift/grave_entry';
 import { NODE_HARVEST_TABLE } from '../sim/professions/gathering';
 import { canGatherTier } from '../sim/professions/tools';
 import { isQuestGatedGroundObjectHidden } from '../sim/quest_gated_entity';
@@ -574,7 +575,12 @@ export function createMinimapMarkers(): MinimapMarkers {
               service:
                 e.templateId === EASTBROOK_NOTICEBOARD_TEMPLATE_ID ? 'noticeboard' : 'mailbox',
             });
-          } else if (e.lootable && centerFits(dist2, S, clearance['object-loot'])) {
+          } else if (
+            e.lootable &&
+            // The Graveyard Shift grave is a secret: no loot dot gives it away.
+            !isGraveyardShiftGrave(e) &&
+            centerFits(dist2, S, clearance['object-loot'])
+          ) {
             dynamicMarkers.push({ kind: 'object-loot', mx, my });
           }
         } else if (

@@ -156,6 +156,9 @@ describe('the real catalog', () => {
       'col_set_wyrmshadow',
       'col_seven_regalia',
       'col_true_colors',
+      // Deliberate growth: the Graveyard Shift's secret first-win deed is a
+      // personal celebration, zero Renown like the other hidden deeds.
+      'hid_boss_for_a_day',
       'hid_bountiful_coffer',
       'hid_forgebreaker',
       'hid_roll_hundred',

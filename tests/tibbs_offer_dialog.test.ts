@@ -1,0 +1,239 @@
+// @vitest-environment happy-dom
+// Tibbs' shift offer in the quest dialog: his lines, Take the shift (the
+// sim's targeted interact on him), and Not today (his answer, then closed).
+import { describe, expect, it, vi } from 'vitest';
+import { TIBBS_NPC_ID } from '../src/sim/graveyard_shift/grave_entry';
+import type { Entity } from '../src/sim/types';
+import type { FocusTrapHandle } from '../src/ui/focus_manager';
+import { QuestDialogController } from '../src/ui/hud/quest/quest_dialog_controller';
+import { setLanguage } from '../src/ui/i18n';
+import type { IWorld } from '../src/world_api';
+
+// Importing the dialog pulls in a module whose three.js loader may finish a
+// download after this file's environment is torn down (under a loaded run):
+// happy-dom has no ProgressEvent, so give the late callback one to build.
+(globalThis as { ProgressEvent?: unknown }).ProgressEvent ??= class extends Event {
+  constructor(type: string, init?: EventInit) {
+    super(type, init);
+  }
+};
+
+// Each caller's Tibbs takes a fresh id; any id stands in for one here.
+const TIBBS_ENTITY_ID = 900_001;
+
+const clock = { now: 1_000 };
+
+function harness(deedsEarned = new Map<string, string>()) {
+  clock.now = 1_000;
+  setLanguage('en');
+  document.body.innerHTML = '';
+  const element = document.createElement('div');
+  element.id = 'quest-dialog';
+  document.body.appendChild(element);
+  const tibbs = {
+    id: TIBBS_ENTITY_ID,
+    kind: 'npc',
+    templateId: TIBBS_NPC_ID,
+    pos: { x: 0, y: 0, z: 0 },
+    questIds: [],
+    vendorItems: [],
+  } as unknown as Entity;
+  const targetEntity = vi.fn();
+  const interact = vi.fn();
+  const world = {
+    entities: new Map([[tibbs.id, tibbs]]),
+    cfg: { playerClass: 'warrior' },
+    player: { name: 'Ari', pos: { x: 0, y: 0, z: 0 } },
+    questLog: new Map(),
+    questsDone: new Set<string>(),
+    deedsEarned,
+    clueHunt: null,
+    targetEntity,
+    interact,
+  } as unknown as IWorld;
+  const trap: FocusTrapHandle = {
+    release: vi.fn(),
+    focusFirst: vi.fn(),
+    opener: vi.fn(() => null),
+  };
+  const noop = vi.fn();
+  const controller = new QuestDialogController({
+    element,
+    document,
+    world: () => world,
+    now: () => clock.now,
+    text: {
+      npcName: () => 'Tibbs',
+      mobName: (id) => id,
+      npcTitle: () => 'Mob Union Rep',
+      npcGreeting: () => 'Hello',
+      delveName: (id) => id,
+      questTitle: (id) => id,
+      questNarrative: (id) => id,
+      objectiveLabel: (id) => id,
+      number: String,
+      progress: (label) => label,
+      suggestedPlayers: () => '',
+      money: (copper) => `<span data-copper>${copper}</span>`,
+    },
+    openFocusTrap: () => trap,
+    closeTransient: noop,
+    hideTooltip: noop,
+    itemIcon: () => '<img>',
+    itemTooltip: () => '',
+    attachTooltip: noop,
+    openChronicles: noop,
+    openVendor: noop,
+    openHeroicVendor: noop,
+    openCrucibleVendor: noop,
+    openWarfareVendor: noop,
+    openMarket: noop,
+    openWorldQuestBoard: noop,
+    openDelveBoard: noop,
+    openCardDuel: noop,
+    openTrain: noop,
+    openUnbind: noop,
+    openCrafting: noop,
+    onOpenChange: noop,
+    voice: { play: noop, isPlaying: vi.fn(() => false), setDistance: noop },
+  });
+  return { controller, element, targetEntity, interact, world, tibbs };
+}
+
+describe("Tibbs' shift offer", () => {
+  it('shows his pitch under his name and title with the two choices', () => {
+    const { controller, element } = harness();
+    controller.open(TIBBS_ENTITY_ID);
+    expect(element.style.display).toBe('block');
+    expect(element.querySelector('#quest-dialog-title')?.textContent).toContain('Tibbs');
+    expect(element.querySelector('#quest-dialog-title')?.textContent).toContain('Mob Union Rep');
+    const lines = [...element.querySelectorAll('.qd-text')].map((el) => el.textContent);
+    expect(lines).toHaveLength(3);
+    expect(lines[1]).toContain('four thousand eight hundred times');
+    // One speech in paragraphs, not a stack of quoted lines.
+    expect(lines.some((line) => line?.includes('"'))).toBe(false);
+    expect(element.querySelector('[data-gshift-accept]')?.textContent).toBe('Take the shift');
+    expect(element.querySelector('[data-gshift-decline]')?.textContent).toBe('Not today');
+  });
+
+  it('Take the shift targets Tibbs and interacts, then closes', () => {
+    const { controller, element, targetEntity, interact } = harness();
+    controller.open(TIBBS_ENTITY_ID);
+    element.querySelector<HTMLButtonElement>('[data-gshift-accept]')!.click();
+    expect(targetEntity).toHaveBeenCalledWith(TIBBS_ENTITY_ID);
+    expect(interact).toHaveBeenCalledOnce();
+    expect(targetEntity.mock.invocationCallOrder[0]).toBeLessThan(
+      interact.mock.invocationCallOrder[0],
+    );
+    expect(element.style.display).not.toBe('block');
+  });
+
+  it('Not today answers in his voice, stays up through a refresh, and closes on continue', () => {
+    const { controller, element, interact } = harness();
+    controller.open(TIBBS_ENTITY_ID);
+    element.querySelector<HTMLButtonElement>('[data-gshift-decline]')!.click();
+    expect(interact).not.toHaveBeenCalled();
+    const reply = () => [...element.querySelectorAll('.qd-text')].map((el) => el.textContent);
+    expect(reply()).toEqual(['"Fair. Nobody reads the job description either."']);
+    controller.refresh();
+    controller.refreshIfChanged();
+    expect(reply()).toEqual(['"Fair. Nobody reads the job description either."']);
+    const buttons = [...element.querySelectorAll<HTMLButtonElement>('button.btn')];
+    expect(buttons).toHaveLength(1);
+    buttons[0].click();
+    expect(element.style.display).not.toBe('block');
+  });
+
+  it('after the win he only says the shift is covered: no Take the shift, Continue closes', () => {
+    const { controller, element, interact } = harness(
+      new Map([['hid_boss_for_a_day', '2026-10-04']]),
+    );
+    controller.open(TIBBS_ENTITY_ID);
+    const lines = [...element.querySelectorAll('.qd-text')].map((el) => el.textContent);
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).toBe(
+      '"Your shift is covered. Morthen is back at work, and he says thank you."',
+    );
+    expect(element.querySelector('[data-gshift-accept]')).toBeNull();
+    const buttons = [...element.querySelectorAll<HTMLButtonElement>('button.btn')];
+    expect(buttons.map((b) => b.textContent)).toEqual(['Continue']);
+    buttons[0].click();
+    expect(interact).not.toHaveBeenCalled();
+    expect(element.style.display).not.toBe('block');
+  });
+
+  it('opens his win report with the pay under it and one way out', () => {
+    const { controller, element, interact } = harness(
+      new Map([['hid_boss_for_a_day', '2026-10-04']]),
+    );
+    controller.open(TIBBS_ENTITY_ID, { outcome: 'won', sent: 10, saved: 2, copper: 2000 });
+    const lines = [...element.querySelectorAll('.qd-text')].map((el) => el.textContent);
+    expect(lines).toEqual([
+      'Shift report! Adventurers sent home: 10. Colleagues saved: 2. Trousers not handed out: 1.',
+      "Good job and thank you for your help, adventurer. Here's your payout.",
+    ]);
+    expect(element.querySelector('[data-gshift-reward] [data-copper]')?.textContent).toBe('2000');
+    expect(element.querySelector('[data-gshift-accept]')).toBeNull();
+    const buttons = [...element.querySelectorAll<HTMLButtonElement>('button.btn')];
+    expect(buttons.map((b) => b.textContent)).toEqual(['Thanks, Tibbs']);
+    buttons[0].click();
+    expect(interact).not.toHaveBeenCalled();
+    expect(element.style.display).not.toBe('block');
+    // Talked to again later, the report is gone: the closing line only.
+    controller.open(TIBBS_ENTITY_ID);
+    expect(element.querySelector('[data-gshift-reward]')).toBeNull();
+    expect(element.querySelector('.qd-text')?.textContent).toContain('Your shift is covered.');
+  });
+
+  it('after a loss he consoles and offers the shift again', () => {
+    const { controller, element, targetEntity, interact } = harness();
+    controller.open(TIBBS_ENTITY_ID, { outcome: 'lost', sent: 3, saved: 0, copper: 0 });
+    const lines = [...element.querySelectorAll('.qd-text')].map((el) => el.textContent);
+    expect(lines).toEqual([
+      'Do not worry. They kill us every day. Welcome to the job.',
+      'Another shift? They certainly will.',
+    ]);
+    expect(element.querySelector('[data-gshift-reward]')).toBeNull();
+    element.querySelector<HTMLButtonElement>('[data-gshift-accept]')!.click();
+    expect(targetEntity).toHaveBeenCalledWith(TIBBS_ENTITY_ID);
+    expect(interact).toHaveBeenCalledOnce();
+  });
+
+  it('opens once his entity arrives when the offer lands first, and gives up after a while', () => {
+    const { controller, element, world, tibbs } = harness();
+    world.entities.delete(TIBBS_ENTITY_ID);
+    controller.openWhenPresent(TIBBS_ENTITY_ID);
+    expect(element.style.display).not.toBe('block');
+    world.entities.set(TIBBS_ENTITY_ID, tibbs);
+    controller.updateProximity();
+    expect(element.style.display).toBe('block');
+    expect(element.querySelector('[data-gshift-accept]')).not.toBeNull();
+    controller.close();
+    // Too late: an offer whose Tibbs never came is dropped, not opened later.
+    world.entities.delete(TIBBS_ENTITY_ID);
+    controller.openWhenPresent(TIBBS_ENTITY_ID);
+    clock.now += 3_500;
+    world.entities.set(TIBBS_ENTITY_ID, tibbs);
+    controller.updateProximity();
+    expect(element.style.display).not.toBe('block');
+  });
+
+  it('a report that lands before his entity opens as the report once he arrives', () => {
+    const { controller, element, world, tibbs } = harness(
+      new Map([['hid_boss_for_a_day', '2026-10-04']]),
+    );
+    world.entities.delete(TIBBS_ENTITY_ID);
+    controller.openWhenPresent(TIBBS_ENTITY_ID, {
+      outcome: 'won',
+      sent: 10,
+      saved: 2,
+      copper: 2000,
+    });
+    expect(element.style.display).not.toBe('block');
+    world.entities.set(TIBBS_ENTITY_ID, tibbs);
+    controller.updateProximity();
+    expect(element.style.display).toBe('block');
+    expect(element.querySelector('[data-gshift-reward] [data-copper]')?.textContent).toBe('2000');
+    expect(element.querySelector('.qd-text')?.textContent).toContain('Adventurers sent home: 10.');
+  });
+});

@@ -31,6 +31,7 @@
 // default), and no two NPCs share an appearance.
 
 import { SHADOW_GUARDS } from '../../sim/content/world_quest_shadow';
+import { TIBBS_NPC_ID } from '../../sim/graveyard_shift/grave_entry';
 import type { EntityKind } from '../../sim/types';
 import {
   type ArmorLoadout,
@@ -2527,6 +2528,13 @@ export function aldricKeepsHisRig(templateId: string): boolean {
   return templateId.startsWith('brother_aldric');
 }
 
+/** NPCs that keep a fixed rig instead of a composed look: Brother Aldric (above),
+ *  and Tibbs, the Graveyard Shift's union rep, a friendly skeleton drawn on the
+ *  skeleton minion rig (manifest.ts NPC_KEYS). */
+export function keepsFixedRig(templateId: string): boolean {
+  return aldricKeepsHisRig(templateId) || templateId === TIBBS_NPC_ID;
+}
+
 /** normalizeAppearance for an authored NPC look: the same clamps, except that an
  *  NPC-only outfit colorway (modular.ts NPC_MATERIAL_COLORWAY_IDS) survives where
  *  the player normalizer would clamp it back to the default. */
@@ -2556,7 +2564,7 @@ const resolved = new Map<string, ModularLook | null>();
  *  (which keeps its fixed rig, the same null the player path uses). */
 export function npcLookFor(templateId: string, kind: EntityKind = 'npc'): ModularLook | null {
   if (kind !== 'npc') return null;
-  if (aldricKeepsHisRig(templateId)) return null;
+  if (keepsFixedRig(templateId)) return null;
   const id = baseId(templateId);
   let look = resolved.get(id);
   if (look === undefined) {

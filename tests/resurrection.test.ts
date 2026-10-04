@@ -407,7 +407,9 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
     // purpose. battleground.ts: the seat (placeInBg, which is also the form-up
     // set-back), the countdown end, the leaver reset, and the match end; its
     // WAVE respawn passes clearPrep: false and is in the second table instead.
-    // yumi.ts: the revive. fiesta.ts: the revive. arena.ts: the body of
+    // yumi.ts: the revive. fiesta.ts: the revive. graveyard_shift/run_lifecycle.ts:
+    // the Graveyard Shift seat (entry) and its one teardown (every exit).
+    // arena.ts: the body of
     // resetForArena (the wrapper the next case counts the callers of) and,
     // with clearPrep: false, the countdown-end top-off that keeps a fighter's
     // targets. sim.ts: the seam delegate passes its opts through, the one
@@ -430,6 +432,7 @@ describe('resurrection: which sim modules wipe through aurasSurvivingCleanSlate'
       }
     }
     expect([...wipes.entries()].sort()).toEqual([
+      ['graveyard_shift/run_lifecycle.ts', 2],
       ['social/arena.ts', 1],
       ['social/battleground.ts', 4],
       ['social/fiesta.ts', 1],

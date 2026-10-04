@@ -8,6 +8,7 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import { createDeedRuntime } from '../src/sim/deeds';
+import { GraveyardShiftBook } from '../src/sim/graveyard_shift/run_state';
 import { createMobScanCounters } from '../src/sim/mob/scan_counters';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
@@ -228,6 +229,9 @@ const CALLBACK_KEYS = [
   'setPlayerLevel',
   'notice',
   'spawnDevBot',
+  // Graveyard Shift adventurer party join and leave.
+  'addPlayer',
+  'removePlayer',
   'spawnDevVendor',
   'startCascadePlaytest',
   'startDevSandbox',
@@ -369,6 +373,7 @@ function makeFakeHost() {
     nextBgProposalId: 1,
     nextBgMatchId: 1,
     delveRuns: [],
+    graveyardShiftRuns: new GraveyardShiftBook(),
     delvePetStash: new Map(),
     utcDay: '',
     resetDay: '',
@@ -618,6 +623,8 @@ function makeFakeHost() {
     setPlayerLevel: vi.fn(),
     notice: vi.fn(),
     spawnDevBot: vi.fn(),
+    addPlayer: vi.fn(),
+    removePlayer: vi.fn(),
     spawnDevVendor: vi.fn(),
     startCascadePlaytest: vi.fn(),
     startDevSandbox: vi.fn(),

@@ -11,6 +11,7 @@
 // on Sim and are read through the seam.
 
 import { ownedNecromancyUndead } from '../combat/necromancy';
+import { isGraveyardShiftBotPid } from '../graveyard_shift/run_state';
 import type { DuelState } from '../sim';
 import type { SimContext } from '../sim_context';
 import { DT, dist2d, type Entity } from '../types';
@@ -22,7 +23,8 @@ export function duelRequest(ctx: SimContext, targetPid: number, pid?: number): v
   const r = ctx.resolve(pid);
   const target = ctx.players.get(targetPid);
   const targetE = ctx.entities.get(targetPid);
-  if (!r || !target || !targetE) return;
+  // A Graveyard Shift adventurer is nobody's to duel, trade or invite.
+  if (!r || !target || !targetE || isGraveyardShiftBotPid(ctx, targetPid)) return;
   if (targetPid === r.meta.entityId) return;
   if (
     ctx.entityInDungeon(r.e, 'nythraxis_boss_arena') ||

@@ -6949,6 +6949,112 @@ export const ko_KR: EnTranslations = {
       }
     }
   },
+  "graveyardShift": {
+    "identityAura": "무덤부름 모르덴",
+    "defeatedAura": "패배",
+    "staffExit": "직원 출구",
+    "adventurerAura": "모험가",
+    "resource": "공포",
+    "errors": {
+      "notEnoughDread": "공포가 부족합니다!",
+      "noCorpse": "되살릴 시체가 없습니다."
+    },
+    "abilities": {
+      "shadowPulse": {
+        "name": "암흑 파동",
+        "description": "암흑의 파동을 방출해 시야 내 {radius}야드 이내의 모든 적에게 {min}~{max}의 암흑 피해를 입힙니다. 적중한 적은 각각 {distance}야드 밀려나고 {slowSeconds}초 동안 이동 속도가 {slow} 감소합니다."
+      },
+      "sextonsChain": {
+        "name": "묘지기의 사슬",
+        "description": "대상을 자신으로부터 {stop}야드 이내로 끌어당기고 {slowSeconds}초 동안 이동 속도를 {slow} 감소시킵니다. 대상이 시전 중인 주문은 차단되고 해당 계열은 {lockout}초 동안 잠기며, 대상은 {silence}초 동안 침묵에 걸립니다."
+      },
+      "raiseFallen": {
+        "name": "쓰러진 자 일으키기",
+        "description": "{radius}야드 이내에서 가장 가까운 시체를 해골로 일으켜 {seconds}초 동안 당신을 위해 싸우게 합니다. 각 시체는 한 번만 일어납니다."
+      }
+    },
+    "hints": {
+      "chain": "묘지기의 사슬: 한 명을 골라 끌어오세요. 치유사부터 시작하는 것도 좋습니다.",
+      "pulse": "암흑 파동 준비 완료: 주변에 강력한 폭발을 일으키며, 적이 가까이 있을수록 좋습니다. 적이 차단할 수 있습니다. 분명 시도할 겁니다.",
+      "raise": "쓰러진 자 일으키기: 근처에 시체가 있습니다. 모든 시체는 동료입니다. 저들의 시체조차도.",
+      "exit": "근무 끝. 왕좌 뒤의 직원 출구로 집에 갈 수 있습니다."
+    },
+    "graveName": "빛나는 무덤",
+    "tibbs": {
+      "whisper": "쉿. 여기, 아래요.",
+      "offer": {
+        "intro1": "아, 내 말이 들렸구려. 내 이름은 팁스요. 이 묘실의 몬스터들을 대변하고 있소. 늘 당신 도끼날 앞에서 마주치는 그 녀석들 말이오.",
+        "intro2": "우리 보스 모르덴은 이번 주에만 사천팔백 번 죽었소. 매번 똑같은 바지 한 벌 때문에. 노조 규정상 하루 쉴 자격이 있는데, 아무도 그의 근무를 대신 서 주지 않소.",
+        "intro3": "당신만은 예외였으면 하오. 간단한 일이오. 당신이 보스를 맡는 거요. 모험가 파티가 이미 안에 들어와 있소. 그들을 막으시오. 차이는 절대 눈치채지 못할 거요. 뭐. 채겠지만.",
+        "accept": "근무 맡기",
+        "decline": "오늘은 안 돼요",
+        "thanks": "고마워요, 팁스"
+      },
+      "say": {
+        "accept": "훌륭하오. 내려가는 길에 뼈 조심하시오. 그중 몇은 동료라오.",
+        "decline": "그럴 만하오. 직무 설명서도 아무도 안 읽으니까.",
+        "busy": "덜 바쁠 때 다시 오시오. 노조 규정이오.",
+        "report": "근무 보고! 집으로 돌려보낸 모험가: {sent}. 구한 동료: {saved}. 지급되지 않은 바지: 1.",
+        "payout": "수고했소, 도와줘서 고맙소, 모험가. 여기 보수요.",
+        "covered": "당신 근무는 해결됐소. 모르덴이 복귀했고, 고맙다고 전해 달라더군.",
+        "consolation": "걱정 마시오. 저들은 매일 우리를 죽인다오. 이 일에 온 걸 환영하오.",
+        "anotherShift": "한 번 더 근무하겠소? 저들은 분명 또 올 거요."
+      }
+    },
+    "say": {
+      "clearing": {
+        "lastPull": "ㅇㅋ 막팩 잡고 보스 잡고 잠",
+        "stayAway": "다들 보스 근처 가지 마",
+        "speedUp": "10분 뒤에 가야 됨, 좀 빨리 가자",
+        "howsMana": "힐러 마나 어때"
+      },
+      "notice": {
+        "pulledEarly": "보스 벌써 풀림??",
+        "whoPulled": "누가 땡김!!!",
+        "boredWaiting": "보스가 기다리다 지쳐서 온 거임?"
+      },
+      "death": {
+        "rip": "사망 ㅠㅠ",
+        "healerHealer": "힐러?? 힐러!!??",
+        "lag": "렉. 방금 렉이었음. 다들 봤지"
+      },
+      "healerOom": {
+        "oom": "마나 바닥",
+        "emotionalSupport": "이제 그냥 정신적 지원으로 힐하는 중"
+      },
+      "wipeThreat": {
+        "popEverything": "다 써. 쿨기 다 박아!!",
+        "wedding": "쿨기 결혼식 때 쓰려고 아끼는 사람 누구임",
+        "goingBadly": "이거 망하는 중"
+      },
+      "corpseRun": {
+        "runningBack": "시체 찾으러 뛰어오는 중, 버텨",
+        "kiteHim": "그냥 빙빙 돌면서 카이팅해",
+        "holdHim": "올 때까지 붙잡고 있어"
+      },
+      "returned": {
+        "roundTwo": "ㅇㅋ 2라운드, 이번엔 진짜로",
+        "imBack": "나 왔음, 뭐 놓친 거 있음?",
+        "knowHisMoves": "ㅇㅋ 이제 패턴 다 앎",
+        "revengeTime": "복수의 시간"
+      },
+      "giveUp": {
+        "gn": "ㅇㅋ 나 나감, 굿밤",
+        "ggBoss": "gg 보스, 솔직히 쩔었다",
+        "betterRotation": "보스가 나보다 딜사이클 잘 돌림",
+        "sameTime": "내일 같은 시간?"
+      },
+      "loot": {
+        "whoNeeds": "ㅇㅋ 바지 필요한 사람",
+        "need": "입찰!!"
+      },
+      "partyWins": {
+        "easy": "개꿀",
+        "gg": "gg",
+        "toldYouEasy": "쉽다고 했잖아"
+      }
+    }
+  },
   "guide": {
     "brand": "World of ClaudeCraft",
     "brandShort": "ClaudeCraft",
@@ -20890,6 +20996,11 @@ export const ko_KR: EnTranslations = {
         "name": "교관 헤일",
         "title": "부두 대련 사범",
         "greeting": "내 뒤에 있는 허수아비는 되받아치지도, 쓰러지지도 않는다, {className}. 중요한 건 장부다. 네가 저기에 꽂은 일격은 하나도 빠짐없이 피해량 미터가 세어 준다. 저것을 대상으로 삼고 미터를 열어라, 나머지는 내가 알려주마."
+      },
+      "tibbs": {
+        "name": "팁스",
+        "title": "몬스터 노조 대표",
+        "greeting": "팁스요. 몬스터 노조 대표지요. 뼈 조심하시오. 그중엔 내 동료도 있으니."
       },
       "tidewatcher_ondrel": {
         "name": "온드렐 베인",

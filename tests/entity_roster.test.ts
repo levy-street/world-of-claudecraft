@@ -18,6 +18,7 @@ import {
   runDespawnDecay,
   tickGroundAoEs,
 } from '../src/sim/entity_roster';
+import { GraveyardShiftBook } from '../src/sim/graveyard_shift/run_state';
 import { createMobScanCounters } from '../src/sim/mob/scan_counters';
 import type { PendingProjectile } from '../src/sim/projectile_travel';
 import { Rng } from '../src/sim/rng';
@@ -173,6 +174,7 @@ function makeCtx() {
     nextBgProposalId: 1,
     nextBgMatchId: 1,
     delveRuns: [],
+    graveyardShiftRuns: new GraveyardShiftBook(),
     delvePetStash: new Map(),
     utcDay: '',
     resetDay: '',
@@ -428,6 +430,8 @@ function makeCtx() {
     setPlayerLevel: vi.fn(),
     notice: vi.fn(),
     spawnDevBot: vi.fn(),
+    addPlayer: vi.fn(),
+    removePlayer: vi.fn(),
     spawnDevVendor: vi.fn(),
     startCascadePlaytest: vi.fn(),
     startDevSandbox: vi.fn(),

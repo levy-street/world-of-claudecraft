@@ -42,6 +42,7 @@ import {
 } from './data';
 import { GALE_HARBOR_DECKS } from './gale_harbor';
 import { GLIDER_WHARF_DECKS } from './glider_wharf_layout';
+import { TIBBS_NPC_ID } from './graveyard_shift/grave_entry';
 import { REACH_DECKS } from './reach_decks';
 import { WORLD_BOSSES } from './world_boss';
 
@@ -166,6 +167,9 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
   for (const node of GATHER_NODES) pad('gatherNode', node.pos.x, node.pos.z, 5, 12, false);
   for (const id in NPCS) {
     if (Object.hasOwn(WORLD_QUEST_CALLIGRAPHY_NPCS, id)) continue;
+    // Tibbs rises beside his grave on demand (graveyard_shift/grave_staging.ts):
+    // the old graveyard ground stays as it was, minted rings unchanged.
+    if (id === TIBBS_NPC_ID) continue;
     const npc = NPCS[id];
     pad('npc', npc.pos.x, npc.pos.z, 6, 14, false);
   }

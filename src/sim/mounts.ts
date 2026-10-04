@@ -1,4 +1,5 @@
 import { gliderActionsLocked } from './glider_action_lock';
+import { hasMorthenIdentity } from './graveyard_shift/morthen_identity';
 import { shadowActionsLocked } from './shadow_action_lock';
 // Rideable ground mounts: collection + mount/dismount rules, a sibling sim
 // system behind the SimContext seam (module-first; sim.ts keeps thin delegates).
@@ -255,7 +256,8 @@ export function summonMountItem(ctx: SimContext, pid: number, key: string): bool
   if (
     wispMazeActionsLocked(meta.worldQuestLog) ||
     shadowActionsLocked(meta.worldQuestLog) ||
-    gliderActionsLocked(meta.worldQuestLog)
+    gliderActionsLocked(meta.worldQuestLog) ||
+    hasMorthenIdentity(e)
   )
     return false;
   const def = mountDef(key);
@@ -329,7 +331,8 @@ export function toggleMount(ctx: SimContext, pid: number): boolean {
   if (
     wispMazeActionsLocked(meta.worldQuestLog) ||
     shadowActionsLocked(meta.worldQuestLog) ||
-    gliderActionsLocked(meta.worldQuestLog)
+    gliderActionsLocked(meta.worldQuestLog) ||
+    hasMorthenIdentity(e)
   )
     return false;
   // A toggle while a summon/dismount is already channeling is ignored.

@@ -10,6 +10,7 @@ import { apiErrorStrings } from './api_error';
 import { clueStrings } from './clues';
 import { editorStrings } from './editor';
 import { gameStrings } from './game';
+import { graveyardShiftStrings } from './graveyard_shift';
 import { guideStrings } from './guide';
 import { hudStrings } from './hud';
 import { hudChromeStrings } from './hud_chrome';
@@ -38,6 +39,7 @@ export {
   gameStringsZhCN,
   gameStringsZhTW,
 } from './game';
+export { graveyardShiftStrings } from './graveyard_shift';
 export { guideStrings } from './guide';
 export { hudStrings } from './hud';
 export { hudChromeStrings } from './hud_chrome';
@@ -249,6 +251,8 @@ export const en = {
   apiError: apiErrorStrings,
   // Clue Scroll hunt titles and per-step riddles (src/ui/i18n.catalog/clues.ts).
   clues: clueStrings,
+  // The Graveyard Shift (src/ui/i18n.catalog/graveyard_shift.ts).
+  graveyardShift: graveyardShiftStrings,
   guide: guideStrings,
   editor: editorStrings,
   // Cosmetic skin-select event overlay. Rarity names reuse itemUi.quality.*.

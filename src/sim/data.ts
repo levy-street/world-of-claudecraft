@@ -1,3 +1,4 @@
+import { TIBBS_NPC_DEF } from './content/graveyard_shift';
 import { INVESTIGATION_MOB, INVESTIGATION_NPCS } from './content/world_quest_investigation';
 import { SHADOW_GUARDS, SHADOW_NPC_DEF } from './content/world_quest_shadow';
 // Content merge layer. Actual game content lives in sim/content/* — one
@@ -519,6 +520,9 @@ export const NPCS: Record<string, NpcDef> = {
   // (content/wyrmwatch_harbor_house.ts), appended last so every NPC placed
   // before her keeps its entity id.
   ...WYRMWATCH_HARBOR_NPCS,
+  // Tibbs (content/graveyard_shift.ts): dynamic, spawned on demand by his
+  // grave, appended last so his record moves no id.
+  [TIBBS_NPC_DEF.id]: TIBBS_NPC_DEF,
 };
 
 // Graveyards + the Spirit Healer: re-exported so the Sim and spirit.ts import the

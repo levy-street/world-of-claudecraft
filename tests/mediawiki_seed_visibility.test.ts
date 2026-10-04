@@ -72,4 +72,9 @@ describe('MediaWiki ability visibility', () => {
     expect(xml).toContain('<title>Debt of Light (Ability)</title>');
     expect(xml).not.toContain('Faithforged Guard (Ability)');
   });
+
+  it('keeps the Graveyard Shift secret: no Tibbs page, link or zone listing', () => {
+    expect(xml).not.toContain('Tibbs');
+    expect(xml).not.toContain('Mob Union Rep');
+  });
 });

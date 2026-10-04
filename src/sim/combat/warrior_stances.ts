@@ -8,6 +8,7 @@
 // the reconcile diff) carry NO ctx/DOM and are unit-tested directly. The thin
 // ensureWarriorStance consumer applies that decision through SimContext.
 import { ABILITIES } from '../data';
+import { hasMorthenIdentity } from '../graveyard_shift/morthen_identity';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Aura, AuraKind, Entity } from '../types';
@@ -99,7 +100,8 @@ export function warriorStanceReconcile(
 // (or a spec change that invalidates the worn stance) it strips the stale stance
 // and applies the spec default. Draws no rng. Runs once per player-tick.
 export function ensureWarriorStance(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
-  if (meta.cls !== 'warrior') return;
+  // Morthen has no stance: the run owner fights with the template's kit.
+  if (meta.cls !== 'warrior' || hasMorthenIdentity(p)) return;
   const worn = p.auras.filter((a) => isWarriorStanceKind(a.kind)).map((a) => a.kind);
   const spec = ctx.playerMods(meta).spec;
   const plan = warriorStanceReconcile(spec, worn);

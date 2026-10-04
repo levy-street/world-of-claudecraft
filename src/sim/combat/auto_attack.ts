@@ -31,6 +31,7 @@ import { shadowActionsLocked } from '../shadow_action_lock';
 
 import { WARSPIRIT_EMBERSCALE_2PC_CADENCE_STEPS } from '../content/ignivar_set_bonuses';
 import { isArenaPos, MOBS } from '../data';
+import { hasMorthenIdentity } from '../graveyard_shift/morthen_identity';
 import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import { forceDismount } from '../mounts';
 import { grantDevotionFromBlock } from '../paladin_devotion';
@@ -265,7 +266,8 @@ export function tryPlayerSwing(ctx: SimContext, p: Entity, meta: PlayerMeta): vo
   // somehow retained autoAttack=true) force-dismounts before the swing lands,
   // mirroring the ghost_wolf break pattern below and the startAutoAttack guard.
   if (p.mountKey !== '') forceDismount(ctx, p);
-  const ranged = rangedAutoProfile(p, meta.cls);
+  // Morthen only swings his template weapon: no class Auto Shot or wand.
+  const ranged = hasMorthenIdentity(p) ? undefined : rangedAutoProfile(p, meta.cls);
   if (ranged && d <= ranged.maxRange && d >= (ranged.wand ? 0 : ranged.minRange)) {
     if (!ctx.hasLineOfSight(p, t)) return;
     ctx.breakGhostWolf(p);
@@ -389,7 +391,7 @@ function maybeProcBattleTrance(
   meta: PlayerMeta,
   connected: boolean,
 ): void {
-  if (!connected || meta.cls !== 'warrior') return;
+  if (!connected || meta.cls !== 'warrior' || hasMorthenIdentity(player)) return;
   const proc = ctx.rng.chance(BATTLE_TRANCE_CHANCE);
   if (!proc || ctx.playerMods(meta).spec === 'fury') return;
   ctx.applyAura(player, {

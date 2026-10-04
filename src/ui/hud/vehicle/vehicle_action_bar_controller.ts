@@ -22,6 +22,7 @@ import { CannonFeedbackCursor } from './cannon_feedback_core';
 import { cannonTacticsHint } from './cannon_tactics_view';
 import { ForgeActionBarController, type ForgeBarWorld } from './forge_action_bar_controller';
 import { createGliderActionBarView, gliderBoostDescription } from './glider_action_bar_view';
+import { MorthenShiftController, type MorthenShiftWorld } from './morthen_shift_controller';
 import { ShadowActionBarController } from './shadow_action_bar_controller';
 import { createVehicleActionBarView } from './vehicle_action_bar_view';
 import { vehicleActionTooltip } from './vehicle_action_tooltip';
@@ -29,7 +30,7 @@ import { VEHICLE_ACTION_SLOTS, VehicleAimCore } from './vehicle_aim_core';
 
 interface VehicleBarDeps {
   world: IWorldVehicles &
-    Partial<ShadowControlWorld & ForgeBarWorld> & {
+    Partial<ShadowControlWorld & ForgeBarWorld & MorthenShiftWorld> & {
       boostWorldQuestGlider?(): void;
     };
   writers: PainterHostWriters;
@@ -46,6 +47,10 @@ interface VehicleBarDeps {
   /** Flight bar Climb/Dive slots: a held pointer pins the glider pitch (+1 climb,
    *  -1 dive) until release; 0 hands control back to the camera. */
   gliderPitchHold?(value: -1 | 0 | 1): void;
+  /** The Graveyard Shift hint lines land in the chat log as tips. */
+  logTip?(text: string): void;
+  /** Re-show the pad's resting cross hotbar (the Morthen kit came or went). */
+  refreshPadBar?(): void;
 }
 
 /** Flight bar slot layout: 0 boost, 1 climb, 2 dive (see glider_action_bar_view). */
@@ -72,6 +77,7 @@ export class VehicleActionBarController {
   private gliderMode: boolean | null = null;
   private readonly shadow: ShadowActionBarController | null;
   private readonly forge: ForgeActionBarController | null;
+  private readonly morthen: MorthenShiftController | null;
 
   constructor(private readonly deps: VehicleBarDeps) {
     this.shadow =
@@ -100,6 +106,16 @@ export class VehicleActionBarController {
             deps.consumePeek,
             deps.padKind,
           )
+        : null;
+    this.morthen =
+      deps.world.player && deps.world.entities
+        ? new MorthenShiftController({
+            world: deps.world as MorthenShiftWorld,
+            writers: deps.writers,
+            cancelOnEnter: deps.cancelOnEnter,
+            showHint: (text) => deps.logTip?.(text),
+            refreshPadBar: () => deps.refreshPadBar?.(),
+          })
         : null;
     this.aim = new VehicleAimCore(deps.world, () => {
       deps.clearReticle?.();
@@ -234,6 +250,7 @@ export class VehicleActionBarController {
   }
 
   update(): void {
+    this.morthen?.update();
     this.shadow?.update();
     this.forge?.update();
     const session = this.deps.world.vehicleSession;

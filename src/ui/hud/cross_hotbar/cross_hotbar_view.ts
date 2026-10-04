@@ -114,6 +114,8 @@ export interface CrossHotbarPanelHooks {
   /** Offer a cell to any newly learned ability, so levelling into a spell puts it
    *  in reach instead of leaving a pad player to find the arrange chord first. */
   syncCrossHotbarKnown(abilityIds: readonly string[]): void;
+  /** Re-show the resting bar after a temporary kit comes or goes. */
+  refreshCrossHotbar(): void;
   crossHotbarSets(): readonly (readonly CrossHotbarOverlayAction[])[];
   bindCrossHotbar(set: number, position: number, action: CrossHotbarOverlayAction): void;
   resetCrossHotbar(): void;

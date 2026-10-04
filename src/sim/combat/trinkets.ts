@@ -29,6 +29,7 @@ import {
   trinketSpec,
 } from '../content/trinkets';
 import { ITEMS } from '../data';
+import { hasMorthenIdentity } from '../graveyard_shift/morthen_identity';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { duelJustEndedBetween } from '../social/duel';
@@ -58,7 +59,8 @@ export function wornTrinket(
   ctx: SimContext,
   e: Entity,
 ): { itemId: string; spec: TrinketSpec } | null {
-  if (e.kind !== 'player') return null;
+  // Morthen wears nothing of the real character's (Graveyard Shift).
+  if (e.kind !== 'player' || hasMorthenIdentity(e)) return null;
   const itemId = ctx.players.get(e.id)?.equipment?.trinket ?? null;
   const spec = trinketSpec(itemId);
   return itemId && spec ? { itemId, spec } : null;

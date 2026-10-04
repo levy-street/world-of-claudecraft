@@ -24,6 +24,7 @@ export {
   prepareFarshoreSalvageObjects,
   prewarmFarshoreSalvageObjects,
 } from './farshore_salvage_assets';
+export { lootGlint } from './ground_object_glint_core';
 
 import { buildForgeAnvilTarget, buildForgeWellTarget } from './forge_anvil_target';
 import { GFX, surfaceMat } from './gfx';
@@ -57,6 +58,9 @@ const QUEST_OBJECT_URLS: Record<string, string> = {
   grave_sir_aldren: '/models/dungeon/gravestone.glb',
   grave_high_priest_malric: '/models/dungeon/gravestone.glb',
   grave_captain_voss: '/models/dungeon/gravestone.glb',
+  // The Graveyard Shift's way in: a grave by the Hollow Crypt that only an
+  // eligible player ever sees (the sim spawns it for them alone).
+  gshift_grave: '/models/dungeon/gravestone.glb',
   // The Proving Shore ferry bells (a clicked travel object, not a pickup):
   // the standing bell-on-frame prop the marsh dressing already ships.
   ps_ferry_bell: '/models/props/marsh_bell_gallows.glb',
@@ -79,6 +83,7 @@ const QUEST_OBJECT_HEIGHTS: Record<string, number> = {
   grave_sir_aldren: 1.6,
   grave_high_priest_malric: 1.6,
   grave_captain_voss: 1.6,
+  gshift_grave: 1.6,
   // A closed tome resting on the ground: shorter than the scroll/sigil
   // pickups, since it lies flat rather than standing upright.
   royal_seal: 1.5,
@@ -131,6 +136,9 @@ const ITEM_MAT_OVERRIDES: Record<
   soulshard_pillar: { color: 0x6f1b2c, emissive: 0x8f1232, emissiveIntensity: 0.42 },
   sanctum_key_shard: { emissive: 0x1a4060, emissiveIntensity: 0.5 },
   morthen_grimoire: { emissive: 0x3a1850, emissiveIntensity: 0.12 },
+  // The Graveyard Shift grave's soft glow, Morthen's own purple: the one cue
+  // that this grave is not like its neighbours.
+  gshift_grave: { emissive: 0x4a235a, emissiveIntensity: 0.35 },
   leyline_cache: { color: 0x4f8edc, emissive: 0x245fb0, emissiveIntensity: 0.18 },
   confection_game_box: { color: 0xc45a88, emissive: 0x8e2f63, emissiveIntensity: 0.12 },
 };

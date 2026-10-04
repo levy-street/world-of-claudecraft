@@ -37,6 +37,7 @@ import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
 import { castBarState } from './cast_bar';
 import { anyCharacterRigDrawing, entityHasNoBody } from './entity_gate_stand_in_core';
 import { mobDisplayName, npcDisplayName, objectDisplayName } from './entity_labels';
+import { applyMorthenNameplate, isMorthenPlate } from './morthen_nameplate_core';
 import {
   createNameplateCanvasState,
   type NameplateCanvasState,
@@ -194,6 +195,8 @@ export class NameplatePainter {
   private readonly isHostilePlayer: (e: Entity) => boolean;
   private readonly surface: NameplateCanvasSurface;
   private readonly states = new Map<number, NameplateCanvasState>();
+  // The plates last built as the Graveyard Shift's Morthen (morthen_nameplate_core.ts).
+  private readonly morthenPlates = new Set<number>();
   private readonly traceLabels = new WorldQuestTraceLabels();
   private readonly tmpV = new THREE.Vector3();
   private readonly tmpV2 = new THREE.Vector3();
@@ -348,8 +351,20 @@ export class NameplatePainter {
       // The /pvp flag is the one content input read every pass: a flip
       // re-resolves the row THIS frame (state.pvpFlag), never on the tier cadence.
       const pvpFlipped = state.pvpFlag !== (entity.pvpFlag === true);
-      if (!state.initialized || fullPass || plan.urgent || languageChanged || pvpFlipped) {
+      // So is the Graveyard Shift identity: the plate turns with the body.
+      const morthen = isMorthenPlate(entity);
+      const morthenFlipped = this.morthenPlates.has(id) !== morthen;
+      if (
+        !state.initialized ||
+        fullPass ||
+        plan.urgent ||
+        languageChanged ||
+        pvpFlipped ||
+        morthenFlipped
+      ) {
         this.resolveContent(state, entity, player, plan, showOwnNameplate, showDevBadges);
+        if (morthen) this.morthenPlates.add(id);
+        else this.morthenPlates.delete(id);
       }
 
       const anchor = this.anchorScratch[this.anchorCount];
@@ -441,6 +456,7 @@ export class NameplatePainter {
 
   remove(id: number): void {
     this.states.delete(id);
+    this.morthenPlates.delete(id);
     for (let i = 0; i < this.anchorCount; i++) {
       const anchor = this.anchorScratch[i];
       if (anchor.id !== id) continue;
@@ -613,6 +629,10 @@ export class NameplatePainter {
       // player and an unflagged one both need to read it); the red colour below
       // is the hostile-to-me verdict on top of it.
       state.pvpFlag = entity.pvpFlag === true;
+      if (isMorthenPlate(entity)) {
+        applyMorthenNameplate(state, entity, player.level);
+        return;
+      }
       const pvpTag = state.pvpFlag ? `<${t('hudChrome.nameplate.pvpTag')}> ` : '';
       const afkTag = entity.afk ? `<${t('hudChrome.nameplate.afkTag')}> ` : '';
       state.name = `${pvpTag}${afkTag}${baseName}`;

@@ -15,6 +15,7 @@ import {
   CROSS_HOTBAR_SLOTS_PER_SET,
   type CrossHotbarAction,
   type CrossHotbarLayer,
+  type CrossHotbarLayout,
   crossHotbarActionFor,
   crossHotbarPosition,
   crossHotbarSetActions,
@@ -50,6 +51,10 @@ export class CrossHotbarBindings {
   // than reappearing on the next sync.
   private seen = new Set<string>();
   private readonly storeKey: string;
+  // A temporary kit the bar shows and casts instead of the stored layout (a
+  // possess bar: the Graveyard Shift's Morthen kit), read live. While it is on,
+  // every writer below is a no-op, so nothing of it is ever saved.
+  private overrideSource: (() => CrossHotbarLayout | null) | null = null;
 
   // Required rather than defaulted: an omitted scope lands every character back on
   // the one shared key, which is the bug the namespacing exists to prevent.
@@ -89,6 +94,20 @@ export class CrossHotbarBindings {
     return legacy;
   }
 
+  /** Install the live source of a temporary kit (null when none is active). */
+  setOverride(source: () => CrossHotbarLayout | null): void {
+    this.overrideSource = source;
+  }
+
+  /** True while a temporary kit stands in for the stored layout. */
+  overridden(): boolean {
+    return (this.overrideSource?.() ?? null) !== null;
+  }
+
+  private shown(): CrossHotbarLayout {
+    return this.overrideSource?.() ?? this.layout;
+  }
+
   private save(): void {
     try {
       localStorage.setItem(
@@ -110,7 +129,7 @@ export class CrossHotbarBindings {
    * queue placements that surface later when the player frees a slot.
    */
   syncKnown(abilityIds: readonly string[]): boolean {
-    if (!this.isSeeded()) return false;
+    if (!this.isSeeded() || this.overridden()) return false;
     let changed = false;
     for (const id of abilityIds) {
       if (this.seen.has(id)) continue;
@@ -128,7 +147,7 @@ export class CrossHotbarBindings {
    *  the rows it touches instead of mutating them, so a held snapshot stays the
    *  layout it was taken from. */
   all(): readonly (readonly CrossHotbarAction[])[] {
-    return this.layout;
+    return this.shown();
   }
 
   /** Whether anything sits on the bar yet. */
@@ -150,7 +169,7 @@ export class CrossHotbarBindings {
   }
 
   seedOnce(barActions: readonly CrossHotbarAction[], extras: readonly string[] = []): boolean {
-    if (this.isSeeded()) return false;
+    if (this.isSeeded() || this.overridden()) return false;
     // Wait for the ACTION BAR specifically, not for any content at all. A pad is
     // usually connected before the character's bar loads, and the extras (the
     // stance) are ready first: latching then would seed a bar holding nothing but
@@ -165,12 +184,12 @@ export class CrossHotbarBindings {
 
   /** The sixteen actions of one set, in display order. */
   setActions(set: number): readonly CrossHotbarAction[] {
-    return crossHotbarSetActions(this.layout, set);
+    return crossHotbarSetActions(this.shown(), set);
   }
 
   /** The action a held-trigger press casts, or null when unclaimed or empty. */
   actionFor(set: number, layer: CrossHotbarLayer, button: number): CrossHotbarAction {
-    return crossHotbarActionFor(this.layout, set, layer, button);
+    return crossHotbarActionFor(this.shown(), set, layer, button);
   }
 
   /** The layout with one cell rewritten, sharing every untouched row. Copy-on-write
@@ -192,6 +211,7 @@ export class CrossHotbarBindings {
    *  positions are ignored rather than clamped: a caller naming a cell that does
    *  not exist is a bug, and quietly writing a neighbour would hide it. */
   bind(set: number, position: number, action: CrossHotbarAction): void {
+    if (this.overridden()) return;
     if (!Number.isInteger(set) || set < 0 || set >= CROSS_HOTBAR_SET_COUNT) return;
     if (!Number.isInteger(position) || position < 0 || position >= CROSS_HOTBAR_SLOTS_PER_SET)
       return;
@@ -214,6 +234,7 @@ export class CrossHotbarBindings {
 
   /** Move a cell onto another, swapping whatever was there (the edit-mode drag). */
   swap(setA: number, posA: number, setB: number, posB: number): void {
+    if (this.overridden()) return;
     const a = this.layout[setA]?.[posA];
     const b = this.layout[setB]?.[posB];
     if (a === undefined || b === undefined) return;
@@ -225,6 +246,7 @@ export class CrossHotbarBindings {
    *  Forgets what has been offered too, or a bar the player reset would never be
    *  offered the abilities it just lost. */
   reset(): void {
+    if (this.overridden()) return;
     this.layout = defaultCrossHotbarLayout();
     this.seen.clear();
     this.save();

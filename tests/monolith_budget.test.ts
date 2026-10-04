@@ -537,7 +537,11 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 18081 and the
     // branch 18235; the two sides' additions compose to 18093 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 18093,
+    // LOWERED 18093 -> 18073 by the Graveyard Shift possess-bar override: the
+    // freed Attack slot's display memo moved into ActionBarController beside the
+    // slot read it wraps, making room for the override's two hooks. Extract,
+    // then lower. Exact count, zero slack.
+    ceiling: 18073,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1207,7 +1211,20 @@ const MONOLITHS: MonolithRow[] = [
     // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
-    ceiling: 11642,
+    // Re-pinned for the Graveyard Shift prototype, a net lowering from the
+    // release base's 11642 once its own growth is counted: the
+    // Ice Block crowd-control predicates moved to src/sim/combat/ice_block_guard.ts
+    // (the residual is the import and the isControlAura delegate the ctx binding
+    // keeps), which paid for the run's seam lines (the graveyard_shift import,
+    // the run map and its ctx view, the tick call, the offlineHost config copy,
+    // the action-bar freeze getter, the adventurer join/leave ctx bindings and
+    // the run hostility arm; the known-list rule swapped in place). Exact count,
+    // zero slack.
+    // LOWERED 11639 -> 11636 by the Graveyard Shift save override: the run
+    // hostility arm moved into graveyard_shift/hostility.ts (shiftPairHostile),
+    // which paid for the one serializeCharacter line that routes every save
+    // through graveyard_shift/save_override.ts. Exact count, zero slack.
+    ceiling: 11636,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1689,7 +1706,11 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 9827 and the
     // branch 9965; the two sides' additions compose to 9840 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 9840,
+    // LOWERED 9840 -> 9834 for the Graveyard Shift's online session edges: the
+    // leave path's pre-save mode resolutions (arena, Card Duel, Thornhollow) moved
+    // into server/graveyard_shift_session.ts beside the run's own, paying for the
+    // dropped-connection and jail hooks. Exact count, zero slack.
+    ceiling: 9834,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

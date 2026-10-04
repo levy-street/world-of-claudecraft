@@ -146,7 +146,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // 10 and the tenth at 25: +35).
     // 318 / 3535 with the release's Eastbrook ferry round trip
     // (exp_harbor_to_harbor at renown 5) at the fourth release/v0.44.0 base merge.
-    expect(DEED_ORDER.length).toBe(319);
+    // 320 / 3545 with the Graveyard Shift's hidden Boss for a Day (renown 0).
+    expect(DEED_ORDER.length).toBe(320);
     expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3545);
   });
 
@@ -190,7 +191,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +1 the release's ferry round trip (exp_harbor_to_harbor).
       exploration: 22,
       feat: 3,
-      hidden: 10,
+      // +1 the Graveyard Shift's first won shift (hid_boss_for_a_day).
+      hidden: 11,
     });
   });
 
@@ -409,6 +411,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // The release's Eastbrook ferry round trip, appended last at the fourth
       // release/v0.44.0 base merge.
       'exp_harbor_to_harbor',
+      'hid_boss_for_a_day',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -1040,7 +1043,11 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // shipped trigger or renown value was touched.
   // Re-baselined at the 2026-09-28 release merge into feature/buried-hoards: one NEW
   // deed (cmb_coinsack_caught) joins; no existing trigger or renown changed.
-  const FROZEN_CATALOG_SHA256 = '765c2ea13a8a87d5b43a3f725ab56e1c58464f850dc2ec0e10048adc12f67829';
+  // Re-baselined for the Graveyard Shift's hidden Boss for a Day
+  // (hid_boss_for_a_day, a manual deed appended last), re-minted THE AUDITABLE
+  // WAY: the 765c2ea1... literal rotated down into PRE_APPEND_CATALOG_SHA256 and
+  // the proof below reproduces it exactly. No shipped trigger or renown changed.
+  const FROZEN_CATALOG_SHA256 = 'e35e2d99e87256221c1b6da4037018426784aac5e659108ae0f7fe95bdf00e5c';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1103,26 +1110,25 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // 2b8d9d03... literal (rotated down here), and stripping the two must
   // reproduce it exactly.
   //
-  // The release's Eastbrook ferry round trip appends exp_harbor_to_harbor
-  // after exp_clue_ten_caskets at the fourth release/v0.44.0 base merge; the
-  // previous mint is the clue pair's 0d91bc68... literal (rotated down here),
-  // and stripping the one id must reproduce it exactly.
+  // The Graveyard Shift appends hid_boss_for_a_day after the release's
+  // exp_harbor_to_harbor; the previous mint is the 765c2ea1... literal
+  // (rotated down here), and stripping the one id must reproduce it exactly.
   const PRE_APPEND_CATALOG_SHA256 =
-    '0d91bc68e18b88a6b0c4dc7088c118d556b3bbec0be1617506b36b8172123eb6';
-  const APPENDED_SINCE: readonly string[] = ['cmb_coinsack_caught', 'exp_harbor_to_harbor'];
+    '765c2ea13a8a87d5b43a3f725ab56e1c58464f850dc2ec0e10048adc12f67829';
+  const APPENDED_SINCE: readonly string[] = ['hid_boss_for_a_day'];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
     for (const id of APPENDED_SINCE) {
       expect(DEED_ORDER.includes(id), `${id} is in the live catalog`).toBe(true);
     }
-    // The ferry round trip sits at the true tail after the Clue Scroll casket
-    // pair. Pin its two predecessors too: this is an append into a
+    // Boss for a Day sits at the true tail after the goblin catch and the
+    // ferry round trip. Pin its two predecessors too: this is an append into a
     // known seat, never a scattered insert or a retro-edit (the digest below
     // proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'exp_clue_first_casket',
-      'exp_clue_ten_caskets',
+      'cmb_coinsack_caught',
+      'exp_harbor_to_harbor',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1341,9 +1347,9 @@ describe('table shape', () => {
     // raid block (whose flawless task was the previous final entry).
     // The one-time Forgebreaker quest's hidden celebration appends after it,
     // then the world-quest block, then the faction standing ladder, then the
-    // Clue Scroll casket pair, then the release's ferry round trip as the
-    // final entry.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('exp_harbor_to_harbor');
+    // Clue Scroll casket pair, then the release's ferry round trip, then the
+    // Graveyard Shift's Boss for a Day as the final entry.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('hid_boss_for_a_day');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

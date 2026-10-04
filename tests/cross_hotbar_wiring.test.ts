@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { CROSS_HOTBAR_LAYER_BUTTONS } from '../src/game/cross_hotbar';
+import { CROSS_HOTBAR_LAYER_BUTTONS, type CrossHotbarLayout } from '../src/game/cross_hotbar';
 import { CrossHotbarBindings } from '../src/game/cross_hotbar_bindings';
 import {
   type CrossHotbarHoldInfo,
@@ -307,5 +307,37 @@ describe('the display preset', () => {
     const store = { set: (_k: string, v: never) => v };
     wiring.applySetting(pad, store, 'gamepadCrossHotbarDisplay', 99);
     expect(bodyClasses.has('xhb-full')).toBe(true);
+  });
+});
+
+describe('createCrossHotbar: a temporary kit override', () => {
+  it('reads the host override and re-shows the resting bar when it comes or goes', () => {
+    const host = fakeHost([{ type: 'ability', id: 'fireball' }]);
+    let kit: CrossHotbarLayout | null = null;
+    const wiring = createCrossHotbar(
+      () => ({ ...host, crossHotbarOverride: () => kit }),
+      SCOPE,
+      PAD_LAYOUT,
+    );
+    wiring.syncPadMode(fakePad(true));
+    const restingIds = () =>
+      host.setCrossHotbar.mock.calls
+        .at(-1)?.[0]
+        ?.slots.slice(0, 2)
+        .map((cell) => cell?.id);
+    expect(restingIds()).toEqual(['fireball', undefined]);
+    kit = [
+      [
+        { type: 'ability', id: 'attack' },
+        { type: 'ability', id: 'gshift_sextons_chain' },
+      ],
+      [],
+    ];
+    wiring.hooks.refreshCrossHotbar();
+    expect(restingIds()).toEqual(['attack', 'gshift_sextons_chain']);
+    expect(wiring.bindings.overridden()).toBe(true);
+    kit = null;
+    wiring.hooks.refreshCrossHotbar();
+    expect(restingIds()).toEqual(['fireball', undefined]);
   });
 });

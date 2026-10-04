@@ -218,8 +218,8 @@ describe('renderer CPU hot path', () => {
   it('culls before decluttering and keeps canvas text APIs out of the entity loop', () => {
     expect(nameplates).toContain('isNameplateScreenAnchorVisible');
     expect(nameplates).toContain('declutterNameplatesInPlace');
-    expect(nameplates).toContain(
-      '!state.initialized || fullPass || plan.urgent || languageChanged',
+    expect(nameplates).toMatch(
+      /!state\.initialized \|\|\s*fullPass \|\|\s*plan\.urgent \|\|\s*languageChanged/,
     );
     expect(nameplates).not.toContain('fillText(');
     expect(nameplates).not.toContain('strokeText(');

@@ -4,7 +4,13 @@ import { CHRONICLER_TEMPLATE_IDS } from '../../../sim/deeds';
 import { craftsForPairTarget } from '../../../sim/professions/archetype';
 import { professionQuestSelectionTargets } from '../../../sim/quests/profession_quest_effects';
 import { npcQuestMarkerKind, type QuestMarkerKind } from '../../../sim/quests/quest_marker_kind';
-import { dist2d, type Entity, type ItemDef, questObjectiveRequired } from '../../../sim/types';
+import {
+  dist2d,
+  type Entity,
+  type GraveyardShiftReport,
+  type ItemDef,
+  questObjectiveRequired,
+} from '../../../sim/types';
 import { WEEKLY_KEEPER_ID } from '../../../sim/weekly_rewards';
 import type { IWorld } from '../../../world_api';
 import { archetypeTitleText, craftNameText } from '../../char_window';
@@ -38,11 +44,15 @@ import { clueReplyKey, clueTalkFor } from './clue_talk_row_core';
 import { gossipMenuIsEmpty } from './gossip_menu';
 import { masterCraftTarget } from './master_craft_core';
 import { PROF_INTRO_QUEST_ID, professionIntroHintVisible } from './prof_intro_hint_core';
+import { tibbsDeclineLine, tibbsOfferDialog } from './tibbs_offer_view';
 
 /** One string per offerable-row set, for cheap open-dialog change detection
  *  (the refreshIfChanged staleness signature). */
 const gossipRowSig = (rows: { questId: string; kind: QuestMarkerKind }[]): string =>
   rows.map((r) => `${r.questId}:${r.kind}`).join('|');
+
+// How long an open waits for its NPC to reach this client.
+const PENDING_OPEN_MS = 3000;
 
 export interface QuestDialogTextPort {
   npcName(templateId: string): string;
@@ -123,6 +133,12 @@ export class QuestDialogController {
   // tick-threshold crossing, with NO quest event to repaint through).
   private lastIntroHintVisible: boolean | null = null;
   private clueReplyOpen = false;
+  // Tibbs' end-of-shift report while his dialog shows it (cleared on close).
+  private tibbsReport: GraveyardShiftReport | null = null;
+  // An open asked for an NPC this client does not hold yet (online, his event
+  // can land before the snapshot that brings him): retried until he arrives.
+  private pendingOpen: { npcId: number; report?: GraveyardShiftReport; until: number } | null =
+    null;
   private lastGossipRowSig: string | null = null;
   // The Clue Scroll row's staleness signature (clue_step_row_view.ts): the row reads
   // LIVE hunt state, so it joins the refreshIfChanged watch (a step can advance
@@ -139,7 +155,8 @@ export class QuestDialogController {
     return this.openState;
   }
 
-  open(npcId: number): void {
+  open(npcId: number, tibbsReport?: GraveyardShiftReport): void {
+    this.tibbsReport = tibbsReport ?? null;
     const world = this.deps.world();
     const npc = world.entities.get(npcId);
     if (
@@ -231,6 +248,7 @@ export class QuestDialogController {
     this.deps.element.style.display = 'none';
     this.npcId = null;
     this.clueReplyOpen = false;
+    this.tibbsReport = null;
     this.detailQuestId = null;
     this.investigationSig = null;
     this.lastIntroHintVisible = null;
@@ -310,7 +328,24 @@ export class QuestDialogController {
     this.deps.voice.setDistance(npc ? dist2d(world.player.pos, npc.pos) : null);
   }
 
+  /** Open on this NPC now, or as soon as he arrives (within a few seconds). */
+  openWhenPresent(npcId: number, tibbsReport?: GraveyardShiftReport): void {
+    this.pendingOpen = { npcId, report: tibbsReport, until: this.deps.now() + PENDING_OPEN_MS };
+    this.retryPendingOpen();
+  }
+
+  private retryPendingOpen(): void {
+    const pending = this.pendingOpen;
+    if (!pending) return;
+    if (this.deps.now() > pending.until) this.pendingOpen = null;
+    else if (this.deps.world().entities.has(pending.npcId)) {
+      this.pendingOpen = null;
+      this.open(pending.npcId, pending.report);
+    }
+  }
+
   updateProximity(): void {
+    this.retryPendingOpen();
     if (this.npcId === null) return;
     const world = this.deps.world();
     const npc = world.entities.get(this.npcId);
@@ -378,6 +413,7 @@ export class QuestDialogController {
     if (this.renderInvestigation(npc)) return;
     this.investigationSig = null;
     if (this.renderWorldQuestInstructor(npc)) return;
+    if (this.renderTibbsOffer(npc)) return;
     this.clueReplyOpen = false;
     const definition = NPCS[npc.templateId];
     const interesting = this.offerableRows(npc);
@@ -936,6 +972,71 @@ export class QuestDialogController {
     this.bindClose();
     this.showAndFocus();
     return true;
+  }
+
+  /** Tibbs' shift offer (the Graveyard Shift's way in): his lines, then Take the
+   *  shift (the sim's targeted interact on him starts the run) or Not today
+   *  (his answer, then the dialog closes). */
+  private renderTibbsOffer(npc: Entity): boolean {
+    const view = tibbsOfferDialog(npc, this.deps.world().deedsEarned, this.tibbsReport);
+    if (!view) return false;
+    this.npcId = npc.id;
+    this.detailQuestId = null;
+    // No gossip rows here: keep the row-signature watch from repainting it.
+    this.lastIntroHintVisible = null;
+    this.clueReplyOpen = false;
+    this.paintTibbs(npc, view.lines, view.quoted, view.rewardCopper);
+    // The shift won: his closing line and a way out, nothing to accept.
+    if (view.acceptLabel === null) {
+      const done = this.makeButton(view.declineLabel);
+      done.addEventListener('click', () => this.close());
+      this.deps.element.appendChild(done);
+      this.bindClose();
+      this.showAndFocus();
+      return true;
+    }
+    const accept = this.makeButton(view.acceptLabel);
+    accept.dataset.gshiftAccept = String(npc.id);
+    accept.addEventListener('click', () => {
+      this.close();
+      this.deps.world().targetEntity(npc.id);
+      this.deps.world().interact();
+    });
+    const decline = this.makeButton(view.declineLabel);
+    decline.dataset.gshiftDecline = String(npc.id);
+    decline.addEventListener('click', () => {
+      // Held like a clue reply: a quest event must not repaint the offer over it.
+      this.clueReplyOpen = true;
+      this.paintTibbs(npc, [tibbsDeclineLine()], true, 0);
+      const done = this.makeButton(t('questUi.dialog.continue'));
+      done.addEventListener('click', () => this.close());
+      this.deps.element.appendChild(done);
+      this.bindClose();
+      this.showAndFocus();
+    });
+    this.deps.element.append(accept, decline);
+    this.bindClose();
+    this.showAndFocus();
+    return true;
+  }
+
+  private paintTibbs(
+    npc: Entity,
+    lines: readonly string[],
+    quoted: boolean,
+    rewardCopper: number,
+  ): void {
+    markDialogRoot(this.deps.element, { labelledBy: 'quest-dialog-title' });
+    const name = this.deps.text.npcName(npc.templateId);
+    const title = this.deps.text.npcTitle(npc.templateId);
+    let html = `<div class="panel-title ui-win-head"><span class="ui-win-title" id="quest-dialog-title">${esc(name)}<span class="quest-muted ui-win-sub"> &lt;${esc(title)}&gt;</span></span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
+    const quote = quoted ? '"' : '';
+    for (const line of lines) html += `<div class="qd-text">${quote}${esc(line)}${quote}</div>`;
+    if (rewardCopper > 0) {
+      html += `<div class="qd-sub">${esc(t('questUi.detail.rewards'))}</div>`;
+      html += `<div class="qd-obj" data-gshift-reward>${this.deps.text.money(rewardCopper)}</div>`;
+    }
+    this.deps.element.innerHTML = html;
   }
 
   /** The NPC's answer to a solved clue talk or delivery, then back to the gossip

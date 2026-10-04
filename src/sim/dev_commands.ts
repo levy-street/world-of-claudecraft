@@ -7,6 +7,7 @@ import { DUNGEONS, getActiveWorldContent, ITEMS, MOBS, NPCS, WORLD_QUESTS_BY_ID 
 import { equipBestInSlotForDev } from './dev/bis_gear';
 import { displacePlayerForDev } from './dev/dev_displace';
 import { handleFerryDevChat } from './dev/ferry_dev';
+import { handleGraveyardShiftDevChat } from './dev/graveyard_shift_dev';
 import { handleDevHoardTravel } from './dev/hoard_travel';
 import { devTownList, resolveDevTown } from './dev/town_teleport';
 import { prepareWeeklyVaultPlaytest } from './dev/weekly_vault_playtest';
@@ -26,6 +27,7 @@ import { armWorldQuestTracingForDev } from './dev_world_quest_tracing';
 import { armWorldQuestWispMazeForDev } from './dev_world_quest_wisp_maze';
 import { createGroundObject, createMob } from './entity';
 import { awardFactionReputation, FACTION_IDS } from './factions';
+import { hasMorthenIdentity } from './graveyard_shift/morthen_identity';
 import {
   ignivarDevRaidTravelRoster,
   setupIgnivarDevRaid,
@@ -177,8 +179,13 @@ export function handleDevChat(
     return null;
   }
   if (handleFerryDevChat(ctx, raw, pid)) return null; // /dev ferry (dev/ferry_dev.ts)
+  if (handleGraveyardShiftDevChat(ctx, raw, pid)) return null; // dev/graveyard_shift_dev.ts
   const levelMatch = /^\/(?:dev\s+level|devlevel)\s+(\d+)\s*$/i.exec(raw);
   if (levelMatch) {
+    if (hasMorthenIdentity(ctx.entities.get(pid))) {
+      emitDevLog(ctx, pid, '[dev] Not while on a Graveyard Shift.');
+      return null;
+    }
     const level = Number(levelMatch[1]);
     ctx.setPlayerLevel(level, pid);
     emitDevLog(ctx, pid, `[dev] Level set to ${clampInteger(level, 1, MAX_LEVEL)}.`);
@@ -829,6 +836,10 @@ export function handleDevChat(
   }
 
   const bisMatch = /^\/(?:dev\s+bis|devbis)(?:\s+(\S+))?\s*$/i.exec(raw);
+  if (bisMatch && hasMorthenIdentity(ctx.entities.get(pid))) {
+    emitDevLog(ctx, pid, '[dev] Not while on a Graveyard Shift.');
+    return null;
+  }
   if (bisMatch) {
     const meta = ctx.players.get(pid);
     if (!meta) return null;
@@ -1384,7 +1395,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev wq [name], /dev salvage, /dev clue [hunt <huntId>|solve|casket], /dev map [rarity|site|coin], /dev caravan, /dev calligraphy, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill, /dev hill [zone] | warn [zone] [seconds] | rise | end | next',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev wq [name], /dev salvage, /dev clue [hunt <huntId>|solve|casket], /dev map [rarity|site|coin], /dev caravan, /dev calligraphy, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill, /dev graveyardshift [start|end|status], /dev hill [zone] | warn [zone] [seconds] | rise | end | next',
     );
     return null;
   }

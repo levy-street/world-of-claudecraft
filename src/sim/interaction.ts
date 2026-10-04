@@ -1,3 +1,6 @@
+import { GRAVE_ITEM_ID } from './graveyard_shift/grave_entry';
+import { isTibbs, touchGraveyardShiftGrave } from './graveyard_shift/grave_staging';
+import { acceptGraveyardShiftFromTibbs } from './graveyard_shift/run_lifecycle';
 import { isHoardRewardChestTemplate, openHoardRewardChest } from './rift/hoard_reward_chest';
 import { isRiftEntranceTemplate } from './rift/vault_seed';
 import { vehicleStationByEntityId } from './vehicle_stations';
@@ -375,6 +378,8 @@ export function pickUpObject(
   if (objectItemId === FERRY_BELL_OBJECT_ID) {
     return tryRingFerryBell(ctx, obj, p, meta);
   }
+  // The Graveyard Shift grave wakes Tibbs; it is never looted.
+  if (objectItemId === GRAVE_ITEM_ID) return touchGraveyardShiftGrave(ctx, p, meta);
   const ignivarLore = interactIgnivarRaidLore(ctx, obj, meta);
   if (!ignivarLore.allowQuestCredit) return ignivarLore.handled;
   const beforeQuestProgress = meta.counters.questProgress;
@@ -512,6 +517,11 @@ export function interact(
         }
         if (tryStartNythraxisWardChannel(ctx, target, p)) return;
         pickUpObject(ctx, target.id, p.id, noticeboardDefinitions);
+        return;
+      }
+      // Tibbs' dialogue sends its [Take the shift] as a targeted interact.
+      if (isTibbs(target)) {
+        acceptGraveyardShiftFromTibbs(ctx, p.id, target.id);
         return;
       }
       if (talkToWeeklyKeeper(ctx, target, p)) return;

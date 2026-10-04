@@ -17,6 +17,7 @@ import {
   TOOL_RECHARGE_CAST_ID,
 } from '../sim/types';
 import { abilityDisplayName, abilityDisplayNameFromSource } from './ability_display_name';
+import { graveyardShiftAbilityName } from './graveyard_shift_text_core';
 import { type TranslationKey, t } from './i18n';
 
 // Rift boss one-shot mechanic cast IDs: keyed by their authored mechanic name.
@@ -91,7 +92,7 @@ export const castDisplayName = (id: string): string => {
   const riftKey = `abilityUi.cast.${id}` as TranslationKey;
   if (riftKey in RIFT_CAST_DISPLAY_KEYS) return t(riftKey);
   const ability = ABILITIES[id];
-  return ability ? abilityDisplayName(ability) : id;
+  return ability ? abilityDisplayName(ability) : (graveyardShiftAbilityName(id) ?? id);
 };
 
 /** The TARGET cast bar's label. A mob's cast label is usually an authored
