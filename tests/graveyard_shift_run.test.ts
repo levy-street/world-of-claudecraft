@@ -84,10 +84,9 @@ describe('Graveyard Shift run shell', () => {
     expect(logs(sim, events)).toContain('[dev] Graveyard Shift ended (aborted).');
   });
 
-  it('refuses outside the offline world, below level 15, in a party, or twice', () => {
+  it('runs on a shared host too, and refuses below level 15, in a party, or twice', () => {
     const online = shiftSim({ offlineHost: false });
-    expect(start(online)).toBeNull();
-    expect(logs(online)).toContain('[dev] Graveyard Shift runs offline only.');
+    expect(start(online)?.entry).toBe('dev');
 
     const low = shiftSim();
     low.setPlayerLevel(14);

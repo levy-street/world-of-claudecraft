@@ -49,8 +49,6 @@ function onShift(name: string, characterId: number) {
   if ('error' in joined) throw new Error(joined.error);
   const session: ClientSession = joined;
   const sim = server.sim;
-  // Until the offline gate lifts (a later lot), the test opens it itself.
-  (sim.cfg as { offlineHost?: boolean }).offlineHost = true;
   sim.setPlayerLevel(15, session.pid);
   expect(startGraveyardShift(sim.ctx, session.pid, 'grave')).toBeNull();
   expect(hasMorthenIdentity(sim.entities.get(session.pid))).toBe(true);

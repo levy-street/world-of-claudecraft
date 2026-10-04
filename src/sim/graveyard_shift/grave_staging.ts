@@ -167,7 +167,7 @@ export function dismissTibbs(ctx: SimContext, summonerPid: number): void {
 // pickUpObject's branch for the grave. An ineligible toucher gets nothing: the
 // grave is just a grave (and online they never even see it).
 export function touchGraveyardShiftGrave(ctx: SimContext, p: Entity, meta: PlayerMeta): boolean {
-  if (!ctx.cfg.offlineHost || !eligibleMeta(ctx, meta)) return false;
+  if (!eligibleMeta(ctx, meta)) return false;
   if (!withinGrave(p.pos, GRAVE_INTERACT_RADIUS)) return false;
   const tibbs = raiseTibbs(ctx, p);
   if (!tibbs) return false;

@@ -71,10 +71,10 @@ export function canStartGraveyardShift(
   pid: number,
   entry: 'dev' | 'grave' = 'dev',
 ): string | null {
-  // Offline only: a server would autosave the run's state over the real
-  // character, and the online client would rebuild the bar from it.
-  if (!ctx.cfg.offlineHost) return 'Graveyard Shift runs offline only.';
-  if (entry === 'dev' && !ctx.devCommands) return 'Graveyard Shift runs offline only.';
+  // Every host runs it (the save override, the session edges, the per-viewer
+  // grave and the client mirror make it safe online); the dev entry alone stays
+  // behind dev commands.
+  if (entry === 'dev' && !ctx.devCommands) return 'Graveyard Shift needs dev commands.';
   const r = ctx.resolve(pid);
   if (!r || r.e.dead || r.e.ghost) return 'You cannot start a shift right now.';
   if (ctx.graveyardShiftRuns.has(pid)) return 'You are already on shift.';

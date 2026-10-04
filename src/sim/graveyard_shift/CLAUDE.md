@@ -10,17 +10,12 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
 (the living bots talk aloud, heard only up close).
 
 ## Contract
-- **Offline only while a prototype.** `canStartGraveyardShift` refuses unless
-  `ctx.cfg.offlineHost` (set only by `src/game/offline_world_config.ts`, and the
-  offline world itself is offered in dev builds only: `src/game/offline_mode_gate.ts`,
-  so no production player can reach the grave yet); the dev entry also needs
-  `ctx.devCommands`. Lifting this gate is the online work in progress (the
-  save override below is in; client mirror and a per-viewer grave gate to come),
-  and so is moving the mode's player-visible
-  strings (grave and Staff Exit labels, Tibbs, hints, say lines) out of
-  `devCommand.graveyardShift.*` into a player namespace with their non-Latin fills:
-  the M16 guard skips `devCommand.` keys, which is only right while the mode is a
-  dev-gated prototype.
+- **Every host runs it, on by default.** Offline and on the authoritative server
+  alike (owner decision: no kill switch); only the `/dev graveyardshift` entry
+  needs `ctx.devCommands`. What makes it safe on a shared realm: the save
+  override, the session edges (`server/graveyard_shift_session.ts`), the per-viewer
+  grave and per-caller Tibbs, the private bots and the run cap, and the client
+  mirror, each described below.
 - **Two ways in.** `/dev graveyardshift` (`src/sim/dev/graveyard_shift_dev.ts`,
   dev-channel English with a `[dev]` prefix) and the grave (`grave_entry.ts`, the
   pure leaf the renderer and client share, and `grave_staging.ts`): on the offline

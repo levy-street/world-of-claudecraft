@@ -191,15 +191,12 @@ describe('the grave', () => {
     otherMeta.deedsEarned.set('dgn_hollow_crypt', '2026-10-01');
     const spot = graveReturnSpot();
     const otherE = sim.entities.get(other)!;
-    // Both stand at the grave and touch it (a shared host lets the touch through
-    // only once the offline gate lifts; open it here for the staging under test).
-    (sim.cfg as { offlineHost?: boolean }).offlineHost = true;
+    // Both stand at the grave and touch it.
     place(sim, sim.player, spot.x, spot.z);
     place(sim, otherE, spot.x + 1, spot.z);
     sim.pickUpObject(GRAVE_ENTITY_ID);
     sim.pickUpObject(GRAVE_ENTITY_ID, other);
     const events = sim.tick();
-    (sim.cfg as { offlineHost?: boolean }).offlineHost = false;
     const mine = tibbsFor(sim.ctx, sim.playerId)!;
     const theirs = tibbsFor(sim.ctx, other)!;
     expect(mine.id).not.toBe(theirs.id);
@@ -347,7 +344,7 @@ describe('Tibbs', () => {
   it('the dev path still needs dev commands', () => {
     const sim = graveSim({ devCommands: false });
     sim.tick();
-    expect(startGraveyardShift(sim.ctx, sim.playerId)).toBe('Graveyard Shift runs offline only.');
+    expect(startGraveyardShift(sim.ctx, sim.playerId)).toBe('Graveyard Shift needs dev commands.');
     expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).toBeNull();
   });
 });
