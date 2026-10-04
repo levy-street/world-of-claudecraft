@@ -190,6 +190,7 @@ export function endGraveyardShift(
   ctx: SimContext,
   run: GraveyardShiftRun,
   outcome: GraveyardShiftOutcome,
+  leaving = false,
 ): void {
   ctx.graveyardShiftRuns.delete(run.ownerPid);
   // Tibbs' report counts, taken before the party and the allies are cleared.
@@ -224,7 +225,15 @@ export function endGraveyardShift(
     }
   }
   releaseGraveyardShiftSlot(ctx, run.slot, run.key);
-  if (run.entry === 'grave') endShiftAtGrave(ctx, run, outcome, report);
+  if (run.entry === 'grave') endShiftAtGrave(ctx, run, outcome, report, leaving);
+}
+
+/** The owner is leaving the world (logout, a dropped connection, jail): the run
+ *  ends now, before the host's save, never a tick later. A won scene keeps its
+ *  win (the deed and the pay are already granted); anything else aborts. */
+export function graveyardShiftResolveLeave(ctx: SimContext, pid: number): void {
+  const run = ctx.graveyardShiftRuns.get(pid);
+  if (run) endGraveyardShift(ctx, run, run.outro?.kind === 'won' ? 'won' : 'aborted', true);
 }
 
 // Anything Morthen still has in flight must not land from the restored real character.

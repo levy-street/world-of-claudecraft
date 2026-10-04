@@ -3,7 +3,7 @@
 // the shift, the accept and refusal paths, and every grave shift ending back in
 // front of him with his report, his consolation, or nothing at all.
 import { describe, expect, it } from 'vitest';
-import { graveyardShiftRunFor } from '../src/sim/graveyard_shift';
+import { graveyardShiftRunFor, hasMorthenIdentity } from '../src/sim/graveyard_shift';
 import { CORPSE_RETURN_TICKS } from '../src/sim/graveyard_shift/corpse_run';
 import {
   BOSS_FOR_A_DAY_DEED_ID,
@@ -23,6 +23,7 @@ import { graveyardShiftEligibleFor } from '../src/sim/graveyard_shift/grave_stag
 import {
   acceptGraveyardShiftFromTibbs,
   endGraveyardShift,
+  graveyardShiftResolveLeave,
   startGraveyardShift,
 } from '../src/sim/graveyard_shift/run_lifecycle';
 import { LOSS_OUTRO_TICKS } from '../src/sim/graveyard_shift/shift_end_marks';
@@ -299,10 +300,12 @@ describe('Tibbs', () => {
 });
 
 describe('the end of a grave shift', () => {
-  it('the deed lands the moment the fight is won, still in the Crypt', () => {
+  it('the deed and the pay land the moment the fight is won, still in the Crypt', () => {
+    expect(GRAVEYARD_SHIFT_PAYOUT_COPPER).toBe(2000);
     const sim = graveSim();
     takeShift(sim);
     const meta = meta0(sim);
+    const copperBefore = meta.copper;
     expect(meta.deedsEarned.has(BOSS_FOR_A_DAY_DEED_ID)).toBe(false);
     const { won } = winShift(sim);
     const unlock = won.find((ev) => ev.type === 'deedUnlocked') as
@@ -310,10 +313,15 @@ describe('the end of a grave shift', () => {
       | undefined;
     expect(unlock?.deedId).toBe('hid_boss_for_a_day');
     expect(meta.deedsEarned.has(BOSS_FOR_A_DAY_DEED_ID)).toBe(true);
+    expect(
+      won.some(
+        (ev) => ev.type === 'loot' && ev.pid === sim.playerId && ev.text === 'You receive 20s.',
+      ),
+    ).toBe(true);
+    expect(meta.copper - copperBefore).toBe(2000);
   });
 
-  it('a win sets the owner down at the grave, pays 20 silver and opens his report', () => {
-    expect(GRAVEYARD_SHIFT_PAYOUT_COPPER).toBe(2000);
+  it('a win sets the owner down at the grave and opens his report with the pay', () => {
     const sim = graveSim();
     takeShift(sim);
     const meta = meta0(sim);
@@ -321,12 +329,9 @@ describe('the end of a grave shift', () => {
     const { events, saved } = winShift(sim);
     expect(atGrave(sim)).toBe(true);
     expect(sim.entities.has(TIBBS_ENTITY_ID)).toBe(true);
+    // Paid once, at the win: the walk out pays nothing more.
     expect(meta.copper - copperBefore).toBe(2000);
-    expect(
-      events.some(
-        (ev) => ev.type === 'loot' && ev.pid === sim.playerId && ev.text === 'You receive 20s.',
-      ),
-    ).toBe(true);
+    expect(events.some((ev) => ev.type === 'loot')).toBe(false);
     // His report opens in the NPC dialog, never as bubbles. Five adventurers,
     // each killed twice.
     const offer = offerOf(events);
@@ -416,6 +421,42 @@ describe('the end of a grave shift', () => {
     sim.targetEntity(TIBBS_ENTITY_ID);
     sim.interact();
     expect(graveyardShiftRunFor(sim.ctx, sim.playerId)?.entry).toBe('grave');
+  });
+
+  it('a leaver mid-fight is set down at the grave at once, the run aborted, no Tibbs', () => {
+    const sim = graveSim();
+    takeShift(sim);
+    ticks(sim, 20 * 3);
+    graveyardShiftResolveLeave(sim.ctx, sim.playerId);
+    // Synchronous: a host save right after sees the real character outside.
+    expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).toBeNull();
+    expect(hasMorthenIdentity(sim.player)).toBe(false);
+    expect(sim.player.level).toBe(15);
+    expect(atGrave(sim)).toBe(true);
+    expect(sim.entities.has(TIBBS_ENTITY_ID)).toBe(false);
+    const events = sim.tick();
+    expect(offerOf(events)).toBeUndefined();
+    expect(meta0(sim).deedsEarned.has(BOSS_FOR_A_DAY_DEED_ID)).toBe(false);
+    // Idempotent.
+    graveyardShiftResolveLeave(sim.ctx, sim.playerId);
+  });
+
+  it('a leaver in the won scene keeps the win: deed and pay, no Tibbs', () => {
+    const sim = graveSim();
+    takeShift(sim);
+    const meta = meta0(sim);
+    const copperBefore = meta.copper;
+    const run = graveyardShiftRunFor(sim.ctx, sim.playerId)!;
+    for (const b of run.bots) lethal(sim, sim.entities.get(b.pid)!);
+    ticks(sim, CORPSE_RETURN_TICKS + 1);
+    for (const b of run.bots) lethal(sim, sim.entities.get(b.pid)!);
+    sim.tick();
+    expect(run.outro?.kind).toBe('won');
+    graveyardShiftResolveLeave(sim.ctx, sim.playerId);
+    expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).toBeNull();
+    expect(meta.deedsEarned.has(BOSS_FOR_A_DAY_DEED_ID)).toBe(true);
+    expect(meta.copper - copperBefore).toBe(2000);
+    expect(sim.entities.has(TIBBS_ENTITY_ID)).toBe(false);
   });
 
   it('lands settled at the grave: no fall carried over from the Crypt', () => {

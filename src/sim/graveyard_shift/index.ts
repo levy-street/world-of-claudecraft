@@ -13,6 +13,7 @@ export {
   canStartGraveyardShift,
   endGraveyardShift,
   GRAVEYARD_SHIFT_MIN_LEVEL,
+  graveyardShiftResolveLeave,
   startGraveyardShift,
   updateGraveyardShift,
 } from './run_lifecycle';

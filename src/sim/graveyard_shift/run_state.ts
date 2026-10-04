@@ -90,8 +90,15 @@ export interface GraveyardShiftRun {
   say?: BotSayState;
 }
 
+const RUN_KEY_PREFIX = 'gshift:';
+
 export function graveyardShiftRunKey(ownerPid: number): string {
-  return `gshift:${ownerPid}`;
+  return `${RUN_KEY_PREFIX}${ownerPid}`;
+}
+
+/** Whether a claimed slot's partyKey is a run's (hosts skip it as a dungeon run). */
+export function isGraveyardShiftRunKey(key: string | null): boolean {
+  return key?.startsWith(RUN_KEY_PREFIX) ?? false;
 }
 
 export function graveyardShiftRunFor(ctx: SimContext, pid: number): GraveyardShiftRun | null {

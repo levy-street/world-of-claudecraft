@@ -11,7 +11,7 @@ import { instanceOriginOf } from '../instances/dungeons';
 import type { SimContext } from '../sim_context';
 import type { Aura, Entity } from '../types';
 import { dist2d, TICK_RATE } from '../types';
-import { grantBossForADay } from './grave_staging';
+import { payBossForADay } from './grave_staging';
 import { dismissGraveyardShiftAllies } from './run_allies';
 import { GRAVEYARD_SHIFT_DUNGEON_ID, GRAVEYARD_SHIFT_STAFF_EXIT } from './run_layout';
 import type { GraveyardShiftOutcome, GraveyardShiftRun } from './run_state';
@@ -95,8 +95,8 @@ export function startWonOutro(ctx: SimContext, run: GraveyardShiftRun): void {
     if (ally) ally.petMode = 'passive';
   }
   run.outro.portalId = openStaffExit(ctx, run);
-  // The deed lands with the win, so its banner and sound tell the fight is over.
-  grantBossForADay(ctx, run);
+  // The deed and the pay land with the win: the banner and sound tell the fight is over.
+  payBossForADay(ctx, run);
 }
 
 /** The outcome the outro ends on this tick, or null while it plays. */

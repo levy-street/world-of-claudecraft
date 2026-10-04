@@ -1706,7 +1706,11 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 9827 and the
     // branch 9965; the two sides' additions compose to 9840 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 9840,
+    // LOWERED 9840 -> 9834 for the Graveyard Shift's online session edges: the
+    // leave path's pre-save mode resolutions (arena, Card Duel, Thornhollow) moved
+    // into server/graveyard_shift_session.ts beside the run's own, paying for the
+    // dropped-connection and jail hooks. Exact count, zero slack.
+    ceiling: 9834,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

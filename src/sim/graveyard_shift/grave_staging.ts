@@ -176,6 +176,7 @@ export function endShiftAtGrave(
   run: GraveyardShiftRun,
   outcome: GraveyardShiftOutcome,
   report: { sent: number; saved: number },
+  leaving = false,
 ): void {
   const p = ctx.entities.get(run.ownerPid);
   const meta = ctx.players.get(run.ownerPid);
@@ -187,14 +188,11 @@ export function endShiftAtGrave(
   p.facing = Math.atan2(GRAVE_POS.x - spot.x, GRAVE_POS.z - spot.z);
   p.prevFacing = p.facing;
   settleTeleportArrival(p);
-  if (outcome === 'aborted') return;
+  // A leaver (logout, a dropped connection, jail) gets no Tibbs: nobody to talk to.
+  if (outcome === 'aborted' || leaving) return;
   if (!raiseTibbs(ctx, p)) return;
-  // Paid on arrival, so closing his dialog early loses nothing (a win comes once).
+  // The pay went out with the deed at the win; his report shows it.
   const copper = outcome === 'won' ? GRAVEYARD_SHIFT_PAYOUT_COPPER : 0;
-  if (copper > 0) {
-    meta.copper += copper;
-    ctx.emit({ type: 'loot', text: `You receive ${formatMoney(copper)}.`, pid: p.id });
-  }
   ctx.emit({
     type: 'graveyardShiftOffer',
     npcId: TIBBS_ENTITY_ID,
@@ -203,8 +201,17 @@ export function endShiftAtGrave(
   });
 }
 
-/** The deed for a won grave shift, granted the moment the fight is won. */
-export function grantBossForADay(ctx: SimContext, run: GraveyardShiftRun): void {
+/** The deed and Tibbs' pay for a won grave shift, the moment the fight is won:
+ *  the deed's banner and sound mark the end, and one save carries both, so a
+ *  crash or a logout before the walk back loses neither. */
+export function payBossForADay(ctx: SimContext, run: GraveyardShiftRun): void {
   const meta = ctx.players.get(run.ownerPid);
-  if (run.entry === 'grave' && meta) grantDeed(ctx, meta, BOSS_FOR_A_DAY_DEED_ID);
+  if (run.entry !== 'grave' || !meta) return;
+  meta.copper += GRAVEYARD_SHIFT_PAYOUT_COPPER;
+  ctx.emit({
+    type: 'loot',
+    text: `You receive ${formatMoney(GRAVEYARD_SHIFT_PAYOUT_COPPER)}.`,
+    pid: run.ownerPid,
+  });
+  grantDeed(ctx, meta, BOSS_FOR_A_DAY_DEED_ID);
 }

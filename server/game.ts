@@ -276,6 +276,7 @@ import {
 import { consumeGeneralChatQuota, type GeneralChatRateLimit } from './general_chat_quota_db';
 import { mergedPrsForLogin } from './github_contributors';
 import { githubForAccount } from './github_db';
+import * as gshiftSession from './graveyard_shift_session';
 import { groundTelegraphWireJson, groundTelegraphWorld } from './ground_telegraph_wire';
 import { forEachGuarded, runGuarded } from './guarded_iter';
 import { handleGuildBankEscrowRefusal as handleEscrowRefusal } from './guild_bank_escrow_refusal';
@@ -2130,6 +2131,7 @@ export class GameServer {
 
   private jailSession(_moderator: ClientSession, target: ClientSession, minutes: number): void {
     const sentencedAtMs = Date.now();
+    gshiftSession.resolveGraveyardShiftDeparture(this.sim, target.pid);
     const targetEntity = this.sim.entities.get(target.pid);
     if (!targetEntity) return;
     target.jailed = {
@@ -3776,6 +3778,7 @@ export class GameServer {
     // Stop any held movement now; the sim keeps ticking this entity (it can
     // still be attacked, healed, or die while linkdead, like any player).
     stopDisconnectedPlayerInput(this.sim, session.pid);
+    gshiftSession.resolveGraveyardShiftDeparture(this.sim, session.pid);
     // Safety flush so a process crash during the grace window loses nothing.
     void this.saveCharacter(session, { withMarket: opts.withMarket ?? true }).catch((err) =>
       console.error(`linkdead save failed for ${session.name}:`, err),
@@ -3873,17 +3876,8 @@ export class GameServer {
         console.error('failed to close play session:', err),
       );
     }
-    // Arena forfeit accounting also resolves before persistence. This keeps the
-    // remaining player's win/honor durable if both combatants disconnect close
-    // together; removePlayer repeats the idempotent cleanup after the save.
-    this.sim.arenaResolveDesertion(session.pid);
-    // Card Duel: drop the queue slot and forfeit any live match on disconnect,
-    // same idempotent-before-persistence shape as the two lines above.
-    this.sim.leaveCardMinigameEntirely(session.pid);
-    // Thornhollow Fields desertion also resolves before the leave save so the leaver's
-    // recorded loss and rating delta are in the persisted state (idempotent;
-    // removePlayer repeats it harmlessly).
-    this.sim.bgResolveDesertion(session.pid);
+    // Live modes (Graveyard Shift, arena, Card Duel, Thornhollow) resolve before the save.
+    gshiftSession.resolveModesBeforeLeaveSave(this.sim, session.pid);
     // Freeze reward eligibility and reconcile pending loot before the leave
     // snapshot. saveCharacterOnLeave awaits the database; without this
     // synchronous prefix, a roll or boss death can mutate the character after
@@ -6840,7 +6834,7 @@ export class GameServer {
       // crashing the session), merges the named profile into the session's
       // document, and persists it via the per-character FIFO save queue.
       case 'save_hotbar_layout':
-        this.hotbarLayouts.save(session, msg);
+        if (gshiftSession.hotbarLayoutSaveAllowed(sim, pid)) this.hotbarLayouts.save(session, msg);
         break;
       // Skin-select event lock-in. The Sim re-validates the skin against the
       // rank it rolled and consumes the event token; a forged claim no-ops.

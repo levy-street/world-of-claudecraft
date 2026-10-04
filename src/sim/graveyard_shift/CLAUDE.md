@@ -39,9 +39,17 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
   shift (`run.entry`) ends back in front of the grave: Tibbs rises and a
   `graveyardShiftOffer` event carrying his report opens his NPC dialog (no say
   bubbles): on a win the counts and `GRAVEYARD_SHIFT_PAYOUT_COPPER` (20 silver,
-  paid on arrival, so closing the dialog loses nothing), on a loss his
-  consolation and a fresh offer; an aborted one says nothing. A `/dev` shift
+  paid WITH the deed at the win, `payBossForADay`, so one save carries both and
+  neither a crash nor an early logout loses it), on a loss his consolation and
+  a fresh offer; an aborted one says nothing. A `/dev` shift
   pays nothing and grants no deed.
+- **Leaving closes the run first.** `graveyardShiftResolveLeave` ends the run
+  synchronously (a won scene keeps its win, anything else aborts; no Tibbs for a
+  leaver). The server calls it from `server/graveyard_shift_session.ts` on a
+  dropped connection (before the safety flush), on logout (before the leave
+  save, with the other modes' desertions) and on a jail sentence (before the
+  return point is captured), and refuses a hotbar layout upload while the
+  identity is on. The parse segmenter skips a run's slot (`isGraveyardShiftRunKey`).
 - **Saves write the real character.** `serializeCharacter` routes its result
   through `graveyardShiftSaveState` (`save_override.ts`, the `meta.fiestaRestore`
   precedent): for a run's owner a save writes the parked level and talents, the
