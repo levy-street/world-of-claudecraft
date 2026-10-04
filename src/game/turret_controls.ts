@@ -1,7 +1,7 @@
 // Fire and Fly seat input. Movement is locked while seated, so the tank's heading
-// follows the reticle instead of the camera, the turn keys orbit the view, and
-// Escape with nothing left to close leaves the seat. On a pad, Y and LB reach the
-// weapon sockets (the seat has no jump, and LB is unbound by default).
+// follows the reticle instead of the camera, the turn keys and the touch move stick
+// orbit the view, and Escape with nothing left to close leaves the seat. On a pad, Y and
+// LB reach the weapon sockets (the seat has no jump, and LB is unbound by default).
 import { TURN_SPEED } from '../sim/types';
 import type { IWorldVehicles } from '../world_api/vehicles';
 import { GP } from './gamepad_map';
@@ -45,14 +45,18 @@ export function leaveTurretOnEscape(
   return true;
 }
 
-/** The camera yaw the held turn keys add this frame while seated (left turns up the yaw). */
-export function turretKeyboardLookYaw(
+/**
+ * The camera yaw the held turn keys and the touch stick's sideways push add this frame
+ * while seated (left turns up the yaw); both at once turn no faster than one.
+ */
+export function turretLookYaw(
   world: { readonly turretSession?: unknown },
-  input: { heldTurnAxis(): number },
+  input: { heldTurnAxis(): number; touchTurnAxis(): number },
   frameDt: number,
 ): number {
   if (!turretSeated(world)) return 0;
-  return input.heldTurnAxis() * TURN_SPEED * Math.min(MAX_LOOK_DT, Math.max(0, frameDt));
+  const axis = Math.max(-1, Math.min(1, input.heldTurnAxis() + input.touchTurnAxis()));
+  return axis * TURN_SPEED * Math.min(MAX_LOOK_DT, Math.max(0, frameDt));
 }
 
 /** The seat's pad buttons for the weapon sockets, by bar slot: Y slams (slot 0), LB arms (slot 1). */

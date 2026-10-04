@@ -173,30 +173,40 @@
       display: none;
     }
   }
+  /* The rail clears the scaled weapon sockets on either side of it. */
   body.mobile-touch #turret-rail {
     bottom: max(10px, env(safe-area-inset-bottom));
-    width: clamp(160px, calc(100% - 340px), 300px);
+    width: clamp(
+      160px,
+      calc(100% - 2 * (34px + var(--btn-scale, 1) * (2 * var(--menu-btn-size) + 8px))),
+      300px
+    );
   }
   body.mobile-touch .turret-rail-bevel {
     height: 14px;
   }
-  /* The tower moves nothing, so its weapon sockets take the move stick's corner (the same
-     anchor as #mobile-move-zone, mirrored for the left-handed layout) at the 48px touch
-     size, with no keycap (touch has no keys); the idle stick steps aside. */
-  body.mobile-touch.manning-turret :is(#mobile-move-zone, #mobile-move-joystick) {
-    display: none;
-  }
+  /* The weapon sockets take the action ring's corner (the ring is hidden while seated)
+     with its anchor, button size, button-scale and opacity settings, mirrored for the
+     left-handed layout, with no keycap (touch has no keys). The move stick stays: the
+     seat reads it as a turn. A pad on a phone reaches the weapons from Y and LB. */
   body.mobile-touch #turret-weapons {
-    left: max(18px, env(safe-area-inset-left));
-    bottom: calc(26px + env(safe-area-inset-bottom));
-    transform: none;
-  }
-  body.mobile-touch.mobile-left-handed #turret-weapons {
     left: auto;
     right: max(18px, env(safe-area-inset-right));
+    bottom: calc(20px + env(safe-area-inset-bottom));
+    transform-origin: right bottom;
+    transform: scale(var(--btn-scale, 1));
+    opacity: var(--touch-opacity, 1);
+  }
+  body.mobile-touch.mobile-left-handed #turret-weapons {
+    left: max(18px, env(safe-area-inset-left));
+    right: auto;
+    transform-origin: left bottom;
+  }
+  body.mobile-touch.xhb-mode #turret-weapons {
+    display: none;
   }
   body.mobile-touch #turret-weapons .turret-weapon {
-    --ui-socket-size: 48px;
+    --ui-socket-size: var(--menu-btn-size);
   }
   body.mobile-touch #turret-weapons .keybind {
     display: none;

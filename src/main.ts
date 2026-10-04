@@ -2018,6 +2018,7 @@ async function startGame(
       return music.enabled;
     },
     onRecenterCamera: () => input.recenterCameraBehind(world.player.facing),
+    stickTurnsView: () => turretControls.turretSeated(world),
     onGroundAimMove: (x, y) => {
       if (!hud.isGroundAimActive()) return false;
       hud.updateGroundAimPoint(renderer.groundPoint(x, y, world.player.pos.y));
@@ -2025,6 +2026,11 @@ async function startGame(
     },
     onGroundAimTap: (x, y) => {
       if (!hud.isGroundAimActive()) return false;
+      // The seat fires at the reticle shown: the stick may have turned the view under a still finger.
+      if (turretControls.turretSeated(world)) {
+        hud.commitGroundAimAt();
+        return true;
+      }
       const point = renderer.groundPoint(x, y, world.player.pos.y);
       if (point) hud.commitGroundAimAt(point);
       return true;
@@ -3850,7 +3856,7 @@ async function startGame(
     riftFloor: null,
   };
   function updateCamera(frameDt: number, interpFacing: number): void {
-    input.camYaw += turretControls.turretKeyboardLookYaw(world, input, frameDt);
+    input.camYaw += turretControls.turretLookYaw(world, input, frameDt);
     const mi = input.readMoveInput();
     const clickMoving = !!input.clickMoveTarget && !input.suspendMovement && !movementFrozen();
     // When click-to-move ends, the player's facing snaps from the (camera-lagging)

@@ -35,7 +35,13 @@ quest at the Evergarden gate").
   never moves, right-drag and the turn keys turn the view, the wheel zooms, and
   a ground reticle under the mouse aims (`src/game/turret_controls.ts`,
   `src/ui/hud/vehicle/turret_aim_core.ts`). One click is one shot; holding the
-  button does not auto-fire.
+  button does not auto-fire. On touch the seat keeps the game's mobile layout:
+  one finger on the field aims and fires on lift, at the reticle shown; the move
+  stick, idle since the player never moves, turns the view sideways like the turn
+  keys (its push up never latches autorun); and the weapon sockets take the action
+  ring's corner, with its button size and left-handed mirror, answering any finger.
+  Pinned by `tests/turret_controls.test.ts`, `tests/mobile_controls.test.ts` and
+  `tests/turret_hud_css.test.ts`.
 - Leaving (the Leave button, or Escape with nothing else to close) ends the seat
   and returns the player exactly where they stood, remounting the mount they rode
   in on when they still hold it and are out of combat. Death inside revives at
@@ -654,7 +660,7 @@ seed (`tests/turret_scenarios.test.ts`, `tests/fire_and_fly_missions.test.ts`).
   click or Escape disarms it with no charge spent. Gamepad: Y slams, LB arms or
   disarms, the pad's cancel disarms. A key or button of a weapon the scenario does
   not give does nothing and says nothing. Touch and mouse: a weapon socket beside
-  the tower rail for each weapon the scenario gives (the row closes up around a
+  the tower rail (in the action ring's corner on touch) for each weapon the scenario gives (the row closes up around a
   missing one) shows the charges, the Shockwave's rearm, and a gold pulse once three
   strikes are due, two in Standing Watch where the Shockwave is learned: a monster
   winding up, or one whose walk ends in a strike within 1.5 s

@@ -6,7 +6,7 @@ import {
   facingToward,
   leaveTurretOnEscape,
   TURRET_PAD_WEAPON_BUTTONS,
-  turretKeyboardLookYaw,
+  turretLookYaw,
   turretPadWeaponSlot,
   turretRenderFacing,
   turretSeated,
@@ -67,17 +67,22 @@ describe('the turret seat input', () => {
     expect(leaveVehicle).toHaveBeenCalledTimes(1);
   });
 
-  it('turns the view with the held turn keys while seated, at the keyboard turn rate', () => {
-    const left = { heldTurnAxis: () => 1 };
-    const right = { heldTurnAxis: () => -1 };
-    expect(turretKeyboardLookYaw({ turretSession: SEATED }, left, 0.05)).toBeCloseTo(
-      TURN_SPEED * 0.05,
-    );
-    expect(turretKeyboardLookYaw({ turretSession: SEATED }, right, 0.05)).toBeCloseTo(
-      -TURN_SPEED * 0.05,
-    );
-    expect(turretKeyboardLookYaw({ turretSession: SEATED }, left, 5)).toBeCloseTo(TURN_SPEED * 0.1);
-    expect(turretKeyboardLookYaw({ turretSession: null }, left, 0.05)).toBe(0);
+  it('turns the view with the held turn keys or the touch stick while seated, at the keyboard turn rate', () => {
+    const turn = (keys: number, touch: number) => ({
+      heldTurnAxis: () => keys,
+      touchTurnAxis: () => touch,
+    });
+    const at = (input: ReturnType<typeof turn>, dt = 0.05) =>
+      turretLookYaw({ turretSession: SEATED }, input, dt);
+    expect(at(turn(1, 0))).toBeCloseTo(TURN_SPEED * 0.05);
+    expect(at(turn(-1, 0))).toBeCloseTo(-TURN_SPEED * 0.05);
+    expect(at(turn(0, 1))).toBeCloseTo(TURN_SPEED * 0.05);
+    expect(at(turn(0, -1))).toBeCloseTo(-TURN_SPEED * 0.05);
+    // Key and stick the same way turn no faster than one; opposite ways cancel.
+    expect(at(turn(1, 1))).toBeCloseTo(TURN_SPEED * 0.05);
+    expect(at(turn(1, -1))).toBe(0);
+    expect(at(turn(1, 0), 5)).toBeCloseTo(TURN_SPEED * 0.1);
+    expect(turretLookYaw({ turretSession: null }, turn(1, 1), 0.05)).toBe(0);
   });
 
   it('locks local movement while seated in the turret, the cannon unchanged', () => {
@@ -107,8 +112,15 @@ describe('the turret wiring in main.ts', () => {
     );
   });
 
-  it('turns the view with the held turn keys', () => {
-    pinned('input.camYaw += turretControls.turretKeyboardLookYaw(world, input, frameDt);');
+  it('turns the view with the held turn keys and the touch stick', () => {
+    pinned('input.camYaw += turretControls.turretLookYaw(world, input, frameDt);');
+    pinned('stickTurnsView: () => turretControls.turretSeated(world),');
+  });
+
+  it('fires a lifted touch at the reticle shown, never a re-projected finger', () => {
+    pinned(
+      'onGroundAimTap: (x, y) => { if (!hud.isGroundAimActive()) return false; if (turretControls.turretSeated(world)) { hud.commitGroundAimAt(); return true; }',
+    );
   });
 
   it('leaves the turret on Escape only once no window is left to close, from keys and pad', () => {

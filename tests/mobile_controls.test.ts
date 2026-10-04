@@ -863,6 +863,40 @@ describe('MobileControls pointer lifecycle', () => {
     expect(autorunTarget.classList.contains('locked')).toBe(false);
   });
 
+  it('turns the view with the stick while seated: a sideways push, and no autorun from a push up', () => {
+    const { autorunTarget, moveZone, windowTarget } = installMobileControlDom();
+    const moves: TouchMoveInput[] = [];
+    const setAutorun = vi.fn();
+    const input = {
+      autorun: false,
+      setTouchMove: (move: TouchMoveInput) => moves.push(move),
+      clearTouchMove: vi.fn(),
+      setAutorun,
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+    new MobileControls(input, { ...mobileCallbacks(), stickTurnsView: () => true }).start();
+
+    moveZone.dispatchEvent(
+      pointerEvent('pointerdown', { pointerId: 21, clientX: 100, clientY: 100 }),
+    );
+    moveZone.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 21, clientX: 30, clientY: 100 }),
+    );
+    expect(moves.at(-1)).toMatchObject({ strafeLeft: true, strafeRight: false });
+    // Deep into the autorun target: still a plain stick read, never a latch.
+    moveZone.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 21, clientX: 100, clientY: -5 }),
+    );
+    expect(moves.at(-1)).toMatchObject({ forward: true });
+    expect(setAutorun).not.toHaveBeenCalled();
+    expect(autorunTarget.classList.contains('near')).toBe(false);
+    expect(autorunTarget.classList.contains('locked')).toBe(false);
+    windowTarget.dispatchEvent(pointerEvent('pointerup', { pointerId: 21 }));
+    expect(input.clearTouchMove).toHaveBeenCalled();
+    expect(setAutorun).not.toHaveBeenCalled();
+  });
+
   it('cancels a locked autorun when the same joystick drag leaves the target', () => {
     const { autorunTarget, moveZone } = installMobileControlDom();
     let autorunOn = false;

@@ -241,23 +241,29 @@ describe('the Fire and Fly seat HUD stylesheet', () => {
     expect(socket).toContain('pointer-events: auto;');
   });
 
-  it("puts the touch sockets in the idle move stick's corner, at 48px and keyless", () => {
-    expect(
-      declarationsFor(
-        mobile,
-        `body.mobile-touch.${TURRET_SEATED_CLASS} :is(#mobile-move-zone, #mobile-move-joystick)`,
-      ),
-    ).toBe('display: none;');
+  it("puts the touch sockets in the action ring's corner at its button size, keyless, and keeps the move stick", () => {
+    // The stick turns the view while seated: no seat rule may hide it.
+    expect(mobile).not.toMatch(
+      new RegExp(`${TURRET_SEATED_CLASS}[^{]*#mobile-move-(zone|joystick)`),
+    );
     const row = declarationsFor(mobile, `body.mobile-touch #${TURRET_WEAPONS_ID}`);
-    expect(row).toContain('left: max(18px, env(safe-area-inset-left));');
-    expect(row).toContain('bottom: calc(26px + env(safe-area-inset-bottom));');
-    expect(row).toContain('transform: none;');
+    expect(row).toContain('right: max(18px, env(safe-area-inset-right));');
+    expect(row).toContain('bottom: calc(20px + env(safe-area-inset-bottom));');
+    expect(row).toContain('transform: scale(var(--btn-scale, 1));');
+    expect(row).toContain('opacity: var(--touch-opacity, 1);');
+    // The ring's own anchor, so the weapons sit under the thumb that fires the game's actions.
+    const ring = declarationsFor(mobile, 'body.mobile-touch #mobile-action-ring');
+    expect(ring).toContain('right: max(18px, env(safe-area-inset-right));');
+    expect(ring).toContain('bottom: calc(20px + env(safe-area-inset-bottom));');
     expect(
       declarationsFor(mobile, `body.mobile-touch.mobile-left-handed #${TURRET_WEAPONS_ID}`),
-    ).toContain('right: max(18px, env(safe-area-inset-right));');
+    ).toContain('left: max(18px, env(safe-area-inset-left));');
+    expect(declarationsFor(mobile, `body.mobile-touch.xhb-mode #${TURRET_WEAPONS_ID}`)).toBe(
+      'display: none;',
+    );
     expect(
       declarationsFor(mobile, `body.mobile-touch #${TURRET_WEAPONS_ID} .turret-weapon`),
-    ).toContain('--ui-socket-size: 48px;');
+    ).toContain('--ui-socket-size: var(--menu-btn-size);');
     expect(declarationsFor(mobile, `body.mobile-touch #${TURRET_WEAPONS_ID} .keybind`)).toBe(
       'display: none;',
     );
