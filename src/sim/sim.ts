@@ -308,6 +308,7 @@ import {
   paginateLeaderboard,
 } from './leaderboard_page';
 import { entityLineOfSightClear } from './line_of_sight_elevation';
+import { cloneGearSet } from './loadout_gear';
 import type { Ante, PickAction } from './lockpick';
 import { retirePartyTradeOnLoad, retirePartyTradeOnSave } from './loot/bop_trade_persistence';
 import { withoutPartyTradeMarker } from './loot/bop_trade_window';
@@ -3970,6 +3971,7 @@ export class Sim {
         name: l.name,
         alloc: cloneAllocation(l.alloc),
         bar: [...l.bar],
+        ...(l.gear ? { gear: cloneGearSet(l.gear) } : {}),
       })),
       activeLoadout: meta.activeLoadout,
       raidLockouts: Object.fromEntries(
