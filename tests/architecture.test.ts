@@ -803,6 +803,7 @@ const RENDER_PURE_CORES = [
   // The Graveyard Shift grave: no loot glint, and its once-per-session whisper.
   'src/render/ground_object_glint_core.ts',
   'src/render/grave_whisper_core.ts',
+  'src/render/morthen_nameplate_core.ts',
   'src/render/ambience_state_core.ts',
   'src/render/ability_vfx/cast_admission_core.ts',
   'src/render/ability_vfx/physical_choreography_core.ts',
