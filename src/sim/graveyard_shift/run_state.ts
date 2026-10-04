@@ -90,6 +90,13 @@ export interface GraveyardShiftRun {
   say?: BotSayState;
 }
 
+/** The mode's book on Sim: the runs by owner pid (the Map itself) plus the
+ *  Tibbs each player has raised (summoner pid to his entity id). One Sim field,
+ *  one ctx view; every Tibbs is private to the player who woke him. */
+export class GraveyardShiftBook extends Map<number, GraveyardShiftRun> {
+  readonly tibbs = new Map<number, number>();
+}
+
 const RUN_KEY_PREFIX = 'gshift:';
 
 export function graveyardShiftRunKey(ownerPid: number): string {

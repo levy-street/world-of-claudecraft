@@ -25,9 +25,14 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
   dev-channel English with a `[dev]` prefix) and the grave (`grave_entry.ts`, the
   pure leaf the renderer and client share, and `grave_staging.ts`): on the offline
   host the Glowing Grave by the Hollow Crypt spawns only while the player is
-  eligible (level 15, Cryptbreaker or the Crypt quest, and the shift not yet won: it can be won once), so an ineligible player
-  simply has no grave; touching it raises Tibbs <Mob Union Rep> (a dynamic NPC on a
-  stable id, his caller and tick on his entity) and emits `graveyardShiftOffer`; the
+  eligible (level 15, Cryptbreaker or the Crypt quest, and the shift not yet won: it
+  can be won once), so an ineligible player simply has no grave; a shared host keeps
+  one grave for good and the server's snapshot filter shows it only to an eligible
+  viewer (`graveyardShiftObservable`). Touching it raises the caller's OWN Tibbs
+  <Mob Union Rep> (a dynamic NPC on a fresh id, tracked on the run book
+  `GraveyardShiftBook.tibbs`, visible to that caller alone, his dust pid-scoped)
+  and emits `graveyardShiftOffer`, which the client opens once his entity has
+  arrived (`QuestDialogController.openWhenPresent`); the
   client's dialogue sends [Take the shift] as a targeted interact on Tibbs
   (`acceptGraveyardShiftFromTibbs`, honoured only from the player who woke him and
   re-checking eligibility, so a stale dialog after the win gets his 'covered' line;
@@ -57,8 +62,9 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
   front of the grave (or at the Crypt door for a dev run). Every save path reads
   `serializeCharacter` (autosave, a dropped socket's flush, logout, shutdown, the
   deed unlock's save, the leaderboard level), so none can persist Morthen.
-- **State on Sim.** Runs live in `Sim.graveyardShiftRuns` (owner pid to run),
-  exposed as the `ctx.graveyardShiftRuns` live view. Modules here hold functions.
+- **State on Sim.** Runs live in `Sim.graveyardShiftRuns`, a `GraveyardShiftBook`
+  (owner pid to run, plus each player's Tibbs), exposed as the
+  `ctx.graveyardShiftRuns` live view. Modules here hold functions.
 - **Zero shared rng from this module.** Nothing here calls `ctx.rng`: starting
   and ending a run draw nothing, and with no run the tick entry only checks the
   offline grave (no draw), so a world without a run is byte-identical to one

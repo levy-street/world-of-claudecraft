@@ -2,7 +2,7 @@
 // Tibbs' shift offer in the quest dialog: his lines, Take the shift (the
 // sim's targeted interact on him), and Not today (his answer, then closed).
 import { describe, expect, it, vi } from 'vitest';
-import { TIBBS_ENTITY_ID, TIBBS_NPC_ID } from '../src/sim/graveyard_shift/grave_entry';
+import { TIBBS_NPC_ID } from '../src/sim/graveyard_shift/grave_entry';
 import type { Entity } from '../src/sim/types';
 import type { FocusTrapHandle } from '../src/ui/focus_manager';
 import { QuestDialogController } from '../src/ui/hud/quest/quest_dialog_controller';
@@ -18,7 +18,13 @@ import type { IWorld } from '../src/world_api';
   }
 };
 
+// Each caller's Tibbs takes a fresh id; any id stands in for one here.
+const TIBBS_ENTITY_ID = 900_001;
+
+const clock = { now: 1_000 };
+
 function harness(deedsEarned = new Map<string, string>()) {
+  clock.now = 1_000;
   setLanguage('en');
   document.body.innerHTML = '';
   const element = document.createElement('div');
@@ -55,7 +61,7 @@ function harness(deedsEarned = new Map<string, string>()) {
     element,
     document,
     world: () => world,
-    now: () => 1_000,
+    now: () => clock.now,
     text: {
       npcName: () => 'Tibbs',
       mobName: (id) => id,
@@ -91,7 +97,7 @@ function harness(deedsEarned = new Map<string, string>()) {
     onOpenChange: noop,
     voice: { play: noop, isPlaying: vi.fn(() => false), setDistance: noop },
   });
-  return { controller, element, targetEntity, interact };
+  return { controller, element, targetEntity, interact, world, tibbs };
 }
 
 describe("Tibbs' shift offer", () => {
@@ -191,5 +197,24 @@ describe("Tibbs' shift offer", () => {
     element.querySelector<HTMLButtonElement>('[data-gshift-accept]')!.click();
     expect(targetEntity).toHaveBeenCalledWith(TIBBS_ENTITY_ID);
     expect(interact).toHaveBeenCalledOnce();
+  });
+
+  it('opens once his entity arrives when the offer lands first, and gives up after a while', () => {
+    const { controller, element, world, tibbs } = harness();
+    world.entities.delete(TIBBS_ENTITY_ID);
+    controller.openWhenPresent(TIBBS_ENTITY_ID);
+    expect(element.style.display).not.toBe('block');
+    world.entities.set(TIBBS_ENTITY_ID, tibbs);
+    controller.updateProximity();
+    expect(element.style.display).toBe('block');
+    expect(element.querySelector('[data-gshift-accept]')).not.toBeNull();
+    controller.close();
+    // Too late: an offer whose Tibbs never came is dropped, not opened later.
+    world.entities.delete(TIBBS_ENTITY_ID);
+    controller.openWhenPresent(TIBBS_ENTITY_ID);
+    clock.now += 3_500;
+    world.entities.set(TIBBS_ENTITY_ID, tibbs);
+    controller.updateProximity();
+    expect(element.style.display).not.toBe('block');
   });
 });

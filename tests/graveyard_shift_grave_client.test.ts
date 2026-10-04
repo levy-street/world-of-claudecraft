@@ -19,7 +19,6 @@ import {
   GRAVE_ITEM_ID,
   GRAVE_POS,
   GRAVE_WHISPER_RADIUS,
-  TIBBS_ENTITY_ID,
   TIBBS_NPC_ID,
 } from '../src/sim/graveyard_shift/grave_entry';
 import type { Entity, SimEvent } from '../src/sim/types';
@@ -27,6 +26,9 @@ import { applyQuestEventPresentation } from '../src/ui/hud/quest/quest_event_rou
 import { tibbsDeclineLine, tibbsOfferDialog } from '../src/ui/hud/quest/tibbs_offer_view';
 import { setLanguage } from '../src/ui/i18n';
 import type { IWorld } from '../src/world_api';
+
+// Each caller's Tibbs takes a fresh id; any id stands in for one here.
+const TIBBS_ENTITY_ID = 900_001;
 
 vi.mock('../src/game/sfx', () => ({ sfx: { playUi: vi.fn() } }));
 
@@ -163,7 +165,7 @@ describe('Tibbs', () => {
       log: vi.fn(),
       questBanner: { show: vi.fn() },
       showBanner: vi.fn(),
-      questDialog: { refresh: vi.fn(), open: vi.fn() },
+      questDialog: { refresh: vi.fn(), open: vi.fn(), openWhenPresent: vi.fn() },
       worldQuestPuzzleWindow: { applyEventPresentation: vi.fn() },
       treasureMapWindow: { open: vi.fn(), refresh: vi.fn() },
     };
@@ -173,11 +175,11 @@ describe('Tibbs', () => {
       pid: 1,
     } as SimEvent;
     expect(applyQuestEventPresentation(hud, ev)).toBe(true);
-    expect(hud.questDialog.open).toHaveBeenCalledWith(TIBBS_ENTITY_ID, undefined);
+    expect(hud.questDialog.openWhenPresent).toHaveBeenCalledWith(TIBBS_ENTITY_ID, undefined);
     expect(hud.log).not.toHaveBeenCalled();
     // At the end of a grave shift the event carries his report into the dialog.
     const report = { outcome: 'won' as const, sent: 10, saved: 2, copper: 2000 };
     applyQuestEventPresentation(hud, { ...ev, report } as SimEvent);
-    expect(hud.questDialog.open).toHaveBeenLastCalledWith(TIBBS_ENTITY_ID, report);
+    expect(hud.questDialog.openWhenPresent).toHaveBeenLastCalledWith(TIBBS_ENTITY_ID, report);
   });
 });

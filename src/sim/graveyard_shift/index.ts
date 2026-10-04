@@ -18,6 +18,7 @@ export {
   updateGraveyardShift,
 } from './run_lifecycle';
 export {
+  GraveyardShiftBook,
   type GraveyardShiftOutcome,
   type GraveyardShiftRun,
   graveyardShiftRunFor,

@@ -31,10 +31,11 @@ import { graveyardShiftRunSeed } from './bot_brain';
 import { updateGraveyardShiftBots } from './bot_driver';
 import { sayGraveyardShiftGiveUp, updateGraveyardShiftSay } from './bot_say';
 import { partyGivesUp, partyWiped, updateGraveyardShiftCorpseRuns } from './corpse_run';
-import { GRAVEYARD_SHIFT_MIN_LEVEL, TIBBS_ENTITY_ID } from './grave_entry';
+import { GRAVEYARD_SHIFT_MIN_LEVEL } from './grave_entry';
 import {
   endShiftAtGrave,
   graveyardShiftEligibleFor,
+  tibbsFor,
   tibbsSay,
   updateGraveyardShiftGrave,
 } from './grave_staging';
@@ -167,8 +168,8 @@ export function startGraveyardShift(
 // The targeted interact on Tibbs: the player took the shift. A refusal (a
 // party, a fight, a queue) is one Tibbs line rather than a dev message.
 export function acceptGraveyardShiftFromTibbs(ctx: SimContext, pid: number): void {
-  // Only the player who woke him holds his offer.
-  if (ctx.entities.get(TIBBS_ENTITY_ID)?.gshiftSummonerPid !== pid) return;
+  // Only the player who woke him holds his offer: their own Tibbs must be up.
+  if (!tibbsFor(ctx, pid)) return;
   // Won once is won: Tibbs is still up for his report, but the shift is closed.
   if (!graveyardShiftEligibleFor(ctx, pid)) {
     tibbsSay(ctx, pid, 'covered');

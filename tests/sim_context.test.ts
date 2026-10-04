@@ -8,6 +8,7 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import { createDeedRuntime } from '../src/sim/deeds';
+import { GraveyardShiftBook } from '../src/sim/graveyard_shift/run_state';
 import { createMobScanCounters } from '../src/sim/mob/scan_counters';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
@@ -372,7 +373,7 @@ function makeFakeHost() {
     nextBgProposalId: 1,
     nextBgMatchId: 1,
     delveRuns: [],
-    graveyardShiftRuns: new Map(),
+    graveyardShiftRuns: new GraveyardShiftBook(),
     delvePetStash: new Map(),
     utcDay: '',
     resetDay: '',

@@ -51,6 +51,9 @@ import { tibbsDeclineLine, tibbsOfferDialog } from './tibbs_offer_view';
 const gossipRowSig = (rows: { questId: string; kind: QuestMarkerKind }[]): string =>
   rows.map((r) => `${r.questId}:${r.kind}`).join('|');
 
+// How long an open waits for its NPC to reach this client.
+const PENDING_OPEN_MS = 3000;
+
 export interface QuestDialogTextPort {
   npcName(templateId: string): string;
   mobName(templateId: string): string;
@@ -132,6 +135,10 @@ export class QuestDialogController {
   private clueReplyOpen = false;
   // Tibbs' end-of-shift report while his dialog shows it (cleared on close).
   private tibbsReport: GraveyardShiftReport | null = null;
+  // An open asked for an NPC this client does not hold yet (online, his event
+  // can land before the snapshot that brings him): retried until he arrives.
+  private pendingOpen: { npcId: number; report?: GraveyardShiftReport; until: number } | null =
+    null;
   private lastGossipRowSig: string | null = null;
   // The Clue Scroll row's staleness signature (clue_step_row_view.ts): the row reads
   // LIVE hunt state, so it joins the refreshIfChanged watch (a step can advance
@@ -321,7 +328,24 @@ export class QuestDialogController {
     this.deps.voice.setDistance(npc ? dist2d(world.player.pos, npc.pos) : null);
   }
 
+  /** Open on this NPC now, or as soon as he arrives (within a few seconds). */
+  openWhenPresent(npcId: number, tibbsReport?: GraveyardShiftReport): void {
+    this.pendingOpen = { npcId, report: tibbsReport, until: this.deps.now() + PENDING_OPEN_MS };
+    this.retryPendingOpen();
+  }
+
+  private retryPendingOpen(): void {
+    const pending = this.pendingOpen;
+    if (!pending) return;
+    if (this.deps.now() > pending.until) this.pendingOpen = null;
+    else if (this.deps.world().entities.has(pending.npcId)) {
+      this.pendingOpen = null;
+      this.open(pending.npcId, pending.report);
+    }
+  }
+
   updateProximity(): void {
+    this.retryPendingOpen();
     if (this.npcId === null) return;
     const world = this.deps.world();
     const npc = world.entities.get(this.npcId);

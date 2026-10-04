@@ -23,7 +23,11 @@ interface QuestEventHost {
     source?: null,
     bannerClass?: 'deed',
   ): unknown;
-  questDialog: { refresh(): void; open(npcId: number, tibbsReport?: GraveyardShiftReport): void };
+  questDialog: {
+    refresh(): void;
+    open(npcId: number): void;
+    openWhenPresent(npcId: number, tibbsReport?: GraveyardShiftReport): void;
+  };
   worldQuestPuzzleWindow: { applyEventPresentation(presentation: QuestEventPresentation): void };
   treasureMapWindow: { open(): void; refresh(): void };
 }
@@ -35,7 +39,7 @@ export function applyQuestEventPresentation(hud: object, ev: SimEvent): boolean 
   // Tibbs climbed out of his grave: his offer, or his end-of-shift report,
   // opens in the quest dialog.
   if (ev.type === 'graveyardShiftOffer') {
-    h.questDialog.open(ev.npcId, ev.report);
+    h.questDialog.openWhenPresent(ev.npcId, ev.report);
     return true;
   }
   // A read treasure map opens its parchment (a re-read has no log line, so

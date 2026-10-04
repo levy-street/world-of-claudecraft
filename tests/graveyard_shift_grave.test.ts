@@ -13,13 +13,16 @@ import {
   GRAVE_POS,
   GRAVEYARD_SHIFT_PAYOUT_COPPER,
   graveReturnSpot,
-  TIBBS_ENTITY_ID,
   TIBBS_IDLE_SECONDS,
   TIBBS_LEAVE_RADIUS,
   TIBBS_NPC_ID,
   tibbsSpot,
 } from '../src/sim/graveyard_shift/grave_entry';
-import { graveyardShiftEligibleFor } from '../src/sim/graveyard_shift/grave_staging';
+import {
+  graveyardShiftEligibleFor,
+  graveyardShiftObservable,
+  tibbsFor,
+} from '../src/sim/graveyard_shift/grave_staging';
 import {
   acceptGraveyardShiftFromTibbs,
   endGraveyardShift,
@@ -56,6 +59,8 @@ function graveSim(opts: Opts = {}) {
 }
 
 const meta0 = (sim: Sim) => sim.ctx.players.get(sim.playerId)!;
+const tibbsId = (sim: Sim) => sim.ctx.graveyardShiftRuns.tibbs.get(sim.playerId)!;
+const hasTibbs = (sim: Sim) => tibbsFor(sim.ctx, sim.playerId) !== undefined;
 
 function place(sim: Sim, e: Entity, x: number, z: number) {
   e.pos = sim.ctx.groundPos(x, z);
@@ -73,7 +78,8 @@ const tibbsLines = (events: SimEvent[]) =>
   events
     .filter(
       (ev): ev is Extract<SimEvent, { type: 'chat' }> =>
-        ev.type === 'chat' && ev.fromPid === TIBBS_ENTITY_ID,
+        ev.type === 'chat' &&
+        ev.textKey?.startsWith('devCommand.graveyardShift.tibbs.say.') === true,
     )
     .map((ev) => ev.textKey?.replace('devCommand.graveyardShift.tibbs.say.', ''));
 
@@ -88,7 +94,7 @@ function wakeTibbs(sim: Sim): SimEvent[] {
 
 function takeShift(sim: Sim): SimEvent[] {
   wakeTibbs(sim);
-  sim.targetEntity(TIBBS_ENTITY_ID);
+  sim.targetEntity(tibbsId(sim));
   sim.interact();
   return sim.tick();
 }
@@ -137,7 +143,6 @@ describe('the grave', () => {
   it('keeps its load-bearing ids', () => {
     expect(GRAVE_ITEM_ID).toBe('gshift_grave');
     expect(GRAVE_ENTITY_ID).toBe(2_147_200_001);
-    expect(TIBBS_ENTITY_ID).toBe(2_147_200_002);
     expect(TIBBS_NPC_ID).toBe('tibbs');
     expect(BOSS_FOR_A_DAY_DEED_ID).toBe('hid_boss_for_a_day');
   });
@@ -159,10 +164,59 @@ describe('the grave', () => {
     }
   });
 
-  it('never stands on a host that is not the offline world', () => {
-    const sim = graveSim({ offlineHost: false });
+  it('on a shared host stands for good, shown only to an eligible viewer', () => {
+    const sim = graveSim({ offlineHost: false, deed: false });
     ticks(sim, 3);
-    expect(sim.entities.has(GRAVE_ENTITY_ID)).toBe(false);
+    // One grave for the realm, whoever is eligible: nobody is, it still stands.
+    const grave = sim.entities.get(GRAVE_ENTITY_ID)!;
+    expect(grave).toBeDefined();
+    const viewer = sim.player;
+    expect(graveyardShiftObservable(sim.ctx, viewer, grave)).toBe(false);
+    meta0(sim).deedsEarned.set('dgn_hollow_crypt', '2026-10-01');
+    expect(graveyardShiftObservable(sim.ctx, viewer, grave)).toBe(true);
+    // A won shift hides it again; ordinary entities are never filtered.
+    meta0(sim).deedsEarned.set(BOSS_FOR_A_DAY_DEED_ID, '2026-10-02');
+    expect(graveyardShiftObservable(sim.ctx, viewer, grave)).toBe(false);
+    expect(graveyardShiftObservable(sim.ctx, viewer, viewer)).toBe(true);
+    ticks(sim, 3);
+    expect(sim.entities.has(GRAVE_ENTITY_ID)).toBe(true);
+  });
+
+  it('gives every caller a Tibbs of their own, seen by that caller alone', () => {
+    const sim = graveSim({ offlineHost: false });
+    sim.tick();
+    const other = sim.addPlayer('mage', 'Second');
+    const otherMeta = sim.ctx.players.get(other)!;
+    sim.setPlayerLevel(15, other);
+    otherMeta.deedsEarned.set('dgn_hollow_crypt', '2026-10-01');
+    const spot = graveReturnSpot();
+    const otherE = sim.entities.get(other)!;
+    // Both stand at the grave and touch it (a shared host lets the touch through
+    // only once the offline gate lifts; open it here for the staging under test).
+    (sim.cfg as { offlineHost?: boolean }).offlineHost = true;
+    place(sim, sim.player, spot.x, spot.z);
+    place(sim, otherE, spot.x + 1, spot.z);
+    sim.pickUpObject(GRAVE_ENTITY_ID);
+    sim.pickUpObject(GRAVE_ENTITY_ID, other);
+    const events = sim.tick();
+    (sim.cfg as { offlineHost?: boolean }).offlineHost = false;
+    const mine = tibbsFor(sim.ctx, sim.playerId)!;
+    const theirs = tibbsFor(sim.ctx, other)!;
+    expect(mine.id).not.toBe(theirs.id);
+    expect(graveyardShiftObservable(sim.ctx, sim.player, mine)).toBe(true);
+    expect(graveyardShiftObservable(sim.ctx, sim.player, theirs)).toBe(false);
+    expect(graveyardShiftObservable(sim.ctx, otherE, theirs)).toBe(true);
+    // Each offer and each dust cloud goes to its own caller.
+    const offers = events.filter((ev) => ev.type === 'graveyardShiftOffer');
+    expect(offers.map((ev) => ev.pid).sort()).toEqual([sim.playerId, other].sort());
+    const dust = events.filter((ev) => ev.type === 'spellfxAt' && ev.fx === 'nova');
+    expect(dust.every((ev) => ev.pid === sim.playerId || ev.pid === other)).toBe(true);
+    expect(dust).toHaveLength(2);
+    // One walking off sends only their own Tibbs down.
+    place(sim, otherE, GRAVE_POS.x, GRAVE_POS.z - TIBBS_LEAVE_RADIUS - 5);
+    sim.tick();
+    expect(tibbsFor(sim.ctx, other)).toBeUndefined();
+    expect(tibbsFor(sim.ctx, sim.playerId)?.id).toBe(mine.id);
   });
 
   it('stands at its spot for an eligible player, by the deed or by the quest', () => {
@@ -206,15 +260,13 @@ describe('Tibbs', () => {
   it('climbs out beside the grave when it is touched and offers the shift', () => {
     const sim = graveSim();
     const events = wakeTibbs(sim);
-    const tibbs = sim.entities.get(TIBBS_ENTITY_ID)!;
+    const tibbs = tibbsFor(sim.ctx, sim.playerId)!;
     expect(tibbs.templateId).toBe('tibbs');
     expect(tibbs.kind).toBe('npc');
     const spot = tibbsSpot();
     expect(Math.hypot(tibbs.pos.x - spot.x, tibbs.pos.z - spot.z)).toBeLessThan(0.01);
     const offers = events.filter((ev) => ev.type === 'graveyardShiftOffer');
-    expect(offers).toEqual([
-      { type: 'graveyardShiftOffer', npcId: TIBBS_ENTITY_ID, pid: sim.playerId },
-    ]);
+    expect(offers).toEqual([{ type: 'graveyardShiftOffer', npcId: tibbs.id, pid: sim.playerId }]);
   });
 
   it('stays down when the grave is touched from too far away', () => {
@@ -223,14 +275,15 @@ describe('Tibbs', () => {
     place(sim, sim.player, GRAVE_POS.x, GRAVE_POS.z - (GRAVE_INTERACT_RADIUS + 3));
     sim.pickUpObject(GRAVE_ENTITY_ID);
     const events = sim.tick();
-    expect(sim.entities.has(TIBBS_ENTITY_ID)).toBe(false);
+    expect(hasTibbs(sim)).toBe(false);
     expect(events.some((ev) => ev.type === 'graveyardShiftOffer')).toBe(false);
   });
 
   it('starts a grave shift on [Take the shift], without dev commands', () => {
     const sim = graveSim({ devCommands: false });
     wakeTibbs(sim);
-    sim.targetEntity(TIBBS_ENTITY_ID);
+    const tibbs = tibbsId(sim);
+    sim.targetEntity(tibbs);
     sim.interact();
     const run = graveyardShiftRunFor(sim.ctx, sim.playerId);
     expect(run?.entry).toBe('grave');
@@ -238,10 +291,10 @@ describe('Tibbs', () => {
     const accept = events.find(
       (ev) => ev.type === 'chat' && ev.textKey === 'devCommand.graveyardShift.tibbs.say.accept',
     ) as Extract<SimEvent, { type: 'chat' }> | undefined;
-    expect(accept?.entityId).toBe(TIBBS_ENTITY_ID);
+    expect(accept?.entityId).toBe(tibbs);
     expect(accept?.pid).toBe(sim.playerId);
     // He goes back down once the shift has begun.
-    expect(sim.entities.has(TIBBS_ENTITY_ID)).toBe(false);
+    expect(hasTibbs(sim)).toBe(false);
     // The grave stays for the way back, though Morthen reads as level 10 on shift.
     ticks(sim, 20 * 10);
     expect(sim.entities.has(GRAVE_ENTITY_ID)).toBe(true);
@@ -264,7 +317,7 @@ describe('Tibbs', () => {
     const sim = graveSim();
     wakeTibbs(sim);
     sim.player.inCombat = true;
-    sim.targetEntity(TIBBS_ENTITY_ID);
+    sim.targetEntity(tibbsId(sim));
     sim.interact();
     const events = sim.tick();
     expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).toBeNull();
@@ -276,19 +329,19 @@ describe('Tibbs', () => {
     wakeTibbs(sim);
     place(sim, sim.player, GRAVE_POS.x, GRAVE_POS.z - TIBBS_LEAVE_RADIUS + 2);
     sim.tick();
-    expect(sim.entities.has(TIBBS_ENTITY_ID)).toBe(true);
+    expect(hasTibbs(sim)).toBe(true);
     place(sim, sim.player, GRAVE_POS.x, GRAVE_POS.z - TIBBS_LEAVE_RADIUS - 5);
     sim.tick();
-    expect(sim.entities.has(TIBBS_ENTITY_ID)).toBe(false);
+    expect(hasTibbs(sim)).toBe(false);
   });
 
   it('goes back down when left standing too long', () => {
     const sim = graveSim();
     wakeTibbs(sim);
     ticks(sim, TIBBS_IDLE_SECONDS * TICK_RATE - 5);
-    expect(sim.entities.has(TIBBS_ENTITY_ID)).toBe(true);
+    expect(hasTibbs(sim)).toBe(true);
     ticks(sim, 10);
-    expect(sim.entities.has(TIBBS_ENTITY_ID)).toBe(false);
+    expect(hasTibbs(sim)).toBe(false);
   });
 
   it('the dev path still needs dev commands', () => {
@@ -328,14 +381,14 @@ describe('the end of a grave shift', () => {
     const copperBefore = meta.copper;
     const { events, saved } = winShift(sim);
     expect(atGrave(sim)).toBe(true);
-    expect(sim.entities.has(TIBBS_ENTITY_ID)).toBe(true);
+    expect(hasTibbs(sim)).toBe(true);
     // Paid once, at the win: the walk out pays nothing more.
     expect(meta.copper - copperBefore).toBe(2000);
     expect(events.some((ev) => ev.type === 'loot')).toBe(false);
     // His report opens in the NPC dialog, never as bubbles. Five adventurers,
     // each killed twice.
     const offer = offerOf(events);
-    expect(offer?.npcId).toBe(TIBBS_ENTITY_ID);
+    expect(offer?.npcId).toBe(tibbsId(sim));
     expect(offer?.pid).toBe(sim.playerId);
     expect(offer?.report).toEqual({ outcome: 'won', sent: 10, saved, copper: 2000 });
     expect(tibbsLines(events)).toEqual([]);
@@ -379,7 +432,7 @@ describe('the end of a grave shift', () => {
     // Nothing left to touch: no Tibbs, no offer.
     sim.pickUpObject(GRAVE_ENTITY_ID);
     const events = sim.tick();
-    expect(sim.entities.has(TIBBS_ENTITY_ID)).toBe(false);
+    expect(hasTibbs(sim)).toBe(false);
     expect(events.some((ev) => ev.type === 'graveyardShiftOffer')).toBe(false);
   });
 
@@ -388,8 +441,8 @@ describe('the end of a grave shift', () => {
     takeShift(sim);
     winShift(sim);
     // Tibbs still stands for his report; [Take the shift] from a stale dialog.
-    expect(sim.entities.has(TIBBS_ENTITY_ID)).toBe(true);
-    sim.targetEntity(TIBBS_ENTITY_ID);
+    expect(hasTibbs(sim)).toBe(true);
+    sim.targetEntity(tibbsId(sim));
     sim.interact();
     const events = sim.tick();
     expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).toBeNull();
@@ -418,7 +471,7 @@ describe('the end of a grave shift', () => {
     expect(meta0(sim).copper).toBe(copperBefore);
     expect(meta0(sim).deedsEarned.has(BOSS_FOR_A_DAY_DEED_ID)).toBe(false);
     // He offers again: [Take the shift] from his dialog starts a new one.
-    sim.targetEntity(TIBBS_ENTITY_ID);
+    sim.targetEntity(tibbsId(sim));
     sim.interact();
     expect(graveyardShiftRunFor(sim.ctx, sim.playerId)?.entry).toBe('grave');
   });
@@ -433,7 +486,7 @@ describe('the end of a grave shift', () => {
     expect(hasMorthenIdentity(sim.player)).toBe(false);
     expect(sim.player.level).toBe(15);
     expect(atGrave(sim)).toBe(true);
-    expect(sim.entities.has(TIBBS_ENTITY_ID)).toBe(false);
+    expect(hasTibbs(sim)).toBe(false);
     const events = sim.tick();
     expect(offerOf(events)).toBeUndefined();
     expect(meta0(sim).deedsEarned.has(BOSS_FOR_A_DAY_DEED_ID)).toBe(false);
@@ -456,7 +509,7 @@ describe('the end of a grave shift', () => {
     expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).toBeNull();
     expect(meta.deedsEarned.has(BOSS_FOR_A_DAY_DEED_ID)).toBe(true);
     expect(meta.copper - copperBefore).toBe(2000);
-    expect(sim.entities.has(TIBBS_ENTITY_ID)).toBe(false);
+    expect(hasTibbs(sim)).toBe(false);
   });
 
   it('lands settled at the grave: no fall carried over from the Crypt', () => {
@@ -493,7 +546,7 @@ describe('the end of a grave shift', () => {
     expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).toBeNull();
     expect(atGrave(sim)).toBe(true);
     expect(tibbsLines(events)).toEqual([]);
-    expect(sim.entities.has(TIBBS_ENTITY_ID)).toBe(false);
+    expect(hasTibbs(sim)).toBe(false);
   });
 
   it('a dev-entry shift still ends at the Crypt door, not the grave', () => {
@@ -512,5 +565,5 @@ describe('the end of a grave shift', () => {
 // Let the waiting Tibbs time out so a fresh offer raises him anew.
 function dismissAndWait(sim: Sim) {
   ticks(sim, TIBBS_IDLE_SECONDS * TICK_RATE + 2);
-  expect(sim.entities.has(TIBBS_ENTITY_ID)).toBe(false);
+  expect(hasTibbs(sim)).toBe(false);
 }

@@ -2046,7 +2046,7 @@ export class Sim {
   escortRuns = new Map<string, EscortRunState>();
   // delve instances (separate slot pool from dungeons)
   delveRuns: DelveRun[] = [];
-  readonly graveyardShiftRuns = new Map<number, gshiftMod.GraveyardShiftRun>();
+  readonly graveyardShiftRuns = new gshiftMod.GraveyardShiftBook();
   private delvePetStash = new Map<number, PetState>();
   // Real-world UTC day ('YYYY-MM-DD') for the delve daily reset (FR-5.1). The sim
   // core must stay deterministic, so it never reads the wall clock itself: the host

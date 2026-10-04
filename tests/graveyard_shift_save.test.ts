@@ -10,7 +10,6 @@ import {
   GRAVE_ENTITY_ID,
   GRAVE_POS,
   graveReturnSpot,
-  TIBBS_ENTITY_ID,
 } from '../src/sim/graveyard_shift/grave_entry';
 import { hasMorthenIdentity } from '../src/sim/graveyard_shift/morthen_identity';
 import { graveyardShiftDoorDrop } from '../src/sim/graveyard_shift/run_layout';
@@ -59,7 +58,7 @@ function takeShiftAtGrave(sim: Sim) {
   place(sim, sim.player, spot.x, spot.z);
   sim.pickUpObject(GRAVE_ENTITY_ID);
   sim.tick();
-  sim.targetEntity(TIBBS_ENTITY_ID);
+  sim.targetEntity(sim.ctx.graveyardShiftRuns.tibbs.get(sim.playerId)!);
   sim.interact();
   expect(graveyardShiftRunFor(sim.ctx, sim.playerId)?.entry).toBe('grave');
 }
