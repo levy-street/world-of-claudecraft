@@ -71,8 +71,6 @@ const bunches = (
 const MUSTER = { speedScale: 1, speedScaleMax: 1.35 } as const;
 /** Light, quick monsters that gather with the pack and break out at the departure. */
 const SCOUT = { role: 'scout', speedScale: 2.2, speedScaleMax: 2.6 } as const;
-/** The wave-8 pincer: a sprint group's monsters, that never gather and run straight in. */
-const SPRINT = { speedScale: 2.4 } as const;
 /**
  * The last three waves: every monster a tenth quicker to its rally or the tower, never
  * tougher than its template. Their difficulty is in the packs, not in the health.
@@ -109,16 +107,14 @@ const WIDTH = 0.1;
 
 /**
  * A hunt wave: its packs in order, each gathering at a rally in the band and waiting up to
- * `holdSeconds` for its last member, the kegs on their paths, then a sprint group (if any)
- * setting off `sprint.delay` s in. A hunt wave lays its kegs on its packs' paths, none on
- * the ring.
+ * `holdSeconds` for its last member, the kegs on their paths. A hunt wave lays its kegs on
+ * its packs' paths, none on the ring.
  */
 function huntWave(
   coreDamage: number,
   band: readonly [number, number],
   holdSeconds: number,
   packs: readonly PackSpec[],
-  sprint?: { entries: readonly TurretWaveEntry[]; delay: number },
 ): TurretWaveDef {
   const groups: TurretGroupDef[] = packs.map((p) => ({
     brick: 'pack',
@@ -131,14 +127,6 @@ function huntWave(
     advanceScale: p.advanceScale,
     ...(p.delay ? { delayTicks: ticks(p.delay) } : {}),
   }));
-  if (sprint)
-    groups.push({
-      brick: 'sprint',
-      entries: sprint.entries,
-      spreadTicks: SPREAD,
-      widthTurn: WIDTH,
-      delayTicks: ticks(sprint.delay),
-    });
   const kegs: TurretKegLotDef[] = packs.flatMap((p, group) =>
     p.kegs.map((placement) => ({ mode: 'path' as const, group, placement })),
   );
@@ -158,14 +146,35 @@ const CLOSE = [30, 33] as const;
  * second later, the pack advances on the tower together at one walking pace, past the keg
  * laid on its path, while its scouts break out at a run. The rallies carry no marker: the
  * standing pack and the cry are the telegraph. One pack, then scouts, then two packs and
- * three, the gathering windows closing as the hold timer shortens from 6 s to 2.5 s; the
- * finale adds a sprint group that never gathers. A monster at the tower's foot strikes
+ * three, the gathering windows closing as the hold timer shortens from 6 s to 2.5 s; between
+ * the packs, a few walkers and quick wolves surging in away from the fight, the finale's
+ * quick stalkers from two sides. A monster at the tower's foot strikes
  * fast, so the hunt is won in the field: the keg as a pack walks past it, the frag on a
  * pack standing clear of any keg, the shells on the scouts. No monster is tougher than its
  * template: each wave's shell damage, matched to its members' health, fells a member in
  * two good hits and a leader in five or six, so the last two waves are four packs at
  * once, not a crowd of sponges at the tower's foot.
  */
+/** A hunt wave with more groups after its packs (walkers, surgers): the packs keep their indices. */
+const plus = (wave: TurretWaveDef, ...groups: TurretGroupDef[]): TurretWaveDef => ({
+  ...wave,
+  groups: [...wave.groups, ...groups],
+});
+/** A quick monster or two surging in away from the fight while the packs gather. */
+const PACK_SURGE = { speedScale: 2.2, speedScaleMax: 2.5 } as const;
+const packSurgers = (count: number, sides: number, delay: number): TurretGroupDef => ({
+  brick: 'surgers',
+  entries: [{ templateId: 'forest_wolf', count, level: 2, ...PACK_SURGE }],
+  sides,
+  widthTurn: 0.04,
+  ...gap(0.4, 0.8),
+  delayTicks: ticks(delay),
+});
+const packWalkers = (entries: readonly TurretWaveEntry[], delay: number): TurretGroupDef => ({
+  ...walkers(entries, gap(1, 1.6)),
+  delayTicks: ticks(delay),
+});
+
 export const TURRET_MISSION_PACK: TurretScenarioDef = {
   id: 'fire_and_fly_pack',
   boardKey: 'pack',
@@ -180,33 +189,39 @@ export const TURRET_MISSION_PACK: TurretScenarioDef = {
         FRONT,
       ]),
     ]),
-    huntWave(52, FIELD, 6, [
-      pack(
-        [
-          { templateId: 'forest_wolf', count: 5, level: 2, ...MUSTER, leads: true },
-          { templateId: 'wild_boar', count: 4, level: 3, ...MUSTER },
-          { templateId: 'forest_wolf', count: 2, level: 2, ...SCOUT },
-        ],
-        1.15,
-        [FRONT],
-      ),
-    ]),
-    huntWave(
-      71,
-      FIELD,
-      4,
-      [0, 1].map((p) =>
+    plus(
+      huntWave(52, FIELD, 6, [
         pack(
           [
-            { templateId: 'webwood_spider', count: 3, level: 4, ...MUSTER, leads: true },
-            { templateId: 'vale_bandit', count: 4, level: 5, ...MUSTER },
-            { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT },
+            { templateId: 'forest_wolf', count: 5, level: 2, ...MUSTER, leads: true },
+            { templateId: 'wild_boar', count: 4, level: 3, ...MUSTER },
+            { templateId: 'forest_wolf', count: 2, level: 2, ...SCOUT },
           ],
-          1.2,
-          [p === 0 ? FRONT : SIDE],
-          p === 0 ? 0 : 7,
+          1.15,
+          [FRONT],
+        ),
+      ]),
+      packWalkers([{ templateId: 'wild_boar', count: 3, level: 3 }], 9),
+    ),
+    plus(
+      huntWave(
+        71,
+        FIELD,
+        4,
+        [0, 1].map((p) =>
+          pack(
+            [
+              { templateId: 'webwood_spider', count: 3, level: 4, ...MUSTER, leads: true },
+              { templateId: 'vale_bandit', count: 4, level: 5, ...MUSTER },
+              { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT },
+            ],
+            1.2,
+            [p === 0 ? FRONT : SIDE],
+            p === 0 ? 0 : 7,
+          ),
         ),
       ),
+      packSurgers(1, 1, 11),
     ),
     huntWave(
       89,
@@ -226,47 +241,54 @@ export const TURRET_MISSION_PACK: TurretScenarioDef = {
         ),
       ),
     ),
-    huntWave(
-      261,
-      FIELD,
-      4,
-      [0, 1].map((p) =>
-        pack(
-          [
-            { templateId: 'deeprock_kobold', count: 3, level: 15, ...MUSTER },
-            { templateId: 'boneclad_revenant', count: 4, level: 19, ...MUSTER },
-            { templateId: 'thornpeak_ogre', count: 1, level: 16, ...MUSTER, leads: true },
-            { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT },
-          ],
-          1.25,
-          [FRONT],
-          p === 0 ? 0 : 2,
+    plus(
+      huntWave(
+        261,
+        FIELD,
+        4,
+        [0, 1].map((p) =>
+          pack(
+            [
+              { templateId: 'deeprock_kobold', count: 3, level: 15, ...MUSTER },
+              { templateId: 'boneclad_revenant', count: 4, level: 19, ...MUSTER },
+              { templateId: 'thornpeak_ogre', count: 1, level: 16, ...MUSTER, leads: true },
+              { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT },
+            ],
+            1.25,
+            [FRONT],
+            p === 0 ? 0 : 2,
+          ),
         ),
       ),
+      packWalkers([{ templateId: 'forest_wolf', count: 4, level: 2, speedScale: 1.2 }], 0),
+      packSurgers(2, 2, 10),
     ),
-    huntWave(
-      256,
-      FIELD,
-      3,
-      (
-        [
-          [[FRONT], 0],
-          [[SIDE], 3],
-          [[], 6],
-        ] as const
-      ).map(([kegs, delay]) =>
-        pack(
+    plus(
+      huntWave(
+        256,
+        FIELD,
+        3,
+        (
           [
-            { templateId: 'boneclad_revenant', count: 3, level: 19, ...MUSTER_LATE },
-            { templateId: 'deeprock_kobold', count: 2, level: 15, ...MUSTER_LATE },
-            { templateId: 'frostmane_yeti', count: 1, level: 19, ...MUSTER_LATE, leads: true },
-            { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT_LATE },
-          ],
-          1.25,
-          kegs,
-          delay,
+            [[FRONT], 0],
+            [[SIDE], 3],
+            [[], 6],
+          ] as const
+        ).map(([kegs, delay]) =>
+          pack(
+            [
+              { templateId: 'boneclad_revenant', count: 3, level: 19, ...MUSTER_LATE },
+              { templateId: 'deeprock_kobold', count: 2, level: 15, ...MUSTER_LATE },
+              { templateId: 'frostmane_yeti', count: 1, level: 19, ...MUSTER_LATE, leads: true },
+              { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT_LATE },
+            ],
+            1.25,
+            kegs,
+            delay,
+          ),
         ),
       ),
+      packSurgers(2, 1, 8),
     ),
     huntWave(
       96,
@@ -293,31 +315,36 @@ export const TURRET_MISSION_PACK: TurretScenarioDef = {
         ),
       ),
     ),
-    huntWave(
-      256,
-      CLOSE,
-      2,
-      (
-        [
-          [[FRONT], 0],
-          [[SIDE], 1],
-          [[], 2],
-          [[FRONT], 3],
-        ] as const
-      ).map(([kegs, delay]) =>
-        pack(
+    plus(
+      huntWave(
+        256,
+        CLOSE,
+        2,
+        (
           [
-            { templateId: 'boneclad_revenant', count: 2, level: 19, ...MUSTER_LATE },
-            { templateId: 'deeprock_kobold', count: 2, level: 15, ...MUSTER_LATE },
-            { templateId: 'frostmane_yeti', count: 1, level: 19, ...MUSTER_LATE, leads: true },
-            { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT_LATE },
-          ],
-          1.35,
-          kegs,
-          delay,
+            [[FRONT], 0],
+            [[SIDE], 1],
+            [[], 2],
+            [[FRONT], 3],
+          ] as const
+        ).map(([kegs, delay]) =>
+          pack(
+            [
+              { templateId: 'boneclad_revenant', count: 2, level: 19, ...MUSTER_LATE },
+              { templateId: 'deeprock_kobold', count: 2, level: 15, ...MUSTER_LATE },
+              { templateId: 'frostmane_yeti', count: 1, level: 19, ...MUSTER_LATE, leads: true },
+              { templateId: 'tunnel_rat', count: 2, level: 6, ...SCOUT_LATE },
+            ],
+            1.35,
+            kegs,
+            delay,
+          ),
         ),
       ),
-      { entries: [{ templateId: 'tunnel_rat', count: 6, level: 6, ...late(SPRINT) }], delay: 3 },
+      {
+        ...packSurgers(3, 2, 3),
+        entries: [{ templateId: 'tunnel_rat', count: 6, level: 6, ...late(PACK_SURGE) }],
+      },
     ),
   ],
 };

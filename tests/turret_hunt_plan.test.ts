@@ -2,6 +2,7 @@
 // resolver, turret_group_plan.ts) and the speed spread (turret_pace.ts): a wave's pack and
 // sprint groups resolved into their schedules, paces and leaders, the client decoder
 // refusing a forged one, and each monster's own pace drawn once by id.
+
 import { describe, expect, it } from 'vitest';
 import { decodeTurretPlan } from '../src/net/turret_session_wire';
 import { TURRET_MISSION_PACK } from '../src/sim/content/fire_and_fly_missions';
@@ -22,6 +23,7 @@ import type {
   TurretScenarioDef,
   TurretWaveEntry,
 } from '../src/sim/types';
+import { TURRET_BRICKS_SCENARIO } from './helpers/turret_wave_plan';
 
 const march = (templateId: string) => MOBS[templateId].moveSpeed * TURRET_TIMING.marchFactor;
 
@@ -199,12 +201,32 @@ describe('a hunt wave in the plan', () => {
       (w: G) => (w.kegCap = 0),
     ])
       expect(forge(2, edit)).toBeNull();
-    // A sprint kind spawned inside a pack, or a sprint group with no pack, is no plan the resolver makes.
-    const sprintKind = plan.kinds.findIndex((k: { role?: string }) => k.role === 'sprint');
+    // A sprint kind spawned inside a pack, or a sprint group with no pack, is no plan the
+    // resolver makes (on the bricks plan: no shipped mission keeps a sprint group).
+    const bricks = JSON.parse(JSON.stringify(resolveTurretPlan(TURRET_BRICKS_SCENARIO)));
+    expect(decodeTurretPlan(bricks)).not.toBeNull();
+    const sw = bricks.waves.findIndex((w: { groups: G[] }) =>
+      w.groups.some((g) => g.brick === 'sprint'),
+    );
+    expect(sw).toBeGreaterThanOrEqual(0);
+    const forgeBricks = (edit: (w: G) => void) => {
+      const copy = JSON.parse(JSON.stringify(bricks));
+      edit(copy.waves[sw]);
+      return decodeTurretPlan(copy);
+    };
+    const sprintKind = bricks.kinds.findIndex((k: { role?: string }) => k.role === 'sprint');
     expect(sprintKind).toBeGreaterThanOrEqual(0);
-    expect(forge(7, (w) => ((w.spawns as number[])[0] = sprintKind))).toBeNull();
+    const packStart = (w: G) => {
+      let at = 0;
+      for (const g of groups(w)) {
+        if (g.brick === 'pack') return at;
+        at += g.count as number;
+      }
+      return -1;
+    };
+    expect(forgeBricks((w) => ((w.spawns as number[])[packStart(w)] = sprintKind))).toBeNull();
     expect(
-      forge(7, (w) => {
+      forgeBricks((w) => {
         for (const g of groups(w)) if (g.brick === 'pack') g.brick = 'sprint';
       }),
     ).toBeNull();

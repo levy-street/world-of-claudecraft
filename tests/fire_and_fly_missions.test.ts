@@ -149,15 +149,24 @@ describe('the mission table', () => {
     }
   });
 
-  it('hunts The Pack in packs that gather at rallies, one wave by one, fewer than the R3 draft', () => {
+  it('hunts The Pack in packs that gather at rallies, with walkers and surgers between them', () => {
     const waves = TURRET_MISSION_PACK.waves;
     const plan = resolveTurretPlan(TURRET_MISSION_PACK);
-    expect(spawnsOf(TURRET_MISSION_PACK)).toEqual([8, 11, 18, 20, 20, 24, 28, 34]);
-    // Under the R3 draft wave by wave (10, 14, 24, 24, 24, 36, 48, 54): a monster at the
-    // foot now strikes in 0.8 s, so fewer of them, the last two waves in smaller packs.
-    const r3 = [10, 14, 24, 24, 24, 36, 48, 54];
-    for (const [i, n] of spawnsOf(TURRET_MISSION_PACK).entries()) expect(n).toBeLessThan(r3[i]);
+    expect(spawnsOf(TURRET_MISSION_PACK)).toEqual([8, 14, 19, 20, 26, 26, 28, 34]);
     expect(waves.map((w) => packsOf(w).length)).toEqual([1, 1, 2, 2, 2, 3, 4, 4]);
+    // Between the packs, a few walkers and quick monsters surging in away from the fight.
+    expect(
+      waves.map((w) => w.groups.filter((g) => g.brick !== 'pack').map((g) => g.brick)),
+    ).toEqual([
+      [],
+      ['walkers'],
+      ['surgers'],
+      [],
+      ['walkers', 'surgers'],
+      ['surgers'],
+      [],
+      ['surgers'],
+    ]);
     for (const [i, wave] of waves.entries()) {
       const packs = packsOf(wave);
       // One hold per wave, from 6 s down to 2 s.
@@ -168,20 +177,17 @@ describe('the mission table', () => {
       for (const p of packs) expect([p.minRadius, p.maxRadius]).toEqual(band);
       // A hunt wave lays its kegs on its packs' paths, none on the ring.
       for (const lot of wave.kegs ?? []) expect(lot.mode).toBe('path');
-      // Every group a pack but the finale's sprint group, last.
-      const sprint = wave.groups.filter((g) => g.brick === 'sprint');
-      expect(sprint).toHaveLength(i === 7 ? 1 : 0);
-      expect(packs.length + sprint.length).toBe(wave.groups.length);
+      // The packs first, so a path keg's group index names a pack.
+      expect(wave.groups.slice(0, packs.length).every((g) => g.brick === 'pack')).toBe(true);
       const scouts = entriesOf(wave).filter((e) => e.role === 'scout');
       const perPack = scouts.reduce((n, e) => n + e.count, 0) / packs.length;
       expect(perPack).toBe(i === 0 ? 0 : 2);
       // The last three waves: a tenth quicker to rally and run, never tougher than the
       // template (lot R5: the owner's playtest found the sponges a chore).
       const late = i >= 5 ? 1.1 : 1;
-      for (const group of wave.groups) {
+      for (const group of packs) {
         for (const entry of group.entries) {
-          const [min, max] =
-            entry.role === 'scout' ? [2.2, 2.6] : group.brick === 'sprint' ? [2.4, 2.4] : [1, 1.35];
+          const [min, max] = entry.role === 'scout' ? [2.2, 2.6] : [1, 1.35];
           expect(entry.speedScale).toBeCloseTo(min * late, 12);
           expect(entry.speedScaleMax ?? entry.speedScale).toBeCloseTo(max * late, 12);
           expect(entry.hpScale).toBeUndefined();
@@ -222,7 +228,16 @@ describe('the mission table', () => {
 
   it('paces The Pack at a walk: members to the rally, one advance per pack, scouts at a run', () => {
     const plan = resolveTurretPlan(TURRET_MISSION_PACK);
+    // The packs' kinds: the walkers and surgers between them keep their own paces.
+    const packKinds = new Set<number>();
+    for (const wave of plan.waves)
+      for (const [g, group] of wave.groups.entries()) {
+        if (group.brick !== 'pack') continue;
+        const start = turretGroupStart(wave, g);
+        for (const kind of wave.spawns.slice(start, start + group.count)) packKinds.add(kind);
+      }
     for (const [k, kind] of plan.kinds.entries()) {
+      if (!packKinds.has(k)) continue;
       const base = MOBS[kind.templateId].moveSpeed * TURRET_TIMING.marchFactor;
       const top = (kind.marchSpeedMax ?? kind.marchSpeed) / base;
       // The last three waves' kinds gather and run a tenth quicker.
@@ -230,8 +245,7 @@ describe('the mission table', () => {
       if (kind.role === 'scout') {
         expect(kind.marchSpeed / base).toBeCloseTo(2.2 * late, 12);
         expect(top).toBeCloseTo(2.6 * late, 12);
-      } else if (kind.role === 'sprint') expect(kind.marchSpeed / base).toBeCloseTo(2.4 * late, 12);
-      else {
+      } else {
         expect(kind.marchSpeed / base).toBeCloseTo(late, 12);
         expect(top).toBeCloseTo(1.35 * late, 12);
       }
