@@ -47,6 +47,7 @@ import { materialPayloadKey } from '../src/sim/material_payload_identity';
 import { materialSourceKey } from '../src/sim/material_sources';
 import { normalizeMaterialStack } from '../src/sim/material_stack';
 import { Sim } from '../src/sim/sim';
+import { isStackProvenanceItemId } from '../src/sim/stack_provenance_ids';
 import type { Entity, InvSlot, WorldContent } from '../src/sim/types';
 import { META_EXCLUDE, samplePlayerMeta } from './parity/trace';
 
@@ -60,11 +61,9 @@ const EXPANSION_TOTAL = 1925000; // 192g50s across the six treasury expansions (
 
 const EMPTY: GuildBankState = { treasury: 0, inventory: [], purchasedSlots: 0 };
 
-// The one NON-material fixture id this suite uses, the same one the personal
-// bank's twin arms use (tests/bank.test.ts): kind 'food', so the junk-kind
-// material set excludes it. It is what keeps the indivisibility and flooring
-// controls on an item whose units really are inseparable from their payload.
-const NON_MATERIAL_SIM = 'roasted_boar';
+// Non-reagent junk keeps the indivisibility and fractional-flooring controls
+// outside both material and crafted-consumable source accounting.
+const NON_MATERIAL_SIM = 'tangled_weed';
 
 function freshSim(): Sim {
   return new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true });
@@ -1228,6 +1227,7 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
     // always applied.
     const sim = makeOfficerSim();
     expect(isMaterialItemId(NON_MATERIAL_SIM)).toBe(false);
+    expect(isStackProvenanceItemId(NON_MATERIAL_SIM)).toBe(false);
     // Premise: the anonymous-pipe policy passes it, so the capacity/count arm
     // is what answers rather than a refusal upstream of it.
     expect(guildBankPipeRefusal({ itemId: NON_MATERIAL_SIM, count: 1 })).toBeNull();
@@ -1371,6 +1371,7 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
     // the wrong contract.
     const sim = makeOfficerSim();
     expect(isMaterialItemId(NON_MATERIAL_SIM)).toBe(false);
+    expect(isStackProvenanceItemId(NON_MATERIAL_SIM)).toBe(false);
     for (let i = 0; i < GUILD_BANK_RUNG_SLOTS[0] - 1; i++) {
       book(sim).inventory.push({ itemId: 'wolf_fang', count: 1, instance: { signer: `S${i}` } });
     }
@@ -1531,6 +1532,7 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
     const sim = makeOfficerSim();
     const payload = { signer: 'Ana' };
     expect(isMaterialItemId(NON_MATERIAL_SIM)).toBe(false);
+    expect(isStackProvenanceItemId(NON_MATERIAL_SIM)).toBe(false);
     meta(sim).inventory.push({ itemId: NON_MATERIAL_SIM, count: 3, instance: { ...payload } });
     const idx = meta(sim).inventory.findIndex((s) => s.instance?.signer === 'Ana');
     sim.guildBankDepositFor(sim.playerId, idx, 1); // partial request: still all 3

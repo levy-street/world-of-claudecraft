@@ -128,6 +128,22 @@ beforeEach(() => {
 });
 
 describe('guild bank grid instanced-slot marker', () => {
+  it('keeps maker glyph and accessible label on a normalized mixed potion', () => {
+    const root = harness([
+      {
+        itemId: 'minor_healing_potion',
+        count: 3,
+        materialSources: [
+          { source: { signer: 'Ana' }, count: 1 },
+          { source: { signer: 'Bru' }, count: 2 },
+        ],
+      },
+    ]);
+    const cell = root.querySelector('.bank-item:not(.empty)');
+    expect(cell?.querySelector('.bi-glyph-signed')).not.toBeNull();
+    expect(cell?.getAttribute('aria-label')).toContain('maker-marked copy');
+  });
+
   it('a named legendary-rolled copy announces its chosen name and asks for its rim', () => {
     // No promoted copy reaches the guild grid today (bound copies are refused
     // at the anonymous pipe), but the cell describes its copy through the same
@@ -259,7 +275,7 @@ describe('guild bank painter mark contract (source pins)', () => {
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/\/\/[^\n]*/g, '');
     expect(painter).toContain('cornerMarkHtml(cornerMark)');
-    expect(painter).toContain('bagInstanceGlyphKind(slot.instance)');
+    expect(painter).toContain('bagInstanceGlyphKind(slot.instance, slot.materialSources)');
     expect(painter).toMatch(/(?<!UNKNOWN_)INSTANCE_GLYPH_ARIA_KEYS\[glyphKind\]/);
     // The guild pane never uses the UNKNOWN_ key family (see the aria case
     // above); a switch to it must be a deliberate edit, not drift.

@@ -523,7 +523,7 @@ describe('instanced attachments (finding 1)', () => {
     const instanced = aliceMeta.inventory.filter((s) => s.instance);
     expect(instanced).toHaveLength(1);
     expect(instanced[0]?.instance?.boundTo).toBe(alice);
-    expect(instanced[0]?.instance?.signer).toBe('Alice');
+    expect(instanced[0]?.materialSources).toEqual([{ source: { signer: 'Alice' }, count: 1 }]);
     expect(sim.countItem('roasted_boar', alice)).toBe(1);
   });
 
@@ -591,7 +591,9 @@ describe('taking attachments against bag capacity (finding 2)', () => {
     expect(events.some((e) => e.type === 'error' && e.text === 'Your bags are full.')).toBe(true);
     expect(bobMeta.copper).toBe(before + 700);
     const still = sim.mailInfoFor(bob)?.messages.find((m) => m.id === gift.id);
-    expect(still?.items).toEqual([{ itemId: 'roasted_boar', count: 2 }]);
+    expect(still?.items).toEqual([
+      { itemId: 'roasted_boar', count: 2, materialSources: [{ source: {}, count: 2 }] },
+    ]);
     expect(still?.copper).toBe(0);
 
     // Free a slot and take again: the held stack now arrives.
@@ -721,7 +723,9 @@ describe('taking attachments against bag capacity (finding 2)', () => {
 
     expect(sim.countItem('linen_scrap', bob)).toBe(2); // delivered into the satchel
     const still = sim.mailInfoFor(bob)?.messages.find((m) => m.id === letter.id);
-    expect(still?.items).toEqual([{ itemId: 'roasted_boar', count: 2 }]); // kept, not destroyed
+    expect(still?.items).toEqual([
+      { itemId: 'roasted_boar', count: 2, materialSources: [{ source: {}, count: 2 }] },
+    ]); // kept, not destroyed
     expect(events.some((e) => e.type === 'error' && e.text === 'Your bags are full.')).toBe(true);
 
     // Free one general slot and the held food parcel arrives on the next take.
@@ -1649,7 +1653,9 @@ describe('purgeMailOwner - deleting a character', () => {
     expect(parcel.senderName).toBe('Doomed');
     expect(parcel.returned).toBe(true);
     expect(parcel.copper).toBe(500);
-    expect(parcel.items).toEqual([{ itemId: 'roasted_boar', count: 2 }]);
+    expect(parcel.items).toEqual([
+      { itemId: 'roasted_boar', count: 2, materialSources: [{ source: {}, count: 2 }] },
+    ]);
     const legacy = letterBy(sim, (m) => m.subject === 'Legacy', 'legacy parcel');
     expect(legacy.recipientKey).toBe(aliceKey);
     expect(legacy.copper).toBe(250);
@@ -1661,7 +1667,9 @@ describe('purgeMailOwner - deleting a character', () => {
     const goods = letterBy(sim, (m) => m.subject === 'Goods', 'goods-only parcel');
     expect(goods.recipientKey).toBe(aliceKey);
     expect(goods.copper).toBe(0);
-    expect(goods.items).toEqual([{ itemId: 'roasted_boar', count: 3 }]);
+    expect(goods.items).toEqual([
+      { itemId: 'roasted_boar', count: 3, materialSources: [{ source: {}, count: 3 }] },
+    ]);
     expect(goods.returned).toBe(true);
 
     // The bare note, the sub-silver tip (coin and all, no return flight), and
@@ -2010,13 +2018,13 @@ describe('purgeMailOwner - deleting a character', () => {
     );
     const letter = sim.postOffice.mail.find((m) => m.subject === 'Signed');
     if (!letter) throw new Error('no letter');
-    expect(letter.items[0]?.instance?.signer).toBe('Alice');
+    expect(letter.items[0]?.materialSources).toEqual([{ source: { signer: 'Alice' }, count: 1 }]);
 
     // The sweep is scoped to the recipient arm, so address the parcel to the
     // character being renamed. (Alice signed it; the signer is what follows.)
     letter.recipientKey = 'Alice';
     expect(sim.rekeyMailOwner(555, 'Alice', 'Alicia')).toBe(true);
-    expect(letter.items[0]?.instance?.signer).toBe('Alicia');
+    expect(letter.items[0]?.materialSources).toEqual([{ source: { signer: 'Alicia' }, count: 1 }]);
   });
 
   it('the rename sweep leaves a parcel addressed to a STRANGER alone', () => {
@@ -2046,6 +2054,6 @@ describe('purgeMailOwner - deleting a character', () => {
     letter.senderName = 'Somebody Else';
 
     sim.rekeyMailOwner(555, 'Alice', 'Alicia');
-    expect(letter.items[0]?.instance?.signer).toBe('Alice');
+    expect(letter.items[0]?.materialSources).toEqual([{ source: { signer: 'Alice' }, count: 1 }]);
   });
 });

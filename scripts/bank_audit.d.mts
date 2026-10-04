@@ -108,6 +108,9 @@ export function auditBank(input: {
   ledgerRows: BankLedgerAuditRow[];
   characters: BankAuditCharacter[];
   guildBanks?: BankAuditGuildBank[];
+  projectPersonalSlot?: (
+    slot: import('../src/sim/types').InvSlot,
+  ) => readonly import('../src/sim/types').InvSlot[];
 }): BankAuditFinding[];
 
 // A one-line-per-finding report grouped by container, plus per-container counts.

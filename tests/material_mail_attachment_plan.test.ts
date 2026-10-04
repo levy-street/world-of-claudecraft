@@ -12,11 +12,11 @@ describe('material mail attachment planning', () => {
   it('keeps one index-aligned null entry for each non-material request', () => {
     const planned = planMaterialMailAttachments(
       [
-        { itemId: 'baked_bread', count: 2 },
+        { itemId: 'worn_sword', count: 2 },
         { itemId: HIDE, count: 1, materialSources: [{ source: {}, count: 1 }] },
       ],
       [
-        { itemId: 'baked_bread', count: 1 },
+        { itemId: 'worn_sword', count: 1 },
         { itemId: HIDE, count: 1 },
       ],
     );
@@ -27,7 +27,7 @@ describe('material mail attachment planning', () => {
       null,
       [{ itemId: HIDE, count: 1, materialSources: [{ source: {}, count: 1 }] }],
     ]);
-    expect(planned.value.inventory).toEqual([{ itemId: 'baked_bread', count: 2 }]);
+    expect(planned.value.inventory).toEqual([{ itemId: 'worn_sword', count: 2 }]);
   });
 
   it('plans the whole plain pool in source priority order while ignoring manual grouping', () => {

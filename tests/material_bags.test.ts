@@ -27,13 +27,14 @@ import {
 import { ITEMS } from '../src/sim/data';
 import { materialItemIds } from '../src/sim/material_ids';
 import type { MaterialComposition, MaterialSource } from '../src/sim/material_sources';
+import { isStackProvenanceItemId } from '../src/sim/stack_provenance_ids';
 import type { InvSlot, ItemInstancePayload } from '../src/sim/types';
 
 // Real shipped ids, classified by the assertions in the first block rather than
-// assumed: two gathering materials, a food and a weapon that are not materials.
+// assumed: two gathering materials, a junk and a weapon that are not materials.
 const ORE = 'copper_ore';
 const IRON = 'iron_ore';
-const FOOD = 'baked_bread';
+const JUNK = 'tangled_weed';
 const GEAR = 'worn_sword';
 
 /** The junk-kind default cap these materials really carry; pinned below. */
@@ -80,16 +81,17 @@ const expectSourcesAgree = (inventory: readonly InvSlot[]): void => {
 const noPool = (general: number): PoolCapacity => ({ general, materials: 0 });
 
 describe('the fixture ids, classified from the real registry', () => {
-  it('the two ore ids ARE materials, the food and the weapon are not, at the real caps', () => {
+  it('the two ore ids ARE materials, the junk and the weapon are not, at the real caps', () => {
     const materials = materialItemIds();
     expect(materials.has(ORE)).toBe(true);
     expect(materials.has(IRON)).toBe(true);
-    expect(materials.has(FOOD)).toBe(false);
+    expect(materials.has(JUNK)).toBe(false);
+    expect(isStackProvenanceItemId(JUNK)).toBe(false);
     expect(materials.has(GEAR)).toBe(false);
     // The arithmetic below is written against these caps, not against a guess.
     expect(stackSizeOf(ITEMS[ORE])).toBe(STACK);
     expect(stackSizeOf(ITEMS[IRON])).toBe(STACK);
-    expect(stackSizeOf(ITEMS[FOOD])).toBe(STACK);
+    expect(stackSizeOf(ITEMS[JUNK])).toBe(STACK);
     expect(stackSizeOf(ITEMS[GEAR])).toBe(1);
   });
 });
@@ -113,13 +115,13 @@ describe('countFit: differently sourced material shares real room', () => {
 
     // The discriminator: the same shaped inventory of a NON-material still
     // answers the old way, seeing only the one byte-equal stack.
-    const food: InvSlot[] = [
-      { itemId: FOOD, count: 6, instance: { signer: 'Ana' } },
-      { itemId: FOOD, count: 6, instance: { signer: 'Bru' } },
-      { itemId: FOOD, count: 5 },
+    const junk: InvSlot[] = [
+      { itemId: JUNK, count: 6, instance: { signer: 'Ana' } },
+      { itemId: JUNK, count: 6, instance: { signer: 'Bru' } },
+      { itemId: JUNK, count: 5 },
     ];
-    expect(countFit(food, pools, FOOD, 99, { signer: 'Ana' })).toBe(14);
-    expect(countFit(food, pools, FOOD, 99)).toBe(15);
+    expect(countFit(junk, pools, JUNK, 99, { signer: 'Ana' })).toBe(14);
+    expect(countFit(junk, pools, JUNK, 99)).toBe(15);
   });
 
   it('lands the promised units in the existing stacks, taking no new slot', () => {
@@ -368,28 +370,28 @@ describe('every capacity wrapper agrees with countFit', () => {
     expect(canGrantItemInstance(inventory, pools, ORE, { signer: 'Bru' }, 23)).toBe(false);
   });
 
-  it('keeps the two-pool split: a material reaches materials headroom, a food does not', () => {
+  it('keeps the two-pool split: a material reaches materials headroom, a junk does not', () => {
     const pools: PoolCapacity = { general: 1, materials: 2 };
     const inventory: InvSlot[] = [{ itemId: GEAR, count: 1 }];
 
     // General is full; the materials pool is still open to the ore alone.
     expect(countFit(inventory, pools, ORE, 999)).toBe(40);
-    expect(countFit(inventory, pools, FOOD, 999)).toBe(0);
+    expect(countFit(inventory, pools, JUNK, 999)).toBe(0);
     expect(canGrantCopies(inventory, pools, ORE, 40)).toBe(true);
     expect(canGrantCopies(inventory, pools, ORE, 41)).toBe(false);
   });
 });
 
 describe('non-material behavior is unchanged by the material arm', () => {
-  it('stacks food and gear exactly as before, stamping no sources', () => {
+  it('stacks junk and gear exactly as before, stamping no sources', () => {
     const pools = noPool(3);
-    const food: InvSlot[] = [{ itemId: FOOD, count: 5, instance: { signer: 'Ana' } }];
+    const junk: InvSlot[] = [{ itemId: JUNK, count: 5, instance: { signer: 'Ana' } }];
 
-    expect(countFit(food, pools, FOOD, 99)).toBe(40);
-    addStacked(food, FOOD, 3);
-    expect(food).toEqual([
-      { itemId: FOOD, count: 5, instance: { signer: 'Ana' } },
-      { itemId: FOOD, count: 3 },
+    expect(countFit(junk, pools, JUNK, 99)).toBe(40);
+    addStacked(junk, JUNK, 3);
+    expect(junk).toEqual([
+      { itemId: JUNK, count: 5, instance: { signer: 'Ana' } },
+      { itemId: JUNK, count: 3 },
     ]);
 
     const gear: InvSlot[] = [];
@@ -405,11 +407,11 @@ describe('non-material behavior is unchanged by the material arm', () => {
     const pools = noPool(3);
     const charged = { signer: 'Ana', charges: { zap: 2 } };
     const inventory: InvSlot[] = [
-      { itemId: FOOD, count: 1, instance: { ...charged, charges: { zap: 2 } } },
+      { itemId: JUNK, count: 1, instance: { ...charged, charges: { zap: 2 } } },
     ];
 
-    expect(countFit(inventory, pools, FOOD, 99, charged)).toBe(2);
-    addStacked(inventory, FOOD, 2, charged);
+    expect(countFit(inventory, pools, JUNK, 99, charged)).toBe(2);
+    addStacked(inventory, JUNK, 2, charged);
     expect(inventory).toHaveLength(3);
     for (const slot of inventory) expect(slot.count).toBe(1);
   });
@@ -436,13 +438,13 @@ describe('non-material behavior is unchanged by the material arm', () => {
 
   it('keeps the legacy end-first walk when removing a NON-material', () => {
     const inventory: InvSlot[] = [
-      { itemId: FOOD, count: 3 },
-      { itemId: FOOD, count: 3 },
+      { itemId: JUNK, count: 3 },
+      { itemId: JUNK, count: 3 },
     ];
 
-    removeStacked(inventory, FOOD, 4);
+    removeStacked(inventory, JUNK, 4);
 
-    expect(inventory).toEqual([{ itemId: FOOD, count: 2 }]);
+    expect(inventory).toEqual([{ itemId: JUNK, count: 2 }]);
   });
 
   it('keeps a crafted-marker mismatch apart for a material, as for anything else', () => {
@@ -692,10 +694,10 @@ describe('consumeOneScratch reports the unit it really spent', () => {
   });
 
   it('answers undefined when no stack of the material is held', () => {
-    const scratch: InvSlot[] = [{ itemId: FOOD, count: 2 }];
+    const scratch: InvSlot[] = [{ itemId: JUNK, count: 2 }];
 
     expect(consumeOneScratch(scratch, ORE)).toBeUndefined();
-    expect(scratch).toEqual([{ itemId: FOOD, count: 2 }]);
+    expect(scratch).toEqual([{ itemId: JUNK, count: 2 }]);
   });
 
   it('refuses malformed provenance before writing anything', () => {

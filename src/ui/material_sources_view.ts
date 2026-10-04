@@ -27,7 +27,7 @@
 // never looked up, never resolved against a live profile, and carry no account
 // data; the renderer escapes them.
 
-import { isMaterialItemId, materialItemIds } from '../sim/material_ids';
+import { isMaterialItemId } from '../sim/material_ids';
 import { materialSourceUnitPayload } from '../sim/material_inventory_units';
 import {
   isPremiumMaterialSource,
@@ -39,6 +39,7 @@ import {
   totalMaterialCount,
 } from '../sim/material_sources';
 import { normalizeMaterialStack } from '../sim/material_stack';
+import { isStackProvenanceItemId, stackProvenanceItemIds } from '../sim/stack_provenance_ids';
 import type { InvSlot } from '../sim/types';
 
 /** One displayed bucket. `kind` decides the wording, `premium` the marker. */
@@ -189,8 +190,8 @@ export function materialSourcesForDisplay(
  * empty-string signers while the sim still treats them as their own payload.
  */
 export function materialFungibleUnitCount(slot: MaterialSourceSlot): number {
-  if (!isMaterialItemId(slot.itemId)) return slot.count;
-  const normalized = normalizeMaterialStack(slot, materialItemIds());
+  if (!isStackProvenanceItemId(slot.itemId)) return slot.count;
+  const normalized = normalizeMaterialStack(slot, stackProvenanceItemIds());
   if (!normalized.ok) return 0;
   const materialSlot = normalized.value;
   if (materialSlot.instance?.locked === true) return 0;

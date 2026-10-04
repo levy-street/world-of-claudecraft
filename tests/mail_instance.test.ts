@@ -121,7 +121,7 @@ function signerCountsAcross(rows: readonly SourceCarrier[]): Record<string, numb
 
 // A non-material stackable and a non-material unstackable, for the controls
 // that must prove the material arm changed nothing outside its own taxonomy.
-const BREAD = 'baked_bread';
+const NON_SOURCE_STACK = 'stag_antler'; // Vendor junk, not a reagent or consumable.
 const SWORD = 'worn_sword';
 
 const ENCHANTED: ItemInstancePayload = {
@@ -444,11 +444,11 @@ describe('mailSend: instanced attachments', () => {
     // The control for the row above: outside the material taxonomy the escrow
     // row is byte-identical to what it always was, with no source list at all.
     const { sim, sender } = mailSetup();
-    sim.addItem(BREAD, 5, sender);
-    sim.mailSend('Rex', 'lunch', 'bread', 0, [{ itemId: BREAD, count: 3 }], sender);
+    sim.addItem(NON_SOURCE_STACK, 5, sender);
+    sim.mailSend('Rex', 'lunch', 'bread', 0, [{ itemId: NON_SOURCE_STACK, count: 3 }], sender);
     expect(mailCodes(sim.drainEvents())).toContain('sent');
     const letter = bookOf(sim).find((m) => m.items.length > 0);
-    expect(letter?.items).toEqual([{ itemId: BREAD, count: 3 }]);
+    expect(letter?.items).toEqual([{ itemId: NON_SOURCE_STACK, count: 3 }]);
   });
 });
 
@@ -553,9 +553,9 @@ describe('mailSend: mergeable instanced attachments bundle into one parcel', () 
     const { sim, sender } = mailSetup();
     sim.addItemInstance(BOOTS, { ...SIGNED }, sender, 1, { craftedRecipeId: 'recipeA' });
     sim.addItemInstance(BOOTS, { ...SIGNED }, sender, 2, { craftedRecipeId: 'recipeB' });
-    sim.addItem(BREAD, 1, sender);
+    sim.addItem(NON_SOURCE_STACK, 1, sender);
     sim.addItem('roasted_boar', 1, sender);
-    const breadBefore = sim.countItem(BREAD, sender);
+    const breadBefore = sim.countItem(NON_SOURCE_STACK, sender);
     const boarBefore = sim.countItem('roasted_boar', sender);
 
     sim.mailSend(
@@ -565,7 +565,7 @@ describe('mailSend: mergeable instanced attachments bundle into one parcel', () 
       0,
       [
         { itemId: BOOTS, count: 3, instance: SIGNED },
-        { itemId: BREAD, count: 1 },
+        { itemId: NON_SOURCE_STACK, count: 1 },
         { itemId: 'roasted_boar', count: 1 },
       ],
       sender,
@@ -575,7 +575,7 @@ describe('mailSend: mergeable instanced attachments bundle into one parcel', () 
     expect(codes).toContain('tooManyParcels');
     expect(codes).not.toContain('sent');
     expect(slotsOf(sim, sender, BOOTS).reduce((n, s) => n + s.count, 0)).toBe(3);
-    expect(sim.countItem(BREAD, sender)).toBe(breadBefore);
+    expect(sim.countItem(NON_SOURCE_STACK, sender)).toBe(breadBefore);
     expect(sim.countItem('roasted_boar', sender)).toBe(boarBefore);
     expect(metaOf(sim, sender).copper).toBe(10000);
     expect(bookOf(sim).filter((m) => m.items.length > 0)).toHaveLength(0);
@@ -709,20 +709,20 @@ describe('mailTake: instanced capacity modeling', () => {
     // The taxonomy control: outside materials the capacity model is untouched,
     // signature and all.
     const { sim, sender, recipient } = mailSetup();
-    sim.addItemInstance(BREAD, { ...SIGNED }, sender);
+    sim.addItemInstance(NON_SOURCE_STACK, { ...SIGNED }, sender);
     sim.mailSend(
       'Rex',
       'gift',
       'bread',
       0,
-      [{ itemId: BREAD, count: 1, instance: SIGNED }],
+      [{ itemId: NON_SOURCE_STACK, count: 1, instance: SIGNED }],
       sender,
     );
     tickFor(sim, MAIL_DELIVERY_SECONDS + 1);
     moveToMailbox(sim, recipient);
     const recipientMeta = metaOf(sim, recipient);
     recipientMeta.inventory.length = 0;
-    sim.addItem(BREAD, 1, recipient);
+    sim.addItem(NON_SOURCE_STACK, 1, recipient);
     fillBackpack(sim, recipient);
 
     const letterId = firstPlayerLetterId(sim, recipient);
@@ -732,7 +732,7 @@ describe('mailTake: instanced capacity modeling', () => {
 
     recipientMeta.inventory.pop();
     sim.mailTake(letterId, recipient);
-    const got = slotsOf(sim, recipient, BREAD).filter((s) => s.instance);
+    const got = slotsOf(sim, recipient, NON_SOURCE_STACK).filter((s) => s.instance);
     expect(got).toHaveLength(1);
     expect(got[0].instance).toEqual(SIGNED);
   });
@@ -963,7 +963,7 @@ describe('persistence: pre-payload saves', () => {
           subject: 'old',
           body: 'plain parcel',
           copper: 5,
-          items: [{ itemId: BREAD, count: 2 }],
+          items: [{ itemId: NON_SOURCE_STACK, count: 2 }],
           deliverIn: 0,
           secondsLeft: 1000,
           read: false,

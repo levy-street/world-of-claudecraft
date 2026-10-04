@@ -24,7 +24,7 @@ const h = vi.hoisted(() => {
     const text = String(sql);
     // The boot refuses unless every connection announces the capability.
     if (text.includes('woc.material_source_writer')) {
-      return Promise.resolve({ rows: [{ capability: '1' }], rowCount: 1 });
+      return Promise.resolve({ rows: [{ capability: '2' }], rowCount: 1 });
     }
     if (text.includes('to_regclass')) {
       return Promise.resolve({ rows: [{ reg: 'public.rate_limits' }], rowCount: 1 });
@@ -75,7 +75,7 @@ function expectAnnouncing(config: Record<string, unknown>, label: string): void 
   // The operator's own options survive, byte for byte, with the capability
   // appended LAST so it wins a repeated GUC.
   expect(config.options, `${label} options`).toBe(
-    '-c search_path=woc -c woc.material_source_writer=1',
+    '-c search_path=woc -c woc.material_source_writer=2',
   );
   expect(config.options).toBe(EXPECTED.options);
   expect(String(config.options)).toContain(MATERIAL_SOURCE_WRITER_STARTUP_OPTION);
@@ -130,6 +130,7 @@ describe('every db.ts connection announces the writer capability', () => {
     const probes = h.query.mock.calls.filter(
       (call) => String(call[0]) === MATERIAL_SOURCE_CAPABILITY_PROBE_SQL,
     );
-    expect(probes).toHaveLength(2);
+    // Both connections are checked before upgrade DML and final installation.
+    expect(probes).toHaveLength(4);
   });
 });

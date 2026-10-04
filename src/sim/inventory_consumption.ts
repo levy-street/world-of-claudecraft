@@ -1,7 +1,7 @@
-// Inventory counts and consumption behind SimContext. Materials use exact source
+// Inventory counts and consumption behind SimContext. Source-aware items use exact source
 // plans; other items retain newest-first removal and their existing payload rules.
 // Quest hooks fire once after each resolved removal, including a no-op request.
-import { isMaterialItemId } from './material_ids';
+
 import {
   countMaterialInventoryForHub,
   takeMaterialInventoryForHub,
@@ -12,12 +12,13 @@ import {
 } from './material_inventory_units';
 import { isEnchantedInstance } from './professions/enchanting';
 import type { SimContext } from './sim_context';
+import { isStackProvenanceItemId } from './stack_provenance_ids';
 import { cloneItemInstancePayload, type InventoryUnit, type ItemInstancePayload } from './types';
 
 export function countFungibleItem(ctx: SimContext, itemId: string, pid?: number): number {
   const r = ctx.resolve(pid);
   if (!r) return 0;
-  if (isMaterialItemId(itemId)) {
+  if (isStackProvenanceItemId(itemId)) {
     return countMaterialInventoryForHub(
       r.meta.inventory,
       itemId,
@@ -39,7 +40,7 @@ export function removeItem(
   const r = ctx.resolve(pid);
   if (!r) return consumedInstances;
   const { meta } = r;
-  if (isMaterialItemId(itemId) && count > 0) {
+  if (isStackProvenanceItemId(itemId) && count > 0) {
     const plan = takeMaterialInventoryForHub(meta.inventory, itemId, count);
     const consumed = consumedMaterialInstancePayloads(plan);
     ctx.onInventoryChangedForQuests(meta);
@@ -72,7 +73,7 @@ export function removeFungibleItem(
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta } = r;
-  if (isMaterialItemId(itemId) && count > 0) {
+  if (isStackProvenanceItemId(itemId) && count > 0) {
     takeMaterialInventoryForHub(meta.inventory, itemId, count, (payload) => payload === undefined);
     ctx.onInventoryChangedForQuests(meta);
     return;
@@ -91,7 +92,7 @@ export function removeFungibleItem(
 export function countEnchantableItem(ctx: SimContext, itemId: string, pid?: number): number {
   const r = ctx.resolve(pid);
   if (!r) return 0;
-  if (isMaterialItemId(itemId)) {
+  if (isStackProvenanceItemId(itemId)) {
     return countMaterialInventoryForHub(
       r.meta.inventory,
       itemId,
@@ -117,7 +118,7 @@ export function removeEnchantableItem(
   const r = ctx.resolve(pid);
   if (!r) return consumed;
   const { meta } = r;
-  if (isMaterialItemId(itemId) && count > 0) {
+  if (isStackProvenanceItemId(itemId) && count > 0) {
     const plan = takeMaterialInventoryForHub(
       meta.inventory,
       itemId,

@@ -24,13 +24,12 @@
 // - Nothing is capped or truncated, no source is invented or substituted, and
 //   a refusal writes nothing.
 //
-// A non-material id answers empty from every entry point, so a caller keeps its
-// legacy walk byte for byte by branching on the answer or on the registry.
+// The registry also includes stackable consumables. Other ids answer empty,
+// so callers retain their legacy walks outside the source-accounting registry.
 //
 // Pure leaf: no SimContext, no rng, no clock. A Vitest drives it with a plain
 // `InvSlot[]`.
 
-import { isMaterialItemId, materialItemIds } from './material_ids';
 import {
   applyMaterialInventoryTake,
   type MaterialTakePlan,
@@ -47,6 +46,7 @@ import {
   mergeMaterialCompositions,
 } from './material_sources';
 import type { MaterialStackSlot } from './material_stack';
+import { isStackProvenanceItemId, stackProvenanceItemIds } from './stack_provenance_ids';
 import type { InventoryUnit, InvSlot, ItemInstancePayload } from './types';
 
 /** Dev-channel only, never player-visible: material data the shared model
@@ -110,7 +110,7 @@ function planSpend(request: SpendRequest): MaterialTakePlan | null {
     inventory: request.inventory,
     itemId: request.itemId,
     count: request.count,
-    materialIds: materialItemIds(),
+    materialIds: stackProvenanceItemIds(),
     slotIndex: request.slotIndex,
     eligibleSource: request.eligibleSource,
     allowPartial: request.allowPartial,
@@ -132,7 +132,7 @@ export function planMaterialUnitWithdrawal(
   itemId: string,
   slotIndex: number,
 ): MaterialUnitWithdrawal | null {
-  if (!isMaterialItemId(itemId)) return null;
+  if (!isStackProvenanceItemId(itemId)) return null;
   const plan = planSpend({ inventory, itemId, count: 1, slotIndex });
   if (plan === null) return null;
   const unit = materialInventoryUnits(plan)[0];
@@ -175,10 +175,10 @@ export function takeMaterialUnitFromSlot(
  * is indifferent: the planner breaks a tie between two stacks holding the SAME
  * descriptor by taking the highest index.
  *
- * Non-material ids answer null so their caller keeps the old walk untouched.
+ * Ids outside the source-accounting registry answer null for the legacy walk.
  */
 export function takeMaterialUnit(inventory: InvSlot[], itemId: string): InventoryUnit | null {
-  if (!isMaterialItemId(itemId)) return null;
+  if (!isStackProvenanceItemId(itemId)) return null;
   const plan = planSpend({ inventory, itemId, count: 1 });
   if (plan === null) return null;
   const unit = materialInventoryUnits(plan)[0];
@@ -206,7 +206,7 @@ function validatePool(inventory: readonly InvSlot[], itemId: string): void {
     inventory,
     itemId,
     count: 1,
-    materialIds: materialItemIds(),
+    materialIds: stackProvenanceItemIds(),
     eligibleSource: () => false,
     allowPartial: true,
   });
@@ -222,7 +222,7 @@ function walk(
   filters: MaterialUnitFilters,
   collect: (plan: MaterialTakePlan) => void,
 ): number {
-  if (!isMaterialItemId(itemId)) return 0;
+  if (!isStackProvenanceItemId(itemId)) return 0;
   if (count > 0) validatePool(inventory, itemId);
   let left = count;
   for (const takeLast of passesFor(filters)) {

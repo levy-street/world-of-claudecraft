@@ -14,6 +14,7 @@ import {
   assertMaterialSourceWriterCapability,
   MATERIAL_SOURCE_CAPABILITY_PROBE_SQL,
   MATERIAL_SOURCE_CAPABILITY_REFUSAL,
+  prepareMaterialSourceWriterUpgrade,
 } from '../../server/material_source_host';
 import {
   MATERIAL_SOURCE_CONTAINERS_TABLE,
@@ -21,6 +22,7 @@ import {
 } from '../../server/material_source_journal_db';
 import {
   MATERIAL_SOURCE_WRITER_CAPABILITY,
+  MATERIAL_SOURCE_WRITER_FUNCTION_SQL,
   MATERIAL_SOURCE_WRITER_GUARD_FUNCTION,
   MATERIAL_SOURCE_WRITER_VERSION,
 } from '../../server/material_source_writer';
@@ -34,6 +36,30 @@ function connection(capability: string | null = MATERIAL_SOURCE_WRITER_VERSION) 
   );
   return { query };
 }
+
+describe('writer upgrade before schema backfills', () => {
+  it('checks both connections before replacing only the function', async () => {
+    const boot = connection();
+    const pool = connection();
+    await prepareMaterialSourceWriterUpgrade(boot, pool);
+    expect(boot.query.mock.calls.map(([sql]) => sql)).toEqual([
+      MATERIAL_SOURCE_CAPABILITY_PROBE_SQL,
+      MATERIAL_SOURCE_WRITER_FUNCTION_SQL,
+    ]);
+    expect(pool.query).toHaveBeenCalledWith(MATERIAL_SOURCE_CAPABILITY_PROBE_SQL);
+    expect(MATERIAL_SOURCE_WRITER_FUNCTION_SQL).not.toContain('CREATE OR REPLACE TRIGGER');
+  });
+
+  it('does not replace the old guard when a connection still announces v1', async () => {
+    const boot = connection();
+    await expect(prepareMaterialSourceWriterUpgrade(boot, connection('1'))).rejects.toThrow(
+      'version 1',
+    );
+    expect(boot.query.mock.calls.map(([sql]) => sql)).toEqual([
+      MATERIAL_SOURCE_CAPABILITY_PROBE_SQL,
+    ]);
+  });
+});
 
 describe('applyMaterialSourceSchema', () => {
   it('applies the additive anchor + journal DDL on the boot client it is handed', async () => {
@@ -86,10 +112,10 @@ describe('assertMaterialSourceWriterCapability', () => {
   it('REFUSES a connection announcing a DIFFERENT writer version', async () => {
     // An older binary's pool, or a rolled-back deploy: announcing something is
     // not announcing THIS composition format.
-    const stale = connection('0');
+    const stale = connection('1');
     await expect(
       assertMaterialSourceWriterCapability([{ label: 'pool', client: stale }]),
-    ).rejects.toThrow(`pool reports version 0, expected ${MATERIAL_SOURCE_WRITER_VERSION}`);
+    ).rejects.toThrow(`pool reports version 1, expected ${MATERIAL_SOURCE_WRITER_VERSION}`);
   });
 
   it('REFUSES a result that answers no capability column at all', async () => {

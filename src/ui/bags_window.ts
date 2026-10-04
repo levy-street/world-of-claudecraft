@@ -100,6 +100,10 @@ import {
 } from './item_instance_glyph_mark';
 import { knownItemDef } from './known_item';
 import {
+  marketConsumableSellChoice,
+  marketConsumableSellSources,
+} from './market_consumable_sources_view';
+import {
   bagMaterialDepositSelection,
   type MaterialStorageDestination,
 } from './material_source_storage_actions';
@@ -1090,7 +1094,7 @@ export class BagsWindow {
       // masterwork > quest seal > fine seal > enchanted / signed / bound >
       // generic wedge. The fine rim/wash is independent of which seal wins the
       // corner (a masterwork fine stack keeps its rim).
-      const glyphKind = bagInstanceGlyphKind(s.instance);
+      const glyphKind = bagInstanceGlyphKind(s.instance, s.materialSources);
       const cornerMark = bagCornerMark(glyphKind, questMark, fineMark);
       const locked = isItemLocked(s.instance);
       row.style.setProperty('--bag-slot-quality', qColor);
@@ -1500,7 +1504,7 @@ export class BagsWindow {
     // tooltip is mouse-only, and the two channels must agree (the glyph
     // aria-key rule above). The def-free glyph kind rides the same aria keys
     // the known cell uses, with the unknown label as the item token.
-    const glyphKind = bagInstanceGlyphKind(s.instance);
+    const glyphKind = bagInstanceGlyphKind(s.instance, s.materialSources);
     row.setAttribute(
       'aria-label',
       glyphKind
@@ -1810,9 +1814,31 @@ export class BagsWindow {
       case 'marketSellBlockedBound':
         this.deps.showError(t('hud.errors.marketListBound'));
         return;
-      case 'marketSell':
+      case 'marketSell': {
+        const sourced = marketConsumableSellSources(s);
+        const sources = sourced?.materialSources;
+        if (sourced && sources) {
+          const stage = (selected: typeof sources) => {
+            if (!this.deps.isMarketSell()) return;
+            const choice = marketConsumableSellChoice(sourced, selected);
+            if (choice) this.deps.stageMarketSell(s.itemId, choice.instance);
+          };
+          if (sources.length === 1) stage([{ source: sources[0].source, count: 1 }]);
+          else
+            this.deps.openMaterialSources?.({
+              itemName: itemDisplayName(item),
+              sources,
+              limit: 1,
+              stepSize: 1,
+              opener: ev.currentTarget instanceof HTMLElement ? ev.currentTarget : this.deps.root(),
+              associatedOwners: [this.deps.root()],
+              onConfirm: (selected) => stage(selected.sources),
+            });
+          break;
+        }
         this.deps.stageMarketSell(s.itemId, s.instance);
         break;
+      }
       case 'vendorSellBlocked':
         this.deps.showError(t('itemUi.tooltip.cannotVendor'));
         return;

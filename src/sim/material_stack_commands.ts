@@ -3,12 +3,13 @@
 import { freePoolSlots } from './bag_pools';
 import { bagPools, stackSizeOf } from './bags';
 import { ITEMS } from './data';
-import { isMaterialItemId, materialItemIds } from './material_ids';
+import { isMaterialItemId } from './material_ids';
 import type { MaterialComposition } from './material_sources';
 import { planMaterialStackCombination } from './material_stack_combination';
 import type { MaterialStackSelection } from './material_stack_selection';
 import { planMaterialStackSeparation } from './material_stack_separation';
 import type { SimContext } from './sim_context';
+import { stackProvenanceItemIds } from './stack_provenance_ids';
 
 export function changeMaterialStackGrouping(
   ctx: SimContext,
@@ -25,7 +26,7 @@ export function changeMaterialStackGrouping(
     inventory,
     itemId,
     selection: target,
-    materialIds: materialItemIds(),
+    materialIds: stackProvenanceItemIds(),
     stackSize: stackSizeOf(ITEMS[itemId]),
   };
   const result =

@@ -94,9 +94,9 @@ describe('stack sizes and stacking math', () => {
     const inv: InvSlot[] = [{ itemId: 'baked_bread', count: 18 }];
     addStacked(inv, 'baked_bread', 25);
     expect(inv).toEqual([
-      { itemId: 'baked_bread', count: 20 },
-      { itemId: 'baked_bread', count: 20 },
-      { itemId: 'baked_bread', count: 3 },
+      { itemId: 'baked_bread', count: 20, materialSources: [{ source: {}, count: 20 }] },
+      { itemId: 'baked_bread', count: 20, materialSources: [{ source: {}, count: 20 }] },
+      { itemId: 'baked_bread', count: 3, materialSources: [{ source: {}, count: 3 }] },
     ]);
   });
 
@@ -115,33 +115,33 @@ describe('stack sizes and stacking math', () => {
   });
 
   it('never merges into an instanced slot and offers it no top-up room (#1165)', () => {
-    const inv: InvSlot[] = [{ itemId: 'baked_bread', count: 5, instance: { signer: 'Ana' } }];
+    const inv: InvSlot[] = [{ itemId: 'tangled_weed', count: 5, instance: { signer: 'Ana' } }];
     // capacity 1: the instanced slot occupies the only slot and cannot absorb more
-    expect(countFit(inv, { general: 1, materials: 0 }, 'baked_bread', 1)).toBe(0);
-    addStacked(inv, 'baked_bread', 3);
+    expect(countFit(inv, { general: 1, materials: 0 }, 'tangled_weed', 1)).toBe(0);
+    addStacked(inv, 'tangled_weed', 3);
     expect(inv).toEqual([
-      { itemId: 'baked_bread', count: 5, instance: { signer: 'Ana' } },
-      { itemId: 'baked_bread', count: 3 },
+      { itemId: 'tangled_weed', count: 5, instance: { signer: 'Ana' } },
+      { itemId: 'tangled_weed', count: 3 },
     ]);
   });
 
   it('an instanced add merges into a byte-equal slot and never into a plain one', () => {
     const inv: InvSlot[] = [
-      { itemId: 'baked_bread', count: 5, instance: { signer: 'Ana' } },
-      { itemId: 'baked_bread', count: 5 },
+      { itemId: 'tangled_weed', count: 5, instance: { signer: 'Ana' } },
+      { itemId: 'tangled_weed', count: 5 },
     ];
     // Both slots occupied (capacity 2): the byte-equal signed stack is the only
     // top-up room the signed add sees; the plain stack offers it none.
-    expect(countFit(inv, { general: 2, materials: 0 }, 'baked_bread', 99, { signer: 'Ana' })).toBe(
+    expect(countFit(inv, { general: 2, materials: 0 }, 'tangled_weed', 99, { signer: 'Ana' })).toBe(
       15,
     );
-    addStacked(inv, 'baked_bread', 3, { signer: 'Ana' });
+    addStacked(inv, 'tangled_weed', 3, { signer: 'Ana' });
     expect(inv).toEqual([
-      { itemId: 'baked_bread', count: 8, instance: { signer: 'Ana' } },
-      { itemId: 'baked_bread', count: 5 },
+      { itemId: 'tangled_weed', count: 8, instance: { signer: 'Ana' } },
+      { itemId: 'tangled_weed', count: 5 },
     ]);
     // A differently-signed add gets no top-up room from either slot.
-    expect(countFit(inv, { general: 2, materials: 0 }, 'baked_bread', 1, { signer: 'Bru' })).toBe(
+    expect(countFit(inv, { general: 2, materials: 0 }, 'tangled_weed', 1, { signer: 'Bru' })).toBe(
       0,
     );
   });
@@ -166,27 +166,27 @@ describe('stack sizes and stacking math', () => {
     // the other two push a fresh slot past capacity (#2139, the class this
     // guard exists to close).
     const signer = { signer: 'Ana' };
-    const inv: InvSlot[] = [{ itemId: 'baked_bread', count: 19, instance: { signer: 'Ana' } }];
+    const inv: InvSlot[] = [{ itemId: 'tangled_weed', count: 19, instance: { signer: 'Ana' } }];
     // Capacity 1: zero free slots, exactly one unit of merge room.
-    expect(canGrantItemInstance(inv, { general: 1, materials: 0 }, 'baked_bread', signer)).toBe(
+    expect(canGrantItemInstance(inv, { general: 1, materials: 0 }, 'tangled_weed', signer)).toBe(
       true,
     );
-    expect(canGrantItemInstance(inv, { general: 1, materials: 0 }, 'baked_bread', signer, 1)).toBe(
+    expect(canGrantItemInstance(inv, { general: 1, materials: 0 }, 'tangled_weed', signer, 1)).toBe(
       true,
     );
-    expect(canGrantItemInstance(inv, { general: 1, materials: 0 }, 'baked_bread', signer, 2)).toBe(
+    expect(canGrantItemInstance(inv, { general: 1, materials: 0 }, 'tangled_weed', signer, 2)).toBe(
       false,
     );
-    expect(canGrantItemInstance(inv, { general: 1, materials: 0 }, 'baked_bread', signer, 3)).toBe(
+    expect(canGrantItemInstance(inv, { general: 1, materials: 0 }, 'tangled_weed', signer, 3)).toBe(
       false,
     );
     // One free slot absorbs a whole fresh stack, so the same counts now pass.
-    expect(canGrantItemInstance(inv, { general: 2, materials: 0 }, 'baked_bread', signer, 3)).toBe(
+    expect(canGrantItemInstance(inv, { general: 2, materials: 0 }, 'tangled_weed', signer, 3)).toBe(
       true,
     );
     // A differently-signed grant sees neither the merge room nor a shortcut.
     expect(
-      canGrantItemInstance(inv, { general: 1, materials: 0 }, 'baked_bread', { signer: 'Bru' }, 1),
+      canGrantItemInstance(inv, { general: 1, materials: 0 }, 'tangled_weed', { signer: 'Bru' }, 1),
     ).toBe(false);
   });
 
@@ -219,18 +219,18 @@ describe('stack sizes and stacking math', () => {
     // (never topping up an existing, differently-provenanced locked stack)
     // is unaffected: canStackInstancePayloads still refuses the merge.
     const lockedTwin: InvSlot[] = [
-      { itemId: 'baked_bread', count: 5, instance: { signer: 'Bru', locked: true } },
+      { itemId: 'tangled_weed', count: 5, instance: { signer: 'Bru', locked: true } },
     ];
     const locked = { signer: 'Ana', locked: true };
     // The existing Bru-locked stack already occupies one general slot, so
     // `general: N` leaves (N - 1) FREE slots for the incoming stack.
     // No top-up into the existing (differently-signed) locked stack, however
     // much room it has left; one fresh slot holds a full cap's worth.
-    expect(countFit(lockedTwin, { general: 1, materials: 0 }, 'baked_bread', 25, locked)).toBe(0);
-    expect(countFit(lockedTwin, { general: 2, materials: 0 }, 'baked_bread', 25, locked)).toBe(20);
-    expect(countFit(lockedTwin, { general: 3, materials: 0 }, 'baked_bread', 25, locked)).toBe(25);
+    expect(countFit(lockedTwin, { general: 1, materials: 0 }, 'tangled_weed', 25, locked)).toBe(0);
+    expect(countFit(lockedTwin, { general: 2, materials: 0 }, 'tangled_weed', 25, locked)).toBe(20);
+    expect(countFit(lockedTwin, { general: 3, materials: 0 }, 'tangled_weed', 25, locked)).toBe(25);
 
-    addStacked(lockedTwin, 'baked_bread', 25, locked);
+    addStacked(lockedTwin, 'tangled_weed', 25, locked);
     const fresh = lockedTwin.filter((s) => s.instance?.signer === 'Ana');
     expect(fresh.map((s) => s.count)).toEqual([20, 5]);
     for (const s of fresh) expect(s.instance).toEqual(locked);
@@ -259,8 +259,10 @@ describe('stack sizes and stacking math', () => {
     // object between them (or with the caller) would alias rolled.stats.
     addStacked(inv, 'baked_bread', 25, payload);
     expect(inv).toHaveLength(2);
-    expect(inv[0].instance).toEqual(payload);
-    expect(inv[1].instance).toEqual(payload);
+    expect(inv[0].instance).toEqual({ rolled: payload.rolled });
+    expect(inv[1].instance).toEqual({ rolled: payload.rolled });
+    expect(inv[0].materialSources).toEqual([{ source: { signer: 'Ana' }, count: 20 }]);
+    expect(inv[1].materialSources).toEqual([{ source: { signer: 'Ana' }, count: 5 }]);
     expect(inv[0].instance).not.toBe(inv[1].instance);
     payload.rolled.stats.str = 99;
     expect(inv[0].instance?.rolled?.stats?.str).toBe(1);
@@ -575,7 +577,9 @@ describe('bags are declared payload-free (#2837)', () => {
     expect(result.ok).toBe(true);
     const slot = sim.inventory.find((s) => s.itemId === 'ironhusk_flask');
     const name = (sim.players.get(pid) as { name?: string } | undefined)?.name;
-    expect(slot?.instance?.signer, 'the epic non-bag output is signed').toBe(name);
+    expect(slot?.materialSources, 'the epic non-bag output is signed').toEqual([
+      { source: { signer: name }, count: slot?.count },
+    ]);
   });
 
   it('bags are never a commission-eligible kind', () => {

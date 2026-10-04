@@ -41,6 +41,7 @@ import {
 import type { MaterialComposition } from './material_sources';
 import { sanitizeRiftGearInstance } from './rift/progression';
 import type { SimContext } from './sim_context';
+import { isStackProvenanceItemId } from './stack_provenance_ids';
 import { cloneInvSlot, dist2d, type Entity, INTERACT_RANGE, type InvSlot } from './types';
 
 /** Slots every character's bank starts with, before any expansion. */
@@ -332,7 +333,7 @@ export function moveBetweenContainers(
     return { moved: 0, refusal: 'invalid' };
   }
   const slot = source[sourceIndex];
-  if (isMaterialItemId(slot.itemId)) {
+  if (isStackProvenanceItemId(slot.itemId)) {
     return moveMaterialBetweenContainers(
       source,
       sourceIndex,

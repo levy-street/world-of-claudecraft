@@ -146,7 +146,9 @@ describe('the return flight', () => {
     expect(raw.recipientName).toBe('Alice');
     expect(raw.senderName).toBe('Bob');
     // Attachments ride home intact and the letter flies fresh.
-    expect(raw.items).toEqual([{ itemId: 'roasted_boar', count: 2 }]);
+    expect(raw.items).toEqual([
+      { itemId: 'roasted_boar', count: 2, materialSources: [{ source: {}, count: 2 }] },
+    ]);
     expect(raw.copper).toBe(500);
     expect(raw.read).toBe(false);
     expect(raw.announced).toBe(false);
@@ -172,7 +174,9 @@ describe('the return flight', () => {
     expect(back?.senderName).toBe('Bob');
     expect(back?.kind).toBe('player');
     expect(back?.copper).toBe(500);
-    expect(back?.items).toEqual([{ itemId: 'roasted_boar', count: 2 }]);
+    expect(back?.items).toEqual([
+      { itemId: 'roasted_boar', count: 2, materialSources: [{ source: {}, count: 2 }] },
+    ]);
     expect(back?.read).toBe(false);
   });
 
@@ -211,7 +215,9 @@ describe('the return flight', () => {
     const back = info?.messages.find((m) => m.subject === 'Parcel');
     expect(back).toBeDefined();
     expect(back?.copper).toBe(500);
-    expect(back?.items).toEqual([{ itemId: 'roasted_boar', count: 2 }]);
+    expect(back?.items).toEqual([
+      { itemId: 'roasted_boar', count: 2, materialSources: [{ source: {}, count: 2 }] },
+    ]);
 
     const coinBefore = aliceMeta.copper;
     if (back) sim.mailTake(back.id, alice);
@@ -240,7 +246,9 @@ describe('the return flight', () => {
     tickFor(sim, 2);
     expect(bookOf(sim).some((m) => m.id === id)).toBe(true);
     expect(raw.returned).toBe(true);
-    expect(raw.items).toEqual([{ itemId: 'roasted_boar', count: 2 }]);
+    expect(raw.items).toEqual([
+      { itemId: 'roasted_boar', count: 2, materialSources: [{ source: {}, count: 2 }] },
+    ]);
     expect(raw.copper).toBe(500);
     // It bounced back the other way: recipient and sender swapped again, still
     // keyed by the stable id on both legs.
@@ -266,7 +274,9 @@ describe('the return flight', () => {
     expect(bookOf(sim).some((m) => m.id === id)).toBe(true);
     expect(raw.returned).toBe(true);
     expect(raw.recipientKey).toBe(sim.postOffice.mailKeyFor(aliceMeta));
-    expect(raw.items).toEqual([{ itemId: 'roasted_boar', count: 2 }]);
+    expect(raw.items).toEqual([
+      { itemId: 'roasted_boar', count: 2, materialSources: [{ source: {}, count: 2 }] },
+    ]);
     expect(raw.copper).toBe(500);
     expect(sim.mailUnreadFor(alice)).toBe(unread);
   });
@@ -737,7 +747,9 @@ describe('persistence', () => {
     sim3.loadMail(legacy);
     const raw3 = bookOf(sim3).find((m) => m.subject === 'Parcel');
     expect(raw3.returned).toBe(true);
-    expect(raw3.items).toEqual([{ itemId: 'roasted_boar', count: 2 }]);
+    expect(raw3.items).toEqual([
+      { itemId: 'roasted_boar', count: 2, materialSources: [{ source: {}, count: 2 }] },
+    ]);
     expect(raw3.expiresAt).toBe(Infinity);
   });
 
@@ -849,7 +861,9 @@ describe('a full sender mailbox', () => {
     // 100 stored at the cap, plus the returned letter the cap cannot refuse.
     expect(info?.totalCount).toBe(101);
     const back = info?.messages.find((m) => m.subject === 'Parcel');
-    expect(back?.items).toEqual([{ itemId: 'roasted_boar', count: 2 }]);
+    expect(back?.items).toEqual([
+      { itemId: 'roasted_boar', count: 2, materialSources: [{ source: {}, count: 2 }] },
+    ]);
     expect(back?.copper).toBe(500);
   });
 });
@@ -878,7 +892,9 @@ describe('a full-bags player parcel keeps its real deadline', () => {
     const events = sim.drainEvents();
     expect(events.some((e) => e.type === 'error' && e.text === 'Your bags are full.')).toBe(true);
     // The coin collected but the stack stayed attached, kept on the letter.
-    expect(raw.items).toEqual([{ itemId: 'roasted_boar', count: 2 }]);
+    expect(raw.items).toEqual([
+      { itemId: 'roasted_boar', count: 2, materialSources: [{ source: {}, count: 2 }] },
+    ]);
 
     // NOT Infinity: a player parcel's clock is never paused by the bags-full
     // branch, unlike system/npc mail.
@@ -889,7 +905,9 @@ describe('a full-bags player parcel keeps its real deadline', () => {
     raw.expiresAt = sim.time;
     tickFor(sim, 2);
     expect(raw.returned).toBe(true);
-    expect(raw.items).toEqual([{ itemId: 'roasted_boar', count: 2 }]);
+    expect(raw.items).toEqual([
+      { itemId: 'roasted_boar', count: 2, materialSources: [{ source: {}, count: 2 }] },
+    ]);
     expect(raw.copper).toBe(0); // already collected before the bags-full branch
   });
 });

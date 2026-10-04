@@ -85,8 +85,8 @@ import {
 import { canStackInstancePayloads, itemInstancePayloadsEqual } from './item_instance_merge';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
 import { isItemLocked } from './item_lock';
+import { type ItemUseConsumption, planItemUseConsumption } from './item_use_consumption';
 import { withoutPartyTradeMarker } from './loot/bop_trade_window';
-import { isMaterialItemId } from './material_ids';
 import {
   buybackCompositionAfter,
   commitMaterialUnitWithdrawal,
@@ -106,6 +106,7 @@ import { refreshModsForEquipmentChange } from './progression/talents';
 import { useForgebreakerEmber } from './quests/forgebreaker_ember';
 import type { ItemUseResult, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
+import { isStackProvenanceItemId } from './stack_provenance_ids';
 import { usePassingStone } from './tutorial/death_lesson';
 import {
   ALL_EQUIP_SLOTS,
@@ -279,7 +280,7 @@ export function removePreferFungible(
   // beside it. Absent, the walk is byte-identical to before.
   deprioritize?: (instance: ItemInstancePayload) => boolean,
 ): ItemInstancePayload[] {
-  if (isMaterialItemId(itemId)) {
+  if (isStackProvenanceItemId(itemId)) {
     const held = ctx.resolve(pid);
     if (!held) return [];
     const payloads = consumeMaterialUnitPayloads(held.meta.inventory, itemId, count, {
@@ -382,7 +383,7 @@ export function removeSellUnitsFromInventory(
   // predicates (read on each unit's effective payload), but the source rides
   // along on every unit, so a sale, a trade preview and the real swap move the
   // units they said they would. `skipPlainStacks` reads as payload-only here.
-  if (isMaterialItemId(itemId)) {
+  if (isStackProvenanceItemId(itemId)) {
     return takeMaterialUnits(inventory, itemId, count, {
       skip,
       deprioritize,
@@ -860,7 +861,13 @@ export function useItem(
   // Consumables of one id are interchangeable in effect, so this matters less
   // than it does for gear; it is threaded anyway so the family has no id-only
   // holes left for a new command to copy.
+  let sourceUse: ItemUseConsumption | null | undefined;
   const consumeOneUnit = (): ItemInstancePayload | undefined => {
+    if (sourceUse) {
+      const payload = sourceUse.consume();
+      ctx.onInventoryChangedForQuests?.(meta);
+      return payload;
+    }
     if (slotIndex === undefined) {
       const [unit] = ctx.removeItem(itemId, 1, meta.entityId);
       return unit;
@@ -890,6 +897,13 @@ export function useItem(
   ) {
     ctx.error(meta.entityId, "You don't have that item.");
     return;
+  }
+  if (isStackProvenanceItemId(itemId)) {
+    sourceUse = planItemUseConsumption(meta.inventory, itemId, slotIndex);
+    if (!sourceUse) {
+      ctx.error(meta.entityId, "You don't have that item.");
+      return;
+    }
   }
   if (def.use?.type === 'fishing') {
     ctx.startFishing(p, meta);
@@ -1911,7 +1925,7 @@ export function buyBackItem(
   // row that cannot give a unit reads as unavailable rather than half-spent.
   const rowIndex = meta.vendorBuyback.indexOf(slot);
   const withdrawal = planMaterialUnitWithdrawal(meta.vendorBuyback, itemId, rowIndex);
-  if (isMaterialItemId(itemId) && withdrawal === null) {
+  if (isStackProvenanceItemId(itemId) && withdrawal === null) {
     ctx.error(meta.entityId, 'That item is not available for buyback.');
     return;
   }

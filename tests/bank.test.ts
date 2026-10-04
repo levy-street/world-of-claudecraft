@@ -30,6 +30,7 @@ import { STORAGE_SKUS } from '../src/sim/content/storage_charters';
 import { BUILTIN_WORLD, ITEMS, QUESTS } from '../src/sim/data';
 import { isMaterialItemId } from '../src/sim/material_ids';
 import { Sim } from '../src/sim/sim';
+import { isStackProvenanceItemId } from '../src/sim/stack_provenance_ids';
 import type {
   Entity,
   InvSlot,
@@ -59,11 +60,8 @@ const BANKERS = ['bursar_fernando', 'bursar_petra_vell', 'bursar_aldous_crane'] 
 // lets one stand in for the other in a capacity fixture without re-deriving a
 // single number (the premise is pinned below, not assumed).
 const MATERIAL = 'wolf_fang'; // kind 'junk' AND a recipe reagent
-const NON_MATERIAL = 'baked_bread'; // kind 'food', so structurally never a material
-// The Sim-driven arms need a non-material the character does NOT already carry:
-// baked_bread is every class's starting ration (5 loaves), which would collide
-// with each fixture's own counts. Spitted Boar Haunch is the same kind and cap.
-const NON_MATERIAL_SIM = 'roasted_boar';
+const NON_MATERIAL = 'stag_antler'; // Non-reagent vendor junk, outside source accounting.
+const NON_MATERIAL_SIM = 'amber_hide'; // Same cap and absent from starter inventory.
 
 // Exact per-unit provenance, written as LITERALS a test owns. Never derived by
 // calling the production normalizer: an expectation computed from the code under
@@ -186,13 +184,15 @@ describe('fixture premises (the material split this suite is built on)', () => {
     // The cap that lets the two stand in for each other, pinned as a literal on
     // both sides (20 is the default for every kind outside the unstacked family).
     expect(stackSizeOf(ITEMS[MATERIAL])).toBe(20);
+    expect(isStackProvenanceItemId(NON_MATERIAL)).toBe(false);
+    expect(isStackProvenanceItemId(NON_MATERIAL_SIM)).toBe(false);
     expect(stackSizeOf(ITEMS[NON_MATERIAL])).toBe(20);
     expect(stackSizeOf(ITEMS[NON_MATERIAL_SIM])).toBe(20);
-    // WHY each non-material can never drift into the material set: the
-    // derivation keeps only kind 'junk' ids, whatever table names them.
+    // Junk membership alone does not make a material: the reagent registry
+    // must actually include it. Vendor trash remains outside source accounting.
     expect(ITEMS[MATERIAL].kind).toBe('junk');
-    expect(ITEMS[NON_MATERIAL].kind).toBe('food');
-    expect(ITEMS[NON_MATERIAL_SIM].kind).toBe('food');
+    expect(ITEMS[NON_MATERIAL].kind).toBe('junk');
+    expect(ITEMS[NON_MATERIAL_SIM].kind).toBe('junk');
     // The filler gear every capacity fixture packs containers with is outside
     // the material set too, so a gear-filled container never accidentally
     // exercises the source-aware packing path.
@@ -1500,6 +1500,7 @@ describe('persistence and back-compat', () => {
     // shape. The one-time conversion of a LEGACY sourceless row is a different
     // question, asked by its own case below rather than by weakening this
     // comparison (nothing is stripped from either side here).
+    m.inventory = [{ itemId: 'baked_bread', count: 5, materialSources: unrecorded(5) }];
     m.bank.inventory = [
       { itemId: 'wolf_fang', count: 12, materialSources: unrecorded(12) },
       { itemId: 'linen_scrap', count: 4, materialSources: unrecorded(4) },
@@ -1545,6 +1546,7 @@ describe('persistence and back-compat', () => {
     // deep-equal test that only ever looked at already-canonical stock.
     const sim = makeSim();
     const m = meta(sim);
+    m.inventory = [{ itemId: 'baked_bread', count: 5, materialSources: unrecorded(5) }];
     m.bank.inventory = [
       { itemId: 'wolf_fang', count: 12 },
       { itemId: 'worn_sword', count: 1, instance: { signer: 'Cyd' } },

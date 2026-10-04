@@ -39,13 +39,12 @@ import {
   sanitizeEscrowSlot,
 } from '../item_instance_transfer';
 import { removeSellUnitsFromInventory, removeVendorSellUnits } from '../items';
-import { isMaterialItemId } from '../material_ids';
 import { rekeyMaterialSignature } from '../material_signatures';
 import { validateMaterialSlotSourcesOnLoad } from '../material_slot_load';
-
 import { WYRMFALL_CORE_ITEM_ID } from '../professions/masterwrought_materials';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
+import { isStackProvenanceItemId } from '../stack_provenance_ids';
 import {
   cloneInvSlot,
   dist2d,
@@ -614,10 +613,10 @@ export class PostOffice {
           this.result(meta.entityId, 'noMailBound');
           return;
         }
-        if (!isMaterialItemId(s.itemId)) {
+        if (!isStackProvenanceItemId(s.itemId)) {
           instancedWanted.push({ itemId: s.itemId, instance: s.instance, count });
         }
-      } else if (!isMaterialItemId(s.itemId)) {
+      } else if (!isStackProvenanceItemId(s.itemId)) {
         wanted.set(s.itemId, (wanted.get(s.itemId) ?? 0) + count);
       }
     }

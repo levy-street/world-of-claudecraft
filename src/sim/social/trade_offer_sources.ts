@@ -29,7 +29,6 @@
 // `pinnedTradeUnits` about what a source-blind remover degrades to.
 
 import { itemInstancePayloadsEqual } from '../item_instance_merge';
-import { materialItemIds } from '../material_ids';
 import { applyMaterialInventoryTake, planMaterialInventoryTake } from '../material_inventory_take';
 import { materialInventoryUnits, materialSourceUnitPayload } from '../material_inventory_units';
 import {
@@ -40,6 +39,7 @@ import {
   totalMaterialCount,
 } from '../material_sources';
 import { type MaterialStackSlot, normalizeMaterialStack } from '../material_stack';
+import { stackProvenanceItemIds } from '../stack_provenance_ids';
 import type { InventoryUnit, InvSlot, ItemInstancePayload } from '../types';
 
 /** The per-copy skip predicate every trade site already speaks. */
@@ -201,7 +201,7 @@ export function pinnedTradeUnits(request: PinnedTakeRequest): InventoryUnit[] | 
     inventory,
     itemId,
     count,
-    materialIds: materialItemIds(),
+    materialIds: stackProvenanceItemIds(),
     selectedSources: sources,
     eligibleSource: (source, slot) => identityMatches(slot) && eligible(source, slot),
   });
@@ -266,7 +266,7 @@ export function carriersReadable(itemId: string, units: readonly InventoryUnit[]
   // preflighted only the payload-free subset and let a corrupt or ambiguous
   // composition on an instanced unit through to the grant, which is the exact
   // class this preflight exists to catch.
-  const materialIds = materialItemIds();
+  const materialIds = stackProvenanceItemIds();
   if (materialIds.has(itemId)) {
     for (const unit of units) {
       if (!carrierGrantable(itemId, unit, materialIds)) return false;

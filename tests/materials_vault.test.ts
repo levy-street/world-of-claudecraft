@@ -13,7 +13,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
 import { generalOnlyPools } from '../src/sim/bag_pools';
-import { bagCapacity, bagPools, countFit } from '../src/sim/bags';
+import { addStacked, bagCapacity, bagPools, countFit } from '../src/sim/bags';
 import { BUILTIN_WORLD, ITEMS, QUESTS } from '../src/sim/data';
 import { MATERIAL_ITEM_IDS } from '../src/sim/material_taxonomy';
 import {
@@ -1088,6 +1088,20 @@ describe('persistence and back-compat', () => {
     const m = meta(sim);
     m.vault = { stock: { copper_ore: 37, iron_ore: 4 }, special: [], upgrades: 3 };
     m.copper = 4242;
+    // Start from the current grant representation. Legacy starter consumables
+    // acquire exact unrecorded-source counts on their first load.
+    const starter = m.inventory;
+    m.inventory = [];
+    for (const slot of starter) {
+      addStacked(
+        m.inventory,
+        slot.itemId,
+        slot.count,
+        slot.instance,
+        slot.craftedRecipeId,
+        slot.materialSources,
+      );
+    }
 
     const s1 = sim.serializeCharacter(sim.playerId)!;
     const sim2 = makeVaultWorld(1);
@@ -1104,6 +1118,21 @@ describe('persistence and back-compat', () => {
       special: [],
       upgrades: 3,
     });
+  });
+
+  it('normalizes legacy starter consumables without changing a populated vault', () => {
+    const sim = makeSim();
+    const state = sim.serializeCharacter(sim.playerId)!;
+    state.inventory = [{ itemId: 'baked_bread', count: 3 }];
+    state.vault = { stock: { copper_ore: 37, iron_ore: 4 }, upgrades: 3 };
+    const restored = makeVaultWorld(1);
+    const pid = restored.addPlayer('warrior', 'Saver', { state });
+    const loaded = restored.serializeCharacter(pid)!;
+    expect(loaded.inventory).toEqual([
+      { itemId: 'baked_bread', count: 3, materialSources: [{ source: {}, count: 3 }] },
+    ]);
+    expect(loaded.vault).toEqual(state.vault);
+    expect(state.inventory).toEqual([{ itemId: 'baked_bread', count: 3 }]);
   });
 
   it('writes the vault key unconditionally and as a boundary clone', () => {

@@ -26,6 +26,7 @@
 import { bankPurchasedSlotsFor } from '../src/sim/bank';
 import type { MaterialSourceTransferSelection } from '../src/sim/material_source_transfer_selection';
 import type { SimContext } from '../src/sim/sim_context';
+import type { InvSlot } from '../src/sim/types';
 import { weeklyRewardInfoFor } from '../src/sim/weekly_rewards';
 import type { BankInfo, GuildBankInfo } from '../src/world_api';
 import {
@@ -35,8 +36,9 @@ import {
   recordBankSocketOp,
 } from './bank_ledger';
 import type { BankLedgerAdmission, BankLedgerAdmissionHandle } from './bank_ledger_admission';
-import { bankVaultLedgerMaxRows } from './bank_vault_ledger_guard';
+import { BANK_VAULT_LEDGER_ROW_BURST, bankVaultLedgerMaxRows } from './bank_vault_ledger_guard';
 import { readMaterialSourceTransferWire } from './material_source_transfer_wire';
+import { personalBankLedgerRowBound } from './personal_bank_ledger_row_bound';
 import { storagePurchaseInFlight } from './storage_purchases';
 import { nextRungClaudiumPriceFor } from './storage_store_cache';
 
@@ -49,7 +51,9 @@ export interface BankSim {
   ctx: {
     // `bank` is the ladder counter emitBankSelfKeys reads through the shared
     // sim helper; `entityId` is what the purchase-lock refusal line addresses.
-    resolve(pid?: number): { meta: { entityId: number; bank: { purchasedSlots: number } } } | null;
+    resolve(pid?: number): {
+      meta: { entityId: number; bank: { purchasedSlots: number }; inventory?: readonly InvSlot[] };
+    } | null;
     error(id: number, text: string): void;
   };
   bankInfoFor(pid: number): BankInfo | null;
@@ -91,9 +95,15 @@ function reserveLedgerRows(
   sim: BankSim,
   pid: number,
   command: BankCommandName,
+  rowBound = bankVaultLedgerMaxRows(command),
 ): BankLedgerAdmissionHandle | null | undefined {
   if (admission === undefined) return undefined;
-  const reservation = admission?.tryReserve(bankVaultLedgerMaxRows(command), 0, 'personal') ?? null;
+  const maxRows = Math.max(bankVaultLedgerMaxRows(command), rowBound);
+  if (maxRows > BANK_VAULT_LEDGER_ROW_BURST) {
+    refuseLedgerAdmission(sim, pid);
+    return null;
+  }
+  const reservation = admission?.tryReserve(maxRows, 0, 'personal') ?? null;
   if (!reservation) refuseLedgerAdmission(sim, pid);
   return reservation;
 }
@@ -151,7 +161,8 @@ export function dispatchBankCommand(
         const transfer = readMaterialSourceTransferWire(msg, slot);
         if (transfer === null) break;
         const { count, selection } = transfer;
-        const reservation = reserveLedgerRows(admission, sim, pid, 'bank_deposit');
+        const rowBound = personalBankLedgerRowBound(sim.ctx.resolve(pid)?.meta.inventory?.[slot]);
+        const reservation = reserveLedgerRows(admission, sim, pid, 'bank_deposit', rowBound);
         if (reservation === null) break;
         const before = runReservedSimCall(
           reservation,
@@ -172,11 +183,13 @@ export function dispatchBankCommand(
         const transfer = readMaterialSourceTransferWire(msg, slot);
         if (transfer === null) break;
         const { count, selection } = transfer;
-        const reservation = reserveLedgerRows(admission, sim, pid, 'bank_withdraw');
+        const snapshot = sim.bankInfoFor(pid);
+        const rowBound = personalBankLedgerRowBound(snapshot?.slots[slot]);
+        const reservation = reserveLedgerRows(admission, sim, pid, 'bank_withdraw', rowBound);
         if (reservation === null) break;
         const before = runReservedSimCall(
           reservation,
-          () => sim.bankInfoFor(pid),
+          () => snapshot,
           () => sim.bankWithdraw(slot, count, selection, pid),
         );
         finishReservedSimCall(reservation, () => {

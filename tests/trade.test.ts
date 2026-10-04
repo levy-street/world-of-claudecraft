@@ -328,13 +328,13 @@ describe('trade module (direct, no Sim)', () => {
     // Keep this payload test on a non-material item. Material signers are
     // canonicalized into materialSources, which is covered by trade_material_sources.test.ts.
     const { ctx, players } = makeInstancedTradeCtx(
-      [{ itemId: 'baked_bread', count: 1, instance }],
+      [{ itemId: 'stag_antler', count: 1, instance }],
       [],
     );
 
     tradeMod.tradeRequest(ctx, 2, 1);
     tradeMod.tradeAccept(ctx, 2);
-    tradeMod.tradeSetOffer(ctx, [{ itemId: 'baked_bread', count: 1 }], 0, 1);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'stag_antler', count: 1 }], 0, 1);
     tradeMod.tradeConfirm(ctx, 1);
     tradeMod.tradeConfirm(ctx, 2);
 
@@ -432,15 +432,15 @@ describe('trade module (direct, no Sim)', () => {
     const foreign = { signer: 'Cedric' };
     const { ctx, players } = makeInstancedTradeCtx(
       [
-        { itemId: 'baked_bread', count: 1, instance: foreign },
-        { itemId: 'baked_bread', count: 1, instance: selfSigned },
+        { itemId: 'worn_sword', count: 1, instance: foreign },
+        { itemId: 'worn_sword', count: 1, instance: selfSigned },
       ],
       [],
     );
 
     tradeMod.tradeRequest(ctx, 2, 1);
     tradeMod.tradeAccept(ctx, 2);
-    tradeMod.tradeSetOffer(ctx, [{ itemId: 'baked_bread', count: 1 }], 0, 1);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'worn_sword', count: 1 }], 0, 1);
     tradeMod.tradeConfirm(ctx, 1);
     tradeMod.tradeConfirm(ctx, 2);
 
@@ -586,24 +586,24 @@ describe('trade module (direct, no Sim)', () => {
   it('rejects a trade that would push the receiver over bag capacity via an instanced grant', () => {
     // Reproduces the capacity-gate hole the fitsAfterSwap fix closes: the
     // receiver is already at full (16-slot) capacity, one of those slots is a
-    // partial plain baked_bread stack. addStacked/countFit would let a receive
+    // partial plain stag_antler stack. addStacked/countFit would let a receive
     // "stack" onto that partial slot, but the real transfer grants an
     // instanced copy via addItemInstance, which never merges and always takes
     // a fresh slot, so the receiver would end up over capacity.
     const instance = { signer: 'Borin' };
     const receiverInv = [
-      { itemId: 'baked_bread', count: 1 }, // partial plain stack (room to stack, but not a free slot)
+      { itemId: 'stag_antler', count: 1 }, // partial plain stack (room to stack, but not a free slot)
       ...Array.from({ length: 15 }, (_, i) => ({ itemId: `filler_${i}`, count: 1 })),
     ];
     const { ctx, players, events } = makeInstancedTradeCtx(
-      [{ itemId: 'baked_bread', count: 1, instance }],
+      [{ itemId: 'stag_antler', count: 1, instance }],
       receiverInv,
     );
     expect(players.get(2).inventory).toHaveLength(16);
 
     tradeMod.tradeRequest(ctx, 2, 1);
     tradeMod.tradeAccept(ctx, 2);
-    tradeMod.tradeSetOffer(ctx, [{ itemId: 'baked_bread', count: 1 }], 0, 1);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'stag_antler', count: 1 }], 0, 1);
     tradeMod.tradeConfirm(ctx, 1);
     tradeMod.tradeConfirm(ctx, 2);
 
@@ -653,15 +653,15 @@ describe('trade module (direct, no Sim)', () => {
     const instance = { signer: 'Ayla' };
     const { ctx, players } = makeInstancedTradeCtx(
       [
-        { itemId: 'baked_bread', count: 1 },
-        { itemId: 'baked_bread', count: 1, instance },
+        { itemId: 'stag_antler', count: 1 },
+        { itemId: 'stag_antler', count: 1, instance },
       ],
       [],
     );
 
     tradeMod.tradeRequest(ctx, 2, 1);
     tradeMod.tradeAccept(ctx, 2);
-    tradeMod.tradeSetOffer(ctx, [{ itemId: 'baked_bread', count: 2 }], 0, 1);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'stag_antler', count: 2 }], 0, 1);
     tradeMod.tradeConfirm(ctx, 1);
     tradeMod.tradeConfirm(ctx, 2);
 
@@ -702,19 +702,19 @@ describe('trade module (direct, no Sim)', () => {
         { itemId: 'wolf_fang', count: 1 },
         { itemId: 'wolf_fang', count: 1, instance: instA },
       ],
-      [{ itemId: 'baked_bread', count: 1, instance: instB }],
+      [{ itemId: 'stag_antler', count: 1, instance: instB }],
     );
 
     tradeMod.tradeRequest(ctx, 2, 1);
     tradeMod.tradeAccept(ctx, 2);
     tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 2 }], 0, 1);
-    tradeMod.tradeSetOffer(ctx, [{ itemId: 'baked_bread', count: 1 }], 0, 2);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'stag_antler', count: 1 }], 0, 2);
     tradeMod.tradeConfirm(ctx, 1);
     tradeMod.tradeConfirm(ctx, 2);
 
     // b to a: the instanced bread lands on A with its whole payload.
     expect(players.get(1).inventory).toHaveLength(1);
-    expect(players.get(1).inventory[0].itemId).toBe('baked_bread');
+    expect(players.get(1).inventory[0].itemId).toBe('stag_antler');
     expect(players.get(1).inventory[0].instance).toEqual(instB);
     // a to b: one plain fang plus the instanced fang carrying instA, not instB.
     expect(players.get(2).inventory).toHaveLength(2);
@@ -853,14 +853,14 @@ describe('trade module (direct, no Sim)', () => {
       ],
       [
         { itemId: 'wolf_fang', count: 1, instance: { signer: 'Ayla' } },
-        { itemId: 'baked_bread', count: 2, instance: { signer: 'Borin' } },
+        { itemId: 'stag_antler', count: 2, instance: { signer: 'Borin' } },
       ],
     );
 
     tradeMod.tradeRequest(ctx, 2, 1);
     tradeMod.tradeAccept(ctx, 2);
     tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 4 }], 0, 1);
-    tradeMod.tradeSetOffer(ctx, [{ itemId: 'baked_bread', count: 2 }], 0, 2);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'stag_antler', count: 2 }], 0, 2);
     tradeMod.tradeConfirm(ctx, 1);
     tradeMod.tradeConfirm(ctx, 2);
     expect(events.some((e) => e.type === 'error')).toBe(false);
@@ -872,7 +872,7 @@ describe('trade module (direct, no Sim)', () => {
       count: 1,
       materialSources: [{ count: 1, source: { signer: 'Ayla' } }],
     });
-    const breadA = invA.filter((s: any) => s.itemId === 'baked_bread');
+    const breadA = invA.filter((s: any) => s.itemId === 'stag_antler');
     expect(breadA).toHaveLength(1);
     expect(breadA[0].count).toBe(2);
     expect(breadA[0].instance).toEqual({ signer: 'Borin' });
@@ -880,7 +880,7 @@ describe('trade module (direct, no Sim)', () => {
     // B receives the exact five-unit composition: two unrecorded units and
     // three units signed by Ana. Source-aware packing keeps them in one row.
     const invB = players.get(2).inventory;
-    expect(invB.some((s: any) => s.itemId === 'baked_bread')).toBe(false);
+    expect(invB.some((s: any) => s.itemId === 'stag_antler')).toBe(false);
     expect(invB).toEqual([
       {
         itemId: 'wolf_fang',
@@ -898,7 +898,7 @@ describe('trade module (direct, no Sim)', () => {
         .filter((s: any) => s.itemId === itemId)
         .reduce((n: number, s: any) => n + s.count, 0);
     expect(units('wolf_fang')).toBe(6);
-    expect(units('baked_bread')).toBe(2);
+    expect(units('stag_antler')).toBe(2);
   });
 
   it('stages the offer as PER-COPY slots carrying the payloads the swap will move', () => {
@@ -1378,8 +1378,8 @@ describe('trade module (direct, no Sim)', () => {
     // overflowed past the gate). One plain plus one instanced bread need TWO
     // receiver slots; with one free slot the trade must refuse.
     const giver = [
-      { itemId: 'baked_bread', count: 1 },
-      { itemId: 'baked_bread', count: 1, instance: { signer: 'Ayla' } },
+      { itemId: 'stag_antler', count: 1 },
+      { itemId: 'stag_antler', count: 1, instance: { signer: 'Ayla' } },
     ];
     const receiverFull = Array.from({ length: 15 }, (_, i) => ({
       itemId: `filler_${i}`,
@@ -1391,7 +1391,7 @@ describe('trade module (direct, no Sim)', () => {
       ]);
       tradeMod.tradeRequest(ctx, 2, 1);
       tradeMod.tradeAccept(ctx, 2);
-      tradeMod.tradeSetOffer(ctx, [{ itemId: 'baked_bread', count: 2 }], 0, 1);
+      tradeMod.tradeSetOffer(ctx, [{ itemId: 'stag_antler', count: 2 }], 0, 1);
       tradeMod.tradeConfirm(ctx, 1);
       tradeMod.tradeConfirm(ctx, 2);
       expect(events.some((e) => e.type === 'error' && /not enough bag space/.test(e.text))).toBe(
@@ -1408,7 +1408,7 @@ describe('trade module (direct, no Sim)', () => {
       );
       tradeMod.tradeRequest(ctx, 2, 1);
       tradeMod.tradeAccept(ctx, 2);
-      tradeMod.tradeSetOffer(ctx, [{ itemId: 'baked_bread', count: 2 }], 0, 1);
+      tradeMod.tradeSetOffer(ctx, [{ itemId: 'stag_antler', count: 2 }], 0, 1);
       tradeMod.tradeConfirm(ctx, 1);
       tradeMod.tradeConfirm(ctx, 2);
       expect(events.some((e) => e.type === 'error')).toBe(false);

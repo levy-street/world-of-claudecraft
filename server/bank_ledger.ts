@@ -8,8 +8,8 @@
 // nothing, so an empty diff writes no row. bankInfoFor returns null away from a
 // banker, so a null on either side is also a no-op.
 //
-// diffBankOp is PURE (unit-tested directly). recordBankOp turns each diff element
-// into a fire-and-forget insert chained onto a per-process FIFO promise tail: the
+// diffBankOp is PURE (unit-tested directly). recordBankOp turns each command diff
+// into a fire-and-forget batch chained onto a per-process FIFO promise tail: the
 // game loop NEVER awaits it, a rejected insert logs and never blocks or reorders
 // anything, and the observer can never throw into the caller. A character lives on
 // one realm process, so the FIFO preserves that character's op order.
@@ -19,10 +19,10 @@
 // and every replay in scripts/bank_audit.mjs reads a container's WHOLE history,
 // so pruning any prefix would turn later legitimate withdraws into false
 // findings and erase the evidence a real dupe investigation needs. The growth
-// bound is therefore economic activity (one row per successful op, EXCEPT the
-// vault sweep: vault_deposit_all diffs to one row per distinct carried slot,
-// including separate crafted/signer identities, at most the 112-slot inventory),
-// not time.
+// bound is therefore economic activity, not time: one row per source payload
+// for a personal consumable move, normally one row per other successful op.
+// The vault_deposit_all sweep diffs to one row per distinct carried slot,
+// including separate crafted/signer identities, at most the 112-slot inventory.
 // This is deliberately not open-ended: the named REVISIT threshold is
 // 10,000,000 rows. At that size the audit's single ordered full scan is the
 // thing that breaks first (the recorded deferral there is a keyset cursor), and
@@ -53,6 +53,7 @@
 import { isMaterialItemId, materialItemIds } from '../src/sim/material_ids';
 import type { MaterialSourceDelta } from '../src/sim/material_sources';
 import { normalizeMaterialStack } from '../src/sim/material_stack';
+import { isStackProvenanceItemId } from '../src/sim/stack_provenance_ids';
 import type { ItemInstancePayload } from '../src/sim/types';
 import type { BankInfo, GuildBankInfo, VaultInfo } from '../src/world_api';
 import { BankLedgerGrowthLimitExceeded } from './bank_ledger_growth_budget';
@@ -60,6 +61,7 @@ import { type BankLedgerRow, insertBankLedgerRow, insertBankLedgerRows } from '.
 import { guildBookMaterialMovements } from './guild_bank_source_journal';
 import { gameMetricsCounters } from './http/game_signals';
 import type { MaterialMovementRow } from './material_source_ledger';
+import { personalBankSourceProjection } from './personal_bank_source_projection';
 import { REALM } from './realm';
 
 // The socket trio (Bank Storage phase 07) joins the personal vocabulary:
@@ -155,7 +157,7 @@ function slotKey(slot: BankSlot): string {
 // summing keeps the diff honest if the same key ever appears twice.
 function countByKey(slots: BankSlot[]): Map<string, { slot: BankSlot; count: number }> {
   const m = new Map<string, { slot: BankSlot; count: number }>();
-  for (const slot of slots) {
+  for (const slot of slots.flatMap((slot) => personalBankSourceProjection(slot))) {
     const key = slotKey(slot);
     const existing = m.get(key);
     if (existing) existing.count += slot.count;
@@ -375,7 +377,7 @@ function shouldLogBankLedgerWriteFailure(error: unknown): boolean {
 }
 
 // Record a successful bank op fire-and-forget. Computes the diff and enqueues one
-// insert per element onto the FIFO tail. Returns void immediately (never a promise,
+// batched insert onto the FIFO tail. Returns void immediately (never a promise,
 // never awaited by the game loop); the whole body is guarded so it can never throw
 // into the caller and gameplay never depends on the write landing.
 export function recordBankOp(
@@ -386,10 +388,11 @@ export function recordBankOp(
   opts: BankBuyOpts = {},
 ): void {
   try {
-    for (const row of buildPersonalBankLedgerRows(op, who, before, after, opts)) {
+    const rows = buildPersonalBankLedgerRows(op, who, before, after, opts);
+    if (rows.length > 0) {
       enqueueOnTail(
-        1,
-        () => insertBankLedgerRow(row),
+        rows.length,
+        () => (rows.length === 1 ? insertBankLedgerRow(rows[0]) : insertBankLedgerRows(rows)),
         (err) => {
           countBankLedgerGrowthRefusal(err);
           if (shouldLogBankLedgerWriteFailure(err)) {
@@ -1139,7 +1142,8 @@ export function diffGuildBankOp(
   const beforeCounts = countByGuildKey(before.slots);
   const afterCounts = countByGuildKey(after.slots);
   const keys = new Set<string>([...beforeCounts.keys(), ...afterCounts.keys()]);
-  // MATERIAL stock is owned by the source arm below, never by this multiset.
+  // Source-accounted stock, including consumables, belongs to the source arm
+  // below, never to this multiset.
   // The two do not agree and cannot be made to: this key is the RAW payload, so
   // a legacy signed stack and the normalized stack it merges with are two keys
   // here and one payload identity there, and reading a merge through this key
@@ -1150,7 +1154,7 @@ export function diffGuildBankOp(
   const out: BankOpDelta[] = [];
   for (const key of keys) {
     const representative = (afterCounts.get(key) ?? beforeCounts.get(key))?.slot;
-    if (representative !== undefined && isMaterialItemId(representative.itemId)) continue;
+    if (representative !== undefined && isStackProvenanceItemId(representative.itemId)) continue;
     const b = beforeCounts.get(key)?.count ?? 0;
     const a = afterCounts.get(key)?.count ?? 0;
     const delta = a - b;

@@ -96,7 +96,7 @@ const h = vi.hoisted(() => {
     // refusal arm instead of leaving it unexercised.
     if (String(sql).includes('woc.material_source_writer')) {
       return Promise.resolve({
-        rows: [{ capability: state.announcesWriterCapability ? '1' : null }],
+        rows: [{ capability: state.announcesWriterCapability ? '2' : null }],
         rowCount: 1,
       });
     }
@@ -325,6 +325,16 @@ describe('ensureSchema wires every schema module at boot', () => {
     const probeIndex = h.calls.findIndex((sql) => sql.includes('woc.material_source_writer'));
     expect(probeIndex).toBeGreaterThanOrEqual(0);
     expect(probeIndex).toBeLessThan(guardIndex);
+    const refreshIndex = h.calls.findIndex((sql) =>
+      sql.includes('CREATE OR REPLACE FUNCTION woc_material_source_writer_guard'),
+    );
+    const lockIndex = h.calls.findIndex((sql) => sql.includes('pg_advisory_xact_lock'));
+    const coreIndex = h.calls.findIndex((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS characters'),
+    );
+    expect(refreshIndex).toBeGreaterThan(lockIndex);
+    expect(refreshIndex).toBeGreaterThan(probeIndex);
+    expect(refreshIndex).toBeLessThan(coreIndex);
   });
 
   it('REFUSES to boot when this process does not announce the writer capability', async () => {

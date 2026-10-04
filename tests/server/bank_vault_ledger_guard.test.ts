@@ -547,15 +547,16 @@ describe('vault surface reservation shape', () => {
     expect(BANK_VAULT_LEDGER_ROW_BURST).toBe(121);
   });
 
-  it('throws the budget-mismatch error at 122, zero, a fraction, and a personal-surface widening', () => {
+  it('throws the budget-mismatch error at 122, zero, a fraction, and unsupported effect deltas', () => {
     const coordinator = createBankVaultLedgerGuardCoordinator(() => 0);
     const runtime = coordinator.createRuntime(13, fakeAdmission().admission, vi.fn());
     expect(() => runtime.admission.tryReserve(122, 0, 'vault')).toThrow(expected);
     expect(() => runtime.admission.tryReserve(0, 0, 'vault')).toThrow(expected);
     expect(() => runtime.admission.tryReserve(1.5, 0, 'vault')).toThrow(expected);
     expect(() => runtime.admission.tryReserve(3, 1, 'vault')).toThrow(expected);
-    // The personal bank keeps its two literals: the range is vault-only.
-    expect(() => runtime.admission.tryReserve(3, 0, 'personal')).toThrow(expected);
+    // Mixed-maker personal stacks share the same finite reservation ceiling.
+    expect(() => runtime.admission.tryReserve(122, 0, 'personal')).toThrow(expected);
+    expect(() => runtime.admission.tryReserve(3, 1, 'personal')).toThrow(expected);
     // Nothing above consumed a command token, so a legal reservation still admits.
     expect(runtime.admission.tryReserve(2, 0, 'vault')?.commit([row, row])).toBe(true);
   });

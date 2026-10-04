@@ -42,6 +42,9 @@
 // reserve worst case before mutation, then refund unused rows after the
 // journal accepts the exact immutable batch. Craft/enchant vault draws
 // reserve their exact take count.
+// Personal-bank consumables likewise reserve their source slot's effective
+// maker identities (personal_bank_ledger_row_bound.ts), under the SAME row
+// burst and refill. The historical one/two-row command entries remain floors.
 
 import type { VaultConsumptionReservation } from '../src/sim/types';
 import type {
@@ -429,14 +432,13 @@ function reservationShapeIsKnown(
   surface: BankLedgerProjectionSurface,
 ): boolean {
   if (maxGuildEffectDeltas !== 0) return false;
-  if (surface === 'personal') return maxRows === 1 || maxRows === 2;
-  // Vault commands reserve a per-command bound read from the pre-mutation
+  // Bank and vault commands reserve a per-command bound read from the pre-mutation
   // state (server/vault_ledger_row_bound.ts): one row per distinct ledger
   // identity the command's stack(s) can touch, never below the table floor.
   // So the known shape is a RANGE, positive up to the account row burst the
   // bucket can hold at all; the dispatcher refuses anything above it before
   // mutating rather than asking for a reservation that could never be granted.
-  if (surface === 'vault') {
+  if (surface === 'vault' || surface === 'personal') {
     return Number.isSafeInteger(maxRows) && maxRows >= 1 && maxRows <= BANK_VAULT_LEDGER_ROW_BURST;
   }
   return false;

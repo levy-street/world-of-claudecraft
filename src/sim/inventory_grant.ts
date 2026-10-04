@@ -1,10 +1,10 @@
-// Shared inventory mutation for the instance-grant hub. Materials use exact
+// Shared inventory mutation for the instance-grant hub. Source-aware items use exact
 // source-aware packing; other items retain their existing per-copy semantics.
 import { addStacked, stackSizeOf } from './bags';
 import { ITEMS } from './data';
 import { canStackInstancePayloads } from './item_instance_merge';
-import { isMaterialItemId } from './material_ids';
 import type { MaterialComposition } from './material_sources';
+import { isStackProvenanceItemId } from './stack_provenance_ids';
 import { cloneItemInstancePayload, type InvSlot, type ItemInstancePayload } from './types';
 
 /** Acquisition metadata shared by both inventory grant callbacks. */
@@ -24,7 +24,7 @@ export function grantInventoryInstances(
   craftedRecipeId?: string,
   materialSources?: MaterialComposition,
 ): void {
-  if (isMaterialItemId(itemId)) {
+  if (isStackProvenanceItemId(itemId)) {
     addStacked(inventory, itemId, count, instance, craftedRecipeId, materialSources);
     return;
   }

@@ -1425,10 +1425,18 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(s2.equipmentInstance?.[keptSlot]?.signer).toBe(legalSigner);
     expect('signer' in (s2.inventory?.[0]?.instance ?? {})).toBe(false);
     expect(s2.inventory?.[0]?.instance?.enchant).toBe('enchant_weapon_might');
-    expect(s2.inventory?.[bagSurvivorIndex]?.instance?.signer).toBe(legalSigner);
+    expect(s2.inventory?.[bagSurvivorIndex]?.materialSources).toEqual([
+      { source: { signer: legalSigner }, count: 1 },
+    ]);
+    expect(s2.inventory?.[bagSurvivorIndex]?.instance?.enchant).toBe('enchant_weapon_might');
     expect('signer' in (s2.bank?.inventory?.[0]?.instance ?? {})).toBe(false);
     expect(s2.bank?.inventory?.[0]?.instance?.enchant).toBe('enchant_weapon_might');
-    expect(s2.bank?.inventory?.[1]?.instance?.signer).toBe(legalSigner);
+    expect(s2.bank?.inventory?.[1]?.materialSources).toEqual([
+      { source: { signer: legalSigner }, count: 1 },
+    ]);
+    expect(s2.bank?.inventory?.[1]?.instance?.enchant).toBe('enchant_weapon_might');
+    expect(s2.bank?.inventory?.[0]?.materialSources).toEqual([{ source: {}, count: 1 }]);
+    expect(s2.vendorBuyback?.[0]?.materialSources).toEqual([{ source: {}, count: 1 }]);
     expect('signer' in (s2.vendorBuyback?.[0]?.instance ?? {})).toBe(false);
     expect(s2.vendorBuyback?.[0]?.instance?.enchant).toBe('enchant_weapon_might');
   });

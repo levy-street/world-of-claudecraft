@@ -1,8 +1,9 @@
 // Material provenance is validated before legacy load coercions can erase it.
 import { ITEMS } from './data';
 import { isChargeBearingPayload } from './item_instance_merge';
-import { isMaterialItemId, materialItemIds } from './material_ids';
+import { isMaterialItemId } from './material_ids';
 import { normalizeMaterialStack } from './material_stack';
+import { isStackProvenanceItemId, stackProvenanceItemIds } from './stack_provenance_ids';
 import { cloneInvSlot, type InvSlot } from './types';
 
 const LOAD_REFUSED = 'material source state is invalid; refusing character load';
@@ -10,7 +11,7 @@ const record = (v: unknown): v is Record<string, unknown> =>
   typeof v === 'object' && v !== null && !Array.isArray(v);
 
 function slotMaterialIds(slot: InvSlot): ReadonlySet<string> | null {
-  if (isMaterialItemId(slot.itemId)) return materialItemIds();
+  if (isStackProvenanceItemId(slot.itemId)) return stackProvenanceItemIds();
   if (slot.materialSources === undefined) return null;
   // A removed material remains recoverable. A known non-material must not
   // acquire a material marker that bypasses its equipment load rules.

@@ -541,7 +541,7 @@ describe('bags_window: touch peek + bank-cluster close', () => {
       /case 'mailAttach':\s*this\.deps\.stageMailParcel\(s\.itemId, s\.instance\);/,
     );
     expect(body).toMatch(
-      /case 'marketSell':\s*this\.deps\.stageMarketSell\(s\.itemId, s\.instance\);/,
+      /case 'marketSell': \{[\s\S]*?marketConsumableSellSources\(s\)[\s\S]*?this\.deps\.stageMarketSell\(s\.itemId, s\.instance\);/,
     );
     expect(body).toMatch(/case 'bankDeposit': \{/);
     // feedPet and useItem now also forward WHICH bag copy was clicked, resolved
@@ -832,7 +832,7 @@ describe('bags_window: unknown-id stacks stay visible (stale-client guard, R34)'
     expect(body).not.toContain('onclick');
     // The def-free corner glyph and its aria flag survive the missing def: a
     // bound or enchanted copy keeps its marker in both channels.
-    expect(body).toContain('bagInstanceGlyphKind(s.instance)');
+    expect(body).toContain('bagInstanceGlyphKind(s.instance, s.materialSources)');
     expect(body).toContain('t(UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS[glyphKind], {');
     // Never the known cell's keys: those drop the UNKNOWN signal. The known
     // map's name is a SUBSTRING of the unknown one, so the lookbehind keeps

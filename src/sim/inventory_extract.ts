@@ -21,6 +21,8 @@
 
 import { exchangeHardLock } from './exchange_eligibility';
 import { itemInstancePayloadsEqual } from './item_instance_merge';
+import { takeMaterialStack } from './material_stack';
+import { isStackProvenanceItemId, stackProvenanceItemIds } from './stack_provenance_ids';
 import type { InvSlot, ItemDef, ItemInstancePayload } from './types';
 import { cloneItemInstancePayload } from './types';
 
@@ -75,6 +77,13 @@ export function extractTradableCopy(
   // the server's policy had already cleared (see exchange_eligibility.ts).
   const lock = exchangeHardLock(def, slot.instance);
   if (lock) return { ok: false, reason: lock };
+  if (isStackProvenanceItemId(slot.itemId)) {
+    const take = takeMaterialStack(slot, 1, stackProvenanceItemIds());
+    if (!take.ok) return { ok: false, reason: 'stale_copy' };
+    if (take.value.remaining) inventory[ref.index] = take.value.remaining;
+    else inventory.splice(ref.index, 1);
+    return { ok: true, extracted: take.value.taken };
+  }
   // Exactly one unit leaves the bags. A surviving stack keeps the original
   // payload object and the extracted unit gets its own clone (the aliasing
   // rule at cloneItemInstancePayload in types.ts); the final unit of a

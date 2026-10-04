@@ -36,7 +36,7 @@ export interface MaterialSourceTables {
 
 /** A runtime-immutable ReadonlySet facade. The mutable Set is closure-private,
  *  and the frozen public object exposes only standard read operations. */
-function readonlySetView<T>(values: Iterable<T>): ReadonlySet<T> {
+export function readonlySetView<T>(values: Iterable<T>): ReadonlySet<T> {
   const backing = new Set(values);
   let view: ReadonlySet<T>;
   view = Object.freeze({

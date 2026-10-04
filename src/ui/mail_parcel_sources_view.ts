@@ -2,11 +2,13 @@
 // PostOffice which material units each pool request would consume, so a chip
 // never presents the clicked bag row as though mail had selected that row.
 
+import { isMergeableInstancePayload } from '../sim/item_instance_merge';
 import {
   type MaterialMailAttachmentRequest,
   mailMaterialAttachmentAvailableCount,
   planMaterialMailAttachments,
 } from '../sim/mail/material_attachment_plan';
+import { isMaterialItemId } from '../sim/material_ids';
 import {
   canonicalMaterialComposition,
   type MaterialComposition,
@@ -54,7 +56,10 @@ export function appendableMailParcelCount(
   if (!prefix.ok) return 0;
   const remaining = mailMaterialAttachmentAvailableCount(prefix.value.inventory, itemId, instance);
   if (remaining === null || remaining < 1) return 0;
-  const count = instance === undefined ? remaining : 1;
+  const count =
+    instance === undefined || (!isMaterialItemId(itemId) && isMergeableInstancePayload(instance))
+      ? remaining
+      : 1;
   const candidate = [...attachments, { itemId, count, ...(instance ? { instance } : {}) }];
   return planMaterialMailAttachments(inventory, candidate).ok ? count : 0;
 }
@@ -75,7 +80,11 @@ export function mailParcelCountCeiling(
   );
   if (materialOwned === null) return null;
   let low = 0;
-  let high = request.instance === undefined ? materialOwned : Math.min(1, materialOwned);
+  let high =
+    request.instance === undefined ||
+    (!isMaterialItemId(request.itemId) && isMergeableInstancePayload(request.instance))
+      ? materialOwned
+      : Math.min(1, materialOwned);
   while (low < high) {
     const count = low + Math.ceil((high - low) / 2);
     const candidate = attachments.map((attachment, attachmentIndex) =>

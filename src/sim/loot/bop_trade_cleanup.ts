@@ -5,6 +5,9 @@
 import { stackSizeOf } from '../bags';
 import { ITEMS } from '../data';
 import { canStackInstancePayloads, isMergeableInstancePayload } from '../item_instance_merge';
+import { cloneMaterialData } from '../material_payload_identity';
+import { planMaterialStackAdd } from '../material_stack_packing';
+import { isStackProvenanceItemId, stackProvenanceItemIds } from '../stack_provenance_ids';
 import { cloneItemInstancePayload, type InvSlot } from '../types';
 import { partyTradeActive, withoutPartyTradeMarker } from './bop_trade_window';
 
@@ -82,6 +85,31 @@ function normalizePartyTradeSlotsWithPolicy(
     let remaining = source.count;
     const stackCap = stackSizeOf(ITEMS[source.itemId]);
     const mergeable = isMergeableInstancePayload(source.instance);
+    if (isStackProvenanceItemId(source.itemId)) {
+      // Retirement is a local repack, not a source-blind count edit. Buyback
+      // and non-mergeable rows retain their original quantity and metadata.
+      if (!restack || !mergeable) {
+        result.push({ sourceIndex, splitIndex: 0, slot: cloneMaterialData(source) });
+        continue;
+      }
+      const plan = planMaterialStackAdd({
+        inventory: result.map((entry) => entry.slot),
+        incoming: source,
+        materialIds: stackProvenanceItemIds(),
+        stackSize: stackCap,
+        maxNewSlots: Number.MAX_SAFE_INTEGER,
+      });
+      if (!plan.ok) throw new Error('party trade cleanup refused invalid source state');
+      for (const replacement of plan.value.replacements) {
+        result[replacement.index].slot = replacement.slot;
+      }
+      for (let splitIndex = 0; splitIndex < plan.value.appended.length; splitIndex++) {
+        const slot = plan.value.appended[splitIndex];
+        if (splitIndex === 0 && source.slot !== undefined) slot.slot = source.slot;
+        result.push({ sourceIndex, splitIndex, slot });
+      }
+      continue;
+    }
     if (restack && mergeable) {
       for (const target of result) {
         if (remaining <= 0) break;

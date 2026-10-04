@@ -20,8 +20,8 @@
 //   is ordinary spendable stock. Spending never merges it with anything, and its
 //   remainder stays separated.
 // - `instance.locked` IS a lock: those units are never selected, unless the
-//   caller opts in with `includeLocked` (default false) to replay a move a
-//   lock-blind pipe already made.
+//   caller opts in with `includeLocked` (default false) for direct item use
+//   or to replay a move a lock-blind pipe already made.
 // - An explicit slot index or source selection never falls back. If the named
 //   slot or descriptor cannot cover the request, the request is refused.
 // - `eligibleSource` narrows the pool one BUCKET at a time, so a partly
@@ -100,12 +100,15 @@ export interface MaterialTakeRequest {
    *  salvage/craft/vendor safety mark and this module refusing to spend it is
    *  what makes that mark mean anything.
    *
-   *  The one caller that sets it is a REPLAY of a move that already happened
+   *  A replay caller sets it for a move that already happened
    *  through a pipe whose established policy does not consult the lock (the
    *  guild book; see transfer_lock.ts, which scopes the lock to the $WOC rail).
    *  Such a replay must land the same units the live move did, locked payload
    *  included, so a durable book cannot drift from the live one. It is not a
-   *  permission to spend a locked copy: the caller has already moved it. */
+   *  permission to spend a locked copy: the caller has already moved it.
+   *  Direct item use also opts in through item_use_consumption.ts: the owner
+   *  may drink a locked potion or eat a locked meal. That explicit use must
+   *  consume its unit while ordinary salvage/craft/vendor spending stays locked. */
   readonly includeLocked?: boolean;
 }
 

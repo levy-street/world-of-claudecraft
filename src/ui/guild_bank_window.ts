@@ -609,7 +609,7 @@ export class GuildBankTab {
     // enter the guild bank, so the quest arm is always null. The unknown-id
     // arm below shares this mint: a stale or removed id is never in the local
     // grade table, so fineMark is false there and only the glyph can paint.
-    const glyphKind = bagInstanceGlyphKind(slot.instance);
+    const glyphKind = bagInstanceGlyphKind(slot.instance, slot.materialSources);
     const fineMark = bagFineMark(slot.itemId);
     const cornerMark = bagCornerMark(glyphKind, null, fineMark);
     const instanceMark = cornerMarkHtml(cornerMark);

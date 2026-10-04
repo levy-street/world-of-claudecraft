@@ -3,15 +3,16 @@
 // Requests name an item pool and, optionally, a canonical payload; they never
 // name a bag slot or imply that a manually separated stack was selected.
 
-import { itemInstancePayloadsEqual } from '../item_instance_merge';
+import { isMergeableInstancePayload, itemInstancePayloadsEqual } from '../item_instance_merge';
 import { coalesceMaterialTransferSlots } from '../material_exchange_transfer';
-import { isMaterialItemId, materialItemIds } from '../material_ids';
+import { isMaterialItemId } from '../material_ids';
 import {
   applyMaterialInventoryTake,
   type MaterialTakeError,
   planMaterialInventoryTake,
 } from '../material_inventory_take';
 import { materialSourceUnitPayload } from '../material_inventory_units';
+import { isStackProvenanceItemId, stackProvenanceItemIds } from '../stack_provenance_ids';
 import { isTransferLockedInstance } from '../transfer_lock';
 import { cloneInvSlot, type InvSlot, type ItemInstancePayload } from '../types';
 
@@ -80,7 +81,7 @@ function planOne(
     inventory,
     itemId: request.itemId,
     count: request.count,
-    materialIds: materialItemIds(),
+    materialIds: stackProvenanceItemIds(),
     eligibleSource: eligibleFor(request.instance),
     allowPartial,
   });
@@ -96,7 +97,7 @@ export function mailMaterialAttachmentAvailableCount(
   itemId: string,
   instance?: ItemInstancePayload,
 ): number | null {
-  if (!isMaterialItemId(itemId)) return null;
+  if (!isStackProvenanceItemId(itemId)) return null;
   const planned = planOne(
     inventory,
     { itemId, count: Number.MAX_SAFE_INTEGER, ...(instance === undefined ? {} : { instance }) },
@@ -118,7 +119,7 @@ export function planMaterialMailAttachments(
   const rowsByAttachment: (readonly InvSlot[] | null)[] = [];
 
   for (const request of attachments) {
-    if (!isMaterialItemId(request.itemId)) {
+    if (!isStackProvenanceItemId(request.itemId)) {
       rowsByAttachment.push(null);
       continue;
     }
@@ -126,7 +127,11 @@ export function planMaterialMailAttachments(
     if (!Number.isFinite(request.count) || !Number.isSafeInteger(count) || count <= 0) {
       return { ok: false, error: 'invalid-request' };
     }
-    if (request.instance !== undefined && count !== 1) {
+    if (
+      request.instance !== undefined &&
+      count !== 1 &&
+      (isMaterialItemId(request.itemId) || !isMergeableInstancePayload(request.instance))
+    ) {
       return { ok: false, error: 'invalid-request' };
     }
     const planned = planOne(scratch, { ...request, count });

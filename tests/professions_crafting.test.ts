@@ -1110,13 +1110,13 @@ describe('rare-quality signing composes with multi-copy outputs (#1149 regressio
     const slots = meta.inventory.filter((s: any) => s.itemId === 'anglers_feast_platter');
     const totalGranted = slots.reduce((sum: number, s: any) => sum + s.count, 0);
     expect(totalGranted).toBe(3);
-    // All 3 copies carry the SAME {signer} payload, so the single
-    // addItemInstance call must merge them into ONE byte-equal stack. Pinning
+    // All 3 copies carry the same signer source, so the single
+    // addItemInstance call must merge them into one source-backed stack. Pinning
     // the stack count (not just "at least one") is what fails a regression to
     // a per-copy grant loop, which would fragment the output into 3 slots.
     expect(slots.length).toBe(1);
     for (const slot of slots) {
-      expect(slot.instance?.signer).toBe(meta.name);
+      expect(slot.materialSources).toEqual([{ source: { signer: meta.name }, count: 3 }]);
     }
   });
 
@@ -1149,7 +1149,7 @@ describe('rare-quality signing composes with multi-copy outputs (#1149 regressio
     // Same single-stack merge pin as the platter case above.
     expect(slots.length).toBe(1);
     for (const slot of slots) {
-      expect(slot.instance?.signer).toBe(meta.name);
+      expect(slot.materialSources).toEqual([{ source: { signer: meta.name }, count: 2 }]);
     }
   });
 });

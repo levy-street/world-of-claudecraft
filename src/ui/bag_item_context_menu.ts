@@ -17,11 +17,11 @@
 
 import { ENCHANTS } from '../sim/content/enchants';
 import { isItemLocked } from '../sim/item_lock';
-import { isMaterialItemId } from '../sim/material_ids';
 import type { MaterialComposition } from '../sim/material_sources';
 import { isDisenchantable, isEnchantedInstance } from '../sim/professions/enchanting';
 import { isSalvageable } from '../sim/professions/salvage';
 import { isSunderable } from '../sim/professions/sundering';
+import { isStackProvenanceItemId } from '../sim/stack_provenance_ids';
 import type { ItemDef, ItemInstancePayload } from '../sim/types';
 import type { TranslationKey } from './i18n.catalog';
 import { separableMaterialSources } from './material_sources_view';
@@ -106,7 +106,7 @@ export function bagItemNewActions(
   if (isSalvageable(def) && !isItemLocked(instance)) out.push('salvage');
   if (isSunderable(def)) out.push('sunder');
   if (isEnchantReagentItem(itemId)) out.push('applyEnchant');
-  if (includeMaterialActions && isMaterialItemId(itemId)) {
+  if (includeMaterialActions && isStackProvenanceItemId(itemId)) {
     if (materialSources !== undefined && materialSources.length > 0) {
       out.push('viewSources');
       if (separableMaterialSources(materialSources)) out.push('separateByGatherer');

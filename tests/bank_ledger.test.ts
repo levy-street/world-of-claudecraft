@@ -38,8 +38,8 @@ import type { BankInfo, VaultInfo } from '../src/world_api';
 const insertMock = vi.mocked(insertBankLedgerRow);
 const saveCharacterMock = vi.mocked(saveCharacterState);
 // The vault observer writes through the BATCHED sibling (one insert per op,
-// however many materials the diff produced); the personal bank and guild arms
-// stay on the single-row writer above.
+// however many materials the diff produced). Mixed consumable personal moves
+// also use one batch; single-row personal moves retain the legacy writer.
 const insertRowsMock = vi.mocked(insertBankLedgerRows);
 
 interface LedgerBatchView {
@@ -95,6 +95,39 @@ function info(
 }
 
 describe('diffBankOp (pure)', () => {
+  it('counts only the incoming maker when a legacy signed potion joins a mixed stack', () => {
+    expect(
+      diffBankOp(
+        'deposit',
+        info([
+          {
+            itemId: 'minor_healing_potion',
+            count: 2,
+            instance: { signer: 'Ana' },
+          },
+        ]),
+        info([
+          {
+            itemId: 'minor_healing_potion',
+            count: 5,
+            materialSources: [
+              { source: { signer: 'Ana' }, count: 2 },
+              { source: { signer: 'Bru' }, count: 3 },
+            ],
+          },
+        ]),
+      ),
+    ).toEqual([
+      {
+        itemId: 'minor_healing_potion',
+        count: 3,
+        instance: { signer: 'Bru' },
+        copperDelta: 0,
+        purchasedSlotsAfter: 0,
+      },
+    ]);
+  });
+
   it('a deposit of a new stack yields the deposited count', () => {
     expect(diffBankOp('deposit', info([]), info([{ itemId: 'wolf_fang', count: 3 }]))).toEqual([
       { itemId: 'wolf_fang', count: 3, instance: null, copperDelta: 0, purchasedSlotsAfter: 0 },
@@ -339,6 +372,33 @@ describe('bank ledger dispatch integration', () => {
     insertRowsMock.mockClear();
     saveCharacterMock.mockReset();
     saveCharacterMock.mockResolvedValue(true);
+  });
+
+  it('batches a mixed-consumable legacy recorder move into one database call', async () => {
+    recordBankOp(
+      'deposit',
+      { characterId: 42, accountId: 7 },
+      info([]),
+      info([
+        {
+          itemId: 'minor_healing_potion',
+          count: 5,
+          materialSources: [
+            { source: { signer: 'Ana' }, count: 2 },
+            { source: { signer: 'Bru' }, count: 3 },
+          ],
+        },
+      ]),
+    );
+    await bankLedgerIdle();
+    expect(insertMock).not.toHaveBeenCalled();
+    expect(insertRowsMock).toHaveBeenCalledTimes(1);
+    expect(
+      insertRowsMock.mock.calls[0][0].map(({ count, instance }) => ({ count, instance })),
+    ).toEqual([
+      { count: 2, instance: { signer: 'Ana' } },
+      { count: 3, instance: { signer: 'Bru' } },
+    ]);
   });
 
   it('deposit, withdraw, and buy stage exact rows until the matching character snapshot commits', async () => {

@@ -63,7 +63,7 @@ export function buildPersonalBankItemCell(
     '--bank-slot-quality',
     QUALITY_COLOR[slot.qualityKey] ?? QUALITY_DEFAULT_COLOR,
   );
-  const glyphKind = bagInstanceGlyphKind(slot.instance);
+  const glyphKind = bagInstanceGlyphKind(slot.instance, slot.materialSources);
   const cornerMark = bagCornerMark(glyphKind, null, fineMark);
   const locked = isItemLocked(slot.instance);
   const parts = item ? wornItemCellParts(item, slot.instance) : null;

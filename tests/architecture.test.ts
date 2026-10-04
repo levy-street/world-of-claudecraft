@@ -568,6 +568,7 @@ const UI_PURE_CORES = [
   'src/ui/objective_glow_view.ts',
   'src/ui/vendor_stock_gate_core.ts',
   'src/ui/market_view.ts',
+  'src/ui/market_consumable_sources_view.ts',
   'src/ui/market_price_view.ts',
   'src/ui/market_name_color.ts',
   'src/ui/market_armor_badge.ts',

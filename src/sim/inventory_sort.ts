@@ -31,9 +31,9 @@
 
 import { canStackInstancePayloads, isMergeableInstancePayload } from './item_instance_merge';
 import type { Quality } from './loot_master';
-import { materialItemIds } from './material_ids';
 import { consolidateMaterialStacks } from './material_stack_grouping';
 import { baseMaterialFor } from './professions/material_grades';
+import { stackProvenanceItemIds } from './stack_provenance_ids';
 import { ALL_EQUIP_SLOTS, type InvSlot, type ItemDef, type ItemKind } from './types';
 
 /** Item-table access, injected so tests drive synthetic defs and the leaf
@@ -185,7 +185,7 @@ export function consolidateBagStacks(
   lookup: ItemDefLookup,
   stackCap: (def: ItemDef | undefined) => number,
 ): void {
-  const materialIds = materialItemIds();
+  const materialIds = stackProvenanceItemIds();
   const materialResult = consolidateMaterialStacks(inventory, materialIds, (itemId) =>
     stackCap(lookup(itemId)),
   );

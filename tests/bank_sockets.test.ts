@@ -29,6 +29,7 @@ import {
 } from '../src/sim/bank';
 import { BUILTIN_WORLD, ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
+import { isStackProvenanceItemId } from '../src/sim/stack_provenance_ids';
 import type { Entity, InvSlot, WorldContent } from '../src/sim/types';
 
 // The three Gilded Strongbox bursars (banker NPCs), one per town hub.
@@ -858,9 +859,13 @@ describe('two-pool deposits through the real gate', () => {
     // materials space is irrelevant to the refusal).
     const sim = simWithSockets(1);
     const m = meta(sim);
+    // Source-accounted consumables split by unit. This control exercises the
+    // legacy indivisible payload arm on genuine non-reagent junk.
+    const indivisibleItem = 'tangled_weed';
+    expect(isStackProvenanceItemId(indivisibleItem)).toBe(false);
     for (let i = 0; i < 23; i++) m.bank.inventory.push(fullStack(BREAD));
-    const idx = carry(sim, BREAD, 1);
-    m.inventory[idx] = { itemId: BREAD, count: 3, instance: { charges: { heal: 2 } } };
+    const idx = carry(sim, indivisibleItem, 1);
+    m.inventory[idx] = { itemId: indivisibleItem, count: 3, instance: { charges: { heal: 2 } } };
     sim.drainEvents();
     sim.bankDeposit(idx);
     expect(
@@ -1062,7 +1067,11 @@ describe('persistence', () => {
     const rebank = sim2.serializeCharacter(pid)!.bank!;
     expect('unlockedSockets' in rebank).toBe(false);
     expect('socketBags' in rebank).toBe(false);
-    expect(rebank.inventory).toEqual([fullStack(BREAD)]);
+    // The old count survives; only the consumable's absent ledger migrates.
+    expect(rebank.inventory).toEqual([
+      { ...fullStack(BREAD), materialSources: [{ source: {}, count: 20 }] },
+    ]);
+    expect(state.bank.inventory).toEqual([fullStack(BREAD)]);
   });
 
   it('no shipped writer ever decrements unlockedSockets (the omission predicate tripwire)', () => {
