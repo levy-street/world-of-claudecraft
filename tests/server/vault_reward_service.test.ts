@@ -51,7 +51,6 @@ describe('vault reward orchestration', () => {
     Object.assign(f.owner.vaultAttempt, { bossKilledAtMs: 500, expiresAtMs: 900_500 });
     const service = new VaultRewardService(f.host, {
       ...mailDbStubs,
-      guestPayoutsForCycle: vi.fn(async () => 0),
       commitVaultOutcome: vi.fn(),
       loadVaultOutcome: vi.fn(async () => null),
       dueVaultRewardClaims: vi.fn(async () => []),
@@ -72,7 +71,6 @@ describe('vault reward orchestration', () => {
     );
     const service = new VaultRewardService(f.host, {
       ...mailDbStubs,
-      guestPayoutsForCycle: vi.fn(async () => 0),
       commitVaultOutcome,
       loadVaultOutcome: vi.fn(async () => null),
       dueVaultRewardClaims: vi.fn(async () => []),
@@ -113,7 +111,6 @@ describe('vault reward orchestration', () => {
       {
         ...mailDbStubs,
         deferVaultRewardClaim,
-        guestPayoutsForCycle: vi.fn(async () => 0),
         commitVaultOutcome: vi.fn(),
         loadVaultOutcome: vi.fn(),
         dueVaultRewardClaims: vi.fn(async () => []),
@@ -150,7 +147,6 @@ describe('vault reward orchestration', () => {
       ...mailDbStubs,
       wakeOldestVaultRewardClaim,
       deferVaultRewardClaim,
-      guestPayoutsForCycle: vi.fn(async () => 0),
       commitVaultOutcome: vi.fn(),
       loadVaultOutcome: vi.fn(),
       dueVaultRewardClaims: vi.fn(async () => []),
@@ -188,7 +184,6 @@ describe('vault reward orchestration', () => {
       f.host,
       {
         ...mailDbStubs,
-        guestPayoutsForCycle: vi.fn(async () => 0),
         commitVaultOutcome: vi.fn(),
         loadVaultOutcome: vi.fn(),
         dueVaultRewardClaims,
@@ -230,7 +225,6 @@ describe('vault reward orchestration', () => {
       {
         ...mailDbStubs,
         wakeOldestVaultRewardClaim,
-        guestPayoutsForCycle: vi.fn(async () => 0),
         commitVaultOutcome: vi.fn(),
         loadVaultOutcome: vi.fn(),
         dueVaultRewardClaims: vi.fn(async () => []),
@@ -253,7 +247,6 @@ describe('vault reward orchestration', () => {
     const service = new VaultRewardService(f.host, {
       ...mailDbStubs,
       wakeOldestVaultRewardClaim,
-      guestPayoutsForCycle: vi.fn(async () => 0),
       commitVaultOutcome: vi.fn(),
       loadVaultOutcome: vi.fn(),
       dueVaultRewardClaims: vi.fn(async () => []),
@@ -285,7 +278,6 @@ describe('vault reward orchestration', () => {
     };
     const db = {
       ...mailDbStubs,
-      guestPayoutsForCycle: vi.fn(async () => 0),
       commitVaultOutcome: vi.fn(),
       loadVaultOutcome: vi.fn(async () => ({
         attemptId: '7:1',
@@ -341,7 +333,6 @@ describe('vault reward orchestration', () => {
       f.host,
       {
         ...mailDbStubs,
-        guestPayoutsForCycle: vi.fn(async () => 0),
         commitVaultOutcome: vi.fn(),
         loadVaultOutcome: vi.fn(),
         dueVaultRewardClaims: vi.fn(),
@@ -372,7 +363,6 @@ describe('vault reward orchestration', () => {
       f.host,
       {
         ...mailDbStubs,
-        guestPayoutsForCycle: vi.fn(async () => 0),
         commitVaultOutcome: vi.fn(),
         loadVaultOutcome: vi.fn(),
         dueVaultRewardClaims: vi.fn(),
@@ -429,7 +419,6 @@ describe('vault reward orchestration', () => {
         fixture().host,
         {
           ...mailDbStubs,
-          guestPayoutsForCycle: vi.fn(async () => 0),
           commitVaultOutcome: vi.fn(),
           loadVaultOutcome: vi.fn(),
           dueVaultRewardClaims: vi.fn(),
@@ -466,7 +455,6 @@ describe('vault reward orchestration', () => {
     );
     const db = {
       ...mailDbStubs,
-      guestPayoutsForCycle: vi.fn(async () => 0),
       commitVaultOutcome,
       loadVaultOutcome: vi.fn(async () => null),
       dueVaultRewardClaims: vi.fn(async () => []),
@@ -507,7 +495,7 @@ describe('vault reward orchestration', () => {
     expect(f.saveOwner).toHaveBeenCalledWith(70);
   });
 
-  it('hydrates a live guest from mail-backed payout reservations before opening the chest', async () => {
+  it('opens the chest after commit without reading guest usage', async () => {
     const f = fixture();
     const guest = {
       ...f.owner,
@@ -519,16 +507,8 @@ describe('vault reward orchestration', () => {
     };
     f.ctx.players.set(71, guest);
     f.host.characterPid = vi.fn((id: number) => (id === 8 ? 71 : 70));
-    let finishUsage: ((value: number) => void) | undefined;
-    const guestPayoutsForCycle = vi.fn(
-      () =>
-        new Promise<number>((resolve) => {
-          finishUsage = resolve;
-        }),
-    );
     const db = {
       ...mailDbStubs,
-      guestPayoutsForCycle,
       commitVaultOutcome: vi.fn(async () => 'created' as const),
       loadVaultOutcome: vi.fn(async () => null),
       dueVaultRewardClaims: vi.fn(async () => []),
@@ -545,18 +525,14 @@ describe('vault reward orchestration', () => {
         ],
       } as SimEvent,
     ]);
-    await vi.waitFor(() => expect(guestPayoutsForCycle).toHaveBeenCalledWith(8, 'wq1_10'));
-    expect(f.chest.lootable).toBe(false);
-    finishUsage?.(3);
     await vi.waitFor(() => expect(f.chest.lootable).toBe(true));
-    expect(guest.vaultGuestPayouts).toBe(3);
+    expect(guest.vaultGuestPayouts).toBe(1);
   });
 
   it('reconciles an already-completed owner marker before permitting its portal', async () => {
     const f = fixture();
     const db = {
       ...mailDbStubs,
-      guestPayoutsForCycle: vi.fn(async () => 0),
       commitVaultOutcome: vi.fn(async () => 'created' as const),
       loadVaultOutcome: vi.fn(async () => ({
         attemptId: '7:1',
@@ -585,7 +561,6 @@ describe('vault reward orchestration', () => {
     f.ctx.players.set(71, f.owner);
     const service = new VaultRewardService(f.host, {
       ...mailDbStubs,
-      guestPayoutsForCycle: vi.fn(async () => 0),
       commitVaultOutcome: vi.fn(),
       loadVaultOutcome: vi.fn(async () => null),
       dueVaultRewardClaims: vi.fn(async () => []),

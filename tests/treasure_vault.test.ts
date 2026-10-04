@@ -226,6 +226,9 @@ describe('the vault run', () => {
     const portal = [...sim.entities.values()].find((e) => e.vaultOwnerPid === owner)!;
     const guest = sim.addPlayer('warrior', 'Guest');
     sim.setPlayerLevel(20, guest);
+    const guestMeta = sim.meta(guest)!;
+    guestMeta.vaultGuestCycle = guestMeta.worldQuestCycle;
+    guestMeta.vaultGuestPayouts = 3;
     sim.partyInvite(guest, owner);
     sim.partyAccept(guest);
     sim.enterRift(portal.riftSeed!, portal.riftBaseLevel!, owner, undefined, portal);
@@ -233,6 +236,7 @@ describe('the vault run', () => {
     const inst = sim.riftInstances.find((i) => i.partyKey !== null)!;
     const ownerMeta = sim.meta(owner)!;
     const copperBefore = ownerMeta.copper;
+    const guestCopperBefore = guestMeta.copper;
     leaveRift(sim.ctx, owner);
     for (const id of inst.mobIds) {
       const mob = sim.entities.get(id);
@@ -247,6 +251,8 @@ describe('the vault run', () => {
     expect(inst.vault?.chest?.eligible).toContain(guest);
     clearHoardRewardChest(sim.ctx, inst);
     expect(ownerMeta.copper).toBeGreaterThan(copperBefore);
+    expect(guestMeta.copper).toBeGreaterThan(guestCopperBefore);
+    expect(guestMeta.vaultGuestPayouts).toBe(3);
   });
 
   it('freezes three rewards and seals the online chest when the owner disconnects', () => {
@@ -265,6 +271,11 @@ describe('the vault run', () => {
       sim.partyInvite(guest, owner);
       sim.partyAccept(guest);
     }
+    for (const [index, guest] of guests.entries()) {
+      const meta = sim.meta(guest)!;
+      meta.vaultGuestCycle = meta.worldQuestCycle;
+      meta.vaultGuestPayouts = index + 3;
+    }
     for (const pid of [owner, ...guests])
       sim.enterRift(portal.riftSeed!, portal.riftBaseLevel!, pid, undefined, portal);
     const inst = sim.riftInstances.find((i) => i.vault?.attemptId === '701:1')!;
@@ -282,6 +293,9 @@ describe('the vault run', () => {
     expect(pending).toHaveLength(1);
     expect(pending[0].claims.map((claim) => claim.characterId).sort()).toEqual([701, 702, 703]);
     expect(pending[0].claims.every((claim) => claim.items.length > 0)).toBe(true);
+    expect(
+      [...inst.vault!.entrantSnapshots!.values()].every((entrant) => !entrant.guestCapped),
+    ).toBe(true);
     const chest = sim.entities.get(inst.vault!.chest!.entityId)!;
     expect(chest.lootable).toBe(false);
     expect(confirmHoardRewardChest(sim.ctx, '701:1')).toBe(true);

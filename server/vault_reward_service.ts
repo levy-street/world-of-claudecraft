@@ -3,7 +3,6 @@
 import type { Pool, PoolClient } from 'pg';
 import { HOARD_REWARD_LETTER } from '../src/sim/content/letters';
 import { ITEMS } from '../src/sim/data';
-import { applyDurableVaultGuestPayouts } from '../src/sim/rift/hoard_guest_cap';
 import {
   confirmHoardRewardChest,
   confirmHoardRewardClaim,
@@ -256,24 +255,6 @@ export class VaultRewardService {
     this.committing.add(attemptId);
     try {
       await this.host.withPermit(() => this.db.commitVaultOutcome(input));
-      // A mailed reward consumes the guest allowance at clear, even when nobody
-      // opens the chest. Keep online cap checks in step before opening it.
-      for (const claim of input.claims) {
-        if (claim.characterId === input.ownerCharacterId || !claim.guestCycle) continue;
-        const pid = this.host.characterPid(claim.characterId);
-        const meta = pid === null ? undefined : this.host.sim.meta(pid);
-        if (
-          !meta ||
-          meta.characterId !== claim.characterId ||
-          meta.worldQuestCycle !== claim.guestCycle
-        )
-          continue;
-        const used = await this.host.withPermit(() =>
-          this.db.guestPayoutsForCycle(claim.characterId, claim.guestCycle as string),
-        );
-        if (this.host.characterPid(claim.characterId) === pid)
-          applyDurableVaultGuestPayouts(meta, claim.guestCycle, used);
-      }
       this.pending.delete(attemptId);
       this.outcomeRetryAt.delete(attemptId);
       confirmHoardRewardChest(this.host.sim.ctx, attemptId);

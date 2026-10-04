@@ -11,8 +11,8 @@
 //   - a read map can be redrawn one rarity finer with Cartographer's Ink, which
 //     the faction quartermasters sell for their currency.
 //
-// State lives on PlayerMeta (treasureMap, vaultGuestCycle, vaultGuestPayouts)
-// behind the world-quest save. Every roll draws from ctx.rng in a fixed order.
+// State lives on PlayerMeta (treasureMap) behind the world-quest save.
+// Legacy guest counters remain readable. Every roll draws from ctx.rng in a fixed order.
 
 import {
   CARTOGRAPHERS_INK_ITEM_ID,
@@ -29,7 +29,6 @@ import {
   TREASURE_SITES_BY_ID,
   type TreasureMapProgress,
   type TreasureMapRarity,
-  VAULT_GUEST_PAYOUTS_PER_CYCLE,
   vaultDamageFactor,
   vaultHealthFactor,
 } from './content/treasure_maps';
@@ -394,8 +393,7 @@ export function vaultScaledTuning(
 }
 
 /** The boss fell: pay every entrant the rarity's table, the gear off the fallen
- *  boss's own loot (`bossTemplateId`, content/hoard_loot.ts). A guest past the
- *  per-cycle cap is told so and paid nothing; the owner is never capped. */
+ *  boss's own loot (`bossTemplateId`, content/hoard_loot.ts). */
 export function payTreasureVault(
   ctx: SimContext,
   vault: NonNullable<RiftInstance['vault']>,
@@ -415,13 +413,10 @@ export function payTreasureVault(
       cls: meta.cls,
       level: player.level,
       owner,
-      guestCapped:
-        !owner &&
-        meta.vaultGuestCycle === meta.worldQuestCycle &&
-        (meta.vaultGuestPayouts ?? 0) >= VAULT_GUEST_PAYOUTS_PER_CYCLE,
+      guestCapped: false,
       mountOwned: mountOwned(meta, VAULT_MOUNT_KEY),
     });
-    grantHoardReward(ctx, pid, vault.rarity, reward, owner);
+    grantHoardReward(ctx, pid, vault.rarity, reward);
   }
 }
 

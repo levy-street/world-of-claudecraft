@@ -68,8 +68,8 @@ export interface WorldQuestPlayerState {
   clueCasketsOpened: number;
   /**
    * Treasure maps (src/sim/treasure_vault.ts): the map read and not yet dug up
-   * (null when none), and the guest vault payouts taken in `vaultGuestCycle`
-   * (the owner's own vaults never count). Cycle-independent like the hunt.
+   * (null when none). Legacy guest payout counters remain in saves for
+   * compatibility with older versions; they no longer restrict rewards.
    */
   treasureMap: TreasureMapProgress | null;
   vaultAttempt: VaultAttempt | null;

@@ -463,7 +463,6 @@ import {
   assetsListMineCore,
   assetUploadCore,
 } from './user_assets_routes';
-import { createVaultRewardsDb } from './vault_rewards_db';
 import {
   configureWalletRuntime,
   handleDesktopWalletHandoffClaim,
@@ -3800,7 +3799,6 @@ export async function startServer(): Promise<http.Server> {
   // command; without this the ws default (~100 MiB) lets one socket force a
   // huge allocation + parse before any field-level validation runs
   const wss = new WebSocketServer({ noServer: true, maxPayload: WS_MAX_PAYLOAD_BYTES });
-  const vaultRewardsDb = createVaultRewardsDb(pool, REALM);
   const wsAuth = createWsAuth({
     game,
     accountAndScopeForToken,
@@ -3821,7 +3819,6 @@ export async function startServer(): Promise<http.Server> {
     acquireCharacterLease,
     releaseCharacterLease,
     bankBonusForAccount: async (id) => computeBankBonus(await bankBonusFactsForAccount(id)),
-    guestPayoutsForCycle: (id, cycle) => vaultRewardsDb.guestPayoutsForCycle(id, cycle),
   });
   wsAuth.attachUpgrade(server, wss);
 

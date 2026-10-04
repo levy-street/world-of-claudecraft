@@ -135,13 +135,7 @@ describe('direct vault reward character snapshot', () => {
     };
     addVaultRewardToCharacterState(projected, claim);
     expect(
-      grantHoardReward(
-        sim.ctx,
-        pid,
-        'rare',
-        { items: claim.items, copper: 1, capped: false },
-        true,
-      ),
+      grantHoardReward(sim.ctx, pid, 'rare', { items: claim.items, copper: 1, capped: false }),
     ).toBe(true);
     const live = sim.serializeCharacter(pid);
     expect(projected.deedStats).toEqual(live?.deedStats);

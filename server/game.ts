@@ -3219,7 +3219,6 @@ export class GameServer {
         generalChatRateLimit?: GeneralChatRateLimit | null;
         // Fresh-login bank entitlement; absent for resumes and bare test joins.
         bankBonus?: { bonusSlots: number; sources: BankBonusSource[] };
-        vaultGuestUsage?: { cycle: string; payouts: number };
         // Stored layout is untrusted and revalidated before reaching the client.
         hotbarLayout?: unknown;
         // Authored appearance rides the entity identity wire.
@@ -3261,7 +3260,6 @@ export class GameServer {
       tutorialGreetingSent: state === null,
     });
     const player = this.sim.entities.get(pid);
-    this.vault.applyGuestUsage(pid, meta.vaultGuestUsage);
     if (player) {
       player.petSpecialCommandsSupported = meta.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION;
     }

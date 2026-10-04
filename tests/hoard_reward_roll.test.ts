@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { HOARD_LOOT_CLASS_BIAS } from '../src/sim/content/hoard_loot';
-import { VAULT_PAYOUTS } from '../src/sim/content/treasure_maps';
+import { VAULT_GUEST_GEAR_CHANCE, VAULT_PAYOUTS } from '../src/sim/content/treasure_maps';
 import { rollHoardReward } from '../src/sim/rift/hoard_reward_roll';
 import { Rng } from '../src/sim/rng';
 
@@ -86,19 +86,26 @@ describe('rollHoardReward', () => {
     ]);
   });
 
-  it('returns a capped guest with no payout and no random draws', () => {
-    const script = scriptedRng([], []);
-    expect(
-      rollHoardReward(script.rng, {
-        rarity: 'legendary',
-        cls: 'druid',
-        level: 20,
-        owner: false,
-        guestCapped: true,
-        mountOwned: false,
-      }),
-    ).toEqual({ capped: true, copper: 0, items: [] });
-    expect(script.calls).toEqual([]);
+  it('pays a guest with old capped state', () => {
+    const script = scriptedRng([0], [false, false, false, false]);
+    const reward = rollHoardReward(script.rng, {
+      rarity: 'legendary',
+      cls: 'druid',
+      level: 20,
+      owner: false,
+      guestCapped: true,
+      mountOwned: false,
+    });
+    expect(reward.capped).toBe(false);
+    expect(reward.copper).toBeGreaterThan(0);
+    expect(reward.items.length).toBeGreaterThan(0);
+    expect(script.calls).toEqual([
+      ['int', 0, 2],
+      ['chance', VAULT_GUEST_GEAR_CHANCE.legendary],
+      ['chance', VAULT_PAYOUTS.legendary.markChance],
+      ['chance', VAULT_PAYOUTS.legendary.mountChance],
+      ['chance', VAULT_PAYOUTS.legendary.nextMapChance],
+    ]);
   });
 
   it('draws the mount chance even when already owned', () => {

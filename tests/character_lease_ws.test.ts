@@ -103,7 +103,6 @@ function makeDeps(opts: { joinResult?: any; hasSession?: boolean; acquireResult?
     acquireCharacterLease: acquireSpy,
     releaseCharacterLease: releaseSpy,
     bankBonusForAccount: bankBonusSpy,
-    guestPayoutsForCycle: vi.fn(async () => 0),
     characterCountForAccount: vi.fn(async () => 1),
   };
   return {
@@ -226,19 +225,6 @@ describe('ws auth character load lease', () => {
     const nonce = acquireSpy.mock.calls[0][2];
     expect(releaseSpy).toHaveBeenCalledTimes(1);
     expect(releaseSpy).toHaveBeenCalledWith(character.id, nonce);
-    expect(joinSpy).not.toHaveBeenCalled();
-  });
-
-  it('releases the acquired lease when guest-usage hydration rejects', async () => {
-    const { deps, character, joinSpy, acquireSpy, releaseSpy } = makeDeps();
-    deps.guestPayoutsForCycle = vi.fn(async () => {
-      throw new Error('guest ledger unavailable');
-    });
-    const { ws } = fakeWs();
-    await expect(
-      createWsAuth(deps).authenticateWebSocket(ws, authFrame(7), fakeReq()),
-    ).rejects.toThrow('guest ledger unavailable');
-    expect(releaseSpy).toHaveBeenCalledWith(character.id, acquireSpy.mock.calls[0][2]);
     expect(joinSpy).not.toHaveBeenCalled();
   });
 

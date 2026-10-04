@@ -91,15 +91,14 @@ describeDb('vault reward ledger (REAL Postgres)', () => {
     ],
   };
 
-  it('reads the capped paid-cycle usage before and after a mail-backed claim', async () => {
+  it('keeps paying guests after the third claim despite legacy saved usage', async () => {
     const db = createVaultRewardsDb(pool, 'GuestUsageRealm');
-    expect(await db.guestPayoutsForCycle(801, 'wq1_10')).toBe(0);
     await pool.query(`INSERT INTO characters (id, realm, state) VALUES ($1, $2, $3::jsonb)`, [
       801,
       'GuestUsageRealm',
       JSON.stringify({ worldQuests: { vaultGuestCycle: 'wq1_10', vaultGuestPayouts: 1 } }),
     ]);
-    for (let n = 1; n <= 3; n++) {
+    for (let n = 1; n <= 4; n++) {
       await db.commitVaultOutcome({
         attemptId: `801:usage:${n}`,
         ownerCharacterId: 800,
@@ -115,10 +114,8 @@ describeDb('vault reward ledger (REAL Postgres)', () => {
           },
         ],
       });
-      expect(await db.guestPayoutsForCycle(801, 'wq1_10')).toBe(Math.min(3, n + 1));
+      expect((await db.loadVaultOutcome(`801:usage:${n}`))?.claims[1].copper).toBe(1);
     }
-    expect((await db.loadVaultOutcome('801:usage:3'))?.claims[1].copper).toBe(0);
-    expect(await db.guestPayoutsForCycle(801, 'wq1_11')).toBe(0);
   });
 
   it('atomically records every participant, preserves the first payload, and pages due claims', async () => {
@@ -451,9 +448,9 @@ describeDb('vault reward ledger (REAL Postgres)', () => {
     ).toBe(true);
   });
 
-  it('reserves at most three guest payouts per cycle at clear, even before any chest or mail claim', async () => {
+  it('pays every guest claim at clear, including concurrent fourth and fifth clears', async () => {
     const db = createVaultRewardsDb(pool, 'VaultRealm');
-    for (let sequence = 10; sequence < 14; sequence++) {
+    for (let sequence = 10; sequence < 13; sequence++) {
       const attemptId = `72:${sequence}`;
       const input: VaultOutcomeInput = {
         attemptId,
@@ -468,12 +465,27 @@ describeDb('vault reward ledger (REAL Postgres)', () => {
       const guest = (await db.loadVaultOutcome(attemptId))?.claims.find(
         (claim) => claim.characterId === 74,
       );
-      expect(guest?.copper).toBe(sequence === 13 ? 0 : 80);
-      expect(guest?.items).toEqual(sequence === 13 ? [] : [{ itemId: 'treasure_map_b', count: 1 }]);
+      expect(guest?.copper).toBe(80);
+      expect(guest?.items).toEqual([{ itemId: 'treasure_map_b', count: 1 }]);
+    }
+    const later = [13, 14].map((sequence) => ({
+      attemptId: `72:${sequence}`,
+      ownerCharacterId: 72,
+      claims: [outcome.claims[0], { ...outcome.claims[1], characterId: 74, guestCycle: 'cycle-1' }],
+    }));
+    expect(await Promise.all(later.map((input) => db.commitVaultOutcome(input)))).toEqual([
+      'created',
+      'created',
+    ]);
+    for (const input of later) {
+      const guest = (await db.loadVaultOutcome(input.attemptId))?.claims[1];
+      expect(guest?.copper).toBe(80);
+      expect(guest?.items).toEqual([{ itemId: 'treasure_map_b', count: 1 }]);
+      expect(await db.commitVaultOutcome(input)).toBe('already_committed');
     }
   });
 
-  it('honors guest payouts already saved before the new ledger was deployed', async () => {
+  it('ignores guest payouts already saved before the limit was removed', async () => {
     await pool.query(`INSERT INTO characters (id, realm, state) VALUES ($1, $2, $3::jsonb)`, [
       76,
       'VaultRealm',
@@ -493,16 +505,16 @@ describeDb('vault reward ledger (REAL Postgres)', () => {
       const guest = (await db.loadVaultOutcome(attemptId))?.claims.find(
         (claim) => claim.characterId === 76,
       );
-      expect(guest?.copper).toBe(sequence === 30 ? 80 : 0);
+      expect(guest?.copper).toBe(80);
     }
   });
 
-  it('sanitizes malformed and out-of-range legacy guest counters before reserving a clear', async () => {
+  it('ignores malformed and out-of-range legacy guest counters', async () => {
     const db = createVaultRewardsDb(pool, 'VaultRealm');
-    for (const [id, raw, paid] of [
-      [90, 'oops', true],
-      [91, -1, true],
-      [92, 9999999999999, false],
+    for (const [id, raw] of [
+      [90, 'oops'],
+      [91, -1],
+      [92, 9999999999999],
     ] as const) {
       await pool.query('INSERT INTO characters (id, realm, state) VALUES ($1, $2, $3::jsonb)', [
         id,
@@ -520,7 +532,7 @@ describeDb('vault reward ledger (REAL Postgres)', () => {
       const guest = (await db.loadVaultOutcome(attemptId))?.claims.find(
         (claim) => claim.characterId === id,
       );
-      expect(guest?.copper).toBe(paid ? 80 : 0);
+      expect(guest?.copper).toBe(80);
     }
   });
 

@@ -62,9 +62,6 @@ export const HOARD_MIN_LEVEL = 16;
 export const TREASURE_DIG_RADIUS = 12;
 /** Maximum vault lifetime from digging (seconds), regardless of occupancy. */
 export const VAULT_PORTAL_LIFETIME = 6 * 60 * 60;
-/** Vaults a character may be paid for as a GUEST (not the map's owner) per
- *  world-quest cycle. The owner's own maps are never capped. */
-export const VAULT_GUEST_PAYOUTS_PER_CYCLE = 3;
 /** Copper bonus the map's owner earns on top of the shared payout. */
 export const VAULT_OWNER_COPPER_BONUS = 0.5;
 

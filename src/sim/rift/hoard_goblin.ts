@@ -15,12 +15,7 @@
 // player in the room, in room order, paid or not. Movement reads no rng.
 
 import { CASKET_MATERIAL_POOL, treasureCasketCopper } from '../clue_casket';
-import {
-  type TreasureMapRarity,
-  VAULT_GUEST_PAYOUTS_PER_CYCLE,
-  VAULT_PAYOUTS,
-  vaultHealthFactor,
-} from '../content/treasure_maps';
+import { type TreasureMapRarity, VAULT_PAYOUTS, vaultHealthFactor } from '../content/treasure_maps';
 import { MOBS, RIFT_REGION_HALF_X, RIFT_REGION_HALF_Z, riftInstanceOrigin } from '../data';
 import { createMob } from '../entity';
 import { formatMoney } from '../format_money';
@@ -232,7 +227,7 @@ function payHoardGoblin(ctx: SimContext, inst: RiftInstance, mob: Entity): void 
     // on the outcome of either.
     const found = ctx.rng.chance(HOARD_GOBLIN_MATERIAL_CHANCE);
     const material = CASKET_MATERIAL_POOL[ctx.rng.int(0, CASKET_MATERIAL_POOL.length - 1)];
-    if (!meta || meta.leaving || guestCapped(meta, player.id, vault.ownerPid)) continue;
+    if (!meta || meta.leaving) continue;
     const copper = hoardGoblinCopper(player.level, vault.rarity);
     meta.copper += copper;
     meta.counters.lootCopper += copper;
@@ -258,15 +253,6 @@ function escapeHoardGoblin(ctx: SimContext, inst: RiftInstance, mob: Entity): vo
     });
   }
   removeGoblin(ctx, state.id);
-}
-
-/** A guest who has used up this cycle's hoard payouts (treasure_vault.ts
- *  payTreasureVault) takes nothing off the goblin either, so it is never a way
- *  round the cap. Reads the cap; spending it stays the chest's job. */
-function guestCapped(meta: PlayerMeta, pid: number, ownerPid: number): boolean {
-  if (pid === ownerPid) return false;
-  if (meta.vaultGuestCycle !== meta.worldQuestCycle) return false;
-  return (meta.vaultGuestPayouts ?? 0) >= VAULT_GUEST_PAYOUTS_PER_CYCLE;
 }
 
 function removeGoblin(ctx: SimContext, id: number): void {

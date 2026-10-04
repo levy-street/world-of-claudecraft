@@ -5,7 +5,6 @@
 // keeps one-line call sites (tests/monolith_budget.test.ts pins server/game.ts).
 // No game rules live here; every rule stays in the modules this composes.
 
-import { applyDurableVaultGuestPayouts } from '../src/sim/rift/hoard_guest_cap';
 import type { MailSave, Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
 import type { ClientSession } from './game';
@@ -97,12 +96,6 @@ export class VaultGameServices {
   /** A fresh join is refused while this character's vault mail is still recovering. */
   joinError(characterId: number): string | null {
     return this.recovery.joinError(characterId);
-  }
-
-  /** Re-applies the durable per-cycle guest payout count loaded at join. */
-  applyGuestUsage(pid: number, usage: { cycle: string; payouts: number } | undefined): void {
-    const meta = this.host.sim().meta(pid);
-    if (usage && meta) applyDurableVaultGuestPayouts(meta, usage.cycle, usage.payouts, usage.cycle);
   }
 
   /** A registered session: heal an orphaned vault-mail take, reconcile a live attempt. */

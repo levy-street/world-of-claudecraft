@@ -61,15 +61,11 @@ class RewardHost {
         const claim = outcome?.claims.find((c) => c.characterId === event.characterId);
         const inst = this.sim.riftInstances.find((i) => i.vault?.attemptId === event.attemptId);
         if (!outcome || !claim || !inst?.vault) throw new Error('claim without an outcome');
-        const granted = grantHoardReward(
-          this.sim.ctx,
-          event.pid,
-          inst.vault.rarity,
-          { items: claim.items, copper: claim.copper, capped: claim.items.length === 0 },
-          outcome.ownerCharacterId === event.characterId,
-          claim.guestCycle,
-          true,
-        );
+        const granted = grantHoardReward(this.sim.ctx, event.pid, inst.vault.rarity, {
+          items: claim.items,
+          copper: claim.copper,
+          capped: claim.items.length === 0 && claim.copper === 0,
+        });
         expect(granted).toBe(true);
         this.grants.set(event.characterId, (this.grants.get(event.characterId) ?? 0) + 1);
         confirmHoardRewardClaim(this.sim.ctx, event.attemptId, event.pid);

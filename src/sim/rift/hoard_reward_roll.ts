@@ -35,15 +35,11 @@ export interface HoardReward {
   readonly capped: boolean;
 }
 
-/** Preserve the old draw order even for already-owned mounts and top-tier maps.
- * A capped guest takes no draws; the owner is exempt from that cap. */
+/** Preserve the old draw order even for already-owned mounts and top-tier maps. */
 export function rollHoardReward(
   rng: Pick<Rng, 'int' | 'chance'>,
   input: HoardRewardInput,
 ): HoardReward {
-  if (!input.owner && input.guestCapped)
-    return Object.freeze({ items: Object.freeze([]), copper: 0, capped: true });
-
   const def = VAULT_PAYOUTS[input.rarity];
   const items: Array<{ itemId: string; count: number }> = [];
   const material = CASKET_MATERIAL_POOL[rng.int(0, CASKET_MATERIAL_POOL.length - 1)];

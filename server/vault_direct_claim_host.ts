@@ -118,15 +118,7 @@ export function claimVaultRewardForSession(
         if (
           !acknowledged ||
           !inst?.vault ||
-          !grantHoardReward(
-            host.sim.ctx,
-            session.pid,
-            inst.vault.rarity,
-            reward,
-            owner,
-            claim.guestCycle,
-            true,
-          )
+          !grantHoardReward(host.sim.ctx, session.pid, inst.vault.rarity, reward)
         ) {
           host.quarantine(session.pid, claim.characterId, 'ambiguous', 'vault reward projection');
           throw new Error('vault reward committed but live projection unavailable');
