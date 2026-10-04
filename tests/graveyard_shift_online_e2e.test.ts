@@ -121,9 +121,9 @@ describe('the Graveyard Shift on the server, end to end', () => {
     for (const bot of run.bots) lethal(bot.pid);
     advance(server);
     expect(run.outro?.kind).toBe('won');
-    // The deed and the pay land with the win, in the Crypt.
+    // The deed lands with the win, in the Crypt; the pay waits for Tibbs.
     expect(meta.deedsEarned.has(BOSS_FOR_A_DAY_DEED_ID)).toBe(true);
-    expect(meta.copper - copperBefore).toBe(2000);
+    expect(meta.copper).toBe(copperBefore);
 
     // Through the Staff Exit: back at the grave, his report in A's dialog.
     const exit = sim.entities.get(run.outro!.portalId!)!;
@@ -135,6 +135,8 @@ describe('the Graveyard Shift on the server, end to end', () => {
     expect(hasMorthenIdentity(back)).toBe(false);
     expect(Math.hypot(back.pos.x - spot.x, back.pos.z - spot.z)).toBeLessThan(0.5);
     expect(sentText(fcA)).toContain('"report":{"outcome":"won"');
+    // Tibbs pays with his report.
+    expect(meta.copper - copperBefore).toBe(2000);
     // The shift won, the grave leaves A's view too.
     for (let i = 0; i < 3; i++) advance(server);
     const latest = fcA.sent.filter((m: any) => m.t === 'snap').at(-1);

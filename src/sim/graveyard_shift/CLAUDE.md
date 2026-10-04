@@ -39,9 +39,10 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
   shift (`run.entry`) ends back in front of the grave: Tibbs rises and a
   `graveyardShiftOffer` event carrying his report opens his NPC dialog (no say
   bubbles): on a win the counts and `GRAVEYARD_SHIFT_PAYOUT_COPPER` (20 silver,
-  paid WITH the deed at the win, `payBossForADay`, so one save carries both and
-  neither a crash nor an early logout loses it), on a loss his consolation and
-  a fresh offer; an aborted one says nothing. A `/dev` shift
+  paid by Tibbs as he gives his report at the grave, owner decision; a leaver of
+  a won shift is paid without the scene), on a loss his consolation and a fresh
+  offer; an aborted one says nothing. The deed alone lands at the win
+  (`grantBossForADay`). A `/dev` shift
   pays nothing and grants no deed.
 - **Leaving closes the run first.** `graveyardShiftResolveLeave` ends the run
   synchronously (a won scene keeps its win, anything else aborts; no Tibbs for a

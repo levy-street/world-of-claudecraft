@@ -375,28 +375,31 @@ describe('Tibbs', () => {
 });
 
 describe('the end of a grave shift', () => {
-  it('the deed and the pay land the moment the fight is won, still in the Crypt', () => {
-    expect(GRAVEYARD_SHIFT_PAYOUT_COPPER).toBe(2000);
+  it('the deed lands the moment the fight is won, the pay waits for Tibbs', () => {
     const sim = graveSim();
     takeShift(sim);
     const meta = meta0(sim);
     const copperBefore = meta.copper;
     expect(meta.deedsEarned.has(BOSS_FOR_A_DAY_DEED_ID)).toBe(false);
-    const { won } = winShift(sim);
+    const run = graveyardShiftRunFor(sim.ctx, sim.playerId)!;
+    for (const b of run.bots) lethal(sim, sim.entities.get(b.pid)!);
+    ticks(sim, CORPSE_RETURN_TICKS + 1);
+    for (const b of run.bots) lethal(sim, sim.entities.get(b.pid)!);
+    const won = sim.tick();
+    expect(run.outro?.kind).toBe('won');
     const unlock = won.find((ev) => ev.type === 'deedUnlocked') as
       | Extract<SimEvent, { type: 'deedUnlocked' }>
       | undefined;
     expect(unlock?.deedId).toBe('hid_boss_for_a_day');
     expect(meta.deedsEarned.has(BOSS_FOR_A_DAY_DEED_ID)).toBe(true);
-    expect(
-      won.some(
-        (ev) => ev.type === 'loot' && ev.pid === sim.playerId && ev.text === 'You receive 20s.',
-      ),
-    ).toBe(true);
-    expect(meta.copper - copperBefore).toBe(2000);
+    // Still in the Crypt, the Staff Exit open: not paid yet, Tibbs pays at the grave.
+    ticks(sim, 20 * 5);
+    expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).not.toBeNull();
+    expect(meta.copper).toBe(copperBefore);
   });
 
-  it('a win sets the owner down at the grave and opens his report with the pay', () => {
+  it('a win sets the owner down at the grave, where Tibbs pays 20 silver with his report', () => {
+    expect(GRAVEYARD_SHIFT_PAYOUT_COPPER).toBe(2000);
     const sim = graveSim();
     takeShift(sim);
     const meta = meta0(sim);
@@ -404,9 +407,13 @@ describe('the end of a grave shift', () => {
     const { events, saved } = winShift(sim);
     expect(atGrave(sim)).toBe(true);
     expect(hasTibbs(sim)).toBe(true);
-    // Paid once, at the win: the walk out pays nothing more.
+    // Paid once, in Tibbs' scene.
     expect(meta.copper - copperBefore).toBe(2000);
-    expect(events.some((ev) => ev.type === 'loot')).toBe(false);
+    expect(
+      events.filter(
+        (ev) => ev.type === 'loot' && ev.pid === sim.playerId && ev.text === 'You receive 20s.',
+      ),
+    ).toHaveLength(1);
     // His report opens in the NPC dialog, never as bubbles. Five adventurers,
     // each killed twice.
     const offer = offerOf(events);

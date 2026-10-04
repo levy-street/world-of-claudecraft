@@ -219,10 +219,16 @@ export function endShiftAtGrave(
   p.facing = Math.atan2(GRAVE_POS.x - spot.x, GRAVE_POS.z - spot.z);
   p.prevFacing = p.facing;
   settleTeleportArrival(p);
-  // A leaver (logout, a dropped connection, jail) gets no Tibbs: nobody to talk to.
-  if (outcome === 'aborted' || leaving) return;
-  // The pay went out with the deed at the win; his report shows it.
+  // Tibbs pays as he gives his report (owner decision): back at the grave, never
+  // in the Crypt. A leaver of a won shift (logout, a dropped connection, jail) is
+  // paid all the same, just without the scene.
   const copper = outcome === 'won' ? GRAVEYARD_SHIFT_PAYOUT_COPPER : 0;
+  if (copper > 0) {
+    meta.copper += copper;
+    ctx.emit({ type: 'loot', text: `You receive ${formatMoney(copper)}.`, pid: p.id });
+  }
+  // A leaver gets no Tibbs: nobody to talk to.
+  if (outcome === 'aborted' || leaving) return;
   const tibbs = raiseTibbs(ctx, p);
   if (!tibbs) return;
   ctx.emit({
@@ -233,17 +239,9 @@ export function endShiftAtGrave(
   });
 }
 
-/** The deed and Tibbs' pay for a won grave shift, the moment the fight is won:
- *  the deed's banner and sound mark the end, and one save carries both, so a
- *  crash or a logout before the walk back loses neither. */
-export function payBossForADay(ctx: SimContext, run: GraveyardShiftRun): void {
+/** The deed for a won grave shift, the moment the fight is won: its banner and
+ *  sound mark the end of the fight (Tibbs pays later, at the grave). */
+export function grantBossForADay(ctx: SimContext, run: GraveyardShiftRun): void {
   const meta = ctx.players.get(run.ownerPid);
-  if (run.entry !== 'grave' || !meta) return;
-  meta.copper += GRAVEYARD_SHIFT_PAYOUT_COPPER;
-  ctx.emit({
-    type: 'loot',
-    text: `You receive ${formatMoney(GRAVEYARD_SHIFT_PAYOUT_COPPER)}.`,
-    pid: run.ownerPid,
-  });
-  grantDeed(ctx, meta, BOSS_FOR_A_DAY_DEED_ID);
+  if (run.entry === 'grave' && meta) grantDeed(ctx, meta, BOSS_FOR_A_DAY_DEED_ID);
 }
