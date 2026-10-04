@@ -43,7 +43,7 @@ class RecordingContext {
   }
 }
 
-function worldIn(dungeonId: string): IWorld {
+function worldIn(dungeonId: string, difficulty: 'normal' | 'heroic' = 'normal'): IWorld {
   const origin = instanceOrigin(DUNGEONS[dungeonId].index, 0);
   const player = {
     id: 1,
@@ -59,6 +59,7 @@ function worldIn(dungeonId: string): IWorld {
     partyInfo: null,
     riftFloor: null,
     delveRun: null,
+    dungeonDifficulty: () => difficulty,
   } as unknown as IWorld;
 }
 
@@ -85,7 +86,7 @@ describe('DungeonMapPainter', () => {
   afterEach(() => vi.unstubAllGlobals());
 
   it.each(['hollow_crypt', IGNIVAR_MOLTEN_ASSEMBLY_ID])(
-    'paints %s on the minimap and M-map with its localized title',
+    'paints %s on the minimap and M-map with its localized title and difficulty',
     (dungeonId) => {
       const painter = new DungeonMapPainter(
         { setText } as unknown as PainterHostWriters,
@@ -95,24 +96,49 @@ describe('DungeonMapPainter', () => {
       const label = {} as HTMLElement;
       painter.paintMinimap(
         minimap as unknown as CanvasRenderingContext2D,
-        worldIn(dungeonId),
+        worldIn(dungeonId, 'normal'),
         label,
         162,
         1,
       );
-      expect(setText).toHaveBeenCalledWith(label, dungeonDisplayName(dungeonId));
+      expect(setText).toHaveBeenCalledWith(label, `${dungeonDisplayName(dungeonId)} (Normal)`);
       expect(minimap.draws).toBe(1);
 
       const map = new RecordingContext();
       const result = painter.paintWorldMap(
         map as unknown as CanvasRenderingContext2D,
-        worldIn(dungeonId),
+        worldIn(dungeonId, 'normal'),
         560,
       );
-      expect(result?.title).toBe(dungeonDisplayName(dungeonId));
+      expect(result?.title).toBe(`${dungeonDisplayName(dungeonId)} (Normal)`);
       expect(map.draws).toBe(1);
       expect(map.texts).toEqual([result?.title, result?.title]);
       expect(createdContexts.length).toBeGreaterThan(0);
     },
   );
+
+  it('formats Heroic difficulty suffix on minimap and M-map', () => {
+    const painter = new DungeonMapPainter(
+      { setText } as unknown as PainterHostWriters,
+      (cls) => `class:${cls}`,
+    );
+    const minimap = new RecordingContext();
+    const label = {} as HTMLElement;
+    painter.paintMinimap(
+      minimap as unknown as CanvasRenderingContext2D,
+      worldIn('hollow_crypt', 'heroic'),
+      label,
+      162,
+      1,
+    );
+    expect(setText).toHaveBeenCalledWith(label, `${dungeonDisplayName('hollow_crypt')} (Heroic)`);
+
+    const map = new RecordingContext();
+    const result = painter.paintWorldMap(
+      map as unknown as CanvasRenderingContext2D,
+      worldIn('hollow_crypt', 'heroic'),
+      560,
+    );
+    expect(result?.title).toBe(`${dungeonDisplayName('hollow_crypt')} (Heroic)`);
+  });
 });

@@ -4001,6 +4001,18 @@
     width: 24px;
     height: 24px;
   }
+  body.mobile-touch #instance-difficulty {
+    left: 2px;
+    top: 26px;
+    width: var(--rim-satellite-size);
+    height: var(--rim-satellite-size);
+    border-width: 2px;
+    transform: scale(var(--rim-satellite-scale));
+  }
+  body.mobile-touch #instance-difficulty svg {
+    width: 24px;
+    height: 24px;
+  }
   body.mobile-touch #mail-indicator {
     right: var(--rim-satellite-inset);
     bottom: var(--rim-satellite-inset);

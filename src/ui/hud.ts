@@ -272,6 +272,7 @@ import { markDialogRoot } from './dialog_root';
 import { dropdownKeyNav } from './dropdown_nav';
 import { DungeonFinderProposalPopup } from './dungeon_finder_proposal_popup';
 import { DungeonFinderWindow } from './dungeon_finder_window';
+import { dungeonMapLocal } from './dungeon_map_view';
 import { emoteIconUrl } from './emote_icons';
 import { crossHotbarActionSlot, EmpowerHold } from './empower_hold_core';
 import {
@@ -1681,6 +1682,10 @@ export class Hud {
   private readonly dayNightDial = new DayNightDialPainter();
   private raidLockoutEl: HTMLElement | null = null;
   private raidLockoutLocked = false;
+  private instanceDifficultyEl: HTMLButtonElement | null = null;
+  private lastInstanceDifficulty: string | null = null;
+  private lastInstanceDungeonId: string | null = null;
+  private lastInstanceActive = false;
   private clock24 = false; // 24-hour vs 12-hour AM/PM display
   private lastClockText = ''; // avoid redundant DOM writes each frame
   private lastCoordsText = ''; // cache so we only touch the DOM when coords change
@@ -2818,6 +2823,18 @@ export class Hud {
         ev.preventDefault();
         ev.stopPropagation();
         this.showRaidLockoutTooltip();
+      });
+    }
+    this.instanceDifficultyEl = document.getElementById(
+      'instance-difficulty',
+    ) as HTMLButtonElement | null;
+    if (this.instanceDifficultyEl) {
+      this.attachTooltip(this.instanceDifficultyEl, () => this.instanceDifficultyTooltipHtml());
+      this.instanceDifficultyEl.addEventListener('click', (ev) => {
+        if (!document.body.classList.contains('mobile-touch')) return;
+        ev.preventDefault();
+        ev.stopPropagation();
+        this.showInstanceDifficultyTooltip();
       });
     }
     const dailyRewardsButton = document.getElementById(
@@ -8778,6 +8795,7 @@ export class Hud {
     this.tutorial.update(sim, this.renderer, this.keybinds);
     this.bootcamp.update(sim, this.renderer, this.keybinds, this.optionsHooks?.gamepad ?? null);
     if (slowHud) this.updateRaidLockoutBadge();
+    if (slowHud) this.updateInstanceDifficultyBadge();
     if (slowHud) this.dailyRewardsLauncher.refresh();
     this.maybeRestoreActionBarLayout();
     this.resolvePendingLoadoutBar();
@@ -9807,6 +9825,73 @@ export class Hud {
       duration: formatLockoutDuration,
     };
     return raidLockoutPanelHtml(this.sim.raidLockouts(), i18n);
+  }
+
+  private showInstanceDifficultyTooltip(): void {
+    const el = this.instanceDifficultyEl;
+    if (!el || el.hidden) return;
+    const rect = el.getBoundingClientRect();
+    this.paintTooltipAt(
+      this.instanceDifficultyTooltipHtml(),
+      rect.left,
+      rect.top + rect.height / 2,
+    );
+  }
+
+  private instanceDifficultyTooltipHtml(): string {
+    const local = dungeonMapLocal(this.sim.player.pos.x, this.sim.player.pos.z);
+    if (!local) return '';
+    const name = dungeonDisplayName(local.dungeonId);
+    const difficulty = this.sim.dungeonDifficulty?.() ?? 'normal';
+    const isRaid =
+      local.dungeonId.startsWith('ignivar_') || local.dungeonId.startsWith('nythraxis_');
+    const diffLabel =
+      difficulty === 'heroic' ? t('hudChrome.finder.heroic') : t('hudChrome.finder.normal');
+    const typeLabel = isRaid ? t('hudChrome.finder.kindRaid') : t('hudChrome.finder.kindDungeon');
+    return (
+      `<div class="tt-title ui-cin">${esc(name)}</div>` +
+      `<div><span class="df-badge ui-chip${difficulty === 'heroic' ? ' heroic' : ''}">${esc(diffLabel)}</span>` +
+      `<span class="df-kind">${esc(typeLabel)}</span></div>`
+    );
+  }
+
+  private updateInstanceDifficultyBadge(): void {
+    const el = this.instanceDifficultyEl;
+    if (!el) return;
+    const local = dungeonMapLocal(this.sim.player.pos.x, this.sim.player.pos.z);
+    const active = local !== null;
+    if (!active) {
+      if (this.lastInstanceActive) {
+        this.lastInstanceActive = false;
+        this.lastInstanceDifficulty = null;
+        this.lastInstanceDungeonId = null;
+        el.hidden = true;
+      }
+      return;
+    }
+    const difficulty = this.sim.dungeonDifficulty?.() ?? 'normal';
+    const dungeonId = local.dungeonId;
+    if (
+      this.lastInstanceActive &&
+      this.lastInstanceDifficulty === difficulty &&
+      this.lastInstanceDungeonId === dungeonId
+    ) {
+      return;
+    }
+    this.lastInstanceActive = true;
+    this.lastInstanceDifficulty = difficulty;
+    this.lastInstanceDungeonId = dungeonId;
+    el.hidden = false;
+
+    const isHeroic = difficulty === 'heroic';
+    el.classList.toggle('heroic', isHeroic);
+    el.classList.toggle('normal', !isHeroic);
+    el.innerHTML = svgIcon(isHeroic ? 'skull' : 'dfinder');
+    const diffLabel = isHeroic ? t('hudChrome.finder.heroic') : t('hudChrome.finder.normal');
+    const name = dungeonDisplayName(dungeonId);
+    const label = `${name} (${diffLabel})`;
+    el.title = label;
+    el.setAttribute('aria-label', label);
   }
 
   private updateQuestTracker(now: number): void {

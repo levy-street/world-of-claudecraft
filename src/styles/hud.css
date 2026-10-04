@@ -8534,6 +8534,67 @@
     border-color: var(--gold-dim);
     box-shadow: var(--glow-gold-soft), var(--edge-glint);
   }
+  /* instance-difficulty badge: satellite indicator on the minimap cluster
+     (top-left rim, classic WoW instance difficulty indicator placement). Visible
+     only while inside a dungeon or raid instance. Normal shows the dungeon
+     arch gate; Heroic lights up as a golden skull with gold border and glow. */
+  #instance-difficulty {
+    position: absolute;
+    left: 8px;
+    top: 35px;
+    z-index: 10;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    cursor: default;
+    color: var(--color-text-muted);
+    border-color: var(--color-control-border);
+    background: radial-gradient(
+      circle at 45% 35%,
+      var(--color-socket-hi, #2c2c3a) 0%,
+      #15131a 70%,
+      var(--color-ink-deep, #0b0b10) 100%
+    );
+    background-color: #121016;
+    box-shadow:
+      0 2px 6px rgba(0, 0, 0, 0.9),
+      var(--edge-glint);
+  }
+  #instance-difficulty[hidden] {
+    display: none;
+  }
+  #instance-difficulty svg {
+    width: 16px;
+    height: 16px;
+    display: block;
+  }
+  #instance-difficulty.heroic {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+    box-shadow:
+      var(--glow-gold-soft),
+      0 2px 6px rgba(0, 0, 0, 0.9),
+      var(--edge-glint);
+  }
+  #instance-difficulty.normal {
+    color: var(--color-text-light);
+    border-color: var(--color-control-border);
+    box-shadow:
+      0 2px 6px rgba(0, 0, 0, 0.9),
+      var(--edge-glint);
+  }
+  #instance-difficulty:hover,
+  #instance-difficulty:focus-visible {
+    border-color: var(--gold);
+  }
+  #instance-difficulty:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
   /* The store chest occupies a normal menu slot, including compact mode. */
   #daily-rewards-button {
     display: flex;
