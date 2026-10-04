@@ -1667,13 +1667,13 @@ export class Input {
     return this.attackMoveEnabled && this.keybinds.codesForAction('attackMove').includes(code);
   }
 
-  /** The held turn keys as a yaw direction (+1 left, -1 right), read even while movement
-   *  is suspended (a seat locks movement, not the view); 0 while a surface owns the keys. */
   /** The touch stick's sideways push as a turn (left +1, right -1); read by the seat only. */
   touchTurnAxis(): number {
     return Number(this.touchMove.strafeLeft) - Number(this.touchMove.strafeRight);
   }
 
+  /** The held turn keys as a yaw direction (+1 left, -1 right), read even while movement
+   *  is suspended (a seat locks movement, not the view); 0 while a surface owns the keys. */
   heldTurnAxis(): number {
     if (this.cb.canUseGameKeys && !this.cb.canUseGameKeys()) return 0;
     return Number(this.heldAction('turnLeft')) - Number(this.heldAction('turnRight'));

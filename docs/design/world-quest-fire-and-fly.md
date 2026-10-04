@@ -660,8 +660,8 @@ seed (`tests/turret_scenarios.test.ts`, `tests/fire_and_fly_missions.test.ts`).
   click or Escape disarms it with no charge spent. Gamepad: Y slams, LB arms or
   disarms, the pad's cancel disarms. A key or button of a weapon the scenario does
   not give does nothing and says nothing. Touch and mouse: a weapon socket beside
-  the tower rail (in the action ring's corner on touch) for each weapon the scenario gives (the row closes up around a
-  missing one) shows the charges, the Shockwave's rearm, and a gold pulse once three
+  the tower rail (in the action ring's corner on touch) for each weapon the scenario
+  gives (the row closes up around a missing one) shows the charges, the Shockwave's rearm, and a gold pulse once three
   strikes are due, two in Standing Watch where the Shockwave is learned: a monster
   winding up, or one whose walk ends in a strike within 1.5 s
   (`TURRET_SHOCK_NUDGE_LEAD_TICKS`), so the 0.8 s strike leaves the pulse the lead
