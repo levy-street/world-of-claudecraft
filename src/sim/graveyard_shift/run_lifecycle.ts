@@ -40,6 +40,7 @@ import {
   updateGraveyardShiftAllies,
 } from './run_allies';
 import { GRAVEYARD_SHIFT_ARRIVAL, graveyardShiftDoorDrop } from './run_layout';
+import { removeGraveyardShiftOpening, spawnGraveyardShiftOpening } from './run_opening';
 import { removeGraveyardShiftParty, spawnGraveyardShiftParty } from './run_party';
 import { claimGraveyardShiftSlot, releaseGraveyardShiftSlot } from './run_slot';
 import {
@@ -135,15 +136,18 @@ export function startGraveyardShift(
     seed: graveyardShiftRunSeed(ctx.cfg.seed, ctx.tickCount, pid),
     bots: [],
     allyIds: [],
+    packIds: [],
     corpseIds: [],
     raisedCorpseIds: new Set(),
     engaged: false,
+    noticed: false,
     pendingOutcome: null,
     outro: null,
   };
   ctx.graveyardShiftRuns.set(pid, run);
   spawnGraveyardShiftParty(ctx, run);
   spawnGraveyardShiftAllies(ctx, run, p);
+  spawnGraveyardShiftOpening(ctx, run, p);
   return null;
 }
 
@@ -176,6 +180,7 @@ export function endGraveyardShift(
   };
   removeGraveyardShiftParty(ctx, run);
   dismissGraveyardShiftAllies(ctx, run);
+  removeGraveyardShiftOpening(ctx, run);
   const p = ctx.entities.get(run.ownerPid);
   const meta = ctx.players.get(run.ownerPid);
   if (p && meta) {

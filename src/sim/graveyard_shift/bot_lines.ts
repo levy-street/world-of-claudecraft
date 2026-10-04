@@ -5,6 +5,7 @@
 import type { BotRole } from './bot_brain';
 
 export type BotSayTrigger =
+  | 'clearing'
   | 'notice'
   | 'death'
   | 'healerOom'
@@ -38,6 +39,12 @@ const line = (
 });
 
 export const BOT_LINES: Readonly<Record<BotSayTrigger, readonly BotLine[]>> = {
+  clearing: [
+    line('clearing', 'lastPull', 'ok last pull before the boss'),
+    line('clearing', 'spiders', 'can we NOT pull the spiders this time'),
+    line('clearing', 'boneQuest', "who still needs the bone quest, I'm at 6 of 10"),
+    line('clearing', 'howsMana', "healer how's mana", { notBy: 'healer' }),
+  ],
   notice: [
     line('notice', 'pulledEarly', 'boss pulled early??'),
     line('notice', 'whoPulled', 'WHO PULLED'),

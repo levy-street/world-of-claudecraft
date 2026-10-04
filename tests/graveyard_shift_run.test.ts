@@ -5,6 +5,8 @@ import { CRYPT_DOOR_POS, dungeonAt } from '../src/sim/data';
 import { graveyardShiftRunFor } from '../src/sim/graveyard_shift';
 import { Sim } from '../src/sim/sim';
 import { inertVaultConsumptionAdmission } from '../src/sim/sim_context';
+import type { Aura } from '../src/sim/types';
+import { clearGraveyardShiftOpening } from './helpers/graveyard_shift_opening';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function shiftSim(
@@ -32,7 +34,9 @@ function logs(sim: Sim, events = sim.events): string[] {
 
 function start(sim: Sim, pid = sim.playerId) {
   sim.chat('/dev graveyardshift start', pid);
-  return graveyardShiftRunFor(sim.ctx, pid);
+  const run = graveyardShiftRunFor(sim.ctx, pid);
+  if (run) clearGraveyardShiftOpening(sim, run);
+  return run;
 }
 
 function castAndFinish(sim: Sim, id: string) {
@@ -247,14 +251,55 @@ describe('Graveyard Shift run shell', () => {
     expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).toBe(run);
   });
 
+  // Starting and ending a run draws nothing from the shared stream. Once the
+  // fight runs, combat rolls draw from it like any fight (the opening's pack
+  // engages the party at once), so the long form holds everyone still.
   it.each([false, true])(
-    'a run never shifts the shared rng stream (full world: %s)',
+    'starting and ending a run draws nothing from the shared rng stream (full world: %s)',
     (fullWorld) => {
       const draws = (withRun: boolean) => {
         const sim = shiftSim({ fullWorld });
         let count = 0;
         sim.rng.setObserver(() => count++);
-        if (withRun) start(sim);
+        if (withRun) {
+          sim.chat('/dev graveyardshift start');
+          expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).not.toBeNull();
+          sim.chat('/dev graveyardshift end');
+        }
+        sim.tick();
+        sim.tick();
+        sim.rng.setObserver(null);
+        return { count, next: sim.rng.next() };
+      };
+      expect(draws(true)).toEqual(draws(false));
+    },
+  );
+
+  it.each([false, true])(
+    'a held run, opening and all, never shifts the shared rng stream (full world: %s)',
+    (fullWorld) => {
+      const hold = (sim: Sim, id: number) =>
+        sim.entities.get(id)?.auras.push({
+          id: 'test_hold',
+          name: 'Hold',
+          kind: 'stun',
+          remaining: 999,
+          duration: 999,
+          value: 0,
+          sourceId: sim.playerId,
+          school: 'physical',
+        } as Aura);
+      const draws = (withRun: boolean) => {
+        const sim = shiftSim({ fullWorld });
+        let count = 0;
+        sim.rng.setObserver(() => count++);
+        if (withRun) {
+          sim.chat('/dev graveyardshift start');
+          const run = graveyardShiftRunFor(sim.ctx, sim.playerId)!;
+          expect(run.allyIds.length).toBeGreaterThan(2);
+          for (const b of run.bots) hold(sim, b.pid);
+          for (const id of run.allyIds) hold(sim, id);
+        }
         for (let i = 0; i < 100; i++) sim.tick();
         if (withRun) sim.chat('/dev graveyardshift end');
         sim.tick();

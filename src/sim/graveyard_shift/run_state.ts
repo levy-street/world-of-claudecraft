@@ -67,12 +67,17 @@ export interface GraveyardShiftRun {
   readonly bots: GraveyardShiftBot[];
   // Morthen's living skeleton allies (run_allies.ts), in spawn order.
   readonly allyIds: number[];
-  // The opening's cleared-room corpses (run_opening.ts), dropped by the teardown.
+  // The opening's pack (also among the allies while it stands) and cleared-room
+  // corpses (run_opening.ts): the teardown drops both, a fallen pack mob too.
+  readonly packIds: number[];
   readonly corpseIds: number[];
   // Corpses Raise the Fallen already used (each rises once).
   readonly raisedCorpseIds: Set<number>;
-  // The party has noticed Morthen (he came close or landed a hit).
+  // The party is fighting (the opening's pack starts it at once).
   engaged: boolean;
+  // The party has noticed Morthen himself (he came within its notice radius):
+  // until then nobody targets or answers him.
+  noticed: boolean;
   // Set by a mid-tick decision (a command or, later, a lethal hit); the run tick
   // tears down, never the code path that decided.
   pendingOutcome: GraveyardShiftOutcome | null;

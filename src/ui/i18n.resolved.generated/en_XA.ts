@@ -262,6 +262,12 @@ export const en_XA: EnTranslations = {
         }
       },
       "say": {
+        "clearing": {
+          "lastPull": "[óķ ļášţ þúļļ ƀéƒóŕé ţĥé ƀóšš]",
+          "spiders": "[çáñ ŵé ÑÓŢ þúļļ ţĥé šþíðéŕš ţĥíš ţíɱé]",
+          "boneQuest": "[ŵĥó šţíļļ ñééðš ţĥé ƀóñé ɋúéšţ, Í'ɱ áţ 6 óƒ 10]",
+          "howsMana": "[ĥéáļéŕ ĥóŵ'š ɱáñá]"
+        },
         "notice": {
           "pulledEarly": "[ƀóšš þúļļéð éáŕļý??]",
           "whoPulled": "[ŴĤÓ ÞÚĻĻÉÐ]",

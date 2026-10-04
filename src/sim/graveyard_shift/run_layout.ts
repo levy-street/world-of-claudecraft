@@ -12,18 +12,21 @@ export const GRAVEYARD_SHIFT_DUNGEON_ID = 'hollow_crypt';
 // stands at z 98), facing back down the nave toward the entrance (-z).
 export const GRAVEYARD_SHIFT_ARRIVAL = { x: 0, z: 92, facing: Math.PI } as const;
 
-// The prototype party waits inside Morthen's chamber, in line of sight of the
-// arrival point (owner decision: the concept's "busy in the next room" opening
-// comes with the final version). Ordered by roster index: spawn order is fixed.
-// They stand 16 to 22 yards out, past the party's engage radius, so they wait
-// until Morthen walks up to them or hits one.
+// The party is in the room before Morthen's chamber (the concept's opening),
+// busy with the last pack (GRAVEYARD_SHIFT_PACK, a few yards toward the
+// chamber): the tank and the rogue up front, the casters and the hunter behind.
+// Ordered by roster index: spawn order is fixed. Every spot is out of say
+// range of the arrival point (no speech reaches the boss room), and so past
+// the party's notice radius: Morthen walks in unheard and unseen.
 export const GRAVEYARD_SHIFT_BOT_SPOTS: readonly { x: number; z: number }[] = [
-  { x: -3, z: 74 },
-  { x: 2, z: 70 },
-  { x: 6, z: 72 },
-  { x: -6, z: 71 },
-  { x: 3, z: 76 },
+  { x: -1, z: 64 },
+  { x: 3, z: 54 },
+  { x: 7, z: 56 },
+  { x: -6, z: 55 },
+  { x: 2, z: 65 },
 ];
+// What the party faces as it fights: the pack, toward the chamber.
+export const GRAVEYARD_SHIFT_PARTY_FACES = { x: 0, z: 69 } as const;
 
 // The shift's opening (run_opening.ts): the last pack of the party's clear,
 // Morthen's own colleagues, already fighting it in the room before his
@@ -31,9 +34,9 @@ export const GRAVEYARD_SHIFT_BOT_SPOTS: readonly { x: number; z: number }[] = [
 // Crypt's own spawn list placed them (crypt_shambler and hollow_acolyte rows
 // short of the widows' room).
 export const GRAVEYARD_SHIFT_PACK: readonly { templateId: string; x: number; z: number }[] = [
-  { templateId: 'crypt_shambler', x: -2, z: 71 },
-  { templateId: 'crypt_shambler', x: 2, z: 72 },
-  { templateId: 'hollow_acolyte', x: 0, z: 74 },
+  { templateId: 'crypt_shambler', x: -2, z: 68 },
+  { templateId: 'crypt_shambler', x: 2, z: 69 },
+  { templateId: 'hollow_acolyte', x: 0, z: 71 },
 ];
 export const GRAVEYARD_SHIFT_CLEARED_CORPSES: readonly {
   templateId: string;

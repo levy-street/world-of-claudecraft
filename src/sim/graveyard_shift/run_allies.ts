@@ -61,5 +61,7 @@ export function updateGraveyardShiftAllies(ctx: SimContext, run: GraveyardShiftR
 
 export function dismissGraveyardShiftAllies(ctx: SimContext, run: GraveyardShiftRun): void {
   despawnTemporaryNecromancyUndead(ctx, run.ownerPid);
+  // The opening's pack is plain crypt mobs, not necromancy undead.
+  for (const id of run.allyIds) if (ctx.entities.has(id)) ctx.dropEntity(id);
   run.allyIds.length = 0;
 }

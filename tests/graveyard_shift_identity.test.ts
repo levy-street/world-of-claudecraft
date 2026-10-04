@@ -6,6 +6,7 @@ import { restorePetFromDelveStash } from '../src/sim/pet/pet_commands';
 import { refreshModsForEquipmentChange } from '../src/sim/progression/talents';
 import { Sim } from '../src/sim/sim';
 import type { Aura, PlayerClass } from '../src/sim/types';
+import { clearGraveyardShiftOpening } from './helpers/graveyard_shift_opening';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function shiftSim(cls: PlayerClass = 'warrior', level = 15) {
@@ -27,6 +28,7 @@ function start(sim: Sim) {
   sim.chat('/dev graveyardshift start');
   const run = graveyardShiftRunFor(sim.ctx, sim.playerId);
   expect(run).not.toBeNull();
+  clearGraveyardShiftOpening(sim, run!);
   return run!;
 }
 
@@ -116,8 +118,8 @@ describe('Graveyard Shift Morthen identity', () => {
     const p = sim.player;
     expect(hasMorthenIdentity(p)).toBe(true);
     expect(p.level).toBe(10);
-    expect(p.maxHp).toBe(2978);
-    expect(p.hp).toBe(2978);
+    expect(p.maxHp).toBe(2620);
+    expect(p.hp).toBe(2620);
     expect(p.stats.armor).toBe(234);
     expect(p.weapon).toEqual({ min: 82, max: 130, speed: 2.6 });
     expect(p.attackPower).toBe(0);
@@ -149,10 +151,10 @@ describe('Graveyard Shift Morthen identity', () => {
     start(sim);
     const p = sim.player;
     (sim as any).applyAura(p, { ...foreignAura('buff_str', p.id), value: 50, remaining: 0.2 });
-    expect(p.maxHp).toBe(2978);
+    expect(p.maxHp).toBe(2620);
     for (let i = 0; i < 10; i++) sim.tick();
     expect(p.auras.some((a) => a.id === 'test_buff_str')).toBe(false);
-    expect(p.maxHp).toBe(2978);
+    expect(p.maxHp).toBe(2620);
     expect(p.weapon).toEqual({ min: 82, max: 130, speed: 2.6 });
   });
 
@@ -268,7 +270,7 @@ describe('Graveyard Shift Morthen identity', () => {
     start(sim);
     sim.chat('/dev mounts');
     expect(sim.player.level).toBe(10);
-    expect(sim.player.maxHp).toBe(2978);
+    expect(sim.player.maxHp).toBe(2620);
     end(sim);
     expect(sim.player.level).toBe(16);
     expect(meta(sim).lifetimeXp).toBe(lifetimeXp);
@@ -325,8 +327,8 @@ describe('Graveyard Shift Morthen identity', () => {
     });
     (sim as any).applyAura(p, { ...foreignAura('buff_sta', p.id), value: 50, remaining: 30 });
     (sim as any).applyAura(p, { ...foreignAura('buff_str', p.id), value: 50, remaining: 30 });
-    expect(p.maxHp).toBe(2978);
-    expect(p.hp).toBe(2978);
+    expect(p.maxHp).toBe(2620);
+    expect(p.hp).toBe(2620);
     expect(p.attackPower).toBe(0);
     expect(p.stats.str).toBe(0);
   });
@@ -336,7 +338,7 @@ describe('Graveyard Shift Morthen identity', () => {
     start(sim);
     for (let i = 0; i < 20 * 60; i++) sim.tick();
     expect(hasMorthenIdentity(sim.player)).toBe(true);
-    expect(sim.player.maxHp).toBe(2978);
+    expect(sim.player.maxHp).toBe(2620);
   });
 
   it.each([false, true])(

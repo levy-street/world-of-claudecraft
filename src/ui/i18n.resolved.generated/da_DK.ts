@@ -262,6 +262,12 @@ export const da_DK: EnTranslations = {
         }
       },
       "say": {
+        "clearing": {
+          "lastPull": "ok last pull before the boss",
+          "spiders": "can we NOT pull the spiders this time",
+          "boneQuest": "who still needs the bone quest, I'm at 6 of 10",
+          "howsMana": "healer how's mana"
+        },
         "notice": {
           "pulledEarly": "boss pulled early??",
           "whoPulled": "WHO PULLED",

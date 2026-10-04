@@ -17,6 +17,7 @@ import { Sim } from '../src/sim/sim';
 import type { Aura, Entity, PlayerClass, SimEvent } from '../src/sim/types';
 import { resourceDisplayName } from '../src/ui/ability_tooltip_lines';
 import { lowResourceView } from '../src/ui/low_resource';
+import { clearGraveyardShiftOpening } from './helpers/graveyard_shift_opening';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function shiftSim(cls: PlayerClass = 'warrior', level = 15) {
@@ -36,7 +37,9 @@ const meta = (sim: Sim) => (sim as any).players.get(sim.playerId);
 
 function start(sim: Sim) {
   sim.chat('/dev graveyardshift start');
-  expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).not.toBeNull();
+  const run = graveyardShiftRunFor(sim.ctx, sim.playerId);
+  expect(run).not.toBeNull();
+  clearGraveyardShiftOpening(sim, run!);
 }
 
 function end(sim: Sim) {

@@ -13,7 +13,7 @@ import { settleTeleportArrival } from '../teleport_arrival';
 import type { PlayerClass } from '../types';
 import { type BotRole, botSeed } from './bot_brain';
 import { adventurerMarkerAura } from './hostility';
-import { GRAVEYARD_SHIFT_ARRIVAL, GRAVEYARD_SHIFT_BOT_SPOTS } from './run_layout';
+import { GRAVEYARD_SHIFT_BOT_SPOTS, GRAVEYARD_SHIFT_PARTY_FACES } from './run_layout';
 import type { GraveyardShiftBot, GraveyardShiftRun } from './run_state';
 
 export type GraveyardShiftRole = BotRole;
@@ -48,8 +48,11 @@ export function spawnGraveyardShiftParty(ctx: SimContext, run: GraveyardShiftRun
     e.prevPos = { ...e.pos };
     ctx.rebucket(e);
     settleTeleportArrival(e);
-    // Facing Morthen's arrival point.
-    e.facing = Math.atan2(GRAVEYARD_SHIFT_ARRIVAL.x - spot.x, GRAVEYARD_SHIFT_ARRIVAL.z - spot.z);
+    // Facing the pack they are fighting, their backs to the way they came.
+    e.facing = Math.atan2(
+      GRAVEYARD_SHIFT_PARTY_FACES.x - spot.x,
+      GRAVEYARD_SHIFT_PARTY_FACES.z - spot.z,
+    );
     e.prevFacing = e.facing;
     e.auras.push(adventurerMarkerAura(pid));
     const bot: GraveyardShiftBot = {

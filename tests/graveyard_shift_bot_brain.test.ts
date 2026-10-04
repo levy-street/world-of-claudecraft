@@ -16,12 +16,14 @@ import {
   reactionDelayTicks,
   willKick,
 } from '../src/sim/graveyard_shift/bot_brain';
+import { GRAVEYARD_SHIFT_ALLY_TEMPLATE } from '../src/sim/graveyard_shift/run_allies';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
+import { clearGraveyardShiftOpening } from './helpers/graveyard_shift_opening';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
-function shiftSim(seed = 42) {
+function shiftSim(seed = 42, opening = false) {
   const sim = new Sim({
     seed,
     playerClass: 'warrior',
@@ -33,6 +35,7 @@ function shiftSim(seed = 42) {
   sim.chat('/dev graveyardshift start');
   const run = graveyardShiftRunFor(sim.ctx, sim.playerId)!;
   expect(run).not.toBeNull();
+  if (!opening) clearGraveyardShiftOpening(sim, run);
   return { sim, run };
 }
 
@@ -116,14 +119,38 @@ describe('Graveyard Shift bot brain (pure rules)', () => {
 });
 
 describe('Graveyard Shift party in a real fight', () => {
-  it('waits idle until Morthen comes close', () => {
-    const { sim, run } = shiftSim();
-    const before = run.bots.map((b) => ({ ...sim.entities.get(b.pid)!.pos }));
-    runTicks(sim, 60);
-    expect(run.engaged).toBe(false);
-    run.bots.forEach((b, i) => {
-      expect(sim.entities.get(b.pid)!.pos).toEqual(before[i]);
-    });
+  it('busy with the pack, the party targets only the pack, never Morthen until he comes within the notice radius, then turns on him', () => {
+    const { sim, run } = shiftSim(42, true);
+    const skeletons = new Set(
+      run.allyIds.filter(
+        (id) => sim.entities.get(id)?.templateId === GRAVEYARD_SHIFT_ALLY_TEMPLATE,
+      ),
+    );
+    const pack = new Set(run.allyIds.filter((id) => !skeletons.has(id)));
+    expect(pack.size).toBeGreaterThan(0);
+    let targeted = 0;
+    for (let i = 0; i < 20 * 4; i++) {
+      sim.tick();
+      for (const b of run.bots) {
+        const t = sim.entities.get(b.pid)!.targetId;
+        expect(t).not.toBe(sim.playerId);
+        if (t !== null) {
+          expect(pack.has(t)).toBe(true);
+          targeted++;
+        }
+      }
+    }
+    expect(run.engaged).toBe(true);
+    expect(run.noticed).toBe(false);
+    expect(targeted).toBeGreaterThan(0);
+    engage(sim, run);
+    let onMorthen = false;
+    for (let i = 0; i < 20 * 10 && !onMorthen; i++) {
+      sim.tick();
+      onMorthen = run.bots.some((b) => sim.entities.get(b.pid)!.targetId === sim.playerId);
+    }
+    expect(run.noticed).toBe(true);
+    expect(onMorthen).toBe(true);
   });
 
   it('engages: the tank closes to melee, the casters cast at Morthen', () => {

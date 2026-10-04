@@ -51,7 +51,8 @@ export interface BotSayState {
   readonly used: Set<string>;
   lastTick: number;
   readonly botLastTick: Map<number, number>;
-  sawEngaged: boolean;
+  overheard: boolean;
+  sawNoticed: boolean;
   readonly deadSeen: Set<number>;
   healerLow: boolean;
   wipeThreat: boolean;
@@ -71,7 +72,8 @@ export function freshBotSayState(runSeed: number): BotSayState {
     used: new Set(),
     lastTick: Number.NEGATIVE_INFINITY,
     botLastTick: new Map(),
-    sawEngaged: false,
+    overheard: false,
+    sawNoticed: false,
     deadSeen: new Set(),
     healerLow: false,
     wipeThreat: false,
@@ -133,6 +135,24 @@ function sayLootLine(ctx: SimContext, run: GraveyardShiftRun, state: BotSayState
   emitBotSay(ctx, speaker, LOOT_LINES[index]);
 }
 
+// The living adventurer nearest Morthen, if one is close enough to be heard.
+function closestInEarshot(ctx: SimContext, run: GraveyardShiftRun): number | null {
+  const boss = ctx.entities.get(run.ownerPid);
+  if (!boss) return null;
+  let best: number | null = null;
+  let bestDist = SAY_RANGE;
+  for (const bot of run.bots) {
+    const e = ctx.entities.get(bot.pid);
+    if (!living(e)) continue;
+    const d = dist2d(e.pos, boss.pos);
+    if (d <= bestDist) {
+      best = bot.pid;
+      bestDist = d;
+    }
+  }
+  return best;
+}
+
 function queue(state: BotSayState, trigger: BotSayTrigger, now: number, speakerPid?: number): void {
   if (state.pending.some((p) => p.trigger === trigger && p.speakerPid === speakerPid)) return;
   state.pending.push({ trigger, expiresTick: now + BOT_SAY_PENDING_TICKS, speakerPid });
@@ -146,8 +166,17 @@ export function sayGraveyardShiftGiveUp(ctx: SimContext, run: GraveyardShiftRun)
 }
 
 function observe(ctx: SimContext, run: GraveyardShiftRun, state: BotSayState, now: number): void {
-  if (run.engaged && !state.sawEngaged) queue(state, 'notice', now);
-  state.sawEngaged = run.engaged;
+  // The party's chatter over the pack is overheard as Morthen creeps into
+  // earshot, before anyone has seen him (said earlier, it would reach nobody).
+  if (run.engaged && !run.noticed && !state.overheard) {
+    const voice = closestInEarshot(ctx, run);
+    if (voice !== null) {
+      state.overheard = true;
+      queue(state, 'clearing', now, voice);
+    }
+  }
+  if (run.noticed && !state.sawNoticed) queue(state, 'notice', now);
+  state.sawNoticed = run.noticed;
   if (releasingNow(ctx, run)) queue(state, 'corpseRun', now);
   const boss = ctx.entities.get(run.ownerPid);
   for (const bot of run.bots) {

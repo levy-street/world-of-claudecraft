@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { graveyardShiftRunFor } from '../src/sim/graveyard_shift';
 import { Sim } from '../src/sim/sim';
 import type { Aura, Entity, SimEvent } from '../src/sim/types';
+import { clearGraveyardShiftOpening } from './helpers/graveyard_shift_opening';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function shiftSim() {
@@ -16,6 +17,7 @@ function shiftSim() {
   sim.chat('/dev graveyardshift start');
   const run = graveyardShiftRunFor(sim.ctx, sim.playerId)!;
   expect(run).not.toBeNull();
+  clearGraveyardShiftOpening(sim, run);
   return { sim, run };
 }
 

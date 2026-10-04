@@ -30,9 +30,12 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
   the follow-up line delayed so both bubbles read; an aborted one says nothing.
 - **State on Sim.** Runs live in `Sim.graveyardShiftRuns` (owner pid to run),
   exposed as the `ctx.graveyardShiftRuns` live view. Modules here hold functions.
-- **Zero shared rng.** Nothing here calls `ctx.rng`; with no run the tick entry
-  returns at once, so a world without a run is byte-identical to one without
-  this module (pinned in `tests/graveyard_shift_run.test.ts`).
+- **Zero shared rng from this module.** Nothing here calls `ctx.rng`: starting
+  and ending a run draw nothing, and with no run the tick entry only checks the
+  offline grave (no draw), so a world without a run is byte-identical to one
+  without this module (pinned in `tests/graveyard_shift_run.test.ts`). Once the
+  fight runs (the opening starts it at once), combat rolls draw from the shared
+  stream like any fight.
 - **One teardown.** Every exit funnels into `endGraveyardShift`: the arena pools
   snapshot (`snapshotArenaReturnPools`) goes back, the stowed pet returns (Morthen
   cannot summon one on shift), the slot is freed. A dead owner,
@@ -55,12 +58,12 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
   `sim.ts` and the lock sites can import it without a cycle).
 - **Stats:** `recalcPlayerStats` re-enters over no gear and no talents, then
   `applyMorthenProfile` lays the `morthen` template on top through `mobBaseStats`
-  (the createMob formula), then the solo multipliers (`MORTHEN_SOLO_HP_MULT` x2.5,
+  (the createMob formula), then the solo multipliers (`MORTHEN_SOLO_HP_MULT` x2.2,
   rounded to a whole point, `MORTHEN_SOLO_DAMAGE_MULT` x2 on the weapon and the
-  kit's damage): 2978 hp, 82 to 130 at 2.6 sec, 234 armor at level 10. Tuned on a
-  headless probe against the party of five and its corpse run: standing still,
-  hitting only the tank or pressing buttons at random lose; a sharp scripted player
-  wins four shifts in five with a median quarter of his health left. Every recalc path (buff, expiry, equip) therefore
+  kit's damage): 2620 hp, 82 to 130 at 2.6 sec, 234 armor at level 10. Tuned on a
+  headless probe against the party of five, the opening and the corpse run: hitting
+  only the tank or pressing buttons at random lose; a sharp scripted player wins
+  with about a third of his health left. Every recalc path (buff, expiry, equip) therefore
   lands on the same numbers.
 - **No cast pushback:** the profile sets `castPushbackReduction` to 1, as for a
   boss. The classic player pushback is uncapped per hit, so five adventurers
@@ -89,10 +92,18 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
 
 ## The adventurer party
 - **Real players with no client** (`run_party.ts`): `ctx.addPlayer` (bot join,
-  greeting already sent), level 10, placed in Morthen's chamber in line of sight
-  (owner decision for the prototype), in a fixed roster order: warrior tank
+  greeting already sent), level 10, in the room before Morthen's chamber, out of
+  his say range and notice radius, in a fixed roster order: warrior tank
   Bulwarkbro, priest healer Mendolyn, mage Pyrotechnic, hunter Arrowsmith, rogue
-  Stabbyjoe (the concept's classic five; the hunter's pet waits for a later step).
+  Stabbyjoe (the concept's classic five; no hunter pet, owner decision).
+- **The opening** (`run_opening.ts`, the concept's soft start): the party is
+  already fighting the last pack (two crypt shamblers and an acolyte, Morthen's
+  own, on the pet AI's aggressive stance, aggro on the tank, at
+  `GRAVEYARD_SHIFT_PACK_HP_FRACTION` of their health: a fresh pack of elites, with
+  his skeletons, won the shift for him whatever he pressed), and the monsters it
+  cleared on the way in lie dead toward the entrance on the Crypt's own spawn
+  spots (ownerless, so Raise the Fallen can take them). The pack rides
+  `run.allyIds`; the corpses `run.corpseIds`; the teardown drops both.
   No `PlayerMeta` flag (never
   `isDevBot`) and never a `characterId`; membership is the run's roster plus the
   permanent `gshift_adventurer` marker aura.
@@ -141,8 +152,9 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
   the shared `bots/steer.ts` core, never move while casting), and acts only
   through the real verbs (`castAbility`, `targetEntity`, `startAutoAttack`,
   `moveInput`), pre-checking cooldown, GCD, resource, range and sight so the real
-  path never refuses. The party waits idle until Morthen comes within
-  `PARTY_ENGAGE_RADIUS` or lands a hit.
+  path never refuses. The party engages as soon as anyone is hurt (the pack sees
+  to that); it ignores Morthen (no target, no chip damage from the healer) until
+  he comes within `PARTY_ENGAGE_RADIUS` of one of them (`run.noticed`).
 - **Kicks:** each kicker rolls once per fresh cast whether it notices it at all
   (`BOT_KICK`: tank 45, rogue 30, mage 20 percent; the hunter never presses Counter
   Shot). With every kicker going for every cast, no Pulse ever landed. A bot that
@@ -218,7 +230,9 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
   party chat. The event carries `textKey` (`devCommand.graveyardShift.say.*`) and
   the English as `text`; the HUD's say line and bubble render it through
   `localizeChatBody`, so player-authored say (no key) stays verbatim.
-- **Observed state, never a timer:** the `engaged` flip (notice), an adventurer
+- **Observed state, never a timer:** the party's chatter over the pack once
+  Morthen is in earshot and not yet seen (clearing, said by the nearest bot in
+  range), the `noticed` flip (notice), an adventurer
   going down (death), the healer under 15 percent mana (oom), two down or the
   living party under 35 percent average health (wipe threat), a fallen one's
   release (corpse run, said by a survivor), a returner coming into earshot
@@ -271,6 +285,7 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
 | `morthen_profile.ts` | `applyMorthenProfile` and the pinned level, from the `morthen` template |
 | `morthen_transform.ts` | `applyMorthenIdentity` / `removeMorthenIdentity`, `knownAbilitiesFor` |
 | `kit.ts` | the three mode-local kit `AbilityDef`s, their `KnownAbility` list and the bar's slot layout |
+| `run_opening.ts` | the opening: the wounded pack fighting the party, the cleared corpses, their teardown |
 | `run_party.ts` | the fixed party, its spawn after the identity and its removal |
 | `hostility.ts` | pure leaf: the adventurer marker and the Morthen-versus-adventurer pair rule |
 | `death_intercept.ts` | the lethal-blow clamp `dealDamage` calls |

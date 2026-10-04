@@ -35,6 +35,13 @@ export function updateGraveyardShiftBots(ctx: SimContext, run: GraveyardShiftRun
     });
     if (!run.engaged) return;
   }
+  // Busy with the pack, nobody looks at Morthen until he walks up to them.
+  if (!run.noticed) {
+    run.noticed = run.bots.some((bot) => {
+      const e = ctx.entities.get(bot.pid);
+      return !!e && !e.dead && dist2d(e.pos, boss.pos) <= PARTY_ENGAGE_RADIUS;
+    });
+  }
   run.bots.forEach((bot, index) => {
     const e = ctx.entities.get(bot.pid);
     const meta = ctx.players.get(bot.pid);
@@ -44,9 +51,9 @@ export function updateGraveyardShiftBots(ctx: SimContext, run: GraveyardShiftRun
   });
 }
 
-// Morthen and his owned allies still standing in the run's slot.
+// Morthen (once noticed) and his owned allies still standing in the run's slot.
 function enemiesOf(ctx: SimContext, run: GraveyardShiftRun, boss: Entity): Entity[] {
-  const out = [boss];
+  const out = run.noticed ? [boss] : [];
   for (const e of ctx.entities.values()) {
     if (
       e.ownerId === boss.id &&
@@ -228,9 +235,10 @@ function thinkHealer(
     if (need.hpFrac < 0.8 && !renewed && tryCast(ctx, bot, e, 'renew', ally)) return;
     if (need.hpFrac < 0.65 && tryCast(ctx, bot, e, 'lesser_heal', ally)) return;
   }
-  // Everyone healthy and mana to spare: the healer chips in on Morthen.
+  // Everyone healthy and mana to spare: the healer chips in on Morthen, once
+  // the party has seen him.
   const everyoneUp = allies.every((ally) => ally.hpFrac > 0.8);
-  if (!everyoneUp || e.resource <= e.maxResource * 0.5) return;
+  if (!run.noticed || !everyoneUp || e.resource <= e.maxResource * 0.5) return;
   const dotted = boss.auras.some((a) => a.id === 'shadow_word_pain' && a.sourceId === e.id);
   if (!dotted && tryCast(ctx, bot, e, 'shadow_word_pain', boss)) return;
   if (tryCast(ctx, bot, e, 'mind_blast', boss)) return;

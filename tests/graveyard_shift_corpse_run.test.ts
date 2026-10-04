@@ -9,6 +9,10 @@ import { instanceOriginOf } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
 import { RES_HP_FRACTION } from '../src/sim/spirit';
 import type { Aura, Entity, SimEvent } from '../src/sim/types';
+import {
+  clearGraveyardShiftOpening,
+  placeMorthenInEarshot,
+} from './helpers/graveyard_shift_opening';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function shiftSim() {
@@ -23,6 +27,8 @@ function shiftSim() {
   sim.chat('/dev graveyardshift start');
   const run = graveyardShiftRunFor(sim.ctx, sim.playerId)!;
   expect(run).not.toBeNull();
+  clearGraveyardShiftOpening(sim, run);
+  placeMorthenInEarshot(sim, run);
   return { sim, run };
 }
 
@@ -120,8 +126,9 @@ describe('Graveyard Shift corpse run', () => {
     expect(calls[0].fromPid).not.toBe(mage.id);
     sim.tick();
     expect(mage.dead).toBe(false);
-    // Walk it into earshot: only the returner announces its own arrival.
-    mage.pos = sim.ctx.groundPos(sim.player.pos.x, sim.player.pos.z - 5);
+    // Walk it into earshot (but short of the notice radius, so no notice line
+    // takes the voice first): only the returner announces its own arrival.
+    mage.pos = sim.ctx.groundPos(sim.player.pos.x, sim.player.pos.z - 20);
     mage.prevPos = { ...mage.pos };
     (sim as any).rebucket(mage);
     const arrival = ticks(sim, 20 * 4);

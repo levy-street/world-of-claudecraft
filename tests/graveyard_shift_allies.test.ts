@@ -4,6 +4,7 @@ import { ALLY_DEATH_DREAD } from '../src/sim/graveyard_shift/dread';
 import { GRAVEYARD_SHIFT_ALLY_TEMPLATE } from '../src/sim/graveyard_shift/run_allies';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
+import { clearGraveyardShiftOpening } from './helpers/graveyard_shift_opening';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function shiftSim() {
@@ -18,6 +19,7 @@ function shiftSim() {
   sim.chat('/dev graveyardshift start');
   const run = graveyardShiftRunFor(sim.ctx, sim.playerId)!;
   expect(run).not.toBeNull();
+  clearGraveyardShiftOpening(sim, run);
   return { sim, run };
 }
 

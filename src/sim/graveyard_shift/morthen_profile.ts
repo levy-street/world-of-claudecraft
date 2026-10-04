@@ -12,11 +12,11 @@ export const MORTHEN_TEMPLATE_ID = 'morthen';
 
 // One player against a party: the template is tuned to lose to five players.
 // Owner decision: scale the boss, not the party. Tuned on a headless probe over
-// five seeds against the full party of five and its corpse run (2026-10-04):
-// standing still, hitting only the tank, or pressing buttons at random all
-// lose; a sharp scripted player (Chain the healer, Pulse into the melee, raise
-// the dead) wins four shifts in five, with a median quarter of his health left.
-export const MORTHEN_SOLO_HP_MULT = 2.5;
+// five seeds against the full party of five, the next-room opening and the
+// corpse run (2026-10-04): walking up and hitting only the tank, or pressing
+// buttons at random, lose; a sharp scripted player (Chain the healer, Pulse
+// into the melee, raise the dead) wins with about a third of his health left.
+export const MORTHEN_SOLO_HP_MULT = 2.2;
 export const MORTHEN_SOLO_DAMAGE_MULT = 2;
 
 // The level the owner is pinned to for the run (the template's own level).

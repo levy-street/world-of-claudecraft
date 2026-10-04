@@ -18,6 +18,10 @@ import { LOSS_OUTRO_TICKS } from '../src/sim/graveyard_shift/shift_end_marks';
 import { SAY_RANGE, Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
 import { type TranslationKey, t } from '../src/ui/i18n';
+import {
+  clearGraveyardShiftOpening,
+  placeMorthenInEarshot,
+} from './helpers/graveyard_shift_opening';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 type ChatEvent = Extract<SimEvent, { type: 'chat' }>;
@@ -38,6 +42,8 @@ function shiftSim(seed = 42) {
   sim.chat('/dev graveyardshift start');
   const run = graveyardShiftRunFor(sim.ctx, sim.playerId)!;
   expect(run).not.toBeNull();
+  clearGraveyardShiftOpening(sim, run);
+  placeMorthenInEarshot(sim, run);
   return { sim, run };
 }
 
@@ -193,7 +199,9 @@ describe('Graveyard Shift say lines (run)', () => {
       e.hp = Math.floor(e.maxHp * 0.5);
     }
     const heard = heardBy(runTicks(sim, BOT_SAY_GLOBAL_COOLDOWN_TICKS + 10), sim.playerId);
-    expect(heard.map((h) => triggerOf(h.ev))).toEqual(['notice']);
+    // Wounded, the party is fighting: its chatter is overheard, then it walks
+    // onto the skeletons by Morthen and spots him. Never a wipe threat.
+    expect(heard.map((h) => triggerOf(h.ev))).toEqual(['clearing', 'notice']);
   });
 
   it('Morthen losing makes a living bot say a win line, then the loot lines, before the teardown', () => {
