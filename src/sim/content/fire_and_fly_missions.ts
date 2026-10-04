@@ -596,13 +596,30 @@ export const TURRET_MISSION_DELUGE: TurretScenarioDef = {
 const STEADY_GAP = gap(0.9, 1.7);
 
 /**
- * The tower holds only 7 points: a small monster's strike costs 1 or 2 of them, a
- * medium's up to 4, so every monster must fall before it winds up. No large or huge
- * one comes: a single full-health strike of theirs would end the run. The fodder walks in
- * at its own pace, then the armoured dead come quicker from two and three flanks, and the
- * last two waves send thirty-two and forty-four of them from everywhere at two and a half
- * times their pace, hardly a breath between them.
+ * The tower holds only 7 points and the dead march on it: restless bones, hollow acolytes,
+ * crypt shamblers and revenants, shadow hounds running at their heels. Its accent is the
+ * fragility: a small strike costs 1 or 2 points, a medium one up to 4, so every leak counts
+ * and a hound surging in from a side away from the fight is a real threat. No large monster
+ * comes. The waves vary: walkers, small groups, a procession of shamblers gathering as a
+ * pack, hounds surging in, and a great procession of two packs at the end. No sponge: a
+ * medium dead falls to two or three good shells.
  */
+const DEAD = { speedScale: 0.9, speedScaleMax: 1.05 } as const;
+const HOUND = { speedScale: 1.6, speedScaleMax: 1.9 } as const;
+const HOUND_RUN = { speedScale: 2, speedScaleMax: 2.3 } as const;
+const HOUND_SCOUT = { role: 'scout', speedScale: 2, speedScaleMax: 2.3 } as const;
+const procession = (entries: readonly TurretWaveEntry[], delay: number): TurretGroupDef => ({
+  brick: 'pack',
+  minRadius: 30,
+  maxRadius: 36,
+  holdTicks: ticks(4),
+  spreadTicks: ticks(2),
+  widthTurn: 0.1,
+  advanceScale: 1.05,
+  entries,
+  delayTicks: ticks(delay),
+});
+
 export const TURRET_MISSION_BRITTLE: TurretScenarioDef = {
   id: 'fire_and_fly_brittle',
   boardKey: 'brittle',
@@ -612,103 +629,128 @@ export const TURRET_MISSION_BRITTLE: TurretScenarioDef = {
   supply: MISSION_SUPPLY,
   waves: [
     {
-      groups: [walkers([{ templateId: 'forest_wolf', count: 8, level: 2 }], STEADY_GAP)],
+      // Restless bones walking in slowly from all around.
+      groups: [walkers([{ templateId: 'tunnel_rat', count: 8, level: 4, ...DEAD }], gap(1.2, 1.8))],
       coreDamage: 60,
-      kegs: KEGS(3),
+      kegs: [spaced(2)],
     },
     {
+      // More bones, then two quick bunches of shadow hounds.
       groups: [
-        walkers(
+        walkers([{ templateId: 'tunnel_rat', count: 6, level: 4, ...DEAD }], gap(1, 1.5)),
+        {
+          ...bunches(
+            [{ templateId: 'wild_boar', count: 6, level: 2, ...HOUND }],
+            gap(0.2, 0.35),
+            3,
+            5,
+            0.06,
+          ),
+          delayTicks: ticks(6),
+        },
+      ],
+      coreDamage: 60,
+      kegs: [spaced(2)],
+    },
+    {
+      // Hollow acolytes from two sides, then the first hound surging in from behind.
+      groups: [
+        walkers([{ templateId: 'vale_bandit', count: 8, level: 4, ...DEAD }], gap(1, 1.5), {
+          kind: 'flanks',
+          count: 2,
+          widthTurn: 0.1,
+        }),
+        surgers([{ templateId: 'wild_boar', count: 1, level: 2, ...HOUND_RUN }], 1, 10),
+      ],
+      coreDamage: 60,
+      kegs: [front(0)],
+    },
+    {
+      // The procession: a few bones, then crypt shamblers gathering as a pack, hounds ahead.
+      groups: [
+        walkers([{ templateId: 'tunnel_rat', count: 4, level: 4, ...DEAD }], gap(1, 1.4)),
+        procession(
           [
-            { templateId: 'forest_wolf', count: 6, level: 2 },
-            { templateId: 'wild_boar', count: 6, level: 3 },
+            { templateId: 'deeprock_kobold', count: 6, level: 14, ...MUSTER, leads: true },
+            { templateId: 'wild_boar', count: 2, level: 2, ...HOUND_SCOUT },
           ],
-          gap(0.8, 1.5),
+          3,
         ),
       ],
-      coreDamage: 64,
-      kegs: KEGS(3),
+      coreDamage: 150,
+      kegs: [front(1, 2)],
     },
     {
+      // A false lull: slow bones, and two hounds surging in from two sides.
       groups: [
         walkers(
+          [{ templateId: 'tunnel_rat', count: 6, level: 4, speedScale: 0.85 }],
+          gap(1.2, 1.8),
+        ),
+        surgers([{ templateId: 'wild_boar', count: 2, level: 2, ...HOUND_RUN }], 2, 8),
+      ],
+      coreDamage: 60,
+      kegs: [spaced(2)],
+    },
+    {
+      // Small groups of acolytes and revenants from three sides, one after another.
+      groups: [
+        bunches(
           [
-            { templateId: 'vale_bandit', count: 8, level: 5 },
-            { templateId: 'webwood_spider', count: 6, level: 4 },
+            { templateId: 'vale_bandit', count: 6, level: 5, ...DEAD },
+            { templateId: 'boneclad_revenant', count: 6, level: 18, ...DEAD },
           ],
-          gap(0.7, 1.3),
+          gap(0.3, 0.5),
+          4,
+          5,
+          0.06,
         ),
       ],
-      coreDamage: 84,
-      kegs: KEGS(4),
+      coreDamage: 200,
+      kegs: [front(0), spaced(1)],
     },
     {
+      // The dead walking in from everywhere, and two hounds surging in.
       groups: [
         walkers(
           [
-            { templateId: 'tunnel_rat', count: 8, level: 6 },
-            { templateId: 'vale_bandit', count: 8, level: 5 },
+            { templateId: 'vale_bandit', count: 6, level: 5, ...DEAD },
+            { templateId: 'deeprock_kobold', count: 4, level: 14, ...DEAD },
           ],
-          gap(0.6, 1.1),
-          { kind: 'flanks', count: 2, widthTurn: 0.14 },
+          gap(0.9, 1.4),
         ),
-      ],
-      coreDamage: 100,
-      kegs: KEGS(4),
-    },
-    {
-      groups: [
-        walkers(
-          [
-            { templateId: 'deeprock_kobold', count: 10, level: 15 },
-            { templateId: 'boneclad_revenant', count: 4, level: 19 },
-          ],
-          gap(0.5, 0.9),
-          { kind: 'flanks', count: 3, widthTurn: 0.1 },
-        ),
-      ],
-      coreDamage: 130,
-      kegs: KEGS(5),
-    },
-    {
-      groups: [
-        walkers(
-          [
-            { templateId: 'boneclad_revenant', count: 8, level: 19, speedScale: 1.3 },
-            { templateId: 'deeprock_kobold', count: 8, level: 15, speedScale: 1.3 },
-          ],
-          gap(0.35, 0.7),
-          { kind: 'flanks', count: 3, widthTurn: 0.1 },
-        ),
+        surgers([{ templateId: 'wild_boar', count: 2, level: 2, ...HOUND_RUN }], 2, 7),
       ],
       coreDamage: 160,
-      kegs: KEGS(5),
+      kegs: [spaced(1, 3)],
     },
     {
+      // The great procession: two packs of the dead gathering on opposite sides, hounds
+      // surging in, and bones walking in around them.
       groups: [
-        walkers(
+        procession(
           [
-            { templateId: 'boneclad_revenant', count: 20, level: 19, speedScale: 2.3 },
-            { templateId: 'deeprock_kobold', count: 12, level: 15, speedScale: 2.3 },
+            { templateId: 'deeprock_kobold', count: 5, level: 14, ...MUSTER, leads: true },
+            { templateId: 'wild_boar', count: 2, level: 2, ...HOUND_SCOUT },
           ],
-          gap(0.1, 0.25),
+          0,
         ),
-      ],
-      coreDamage: 170,
-      kegs: KEGS(5),
-    },
-    {
-      groups: [
-        walkers(
+        procession(
           [
-            { templateId: 'boneclad_revenant', count: 26, level: 19, speedScale: 2.8 },
-            { templateId: 'deeprock_kobold', count: 18, level: 15, speedScale: 2.8 },
+            { templateId: 'boneclad_revenant', count: 4, level: 18, ...MUSTER, leads: true },
+            { templateId: 'vale_bandit', count: 2, level: 5, ...MUSTER },
+            { templateId: 'wild_boar', count: 2, level: 2, ...HOUND_SCOUT },
           ],
-          gap(0.08, 0.2),
+          4,
         ),
+        {
+          ...walkers([{ templateId: 'tunnel_rat', count: 6, level: 4, ...DEAD }], gap(0.9, 1.3)),
+          delayTicks: ticks(10),
+        },
+        surgers([{ templateId: 'wild_boar', count: 2, level: 2, ...HOUND_RUN }], 2, 14),
       ],
-      coreDamage: 180,
-      kegs: KEGS(5),
+      coreDamage: 200,
+      kegs: [front(0), front(1)],
     },
   ],
 };

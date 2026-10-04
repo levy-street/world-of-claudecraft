@@ -292,6 +292,27 @@ describe('the mission table', () => {
     expect(spawnsOf(TURRET_MISSION_DELUGE).reduce((a, b) => a + b)).toBeGreaterThanOrEqual(100);
   });
 
+  it('marches the dead on The Cracked Tower in varied waves, hounds surging, two processions', () => {
+    const plan = resolveTurretPlan(TURRET_MISSION_BRITTLE);
+    const waves = TURRET_MISSION_BRITTLE.waves;
+    const bricks = new Set(waves.flatMap((w) => w.groups.map((g) => g.brick)));
+    for (const b of ['walkers', 'smallGroup', 'pack', 'surgers'] as const)
+      expect(bricks.has(b), b).toBe(true);
+    // The processions: one pack in the fourth wave, two in the last.
+    const packs = waves.map((w) => w.groups.filter((g) => g.brick === 'pack').length);
+    expect(packs).toEqual([0, 0, 0, 1, 0, 0, 0, 2]);
+    // The hounds are the surgers, and nothing surges but a hound.
+    for (const g of waves.flatMap((w) => w.groups).filter((g) => g.brick === 'surgers'))
+      for (const e of g.entries) expect(e.templateId).toBe('wild_boar');
+    // No sponge: a small dead falls to two good shells, a medium one to three.
+    plan.waves.forEach((wave) => {
+      for (const kind of new Set(wave.spawns)) {
+        const shells = Math.ceil(plan.kinds[kind].maxHp / wave.coreDamage);
+        expect(shells).toBeLessThanOrEqual(plan.kinds[kind].sizeClass === 'small' ? 2 : 3);
+      }
+    });
+  });
+
   it('gives The Cracked Tower 7 tower points and no large or huge monster', () => {
     const plan = resolveTurretPlan(TURRET_MISSION_BRITTLE);
     expect(plan.integrity).toBe(7);

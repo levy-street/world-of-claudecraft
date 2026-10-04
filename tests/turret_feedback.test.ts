@@ -70,7 +70,7 @@ describe('the turret feedback ring', () => {
       hard: 821,
       pack: 1290,
       deluge: 1021,
-      brittle: 1303,
+      brittle: 695,
       powder: 2876,
     });
     const burst = Math.max(...bursts.map(([, n]) => n));
