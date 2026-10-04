@@ -17552,6 +17552,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.drillmaster_hale.title': '波止場の稽古師範',
   'entities.npcs.drillmaster_hale.greeting':
     '後ろのダミーは打ち返しもしなければ倒れもしない、{className}。大事なのは記録だ。お前が当てた一撃は残らずダメージメーターが数えてくれる。あれを標的にしてメーターを開け、あとは俺が教えてやる。',
+  'entities.npcs.tibbs.name': 'ティブス',
+  'entities.npcs.tibbs.title': 'モンスター組合代表',
+  'entities.npcs.tibbs.greeting':
+    'ティブスだ。モンスター組合の代表だよ。骨に気をつけてくれ、同僚もいるんでね。',
   'entities.quests.q_ps_the_gauntlet.title': 'ガントレットを走れ',
   'entities.quests.q_ps_the_gauntlet.text':
     '渓谷に名を知られた者は皆、まずこのレーンを走った、{playerName}。最初のレーンを西へ旗まで歩き、その場で向きを変え、南のレーンを二本目の旗まで歩き、それから最後のレーンを赤い旗まで横歩きで進むんだ。旗は順番どおりに通ること。画面上部のカードが、そのつど必要なボタンを見せてくれる。監督官ペルがレーンの先で走りをすべて計っている。赤い旗を越えれば、彼がすぐそこに立って走りを受け取ってくれるよ。',

@@ -11,12 +11,23 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
 
 ## Contract
 - **Offline only while a prototype.** `canStartGraveyardShift` refuses unless
-  `ctx.cfg.offlineHost` (set only by `src/game/offline_world_config.ts`) and
-  `ctx.devCommands`. A server would autosave the run's state over the real
-  character. Lifting this gate is a step of its own (save override, client mirror).
-- **Reachable only through `/dev graveyardshift`** (`src/sim/dev/graveyard_shift_dev.ts`),
-  so every message is dev-channel English with a `[dev]` prefix. Player-facing
-  strings arrive with the content step, as catalog keys.
+  `ctx.cfg.offlineHost` (set only by `src/game/offline_world_config.ts`); the dev
+  entry also needs `ctx.devCommands`. A server would autosave the run's state over
+  the real character. Lifting this gate is a step of its own (save override, client
+  mirror, a per-viewer grave gate).
+- **Two ways in.** `/dev graveyardshift` (`src/sim/dev/graveyard_shift_dev.ts`,
+  dev-channel English with a `[dev]` prefix) and the grave (`grave_entry.ts`, the
+  pure leaf the renderer and client share, and `grave_staging.ts`): on the offline
+  host the Weathered Grave by the Hollow Crypt spawns only while the player is
+  eligible (level 10 and Cryptbreaker or the Crypt quest), so an ineligible player
+  simply has no grave; touching it raises Tibbs <Mob Union Rep> (a dynamic NPC on a
+  stable id, his caller and tick on his entity) and emits `graveyardShiftOffer`; the
+  client's dialogue sends [Take the shift] as a targeted interact on Tibbs
+  (`acceptGraveyardShiftFromTibbs`; a refusal is one keyed Tibbs line). Tibbs goes
+  back down when his caller walks off, starts the shift or leaves him idle. A grave
+  shift (`run.entry`) ends back in front of the grave with Tibbs' keyed report (win,
+  with the hidden `hid_boss_for_a_day` deed on the first one) or consolation (loss),
+  the follow-up line delayed so both bubbles read; an aborted one says nothing.
 - **State on Sim.** Runs live in `Sim.graveyardShiftRuns` (owner pid to run),
   exposed as the `ctx.graveyardShiftRuns` live view. Modules here hold functions.
 - **Zero shared rng.** Nothing here calls `ctx.rng`; with no run the tick entry
@@ -273,6 +284,8 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
 | `kit_effects.ts` | Raise the Fallen and its cast refusal |
 | `bot_lines.ts` | pure leaf: the say pools per trigger (line id, catalog key, English, role limits) |
 | `bot_say.ts` | the say observer: triggers, pacing, the private say Rng, the pid-routed emit |
+| `grave_entry.ts` | pure leaf: the grave and Tibbs ids and spots, the eligibility rule, the deed id |
+| `grave_staging.ts` | the grave spawn, Tibbs' rise, offer, lines and dismissal, the end of a grave shift |
 | `run_lifecycle.ts` | `canStartGraveyardShift`, `startGraveyardShift`, `endGraveyardShift`, `updateGraveyardShift` (the one tick entry, called just before the delve runs) |
 | `index.ts` | the public barrel |
 

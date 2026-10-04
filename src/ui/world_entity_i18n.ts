@@ -421,6 +421,8 @@ const NPC_IDS = [
   'tidewarden_nel',
   // the Eastbrook quay's sparring master (content/practice_dummies.ts)
   'drillmaster_hale',
+  // the Graveyard Shift's union rep (content/graveyard_shift.ts)
+  'tibbs',
 ] as const;
 
 const QUEST_IDS = [

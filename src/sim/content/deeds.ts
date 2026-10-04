@@ -3597,6 +3597,19 @@ export const DEEDS: Record<string, DeedDef> = {
       ],
     },
   },
+  // The Graveyard Shift (sim/graveyard_shift/grave_staging.ts): Tibbs grants it
+  // after a player's first won shift as Morthen. Secret like the rest of the
+  // grave (whose way in is never stated), cosmetic only; appended at the END
+  // per the append-only contract.
+  hid_boss_for_a_day: {
+    id: 'hid_boss_for_a_day',
+    name: 'Boss for a Day',
+    desc: "Cover Morthen's shift in the Hollow Crypt and send the adventurers home.",
+    category: 'hidden',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    hidden: true,
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

@@ -4768,6 +4768,9 @@ const FAMILY_KEYS: Record<string, string> = {
 };
 
 const NPC_KEYS: Record<string, string> = {
+  // Tibbs, the Graveyard Shift's union rep: a friendly skeleton who climbs out of
+  // his grave (npc_looks.ts keepsFixedRig keeps him off the composed bodies).
+  tibbs: 'skel_minion',
   infiltrator_captain: 'npc_knight',
   infiltrator_nella: 'npc_knight',
   infiltrator_orin: 'npc_knight',

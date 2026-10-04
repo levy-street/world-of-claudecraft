@@ -21,6 +21,7 @@ import {
   YUMI_MAZE_X,
   zoneAt,
 } from '../src/sim/data';
+import { GRAVE_ITEM_ID } from '../src/sim/graveyard_shift/grave_entry';
 import { isProfessionQuest } from '../src/sim/quests/ambient_quest_marker';
 import { isQuestTurnInNpc } from '../src/sim/types';
 import { WORLD_BOSSES, worldBossLockoutId } from '../src/sim/world_boss';
@@ -502,6 +503,18 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
       }
     },
   );
+
+  it('never draws a loot dot for the Graveyard Shift grave, a secret', () => {
+    const lootDots = (world: IWorld) =>
+      buildMarkers(world).filter((marker) => marker.kind === 'object-loot').length;
+    const plain = makeWorld('client');
+    const before = lootDots(plain);
+    expect(before).toBeGreaterThan(0);
+    const secret = makeWorld('client');
+    const loot = secret.entities.get(10) as unknown as { objectItemId: string };
+    loot.objectItemId = GRAVE_ITEM_ID;
+    expect(lootDots(secret)).toBe(before - 1);
+  });
 
   it('uses the compact quest footprint when deciding whether a rim NPC can draw', () => {
     const world = makeWorld('client');

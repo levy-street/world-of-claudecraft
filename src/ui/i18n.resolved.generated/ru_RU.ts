@@ -240,6 +240,29 @@ export const ru_RU: EnTranslations = {
         "raise": "Raise the Fallen: a body lies near. Every corpse is a colleague. Even theirs.",
         "exit": "Shift over. The Staff Exit behind the throne takes you home."
       },
+      "graveName": "Weathered Grave",
+      "tibbs": {
+        "whisper": "Psst. Down here.",
+        "offer": {
+          "intro1": "Ah. You heard me. Tibbs. Mob union rep. You have met our members. Mostly with an axe.",
+          "intro2": "Morthen has been killed four thousand eight hundred times this week. For trousers.",
+          "intro3": "Union rules say he gets a day off. Nobody wants to cover his shift. Except, I am hoping, you.",
+          "intro4": "Simple job. You are the boss. Adventurers come in. You stop them. They will not notice the difference. Well. They will.",
+          "returning": "Morthen is off again. Bad back. Well. Bad spine. Cover for him?",
+          "accept": "Take the shift",
+          "decline": "Not today"
+        },
+        "say": {
+          "accept": "Wonderful. Mind the bones on the way down. Some of them are colleagues.",
+          "decline": "Fair. Nobody reads the job description either.",
+          "busy": "Come back when you are not so busy. Union rules.",
+          "report": "Shift report! Adventurers sent home: {sent}. Colleagues saved: {saved}. Trousers not handed out: 1.",
+          "payout": "Good job and thank you for your help, adventurer. Here's your payout.",
+          "overtime": "The union admires the overtime.",
+          "consolation": "Do not worry. They kill us every day. Welcome to the job.",
+          "anotherShift": "Another shift? They certainly will."
+        }
+      },
       "say": {
         "notice": {
           "pulledEarly": "boss pulled early??",
@@ -20971,6 +20994,11 @@ export const ru_RU: EnTranslations = {
         "name": "Наставник Хейл",
         "title": "Мастер боя на пристани",
         "greeting": "Манекен у меня за спиной не отвечает ударом на удар и никогда не падает, {className}. Важен счет: твои счетчики урона запоминают каждый удар, что ты по нему нанесешь. Возьми его в цель и открой счетчики, а остальное я тебе покажу."
+      },
+      "tibbs": {
+        "name": "Тиббс",
+        "title": "Представитель профсоюза монстров",
+        "greeting": "Тиббс. Представитель профсоюза монстров. Осторожнее с костями, некоторые из них мои коллеги."
       },
       "tidewatcher_ondrel": {
         "name": "Ондрел Вейн",

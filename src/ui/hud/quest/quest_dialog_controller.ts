@@ -38,6 +38,7 @@ import { clueReplyKey, clueTalkFor } from './clue_talk_row_core';
 import { gossipMenuIsEmpty } from './gossip_menu';
 import { masterCraftTarget } from './master_craft_core';
 import { PROF_INTRO_QUEST_ID, professionIntroHintVisible } from './prof_intro_hint_core';
+import { tibbsDeclineLine, tibbsOfferDialog } from './tibbs_offer_view';
 
 /** One string per offerable-row set, for cheap open-dialog change detection
  *  (the refreshIfChanged staleness signature). */
@@ -378,6 +379,7 @@ export class QuestDialogController {
     if (this.renderInvestigation(npc)) return;
     this.investigationSig = null;
     if (this.renderWorldQuestInstructor(npc)) return;
+    if (this.renderTibbsOffer(npc)) return;
     this.clueReplyOpen = false;
     const definition = NPCS[npc.templateId];
     const interesting = this.offerableRows(npc);
@@ -936,6 +938,52 @@ export class QuestDialogController {
     this.bindClose();
     this.showAndFocus();
     return true;
+  }
+
+  /** Tibbs' shift offer (the Graveyard Shift's way in): his lines, then Take the
+   *  shift (the sim's targeted interact on him starts the run) or Not today
+   *  (his answer, then the dialog closes). */
+  private renderTibbsOffer(npc: Entity): boolean {
+    const view = tibbsOfferDialog(this.deps.world(), npc);
+    if (!view) return false;
+    this.npcId = npc.id;
+    this.detailQuestId = null;
+    // No gossip rows here: keep the row-signature watch from repainting it.
+    this.lastIntroHintVisible = null;
+    this.clueReplyOpen = false;
+    this.paintTibbs(npc, view.lines);
+    const accept = this.makeButton(view.acceptLabel);
+    accept.dataset.gshiftAccept = String(npc.id);
+    accept.addEventListener('click', () => {
+      this.close();
+      this.deps.world().targetEntity(npc.id);
+      this.deps.world().interact();
+    });
+    const decline = this.makeButton(view.declineLabel);
+    decline.dataset.gshiftDecline = String(npc.id);
+    decline.addEventListener('click', () => {
+      // Held like a clue reply: a quest event must not repaint the offer over it.
+      this.clueReplyOpen = true;
+      this.paintTibbs(npc, [tibbsDeclineLine()]);
+      const done = this.makeButton(t('questUi.dialog.continue'));
+      done.addEventListener('click', () => this.close());
+      this.deps.element.appendChild(done);
+      this.bindClose();
+      this.showAndFocus();
+    });
+    this.deps.element.append(accept, decline);
+    this.bindClose();
+    this.showAndFocus();
+    return true;
+  }
+
+  private paintTibbs(npc: Entity, lines: readonly string[]): void {
+    markDialogRoot(this.deps.element, { labelledBy: 'quest-dialog-title' });
+    const name = this.deps.text.npcName(npc.templateId);
+    const title = this.deps.text.npcTitle(npc.templateId);
+    let html = `<div class="panel-title ui-win-head"><span class="ui-win-title" id="quest-dialog-title">${esc(name)}<span class="quest-muted ui-win-sub"> &lt;${esc(title)}&gt;</span></span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
+    for (const line of lines) html += `<div class="qd-text">"${esc(line)}"</div>`;
+    this.deps.element.innerHTML = html;
   }
 
   /** The NPC's answer to a solved clue talk or delivery, then back to the gossip

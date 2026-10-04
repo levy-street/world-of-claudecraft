@@ -251,6 +251,7 @@ const UI_PURE_CORES = [
   // The Graveyard Shift hint line, and the kit's display text and borrowed icons.
   'src/ui/hud/vehicle/morthen_hint_view.ts',
   'src/ui/hud/vehicle/morthen_fade_view.ts',
+  'src/ui/hud/quest/tibbs_offer_view.ts',
   'src/ui/hud/action_bar/action_bar_override_core.ts',
   'src/ui/graveyard_shift_text_core.ts',
   'src/ui/graveyard_shift_icons_core.ts',
@@ -799,6 +800,9 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
   'src/render/action_cam_core.ts',
+  // The Graveyard Shift grave: no loot glint, and its once-per-session whisper.
+  'src/render/ground_object_glint_core.ts',
+  'src/render/grave_whisper_core.ts',
   'src/render/ambience_state_core.ts',
   'src/render/ability_vfx/cast_admission_core.ts',
   'src/render/ability_vfx/physical_choreography_core.ts',

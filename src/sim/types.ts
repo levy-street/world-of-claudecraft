@@ -5641,6 +5641,10 @@ export interface Entity extends ClientMirroredEntityFields {
   forcedTargetTimer: number; // seconds left on the forced-attack window
   shuffleTargetTimer?: number; // seconds until a special AI may reroll its preferred target
   ownerId: number | null; // controlled pets: owning player's entity id (null = wild)
+  // Graveyard Shift's Tibbs (graveyard_shift/grave_staging.ts): who called him up
+  // out of his grave, and on which tick; unset on every other entity.
+  gshiftSummonerPid?: number;
+  gshiftSummonedTick?: number;
   petMode: PetMode; // hunter pet behavior stance
   petTauntTimer: number; // controlled pet Growl cooldown
   petSkillTimer?: number; // independent cooldown for a pet template's signature skill
@@ -7138,6 +7142,10 @@ export type SimEvent = { pid?: number } & (
       past: readonly RealmBuilderHonour[];
     }
   | { type: 'worldQuestInvestigationDialogue'; targetId: number }
+  // Graveyard Shift: Tibbs has climbed out of his grave and offers the shift
+  // (graveyard_shift/grave_staging.ts); the client opens his dialogue. `returning`
+  // is a character that has covered a shift before (the later-meeting line).
+  | { type: 'graveyardShiftOffer'; npcId: number; returning: boolean }
   // `boardId` is the authored NoticeboardDef id (every board shares one
   // templateId), so the client can tell the Proving Shore's recruits' signpost
   // from a town board and open the guild board on its default view.

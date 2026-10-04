@@ -47,6 +47,9 @@ export interface GraveyardShiftOutro {
 
 export interface GraveyardShiftRun {
   readonly ownerPid: number;
+  // How the shift began: the dev command, or Tibbs at his grave (a grave shift
+  // ends back in front of him, grave_staging.ts).
+  readonly entry: 'dev' | 'grave';
   // The claimed slot's partyKey, distinct from every instanceKeyFor key so
   // Reset All Instances and the dungeon door never resolve this claim.
   readonly key: string;

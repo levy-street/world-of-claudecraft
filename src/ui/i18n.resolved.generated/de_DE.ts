@@ -240,6 +240,29 @@ export const de_DE: EnTranslations = {
         "raise": "Raise the Fallen: a body lies near. Every corpse is a colleague. Even theirs.",
         "exit": "Shift over. The Staff Exit behind the throne takes you home."
       },
+      "graveName": "Weathered Grave",
+      "tibbs": {
+        "whisper": "Psst. Down here.",
+        "offer": {
+          "intro1": "Ah. You heard me. Tibbs. Mob union rep. You have met our members. Mostly with an axe.",
+          "intro2": "Morthen has been killed four thousand eight hundred times this week. For trousers.",
+          "intro3": "Union rules say he gets a day off. Nobody wants to cover his shift. Except, I am hoping, you.",
+          "intro4": "Simple job. You are the boss. Adventurers come in. You stop them. They will not notice the difference. Well. They will.",
+          "returning": "Morthen is off again. Bad back. Well. Bad spine. Cover for him?",
+          "accept": "Take the shift",
+          "decline": "Not today"
+        },
+        "say": {
+          "accept": "Wonderful. Mind the bones on the way down. Some of them are colleagues.",
+          "decline": "Fair. Nobody reads the job description either.",
+          "busy": "Come back when you are not so busy. Union rules.",
+          "report": "Shift report! Adventurers sent home: {sent}. Colleagues saved: {saved}. Trousers not handed out: 1.",
+          "payout": "Good job and thank you for your help, adventurer. Here's your payout.",
+          "overtime": "The union admires the overtime.",
+          "consolation": "Do not worry. They kill us every day. Welcome to the job.",
+          "anotherShift": "Another shift? They certainly will."
+        }
+      },
       "say": {
         "notice": {
           "pulledEarly": "boss pulled early??",
@@ -20971,6 +20994,11 @@ export const de_DE: EnTranslations = {
         "name": "Ausbilder Hale",
         "title": "Meister des Kai-Trainings",
         "greeting": "Die Attrappe hinter mir schlägt nie zurück und fällt nie um, {className}. Entscheidend ist die Summe: Deine Schadensanzeigen zählen jeden Treffer. Wähle sie aus und öffne die Anzeigen, dann führe ich dich durch den Rest."
+      },
+      "tibbs": {
+        "name": "Tibbs",
+        "title": "Mob Union Rep",
+        "greeting": "Tibbs. Mob union rep. Mind the bones, some of them are colleagues."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",

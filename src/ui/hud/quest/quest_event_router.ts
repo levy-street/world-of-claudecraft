@@ -23,7 +23,7 @@ interface QuestEventHost {
     source?: null,
     bannerClass?: 'deed',
   ): unknown;
-  questDialog: { refresh(): void };
+  questDialog: { refresh(): void; open(npcId: number): void };
   worldQuestPuzzleWindow: { applyEventPresentation(presentation: QuestEventPresentation): void };
   treasureMapWindow: { open(): void; refresh(): void };
 }
@@ -32,6 +32,11 @@ interface QuestEventHost {
  *  so the HUD's per-event switch skips it. */
 export function applyQuestEventPresentation(hud: object, ev: SimEvent): boolean {
   const h = hud as QuestEventHost;
+  // Tibbs climbed out of his grave: his offer opens in the quest dialog.
+  if (ev.type === 'graveyardShiftOffer') {
+    h.questDialog.open(ev.npcId);
+    return true;
+  }
   // A read treasure map opens its parchment (a re-read has no log line, so
   // this runs before the presentation check); an upgrade or a dig repaints it.
   if (ev.type === 'treasureMapRead') h.treasureMapWindow.open();

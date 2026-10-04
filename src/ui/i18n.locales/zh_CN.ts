@@ -16694,6 +16694,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.drillmaster_hale.title': '码头陪练师',
   'entities.npcs.drillmaster_hale.greeting':
     '我身后那具假人从不还手，也永远打不倒，{className}。真正重要的是账目：你的伤害统计会记下你落在它身上的每一击。把它设为目标，打开伤害统计窗口，剩下的交给我来教你。',
+  'entities.npcs.tibbs.name': '蒂布斯',
+  'entities.npcs.tibbs.title': '怪物工会代表',
+  'entities.npcs.tibbs.greeting': '蒂布斯，怪物工会代表。小心脚下的骨头，有些是我的同事。',
   'entities.quests.q_ps_the_gauntlet.title': '跑过试炼跑道',
   'entities.quests.q_ps_the_gauntlet.text':
     '谷地敬重的每一双腿，都是先从这几条跑道跑出来的，{playerName}。沿第一条跑道向西走到旗帜处，原地转过身来，沿南边的跑道走到第二面旗，最后沿末尾的跑道横移到红旗处。旗帜要按顺序经过；屏幕上方的卡片会随时告诉你该按哪个键。监工佩尔在跑道尽头掐着每一趟的表：等红旗被你甩在身后，他就站在那里等着收你的成绩。',

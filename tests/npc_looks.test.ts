@@ -16,6 +16,7 @@ import {
 } from '../src/render/characters/modular';
 import {
   aldricKeepsHisRig,
+  keepsFixedRig,
   NPC_LOOKS,
   NPC_PROP_SET_IDS,
   normalizeNpcAppearance,
@@ -25,10 +26,8 @@ import {
 import { NPCS } from '../src/sim/data';
 
 describe('npc looks roster', () => {
-  it('covers every NpcDef id except Brother Aldric (every other world NPC composes)', () => {
-    const missing = Object.keys(NPCS).filter(
-      (id) => !aldricKeepsHisRig(id) && npcLookFor(id) === null,
-    );
+  it('covers every NpcDef id except the fixed-rig ones (every other world NPC composes)', () => {
+    const missing = Object.keys(NPCS).filter((id) => !keepsFixedRig(id) && npcLookFor(id) === null);
     expect(missing).toEqual([]);
   });
 
@@ -44,6 +43,16 @@ describe('npc looks roster', () => {
       expect(npcLookFor(id), id).toBeNull();
     }
     expect(Object.keys(NPC_LOOKS).filter((id) => id.startsWith('brother_aldric'))).toEqual([]);
+  });
+
+  // Tibbs, the Graveyard Shift's union rep, is a friendly skeleton on the
+  // skeleton minion rig, never a composed human body.
+  it('keeps Tibbs on his skeleton rig, and only Aldric and Tibbs are fixed', () => {
+    expect(keepsFixedRig('tibbs')).toBe(true);
+    expect(npcLookFor('tibbs')).toBeNull();
+    expect(NPC_LOOKS.tibbs).toBeUndefined();
+    expect(keepsFixedRig('brother_aldric')).toBe(true);
+    expect(keepsFixedRig('gravedigger_mosley')).toBe(false);
   });
 
   it('covers the NPC-bodied quest actors and the dev vendor', () => {

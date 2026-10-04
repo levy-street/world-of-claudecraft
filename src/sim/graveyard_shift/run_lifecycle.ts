@@ -30,6 +30,8 @@ import { graveyardShiftRunSeed } from './bot_brain';
 import { updateGraveyardShiftBots } from './bot_driver';
 import { sayGraveyardShiftGiveUp, updateGraveyardShiftSay } from './bot_say';
 import { partyGivesUp, partyWiped, updateGraveyardShiftCorpseRuns } from './corpse_run';
+import { GRAVEYARD_SHIFT_MIN_LEVEL } from './grave_entry';
+import { endShiftAtGrave, tibbsSay, updateGraveyardShiftGrave } from './grave_staging';
 import { applyMorthenIdentity, removeMorthenIdentity } from './morthen_transform';
 import { graveyardShiftOutroEnd, startLossOutro, startWonOutro } from './outro';
 import {
@@ -46,17 +48,22 @@ import {
   graveyardShiftRunKey,
 } from './run_state';
 
-export const GRAVEYARD_SHIFT_MIN_LEVEL = 10;
+export { GRAVEYARD_SHIFT_MIN_LEVEL };
 
 // A shift that neither side finishes (a stuck bot, an idle owner) ends here.
 export const GRAVEYARD_SHIFT_MAX_SECONDS = 15 * 60;
 
-// Why the owner cannot start a shift right now, or null. Dev-channel English:
-// the run is reachable only through /dev while it is a prototype.
-export function canStartGraveyardShift(ctx: SimContext, pid: number): string | null {
+// Why the owner cannot start a shift right now, or null. Dev-channel English,
+// read by the dev command; the grave answers any refusal with one Tibbs line.
+export function canStartGraveyardShift(
+  ctx: SimContext,
+  pid: number,
+  entry: 'dev' | 'grave' = 'dev',
+): string | null {
   // Offline only: a server would autosave the run's state over the real
   // character, and the online client would rebuild the bar from it.
-  if (!ctx.cfg.offlineHost || !ctx.devCommands) return 'Graveyard Shift runs offline only.';
+  if (!ctx.cfg.offlineHost) return 'Graveyard Shift runs offline only.';
+  if (entry === 'dev' && !ctx.devCommands) return 'Graveyard Shift runs offline only.';
   const r = ctx.resolve(pid);
   if (!r || r.e.dead || r.e.ghost) return 'You cannot start a shift right now.';
   if (ctx.graveyardShiftRuns.has(pid)) return 'You are already on shift.';
@@ -87,8 +94,12 @@ export function canStartGraveyardShift(ctx: SimContext, pid: number): string | n
 }
 
 // Moves the owner into a fresh private slot. Returns the refusal, or null.
-export function startGraveyardShift(ctx: SimContext, pid: number): string | null {
-  const gate = canStartGraveyardShift(ctx, pid);
+export function startGraveyardShift(
+  ctx: SimContext,
+  pid: number,
+  entry: 'dev' | 'grave' = 'dev',
+): string | null {
+  const gate = canStartGraveyardShift(ctx, pid, entry);
   if (gate) return gate;
   const r = ctx.resolve(pid);
   if (!r) return 'You cannot start a shift right now.';
@@ -114,6 +125,7 @@ export function startGraveyardShift(ctx: SimContext, pid: number): string | null
   const parked = applyMorthenIdentity(ctx, r.meta, p);
   const run: GraveyardShiftRun = {
     ownerPid: pid,
+    entry,
     key,
     slot,
     pools,
@@ -134,6 +146,17 @@ export function startGraveyardShift(ctx: SimContext, pid: number): string | null
   return null;
 }
 
+// The targeted interact on Tibbs: the player took the shift. A refusal (a
+// party, a fight, a queue) is one Tibbs line rather than a dev message.
+export function acceptGraveyardShiftFromTibbs(ctx: SimContext, pid: number): void {
+  if (canStartGraveyardShift(ctx, pid, 'grave') !== null) {
+    tibbsSay(ctx, pid, 'busy');
+    return;
+  }
+  tibbsSay(ctx, pid, 'accept');
+  if (startGraveyardShift(ctx, pid, 'grave') !== null) tibbsSay(ctx, pid, 'busy');
+}
+
 // Hands the real character back and frees the slot. Inside the claim the owner
 // is walked out to the Crypt door; a dead owner (corpse or released ghost, since
 // Release can land before this tick) is revived at that same door; already
@@ -145,6 +168,11 @@ export function endGraveyardShift(
   outcome: GraveyardShiftOutcome,
 ): void {
   ctx.graveyardShiftRuns.delete(run.ownerPid);
+  // Tibbs' report counts, taken before the party and the allies are cleared.
+  const report = {
+    sent: run.bots.reduce((sum, bot) => sum + bot.deaths, 0),
+    saved: run.allyIds.filter((id) => ctx.entities.get(id)?.dead === false).length,
+  };
   removeGraveyardShiftParty(ctx, run);
   dismissGraveyardShiftAllies(ctx, run);
   const p = ctx.entities.get(run.ownerPid);
@@ -165,6 +193,7 @@ export function endGraveyardShift(
     ctx.emit({ type: 'log', text: `[dev] Graveyard Shift ended (${outcome}).`, pid: run.ownerPid });
   }
   releaseGraveyardShiftSlot(ctx, run.slot, run.key);
+  if (run.entry === 'grave') endShiftAtGrave(ctx, run, outcome, report);
 }
 
 // Anything Morthen still has in flight must not land from the restored real character.
@@ -189,6 +218,7 @@ function pruneStrayBots(ctx: SimContext, run: GraveyardShiftRun): void {
 // The single per-tick entry: every exit the run did not decide itself is caught
 // here, one tick late at most. Free when no run exists.
 export function updateGraveyardShift(ctx: SimContext): void {
+  updateGraveyardShiftGrave(ctx);
   if (ctx.graveyardShiftRuns.size === 0) return;
   for (const run of [...ctx.graveyardShiftRuns.values()]) {
     updateGraveyardShiftSay(ctx, run);

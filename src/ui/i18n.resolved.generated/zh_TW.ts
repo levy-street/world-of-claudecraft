@@ -240,6 +240,29 @@ export const zh_TW: EnTranslations = {
         "raise": "Raise the Fallen: a body lies near. Every corpse is a colleague. Even theirs.",
         "exit": "Shift over. The Staff Exit behind the throne takes you home."
       },
+      "graveName": "Weathered Grave",
+      "tibbs": {
+        "whisper": "Psst. Down here.",
+        "offer": {
+          "intro1": "Ah. You heard me. Tibbs. Mob union rep. You have met our members. Mostly with an axe.",
+          "intro2": "Morthen has been killed four thousand eight hundred times this week. For trousers.",
+          "intro3": "Union rules say he gets a day off. Nobody wants to cover his shift. Except, I am hoping, you.",
+          "intro4": "Simple job. You are the boss. Adventurers come in. You stop them. They will not notice the difference. Well. They will.",
+          "returning": "Morthen is off again. Bad back. Well. Bad spine. Cover for him?",
+          "accept": "Take the shift",
+          "decline": "Not today"
+        },
+        "say": {
+          "accept": "Wonderful. Mind the bones on the way down. Some of them are colleagues.",
+          "decline": "Fair. Nobody reads the job description either.",
+          "busy": "Come back when you are not so busy. Union rules.",
+          "report": "Shift report! Adventurers sent home: {sent}. Colleagues saved: {saved}. Trousers not handed out: 1.",
+          "payout": "Good job and thank you for your help, adventurer. Here's your payout.",
+          "overtime": "The union admires the overtime.",
+          "consolation": "Do not worry. They kill us every day. Welcome to the job.",
+          "anotherShift": "Another shift? They certainly will."
+        }
+      },
       "say": {
         "notice": {
           "pulledEarly": "boss pulled early??",
@@ -20971,6 +20994,11 @@ export const zh_TW: EnTranslations = {
         "name": "操練官黑爾",
         "title": "碼頭陪練師",
         "greeting": "我身後那具假人從不還手，也永遠打不倒，{className}。真正重要的是帳目：你的傷害統計會記下你落在它身上的每一擊。把它設為目標，打開傷害統計視窗，剩下的交給我來教你。"
+      },
+      "tibbs": {
+        "name": "提布斯",
+        "title": "怪物工會代表",
+        "greeting": "提布斯，怪物工會代表。小心腳下的骨頭，有些是我的同事。"
       },
       "tidewatcher_ondrel": {
         "name": "翁德瑞爾·韋恩",

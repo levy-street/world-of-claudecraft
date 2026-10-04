@@ -17503,6 +17503,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.drillmaster_hale.title': '부두 대련 사범',
   'entities.npcs.drillmaster_hale.greeting':
     '내 뒤에 있는 허수아비는 되받아치지도, 쓰러지지도 않는다, {className}. 중요한 건 장부다. 네가 저기에 꽂은 일격은 하나도 빠짐없이 피해량 미터가 세어 준다. 저것을 대상으로 삼고 미터를 열어라, 나머지는 내가 알려주마.',
+  'entities.npcs.tibbs.name': '팁스',
+  'entities.npcs.tibbs.title': '몬스터 노조 대표',
+  'entities.npcs.tibbs.greeting':
+    '팁스요. 몬스터 노조 대표지요. 뼈 조심하시오. 그중엔 내 동료도 있으니.',
   'entities.quests.q_ps_the_gauntlet.title': '건틀릿 완주',
   'entities.quests.q_ps_the_gauntlet.text':
     '골짜기가 인정하는 다리는 모두 이 길부터 달렸습니다, {playerName}. 첫 번째 길을 서쪽 깃발까지 걷고, 몸을 빙 돌려 남쪽 길을 두 번째 깃발까지 걸은 다음, 마지막 길은 옆걸음으로 붉은 깃발까지 가세요. 깃발은 순서대로 지나야 합니다. 화면 위의 카드가 그때그때 필요한 버튼을 보여 줄 거예요. 감독관 펠이 길 끝에서 모든 완주를 재고 있습니다. 붉은 깃발을 지나면 바로 그 자리에 서서 당신의 완주를 받아 줄 겁니다.',
