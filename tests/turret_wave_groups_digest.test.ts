@@ -148,11 +148,11 @@ const RUNS: readonly [number, number, Aimer, boolean][] = FIRE_AND_FLY_SCENARIOS
 
 const DIGESTS: Readonly<Record<string, string>> = {
   // Re-taken when The Cracked Tower was recomposed from varied bricks (its content changed).
-  'brittle/1/nearest/plain': 'won:7:7:906a6646',
-  'brittle/3/slow/plain': 'won:7:7:da768cf5',
-  'brittle/4/slow/salted': 'won:7:7:aef7731b',
-  'brittle/5/armed/plain': 'won:7:7:37097963',
-  'brittle/9/armed/salted': 'won:7:7:ff0eb959',
+  'brittle/1/nearest/plain': 'won:7:7:2d89b03d',
+  'brittle/3/slow/plain': 'won:7:7:478d09ce',
+  'brittle/4/slow/salted': 'won:7:7:1016bbc1',
+  'brittle/5/armed/plain': 'won:7:7:958a3d05',
+  'brittle/9/armed/salted': 'won:7:7:0b14faac',
   // Re-taken when The Deluge was recomposed from varied bricks (its content changed).
   'deluge/1/nearest/plain': 'won:7:70:098bfd5a',
   'deluge/3/slow/plain': 'won:7:53:21192485',

@@ -601,8 +601,9 @@ const STEADY_GAP = gap(0.9, 1.7);
  * fragility: a small strike costs 1 or 2 points, a medium one up to 4, so every leak counts
  * and a hound surging in from a side away from the fight is a real threat. No large monster
  * comes. The waves vary: walkers, small groups, a procession of shamblers gathering as a
- * pack, hounds surging in, and a great procession of two packs at the end. No sponge: a
- * medium dead falls to two or three good shells.
+ * pack and a great procession of two at the end, and hounds surging in again and again,
+ * most often while the player watches a procession gather. No sponge: a medium dead falls
+ * to two or three good shells.
  */
 const DEAD = { speedScale: 0.9, speedScaleMax: 1.05 } as const;
 const HOUND = { speedScale: 1.6, speedScaleMax: 1.9 } as const;
@@ -648,6 +649,7 @@ export const TURRET_MISSION_BRITTLE: TurretScenarioDef = {
           ),
           delayTicks: ticks(6),
         },
+        surgers([{ templateId: 'wild_boar', count: 1, level: 2, ...HOUND_RUN }], 1, 13),
       ],
       coreDamage: 60,
       kegs: [spaced(2)],
@@ -660,7 +662,8 @@ export const TURRET_MISSION_BRITTLE: TurretScenarioDef = {
           count: 2,
           widthTurn: 0.1,
         }),
-        surgers([{ templateId: 'wild_boar', count: 1, level: 2, ...HOUND_RUN }], 1, 10),
+        surgers([{ templateId: 'wild_boar', count: 1, level: 2, ...HOUND_RUN }], 1, 8),
+        surgers([{ templateId: 'wild_boar', count: 2, level: 2, ...HOUND_RUN }], 2, 15),
       ],
       coreDamage: 60,
       kegs: [front(0)],
@@ -676,6 +679,7 @@ export const TURRET_MISSION_BRITTLE: TurretScenarioDef = {
           ],
           3,
         ),
+        surgers([{ templateId: 'wild_boar', count: 2, level: 2, ...HOUND_RUN }], 2, 9),
       ],
       coreDamage: 150,
       kegs: [front(1, 2)],
@@ -687,10 +691,10 @@ export const TURRET_MISSION_BRITTLE: TurretScenarioDef = {
           [{ templateId: 'tunnel_rat', count: 6, level: 4, speedScale: 0.85 }],
           gap(1.2, 1.8),
         ),
-        surgers([{ templateId: 'wild_boar', count: 2, level: 2, ...HOUND_RUN }], 2, 8),
+        surgers([{ templateId: 'wild_boar', count: 3, level: 2, ...HOUND_RUN }], 3, 8),
       ],
       coreDamage: 60,
-      kegs: [spaced(2)],
+      kegs: [smallCrown(2)],
     },
     {
       // Small groups of acolytes and revenants from three sides, one after another.
@@ -705,6 +709,17 @@ export const TURRET_MISSION_BRITTLE: TurretScenarioDef = {
           5,
           0.06,
         ),
+        surgers([{ templateId: 'wild_boar', count: 2, level: 2, ...HOUND_RUN }], 1, 6),
+        {
+          ...bunches(
+            [{ templateId: 'wild_boar', count: 4, level: 2, ...HOUND_RUN }],
+            gap(0.15, 0.3),
+            4,
+            1,
+            0.05,
+          ),
+          delayTicks: ticks(13),
+        },
       ],
       coreDamage: 200,
       kegs: [front(0), spaced(1)],
@@ -719,7 +734,8 @@ export const TURRET_MISSION_BRITTLE: TurretScenarioDef = {
           ],
           gap(0.9, 1.4),
         ),
-        surgers([{ templateId: 'wild_boar', count: 2, level: 2, ...HOUND_RUN }], 2, 7),
+        surgers([{ templateId: 'wild_boar', count: 3, level: 2, ...HOUND_RUN }], 3, 7),
+        surgers([{ templateId: 'wild_boar', count: 1, level: 2, ...HOUND_RUN }], 1, 14),
       ],
       coreDamage: 160,
       kegs: [spaced(1, 3)],
@@ -747,7 +763,8 @@ export const TURRET_MISSION_BRITTLE: TurretScenarioDef = {
           ...walkers([{ templateId: 'tunnel_rat', count: 6, level: 4, ...DEAD }], gap(0.9, 1.3)),
           delayTicks: ticks(10),
         },
-        surgers([{ templateId: 'wild_boar', count: 2, level: 2, ...HOUND_RUN }], 2, 14),
+        surgers([{ templateId: 'wild_boar', count: 2, level: 2, ...HOUND_RUN }], 2, 7),
+        surgers([{ templateId: 'wild_boar', count: 3, level: 2, ...HOUND_RUN }], 3, 15),
       ],
       coreDamage: 200,
       kegs: [front(0), front(1)],

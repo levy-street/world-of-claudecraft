@@ -436,14 +436,16 @@ describe('Fire and Fly online: the socket-free round trip', () => {
       shockwave: plan.arsenal.shockwave + 3,
       fragmentation: plan.arsenal.fragmentation + 3,
     });
+    // The aimer spends every frag; a Shockwave only when a body stands in reach, so the
+    // run may end with one left: the client counts exactly what the server spent.
     expect(truth.defense.stats.frags).toBe(given.fragmentation);
-    expect(truth.defense.stats.shockwaves).toBe(given.shockwave);
-    expect(slams).toBeGreaterThanOrEqual(given.shockwave);
+    expect(truth.defense.stats.shockwaves).toBeGreaterThanOrEqual(given.shockwave - 1);
+    expect(slams).toBeGreaterThanOrEqual(truth.defense.stats.shockwaves);
     expect(client.turretSession!.defense.stats).toEqual(truth.defense.stats);
-    expect(turretChargesLeft(client.turretSession!.defense)).toEqual({
-      shockwave: 0,
-      fragmentation: 0,
-    });
+    expect(turretChargesLeft(client.turretSession!.defense)).toEqual(
+      turretChargesLeft(truth.defense),
+    );
+    expect(turretChargesLeft(truth.defense).fragmentation).toBe(0);
     // Each weapon's entries reached the client and matched the server's ring every tick.
     for (const kind of [
       'fired frag',
