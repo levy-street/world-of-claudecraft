@@ -223,6 +223,19 @@ describe('Graveyard Shift outro: a won shift', () => {
     expect(dungeonAt(sim.player.pos.x)).toBeNull();
   });
 
+  it('a won owner who leaves the claim another way (a teleport) still ends the shift as a win', () => {
+    const { sim, run } = shiftSim();
+    giveUp(sim, run);
+    const exitId = run.outro!.portalId!;
+    place(sim, sim.player, 10, 10);
+    const events = sim.tick();
+    expect(run.outro!.leaving).toBe(false);
+    expect(logs(events)).toContain(ENDED('won'));
+    expect(logs(events)).not.toContain(ENDED('aborted'));
+    expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).toBeNull();
+    expect(sim.entities.has(exitId)).toBe(false);
+  });
+
   it('a won shift nobody walks out of ends as a win on its own', () => {
     const { sim, run } = shiftSim();
     giveUp(sim, run);
@@ -252,6 +265,20 @@ describe('Graveyard Shift outro: leaveDungeon outside a won shift', () => {
     expect(run.outro).toBeNull();
     expect(dungeonAt(sim.player.pos.x)).toBeNull();
     expect(logs(sim.tick())).toContain(ENDED('aborted'));
+  });
+
+  it('during a lost shift it walks the owner out and the run ends lost, never won', () => {
+    const { sim, run } = shiftSim();
+    lethal(sim, null, sim.player);
+    sim.tick();
+    expect(run.outro?.kind).toBe('lost');
+    expect(sim.leaveDungeon()).toBe(true);
+    expect(run.outro!.leaving).toBe(false);
+    expect(dungeonAt(sim.player.pos.x)).toBeNull();
+    const events = sim.tick();
+    expect(logs(events)).toContain(ENDED('lost'));
+    expect(logs(events)).not.toContain(ENDED('won'));
+    expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).toBeNull();
   });
 
   it('in the open world with no run it does nothing', () => {

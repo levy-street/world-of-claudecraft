@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { graveyardShiftRunFor } from '../src/sim/graveyard_shift';
-import { hasMorthenIdentity } from '../src/sim/graveyard_shift/morthen_identity';
+import {
+  adventurerMarkerAura,
+  GSHIFT_ADVENTURER_AURA_ID,
+} from '../src/sim/graveyard_shift/hostility';
+import {
+  hasMorthenIdentity,
+  MORTHEN_IDENTITY_AURA_ID,
+  morthenIdentityAura,
+} from '../src/sim/graveyard_shift/morthen_identity';
 import { summonMountItem } from '../src/sim/mounts';
 import { restorePetFromDelveStash } from '../src/sim/pet/pet_commands';
 import { refreshModsForEquipmentChange } from '../src/sim/progression/talents';
@@ -102,6 +110,13 @@ function hitPlayer(sim: Sim, amount: number) {
 }
 
 describe('Graveyard Shift Morthen identity', () => {
+  it('keeps the load-bearing identity and adventurer aura ids', () => {
+    expect(MORTHEN_IDENTITY_AURA_ID).toBe('gshift_morthen_identity');
+    expect(morthenIdentityAura(1).id).toBe('gshift_morthen_identity');
+    expect(GSHIFT_ADVENTURER_AURA_ID).toBe('gshift_adventurer');
+    expect(adventurerMarkerAura(1).id).toBe('gshift_adventurer');
+  });
+
   it.each([
     ['warrior', 15],
     ['mage', 20],

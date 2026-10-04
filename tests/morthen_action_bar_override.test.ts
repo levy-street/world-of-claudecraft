@@ -13,6 +13,7 @@ import {
   morthenControlsActive,
   morthenCrossHotbarOverride,
 } from '../src/game/morthen_controls';
+import { ABILITIES } from '../src/sim/data';
 import { MORTHEN_KIT } from '../src/sim/graveyard_shift/kit';
 import { morthenIdentityAura } from '../src/sim/graveyard_shift/morthen_identity';
 import { Sim } from '../src/sim/sim';
@@ -144,6 +145,27 @@ describe('the action bar under the override', () => {
     expect(bar.actionForSlot(1)).toEqual({ type: 'ability', id: 'fireball' });
     expect(bar.actionForSlot(2)).toEqual({ type: 'ability', id: 'frostbolt' });
   });
+
+  it('memoizes the freed Attack slot stub per ability id, and reads none under the kit', () => {
+    const identity = { on: false };
+    const { bar } = controller(() => ['fireball', 'frostbolt'], identity);
+    expect(bar.freedAttackSlotAbility()).toBeNull();
+    bar.replaceAttackAction({ type: 'ability', id: 'fireball' });
+    const first = bar.freedAttackSlotAbility();
+    expect(first).toEqual({ def: ABILITIES.fireball, cost: 0, known: false });
+    expect(bar.freedAttackSlotAbility()).toBe(first);
+    bar.replaceAttackAction({ type: 'ability', id: 'frostbolt' });
+    const second = bar.freedAttackSlotAbility();
+    expect(second).toEqual({ def: ABILITIES.frostbolt, cost: 0, known: false });
+    expect(bar.freedAttackSlotAbility()).toBe(second);
+    // Slot 0 is the Attack toggle under the kit, whatever the saved slot holds.
+    identity.on = true;
+    expect(bar.freedAttackSlotAbility()).toBeNull();
+    identity.on = false;
+    expect(bar.freedAttackSlotAbility()?.def).toBe(ABILITIES.frostbolt);
+    bar.replaceAttackAction(null);
+    expect(bar.freedAttackSlotAbility()).toBeNull();
+  });
 });
 
 describe('the kit on the real bar view', () => {
@@ -244,6 +266,32 @@ describe('the cross hotbar under the override', () => {
       type: 'ability',
       id: 'fireball',
     });
+  });
+});
+
+describe('the cross hotbar seed under the override', () => {
+  let store: Map<string, string>;
+  beforeEach(() => {
+    store = installStorage();
+  });
+
+  it('seeds nothing while the kit stands in, then seeds once it lifts', () => {
+    const bindings = new CrossHotbarBindings('char:seed');
+    let on = true;
+    bindings.setOverride(() => morthenCrossHotbarOverride(on ? morthen : plain));
+    const before = JSON.stringify([...store]);
+    const barActions = [{ type: 'ability' as const, id: 'fireball' }];
+    expect(bindings.seedOnce(barActions)).toBe(false);
+    expect(bindings.isSeeded()).toBe(false);
+    expect(JSON.stringify([...store])).toBe(before);
+    on = false;
+    expect(bindings.seedOnce(barActions)).toBe(true);
+    expect(bindings.isSeeded()).toBe(true);
+    expect(bindings.setActions(CROSS_HOTBAR_PRIMARY_SET)[0]).toEqual({
+      type: 'ability',
+      id: 'fireball',
+    });
+    expect(JSON.stringify([...store])).not.toBe(before);
   });
 });
 

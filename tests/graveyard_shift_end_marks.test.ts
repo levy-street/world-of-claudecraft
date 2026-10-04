@@ -31,6 +31,11 @@ import { setLanguage } from '../src/ui/i18n';
 const DEFEATED = defeatedAura(1);
 
 describe('the Defeated aura on the client', () => {
+  it('keeps its load-bearing aura id', () => {
+    expect(DEFEATED_AURA_ID).toBe('gshift_defeated');
+    expect(DEFEATED.id).toBe('gshift_defeated');
+  });
+
   it('poses the living body dead, keyed on the aura id', () => {
     expect(DEFEATED.id).toBe(DEFEATED_AURA_ID);
     const flags = characterEffectFlags([DEFEATED]);

@@ -15,9 +15,13 @@ import {
   TIBBS_ENTITY_ID,
   TIBBS_IDLE_SECONDS,
   TIBBS_LEAVE_RADIUS,
+  TIBBS_NPC_ID,
   tibbsSpot,
 } from '../src/sim/graveyard_shift/grave_entry';
-import { TIBBS_FOLLOW_UP_SECONDS } from '../src/sim/graveyard_shift/grave_staging';
+import {
+  graveyardShiftEligibleFor,
+  TIBBS_FOLLOW_UP_SECONDS,
+} from '../src/sim/graveyard_shift/grave_staging';
 import {
   acceptGraveyardShiftFromTibbs,
   endGraveyardShift,
@@ -127,6 +131,14 @@ const atGrave = (sim: Sim) => {
 };
 
 describe('the grave', () => {
+  it('keeps its load-bearing ids', () => {
+    expect(GRAVE_ITEM_ID).toBe('gshift_grave');
+    expect(GRAVE_ENTITY_ID).toBe(2_147_200_001);
+    expect(TIBBS_ENTITY_ID).toBe(2_147_200_002);
+    expect(TIBBS_NPC_ID).toBe('tibbs');
+    expect(BOSS_FOR_A_DAY_DEED_ID).toBe('hid_boss_for_a_day');
+  });
+
   it('is absent for an ineligible offline player', () => {
     for (const opts of [{ level: 14 }, { level: 15, deed: false }] satisfies Opts[]) {
       const sim = graveSim(opts);
@@ -230,6 +242,19 @@ describe('Tibbs', () => {
     // The grave stays for the way back, though Morthen reads as level 10 on shift.
     ticks(sim, 20 * 10);
     expect(sim.entities.has(GRAVE_ENTITY_ID)).toBe(true);
+  });
+
+  it('reads eligibility from the parked real level while Morthen is pinned to level 10', () => {
+    const sim = graveSim();
+    takeShift(sim);
+    const run = graveyardShiftRunFor(sim.ctx, sim.playerId)!;
+    expect(sim.player.level).toBe(10);
+    expect(run.parked.level).toBe(15);
+    expect(graveyardShiftEligibleFor(sim.ctx, sim.playerId)).toBe(true);
+    const parked = run.parked;
+    Object.assign(run, { parked: { ...parked, level: 14 } });
+    expect(graveyardShiftEligibleFor(sim.ctx, sim.playerId)).toBe(false);
+    Object.assign(run, { parked });
   });
 
   it('answers a busy player with one line and starts nothing', () => {

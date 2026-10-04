@@ -228,6 +228,32 @@ describe('Graveyard Shift say lines (run)', () => {
     expect(rest.map((h) => triggerOf(h.ev))).toEqual(['loot', 'loot']);
   });
 
+  it('the two loot lines come from two different living bots', () => {
+    // Two left standing, so a repeated speaker would show on most seeds.
+    for (const seed of [42, 7, 99, 1234, 2026, 31337]) {
+      const { sim, run } = shiftSim(seed);
+      const standing = new Set([botEntity(sim, run, 'tank').id, botEntity(sim, run, 'healer').id]);
+      for (const b of run.bots) if (!standing.has(b.pid)) kill(sim, sim.entities.get(b.pid)!);
+      runTicks(sim, 2);
+      (sim as any).dealDamage(
+        null,
+        sim.player,
+        sim.player.maxHp + 500,
+        false,
+        'physical',
+        null,
+        'hit',
+        true,
+      );
+      const loot = heardBy(runTicks(sim, LOSS_OUTRO_TICKS + 3), sim.playerId).filter(
+        (h) => triggerOf(h.ev) === 'loot',
+      );
+      expect(loot, `seed ${seed}`).toHaveLength(2);
+      for (const h of loot) expect(standing.has(h.ev.fromPid), `seed ${seed}`).toBe(true);
+      expect(loot[0].ev.fromPid, `seed ${seed}`).not.toBe(loot[1].ev.fromPid);
+    }
+  });
+
   it('Morthen dying outright (the /dev kill path) also makes the party cheer', () => {
     const { sim } = shiftSim();
     runTicks(sim, 2);

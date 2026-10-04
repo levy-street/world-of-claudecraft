@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { DUNGEONS } from '../src/sim/data';
 import { graveyardShiftRunFor } from '../src/sim/graveyard_shift';
-import { CORPSE_RELEASE_TICKS, CORPSE_RETURN_TICKS } from '../src/sim/graveyard_shift/corpse_run';
+import {
+  CORPSE_RELEASE_TICKS,
+  CORPSE_RETURN_TICKS,
+  partyGivesUp,
+  partyWiped,
+} from '../src/sim/graveyard_shift/corpse_run';
 import { isGraveyardShiftAdventurer } from '../src/sim/graveyard_shift/hostility';
 import { GRAVEYARD_SHIFT_DUNGEON_ID } from '../src/sim/graveyard_shift/run_layout';
 import { isGraveyardShiftStaffExit } from '../src/sim/graveyard_shift/shift_end_marks';
@@ -91,7 +96,7 @@ describe('Graveyard Shift corpse run', () => {
     const entry = DUNGEONS[GRAVEYARD_SHIFT_DUNGEON_ID].entry;
     // At the entrance, a hundred yards from the boss chamber (it has started walking).
     expect(Math.abs(mage.pos.x - (origin.x + entry.x))).toBeLessThan(3);
-    expect(mage.pos.z - (origin.z + entry.z)).toBeLessThan(5);
+    expect(Math.abs(mage.pos.z - (origin.z + entry.z))).toBeLessThan(5);
     // Hostile again: the death had stripped the marker.
     expect(isGraveyardShiftAdventurer(mage)).toBe(true);
     expect((sim as any).isHostileTo(sim.player, mage)).toBe(true);
@@ -175,6 +180,30 @@ describe('Graveyard Shift corpse run', () => {
     for (const b of run.bots) if (b.pid !== tank.id) kill(sim, sim.entities.get(b.pid)!);
     ticks(sim, CORPSE_RETURN_TICKS - 1);
     expect(graveyardShiftRunFor(sim.ctx, sim.playerId)).not.toBeNull();
+  });
+
+  it('the last one down with its corpse run to come does not give up, even with nobody else left', () => {
+    const { sim, run } = shiftSim();
+    const tank = bot(sim, run, 'warrior');
+    const others = run.bots.map((b) => sim.entities.get(b.pid)!).filter((e) => e !== tank);
+    for (const e of others) kill(sim, e);
+    ticks(sim, CORPSE_RETURN_TICKS + 1);
+    for (const e of others) expect(e.dead).toBe(false);
+    // Same instant: the four fall for good, the tank falls for the first time.
+    for (const e of others) kill(sim, e);
+    kill(sim, tank);
+    const events = sim.tick();
+    expect(partyWiped(sim.ctx, run)).toBe(false);
+    expect(partyGivesUp(sim.ctx, run)).toBe(false);
+    expect(run.outro).toBeNull();
+    expect(said(events, 'devCommand.graveyardShift.say.giveUp')).toHaveLength(0);
+    ticks(sim, CORPSE_RETURN_TICKS - 2);
+    expect(tank.dead).toBe(true);
+    expect(run.outro).toBeNull();
+    // Back in alone, it is the last one standing with nobody to wait for.
+    ticks(sim, 2);
+    expect(run.outro?.kind).toBe('won');
+    expect(sim.ctx.players.has(tank.id)).toBe(false);
   });
 
   it('a raised corpse leaves with its owner: the next corpse can rise again', () => {
