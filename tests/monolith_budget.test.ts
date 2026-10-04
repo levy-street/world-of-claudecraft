@@ -1220,7 +1220,11 @@ const MONOLITHS: MonolithRow[] = [
     // the action-bar freeze getter, the adventurer join/leave ctx bindings and
     // the run hostility arm; the known-list rule swapped in place). Exact count,
     // zero slack.
-    ceiling: 11639,
+    // LOWERED 11639 -> 11636 by the Graveyard Shift save override: the run
+    // hostility arm moved into graveyard_shift/hostility.ts (shiftPairHostile),
+    // which paid for the one serializeCharacter line that routes every save
+    // through graveyard_shift/save_override.ts. Exact count, zero slack.
+    ceiling: 11636,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

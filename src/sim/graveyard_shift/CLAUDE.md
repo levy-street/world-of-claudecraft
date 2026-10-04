@@ -14,9 +14,9 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
   `ctx.cfg.offlineHost` (set only by `src/game/offline_world_config.ts`, and the
   offline world itself is offered in dev builds only: `src/game/offline_mode_gate.ts`,
   so no production player can reach the grave yet); the dev entry also needs
-  `ctx.devCommands`. A server would autosave the run's state over
-  the real character. Lifting this gate is a step of its own (save override, client
-  mirror, a per-viewer grave gate), and so is moving the mode's player-visible
+  `ctx.devCommands`. Lifting this gate is the online work in progress (the
+  save override below is in; client mirror and a per-viewer grave gate to come),
+  and so is moving the mode's player-visible
   strings (grave and Staff Exit labels, Tibbs, hints, say lines) out of
   `devCommand.graveyardShift.*` into a player namespace with their non-Latin fills:
   the M16 guard skips `devCommand.` keys, which is only right while the mode is a
@@ -42,6 +42,13 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
   paid on arrival, so closing the dialog loses nothing), on a loss his
   consolation and a fresh offer; an aborted one says nothing. A `/dev` shift
   pays nothing and grants no deed.
+- **Saves write the real character.** `serializeCharacter` routes its result
+  through `graveyardShiftSaveState` (`save_override.ts`, the `meta.fiestaRestore`
+  precedent): for a run's owner a save writes the parked level and talents, the
+  snapshotted pools, cooldowns and sickness, the real resource, a living body in
+  front of the grave (or at the Crypt door for a dev run). Every save path reads
+  `serializeCharacter` (autosave, a dropped socket's flush, logout, shutdown, the
+  deed unlock's save, the leaderboard level), so none can persist Morthen.
 - **State on Sim.** Runs live in `Sim.graveyardShiftRuns` (owner pid to run),
   exposed as the `ctx.graveyardShiftRuns` live view. Modules here hold functions.
 - **Zero shared rng from this module.** Nothing here calls `ctx.rng`: starting
@@ -204,9 +211,8 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
   path; a short cast is refused with "Not enough Dread!"
   (both cost checks in `casting_lifecycle.ts`), re-localized by
   `error_text_i18n_core.ts` into a `devCommand.graveyardShift.*` key.
-- **Not persisted.** Offline only; `persistedResource` would write a warrior's Dread
-  as rage and a mana class's stale `savedMana` (pinned in `tests/dread_resource.test.ts`),
-  a step of its own (save override, client mirror).
+- **Never persisted.** A save taken mid-run writes the real resource instead
+  (`run.savedResource`, persistedResource at the start; see the save override).
 
 ## Skeleton allies
 - **Two temporary necromancy skeletons** (`run_allies.ts`, `necromancy_skeletal_warrior`
@@ -315,6 +321,7 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
 | `bot_say.ts` | the say observer: triggers, pacing, the private say Rng, the pid-routed emit |
 | `grave_entry.ts` | pure leaf: the grave and Tibbs ids and spots, the eligibility rule, the deed id |
 | `grave_staging.ts` | the grave spawn, Tibbs' rise, offer, lines and dismissal, the end of a grave shift |
+| `save_override.ts` | what a save taken mid-run writes: the owner's real character (`graveyardShiftSaveState`) |
 | `run_lifecycle.ts` | `canStartGraveyardShift`, `startGraveyardShift`, `endGraveyardShift`, `updateGraveyardShift` (the one tick entry, called just before the delve runs) |
 | `index.ts` | the public barrel |
 

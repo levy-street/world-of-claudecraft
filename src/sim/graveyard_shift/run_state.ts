@@ -56,6 +56,9 @@ export interface GraveyardShiftRun {
   readonly slot: InstanceSlot;
   // What the owner carried in, handed back on every exit (arena parenthesis).
   readonly pools: ArenaReturnPools;
+  // The real resource as a save persists it (persistedResource at the start), so
+  // a save mid-run writes it rather than the Dread pool (save_override.ts).
+  readonly savedResource: number;
   readonly petStowed: boolean;
   // The owner's real level and talent modifiers while they are Morthen.
   readonly parked: MorthenParked;

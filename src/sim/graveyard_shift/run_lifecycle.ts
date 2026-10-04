@@ -6,13 +6,14 @@
 
 import { dismissOwnedGuardians } from '../combat/guardians';
 import { despawnTemporaryNecromancyUndead } from '../combat/necromancy';
-import { dungeonAt, isArenaPos, isDelvePos } from '../data';
+import { CLASSES, dungeonAt, isArenaPos, isDelvePos } from '../data';
 import { gliderActionsLocked } from '../glider_action_lock';
 import { instanceClaimHolds, instanceOriginOf, leaveDungeon } from '../instances/dungeons';
 import { isInJailCage } from '../jail';
 import { forceDismount } from '../mounts';
 import { restorePetFromDelveStash, stowPetForDelve } from '../pet/pet_commands';
 import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
+import { persistedResource } from '../serialize_resource';
 import { shadowActionsLocked } from '../shadow_action_lock';
 import type { SimContext } from '../sim_context';
 import {
@@ -114,6 +115,12 @@ export function startGraveyardShift(
   if (!slot) return 'Every crypt is busy. Try again soon.';
   const p = r.e;
   const pools = snapshotArenaReturnPools(p);
+  const savedResource = persistedResource(
+    CLASSES[r.meta.cls].resourceType,
+    p.resourceType,
+    p.resource,
+    p.savedMana,
+  );
   forceDismount(ctx, p);
   despawnTemporaryNecromancyUndead(ctx, pid);
   dismissOwnedGuardians(ctx, pid);
@@ -135,6 +142,7 @@ export function startGraveyardShift(
     key,
     slot,
     pools,
+    savedResource,
     petStowed: !stashedBefore && ctx.delvePetStash.has(pid),
     parked,
     startedTick: ctx.tickCount,

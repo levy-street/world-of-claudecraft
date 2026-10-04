@@ -4091,7 +4091,8 @@ export class Sim {
       ...materialGathererIdentitySaveFragment(meta.gathererIdentity),
     };
     // Expired party-trade markers retire at this persistence boundary, never by tick sweep.
-    return sanitizeRemovedZone1Content(retirePartyTradeOnSave(state, this.lockoutNowMs())).state;
+    const saved = gshiftMod.graveyardShiftSaveState(this.ctx, pid, state);
+    return sanitizeRemovedZone1Content(retirePartyTradeOnSave(saved, this.lockoutNowMs())).state;
   }
 
   /** Set a player's appearance skin (meta + entity). Bounded; the renderer
@@ -9130,11 +9131,7 @@ export class Sim {
       if (bg && bg.state === 'active' && this.bgMatches.get(target.id) === bg) {
         return bgMod.bgTeamOf(bg, attackerPlayer.id) !== bgMod.bgTeamOf(bg, target.id);
       }
-      if (
-        this.graveyardShiftRuns.size > 0 &&
-        gshiftMod.graveyardShiftPairHostile(attackerPlayer, target)
-      )
-        return true;
+      if (gshiftMod.shiftPairHostile(this.graveyardShiftRuns, attackerPlayer, target)) return true;
       if (worldPvpMod.isWorldPvpHostile(this.ctx, attackerPlayer, target)) return true;
       // The jail brawl: prisoners are hostile to each other, always (pets
       // resolve to their owner via pvpController above, so a prisoner's pet

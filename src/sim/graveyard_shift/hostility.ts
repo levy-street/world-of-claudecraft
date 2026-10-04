@@ -20,6 +20,15 @@ export function graveyardShiftPairHostile(a: Entity, b: Entity): boolean {
   );
 }
 
+/** Sim.isHostileTo's player arm: free while no run exists. */
+export function shiftPairHostile(
+  runs: ReadonlyMap<number, unknown>,
+  a: Entity,
+  b: Entity,
+): boolean {
+  return runs.size > 0 && graveyardShiftPairHostile(a, b);
+}
+
 // Permanent and undispellable: only the run's teardown removes an adventurer.
 export function adventurerMarkerAura(botId: number): Aura {
   return {
