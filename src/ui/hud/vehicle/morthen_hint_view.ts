@@ -29,10 +29,10 @@ const HINT_ABILITY: Readonly<Record<MorthenHintId, string>> = {
 };
 
 const HINT_KEY: Readonly<Record<MorthenHintId, TranslationKey>> = {
-  chain: 'devCommand.graveyardShift.hints.chain',
-  pulse: 'devCommand.graveyardShift.hints.pulse',
-  raise: 'devCommand.graveyardShift.hints.raise',
-  exit: 'devCommand.graveyardShift.hints.exit',
+  chain: 'graveyardShift.hints.chain',
+  pulse: 'graveyardShift.hints.pulse',
+  raise: 'graveyardShift.hints.raise',
+  exit: 'graveyardShift.hints.exit',
 };
 
 const PULSE = MORTHEN_KIT.find((def) => def.id === HINT_ABILITY.pulse) ?? null;

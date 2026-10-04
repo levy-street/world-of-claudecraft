@@ -94,8 +94,8 @@ export function objectDisplayName(entity: Entity): string {
   if (entity.templateId === 'delve_bell_rope' || entity.templateId === 'delve_bell_rope_pulled') {
     return t('delveUi.object.bell_rope');
   }
-  if (isGraveyardShiftStaffExit(entity)) return t('devCommand.graveyardShift.staffExit');
-  if (isGraveyardShiftGrave(entity)) return t('devCommand.graveyardShift.graveName');
+  if (isGraveyardShiftStaffExit(entity)) return t('graveyardShift.staffExit');
+  if (isGraveyardShiftGrave(entity)) return t('graveyardShift.graveName');
   if (
     (entity.templateId === 'dungeon_door' || entity.templateId === 'dungeon_exit') &&
     entity.dungeonId

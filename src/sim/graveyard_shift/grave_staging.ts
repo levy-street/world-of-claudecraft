@@ -35,10 +35,10 @@ import {
 import type { GraveyardShiftOutcome, GraveyardShiftRun } from './run_state';
 
 const GRAVE_NAME = 'Glowing Grave';
-const SAY_KEY = 'devCommand.graveyardShift.tibbs.say';
+const SAY_KEY = 'graveyardShift.tibbs.say';
 
 // English fallbacks for Tibbs' keyed lines (the client renders the catalog).
-const TIBBS_LINES = {
+export const TIBBS_LINES = {
   accept: 'Wonderful. Mind the bones on the way down. Some of them are colleagues.',
   busy: 'Come back when you are not so busy. Union rules.',
   covered: 'Your shift is covered. Morthen is back at work, and he says thank you.',

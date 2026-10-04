@@ -18756,6 +18756,84 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '道を南へ、境を越えてゲイルクレストへ入り、海岸まで出よ。古い灯台の番人、灯台守ブラムが最後の言葉を持っている。',
   'clues.hunt_evergarden_beacon_road.3':
     'オールドビーコンの北西、灯りから下る小道のすぐ脇で、芝が切り取られて元に戻されている。そこで巻物を使い、掘れ。',
+  'graveyardShift.identityAura': '墓呼びのモーセン',
+  'graveyardShift.defeatedAura': '敗北',
+  'graveyardShift.staffExit': '従業員出口',
+  'graveyardShift.adventurerAura': '冒険者',
+  'graveyardShift.resource': '戦慄',
+  'graveyardShift.errors.notEnoughDread': '戦慄が足りません！',
+  'graveyardShift.errors.noCorpse': '蘇らせる死体がありません。',
+  'graveyardShift.abilities.shadowPulse.name': '影の波動',
+  'graveyardShift.abilities.shadowPulse.description':
+    '影の波動を放ち、視界内の{radius}ヤード以内にいる敵それぞれに{min}から{max}の影ダメージを与えます。命中した敵はそれぞれ{distance}ヤード吹き飛ばされ、{slowSeconds}秒間移動速度が{slow}低下します。',
+  'graveyardShift.abilities.sextonsChain.name': '墓守の鎖',
+  'graveyardShift.abilities.sextonsChain.description':
+    '対象を自分から{stop}ヤード以内まで引き寄せ、{slowSeconds}秒間移動速度を{slow}低下させます。詠唱中の呪文は中断されてその系統が{lockout}秒間封じられ、対象は{silence}秒間沈黙します。',
+  'graveyardShift.abilities.raiseFallen.name': '倒れし者の蘇生',
+  'graveyardShift.abilities.raiseFallen.description':
+    '{radius}ヤード以内で最も近い死体をスケルトンとして蘇らせ、{seconds}秒間自分のために戦わせます。各死体は一度しか蘇りません。',
+  'graveyardShift.hints.chain':
+    '墓守の鎖：一人選んで引き寄せましょう。まずはヒーラーがおすすめです。',
+  'graveyardShift.hints.pulse':
+    '影の波動が使用可能：周囲への強烈な一撃で、敵が近くにいるほど効果的です。詠唱は妨害されることがあります。彼らは狙ってきます。',
+  'graveyardShift.hints.raise':
+    '倒れし者の蘇生：近くに亡骸があります。死体はみな同僚です。彼らのものでさえ。',
+  'graveyardShift.hints.exit': 'シフト終了。玉座の裏の従業員出口から帰れます。',
+  'graveyardShift.graveName': '光る墓',
+  'graveyardShift.tibbs.whisper': 'しっ。こっちだ、下だよ。',
+  'graveyardShift.tibbs.offer.intro1':
+    'おっと、聞こえたか。名前はティブスだ。この墓所のモンスターたちの代表をしている。君がいつも斧を振り下ろす先で出会う連中さ。',
+  'graveyardShift.tibbs.offer.intro2':
+    'うちのボスのモーセンは、今週だけで四千八百回も倒されている。いつも同じズボン一本のためにね。組合規定では一日休む権利があるんだが、誰もシフトを代わってくれない。',
+  'graveyardShift.tibbs.offer.intro3':
+    '君以外は、だといいんだが。簡単な仕事さ。君がボスを演じる。冒険者のパーティーがもう中に入っている。止めてくれ。違いには絶対気づかないよ。まあ。気づくだろうね。',
+  'graveyardShift.tibbs.offer.accept': 'シフトを引き受ける',
+  'graveyardShift.tibbs.offer.decline': '今日はやめておく',
+  'graveyardShift.tibbs.offer.thanks': 'ありがとう、ティブス',
+  'graveyardShift.tibbs.say.accept':
+    '素晴らしい。下りる途中の骨に気をつけてくれ。同僚も混じってるからね。',
+  'graveyardShift.tibbs.say.decline': 'もっともだ。職務内容なんて誰も読まないしな。',
+  'graveyardShift.tibbs.say.busy': '手が空いたらまた来てくれ。組合規定でね。',
+  'graveyardShift.tibbs.say.report':
+    'シフト報告！帰宅させた冒険者：{sent}。救った同僚：{saved}。渡さずに済んだズボン：1。',
+  'graveyardShift.tibbs.say.payout':
+    'よくやってくれた、手伝ってくれてありがとう、冒険者。これが報酬だ。',
+  'graveyardShift.tibbs.say.covered':
+    'シフトの穴は埋まったよ。モーセンは仕事に戻った。君にありがとうと言ってたよ。',
+  'graveyardShift.tibbs.say.consolation':
+    '気にするな。奴らは毎日我々を倒すんだ。この仕事へようこそ。',
+  'graveyardShift.tibbs.say.anotherShift': 'もう一シフト？奴らは間違いなく来るよ。',
+  'graveyardShift.say.clearing.lastPull': 'おけ、ラスト1パック倒したらボスで寝る',
+  'graveyardShift.say.clearing.stayAway': 'みんなボスには近づかないで',
+  'graveyardShift.say.clearing.speedUp': '10分で落ちるから急げる？',
+  'graveyardShift.say.clearing.howsMana': 'ヒラさんMPどう？',
+  'graveyardShift.say.notice.pulledEarly': 'ボス早釣り？？',
+  'graveyardShift.say.notice.whoPulled': '誰が釣った！！',
+  'graveyardShift.say.notice.boredWaiting': 'ボス待ちくたびれて来た？',
+  'graveyardShift.say.death.rip': '南無',
+  'graveyardShift.say.death.healerHealer': 'ヒラ？？ ヒラさん！！？？',
+  'graveyardShift.say.death.lag': 'ラグ。今のはラグ。みんな見たよね',
+  'graveyardShift.say.healerOom.oom': 'MP切れ',
+  'graveyardShift.say.healerOom.emotionalSupport': 'もう気持ちだけで回復してる',
+  'graveyardShift.say.wipeThreat.popEverything': 'CD全部吐いて。全部吐いて！！',
+  'graveyardShift.say.wipeThreat.wedding': '結婚式のためにCD温存してるの誰',
+  'graveyardShift.say.wipeThreat.goingBadly': 'これはやばい',
+  'graveyardShift.say.corpseRun.runningBack': '今走って戻ってきてる、耐えて',
+  'graveyardShift.say.corpseRun.kiteHim': 'ぐるぐる引き回しとけばいい',
+  'graveyardShift.say.corpseRun.holdHim': '戻ってくるまで抑えといて',
+  'graveyardShift.say.returned.roundTwo': 'おけ2回戦、今度こそ本気',
+  'graveyardShift.say.returned.imBack': 'ただいま、何かあった？',
+  'graveyardShift.say.returned.knowHisMoves': 'おけ、もう動き覚えた',
+  'graveyardShift.say.returned.revengeTime': 'リベンジの時間',
+  'graveyardShift.say.giveUp.gn': 'おけ落ちます、おやすみ',
+  'graveyardShift.say.giveUp.ggBoss': 'gg ボス、正直すごかった',
+  'graveyardShift.say.giveUp.betterRotation': 'ボスの方が回しうまかったわ',
+  'graveyardShift.say.giveUp.sameTime': '明日同じ時間？',
+  'graveyardShift.say.loot.whoNeeds': 'おけ、ズボン欲しい人',
+  'graveyardShift.say.loot.need': 'ニード！！',
+  'graveyardShift.say.partyWins.easy': '楽勝',
+  'graveyardShift.say.partyWins.gg': 'gg',
+  'graveyardShift.say.partyWins.toldYouEasy': 'だから楽勝って言ったじゃん',
   'hudChrome.questLog.completed': '完了済み',
   'hudChrome.questLog.zoneSummary': '{count}件（{ready}件完了）',
   'hudChrome.questLog.shiftHint':

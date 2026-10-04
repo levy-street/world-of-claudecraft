@@ -29,7 +29,7 @@ const RESOURCE_LABEL_KEYS: Record<ResourceType, TranslationKey> = {
   energy: 'abilityUi.resources.energy',
   focus: 'abilityUi.resources.focus',
   // Morthen's bar on a Graveyard Shift run (dev-gated prototype).
-  dread: 'devCommand.graveyardShift.resource',
+  dread: 'graveyardShift.resource',
 };
 
 const FORM_LABEL_KEYS: Record<DruidCombatForm, TranslationKey> = {

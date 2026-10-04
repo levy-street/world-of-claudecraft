@@ -79,9 +79,9 @@ const tibbsLines = (events: SimEvent[]) =>
     .filter(
       (ev): ev is Extract<SimEvent, { type: 'chat' }> =>
         ev.type === 'chat' &&
-        ev.textKey?.startsWith('devCommand.graveyardShift.tibbs.say.') === true,
+        ev.textKey?.startsWith('graveyardShift.tibbs.say.') === true,
     )
-    .map((ev) => ev.textKey?.replace('devCommand.graveyardShift.tibbs.say.', ''));
+    .map((ev) => ev.textKey?.replace('graveyardShift.tibbs.say.', ''));
 
 // Up to the grave, wake Tibbs, and collect the tick's events.
 function wakeTibbs(sim: Sim): SimEvent[] {
@@ -286,7 +286,7 @@ describe('Tibbs', () => {
     expect(run?.entry).toBe('grave');
     const events = sim.tick();
     const accept = events.find(
-      (ev) => ev.type === 'chat' && ev.textKey === 'devCommand.graveyardShift.tibbs.say.accept',
+      (ev) => ev.type === 'chat' && ev.textKey === 'graveyardShift.tibbs.say.accept',
     ) as Extract<SimEvent, { type: 'chat' }> | undefined;
     expect(accept?.entityId).toBe(tibbs);
     expect(accept?.pid).toBe(sim.playerId);

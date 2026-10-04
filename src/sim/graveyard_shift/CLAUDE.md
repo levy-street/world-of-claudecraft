@@ -228,7 +228,7 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
   nearby. **Spent** by Shadow Pulse (`SHADOW_PULSE_DREAD`) through the ordinary cost
   path; a short cast is refused with "Not enough Dread!"
   (both cost checks in `casting_lifecycle.ts`), re-localized by
-  `error_text_i18n_core.ts` into a `devCommand.graveyardShift.*` key.
+  `error_text_i18n_core.ts` into a `graveyardShift.*` key.
 - **Never persisted.** A save taken mid-run writes the real resource instead
   (`run.savedResource`, persistedResource at the start; see the save override).
 
@@ -265,7 +265,7 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
 - **Local only** (`bot_say.ts`): a LIVING adventurer speaks a keyed line on the
   `say` channel, pid-routed to the run's owner when within `SAY_RANGE` of it
   (the slot is private, so the owner is the one listener; never `Sim.chat()`); the dead are silent and nothing rides
-  party chat. The event carries `textKey` (`devCommand.graveyardShift.say.*`) and
+  party chat. The event carries `textKey` (`graveyardShift.say.*`) and
   the English as `text`; the HUD's say line and bubble render it through
   `localizeChatBody`, so player-authored say (no key) stays verbatim.
 - **Observed state, never a timer:** the party's chatter over the pack once

@@ -141,8 +141,8 @@ describe('Graveyard Shift opening', () => {
       }
     }
     meta.moveInput.forward = false;
-    const clearing = heard(events, p.id, 'devCommand.graveyardShift.say.clearing');
-    const notice = heard(events, p.id, 'devCommand.graveyardShift.say.notice');
+    const clearing = heard(events, p.id, 'graveyardShift.say.clearing');
+    const notice = heard(events, p.id, 'graveyardShift.say.notice');
     expect(clearing).toHaveLength(1);
     expect(notice).toHaveLength(1);
     expect(events.indexOf(clearing[0])).toBeLessThan(events.indexOf(notice[0]));

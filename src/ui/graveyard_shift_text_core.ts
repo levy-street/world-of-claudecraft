@@ -19,23 +19,23 @@ interface KitText {
 
 const KIT_TEXT: Readonly<Record<string, KitText>> = {
   gshift_shadow_pulse: {
-    name: 'devCommand.graveyardShift.abilities.shadowPulse.name',
-    description: 'devCommand.graveyardShift.abilities.shadowPulse.description',
+    name: 'graveyardShift.abilities.shadowPulse.name',
+    description: 'graveyardShift.abilities.shadowPulse.description',
   },
   gshift_sextons_chain: {
-    name: 'devCommand.graveyardShift.abilities.sextonsChain.name',
-    description: 'devCommand.graveyardShift.abilities.sextonsChain.description',
+    name: 'graveyardShift.abilities.sextonsChain.name',
+    description: 'graveyardShift.abilities.sextonsChain.description',
   },
   gshift_raise_fallen: {
-    name: 'devCommand.graveyardShift.abilities.raiseFallen.name',
-    description: 'devCommand.graveyardShift.abilities.raiseFallen.description',
+    name: 'graveyardShift.abilities.raiseFallen.name',
+    description: 'graveyardShift.abilities.raiseFallen.description',
   },
 };
 
-const ADVENTURER_AURA_KEY: TranslationKey = 'devCommand.graveyardShift.adventurerAura';
+const ADVENTURER_AURA_KEY: TranslationKey = 'graveyardShift.adventurerAura';
 const ADVENTURER_AURA_NAME = adventurerMarkerAura(0).name;
 
-const IDENTITY_AURA_KEY: TranslationKey = 'devCommand.graveyardShift.identityAura';
+const IDENTITY_AURA_KEY: TranslationKey = 'graveyardShift.identityAura';
 const IDENTITY_AURA_NAME = morthenIdentityAura(0).name;
 
 const KIT_BY_ID: ReadonlyMap<string, AbilityDef> = new Map(MORTHEN_KIT.map((def) => [def.id, def]));
@@ -65,7 +65,7 @@ export function graveyardShiftAbilityNameFromSource(name: string): string | null
  *  (which carries its ability's English name). Null for every other aura. */
 export function graveyardShiftAuraName(name: string): string | null {
   if (name === IDENTITY_AURA_NAME) return t(IDENTITY_AURA_KEY);
-  if (name === DEFEATED_AURA_NAME) return t('devCommand.graveyardShift.defeatedAura');
+  if (name === DEFEATED_AURA_NAME) return t('graveyardShift.defeatedAura');
   if (name === ADVENTURER_AURA_NAME) return t(ADVENTURER_AURA_KEY);
   return graveyardShiftAbilityNameFromSource(name);
 }

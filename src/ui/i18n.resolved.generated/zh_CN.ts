@@ -209,112 +209,6 @@ export const zh_CN: EnTranslations = {
         "label": "结束山丘",
         "description": "让当前山丘立即回落。"
       }
-    },
-    "graveyardShift": {
-      "identityAura": "Morthen the Gravecaller",
-      "defeatedAura": "Defeated",
-      "staffExit": "Staff Exit",
-      "adventurerAura": "Adventurer",
-      "resource": "Dread",
-      "errors": {
-        "notEnoughDread": "Not enough Dread!",
-        "noCorpse": "There is no corpse to raise."
-      },
-      "abilities": {
-        "shadowPulse": {
-          "name": "Shadow Pulse",
-          "description": "Release a pulse of shadow that deals {min} to {max} Shadow damage to each enemy within {radius} yards in your line of sight. Each enemy hit is knocked back {distance} yards and slowed by {slow} for {slowSeconds} sec."
-        },
-        "sextonsChain": {
-          "name": "Sexton's Chain",
-          "description": "Drag your target to within {stop} yards of you and slow it by {slow} for {slowSeconds} sec. A spell it is casting is interrupted and that school is locked for {lockout} sec, and the target is silenced for {silence} sec."
-        },
-        "raiseFallen": {
-          "name": "Raise the Fallen",
-          "description": "Raise the nearest corpse within {radius} yards as a skeleton that fights for you for {seconds} sec. Each corpse rises only once."
-        }
-      },
-      "hints": {
-        "chain": "Sexton's Chain: pick one of them and drag them to you. The healer is a fine start.",
-        "pulse": "Shadow Pulse is ready: a heavy blast around you, best with them up close. They can interrupt it. They will try.",
-        "raise": "Raise the Fallen: a body lies near. Every corpse is a colleague. Even theirs.",
-        "exit": "Shift over. The Staff Exit behind the throne takes you home."
-      },
-      "graveName": "Glowing Grave",
-      "tibbs": {
-        "whisper": "Psst. Down here.",
-        "offer": {
-          "intro1": "Ah, you heard me. Name's Tibbs. I speak for the monsters of this crypt, the ones you keep meeting at the wrong end of an axe.",
-          "intro2": "Our boss, Morthen, has been killed four thousand eight hundred times this week. Always for the same pair of trousers. Union rules say he has earned a day off, and nobody will cover his shift.",
-          "intro3": "Nobody except you, I hope. It is a simple job: you play the boss. A party of adventurers is already inside. Stop them. They will never notice the difference. Well. They will.",
-          "accept": "Take the shift",
-          "decline": "Not today",
-          "thanks": "Thanks, Tibbs"
-        },
-        "say": {
-          "accept": "Wonderful. Mind the bones on the way down. Some of them are colleagues.",
-          "decline": "Fair. Nobody reads the job description either.",
-          "busy": "Come back when you are not so busy. Union rules.",
-          "report": "Shift report! Adventurers sent home: {sent}. Colleagues saved: {saved}. Trousers not handed out: 1.",
-          "payout": "Good job and thank you for your help, adventurer. Here's your payout.",
-          "covered": "Your shift is covered. Morthen is back at work, and he says thank you.",
-          "consolation": "Do not worry. They kill us every day. Welcome to the job.",
-          "anotherShift": "Another shift? They certainly will."
-        }
-      },
-      "say": {
-        "clearing": {
-          "lastPull": "ok last pack, then boss, then bed",
-          "stayAway": "stay away from the boss guys",
-          "speedUp": "gtg in 10 min, can we speed up",
-          "howsMana": "healer how's mana"
-        },
-        "notice": {
-          "pulledEarly": "boss pulled early??",
-          "whoPulled": "WHO PULLED",
-          "boredWaiting": "did the boss just get bored of waiting"
-        },
-        "death": {
-          "rip": "rip",
-          "healerHealer": "healer?? HEALER??",
-          "lag": "lag. that was lag. we all saw it"
-        },
-        "healerOom": {
-          "oom": "oom",
-          "emotionalSupport": "I'm healing with pure emotional support at this point"
-        },
-        "wipeThreat": {
-          "popEverything": "pop everything. POP EVERYTHING",
-          "wedding": "who's been saving a cooldown for their wedding",
-          "goingBadly": "this is going badly"
-        },
-        "corpseRun": {
-          "runningBack": "they're running back, hold on",
-          "kiteHim": "just kite him in circles",
-          "holdHim": "hold him till they're back"
-        },
-        "returned": {
-          "roundTwo": "ok round 2, for real this time",
-          "imBack": "I'm back, did I miss anything",
-          "knowHisMoves": "ok I know his moves now",
-          "revengeTime": "revenge time"
-        },
-        "giveUp": {
-          "gn": "ok I'm out, gn",
-          "ggBoss": "gg boss, honestly that was sick",
-          "betterRotation": "the boss had a better rotation than me",
-          "sameTime": "same time tomorrow?"
-        },
-        "loot": {
-          "whoNeeds": "ok who needs the trousers",
-          "need": "NEED"
-        },
-        "partyWins": {
-          "easy": "EZ",
-          "gg": "gg",
-          "toldYouEasy": "told you he was easy"
-        }
-      }
     }
   },
   "game": {
@@ -7052,6 +6946,112 @@ export const zh_CN: EnTranslations = {
       "reply": {
         "0": "像样的堆肥，花床有救了。老磨坊主离开前埋了些东西。他的磨坊还在花园最远的角落里转着。去它旁边站一站吧。",
         "2": "原来是磨坊把你一路送到了海岸路上。灯塔还藏着最后一个秘密：在它西北方，就在小路旁，草皮被切开又铺了回去。就在那里挖。"
+      }
+    }
+  },
+  "graveyardShift": {
+    "identityAura": "唤墓者莫森",
+    "defeatedAura": "已被击败",
+    "staffExit": "员工出口",
+    "adventurerAura": "冒险者",
+    "resource": "恐惧",
+    "errors": {
+      "notEnoughDread": "恐惧不足！",
+      "noCorpse": "没有可供唤起的尸体。"
+    },
+    "abilities": {
+      "shadowPulse": {
+        "name": "暗影脉冲",
+        "description": "释放一道暗影脉冲，对视线内 {radius} 码范围内的每个敌人造成 {min} 到 {max} 点暗影伤害。每个被击中的敌人会被击退 {distance} 码，并被减速 {slow}，持续 {slowSeconds} 秒。"
+      },
+      "sextonsChain": {
+        "name": "守墓人之链",
+        "description": "将你的目标拖到距你 {stop} 码以内，并使其减速 {slow}，持续 {slowSeconds} 秒。打断其正在施放的法术，并使该系法术锁定 {lockout} 秒，同时使目标沉默 {silence} 秒。"
+      },
+      "raiseFallen": {
+        "name": "唤起亡者",
+        "description": "将 {radius} 码内最近的一具尸体唤起为骷髅，为你作战 {seconds} 秒。每具尸体只能被唤起一次。"
+      }
+    },
+    "hints": {
+      "chain": "守墓人之链：挑一个拖到你身边。治疗者是个不错的开始。",
+      "pulse": "暗影脉冲已就绪：在你周围造成一次猛烈爆发，敌人贴近时效果最好。他们可以打断它。他们会试的。",
+      "raise": "唤起亡者：附近躺着一具尸体。每具尸体都是同事。连他们的也是。",
+      "exit": "下班了。王座后面的员工出口会带你回家。"
+    },
+    "graveName": "发光的坟墓",
+    "tibbs": {
+      "whisper": "嘘，这儿，下面。",
+      "offer": {
+        "intro1": "啊，你听见了。我叫蒂布斯。我代表这座墓穴里的怪物说话，也就是总在你斧下碰面的那些家伙。",
+        "intro2": "我们的老板莫森这周已经被杀了四千八百次。每次都是为了同一条裤子。按工会规定，他该休一天假了，可没人愿意替他顶班。",
+        "intro3": "但愿你是个例外。活儿很简单：你来扮演首领。一队冒险者已经进来了。阻止他们。他们绝不会发现有什么不同。嗯。他们会发现的。",
+        "accept": "接下这个班",
+        "decline": "今天不行",
+        "thanks": "谢谢，蒂布斯"
+      },
+      "say": {
+        "accept": "太好了。下去的路上小心脚下的骨头，有些是同事。",
+        "decline": "也对。反正也没人看岗位说明。",
+        "busy": "等你没那么忙了再来吧。工会规定。",
+        "report": "值班报告！送回家的冒险者：{sent}。救下的同事：{saved}。没发出去的裤子：1。",
+        "payout": "干得好，感谢你的帮助，冒险者。这是你的报酬。",
+        "covered": "这个班已经有人顶上了。莫森回来上班了，他说谢谢你。",
+        "consolation": "别担心。他们每天都杀我们。欢迎入职。",
+        "anotherShift": "再来一班？他们肯定会再来的。"
+      }
+    },
+    "say": {
+      "clearing": {
+        "lastPull": "ok最后一波，然后BOSS，然后睡觉",
+        "stayAway": "大家离BOSS远点",
+        "speedUp": "10分钟后得走，能快点吗",
+        "howsMana": "奶妈蓝还够吗"
+      },
+      "notice": {
+        "pulledEarly": "BOSS提前开了??",
+        "whoPulled": "谁开的怪！！！",
+        "boredWaiting": "BOSS是等得不耐烦了吗"
+      },
+      "death": {
+        "rip": "凉了",
+        "healerHealer": "奶妈?? 奶妈！！",
+        "lag": "卡了。刚才是卡了。大家都看见了"
+      },
+      "healerOom": {
+        "oom": "没蓝了",
+        "emotionalSupport": "我现在纯靠精神支持在奶了"
+      },
+      "wipeThreat": {
+        "popEverything": "全开。大招全交！！",
+        "wedding": "谁的大招是留着结婚用的",
+        "goingBadly": "情况不妙啊"
+      },
+      "corpseRun": {
+        "runningBack": "他们在跑尸了，顶住",
+        "kiteHim": "绕圈放风筝就行",
+        "holdHim": "拖住他等他们回来"
+      },
+      "returned": {
+        "roundTwo": "ok第二轮，这次来真的",
+        "imBack": "我回来了，错过啥了吗",
+        "knowHisMoves": "ok我摸清他的套路了",
+        "revengeTime": "复仇时间"
+      },
+      "giveUp": {
+        "gn": "ok我撤了，晚安",
+        "ggBoss": "gg BOSS，说真的太强了",
+        "betterRotation": "这BOSS的输出循环比我还好",
+        "sameTime": "明天老时间？"
+      },
+      "loot": {
+        "whoNeeds": "ok谁需要这条裤子",
+        "need": "需求！！"
+      },
+      "partyWins": {
+        "easy": "EZ",
+        "gg": "gg",
+        "toldYouEasy": "早说了他很简单"
       }
     }
   },

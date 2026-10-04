@@ -209,112 +209,6 @@ export const ja_JP: EnTranslations = {
         "label": "丘を終了",
         "description": "現在の丘を今すぐ消します。"
       }
-    },
-    "graveyardShift": {
-      "identityAura": "Morthen the Gravecaller",
-      "defeatedAura": "Defeated",
-      "staffExit": "Staff Exit",
-      "adventurerAura": "Adventurer",
-      "resource": "Dread",
-      "errors": {
-        "notEnoughDread": "Not enough Dread!",
-        "noCorpse": "There is no corpse to raise."
-      },
-      "abilities": {
-        "shadowPulse": {
-          "name": "Shadow Pulse",
-          "description": "Release a pulse of shadow that deals {min} to {max} Shadow damage to each enemy within {radius} yards in your line of sight. Each enemy hit is knocked back {distance} yards and slowed by {slow} for {slowSeconds} sec."
-        },
-        "sextonsChain": {
-          "name": "Sexton's Chain",
-          "description": "Drag your target to within {stop} yards of you and slow it by {slow} for {slowSeconds} sec. A spell it is casting is interrupted and that school is locked for {lockout} sec, and the target is silenced for {silence} sec."
-        },
-        "raiseFallen": {
-          "name": "Raise the Fallen",
-          "description": "Raise the nearest corpse within {radius} yards as a skeleton that fights for you for {seconds} sec. Each corpse rises only once."
-        }
-      },
-      "hints": {
-        "chain": "Sexton's Chain: pick one of them and drag them to you. The healer is a fine start.",
-        "pulse": "Shadow Pulse is ready: a heavy blast around you, best with them up close. They can interrupt it. They will try.",
-        "raise": "Raise the Fallen: a body lies near. Every corpse is a colleague. Even theirs.",
-        "exit": "Shift over. The Staff Exit behind the throne takes you home."
-      },
-      "graveName": "Glowing Grave",
-      "tibbs": {
-        "whisper": "Psst. Down here.",
-        "offer": {
-          "intro1": "Ah, you heard me. Name's Tibbs. I speak for the monsters of this crypt, the ones you keep meeting at the wrong end of an axe.",
-          "intro2": "Our boss, Morthen, has been killed four thousand eight hundred times this week. Always for the same pair of trousers. Union rules say he has earned a day off, and nobody will cover his shift.",
-          "intro3": "Nobody except you, I hope. It is a simple job: you play the boss. A party of adventurers is already inside. Stop them. They will never notice the difference. Well. They will.",
-          "accept": "Take the shift",
-          "decline": "Not today",
-          "thanks": "Thanks, Tibbs"
-        },
-        "say": {
-          "accept": "Wonderful. Mind the bones on the way down. Some of them are colleagues.",
-          "decline": "Fair. Nobody reads the job description either.",
-          "busy": "Come back when you are not so busy. Union rules.",
-          "report": "Shift report! Adventurers sent home: {sent}. Colleagues saved: {saved}. Trousers not handed out: 1.",
-          "payout": "Good job and thank you for your help, adventurer. Here's your payout.",
-          "covered": "Your shift is covered. Morthen is back at work, and he says thank you.",
-          "consolation": "Do not worry. They kill us every day. Welcome to the job.",
-          "anotherShift": "Another shift? They certainly will."
-        }
-      },
-      "say": {
-        "clearing": {
-          "lastPull": "ok last pack, then boss, then bed",
-          "stayAway": "stay away from the boss guys",
-          "speedUp": "gtg in 10 min, can we speed up",
-          "howsMana": "healer how's mana"
-        },
-        "notice": {
-          "pulledEarly": "boss pulled early??",
-          "whoPulled": "WHO PULLED",
-          "boredWaiting": "did the boss just get bored of waiting"
-        },
-        "death": {
-          "rip": "rip",
-          "healerHealer": "healer?? HEALER??",
-          "lag": "lag. that was lag. we all saw it"
-        },
-        "healerOom": {
-          "oom": "oom",
-          "emotionalSupport": "I'm healing with pure emotional support at this point"
-        },
-        "wipeThreat": {
-          "popEverything": "pop everything. POP EVERYTHING",
-          "wedding": "who's been saving a cooldown for their wedding",
-          "goingBadly": "this is going badly"
-        },
-        "corpseRun": {
-          "runningBack": "they're running back, hold on",
-          "kiteHim": "just kite him in circles",
-          "holdHim": "hold him till they're back"
-        },
-        "returned": {
-          "roundTwo": "ok round 2, for real this time",
-          "imBack": "I'm back, did I miss anything",
-          "knowHisMoves": "ok I know his moves now",
-          "revengeTime": "revenge time"
-        },
-        "giveUp": {
-          "gn": "ok I'm out, gn",
-          "ggBoss": "gg boss, honestly that was sick",
-          "betterRotation": "the boss had a better rotation than me",
-          "sameTime": "same time tomorrow?"
-        },
-        "loot": {
-          "whoNeeds": "ok who needs the trousers",
-          "need": "NEED"
-        },
-        "partyWins": {
-          "easy": "EZ",
-          "gg": "gg",
-          "toldYouEasy": "told you he was easy"
-        }
-      }
     }
   },
   "game": {
@@ -7052,6 +6946,112 @@ export const ja_JP: EnTranslations = {
       "reply": {
         "0": "ちゃんとした堆肥だね、これで花壇は生き返る。昔の粉屋は去る前に何かを埋めていった。庭園の奥の隅で、あの風車はまだ回っている。そのそばに立ってごらん。",
         "2": "風車があなたを海沿いの道へ送ったか。灯台には最後の秘密がひとつある。北西、小道のすぐ脇で、芝が切られて元に戻されている。そこを掘れ。"
+      }
+    }
+  },
+  "graveyardShift": {
+    "identityAura": "墓呼びのモーセン",
+    "defeatedAura": "敗北",
+    "staffExit": "従業員出口",
+    "adventurerAura": "冒険者",
+    "resource": "戦慄",
+    "errors": {
+      "notEnoughDread": "戦慄が足りません！",
+      "noCorpse": "蘇らせる死体がありません。"
+    },
+    "abilities": {
+      "shadowPulse": {
+        "name": "影の波動",
+        "description": "影の波動を放ち、視界内の{radius}ヤード以内にいる敵それぞれに{min}から{max}の影ダメージを与えます。命中した敵はそれぞれ{distance}ヤード吹き飛ばされ、{slowSeconds}秒間移動速度が{slow}低下します。"
+      },
+      "sextonsChain": {
+        "name": "墓守の鎖",
+        "description": "対象を自分から{stop}ヤード以内まで引き寄せ、{slowSeconds}秒間移動速度を{slow}低下させます。詠唱中の呪文は中断されてその系統が{lockout}秒間封じられ、対象は{silence}秒間沈黙します。"
+      },
+      "raiseFallen": {
+        "name": "倒れし者の蘇生",
+        "description": "{radius}ヤード以内で最も近い死体をスケルトンとして蘇らせ、{seconds}秒間自分のために戦わせます。各死体は一度しか蘇りません。"
+      }
+    },
+    "hints": {
+      "chain": "墓守の鎖：一人選んで引き寄せましょう。まずはヒーラーがおすすめです。",
+      "pulse": "影の波動が使用可能：周囲への強烈な一撃で、敵が近くにいるほど効果的です。詠唱は妨害されることがあります。彼らは狙ってきます。",
+      "raise": "倒れし者の蘇生：近くに亡骸があります。死体はみな同僚です。彼らのものでさえ。",
+      "exit": "シフト終了。玉座の裏の従業員出口から帰れます。"
+    },
+    "graveName": "光る墓",
+    "tibbs": {
+      "whisper": "しっ。こっちだ、下だよ。",
+      "offer": {
+        "intro1": "おっと、聞こえたか。名前はティブスだ。この墓所のモンスターたちの代表をしている。君がいつも斧を振り下ろす先で出会う連中さ。",
+        "intro2": "うちのボスのモーセンは、今週だけで四千八百回も倒されている。いつも同じズボン一本のためにね。組合規定では一日休む権利があるんだが、誰もシフトを代わってくれない。",
+        "intro3": "君以外は、だといいんだが。簡単な仕事さ。君がボスを演じる。冒険者のパーティーがもう中に入っている。止めてくれ。違いには絶対気づかないよ。まあ。気づくだろうね。",
+        "accept": "シフトを引き受ける",
+        "decline": "今日はやめておく",
+        "thanks": "ありがとう、ティブス"
+      },
+      "say": {
+        "accept": "素晴らしい。下りる途中の骨に気をつけてくれ。同僚も混じってるからね。",
+        "decline": "もっともだ。職務内容なんて誰も読まないしな。",
+        "busy": "手が空いたらまた来てくれ。組合規定でね。",
+        "report": "シフト報告！帰宅させた冒険者：{sent}。救った同僚：{saved}。渡さずに済んだズボン：1。",
+        "payout": "よくやってくれた、手伝ってくれてありがとう、冒険者。これが報酬だ。",
+        "covered": "シフトの穴は埋まったよ。モーセンは仕事に戻った。君にありがとうと言ってたよ。",
+        "consolation": "気にするな。奴らは毎日我々を倒すんだ。この仕事へようこそ。",
+        "anotherShift": "もう一シフト？奴らは間違いなく来るよ。"
+      }
+    },
+    "say": {
+      "clearing": {
+        "lastPull": "おけ、ラスト1パック倒したらボスで寝る",
+        "stayAway": "みんなボスには近づかないで",
+        "speedUp": "10分で落ちるから急げる？",
+        "howsMana": "ヒラさんMPどう？"
+      },
+      "notice": {
+        "pulledEarly": "ボス早釣り？？",
+        "whoPulled": "誰が釣った！！",
+        "boredWaiting": "ボス待ちくたびれて来た？"
+      },
+      "death": {
+        "rip": "南無",
+        "healerHealer": "ヒラ？？ ヒラさん！！？？",
+        "lag": "ラグ。今のはラグ。みんな見たよね"
+      },
+      "healerOom": {
+        "oom": "MP切れ",
+        "emotionalSupport": "もう気持ちだけで回復してる"
+      },
+      "wipeThreat": {
+        "popEverything": "CD全部吐いて。全部吐いて！！",
+        "wedding": "結婚式のためにCD温存してるの誰",
+        "goingBadly": "これはやばい"
+      },
+      "corpseRun": {
+        "runningBack": "今走って戻ってきてる、耐えて",
+        "kiteHim": "ぐるぐる引き回しとけばいい",
+        "holdHim": "戻ってくるまで抑えといて"
+      },
+      "returned": {
+        "roundTwo": "おけ2回戦、今度こそ本気",
+        "imBack": "ただいま、何かあった？",
+        "knowHisMoves": "おけ、もう動き覚えた",
+        "revengeTime": "リベンジの時間"
+      },
+      "giveUp": {
+        "gn": "おけ落ちます、おやすみ",
+        "ggBoss": "gg ボス、正直すごかった",
+        "betterRotation": "ボスの方が回しうまかったわ",
+        "sameTime": "明日同じ時間？"
+      },
+      "loot": {
+        "whoNeeds": "おけ、ズボン欲しい人",
+        "need": "ニード！！"
+      },
+      "partyWins": {
+        "easy": "楽勝",
+        "gg": "gg",
+        "toldYouEasy": "だから楽勝って言ったじゃん"
       }
     }
   },

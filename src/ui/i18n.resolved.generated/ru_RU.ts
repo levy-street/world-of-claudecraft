@@ -209,112 +209,6 @@ export const ru_RU: EnTranslations = {
         "label": "Завершить холм",
         "description": "Немедленно обрушить текущий холм."
       }
-    },
-    "graveyardShift": {
-      "identityAura": "Morthen the Gravecaller",
-      "defeatedAura": "Defeated",
-      "staffExit": "Staff Exit",
-      "adventurerAura": "Adventurer",
-      "resource": "Dread",
-      "errors": {
-        "notEnoughDread": "Not enough Dread!",
-        "noCorpse": "There is no corpse to raise."
-      },
-      "abilities": {
-        "shadowPulse": {
-          "name": "Shadow Pulse",
-          "description": "Release a pulse of shadow that deals {min} to {max} Shadow damage to each enemy within {radius} yards in your line of sight. Each enemy hit is knocked back {distance} yards and slowed by {slow} for {slowSeconds} sec."
-        },
-        "sextonsChain": {
-          "name": "Sexton's Chain",
-          "description": "Drag your target to within {stop} yards of you and slow it by {slow} for {slowSeconds} sec. A spell it is casting is interrupted and that school is locked for {lockout} sec, and the target is silenced for {silence} sec."
-        },
-        "raiseFallen": {
-          "name": "Raise the Fallen",
-          "description": "Raise the nearest corpse within {radius} yards as a skeleton that fights for you for {seconds} sec. Each corpse rises only once."
-        }
-      },
-      "hints": {
-        "chain": "Sexton's Chain: pick one of them and drag them to you. The healer is a fine start.",
-        "pulse": "Shadow Pulse is ready: a heavy blast around you, best with them up close. They can interrupt it. They will try.",
-        "raise": "Raise the Fallen: a body lies near. Every corpse is a colleague. Even theirs.",
-        "exit": "Shift over. The Staff Exit behind the throne takes you home."
-      },
-      "graveName": "Glowing Grave",
-      "tibbs": {
-        "whisper": "Psst. Down here.",
-        "offer": {
-          "intro1": "Ah, you heard me. Name's Tibbs. I speak for the monsters of this crypt, the ones you keep meeting at the wrong end of an axe.",
-          "intro2": "Our boss, Morthen, has been killed four thousand eight hundred times this week. Always for the same pair of trousers. Union rules say he has earned a day off, and nobody will cover his shift.",
-          "intro3": "Nobody except you, I hope. It is a simple job: you play the boss. A party of adventurers is already inside. Stop them. They will never notice the difference. Well. They will.",
-          "accept": "Take the shift",
-          "decline": "Not today",
-          "thanks": "Thanks, Tibbs"
-        },
-        "say": {
-          "accept": "Wonderful. Mind the bones on the way down. Some of them are colleagues.",
-          "decline": "Fair. Nobody reads the job description either.",
-          "busy": "Come back when you are not so busy. Union rules.",
-          "report": "Shift report! Adventurers sent home: {sent}. Colleagues saved: {saved}. Trousers not handed out: 1.",
-          "payout": "Good job and thank you for your help, adventurer. Here's your payout.",
-          "covered": "Your shift is covered. Morthen is back at work, and he says thank you.",
-          "consolation": "Do not worry. They kill us every day. Welcome to the job.",
-          "anotherShift": "Another shift? They certainly will."
-        }
-      },
-      "say": {
-        "clearing": {
-          "lastPull": "ok last pack, then boss, then bed",
-          "stayAway": "stay away from the boss guys",
-          "speedUp": "gtg in 10 min, can we speed up",
-          "howsMana": "healer how's mana"
-        },
-        "notice": {
-          "pulledEarly": "boss pulled early??",
-          "whoPulled": "WHO PULLED",
-          "boredWaiting": "did the boss just get bored of waiting"
-        },
-        "death": {
-          "rip": "rip",
-          "healerHealer": "healer?? HEALER??",
-          "lag": "lag. that was lag. we all saw it"
-        },
-        "healerOom": {
-          "oom": "oom",
-          "emotionalSupport": "I'm healing with pure emotional support at this point"
-        },
-        "wipeThreat": {
-          "popEverything": "pop everything. POP EVERYTHING",
-          "wedding": "who's been saving a cooldown for their wedding",
-          "goingBadly": "this is going badly"
-        },
-        "corpseRun": {
-          "runningBack": "they're running back, hold on",
-          "kiteHim": "just kite him in circles",
-          "holdHim": "hold him till they're back"
-        },
-        "returned": {
-          "roundTwo": "ok round 2, for real this time",
-          "imBack": "I'm back, did I miss anything",
-          "knowHisMoves": "ok I know his moves now",
-          "revengeTime": "revenge time"
-        },
-        "giveUp": {
-          "gn": "ok I'm out, gn",
-          "ggBoss": "gg boss, honestly that was sick",
-          "betterRotation": "the boss had a better rotation than me",
-          "sameTime": "same time tomorrow?"
-        },
-        "loot": {
-          "whoNeeds": "ok who needs the trousers",
-          "need": "NEED"
-        },
-        "partyWins": {
-          "easy": "EZ",
-          "gg": "gg",
-          "toldYouEasy": "told you he was easy"
-        }
-      }
     }
   },
   "game": {
@@ -7052,6 +6946,112 @@ export const ru_RU: EnTranslations = {
       "reply": {
         "0": "Настоящий компост, клумбы оживут. Старый мельник перед уходом что-то закопал. Его мельница всё ещё крутится в дальнем углу садов. Встаньте рядом с ней.",
         "2": "Значит, мельница отправила вас по прибрежной дороге. У маяка осталась последняя тайна: к северо-западу от него, у самой тропы, дёрн срезали и уложили обратно. Копайте там."
+      }
+    }
+  },
+  "graveyardShift": {
+    "identityAura": "Мортен Могильный Зов",
+    "defeatedAura": "Повержен",
+    "staffExit": "Служебный выход",
+    "adventurerAura": "Искатель приключений",
+    "resource": "Ужас",
+    "errors": {
+      "notEnoughDread": "Недостаточно ужаса!",
+      "noCorpse": "Нет трупа, который можно поднять."
+    },
+    "abilities": {
+      "shadowPulse": {
+        "name": "Теневой импульс",
+        "description": "Выпускает импульс тьмы, который наносит от {min} до {max} ед. урона от тьмы каждому врагу в радиусе {radius} ярдов в пределах прямой видимости. Каждый поражённый враг отбрасывается на {distance} ярдов и замедляется на {slow} на {slowSeconds} сек."
+      },
+      "sextonsChain": {
+        "name": "Цепь могильщика",
+        "description": "Притягивает цель на расстояние до {stop} ярдов от вас и замедляет её на {slow} на {slowSeconds} сек. Произносимое ею заклинание прерывается, эта школа магии блокируется на {lockout} сек., а на цель накладывается немота на {silence} сек."
+      },
+      "raiseFallen": {
+        "name": "Поднятие павших",
+        "description": "Поднимает ближайший труп в радиусе {radius} ярдов в виде скелета, который сражается за вас {seconds} сек. Каждый труп можно поднять лишь один раз."
+      }
+    },
+    "hints": {
+      "chain": "Цепь могильщика: выберите одного из них и притяните к себе. Для начала подойдёт лекарь.",
+      "pulse": "Теневой импульс готов: мощный взрыв вокруг вас, лучше всего, когда они рядом. Они могут его прервать. И попытаются.",
+      "raise": "Поднятие павших: рядом лежит тело. Каждый труп нам коллега. Даже их трупы.",
+      "exit": "Смена окончена. Служебный выход за троном ведёт домой."
+    },
+    "graveName": "Светящаяся могила",
+    "tibbs": {
+      "whisper": "Псст. Здесь, внизу.",
+      "offer": {
+        "intro1": "А, вы меня услышали. Меня зовут Тиббс. Я говорю от имени монстров этого склепа, тех самых, кого вы то и дело встречаете по ту сторону своего топора.",
+        "intro2": "Нашего босса, Мортена, на этой неделе убили четыре тысячи восемьсот раз. И всегда ради одних и тех же штанов. По правилам профсоюза ему положен выходной, но подменить его на смене никто не хочет.",
+        "intro3": "Никто, кроме вас, надеюсь. Работа простая: вы играете босса. Группа искателей приключений уже внутри. Остановите их. Они ни за что не заметят разницы. Ну. Заметят.",
+        "accept": "Взять смену",
+        "decline": "Не сегодня",
+        "thanks": "Спасибо, Тиббс"
+      },
+      "say": {
+        "accept": "Чудесно. Осторожнее с костями по пути вниз. Некоторые из них коллеги.",
+        "decline": "Справедливо. Должностную инструкцию тоже никто не читает.",
+        "busy": "Приходите, когда будете не так заняты. Правила профсоюза.",
+        "report": "Отчёт о смене! Отправлено домой искателей приключений: {sent}. Спасено коллег: {saved}. Не выдано штанов: 1.",
+        "payout": "Отличная работа, и спасибо за помощь, искатель приключений. Вот ваша плата.",
+        "covered": "Ваша смена закрыта. Мортен вернулся на работу и передаёт вам спасибо.",
+        "consolation": "Не переживайте. Нас убивают каждый день. Добро пожаловать на работу.",
+        "anotherShift": "Ещё одна смена? Они-то уж точно вернутся."
+      }
+    },
+    "say": {
+      "clearing": {
+        "lastPull": "ок последний пак, потом босс, потом спать",
+        "stayAway": "держитесь подальше от босса",
+        "speedUp": "мне через 10 мин уходить, можно побыстрее",
+        "howsMana": "хил, как мана"
+      },
+      "notice": {
+        "pulledEarly": "босса спулили раньше времени??",
+        "whoPulled": "КТО СПУЛИЛ",
+        "boredWaiting": "босс что, устал ждать"
+      },
+      "death": {
+        "rip": "рип",
+        "healerHealer": "хил?? ХИЛ??",
+        "lag": "лаг. это был лаг. все видели"
+      },
+      "healerOom": {
+        "oom": "я без маны",
+        "emotionalSupport": "я уже хилю чисто моральной поддержкой"
+      },
+      "wipeThreat": {
+        "popEverything": "жмите всё. ЖМИТЕ ВСЁ",
+        "wedding": "кто копит кд на свою свадьбу",
+        "goingBadly": "что-то всё плохо идёт"
+      },
+      "corpseRun": {
+        "runningBack": "они бегут с кладбища, держитесь",
+        "kiteHim": "просто кайтите его по кругу",
+        "holdHim": "держите его, пока они не вернутся"
+      },
+      "returned": {
+        "roundTwo": "ок второй раунд, теперь по-настоящему",
+        "imBack": "я вернулся, что-то пропустил?",
+        "knowHisMoves": "ок, я понял его тактику",
+        "revengeTime": "время мести"
+      },
+      "giveUp": {
+        "gn": "ок я всё, всем спокойной",
+        "ggBoss": "гг босс, честно, это было круто",
+        "betterRotation": "у босса ротация лучше, чем у меня",
+        "sameTime": "завтра в то же время?"
+      },
+      "loot": {
+        "whoNeeds": "ок, кому штаны",
+        "need": "НИД"
+      },
+      "partyWins": {
+        "easy": "ИЗИ",
+        "gg": "гг",
+        "toldYouEasy": "говорил же, он лёгкий"
       }
     }
   },

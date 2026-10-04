@@ -122,9 +122,9 @@ describe('Graveyard Shift corpse run', () => {
     kill(sim, mage);
     // Let the death line clear the say cooldowns first.
     const beforeRelease = ticks(sim, CORPSE_RELEASE_TICKS);
-    expect(said(beforeRelease, 'devCommand.graveyardShift.say.corpseRun')).toHaveLength(0);
+    expect(said(beforeRelease, 'graveyardShift.say.corpseRun')).toHaveLength(0);
     const window = ticks(sim, CORPSE_RETURN_TICKS - CORPSE_RELEASE_TICKS);
-    const calls = said(window, 'devCommand.graveyardShift.say.corpseRun');
+    const calls = said(window, 'graveyardShift.say.corpseRun');
     // One copy, to Morthen only: the fallen mage (marker stripped) gets none.
     expect(calls).toHaveLength(1);
     expect((calls[0] as any).pid).toBe(sim.playerId);
@@ -137,7 +137,7 @@ describe('Graveyard Shift corpse run', () => {
     mage.prevPos = { ...mage.pos };
     (sim as any).rebucket(mage);
     const arrival = ticks(sim, 20 * 4);
-    const returned = said(arrival, 'devCommand.graveyardShift.say.returned');
+    const returned = said(arrival, 'graveyardShift.say.returned');
     expect(returned).toHaveLength(1);
     expect(returned[0].fromPid).toBe(mage.id);
   });
@@ -154,7 +154,7 @@ describe('Graveyard Shift corpse run', () => {
     expect(run.outro).toBeNull();
     kill(sim, others[others.length - 1]);
     const events = sim.tick();
-    const goodbye = said(events, 'devCommand.graveyardShift.say.giveUp');
+    const goodbye = said(events, 'graveyardShift.say.giveUp');
     expect(goodbye).toHaveLength(1);
     expect(goodbye[0].fromPid).toBe(tank.id);
     // The quitter walks out and the Staff Exit opens: the shift is won.
@@ -196,7 +196,7 @@ describe('Graveyard Shift corpse run', () => {
     expect(partyWiped(sim.ctx, run)).toBe(false);
     expect(partyGivesUp(sim.ctx, run)).toBe(false);
     expect(run.outro).toBeNull();
-    expect(said(events, 'devCommand.graveyardShift.say.giveUp')).toHaveLength(0);
+    expect(said(events, 'graveyardShift.say.giveUp')).toHaveLength(0);
     ticks(sim, CORPSE_RETURN_TICKS - 2);
     expect(tank.dead).toBe(true);
     expect(run.outro).toBeNull();

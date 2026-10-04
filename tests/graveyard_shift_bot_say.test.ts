@@ -80,7 +80,7 @@ function runTicks(sim: Sim, n: number, out: Heard[] = [], stray?: ChatEvent[]): 
 }
 
 const heardBy = (heard: Heard[], pid: number) => heard.filter((h) => h.ev.pid === pid);
-const triggerOf = (ev: ChatEvent) => ev.textKey!.split('.')[3] as BotSayTrigger;
+const triggerOf = (ev: ChatEvent) => ev.textKey!.split('.')[2] as BotSayTrigger;
 const allLines = Object.values(BOT_LINES).flat();
 
 describe('Graveyard Shift say lines (table)', () => {
@@ -88,7 +88,7 @@ describe('Graveyard Shift say lines (table)', () => {
     const ids = allLines.map((l) => l.id);
     expect(new Set(ids).size).toBe(ids.length);
     for (const l of allLines) {
-      expect(l.key).toBe(`devCommand.graveyardShift.say.${l.id}`);
+      expect(l.key).toBe(`graveyardShift.say.${l.id}`);
       expect(t(l.key as TranslationKey)).toBe(l.text);
     }
   });

@@ -43,7 +43,7 @@ export function updateWorldSpeech(
   if (!graveWhisperDue(grave.pos, world.player.pos, state, nowMs)) return;
   host.showChatBubble(
     GRAVE_ENTITY_ID,
-    t('devCommand.graveyardShift.tibbs.whisper'),
+    t('graveyardShift.tibbs.whisper'),
     undefined,
     GRAVE_WHISPER_TTL_SEC,
   );

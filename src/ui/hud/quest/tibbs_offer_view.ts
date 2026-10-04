@@ -9,9 +9,9 @@ import type { Entity, GraveyardShiftReport } from '../../../sim/types';
 import { type TranslationKey, t } from '../../i18n';
 
 const FIRST_MEETING: readonly TranslationKey[] = [
-  'devCommand.graveyardShift.tibbs.offer.intro1',
-  'devCommand.graveyardShift.tibbs.offer.intro2',
-  'devCommand.graveyardShift.tibbs.offer.intro3',
+  'graveyardShift.tibbs.offer.intro1',
+  'graveyardShift.tibbs.offer.intro2',
+  'graveyardShift.tibbs.offer.intro3',
 ];
 
 export interface TibbsOfferView {
@@ -42,18 +42,18 @@ export function tibbsOfferDialog(
   if (report?.outcome === 'won') {
     return {
       lines: [
-        t('devCommand.graveyardShift.tibbs.say.report', { sent: report.sent, saved: report.saved }),
-        t('devCommand.graveyardShift.tibbs.say.payout'),
+        t('graveyardShift.tibbs.say.report', { sent: report.sent, saved: report.saved }),
+        t('graveyardShift.tibbs.say.payout'),
       ],
       quoted: false,
       rewardCopper: report.copper,
       acceptLabel: null,
-      declineLabel: t('devCommand.graveyardShift.tibbs.offer.thanks'),
+      declineLabel: t('graveyardShift.tibbs.offer.thanks'),
     };
   }
   if (deedsEarned.has(BOSS_FOR_A_DAY_DEED_ID)) {
     return {
-      lines: [t('devCommand.graveyardShift.tibbs.say.covered')],
+      lines: [t('graveyardShift.tibbs.say.covered')],
       quoted: true,
       rewardCopper: 0,
       acceptLabel: null,
@@ -64,18 +64,18 @@ export function tibbsOfferDialog(
     lines:
       report?.outcome === 'lost'
         ? [
-            t('devCommand.graveyardShift.tibbs.say.consolation'),
-            t('devCommand.graveyardShift.tibbs.say.anotherShift'),
+            t('graveyardShift.tibbs.say.consolation'),
+            t('graveyardShift.tibbs.say.anotherShift'),
           ]
         : FIRST_MEETING.map((key) => t(key)),
     quoted: false,
     rewardCopper: 0,
-    acceptLabel: t('devCommand.graveyardShift.tibbs.offer.accept'),
-    declineLabel: t('devCommand.graveyardShift.tibbs.offer.decline'),
+    acceptLabel: t('graveyardShift.tibbs.offer.accept'),
+    declineLabel: t('graveyardShift.tibbs.offer.decline'),
   };
 }
 
 /** Tibbs' answer to a declined offer. */
 export function tibbsDeclineLine(): string {
-  return t('devCommand.graveyardShift.tibbs.say.decline');
+  return t('graveyardShift.tibbs.say.decline');
 }

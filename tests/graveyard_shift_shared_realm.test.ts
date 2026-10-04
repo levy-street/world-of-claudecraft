@@ -94,7 +94,7 @@ describe('the adventurer bots on a shared realm', () => {
     for (let i = 0; i < 20 * 20; i++) heard.push(...sim.tick());
     const says = heard.filter(
       (ev): ev is Extract<SimEvent, { type: 'chat' }> =>
-        ev.type === 'chat' && ev.textKey?.startsWith('devCommand.graveyardShift.say.') === true,
+        ev.type === 'chat' && ev.textKey?.startsWith('graveyardShift.say.') === true,
     );
     expect(says.length).toBeGreaterThan(0);
     expect(says.every((ev) => ev.pid === sim.playerId)).toBe(true);

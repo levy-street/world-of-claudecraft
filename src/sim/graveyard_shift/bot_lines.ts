@@ -1,5 +1,5 @@
 // The adventurers' say lines, pooled per trigger: a stable id, the catalog key
-// the client renders (devCommand.graveyardShift.say.*) and the English source the
+// the client renders (graveyardShift.say.*) and the English source the
 // event carries as its fallback text. Pure data, no SimContext, no rng.
 
 import type { BotRole } from './bot_brain';
@@ -33,7 +33,7 @@ const line = (
   roles: { by?: BotRole; notBy?: BotRole } = {},
 ): BotLine => ({
   id: `${trigger}.${name}`,
-  key: `devCommand.graveyardShift.say.${trigger}.${name}`,
+  key: `graveyardShift.say.${trigger}.${name}`,
   text,
   ...roles,
 });

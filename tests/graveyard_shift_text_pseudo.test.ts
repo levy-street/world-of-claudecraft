@@ -27,7 +27,7 @@ import { localizeErrorText } from '../src/ui/error_text_i18n_core';
 import { isPseudoActive } from '../src/ui/i18n';
 import { en_XA } from '../src/ui/i18n.resolved.generated/en_XA';
 
-const PSEUDO = en_XA.devCommand.graveyardShift;
+const PSEUDO = en_XA.graveyardShift;
 
 afterAll(() => {
   window.history.replaceState({}, '', '/');

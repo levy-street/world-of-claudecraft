@@ -120,7 +120,7 @@ describe('Graveyard Shift outro: a lost shift', () => {
     for (let i = 0; i < LOSS_OUTRO_TICKS - 1; i++) {
       for (const ev of sim.tick()) {
         const key = (ev as any).textKey as string | undefined;
-        if (ev.type === 'chat' && key?.startsWith('devCommand.graveyardShift.say.loot.')) {
+        if (ev.type === 'chat' && key?.startsWith('graveyardShift.say.loot.')) {
           loot.push({
             tick: sim.ctx.tickCount - started,
             key,

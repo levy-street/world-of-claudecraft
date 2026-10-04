@@ -21,10 +21,11 @@ import {
   GRAVE_WHISPER_RADIUS,
   TIBBS_NPC_ID,
 } from '../src/sim/graveyard_shift/grave_entry';
+import { TIBBS_LINES } from '../src/sim/graveyard_shift/grave_staging';
 import type { Entity, SimEvent } from '../src/sim/types';
 import { applyQuestEventPresentation } from '../src/ui/hud/quest/quest_event_router';
 import { tibbsDeclineLine, tibbsOfferDialog } from '../src/ui/hud/quest/tibbs_offer_view';
-import { setLanguage } from '../src/ui/i18n';
+import { setLanguage, type TranslationKey, t } from '../src/ui/i18n';
 import type { IWorld } from '../src/world_api';
 
 // Each caller's Tibbs takes a fresh id; any id stands in for one here.
@@ -123,6 +124,17 @@ describe('the grave whisper', () => {
     const next = { showChatBubble: vi.fn() };
     updateWorldSpeech(world, next, 41_500);
     expect(next.showChatBubble).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("Tibbs' keyed lines", () => {
+  it('emit the catalog English as their fallback text, key for key', () => {
+    setLanguage('en');
+    const lines = Object.entries(TIBBS_LINES);
+    expect(lines.length).toBeGreaterThan(0);
+    for (const [line, text] of lines) {
+      expect(t(`graveyardShift.tibbs.say.${line}` as TranslationKey)).toBe(text);
+    }
   });
 });
 
