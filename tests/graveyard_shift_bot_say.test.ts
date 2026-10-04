@@ -160,7 +160,7 @@ describe('Graveyard Shift say lines (run)', () => {
     const { sim, run } = shiftSim();
     const healer = botEntity(sim, run, 'healer');
     const said: string[] = [];
-    for (let round = 0; round < 4; round++) {
+    for (let round = 0; round < 3; round++) {
       healer.resource = Math.floor(healer.maxResource * 0.1);
       const heard = heardBy(runTicks(sim, 2), sim.playerId);
       said.push(...heard.map((h) => h.ev.textKey!));
@@ -168,9 +168,9 @@ describe('Graveyard Shift say lines (run)', () => {
       healer.resource = healer.maxResource;
       runTicks(sim, BOT_SAY_BOT_COOLDOWN_TICKS);
     }
-    // Three oom lines in the pool: three distinct lines, then silence.
-    expect(said).toHaveLength(3);
-    expect(new Set(said).size).toBe(3);
+    // Two oom lines in the pool: two distinct lines, then silence.
+    expect(said).toHaveLength(2);
+    expect(new Set(said).size).toBe(2);
     expect(said.every((k) => k.includes('.say.healerOom.'))).toBe(true);
   });
 

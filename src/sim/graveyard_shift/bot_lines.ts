@@ -40,18 +40,15 @@ const line = (
 
 export const BOT_LINES: Readonly<Record<BotSayTrigger, readonly BotLine[]>> = {
   clearing: [
-    line('clearing', 'lastPull', 'ok last pull before the boss'),
-    line('clearing', 'spiders', 'can we NOT pull the spiders this time'),
-    line('clearing', 'boneQuest', "who still needs the bone quest, I'm at 6 of 10"),
+    line('clearing', 'lastPull', 'ok last pack, then boss, then bed'),
+    line('clearing', 'stayAway', 'stay away from the boss guys'),
+    line('clearing', 'speedUp', 'gtg in 10 min, can we speed up'),
     line('clearing', 'howsMana', "healer how's mana", { notBy: 'healer' }),
   ],
   notice: [
     line('notice', 'pulledEarly', 'boss pulled early??'),
     line('notice', 'whoPulled', 'WHO PULLED'),
-    line('notice', 'didntTouch', 'I DIDNT TOUCH IT'),
-    line('notice', 'walkingTowards', 'uh, is the boss supposed to be walking towards us'),
-    line('notice', 'notInSpot', "wait he's not in his spot. is this a new patch"),
-    line('notice', 'watchedGuide', "I watched a guide, he's easy, just don't stand in purple"),
+    line('notice', 'boredWaiting', 'did the boss just get bored of waiting'),
   ],
   death: [
     line('death', 'rip', 'rip'),
@@ -63,23 +60,22 @@ export const BOT_LINES: Readonly<Record<BotSayTrigger, readonly BotLine[]>> = {
     line('healerOom', 'emotionalSupport', "I'm healing with pure emotional support at this point", {
       by: 'healer',
     }),
-    line('healerOom', 'iKnow', 'yes I know the boss is already pulled, I KNOW', { by: 'healer' }),
   ],
   wipeThreat: [
     line('wipeThreat', 'popEverything', 'pop everything. POP EVERYTHING'),
     line('wipeThreat', 'wedding', "who's been saving a cooldown for their wedding"),
-    line('wipeThreat', 'blamePet', "if we wipe I'm blaming the pet"),
+    line('wipeThreat', 'goingBadly', 'this is going badly'),
   ],
   corpseRun: [
     line('corpseRun', 'runningBack', "they're running back, hold on"),
-    line('corpseRun', 'kiteHim', '30 sec, kite him'),
-    line('corpseRun', 'stayAlive', 'just stay alive, just stay alive'),
+    line('corpseRun', 'kiteHim', 'just kite him in circles'),
+    line('corpseRun', 'holdHim', "hold him till they're back"),
   ],
   returned: [
     line('returned', 'roundTwo', 'ok round 2, for real this time'),
-    line('returned', 'tactics', "who has the boss's tactics?"),
-    line('returned', 'guideOnTheWay', 'I watched a guide on the way'),
-    line('returned', 'gearRed', "my gear is red, whatever, let's go"),
+    line('returned', 'imBack', "I'm back, did I miss anything"),
+    line('returned', 'knowHisMoves', 'ok I know his moves now'),
+    line('returned', 'revengeTime', 'revenge time'),
   ],
   giveUp: [
     line('giveUp', 'gn', "ok I'm out, gn"),
@@ -89,8 +85,9 @@ export const BOT_LINES: Readonly<Record<BotSayTrigger, readonly BotLine[]>> = {
   ],
   loot: [],
   partyWins: [
-    line('partyWins', 'firstTry', 'WE DID IT, first try'),
-    line('partyWins', 'respect', 'the boss almost had us, respect'),
+    line('partyWins', 'easy', 'EZ'),
+    line('partyWins', 'gg', 'gg'),
+    line('partyWins', 'toldYouEasy', 'told you he was easy'),
   ],
 };
 
@@ -98,7 +95,7 @@ export const BOT_LINES: Readonly<Record<BotSayTrigger, readonly BotLine[]>> = {
 // order, by whoever is standing (outro.ts times them).
 export const LOOT_LINES: readonly BotLine[] = [
   line('loot', 'whoNeeds', 'ok who needs the trousers'),
-  line('loot', 'need', 'NEED. I need them'),
+  line('loot', 'need', 'NEED'),
 ];
 
 export function botLineAllowed(l: BotLine, role: BotRole): boolean {

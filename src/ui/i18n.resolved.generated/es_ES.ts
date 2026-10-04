@@ -264,18 +264,15 @@ export const es_ES: EnTranslations = {
       },
       "say": {
         "clearing": {
-          "lastPull": "ok last pull before the boss",
-          "spiders": "can we NOT pull the spiders this time",
-          "boneQuest": "who still needs the bone quest, I'm at 6 of 10",
+          "lastPull": "ok last pack, then boss, then bed",
+          "stayAway": "stay away from the boss guys",
+          "speedUp": "gtg in 10 min, can we speed up",
           "howsMana": "healer how's mana"
         },
         "notice": {
           "pulledEarly": "boss pulled early??",
           "whoPulled": "WHO PULLED",
-          "didntTouch": "I DIDNT TOUCH IT",
-          "walkingTowards": "uh, is the boss supposed to be walking towards us",
-          "notInSpot": "wait he's not in his spot. is this a new patch",
-          "watchedGuide": "I watched a guide, he's easy, just don't stand in purple"
+          "boredWaiting": "did the boss just get bored of waiting"
         },
         "death": {
           "rip": "rip",
@@ -284,24 +281,23 @@ export const es_ES: EnTranslations = {
         },
         "healerOom": {
           "oom": "oom",
-          "emotionalSupport": "I'm healing with pure emotional support at this point",
-          "iKnow": "yes I know the boss is already pulled, I KNOW"
+          "emotionalSupport": "I'm healing with pure emotional support at this point"
         },
         "wipeThreat": {
           "popEverything": "pop everything. POP EVERYTHING",
           "wedding": "who's been saving a cooldown for their wedding",
-          "blamePet": "if we wipe I'm blaming the pet"
+          "goingBadly": "this is going badly"
         },
         "corpseRun": {
           "runningBack": "they're running back, hold on",
-          "kiteHim": "30 sec, kite him",
-          "stayAlive": "just stay alive, just stay alive"
+          "kiteHim": "just kite him in circles",
+          "holdHim": "hold him till they're back"
         },
         "returned": {
           "roundTwo": "ok round 2, for real this time",
-          "tactics": "who has the boss's tactics?",
-          "guideOnTheWay": "I watched a guide on the way",
-          "gearRed": "my gear is red, whatever, let's go"
+          "imBack": "I'm back, did I miss anything",
+          "knowHisMoves": "ok I know his moves now",
+          "revengeTime": "revenge time"
         },
         "giveUp": {
           "gn": "ok I'm out, gn",
@@ -311,11 +307,12 @@ export const es_ES: EnTranslations = {
         },
         "loot": {
           "whoNeeds": "ok who needs the trousers",
-          "need": "NEED. I need them"
+          "need": "NEED"
         },
         "partyWins": {
-          "firstTry": "WE DID IT, first try",
-          "respect": "the boss almost had us, respect"
+          "easy": "EZ",
+          "gg": "gg",
+          "toldYouEasy": "told you he was easy"
         }
       }
     }
