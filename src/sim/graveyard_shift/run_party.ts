@@ -73,10 +73,14 @@ export function spawnGraveyardShiftParty(ctx: SimContext, run: GraveyardShiftRun
       returning: false,
     };
     run.bots.push(bot);
+    ctx.graveyardShiftRuns.botPids.add(pid);
   });
 }
 
 export function removeGraveyardShiftParty(ctx: SimContext, run: GraveyardShiftRun): void {
-  for (const bot of run.bots) if (ctx.players.has(bot.pid)) ctx.removePlayer(bot.pid);
+  for (const bot of run.bots) {
+    ctx.graveyardShiftRuns.botPids.delete(bot.pid);
+    if (ctx.players.has(bot.pid)) ctx.removePlayer(bot.pid);
+  }
   run.bots.length = 0;
 }

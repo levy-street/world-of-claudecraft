@@ -876,7 +876,7 @@ describe('renderer celebration + nameplate title', () => {
     // A monotonic i18n revision, not getLanguage(), also catches pseudo-locale
     // transitions that deliberately leave the public language key at English.
     expect(nameplateSrc).toContain('const revision = getI18nRevision();');
-    expect(nameplateSrc).toContain('fullPass || plan.urgent || languageChanged');
+    expect(nameplateSrc).toMatch(/fullPass \|\|\s*plan\.urgent \|\|\s*languageChanged/);
     expect(nameplateSrc).toContain('this.surface.clearTextCache();');
     expect(rendererSrc).not.toContain("titleEl.className = 'np-title';");
   });

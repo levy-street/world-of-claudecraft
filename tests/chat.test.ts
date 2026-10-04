@@ -3,6 +3,7 @@ import { MOUNT_KEYS, MOUNTS } from '../src/sim/content/mounts';
 import { BUILTIN_WORLD, MOBS, NPCS, zoneAt } from '../src/sim/data';
 import { grantDeed } from '../src/sim/deeds';
 import { createMob } from '../src/sim/entity';
+import { GraveyardShiftBook } from '../src/sim/graveyard_shift/run_state';
 import { emitMobYell } from '../src/sim/mob/yells';
 import { ownedMounts } from '../src/sim/mounts';
 import { Sim } from '../src/sim/sim';
@@ -1084,6 +1085,7 @@ describe('chat module (direct, no Sim)', () => {
       emit: (ev: any) => events.push(ev),
       error: (pid: number, text: string) => events.push({ type: 'error', pid, text }),
       notice: (pid: number, text: string) => events.push({ type: 'log', pid, text }),
+      graveyardShiftRuns: new GraveyardShiftBook(),
     } as unknown as SimContext;
     function addPlayer(pid: number, name: string, x = 0, z = 0) {
       players.set(pid, { entityId: pid, name, cls: 'mage' });

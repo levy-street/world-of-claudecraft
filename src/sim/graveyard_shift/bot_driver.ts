@@ -52,10 +52,14 @@ export function updateGraveyardShiftBots(ctx: SimContext, run: GraveyardShiftRun
 }
 
 // Morthen (once noticed) and his owned allies still standing in the run's slot.
+// Morthen and his living allies (skeletons, the opening's pack, the raised): all
+// ride run.allyIds, so the scan is bounded by the run, never by the realm.
 function enemiesOf(ctx: SimContext, run: GraveyardShiftRun, boss: Entity): Entity[] {
   const out = run.noticed ? [boss] : [];
-  for (const e of ctx.entities.values()) {
+  for (const id of run.allyIds) {
+    const e = ctx.entities.get(id);
     if (
+      e &&
       e.ownerId === boss.id &&
       e.kind === 'mob' &&
       !e.dead &&

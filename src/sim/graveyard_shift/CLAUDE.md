@@ -55,6 +55,12 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
   save, with the other modes' desertions) and on a jail sentence (before the
   return point is captured), and refuses a hotbar layout upload while the
   identity is on. The parse segmenter skips a run's slot (`isGraveyardShiftRunKey`).
+- **A realm shared with other players.** The adventurers are nobody's to
+  whisper, inspect, invite, trade with or duel (the name lookups in
+  `social/chat.ts` and the party/trade/duel requests skip them), their say lines
+  reach the run's owner alone, "is this a bot" is the O(1) `botPids` set on the
+  run book, the party's enemy scan walks `run.allyIds` (never the realm), and a
+  realm runs at most `GRAVEYARD_SHIFT_MAX_CONCURRENT_RUNS` (4) shifts at once.
 - **Saves write the real character.** `serializeCharacter` routes its result
   through `graveyardShiftSaveState` (`save_override.ts`, the `meta.fiestaRestore`
   precedent): for a run's owner a save writes the parked level and talents, the
@@ -259,8 +265,8 @@ Morthen's SKELETON ALLIES, the KIT EFFECTS (Raise the Fallen) and the SAY LINES
 
 ## The say lines
 - **Local only** (`bot_say.ts`): a LIVING adventurer speaks a keyed line on the
-  `say` channel, pid-routed to every player within `SAY_RANGE` of it (the
-  `emitMobYell` shape, never `Sim.chat()`); the dead are silent and nothing rides
+  `say` channel, pid-routed to the run's owner when within `SAY_RANGE` of it
+  (the slot is private, so the owner is the one listener; never `Sim.chat()`); the dead are silent and nothing rides
   party chat. The event carries `textKey` (`devCommand.graveyardShift.say.*`) and
   the English as `text`; the HUD's say line and bubble render it through
   `localizeChatBody`, so player-authored say (no key) stays verbatim.

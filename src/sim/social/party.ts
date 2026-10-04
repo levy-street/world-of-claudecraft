@@ -16,6 +16,7 @@
 // render/ui/game/net, no Math.random/Date.now), so it runs unchanged in Node, the
 // browser, and the headless RL env (enforced by tests/architecture.test.ts).
 
+import { isGraveyardShiftBotPid } from '../graveyard_shift/run_state';
 import { revokeMasterLooterAuthority } from '../loot/loot_roll';
 import { effectiveMasterLooter } from '../loot_master';
 import type { Party } from '../sim';
@@ -126,7 +127,8 @@ export class PartyMachine {
   partyInvite(targetPid: number, pid?: number): void {
     const r = this.ctx.resolve(pid);
     const target = this.ctx.players.get(targetPid);
-    if (!r || !target) return;
+    // A Graveyard Shift adventurer is nobody's to invite.
+    if (!r || !target || isGraveyardShiftBotPid(this.ctx, targetPid)) return;
     if (targetPid === r.meta.entityId) return;
     const myParty = this.partyOf(r.meta.entityId);
     if (myParty && myParty.leader !== r.meta.entityId) {

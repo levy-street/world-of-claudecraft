@@ -132,7 +132,7 @@ function sayLootLine(ctx: SimContext, run: GraveyardShiftRun, state: BotSayState
   const speaker = pool[state.rng.int(0, pool.length - 1)];
   state.lastTick = ctx.tickCount;
   state.lastSpeakerPid = speaker.id;
-  emitBotSay(ctx, speaker, LOOT_LINES[index]);
+  emitBotSay(ctx, run, speaker, LOOT_LINES[index]);
 }
 
 // The living adventurer nearest Morthen, if one is close enough to be heard.
@@ -246,27 +246,23 @@ function speak(
   state.lastTick = now;
   state.botLastTick.set(pick.bot.pid, now);
   state.lastSpeakerPid = pick.bot.pid;
-  emitBotSay(ctx, pick.e, said);
+  emitBotSay(ctx, run, pick.e, said);
   return true;
 }
 
-function emitBotSay(ctx: SimContext, speaker: Entity, said: BotLine): void {
-  for (const meta of ctx.players.values()) {
-    const p = ctx.entities.get(meta.entityId);
-    // The party's own members need no copy: they are client-less. Keyed on the
-    // roster, not the marker aura, which a death strips.
-    if (!p || isGraveyardShiftBotPid(ctx, p.id) || dist2d(p.pos, speaker.pos) > SAY_RANGE) {
-      continue;
-    }
-    ctx.emit({
-      type: 'chat',
-      fromPid: speaker.id,
-      from: speaker.name,
-      text: said.text,
-      textKey: said.key,
-      channel: 'say',
-      entityId: speaker.id,
-      pid: meta.entityId,
-    });
-  }
+// The run's slot is private: its owner is the one listener a say line can
+// reach (the party's own members are client-less), so the emit is O(1).
+function emitBotSay(ctx: SimContext, run: GraveyardShiftRun, speaker: Entity, said: BotLine): void {
+  const owner = ctx.entities.get(run.ownerPid);
+  if (!owner || dist2d(owner.pos, speaker.pos) > SAY_RANGE) return;
+  ctx.emit({
+    type: 'chat',
+    fromPid: speaker.id,
+    from: speaker.name,
+    text: said.text,
+    textKey: said.key,
+    channel: 'say',
+    entityId: speaker.id,
+    pid: run.ownerPid,
+  });
 }

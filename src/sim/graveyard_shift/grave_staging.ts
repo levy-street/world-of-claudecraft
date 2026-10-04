@@ -187,7 +187,8 @@ export function updateGraveyardShiftGrave(ctx: SimContext): void {
   ensureGraveyardShiftGrave(ctx);
   const book = ctx.graveyardShiftRuns;
   if (book.tibbs.size === 0) return;
-  for (const [summonerPid, id] of [...book.tibbs]) {
+  // A dismissal deletes only the current entry, which Map iteration allows.
+  for (const [summonerPid, id] of book.tibbs) {
     const tibbs = ctx.entities.get(id);
     const caller = ctx.entities.get(summonerPid);
     const idle =

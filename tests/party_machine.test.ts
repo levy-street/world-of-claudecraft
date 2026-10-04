@@ -5,6 +5,7 @@
 // branches and the leadership-handoff / disband teardown.
 
 import { beforeEach, describe, expect, it } from 'vitest';
+import { GraveyardShiftBook } from '../src/sim/graveyard_shift/run_state';
 import { effectiveMasterLooter } from '../src/sim/loot_master';
 import type { PlayerMeta } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
@@ -68,6 +69,7 @@ function makeCtx() {
     dropPartyMarkers(partyId: number) {
       droppedMarkers.push(partyId);
     },
+    graveyardShiftRuns: new GraveyardShiftBook(),
   } as unknown as SimContext;
 
   const addPlayer = (pid: number, name: string): number => {

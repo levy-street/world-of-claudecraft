@@ -17,6 +17,7 @@ import type { TradeInfo } from '../../world_api';
 import { addStacked, bagPools, countFit } from '../bags';
 import { RIFT_GEAR_ITEM_ID_SET } from '../content/rift/items';
 import { ITEMS } from '../data';
+import { isGraveyardShiftBotPid } from '../graveyard_shift/run_state';
 import { itemCopyPin } from '../item_copy_ref';
 import { itemInstancePayloadsEqual } from '../item_instance_merge';
 import {
@@ -147,7 +148,8 @@ export function tradeRequest(ctx: SimContext, targetPid: number, pid?: number): 
   const r = ctx.resolve(pid);
   const target = ctx.players.get(targetPid);
   const targetE = ctx.entities.get(targetPid);
-  if (!r || !target || !targetE) return;
+  // A Graveyard Shift adventurer is nobody's to duel, trade or invite.
+  if (!r || !target || !targetE || isGraveyardShiftBotPid(ctx, targetPid)) return;
   if (targetPid === r.meta.entityId) return;
   if (ctx.trades.has(r.meta.entityId) || ctx.trades.has(targetPid)) {
     ctx.error(r.meta.entityId, 'A trade is already in progress.');

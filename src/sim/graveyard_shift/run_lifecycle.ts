@@ -60,6 +60,9 @@ export { GRAVEYARD_SHIFT_MIN_LEVEL };
 
 // A shift that neither side finishes (a stuck bot, an idle owner) ends here.
 export const GRAVEYARD_SHIFT_MAX_SECONDS = 15 * 60;
+// Concurrent runs per realm (owner pick): 4 of the Hollow Crypt's slots at most,
+// the rest stay free for real groups.
+export const GRAVEYARD_SHIFT_MAX_CONCURRENT_RUNS = 4;
 
 // Why the owner cannot start a shift right now, or null. Dev-channel English,
 // read by the dev command; the grave answers any refusal with one Tibbs line.
@@ -75,6 +78,10 @@ export function canStartGraveyardShift(
   const r = ctx.resolve(pid);
   if (!r || r.e.dead || r.e.ghost) return 'You cannot start a shift right now.';
   if (ctx.graveyardShiftRuns.has(pid)) return 'You are already on shift.';
+  // A realm shares its Hollow Crypt slots with real groups: a few shifts at once.
+  if (ctx.graveyardShiftRuns.size >= GRAVEYARD_SHIFT_MAX_CONCURRENT_RUNS) {
+    return 'Every crypt is busy. Try again soon.';
+  }
   if (r.e.level < GRAVEYARD_SHIFT_MIN_LEVEL) {
     return `You must be level ${GRAVEYARD_SHIFT_MIN_LEVEL} to cover a shift.`;
   }
@@ -251,6 +258,7 @@ function pruneStrayBots(ctx: SimContext, run: GraveyardShiftRun): void {
   for (let i = run.bots.length - 1; i >= 0; i--) {
     const bot = ctx.entities.get(run.bots[i].pid);
     if (bot && instanceClaimHolds(run.slot, bot.pos)) continue;
+    ctx.graveyardShiftRuns.botPids.delete(run.bots[i].pid);
     if (bot) ctx.removePlayer(run.bots[i].pid);
     run.bots.splice(i, 1);
   }
@@ -261,7 +269,8 @@ function pruneStrayBots(ctx: SimContext, run: GraveyardShiftRun): void {
 export function updateGraveyardShift(ctx: SimContext): void {
   updateGraveyardShiftGrave(ctx);
   if (ctx.graveyardShiftRuns.size === 0) return;
-  for (const run of [...ctx.graveyardShiftRuns.values()]) {
+  // A run's teardown deletes only its own entry, which Map iteration allows.
+  for (const run of ctx.graveyardShiftRuns.values()) {
     updateGraveyardShiftSay(ctx, run);
     const p = ctx.entities.get(run.ownerPid);
     const outroEnd = graveyardShiftOutroEnd(ctx, run);

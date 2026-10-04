@@ -95,6 +95,9 @@ export interface GraveyardShiftRun {
  *  one ctx view; every Tibbs is private to the player who woke him. */
 export class GraveyardShiftBook extends Map<number, GraveyardShiftRun> {
   readonly tibbs = new Map<number, number>();
+  // Every run's adventurer pids, so "is this a bot" is O(1) on the hot paths
+  // (deeds, name lookups, social targets). Kept at spawn and removal.
+  readonly botPids = new Set<number>();
 }
 
 const RUN_KEY_PREFIX = 'gshift:';
@@ -115,8 +118,5 @@ export function graveyardShiftRunFor(ctx: SimContext, pid: number): GraveyardShi
 // Whether a pid is one of a run's adventurers. Keyed on the roster, not the
 // marker aura: a death strips auras, and a fallen adventurer is still one.
 export function isGraveyardShiftBotPid(ctx: SimContext, pid: number): boolean {
-  for (const run of ctx.graveyardShiftRuns.values()) {
-    if (run.bots.some((bot) => bot.pid === pid)) return true;
-  }
-  return false;
+  return ctx.graveyardShiftRuns.botPids.has(pid);
 }
