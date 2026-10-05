@@ -12173,6 +12173,7 @@ export const vi_VN: EnTranslations = {
       "edictExplosion": "Khi Ascension hoạt động, vụ nổ gây {damage} sát thương Thánh trong vòng {radius} m, giảm khi vượt quá {cap} mục tiêu. Sát thương này tăng theo Sức Mạnh Bài Trừ.",
       "edictDamage": "Tấn công gây {weaponPercent}% sát thương vũ khí cộng {damage} sát thương Vật Lý. Sát thương vũ khí bao gồm Sức Mạnh Tấn Công.",
       "verdictDamage": "Edict Cuối Cùng nổ tung gây {verdictSingleDamage} sát thương Thánh. Dawnfall nổ tung gây {verdictAreaDamage} sát thương Thánh trong vòng {verdictAreaRadius} m, giảm khi vượt quá {verdictAreaCap} mục tiêu. Không cả hai vụ nổ nào cấp độ lên theo Sức Mạnh Bài Trừ. Chỉ một kẻ thù có thể chịu nhãn của bạn.",
+      "weaponScaledSpell": "Damage increases with your weapon damage, Attack Power, and Spell Power.",
       "finisherDamage": "{base} cộng {perCombo} mỗi điểm combo"
     },
     "resources": {

@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "abilityUi.tooltip.weaponScaledSpell"
+  ],
+  "es_ES": [
+    "abilityUi.tooltip.weaponScaledSpell"
+  ],
+  "fr_FR": [
+    "abilityUi.tooltip.weaponScaledSpell"
+  ],
+  "fr_CA": [
+    "abilityUi.tooltip.weaponScaledSpell"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "abilityUi.tooltip.weaponScaledSpell"
+  ],
+  "de_DE": [
+    "abilityUi.tooltip.weaponScaledSpell"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "abilityUi.tooltip.weaponScaledSpell"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "abilityUi.tooltip.weaponScaledSpell"
+  ],
+  "nl_NL": [
+    "abilityUi.tooltip.weaponScaledSpell"
+  ],
+  "pl_PL": [
+    "abilityUi.tooltip.weaponScaledSpell"
+  ],
+  "id_ID": [
+    "abilityUi.tooltip.weaponScaledSpell"
+  ],
+  "tr_TR": [
+    "abilityUi.tooltip.weaponScaledSpell"
+  ],
+  "sv_SE": [
+    "abilityUi.tooltip.weaponScaledSpell"
+  ],
+  "vi_VN": [
+    "abilityUi.tooltip.weaponScaledSpell"
+  ],
+  "da_DK": [
+    "abilityUi.tooltip.weaponScaledSpell"
+  ]
 };

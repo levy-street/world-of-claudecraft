@@ -12173,6 +12173,7 @@ export const nl_NL: EnTranslations = {
       "edictExplosion": "Terwijl Verheffing actief is, zet de explosie {damage} Fysieke schade vrij in {radius} m, verminderd voorbij {cap} doelen. Deze schade groeit met Aanvalssterkte.",
       "edictDamage": "Slaat voor {weaponPercent}% wapenschade plus {damage} Fysieke schade. Wapenschade bevat Aanvalssterkte.",
       "verdictDamage": "Laatste Edict ontploft voor {verdictSingleDamage} Heilige schade. Dageraadsval ontploft voor {verdictAreaDamage} Heilige schade in {verdictAreaRadius} m, verminderd voorbij {verdictAreaCap} doelen. Geen van beide detonaties groeit met Spreuksterkte. Slechts één vijand kan jouw merk dragen.",
+      "weaponScaledSpell": "Damage increases with your weapon damage, Attack Power, and Spell Power.",
       "finisherDamage": "{base} plus {perCombo} per combopunt"
     },
     "resources": {

@@ -19,6 +19,7 @@
 // hud.ts is the thin consumer.
 import type { AbilityOutputScaling } from '../sim/ability_output_scaling';
 import { benisonPrayerHealingMultiplier } from '../sim/combat/priest/benison_dawnweave';
+import { weaponScaledDamageRange } from '../sim/combat/weapon_scaled_damage';
 import type { ResolvedAbility } from '../sim/sim';
 import {
   abilityScalingPower,
@@ -29,7 +30,7 @@ import {
   dotTickBonus,
   hotTickBonus,
 } from '../sim/spell_scaling';
-import type { AbilityEffect, Entity } from '../sim/types';
+import type { AbilityEffect, Entity, WeaponInfo } from '../sim/types';
 
 // The all-1 fallback used everywhere `res.outputScaling` is absent (a mob/pet
 // ability, or a caller resolved before this metadata existed): reproduces the
@@ -52,13 +53,15 @@ export interface AbilityScaling {
   rangedPower: number;
   attackPower: number;
   auras?: readonly { id?: string; stacks?: number; remaining?: number }[];
+  /** The main-hand weapon a weaponMult directDamage (Tolling Hammer) scales from. */
+  weapon?: Pick<WeaponInfo, 'min' | 'max' | 'speed'>;
 }
 
 /** Build the scaling snapshot from a live entity: the ONE constructor, so a
  *  consumer (the HUD tooltips) can never miss a scaling field. */
 export function abilityScalingOf(
   e: Pick<Entity, 'spellPower' | 'healPower' | 'rangedPower' | 'attackPower'> &
-    Partial<Pick<Entity, 'auras'>>,
+    Partial<Pick<Entity, 'auras' | 'weapon'>>,
 ): AbilityScaling {
   return {
     spellPower: e.spellPower,
@@ -66,7 +69,27 @@ export function abilityScalingOf(
     rangedPower: e.rangedPower,
     attackPower: e.attackPower,
     auras: e.auras,
+    weapon: e.weapon,
   };
+}
+
+/** The authored roll range of a direct hit, widened by its weapon share when
+ *  the effect sets weaponMult and the snapshot carries a weapon: the same
+ *  range combat draws from (combat/weapon_scaled_damage.ts). A player's
+ *  Attack Power already folds its auras in, so the raw rating matches
+ *  combat's effectiveAttackPower. */
+export function directDamageRollRange(
+  eff: Extract<AbilityEffect, { type: 'directDamage' }>,
+  scaling?: AbilityScaling,
+): { min: number; max: number } {
+  if (eff.weaponMult === undefined || !scaling?.weapon) return { min: eff.min, max: eff.max };
+  return weaponScaledDamageRange(
+    eff.min,
+    eff.max,
+    scaling.weapon,
+    scaling.attackPower,
+    eff.weaponMult,
+  );
 }
 
 /** Flat bonus this character adds to ONE displayed hit of `eff` (or, for a DoT, to

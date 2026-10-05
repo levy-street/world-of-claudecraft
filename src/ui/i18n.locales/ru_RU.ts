@@ -443,6 +443,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Пока активно Вознесение, взрыв наносит {damage} физического урона в радиусе {radius} м; при более чем {cap} целях урон снижается. Этот урон растёт с силой атаки.',
   'abilityUi.tooltip.verdictDamage':
     '«Последний эдикт» взрывается, нанося {verdictSingleDamage} светлого урона. «Падение рассвета» взрывается, нанося {verdictAreaDamage} светлого урона в радиусе {verdictAreaRadius} м; при более чем {verdictAreaCap} целях урон снижается. Ни один из взрывов не растёт от силы заклинаний. Только один враг может нести вашу метку.',
+  'abilityUi.tooltip.weaponScaledSpell':
+    'Урон растёт от урона оружием, силы атаки и силы заклинаний.',
   'hud.core.deathRecap': 'Итог',
   'hud.core.deathRecapClose': 'Закрыть',
   'hud.core.deathRecapCrit': 'Крит.',

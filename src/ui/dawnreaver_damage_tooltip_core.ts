@@ -1,6 +1,6 @@
 import type { ResolvedAbility } from '../sim/sim';
 import type { AbilityEffect } from '../sim/types';
-import { type AbilityScaling, abilityDamageBonus } from './ability_damage';
+import { type AbilityScaling, abilityDamageBonus, directDamageRollRange } from './ability_damage';
 
 const ZERO_POWER: AbilityScaling = {
   spellPower: 0,
@@ -19,10 +19,11 @@ export function primaryDamageTooltipRange(
   const factor = res.outputScaling?.primaryDamage ?? 1;
   if (effect.type !== 'directDamage' && effect.type !== 'aoeDamage') return null;
   const effectMult = effect.type === 'directDamage' ? (effect.damageMult ?? 1) : 1;
+  const roll = effect.type === 'directDamage' ? directDamageRollRange(effect, scaling) : effect;
   const bonus = abilityDamageBonus(res, effect, scaling);
   return {
-    min: Math.round((effect.min + bonus) * effectMult * factor),
-    max: Math.round((effect.max + bonus) * effectMult * factor),
+    min: Math.round((roll.min + bonus) * effectMult * factor),
+    max: Math.round((roll.max + bonus) * effectMult * factor),
   };
 }
 

@@ -495,6 +495,10 @@ describe("Zealfire 4pc: Dawn's Wrath bakes the wearer mult into the aura", () =>
       sim.targetEntity(target.id);
       if (empowered) grantDawnsWrath(sim.ctx, sim.player);
       sim.player.spellPower = 70;
+      // Tolling Hammer scales with the weapon hit: pin one weapon and AP so the
+      // set pieces' Strength cannot move the base between wearer and control.
+      sim.player.weapon = { min: 77, max: 115, speed: 3.6 };
+      sim.player.attackPower = 400;
       sim.rng.next = () => 0.5;
       sim.rng.chance = (chance) => chance > 0.5;
       const hpBefore = target.hp;
@@ -502,11 +506,12 @@ describe("Zealfire 4pc: Dawn's Wrath bakes the wearer mult into the aura", () =>
       for (let tick = 0; tick < 200 && target.hp === hpBefore; tick++) sim.tick();
       return hpBefore - target.hp;
     }
-    // Dawnreaver and Wrath multiply the unrounded hit before the final round.
-    // Multiplying the rounded base again would overstate each empowered hit.
-    expect(castDamage(true, false)).toBe(410);
-    expect(castDamage(true, true)).toBe(573);
-    expect(castDamage(false, false)).toBe(410);
-    expect(castDamage(false, true)).toBe(491);
+    // Dawnreaver and Wrath multiply the unrounded hit before the final round:
+    // 207.81 x 1.75 = 364, x 1.4 = 509, x 1.2 = 436. Multiplying the rounded
+    // base again (510, 437) would overstate each empowered hit.
+    expect(castDamage(true, false)).toBe(364);
+    expect(castDamage(true, true)).toBe(509);
+    expect(castDamage(false, false)).toBe(364);
+    expect(castDamage(false, true)).toBe(436);
   });
 });

@@ -12173,6 +12173,7 @@ export const sv_SE: EnTranslations = {
       "edictExplosion": "Medan Upphöjelse är aktiv, explosionen orsakar {damage} fysisk skada inom {radius} m, reducerad bortom {cap} mål. Denna skada ökar med Attackkraft.",
       "edictDamage": "Slå för {weaponPercent}% vapenskada plus {damage} fysisk skada. Vapenskada inkluderar Attackkraft.",
       "verdictDamage": "Final Edikt detonerar för {verdictSingleDamage} helig skada. Gryningsfall detonerar för {verdictAreaDamage} helig skada inom {verdictAreaRadius} m, reducerad bortom {verdictAreaCap} mål. Ingen detonation skalas med Trollformkraft. Endast en fiende kan bära ditt märke.",
+      "weaponScaledSpell": "Damage increases with your weapon damage, Attack Power, and Spell Power.",
       "finisherDamage": "{base} plus {perCombo} per kombopoäng"
     },
     "resources": {

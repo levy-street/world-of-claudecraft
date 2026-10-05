@@ -332,7 +332,11 @@ const retribution: AbilityDef[] = [
     school: 'holy',
     requiresTarget: true,
     executeThreshold: 0.2,
-    effects: [{ type: 'directDamage', min: 150, max: 180 }],
+    // Weapon-scaled, not flat: the old 150 to 180 hit the same with a level 14
+    // green as with Forgebreaker, so it carried leveling Dawnreaver far past
+    // its peers. 0.72 of the weapon hit holds the Forgebreaker raid hit where
+    // the flat version had it (dawnreaverDamageMultiplier still applies).
+    effects: [{ type: 'directDamage', min: 0, max: 0, weaponMult: 0.72 }],
     description:
       "Hurl a holy hammer for $d damage and generate 1 Devotion. Usable below 20% health, or during Divine Ascension or Zealwing. Dawn's Wrath grants an additional cast against any target that ignores its current cooldown and deals 20% more damage. Ascension increases its damage by 30%.",
   },

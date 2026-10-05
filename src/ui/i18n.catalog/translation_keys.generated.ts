@@ -127,6 +127,7 @@ export type TranslationKeyFlat =
   | 'abilityUi.tooltip.selfOnly'
   | 'abilityUi.tooltip.unavailable'
   | 'abilityUi.tooltip.verdictDamage'
+  | 'abilityUi.tooltip.weaponScaledSpell'
   | 'apiError.account.characters_online'
   | 'apiError.account.deactivated'
   | 'apiError.account.not_found'

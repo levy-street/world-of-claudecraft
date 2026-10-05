@@ -12173,6 +12173,7 @@ export const cs_CZ: EnTranslations = {
       "edictExplosion": "Dokud je aktivní Vzestup, výbuch způsobí {damage} fyzického poškození v okruhu {radius} m, snížené nad {cap} cílů. Toto poškození roste se silou útoku.",
       "edictDamage": "Udeříš za {weaponPercent} % poškození zbraně plus {damage} fyzického poškození. Poškození zbraně zahrnuje sílu útoku.",
       "verdictDamage": "Poslední edikt exploduje za {verdictSingleDamage} svatého poškození. Pád úsvitu exploduje za {verdictAreaDamage} svatého poškození v okruhu {verdictAreaRadius} m, snížené nad {verdictAreaCap} cílů. Ani jedna exploze neškáluje se silou kouzel. Tvé znamení může nést jen jeden nepřítel.",
+      "weaponScaledSpell": "Damage increases with your weapon damage, Attack Power, and Spell Power.",
       "finisherDamage": "{base} plus {perCombo} za combo bod"
     },
     "resources": {

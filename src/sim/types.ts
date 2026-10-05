@@ -3086,6 +3086,11 @@ export type AbilityEffect =
       selfHealDamageFrac?: number;
       /** Optional authored coefficient that replaces the cast-time coefficient. */
       spellPowerCoeff?: number;
+      /** Adds this share of the caster's weapon hit (weapon roll plus Attack
+       *  Power / 14 x weapon speed) to the min/max range, resolved in the
+       *  ability's own school (combat/weapon_scaled_damage.ts). Talent and
+       *  Ascension multipliers scale it like the authored range. */
+      weaponMult?: number;
     }
   // rageOnInterrupt: rage minted when a cast is ACTUALLY cut (Pummel's
   // incentive design), scaled like ability-granted rage; never on a whiff.

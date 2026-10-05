@@ -278,7 +278,11 @@ export function resolveAscensionAbility(
           : effect;
       case 'hammer_of_wrath':
         return effect.type === 'directDamage'
-          ? { ...effect, ...scaleRange(effect.min, effect.max, 1.3) }
+          ? {
+              ...effect,
+              ...scaleRange(effect.min, effect.max, 1.3),
+              ...(effect.weaponMult === undefined ? {} : { weaponMult: effect.weaponMult * 1.3 }),
+            }
           : effect;
       case 'valkyrs_calling':
         return effect.type === 'valkyrsCalling'

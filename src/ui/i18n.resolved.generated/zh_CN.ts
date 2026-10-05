@@ -12173,6 +12173,7 @@ export const zh_CN: EnTranslations = {
       "edictExplosion": "神圣升华生效期间，爆炸会在 {radius} 米内造成 {damage} 点物理伤害，目标超过 {cap} 个时伤害降低。此伤害随攻击强度提升。",
       "edictDamage": "以武器伤害的 {weaponPercent}% 加上 {damage} 点物理伤害进行打击。武器伤害会计入攻击强度。",
       "verdictDamage": "终末敕令引爆，造成 {verdictSingleDamage} 点神圣伤害。黎明坠击引爆，在 {verdictAreaRadius} 米内造成 {verdictAreaDamage} 点神圣伤害，目标超过 {verdictAreaCap} 个时伤害降低。两次引爆的伤害均不随法术强度提升。同一时间只有一名敌人能承受你的印记。",
+      "weaponScaledSpell": "伤害随你的武器伤害、攻击强度和法术强度提升。",
       "finisherDamage": "{base} 加每个连击点 {perCombo}"
     },
     "resources": {

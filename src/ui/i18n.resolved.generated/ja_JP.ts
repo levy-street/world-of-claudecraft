@@ -12173,6 +12173,7 @@ export const ja_JP: EnTranslations = {
       "edictExplosion": "昇天が発動中、爆発は半径{radius}メートル以内に{damage}の物理ダメージを与え、対象が{cap}体を超えるとダメージが減少します。このダメージは攻撃力に応じて増加します。",
       "edictDamage": "武器ダメージの{weaponPercent}%に{damage}の物理ダメージを加えて打ちます。武器ダメージには攻撃力が含まれます。",
       "verdictDamage": "最後の勅令は{verdictSingleDamage}の神聖ダメージで爆発します。暁落としは半径{verdictAreaRadius}メートル以内に{verdictAreaDamage}の神聖ダメージで爆発し、対象が{verdictAreaCap}体を超えるとダメージが減少します。どちらの爆発もスペルパワーでは上昇しません。あなたの印を受けられる敵は同時に1体のみです。",
+      "weaponScaledSpell": "ダメージは武器ダメージ、攻撃力、スペルパワーに応じて上昇します。",
       "finisherDamage": "{base}にコンボポイントごと{perCombo}"
     },
     "resources": {

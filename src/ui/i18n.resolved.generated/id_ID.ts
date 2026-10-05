@@ -12173,6 +12173,7 @@ export const id_ID: EnTranslations = {
       "edictExplosion": "Saat Kenaikan Ilahi aktif, ledakan menimbulkan {damage} kerusakan Fisik dalam {radius} m, berkurang melampaui {cap} target. Kerusakan ini meningkat dengan Kekuatan Serangan.",
       "edictDamage": "Menyerang dengan {weaponPercent}% kerusakan senjata ditambah {damage} kerusakan Fisik. Kerusakan senjata mencakup Kekuatan Serangan.",
       "verdictDamage": "Titah Terakhir meledak dengan {verdictSingleDamage} kerusakan Ilahi. Runtuhnya Fajar meledak dengan {verdictAreaDamage} kerusakan Ilahi dalam {verdictAreaRadius} m, berkurang melampaui {verdictAreaCap} target. Ledakan mana pun tidak berskala dengan Kekuatan Sihir. Hanya satu musuh yang bisa membawa tanda milikmu.",
+      "weaponScaledSpell": "Damage increases with your weapon damage, Attack Power, and Spell Power.",
       "finisherDamage": "{base} ditambah {perCombo} per poin kombo"
     },
     "resources": {
