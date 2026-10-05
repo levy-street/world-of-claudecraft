@@ -14,11 +14,13 @@ import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import type { FocusTrapHandle } from '../../focus_manager';
+import { captureFocusKey, findFocusKey } from '../../focus_restore';
 import { type TranslationKey, t } from '../../i18n';
 import { QUALITY_COLOR } from '../../icons';
 import { NPC_WINDOW_CLOSE_RANGE } from '../../npc_service_range';
 import type { PainterHostPresentation } from '../../painter_host';
 import { clueHuntTitle } from '../../quest_event_view';
+import { rovingTarget } from '../../roving_index';
 import { svgIcon } from '../../ui_icons';
 import {
   isWorldQuestInstructorOrEscort,
@@ -297,7 +299,10 @@ export class QuestDialogController {
       return;
     }
     if (this.detailQuestId && QUESTS[this.detailQuestId]) {
+      // A focused reward card keeps focus across the rebuild (its focus key).
+      const focusKey = captureFocusKey(this.deps.element);
       this.renderQuestDetail(npc, this.detailQuestId);
+      if (focusKey) findFocusKey(this.deps.element, focusKey)?.focus();
     } else {
       this.renderGossip(npc);
     }
@@ -871,14 +876,35 @@ export class QuestDialogController {
       if (!ITEMS[itemId]) continue;
       this.deps.attachTooltip(choiceRow, () => this.deps.itemTooltip(ITEMS[itemId]));
       if (choiceRow.getAttribute('role') !== 'radio') continue;
-      choiceRow.addEventListener('click', () => {
-        this.rewardPick = { questId, itemId };
-        for (const other of choiceRows) {
-          const checked = other === choiceRow;
-          other.classList.toggle('is-selected', checked);
-          other.setAttribute('aria-checked', String(checked));
-        }
+      choiceRow.addEventListener('click', () =>
+        this.checkRewardCard(questId, choiceRows, choiceRow),
+      );
+      // Roving radio group: arrows on both axes plus Home/End move the check and
+      // the focus together (the house pattern, src/ui/roving_index.ts).
+      choiceRow.addEventListener('keydown', (e) => {
+        const cards = [...choiceRows];
+        const next = rovingTarget(e.key, cards.indexOf(choiceRow), cards.length, 'both');
+        if (next === null) return;
+        e.preventDefault();
+        cards[next].focus();
+        this.checkRewardCard(questId, choiceRows, cards[next]);
       });
+    }
+  }
+
+  private checkRewardCard(
+    questId: string,
+    cards: NodeListOf<HTMLElement>,
+    picked: HTMLElement,
+  ): void {
+    const itemId = picked.dataset.rewardChoice ?? '';
+    if (!ITEMS[itemId]) return;
+    this.rewardPick = { questId, itemId };
+    for (const card of cards) {
+      const checked = card === picked;
+      card.classList.toggle('is-selected', checked);
+      card.setAttribute('aria-checked', String(checked));
+      card.tabIndex = checked ? 0 : -1;
     }
   }
 

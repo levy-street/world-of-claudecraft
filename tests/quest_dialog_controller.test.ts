@@ -489,6 +489,32 @@ describe('QuestDialogController', () => {
     expect(ready.turnInQuest).toHaveBeenCalledWith('q_wolves', other?.dataset.rewardChoice);
   });
 
+  it('moves the reward check and the one tab stop with the arrow keys and Home/End', () => {
+    const readyNpc = npc(34, 'marshal_redbrook');
+    readyNpc.questIds = ['q_wolves'];
+    const ready = harness(readyNpc, 'ready');
+    ready.controller.open(readyNpc.id);
+    ready.element.querySelector<HTMLButtonElement>('[data-quest="q_wolves"]')?.click();
+    const cards = [
+      ...ready.element.querySelectorAll<HTMLButtonElement>('button[data-reward-choice]'),
+    ];
+    const checkedIndex = () => cards.findIndex((c) => c.getAttribute('aria-checked') === 'true');
+    const press = (key: string) =>
+      cards[checkedIndex()].dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+    press('Home');
+    expect(checkedIndex()).toBe(0);
+    press('ArrowRight');
+    expect(checkedIndex()).toBe(1);
+    expect(document.activeElement).toBe(cards[1]);
+    press('End');
+    expect(checkedIndex()).toBe(cards.length - 1);
+    press('ArrowDown');
+    expect(checkedIndex()).toBe(0);
+    expect(cards.filter((c) => c.tabIndex === 0)).toEqual([cards[0]]);
+    ready.element.querySelector<HTMLButtonElement>('.btn')?.click();
+    expect(ready.turnInQuest).toHaveBeenCalledWith('q_wolves', cards[0].dataset.rewardChoice);
+  });
+
   it('the preview promises the REMEMBERED hobby when the identity carries one', () => {
     // The controller must pass identity.questedHobbies through to the view:
     // with the pass-through dropped, the preview silently reverts to the

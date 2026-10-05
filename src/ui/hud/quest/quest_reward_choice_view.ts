@@ -12,6 +12,7 @@ import { defaultRewardChoice, questRewardChoices } from '../../../sim/quests/que
 import type { ItemDef, PlayerClass } from '../../../sim/types';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
+import { focusKeyAttr } from '../../focus_restore';
 import { t } from '../../i18n';
 import { itemNameColor } from '../../item_name_color';
 
@@ -46,6 +47,9 @@ export function questRewardChoiceHtml(
   deps: QuestRewardChoicePaintDeps,
   interactive: boolean,
 ): string {
+  // The radio group's one tab stop (APG roving tabindex): the checked card, else the first.
+  const tabStop =
+    model.selected && model.itemIds.includes(model.selected) ? model.selected : model.itemIds[0];
   const heading = t(interactive ? 'questUi.detail.chooseReward' : 'questUi.detail.rewardChoices');
   const rows = model.itemIds
     .map((id) => {
@@ -56,7 +60,8 @@ export function questRewardChoiceHtml(
         return `<div class="qd-reward-row qd-reward-choice ui-card" data-reward-choice="${esc(id)}">${socket}${name}</div>`;
       }
       const checked = id === model.selected;
-      return `<button type="button" class="qd-reward-row qd-reward-choice ui-card${checked ? ' is-selected' : ''}" role="radio" aria-checked="${checked}" data-reward-choice="${esc(id)}">${socket}${name}</button>`;
+      const tabindex = id === tabStop ? 0 : -1;
+      return `<button type="button" class="qd-reward-row qd-reward-choice ui-card${checked ? ' is-selected' : ''}" role="radio" aria-checked="${checked}" tabindex="${tabindex}"${focusKeyAttr(`reward:${id}`)} data-reward-choice="${esc(id)}">${socket}${name}</button>`;
     })
     .join('');
   const group = interactive ? ` role="radiogroup" aria-label="${esc(heading)}"` : '';

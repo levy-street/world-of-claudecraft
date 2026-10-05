@@ -870,18 +870,21 @@
   .qd-reward-choices {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 4px;
-    margin-top: 4px;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-xs);
   }
   .qd-reward-choice {
     margin-top: 0;
     min-height: 40px;
-    padding: 4px 6px;
+    padding: var(--spacing-xs) var(--spacing-sm);
     text-align: left;
     font: inherit;
   }
   button.qd-reward-choice {
     cursor: var(--cursor-point);
+  }
+  button.qd-reward-choice:hover {
+    border-color: var(--color-accent);
   }
   .qd-reward-choice:focus-visible {
     outline: 2px solid var(--color-border-focus);

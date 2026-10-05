@@ -10,8 +10,8 @@ export function acceptQuestWire(sim: Sim, msg: QuestWireMessage, pid: number): b
 }
 
 // The choose-one pick rides the turn-in as `choice`. Anything but a short
-// string is dropped, and the sim then refuses a choice quest with "Choose a
-// reward first." instead of granting a default the player never picked.
+// string is dropped as no pick, which the sim settles with the spec default;
+// a pick the class is not offered is refused there.
 const MAX_REWARD_CHOICE_LENGTH = 64;
 
 export function turnInQuestWire(sim: Sim, msg: QuestWireMessage, pid: number): void {
