@@ -71,6 +71,7 @@ plausibly covers means the table needs a new row in the same change.
 | Module | Owns |
 |--------|------|
 | `player_movement_modes.ts` | exclusive locomotion order before ordinary walking: vehicle freeze, rift lift strip, deliberate-input AFK clear, Valkyr, race countdown, leap and ledge climb |
+| `npc_update.ts` | friendly NPC aura upkeep and scripted walks through the existing entity-owned `wanderTarget`; movement continues after an encounter ends |
 | `combat/damage.ts` | `dealDamage`, `handleDeath`, `grantXp` (+ lifetime-XP; milestone unlocks absorbed into `deeds.ts`) |
 | `combat/heal.ts` | `applyHeal`, healing threat/taken-mult, hex/crit-vuln mults, heal-absorb |
 | `combat/threat_modifiers.ts` | aura, talent, and known-passive threat multipliers through `SimContext` |

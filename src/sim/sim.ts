@@ -67,7 +67,6 @@ import { clearAfflictionState } from './combat/affliction';
 import { auraAffectsStats, removeCancelableAura } from './combat/aura_cancel';
 import { auraReplacementConflicts } from './combat/aura_stacking';
 import {
-  cleanseFriendlyNpcAuras,
   isRejectedFriendlyNpcAura,
   updateAuras,
   updateComboExpiry,
@@ -406,6 +405,7 @@ import {
   mountTrainBegin as mountTrainBeginImpl,
   tickMountTraining as tickMountTrainingImpl,
 } from './mounts_training';
+import { updateNpc } from './npc_update';
 import * as nythraxisReadouts from './nythraxis_raid_readouts';
 import {
   grantDevotionFromBlock,
@@ -6063,7 +6063,7 @@ export class Sim {
         updateAuras(this.ctx, e);
         lap?.('mob.auras');
       } else if (e.kind === 'npc') {
-        cleanseFriendlyNpcAuras(this.ctx, e);
+        updateNpc(this.ctx, e);
       } else if (e.kind === 'object') {
         if (!e.lootable) {
           e.respawnTimer -= DT;

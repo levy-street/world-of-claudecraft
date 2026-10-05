@@ -29,7 +29,7 @@ import { isBlocked } from '../colliders';
 import { isUnbreakableControlAura } from '../combat/cc';
 import { resetLongCooldownsForRaidWipe } from '../combat/raid_wipe_cooldowns';
 import { resurrectionArrivalAnchor } from '../combat/resurrection_offer';
-import { ITEMS, MOBS, NPCS, QUESTS } from '../data';
+import { DUNGEONS, ITEMS, MOBS, NPCS, QUESTS } from '../data';
 import * as deedsMod from '../deeds';
 import { dungeonInstanceAt } from '../dungeon_floor';
 import { createMob, createNpc } from '../entity';
@@ -2568,6 +2568,13 @@ export function updateNythraxisTransition(
   if (st.transitionTimer > 0) return;
   st.phase = 2;
   st.transitionReleased = true;
+  // Step aside by the entrance once the speech ends, leaving the wardstone clear.
+  // The NPC tick owns the walk so an early boss kill cannot strand him here.
+  const frame = dungeonInstanceAt(boss.spawnPos.x, boss.spawnPos.z);
+  if (aldric && frame) {
+    const arena = DUNGEONS.nythraxis_boss_arena;
+    aldric.wanderTarget = ctx.groundPos(frame.ox + arena.entry.x + 8, frame.oz + arena.entry.z + 4);
+  }
   st.gravebreakerTimer = 3;
   st.soulRendTimer = NYTHRAXIS_PHASE_TWO_SETTLE_DELAY;
   st.deathlessTimer = NYTHRAXIS_PHASE_TWO_SETTLE_DELAY + 15;
