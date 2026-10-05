@@ -1,6 +1,17 @@
 // @vitest-environment happy-dom
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+// This suite exercises quest dialog routing, not character portraits.
+// Keep GLB fetches from outliving the happy-dom environment.
+vi.mock('../src/ui/portrait_chip', () => ({
+  hydratePortraits: () => undefined,
+  isComposedPortraitKey: () => false,
+  modularLookFor: () => null,
+  onPortraitUpdate: () => undefined,
+  portraitChipHtml: () => '',
+}));
+
 import {
   INVESTIGATION_CLUES,
   INVESTIGATION_NPC_IDS,

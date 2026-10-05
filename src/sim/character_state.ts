@@ -384,6 +384,8 @@ export interface CharacterState {
 export interface PetState {
   templateId: string;
   name: string;
+  /** Non-template cosmetic size of a tamed beast. Older saves omit it. */
+  scale?: number;
   level: number;
   hp: number;
   dead: boolean;
