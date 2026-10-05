@@ -6925,6 +6925,7 @@
     top: max(10px, env(safe-area-inset-top));
     bottom: max(10px, env(safe-area-inset-bottom));
     width: auto;
+    height: auto;
     transform: none;
     max-width: none;
     max-height: none;
