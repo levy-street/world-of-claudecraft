@@ -10255,11 +10255,11 @@
     width: 24px;
     height: 24px;
     border-radius: 4px;
-    border: 1px solid #4a3d26;
+    border: 1px solid var(--color-deed-buddy-icon-border);
     flex: 0 0 auto;
   }
   .deed-buddy-icon-empty {
-    background: linear-gradient(160deg, #17130c, #0c0a07);
+    background: linear-gradient(160deg, var(--color-card-hi), var(--color-card-lo));
   }
   .deed-buddy-drag {
     margin-left: auto;
@@ -14057,14 +14057,17 @@
     font-size: 12px;
     padding: 5px 4px;
     color: var(--color-text-muted);
-    background: linear-gradient(#2a2418, #1d1811);
+    background: linear-gradient(var(--color-collections-tab-hi), var(--color-collections-tab-lo));
     border: 1px solid var(--color-border-showcase);
     border-radius: 3px;
     cursor: pointer;
   }
   .col-tab.active {
     color: var(--gold);
-    background: linear-gradient(#4a3c1c, #302713);
+    background: linear-gradient(
+      var(--color-collections-tab-active-hi),
+      var(--color-collections-tab-active-lo)
+    );
   }
   /* Readability pass (owner request): every word in this window is white and
      bold. The item-quality tints the rows carry (q-common through q-epic) read
@@ -14080,7 +14083,7 @@
   #collections-window .col-line-value,
   #collections-window .col-note,
   #collections-window .col-tab {
-    color: #fff;
+    color: var(--color-white);
     font-weight: 700;
   }
   /* Two panes: the catalog list scrolls, the detail pane holds the preview. */
@@ -14117,7 +14120,7 @@
   }
   .col-row.active {
     border-color: var(--color-border-showcase);
-    background: #ffffff0f;
+    background: var(--color-collections-row-active-bg);
   }
   /* An entry nothing in the game grants yet: still listed, visibly dimmed. */
   .col-row.col-locked {
@@ -14173,7 +14176,7 @@
     font-size: 11px;
     font-style: italic;
     line-height: 1.45;
-    color: #ded6c2;
+    color: var(--color-collections-lore-text);
   }
   .col-line {
     display: flex;
@@ -14200,18 +14203,18 @@
   /* A piece the player already owns: green tick beside the name and a green
      ring on the icon, so a set can be read at a glance without counting. */
   .col-piece.col-owned .item-icon {
-    outline: 2px solid #4fdc6a;
+    outline: 2px solid var(--color-collections-owned);
     outline-offset: -2px;
     border-radius: 3px;
   }
   .col-tick {
-    color: #4fdc6a;
+    color: var(--color-collections-owned);
     margin-right: 4px;
     font-weight: 700;
   }
   /* Item level rides the name line, dimmer than the name it qualifies. */
   .col-ilvl {
-    color: #c9c1a8;
+    color: var(--color-collections-ilvl-text);
     font-size: 10px;
     font-weight: 400;
   }
@@ -14222,7 +14225,7 @@
   }
   .col-bonus-live .col-line-value {
     opacity: 1;
-    color: #4fdc6a;
+    color: var(--color-collections-owned);
   }
   .col-piece {
     display: grid;
@@ -14239,7 +14242,7 @@
      broken image. */
   .col-noart {
     display: inline-block;
-    background: #ffffff0a;
+    background: var(--color-collections-noart-bg);
   }
 
   /* ---------- Ashen Coliseum (arena) ---------- */

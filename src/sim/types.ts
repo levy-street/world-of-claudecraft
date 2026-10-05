@@ -191,6 +191,19 @@ export const TOOL_RECHARGE_CAST_ID = 'tool_recharge';
 // harvest_admission.ts) is the frozen duration; professions/
 // corpse_harvest_session.ts owns the whole session.
 export const CORPSE_HARVEST_CAST_ID = 'corpse_harvest';
+// The buddy search (src/sim/pet/buddy_autoloot.ts): a cosmetic follower rummaging
+// one of its owner's corpses before the loot lands. Same activity-marker shape
+// as the sentinels above, but it rides a MOB (the buddy entity), is ticked only
+// by its own module, and exists so every client can see the errand: the
+// renderer plays the rig's Search clip off it. Deliberately NOT a member of
+// isNonSpellCast below. That set routes a cast through the PLAYER-shaped
+// cancel and pushback paths (damage cancel and pushback are player-only), and
+// a buddy's cast fields must stay the sole property of buddy_autoloot.ts,
+// which is the only code that ever sets, ticks or clears them. A buddy CAN be
+// a friendly target and stray damage can reach one; neither touches the
+// search, and an interrupt effect finds no ability and no scripted channel
+// under this id, so it falls through.
+export const BUDDY_SEARCH_CAST_ID = 'buddy_search';
 // The non-spell casts: castingAbility sentinels that are activities, not
 // abilities. They share one semantics bundle at the casting choke points:
 // exempt from silence and school lockouts, no blink-through, no spell queue,
@@ -4784,6 +4797,24 @@ export interface GuardianState {
   dismissWhenUntargeted?: boolean;
 }
 
+/** One cosmetic buddy's loot-errand scratch (Entity.buddyErrand). The walk
+ *  half describes the corpse it is heading for right now; the set-aside half is
+ *  its short memory of corpses that did not work out. */
+export interface BuddyErrand {
+  /** The corpse `best` and `stall` describe, or null between errands. */
+  corpseId: number | null;
+  /** The closest the buddy has been to that corpse so far, in yards. */
+  best: number;
+  /** Seconds since it last got closer than that. */
+  stall: number;
+  /** Corpses set aside: a search took nothing off them, or the buddy could
+   *  not get within reach. Skipped until `setAsideSeconds` runs out. */
+  setAside: number[];
+  /** Seconds until the set-aside list is forgotten and those corpses may be
+   *  tried again. */
+  setAsideSeconds: number;
+}
+
 /**
  * Fields the SIM NEVER WRITES: client-side mirrors decoded from the wire
  * (src/net/online.ts) so the online renderer can pose movement modes it does
@@ -5645,6 +5676,12 @@ export interface Entity extends ClientMirroredEntityFields {
   // Enable/Disable row. Session state, not persisted, exactly like buddyKey:
   // the buddy itself is re-summoned every login.
   buddyAutoloot: boolean;
+  // Sim-only scratch for the buddy loot errand (src/sim/pet/buddy_autoloot.ts),
+  // kept on the BUDDY entity: how its walk to the current corpse is going, and
+  // the corpses it has set aside. Created the first time a buddy is sent on an
+  // errand and absent on everything else. Optional and transient: never
+  // serialized, never mirrored to clients.
+  buddyErrand?: BuddyErrand;
   // Equipped mainhand item id (players only; null otherwise). Render-only: the
   // client maps it to a held weapon model. Recomputed in recalcPlayerStats and
   // synced in identity fields (terse `mh`). The sim never reads it for gameplay.

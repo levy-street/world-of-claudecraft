@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { castHoldStep } from '../src/render/characters/anim_state';
 import { PALADIN_SYNTHESIZED_CLIP_SOURCES } from '../src/render/characters/assets';
 import {
   type ClipMap,
@@ -9,6 +10,9 @@ import {
   type VisualDef,
   visualAssetUrlForGraphics,
 } from '../src/render/characters/manifest';
+import { BUDDY_KEYS } from '../src/sim/content/buddies';
+import { buddyTemplateId } from '../src/sim/content/buddy_mobs';
+import { BUDDY_SEARCH_FIND_SECONDS, BUDDY_SEARCH_SECONDS } from '../src/sim/pet/buddy_autoloot';
 
 // A clip name the shipped GLB does not carry fails SILENTLY at every layer:
 // baseAction() falls back, fadeTo()/playOneShot() return early, and the
@@ -21,8 +25,13 @@ const GLB_MAGIC = 0x46546c67; // 'glTF'
 const CHUNK_JSON = 0x4e4f534a; // 'JSON'
 
 interface GlbJson {
-  animations?: { name?: string; channels?: { target?: { node?: number } }[] }[];
+  animations?: {
+    name?: string;
+    channels?: { target?: { node?: number } }[];
+    samplers?: { input?: number }[];
+  }[];
   nodes?: { name?: string }[];
+  accessors?: { max?: number[] }[];
 }
 
 /** Minimal glTF-binary reader: 12-byte header, then chunks; the JSON chunk
@@ -87,6 +96,24 @@ function glbClipTargets(publicPath: string): Map<string, Set<string>> {
     targets.set(anim.name ?? '', names);
   }
   return targets;
+}
+
+/** Each clip's length in seconds: the latest key time across its samplers. A
+ *  glTF animation input accessor must declare its max, so the JSON chunk alone
+ *  carries this and no buffer is decoded. */
+function glbClipDurations(publicPath: string): Map<string, number> {
+  const json = glbJsonChunk(publicPath);
+  const durations = new Map<string, number>();
+  for (const animation of json.animations ?? []) {
+    if (!animation.name) continue;
+    let duration = 0;
+    for (const sampler of animation.samplers ?? []) {
+      const max = sampler.input === undefined ? undefined : json.accessors?.[sampler.input]?.max;
+      if (max?.[0] !== undefined) duration = Math.max(duration, max[0]);
+    }
+    durations.set(animation.name, duration);
+  }
+  return durations;
 }
 
 function publicPath(url: string): string {
@@ -166,6 +193,7 @@ function requiredClipNames(clips: ClipMap): string[] {
     clips.land,
     clips.walkBack,
     clips.flourish,
+    clips.hop,
     clips.stow,
     ...clips.attack,
     ...(clips.idleVariants ?? []),
@@ -208,6 +236,9 @@ const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
   'land',
   'walkBack',
   'flourish',
+  'hop',
+  // names no clip: [leave the ground, touch down] seconds inside `hop`
+  'hopAir',
   'stow',
   'attack',
   'hit',
@@ -370,6 +401,69 @@ describe('character ClipMaps match the shipped GLBs', () => {
     expect(VISUALS.mount_rallycart_rxt.cutToIdle).toBe(true);
     // Opt-in only: a creature's legs blending down to a stand needs the fade.
     expect(VISUALS.mount_valorsteed.cutToIdle).toBeUndefined();
+  });
+
+  it('places every follower hop window inside its own Jump clip', () => {
+    // hopAir names no clip, so the name gate above cannot see it: it is two
+    // times INSIDE `hop`. A window past the clip end never hands a hop back to
+    // a running body, and one that starts at or after its own end skips the
+    // whole jump.
+    const hoppers = rigs.filter(([, def]) => def.clips.hop || def.clips.hopAir);
+    expect(hoppers.map(([key]) => key).sort()).toEqual(
+      BUDDY_KEYS.map((key) => buddyTemplateId(key)).sort(),
+    );
+    for (const [key, def] of hoppers) {
+      const { hop, hopAir } = def.clips;
+      if (!hop || !hopAir) throw new Error(`${key} needs both hop and hopAir`);
+      const duration = glbClipDurations(publicPath(def.url)).get(hop);
+      if (duration === undefined) throw new Error(`${key} ships no ${hop} clip`);
+      expect(hopAir[0], `${key} take-off`).toBeGreaterThanOrEqual(0);
+      expect(hopAir[0], `${key} take-off before touchdown`).toBeLessThan(hopAir[1]);
+      expect(hopAir[1], `${key} touchdown inside the clip`).toBeLessThanOrEqual(duration);
+    }
+  });
+
+  it('plays a buddy Search once: held just short of its own clip end, never wrapped', () => {
+    // The sim holds a searching buddy under its cast for BUDDY_SEARCH_SECONDS
+    // and a cast clip LOOPS while its cast is held. Each rig's Search is its own
+    // length, a hair either side of that cast, so without a hold point the
+    // clip wraps (the horse's is the shorter) and the cast-exit play-out then
+    // runs the whole rummage a second time. A hold point at or past the clip
+    // end is the same bug: castHoldStep disables the freeze there.
+    for (const buddy of BUDDY_KEYS) {
+      const key = buddyTemplateId(buddy);
+      const { cast, castHoldPointSeconds: hold, castPlayOut } = VISUALS[key].clips;
+      if (!cast || hold === undefined) throw new Error(`${key} needs a held Search`);
+      const duration = glbClipDurations(publicPath(VISUALS[key].url)).get(cast);
+      if (duration === undefined) throw new Error(`${key} ships no ${cast} clip`);
+      // It freezes, and only in the clip's last moments.
+      expect(castHoldStep(hold, hold, duration), key).toEqual({ paused: true, time: hold });
+      expect(castHoldStep(hold - 0.01, hold, duration).paused, key).toBe(false);
+      expect(duration - hold, `${key} holds near its end`).toBeLessThan(0.25);
+      // The "found it" beat, where the sim lands the loot, plays before the hold...
+      expect(hold, `${key} find beat on screen`).toBeGreaterThan(BUDDY_SEARCH_FIND_SECONDS);
+      // ...and the hold is reached inside the cast, so the whole rummage is seen.
+      expect(hold, `${key} hold inside the cast`).toBeLessThan(BUDDY_SEARCH_SECONDS);
+      // The last few frames finish as a one-shot when the cast ends.
+      expect(castPlayOut, key).toContain(cast);
+    }
+  });
+
+  it('gives every buddy a named swim, so none falls back to the procedural prone', () => {
+    // A rig with no swim clip is pitched onto its nose by the procedural prone
+    // (SWIM_PITCH_PROCEDURAL in visual.ts): right for a biped with no stroke,
+    // wrong for a quadruped or a floater. Naming swimSurface is what turns the
+    // pitch off, and the three slots resolving is covered by the name gate.
+    for (const buddy of BUDDY_KEYS) {
+      const key = buddyTemplateId(buddy);
+      const { clips, swimRise } = VISUALS[key];
+      expect(clips.swim, key).toBe(clips.walk);
+      expect(clips.swimSurface, key).toBe(clips.walk);
+      expect(clips.swimIdle, key).toBeDefined();
+      // The same waterline moving and still, so stopping never pops the body.
+      expect(swimRise, key).toBeDefined();
+      expect(swimRise?.stroke, key).toBe(swimRise?.tread);
+    }
   });
 
   it('bakes the far-LOD proxy from a real idle pose, never bind pose', () => {

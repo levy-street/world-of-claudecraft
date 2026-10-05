@@ -16784,6 +16784,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.whistle_triple_t.name': '트리플 T의 호루라기',
   'entities.items.whistle_trollface.name': '트롤페이스의 호루라기',
   'entities.items.whistle_tuskhorn_boar.name': '엄니뿔 멧돼지의 호루라기',
+  'hudChrome.buddyMenu.rename': '버디 이름 변경',
+  'hudChrome.buddyMenu.nameLabel': '버디 이름',
   'hudChrome.buddyMenu.autolootEnable': '자동 전리품 켜기',
   'hudChrome.buddyMenu.autolootDisable': '자동 전리품 끄기',
   'hudChrome.buddyMenu.autolootHint':
@@ -16840,6 +16842,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.collections.detail.marksPrice': '영웅의 징표 {amount}',
   'hudChrome.options.showPetNames': '펫 이름 표시',
   'hudChrome.warfareShop.companions': '동료',
+  'hudChrome.warfareShop.companionPurchase':
+    '이 버디를 영구적으로 해금하고 즉시 소환합니다. 가방에는 아이템이 추가되지 않습니다.',
+  'hudChrome.warfareShop.companionOwnedAria': '{item}, 이미 수집했거나 등장 대기 중',
   'itemUi.kind.buddy': '버디',
   'hudChrome.collections.buddyLore.alon':
     '어떤 지도에도 없는 길에서 온 여행자의 마스코트로, 일이 틀어지는 곳이면 어디든 나타난다. 지켜보고, 고개를 끄덕이고, 도움은 전혀 주지 않는다.',
@@ -17286,6 +17291,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.tabMounts': '탈것',
   'hudChrome.cosmetics.tabSkins': '스킨',
   'hudChrome.cosmetics.tabMech': '메카',
+  'hudChrome.cosmetics.buddyActive': '소환됨',
+  'hudChrome.cosmetics.buddyDrag': '행동 단축바로 끌어다 놓기',
   'hudChrome.cosmetics.legend': '계정: 모든 캐릭터가 공유. 캐릭터: 이 캐릭터만.',
   'hudChrome.cosmetics.scopeAccount': '계정',
   'hudChrome.cosmetics.scopeCharacter': '캐릭터',

@@ -38,6 +38,7 @@ import {
   pickProxyHeight,
   SUBMERGED_HEAD_FRACTION,
   scanAnimRepair,
+  shouldHandBackHop,
   shouldInterruptLanding,
   shouldPlayLanding,
   shouldPlayOutCastExit,
@@ -691,6 +692,9 @@ export class CharacterVisual {
    *  over a body the sim is already MOVING glides the model across the floor
    *  with no run animation (the post-Slam "teleport" to the tank) */
   private currentOneShotIsCastExit = false;
+  /** the running one-shot is a follower hop (playHop): once the body is back on
+   *  the ground a hop yields to movement, like a landing does */
+  private currentOneShotIsHop = false;
   // Whether the live one-shot is the ATTACK, as opposed to a hit react, a
   // landing, the sheathe gesture or any other one-shot. Only the aim pin needs
   // the distinction (skin_attack.ts rangedSkinAiming); a stale true is harmless
@@ -1070,6 +1074,22 @@ export class CharacterVisual {
         // travels, jumps again or enters water yields to its real pose at once.
         this.currentIsOneShot = false;
         this.currentOneShotIsLanding = false;
+        this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);
+      } else if (
+        this.currentIsOneShot &&
+        this.currentOneShotIsHop &&
+        this.current !== null &&
+        // The latch is only cleared where a hop ends; checking the action too
+        // means a stale one can never cut some other one-shot short.
+        this.current === this.action(this.def.clips.hop) &&
+        shouldHandBackHop(s, this.current.time, this.def.clips.hopAir?.[1])
+      ) {
+        // A follower's hop yields early (see shouldHandBackHop): a body still
+        // travelling past touchdown would skate through the standing settle
+        // exactly as the landing case above did, and a search or water that
+        // starts mid-hop needs the rig now.
+        this.currentIsOneShot = false;
+        this.currentOneShotIsHop = false;
         this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);
       } else if (this.currentOneShotIsCastExit && this.shouldInterruptEmote(s)) {
         // The recovery tail outlived the sim's stand-still window (the clip
@@ -3767,6 +3787,7 @@ export class CharacterVisual {
     this.currentOneShotIsIdleVariant = false;
     this.currentOneShotIsLanding = false;
     this.currentOneShotIsCastExit = false;
+    this.currentOneShotIsHop = false;
   }
 
   private onFinished(a: THREE.AnimationAction): void {
@@ -3783,6 +3804,7 @@ export class CharacterVisual {
       this.currentOneShotIsIdleVariant = false;
       this.currentOneShotIsLanding = false;
       this.currentOneShotIsCastExit = false;
+      this.currentOneShotIsHop = false;
       this.fadeTo(this.baseAction(), 0.18, false);
     }
   }
@@ -3805,6 +3827,22 @@ export class CharacterVisual {
   playFlourish(): void {
     const clip = this.def.clips.flourish;
     if (clip && this.action(clip)) this.playOneShot(clip, 1);
+  }
+
+  /** One-shot the follower hop: a cosmetic buddy leaving the ground because
+   *  its owner did (entity_gesture_core.ts). Never over another one-shot, and a
+   *  no-op for every rig without a hop clip. `moving` skips the crouch before
+   *  take-off (ClipMap.hopAir): a body already travelling has no still moment
+   *  to wind up in, and the feet would slide through it. */
+  playHop(moving: boolean): void {
+    const clip = this.def.clips.hop;
+    if (this.deadLock || this.currentIsOneShot || !clip) return;
+    const a = this.action(clip);
+    if (!a) return;
+    this.playOneShot(clip, 1);
+    this.currentOneShotIsHop = true;
+    const takeOff = this.def.clips.hopAir?.[0];
+    if (moving && takeOff !== undefined) a.time = Math.min(takeOff, a.getClip().duration);
   }
 
   private enterDeath(): void {
@@ -3917,6 +3955,7 @@ function clipNamesOf(def: VisualDef): string[] {
     c.land,
     c.walkBack,
     c.flourish,
+    c.hop,
     c.stow,
     // The idle-breakers and the idle beat were MISSING here, which is the only
     // place actions get built (visual.ts constructor). A clip absent from this

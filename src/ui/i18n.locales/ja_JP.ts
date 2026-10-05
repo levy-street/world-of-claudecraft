@@ -16822,6 +16822,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.whistle_triple_t.name': 'トリプルTの笛',
   'entities.items.whistle_trollface.name': 'トロールフェイスの笛',
   'entities.items.whistle_tuskhorn_boar.name': 'タスクホーン・ボアの笛',
+  'hudChrome.buddyMenu.rename': 'バディ名変更',
+  'hudChrome.buddyMenu.nameLabel': 'バディ名',
   'hudChrome.buddyMenu.autolootEnable': '自動収集を有効化',
   'hudChrome.buddyMenu.autolootDisable': '自動収集を無効化',
   'hudChrome.buddyMenu.autolootHint':
@@ -16878,6 +16880,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.collections.detail.marksPrice': '英雄の証{amount}',
   'hudChrome.options.showPetNames': 'ペット名を表示',
   'hudChrome.warfareShop.companions': 'コンパニオン',
+  'hudChrome.warfareShop.companionPurchase':
+    'このバディを永久にアンロックし、すぐに呼び出します。バッグにアイテムは追加されません。',
+  'hudChrome.warfareShop.companionOwnedAria': '{item}、収集済みまたは登場待ち',
   'itemUi.kind.buddy': 'バディ',
   'hudChrome.collections.buddyLore.alon':
     'どの地図も認めない道から来た旅人のマスコット。計画が狂っている場所に必ず現れる。見て、うなずいて、助けは一切しない。',
@@ -17320,6 +17325,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.tabMounts': 'マウント',
   'hudChrome.cosmetics.tabSkins': 'スキン',
   'hudChrome.cosmetics.tabMech': 'メカ',
+  'hudChrome.cosmetics.buddyActive': '呼び出し中',
+  'hudChrome.cosmetics.buddyDrag': 'アクションバーへドラッグ',
   'hudChrome.cosmetics.legend':
     'アカウント：全キャラクターで共有。キャラクター：このキャラクターのみ。',
   'hudChrome.cosmetics.scopeAccount': 'アカウント',

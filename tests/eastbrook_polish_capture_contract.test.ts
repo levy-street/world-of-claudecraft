@@ -690,7 +690,10 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted for the release/v0.44.0 merge into feature/buddy-companions-v43:
   // the merged renderer leaf (the buddy selection-ring scale over the release's
   // screenshot-capture extraction) matches neither parent. No capture was retaken.
-  '5c8a7e7b8337f13bf1fac32c34f61989f47bc72046ae68610afe3cc432c2fbfe';
+  // Re-minted for the buddy gesture extraction: the overhead-emote edge moved out
+  // of the renderer leaf into entity_gesture_core.ts, which now also drives the
+  // follower hop. No capture was retaken.
+  '28a7f59e9c740522eac3290503616075b024e09043afb3f331270d9554e288a7';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

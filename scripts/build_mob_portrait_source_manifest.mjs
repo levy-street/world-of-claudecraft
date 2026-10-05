@@ -12,6 +12,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { isDeepStrictEqual } from 'node:util';
+import * as esbuild from 'esbuild';
 import {
   buildMobPortraitJobs,
   buildPortraitRendererContract,
@@ -30,6 +31,34 @@ const bootstrapReviewRelativePath =
   'docs/achievements/placeholder-art-completion-2026-08-09/portrait-manifest-bootstrap-review.md';
 
 /**
+ * The HUD's own portrait rule (src/ui/target_portrait_view.ts), bundled the way
+ * scripts/lib/mob_portrait_jobs.mjs bundles the game data. This ledger covers
+ * the committed public/ui/mobs/<id>.webp files, so it lists exactly the mobs
+ * the HUD serves from that folder. A template with a portrait lane of its own
+ * has no file there: the buddy followers read
+ * public/ui/portraits/buddy_<key>.webp, baked by
+ * scripts/render_buddy_portraits.mjs. Demanding one would fail the ledger on a
+ * portrait the game never shows, and tests/target_portrait_view.test.ts
+ * applies this same rule in its orphan sweep.
+ *
+ * The filter lives here, in the bookkeeping command, on purpose: the job
+ * builder and the finder renderer are fingerprinted renderer sources, and
+ * editing either would stale every committed portrait's proof.
+ */
+async function loadTargetPortraitUrl() {
+  const built = await esbuild.build({
+    entryPoints: [path.join(repoRoot, 'src/ui/target_portrait_view.ts')],
+    bundle: true,
+    platform: 'node',
+    format: 'esm',
+    write: false,
+    logLevel: 'silent',
+  });
+  const dataUrl = `data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString('base64')}`;
+  return (await import(dataUrl)).targetPortraitUrl;
+}
+
+/**
  * `renderEnv` is the ONE manifest field this bookkeeping command cannot derive:
  * every other field is read back off the tree, while the render environment is a
  * fact only the actual render observed. So it is carried IN. On --write it comes
@@ -40,7 +69,9 @@ const bootstrapReviewRelativePath =
  */
 export async function buildManifest({ renderEnv = null } = {}) {
   const renderer = await buildPortraitRendererContract(repoRoot);
+  const targetPortraitUrl = await loadTargetPortraitUrl();
   const portraits = (await buildMobPortraitJobs(repoRoot))
+    .filter((job) => targetPortraitUrl(job.mobId, true)?.startsWith('/ui/mobs/'))
     .sort((left, right) => left.mobId.localeCompare(right.mobId))
     .map((job) => {
       const outputPath = `public/ui/mobs/${job.mobId}.webp`;

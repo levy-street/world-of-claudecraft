@@ -6,7 +6,13 @@
 // the bobber + cue, never by the bar); the gather cast fills like any
 // hardcast and its label rides `label` + castDisplayName.
 import { MOUNT_SUMMON_SECONDS } from '../sim/mounts';
-import { CONSUME_DURATION, type Consuming, type Entity, FISHING_CAST_ID } from '../sim/types';
+import {
+  BUDDY_SEARCH_CAST_ID,
+  CONSUME_DURATION,
+  type Consuming,
+  type Entity,
+  FISHING_CAST_ID,
+} from '../sim/types';
 
 export interface CastBarState {
   /** whether the bar should be shown at all this frame */
@@ -30,6 +36,11 @@ const HIDDEN: CastBarState = { visible: false, channel: false, fill: 0, label: '
 export function castBarState(e: Entity): CastBarState {
   // corpses, doors/crates, and idle entities show nothing; guard the divide too
   if (e.dead || e.kind === 'object' || !e.castingAbility || e.castTotal <= 0) return HIDDEN;
+  // A buddy rummaging a corpse is "casting" only so every client can see the
+  // errand (src/sim/pet/buddy_autoloot.ts): the body's Search animation IS the
+  // readout. It is a cosmetic follower with nothing to interrupt, so it shows
+  // no bar on its plate or on a target frame.
+  if (e.castingAbility === BUDDY_SEARCH_CAST_ID) return HIDDEN;
   const remaining = Math.max(0, Math.min(1, e.castRemaining / e.castTotal));
   // Fishing (Professions 2.0) renders a CONSTANT full waiting bar:
   // the bite moment is the bobber + cue, and the bar must carry no bite (or

@@ -21,7 +21,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1007,
-      "state": "eef4c980",
+      "state": "4300604e",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -49,7 +49,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -173,7 +175,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1007,
-      "state": "542ae631",
+      "state": "c488db23",
       "events": "57b98de8",
       "rng": {
         "draws": 0,
@@ -201,7 +203,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -329,7 +333,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1007,
-      "state": "6f262657",
+      "state": "d237fb6d",
       "events": "81bf50b3",
       "rng": {
         "draws": 1,
@@ -357,7 +361,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -505,7 +511,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1007,
-      "state": "1b6ebe5a",
+      "state": "3f855f30",
       "events": "8c1e21cf",
       "rng": {
         "draws": 2,
@@ -540,7 +546,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -758,7 +766,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1007,
-      "state": "5f6e9aeb",
+      "state": "3c933e0d",
       "events": "81bf50b3",
       "rng": {
         "draws": 3,
@@ -793,7 +801,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -1009,7 +1019,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1007,
-      "state": "d5bcef20",
+      "state": "b8db8006",
       "events": "f76603c0",
       "rng": {
         "draws": 4,
@@ -1044,7 +1054,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -1304,7 +1316,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1007,
-      "state": "078ba90b",
+      "state": "18bd656d",
       "events": "38d6648f",
       "rng": {
         "draws": 4,
@@ -1339,7 +1351,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -1596,7 +1610,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1007,
-      "state": "2668f921",
+      "state": "79764b4b",
       "events": "1e2f0587",
       "rng": {
         "draws": 4,
@@ -1631,7 +1645,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -1923,7 +1939,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1007,
-      "state": "2668f921",
+      "state": "79764b4b",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -1958,7 +1974,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {

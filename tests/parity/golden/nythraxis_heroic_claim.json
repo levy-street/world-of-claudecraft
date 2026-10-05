@@ -31,7 +31,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1016,
-      "state": "729d9bd5",
+      "state": "b84a73f7",
       "events": "aa68d002",
       "rng": {
         "draws": 1,
@@ -59,7 +59,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -139,7 +141,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -217,7 +221,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -295,7 +301,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -373,7 +381,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -740,8 +750,8 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1016,
-      "state": "0b0db4cd",
-      "events": "9f5a8b47",
+      "state": "6cc707b1",
+      "events": "b81eb6d0",
       "rng": {
         "draws": 17,
         "digest": "21ff5c13"
@@ -769,10 +779,7 @@
           },
           "bgRating": 1500,
           "buddies": {
-            "cosmetics": [
-              "crystal_lich_frostbound",
-              "crystal_lich_voltaic"
-            ]
+            "names": {}
           },
           "cls": "warrior",
           "companionUpgrades": {},
@@ -960,9 +967,7 @@
           },
           "bgRating": 1500,
           "buddies": {
-            "cosmetics": [
-              "crystal_lich_frostbound"
-            ]
+            "names": {}
           },
           "cls": "mage",
           "companionUpgrades": {},
@@ -1141,9 +1146,7 @@
           },
           "bgRating": 1500,
           "buddies": {
-            "cosmetics": [
-              "crystal_lich_frostbound"
-            ]
+            "names": {}
           },
           "cls": "mage",
           "companionUpgrades": {},
@@ -1322,9 +1325,7 @@
           },
           "bgRating": 1500,
           "buddies": {
-            "cosmetics": [
-              "crystal_lich_frostbound"
-            ]
+            "names": {}
           },
           "cls": "mage",
           "companionUpgrades": {},
@@ -1503,9 +1504,7 @@
           },
           "bgRating": 1500,
           "buddies": {
-            "cosmetics": [
-              "crystal_lich_frostbound"
-            ]
+            "names": {}
           },
           "cls": "mage",
           "companionUpgrades": {},
@@ -2012,7 +2011,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1016,
-      "state": "0b0db4cd",
+      "state": "6cc707b1",
       "events": "741638a5",
       "rng": {
         "draws": 17,
@@ -2041,10 +2040,7 @@
           },
           "bgRating": 1500,
           "buddies": {
-            "cosmetics": [
-              "crystal_lich_frostbound",
-              "crystal_lich_voltaic"
-            ]
+            "names": {}
           },
           "cls": "warrior",
           "companionUpgrades": {},
@@ -2232,9 +2228,7 @@
           },
           "bgRating": 1500,
           "buddies": {
-            "cosmetics": [
-              "crystal_lich_frostbound"
-            ]
+            "names": {}
           },
           "cls": "mage",
           "companionUpgrades": {},
@@ -2413,9 +2407,7 @@
           },
           "bgRating": 1500,
           "buddies": {
-            "cosmetics": [
-              "crystal_lich_frostbound"
-            ]
+            "names": {}
           },
           "cls": "mage",
           "companionUpgrades": {},
@@ -2594,9 +2586,7 @@
           },
           "bgRating": 1500,
           "buddies": {
-            "cosmetics": [
-              "crystal_lich_frostbound"
-            ]
+            "names": {}
           },
           "cls": "mage",
           "companionUpgrades": {},
@@ -2775,9 +2765,7 @@
           },
           "bgRating": 1500,
           "buddies": {
-            "cosmetics": [
-              "crystal_lich_frostbound"
-            ]
+            "names": {}
           },
           "cls": "mage",
           "companionUpgrades": {},

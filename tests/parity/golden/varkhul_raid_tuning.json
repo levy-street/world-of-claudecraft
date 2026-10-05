@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1007,
-      "state": "eef4c980",
+      "state": "4300604e",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -44,7 +44,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -168,7 +170,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1010,
-      "state": "d9acbfff",
+      "state": "58b19611",
       "events": "c68f05bc",
       "rng": {
         "draws": 1,
@@ -179,7 +181,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1010,
-      "state": "d9acbfff",
+      "state": "58b19611",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -207,7 +209,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -450,7 +454,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 1011,
-      "state": "638c4712",
+      "state": "d14f843e",
       "events": "1b409cd5",
       "rng": {
         "draws": 1,
@@ -461,7 +465,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 1011,
-      "state": "e67d489c",
+      "state": "b9ded7d8",
       "events": "2bd38884",
       "rng": {
         "draws": 1,
@@ -472,7 +476,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 1011,
-      "state": "2a0d6e65",
+      "state": "d20d8459",
       "events": "ae9cda30",
       "rng": {
         "draws": 1,
@@ -483,7 +487,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 1011,
-      "state": "2a0d6e65",
+      "state": "d20d8459",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -511,7 +515,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -612,7 +618,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -957,7 +965,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1011,
-      "state": "47927ef2",
+      "state": "c384e28e",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -968,7 +976,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1011,
-      "state": "47927ef2",
+      "state": "c384e28e",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -996,7 +1004,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -1097,7 +1107,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -1366,7 +1378,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1011,
-      "state": "47927ef2",
+      "state": "c384e28e",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -1394,7 +1406,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -1495,7 +1509,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {

@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest';
+import { shouldDrawLegacyCastSparkle } from '../src/render/ability_vfx_registry';
 import { castBarState, consumeBarState, mountSummonBarState } from '../src/render/cast_bar';
+import { characterPresentationCasting } from '../src/render/character_presentation_core';
 import { MOUNT_SUMMON_SECONDS } from '../src/sim/mounts';
-import { CONSUME_DURATION, type Consuming, type Entity } from '../src/sim/types';
+import { BUDDY_SEARCH_SECONDS } from '../src/sim/pet/buddy_autoloot';
+import {
+  BUDDY_SEARCH_CAST_ID,
+  CONSUME_DURATION,
+  type Consuming,
+  type Entity,
+} from '../src/sim/types';
 
 // castBarState reads only a handful of cast fields, so a minimal partial entity
 // cast to Entity is enough to exercise every branch without a WebGL context.
@@ -16,6 +24,31 @@ function caster(over: Partial<Entity>): Entity {
     ...over,
   } as Entity;
 }
+
+// A buddy rummaging a corpse rides the cast fields only so every client can
+// see the errand. The body's Search animation is the whole readout.
+describe('buddy search presentation', () => {
+  const searching = caster({
+    castingAbility: BUDDY_SEARCH_CAST_ID,
+    castRemaining: BUDDY_SEARCH_SECONDS / 2,
+    castTotal: BUDDY_SEARCH_SECONDS,
+  });
+
+  it('drives the rig as a cast, so the Search clip plays', () => {
+    expect(characterPresentationCasting(searching.castingAbility, false, false)).toBe(true);
+  });
+
+  it('shows no cast bar, on a plate or a target frame', () => {
+    expect(castBarState(searching).visible).toBe(false);
+    // The same fields under a real spell DO show: it is the id that hides it.
+    expect(castBarState({ ...searching, castingAbility: 'fireball' } as Entity).visible).toBe(true);
+  });
+
+  it('draws no spell sparkle', () => {
+    expect(shouldDrawLegacyCastSparkle(true, BUDDY_SEARCH_CAST_ID)).toBe(false);
+    expect(shouldDrawLegacyCastSparkle(true, 'fireball')).toBe(true);
+  });
+});
 
 describe('overhead cast bar', () => {
   it('is hidden when nothing is being cast', () => {

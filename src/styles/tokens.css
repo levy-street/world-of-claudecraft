@@ -23,6 +23,11 @@
     --color-deed-banner-text: #ffe27a;
     --color-deed-banner-border: #b8902a;
     --color-deed-banner-bg: rgb(26 21 12 / 92%);
+    /* The Book of Deeds buddy shelf's whistle still (components.css
+       .deed-buddy-icon): the same resting keyline as the picker option it
+       sits in. Its empty state reads the library card stops
+       (--color-card-hi / --color-card-lo). */
+    --color-deed-buddy-icon-border: #4a3d26;
     /* Gathering skill milestone plate (#banner.banner-skill). Warm copper
        craft language, framed so a Mining 50 plate can never read as a
        character level-up (the bare --gold celebration). Distinct from the
@@ -1180,6 +1185,26 @@
       var(--unit-frame-bar-gap) +
       70px
     );
+
+    /* collections window */
+    /* The Collections window's own palette (components.css, the Collections
+       section). Its white text reads --color-white. */
+    /* Tab plate stops, top then bottom, resting and selected. */
+    --color-collections-tab-hi: #2a2418;
+    --color-collections-tab-lo: #1d1811;
+    --color-collections-tab-active-hi: #4a3c1c;
+    --color-collections-tab-active-lo: #302713;
+    /* The selected catalog row's wash, and the fainter cell that stands in
+       for an entry with no committed item art. */
+    --color-collections-row-active-bg: #ffffff0f;
+    --color-collections-noart-bg: #ffffff0a;
+    /* Companion lore, and the item level riding a set piece's name line: two
+       parchment steps under the window's white text. */
+    --color-collections-lore-text: #ded6c2;
+    --color-collections-ilvl-text: #c9c1a8;
+    /* The "you have this" green: an owned piece's ring and tick, and a set
+       bonus the player's pieces have lit. */
+    --color-collections-owned: #4fdc6a;
   }
 
   /* Glass is dropped WHOLE-RULE at the low effect tier: a universal removal

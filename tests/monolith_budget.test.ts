@@ -876,7 +876,10 @@ const MONOLITHS: MonolithRow[] = [
     // CPU-hygiene review: the ranked and required view candidates share the
     // scan module's liveViewCandidate check (present, view-less, admitted),
     // which drops the coordinator's own admission call. Exact count.
-    ceiling: 12806, // buddy follower view notes (release/v0.44.0 merge into feature/buddy-companions-v43)
+    // Buddy gestures: the per-entity overhead-emote edge moved out to
+    // src/render/entity_gesture_core.ts together with the new follower hop, so
+    // the coordinator keeps one call where it had the block. Exact count.
+    ceiling: 12795,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
