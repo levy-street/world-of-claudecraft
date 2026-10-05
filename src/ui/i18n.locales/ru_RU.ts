@@ -17113,6 +17113,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Свисток: Тролльфейс',
   'entities.items.whistle_tuskhorn_boar.name':
     'Свисток: Клыкорогий вепрь',
+  'hudChrome.buddyMenu.rename':
+    'Переименовать спутника',
+  'hudChrome.buddyMenu.nameLabel':
+    'Имя спутника',
   'hudChrome.buddyMenu.autolootEnable':
     'Включить автосбор',
   'hudChrome.buddyMenu.autolootDisable':
@@ -17217,6 +17221,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Показывать имена питомцев',
   'hudChrome.warfareShop.companions':
     'Спутники',
+  'hudChrome.warfareShop.companionPurchase':
+    'Навсегда открывает этого спутника и сразу призывает его. В ваши сумки не добавляется никакой предмет.',
+  'hudChrome.warfareShop.companionOwnedAria':
+    '{item}, уже в коллекции или ожидает появления',
   'itemUi.kind.buddy':
     'Спутник',
   'hudChrome.collections.buddyLore.alon':
@@ -17650,6 +17658,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.tabMounts': 'Ездовые животные',
   'hudChrome.cosmetics.tabSkins': 'Облики',
   'hudChrome.cosmetics.tabMech': 'Мех',
+  'hudChrome.cosmetics.buddyActive': 'Призван',
+  'hudChrome.cosmetics.buddyDrag': 'Перетащите на панель действий',
   'hudChrome.cosmetics.legend':
     'Аккаунт: общее для всех персонажей. Персонаж: только этот персонаж.',
   'hudChrome.cosmetics.scopeAccount': 'Аккаунт',

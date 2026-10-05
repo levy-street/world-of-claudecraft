@@ -15979,6 +15979,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.whistle_triple_t.name': '三重T的哨子',
   'entities.items.whistle_trollface.name': '巨魔脸的哨子',
   'entities.items.whistle_tuskhorn_boar.name': '獠角野猪的哨子',
+  'hudChrome.buddyMenu.rename': '重命名伙伴',
+  'hudChrome.buddyMenu.nameLabel': '伙伴名称',
   'hudChrome.buddyMenu.autolootEnable': '开启自动拾取',
   'hudChrome.buddyMenu.autolootDisable': '关闭自动拾取',
   'hudChrome.buddyMenu.autolootHint': '你的伙伴会去拾取 30 码内属于你自己的尸体上的战利品。',
@@ -16034,6 +16036,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.collections.detail.marksPrice': '{amount} 英雄徽记',
   'hudChrome.options.showPetNames': '显示宠物名称',
   'hudChrome.warfareShop.companions': '伙伴',
+  'hudChrome.warfareShop.companionPurchase':
+    '永久解锁这个伙伴并立即召唤它。不会有任何物品放入你的背包。',
+  'hudChrome.warfareShop.companionOwnedAria': '{item}，已收集或等待现身',
   'itemUi.kind.buddy': '伙伴',
   'hudChrome.collections.buddyLore.alon':
     '一位旅人的吉祥物，来自任何地图都不肯承认的道路，总在计划出岔子的地方现身。它看着，它点头，然后什么忙也不帮。',
@@ -16452,6 +16457,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.tabMounts': '坐骑',
   'hudChrome.cosmetics.tabSkins': '皮肤',
   'hudChrome.cosmetics.tabMech': '机甲',
+  'hudChrome.cosmetics.buddyActive': '已召唤',
+  'hudChrome.cosmetics.buddyDrag': '拖到动作条上',
   'hudChrome.cosmetics.legend': '账号：所有角色共享。角色：仅此角色。',
   'hudChrome.cosmetics.scopeAccount': '账号',
   'hudChrome.cosmetics.scopeCharacter': '角色',

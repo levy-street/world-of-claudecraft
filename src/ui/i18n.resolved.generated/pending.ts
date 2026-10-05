@@ -1517,16 +1517,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.buddy_frog.name",
     "entities.mobs.buddy_moss_hare.name",
     "entities.mobs.buddy_stag.name",
-    "hudChrome.buddyMenu.nameLabel",
-    "hudChrome.buddyMenu.rename",
     "hudChrome.collections.armor.mail",
     "hudChrome.collections.detail.vendor",
     "hudChrome.collections.detail.vendorLabel",
-    "hudChrome.collections.tabs.sets",
-    "hudChrome.cosmetics.buddyActive",
-    "hudChrome.cosmetics.buddyDrag",
-    "hudChrome.warfareShop.companionOwnedAria",
-    "hudChrome.warfareShop.companionPurchase"
+    "hudChrome.collections.tabs.sets"
   ],
   "zh_TW": [
     "entities.mobs.buddy_alon.name",
@@ -1535,16 +1529,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.buddy_frog.name",
     "entities.mobs.buddy_moss_hare.name",
     "entities.mobs.buddy_stag.name",
-    "hudChrome.buddyMenu.nameLabel",
-    "hudChrome.buddyMenu.rename",
     "hudChrome.collections.armor.mail",
     "hudChrome.collections.detail.vendor",
     "hudChrome.collections.detail.vendorLabel",
-    "hudChrome.collections.tabs.sets",
-    "hudChrome.cosmetics.buddyActive",
-    "hudChrome.cosmetics.buddyDrag",
-    "hudChrome.warfareShop.companionOwnedAria",
-    "hudChrome.warfareShop.companionPurchase"
+    "hudChrome.collections.tabs.sets"
   ],
   "ko_KR": [
     "entities.mobs.buddy_alon.name",
@@ -1553,16 +1541,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.buddy_frog.name",
     "entities.mobs.buddy_moss_hare.name",
     "entities.mobs.buddy_stag.name",
-    "hudChrome.buddyMenu.nameLabel",
-    "hudChrome.buddyMenu.rename",
     "hudChrome.collections.armor.mail",
     "hudChrome.collections.detail.vendor",
     "hudChrome.collections.detail.vendorLabel",
-    "hudChrome.collections.tabs.sets",
-    "hudChrome.cosmetics.buddyActive",
-    "hudChrome.cosmetics.buddyDrag",
-    "hudChrome.warfareShop.companionOwnedAria",
-    "hudChrome.warfareShop.companionPurchase"
+    "hudChrome.collections.tabs.sets"
   ],
   "ja_JP": [
     "entities.mobs.buddy_alon.name",
@@ -1571,16 +1553,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.buddy_frog.name",
     "entities.mobs.buddy_moss_hare.name",
     "entities.mobs.buddy_stag.name",
-    "hudChrome.buddyMenu.nameLabel",
-    "hudChrome.buddyMenu.rename",
     "hudChrome.collections.armor.mail",
     "hudChrome.collections.detail.vendor",
     "hudChrome.collections.detail.vendorLabel",
-    "hudChrome.collections.tabs.sets",
-    "hudChrome.cosmetics.buddyActive",
-    "hudChrome.cosmetics.buddyDrag",
-    "hudChrome.warfareShop.companionOwnedAria",
-    "hudChrome.warfareShop.companionPurchase"
+    "hudChrome.collections.tabs.sets"
   ],
   "pt_BR": [
     "entities.items.charm_stag_acorn.name",
@@ -1839,16 +1815,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.buddy_frog.name",
     "entities.mobs.buddy_moss_hare.name",
     "entities.mobs.buddy_stag.name",
-    "hudChrome.buddyMenu.nameLabel",
-    "hudChrome.buddyMenu.rename",
     "hudChrome.collections.armor.mail",
     "hudChrome.collections.detail.vendor",
     "hudChrome.collections.detail.vendorLabel",
-    "hudChrome.collections.tabs.sets",
-    "hudChrome.cosmetics.buddyActive",
-    "hudChrome.cosmetics.buddyDrag",
-    "hudChrome.warfareShop.companionOwnedAria",
-    "hudChrome.warfareShop.companionPurchase"
+    "hudChrome.collections.tabs.sets"
   ],
   "cs_CZ": [
     "entities.items.charm_stag_acorn.name",

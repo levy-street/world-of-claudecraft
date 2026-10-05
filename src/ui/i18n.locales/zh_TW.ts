@@ -15987,6 +15987,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.whistle_triple_t.name': '三重T的哨子',
   'entities.items.whistle_trollface.name': '巨魔臉的哨子',
   'entities.items.whistle_tuskhorn_boar.name': '獠角野豬的哨子',
+  'hudChrome.buddyMenu.rename': '重新命名夥伴',
+  'hudChrome.buddyMenu.nameLabel': '夥伴名稱',
   'hudChrome.buddyMenu.autolootEnable': '開啟自動拾取',
   'hudChrome.buddyMenu.autolootDisable': '關閉自動拾取',
   'hudChrome.buddyMenu.autolootHint': '你的夥伴會去拾取 30 碼內屬於你自己的屍體上的戰利品。',
@@ -16042,6 +16044,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.collections.detail.marksPrice': '{amount} 英雄徽記',
   'hudChrome.options.showPetNames': '顯示寵物名稱',
   'hudChrome.warfareShop.companions': '夥伴',
+  'hudChrome.warfareShop.companionPurchase':
+    '永久解鎖這個夥伴並立即召喚牠。不會有任何物品放入你的背包。',
+  'hudChrome.warfareShop.companionOwnedAria': '{item}，已收集或等待現身',
   'itemUi.kind.buddy': '夥伴',
   'hudChrome.collections.buddyLore.alon':
     '一位旅人的吉祥物，來自任何地圖都不肯承認的道路，總在計畫出岔子的地方現身。牠看著，牠點頭，然後什麼忙也不幫。',
@@ -16460,6 +16465,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.tabMounts': '坐騎',
   'hudChrome.cosmetics.tabSkins': '造型',
   'hudChrome.cosmetics.tabMech': '機甲',
+  'hudChrome.cosmetics.buddyActive': '已召喚',
+  'hudChrome.cosmetics.buddyDrag': '拖到動作條上',
   'hudChrome.cosmetics.legend': '帳號：所有角色共用。角色：僅此角色。',
   'hudChrome.cosmetics.scopeAccount': '帳號',
   'hudChrome.cosmetics.scopeCharacter': '角色',
