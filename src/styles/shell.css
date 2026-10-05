@@ -2880,6 +2880,16 @@
       box-shadow: none;
       overflow: hidden;
     }
+    /* The #hero-view subpanel rule near the top of this sheet (two ids,
+       margin-top: 10px) outranks the takeover selector above, so its
+       margin reset lost and the fixed panel began 10px down: a strip of the
+       landing backdrop showed along the top edge with no blur or shade.
+       Restate the reset at a specificity that wins. Pinned by
+       tests/browser/charscreen_takeover_edges.browser.test.ts. */
+    #hero-view #offline-select.cs-wow,
+    body:not(.mobile-touch) #hero-view :is(#charselect-panel, #charcreate-panel).cs-wow {
+      margin: 0;
+    }
     /* The online panels' card layout is a grid, and grid-placement on an
        absolutely-positioned child would anchor it to its grid AREA rather
        than the full-screen panel: flatten. The create panel stays a block
