@@ -54,6 +54,7 @@ import {
   varkhulAssemblyRounds,
   varkhulAssemblyRuneSlots,
 } from '../varkhul_assembly';
+import { varkhulArenaPlayers } from '../varkhul_attempt';
 import {
   VARKHUL_CINDER_ARTIFICER_FIRST_SECONDS,
   VARKHUL_CINDER_ARTIFICER_PORTAL_TELEGRAPH_SECONDS,
@@ -94,6 +95,7 @@ import {
   startVarkhulEngage,
   tickVarkhulEngage,
   VARKHUL_ENGAGE_ARENA_LOCAL_POS,
+  VARKHUL_ENGAGE_RADIUS,
   varkhulEngagePulled,
   varkhulForgingHammerTick,
 } from '../varkhul_engage';
@@ -326,8 +328,12 @@ function encounterInstance(ctx: SimContext, boss: Entity) {
   return ctx.instances.find((instance) => instance.mobIds.includes(boss.id)) ?? null;
 }
 
-function playersInEncounter(ctx: SimContext, boss: Entity, includeDead = false): Entity[] {
-  const instance = encounterInstance(ctx, boss);
+function playersInEncounter(
+  ctx: SimContext,
+  boss: Entity,
+  includeDead = false,
+  instance: ReturnType<typeof encounterInstance> = encounterInstance(ctx, boss),
+): Entity[] {
   if (!instance || instance.exitId === null) return [];
   const players: Entity[] = [];
   for (const meta of ctx.players.values()) {
@@ -2756,14 +2762,20 @@ function updateMajorAbility(
 
 export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarget = false): void {
   if (boss.templateId !== VARKHUL_BOSS_TEMPLATE_ID || boss.dead) return;
-  let players = playersInEncounter(ctx, boss);
+  const instance = encounterInstance(ctx, boss);
+  let players = playersInEncounter(ctx, boss, false, instance);
+  const arenaPlayers = instance
+    ? varkhulArenaPlayers(
+        players,
+        ctx.instanceOriginOf(instance).z + VARKHUL_ENGAGE_ARENA_LOCAL_POS.z - VARKHUL_ENGAGE_RADIUS,
+      )
+    : [];
   // An engaged attempt is lost once no participant of it is left alive, even
-  // when a raider zoned in through the gate as the last one died: the boss
-  // resets like any wipe instead of latching onto the entrant at his current
-  // health (encounters/attempt_wipe.ts). The pre-pull room is never "lost".
+  // when a raider waits at the entry landing. Only players past that landing
+  // can keep the active pull alive; the pre-pull room is never "lost".
   if (
     players.length === 0 ||
-    (boss.inCombat && attemptLost(boss.varkhul?.attemptParticipantIds, players))
+    (boss.inCombat && attemptLost(boss.varkhul?.attemptParticipantIds, arenaPlayers))
   ) {
     if (
       !boss.inCombat &&
@@ -2788,6 +2800,7 @@ export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarg
     }
     resetVarkhulEncounter(ctx, boss);
     ctx.resetEvadingMob(boss);
+    boss.aggroTargetId = null;
     // One home reset: back to the anvil work spot (his spawn) in the inert
     // pre-pull pose. The encounter dispatch above means locomotion's idle-arm
     // spawn restore never runs for him, so without this he would stand
@@ -2797,7 +2810,7 @@ export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarg
     return;
   }
   const st = initVarkhulEncounter(boss);
-  if (boss.inCombat) recordVarkhulAttemptParticipants(st, players);
+  if (boss.inCombat) recordVarkhulAttemptParticipants(st, arenaPlayers);
   st.assemblyForgeVentedThisTick = false;
   maybeStartMasterpieceUnbound(ctx, boss, st);
   if (st.assemblyRuneDifficulty === 'heroic' && st.masterpieceTriggered) {
@@ -2841,7 +2854,7 @@ export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarg
   boss.aggroTargetId = target.id;
   boss.inCombat = true;
   boss.aiState = 'attack';
-  recordVarkhulAttemptParticipants(st, players);
+  recordVarkhulAttemptParticipants(st, arenaPlayers);
 
   if (!st.assemblyTriggered && boss.hp / boss.maxHp <= VARKHUL_MASTERS_ASSEMBLY_HP_THRESHOLD) {
     startMastersAssembly(ctx, boss, st);
@@ -2855,7 +2868,7 @@ export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarg
     return;
   }
   updateMasterpieceUnbound(ctx, boss, st, players);
-  players = playersInEncounter(ctx, boss);
+  players = playersInEncounter(ctx, boss, false, instance);
   target = resolveLivingTarget(boss, players);
   if (!target) return;
 
