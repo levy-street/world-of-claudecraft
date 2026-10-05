@@ -16,8 +16,9 @@
 // translation ride the sim; the visual bob and roll stay render-only.
 //
 // Under way the gangplank is stowed and the gangway's side step shipped with
-// it, so the port gangway opening is a sheer drop: the one way overboard
-// (the rails top a jump everywhere else). A body that leaves the hull's
+// it, so the port gangway opening is a sheer drop. Rails and gangway bars
+// share the low-fence jump rule, letting a passenger jump off either side.
+// A body that leaves the hull's
 // footprint is simply no longer carried: it falls into the sea where it is
 // and swims, and the ship sails on. Nothing boards a ship under way from the
 // water: the hull's sides stand taller than any swimmer can hop.
@@ -156,7 +157,15 @@ export class DeckPlatform {
     this.colliders = this.volumes.map((v) =>
       v.shape === 'circle'
         ? { type: 'circle' as const, x: 0, z: 0, r: v.r ?? 0.5 }
-        : { type: 'obb' as const, x: 0, z: 0, hw: v.hw ?? 0.5, hd: v.hd ?? 0.5, rot: 0 },
+        : {
+            type: 'obb' as const,
+            x: 0,
+            z: 0,
+            hw: v.hw ?? 0.5,
+            hd: v.hd ?? 0.5,
+            rot: 0,
+            isFence: v.kind === 'rail' || v.kind === 'gate',
+          },
     );
   }
 

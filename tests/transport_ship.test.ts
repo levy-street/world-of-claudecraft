@@ -68,6 +68,15 @@ describe('shipHullColliders', () => {
     });
   });
 
+  it('only rails and gangway bars use jump clearance, preserving their sight tops', () => {
+    HULL.volumes.forEach((v, i) => {
+      const c = colliders[i];
+      if (c.type !== 'obb') return;
+      expect(c.isFence === true, v.id).toBe(v.kind === 'rail' || v.kind === 'gate');
+      expect(c.cameraTopY).toBe(pose.baseY + (v.sightTop ?? v.top));
+    });
+  });
+
   it('only open balustrades see through below their rail, never a floor or a mast', () => {
     const open = HULL.volumes.filter((v) => v.sightTop !== undefined);
     expect(open.map((v) => v.id).sort()).toEqual(

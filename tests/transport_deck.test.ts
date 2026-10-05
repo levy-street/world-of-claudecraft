@@ -135,6 +135,8 @@ describe('the deck platform (pure)', () => {
       expect(colliders[i].z).toBeCloseTo(at.z, 9);
       expect(colliders[i].moveTopY).toBeCloseTo(WATER_LEVEL + v.top, 9);
       expect(colliders[i].standable === true).toBe(v.standable);
+      const c = colliders[i];
+      if (c.type === 'obb') expect(c.isFence === true).toBe(v.kind === 'rail' || v.kind === 'gate');
     });
     // the same pose hands back the same live list; a new pose re-places it
     expect(deck.at(pose, WATER_LEVEL)).toBe(colliders);
@@ -263,12 +265,12 @@ describe('walking the deck under way (the real Sim and kernel)', () => {
     expect(Math.hypot(end.x - start.x, end.z - start.z)).toBeLessThan(0.2);
   });
 
-  it('the rails hold a passenger on deck (walking and jumping into them)', () => {
+  it('the rails hold a passenger on deck when walking into either side', () => {
     const sim = sailingSim(60);
     const p = sim.player;
     // face starboard (-x in the ship frame is the bow's right: facing -PI/2)
     placeOnDeck(sim, p, -2.5, 4, -Math.PI / 2);
-    hold(sim, { forward: true, jump: true }, 3);
+    hold(sim, { forward: true }, 3);
     const at = local(sim, p);
     expect(at.x).toBeGreaterThan(-HULL.beam / 2 + 0.3);
     expect(at.y).toBeGreaterThanOrEqual(HULL.mainDeckY - 0.01);
@@ -278,6 +280,22 @@ describe('walking the deck under way (the real Sim and kernel)', () => {
     hold(sim, { forward: true }, 2);
     expect(local(sim, p).x).toBeLessThan(HULL.beam / 2 - 0.3);
     expect(p.ferryRide).toBeTruthy();
+  });
+
+  it.each([1, -1])('jumps over the rail on side %s and leaves the sailing ship behind', (side) => {
+    const sim = sailingSim(60);
+    const p = sim.player;
+    // Clear of deck dressing and the port gangway, so both exits cross a rail.
+    placeOnDeck(sim, p, side * 3.5, 3, (side * Math.PI) / 2);
+    sim.tick();
+    expect(p.ferryRide).toBeTruthy();
+    hold(sim, { forward: true, jump: true }, 0.7);
+    hold(sim, {}, 3);
+    expect(p.ferryRide ?? null).toBeNull();
+    expect(sim.isSwimming(p)).toBe(true);
+    expect(p.pos.y).toBeLessThan(WATER_LEVEL);
+    const pose = poseAt(sim);
+    expect(Math.hypot(pose.x - p.pos.x, pose.z - p.pos.z)).toBeGreaterThan(25);
   });
 
   it('climbs the quarterdeck stair under way', () => {

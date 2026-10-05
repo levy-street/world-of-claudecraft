@@ -15,9 +15,9 @@
 // open-world collider (colliders.ts): a STANDABLE volume is a floor a mover
 // walks on (decks, stair treads, the gangplank), a blocking one is a wall a
 // grounded mover cannot step over (rails at waist height, masts). Blocking
-// tops still feed the movement model's passes-over rule, so a rail at
-// deck + 1.2 stays above a jump's apex (1.125) and a player on foot cannot
-// hop the side; sight checks (`cameraTopY`) read the same tops, so a player
+// tops still feed the movement model's passes-over rule. Rails and gangway
+// bars use the low-fence jump rule so a deliberate jump clears either side,
+// while walking still collides; sight checks (`cameraTopY`) read the tops, so a player
 // sees over a rail but not through a mast.
 //
 // Pure leaf: deterministic, no SimContext, no three.js. The content rows
@@ -138,6 +138,7 @@ export function shipHullColliders(layout: ShipHullLayout, pose: ShipPose): Colli
       hw: v.hw ?? 0.5,
       hd: v.hd ?? 0.5,
       rot: pose.rot + (v.rot ?? 0),
+      isFence: v.kind === 'rail' || v.kind === 'gate',
       cameraTopY,
       ...stand,
     });

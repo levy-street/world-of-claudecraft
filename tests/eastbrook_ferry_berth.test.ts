@@ -233,15 +233,15 @@ describe('walking aboard (the real movement kernel)', () => {
     expect(fc.y).toBeCloseTo(HULL.forecastleY, 3);
   });
 
-  it('the rails hold: walking or jumping at the side keeps the player aboard', () => {
+  it('the rails hold: walking at the side keeps the player aboard', () => {
     placeLocal(0, 3.5, HULL.mainDeckY);
     const walked = walkToLocal(-8, 3.5, false, 90);
     expect(walked.overboard).toBe(false);
     expect(walked.x).toBeGreaterThan(-5.2);
     placeLocal(0, -1.8, HULL.mainDeckY);
-    const jumped = walkToLocal(8, -1.8, true, 90);
-    expect(jumped.overboard).toBe(false);
-    expect(jumped.x).toBeLessThan(5.2);
+    const port = walkToLocal(8, -1.8, false, 90);
+    expect(port.overboard).toBe(false);
+    expect(port.x).toBeLessThan(5.2);
     // the starboard gangway is barred while no dock meets it
     placeLocal(-2, 0.8, HULL.mainDeckY);
     const barred = walkToLocal(-8, 0.8, false, 90);
@@ -257,16 +257,23 @@ describe('walking aboard (the real movement kernel)', () => {
     expect(bow.y).toBeCloseTo(HULL.forecastleY, 3);
   }, 60_000);
 
-  it('the rails hold beside the edge dressing too (bench, barrels, crates)', () => {
-    // jumping at the rail from right beside the bench and the barrels holds too
+  it.each([1, -1])('jumps over side %s of the docked ship into the water', (side) => {
+    placeLocal(side * 3.5, 3, HULL.mainDeckY);
+    const jumped = walkToLocal(side * 8, 3, true, 90);
+    expect(jumped.x * side).toBeGreaterThan(6);
+    expect(jumped.overboard).toBe(true);
+    expect(sim.isSwimming(sim.player)).toBe(true);
+  });
+
+  it('walking into the rails beside benches, barrels and crates keeps the player aboard', () => {
     placeLocal(3.3, 5.0, HULL.mainDeckY);
-    const fromBench = walkToLocal(8, 5.0, true, 90);
+    const fromBench = walkToLocal(8, 5.0, false, 90);
     expect(fromBench.overboard).toBe(false);
     placeLocal(-2.4, 7.4, HULL.mainDeckY);
-    const fromBarrels = walkToLocal(-8, 7.4, true, 90);
+    const fromBarrels = walkToLocal(-8, 7.4, false, 90);
     expect(fromBarrels.overboard).toBe(false);
     placeLocal(2.2, 7.5, HULL.mainDeckY);
-    const fromCrates = walkToLocal(8, 7.5, true, 90);
+    const fromCrates = walkToLocal(8, 7.5, false, 90);
     expect(fromCrates.overboard).toBe(false);
   }, 60_000);
 
