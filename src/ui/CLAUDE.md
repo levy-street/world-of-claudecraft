@@ -29,11 +29,14 @@ mobile portrait *and* landscape before calling UI work done.
   margins/padding are added). Flex/grid + fluid type; no ad-hoc inline styles.
 - **Mobile touch** (gate on touch capability / runtime state, not only `max-width`: landscape
   phones need it too):
-  - Every visible `input`/`select`/`textarea` is **>=16px** font, or iOS Safari auto-zooms the
+  - Every visible `input`/`select`/`textarea` is **>=16px rendered** font, or iOS Safari auto-zooms the
     page on focus (it ignores the viewport `user-scalable=no`/`maximum-scale`; font-size is the
     only reliable fix). Enforced centrally by the `@media (pointer: coarse)` 16px `!important`
-    floor in `src/styles/base.css` (the admin bundle mirrors it in `src/admin/styles/`); never
-    set a per-control mobile font below 16px. Regression check:
+    floor and `body.mobile-touch` fallback in `src/styles/base.css`. Inside `#ui`, the
+    inherited `--touch-input-font-size` compensates for UI Scale below 1; a computed
+    16px font alone can render smaller after CSS zoom. The admin bundle has its own
+    unscaled floor in `src/admin/styles/`. Never set a per-control mobile font below
+    the rendered floor. Regression check:
     `node scripts/mobile_input_zoom_check.mjs` (needs `npm run dev`).
   - Every tappable target stays **>=40x40px** on mobile touch (the preferred floor); 24x24px
     (WCAG 2.2 SC 2.5.8) is the absolute minimum, used only where 40x40 is genuinely infeasible.
