@@ -22,7 +22,7 @@ import {
   type PlayerClass,
 } from './types';
 import { weeklyChoiceExhausted } from './weekly_reward_availability';
-import { weeklyRewardFitsClass } from './weekly_reward_eligibility';
+import { weeklyRewardFitsClass, weeklyRewardItemAllowed } from './weekly_reward_eligibility';
 import { weeklyTableSource } from './weekly_reward_options';
 import {
   historicalWeeklyBossUnlocks,
@@ -168,11 +168,7 @@ export function sanitizeWeeklyRewards(
         }
         if (typeof choice.itemId !== 'string' || choice.itemId.length > 128) continue;
         const item = ITEMS[choice.itemId];
-        if (
-          item &&
-          ['weapon', 'armor', 'held_offhand'].includes(item.kind) &&
-          (item.quality === 'uncommon' || item.quality === 'rare' || item.quality === 'epic')
-        )
+        if (item && weeklyRewardItemAllowed(item, choice.pool))
           choices.push({
             pool: choice.pool,
             ...tableFields,
@@ -408,7 +404,7 @@ function collectInstanceLoot(
   }
 }
 // Exact catalog shared by preview and claim. Each eligible item is equally likely;
-// class locks are respected, chase legendaries and non-equipment are excluded.
+// Class locks are respected; the Crucible core is the only non-equipment exception.
 export function weeklyLootPool(
   pool: WeeklyPoolId,
   playerClass: PlayerClass,
@@ -445,8 +441,7 @@ export function weeklyLootPool(
       const item = ITEMS[id];
       return (
         item &&
-        (item.kind === 'weapon' || item.kind === 'armor' || item.kind === 'held_offhand') &&
-        (item.quality === 'rare' || item.quality === 'epic') &&
+        weeklyRewardItemAllowed(item, pool, false) &&
         weeklyRewardFitsClass(playerClass, item)
       );
     })

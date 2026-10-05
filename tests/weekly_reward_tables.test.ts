@@ -2,9 +2,11 @@ import { describe, expect, it, vi } from 'vitest';
 import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
 import { BUILTIN_WORLD, ITEMS, MOBS, NPCS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { VARKHUL_BOSS_ID } from '../src/sim/ignivar_raid_ids';
 import { enterDungeon } from '../src/sim/instances/dungeons';
 import { freshInstanceSlot } from '../src/sim/instances/instance_slot';
 import { Sim } from '../src/sim/sim';
+import { ALL_CLASSES, IGNIVAR_BOSS_ID } from '../src/sim/types';
 import {
   sanitizeWeeklyBossUnlocks,
   WEEKLY_BOSS_TABLES,
@@ -22,6 +24,7 @@ import {
   sanitizeWeeklyRewards,
   stateFor,
   WEEKLY_KEEPER_ID,
+  weeklyLootPool,
   weeklyRewardInfoFor,
 } from '../src/sim/weekly_rewards';
 
@@ -59,6 +62,88 @@ function setup() {
 }
 
 describe('weekly boss-table eligibility', () => {
+  it.each(ALL_CLASSES)(
+    'offers one Crucible core per boss table at either difficulty for %s',
+    (cls) => {
+      for (const pool of ['raid', 'raid_heroic'] as const) {
+        for (const bossId of [IGNIVAR_BOSS_ID, VARKHUL_BOSS_ID]) {
+          const items = weeklyBossLootPool(bossId, pool, cls);
+          expect(items.filter((id) => id === 'lastflame_core')).toHaveLength(1);
+          expect(
+            items.filter((id) => !['weapon', 'armor', 'held_offhand'].includes(ITEMS[id].kind)),
+          ).toEqual(['lastflame_core']);
+        }
+        expect(weeklyLootPool(pool, cls)).toContain('lastflame_core');
+      }
+      for (const pool of ['dungeon', 'dungeon_heroic', 'world', 'pvp'] as const)
+        expect(weeklyLootPool(pool, cls)).not.toContain('lastflame_core');
+      expect(weeklyBossLootPool('nythraxis_scourge_of_thornpeak', 'raid', cls)).not.toContain(
+        'lastflame_core',
+      );
+    },
+  );
+
+  it.each(['raid', 'raid_heroic'] as const)(
+    'preserves a %s core through opening, reload and claim',
+    (pool) => {
+      const { sim, pid, meta, state, batch } = setup();
+      batch.bossUnlocks = { [VARKHUL_BOSS_ID]: 2 };
+      batch.choices = [{ pool }];
+      const pick = vi.spyOn(sim.ctx.rng, 'pick').mockImplementation((items) => {
+        expect(items).toContain('lastflame_core');
+        return 'lastflame_core';
+      });
+      const opening = prepareWeeklyRewardOpen(sim.ctx, '1000:0', pid, undefined, VARKHUL_BOSS_ID)!;
+      expect(opening.itemId).toBe('lastflame_core');
+      expect(weeklyRewardInfoFor(sim.ctx, pid)!.state.vaults[0].choices[0].itemId).toBeUndefined();
+      finishWeeklyRewardOpen(opening, true);
+      expect(weeklyRewardInfoFor(sim.ctx, pid)!.state.vaults[0].choices[0].itemId).toBe(
+        'lastflame_core',
+      );
+      expect(
+        sanitizeWeeklyRewards(weeklyRewardInfoFor(sim.ctx, pid)!.state, true)!.vaults[0].choices[0]
+          .itemId,
+      ).toBe('lastflame_core');
+      const restored = sanitizeWeeklyRewards(
+        JSON.parse(JSON.stringify(sim.serializeCharacter(pid)!.weeklyRewards)),
+      )!;
+      expect(restored.vaults[0].choices[0]).toEqual({
+        pool,
+        tableId: VARKHUL_BOSS_ID,
+        itemId: 'lastflame_core',
+        opened: true,
+      });
+      meta.weeklyRewards = restored;
+      sim.claimWeeklyReward('1000:0', pid);
+      expect(restored.vaults).toHaveLength(0);
+      expect(sim.countItem('lastflame_core', pid)).toBe(1);
+      expect(pick).toHaveBeenCalledOnce();
+      expect(state.vaults).toHaveLength(1);
+    },
+  );
+
+  it('rejects saved cores in non-raid slots and unrelated non-equipment rewards', () => {
+    const state = emptyWeeklyRewards(604800000);
+    state.vaults = [
+      {
+        resetAtMs: 1000,
+        choices: [
+          { pool: 'raid', itemId: 'lastflame_core', opened: true },
+          ...(['dungeon', 'dungeon_heroic', 'world', 'pvp'] as const).map((pool) => ({
+            pool,
+            itemId: 'lastflame_core',
+            opened: true as const,
+          })),
+          { pool: 'raid', itemId: 'formula_lastflame_zeal', opened: true },
+          { pool: 'raid', itemId: 'forgefathers_ember', opened: true },
+        ],
+      },
+    ];
+    expect(sanitizeWeeklyRewards(state)!.vaults[0].choices).toEqual([
+      { pool: 'raid', itemId: 'lastflame_core', opened: true },
+    ]);
+  });
+
   it('registers every final boss that pays dungeon and raid clear credit exactly once', () => {
     for (const tuning of Object.values(HEROIC_DUNGEON_TUNING)) {
       expect(
