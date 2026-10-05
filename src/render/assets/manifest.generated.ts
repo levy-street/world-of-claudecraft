@@ -290,7 +290,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/biome/sea_whale.glb": "/media/models/biome/sea_whale.3126c37c7a3e.glb",
   "models/buddies/crystal_lich.glb": "/media/models/buddies/crystal_lich.1a9fe68b5a8c.glb",
   "models/buddies/forgemaw.glb": "/media/models/buddies/forgemaw.e03f4f517390.glb",
-  "models/buddies/horse.glb": "/media/models/buddies/horse.cdbb7b665ad6.glb",
+  "models/buddies/horse.glb": "/media/models/buddies/horse.6724813a53ad.glb",
   "models/chars/enemies/necromancer.glb": "/media/models/chars/enemies/necromancer.9f1e4ea76333.glb",
   "models/chars/enemies/necromancer_hit_variety_anims.glb": "/media/models/chars/enemies/necromancer_hit_variety_anims.ad8dfeb177f6.glb",
   "models/chars/enemies/skelboss_ability_anims.glb": "/media/models/chars/enemies/skelboss_ability_anims.8135e53d97cc.glb",
