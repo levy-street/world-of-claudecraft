@@ -166,12 +166,16 @@ describe('interior encounter prewarm spec', () => {
     expect(encounterPrewarmForInterior('arena')).toBeNull();
 
     const renderer = readSource('../src/render/renderer.ts');
-    const buildStart = renderer.indexOf('private buildInterior(');
-    const buildEnd = renderer.indexOf('\n  // Outdoor fog presets', buildStart);
+    const buildStart = renderer.indexOf(
+      'private readonly staticInteriors = new StaticInteriorTracker(',
+    );
+    const buildEnd = renderer.indexOf('\n  );', buildStart);
+    expect(buildStart).toBeGreaterThan(-1);
+    expect(buildEnd).toBeGreaterThan(buildStart);
     const build = renderer.slice(buildStart, buildEnd);
     expect(build).toContain('encounterPrewarm.startInteriorEncounterPrewarm(interior, this)');
     const kickAt = build.indexOf('encounterPrewarm.startInteriorEncounterPrewarm(interior, this)');
-    const kitAt = build.indexOf('.buildInterior(interior, ox, oz, opts)');
+    const kitAt = build.indexOf('this.ensureDungeons().buildInterior(interior, x, z)');
     expect(kickAt).toBeGreaterThan(-1);
     expect(kitAt).toBeGreaterThan(kickAt);
 

@@ -66,7 +66,7 @@ function makeSim(seed = 99): AnySim {
 }
 
 function teleport(sim: AnySim, e: AnyEntity, x: number, z: number): void {
-  e.pos = { x, y: e.pos.y, z };
+  e.pos = sim.groundPos(x, z);
   e.prevPos = { ...e.pos };
   sim.rebucket(e);
 }

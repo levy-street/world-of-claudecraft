@@ -765,6 +765,7 @@ import { SkyResidencyDriver } from './sky_residency_driver';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { buildSoulwell, disposeSoulwellVisual, syncSoulwellVisual } from './soulwell';
 import { SpiritGrade } from './spirit_grade';
+import { StaticInteriorTracker } from './static_interior_tracker';
 import {
   freezeStaticMatrices,
   freezeStaticSubtreeMatrices,
@@ -8710,19 +8711,15 @@ export class Renderer {
     return this.dungeons;
   }
 
-  private buildInterior(
-    interior: string,
-    ox: number,
-    oz: number,
-    opts?: Parameters<DungeonInteriors['buildInterior']>[3],
-  ): void {
-    encounterPrewarm.startInteriorEncounterPrewarm(interior, this);
-    void this.ensureDungeons()
-      .buildInterior(interior, ox, oz, opts)
-      .catch((err) => {
-        console.error('Failed to build dungeon interior:', err);
-      });
-  }
+  private readonly staticInteriors = new StaticInteriorTracker(
+    this.builtInteriors,
+    (interior, x, z) => {
+      encounterPrewarm.startInteriorEncounterPrewarm(interior, this);
+      return this.ensureDungeons().buildInterior(interior, x, z);
+    },
+    () => performance.now(),
+    (error) => console.error('Failed to build dungeon interior:', error),
+  );
 
   // Outdoor fog presets per biome (high tier eases between them as the player
   // crosses zone bands; low keeps one preset everywhere). Distances are the
@@ -9090,8 +9087,7 @@ export class Renderer {
         if (this.builtInteriors.has(key)) continue;
         const o = arenaOrigin(i);
         if (Math.abs(px - o.x) < 200 && Math.abs(pz - o.z) < 120) {
-          this.builtInteriors.add(key);
-          this.buildInterior('arena', o.x, o.z);
+          this.staticInteriors.schedule(key, 'arena', o.x, o.z);
         }
       }
     } else if (isRiftPos(px)) {
@@ -9153,8 +9149,7 @@ export class Renderer {
           if (this.builtInteriors.has(key)) continue;
           const o = instanceOrigin(dungeon.index, i);
           if (Math.abs(px - o.x) < 200 && Math.abs(this.sim.player.pos.z - o.z) < 250) {
-            this.builtInteriors.add(key);
-            this.buildInterior(dungeon.interior, o.x, o.z);
+            this.staticInteriors.schedule(key, dungeon.interior, o.x, o.z);
           }
         }
       }

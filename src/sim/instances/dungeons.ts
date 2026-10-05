@@ -66,6 +66,7 @@ import {
   mobLevelForDungeonDifficulty,
   mobTemplateForDungeonDifficulty,
 } from './difficulty';
+import { nearestDungeonDoor } from './dungeon_door_selection';
 import { applyDungeonSpawnMinibossTuning } from './dungeon_spawn_miniboss';
 import {
   IGNIVAR_ENTRY_DENIED_NOTICE_SECONDS,
@@ -344,13 +345,17 @@ export function updateDoorTriggers(ctx: SimContext, p: Entity): void {
       if (e.templateId === 'dungeon_door') ctx.dungeonDoorIds.push(e.id);
     }
   }
-  for (const doorId of ctx.dungeonDoorIds) {
-    const door = ctx.entities.get(doorId);
-    if (door?.dungeonId && dist2d(p.pos, door.pos) < DOOR_TRIGGER_RADIUS) {
-      enterDungeon(ctx, door.dungeonId, p.id);
-      return;
-    }
-  }
+  const corpseClaim = p.ghost && p.corpsePos ? claimedInstanceAt(ctx, p.corpsePos) : null;
+  const corpseDungeonId =
+    corpseClaim?.exitId === p.corpseInstanceId ? (corpseClaim?.dungeonId ?? null) : null;
+  const door = nearestDungeonDoor(
+    ctx.entities,
+    ctx.dungeonDoorIds,
+    p.pos,
+    DOOR_TRIGGER_RADIUS,
+    corpseDungeonId,
+  );
+  if (door?.dungeonId) enterDungeon(ctx, door.dungeonId, p.id);
 }
 
 export function enterDungeon(

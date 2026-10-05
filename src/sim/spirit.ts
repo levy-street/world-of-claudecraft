@@ -420,7 +420,12 @@ export function resurrectOnInstanceReentry(
 ): void {
   // Only a spirit whose body actually lies inside an instance revives on re-entry, so
   // walking a ghost through an unrelated door is not a free resurrection.
-  if (!p.corpsePos || p.corpseInstanceId === null) return;
+  if (
+    !p.corpsePos ||
+    p.corpseInstanceId === null ||
+    ctx.instanceClaimIdAt(pos) !== p.corpseInstanceId
+  )
+    return;
   reviveAt(ctx, meta, p, pos, RES_HP_FRACTION, 'none');
   ctx.emit({ type: 'respawn', pid: meta.entityId });
 }

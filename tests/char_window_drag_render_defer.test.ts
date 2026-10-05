@@ -18,6 +18,16 @@ import { describe, expect, it, vi } from 'vitest';
 import { CharWindow, type CharWindowDeps } from '../src/ui/char_window';
 import { ItemDragState } from '../src/ui/item_drag_state';
 
+// This DOM drag test owns no portrait renderer. Real portrait asset requests
+// can outlive happy-dom and reject after its ProgressEvent global is removed.
+vi.mock('../src/ui/portrait_chip', () => ({
+  hydratePortraits: vi.fn(),
+  isComposedPortraitKey: () => false,
+  modularLookFor: () => null,
+  onPortraitUpdate: vi.fn(),
+  portraitChipHtml: () => '',
+}));
+
 function harness() {
   let canvasContext: unknown;
   canvasContext = new Proxy({}, { get: () => () => canvasContext, set: () => true });
