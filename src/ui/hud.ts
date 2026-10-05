@@ -99,6 +99,7 @@ import { inRangeStationTypes, stationTypesSignature } from '../sim/professions/s
 import { TIER_SKILL_STEP, tierForSkill } from '../sim/professions/wheel';
 import { questObjectivesForMob } from '../sim/quest_targets';
 import type { ResolvedAbility } from '../sim/sim';
+import { duelEndVisibleToViewer } from '../sim/social/duel_zone';
 import {
   type AuraKind,
   CONSUME_DURATION,
@@ -270,6 +271,7 @@ import { DevCommandWindow } from './dev_command_window';
 import { bindDialogKeyActivation } from './dialog_key_activation';
 import { markDialogRoot } from './dialog_root';
 import { dropdownKeyNav } from './dropdown_nav';
+import { duelEndFeedback } from './duel_end_feedback';
 import { DungeonFinderProposalPopup } from './dungeon_finder_proposal_popup';
 import { DungeonFinderWindow } from './dungeon_finder_window';
 import { emoteIconUrl } from './emote_icons';
@@ -11127,6 +11129,8 @@ export class Hud {
       // server/game.ts), so an event a bystander should see must be pid-less
       // by construction on every host.
       if (ev.pid !== undefined && ev.pid !== sim.playerId) continue;
+      if (ev.type === 'duelEnd' && !duelEndVisibleToViewer(ev, sim.playerId, sim.player.pos))
+        continue;
       // visual effects (swings, projectiles, glows) — for everyone nearby,
       // not just events involving this player
       this.renderer.handleEvent(ev);
@@ -12668,22 +12672,13 @@ export class Hud {
         case 'duelStart':
           audio.duelStart();
           break;
-        case 'duelEnd':
-          this.showBanner(
-            t('hud.system.duelEndBanner', {
-              winner: ev.winnerName,
-              loser: ev.loserName,
-            }),
-          );
-          this.combatLog(
-            t('hud.system.duelEndLog', {
-              winner: ev.winnerName,
-              loser: ev.loserName,
-            }),
-            HUD_LOG.CONTEST,
-          );
+        case 'duelEnd': {
+          const feedback = duelEndFeedback(ev);
+          this.showBanner(feedback.banner);
+          this.combatLog(feedback.log, HUD_LOG.CONTEST);
           audio.duelEnd();
           break;
+        }
         case 'arenaQueued':
           this.log(
             t('hud.system.arenaQueued', {

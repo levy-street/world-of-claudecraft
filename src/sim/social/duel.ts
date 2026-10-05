@@ -14,6 +14,7 @@ import { ownedNecromancyUndead } from '../combat/necromancy';
 import type { DuelState } from '../sim';
 import type { SimContext } from '../sim_context';
 import { DT, dist2d, type Entity } from '../types';
+import { duelZoneIdAt } from './duel_zone';
 
 const DUEL_COUNTDOWN = 3;
 const DUEL_FORFEIT_DISTANCE = 60;
@@ -254,7 +255,15 @@ export function endDuel(ctx: SimContext, duel: DuelState, winnerPid: number | nu
   if (winnerPid !== null && aMeta && bMeta) {
     const winner = winnerPid === duel.a ? aMeta : bMeta;
     const loser = winnerPid === duel.a ? bMeta : aMeta;
-    ctx.emit({ type: 'duelEnd', winnerName: winner.name, loserName: loser.name });
+    const winnerEntity = winnerPid === duel.a ? ea : eb;
+    ctx.emit({
+      type: 'duelEnd',
+      winnerName: winner.name,
+      loserName: loser.name,
+      winnerPid,
+      loserPid: loser.entityId,
+      zoneId: winnerEntity ? duelZoneIdAt(winnerEntity.pos) : null,
+    });
     // Only decided duels count; timed-out or cancelled duels resolve with a
     // null winner and count nothing.
     ctx.bumpDeedStat(winner, 'duelsWon', 1);

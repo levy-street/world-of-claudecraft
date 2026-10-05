@@ -257,7 +257,7 @@ import { isUpdateDue } from './entity_update_cadence';
 // Dual fan-out (D21): Steam and Epic reconcile independently.
 import { reconcileOnLogin as reconcileEpicOnLogin } from './epic/mirror';
 import { equippedInstanceWire } from './equipped_instance_wire';
-import { eventAnchor, shouldDeliverCombatEventToViewer } from './event_delivery';
+import { eventAnchor, shouldDeliverEventToViewer } from './event_delivery';
 import { assembleEventsFrame, filterRoutableEvents, serializeEventFragments } from './event_frame';
 import { buildEventPidIndex, forEachSelectedEventIndex } from './event_pid_index';
 import { appendFarmPlotsWire, dispatchFarmingCommand } from './farming_commands';
@@ -9181,7 +9181,7 @@ export class GameServer {
         forEachSelectedEventIndex(pidIndex, anchorPid, session.pid, (i) => {
           const ev = routableEvents[i];
           if (suppressedInvites?.has(ev)) return;
-          if (!shouldDeliverCombatEventToViewer(ev, anchorPid, anchorParty, ownerOf)) return;
+          if (!shouldDeliverEventToViewer(ev, anchorPid, anchorParty, ownerOf, anchorPos)) return;
           // ignore list: drop chat originating from a character this player has
           // blocked, before it ever reaches their client
           if (

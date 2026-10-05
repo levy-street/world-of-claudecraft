@@ -7265,7 +7265,14 @@ export type SimEvent = { pid?: number } & (
   | { type: 'duelRequest'; fromPid: number; fromName: string }
   | { type: 'duelCountdown'; seconds: number }
   | { type: 'duelStart' }
-  | { type: 'duelEnd'; winnerName: string; loserName: string }
+  | {
+      type: 'duelEnd';
+      winnerName: string;
+      loserName: string;
+      winnerPid: number;
+      loserPid: number;
+      zoneId: string | null;
+    }
   // Dungeon Finder: a 30s availability proposal opened for this player (the
   // client pops the finder window; state rides the `df` self snapshot).
   | { type: 'dfProposal' }

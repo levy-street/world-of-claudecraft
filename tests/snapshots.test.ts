@@ -8164,6 +8164,87 @@ describe('aura decode fast-path guards (composition edge cases)', () => {
 });
 
 describe('entity-anchored world event scoping', () => {
+  it('delivers duel victories across the local zone but not into another zone', () => {
+    const server = new GameServer();
+    const winnerSocket = fakeWs();
+    const sameSocket = fakeWs();
+    const otherSocket = fakeWs();
+    const spectatorSocket = fakeWs();
+    const winner = joinServer(server, winnerSocket, 1, 'Winner');
+    const same = joinServer(server, sameSocket, 2, 'Samezone');
+    const other = joinServer(server, otherSocket, 3, 'Otherzone');
+    const spectator = joinServer(server, spectatorSocket, 4, 'Spectator');
+    server.sim.entities.get(winner.pid)!.pos.z = 175;
+    server.sim.entities.get(same.pid)!.pos.z = -175; // far beyond EVENT_RADIUS
+    server.sim.entities.get(other.pid)!.pos.z = 185; // near, but over the zone edge
+    server.sim.entities.get(spectator.pid)!.pos.z = 185;
+    spectator.spectating = {
+      characterId: winner.characterId,
+      name: 'Winner',
+      savedPos: { ...server.sim.entities.get(spectator.pid)!.pos },
+      priorGm: false,
+      stowedPet: null,
+    };
+    winnerSocket.sent.length = 0;
+    sameSocket.sent.length = 0;
+    otherSocket.sent.length = 0;
+    spectatorSocket.sent.length = 0;
+
+    (server as any).routeEvents([
+      {
+        type: 'duelEnd',
+        winnerName: 'Winner',
+        loserName: 'Loser',
+        winnerPid: winner.pid,
+        loserPid: -1,
+        zoneId: 'eastbrook_vale',
+      },
+    ]);
+    const victories = (socket: ReturnType<typeof fakeWs>) =>
+      socket.sent
+        .flatMap((msg) => (msg.t === 'events' ? msg.list : []))
+        .filter((ev: { type: string }) => ev.type === 'duelEnd');
+    expect(victories(winnerSocket)).toHaveLength(1);
+    expect(victories(sameSocket)).toHaveLength(1);
+    expect(victories(otherSocket)).toHaveLength(0);
+    expect(victories(spectatorSocket)).toHaveLength(1);
+  });
+
+  it('keeps an instanced duel victory with its participants', () => {
+    const server = new GameServer();
+    const winnerSocket = fakeWs();
+    const loserSocket = fakeWs();
+    const bystanderSocket = fakeWs();
+    const winner = joinServer(server, winnerSocket, 1, 'Winner');
+    const loser = joinServer(server, loserSocket, 2, 'Loser');
+    const bystander = joinServer(server, bystanderSocket, 3, 'Bystander');
+    for (const pid of [winner.pid, loser.pid, bystander.pid]) {
+      server.sim.entities.get(pid)!.pos.x = 100_900;
+    }
+    winnerSocket.sent.length = 0;
+    loserSocket.sent.length = 0;
+    bystanderSocket.sent.length = 0;
+
+    (server as any).routeEvents([
+      {
+        type: 'duelEnd',
+        winnerName: 'Winner',
+        loserName: 'Loser',
+        winnerPid: winner.pid,
+        loserPid: loser.pid,
+        zoneId: null,
+      },
+    ]);
+    const gotVictory = (socket: ReturnType<typeof fakeWs>) =>
+      socket.sent.some(
+        (msg) =>
+          msg.t === 'events' && msg.list.some((ev: { type: string }) => ev.type === 'duelEnd'),
+      );
+    expect(gotVictory(winnerSocket)).toBe(true);
+    expect(gotVictory(loserSocket)).toBe(true);
+    expect(gotVictory(bystanderSocket)).toBe(false);
+  });
+
   it('delivers delveRitePulse to sessions near its entityId anchor and not to far ones', () => {
     // The rite pulse is a world event with no pid; eventAnchor must resolve its
     // entityId to the shrine position and interest-scope delivery (EVENT_RADIUS).
