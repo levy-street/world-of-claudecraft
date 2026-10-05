@@ -28,7 +28,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "939a3abb",
+      "state": "1d97cfcd",
       "events": "81b4ca44",
       "rng": {
         "draws": 0,
@@ -56,7 +56,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -139,7 +141,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
@@ -216,7 +220,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
@@ -293,7 +299,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
@@ -370,7 +378,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
@@ -703,7 +713,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "939a3abb",
+      "state": "1d97cfcd",
       "events": "ffc8ab99",
       "rng": {
         "draws": 0,
@@ -731,7 +741,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -814,7 +826,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
@@ -891,7 +905,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
@@ -968,7 +984,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
@@ -1045,7 +1063,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
@@ -1378,7 +1398,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1011,
-      "state": "8a8c900d",
+      "state": "35bedf2b",
       "events": "27564d07",
       "rng": {
         "draws": 0,
@@ -1406,7 +1426,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -1496,7 +1518,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
@@ -1580,7 +1604,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
@@ -1664,7 +1690,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
@@ -1748,7 +1776,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},

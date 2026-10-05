@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1007,
-      "state": "68adaf6f",
+      "state": "32bca83d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -45,7 +45,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -169,7 +171,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1028,
-      "state": "e9668bbf",
+      "state": "fc88e2f5",
       "events": "d46d15b1",
       "rng": {
         "draws": 1,
@@ -180,7 +182,7 @@
       "tick": 7,
       "time": 0.35,
       "nextId": 1028,
-      "state": "788a0b30",
+      "state": "0ced9ba6",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -209,7 +211,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -343,7 +347,7 @@
       "tick": 7,
       "time": 0.35,
       "nextId": 1028,
-      "state": "ac897899",
+      "state": "3928bc73",
       "events": "fd08b941",
       "rng": {
         "draws": 3,
@@ -372,7 +376,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {
             "companion_tessa": 2
@@ -514,7 +520,7 @@
       "tick": 9,
       "time": 0.45,
       "nextId": 1028,
-      "state": "93263790",
+      "state": "a45da2aa",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -543,7 +549,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {
             "companion_tessa": 2

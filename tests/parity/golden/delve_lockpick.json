@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1007,
-      "state": "f07d182e",
+      "state": "b1220af0",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -45,7 +45,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
@@ -164,7 +166,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1017,
-      "state": "af05aeab",
+      "state": "5179542d",
       "events": "961bb7ba",
       "rng": {
         "draws": 5,
@@ -175,7 +177,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1017,
-      "state": "f4f8fc08",
+      "state": "dcae7102",
       "events": "82b32424",
       "rng": {
         "draws": 5,
@@ -186,7 +188,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 1017,
-      "state": "61ce5925",
+      "state": "a3e56457",
       "events": "a9ce1d5d",
       "rng": {
         "draws": 8,
@@ -197,7 +199,7 @@
       "tick": 38,
       "time": 1.9,
       "nextId": 1019,
-      "state": "ccee86f5",
+      "state": "71031313",
       "events": "73fb3ff3",
       "rng": {
         "draws": 11,
@@ -226,7 +228,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "rogue",
           "companionUpgrades": {},
           "copper": 19,
@@ -535,7 +539,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1019,
-      "state": "7e3adc59",
+      "state": "18936bd7",
       "events": "741638a5",
       "rng": {
         "draws": 11,
@@ -546,7 +550,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1019,
-      "state": "7e3adc59",
+      "state": "18936bd7",
       "events": "741638a5",
       "rng": {
         "draws": 11,
@@ -575,7 +579,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "rogue",
           "companionUpgrades": {},
           "copper": 19,

@@ -35,7 +35,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1015,
-      "state": "f99ffd73",
+      "state": "440daf11",
       "events": "4bff3cc9",
       "rng": {
         "draws": 6,
@@ -63,7 +63,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
@@ -138,7 +140,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "paladin",
           "companionUpgrades": {},
           "counters": {},
@@ -215,7 +219,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {},
@@ -290,7 +296,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {},
@@ -365,7 +373,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -937,7 +947,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1015,
-      "state": "66aee983",
+      "state": "014c5d71",
       "events": "09616586",
       "rng": {
         "draws": 6,
@@ -965,7 +975,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
@@ -1040,7 +1052,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "paladin",
           "companionUpgrades": {},
           "counters": {},
@@ -1117,7 +1131,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {
@@ -1197,7 +1213,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {},
@@ -1272,7 +1290,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -1862,7 +1882,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1015,
-      "state": "b920bbd4",
+      "state": "f063089a",
       "events": "37081e11",
       "rng": {
         "draws": 10,
@@ -1873,7 +1893,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 1015,
-      "state": "47865e1c",
+      "state": "c3a9aab2",
       "events": "6fe8fdbd",
       "rng": {
         "draws": 10,
@@ -1901,7 +1921,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "priest",
           "companionUpgrades": {},
           "counters": {},
@@ -1976,7 +1998,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "paladin",
           "companionUpgrades": {},
           "counters": {},
@@ -2053,7 +2077,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {
@@ -2133,7 +2159,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {},
@@ -2208,7 +2236,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},

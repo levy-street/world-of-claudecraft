@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1007,
-      "state": "7a586a68",
+      "state": "baf71f2a",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -44,7 +44,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {},
@@ -154,7 +156,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1010,
-      "state": "4b8cf749",
+      "state": "194ec697",
       "events": "576d63e9",
       "rng": {
         "draws": 10,
@@ -165,7 +167,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1010,
-      "state": "86b79b54",
+      "state": "fc80a242",
       "events": "741638a5",
       "rng": {
         "draws": 10,
@@ -176,7 +178,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1010,
-      "state": "0bdffdc0",
+      "state": "7e943b4e",
       "events": "2895df1b",
       "rng": {
         "draws": 174,
@@ -187,7 +189,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1010,
-      "state": "847721b9",
+      "state": "0fd6552f",
       "events": "741638a5",
       "rng": {
         "draws": 339,
@@ -198,7 +200,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1010,
-      "state": "63a48f12",
+      "state": "2f9fade4",
       "events": "1a88d69f",
       "rng": {
         "draws": 533,
@@ -209,7 +211,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1010,
-      "state": "9714747f",
+      "state": "57567e61",
       "events": "741638a5",
       "rng": {
         "draws": 736,
@@ -220,7 +222,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1010,
-      "state": "9714747f",
+      "state": "57567e61",
       "events": "741638a5",
       "rng": {
         "draws": 736,
@@ -249,7 +251,9 @@
             ]
           },
           "bgRating": 1500,
-          "buddies": {},
+          "buddies": {
+            "names": {}
+          },
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {
