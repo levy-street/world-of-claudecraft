@@ -19,8 +19,8 @@
 // way an interrupted escort run is forgotten.
 
 import { MOBS } from './data';
-import { createMob } from './entity';
 import { applyDungeonSpawnMinibossTuning } from './instances/dungeon_spawn_miniboss';
+import { spawnOpenWorldMob } from './mob/open_world_tuning';
 import { emitMobYell } from './mob/yells';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -160,7 +160,7 @@ function spawnRing(
       def.portal.x + Math.sin(angle) * def.ringYards,
       def.portal.z + Math.cos(angle) * def.ringYards,
     );
-    const mob = createMob(ctx.nextId++, template, wave.level, pos);
+    const mob = spawnOpenWorldMob(ctx.nextId++, template, wave.level, pos);
     mob.summonedAdd = true;
     mob.runScoped = true;
     if (promote)
