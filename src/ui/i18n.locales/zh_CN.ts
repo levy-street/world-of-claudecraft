@@ -425,8 +425,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '神圣升华生效期间，爆炸会在 {radius} 米内造成 {damage} 点物理伤害，目标超过 {cap} 个时伤害降低。此伤害随攻击强度提升。',
   'abilityUi.tooltip.verdictDamage':
     '终末敕令引爆，造成 {verdictSingleDamage} 点神圣伤害。黎明坠击引爆，在 {verdictAreaRadius} 米内造成 {verdictAreaDamage} 点神圣伤害，目标超过 {verdictAreaCap} 个时伤害降低。两次引爆的伤害均不随法术强度提升。同一时间只有一名敌人能承受你的印记。',
-  'abilityUi.tooltip.weaponScaledSpell':
-    '伤害随你的武器伤害、攻击强度和法术强度提升。',
+  'abilityUi.tooltip.weaponScaledSpell': '伤害随你的武器伤害、攻击强度和法术强度提升。',
   'hud.core.deathRecap': '回顾',
   'hud.core.deathRecapClose': '关闭',
   'hud.core.deathRecapCrit': '暴击',
