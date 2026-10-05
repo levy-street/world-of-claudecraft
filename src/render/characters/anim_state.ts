@@ -408,6 +408,26 @@ export function shouldInterruptLanding(
   return s.moving || s.airborne || s.swimming;
 }
 
+/** Whether a follower's hop one-shot (ClipMap.hop) should hand the rig back to
+ *  its base state before the clip has finished. `time` is how far into the hop
+ *  clip the rig is and `touchdown` that clip's own landing (ClipMap.hopAir[1]).
+ *
+ *  A buddy that hopped mid-stride is back on the ground and still travelling
+ *  once it passes touchdown: the rest of the clip is a standing settle, and
+ *  holding it would skate the body forward under a one-shot, the same trap as
+ *  the landing recovery above. A search or water starting mid-hop takes the
+ *  body at once, wherever the hop has got to: the search has a loot beat to
+ *  stay in step with, and nothing jumps while it swims. A hop on the spot
+ *  always plays out whole. */
+export function shouldHandBackHop(
+  s: Pick<AnimState, 'moving' | 'casting' | 'swimming'>,
+  time: number,
+  touchdown: number | undefined,
+): boolean {
+  if (s.casting || s.swimming) return true;
+  return s.moving && touchdown !== undefined && time >= touchdown;
+}
+
 /**
  * `hasWadeClip` defaults TRUE so the state machine's own rule (wading beats the
  * dry gait) is what a caller gets by default. A rig with no wade cycle passes

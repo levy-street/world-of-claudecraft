@@ -1384,7 +1384,10 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted for the release/v0.44.0 merge into feature/buddy-companions-v43:
   // the merged renderer leaf (the buddy selection-ring scale over the release's
   // screenshot-capture extraction) matches neither parent. No capture was retaken.
-  '36ce52a85d6ee482de3ea384fd6c808e82dc2debcd0a407c18d312857d7382d8';
+  // Re-minted for the buddy gesture extraction (the renderer leaf moved): the
+  // composite first, then this metadata seal from the swept file. No capture
+  // was retaken.
+  'c90fb9108dadfb0f733c3c46810d774fd9ee187135d219ec3b52a7f6cd49bf1b';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
@@ -1397,7 +1400,7 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the release/v0.44.0 merge into feature/buddy-companions-v43:
   // the merged renderer leaf (the buddy selection-ring scale over the release's
   // screenshot-capture extraction) matches neither parent. No capture was retaken.
-  '5c8a7e7b8337f13bf1fac32c34f61989f47bc72046ae68610afe3cc432c2fbfe';
+  '28a7f59e9c740522eac3290503616075b024e09043afb3f331270d9554e288a7';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2770,7 +2773,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // was retaken.
       // v0.42.2 hotfix line forward merge into release/v0.43.0: recomputed LAST
       // again over the re-swept evidence. No capture was retaken.
-    ).toBe('b077f68ba1d37ec34988075502fa39093904a82e43ca686a46a74354823f1a34');
+    ).toBe('49813d8aba98582dd4c60d272bb4e327e4b6f2b01c3f08bf16ed153594468f6a');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

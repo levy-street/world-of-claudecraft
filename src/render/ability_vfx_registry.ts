@@ -1,3 +1,4 @@
+import { BUDDY_SEARCH_CAST_ID } from '../sim/types';
 import type { AbilityVfxFullSpec, AbilityVfxSpec } from './ability_vfx_core';
 import { ABILITY_VFX_FULL_SPECS } from './ability_vfx_full_specs';
 import { ABILITY_VFX_SPECS } from './ability_vfx_specs';
@@ -141,6 +142,8 @@ export function shouldDrawLegacyCastSparkle(
     casting &&
     abilityId !== 'soul_harvest' &&
     abilityId !== 'shadow_bolt' &&
-    abilityId !== 'soul_lance'
+    abilityId !== 'soul_lance' &&
+    // a buddy rummaging a corpse is no spell: its Search animation is the effect
+    abilityId !== BUDDY_SEARCH_CAST_ID
   );
 }

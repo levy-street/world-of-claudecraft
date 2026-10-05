@@ -15,6 +15,7 @@ import {
   SWIM_PITCH_FULL_SPEED,
   SWIM_PITCH_MAX,
   scanAnimRepair,
+  shouldHandBackHop,
   shouldInterruptLanding,
   shouldPlayLanding,
   shouldPlayOutCastExit,
@@ -109,6 +110,34 @@ describe('landing recovery interruption', () => {
     expect(shouldInterruptLanding(anim({ moving: true }))).toBe(true);
     expect(shouldInterruptLanding(anim({ airborne: true }))).toBe(true);
     expect(shouldInterruptLanding(anim({ swimming: true }))).toBe(true);
+  });
+});
+
+describe('follower hop hand-back', () => {
+  const TOUCHDOWN = 0.93;
+
+  it('plays a hop on the spot out whole', () => {
+    for (const time of [0, 0.4, TOUCHDOWN, 1.2]) {
+      expect(shouldHandBackHop(anim(), time, TOUCHDOWN)).toBe(false);
+    }
+  });
+
+  it('hands a travelling body back at touchdown, not before', () => {
+    const moving = anim({ moving: true });
+    expect(shouldHandBackHop(moving, 0.3, TOUCHDOWN)).toBe(false);
+    expect(shouldHandBackHop(moving, TOUCHDOWN - 0.01, TOUCHDOWN)).toBe(false);
+    expect(shouldHandBackHop(moving, TOUCHDOWN, TOUCHDOWN)).toBe(true);
+    expect(shouldHandBackHop(moving, 1.2, TOUCHDOWN)).toBe(true);
+    // A rig that names no touchdown has nowhere to hand back, so it plays out.
+    expect(shouldHandBackHop(moving, 1.2, undefined)).toBe(false);
+  });
+
+  it('gives the rig up at once to a search or to water, wherever the hop has got to', () => {
+    for (const time of [0, 0.3, 1.2]) {
+      expect(shouldHandBackHop(anim({ casting: true }), time, TOUCHDOWN)).toBe(true);
+      expect(shouldHandBackHop(anim({ swimming: true }), time, TOUCHDOWN)).toBe(true);
+      expect(shouldHandBackHop(anim({ casting: true }), time, undefined)).toBe(true);
+    }
   });
 });
 

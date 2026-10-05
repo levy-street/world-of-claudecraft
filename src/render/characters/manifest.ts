@@ -136,6 +136,15 @@ export interface ClipMap {
   walkBack?: string;
   /** one-shot played on respawn (skeleton awaken / boss taunt) */
   flourish?: string;
+  /** One-shot hop for a cosmetic follower, fired when its OWNER leaves the
+   *  ground (src/render/entity_gesture_core.ts). The clip carries its own rise
+   *  and fall on the root bone; the sim never moves the follower vertically. */
+  hop?: string;
+  /** [leave the ground, touch down] in `hop` clip seconds. A follower already
+   *  on the move skips the crouch before the first and hands back to its gait
+   *  after the second, so the feet never slide through a wind-up or a settle.
+   *  Absent = the hop always plays whole. */
+  hopAir?: readonly [number, number];
   /** arm gesture for the Z-key sheathe toggle; the held-prop swap lands at its
    *  midpoint (see visual.ts setWeaponStowed). Absent = snap with no gesture. */
   stow?: string;
@@ -393,10 +402,46 @@ const animal = (attack: string[]): ClipMap => ({
   death: 'Death',
 });
 
-// Every buddy rig (public/models/buddies/) ships exactly Idle + Walk, renamed
-// in-place to this convention (see the buddy_* VISUALS entries below); run
-// and death alias Walk/Idle since a buddy never plays either.
-const BUDDY_CLIPS: ClipMap = { idle: 'Idle', walk: 'Walk', run: 'Walk', attack: [], death: 'Idle' };
+// Every buddy rig (public/models/buddies/) ships the same five authored clips:
+// Idle, Walk, Run, Search and Jump.
+//
+// Search rides the cast slot: the sim puts a buddy under the
+// BUDDY_SEARCH_CAST_ID cast while it rummages a corpse on the loot errand
+// (src/sim/pet/buddy_autoloot.ts). The clips are a hair longer or shorter than
+// that cast (each rig has its own length), and a cast clip LOOPS while its
+// cast is held, so `searchHold` parks each rig just short of its own clip end:
+// the rummage plays once and freezes there instead of wrapping into a second
+// one, and castPlayOut then finishes the last few frames when the cast ends
+// (or the whole remainder, when the errand was called off early).
+//
+// Jump is the follower hop, fired when the owner jumps; `hopAir` is that
+// rig's own take-off and touchdown, read off its Jump clip.
+//
+// Swimming is the Walk cycle (2026-10-05 owner call): the horse paddles, the
+// two floaters glide. All three water slots are named so the rig keeps its own
+// upright posture: a body with no swim clip gets the procedural prone pitch,
+// which tips a quadruped or a floater onto its nose. `swimIdle` is the clip a
+// buddy holds when its owner stops in the water. Death holds Idle since a
+// buddy never dies.
+const buddyClips = (
+  hopAir: readonly [number, number],
+  searchHold: number,
+  swimIdle: 'Idle' | 'Walk',
+): ClipMap => ({
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: [],
+  death: 'Idle',
+  cast: 'Search',
+  castHoldPointSeconds: searchHold,
+  castPlayOut: ['Search'],
+  hop: 'Jump',
+  hopAir,
+  swim: 'Walk',
+  swimSurface: 'Walk',
+  swimIdle,
+});
 
 // Rideable mounts. The Tripo-lane rigs (bear, toad, griffin) ship clips baked
 // locally by scripts/bake_mount_gaits.mjs (the Tripo quadruped retarget was
@@ -2430,20 +2475,52 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.35,
   },
   // Cosmetic followers: each active buddy keeps its authored rig and colors.
+  //
+  // The horse is the one buddy with feet. Its refs are MEASURED off the clips
+  // (a planted hoof's travel over its stance time, times this def's height
+  // normalisation and the roster's shared BUDDY_SCALE): the walk covers 0.42
+  // yd/s and the gallop 2.3. He is a pony keeping pace with a player, so `gait`
+  // hands over to the gallop well below the global threshold instead of leaving
+  // a walk cycle to skate at jogging speed. Say the rest plainly: a follower
+  // heels at its owner's 7 yd/s or better, which is three times this gallop, and
+  // locomotionTimeScale clamps a run at 1.6. So at full pace the gallop sits on
+  // that clamp (about three strides a second) and the hooves carry roughly half
+  // the ground he covers. The measured refs are what make the WALK and the
+  // easing in and out of a run match; closing the gap at a sprint would take a
+  // longer-striding gallop clip, not a different number here.
+  //
+  // In water every buddy sits IN it rather than on it (2026-10-05 owner call).
+  // The sim floats a swimming mob with its pivot 0.75 yd under the line
+  // (swimSurfaceY), so `swimRise` only trims where that line cuts each body:
+  // the horse rides with its back awash and its head and neck clear; the two
+  // floaters hang with the trailing third of the body under.
   buddy_horse: {
     url: `${BUDDIES_DIR}/horse.glb`,
     height: 0.75,
-    clips: BUDDY_CLIPS,
+    clips: buddyClips([0.25, 0.93], 3.36, 'Walk'),
+    walkRef: 0.42,
+    runRef: 2.3,
+    gait: { runEnter: 1.4, runExit: 1.0 },
+    swimRise: { stroke: 0, tread: 0 },
   },
+  // The two floaters have no feet to match. Their refs only set how briskly
+  // the glide and the dive sway at a given speed: the glide stays unhurried
+  // across the whole walk band, the dive runs at its authored tempo at a run.
   buddy_crystal_lich: {
     url: `${BUDDIES_DIR}/crystal_lich.glb`,
     height: 0.9,
-    clips: BUDDY_CLIPS,
+    clips: buddyClips([0.27, 1.15], 3.43, 'Idle'),
+    walkRef: 4,
+    runRef: 7,
+    swimRise: { stroke: 0, tread: 0 },
   },
   buddy_forgemaw: {
     url: `${BUDDIES_DIR}/forgemaw.glb`,
     height: 0.85,
-    clips: BUDDY_CLIPS,
+    clips: buddyClips([0.28, 1.15], 3.43, 'Idle'),
+    walkRef: 4,
+    runRef: 7,
+    swimRise: { stroke: 0, tread: 0 },
     // The rig is authored facing -Z, so without this it heels the owner
     // back-to-front: chest toward the camera while its owner walks away.
     yaw: Math.PI,

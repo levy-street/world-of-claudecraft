@@ -324,16 +324,20 @@ export function petFollow(
   pet: Entity,
   owner: Entity,
   targetOverride?: Vec3,
+  stopDistance = PET_FOLLOW_DISTANCE,
 ): void {
   // A real combat pet heels onto the owner's own tile (targetOverride unset).
   // buddy_ai.ts's cosmetic-follower dispatcher passes its usual left-and-back
   // offset point instead, so a buddy keeps standing where it always has while
   // reusing this exact A*-pathed heel locomotion (owner speed/mount/slow
   // still read off the real `owner` below; only the aimed-at point changes).
+  // `stopDistance` is how close it parks. Every heel leaves it at the default;
+  // only the buddy's loot errand (buddy_autoloot.ts) closes right up, because
+  // it has to be standing ON the corpse it is about to rummage.
   const target = targetOverride ?? owner.pos;
   pet.petPathCooldown = Math.max(0, pet.petPathCooldown - DT);
   const d = dist2d(pet.pos, target);
-  if (d <= PET_FOLLOW_DISTANCE) {
+  if (d <= stopDistance) {
     pet.petPath = [];
     return;
   }

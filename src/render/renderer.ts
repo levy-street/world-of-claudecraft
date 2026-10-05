@@ -270,6 +270,7 @@ import { buildEastbrookTownView, type EastbrookTownView } from './eastbrook_town
 import { buildEmberFeatures, type EmberFeaturesView } from './ember_features';
 import { buildEmberPools, type EmberPoolsView } from './ember_pools';
 import { applyCharacterFormVisibility } from './entity_gate_stand_in_core';
+import { tickEntityGestures } from './entity_gesture_core';
 import { sampleGroundTilt, sampleStandingSurface } from './entity_ground_sample';
 import {
   createEntityGroundSample,
@@ -11271,19 +11272,7 @@ export class Renderer {
         mountShown && !v.mountCompilePending && runCharacterPresentation ? this.vfx : null,
       );
 
-      const emoteId =
-        e.kind === 'player' && e.overheadEmoteId && !e.dead ? e.overheadEmoteId : null;
-      const emoteKey = emoteId ? `${emoteId}:${e.overheadEmoteSeq}` : null;
-      if (emoteKey !== v.lastOverheadEmoteKey) {
-        const canPlayEmote =
-          emoteId && !moving && !st.airborne && !st.swimming && !st.casting && !st.sitting;
-        if (canPlayEmote) {
-          active.playEmote(emoteId);
-          v.lastOverheadEmoteKey = emoteKey;
-        } else if (!emoteId) {
-          v.lastOverheadEmoteKey = null;
-        }
-      }
+      tickEntityGestures(v, e, st, moving, active, this.views, runCharacterPresentation);
 
       // per-ability windup orb + buff-orbit bands (spec-driven; no-op for
       // entities with no spec'd cast or aura)

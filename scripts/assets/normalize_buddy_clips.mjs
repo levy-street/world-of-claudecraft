@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Rename a buddy rig's animation clips in-place to the shared 'Idle'/'Walk'
-// convention every buddy_* VISUALS entry reads through BUDDY_CLIPS
+// convention every buddy_* VISUALS entry reads through buddyClips
 // (src/render/characters/manifest.ts). Source rigs ship the pair under a
 // per-generator name (IDLE/WALK, Idle_Breathing, Crab_Idle, ...); the 2026-08-28
 // pass renamed the roster it had, and this is that same pass as a script so the
