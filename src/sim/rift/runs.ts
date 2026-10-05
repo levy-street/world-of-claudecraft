@@ -31,7 +31,12 @@ import {
 } from '../professions/masterwrought_materials';
 import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import type { SimContext } from '../sim_context';
-import { mayEnterVaultPortal, vaultForPortal, vaultScaledTuning } from '../treasure_vault';
+import {
+  finishLocalVaultAttempt,
+  mayEnterVaultPortal,
+  vaultForPortal,
+  vaultScaledTuning,
+} from '../treasure_vault';
 import { DT, dist2d, type Entity, type SimEvent, type Vec3 } from '../types';
 import { isInWaterBody } from '../world';
 import { riftFx } from './fx';
@@ -1600,6 +1605,8 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
   inst.rewarded = true;
   inst.outcome = 'won';
   inst.finishedAt = ctx.time;
+  if (inst.vault?.attemptId && !ctx.cfg.vaultRewardNeedsSave)
+    finishLocalVaultAttempt(ctx, inst.vault.ownerPid, inst.vault.attemptId);
   if (inst.vault?.attemptId && inst.vault.ownerCharacterId && ctx.cfg.vaultRewardNeedsSave) {
     const claims = [...(inst.vault.entrantSnapshots?.values() ?? [])].map((entrant) => {
       const reward = rollHoardReward(ctx.rng, {

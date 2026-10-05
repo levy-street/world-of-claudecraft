@@ -26,7 +26,11 @@ import { riftFloorCount } from '../src/sim/rift/rift_gen';
 import { leaveRift } from '../src/sim/rift/runs';
 import { vaultSeedOpen, vaultSeedTier, vaultSeedZone } from '../src/sim/rift/vault_seed';
 import { Sim } from '../src/sim/sim';
-import { confirmVaultAttemptDurable, vaultScaledTuning } from '../src/sim/treasure_vault';
+import {
+  confirmVaultAttemptDurable,
+  finishVaultAttempt,
+  vaultScaledTuning,
+} from '../src/sim/treasure_vault';
 import type { SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
@@ -219,6 +223,70 @@ describe('the vault run', () => {
     );
     return sim.riftInstances.find((i) => i.partyKey !== null)!;
   }
+
+  it('lets the owner read the next map as soon as the vault is cleared', () => {
+    const sim = makeSim();
+    readAndDig(sim, 'common');
+    const inst = enterVault(sim);
+    sim.addItem(TREASURE_MAP_ITEM_IDS.rare, 1);
+    sim.drainEvents();
+    sim.useItem(TREASURE_MAP_ITEM_IDS.rare);
+    expect(ofType(sim.drainEvents(), 'error').map((event) => event.text)).toEqual([
+      'You are already following another treasure map.',
+    ]);
+
+    for (const id of inst.mobIds) {
+      const mob = sim.entities.get(id);
+      if (mob) {
+        mob.hp = 0;
+        mob.dead = true;
+      }
+    }
+    for (let i = 0; i < 45; i++) {
+      sim.player.hp = sim.player.maxHp;
+      sim.tick();
+    }
+    expect(inst.outcome).toBe('won');
+    expect(metaOf(sim).vaultAttempt).toBeNull();
+    sim.drainEvents();
+    sim.useItem(TREASURE_MAP_ITEM_IDS.rare);
+    expect(ofType(sim.drainEvents(), 'treasureMapRead')).toEqual([
+      expect.objectContaining({ rarity: 'rare', fresh: true }),
+    ]);
+  });
+
+  it('keeps an online owner locked until the cleared outcome is committed', () => {
+    const sim = makeSim();
+    sim.cfg.vaultRewardNeedsSave = true;
+    metaOf(sim).characterId = 8123;
+    readAndDig(sim, 'common');
+    const inst = enterVault(sim);
+    sim.addItem(TREASURE_MAP_ITEM_IDS.rare, 1);
+    for (const id of inst.mobIds) {
+      const mob = sim.entities.get(id);
+      if (mob) {
+        mob.hp = 0;
+        mob.dead = true;
+      }
+    }
+    for (let i = 0; i < 45; i++) {
+      sim.player.hp = sim.player.maxHp;
+      sim.tick();
+    }
+    expect(inst.outcome).toBe('won');
+    expect(metaOf(sim).vaultAttempt?.id).toBe('8123:1');
+    sim.drainEvents();
+    sim.useItem(TREASURE_MAP_ITEM_IDS.rare);
+    expect(ofType(sim.drainEvents(), 'error').map((event) => event.text)).toEqual([
+      'You are already following another treasure map.',
+    ]);
+
+    expect(finishVaultAttempt(sim.ctx, 8123, '8123:1')).toBe(sim.playerId);
+    sim.useItem(TREASURE_MAP_ITEM_IDS.rare);
+    expect(ofType(sim.drainEvents(), 'treasureMapRead')).toEqual([
+      expect.objectContaining({ rarity: 'rare', fresh: true }),
+    ]);
+  });
 
   it('keeps the owner eligible when a guest defeats the boss after the owner exits', () => {
     const sim = makeSim();
