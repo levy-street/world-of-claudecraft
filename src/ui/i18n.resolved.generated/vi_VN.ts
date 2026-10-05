@@ -18958,89 +18958,89 @@ export const vi_VN: EnTranslations = {
       "hollowveil_cord": {
         "name": "Hollowveil Cord"
       },
-      "roadwarden_robe": {
-        "name": "Roadwarden Robe"
+      "trailwarden_robe": {
+        "name": "Trailwarden Robe"
       },
-      "roadwarden_leggings": {
-        "name": "Roadwarden Leggings"
+      "trailwarden_leggings": {
+        "name": "Trailwarden Leggings"
       },
-      "roadwarden_slippers": {
-        "name": "Roadwarden Slippers"
+      "trailwarden_slippers": {
+        "name": "Trailwarden Slippers"
       },
-      "roadwarden_hood": {
-        "name": "Roadwarden Hood"
+      "trailwarden_hood": {
+        "name": "Trailwarden Hood"
       },
-      "roadwarden_gloves": {
-        "name": "Roadwarden Gloves"
+      "trailwarden_gloves": {
+        "name": "Trailwarden Gloves"
       },
-      "roadwarden_mantle": {
-        "name": "Roadwarden Mantle"
+      "trailwarden_mantle": {
+        "name": "Trailwarden Mantle"
       },
-      "roadwarden_sash": {
-        "name": "Roadwarden Sash"
+      "trailwarden_sash": {
+        "name": "Trailwarden Sash"
       },
-      "roadwarden_jerkin": {
-        "name": "Roadwarden Jerkin"
+      "trailwarden_jerkin": {
+        "name": "Trailwarden Jerkin"
       },
-      "roadwarden_breeches": {
-        "name": "Roadwarden Breeches"
+      "trailwarden_breeches": {
+        "name": "Trailwarden Breeches"
       },
-      "roadwarden_boots": {
-        "name": "Roadwarden Boots"
+      "trailwarden_boots": {
+        "name": "Trailwarden Boots"
       },
-      "roadwarden_cap": {
-        "name": "Roadwarden Cap"
+      "trailwarden_cap": {
+        "name": "Trailwarden Cap"
       },
-      "roadwarden_grips": {
-        "name": "Roadwarden Grips"
+      "trailwarden_grips": {
+        "name": "Trailwarden Grips"
       },
-      "roadwarden_shoulderpads": {
-        "name": "Roadwarden Shoulderpads"
+      "trailwarden_shoulderpads": {
+        "name": "Trailwarden Shoulderpads"
       },
-      "roadwarden_belt": {
-        "name": "Roadwarden Belt"
+      "trailwarden_belt": {
+        "name": "Trailwarden Belt"
       },
-      "roadwarden_hauberk": {
-        "name": "Roadwarden Hauberk"
+      "trailwarden_hauberk": {
+        "name": "Trailwarden Hauberk"
       },
-      "roadwarden_legguards": {
-        "name": "Roadwarden Legguards"
+      "trailwarden_legguards": {
+        "name": "Trailwarden Legguards"
       },
-      "roadwarden_sabatons": {
-        "name": "Roadwarden Sabatons"
+      "trailwarden_sabatons": {
+        "name": "Trailwarden Sabatons"
       },
-      "roadwarden_helm": {
-        "name": "Roadwarden Helm"
+      "trailwarden_helm": {
+        "name": "Trailwarden Helm"
       },
-      "roadwarden_gauntlets": {
-        "name": "Roadwarden Gauntlets"
+      "trailwarden_gauntlets": {
+        "name": "Trailwarden Gauntlets"
       },
-      "roadwarden_pauldrons": {
-        "name": "Roadwarden Pauldrons"
+      "trailwarden_pauldrons": {
+        "name": "Trailwarden Pauldrons"
       },
-      "roadwarden_girdle": {
-        "name": "Roadwarden Girdle"
+      "trailwarden_girdle": {
+        "name": "Trailwarden Girdle"
       },
-      "roadwarden_chainmail": {
-        "name": "Roadwarden Chainmail"
+      "trailwarden_chainmail": {
+        "name": "Trailwarden Chainmail"
       },
-      "roadwarden_chausses": {
-        "name": "Roadwarden Chausses"
+      "trailwarden_chausses": {
+        "name": "Trailwarden Chausses"
       },
-      "roadwarden_greaves": {
-        "name": "Roadwarden Greaves"
+      "trailwarden_greaves": {
+        "name": "Trailwarden Greaves"
       },
-      "roadwarden_coif": {
-        "name": "Roadwarden Coif"
+      "trailwarden_coif": {
+        "name": "Trailwarden Coif"
       },
-      "roadwarden_handguards": {
-        "name": "Roadwarden Handguards"
+      "trailwarden_handguards": {
+        "name": "Trailwarden Handguards"
       },
-      "roadwarden_spaulders": {
-        "name": "Roadwarden Spaulders"
+      "trailwarden_spaulders": {
+        "name": "Trailwarden Spaulders"
       },
-      "roadwarden_cord": {
-        "name": "Roadwarden Cord"
+      "trailwarden_cord": {
+        "name": "Trailwarden Cord"
       },
       "highgale_robe": {
         "name": "Highgale Robe"

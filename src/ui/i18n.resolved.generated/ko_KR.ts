@@ -18958,88 +18958,88 @@ export const ko_KR: EnTranslations = {
       "hollowveil_cord": {
         "name": "안개장막 허리끈"
       },
-      "roadwarden_robe": {
+      "trailwarden_robe": {
         "name": "길지킴이 로브"
       },
-      "roadwarden_leggings": {
+      "trailwarden_leggings": {
         "name": "길지킴이 각반"
       },
-      "roadwarden_slippers": {
+      "trailwarden_slippers": {
         "name": "길지킴이 슬리퍼"
       },
-      "roadwarden_hood": {
+      "trailwarden_hood": {
         "name": "길지킴이 두건"
       },
-      "roadwarden_gloves": {
+      "trailwarden_gloves": {
         "name": "길지킴이 장갑"
       },
-      "roadwarden_mantle": {
+      "trailwarden_mantle": {
         "name": "길지킴이 어깨걸이"
       },
-      "roadwarden_sash": {
+      "trailwarden_sash": {
         "name": "길지킴이 장식띠"
       },
-      "roadwarden_jerkin": {
+      "trailwarden_jerkin": {
         "name": "길지킴이 웃옷"
       },
-      "roadwarden_breeches": {
+      "trailwarden_breeches": {
         "name": "길지킴이 가죽바지"
       },
-      "roadwarden_boots": {
+      "trailwarden_boots": {
         "name": "길지킴이 장화"
       },
-      "roadwarden_cap": {
+      "trailwarden_cap": {
         "name": "길지킴이 모자"
       },
-      "roadwarden_grips": {
+      "trailwarden_grips": {
         "name": "길지킴이 손아귀"
       },
-      "roadwarden_shoulderpads": {
+      "trailwarden_shoulderpads": {
         "name": "길지킴이 어깨덧대"
       },
-      "roadwarden_belt": {
+      "trailwarden_belt": {
         "name": "길지킴이 허리띠"
       },
-      "roadwarden_hauberk": {
+      "trailwarden_hauberk": {
         "name": "길지킴이 사슬갑옷"
       },
-      "roadwarden_legguards": {
+      "trailwarden_legguards": {
         "name": "길지킴이 다리갑옷"
       },
-      "roadwarden_sabatons": {
+      "trailwarden_sabatons": {
         "name": "길지킴이 쇠장화"
       },
-      "roadwarden_helm": {
+      "trailwarden_helm": {
         "name": "길지킴이 투구"
       },
-      "roadwarden_gauntlets": {
+      "trailwarden_gauntlets": {
         "name": "길지킴이 건틀릿"
       },
-      "roadwarden_pauldrons": {
+      "trailwarden_pauldrons": {
         "name": "길지킴이 어깨갑옷"
       },
-      "roadwarden_girdle": {
+      "trailwarden_girdle": {
         "name": "길지킴이 허리갑"
       },
-      "roadwarden_chainmail": {
+      "trailwarden_chainmail": {
         "name": "길지킴이 사슬옷"
       },
-      "roadwarden_chausses": {
+      "trailwarden_chausses": {
         "name": "길지킴이 사슬각반"
       },
-      "roadwarden_greaves": {
+      "trailwarden_greaves": {
         "name": "길지킴이 경갑"
       },
-      "roadwarden_coif": {
+      "trailwarden_coif": {
         "name": "길지킴이 사슬두건"
       },
-      "roadwarden_handguards": {
+      "trailwarden_handguards": {
         "name": "길지킴이 손보호구"
       },
-      "roadwarden_spaulders": {
+      "trailwarden_spaulders": {
         "name": "길지킴이 어깨보호구"
       },
-      "roadwarden_cord": {
+      "trailwarden_cord": {
         "name": "길지킴이 허리끈"
       },
       "highgale_robe": {

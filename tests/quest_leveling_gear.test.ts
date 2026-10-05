@@ -4,7 +4,7 @@ import { QUEST_CHOICE_REWARDS } from '../src/sim/content/quest_choice_rewards';
 import { QUEST_LEVELING_GEAR_ITEMS } from '../src/sim/content/quest_leveling_gear';
 import { DUNGEONS, ITEMS, MOBS, QUESTS } from '../src/sim/data';
 import { checkStaminaModel, primaryStatBudget } from '../src/sim/item_budget';
-import { itemLevel, itemSourceLevel } from '../src/sim/item_level';
+import { itemFromRaid, itemLevel, itemSourceLevel } from '../src/sim/item_level';
 import { defaultRewardChoice, questRewardChoices } from '../src/sim/quests/quest_reward_choice';
 import { MAX_LEVEL, type PlayerClass, type QuestDef } from '../src/sim/types';
 
@@ -23,7 +23,12 @@ const raidMobs = new Set(
 // repeatable quests, raid quests and quests above the level cap are left out.
 function levelingQuest(q: QuestDef): boolean {
   if (q.retired || q.repeatable) return false;
-  if (q.objectives.some((o) => o.type === 'kill' && raidMobs.has(o.targetMobId))) return false;
+  const raid = q.objectives.some(
+    (o) =>
+      (o.type === 'kill' && raidMobs.has(o.targetMobId)) ||
+      (o.type === 'collect' && itemFromRaid(o.itemId)),
+  );
+  if (raid) return false;
   // The hardest source item_level.ts prices a quest at: kill, collect, minLevel.
   const sources = q.objectives.map((o) =>
     o.type === 'kill'

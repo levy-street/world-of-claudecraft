@@ -18958,89 +18958,89 @@ export const zh_CN: EnTranslations = {
       "hollowveil_cord": {
         "name": "空幕腰绳"
       },
-      "roadwarden_robe": {
-        "name": "路卫长袍"
+      "trailwarden_robe": {
+        "name": "径卫长袍"
       },
-      "roadwarden_leggings": {
-        "name": "路卫腿甲衣"
+      "trailwarden_leggings": {
+        "name": "径卫腿甲衣"
       },
-      "roadwarden_slippers": {
-        "name": "路卫软靴"
+      "trailwarden_slippers": {
+        "name": "径卫软靴"
       },
-      "roadwarden_hood": {
-        "name": "路卫兜帽"
+      "trailwarden_hood": {
+        "name": "径卫兜帽"
       },
-      "roadwarden_gloves": {
-        "name": "路卫手套"
+      "trailwarden_gloves": {
+        "name": "径卫手套"
       },
-      "roadwarden_mantle": {
-        "name": "路卫披肩"
+      "trailwarden_mantle": {
+        "name": "径卫披肩"
       },
-      "roadwarden_sash": {
-        "name": "路卫束带"
+      "trailwarden_sash": {
+        "name": "径卫束带"
       },
-      "roadwarden_jerkin": {
-        "name": "路卫皮甲"
+      "trailwarden_jerkin": {
+        "name": "径卫皮甲"
       },
-      "roadwarden_breeches": {
-        "name": "路卫及膝裤"
+      "trailwarden_breeches": {
+        "name": "径卫及膝裤"
       },
-      "roadwarden_boots": {
-        "name": "路卫靴子"
+      "trailwarden_boots": {
+        "name": "径卫靴子"
       },
-      "roadwarden_cap": {
-        "name": "路卫便帽"
+      "trailwarden_cap": {
+        "name": "径卫便帽"
       },
-      "roadwarden_grips": {
-        "name": "路卫握把"
+      "trailwarden_grips": {
+        "name": "径卫握把"
       },
-      "roadwarden_shoulderpads": {
-        "name": "路卫肩垫"
+      "trailwarden_shoulderpads": {
+        "name": "径卫肩垫"
       },
-      "roadwarden_belt": {
-        "name": "路卫腰带"
+      "trailwarden_belt": {
+        "name": "径卫腰带"
       },
-      "roadwarden_hauberk": {
-        "name": "路卫锁衣"
+      "trailwarden_hauberk": {
+        "name": "径卫锁衣"
       },
-      "roadwarden_legguards": {
-        "name": "路卫腿护"
+      "trailwarden_legguards": {
+        "name": "径卫腿护"
       },
-      "roadwarden_sabatons": {
-        "name": "路卫甲靴"
+      "trailwarden_sabatons": {
+        "name": "径卫甲靴"
       },
-      "roadwarden_helm": {
-        "name": "路卫头盔"
+      "trailwarden_helm": {
+        "name": "径卫头盔"
       },
-      "roadwarden_gauntlets": {
-        "name": "路卫甲手"
+      "trailwarden_gauntlets": {
+        "name": "径卫甲手"
       },
-      "roadwarden_pauldrons": {
-        "name": "路卫肩甲"
+      "trailwarden_pauldrons": {
+        "name": "径卫肩甲"
       },
-      "roadwarden_girdle": {
-        "name": "路卫腰饰"
+      "trailwarden_girdle": {
+        "name": "径卫腰饰"
       },
-      "roadwarden_chainmail": {
-        "name": "路卫锁甲"
+      "trailwarden_chainmail": {
+        "name": "径卫锁甲"
       },
-      "roadwarden_chausses": {
-        "name": "路卫腿甲"
+      "trailwarden_chausses": {
+        "name": "径卫腿甲"
       },
-      "roadwarden_greaves": {
-        "name": "路卫胫甲"
+      "trailwarden_greaves": {
+        "name": "径卫胫甲"
       },
-      "roadwarden_coif": {
-        "name": "路卫头罩"
+      "trailwarden_coif": {
+        "name": "径卫头罩"
       },
-      "roadwarden_handguards": {
-        "name": "路卫护手"
+      "trailwarden_handguards": {
+        "name": "径卫护手"
       },
-      "roadwarden_spaulders": {
-        "name": "路卫肩铠"
+      "trailwarden_spaulders": {
+        "name": "径卫肩铠"
       },
-      "roadwarden_cord": {
-        "name": "路卫腰绳"
+      "trailwarden_cord": {
+        "name": "径卫腰绳"
       },
       "highgale_robe": {
         "name": "高风长袍"

@@ -18958,89 +18958,89 @@ export const en_XA: EnTranslations = {
       "hollowveil_cord": {
         "name": "[Ĥóļļóŵʋéíļ Çóŕð]"
       },
-      "roadwarden_robe": {
-        "name": "[Ŕóáðŵáŕðéñ Ŕóƀé]"
+      "trailwarden_robe": {
+        "name": "[Ţŕáíļŵáŕðéñ Ŕóƀé]"
       },
-      "roadwarden_leggings": {
-        "name": "[Ŕóáðŵáŕðéñ Ļéĝĝíñĝš]"
+      "trailwarden_leggings": {
+        "name": "[Ţŕáíļŵáŕðéñ Ļéĝĝíñĝš]"
       },
-      "roadwarden_slippers": {
-        "name": "[Ŕóáðŵáŕðéñ Šļíþþéŕš]"
+      "trailwarden_slippers": {
+        "name": "[Ţŕáíļŵáŕðéñ Šļíþþéŕš]"
       },
-      "roadwarden_hood": {
-        "name": "[Ŕóáðŵáŕðéñ Ĥóóð]"
+      "trailwarden_hood": {
+        "name": "[Ţŕáíļŵáŕðéñ Ĥóóð]"
       },
-      "roadwarden_gloves": {
-        "name": "[Ŕóáðŵáŕðéñ Ĝļóʋéš]"
+      "trailwarden_gloves": {
+        "name": "[Ţŕáíļŵáŕðéñ Ĝļóʋéš]"
       },
-      "roadwarden_mantle": {
-        "name": "[Ŕóáðŵáŕðéñ Ɱáñţļé]"
+      "trailwarden_mantle": {
+        "name": "[Ţŕáíļŵáŕðéñ Ɱáñţļé]"
       },
-      "roadwarden_sash": {
-        "name": "[Ŕóáðŵáŕðéñ Šášĥ]"
+      "trailwarden_sash": {
+        "name": "[Ţŕáíļŵáŕðéñ Šášĥ]"
       },
-      "roadwarden_jerkin": {
-        "name": "[Ŕóáðŵáŕðéñ Ĵéŕķíñ]"
+      "trailwarden_jerkin": {
+        "name": "[Ţŕáíļŵáŕðéñ Ĵéŕķíñ]"
       },
-      "roadwarden_breeches": {
-        "name": "[Ŕóáðŵáŕðéñ Ɓŕééçĥéš]"
+      "trailwarden_breeches": {
+        "name": "[Ţŕáíļŵáŕðéñ Ɓŕééçĥéš]"
       },
-      "roadwarden_boots": {
-        "name": "[Ŕóáðŵáŕðéñ Ɓóóţš]"
+      "trailwarden_boots": {
+        "name": "[Ţŕáíļŵáŕðéñ Ɓóóţš]"
       },
-      "roadwarden_cap": {
-        "name": "[Ŕóáðŵáŕðéñ Çáþ]"
+      "trailwarden_cap": {
+        "name": "[Ţŕáíļŵáŕðéñ Çáþ]"
       },
-      "roadwarden_grips": {
-        "name": "[Ŕóáðŵáŕðéñ Ĝŕíþš]"
+      "trailwarden_grips": {
+        "name": "[Ţŕáíļŵáŕðéñ Ĝŕíþš]"
       },
-      "roadwarden_shoulderpads": {
-        "name": "[Ŕóáðŵáŕðéñ Šĥóúļðéŕþáðš]"
+      "trailwarden_shoulderpads": {
+        "name": "[Ţŕáíļŵáŕðéñ Šĥóúļðéŕþáðš]"
       },
-      "roadwarden_belt": {
-        "name": "[Ŕóáðŵáŕðéñ Ɓéļţ]"
+      "trailwarden_belt": {
+        "name": "[Ţŕáíļŵáŕðéñ Ɓéļţ]"
       },
-      "roadwarden_hauberk": {
-        "name": "[Ŕóáðŵáŕðéñ Ĥáúƀéŕķ]"
+      "trailwarden_hauberk": {
+        "name": "[Ţŕáíļŵáŕðéñ Ĥáúƀéŕķ]"
       },
-      "roadwarden_legguards": {
-        "name": "[Ŕóáðŵáŕðéñ Ļéĝĝúáŕðš]"
+      "trailwarden_legguards": {
+        "name": "[Ţŕáíļŵáŕðéñ Ļéĝĝúáŕðš]"
       },
-      "roadwarden_sabatons": {
-        "name": "[Ŕóáðŵáŕðéñ Šáƀáţóñš]"
+      "trailwarden_sabatons": {
+        "name": "[Ţŕáíļŵáŕðéñ Šáƀáţóñš]"
       },
-      "roadwarden_helm": {
-        "name": "[Ŕóáðŵáŕðéñ Ĥéļɱ]"
+      "trailwarden_helm": {
+        "name": "[Ţŕáíļŵáŕðéñ Ĥéļɱ]"
       },
-      "roadwarden_gauntlets": {
-        "name": "[Ŕóáðŵáŕðéñ Ĝáúñţļéţš]"
+      "trailwarden_gauntlets": {
+        "name": "[Ţŕáíļŵáŕðéñ Ĝáúñţļéţš]"
       },
-      "roadwarden_pauldrons": {
-        "name": "[Ŕóáðŵáŕðéñ Þáúļðŕóñš]"
+      "trailwarden_pauldrons": {
+        "name": "[Ţŕáíļŵáŕðéñ Þáúļðŕóñš]"
       },
-      "roadwarden_girdle": {
-        "name": "[Ŕóáðŵáŕðéñ Ĝíŕðļé]"
+      "trailwarden_girdle": {
+        "name": "[Ţŕáíļŵáŕðéñ Ĝíŕðļé]"
       },
-      "roadwarden_chainmail": {
-        "name": "[Ŕóáðŵáŕðéñ Çĥáíñɱáíļ]"
+      "trailwarden_chainmail": {
+        "name": "[Ţŕáíļŵáŕðéñ Çĥáíñɱáíļ]"
       },
-      "roadwarden_chausses": {
-        "name": "[Ŕóáðŵáŕðéñ Çĥáúššéš]"
+      "trailwarden_chausses": {
+        "name": "[Ţŕáíļŵáŕðéñ Çĥáúššéš]"
       },
-      "roadwarden_greaves": {
-        "name": "[Ŕóáðŵáŕðéñ Ĝŕéáʋéš]"
+      "trailwarden_greaves": {
+        "name": "[Ţŕáíļŵáŕðéñ Ĝŕéáʋéš]"
       },
-      "roadwarden_coif": {
-        "name": "[Ŕóáðŵáŕðéñ Çóíƒ]"
+      "trailwarden_coif": {
+        "name": "[Ţŕáíļŵáŕðéñ Çóíƒ]"
       },
-      "roadwarden_handguards": {
-        "name": "[Ŕóáðŵáŕðéñ Ĥáñðĝúáŕðš]"
+      "trailwarden_handguards": {
+        "name": "[Ţŕáíļŵáŕðéñ Ĥáñðĝúáŕðš]"
       },
-      "roadwarden_spaulders": {
-        "name": "[Ŕóáðŵáŕðéñ Šþáúļðéŕš]"
+      "trailwarden_spaulders": {
+        "name": "[Ţŕáíļŵáŕðéñ Šþáúļðéŕš]"
       },
-      "roadwarden_cord": {
-        "name": "[Ŕóáðŵáŕðéñ Çóŕð]"
+      "trailwarden_cord": {
+        "name": "[Ţŕáíļŵáŕðéñ Çóŕð]"
       },
       "highgale_robe": {
         "name": "[Ĥíĝĥĝáļé Ŕóƀé]"

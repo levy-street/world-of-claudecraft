@@ -18958,89 +18958,89 @@ export const ja_JP: EnTranslations = {
       "hollowveil_cord": {
         "name": "空洞の帳のコード"
       },
-      "roadwarden_robe": {
-        "name": "道守のローブ"
+      "trailwarden_robe": {
+        "name": "径守のローブ"
       },
-      "roadwarden_leggings": {
-        "name": "道守のレギンス"
+      "trailwarden_leggings": {
+        "name": "径守のレギンス"
       },
-      "roadwarden_slippers": {
-        "name": "道守のスリッパー"
+      "trailwarden_slippers": {
+        "name": "径守のスリッパー"
       },
-      "roadwarden_hood": {
-        "name": "道守のフード"
+      "trailwarden_hood": {
+        "name": "径守のフード"
       },
-      "roadwarden_gloves": {
-        "name": "道守の手甲"
+      "trailwarden_gloves": {
+        "name": "径守の手甲"
       },
-      "roadwarden_mantle": {
-        "name": "道守のマント"
+      "trailwarden_mantle": {
+        "name": "径守のマント"
       },
-      "roadwarden_sash": {
-        "name": "道守のサッシュ"
+      "trailwarden_sash": {
+        "name": "径守のサッシュ"
       },
-      "roadwarden_jerkin": {
-        "name": "道守のジャーキン"
+      "trailwarden_jerkin": {
+        "name": "径守のジャーキン"
       },
-      "roadwarden_breeches": {
-        "name": "道守のブリーチーズ"
+      "trailwarden_breeches": {
+        "name": "径守のブリーチーズ"
       },
-      "roadwarden_boots": {
-        "name": "道守のブーツ"
+      "trailwarden_boots": {
+        "name": "径守のブーツ"
       },
-      "roadwarden_cap": {
-        "name": "道守のキャップ"
+      "trailwarden_cap": {
+        "name": "径守のキャップ"
       },
-      "roadwarden_grips": {
-        "name": "道守のグリップ"
+      "trailwarden_grips": {
+        "name": "径守のグリップ"
       },
-      "roadwarden_shoulderpads": {
-        "name": "道守のショルダーパッド"
+      "trailwarden_shoulderpads": {
+        "name": "径守のショルダーパッド"
       },
-      "roadwarden_belt": {
-        "name": "道守のベルト"
+      "trailwarden_belt": {
+        "name": "径守のベルト"
       },
-      "roadwarden_hauberk": {
-        "name": "道守のホーバーク"
+      "trailwarden_hauberk": {
+        "name": "径守のホーバーク"
       },
-      "roadwarden_legguards": {
-        "name": "道守のレグガード"
+      "trailwarden_legguards": {
+        "name": "径守のレグガード"
       },
-      "roadwarden_sabatons": {
-        "name": "道守のサバトン"
+      "trailwarden_sabatons": {
+        "name": "径守のサバトン"
       },
-      "roadwarden_helm": {
-        "name": "道守のヘルム"
+      "trailwarden_helm": {
+        "name": "径守のヘルム"
       },
-      "roadwarden_gauntlets": {
-        "name": "道守の籠手"
+      "trailwarden_gauntlets": {
+        "name": "径守の籠手"
       },
-      "roadwarden_pauldrons": {
-        "name": "道守の肩甲"
+      "trailwarden_pauldrons": {
+        "name": "径守の肩甲"
       },
-      "roadwarden_girdle": {
-        "name": "道守のガードル"
+      "trailwarden_girdle": {
+        "name": "径守のガードル"
       },
-      "roadwarden_chainmail": {
-        "name": "道守のチェーンメイル"
+      "trailwarden_chainmail": {
+        "name": "径守のチェーンメイル"
       },
-      "roadwarden_chausses": {
-        "name": "道守のチョース"
+      "trailwarden_chausses": {
+        "name": "径守のチョース"
       },
-      "roadwarden_greaves": {
-        "name": "道守のグリーブ"
+      "trailwarden_greaves": {
+        "name": "径守のグリーブ"
       },
-      "roadwarden_coif": {
-        "name": "道守のコイフ"
+      "trailwarden_coif": {
+        "name": "径守のコイフ"
       },
-      "roadwarden_handguards": {
-        "name": "道守のハンドガード"
+      "trailwarden_handguards": {
+        "name": "径守のハンドガード"
       },
-      "roadwarden_spaulders": {
-        "name": "道守のスポルダー"
+      "trailwarden_spaulders": {
+        "name": "径守のスポルダー"
       },
-      "roadwarden_cord": {
-        "name": "道守のコード"
+      "trailwarden_cord": {
+        "name": "径守のコード"
       },
       "highgale_robe": {
         "name": "高き疾風のローブ"

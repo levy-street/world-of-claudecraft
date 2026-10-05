@@ -19,8 +19,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 13, sta: 1, int: 2 },
-    sellValue: 43,
+    stats: { armor: 15, sta: 1, int: 2 },
+    sellValue: 169,
   },
   // Saltbitten (the Proving Shore): item level 3, legs budget 1.
   saltbitten_leggings: {
@@ -31,7 +31,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'legs',
     quality: 'uncommon',
     stats: { armor: 11, int: 1 },
-    sellValue: 22,
+    sellValue: 120,
   },
   // Saltbitten (the Proving Shore): item level 3, feet budget 1.
   saltbitten_slippers: {
@@ -42,7 +42,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'uncommon',
     stats: { armor: 9, int: 1 },
-    sellValue: 16,
+    sellValue: 87,
   },
   // Saltbitten (the Proving Shore): item level 3, helmet budget 1.
   saltbitten_hood: {
@@ -52,8 +52,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 8, int: 1 },
-    sellValue: 20,
+    stats: { armor: 10, int: 1 },
+    sellValue: 113,
   },
   // Saltbitten (the Proving Shore): item level 3, gloves budget 1.
   saltbitten_gloves: {
@@ -64,7 +64,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'gloves',
     quality: 'uncommon',
     stats: { armor: 8, int: 1 },
-    sellValue: 17,
+    sellValue: 93,
   },
   // Saltbitten (the Proving Shore): item level 4, shoulder budget 1.
   saltbitten_mantle: {
@@ -74,8 +74,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'shoulder',
     quality: 'uncommon',
-    stats: { armor: 10, int: 1 },
-    sellValue: 32,
+    stats: { armor: 11, int: 1 },
+    sellValue: 127,
   },
   // Saltbitten (the Proving Shore): item level 4, waist budget 1.
   saltbitten_sash: {
@@ -85,8 +85,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 9, int: 1 },
-    sellValue: 30,
+    stats: { armor: 11, int: 1 },
+    sellValue: 118,
   },
   // Saltbitten (the Proving Shore): item level 4, chest budget 2.
   saltbitten_jerkin: {
@@ -96,8 +96,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 23, agi: 1, sta: 1 },
-    sellValue: 43,
+    stats: { armor: 31, agi: 1, sta: 1 },
+    sellValue: 169,
   },
   // Saltbitten (the Proving Shore): item level 3, legs budget 1.
   saltbitten_breeches: {
@@ -108,7 +108,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'legs',
     quality: 'uncommon',
     stats: { armor: 14, agi: 1 },
-    sellValue: 22,
+    sellValue: 120,
   },
   // Saltbitten (the Proving Shore): item level 3, feet budget 1.
   saltbitten_boots: {
@@ -119,7 +119,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'uncommon',
     stats: { armor: 8, agi: 1 },
-    sellValue: 16,
+    sellValue: 87,
   },
   // Saltbitten (the Proving Shore): item level 3, helmet budget 1.
   saltbitten_cap: {
@@ -129,8 +129,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 7, agi: 1 },
-    sellValue: 20,
+    stats: { armor: 20, agi: 1 },
+    sellValue: 113,
   },
   // Saltbitten (the Proving Shore): item level 3, gloves budget 1.
   saltbitten_grips: {
@@ -140,8 +140,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 10, agi: 1 },
-    sellValue: 17,
+    stats: { armor: 16, agi: 1 },
+    sellValue: 93,
   },
   // Saltbitten (the Proving Shore): item level 4, shoulder budget 1.
   saltbitten_shoulderpads: {
@@ -151,8 +151,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'shoulder',
     quality: 'uncommon',
-    stats: { armor: 11, agi: 1 },
-    sellValue: 32,
+    stats: { armor: 24, agi: 1 },
+    sellValue: 127,
   },
   // Saltbitten (the Proving Shore): item level 4, waist budget 1.
   saltbitten_belt: {
@@ -162,8 +162,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 10, agi: 1 },
-    sellValue: 30,
+    stats: { armor: 22, agi: 1 },
+    sellValue: 118,
   },
   // Saltbitten (the Proving Shore): item level 4, chest budget 2.
   saltbitten_hauberk: {
@@ -173,8 +173,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 34, str: 1, sta: 1 },
-    sellValue: 43,
+    stats: { armor: 42, str: 1, sta: 1 },
+    sellValue: 169,
   },
   // Saltbitten (the Proving Shore): item level 3, legs budget 1.
   saltbitten_legguards: {
@@ -184,8 +184,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'legs',
     quality: 'uncommon',
-    stats: { armor: 15, str: 1 },
-    sellValue: 22,
+    stats: { armor: 14, str: 1 },
+    sellValue: 120,
   },
   // Saltbitten (the Proving Shore): item level 3, feet budget 1.
   saltbitten_sabatons: {
@@ -196,7 +196,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'uncommon',
     stats: { armor: 14, str: 1 },
-    sellValue: 16,
+    sellValue: 87,
   },
   // Saltbitten (the Proving Shore): item level 3, helmet budget 1.
   saltbitten_helm: {
@@ -206,8 +206,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 13, str: 1 },
-    sellValue: 20,
+    stats: { armor: 27, str: 1 },
+    sellValue: 113,
   },
   // Saltbitten (the Proving Shore): item level 3, gloves budget 1.
   saltbitten_gauntlets: {
@@ -217,8 +217,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 13, str: 1 },
-    sellValue: 17,
+    stats: { armor: 22, str: 1 },
+    sellValue: 93,
   },
   // Saltbitten (the Proving Shore): item level 4, shoulder budget 1.
   saltbitten_pauldrons: {
@@ -229,7 +229,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'uncommon',
     stats: { armor: 15, str: 1 },
-    sellValue: 32,
+    sellValue: 127,
   },
   // Saltbitten (the Proving Shore): item level 4, waist budget 1.
   saltbitten_girdle: {
@@ -239,8 +239,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 16, str: 1 },
-    sellValue: 30,
+    stats: { armor: 29, str: 1 },
+    sellValue: 118,
   },
   // Saltbitten (the Proving Shore): item level 4, chest budget 2.
   saltbitten_chainmail: {
@@ -250,8 +250,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 34, sta: 1, int: 2 },
-    sellValue: 43,
+    stats: { armor: 42, sta: 1, int: 2 },
+    sellValue: 169,
   },
   // Saltbitten (the Proving Shore): item level 3, legs budget 1.
   saltbitten_chausses: {
@@ -261,8 +261,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'legs',
     quality: 'uncommon',
-    stats: { armor: 15, int: 1 },
-    sellValue: 22,
+    stats: { armor: 14, int: 1 },
+    sellValue: 120,
   },
   // Saltbitten (the Proving Shore): item level 3, feet budget 1.
   saltbitten_greaves: {
@@ -273,7 +273,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'uncommon',
     stats: { armor: 14, int: 1 },
-    sellValue: 16,
+    sellValue: 87,
   },
   // Saltbitten (the Proving Shore): item level 3, helmet budget 1.
   saltbitten_coif: {
@@ -283,8 +283,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 13, int: 1 },
-    sellValue: 20,
+    stats: { armor: 27, int: 1 },
+    sellValue: 113,
   },
   // Saltbitten (the Proving Shore): item level 3, gloves budget 1.
   saltbitten_handguards: {
@@ -294,8 +294,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 13, int: 1 },
-    sellValue: 17,
+    stats: { armor: 22, int: 1 },
+    sellValue: 93,
   },
   // Saltbitten (the Proving Shore): item level 4, shoulder budget 1.
   saltbitten_spaulders: {
@@ -306,7 +306,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'uncommon',
     stats: { armor: 15, int: 1 },
-    sellValue: 32,
+    sellValue: 127,
   },
   // Saltbitten (the Proving Shore): item level 4, waist budget 1.
   saltbitten_cord: {
@@ -316,8 +316,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 16, int: 1 },
-    sellValue: 30,
+    stats: { armor: 29, int: 1 },
+    sellValue: 118,
   },
   // Brookwatch (Eastbrook Vale): item level 6, chest budget 2.
   brookwatch_robe: {
@@ -327,8 +327,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 19, sta: 1, int: 2 },
-    sellValue: 96,
+    stats: { armor: 23, sta: 1, int: 2 },
+    sellValue: 200,
   },
   // Brookwatch (Eastbrook Vale): item level 6, legs budget 2.
   brookwatch_leggings: {
@@ -338,8 +338,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'legs',
     quality: 'uncommon',
-    stats: { armor: 22, sta: 1, int: 2 },
-    sellValue: 86,
+    stats: { armor: 24, sta: 1, int: 2 },
+    sellValue: 180,
   },
   // Brookwatch (Eastbrook Vale): item level 6, feet budget 2.
   brookwatch_slippers: {
@@ -350,7 +350,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'uncommon',
     stats: { armor: 17, sta: 1, int: 2 },
-    sellValue: 62,
+    sellValue: 130,
   },
   // Brookwatch (Eastbrook Vale): item level 5, helmet budget 2.
   brookwatch_hood: {
@@ -360,8 +360,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 14, sta: 1, int: 2 },
-    sellValue: 57,
+    stats: { armor: 16, sta: 1, int: 2 },
+    sellValue: 146,
   },
   // Brookwatch (Eastbrook Vale): item level 5, gloves budget 1.
   brookwatch_gloves: {
@@ -372,7 +372,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'gloves',
     quality: 'uncommon',
     stats: { armor: 13, int: 1 },
-    sellValue: 47,
+    sellValue: 120,
   },
   // Brookwatch (Eastbrook Vale): item level 6, shoulder budget 2.
   brookwatch_mantle: {
@@ -382,8 +382,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'shoulder',
     quality: 'uncommon',
-    stats: { armor: 14, sta: 1, int: 2 },
-    sellValue: 72,
+    stats: { armor: 17, sta: 1, int: 2 },
+    sellValue: 150,
   },
   // Brookwatch (Eastbrook Vale): item level 6, waist budget 2.
   brookwatch_sash: {
@@ -393,8 +393,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 13, sta: 1, int: 2 },
-    sellValue: 67,
+    stats: { armor: 16, sta: 1, int: 2 },
+    sellValue: 140,
   },
   // Brookwatch (Eastbrook Vale): item level 6, chest budget 2.
   brookwatch_jerkin: {
@@ -404,8 +404,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 34, agi: 1, sta: 1 },
-    sellValue: 96,
+    stats: { armor: 47, agi: 1, sta: 1 },
+    sellValue: 200,
   },
   // Brookwatch (Eastbrook Vale): item level 6, legs budget 2.
   brookwatch_breeches: {
@@ -416,7 +416,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'legs',
     quality: 'uncommon',
     stats: { armor: 27, agi: 1, sta: 1 },
-    sellValue: 86,
+    sellValue: 180,
   },
   // Brookwatch (Eastbrook Vale): item level 6, feet budget 2.
   brookwatch_boots: {
@@ -427,7 +427,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'uncommon',
     stats: { armor: 15, agi: 1, sta: 1 },
-    sellValue: 62,
+    sellValue: 130,
   },
   // Brookwatch (Eastbrook Vale): item level 5, helmet budget 2.
   brookwatch_cap: {
@@ -437,8 +437,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 12, agi: 1, sta: 1 },
-    sellValue: 57,
+    stats: { armor: 33, agi: 1, sta: 1 },
+    sellValue: 146,
   },
   // Brookwatch (Eastbrook Vale): item level 5, gloves budget 1.
   brookwatch_grips: {
@@ -448,8 +448,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 17, agi: 1 },
-    sellValue: 47,
+    stats: { armor: 27, agi: 1 },
+    sellValue: 120,
   },
   // Brookwatch (Eastbrook Vale): item level 6, shoulder budget 2.
   brookwatch_shoulderpads: {
@@ -459,8 +459,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'shoulder',
     quality: 'uncommon',
-    stats: { armor: 17, agi: 1, sta: 1 },
-    sellValue: 72,
+    stats: { armor: 35, agi: 1, sta: 1 },
+    sellValue: 150,
   },
   // Brookwatch (Eastbrook Vale): item level 6, waist budget 2.
   brookwatch_belt: {
@@ -470,8 +470,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 14, agi: 1, sta: 1 },
-    sellValue: 67,
+    stats: { armor: 33, agi: 1, sta: 1 },
+    sellValue: 140,
   },
   // Brookwatch (Eastbrook Vale): item level 6, chest budget 2.
   brookwatch_hauberk: {
@@ -481,8 +481,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 51, str: 1, sta: 1 },
-    sellValue: 96,
+    stats: { armor: 63, str: 1, sta: 1 },
+    sellValue: 200,
   },
   // Brookwatch (Eastbrook Vale): item level 6, legs budget 2.
   brookwatch_legguards: {
@@ -492,8 +492,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'legs',
     quality: 'uncommon',
-    stats: { armor: 29, str: 1, sta: 1 },
-    sellValue: 86,
+    stats: { armor: 27, str: 1, sta: 1 },
+    sellValue: 180,
   },
   // Brookwatch (Eastbrook Vale): item level 6, feet budget 2.
   brookwatch_sabatons: {
@@ -504,7 +504,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'uncommon',
     stats: { armor: 27, str: 1, sta: 1 },
-    sellValue: 62,
+    sellValue: 130,
   },
   // Brookwatch (Eastbrook Vale): item level 5, helmet budget 2.
   brookwatch_helm: {
@@ -514,8 +514,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 22, str: 1, sta: 1 },
-    sellValue: 57,
+    stats: { armor: 44, str: 1, sta: 1 },
+    sellValue: 146,
   },
   // Brookwatch (Eastbrook Vale): item level 5, gloves budget 1.
   brookwatch_gauntlets: {
@@ -525,8 +525,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 22, str: 1 },
-    sellValue: 47,
+    stats: { armor: 37, str: 1 },
+    sellValue: 120,
   },
   // Brookwatch (Eastbrook Vale): item level 6, shoulder budget 2.
   brookwatch_pauldrons: {
@@ -537,7 +537,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'uncommon',
     stats: { armor: 22, str: 1, sta: 1 },
-    sellValue: 72,
+    sellValue: 150,
   },
   // Brookwatch (Eastbrook Vale): item level 6, waist budget 2.
   brookwatch_girdle: {
@@ -547,8 +547,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 24, str: 1, sta: 1 },
-    sellValue: 67,
+    stats: { armor: 44, str: 1, sta: 1 },
+    sellValue: 140,
   },
   // Brookwatch (Eastbrook Vale): item level 6, chest budget 2.
   brookwatch_chainmail: {
@@ -558,8 +558,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 51, sta: 1, int: 2 },
-    sellValue: 96,
+    stats: { armor: 63, sta: 1, int: 2 },
+    sellValue: 200,
   },
   // Brookwatch (Eastbrook Vale): item level 6, legs budget 2.
   brookwatch_chausses: {
@@ -569,8 +569,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'legs',
     quality: 'uncommon',
-    stats: { armor: 29, sta: 1, int: 2 },
-    sellValue: 86,
+    stats: { armor: 27, sta: 1, int: 2 },
+    sellValue: 180,
   },
   // Brookwatch (Eastbrook Vale): item level 6, feet budget 2.
   brookwatch_greaves: {
@@ -581,7 +581,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'uncommon',
     stats: { armor: 27, sta: 1, int: 2 },
-    sellValue: 62,
+    sellValue: 130,
   },
   // Brookwatch (Eastbrook Vale): item level 5, helmet budget 2.
   brookwatch_coif: {
@@ -591,8 +591,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 22, sta: 1, int: 2 },
-    sellValue: 57,
+    stats: { armor: 44, sta: 1, int: 2 },
+    sellValue: 146,
   },
   // Brookwatch (Eastbrook Vale): item level 5, gloves budget 1.
   brookwatch_handguards: {
@@ -602,8 +602,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 22, int: 1 },
-    sellValue: 47,
+    stats: { armor: 37, int: 1 },
+    sellValue: 120,
   },
   // Brookwatch (Eastbrook Vale): item level 6, shoulder budget 2.
   brookwatch_spaulders: {
@@ -614,7 +614,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'uncommon',
     stats: { armor: 22, sta: 1, int: 2 },
-    sellValue: 72,
+    sellValue: 150,
   },
   // Brookwatch (Eastbrook Vale): item level 6, waist budget 2.
   brookwatch_cord: {
@@ -624,8 +624,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 24, sta: 1, int: 2 },
-    sellValue: 67,
+    stats: { armor: 44, sta: 1, int: 2 },
+    sellValue: 140,
   },
   // Hedgerow (the Eastbrook hedges and the Mirefen edge): item level 8, chest budget 3.
   hedgerow_robe: {
@@ -635,8 +635,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 26, sta: 1, int: 2, spi: 1 },
-    sellValue: 171,
+    stats: { armor: 31, sta: 1, int: 2, spi: 1 },
+    sellValue: 200,
   },
   // Hedgerow (the Eastbrook hedges and the Mirefen edge): item level 8, legs budget 3.
   hedgerow_leggings: {
@@ -646,8 +646,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'legs',
     quality: 'uncommon',
-    stats: { armor: 30, sta: 1, int: 2, spi: 1 },
-    sellValue: 154,
+    stats: { armor: 31, sta: 1, int: 2, spi: 1 },
+    sellValue: 180,
   },
   // Hedgerow (the Eastbrook hedges and the Mirefen edge): item level 8, feet budget 2.
   hedgerow_slippers: {
@@ -658,7 +658,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'uncommon',
     stats: { armor: 23, sta: 1, int: 2 },
-    sellValue: 111,
+    sellValue: 130,
   },
   // Hedgerow (the Eastbrook hedges and the Mirefen edge): item level 8, helmet budget 3.
   hedgerow_hood: {
@@ -668,8 +668,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 22, sta: 1, int: 2, spi: 1 },
-    sellValue: 145,
+    stats: { armor: 26, sta: 1, int: 2, spi: 1 },
+    sellValue: 170,
   },
   // Hedgerow (the Eastbrook hedges and the Mirefen edge): item level 8, gloves budget 2.
   hedgerow_gloves: {
@@ -680,7 +680,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'gloves',
     quality: 'uncommon',
     stats: { armor: 21, sta: 1, int: 2 },
-    sellValue: 119,
+    sellValue: 140,
   },
   // Hedgerow (the Eastbrook hedges and the Mirefen edge): item level 9, shoulder budget 3.
   hedgerow_mantle: {
@@ -690,8 +690,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'shoulder',
     quality: 'uncommon',
-    stats: { armor: 22, sta: 1, int: 2, spi: 1 },
-    sellValue: 162,
+    stats: { armor: 26, sta: 1, int: 2, spi: 1 },
+    sellValue: 150,
   },
   // Hedgerow (the Eastbrook hedges and the Mirefen edge): item level 9, waist budget 2.
   hedgerow_sash: {
@@ -701,8 +701,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 19, sta: 1, int: 2 },
-    sellValue: 151,
+    stats: { armor: 24, sta: 1, int: 2 },
+    sellValue: 140,
   },
   // Hedgerow (the Eastbrook hedges and the Mirefen edge): item level 8, chest budget 3.
   hedgerow_jerkin: {
@@ -712,8 +712,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 46, agi: 2, sta: 1 },
-    sellValue: 171,
+    stats: { armor: 63, agi: 2, sta: 1 },
+    sellValue: 200,
   },
   // Hedgerow (the Eastbrook hedges and the Mirefen edge): item level 8, legs budget 3.
   hedgerow_breeches: {
@@ -724,7 +724,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'legs',
     quality: 'uncommon',
     stats: { armor: 36, agi: 2, sta: 1 },
-    sellValue: 154,
+    sellValue: 180,
   },
   // Hedgerow (the Eastbrook hedges and the Mirefen edge): item level 8, feet budget 2.
   hedgerow_boots: {
@@ -735,7 +735,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'uncommon',
     stats: { armor: 20, agi: 1, sta: 1 },
-    sellValue: 111,
+    sellValue: 130,
   },
   // Hedgerow (the Eastbrook hedges and the Mirefen edge): item level 8, helmet budget 3.
   hedgerow_cap: {
@@ -745,8 +745,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 19, agi: 2, sta: 1 },
-    sellValue: 145,
+    stats: { armor: 53, agi: 2, sta: 1 },
+    sellValue: 170,
   },
   // Hedgerow (the Eastbrook hedges and the Mirefen edge): item level 8, gloves budget 2.
   hedgerow_grips: {
@@ -756,8 +756,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 27, agi: 1, sta: 1 },
-    sellValue: 119,
+    stats: { armor: 44, agi: 1, sta: 1 },
+    sellValue: 140,
   },
   // Hedgerow (the Eastbrook hedges and the Mirefen edge): item level 9, shoulder budget 3.
   hedgerow_shoulderpads: {
@@ -767,8 +767,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'shoulder',
     quality: 'uncommon',
-    stats: { armor: 25, agi: 2, sta: 1 },
-    sellValue: 162,
+    stats: { armor: 53, agi: 2, sta: 1 },
+    sellValue: 150,
   },
   // Hedgerow (the Eastbrook hedges and the Mirefen edge): item level 9, waist budget 2.
   hedgerow_belt: {
@@ -778,8 +778,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 22, agi: 1, sta: 1 },
-    sellValue: 151,
+    stats: { armor: 49, agi: 1, sta: 1 },
+    sellValue: 140,
   },
   // Hedgerow (the Eastbrook hedges and the Mirefen edge): item level 8, chest budget 3.
   hedgerow_hauberk: {
@@ -789,8 +789,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 68, str: 2, sta: 1 },
-    sellValue: 171,
+    stats: { armor: 84, str: 2, sta: 1 },
+    sellValue: 200,
   },
   // Hedgerow (the Eastbrook hedges and the Mirefen edge): item level 8, legs budget 3.
   hedgerow_legguards: {
@@ -800,8 +800,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'legs',
     quality: 'uncommon',
-    stats: { armor: 39, str: 2, sta: 1 },
-    sellValue: 154,
+    stats: { armor: 36, str: 2, sta: 1 },
+    sellValue: 180,
   },
   // Hedgerow (the Eastbrook hedges and the Mirefen edge): item level 8, feet budget 2.
   hedgerow_sabatons: {
@@ -812,7 +812,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'uncommon',
     stats: { armor: 36, str: 1, sta: 1 },
-    sellValue: 111,
+    sellValue: 130,
   },
   // Hedgerow (the Eastbrook hedges and the Mirefen edge): item level 8, helmet budget 3.
   hedgerow_helm: {
@@ -822,8 +822,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 35, str: 2, sta: 1 },
-    sellValue: 145,
+    stats: { armor: 71, str: 2, sta: 1 },
+    sellValue: 170,
   },
   // Hedgerow (the Eastbrook hedges and the Mirefen edge): item level 8, gloves budget 2.
   hedgerow_gauntlets: {
@@ -833,8 +833,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 35, str: 1, sta: 1 },
-    sellValue: 119,
+    stats: { armor: 59, str: 1, sta: 1 },
+    sellValue: 140,
   },
   // Hedgerow (the Eastbrook hedges and the Mirefen edge): item level 9, shoulder budget 3.
   hedgerow_pauldrons: {
@@ -845,7 +845,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'uncommon',
     stats: { armor: 34, str: 2, sta: 1 },
-    sellValue: 162,
+    sellValue: 150,
   },
   // Hedgerow (the Eastbrook hedges and the Mirefen edge): item level 9, waist budget 2.
   hedgerow_girdle: {
@@ -855,8 +855,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 36, str: 1, sta: 1 },
-    sellValue: 151,
+    stats: { armor: 66, str: 1, sta: 1 },
+    sellValue: 140,
   },
   // Hedgerow (the Eastbrook hedges and the Mirefen edge): item level 8, chest budget 3.
   hedgerow_chainmail: {
@@ -866,8 +866,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 68, sta: 1, int: 2, spi: 1 },
-    sellValue: 171,
+    stats: { armor: 84, sta: 1, int: 2, spi: 1 },
+    sellValue: 200,
   },
   // Hedgerow (the Eastbrook hedges and the Mirefen edge): item level 8, legs budget 3.
   hedgerow_chausses: {
@@ -877,8 +877,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'legs',
     quality: 'uncommon',
-    stats: { armor: 39, sta: 1, int: 2, spi: 1 },
-    sellValue: 154,
+    stats: { armor: 36, sta: 1, int: 2, spi: 1 },
+    sellValue: 180,
   },
   // Hedgerow (the Eastbrook hedges and the Mirefen edge): item level 8, feet budget 2.
   hedgerow_greaves: {
@@ -889,7 +889,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'uncommon',
     stats: { armor: 36, sta: 1, int: 2 },
-    sellValue: 111,
+    sellValue: 130,
   },
   // Hedgerow (the Eastbrook hedges and the Mirefen edge): item level 8, helmet budget 3.
   hedgerow_coif: {
@@ -899,8 +899,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 35, sta: 1, int: 2, spi: 1 },
-    sellValue: 145,
+    stats: { armor: 71, sta: 1, int: 2, spi: 1 },
+    sellValue: 170,
   },
   // Hedgerow (the Eastbrook hedges and the Mirefen edge): item level 8, gloves budget 2.
   hedgerow_handguards: {
@@ -910,8 +910,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 35, sta: 1, int: 2 },
-    sellValue: 119,
+    stats: { armor: 59, sta: 1, int: 2 },
+    sellValue: 140,
   },
   // Hedgerow (the Eastbrook hedges and the Mirefen edge): item level 9, shoulder budget 3.
   hedgerow_spaulders: {
@@ -922,7 +922,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'uncommon',
     stats: { armor: 34, sta: 1, int: 2, spi: 1 },
-    sellValue: 162,
+    sellValue: 150,
   },
   // Hedgerow (the Eastbrook hedges and the Mirefen edge): item level 9, waist budget 2.
   hedgerow_cord: {
@@ -932,8 +932,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 36, sta: 1, int: 2 },
-    sellValue: 151,
+    stats: { armor: 66, sta: 1, int: 2 },
+    sellValue: 140,
   },
   // Bogwalker (Mirefen Marsh): item level 13, chest budget 5.
   bogwalker_robe: {
@@ -944,7 +944,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'chest',
     quality: 'uncommon',
     stats: { armor: 42, sta: 2, int: 4, spi: 1 },
-    sellValue: 451,
+    sellValue: 350,
   },
   // Bogwalker (Mirefen Marsh): item level 13, legs budget 5.
   bogwalker_leggings: {
@@ -955,7 +955,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'legs',
     quality: 'uncommon',
     stats: { armor: 48, sta: 2, int: 4, spi: 1 },
-    sellValue: 406,
+    sellValue: 315,
   },
   // Bogwalker (Mirefen Marsh): item level 13, feet budget 3.
   bogwalker_slippers: {
@@ -966,7 +966,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'uncommon',
     stats: { armor: 37, sta: 1, int: 2, spi: 1 },
-    sellValue: 293,
+    sellValue: 228,
   },
   // Bogwalker (Mirefen Marsh): item level 13, helmet budget 4.
   bogwalker_hood: {
@@ -977,7 +977,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'helmet',
     quality: 'uncommon',
     stats: { armor: 36, sta: 1, int: 3, spi: 1 },
-    sellValue: 383,
+    sellValue: 298,
   },
   // Bogwalker (Mirefen Marsh): item level 13, gloves budget 4.
   bogwalker_gloves: {
@@ -988,7 +988,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'gloves',
     quality: 'uncommon',
     stats: { armor: 33, sta: 1, int: 3, spi: 1 },
-    sellValue: 315,
+    sellValue: 245,
   },
   // Bogwalker (Mirefen Marsh): item level 13, shoulder budget 4.
   bogwalker_mantle: {
@@ -999,7 +999,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'uncommon',
     stats: { armor: 31, sta: 1, int: 3, spi: 1 },
-    sellValue: 338,
+    sellValue: 263,
   },
   // Bogwalker (Mirefen Marsh): item level 13, waist budget 4.
   bogwalker_sash: {
@@ -1009,8 +1009,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 28, sta: 1, int: 3, spi: 1 },
-    sellValue: 315,
+    stats: { armor: 29, sta: 1, int: 3, spi: 1 },
+    sellValue: 245,
   },
   // Bogwalker (Mirefen Marsh): item level 13, chest budget 5.
   bogwalker_jerkin: {
@@ -1020,8 +1020,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 74, agi: 3, sta: 2 },
-    sellValue: 451,
+    stats: { armor: 68, agi: 3, sta: 2 },
+    sellValue: 350,
   },
   // Bogwalker (Mirefen Marsh): item level 13, legs budget 5.
   bogwalker_breeches: {
@@ -1032,7 +1032,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'legs',
     quality: 'uncommon',
     stats: { armor: 59, agi: 3, sta: 2 },
-    sellValue: 406,
+    sellValue: 315,
   },
   // Bogwalker (Mirefen Marsh): item level 13, feet budget 3.
   bogwalker_boots: {
@@ -1043,7 +1043,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'uncommon',
     stats: { armor: 33, agi: 2, sta: 1 },
-    sellValue: 293,
+    sellValue: 228,
   },
   // Bogwalker (Mirefen Marsh): item level 13, helmet budget 4.
   bogwalker_cap: {
@@ -1053,8 +1053,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 31, agi: 3, sta: 1 },
-    sellValue: 383,
+    stats: { armor: 57, agi: 3, sta: 1 },
+    sellValue: 298,
   },
   // Bogwalker (Mirefen Marsh): item level 13, gloves budget 4.
   bogwalker_grips: {
@@ -1064,8 +1064,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 45, agi: 3, sta: 1 },
-    sellValue: 315,
+    stats: { armor: 47, agi: 3, sta: 1 },
+    sellValue: 245,
   },
   // Bogwalker (Mirefen Marsh): item level 13, shoulder budget 4.
   bogwalker_shoulderpads: {
@@ -1075,8 +1075,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'shoulder',
     quality: 'uncommon',
-    stats: { armor: 36, agi: 3, sta: 1 },
-    sellValue: 338,
+    stats: { armor: 51, agi: 3, sta: 1 },
+    sellValue: 263,
   },
   // Bogwalker (Mirefen Marsh): item level 13, waist budget 4.
   bogwalker_belt: {
@@ -1086,8 +1086,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 31, agi: 3, sta: 1 },
-    sellValue: 315,
+    stats: { armor: 47, agi: 3, sta: 1 },
+    sellValue: 245,
   },
   // Bogwalker (Mirefen Marsh): item level 13, chest budget 5.
   bogwalker_hauberk: {
@@ -1097,8 +1097,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 110, str: 2, agi: 1, sta: 2 },
-    sellValue: 451,
+    stats: { armor: 130, str: 2, agi: 1, sta: 2 },
+    sellValue: 350,
   },
   // Bogwalker (Mirefen Marsh): item level 13, legs budget 5.
   bogwalker_legguards: {
@@ -1108,8 +1108,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'legs',
     quality: 'uncommon',
-    stats: { armor: 63, str: 2, agi: 1, sta: 2 },
-    sellValue: 406,
+    stats: { armor: 59, str: 2, agi: 1, sta: 2 },
+    sellValue: 315,
   },
   // Bogwalker (Mirefen Marsh): item level 13, feet budget 3.
   bogwalker_sabatons: {
@@ -1120,7 +1120,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'uncommon',
     stats: { armor: 59, str: 2, sta: 1 },
-    sellValue: 293,
+    sellValue: 228,
   },
   // Bogwalker (Mirefen Marsh): item level 13, helmet budget 4.
   bogwalker_helm: {
@@ -1130,8 +1130,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 57, str: 2, agi: 1, sta: 1 },
-    sellValue: 383,
+    stats: { armor: 111, str: 2, agi: 1, sta: 1 },
+    sellValue: 298,
   },
   // Bogwalker (Mirefen Marsh): item level 13, gloves budget 4.
   bogwalker_gauntlets: {
@@ -1141,8 +1141,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 57, str: 2, agi: 1, sta: 1 },
-    sellValue: 315,
+    stats: { armor: 91, str: 2, agi: 1, sta: 1 },
+    sellValue: 245,
   },
   // Bogwalker (Mirefen Marsh): item level 13, shoulder budget 4.
   bogwalker_pauldrons: {
@@ -1153,7 +1153,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'uncommon',
     stats: { armor: 49, str: 2, agi: 1, sta: 1 },
-    sellValue: 338,
+    sellValue: 263,
   },
   // Bogwalker (Mirefen Marsh): item level 13, waist budget 4.
   bogwalker_girdle: {
@@ -1163,8 +1163,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 52, str: 2, agi: 1, sta: 1 },
-    sellValue: 315,
+    stats: { armor: 91, str: 2, agi: 1, sta: 1 },
+    sellValue: 245,
   },
   // Bogwalker (Mirefen Marsh): item level 13, chest budget 5.
   bogwalker_chainmail: {
@@ -1174,8 +1174,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 110, sta: 2, int: 4, spi: 1 },
-    sellValue: 451,
+    stats: { armor: 130, sta: 2, int: 4, spi: 1 },
+    sellValue: 350,
   },
   // Bogwalker (Mirefen Marsh): item level 13, legs budget 5.
   bogwalker_chausses: {
@@ -1185,8 +1185,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'legs',
     quality: 'uncommon',
-    stats: { armor: 63, sta: 2, int: 4, spi: 1 },
-    sellValue: 406,
+    stats: { armor: 59, sta: 2, int: 4, spi: 1 },
+    sellValue: 315,
   },
   // Bogwalker (Mirefen Marsh): item level 13, feet budget 3.
   bogwalker_greaves: {
@@ -1197,7 +1197,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'uncommon',
     stats: { armor: 59, sta: 1, int: 2, spi: 1 },
-    sellValue: 293,
+    sellValue: 228,
   },
   // Bogwalker (Mirefen Marsh): item level 13, helmet budget 4.
   bogwalker_coif: {
@@ -1207,8 +1207,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 57, sta: 1, int: 3, spi: 1 },
-    sellValue: 383,
+    stats: { armor: 111, sta: 1, int: 3, spi: 1 },
+    sellValue: 298,
   },
   // Bogwalker (Mirefen Marsh): item level 13, gloves budget 4.
   bogwalker_handguards: {
@@ -1218,8 +1218,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 57, sta: 1, int: 3, spi: 1 },
-    sellValue: 315,
+    stats: { armor: 91, sta: 1, int: 3, spi: 1 },
+    sellValue: 245,
   },
   // Bogwalker (Mirefen Marsh): item level 13, shoulder budget 4.
   bogwalker_spaulders: {
@@ -1230,7 +1230,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'uncommon',
     stats: { armor: 49, sta: 1, int: 3, spi: 1 },
-    sellValue: 338,
+    sellValue: 263,
   },
   // Bogwalker (Mirefen Marsh): item level 13, waist budget 4.
   bogwalker_cord: {
@@ -1240,8 +1240,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 52, sta: 1, int: 3, spi: 1 },
-    sellValue: 315,
+    stats: { armor: 91, sta: 1, int: 3, spi: 1 },
+    sellValue: 245,
   },
   // Thornspire (Thornpeak Heights): item level 17, chest budget 7.
   thornspire_robe: {
@@ -1251,8 +1251,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 55, sta: 2, int: 5, spi: 2 },
-    sellValue: 771,
+    stats: { armor: 49, sta: 2, int: 5, spi: 2 },
+    sellValue: 600,
   },
   // Thornspire (Thornpeak Heights): item level 17, legs budget 6.
   thornspire_leggings: {
@@ -1263,7 +1263,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'legs',
     quality: 'uncommon',
     stats: { armor: 63, sta: 2, int: 5, spi: 1 },
-    sellValue: 694,
+    sellValue: 540,
   },
   // Thornspire (Thornpeak Heights): item level 17, feet budget 4.
   thornspire_slippers: {
@@ -1273,8 +1273,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'feet',
     quality: 'uncommon',
-    stats: { armor: 49, sta: 1, int: 3, spi: 1 },
-    sellValue: 501,
+    stats: { armor: 55, sta: 1, int: 3, spi: 1 },
+    sellValue: 390,
   },
   // Thornspire (Thornpeak Heights): item level 17, helmet budget 6.
   thornspire_hood: {
@@ -1284,8 +1284,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 46, sta: 2, int: 5, spi: 1 },
-    sellValue: 655,
+    stats: { armor: 41, sta: 2, int: 5, spi: 1 },
+    sellValue: 510,
   },
   // Thornspire (Thornpeak Heights): item level 17, gloves budget 5.
   thornspire_gloves: {
@@ -1296,7 +1296,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'gloves',
     quality: 'uncommon',
     stats: { armor: 44, sta: 2, int: 4, spi: 1 },
-    sellValue: 539,
+    sellValue: 420,
   },
   // Thornspire (Thornpeak Heights): item level 17, shoulder budget 5.
   thornspire_mantle: {
@@ -1306,8 +1306,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'shoulder',
     quality: 'uncommon',
-    stats: { armor: 41, sta: 2, int: 4, spi: 1 },
-    sellValue: 578,
+    stats: { armor: 36, sta: 2, int: 4, spi: 1 },
+    sellValue: 450,
   },
   // Thornspire (Thornpeak Heights): item level 17, waist budget 5.
   thornspire_sash: {
@@ -1317,8 +1317,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 36, sta: 2, int: 4, spi: 1 },
-    sellValue: 539,
+    stats: { armor: 34, sta: 2, int: 4, spi: 1 },
+    sellValue: 420,
   },
   // Thornspire (Thornpeak Heights): item level 17, chest budget 7.
   thornspire_jerkin: {
@@ -1328,8 +1328,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 97, agi: 5, sta: 2 },
-    sellValue: 771,
+    stats: { armor: 85, agi: 5, sta: 2 },
+    sellValue: 600,
   },
   // Thornspire (Thornpeak Heights): item level 17, legs budget 6.
   thornspire_breeches: {
@@ -1340,7 +1340,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'legs',
     quality: 'uncommon',
     stats: { armor: 77, agi: 4, sta: 2 },
-    sellValue: 694,
+    sellValue: 540,
   },
   // Thornspire (Thornpeak Heights): item level 17, feet budget 4.
   thornspire_boots: {
@@ -1351,7 +1351,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'uncommon',
     stats: { armor: 43, agi: 3, sta: 1 },
-    sellValue: 501,
+    sellValue: 390,
   },
   // Thornspire (Thornpeak Heights): item level 17, helmet budget 6.
   thornspire_cap: {
@@ -1361,8 +1361,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 40, agi: 4, sta: 2 },
-    sellValue: 655,
+    stats: { armor: 72, agi: 4, sta: 2 },
+    sellValue: 510,
   },
   // Thornspire (Thornpeak Heights): item level 17, gloves budget 5.
   thornspire_grips: {
@@ -1372,8 +1372,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 58, agi: 3, sta: 2 },
-    sellValue: 539,
+    stats: { armor: 59, agi: 3, sta: 2 },
+    sellValue: 420,
   },
   // Thornspire (Thornpeak Heights): item level 17, shoulder budget 5.
   thornspire_shoulderpads: {
@@ -1383,8 +1383,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'shoulder',
     quality: 'uncommon',
-    stats: { armor: 47, agi: 3, sta: 2 },
-    sellValue: 578,
+    stats: { armor: 64, agi: 3, sta: 2 },
+    sellValue: 450,
   },
   // Thornspire (Thornpeak Heights): item level 17, waist budget 5.
   thornspire_belt: {
@@ -1394,8 +1394,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 41, agi: 3, sta: 2 },
-    sellValue: 539,
+    stats: { armor: 59, agi: 3, sta: 2 },
+    sellValue: 420,
   },
   // Thornspire (Thornpeak Heights): item level 17, chest budget 7.
   thornspire_hauberk: {
@@ -1405,8 +1405,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 144, str: 4, agi: 1, sta: 2 },
-    sellValue: 771,
+    stats: { armor: 138, str: 4, agi: 1, sta: 2 },
+    sellValue: 600,
   },
   // Thornspire (Thornpeak Heights): item level 17, legs budget 6.
   thornspire_legguards: {
@@ -1417,7 +1417,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'legs',
     quality: 'uncommon',
     stats: { armor: 83, str: 3, agi: 1, sta: 2 },
-    sellValue: 694,
+    sellValue: 540,
   },
   // Thornspire (Thornpeak Heights): item level 17, feet budget 4.
   thornspire_sabatons: {
@@ -1428,7 +1428,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'uncommon',
     stats: { armor: 77, str: 2, agi: 1, sta: 1 },
-    sellValue: 501,
+    sellValue: 390,
   },
   // Thornspire (Thornpeak Heights): item level 17, helmet budget 6.
   thornspire_helm: {
@@ -1438,8 +1438,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 74, str: 3, agi: 1, sta: 2 },
-    sellValue: 655,
+    stats: { armor: 117, str: 3, agi: 1, sta: 2 },
+    sellValue: 510,
   },
   // Thornspire (Thornpeak Heights): item level 17, gloves budget 5.
   thornspire_gauntlets: {
@@ -1449,8 +1449,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 75, str: 2, agi: 1, sta: 2 },
-    sellValue: 539,
+    stats: { armor: 96, str: 2, agi: 1, sta: 2 },
+    sellValue: 420,
   },
   // Thornspire (Thornpeak Heights): item level 17, shoulder budget 5.
   thornspire_pauldrons: {
@@ -1461,7 +1461,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'uncommon',
     stats: { armor: 63, str: 2, agi: 1, sta: 2 },
-    sellValue: 578,
+    sellValue: 450,
   },
   // Thornspire (Thornpeak Heights): item level 17, waist budget 5.
   thornspire_girdle: {
@@ -1471,8 +1471,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 68, str: 2, agi: 1, sta: 2 },
-    sellValue: 539,
+    stats: { armor: 96, str: 2, agi: 1, sta: 2 },
+    sellValue: 420,
   },
   // Thornspire (Thornpeak Heights): item level 17, chest budget 7.
   thornspire_chainmail: {
@@ -1482,8 +1482,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 144, sta: 2, int: 5, spi: 2 },
-    sellValue: 771,
+    stats: { armor: 138, sta: 2, int: 5, spi: 2 },
+    sellValue: 600,
   },
   // Thornspire (Thornpeak Heights): item level 17, legs budget 6.
   thornspire_chausses: {
@@ -1494,7 +1494,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'legs',
     quality: 'uncommon',
     stats: { armor: 83, sta: 2, int: 5, spi: 1 },
-    sellValue: 694,
+    sellValue: 540,
   },
   // Thornspire (Thornpeak Heights): item level 17, feet budget 4.
   thornspire_greaves: {
@@ -1505,7 +1505,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'uncommon',
     stats: { armor: 77, sta: 1, int: 3, spi: 1 },
-    sellValue: 501,
+    sellValue: 390,
   },
   // Thornspire (Thornpeak Heights): item level 17, helmet budget 6.
   thornspire_coif: {
@@ -1515,8 +1515,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 74, sta: 2, int: 5, spi: 1 },
-    sellValue: 655,
+    stats: { armor: 117, sta: 2, int: 5, spi: 1 },
+    sellValue: 510,
   },
   // Thornspire (Thornpeak Heights): item level 17, gloves budget 5.
   thornspire_handguards: {
@@ -1526,8 +1526,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 75, sta: 2, int: 4, spi: 1 },
-    sellValue: 539,
+    stats: { armor: 96, sta: 2, int: 4, spi: 1 },
+    sellValue: 420,
   },
   // Thornspire (Thornpeak Heights): item level 17, shoulder budget 5.
   thornspire_spaulders: {
@@ -1538,7 +1538,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'uncommon',
     stats: { armor: 63, sta: 2, int: 4, spi: 1 },
-    sellValue: 578,
+    sellValue: 450,
   },
   // Thornspire (Thornpeak Heights): item level 17, waist budget 5.
   thornspire_cord: {
@@ -1548,8 +1548,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 68, sta: 2, int: 4, spi: 1 },
-    sellValue: 539,
+    stats: { armor: 96, sta: 2, int: 4, spi: 1 },
+    sellValue: 420,
   },
   // Hollowveil (the Veiled Hollow and the Frostveil Reach): item level 19, chest budget 7.
   hollowveil_robe: {
@@ -1559,8 +1559,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 61, sta: 2, int: 5, spi: 2 },
-    sellValue: 963,
+    stats: { armor: 54, sta: 2, int: 5, spi: 2 },
+    sellValue: 1357,
   },
   // Hollowveil (the Veiled Hollow and the Frostveil Reach): item level 19, legs budget 7.
   hollowveil_leggings: {
@@ -1570,8 +1570,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'legs',
     quality: 'uncommon',
-    stats: { armor: 70, sta: 2, int: 5, spi: 2 },
-    sellValue: 866,
+    stats: { armor: 50, sta: 2, int: 5, spi: 2 },
+    sellValue: 1221,
   },
   // Hollowveil (the Veiled Hollow and the Frostveil Reach): item level 19, feet budget 5.
   hollowveil_slippers: {
@@ -1581,8 +1581,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'feet',
     quality: 'uncommon',
-    stats: { armor: 54, sta: 2, int: 4, spi: 1 },
-    sellValue: 626,
+    stats: { armor: 56, sta: 2, int: 4, spi: 1 },
+    sellValue: 882,
   },
   // Hollowveil (the Veiled Hollow and the Frostveil Reach): item level 19, helmet budget 6.
   hollowveil_hood: {
@@ -1592,8 +1592,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 52, sta: 2, int: 5, spi: 1 },
-    sellValue: 818,
+    stats: { armor: 46, sta: 2, int: 5, spi: 1 },
+    sellValue: 1154,
   },
   // Hollowveil (the Veiled Hollow and the Frostveil Reach): item level 19, gloves budget 5.
   hollowveil_gloves: {
@@ -1604,7 +1604,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'gloves',
     quality: 'uncommon',
     stats: { armor: 49, sta: 2, int: 4, spi: 1 },
-    sellValue: 674,
+    sellValue: 950,
   },
   // Hollowveil (the Veiled Hollow and the Frostveil Reach): item level 19, shoulder budget 5.
   hollowveil_mantle: {
@@ -1614,8 +1614,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'shoulder',
     quality: 'uncommon',
-    stats: { armor: 46, sta: 2, int: 4, spi: 1 },
-    sellValue: 722,
+    stats: { armor: 41, sta: 2, int: 4, spi: 1 },
+    sellValue: 1018,
   },
   // Hollowveil (the Veiled Hollow and the Frostveil Reach): item level 19, waist budget 5.
   hollowveil_sash: {
@@ -1625,8 +1625,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 41, sta: 2, int: 4, spi: 1 },
-    sellValue: 674,
+    stats: { armor: 38, sta: 2, int: 4, spi: 1 },
+    sellValue: 950,
   },
   // Hollowveil (the Veiled Hollow and the Frostveil Reach): item level 19, chest budget 7.
   hollowveil_jerkin: {
@@ -1636,8 +1636,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 109, agi: 5, sta: 2 },
-    sellValue: 963,
+    stats: { armor: 95, agi: 5, sta: 2 },
+    sellValue: 1357,
   },
   // Hollowveil (the Veiled Hollow and the Frostveil Reach): item level 19, legs budget 7.
   hollowveil_breeches: {
@@ -1648,7 +1648,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'legs',
     quality: 'uncommon',
     stats: { armor: 86, agi: 5, sta: 2 },
-    sellValue: 866,
+    sellValue: 1221,
   },
   // Hollowveil (the Veiled Hollow and the Frostveil Reach): item level 19, feet budget 5.
   hollowveil_boots: {
@@ -1659,7 +1659,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'uncommon',
     stats: { armor: 48, agi: 3, sta: 2 },
-    sellValue: 626,
+    sellValue: 882,
   },
   // Hollowveil (the Veiled Hollow and the Frostveil Reach): item level 19, helmet budget 6.
   hollowveil_cap: {
@@ -1669,8 +1669,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 45, agi: 4, sta: 2 },
-    sellValue: 818,
+    stats: { armor: 81, agi: 4, sta: 2 },
+    sellValue: 1154,
   },
   // Hollowveil (the Veiled Hollow and the Frostveil Reach): item level 19, gloves budget 5.
   hollowveil_grips: {
@@ -1680,8 +1680,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 65, agi: 3, sta: 2 },
-    sellValue: 674,
+    stats: { armor: 67, agi: 3, sta: 2 },
+    sellValue: 950,
   },
   // Hollowveil (the Veiled Hollow and the Frostveil Reach): item level 19, shoulder budget 5.
   hollowveil_shoulderpads: {
@@ -1691,8 +1691,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'shoulder',
     quality: 'uncommon',
-    stats: { armor: 52, agi: 3, sta: 2 },
-    sellValue: 722,
+    stats: { armor: 71, agi: 3, sta: 2 },
+    sellValue: 1018,
   },
   // Hollowveil (the Veiled Hollow and the Frostveil Reach): item level 19, waist budget 5.
   hollowveil_belt: {
@@ -1702,8 +1702,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 46, agi: 3, sta: 2 },
-    sellValue: 674,
+    stats: { armor: 67, agi: 3, sta: 2 },
+    sellValue: 950,
   },
   // Hollowveil (the Veiled Hollow and the Frostveil Reach): item level 19, chest budget 7.
   hollowveil_hauberk: {
@@ -1713,8 +1713,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 161, str: 4, agi: 1, sta: 2 },
-    sellValue: 963,
+    stats: { armor: 105, str: 4, agi: 1, sta: 2 },
+    sellValue: 1357,
   },
   // Hollowveil (the Veiled Hollow and the Frostveil Reach): item level 19, legs budget 7.
   hollowveil_legguards: {
@@ -1725,7 +1725,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'legs',
     quality: 'uncommon',
     stats: { armor: 93, str: 4, agi: 1, sta: 2 },
-    sellValue: 866,
+    sellValue: 1221,
   },
   // Hollowveil (the Veiled Hollow and the Frostveil Reach): item level 19, feet budget 5.
   hollowveil_sabatons: {
@@ -1736,7 +1736,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'uncommon',
     stats: { armor: 86, str: 2, agi: 1, sta: 2 },
-    sellValue: 626,
+    sellValue: 882,
   },
   // Hollowveil (the Veiled Hollow and the Frostveil Reach): item level 19, helmet budget 6.
   hollowveil_helm: {
@@ -1746,8 +1746,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 83, str: 3, agi: 1, sta: 2 },
-    sellValue: 818,
+    stats: { armor: 89, str: 3, agi: 1, sta: 2 },
+    sellValue: 1154,
   },
   // Hollowveil (the Veiled Hollow and the Frostveil Reach): item level 19, gloves budget 5.
   hollowveil_gauntlets: {
@@ -1757,8 +1757,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 84, str: 2, agi: 1, sta: 2 },
-    sellValue: 674,
+    stats: { armor: 73, str: 2, agi: 1, sta: 2 },
+    sellValue: 950,
   },
   // Hollowveil (the Veiled Hollow and the Frostveil Reach): item level 19, shoulder budget 5.
   hollowveil_pauldrons: {
@@ -1769,7 +1769,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'uncommon',
     stats: { armor: 71, str: 2, agi: 1, sta: 2 },
-    sellValue: 722,
+    sellValue: 1018,
   },
   // Hollowveil (the Veiled Hollow and the Frostveil Reach): item level 19, waist budget 5.
   hollowveil_girdle: {
@@ -1779,8 +1779,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 76, str: 2, agi: 1, sta: 2 },
-    sellValue: 674,
+    stats: { armor: 73, str: 2, agi: 1, sta: 2 },
+    sellValue: 950,
   },
   // Hollowveil (the Veiled Hollow and the Frostveil Reach): item level 19, chest budget 7.
   hollowveil_chainmail: {
@@ -1790,8 +1790,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 161, sta: 2, int: 5, spi: 2 },
-    sellValue: 963,
+    stats: { armor: 105, sta: 2, int: 5, spi: 2 },
+    sellValue: 1357,
   },
   // Hollowveil (the Veiled Hollow and the Frostveil Reach): item level 19, legs budget 7.
   hollowveil_chausses: {
@@ -1802,7 +1802,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'legs',
     quality: 'uncommon',
     stats: { armor: 93, sta: 2, int: 5, spi: 2 },
-    sellValue: 866,
+    sellValue: 1221,
   },
   // Hollowveil (the Veiled Hollow and the Frostveil Reach): item level 19, feet budget 5.
   hollowveil_greaves: {
@@ -1813,7 +1813,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'uncommon',
     stats: { armor: 86, sta: 2, int: 4, spi: 1 },
-    sellValue: 626,
+    sellValue: 882,
   },
   // Hollowveil (the Veiled Hollow and the Frostveil Reach): item level 19, helmet budget 6.
   hollowveil_coif: {
@@ -1823,8 +1823,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 83, sta: 2, int: 5, spi: 1 },
-    sellValue: 818,
+    stats: { armor: 89, sta: 2, int: 5, spi: 1 },
+    sellValue: 1154,
   },
   // Hollowveil (the Veiled Hollow and the Frostveil Reach): item level 19, gloves budget 5.
   hollowveil_handguards: {
@@ -1834,8 +1834,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 84, sta: 2, int: 4, spi: 1 },
-    sellValue: 674,
+    stats: { armor: 73, sta: 2, int: 4, spi: 1 },
+    sellValue: 950,
   },
   // Hollowveil (the Veiled Hollow and the Frostveil Reach): item level 19, shoulder budget 5.
   hollowveil_spaulders: {
@@ -1846,7 +1846,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'uncommon',
     stats: { armor: 71, sta: 2, int: 4, spi: 1 },
-    sellValue: 722,
+    sellValue: 1018,
   },
   // Hollowveil (the Veiled Hollow and the Frostveil Reach): item level 19, waist budget 5.
   hollowveil_cord: {
@@ -1856,316 +1856,316 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 76, sta: 2, int: 4, spi: 1 },
-    sellValue: 674,
+    stats: { armor: 73, sta: 2, int: 4, spi: 1 },
+    sellValue: 950,
   },
-  // Roadwarden (the frontier roads): item level 20, chest budget 8.
-  roadwarden_robe: {
-    id: 'roadwarden_robe',
-    name: 'Roadwarden Robe',
+  // Trailwarden (the frontier trails): item level 20, chest budget 8.
+  trailwarden_robe: {
+    id: 'trailwarden_robe',
+    name: 'Trailwarden Robe',
     kind: 'armor',
     armorType: 'cloth',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 64, sta: 3, int: 6, spi: 2 },
-    sellValue: 1067,
+    stats: { armor: 57, sta: 3, int: 6, spi: 2 },
+    sellValue: 1385,
   },
-  // Roadwarden (the frontier roads): item level 20, legs budget 7.
-  roadwarden_leggings: {
-    id: 'roadwarden_leggings',
-    name: 'Roadwarden Leggings',
+  // Trailwarden (the frontier trails): item level 20, legs budget 7.
+  trailwarden_leggings: {
+    id: 'trailwarden_leggings',
+    name: 'Trailwarden Leggings',
     kind: 'armor',
     armorType: 'cloth',
     slot: 'legs',
     quality: 'uncommon',
-    stats: { armor: 74, sta: 2, int: 5, spi: 2 },
-    sellValue: 960,
+    stats: { armor: 52, sta: 2, int: 5, spi: 2 },
+    sellValue: 1246,
   },
-  // Roadwarden (the frontier roads): item level 20, feet budget 5.
-  roadwarden_slippers: {
-    id: 'roadwarden_slippers',
-    name: 'Roadwarden Slippers',
+  // Trailwarden (the frontier trails): item level 20, feet budget 5.
+  trailwarden_slippers: {
+    id: 'trailwarden_slippers',
+    name: 'Trailwarden Slippers',
     kind: 'armor',
     armorType: 'cloth',
     slot: 'feet',
     quality: 'uncommon',
-    stats: { armor: 57, sta: 2, int: 4, spi: 1 },
-    sellValue: 693,
+    stats: { armor: 59, sta: 2, int: 4, spi: 1 },
+    sellValue: 900,
   },
-  // Roadwarden (the frontier roads): item level 20, helmet budget 7.
-  roadwarden_hood: {
-    id: 'roadwarden_hood',
-    name: 'Roadwarden Hood',
+  // Trailwarden (the frontier trails): item level 20, helmet budget 7.
+  trailwarden_hood: {
+    id: 'trailwarden_hood',
+    name: 'Trailwarden Hood',
     kind: 'armor',
     armorType: 'cloth',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 55, sta: 2, int: 5, spi: 2 },
-    sellValue: 907,
+    stats: { armor: 49, sta: 2, int: 5, spi: 2 },
+    sellValue: 1177,
   },
-  // Roadwarden (the frontier roads): item level 20, gloves budget 5.
-  roadwarden_gloves: {
-    id: 'roadwarden_gloves',
-    name: 'Roadwarden Gloves',
+  // Trailwarden (the frontier trails): item level 20, gloves budget 5.
+  trailwarden_gloves: {
+    id: 'trailwarden_gloves',
+    name: 'Trailwarden Gloves',
     kind: 'armor',
     armorType: 'cloth',
     slot: 'gloves',
     quality: 'uncommon',
     stats: { armor: 51, sta: 2, int: 4, spi: 1 },
-    sellValue: 747,
+    sellValue: 969,
   },
-  // Roadwarden (the frontier roads): item level 20, shoulder budget 6.
-  roadwarden_mantle: {
-    id: 'roadwarden_mantle',
-    name: 'Roadwarden Mantle',
+  // Trailwarden (the frontier trails): item level 20, shoulder budget 6.
+  trailwarden_mantle: {
+    id: 'trailwarden_mantle',
+    name: 'Trailwarden Mantle',
     kind: 'armor',
     armorType: 'cloth',
     slot: 'shoulder',
     quality: 'uncommon',
-    stats: { armor: 48, sta: 2, int: 5, spi: 1 },
-    sellValue: 800,
+    stats: { armor: 43, sta: 2, int: 5, spi: 1 },
+    sellValue: 1038,
   },
-  // Roadwarden (the frontier roads): item level 20, waist budget 5.
-  roadwarden_sash: {
-    id: 'roadwarden_sash',
-    name: 'Roadwarden Sash',
+  // Trailwarden (the frontier trails): item level 20, waist budget 5.
+  trailwarden_sash: {
+    id: 'trailwarden_sash',
+    name: 'Trailwarden Sash',
     kind: 'armor',
     armorType: 'cloth',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 43, sta: 2, int: 4, spi: 1 },
-    sellValue: 747,
+    stats: { armor: 40, sta: 2, int: 4, spi: 1 },
+    sellValue: 969,
   },
-  // Roadwarden (the frontier roads): item level 20, chest budget 8.
-  roadwarden_jerkin: {
-    id: 'roadwarden_jerkin',
-    name: 'Roadwarden Jerkin',
+  // Trailwarden (the frontier trails): item level 20, chest budget 8.
+  trailwarden_jerkin: {
+    id: 'trailwarden_jerkin',
+    name: 'Trailwarden Jerkin',
     kind: 'armor',
     armorType: 'leather',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 114, agi: 5, sta: 3 },
-    sellValue: 1067,
+    stats: { armor: 100, agi: 5, sta: 3 },
+    sellValue: 1385,
   },
-  // Roadwarden (the frontier roads): item level 20, legs budget 7.
-  roadwarden_breeches: {
-    id: 'roadwarden_breeches',
-    name: 'Roadwarden Breeches',
+  // Trailwarden (the frontier trails): item level 20, legs budget 7.
+  trailwarden_breeches: {
+    id: 'trailwarden_breeches',
+    name: 'Trailwarden Breeches',
     kind: 'armor',
     armorType: 'leather',
     slot: 'legs',
     quality: 'uncommon',
     stats: { armor: 90, agi: 5, sta: 2 },
-    sellValue: 960,
+    sellValue: 1246,
   },
-  // Roadwarden (the frontier roads): item level 20, feet budget 5.
-  roadwarden_boots: {
-    id: 'roadwarden_boots',
-    name: 'Roadwarden Boots',
+  // Trailwarden (the frontier trails): item level 20, feet budget 5.
+  trailwarden_boots: {
+    id: 'trailwarden_boots',
+    name: 'Trailwarden Boots',
     kind: 'armor',
     armorType: 'leather',
     slot: 'feet',
     quality: 'uncommon',
     stats: { armor: 51, agi: 3, sta: 2 },
-    sellValue: 693,
+    sellValue: 900,
   },
-  // Roadwarden (the frontier roads): item level 20, helmet budget 7.
-  roadwarden_cap: {
-    id: 'roadwarden_cap',
-    name: 'Roadwarden Cap',
+  // Trailwarden (the frontier trails): item level 20, helmet budget 7.
+  trailwarden_cap: {
+    id: 'trailwarden_cap',
+    name: 'Trailwarden Cap',
     kind: 'armor',
     armorType: 'leather',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 48, agi: 5, sta: 2 },
-    sellValue: 907,
+    stats: { armor: 85, agi: 5, sta: 2 },
+    sellValue: 1177,
   },
-  // Roadwarden (the frontier roads): item level 20, gloves budget 5.
-  roadwarden_grips: {
-    id: 'roadwarden_grips',
-    name: 'Roadwarden Grips',
+  // Trailwarden (the frontier trails): item level 20, gloves budget 5.
+  trailwarden_grips: {
+    id: 'trailwarden_grips',
+    name: 'Trailwarden Grips',
     kind: 'armor',
     armorType: 'leather',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 69, agi: 3, sta: 2 },
-    sellValue: 747,
+    stats: { armor: 70, agi: 3, sta: 2 },
+    sellValue: 969,
   },
-  // Roadwarden (the frontier roads): item level 20, shoulder budget 6.
-  roadwarden_shoulderpads: {
-    id: 'roadwarden_shoulderpads',
-    name: 'Roadwarden Shoulderpads',
+  // Trailwarden (the frontier trails): item level 20, shoulder budget 6.
+  trailwarden_shoulderpads: {
+    id: 'trailwarden_shoulderpads',
+    name: 'Trailwarden Shoulderpads',
     kind: 'armor',
     armorType: 'leather',
     slot: 'shoulder',
     quality: 'uncommon',
-    stats: { armor: 55, agi: 4, sta: 2 },
-    sellValue: 800,
+    stats: { armor: 75, agi: 4, sta: 2 },
+    sellValue: 1038,
   },
-  // Roadwarden (the frontier roads): item level 20, waist budget 5.
-  roadwarden_belt: {
-    id: 'roadwarden_belt',
-    name: 'Roadwarden Belt',
+  // Trailwarden (the frontier trails): item level 20, waist budget 5.
+  trailwarden_belt: {
+    id: 'trailwarden_belt',
+    name: 'Trailwarden Belt',
     kind: 'armor',
     armorType: 'leather',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 48, agi: 3, sta: 2 },
-    sellValue: 747,
+    stats: { armor: 70, agi: 3, sta: 2 },
+    sellValue: 969,
   },
-  // Roadwarden (the frontier roads): item level 20, chest budget 8.
-  roadwarden_hauberk: {
-    id: 'roadwarden_hauberk',
-    name: 'Roadwarden Hauberk',
+  // Trailwarden (the frontier trails): item level 20, chest budget 8.
+  trailwarden_hauberk: {
+    id: 'trailwarden_hauberk',
+    name: 'Trailwarden Hauberk',
     kind: 'armor',
     armorType: 'mail',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 169, str: 4, agi: 1, sta: 3 },
-    sellValue: 1067,
+    stats: { armor: 110, str: 4, agi: 1, sta: 3 },
+    sellValue: 1385,
   },
-  // Roadwarden (the frontier roads): item level 20, legs budget 7.
-  roadwarden_legguards: {
-    id: 'roadwarden_legguards',
-    name: 'Roadwarden Legguards',
+  // Trailwarden (the frontier trails): item level 20, legs budget 7.
+  trailwarden_legguards: {
+    id: 'trailwarden_legguards',
+    name: 'Trailwarden Legguards',
     kind: 'armor',
     armorType: 'mail',
     slot: 'legs',
     quality: 'uncommon',
     stats: { armor: 98, str: 4, agi: 1, sta: 2 },
-    sellValue: 960,
+    sellValue: 1246,
   },
-  // Roadwarden (the frontier roads): item level 20, feet budget 5.
-  roadwarden_sabatons: {
-    id: 'roadwarden_sabatons',
-    name: 'Roadwarden Sabatons',
+  // Trailwarden (the frontier trails): item level 20, feet budget 5.
+  trailwarden_sabatons: {
+    id: 'trailwarden_sabatons',
+    name: 'Trailwarden Sabatons',
     kind: 'armor',
     armorType: 'mail',
     slot: 'feet',
     quality: 'uncommon',
     stats: { armor: 90, str: 2, agi: 1, sta: 2 },
-    sellValue: 693,
+    sellValue: 900,
   },
-  // Roadwarden (the frontier roads): item level 20, helmet budget 7.
-  roadwarden_helm: {
-    id: 'roadwarden_helm',
-    name: 'Roadwarden Helm',
+  // Trailwarden (the frontier trails): item level 20, helmet budget 7.
+  trailwarden_helm: {
+    id: 'trailwarden_helm',
+    name: 'Trailwarden Helm',
     kind: 'armor',
     armorType: 'mail',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 87, str: 4, agi: 1, sta: 2 },
-    sellValue: 907,
+    stats: { armor: 94, str: 4, agi: 1, sta: 2 },
+    sellValue: 1177,
   },
-  // Roadwarden (the frontier roads): item level 20, gloves budget 5.
-  roadwarden_gauntlets: {
-    id: 'roadwarden_gauntlets',
-    name: 'Roadwarden Gauntlets',
+  // Trailwarden (the frontier trails): item level 20, gloves budget 5.
+  trailwarden_gauntlets: {
+    id: 'trailwarden_gauntlets',
+    name: 'Trailwarden Gauntlets',
     kind: 'armor',
     armorType: 'mail',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 88, str: 2, agi: 1, sta: 2 },
-    sellValue: 747,
+    stats: { armor: 77, str: 2, agi: 1, sta: 2 },
+    sellValue: 969,
   },
-  // Roadwarden (the frontier roads): item level 20, shoulder budget 6.
-  roadwarden_pauldrons: {
-    id: 'roadwarden_pauldrons',
-    name: 'Roadwarden Pauldrons',
+  // Trailwarden (the frontier trails): item level 20, shoulder budget 6.
+  trailwarden_pauldrons: {
+    id: 'trailwarden_pauldrons',
+    name: 'Trailwarden Pauldrons',
     kind: 'armor',
     armorType: 'mail',
     slot: 'shoulder',
     quality: 'uncommon',
     stats: { armor: 75, str: 3, agi: 1, sta: 2 },
-    sellValue: 800,
+    sellValue: 1038,
   },
-  // Roadwarden (the frontier roads): item level 20, waist budget 5.
-  roadwarden_girdle: {
-    id: 'roadwarden_girdle',
-    name: 'Roadwarden Girdle',
+  // Trailwarden (the frontier trails): item level 20, waist budget 5.
+  trailwarden_girdle: {
+    id: 'trailwarden_girdle',
+    name: 'Trailwarden Girdle',
     kind: 'armor',
     armorType: 'mail',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 80, str: 2, agi: 1, sta: 2 },
-    sellValue: 747,
+    stats: { armor: 77, str: 2, agi: 1, sta: 2 },
+    sellValue: 969,
   },
-  // Roadwarden (the frontier roads): item level 20, chest budget 8.
-  roadwarden_chainmail: {
-    id: 'roadwarden_chainmail',
-    name: 'Roadwarden Chainmail',
+  // Trailwarden (the frontier trails): item level 20, chest budget 8.
+  trailwarden_chainmail: {
+    id: 'trailwarden_chainmail',
+    name: 'Trailwarden Chainmail',
     kind: 'armor',
     armorType: 'mail',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 169, sta: 3, int: 6, spi: 2 },
-    sellValue: 1067,
+    stats: { armor: 110, sta: 3, int: 6, spi: 2 },
+    sellValue: 1385,
   },
-  // Roadwarden (the frontier roads): item level 20, legs budget 7.
-  roadwarden_chausses: {
-    id: 'roadwarden_chausses',
-    name: 'Roadwarden Chausses',
+  // Trailwarden (the frontier trails): item level 20, legs budget 7.
+  trailwarden_chausses: {
+    id: 'trailwarden_chausses',
+    name: 'Trailwarden Chausses',
     kind: 'armor',
     armorType: 'mail',
     slot: 'legs',
     quality: 'uncommon',
     stats: { armor: 98, sta: 2, int: 5, spi: 2 },
-    sellValue: 960,
+    sellValue: 1246,
   },
-  // Roadwarden (the frontier roads): item level 20, feet budget 5.
-  roadwarden_greaves: {
-    id: 'roadwarden_greaves',
-    name: 'Roadwarden Greaves',
+  // Trailwarden (the frontier trails): item level 20, feet budget 5.
+  trailwarden_greaves: {
+    id: 'trailwarden_greaves',
+    name: 'Trailwarden Greaves',
     kind: 'armor',
     armorType: 'mail',
     slot: 'feet',
     quality: 'uncommon',
     stats: { armor: 90, sta: 2, int: 4, spi: 1 },
-    sellValue: 693,
+    sellValue: 900,
   },
-  // Roadwarden (the frontier roads): item level 20, helmet budget 7.
-  roadwarden_coif: {
-    id: 'roadwarden_coif',
-    name: 'Roadwarden Coif',
+  // Trailwarden (the frontier trails): item level 20, helmet budget 7.
+  trailwarden_coif: {
+    id: 'trailwarden_coif',
+    name: 'Trailwarden Coif',
     kind: 'armor',
     armorType: 'mail',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 87, sta: 2, int: 5, spi: 2 },
-    sellValue: 907,
+    stats: { armor: 94, sta: 2, int: 5, spi: 2 },
+    sellValue: 1177,
   },
-  // Roadwarden (the frontier roads): item level 20, gloves budget 5.
-  roadwarden_handguards: {
-    id: 'roadwarden_handguards',
-    name: 'Roadwarden Handguards',
+  // Trailwarden (the frontier trails): item level 20, gloves budget 5.
+  trailwarden_handguards: {
+    id: 'trailwarden_handguards',
+    name: 'Trailwarden Handguards',
     kind: 'armor',
     armorType: 'mail',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 88, sta: 2, int: 4, spi: 1 },
-    sellValue: 747,
+    stats: { armor: 77, sta: 2, int: 4, spi: 1 },
+    sellValue: 969,
   },
-  // Roadwarden (the frontier roads): item level 20, shoulder budget 6.
-  roadwarden_spaulders: {
-    id: 'roadwarden_spaulders',
-    name: 'Roadwarden Spaulders',
+  // Trailwarden (the frontier trails): item level 20, shoulder budget 6.
+  trailwarden_spaulders: {
+    id: 'trailwarden_spaulders',
+    name: 'Trailwarden Spaulders',
     kind: 'armor',
     armorType: 'mail',
     slot: 'shoulder',
     quality: 'uncommon',
     stats: { armor: 75, sta: 2, int: 5, spi: 1 },
-    sellValue: 800,
+    sellValue: 1038,
   },
-  // Roadwarden (the frontier roads): item level 20, waist budget 5.
-  roadwarden_cord: {
-    id: 'roadwarden_cord',
-    name: 'Roadwarden Cord',
+  // Trailwarden (the frontier trails): item level 20, waist budget 5.
+  trailwarden_cord: {
+    id: 'trailwarden_cord',
+    name: 'Trailwarden Cord',
     kind: 'armor',
     armorType: 'mail',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 80, sta: 2, int: 4, spi: 1 },
-    sellValue: 747,
+    stats: { armor: 77, sta: 2, int: 4, spi: 1 },
+    sellValue: 969,
   },
   // Highgale (the Galecrest and the outer reaches): item level 21, chest budget 8.
   highgale_robe: {
@@ -2175,8 +2175,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 68, sta: 3, int: 6, spi: 2 },
-    sellValue: 1176,
+    stats: { armor: 60, sta: 3, int: 6, spi: 2 },
+    sellValue: 1357,
   },
   // Highgale (the Galecrest and the outer reaches): item level 21, legs budget 7.
   highgale_leggings: {
@@ -2186,8 +2186,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'legs',
     quality: 'uncommon',
-    stats: { armor: 78, sta: 2, int: 5, spi: 2 },
-    sellValue: 1058,
+    stats: { armor: 55, sta: 2, int: 5, spi: 2 },
+    sellValue: 1221,
   },
   // Highgale (the Galecrest and the outer reaches): item level 21, feet budget 5.
   highgale_slippers: {
@@ -2197,10 +2197,10 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'feet',
     quality: 'uncommon',
-    stats: { armor: 60, sta: 2, int: 4, spi: 1 },
-    sellValue: 764,
+    stats: { armor: 62, sta: 2, int: 4, spi: 1 },
+    sellValue: 882,
   },
-  // Highgale (the Galecrest and the outer reaches): item level 24, helmet budget 8.
+  // Highgale (the Galecrest and the outer reaches): item level 21, helmet budget 7.
   highgale_hood: {
     id: 'highgale_hood',
     name: 'Highgale Hood',
@@ -2208,8 +2208,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 66, sta: 3, int: 6, spi: 2 },
-    sellValue: 1306,
+    stats: { armor: 51, sta: 2, int: 5, spi: 2 },
+    sellValue: 1154,
   },
   // Highgale (the Galecrest and the outer reaches): item level 21, gloves budget 6.
   highgale_gloves: {
@@ -2220,7 +2220,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'gloves',
     quality: 'uncommon',
     stats: { armor: 54, sta: 2, int: 5, spi: 1 },
-    sellValue: 823,
+    sellValue: 950,
   },
   // Highgale (the Galecrest and the outer reaches): item level 21, shoulder budget 6.
   highgale_mantle: {
@@ -2230,8 +2230,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'shoulder',
     quality: 'uncommon',
-    stats: { armor: 51, sta: 2, int: 5, spi: 1 },
-    sellValue: 882,
+    stats: { armor: 45, sta: 2, int: 5, spi: 1 },
+    sellValue: 1018,
   },
   // Highgale (the Galecrest and the outer reaches): item level 21, waist budget 6.
   highgale_sash: {
@@ -2241,8 +2241,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 45, sta: 2, int: 5, spi: 1 },
-    sellValue: 823,
+    stats: { armor: 42, sta: 2, int: 5, spi: 1 },
+    sellValue: 950,
   },
   // Highgale (the Galecrest and the outer reaches): item level 21, chest budget 8.
   highgale_jerkin: {
@@ -2252,8 +2252,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 120, agi: 5, sta: 3 },
-    sellValue: 1176,
+    stats: { armor: 105, agi: 5, sta: 3 },
+    sellValue: 1357,
   },
   // Highgale (the Galecrest and the outer reaches): item level 21, legs budget 7.
   highgale_breeches: {
@@ -2264,7 +2264,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'legs',
     quality: 'uncommon',
     stats: { armor: 95, agi: 5, sta: 2 },
-    sellValue: 1058,
+    sellValue: 1221,
   },
   // Highgale (the Galecrest and the outer reaches): item level 21, feet budget 5.
   highgale_boots: {
@@ -2275,9 +2275,9 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'uncommon',
     stats: { armor: 53, agi: 3, sta: 2 },
-    sellValue: 764,
+    sellValue: 882,
   },
-  // Highgale (the Galecrest and the outer reaches): item level 24, helmet budget 8.
+  // Highgale (the Galecrest and the outer reaches): item level 21, helmet budget 7.
   highgale_cap: {
     id: 'highgale_cap',
     name: 'Highgale Cap',
@@ -2285,8 +2285,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 57, agi: 5, sta: 3 },
-    sellValue: 1306,
+    stats: { armor: 89, agi: 5, sta: 2 },
+    sellValue: 1154,
   },
   // Highgale (the Galecrest and the outer reaches): item level 21, gloves budget 6.
   highgale_grips: {
@@ -2296,8 +2296,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 72, agi: 4, sta: 2 },
-    sellValue: 823,
+    stats: { armor: 74, agi: 4, sta: 2 },
+    sellValue: 950,
   },
   // Highgale (the Galecrest and the outer reaches): item level 21, shoulder budget 6.
   highgale_shoulderpads: {
@@ -2307,8 +2307,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'shoulder',
     quality: 'uncommon',
-    stats: { armor: 58, agi: 4, sta: 2 },
-    sellValue: 882,
+    stats: { armor: 79, agi: 4, sta: 2 },
+    sellValue: 1018,
   },
   // Highgale (the Galecrest and the outer reaches): item level 21, waist budget 6.
   highgale_belt: {
@@ -2318,8 +2318,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 50, agi: 4, sta: 2 },
-    sellValue: 823,
+    stats: { armor: 74, agi: 4, sta: 2 },
+    sellValue: 950,
   },
   // Highgale (the Galecrest and the outer reaches): item level 21, chest budget 8.
   highgale_hauberk: {
@@ -2329,8 +2329,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 178, str: 4, agi: 1, sta: 3 },
-    sellValue: 1176,
+    stats: { armor: 116, str: 4, agi: 1, sta: 3 },
+    sellValue: 1357,
   },
   // Highgale (the Galecrest and the outer reaches): item level 21, legs budget 7.
   highgale_legguards: {
@@ -2341,7 +2341,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'legs',
     quality: 'uncommon',
     stats: { armor: 102, str: 4, agi: 1, sta: 2 },
-    sellValue: 1058,
+    sellValue: 1221,
   },
   // Highgale (the Galecrest and the outer reaches): item level 21, feet budget 5.
   highgale_sabatons: {
@@ -2352,9 +2352,9 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'uncommon',
     stats: { armor: 95, str: 2, agi: 1, sta: 2 },
-    sellValue: 764,
+    sellValue: 882,
   },
-  // Highgale (the Galecrest and the outer reaches): item level 24, helmet budget 8.
+  // Highgale (the Galecrest and the outer reaches): item level 21, helmet budget 7.
   highgale_helm: {
     id: 'highgale_helm',
     name: 'Highgale Helm',
@@ -2362,8 +2362,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 105, str: 4, agi: 1, sta: 3 },
-    sellValue: 1306,
+    stats: { armor: 98, str: 4, agi: 1, sta: 2 },
+    sellValue: 1154,
   },
   // Highgale (the Galecrest and the outer reaches): item level 21, gloves budget 6.
   highgale_gauntlets: {
@@ -2373,8 +2373,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 92, str: 3, agi: 1, sta: 2 },
-    sellValue: 823,
+    stats: { armor: 81, str: 3, agi: 1, sta: 2 },
+    sellValue: 950,
   },
   // Highgale (the Galecrest and the outer reaches): item level 21, shoulder budget 6.
   highgale_pauldrons: {
@@ -2385,7 +2385,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'uncommon',
     stats: { armor: 78, str: 3, agi: 1, sta: 2 },
-    sellValue: 882,
+    sellValue: 1018,
   },
   // Highgale (the Galecrest and the outer reaches): item level 21, waist budget 6.
   highgale_girdle: {
@@ -2395,8 +2395,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 84, str: 3, agi: 1, sta: 2 },
-    sellValue: 823,
+    stats: { armor: 81, str: 3, agi: 1, sta: 2 },
+    sellValue: 950,
   },
   // Highgale (the Galecrest and the outer reaches): item level 21, chest budget 8.
   highgale_chainmail: {
@@ -2406,8 +2406,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 178, sta: 3, int: 6, spi: 2 },
-    sellValue: 1176,
+    stats: { armor: 116, sta: 3, int: 6, spi: 2 },
+    sellValue: 1357,
   },
   // Highgale (the Galecrest and the outer reaches): item level 21, legs budget 7.
   highgale_chausses: {
@@ -2418,7 +2418,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'legs',
     quality: 'uncommon',
     stats: { armor: 102, sta: 2, int: 5, spi: 2 },
-    sellValue: 1058,
+    sellValue: 1221,
   },
   // Highgale (the Galecrest and the outer reaches): item level 21, feet budget 5.
   highgale_greaves: {
@@ -2429,9 +2429,9 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     quality: 'uncommon',
     stats: { armor: 95, sta: 2, int: 4, spi: 1 },
-    sellValue: 764,
+    sellValue: 882,
   },
-  // Highgale (the Galecrest and the outer reaches): item level 24, helmet budget 8.
+  // Highgale (the Galecrest and the outer reaches): item level 21, helmet budget 7.
   highgale_coif: {
     id: 'highgale_coif',
     name: 'Highgale Coif',
@@ -2439,8 +2439,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 105, sta: 3, int: 6, spi: 2 },
-    sellValue: 1306,
+    stats: { armor: 98, sta: 2, int: 5, spi: 2 },
+    sellValue: 1154,
   },
   // Highgale (the Galecrest and the outer reaches): item level 21, gloves budget 6.
   highgale_handguards: {
@@ -2450,8 +2450,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 92, sta: 2, int: 5, spi: 1 },
-    sellValue: 823,
+    stats: { armor: 81, sta: 2, int: 5, spi: 1 },
+    sellValue: 950,
   },
   // Highgale (the Galecrest and the outer reaches): item level 21, shoulder budget 6.
   highgale_spaulders: {
@@ -2462,7 +2462,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'uncommon',
     stats: { armor: 78, sta: 2, int: 5, spi: 1 },
-    sellValue: 882,
+    sellValue: 1018,
   },
   // Highgale (the Galecrest and the outer reaches): item level 21, waist budget 6.
   highgale_cord: {
@@ -2472,7 +2472,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'waist',
     quality: 'uncommon',
-    stats: { armor: 84, sta: 2, int: 5, spi: 1 },
-    sellValue: 823,
+    stats: { armor: 81, sta: 2, int: 5, spi: 1 },
+    sellValue: 950,
   },
 };

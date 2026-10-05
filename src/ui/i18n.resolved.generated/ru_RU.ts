@@ -18958,89 +18958,89 @@ export const ru_RU: EnTranslations = {
       "hollowveil_cord": {
         "name": "Шнур сокрытой лощины"
       },
-      "roadwarden_robe": {
-        "name": "Одеяние дорожного стража"
+      "trailwarden_robe": {
+        "name": "Одеяние стража троп"
       },
-      "roadwarden_leggings": {
-        "name": "Штаны дорожного стража"
+      "trailwarden_leggings": {
+        "name": "Штаны стража троп"
       },
-      "roadwarden_slippers": {
-        "name": "Туфли дорожного стража"
+      "trailwarden_slippers": {
+        "name": "Туфли стража троп"
       },
-      "roadwarden_hood": {
-        "name": "Капюшон дорожного стража"
+      "trailwarden_hood": {
+        "name": "Капюшон стража троп"
       },
-      "roadwarden_gloves": {
-        "name": "Перчатки дорожного стража"
+      "trailwarden_gloves": {
+        "name": "Перчатки стража троп"
       },
-      "roadwarden_mantle": {
-        "name": "Оплечье дорожного стража"
+      "trailwarden_mantle": {
+        "name": "Оплечье стража троп"
       },
-      "roadwarden_sash": {
-        "name": "Кушак дорожного стража"
+      "trailwarden_sash": {
+        "name": "Кушак стража троп"
       },
-      "roadwarden_jerkin": {
-        "name": "Куртка дорожного стража"
+      "trailwarden_jerkin": {
+        "name": "Куртка стража троп"
       },
-      "roadwarden_breeches": {
-        "name": "Бриджи дорожного стража"
+      "trailwarden_breeches": {
+        "name": "Бриджи стража троп"
       },
-      "roadwarden_boots": {
-        "name": "Сапоги дорожного стража"
+      "trailwarden_boots": {
+        "name": "Сапоги стража троп"
       },
-      "roadwarden_cap": {
-        "name": "Шапка дорожного стража"
+      "trailwarden_cap": {
+        "name": "Шапка стража троп"
       },
-      "roadwarden_grips": {
-        "name": "Хваты дорожного стража"
+      "trailwarden_grips": {
+        "name": "Хваты стража троп"
       },
-      "roadwarden_shoulderpads": {
-        "name": "Плечевые накладки дорожного стража"
+      "trailwarden_shoulderpads": {
+        "name": "Плечевые накладки стража троп"
       },
-      "roadwarden_belt": {
-        "name": "Ремень дорожного стража"
+      "trailwarden_belt": {
+        "name": "Ремень стража троп"
       },
-      "roadwarden_hauberk": {
-        "name": "Хауберк дорожного стража"
+      "trailwarden_hauberk": {
+        "name": "Хауберк стража троп"
       },
-      "roadwarden_legguards": {
-        "name": "Набедренники дорожного стража"
+      "trailwarden_legguards": {
+        "name": "Набедренники стража троп"
       },
-      "roadwarden_sabatons": {
-        "name": "Сабатоны дорожного стража"
+      "trailwarden_sabatons": {
+        "name": "Сабатоны стража троп"
       },
-      "roadwarden_helm": {
-        "name": "Шлем дорожного стража"
+      "trailwarden_helm": {
+        "name": "Шлем стража троп"
       },
-      "roadwarden_gauntlets": {
-        "name": "Рукавицы дорожного стража"
+      "trailwarden_gauntlets": {
+        "name": "Рукавицы стража троп"
       },
-      "roadwarden_pauldrons": {
-        "name": "Наплечья дорожного стража"
+      "trailwarden_pauldrons": {
+        "name": "Наплечья стража троп"
       },
-      "roadwarden_girdle": {
-        "name": "Пояс дорожного стража"
+      "trailwarden_girdle": {
+        "name": "Пояс стража троп"
       },
-      "roadwarden_chainmail": {
-        "name": "Кольчуга дорожного стража"
+      "trailwarden_chainmail": {
+        "name": "Кольчуга стража троп"
       },
-      "roadwarden_chausses": {
-        "name": "Шоссы дорожного стража"
+      "trailwarden_chausses": {
+        "name": "Шоссы стража троп"
       },
-      "roadwarden_greaves": {
-        "name": "Наголенники дорожного стража"
+      "trailwarden_greaves": {
+        "name": "Наголенники стража троп"
       },
-      "roadwarden_coif": {
-        "name": "Койф дорожного стража"
+      "trailwarden_coif": {
+        "name": "Койф стража троп"
       },
-      "roadwarden_handguards": {
-        "name": "Латные перчатки дорожного стража"
+      "trailwarden_handguards": {
+        "name": "Латные перчатки стража троп"
       },
-      "roadwarden_spaulders": {
-        "name": "Наплечники дорожного стража"
+      "trailwarden_spaulders": {
+        "name": "Наплечники стража троп"
       },
-      "roadwarden_cord": {
-        "name": "Шнур дорожного стража"
+      "trailwarden_cord": {
+        "name": "Шнур стража троп"
       },
       "highgale_robe": {
         "name": "Одеяние буревого гребня"

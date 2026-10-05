@@ -17,11 +17,27 @@
 // shipped catalog's median per item level for the armor type and slot.
 
 import { writeFileSync } from 'node:fs';
+import { QUEST_CHOICE_REWARDS } from '../src/sim/content/quest_choice_rewards';
+import { QUEST_LEVELING_GEAR_ITEMS } from '../src/sim/content/quest_leveling_gear';
 import { CAMPS, DUNGEONS, ITEMS, MOBS, NPCS, QUEST_ORDER, QUESTS, zoneAt } from '../src/sim/data';
 import { normalizeToStaminaModel, primaryStatBudget, SLOT_STAT_MULT } from '../src/sim/item_budget';
-import { itemLevel, itemSourceLevel, resetItemLevelCache } from '../src/sim/item_level';
+import {
+  itemFromRaid,
+  itemLevel,
+  itemSourceLevel,
+  resetItemLevelCache,
+} from '../src/sim/item_level';
 import type { CoreStats, EquipSlot, ItemDef, QuestDef } from '../src/sim/types';
 import { MAX_LEVEL } from '../src/sim/types';
+
+// A re-run starts from the shipped catalog WITHOUT this tool's previous output
+// (data.ts merges both tables), so ids, names, catalog medians and derived item
+// levels never read the items being regenerated.
+for (const id of Object.keys(QUEST_LEVELING_GEAR_ITEMS)) delete ITEMS[id];
+for (const questId of Object.keys(QUEST_CHOICE_REWARDS)) {
+  if (QUESTS[questId]) delete QUESTS[questId].choiceRewards;
+}
+resetItemLevelCache();
 
 type Slot = Extract<
   EquipSlot,
@@ -76,8 +92,8 @@ const BANDS: readonly Band[] = [
   },
   {
     top: 19,
-    theme: 'Roadwarden',
-    region: 'the frontier roads',
+    theme: 'Trailwarden',
+    region: 'the frontier trails',
     palette: 'travel-worn umber, bronze buckles, deep teal',
   },
   {
@@ -182,8 +198,14 @@ function sourceLevel(q: QuestDef): number | undefined {
   return lvl;
 }
 
+// A raid quest: a kill objective on a raid mob, or a collect objective whose item
+// comes from a raid (item_level.ts would price its rewards with the raid bump).
 function touchesRaid(q: QuestDef): boolean {
-  return q.objectives.some((o) => o.type === 'kill' && raidMobs.has(o.targetMobId));
+  return q.objectives.some(
+    (o) =>
+      (o.type === 'kill' && raidMobs.has(o.targetMobId)) ||
+      (o.type === 'collect' && itemFromRaid(o.itemId)),
+  );
 }
 
 const zoneLevels = new Map<string, number[]>();
@@ -254,37 +276,56 @@ function medianOf(values: number[]): number {
   const sorted = [...values].sort((a, b) => a - b);
   return sorted[Math.floor(sorted.length / 2)] ?? 0;
 }
-const armorPerIlvl = new Map<string, number[]>();
-const sellPerIlvlSq = new Map<string, number[]>();
+interface Peer {
+  ilvl: number;
+  armorType: string;
+  slot: string;
+  armorPerIlvl: number;
+  sellPerSlot: number;
+}
+const peers: Peer[] = [];
 for (const item of Object.values(ITEMS)) {
   if (item.kind !== 'armor' || !item.armorType || !item.slot || item.slot === 'offhand') continue;
   if (item.quality !== 'uncommon') continue;
   const ilvl = itemLevel(item);
   if (!ilvl) continue;
-  const key = `${item.armorType}:${item.slot}`;
-  if ((item.stats?.armor ?? 0) > 0) {
-    armorPerIlvl.set(key, [...(armorPerIlvl.get(key) ?? []), (item.stats?.armor ?? 0) / ilvl]);
-  }
-  if (item.sellValue > 0) {
-    const mult = SLOT_STAT_MULT[item.slot] ?? 1;
-    sellPerIlvlSq.set('all', [
-      ...(sellPerIlvlSq.get('all') ?? []),
-      item.sellValue / (ilvl * ilvl * mult),
-    ]);
-  }
+  peers.push({
+    ilvl,
+    armorType: item.armorType,
+    slot: item.slot,
+    armorPerIlvl: (item.stats?.armor ?? 0) / ilvl,
+    sellPerSlot: item.sellValue / (SLOT_STAT_MULT[item.slot] ?? 1),
+  });
 }
-const ARMOR_FALLBACK: Record<string, number> = { cloth: 0.6, leather: 1.1, mail: 2.2 };
+// The median over the shipped peers nearest `ilvl` (within 2 item levels,
+// widening by 2 until at least three qualify), so each band reads its own
+// level's peers rather than one ratio stretched across the whole range.
+function localMedian(pool: Peer[], ilvl: number, pick: (p: Peer) => number): number {
+  const values = (radius: number) =>
+    pool.filter((p) => Math.abs(p.ilvl - ilvl) <= radius && pick(p) > 0).map(pick);
+  for (let radius = 2; radius <= MAX_LEVEL; radius += 2) {
+    const near = values(radius);
+    if (near.length >= 3) return medianOf(near);
+  }
+  const all = values(Number.POSITIVE_INFINITY);
+  if (all.length === 0) throw new Error('no shipped peers to price against');
+  return medianOf(all);
+}
 const armorFor = (armorType: string, slot: Slot, ilvl: number) => {
-  const samples = armorPerIlvl.get(`${armorType}:${slot}`);
-  const chest = armorPerIlvl.get(`${armorType}:chest`);
-  const per = samples?.length
-    ? medianOf(samples)
-    : (chest?.length ? medianOf(chest) : ARMOR_FALLBACK[armorType]) * (SLOT_STAT_MULT[slot] ?? 1);
-  return Math.max(1, Math.round(per * ilvl));
+  const sameSlot = peers.filter((p) => p.armorType === armorType && p.slot === slot);
+  // Too few same-slot peers: read the chest line and apply the slot weight.
+  const pool =
+    sameSlot.length >= 3
+      ? sameSlot
+      : peers.filter((p) => p.armorType === armorType && p.slot === 'chest');
+  const scale = sameSlot.length >= 3 ? 1 : (SLOT_STAT_MULT[slot] ?? 1);
+  return Math.max(1, Math.round(localMedian(pool, ilvl, (p) => p.armorPerIlvl) * ilvl * scale));
 };
-const sellRate = medianOf(sellPerIlvlSq.get('all') ?? [10]);
 const sellFor = (slot: Slot, ilvl: number) =>
-  Math.max(5, Math.round(sellRate * ilvl * ilvl * (SLOT_STAT_MULT[slot] ?? 1)));
+  Math.max(
+    5,
+    Math.round(localMedian(peers, ilvl, (p) => p.sellPerSlot) * (SLOT_STAT_MULT[slot] ?? 1)),
+  );
 
 // ---------------------------------------------------------------------------
 // Items: provisional records, then the real item level, then baked stats
