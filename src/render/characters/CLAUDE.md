@@ -162,7 +162,12 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   palette update elision), `skin_gpu_layout.ts` (bone-texture compaction
   without changing weights, matrices, draws, or shader math),
   `skinned_sort_spheres.ts` (static sort spheres so three never brute-forces
-  a missing SkinnedMesh bounding sphere), `tinted_material_cache_core.ts`,
+  a missing SkinnedMesh bounding sphere), `skinned_cull_bounds.ts` (the padded
+  per-pass cull sphere over `../character_cull_core.ts`; a skinned vertex never
+  passes through its mesh node, so a geometry-space centre is kept only when
+  three will place it on the rig and the rig's centre stands in when it will
+  not, which is every kit creature hung under the exporter's x100 unit node:
+  `tests/skinned_cull_bounds_assets.test.ts`), `tinted_material_cache_core.ts`,
   `material_program_shape_core.ts` (the per-object facts three re-derives a
   material's program parameters from; its key is a fragment of the tinted
   cache key, so a mounted material is shared only among meshes three would
