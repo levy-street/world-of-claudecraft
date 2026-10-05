@@ -12309,8 +12309,8 @@ export const zh_CN: EnTranslations = {
       "rewards": "奖励",
       "xpReward": "{xp} 点经验",
       "itemReward": "物品奖励：",
-      "chooseReward": "Choose your reward:",
-      "rewardChoices": "You will be able to choose one of these rewards:",
+      "chooseReward": "选择你的奖励：",
+      "rewardChoices": "你将能够选择以下奖励之一：",
       "objectiveProgress": "{label}：{current}/{total}",
       "requiresLevel": "需要等级 {level}"
     },
@@ -12688,7 +12688,7 @@ export const zh_CN: EnTranslations = {
       "incomplete": "该任务尚未完成。",
       "giverMissing": "该任务发布者不在附近。",
       "turnInMissing": "该任务交付点不在附近。",
-      "rewardNotOffered": "That reward is not offered.",
+      "rewardNotOffered": "该奖励未提供。",
       "tooFar": "距离太远。",
       "escortAway": "你要护送的人现在不在原处，稍后就会回来。"
     }
@@ -18453,6 +18453,678 @@ export const zh_CN: EnTranslations = {
       },
       "vanguard_warstaff": {
         "name": "先锋之战杖"
+      },
+      "saltbitten_robe": {
+        "name": "咸蚀长袍"
+      },
+      "saltbitten_leggings": {
+        "name": "咸蚀腿甲衣"
+      },
+      "saltbitten_slippers": {
+        "name": "咸蚀软靴"
+      },
+      "saltbitten_hood": {
+        "name": "咸蚀兜帽"
+      },
+      "saltbitten_gloves": {
+        "name": "咸蚀手套"
+      },
+      "saltbitten_mantle": {
+        "name": "咸蚀披肩"
+      },
+      "saltbitten_sash": {
+        "name": "咸蚀束带"
+      },
+      "saltbitten_jerkin": {
+        "name": "咸蚀皮甲"
+      },
+      "saltbitten_breeches": {
+        "name": "咸蚀及膝裤"
+      },
+      "saltbitten_boots": {
+        "name": "咸蚀靴子"
+      },
+      "saltbitten_cap": {
+        "name": "咸蚀便帽"
+      },
+      "saltbitten_grips": {
+        "name": "咸蚀握把"
+      },
+      "saltbitten_shoulderpads": {
+        "name": "咸蚀肩垫"
+      },
+      "saltbitten_belt": {
+        "name": "咸蚀腰带"
+      },
+      "saltbitten_hauberk": {
+        "name": "咸蚀锁衣"
+      },
+      "saltbitten_legguards": {
+        "name": "咸蚀腿护"
+      },
+      "saltbitten_sabatons": {
+        "name": "咸蚀甲靴"
+      },
+      "saltbitten_helm": {
+        "name": "咸蚀头盔"
+      },
+      "saltbitten_gauntlets": {
+        "name": "咸蚀甲手"
+      },
+      "saltbitten_pauldrons": {
+        "name": "咸蚀肩甲"
+      },
+      "saltbitten_girdle": {
+        "name": "咸蚀腰饰"
+      },
+      "saltbitten_chainmail": {
+        "name": "咸蚀锁甲"
+      },
+      "saltbitten_chausses": {
+        "name": "咸蚀腿甲"
+      },
+      "saltbitten_greaves": {
+        "name": "咸蚀胫甲"
+      },
+      "saltbitten_coif": {
+        "name": "咸蚀头罩"
+      },
+      "saltbitten_handguards": {
+        "name": "咸蚀护手"
+      },
+      "saltbitten_spaulders": {
+        "name": "咸蚀肩铠"
+      },
+      "saltbitten_cord": {
+        "name": "咸蚀腰绳"
+      },
+      "brookwatch_robe": {
+        "name": "溪卫长袍"
+      },
+      "brookwatch_leggings": {
+        "name": "溪卫腿甲衣"
+      },
+      "brookwatch_slippers": {
+        "name": "溪卫软靴"
+      },
+      "brookwatch_hood": {
+        "name": "溪卫兜帽"
+      },
+      "brookwatch_gloves": {
+        "name": "溪卫手套"
+      },
+      "brookwatch_mantle": {
+        "name": "溪卫披肩"
+      },
+      "brookwatch_sash": {
+        "name": "溪卫束带"
+      },
+      "brookwatch_jerkin": {
+        "name": "溪卫皮甲"
+      },
+      "brookwatch_breeches": {
+        "name": "溪卫及膝裤"
+      },
+      "brookwatch_boots": {
+        "name": "溪卫靴子"
+      },
+      "brookwatch_cap": {
+        "name": "溪卫便帽"
+      },
+      "brookwatch_grips": {
+        "name": "溪卫握把"
+      },
+      "brookwatch_shoulderpads": {
+        "name": "溪卫肩垫"
+      },
+      "brookwatch_belt": {
+        "name": "溪卫腰带"
+      },
+      "brookwatch_hauberk": {
+        "name": "溪卫锁衣"
+      },
+      "brookwatch_legguards": {
+        "name": "溪卫腿护"
+      },
+      "brookwatch_sabatons": {
+        "name": "溪卫甲靴"
+      },
+      "brookwatch_helm": {
+        "name": "溪卫头盔"
+      },
+      "brookwatch_gauntlets": {
+        "name": "溪卫甲手"
+      },
+      "brookwatch_pauldrons": {
+        "name": "溪卫肩甲"
+      },
+      "brookwatch_girdle": {
+        "name": "溪卫腰饰"
+      },
+      "brookwatch_chainmail": {
+        "name": "溪卫锁甲"
+      },
+      "brookwatch_chausses": {
+        "name": "溪卫腿甲"
+      },
+      "brookwatch_greaves": {
+        "name": "溪卫胫甲"
+      },
+      "brookwatch_coif": {
+        "name": "溪卫头罩"
+      },
+      "brookwatch_handguards": {
+        "name": "溪卫护手"
+      },
+      "brookwatch_spaulders": {
+        "name": "溪卫肩铠"
+      },
+      "brookwatch_cord": {
+        "name": "溪卫腰绳"
+      },
+      "hedgerow_robe": {
+        "name": "树篱长袍"
+      },
+      "hedgerow_leggings": {
+        "name": "树篱腿甲衣"
+      },
+      "hedgerow_slippers": {
+        "name": "树篱软靴"
+      },
+      "hedgerow_hood": {
+        "name": "树篱兜帽"
+      },
+      "hedgerow_gloves": {
+        "name": "树篱手套"
+      },
+      "hedgerow_mantle": {
+        "name": "树篱披肩"
+      },
+      "hedgerow_sash": {
+        "name": "树篱束带"
+      },
+      "hedgerow_jerkin": {
+        "name": "树篱皮甲"
+      },
+      "hedgerow_breeches": {
+        "name": "树篱及膝裤"
+      },
+      "hedgerow_boots": {
+        "name": "树篱靴子"
+      },
+      "hedgerow_cap": {
+        "name": "树篱便帽"
+      },
+      "hedgerow_grips": {
+        "name": "树篱握把"
+      },
+      "hedgerow_shoulderpads": {
+        "name": "树篱肩垫"
+      },
+      "hedgerow_belt": {
+        "name": "树篱腰带"
+      },
+      "hedgerow_hauberk": {
+        "name": "树篱锁衣"
+      },
+      "hedgerow_legguards": {
+        "name": "树篱腿护"
+      },
+      "hedgerow_sabatons": {
+        "name": "树篱甲靴"
+      },
+      "hedgerow_helm": {
+        "name": "树篱头盔"
+      },
+      "hedgerow_gauntlets": {
+        "name": "树篱甲手"
+      },
+      "hedgerow_pauldrons": {
+        "name": "树篱肩甲"
+      },
+      "hedgerow_girdle": {
+        "name": "树篱腰饰"
+      },
+      "hedgerow_chainmail": {
+        "name": "树篱锁甲"
+      },
+      "hedgerow_chausses": {
+        "name": "树篱腿甲"
+      },
+      "hedgerow_greaves": {
+        "name": "树篱胫甲"
+      },
+      "hedgerow_coif": {
+        "name": "树篱头罩"
+      },
+      "hedgerow_handguards": {
+        "name": "树篱护手"
+      },
+      "hedgerow_spaulders": {
+        "name": "树篱肩铠"
+      },
+      "hedgerow_cord": {
+        "name": "树篱腰绳"
+      },
+      "bogwalker_robe": {
+        "name": "沼行长袍"
+      },
+      "bogwalker_leggings": {
+        "name": "沼行腿甲衣"
+      },
+      "bogwalker_slippers": {
+        "name": "沼行软靴"
+      },
+      "bogwalker_hood": {
+        "name": "沼行兜帽"
+      },
+      "bogwalker_gloves": {
+        "name": "沼行手套"
+      },
+      "bogwalker_mantle": {
+        "name": "沼行披肩"
+      },
+      "bogwalker_sash": {
+        "name": "沼行束带"
+      },
+      "bogwalker_jerkin": {
+        "name": "沼行皮甲"
+      },
+      "bogwalker_breeches": {
+        "name": "沼行及膝裤"
+      },
+      "bogwalker_boots": {
+        "name": "沼行靴子"
+      },
+      "bogwalker_cap": {
+        "name": "沼行便帽"
+      },
+      "bogwalker_grips": {
+        "name": "沼行握把"
+      },
+      "bogwalker_shoulderpads": {
+        "name": "沼行肩垫"
+      },
+      "bogwalker_belt": {
+        "name": "沼行腰带"
+      },
+      "bogwalker_hauberk": {
+        "name": "沼行锁衣"
+      },
+      "bogwalker_legguards": {
+        "name": "沼行腿护"
+      },
+      "bogwalker_sabatons": {
+        "name": "沼行甲靴"
+      },
+      "bogwalker_helm": {
+        "name": "沼行头盔"
+      },
+      "bogwalker_gauntlets": {
+        "name": "沼行甲手"
+      },
+      "bogwalker_pauldrons": {
+        "name": "沼行肩甲"
+      },
+      "bogwalker_girdle": {
+        "name": "沼行腰饰"
+      },
+      "bogwalker_chainmail": {
+        "name": "沼行锁甲"
+      },
+      "bogwalker_chausses": {
+        "name": "沼行腿甲"
+      },
+      "bogwalker_greaves": {
+        "name": "沼行胫甲"
+      },
+      "bogwalker_coif": {
+        "name": "沼行头罩"
+      },
+      "bogwalker_handguards": {
+        "name": "沼行护手"
+      },
+      "bogwalker_spaulders": {
+        "name": "沼行肩铠"
+      },
+      "bogwalker_cord": {
+        "name": "沼行腰绳"
+      },
+      "thornspire_robe": {
+        "name": "棘尖长袍"
+      },
+      "thornspire_leggings": {
+        "name": "棘尖腿甲衣"
+      },
+      "thornspire_slippers": {
+        "name": "棘尖软靴"
+      },
+      "thornspire_hood": {
+        "name": "棘尖兜帽"
+      },
+      "thornspire_gloves": {
+        "name": "棘尖手套"
+      },
+      "thornspire_mantle": {
+        "name": "棘尖披肩"
+      },
+      "thornspire_sash": {
+        "name": "棘尖束带"
+      },
+      "thornspire_jerkin": {
+        "name": "棘尖皮甲"
+      },
+      "thornspire_breeches": {
+        "name": "棘尖及膝裤"
+      },
+      "thornspire_boots": {
+        "name": "棘尖靴子"
+      },
+      "thornspire_cap": {
+        "name": "棘尖便帽"
+      },
+      "thornspire_grips": {
+        "name": "棘尖握把"
+      },
+      "thornspire_shoulderpads": {
+        "name": "棘尖肩垫"
+      },
+      "thornspire_belt": {
+        "name": "棘尖腰带"
+      },
+      "thornspire_hauberk": {
+        "name": "棘尖锁衣"
+      },
+      "thornspire_legguards": {
+        "name": "棘尖腿护"
+      },
+      "thornspire_sabatons": {
+        "name": "棘尖甲靴"
+      },
+      "thornspire_helm": {
+        "name": "棘尖头盔"
+      },
+      "thornspire_gauntlets": {
+        "name": "棘尖甲手"
+      },
+      "thornspire_pauldrons": {
+        "name": "棘尖肩甲"
+      },
+      "thornspire_girdle": {
+        "name": "棘尖腰饰"
+      },
+      "thornspire_chainmail": {
+        "name": "棘尖锁甲"
+      },
+      "thornspire_chausses": {
+        "name": "棘尖腿甲"
+      },
+      "thornspire_greaves": {
+        "name": "棘尖胫甲"
+      },
+      "thornspire_coif": {
+        "name": "棘尖头罩"
+      },
+      "thornspire_handguards": {
+        "name": "棘尖护手"
+      },
+      "thornspire_spaulders": {
+        "name": "棘尖肩铠"
+      },
+      "thornspire_cord": {
+        "name": "棘尖腰绳"
+      },
+      "hollowveil_robe": {
+        "name": "空幕长袍"
+      },
+      "hollowveil_leggings": {
+        "name": "空幕腿甲衣"
+      },
+      "hollowveil_slippers": {
+        "name": "空幕软靴"
+      },
+      "hollowveil_hood": {
+        "name": "空幕兜帽"
+      },
+      "hollowveil_gloves": {
+        "name": "空幕手套"
+      },
+      "hollowveil_mantle": {
+        "name": "空幕披肩"
+      },
+      "hollowveil_sash": {
+        "name": "空幕束带"
+      },
+      "hollowveil_jerkin": {
+        "name": "空幕皮甲"
+      },
+      "hollowveil_breeches": {
+        "name": "空幕及膝裤"
+      },
+      "hollowveil_boots": {
+        "name": "空幕靴子"
+      },
+      "hollowveil_cap": {
+        "name": "空幕便帽"
+      },
+      "hollowveil_grips": {
+        "name": "空幕握把"
+      },
+      "hollowveil_shoulderpads": {
+        "name": "空幕肩垫"
+      },
+      "hollowveil_belt": {
+        "name": "空幕腰带"
+      },
+      "hollowveil_hauberk": {
+        "name": "空幕锁衣"
+      },
+      "hollowveil_legguards": {
+        "name": "空幕腿护"
+      },
+      "hollowveil_sabatons": {
+        "name": "空幕甲靴"
+      },
+      "hollowveil_helm": {
+        "name": "空幕头盔"
+      },
+      "hollowveil_gauntlets": {
+        "name": "空幕甲手"
+      },
+      "hollowveil_pauldrons": {
+        "name": "空幕肩甲"
+      },
+      "hollowveil_girdle": {
+        "name": "空幕腰饰"
+      },
+      "hollowveil_chainmail": {
+        "name": "空幕锁甲"
+      },
+      "hollowveil_chausses": {
+        "name": "空幕腿甲"
+      },
+      "hollowveil_greaves": {
+        "name": "空幕胫甲"
+      },
+      "hollowveil_coif": {
+        "name": "空幕头罩"
+      },
+      "hollowveil_handguards": {
+        "name": "空幕护手"
+      },
+      "hollowveil_spaulders": {
+        "name": "空幕肩铠"
+      },
+      "hollowveil_cord": {
+        "name": "空幕腰绳"
+      },
+      "roadwarden_robe": {
+        "name": "路卫长袍"
+      },
+      "roadwarden_leggings": {
+        "name": "路卫腿甲衣"
+      },
+      "roadwarden_slippers": {
+        "name": "路卫软靴"
+      },
+      "roadwarden_hood": {
+        "name": "路卫兜帽"
+      },
+      "roadwarden_gloves": {
+        "name": "路卫手套"
+      },
+      "roadwarden_mantle": {
+        "name": "路卫披肩"
+      },
+      "roadwarden_sash": {
+        "name": "路卫束带"
+      },
+      "roadwarden_jerkin": {
+        "name": "路卫皮甲"
+      },
+      "roadwarden_breeches": {
+        "name": "路卫及膝裤"
+      },
+      "roadwarden_boots": {
+        "name": "路卫靴子"
+      },
+      "roadwarden_cap": {
+        "name": "路卫便帽"
+      },
+      "roadwarden_grips": {
+        "name": "路卫握把"
+      },
+      "roadwarden_shoulderpads": {
+        "name": "路卫肩垫"
+      },
+      "roadwarden_belt": {
+        "name": "路卫腰带"
+      },
+      "roadwarden_hauberk": {
+        "name": "路卫锁衣"
+      },
+      "roadwarden_legguards": {
+        "name": "路卫腿护"
+      },
+      "roadwarden_sabatons": {
+        "name": "路卫甲靴"
+      },
+      "roadwarden_helm": {
+        "name": "路卫头盔"
+      },
+      "roadwarden_gauntlets": {
+        "name": "路卫甲手"
+      },
+      "roadwarden_pauldrons": {
+        "name": "路卫肩甲"
+      },
+      "roadwarden_girdle": {
+        "name": "路卫腰饰"
+      },
+      "roadwarden_chainmail": {
+        "name": "路卫锁甲"
+      },
+      "roadwarden_chausses": {
+        "name": "路卫腿甲"
+      },
+      "roadwarden_greaves": {
+        "name": "路卫胫甲"
+      },
+      "roadwarden_coif": {
+        "name": "路卫头罩"
+      },
+      "roadwarden_handguards": {
+        "name": "路卫护手"
+      },
+      "roadwarden_spaulders": {
+        "name": "路卫肩铠"
+      },
+      "roadwarden_cord": {
+        "name": "路卫腰绳"
+      },
+      "highgale_robe": {
+        "name": "高风长袍"
+      },
+      "highgale_leggings": {
+        "name": "高风腿甲衣"
+      },
+      "highgale_slippers": {
+        "name": "高风软靴"
+      },
+      "highgale_hood": {
+        "name": "高风兜帽"
+      },
+      "highgale_gloves": {
+        "name": "高风手套"
+      },
+      "highgale_mantle": {
+        "name": "高风披肩"
+      },
+      "highgale_sash": {
+        "name": "高风束带"
+      },
+      "highgale_jerkin": {
+        "name": "高风皮甲"
+      },
+      "highgale_breeches": {
+        "name": "高风及膝裤"
+      },
+      "highgale_boots": {
+        "name": "高风靴子"
+      },
+      "highgale_cap": {
+        "name": "高风便帽"
+      },
+      "highgale_grips": {
+        "name": "高风握把"
+      },
+      "highgale_shoulderpads": {
+        "name": "高风肩垫"
+      },
+      "highgale_belt": {
+        "name": "高风腰带"
+      },
+      "highgale_hauberk": {
+        "name": "高风锁衣"
+      },
+      "highgale_legguards": {
+        "name": "高风腿护"
+      },
+      "highgale_sabatons": {
+        "name": "高风甲靴"
+      },
+      "highgale_helm": {
+        "name": "高风头盔"
+      },
+      "highgale_gauntlets": {
+        "name": "高风甲手"
+      },
+      "highgale_pauldrons": {
+        "name": "高风肩甲"
+      },
+      "highgale_girdle": {
+        "name": "高风腰饰"
+      },
+      "highgale_chainmail": {
+        "name": "高风锁甲"
+      },
+      "highgale_chausses": {
+        "name": "高风腿甲"
+      },
+      "highgale_greaves": {
+        "name": "高风胫甲"
+      },
+      "highgale_coif": {
+        "name": "高风头罩"
+      },
+      "highgale_handguards": {
+        "name": "高风护手"
+      },
+      "highgale_spaulders": {
+        "name": "高风肩铠"
+      },
+      "highgale_cord": {
+        "name": "高风腰绳"
       },
       "conjured_water4": {
         "name": "魔法泉水"
