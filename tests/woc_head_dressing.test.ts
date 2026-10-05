@@ -1,18 +1,24 @@
 // The WOC head's three.js half (woc_head_packs.ts + woc_head_dressing.ts) over a
-// synthetic SPLIT library (the core, one file per hairstyle, the beard files): the
-// body is AWAITED (its host draws none of it) until EVERY file of the look is hung
-// AND revealed (never a headless body, never a bald one popping its hair later),
-// a failed file ends that wait, a later hairstyle or
-// beard change keeps the old one drawn until the new file is revealed, bald and
-// clean shaven need no file, a look change is an in-place flag/morph/uniform flip
-// on the same model, the helm hides the new hair, and every head material (a late
-// file's too) and the body's skin are wrapped with their tint layer. The body's
-// layer follows the body ATLAS (woc_skin_tint_core.ts): on under its own suit, off
-// under a class under-armor atlas, a uniform write either way. Asked to (setMerged),
-// the head also draws as ONE mesh (woc_head_merge.ts): planned by every pass, mounted
-// from the poll (or by the unit the poll queued on the host's work queue) once the head
-// is whole, at rest and drawn, hidden until its programs are linked, dropped by whatever
-// changes the drawn head, and tinted through the merged layer's uniform rows.
+// synthetic SPLIT library (the core, one file per hairstyle, the beard files). A body
+// carries only the pieces its look draws: a piece it no longer draws leaves its scene
+// graph (and its tint clone goes with it), one it starts to draw is hung on the spot.
+// WHOLE LOOK (the default: a preview, a portrait): the body is AWAITED (its host draws
+// none of it) until EVERY piece of the look is hung AND revealed (never a headless
+// body, never a bald one popping its hair later), and a failed file ends that wait.
+// BARE STAND-IN (the world view's opt-in): the head goes live on its core alone, the
+// bare head standing in for a hairstyle or a beard still on the wire or failed, which
+// joins hidden until linked; the body never waits. In both, a later change of any piece
+// keeps the old one drawn until the new one is revealed, bald and clean shaven need no
+// file, a look change happens in place on the same model, the helm hides the hair (which
+// stays hung), and every head material (a late piece's too) and the body's skin are
+// wrapped with their tint layer. The body's layer follows the body ATLAS
+// (woc_skin_tint_core.ts): on under its own suit, off under a class under-armor atlas,
+// a uniform write either way. Asked to (setMerged), the head also draws as ONE mesh
+// (woc_head_merge.ts): planned by every pass, mounted from the poll (or by the unit the
+// poll queued on the host's work queue) once the head is whole, at rest and drawn,
+// hidden until its programs are linked (a head whose program a witness still proves
+// skips that gate: woc_head_merge_proof_core.ts), dropped by whatever changes the drawn
+// head, and tinted through the merged layer's uniform rows.
 import * as THREE from 'three';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -39,9 +45,11 @@ import {
   wocHeadAllNodes,
   wocHeadCoreUrl,
   wocHeadPieceUrl,
+  wocHeadVisibleNodes,
 } from '../src/render/characters/woc_head_catalog';
 import {
   applyWocHeadBakeVisibility,
+  WOC_HEAD_HANG_LABEL,
   WOC_HEAD_MERGE_LABEL,
   WOC_HEAD_MOUNT_LABEL,
   WocHeadDressing,
@@ -53,6 +61,7 @@ import { WOC_HEAD_MERGE_MAX_SLOTS } from '../src/render/characters/woc_head_merg
 import {
   failWocHeadFileForTest,
   hangWocHead,
+  hangWocHeadAtBuild,
   resetWocHeadFilesForTest,
   setWocHeadFileForTest,
   wocHeadFileMaterial,
@@ -150,14 +159,26 @@ function install(...urls: string[]): void {
 }
 const installAll = (): void => install(...LIBRARY.keys());
 
+/** A body as assembleModel builds it (woc_head_packs.ts hangWocHeadAtBuild): the pieces
+ *  the look of `app` draws (null: Type A's default look) hung out of the files resident
+ *  right now, and nothing else of the library. */
+function bornModel(app: Record<string, unknown> | null = null): THREE.Object3D {
+  const model = baseModel();
+  hangWocHeadAtBuild(model, 'male', 'lod0', app);
+  return model;
+}
+
 /** A host whose reveals wait (gated: the compile gate in flight) or land at once. */
 function host(model: THREE.Object3D, gated: boolean) {
   const reveals: ((prepared: boolean) => void)[] = [];
+  const forgotten: THREE.Object3D[] = [];
   let relived = 0;
   const h: WocHeadDressingHost = {
     model,
     adopt: (_node, retint) => retint(),
-    forget: () => undefined,
+    forget: (node) => {
+      forgotten.push(node);
+    },
     reveal: (_node, live) => {
       if (gated) reveals.push(live);
       else live(true);
@@ -173,7 +194,7 @@ function host(model: THREE.Object3D, gated: boolean) {
   const link = (): void => {
     for (const live of reveals.splice(0)) live(true);
   };
-  return { h, link, relived: () => relived };
+  return { h, link, forgotten, relived: () => relived, inFlight: () => reveals.length };
 }
 
 const visible = (model: THREE.Object3D, name: string): boolean =>
@@ -201,11 +222,13 @@ function influence(model: THREE.Object3D, node: string, target: string): number 
   return at === undefined ? undefined : mesh?.morphTargetInfluences?.[at];
 }
 
-/** A model born with the whole library hung and a dressing live on the default look. */
+/** The pieces Type A's default look draws (all a body in it hangs). */
+const DEFAULT_NODES = wocHeadVisibleNodes('a', WOC_HEAD_TYPES.a.defaults, { helm: false });
+
+/** A model born in the default look, the whole library resident, and a dressing live on it. */
 function liveDressing(gated = false) {
   installAll();
-  const model = baseModel();
-  hangWocHead(model, 'a');
+  const model = bornModel();
   const hh = host(model, gated);
   const dressing = new WocHeadDressing(hh.h, 'a');
   dressing.retint();
@@ -264,27 +287,52 @@ describe('WocHeadDressing: going live on a streamed look', () => {
 
   it('never goes live in its constructor, then goes live on the look it is handed', () => {
     installAll();
-    const model = baseModel();
-    expect(hangWocHead(model, 'a')).not.toBeNull();
-    const { h } = host(model, true);
-    const dressing = new WocHeadDressing(h, 'a');
+    const app = { ...DEFAULT_APPEARANCE, headHair: 'long' };
+    // built for its own look: its pieces hung with the body, never the default look's
+    const model = bornModel(app);
+    const { h, inFlight } = host(model, true);
+    const dressing = new WocHeadDressing(h, 'a', 'lod0', app);
     dressing.retint();
-    // built with every file hung, but no look handed in yet: nothing of the head draws,
-    // and the body waits for the look
+    // every piece of its look is hung, but no look was handed in yet: nothing of the head
+    // draws, and the body waits for the look
     expect(dressing.isLive).toBe(false);
     expect(dressing.awaited).toBe(true);
     expect(drawnHair(model)).toEqual([]);
-    // the player's look: live at once, on ITS hairstyle (never the default first)
-    expect(dressing.setAppearance({ ...DEFAULT_APPEARANCE, headHair: 'long' })).toBe(true);
+    // the player's look: live at once, on ITS hairstyle (never the default first), and
+    // with no gate at all (the pieces ride the body's own first draw)
+    expect(dressing.setAppearance(app)).toBe(true);
     expect(dressing.isLive).toBe(true);
     expect(drawnHair(model)).toEqual(['WocHead_A_hair_long']);
     expect(dressing.awaited).toBe(false);
+    expect(inFlight()).toBe(0);
+    // the default hairstyle was never on this body
+    expect(model.getObjectByName(`WocHead_A_hair_${DEFAULT_HAIR}`)).toBeUndefined();
+  });
+
+  it("a body born in the default look and handed another draws nothing of the default's", () => {
+    installAll();
+    // a body built directly (a preview): the default look's pieces hung with it
+    const model = bornModel();
+    const { h, link } = host(model, true);
+    const dressing = new WocHeadDressing(h, 'a');
+    dressing.retint();
+    expect(model.getObjectByName(`WocHead_A_hair_${DEFAULT_HAIR}`)).toBeDefined();
+    // its own look: the new hairstyle is hung in the same call (its file is resident),
+    // behind the gate...
+    dressing.setAppearance({ ...DEFAULT_APPEARANCE, headHair: 'long' });
+    expect(dressing.isLive).toBe(false);
+    expect(drawnHair(model)).toEqual([]);
+    expect(model.getObjectByName('WocHead_A_hair_long')).toBeDefined();
+    // ...and the default's, which this head will never draw, is off the body already
+    expect(model.getObjectByName(`WocHead_A_hair_${DEFAULT_HAIR}`)).toBeUndefined();
+    link();
+    expect(dressing.isLive).toBe(true);
+    expect(drawnHair(model)).toEqual(['WocHead_A_hair_long']);
   });
 
   it('born with its default look repeated: live on the repeat (a change for the caller)', () => {
     installAll();
-    const model = baseModel();
-    hangWocHead(model, 'a');
+    const model = bornModel();
     const dressing = new WocHeadDressing(host(model, true).h, 'a');
     // the same look as the default key, handed in: the head goes live on it
     expect(dressing.setAppearance(null)).toBe(true);
@@ -296,8 +344,7 @@ describe('WocHeadDressing: going live on a streamed look', () => {
   it("a body built before its OWN hairstyle landed waits for it, never drawing the default's", () => {
     // the default look's files are resident at build, the player's hairstyle is not
     install(CORE, hairUrl(DEFAULT_HAIR), beardUrl(DEFAULT_BEARD));
-    const model = baseModel();
-    hangWocHead(model, 'a');
+    const model = bornModel();
     const { h, link } = host(model, true);
     const dressing = new WocHeadDressing(h, 'a');
     dressing.retint();
@@ -319,8 +366,7 @@ describe('WocHeadDressing: going live on a streamed look', () => {
 
   it('waiting on a streaming file costs the frame no re-dress: poll never re-applies the head', () => {
     install(CORE, beardUrl(DEFAULT_BEARD));
-    const model = baseModel();
-    hangWocHead(model, 'a');
+    const model = bornModel();
     const { h, link } = host(model, true);
     const dressing = new WocHeadDressing(h, 'a');
     dressing.retint();
@@ -364,8 +410,7 @@ describe('WocHeadDressing: a head file that cannot arrive ends the wait', () => 
   it('a failed fetch: the body is no longer awaited, and goes live when a later load lands', async () => {
     install(CORE, beardUrl(DEFAULT_BEARD));
     loads.fail.add(hairUrl(DEFAULT_HAIR));
-    const model = baseModel();
-    hangWocHead(model, 'a');
+    const model = bornModel();
     const { h } = host(model, false);
     const dressing = new WocHeadDressing(h, 'a');
     dressing.setAppearance(null);
@@ -391,13 +436,420 @@ describe('WocHeadDressing: a head file that cannot arrive ends the wait', () => 
     const model = new THREE.Group();
     const { h } = host(model, false);
     const dressing = new WocHeadDressing(h, 'a');
-    dressing.setAppearance(null);
     expect(dressing.awaited).toBe(true); // resident, not tried yet
-    vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const missed = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    // the look is handed in: every file is tried on the spot, and none can hang
+    dressing.setAppearance(null);
+    expect(dressing.isLive).toBe(false);
+    expect(dressing.awaited).toBe(false);
+    expect(wocHeadRigOf(model)).toBeNull();
+    // refused for good: a poll never tries the same file again
+    const tries = missed.mock.calls.length;
+    for (let i = 0; i < 3; i++) dressing.poll();
+    expect(missed.mock.calls.length).toBe(tries);
+    expect(dressing.awaited).toBe(false);
+    vi.restoreAllMocks();
+  });
+
+  it('a piece its resident file does not carry never keeps the head back', () => {
+    // the core ships without the default nose: nothing will ever draw it
+    const core = splitHeadScene(
+      [...(LIBRARY.get(CORE)?.scene.children[0].children ?? [])]
+        .map((node) => node.name)
+        .filter((name) => name !== 'WocHead_A_nose_default'),
+      piece,
+    );
+    setWocHeadFileForTest(CORE, core);
+    install(hairUrl(DEFAULT_HAIR), beardUrl(DEFAULT_BEARD));
+    const model = bornModel();
+    const dressing = new WocHeadDressing(host(model, false).h, 'a');
+    dressing.retint();
+    // whole look: live all the same, on every piece that exists
+    expect(dressing.setAppearance(null)).toBe(true);
+    expect(dressing.isLive).toBe(true);
+    expect(dressing.awaited).toBe(false);
+    expect(model.getObjectByName('WocHead_A_nose_default')).toBeUndefined();
+    expect(visible(model, 'WocHead_A_base')).toBe(true);
+    expect(dressing.poll()).toBe(false);
+  });
+});
+
+describe('WocHeadDressing: the bare head stands in (a body in the world)', () => {
+  /** A world body: born with whatever of its look is resident, the stand-in opted into
+   *  before the look is handed in (src/render/characters/index.ts createCharacterVisual). */
+  function worldBody(app: Record<string, unknown> | null, gated = true) {
+    const model = bornModel(app);
+    const hh = host(model, gated);
+    const dressing = new WocHeadDressing(hh.h, 'a', 'lod0', app);
+    dressing.retint();
+    dressing.setBareStandIn(true);
+    dressing.setAppearance(app);
+    return { model, dressing, ...hh };
+  }
+  const beardDrawn = (model: THREE.Object3D): string[] =>
+    [...hangedPieces(model)]
+      .filter(([name, o]) => name.includes('_beard_') && o.visible)
+      .map(([name]) => name);
+
+  it('every file resident: live at once on the whole look, with no gate', () => {
+    install(CORE, hairUrl(DEFAULT_HAIR), beardUrl(DEFAULT_BEARD));
+    const { model, dressing, inFlight } = worldBody(null);
+    expect(dressing.isLive).toBe(true);
+    expect(dressing.awaited).toBe(false);
+    expect(dressing.joining).toBe(false);
+    expect([...dressing.drawnNames].sort()).toEqual([...DEFAULT_NODES].sort());
+    expect(drawnHair(model)).toEqual([`WocHead_A_hair_${DEFAULT_HAIR}`]);
+    expect(inFlight()).toBe(0);
+    expect(dressing.poll()).toBe(false);
+  });
+
+  it('a hairstyle still on the wire: live at once, bald, and it joins hidden until linked', () => {
+    install(CORE, beardUrl(DEFAULT_BEARD));
+    const { model, dressing, link, relived } = worldBody(null);
+    // live from the first frame, never awaited: the body draws, the bare head standing in
+    expect(dressing.isLive).toBe(true);
+    expect(dressing.awaited).toBe(false);
+    expect(visible(model, 'WocHead_A_base')).toBe(true);
+    expect(drawnHair(model)).toEqual([]);
+    expect(beardDrawn(model)).toEqual([`WocHead_A_beard_${DEFAULT_BEARD}`]);
+    // what it draws is the look, bald: the bald crown, no scalp tuck
+    expect(dressing.look.look.hair).toBe(DEFAULT_HAIR);
+    expect(dressing.drawnLook?.hair).toBe('bald');
+    expect(influence(model, 'WocHead_A_base', 'FS_Bald_Crown')).toBe(1);
+    expect(influence(model, 'WocHead_A_base', 'FS_Tuck_swept')).toBe(0);
+    // its file was asked for, and the head is about to change
+    expect(loads.calls).toContain(hairUrl(DEFAULT_HAIR));
+    expect(dressing.joining).toBe(true);
+    for (let i = 0; i < 3; i++) expect(dressing.poll()).toBe(false);
+    expect(relived()).toBe(0);
+    // it lands: hung, hidden behind the gate, the bare head still what draws
+    install(hairUrl(DEFAULT_HAIR));
+    expect(dressing.poll()).toBe(true);
+    const hair = model.getObjectByName(`WocHead_A_hair_${DEFAULT_HAIR}`);
+    expect(hair).toBeDefined();
+    expect(drawnHair(model)).toEqual([]);
+    expect(dressing.joining).toBe(true);
+    expect(relived()).toBe(0);
+    // linked: it joins in that step, the scalp tucked under it, and the host is told (the
+    // far bake and the merged stand-in key on what is drawn)
+    link();
+    expect(drawnHair(model)).toEqual([`WocHead_A_hair_${DEFAULT_HAIR}`]);
+    expect(dressing.drawnLook?.hair).toBe(DEFAULT_HAIR);
+    expect(influence(model, 'WocHead_A_base', 'FS_Bald_Crown')).toBe(0);
+    expect(influence(model, 'WocHead_A_base', 'FS_Tuck_swept')).toBe(1);
+    expect(relived()).toBe(1);
+    expect(dressing.joining).toBe(false);
+    expect(dressing.poll()).toBe(false);
+  });
+
+  it('a hairstyle whose fetch FAILED never hides, beheads or delays the body, and joins when a retry lands', async () => {
+    install(CORE, beardUrl(DEFAULT_BEARD));
+    loads.fail.add(hairUrl(DEFAULT_HAIR));
+    const { model, dressing, link } = worldBody(null);
+    expect(dressing.isLive).toBe(true);
+    expect(dressing.awaited).toBe(false);
+    await vi.waitFor(() => expect(dressing.joining).toBe(false));
+    // at rest in what it holds: the head, its face and its beard, no hairstyle
+    expect(visible(model, 'WocHead_A_base')).toBe(true);
+    expect(drawnHair(model)).toEqual([]);
+    expect(beardDrawn(model)).toEqual([`WocHead_A_beard_${DEFAULT_BEARD}`]);
+    // it keeps asking (the store's own cooldown paces the retries), never settling
+    for (let i = 0; i < 3; i++) expect(dressing.poll()).toBe(false);
+    // a retry lands: hung and revealed like any late piece
+    install(hairUrl(DEFAULT_HAIR));
+    expect(dressing.poll()).toBe(true);
+    link();
+    expect(drawnHair(model)).toEqual([`WocHead_A_hair_${DEFAULT_HAIR}`]);
+    expect(dressing.poll()).toBe(false);
+  });
+
+  it('a beard whose fetch failed: clean shaven meanwhile, the hairstyle drawn', async () => {
+    install(CORE, hairUrl(DEFAULT_HAIR));
+    loads.fail.add(beardUrl(DEFAULT_BEARD));
+    const { model, dressing, link } = worldBody(null);
+    expect(dressing.isLive).toBe(true);
+    expect(dressing.awaited).toBe(false);
+    expect(drawnHair(model)).toEqual([`WocHead_A_hair_${DEFAULT_HAIR}`]);
+    expect(beardDrawn(model)).toEqual([]);
+    expect(dressing.drawnLook?.beard).toBe('none');
+    await vi.waitFor(() => expect(dressing.joining).toBe(false));
+    install(beardUrl(DEFAULT_BEARD));
+    dressing.poll();
+    link();
+    expect(beardDrawn(model)).toEqual([`WocHead_A_beard_${DEFAULT_BEARD}`]);
+    // of the seven beards its file ships, the one it draws is all that was hung
+    expect([...hangedPieces(model).keys()].filter((name) => name.includes('_beard_'))).toEqual([
+      `WocHead_A_beard_${DEFAULT_BEARD}`,
+    ]);
+  });
+
+  it('neither there yet: each joins as its own file lands, in whichever order', () => {
+    install(CORE);
+    const app = { ...DEFAULT_APPEARANCE, headHair: 'long', headBeard: 'handlebar' };
+    const { model, dressing, link, relived } = worldBody(app);
+    expect(dressing.isLive).toBe(true);
+    expect(drawnHair(model)).toEqual([]);
+    expect(beardDrawn(model)).toEqual([]);
+    install(beardUrl('handlebar'));
+    dressing.poll();
+    link();
+    expect(beardDrawn(model)).toEqual(['WocHead_A_beard_handlebar']);
+    expect(drawnHair(model)).toEqual([]);
+    expect(dressing.joining).toBe(true);
+    install(hairUrl('long'));
+    dressing.poll();
+    link();
+    expect(drawnHair(model)).toEqual(['WocHead_A_hair_long']);
+    expect(relived()).toBe(2);
+    expect(dressing.joining).toBe(false);
+  });
+
+  it('the core missing: no head to draw, the body still not awaited, live when it lands', () => {
+    // its hairstyle and beard are resident, its core is not
+    install(hairUrl(DEFAULT_HAIR), beardUrl(DEFAULT_BEARD));
+    const { model, dressing, link, relived } = worldBody(null);
+    expect(dressing.isLive).toBe(false);
+    // a body in the world never waits on a head file, the core included
+    expect(dressing.awaited).toBe(false);
+    expect(dressing.drawnNames.size).toBe(0);
+    // nothing of a head is drawn without the head itself: no hair floating on a neck
+    expect(drawnHair(model)).toEqual([]);
+    expect(dressing.joining).toBe(true);
+    install(CORE);
+    expect(dressing.poll()).toBe(true);
+    expect(dressing.isLive).toBe(false);
+    link();
+    expect(dressing.isLive).toBe(true);
+    expect([...dressing.drawnNames].sort()).toEqual([...DEFAULT_NODES].sort());
+    expect(relived()).toBe(1);
+  });
+
+  it('a later pick holds the old piece exactly as before: the opt-in changes only how a head is born', () => {
+    install(CORE, hairUrl(DEFAULT_HAIR), beardUrl(DEFAULT_BEARD));
+    const { model, dressing, link } = worldBody(null);
+    dressing.setAppearance({ ...DEFAULT_APPEARANCE, headHair: 'mohawk' });
+    // never bald in between: the swept hair stays until the mohawk is linked
+    expect(drawnHair(model)).toEqual([`WocHead_A_hair_${DEFAULT_HAIR}`]);
+    install(hairUrl('mohawk'));
+    dressing.poll();
+    expect(drawnHair(model)).toEqual([`WocHead_A_hair_${DEFAULT_HAIR}`]);
+    link();
+    expect(drawnHair(model)).toEqual(['WocHead_A_hair_mohawk']);
+  });
+
+  it('WITHOUT the opt-in the same body waits whole: a preview never draws a bare head', () => {
+    install(CORE, beardUrl(DEFAULT_BEARD));
+    const model = bornModel();
+    const { h, link } = host(model, true);
+    const dressing = new WocHeadDressing(h, 'a');
+    dressing.retint();
+    dressing.setAppearance(null);
+    expect(dressing.isLive).toBe(false);
+    expect(dressing.awaited).toBe(true);
+    expect(visible(model, 'WocHead_A_base')).toBe(false);
+    install(hairUrl(DEFAULT_HAIR));
+    dressing.poll();
+    link();
+    expect(dressing.isLive).toBe(true);
+    expect(drawnHair(model)).toEqual([`WocHead_A_hair_${DEFAULT_HAIR}`]);
+  });
+
+  it('a replaced gate: a hairstyle still linking is asked of the new one, and the old settle counts for nothing', () => {
+    install(CORE, beardUrl(DEFAULT_BEARD));
+    const model = bornModel();
+    const reveals: { node: THREE.Object3D; live: (prepared: boolean) => void }[] = [];
+    const { h } = host(model, true);
+    h.reveal = (node, live) => {
+      reveals.push({ node, live });
+    };
+    const dressing = new WocHeadDressing(h, 'a');
+    dressing.retint();
+    dressing.setBareStandIn(true);
+    dressing.setAppearance(null);
+    install(hairUrl(DEFAULT_HAIR));
+    dressing.poll();
+    expect(reveals).toHaveLength(1);
+    expect(drawnHair(model)).toEqual([]);
+    // the body is handed to another renderer generation while the hairstyle links: its old
+    // gate may never settle, so the same wrapper is asked of the new one
+    dressing.gateChanged();
+    expect(reveals).toHaveLength(2);
+    expect(reveals[1].node).toBe(reveals[0].node);
+    // the old gate settling late shows nothing: its link proves nothing of the new context
+    reveals[0].live(true);
+    expect(drawnHair(model)).toEqual([]);
+    expect(dressing.joining).toBe(true);
+    // the new gate's settle is the one that counts
+    reveals[1].live(true);
+    expect(drawnHair(model)).toEqual([`WocHead_A_hair_${DEFAULT_HAIR}`]);
+    expect(dressing.joining).toBe(false);
+    // nothing in flight: another gate change asks for nothing
+    dressing.gateChanged();
+    expect(reveals).toHaveLength(2);
+  });
+
+  /** A world body with the renderer's work queue behind it (and its gate in flight). */
+  function queuedWorldBody() {
+    const model = bornModel(null);
+    const hh = worldHost(model, { gated: true, queue: true });
+    const dressing = new WocHeadDressing(hh.h, 'a', 'lod0', null);
+    dressing.retint();
+    dressing.setBareStandIn(true);
+    dressing.setAppearance(null);
+    return { model, dressing, ...hh };
+  }
+  const HAIR_NODE = `WocHead_A_hair_${DEFAULT_HAIR}`;
+
+  it('with a work queue behind the host, a landed file hangs as ONE queued unit, never inside the poll', () => {
+    expect(WOC_HEAD_HANG_LABEL).toBe('woc-head-hang');
+    install(CORE, beardUrl(DEFAULT_BEARD));
+    const { model, dressing, link, queued, runQueued, state } = queuedWorldBody();
+    expect(dressing.isLive).toBe(true);
+    // nothing to hang while the file is on the wire: no unit
+    dressing.poll();
+    expect(queued).toEqual([]);
+    // it lands: the poll asks the queue and hangs nothing itself (guards: a crowd that
+    // waited for one file all hung it, cloned and re-dressed in the frame it landed)
+    install(hairUrl(DEFAULT_HAIR));
+    expect(dressing.poll()).toBe(false);
+    expect(queued.map((unit) => unit.label)).toEqual(['woc-head-hang:a']);
+    expect(model.getObjectByName(HAIR_NODE)).toBeUndefined();
+    // still on its way: the far bake and the merged stand-in keep waiting
+    expect(dressing.joining).toBe(true);
+    // later frames, the unit still queued: never a second one
+    dressing.poll();
+    dressing.poll();
+    expect(queued).toHaveLength(1);
+    // its turn: hung hidden behind the gate, and the host told to re-dress (no poll is
+    // running to hear a return value)
+    const before = state.relived;
+    runQueued();
+    expect(model.getObjectByName(HAIR_NODE)).toBeDefined();
+    expect(drawnHair(model)).toEqual([]);
+    expect(state.relived).toBe(before + 1);
+    expect(dressing.poll()).toBe(false);
+    expect(queued).toEqual([]);
+    link();
+    expect(drawnHair(model)).toEqual([HAIR_NODE]);
+    expect(dressing.joining).toBe(false);
+  });
+
+  it('one queued unit hangs everything that landed by its turn', () => {
+    install(CORE);
+    const { model, dressing, link, queued, runQueued } = queuedWorldBody();
+    install(hairUrl(DEFAULT_HAIR));
+    dressing.poll();
+    install(beardUrl(DEFAULT_BEARD));
+    dressing.poll();
+    expect(queued).toHaveLength(1);
+    runQueued();
+    link();
+    expect(drawnHair(model)).toEqual([HAIR_NODE]);
+    expect(model.getObjectByName(`WocHead_A_beard_${DEFAULT_BEARD}`)?.visible).toBe(true);
+    expect(dressing.poll()).toBe(false);
+    expect(queued).toEqual([]);
+  });
+
+  it('a queued hang its queue dropped is asked again after a gate change, and a stale or orphaned unit hangs nothing', () => {
+    install(CORE);
+    const { model, dressing, queued, runQueued } = queuedWorldBody();
+    install(hairUrl(DEFAULT_HAIR));
+    dressing.poll();
+    // the queue it sat on went with its renderer: the unit never runs, and no poll asks twice
+    const dropped = queued.splice(0);
+    expect(dropped).toHaveLength(1);
+    dressing.poll();
+    expect(queued).toEqual([]);
+    // a gate change (the body handed to the next renderer) lets the head ask again
+    dressing.gateChanged();
+    dressing.poll();
+    expect(queued.map((unit) => unit.label)).toEqual(['woc-head-hang:a']);
+    // the dropped unit, should it run after all, belongs to nothing
+    for (const unit of dropped) unit.work();
+    expect(model.getObjectByName(HAIR_NODE)).toBeUndefined();
+    // ...and neither does one whose body was disposed before its turn
+    dressing.dispose();
+    runQueued();
+    expect(model.getObjectByName(HAIR_NODE)).toBeUndefined();
+  });
+
+  it('a hang re-asked with no gate left is drawn all the same: revealed means visible', () => {
+    install(CORE, beardUrl(DEFAULT_BEARD));
+    const model = bornModel(null);
+    // the real host's gate: it hides the wrapper it is handed until its link settles
+    const hidden: { node: THREE.Object3D; live: (prepared: boolean) => void }[] = [];
+    let gate = true;
+    const { h } = host(model, true);
+    h.reveal = (node, live) => {
+      if (!gate) {
+        live(true);
+        return;
+      }
+      node.visible = false;
+      hidden.push({ node, live });
+    };
+    const dressing = new WocHeadDressing(h, 'a', 'lod0', null);
+    dressing.retint();
+    dressing.setBareStandIn(true);
+    dressing.setAppearance(null);
+    install(hairUrl(DEFAULT_HAIR));
+    dressing.poll();
+    expect(hidden).toHaveLength(1);
+    const wrapper = hidden[0].node;
+    expect(wrapper.visible).toBe(false);
+    // the gate is taken away while the hang links: asked again, it settles at once
+    gate = false;
+    dressing.gateChanged();
+    expect(drawnHair(model)).toEqual([HAIR_NODE]);
+    // guards: its pieces counted as shown while the wrapper the old ask hid stayed hidden
+    expect(wrapper.visible).toBe(true);
+    expect(dressing.joining).toBe(false);
+  });
+
+  it('a head not live yet but a poll away is on its way: its host holds the far bake until it is', () => {
+    install(CORE, hairUrl(DEFAULT_HAIR), beardUrl(DEFAULT_BEARD));
+    const model = bornModel(null);
+    const { h } = host(model, true);
+    const dressing = new WocHeadDressing(h, 'a', 'lod0', null);
+    dressing.retint();
+    dressing.setBareStandIn(true);
+    // every piece hung at build, the head live on its first poll: until then what the body
+    // draws of its head (nothing) is not what it will keep
+    expect(dressing.isLive).toBe(false);
+    expect(dressing.joining).toBe(true);
+    dressing.poll();
+    expect(dressing.isLive).toBe(true);
+    expect(dressing.joining).toBe(false);
+  });
+
+  it('a head whose core FAILED is not on its way: its body bakes as it is', () => {
+    install(hairUrl(DEFAULT_HAIR), beardUrl(DEFAULT_BEARD));
+    failWocHeadFileForTest(CORE);
+    const model = bornModel(null);
+    const { h } = host(model, true);
+    const dressing = new WocHeadDressing(h, 'a', 'lod0', null);
+    dressing.retint();
+    dressing.setBareStandIn(true);
+    dressing.setAppearance(null);
     dressing.poll();
     expect(dressing.isLive).toBe(false);
     expect(dressing.awaited).toBe(false);
-    vi.restoreAllMocks();
+    expect(dressing.joining).toBe(false);
+  });
+
+  it('opting in on a head already waiting lets it go live on the next poll', () => {
+    install(CORE, beardUrl(DEFAULT_BEARD));
+    const model = bornModel();
+    const dressing = new WocHeadDressing(host(model, true).h, 'a');
+    dressing.retint();
+    dressing.setAppearance(null);
+    expect(dressing.awaited).toBe(true);
+    dressing.setBareStandIn(true);
+    // no longer awaited from that call on, live on the poll
+    expect(dressing.awaited).toBe(false);
+    expect(dressing.poll()).toBe(true);
+    expect(dressing.isLive).toBe(true);
+    expect(drawnHair(model)).toEqual([]);
   });
 });
 
@@ -405,8 +857,7 @@ describe('WocHeadDressing: a look change while a file streams', () => {
   it('keeps the old hairstyle drawn until the new file is hung and revealed, then swaps', () => {
     // live on the default look (swept), the mohawk not resident yet
     install(CORE, hairUrl(DEFAULT_HAIR), beardUrl(DEFAULT_BEARD));
-    const model = baseModel();
-    hangWocHead(model, 'a');
+    const model = bornModel();
     const { h, link, relived } = host(model, true);
     const dressing = new WocHeadDressing(h, 'a');
     dressing.retint();
@@ -422,40 +873,57 @@ describe('WocHeadDressing: a look change while a file streams', () => {
     expect(influence(model, 'WocHead_A_base', 'FS_Tuck_swept')).toBe(1);
     expect(influence(model, 'WocHead_A_base', 'FS_Bald_Crown')).toBe(0);
     expect(loads.calls).toContain(hairUrl('mohawk'));
-    // every other slot rides the core: it swaps at once
+    // a slot that rides the core is hung in the same call (its file is always there), and
+    // holds the old piece the same way until the new one is linked: no hole in the face
     dressing.setAppearance({ ...DEFAULT_APPEARANCE, headHair: 'mohawk', headNose: 'broad' });
+    expect(model.getObjectByName('WocHead_A_nose_broad')).toBeDefined();
+    expect(visible(model, 'WocHead_A_nose_broad')).toBe(false);
+    expect(visible(model, 'WocHead_A_nose_default')).toBe(true);
+    expect(dressing.drawnLook?.nose).toBe('default');
+    link();
     expect(visible(model, 'WocHead_A_nose_broad')).toBe(true);
+    // ...and the nose it replaced is off the body
+    expect(model.getObjectByName('WocHead_A_nose_default')).toBeUndefined();
+    expect(relived()).toBe(1);
     expect(drawnHair(model)).toEqual([swept]);
     // the file lands and hangs, still linking: the swept hair stays
     expect(dressing.poll()).toBe(false);
     install(hairUrl('mohawk'));
     expect(dressing.poll()).toBe(true);
     expect(drawnHair(model)).toEqual([swept]);
-    expect(relived()).toBe(0);
+    expect(relived()).toBe(1);
     // revealed: swapped in the same step, the tuck with it, and the far bake told
     link();
     expect(drawnHair(model)).toEqual(['WocHead_A_hair_mohawk']);
     expect(dressing.drawnLook?.hair).toBe('mohawk');
     expect(influence(model, 'WocHead_A_base', 'FS_Tuck_swept')).toBe(0);
-    expect(relived()).toBe(1);
+    expect(relived()).toBe(2);
     expect(dressing.drawnNames.has('WocHead_A_hair_mohawk')).toBe(true);
     expect(dressing.drawnNames.has(swept)).toBe(false);
+    // the hairstyle it held meanwhile left with the swap
+    expect(model.getObjectByName(swept)).toBeUndefined();
   });
 
-  it('holds the old beard until a beard in a file of its own is revealed', () => {
+  it('holds the old beard until the new one is revealed, whichever file ships it', () => {
     install(CORE, hairUrl(DEFAULT_HAIR), beardUrl(DEFAULT_BEARD));
-    const model = baseModel();
-    hangWocHead(model, 'a');
+    const model = bornModel();
     const { h, link } = host(model, true);
     const dressing = new WocHeadDressing(h, 'a');
     dressing.setAppearance(null);
     const boxed = `WocHead_A_beard_${DEFAULT_BEARD}`;
     expect(visible(model, boxed)).toBe(true);
-    // a beard sharing the resident beards file swaps at once
+    // of the seven beards the shared file ships, this body hangs the one it draws
+    expect(model.getObjectByName('WocHead_A_beard_goatee')).toBeUndefined();
+    // a beard of the same resident file: hung in the same call, the boxed one held until
+    // it is linked
     dressing.setAppearance({ ...DEFAULT_APPEARANCE, headBeard: 'goatee' });
+    expect(model.getObjectByName('WocHead_A_beard_goatee')).toBeDefined();
+    expect(visible(model, 'WocHead_A_beard_goatee')).toBe(false);
+    expect(visible(model, boxed)).toBe(true);
+    link();
     expect(visible(model, 'WocHead_A_beard_goatee')).toBe(true);
-    expect(visible(model, boxed)).toBe(false);
-    // the handlebar ships alone: the goatee stays until it is revealed
+    expect(model.getObjectByName(boxed)).toBeUndefined();
+    // the handlebar ships alone: the goatee stays until it lands and is revealed
     dressing.setAppearance({ ...DEFAULT_APPEARANCE, headBeard: 'handlebar' });
     expect(visible(model, 'WocHead_A_beard_goatee')).toBe(true);
     install(beardUrl('handlebar'));
@@ -464,13 +932,12 @@ describe('WocHeadDressing: a look change while a file streams', () => {
     expect(visible(model, 'WocHead_A_beard_handlebar')).toBe(false);
     link();
     expect(visible(model, 'WocHead_A_beard_handlebar')).toBe(true);
-    expect(visible(model, 'WocHead_A_beard_goatee')).toBe(false);
+    expect(model.getObjectByName('WocHead_A_beard_goatee')).toBeUndefined();
   });
 
   it('a pick changed back before its file lands draws the old one at once, and stays', () => {
     install(CORE, hairUrl(DEFAULT_HAIR), beardUrl(DEFAULT_BEARD));
-    const model = baseModel();
-    hangWocHead(model, 'a');
+    const model = bornModel();
     const { h, link, relived } = host(model, true);
     const dressing = new WocHeadDressing(h, 'a');
     dressing.setAppearance(null);
@@ -490,8 +957,7 @@ describe('WocHeadDressing: a look change while a file streams', () => {
 
   it('a bald head picking a hairstyle stays bald (live, never awaited again) until it is revealed', () => {
     install(CORE, beardUrl(DEFAULT_BEARD));
-    const model = baseModel();
-    hangWocHead(model, 'a');
+    const model = bornModel({ ...DEFAULT_APPEARANCE, headHair: 'bald' });
     const { h, link } = host(model, true);
     const dressing = new WocHeadDressing(h, 'a');
     dressing.setAppearance({ ...DEFAULT_APPEARANCE, headHair: 'bald' });
@@ -510,8 +976,7 @@ describe('WocHeadDressing: a look change while a file streams', () => {
 
   it("a NEW subject ('look' hold) keeps the previous head WHOLE, never its hair on the new face", () => {
     install(CORE, hairUrl(DEFAULT_HAIR), beardUrl(DEFAULT_BEARD));
-    const model = baseModel();
-    hangWocHead(model, 'a');
+    const model = bornModel();
     const { h, link, relived } = host(model, true);
     const dressing = new WocHeadDressing(h, 'a');
     dressing.retint();
@@ -551,19 +1016,32 @@ describe('WocHeadDressing: a look change while a file streams', () => {
     expect(hairTint?.tint.value.z).toBeCloseTo(1, 5);
     expect(influence(model, 'WocHead_A_base', 'FS_Chin_Softness')).toBe(1);
     expect(relived()).toBe(1);
+    // the previous subject's pieces left with the swap: nothing of it stays on the body
+    expect(model.getObjectByName(`WocHead_A_hair_${DEFAULT_HAIR}`)).toBeUndefined();
+    expect(model.getObjectByName('WocHead_A_nose_default')).toBeUndefined();
   });
 
   it("a 'look' hold stands through later picks, then draws the latest whole; a drawable one never holds", () => {
     install(CORE, hairUrl(DEFAULT_HAIR), beardUrl(DEFAULT_BEARD), hairUrl('long'));
-    const model = baseModel();
-    hangWocHead(model, 'a');
+    const model = bornModel();
     const { h, link } = host(model, true);
     const dressing = new WocHeadDressing(h, 'a');
     dressing.setAppearance(null);
-    // a subject whose files are all shown draws at once
+    // a subject whose files are all resident: hung in the same call, the head on screen
+    // held whole until its pieces are linked, then drawn whole
     dressing.setAppearance({ ...DEFAULT_APPEARANCE, headHair: 'long', headNose: 'broad' }, 'look');
+    expect(drawnHair(model)).toEqual([`WocHead_A_hair_${DEFAULT_HAIR}`]);
+    expect(visible(model, 'WocHead_A_nose_default')).toBe(true);
+    link();
     expect(drawnHair(model)).toEqual(['WocHead_A_hair_long']);
     expect(visible(model, 'WocHead_A_nose_broad')).toBe(true);
+    // a subject whose every piece is on the body already draws at once: nothing to hold
+    dressing.setAppearance(
+      { ...DEFAULT_APPEARANCE, headHair: 'long', headNose: 'broad', hairHue: 120 },
+      'look',
+    );
+    expect(dressing.drawnLook?.hair).toBe('long');
+    expect(dressing.poll()).toBe(false);
     // two streaming subjects in a row: the head on screen holds for both
     dressing.setAppearance({ ...DEFAULT_APPEARANCE, headHair: 'quiff' }, 'look');
     dressing.setAppearance(
@@ -590,8 +1068,7 @@ describe('WocHeadDressing: a look change while a file streams', () => {
 
   it("wraps a late file's materials with the look's CURRENT colours, and drives its morphs", () => {
     install(CORE, hairUrl(DEFAULT_HAIR), beardUrl(DEFAULT_BEARD));
-    const model = baseModel();
-    hangWocHead(model, 'a');
+    const model = bornModel();
     const { h, link } = host(model, true);
     const dressing = new WocHeadDressing(h, 'a');
     dressing.retint();
@@ -621,9 +1098,10 @@ describe('WocHeadDressing: a look change while a file streams', () => {
 });
 
 describe('WocHeadDressing: the drawn head', () => {
-  it('flips a look in place: same nodes, new flags, morphs and tint uniforms', () => {
+  it('changes a look in place: the same body and head, new pieces, morphs and tint uniforms', () => {
     const { model, dressing } = liveDressing();
-    const nose = model.getObjectByName('WocHead_A_nose_broad');
+    const base = model.getObjectByName('WocHead_A_base');
+    const eye = model.getObjectByName('WocHead_A_eyes_default_L') as THREE.Mesh;
     const changed = dressing.setAppearance({
       ...DEFAULT_APPEARANCE,
       headHair: 'mohawk',
@@ -634,12 +1112,15 @@ describe('WocHeadDressing: the drawn head', () => {
       hairLight: 0.5,
     });
     expect(changed).toBe(true);
-    expect(model.getObjectByName('WocHead_A_nose_broad')).toBe(nose);
+    // nothing rebuilt: every piece the two looks share is the very node it was
+    expect(model.getObjectByName('WocHead_A_base')).toBe(base);
+    expect(model.getObjectByName('WocHead_A_eyes_default_L')).toBe(eye);
+    // the pieces the new look adds are hung and drawn (no gate here: at once)...
     expect(visible(model, 'WocHead_A_hair_mohawk')).toBe(true);
-    expect(visible(model, 'WocHead_A_hair_swept')).toBe(false);
     expect(visible(model, 'WocHead_A_nose_broad')).toBe(true);
-    expect(visible(model, 'WocHead_A_nose_default')).toBe(false);
-    const eye = model.getObjectByName('WocHead_A_eyes_default_L') as THREE.Mesh;
+    // ...and the ones it no longer draws are off the body, never left hidden on it
+    expect(model.getObjectByName('WocHead_A_hair_swept')).toBeUndefined();
+    expect(model.getObjectByName('WocHead_A_nose_default')).toBeUndefined();
     expect(eye.morphTargetInfluences?.[0]).toBe(0.5);
     const hair = model.getObjectByName('WocHead_A_hair_mohawk') as THREE.Mesh;
     const u = wocHeadTintOf(hair.material as THREE.Material);
@@ -662,28 +1143,172 @@ describe('WocHeadDressing: the drawn head', () => {
     ).toBe(false);
   });
 
-  it('hangs every file resident at build, each in its own wrapper on the head bone', () => {
+  it("hangs only the pieces its look draws, each file's in one wrapper on the head bone", () => {
     const { model } = liveDressing();
     const rig = wocHeadRigOf(model);
-    expect([...(rig?.files.keys() ?? [])].sort()).toEqual([...LIBRARY.keys()].sort());
+    // the whole library is resident: the body carries its look's three files of it
+    expect([...(rig?.files.keys() ?? [])]).toEqual([
+      CORE,
+      hairUrl(DEFAULT_HAIR),
+      beardUrl(DEFAULT_BEARD),
+    ]);
     const head = model.getObjectByName('head');
     for (const file of rig?.files.values() ?? []) {
       expect(file.wrappers).toHaveLength(1);
       expect(file.wrappers[0].parent).toBe(head);
     }
-    // the whole library, once each
-    expect([...hangedPieces(model).keys()].sort()).toEqual([...wocHeadAllNodes('a')].sort());
+    // exactly what the look draws, once each: never the library
+    expect([...hangedPieces(model).keys()].sort()).toEqual([...DEFAULT_NODES].sort());
+    expect(hangedPieces(model).size).toBe(11);
+    expect(wocHeadAllNodes('a').length).toBe(57);
+  });
+
+  it('a body whose files were hung WHOLE is pruned to its look by the first pass', () => {
+    installAll();
+    // a host that hangs files whole (the Guide viewer): every piece of the library
+    const model = baseModel();
+    hangWocHead(model, 'a');
+    expect(hangedPieces(model).size).toBe(wocHeadAllNodes('a').length);
+    const { h, forgotten } = host(model, false);
+    const dressing = new WocHeadDressing(h, 'a');
+    dressing.retint();
+    // the first pass leaves the look's pieces and takes everything else off the body...
+    expect([...hangedPieces(model).keys()].sort()).toEqual([...DEFAULT_NODES].sort());
+    expect(wocHeadRigOf(model)?.files.size).toBe(3);
+    // ...telling the host (its per-mesh record lets go of them), and freeing their clones
+    expect(forgotten).toHaveLength(wocHeadAllNodes('a').length - DEFAULT_NODES.length);
+    expect(dressing.poll()).toBe(true);
+    expect(dressing.isLive).toBe(true);
+    expect([...dressing.drawnNames].sort()).toEqual([...DEFAULT_NODES].sort());
+  });
+
+  it('a piece no longer drawn leaves the graph, the host forgets it, and its tint clone is freed', () => {
+    const { model, dressing, forgotten } = liveDressing();
+    const nose = model.getObjectByName('WocHead_A_nose_default') as THREE.Mesh;
+    const wrapper = nose.parent;
+    const clone = nose.material as THREE.Material;
+    expect(wocHeadTintOf(clone)?.role).toBe('skin');
+    const freed = vi.fn();
+    clone.addEventListener('dispose', freed);
+    // the body and each piece of the look that takes a tint: one clone each
+    const before = dressing.tintClones;
+    dressing.setAppearance({ ...DEFAULT_APPEARANCE, headNose: 'broad' });
+    // out of the scene graph (no matrix update or material pass will visit it again)
+    expect(nose.parent).toBeNull();
+    expect(model.getObjectByName('WocHead_A_nose_default')).toBeUndefined();
+    expect(wocHeadRigOf(model)?.pieces.has('WocHead_A_nose_default')).toBe(false);
+    expect(wocHeadRigOf(model)?.meshes).not.toContain(nose);
+    expect(forgotten).toEqual([nose]);
+    expect(freed).toHaveBeenCalledOnce();
+    // one clone left, one minted for the nose that replaced it: the count follows the look
+    expect(dressing.tintClones).toBe(before);
+    // its wrapper stays for the core's other pieces
+    expect(wrapper?.parent).toBe(model.getObjectByName('head'));
+    // a colour change no longer reaches the freed clone
+    const u = wocHeadTintOf(clone);
+    const was = u?.tint.value.toArray();
+    dressing.setAppearance({
+      ...DEFAULT_APPEARANCE,
+      headNose: 'broad',
+      skinHue: 20,
+      skinSat: 0.33,
+      skinLight: 0.16,
+    });
+    expect(u?.tint.value.toArray()).toEqual(was);
+  });
+
+  it('the tint clones follow the look: clean shaven and bald hold fewer, never the library', () => {
+    const { model, dressing } = liveDressing();
+    // every piece of this fixture has a material of its own: the body, and one per piece
+    expect(dressing.tintClones).toBe(1 + DEFAULT_NODES.length);
+    dressing.setAppearance({ ...DEFAULT_APPEARANCE, headHair: 'bald', headBeard: 'none' });
+    expect(dressing.tintClones).toBe(1 + DEFAULT_NODES.length - 2);
+    expect(hangedPieces(model).size).toBe(DEFAULT_NODES.length - 2);
+    // a file left with no piece on the body is no longer hung on it at all
+    expect([...(wocHeadRigOf(model)?.files.keys() ?? [])]).toEqual([CORE]);
+    expect(model.getObjectByName('head')?.children).toHaveLength(1);
+    // back: hung afresh, a clone each again
+    dressing.setAppearance(DEFAULT_APPEARANCE);
+    expect(dressing.tintClones).toBe(1 + DEFAULT_NODES.length);
+    expect(drawnHair(model)).toEqual([`WocHead_A_hair_${DEFAULT_HAIR}`]);
+  });
+
+  it('a piece taken off and picked again is hung afresh, hidden until it is linked', () => {
+    const { model, dressing, link, inFlight } = liveDressing(true);
+    const first = model.getObjectByName('WocHead_A_nose_default');
+    dressing.setAppearance({ ...DEFAULT_APPEARANCE, headNose: 'broad' });
+    link();
+    expect(first?.parent).toBeNull();
+    // picked again: another node over the same shared geometry, behind the gate like any
+    // piece hung on a body already drawn (its program may have been released meanwhile)
+    dressing.setAppearance(DEFAULT_APPEARANCE);
+    const again = model.getObjectByName('WocHead_A_nose_default') as THREE.Mesh;
+    expect(again).toBeDefined();
+    expect(again).not.toBe(first);
+    expect(again.geometry).toBe((first as THREE.Mesh).geometry);
+    expect(inFlight()).toBe(1);
+    expect(again.visible).toBe(false);
+    expect(visible(model, 'WocHead_A_nose_broad')).toBe(true);
+    link();
+    expect(again.visible).toBe(true);
+    expect(model.getObjectByName('WocHead_A_nose_broad')).toBeUndefined();
+  });
+
+  it('a piece still linking is never hung twice: frames change nothing, and a later pick out of the same file lands', () => {
+    const { model, dressing, link, inFlight } = liveDressing(true);
+    dressing.setAppearance({ ...DEFAULT_APPEARANCE, headNose: 'broad' });
+    const broad = model.getObjectByName('WocHead_A_nose_broad');
+    expect(broad).toBeDefined();
+    expect(inFlight()).toBe(1);
+    // frames pass while its programs link: nothing is hung again and the gate is not asked again
+    for (let i = 0; i < 3; i++) expect(dressing.poll()).toBe(false);
+    expect(inFlight()).toBe(1);
+    expect(model.getObjectByName('WocHead_A_nose_broad')).toBe(broad);
+    expect(dressing.joining).toBe(true);
+    link();
+    expect(visible(model, 'WocHead_A_nose_broad')).toBe(true);
+    expect(dressing.joining).toBe(false);
+    // guards: a poll that tried to hang the linking piece again found nothing left to hang
+    // and wrote its whole FILE off as unable to hang on this body, so no later pick out of
+    // the core ever landed
+    dressing.setAppearance(DEFAULT_APPEARANCE);
+    expect(model.getObjectByName('WocHead_A_nose_default')).toBeDefined();
+    expect(inFlight()).toBe(1);
+    link();
+    expect(visible(model, 'WocHead_A_nose_default')).toBe(true);
+    expect(model.getObjectByName('WocHead_A_nose_broad')).toBeUndefined();
+  });
+
+  it('a pick taken back before it links leaves at once, and its late settle changes nothing', () => {
+    const { model, dressing, link, forgotten, relived } = liveDressing(true);
+    dressing.setAppearance({ ...DEFAULT_APPEARANCE, headNose: 'broad' });
+    const broad = model.getObjectByName('WocHead_A_nose_broad');
+    expect(broad).toBeDefined();
+    // taken back while its programs link: off the body, the nose that never left still drawn
+    dressing.setAppearance(DEFAULT_APPEARANCE);
+    expect(broad?.parent).toBeNull();
+    expect(forgotten).toEqual([broad]);
+    expect(visible(model, 'WocHead_A_nose_default')).toBe(true);
+    // nothing is on its way any more: the head is at rest and the poll is free
+    expect(dressing.joining).toBe(false);
+    expect(dressing.poll()).toBe(false);
+    const was = relived();
+    link();
+    expect(visible(model, 'WocHead_A_nose_default')).toBe(true);
+    expect(model.getObjectByName('WocHead_A_nose_broad')).toBeUndefined();
+    expect(relived()).toBe(was);
   });
 
   it('wraps the body skin and every tinted head role, reusing clones on a retint', () => {
     const { model, dressing } = liveDressing();
+    dressing.setAppearance({ ...DEFAULT_APPEARANCE, headPiercing: 'lip' });
     const body = model.getObjectByName('Character_Body') as THREE.Mesh;
     const bodyMat = body.material as THREE.Material;
     expect(wocHeadTintOf(bodyMat)?.role).toBe('skin');
     expect(wocHeadTintOf(bodyMat)?.surface).toBe('suit');
     const piercing = model.getObjectByName('WocHead_A_piercing_lip') as THREE.Mesh;
     expect(wocHeadTintOf(piercing.material as THREE.Material)).toBeNull();
-    const brow = model.getObjectByName('WocHead_A_brows_default_L') as THREE.Mesh;
+    const brow = model.getObjectByName('WocHead_A_brows_relaxed_L') as THREE.Mesh;
     expect(wocHeadTintOf(brow.material as THREE.Material)?.role).toBe('brow');
     dressing.retint();
     expect(body.material).toBe(bodyMat);
@@ -786,16 +1411,33 @@ describe('WocHeadDressing: the drawn head', () => {
     expect(visible(model, boxed)).toBe(true);
     expect(visible(model, `WocHead_A_hair_${DEFAULT_HAIR}`)).toBe(false);
     dressing.setHelm(false);
-    const node = model.getObjectByName('WocHead_A_beard_goatee');
     expect(dressing.setAppearance({ ...DEFAULT_APPEARANCE, headBeard: 'goatee' })).toBe(true);
-    expect(model.getObjectByName('WocHead_A_beard_goatee')).toBe(node);
     expect(visible(model, 'WocHead_A_beard_goatee')).toBe(true);
-    expect(visible(model, boxed)).toBe(false);
-    // clean shaven draws no beard at all
+    // the beard it replaced is off the body
+    expect(model.getObjectByName(boxed)).toBeUndefined();
+    // clean shaven draws no beard at all, and hangs none
     dressing.setAppearance({ ...DEFAULT_APPEARANCE, headBeard: 'none' });
-    for (const [name] of hangedPieces(model)) {
-      if (name.includes('_beard_')) expect(visible(model, name), name).toBe(false);
-    }
+    expect([...hangedPieces(model).keys()].filter((name) => name.includes('_beard_'))).toEqual([]);
+  });
+
+  it('a hairstyle a helm hides stays hung: the helm coming off is a flag, never a hang or a gate', () => {
+    const { model, dressing, forgotten, inFlight } = liveDressing(true);
+    const hair = model.getObjectByName(`WocHead_A_hair_${DEFAULT_HAIR}`) as THREE.Mesh;
+    dressing.setHelm(true);
+    // hidden, still on the body (a portrait shows it bare-headed, and the helm comes off
+    // in the middle of a fight)
+    expect(hair.visible).toBe(false);
+    expect(model.getObjectByName(`WocHead_A_hair_${DEFAULT_HAIR}`)).toBe(hair);
+    expect(forgotten).toEqual([]);
+    dressing.setHelm(false);
+    expect(hair.visible).toBe(true);
+    expect(inFlight()).toBe(0);
+    // ...and so does a hairstyle HELD under a helm while the picked one streams
+    dressing.setHelm(true);
+    dressing.setAppearance({ ...DEFAULT_APPEARANCE, headHair: 'mohawk' });
+    expect(model.getObjectByName(`WocHead_A_hair_${DEFAULT_HAIR}`)).toBe(hair);
+    dressing.setHelm(false);
+    expect(drawnHair(model)).toEqual([`WocHead_A_hair_${DEFAULT_HAIR}`]);
   });
 
   it('tints the beard with the HAIR colour, following every hair change in place', () => {
@@ -832,15 +1474,23 @@ describe('WocHeadDressing: the drawn head', () => {
 
   it('drives the chin on every piece that carries it and the bald crown on the base', () => {
     const { model, dressing } = liveDressing();
-    // the authored chin by default, on the head, lips, nose and beards alike
-    for (const node of ['WocHead_A_base', 'WocHead_A_mouth_full', 'WocHead_A_beard_long']) {
+    // the authored chin by default, on the head, lips, nose and beard alike
+    for (const node of ['WocHead_A_base', 'WocHead_A_mouth_default', 'WocHead_A_beard_boxed']) {
       expect(influence(model, node, 'FS_Chin_Softness'), node).toBeCloseTo(0.65, 6);
     }
+    const narrow = { ...DEFAULT_APPEARANCE.headShape, chinWidth: 1 };
+    dressing.setAppearance({ ...DEFAULT_APPEARANCE, headShape: narrow });
+    for (const node of ['WocHead_A_base', 'WocHead_A_nose_default', 'WocHead_A_beard_boxed']) {
+      expect(influence(model, node, 'FS_Chin_Softness'), node).toBe(1);
+    }
+    // a piece hung later is posed with the face it joins, never at the pack's own influence
     dressing.setAppearance({
       ...DEFAULT_APPEARANCE,
-      headShape: { ...DEFAULT_APPEARANCE.headShape, chinWidth: 1 },
+      headShape: narrow,
+      headNose: 'broad',
+      headBeard: 'chops',
     });
-    for (const node of ['WocHead_A_base', 'WocHead_A_nose_broad', 'WocHead_A_beard_chops']) {
+    for (const node of ['WocHead_A_nose_broad', 'WocHead_A_beard_chops']) {
       expect(influence(model, node, 'FS_Chin_Softness'), node).toBe(1);
     }
     // a piece without the target is left alone (by name, never by index)
@@ -944,9 +1594,9 @@ function atlasPiece(name: string, side: THREE.Side = THREE.FrontSide): THREE.Mes
 
 type Library = typeof LIBRARY;
 /** Type A's library as one merged material can draw it, every piece one sided (a Type A
- *  head is). Minted per case, never shared between two: a merged program is remembered
- *  as linked by the material it was wrapped from (woc_head_dressing.ts), so a case on
- *  another case's materials would find its gate already passed. */
+ *  head is). Minted per case, never shared between two: a merged program's witness is
+ *  kept by the material it was wrapped from (woc_head_merge_proof_core.ts), so a case on
+ *  another case's materials could find its gate already proven. */
 const mergeLibrary = (): Library => splitHeadScenes('a', (name) => atlasPiece(name));
 /** The same library with every piece two sided but the hairstyles. */
 const twoSidedLibrary = (): Library =>
@@ -966,6 +1616,8 @@ function installFrom(library: Library, urls: readonly string[] = [...library.key
 interface WorldHostOptions {
   /** Reveals wait for `link` (the compile gate in flight) instead of settling at once. */
   gated?: boolean;
+  /** The gate hands no readiness proof with its settle (a host that cannot prove a link). */
+  unproven?: boolean;
   /** A work queue stands behind the host: scheduled units wait for `runQueued`. */
   queue?: boolean;
   /** Runs inside every adoption, after the dressing's retint pass (the effect the body
@@ -980,14 +1632,19 @@ const standInOf = (node: THREE.Object3D): THREE.Mesh | null =>
 /** The host a world view hands the dressing: what the suite's fake answers, plus what a
  *  merged head asks of it, every call recorded. */
 function worldHost(model: THREE.Object3D, opts: WorldHostOptions = {}) {
-  const reveals: { node: THREE.Object3D; live: (prepared: boolean) => void }[] = [];
+  const reveals: {
+    node: THREE.Object3D;
+    live: (prepared: boolean, proof?: () => boolean) => void;
+  }[] = [];
   /** Every node the host's gate was asked to reveal, in order. */
   const revealed: THREE.Object3D[] = [];
   const forgotten: THREE.Object3D[] = [];
   const queued: { work: () => void; label: string }[] = [];
   /** `drawn`: what rigDrawn answers; `asks`: how often it was asked; `adopts`: how many
-   *  merged stand-ins were adopted. */
-  const state = { drawn: true, asks: 0, relived: 0, adopts: 0 };
+   *  merged stand-ins were adopted; `context`: whether this host's GPU context still holds
+   *  what its gates linked (what every proof it handed answers when asked again);
+   *  `proofs`: how often one of them was asked. */
+  const state = { drawn: true, asks: 0, relived: 0, adopts: 0, context: true, proofs: 0 };
   const h: WocHeadDressingHost = {
     model,
     adopt: (node, retint) => {
@@ -1017,13 +1674,19 @@ function worldHost(model: THREE.Object3D, opts: WorldHostOptions = {}) {
       queued.push({ work, label });
     };
   }
-  /** Settle every reveal in flight: the gate linked, or gave up (prepared false). */
+  /** Settle every reveal in flight: the gate linked, or gave up (prepared false). As the
+   *  renderer's gate does, it hands the proof it settled on, which can be asked again. */
   const link = (prepared = true): void => {
-    for (const { live } of reveals.splice(0)) live(prepared);
+    const proof = (): boolean => {
+      state.proofs++;
+      return prepared && state.context;
+    };
+    for (const { live } of reveals.splice(0)) live(prepared, opts.unproven ? undefined : proof);
   };
-  /** Give every queued unit its turn. */
+  /** Give every queued unit its turn, and every unit one of them asks for in its turn (a
+   *  new head is a band of its fold, then its mount). */
   const runQueued = (): void => {
-    for (const { work } of queued.splice(0)) work();
+    while (queued.length > 0) for (const { work } of queued.splice(0)) work();
   };
   return { h, link, reveals, revealed, forgotten, queued, runQueued, state };
 }
@@ -1100,12 +1763,13 @@ describe('WocHeadDressing: the one-draw merged head', () => {
     hang?: readonly string[];
   }
 
-  /** A body live on the default look over a mergeable library (merging still off). */
+  /** A body live on the default look over a mergeable library (merging still off): born
+   *  with its look's pieces, or with the files of `hang` hung whole in that order. */
   function mergeable(opts: BodyOptions = {}) {
     const library = opts.library ?? mergeLibrary();
     installFrom(library);
-    const model = baseModel();
-    hangWocHead(model, 'a', opts.hang);
+    const model = opts.hang ? baseModel() : bornModel();
+    if (opts.hang) hangWocHead(model, 'a', opts.hang);
     const hh = worldHost(model, opts);
     const dressing = new WocHeadDressing(hh.h, 'a');
     dressing.retint();
@@ -1146,8 +1810,7 @@ describe('WocHeadDressing: the one-draw merged head', () => {
     const library = mergeLibrary();
     // the default look's hairstyle still streams: the head is not live
     installFrom(library, [CORE, beardUrl(DEFAULT_BEARD)]);
-    const model = baseModel();
-    hangWocHead(model, 'a');
+    const model = bornModel();
     const { h, link } = worldHost(model, { gated: true });
     const dressing = new WocHeadDressing(h, 'a');
     dressing.retint();
@@ -1197,8 +1860,8 @@ describe('WocHeadDressing: the one-draw merged head', () => {
     expect(mesh?.geometry.getAttribute('position').count).toBe(DEFAULT_PIECES.length * 24);
     // what a piece IS stays the dressing's: still shown, still the far bake's part set
     for (const name of DEFAULT_PIECES) expect(visible(model, name), name).toBe(true);
-    expect(visible(model, 'WocHead_A_nose_broad')).toBe(false);
-    expect((model.getObjectByName('WocHead_A_nose_broad') as THREE.Mesh).layers.mask).toBe(1);
+    // ...and the stand-in folds everything this body carries: nothing else hangs on it
+    expect([...(wocHeadRigOf(model)?.pieces.keys() ?? [])].sort()).toEqual(DEFAULT_PIECES);
     // settled: later polls mount nothing more
     dressing.poll();
     expect(
@@ -1395,10 +2058,13 @@ describe('WocHeadDressing: the one-draw merged head', () => {
 
   it('a piece swapped in place is another head: the old one drops, the new one merges', () => {
     const { model, dressing } = merged();
+    const old = model.getObjectByName('WocHead_A_nose_default') as THREE.Mesh;
     dressing.setAppearance({ ...DEFAULT_APPEARANCE, headNose: 'broad' });
     expect(mergedMesh(model)).toBeUndefined();
     expect(maskSet(model, dressing)).toEqual([1]);
-    expect((model.getObjectByName('WocHead_A_nose_default') as THREE.Mesh).layers.mask).toBe(1);
+    // the nose it replaced left the body with its layers handed back, never stranded at 0
+    expect(old.parent).toBeNull();
+    expect(old.layers.mask).toBe(1);
     dressing.poll();
     expect(dressing.isMerged).toBe(true);
     expect(drawnMasks(model, dressing).WocHead_A_nose_broad).toBe(0);
@@ -1408,8 +2074,8 @@ describe('WocHeadDressing: the one-draw merged head', () => {
   it('waits for a head that is whole and at rest: never while a file streams or links', () => {
     const library = mergeLibrary();
     installFrom(library, [CORE, hairUrl(DEFAULT_HAIR), beardUrl(DEFAULT_BEARD)]);
-    const model = baseModel();
-    hangWocHead(model, 'a');
+    const model = bornModel();
+    const swept = model.getObjectByName(`WocHead_A_hair_${DEFAULT_HAIR}`) as THREE.Mesh;
     const { h, link } = worldHost(model, { gated: true });
     const dressing = new WocHeadDressing(h, 'a');
     dressing.retint();
@@ -1440,18 +2106,16 @@ describe('WocHeadDressing: the one-draw merged head', () => {
     expect(dressing.isMerged).toBe(true);
     expect(drawnMasks(model, dressing).WocHead_A_hair_mohawk).toBe(0);
     expect(maskSet(model, dressing)).toEqual([0]);
-    expect(
-      (model.getObjectByName(`WocHead_A_hair_${DEFAULT_HAIR}`) as THREE.Mesh).layers.mask,
-    ).toBe(1);
+    // the hairstyle it held left the body with its layers handed back
+    expect(swept.parent).toBeNull();
+    expect(swept.layers.mask).toBe(1);
   });
 
-  it('waits out a file still linking, even one the look no longer wants', () => {
+  it('a pick taken back before its piece links leaves at once: the head is at rest in what it draws', () => {
     const library = mergeLibrary();
-    const worn = [CORE, hairUrl(DEFAULT_HAIR), beardUrl(DEFAULT_BEARD)];
-    installFrom(library, [...worn, hairUrl('mohawk')]);
-    const model = baseModel();
-    hangWocHead(model, 'a', worn);
-    const { h, link } = worldHost(model, { gated: true });
+    installFrom(library, [CORE, hairUrl(DEFAULT_HAIR), beardUrl(DEFAULT_BEARD), hairUrl('mohawk')]);
+    const model = bornModel();
+    const { h, link, forgotten } = worldHost(model, { gated: true });
     const dressing = new WocHeadDressing(h, 'a');
     dressing.retint();
     dressing.setAppearance(null);
@@ -1459,21 +2123,105 @@ describe('WocHeadDressing: the one-draw merged head', () => {
     dressing.poll();
     link();
     expect(dressing.isMerged).toBe(true);
-    // a hairstyle is picked: its file hangs and starts linking (the old hair held)...
+    // a hairstyle is picked: its piece hangs and starts linking (the old hair held, so the
+    // stand-in still matches what is drawn)...
     dressing.setAppearance({ ...DEFAULT_APPEARANCE, headHair: 'mohawk' });
-    dressing.poll();
+    const mohawk = model.getObjectByName('WocHead_A_hair_mohawk');
+    expect(mohawk).toBeDefined();
     expect(dressing.isMerged).toBe(true);
-    // ...and the pick is taken back, with another face, before it links
+    // ...and no stand-in would be mounted for a head about to change
+    expect(dressing.joining).toBe(true);
+    // the pick is taken back, with another face, before it links
     dressing.setAppearance(OTHER_FACE);
     expect(mergedMesh(model)).toBeUndefined();
-    for (let i = 0; i < 3; i++) dressing.poll();
-    // every file the look wants is shown, but a reveal is still in flight: not at rest
-    expect(mergedMesh(model)).toBeUndefined();
-    expect(maskSet(model, dressing)).toEqual([1]);
-    link();
+    // the piece nobody wants any more is off the body: nothing is on its way
+    expect(mohawk?.parent).toBeNull();
+    expect(forgotten).toContain(mohawk);
+    expect(dressing.joining).toBe(false);
+    // at rest in what it draws, so the very next poll merges it (the first stand-in's
+    // program is still proven: no gate of its own)
     dressing.poll();
     expect(dressing.isMerged).toBe(true);
+    expect(maskSet(model, dressing)).toEqual([0]);
+    // the gate settling on the piece that left changes nothing
+    link();
+    expect(dressing.isMerged).toBe(true);
     expect(drawnHair(model)).toEqual([`WocHead_A_hair_${DEFAULT_HAIR}`]);
+    expect(model.getObjectByName('WocHead_A_hair_mohawk')).toBeUndefined();
+  });
+
+  it('a head standing in bare is not merged until its hairstyle joins: one stand-in built, never two', () => {
+    const library = mergeLibrary();
+    installFrom(library, [CORE, beardUrl(DEFAULT_BEARD)]);
+    const model = bornModel();
+    const { h, link } = worldHost(model, { gated: true });
+    const dressing = new WocHeadDressing(h, 'a');
+    dressing.retint();
+    dressing.setBareStandIn(true);
+    dressing.setMerged(true);
+    dressing.setAppearance(null);
+    // live and drawn, bald: its hairstyle is on the wire
+    expect(dressing.isLive).toBe(true);
+    expect(drawnHair(model)).toEqual([]);
+    for (let i = 0; i < 3; i++) dressing.poll();
+    // the head is about to change, so nothing is built for what it draws meanwhile
+    expect(mergedMesh(model)).toBeUndefined();
+    expect(wocHeadMergeInternalsForTest.cache.size).toBe(0);
+    expect(maskSet(model, dressing)).toEqual([1]);
+    // the file lands and hangs, still linking: still nothing
+    installFrom(library, [hairUrl(DEFAULT_HAIR)]);
+    dressing.poll();
+    dressing.poll();
+    expect(mergedMesh(model)).toBeUndefined();
+    // the hairstyle joins, and the next poll merges the whole head
+    link();
+    expect(drawnHair(model)).toEqual([`WocHead_A_hair_${DEFAULT_HAIR}`]);
+    dressing.poll();
+    link();
+    expect(dressing.isMerged).toBe(true);
+    expect(Object.keys(drawnMasks(model, dressing))).toEqual(DEFAULT_PIECES);
+    expect(maskSet(model, dressing)).toEqual([0]);
+    // only the whole head was ever folded
+    expect(wocHeadMergeInternalsForTest.cache.size).toBe(1);
+  });
+
+  it('a hairstyle that failed leaves the bare head at rest: merged bald, then dropped and merged whole when a retry lands', () => {
+    const library = mergeLibrary();
+    installFrom(library, [CORE, beardUrl(DEFAULT_BEARD)]);
+    failWocHeadFileForTest(hairUrl(DEFAULT_HAIR));
+    const model = bornModel();
+    const { h, link, forgotten } = worldHost(model, { gated: true });
+    const dressing = new WocHeadDressing(h, 'a');
+    dressing.retint();
+    dressing.setBareStandIn(true);
+    dressing.setMerged(true);
+    dressing.setAppearance(null);
+    expect(dressing.joining).toBe(false);
+    // at rest in what it holds: the bald head is folded like any other
+    dressing.poll();
+    link();
+    expect(dressing.isMerged).toBe(true);
+    const bald = mergedMesh(model) as THREE.Mesh;
+    expect(bald.geometry.getAttribute('position').count).toBe((DEFAULT_PIECES.length - 1) * 24);
+    // a retry lands: its piece hangs behind the gate, the bald stand-in still what draws
+    installFrom(library, [hairUrl(DEFAULT_HAIR)]);
+    dressing.poll();
+    expect(mergedMesh(model)).toBe(bald);
+    expect(dressing.isMerged).toBe(true);
+    // it joins: the stand-in drops in that step (the pieces draw, hair and all), through
+    // the edge every change of the drawn head takes
+    link();
+    expect(mergedMesh(model)).toBeUndefined();
+    expect(forgotten).toEqual([bald.parent]);
+    expect(maskSet(model, dressing)).toEqual([1]);
+    expect(drawnHair(model)).toEqual([`WocHead_A_hair_${DEFAULT_HAIR}`]);
+    // ...and the next poll merges the whole head
+    dressing.poll();
+    link();
+    expect(dressing.isMerged).toBe(true);
+    expect(mergedMesh(model)?.geometry.getAttribute('position').count).toBe(
+      DEFAULT_PIECES.length * 24,
+    );
   });
 
   it.each([
@@ -1491,8 +2239,7 @@ describe('WocHeadDressing: the one-draw merged head', () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const library = mergeLibrary();
     installFrom(library, [CORE, hairUrl(DEFAULT_HAIR), beardUrl(DEFAULT_BEARD)]);
-    const model = baseModel();
-    hangWocHead(model, 'a');
+    const model = bornModel();
     const { h } = worldHost(model);
     const dressing = new WocHeadDressing(h, 'a');
     dressing.retint();
@@ -1730,9 +2477,8 @@ describe('WocHeadDressing: the one-draw merged head', () => {
   it('a queued unit mounts nothing for a head no longer at rest, and the poll asks again later', () => {
     const library = mergeLibrary();
     installFrom(library, [CORE, hairUrl(DEFAULT_HAIR), beardUrl(DEFAULT_BEARD)]);
-    const model = baseModel();
-    hangWocHead(model, 'a');
-    const { h, queued, runQueued } = worldHost(model, { queue: true });
+    const model = bornModel();
+    const { h, queued, runQueued, state } = worldHost(model, { queue: true });
     const dressing = new WocHeadDressing(h, 'a');
     dressing.retint();
     dressing.setAppearance(null);
@@ -1749,10 +2495,18 @@ describe('WocHeadDressing: the one-draw merged head', () => {
     dressing.poll();
     dressing.poll();
     expect(queued).toEqual([]);
-    // the file lands, hangs and is revealed inside one poll: at rest, so that poll asks
+    // the file lands: its hang is a unit of the queue too, and no mount is asked for yet
     installFrom(library, [hairUrl('mohawk')]);
     dressing.poll();
+    expect(queued.map((unit) => unit.label)).toEqual(['woc-head-hang:a']);
+    expect(drawnHair(model)).toEqual([`WocHead_A_hair_${DEFAULT_HAIR}`]);
+    const relived = state.relived;
+    runQueued();
+    // hung and revealed (this host's gate settles at once): the host is told to re-dress
     expect(drawnHair(model)).toEqual(['WocHead_A_hair_mohawk']);
+    expect(state.relived).toBeGreaterThan(relived);
+    // at rest in the new hair: the next poll asks for the mount
+    dressing.poll();
     expect(queued.map((unit) => unit.label)).toEqual(['woc-head-merge:a']);
     runQueued();
     expect(dressing.isMerged).toBe(true);
@@ -1857,7 +2611,7 @@ describe('WocHeadDressing: the one-draw merged head', () => {
     expect(gatedStandIns(one.revealed)).toBe(1);
     expect(one.dressing.isMerged).toBe(false);
     // a second body in the same face mounts while the first still links: nothing is
-    // known linked yet, so it waits behind the gate too
+    // proven yet, so it waits behind the gate too
     const two = mergeable({ gated: true, library: one.library });
     two.dressing.setMerged(true);
     two.dressing.poll();
@@ -1867,7 +2621,8 @@ describe('WocHeadDressing: the one-draw merged head', () => {
     two.link();
     expect(one.dressing.isMerged).toBe(true);
     expect(two.dressing.isMerged).toBe(true);
-    // a third: the program is linked by now, so it stands the moment it mounts
+    // a third: a head that took the gate still proves the program, so it stands the
+    // moment it mounts
     const three = mergeable({ gated: true, library: one.library });
     three.dressing.setMerged(true);
     three.dressing.poll();
@@ -1877,6 +2632,126 @@ describe('WocHeadDressing: the one-draw merged head', () => {
     expect(maskSet(three.model, three.dressing)).toEqual([0]);
     // (each body wraps its own clone of the one tier material: one program between them)
     expect(mergedMesh(three.model)?.material).not.toBe(mergedMesh(one.model)?.material);
+  });
+
+  it('a body disposed while it is the witness lets go of it there and then: the next head takes the gate', () => {
+    const one = mergeable({ gated: true });
+    one.dressing.setMerged(true);
+    one.dressing.poll();
+    one.link();
+    expect(one.dressing.isMerged).toBe(true);
+    // it leaves. Its gate's proof would still answer yes here (this fake context holds
+    // on to everything), so only letting go of the witness at dispose sends the next head
+    // to the gate: guards a witness that kept its mesh, its buffers and the renderer
+    // behind its proof alive until some later head happened to ask
+    const asked = one.state.proofs;
+    one.dressing.dispose();
+    const two = mergeable({ gated: true, library: one.library });
+    two.dressing.setMerged(true);
+    two.dressing.poll();
+    expect(one.state.proofs).toBe(asked);
+    expect(gatedStandIns(two.revealed)).toBe(1);
+    expect(two.dressing.isMerged).toBe(false);
+    two.link();
+    expect(two.dressing.isMerged).toBe(true);
+    // ...and so does switching the merge off on the body that was the witness
+    two.dressing.setMerged(false);
+    const three = mergeable({ gated: true, library: one.library });
+    three.dressing.setMerged(true);
+    three.dressing.poll();
+    expect(gatedStandIns(three.revealed)).toBe(1);
+  });
+
+  it("the skip is the gate's own proof, asked again at every mount, never a remembered bit", () => {
+    const one = merged({ gated: true });
+    // the newest proven reveal is the witness: its gate's proof is asked when a head mounts
+    const asked = one.state.proofs;
+    const two = mergeable({ gated: true, library: one.library });
+    two.dressing.setMerged(true);
+    two.dressing.poll();
+    expect(one.state.proofs).toBe(asked + 1);
+    expect(gatedStandIns(two.revealed)).toBe(0);
+    expect(two.dressing.isMerged).toBe(true);
+
+    // The context behind the witness no longer holds what its gate linked (restored after
+    // a loss, or the renderer rebuilt, or every material of the program disposed and the
+    // program released with the last): the proof answers no, and the next head of the very
+    // same face takes the gate instead of linking on a live frame.
+    one.state.context = false;
+    const three = mergeable({ gated: true, library: one.library });
+    three.dressing.setMerged(true);
+    three.dressing.poll();
+    expect(gatedStandIns(three.revealed)).toBe(1);
+    expect(three.dressing.isMerged).toBe(false);
+    expect(mergedMesh(three.model)?.parent?.visible).toBe(false);
+    expect(maskSet(three.model, three.dressing)).toEqual([1]);
+    // its own reveal proves the program again: it is the witness now
+    three.link();
+    expect(three.dressing.isMerged).toBe(true);
+    const four = mergeable({ gated: true, library: one.library });
+    four.dressing.setMerged(true);
+    four.dressing.poll();
+    expect(gatedStandIns(four.revealed)).toBe(0);
+    expect(four.dressing.isMerged).toBe(true);
+    // ...and the dead witness is never trusted again, even should its proof answer yes
+    one.state.context = true;
+    three.state.context = false;
+    const five = mergeable({ gated: true, library: one.library });
+    five.dressing.setMerged(true);
+    five.dressing.poll();
+    expect(gatedStandIns(five.revealed)).toBe(1);
+    expect(five.dressing.isMerged).toBe(false);
+  });
+
+  it('the same body re-mounting after a restore takes the gate again too', () => {
+    const { model, dressing, revealed, link, state } = merged({ gated: true });
+    expect(gatedStandIns(revealed)).toBe(1);
+    // another face: the same wrap, its program still proven, no gate
+    dressing.setAppearance(OTHER_FACE);
+    dressing.poll();
+    expect(dressing.isMerged).toBe(true);
+    expect(gatedStandIns(revealed)).toBe(1);
+    // the context is restored: every program is gone, whatever this body remembers
+    state.context = false;
+    dressing.setAppearance(DEFAULT_APPEARANCE);
+    dressing.poll();
+    expect(gatedStandIns(revealed)).toBe(2);
+    expect(dressing.isMerged).toBe(false);
+    expect(maskSet(model, dressing)).toEqual([1]);
+    state.context = true;
+    link();
+    expect(dressing.isMerged).toBe(true);
+  });
+
+  it('a gate that hands no proof leaves no witness: every head takes its own gate', () => {
+    // a host that cannot prove a link (no parallel shader compile): its settle vouches
+    // for the reveal, but there is nothing to ask again later
+    const one = merged({ gated: true, unproven: true });
+    expect(one.dressing.isMerged).toBe(true);
+    const two = mergeable({ gated: true, unproven: true, library: one.library });
+    two.dressing.setMerged(true);
+    two.dressing.poll();
+    expect(gatedStandIns(two.revealed)).toBe(1);
+    expect(two.dressing.isMerged).toBe(false);
+    two.link();
+    expect(two.dressing.isMerged).toBe(true);
+  });
+
+  it('a witness wearing an effect proves nothing for now: the next head takes the gate', () => {
+    const one = merged({ gated: true });
+    const witness = mergedMesh(one.model) as THREE.Mesh;
+    const plain = witness.material as THREE.Material;
+    // the host mounts an effect over the witness (a buff glow: another material object)
+    witness.material = cloneMaterialWithHooks(plain);
+    const asked = one.state.proofs;
+    const two = mergeable({ gated: true, library: one.library });
+    two.dressing.setMerged(true);
+    two.dressing.poll();
+    expect(gatedStandIns(two.revealed)).toBe(1);
+    // the proof is about the material the gate proved, so it was not even asked
+    expect(one.state.proofs).toBe(asked);
+    two.link();
+    expect(two.dressing.isMerged).toBe(true);
   });
 
   it('a gate that gave up leaves the head in its pieces: planned once more, then left for good', () => {
@@ -1909,7 +2784,7 @@ describe('WocHeadDressing: the one-draw merged head', () => {
     expect(one.state.adopts).toBe(2);
     expect(maskSet(one.model, one.dressing)).toEqual([1]);
 
-    // nothing was proven linked: another body in the same face still waits behind its gate
+    // nothing was proven: another body in the same face still waits behind its gate
     const two = mergeable({ gated: true, library: one.library });
     two.dressing.setMerged(true);
     two.dressing.poll();
@@ -1919,7 +2794,7 @@ describe('WocHeadDressing: the one-draw merged head', () => {
     expect(two.dressing.isMerged).toBe(true);
   });
 
-  it('a head whose first reveal missed stands on its second, and its program counts as linked', () => {
+  it('a head whose first reveal missed stands on its second, and is then the witness of its program', () => {
     const one = mergeable({ gated: true });
     one.dressing.setMerged(true);
     one.dressing.poll();
@@ -2186,21 +3061,35 @@ describe('WocHeadDressing: the one-draw merged head', () => {
     expect(m.dressing.isMerged).toBe(true);
   });
 
-  it('...and is overruled when the plain program is already known linked', () => {
-    // a first body linked the plain program
+  it('...and is overruled when a witness still proves the plain program', () => {
+    // a first body took the gate on the plain program, and still stands on it
     const first = merged({ gated: true });
     const m = underAnEffect(first.library);
-    // under another program it takes the gate, whatever is known of the plain one
+    // under another program it takes the gate, whatever is proven of the plain one
     expect(gatedStandIns(m.revealed)).toBe(1);
     expect(m.dressing.isMerged).toBe(false);
     const mesh = mergedMesh(m.model) as THREE.Mesh;
     m.seen.struck = false;
     mesh.material = m.seen.plain as THREE.Material;
     m.link(false);
-    // the plain wrap draws with a linked program: nothing to wait for
+    // the plain wrap draws with a program the witness proves: nothing to wait for
     expect(m.dressing.isMerged).toBe(true);
     expect(mergedMesh(m.model)).toBe(mesh);
     expect(m.state.adopts).toBe(1);
+  });
+
+  it('...but not once the witness of the plain program is gone: left in its pieces to try again', () => {
+    const first = merged({ gated: true });
+    const m = underAnEffect(first.library);
+    const mesh = mergedMesh(m.model) as THREE.Mesh;
+    // the context no longer holds what the first body linked
+    first.state.context = false;
+    m.seen.struck = false;
+    mesh.material = m.seen.plain as THREE.Material;
+    m.link(false);
+    expect(mergedMesh(m.model)).toBeUndefined();
+    expect(m.dressing.isMerged).toBe(false);
+    expect(maskSet(m.model, m.dressing)).toEqual([1]);
   });
 
   it('two characters in one look share ONE merged buffer, whatever order their files hung in', () => {
@@ -2278,7 +3167,7 @@ describe('WocHeadDressing: the one-draw merged head', () => {
     link();
     expect(dressing.isMerged).toBe(true);
     // the helm comes off: the first variant's wrap is reused, never minted again, and
-    // both programs are linked by now
+    // each variant's own reveal still proves its program
     dressing.setHelm(false);
     dressing.poll();
     expect(mergedMesh(model)?.material).toBe(withHair);
@@ -2365,8 +3254,7 @@ describe('WocHeadDressing: the one-draw merged head', () => {
 describe('WocHeadDressing: a head file whose compile gate gave up', () => {
   it('is shown all the same (nothing stands in for it), and the head goes live on it', () => {
     install(CORE, beardUrl(DEFAULT_BEARD));
-    const model = baseModel();
-    hangWocHead(model, 'a');
+    const model = bornModel();
     const { h, link, state } = worldHost(model, { gated: true });
     const dressing = new WocHeadDressing(h, 'a');
     dressing.retint();

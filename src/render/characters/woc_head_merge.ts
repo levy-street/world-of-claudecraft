@@ -34,26 +34,28 @@
 // draw, a variant over the very same buffers, so two characters in one face share the
 // buffer whatever their detail and each draws its own level of it. An idle entry is
 // kept for a while (the same look comes back when a peer walks
-// back into view) and the oldest are dropped past a cap. A mount is real main-thread
-// work, a build most of all (a few thousand vertices through their morph targets), so
-// this module never decides WHEN: the rig only plans and waits, and its owner asks the
-// host's work queue for the mount (woc_head_dressing.ts), whose frame budget spreads a
-// crowd arriving at once. Everyone waiting keeps drawing their pieces: correct, just
-// not yet cheap.
+// back into view) and the oldest are dropped past a cap; a head folded whole whose owner
+// has yet to mount it is not idle. A mount is real main-thread
+// work, a build most of all (ten thousand vertices and more through their morph
+// targets), so this module never decides WHEN: the rig only plans and waits, and its
+// owner asks the host's work queue for the fold, a band a unit (foldPending over
+// woc_head_merge_fold.ts: one fold for every character in the same face, and the head
+// that has waited longest folded first, whichever character's unit runs a band), and
+// then for the mount (woc_head_dressing.ts), whose frame budget spreads a crowd arriving
+// at once. Everyone waiting keeps drawing their pieces: correct, just not yet cheap.
 import * as THREE from 'three';
 import {
   type GeometryLodLevel,
   geometryLodSourceOf,
   geometryLodVariant,
-  mergeGeometryLod,
 } from '../assets/geometry_lod';
 import { recordBuildSpan } from '../build_spans';
+import { GFX } from '../gfx';
 import { riggedWornFamilyFor } from '../worn_stone';
 import { logAssetMissOnce } from './asset_miss_log';
 import type { WocHeadType } from './woc_head_catalog';
 import type { WocHeadTintedRole, WocLinearRgb } from './woc_head_look_core';
 import {
-  WOC_HEAD_MERGE_SLOT_ATTRIBUTE,
   type WocHeadMergeFoldFacts,
   type WocHeadMergeLayer,
   type WocHeadMergeSlot,
@@ -61,130 +63,15 @@ import {
   wocHeadMergeKey,
   wocHeadMergeTransformHash,
 } from './woc_head_merge_core';
+import {
+  mergeWocHeadGeometry,
+  WocHeadGeometryFold,
+  type WocHeadMergePiece,
+} from './woc_head_merge_fold';
 import type { WocHeadMergeSurface } from './woc_head_tint';
+import { wocIdleCacheCaps } from './woc_idle_cache_core';
 
-/** One piece mesh folded into a merged head. */
-export interface WocHeadMergePiece {
-  /** The drawn piece mesh, its morph influences as the head is posed. */
-  readonly mesh: THREE.Mesh;
-  /** The mesh's local space to the merged mesh's space (the head bone's). */
-  readonly toRoot: THREE.Matrix4;
-  readonly slot: number;
-  /** A flat-coloured piece's uv (the atlas's white cell); null: the piece's own uv. */
-  readonly flatUv: readonly [number, number] | null;
-}
-
-/** The index count of a triangle list, less a trailing partial triangle: every piece
- *  after a malformed one would otherwise have its triangles shifted. */
-const wholeTriangles = (count: number): number => count - (count % 3);
-
-const _v = new THREE.Vector3();
-const _d = new THREE.Vector3();
-const _n = new THREE.Vector3();
-const _base = new THREE.Vector3();
-
-/**
- * Fold `pieces` into one geometry: positions and normals posed and moved into the
- * merged mesh's space, uv, and the per-vertex slot. A mirrored piece (a negative
- * determinant) has its winding flipped, as three flips the front face for its mesh.
- *
- * Each piece is folded from its SOURCE geometry (a piece drawn at a coarser level draws a
- * variant over the same buffers: assets/geometry_lod.ts), and the merged geometry carries
- * the pieces' coarser levels, offset and flipped as its own index is: its mid level draws
- * exactly the pieces' mid triangles, whoever folded it.
- */
-export function mergeWocHeadGeometry(pieces: readonly WocHeadMergePiece[]): THREE.BufferGeometry {
-  let vertices = 0;
-  let indices = 0;
-  for (const { mesh } of pieces) {
-    const source = geometryLodSourceOf(mesh.geometry);
-    const pos = source.getAttribute('position');
-    vertices += pos.count;
-    indices += wholeTriangles(source.index ? source.index.count : pos.count);
-  }
-  const position = new Float32Array(vertices * 3);
-  const normal = new Int16Array(vertices * 3);
-  const uv = new Float32Array(vertices * 2);
-  const slot = new Uint8Array(vertices);
-  const index = vertices > 0xffff ? new Uint32Array(indices) : new Uint16Array(indices);
-  const normalMatrix = new THREE.Matrix3();
-  let v0 = 0;
-  let i0 = 0;
-  for (const piece of pieces) {
-    const { mesh, toRoot } = piece;
-    const geo = geometryLodSourceOf(mesh.geometry);
-    const pos = geo.getAttribute('position');
-    const nor = geo.getAttribute('normal') as THREE.BufferAttribute | undefined;
-    const tex = geo.getAttribute('uv') as THREE.BufferAttribute | undefined;
-    const morphNormals = geo.morphAttributes.normal;
-    const influences = mesh.morphTargetInfluences;
-    normalMatrix.getNormalMatrix(toRoot);
-    for (let i = 0; i < pos.count; i++) {
-      // the same sum three's morph chunk draws (relative targets, as glTF ships them)
-      THREE.Mesh.prototype.getVertexPosition.call(mesh, i, _v);
-      _v.applyMatrix4(toRoot);
-      const p = (v0 + i) * 3;
-      position[p] = _v.x;
-      position[p + 1] = _v.y;
-      position[p + 2] = _v.z;
-      if (nor) {
-        _n.fromBufferAttribute(nor, i);
-        if (morphNormals && influences) {
-          // an absolute target moves the normal by its offset from the BASE normal,
-          // whatever the targets before it did (three's morph chunk)
-          _base.copy(_n);
-          for (let t = 0; t < morphNormals.length; t++) {
-            const w = influences[t];
-            if (!w) continue;
-            _d.fromBufferAttribute(morphNormals[t] as THREE.BufferAttribute, i);
-            if (geo.morphTargetsRelative) _n.addScaledVector(_d, w);
-            else _n.addScaledVector(_d.sub(_base), w);
-          }
-        }
-        _n.applyMatrix3(normalMatrix).normalize();
-      } else {
-        _n.set(0, 0, 1);
-      }
-      normal[p] = Math.round(_n.x * 32767);
-      normal[p + 1] = Math.round(_n.y * 32767);
-      normal[p + 2] = Math.round(_n.z * 32767);
-      const q = (v0 + i) * 2;
-      if (piece.flatUv) {
-        uv[q] = piece.flatUv[0];
-        uv[q + 1] = piece.flatUv[1];
-      } else if (tex) {
-        uv[q] = tex.getX(i);
-        uv[q + 1] = tex.getY(i);
-      }
-      slot[v0 + i] = piece.slot;
-    }
-    const flip = toRoot.determinant() < 0;
-    const count = wholeTriangles(geo.index ? geo.index.count : pos.count);
-    for (let k = 0; k < count; k += 3) {
-      const a = geo.index ? geo.index.getX(k) : k;
-      const b = geo.index ? geo.index.getX(k + 1) : k + 1;
-      const c = geo.index ? geo.index.getX(k + 2) : k + 2;
-      index[i0 + k] = v0 + a;
-      index[i0 + k + 1] = v0 + (flip ? c : b);
-      index[i0 + k + 2] = v0 + (flip ? b : c);
-    }
-    v0 += pos.count;
-    i0 += count;
-  }
-  const out = new THREE.BufferGeometry();
-  out.setAttribute('position', new THREE.BufferAttribute(position, 3));
-  out.setAttribute('normal', new THREE.BufferAttribute(normal, 3, true));
-  out.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
-  out.setAttribute(WOC_HEAD_MERGE_SLOT_ATTRIBUTE, new THREE.BufferAttribute(slot, 1));
-  out.setIndex(new THREE.BufferAttribute(index, 1));
-  mergeGeometryLod(
-    out,
-    pieces.map(({ mesh, toRoot }) => ({ geometry: mesh.geometry, flip: toRoot.determinant() < 0 })),
-  );
-  out.computeBoundingSphere();
-  out.computeBoundingBox();
-  return out;
-}
+export { mergeWocHeadGeometry, WocHeadGeometryFold, type WocHeadMergePiece };
 
 // ---------------------------------------------------------------------------
 // The shared geometry cache
@@ -193,12 +80,24 @@ export function mergeWocHeadGeometry(pieces: readonly WocHeadMergePiece[]): THRE
 interface Entry {
   geometry: THREE.BufferGeometry;
   refs: number;
+  /** Rigs that folded this head a band a unit and have yet to mount it or let it go
+   *  (the fold's drivers when its last band handed it over: publishSharedFold). A head is
+   *  whole a queue turn or two before its owner's mount unit comes round, and a crowd of
+   *  new faces hands the cache heads faster than that: counted idle meanwhile, the cap
+   *  would drop it, its owner would fold it all over again, and past a certain crowd
+   *  nothing would ever mount. */
+  awaited: number;
 }
 
 const cache = new Map<string, Entry>();
 /** Idle merged heads kept for a look that comes back (each is about 0.35 MB: some ten
- *  thousand vertices at 27 bytes and their indices). */
-const MAX_IDLE_MERGES = 12;
+ *  thousand vertices at 27 bytes and their indices): fewer on a constrained profile
+ *  (woc_idle_cache_core.ts). */
+const maxIdleMerges = (): number => wocIdleCacheCaps(GFX.constrainedMemory).mergedHeads;
+
+/** Nobody draws it, and nobody who folded it still waits to: kept only for a look that
+ *  comes back, and counted against the cap. */
+const idle = (entry: Entry): boolean => entry.refs === 0 && entry.awaited === 0;
 
 export interface WocHeadMergeLease {
   readonly geometry: THREE.BufferGeometry;
@@ -211,15 +110,27 @@ export function wocHeadMergeBuilt(key: string): boolean {
 }
 
 function trimIdle(): void {
-  let idle = 0;
-  for (const entry of cache.values()) if (entry.refs === 0) idle++;
+  let spare = 0;
+  for (const entry of cache.values()) if (idle(entry)) spare++;
+  const cap = maxIdleMerges();
   for (const [key, entry] of cache) {
-    if (idle <= MAX_IDLE_MERGES) break;
-    if (entry.refs > 0) continue;
+    if (spare <= cap) break;
+    if (!idle(entry)) continue;
     cache.delete(key);
     entry.geometry.dispose();
-    idle--;
+    spare--;
   }
+}
+
+/** A lease or a wait on `entry` just ended: once nobody holds it, it is idle from here,
+ *  the newest of the idle ones (release order is the LRU order, as in the far bake cache),
+ *  and the cap is applied. */
+function settleEntry(key: string, entry: Entry): void {
+  if (idle(entry) && cache.get(key) === entry) {
+    cache.delete(key);
+    cache.set(key, entry);
+  }
+  trimIdle();
 }
 
 /** Lease the merged geometry for `key`, building it on a miss. */
@@ -229,7 +140,7 @@ export function retainWocHeadMerge(
 ): WocHeadMergeLease {
   let entry = cache.get(key);
   if (!entry) {
-    entry = { geometry: build(), refs: 0 };
+    entry = { geometry: build(), refs: 0, awaited: 0 };
     cache.set(key, entry);
   }
   entry.refs++;
@@ -241,12 +152,7 @@ export function retainWocHeadMerge(
       if (released) return;
       released = true;
       held.refs--;
-      // release order is the LRU order, as in the far bake cache
-      if (held.refs === 0 && cache.get(key) === held) {
-        cache.delete(key);
-        cache.set(key, held);
-      }
-      trimIdle();
+      settleEntry(key, held);
     },
   };
 }
@@ -254,7 +160,8 @@ export function retainWocHeadMerge(
 /**
  * Drop every merged head nobody draws (a graphics profile change: the views that
  * leased them are gone, and the idle entries would otherwise outlive the renderer
- * that uploaded them). A head still leased is left to its holder.
+ * that uploaded them). A head still leased is left to its holder; one only waited for
+ * goes too, and its owner folds it again.
  */
 export function clearIdleWocHeadMerges(): void {
   for (const [key, entry] of cache) {
@@ -264,11 +171,134 @@ export function clearIdleWocHeadMerges(): void {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Folds in flight
+// ---------------------------------------------------------------------------
+
+/** A head's geometry being folded a band at a time (woc_head_merge_fold.ts), and how
+ *  many rigs drive it. */
+interface SharedFold {
+  readonly key: string;
+  /** The fold, while it stands in the line: null once it left (whole, failed, overtaken
+   *  by a head built whole, or let go of by its last driver), so a rig that still holds
+   *  this entry pins none of its buffers. */
+  fold: WocHeadGeometryFold | null;
+  /** The rigs whose units fold its bands: the last one to leave lets it go. */
+  drivers: number;
+  /** What a band of it threw, once one did: nobody folds it again, and each rig that
+   *  drove it leaves its head in pieces when it next looks. */
+  failure: { readonly error: unknown } | null;
+  /** The cache entry its last band made, which its drivers wait to mount (Entry.awaited). */
+  built: Entry | null;
+}
+
+/** A fold standing in the line. */
+type LinedFold = SharedFold & { fold: WocHeadGeometryFold };
+
+/** The line: the folds in flight, by the head each builds, in the order they started.
+ *  Every character in one face drives ONE, whichever character's unit runs a band. Never
+ *  a geometry in here: a fold holds plain arrays until its last band, and what that band
+ *  makes goes straight into the cache. */
+const folds = new Map<string, LinedFold>();
+
+/** Drive the fold of `key`, starting it from `pieces` (behind every fold already in the
+ *  line) when nobody folds that head yet. */
+function joinSharedFold(key: string, pieces: readonly WocHeadMergePiece[]): LinedFold {
+  let shared = folds.get(key);
+  if (!shared) {
+    shared = {
+      key,
+      fold: new WocHeadGeometryFold(pieces),
+      drivers: 0,
+      failure: null,
+      built: null,
+    };
+    folds.set(key, shared);
+  }
+  shared.drivers++;
+  return shared;
+}
+
+/** Take a fold out of the line, and its buffers with it. */
+function leaveLine(shared: SharedFold): void {
+  if (folds.get(shared.key) === shared) folds.delete(shared.key);
+  shared.fold = null;
+}
+
+/** One driver lets go of a fold: with none left it is dropped where it stands (a head
+ *  nobody waits for is never finished, and a later ask starts over). Of a fold that is
+ *  whole, it is one rig fewer waiting to mount the head: mounted or let go of. */
+function leaveSharedFold(shared: SharedFold): void {
+  shared.drivers--;
+  if (shared.drivers <= 0) leaveLine(shared);
+  const entry = shared.built;
+  if (!entry) return;
+  entry.awaited--;
+  settleEntry(shared.key, entry);
+}
+
+/** A fold's last band made its geometry: it is the cache's from here on, waited for by
+ *  the rigs that drove the fold until each mounts it, from a unit of its own, or lets it
+ *  go. Nobody folds a band of a head the cache already holds (a rig looks before it
+ *  joins, and leadingFold before it answers), so the key is free. */
+function publishSharedFold(shared: LinedFold, geometry: THREE.BufferGeometry): void {
+  leaveLine(shared);
+  shared.built = { geometry, refs: 0, awaited: shared.drivers };
+  cache.set(shared.key, shared.built);
+  trimIdle();
+}
+
+/**
+ * The fold the next band belongs to: the one in the line LONGEST, whoever asks. A head
+ * half folded saves nobody a draw, so a crowd's heads are folded one after another, each
+ * standing in as soon as its own bands are done. Folded a band each in turn (the order
+ * the bodies' units leave the queue in) they would all be whole in the same few frames
+ * at the very end, every body drawing its pieces until then, and every one of them
+ * holding its buffers meanwhile.
+ */
+function leadingFold(): LinedFold | undefined {
+  for (const shared of folds.values()) {
+    if (!cache.has(shared.key)) return shared;
+    // built whole meanwhile (a body with no queue behind it mounted that face on the
+    // spot): over, and its drivers only mount. A band more would end in a second
+    // geometry under a key the cache holds, and orphan the leased one.
+    leaveLine(shared);
+  }
+  return undefined;
+}
+
+/**
+ * Fold ONE band of the leading fold. The band that ends it hands its geometry to the
+ * cache; one that throws takes the fold out of the line for good, and each rig that
+ * drove it finds that out from its own next unit (foldPending), never the rig whose unit
+ * happened to run the band.
+ */
+function foldLeadingBand(): void {
+  const lead = leadingFold();
+  if (!lead) return;
+  const started = performance.now();
+  try {
+    const geometry = lead.fold.step();
+    // each band under its own view-lane kind, beside the mount's
+    recordBuildSpan('view:woc-head-fold', performance.now() - started, started);
+    if (geometry) publishSharedFold(lead, geometry);
+  } catch (error) {
+    lead.failure = { error };
+    leaveLine(lead);
+  }
+}
+
 export const wocHeadMergeInternalsForTest = {
   cache,
+  /** The folds in flight, by key (a fold's `drivers` and its progress). */
+  folds: folds as ReadonlyMap<
+    string,
+    { readonly fold: WocHeadGeometryFold; readonly drivers: number }
+  >,
   reset(): void {
     for (const entry of cache.values()) entry.geometry.dispose();
     cache.clear();
+    for (const shared of [...folds.values()]) leaveLine(shared);
   },
 };
 
@@ -563,6 +593,10 @@ export class WocHeadMergeRig {
   private unprepared: { key: string; count: number } | null = null;
   /** The last mount was adopted straight into a translucent effect and taken down. */
   private translucent = false;
+  /** The waiting head's fold: its place in the line (foldPending), shared with every rig
+   *  waiting on the same face, and, once the fold is whole, this rig's wait on the head
+   *  until it mounts it or lets it go. */
+  private folding: SharedFold | null = null;
 
   constructor(
     private readonly host: WocHeadMergeHost,
@@ -618,6 +652,8 @@ export class WocHeadMergeRig {
    */
   sync(headBone: THREE.Object3D | null, drawn: readonly WocHeadMergeCandidate[] | null): boolean {
     const plan = headBone && drawn ? this.plan(headBone, drawn) : null;
+    // a fold driven for another head than the one drawn now is no longer this rig's
+    if (this.folding && this.folding.key !== plan?.key) this.leaveFold();
     this.pending = null;
     if (!plan || !headBone || plan.key === this.refused) return this.drop();
     if (this.mounted?.key === plan.key) return false;
@@ -637,29 +673,86 @@ export class WocHeadMergeRig {
     if (!wanted) return false;
     this.pending = null;
     this.translucent = false;
-    // the geometry is baked from the pieces as they are NOW, under the key taken when
-    // the head was planned: a face written since (only `apply` writes one, and it plans
-    // again) would be cached under another face's key
-    if (planKey(wanted.plan) !== wanted.plan.key) return false;
-    const started = performance.now();
     try {
-      this.mount(wanted.bone, wanted.plan);
-    } catch (err) {
-      // a head that cannot mount keeps its pieces, and is never tried again: a throw
-      // from the per-frame path would stall every frame after it
-      this.drop();
-      this.refused = wanted.plan.key;
-      logAssetMissOnce(
-        `woc-head-merge:${this.type}:${err instanceof Error ? err.message : String(err)}`,
-        'WOC merged head could not mount, the head keeps drawing piece by piece:',
-        err,
-      );
-      return false;
+      // the geometry is baked from the pieces as they are NOW, under the key taken when
+      // the head was planned: a face written since (only `apply` writes one, and it plans
+      // again) would be cached under another face's key
+      if (planKey(wanted.plan) !== wanted.plan.key) return false;
+      const started = performance.now();
+      try {
+        this.mount(wanted.bone, wanted.plan);
+      } catch (err) {
+        // a head that cannot mount keeps its pieces, and is never tried again: a throw
+        // from the per-frame path would stall every frame after it
+        this.drop();
+        this.refuse(wanted.plan.key, err);
+        return false;
+      }
+      // the whole mount (the build on a miss, the visual's per-mesh setup, the wrap) under
+      // its own view-lane kind: it runs from the per-frame path, never inside a view build
+      recordBuildSpan('view:woc-head-merge', performance.now() - started, started);
+      return this.mounted !== null;
+    } finally {
+      // After the lease, never before it: a head this rig folded stays waited for until
+      // it is mounted. (And a head mounted whole, no queue behind its owner, needs no
+      // band of a chained fold.)
+      this.leaveFold();
     }
-    // the whole mount (the build on a miss, the visual's per-mesh setup, the wrap) under
-    // its own view-lane kind: it runs from the per-frame path, never inside a view build
-    recordBuildSpan('view:woc-head-merge', performance.now() - started, started);
-    return this.mounted !== null;
+  }
+
+  /**
+   * Fold ONE band of a head's geometry (woc_head_merge_fold.ts): the build `mountPending`
+   * does whole, for an owner that runs it as a chain of queue units. The waiting head
+   * takes its place in the line (every rig waiting on one face drives the same fold),
+   * and the band folded is the LEADING fold's, this rig's own or not (leadingFold): the
+   * heads of a crowd finish one after another, whichever rig's unit runs a band, and the
+   * band that ends a fold hands its geometry to the cache. `wanted` false (the owner
+   * looked again: the head is no longer at rest, its body no longer drawn, the merge
+   * switched off) lets go of this rig's fold instead, and a fold nobody drives is
+   * dropped. Returns whether nothing is left to fold FOR THIS RIG: its head is built
+   * (`mountPending` only mounts), or it is no longer waited for. A plan gone stale and a
+   * fold that threw (a band of it, under any rig's unit, or its start) leave the head in
+   * its pieces, as they do in `mountPending`.
+   */
+  foldPending(wanted = true): boolean {
+    const pending = wanted ? this.pending : null;
+    if (!pending) {
+      this.leaveFold();
+      return true;
+    }
+    if (wocHeadMergeBuilt(pending.plan.key)) {
+      // Whole: nothing to fold. A rig that drove the fold to its end goes on waiting for
+      // the head until it mounts it or lets it go; one whose fold was overtaken (a body
+      // with no queue built that face whole) has no band left to drive.
+      if (!this.folding?.built) this.leaveFold();
+      return true;
+    }
+    const { plan } = pending;
+    let own = this.folding;
+    // (a band of it threw under another rig's unit since this one last looked)
+    if (own?.key === plan.key && own.failure) return this.failFold(plan.key, own.failure.error);
+    // (a fold that left the line since, finished or overtaken by a head built whole, and
+    // whose geometry the cache has dropped again, is over: the head starts another)
+    if (own?.key !== plan.key || !own.fold) {
+      this.leaveFold();
+      try {
+        // a fold bakes the pieces as they are when it STARTS, under the key taken when
+        // the head was planned (mountPending's rule): a face written since is another head
+        if (planKey(plan) !== plan.key) {
+          this.pending = null;
+          return true;
+        }
+        own = joinSharedFold(plan.key, plan.pieces);
+      } catch (err) {
+        return this.failFold(plan.key, err);
+      }
+      this.folding = own;
+    }
+    foldLeadingBand();
+    if (own.failure) return this.failFold(plan.key, own.failure.error);
+    // still in the line: more to fold, its own bands or those of the heads ahead of it;
+    // out of it, the head is whole and this rig waits to mount it
+    return !own.fold;
   }
 
   /** Take the merged head down; its pieces draw again. Returns whether one was up. */
@@ -680,6 +773,36 @@ export class WocHeadMergeRig {
   dispose(): void {
     this.drop();
     this.pending = null;
+    this.leaveFold();
+  }
+
+  /** Stop driving the fold this rig ran bands of: the last driver to leave drops it. */
+  private leaveFold(): void {
+    const shared = this.folding;
+    if (!shared) return;
+    this.folding = null;
+    leaveSharedFold(shared);
+  }
+
+  /** The waiting head's fold threw (a band of it, under this rig's unit or another's, or
+   *  its start): the head keeps its pieces and is never tried again, or its owner would
+   *  ask for the same band on every frame after this one. Answers what foldPending does:
+   *  nothing is left to fold. */
+  private failFold(key: string, err: unknown): true {
+    this.leaveFold();
+    this.pending = null;
+    this.refuse(key, err);
+    return true;
+  }
+
+  /** Leave a head that threw in its pieces for good. */
+  private refuse(key: string, err: unknown): void {
+    this.refused = key;
+    logAssetMissOnce(
+      `woc-head-merge:${this.type}:${err instanceof Error ? err.message : String(err)}`,
+      'WOC merged head could not mount, the head keeps drawing piece by piece:',
+      err,
+    );
   }
 
   private plan(headBone: THREE.Object3D, drawn: readonly WocHeadMergeCandidate[]): Plan | null {

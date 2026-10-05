@@ -160,8 +160,10 @@ describe('character presentation sleep wiring', () => {
   it('reuses one mount host and stows weapons only while actually mounted', () => {
     expect(renderer).toContain('private readonly mountHost: MountViewHost = {');
     expect(renderer.match(/syncMountVisual\(v, mountSpec, this\.mountHost\)/g)).toHaveLength(1);
+    // the PRESENTED ride: a rider whose death is held for a blade still in the air stays
+    // mounted, and stowed, until the collapse (tests/melee_contact_wiring.test.ts)
     expect(renderer).toContain(
-      "const stowed = weaponStowedOverlay(e.weaponStowed, swimming, e.mountKey !== '');",
+      "const stowed = weaponStowedOverlay(e.weaponStowed, swimming, mountKey !== '');",
     );
   });
 });

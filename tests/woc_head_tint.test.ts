@@ -8,7 +8,9 @@
 // texel of a coloured one's linear luminance draws what it drew (evaluated here
 // on the shader's own formula), and where the emissive map is the colour map
 // they glow by the texel the transfer draws, three's own lookup switched off but
-// still included for the layers that anchor on it.
+// still included for the layers that anchor on it. What the skin and eye transfers
+// read of a uniform colour as an HSV is converted on the CPU and bound beside it
+// (tests/woc_tint_hsv_core.test.ts holds the conversion to the shader's own).
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import {
@@ -28,6 +30,7 @@ import {
   wocHeadTintOf,
 } from '../src/render/characters/woc_head_tint';
 import { WOC_SUIT_SKIN_GATE_GLSL } from '../src/render/characters/woc_skin_tint_core';
+import { wocTintSrgbHsv } from '../src/render/characters/woc_tint_hsv_core';
 import { cloneMaterialWithHooks } from '../src/render/material_clone_hooks';
 
 function compile(mat: THREE.Material): {
@@ -294,6 +297,106 @@ const ROLE_HAIR_GLOW = [
 ].join('\n');
 
 const count = (text: string, needle: string): number => text.split(needle).length - 1;
+
+describe('what the skin and eye transfers read off the CPU', () => {
+  const REF = [0.2346, 0.1195, 0.0865] as const;
+  const single = (values: readonly number[]): number[] => values.map((v) => Math.fround(v));
+
+  it('converts the reference once, at attach: its sRGB hue and saturation ride their own uniform', () => {
+    const m = new THREE.MeshStandardMaterial();
+    const u = attachWocHeadTint(m, 'skin', REF);
+    expect(u.refHs.value.toArray()).toEqual(wocTintSrgbHsv(REF).slice(0, 2));
+    // literal, worked by hand from the gamma curve: an orange of hue 0.046 at saturation 0.365
+    expect(u.refHs.value.x).toBeCloseTo(0.046, 3);
+    expect(u.refHs.value.y).toBeCloseTo(0.365, 3);
+    // the reference itself is untouched: the transfer still reads its luminance and its chroma
+    expect(u.ref.value.toArray()).toEqual([...REF]);
+    const shader = compile(m);
+    expect(shader.uniforms.uWocHtRefHs).toBe(u.refHs);
+    expect(shader.uniforms.uWocHtTintHsv).toBe(u.tintHsv);
+    expect(shader.fragmentShader).toContain('uniform vec2 uWocHtRefHs;');
+    expect(shader.fragmentShader).toContain('uniform vec3 uWocHtTintHsv;');
+    // a colour write never moves it: the reference is the material's, for good
+    setWocHeadTint(u, [0.9, 0.1, 0.3]);
+    expect(u.refHs.value.toArray()).toEqual(wocTintSrgbHsv(REF).slice(0, 2));
+  });
+
+  it("converts the eye colour with every write, and no other role's", () => {
+    const eye = attachWocHeadTint(new THREE.MeshStandardMaterial(), 'eye', [0.227, 0.1845, 0.1651]);
+    // born pointed at white
+    expect(eye.tintHsv.value.toArray()).toEqual([0, 0, 1]);
+    const hsv = eye.tintHsv.value;
+    setWocHeadTint(eye, [0.0625, 0.5, 0.75]);
+    expect(eye.tintHsv.value).toBe(hsv);
+    expect(hsv.toArray()).toEqual(wocTintSrgbHsv([0.0625, 0.5, 0.75]));
+    // literal, by hand: a sky blue, hue 0.541 (195 degrees)
+    expect(hsv.x).toBeCloseTo(0.5414, 3);
+    expect(hsv.y).toBeCloseTo(0.6768, 3);
+    expect(eye.tint.value.toArray()).toEqual([0.0625, 0.5, 0.75]);
+    setWocHeadTint(eye, [0.6, 0.1, 0.1], 0.5);
+    expect(single(hsv.toArray())).toEqual(single(wocTintSrgbHsv([0.6, 0.1, 0.1])));
+    expect(hsv.x).toBeLessThan(0.01);
+    // the eye's own reference: the saturation its iris test starts above
+    expect(eye.refHs.value.y).toBeCloseTo(0.135, 3);
+    // skin, hair and brow read their colour as it is: nothing is converted for them
+    for (const role of ['skin', 'hair', 'brow'] as const) {
+      const u = attachWocHeadTint(new THREE.MeshStandardMaterial(), role, [0.1, 0.1, 0.1]);
+      setWocHeadTint(u, [0.0625, 0.5, 0.75]);
+      expect(u.tintHsv.value.toArray(), role).toEqual([0, 0, 1]);
+    }
+  });
+
+  it('declares in each layer only the constants its transfer reads', () => {
+    const body = (role: 'skin' | 'eye' | 'hair' | 'brow', surface?: 'suit'): string => {
+      const m = new THREE.MeshStandardMaterial();
+      attachWocHeadTint(m, role, [0.2, 0.1, 0.08], surface);
+      const text = compile(m).fragmentShader;
+      return text.slice(text.indexOf('if (uWocHtMix > 0.0) {'));
+    };
+    const RK = 'vec2 rk = uWocHtRefHs;';
+    const TK = 'vec3 tk = uWocHtTintHsv;';
+    // the skin band is centred on the reference's hue
+    for (const text of [body('skin'), body('skin', 'suit')]) {
+      expect(text).toContain(`vec3 r = uWocHtRef;\n  ${RK}\n  vec3 o = c;`);
+      expect(text).not.toContain(TK);
+      expect(text).toContain('float dh = mod((hs.x - rk.x) * 360.0 + 540.0, 360.0) - 180.0;');
+    }
+    // the iris test starts above the reference's saturation, the iris takes the target's HSV
+    const eye = body('eye');
+    expect(eye).toContain(`vec3 r = uWocHtRef;\n  ${RK}\n  ${TK}\n  vec3 o = c;`);
+    expect(eye).toContain(
+      'float w = smoothstep(rk.y + 0.08, rk.y + 0.22, hs.y) * smoothstep(0.03, 0.1, hs.z);',
+    );
+    expect(eye).toContain(
+      'vec3 iris = wocHtSrgb2Lin(wocHtHsv2Rgb(vec3(tk.x, tk.y, clamp(hs.z * (0.4 + tk.z), 0.0, 1.0))));',
+    );
+    // hair and brow read neither
+    for (const role of ['hair', 'brow'] as const) {
+      expect(body(role), role).not.toContain(' rk');
+      expect(body(role), role).not.toContain(' tk');
+    }
+    // one conversion a fragment in the skin and eye layers (the texel's), none of a uniform
+    for (const text of [body('skin'), body('skin', 'suit'), eye]) {
+      expect(count(text, 'wocHtRgb2Hsv(')).toBe(1);
+      expect(text).toContain('vec3 hs = wocHtRgb2Hsv(wocHtLin2Srgb(c));');
+    }
+  });
+
+  it('an effect clone shares the converted constants with its source', () => {
+    const src = new THREE.MeshStandardMaterial();
+    const u = attachWocHeadTint(src, 'eye', [0.227, 0.1845, 0.1651]);
+    const glow = cloneMaterialWithHooks(src);
+    const shader = compile(glow);
+    expect(shader.uniforms.uWocHtRefHs).toBe(u.refHs);
+    expect(shader.uniforms.uWocHtTintHsv).toBe(u.tintHsv);
+    // a colour written after the clone reaches it converted
+    setWocHeadTint(u, [0.1, 0.6, 0.1]);
+    expect((shader.uniforms.uWocHtTintHsv as { value: THREE.Vector3 }).value.x).toBeCloseTo(
+      1 / 3,
+      9,
+    );
+  });
+});
 
 describe('the hair and brow transfer reads a texel by its luminance alone', () => {
   it.each(LIBS)('takes the luminance of the sampled texel times the colour on %s', (lib) => {

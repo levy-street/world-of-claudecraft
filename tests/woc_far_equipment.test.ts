@@ -3,6 +3,7 @@
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { WocCharacterManifest } from '../src/render/characters/woc_character_manifest';
+import { threeProgramKeys } from './helpers/three_program_keys';
 
 const KEY = 'player_paladin';
 /** A standing idle frame (armory_preview.ts IDLE_STATE). */
@@ -158,12 +159,20 @@ async function harness() {
   const { CharacterVisual } = await import('../src/render/characters/visual');
   let now = 1000;
   vi.spyOn(performance, 'now').mockImplementation(() => now);
-  // the head core's fetch has failed before any body is built
+  // every fetch of the head's look has failed before any body is built (the core, and the
+  // default hairstyle and beard a look asks for): a head file still on the wire holds a
+  // body's far bake back (woc_head_stream_core.ts wocHeadFileJoining), a failed one does not
   const heads = await import('../src/render/characters/woc_head_packs');
-  const { wocHeadCoreUrl } = await import('../src/render/characters/woc_head_catalog');
+  const { wocHeadLookUrls } = await import('../src/render/characters/woc_head_catalog');
   vi.spyOn(console, 'warn').mockImplementation(() => undefined);
-  heads.ensureWocHeadFile(wocHeadCoreUrl('a'));
-  await vi.waitFor(() => expect(heads.wocHeadFileState(wocHeadCoreUrl('a'))).toBe('failed'));
+  heads.ensureWocHeadForAppearance('male', null);
+  await vi.waitFor(() =>
+    expect(wocHeadLookUrls('a', null).map(heads.wocHeadFileState)).toEqual([
+      'failed',
+      'failed',
+      'failed',
+    ]),
+  );
   return {
     CharacterVisual,
     nextFrame: (elapsed = 40) => {
@@ -197,12 +206,19 @@ async function previewHarness() {
       }),
   );
   const order: string[] = [];
-  const compiles: { target: THREE.Object3D; scene: THREE.Scene | undefined; finish(): void }[] = [];
+  const compiles: {
+    target: THREE.Object3D;
+    scene: THREE.Scene | undefined;
+    finish(): void;
+    fail(err: Error): void;
+  }[] = [];
   const programs = new Map<THREE.Material, object>();
   const renderer = {
     compileAsync: (target: THREE.Object3D, _camera: THREE.Camera, scene?: THREE.Scene) => {
       order.push('compile');
-      return new Promise<void>((resolve) => compiles.push({ target, scene, finish: resolve }));
+      return new Promise<void>((resolve, reject) =>
+        compiles.push({ target, scene, finish: resolve, fail: reject }),
+      );
     },
     initTexture: (texture: THREE.Texture) => order.push(`upload:${texture.name}`),
     properties: {
@@ -247,7 +263,21 @@ async function previewHarness() {
     canvas: { remove: vi.fn() },
   });
   preview.setVisualKey(KEY);
-  return { preview, renderer, order, compiles, scene, group, finishAtlas: () => finishAtlas() };
+  /** One frame of the preview's own loop for its body (CharacterPreview.animate). */
+  const frame = () =>
+    (
+      preview as unknown as { currentVisual: { update(dt: number, s: never, a: boolean): void } }
+    ).currentVisual.update(1 / 60, IDLE, true);
+  return {
+    preview,
+    renderer,
+    order,
+    compiles,
+    scene,
+    group,
+    frame,
+    finishAtlas: () => finishAtlas(),
+  };
 }
 
 async function flushPreview(): Promise<void> {
@@ -260,21 +290,50 @@ afterEach(() => {
 });
 
 describe('WOC equipment follows the character into the far and shadow bands', () => {
-  it('prepares the selected shadow silhouette before ever crossing into far LOD', async () => {
+  it("casts its key's stand-in in the shadow band and bakes nothing until the far crossing", async () => {
+    // guards: the shadow plan baked a body's far silhouette the frame it asked for a
+    // proxy, a whole far bake per character standing in the middle distance
     const { CharacterVisual } = await harness();
+    const assets = await import('../src/render/characters/assets');
+    const assembled = vi.spyOn(assets, 'assembleModel');
     const visual = new CharacterVisual(KEY, 0xffffff, 0, null, null, null, null, CROWD);
     const gates: (() => void)[] = [];
     visual.setFarBakeGate((_target, settle) => gates.push(settle));
     visual.setWocEquipment({}, false);
-    visual.setProxyShadow(true);
+    assembled.mockClear();
+    const standIn = mesh(visual.root, 'character_shadow_stand_in');
+    expect(standIn.visible).toBe(false);
+    // the plan asks for the proxy, frame after frame: no bake, no gate, no far mesh, and
+    // the stand-in casts from the first of them
+    for (let frame = 0; frame < 3; frame++) {
+      visual.setProxyShadow(true);
+      visual.update(0.016, IDLE, true);
+    }
+    expect(assembled).not.toHaveBeenCalled();
+    expect(gates).toHaveLength(0);
+    expect(visual.root.getObjectByName('character_far_mesh')).toBeUndefined();
+    expect(standIn.visible).toBe(true);
+    expect(standIn.castShadow).toBe(true);
+    expect(visual.root.getObjectByName('character_model_wrap')?.visible).toBe(true);
+    // the far crossing bakes the body's own silhouette; the stand-in casts while it links
+    visual.setFar(true);
     expect(gates).toHaveLength(1);
+    const proxy = mesh(visual.root, 'character_shadow_proxy');
     expect(vertices(visual.root, 'character_shadow_proxy')).toBe(24);
-    expect(mesh(visual.root, 'character_shadow_proxy').visible).toBe(false);
+    expect(proxy.visible).toBe(false);
+    expect(standIn.visible).toBe(true);
+    // linked: the body's own takes over, and never both at once
     gates[0]();
     visual.setProxyShadow(true);
-    expect(mesh(visual.root, 'character_shadow_proxy').visible).toBe(true);
-    expect(mesh(visual.root, 'character_far_mesh').visible).toBe(false);
-    expect(visual.root.getObjectByName('character_model_wrap')?.visible).toBe(true);
+    expect(proxy.visible).toBe(true);
+    expect(standIn.visible).toBe(false);
+    // a re-dress takes the baked silhouette down: the stand-in casts again in that call
+    visual.setWocEquipment({ helmet: 'some-helm' }, false);
+    expect(visual.root.getObjectByName('character_shadow_proxy')).toBeUndefined();
+    expect(standIn.visible).toBe(true);
+    // the plan stops asking: nothing casts
+    visual.setProxyShadow(false);
+    expect(standIn.visible).toBe(false);
     visual.dispose();
   });
 
@@ -460,6 +519,64 @@ describe('WOC equipment follows the character into the far and shadow bands', ()
     bare.dispose();
   });
 
+  it('draws every far body under the under-armor atlas with ONE body material, whatever its skin tone', async () => {
+    // guards: a material of its own per far body for a skin layer that draws nothing (the
+    // body is cloth edge to edge under a chest), sorted between every two far heads
+    const { CharacterVisual, nextFrame } = await harness();
+    const { wocHeadTintOf } = await import('../src/render/characters/woc_head_tint');
+    const farBody = (visual: { root: THREE.Object3D }): THREE.Material => {
+      const far = mesh(visual.root, 'character_far_mesh');
+      const found = (Array.isArray(far.material) ? far.material : [far.material]).find(
+        (m) => wocHeadTintOf(m)?.surface === 'suit',
+      );
+      if (!found) throw new Error('no far body group');
+      return found;
+    };
+    const build = (worn: Record<string, string>) => {
+      const visual = new CharacterVisual(KEY, 0xffffff, 0, null, null, null, null, CROWD);
+      visual.setWocEquipment(worn, false);
+      return visual;
+    };
+    const armored = [build({ chest: 'some-chest' }), build({ chest: 'some-chest' })];
+    const bare = [build({}), build({})];
+    for (const visual of armored) {
+      await vi.waitFor(() =>
+        expect(mapNames(mesh(visual.root, 'Character_Body'))).toEqual([ATLAS]),
+      );
+    }
+    // two skin tones in each pair
+    const ebony = { skinHue: 20, skinSat: 0.33, skinLight: 0.16 };
+    expect(armored[1].setWocHeadLook(ebony)).toBe(true);
+    expect(bare[1].setWocHeadLook(ebony)).toBe(true);
+    // a bake per kit, a budget window apart (the second of each pair mounts the cached one)
+    armored[0].setFar(true);
+    armored[1].setFar(true);
+    nextFrame();
+    bare[0].setFar(true);
+    bare[1].setFar(true);
+    // under the atlas: the very same material on both bodies, its layer off
+    const shared = farBody(armored[0]);
+    expect(farBody(armored[1])).toBe(shared);
+    expect(wocHeadTintOf(shared)?.mix.value).toBe(0);
+    expect(mapNames(mesh(armored[0].root, 'character_far_mesh'))).toEqual([ATLAS, 'embedded']);
+    // on the suit the skin paint draws each body's own tone: a material each
+    expect(farBody(bare[1])).not.toBe(farBody(bare[0]));
+    expect(wocHeadTintOf(farBody(bare[0]))?.mix.value).toBe(1);
+    expect(wocHeadTintOf(farBody(bare[1]))?.tint.value.toArray()).not.toEqual(
+      wocHeadTintOf(farBody(bare[0]))?.tint.value.toArray(),
+    );
+    // a tone change on one armored body is still nobody's business under the atlas
+    expect(armored[0].setWocHeadLook({ skinHue: 30, skinSat: 0.5, skinLight: 0.7 })).toBe(true);
+    expect(farBody(armored[0])).toBe(shared);
+    expect(wocHeadTintOf(shared)?.mix.value).toBe(0);
+    // one of them leaves: the other keeps drawing the material, which is not freed
+    const freed = vi.spyOn(shared, 'dispose');
+    armored[0].dispose();
+    expect(freed).not.toHaveBeenCalled();
+    expect(farBody(armored[1])).toBe(shared);
+    for (const visual of [armored[1], ...bare]) visual.dispose();
+  });
+
   it('keeps the linked body atlas during load/compile and cancels superseded or disposed atlas swaps', async () => {
     const { CharacterVisual } = await harness();
     const visual = new CharacterVisual(KEY, 0xffffff, 0, null, null, null, null, CROWD);
@@ -480,18 +597,232 @@ describe('WOC equipment follows the character into the far and shadow bands', ()
     visual.setWeapon('test-sword');
     expect(mapNames(body)).toEqual(['embedded']);
     pending.settle();
+    visual.update(1 / 60, IDLE, true);
     expect(mapNames(body)).toEqual([ATLAS]);
     expect(pending.target.parent).toBeNull();
     visual.setWocEquipment({}, false);
     const removing = gates[gates.length - 1];
     visual.setWocEquipment({ chest: 'some-chest' }, false);
+    // a settle of the swap the chest superseded commits nothing, on this frame or a later one
     removing.settle();
+    visual.update(1 / 60, IDLE, true);
     expect(mapNames(body)).toEqual([ATLAS]);
+    expect(removing.target.parent).toBeNull();
     visual.setWocEquipment({}, false);
     const disposed = gates[gates.length - 1];
     visual.dispose();
     disposed.settle();
     expect(disposed.target.parent).toBeNull();
+  });
+
+  // The swap behind a gate, step by step (woc_atlas_swap.ts): what the gate is asked to
+  // link, when the swap is taken, and what a settle that could not vouch for it does.
+  describe('the under-armor atlas swap behind the compile gate', () => {
+    type Gate = {
+      target: THREE.Object3D;
+      settle: (ready?: () => boolean) => void;
+      /** What the first twin wore at the moment the gate was asked (a gate may compile inside
+       *  the ask itself, as the preview's does). */
+      asked: THREE.Material | null;
+    };
+    const SCRATCH = 'character_body_atlas_scratch';
+    const single = (m: THREE.Material | THREE.Material[]): THREE.Material =>
+      Array.isArray(m) ? m[0] : m;
+
+    /** A crowd body that put its chest on behind a gate: the atlas landed, its twin is asked.
+     *  `refuse` makes the gate throw on the asks it returns true for (by ask count, from 1). */
+    async function gatedSwap(refuse: (ask: number) => boolean = () => false) {
+      const h = await harness();
+      const visual = new h.CharacterVisual(KEY, 0xffffff, 0, null, null, null, null, CROWD);
+      const body = mesh(visual.root, 'Character_Body');
+      const gates: Gate[] = [];
+      visual.setFarBakeGate((target, settle) => {
+        const twin = target.children[0] as THREE.Mesh | undefined;
+        gates.push({ target, settle, asked: twin?.material ? single(twin.material) : null });
+        if (target.name === SCRATCH && refuse(asks().length)) throw new Error('lane shut down');
+      });
+      const asks = () => gates.filter(({ target }) => target.name === SCRATCH);
+      visual.setWocEquipment({ chest: 'some-chest' }, false);
+      await vi.waitFor(() => expect(asks()).toHaveLength(1));
+      const frame = () => visual.update(1 / 60, IDLE, true);
+      return { visual, body, asks, frame, nextFrame: h.nextFrame };
+    }
+
+    it('asks the gate for the program the live body draws: the twin wears its tint wrap', async () => {
+      const h = await gatedSwap();
+      // this module world's layer registry (the harness resets modules)
+      const { wocHeadTintOf } = await import('../src/render/characters/woc_head_tint');
+      const twin = h.asks()[0].target.children[0] as THREE.SkinnedMesh;
+      const staged = single(twin.material);
+      const live = single(h.body.material);
+      // wrapped BEFORE the gate was asked: a gate that compiles inside the ask links this one
+      expect(h.asks()[0].asked).toBe(staged);
+      // the body's own layer (its skin paint keys on the suit atlas), as on the live mesh
+      expect(wocHeadTintOf(live)?.surface).toBe('suit');
+      expect(wocHeadTintOf(staged)?.surface).toBe('suit');
+      expect(wocHeadTintOf(staged)?.role).toBe('skin');
+      // three's own program key for the draw: the twin's is the live body's
+      const liveKey = threeProgramKeys(live, h.body);
+      expect(staged.customProgramCacheKey()).toBe(live.customProgramCacheKey());
+      expect(threeProgramKeys(staged, twin)).toBe(liveKey);
+      // ...and it is another material, on the new atlas, on the body's own mesh kind
+      expect(staged).not.toBe(live);
+      expect(mapNames(twin)).toEqual([ATLAS]);
+      expect(twin.isSkinnedMesh).toBe(true);
+      expect(twin.skeleton).toBe((h.body as THREE.SkinnedMesh).skeleton);
+      // the swap mounts the very material the gate prepared: nothing left to link or upload
+      h.asks()[0].settle();
+      h.frame();
+      expect(single(h.body.material)).toBe(staged);
+      expect(threeProgramKeys(single(h.body.material), h.body)).toBe(liveKey);
+      // under the under-armor atlas the layer is off, by its strength uniform alone
+      expect(wocHeadTintOf(staged)?.mix.value).toBe(0);
+      h.visual.dispose();
+    });
+
+    it('takes the swap on the next update, never inside the gate callback', async () => {
+      const h = await gatedSwap();
+      const [ask] = h.asks();
+      ask.settle();
+      // the settle only records: the body still draws its suit, the twin still holds its claims
+      expect(mapNames(h.body)).toEqual(['embedded']);
+      expect(ask.target.parent).not.toBeNull();
+      h.frame();
+      expect(mapNames(h.body)).toEqual([ATLAS]);
+      expect(ask.target.parent).toBeNull();
+      // one swap, one ask: a later frame has nothing more to take
+      h.frame();
+      expect(h.asks()).toHaveLength(1);
+      expect(mapNames(h.body)).toEqual([ATLAS]);
+      h.visual.dispose();
+    });
+
+    it('takes the swap on an off-screen body too, on its own per-frame path', async () => {
+      const h = await gatedSwap();
+      const [ask] = h.asks();
+      ask.settle();
+      expect(mapNames(h.body)).toEqual(['embedded']);
+      // a body outside the frustum is advanced, never updated: its swap must not wait for
+      // the frame it comes back into view (a crowd dressed behind the camera would all swap
+      // on that one frame)
+      h.visual.advanceOffscreen(1 / 60);
+      expect(mapNames(h.body)).toEqual([ATLAS]);
+      expect(ask.target.parent).toBeNull();
+      h.visual.dispose();
+    });
+
+    it('keeps the current atlas on a settle that could not vouch, and asks again', async () => {
+      const h = await gatedSwap();
+      const [first] = h.asks();
+      first.settle(() => false);
+      h.frame();
+      // not committed: the suit keeps drawing, and the same twin is asked a second time
+      expect(mapNames(h.body)).toEqual(['embedded']);
+      expect(h.asks()).toHaveLength(2);
+      expect(h.asks()[1].target).toBe(first.target);
+      expect(first.target.parent).not.toBeNull();
+      // idle frames ask nothing more while that link is out
+      h.frame();
+      h.frame();
+      expect(h.asks()).toHaveLength(2);
+      // the second link is vouched for: the swap is taken
+      h.asks()[1].settle(() => true);
+      expect(mapNames(h.body)).toEqual(['embedded']);
+      h.frame();
+      expect(mapNames(h.body)).toEqual([ATLAS]);
+      expect(first.target.parent).toBeNull();
+      h.visual.dispose();
+    });
+
+    it('asks twice more at most, then takes the swap all the same', async () => {
+      const h = await gatedSwap();
+      for (const round of [0, 1]) {
+        h.asks()[round].settle(() => false);
+        h.frame();
+        expect(mapNames(h.body), `after unprepared settle ${round + 1}`).toEqual(['embedded']);
+        expect(h.asks()).toHaveLength(round + 2);
+      }
+      // a gate that keeps giving up must not keep a body in the wrong cloth for good
+      h.asks()[2].settle(() => false);
+      h.frame();
+      expect(mapNames(h.body)).toEqual([ATLAS]);
+      expect(h.asks()).toHaveLength(3);
+      expect(h.asks()[0].target.parent).toBeNull();
+      // the count is per swap: the next one starts with its two re-asks
+      h.visual.setWocEquipment({}, false);
+      await vi.waitFor(() => expect(h.asks()).toHaveLength(4));
+      h.asks()[3].settle(() => false);
+      h.frame();
+      expect(mapNames(h.body)).toEqual([ATLAS]);
+      expect(h.asks()).toHaveLength(5);
+      h.visual.dispose();
+    });
+
+    it('forgets a settle the next request superseded: the new twin waits for its own answer', async () => {
+      const h = await gatedSwap();
+      const [first] = h.asks();
+      // vouched for and recorded, not yet taken...
+      first.settle();
+      // ...when the chest comes off and goes back on before a frame: the first twin is
+      // dropped, and the atlas (resident by now) is staged again at once
+      h.visual.setWocEquipment({}, false);
+      expect(first.target.parent).toBeNull();
+      h.visual.setWocEquipment({ chest: 'some-chest' }, false);
+      expect(h.asks()).toHaveLength(2);
+      const second = h.asks()[1];
+      expect(second.target).not.toBe(first.target);
+      // the recorded answer was for the dropped twin: nothing is taken on its strength
+      h.frame();
+      expect(mapNames(h.body)).toEqual(['embedded']);
+      expect(second.target.parent).not.toBeNull();
+      second.settle();
+      h.frame();
+      expect(mapNames(h.body)).toEqual([ATLAS]);
+      h.visual.dispose();
+    });
+
+    it('backs off like any refused gate when a repeated ask is refused', async () => {
+      // the second ask (the first re-ask) throws: a lane shut down under a graphics rebuild
+      const h = await gatedSwap((ask) => ask === 2);
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      const [first] = h.asks();
+      first.settle(() => false);
+      h.frame();
+      expect(h.asks()).toHaveLength(2);
+      // dropped, the current atlas still drawing, and nothing asked again on idle frames
+      expect(first.target.parent).toBeNull();
+      expect(mapNames(h.body)).toEqual(['embedded']);
+      expect(warn).toHaveBeenCalled();
+      h.frame();
+      h.visual.setWocEquipment({ chest: 'some-chest' }, false);
+      expect(h.asks()).toHaveLength(2);
+      // past the backoff, the unchanged equipment sync stages it afresh, with its re-asks
+      h.nextFrame(2000);
+      h.visual.setWocEquipment({ chest: 'some-chest' }, false);
+      expect(h.asks()).toHaveLength(3);
+      expect(h.asks()[2].target).not.toBe(first.target);
+      h.asks()[2].settle();
+      h.frame();
+      expect(mapNames(h.body)).toEqual([ATLAS]);
+      h.visual.dispose();
+    });
+
+    it('hears only the ask that is out: a second settle of a repeated ask commits nothing', async () => {
+      const h = await gatedSwap();
+      const [first] = h.asks();
+      first.settle(() => false);
+      h.frame();
+      expect(h.asks()).toHaveLength(2);
+      // the first ask settling again, vouching this time, is not the answer to the second
+      first.settle(() => true);
+      h.frame();
+      expect(mapNames(h.body)).toEqual(['embedded']);
+      expect(h.asks()).toHaveLength(2);
+      h.asks()[1].settle();
+      h.frame();
+      expect(mapNames(h.body)).toEqual([ATLAS]);
+      h.visual.dispose();
+    });
   });
 
   it('keeps live geometry claimed while bounded idle geometry is evicted', async () => {
@@ -532,8 +863,12 @@ describe('WOC equipment follows the character into the far and shadow bands', ()
     const { peekWocFarBake, retainWocFarBake } = await import(
       '../src/render/characters/woc_far_bake'
     );
-    // the full-detail pack: an assembled high pack is held and let go like a file
-    const url = wocArmorPackUrl('male', 'fixture', currentWocArmorTier());
+    // a file of a tier this preset draws for nobody, so that it IS freed once idle (the tier a
+    // crowd draws stays in memory on a desktop: woc_armor_core.ts wocArmorIdleEvictMs)
+    const tier = currentWocArmorTier('crowd') === 'low' ? 'medium' : 'low';
+    const url = wocArmorPackUrl('male', 'fixture', tier);
+    packs.ensureWocArmorPack(url);
+    await vi.waitFor(() => expect(packs.wocArmorPackResident(url)).toBe(true));
     const files = [{ set: 'fixture', url }];
     const parts = new Set(['Character_Body', 'Chest']);
     const lease = retainWocFarBake(KEY, parts, files);
@@ -634,6 +969,9 @@ describe('WOC equipment follows the character into the far and shadow bands', ()
     nextFrame(2000);
     visual.setWocEquipment(equipped, false);
     expect(targets).toHaveLength(2);
+    // settled inside the gate call itself: still nothing swaps before the per-frame path
+    expect(mapNames(mesh(visual.root, 'Character_Body'))).toEqual(['embedded']);
+    visual.update(1 / 60, IDLE, true);
     expect(targets[1].parent).toBeNull();
     expect(mapNames(mesh(visual.root, 'Character_Body'))).toEqual([ATLAS]);
     visual.dispose();
@@ -662,8 +1000,76 @@ describe('WOC equipment follows the character into the far and shadow bands', ()
     pending.finish();
     await flushPreview();
     expect(h.order).toEqual(['compile', `upload:${ATLAS}`, 'uniforms', 'attributes']);
+    // warmed and settled: the swap itself is taken on the preview's next frame
+    expect(mapNames(body)).toEqual(['embedded']);
+    h.frame();
     expect(mapNames(body)).toEqual([ATLAS]);
     expect(pending.target.parent).toBeNull();
+    h.preview.destroy();
+  });
+
+  // A warm the preview context REJECTS (preview_material_gate.ts): the atlas already
+  // prepared keeps drawing, and the cold one is never committed merely because its compile
+  // or upload failed. The gate reports the first failure (not ready), the swap asks once
+  // more, and a twin whose warm fails again simply stays behind its stand-in.
+  it('retries a preview atlas whose warm was rejected, and takes it once the retry warms', async () => {
+    const h = await previewHarness();
+    const body = mesh(h.group, 'Character_Body');
+    h.preview.setWocEquipment({ chest: 'some-chest' }, false);
+    h.finishAtlas();
+    await flushPreview();
+    expect(h.compiles).toHaveLength(1);
+    const pending = h.compiles[0];
+    expect(pending.target.name).toBe('character_body_atlas_scratch');
+    pending.fail(new Error('context busy'));
+    await flushPreview();
+    // reported, never committed: nothing was uploaded and the body keeps its suit
+    expect(h.order).toEqual(['compile']);
+    expect(mapNames(body)).toEqual(['embedded']);
+    h.frame();
+    expect(mapNames(body)).toEqual(['embedded']);
+    // the same hidden twin is warmed a second time
+    expect(h.compiles).toHaveLength(2);
+    expect(h.compiles[1].target).toBe(pending.target);
+    expect(pending.target.parent).not.toBeNull();
+    h.compiles[1].finish();
+    await flushPreview();
+    expect(h.order).toEqual(['compile', 'compile', `upload:${ATLAS}`, 'uniforms', 'attributes']);
+    expect(mapNames(body)).toEqual(['embedded']);
+    h.frame();
+    expect(mapNames(body)).toEqual([ATLAS]);
+    expect(pending.target.parent).toBeNull();
+    h.preview.destroy();
+  });
+
+  it('never commits a cold preview atlas, however often its warm is rejected', async () => {
+    const h = await previewHarness();
+    const body = mesh(h.group, 'Character_Body');
+    h.preview.setWocEquipment({ chest: 'some-chest' }, false);
+    h.finishAtlas();
+    await flushPreview();
+    const pending = h.compiles[0];
+    pending.fail(new Error('context busy'));
+    await flushPreview();
+    h.frame();
+    expect(h.compiles).toHaveLength(2);
+    h.compiles[1].fail(new Error('still busy'));
+    await flushPreview();
+    for (let i = 0; i < 6; i++) {
+      h.frame();
+      await flushPreview();
+    }
+    // the atlas that was prepared is still the one drawn, nothing cold was uploaded, and
+    // the gate is not asked again for a twin it cannot warm
+    expect(mapNames(body)).toEqual(['embedded']);
+    expect(h.order).toEqual(['compile', 'compile']);
+    expect(h.compiles).toHaveLength(2);
+    // the twin waits, hidden, until the next pick supersedes it
+    expect(pending.target.parent).not.toBeNull();
+    expect(pending.target.visible).toBe(false);
+    h.preview.setWocEquipment({}, false);
+    expect(pending.target.parent).toBeNull();
+    expect(mapNames(body)).toEqual(['embedded']);
     h.preview.destroy();
   });
 

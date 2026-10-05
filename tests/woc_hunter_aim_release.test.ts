@@ -124,6 +124,21 @@ describe('live WOC combat event linkage', () => {
       visual,
       peek: visual as unknown as Peek,
       event: (event: SimEvent) => Renderer.prototype.handleEvent.call(renderer, event),
+      /** The renderer's contact seam, as the hud calls it for every sim event. */
+      atContact: (ev: SimEvent, fn: (ev: SimEvent) => void, self: unknown) =>
+        (
+          Renderer.prototype.atContact as (
+            this: RendererType,
+            ev: SimEvent,
+            fn: (ev: SimEvent) => void,
+            self: unknown,
+          ) => void
+        ).call(renderer, ev, fn, self),
+      contactDelayFor: (ev: SimEvent) => Renderer.prototype.contactDelayFor.call(renderer, ev),
+      tickContacts: (now: number) =>
+        (renderer as unknown as { contactQueue: { tick(now: number): void } }).contactQueue.tick(
+          now,
+        ),
       attackCount: () => (renderer as unknown as { attackTriggerCount: number }).attackTriggerCount,
       usePainter: async () => {
         const { AbilityVfx } = await import('../src/render/ability_vfx/painter');
@@ -151,6 +166,41 @@ describe('live WOC combat event linkage', () => {
     kind: 'hit',
     ability,
     ...(abilityId ? { abilityId } : {}),
+  });
+
+  it('hands a contact-staged call its receiver and its event, at once or at the blade', async () => {
+    // Renderer.atContact is what the hud runs for EVERY sim event (its impact sound): the
+    // caller's method must reach the queue with its receiver, or it runs detached from its
+    // object. Real renderer method, real queue, a real swing's contact.
+    const h = await harness();
+    const calls: { self: unknown; ev: SimEvent }[] = [];
+    const host = {
+      play(this: unknown, ev: SimEvent): void {
+        calls.push({ self: this, ev });
+      },
+    };
+    // an event with no swing behind it: in place, on the receiver, with the event
+    const cue = { type: 'spellfx', sourceId: 1, targetId: 2, fx: 'burst' } as unknown as SimEvent;
+    expect(h.contactDelayFor(cue)).toBe(0);
+    h.atContact(cue, host.play, host);
+    expect(calls).toHaveLength(1);
+    expect(calls[0].self).toBe(host);
+    expect(calls[0].ev).toBe(cue);
+    // a melee hit: the swing it starts reports its blade contact, and the call waits for it
+    const hit = damage(null);
+    h.event(hit);
+    const delaySec = h.contactDelayFor(hit);
+    expect(delaySec).toBeGreaterThan(0.1);
+    const before = performance.now();
+    h.atContact(hit, host.play, host);
+    const after = performance.now();
+    expect(calls).toHaveLength(1);
+    h.tickContacts(before + delaySec * 1000 - 1);
+    expect(calls).toHaveLength(1);
+    h.tickContacts(after + delaySec * 1000 + 1);
+    expect(calls).toHaveLength(2);
+    expect(calls[1].self).toBe(host);
+    expect(calls[1].ev).toBe(hit);
   });
 
   it('keeps Hunter melee autos swinging after a melee skill, while shot launches still shoot', async () => {

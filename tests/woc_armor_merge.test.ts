@@ -1885,12 +1885,13 @@ describe('one character wearing a merged kit', () => {
       ['view:woc-armor-merge', 0, now],
       ['view:woc-armor-merge', 0, now],
     ]);
-    // nothing to fold records nothing
+    // nothing to fold records nothing (the new set's own first attach names its prepare, a
+    // step of whatever build paid it: woc_armor_packs.ts)
     const bare = body();
     await wear(bare, freshSet());
     for (const name of KIT_FOLDED) part(bare.model, name).visible = false;
     new WocArmorMergeRig(host(false), bare.model).sync();
-    expect(spans).toHaveLength(2);
+    expect(spans.filter(([kind]) => kind === 'view:woc-armor-merge')).toHaveLength(2);
   });
 
   it('parks under an effect overlay that blends, and stands again when it ends, with no rebuild', async () => {

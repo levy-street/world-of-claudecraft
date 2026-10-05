@@ -12,7 +12,9 @@
 // later write reaches; every merged head of a variant shares one program; the layer
 // composes with the hooks a material wears before AND after it and survives an effect
 // clone; and the slot and colour writers put each number in the row and component the
-// GLSL reads it from.
+// GLSL reads it from, the two constants the skin and eye transfers read off the CPU with
+// them (a slot's reference hue and saturation, the eye colour's HSV:
+// tests/woc_tint_hsv_core.test.ts holds those to the conversions the fragment used to run).
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { applyEnvSheen } from '../src/render/characters/env_sheen';
@@ -41,6 +43,7 @@ import {
   wocHeadMergeOneSided,
   wocHeadTintOf,
 } from '../src/render/characters/woc_head_tint';
+import { wocTintSrgbHsv } from '../src/render/characters/woc_tint_hsv_core';
 import { cloneMaterialWithHooks } from '../src/render/material_clone_hooks';
 import { threeProgramKeys } from './helpers/three_program_keys';
 
@@ -360,7 +363,7 @@ describe('attachWocHeadMergedTint: the fragment stage on the standard shader', (
       [`uniform vec4 uWocHmRef[${N}];`, u.ref.value],
       [`uniform vec4 uWocHmCol[${N}];`, u.col.value],
       [`uniform vec4 uWocHmEmi[${N}];`, u.emi.value],
-      [`uniform vec2 uWocHmSurf[${N}];`, u.surf.value],
+      [`uniform vec4 uWocHmSurf[${N}];`, u.surf.value],
     ] as const) {
       const at = fragmentShader.indexOf(decl);
       expect(at, decl).toBeGreaterThan(-1);
@@ -371,6 +374,11 @@ describe('attachWocHeadMergedTint: the fragment stage on the standard shader', (
     expect(fragmentShader).toContain('uniform float uWocHmMix;');
     // literal: one colour per tinted role
     expect(fragmentShader).toContain('uniform vec3 uWocHmTint[4];');
+    // ...and the eye colour once more, as the HSV its transfer reads
+    expect(fragmentShader).toContain('uniform vec3 uWocHmEyeHsv;');
+    // the surface row is whole: its two free components carry the reference's hue and
+    // saturation, so the table grew by no vector for them
+    expect(fragmentShader).not.toContain('uniform vec2 uWocHmSurf');
   });
 
   it("draws the slot's own colour and emissive over the material's", () => {
@@ -648,17 +656,42 @@ describe('attachWocHeadMergedTint: the role transfers', () => {
     expect(WOC_HEAD_MERGE_ROLE_CODE).toEqual({ skin: 1, eye: 2, hair: 3, brow: 4 });
     expect(WOC_HEAD_MERGE_ROLES).toEqual(['skin', 'eye', 'hair', 'brow']);
     expect(fragmentShader).toContain('if (wocRef.a < 1.5) {\n    vec3 t = uWocHmTint[0];');
-    expect(fragmentShader).toContain('} else if (wocRef.a < 2.5) {\n    vec3 t = uWocHmTint[1];');
+    // the eye transfer reads its colour as an HSV alone: converted on the CPU, in its own
+    // uniform (the table's eye row is written for whoever reads the look's colours back)
+    expect(fragmentShader).toContain('} else if (wocRef.a < 2.5) {\n    vec3 tk = uWocHmEyeHsv;');
+    expect(fragmentShader).not.toContain('uWocHmTint[1]');
     expect(fragmentShader).toContain(
       '} else {\n    vec3 t = wocRef.a < 3.5 ? uWocHmTint[2] : uWocHmTint[3];',
     );
   });
 
+  it("reads a slot's reference hue and saturation off its surface row, never off a conversion", () => {
+    // beside the reference itself, before any branch: the skin band and the iris test
+    // both read `rk`
+    const reference = fragmentShader.indexOf('vec3 r = wocRef.rgb;');
+    const constants = fragmentShader.indexOf('vec2 rk = uWocHmSurf[wocSlot].zw;');
+    expect(constants).toBeGreaterThan(reference);
+    expect(constants).toBeLessThan(fragmentShader.indexOf('if (wocRef.a < 1.5) {'));
+    expect(count(fragmentShader, 'vec2 rk = ')).toBe(1);
+    expect(fragmentShader).toContain(
+      'float dh = mod((hs.x - rk.x) * 360.0 + 540.0, 360.0) - 180.0;',
+    );
+    expect(fragmentShader).toContain('smoothstep(rk.y + 0.08, rk.y + 0.22, hs.y)');
+    // the two conversions left are the texel's, one in the skin branch and one in the eye
+    // branch (five were inlined here: three of them of a uniform)
+    expect(count(fragmentShader, 'wocHtRgb2Hsv(')).toBe(1 + 2);
+    expect(count(fragmentShader, 'wocHtRgb2Hsv(wocHtLin2Srgb(c))')).toBe(2);
+    expect(count(fragmentShader, 'wocHtLin2Srgb(')).toBe(1 + 2);
+  });
+
   it('runs the very transfer each role runs on a piece of its own', () => {
     const skin = fragmentShader.indexOf('vec3 t = uWocHmTint[0];');
-    const eye = fragmentShader.indexOf('vec3 t = uWocHmTint[1];');
+    const eye = fragmentShader.indexOf('vec3 tk = uWocHmEyeHsv;');
     const hair = fragmentShader.indexOf('uWocHmTint[2] : uWocHmTint[3];');
     const end = fragmentShader.indexOf('diffuseColor.rgb = mix(c, max(o, vec3(0.0)), uWocHmMix);');
+    expect(skin).toBeGreaterThan(-1);
+    expect(eye).toBeGreaterThan(skin);
+    expect(hair).toBeGreaterThan(eye);
     const body = (from: number, to: number): string => fragmentShader.slice(from, to);
     expect(body(skin, eye)).toContain(roleTransfer('skin'));
     expect(body(eye, hair)).toContain(roleTransfer('eye'));
@@ -753,6 +786,7 @@ describe('attachWocHeadMergedTint: uniforms and the program key', () => {
     expect(shader.uniforms.uWocHmCol).toBe(u.col);
     expect(shader.uniforms.uWocHmEmi).toBe(u.emi);
     expect(shader.uniforms.uWocHmSurf).toBe(u.surf);
+    expect(shader.uniforms.uWocHmEyeHsv).toBe(u.eye);
     expect(shader.uniforms.uWocHmHair).toBe(u.hair);
     expect(shader.uniforms.uWocHmBeard).toBe(u.beard);
     expect(shader.uniforms.uWocHmScalp).toBe(u.scalp);
@@ -762,6 +796,7 @@ describe('attachWocHeadMergedTint: uniforms and the program key', () => {
       'uWocHmBeard',
       'uWocHmCol',
       'uWocHmEmi',
+      'uWocHmEyeHsv',
       'uWocHmHair',
       'uWocHmMix',
       'uWocHmRef',
@@ -786,9 +821,13 @@ describe('attachWocHeadMergedTint: uniforms and the program key', () => {
     u.hair.value = hair;
     const bound = shader.uniforms as {
       uWocHmTint: { value: THREE.Vector3[] };
+      uWocHmEyeHsv: { value: THREE.Vector3 };
       uWocHmHair: { value: THREE.Texture | null };
     };
     expect(bound.uWocHmTint.value[0].toArray()).toEqual([0.5, 0.25, 0.125]);
+    // the eye colour (a pure blue) reached its uniform converted: two thirds round the wheel
+    expect(bound.uWocHmEyeHsv.value.x).toBeCloseTo(2 / 3, 9);
+    expect(bound.uWocHmEyeHsv.value.z).toBe(1);
     expect(bound.uWocHmHair.value).toBe(hair);
     expect(mat.customProgramCacheKey()).toBe(key);
   });
@@ -808,6 +847,9 @@ describe('attachWocHeadMergedTint: uniforms and the program key', () => {
     expect(u.mix.value).toBe(0);
     // no slot is one sided until the rows are written
     expect(u.surf.value.every((v) => v.x === 0 && v.y === 0)).toBe(true);
+    expect(u.surf.value.every((v) => v.isVector4 === true)).toBe(true);
+    // the role colours are born white, and the eye's HSV with them
+    expect(u.eye.value.toArray()).toEqual([0, 0, 1]);
   });
 
   it('gives every merged head one key of its own, apart from any per-role layer', () => {
@@ -1130,7 +1172,14 @@ describe('setWocHeadMergedSlots', () => {
     surf: u.surf.value[i].toArray(),
   });
   /** What a row holds when no slot uses it. */
-  const UNUSED = { ref: [0, 0, 0, 0], col: [1, 1, 1, 0], emi: [0, 0, 0, 1], surf: [0, 0] };
+  const UNUSED = { ref: [0, 0, 0, 0], col: [1, 1, 1, 0], emi: [0, 0, 0, 1], surf: [0, 0, 0, 0] };
+  /** A surface row: metalness, sidedness, then the hue and saturation the layer's CPU
+   *  half converts the slot's reference to (woc_tint_hsv_core.ts). */
+  const surf = (
+    metalness: number,
+    oneSided: 0 | 1,
+    ref: readonly [number, number, number],
+  ): number[] => [metalness, oneSided, ...wocTintSrgbHsv(ref).slice(0, 2)];
 
   it('writes each slot as its reference and role, its colour OVER the base, its emissive LESS the base', () => {
     const { u } = merged();
@@ -1163,50 +1212,59 @@ describe('setWocHeadMergedSlots', () => {
       BASE,
     );
     // a slot drawing exactly the base's surface is the identity row; its surface row is
-    // (metalness, 1 for a one sided slot)
+    // (metalness, 1 for a one sided slot, then its reference's sRGB hue and saturation)
     expect(rows(u, 0)).toEqual({
       ref: [0.2346, 0.1195, 0.0865, 1],
       col: [1, 1, 1, 0],
       emi: [0, 0, 0, 0.625],
-      surf: [0, 1],
+      surf: surf(0, 1, [0.2346, 0.1195, 0.0865]),
     });
+    // literal, worked by hand from the gamma curve: the skin reference is an orange of
+    // hue 0.046 (16.5 degrees) at saturation 0.365
+    expect(u.surf.value[0].z).toBeCloseTo(0.046, 3);
+    expect(u.surf.value[0].w).toBeCloseTo(0.365, 3);
     // colour is a RATIO (1 / 0.5, 0.75 / 0.25, 0.0625 / 0.125) with the layer in w;
     // emissive a DIFFERENCE (0.75 - 0.25, 0.125 - 0.125, 0.25 - 0.5) with roughness in w
     expect(rows(u, 1)).toEqual({
       ref: [0.0184, 0.0184, 0.0184, 3],
       col: [2, 3, 0.5, 1],
       emi: [0.5, 0, -0.25, 0.75],
-      surf: [0.25, 0],
+      // a grey reference (hair, brow) has neither hue nor saturation
+      surf: [0.25, 0, 0, 0],
     });
     expect(rows(u, 2)).toEqual({
       ref: [0, 0, 0, 0],
       col: [2, 2, 2, 0],
       emi: [-0.25, -0.125, -0.5, 0.25],
-      surf: [1, 1],
+      surf: [1, 1, 0, 0],
     });
     expect(rows(u, 3)).toEqual({
       ref: [0.0603, 0.0603, 0.0603, 3],
       col: [0.5, 1, 2, 2],
       emi: [0, 0.125, 0, 0.5],
-      surf: [0, 0],
+      surf: [0, 0, 0, 0],
     });
     expect(rows(u, 4)).toEqual({
       ref: [0.023, 0.023, 0.023, 4],
       col: [1, 2, 4, 0],
       emi: [0.25, 0, 0, 0.875],
-      surf: [0.5, 0],
+      surf: [0.5, 0, 0, 0],
     });
     expect(rows(u, 5)).toEqual({
       ref: [0.227, 0.1845, 0.1651, 2],
       col: [0.25, 0.5, 1, 0],
       emi: [0, 0.25, 0.5, 1],
-      surf: [0.75, 1],
+      surf: surf(0.75, 1, [0.227, 0.1845, 0.1651]),
     });
+    // literal, by hand: the eyeball's median is a pale warm grey, saturation 0.135 (the
+    // iris test starts a little above it)
+    expect(u.surf.value[5].w).toBeCloseTo(0.135, 3);
+    expect(u.surf.value[5].z).toBeCloseTo(0.055, 3);
     expect(rows(u, 6)).toEqual({
       ref: [0.0796, 0.0796, 0.0796, 3],
       col: [1, 1, 1, 3],
       emi: [0, 0, 0, 0.125],
-      surf: [0.125, 0],
+      surf: [0.125, 0, 0, 0],
     });
     // every row past the head's slots is the unused row
     for (let i = 7; i < N; i++) expect(rows(u, i), `row ${i}`).toEqual(UNUSED);
@@ -1227,7 +1285,7 @@ describe('setWocHeadMergedSlots', () => {
         ref: [0.5, 0.5, 0.5, 4],
         col: [2, 4, 8, 2],
         emi: [0.75, 0.875, 0.5, 0.25],
-        surf: [1, 1],
+        surf: [1, 1, 0, 0],
       });
     }
     // then a head of two slots: rows 2 and up go back to drawing nothing of their own
@@ -1238,6 +1296,9 @@ describe('setWocHeadMergedSlots', () => {
       BASE,
     );
     expect(rows(u, 1).ref).toEqual([0.02, 0.02, 0.02, 3]);
+    // the skin slot's converted reference is in its row, and gone from the rows it left
+    expect(rows(u, 0).surf).toEqual(surf(1, 0, [0.2, 0.1, 0.05]));
+    expect(rows(u, 0).surf[2]).toBeGreaterThan(0.01);
     for (let i = 2; i < N; i++) expect(rows(u, i), `row ${i}`).toEqual(UNUSED);
     // and no head at all: every row
     setWocHeadMergedSlots(u, [], [], BASE);
@@ -1280,8 +1341,8 @@ describe('setWocHeadMergedSlots', () => {
       expect(u.emi.value[i]).toBe(before.emi[i]);
       expect(u.surf.value[i]).toBe(before.surf[i]);
     }
-    const bound = shader.uniforms.uWocHmSurf as { value: THREE.Vector2[] };
-    expect(bound.value[0].toArray()).toEqual([0.25, 1]);
+    const bound = shader.uniforms.uWocHmSurf as { value: THREE.Vector4[] };
+    expect(bound.value[0].toArray()).toEqual(surf(0.25, 1, [0.2, 0.1, 0.05]));
   });
 
   it('never divides by a black base: the ratio stays finite', () => {
@@ -1321,6 +1382,33 @@ describe('setWocHeadMergedColors', () => {
       expect(WOC_HEAD_MERGE_ROLE_CODE[role] - 1, role).toBe(i);
     });
     expect(u.mix.value).toBe(1);
+    // ...and the eye colour as the HSV its transfer reads, converted here once
+    expect(u.eye.value.toArray()).toEqual(wocTintSrgbHsv([0.0625, 0.5, 0.75]));
+    // literal, by hand: a sky blue, hue 0.541 (195 degrees), value the blue channel's
+    expect(u.eye.value.x).toBeCloseTo(0.5414, 3);
+    expect(u.eye.value.y).toBeCloseTo(0.6768, 3);
+    expect(u.eye.value.z).toBeCloseTo(0.75 ** (1 / 2.2), 12);
+  });
+
+  it('follows the eye colour, and no other, into the eye uniform', () => {
+    const { u } = merged();
+    const look = {
+      skin: [0.5, 0.25, 0.125],
+      eye: [0.6, 0.1, 0.1],
+      hair: [1, 0, 0.5],
+      brow: [0.25, 0.75, 0],
+    } as const;
+    const eye = u.eye.value;
+    setWocHeadMergedColors(u, look);
+    const red = eye.toArray();
+    // every other role moved: the eye uniform holds still
+    setWocHeadMergedColors(u, { ...look, skin: [0, 1, 0], hair: [0, 0, 1], brow: [1, 1, 1] });
+    expect(eye.toArray()).toEqual(red);
+    // the eye colour moved: the same vector, another value
+    setWocHeadMergedColors(u, { ...look, eye: [0.1, 0.6, 0.1] });
+    expect(u.eye.value).toBe(eye);
+    expect(eye.toArray()).not.toEqual(red);
+    expect(eye.x).toBeCloseTo(1 / 3, 9);
   });
 
   it('switches the layer on at full strength: a head piece is never half tinted', () => {

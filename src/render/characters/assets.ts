@@ -13,7 +13,6 @@
 // permanently blanking it on a cold, first-visit cache.
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import {
   mainhandShowsWeaponSkin,
@@ -21,19 +20,17 @@ import {
 } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { applyGeometryLod, type GeometryLodLevel } from '../assets/geometry_lod';
+import type { LoadPriority } from '../assets/load_queue_core';
 import { retryDelayMs as gltfRetryDelayMs } from '../assets/load_retry';
 import { loadGltf, loadKtx2Texture, loadTexture } from '../assets/loader';
-import { registerPreload } from '../assets/preload';
+import { registerDeferredPreload, registerPreload } from '../assets/preload';
 import { recordBuildSpan, timeBuildSpan } from '../build_spans';
 import { addRimGlow, EMISSIVE_GLOW, GFX, type GfxSettings } from '../gfx';
 import { renderLayerDisabled } from '../render_dev_flags';
 import { applyRiggedWornDetail, applySurfaceDetail } from '../worn_stone';
 import { type ArmorDyeSpec, attachArmorDye } from './armor_dye';
 import { backGripFor, slotToChestScale } from './back_grips';
-import { dequantizeAttribute } from './dequantize_attribute';
 import { applyEnvSheen } from './env_sheen';
-import { coalesceFarBakeGroups, farBakeGroupRanges } from './far_bake_groups_core';
-import { padMissingUv } from './far_bake_uv_pad';
 import {
   type HandGrip,
   KAYKIT_ONE_HAND_SWORD_GRIP,
@@ -107,6 +104,7 @@ import { characterMeshCastsShadow } from './shadow_policy';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
 import { optimizeSkinGpuLayout } from './skin_gpu_layout';
 import { primeSkinnedSortSpheres } from './skinned_sort_spheres';
+import { bakeStaticPose, farBakeGroupKey } from './static_pose_bake';
 import { buildStubbleDecal, headNodeName } from './stubble';
 import { TINTED_MATERIAL_IDLE_CACHE_MAX, TintedMaterialCache } from './tinted_material_cache_core';
 import { prepareWarriorAbilityClips } from './warrior_ability_clips';
@@ -117,8 +115,10 @@ import { WOC_ANATOMY_TOP, type WocArmorDetail, wocArmorTierFor } from './woc_arm
 import { attachWocArmorAtBuild, type WocArmorFile } from './woc_armor_dressing';
 import { clearIdleWocArmorMerges } from './woc_armor_merge';
 import { prepareWocArmorTier, wocArmorResidentScenes } from './woc_armor_packs';
+import { startWocCrowdPrefetch, wocCrowdPrefetchStarted } from './woc_crowd_prefetch';
+import { loadWocEntryFiles } from './woc_entry_preload';
 import { clearIdleWocHeadMerges } from './woc_head_merge';
-import { ensureWocHeadCoreForFit, hangWocHeadAtBuild } from './woc_head_packs';
+import { ensureWocHeadCoreForFit, hangWocHeadAtBuild, type WocHeadBorn } from './woc_head_packs';
 import { WOC_FAR_BAKE_LOD, wocLodLevelFor } from './woc_lod_core';
 import { applyWocPartVisibility, resolveWocPartNodes } from './woc_parts';
 import {
@@ -128,6 +128,7 @@ import {
   wocMergePartition,
   wocVisibleParts,
 } from './woc_parts_core';
+import { bakeWocShadowStandIn } from './woc_shadow_stand_in';
 
 const DEFAULT_TINT_STRENGTH = 0.4;
 
@@ -654,6 +655,15 @@ const lazyOnDemandUrls = new Set(
 let postEntryStreamUrls = postEntryStreamUrlsFor(streamedUrls);
 const preloadUrls = allPreloadUrls.filter((url) => !streamedUrlSet.has(url));
 const characterLoadTasks = new Map<string, Promise<void>>();
+/** The urls in flight that the post-entry stream queued as background loads. */
+const streamQueuedUrls = new Set<string>();
+/** Body files a host is waiting on (visualAssetsResident), until each lands. */
+const hostAwaitedUrls = new Set<string>();
+/** The awaited files whose fetch failed and whose next ask is already scheduled. */
+const characterRetryArmed = new Set<string>();
+/** A file a host waits on is asked for again this long after a failed fetch: the cooldown
+ *  the head files and the armor packs keep (woc_head_packs.ts, woc_armor_packs.ts). */
+const CHARACTER_RETRY_MS = 8000;
 type CharacterAssetReadyListener = (url: string) => void;
 const characterAssetReadyListeners = new Set<CharacterAssetReadyListener>();
 
@@ -680,21 +690,50 @@ function notifyCharacterAssetReady(url: string): void {
 // body, which preloads under its own raw entry); an alias added inside
 // models/creatures/ or the weapon-skin set would make that asset look
 // permanently non-resident, so key any such future entry resolved.
-function prepareCharacterUrl(url: string): Promise<void> {
+function prepareCharacterUrl(url: string, priority?: LoadPriority): Promise<void> {
   if (gltfByUrl.has(url)) return Promise.resolve();
   const existing = characterLoadTasks.get(url);
-  if (existing) return existing;
-  const task = loadGltf(url)
+  if (existing) {
+    // Asked for again by a caller that needs it now: a body the bulk stream queued must not
+    // wait out the rest of the stream, so the loader is asked once more as a demand, which
+    // moves its waiting start up (assets/load_queue_core.ts). Same fetch, same task.
+    if (priority !== 'background' && streamQueuedUrls.delete(url)) {
+      void loadGltf(url).catch(() => undefined);
+    }
+    return existing;
+  }
+  if (priority === 'background') streamQueuedUrls.add(url);
+  const load = priority === 'background' ? loadGltf(url, { priority }) : loadGltf(url);
+  const task = load
     .then((gltf) => {
       gltfByUrl.set(url, gltf);
+      hostAwaitedUrls.delete(url);
       notifyCharacterAssetReady(url);
     })
     .catch((err) => {
       characterLoadTasks.delete(url);
+      if (hostAwaitedUrls.has(url)) armCharacterRetry(url);
       throw err;
-    });
+    })
+    .finally(() => streamQueuedUrls.delete(url));
   characterLoadTasks.set(url, task);
   return task;
+}
+
+/** Ask once more, after the cooldown, for a file a host is waiting on whose fetch failed.
+ *  A host hears of a body through the ready signal alone, and a failure fires none: without
+ *  this a dropped request left a launcher preview empty (and a roster portrait on its
+ *  crest) until the player picked something else. Asks made while it is armed start no
+ *  fetch, so a host that asks every frame cannot keep a dead file on the wire. */
+function armCharacterRetry(url: string): void {
+  if (characterRetryArmed.has(url)) return;
+  characterRetryArmed.add(url);
+  const timer: unknown = setTimeout(() => {
+    characterRetryArmed.delete(url);
+    if (hostAwaitedUrls.has(url)) ensureCharacterUrl(url);
+  }, CHARACTER_RETRY_MS);
+  // A pending ask must never hold a Node host open (a Vitest worker importing this module).
+  (timer as { unref?: () => void }).unref?.();
 }
 
 /** True when a character GLB is resident and attach/build paths may resolve it. */
@@ -710,10 +749,15 @@ export function ensureCharacterUrl(url: string | null | undefined): void {
 
 /** Whether every file a visual key builds from (its body GLB and animation
  *  libraries) is resident, kicking the fetch of any on-demand one that is not
- *  (`fetch: false` only asks): a WOC base or animation library streams on
- *  first use (woc_armor_core.ts), so a host that builds a CharacterVisual
- *  directly (the creation preview) asks here first and retries on
- *  onCharacterAssetReady instead of throwing. */
+ *  (`fetch: false` only asks). The asker is a host that builds a CharacterVisual
+ *  directly: it asks here first and builds on onCharacterAssetReady instead of
+ *  throwing. For a WOC body that wait only exists BEFORE the world does (the
+ *  launcher's creation and character-select previews, a roster portrait), where
+ *  a fit's base and animation library are fetched on demand; in the world both
+ *  fits are resident from entry (woc_entry_preload.ts). A fetch that fails does
+ *  not end the wait: the file is asked for again after its cooldown, by itself
+ *  (armCharacterRetry), and its landing fires the ready signal like any other,
+ *  so a host may ask once or every frame. */
 export function visualAssetsResident(key: string, fetch = true): boolean {
   const def = VISUALS[key];
   if (!def) return false;
@@ -723,27 +767,11 @@ export function visualAssetsResident(key: string, fetch = true): boolean {
   for (const url of [def.url, ...(def.animUrls ?? [])]) {
     if (characterAssetResident(url)) continue;
     resident = false;
-    if (fetch && (streamedUrlSet.has(url) || lazyOnDemandUrls.has(url))) ensureCharacterUrl(url);
+    if (!fetch || !(streamedUrlSet.has(url) || lazyOnDemandUrls.has(url))) continue;
+    hostAwaitedUrls.add(url);
+    if (!characterRetryArmed.has(url)) ensureCharacterUrl(url);
   }
   return resident;
-}
-
-/** Whether a WOC visual key waits ONLY on its split base or animation library
- *  still streaming (a designed wait, never a missed preload), kicking their
- *  fetch: a world view skips the frame quietly and tries again the next one.
- *  Every other lazy body keeps the logged miss (issue 2079). */
-export function visualAwaitsStream(key: string, fetch = true): boolean {
-  const def = VISUALS[key];
-  if (!def?.wocCharacter) return false;
-  if (fetch) ensureWocHeadCoreForFit(def.wocCharacter.fit);
-  let waiting = false;
-  for (const url of [def.url, ...(def.animUrls ?? [])]) {
-    if (characterAssetResident(url)) continue;
-    if (!streamedUrlSet.has(url) && !lazyOnDemandUrls.has(url)) return false;
-    if (fetch) ensureCharacterUrl(url);
-    waiting = true;
-  }
-  return waiting;
 }
 
 /** A streamed url that has not arrived yet must degrade, never throw: return
@@ -760,20 +788,42 @@ for (const url of preloadUrls) {
   registerPreload(prepareCharacterUrl(url));
 }
 
+// World entry (the deferred lane, awaited before the Renderer exists): the minimum to draw
+// ANY player, which is the WOC base and animation library of both body fits and both head
+// cores, so no player's body waits on a file once the world is up (woc_entry_preload.ts;
+// the loading model is in src/render/CLAUDE.md "Asset loading"). Nothing of it starts on the
+// launcher, whose previews fetch only what they show (visualAssetsResident).
+registerDeferredPreload(() => loadWocEntryFiles((url) => prepareCharacterUrl(url)));
+
 let streamedStarted = false;
 /**
  * Start the post-entry mob-body stream (idempotent; returns how many fetches
  * this call started). main.ts calls it after the first painted world frame,
- * once the entry allocation spike has cleared. A failed fetch re-arms
+ * once the entry allocation spike has cleared. The stream is BACKGROUND work
+ * (assets/load_queue_core.ts): a file somebody needs now (a player's armor set,
+ * a hairstyle, a mount, a creature already in view) starts ahead of whatever
+ * the stream still has waiting. A failed fetch re-arms
  * when a visual build next needs the body: resolvedGltf kicks
  * ensureCharacterUrl for a non-resident streamed url before its fail-soft
  * throw, and the view-create retry gate re-attempts the build.
  */
 export function startStreamedCharacterPreloads(): number {
+  // The same first painted frame starts the crowd prefetch (woc_crowd_prefetch.ts): the rest
+  // of the crowd set (hair, beards, the armor sets at the crowd's tier, the under-armor
+  // atlases), background work on a profile with the memory for it and nothing at all on a
+  // constrained one. It keeps its own once-per-plan guard, and is not part of the count
+  // below, which reports the deferred creature stream.
+  try {
+    startWocCrowdPrefetch(GFX, prefetchUnderArmorAtlas);
+  } catch (err) {
+    // fetched ahead of need only: whatever goes wrong here must never cost the creature
+    // stream below (every file it would have fetched still streams on first sight)
+    console.warn('WOC crowd prefetch failed to start', err);
+  }
   if (streamedStarted) return 0;
   streamedStarted = true;
   for (const url of postEntryStreamUrls) {
-    void prepareCharacterUrl(url).catch(() => undefined);
+    void prepareCharacterUrl(url, 'background').catch(() => undefined);
   }
   return postEntryStreamUrls.length;
 }
@@ -793,10 +843,16 @@ const skinEmisTexByUrl = new Map<string, THREE.Texture>();
 // sweep this pass targets.
 const KTX2_ATLAS_PREFIX = `${SKINS_DIR}/`;
 
-/** Load a skin/emissive atlas with the glTF body-UV conventions (sRGB, no flip). */
-function loadSkinTexInto(url: string, into: Map<string, THREE.Texture>): Promise<void> {
+/** Load a skin/emissive atlas with the glTF body-UV conventions (sRGB, no flip).
+ *  `priority`: `background` for an atlas fetched ahead of need (a KTX2 atlas only; the few
+ *  PNG ones are never prefetched). */
+function loadSkinTexInto(
+  url: string,
+  into: Map<string, THREE.Texture>,
+  priority?: LoadPriority,
+): Promise<void> {
   const load = url.startsWith(KTX2_ATLAS_PREFIX)
-    ? loadKtx2Texture(`${url.slice(0, -'.png'.length)}.ktx2`)
+    ? loadKtx2Texture(`${url.slice(0, -'.png'.length)}.ktx2`, { priority })
     : loadTexture(url, { srgb: true });
   return load.then((t) => {
     t.flipY = false;
@@ -837,15 +893,18 @@ export async function prepareCharacterProfileAssets(target: Readonly<GfxSettings
   const requiredGltf = manifestUrlsForGraphics(target.standardMaterials).filter(
     (url) => !nextStreamedSet.has(url),
   );
-  await Promise.all(requiredGltf.map(prepareCharacterUrl));
-  // the armor sets in memory, at the tier every character of the new profile draws first
-  // (woc_armor_core.ts: low, or the medium file the local player's high pack is laid over)
+  await Promise.all(requiredGltf.map((url) => prepareCharacterUrl(url)));
+  // the armor sets drawn now or lately, at the tier every character of the new profile draws
+  // first (woc_armor_core.ts: low, or the medium file the local player's high pack is laid over)
   await prepareWocArmorTier(wocArmorTierFor(target, 'crowd'));
   const nextSignature = nextStreamedUrls.join('|');
   if (nextSignature !== streamedUrls.join('|')) streamedStarted = false;
   streamedUrls = nextStreamedUrls;
   streamedUrlSet = nextStreamedSet;
   postEntryStreamUrls = postEntryStreamUrlsFor(nextStreamedUrls);
+  // A preset change can move the tier the crowd draws: once the world is up the prefetch
+  // plans again for the new profile (never on the launcher, where it has not started).
+  if (wocCrowdPrefetchStarted()) startWocCrowdPrefetch(target, prefetchUnderArmorAtlas);
 }
 
 /** Resolve once every boot-time character GLB + skin atlas is cached, retrying
@@ -924,9 +983,17 @@ export function atlasTextureByUrl(url: string): THREE.Texture | null {
   return skinTexByUrl.get(url) ?? null;
 }
 
-/** Ensure a body atlas named by URL is loaded (null = already resident). */
-export function ensureAtlasByUrl(url: string): Promise<void> | null {
-  return skinTexByUrl.has(url) ? null : loadSkinTexInto(url, skinTexByUrl);
+/** Ensure a body atlas named by URL is loaded (null = already resident). `priority`:
+ *  `background` for a fetch ahead of need (the crowd prefetch), which a body's own ask for
+ *  the same atlas then promotes. */
+export function ensureAtlasByUrl(url: string, priority?: LoadPriority): Promise<void> | null {
+  return skinTexByUrl.has(url) ? null : loadSkinTexInto(url, skinTexByUrl, priority);
+}
+
+/** The crowd prefetch's atlas loader: background work whose failure nobody hears (the
+ *  wearer's own ask fetches the atlas again). */
+function prefetchUnderArmorAtlas(url: string): void {
+  void ensureAtlasByUrl(url, 'background')?.catch(() => undefined);
 }
 
 /** Resolved emissive (glow) map for a visual key + skin index, or null when the
@@ -1574,8 +1641,9 @@ export interface AssembleOptions {
   wocArmor?: readonly WocArmorFile[];
   /** How much armor texture detail a WOC body draws (woc_armor_core.ts wocArmorTierFor).
    *  Omitted: full, the local player's own character and every body built directly (a
-   *  preview, a portrait). The world view passes crowd for every other character
-   *  (createCharacterVisual): the medium file where full detail draws high. */
+   *  portrait, a try-on). The world view passes crowd for every other character
+   *  (createCharacterVisual): the medium file where full detail draws high. A preview
+   *  passes what its stage shows (preview_armor_detail_core.ts). */
   wocArmorDetail?: WocArmorDetail;
   /** The geometry level a WOC body draws (woc_lod_core.ts). Omitted: the level its detail
    *  draws under the live graphics profile (wocBuildLod). The far LOD bakes pass `far`. */
@@ -1584,6 +1652,13 @@ export interface AssembleOptions {
    *  streamed files already resident and fetches none, so warming shaders never pulls a
    *  body or an armor set nobody wears. */
   fetchStreamed?: boolean;
+  /** The stored appearance whose modular head a WOC body is born with (woc_head_packs.ts
+   *  hangWocHeadAtBuild): the pieces its look draws, out of the head files resident now,
+   *  hung hidden for the visual's dressing to show, and nothing else of the library. Null:
+   *  the body type's default look. Omitted: no head piece at all, for a throwaway nobody
+   *  dresses (the key's measure; a far bake hangs its own part set). CharacterVisual always
+   *  names one: the look its host handed it (the world view's entity), else null. */
+  wocHead?: WocHeadBorn;
 }
 
 /** The geometry level a WOC body of these options draws (woc_lod_core.ts): an explicit
@@ -1835,9 +1910,9 @@ export function assembleModel(
       opts?.wocArmorDetail,
       lod,
     );
-    // the modular head's resident files (woc_head_packs.ts), hidden until the visual
-    // dresses it
-    hangWocHeadAtBuild(root, def.wocCharacter.fit, lod);
+    // the pieces of the modular head it is born with (woc_head_packs.ts: its look's, never
+    // the library's), hidden until the visual dresses it
+    hangWocHeadAtBuild(root, def.wocCharacter.fit, lod, opts?.wocHead);
   }
   // tag the character's own meshes (body + accessories share one texture atlas)
   // so a skin override hits them but not the separate weapons attached below.
@@ -2584,9 +2659,11 @@ export interface PreparedVisual {
   yOffset: number;
   /** clip name -> clip, resolved from the source gltf */
   clips: Map<string, THREE.AnimationClip>;
-  /** static idle-pose geometry in normalized space (far LOD + shadow proxy) */
+  /** static idle-pose geometry in normalized space (far LOD + shadow proxy); null
+   *  for a WOC key, whose far LOD is baked per body (woc_far_bake.ts) */
   idleGeo: THREE.BufferGeometry | null;
-  /** caster-only idle-pose geometry for the mid-distance shadow proxy */
+  /** caster-only idle-pose geometry for the mid-distance shadow proxy; for a WOC
+   *  key its shadow stand-in (woc_shadow_stand_in.ts), null on a tier that casts none */
   shadowGeo: THREE.BufferGeometry | null;
   /** source materials aligned with idleGeo groups */
   idleSrcMats: THREE.Material[];
@@ -2670,10 +2747,10 @@ export function prepareVisual(key: string): PreparedVisual {
   // face decals on a modular throwaway: the flatten drops them (farBakeMeshes),
   // and the default look's scalp decal would otherwise be minted and thrown
   // away per modular key, on the far crossing that first prepares the key.
-  // A WOC body is measured and baked bare (wocArmor: []): the cached far bake of a
-  // key lives as long as the session, and must never pin a streamed set's
-  // materials (woc_far_bake.ts bakes the worn kit, and holds its files). Its far
-  // level is what the bake freezes (the measure reads every vertex either way).
+  // A WOC body is measured bare (wocArmor: []), and bare is all the key bakes of it:
+  // its far LOD is baked per body from what it wears (woc_far_bake.ts, which holds the
+  // worn files), so the key owns only the shadow stand-in below. Its far level is
+  // what that freezes (the measure reads every vertex either way).
   const temp = assembleModel(def, null, null, null, {
     skipDecals: true,
     wocArmor: [],
@@ -2703,8 +2780,8 @@ export function prepareVisual(key: string): PreparedVisual {
   // neck (its head is a streamed pack, hung hidden until its look draws), so
   // the body alone would size the character to its neck and stretch it a fifth
   // too tall; measuring a hung head or the worn kit would let a hairstyle or a
-  // tall helm shrink the whole body. The default kit is put back before the
-  // far bake below.
+  // tall helm shrink the whole body. The anatomy stays dressed for the
+  // shadow stand-in below, which is that same anatomy.
   const wocParts = def.wocCharacter ? resolveWocPartNodes(temp, def.wocCharacter) : null;
   if (def.wocCharacter && wocParts) {
     applyWocPartVisibility(wocParts, def.wocCharacter, wocAnatomyParts(def.wocCharacter));
@@ -2728,17 +2805,10 @@ export function prepareVisual(key: string): PreparedVisual {
       bounds.expandByPoint(v);
     }
   });
+  // where the bare body ends: the stand-in's head starts there (woc_shadow_stand_in.ts)
+  const wocNeckTop = bounds.max.y;
   if (def.wocCharacter && !bounds.isEmpty()) {
     bounds.max.y = Math.max(bounds.max.y, WOC_ANATOMY_TOP[def.wocCharacter.fit]);
-  }
-  if (def.wocCharacter && wocParts) {
-    const manifest = def.wocCharacter;
-    applyWocPartVisibility(
-      wocParts,
-      manifest,
-      wocVisibleParts(manifest, wocDefaultAppearance(manifest), wocDefaultWorn(manifest)),
-    );
-    temp.updateMatrixWorld(true);
   }
   // Non-skinned models (procedural form GLBs animated by node transforms, with no
   // skeleton — e.g. the chicken-cow Travel Form) contribute no skinned meshes, so
@@ -2778,11 +2848,34 @@ export function prepareVisual(key: string): PreparedVisual {
     .multiply(new THREE.Matrix4().makeRotationY(def.yaw ?? 0))
     .multiply(new THREE.Matrix4().makeScale(normScale, normScale, normScale));
 
-  const farMeshes = farBakeMeshes(temp);
-  const { geo, mats, isBody } = bakeStaticPose(norm, farMeshes);
-  const shadowMeshes = farMeshes.filter(characterMeshCastsShadow);
-  const shadowGeo =
-    shadowMeshes.length === farMeshes.length ? geo : bakeStaticPose(norm, shadowMeshes).geo;
+  let geo: THREE.BufferGeometry | null = null;
+  let shadowGeo: THREE.BufferGeometry | null = null;
+  let mats: THREE.Material[] = [];
+  let isBody: boolean[] = [];
+  if (def.wocCharacter) {
+    // A WOC key bakes NO far mesh: a body's far LOD is its own look's (woc_far_bake.ts),
+    // and the key's bare one was a mesh no body ever drew. The key owns the shadow
+    // stand-in instead: what its bodies cast in the proxy band until their own far bake
+    // exists (far_lod_reveal_core.ts shadowStandInShown), on the tiers that cast at all.
+    // The measure above left the rig at rest; the stand-in poses it mid-idle again.
+    if (GFX.dynamicShadows) {
+      shadowGeo = bakeWocShadowStandIn(
+        temp,
+        composedFarMeshes(temp).filter(characterMeshCastsShadow),
+        idle,
+        norm,
+        wocNeckTop,
+        WOC_ANATOMY_TOP[def.wocCharacter.fit],
+      );
+    }
+  } else {
+    const farMeshes = farBakeMeshes(temp);
+    const baked = bakeStaticPose(norm, farMeshes);
+    ({ geo, mats, isBody } = baked);
+    const shadowMeshes = farMeshes.filter(characterMeshCastsShadow);
+    shadowGeo =
+      shadowMeshes.length === farMeshes.length ? geo : bakeStaticPose(norm, shadowMeshes).geo;
+  }
   // The throwaway retained a variant when the def is modular (assembleModular
   // retains every clone it makes). It exists only to be measured and flattened,
   // so give it back rather than pinning one part set per modular key forever
@@ -3031,26 +3124,11 @@ function meshChainVisible(o: THREE.Object3D, stopAt: THREE.Object3D): boolean {
   return true;
 }
 
-/** What a baked source mesh's far material is a function of, so two meshes that
- *  answer the same string can share ONE geometry group.
- *
- *  The default is the pair `tintedFarMaterials` reads: the source material and
- *  the body flag that gates the skin/emissive override. A composed bake adds
- *  the node-name partition, because a composed group's material is not read off
- *  this walk at all: it is looked up per character, per slot, through
- *  `farSourceMaterials`, and that lookup is `recolored(source, look, name
- *  facts)`. Two slots therefore resolve alike for EVERY look exactly when their
- *  source material and their name facts agree, which is what this key states.
- *  (The temp's material identity already implies the source's: the recolour
- *  cache keys on the source uuid.) A WOC bake adds the head-tint partition on
- *  top of the default, and answers ONE key of its own for every head piece its
- *  merged head material can draw (woc_far_bake.ts). */
-export function farBakeGroupKey(mesh: THREE.Mesh): string {
-  const mat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
-  return `${mat?.uuid ?? 'none'}|${(mesh.userData.skinAtlasTarget ?? mesh.userData.bodyMesh) ? 1 : 0}`;
-}
+// The posed static bake itself (and the group key every far bake starts from) lives in
+// static_pose_bake.ts; the walks that feed it stay here, beside the materials they read.
+export { bakeStaticPose, farBakeGroupKey, type StaticPoseBake } from './static_pose_bake';
 
-/** The composed arm of the key above. */
+/** The composed arm of farBakeGroupKey: the node-name partition on top of it. */
 function composedFarBakeGroupKey(mesh: THREE.Mesh): string {
   return `${farBakeGroupKey(mesh)}|${modularMergePartition(mesh.name)}`;
 }
@@ -3059,116 +3137,3 @@ function composedFarBakeGroupKey(mesh: THREE.Mesh): string {
  *  a far-LOD draw, and getting either wrong paints a distant body in another
  *  slot's colours, silently. */
 export const farBakeGroupKeysForTest = { farBakeGroupKey, composedFarBakeGroupKey };
-
-export interface StaticPoseBake {
-  geo: THREE.BufferGeometry | null;
-  /** One entry per GROUP: the source material of the mesh that group draws. */
-  mats: THREE.Material[];
-  /** One entry per GROUP: the body flag gating the skin/emissive override. */
-  isBody: boolean[];
-  /** One entry per GROUP: the index, in the `meshes` walk, of the source mesh
-   *  the group draws. The identity map before coalescing, and the indirection a
-   *  composed body resolves its per-character materials through. */
-  slots: number[];
-  /** Every index of the `meshes` walk in the order its vertices sit in `geo`
-   *  (groups concatenated): how a caller that adds a per-vertex value after the
-   *  bake (the WOC far head's slot attribute) finds one source mesh's vertices. */
-  order: number[];
-}
-
-/** Bake every visible mesh of a posed clone into one static BufferGeometry
- *  (skinned verts via applyBoneTransform), normalized into world units.
- *
- *  Meshes whose `groupKey` agrees share ONE group, so the "single-draw far
- *  mesh" the crowd LOD counts on really is close to one draw instead of a group
- *  per source primitive. Groups keep the order of their FIRST member, so the
- *  slot map stays readable and a bake is deterministic. */
-export function bakeStaticPose(
-  norm: THREE.Matrix4,
-  meshes: THREE.Mesh[],
-  groupKey: (mesh: THREE.Mesh) => string = farBakeGroupKey,
-): StaticPoseBake {
-  const geos: THREE.BufferGeometry[] = [];
-  const mats: THREE.Material[] = [];
-  const isBody: boolean[] = [];
-  const v = new THREE.Vector3();
-  const full = new THREE.Matrix4();
-
-  // The caller passes the walk, so which filter a bake belongs to is decided at
-  // the one place that also knows where its materials come from: the composed
-  // bake is handed composedFarMeshes, the same list assembleModular captured its
-  // slots from, and group N here names slot `slots[N]` there.
-  for (const mesh of meshes) {
-    const srcGeo = mesh.geometry;
-    const srcPos = srcGeo.getAttribute('position') as THREE.BufferAttribute;
-    const out = new THREE.BufferGeometry();
-    const baked = new Float32Array(srcPos.count * 3);
-    const skinned = (mesh as unknown as THREE.SkinnedMesh).isSkinnedMesh
-      ? (mesh as unknown as THREE.SkinnedMesh)
-      : null;
-    full.multiplyMatrices(norm, mesh.matrixWorld);
-    for (let i = 0; i < srcPos.count; i++) {
-      v.fromBufferAttribute(srcPos, i);
-      if (skinned) {
-        skinned.applyBoneTransform(i, v);
-        v.applyMatrix4(skinned.matrixWorld).applyMatrix4(norm);
-      } else {
-        v.applyMatrix4(full);
-      }
-      baked[i * 3] = v.x;
-      baked[i * 3 + 1] = v.y;
-      baked[i * 3 + 2] = v.z;
-    }
-    out.setAttribute('position', new THREE.BufferAttribute(baked, 3));
-    const uv = srcGeo.getAttribute('uv');
-    // Different source primitives can quantize uv differently (e.g. a
-    // normalized Uint16Array on one, a plain Float32Array on another);
-    // dequantize so every baked geo's uv shares one typed-array type and
-    // mergeGeometries below can combine them.
-    if (uv) out.setAttribute('uv', dequantizeAttribute(uv as THREE.BufferAttribute));
-    if (srcGeo.index) out.setIndex(srcGeo.index.clone());
-    out.computeVertexNormals();
-    geos.push(out);
-    // GLTFLoader emits one Mesh per primitive — materials are never arrays here
-    mats.push(Array.isArray(mesh.material) ? mesh.material[0] : mesh.material);
-    isBody.push(!!(mesh.userData.skinAtlasTarget ?? mesh.userData.bodyMesh));
-  }
-
-  if (geos.length === 0) return { geo: null, mats: [], isBody: [], slots: [], order: [] };
-  // uv presence must agree for merging. PAD the parts that lack one rather
-  // than dropping it everywhere: a composed body always carries colour-only
-  // face parts (head, ears, eyes, mouth, brows) with no uv at all, and the old
-  // "delete uv from every geo" arm stripped the atlas-mapped kit beside them
-  // too, so the frozen far mesh drew the whole robe and hat from the single
-  // texel at uv (0,0), a flat untextured body the moment a peer or NPC
-  // crossed into the static band (the "NPCs lose their textures" report).
-  // A zero uv on a part that never samples a map costs nothing.
-  padMissingUv(geos);
-
-  // One group per distinct key, fed to the merge in grouped order so each
-  // group's members land CONTIGUOUSLY (one addGroup can only cover a run).
-  const grouping = coalesceFarBakeGroups(meshes.map(groupKey));
-  const geo =
-    grouping.mergeOrder.length === 1
-      ? geos[grouping.mergeOrder[0]]
-      : mergeGeometries(
-          grouping.mergeOrder.map((i) => geos[i]),
-          true,
-        );
-  if (!geo) return { geo: null, mats: [], isBody: [], slots: [], order: [] };
-  // mergeGeometries emitted one group per INPUT (and a single geometry keeps
-  // whatever groups it arrived with); rewrite them as one group per coalesced
-  // run, whose material index is the run's own index.
-  const counts = geos.map((g) => (g.index ? g.index.count : g.getAttribute('position').count));
-  geo.clearGroups();
-  for (const range of farBakeGroupRanges(grouping, counts)) {
-    geo.addGroup(range.start, range.count, range.materialIndex);
-  }
-  return {
-    geo,
-    mats: grouping.slots.map((i) => mats[i]),
-    isBody: grouping.slots.map((i) => isBody[i]),
-    slots: [...grouping.slots],
-    order: [...grouping.mergeOrder],
-  };
-}

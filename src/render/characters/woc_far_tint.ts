@@ -33,8 +33,25 @@
 // a new face) re-mounts the clones it already linked: the merged head's slot rows
 // and its hair, beard and scalp textures are uniforms, rewritten for the new head.
 // Freed with the visual.
+//
+// One clone is NOT per character: the body's skin layer SWITCHED OFF (its body draws a
+// class under-armor atlas). At strength 0 the layer leaves every texel exactly as sampled,
+// whatever colour it holds, so every character on the same far material draws the same
+// thing, and they share one wrapped clone (sharedOffLayer). A far crowd is sorted by
+// material: a clone per body put a material of its own, on a program of its own, between
+// every two far heads, and each of those is a program switch and a full uniform upload for
+// a layer that draws nothing. Shared, the bodies of one class draw back to back.
+//
+// Three dev A/B arms (render_dev_flags.ts), for attributing what a far crowd costs, one
+// layer at a time: `?wocfarheadtint=off` draws the head group with its plain far material
+// (no merged layer: the colours are wrong on purpose, a hair slot samples the core atlas),
+// `?wocfarbodytint=off` draws the body's own group with the far material itself (no skin
+// layer, no clone at all), and `?wocfarshare=off` gives every body a clone of its own for
+// a switched-off layer again (the shape before the sharing above: same pixels, a
+// material and a program switch more per body). None is a player setting.
 import type * as THREE from 'three';
 import { cloneMaterialWithHooks } from '../material_clone_hooks';
+import { renderLayerDisabled } from '../render_dev_flags';
 import type { WocHeadTintedRole, WocHeadTintRef, WocLinearRgb } from './woc_head_look_core';
 import { wocHeadMergeSurfaceOf } from './woc_head_merge';
 import type { WocHeadMergeSlot } from './woc_head_merge_core';
@@ -73,6 +90,41 @@ export interface WocFarHeadTint {
  *  or not at all. */
 export type WocFarGroupTint = WocHeadTintRef | WocFarHeadTint | null;
 
+/** Each far source's switched-off skin layers, by layer and reference: shared by every
+ *  character that draws that source with the layer off, and freed with the source (the
+ *  tinted-material cache disposes a far clone once no visual mounts it). */
+const offLayers = new WeakMap<THREE.Material, Map<string, THREE.Material>>();
+
+/** The clone of `source` wearing `tint`'s layer at strength 0: one for all its wearers. */
+function sharedOffLayer(source: THREE.Material, tint: WocHeadTintRef): THREE.Material {
+  let layers = offLayers.get(source);
+  if (!layers) {
+    const made = new Map<string, THREE.Material>();
+    offLayers.set(source, made);
+    source.addEventListener('dispose', () => {
+      for (const material of made.values()) material.dispose();
+      made.clear();
+    });
+    layers = made;
+  }
+  const key = `${tint.role}|${tint.surface ?? ''}|${tint.ref.join(',')}`;
+  let out = layers.get(key);
+  if (!out) {
+    out = cloneMaterialWithHooks(source);
+    // born switched off (the strength uniform starts at 0) and never written again: no
+    // character's colours reach it
+    attachWocHeadTint(out, tint.role, tint.ref, tint.surface);
+    layers.set(key, out);
+  }
+  return out;
+}
+
+/** The dev A/B arms above: the far head's merged layer, the far body's skin layer, and
+ *  the sharing of that layer where it is switched off. */
+export const WOC_FAR_HEAD_TINT_FLAG = 'wocfarheadtint';
+export const WOC_FAR_BODY_TINT_FLAG = 'wocfarbodytint';
+export const WOC_FAR_SHARE_FLAG = 'wocfarshare';
+
 export class WocFarTint {
   /** `${source uuid}|${role}|${surface}|${reference}` (the merged head: `${source
    *  uuid}|merged|${program variant}`) -> this character's wrapped clone. */
@@ -104,9 +156,14 @@ export class WocFarTint {
     const out = tints.map((tint, i) => {
       const source = mats[i];
       if (!tint) return source;
-      return 'slots' in tint
-        ? this.wrapHead(source, tint, mats)
-        : this.wrapOne(source, tint, wocTintStrength(tint, bodyAtlas));
+      if ('slots' in tint) {
+        return renderLayerDisabled(WOC_FAR_HEAD_TINT_FLAG)
+          ? source
+          : this.wrapHead(source, tint, mats);
+      }
+      // the body's own group is the one tinted on the suit surface
+      if (tint.surface === 'suit' && renderLayerDisabled(WOC_FAR_BODY_TINT_FLAG)) return source;
+      return this.wrapOne(source, tint, wocTintStrength(tint, bodyAtlas));
     });
     this.setColors(colors);
     return out;
@@ -129,6 +186,10 @@ export class WocFarTint {
   }
 
   private wrapOne(source: THREE.Material, tint: WocHeadTintRef, strength: number): THREE.Material {
+    // a layer that draws nothing is the same for everyone on this source: share it
+    if (strength === 0 && !renderLayerDisabled(WOC_FAR_SHARE_FLAG)) {
+      return sharedOffLayer(source, tint);
+    }
     const key = `${source.uuid}|${tint.role}|${tint.surface ?? ''}|${tint.ref.join(',')}`;
     let out = this.wrapped.get(key);
     if (!out) {

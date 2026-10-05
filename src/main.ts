@@ -4961,9 +4961,9 @@ async function startGame(
       // Kick the deferred creature-body fetches now, before the settle cover and
       // the curtain fade: until a creature GLB arrives its view, nameplate, and
       // click target do not exist, so every ms the stream waits past first paint
-      // widens the pop-in window on the tight-memory profile (desktop's stream
-      // set is empty). The allocation spike the stream was deferred past has
-      // cleared by this frame.
+      // widens the pop-in window on the tight-memory profile (desktop's creature
+      // set is empty: there the same kick starts the WOC crowd prefetch). The
+      // allocation spike the stream was deferred past has cleared by this frame.
       kickCharacterPreloadStream({
         startCharacterPreloads: startStreamedCharacterPreloads,
         onCharacterPreloadsStarted: (count) => {
@@ -5468,7 +5468,7 @@ function creationLoadout(cls: PlayerClass): ArmorLoadout {
 function previewClassBody(cls: PlayerClass): void {
   if (!characterPreview) return;
   const look = modularLookForClass(cls);
-  if (look) characterPreview.setModular(look.app, look.worn, cls);
+  if (look) characterPreview.setCreationClass(look.app, look.worn, cls);
   else characterPreview.setClass(cls);
 }
 
@@ -5522,13 +5522,13 @@ function syncAppearanceUi(panelId: string, cls: PlayerClass): void {
         modularAppearance = next;
         storeAppearance(next);
         const c = panelClass();
-        characterPreview?.setModular(next, creationLoadout(c), c);
+        characterPreview?.setCreationClass(next, creationLoadout(c), c);
       },
       helm: creationHelm,
       onHelm: (on) => {
         creationHelm = on;
         const c = panelClass();
-        characterPreview?.setModular(modularAppearance, creationLoadout(c), c);
+        characterPreview?.setCreationClass(modularAppearance, creationLoadout(c), c);
       },
       // Chips preview against the set actually worn (stored override, else class kit).
       armorSet: () => readStoredArmorSet(panelClass()),

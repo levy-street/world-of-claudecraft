@@ -186,6 +186,10 @@ export const DEFAULT_MESHES = [...TEXTURED_MESHES, ...FLAT_MESHES] as const;
 export const DEFAULT_MATERIALS = TEXTURED_MESHES.length + 1;
 /** Vertices of the body's box, and of the armor's. */
 export const BOX = 24;
+/** A big base head's segments a side (WocVisualHarnessOptions.bigHead): 3750 vertices and
+ *  20736 index entries, several bands of the merged head's fold of each kind
+ *  (woc_head_merge_core.ts WOC_HEAD_MERGE_BAND_VERTICES, WOC_HEAD_MERGE_BAND_INDICES). */
+export const BIG_BASE_SEGMENTS = 24;
 /** The eyeliner's own morph delta (along y, pack units): a flat-coloured piece that is
  *  posed too. */
 export const LINER_CHIN_DELTA = 0.25;
@@ -211,6 +215,8 @@ interface HeadKit {
   /** Every material two sided, as Type B's head ships (Type A's head and eyeballs are
    *  one sided). */
   readonly allTwoSided: boolean;
+  /** The base head ships BIG_BASE_SEGMENTS segments a side (WocVisualHarnessOptions.bigHead). */
+  readonly bigBase: boolean;
 }
 
 function texture(name: string): THREE.Texture {
@@ -244,8 +250,17 @@ export function meshUv(mesh: string): readonly [number, number] {
   return uv;
 }
 
-function taggedBox(mesh: string, size: number): THREE.BufferGeometry {
-  const g = headBox(mesh, size);
+function taggedBox(mesh: string, size: number, big = false): THREE.BufferGeometry {
+  const g = big
+    ? new THREE.BoxGeometry(
+        size,
+        size,
+        size,
+        BIG_BASE_SEGMENTS,
+        BIG_BASE_SEGMENTS,
+        BIG_BASE_SEGMENTS,
+      )
+    : headBox(mesh, size);
   const uv = g.getAttribute('uv');
   const [u, v] = meshUv(mesh);
   for (let i = 0; i < uv.count; i++) uv.setXY(i, u, v);
@@ -463,7 +478,7 @@ function pieceMesh(name: string, kit: HeadKit): THREE.Object3D {
     return node;
   }
   const isBase = name === BASE;
-  const g = taggedBox(name, isBase ? 0.4 : 0.05);
+  const g = taggedBox(name, isBase ? 0.4 : 0.05, isBase && kit.bigBase);
   const targets = isBase ? Object.keys(BASE_DELTA) : [];
   g.morphAttributes.position = targets.map((t) => {
     const n = g.getAttribute('position').count;
@@ -487,6 +502,7 @@ function headFile(
   url: string,
   unfoldable: Readonly<Record<string, Unfoldable>>,
   allTwoSided: boolean,
+  bigBase: boolean,
 ) {
   const nodes = HEAD_FILES.get(url);
   if (!nodes) throw new Error(`no head file ${url}`);
@@ -499,6 +515,7 @@ function headFile(
     gold: flatMaterial('metal_gold', GOLD, { roughness: 0.3, metalness: 1 }),
     unfoldable,
     allTwoSided,
+    bigBase,
   };
   return splitHeadScene(nodes, (name) => pieceMesh(name, kit));
 }
@@ -534,6 +551,9 @@ export interface WocVisualHarnessOptions {
   failed?: readonly string[];
   unfoldable?: Readonly<Record<string, Unfoldable>>;
   allTwoSided?: boolean;
+  /** The base head ships a few thousand vertices (BIG_BASE_SEGMENTS), so a merged head's
+   *  fold is several bands of vertices and of triangles; off, a whole head fits one band. */
+  bigHead?: boolean;
   /** The low tier: every character material is rebuilt as a Lambert. */
   lowTier?: boolean;
   /** The body and its armor file: `manifest` and its helm and chest (the default), or
@@ -543,6 +563,9 @@ export interface WocVisualHarnessOptions {
    *  plugin stores them: fixtureLodLevels), its box groups cleared as a glTF primitive has
    *  none. Off: no file carries a level, as before. */
   lods?: boolean;
+  /** No armor file is resident when the harness returns: each lands when the case says
+   *  (`landArmor`), as a set does for a crowd that arrived before it. */
+  armorHeld?: boolean;
 }
 
 /** The fixture's coarser levels of one geometry: mid every other triangle of its own index,
@@ -571,6 +594,8 @@ export async function wocVisualHarness(opts: WocVisualHarnessOptions = {}) {
   const body = opts.kit === 'full' ? fullKitManifest : manifest;
   /** A held head file's landing, released by the case. */
   const releases = new Map<string, () => void>();
+  /** Held armor files' landings (armorHeld), by url. */
+  const armorReleases = new Map<string, () => void>();
   // this module world's level store: what the loader's plugin would fill for a file
   const lodStore = opts.lods ? await import('../../src/render/assets/geometry_lod') : null;
   const withLods = <T extends { scene: THREE.Object3D }>(gltf: T): T => {
@@ -585,11 +610,15 @@ export async function wocVisualHarness(opts: WocVisualHarnessOptions = {}) {
     return gltf;
   };
   const file = (url: string) =>
-    withLods(headFile(url, opts.unfoldable ?? {}, opts.allTwoSided ?? false));
+    withLods(
+      headFile(url, opts.unfoldable ?? {}, opts.allTwoSided ?? false, opts.bigHead ?? false),
+    );
   vi.doMock('../../src/render/assets/loader', () => ({
     loadGltf: vi.fn((url: string) => {
       if (url.includes('/armor/')) {
-        return Promise.resolve(withLods(opts.kit === 'full' ? fullKitSource() : armorSource()));
+        const armor = () => withLods(opts.kit === 'full' ? fullKitSource() : armorSource());
+        if (!opts.armorHeld) return Promise.resolve(armor());
+        return new Promise((resolve) => armorReleases.set(url, () => resolve(armor())));
       }
       if (url.includes('head_type_')) {
         if (!headPack) return new Promise(() => undefined);
@@ -627,8 +656,10 @@ export async function wocVisualHarness(opts: WocVisualHarnessOptions = {}) {
   const armor = await import('../../src/render/characters/woc_armor_packs');
   const { wocArmorPackUrl } = await import('../../src/render/characters/woc_armor_core');
   const kit = wocArmorPackUrl('male', 'fixture', currentWocArmorTier());
-  armor.ensureWocArmorPack(kit);
-  await vi.waitFor(() => expect(armor.wocArmorPackResident(kit)).toBe(true));
+  if (!opts.armorHeld) {
+    armor.ensureWocArmorPack(kit);
+    await vi.waitFor(() => expect(armor.wocArmorPackResident(kit)).toBe(true));
+  }
   const heads = await import('../../src/render/characters/woc_head_packs');
   if (headPack) {
     // the whole library resident (but any held file), so every look is born with its head
@@ -649,12 +680,15 @@ export async function wocVisualHarness(opts: WocVisualHarnessOptions = {}) {
   vi.spyOn(performance, 'now').mockImplementation(() => now);
   const gates: HarnessGate[] = [];
   /** A far-ready WOC visual wearing `app`, dressed bare, its far mesh minted and
-   *  linked (the gate settled, the reveal taken on the next setFar). */
+   *  linked (the gate settled, the reveal taken on the next setFar). Built as the world
+   *  view builds a body (createCharacterVisual): born with the pieces of its own look,
+   *  and handed that look before the renderer's gate is installed, so its head rides the
+   *  body's own first draw instead of a gate of its own. */
   const farVisual = (app: Record<string, unknown>, equipped: Record<string, string> = {}) => {
-    const v = new CharacterVisual(KEY, 0xffffff, 0);
+    const v = new CharacterVisual(KEY, 0xffffff, 0, null, null, null, null, { wocHead: app });
+    v.setWocHeadLook(app);
     v.setFarBakeGate((target, settle) => gates.push({ target, settle }));
     v.setWocEquipment(equipped, false);
-    v.setWocHeadLook(app);
     now += 40; // a fresh bake-budget window per build
     v.setFar(true);
     for (const gate of gates.splice(0)) gate.settle();
@@ -685,6 +719,19 @@ export async function wocVisualHarness(opts: WocVisualHarnessOptions = {}) {
     CharacterVisual,
     heads,
     releases,
+    /** The armor store of this module world (woc_armor_packs.ts). */
+    armor,
+    /** Land every held armor file asked for so far (armorHeld), and wait for the store. */
+    landArmor: async (): Promise<void> => {
+      const landing = [...armorReleases.keys()];
+      for (const url of landing) {
+        armorReleases.get(url)?.();
+        armorReleases.delete(url);
+      }
+      await vi.waitFor(() => {
+        for (const url of landing) expect(armor.wocArmorPackResident(url)).toBe(true);
+      });
+    },
     DEFAULT_APPEARANCE: modular.DEFAULT_APPEARANCE,
     WOC_BODY_SKIN_REF: look.WOC_BODY_SKIN_REF,
     wocHeadTintOf: tint.wocHeadTintOf,
@@ -693,6 +740,8 @@ export async function wocVisualHarness(opts: WocVisualHarnessOptions = {}) {
     riggedWornFamilyFor: worn.riggedWornFamilyFor,
     /** The merged draws' shared geometry caches (their leases), this module world's. */
     headMergeCache: merge.wocHeadMergeInternalsForTest.cache,
+    /** The merged heads being folded a band at a time (woc_head_merge.ts). */
+    headMergeFolds: merge.wocHeadMergeInternalsForTest.folds,
     armorMergeCache: armorMerge.wocArmorMergeInternalsForTest.cache,
     /** The file material an attached armor mesh hangs with (woc_armor_packs.ts). */
     armorFileMaterial: armor.wocArmorFileMaterial,

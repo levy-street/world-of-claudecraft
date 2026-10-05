@@ -7,9 +7,13 @@
 // head, two brows, two ears, two eyelid shells, two eyeballs, the mouth, the nose,
 // Type B's eyeliner, then the hairstyle and the beard), each its own mesh with its
 // own material, so one character cost a dozen draws in the colour pass and a dozen
-// more in the shadow pass before its body and armor drew at all. Measured on
-// 2026-10-02, 40 characters close by: 2098 draw calls against 677 for the bodies
-// they replace. The pieces of a core all sample ONE atlas since that day
+// more in the shadow pass before its body and armor drew at all. Measured in one
+// build on one Apple GPU with vsync off, 40 characters close by drew 2,099 calls
+// piece by piece and 874 folded (the crowd page of the character pack's screenshots,
+// characters-20260923/crowd/README.md: the fold measured against itself, never a
+// comparison with the bodies a release player draws, which that page describes). The
+// pieces of a core all sample ONE
+// atlas since 2026-10-02
 // (scripts/assets/woc_character/head_atlas.mjs), so the only thing still keeping
 // them apart is what differs per MATERIAL: the tint role and its measured
 // reference, the surface (roughness, metalness, a flat colour) and, for the hair
@@ -300,4 +304,37 @@ export function wocHeadMergeFoldPlan(
  *  back-face drop: woc_head_tint.ts attachWocHeadMergedTint). */
 export function wocHeadMergeOneSided(slots: readonly WocHeadMergeSlot[]): boolean {
   return slots.some((slot) => slot.oneSided);
+}
+
+// ---------------------------------------------------------------------------
+// The fold's bands
+// ---------------------------------------------------------------------------
+
+/** Vertices of a head one queue unit folds (woc_head_merge_fold.ts): a STRUCTURAL
+ *  fraction of a head (several thousand vertices for a bald one to some fourteen
+ *  thousand for the fullest in the shipped library, so a head is a dozen units to thirty:
+ *  tests/woc_head_merge_library.test.ts), never a timing, as the decal maps' row bands
+ *  are (look_pieces.ts LOOK_BAND_ROWS). It fixes a unit small enough that the frame
+ *  budget decides how many fit a frame. What set it: a vertex is posed through as many
+ *  as nine morph targets and moved, its normal with it, and a head folded whole measured
+ *  several times the budget's smallest slice on a weak machine; a band is a small
+ *  fraction of that. */
+export const WOC_HEAD_MERGE_BAND_VERTICES = 512;
+
+/** Index entries one unit copies once the vertices are folded (whole triangles: a
+ *  multiple of three). An entry is a read, an add and a write, a small fraction of what
+ *  a posed vertex costs, so a band of them is this many times a band of vertices. */
+export const WOC_HEAD_MERGE_BAND_INDICES = WOC_HEAD_MERGE_BAND_VERTICES * 24;
+
+/**
+ * How many units the fold of a head takes (woc_head_merge_fold.ts WocHeadGeometryFold.step,
+ * at the bands above): a band of vertices each, the one that ends them going on to the
+ * first band of triangles, and the one that ends those closing the geometry. A head that
+ * fits one band of each is one unit. `indices` counts index entries, whole triangles only.
+ */
+export function wocHeadMergeFoldUnits(vertices: number, indices: number): number {
+  const bands = (count: number, band: number): number => Math.max(1, Math.ceil(count / band));
+  return (
+    bands(vertices, WOC_HEAD_MERGE_BAND_VERTICES) + bands(indices, WOC_HEAD_MERGE_BAND_INDICES) - 1
+  );
 }

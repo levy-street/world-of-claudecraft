@@ -1,6 +1,7 @@
-// WOC player bodies stream on demand (src/render/characters/woc_armor_core.ts): their base and
-// animation library are never in the boot preload, so a test that builds a WOC player visual
-// right after charactersReady() lands them first, exactly as the renderer's retry would.
+// WOC player bodies are never in the boot preload (src/render/characters/woc_armor_core.ts):
+// the launcher fetches a fit on demand and world entry loads both (woc_entry_preload.ts). So a
+// test that builds a WOC player visual right after charactersReady() lands their base and
+// animation library first, as either of those would.
 // Pass the SAME assets module instance the harness imported (after its vi.doMock calls).
 
 import { VISUALS } from '../../src/render/characters/manifest';

@@ -209,8 +209,9 @@ describe('the shipped WOC split files', () => {
       expect(def.authoredAtlas, key).toBe(true);
       expect(def.modular, key).toBeUndefined();
     }
-    // Login downloads nothing of a WOC body: the base and library of a fit stream the first
-    // time a character of that fit is built, each armor set the first time one is worn.
+    // The boot gate downloads nothing of a WOC body: the launcher fetches a fit when a
+    // preview first shows it, world entry loads both fits before the Renderer exists
+    // (tests/woc_entry_preload.test.ts), and each armor set streams the first time one is worn.
     for (const url of characterPreloadUrls(false)) {
       expect(url.startsWith(`${WOC_SPLIT_DIR}/`), url).toBe(false);
     }

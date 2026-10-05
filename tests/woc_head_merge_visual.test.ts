@@ -6,7 +6,9 @@
 // gate, effectsChanged, dispose), which nothing else would notice going missing: a world
 // body's head mounts as ONE unit of the work queue the renderer installs AFTER the visual
 // is built, links hidden behind the gate, stands in for its pieces, goes back to them
-// under a translucent effect, and wears the hit response like any other mesh.
+// under a translucent effect, and wears the hit response like any other mesh. A head
+// whose program an earlier one took the gate for stands with no gate of its own, but
+// only on that gate's own proof, asked again in the context as it is now.
 import * as THREE from 'three';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -212,9 +214,9 @@ beforeAll(async () => {
 
 beforeEach(() => {
   wocHeadMergeInternalsForTest.reset();
-  // the library again, on materials of its own: a merged program is remembered as linked
-  // by the material it was wrapped from (woc_head_dressing.ts), so a case on another
-  // case's materials would find its gate already passed
+  // the library again, on materials of its own: a merged program's witness is kept by the
+  // material it was wrapped from (woc_head_merge_proof_core.ts), so a case on another
+  // case's materials could find its gate already proven
   for (const url of HEAD_FILES.keys()) setWocHeadFileForTest(url, headFile(url));
   vi.spyOn(console, 'warn').mockImplementation(() => undefined);
 });
@@ -252,29 +254,37 @@ function body(opts: { queue?: boolean } = {}) {
   visual.setWocEquipment({}, false);
   visual.setWocHeadLook(DEFAULT_APPEARANCE);
   const pieces = DEFAULT_PIECES.map((name) => visual.root.getObjectByName(name) as THREE.Mesh);
+  /** Whether this body's GPU context still holds what its gates linked: what the proof a
+   *  settle hands answers whenever it is asked again (the renderer hands
+   *  compileTargetPrepared over its context's own settle record). */
+  const context = { held: true };
+  const proof = (): boolean => context.held;
   return {
     visual,
     gates,
     units,
     pieces,
+    context,
     cache: wocHeadMergeInternalsForTest.cache,
     standIn: (): THREE.Mesh | undefined =>
       visual.root.getObjectByName(MERGED) as THREE.Mesh | undefined,
     /** Each default piece's layer mask: 1 when it draws by itself, 0 behind the stand-in. */
     masks: (): number[] => pieces.map((p) => p.layers.mask),
     frame: (): void => visual.update(0.05, IDLE, true),
-    /** Run what the work queue holds, as its frame budget would. */
+    /** Run what the work queue holds, as its frame budget would, and what those units ask
+     *  for in their turn (a new head is a band of its fold, then its mount). */
     work: (): void => {
-      for (const unit of units.splice(0)) unit.work();
+      while (units.length > 0) for (const unit of units.splice(0)) unit.work();
     },
     /** The gate asks still open for a target of this name. */
     asked: (name: string): Gate[] => gates.filter((g) => g.target.name === name),
-    /** Settle (and forget) every gate ask for a target of this name. */
-    settle: (name: string, ready?: () => boolean): void => {
+    /** Settle (and forget) every gate ask for a target of this name, handing the gate's
+     *  proof as the renderer does (`null`: a gate with no proof to hand). */
+    settle: (name: string, ready: (() => boolean) | null = proof): void => {
       for (let i = gates.length - 1; i >= 0; i--) {
         if (gates[i].target.name !== name) continue;
         const [asked] = gates.splice(i, 1);
-        asked.settle(ready);
+        asked.settle(ready ?? undefined);
       }
     },
     /** Bring the head's stand-in all the way up. */
@@ -386,6 +396,50 @@ describe('a WOC body drawing its head merged, through the real visual', () => {
     );
     one.visual.dispose();
     expect(two.masks()).toEqual(ALL(0));
+    two.visual.dispose();
+  });
+
+  it("the skip stands on the first body's gate proof, asked in the context as it is NOW", () => {
+    const one = body();
+    one.stand();
+    // the context behind that proof is restored after a loss (or its renderer rebuilt): the
+    // program the first body linked is gone, whatever any script remembers
+    one.context.held = false;
+    const two = body();
+    two.frame();
+    two.work();
+    // so the second body takes the gate: hidden until its own link is proven
+    expect(two.asked(WRAPPER)).toHaveLength(1);
+    expect(two.standIn()?.parent?.visible).toBe(false);
+    expect(two.masks()).toEqual(ALL(1));
+    two.settle(WRAPPER);
+    expect(two.masks()).toEqual(ALL(0));
+    // ...and is the witness from then on: a third stands at once
+    const three = body();
+    three.frame();
+    three.work();
+    expect(three.asked(WRAPPER)).toEqual([]);
+    expect(three.masks()).toEqual(ALL(0));
+    one.visual.dispose();
+    two.visual.dispose();
+    three.visual.dispose();
+  });
+
+  it('a gate with no proof to hand leaves nothing to skip on: every head takes its own', () => {
+    // a host that cannot prove a link (no parallel shader compile): the settle vouches for
+    // the reveal, and the next head is gated like the first
+    const one = body();
+    one.frame();
+    one.work();
+    one.settle(WRAPPER, null);
+    expect(one.masks()).toEqual(ALL(0));
+    const two = body();
+    two.frame();
+    two.work();
+    expect(two.asked(WRAPPER)).toHaveLength(1);
+    two.settle(WRAPPER, null);
+    expect(two.masks()).toEqual(ALL(0));
+    one.visual.dispose();
     two.visual.dispose();
   });
 
@@ -529,6 +583,10 @@ describe('a WOC body drawing its head merged, through the real visual', () => {
     expect(headLabels(h.units)).toEqual([]);
     h.frame();
     expect(headLabels(units)).toHaveLength(1);
+    for (const unit of units.splice(0)) unit.work();
+    // folded: the mount is a unit of its own kind, on the same queue
+    expect(headLabels(units)).toEqual(['woc-head-mount:a']);
+    expect(gates).toEqual([]);
     for (const unit of units.splice(0)) unit.work();
     const asked = gates.filter((g) => g.target.name === WRAPPER);
     expect(asked).toHaveLength(1);

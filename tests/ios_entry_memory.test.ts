@@ -13,6 +13,7 @@ import {
   preloadInternalsForTest,
   registerPreload,
 } from '../src/render/assets/preload';
+import { stripComments } from './helpers/strip_comments';
 
 const read = (path: string): string => readFileSync(new URL(path, import.meta.url), 'utf8');
 const mainSource = read('../src/main.ts');
@@ -340,6 +341,35 @@ describe('post-entry mob-body streaming', () => {
     expect(assetsSource).toContain(
       'if (streamedUrlSet.has(url) || lazyOnDemandUrls.has(url)) ensureCharacterUrl(url);',
     );
+  });
+
+  it('queues the stream as background loads, behind any file somebody needs now', () => {
+    // About 140 creature GLBs land in the loader's queue at first paint here, two at a
+    // time on a phone. As plain loads they stood in front of every file a player needed
+    // right then (an armor set, a hairstyle, a mount) for as long as the stream took.
+    // Behaviour: tests/character_stream_priority.test.ts and
+    // tests/render_asset_load_priority.test.ts.
+    const code = stripComments(assetsSource);
+    const start = code.indexOf('export function startStreamedCharacterPreloads()');
+    const body = code.slice(start, code.indexOf('\n}\n', start));
+    expect(start).toBeGreaterThan(-1);
+    expect(body).toContain("void prepareCharacterUrl(url, 'background').catch(() => undefined);");
+    // the one ask in the stream: no arm of it asks at demand priority
+    expect(body.match(/prepareCharacterUrl\(/g)).toHaveLength(1);
+  });
+
+  it('awaits the player bodies in the deferred lane, never on the launcher', () => {
+    // The WOC entry files (both fits' base and library, both head cores) are awaited
+    // before the Renderer exists, so no player body waits on a download in the world. They
+    // ride the DEFERRED lane: fetched eagerly they would download and decode on the home
+    // screen, the spike this suite guards against. tests/woc_entry_preload.test.ts drives
+    // the lane; this pins the registration it drives.
+    const code = stripComments(assetsSource);
+    expect(code).toContain(
+      'registerDeferredPreload(() => loadWocEntryFiles((url) => prepareCharacterUrl(url)));',
+    );
+    // that registration is the only place the task is started from
+    expect(code.match(/loadWocEntryFiles\(/g)).toHaveLength(1);
   });
 
   it('starts the stream at first paint, not inside the entry gate', () => {

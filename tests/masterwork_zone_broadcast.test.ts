@@ -50,6 +50,7 @@ import { MASTERWORK_SEAL_IMAGE_URL } from '../src/ui/hud/professions/profession_
 import { t } from '../src/ui/i18n';
 import { QUALITY_COLOR } from '../src/ui/icons';
 import { runCraft } from './helpers/enchant_family_cast';
+import { contactAtOnce } from './helpers/renderer_contact';
 
 const RECIPE_ID = 'recipe_eastbrook_ritual_vestments';
 const ITEM_ID = 'eastbrook_ritual_vestments';
@@ -334,7 +335,7 @@ interface MasterworkZoneHudHarness {
   renderer: {
     handleEvent: ReturnType<typeof vi.fn>;
     // the event sound waits for a swing's blade contact (contact_queue.ts); none here
-    atContact: (ev: unknown, fn: () => void) => void;
+    atContact: typeof contactAtOnce;
   };
   playEventSfx: ReturnType<typeof vi.fn>;
   meters: { onEvent: ReturnType<typeof vi.fn> };
@@ -356,7 +357,7 @@ function masterworkZoneHud(): MasterworkZoneHudHarness {
     craftSkills: {},
     gatheringProficiency: {},
   };
-  hud.renderer = { handleEvent: vi.fn(), atContact: (_ev: unknown, fn: () => void) => fn() };
+  hud.renderer = { handleEvent: vi.fn(), atContact: contactAtOnce };
   hud.playEventSfx = vi.fn();
   hud.meters = { onEvent: vi.fn() };
   hud.isNythraxisEvent = vi.fn(() => false);

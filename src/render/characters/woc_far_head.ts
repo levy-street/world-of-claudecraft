@@ -48,20 +48,19 @@ function drawn(mesh: THREE.Object3D, root: THREE.Object3D): boolean {
   return true;
 }
 
-/** A piece's positions with its current morph influences applied (never its
- *  bones: bakeStaticPose skins what it is handed), over the source's other
- *  attributes by reference. */
-function morphedGeometry(mesh: THREE.Mesh): THREE.BufferGeometry {
+/** One drawn piece on its way through the pose: its morph-applied positions so far. */
+interface PosedPiece {
+  readonly mesh: THREE.Mesh;
+  readonly baked: Float32Array;
+  /** The next vertex to pose. */
+  next: number;
+}
+
+/** A piece's scratch geometry: its morph-applied positions (never its bones:
+ *  bakeStaticPose skins what it is handed) over the source's other attributes by
+ *  reference. */
+function morphedGeometry(mesh: THREE.Mesh, baked: Float32Array): THREE.BufferGeometry {
   const src = mesh.geometry;
-  const pos = src.getAttribute('position');
-  const baked = new Float32Array(pos.count * 3);
-  const v = new THREE.Vector3();
-  for (let i = 0; i < pos.count; i++) {
-    THREE.Mesh.prototype.getVertexPosition.call(mesh, i, v);
-    baked[i * 3] = v.x;
-    baked[i * 3 + 1] = v.y;
-    baked[i * 3 + 2] = v.z;
-  }
   const out = new THREE.BufferGeometry();
   out.setAttribute('position', new THREE.BufferAttribute(baked, 3));
   for (const name of ['uv', 'skinIndex', 'skinWeight']) {
@@ -73,34 +72,86 @@ function morphedGeometry(mesh: THREE.Mesh): THREE.BufferGeometry {
 }
 
 /**
- * Pose a throwaway bake model's hung head with a far pose: every piece's
- * influences written BY NAME, exactly as the dressing drives the live body (a
- * piece without a target is skipped), then every drawn piece with a non-zero
- * influence baked into a scratch geometry. Returns the scratch geometries for
- * the caller to dispose once the bake has read them. A no-op without a hung
- * head or a pose.
+ * The pose of a throwaway bake model's hung head, a band of vertices at a time (a far
+ * bake is queue units, never a frame's work: woc_far_bake.ts). Building it writes every
+ * piece's influences BY NAME, exactly as the dressing drives the live body (a piece
+ * without a target is skipped); each `advance` then bakes the morphs of the drawn
+ * pieces with a non-zero influence, and a piece whose last vertex is through is handed
+ * its scratch geometry. `scratch` collects them for the caller to dispose once the bake
+ * has read them. Nothing to do without a hung head or a pose.
+ */
+export class WocHeadBakePose {
+  readonly scratch: THREE.BufferGeometry[] = [];
+  private readonly pieces: PosedPiece[] = [];
+  private at = 0;
+  private readonly v = new THREE.Vector3();
+
+  constructor(model: THREE.Object3D, pose: WocFarHeadPose | null) {
+    const rig = wocHeadRigOf(model);
+    if (!rig || !pose) return;
+    for (const mesh of rig.meshes) {
+      const dict = mesh.morphTargetDictionary;
+      const influences = mesh.morphTargetInfluences;
+      if (!dict || !influences) continue;
+      for (const name in pose.morphs) {
+        const at = dict[name];
+        if (at !== undefined) influences[at] = pose.morphs[name];
+      }
+      if (!drawn(mesh, model) || !influences.some((w) => w !== 0)) continue;
+      const count = mesh.geometry.getAttribute('position').count;
+      this.pieces.push({ mesh, baked: new Float32Array(count * 3), next: 0 });
+    }
+  }
+
+  /** Vertices still to pose. */
+  get remaining(): number {
+    let left = 0;
+    for (let i = this.at; i < this.pieces.length; i++) {
+      left += this.pieces[i].baked.length / 3 - this.pieces[i].next;
+    }
+    return left;
+  }
+
+  /** Pose up to `maxVertices` more vertices (all of them by default). True once every
+   *  piece is posed. A spent budget (zero or less) poses nothing. */
+  advance(maxVertices = Number.POSITIVE_INFINITY): boolean {
+    let budget = maxVertices > 0 ? maxVertices : 0;
+    const v = this.v;
+    while (this.at < this.pieces.length && budget > 0) {
+      const piece = this.pieces[this.at];
+      const { mesh, baked } = piece;
+      const count = baked.length / 3;
+      const end = Math.min(count, piece.next + budget);
+      for (let i = piece.next; i < end; i++) {
+        THREE.Mesh.prototype.getVertexPosition.call(mesh, i, v);
+        baked[i * 3] = v.x;
+        baked[i * 3 + 1] = v.y;
+        baked[i * 3 + 2] = v.z;
+      }
+      budget -= end - piece.next;
+      piece.next = end;
+      if (end < count) break;
+      const geometry = morphedGeometry(mesh, baked);
+      mesh.geometry = geometry;
+      this.scratch.push(geometry);
+      this.at++;
+    }
+    return this.at >= this.pieces.length;
+  }
+}
+
+/**
+ * Pose a throwaway bake model's hung head with a far pose, whole (WocHeadBakePose in one
+ * call). Returns the scratch geometries for the caller to dispose once the bake has read
+ * them. A no-op without a hung head or a pose.
  */
 export function poseWocHeadForBake(
   model: THREE.Object3D,
   pose: WocFarHeadPose | null,
 ): THREE.BufferGeometry[] {
-  const rig = wocHeadRigOf(model);
-  if (!rig || !pose) return [];
-  const scratch: THREE.BufferGeometry[] = [];
-  for (const mesh of rig.meshes) {
-    const dict = mesh.morphTargetDictionary;
-    const influences = mesh.morphTargetInfluences;
-    if (!dict || !influences) continue;
-    for (const name in pose.morphs) {
-      const at = dict[name];
-      if (at !== undefined) influences[at] = pose.morphs[name];
-    }
-    if (!drawn(mesh, model) || !influences.some((w) => w !== 0)) continue;
-    const geometry = morphedGeometry(mesh);
-    mesh.geometry = geometry;
-    scratch.push(geometry);
-  }
-  return scratch;
+  const run = new WocHeadBakePose(model, pose);
+  run.advance();
+  return run.scratch;
 }
 
 /** What a far bake draws as ONE head group. */

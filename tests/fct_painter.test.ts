@@ -730,6 +730,180 @@ describe('FctPainter.stagedShape: the damage spawn seam', () => {
   });
 });
 
+// ---------------------------------------------------------------------------
+// One beat per strike: a floater that reports a strike beside that strike's own number (its
+// "Absorbed N") is spawned WITH the strike and held to the same beat, so the two land together
+// with the blade instead of the text popping the moment the swing starts. Before this the
+// absorbed text carried no delay at all (fctSpawnShape stamps none), ahead of a held number.
+// ---------------------------------------------------------------------------
+
+describe('FctPainter.spawn: a floater spawned with its strike', () => {
+  let mount: FakeEl;
+  let calls: Call[];
+
+  beforeEach(() => {
+    mount = fakeEl('div');
+  });
+
+  function pairPainter(contactDelaySec: (s: object) => number = () => 0): FctPainter {
+    const facet = recordingFacet();
+    calls = facet.calls;
+    return new FctPainter(
+      facet.writers,
+      mount as unknown as HTMLElement,
+      () => ({ x: 0, y: 0, behind: false }),
+      () => 1,
+      { cap: 8, doc: fakeDoc, random: () => 0.5, contactDelaySec },
+    );
+  }
+
+  const liveTexts = () => mount.childNodes.map((n) => lastText(calls, n));
+  const absorbed = (text = 'Absorbed 40'): FctEvent => evt({ kind: 'absorb', text });
+  const hit = (over: Partial<FctSpawnSource> = {}): FctSpawnSource =>
+    ({
+      type: 'damage',
+      damageKind: 'hit',
+      ability: false,
+      crit: false,
+      isPlayerSource: true,
+      isPlayerTarget: false,
+      ...over,
+    }) as FctSpawnSource;
+  /** The hud's damage arm for one strike: the absorbed text first, then the number. */
+  function strikeFloaters(painter: FctPainter, strike: object, now: number, amount: string) {
+    const blow = strike as { sourceId: number; abilityId?: string | null };
+    painter.spawn(absorbed(), now, blow);
+    const shape = painter.stagedShape(blow, now, hit());
+    if (shape) painter.spawn({ ...shape, text: amount, target: absorbed().target }, now);
+    return shape;
+  }
+
+  it("holds the absorbed text for the swing's blade contact, with the number it belongs to", () => {
+    const swing = { sourceId: 7, abilityId: null };
+    const painter = pairPainter((s) => (s === swing ? 0.45 : 0));
+    const shape = strikeFloaters(painter, swing, 1000, '12');
+    expect(shape?.delaySec).toBe(0.45);
+    // nothing floats on the frame the swing starts: both wait for the blade
+    expect(painter.liveCount()).toBe(0);
+    expect(painter.heldCount()).toBe(2);
+    painter.step(1449);
+    expect(liveTexts()).toEqual([]);
+    // the blade lands: the absorbed text and the number, on the same frame, in spawn order
+    painter.step(1450);
+    expect(liveTexts()).toEqual(['Absorbed 40', '12']);
+    expect(painter.heldCount()).toBe(0);
+  });
+
+  it('floats a fully absorbed strike (no number at all) at the contact too', () => {
+    const swing = { sourceId: 7, abilityId: null };
+    const painter = pairPainter(() => 0.3);
+    painter.spawn(absorbed('Absorbed 90'), 1000, swing);
+    // the number is suppressed (fct_event: a soaked hit floats no bare 0), and takes no beat
+    expect(painter.stagedShape(swing, 1000, hit({ fullyAbsorbed: true }))).toBeNull();
+    expect(painter.liveCount()).toBe(0);
+    painter.step(1299);
+    expect(liveTexts()).toEqual([]);
+    painter.step(1300);
+    expect(liveTexts()).toEqual(['Absorbed 90']);
+  });
+
+  it('spawns at once for a strike with no contact and no beat, exactly as before', () => {
+    const painter = pairPainter();
+    const bite = { sourceId: 3, abilityId: null }; // a mob's swing: nothing is recorded for it
+    const shape = strikeFloaters(painter, bite, 1000, '-8');
+    expect(shape?.delaySec).toBeUndefined();
+    expect(painter.heldCount()).toBe(0);
+    expect(liveTexts()).toEqual(['Absorbed 40', '-8']);
+    // and with no strike handed in, a floater is what it always was
+    painter.spawn(absorbed('Absorbed 5'), 1000);
+    expect(liveTexts()).toEqual(['Absorbed 40', '-8', 'Absorbed 5']);
+  });
+
+  it('takes ONE beat for the pair: the next strike of the cast still lands on the next beat', () => {
+    const painter = pairPainter();
+    const [first, second, third] = FURY_AUDIO.red_harvest.times;
+    // three strikes of one Red Harvest, each its own event, the middle one absorbed in part
+    const strikes = [0, 1, 2].map(() => ({ sourceId: 4, abilityId: 'red_harvest' }));
+    expect(painter.stagedShape(strikes[0], 10, hit({ ability: true }))?.delaySec).toBe(first);
+    painter.spawn(absorbed(), 10, strikes[1]);
+    // the absorbed text consumed the second beat; its number shares it, never the third
+    expect(painter.stagedShape(strikes[1], 10, hit({ ability: true }))?.delaySec).toBe(second);
+    expect(painter.stagedShape(strikes[2], 10, hit({ ability: true }))?.delaySec).toBe(third);
+    // the held absorbed text is due on the second beat
+    painter.step(10 + second * 1000 - 1);
+    expect(liveTexts()).toEqual([]);
+    painter.step(10 + second * 1000);
+    expect(liveTexts()).toEqual(['Absorbed 40']);
+  });
+
+  it('shares the beat once: a strike staged again on its own takes the next ordinal', () => {
+    // The stager counts strikes, so the hand-off is consumed by the number it was for. One
+    // strike object asked three times stays three beats (the seam's own contract above).
+    const painter = pairPainter();
+    const harvest = { sourceId: 4, abilityId: 'red_harvest' };
+    const [first, second, third] = FURY_AUDIO.red_harvest.times;
+    painter.spawn(absorbed(), 10, harvest);
+    expect(painter.stagedShape(harvest, 10, hit({ ability: true }))?.delaySec).toBe(first);
+    expect(painter.stagedShape(harvest, 10, hit({ ability: true }))?.delaySec).toBe(second);
+    expect(painter.stagedShape(harvest, 10, hit({ ability: true }))?.delaySec).toBe(third);
+  });
+
+  it('never hands one strike beat to another strike', () => {
+    const swing = { sourceId: 7, abilityId: null };
+    const other = { sourceId: 8, abilityId: null };
+    const painter = pairPainter((s) => (s === swing ? 0.45 : 0));
+    painter.spawn(absorbed(), 1000, swing);
+    // another event staged next is not the paired strike: it resolves its own (no) delay
+    expect(painter.stagedShape(other, 1000, hit())?.delaySec).toBeUndefined();
+    expect(painter.stagedShape(swing, 1000, hit())?.delaySec).toBe(0.45);
+  });
+
+  it('keeps a pairing for the very next shape only: one nothing claimed is dropped', () => {
+    // The hud stages a strike's number right after its paired floater. A pairing that the
+    // next staged shape was not for is stale, and is let go rather than kept for an event
+    // object that will never ask: asked later, that strike resolves its own beat afresh.
+    const painter = pairPainter();
+    const [first, second] = FURY_AUDIO.red_harvest.times;
+    const harvest = { sourceId: 4, abilityId: 'red_harvest' };
+    const bystander = { sourceId: 9, abilityId: null };
+    painter.spawn(absorbed(), 10, harvest); // resolves the cast's first beat
+    expect(painter.stagedShape(bystander, 10, hit())?.delaySec).toBeUndefined();
+    // no longer paired: this ask is a strike of its own and takes the SECOND beat
+    expect(painter.stagedShape(harvest, 10, hit({ ability: true }))?.delaySec).toBe(second);
+    expect(first).toBeLessThan(second);
+  });
+
+  it('keeps the later of its own delay and the strike beat', () => {
+    const swing = { sourceId: 7, abilityId: null };
+    const painter = pairPainter(() => 0.2);
+    // the floater's own delay is the later one: it wins
+    painter.spawn({ ...absorbed('late'), delaySec: 0.5 }, 0, swing);
+    painter.step(499);
+    expect(liveTexts()).toEqual([]);
+    painter.step(500);
+    expect(liveTexts()).toEqual(['late']);
+    // the strike's beat is the later one: it wins
+    painter.spawn({ ...absorbed('early'), delaySec: 0.05 }, 1000, swing);
+    painter.step(1199);
+    expect(liveTexts()).toEqual(['late']);
+    painter.step(1200);
+    expect(liveTexts()).toEqual(['late', 'early']);
+  });
+
+  it('drops the pairing on dispose: a torn-down painter hands no stale beat on', () => {
+    const swing = { sourceId: 7, abilityId: null };
+    let contact = 0.2;
+    const painter = pairPainter(() => contact);
+    painter.spawn(absorbed('gone'), 1000, swing); // paired at 0.2
+    painter.dispose();
+    expect(painter.heldCount()).toBe(0);
+    // what the same strike resolves NOW differs from what was paired: a pairing that
+    // survived the teardown would hand back the old 0.2
+    contact = 0.35;
+    expect(painter.stagedShape(swing, 2000, hit())?.delaySec).toBe(0.35);
+  });
+});
+
 // The hud.ts damage spawn sites must route through the stage: a plain fctSpawnShape call
 // there would spawn all three Red Harvest numbers on the cast tick again. A source pin,
 // in the existing style, because the FCT spawn path has no integration harness.

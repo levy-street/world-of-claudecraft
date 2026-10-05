@@ -169,7 +169,11 @@ describe('WocFarTint.wrap', () => {
       WOC_HEAD_MERGE_LAYER.atlas,
     ]);
     expect(u.emi.value[0].toArray()).toEqual([0.03 - 0.02, 0.02 - 0.02, 0.02 - 0.02, 0.65]);
-    expect(u.surf.value[0].toArray()).toEqual([0, 1]);
+    expect(u.surf.value[0].toArray().slice(0, 2)).toEqual([0, 1]);
+    // ...then its reference's sRGB hue and saturation, converted on the CPU for the skin
+    // band (woc_tint_hsv_core.ts; literal, by hand: an orange of hue 0.044, saturation 0.347)
+    expect(u.surf.value[0].z).toBeCloseTo(0.0438, 3);
+    expect(u.surf.value[0].w).toBeCloseTo(0.347, 3);
     // the hair: its colour over the head's, its emissive less the head's, its roughness
     expect(u.ref.value[1].toArray()).toEqual([0.04, 0.04, 0.04, WOC_HEAD_MERGE_ROLE_CODE.hair]);
     expect(u.col.value[1].toArray()).toEqual([
@@ -179,7 +183,7 @@ describe('WocFarTint.wrap', () => {
       WOC_HEAD_MERGE_LAYER.hair,
     ]);
     expect(u.emi.value[1].toArray()).toEqual([0.05 - 0.02, 0.02 - 0.02, 0.01 - 0.02, 0.72]);
-    expect(u.surf.value[1].toArray()).toEqual([0, 0]);
+    expect(u.surf.value[1].toArray()).toEqual([0, 0, 0, 0]);
     // the liner: untinted, and its own roughness and metalness
     expect(u.ref.value[2].toArray()).toEqual([0, 0, 0, 0]);
     expect(u.col.value[2].toArray()).toEqual([
@@ -189,13 +193,13 @@ describe('WocFarTint.wrap', () => {
       WOC_HEAD_MERGE_LAYER.atlas,
     ]);
     expect(u.emi.value[2].toArray()).toEqual([0 - 0.02, 0 - 0.02, 0 - 0.02, 0.9]);
-    expect(u.surf.value[2].toArray()).toEqual([0.25, 0]);
+    expect(u.surf.value[2].toArray()).toEqual([0.25, 0, 0, 0]);
     // every row past the table is inert
     for (let i = SLOTS.length; i < WOC_HEAD_MERGE_MAX_SLOTS; i++) {
       expect(u.ref.value[i].toArray()).toEqual([0, 0, 0, 0]);
       expect(u.col.value[i].toArray()).toEqual([1, 1, 1, 0]);
       expect(u.emi.value[i].toArray()).toEqual([0, 0, 0, 1]);
-      expect(u.surf.value[i].toArray()).toEqual([0, 0]);
+      expect(u.surf.value[i].toArray()).toEqual([0, 0, 0, 0]);
     }
   });
 
@@ -231,7 +235,7 @@ describe('WocFarTint.wrap', () => {
     expect(plain).not.toBe(mixed);
     expect(mergedOf(plain).oneSided).toBe(false);
     expect(plain.defines ?? {}).not.toHaveProperty('WOC_HM_ONE_SIDED');
-    expect(mergedOf(plain).surf.value[0].toArray()).toEqual([0, 0]);
+    expect(mergedOf(plain).surf.value[0].toArray()).toEqual([0, 0, 0, 0]);
     // back on the first head: the clone it already linked
     expect(tint.wrap(mats, tints, COLORS)[1]).toBe(mixed);
   });
@@ -285,10 +289,10 @@ describe('WocFarTint: colours are uniform writes', () => {
       0.05 / 0.25,
       WOC_HEAD_MERGE_LAYER.atlas,
     ]);
-    expect(u.surf.value[1].toArray()).toEqual([0.25, 0]);
+    expect(u.surf.value[1].toArray()).toEqual([0.25, 0, 0, 0]);
     // the row the old table used is inert again
     expect(u.col.value[2].toArray()).toEqual([1, 1, 1, 0]);
-    expect(u.surf.value[2].toArray()).toEqual([0, 0]);
+    expect(u.surf.value[2].toArray()).toEqual([0, 0, 0, 0]);
   });
 
   it('keeps a clone per head source: a re-derived far material is a new wrap', () => {

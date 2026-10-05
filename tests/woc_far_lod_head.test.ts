@@ -7,8 +7,9 @@
 // cell), a piece the merged material cannot draw keeps a group of its own, the
 // chosen colours ride the layer's uniforms (a colour change is a uniform write),
 // the face the near head draws is frozen into the far pose (chin, tuck, bald crown,
-// the helm's raised crown), close faces share one bake, a body still waiting for
-// its head draws no far mesh at all, and the body size carries into the far band.
+// the helm's raised crown), close faces share one bake, a body whose head is still
+// on its way bakes no far mesh at all (one bake, with its head, once it has joined),
+// and the body size carries into the far band.
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { WocFarBake } from '../src/render/characters/woc_far_bake';
@@ -187,6 +188,18 @@ function farCentroid(root: THREE.Object3D, mesh: string): THREE.Vector3 {
 
 afterEach(() => releaseWocVisualHarness());
 
+/** A linear colour's sRGB hue and saturation by the textbook formula (gamma 2.2, as the
+ *  tint layer reads a colour): what a slot's surface row carries of its reference. The
+ *  layer's own conversion is woc_tint_hsv_core.ts, held to the shader text in its suite. */
+function hueAndSaturation(linear: readonly number[]): [number, number] {
+  const [r, g, b] = linear.map((x) => x ** (1 / 2.2));
+  const max = Math.max(r, g, b);
+  const d = max - Math.min(r, g, b);
+  if (d === 0) return [0, 0];
+  const sixth = max === r ? ((g - b) / d + 6) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  return [sixth / 6, d / max];
+}
+
 describe('the WOC far LOD wears the near head', () => {
   it('freezes the face the near head draws: chin, scalp tuck and bald crown', async () => {
     const h = await harness();
@@ -298,27 +311,41 @@ describe('the WOC far LOD wears the near head', () => {
       wading: false,
       sitting: false,
     };
-    // the player's hairstyle is still streaming: the body waits for its head, so neither
-    // its rig nor its far mesh draws, and the far set holds no head piece
+    // the player's hairstyle is still streaming: the body waits for its head, so its rig
+    // does not draw, and NO far mesh is baked for it (it would freeze a headless body
+    // nobody sees, and be thrown away the frame the head goes live)
+    const assets = await import('../src/render/characters/assets');
+    const assembled = vi.spyOn(assets, 'assembleModel');
     const v = h.farVisual({ ...h.DEFAULT_APPEARANCE, headHair: 'quiff' });
-    expect(hasFarHead(v)).toBe(false);
-    expect(farMaterials(v.root).map(mapName)).toEqual(['body']);
-    expect(far(v.root).visible).toBe(false);
+    const bakes = (): number =>
+      assembled.mock.calls.filter(([, , , , opts]) => opts?.wocLod === 'far').length;
+    expect(v.isFar).toBe(true);
+    expect(v.root.getObjectByName('character_far_mesh')).toBeUndefined();
+    expect(bakes()).toBe(0);
+    expect(h.gates).toHaveLength(0);
     expect(v.root.getObjectByName('character_model_wrap')?.visible).toBe(false);
-    // the file lands: the next frame hangs it behind the gate, the body still undrawn
+    // the file lands: the next frame hangs it behind the gate, the body still undrawn,
+    // and frames spent waiting for the link bake nothing either
     h.releases.get(quiff)?.();
     await vi.waitFor(() => expect(h.heads.wocHeadFileResident(quiff)).toBe(true));
-    v.update(0.05, idle, true);
-    expect(h.gates).toHaveLength(1);
-    expect(far(v.root).visible).toBe(false);
-    expect(v.root.getObjectByName('character_model_wrap')?.visible).toBe(false);
-    // revealed: the head goes live, the next frame re-dresses, and the far set re-bakes
-    for (const gate of h.gates.splice(0)) gate.settle();
-    v.update(0.05, idle, true);
     h.nextFrame();
+    v.update(0.05, idle, true);
+    v.setFar(true);
+    expect(h.gates).toHaveLength(1);
+    v.setFar(true);
+    v.update(0.05, idle, true);
+    expect(bakes()).toBe(0);
+    expect(v.root.getObjectByName('character_far_mesh')).toBeUndefined();
+    expect(v.root.getObjectByName('character_model_wrap')?.visible).toBe(false);
+    // revealed: the head goes live, the next frame re-dresses, and the far set bakes
+    // ONCE, with its head
+    for (const gate of h.gates.splice(0)) gate.settle();
+    h.nextFrame();
+    v.update(0.05, idle, true);
     v.setFar(true);
     for (const gate of h.gates.splice(0)) gate.settle();
     v.setFar(true);
+    expect(bakes()).toBe(1);
     const head = farHead(v);
     expect(mapName(head.material)).toBe('atlas');
     expect(slotOf(h, v, BASE)).toBeGreaterThanOrEqual(0);
@@ -536,12 +563,23 @@ describe('the WOC far head is ONE draw', () => {
         own.emissive[2] - base.emissive[2],
         own.roughness,
       ]);
-      // ...its metalness, and whether its own material drew its front faces only
-      expect(u.surf.value[i].toArray(), mesh).toEqual([
+      // ...its metalness, whether its own material drew its front faces only, and its
+      // reference's sRGB hue and saturation (what the skin band and the iris test read of
+      // it, converted when the row is written), here by the textbook formula
+      const [hue, saturation] = hueAndSaturation(ref ? ref.ref : [0, 0, 0]);
+      const surf = u.surf.value[i].toArray();
+      expect(surf.slice(0, 2), mesh).toEqual([
         own.metalness,
         file.side === THREE.DoubleSide ? 0 : 1,
       ]);
+      expect(surf[2], mesh).toBeCloseTo(hue, 6);
+      expect(surf[3], mesh).toBeCloseTo(saturation, 6);
     }
+    // literal: the base head's skin reference is an orange of hue 0.046 and saturation
+    // 0.365, and a grey one (the hair, the brows) has neither
+    expect(u.surf.value[rows.get(BASE) ?? -1].z).toBeCloseTo(0.04596, 4);
+    expect(u.surf.value[rows.get(BASE) ?? -1].w).toBeCloseTo(0.36461, 4);
+    expect(u.surf.value[rows.get(SWEPT) ?? -1].toArray().slice(2)).toEqual([0, 0]);
     // ...which on this tier reads: each role tinted against its own reference, the hair
     // and the beard on their own textures, the liner untinted, flat-coloured and a little
     // metallic, and every roughness the far tier's (the body band holds the liner's 0.95
@@ -964,77 +1002,108 @@ describe('the WOC far head is ONE draw', () => {
       expect(u.emi.value[liner].getComponent(channel)).toBeCloseTo((lifted(c) - 1) * 0.045, 12);
     });
     expect(u.emi.value[liner].w).toBe(1);
-    expect(u.surf.value[liner].toArray()).toEqual([0, 0]);
+    expect(u.surf.value[liner].toArray()).toEqual([0, 0, 0, 0]);
     v.dispose();
   });
 });
 
-describe('a WOC body waits for its head (a base file ends at the neck)', () => {
+describe('a WOC body and its head files (a base file ends at the neck)', () => {
   const QUIFF = 'models/chars/players/woc/head_type_a_hair_quiff.glb';
+  const QUIFF_NODE = 'WocHead_A_hair_quiff';
 
-  it('the world view builds a character only once its own head files are resident', async () => {
+  /** A world body with the renderer's gate installed after it was built (createView): the
+   *  gate asks it made, and every target it was ever asked to link. */
+  async function worldBody(h: Harness, e: Entity) {
+    const { createCharacterVisual } = await import('../src/render/characters/index');
+    const v = createCharacterVisual(e);
+    // never a wait for a head file: the body is there on the frame it was asked for
+    if (!v) throw new Error('the world body did not build');
+    const asked: THREE.Object3D[] = [];
+    v.setFarBakeGate((target, settle) => {
+      asked.push(target);
+      h.gates.push({ target, settle });
+    });
+    v.setWocEquipment({}, false);
+    return {
+      v,
+      asked,
+      /** Far sets minted so far (each goes through the gate once). */
+      minted: (): number => asked.filter((t) => t.name === 'character_far_wrap').length,
+      frame: (): void => {
+        h.nextFrame();
+        v.update(0.05, IDLE, true);
+      },
+    };
+  }
+
+  it('a world body whose hairstyle joins late bakes its far mesh ONCE, with its hair on', async () => {
     const h = await harness({ headPack: true, held: [QUIFF] });
-    const { createCharacterVisual, characterBuildStreaming } = await import(
-      '../src/render/characters/index'
+    const { v, minted, frame } = await worldBody(
+      h,
+      player({ ...h.DEFAULT_APPEARANCE, headHair: 'quiff' }),
     );
-    const e = player({ ...h.DEFAULT_APPEARANCE, headHair: 'quiff' });
-    // base, library, core and beards are resident; its hairstyle is still on the wire
-    expect(createCharacterVisual(e)).toBeNull();
-    expect(characterBuildStreaming()).toBe(true);
-    expect(createCharacterVisual(e)).toBeNull(); // every frame until it lands
+    const wrap = v.root.getObjectByName('character_model_wrap');
+    // drawn at once, bald: the bare head stands in for the hairstyle still on the wire
+    expect(wrap?.visible).toBe(true);
+    expect(v.wocHeadDrawnLook?.hair).toBe('bald');
+    // far away already: the articulated rig stands in, and NOTHING is baked for a head
+    // that is about to change (it would be baked again the moment the hair joined)
+    frame();
+    v.setFar(true);
+    for (let i = 0; i < 3; i++) {
+      frame();
+      v.setFar(true);
+    }
+    expect(v.root.getObjectByName('character_far_mesh')).toBeUndefined();
+    expect(minted()).toBe(0);
+    expect(wrap?.visible).toBe(true);
+    // the file lands and hangs behind the gate: still the rig, still nothing baked
     h.releases.get(QUIFF)?.();
     await vi.waitFor(() => expect(h.heads.wocHeadFileResident(QUIFF)).toBe(true));
-    const v = createCharacterVisual(e);
-    expect(characterBuildStreaming()).toBe(false);
-    expect(v).not.toBeNull();
-    // born with its head live, so it draws from its first frame
-    expect(v?.wocHeadLook?.look.hair).toBe('quiff');
-    expect(v?.root.getObjectByName('character_model_wrap')?.visible).toBe(true);
-    v?.dispose();
+    frame();
+    v.setFar(true);
+    expect(v.root.getObjectByName(QUIFF_NODE)).toBeDefined();
+    expect(minted()).toBe(0);
+    // linked: the hair joins, the next frame re-dresses, and the one bake is the whole head
+    for (const gate of h.gates.splice(0)) gate.settle();
+    expect(v.wocHeadDrawnLook?.hair).toBe('quiff');
+    frame();
+    v.setFar(true);
+    expect(minted()).toBe(1);
+    for (const gate of h.gates.splice(0)) gate.settle();
+    v.setFar(true);
+    expect(far(v.root).visible).toBe(true);
+    expect(slotOf(h, v, QUIFF_STRANDS)).toBeGreaterThanOrEqual(0);
+    expect(slotOf(h, v, QUIFF_SCALP)).toBeGreaterThanOrEqual(0);
+    // settled: later frames bake nothing more
+    for (let i = 0; i < 3; i++) {
+      frame();
+      v.setFar(true);
+    }
+    expect(minted()).toBe(1);
+    v.dispose();
   });
 
-  it('a speculative build (no fetch) never waits on a head, and a mob on a WOC body waits for the default look', async () => {
-    const swept = 'models/chars/players/woc/head_type_a_hair_swept.glb';
-    const h = await harness({ headPack: true, held: [swept] });
-    const { createCharacterVisual, characterBuildStreaming } = await import(
-      '../src/render/characters/index'
-    );
-    // a mob drawn on the same body wears the type's default look (swept hair): it waits too
-    const mob = { ...player({}), kind: 'mob', modularAppearance: undefined } as unknown as Entity;
-    vi.spyOn(await import('../src/render/characters/manifest'), 'visualKeyFor').mockReturnValue(
-      KEY,
-    );
-    expect(createCharacterVisual(mob)).toBeNull();
-    expect(characterBuildStreaming()).toBe(true);
-    // the zone prewarm's speculative build fetches nothing and waits on nothing
-    const speculative = createCharacterVisual(mob, undefined, { fetchStreamed: false });
-    expect(speculative).not.toBeNull();
-    expect(characterBuildStreaming()).toBe(false);
-    speculative?.dispose();
-    h.releases.get(swept)?.();
-    await vi.waitFor(() => expect(h.heads.wocHeadFileResident(swept)).toBe(true));
-    const v = createCharacterVisual(mob);
-    expect(v).not.toBeNull();
-    v?.dispose();
-  });
-
-  it('a head file that failed to load never hides a character: the body builds and draws without it', async () => {
+  it('a hairstyle that FAILED holds no far bake back: the bare head bakes as it is, at once', async () => {
     const h = await harness({ headPack: true, failed: [QUIFF] });
     vi.spyOn(console, 'warn').mockImplementation(() => undefined);
-    const { createCharacterVisual, characterBuildStreaming } = await import(
-      '../src/render/characters/index'
-    );
     const e = player({ ...h.DEFAULT_APPEARANCE, headHair: 'quiff' });
-    // the first ask kicks the fetch
+    // the first ask kicks the fetch, which fails
+    const { createCharacterVisual } = await import('../src/render/characters/index');
     createCharacterVisual(e)?.dispose();
     await vi.waitFor(() => expect(h.heads.wocHeadFileState(QUIFF)).toBe('failed'));
-    const v = createCharacterVisual(e);
-    expect(characterBuildStreaming()).toBe(false);
-    expect(v).not.toBeNull();
-    // no head (its look never completed), but the body is on screen
-    expect(v?.wocHeadLook).toBeNull();
-    expect(v?.root.getObjectByName('character_model_wrap')?.visible).toBe(true);
-    v?.dispose();
+    const { v, minted, frame } = await worldBody(h, e);
+    frame();
+    v.setFar(true);
+    // at rest in what it holds: one bake, of the head without its hairstyle
+    expect(minted()).toBe(1);
+    for (const gate of h.gates.splice(0)) gate.settle();
+    v.setFar(true);
+    expect(far(v.root).visible).toBe(true);
+    expect(hasFarHead(v)).toBe(true);
+    expect(slotOf(h, v, BASE)).toBeGreaterThanOrEqual(0);
+    expect(h.wocHeadMergedTintOf(farHead(v).material)?.hair.value).toBeNull();
+    v.dispose();
   });
 
   it('a body built directly (a preview) draws nothing until its head is live', async () => {

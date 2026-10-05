@@ -329,9 +329,8 @@ describe('far-LOD wiring (source pins)', () => {
 
   it('retries a pending bake from the per-frame update', () => {
     const body = fnBody('src/render/characters/visual.ts', '  update(dt: number');
-    expect(body).toContain('this.farBakePending &&');
-    expect(body).toContain('this.far || (this.wocFarParts && this.proxyShadowWanted)');
-    expect(body).toContain('!this.farBakeTried');
+    // a far body only: nothing bakes for the shadow plan's sake
+    expect(body).toContain('this.farBakePending && this.far && !this.farBakeTried');
     expect(body).toContain('this.attemptComposedFar()');
   });
 

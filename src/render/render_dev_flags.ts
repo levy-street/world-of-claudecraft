@@ -52,6 +52,24 @@
 //   woclod      - the WOC bodies' coarser geometry levels (characters/woc_lod_core.ts,
 //                 assets.ts wocBuildLod); off draws level 0 for everyone, the
 //                 far bakes included, the before arm of a crowd capture
+//   wocfarheadtint - the merged tint layer on a WOC far body's head group
+//                 (characters/woc_far_tint.ts); off draws that group with its
+//                 plain far material (wrong colours, on purpose), the A/B arm
+//                 that prices the layer's per-body slot rows and texture reads
+//                 in a far crowd
+//   wocfarbodytint - the skin tint layer on a WOC far body's own group; off
+//                 draws the far material itself (no layer, no clone), the A/B
+//                 arm that prices the layer's program and, for a body on its
+//                 suit, its per-body material
+//   wocfarshare - one wrapped clone for every far body whose skin layer is
+//                 switched off (a body under its under-armor atlas); off gives
+//                 each body its own again, same pixels, the before arm that
+//                 prices a material and a program switch per far body
+//   woccrowdprefetch - the crowd prefetch after first paint
+//                 (characters/woc_crowd_prefetch.ts); off fetches nothing ahead
+//                 of need, so hair, armor and under-armor stream on first
+//                 sight as on a phone: the A/B arm that prices the prefetch
+//                 (the frames after first paint, and what it keeps resident)
 
 // Beside the ?<name>=off layer switches, knobs and modes with their own accessors:
 //   ?bladesectors=<n> - how many ways each blade-grass pool's slot grid is split

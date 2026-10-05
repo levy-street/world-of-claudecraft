@@ -98,6 +98,7 @@ import {
   mergeGeometryLod,
 } from '../assets/geometry_lod';
 import { recordBuildSpan } from '../build_spans';
+import { GFX } from '../gfx';
 import { logAssetMissOnce } from './asset_miss_log';
 import { rebakeMatrix, solveRebindTransform } from './rig_merge';
 import { characterMeshCastsShadow } from './shadow_policy';
@@ -113,6 +114,7 @@ import {
   wocScaleIsUniform,
 } from './woc_armor_merge_core';
 import { wocArmorContainers, wocArmorFileMaterial, wocArmorPieces } from './woc_armor_packs';
+import { wocIdleCacheCaps } from './woc_idle_cache_core';
 
 /** Tag on a merged armor mesh (beside `wocArmorPart`, which keeps it out of the rig's
  *  body-mesh lookups exactly like the parts it folds). */
@@ -663,8 +665,9 @@ interface Entry {
 
 const cache = new Map<string, Entry>();
 /** Idle merged kits kept for a kit that comes back (a few hundred KB each; the
- *  heaviest, the male warrior's, about 0.8 MB). */
-const MAX_IDLE_MERGES = 16;
+ *  heaviest, the male warrior's, about 0.8 MB): fewer on a constrained profile
+ *  (woc_idle_cache_core.ts). */
+const maxIdleMerges = (): number => wocIdleCacheCaps(GFX.constrainedMemory).mergedArmor;
 
 export interface WocArmorMergeLease {
   readonly geometry: THREE.BufferGeometry;
@@ -679,8 +682,9 @@ export function wocArmorMergeBuilt(key: string): boolean {
 function trimIdle(): void {
   let idle = 0;
   for (const entry of cache.values()) if (entry.refs === 0) idle++;
+  const cap = maxIdleMerges();
   for (const [key, entry] of cache) {
-    if (idle <= MAX_IDLE_MERGES) break;
+    if (idle <= cap) break;
     if (entry.refs > 0) continue;
     cache.delete(key);
     entry.geometry.dispose();

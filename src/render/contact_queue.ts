@@ -13,10 +13,33 @@
  * (nothing a player acts on is delayed), and a swing with no listed contact plays everything at
  * once exactly as before. No timers: due callbacks run from the renderer's frame (tick), off the
  * frame clock it already passes.
+ *
+ * A kill is held the same way (holdsDeath): the struck body keeps standing until the blade lands.
+ * The renderer asks for that hold once per body per frame and three things read the one answer,
+ * so they go on the same frame (collapsed, heldUntilCollapse below): the death pose, the mount
+ * under a seated rider, and the wings on a paladin. Nothing else is held: whatever else the death
+ * ended (a shapeshift form, a cast pose, the other aura-driven looks) still leaves on the event.
  */
 
 /** The longest a presentation effect may be held: a clip listing a later contact is clamped. */
 export const CONTACT_HOLD_MAX_SEC = 1.0;
+
+/** Whether a dead body is PRESENTED dead this frame: dead, and its collapse not held for the
+ *  blade that dealt the kill (`deathHeld`: ContactQueue.holdsDeath). */
+export function collapsed(dead: boolean, deathHeld: boolean): boolean {
+  return dead && !deathHeld;
+}
+
+/**
+ * What a body whose death is held keeps showing of something that death ended. The sim clears
+ * those on the tick the death resolves (a rider's mountKey: the mount bolts; a paladin's wing
+ * auras: stripped with every buff), a frame before a held collapse shows any of it, so `live`
+ * is already empty when the hold begins. While the death is held the body presents what it
+ * presented on the frame before (`last`); from the collapse on, the live value again.
+ */
+export function heldUntilCollapse<T>(deathHeld: boolean, live: T, last: T): T {
+  return deathHeld ? last : live;
+}
 
 interface Pending {
   dueAt: number;
@@ -30,6 +53,8 @@ export class ContactQueue {
   /** target entity id -> frame time (ms) its last pending blade lands: a target killed by the
    *  swing keeps standing until then, so it collapses under the blade, not ahead of it */
   private readonly deathHold = new Map<number, number>();
+  /** The frame clock (ms) of the last tick: what a hold is read against inside that frame. */
+  private frameNow = 0;
 
   /** Record the contact delay of the swing this event started (<= 0 records nothing), and hold
    *  the target's collapse until that contact. */
@@ -43,8 +68,9 @@ export class ContactQueue {
     }
   }
 
-  /** True while a blade swung at this entity has not landed yet (its death pose waits). */
-  holdsDeath(id: number, now: number): boolean {
+  /** True while a blade swung at this entity has not landed yet (its death pose waits). `now`
+   *  is the frame clock in ms: the last tick's unless one is given. */
+  holdsDeath(id: number, now = this.frameNow): boolean {
     const until = this.deathHold.get(id);
     if (until === undefined) return false;
     if (now < until) return true;
@@ -57,9 +83,18 @@ export class ContactQueue {
     return this.delays.get(ev) ?? 0;
   }
 
-  /** Run `fn` when this event's blade lands (at once when it carries no contact). */
-  atContact(ev: object, now: number, fn: () => void): void {
-    this.after(this.delayFor(ev), now, fn);
+  /** Run `fn(ev)` on `self` when this event's blade lands. An event with no contact (every
+   *  event but a held melee hit) runs it at once and allocates nothing, so a caller on a
+   *  per-event path hands its method and itself over instead of building a closure per event. */
+  atContact<E extends object, S = undefined>(
+    ev: E,
+    now: number,
+    fn: (this: S, ev: E) => void,
+    self?: S,
+  ): void {
+    const delaySec = this.delayFor(ev);
+    if (delaySec > 0) this.after(delaySec, now, () => fn.call(self as S, ev));
+    else fn.call(self as S, ev);
   }
 
   /** Run `fn` after `delaySec` (at once for <= 0). `now` is the frame clock in ms. */
@@ -78,6 +113,7 @@ export class ContactQueue {
   /** Run every held effect whose contact has arrived (call once per frame), and forget the
    *  death holds that have passed (a target that never died would otherwise keep its entry). */
   tick(now: number): void {
+    this.frameNow = now;
     for (const [id, until] of this.deathHold) if (now >= until) this.deathHold.delete(id);
     let n = 0;
     while (n < this.pending.length && this.pending[n].dueAt <= now) n++;

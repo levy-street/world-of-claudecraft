@@ -15,6 +15,8 @@ import {
 } from '../src/render/characters/woc_head_catalog';
 import { WOC_HEAD_TINTED_ROLES } from '../src/render/characters/woc_head_look_core';
 import {
+  WOC_HEAD_MERGE_BAND_INDICES,
+  WOC_HEAD_MERGE_BAND_VERTICES,
   WOC_HEAD_MERGE_LAYER,
   WOC_HEAD_MERGE_MAX_SLOTS,
   WOC_HEAD_MERGE_ROLE_CODE,
@@ -25,6 +27,7 @@ import {
   type WocHeadMergePieceFacts,
   type WocHeadMergeSlot,
   wocHeadMergeFoldPlan,
+  wocHeadMergeFoldUnits,
   wocHeadMergeKey,
   wocHeadMergeLayerOf,
   wocHeadMergeOneSided,
@@ -760,5 +763,32 @@ describe('wocHeadMergeFoldPlan', () => {
       [0, [0, 0, 0]],
       [0, [0, 0, 0]],
     ]);
+  });
+});
+
+describe("the fold's bands", () => {
+  it('are a structural fraction of a head: 512 vertices, 12288 index entries in whole triangles', () => {
+    // literal: the unit sizes the budget prices (woc_head_merge_fold.ts folds by them)
+    expect(WOC_HEAD_MERGE_BAND_VERTICES).toBe(512);
+    expect(WOC_HEAD_MERGE_BAND_INDICES).toBe(12288);
+    expect(WOC_HEAD_MERGE_BAND_INDICES % 3).toBe(0);
+  });
+
+  it('counts the units of a fold: a band of vertices each, the last going on to the triangles', () => {
+    const V = WOC_HEAD_MERGE_BAND_VERTICES;
+    const I = WOC_HEAD_MERGE_BAND_INDICES;
+    // a head that fits one band of each is one unit, an empty one too
+    expect(wocHeadMergeFoldUnits(0, 0)).toBe(1);
+    expect(wocHeadMergeFoldUnits(6, 6)).toBe(1);
+    expect(wocHeadMergeFoldUnits(V, I)).toBe(1);
+    // one vertex past a band is one more unit; one triangle past a band of them too
+    expect(wocHeadMergeFoldUnits(V + 1, I)).toBe(2);
+    expect(wocHeadMergeFoldUnits(V, I + 3)).toBe(2);
+    expect(wocHeadMergeFoldUnits(V + 1, I + 3)).toBe(3);
+    // the unit that ends the vertices is the first of the triangles: never one between
+    expect(wocHeadMergeFoldUnits(10 * V, I)).toBe(10);
+    expect(wocHeadMergeFoldUnits(10 * V, 3 * I)).toBe(12);
+    // literal: the fullest head of the shipped library (tests/woc_head_merge_library.test.ts)
+    expect(wocHeadMergeFoldUnits(14297, 40263)).toBe(31);
   });
 });

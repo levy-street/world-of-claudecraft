@@ -83,7 +83,8 @@ import {
   newDualSwingState,
   pickDualSwing,
 } from './attack_swing_core';
-import { splitClipAt } from './clip_split';
+import { sharedClipSplit } from './clip_split';
+import { twinClipOf } from './clip_twin';
 import { extendBrace, isBraced } from './combat_brace_core';
 import { deathGroundingOffset } from './death_grounding_core';
 import {
@@ -93,7 +94,12 @@ import {
   type GhostStyle,
   ghostEffectOpacity,
 } from './effect_materials';
-import { bodyDrawn, farMeshShown, shadowProxyShown } from './far_lod_reveal_core';
+import {
+  bodyDrawn,
+  farMeshShown,
+  shadowProxyShown,
+  shadowStandInShown,
+} from './far_lod_reveal_core';
 import { FormAdornments } from './form_adornments';
 import { HairSwayDriver } from './hair_sway';
 import { buildHalo } from './halo';
@@ -142,14 +148,19 @@ import {
   type WocArmorDressingHost,
   type WocArmorFile,
 } from './woc_armor_dressing';
-import { releaseWocArmorOf } from './woc_armor_packs';
+import { releaseWocArmorOf, setWocArmorWorkQueue } from './woc_armor_packs';
 import { WocAtlasSwap } from './woc_atlas_swap';
 import type { WocCharacterManifest } from './woc_character_manifest';
 import {
   peekWocFarBake,
+  queueWocFarBake,
   retainWocFarBake,
+  WOC_FAR_MOUNT_LABEL,
+  WOC_FAR_MOUNT_SPAN,
   type WocFarBake,
   type WocFarBakeLease,
+  type WocFarBakeRequest,
+  warnWocFarStopped,
   wocFarPartsKey,
 } from './woc_far_bake';
 import { wocDrawnHeadMorphs } from './woc_far_head';
@@ -176,8 +187,8 @@ export type { AnimState, BaseState } from './anim_state';
 
 /** The renderer's live compile gate for a far LOD minted (or re-skinned) after
  *  the view's own creation gate ran: compile `target` hidden, off-thread, and
- *  call `settle` (a lazy `ready` proof) once its programs are linked, or
- *  immediately when async compile is unsupported. Mirrors `gateSwapFlagOnCompile`. */
+ *  call `settle` (a lazy `ready` proof) once the gate settles, or immediately
+ *  and with no proof when async compile is unsupported. Mirrors `gateSwapFlagOnCompile`. */
 export type FarBakeGate = (target: THREE.Object3D, settle: (ready?: () => boolean) => void) => void;
 
 /** The work queue each renderer gate was first installed with (setFarBakeGate). */
@@ -547,6 +558,14 @@ export class CharacterVisual {
   /** The head's face the far parts freeze (woc_far_head_core.ts); null while the
    *  modular head is not drawn. */
   private wocFarHead: WocFarHeadPose | null = null;
+  /** The far key of the three inputs above (woc_far_bake.ts wocFarPartsKey), built once
+   *  per dressing: every later ask (a pending bake's peek, the bake itself) reuses it. */
+  private wocFarKey: string | null = null;
+  /** This body's ask for a queued far bake (woc_far_bake.ts queueWocFarBake), from its
+   *  far crossing until its mount unit has run. A re-dress, a new gate and a dispose all
+   *  drop it, and a dropped ask mounts nothing. The ask holds the finished bake in the
+   *  cache until this body has mounted it, so every way out of it releases it. */
+  private wocFarJob: WocFarBakeRequest | null = null;
   /** This body's head tints on its far set (woc_far_tint.ts); null on any other rig. */
   private wocFarTint: WocFarTint | null = null;
   /** The streamed armor files this WOC body draws (woc_armor_dressing.ts); null on any
@@ -559,10 +578,12 @@ export class CharacterVisual {
   private wocHead: WocHeadDressing | null = null;
   private wocHeadApp: WocHeadAppearanceInput = undefined;
   private wocHeadRedress = false;
-  /** A WOC body draws nothing until its head is live: the base file ends at the neck, so
-   *  the body alone would be a headless figure (woc_head_dressing.ts `awaited`). Set at
-   *  birth, cleared ONCE (syncWocHeadWait): a body that has drawn never hides for its
-   *  head again (a later look change holds the previous head instead). */
+  /** A WOC body built directly (a preview, a portrait) draws nothing until its head is
+   *  live: the base file ends at the neck, so the body alone would be a headless figure
+   *  (woc_head_dressing.ts `awaited`). Set at birth, cleared ONCE (syncWocHeadWait): a
+   *  body that has drawn never hides for its head again (a later look change holds the
+   *  previous head instead). A body in the world never waits at all: its opt-in
+   *  (setWocBareHeadStandIn) clears this before its first frame. */
   private wocHeadAwaited = false;
   /** click-capsule radius (measured body extent); the pick proxy's standing scale.y
    *  is `height`, collapsed to a flat profile while dead (see enterDeath/revive). */
@@ -627,6 +648,17 @@ export class CharacterVisual {
     return true;
   }
 
+  /** Change how much armor texture detail a WOC body draws, on the LIVE body: a preview
+   *  whose character was just chosen, or whose stage changed hands
+   *  (preview_armor_detail_core.ts). Never a rebuild and never a blink: with the body's
+   *  next dressing (setWocEquipment, setWocDefaultEquipment), else its next update, the
+   *  dressing asks for the files of the new detail and keeps drawing the ones it has until
+   *  each replacement's reveal settles (woc_armor_dressing.ts setDetail). The geometry
+   *  level is no part of it (fixed at build). A no-op on any other rig and on a repeat. */
+  setWocArmorDetail(detail: import('./woc_armor_core').WocArmorDetail): void {
+    this.wocArmor?.setDetail(detail);
+  }
+
   /** Draw a WOC head look (the stored appearance: its head picks, face controls and
    *  colours) IN PLACE: visibility flags, morph influences and tint uniforms on the
    *  live model, never a rebuild (a body-type change is another body, which the
@@ -656,8 +688,10 @@ export class CharacterVisual {
     if (this.wocHeadAwaited) this.syncFarVisibility();
   }
 
-  /** The WOC head's live look (tests, dev overlays); null on any other rig and while the
-   *  head's files still stream (the body is not drawn yet). */
+  /** The WOC head's live look (tests, dev overlays); null on any other rig and until the
+   *  head is live (a body built directly is not drawn yet; one in the world draws without
+   *  a head only while its core is missing). What it DRAWS of that look, a hairstyle or a
+   *  beard still on the wire left off, is wocHeadDrawnLook. */
   get wocHeadLook(): WocHeadDressing['look'] | null {
     return this.wocHead?.isLive ? this.wocHead.look : null;
   }
@@ -674,8 +708,9 @@ export class CharacterVisual {
     this.wocWorn = worn;
     // The files this worn set draws from: the class's own set (always: it is the
     // kit a bare slot falls back to) plus any set a display row points one of
-    // the worn items at (woc_item_display.ts). Resident files attach now, the
-    // rest stream and attach from update() the frame they land.
+    // the worn items at (woc_item_display.ts). Resident files attach (at once on
+    // a body with no work queue behind it, else as a unit of it), the rest
+    // stream and attach once they land.
     const sets = wocManifestSets(manifest);
     for (const set of wocWornSets(manifest, worn)) if (!sets.includes(set)) sets.push(set);
     if (this.wocArmor?.want(sets)) this.wocParts = null;
@@ -702,14 +737,13 @@ export class CharacterVisual {
     const head = this.wocHead?.isLive
       ? wocFarHeadPose(wocDrawnHeadMorphs(this.model, this.wocHead.look.morphs))
       : null;
-    if (
-      !this.wocFarParts ||
-      wocFarPartsKey(parts, files, head) !==
-        wocFarPartsKey(this.wocFarParts, this.wocFarFiles, this.wocFarHead)
-    ) {
+    // the key is built here, once per dressing, and kept: nothing asks for it per frame
+    const farKey = wocFarPartsKey(parts, files, head);
+    if (farKey !== this.wocFarKey) {
       this.wocFarParts = parts;
       this.wocFarFiles = files;
       this.wocFarHead = head;
+      this.wocFarKey = farKey;
       this.invalidateWocFar();
     }
     this.setWocBodyAtlas(wocUnderArmorAtlas(manifest, worn));
@@ -728,19 +762,47 @@ export class CharacterVisual {
 
   /** The dressing's view of this visual (woc_armor_dressing.ts). */
   private wocArmorHost(): WocArmorDressingHost {
+    // No queue behind this body (the constructor's own dressing, a preview, a portrait)
+    // is no `schedule` at all: the dressing then attaches a file on the spot, where with
+    // one it waits for the file's prepare unit and attaches as a unit of its own (the
+    // same scheduleWocWork, and so the same priority, as the merged stand-ins' mounts).
+    const queued = (): WocArmorDressingHost['schedule'] =>
+      this.workQueue ? this.scheduleWocWork : undefined;
     return {
       model: this.model,
       adopt: (container) => this.adoptWocArmor(container),
       forget: (container) => this.forgetWocArmor(container),
       reveal: (container, live) => this.revealOnCompile(container, 'armor set', live),
       rigDrawn: this.wocRigDrawn,
-      schedule: this.scheduleWocWork,
+      get schedule() {
+        return queued();
+      },
     };
   }
 
-  /** Whether the articulated rig is what draws right now: a merged stand-in (the head,
-   *  the armor) is not built for a body shown by its far mesh, or not shown at all. */
-  private readonly wocRigDrawn = (): boolean => this.root.visible && this.modelWrap.visible;
+  /** Whether the articulated rig is what draws right now, to stay, behind a gate: a merged
+   *  stand-in (the head, the armor) is not built for a body never handed a gate, one shown
+   *  by its far mesh, one not shown at all, or one drawn by its rig only until its far mesh
+   *  arrives (farLodArriving). */
+  private readonly wocRigDrawn = (): boolean =>
+    this.farBakeGate !== null &&
+    this.root.visible &&
+    this.modelWrap.visible &&
+    !this.farLodArriving;
+
+  /** A far body whose far mesh is on its way: asked for (in line behind other looks, or
+   *  baking), mounting or linking. Its rig is a stopgap until then, and a crowd arriving in
+   *  the far band would pay a fold per body for a stand-in its far mesh replaces. A body
+   *  whose far bake came to nothing is not arriving: it stays on its rig, and is merged
+   *  like any. */
+  private get farLodArriving(): boolean {
+    return (
+      this.far &&
+      (this.wocFarJob !== null ||
+        (this.farBakePending && !this.farBakeTried) ||
+        (this.farMesh !== null && this.farCompilePending))
+    );
+  }
 
   /**
    * Run a merged stand-in's mount as one unit of the renderer's work queue. The queue
@@ -784,6 +846,17 @@ export class CharacterVisual {
   setWocDrawMerge(on: boolean): void {
     this.wocHead?.setMerged(on);
     this.wocArmor?.setMerged(on);
+  }
+
+  /** Let this WOC body draw with the bare head standing in for a hairstyle or a beard
+   *  whose file is still on the wire, or failed (woc_head_dressing.ts setBareStandIn):
+   *  the body never waits on a head file, and the missing piece joins hidden until
+   *  linked, like a later pick. The world view's opt-in (createCharacterVisual), where a
+   *  player with no body at all is the cost; a preview, a portrait and the face builder
+   *  keep drawing a head only whole. A no-op on any other rig. */
+  setWocBareHeadStandIn(on: boolean): void {
+    this.wocHead?.setBareStandIn(on);
+    this.syncWocHeadWait();
   }
 
   /** Give a streamed armor set attached after construction everything the
@@ -846,6 +919,7 @@ export class CharacterVisual {
       fallback: skinTexture(this.key, this.skinIndex),
       emissive: skinEmissiveTexture(this.key, this.skinIndex),
       gate: this.farBakeGate,
+      wrap: (scratch) => this.wocHead?.wrapTwins(scratch),
       commit: () => this.applySkinMaterials(this.skinIndex),
     }));
   }
@@ -923,11 +997,13 @@ export class CharacterVisual {
    *  the host's compile gate (immediately without one: previews, tests).
    *  `revealed` hears whether the gate could prepare it (its `ready` proof): a
    *  node with a stand-in still drawing can stay behind it instead of linking
-   *  on a live frame. */
+   *  on a live frame. It is handed the proof itself too, when the gate has one:
+   *  asked again later it answers for the gate's context as it is then
+   *  (woc_head_merge_proof_core.ts). */
   private revealOnCompile(
     node: THREE.Object3D,
     what: string,
-    revealed?: (prepared: boolean) => void,
+    revealed?: (prepared: boolean, proof?: () => boolean) => void,
   ): void {
     const gate = this.farBakeGate;
     if (!gate) {
@@ -941,7 +1017,7 @@ export class CharacterVisual {
         // flight: the settle belongs to a node this visual no longer draws.
         if (this.disposed || node.parent === null) return;
         node.visible = true;
-        revealed?.(ready?.() !== false);
+        revealed?.(ready?.() !== false, ready);
       });
     } catch (err) {
       // A gate that rejects outright (a lane shut down under a graphics
@@ -1005,11 +1081,18 @@ export class CharacterVisual {
    *  at construction: most of a crowd stands close and never needs one. This
    *  latches so a bake that yields nothing is not retried every crossing. */
   private farBakeTried = false;
-  /** Waiting on the per-frame bake budget (takeFarBakeBudget): the band
-   *  crossed but this part set's slot was taken, so update() retries. The
-   *  visual stays articulated meanwhile (correct, just not yet cheap). */
+  /** A far body whose bake could not be asked for yet, so update() asks again: it
+   *  waits on the per-frame bake budget (takeFarBakeBudget: the band crossed but
+   *  this part set's slot was taken), or it is a WOC body still waiting for its
+   *  head (attemptWocFar). The visual stays articulated meanwhile (correct, just
+   *  not yet cheap). */
   private farBakePending = false;
   private shadowProxy: THREE.Mesh | null = null;
+  /** A WOC body's shadow in the proxy band while its own far bake cannot cast it: the
+   *  key's stand-in silhouette (woc_shadow_stand_in.ts), mounted at construction so the
+   *  body's own creation gate links it. Null on every other rig, and on a tier that
+   *  casts no dynamic shadow. */
+  private shadowStandIn: THREE.Mesh | null = null;
   /** The far mesh and its shadow proxy under one node, so the compile gate
    *  walks both (colour + depth arms) in one pass. */
   private farWrap: THREE.Group | null = null;
@@ -1293,8 +1376,10 @@ export class CharacterVisual {
     // A WOC body's geometry level, fixed for its life: the model and both dressings draw it
     // (woc_lod_core.ts; a graphics change rebuilds every visual).
     const wocLod = wocBuildLod(opts);
+    // ...and the head it is born with: the look its host named, else the type's default
+    const wocHead = opts?.wocHead ?? null;
     this.model = timeBuildSpan('view-part:assemble', () =>
-      assembleModel(this.def, weaponItemId, offhandItemId, look, { ...opts, wocLod }),
+      assembleModel(this.def, weaponItemId, offhandItemId, look, { ...opts, wocLod, wocHead }),
     );
     // Release-on-throw for everything below: the retry gate re-runs this whole
     // constructor when a streamed asset lands late (a designed path, not an
@@ -1316,14 +1401,15 @@ export class CharacterVisual {
           this.tintedRigClaims,
         ),
       );
-      // A WOC body's modular head (the files resident at build hung by assembleModel,
-      // the rest attached the frame they land): its tint wrap goes on before the
-      // material snapshot below, so the body's first draw links the tinted program.
+      // A WOC body's modular head (the pieces of its look resident at build hung by
+      // assembleModel, the rest hung the frame they land): its tint wrap goes on before
+      // the material snapshot below, so the body's first draw links the tinted program.
       if (prep.def.wocCharacter) {
         this.wocHead = new WocHeadDressing(
           this.wocHeadHost(),
           wocHeadTypeForGender(prep.def.wocCharacter.fit),
           wocLod,
+          wocHead,
         );
         this.wocHead.retint();
         this.wocFarTint = new WocFarTint();
@@ -1404,6 +1490,11 @@ export class CharacterVisual {
       // hair and outfit. Theirs is baked from their own part set instead, and
       // lazily (buildComposedFar), because most of a crowd stands close enough
       // that the mesh would never be drawn.
+      //
+      // A WOC body's far LOD is baked from what it wears too (woc_far_bake.ts), and
+      // its key bakes no far mesh at all (prepareVisual): nothing is built here that
+      // its first dressing would only throw away. What it mounts is the key's shadow
+      // stand-in, the one thing it casts in the proxy band before that bake exists.
       const idleGeo = prep.idleGeo;
       if (idleGeo && !this.look) {
         timeBuildSpan('view-part:far-bake', () =>
@@ -1421,6 +1512,8 @@ export class CharacterVisual {
             prep.shadowGeo,
           ),
         );
+      } else if (prep.def.wocCharacter && prep.shadowGeo) {
+        this.mountShadowStandIn(prep.shadowGeo);
       }
 
       if (this.wocHeadAwaited) this.syncFarVisibility();
@@ -1446,13 +1539,14 @@ export class CharacterVisual {
         if (clip) this.actions.set(name, this.mixer.clipAction(clip));
       }
       // A two-strike dual-wield clip is minted as two one-shots, one per hand
-      // (ClipMap.dualWieldSplit), so a swing plays its own strike only.
+      // (ClipMap.dualWieldSplit), so a swing plays its own strike only. The halves are
+      // cut once per source clip and shared by every rig (clip_split.ts sharedClipSplit).
       const dual = prep.def.clips.attackByHand?.dualwield;
       const dualClip = dual ? prep.clips.get(dual) : undefined;
       const split = prep.def.clips.dualWieldSplit;
       if (dual && dualClip && split !== undefined && split > 0 && split < dualClip.duration) {
         const names = dualWieldHalfNames(dual);
-        const [main, off] = splitClipAt(dualClip, split, names);
+        const [main, off] = sharedClipSplit(dualClip, split, names);
         this.actions.set(names[0], this.mixer.clipAction(main));
         this.actions.set(names[1], this.mixer.clipAction(off));
       }
@@ -1461,7 +1555,7 @@ export class CharacterVisual {
       for (const cut of prep.def.clips.clipSplits ?? []) {
         const source = prep.clips.get(cut.clip);
         if (!source || !(cut.at > 0) || cut.at >= source.duration) continue;
-        const [head, tail] = splitClipAt(source, cut.at, [cut.names[0], cut.names[1]]);
+        const [head, tail] = sharedClipSplit(source, cut.at, cut.names);
         this.actions.set(cut.names[0], this.mixer.clipAction(head));
         this.actions.set(cut.names[1], this.mixer.clipAction(tail));
       }
@@ -1543,11 +1637,13 @@ export class CharacterVisual {
       this.braceUntil = extendBrace(this.braceUntil, this.clock);
     }
     if (this.surfaceResponse.update(dt, this.root, this.height)) this.applyVisualMaterials();
-    // A streamed armor file that landed (or a better tier of one): attach it and
-    // re-dress, on the per-frame path like every other late attach.
+    // A streamed armor file that landed (or a better tier of one): the dressing
+    // attaches it (at once with no work queue behind this body, else as a unit
+    // of it), and the re-dress that follows is here, on the per-frame path.
     if (this.wocArmor?.poll()) this.redressWoc();
-    // A head file the look wants landed (hang it, gated) or a reveal changed the drawn
-    // head (re-dress, so the far bake keys on it): both on the per-frame path.
+    // A head piece the look wants can hang (its file landed: hang it, gated) or a reveal
+    // changed the drawn head (re-dress, so the far bake keys on it): both on the per-frame
+    // path.
     else if (this.wocHead?.poll() || this.wocHeadRedress) {
       this.wocHeadRedress = false;
       this.redressWoc();
@@ -1564,16 +1660,17 @@ export class CharacterVisual {
     // on the per-frame path, never in the gate callback (see effectSwapSettled).
     if (this.effectSwapSettled) this.commitPendingEffectSwap();
     // A far crossing that lost the bake-budget race retries here until its
-    // part set gets a slot (or someone else bakes it, making the peek free).
-    if (
-      this.farBakePending &&
-      (this.far || (this.wocFarParts && this.proxyShadowWanted)) &&
-      !this.farBakeTried
-    ) {
+    // part set gets a slot (or someone else bakes it, making the peek free), and
+    // so does one whose body still waited for its head. Only a FAR body asks: the
+    // shadow plan never bakes (a WOC body casts its key's stand-in meanwhile).
+    if (this.farBakePending && this.far && !this.farBakeTried) {
       this.attemptComposedFar();
       this.syncFarVisibility();
     }
     this.hitCooldown = Math.max(0, this.hitCooldown - dt);
+    // A body atlas the gate answered for is swapped in here, on the per-frame path and
+    // never in the gate callback (woc_atlas_swap.ts), as an effect swap is above.
+    if (this.wocAtlas.settled) this.wocAtlas.commit();
     this.updateMetamorphWings(dt, s, reducedMotion);
     this.formAdornments?.update(
       dt,
@@ -1985,6 +2082,10 @@ export class CharacterVisual {
       this.holdT -= dt;
       if (this.holdT <= 0) this.holdCooldown = HOLD_REFRACTORY_S;
     }
+    // A body atlas the gate answered for is taken on this per-frame path too: left for the
+    // next visible update, a crowd dressed behind the camera would all swap on the one
+    // frame it turns into view.
+    if (this.wocAtlas.settled) this.wocAtlas.commit();
   }
 
   /** Push the live base action down to `1 - k` under a climb overlay, restoring
@@ -2694,10 +2795,11 @@ export class CharacterVisual {
     for (const m of this.casters) m.castShadow = on;
   }
 
+  /** The shadow plan's answer for the proxy band. A flag and a visibility write, never a
+   *  bake: a body with no far bake of its own casts nothing here (a composed body, until
+   *  its first far crossing) or its key's stand-in (a WOC body). */
   setProxyShadow(on: boolean): void {
     this.proxyShadowWanted = on;
-    if (on && GFX.tier !== 'low' && this.wocFarParts && !this.farMesh && !this.farBakeTried)
-      this.attemptComposedFar();
     this.syncShadowProxyVisibility();
   }
 
@@ -2724,8 +2826,9 @@ export class CharacterVisual {
       // but a camera leaving a capital crosses every peer in one frame, so only
       // one genuinely new part set bakes per window and the rest go pending and
       // retry from update(). A part set someone already baked is free (the peek)
-      // and never competes for the slot.
-      if (!far && !(this.wocFarParts && this.proxyShadowWanted)) this.farBakePending = false;
+      // and never competes for the slot. (A WOC body's bake is units of the
+      // renderer's work queue instead, whose budget does that spreading.)
+      if (!far) this.farBakePending = false;
     }
     if (far && !this.farMesh && !this.farBakeTried) this.attemptComposedFar();
     // Every frame, not only on the edge: the compile gate's settle only clears
@@ -2739,7 +2842,7 @@ export class CharacterVisual {
   }
 
   /** The one place the rig/far-mesh handoff is written (far_lod_reveal_core):
-   *  the LOD edge, the budget retry and the per-frame setFar all land here, so
+   *  the LOD edge, update()'s retry and the per-frame setFar all land here, so
    *  a far mesh whose materials are still linking never draws early and the
    *  articulated rig never hides without a ready stand-in. */
   private syncFarVisibility(): void {
@@ -2756,12 +2859,26 @@ export class CharacterVisual {
   }
 
   private syncShadowProxyVisibility(): void {
-    if (!this.shadowProxy) return;
-    const show = bodyDrawn(
-      shadowProxyShown(this.proxyShadowWanted, this.farMesh !== null, this.farCompilePending),
-      this.wocHeadAwaited,
-    );
-    if (this.shadowProxy.visible !== show) this.shadowProxy.visible = show;
+    const hasFar = this.farMesh !== null;
+    if (this.shadowProxy) {
+      const show = bodyDrawn(
+        shadowProxyShown(this.proxyShadowWanted, hasFar, this.farCompilePending),
+        this.wocHeadAwaited,
+      );
+      if (this.shadowProxy.visible !== show) this.shadowProxy.visible = show;
+    }
+    // a WOC body's stand-in casts for as long as its own baked silhouette cannot
+    if (this.shadowStandIn) {
+      const show = bodyDrawn(
+        shadowStandInShown(
+          this.proxyShadowWanted,
+          this.shadowProxy !== null,
+          this.farCompilePending,
+        ),
+        this.wocHeadAwaited,
+      );
+      if (this.shadowStandIn.visible !== show) this.shadowStandIn.visible = show;
+    }
   }
 
   /** Install (or clear) the renderer's compile gate for far bakes minted after
@@ -2777,6 +2894,9 @@ export class CharacterVisual {
     if (gate && work) queueOfGate.set(gate, work);
     const queue = work ?? (gate ? queueOfGate.get(gate) : undefined);
     if (queue) this.workQueue = queue;
+    // ...and the armor store rides the same queue: a set that lands is prepared as a
+    // unit of it, ahead of any wearer's attach (woc_armor_packs.ts)
+    if (queue) setWocArmorWorkQueue(queue);
     this.wocHead?.gateChanged();
     this.wocArmor?.gateChanged();
     this.wocAtlas.restart();
@@ -2784,9 +2904,20 @@ export class CharacterVisual {
     if (this.weaponAuraSanguine) this.rebuildWeaponAura();
     this.dropPendingFarMaterials();
     this.farCompilePending = false;
+    // ...and a far bake asked of the previous queue may never be run: a body still far
+    // asks the new one on its next frame, also when the previous queue had already
+    // answered that it would never bake (it shut down under the ask).
+    this.dropWocFarJob();
+    if (this.wocFarParts && !this.farMesh && !this.wocFarLease) this.farBakeTried = false;
     // Same reason as the far arm: a settle the old renderer generation dropped
     // must not leave this visual waiting forever on an effect it already wears.
+    // A swap that was still in flight is planned again behind THIS gate: dropped and
+    // forgotten, the rig kept the materials of an effect state it had already left
+    // (opaque while stealthed, a ghost after the ghost run) until some later edge
+    // happened to sweep it.
+    const replan = this.effectSwapScratch !== null;
     this.dropPendingEffectSwap();
+    if (replan && !this.disposed) this.applyVisualMaterials();
   }
 
   /** Route a freshly minted far bake (mesh + shadow proxy) through the compile
@@ -2806,12 +2937,20 @@ export class CharacterVisual {
     });
   }
 
-  /** One budgeted attempt at the composed far LOD. Free when the part set is
-   *  already baked; otherwise takes the frame slot or goes pending. */
+  /** One attempt at the composed far LOD, budgeted: free when the part set is already
+   *  baked; otherwise it takes the frame slot or goes pending. A WOC body behind a
+   *  renderer never bakes here: its bake is units of the work queue (attemptWocFar). */
   private attemptComposedFar(): void {
     if (!this.look && !this.wocFarParts) return;
+    if (this.wocFarParts && this.attemptWocFar()) return;
     const cached = this.wocFarParts
-      ? peekWocFarBake(this.key, this.wocFarParts, this.wocFarFiles, this.wocFarHead)
+      ? peekWocFarBake(
+          this.key,
+          this.wocFarParts,
+          this.wocFarFiles,
+          this.wocFarHead,
+          this.wocFarKey ?? undefined,
+        )
       : this.look && peekModularFarBake(this.key, this.look);
     if (!cached && !takeFarBakeBudget()) {
       this.farBakePending = true;
@@ -2821,9 +2960,142 @@ export class CharacterVisual {
     this.buildComposedFar();
   }
 
-  /** An equipment edge drops the obsolete silhouette, restoring the rig until
-   *  its replacement passes the same budget and compile gate as composed LOD. */
+  /**
+   * A WOC body's far bake, off the frame. Nothing is baked for a body that draws nothing
+   * yet (it still waits for its head), nor for one whose head just changed under a
+   * dressing update() has not run yet: either bake would freeze a head the body is about
+   * to stop drawing (none at all, for the first) and be thrown away the frame the far key
+   * catches up, so it stays pending and update() asks again. A body behind a renderer
+   * (a compile gate, and the work queue that rode in with it) hands the bake to that queue
+   * and keeps its rig until its mount unit has run. True when this call dealt with the
+   * attempt; false for a body with none (a direct build, a preview, a test), which bakes
+   * on the spot under the bake budget, as a composed body does.
+   */
+  private attemptWocFar(): boolean {
+    // A head piece still on its way (a hairstyle joining a head that stands in bare) re-keys
+    // the bake the moment it joins (dressWoc): the rig stands in until then, so a file
+    // landing late never costs this body a second bake. A file that failed is not on its
+    // way: the head is at rest in what it holds, and bakes as it is.
+    if (this.wocHeadAwaited || this.wocHeadRedress || this.wocHead?.joining) {
+      this.farBakePending = true;
+      return true;
+    }
+    const queue = this.rendererWorkQueue();
+    if (!queue) return false;
+    this.farBakePending = false;
+    if (!this.wocFarJob) this.queueWocFar(queue);
+    return true;
+  }
+
+  /** The work queue of the renderer behind this body, or null for a body with no gate (a
+   *  queue outlives the gate it came with only on a body whose gate was taken away). A
+   *  pooled body is handed its gate alone, and one taken before the renderer had paired
+   *  that gate with its queue met no queue then: it finds it here, by the gate, the first
+   *  time it needs one. */
+  private rendererWorkQueue(): CharacterWorkQueue | null {
+    const gate = this.farBakeGate;
+    if (!gate) return null;
+    this.workQueue ??= queueOfGate.get(gate) ?? null;
+    return this.workQueue;
+  }
+
+  /**
+   * Ask the work queue for this body's far LOD: the bake's units (shared with every body
+   * in the same look, and none at all for a look already baked: woc_far_bake.ts
+   * queueWocFarBake), then this body's own mount as one more unit, so a crowd crossing
+   * the band together mounts a few bodies a frame. The far mesh is an optimization of a
+   * body its rig already draws whole, so its units sit with the merged stand-ins: below
+   * the live views, in the class that still gets a slot a frame under load.
+   */
+  private queueWocFar(queue: CharacterWorkQueue): void {
+    const parts = this.wocFarParts;
+    const fit = this.def.wocCharacter?.fit;
+    if (!parts || !fit) return;
+    const priority = GPU_WORK_PRIORITY.VISIBLE_PREWARM;
+    const job = queueWocFarBake(
+      this.key,
+      parts,
+      this.wocFarFiles,
+      this.wocFarHead,
+      queue,
+      priority,
+      this.wocFarKey ?? undefined,
+    );
+    this.wocFarJob = job;
+    void job.ready
+      .then((baked) => {
+        // an ask dropped meanwhile mounts nothing, so it asks the queue for nothing
+        if (this.wocFarJob !== job) return undefined;
+        // nothing to mount: the look bakes to nothing, or the bake stopped and said so
+        if (!baked) return this.endWocFarJob(job);
+        return queue.run(() => this.mountWocFar(job), priority, `${WOC_FAR_MOUNT_LABEL}:${fit}`);
+      })
+      .catch((err) => {
+        // the mount unit was refused (a queue shut down with its renderer) or threw
+        warnWocFarStopped(`mount:${this.key}`, err);
+        this.endWocFarJob(job);
+      });
+  }
+
+  /** The mount unit of a queued far bake: build this body's far mesh from the bake its
+   *  units just finished, hidden behind the compile gate. The ask holds that bake in the
+   *  cache until here, so this retains it and never bakes. An ask dropped since (a
+   *  re-dress, a new gate, a dispose) mounts nothing. The reveal is the next per-frame
+   *  setFar's, never this unit's (see setFar). */
+  private mountWocFar(job: WocFarBakeRequest): void {
+    if (this.wocFarJob !== job) return;
+    this.wocFarJob = null;
+    try {
+      if (this.disposed || this.farMesh || this.farBakeTried) return;
+      // the head changed under a dressing update() has not run yet, or a piece of it is
+      // joining: the look this bake froze is about to be re-keyed, so the body asks again
+      // once it is dressed
+      if (this.wocHeadRedress || this.wocHead?.joining) {
+        this.farBakePending = this.far;
+        return;
+      }
+      this.buildComposedFar();
+    } finally {
+      // after the body's own lease is taken: the bake never goes idle in between
+      job.release();
+    }
+  }
+
+  /** A far ask that came to nothing: the body keeps its rig, and asks again only once it
+   *  is dressed again. Never a bake on the spot in its place. */
+  private endWocFarJob(job: WocFarBakeRequest): undefined {
+    job.release();
+    if (this.wocFarJob !== job) return undefined;
+    this.wocFarJob = null;
+    this.farBakeTried = true;
+    this.farBakePending = false;
+    return undefined;
+  }
+
+  /** The body is parked (its entity streamed out and the pool kept it): nobody sees it,
+   *  so it stops waiting for a far mesh. Its look leaves the line unless another body
+   *  waits for it too. */
+  parked(): void {
+    this.dropWocFarJob();
+    this.farBakePending = false;
+  }
+
+  /** Let go of a queued far bake this body no longer wants. */
+  private dropWocFarJob(): void {
+    this.wocFarJob?.release();
+    this.wocFarJob = null;
+  }
+
+  /** An equipment edge drops the obsolete silhouette, restoring the rig until its
+   *  replacement is baked (units of the work queue, or the bake budget for a body with no
+   *  queue) and linked behind the compile gate. A body with none mounted only forgets
+   *  what it asked for: there is nothing to take down, so nothing is swept. */
   private invalidateWocFar(): void {
+    this.dropWocFarJob();
+    this.farBakeTried = false;
+    this.farBakePending = this.far;
+    // (a lease with no mesh is a mint that threw part way: it is given back like any other)
+    if (!this.farWrap && !this.wocFarLease) return;
     this.dropPendingFarMaterials();
     this.dropPendingEffectSwap();
     this.farWrap?.removeFromParent();
@@ -2832,8 +3104,6 @@ export class CharacterVisual {
     this.farMaterials = null;
     this.shadowProxy = null;
     this.farCompilePending = false;
-    this.farBakeTried = false;
-    this.farBakePending = this.far || this.proxyShadowWanted;
     releaseTintedMaterials(this.tintedFarClaims);
     this.tintedFarClaims.clear();
     this.wocFarLease?.release();
@@ -2868,10 +3138,38 @@ export class CharacterVisual {
     this.poseWrap.add(wrap);
   }
 
+  /** Hang a WOC key's shadow stand-in on the pose wrapper, hidden until the shadow plan
+   *  wants a proxy this body's own far bake cannot cast (syncShadowProxyVisibility). A
+   *  mesh over the key's shared geometry and the shared shadow-only material: nothing to
+   *  derive, nothing to free. */
+  private mountShadowStandIn(geo: THREE.BufferGeometry): void {
+    const standIn = new THREE.Mesh(geo, shadowOnlyMat());
+    standIn.name = 'character_shadow_stand_in';
+    standIn.castShadow = true;
+    standIn.visible = false;
+    this.shadowStandIn = standIn;
+    this.poseWrap.add(standIn);
+  }
+
   /** Bake (or reuse) this composed body's far LOD. Leaves farMesh null if the
    *  look bakes to nothing, in which case the character simply keeps its
-   *  articulated model at distance (correct, just not as cheap). */
+   *  articulated model at distance (correct, just not as cheap). Under its own
+   *  view-lane kind in the CPU build ledger: it runs from a far crossing or a unit of
+   *  the work queue, never inside a view build. */
   private buildComposedFar(): void {
+    const started = performance.now();
+    try {
+      this.mintComposedFar();
+    } finally {
+      recordBuildSpan(
+        this.wocFarParts ? WOC_FAR_MOUNT_SPAN : 'view:composed-far-bake',
+        performance.now() - started,
+        started,
+      );
+    }
+  }
+
+  private mintComposedFar(): void {
     this.farBakeTried = true;
     if (this.wocFarParts) {
       this.wocFarLease = retainWocFarBake(
@@ -2879,6 +3177,7 @@ export class CharacterVisual {
         this.wocFarParts,
         this.wocFarFiles,
         this.wocFarHead,
+        this.wocFarKey ?? undefined,
       );
     }
     const woc = this.wocFarLease?.bake;
@@ -4184,6 +4483,8 @@ export class CharacterVisual {
   dispose(): void {
     this.actionProps?.restore();
     this.disposed = true;
+    // first: whatever below throws, no bake goes on for a body that is gone
+    this.dropWocFarJob();
     this.wocAtlas.dispose();
     // Give the streamed armor files back: a set nobody wears is freed after the
     // idle window (woc_armor_packs.ts).
@@ -4488,11 +4789,12 @@ export class CharacterVisual {
     return marked;
   }
 
+  /** Whether the rig carries a clip. Built once: action() asks about ten times a frame. */
+  private readonly hasClip = (name: string): boolean => this.actions.has(name);
+
   private action(name: string | undefined): THREE.AnimationAction | null {
     if (!name) return null;
-    const clip = this.loadoutSwap
-      ? swappedClip(this.loadoutSwap, name, (n) => this.actions.has(n))
-      : name;
+    const clip = this.loadoutSwap ? swappedClip(this.loadoutSwap, name, this.hasClip) : name;
     return clip ? (this.actions.get(clip) ?? null) : null;
   }
 
@@ -4899,12 +5201,14 @@ export class CharacterVisual {
     this.currentOneShotIsCastExit = false;
   }
 
-  /** The second action of a one-shot's clip (a clone under the same name), minted on first
-   *  use; the two alternate on repeated re-triggers. */
+  /** The second action of a one-shot's clip, minted on first use; the two alternate on
+   *  repeated re-triggers. It rides the clip's twin (a clone under the same name, one per
+   *  source clip and shared by every rig: clip_twin.ts), since this mixer already holds
+   *  the one action it keeps per clip. */
   private twinOf(a: THREE.AnimationAction): THREE.AnimationAction {
     let twin = this.twinActions.get(a);
     if (!twin) {
-      twin = this.mixer.clipAction(a.getClip().clone());
+      twin = this.mixer.clipAction(twinClipOf(a.getClip()));
       this.twinActions.set(a, twin);
       this.twinActions.set(twin, a);
     }

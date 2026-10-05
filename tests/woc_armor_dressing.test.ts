@@ -1,175 +1,36 @@
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { WocCharacterManifest } from '../src/render/characters/woc_character_manifest';
+import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
+import {
+  armorFile,
+  bones,
+  type HeldQueue,
+  armorStoreHarness as harness,
+  heldQueue,
+  manifest,
+  model,
+  partNames,
+  releaseArmorStoreHarness,
+} from './helpers/woc_armor_store_harness';
 
 // The streamed-armor lifecycle one character sees (the 2026-09-25 character size gameplan,
 // steps 5 and 6): a set not yet resident draws nothing (the suit), a resident lower tier
 // stands in while the wanted tier streams, the wanted tier takes over once its reveal
 // settles (the file it replaces drawing until then: 2026-10-03), every attached node goes
-// through the host's setup and compile gate, and a set nobody wears is freed after the idle
-// window. And the merged stand-in a world view asks for (woc_armor_merge.ts): never mounted
-// by default, built from the poll, dropped at once by the host's redress when the drawn parts
-// change, taken down before a file it folds detaches. Only the loader and the graphics profile
-// are stubbed. Most cases dress a CROWD character (the medium file on any preset but low), a
-// set's one-file path; the local player's assembled high pack has its own suite
-// (tests/woc_armor_high_pack.test.ts).
-
-const manifest: WocCharacterManifest = {
-  schemaVersion: 1,
-  rigId: 'dressing-fixture',
-  fit: 'male',
-  baseNodes: ['Character_Body'],
-  appearance: {},
-  defaultAppearance: {},
-  armorSlots: { head: { label: 'Head' }, arms: { label: 'Arms' } },
-  items: {
-    male_test_helm: { label: 'Helm', slot: 'head', set: 'test', nodes: ['Armor_Test_Helm'] },
-    male_test_shoulders: {
-      label: 'Shoulders',
-      slot: 'arms',
-      set: 'test',
-      nodes: ['Armor_Test_Shoulder_L'],
-    },
-  },
-  defaultEquipment: { head: 'male_test_helm', arms: 'male_test_shoulders' },
-  animationNames: [],
-};
-
-function bones(): { root: THREE.Group; spine: THREE.Bone; list: THREE.Bone[] } {
-  const root = new THREE.Group();
-  const hips = new THREE.Bone();
-  hips.name = 'root';
-  const spine = new THREE.Bone();
-  spine.name = 'spine';
-  spine.position.set(0, 1, 0);
-  root.add(hips);
-  hips.add(spine);
-  root.updateMatrixWorld(true);
-  return { root, spine, list: [hips, spine] };
-}
-
-function tri(): THREE.BufferGeometry {
-  const g = new THREE.BufferGeometry();
-  g.setAttribute(
-    'position',
-    new THREE.Float32BufferAttribute([0, 1, 0, 0.2, 1.2, 0, -0.2, 1.4, 0], 3),
-  );
-  g.setAttribute(
-    'skinIndex',
-    new THREE.Uint16BufferAttribute([1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0], 4),
-  );
-  g.setAttribute(
-    'skinWeight',
-    new THREE.Float32BufferAttribute([1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0], 4),
-  );
-  return g;
-}
-
-/** The character: a base body on the rig. */
-function model(): THREE.Group {
-  const r = bones();
-  const body = new THREE.SkinnedMesh(tri(), new THREE.MeshBasicMaterial());
-  body.name = 'Character_Body';
-  r.root.add(body);
-  body.bind(new THREE.Skeleton(r.list));
-  return r.root;
-}
-
-/** One armor file: a skinned helm and a rigid shoulder pad on its own rig copy. */
-function armorFile(tier: string) {
-  const r = bones();
-  const material = new THREE.MeshBasicMaterial();
-  material.name = tier;
-  const helm = new THREE.SkinnedMesh(tri(), material);
-  helm.name = 'Armor_Test_Helm';
-  r.root.add(helm);
-  helm.bind(new THREE.Skeleton(r.list));
-  const pad = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.1), material);
-  pad.name = 'Armor_Test_Shoulder_L';
-  r.spine.add(pad);
-  return { scene: r.root, animations: [] };
-}
-
-/** `tier`: the graphics preset. `reveals`: how the host's compile gate answers a reveal.
- *  'never' (the default: the attach cases only count the calls), 'now' (no gate: the node is
- *  live at once), or 'gated' (hidden until `settle`, as a link in flight). */
-async function harness(
-  tier: 'low' | 'medium' | 'high',
-  reveals: 'never' | 'now' | 'gated' = 'never',
-  file: (fileTier: string) => { scene: THREE.Object3D; animations: never[] } = armorFile,
-) {
-  vi.resetModules();
-  const pending = new Map<string, (value: unknown) => void>();
-  const released: string[] = [];
-  vi.doMock('../src/render/gfx', () => ({ GFX: { tier, constrainedMemory: false } }));
-  vi.doMock('../src/render/assets/loader', () => ({
-    loadGltf: vi.fn(
-      (url: string) =>
-        new Promise((resolve) => {
-          pending.set(url, resolve);
-        }),
-    ),
-    releaseGltf: vi.fn((url: string) => released.push(url)),
-  }));
-  const packs = await import('../src/render/characters/woc_armor_packs');
-  const dressing = await import('../src/render/characters/woc_armor_dressing');
-  const core = await import('../src/render/characters/woc_armor_core');
-  let now = 0;
-  packs.setWocArmorClockForTest(() => now);
-  const land = async (fileTier: string) => {
-    const url = core.wocArmorPackUrl('male', 'test', fileTier as 'low');
-    pending.get(url)?.(file(fileTier));
-    await Promise.resolve();
-    await Promise.resolve();
-  };
-  const linking: ((prepared: boolean) => void)[] = [];
-  const host = {
-    model: model(),
-    adopt: vi.fn((_node: THREE.Object3D): void => undefined),
-    forget: vi.fn((_node: THREE.Object3D): void => undefined),
-    reveal: vi.fn((node: THREE.Object3D, live?: (prepared: boolean) => void): void => {
-      if (reveals === 'now') live?.(true);
-      if (reveals !== 'gated') return;
-      node.visible = false;
-      linking.push((prepared) => {
-        // the real gate drops the settle of a node detached meanwhile
-        if (node.parent === null) return;
-        node.visible = true;
-        live?.(prepared);
-      });
-    }),
-    /** The articulated rig draws (a case that tests a far or hidden body swaps this). */
-    rigDrawn: (): boolean => true,
-    /** No renderer's work queue behind the body, unless a case installs one. */
-    schedule: undefined as ((work: () => void, label: string) => void) | undefined,
-  };
-  return {
-    packs,
-    core,
-    dressing,
-    host,
-    land,
-    pending,
-    released,
-    advance: (ms: number) => {
-      now += ms;
-    },
-    /** Every reveal in flight settles (`prepared`: its programs are known linked; false is a
-     *  gate that gave up). */
-    settle: (prepared = true) => {
-      for (const reveal of linking.splice(0)) reveal(prepared);
-    },
-    /** Only the first reveal in flight settles. */
-    settleOne: (prepared = true) => {
-      linking.shift()?.(prepared);
-    },
-  };
-}
+// through the host's setup and compile gate, and a set nobody wears is freed by the idle
+// rule of its tier. A body with the renderer's work queue behind it attaches a file as ONE
+// unit of that queue, once the store prepared it as a unit of its own, and never inside a
+// frame's poll; a body with none (a preview, a portrait) attaches on the spot. And the
+// merged stand-in a world view asks for (woc_armor_merge.ts): never mounted by default,
+// built from the poll, dropped at once by the host's redress when the drawn parts change,
+// taken down before a file it folds detaches. Only the loader and the graphics profile are
+// stubbed (tests/helpers/woc_armor_store_harness.ts). Most cases dress a CROWD character (the
+// medium file on any preset but low), a set's one-file path; the local player's assembled
+// high pack has its own suite (tests/woc_armor_high_pack.test.ts), and the store's own rules
+// theirs (tests/woc_armor_packs.test.ts).
 
 afterEach(() => {
-  vi.doUnmock('../src/render/gfx');
-  vi.doUnmock('../src/render/assets/loader');
-  vi.resetModules();
+  releaseArmorStoreHarness();
 });
 
 describe('a WOC character wearing streamed armor', () => {
@@ -275,9 +136,11 @@ describe('a WOC character wearing streamed armor', () => {
     expect(d.poll()).toBe(false);
   });
 
-  it('asks an unprepared replacement again while the old file draws, and takes over all the same on the next try', async () => {
+  it('asks an unprepared replacement again while the old file draws, then keeps the old file and stops asking', async () => {
     const h = await harness('high', 'gated');
-    h.packs.ensureWocArmorPack(h.core.wocArmorPackUrl('male', 'test', 'low'));
+    const low = h.core.wocArmorPackUrl('male', 'test', 'low');
+    const medium = h.core.wocArmorPackUrl('male', 'test', 'medium');
+    h.packs.ensureWocArmorPack(low);
     await h.land('low');
     const d = new h.dressing.WocArmorDressing(h.host, manifest, 'crowd');
     d.want(['test']);
@@ -287,23 +150,194 @@ describe('a WOC character wearing streamed armor', () => {
     d.poll();
     const next = h.packs.wocArmorContainers(h.host.model)[1];
     const nextPieces = h.packs.wocArmorPieces(next);
-    const reveals = h.host.reveal.mock.calls.length;
+    expect(nextPieces).toHaveLength(2);
+    let reveals = h.host.reveal.mock.calls.length;
     // the gate gives up on both pieces: the old file stands in, so each is asked again
     h.settle(false);
-    expect(h.host.reveal.mock.calls.length).toBe(reveals + nextPieces.length);
+    expect(h.host.reveal.mock.calls.length).toBe(reveals + 2);
     expect(nextPieces.every((piece) => !piece.visible)).toBe(true);
     expect(lowPieces.every((piece) => piece.parent !== null && piece.visible)).toBe(true);
     expect(h.host.forget).not.toHaveBeenCalled();
-    expect(d.attachedFiles).toEqual([
-      { set: 'test', url: h.core.wocArmorPackUrl('male', 'test', 'low') },
-    ]);
-    // ...and a gate that keeps giving up does not keep the old file drawing for good
+    expect(d.attachedFiles).toEqual([{ set: 'test', url: low }]);
+    // ...and again: each piece has tries of its own (two pieces missing once each are not one
+    // piece missing twice)
     h.settle(false);
-    expect(nextPieces.every((piece) => piece.visible)).toBe(true);
-    expect(lowPieces.every((piece) => piece.parent === null)).toBe(true);
-    expect(d.attachedFiles).toEqual([
-      { set: 'test', url: h.core.wocArmorPackUrl('male', 'test', 'medium') },
-    ]);
+    expect(h.host.reveal.mock.calls.length).toBe(reveals + 4);
+    expect(h.packs.wocArmorContainers(h.host.model)).toHaveLength(2);
+    // a third miss on the very materials asked: the replacement comes off unseen. It never
+    // takes over unproven (that would link or upload inside a live frame), and the file it was
+    // to replace, the same armor at another sharpness, keeps drawing
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    h.settle(false);
+    // (named once on the dev channel: a body kept at the tier below is never a silent loss)
+    expect(logged).toHaveBeenCalledTimes(1);
+    expect(String(logged.mock.calls[0][0])).toContain(medium);
+    expect(h.packs.wocArmorContainers(h.host.model)).toHaveLength(1);
+    expect(nextPieces.every((piece) => piece.parent === null)).toBe(true);
+    expect(lowPieces.every((piece) => piece.parent !== null && piece.visible)).toBe(true);
+    expect(d.attachedFiles).toEqual([{ set: 'test', url: low }]);
+    expect(h.packs.wocArmorPackRefs(medium)).toBe(0);
+    expect(h.packs.wocArmorPackRefs(low)).toBe(1);
+    // only the replacement's two nodes left the host's bookkeeping
+    expect(h.host.forget.mock.calls.map(([node]) => node)).toEqual(nextPieces);
+    // the host hears once (the replacement's nodes are gone), and then every frame is free:
+    // refused, so nothing attaches it again and nothing asks the gate again
+    reveals = h.host.reveal.mock.calls.length;
+    expect(d.poll()).toBe(true);
+    for (let frame = 0; frame < 5; frame++) expect(d.poll()).toBe(false);
+    expect(d.isWaiting).toBe(false);
+    expect(h.host.reveal.mock.calls.length).toBe(reveals);
+    expect(h.packs.wocArmorContainers(h.host.model)).toHaveLength(1);
+    // the same kit handed in again changes nothing
+    expect(d.want(['test'])).toBe(false);
+    expect(h.packs.wocArmorContainers(h.host.model)).toHaveLength(1);
+    expect(h.host.reveal.mock.calls.length).toBe(reveals);
+    // a kit that really changed gives the file another try, and this time the gate links it
+    d.want(['test', 'other']);
+    expect(h.packs.wocArmorContainers(h.host.model)).toHaveLength(2);
+    expect(h.host.reveal.mock.calls.length).toBe(reveals + 2);
+    h.settle();
+    expect(d.attachedFiles).toEqual([{ set: 'test', url: medium }]);
+    d.dispose();
+  });
+
+  it('gives a refused replacement another try under a replaced gate', async () => {
+    const h = await harness('high', 'gated');
+    const medium = h.core.wocArmorPackUrl('male', 'test', 'medium');
+    h.packs.ensureWocArmorPack(h.core.wocArmorPackUrl('male', 'test', 'low'));
+    await h.land('low');
+    const d = new h.dressing.WocArmorDressing(h.host, manifest, 'crowd');
+    d.want(['test']);
+    h.settle();
+    await h.land('medium');
+    d.poll();
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    for (let round = 0; round < 3; round++) h.settle(false);
+    expect(h.packs.wocArmorContainers(h.host.model)).toHaveLength(1);
+    expect(d.poll()).toBe(true);
+    expect(d.poll()).toBe(false);
+    // the renderer generation changed: the refusal was the old gate's verdict
+    d.gateChanged();
+    expect(d.poll()).toBe(true);
+    expect(h.packs.wocArmorContainers(h.host.model)).toHaveLength(2);
+    h.settle();
+    expect(d.attachedFiles).toEqual([{ set: 'test', url: medium }]);
+    d.dispose();
+  });
+
+  it('does not count a reveal an effect edge spoiled: what the pieces wear now is asked for, as often as it takes', async () => {
+    const h = await harness('high', 'gated');
+    const low = h.core.wocArmorPackUrl('male', 'test', 'low');
+    const medium = h.core.wocArmorPackUrl('male', 'test', 'medium');
+    h.packs.ensureWocArmorPack(low);
+    await h.land('low');
+    const d = new h.dressing.WocArmorDressing(h.host, manifest, 'crowd');
+    d.want(['test']);
+    h.settle();
+    await h.land('medium');
+    d.poll();
+    const next = h.packs.wocArmorContainers(h.host.model)[1];
+    const nextPieces = h.packs.wocArmorPieces(next);
+    /** The host mounts another effect state (a buff glow, a hit response) on every mesh of
+     *  the replacement while the gate links it. */
+    const effectEdge = (): void => {
+      for (const piece of nextPieces) {
+        piece.traverse((o) => {
+          const mesh = o as THREE.Mesh;
+          if (mesh.isMesh) mesh.material = (mesh.material as THREE.Material).clone();
+        });
+      }
+    };
+    // far more unproven settles than a file's tries, every one of them because the materials
+    // moved under the gate: no verdict on the file, so it is neither refused nor taken over
+    for (let edge = 0; edge < 8; edge++) {
+      effectEdge();
+      h.settle(false);
+      expect(h.linking()).toBe(nextPieces.length);
+    }
+    expect(h.packs.wocArmorContainers(h.host.model)).toHaveLength(2);
+    expect(d.attachedFiles).toEqual([{ set: 'test', url: low }]);
+    // the edges did not spend the file's own tries either: it still has both
+    h.settle(false);
+    h.settle(false);
+    expect(h.packs.wocArmorContainers(h.host.model)).toHaveLength(2);
+    // the gate links what the pieces wear: the set is handed over
+    h.settle();
+    expect(d.attachedFiles).toEqual([{ set: 'test', url: medium }]);
+    expect(h.packs.wocArmorContainers(h.host.model)).toHaveLength(1);
+    d.dispose();
+  });
+
+  it('needs no proof for a piece with no mesh of its own (the Group of a file whose parts are all rigid)', async () => {
+    // a file with no skinned part: its Group is empty, and the renderer's proof for a target
+    // with no material is always "not prepared" (compile_target_readiness.ts)
+    const rigidOnly = (fileTier: string) => {
+      const r = bones();
+      const material = new THREE.MeshBasicMaterial();
+      material.name = fileTier;
+      const pad = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.1), material);
+      pad.name = 'Armor_Test_Shoulder_L';
+      r.spine.add(pad);
+      return { scene: r.root, animations: [] as never[] };
+    };
+    const h = await harness('high', 'gated', rigidOnly);
+    const low = h.core.wocArmorPackUrl('male', 'test', 'low');
+    const medium = h.core.wocArmorPackUrl('male', 'test', 'medium');
+    h.packs.ensureWocArmorPack(low);
+    await h.land('low');
+    const d = new h.dressing.WocArmorDressing(h.host, manifest, 'crowd');
+    d.want(['test']);
+    h.settle();
+    await h.land('medium');
+    d.poll();
+    const next = h.packs.wocArmorContainers(h.host.model)[1];
+    const [group, wrapper] = h.packs.wocArmorPieces(next);
+    expect(group.children).toEqual([]);
+    expect(wrapper.children).toHaveLength(1);
+    // the empty Group settles unproven, as it always will: not a miss, and never asked again
+    const reveals = h.host.reveal.mock.calls.length;
+    h.settleOne(false);
+    expect(h.host.reveal.mock.calls.length).toBe(reveals);
+    expect(d.attachedFiles).toEqual([{ set: 'test', url: low }]);
+    // the one piece that draws is proven: the set is handed over
+    h.settleOne(true);
+    expect(d.attachedFiles).toEqual([{ set: 'test', url: medium }]);
+    expect(h.packs.wocArmorContainers(h.host.model)).toHaveLength(1);
+    d.dispose();
+  });
+
+  it("shows a set's first file whatever the gate answers: only the suit stood in for it", async () => {
+    const h = await harness('medium', 'gated');
+    const medium = h.core.wocArmorPackUrl('male', 'test', 'medium');
+    const other = h.core.wocArmorPackUrl('male', 'other', 'medium');
+    const d = new h.dressing.WocArmorDressing(h.host, manifest, 'crowd');
+    d.want(['test']);
+    await h.land('medium');
+    expect(d.poll()).toBe(true);
+    const pieces = h.packs.wocArmorPieces(h.packs.wocArmorContainers(h.host.model)[0]);
+    let reveals = h.host.reveal.mock.calls.length;
+    // the gate gives up: the file draws all the same (a set linking on its first draw beats
+    // one that never shows), and is not asked for again
+    h.settle(false);
+    expect(pieces.every((piece) => piece.visible)).toBe(true);
+    expect(d.attachedFiles).toEqual([{ set: 'test', url: medium }]);
+    expect(h.host.reveal.mock.calls.length).toBe(reveals);
+    expect(h.packs.wocArmorContainers(h.host.model)).toHaveLength(1);
+    // a change of SET is that same arm: the old set is the wrong armor, so it comes off at
+    // once, and the new set's first file attaches straight and shows on the gate's give-up
+    h.packs.ensureWocArmorPack(other);
+    await h.land('medium', 'other');
+    reveals = h.host.reveal.mock.calls.length;
+    expect(d.want(['other'])).toBe(true);
+    expect(pieces.every((piece) => piece.parent === null)).toBe(true);
+    expect(h.packs.wocArmorPackRefs(medium)).toBe(0);
+    const otherPieces = h.packs.wocArmorPieces(h.packs.wocArmorContainers(h.host.model)[0]);
+    expect(h.host.reveal.mock.calls.length).toBe(reveals + otherPieces.length);
+    h.settle(false);
+    expect(otherPieces.every((piece) => piece.visible)).toBe(true);
+    expect(d.attachedFiles).toEqual([{ set: 'other', url: other }]);
+    expect(h.host.model.getObjectByName(partNames('other')[0])).toBeDefined();
+    expect(h.host.reveal.mock.calls.length).toBe(reveals + otherPieces.length);
     d.dispose();
   });
 
@@ -363,7 +397,7 @@ describe('a WOC character wearing streamed armor', () => {
     d.dispose();
   });
 
-  it('detaches a set no longer wanted, and frees a set nobody has worn for the idle window', async () => {
+  it('detaches a set no longer wanted, and keeps the file a crowd draws for the wearer who comes back', async () => {
     const h = await harness('medium');
     const url = h.core.wocArmorPackUrl('male', 'test', 'medium');
     const d = new h.dressing.WocArmorDressing(h.host, manifest, 'crowd');
@@ -373,41 +407,150 @@ describe('a WOC character wearing streamed armor', () => {
     const helm = h.host.model.getObjectByName('Armor_Test_Helm') as THREE.SkinnedMesh;
     const geometry = helm.geometry;
     const dispose = vi.spyOn(geometry, 'dispose');
-    // the rigid pad draws the parse's own geometry: freed with the file too
-    const pad = h.host.model.getObjectByName('Armor_Test_Shoulder_L') as THREE.Mesh;
-    const padDispose = vi.spyOn(pad.geometry, 'dispose');
     expect(d.want([])).toBe(true);
     expect(h.host.model.getObjectByName('Armor_Test_Helm')).toBeUndefined();
     expect(h.host.model.getObjectByName('Armor_Test_Shoulder_L')).toBeUndefined();
     expect(h.packs.wocArmorPackRefs(url)).toBe(0);
-    // still in memory inside the window (a re-equip attaches at once, no fetch)
-    h.advance(h.core.WOC_ARMOR_IDLE_EVICT_MS - 1);
-    h.packs.sweepWocArmorPacks();
+    // the crowd's tier on a desktop: idle for hours, and still in memory (nothing to read,
+    // prepare and attach again every few minutes)
+    h.advance(100 * h.core.WOC_ARMOR_IDLE_EVICT_MS);
+    expect(h.packs.sweepWocArmorPacks()).toEqual([]);
     expect(h.packs.wocArmorPackResident(url)).toBe(true);
     expect(dispose).not.toHaveBeenCalled();
-    h.advance(1);
-    expect(h.packs.sweepWocArmorPacks()).toEqual([url]);
-    expect(h.packs.wocArmorPackResident(url)).toBe(false);
-    expect(dispose).toHaveBeenCalled();
-    expect(padDispose).toHaveBeenCalled();
-    expect(h.released).toEqual([url]);
+    expect(h.released).toEqual([]);
+    // the wearer comes back: no fetch, no second prepare, the very geometry it left
+    h.fetches.length = 0;
+    expect(d.want(['test'])).toBe(true);
+    expect(h.fetches).toEqual([]);
+    expect(h.bind.prepareWocArmor).toHaveBeenCalledTimes(1);
+    expect((h.host.model.getObjectByName('Armor_Test_Helm') as THREE.Mesh).geometry).toBe(geometry);
     d.dispose();
   });
 
-  it('frees an idle set from the per-frame poll alone, with no later release', async () => {
+  it('frees a file of a tier the preset draws for nobody after the long window, geometry and parse with it', async () => {
+    const h = await harness('high', 'now');
+    const low = h.core.wocArmorPackUrl('male', 'test', 'low');
+    const medium = h.core.wocArmorPackUrl('male', 'test', 'medium');
+    // a low file on a preset whose crowd draws medium (a portrait's own fetch, a preset
+    // change): it stands in until the medium file lands
+    h.packs.ensureWocArmorPack(low);
+    await h.land('low');
+    const d = new h.dressing.WocArmorDressing(h.host, manifest, 'crowd');
+    d.want(['test']);
+    const helm = h.host.model.getObjectByName('Armor_Test_Helm') as THREE.SkinnedMesh;
+    const dispose = vi.spyOn(helm.geometry, 'dispose');
+    // the rigid pad draws the parse's own geometry: freed with the file too
+    const pad = h.host.model.getObjectByName('Armor_Test_Shoulder_L') as THREE.Mesh;
+    const padDispose = vi.spyOn(pad.geometry, 'dispose');
+    await h.land('medium');
+    expect(d.poll()).toBe(true);
+    expect(d.attachedFiles).toEqual([{ set: 'test', url: medium }]);
+    expect(h.packs.wocArmorPackRefs(low)).toBe(0);
+    // still in memory inside the window (a preset flipped back finds it, no fetch)
+    h.advance(h.core.WOC_ARMOR_IDLE_EVICT_MS - 1);
+    expect(h.packs.sweepWocArmorPacks()).toEqual([]);
+    expect(h.packs.wocArmorPackResident(low)).toBe(true);
+    expect(dispose).not.toHaveBeenCalled();
+    h.advance(1);
+    expect(h.packs.sweepWocArmorPacks()).toEqual([low]);
+    expect(h.packs.wocArmorPackResident(low)).toBe(false);
+    expect(dispose).toHaveBeenCalled();
+    expect(padDispose).toHaveBeenCalled();
+    expect(h.released).toEqual([low]);
+    // the worn medium file is nobody's to free
+    expect(h.packs.wocArmorPackResident(medium)).toBe(true);
+    d.dispose();
+  });
+
+  it('frees an idle set from the per-frame poll alone on a phone, soon and with no later release', async () => {
     const h = await harness('medium');
+    // the phone-class memory profile: low for everyone, and nothing kept past its window
+    h.gfx.constrainedMemory = true;
+    const url = h.core.wocArmorPackUrl('male', 'test', 'low');
+    const d = new h.dressing.WocArmorDressing(h.host, manifest, 'crowd');
+    d.want(['test']);
+    await h.land('low');
+    d.poll();
+    d.want([]); // released now; nothing else will release again
+    const other = new h.dressing.WocArmorDressing(h.hostOf(), manifest, 'crowd');
+    h.advance(h.core.WOC_ARMOR_CONSTRAINED_IDLE_EVICT_MS - 1);
+    other.poll();
+    expect(h.packs.wocArmorPackResident(url)).toBe(true);
+    // the poll sweeps on its own clock (a few seconds), so the set is gone within a sweep of
+    // its window: well inside the minute after its last wearer left
+    h.advance(1 + 5000);
+    other.poll(); // any character's frame
+    expect(h.packs.wocArmorPackResident(url)).toBe(false);
+    expect(h.released).toEqual([url]);
+    d.dispose();
+    other.dispose();
+  });
+
+  it('takes a file off again when its attach throws, and does not try it again every frame', async () => {
+    const h = await harness('medium', 'now');
     const url = h.core.wocArmorPackUrl('male', 'test', 'medium');
     const d = new h.dressing.WocArmorDressing(h.host, manifest, 'crowd');
     d.want(['test']);
     await h.land('medium');
-    d.poll();
-    d.want([]); // released now; nothing else will release again
-    const other = new h.dressing.WocArmorDressing({ ...h.host, model: model() }, manifest, 'crowd');
-    h.advance(h.core.WOC_ARMOR_IDLE_EVICT_MS);
-    other.poll(); // any character's frame
-    expect(h.packs.wocArmorPackResident(url)).toBe(false);
+    // the host's own per-mesh setup throws on the file's second node
+    h.host.adopt
+      .mockImplementationOnce(() => undefined)
+      .mockImplementationOnce(() => {
+        throw new Error('a host step that throws');
+      });
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    let heard = false;
+    expect(() => {
+      heard = d.poll();
+    }).not.toThrow();
+    // all of the file is off again: no node on the model, no reference, nothing drawn of it
+    expect(d.attachedFiles).toEqual([]);
+    expect(h.packs.wocArmorContainers(h.host.model)).toEqual([]);
+    expect(h.host.model.getObjectByName('Armor_Test_Helm')).toBeUndefined();
+    expect(h.host.model.getObjectByName('Armor_Test_Shoulder_L')).toBeUndefined();
+    expect(h.packs.wocArmorPackRefs(url)).toBe(0);
+    expect(h.host.forget).toHaveBeenCalledTimes(2);
+    expect(logged).toHaveBeenCalledTimes(1);
+    // the host reads its parts afresh once, and then no frame tries the file again
+    expect(heard).toBe(true);
+    const adopts = h.host.adopt.mock.calls.length;
+    for (let frame = 0; frame < 5; frame++) expect(d.poll()).toBe(false);
+    expect(h.host.adopt.mock.calls.length).toBe(adopts);
+    expect(d.isWaiting).toBe(false);
+    // a kit that really changed tries it again, and this time it attaches
+    d.want([]);
+    expect(d.want(['test'])).toBe(true);
+    expect(d.attachedFiles).toEqual([{ set: 'test', url }]);
+    expect(h.packs.wocArmorPackRefs(url)).toBe(1);
     d.dispose();
-    other.dispose();
+  });
+
+  it('keeps the file a replacement was to take over from when the replacement attach throws', async () => {
+    const h = await harness('high', 'gated');
+    const low = h.core.wocArmorPackUrl('male', 'test', 'low');
+    const medium = h.core.wocArmorPackUrl('male', 'test', 'medium');
+    h.packs.ensureWocArmorPack(low);
+    await h.land('low');
+    const d = new h.dressing.WocArmorDressing(h.host, manifest, 'crowd');
+    d.want(['test']);
+    h.settle();
+    const lowPieces = h.packs.wocArmorPieces(h.packs.wocArmorContainers(h.host.model)[0]);
+    await h.land('medium');
+    h.host.adopt.mockImplementationOnce(() => {
+      throw new Error('a host step that throws');
+    });
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    expect(() => d.poll()).not.toThrow();
+    // the stand-in tier still draws, whole, and nothing of the replacement is left behind
+    expect(d.attachedFiles).toEqual([{ set: 'test', url: low }]);
+    expect(h.packs.wocArmorContainers(h.host.model)).toHaveLength(1);
+    expect(lowPieces.every((piece) => piece.parent !== null && piece.visible)).toBe(true);
+    expect(h.packs.wocArmorPackRefs(medium)).toBe(0);
+    expect(h.linking()).toBe(0);
+    for (let frame = 0; frame < 3; frame++) d.poll();
+    expect(h.packs.wocArmorContainers(h.host.model)).toHaveLength(1);
+    d.dispose();
+    expect(h.packs.wocArmorPackRefs(low)).toBe(0);
   });
 
   it('gives every file back on dispose', async () => {
@@ -422,6 +565,476 @@ describe('a WOC character wearing streamed armor', () => {
     expect(h.packs.wocArmorPackRefs(url)).toBe(0);
     expect(h.packs.wocArmorContainers(h.host.model)).toEqual([]);
     expect(d.attachedFiles).toEqual([]);
+  });
+});
+
+describe('a WOC character with the work queue behind it', () => {
+  /** The label kinds of the two units (what the frame budget prices). */
+  const PREPARE = 'woc-armor-prepare';
+  const ATTACH = 'woc-armor-attach';
+
+  /** A world session: the store and every body ride one queue that holds its units until
+   *  the case runs them, and each body was built the way assembleModel builds one (its
+   *  build step is how the store learns the fit's rig). */
+  async function world(tier: 'low' | 'medium' | 'high', reveals: 'now' | 'gated' = 'now') {
+    const h = await harness(tier, reveals);
+    const queue = heldQueue();
+    h.packs.setWocArmorWorkQueue(queue);
+    const rideQueue = (on: HeldQueue) => (work: () => void, label: string) => {
+      // the visual's own wrapper: a unit the queue refuses is dropped
+      void on.run(work, GPU_WORK_PRIORITY.VISIBLE_PREWARM, label).catch(() => undefined);
+    };
+    /** A crowd character of the world (built, then handed the queue with its gate), or a
+     *  body built directly at full detail with no queue (`preview`: the character sheet, a
+     *  portrait). `fetch: false` is a speculative build (the zone prewarm). */
+    const body = (kind: 'world' | 'preview' = 'world', fetch = true) => {
+      const host = h.hostOf();
+      const detail = kind === 'world' ? 'crowd' : 'full';
+      h.dressing.attachWocArmorAtBuild(host.model, manifest, undefined, fetch, detail);
+      const d = new h.dressing.WocArmorDressing(host, manifest, detail);
+      if (fetch) d.want(['test']);
+      if (kind === 'world') host.schedule = rideQueue(queue);
+      return { host, d };
+    };
+    /** A set's file, resident and prepared, as an earlier wearer left it. */
+    const resident = async (fileTier: string, set = 'test'): Promise<string> => {
+      const url = h.core.wocArmorPackUrl('male', set, fileTier as 'low');
+      h.packs.ensureWocArmorPack(url);
+      await h.land(fileTier, set);
+      queue.runOne(PREPARE);
+      expect(h.packs.wocArmorPackPrepared(url)).toBe(true);
+      return url;
+    };
+    return { h, queue, body, resident, rideQueue };
+  }
+
+  it('prepares a landed file once, as a unit of its own, then attaches each waiting wearer as one unit, never inside a poll', async () => {
+    const { h, queue, body } = await world('medium');
+    const url = h.core.wocArmorPackUrl('male', 'test', 'medium');
+    const wearers = [body(), body(), body()];
+    for (const w of wearers) expect(w.d.want(['test'])).toBe(false);
+    expect(queue.units).toEqual([]);
+    await h.land('medium');
+    // landed: ONE unit, the prepare, at the stand-ins' priority; nothing ran inside the landing
+    expect(queue.kinds()).toEqual([PREPARE]);
+    // (its label names the file after the kind the budget prices)
+    expect(queue.labels()).toEqual(['woc-armor-prepare:male:test:medium']);
+    expect(queue.units[0].priority).toBe(GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    expect(h.bind.prepareWocArmor).not.toHaveBeenCalled();
+    // a frame of every wearer: nothing attaches, nobody asks for anything more
+    for (const w of wearers) expect(w.d.poll()).toBe(false);
+    expect(queue.kinds()).toEqual([PREPARE]);
+    expect(h.packs.wocArmorPackPrepared(url)).toBe(false);
+    for (const w of wearers) {
+      expect(w.host.adopt).not.toHaveBeenCalled();
+      expect(w.d.isWaiting).toBe(true);
+    }
+    // the queue runs it: one prepare for all of them, before any attach was even asked for
+    expect(h.spans).toEqual([]);
+    queue.drain();
+    expect(h.bind.prepareWocArmor).toHaveBeenCalledTimes(1);
+    // ...named in the CPU build ledger under its own kind
+    expect(h.spans).toEqual(['view:woc-armor-prepare']);
+    expect(h.packs.wocArmorPackPrepared(url)).toBe(true);
+    expect(h.packs.wocArmorPackRefs(url)).toBe(0);
+    // the next frame: one attach unit a wearer, and still nothing attached inside a poll
+    for (const w of wearers) expect(w.d.poll()).toBe(false);
+    expect(queue.kinds()).toEqual([ATTACH, ATTACH, ATTACH]);
+    expect(queue.labels()).toEqual(Array(3).fill('woc-armor-attach:male:test'));
+    expect(queue.units.map((unit) => unit.priority)).toEqual(
+      Array(3).fill(GPU_WORK_PRIORITY.VISIBLE_PREWARM),
+    );
+    for (const w of wearers) expect(w.host.adopt).not.toHaveBeenCalled();
+    expect(h.packs.wocArmorContainers(wearers[0].host.model)).toEqual([]);
+    // every frame until they run asks nothing more
+    for (const w of wearers) w.d.poll();
+    expect(queue.units).toHaveLength(3);
+    // the queue's budget lets one through: one wearer wears it, the others keep their suit
+    queue.units.shift()?.run();
+    expect(wearers.map((w) => w.d.attachedFiles.length)).toEqual([1, 0, 0]);
+    expect(h.spans).toEqual(['view:woc-armor-prepare', 'view:woc-armor-attach']);
+    expect(wearers[0].host.adopt).toHaveBeenCalledTimes(2);
+    expect(wearers[0].host.reveal).toHaveBeenCalledTimes(2);
+    expect(h.packs.wocArmorPackRefs(url)).toBe(1);
+    // its host hears on its next frame, once (the re-dress); the others hear nothing
+    expect(wearers.map((w) => w.d.poll())).toEqual([true, false, false]);
+    expect(wearers[0].d.poll()).toBe(false);
+    expect(wearers[0].d.isWaiting).toBe(false);
+    queue.drain();
+    for (const w of wearers) expect(w.d.attachedFiles).toEqual([{ set: 'test', url }]);
+    expect(h.packs.wocArmorPackRefs(url)).toBe(3);
+    // still the one prepare: every wearer draws the one shared geometry
+    expect(h.bind.prepareWocArmor).toHaveBeenCalledTimes(1);
+    const helms = wearers.map(
+      (w) => w.host.model.getObjectByName('Armor_Test_Helm') as THREE.SkinnedMesh,
+    );
+    expect(new Set(helms.map((helm) => helm.geometry)).size).toBe(1);
+    expect(h.dressing.WOC_ARMOR_ATTACH_LABEL).toBe('woc-armor-attach');
+    expect(h.packs.WOC_ARMOR_PREPARE_LABEL).toBe('woc-armor-prepare');
+    for (const w of wearers) w.d.dispose();
+    expect(h.packs.wocArmorPackRefs(url)).toBe(0);
+  });
+
+  it('skips a wearer disposed before its unit runs, and leaves the ledger balanced', async () => {
+    const { h, queue, body } = await world('medium');
+    const url = h.core.wocArmorPackUrl('male', 'test', 'medium');
+    const [stays, leaves] = [body(), body()];
+    stays.d.want(['test']);
+    leaves.d.want(['test']);
+    await h.land('medium');
+    queue.drain();
+    stays.d.poll();
+    leaves.d.poll();
+    expect(queue.kinds()).toEqual([ATTACH, ATTACH]);
+    // gone (out of range, logged out) while its unit waited its turn
+    leaves.d.dispose();
+    queue.drain();
+    // one attach ran, and one unit ran to nothing (no span of its own)
+    expect(h.spans).toEqual(['view:woc-armor-prepare', 'view:woc-armor-attach']);
+    expect(leaves.host.adopt).not.toHaveBeenCalled();
+    expect(leaves.host.reveal).not.toHaveBeenCalled();
+    expect(h.packs.wocArmorContainers(leaves.host.model)).toEqual([]);
+    // one wearer, one reference: the unit of the one that left took none
+    expect(stays.d.attachedFiles).toEqual([{ set: 'test', url }]);
+    expect(h.packs.wocArmorPackRefs(url)).toBe(1);
+    stays.d.dispose();
+    expect(h.packs.wocArmorPackRefs(url)).toBe(0);
+  });
+
+  it('attaches nothing inside want either, and the set the body wears when its unit runs, not the one it wore when it asked', async () => {
+    const { h, queue, body, resident } = await world('medium');
+    const w = body();
+    const test = await resident('medium');
+    const other = await resident('medium', 'other');
+    // resident and prepared, and still not attached inside the call: a unit is asked for
+    expect(w.d.want(['test'])).toBe(false);
+    expect(w.host.adopt).not.toHaveBeenCalled();
+    expect(w.d.isWaiting).toBe(true);
+    expect(queue.kinds()).toEqual([ATTACH]);
+    // the kit changes before the queue runs it
+    expect(w.d.want(['other'])).toBe(false);
+    expect(queue.kinds()).toEqual([ATTACH, ATTACH]);
+    queue.drain();
+    expect(w.d.attachedFiles).toEqual([{ set: 'other', url: other }]);
+    expect(h.packs.wocArmorPackRefs(test)).toBe(0);
+    expect(h.packs.wocArmorPackRefs(other)).toBe(1);
+    expect(w.host.model.getObjectByName('Armor_Test_Helm')).toBeUndefined();
+    expect(w.host.model.getObjectByName(partNames('other')[0])).toBeDefined();
+    // the first unit did nothing at all: the two nodes adopted are the second set's
+    expect(w.host.adopt).toHaveBeenCalledTimes(2);
+    expect(w.d.poll()).toBe(true);
+    expect(w.d.poll()).toBe(false);
+    w.d.dispose();
+  });
+
+  it('attaches the better tier that landed while its unit waited, never the stand-in it was asked for', async () => {
+    const { h, queue, body, resident } = await world('high');
+    const w = body();
+    // the low file stands in for a crowd character whose medium file still streams
+    const low = await resident('low');
+    const medium = h.core.wocArmorPackUrl('male', 'test', 'medium');
+    w.d.want(['test']);
+    expect(queue.kinds()).toEqual([ATTACH]);
+    expect(h.pending.has(medium)).toBe(true);
+    // the medium file lands, and is prepared, before the attach gets its turn
+    await h.land('medium');
+    queue.runOne(PREPARE);
+    queue.drain();
+    expect(w.d.attachedFiles).toEqual([{ set: 'test', url: medium }]);
+    expect(h.packs.wocArmorPackRefs(low)).toBe(0);
+    expect(h.packs.wocArmorContainers(w.host.model)).toHaveLength(1);
+    w.d.dispose();
+  });
+
+  it('waits for the prepare inside the unit too: a file that landed since is prepared as its own unit, never inside an attach', async () => {
+    const { h, queue, body, resident } = await world('high');
+    const w = body();
+    await resident('low');
+    const medium = h.core.wocArmorPackUrl('male', 'test', 'medium');
+    w.d.want(['test']);
+    await h.land('medium');
+    // the attach unit runs ahead of the medium file's prepare: it attaches nothing (the file
+    // the set draws from now is not prepared, and the stand-in is no longer that file)
+    queue.runOne(ATTACH);
+    expect(w.host.adopt).not.toHaveBeenCalled();
+    expect(h.bind.prepareWocArmor).toHaveBeenCalledTimes(1);
+    expect(w.d.poll()).toBe(false);
+    expect(queue.kinds()).toEqual([PREPARE]);
+    queue.drain();
+    expect(h.bind.prepareWocArmor).toHaveBeenCalledTimes(2);
+    expect(w.d.poll()).toBe(false);
+    expect(queue.kinds()).toEqual([ATTACH]);
+    queue.drain();
+    expect(w.d.attachedFiles).toEqual([{ set: 'test', url: medium }]);
+    w.d.dispose();
+  });
+
+  it('attaches on the spot on a full-detail body with no queue behind it, preparing the file itself when no unit has yet', async () => {
+    const { h, queue, body } = await world('medium');
+    const url = h.core.wocArmorPackUrl('male', 'test', 'medium');
+    // the character sheet's body, a portrait's: built directly while the world runs
+    const preview = body('preview');
+    await h.land('medium');
+    // the store asked the world's queue for the prepare; the unit has not run
+    expect(queue.kinds()).toEqual([PREPARE]);
+    // its own frame attaches it, whole, inside the poll
+    expect(preview.d.poll()).toBe(true);
+    expect(preview.d.attachedFiles).toEqual([{ set: 'test', url }]);
+    expect(preview.host.adopt).toHaveBeenCalledTimes(2);
+    expect(preview.d.isWaiting).toBe(false);
+    expect(h.bind.prepareWocArmor).toHaveBeenCalledTimes(1);
+    // (paid where the body stands: a step of that frame in the build ledger, no unit's span)
+    expect(h.spans).toEqual(['view-part:woc-armor-prepare']);
+    // the world's unit finds the file prepared: nothing is done twice
+    queue.drain();
+    expect(h.bind.prepareWocArmor).toHaveBeenCalledTimes(1);
+    expect(h.spans).toEqual(['view-part:woc-armor-prepare']);
+    // ...and a body BUILT with the file resident and prepared is born wearing it
+    const born = body();
+    expect(born.d.attachedFiles).toEqual([{ set: 'test', url }]);
+    expect(born.d.want(['test'])).toBe(false);
+    expect(queue.units).toEqual([]);
+    preview.d.dispose();
+    born.d.dispose();
+  });
+
+  it('is born in its suit as a crowd character whose file is resident but not prepared yet: the prepare stays the queue unit', async () => {
+    const { h, queue, body } = await world('medium');
+    const url = h.core.wocArmorPackUrl('male', 'test', 'medium');
+    body(); // an earlier wearer: the fetch is kicked, the store has the rig
+    await h.land('medium');
+    expect(queue.kinds()).toEqual([PREPARE]);
+    // the budget has not let the prepare run, and the next wearer's view is built in a live
+    // frame: it must not pay the prepare inside its build
+    const late = body();
+    expect(late.d.attachedFiles).toEqual([]);
+    expect(late.host.adopt).not.toHaveBeenCalled();
+    expect(late.d.isWaiting).toBe(true);
+    expect(h.bind.prepareWocArmor).not.toHaveBeenCalled();
+    // frames ask for nothing while the unit waits its turn
+    expect(late.d.poll()).toBe(false);
+    expect(queue.kinds()).toEqual([PREPARE]);
+    queue.drain();
+    expect(h.bind.prepareWocArmor).toHaveBeenCalledTimes(1);
+    expect(late.d.poll()).toBe(false);
+    expect(queue.kinds()).toEqual([ATTACH]);
+    queue.drain();
+    expect(late.d.attachedFiles).toEqual([{ set: 'test', url }]);
+    // the prepare and the attach each ran as a unit: nothing was paid inside a build
+    expect(h.spans).toEqual(['view:woc-armor-prepare', 'view:woc-armor-attach']);
+    late.d.dispose();
+  });
+
+  it.each([
+    {
+      who: 'a view built under an arrival cover (behind a loading screen there is no frame to protect)',
+      build: 'covered',
+    },
+    {
+      who: 'a full-detail body (the local player, a preview)',
+      build: 'full',
+    },
+    {
+      who: 'a speculative build (the zone prewarm, which fetches nothing and waits on nothing)',
+      build: 'speculative',
+    },
+  ] as const)(
+    'is born whole all the same as $who, the prepare paid where it stands',
+    async ({ build }) => {
+      const { h, queue, body } = await world('medium');
+      const url = h.core.wocArmorPackUrl('male', 'test', 'medium');
+      body(); // an earlier wearer: the fetch is kicked, the store has the rig
+      await h.land('medium');
+      // resident, and its prepare still waiting in the queue
+      expect(queue.kinds()).toEqual([PREPARE]);
+      expect(h.bind.prepareWocArmor).not.toHaveBeenCalled();
+      if (build === 'covered') h.setArrivalCover(true);
+      const born =
+        build === 'full'
+          ? body('preview')
+          : build === 'speculative'
+            ? body('world', false)
+            : body();
+      if (build === 'covered') h.setArrivalCover(false);
+      // it cannot come out in its suit: attached inside its build, prepared there too
+      expect(born.d.attachedFiles).toEqual([{ set: 'test', url }]);
+      expect(h.bind.prepareWocArmor).toHaveBeenCalledTimes(1);
+      expect(h.spans).toEqual(['view-part:woc-armor-prepare']);
+      // the queued unit then runs to nothing
+      queue.drain();
+      expect(h.bind.prepareWocArmor).toHaveBeenCalledTimes(1);
+      expect(h.spans).toEqual(['view-part:woc-armor-prepare']);
+      born.d.dispose();
+    },
+  );
+
+  it('asks a replaced queue again for the attach the old one still held', async () => {
+    const { h, queue, body, resident, rideQueue } = await world('medium');
+    const w = body();
+    const url = await resident('medium');
+    w.d.want(['test']);
+    expect(queue.kinds()).toEqual([ATTACH]);
+    // the renderer generation changed: the old queue never runs its unit
+    const next = heldQueue();
+    w.host.schedule = rideQueue(next);
+    w.d.gateChanged();
+    w.d.poll();
+    expect(next.kinds()).toEqual([ATTACH]);
+    next.drain();
+    expect(w.d.attachedFiles).toEqual([{ set: 'test', url }]);
+    // the old queue's unit, should it ever run after all, attaches nothing more
+    queue.drain();
+    expect(h.packs.wocArmorContainers(w.host.model)).toHaveLength(1);
+    expect(h.packs.wocArmorPackRefs(url)).toBe(1);
+    expect(w.host.adopt).toHaveBeenCalledTimes(2);
+    w.d.dispose();
+  });
+
+  it('attaches a replacement as a unit as well, the file it replaces drawing until its reveal settles', async () => {
+    const { h, queue, body, resident } = await world('high', 'gated');
+    const w = body();
+    const low = await resident('low');
+    const medium = h.core.wocArmorPackUrl('male', 'test', 'medium');
+    w.d.want(['test']);
+    queue.drain();
+    h.settle();
+    expect(w.d.poll()).toBe(true);
+    expect(w.d.attachedFiles).toEqual([{ set: 'test', url: low }]);
+    await h.land('medium');
+    queue.runOne(PREPARE);
+    // the frame asks; nothing of the new file is on the body until the unit runs
+    expect(w.d.poll()).toBe(false);
+    expect(queue.kinds()).toEqual([ATTACH]);
+    expect(h.packs.wocArmorContainers(w.host.model)).toHaveLength(1);
+    queue.drain();
+    expect(h.packs.wocArmorContainers(w.host.model)).toHaveLength(2);
+    expect(w.d.attachedFiles).toEqual([{ set: 'test', url: low }]);
+    expect(w.d.poll()).toBe(true); // the host dresses the new file's nodes too
+    h.settle();
+    expect(w.d.attachedFiles).toEqual([{ set: 'test', url: medium }]);
+    expect(h.packs.wocArmorContainers(w.host.model)).toHaveLength(1);
+    expect(w.d.poll()).toBe(true);
+    expect(w.d.poll()).toBe(false);
+    w.d.dispose();
+  });
+
+  it('contains an attach that throws inside its unit, and asks for no further unit frame after frame', async () => {
+    const { h, body, resident } = await world('medium');
+    const w = body();
+    const url = await resident('medium');
+    // this body's queue hands its units straight to the case, so a throw would be seen
+    const units: (() => void)[] = [];
+    w.host.schedule = (work) => units.push(work);
+    w.d.want(['test']);
+    expect(units).toHaveLength(1);
+    w.host.adopt.mockImplementationOnce(() => {
+      throw new Error('a host step that throws');
+    });
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    expect(() => units.shift()?.()).not.toThrow();
+    // nothing of the file is left on the body, and its reference is back
+    expect(w.d.attachedFiles).toEqual([]);
+    expect(h.packs.wocArmorContainers(w.host.model)).toEqual([]);
+    expect(h.packs.wocArmorPackRefs(url)).toBe(0);
+    expect(logged).toHaveBeenCalledTimes(1);
+    // the host reads its parts afresh once; then no frame asks for the attach again
+    expect(w.d.poll()).toBe(true);
+    for (let frame = 0; frame < 5; frame++) expect(w.d.poll()).toBe(false);
+    expect(units).toEqual([]);
+    expect(w.d.isWaiting).toBe(false);
+    w.d.dispose();
+  });
+
+  it('asks nothing every frame for a file its model cannot take', async () => {
+    const { h, queue, body, resident, rideQueue } = await world('medium');
+    body();
+    await resident('medium');
+    // a model with no rig of its own: nothing to bind armor to
+    const host = h.hostOf(new THREE.Group());
+    host.schedule = rideQueue(queue);
+    const d = new h.dressing.WocArmorDressing(host, manifest, 'crowd');
+    d.want(['test']);
+    expect(queue.kinds()).toEqual([ATTACH]);
+    queue.drain();
+    expect(d.attachedFiles).toEqual([]);
+    for (let frame = 0; frame < 5; frame++) expect(d.poll()).toBe(false);
+    expect(queue.units).toEqual([]);
+    expect(d.isWaiting).toBe(false);
+    d.dispose();
+  });
+});
+
+describe('a WOC character giving its armor back', () => {
+  it('gives every file back when one of them throws on the way out, and never throws itself', async () => {
+    const h = await harness('medium', 'now');
+    const test = h.core.wocArmorPackUrl('male', 'test', 'medium');
+    const other = h.core.wocArmorPackUrl('male', 'other', 'medium');
+    h.packs.ensureWocArmorPack(test);
+    h.packs.ensureWocArmorPack(other);
+    await h.land('medium');
+    await h.land('medium', 'other');
+    const d = new h.dressing.WocArmorDressing(h.host, manifest, 'crowd');
+    d.want(['test', 'other']);
+    expect([h.packs.wocArmorPackRefs(test), h.packs.wocArmorPackRefs(other)]).toEqual([1, 1]);
+    // the first file's node cannot leave the model
+    const [first] = h.packs.wocArmorContainers(h.host.model);
+    first.removeFromParent = () => {
+      throw new Error('a node that will not detach');
+    };
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    expect(() => d.dispose()).not.toThrow();
+    // both references are back, the throwing file's too, and the other file left the model
+    expect([h.packs.wocArmorPackRefs(test), h.packs.wocArmorPackRefs(other)]).toEqual([0, 0]);
+    expect(h.host.model.getObjectByName(partNames('other')[0])).toBeUndefined();
+    expect(d.attachedFiles).toEqual([]);
+    expect(logged).toHaveBeenCalledTimes(1);
+  });
+
+  it('gives its files back when taking its merged stand-in down throws', async () => {
+    const h = await harness('medium', 'now', (fileTier) => {
+      // one material, the same attributes on both parts: a kit that folds
+      const r = bones();
+      const material = new THREE.MeshBasicMaterial();
+      material.name = fileTier;
+      const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
+      const count = geometry.getAttribute('position').count;
+      const joints = new Uint16Array(count * 4);
+      const weights = new Float32Array(count * 4);
+      for (let i = 0; i < count; i++) {
+        joints[i * 4] = 1;
+        weights[i * 4] = 1;
+      }
+      geometry.setAttribute('skinIndex', new THREE.BufferAttribute(joints, 4));
+      geometry.setAttribute('skinWeight', new THREE.BufferAttribute(weights, 4));
+      const helm = new THREE.SkinnedMesh(geometry, material);
+      helm.name = 'Armor_Test_Helm';
+      r.root.add(helm);
+      helm.bind(new THREE.Skeleton(r.list));
+      const pad = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.1), material);
+      pad.name = 'Armor_Test_Shoulder_L';
+      r.spine.add(pad);
+      return { scene: r.root, animations: [] };
+    });
+    const url = h.core.wocArmorPackUrl('male', 'test', 'medium');
+    const d = new h.dressing.WocArmorDressing(h.host, manifest, 'crowd');
+    d.want(['test']);
+    await h.land('medium');
+    d.poll();
+    for (const name of ['Armor_Test_Helm', 'Armor_Test_Shoulder_L']) {
+      const part = h.host.model.getObjectByName(name);
+      if (part) part.visible = true;
+    }
+    d.setMerged(true);
+    d.redressed();
+    d.poll();
+    expect(d.isMerged).toBe(true);
+    h.host.forget.mockImplementation(() => {
+      throw new Error('a host that cannot forget');
+    });
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    expect(() => d.dispose()).not.toThrow();
+    expect(h.packs.wocArmorPackRefs(url)).toBe(0);
+    expect(h.packs.wocArmorContainers(h.host.model)).toEqual([]);
   });
 });
 
@@ -649,7 +1262,11 @@ describe('a WOC character drawing its armor merged', () => {
     // a kit somebody already built rides its own kind: the budget learns the two apart
     const peerHost = { ...h.host, model: model() };
     const other = new h.dressing.WocArmorDressing(peerHost, manifest, 'crowd');
+    // (a body with the queue behind it attaches its file as a unit of it, too)
     other.want(['test']);
+    expect(queue.map((unit) => unit.label)).toEqual(['woc-armor-attach:male:test']);
+    queue.shift()?.work();
+    expect(other.poll()).toBe(true);
     dress(peerHost.model, other);
     other.setMerged(true);
     other.poll();

@@ -17,6 +17,7 @@ import { deedName } from '../src/ui/deed_i18n';
 import { Hud } from '../src/ui/hud';
 import { t } from '../src/ui/i18n';
 import { reliquaryPageName } from '../src/ui/reliquary_i18n';
+import { contactAtOnce } from './helpers/renderer_contact';
 
 const UNLOCK_ID = 'prog_first_steps';
 const BROADCAST_ID = 'cmb_first_blood';
@@ -35,7 +36,7 @@ interface DeedLinkHarness {
   renderer: {
     handleEvent: ReturnType<typeof vi.fn>;
     // the event sound waits for a swing's blade contact (contact_queue.ts); none here
-    atContact: (ev: unknown, fn: () => void) => void;
+    atContact: typeof contactAtOnce;
   };
   playEventSfx: ReturnType<typeof vi.fn>;
   meters: { onEvent: ReturnType<typeof vi.fn> };
@@ -69,7 +70,7 @@ function makeHud(): DeedLinkHarness {
     craftSkills: {},
     gatheringProficiency: {},
   };
-  hud.renderer = { handleEvent: vi.fn(), atContact: (_ev: unknown, fn: () => void) => fn() };
+  hud.renderer = { handleEvent: vi.fn(), atContact: contactAtOnce };
   hud.playEventSfx = vi.fn();
   hud.meters = { onEvent: vi.fn() };
   hud.isNythraxisEvent = vi.fn(() => false);

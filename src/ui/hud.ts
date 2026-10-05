@@ -11131,7 +11131,7 @@ export class Hud {
       // visual effects (swings, projectiles, glows) — for everyone nearby,
       // not just events involving this player
       this.renderer.handleEvent(ev);
-      this.renderer.atContact(ev, () => this.playEventSfx(ev)); // lands with the blade
+      this.renderer.atContact(ev, this.playEventSfx, this); // lands with the blade
       this.meters.onEvent(ev);
       if (this.isNythraxisEvent(ev)) this.lastNythraxisCombatEventAt = performance.now();
       if (applyQuestEventPresentation(this, ev)) continue;
@@ -11161,13 +11161,13 @@ export class Hud {
                 {
                   ...absorbShape,
                   text: t('hudChrome.fct.absorbed', {
-                    amount: formatNumber(ev.absorbed ?? 0, {
-                      maximumFractionDigits: 0,
-                    }),
+                    amount: formatNumber(ev.absorbed ?? 0, { maximumFractionDigits: 0 }),
                   }),
                   target: tgt,
                 },
                 now,
+                // the strike it reports: held with that strike's number, for the blade's contact
+                ev,
               );
           }
           if (

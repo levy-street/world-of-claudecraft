@@ -16,6 +16,7 @@ import {
   foldWocHeadForBake,
   poseWocHeadForBake,
   setWocFarHeadSlots,
+  WocHeadBakePose,
 } from '../src/render/characters/woc_far_head';
 import { wocHeadAllUrls } from '../src/render/characters/woc_head_catalog';
 import { wocHeadMergedSource } from '../src/render/characters/woc_head_merge';
@@ -347,5 +348,91 @@ describe('setWocFarHeadSlots', () => {
     expect(Array.from(geo.getAttribute('aWocHmSlot').array)).toEqual([
       3, 3, 3, 3, 3, 3, 0, 0, 0, 0,
     ]);
+  });
+});
+
+describe('WocHeadBakePose: the far pose a band of vertices at a time', () => {
+  const POSE = { morphs: { FS_Chin_Softness: 1 }, key: 'chin' };
+  const liners = (d: ReturnType<typeof dressed>): THREE.Mesh[] => [
+    d.meshesOf(EYE_L)[1],
+    d.meshesOf(EYE_R)[1],
+  ];
+  const positions = (mesh: THREE.Mesh): number[] =>
+    Array.from(mesh.geometry.getAttribute('position').array);
+
+  it('poses a few vertices a call, hands a piece its scratch only once it is whole, and ends where the whole pose ends', () => {
+    // guards: a far bake is queue units (woc_far_bake.ts), and a head posed in one go was
+    // a whole head's morphs inside a single unit
+    const whole = dressed(LOOK);
+    poseWocHeadForBake(whole.root, POSE);
+    const d = dressed(LOOK);
+    const [linerL, linerR] = liners(d);
+    const packs = [linerL.geometry, linerR.geometry];
+    // the two liners are the only drawn pieces this pose moves: 8 and 9 vertices
+    const all = packs.reduce((n, g) => n + g.getAttribute('position').count, 0);
+    expect(all).toBe(17);
+    const run = new WocHeadBakePose(d.root, POSE);
+    // building it writes the influences, and bakes nothing yet
+    expect(linerL.morphTargetInfluences).toEqual([1]);
+    expect(linerR.morphTargetInfluences).toEqual([1]);
+    expect(run.remaining).toBe(all);
+    expect(run.scratch).toEqual([]);
+    // a spent band poses nothing
+    expect(run.advance(0)).toBe(false);
+    expect(run.remaining).toBe(all);
+    // seven vertices: neither liner is whole, so both still hold the pack's geometry
+    expect(run.advance(7)).toBe(false);
+    expect(run.remaining).toBe(all - 7);
+    expect([linerL.geometry, linerR.geometry]).toEqual(packs);
+    expect(run.scratch).toHaveLength(0);
+    // seven more: the first is whole and wears its scratch, the second is cut mid-band
+    expect(run.advance(7)).toBe(false);
+    expect(run.remaining).toBe(all - 14);
+    expect(run.scratch).toHaveLength(1);
+    expect([linerL.geometry, linerR.geometry].filter((g) => packs.includes(g))).toHaveLength(1);
+    // the last three: done, and a further call has nothing to do
+    expect(run.advance(7)).toBe(true);
+    expect(run.remaining).toBe(0);
+    expect(run.scratch).toHaveLength(2);
+    expect(run.advance(7)).toBe(true);
+    expect(run.scratch).toEqual(expect.arrayContaining([linerL.geometry, linerR.geometry]));
+    // the bands end exactly where the whole pose ends, vertex for vertex
+    const [wholeL, wholeR] = liners(whole);
+    expect(positions(linerL)).toEqual(positions(wholeL));
+    expect(positions(linerR)).toEqual(positions(wholeR));
+    // ...which is each vertex lifted by its own morph (a strip stands at y = its index)
+    expect(linerL.geometry.getAttribute('position').getY(0)).toBe(LINER_LIFT);
+    expect(linerR.geometry.getAttribute('position').getY(8)).toBe(8 + LINER_LIFT);
+    // the pack's own geometry, shared by every character, is never written
+    for (const pack of packs) expect(pack.getAttribute('position').getY(0)).toBe(0);
+  });
+
+  it('has nothing to do without a pose, without a hung head, or for a piece nothing moves', () => {
+    const d = dressed(LOOK);
+    const [linerL] = liners(d);
+    const still = new WocHeadBakePose(d.root, null);
+    expect(still.remaining).toBe(0);
+    expect(still.advance(4)).toBe(true);
+    expect(linerL.morphTargetInfluences).toEqual([0]);
+    const bare = new WocHeadBakePose(model(), POSE);
+    expect(bare.remaining).toBe(0);
+    expect(bare.advance()).toBe(true);
+    // a pose that names no target of this head moves no piece
+    const other = new WocHeadBakePose(d.root, { morphs: { FS_Not_On_This_Head: 1 }, key: 'x' });
+    expect(other.remaining).toBe(0);
+    expect(other.scratch).toEqual([]);
+  });
+
+  it('skips a piece the body does not draw: its influences are written, its vertices are not posed', () => {
+    // the right eye is hung but hidden (a look that draws another eye shape)
+    const d = dressed(LOOK.filter((name) => name !== EYE_R));
+    const [linerL, linerR] = liners(d);
+    const packR = linerR.geometry;
+    const run = new WocHeadBakePose(d.root, POSE);
+    expect(linerR.morphTargetInfluences).toEqual([1]);
+    expect(run.remaining).toBe(linerL.geometry.getAttribute('position').count);
+    expect(run.advance()).toBe(true);
+    expect(linerR.geometry).toBe(packR);
+    expect(run.scratch).toEqual([linerL.geometry]);
   });
 });

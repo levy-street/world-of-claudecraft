@@ -18,8 +18,12 @@
 // the world (woc_armor_core.ts WocArmorDetail). A piece without a level of the kind wanted draws
 // the next finer one it has (geometry_lod_core.ts geometryLodDrawn). One exception, by design: a
 // head piece the face sliders move keeps level 0 while it draws on its own (woc_head_packs.ts
-// hangWocHeadFile), because a variant would cost a second morph texture; the merged head draws
+// hangWocHeadPieces), because a variant would cost a second morph texture; the merged head draws
 // its level instead.
+//
+// A preview whose stage draws the crowd's ARMOR detail (the creator, inspect) still draws the
+// full detail column of the table: it hands its build that level outright
+// (preview_armor_detail_core.ts previewArmorBuildOptions), since the levels ride the same files.
 //
 // Geometry detail is cosmetic only, never information a player acts on
 // (docs/design/graphics-settings-fairness.md): every level draws the same pieces over the same

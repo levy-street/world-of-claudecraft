@@ -33,7 +33,12 @@ const IDLE: AnimState = {
 describe('Paladin Templar Verdict baked asset', () => {
   beforeAll(async () => {
     await assetsReady();
-    await landWocFiles(assets, dressing, heads, ['player_paladin', 'player_paladin_female']);
+    // the composed paladin def is fetched on demand too (manifest.ts: out of the boot gate)
+    await landWocFiles(assets, dressing, heads, [
+      'player_paladin',
+      'player_paladin_female',
+      'player_paladin_modular',
+    ]);
   }, 90_000);
 
   it('builds the separate clip against the real KayKit Paladin skeleton', () => {

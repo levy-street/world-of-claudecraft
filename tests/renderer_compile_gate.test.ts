@@ -3,6 +3,8 @@ import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
 import * as characters from '../src/render/characters';
+import { SerialGateLane } from '../src/render/compile_gate';
+import { compileProof } from '../src/render/compile_target_readiness';
 import {
   buildFarmPatchProps,
   FarmPatchVisuals,
@@ -995,13 +997,14 @@ describe('the far-bake compile gate handed to character visuals', () => {
     // ...and one crowd bake links at a time: the gate is enqueued on the
     // renderer's SerialGateLane. The settle hands the caller a LAZY proof
     // thunk instead of an eagerly computed boolean, so a crowd bake whose
-    // settle callback ignores it (every consumer but the sanguine weapon
-    // sheath) never pays compileTargetPrepared's target traverse.
+    // settle callback ignores it never pays compileTargetPrepared's target
+    // traverse; a host without parallel compile hands no proof at all
+    // (compileProof, pinned below).
     expect(rendererSource).toContain(
       'private readonly farBakeGate: FarBakeGate = (target, onSettled) =>\n' +
         '    this.farBakeLane.enqueue(\n' +
         '      (settled) => this.gateSwapFlagOnCompile(target, settled),\n' +
-        '      () => onSettled(() => compileTargetPrepared(this.webgl.properties, target)),\n' +
+        '      () => onSettled(compileProof(this.asyncCompileSupported, this.webgl.properties, target)),\n' +
         '    );',
     );
     expect(rendererSource).toContain('private readonly farBakeLane = new SerialGateLane();');
@@ -1010,6 +1013,48 @@ describe('the far-bake compile gate handed to character visuals', () => {
       'visual.setFarBakeGate(this.farBakeGate, this.backgroundGpuWork);',
     );
     expect(rendererSource).toContain('farBakeGate: () => this.farBakeGate,');
+  });
+
+  it('on a host without parallel shader compile it settles with no compile behind it, and hands no proof', async () => {
+    // The field cannot be built on this harness (above), so its body is composed here
+    // from the very parts the source pin names: the lane, gateSwapFlagOnCompile and
+    // compileProof. What a WOC stand-in rests on (tests/woc_merge_visual.test.ts): that
+    // host's settle comes with nothing linked, and so with NO proof, never with one that
+    // could only read false.
+    const renderer = harness();
+    const compileGate = vi.fn(() => Promise.resolve());
+    renderer.compileGate = compileGate;
+    const lane = new SerialGateLane();
+    const properties = { get: (): unknown => undefined };
+    const farBakeGate = (
+      target: THREE.Object3D,
+      onSettled: (ready?: () => boolean) => void,
+    ): void =>
+      lane.enqueue(
+        (settled) => renderer.gateSwapFlagOnCompile(target, settled),
+        () =>
+          onSettled(compileProof(renderer.asyncCompileSupported as boolean, properties, target)),
+      );
+    const settles: ((() => boolean) | undefined)[] = [];
+    const material = new THREE.MeshBasicMaterial();
+    const target = new THREE.Mesh(new THREE.BoxGeometry(), material);
+    renderer.asyncCompileSupported = false;
+    farBakeGate(target, (ready) => settles.push(ready));
+    await flushGate();
+    expect(settles).toEqual([undefined]);
+    expect(compileGate).not.toHaveBeenCalled();
+    expect(lane.pending).toBe(0);
+    // with the extension the same gate compiles first, and its settle carries a proof to
+    // read (false here: nothing recorded a linked program for the target)
+    renderer.asyncCompileSupported = true;
+    farBakeGate(target, (ready) => settles.push(ready));
+    await flushGate();
+    await flushGate();
+    expect(compileGate).toHaveBeenCalledTimes(1);
+    expect(settles).toHaveLength(2);
+    expect(settles[1]?.()).toBe(false);
+    target.geometry.dispose();
+    material.dispose();
   });
 });
 

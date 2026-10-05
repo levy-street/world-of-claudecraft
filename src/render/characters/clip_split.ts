@@ -8,7 +8,9 @@
 //
 // Used for the two-strike dual-wield clip (ClipMap.dualWieldSplit): the sim
 // swings the mainhand and the offhand as separate events, so each swing plays
-// its own strike instead of the whole clip replaying the same arm first.
+// its own strike instead of the whole clip replaying the same arm first. And for
+// a hold-and-release cast (ClipMap.clipSplits). A rig asks through
+// sharedClipSplit, which cuts a clip once and hands every rig the same halves.
 import * as THREE from 'three';
 
 function sliced(
@@ -66,6 +68,38 @@ export function splitClipAt(
     new THREE.AnimationClip(names[0], cut, head),
     new THREE.AnimationClip(names[1], clip.duration - cut, tail),
   ];
+}
+
+// The halves of each source clip, per cut (the time and both names). Weak on the source:
+// a library that is let go takes its halves with it.
+const sharedSplits = new WeakMap<
+  THREE.AnimationClip,
+  Map<string, [THREE.AnimationClip, THREE.AnimationClip]>
+>();
+
+/** `splitClipAt`, minted once per source clip and cut and handed to every caller after:
+ *  the halves are data like the clip they are cut from, and a mixer binds a clip per root,
+ *  so one pair drives every rig built from that clip (as each uncut clip of a library
+ *  already does) instead of each rig re-sampling its own copy at build. Never mutate what
+ *  this returns. */
+export function sharedClipSplit(
+  clip: THREE.AnimationClip,
+  at: number,
+  names: readonly [string, string],
+): [THREE.AnimationClip, THREE.AnimationClip] {
+  let cuts = sharedSplits.get(clip);
+  if (!cuts) {
+    cuts = new Map();
+    sharedSplits.set(clip, cuts);
+  }
+  // JSON, not a joined string: a clip name may hold any character a separator could be
+  const key = JSON.stringify([at, names[0], names[1]]);
+  let halves = cuts.get(key);
+  if (!halves) {
+    halves = splitClipAt(clip, at, [names[0], names[1]]);
+    cuts.set(key, halves);
+  }
+  return halves;
 }
 
 // The half names live in the pure swing core (so the swing picker can name them without three);

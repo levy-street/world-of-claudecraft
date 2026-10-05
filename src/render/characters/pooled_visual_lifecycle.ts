@@ -17,6 +17,9 @@ export interface PooledCharacterVisual extends PoolableVisual {
   setEntityColor(color: number): void;
   setFarBakeGate(gate: FarBakeGate | null): void;
   clearElementResponse?(): void;
+  /** The visual is parked: it lets go of what it was still waiting on for a body nobody
+   *  sees any more (a queued far bake). */
+  parked?(): void;
 }
 
 /** What the renderer supplies, read at call time (the gate is a renderer
@@ -74,6 +77,7 @@ export class PooledVisualLifecycle<V extends PooledCharacterVisual> {
   store(key: string, visual: V): void {
     resetPooledRoot(visual.root, false);
     visual.clearElementResponse?.();
+    visual.parked?.();
     this.pool.store(key, visual, this.host.maxPooled());
   }
 }

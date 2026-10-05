@@ -163,7 +163,6 @@ import {
   type AssembleOptions,
   applyEntityAnimOverrides,
   type CharacterVisual,
-  characterBuildStreaming,
   composedLookPiecesOf,
   createCharacterVisual,
   type FarBakeGate,
@@ -212,6 +211,7 @@ import { playerRangedAttackStartsAtLaunch } from './characters/skin_attack';
 import { CharacterVisualPool, characterVisualPoolKey } from './characters/visual_pool';
 import { shouldRetainPooledCharacterVisual } from './characters/visual_pool_policy';
 import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack_style_core';
+import { prepareWocEntry } from './characters/woc_entry_prepare';
 import {
   chosenCadenceHoldsQuality,
   chosenCadenceMissShare,
@@ -232,8 +232,8 @@ import {
   compileMayStartBeforeInitialPaint,
   compilePriorityForTarget,
 } from './compile_priority_core';
-import { compileTargetPrepared } from './compile_target_readiness';
-import { ContactQueue } from './contact_queue';
+import { compileProof } from './compile_target_readiness';
+import { ContactQueue, collapsed, heldUntilCollapse } from './contact_queue';
 import { preflightWebGL2ContextRecycle, type RecycledRendererContext } from './context_recycle';
 import { trackWebGLContext } from './context_release';
 import { type CorpseBeacon, createCorpseBeacon } from './corpse_beacon';
@@ -703,6 +703,7 @@ import {
   disposeRendererPrewarmAndGroundFx,
   disposeRendererWorldViews,
 } from './renderer_resource_lifecycle';
+import { createRequiredViews } from './required_views_core';
 import { createResizeCoalescer } from './resize_coalesce_core';
 import { createRevealCompileHost, REVEAL_GATE_PREP_KIND } from './reveal_compile_host';
 import { createRevealGate } from './reveal_gate';
@@ -4649,21 +4650,8 @@ export class Renderer {
     });
   }
 
-  private createRequiredView(id: number | null, createdViewTypes: string[]): number {
-    if (id === null) return 0;
-    const e = liveViewCandidate(id, this.sim, this.views, this.questObjectHidden);
-    if (!e) return 0;
-    if (!this.viewCreateRetry.canAttempt(e.id, 'view', performance.now())) return 0;
-    this.createView(e);
-    sampleCreatedViewType(createdViewTypes, e);
-    return 1;
-  }
-
   private createRequiredViews(player: Entity, createdViewTypes: string[]): number {
-    return (
-      this.createRequiredView(player.id, createdViewTypes) +
-      this.createRequiredView(player.targetId, createdViewTypes)
-    );
+    return createRequiredViews(this, player, createdViewTypes, performance.now());
   }
 
   private async createMandatoryLandmarkViews(
@@ -4758,8 +4746,8 @@ export class Renderer {
       if (!this.viewCreateRetry.canAttempt(e.id, 'view', performance.now())) continue;
       if (deferLooks) this.createViewDeferringLook(e);
       else this.createView(e);
-      sampleCreatedViewType(createdViewTypes, e);
-      if (this.views.has(e.id) || !characterBuildStreaming()) created++;
+      if (this.views.has(e.id)) sampleCreatedViewType(createdViewTypes, e);
+      created++;
     }
     return { created, trimmed };
   }
@@ -4798,7 +4786,7 @@ export class Renderer {
     if (visual) {
       this.viewCreateRetry.markSucceeded(e.id, slot);
       visual.setFarBakeGate(this.farBakeGate, this.backgroundGpuWork);
-    } else if (!characterBuildStreaming()) this.viewCreateRetry.markFailed(e.id, slot, now);
+    } else this.viewCreateRetry.markFailed(e.id, slot, now);
     return visual;
   }
 
@@ -4810,7 +4798,7 @@ export class Renderer {
   private readonly farBakeGate: FarBakeGate = (target, onSettled) =>
     this.farBakeLane.enqueue(
       (settled) => this.gateSwapFlagOnCompile(target, settled),
-      () => onSettled(() => compileTargetPrepared(this.webgl.properties, target)),
+      () => onSettled(compileProof(this.asyncCompileSupported, this.webgl.properties, target)),
     );
 
   /** Build one lazy FORM rig into its view slot. A null build leaves the slot
@@ -5361,6 +5349,10 @@ export class Renderer {
     });
     if (!GFX.constrainedMemory) this.farmPatchVisuals?.stageProgramAnchors();
     this.installSceneryRevealGates();
+    // The player bodies' own head start, ahead of the budget clock below: the local
+    // player's look settled and both body fits prepared (characters/woc_entry_prepare.ts).
+    const announceBodies = () => options.onEntryStart?.('entities.player-bodies', 'entities');
+    await prepareWocEntry(this.sim.player, announceBodies);
     const policy: PrewarmPolicy = resolvePrewarmPolicy({
       constrainedMemory: GFX.constrainedMemory,
       asyncCompileSupported: this.asyncCompileSupported,
@@ -8010,8 +8002,8 @@ export class Renderer {
         // ever recycled, so every mob past that count churned. Key is per-template, so
         // the pool stays bounded by the peak simultaneous count.
         visual = this.createCharacterVisualWithRetry(e, 'view', undefined, opts);
-        // assets unavailable: skip; a failed build sits out the retry cooldown and a
-        // streaming WOC body costs no budget slot, so neither starves the frame
+        // assets unavailable: skip; a failed build sits out the retry cooldown, so it
+        // cannot burn a budget slot every frame
         if (!visual) {
           return;
         }
@@ -8562,7 +8554,6 @@ export class Renderer {
 
   /** Blade-contact holds for melee presentation (contact_queue.ts). */
   private readonly contactQueue = new ContactQueue();
-  private lastSyncStart = 0;
   private readonly meleeContactHost: MeleeContactHost = {
     targetVisual: (id) => {
       const v = this.views.get(id);
@@ -8579,9 +8570,9 @@ export class Renderer {
     return this.contactQueue.delayFor(ev);
   }
 
-  /** Run `fn` at this damage event's blade contact (at once for an event with none). */
-  atContact(ev: object, fn: () => void): void {
-    this.contactQueue.atContact(ev, performance.now(), fn);
+  /** Run `fn(ev)` on `self` at this event's blade contact (at once, unallocated, with none). */
+  atContact<E extends object, S>(ev: E, fn: (this: S, ev: E) => void, self: S): void {
+    this.contactQueue.atContact(ev, performance.now(), fn, self);
   }
 
   private playShoutFx(
@@ -9669,7 +9660,6 @@ export class Renderer {
   ): void {
     if (this.shutdownStarted) return;
     const totalStart = performance.now();
-    this.lastSyncStart = totalStart;
     this.contactQueue.tick(totalStart);
     this.resizeGate.flush(); // before anything draws: see resize_coalesce_core.ts
     // The hitch sample's start reading, before any view creation, then a new
@@ -9893,9 +9883,9 @@ export class Renderer {
         v.liveScale = displayScale;
         v.group.scale.setScalar(displayScale);
       }
-      // a kill's collapse waits for the blade that dealt it (contact_queue.ts)
-      const visuallyDead =
-        isVisuallyDead(e) && !e.ghost && !this.contactQueue.holdsDeath(e.id, this.lastSyncStart);
+      // a kill's collapse waits for the blade that dealt it, its mount and wings with it
+      const deathHeld = isVisuallyDead(e) && !e.ghost && this.contactQueue.holdsDeath(e.id);
+      const visuallyDead = collapsed(isVisuallyDead(e) && !e.ghost, deathHeld);
       const waterJetVisualChannel = this.waterJetVisualChannels.has(e.id);
       // This is the final render-side casting state, including Water Jet's
       // spellfx-driven channel. It feeds both the rig and the fairness carve-out.
@@ -10247,7 +10237,7 @@ export class Renderer {
           v.paladinAvengingWrathVisual,
           v.riderAnchor,
           v.height,
-          !e.dead && hasPaladinWings,
+          heldUntilCollapse(deathHeld, !e.dead && hasPaladinWings, !!v.paladinAvengingWrathVisual),
           dt,
           this.reducedMotion(),
         );
@@ -10407,8 +10397,10 @@ export class Renderer {
       // the visual appears once ready. A druid form replaces the whole body,
       // so the form wins visually and the mount hides (the sim's speed math
       // is untouched either way).
-      const mountSpec = e.kind === 'player' ? mountVisualSpecFor(e.mountKey, e.mountSkinId) : null;
-      const mountShown = !!mountSpec && requestedForm === 'base' && !e.dead;
+      // The sim clears mountKey the tick a rider dies: a held collapse keeps the mount it sat on.
+      const mountKey = heldUntilCollapse(deathHeld && v.mountLift > 0, e.mountKey, v.lastMountKey);
+      const mountSpec = e.kind === 'player' ? mountVisualSpecFor(mountKey, e.mountSkinId) : null;
+      const mountShown = !!mountSpec && requestedForm === 'base' && !collapsed(e.dead, deathHeld);
       const targetMountVisualKey = mountSpec?.visualKey ?? '';
       if (v.mountVisualKey !== targetMountVisualKey) {
         releaseMountFx(v);
@@ -10552,7 +10544,7 @@ export class Renderer {
       // Mounting folds into the SAME overlay for the same reason (nobody rides
       // with a sword in hand); it must stay the single writer of
       // `v.weaponStowed` (see weaponStowedOverlay's header).
-      const stowed = weaponStowedOverlay(e.weaponStowed, swimming, e.mountKey !== '');
+      const stowed = weaponStowedOverlay(e.weaponStowed, swimming, mountKey !== '');
       if (stowed !== v.weaponStowed) {
         v.weaponStowed = stowed;
         v.visual.setWeaponStowed(stowed);
@@ -10707,7 +10699,7 @@ export class Renderer {
       // A mounted rider stays planted in the saddle: the MOUNT carries the
       // jump arc (its anim scratch below keeps the real airborne flag), while
       // the rider holds the seated pose instead of replaying the jump clip.
-      const mountLook = mountPresentationKey(e.mountKey, e.mountSkinId);
+      const mountLook = mountPresentationKey(mountKey, e.mountSkinId);
       const logicallyMounted = mountLook !== '';
       const riderMounted = v.mountLift > 0;
       st.airborne = airborne && !riderMounted;
@@ -10749,8 +10741,8 @@ export class Renderer {
           mountCasting: e.mountCastRemaining > 0,
           mountCastKey: e.mountCastKey,
           mountCastRemaining: e.mountCastRemaining,
-          mountKey: e.mountKey,
-          mountLook: mountPresentationKey(e.mountCastKey || e.mountKey, e.mountSkinId),
+          mountKey,
+          mountLook: mountPresentationKey(e.mountCastKey || mountKey, e.mountSkinId),
           poseAllowed: !visuallyDead && !swimming && runCharacterPresentation,
           present: runCharacterPresentation,
           playCallPose: (secs: number) => active.playCallPose(secs),

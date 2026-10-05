@@ -7,6 +7,7 @@ import { ErrorToastController } from '../src/ui/error_toast_controller';
 import { heldLootWarningText } from '../src/ui/held_loot_warning_view';
 import { Hud } from '../src/ui/hud';
 import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
+import { contactAtOnce } from './helpers/renderer_contact';
 
 const heldText = 'Your bags are full; [[i:greyjaw_hide_boots]] is waiting on the corpse for you.';
 
@@ -22,7 +23,7 @@ function rig() {
       gatheringProficiency: {},
     },
     // the melee arm defers its sound to blade contact through the renderer (contact_queue.ts)
-    renderer: { handleEvent: vi.fn(), atContact: (_ev: unknown, fn: () => void) => fn() },
+    renderer: { handleEvent: vi.fn(), atContact: contactAtOnce },
     playEventSfx: vi.fn(),
     meters: { onEvent: vi.fn() },
     isNythraxisEvent: vi.fn(() => false),
@@ -47,6 +48,21 @@ describe('held loot error toast through the HUD', () => {
     vi.useRealTimers();
     vi.restoreAllMocks();
     setLanguage('en');
+  });
+
+  it('plays an event sound through the contact seam: on the hud itself, with that event', () => {
+    // The hud hands the renderer its own method and itself, never a closure per event
+    // (Renderer.atContact): the seam has to run it ON the hud, with the event.
+    const { hud, send } = rig();
+    const ev: SimEvent = { type: 'loot', text: heldText, pid: 7 };
+    send([ev]);
+    expect(hud.renderer.handleEvent).toHaveBeenCalledWith(ev);
+    expect(hud.playEventSfx).toHaveBeenCalledOnce();
+    expect(hud.playEventSfx).toHaveBeenCalledWith(ev);
+    expect(hud.playEventSfx.mock.contexts[0]).toBe(hud);
+    // an event addressed to another player is none of this hud's: nothing plays for it
+    send([{ type: 'loot', text: heldText, pid: 8 }]);
+    expect(hud.playEventSfx).toHaveBeenCalledOnce();
   });
 
   it('shows the winner a readable item name for 7.5 seconds and keeps one linked chat line', () => {

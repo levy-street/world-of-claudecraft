@@ -14,11 +14,20 @@ interface ContactFakeParts {
   sim?: { playerId?: number };
 }
 
+/**
+ * The `atContact` of a renderer fake for a HUD harness with no blade to wait for: the real
+ * seam's at-once arm (Renderer.atContact over ContactQueue.atContact), which runs the caller's
+ * method ON the caller, with the event. The hud hands its method and itself over instead of a
+ * closure per event, so a fake that calls `fn()` bare would run it detached from its object.
+ */
+export function contactAtOnce<E>(ev: E, fn: (this: unknown, ev: E) => void, self: unknown): void {
+  fn.call(self, ev);
+}
+
 export function withMeleeContact<T extends object>(fake: T): T {
   const r = fake as unknown as ContactFakeParts;
   Object.assign(fake, {
     contactQueue: new ContactQueue(),
-    lastSyncStart: 0,
     meleeContactHost: {
       targetVisual: (id: number) => {
         const view = r.views?.get(id);

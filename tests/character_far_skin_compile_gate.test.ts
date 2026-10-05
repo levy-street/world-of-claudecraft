@@ -42,8 +42,8 @@ function stubSourceClip(name: string): THREE.AnimationClip {
 function stubGltf() {
   const scene = new THREE.Group();
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshStandardMaterial());
-  // The WOC paladin restricts the skin atlas to the manifest's body node
-  // (userData.skinAtlasTarget), so the stub body carries that name.
+  // (named as the paladin's body node; on the fixed rig this test builds, every
+  // mesh of the body takes the skin atlas)
   mesh.name = 'Character_Body';
   scene.add(mesh);
   return {
@@ -77,6 +77,12 @@ describe('a far re-skin swaps in only once its programs are linked', () => {
       ),
       releaseGltf: vi.fn(),
     }));
+    // A FIXED rig is what this rule is about: a body whose far mesh is its key's own bake,
+    // built with the body (a mob, an NPC, the Combat Mech). The paladin def is lent to it
+    // without its WOC manifest: a WOC body bakes its far mesh per look, on its far crossing
+    // (tests/woc_far_equipment.test.ts), and builds none at construction.
+    const manifest = await import('../src/render/characters/manifest');
+    manifest.VISUALS[VISUAL_KEY] = { ...manifest.VISUALS[VISUAL_KEY], wocCharacter: undefined };
     const assets = await import('../src/render/characters/assets');
     const { charactersReady } = assets;
     await charactersReady();

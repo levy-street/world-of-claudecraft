@@ -5,7 +5,7 @@
 import { type Entity, isMechWearer, type PlayerClass } from '../../sim/types';
 import { renderLayerDisabled } from '../render_dev_flags';
 import { logAssetMissOnce } from './asset_miss_log';
-import { type AssembleOptions, modularHeadFor, visualAwaitsStream } from './assets';
+import { type AssembleOptions, modularHeadFor } from './assets';
 import { type CharacterFormKey, characterFormAssetKey } from './form_visual_selection_core';
 import { composedLookPiecesFor, type LookPieceQueue, type LookPieces } from './look_pieces';
 import {
@@ -18,7 +18,7 @@ import {
 import { MODULAR_WARRIOR_KEY, type ModularLook, wocBodyScaleOf } from './modular';
 import { npcModularKeyFor } from './npc_looks';
 import { CharacterVisual } from './visual';
-import { ensureWocHeadForAppearance, wocHeadAppearanceAwaited } from './woc_head_packs';
+import { ensureWocHeadForAppearance } from './woc_head_packs';
 
 export {
   type AnimOverrideFacts,
@@ -107,14 +107,6 @@ export function createMountVisual(visualKey: string): CharacterVisual {
   return new CharacterVisual(visualKey, 0xffffff, 0, null, null);
 }
 
-/** Whether the last createCharacterVisual returned null because the body was
- *  still streaming (a designed wait the caller retries next frame, never
- *  booking the failure cooldown), not because it failed. */
-let buildStreaming = false;
-export function characterBuildStreaming(): boolean {
-  return buildStreaming;
-}
-
 /** Build the visual for an entity (or an explicit shapeshift/polymorph form key).
  *  Returns null when the visual's assets are unavailable (a missed preload, a
  *  lazy fetch that has not landed): callers skip that entity's view for the
@@ -149,27 +141,29 @@ export function createCharacterVisual(
       ? mechHeldWeaponOverride(e.templateId as PlayerClass)
       : null;
   // A WOC body's own head files (its type's core, hairstyle and facial hair: a player's
-  // look, the type's default on a mob) stream beside its base, and the body WAITS for
-  // them: a base file ends at the neck, so a character is built only once its head can
-  // draw with it (woc_head_packs.ts wocHeadAppearanceAwaited; a head file that failed to
-  // load ends the wait, and that body draws without a head until a retry lands).
+  // look, the type's default on a mob) are asked for beside its base, and the body NEVER
+  // waits for a hairstyle or a beard: a player with no body at all is the worse sight. It
+  // is built as soon as its head CORE is resident, with whatever pieces of its look are
+  // resident too (AssembleOptions.wocHead), and draws at once, the bare head standing in
+  // for a hairstyle or a beard still on the wire (or one whose fetch failed), which joins
+  // hidden until linked (woc_head_stream_core.ts). The core itself is resident from world
+  // entry, with the base and the animation library (woc_entry_preload.ts awaits all three
+  // for both fits before the Renderer exists), so NOTHING is waited for here: no file of a
+  // WOC body makes this return null quietly. A base or library that is missing anyway is a
+  // miss like any other body's and takes the logged fail-soft path below, with the
+  // caller's retry cooldown; a core that is missing anyway (a host that built a world
+  // without the entry gate) leaves the body drawing without a head until it lands.
   const wocFit = formKey ? undefined : VISUALS[key]?.wocCharacter?.fit;
   const wocHeadApp = e.kind === 'player' ? e.modularAppearance : null;
-  const fetchStreamed = opts?.fetchStreamed !== false;
-  if (wocFit && fetchStreamed) ensureWocHeadForAppearance(wocFit, wocHeadApp);
-  // A body still streaming (a WOC base, library or head, fetched on first use) is a
-  // designed wait, not a miss: skip the frame quietly (no throw, no log) and
-  // let the caller try the next one (characterBuildStreaming).
-  buildStreaming =
-    visualAwaitsStream(key, fetchStreamed) ||
-    (wocFit !== undefined && fetchStreamed && wocHeadAppearanceAwaited(wocFit, wocHeadApp));
-  if (buildStreaming) return null;
+  if (wocFit && opts?.fetchStreamed !== false) ensureWocHeadForAppearance(wocFit, wocHeadApp);
   try {
     // The world path, and the only one with a point-light budget: its weapon
     // light is born hidden and the budget decides when it shines. A rig built
     // directly (previews) keeps a light that lights immediately. It is also the
     // one path that opts a WOC body's armor down to the crowd's detail: anyone
-    // but the local player (a body built directly keeps full detail).
+    // but the local player (a body built directly keeps full detail). A WOC body
+    // is born with the head pieces of its own look hung (never the library's).
+    const born: AssembleOptions = { ...opts, wocHead: wocHeadApp ?? null };
     const visual = new CharacterVisual(
       key,
       e.color,
@@ -178,13 +172,16 @@ export function createCharacterVisual(
       weaponOverride,
       formKey ? null : e.offhandItemId,
       look,
-      localPlayer ? opts : { ...opts, wocArmorDetail: 'crowd' },
+      localPlayer ? born : { ...born, wocArmorDetail: 'crowd' },
     );
     visual.budgetedWeaponLight = true;
     // ...and the only one that draws crowds: a WOC body folds its head's dozen pieces
     // into one draw here (woc_head_merge.ts). A rig built directly (previews, portraits)
     // keeps drawing piece by piece. `?wocmerge=off` keeps the pieces, for an A/B capture.
     visual.setWocDrawMerge(!renderLayerDisabled('wocmerge'));
+    // ...and the only one where a body must never wait for its head: the bare head stands
+    // in for a hairstyle or a beard still streaming (a preview draws a head only whole).
+    visual.setWocBareHeadStandIn(true);
     // A WOC body is born wearing its player's modular head look and body size
     // (no-op elsewhere), so it never draws one frame at the wrong size.
     if (!formKey && e.kind === 'player') {

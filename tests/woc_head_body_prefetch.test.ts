@@ -43,13 +43,13 @@ describe('a WOC player fetches its own head files beside its streaming body', ()
     vi.resetModules();
     const calls: string[] = [];
     mockLoader(calls);
-    const { createCharacterVisual, characterBuildStreaming } = await import(
-      '../src/render/characters/index'
-    );
+    const { createCharacterVisual } = await import('../src/render/characters/index');
     const { DEFAULT_APPEARANCE } = await import('../src/render/characters/modular');
     const app = { ...DEFAULT_APPEARANCE, headHair: 'mohawk', headBeard: 'handlebar' };
+    // nothing lands in this case, so the build is the logged miss of a body with no base;
+    // what is pinned here is what it asked for on the way
+    const miss = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     expect(createCharacterVisual(player(app))).toBeNull();
-    expect(characterBuildStreaming()).toBe(true);
     expect(headCalls(calls)).toEqual(
       [
         `${DIR}/head_type_a_core.glb`,
@@ -64,6 +64,7 @@ describe('a WOC player fetches its own head files beside its streaming body', ()
     expect(headCalls(calls)).toEqual(
       [`${DIR}/head_type_b_core.glb`, `${DIR}/head_type_b_hair_bob.glb`].sort(),
     );
+    miss.mockRestore();
   });
 
   it('a speculative request for a streaming body fetches no head file', async () => {

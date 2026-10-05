@@ -10,7 +10,9 @@
 // compile gate; a body whose rig is not drawn asks for nothing; the hit response's
 // shader reaches a merged head; a reveal the gate could not prove costs one more try,
 // never the head (or the kit) for life, and an effect edge while a stand-in links is no
-// miss at all; a head of a program already linked shows with no gate of its own; a
+// miss at all; a head of a program already linked shows with no gate of its own, on the
+// renderer's own proof asked again each time (a restored context or a released program
+// sends the next head back to the gate); a
 // translucent effect puts the head back into its pieces in the call that mounts it; the
 // worn kit folds into one draw per file material and a re-dress drops it at once; a
 // settle a replaced gate still delivers shows no stand-in that is not standing; and a
@@ -20,6 +22,7 @@ import * as THREE from 'three';
 import { afterEach, describe, expect, it } from 'vitest';
 import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
 import { Rng } from '../src/sim/rng';
+import { threeProgramKeys } from './helpers/three_program_keys';
 import {
   BASE,
   FULL_KIT_EQUIPPED,
@@ -73,9 +76,10 @@ function heldQueue() {
         units.push({ run: () => resolve(work() as T), priority, label });
       });
     },
-    /** Run every unit queued so far, in the order it was asked for. */
+    /** Run every unit queued so far, in the order it was asked for, and every unit those
+     *  ask for in their turn (a new head is a band of its fold, then its mount). */
     drain(): void {
-      for (const unit of units.splice(0)) unit.run();
+      while (units.length > 0) for (const unit of units.splice(0)) unit.run();
     },
   };
 }
@@ -364,6 +368,76 @@ async function rendererGate() {
   return { gate, linking, settle };
 }
 
+/**
+ * A WebGL context as the renderer's far-bake gate reads it, with the driver faked: asked
+ * to link a target, every material under it gets a linked program and every texture is
+ * uploaded, and the settle hands the renderer's REAL proof (compile_target_readiness.ts)
+ * as the renderer hands it, LAZILY: asked again later it reads the context as it is by
+ * then. Like three's, the context forgets a material's programs when the material is
+ * disposed (and releases a program with the last material holding it), and `restore`
+ * loses every record at once, as a context restored after a loss does.
+ */
+async function contextGate() {
+  const { compileTargetPrepared } = await import('../src/render/compile_target_readiness');
+  const { markProgramReady } = await import('../src/render/linked_program_readiness');
+  const { collectPrewarmTextures } = await import('../src/render/texture_prewarm');
+  let records = new WeakMap<object, unknown>();
+  const properties = { get: (o: object): unknown => records.get(o) };
+  const linking: { target: THREE.Object3D; settle: () => void }[] = [];
+  const gate: Gate = (target, settle) => {
+    const linkedIn = records;
+    target.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      for (const material of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
+        const program = { getUniforms: () => ({}), getAttributes: () => ({}) };
+        markProgramReady(program);
+        linkedIn.set(material, { programs: new Map([['fixture', program]]) });
+        material.addEventListener('dispose', () => linkedIn.delete(material));
+      }
+    });
+    const textures = new Set<THREE.Texture>();
+    collectPrewarmTextures(target, textures);
+    for (const t of textures) linkedIn.set(t, { __webglTexture: {}, __version: t.version });
+    linking.push({
+      target,
+      settle: () => settle(() => compileTargetPrepared(properties, target)),
+    });
+  };
+  return {
+    gate,
+    /** The targets still linking, by name. */
+    asked: (): string[] => linking.map((entry) => entry.target.name),
+    /** Settle every link in flight. */
+    settle: (): void => {
+      for (const entry of linking.splice(0)) entry.settle();
+    },
+    /** The context is lost and restored: nothing it linked or uploaded is left. */
+    restore: (): void => {
+      records = new WeakMap();
+    },
+  };
+}
+
+/**
+ * The renderer's far-bake gate where nothing links ahead of the draw: its settle comes at
+ * once, over a target no program was ever linked for, and hands back the renderer's REAL
+ * proof for that host (compile_target_readiness.ts compileProof, what renderer.ts
+ * farBakeGate hands a settle). `asyncCompile` false is a host without parallel shader
+ * compile, whose gate is a no-op (renderer.ts gateSwapFlagOnCompile); true is a host with
+ * it whose gate gave up before the driver linked anything.
+ */
+async function unlinkedGate(asyncCompile: boolean) {
+  const { compileProof } = await import('../src/render/compile_target_readiness');
+  const properties = { get: (): unknown => undefined };
+  const asked: string[] = [];
+  const gate: Gate = (target, settle) => {
+    asked.push(target.name);
+    settle(compileProof(asyncCompile, properties, target));
+  };
+  return { gate, asked };
+}
+
 afterEach(() => releaseWocVisualHarness());
 
 describe("a merged head's mount rides the renderer's work queue", () => {
@@ -388,8 +462,18 @@ describe("a merged head's mount rides the renderer's work queue", () => {
     frame(crowd, null);
     frame(crowd, null);
     expect(queue.units).toHaveLength(12);
-    // the queue gets to three of them: three heads mount, hidden while they link
+    // the queue gets to three of them: three heads are folded, and each asks for its
+    // mount, a unit of the kind that only mounts, behind the nine still waiting
     for (const unit of queue.units.splice(0, 3)) unit.run();
+    expect(h.headMergeCache.size).toBe(3);
+    expect(crowd.filter((v) => mergedHeadOf(v) !== null)).toHaveLength(0);
+    expect(h.gates).toHaveLength(0);
+    expect(queue.units.map((unit) => unit.label)).toEqual([
+      ...new Array<string>(9).fill(HEAD_MERGE_UNIT),
+      ...new Array<string>(3).fill(HEAD_MOUNT_UNIT),
+    ]);
+    // ...then to those three mounts: three heads mount, hidden while they link
+    for (const unit of queue.units.splice(9, 3)) unit.run();
     expect(crowd.map((v) => mergedHeadOf(v) !== null)).toEqual(crowd.map((_, i) => i < 3));
     expect(h.headMergeCache.size).toBe(3);
     expect(new Set(h.gates.map((g) => g.target.name))).toEqual(new Set([HEAD_GATE]));
@@ -421,6 +505,39 @@ describe("a merged head's mount rides the renderer's work queue", () => {
     expect(leases(h.headMergeCache)).toEqual(crowd.map(() => 0));
   });
 
+  it('thirty new faces in one frame: every head is folded once, and every body stands in', async () => {
+    // guards: a head folded whole waited idle for its owner's mount unit, a queue turn
+    // away, while the units ahead of it handed the cache more heads than its idle cap
+    // keeps: the first were dropped unmounted and folded again, and a big enough crowd of
+    // new faces never stood in at all
+    const { h, body, frame, face } = await world();
+    const { setBuildSpanSink } = await import('../src/render/build_spans');
+    const kinds: string[] = [];
+    setBuildSpanSink((kind) => kinds.push(kind));
+    const queue = heldQueue();
+    const crowd = Array.from({ length: 30 }, (_, i) => body(face(i / 30), { queue }));
+    frame(crowd, null);
+    expect(queue.units.map((unit) => unit.label)).toEqual(crowd.map(() => HEAD_MERGE_UNIT));
+    // the queue, a turn at a time: every unit it holds, then what those asked for
+    for (const unit of queue.units.splice(0)) unit.run();
+    // thirty heads whole, every one still waited for: more than the idle cap, none dropped
+    expect(h.headMergeCache.size).toBe(30);
+    expect(leases(h.headMergeCache)).toEqual(crowd.map(() => 0));
+    expect(queue.units.map((unit) => unit.label)).toEqual(crowd.map(() => HEAD_MOUNT_UNIT));
+    for (const unit of queue.units.splice(0)) unit.run();
+    for (const g of h.gates.splice(0)) g.settle(PROVEN);
+    expect(queue.units).toHaveLength(0);
+    for (const v of crowd) expect(headDrawn(h, v)).toBe('merged');
+    expect(leases(h.headMergeCache)).toEqual(crowd.map(() => 1));
+    // thirty heads, thirty folds, thirty mounts: none was folded twice
+    expect(kinds.filter((kind) => kind === 'view:woc-head-fold')).toHaveLength(30);
+    expect(kinds.filter((kind) => kind === 'view:woc-head-merge')).toHaveLength(30);
+    setBuildSpanSink(null);
+    for (const v of crowd) v.dispose();
+    // let go of at last, they are idle heads like any other: the cap holds again
+    expect(h.headMergeCache.size).toBe(12);
+  });
+
   it('a body shown by its far mesh, or not shown at all, asks for nothing until its rig draws', async () => {
     // guards: a stand-in was built for a body nobody saw (a far crowd paid every mount)
     const { h, body, frame } = await world({ kit: 'full' });
@@ -428,9 +545,30 @@ describe("a merged head's mount rides the renderer's work queue", () => {
     const equipped = { ...FULL_KIT_EQUIPPED };
     const asked = (): (string | undefined)[] => queue.units.map((unit) => unit.label).sort();
     const far = body({ ...h.DEFAULT_APPEARANCE }, { queue, equipped });
-    // into the far band before its first frame: the far mesh mints, links, stands in
+    // Into the far band before its first frame: the far mesh is baked and mounted by
+    // units of the same queue (woc_far_bake.ts, each asked for by the one before it).
+    // The rig is what draws for those frames, a stopgap: they ask for NO stand-in (a
+    // crowd arriving far paid a fold a body for a rig its far mesh replaced a moment
+    // later), so the far LOD's own units are all the queue ever holds.
     h.nextFrame();
     far.setFar(true);
+    const arriving: (string | undefined)[] = [];
+    for (let i = 0; i < 40 && !far.root.getObjectByName('character_far_mesh'); i++) {
+      frame(far, null);
+      expect(rigOf(far).visible).toBe(true);
+      arriving.push(...queue.units.map((unit) => unit.label));
+      queue.drain();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    }
+    expect(arriving).toContain('woc-far-assemble:male');
+    expect(arriving).toContain('woc-far-mount:male');
+    expect(arriving.filter((label) => !label?.startsWith('woc-far-'))).toEqual([]);
+    // mounted and still linking: the rig draws on, and still nothing is asked
+    frame(far, null);
+    frame(far, null);
+    expect(rigOf(far).visible).toBe(true);
+    expect(queue.units).toHaveLength(0);
+    expect(mergedHeadOf(far)).toBeNull();
     for (const g of h.gates.splice(0)) g.settle(PROVEN);
     far.setFar(true);
     expect(far.root.getObjectByName('character_far_mesh')?.visible).toBe(true);
@@ -671,6 +809,114 @@ describe('the linked-program shortcut', () => {
     for (const g of h.gates.splice(0)) g.settle(PROVEN);
     expect(headDrawn(h, struck)).toBe('merged');
     for (const v of [first, second, struck]) v.dispose();
+  });
+
+  it("stands on the renderer's own proof, asked again each time: a released program or a restored context sends the next head back to the gate", async () => {
+    const { h, body, frame, face } = await world();
+    const gl = await contextGate();
+    const arrive = (chin: number): Visual => {
+      const v = body(face(chin), { gate: gl.gate });
+      frame(v, null);
+      return v;
+    };
+    // the first head takes the gate, the second stands on that proof with no gate at all
+    const first = arrive(0.1);
+    expect(gl.asked()).toEqual([HEAD_GATE]);
+    gl.settle();
+    expect(headDrawn(h, first)).toBe('merged');
+    const second = arrive(0.9);
+    expect(gl.asked()).toEqual([]);
+    expect(headDrawn(h, second)).toBe('merged');
+
+    // guards: a page-wide "linked" bit outlived the program. The first body leaves, its
+    // merged wrap is disposed, and the context lets go of what it linked for it (three
+    // releases a program with the last material that holds it). Nothing proves the
+    // program any more, so the next head must not be drawn on trust: it takes the gate.
+    first.dispose();
+    const third = arrive(0.5);
+    expect(gl.asked()).toEqual([HEAD_GATE]);
+    expect(headDrawn(h, third)).toBe('pieces');
+    gl.settle();
+    expect(headDrawn(h, third)).toBe('merged');
+    // ...and its own reveal is the proof the one after it stands on
+    const fourth = arrive(0.3);
+    expect(gl.asked()).toEqual([]);
+    expect(headDrawn(h, fourth)).toBe('merged');
+
+    // guards: the same bit outlived the CONTEXT. Restored after a loss, it holds no
+    // program at all, whatever any script remembers of the one before it
+    gl.restore();
+    const fifth = arrive(0.7);
+    expect(gl.asked()).toEqual([HEAD_GATE]);
+    expect(headDrawn(h, fifth)).toBe('pieces');
+    gl.settle();
+    expect(headDrawn(h, fifth)).toBe('merged');
+    for (const v of [second, third, fourth, fifth]) v.dispose();
+  });
+
+  it('a body taken into its pieces by an effect is still the witness: the next head stands at once', async () => {
+    const { h, body, frame, face } = await world();
+    const gl = await contextGate();
+    const first = body(face(0.1), { gate: gl.gate });
+    frame(first, null);
+    gl.settle();
+    expect(headDrawn(h, first)).toBe('merged');
+    // stealth: its clones link behind the gate, then the head goes back to its pieces,
+    // its stand-in taken down wearing the effect's clone
+    first.setGhost(true, 'stealth');
+    gl.settle();
+    frame(first, null);
+    expect(headDrawn(h, first)).toBe('pieces');
+    expect(mergedHeadOf(first)).toBeNull();
+    // the plain program it proved is still linked (its wrap is alive): no gate for the next
+    const second = body(face(0.9), { gate: gl.gate });
+    frame(second, null);
+    expect(gl.asked()).toEqual([]);
+    expect(headDrawn(h, second)).toBe('merged');
+    // ...nor for itself when the effect ends
+    first.setGhost(false);
+    frame(first, null);
+    frame(first, null);
+    expect(gl.asked()).toEqual([]);
+    expect(headDrawn(h, first)).toBe('merged');
+    first.dispose();
+    second.dispose();
+  });
+
+  it('what makes the shortcut sound: by the key three itself computes, every merged head of one sidedness variant draws with ONE program, whatever its look', async () => {
+    /** three's own program cache key of each look's mounted merged head. */
+    const keysOf = async (opts: WocVisualHarnessOptions, apps: readonly Appearance[]) => {
+      const { body, frame } = await world(opts);
+      const out: string[] = [];
+      for (const app of apps) {
+        const v = body(app);
+        frame(v);
+        const head = mergedHeadOf(v);
+        if (!head) throw new Error('the head did not merge');
+        out.push(threeProgramKeys(worn(head), head));
+        v.dispose();
+      }
+      releaseWocVisualHarness();
+      return out;
+    };
+    const D = (await wocVisualHarness()).DEFAULT_APPEARANCE;
+    releaseWocVisualHarness();
+    // another face, other colours, another hairstyle (two textures), no beard, a piercing
+    // beside it, a helm-bald head: other buffers, other slot rows, other uniforms
+    const looks: Appearance[] = [
+      { ...D },
+      { ...D, headShape: { ...D.headShape, chinWidth: 1 }, hairHue: 10, hairSat: 0.9 },
+      { ...D, headHair: 'quiff', skinHue: 20, skinSat: 0.33, skinLight: 0.16 },
+      { ...D, headHair: 'bald', headBeard: 'none' },
+      { ...D, headNose: 'broad', headPiercing: 'full' },
+    ];
+    const oneSided = await keysOf({}, looks);
+    expect(new Set(oneSided).size).toBe(1);
+    // the other variant (a head with no one sided piece: Type B's) is another program,
+    // which is why a proof is of one variant
+    const twoSided = await keysOf({ allTwoSided: true }, looks);
+    expect(new Set(twoSided).size).toBe(1);
+    expect(twoSided[0]).not.toBe(oneSided[0]);
   });
 });
 
@@ -1005,6 +1251,114 @@ describe('the merged armor on the real host', () => {
   });
 });
 
+describe('a host without parallel shader compile', () => {
+  const KIT_PARTS = Object.values(FULL_KIT_PARTS).flat();
+  const asks = (asked: readonly string[], name: string): number =>
+    asked.filter((target) => target === name).length;
+
+  it('still folds the head and the kit: its gate hands no proof, and the pieces leave the render lists', async () => {
+    // guards: that host's gate settled at once with a proof over programs it never
+    // linked, which read unprepared for ever, so every head and every kit was refused
+    // after two tries and each body drew its pieces one by one for good
+    const { h, body } = await world({ kit: 'full' });
+    const { gate, asked } = await unlinkedGate(false);
+    const v = body({ ...h.DEFAULT_APPEARANCE }, { gate, equipped: { ...FULL_KIT_EQUIPPED } });
+    for (let i = 0; i < 4; i++) {
+      h.nextFrame(16);
+      v.update(0.016, IDLE, true);
+    }
+    // each stand-in asked the gate once, and stands on its first settle
+    expect(asks(asked, HEAD_GATE)).toBe(1);
+    expect(asks(asked, ARMOR_GATE)).toBe(1);
+    expect(headDrawn(h, v)).toBe('merged');
+    expect(drawnArmor(v)).toEqual(['Gloves', 'woc_armor_merged_0', 'woc_armor_merged_1']);
+    expect(drawProblems(h, v)).toEqual([]);
+    // the pieces they fold are out of the render lists: one draw for the head, one per
+    // shared file material for the kit
+    const s = sceneOf(v);
+    const shownPieces = s.pieces.filter(s.shown);
+    const foldedPieces = shownPieces.filter((piece) => piece.layers.mask === 0);
+    expect(foldedPieces.length).toBeGreaterThan(8);
+    expect(foldedPieces.length).toBe(shownPieces.length);
+    const foldedParts = s.parts.filter((part) => s.shown(part) && part.layers.mask === 0);
+    expect(names(foldedParts)).toEqual(
+      [...FULL_KIT_PARTS.kit_plate, ...FULL_KIT_PARTS.kit_hide].sort(),
+    );
+    v.dispose();
+  });
+
+  it('where the extension is there, a settle whose programs never linked is still refused', async () => {
+    // the other arm of the same proof: with parallel compile a settle is not a link (a
+    // timeout, a lane that gave up), and a stand-in that would link on its first draw
+    // stays behind its pieces, asked for once more and then left alone
+    const { h, body } = await world({ kit: 'full' });
+    const { gate, asked } = await unlinkedGate(true);
+    const v = body({ ...h.DEFAULT_APPEARANCE }, { gate, equipped: { ...FULL_KIT_EQUIPPED } });
+    for (let i = 0; i < 12; i++) {
+      h.nextFrame(16);
+      v.update(0.016, IDLE, true);
+    }
+    expect(asks(asked, HEAD_GATE)).toBe(2);
+    expect(asks(asked, ARMOR_GATE)).toBe(2);
+    expect(headDrawn(h, v)).toBe('pieces');
+    expect(mergedHeadOf(v)).toBeNull();
+    expect(sceneOf(v).mergedArmor).toHaveLength(0);
+    expect(drawnArmor(v)).toEqual([...KIT_PARTS].sort());
+    expect(drawProblems(h, v)).toEqual([]);
+    v.dispose();
+  });
+});
+
+describe('a body the renderer never gated (a prewarm or speculative build)', () => {
+  it('mounts no stand-in, however often it is updated, until a compile gate is installed', async () => {
+    // guards: the factory turns the draw merge on for every body it builds, the zone and
+    // encounter prewarm rigs included, and those never meet the renderer's gate or its
+    // queue: updated once, such a rig folded and mounted its stand-ins on the spot and
+    // revealed them with nothing proving their programs. It was harmless only because
+    // nothing updates a prewarm rig.
+    const { h, gate } = await world({ kit: 'full' });
+    const { createCharacterVisual } = await import('../src/render/characters/index');
+    const v = createCharacterVisual(player({ ...h.DEFAULT_APPEARANCE }));
+    if (!v) throw new Error('the fixture body did not build');
+    v.setWocEquipment({ ...FULL_KIT_EQUIPPED }, false);
+    const frames = (n: number): void => {
+      for (let i = 0; i < n; i++) {
+        h.nextFrame(16);
+        v.update(0.016, IDLE, true);
+      }
+    };
+    frames(6);
+    // drawn whole, piece by piece: nothing folded, nothing mounted, nothing asked for
+    expect(mergedHeadOf(v)).toBeNull();
+    expect(sceneOf(v).mergedArmor).toHaveLength(0);
+    expect(h.headMergeCache.size + h.armorMergeCache.size).toBe(0);
+    expect(headDrawn(h, v)).toBe('pieces');
+    expect(drawnArmor(v)).toEqual(Object.values(FULL_KIT_PARTS).flat().sort());
+    expect(h.gates).toHaveLength(0);
+    // the renderer takes it on (a pooled prewarm rig handed to a live entity): behind its
+    // gate, and on its queue, the stand-ins are asked for, mount, link and stand like
+    // any other body's
+    const queue = heldQueue();
+    v.setFarBakeGate(gate, queue);
+    frames(2);
+    expect(queue.units.map((unit) => unit.label).sort()).toEqual([
+      ARMOR_MERGE_UNIT,
+      HEAD_MERGE_UNIT,
+    ]);
+    expect(mergedHeadOf(v)).toBeNull();
+    expect(h.gates).toHaveLength(0);
+    queue.drain();
+    expect(h.gates.map((g) => g.target.name).sort()).toEqual([ARMOR_GATE, HEAD_GATE]);
+    expect(headDrawn(h, v)).toBe('pieces');
+    for (const g of h.gates.splice(0)) g.settle(PROVEN);
+    frames(1);
+    expect(headDrawn(h, v)).toBe('merged');
+    expect(drawnArmor(v)).toEqual(['Gloves', 'woc_armor_merged_0', 'woc_armor_merged_1']);
+    expect(drawProblems(h, v)).toEqual([]);
+    v.dispose();
+  });
+});
+
 describe('a seeded run of the whole lifecycle', () => {
   it('never draws a piece twice, never leaves a hole, and gives every geometry back', async () => {
     // guards: the interleavings no scripted case names (an effect over a queued mount, a
@@ -1057,11 +1411,10 @@ describe('a seeded run of the whole lifecycle', () => {
     ];
     const schools = ['fire', 'frost', 'physical', 'holy', 'shadow', 'nature'];
     const slots = Object.keys(FULL_KIT_EQUIPPED) as (keyof typeof FULL_KIT_EQUIPPED)[];
-    /** A body the way the world builds one. A look whose file still streams builds no
-     *  body yet (the world retries next frame): the default look's then. */
+    /** A body the way the world builds one. A look whose file still streams builds its
+     *  body all the same, the bare head standing in until the hairstyle joins. */
     const born = (): Visual => {
-      const v =
-        createCharacterVisual(player(pick(looks))) ?? createCharacterVisual(player({ ...D }));
+      const v = createCharacterVisual(player(pick(looks)));
       if (!v) throw new Error('the fixture body did not build');
       v.setFarBakeGate(gateFor(v), queue);
       return v;

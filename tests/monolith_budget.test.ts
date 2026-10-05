@@ -1005,7 +1005,11 @@ const MONOLITHS: MonolithRow[] = [
     // target_cone_debug_mesh.ts, the melee blade-contact presentation in
     // contact_queue.ts + melee_contact_present.ts, net of the contact timing and
     // streamed WOC body wiring); wc -l on the merged tree. Exact count, zero slack.
-    ceiling: 12606,
+    // LOWERED 12606 -> 12598 at the PR 4360 review round: the required pair of views (the
+    // player, its target) moved into required_views_core.ts, which counts a view only when
+    // its build made one; the world-entry head start of the player bodies
+    // (characters/woc_entry_prepare.ts) came in as one awaited, announced call. Exact count.
+    ceiling: 12598,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

@@ -600,9 +600,11 @@ export const WOC_CONTACTS_FEMALE: Readonly<Record<string, readonly number[]>> = 
 };
 
 /** A WOC body's files (woc_armor_core.ts): its fit's shared base and animation
- *  library, fetched on demand (lazyPreload) the first time a character of that
- *  fit is built and never in the boot gate. Its armor streams per set, at the
- *  graphics setting's texture tier (woc_armor_dressing.ts). */
+ *  library, out of the boot gate (lazyPreload). The launcher fetches a fit when
+ *  a preview first shows it, and world entry loads both fits before the
+ *  Renderer exists (woc_entry_preload.ts), so no player body in the world waits
+ *  on them. Its armor streams per set, at the graphics setting's texture tier
+ *  (woc_armor_dressing.ts). */
 /** The share of the sky reflection a WOC body's cloth, leather and skin keep (VisualDef.envSheen):
  *  measured in game against the dark authored atlases, where the full reflection read as a
  *  grey film at noon and a quarter keeps a hint of sky without it. */
@@ -4559,8 +4561,8 @@ export const VISUALS: Record<string, VisualDef> = {
 // synthesized per-class attacks (Shield_Bash, Garrote_Choke, Kick_A, ...)
 // exist only there, and every player body shares KayKit's Rig_Medium, so its
 // clips bind onto the modular skeleton by node name, the swim/bow clip packs
-// are the precedent. No extra fetch: the class GLB is already preloaded as the
-// fixed rig every OTHER entity still wears.
+// are the precedent. Which of these defs still preload at boot is decided where
+// they are generated, below.
 //
 // Deliberately dropped from the class def:
 //  - `show`: the composed body has no baked accessory meshes to allowlist;
@@ -5178,6 +5180,17 @@ export const KAYKIT_BASELINES: Partial<Record<PlayerClass, VisualDef>> = {
 // Driven by ALL_CLASSES rather than a local copy: a tenth class would otherwise
 // get no modular def at all and fall back to the warrior's clips through
 // modularKeyFor, silently, with no test able to see it.
+//
+// A class on a WOC body never composes (woc_parts_core.ts classBodyComposes: the
+// look provider, the roster look, the creation turntable and the portrait chip
+// all answer null for it), so nothing a player can reach builds its `_modular`
+// def, and the def is `lazyPreload`: the KayKit class rig and donor clip GLBs
+// only it names stay out of every client's boot download and are fetched if a
+// build ever asks (assets.ts visualAssetsResident; the dev outfit audit rig,
+// src/dev/outfit_audit.ts, is the one caller left). The warrior's stays in the
+// boot gate: it is the library's own fallback key (MODULAR_WARRIOR_KEY, what
+// modularKeyFor hands a composed player whose class has no def), and it costs
+// the boot nothing while mob_vision_aldren names the same files.
 for (const cls of ALL_CLASSES) {
   const classDef = VISUALS[`player_${cls}`];
   const {
@@ -5191,6 +5204,7 @@ for (const cls of ALL_CLASSES) {
     url: `${MODULAR}/warrior_modular.glb`,
     modular: true,
     animUrls: [base.url, ...(base.animUrls ?? [])],
+    ...(classDef.wocCharacter && cls !== 'warrior' ? { lazyPreload: true } : {}),
   };
 }
 
@@ -5651,6 +5665,10 @@ export function mechHeldWeaponOverride(cls: PlayerClass): WeaponLayoutOverride |
 export function manifestUrls(): string[] {
   const urls = new Set<string>();
   for (const def of Object.values(VISUALS)) {
+    // A WOC body streams its base and library, never the weapons it holds: a held prop
+    // attaches synchronously at build, so those stay in the boot gate in their own right
+    // (the warlock's wand is held by no other boot def).
+    if (def.wocCharacter) for (const a of def.attach ?? []) urls.add(a.url);
     if (def.lazyPreload) continue; // fetched on demand, not at boot
     urls.add(def.url);
     for (const url of def.animUrls ?? []) urls.add(url);

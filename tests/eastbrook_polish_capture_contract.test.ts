@@ -706,7 +706,8 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted for the WOC crowd-draw work: the renderer leaf hands the background work
   // queue to each character visual with the far bake gate. No capture was retaken.
   // Re-minted for WOC armor detail: the renderer leaf passes each view whether it is the local player's own. No capture was retaken.
-  'dbef51d97275023192d5102bb30d9dde5cfb9f6840b3d7ba7646806aa81f75b5';
+  // Re-minted for the PR 4360 review response: the renderer leaf moved (required views, the far-bake gate's proof, the death hold). No capture was retaken.
+  'c70430294fa580de59802d4bd2c0b5eb40d5ce70c7f4746238b2a30e608a3c68';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

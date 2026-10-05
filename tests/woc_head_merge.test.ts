@@ -12,6 +12,7 @@
 // exactly as before.
 import * as THREE from 'three';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { geometryLodOf, setGeometryLod } from '../src/render/assets/geometry_lod';
 import { buildLedgerLane } from '../src/render/build_ledger_core';
 import { setBuildSpanSink } from '../src/render/build_spans';
 import type { WocHeadType } from '../src/render/characters/woc_head_catalog';
@@ -20,6 +21,7 @@ import {
   mergeWocHeadGeometry,
   retainWocHeadMerge,
   WOC_HEAD_MERGED_KEY,
+  WocHeadGeometryFold,
   type WocHeadMergeCandidate,
   type WocHeadMergeHost,
   type WocHeadMergePiece,
@@ -30,10 +32,16 @@ import {
   wocHeadMergeInternalsForTest,
   wocHeadMergeSurfaceOf,
 } from '../src/render/characters/woc_head_merge';
-import { WOC_HEAD_MERGE_MAX_SLOTS } from '../src/render/characters/woc_head_merge_core';
+import {
+  WOC_HEAD_MERGE_BAND_INDICES,
+  WOC_HEAD_MERGE_BAND_VERTICES,
+  WOC_HEAD_MERGE_MAX_SLOTS,
+  wocHeadMergeFoldUnits,
+} from '../src/render/characters/woc_head_merge_core';
+import { gfxInternalsForTest } from '../src/render/gfx';
 
-/** woc_head_merge.ts MAX_IDLE_MERGES (not exported): the idle merged heads the cache
- *  keeps. Re-pin it here when that cap moves. */
+/** The idle merged heads the cache keeps on an unconstrained profile
+ *  (woc_idle_cache_core.ts wocIdleCacheCaps). Re-pin it here when that cap moves. */
 const MAX_IDLE = 12;
 
 /** The clock a mount's build span reads. */
@@ -419,6 +427,262 @@ describe('mergeWocHeadGeometry: triangles', () => {
   });
 });
 
+// ---------------------------------------------------------------------------
+// The fold, a band at a time
+// ---------------------------------------------------------------------------
+
+/** A strip of `quads` quads along x from `x0` (four vertices and two triangles each, no
+ *  vertex shared), every position, normal and uv its own so a value folded into the wrong
+ *  place shows. `morphs` relative targets (positions and normals), and coarser levels
+ *  (mid: every other quad, far: every fourth) when asked. */
+function strip(
+  quads: number,
+  x0: number,
+  opts: { morphs?: number; lod?: boolean; indexed?: boolean } = {},
+): THREE.BufferGeometry {
+  const positions: number[] = [];
+  const normals: number[] = [];
+  const uvs: number[] = [];
+  const index: number[] = [];
+  for (let q = 0; q < quads; q++) {
+    const z = q * 0.03125;
+    positions.push(x0 + q, 0, z, x0 + q + 1, 0, z, x0 + q + 1, 1, z, x0 + q, 1, z);
+    for (let k = 0; k < 4; k++) {
+      const n = new THREE.Vector3(0.25 * k, 0.5 + q * 0.125, 1).normalize();
+      normals.push(n.x, n.y, n.z);
+      uvs.push((q * 4 + k) / 1024, (x0 + k) / 64);
+    }
+    index.push(q * 4, q * 4 + 1, q * 4 + 2, q * 4, q * 4 + 2, q * 4 + 3);
+  }
+  const count = quads * 4;
+  const deltas = (scale: number): number[][] =>
+    Array.from({ length: opts.morphs ?? 0 }, (_m, t) =>
+      Array.from({ length: count * 3 }, (_c, i) => ((i % 7) - 3) * 0.015625 * (t + 1) * scale),
+    );
+  const g = geometry({
+    positions,
+    normals,
+    uvs,
+    index: opts.indexed === false ? undefined : index,
+    morphs: opts.morphs ? deltas(1) : undefined,
+    morphNormals: opts.morphs ? deltas(0.5) : undefined,
+  });
+  if (opts.lod) {
+    const level = (every: number): THREE.BufferAttribute =>
+      new THREE.BufferAttribute(
+        new Uint16Array(index.filter((_v, i) => Math.floor(i / 6) % every === 0)),
+        1,
+      );
+    setGeometryLod(g, { mid: level(2), far: level(4) });
+  }
+  return g;
+}
+
+/** Everything a merged head's geometry is: each attribute, the index, the coarser levels
+ *  and the bounds. */
+function wholeOf(geo: THREE.BufferGeometry) {
+  const lod = geometryLodOf(geo);
+  const list = (a: THREE.BufferAttribute | null | undefined): number[] | null =>
+    a ? Array.from(a.array) : null;
+  return {
+    attributes: Object.keys(geo.attributes).sort(),
+    position: values(geo, 'position'),
+    normal: values(geo, 'normal'),
+    normalNormalized: geo.getAttribute('normal').normalized,
+    uv: values(geo, 'uv'),
+    slot: values(geo, 'aWocHmSlot'),
+    index: indices(geo),
+    indexType: geo.index?.array.constructor.name,
+    mid: list(lod?.mid),
+    far: list(lod?.far),
+    box: [geo.boundingBox?.min.toArray(), geo.boundingBox?.max.toArray()],
+    sphere: [geo.boundingSphere?.center.toArray(), geo.boundingSphere?.radius],
+  };
+}
+
+/** A head of every kind of piece the fold meets: a posed one with coarser levels, a
+ *  mirrored one, a flat-coloured one with neither normal nor uv, one drawn without an
+ *  index, and one whose index ends on a partial triangle. */
+function mixedHead(): WocHeadMergePiece[] {
+  const flat = geometry({ positions: strip(3, 40).getAttribute('position').array as never });
+  flat.setIndex([0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11]);
+  const ragged = strip(2, 60);
+  ragged.setIndex([...Array.from(ragged.index?.array ?? []), 1]);
+  return [
+    piece(strip(9, 0, { morphs: 3, lod: true }), {
+      toRoot: new THREE.Matrix4().compose(
+        new THREE.Vector3(1, 2, 3),
+        new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0.5),
+        new THREE.Vector3(2, 2, 2),
+      ),
+      influences: [0.25, 0, -0.5],
+    }),
+    piece(strip(4, 20, { lod: true }), {
+      toRoot: new THREE.Matrix4().makeScale(-1, 1, 1),
+      slot: 1,
+    }),
+    piece(flat, { slot: 2, flatUv: [0.75, 0.25] }),
+    piece(strip(5, 50, { indexed: false, morphs: 1 }), { slot: 3, influences: [1] }),
+    piece(ragged, { slot: 4 }),
+  ];
+}
+
+/** Run a fold to its end at the bands given; answers the geometry and what each call
+ *  folded. */
+function foldInBands(pieces: readonly WocHeadMergePiece[], vertices?: number, indices?: number) {
+  const fold = new WocHeadGeometryFold(pieces);
+  const calls: { vertices: number; indices: number }[] = [];
+  let out: THREE.BufferGeometry | null = null;
+  while (!out) {
+    const before = { vertices: fold.foldedVertices, indices: fold.foldedIndices };
+    out = fold.step(vertices, indices);
+    calls.push({
+      vertices: fold.foldedVertices - before.vertices,
+      indices: fold.foldedIndices - before.indices,
+    });
+    if (calls.length > 100000) throw new Error('the fold never ends');
+  }
+  return { fold, out, calls };
+}
+
+describe('WocHeadGeometryFold: the fold a band at a time', () => {
+  it.each([
+    [1, 3],
+    [2, 3],
+    [5, 6],
+    [7, 9],
+    [36, 30],
+    [100000, 3],
+    [1, 100000],
+  ])(
+    'folds the very geometry the one-shot fold does at %i vertices and %i index entries a band',
+    (bandVertices, bandIndices) => {
+      const whole = wholeOf(mergeWocHeadGeometry(mixedHead()));
+      // the fixture is what it says: every level, a 16 bit index, a flat piece, a flip
+      expect(whole.mid?.length).toBeGreaterThan(0);
+      expect(whole.far?.length).toBeGreaterThan(0);
+      expect(whole.position).toHaveLength(92 * 3);
+      const { out, calls } = foldInBands(mixedHead(), bandVertices, bandIndices);
+      expect(wholeOf(out)).toEqual(whole);
+      // ...in more than one call: the bands really cut it
+      expect(calls.length).toBeGreaterThan(1);
+      for (const call of calls) {
+        expect(call.vertices).toBeLessThanOrEqual(bandVertices);
+        expect(call.indices).toBeLessThanOrEqual(bandIndices);
+        expect(call.indices % 3).toBe(0);
+      }
+    },
+  );
+
+  it('folds no more than its band a call, in exactly the calls the core counts', () => {
+    // a head of the library's size: four pieces, 13,600 vertices and 40,800 index entries
+    const head = (): WocHeadMergePiece[] => [
+      piece(strip(1500, 0, { morphs: 2, lod: true }), { influences: [0.5, 0.25] }),
+      piece(strip(1300, 2000, { lod: true }), { slot: 1 }),
+      piece(strip(550, 4000), { slot: 2 }),
+      piece(strip(50, 5000), { slot: 3 }),
+    ];
+    // literal: the bands (index entries in whole triangles)
+    expect(WOC_HEAD_MERGE_BAND_VERTICES).toBe(512);
+    expect(WOC_HEAD_MERGE_BAND_INDICES).toBe(12288);
+    expect(WOC_HEAD_MERGE_BAND_INDICES % 3).toBe(0);
+    const { fold, out, calls } = foldInBands(head());
+    expect(fold.vertices).toBe(13600);
+    expect(fold.indices).toBe(20400);
+    expect(fold.foldedVertices).toBe(13600);
+    expect(fold.foldedIndices).toBe(20400);
+    // 27 bands of vertices, the last going on to the first of two bands of triangles
+    expect(calls).toHaveLength(28);
+    expect(wocHeadMergeFoldUnits(fold.vertices, fold.indices)).toBe(28);
+    for (const call of calls) {
+      expect(call.vertices).toBeLessThanOrEqual(WOC_HEAD_MERGE_BAND_VERTICES);
+      expect(call.indices).toBeLessThanOrEqual(WOC_HEAD_MERGE_BAND_INDICES);
+    }
+    // every band but the last of each kind is full: nothing is folded in dribbles
+    expect(calls.slice(0, 26).map((call) => call.vertices)).toEqual(
+      new Array<number>(26).fill(WOC_HEAD_MERGE_BAND_VERTICES),
+    );
+    expect(calls[26]).toEqual({ vertices: 13600 - 26 * 512, indices: 12288 });
+    expect(calls[27]).toEqual({ vertices: 0, indices: 20400 - 12288 });
+    expect(wholeOf(out)).toEqual(wholeOf(mergeWocHeadGeometry(head())));
+  });
+
+  it('is whole after one call when the head fits one band', () => {
+    const { calls } = foldInBands([piece(triangle()), piece(triangle(10), { slot: 1 })]);
+    expect(calls).toEqual([{ vertices: 6, indices: 6 }]);
+    expect(wocHeadMergeFoldUnits(6, 6)).toBe(1);
+    // an empty head is one call too, and an empty geometry
+    const empty = foldInBands([]);
+    expect(empty.calls).toEqual([{ vertices: 0, indices: 0 }]);
+    expect(empty.out.getAttribute('position').count).toBe(0);
+    expect(empty.out.index?.count).toBe(0);
+  });
+
+  it('ends on a full band without a call that folds nothing', () => {
+    // guards: a band that ended exactly on the last vertex (or the last triangle) handed
+    // the rest to another call, one unit more than the head needs
+    // the mixed head is 92 vertices and 126 index entries: two bands of 46, two of 63
+    const { calls } = foldInBands(mixedHead(), 46, 63);
+    expect(calls).toEqual([
+      { vertices: 46, indices: 0 },
+      { vertices: 46, indices: 63 },
+      { vertices: 0, indices: 63 },
+    ]);
+    // at the real bands: 8192 vertices are sixteen bands exactly, their 12288 index
+    // entries one band exactly, folded by the call that folds the last vertices
+    const even = foldInBands([piece(strip(2048, 0))]);
+    expect(even.fold.vertices).toBe(16 * WOC_HEAD_MERGE_BAND_VERTICES);
+    expect(even.fold.indices).toBe(WOC_HEAD_MERGE_BAND_INDICES);
+    expect(even.calls).toHaveLength(16);
+    expect(even.calls).toHaveLength(wocHeadMergeFoldUnits(even.fold.vertices, even.fold.indices));
+    expect(even.calls[15]).toEqual({
+      vertices: WOC_HEAD_MERGE_BAND_VERTICES,
+      indices: WOC_HEAD_MERGE_BAND_INDICES,
+    });
+    for (const call of even.calls) expect(call.vertices + call.indices).toBeGreaterThan(0);
+  });
+
+  it('hands back the one geometry from every call once it is whole', () => {
+    const fold = new WocHeadGeometryFold(mixedHead());
+    expect(fold.done).toBe(false);
+    let out: THREE.BufferGeometry | null = null;
+    while (!out) out = fold.step(40, 60);
+    expect(fold.done).toBe(true);
+    expect(fold.step()).toBe(out);
+    expect(fold.step(1, 3)).toBe(out);
+    expect(fold.foldedVertices).toBe(fold.vertices);
+  });
+
+  it('folds the face it was started with: a slider moved mid-fold changes nothing', () => {
+    // guards: a band read the mesh's live morph influences, so a face written between two
+    // units folded half of one face and half of another under the first one's key
+    const pieces = mixedHead();
+    const before = wholeOf(mergeWocHeadGeometry(pieces));
+    const fold = new WocHeadGeometryFold(pieces);
+    expect(fold.step(10, 3)).toBeNull();
+    (pieces[0].mesh.morphTargetInfluences as number[])[0] = 1;
+    (pieces[3].mesh.morphTargetInfluences as number[])[0] = 0;
+    let out: THREE.BufferGeometry | null = null;
+    while (!out) out = fold.step(10, 3);
+    expect(wholeOf(out)).toEqual(before);
+    // and that write does move the vertices of a fold started after it
+    expect(wholeOf(mergeWocHeadGeometry(pieces)).position).not.toEqual(before.position);
+  });
+
+  it("bounds the head exactly as three's own two passes over the finished attribute do", () => {
+    const { out } = foldInBands(mixedHead(), 7, 9);
+    const check = new THREE.BufferGeometry();
+    check.setAttribute('position', out.getAttribute('position'));
+    check.computeBoundingBox();
+    check.computeBoundingSphere();
+    expect(out.boundingBox?.min.toArray()).toEqual(check.boundingBox?.min.toArray());
+    expect(out.boundingBox?.max.toArray()).toEqual(check.boundingBox?.max.toArray());
+    expect(out.boundingSphere?.center.toArray()).toEqual(check.boundingSphere?.center.toArray());
+    expect(out.boundingSphere?.radius).toBe(check.boundingSphere?.radius);
+    expect(out.boundingSphere?.radius).toBeGreaterThan(10);
+  });
+});
+
 describe('the merged geometry cache', () => {
   const built = (): THREE.BufferGeometry => new THREE.BufferGeometry();
   const refs = (key: string): number | undefined =>
@@ -492,6 +756,26 @@ describe('the merged geometry cache', () => {
     expect(again).not.toHaveBeenCalled();
     expect(second.geometry).toBe(geo);
     expect(refs('head')).toBe(1);
+  });
+
+  it('keeps only a few idle heads on a constrained profile (a phone near its memory ceiling)', () => {
+    // PR 4360 review, N20: what a crowd leaves behind is trimmed to the phone's cap
+    const restore = gfxInternalsForTest.overrideSettings({ constrainedMemory: true });
+    try {
+      const disposes = Array.from({ length: 6 }, (_x, i) => idle(`phone${i}`));
+      // six looks came and went: the four newest are kept, the two oldest are freed
+      expect(wocHeadMergeInternalsForTest.cache.size).toBe(4);
+      expect(disposes.map((dispose) => dispose.mock.calls.length)).toEqual([1, 1, 0, 0, 0, 0]);
+      // a head somebody still draws is never trimmed, whatever the cap
+      const drawn = retainWocHeadMerge('drawn', built);
+      const drawnDispose = vi.spyOn(drawn.geometry, 'dispose');
+      for (let i = 0; i < 6; i++) idle(`after${i}`);
+      expect(drawnDispose).not.toHaveBeenCalled();
+      expect(wocHeadMergeBuilt('drawn')).toBe(true);
+      drawn.release();
+    } finally {
+      restore();
+    }
   });
 
   it('keeps as many idle heads as its cap, and past it disposes the OLDEST idle one', () => {
@@ -1902,6 +2186,684 @@ describe('WocHeadMergeRig: a plan gone stale', () => {
     pose(other, 0.00006);
     expect(second.rig.mountPending()).toBe(false);
     expect(second.rig.mesh).toBeNull();
+  });
+});
+
+describe('WocHeadMergeRig: folding the waiting head a band a call', () => {
+  /** A library whose base head is 2800 vertices (and carries the one face control): with
+   *  the three small pieces 2809 vertices and 4209 index entries, six bands of the fold. */
+  const big = (): Library => {
+    const lib = library();
+    lib.geos.base = strip(700, 0, { morphs: 1 });
+    return lib;
+  };
+  const VERTICES = 2809;
+  const UNITS = 6;
+  const folds = wocHeadMergeInternalsForTest.folds;
+  const cache = wocHeadMergeInternalsForTest.cache;
+  /** Call foldPending until it answers that nothing is left to fold; how many calls. */
+  const foldAll = (rig: WocHeadMergeRig): number => {
+    for (let calls = 1; calls < 1000; calls++) if (rig.foldPending()) return calls;
+    throw new Error('the fold never ends');
+  };
+  /** The geometry a whole fold builds for a fresh hang of `lib` posed at `weight`. */
+  const wholeHead = (weight = 0) => {
+    const h = hang(big());
+    pose(h, weight);
+    const { rig } = rigOn(false);
+    stand(rig, h.bone, h.drawn);
+    return wholeOf((rig.mesh as THREE.Mesh).geometry);
+  };
+
+  it('folds one band a call, hands the cache the geometry on the last, and leaves mountPending only the mount', () => {
+    expect(wocHeadMergeFoldUnits(VERTICES, 4209)).toBe(UNITS);
+    const h = hang(big());
+    const { rig, calls } = rigOn(false);
+    rig.sync(h.bone, h.drawn);
+    for (let call = 1; call < UNITS; call++) {
+      expect(rig.foldPending(), `call ${call}`).toBe(false);
+      // in flight: one fold, this rig its one driver, a band further each call
+      expect(folds.size).toBe(1);
+      const [shared] = folds.values();
+      expect(shared.drivers).toBe(1);
+      expect(shared.fold.foldedVertices).toBe(call * WOC_HEAD_MERGE_BAND_VERTICES);
+      // ...and nothing built, hung or adopted yet: the head still waits
+      expect(cache.size).toBe(0);
+      expect(rig.isWaiting).toBe(true);
+      expect(rig.pendingBuilt).toBe(false);
+      expect(calls).toEqual([]);
+      expect(mergedWrappers(h.bone)).toEqual([]);
+    }
+    expect(rig.foldPending()).toBe(true);
+    // whole: the cache's, idle until the mount, and the fold is gone
+    expect(folds.size).toBe(0);
+    expect(cacheRefs()).toEqual([0]);
+    expect(rig.pendingBuilt).toBe(true);
+    expect(rig.isWaiting).toBe(true);
+    expect(calls).toEqual([]);
+    // nothing is left to fold: another call folds nothing
+    expect(rig.foldPending()).toBe(true);
+    expect(folds.size).toBe(0);
+    const [built] = [...cache.values()].map((entry) => entry.geometry);
+    expect(rig.mountPending()).toBe(true);
+    expect((rig.mesh as THREE.Mesh).geometry).toBe(built);
+    expect(cacheRefs()).toEqual([1]);
+    expect(calls).toEqual(['adopt', 'reveal']);
+    expect(masksOf(h)).toEqual([0, 0, 0, 0]);
+    // the very head a whole fold of the same pieces builds
+    expect(wholeOf(built)).toEqual(wholeHead());
+    expect(built.getAttribute('position').count).toBe(VERTICES);
+  });
+
+  it('times each band as one view-lane span of its own kind, beside the mount', () => {
+    const spans: { kind: string; ms: number; atMs: number }[] = [];
+    setBuildSpanSink((kind, ms, atMs) => spans.push({ kind, ms, atMs }));
+    const h = hang(big());
+    const { rig } = rigOn(false);
+    rig.sync(h.bone, h.drawn);
+    now = 2000;
+    expect(foldAll(rig)).toBe(UNITS);
+    expect(spans.map((span) => span.kind)).toEqual(new Array(UNITS).fill('view:woc-head-fold'));
+    expect(buildLedgerLane('view:woc-head-fold')).toBe('view');
+    expect(spans.every((span) => span.atMs === 2000)).toBe(true);
+    rig.mountPending();
+    expect(spans.map((span) => span.kind).slice(UNITS)).toEqual(['view:woc-head-merge']);
+    // a head already built folds nothing, and times nothing
+    const twin = hang(h.lib);
+    const other = rigOn(false);
+    other.rig.sync(twin.bone, twin.drawn);
+    expect(other.rig.foldPending()).toBe(true);
+    expect(spans).toHaveLength(UNITS + 1);
+  });
+
+  it('two rigs in one face drive ONE fold, whichever of them folds a band', () => {
+    const lib = big();
+    const one = hang(lib);
+    const two = hang(lib);
+    const a = rigOn(false);
+    const b = rigOn(false);
+    a.rig.sync(one.bone, one.drawn);
+    b.rig.sync(two.bone, two.drawn);
+    // turn about: each call folds the next band of the same fold
+    const answers: boolean[] = [];
+    for (let call = 0; call < UNITS; call++) {
+      const rig = call % 2 === 0 ? a.rig : b.rig;
+      answers.push(rig.foldPending());
+      if (call === 1) {
+        expect(folds.size).toBe(1);
+        expect([...folds.values()][0].drivers).toBe(2);
+        expect([...folds.values()][0].fold.foldedVertices).toBe(2 * WOC_HEAD_MERGE_BAND_VERTICES);
+      }
+    }
+    // six bands between them, never six each: the sixth call ended it
+    expect(answers).toEqual([false, false, false, false, false, true]);
+    expect(folds.size).toBe(0);
+    expect(cache.size).toBe(1);
+    // the rig that did not fold the last band finds the head built: nothing more to fold
+    expect(a.rig.foldPending()).toBe(true);
+    expect(cache.size).toBe(1);
+    expect(a.rig.mountPending()).toBe(true);
+    expect(b.rig.mountPending()).toBe(true);
+    expect(a.rig.mesh?.geometry).toBe(b.rig.mesh?.geometry);
+    expect(cacheRefs()).toEqual([2]);
+    expect(wholeOf((a.rig.mesh as THREE.Mesh).geometry)).toEqual(wholeHead());
+  });
+
+  it('a head planned again for another face mid-fold lets its fold go and folds the new face from its first band', () => {
+    const h = hang(big());
+    const { rig } = rigOn(false);
+    rig.sync(h.bone, h.drawn);
+    expect(rig.foldPending()).toBe(false);
+    expect(rig.foldPending()).toBe(false);
+    const [old] = folds.keys();
+    // the slider moves and the owner plans again: the half folded head is nobody's
+    pose(h, 1);
+    rig.sync(h.bone, h.drawn);
+    expect(folds.size).toBe(0);
+    expect(cache.size).toBe(0);
+    expect(rig.isWaiting).toBe(true);
+    // the new face, from its first band
+    expect(rig.foldPending()).toBe(false);
+    expect([...folds.keys()]).not.toEqual([old]);
+    expect([...folds.values()][0].fold.foldedVertices).toBe(WOC_HEAD_MERGE_BAND_VERTICES);
+    expect(foldAll(rig)).toBe(UNITS - 1);
+    expect(rig.mountPending()).toBe(true);
+    // only the face that draws was ever built, and it IS that face
+    expect(cache.size).toBe(1);
+    expect(cache.has(old)).toBe(false);
+    const geo = (rig.mesh as THREE.Mesh).geometry;
+    expect(wholeOf(geo)).toEqual(wholeHead(1));
+    expect(wholeOf(geo).position).not.toEqual(wholeHead(0).position);
+  });
+
+  it('drops a fold its last driver lets go of: not wanted, nothing drawn, disposed, or mounted whole', () => {
+    const leave: [string, (rig: WocHeadMergeRig) => void][] = [
+      ['its owner no longer wants it', (rig) => expect(rig.foldPending(false)).toBe(true)],
+      ['nothing to stand in for', (rig) => rig.sync(null, null)],
+      ['disposed', (rig) => rig.dispose()],
+    ];
+    for (const [why, letGo] of leave) {
+      const h = hang(big());
+      const { rig, calls } = rigOn(false);
+      rig.sync(h.bone, h.drawn);
+      expect(rig.foldPending(), why).toBe(false);
+      expect(rig.foldPending(), why).toBe(false);
+      expect(folds.size, why).toBe(1);
+      letGo(rig);
+      // gone where it stood: no geometry was ever made of it
+      expect(folds.size, why).toBe(0);
+      expect(cache.size, why).toBe(0);
+      expect(calls, why).toEqual([]);
+      expect(masksOf(h), why).toEqual([1, 1, 1, 1]);
+    }
+    // not wanted is not refused: asked again, the head folds from its first band
+    const h = hang(big());
+    const { rig } = rigOn(false);
+    rig.sync(h.bone, h.drawn);
+    rig.foldPending();
+    rig.foldPending();
+    rig.foldPending(false);
+    expect(rig.isWaiting).toBe(true);
+    expect(rig.foldPending()).toBe(false);
+    expect([...folds.values()][0].fold.foldedVertices).toBe(WOC_HEAD_MERGE_BAND_VERTICES);
+    // a mount on the spot (no queue behind the owner) builds the head whole instead
+    expect(rig.mountPending()).toBe(true);
+    expect(folds.size).toBe(0);
+    expect(cacheRefs()).toEqual([1]);
+    expect(wholeOf((rig.mesh as THREE.Mesh).geometry)).toEqual(wholeHead());
+  });
+
+  it('keeps a fold one driver left for the driver that stays', () => {
+    const lib = big();
+    const one = hang(lib);
+    const two = hang(lib);
+    const a = rigOn(false);
+    const b = rigOn(false);
+    a.rig.sync(one.bone, one.drawn);
+    b.rig.sync(two.bone, two.drawn);
+    expect(a.rig.foldPending()).toBe(false);
+    expect(b.rig.foldPending()).toBe(false);
+    // the first body leaves (its head changed): the fold is the second one's now
+    a.rig.dispose();
+    expect(folds.size).toBe(1);
+    expect([...folds.values()][0].drivers).toBe(1);
+    expect([...folds.values()][0].fold.foldedVertices).toBe(2 * WOC_HEAD_MERGE_BAND_VERTICES);
+    // ...which goes on from where the two of them got to
+    expect(foldAll(b.rig)).toBe(UNITS - 2);
+    expect(b.rig.mountPending()).toBe(true);
+    expect(wholeOf((b.rig.mesh as THREE.Mesh).geometry)).toEqual(wholeHead());
+  });
+
+  it('a head somebody built whole meanwhile ends the fold: the built one is mounted', () => {
+    const lib = big();
+    const one = hang(lib);
+    const two = hang(lib);
+    const a = rigOn(false);
+    const b = rigOn(false);
+    a.rig.sync(one.bone, one.drawn);
+    expect(a.rig.foldPending()).toBe(false);
+    // a body with no queue behind it mounts the same face on the spot
+    expect(stand(b.rig, two.bone, two.drawn)).toBe(true);
+    expect(cacheRefs()).toEqual([1]);
+    // the chained one finds it built: no further band, its half fold dropped
+    expect(a.rig.foldPending()).toBe(true);
+    expect(folds.size).toBe(0);
+    expect(a.rig.mountPending()).toBe(true);
+    expect(a.rig.mesh?.geometry).toBe(b.rig.mesh?.geometry);
+    expect(cacheRefs()).toEqual([2]);
+  });
+
+  it('does not fold a plan gone stale: a face written since, with no word to the rig', () => {
+    const h = hang(big());
+    const { rig, calls } = rigOn(false);
+    rig.sync(h.bone, h.drawn);
+    pose(h, 0.5);
+    // nothing to fold for this rig: the head it planned is not the head drawn
+    expect(rig.foldPending()).toBe(true);
+    expect(folds.size).toBe(0);
+    expect(cache.size).toBe(0);
+    expect(rig.isWaiting).toBe(false);
+    expect(rig.mountPending()).toBe(false);
+    expect(calls).toEqual([]);
+    // planned again, it folds and mounts the face as it is
+    rig.sync(h.bone, h.drawn);
+    expect(foldAll(rig)).toBe(UNITS);
+    expect(rig.mountPending()).toBe(true);
+    expect(wholeOf((rig.mesh as THREE.Mesh).geometry)).toEqual(wholeHead(0.5));
+  });
+
+  it('a band that throws leaves the head in its pieces for good, said once', () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const spans: string[] = [];
+    setBuildSpanSink((kind) => spans.push(kind));
+    const h = hang(big());
+    const { rig, calls } = rigOn(false);
+    rig.sync(h.bone, h.drawn);
+    expect(rig.foldPending()).toBe(false);
+    // (a message of its own: the dev channel says each one once)
+    const failure = new Error('a band failed');
+    vi.spyOn(THREE.Mesh.prototype, 'getVertexPosition').mockImplementation(() => {
+      throw failure;
+    });
+    let folded = false;
+    expect(() => {
+      folded = rig.foldPending();
+    }).not.toThrow();
+    // nothing left to fold for this rig: the head is refused, never built
+    expect(folded).toBe(true);
+    expect(rig.isWaiting).toBe(false);
+    expect(folds.size).toBe(0);
+    expect(cache.size).toBe(0);
+    expect(calls).toEqual([]);
+    expect(masksOf(h)).toEqual([1, 1, 1, 1]);
+    expect(error).toHaveBeenCalledTimes(1);
+    expect(error.mock.calls[0][1]).toBe(failure);
+    // the band that threw is not a band the ledger timed
+    expect(spans).toEqual(['view:woc-head-fold']);
+    // refused, even once the fold would work again
+    vi.mocked(THREE.Mesh.prototype.getVertexPosition).mockRestore();
+    expect(rig.sync(h.bone, h.drawn)).toBe(false);
+    expect(rig.isWaiting).toBe(false);
+    expect(rig.foldPending()).toBe(true);
+    expect(folds.size).toBe(0);
+    expect(error).toHaveBeenCalledTimes(1);
+  });
+
+  it('holds heads folded whole and let go of unmounted to the idle cap: the oldest goes, never the newest', () => {
+    // each owner looked away at its last band: folded, handed to the cache, let go of,
+    // never leased
+    const built: { key: string; dispose: ReturnType<typeof vi.spyOn> }[] = [];
+    for (let n = 0; n <= MAX_IDLE; n++) {
+      const h = hang(library());
+      const { rig } = rigOn(false);
+      rig.sync(h.bone, h.drawn);
+      expect(foldAll(rig)).toBe(1);
+      const [key, entry] = [...cache].at(-1) as [string, { geometry: THREE.BufferGeometry }];
+      built.push({ key, dispose: vi.spyOn(entry.geometry, 'dispose') });
+      expect(rig.foldPending(false)).toBe(true);
+      // never more idle heads than a look let go of leaves behind
+      expect(cache.size).toBe(Math.min(n + 1, MAX_IDLE));
+    }
+    expect(new Set(built.map((head) => head.key)).size).toBe(MAX_IDLE + 1);
+    expect(cacheRefs()).toEqual(new Array(MAX_IDLE).fill(0));
+    // the first one folded is the one dropped, its buffers with it, and only that one
+    expect(cache.has(built[0].key)).toBe(false);
+    expect(built.map((head) => head.dispose.mock.calls.length)).toEqual([
+      1,
+      ...new Array<number>(MAX_IDLE).fill(0),
+    ]);
+    expect(cache.has(built[MAX_IDLE].key)).toBe(true);
+  });
+
+  it('keeps a head its owner still waits to mount, however many heads go idle meanwhile', () => {
+    // guards: a head folded whole sat idle until its owner's mount unit came round, and a
+    // crowd of new faces handed the cache heads faster than that: the idle cap dropped
+    // it first, its owner folded it all over again, and past a certain crowd nothing
+    // ever mounted
+    const h = hang(big());
+    const { rig } = rigOn(false);
+    rig.sync(h.bone, h.drawn);
+    expect(foldAll(rig)).toBe(UNITS);
+    const [waited] = cache.keys();
+    const built = cache.get(waited)?.geometry as THREE.BufferGeometry;
+    const dispose = vi.spyOn(built, 'dispose');
+    // more heads than the cap keeps, each folded whole and let go of by its owner
+    for (let n = 0; n <= MAX_IDLE; n++) {
+      const other = hang(library());
+      const o = rigOn(false);
+      o.rig.sync(other.bone, other.drawn);
+      expect(foldAll(o.rig)).toBe(1);
+      o.rig.foldPending(false);
+    }
+    // the cap holds for the idle ones, and the head still waited for is not one of them
+    expect(cache.size).toBe(MAX_IDLE + 1);
+    expect(cache.get(waited)?.geometry).toBe(built);
+    expect(dispose).not.toHaveBeenCalled();
+    // its owner mounts the very head it folded: no second fold, no build
+    expect(rig.pendingBuilt).toBe(true);
+    expect(rig.foldPending()).toBe(true);
+    expect(folds.size).toBe(0);
+    expect(rig.mountPending()).toBe(true);
+    expect(rig.mesh?.geometry).toBe(built);
+    // leased before its wait ends, so the mount costs no idle head its place: the cap
+    // never sees one head too many
+    expect(cache.size).toBe(MAX_IDLE + 1);
+    expect(cacheRefs().filter((refs) => refs === 0)).toHaveLength(MAX_IDLE);
+    // ...and taken down later it is an idle head like any other, the newest of them: the
+    // oldest goes
+    rig.dispose();
+    expect(cache.size).toBe(MAX_IDLE);
+    expect(cache.has(waited)).toBe(true);
+    expect(dispose).not.toHaveBeenCalled();
+  });
+
+  it('a profile change drops a head still waited for too: its owner folds it again', () => {
+    const h = hang(big());
+    const { rig } = rigOn(false);
+    rig.sync(h.bone, h.drawn);
+    expect(foldAll(rig)).toBe(UNITS);
+    const [built] = [...cache.values()].map((entry) => entry.geometry);
+    const dispose = vi.spyOn(built, 'dispose');
+    clearIdleWocHeadMerges();
+    expect(cache.size).toBe(0);
+    expect(dispose).toHaveBeenCalledTimes(1);
+    // nothing mounts a disposed head: the owner's next unit starts the fold over
+    expect(rig.pendingBuilt).toBe(false);
+    expect(rig.foldPending()).toBe(false);
+    expect([...folds.values()][0].fold.foldedVertices).toBe(WOC_HEAD_MERGE_BAND_VERTICES);
+    expect(foldAll(rig)).toBe(UNITS - 1);
+    expect(rig.mountPending()).toBe(true);
+    expect(rig.mesh?.geometry).not.toBe(built);
+    expect(wholeOf((rig.mesh as THREE.Mesh).geometry)).toEqual(wholeHead());
+  });
+
+  it('folds the head that has waited longest, whoever asks: the heads of a crowd finish one after another', () => {
+    // guards: a band each in turn (the order the bodies' units leave the queue in) folds
+    // every head of an arriving crowd side by side, so all of them stand in together at
+    // the very end and each body draws its pieces until then
+    const hung = [hang(big()), hang(big()), hang(big())];
+    const rigs = hung.map(() => rigOn(false).rig);
+    for (const [i, h] of hung.entries()) rigs[i].sync(h.bone, h.drawn);
+    // the three bodies' units, turn about: nobody's head is whole after six bands of its own
+    for (let call = 0; call < UNITS; call++) {
+      expect(rigs[call % 3].foldPending(), `call ${call}`).toBe(false);
+    }
+    // ...because all six were the FIRST head's. It is whole, and the two behind it, in
+    // the order they asked, have not folded a vertex
+    const [first] = cache.keys();
+    expect(cache.size).toBe(1);
+    expect(folds.size).toBe(2);
+    expect([...folds.values()].map((shared) => shared.fold.foldedVertices)).toEqual([0, 0]);
+    expect([...folds.values()].map((shared) => shared.drivers)).toEqual([1, 1]);
+    // the first body stands in while the others still fold
+    expect(rigs[0].pendingBuilt).toBe(true);
+    expect(rigs[0].foldPending()).toBe(true);
+    expect(rigs[0].mountPending()).toBe(true);
+    expect(masksOf(hung[0])).toEqual([0, 0, 0, 0]);
+    expect(masksOf(hung[1])).toEqual([1, 1, 1, 1]);
+    expect(masksOf(hung[2])).toEqual([1, 1, 1, 1]);
+    // then the second head, whichever of the two left runs a band of it
+    for (let call = 0; call < UNITS; call++) {
+      expect(rigs[1 + (call % 2)].foldPending(), `call ${call}`).toBe(false);
+    }
+    expect(cache.size).toBe(2);
+    expect(rigs[1].pendingBuilt).toBe(true);
+    expect(rigs[2].pendingBuilt).toBe(false);
+    expect([...folds.values()].map((shared) => shared.fold.foldedVertices)).toEqual([0]);
+    expect(rigs[1].foldPending()).toBe(true);
+    expect(rigs[1].mountPending()).toBe(true);
+    // and the third: eighteen bands in all, never a band more than the three heads have
+    expect(foldAll(rigs[2])).toBe(UNITS);
+    expect(rigs[2].mountPending()).toBe(true);
+    expect(folds.size).toBe(0);
+    expect(cacheRefs()).toEqual([1, 1, 1]);
+    expect(cache.has(first)).toBe(true);
+    // each its own head, the very one a whole fold builds
+    const built = rigs.map((rig) => (rig.mesh as THREE.Mesh).geometry);
+    expect(new Set(built).size).toBe(3);
+    for (const geometry of built) expect(wholeOf(geometry)).toEqual(wholeHead());
+  });
+
+  it('finishes a head whose owner stopped asking, and leaves it idle in the cache for it', () => {
+    const one = hang(big());
+    const two = hang(big());
+    const a = rigOn(false);
+    const b = rigOn(false);
+    a.rig.sync(one.bone, one.drawn);
+    b.rig.sync(two.bone, two.drawn);
+    // one band of the first head, and then its unit never runs again
+    expect(a.rig.foldPending()).toBe(false);
+    // the second body's units alone: the five bands left of the first head, then its own six
+    expect(foldAll(b.rig)).toBe(UNITS - 1 + UNITS);
+    expect(folds.size).toBe(0);
+    expect(cacheRefs()).toEqual([0, 0]);
+    expect(a.calls).toEqual([]);
+    // the first body, whenever it looks again, only mounts
+    expect(a.rig.pendingBuilt).toBe(true);
+    expect(a.rig.foldPending()).toBe(true);
+    expect(a.rig.mountPending()).toBe(true);
+    expect(b.rig.mountPending()).toBe(true);
+    expect(cacheRefs()).toEqual([1, 1]);
+    expect(wholeOf((a.rig.mesh as THREE.Mesh).geometry)).toEqual(wholeHead());
+  });
+
+  it('a leading head built whole meanwhile leaves the line: no band more of it, and the built one is never replaced', () => {
+    // guards: a body with no queue behind it mounts the leading face on the spot, and the
+    // bodies behind go on folding that fold to its end: a second geometry lands in the
+    // cache under the key the first is leased from, which is then never disposed
+    const one = hang(big());
+    const two = hang(big());
+    const a = rigOn(false);
+    const b = rigOn(false);
+    a.rig.sync(one.bone, one.drawn);
+    b.rig.sync(two.bone, two.drawn);
+    expect(a.rig.foldPending()).toBe(false);
+    expect(b.rig.foldPending()).toBe(false);
+    const [leading, behind] = [...folds.keys()];
+    expect([...folds.values()].map((shared) => shared.fold.foldedVertices)).toEqual([
+      2 * WOC_HEAD_MERGE_BAND_VERTICES,
+      0,
+    ]);
+    const twin = hang(one.lib);
+    const whole = rigOn(false);
+    expect(stand(whole.rig, twin.bone, twin.drawn)).toBe(true);
+    const built = cache.get(leading)?.geometry;
+    expect(built).toBe(whole.rig.mesh?.geometry);
+    const dispose = vi.spyOn(built as THREE.BufferGeometry, 'dispose');
+    // the second body's unit: the leading head is over, so the band is its own head's
+    expect(b.rig.foldPending()).toBe(false);
+    expect([...folds.keys()]).toEqual([behind]);
+    expect([...folds.values()][0].fold.foldedVertices).toBe(WOC_HEAD_MERGE_BAND_VERTICES);
+    expect(foldAll(b.rig)).toBe(UNITS - 1);
+    // the head somebody built is still the one the cache holds, leased as it was
+    expect(cache.get(leading)?.geometry).toBe(built);
+    expect(cache.get(leading)?.refs).toBe(1);
+    expect(dispose).not.toHaveBeenCalled();
+    // ...and the body that was folding it only mounts that one
+    expect(a.rig.foldPending()).toBe(true);
+    expect(a.rig.mountPending()).toBe(true);
+    expect(a.rig.mesh?.geometry).toBe(built);
+    expect(cache.get(leading)?.refs).toBe(2);
+    expect(cache.size).toBe(2);
+  });
+
+  it('a head that left the line and lost its built geometry starts over behind the others', () => {
+    const one = hang(big());
+    const two = hang(big());
+    const a = rigOn(false);
+    const b = rigOn(false);
+    a.rig.sync(one.bone, one.drawn);
+    b.rig.sync(two.bone, two.drawn);
+    expect(a.rig.foldPending()).toBe(false);
+    const [leading] = folds.keys();
+    // built whole by a body with no queue, which the second body's unit notices...
+    const twin = hang(one.lib);
+    const whole = rigOn(false);
+    stand(whole.rig, twin.bone, twin.drawn);
+    expect(b.rig.foldPending()).toBe(false);
+    expect([...folds.keys()]).not.toContain(leading);
+    // ...and gone again before the first body looks: that body left, a profile change
+    whole.rig.dispose();
+    clearIdleWocHeadMerges();
+    expect(cache.size).toBe(0);
+    // the first body's unit: its old fold is nobody's, so its head joins the line again,
+    // behind the second, and this unit folds a band of that one
+    expect(a.rig.foldPending()).toBe(false);
+    expect([...folds.keys()].at(-1)).toBe(leading);
+    expect([...folds.values()].map((shared) => shared.fold.foldedVertices)).toEqual([
+      2 * WOC_HEAD_MERGE_BAND_VERTICES,
+      0,
+    ]);
+    // both end whole
+    expect(foldAll(b.rig)).toBe(UNITS - 2);
+    expect(foldAll(a.rig)).toBe(UNITS);
+    expect(a.rig.mountPending()).toBe(true);
+    expect(b.rig.mountPending()).toBe(true);
+    expect(wholeOf((a.rig.mesh as THREE.Mesh).geometry)).toEqual(wholeHead());
+    expect(wholeOf((b.rig.mesh as THREE.Mesh).geometry)).toEqual(wholeHead());
+  });
+
+  it("a band that throws under another body's unit refuses the head it belongs to, never the rig that ran it", () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const one = hang(big());
+    const two = hang(big());
+    const a = rigOn(false);
+    const b = rigOn(false);
+    a.rig.sync(one.bone, one.drawn);
+    b.rig.sync(two.bone, two.drawn);
+    expect(a.rig.foldPending()).toBe(false);
+    // the leading head breaks (its own base geometry and no other), and it is the second
+    // body's unit that runs the band
+    const failure = new Error('a band of the leading head failed');
+    const posed = THREE.Mesh.prototype.getVertexPosition;
+    vi.spyOn(THREE.Mesh.prototype, 'getVertexPosition').mockImplementation(function (
+      this: THREE.Mesh,
+      index: number,
+      target: THREE.Vector3,
+    ) {
+      if (this.geometry === one.lib.geos.base) throw failure;
+      return posed.call(this, index, target);
+    });
+    let more = false;
+    expect(() => {
+      more = !b.rig.foldPending();
+    }).not.toThrow();
+    // the second body is not refused: it goes on waiting, and the broken head left the line
+    expect(more).toBe(true);
+    expect(b.rig.isWaiting).toBe(true);
+    expect(folds.size).toBe(1);
+    expect(cache.size).toBe(0);
+    // its next band is its own head's first
+    expect(b.rig.foldPending()).toBe(false);
+    expect([...folds.values()][0].fold.foldedVertices).toBe(WOC_HEAD_MERGE_BAND_VERTICES);
+    expect(error).not.toHaveBeenCalled();
+    // the first body finds out when its own unit next looks: refused for good, said once
+    expect(a.rig.foldPending()).toBe(true);
+    expect(a.rig.isWaiting).toBe(false);
+    expect(error).toHaveBeenCalledTimes(1);
+    expect(error.mock.calls[0][1]).toBe(failure);
+    expect(a.calls).toEqual([]);
+    expect(masksOf(one)).toEqual([1, 1, 1, 1]);
+    expect(a.rig.sync(one.bone, one.drawn)).toBe(false);
+    expect(a.rig.isWaiting).toBe(false);
+    expect(folds.size).toBe(1);
+    // and the second head ends whole
+    expect(foldAll(b.rig)).toBe(UNITS - 1);
+    expect(b.rig.mountPending()).toBe(true);
+    vi.mocked(THREE.Mesh.prototype.getVertexPosition).mockRestore();
+    expect(wholeOf((b.rig.mesh as THREE.Mesh).geometry)).toEqual(wholeHead());
+  });
+
+  it('a head another body finished, whose geometry the cache dropped before this one looked, is folded again from its first band', () => {
+    // guards: the rig still held the finished fold, and handed the cache its geometry a
+    // second time, the one the cache had just disposed
+    const lib = big();
+    const one = hang(lib);
+    const two = hang(lib);
+    const a = rigOn(false);
+    const b = rigOn(false);
+    a.rig.sync(one.bone, one.drawn);
+    b.rig.sync(two.bone, two.drawn);
+    expect(a.rig.foldPending()).toBe(false);
+    // the second body's units end the fold they share...
+    expect(foldAll(b.rig)).toBe(UNITS - 1);
+    const [finished] = [...cache.values()].map((entry) => entry.geometry);
+    const dispose = vi.spyOn(finished, 'dispose');
+    // ...and the cache drops it (nobody leased it yet: a profile change) before the first
+    // body looks again
+    clearIdleWocHeadMerges();
+    expect(dispose).toHaveBeenCalledTimes(1);
+    expect(cache.size).toBe(0);
+    expect(a.rig.foldPending()).toBe(false);
+    expect(cache.size).toBe(0);
+    expect(folds.size).toBe(1);
+    expect([...folds.values()][0].drivers).toBe(1);
+    expect([...folds.values()][0].fold.foldedVertices).toBe(WOC_HEAD_MERGE_BAND_VERTICES);
+    expect(foldAll(a.rig)).toBe(UNITS - 1);
+    const [again] = [...cache.values()].map((entry) => entry.geometry);
+    expect(again).not.toBe(finished);
+    expect(a.rig.mountPending()).toBe(true);
+    expect(a.rig.mesh?.geometry).toBe(again);
+    expect(wholeOf(again)).toEqual(wholeHead());
+    // the second body, looking again, folds nothing: the head is built
+    expect(b.rig.foldPending()).toBe(true);
+    expect(b.rig.mountPending()).toBe(true);
+    expect(b.rig.mesh?.geometry).toBe(again);
+  });
+
+  it('a band that throws refuses every body that drove that fold, and says so once', () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const lib = big();
+    const one = hang(lib);
+    const two = hang(lib);
+    const a = rigOn(false);
+    const b = rigOn(false);
+    a.rig.sync(one.bone, one.drawn);
+    b.rig.sync(two.bone, two.drawn);
+    expect(a.rig.foldPending()).toBe(false);
+    expect(b.rig.foldPending()).toBe(false);
+    expect([...folds.values()][0].drivers).toBe(2);
+    const failure = new Error('a band of a shared head failed');
+    vi.spyOn(THREE.Mesh.prototype, 'getVertexPosition').mockImplementation(() => {
+      throw failure;
+    });
+    // under the second body's unit: that body is refused there and then
+    expect(b.rig.foldPending()).toBe(true);
+    expect(b.rig.isWaiting).toBe(false);
+    expect(folds.size).toBe(0);
+    expect(cache.size).toBe(0);
+    // the first finds out from its own next unit, with no band folded for it again
+    vi.mocked(THREE.Mesh.prototype.getVertexPosition).mockRestore();
+    expect(a.rig.isWaiting).toBe(true);
+    expect(a.rig.foldPending()).toBe(true);
+    expect(a.rig.isWaiting).toBe(false);
+    expect(folds.size).toBe(0);
+    expect(cache.size).toBe(0);
+    expect(error).toHaveBeenCalledTimes(1);
+    expect(error.mock.calls[0][1]).toBe(failure);
+    for (const h of [one, two]) expect(masksOf(h)).toEqual([1, 1, 1, 1]);
+    // refused for good, both of them
+    expect(a.rig.sync(one.bone, one.drawn)).toBe(false);
+    expect(b.rig.sync(two.bone, two.drawn)).toBe(false);
+    expect(a.rig.isWaiting || b.rig.isWaiting).toBe(false);
+  });
+
+  it('a head whose fold cannot even start is refused the same way, and nothing escapes the call', () => {
+    // guards: a throw from reading the pieces (before the first band) left the unit by
+    // the back door: no refusal, no word, and its owner waiting on that unit for ever
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const h = hang(big());
+    const { rig, calls } = rigOn(false);
+    rig.sync(h.bone, h.drawn);
+    const failure = new Error('a head that cannot start its fold');
+    vi.spyOn(h.lib.geos.base, 'getAttribute').mockImplementation(() => {
+      throw failure;
+    });
+    let done = false;
+    expect(() => {
+      done = rig.foldPending();
+    }).not.toThrow();
+    expect(done).toBe(true);
+    expect(rig.isWaiting).toBe(false);
+    expect(folds.size).toBe(0);
+    expect(cache.size).toBe(0);
+    expect(calls).toEqual([]);
+    expect(error).toHaveBeenCalledTimes(1);
+    expect(error.mock.calls[0][1]).toBe(failure);
+    vi.mocked(h.lib.geos.base.getAttribute).mockRestore();
+    expect(rig.sync(h.bone, h.drawn)).toBe(false);
+    expect(rig.isWaiting).toBe(false);
+  });
+
+  it('answers that nothing is left to fold when nothing waits', () => {
+    const h = hang(big());
+    const { rig } = rigOn(false);
+    expect(rig.foldPending()).toBe(true);
+    stand(rig, h.bone, h.drawn);
+    // mounted: nothing waits
+    expect(rig.foldPending()).toBe(true);
+    expect(folds.size).toBe(0);
+    expect(cacheRefs()).toEqual([1]);
   });
 });
 

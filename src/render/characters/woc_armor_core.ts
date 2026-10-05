@@ -18,7 +18,8 @@
  *
  * A body loads its base and animation library once; an armor set loads the first time a
  * visible character wears it, at the texture tier that character draws (wocArmorTierFor),
- * and is freed once nobody has worn it for a few minutes. The high tier has no file of its
+ * and how long it outlives its last wearer is the idle rule's (wocArmorIdleEvictMs: the
+ * tier a crowd draws stays for the session on a desktop). The high tier has no file of its
  * own: the store assembles it from the medium file and the top file (woc_armor_packs.ts),
  * and the top file's url names it. Until a set arrives the body draws its own black suit (or
  * a tier of the same set that is already resident), and nothing ever waits on a set to enter
@@ -38,8 +39,9 @@ export type WocArmorTier = 'low' | 'medium' | 'high';
 export const WOC_ARMOR_TIERS: readonly WocArmorTier[] = ['low', 'medium', 'high'];
 
 /** How much armor texture detail one character is given: `full` for a character seen up close
- *  (the local player's own, and every body built directly: a preview, a portrait), `crowd` for
- *  every other character in the world. */
+ *  (the local player's own, and by default every body built directly: a portrait, a try-on),
+ *  `crowd` for every other character in the world, and for a preview whose stage shows someone
+ *  else's character or a class nobody chose yet (preview_armor_detail_core.ts). */
 export type WocArmorDetail = 'full' | 'crowd';
 
 /** The file whose url names each tier's pack: the high pack is named by the top file, the one
@@ -121,9 +123,10 @@ export interface WocTierProfile {
  * preset and every phone draw the low file for everyone, and the medium preset draws the
  * medium file for everyone (the owner's call, 2026-10-03: the top levels are a High
  * download). On high and above the character's DETAIL decides: full detail (the local
- * player's own character and every body built directly: the character creator, inspect, the
- * armory, the character sheet, a portrait's live build) draws high, and every other character
- * in the world draws medium.
+ * player's own character and, by default, a body built directly: the armory, the character
+ * sheet, a portrait's live build) draws high, and crowd detail draws medium: every other
+ * character in the world, and a preview of someone else's character or of a class nobody
+ * chose yet (inspect, the creator: preview_armor_detail_core.ts).
  *
  * Texture resolution is cosmetic sharpness only, never information a player acts on
  * (docs/design/graphics-settings-fairness.md): every tier draws the same pieces, shapes and
@@ -165,21 +168,75 @@ export function wocStandInTier(
   return null;
 }
 
-/** How long a set nobody wears stays in memory before it is freed. */
+/** How long a file of a tier the profile no longer draws for anyone stays in memory once
+ *  nobody draws it (the files a graphics preset change left behind): long enough that
+ *  flipping the preset back finds them, and the default window of a ledger given none. */
 export const WOC_ARMOR_IDLE_EVICT_MS = 3 * 60 * 1000;
 
 /**
- * Live users per armor pack, and the packs nobody has used for WOC_ARMOR_IDLE_EVICT_MS. A
- * user is anything drawing the pack's geometry or materials: a character that has its pieces
+ * How long the top levels of a high pack nobody draws stay in memory. The local player's own
+ * character holds its pack for as long as it is in the world; every other one is opened by a
+ * body built directly (the character creator, Inspect, the armory), and each holds every map
+ * of its set again at full size, on the GPU and in the JS heap: by far the largest thing an
+ * armor set keeps. Twenty seconds keeps the class a player just looked at (the creator's A,
+ * B, back to A) and lets go of the rest of a browse, where the long window could keep every
+ * class of both bodies resident at once. The medium file under it is not part of this: it
+ * follows the rule of its own tier.
+ */
+export const WOC_ARMOR_TOP_IDLE_EVICT_MS = 20 * 1000;
+
+/**
+ * How long any file nobody draws stays in memory on the phone-class memory profile. Half a
+ * minute rides out a wearer who steps out of range and back, and has a crowd's sets gone well
+ * inside the minute after it leaves (the long window held every set of a town that had
+ * already emptied). What comes back is one small low file from the HTTP cache.
+ */
+export const WOC_ARMOR_CONSTRAINED_IDLE_EVICT_MS = 30 * 1000;
+
+/**
+ * How long an armor pack of `tier` stays in memory once nobody draws it, in milliseconds;
+ * Infinity for one that is never freed for being idle. Reads the STATIC profile only (the
+ * preset and the phone-class memory profile, which every iOS host sets), never the frame-rate
+ * governor: memory residency, and nothing a player sees or acts on, since a freed set comes
+ * back the way it first arrived (the suit, then the set).
+ *
+ *   - the phone-class memory profile frees everything, soon: its ceiling is the process's;
+ *   - elsewhere the tier a CROWD draws (wocArmorTierFor: low on the low preset, else medium)
+ *     stays for the session: every set a session meets, at that one tier, so the shipped
+ *     sets of both bodies bound it. A set kept is its textures on the GPU (about a megabyte
+ *     by the file census, not a device measurement), their CPU levels again in the JS heap
+ *     (a character texture keeps them) and its prepared geometry; reading, preparing and
+ *     attaching it again every few minutes is paid in frames, where keeping it is paid once;
+ *   - the top levels of a high pack go quickly (they are the large part, and only a close-up
+ *     samples them);
+ *   - any other tier is one the profile draws for nobody (a preset change left it behind).
+ */
+export function wocArmorIdleEvictMs(tier: WocArmorTier, profile: WocTierProfile): number {
+  if (profile.constrainedMemory) return WOC_ARMOR_CONSTRAINED_IDLE_EVICT_MS;
+  if (tier === 'high') return WOC_ARMOR_TOP_IDLE_EVICT_MS;
+  if (tier === wocArmorTierFor(profile, 'crowd')) return Number.POSITIVE_INFINITY;
+  return WOC_ARMOR_IDLE_EVICT_MS;
+}
+
+/**
+ * Live users per armor pack, and the packs nobody has used for their idle window. A user is
+ * anything drawing the pack's geometry or materials: a character that has its pieces
  * attached, a far-LOD bake taken off them. Driven by the caller's clock (no timers): a pack
- * whose last user leaves starts its idle window, and the next acquire, release or sweep past
- * the window hands it back to be freed.
+ * whose last user leaves starts its idle window, and the next sweep past the window hands it
+ * back to be freed. The window is one number for every pack, or the caller's answer per pack,
+ * read again at every sweep (so a graphics preset change moves a pack between rules without
+ * touching the ledger); Infinity is a pack never freed for being idle.
  */
 export class WocArmorResidency {
   private readonly counts = new Map<string, number>();
   private readonly idleSince = new Map<string, number>();
+  /** When each pack's last user left: what `drawnWithin` reads. A pack that only arrived
+   *  (a prefetch) is idle but was never drawn. */
+  private readonly lastDrawn = new Map<string, number>();
 
-  constructor(private readonly idleMs = WOC_ARMOR_IDLE_EVICT_MS) {}
+  constructor(
+    private readonly idleMs: number | ((url: string) => number) = WOC_ARMOR_IDLE_EVICT_MS,
+  ) {}
 
   acquire(url: string): void {
     this.counts.set(url, (this.counts.get(url) ?? 0) + 1);
@@ -194,6 +251,7 @@ export class WocArmorResidency {
     }
     this.counts.delete(url);
     this.idleSince.set(url, now);
+    this.lastDrawn.set(url, now);
   }
 
   /** A pack that arrived with nobody wearing it yet (a prefetch) starts idle at `now`. */
@@ -205,11 +263,19 @@ export class WocArmorResidency {
     return this.counts.get(url) ?? 0;
   }
 
-  /** The packs idle past the window at `now`, dropped from the ledger (the caller frees them). */
+  /** Whether a pack is drawn now, or was until less than `ms` before `now`. */
+  drawnWithin(url: string, now: number, ms: number): boolean {
+    if (this.counts.has(url)) return true;
+    const at = this.lastDrawn.get(url);
+    return at !== undefined && now - at < ms;
+  }
+
+  /** The packs idle past their window at `now`, dropped from the ledger (the caller frees them). */
   takeExpired(now: number): string[] {
     const out: string[] = [];
+    const idleMs = this.idleMs;
     for (const [url, since] of this.idleSince) {
-      if (now - since < this.idleMs) continue;
+      if (now - since < (typeof idleMs === 'number' ? idleMs : idleMs(url))) continue;
       out.push(url);
     }
     for (const url of out) this.idleSince.delete(url);
@@ -220,5 +286,6 @@ export class WocArmorResidency {
   forget(url: string): void {
     this.counts.delete(url);
     this.idleSince.delete(url);
+    this.lastDrawn.delete(url);
   }
 }

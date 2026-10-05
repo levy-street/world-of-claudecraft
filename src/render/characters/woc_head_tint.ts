@@ -36,6 +36,15 @@
 // left exactly as sampled (a body under a class under-armor atlas, which has no skin
 // on it: woc_skin_tint_core.ts wocTintStrength), with no second program to link.
 //
+// A transfer converts to HSV only what changes per fragment, the texel. What the skin
+// and eye transfers read of a UNIFORM colour through HSV (the reference's hue for the
+// skin band, its saturation for the iris test, the eye colour's hue, saturation and
+// value) is a constant of the draw: it is converted on the CPU when the uniform is
+// written (woc_tint_hsv_core.ts, the GLSL helpers mirrored statement for statement) and
+// rides in as `rk` and `tk`; their linear reads of the same colours are as they were.
+// That took three of the five inlined conversions out of a merged head's fragment, with
+// the same result to float rounding (tests/woc_tint_hsv_core.test.ts runs both forms).
+//
 // Materials are owned per visual (woc_head_dressing.ts clones and wraps), so
 // the uniforms are per character; the layer itself allocates nothing per frame.
 //
@@ -67,6 +76,7 @@ import {
   type WocHeadMergeSlot,
 } from './woc_head_merge_core';
 import { WOC_SUIT_SKIN_GATE_GLSL } from './woc_skin_tint_core';
+import { wocTintSrgbHsv } from './woc_tint_hsv_core';
 
 export { wocHeadMergeOneSided } from './woc_head_merge_core';
 
@@ -77,6 +87,12 @@ export interface WocHeadTintUniforms {
   readonly tint: { value: THREE.Vector3 };
   readonly ref: { value: THREE.Vector3 };
   readonly mix: { value: number };
+  /** The reference's sRGB hue and saturation (woc_tint_hsv_core.ts): what the skin band
+   *  and the iris test read of it, converted when the layer is attached. */
+  readonly refHs: { value: THREE.Vector2 };
+  /** The target's sRGB hue, saturation and value, which is all the eye transfer reads of
+   *  it: written with the colour, for the eye role alone. */
+  readonly tintHsv: { value: THREE.Vector3 };
 }
 
 /** One shader variant of the patch: a role's own, or the body atlas's skin key. */
@@ -100,8 +116,12 @@ export interface WocHeadMergedTintUniforms {
   /** Per slot: the piece's emissive less the merged material's own (rgb), and its
    *  roughness (w). */
   readonly emi: { value: THREE.Vector4[] };
-  /** Per slot: metalness (x) and whether the slot draws its front faces only (y). */
-  readonly surf: { value: THREE.Vector2[] };
+  /** Per slot: metalness (x), whether the slot draws its front faces only (y), and the
+   *  sRGB hue (z) and saturation (w) of its tint reference (woc_tint_hsv_core.ts: what the
+   *  skin band and the iris test read of it, converted when the row is written). */
+  readonly surf: { value: THREE.Vector4[] };
+  /** The eye colour's sRGB hue, saturation and value: all the eye transfer reads of it. */
+  readonly eye: { value: THREE.Vector3 };
   /** Whether any slot is one sided: the program then carries the back-face drop. */
   readonly oneSided: boolean;
   /** The hairstyle's, the beard's and the scalp cap's textures (the core atlas rides
@@ -118,6 +138,8 @@ const mergedUniformsOf = new WeakMap<THREE.Material, WocHeadMergedTintUniforms>(
 const HELPERS = `uniform vec3 uWocHtTint;
 uniform vec3 uWocHtRef;
 uniform float uWocHtMix;
+uniform vec2 uWocHtRefHs;
+uniform vec3 uWocHtTintHsv;
 `;
 
 /** The colour-space helpers both layers share. */
@@ -139,10 +161,10 @@ vec3 wocHtSrgb2Lin(vec3 c) { return pow(max(c, vec3(0.0)), vec3(2.2)); }
 `;
 
 /** The skin band: the weight `w` of a texel `c` against the reference `r`, with both
- *  luminances (`lc`, `lr`) left in scope for the transfer and the suit gate. */
+ *  luminances (`lc`, `lr`) left in scope for the transfer and the suit gate. The band is
+ *  centred on the reference's hue, `rk.x` (off the CPU: woc_tint_hsv_core.ts). */
 const SKIN_BAND_GLSL = `vec3 hs = wocHtRgb2Hsv(wocHtLin2Srgb(c));
-  vec3 rh = wocHtRgb2Hsv(wocHtLin2Srgb(r));
-  float dh = mod((hs.x - rh.x) * 360.0 + 540.0, 360.0) - 180.0;
+  float dh = mod((hs.x - rk.x) * 360.0 + 540.0, 360.0) - 180.0;
   float w = 1.0 - smoothstep(14.0, 26.0, abs(dh));
   w *= smoothstep(0.08, 0.16, hs.y) * (1.0 - smoothstep(0.8, 0.92, hs.y));
   w *= smoothstep(0.08, 0.16, hs.z);
@@ -210,23 +232,35 @@ const ROLE_HAIR_EMISSIVE_GLSL = `#ifdef USE_EMISSIVEMAP
 #endif`;
 
 /** The per-layer body of the patch: reads `c` (the texel times the colour, linear), `t` (the
- *  target, linear) and `r` (the reference, linear) and writes `o` (linear). */
+ *  target, linear) and `r` (the reference, linear) and writes `o` (linear). Of the two
+ *  uniform colours the skin and eye bodies also read `rk` (the reference's sRGB hue and
+ *  saturation) and the eye body `tk` (the target's sRGB hue, saturation and value), each
+ *  converted on the CPU (woc_tint_hsv_core.ts): the iris test starts above the
+ *  reference's saturation, and the iris takes the target's hue and saturation, with its
+ *  value as a gain on the texel's. */
 const LAYER_GLSL: Readonly<Record<WocTintLayer, string>> = {
   hair: `${ROLE_HAIR_LUMINANCE_GLSL}
   ${HAIR_TRANSFER_GLSL}`,
   brow: `${ROLE_HAIR_LUMINANCE_GLSL}
   ${HAIR_TRANSFER_GLSL}`,
   eye: `vec3 hs = wocHtRgb2Hsv(wocHtLin2Srgb(c));
-  vec3 th = wocHtRgb2Hsv(wocHtLin2Srgb(t));
-  float ms = wocHtRgb2Hsv(wocHtLin2Srgb(r)).y;
-  float w = smoothstep(ms + 0.08, ms + 0.22, hs.y) * smoothstep(0.03, 0.1, hs.z);
-  vec3 iris = wocHtSrgb2Lin(wocHtHsv2Rgb(vec3(th.x, th.y, clamp(hs.z * (0.4 + th.z), 0.0, 1.0))));
+  float w = smoothstep(rk.y + 0.08, rk.y + 0.22, hs.y) * smoothstep(0.03, 0.1, hs.z);
+  vec3 iris = wocHtSrgb2Lin(wocHtHsv2Rgb(vec3(tk.x, tk.y, clamp(hs.z * (0.4 + tk.z), 0.0, 1.0))));
   o = mix(c, iris, w);`,
   skin: `${SKIN_BAND_GLSL}
   ${SKIN_TRANSFER_GLSL}`,
   skin_suit: `${SKIN_BAND_GLSL}
   ${WOC_SUIT_SKIN_GATE_GLSL}
   ${SKIN_TRANSFER_GLSL}`,
+};
+
+/** What a per-role layer's body reads off the CPU, declared beside `t` and `r`. */
+const LAYER_CONSTANTS_GLSL: Readonly<Record<WocTintLayer, string>> = {
+  hair: '',
+  brow: '',
+  eye: '\n  vec2 rk = uWocHtRefHs;\n  vec3 tk = uWocHtTintHsv;',
+  skin: '\n  vec2 rk = uWocHtRefHs;',
+  skin_suit: '\n  vec2 rk = uWocHtRefHs;',
 };
 
 /** The role a material was wrapped for, or null. */
@@ -248,12 +282,16 @@ export function attachWocHeadTint(
 ): WocHeadTintUniforms {
   const existing = uniformsOf.get(mat);
   if (existing) return existing;
+  const [hue, saturation] = wocTintSrgbHsv(ref);
   const u: WocHeadTintUniforms = {
     role,
     ...(surface ? { surface } : null),
     tint: { value: new THREE.Vector3(1, 1, 1) },
     ref: { value: new THREE.Vector3(ref[0], ref[1], ref[2]) },
     mix: { value: 0 },
+    refHs: { value: new THREE.Vector2(hue, saturation) },
+    // the white the layer is born pointed at
+    tintHsv: { value: new THREE.Vector3(0, 0, 1) },
   };
   hookWocHeadTint(mat, u);
   return u;
@@ -289,6 +327,8 @@ function hookWocHeadTint(mat: THREE.Material, u: WocHeadTintUniforms): void {
     shader.uniforms.uWocHtTint = u.tint;
     shader.uniforms.uWocHtRef = u.ref;
     shader.uniforms.uWocHtMix = u.mix;
+    shader.uniforms.uWocHtRefHs = u.refHs;
+    shader.uniforms.uWocHtTintHsv = u.tintHsv;
     const fragment = shader.fragmentShader
       .replace('void main() {', `${HELPERS}${HELPER_FUNCTIONS}void main() {`)
       .replace(
@@ -297,7 +337,7 @@ function hookWocHeadTint(mat: THREE.Material, u: WocHeadTintUniforms): void {
 if (uWocHtMix > 0.0) {
   vec3 c = diffuseColor.rgb;
   vec3 t = uWocHtTint;
-  vec3 r = uWocHtRef;
+  vec3 r = uWocHtRef;${LAYER_CONSTANTS_GLSL[layer]}
   vec3 o = c;
   ${LAYER_GLSL[layer]}
   diffuseColor.rgb = mix(c, max(o, vec3(0.0)), uWocHtMix);
@@ -321,6 +361,9 @@ if (uWocHtMix > 0.0) {
 export function setWocHeadTint(u: WocHeadTintUniforms, color: WocLinearRgb, strength = 1): void {
   u.tint.value.set(color[0], color[1], color[2]);
   u.mix.value = strength;
+  if (u.role !== 'eye') return;
+  const [hue, saturation, value] = wocTintSrgbHsv(color);
+  u.tintHsv.value.set(hue, saturation, value);
 }
 
 // ---------------------------------------------------------------------------
@@ -341,7 +384,8 @@ uniform float uWocHmMix;
 uniform vec4 uWocHmRef[${N}];
 uniform vec4 uWocHmCol[${N}];
 uniform vec4 uWocHmEmi[${N}];
-uniform vec2 uWocHmSurf[${N}];
+uniform vec4 uWocHmSurf[${N}];
+uniform vec3 uWocHmEyeHsv;
 uniform sampler2D uWocHmHair;
 uniform sampler2D uWocHmBeard;
 uniform sampler2D uWocHmScalp;
@@ -393,12 +437,13 @@ totalEmissiveRadiance += wocEmi.rgb;
 if (uWocHmMix > 0.0 && wocRef.a > 0.5) {
   vec3 c = diffuseColor.rgb;
   vec3 r = wocRef.rgb;
+  vec2 rk = uWocHmSurf[wocSlot].zw;
   vec3 o = c;
   if (wocRef.a < 1.5) {
     vec3 t = uWocHmTint[0];
     ${LAYER_GLSL.skin}
   } else if (wocRef.a < 2.5) {
-    vec3 t = uWocHmTint[1];
+    vec3 tk = uWocHmEyeHsv;
     ${LAYER_GLSL.eye}
   } else {
     vec3 t = wocRef.a < 3.5 ? uWocHmTint[2] : uWocHmTint[3];
@@ -479,7 +524,9 @@ export function attachWocHeadMergedTint(
     ref: { value: rows() },
     col: { value: Array.from({ length: N }, () => new THREE.Vector4(1, 1, 1, 0)) },
     emi: { value: rows() },
-    surf: { value: Array.from({ length: N }, () => new THREE.Vector2(0, 0)) },
+    surf: { value: rows() },
+    // the white the role colours are born at
+    eye: { value: new THREE.Vector3(0, 0, 1) },
     oneSided,
     hair: { value: null },
     beard: { value: null },
@@ -505,6 +552,7 @@ function hookWocHeadMergedTint(mat: THREE.Material, u: WocHeadMergedTintUniforms
     shader.uniforms.uWocHmCol = u.col;
     shader.uniforms.uWocHmEmi = u.emi;
     shader.uniforms.uWocHmSurf = u.surf;
+    shader.uniforms.uWocHmEyeHsv = u.eye;
     shader.uniforms.uWocHmHair = u.hair;
     shader.uniforms.uWocHmBeard = u.beard;
     shader.uniforms.uWocHmScalp = u.scalp;
@@ -568,7 +616,7 @@ export function setWocHeadMergedSlots(
       u.ref.value[i].set(0, 0, 0, 0);
       u.col.value[i].set(1, 1, 1, 0);
       u.emi.value[i].set(0, 0, 0, 1);
-      u.surf.value[i].set(0, 0);
+      u.surf.value[i].set(0, 0, 0, 0);
       continue;
     }
     u.ref.value[i].set(slot.ref[0], slot.ref[1], slot.ref[2], slot.roleCode);
@@ -584,7 +632,9 @@ export function setWocHeadMergedSlots(
       surface.emissive[2] - base.emissive[2],
       surface.roughness,
     );
-    u.surf.value[i].set(surface.metalness, slot.oneSided ? 1 : 0);
+    // (an untinted slot's reference is black: hue and saturation 0, read by no branch)
+    const [hue, saturation] = wocTintSrgbHsv(slot.ref);
+    u.surf.value[i].set(surface.metalness, slot.oneSided ? 1 : 0, hue, saturation);
   }
 }
 
@@ -598,5 +648,7 @@ export function setWocHeadMergedColors(
     const c = colors[role];
     u.tints.value[i].set(c[0], c[1], c[2]);
   });
+  const [hue, saturation, value] = wocTintSrgbHsv(colors.eye);
+  u.eye.value.set(hue, saturation, value);
   u.mix.value = 1;
 }

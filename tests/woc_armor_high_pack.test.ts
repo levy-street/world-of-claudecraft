@@ -7,7 +7,10 @@ import type { WocCharacterManifest } from '../src/render/characters/woc_characte
 // hand, it holds its medium pack resident for as long as it is (a medium pack is never freed
 // under a high one), freeing it disposes only what it made, its top parse is let go at once,
 // and a failed top fetch leaves the medium file drawing and is asked again after the cooldown.
-// Only the loader and the graphics profile are stubbed.
+// Its top levels are the part that goes soon once nobody draws them (seconds), the medium file
+// under them following the rule of its own tier (woc_armor_core.ts wocArmorIdleEvictMs); and
+// the local player's upgrade to it never takes over unproven. Only the loader and the graphics
+// profile are stubbed.
 
 const manifest: WocCharacterManifest = {
   schemaVersion: 1,
@@ -154,9 +157,9 @@ async function harness(opts: { throwOnce?: boolean } = {}) {
   >();
   const fetches: string[] = [];
   const released: string[] = [];
-  vi.doMock('../src/render/gfx', () => ({
-    GFX: { tier: 'high', constrainedMemory: false, anisotropy: 8, normalAnisotropy: 4 },
-  }));
+  /** The live graphics profile: a case moves the preset under the store by writing it. */
+  const gfx = { tier: 'high', constrainedMemory: false, anisotropy: 8, normalAnisotropy: 4 };
+  vi.doMock('../src/render/gfx', () => ({ GFX: gfx }));
   vi.doMock('../src/render/assets/loader', () => ({
     loadGltf: vi.fn(
       (url: string) =>
@@ -208,6 +211,7 @@ async function harness(opts: { throwOnce?: boolean } = {}) {
     dressing,
     mips,
     anisotropy,
+    gfx,
     high,
     medium,
     fetches,
@@ -218,7 +222,7 @@ async function harness(opts: { throwOnce?: boolean } = {}) {
     },
     disposedTop,
     land: async (url: string) => {
-      const parse = url === high ? topFile() : mediumFile();
+      const parse = url.endsWith('_top.glb') ? topFile() : mediumFile();
       if (url === high) {
         for (const texture of contents(parse.scene).textures) {
           texture.addEventListener('dispose', () => disposedTop.push(texture.name));
@@ -364,7 +368,7 @@ describe('the assembled high armor pack', () => {
     expect(registered).toContain(material.normalMap);
   });
 
-  it('frees itself first and only what it made, then the medium file after its own window', async () => {
+  it('frees its top levels seconds after its last wearer, and only what it made: the medium file stays', async () => {
     const h = await harness();
     h.packs.ensureWocArmorPack(h.high);
     await h.land(h.medium);
@@ -380,7 +384,12 @@ describe('the assembled high armor pack', () => {
     expect(medium.geometries.has(meshNamed(body, 'Armor_Test_Shoulder_L').geometry)).toBe(true);
     h.packs.releaseWocArmorContainer(container as THREE.Object3D);
     expect(h.packs.wocArmorPackRefs(h.high)).toBe(0);
-    h.advance(h.core.WOC_ARMOR_IDLE_EVICT_MS);
+    // a flip back to the class just looked at finds it: nothing fetched, nothing freed
+    h.advance(h.core.WOC_ARMOR_TOP_IDLE_EVICT_MS - 1);
+    expect(h.packs.sweepWocArmorPacks()).toEqual([]);
+    expect(h.packs.wocArmorPackResident(h.high)).toBe(true);
+    expect(own.disposed()).toBe(0);
+    h.advance(1);
     expect(h.packs.sweepWocArmorPacks()).toEqual([h.high]);
     expect(h.packs.wocArmorPackResident(h.high)).toBe(false);
     // what it made: its material clone, its combined textures, its prepared geometry
@@ -388,12 +397,45 @@ describe('the assembled high armor pack', () => {
     const material = helm.material as THREE.MeshStandardMaterial;
     expect(own.materials.has(material)).toBe(true);
     expect(own.disposed()).toBeGreaterThanOrEqual(5);
-    // ...and nothing of the medium file's, which only now starts its own idle window
+    // ...and nothing of the medium file's: the crowd's tier on this preset, kept for the
+    // session once the high pack lets go of it
     expect(medium.disposed()).toBe(0);
     expect(h.packs.wocArmorPackResident(h.medium)).toBe(true);
     expect(h.packs.wocArmorPackRefs(h.medium)).toBe(0);
+    h.advance(1000 * h.core.WOC_ARMOR_IDLE_EVICT_MS);
+    expect(h.packs.sweepWocArmorPacks()).toEqual([]);
+    expect(medium.disposed()).toBe(0);
+    expect(h.released).toEqual([h.high]);
+    // opened again: the top file is read again, laid over the medium file still in memory
+    h.fetches.length = 0;
+    h.packs.ensureWocArmorPack(h.high);
+    expect(h.fetches).toEqual([h.high]);
+    await h.land(h.high);
+    expect(h.packs.wocArmorPackResident(h.high)).toBe(true);
+  });
+
+  it('starts the medium file on its own window only when the high pack frees it', async () => {
+    const h = await harness();
+    h.packs.ensureWocArmorPack(h.high);
+    await h.land(h.medium);
+    await h.land(h.high);
+    const container = h.packs.attachWocArmorPack(model(), h.high, 'test', manifest);
+    const medium = watchDisposal(h.parses.get(h.medium)?.scene as THREE.Object3D);
+    h.packs.releaseWocArmorContainer(container as THREE.Object3D);
+    // the player switches down to the low preset: the medium file is a tier nobody draws now
+    h.gfx.tier = 'low';
+    // held by the high pack for as long as that is resident, whatever its own rule says
+    h.advance(h.core.WOC_ARMOR_TOP_IDLE_EVICT_MS - 1);
+    expect(h.packs.sweepWocArmorPacks()).toEqual([]);
+    expect(h.packs.wocArmorPackRefs(h.medium)).toBe(1);
+    h.advance(1);
+    expect(h.packs.sweepWocArmorPacks()).toEqual([h.high]);
+    expect(h.packs.wocArmorPackRefs(h.medium)).toBe(0);
+    expect(medium.disposed()).toBe(0);
+    // ...and only then does its own window run: the long one of a file left behind
     h.advance(h.core.WOC_ARMOR_IDLE_EVICT_MS - 1);
     expect(h.packs.sweepWocArmorPacks()).toEqual([]);
+    expect(h.packs.wocArmorPackResident(h.medium)).toBe(true);
     h.advance(1);
     expect(h.packs.sweepWocArmorPacks()).toEqual([h.medium]);
     expect(medium.disposed()).toBeGreaterThan(0);
@@ -411,6 +453,8 @@ describe('the assembled high armor pack', () => {
     const mediumWorn = h.packs.attachWocArmorPack(crowd, h.medium, 'test', manifest);
     const highWorn = h.packs.attachWocArmorPack(own, h.high, 'test', manifest);
     const medium = watchDisposal(h.parses.get(h.medium)?.scene as THREE.Object3D);
+    // on a profile that frees every idle file soon (the rule least kind to the medium file)
+    h.gfx.constrainedMemory = true;
     h.packs.releaseWocArmorContainer(mediumWorn as THREE.Object3D);
     // the medium file's last wearer is gone, and its pack is still the high pack's
     expect(h.packs.wocArmorPackRefs(h.medium)).toBe(1);
@@ -424,12 +468,43 @@ describe('the assembled high armor pack', () => {
     expect(map.mipmaps[1].data.length).toBeGreaterThan(0);
     // the high pack goes first, then the medium file after a window of its own
     h.packs.releaseWocArmorContainer(highWorn as THREE.Object3D);
-    h.advance(h.core.WOC_ARMOR_IDLE_EVICT_MS);
+    h.advance(h.core.WOC_ARMOR_CONSTRAINED_IDLE_EVICT_MS);
     expect(h.packs.sweepWocArmorPacks()).toEqual([h.high]);
     expect(h.packs.wocArmorPackResident(h.medium)).toBe(true);
-    h.advance(h.core.WOC_ARMOR_IDLE_EVICT_MS);
+    h.advance(h.core.WOC_ARMOR_CONSTRAINED_IDLE_EVICT_MS);
     expect(h.packs.sweepWocArmorPacks()).toEqual([h.medium]);
     expect(medium.disposed()).toBeGreaterThan(0);
+  });
+
+  it('holds only the top levels of the classes just looked at through a browse of every class', async () => {
+    const h = await harness();
+    // the character creator on a High desktop: one body at a time, each class at full detail
+    const sets = Array.from({ length: 18 }, (_, i) => `set${i}`);
+    const urls = sets.map((set) => ({
+      set,
+      high: h.core.wocArmorPackUrl('male', set, 'high'),
+      medium: h.core.wocArmorPackUrl('male', set, 'medium'),
+    }));
+    const DWELL_MS = 5000;
+    let shown: THREE.Object3D | null = null;
+    let most = 0;
+    for (const { set, high, medium } of urls) {
+      h.packs.ensureWocArmorPack(high);
+      await h.land(medium);
+      await h.land(high);
+      // the preview swaps its body: the class it showed is let go
+      if (shown) h.packs.releaseWocArmorContainer(shown);
+      shown = h.packs.attachWocArmorPack(model(), high, set, manifest);
+      h.advance(DWELL_MS);
+      h.packs.sweepWocArmorPacks();
+      const resident = urls.filter((u) => h.packs.wocArmorPackResident(u.high)).length;
+      most = Math.max(most, resident);
+    }
+    // five seconds a class: the one shown and the three let go 5, 10 and 15 seconds ago,
+    // never the eighteen a three minute window held at once
+    expect(most).toBe(4);
+    // every medium file is still there for the crowd that will draw it
+    expect(urls.every((u) => h.packs.wocArmorPackResident(u.medium))).toBe(true);
   });
 
   it('never fetches the top file while its medium file waits out a failed fetch', async () => {
@@ -548,6 +623,157 @@ describe('the local player streaming its high pack', () => {
     expect(d.poll()).toBe(true);
     expect(d.attachedFiles).toEqual([{ set: 'test', url: h.high }]);
     d.dispose();
+  });
+
+  it('keeps the medium file when the gate cannot prepare the high pack, lets the top levels go, and does not fetch them again', async () => {
+    const h = await harness();
+    const linking: ((prepared: boolean) => void)[] = [];
+    const host = {
+      model: model(),
+      adopt: vi.fn((_node: THREE.Object3D): void => undefined),
+      forget: vi.fn((_node: THREE.Object3D): void => undefined),
+      reveal: vi.fn((node: THREE.Object3D, live?: (prepared: boolean) => void): void => {
+        node.visible = false;
+        linking.push((prepared) => {
+          if (node.parent === null) return;
+          node.visible = true;
+          live?.(prepared);
+        });
+      }),
+      rigDrawn: (): boolean => true,
+    };
+    const settle = (prepared: boolean): void => {
+      for (const reveal of linking.splice(0)) reveal(prepared);
+    };
+    const d = new h.dressing.WocArmorDressing(host, manifest);
+    d.want(['test']);
+    await h.land(h.medium);
+    expect(d.poll()).toBe(true);
+    settle(true);
+    const mediumPieces = h.packs.wocArmorPieces(h.packs.wocArmorContainers(host.model)[0]);
+    await h.land(h.high);
+    expect(d.poll()).toBe(true);
+    expect(h.packs.wocArmorContainers(host.model)).toHaveLength(2);
+    // the gate gives up on the high pack, try after try, on the very materials asked
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    settle(false);
+    settle(false);
+    expect(h.packs.wocArmorContainers(host.model)).toHaveLength(2);
+    settle(false);
+    expect(logged).toHaveBeenCalledTimes(1);
+    // the upgrade is refused: the medium file is the same armor and keeps drawing, whole
+    expect(h.packs.wocArmorContainers(host.model)).toHaveLength(1);
+    expect(d.attachedFiles).toEqual([{ set: 'test', url: h.medium }]);
+    expect(mediumPieces.every((piece) => piece.parent !== null && piece.visible)).toBe(true);
+    expect(h.packs.wocArmorPackRefs(h.high)).toBe(0);
+    expect(d.poll()).toBe(true);
+    expect(d.poll()).toBe(false);
+    expect(d.isWaiting).toBe(false);
+    // nobody draws the top levels now: they go after their short window
+    h.advance(h.core.WOC_ARMOR_TOP_IDLE_EVICT_MS);
+    expect(h.packs.sweepWocArmorPacks()).toEqual([h.high]);
+    expect(h.packs.wocArmorPackResident(h.medium)).toBe(true);
+    // ...and the body that will not draw them does not fetch them again, frame after frame
+    // or when the same kit is handed in again
+    h.fetches.length = 0;
+    for (let frame = 0; frame < 3; frame++) expect(d.poll()).toBe(false);
+    expect(d.want(['test'])).toBe(false);
+    expect(d.isWaiting).toBe(false);
+    expect(h.fetches).toEqual([]);
+    expect(d.attachedFiles).toEqual([{ set: 'test', url: h.medium }]);
+    // a replaced gate (the next renderer generation) gets its own try
+    d.gateChanged();
+    expect(d.poll()).toBe(false);
+    expect(h.fetches).toEqual([h.high]);
+    await h.land(h.high);
+    expect(d.poll()).toBe(true);
+    settle(true);
+    expect(d.attachedFiles).toEqual([{ set: 'test', url: h.high }]);
+    d.dispose();
+  });
+
+  it('gives a refused high pack another try when the body is asked for full detail again', async () => {
+    const h = await harness();
+    const linking: ((prepared: boolean) => void)[] = [];
+    const host = {
+      model: model(),
+      adopt: vi.fn((_node: THREE.Object3D): void => undefined),
+      forget: vi.fn((_node: THREE.Object3D): void => undefined),
+      reveal: vi.fn((node: THREE.Object3D, live?: (prepared: boolean) => void): void => {
+        node.visible = false;
+        linking.push((prepared) => {
+          if (node.parent === null) return;
+          node.visible = true;
+          live?.(prepared);
+        });
+      }),
+      rigDrawn: (): boolean => true,
+    };
+    const settle = (prepared: boolean): void => {
+      for (const reveal of linking.splice(0)) reveal(prepared);
+    };
+    const d = new h.dressing.WocArmorDressing(host, manifest);
+    d.want(['test']);
+    await h.land(h.medium);
+    d.poll();
+    settle(true);
+    await h.land(h.high);
+    d.poll();
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    for (let miss = 0; miss < 3; miss++) settle(false);
+    // refused: the body stays on the medium file and no frame asks again
+    expect(h.packs.wocArmorContainers(host.model)).toHaveLength(1);
+    expect(d.poll()).toBe(true);
+    for (let frame = 0; frame < 3; frame++) expect(d.poll()).toBe(false);
+    expect(d.attachedFiles).toEqual([{ set: 'test', url: h.medium }]);
+    // the stage steps the body down to the crowd's detail (the creator flipped away) and
+    // nothing moves: the medium file is what that detail draws
+    d.setDetail('crowd');
+    expect(d.poll()).toBe(false);
+    expect(h.packs.wocArmorContainers(host.model)).toHaveLength(1);
+    // ...then back up (the class is chosen again): a new ask, so the old refusal no longer
+    // holds and the high pack is laid over the medium file again, behind the gate
+    d.setDetail('full');
+    expect(d.poll()).toBe(true);
+    expect(h.packs.wocArmorContainers(host.model)).toHaveLength(2);
+    expect(d.attachedFiles).toEqual([{ set: 'test', url: h.medium }]);
+    settle(true);
+    expect(d.attachedFiles).toEqual([{ set: 'test', url: h.high }]);
+    d.dispose();
+  });
+
+  it('prepares the medium file and the high pack laid over it each as a unit of its own', async () => {
+    const h = await harness();
+    const units: { run: () => void; label: string | undefined }[] = [];
+    h.packs.setWocArmorWorkQueue({
+      run<T>(work: () => T | Promise<T>, _priority?: number, label?: string): Promise<T> {
+        return new Promise<T>((resolve) => {
+          units.push({ run: () => resolve(work() as T), label });
+        });
+      },
+    });
+    h.packs.noteWocArmorRig(model(), manifest);
+    h.packs.ensureWocArmorPack(h.high);
+    await h.land(h.medium);
+    expect(units.map((unit) => unit.label)).toEqual(['woc-armor-prepare:male:test:medium']);
+    await h.land(h.high);
+    // one kind for the budget to price, and each label names the pack it prepares
+    expect(units.map((unit) => unit.label)).toEqual([
+      'woc-armor-prepare:male:test:medium',
+      'woc-armor-prepare:male:test:high',
+    ]);
+    expect(h.packs.wocArmorPackPrepared(h.medium)).toBe(false);
+    expect(h.packs.wocArmorPackPrepared(h.high)).toBe(false);
+    for (const unit of units.splice(0)) unit.run();
+    expect(h.packs.wocArmorPackPrepared(h.medium)).toBe(true);
+    expect(h.packs.wocArmorPackPrepared(h.high)).toBe(true);
+    // both attach with nothing left to prepare: the high pack's rigid part still draws the
+    // medium parse's own geometry
+    const body = model();
+    expect(h.packs.attachWocArmorPack(body, h.high, 'test', manifest)).not.toBeNull();
+    expect(meshNamed(body, 'Armor_Test_Shoulder_L').geometry).toBe(
+      meshNamed(h.parses.get(h.medium)?.scene as THREE.Object3D, 'Armor_Test_Shoulder_L').geometry,
+    );
   });
 
   it('draws a crowd character on the medium file and never fetches the top levels for it', async () => {

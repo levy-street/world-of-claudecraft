@@ -90,7 +90,7 @@ const tris = (mesh: THREE.Mesh): number =>
   (mesh.geometry.index?.count ?? mesh.geometry.getAttribute('position').count) / 3;
 
 /** A face piece the sliders move: drawn piece by piece it keeps level 0 at every level
- *  (woc_head_packs.ts hangWocHeadFile: a variant would cost a second morph texture). */
+ *  (woc_head_packs.ts hangWocHeadPieces: a variant would cost a second morph texture). */
 const morphed = (mesh: THREE.Mesh): boolean =>
   Object.values(mesh.geometry.morphAttributes).some((list) => list.length > 0);
 

@@ -3,6 +3,7 @@ import { CLASSES } from '../../sim/data';
 import type { EquipSlot, PlayerClass } from '../../sim/types';
 import { GPU_WORK_PRIORITY } from '../background_gpu_queue';
 import { trackWebGLContext } from '../context_release';
+import { GFX } from '../gfx';
 import { gpuPrepNow, recordGpuPrepEvent } from '../gpu_prep_events';
 import {
   type LinkedProgramTouchQueue,
@@ -35,6 +36,12 @@ import {
   previewAppearanceVisual,
 } from './preview_appearance';
 import {
+  type PreviewArmorSurface,
+  previewArmorBuildOptions,
+  previewArmorDetail,
+  previewChosenBody,
+} from './preview_armor_detail_core';
+import {
   CREATION_HEAD_AIM,
   CREATION_HEAD_Y,
   creationFocusPose,
@@ -49,6 +56,7 @@ import { previewMaterialGate } from './preview_material_gate';
 import { createPreviewOpenGate, type PreviewOpenGate } from './preview_open_gate_core';
 import { characterPreviewFrameVisible, resolveCharacterPreviewPolicy } from './preview_policy';
 import { CharacterVisual } from './visual';
+import type { WocArmorDetail } from './woc_armor_core';
 import { wocHeadBaseNode } from './woc_head_catalog';
 import type { WocHeadHold } from './woc_head_dressing';
 import type { WocHeadAppearanceInput } from './woc_head_look_core';
@@ -192,6 +200,18 @@ export class CharacterPreview {
     | { helmHidden: boolean }
     | null = null;
   private unsubscribeAssetReady: (() => void) | null = null;
+  /** What this stage shows, for the armor detail its body draws
+   *  (preview_armor_detail_core.ts): the viewer's own character until a host says
+   *  otherwise (setArmorSurface, setCreationClass). */
+  private armorSurface: PreviewArmorSurface = 'own';
+  /** The body on the stage (its visual key: one class and one body fit), built or
+   *  still waiting on its files; null before the first. */
+  private stagedBody: string | null = null;
+  /** The body the creator's player chose (markChosen); null until one is, and again
+   *  once the creator is left. */
+  private chosenBody: string | null = null;
+  /** The armor detail the built body draws: what it was built at, or changed to since. */
+  private armorDetail: WocArmorDetail = 'full';
 
   // Drag controls
   private isDragging = false;
@@ -316,10 +336,79 @@ export class CharacterPreview {
     this.currentVisual?.setWocDefaultEquipment(helmHidden);
   }
 
+  /** Say what this stage shows from here on (preview_armor_detail_core.ts): the viewer's
+   *  own character, or someone else's (the Inspect stage, whose body draws the crowd's
+   *  armor detail and never a top file). It takes effect with the subject mounted next:
+   *  every mount hands the stage what it shows, then its subject
+   *  (src/ui/preview_subject.ts), so a rebuilt body is born at that detail and a body kept
+   *  across the mount changes in place. The creator is entered by setCreationClass alone. */
+  setArmorSurface(surface: Exclude<PreviewArmorSurface, 'creator'>): void {
+    if (this.destroyed) return;
+    this.armorSurface = surface;
+  }
+
+  /** A subject that is not the creator's takes the stage (the roster's pick, a redesign
+   *  draft): the creator's rule ends with it, and so does the choice made there (a
+   *  choice lasts one visit to the creator: coming back starts at the crowd's detail). A
+   *  stage its host declared (setArmorSurface) stays as it said. */
+  private leaveCreator(): void {
+    if (this.armorSurface !== 'creator') return;
+    this.armorSurface = 'own';
+    this.chosenBody = null;
+  }
+
+  /**
+   * Character creation's turntable: the class body being browsed, in the look being
+   * built, holding the class starters (setModular's creation form). A class nobody has
+   * made yet draws the crowd's armor detail until the player chooses it (markChosen), so
+   * flipping through classes and bodies fetches and holds only the small files
+   * (preview_armor_detail_core.ts).
+   */
+  setCreationClass(app: ModularAppearance, worn: ArmorLoadout, cls: PlayerClass): void {
+    if (this.destroyed) return;
+    this.armorSurface = 'creator';
+    this.showModular(app, worn, cls);
+  }
+
+  /**
+   * The player acted on the appearance of the character on the stage (the face builder,
+   * src/ui/appearance_editor_mount.ts): it is the one being made. In the creator that
+   * class and body draws full armor detail from here on, on the body already built: its
+   * medium file stands in until the top file lands and links
+   * (CharacterVisual.setWocArmorDetail). Flipping to another class or body draws that one
+   * small again and lets this one's files go with its body (a top file still on its way
+   * is not stopped: it lands with nobody holding it, the store's to free); coming back
+   * asks for them again. Every other stage draws what it draws already.
+   */
+  markChosen(): void {
+    if (this.destroyed) return;
+    this.chosenBody = previewChosenBody(this.armorSurface, this.stagedBody, this.chosenBody);
+    this.syncArmorDetail();
+  }
+
+  /** The armor detail the body on this stage draws now. */
+  private stagedArmorDetail(): WocArmorDetail {
+    return previewArmorDetail(this.armorSurface, this.stagedBody, this.chosenBody);
+  }
+
+  /** Draw the built body at the armor detail its stage asks for now, in place (a body
+   *  that is rebuilt is born at it: setVisualKey). The body takes it with its next
+   *  dressing, which a mount hands it right after with the sets of what it shows now,
+   *  else on its next frame. The cached player-card shots show the detail it leaves. */
+  private syncArmorDetail(): void {
+    const detail = this.stagedArmorDetail();
+    if (!this.currentVisual || detail === this.armorDetail) return;
+    this.armorDetail = detail;
+    this.closeupCache.clear();
+    this.currentVisual.setWocArmorDetail(detail);
+  }
+
   /** Set the active character model by player class. Pass explicit hand ids for a
-   *  character sheet; omit them to show the class starter equipment in creation. */
+   *  character sheet; omit them to show the class starter equipment (the creator's own
+   *  turntable goes through setCreationClass). */
   setClass(cls: PlayerClass, weaponItemId?: string | null, offhandItemId?: string | null): void {
     if (this.destroyed) return;
+    this.leaveCreator();
     // A class-driven selection (create/offline picker, or a panel switch) supersedes
     // any pending async mech re-apply, so invalidate the tracked appearance.
     this.appearanceSig = null;
@@ -339,6 +428,7 @@ export class CharacterPreview {
    *  loaded, unless a newer selection has superseded this one. */
   setAppearance(a: PreviewAppearance): void {
     if (this.destroyed) return;
+    this.leaveCreator();
     this.currentSkin = a.skin;
     this.currentWeaponSkinId = a.weaponSkinId ?? null;
     const sig = appearanceSignature(a);
@@ -388,6 +478,19 @@ export class CharacterPreview {
     offhandItemId?: string | null,
   ): void {
     if (this.destroyed) return;
+    this.leaveCreator();
+    this.showModular(app, worn, cls, weaponItemId, offhandItemId);
+  }
+
+  /** setModular's body, shared with the creator's entry (setCreationClass), which stages
+   *  the same look on its own terms. */
+  private showModular(
+    app: ModularAppearance,
+    worn: ArmorLoadout,
+    cls: PlayerClass,
+    weaponItemId?: string | null,
+    offhandItemId?: string | null,
+  ): void {
     this.appearanceSig = null;
     this.pendingLook = { app, worn };
     const weapon = weaponItemId !== undefined ? weaponItemId : (CLASSES[cls].startWeapon ?? null);
@@ -442,6 +545,7 @@ export class CharacterPreview {
     offhandItemId: string | null = null,
   ): void {
     if (this.destroyed) return;
+    this.stagedBody = visualKey;
     const look = VISUALS[visualKey]?.modular ? this.pendingLook : null;
     const nextSig = JSON.stringify([
       visualKey,
@@ -450,7 +554,12 @@ export class CharacterPreview {
       offhandItemId,
       look ? modularBuildSignature(look.app, look.worn) : null,
     ]);
-    if (this.currentVisual && this.currentVisualSig === nextSig) return;
+    if (this.currentVisual && this.currentVisualSig === nextSig) {
+      // the same body on a stage that shows it differently now (the player's own
+      // character, then a peer of its class inspected): only its armor detail changes
+      this.syncArmorDetail();
+      return;
+    }
     this.closeupCache.clear();
     if (this.currentVisual) {
       // CharacterVisual keeps shared geometry/material caches but owns its
@@ -474,6 +583,10 @@ export class CharacterPreview {
     }
 
     try {
+      // born at the armor detail this stage draws, so a class being browsed or a peer
+      // inspected never asks for a top file it will not draw; its geometry level is a
+      // preview's own whatever that detail (preview_armor_detail_core.ts)
+      const detail = this.stagedArmorDetail();
       this.currentVisual = new CharacterVisual(
         visualKey,
         0xffffff,
@@ -482,7 +595,9 @@ export class CharacterPreview {
         weaponOverride,
         offhandItemId,
         look,
+        previewArmorBuildOptions(GFX, detail),
       );
+      this.armorDetail = detail;
       this.currentVisualSig = nextSig;
       this.characterGroup.add(this.currentVisual.root);
       const visual = this.currentVisual;

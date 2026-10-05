@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
   parseWocArmorPackUrl,
+  WOC_ARMOR_CONSTRAINED_IDLE_EVICT_MS,
   WOC_ARMOR_IDLE_EVICT_MS,
   WOC_ARMOR_TIERS,
+  WOC_ARMOR_TOP_IDLE_EVICT_MS,
   WocArmorResidency,
   wocAnimsUrl,
+  wocArmorIdleEvictMs,
   wocArmorPackBaseUrl,
   wocArmorPackUrl,
   wocArmorTierFor,
@@ -14,8 +17,9 @@ import {
 
 // The pure decisions behind the split WOC character files (the 2026-09-25 character size
 // gameplan, steps 2, 5 and 6): which file a body, a clip library and an armor set load from,
-// which texture tier a character draws, what stands in while a tier streams, and when a set
-// nobody wears is freed.
+// which texture tier a character draws, what stands in while a tier streams, and how long a
+// set nobody wears stays in memory (never freed for being idle where a crowd draws it on a
+// desktop, soon on a phone).
 
 describe('the split file names', () => {
   it('names one base and one library per fit, and per set and fit a low, a medium and a top file', () => {
@@ -150,5 +154,103 @@ describe('the armor residency ledger (a set nobody wears is freed)', () => {
     expect(r.refs('q')).toBe(0);
     expect(r.takeExpired(10_000)).toEqual([]);
     expect(WOC_ARMOR_IDLE_EVICT_MS).toBe(3 * 60 * 1000);
+  });
+
+  it('asks the window of each pack at every sweep, and never frees one whose window is infinite', () => {
+    const windows: Record<string, number> = {
+      kept: Number.POSITIVE_INFINITY,
+      short: 100,
+      long: 500,
+    };
+    const r = new WocArmorResidency((url) => windows[url]);
+    for (const url of ['kept', 'short', 'long']) {
+      r.acquire(url);
+      r.release(url, 0);
+    }
+    expect(r.takeExpired(99)).toEqual([]);
+    expect(r.takeExpired(100)).toEqual(['short']);
+    expect(r.takeExpired(500)).toEqual(['long']);
+    // idle for ever: nothing ever hands it back
+    expect(r.takeExpired(Number.MAX_SAFE_INTEGER)).toEqual([]);
+    // the rule changed under it (a preset change): its idle time so far counts
+    windows.kept = 1000;
+    expect(r.takeExpired(999)).toEqual([]);
+    expect(r.takeExpired(1000)).toEqual(['kept']);
+    // ...and a pack whose rule turns infinite stops ageing out without a touch
+    r.acquire('short');
+    r.release('short', 2000);
+    windows.short = Number.POSITIVE_INFINITY;
+    expect(r.takeExpired(1e9)).toEqual([]);
+  });
+
+  it('knows which packs were drawn lately: in use, or let go inside the span asked about', () => {
+    const r = new WocArmorResidency(Number.POSITIVE_INFINITY);
+    r.acquire('worn');
+    expect(r.drawnWithin('worn', 1e9, 1)).toBe(true); // in use, however long ago it began
+    r.acquire('left');
+    r.release('left', 1000);
+    expect(r.drawnWithin('left', 1999, 1000)).toBe(true);
+    expect(r.drawnWithin('left', 2000, 1000)).toBe(false);
+    // a pack that only arrived (a prefetch) is idle, and was never drawn
+    r.noteResident('fetched', 1000);
+    expect(r.drawnWithin('fetched', 1000, 1000)).toBe(false);
+    expect(r.drawnWithin('unknown', 0, 1000)).toBe(false);
+    // one of two users leaving is not the pack being let go
+    r.acquire('worn');
+    r.release('worn', 5000);
+    expect(r.drawnWithin('worn', 1e9, 1)).toBe(true);
+    r.forget('left');
+    expect(r.drawnWithin('left', 1001, 1000)).toBe(false);
+  });
+});
+
+describe('how long an armor pack nobody draws stays in memory', () => {
+  const desktop = (tier: string) => ({ tier, constrainedMemory: false });
+  const phone = (tier: string) => ({ tier, constrainedMemory: true });
+  const NEVER = Number.POSITIVE_INFINITY;
+
+  it('never frees the tier a crowd draws on a desktop: low on the low preset, medium above it', () => {
+    expect(wocArmorIdleEvictMs('low', desktop('low'))).toBe(NEVER);
+    for (const preset of ['medium', 'high', 'ultra', 'insane']) {
+      expect(wocArmorIdleEvictMs('medium', desktop(preset)), preset).toBe(NEVER);
+    }
+    // the rule follows wocArmorTierFor, whatever it answers: one source for both
+    for (const preset of ['low', 'medium', 'high', 'ultra', 'insane']) {
+      const crowd = wocArmorTierFor(desktop(preset), 'crowd');
+      expect(wocArmorIdleEvictMs(crowd, desktop(preset)), preset).toBe(NEVER);
+    }
+  });
+
+  it('frees a tier the preset draws for nobody after the long window (a preset change left it)', () => {
+    // medium files after a switch down to the low preset
+    expect(wocArmorIdleEvictMs('medium', desktop('low'))).toBe(WOC_ARMOR_IDLE_EVICT_MS);
+    // low files (a switch up, or a portrait's own fetch) on every other preset
+    for (const preset of ['medium', 'high', 'ultra', 'insane']) {
+      expect(wocArmorIdleEvictMs('low', desktop(preset)), preset).toBe(WOC_ARMOR_IDLE_EVICT_MS);
+    }
+  });
+
+  it('frees the top levels of a high pack nobody draws quickly, on every desktop preset', () => {
+    for (const preset of ['low', 'medium', 'high', 'ultra', 'insane']) {
+      expect(wocArmorIdleEvictMs('high', desktop(preset)), preset).toBe(
+        WOC_ARMOR_TOP_IDLE_EVICT_MS,
+      );
+    }
+    // short against the window of a file left behind, and long enough to flip back to
+    expect(WOC_ARMOR_TOP_IDLE_EVICT_MS).toBe(20 * 1000);
+    expect(WOC_ARMOR_TOP_IDLE_EVICT_MS).toBeLessThan(WOC_ARMOR_IDLE_EVICT_MS);
+  });
+
+  it('frees everything soon on the phone-class memory profile, whatever the preset and the tier', () => {
+    for (const preset of ['low', 'medium', 'high', 'ultra', 'insane']) {
+      for (const tier of WOC_ARMOR_TIERS) {
+        expect(wocArmorIdleEvictMs(tier, phone(preset)), `${preset} ${tier}`).toBe(
+          WOC_ARMOR_CONSTRAINED_IDLE_EVICT_MS,
+        );
+      }
+    }
+    // inside the minute after a crowd leaves, where three minutes was not
+    expect(WOC_ARMOR_CONSTRAINED_IDLE_EVICT_MS).toBe(30 * 1000);
+    expect(WOC_ARMOR_CONSTRAINED_IDLE_EVICT_MS).toBeLessThan(60 * 1000);
   });
 });

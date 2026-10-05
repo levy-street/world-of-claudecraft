@@ -21,6 +21,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { setBuildSpanSink } from '../src/render/build_spans';
 import * as assets from '../src/render/characters/assets';
 import { SanguineWeaponSheath } from '../src/render/characters/sanguine_weapon_sheath';
 import { CharacterSurfaceResponse } from '../src/render/characters/surface_response';
@@ -240,6 +241,27 @@ describe('the composed far bake links hidden behind the gate', () => {
     expect((fake.farMesh as THREE.Mesh).visible).toBe(true);
   });
 
+  it('records the bake in the CPU build ledger, under the composed kind', () => {
+    // guards: a far crossing's bake ran in the frame with no span, so the frame that paid
+    // for it showed no build at all
+    stubComposedBake();
+    const spans: string[] = [];
+    setBuildSpanSink((kind) => spans.push(kind));
+    try {
+      const fake = fakeVisual();
+      fake.setFar(true);
+      expect(fake.farMesh).not.toBeNull();
+      // one span for the crossing, and a composed body's is not a WOC mount
+      expect(spans).toEqual(['view:composed-far-bake']);
+      // a crossing that finds its far mesh already built records none
+      fake.setFar(false);
+      fake.setFar(true);
+      expect(spans).toHaveLength(1);
+    } finally {
+      setBuildSpanSink(null);
+    }
+  });
+
   it('installing a gate resets a bake left pending by a previous life', () => {
     // pool re-acquire: a settle the old renderer generation dropped must not
     // strand the visual articulated
@@ -267,11 +289,13 @@ describe('the composed far bake links hidden behind the gate', () => {
     // two .visible flags itself (the pre-gate shape, which bypassed the
     // pending flag).
     const source = readSource('src/render/characters/visual.ts');
-    const start = source.indexOf('this.farBakePending &&');
+    const start = source.indexOf('if (this.farBakePending &&');
     expect(start).toBeGreaterThan(-1);
     const block = source.slice(start, source.indexOf('\n    }', start));
-    expect(block).toContain('this.far || (this.wocFarParts && this.proxyShadowWanted)');
-    expect(block).toContain('!this.farBakeTried');
+    // only a FAR body retries: the shadow plan arms no bake (a WOC body in the proxy
+    // band casts its key's stand-in instead, far_lod_reveal_core.ts shadowStandInShown)
+    expect(block).toContain('this.farBakePending && this.far && !this.farBakeTried');
+    expect(block).not.toContain('proxyShadowWanted');
     expect(block).toContain('this.attemptComposedFar();');
     expect(block).toContain('this.syncFarVisibility();');
     expect(block).not.toContain('.visible =');
@@ -284,9 +308,12 @@ describe('the composed far bake links hidden behind the gate', () => {
     expect(mint).toContain('this.farCompilePending = false;');
     expect(mint).not.toContain('syncFarVisibility');
     // and the only writers of the rig/far-mesh handoff are the sync helpers
-    const writers = source.match(/this\.(modelWrap|farMesh|shadowProxy)\.visible = /g) ?? [];
+    const handoff = /this\.(modelWrap|farMesh|shadowProxy|shadowStandIn)\.visible = /g;
+    const writers = source.match(handoff) ?? [];
     expect(writers.length).toBeGreaterThan(0);
-    for (const match of source.matchAll(/this\.(modelWrap|farMesh|shadowProxy)\.visible = /g)) {
+    // the stand-in's reveal is one of them (a WOC body's shadow before its far bake)
+    expect(writers).toContain('this.shadowStandIn.visible = ');
+    for (const match of source.matchAll(handoff)) {
       const before = source.lastIndexOf('\n  private ', match.index);
       const owner = source.slice(before, source.indexOf('(', before));
       expect(['syncFarVisibility', 'syncShadowProxyVisibility', 'buildFarMeshes']).toContain(

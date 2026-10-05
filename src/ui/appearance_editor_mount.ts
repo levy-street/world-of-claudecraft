@@ -9,8 +9,14 @@
 // look the moment it opens, and every hairstyle (or facial hair) file of the
 // current type when that category opens, so each option is resident by the
 // time it is clicked.
+//
+// The face builder's mount is also what tells the stage a character was CHOSEN
+// (AppearanceEditorStage.markChosen): the creator draws a class's armor at the
+// crowd's detail while classes and bodies are flipped through, and at full
+// detail once the player works on the one that is there
+// (render/characters/preview_armor_detail_core.ts).
 
-import type { WocHeadSlot } from '../render/characters/woc_head_catalog';
+import type { WocHeadSlot, WocHeadType } from '../render/characters/woc_head_catalog';
 import { prefetchWocHeadLook, prefetchWocHeadSlot } from '../render/characters/woc_head_packs';
 import { WOC_BODY_CLASSES } from '../render/characters/woc_parts_core';
 import type { PlayerClass } from '../sim/types';
@@ -31,6 +37,11 @@ export type { AppearanceCustomizer } from './appearance_customizer';
 /** The slice of the creation stage the face builder drives. */
 export interface AppearanceEditorStage {
   setFocus(focus: WocBuilderFocus): void;
+  /** The player acted on the appearance of the character on the stage: it is the one
+   *  being made (CharacterPreview.markChosen: the creator draws its armor at full detail
+   *  from here on). Required, so the stage a host hands in cannot lose the call to a
+   *  rename: a stage that draws one detail answers with nothing. */
+  markChosen(): void;
 }
 
 export interface AppearanceEditorOptions extends AppearanceCustomizerOptions {
@@ -57,15 +68,31 @@ export function mountAppearanceEditor(
   opts: AppearanceEditorOptions,
 ): AppearanceCustomizer {
   if (!usesWocHeadBuilder(cls)) return mountAppearanceCustomizer(host, opts);
+  // The stage is told when the player CHOOSES the character on it (markChosen): by
+  // opening a face category (the camera's close-up) or changing any option of the look
+  // on the body that is there. Picking the body type is browsing, like picking a class:
+  // it puts another body on the stage, which nobody chose yet. Neither does the panel
+  // being shown again (set, below): that is the host, not the player.
+  let body: WocHeadType | null = null;
   const builder = mountWocHeadBuilder(host, {
     value: opts.value,
-    onChange: opts.onChange,
-    onFocus: (focus) => opts.stage?.()?.setFocus(focus),
+    onChange: (next) => {
+      const sameBody = headTypeOf(next) === body;
+      body = headTypeOf(next);
+      opts.onChange(next);
+      if (sameBody) opts.stage?.()?.markChosen();
+    },
+    onFocus: (focus) => {
+      const stage = opts.stage?.();
+      stage?.setFocus(focus);
+      if (focus === 'face') stage?.markChosen();
+    },
     onOpen: (cat) => {
       const slot = wocPrefetchSlotOf(cat);
       if (slot) prefetchWocHeadSlot(headTypeOf(builder.value), slot);
     },
   });
+  body = headTypeOf(builder.value);
   // the head the creator opens on: its body type's default look
   prefetchWocHeadLook(headTypeOf(builder.value));
   return {
@@ -77,6 +104,7 @@ export function mountAppearanceEditor(
     // since a stage change reset the camera to the full body.
     set(next) {
       builder.set(next);
+      body = headTypeOf(builder.value);
       opts.stage?.()?.setFocus(builder.focus);
     },
     destroy() {
