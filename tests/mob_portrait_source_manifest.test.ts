@@ -14,6 +14,7 @@ import {
   changedPortraitIds,
 } from '../scripts/lib/mob_portrait_manifest_guard.mjs';
 import { MOBS } from '../src/sim/data';
+import { targetPortraitUrl } from '../src/ui/target_portrait_view';
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 const script = join(repoRoot, 'scripts/build_mob_portrait_source_manifest.mjs');
@@ -82,7 +83,19 @@ describe('mob portrait source manifest', () => {
 
   it('covers every live mob and records each render dependency with a content hash', () => {
     const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as PortraitSourceManifest;
-    const liveIds = Object.keys(MOBS).sort();
+    // Every mob the HUD serves from public/ui/mobs. The buddy follower
+    // templates are MOBS rows too, but they read their own portrait lane
+    // (public/ui/portraits/buddy_<key>.webp, target_portrait_view.ts
+    // BUDDY_PORTRAIT_URLS), so they have no row here: the same rule
+    // tests/target_portrait_view.test.ts applies in its orphan sweep.
+    const liveIds = Object.keys(MOBS)
+      .filter((id) => targetPortraitUrl(id, true)?.startsWith('/ui/mobs/'))
+      .sort();
+    expect(
+      Object.keys(MOBS)
+        .filter((id) => !liveIds.includes(id))
+        .sort(),
+    ).toEqual(['buddy_crystal_lich', 'buddy_forgemaw', 'buddy_horse']);
     // 243: the 233 the v0.39.0 base carried, minus vale_cup_ball (retired with
     // the Vale Cup by the New Eastbrook program), plus the Proving Shore
     // tutorial island's training_effigy, shore_scuttler, and mister_crabs
