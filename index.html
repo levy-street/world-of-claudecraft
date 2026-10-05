@@ -162,6 +162,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<link rel="preload" as="image" href="/worldofclaudecraft-logo.png" fetchpriority="high" />
 <link rel="preload" as="image" href="./ui/cursors/gauntlet.png" />
 <link rel="preload" as="image" href="./ui/cursors/arrow.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -191,15 +192,155 @@
 <!-- End Meta Pixel Code -->
 <link rel="stylesheet" href="/src/styles/index.extra.css" />
 <style>
-  /* Game CSS now lives in src/styles/* (the CSS extraction). The shared
-     layers (tokens, base, layout, components, hud, shell, hud-mobile) load via the
-     src/main.ts barrel; this entry's per-entry layer (the #rotate-device
-     orientation gate) loads from index.extra.css linked above. Layer
-     names are flat (hud-mobile, not hud.mobile): a dot is a sublayer separator. This
-     inline block is intentionally empty. */
+  /* The boot splash paints from this block alone: the game stylesheets load behind it
+     (moved to the end of <body> by the woc-boot-splash-stylesheets Vite plugin) and
+     src/ui/boot_splash.ts lifts it once the start screen is presentable. Every rule
+     here is scoped to the splash or to body.boot-pending, so none outlives the boot.
+     Colors mirror --website-ink-deep, --website-gold and --website-gold-bright. */
+  body.boot-pending {
+    margin: 0;
+    overflow: hidden;
+  }
+  /* Clipped to the screen as well as hidden: unstyled media under the splash (the
+     1536px video poster, the 978px logos) would otherwise widen the layout viewport,
+     and a phone then zooms out and centers the splash off screen. */
+  body.boot-pending > :not(#boot-splash) {
+    visibility: hidden;
+    max-width: 100vw;
+    overflow: hidden;
+    overflow: clip;
+  }
+  #boot-splash {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483647;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(18px, 5vh, 44px);
+    gap: clamp(18px, 5dvh, 44px);
+    background: #0a120f;
+    transition: opacity 350ms ease;
+  }
+  #boot-splash.boot-splash-leaving {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .boot-splash-logo {
+    width: min(540px, 72vw);
+    height: auto;
+    max-height: 52vh;
+    max-height: 52dvh;
+    object-fit: contain;
+    opacity: 0;
+    transition: opacity 500ms ease;
+  }
+  .boot-splash-logo.is-loaded {
+    opacity: 1;
+  }
+  .boot-splash-bar {
+    position: relative;
+    overflow: hidden;
+    width: min(280px, 46vw);
+    height: 2px;
+    border-radius: 1px;
+    background: rgb(200 175 122 / 0.22);
+  }
+  .boot-splash-bar::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    width: 40%;
+    background: linear-gradient(90deg, transparent, #efd594, transparent);
+    transform: translateX(-100%);
+    animation: boot-splash-sweep 1.6s ease-in-out infinite;
+  }
+  @keyframes boot-splash-sweep {
+    to {
+      transform: translateX(250%);
+    }
+  }
+  #boot-splash.boot-splash-still,
+  .boot-splash-still .boot-splash-logo {
+    transition: none;
+  }
+  .boot-splash-still .boot-splash-bar::after {
+    width: 100%;
+    opacity: 0.5;
+    transform: none;
+    animation: none;
+  }
 </style>
+<noscript>
+  <style>
+    body.boot-pending > :not(#boot-splash) {
+      visibility: visible;
+    }
+    #boot-splash {
+      display: none;
+    }
+  </style>
+</noscript>
 </head>
-<body class="steam-wishlist-pending start-screen-open" data-start-panel="mode-select" data-website-redesign>
+<body class="boot-pending steam-wishlist-pending start-screen-open" data-start-panel="mode-select" data-website-redesign>
+  <div id="boot-splash" aria-hidden="true">
+    <img class="boot-splash-logo" src="/worldofclaudecraft-logo.png" width="978" height="654" alt="" fetchpriority="high" />
+    <div class="boot-splash-bar"></div>
+  </div>
+  <script>
+    (() => {
+      const splash = document.getElementById('boot-splash');
+      const logo = splash?.querySelector('.boot-splash-logo');
+      if (!splash || !logo) return;
+      let reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      try {
+        reduceMotion ||= JSON.parse(localStorage.getItem('woc_settings') ?? '{}')?.reduceMotion === true;
+      } catch {}
+      if (reduceMotion) splash.classList.add('boot-splash-still');
+      const showLogo = () => logo.classList.add('is-loaded');
+      if (logo.complete && logo.naturalWidth > 0) showLogo();
+      else logo.addEventListener('load', showLogo, { once: true });
+      // A failed stylesheet keeps a null sheet in some engines, so this mark is what
+      // tells a settled link from one still loading.
+      const markSettled = (event) => {
+        if (event.target instanceof HTMLLinkElement) event.target.dataset.bootSettled = '';
+      };
+      document.addEventListener('load', markSettled, true);
+      document.addEventListener('error', markSettled, true);
+      // Fail-safe: a game module that fails to load or a boot that throws shows the page
+      // at once, and a boot still held after the cap shows it once its own stylesheets
+      // settled. src/ui/boot_splash.ts takes over the error arm when it owns the splash.
+      const release = () => {
+        document.body.classList.remove('boot-pending');
+        splash.remove();
+      };
+      const onBootError = (event) => {
+        const target = event.target;
+        const moduleFailed = target instanceof HTMLScriptElement && target.type === 'module';
+        const bootThrew =
+          event instanceof ErrorEvent && String(event.filename).startsWith(location.origin);
+        if (moduleFailed || bootThrew) release();
+      };
+      addEventListener('error', onBootError, true);
+      document.addEventListener(
+        'woc:boot-splash-owned',
+        () => removeEventListener('error', onBootError, true),
+        { once: true },
+      );
+      const ownStylesSettled = () =>
+        [...document.querySelectorAll('link[rel~="stylesheet"]')].every((link) => {
+          const url = new URL(link.href, location.href);
+          const own = url.protocol === location.protocol && url.host === location.host;
+          return !own || link.sheet || 'bootSettled' in link.dataset;
+        });
+      const releaseOnceStyled = () => {
+        if (ownStylesSettled()) release();
+        else setTimeout(releaseOnceStyled, 1000);
+      };
+      setTimeout(releaseOnceStyled, 60000);
+    })();
+  </script>
   <!-- Skip links: the first focusable elements, visually hidden until focused (a11y
        infra). Targets live inside #game-ui-template, cloned into the page in-game. -->
   <a class="hud-skip" href="#ui" data-i18n="hudChrome.skipLinks.mainHud">Skip to Main HUD</a>

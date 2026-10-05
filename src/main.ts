@@ -1,5 +1,6 @@
 import { applyFrameGeometrySetting } from './game/frame_geometry_settings';
 import { formatAbilityImbueDamage } from './ui/ability_imbue_text';
+import { liftBootSplashWhenReady } from './ui/boot_splash';
 import { bindChatComposerFocusState, resetChatComposer } from './ui/chat_composer_focus_controller';
 import { dispatchCollectionAction } from './ui/collection_actions_core';
 import { createInterfaceVisibility } from './ui/interface_visibility';
@@ -9083,13 +9084,14 @@ function applyLandingBackdrop(highContrast: boolean): void {
   });
 }
 
-function wireStartScreens(): void {
+function wireStartScreens(): Promise<void> {
   // Initial page translation and stats load. Lazy locale flip: a stored non-en locale is now
-  // a real chunk fetch, and the homepage IS the first paint (there is no loading screen to sit
-  // behind), so we localize-then-reveal to prevent an English flash + text swap. The start
-  // screen is held with visibility:hidden - which PRESERVES layout, so there is no layout
-  // shift - ONLY when the boot locale is not already resident; English and any already-loaded
-  // locale skip the gate entirely (no blank, no delay). The gate lifts on BOTH resolve and
+  // a real chunk fetch, so we localize-then-reveal to prevent an English flash + text swap.
+  // The returned promise also holds the boot splash; the gate below still covers a splash
+  // its fail-safe lifted early. The start screen is held with visibility:hidden - which
+  // PRESERVES layout, so there is no layout shift - ONLY when the boot locale is not
+  // already resident; English and any already-loaded locale skip the gate entirely (no
+  // blank, no delay). The gate lifts on BOTH resolve and
   // reject (the English fallback still renders), so a failed locale fetch can never strand the
   // homepage hidden. The stored-locale modulepreload will shrink the non-en hold toward zero.
   const bootLang = getLanguage();
@@ -9109,7 +9111,7 @@ function wireStartScreens(): void {
       if (gated && startScreen) startScreen.style.visibility = '';
     }
   };
-  void ensureLocaleLoaded(bootLang).then(revealLocalized, revealLocalized);
+  const localized = ensureLocaleLoaded(bootLang).then(revealLocalized, revealLocalized);
   // The content-channel chunks (deed names, reliquary page names) render no
   // homepage text, so they never gate the reveal; warm them in parallel so
   // entering the world does not pay the fetch. Each rejection is swallowed:
@@ -10876,6 +10878,7 @@ function wireStartScreens(): void {
     .catch((err: unknown) => {
       console.error('character preview assets failed to load, preview will stay blank:', err);
     });
+  return localized;
 }
 
 // Looping home-page theme. Browsers block audio autoplay until a user gesture,
@@ -10948,6 +10951,7 @@ const diagnosticsAutoOffline =
   startupParams.get('diagnosticsAuto') === '1';
 if (editorPlaytest) {
   startSitePresence('home');
+  void liftBootSplashWhenReady({ landing: false, fadeMs: loadingCurtainFadeDelayMs() });
   void startOffline(
     editorPlaytest.playerClass,
     editorPlaytest.playerName,
@@ -10957,9 +10961,11 @@ if (editorPlaytest) {
   );
 } else if (diagnosticsAutoOffline) {
   startSitePresence('home');
+  void liftBootSplashWhenReady({ landing: false, fadeMs: loadingCurtainFadeDelayMs() });
   void startOffline('warrior', 'Diagnostics', 0);
 } else {
   startSitePresence('home');
-  wireStartScreens();
+  const localized = wireStartScreens();
   initHomepageMusic();
+  void liftBootSplashWhenReady({ landing: true, localized, fadeMs: loadingCurtainFadeDelayMs() });
 }
