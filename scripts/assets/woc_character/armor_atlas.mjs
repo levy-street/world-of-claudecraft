@@ -17,7 +17,15 @@
 //
 // Materials that genuinely differ (double-sidedness, the specular and glow-strength extensions)
 // stay separate materials over the SAME atlas textures: the texture count is what the budget
-// counts. Budgets: tests/woc_character_size_budget.test.ts.
+// counts. Neither is free at runtime: each separate material is one more armor draw a pass for
+// its wearer (src/render/characters/woc_armor_merge_core.ts folds parts per file material), and
+// a specular factor makes its material a physical one on Medium and above
+// (tests/woc_material_extensions.test.ts pins both: the materials each file carries and every
+// specular factor).
+// Budgets: tests/woc_character_size_budget.test.ts (bytes) and
+// tests/woc_texture_budget.test.ts, which pins the size of every map these layouts ship (the
+// low file's, the full layout's in the top file and its half in the medium file) as literals
+// of its own: change a size in ATLAS_SIZES and its pin there together, deliberately.
 import crypto from 'node:crypto';
 import sharp from 'sharp';
 import { m4, nodeTable, worldMatrices } from './rig_math.mjs';
@@ -28,7 +36,7 @@ import { m4, nodeTable, worldMatrices } from './rig_math.mjs';
  *  encoded once at these sizes, then cut along the top mip level, the medium file shipping
  *  every map at half these sizes and the top file the top level (build_woc_split.mjs). */
 export const ATLAS_SIZES = {
-  low: { color: [1024, 1024], emissive: [256, 256] },
+  low: { color: [1024, 512], emissive: [256, 128] },
   full: { color: [2048, 1024], normal: [1024, 512], data: [1024, 512], emissive: [1024, 512] },
 };
 
