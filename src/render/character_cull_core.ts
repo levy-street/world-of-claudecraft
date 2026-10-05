@@ -295,6 +295,15 @@ export function characterRigRadius(height: number, scale: number): number {
 }
 
 /**
+ * How far above its feet a rig's cull centre sits: half its standing height.
+ * The entity cull below measures the rig from this point, and so does
+ * `skinned_cull_bounds.ts` whenever it has to place a part's sphere itself.
+ */
+export function characterRigCentreY(height: number, scale: number): number {
+  return height * 0.5 * scale;
+}
+
+/**
  * The sphere the colour cull tests: the standing silhouette plus the margin,
  * never smaller than `floor` (the Paladin aegis dome is drawn from the rig and
  * reaches well past the body).
@@ -308,12 +317,15 @@ export function characterCullRadius(height: number, scale: number, floor: number
  * The local-space radius a skinned caster's bounding sphere is padded to, so
  * three's own per-pass tests can never reject a rig that is really on screen.
  *
- * The sphere keeps the bind-pose geometry CENTRE, which is some point inside
- * the rig, so it is at most one rig radius away from the rig's centre: twice
- * the rig radius from that point therefore contains the whole animated body,
- * whatever the pose. `worldScale` is the accumulated scale from the mesh's own
- * object space up to the visual root; the group's live entity scale rides
- * matrixWorld outside it, so the world sphere follows a resized rig for free.
+ * The sphere's centre is some point at most one rig radius from the rig's own
+ * centre (`characterRigCentreY` above the feet, in the visual root's frame):
+ * twice the rig radius from that point therefore contains the whole animated
+ * body, whatever the pose. `skinned_cull_bounds.ts` is what makes that premise
+ * true rather than assumed: it keeps a part's bind-pose geometry centre when
+ * three will place it on the rig, and takes the rig's centre when it will not.
+ * `worldScale` is the accumulated scale from the mesh's own object space up to
+ * the visual root; the group's live entity scale rides matrixWorld outside it,
+ * so the world sphere follows a resized rig for free.
  */
 export function skinnedCullSphereRadius(height: number, worldScale: number): number {
   if (!(worldScale > 0)) return Number.POSITIVE_INFINITY;
@@ -379,7 +391,7 @@ export function characterCullBits(
   playerDistSq: number,
 ): number {
   if (!pass.cameraLive) return CHARACTER_CULL_ALL;
-  const cy = feetY + height * 0.5 * scale;
+  const cy = feetY + characterRigCentreY(height, scale);
   const eye = Math.hypot(x - pass.camX, cy - pass.camY, z - pass.camZ);
   const radius = characterCullRadius(height, scale, minR) + pass.turnRad * eye;
   let bits = frustumTouchesSphere(pass.planes, x, cy, z, radius) ? CHARACTER_CULL_DRAWS : 0;

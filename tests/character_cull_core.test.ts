@@ -9,6 +9,7 @@ import {
   CHARACTER_CULL_MARGIN,
   characterCullBits,
   characterCullRadius,
+  characterRigCentreY,
   characterRigRadius,
   createCharacterCullPass,
   setCharacterCullCamera,
@@ -158,6 +159,23 @@ describe('character cull: the colour pass', () => {
     expect(bits(p, 0, y, -20, 3) & CHARACTER_CULL_DRAWS).toBe(CHARACTER_CULL_DRAWS);
   });
 
+  it('measures a scaled rig from the centre of its SCALED height', () => {
+    expect(characterRigCentreY(1.8, 1)).toBe(0.9);
+    expect(characterRigCentreY(1.8, 3)).toBeCloseTo(2.7, 10);
+    // A scale 3 rig stands 2.7 yards to its centre, not 0.9. Hung just under a
+    // 60 degree view 40 yards out, that difference is what still reaches up
+    // into the bottom of the frame.
+    const p = pass();
+    const radius = characterCullRadius(RIG_HEIGHT, 3, 0);
+    const half = Math.PI / 6;
+    // A sphere touches the bottom plane while its centre is above this height.
+    const edge = -40 * Math.tan(half) - radius / Math.cos(half);
+    const feetY = edge + 0.6 - 2.7;
+    expect(bits(p, 0, feetY, -40, 3) & CHARACTER_CULL_DRAWS).toBe(CHARACTER_CULL_DRAWS);
+    // ...and the same rig a little lower is gone, so that case sat on the edge.
+    expect(bits(p, 0, feetY - 1.2, -40, 3) & CHARACTER_CULL_DRAWS).toBe(0);
+  });
+
   it('never shrinks below a caller floor (the aegis dome reaches past the body)', () => {
     expect(characterCullRadius(RIG_HEIGHT, 1, 40)).toBe(40);
     expect(characterCullRadius(RIG_HEIGHT, 1, 0)).toBeCloseTo(
@@ -288,8 +306,9 @@ describe('character cull: the shadow pass', () => {
 
 describe('skinned cull bounds', () => {
   it('pads the sphere to contain the animated rig from any point inside it', () => {
-    // The sphere keeps the bind-pose centre, which is at most one rig radius
-    // from the rig centre, so twice the radius is what has to survive scaling.
+    // The centre is at most one rig radius from the rig's own (checked, not
+    // assumed, by skinned_cull_bounds), so twice the radius is what has to
+    // survive scaling.
     const worldScale = 4;
     const radius = skinnedCullSphereRadius(RIG_HEIGHT, worldScale);
     expect(radius * worldScale).toBeCloseTo(
@@ -379,6 +398,228 @@ describe('skinned cull bounds', () => {
     root.position.set(0, 0, 60);
     root.updateMatrixWorld(true);
     expect(frustum.intersectsObject(mesh)).toBe(false);
+  });
+
+  /** The sphere three actually tests: the mesh's own, through its matrixWorld. */
+  function testedSphere(mesh: THREE.SkinnedMesh): THREE.Sphere {
+    return (mesh.boundingSphere as THREE.Sphere).clone().applyMatrix4(mesh.matrixWorld);
+  }
+
+  /** The wraps CharacterVisual hangs a model under: the pose wrap (swim rise,
+   *  lean, presentation scale) over the model wrap (normalize scale, feet
+   *  offset, def yaw). */
+  function rigWraps() {
+    const root = new THREE.Group();
+    const pose = new THREE.Group();
+    root.add(pose);
+    const wrap = new THREE.Group();
+    wrap.scale.setScalar(1.0619);
+    wrap.position.y = 0.02;
+    wrap.rotation.y = 0.5;
+    pose.add(wrap);
+    return { root, pose, wrap };
+  }
+
+  /**
+   * One skinned part of a kit creature (yeti.glb's face plate, in its own
+   * numbers): the mesh node hangs under the exporter's x100 unit node, and its
+   * positions sit in a quantized frame that only the inverse binds undo. A
+   * skinned vertex never passes through the mesh node, so nothing about that
+   * node, or about the geometry's own bounds, says where the body is.
+   */
+  function kitCreaturePart() {
+    const { root, pose, wrap } = rigWraps();
+    // The exporter's axis flip rides the unit node, and neither node sits at
+    // the origin: a chain read that drops a turn or an offset must show.
+    const unitNode = new THREE.Group();
+    unitNode.scale.setScalar(100);
+    unitNode.rotation.x = -Math.PI / 2;
+    unitNode.position.set(0.02, 0.01, -0.03);
+    wrap.add(unitNode);
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute(
+      'position',
+      new THREE.Float32BufferAttribute([-0.3, -0.95, 0.2, 0.3, -0.95, 0.2, 0, -0.43, 0.5], 3),
+    );
+    const mesh = new THREE.SkinnedMesh(geometry, new THREE.MeshBasicMaterial());
+    mesh.rotation.z = 0.3;
+    mesh.position.set(0.004, -0.002, 0.003);
+    unitNode.add(mesh);
+    return { root, pose, wrap, unitNode, mesh };
+  }
+
+  /**
+   * One skinned part of an authored rig: the mesh node is an identity frame
+   * over the model, so its geometry is already in the body's own units and
+   * its bind-pose centre is a point on the body. `centre` is that point, in
+   * the root's frame once the model wrap has scaled and seated it.
+   */
+  function authoredPart(centre: THREE.Vector3) {
+    const { root, pose, wrap } = rigWraps();
+    root.updateMatrixWorld(true);
+    // Geometry space is the wrap's own space here: carry the point back into it.
+    const local = centre.clone().applyMatrix4(wrap.matrixWorld.clone().invert());
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute(
+      'position',
+      new THREE.Float32BufferAttribute(
+        [local.x - 0.1, local.y, local.z, local.x + 0.1, local.y, local.z],
+        3,
+      ),
+    );
+    const mesh = new THREE.SkinnedMesh(geometry, new THREE.MeshBasicMaterial());
+    wrap.add(mesh);
+    return { root, pose, wrap, mesh, geometry };
+  }
+
+  it('keeps the geometry centre of a part that already sits on the rig, to the bit', () => {
+    // An authored rig was never wrong, and the centre is also three's sort key
+    // for the part: a see-through body (stealth, ghost run) layers its parts by
+    // it, so a rig that was right must come out exactly as it went in.
+    const { root, mesh, geometry } = authoredPart(new THREE.Vector3(0.4, 1.5, -0.2));
+    applySkinnedCullBounds(mesh, root, RIG_HEIGHT);
+    const own = (geometry.boundingSphere as THREE.Sphere).center;
+    const kept = (mesh.boundingSphere as THREE.Sphere).center;
+    expect([kept.x, kept.y, kept.z]).toEqual([own.x, own.y, own.z]);
+    expect(kept).not.toBe(own);
+    expect(mesh.frustumCulled).toBe(true);
+  });
+
+  it('draws the line one rig radius from the rig centre, the premise the radius rests on', () => {
+    const rigCentreY = RIG_HEIGHT * 0.5;
+    const reach = characterRigRadius(RIG_HEIGHT, 1);
+    const landsAt = (offset: number): THREE.Vector3 => {
+      const { root, mesh } = authoredPart(new THREE.Vector3(offset, rigCentreY, 0));
+      applySkinnedCullBounds(mesh, root, RIG_HEIGHT);
+      root.updateMatrixWorld(true);
+      return testedSphere(mesh).center;
+    };
+    // Just inside: the part keeps its own centre.
+    expect(landsAt(reach - 0.01).x).toBeCloseTo(reach - 0.01, 6);
+    // Just outside: no point of the rig is there, so the rig's centre stands in.
+    const outside = landsAt(reach + 0.01);
+    expect(outside.x).toBeCloseTo(0, 6);
+    expect(outside.y).toBeCloseTo(rigCentreY, 6);
+    expect(outside.z).toBeCloseTo(0, 6);
+  });
+
+  it('centres a kit creature part on the rig, in the frame the entity is placed in', () => {
+    const { root, mesh } = kitCreaturePart();
+    // The root is already placed (a seated rider's root is even tilted) when
+    // the sphere is built. The walk stops below it: folding the root in would
+    // put the centre somewhere else the moment the entity moved.
+    root.position.set(40, 3, -25);
+    root.rotation.set(0.25, 1.1, -0.15);
+    root.scale.setScalar(1.4);
+    applySkinnedCullBounds(mesh, root, RIG_HEIGHT);
+    root.updateMatrixWorld(true);
+
+    const rigCentre = new THREE.Vector3(0, RIG_HEIGHT * 0.5, 0).applyMatrix4(root.matrixWorld);
+    const sphere = testedSphere(mesh);
+    // The geometry's own centre, pushed through the x100 node, is about 80
+    // yards from here: that is the sphere that culled the face off a mob
+    // standing in plain view.
+    expect(sphere.center.distanceTo(rigCentre)).toBeLessThan(1e-6);
+    expect(sphere.radius).toBeCloseTo(skinnedCullSphereRadius(RIG_HEIGHT, 1) * 1.4, 6);
+  });
+
+  it('keeps a kit creature in view visible to three, and still culls it behind the camera', () => {
+    const camera = viewCamera();
+    const frustum = new THREE.Frustum().setFromProjectionMatrix(
+      new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse),
+    );
+    const { root, mesh } = kitCreaturePart();
+    applySkinnedCullBounds(mesh, root, RIG_HEIGHT);
+    // The sphere is only consulted while this is set.
+    expect(mesh.frustumCulled).toBe(true);
+
+    // Standing a dozen yards in front of the camera, feet just below eye level.
+    root.position.set(0, -1, -12);
+    root.updateMatrixWorld(true);
+    expect(frustum.intersectsObject(mesh)).toBe(true);
+
+    root.position.set(0, -1, 60);
+    root.updateMatrixWorld(true);
+    expect(frustum.intersectsObject(mesh)).toBe(false);
+  });
+
+  it('still contains the standing body when the sphere was taken mid-pose', () => {
+    // A material rebuild can land while the pose wrap is as far off its rest
+    // as CharacterVisual ever puts it: the full swim rise, the prone pitch and
+    // the presentation scale at once. The centre is then off the body by that
+    // much for good, and the doubled radius is what has to absorb it.
+    const { root, pose, mesh } = kitCreaturePart();
+    pose.position.y = 1.03;
+    pose.rotation.x = 1.18;
+    pose.scale.setScalar(1.2);
+    applySkinnedCullBounds(mesh, root, RIG_HEIGHT);
+
+    const posed = new THREE.Matrix4().compose(pose.position, pose.quaternion, pose.scale);
+
+    pose.position.y = 0;
+    pose.rotation.x = 0;
+    pose.scale.setScalar(1);
+    root.updateMatrixWorld(true);
+    const sphere = testedSphere(mesh);
+    const rigCentre = new THREE.Vector3(0, RIG_HEIGHT * 0.5, 0);
+    // With the wrap back at rest the centre sits where undoing that pose
+    // leaves the rig centre: off the body by the pose, and by nothing else.
+    const expected = rigCentre.clone().applyMatrix4(posed.invert());
+    expect(sphere.center.distanceTo(expected)).toBeLessThan(1e-6);
+    const off = sphere.center.distanceTo(rigCentre);
+    expect(off).toBeGreaterThan(0.5);
+    // The whole standing silhouette is still inside, which is the doubling.
+    expect(off + characterRigRadius(RIG_HEIGHT, 1)).toBeLessThan(sphere.radius);
+  });
+
+  it('rebuilds the centre from the node chain, so a re-apply cannot drift', () => {
+    const { root, mesh } = kitCreaturePart();
+    applySkinnedCullBounds(mesh, root, RIG_HEIGHT);
+    const once = (mesh.boundingSphere as THREE.Sphere).center.clone();
+    for (let again = 0; again < 3; again++) {
+      applySkinnedCullBounds(mesh, root, RIG_HEIGHT);
+      expect((mesh.boundingSphere as THREE.Sphere).center.distanceTo(once)).toBe(0);
+    }
+  });
+
+  it('reads the node chain off each node itself, before any matrix has been refreshed', () => {
+    // A visual is still being assembled when its casters get their spheres:
+    // the wraps were given their scale and offset a line earlier and nothing
+    // has run updateMatrix yet, so every node's `matrix` is still identity.
+    const { root, pose, wrap, unitNode, mesh } = kitCreaturePart();
+    for (const node of [root, pose, wrap, unitNode, mesh]) {
+      expect(node.matrix.equals(new THREE.Matrix4())).toBe(true);
+    }
+    applySkinnedCullBounds(mesh, root, RIG_HEIGHT);
+    root.updateMatrixWorld(true);
+    const rigCentre = new THREE.Vector3(0, RIG_HEIGHT * 0.5, 0).applyMatrix4(root.matrixWorld);
+    expect(testedSphere(mesh).center.distanceTo(rigCentre)).toBeLessThan(1e-6);
+  });
+
+  it('carries the centre through a chain that is not uniformly scaled', () => {
+    const { root, wrap, mesh } = kitCreaturePart();
+    wrap.scale.set(1.3, 0.8, 1.1);
+    wrap.rotation.set(0.2, 0.5, -0.1);
+    applySkinnedCullBounds(mesh, root, RIG_HEIGHT);
+    root.updateMatrixWorld(true);
+    const rigCentre = new THREE.Vector3(0, RIG_HEIGHT * 0.5, 0);
+    expect(testedSphere(mesh).center.distanceTo(rigCentre)).toBeLessThan(1e-6);
+  });
+
+  it('keeps the exemption for a flattened node, the one chain with no way back to the rig', () => {
+    const { root, unitNode, mesh } = kitCreaturePart();
+    unitNode.scale.set(100, 0, 100);
+    applySkinnedCullBounds(mesh, root, RIG_HEIGHT);
+    expect(mesh.frustumCulled).toBe(false);
+  });
+
+  it('exempts a mesh that does not hang under the root it was given', () => {
+    // With no rig frame to measure in, the walk would run on to the scene and
+    // pin the sphere to a point of the WORLD: every such part would vanish.
+    const { mesh } = kitCreaturePart();
+    const stranger = new THREE.Group();
+    applySkinnedCullBounds(mesh, stranger, RIG_HEIGHT);
+    expect(mesh.frustumCulled).toBe(false);
   });
 });
 
