@@ -12309,6 +12309,8 @@ export const ko_KR: EnTranslations = {
       "rewards": "보상",
       "xpReward": "경험치 {xp}",
       "itemReward": "아이템 보상:",
+      "chooseReward": "Choose your reward:",
+      "rewardChoices": "You will be able to choose one of these rewards:",
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "{level}레벨 필요"
     },
@@ -12686,6 +12688,7 @@ export const ko_KR: EnTranslations = {
       "incomplete": "그 퀘스트는 완료되지 않았습니다.",
       "giverMissing": "그 퀘스트를 주는 대상이 근처에 없습니다.",
       "turnInMissing": "그 퀘스트를 보고할 대상이 근처에 없습니다.",
+      "rewardNotOffered": "That reward is not offered.",
       "tooFar": "너무 멉니다.",
       "escortAway": "호송할 대상이 지금 자리에 없습니다. 잠시 후 그곳으로 돌아옵니다."
     }

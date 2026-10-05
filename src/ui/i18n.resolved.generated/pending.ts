@@ -9,25 +9,105 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "questUi.detail.chooseReward",
+    "questUi.detail.rewardChoices",
+    "questUi.errors.rewardNotOffered"
+  ],
+  "es_ES": [
+    "questUi.detail.chooseReward",
+    "questUi.detail.rewardChoices",
+    "questUi.errors.rewardNotOffered"
+  ],
+  "fr_FR": [
+    "questUi.detail.chooseReward",
+    "questUi.detail.rewardChoices",
+    "questUi.errors.rewardNotOffered"
+  ],
+  "fr_CA": [
+    "questUi.detail.chooseReward",
+    "questUi.detail.rewardChoices",
+    "questUi.errors.rewardNotOffered"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "questUi.detail.chooseReward",
+    "questUi.detail.rewardChoices",
+    "questUi.errors.rewardNotOffered"
+  ],
+  "de_DE": [
+    "questUi.detail.chooseReward",
+    "questUi.detail.rewardChoices",
+    "questUi.errors.rewardNotOffered"
+  ],
+  "zh_CN": [
+    "questUi.detail.chooseReward",
+    "questUi.detail.rewardChoices",
+    "questUi.errors.rewardNotOffered"
+  ],
+  "zh_TW": [
+    "questUi.detail.chooseReward",
+    "questUi.detail.rewardChoices",
+    "questUi.errors.rewardNotOffered"
+  ],
+  "ko_KR": [
+    "questUi.detail.chooseReward",
+    "questUi.detail.rewardChoices",
+    "questUi.errors.rewardNotOffered"
+  ],
+  "ja_JP": [
+    "questUi.detail.chooseReward",
+    "questUi.detail.rewardChoices",
+    "questUi.errors.rewardNotOffered"
+  ],
+  "pt_BR": [
+    "questUi.detail.chooseReward",
+    "questUi.detail.rewardChoices",
+    "questUi.errors.rewardNotOffered"
+  ],
+  "ru_RU": [
+    "questUi.detail.chooseReward",
+    "questUi.detail.rewardChoices",
+    "questUi.errors.rewardNotOffered"
+  ],
+  "cs_CZ": [
+    "questUi.detail.chooseReward",
+    "questUi.detail.rewardChoices",
+    "questUi.errors.rewardNotOffered"
+  ],
+  "nl_NL": [
+    "questUi.detail.chooseReward",
+    "questUi.detail.rewardChoices",
+    "questUi.errors.rewardNotOffered"
+  ],
+  "pl_PL": [
+    "questUi.detail.chooseReward",
+    "questUi.detail.rewardChoices",
+    "questUi.errors.rewardNotOffered"
+  ],
+  "id_ID": [
+    "questUi.detail.chooseReward",
+    "questUi.detail.rewardChoices",
+    "questUi.errors.rewardNotOffered"
+  ],
+  "tr_TR": [
+    "questUi.detail.chooseReward",
+    "questUi.detail.rewardChoices",
+    "questUi.errors.rewardNotOffered"
+  ],
+  "sv_SE": [
+    "questUi.detail.chooseReward",
+    "questUi.detail.rewardChoices",
+    "questUi.errors.rewardNotOffered"
+  ],
+  "vi_VN": [
+    "questUi.detail.chooseReward",
+    "questUi.detail.rewardChoices",
+    "questUi.errors.rewardNotOffered"
+  ],
+  "da_DK": [
+    "questUi.detail.chooseReward",
+    "questUi.detail.rewardChoices",
+    "questUi.errors.rewardNotOffered"
+  ]
 };

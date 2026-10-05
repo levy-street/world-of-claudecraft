@@ -12309,6 +12309,8 @@ export const id_ID: EnTranslations = {
       "rewards": "Hadiah",
       "xpReward": "{xp} pengalaman",
       "itemReward": "Hadiah barang:",
+      "chooseReward": "Choose your reward:",
+      "rewardChoices": "You will be able to choose one of these rewards:",
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "Membutuhkan Level {level}"
     },
@@ -12686,6 +12688,7 @@ export const id_ID: EnTranslations = {
       "incomplete": "Misi itu belum selesai.",
       "giverMissing": "Pemberi misi itu tidak ada di dekat sini.",
       "turnInMissing": "Tempat penyerahan misi itu tidak ada di dekat sini.",
+      "rewardNotOffered": "That reward is not offered.",
       "tooFar": "Terlalu jauh.",
       "escortAway": "Orang yang harus kau antar sedang tidak ada di tempatnya. Ia akan segera kembali."
     }

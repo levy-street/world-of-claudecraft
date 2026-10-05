@@ -391,12 +391,9 @@ export function turnInQuest(
     ctx.error(meta.entityId, nearby.tooFar ? 'Too far away.' : 'That quest turn-in is not nearby.');
     return;
   }
-  const choice = resolveRewardChoice(quest, meta.cls, picked);
+  const choice = resolveRewardChoice(quest, meta.cls, picked, meta.talents.spec);
   if (!choice.ok) {
-    ctx.error(
-      meta.entityId,
-      choice.reason === 'missing' ? 'Choose a reward first.' : 'That reward is not offered.',
-    );
+    ctx.error(meta.entityId, 'That reward is not offered.');
     return;
   }
   // Capacity gate (classic): the rewards must fit AFTER the collect items are
@@ -449,8 +446,8 @@ export function turnInQuest(
 // Both the NPC turn-in and quests/dev_quest_commands.ts go through here so the reward
 // math cannot drift.
 // `rewardChoice` is the validated choose-one pick; a caller with no dialog (the
-// /dev completer, scripted completions) leaves it out and the quest's default
-// choice for the class is granted, so no path can finish a choice quest empty.
+// /dev completer, scripted completions) leaves it out and the spec default is
+// granted, so no path can finish a choice quest empty.
 export function turnInQuestCore(
   ctx: SimContext,
   questId: string,
@@ -506,7 +503,7 @@ export function turnInQuestCore(
   }
   const rewardItem = questRewardItemId(quest, meta.cls);
   if (rewardItem) ctx.addItem(rewardItem, 1, meta.entityId);
-  const chosen = rewardChoice ?? defaultRewardChoice(quest, meta.cls);
+  const chosen = rewardChoice ?? defaultRewardChoice(quest, meta.cls, meta.talents.spec);
   if (chosen) ctx.addItem(chosen, 1, meta.entityId);
   grantQuestRecipeReward(ctx, quest, meta);
   ctx.grantXp(quest.xpReward, meta);

@@ -12309,6 +12309,8 @@ export const cs_CZ: EnTranslations = {
       "rewards": "Odměny",
       "xpReward": "{xp} zkušeností",
       "itemReward": "Odměna v podobě předmětu:",
+      "chooseReward": "Choose your reward:",
+      "rewardChoices": "You will be able to choose one of these rewards:",
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "Vyžaduje úroveň {level}"
     },
@@ -12686,6 +12688,7 @@ export const cs_CZ: EnTranslations = {
       "incomplete": "Tento úkol není dokončený.",
       "giverMissing": "Tento zadavatel úkolu není poblíž.",
       "turnInMissing": "Místo pro odevzdání tohoto úkolu není poblíž.",
+      "rewardNotOffered": "That reward is not offered.",
       "tooFar": "Příliš daleko.",
       "escortAway": "Ten, koho máš doprovodit, teď není na svém místě. Za chvíli se tam vrátí."
     }

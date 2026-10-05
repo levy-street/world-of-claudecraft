@@ -12309,6 +12309,8 @@ export const en_XA: EnTranslations = {
       "rewards": "[Ŕéŵáŕðš]",
       "xpReward": "[{xp} éẋþéŕíéñçé]",
       "itemReward": "[Íţéɱ ŕéŵáŕð:]",
+      "chooseReward": "[Çĥóóšé ýóúŕ ŕéŵáŕð:]",
+      "rewardChoices": "[Ýóú ŵíļļ ƀé áƀļé ţó çĥóóšé óñé óƒ ţĥéšé ŕéŵáŕðš:]",
       "objectiveProgress": "[{label}: {current}/{total}]",
       "requiresLevel": "[Ŕéɋúíŕéš Ļéʋéļ {level}]"
     },
@@ -12686,6 +12688,7 @@ export const en_XA: EnTranslations = {
       "incomplete": "[Ţĥáţ ɋúéšţ íš ñóţ çóɱþļéţé.]",
       "giverMissing": "[Ţĥáţ ɋúéšţ ĝíʋéŕ íš ñóţ ñéáŕƀý.]",
       "turnInMissing": "[Ţĥáţ ɋúéšţ ţúŕñ-íñ íš ñóţ ñéáŕƀý.]",
+      "rewardNotOffered": "[Ţĥáţ ŕéŵáŕð íš ñóţ óƒƒéŕéð.]",
       "tooFar": "[Ţóó ƒáŕ áŵáý.]",
       "escortAway": "[Ýóúŕ éšçóŕţ íš ñóţ áţ ţĥéíŕ þóšţ ŕíĝĥţ ñóŵ. Ţĥéý ŵíļļ ŕéţúŕñ ţĥéŕé šĥóŕţļý.]"
     }

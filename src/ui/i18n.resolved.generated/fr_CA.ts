@@ -12309,6 +12309,8 @@ export const fr_CA: EnTranslations = {
       "rewards": "Récompenses",
       "xpReward": "{xp} points d'expérience",
       "itemReward": "Récompense d'objet :",
+      "chooseReward": "Choose your reward:",
+      "rewardChoices": "You will be able to choose one of these rewards:",
       "objectiveProgress": "{label} : {current}/{total}",
       "requiresLevel": "Niveau {level} requis"
     },
@@ -12686,6 +12688,7 @@ export const fr_CA: EnTranslations = {
       "incomplete": "Cette quête n'est pas terminée.",
       "giverMissing": "Le donneur de cette quête n'est pas à proximité.",
       "turnInMissing": "Le rendu de cette quête n'est pas à proximité.",
+      "rewardNotOffered": "That reward is not offered.",
       "tooFar": "Vous êtes trop loin.",
       "escortAway": "Votre escorte n'est pas à son poste pour le moment. Elle y reviendra sous peu."
     }

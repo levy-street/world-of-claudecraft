@@ -12309,6 +12309,8 @@ export const vi_VN: EnTranslations = {
       "rewards": "Phần Thưởng",
       "xpReward": "{xp} kinh nghiệm",
       "itemReward": "Vật phẩm thưởng:",
+      "chooseReward": "Choose your reward:",
+      "rewardChoices": "You will be able to choose one of these rewards:",
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "Yêu Cầu Cấp {level}"
     },
@@ -12686,6 +12688,7 @@ export const vi_VN: EnTranslations = {
       "incomplete": "Nhiệm vụ đó chưa hoàn thành.",
       "giverMissing": "Người giao nhiệm vụ không ở gần đây.",
       "turnInMissing": "Nơi nộp nhiệm vụ không ở gần đây.",
+      "rewardNotOffered": "That reward is not offered.",
       "tooFar": "Quá xa.",
       "escortAway": "Người bạn cần hộ tống hiện không có ở đó. Họ sẽ trở lại sớm."
     }

@@ -12309,6 +12309,8 @@ export const sv_SE: EnTranslations = {
       "rewards": "Belöningar",
       "xpReward": "{xp} erfarenhet",
       "itemReward": "Föremålsbelöning:",
+      "chooseReward": "Choose your reward:",
+      "rewardChoices": "You will be able to choose one of these rewards:",
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "Kräver nivå {level}"
     },
@@ -12686,6 +12688,7 @@ export const sv_SE: EnTranslations = {
       "incomplete": "Det uppdraget är inte slutfört.",
       "giverMissing": "Den uppdragsgivaren är inte i närheten.",
       "turnInMissing": "Den uppdragsmottagaren är inte i närheten.",
+      "rewardNotOffered": "That reward is not offered.",
       "tooFar": "För långt bort.",
       "escortAway": "Den du ska eskortera är inte på plats just nu och återvänder snart."
     }

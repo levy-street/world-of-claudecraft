@@ -12309,6 +12309,8 @@ export const ja_JP: EnTranslations = {
       "rewards": "報酬",
       "xpReward": "経験値 {xp}",
       "itemReward": "アイテム報酬:",
+      "chooseReward": "Choose your reward:",
+      "rewardChoices": "You will be able to choose one of these rewards:",
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "レベル{level}が必要"
     },
@@ -12686,6 +12688,7 @@ export const ja_JP: EnTranslations = {
       "incomplete": "そのクエストは完了していません。",
       "giverMissing": "そのクエストの依頼主が近くにいません。",
       "turnInMissing": "そのクエストの報告先が近くにいません。",
+      "rewardNotOffered": "That reward is not offered.",
       "tooFar": "遠すぎます。",
       "escortAway": "護衛する相手は今その場所にいません。しばらくすれば戻ってきます。"
     }

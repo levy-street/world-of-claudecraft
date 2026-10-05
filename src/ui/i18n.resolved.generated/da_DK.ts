@@ -12309,6 +12309,8 @@ export const da_DK: EnTranslations = {
       "rewards": "Belønninger",
       "xpReward": "{xp} erfaring",
       "itemReward": "Genstandsbelønning:",
+      "chooseReward": "Choose your reward:",
+      "rewardChoices": "You will be able to choose one of these rewards:",
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "Kræver niveau {level}"
     },
@@ -12686,6 +12688,7 @@ export const da_DK: EnTranslations = {
       "incomplete": "Den quest er ikke fuldført.",
       "giverMissing": "Den quest-giver er ikke i nærheden.",
       "turnInMissing": "Den quest-aflevering er ikke i nærheden.",
+      "rewardNotOffered": "That reward is not offered.",
       "tooFar": "For langt væk.",
       "escortAway": "Din eskorte er ikke på sin post lige nu og vender snart tilbage."
     }

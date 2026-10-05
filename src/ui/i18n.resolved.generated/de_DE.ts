@@ -12309,6 +12309,8 @@ export const de_DE: EnTranslations = {
       "rewards": "Belohnungen",
       "xpReward": "{xp} Erfahrung",
       "itemReward": "Gegenstandsbelohnung:",
+      "chooseReward": "Choose your reward:",
+      "rewardChoices": "You will be able to choose one of these rewards:",
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "Benötigt Stufe {level}"
     },
@@ -12686,6 +12688,7 @@ export const de_DE: EnTranslations = {
       "incomplete": "Diese Quest ist nicht abgeschlossen.",
       "giverMissing": "Der Questgeber ist nicht in der Nähe.",
       "turnInMissing": "Die Abgabe dieser Quest ist nicht in der Nähe.",
+      "rewardNotOffered": "That reward is not offered.",
       "tooFar": "Ihr seid zu weit entfernt.",
       "escortAway": "Eure Eskorte ist gerade nicht an ihrem Platz. Sie kehrt in Kürze dorthin zurück."
     }

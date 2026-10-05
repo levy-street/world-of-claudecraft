@@ -12309,6 +12309,8 @@ export const pl_PL: EnTranslations = {
       "rewards": "Nagrody",
       "xpReward": "{xp} doświadczenia",
       "itemReward": "Nagroda w przedmiotach:",
+      "chooseReward": "Choose your reward:",
+      "rewardChoices": "You will be able to choose one of these rewards:",
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "Wymaga poziomu {level}"
     },
@@ -12686,6 +12688,7 @@ export const pl_PL: EnTranslations = {
       "incomplete": "To zadanie nie jest ukończone.",
       "giverMissing": "Tego zleceniodawcy nie ma w pobliżu.",
       "turnInMissing": "Miejsca oddania tego zadania nie ma w pobliżu.",
+      "rewardNotOffered": "That reward is not offered.",
       "tooFar": "Za daleko.",
       "escortAway": "Osoba, którą masz eskortować, nie jest teraz na miejscu. Wróci tam wkrótce."
     }

@@ -12309,6 +12309,8 @@ export const tr_TR: EnTranslations = {
       "rewards": "Ödüller",
       "xpReward": "{xp} deneyim",
       "itemReward": "Eşya ödülü:",
+      "chooseReward": "Choose your reward:",
+      "rewardChoices": "You will be able to choose one of these rewards:",
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "Seviye {level} gerektirir"
     },
@@ -12686,6 +12688,7 @@ export const tr_TR: EnTranslations = {
       "incomplete": "O görev tamamlanmadı.",
       "giverMissing": "O görev veren yakında değil.",
       "turnInMissing": "O görevin teslim yeri yakında değil.",
+      "rewardNotOffered": "That reward is not offered.",
       "tooFar": "Çok uzakta.",
       "escortAway": "Eşlik edeceğin kişi şu anda yerinde değil. Kısa süre içinde dönecek."
     }

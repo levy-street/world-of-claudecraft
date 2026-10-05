@@ -12309,6 +12309,8 @@ export const nl_NL: EnTranslations = {
       "rewards": "Beloningen",
       "xpReward": "{xp} ervaring",
       "itemReward": "Voorwerpbeloning:",
+      "chooseReward": "Choose your reward:",
+      "rewardChoices": "You will be able to choose one of these rewards:",
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "Vereist niveau {level}"
     },
@@ -12686,6 +12688,7 @@ export const nl_NL: EnTranslations = {
       "incomplete": "Die quest is niet voltooid.",
       "giverMissing": "Die questgever is niet in de buurt.",
       "turnInMissing": "Die questinlevering is niet in de buurt.",
+      "rewardNotOffered": "That reward is not offered.",
       "tooFar": "Te ver weg.",
       "escortAway": "Degene die je moet begeleiden is er nu niet. Die komt binnenkort terug."
     }

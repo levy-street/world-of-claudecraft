@@ -750,7 +750,6 @@ import {
   onRecipeCraftedForQuests,
 } from './quests/quest_credit';
 import { migrateRestoredQuestProgress } from './quests/quest_progress_migration';
-import { defaultRewardChoice } from './quests/quest_reward_choice';
 import { createRiftInstance } from './rift/instance_state';
 import { type NaturalRiftPortal, updateRiftPortals as updateRiftPortalsImpl } from './rift/portals';
 import {
@@ -8922,7 +8921,7 @@ export class Sim {
         isQuestTurnInNpc(quest, npc.templateId) &&
         meta.questLog.get(qid)?.state === 'ready'
       ) {
-        this.turnInQuest(qid, defaultRewardChoice(quest, meta.cls), meta.entityId);
+        this.turnInQuest(qid, meta.entityId);
         return;
       }
     }

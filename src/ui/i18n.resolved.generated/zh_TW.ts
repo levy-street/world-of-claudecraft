@@ -12309,6 +12309,8 @@ export const zh_TW: EnTranslations = {
       "rewards": "獎勵",
       "xpReward": "{xp} 點經驗",
       "itemReward": "物品獎勵：",
+      "chooseReward": "Choose your reward:",
+      "rewardChoices": "You will be able to choose one of these rewards:",
       "objectiveProgress": "{label}：{current}/{total}",
       "requiresLevel": "需要等級 {level}"
     },
@@ -12686,6 +12688,7 @@ export const zh_TW: EnTranslations = {
       "incomplete": "該任務尚未完成。",
       "giverMissing": "該任務發布者不在附近。",
       "turnInMissing": "該任務交付點不在附近。",
+      "rewardNotOffered": "That reward is not offered.",
       "tooFar": "距離太遠。",
       "escortAway": "你要護送的人現在不在原處，稍後就會回來。"
     }
