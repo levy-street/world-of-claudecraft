@@ -82,12 +82,12 @@ import {
   accuseInvestigationSuspect,
   clearInvestigationEncounter,
   ensureInvestigationPost,
-  investigationKillCounts,
   readInvestigationClue,
   talkToInvestigation,
   updateInvestigationEncounter,
 } from './world_quest_investigation';
 import { worldQuestItemRewardForQuest } from './world_quest_item_slots';
+import { creditWorldQuestKills } from './world_quest_kill_credit';
 import {
   claimLeyBonus,
   leyBonusPending,
@@ -776,23 +776,9 @@ export function completeWorldQuestVehicle(
 /** Credits an eligible participant for a target killed inside the active area. */
 export function onMobKilledForWorldQuests(ctx: SimContext, mob: Entity, meta: PlayerMeta): void {
   resetCycleIfNeeded(ctx, meta);
-  const player = ctx.entities.get(meta.entityId);
-  if (!player || player.dead) return;
-  const activeQuests = playerActiveWorldQuests(meta);
-  for (const progress of meta.worldQuestLog.values()) {
-    if (progress.state !== 'active') continue;
-    const quest = activeQuests.find((candidate) => candidate.id === progress.questId);
-    if (
-      !quest ||
-      (quest.objective.type !== 'kill' && quest.objective.type !== 'investigation') ||
-      (quest.objective.type === 'investigation' && !investigationKillCounts(meta, mob)) ||
-      mob.templateId !== quest.objective.targetMobId ||
-      !inWorldQuestArea(player, quest) ||
-      !inWorldQuestArea(mob, quest)
-    )
-      continue;
+  creditWorldQuestKills(ctx, mob, meta, (quest, progress) => {
     creditWorldQuest(ctx, meta, quest, progress);
-  }
+  });
 }
 
 /** Credits one successful authoritative profession-node harvest. */
