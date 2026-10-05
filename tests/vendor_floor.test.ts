@@ -821,9 +821,9 @@ describe('stock rows: the phase 11n pulls', () => {
       farmer_hollis: 6,
       farmer_verbena: 6,
       provisioner_fenna: 7,
-      armorer_hode: 6, // + the Gilded Charm buddy look
-      warmarshal_draven_kole: 48, // + the Proud Grunt whistle (honor)
-      fury: 47,
+      armorer_hode: 5,
+      warmarshal_draven_kole: 48, // + the Horse whistle (honor)
+      fury: 48, // + the Horse whistle (honor)
       stablemaster_marla: 2,
       wardsmith_orun: 3,
     });

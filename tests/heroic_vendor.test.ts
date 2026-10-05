@@ -71,7 +71,7 @@ describe('heroic vendor stock: item-level and budget pins', () => {
   // counter is kind 'armor' and nothing else, so the loop now says what it
   // means instead of naming the rows it happens not to want.
   it('every gear offer is a real epic level-20 jewelry item at item level 26', () => {
-    expect(HEROIC_VENDOR_STOCK.length).toBe(40);
+    expect(HEROIC_VENDOR_STOCK.length).toBe(39);
     const gearOffers = HEROIC_VENDOR_STOCK.filter((o) => ITEMS[o.itemId]?.kind === 'armor');
     expect(gearOffers.length).toBe(10);
     // The partition is exhaustive: every row is gear, the one material, a
@@ -80,13 +80,11 @@ describe('heroic vendor stock: item-level and budget pins', () => {
     const nonGear = HEROIC_VENDOR_STOCK.filter((o) => ITEMS[o.itemId]?.kind !== 'armor');
     for (const offer of nonGear) {
       expect(
-        ['junk', 'recipe', 'buddy'],
-        `${offer.itemId} is neither gear, a material, a pattern, a seed nor the companion whistle`,
+        ['junk', 'recipe'],
+        `${offer.itemId} is neither gear, a material, a pattern nor a seed`,
       ).toContain(ITEMS[offer.itemId]?.kind);
     }
-    expect(nonGear.length, 'one core, twenty patterns, eight seeds, one companion whistle').toBe(
-      30,
-    );
+    expect(nonGear.length, 'one core plus twenty patterns plus eight seeds').toBe(29);
     for (const offer of gearOffers) {
       const item = ITEMS[offer.itemId];
       expect(item, offer.itemId).toBeTruthy();
@@ -103,12 +101,13 @@ describe('heroic vendor stock: item-level and budget pins', () => {
     }
   });
 
-  it('sells the Loot Goblin companion for marks, with no item level and no stats', () => {
-    // The stock's one non-gear row (content/items.ts whistle_loot_goblin). It
-    // carries no slot, so the item-level index skips it: a cosmetic can never
-    // enter the budget arithmetic the jewelry above is pinned against.
+  it('no longer sells the Loot Goblin companion: the retired whistle keeps its def, with no item level and no stats', () => {
+    // Retired with the buddy roster cut: no vendor stocks it now (content/items.ts
+    // whistle_loot_goblin), and the def stays for old bags. It carries no slot, so
+    // the item-level index skips it: a cosmetic can never enter the budget
+    // arithmetic the jewelry above is pinned against.
     const offer = HEROIC_VENDOR_STOCK.find((o) => o.itemId === 'whistle_loot_goblin');
-    expect(offer?.marks).toBe(100);
+    expect(offer).toBeUndefined();
     const item = ITEMS.whistle_loot_goblin;
     expect(item.kind).toBe('buddy');
     expect(item.quality).toBe('rare');
@@ -228,12 +227,9 @@ describe('heroic vendor stock: item-level and budget pins', () => {
       // The mark family has exactly TWO points and this counter uses only
       // those: a third price appearing anywhere here is a maintainer decision
       // over the whole family, not something a content phase takes.
-      // Over the PATTERN rows: the Loot Goblin companion whistle rides its
-      // own cosmetic price point (content/heroic_vendor.ts).
-      const patternMarks = HEROIC_VENDOR_STOCK.filter(
-        (o) => ITEMS[o.itemId]?.kind === 'recipe',
-      ).map((o) => o.marks);
-      expect([...new Set(patternMarks)].sort((a, b) => a - b)).toEqual([12, 16]);
+      expect([...new Set(HEROIC_VENDOR_STOCK.map((o) => o.marks))].sort((a, b) => a - b)).toEqual([
+        12, 16,
+      ]);
     });
 
     it('every angler row is priced by the RUNG its recipe teaches, 12 below 125 and 16 at it', () => {
@@ -481,7 +477,7 @@ describe('heroic vendor shop view (pure)', () => {
     // The literal, not HEROIC_VENDOR_STOCK.length: both sides of that compare
     // move together, so a vanished row would pass it (the unknown-id drop is
     // what this fixture proves; the row census literal is pinned above).
-    expect(view.rows.length).toBe(40);
+    expect(view.rows.length).toBe(39);
     expect(view.balance).toBe(12);
     const ring = view.rows.find((r) => r.itemId === 'seal_of_the_nine_oaths');
     const neck = view.rows.find((r) => r.itemId === 'yumis_keepsake_locket');

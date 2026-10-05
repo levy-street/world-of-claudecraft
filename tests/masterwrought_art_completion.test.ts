@@ -815,7 +815,8 @@ describe('Masterwrought art completion evidence', () => {
     // weapon_icons.test.ts, so their mapping owners are genuine, not fabricated.
     // OSSBrain adds the Goblin Rocket Sled and Rallycart RXT reins owners;
     // these do not alter the dated completion/approval universe below.
-    expect(currentOwnerIds).toHaveLength(1283);
+    // The buddy companions add 34 more (32 whistle renders, 2 charm re-tints), pinned below.
+    expect(currentOwnerIds).toHaveLength(1317);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -869,9 +870,24 @@ describe('Masterwrought art completion evidence', () => {
     expect(datedIds.filter((id) => ossBrainMountIds.has(id))).toEqual([]);
     expect(currentOwnerIds.filter((id) => ossBrainMountIds.has(id))).toHaveLength(2);
 
-    // Strip all five later additive waves (Crucible professions, the Field Kit, the
+    // The buddy companion token icons land as exactly two generated-batch entries (the
+    // whistle renders, then the charm re-tints): pin their identity and size like the two
+    // gap-fill waves above, and confirm neither overlaps the frozen dated set.
+    const buddyIconBatches = mapping.generatedBatches.filter(
+      ({ batchId: id }) =>
+        id === 'buddy-whistle-icons-2026-08-28' || id === 'buddy-charm-icons-2026-09-09',
+    );
+    expect(buddyIconBatches.map(({ batchId: id, itemIds }) => [id, itemIds.length])).toEqual([
+      ['buddy-whistle-icons-2026-08-28', 32],
+      ['buddy-charm-icons-2026-09-09', 2],
+    ]);
+    const buddyIconIds = new Set(buddyIconBatches.flatMap(({ itemIds }) => itemIds));
+    expect(buddyIconIds.size).toBe(34);
+    expect(datedIds.filter((id) => buddyIconIds.has(id))).toEqual([]);
+
+    // Strip all six later additive waves (Crucible professions, the Field Kit, the
     // Nythraxis gap-fill weapon renders, Roots' Bramblehide/gap-fill paintings,
-    // and the OSSBrain mount reins)
+    // the OSSBrain mount reins, and the buddy companion token icons)
     // back out of the live mapping by their EXACT ids, so the underlying 1,209-item
     // completion union equation below stays isolated to exactly the same set as
     // completionDatedIds above. This filters by the exact ids of those additions only,
@@ -882,7 +898,8 @@ describe('Masterwrought art completion evidence', () => {
         !crucibleIds.has(id) &&
         id !== 'field_kit' &&
         !laterGapFillIds.has(id) &&
-        !ossBrainMountIds.has(id),
+        !ossBrainMountIds.has(id) &&
+        !buddyIconIds.has(id),
     );
     expect(completionOwnerIds).toHaveLength(1209);
     expect(sorted(completionOwnerIds)).toEqual(completionDatedIds);

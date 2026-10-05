@@ -1481,9 +1481,8 @@ describe('masterwrought Phase 11h: what it did NOT touch', () => {
         (recipe) =>
           !CRUCIBLE_COLLECTION_RECIPES.includes(recipe) && !FORGEBREAKER_RECIPES.includes(recipe),
       ),
-    ).toHaveLength(171);
-    // 204 + the buddy charm recipe (content/recipes.ts BUDDY_CHARM_RECIPES).
-    expect(ALL_RECIPES).toHaveLength(205);
+    ).toHaveLength(170);
+    expect(ALL_RECIPES).toHaveLength(204);
     for (const row of APEX_ROWS) {
       expect(requireRecipe(row.id).skillReq, `${row.id} rung`).toBe(row.rung);
     }

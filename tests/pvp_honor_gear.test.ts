@@ -180,7 +180,7 @@ function equipmentForProfile(profile: Profile): Partial<Record<EquipSlot, string
 }
 
 describe('FURY WARFARE stock', () => {
-  it('merges forty seven unique offers and places FURY in Eastbrook with that exact stock', () => {
+  it('merges forty seven unique gear offers and places FURY in Eastbrook with that exact stock plus the Horse whistle', () => {
     expect(FURY_STOCK).toHaveLength(47);
     expect(new Set(FURY_STOCK).size).toBe(47);
     expect(Object.keys(WARFARE_ITEMS)).toEqual(FURY_STOCK);
@@ -201,7 +201,8 @@ describe('FURY WARFARE stock', () => {
     expect(NPCS.fury.pos).toEqual({ x: 16, z: -78 });
     expect(NPCS.fury.facing).toBe(-2.2455372690184494);
     expect(NPCS.fury.dynamic).toBe(true);
-    expect(NPCS.fury.vendorItems).toEqual(FURY_STOCK);
+    // + the Horse whistle, the one non-gear honor row (content/pvp_honor.ts HONOR_VENDOR_STOCK).
+    expect(NPCS.fury.vendorItems).toEqual([...FURY_STOCK, 'whistle_horse']);
   });
 
   it('covers every supported item slot with two distinct rings per role profile', () => {
