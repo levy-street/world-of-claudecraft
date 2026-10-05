@@ -166,32 +166,17 @@ describe('character presentation sleep wiring', () => {
   });
 });
 
-// The recompose arm has no coverage that would run the composed body's
-// GLTF/mixer pipeline (it needs a live GPU rig), so this pins the statement
-// order the same way the far-LOD wiring above does: composedBefore is what
-// keeps a body that WAS composed (a redesign clearing the look) recomposing
-// down to the class rig, not just a body newly gaining one.
+// The look decisions are exercised directly in live_look_diff.test.ts, including
+// a cleared composed look and a WOC body gaining its first female appearance.
+// This pin covers the coordinator's responsibility: invalidate before replacing
+// the base visual, then dress the settled body so a replacement keeps its armor.
 describe('modular recompose guard (source pin)', () => {
-  it('nulls visualKey through composedBefore, in the order the recompose fix depends on', () => {
-    const start = renderer.indexOf('if (e.modularAppearance !== v.modularAppearance) {');
-    const end = renderer.indexOf('this.updateBaseVisual(e, v);', start);
-    expect(start).toBeGreaterThan(-1);
-    expect(end).toBeGreaterThan(start);
-    const block = renderer.slice(start, end);
-
-    const changedAt = block.indexOf('e.modularAppearance !== v.modularAppearance');
-    const changedFnAt = block.indexOf(
-      'modularLookChanged(v.modularAppearance, e.modularAppearance)',
+  it('invalidates the live look before replacing the base visual, then dresses the settled body', () => {
+    const source = renderer.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+    expect(source).toContain("import { diffComposedLook, diffWornArmor } from './live_look_diff';");
+    expect(source).toContain(
+      'diffComposedLook(e, v);\n      this.updateBaseVisual(e, v);\n      if (!v.visual) continue;\n      diffWornArmor(e, v.visual);',
     );
-    const composedBeforeAt = block.indexOf('composedBefore');
-    const guardAt = block.indexOf('!isMechWearer(e) && (modularLookFor(e) || composedBefore)');
-    const copyAt = block.indexOf('v.modularAppearance = e.modularAppearance;');
-
-    expect(changedAt).toBeGreaterThan(-1);
-    expect(changedFnAt).toBeGreaterThan(changedAt);
-    expect(composedBeforeAt).toBeGreaterThan(changedFnAt);
-    expect(guardAt).toBeGreaterThan(composedBeforeAt);
-    expect(copyAt).toBeGreaterThan(guardAt);
   });
 
   it('births EntityView with the current modularAppearance, nothing to reconcile on the first sync', () => {

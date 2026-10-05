@@ -25,6 +25,7 @@ import * as assets from '../src/render/characters/assets';
 import { SanguineWeaponSheath } from '../src/render/characters/sanguine_weapon_sheath';
 import { CharacterSurfaceResponse } from '../src/render/characters/surface_response';
 import { CharacterVisual, type FarBakeGate } from '../src/render/characters/visual';
+import { WocAtlasSwap } from '../src/render/characters/woc_atlas_swap';
 
 function readSource(file: string): string {
   return readFileSync(resolve(process.cwd(), file), 'utf8');
@@ -45,6 +46,7 @@ function fakeVisual(overrides: Record<string, unknown> = {}): AnyVisual {
     farBakePending: false,
     farCompilePending: false,
     farBakeGate: null,
+    wocAtlas: new WocAtlasSwap(),
     farWrap: null,
     farSkinScratch: null,
     pendingFarClaims: null,
@@ -265,9 +267,11 @@ describe('the composed far bake links hidden behind the gate', () => {
     // two .visible flags itself (the pre-gate shape, which bypassed the
     // pending flag).
     const source = readSource('src/render/characters/visual.ts');
-    const start = source.indexOf('if (this.farBakePending && this.far && !this.farBakeTried) {');
+    const start = source.indexOf('this.farBakePending &&');
     expect(start).toBeGreaterThan(-1);
     const block = source.slice(start, source.indexOf('\n    }', start));
+    expect(block).toContain('this.far || (this.wocFarParts && this.proxyShadowWanted)');
+    expect(block).toContain('!this.farBakeTried');
     expect(block).toContain('this.attemptComposedFar();');
     expect(block).toContain('this.syncFarVisibility();');
     expect(block).not.toContain('.visible =');

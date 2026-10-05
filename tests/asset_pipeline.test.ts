@@ -1251,7 +1251,8 @@ describe('asset library registry parsers', () => {
     const library = await libraryImport;
     const src = readFileSync(join(ROOT, 'src/render/characters/manifest.ts'), 'utf8');
     const map = library.parseVisualUrls(src);
-    expect(map.get('models/chars/players/knight.glb')).toContain('player_warrior');
+    expect(map.get('models/chars/players/woc/base_male.glb')).toContain('player_warrior');
+    expect(map.get('models/chars/players/woc/anims_male.glb')).toContain('player_mage');
     expect(map.get('models/creatures/wolf_basic.glb')).toEqual(
       expect.arrayContaining(['form_ghost_wolf', 'mob_wolf']),
     );
@@ -1264,14 +1265,24 @@ describe('asset library registry parsers', () => {
     const library = await libraryImport;
     const src = readFileSync(join(ROOT, 'src/render/characters/manifest.ts'), 'utf8');
     const map = library.parseSkinsMap(src);
-    const knightA = map.get('textures/skins/knight/alt_a.png') ?? [];
-    expect(knightA).toEqual(expect.arrayContaining([{ key: 'player_warrior', index: 1 }]));
-    // mage.glb atlases serve priest, mage, and warlock.
-    const mageA = map.get('textures/skins/mage/alt_a.png') ?? [];
-    expect(mageA.map((s: { key: string }) => s.key).sort()).toEqual([
-      'player_mage',
-      'player_priest',
-      'player_warlock',
+    // WOC bodies use their authored atlases; legacy KayKit sheets cannot
+    // be painted onto this UV layout. Keep parser coverage on a direct fixture.
+    expect(map.get('textures/skins/knight/alt_a.png') ?? []).not.toContainEqual({
+      key: 'player_warrior',
+      index: 1,
+    });
+    const fixture = library.parseSkinsMap(
+      [
+        'export const SKINS = {',
+        '  player_example: [null, `${SKINS_DIR}/knight/alt_a.png`, null, `${SKINS_DIR}/knight/alt_b.png`],',
+        '};',
+      ].join('\n'),
+    );
+    expect(fixture.get('textures/skins/knight/alt_a.png')).toEqual([
+      { key: 'player_example', index: 1 },
+    ]);
+    expect(fixture.get('textures/skins/knight/alt_b.png')).toEqual([
+      { key: 'player_example', index: 3 },
     ]);
   });
 
@@ -1296,7 +1307,7 @@ describe('asset library registry parsers', () => {
     expect(swordA.registration.itemIds).toContain('worn_sword');
     expect(swordA.registration.icon).toBe('ui/weapons/sword_a.jpg');
     const knight = assets.find(
-      (a: { path: string }) => a.path === 'models/chars/players/knight.glb',
+      (a: { path: string }) => a.path === 'models/chars/players/woc/base_male.glb',
     );
     expect(knight.registration.visualKeys).toContain('player_warrior');
     expect(knight.registration.referenced).toBe(true);

@@ -232,7 +232,7 @@ describe('the spectator bug: the generic pid gate is not enough for harvestPrefe
     // that method's body reaches are stamped on directly.
     const hud = Object.create(Hud.prototype) as HudTestHarness;
     hud.sim = sim;
-    hud.renderer = { handleEvent: vi.fn() };
+    hud.renderer = { handleEvent: vi.fn(), atContact: (_ev: unknown, fn: () => void) => fn() };
     hud.meters = { onEvent: vi.fn() };
     hud.harvestPreferenceController = { open };
     hud.isNythraxisEvent = () => false;

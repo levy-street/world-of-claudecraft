@@ -3,8 +3,9 @@
 // with the preload gate, so createCharacterVisual is synchronous by the time
 // the Renderer constructs views.
 import { type Entity, isMechWearer, type PlayerClass } from '../../sim/types';
+import { renderLayerDisabled } from '../render_dev_flags';
 import { logAssetMissOnce } from './asset_miss_log';
-import { type AssembleOptions, modularHeadFor } from './assets';
+import { type AssembleOptions, modularHeadFor, visualAwaitsStream } from './assets';
 import { type CharacterFormKey, characterFormAssetKey } from './form_visual_selection_core';
 import { composedLookPiecesFor, type LookPieceQueue, type LookPieces } from './look_pieces';
 import {
@@ -14,9 +15,10 @@ import {
   type VisualDef,
   visualKeyFor,
 } from './manifest';
-import { MODULAR_WARRIOR_KEY, type ModularLook } from './modular';
+import { MODULAR_WARRIOR_KEY, type ModularLook, wocBodyScaleOf } from './modular';
 import { npcModularKeyFor } from './npc_looks';
 import { CharacterVisual } from './visual';
+import { ensureWocHeadForAppearance, wocHeadAppearanceAwaited } from './woc_head_packs';
 
 export {
   type AnimOverrideFacts,
@@ -105,16 +107,28 @@ export function createMountVisual(visualKey: string): CharacterVisual {
   return new CharacterVisual(visualKey, 0xffffff, 0, null, null);
 }
 
+/** Whether the last createCharacterVisual returned null because the body was
+ *  still streaming (a designed wait the caller retries next frame, never
+ *  booking the failure cooldown), not because it failed. */
+let buildStreaming = false;
+export function characterBuildStreaming(): boolean {
+  return buildStreaming;
+}
+
 /** Build the visual for an entity (or an explicit shapeshift/polymorph form key).
  *  Returns null when the visual's assets are unavailable (a missed preload, a
  *  lazy fetch that has not landed): callers skip that entity's view for the
  *  frame and the entity stays a future candidate. A synchronous throw here
  *  would stall the per-frame render path forever (issue #2079, the v0.27.0
- *  training dummy freeze). */
+ *  training dummy freeze). `localPlayer`: the entity is the local player, whose
+ *  own WOC armor draws at full detail; every other character the world builds
+ *  here (a speculative or prewarm build included) draws the crowd's
+ *  (woc_armor_core.ts wocArmorTierFor: cosmetic sharpness only). */
 export function createCharacterVisual(
   e: Entity,
   formKey?: CharacterFormKey,
   opts?: AssembleOptions,
+  localPlayer = false,
 ): CharacterVisual | null {
   // Forms are their own models. Skins and held weapons
   // only apply to the base body
@@ -134,10 +148,28 @@ export function createCharacterVisual(
     !formKey && key === 'player_mech' && e.kind === 'player'
       ? mechHeldWeaponOverride(e.templateId as PlayerClass)
       : null;
+  // A WOC body's own head files (its type's core, hairstyle and facial hair: a player's
+  // look, the type's default on a mob) stream beside its base, and the body WAITS for
+  // them: a base file ends at the neck, so a character is built only once its head can
+  // draw with it (woc_head_packs.ts wocHeadAppearanceAwaited; a head file that failed to
+  // load ends the wait, and that body draws without a head until a retry lands).
+  const wocFit = formKey ? undefined : VISUALS[key]?.wocCharacter?.fit;
+  const wocHeadApp = e.kind === 'player' ? e.modularAppearance : null;
+  const fetchStreamed = opts?.fetchStreamed !== false;
+  if (wocFit && fetchStreamed) ensureWocHeadForAppearance(wocFit, wocHeadApp);
+  // A body still streaming (a WOC base, library or head, fetched on first use) is a
+  // designed wait, not a miss: skip the frame quietly (no throw, no log) and
+  // let the caller try the next one (characterBuildStreaming).
+  buildStreaming =
+    visualAwaitsStream(key, fetchStreamed) ||
+    (wocFit !== undefined && fetchStreamed && wocHeadAppearanceAwaited(wocFit, wocHeadApp));
+  if (buildStreaming) return null;
   try {
     // The world path, and the only one with a point-light budget: its weapon
     // light is born hidden and the budget decides when it shines. A rig built
-    // directly (previews) keeps a light that lights immediately.
+    // directly (previews) keeps a light that lights immediately. It is also the
+    // one path that opts a WOC body's armor down to the crowd's detail: anyone
+    // but the local player (a body built directly keeps full detail).
     const visual = new CharacterVisual(
       key,
       e.color,
@@ -146,9 +178,19 @@ export function createCharacterVisual(
       weaponOverride,
       formKey ? null : e.offhandItemId,
       look,
-      opts,
+      localPlayer ? opts : { ...opts, wocArmorDetail: 'crowd' },
     );
     visual.budgetedWeaponLight = true;
+    // ...and the only one that draws crowds: a WOC body folds its head's dozen pieces
+    // into one draw here (woc_head_merge.ts). A rig built directly (previews, portraits)
+    // keeps drawing piece by piece. `?wocmerge=off` keeps the pieces, for an A/B capture.
+    visual.setWocDrawMerge(!renderLayerDisabled('wocmerge'));
+    // A WOC body is born wearing its player's modular head look and body size
+    // (no-op elsewhere), so it never draws one frame at the wrong size.
+    if (!formKey && e.kind === 'player') {
+      visual.setWocHeadLook(e.modularAppearance);
+      visual.setBodyScale(wocBodyScaleOf(e.modularAppearance));
+    }
     return visual;
   } catch (err) {
     // key the dedupe on visual key PLUS message: two models failing with an

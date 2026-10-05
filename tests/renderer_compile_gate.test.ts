@@ -940,13 +940,18 @@ describe('the far-bake compile gate handed to character visuals', () => {
     const renderer = harness();
     const sentinel = () => {};
     renderer.farBakeGate = sentinel;
+    // the work queue rides in with the gate: a visual puts off main-thread pieces on it
+    const queue = { run: vi.fn() };
+    (renderer as unknown as { backgroundGpuWork: unknown }).backgroundGpuWork = queue;
     renderer.viewCreateRetry = {
       canAttempt: () => true,
       markSucceeded: vi.fn(),
       markFailed: vi.fn(),
     };
+    // the local player is entity 7: its own armor draws full detail (woc_armor_core.ts)
+    (renderer as unknown as { sim: { playerId: number } }).sim = { playerId: 7 };
     const setFarBakeGate = vi.fn();
-    vi.spyOn(characters, 'createCharacterVisual').mockReturnValue({
+    const create = vi.spyOn(characters, 'createCharacterVisual').mockReturnValue({
       setFarBakeGate,
     } as unknown as ReturnType<typeof characters.createCharacterVisual>);
     const entity = { id: 7 } as Parameters<typeof characters.createCharacterVisual>[0];
@@ -958,7 +963,16 @@ describe('the far-bake compile gate handed to character visuals', () => {
     ).createCharacterVisualWithRetry(entity, 'view');
 
     expect(built).not.toBeNull();
-    expect(setFarBakeGate).toHaveBeenCalledWith(sentinel);
+    expect(setFarBakeGate).toHaveBeenCalledWith(sentinel, queue);
+    expect(create).toHaveBeenLastCalledWith(entity, undefined, undefined, true);
+    // any other character is built at the crowd's detail
+    const peer = { id: 8 } as Parameters<typeof characters.createCharacterVisual>[0];
+    (
+      renderer as unknown as {
+        createCharacterVisualWithRetry(e: unknown, slot: string): unknown;
+      }
+    ).createCharacterVisualWithRetry(peer, 'view');
+    expect(create).toHaveBeenLastCalledWith(peer, undefined, undefined, false);
     // and a failed build installs nothing (there is no visual to install on)
     vi.spyOn(characters, 'createCharacterVisual').mockReturnValue(null);
     setFarBakeGate.mockClear();
@@ -992,7 +1006,9 @@ describe('the far-bake compile gate handed to character visuals', () => {
     );
     expect(rendererSource).toContain('private readonly farBakeLane = new SerialGateLane();');
     // Both live build paths install it: fresh builds and pool re-acquires.
-    expect(rendererSource).toContain('visual.setFarBakeGate(this.farBakeGate);');
+    expect(rendererSource).toContain(
+      'visual.setFarBakeGate(this.farBakeGate, this.backgroundGpuWork);',
+    );
     expect(rendererSource).toContain('farBakeGate: () => this.farBakeGate,');
   });
 });

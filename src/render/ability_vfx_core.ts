@@ -80,12 +80,8 @@ export function claimsSelfCastVfx(
   return ceremonial || utility;
 }
 
-/** Pure-DoT completions that own an authored rig gesture on their caster's
- * form rig. The list is explicit on purpose: the humanoid rigs also carry
- * attackByAbility rows for their own DoTs (corruption, rupture, serpent_sting),
- * and those completions have never played a gesture; routing every DoT through
- * the gesture read would change three classes to ship one cat finisher. */
-const DOT_COMPLETION_GESTURES: ReadonlySet<string> = new Set(['rip']);
+/** Melee bleed finishers act when applied; their periodic wounds never swing. */
+const DOT_COMPLETION_GESTURES: ReadonlySet<string> = new Set(['rip', 'rupture']);
 
 export function ownsDotCompletionGesture(archetype: string | undefined, ability: string): boolean {
   return archetype === 'dot' && DOT_COMPLETION_GESTURES.has(ability);

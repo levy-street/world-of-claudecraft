@@ -25,11 +25,19 @@ vi.mock('../src/render/characters/portrait', () => ({
     framing = 'headshot',
   ) => portrait.cached.get(`${visualKey}:mod:${look.app.gender}:${framing}`) ?? null,
   playerPortraitDataUrl: () => null,
-  visualPortraitDataUrl: () => null,
+  visualPortraitDataUrl: vi.fn(
+    (visualKey: string, skin: number, framing: string) =>
+      portrait.cached.get(`${visualKey}:${skin}:${framing}`) ?? null,
+  ),
   portraitsReady: () => true,
   composedPortraitKey: (visualKey: string, look: { app: { gender: string } }, framing: string) =>
     `${visualKey}:mod:${look.app.gender}:${framing}`,
   isComposedPortraitKey: (key?: string) => key?.includes(':mod:') === true,
+  // Every fixture head here is a default one, so a class chip keys like no head
+  // (the head-keyed chip path has its own suite: portrait_chip_head_hydrate).
+  visualPortraitKey: (visualKey: string, skin = 0, framing = 'headshot') =>
+    `${visualKey}:${skin}:${framing}`,
+  isHeadPortraitKey: (key?: string) => key?.includes(':head:') === true,
   cachedPortraitByKey: (key: string) => portrait.cached.get(key) ?? null,
 }));
 // portrait_chip re-exports modularLookFor from the characters barrel, whose
@@ -53,6 +61,7 @@ vi.mock('../src/ui/icons', async (importOriginal) => ({
 }));
 
 import type { ModularLook } from '../src/render/characters/modular';
+import { visualPortraitDataUrl } from '../src/render/characters/portrait';
 import { hydrateComposedChips, portraitChipHtml } from '../src/ui/portrait_chip';
 
 const LOOK = { app: { gender: 'female' }, worn: {} } as unknown as ModularLook;
@@ -73,6 +82,7 @@ describe('composed chip in-place hydration', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
     portrait.cached.clear();
+    vi.mocked(visualPortraitDataUrl).mockClear();
   });
 
   it('stamps a pending composed chip with the key its capture files under', () => {
@@ -139,4 +149,37 @@ describe('composed chip in-place hydration', () => {
     const img = root.querySelector<HTMLImageElement>('.portrait-img')!;
     expect(img.getAttribute('src')).not.toBe(composedUrl);
   });
+
+  it.each([false, true])(
+    'preserves the female body through capture and hydration (deferSource %s)',
+    (deferSource) => {
+      const root = mountChip(
+        portraitChipHtml({
+          cls: 'warrior',
+          name: 'Ayla',
+          appearance: { gender: 'female' },
+          deferSource,
+        }),
+      );
+      if (deferSource) expect(visualPortraitDataUrl).not.toHaveBeenCalled();
+      // a default head is no head: the stock getter, with no appearance to key on
+      else
+        expect(visualPortraitDataUrl).toHaveBeenCalledWith(
+          'player_warrior_female',
+          0,
+          'headshot',
+          undefined,
+        );
+      portrait.cached.set('player_warrior:0:headshot', 'data:image/png;base64,male');
+      for (const cb of portrait.listeners) cb('player_warrior', 0);
+      expect(root.querySelector<HTMLImageElement>('.portrait-img')?.src).not.toContain(
+        'base64,male',
+      );
+      portrait.cached.set('player_warrior_female:0:headshot', 'data:image/png;base64,female');
+      for (const cb of portrait.listeners) cb('player_warrior_female', 0);
+      expect(root.querySelector<HTMLImageElement>('.portrait-img')?.src).toBe(
+        'data:image/png;base64,female',
+      );
+    },
+  );
 });

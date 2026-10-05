@@ -24,7 +24,7 @@ import {
   modularLookChanged,
 } from '../src/render/characters/player_look_core';
 import { createPlayer } from '../src/sim/entity';
-import type { Entity, PlayerClass } from '../src/sim/types';
+import { ALL_CLASSES, type Entity, type PlayerClass } from '../src/sim/types';
 import * as appearanceModule from '../src/world_api/appearance';
 
 function playerEntity(over: Partial<Entity> = {}): Entity {
@@ -33,6 +33,47 @@ function playerEntity(over: Partial<Entity> = {}): Entity {
 }
 
 const CLASS_KIT = (cls: PlayerClass): ArmorSetId => (cls === 'mage' ? 'mage' : 'knight');
+
+describe('every class body is a WOC modular body, so no class composes', () => {
+  const authored = DEFAULT_APPEARANCE as unknown as Record<string, unknown>;
+
+  it('keeps the fixed class rig in-world for every class with an authored look', () => {
+    for (const cls of ALL_CLASSES) {
+      expect(
+        inWorldLookFor(playerEntity({ templateId: cls, modularAppearance: authored }), CLASS_KIT),
+        cls,
+      ).toBeNull();
+    }
+  });
+
+  it('agrees at char-select for every class', () => {
+    for (const cls of ALL_CLASSES) {
+      expect(charselectLook({ class: cls, appearance: authored }), cls).toBeNull();
+    }
+  });
+
+  it('offers the helm eye exactly while a helmet item is worn', () => {
+    const lookFor = (): null => null;
+    expect(
+      helmSlotAvailableForEntity(
+        playerEntity({ templateId: 'warrior', equippedItems: {} }),
+        lookFor,
+      ),
+    ).toBe(false);
+    expect(
+      helmSlotAvailableForEntity(
+        playerEntity({ templateId: 'warrior', equippedItems: { helmet: 'mistveil_cord' } }),
+        lookFor,
+      ),
+    ).toBe(true);
+    expect(
+      helmSlotAvailableForEntity(
+        playerEntity({ templateId: 'mage', equippedItems: { helmet: 'wardweave_cowl' } }),
+        lookFor,
+      ),
+    ).toBe(true);
+  });
+});
 
 describe('composedLook', () => {
   it('returns null with nothing authored, so the caller keeps the class rig', () => {
@@ -65,75 +106,29 @@ describe('composedLook', () => {
   });
 });
 
-describe('inWorldLookFor', () => {
-  it('composes a player carrying an authored look', () => {
-    const e = playerEntity({ modularAppearance: { gender: 'female' } });
-    expect(inWorldLookFor(e, CLASS_KIT)?.app.gender).toBe('female');
-  });
-
-  it('returns null for a player with no authored look (a pre-creator character)', () => {
+describe('inWorldLookFor and charselectLook (no class composes any more)', () => {
+  it('returns null for a player with an authored look, a pre-creator character and a mob alike', () => {
+    expect(
+      inWorldLookFor(playerEntity({ modularAppearance: { gender: 'female' } }), CLASS_KIT),
+    ).toBeNull();
     expect(inWorldLookFor(playerEntity({ modularAppearance: null }), CLASS_KIT)).toBeNull();
-  });
-
-  it('returns null for anything that is not a player', () => {
     const mob = playerEntity({ modularAppearance: { gender: 'female' } });
     mob.kind = 'mob';
     expect(inWorldLookFor(mob, CLASS_KIT)).toBeNull();
   });
 
-  it('honours the entity own helm bit, not a global preference', () => {
-    const shown = playerEntity({ modularAppearance: { gender: 'male' }, helmHidden: false });
-    const hidden = playerEntity({ modularAppearance: { gender: 'male' }, helmHidden: true });
-    expect(inWorldLookFor(shown, CLASS_KIT)?.worn.head).not.toBeNull();
-    expect(inWorldLookFor(hidden, CLASS_KIT)?.worn.head).toBeNull();
-  });
-
-  it('takes the armour set from the CALLER, so a peer cannot wear a local override', () => {
-    // This is the whole reason the set is a parameter: reading the dev knob
-    // inside would dress every peer in whatever this machine last picked.
-    const e = playerEntity({ modularAppearance: { gender: 'male' } });
-    const peer = inWorldLookFor(e, CLASS_KIT);
-    const overridden = inWorldLookFor(e, () => 'barbarian');
-    expect(peer?.worn.chest).toBe('mage');
-    expect(overridden?.worn.chest).toBe('barbarian');
-  });
-});
-
-describe('charselectLook', () => {
-  it('composes a roster row that has a stored look', () => {
-    const look = charselectLook({ class: 'rogue', appearance: { gender: 'female' } });
-    expect(look?.app.gender).toBe('female');
-  });
-
-  it('returns null for a pre-creator row', () => {
+  it('returns null for every roster row, stored look or not, mech or not', () => {
+    expect(charselectLook({ class: 'rogue', appearance: { gender: 'female' } })).toBeNull();
     expect(charselectLook({ class: 'rogue', appearance: null })).toBeNull();
-  });
-
-  it('never composes over the Combat Mech, which is a REPLACEMENT body', () => {
     expect(
-      charselectLook({
-        class: 'rogue',
-        appearance: { gender: 'female' },
-        skinCatalog: 'mech',
-      }),
+      charselectLook({ class: 'rogue', appearance: { gender: 'female' }, skinCatalog: 'mech' }),
+    ).toBeNull();
+    expect(
+      charselectLook({ class: 'rogue', appearance: { gender: 'male' }, helmHidden: true }),
     ).toBeNull();
   });
 
-  it('follows the row saved helm preference', () => {
-    const app = { gender: 'male' };
-    expect(charselectLook({ class: 'rogue', appearance: app, helmHidden: true })?.worn.head).toBe(
-      null,
-    );
-    expect(
-      charselectLook({ class: 'rogue', appearance: app, helmHidden: false })?.worn.head,
-    ).not.toBeNull();
-    // Absent reads as "shown", matching the sim's zero-default omission.
-    expect(charselectLook({ class: 'rogue', appearance: app })?.worn.head).not.toBeNull();
-  });
-
   it('matches the in-world answer for the same character', () => {
-    // A roster row and the same character in the world must not disagree, or a
-    // player picks a body at the gate and meets a different one inside.
     const appearance = { gender: 'female', hair: 'highbun' };
     const row = charselectLook({ class: 'mage', appearance, helmHidden: true });
     const world = inWorldLookFor(
@@ -141,6 +136,18 @@ describe('charselectLook', () => {
       CLASS_KIT,
     );
     expect(row).toEqual(world);
+    expect(row).toBeNull();
+  });
+
+  // The composer itself still answers for the library's own consumers (the
+  // composed-body test bed, NPC modular looks): the caller-supplied armour set
+  // is what it wears, never a local override.
+  it('composes from the CALLER-supplied armour set', () => {
+    const app = { gender: 'male' };
+    expect(composedLook(app, 'mage', false)?.worn.chest).toBe('mage');
+    expect(composedLook(app, 'barbarian', false)?.worn.chest).toBe('barbarian');
+    expect(composedLook(app, 'knight', true)?.worn.head).toBeNull();
+    expect(composedLook(app, 'knight', false)?.worn.head).not.toBeNull();
   });
 });
 
@@ -189,9 +196,17 @@ describe('helmSlotAvailableForLook', () => {
 });
 
 describe('helmSlotAvailableForEntity', () => {
-  it('probes the shown look when the current player has hidden the helm', () => {
-    const hidden = playerEntity({ modularAppearance: { gender: 'male' }, helmHidden: true });
+  it('offers the eye while a WOC body wears a helmet item, whatever the helm bit says', () => {
+    // Every class rides a WOC body: the eye follows the equipped helmet item,
+    // not a composed look (woc_parts_core empties the head slot on helmHidden).
+    const hidden = playerEntity({
+      modularAppearance: { gender: 'male' },
+      helmHidden: true,
+      equippedItems: { helmet: 'wardweave_cowl' },
+    });
     expect(helmSlotAvailableForEntity(hidden, (e) => inWorldLookFor(e, CLASS_KIT))).toBe(true);
+    const bare = playerEntity({ modularAppearance: { gender: 'male' }, helmHidden: true });
+    expect(helmSlotAvailableForEntity(bare, (e) => inWorldLookFor(e, CLASS_KIT))).toBe(false);
   });
 
   it('returns false for fixed rigs and replacement bodies', () => {

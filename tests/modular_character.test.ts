@@ -8,6 +8,8 @@ import {
 } from '../src/render/characters/assets';
 import {
   type ClipMap,
+  KAYKIT_BASELINES,
+  KAYKIT_KNIGHT_WARRIOR,
   modularVisualKey,
   VISUALS,
   visualKeyFor,
@@ -1324,7 +1326,16 @@ describe('per-class modular defs', () => {
   it.each(PLAYER_CLASSES)('player_%s_modular mirrors its class def', (cls) => {
     const key = modularVisualKey(cls);
     const def = VISUALS[key];
-    const base = VISUALS[`player_${cls}`];
+    // A class on a WOC modular body (the warrior) never composes the KayKit
+    // library, so its `_modular` def mirrors the retired KayKit warrior rig the
+    // library was cut from (KAYKIT_KNIGHT_WARRIOR), never the WOC class def:
+    // the library rides Rig_Medium and the WOC clips would bind onto it against
+    // the wrong bind pose. Everything below still holds against that base.
+    const classDef = VISUALS[`player_${cls}`];
+    const base = classDef.wocCharacter
+      ? (KAYKIT_BASELINES[cls] ?? KAYKIT_KNIGHT_WARRIOR)
+      : classDef;
+    if (classDef.wocCharacter) expect(def.wocCharacter).toBeUndefined();
     expect(def, key).toBeTruthy();
     expect(def.modular).toBe(true);
     // one shared part library for every class

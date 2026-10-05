@@ -132,15 +132,68 @@ const SIDE_AGNOSTIC_BACK_GRIPS: ReadonlySet<string> = new Set([
   'VAR_CROSSBOW',
 ]);
 
+/** Carries on the UPPER back, drawn over a shoulder: the one-hand shoulder carry and
+ *  the long-haft diagonals (hip carries, crossbows and shields stay where they are).
+ *  The table puts a right-hand prop's grip behind the LEFT shoulder; a rig whose
+ *  sheathe gesture reaches over the RIGHT one (the WOC Sheathe clip) mirrors these
+ *  so the hand meets the grip at the swap. */
+const SHOULDER_CARRY_FAMILIES: ReadonlySet<string> = new Set([
+  '1H_Sword',
+  '2H_Sword',
+  '1H_Axe',
+  '2H_Axe',
+  '2H_Staff',
+  'VAR_SWORD',
+  'VAR_STAFF',
+  'VAR_AXE',
+  'VAR_POLEARM',
+  'VAR_MACE',
+  'VAR_HAMMER',
+  'VAR_BOW',
+]);
+
 /** The on-back transform for a sheathed prop: family-specific, mirrored across X
  *  (position and lean) for a left-hand prop, defaulting for unknown families.
- *  The ranged families opt out of the mirror (see above). */
-export function backGripFor(accessory: string | null, side: 'r' | 'l'): BackGripTransform {
+ *  The ranged families opt out of the mirror (see above). `rightShoulderSheathe`
+ *  swaps the side of an upper-back carry (SHOULDER_CARRY_FAMILIES; the default
+ *  carry is one), so a right-hand prop sits behind the right shoulder. */
+export function backGripFor(
+  accessory: string | null,
+  side: 'r' | 'l',
+  rightShoulderSheathe = false,
+): BackGripTransform {
   const spec = (accessory && BACK_GRIPS[accessory]) || DEFAULT_BACK;
   const handed = !(accessory && SIDE_AGNOSTIC_BACK_GRIPS.has(accessory));
-  const mirror = side === 'l' && handed ? -1 : 1;
+  const shoulderCarry = spec === DEFAULT_BACK || SHOULDER_CARRY_FAMILIES.has(accessory ?? '');
+  const carrySide = rightShoulderSheathe && shoulderCarry ? (side === 'r' ? 'l' : 'r') : side;
+  const mirror = carrySide === 'l' && handed ? -1 : 1;
   return {
     position: [spec.position[0] * mirror, spec.position[1], spec.position[2]],
     quaternion: quatFromEulerXYZ(spec.euler[0], spec.euler[1] * mirror, spec.euler[2] * mirror),
   };
+}
+
+/** The minimal node shape the sheathe ratio walks (three's Object3D fits). */
+export interface ScaledNode {
+  scale: { x: number };
+  parent: ScaledNode | null;
+}
+
+/**
+ * The uniform scale a hand-slot bone carries RELATIVE to the chest bone. The
+ * back-grip table is chest-bone space on the KayKit skeleton, whose slot bones
+ * are unscaled, so there it is 1 and nothing changes. The WOC warrior bakes
+ * its weapon-size compensation (0.457) onto its slot bones instead: a prop
+ * that keeps the hand-grip scale and moves onto the chest for the sheathe
+ * would grow by the inverse, and the table's offsets would land a body-width
+ * off its back. Both the offset and the prop scale multiply by this. 1 when
+ * the chest is not an ancestor of the slot (a rig this rule cannot read).
+ */
+export function slotToChestScale(slot: ScaledNode, chest: ScaledNode): number {
+  let k = 1;
+  for (let node: ScaledNode | null = slot; node; node = node.parent) {
+    if (node === chest) return k;
+    k *= node.scale.x;
+  }
+  return 1;
 }

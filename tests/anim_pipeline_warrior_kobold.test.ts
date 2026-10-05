@@ -12,7 +12,6 @@ import { join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import type { AbilityVfxDeps } from '../src/render/ability_vfx/painter';
 import { AbilityVfx } from '../src/render/ability_vfx/painter';
-import { VISUALS } from '../src/render/characters/manifest';
 import { ABILITIES } from '../src/sim/data';
 
 const ROOT = join(__dirname, '..');
@@ -50,12 +49,17 @@ describe('warrior bespoke movement clip (issue #2889 warrior/kobold batch)', () 
     expect(meshCountOf(glbPath)).toBe(0);
   });
 
-  it('wires the donor GLB into animUrls and keeps every pre-existing attackByAbility entry', () => {
-    const block = manifestBlock('player_warrior: swims({', 'player_paladin: swims({');
-    expect(block).toContain('warrior_ability_anims.glb');
+  it('keeps every attackByAbility entry on the WOC body, with the Rig_Medium donor unwired', () => {
+    // The warrior moved onto the WOC modular rig (the split files: the male base
+    // and its own animation library) and plays only that rig's own clips: a
+    // KayKit clip binds by bone NAME onto these bones (the names match) but
+    // against the wrong bind pose, so the pose-blend donor bake above stays
+    // shipped and deliberately unwired.
+    const block = manifestBlock('player_warrior: {', 'player_paladin: {');
+    expect(block).not.toContain('warrior_ability_anims.glb');
+    expect(block).toContain('animUrls: [`${PLAYERS}/woc/anims_male.glb`]');
     expect(block).toContain('attackByAbility');
-    for (const clip of WARRIOR_NEW_CLIPS) expect(block).toContain(`'${clip}'`);
-    // Pre-existing entries from earlier PRs must survive this change untouched.
+    // Every entry from the earlier PRs and from this batch survives the body swap.
     const preExisting = [
       'mortal_strike',
       'execute',
@@ -72,28 +76,26 @@ describe('warrior bespoke movement clip (issue #2889 warrior/kobold batch)', () 
       'heroic_strike',
       'overpower',
       'hamstring',
-      'sanguine_aura',
-      'raised_guard',
       'pummel',
+      'heroic_leap',
+      'victory_rush',
     ];
     for (const id of preExisting) expect(block).toContain(`${id}:`);
   });
 
-  it('every mapped ability id is a real warrior ability, and every referenced clip is a shipped or pre-existing donor', () => {
-    const warriorBlock = manifestBlock('player_warrior: swims({', 'player_paladin: swims({');
+  it('every mapped ability id is a real warrior ability, and every referenced clip ships in the WOC GLB', () => {
+    const warriorBlock = manifestBlock('player_warrior: {', 'player_paladin: {');
     const abilityStart = warriorBlock.indexOf('attackByAbility: {');
     expect(abilityStart).toBeGreaterThanOrEqual(0);
     const abilityEnd = warriorBlock.indexOf('\n      },', abilityStart);
     expect(abilityEnd).toBeGreaterThan(abilityStart);
     const block = warriorBlock.slice(abilityStart, abilityEnd);
     const rows = [...block.matchAll(/^\s*([a-z_]+): '([A-Za-z_0-9]+)',$/gm)];
-    expect(rows.length).toBeGreaterThan(23); // 18 pre-existing + this batch's 7 additions
-    // Read the actual delivered libraries; a handwritten donor allowlist can
-    // claim a missing clip exists and becomes stale when a new bake ships.
-    const visual = VISUALS.player_warrior;
-    const knightClips = new Set(
-      [visual.url, ...(visual.animUrls ?? [])].flatMap((url) => clipNamesOf(join('public', url))),
-    );
+    expect(rows.length).toBeGreaterThanOrEqual(18); // the strikes; the instant casts carry no entry
+    const wocClips = new Set(clipNamesOf('public/models/chars/players/woc/anims_male.glb'));
+    // the 2026-09-24 set (one-hand and single-weapon clips; its two-hand *_2H set left
+    // 2026-09-30) plus the 2026-09-28 dual-wield set
+    expect(wocClips.size).toBe(51);
     const map: Record<string, string> = {};
     for (const [, abilityId, clip] of rows) {
       map[abilityId] = clip;
@@ -102,37 +104,45 @@ describe('warrior bespoke movement clip (issue #2889 warrior/kobold batch)', () 
         `attackByAbility key '${abilityId}' is not a real ability id`,
       ).toBeTruthy();
       expect(
-        knightClips,
-        `attackByAbility value '${clip}' for '${abilityId}' is not a shipped or pre-existing donor clip`,
+        wocClips,
+        `attackByAbility value '${clip}' for '${abilityId}' is not a clip the WOC GLB ships`,
       ).toContain(clip);
     }
-    // This batch's real additions, spot-checked: every one verified to
-    // actually reach playAttack (see the build script's header trace).
-    expect(map.heroic_leap).toBe('Warrior_Heroic_Leap');
-    expect(map.victory_rush).toBe('Warrior_Victory_Rush');
-    expect(map.berserker_rage).toBe('Warrior_Seething_Fury');
-    expect(map.recklessness).toBe('Warrior_Recklessness');
-    expect(map.die_by_sword).toBe('Warrior_Sword_Guard');
-    expect(map.avatar).toBe('Warrior_Avatar');
-    expect(map.whirlwind).toBe('Warrior_Bladed_Gyre');
-    expect(map.taunt).toBe('Warrior_Goad');
-    expect(map.furious_mending).toBe('Warrior_Furious_Mending');
-    expect(map.piercing_howl).toBe('Warrior_Piercing_Howl');
-    expect(map.storm_bolt).toBe('Warrior_Storm_Bolt');
-    expect(map.charge).toBe('Warrior_Rush_Loop');
-    expect(map.intervene).toBe('Warrior_Rush_Loop');
-    // Bladestorm remains a channel. All seven voices now have shipped native performances.
-    expect(VISUALS.player_warrior.clips.castByAbility?.bladestorm).toBe('Warrior_Bladestorm_Loop');
-    expect(map.bladestorm).toBeUndefined();
-    for (const [id, clip] of Object.entries({
-      battle_shout: 'Warrior_Iron_Bellow',
-      demoralizing_shout: 'Warrior_Direhowl',
-      emboldening_roar: 'Warrior_Emboldening_Roar',
-      defiant_bellow: 'Warrior_Defiant_Bellow',
-      rallying_cry: 'Warrior_Valor_Roar',
-      intimidating_shout: 'Warrior_Intimidating_Shout',
-    }))
-      expect(map[id], `${id} owns its native voice performance`).toBe(clip);
+    // This batch's additions, re-homed on the WOC vocabulary: every one still
+    // reaches playAttack the same way (the build script's header trace).
+    expect(map.heroic_leap).toBe('2H_Chop');
+    expect(map.victory_rush).toBe('1H_Slash');
+    // Instant casts play NO gesture on the WOC body (owner call, 2026-09-16):
+    // the buff and aura ids deliberately have no entry, so the painter draws
+    // nothing and the generic cast arm stays silent (playAttack gestureOnly).
+    for (const silent of [
+      'berserker_rage',
+      'recklessness',
+      'die_by_sword',
+      'avatar',
+      'piercing_howl',
+      'sanguine_aura',
+      'raised_guard',
+    ]) {
+      expect(map[silent], `${silent} must stay silent`).toBeUndefined();
+    }
+    // The dead-code traps this batch deliberately avoided: none of these got
+    // an entry, because no attackByAbility lookup for them is ever reached.
+    for (const deadId of [
+      'whirlwind',
+      'bladestorm',
+      'storm_bolt',
+      'battle_shout',
+      'demoralizing_shout',
+      'emboldening_roar',
+      'defiant_bellow',
+      'rallying_cry',
+      'intimidating_shout',
+    ]) {
+      expect(map[deadId], `${deadId} must stay unmapped (never reaches attackByAbility)`).toBe(
+        undefined,
+      );
+    }
   });
 });
 

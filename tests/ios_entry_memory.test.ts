@@ -136,8 +136,19 @@ describe('deferred cosmetic skin atlases', () => {
     // (early-outs before building anything).
     expect(portraitSource).toContain('const atlasPending = ensureSkinTexture(visualKey, skin);');
     expect(portraitSource).toContain('if (!atlasPending) return false;');
-    expect(portraitSource).toContain('if (trackSkinAtlasPending(visualKey, skin)) return null;');
-    expect(portraitSource).toContain('atlasPending: () => trackSkinAtlasPending(visualKey, skin),');
+    // (and, for a WOC body, until its streamed base, library, kit and the head
+    // files its look draws have landed: trackWocFilesPending, the same
+    // null-and-notify contract; the post-entry prewarm only ASKS,
+    // wocFilesResident, so it never fetches every class set)
+    expect(portraitSource).toContain(
+      'if (trackSkinAtlasPending(visualKey, skin) || trackWocFilesPending(visualKey, skin, headLook)) {\n' +
+        '    return null;\n' +
+        '  }',
+    );
+    expect(portraitSource).toContain(
+      'atlasPending: () =>\n' +
+        '      trackSkinAtlasPending(visualKey, skin) || !wocFilesResident(visualKey, headSig ? head : null),',
+    );
     expect(portraitChipSource).toContain('onPortraitUpdate((visualKey, skin) => {');
     expect(mainSource).toContain('refreshStartSkinPickerPortraits(');
   });

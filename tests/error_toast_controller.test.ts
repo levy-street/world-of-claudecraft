@@ -21,7 +21,8 @@ function rig() {
       craftSkills: {},
       gatheringProficiency: {},
     },
-    renderer: { handleEvent: vi.fn() },
+    // the melee arm defers its sound to blade contact through the renderer (contact_queue.ts)
+    renderer: { handleEvent: vi.fn(), atContact: (_ev: unknown, fn: () => void) => fn() },
     playEventSfx: vi.fn(),
     meters: { onEvent: vi.fn() },
     isNythraxisEvent: vi.fn(() => false),

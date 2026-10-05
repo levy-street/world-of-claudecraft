@@ -120,6 +120,31 @@ const LEGACY_POLISHED_HELD_MODELS = new Set([
 /** The creature and mount defs whose authored atlas showed the low-tier film. */
 const AUTHORED_ATLAS_DEFS = [
   'form_cat',
+  // The one authored PLAYER body: the WOC warrior (woc_warrior.glb, its own
+  // baked Tripo atlases on the artist's rig, never a KayKit palette), which the
+  // loop below exempts from the "never a player body" rule by its wocCharacter
+  // manifest rather than by name.
+  'player_warrior',
+  // ...and the paladin, the same WOC body under its own armor pack.
+  'player_paladin',
+  // ...and the female warrior body, the creation pick's file for the class.
+  'player_warrior_female',
+  'player_paladin_female',
+  // ...and the seven class sets of 2026-09-18, both fits.
+  'player_hunter',
+  'player_hunter_female',
+  'player_rogue',
+  'player_rogue_female',
+  'player_mage',
+  'player_mage_female',
+  'player_priest',
+  'player_priest_female',
+  'player_warlock',
+  'player_warlock_female',
+  'player_druid',
+  'player_druid_female',
+  'player_shaman',
+  'player_shaman_female',
   'mob_wolf',
   'greyjaw',
   'mob_ogre',
@@ -217,6 +242,12 @@ describe('authored surfaces', () => {
       .sort();
     expect(flagged).toEqual([...AUTHORED_ATLAS_DEFS].sort());
     for (const key of flagged) {
+      // A WOC modular body IS an authored atlas on a player rig: the one
+      // sanctioned player-body flag, carried by its part manifest.
+      if (VISUALS[key].wocCharacter) {
+        expect(VISUALS[key].url.startsWith('models/chars/players/'), key).toBe(true);
+        continue;
+      }
       expect(key.startsWith('player_'), key).toBe(false);
       // and never a GLB a player body is composed from or a class rig NPCs share
       expect(VISUALS[key].url.startsWith('models/chars/'), `${key}: ${VISUALS[key].url}`).toBe(

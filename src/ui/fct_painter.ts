@@ -76,6 +76,10 @@
 //    drops the queue and detaches the live nodes for a host that tears its painter
 //    down (the tests, a future HUD teardown); the live HUD keeps one painter for the
 //    page's life and never calls it.
+// CONTACT STAGING (2026-09-28): every melee swing is staged the same way. A swing's one-shot
+// starts on its damage event and its blade lands a clip-authored beat later (ClipMap.contacts),
+// so the renderer records that beat per event (contact_queue.ts) and stagedShape() holds the
+// number until the later of the two stagings.
 // Only the FCT number is staged. Nothing a player reacts to (target HP, nameplates, cast
 // bars, the combat log line) is delayed by any of this.
 //
@@ -205,6 +209,7 @@ export class FctPainter {
   // The per-frame strike-ordinal tracker, fed the ONE authored beat table (src/game
   // owns it; the pure core takes it injected so it stays game-layer-free).
   private readonly beats = new FctBeatStager(FURY_AUDIO.red_harvest.times);
+  private readonly contactDelaySec: ((strike: FctBeatStrike) => number) | null;
   private readonly random: () => number;
   // The pre-allocated pool size. On the full tiers this is also the live cap, so eviction
   // fires only at pool-full (the pre-tiering behavior); on low fctMaxConcurrent caps the
@@ -226,6 +231,9 @@ export class FctPainter {
       doc?: Document;
       random?: () => number;
       getFxTier?: () => UiEffectsTier;
+      /** Seconds a damage number waits for its swing's blade contact (renderer
+       *  contact_queue.ts); absent = no contact staging. */
+      contactDelaySec?: (strike: FctBeatStrike) => number;
     } = {},
   ) {
     const {
@@ -237,6 +245,7 @@ export class FctPainter {
       // test) is untiered (byte-faithful to the pre-tiering behavior).
       getFxTier = () => 'ultra' as UiEffectsTier,
     } = opts;
+    this.contactDelaySec = opts.contactDelaySec ?? null;
     this.cap = cap;
     this.getFxTier = getFxTier;
     // Math.random for the horizontal jitter is allowed on the PAINTER (not the pure core);
@@ -274,7 +283,11 @@ export class FctPainter {
    * strike of the same cast still lands on its own beat rather than sliding forward.
    */
   stagedShape(strike: FctBeatStrike, now: number, src: FctSpawnSource): FctSpawnShape | null {
-    const delaySec = this.beats.delaySec(strike, now);
+    // an authored beat (Red Harvest) or the swing's blade contact, whichever is later
+    const delaySec = Math.max(
+      this.beats.delaySec(strike, now),
+      this.contactDelaySec?.(strike) ?? 0,
+    );
     const shape = fctSpawnShape(src);
     if (shape === null || delaySec <= 0) return shape;
     return { ...shape, delaySec };

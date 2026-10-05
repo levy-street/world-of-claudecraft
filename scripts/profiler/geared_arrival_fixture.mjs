@@ -178,6 +178,41 @@ const OUTFITS = Object.freeze([
 const LIPS = Object.freeze(['none', 'rose', 'coral', 'ruby', 'berry', 'plum', 'nude']);
 const BLUSH = Object.freeze(['none', 'peach', 'rose', 'warm', 'mauve']);
 const SHADOW = Object.freeze(['none', 'smoke', 'bronze', 'plum', 'teal', 'rose']);
+// The WOC head builder's pieces per head type (src/render/characters/
+// woc_head_catalog.ts): Type A rides the male body and Type B the female, and
+// each bot draws from its OWN type so no pick resolves back to a default.
+const HEAD_BY_GENDER = Object.freeze({
+  male: Object.freeze({
+    hair: Object.freeze(['swept', 'long', 'mohawk', 'bald']),
+    nose: Object.freeze(['default', 'broad', 'aquiline']),
+    mouth: Object.freeze(['default', 'full', 'smirk']),
+    brows: Object.freeze(['default', 'slim', 'arched']),
+    ears: Object.freeze(['default', 'large', 'pointed']),
+    eyes: Object.freeze(['default', 'almond', 'hooded']),
+  }),
+  female: Object.freeze({
+    hair: Object.freeze(['waves', 'ponytail', 'braid']),
+    nose: Object.freeze(['default', 'button', 'soft']),
+    mouth: Object.freeze(['default', 'full', 'relaxed']),
+    brows: Object.freeze(['default', 'soft', 'straight']),
+    ears: Object.freeze(['default', 'round', 'pointed']),
+    eyes: Object.freeze(['default', 'almond', 'hooded']),
+  }),
+});
+const PIERCINGS = Object.freeze(['none', 'lobes', 'ears', 'brow', 'nose', 'septum', 'lip', 'full']);
+// Facial hair is one list for both head types (the catalog fits the same styles
+// onto each head), so, like the piercings, one list serves every bot.
+const HEAD_BEARDS = Object.freeze([
+  'none',
+  'moustache',
+  'handlebar',
+  'goatee',
+  'chin',
+  'boxed',
+  'long',
+  'chops',
+  'chinstrap',
+]);
 
 function cycle(values, index, stride = 1) {
   return values[(index * stride) % values.length];
@@ -194,6 +229,9 @@ export function gearedArrivalAppearance(index) {
   const hairHue = (index * 67 + 19) % 360;
   const hairSat = 0.2 + ((index * 17) % 61) / 100;
   const hairLight = 0.12 + ((index * 13) % 57) / 100;
+  const head = HEAD_BY_GENDER[gender];
+  // the index within this bot's gender, so each type's lists are all reached
+  const own = index >> 1;
   return {
     gender,
     hair: cycle(HAIRS, index, 7),
@@ -240,6 +278,29 @@ export function gearedArrivalAppearance(index) {
     blush: cycle(BLUSH, index, 2),
     eyeshadow: cycle(SHADOW, index, 5),
     outfit: cycle(OUTFITS, index, 7),
+    headHair: cycle(head.hair, own),
+    // who wears facial hair follows the beard rule above: every male bot's
+    // cycle, one female bot in five
+    headBeard: gender === 'female' && index % 5 !== 1 ? 'none' : cycle(HEAD_BEARDS, index, 5),
+    headNose: cycle(head.nose, own, 2),
+    headMouth: cycle(head.mouth, own + 1),
+    headBrows: cycle(head.brows, own + 2, 2),
+    headEars: cycle(head.ears, own),
+    headEyes: cycle(head.eyes, own + 1, 2),
+    headPiercing: cycle(PIERCINGS, index, 3),
+    browHue: hairHue,
+    browSat: hairSat,
+    browLight: hairLight,
+    headShape: {
+      eyeSpacing: signed(index, 16, 0.6),
+      eyeSize: signed(index, 17, 0.6),
+      eyeTilt: signed(index, 18, 0.6),
+      browHeight: signed(index, 19, 0.6),
+      // the chin is one-way (0..1, resting at 0.65): the middle 60% of ITS range
+      chinWidth: Number((0.5 + signed(index, 20, 0.3)).toFixed(3)),
+    },
+    // 5% either way of the authored size, in the size slider's whole percents
+    bodyScale: (95 + ((index * 7) % 11)) / 100,
   };
 }
 

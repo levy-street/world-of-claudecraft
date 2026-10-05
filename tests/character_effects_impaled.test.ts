@@ -125,15 +125,18 @@ describe('applyEntityAnimOverrides: the impaled pose', () => {
   it('is fed the renderer per-frame flag word, and only the pose is touched', () => {
     // The renderer folds `characterEffects` once per entity per frame from the
     // aura list; the override reads that word, never the aura list again. The
-    // renderer's own `visuallyDead` stays the sim's death, so nameplate, health
-    // bar, targeting and the corpse/ghost logic keep the live read.
+    // renderer's own `visuallyDead` stays the sim's death (held only until the
+    // killing blow's blade contact lands, contact_queue.ts), so nameplate,
+    // health bar, targeting and the corpse/ghost logic keep the live read.
     const renderer = codeWithoutLineComments(
       readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8'),
     );
     expect(renderer).toContain(
       'applyEntityAnimOverrides(st, e, visuallyDead, characterEffects, hasStealth);',
     );
-    expect(renderer).toContain('const visuallyDead = isVisuallyDead(e) && !e.ghost;');
+    expect(renderer).toContain(
+      'isVisuallyDead(e) && !e.ghost && !this.contactQueue.holdsDeath(e.id, this.lastSyncStart);',
+    );
     expect(renderer).not.toContain('CHARACTER_EFFECT_IMPALED');
   });
 });

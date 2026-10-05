@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { assetsReady } from '../../src/render/assets/preload';
 import type { AnimState } from '../../src/render/characters/anim_state';
+import * as assets from '../../src/render/characters/assets';
 import { prepareVisual } from '../../src/render/characters/assets';
 import {
   PALADIN_TEMPLARS_VERDICT_CLIP,
@@ -10,6 +11,9 @@ import {
   PALADIN_TEMPLARS_VERDICT_IMPACT_TIME,
 } from '../../src/render/characters/paladin_templars_verdict_clip';
 import { CharacterVisual } from '../../src/render/characters/visual';
+import * as dressing from '../../src/render/characters/woc_armor_dressing';
+import * as heads from '../../src/render/characters/woc_head_packs';
+import { landWocFiles } from '../helpers/woc_streamed';
 
 const IDLE: AnimState = {
   speed: 0,
@@ -29,10 +33,11 @@ const IDLE: AnimState = {
 describe('Paladin Templar Verdict baked asset', () => {
   beforeAll(async () => {
     await assetsReady();
-  }, 30_000);
+    await landWocFiles(assets, dressing, heads, ['player_paladin', 'player_paladin_female']);
+  }, 90_000);
 
   it('builds the separate clip against the real KayKit Paladin skeleton', () => {
-    const prepared = prepareVisual('player_paladin');
+    const prepared = prepareVisual('player_paladin_modular');
     const clip = prepared.clips.get(PALADIN_TEMPLARS_VERDICT_CLIP);
 
     expect(clip).toBeDefined();
@@ -73,19 +78,50 @@ describe('Paladin Templar Verdict baked asset', () => {
     expect(angle('upperarmr', 0.47, 0.58)).toBeGreaterThan(8);
   });
 
-  it('shows the solar weapon effect only while Final Edict owns the one-shot', () => {
-    const visual = new CharacterVisual('player_paladin', 0xffffff);
-    visual.update(0, IDLE, true);
-    visual.playAttack('final_edict');
-    visual.update(0.31, IDLE, true);
+  it.each(['player_paladin', 'player_paladin_female'])(
+    'keeps the authored WOC chop and solar effect on %s until the next attack',
+    (key) => {
+      const prepared = prepareVisual(key);
+      const authored = prepared.clips.get('2H_Chop');
+      expect(authored).toBeDefined();
+      expect(prepared.def.clips.attackByAbility?.final_edict).toBe('2H_Chop');
+      expect(prepared.clips.has(PALADIN_TEMPLARS_VERDICT_CLIP)).toBe(false);
+      const visual = new CharacterVisual(key, 0xffffff);
+      // An auto attack now uses the SAME authored chop. Ability ownership,
+      // rather than clip identity alone, must clear the solar effect.
+      visual.setWeapon('eastbrook_greatsword');
+      visual.update(0, IDLE, true);
+      // What the hands hold picks the chop's variant (weapon_loadout_core.ts: a two-hander plays
+      // the two-hand set's chop); the authored ability clip is that variant of 2H_Chop.
+      const swap = (visual as unknown as { loadoutSwap: Record<string, string> | null })
+        .loadoutSwap;
+      const played = prepared.clips.get(swap?.['2H_Chop'] || '2H_Chop');
+      expect(played).toBeDefined();
+      visual.playAttack('final_edict');
+      // half way through the clip that PLAYS (the variant runs at its own length): the
+      // effect's impact flash sits exactly there
+      for (let frame = 0; frame < 5; frame++)
+        visual.update((played?.duration ?? 0) * 0.1, IDLE, true);
+      const action = (visual as unknown as { current: THREE.AnimationAction }).current;
+      // the visual plays its own copy of the prepared clip (per-rig twins): same clip, by name
+      expect(action.getClip().name).toBe(played?.name);
 
-    const effect = visual.root.getObjectByName('paladinTemplarsVerdictFx');
-    expect(effect).toBeDefined();
-    expect(effect?.children.some((child) => child.visible)).toBe(true);
+      const effect = visual.root.getObjectByName('paladinTemplarsVerdictFx');
+      expect(effect).toBeDefined();
+      expect(effect?.children.some((child) => child.visible)).toBe(true);
+      const ancestors: string[] = [];
+      for (let node = effect?.parent; node; node = node.parent) ancestors.push(node.name);
+      expect(ancestors).toContain('handslotr');
+      const impact = effect?.children.at(-1) as THREE.Mesh;
+      expect((impact.material as THREE.MeshBasicMaterial).opacity).toBeCloseTo(0.82);
 
-    visual.playAttack();
-    visual.update(0.016, IDLE, true);
-    expect(effect?.children.every((child) => !child.visible)).toBe(true);
-    visual.dispose();
-  });
+      visual.playAttack();
+      visual.update(0.016, IDLE, true);
+      expect((visual as unknown as { current: THREE.AnimationAction }).current.getClip().name).toBe(
+        played?.name,
+      );
+      expect(effect?.children.every((child) => !child.visible)).toBe(true);
+      visual.dispose();
+    },
+  );
 });

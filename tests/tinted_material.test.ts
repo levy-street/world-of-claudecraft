@@ -10,6 +10,7 @@ import type { VisualDef } from '../src/render/characters/manifest';
 import { type ModularLook, normalizeAppearance } from '../src/render/characters/modular';
 import { gfxInternalsForTest } from '../src/render/gfx';
 import { createWeaponVfx, type WeaponVfxSpec } from '../src/render/weapon_vfx';
+import { landWocBodies } from './helpers/woc_streamed';
 
 vi.mock('../src/render/assets/loader', () => ({
   loadGltf: vi.fn(() => new Promise(() => undefined)),
@@ -483,8 +484,9 @@ describe('tinted character materials', () => {
       releaseGltf: vi.fn(),
     }));
     try {
-      const { charactersReady } = await import('../src/render/characters/assets');
-      await charactersReady();
+      const assets = await import('../src/render/characters/assets');
+      await assets.charactersReady();
+      await landWocBodies(assets, ['player_warrior']);
       const { CharacterVisual } = await import('../src/render/characters/visual');
       // player_warrior: the offhandSlot def, so setOffhand takes the lean path
       // that ends in rebuildCasters (visual.ts setOffhand).

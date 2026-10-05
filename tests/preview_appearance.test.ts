@@ -1,9 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { preloadMechAssets } from '../src/render/characters/assets';
 import { mechHeldWeaponOverride } from '../src/render/characters/manifest';
+import { normalizeAppearance } from '../src/render/characters/modular';
 import { CharacterPreview } from '../src/render/characters/preview';
 import {
   appearanceSignature,
+  charselectPreviewAppearance,
   type PreviewAppearance,
   previewAppearanceVisual,
   previewTryOnMainhand,
@@ -21,6 +23,9 @@ const mechAssets = vi.hoisted(() => ({
 const visualInstances = vi.hoisted(() => [] as Array<{ dispose: ReturnType<typeof vi.fn> }>);
 
 vi.mock('../src/render/characters/assets', () => ({
+  // every body resident: the streamed-WOC wait (pendingBuild) never defers a build here
+  visualAssetsResident: () => true,
+  onCharacterAssetReady: () => () => undefined,
   mechAssetsReady: () => mechAssets.ready,
   preloadMechAssets: vi.fn(() => {
     if (!mechAssets.promise) {
@@ -44,6 +49,10 @@ vi.mock('../src/render/characters/visual', () => ({
     root = {};
     setWeaponSkin = vi.fn();
     setSkin = vi.fn();
+    setWocDefaultEquipment = vi.fn();
+    setWocHeadLook = vi.fn();
+    setBodyScale = vi.fn(() => false);
+    setFarBakeGate = vi.fn();
     dispose = vi.fn();
     constructor() {
       visualInstances.push(this);
@@ -160,6 +169,49 @@ describe('appearanceSignature', () => {
 });
 
 describe('CharacterPreview.setAppearance', () => {
+  it('forwards the roster helmet choice without dropping the default armor kit', () => {
+    const { preview } = barePreview();
+    const setWocDefaultEquipment = vi.fn();
+    Object.assign(preview, {
+      currentVisual: {
+        setSkin: vi.fn(),
+        setWocDefaultEquipment,
+        setWocHeadLook: vi.fn(),
+        setBodyScale: vi.fn(() => false),
+      },
+    });
+    preview.setAppearance(charselectPreviewAppearance({ class: 'warrior', helmHidden: true }));
+    expect(setWocDefaultEquipment).toHaveBeenLastCalledWith(true);
+    preview.setAppearance(charselectPreviewAppearance({ class: 'warrior', helmHidden: false }));
+    expect(setWocDefaultEquipment).toHaveBeenLastCalledWith(false);
+  });
+
+  it.each(['warrior', 'mage', 'rogue'] as const)(
+    'keeps the female %s body when the roster summary reaches the turntable',
+    (cls) => {
+      const { preview, setVisualKey } = barePreview();
+      preview.setAppearance(
+        charselectPreviewAppearance({ class: cls, appearance: { gender: 'female' } }),
+      );
+      expect(setVisualKey).toHaveBeenLastCalledWith(`player_${cls}_female`, null, null, null);
+    },
+  );
+
+  it('shows the selected female body while the mech loads and resumes only the latest request', async () => {
+    const { preview, setVisualKey } = barePreview();
+    preview.setAppearance(appearance({ skinCatalog: 'mech', appearance: { gender: 'male' } }));
+    preview.setAppearance(appearance({ skinCatalog: 'mech', appearance: { gender: 'female' } }));
+    expect(setVisualKey).toHaveBeenLastCalledWith('player_warrior_female', null, null, null);
+    await finishMechLoad();
+    expect(setVisualKey).toHaveBeenCalledTimes(3);
+    expect(setVisualKey).toHaveBeenLastCalledWith(
+      'player_mech',
+      null,
+      mechHeldWeaponOverride('warrior'),
+      null,
+    );
+  });
+
   it('persists the appearance weapon skin so the rebuilt visual re-applies it', () => {
     const { preview } = barePreview();
     const state = preview as unknown as Record<string, unknown>;
@@ -342,6 +394,100 @@ describe('CharacterPreview.setVisualKey: the weapon-skin rebuild contract', () =
     preview.setVisualKey('player_rogue', 'rusty_dagger', null, null);
     const built = visualDoubles.built.at(-1) as { setWeaponSkin: ReturnType<typeof vi.fn> };
     expect(built.setWeaponSkin).not.toHaveBeenCalled();
+  });
+});
+
+describe('CharacterPreview: the WOC body size lands in place', () => {
+  /** A preview over a stub rig that records the size it is handed and answers
+   *  "changed" only when the size really moves, the way CharacterVisual does. */
+  function sizedPreview(): {
+    preview: CharacterPreview;
+    rig: {
+      setBodyScale: ReturnType<typeof vi.fn>;
+      setWocHeadLook: ReturnType<typeof vi.fn>;
+      size: number;
+    };
+    setVisualKey: ReturnType<typeof vi.fn>;
+    state: Record<string, unknown>;
+  } {
+    const { preview, setVisualKey } = barePreview();
+    const state = preview as unknown as Record<string, unknown>;
+    const rig = {
+      size: 1,
+      setSkin: vi.fn(),
+      setWocDefaultEquipment: vi.fn(),
+      setWocHeadLook: vi.fn(),
+      setBodyScale: vi.fn((s: number) => {
+        if (s === rig.size) return false;
+        rig.size = s;
+        return true;
+      }),
+    };
+    state.currentVisual = rig;
+    state.closeupCache = new Map([['hero', {}]]);
+    return { preview, rig, setVisualKey, state };
+  }
+
+  it('rescales the creation turntable on a size change without rebuilding the body', () => {
+    const { preview, rig, setVisualKey } = sizedPreview();
+    const app = { ...normalizeAppearance(null), bodyScale: 0.95 };
+    preview.setModular(app, {}, 'warrior');
+    expect(rig.setBodyScale).toHaveBeenLastCalledWith(0.95);
+    // the head rides the same in-place path, an edit of the character on the stage: a
+    // streaming pick holds just its old hairstyle or beard (WocHeadHold 'slot')
+    expect(rig.setWocHeadLook).toHaveBeenLastCalledWith(app, 'slot');
+    // one body key for both sizes: the build signature never sees the size
+    preview.setModular({ ...app, bodyScale: 1 }, {}, 'warrior');
+    expect(rig.setBodyScale).toHaveBeenLastCalledWith(1);
+    expect(new Set(setVisualKey.mock.calls.map((c) => c[0]))).toEqual(new Set(['player_warrior']));
+  });
+
+  it("puts the roster summary's size on the char-select turntable, clamped", () => {
+    const { preview, rig } = sizedPreview();
+    preview.setAppearance(
+      charselectPreviewAppearance({
+        class: 'mage',
+        appearance: { gender: 'female', bodyScale: 1.03 } as never,
+      }),
+    );
+    expect(rig.setBodyScale).toHaveBeenLastCalledWith(1.03);
+    preview.setAppearance(
+      charselectPreviewAppearance({ class: 'mage', appearance: { bodyScale: 0.2 } as never }),
+    );
+    expect(rig.setBodyScale).toHaveBeenLastCalledWith(0.95);
+    // no look at all is the authored size
+    preview.setAppearance(charselectPreviewAppearance({ class: 'mage' }));
+    expect(rig.setBodyScale).toHaveBeenLastCalledWith(1);
+  });
+
+  it('hands a DIFFERENT character to the head whole: a roster pick and a mounted subject hold the previous head', () => {
+    const { preview, rig } = sizedPreview();
+    const app = { gender: 'male', headHair: 'mohawk' };
+    preview.setAppearance(
+      charselectPreviewAppearance({ class: 'warrior', appearance: app as never }),
+    );
+    // never another character's hair on this face while the new files stream
+    expect(rig.setWocHeadLook).toHaveBeenLastCalledWith(app, 'look');
+    const inspected = { gender: 'male', headHair: 'quiff' };
+    preview.setWocAppearance(inspected);
+    expect(rig.setWocHeadLook).toHaveBeenLastCalledWith(inspected, 'look');
+    // the creator editing the character on the stage holds only the streaming piece
+    const edit = { ...normalizeAppearance(null), headHair: 'long' };
+    preview.setModular(edit, {}, 'warrior');
+    expect(rig.setWocHeadLook).toHaveBeenLastCalledWith(edit, 'slot');
+  });
+
+  it('re-measures the face close-up and drops the card shots only when the size moved', () => {
+    const { preview, state } = sizedPreview();
+    const app = normalizeAppearance(null);
+    state.focusHeadFor = state.currentVisual;
+    preview.setModular(app, {}, 'warrior');
+    // same size: the held head measure and the cached shots stay
+    expect(state.focusHeadFor).toBe(state.currentVisual);
+    expect((state.closeupCache as Map<string, unknown>).size).toBe(1);
+    preview.setModular({ ...app, bodyScale: 0.95 }, {}, 'warrior');
+    expect(state.focusHeadFor).toBeNull();
+    expect((state.closeupCache as Map<string, unknown>).size).toBe(0);
   });
 });
 

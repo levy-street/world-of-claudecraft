@@ -14,11 +14,13 @@ describe('character preview memory policy', () => {
     });
   });
 
-  it('uses a single-sample, single-DPR transient buffer on constrained devices', () => {
+  it('uses a single-sample transient buffer at a capped 1.5x DPR on constrained devices', () => {
+    // 1.5x, not 1x: the phone creator's face close-up read soft at 1x, and the
+    // preview canvas is only a few hundred CSS px, so the cost is small
     expect(resolveCharacterPreviewPolicy(true)).toEqual({
       antialias: false,
       preserveDrawingBuffer: false,
-      pixelRatioCap: 1,
+      pixelRatioCap: 1.5,
     });
   });
 

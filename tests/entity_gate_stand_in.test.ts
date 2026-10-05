@@ -274,7 +274,8 @@ describe('entity gate stand-ins actually stand in', () => {
 
   it('deferred face decals: the body drew from its first frame, the paint alone arrives late', () => {
     // The decals of a body built with them deferred are gated through the far
-    // bake gate (visual.ts revealDecalOnCompile hides ONLY the decal meshes);
+    // bake gate (visual.ts revealDecalOnCompile hands ONLY the decal meshes to
+    // revealOnCompile, the node-level gate streamed armor shares);
     // the body is the stand-in, so no plate is forced and the entity has a
     // click target and silhouette the whole time.
     const row = ENTITY_GATE_STAND_INS.find(
@@ -283,11 +284,13 @@ describe('entity gate stand-ins actually stand in', () => {
     expect(row?.hides).toContain('attachDeferredDecals');
     expect(row?.standIn).toContain('the same body');
     const visual = sourceOf('src/render/characters/visual.ts');
-    const reveal = visual.slice(
-      visual.indexOf('private revealDecalOnCompile('),
-      visual.indexOf('\n  }', visual.indexOf('private revealDecalOnCompile(')),
+    const body = (name: string) =>
+      visual.slice(visual.indexOf(name), visual.indexOf('\n  }', visual.indexOf(name)));
+    expect(body('private revealDecalOnCompile(')).toContain(
+      "this.revealOnCompile(decal, 'face decal');",
     );
-    expect(reveal).toContain('decal.visible = false;');
+    const reveal = body('private revealOnCompile(');
+    expect(reveal).toContain('node.visible = false;');
     expect(reveal).not.toContain('root.visible');
     expect(anyCharacterRigDrawing(slots({ visual: rig(true) }))).toBe(true);
   });

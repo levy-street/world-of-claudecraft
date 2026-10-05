@@ -125,6 +125,8 @@ export function borrowRiderLocomotion(mount: AnimState, rider: AnimState, airbor
   mount.running = rider.running;
   mount.airborne = airborne;
   mount.backwards = rider.backwards;
+  // a direction fact like the backpedal: a mount rig with side runs strafes too
+  mount.strafe = rider.strafe;
   mount.swimming = rider.swimming;
 }
 

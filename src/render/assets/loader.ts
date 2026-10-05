@@ -17,6 +17,7 @@ import { MAX_LOAD_ATTEMPTS, retryDelayMs } from './load_retry';
 import { assetUrl } from './media';
 import { assetLoadStarted, recordAssetLoad } from './stats';
 import { neutralizeGltfTransmission } from './transmission_neutralize';
+import { wocLodPlugin } from './woc_lod_plugin';
 
 let gltfLoader: GLTFLoader | null = null;
 const gltfCache = new Map<string, Promise<GLTF>>();
@@ -97,6 +98,8 @@ function loader(): GLTFLoader {
     // Model textures ship as KTX2 (KHR_texture_basisu): without the transcoder
     // attached, parsing any public/models GLB rejects outright.
     assembled.setKTX2Loader(ktx2Loader());
+    // The WOC character files' coarser levels of detail (woc_lod_plugin.ts).
+    assembled.register(wocLodPlugin);
     gltfLoader = assembled;
   }
   return gltfLoader;

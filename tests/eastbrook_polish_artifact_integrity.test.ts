@@ -1394,7 +1394,13 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '3703e50946207ae92ff2b46d1e14673cca6c363993661222a778c5f11d56f6ce';
+  // Re-minted at the release/v0.45.0 sync into the character branch (WOC split character
+  // files, blade-contact timing; remint_polish_provenance.mjs on the merged tree): the merged
+  // renderer leaf matches neither parent. No capture was retaken.
+  // Re-minted for the WOC crowd-draw work: the renderer leaf hands the background work
+  // queue to each character visual with the far bake gate. No capture was retaken.
+  // Re-minted for WOC armor detail: the renderer leaf passes each view whether it is the local player's own. No capture was retaken.
+  '5f8fa7cf4ebd398f68c7c05893cc7ec6f5642727aab7174fae605fb522c13f6c';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1417,7 +1423,13 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '164b585f770570b773faa8e35c466bcd4ab2840a6572507aa9528bc52572cbc5';
+  // Re-minted at the release/v0.45.0 sync into the character branch (WOC split character
+  // files, blade-contact timing; remint_polish_provenance.mjs on the merged tree): the merged
+  // renderer leaf matches neither parent. No capture was retaken.
+  // Re-minted for the WOC crowd-draw work: the renderer leaf hands the background work
+  // queue to each character visual with the far bake gate. No capture was retaken.
+  // Re-minted for WOC armor detail: the renderer leaf passes each view whether it is the local player's own. No capture was retaken.
+  'dbef51d97275023192d5102bb30d9dde5cfb9f6840b3d7ba7646806aa81f75b5';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2800,7 +2812,12 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // LAST again over the re-swept evidence. No capture was retaken.
       // release/v0.44.0 base merge into PR 4193: recomputed LAST again over the
       // re-swept evidence. No capture was retaken.
-    ).toBe('55abc96a5aead82eb4096d7915be530c7731d95d07bbc9b1181704092cff1db3');
+      // release/v0.45.0 sync into the character branch: recomputed LAST again over the
+      // re-swept evidence. No capture was retaken.
+      // WOC crowd-draw work (the renderer leaf moved): recomputed LAST again over the
+      // re-swept evidence. No capture was retaken.
+      // WOC armor detail (the renderer leaf moved): recomputed LAST again. No capture was retaken.
+    ).toBe('fdf3c15843ff76fc4a0f5b944c293dc722ea8ab72a2145279e65496c9f8881e4');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

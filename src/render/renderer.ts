@@ -39,7 +39,6 @@ import {
   type Entity,
   FISHING_CAST_ID,
   IGNIVAR_BOSS_ID,
-  isMechWearer,
   type SimEvent,
 } from '../sim/types';
 import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
@@ -164,15 +163,16 @@ import {
   type AssembleOptions,
   applyEntityAnimOverrides,
   type CharacterVisual,
+  characterBuildStreaming,
   composedLookPiecesOf,
   createCharacterVisual,
   type FarBakeGate,
   lookPiecesStats,
-  modularLookFor,
   setWeaponVfxViewportHeight,
 } from './characters';
 import {
   advanceSwimPitch,
+  applyLocoDirection,
   isFallingAtSpeed,
   isSubmergedAtHeadHeight,
   isSwimmingAtDepth,
@@ -193,7 +193,10 @@ import {
   preloadTrainingDummyAssets,
   trainingDummyAssetsReady,
 } from './characters/assets';
-import { damageEventStartsAttackAnimation } from './characters/damage_attack_animation';
+import {
+  damageCarriesCastRelease,
+  damageEventStartsAttackAnimation,
+} from './characters/damage_attack_animation';
 import {
   activeCharacterFormVisual,
   characterFormMaskForAura,
@@ -204,7 +207,6 @@ import {
   resolvedCharacterForm,
 } from './characters/form_visual_selection_core';
 import { visualKeyFor, weaponSkinModelUrl } from './characters/manifest';
-import { modularLookChanged } from './characters/player_look_core';
 import { PooledVisualLifecycle } from './characters/pooled_visual_lifecycle';
 import { playerRangedAttackStartsAtLaunch } from './characters/skin_attack';
 import { CharacterVisualPool, characterVisualPoolKey } from './characters/visual_pool';
@@ -231,6 +233,7 @@ import {
   compilePriorityForTarget,
 } from './compile_priority_core';
 import { compileTargetPrepared } from './compile_target_readiness';
+import { ContactQueue } from './contact_queue';
 import { preflightWebGL2ContextRecycle, type RecycledRendererContext } from './context_recycle';
 import { trackWebGLContext } from './context_release';
 import { type CorpseBeacon, createCorpseBeacon } from './corpse_beacon';
@@ -425,7 +428,6 @@ import {
 import { ignivarBossFacingLocked } from './ignivar_encounter_core';
 import { attachIgnivarModelVfx } from './ignivar_model_vfx';
 import { buildIgnivarRaidGate, ignivarRaidGatePlan } from './ignivar_raid_gate';
-import { damageContact } from './impact_contact';
 import { buildImpactSite, buildImpactSitePrewarmGroup, type ImpactSiteView } from './impact_site';
 import { deferredPassArms, initialFrameDeferral, type LinkDebt } from './initial_frame_core';
 import { buildInitialSceneCompileUnits, entryCompileTail } from './initial_scene_compile_units';
@@ -454,6 +456,7 @@ import {
   type PrewarmPacingHandle,
 } from './link_rate_budget';
 import { runWorldGateTouchLane } from './linked_program_touch_lane';
+import { diffComposedLook, diffWornArmor } from './live_look_diff';
 import * as liveProgramWatch from './live_program_watch';
 import {
   type LocoState,
@@ -471,6 +474,7 @@ import {
 import { handleMageGroundSpellfxEvent, MageGroundFx } from './mage_ground_fx';
 import { buildMailboxPillar } from './mailbox';
 import { collectObjectTextures } from './material_texture_slots';
+import { type MeleeContactHost, presentMeleeContact } from './melee_contact_present';
 import { meteorLandingBurst } from './meteor_landing_burst';
 import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
 import { buildMotes, type MotesView } from './motes';
@@ -671,7 +675,10 @@ import {
   type RenderableDiagnosticObject,
   RenderDiagnostics,
 } from './render_diagnostics';
-import { createRendererAbilityPresentation } from './renderer_ability_presentation';
+import {
+  createRendererAbilityPresentation,
+  presentEmpoweredCone,
+} from './renderer_ability_presentation';
 import { createRendererBuildDiag } from './renderer_build_diag';
 import { measureFeatureFootprint, setRenderCategory } from './renderer_diagnostics';
 import { snapshotRendererFrameStats } from './renderer_frame_stats_snapshot';
@@ -776,7 +783,8 @@ import { shouldRenderStealthGhost } from './stealth';
 import { createStepSmooth, type StepSmoothState, stepSmoothHeight } from './step_smooth_core';
 import { buildStreetlamps, type StreetlampsView } from './streetlamps';
 import { strideHit } from './stride_audio_core';
-import { buildFlaredConeFan, buildRingXZ, drapeConeWorld } from './target_cone_debug';
+import { drapeConeWorld } from './target_cone_debug';
+import { buildTargetConeMesh, type TargetConeMesh } from './target_cone_debug_mesh';
 import {
   syncTemporalHourglassVisual,
   TemporalHourglassGroundVisuals,
@@ -1345,17 +1353,7 @@ export class Renderer {
   // Dev-only Tab-target cone overlay (enabled via ?targetcone=1 in main.ts).
   // Null until enabled; once built it is re-draped over the terrain in front of
   // the local player every frame. See target_cone_debug.ts.
-  private targetCone: {
-    group: THREE.Group;
-    pos: THREE.BufferAttribute;
-    localXZ: Float32Array;
-    worldXYZ: Float32Array;
-    // Full query-radius rim (40 yd): the absolute Tab range. Symmetric, so it is
-    // draped with facing 0.
-    ringPos: THREE.BufferAttribute;
-    ringXZ: Float32Array;
-    ringWorldXYZ: Float32Array;
-  } | null = null;
+  private targetCone: TargetConeMesh | null = null;
   // Pool of transient click-feedback markers (ring plus crossed "X"). Each slot is
   // a group reused round-robin, so rapid clicking never allocates. A slot with
   // `elapsed >= lifetime` is free. See click_marker.ts for the animation curves.
@@ -4761,7 +4759,7 @@ export class Renderer {
       if (deferLooks) this.createViewDeferringLook(e);
       else this.createView(e);
       sampleCreatedViewType(createdViewTypes, e);
-      created++;
+      if (this.views.has(e.id) || !characterBuildStreaming()) created++;
     }
     return { created, trimmed };
   }
@@ -4796,11 +4794,11 @@ export class Renderer {
   ): CharacterVisual | null {
     const now = performance.now();
     if (!this.viewCreateRetry.canAttempt(e.id, slot, now)) return null;
-    const visual = createCharacterVisual(e, formKey, opts);
+    const visual = createCharacterVisual(e, formKey, opts, e.id === this.sim.playerId);
     if (visual) {
       this.viewCreateRetry.markSucceeded(e.id, slot);
-      visual.setFarBakeGate(this.farBakeGate);
-    } else this.viewCreateRetry.markFailed(e.id, slot, now);
+      visual.setFarBakeGate(this.farBakeGate, this.backgroundGpuWork);
+    } else if (!characterBuildStreaming()) this.viewCreateRetry.markFailed(e.id, slot, now);
     return visual;
   }
 
@@ -7122,6 +7120,7 @@ export class Renderer {
           break;
         }
         if (isNeedleOfFateProjectile(ev)) {
+          this.triggerAttack(ev.sourceId, ev.ability, true);
           this.needleOfFateVfx.spawn(ev.sourceId, ev.targetId);
           break;
         }
@@ -7176,38 +7175,14 @@ export class Renderer {
           this.pulseAt(ev.sourceId, ev.school, 1.2, 0.35);
           break;
         }
-        if (ev.fx === 'frostCone') {
-          const source = this.sim.entities.get(ev.sourceId);
-          if (source) {
-            this.glacialFrontVisual.spawn(
-              source.pos.x,
-              groundHeight(source.pos.x, source.pos.z, this.sim.cfg.seed),
-              source.pos.z,
-              source.facing,
-              ev.range ?? 7,
-              ev.level ?? 1,
-              ev.angle ?? 70,
-              ev.fx,
-            );
-            this.triggerAttack(ev.sourceId);
-          }
-          break;
-        }
-        if (ev.fx === 'fireCone') {
-          const source = this.sim.entities.get(ev.sourceId);
-          if (source) {
-            this.glacialFrontVisual.spawn(
-              source.pos.x,
-              groundHeight(source.pos.x, source.pos.z, this.sim.cfg.seed),
-              source.pos.z,
-              source.facing,
-              ev.range ?? 6,
-              ev.level ?? 1,
-              ev.angle ?? 55,
-              ev.fx,
-            );
-            this.triggerAttack(ev.sourceId);
-          }
+        if (ev.fx === 'frostCone' || ev.fx === 'fireCone') {
+          presentEmpoweredCone(
+            ev,
+            this.sim.entities.get(ev.sourceId),
+            this.sim.cfg.seed,
+            this.glacialFrontVisual,
+            (id, abilityId) => this.triggerAttack(id, abilityId),
+          );
           break;
         }
         if (ev.fx === 'windup') {
@@ -7241,13 +7216,14 @@ export class Renderer {
           if (ev.fx === 'shout') this.pulseAt(ev.sourceId, ev.school, 1.8, 0.5);
           break;
         }
-        // Player ranged attacks begin when their projectile launches. The live
-        // CharacterVisual chooses the authored crossbow/default clip or the bow
-        // skin's cosmetic draw override without changing the sim timeline.
-        if (ev.fx === 'projectile' && ev.attackAnimation === 'ranged-shot') {
+        // Typed auto projectiles animate at launch, including caster wands.
+        if (ev.fx === 'projectile' && (ev.attackAnimation === 'ranged-shot' || ev.wand)) {
           const source = this.sim.entities.get(ev.sourceId);
-          if (playerRangedAttackStartsAtLaunch(source?.kind, ev.attackAnimation))
-            this.triggerAttack(ev.sourceId);
+          if (
+            source?.kind === 'player' &&
+            (ev.wand || playerRangedAttackStartsAtLaunch(source.kind, ev.attackAnimation))
+          )
+            this.triggerAttack(ev.sourceId, undefined, false, ev.wand ? 'wand' : undefined);
         }
         const warriorCast = warriorCastVisualPlan(ev.fx, ev.ability);
         if (warriorCast?.kind === 'shout') {
@@ -7255,7 +7231,7 @@ export class Renderer {
           break;
         }
         if (warriorCast?.kind === 'gesture') {
-          this.triggerAttack(ev.sourceId, warriorCast.abilityId);
+          this.triggerAttack(ev.sourceId, warriorCast.abilityId, true);
           break;
         }
         if (ev.fx === 'projectile') {
@@ -7504,27 +7480,25 @@ export class Renderer {
           this.sim.entities.get(ev.sourceId),
           sourceView ? this.activeVisual(sourceView) : null,
           ev.attackAnimationStarted,
-          warrior ? ev.ability : undefined,
-          warrior ? ev.abilityId : undefined,
+          ev.ability,
+          ev.abilityId,
           warrior && ev.sourceId === ev.targetId,
+          ev.kind,
         );
-        if (ev.school === 'physical' && ev.sourceId !== -1 && startsAttackAnimation)
-          this.triggerAttack(ev.sourceId, attackAbilityId(ev.ability));
+        // The swing reports when its blade lands: the target-side effects (and the hud's
+        // number and impact sound, via contactDelayFor/atContact) are held until then.
+        const swings =
+          (ev.school === 'physical' || damageCarriesCastRelease(ev.abilityId)) &&
+          ev.sourceId !== -1 &&
+          startsAttackAnimation;
+        const attackId = ev.abilityId ?? attackAbilityId(ev.ability);
+        const contact = swings ? this.triggerAttack(ev.sourceId, attackId, false, 'melee') : 0;
+        this.contactQueue.note(ev, contact, ev.targetId, performance.now());
         const authoredContact = warrior && this.abilityVfx.onDamage(ev) === true;
-        if (ev.kind === 'hit' && ev.amount > 0 && !authoredContact) {
-          if (warrior && ev.ability) {
-            const victim = this.views.get(ev.targetId);
-            damageContact(
-              victim ? this.activeVisual(victim) : null,
-              ev,
-              ev.sourceId === this.sim.playerId,
-              this.reducedMotion(),
-            );
-          }
-          // landed blows flinch the victim (rate-limited inside the visual)
-          this.triggerHit(ev.targetId);
-          if (ev.school === 'physical') this.vfx.meleeSpark(ev.targetId, ev.crit);
-        }
+        if (ev.kind === 'hit' && ev.amount > 0 && !authoredContact)
+          this.contactQueue.after(contact, performance.now(), () =>
+            presentMeleeContact(this.meleeContactHost, ev, warrior),
+          );
         // spec-driven per-ability impact accent (no-op for unknown abilities)
         if (attackAbilityId(ev.ability) === 'drain_life') this.vfx.drainLifeTick(ev.sourceId);
         if (!warrior) this.abilityVfx.onDamage(ev);
@@ -8036,8 +8010,8 @@ export class Renderer {
         // ever recycled, so every mob past that count churned. Key is per-template, so
         // the pool stays bounded by the peak simultaneous count.
         visual = this.createCharacterVisualWithRetry(e, 'view', undefined, opts);
-        // assets unavailable: skip, the entity stays a view candidate but sits
-        // out the retry cooldown so it cannot starve the per-frame budget
+        // assets unavailable: skip; a failed build sits out the retry cooldown and a
+        // streaming WOC body costs no budget slot, so neither starves the frame
         if (!visual) {
           return;
         }
@@ -8570,13 +8544,44 @@ export class Renderer {
 
   private attackTriggerCount = 0;
 
-  triggerAttack(entityId: number, abilityId?: string): void {
+  /** Start the entity's attack one-shot; returns the seconds until its blade lands (0 = none). */
+  triggerAttack(
+    entityId: number,
+    abilityId?: string,
+    gestureOnly = false,
+    kind?: 'melee' | 'wand',
+  ): number {
     const v = this.views.get(entityId);
     const visual = v ? this.activeVisual(v) : null;
-    if (!visual) return;
+    if (!visual) return 0;
     this.attackTriggerCount++;
-    if (isSpinAttackAbility(abilityId)) visual.playWhirl();
-    else visual.playAttack(abilityId);
+    if (isSpinAttackAbility(abilityId)) visual.playWhirl(abilityId);
+    else return visual.playAttack(abilityId, gestureOnly, kind);
+    return 0;
+  }
+
+  /** Blade-contact holds for melee presentation (contact_queue.ts). */
+  private readonly contactQueue = new ContactQueue();
+  private lastSyncStart = 0;
+  private readonly meleeContactHost: MeleeContactHost = {
+    targetVisual: (id) => {
+      const v = this.views.get(id);
+      return v ? this.activeVisual(v) : null;
+    },
+    triggerHit: (id) => this.triggerHit(id),
+    meleeSpark: (id, crit) => this.vfx.meleeSpark(id, crit),
+    playerId: () => this.sim.playerId,
+    reducedMotion: () => this.reducedMotion(),
+  };
+
+  /** Seconds this damage event's presentation is held for its swing's blade contact. */
+  contactDelayFor(ev: object): number {
+    return this.contactQueue.delayFor(ev);
+  }
+
+  /** Run `fn` at this damage event's blade contact (at once for an event with none). */
+  atContact(ev: object, fn: () => void): void {
+    this.contactQueue.atContact(ev, performance.now(), fn);
   }
 
   private playShoutFx(
@@ -8589,7 +8594,7 @@ export class Renderer {
     this.spawnAoeRing(e.pos.x, e.pos.z, plan.ringRadius, 'physical', plan.color);
     const v = this.views.get(entityId);
     const visual = v ? this.activeVisual(v) : null;
-    if (visual && !visual.isMidOneShot) visual.playEmote(plan.emote, plan.repeats);
+    if (visual && !visual.isMidOneShot) visual.playShout(plan.repeats);
   }
 
   triggerHit(entityId: number): void {
@@ -9646,67 +9651,8 @@ export class Renderer {
     queryRadius: number,
   ): void {
     if (this.targetCone) return;
-    const fan = buildFlaredConeFan(nearRadius, halfAt, 16, 48);
-    const worldXYZ = new Float32Array(fan.vertexCount * 3);
-    // Wrap the array by reference (not Float32BufferAttribute, which copies) so
-    // re-draping worldXYZ each frame writes straight into the uploaded buffer.
-    const pos = new THREE.BufferAttribute(worldXYZ, 3);
-    const fillGeo = new THREE.BufferGeometry();
-    fillGeo.setAttribute('position', pos);
-    fillGeo.setIndex(new THREE.BufferAttribute(fan.index, 1));
-    const fillMat = new THREE.MeshBasicMaterial({
-      color: 0x49c0ff,
-      transparent: true,
-      opacity: 0.16,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-    });
-    const fill = new THREE.Mesh(fillGeo, fillMat);
-    fill.frustumCulled = false; // re-draped every frame; its bounds go stale
-    // Outline: a LineLoop over the flared perimeter (left edge -> outer arc ->
-    // right edge), sharing the position buffer so one update moves fill and edge.
-    const lineGeo = new THREE.BufferGeometry();
-    lineGeo.setAttribute('position', pos);
-    lineGeo.setIndex(new THREE.BufferAttribute(fan.outline, 1));
-    const lineMat = new THREE.LineBasicMaterial({
-      color: 0x9be0ff,
-      transparent: true,
-      opacity: 0.85,
-      depthWrite: false,
-    });
-    const outline = new THREE.LineLoop(lineGeo, lineMat);
-    outline.frustumCulled = false;
-    // Query-radius rim: a full circle at max Tab range, in a contrasting amber so
-    // it reads apart from the blue cone.
-    const ringXZ = buildRingXZ(queryRadius, 96);
-    const ringWorldXYZ = new Float32Array((ringXZ.length / 2) * 3);
-    const ringPos = new THREE.BufferAttribute(ringWorldXYZ, 3);
-    const ringGeo = new THREE.BufferGeometry();
-    ringGeo.setAttribute('position', ringPos);
-    const ringMat = new THREE.LineBasicMaterial({
-      color: 0xffb24d,
-      transparent: true,
-      opacity: 0.55,
-      depthWrite: false,
-    });
-    const ring = new THREE.LineLoop(ringGeo, ringMat);
-    ring.frustumCulled = false;
-    const group = new THREE.Group();
-    group.add(fill);
-    group.add(outline);
-    group.add(ring);
-    setRenderCategory(group, 'ui3d');
-    group.visible = false;
-    this.scene.add(group);
-    this.targetCone = {
-      group,
-      pos,
-      localXZ: fan.localXZ,
-      worldXYZ,
-      ringPos,
-      ringXZ,
-      ringWorldXYZ,
-    };
+    this.targetCone = buildTargetConeMesh(halfAt, nearRadius, queryRadius);
+    this.scene.add(this.targetCone.group);
   }
 
   sync(
@@ -9723,6 +9669,8 @@ export class Renderer {
   ): void {
     if (this.shutdownStarted) return;
     const totalStart = performance.now();
+    this.lastSyncStart = totalStart;
+    this.contactQueue.tick(totalStart);
     this.resizeGate.flush(); // before anything draws: see resize_coalesce_core.ts
     // The hitch sample's start reading, before any view creation, then a new
     // ledger frame: what the ledger holds here is the previous callback plus
@@ -9945,7 +9893,9 @@ export class Renderer {
         v.liveScale = displayScale;
         v.group.scale.setScalar(displayScale);
       }
-      const visuallyDead = isVisuallyDead(e) && !e.ghost;
+      // a kill's collapse waits for the blade that dealt it (contact_queue.ts)
+      const visuallyDead =
+        isVisuallyDead(e) && !e.ghost && !this.contactQueue.holdsDeath(e.id, this.lastSyncStart);
       const waterJetVisualChannel = this.waterJetVisualChannels.has(e.id);
       // This is the final render-side casting state, including Water Jet's
       // spellfx-driven channel. It feeds both the rig and the fairness carve-out.
@@ -10327,45 +10277,14 @@ export class Renderer {
         iceBlockActivated = v.iceBlockVisual?.activatedThisFrame === true;
       }
 
-      // live helm toggle (the paperdoll eye): the kit's head piece is part of
-      // the composed geometry, not a texture, so flipping it means recomposing
-      // the body. Nulling the remembered key makes updateBaseVisual's next-key
-      // diff read as a base-visual swap, reusing its whole replace path
-      // (click-target handoff, compile gating). Composed entities only: a
-      // fixed class rig has no kit helm to take off.
-      if (e.helmHidden !== v.helmHidden) {
-        v.helmHidden = e.helmHidden;
-        // Mech wearers keep the mech body (index.ts skips their look), so a
-        // helm toggle must not force a pointless dispose/rebuild of it. Asked
-        // through isMechWearer, the one definition of the rule.
-        if (!isMechWearer(e) && modularLookFor(e)) v.visualKey = null;
-      }
-
-      // live redesign: the server pushed a changed authored look onto this
-      // live entity (server/game.ts) and the client mirror reassigned
-      // e.modularAppearance from a fresh wire read (src/net/online.ts). Cheap
-      // reference check first, exactly like every other diff in this pass;
-      // the reference alone is not a verdict here because the SAME mirror
-      // also reassigns it on every unrelated identity record (an equip, a
-      // level-up), so modularLookChanged does the real by-value comparison
-      // before anything is nulled. Same recompose path as the helm toggle
-      // above: nulling visualKey makes updateBaseVisual's next-key diff read
-      // as a base-visual swap and reuse its whole replace path. The guard
-      // differs from the helm arm in one spot: modularLookFor reads the NEW
-      // state, which is null exactly when a cleared look needs the body to
-      // fall back to the class rig, so a previously composed body (a non-null
-      // prev reference) recomposes too. The reference is copied every time
-      // this fires, changed or not, so the cheap check above stays quiet
-      // until the next real reassignment.
-      if (e.modularAppearance !== v.modularAppearance) {
-        if (modularLookChanged(v.modularAppearance, e.modularAppearance)) {
-          const composedBefore = v.modularAppearance != null;
-          if (!isMechWearer(e) && (modularLookFor(e) || composedBefore)) v.visualKey = null;
-        }
-        v.modularAppearance = e.modularAppearance;
-      }
+      // live look diffs (src/render/live_look_diff.ts): the paperdoll helm eye
+      // and a pushed redesign RECOMPOSE a composed body by nulling the remembered
+      // key so updateBaseVisual's next-key diff reuses its whole replace path;
+      // a WOC body's worn armor is a visibility flip on the settled visual.
+      diffComposedLook(e, v);
       this.updateBaseVisual(e, v);
       if (!v.visual) continue;
+      diffWornArmor(e, v.visual);
       // Warm the local player's own spirit variants once per distinct look, so
       // a death spirit-release never links them inline on the ungated self view.
       if (e.id === this.sim.player.id) {
@@ -10798,8 +10717,7 @@ export class Renderer {
       // st.airborne is already held false for them.
       v.wasFalling = isFallingAtSpeed(v.wasFalling, st.airborne, vy);
       st.falling = v.wasFalling;
-      st.backwards = loco.backwards;
-      st.reverseBackpedal = ghostWolf;
+      applyLocoDirection(st, loco, ghostWolf);
       st.dead = visuallyDead;
       st.casting = characterCasting;
       // Which ability, so the pose layer can tell a drawn shot from a pet

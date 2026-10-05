@@ -399,7 +399,7 @@ describe('held weapon models', () => {
       const def = VISUALS[key];
       // both hunter bodies: the fixed rig and its composed (modular) variant
       // share the class hand layout, so both keep the crossbow
-      if (key === 'player_hunter' || key === 'player_hunter_modular') {
+      if (key.startsWith('player_hunter')) {
         expect(def.weaponSlots, 'hunter must keep its crossbow').toBeUndefined();
       } else {
         expect(def.weaponSlots?.includes(0), `${key} should swap its mainhand`).toBe(true);

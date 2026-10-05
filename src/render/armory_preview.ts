@@ -13,7 +13,11 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { WEAPON_SKINS } from '../sim/content/weapon_skins';
 import { CharacterVisual } from './characters';
-import { onCharacterAssetReady, weaponSkinDisplayModel } from './characters/assets';
+import {
+  onCharacterAssetReady,
+  visualAssetsResident,
+  weaponSkinDisplayModel,
+} from './characters/assets';
 import { weaponSkinModelUrl } from './characters/manifest';
 import {
   appearanceSignature,
@@ -79,6 +83,22 @@ type CachedWeaponRig = {
   floatTime: number;
   targetHeight: number;
 };
+
+/**
+ * Whether the try-on body for `appearance` is resident, so createArmoryPreview can build it
+ * (a WOC base and clip library stream on first use, and a rig built before they land
+ * throws). When not, kicks the fetch and calls `onReady` once, the moment they land.
+ */
+export function armoryPreviewReady(appearance: PreviewAppearance, onReady: () => void): boolean {
+  const key = previewAppearanceVisual(appearance).visualKey;
+  if (visualAssetsResident(key)) return true;
+  const stop = onCharacterAssetReady(() => {
+    if (!visualAssetsResident(key, false)) return;
+    stop();
+    onReady();
+  });
+  return false;
+}
 
 export function createArmoryPreview(
   container: HTMLElement,

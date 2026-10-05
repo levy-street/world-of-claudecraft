@@ -82,7 +82,15 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
 - Portraits: `portrait.ts` (offscreen-WebGL headshot factory, caches data
   URLs) + `portrait_framing.ts` (pure framing math per `PortraitFraming`) +
   `portrait_prewarm_core.ts` (the async capture's step order) +
-  `portrait_capture_lane_core.ts` (one live capture per cache key). The CAPTURE
+  `portrait_capture_lane_core.ts` (one live capture per cache key). A WOC
+  headshot frames off the DRAWN modular head, never a body-height fraction:
+  `woc_portrait_bounds.ts` `measureWocPortraitHead` reads the hung pieces and
+  `headshotAimForHead` sizes the frame on the neck-to-eye height (a hairstyle
+  moves the crown, never that), so every class, head type and body scale frames
+  its face alike (`tests/portrait_framing.test.ts`, and the pixel pins in
+  `tests/browser/woc_portrait.browser.test.ts`). The kit is worn bare-headed
+  there: a helm would hide the hair the player picked. A head-keyed chip waits
+  on its key through the request `portrait_chip.ts` files for it. The CAPTURE
   itself is `portrait_snapshot.ts`, a thin GL adapter over the pure
   `portrait_bitmap_transfer_core.ts` and `portrait_readback_core.ts`, the
   worker client `portrait_bitmap_encode.ts` (with
@@ -201,6 +209,165 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   prewarmed through `ABILITY_MATERIAL_SOURCES`; a rig's first mount of a set
   still waits hidden behind the injected compile gate
   (`tests/form_adornments.test.ts`, `tests/character_form_adornments.test.ts`).
+- WOC split character files (the player bodies, 2026-09-28): one base and one
+  animation library per body fit, and per armor set and fit a low file, a medium
+  file and a TOP file (`woc_armor_core.ts`: file names, the tier a character
+  draws, the stand-in tier, the idle-eviction ledger; pure). Since 2026-10-03 the
+  medium file carries every map of the set's one full layout at half its size and
+  the top file only the top mip level of each (three quarters of a texture's
+  bytes, which only a close-up samples): the HIGH tier is the medium file with
+  the top levels laid over it, assembled in the store (`woc_armor_top_levels.ts`,
+  textures paired by image name; the top file's url names the pack). Who draws
+  what is a per-character DETAIL: the low preset and every phone draw low for
+  everyone, and otherwise the local player's own character and every body built
+  directly (previews, portraits) draw high while every other character in the
+  world draws medium (`createCharacterVisual`'s `localPlayer`; cosmetic
+  sharpness only). A high pack holds its medium pack resident and frees only
+  what it made; the medium file stands in while the top streams, and a file that
+  replaces another keeps the old one drawing until its reveal settles
+  (`woc_armor_dressing.ts`), so the upgrade never blinks
+  (`tests/woc_armor_high_pack.test.ts`, `tests/woc_armor_dressing.test.ts`).
+  A WOC def is `lazyPreload`:
+  nothing of it is in the boot gate, `visualAwaitsStream` (assets.ts) makes a
+  streaming world view a silent retry, and a speculative build (the zone
+  prewarm) passes `fetchStreamed: false` so it never pulls a set nobody wears.
+  `woc_armor_bind.ts` rebakes a set's parts into the base rig's bind space by
+  bone NAME (skinned parts onto the shared Skeleton, rigid parts re-hung on the
+  same-named bone; loader-free, the Guide viewer uses it too);
+  `woc_armor_packs.ts` is the store (fetch, prepare once, residency refs, free
+  after the idle window); `woc_armor_dressing.ts` is one character's attached
+  files (the visual owns the per-mesh setup through its host seam, like a late
+  face decal). `woc_armor_catalog.ts` + `woc_item_display.ts` are the display
+  table (an item shows its row's set piece, else the wearer's class piece).
+  Built by `scripts/assets/woc_character/build_woc_split.mjs` (with
+  `armor_atlas.mjs`: one texture atlas per map kind per set, and `ktx2_levels.mjs`:
+  each full-layout map cut along its top level, `tests/woc_ktx2_levels.test.ts`);
+  sizes ratcheted by `tests/woc_character_size_budget.test.ts`. Every base, low and medium
+  armor file and head file carries level-of-detail index lists per primitive, a mid and a far
+  one over the primitive's own vertices, in the optional `WOC_lod` extension (the file
+  contract is the header of `scripts/assets/woc_character/woc_lod_extension.mjs`; made by
+  `lod_indices.mjs` against measured deviation bounds; `tests/woc_lod_indices.test.ts`,
+  `tests/woc_lod_extension.test.ts`, which also holds the shipped files to the contract).
+  A base file is the rig and the
+  BODY only: it ends at the neck, and the handoff's original face never ships
+  (the build measures it, records its crown and strips it). The height
+  normalization takes that crown as the body's top (`WOC_ANATOMY_TOP` in
+  `woc_armor_core.ts`, pinned to the build's record by
+  `tests/woc_export.test.ts`), so no hairstyle or helm can change a character's
+  size. Blade-contact timing for the
+  hit presentation: `attack_swing_core.ts` (`ClipMap.contacts`, measured off
+  the shipped library by `tests/woc_character.test.ts`).
+- WOC modular heads (the face builder's library, `woc_head_catalog.ts`): it
+  ships SPLIT, one core file per head type (the base head and every small face
+  piece), one file per hairstyle, the beard files (`wocHeadCoreUrl`,
+  `wocHeadPieceUrl`, `wocHeadLookUrls`). `woc_head_packs.ts` is the per-file
+  store (fetch once, prepare once, never freed; the core rides the first body
+  of its type, every other file its first look, `prefetchWocHeadSlot` the face
+  builder's category) and the hang (one wrapper per file on the `head` bone);
+  `woc_head_dressing.ts` is one visual's head. The streaming rules live in the
+  pure `woc_head_stream_core.ts`: a head goes live only once EVERY file of its
+  look is hung and revealed, and until then the BODY WAITS (there is no other
+  head to draw): the world view builds a character only once its look's files
+  are resident (`index.ts` createCharacterVisual, `wocHeadAppearanceAwaited`),
+  and a body built directly (a preview) draws nothing until its head is live
+  (`visual.ts` through `far_lod_reveal_core.ts` `bodyDrawn`). Only a FAILED
+  head file ends the wait, so a dead request never hides a character. A later hairstyle
+  or beard pick whose file still streams keeps the previous one drawn until the
+  new file reveals; a DIFFERENT character handed to a reused body (a roster
+  pick, an inspected player: `WocHeadHold` 'look', passed by the preview) keeps
+  the previous head whole instead (`tests/woc_head_dressing.test.ts`). Never
+  live in the dressing's constructor: its host hands it the look right after
+  building.
+- WOC look colours (skin, eye, hair, brow): one shader layer per role over each
+  head material and the body's own (`woc_head_tint.ts`; a colour is a uniform
+  write, never a link), wrapped per visual by `woc_head_dressing.ts` and per far
+  set by `woc_far_tint.ts`. Which mesh takes which tint, and how strongly, is
+  the pure `woc_skin_tint_core.ts`: skin colour changes ONLY skin. The body mesh
+  is cloth: its own suit atlas tints only its skin paint (the hands, the neck
+  base) through the suit key, and under a class under-armor atlas (no skin on
+  it) the body's layer is switched off by its strength uniform on the SAME
+  program, so an atlas swap links nothing. The near rig, the far LOD and the
+  wiki viewer all resolve through that one rule
+  (`tests/woc_skin_tint_core.test.ts`, `tests/woc_far_equipment.test.ts`).
+  Hair and brow read a texel's LINEAR luminance alone (times its colour's), never
+  its hue, on the albedo and, where the emissive map is the colour map (the low
+  tier), on the glow too; that is why the hair, scalp and beard textures ship
+  grey, ETC1S (`scripts/assets/woc_character/hair_grey.mjs`, run by
+  `woc_head_pack_compress.mjs`; pinned by `tests/woc_head_tint.test.ts`,
+  `tests/woc_hair_grey.test.ts`, `tests/woc_head_split_files.test.ts`). A new
+  hair-role texture that must keep its colour cannot ride a `hair_` material.
+- WOC crowd draws (2026-10-02; a full-kit body was 21 meshes a pass against 2 for
+  the bodies it replaced, and draw calls, not triangles, were the crowd cost):
+  the WORLD view folds a body's many pieces into few draws, while a preview, a
+  portrait and the face builder keep drawing piece by piece
+  (`createCharacterVisual` opts in through `setWocDrawMerge`; `?wocmerge=off`
+  is the A/B arm). The pieces stay the source of truth everywhere: they are
+  shown, posed and tinted exactly as before, a stand-in is built for what is
+  drawn right now, and the pieces leave the render lists (`layers.mask = 0`)
+  only once the stand-in can draw without linking. Whatever changes what is
+  drawn drops the stand-in inside the same pass, the pieces draw again that
+  frame, and the new stand-in is mounted later as ONE unit of the renderer's
+  work queue (the queue rides in with the compile gate, `setFarBakeGate`), only
+  for a rig that is actually drawn (`rigDrawn`: never a far or hidden body), so
+  a crowd arriving at once mounts a few a frame. Never mount inside `apply` or
+  a part pass: both run within the host's own material sweeps. A translucent
+  effect (the ghost run, stealth, Shadowform, the Soul Rend mark) keeps the
+  pieces for as long as it lasts: one merged mesh cannot blend what three sorts
+  piece by piece.
+  - The head (`woc_head_merge.ts`, pure `woc_head_merge_core.ts`: the fold rule,
+    the slot table, the cache identity): one mesh on the head bone with the
+    face morphs baked, each vertex carrying the SLOT of its material; one
+    material, the base head's, wrapped with the merged tint layer
+    (`woc_head_tint.ts`) whose per-slot uniform rows carry what differed per
+    piece (tint role and reference, colour, emissive, roughness, metalness,
+    one sidedness, and which of four textures it samples: the core atlas, the
+    hairstyle, its scalp cap, the beard). What makes it possible is the build:
+    `scripts/assets/woc_character/head_atlas.mjs` packs every texture of a
+    head core into one atlas. Left out on purpose, each still its own draw: a
+    piece whose material takes a surface layer by name (the gold of a
+    piercing: `riggedWornFamilyFor`) and anything not a plain opaque standard
+    material. The merged layer does the work of the map, emissive map,
+    roughness and metalness chunks itself but leaves every one of their
+    includes in place (switched off, or fed the slot's value), because a layer
+    attached after it anchors on them: the hit response
+    (`surface_response.ts`) must still reach a merged head.
+  - The far LOD (`woc_far_head.ts`, `woc_far_tint.ts`): the same fold rule
+    (`wocHeadMergeFold`) bakes every folded head piece into ONE group of the
+    far mesh, drawn by the same merged layer; a far body is its body, its
+    head, its armor groups.
+  - The armor (`woc_armor_merge.ts`, pure `woc_armor_merge_core.ts`): the worn
+    parts of one file material become one skinned mesh on the body's own
+    skeleton (a rigid part rides as vertices weighted to its bone).
+  Tests: `tests/woc_head_merge_core.test.ts`, `tests/woc_head_merge.test.ts`,
+  `tests/woc_head_merged_tint.test.ts`, `tests/woc_head_dressing.test.ts`,
+  `tests/woc_head_merge_library.test.ts` (the shipped head library against the
+  fold rule), `tests/woc_head_atlas.test.ts`, `tests/woc_far_head.test.ts`,
+  `tests/woc_far_tint.test.ts`, `tests/woc_armor_merge_core.test.ts`,
+  `tests/woc_armor_merge.test.ts`, and through a real `CharacterVisual`
+  (`tests/helpers/woc_visual_harness.ts`): `tests/woc_merge_visual.test.ts`
+  (the queue wiring, effects, the reveal rules, a seeded lifecycle fuzz),
+  `tests/woc_head_merge_visual.test.ts`, `tests/woc_armor_merge_visual.test.ts`.
+- WOC geometry levels (2026-10-03): the WOC files (bases, armor low and medium,
+  head cores, hairstyles, beards) carry coarser index lists per primitive, MID
+  and FAR (`WOC_lod`, read by `../assets/woc_lod_plugin.ts`), over the
+  primitive's own vertices. Which one a character draws is the pure
+  `woc_lod_core.ts` (`wocLodLevelFor`: crowd detail mid, full detail level 0,
+  the low preset and phones mid for everyone; the far bake always far), fixed
+  when the visual is built (`assets.ts` `wocBuildLod`, handed to both
+  dressings). A level is drawn by a VARIANT geometry (`../assets/geometry_lod.ts`
+  `geometryLodVariant`): the source's own attribute objects and another index,
+  one per (source, level), shared by every wearer. Its `dispose()` does nothing:
+  it goes with its source's (three deletes every attribute buffer a disposed
+  geometry holds), pinned by `tests/geometry_lod.test.ts`. Levels live in a
+  WeakMap, never `userData`, and reach a derived geometry only where the
+  transform says the vertex order held (`carryGeometryLod`: the rebake, the
+  palette narrowing) or offsets them as it offsets its own index
+  (`mergeGeometryLod`: the part merge, the merged armor, the merged head). A
+  merge folds each piece's SOURCE geometry and keys its cache on it, so every
+  detail shares one merged buffer and draws its own level of it. Tests:
+  `tests/geometry_lod_core.test.ts`, `tests/woc_lod_core.test.ts`,
+  `tests/woc_lod_plugin.test.ts`, `tests/woc_lod_flows.test.ts`,
+  `tests/woc_lod_visual.test.ts` (the harness's `lods` fixture).
 - Pure selection cores: `modular.ts` (composed bodies, below),
   `player_look_core.ts`, `form_visual_selection_core.ts`,
   `far_lod_reveal_core.ts` (the rig/far-mesh/shadow-proxy handoff rule: the
@@ -225,11 +392,20 @@ construction, so a shaman's `ghost_wolf` aura resolves to `form_ghost_wolf` (the
 
 ## Animation
 - `AnimState` (the renderer-derived input) and `BaseState`
-  (`idle|walk|walkBack|run|cast|spin|swim|sit|jump|prowlIdle|prowlWalk|...`) live in `anim_state.ts`, which
+  (`idle|walk|walkBack|run|strafeLeft|strafeRight|cast|spin|swim|sit|jump|prowlIdle|prowlWalk|...`) live in `anim_state.ts`, which
   also owns `desiredBaseState()` (pose selection) and `locomotionTimeScale()`
   (foot-speed matching). Clip *names* are per source rig in the `ClipMap`
   factories (`manifest.ts`); names differ per rig (e.g. KayKit `Walking_A`,
   Quaternius `Gallop`), `baseAction()` falls back gracefully.
+- **Strafe:** a Q/E strafe keeps facing and slides the body at run speed. `locomotion.ts` reads
+  the displayed travel against the displayed facing (|lateral| >= `STRAFE_LATERAL_MIN`, never a
+  backpedal frame) and latches the side over `STRAFE_CONFIRM_SEC`, each frame counted at most the
+  self-facing turn limiter's clamp (`facing_smooth.ts`), so a mouse-steer turn at any frame rate
+  never flashes it. `desiredBaseState` plays `strafeLeft`/`strafeRight` only while running and only
+  for a rig that loads BOTH clips; time-scaled by `strafeRef` (default `runRef`); the side runs
+  blend in and out on a short 0.1 s crossfade (`isStrafeState`, `STRAFE_FADE`: owner call, the
+  one-frame cut read as a snap and the 0.22 s base fade as sluggish). Pinned in
+  `tests/locomotion.test.ts`, `tests/character_anim_state.test.ts`, `tests/character_strafe.test.ts`.
 - **`src/render/renderer.ts` is the sole driver.** It builds `AnimState` each
   frame (swimming/sitting derived there, sim is unaware), calls `update(dt, s,
   animate)`, fires `playAttack()`/`playHit()` from sim events, and toggles live

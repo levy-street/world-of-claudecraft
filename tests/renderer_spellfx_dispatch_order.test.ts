@@ -63,7 +63,8 @@ describe('handleEvent spellfx: the mob engage cue never swallows a warrior castF
 
     harness.handleEvent(cue('flourish', 'raised_guard'));
 
-    expect(calls.triggerAttack).toHaveBeenCalledWith(SOURCE_ID, 'raised_guard');
+    // gesture-only: the visual draws it through an authored entry or not at all
+    expect(calls.triggerAttack).toHaveBeenCalledWith(SOURCE_ID, 'raised_guard', true);
     expect(calls.playFlourish).not.toHaveBeenCalled();
     // and it never walks on to the terminal school nova either
     expect(calls.nova).not.toHaveBeenCalled();
@@ -78,7 +79,6 @@ describe('handleEvent spellfx: the mob engage cue never swallows a warrior castF
     expect(calls.playShoutFx.mock.calls[0]?.[1]).toMatchObject({
       kind: 'shout',
       color: WARRIOR_SHOUT_COLORS.battle_shout,
-      emote: 'cheer',
     });
     expect(calls.playFlourish).not.toHaveBeenCalled();
   });

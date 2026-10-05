@@ -214,7 +214,9 @@ function auraFixture(mesh: THREE.Mesh) {
   const state = {
     model,
     poseWrap,
-    height: 2.2,
+    // `height` is derived (the def height times a WOC body's chosen size)
+    baseHeight: 2.2,
+    bodyScale: 1,
     weaponItemId: 'wyrmfang_greatblade',
     offhandItemId: null,
     weaponAuraColor: null as number | null,

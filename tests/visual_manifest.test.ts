@@ -8,6 +8,10 @@ import { describe, expect, it } from 'vitest';
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 import {
   type ClipMap,
+  KAYKIT_PRIEST,
+  KAYKIT_ROGUE,
+  KAYKIT_SHAMAN,
+  KAYKIT_WARLOCK,
   manifestUrls,
   manifestUrlsForGraphics,
   SKINS,
@@ -403,7 +407,9 @@ describe('character visual manifest', () => {
   });
 
   it('points the rogue bespoke abilities at their synthesized clips in the rogue GLB', async () => {
-    const visual = VISUALS.player_rogue;
+    // The KayKit rogue (the `_modular` baseline since the WOC body took the
+    // class on 2026-09-18) still owns the bespoke one-shots.
+    const visual = KAYKIT_ROGUE;
     // The strangle one-shot (scripts/_add_garrote_choke_anim.mjs): a wire
     // pull to the chest, never the dagger swing the default rotation plays.
     expect(visual.clips.attackByAbility?.garrote).toBe('Garrote_Choke');
@@ -638,22 +644,33 @@ describe('character visual manifest', () => {
     // (the same "faint wash" strength used elsewhere for model-sharing
     // differentiation, see mob_troll's 0.12 above), not just an upper bound,
     // so a future bump toward the wash can't silently pass this test.
-    for (const key of ['player_priest', 'player_shaman', 'player_warlock'] as const) {
-      const visual = VISUALS[key];
+    // Since the 2026-09-18 class sets every player class rides its own WOC
+    // body file, so the sharing tints live on the retired KayKit baselines
+    // (the `_modular` fallbacks still derive from them, tint dropped there).
+    for (const [key, visual] of [
+      ['KAYKIT_PRIEST', KAYKIT_PRIEST],
+      ['KAYKIT_SHAMAN', KAYKIT_SHAMAN],
+      ['KAYKIT_WARLOCK', KAYKIT_WARLOCK],
+    ] as const) {
       expect(typeof visual.tint, key).toBe('number');
       expect(visual.tintStrength, key).toBe(0.12);
     }
-    // The classes that own their model outright (no sharing) stay tint-free:
-    // a wash there would be pure regression, never intentional.
+    // Every class owns its model outright now (a WOC body per class and fit)
+    // and stays tint-free: a wash there would be pure regression, never
+    // intentional.
     for (const key of [
       'player_warrior',
       'player_paladin',
       'player_hunter',
       'player_rogue',
       'player_mage',
+      'player_priest',
+      'player_warlock',
       'player_druid',
+      'player_shaman',
     ] as const) {
       expect(VISUALS[key].tint, key).toBeUndefined();
+      expect(VISUALS[`${key}_female`].tint, key).toBeUndefined();
     }
   });
 

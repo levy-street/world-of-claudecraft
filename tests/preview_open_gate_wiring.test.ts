@@ -29,6 +29,7 @@ vi.mock('../src/render/characters/visual', () => ({
   CharacterVisual: class {
     root = {};
     setWeaponSkin = vi.fn();
+    setFarBakeGate = vi.fn();
     setSkin = vi.fn();
     update = vi.fn();
     dispose = vi.fn();

@@ -26,6 +26,14 @@ import {
   randomizeAppearance,
   SHADOW_SHADES,
 } from '../src/render/characters/modular';
+import {
+  resolveWocHeadLook,
+  WOC_HEAD_MORPH_KEYS,
+  WOC_HEAD_MORPH_RANGE,
+  WOC_HEAD_TYPES,
+  WOC_PIERCING_IDS,
+  wocHeadSlotIds,
+} from '../src/render/characters/woc_head_catalog';
 
 /** Deterministic LCG so the randomized round trip is reproducible. */
 function seededRand(seed: number): () => number {
@@ -66,6 +74,17 @@ describe('design code field registry', () => {
       'shadow',
       'earrings',
       'jewel',
+      'headhair',
+      'headnose',
+      'headmouth',
+      'headbrows',
+      'headears',
+      'headeyes',
+      'headpiercing',
+      'browcol',
+      'headshape',
+      'headbeard',
+      'size',
     ]);
   });
 
@@ -98,6 +117,14 @@ describe('design code drift guard', () => {
     blush: BLUSH_SHADES,
     eyeshadow: SHADOW_SHADES,
     outfit: OUTFIT_COLORWAY_IDS,
+    headHair: wocHeadSlotIds('hair'),
+    headNose: wocHeadSlotIds('nose'),
+    headMouth: wocHeadSlotIds('mouth'),
+    headBrows: wocHeadSlotIds('brows'),
+    headEars: wocHeadSlotIds('ears'),
+    headEyes: wocHeadSlotIds('eyes'),
+    headPiercing: WOC_PIERCING_IDS,
+    headBeard: wocHeadSlotIds('beard'),
   };
 
   it('round-trips a non-default value for EVERY appearance field except body', () => {
@@ -113,6 +140,8 @@ describe('design code drift guard', () => {
       let mutated: ModularAppearance;
       if (key === 'face') {
         mutated = { ...d, face: { ...d.face, nose: 0.4 } };
+      } else if (key === 'headShape') {
+        mutated = { ...d, headShape: { ...d.headShape, eyeTilt: 0.4 } };
       } else if (typeof current === 'boolean') {
         mutated = { ...d, [key]: !current };
       } else if (typeof current === 'number') {
@@ -132,8 +161,13 @@ describe('design code drift guard', () => {
       const r = decodeDesignCode(encodeDesignCode(mutated));
       if (!r.ok) throw new Error(`decode failed for mutated '${key}'`);
       expect(r.coerced, key).toEqual([]);
-      const got = key === 'face' ? r.appearance.face.nose : r.appearance[key];
-      const want = key === 'face' ? 0.4 : mutated[key];
+      const got =
+        key === 'face'
+          ? r.appearance.face.nose
+          : key === 'headShape'
+            ? r.appearance.headShape.eyeTilt
+            : r.appearance[key];
+      const want = key === 'face' || key === 'headShape' ? 0.4 : mutated[key];
       if (typeof want === 'number') {
         const eps = key.endsWith('Hue') ? 0.05 : 0.005;
         expect(Math.abs((got as number) - want), key).toBeLessThanOrEqual(eps);
@@ -162,9 +196,19 @@ describe('design code round trip', () => {
       'eyeshadow',
       'outfit',
       'lashes',
+      'headHair',
+      'headNose',
+      'headMouth',
+      'headBrows',
+      'headEars',
+      'headEyes',
+      'headPiercing',
+      'headBeard',
     ] as const) {
       expect(b[k], k).toBe(a[k]);
     }
+    // the body size survives the percent's one-decimal rounding
+    expect(Math.abs(b.bodyScale - a.bodyScale), 'bodyScale').toBeLessThanOrEqual(0.0005);
     // colours survive within the encoder's one-decimal rounding
     for (const k of [
       'skinHue',
@@ -179,12 +223,20 @@ describe('design code round trip', () => {
       'lashHue',
       'lashSat',
       'lashLight',
+      'browHue',
+      'browSat',
+      'browLight',
     ] as const) {
       const eps = k.endsWith('Hue') ? 0.05 : 0.0005;
       expect(Math.abs(b[k] - a[k]), k).toBeLessThanOrEqual(eps);
     }
     for (const k of FACE_SLIDERS) {
       expect(Math.abs((b.face[k] ?? 0) - (a.face[k] ?? 0)), `face.${k}`).toBeLessThanOrEqual(0.005);
+    }
+    for (const k of WOC_HEAD_MORPH_KEYS) {
+      expect(Math.abs(b.headShape[k] - a.headShape[k]), `headShape.${k}`).toBeLessThanOrEqual(
+        0.005,
+      );
     }
   };
 
@@ -239,6 +291,149 @@ describe('design code round trip', () => {
     expect(r.appearance.face.nose).toBeCloseTo(-0.4, 3);
     expect(r.appearance.face.jaw).toBeCloseTo(0.2, 3);
     expect(r.appearance.face.chin).toBe(0);
+  });
+
+  it('round-trips a WOC head-builder look, piercing, brow colour and shape included', () => {
+    const app = normalizeAppearance({
+      ...DEFAULT_APPEARANCE,
+      gender: 'female',
+      headHair: 'ponytail',
+      headNose: 'button',
+      headMouth: 'relaxed',
+      headBrows: 'straight',
+      headEars: 'pointed',
+      headEyes: 'hooded',
+      headPiercing: 'septum',
+      browHue: 210,
+      browSat: 0.3,
+      browLight: 0.62,
+      // the chin at its own rest value (0.65): unmoved, so not written
+      headShape: { eyeSpacing: -0.4, eyeSize: 0.25, eyeTilt: 0, browHeight: 1, chinWidth: 0.65 },
+    });
+    const code = encodeDesignCode(app);
+    expect(code).toContain('headhair=ponytail');
+    expect(code).toContain('headpiercing=septum');
+    expect(code).toContain('browcol=210/30/62');
+    // only the moved sliders, camelCase kept for readability
+    expect(code).toContain('headshape=eyeSpacing:-40,eyeSize:25,browHeight:100');
+    const r = decodeOk(code);
+    expectSameLook(app, r.appearance);
+    expect(r.coerced).toEqual([]);
+    expect(r.ignored).toEqual([]);
+  });
+
+  it('keeps a code minted before the head builder importing, on the default head', () => {
+    // the exact shape of a shipped code: every field this build knew then
+    const old =
+      'WOC1; body=male; skin=27/46/68; eyes=almond; eyecol=28/42/18; brows=soft; ' +
+      'mouth=neutral; ears=round; lashes=off; lashcol=26/50/24; face=nose:-40; hair=crew; ' +
+      'haircol=0/80/40; beard=none; outfit=classic; lips=none; blush=none; shadow=none; ' +
+      'earrings=none; jewel=default';
+    const r = decodeOk(old);
+    expect(r.ignored).toEqual([]);
+    expect(r.coerced).toEqual([]);
+    expect(r.appearance.face.nose).toBeCloseTo(-0.4, 3);
+    expect(r.appearance.headHair).toBe(DEFAULT_APPEARANCE.headHair);
+    expect(r.appearance.headPiercing).toBe('none');
+    // every face control on the authored face: each its OWN rest value (the
+    // chin 0.65), never a blanket 0
+    for (const k of WOC_HEAD_MORPH_KEYS) {
+      expect(r.appearance.headShape[k], k).toBe(WOC_HEAD_MORPH_RANGE[k].def);
+    }
+    // no beard or size field: the male body's own beard and the authored size
+    expect(r.appearance.headBeard).toBe(WOC_HEAD_TYPES.a.defaults.beard);
+    expect(r.appearance.bodyScale).toBe(1);
+    // the code has no opinion on the brows, so they follow ITS hair (red),
+    // not the default brown
+    expect(r.appearance.browHue).toBe(0);
+    expect(r.appearance.browSat).toBeCloseTo(0.8, 6);
+    expect(r.appearance.browLight).toBeCloseTo(0.4, 6);
+  });
+
+  it('keeps a code minted before the beard, chin and size importing cleanly', () => {
+    // yesterday's shape: the head builder's first nine ids, a four-control shape
+    const old =
+      'WOC1; body=female; headhair=braid; headnose=button; headbrows=soft; ' +
+      'headpiercing=none; browcol=26/50/24; headshape=eyeSize:20';
+    const r = decodeOk(old);
+    expect(r.ignored).toEqual([]);
+    expect(r.coerced).toEqual([]);
+    expect(r.appearance.headShape.eyeSize).toBeCloseTo(0.2, 6);
+    // the chin it never named sits on the authored chin, not on 0
+    expect(r.appearance.headShape.chinWidth).toBe(0.65);
+    // a Type B code with no beard field comes out clean shaven (her own
+    // type's default), not wearing Type A's boxed beard
+    expect(r.appearance.headBeard).toBe('none');
+    expect(r.appearance.bodyScale).toBe(1);
+  });
+
+  it('round-trips the beard, the chin and the body size', () => {
+    const app = normalizeAppearance({
+      ...DEFAULT_APPEARANCE,
+      headBeard: 'handlebar',
+      headShape: { ...DEFAULT_APPEARANCE.headShape, chinWidth: 0 },
+      bodyScale: 0.95,
+    });
+    const code = encodeDesignCode(app);
+    expect(code).toContain('headbeard=handlebar');
+    // the chin moved off its rest value, so it is written, 0 included
+    expect(code).toContain('headshape=chinWidth:0');
+    expect(code).toContain('size=95');
+    const r = decodeOk(code);
+    expect(r.coerced).toEqual([]);
+    expect(r.appearance.headBeard).toBe('handlebar');
+    expect(r.appearance.headShape.chinWidth).toBe(0);
+    expect(r.appearance.bodyScale).toBeCloseTo(0.95, 6);
+    // the authored look writes neither: the chin rests, the size is 100
+    const plain = encodeDesignCode(DEFAULT_APPEARANCE);
+    expect(plain).toContain('headshape=;');
+    expect(plain).toContain('size=100');
+    expect(plain).toContain('headbeard=boxed');
+  });
+
+  it('clamps an out-of-range size and reports it; a damaged one fails the paste', () => {
+    const small = decodeOk('WOC1; size=50');
+    expect(small.appearance.bodyScale).toBe(0.95);
+    expect(small.coerced).toEqual(['size']);
+    const tall = decodeOk('WOC1; size=180');
+    expect(tall.appearance.bodyScale).toBe(1.05);
+    expect(tall.coerced).toEqual(['size']);
+    const fine = decodeOk('WOC1; size=97.5');
+    expect(fine.appearance.bodyScale).toBeCloseTo(0.975, 6);
+    expect(fine.coerced).toEqual([]);
+    expect(decodeOk('WOC1; headbeard=wizard').coerced).toEqual(['headbeard']);
+    for (const bad of ['WOC1; size=', 'WOC1; size=big', 'WOC1; size=-80', 'WOC1; size=8e1']) {
+      expect(decodeDesignCode(bad), bad).toEqual({ ok: false, reason: 'malformed' });
+    }
+  });
+
+  it("keeps another head type's pick: it resolves per body at render time", () => {
+    // Type B's bob on a Type A (male) body: a stored value, not damage
+    const r = decodeOk('WOC1; body=male; headhair=bob; headnose=button');
+    expect(r.coerced).toEqual([]);
+    expect(r.appearance.headHair).toBe('bob');
+    expect(r.appearance.headNose).toBe('button');
+    // The premise: the bob is still Type B's alone. The ponytail this case first
+    // used is fitted onto the Type A head now (like the braid and the waves), and
+    // a style both heads offer is simply drawn, so nothing falls back.
+    expect(WOC_HEAD_TYPES.a.slots.hair.map((x) => x.id)).not.toContain('bob');
+    const drawn = resolveWocHeadLook('a', { hair: r.appearance.headHair });
+    expect(drawn.hair).toBe(WOC_HEAD_TYPES.a.defaults.hair);
+  });
+
+  it('coerces an unknown head pick and reports an unknown head-shape slider', () => {
+    const r = decodeOk('WOC1; headhair=dreadlocks; headpiercing=tongue; headshape=wings:50');
+    expect(r.coerced).toEqual(['headhair', 'headpiercing']);
+    expect(r.ignored).toEqual(['headshape.wings']);
+    expect(r.appearance.headHair).toBe(DEFAULT_APPEARANCE.headHair);
+    expect(r.appearance.headPiercing).toBe('none');
+  });
+
+  it('reads head-shape slider names case-insensitively and clamps past the rails', () => {
+    const r = decodeOk('WOC1; headshape=EYESPACING:30,eyetilt:-250');
+    expect(r.appearance.headShape.eyeSpacing).toBeCloseTo(0.3, 6);
+    expect(r.appearance.headShape.eyeTilt).toBe(-1);
+    expect(r.coerced).toEqual(['headshape']);
   });
 
   it('never carries body proportions: a code neither exports nor imports them', () => {
@@ -328,6 +523,9 @@ describe('design code failures', () => {
     ['WOC1; hair=semi-bald', 'malformed'],
     ['WOC1; lashes=maybe', 'malformed'],
     ['WOC1; face=nose-40', 'malformed'],
+    ['WOC1; headshape=eyeTilt=20', 'malformed'],
+    ['WOC1; browcol=1/2', 'malformed'],
+    ['WOC1; headhair=semi-bald', 'malformed'],
   ] as const)('rejects %j with reason %s', (code, reason) => {
     expect(decodeDesignCode(code)).toEqual({ ok: false, reason });
   });

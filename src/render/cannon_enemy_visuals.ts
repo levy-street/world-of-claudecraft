@@ -53,7 +53,11 @@ export class CannonEnemyVisuals {
 
   private createSlot(kind: CannonEnemyKind) {
     const look = CANNON_ENEMY_LOOKS[kind];
-    const actor = new CharacterVisual(look.key, 0x963c32);
+    // a crowd in the world: a class body's armor at the crowd's detail, never the local
+    // player's own (woc_armor_core.ts wocArmorTierFor)
+    const actor = new CharacterVisual(look.key, 0x963c32, 0, null, null, null, null, {
+      wocArmorDetail: 'crowd',
+    });
     actor.setShadow(false);
     actor.setProxyShadow(false);
     const root = new THREE.Group();

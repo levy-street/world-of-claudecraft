@@ -43,3 +43,15 @@ export function shadowProxyShown(
 ): boolean {
   return wanted && farLodReady(hasFarMesh, compilePending);
 }
+
+/**
+ * A body still waiting for its head draws NOTHING: not its rig, not its far mesh, not its
+ * shadow proxy. A WOC base file ends at the neck (its head is a streamed pack), so the body
+ * alone would be a headless figure; it stays undrawn until its head is live
+ * (woc_head_stream_core.ts wocHeadAwaited decides `awaitingHead`, which a failed head file
+ * ends, so a dead request never hides a character). Every other body passes false and is
+ * exactly `shown`.
+ */
+export function bodyDrawn(shown: boolean, awaitingHead: boolean): boolean {
+  return shown && !awaitingHead;
+}

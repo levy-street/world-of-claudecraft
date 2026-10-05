@@ -125,4 +125,23 @@ describe('far-LOD bake uv survival', () => {
     expect(uv).toBeDefined();
     expect(uv?.count).toBe(6);
   });
+
+  it('carries position, normal and uv and nothing else, on a fixed rig and on a composed body', async () => {
+    const assets = await loadAssets();
+    // The merged head's per-vertex slot is the WOC far bake's own addition
+    // (woc_far_bake.ts, after the shared bake): neither of these two paths gains
+    // an attribute for it.
+    const attributes = (geo: THREE.BufferGeometry | null | undefined): string[] =>
+      Object.keys(geo?.attributes ?? {}).sort();
+    expect(attributes(assets.prepareVisual('mob_mushroom_pixie').idleGeo)).toEqual([
+      'normal',
+      'position',
+      'uv',
+    ]);
+    expect(attributes(assets.modularFarBake(MODULAR_WARRIOR_KEY, DEFAULT_LOOK)?.geo)).toEqual([
+      'normal',
+      'position',
+      'uv',
+    ]);
+  });
 });

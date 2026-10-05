@@ -156,7 +156,17 @@ export class UnitPortraitPainter {
     if (subject.kind === 'mech') this.drawMech(canvas, subject.chroma, subject.cls);
     else if (subject.kind === 'composed')
       this.drawModularPlayer(canvas, subject.visualKey, subject.look, subject.cls, subject.skin);
-    else this.drawClass(canvas, subject.cls, subject.skin);
+    else {
+      // The body in the player's OWN head (a WOC body keys its portrait on the
+      // head look). While that capture runs, the default headshot for the body
+      // is the interim if it is already cached: a PEEK, so the wait never
+      // starts a second capture of a face about to be replaced.
+      const url =
+        visualPortraitDataUrl(subject.visualKey, subject.skin, 'headshot', subject.head) ??
+        (subject.head ? cachedPortraitDataUrl(subject.visualKey, subject.skin) : null);
+      if (url) this.drawHeadshot(canvas, url);
+      else this.drawCrest(canvas, `class_${subject.cls}`);
+    }
   }
 
   /**

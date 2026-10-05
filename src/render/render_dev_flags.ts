@@ -46,6 +46,12 @@
 //                  per-batch reach hide (gather_nodes.ts); off restores the
 //                  (zone, type, z-band) key with every batch drawn to the far
 //                  plane, the A/B arm for pricing the coarser key
+//   wocmerge    - the WOC bodies' merged draws in the world view
+//                 (characters/woc_head_merge.ts); off keeps every head piece
+//                 its own draw, the before arm of a crowd capture
+//   woclod      - the WOC bodies' coarser geometry levels (characters/woc_lod_core.ts,
+//                 assets.ts wocBuildLod); off draws level 0 for everyone, the
+//                 far bakes included, the before arm of a crowd capture
 
 // Beside the ?<name>=off layer switches, knobs and modes with their own accessors:
 //   ?bladesectors=<n> - how many ways each blade-grass pool's slot grid is split

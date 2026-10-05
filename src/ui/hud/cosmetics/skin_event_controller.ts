@@ -1,5 +1,5 @@
-import { skinCount } from '../../../render/characters/manifest';
-import { playerPortraitDataUrl, visualPortraitDataUrl } from '../../../render/characters/portrait';
+import { type BodyPick, playerVisualKey, skinCount } from '../../../render/characters/manifest';
+import { visualPortraitDataUrl } from '../../../render/characters/portrait';
 import { SKIN_RANKS, skinRankOrder } from '../../../sim/content/skins';
 import type { PlayerClass, SkinRank } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
@@ -17,7 +17,10 @@ import {
   skinEventLandingAngle,
 } from './skin_event_model';
 
-type SkinEventWorld = Pick<IWorld, 'cfg' | 'claimEventSkin'>;
+type SkinEventWorld = Pick<IWorld, 'cfg' | 'claimEventSkin'> & {
+  /** The creation pick selects a WOC class's body file (playerVisualKey). */
+  readonly player?: { readonly modularAppearance?: BodyPick } | null;
+};
 
 export interface SkinEventPreviewPort {
   mount(container: HTMLElement, playerClass: PlayerClass, skin: number, previewKey?: string): void;
@@ -141,15 +144,24 @@ export class SkinEventController {
   }
 
   private choiceThumb(index: number): string | null {
+    const world = this.deps.world();
     return this.mode === 'mech'
       ? visualPortraitDataUrl('player_mech', index)
-      : playerPortraitDataUrl(this.deps.world().cfg.playerClass, index);
+      : visualPortraitDataUrl(
+          playerVisualKey(world.cfg.playerClass, world.player?.modularAppearance),
+          index,
+        );
   }
 
   private refreshChoiceThumb(visualKey: string, skin: number): void {
     if (!this.element?.classList.contains('open') || this.revealTimer !== null) return;
     const expectedKey =
-      this.mode === 'mech' ? 'player_mech' : `player_${this.deps.world().cfg.playerClass}`;
+      this.mode === 'mech'
+        ? 'player_mech'
+        : playerVisualKey(
+            this.deps.world().cfg.playerClass,
+            this.deps.world().player?.modularAppearance,
+          );
     if (visualKey !== expectedKey) return;
     const button = this.element.querySelector<HTMLButtonElement>(`.se-swatch[data-skin="${skin}"]`);
     const url = button ? this.choiceThumb(skin) : null;
@@ -204,7 +216,9 @@ export class SkinEventController {
     const playerClass = world.cfg.playerClass;
     const granted = skinRankOrder(rank);
     const mech = this.mode === 'mech';
-    const previewKey = mech ? 'player_mech' : `player_${playerClass}`;
+    const previewKey = mech
+      ? 'player_mech'
+      : playerVisualKey(playerClass, this.deps.world().player?.modularAppearance);
     const element = this.root();
     const title = esc(t('skinEvent.title'));
     const rankName = skinRankName(rank);

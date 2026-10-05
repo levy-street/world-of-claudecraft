@@ -12,6 +12,7 @@
 // after a skin swap.
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
+import { landWocBodies } from './helpers/woc_streamed';
 
 // player_paladin has no `show` allowlist (so a plain, non-skinned stub mesh
 // stays visible through assembleModel's accessory filter) and a real
@@ -46,7 +47,9 @@ function stubSourceClip(name: string): THREE.AnimationClip {
 function stubGltf() {
   const scene = new THREE.Group();
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshStandardMaterial());
-  mesh.name = 'body';
+  // The WOC paladin restricts the skin atlas to the manifest's body node
+  // (userData.skinAtlasTarget), so the stub body carries that name.
+  mesh.name = 'Character_Body';
   scene.add(mesh);
   const emissive = new THREE.Mesh(
     new THREE.BoxGeometry(0.2, 0.2, 0.2),
@@ -89,10 +92,17 @@ describe('far-LOD mesh follows the selected body skin', () => {
       ),
       releaseGltf: vi.fn(),
     }));
-    const { charactersReady, prepareVisual } = await import('../src/render/characters/assets');
+    const assets = await import('../src/render/characters/assets');
+    const { charactersReady, prepareVisual } = assets;
     await charactersReady();
+    await landWocBodies(assets, [VISUAL_KEY]);
     const { CharacterVisual } = await import('../src/render/characters/visual');
     const { SKINS } = await import('../src/render/characters/manifest');
+    // The WOC bodies ship no chromas (every class SKINS row is null since the
+    // 2026-09-18 sets), and this rule is about the far mesh following an
+    // alternate atlas, so lend the row the KayKit paladin's old alt atlas: the
+    // mocked loader tags textures by url and never reads the file.
+    SKINS[VISUAL_KEY] = [null, 'textures/skins/paladin/alt_a.png'];
 
     const altSkinUrl = SKINS[VISUAL_KEY]?.[1];
     expect(altSkinUrl).toBeTruthy();
@@ -108,7 +118,9 @@ describe('far-LOD mesh follows the selected body skin', () => {
       let map: THREE.Texture | null = null;
       visual.root.traverse((o) => {
         const mesh = o as THREE.Mesh;
-        if (mesh.isMesh && mesh.userData.bodyMesh) {
+        // A WOC rig marks the meshes the atlas may repaint; the stub's emissive
+        // box is a body mesh the override deliberately skips.
+        if (mesh.isMesh && mesh.userData.bodyMesh && mesh.userData.skinAtlasTarget !== false) {
           map = (mesh.material as THREE.MeshStandardMaterial).map;
         }
       });

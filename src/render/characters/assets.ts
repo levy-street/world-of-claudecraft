@@ -20,15 +20,18 @@ import {
   offhandMirrorsWeaponSkin,
 } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
+import { applyGeometryLod, type GeometryLodLevel } from '../assets/geometry_lod';
 import { retryDelayMs as gltfRetryDelayMs } from '../assets/load_retry';
 import { loadGltf, loadKtx2Texture, loadTexture } from '../assets/loader';
 import { registerPreload } from '../assets/preload';
 import { recordBuildSpan, timeBuildSpan } from '../build_spans';
 import { addRimGlow, EMISSIVE_GLOW, GFX, type GfxSettings } from '../gfx';
+import { renderLayerDisabled } from '../render_dev_flags';
 import { applyRiggedWornDetail, applySurfaceDetail } from '../worn_stone';
 import { type ArmorDyeSpec, attachArmorDye } from './armor_dye';
-import { backGripFor } from './back_grips';
+import { backGripFor, slotToChestScale } from './back_grips';
 import { dequantizeAttribute } from './dequantize_attribute';
+import { applyEnvSheen } from './env_sheen';
 import { coalesceFarBakeGroups, farBakeGroupRanges } from './far_bake_groups_core';
 import { padMissingUv } from './far_bake_uv_pad';
 import {
@@ -110,6 +113,21 @@ import { prepareWarriorAbilityClips } from './warrior_ability_clips';
 import { prepareWarriorActionFallbacks } from './warrior_action_fallbacks';
 import { variantGripTransform, WEAPON_GRIP_OVERRIDES } from './weapon_grip';
 import { markOwnedWeaponSkinMaterials } from './weapon_skin_materials';
+import { WOC_ANATOMY_TOP, type WocArmorDetail, wocArmorTierFor } from './woc_armor_core';
+import { attachWocArmorAtBuild, type WocArmorFile } from './woc_armor_dressing';
+import { clearIdleWocArmorMerges } from './woc_armor_merge';
+import { prepareWocArmorTier, wocArmorResidentScenes } from './woc_armor_packs';
+import { clearIdleWocHeadMerges } from './woc_head_merge';
+import { ensureWocHeadCoreForFit, hangWocHeadAtBuild } from './woc_head_packs';
+import { WOC_FAR_BAKE_LOD, wocLodLevelFor } from './woc_lod_core';
+import { applyWocPartVisibility, resolveWocPartNodes } from './woc_parts';
+import {
+  wocAnatomyParts,
+  wocDefaultAppearance,
+  wocDefaultWorn,
+  wocMergePartition,
+  wocVisibleParts,
+} from './woc_parts_core';
 
 const DEFAULT_TINT_STRENGTH = 0.4;
 
@@ -378,6 +396,17 @@ const SWAP_OFFHAND_TAG = 'swapOffhandHolder';
 // sheathe toggle can strip and re-attach the full held set at once.
 const HELD_PROP_TAG = 'heldPropHolder';
 
+/** Every held-prop holder currently mounted on a rig (both hands, sheathed or
+ *  drawn): the roots setWeaponsStowed/attachProp mint, found by their tag so a
+ *  caller never depends on which attach call minted which. */
+export function heldPropHolders(root: THREE.Object3D): THREE.Object3D[] {
+  const holders: THREE.Object3D[] = [];
+  root.traverse((o) => {
+    if (o.userData[HELD_PROP_TAG]) holders.push(o);
+  });
+  return holders;
+}
+
 // Sheathed props re-parent onto the chest bone (shared KayKit Rig_Medium).
 const STOW_BONE = 'chest';
 
@@ -422,6 +451,7 @@ function attachProp(
   att: AttachDef,
   swapKind: 'mainhand' | 'offhand' | null = null,
   stowed = false,
+  rightShoulderSheathe = false,
 ): THREE.Object3D {
   const gltf = resolvedGltf(att.url);
   const payload = flattenWeaponScene(cloneSkinned(gltf.scene));
@@ -460,9 +490,16 @@ function attachProp(
   // space; the caller resolved the chest bone) but keep the SCALE the normal
   // grip pass just computed, so variant-pack size clamps carry over.
   if (stowed && isHandslotBone(att.bone)) {
-    const grip = backGripFor(kaykitAccessoryFor(att.url), handSide(att.bone));
-    payload.position.set(...grip.position);
+    const grip = backGripFor(kaykitAccessoryFor(att.url), handSide(att.bone), rightShoulderSheathe);
+    // The table is chest space on an unscaled-slot skeleton; a rig whose slot
+    // bones carry the weapon-size compensation (the WOC warrior) folds that
+    // ratio into both the offset and the prop, so the sheathed prop keeps the
+    // world size it had in the hand and sits against the back.
+    const slot = resolveBone(root, att.bone);
+    const k = slot ? slotToChestScale(slot, bone) : 1;
+    payload.position.set(grip.position[0] * k, grip.position[1] * k, grip.position[2] * k);
     payload.quaternion.set(...grip.quaternion);
+    if (k !== 1) payload.scale.multiplyScalar(k);
   }
   bone.add(payload);
   return payload;
@@ -671,6 +708,44 @@ export function ensureCharacterUrl(url: string | null | undefined): void {
   void prepareCharacterUrl(url).catch(() => undefined);
 }
 
+/** Whether every file a visual key builds from (its body GLB and animation
+ *  libraries) is resident, kicking the fetch of any on-demand one that is not
+ *  (`fetch: false` only asks): a WOC base or animation library streams on
+ *  first use (woc_armor_core.ts), so a host that builds a CharacterVisual
+ *  directly (the creation preview) asks here first and retries on
+ *  onCharacterAssetReady instead of throwing. */
+export function visualAssetsResident(key: string, fetch = true): boolean {
+  const def = VISUALS[key];
+  if (!def) return false;
+  // a WOC body's head core streams beside its base (never gating the build)
+  if (fetch && def.wocCharacter) ensureWocHeadCoreForFit(def.wocCharacter.fit);
+  let resident = true;
+  for (const url of [def.url, ...(def.animUrls ?? [])]) {
+    if (characterAssetResident(url)) continue;
+    resident = false;
+    if (fetch && (streamedUrlSet.has(url) || lazyOnDemandUrls.has(url))) ensureCharacterUrl(url);
+  }
+  return resident;
+}
+
+/** Whether a WOC visual key waits ONLY on its split base or animation library
+ *  still streaming (a designed wait, never a missed preload), kicking their
+ *  fetch: a world view skips the frame quietly and tries again the next one.
+ *  Every other lazy body keeps the logged miss (issue 2079). */
+export function visualAwaitsStream(key: string, fetch = true): boolean {
+  const def = VISUALS[key];
+  if (!def?.wocCharacter) return false;
+  if (fetch) ensureWocHeadCoreForFit(def.wocCharacter.fit);
+  let waiting = false;
+  for (const url of [def.url, ...(def.animUrls ?? [])]) {
+    if (characterAssetResident(url)) continue;
+    if (!streamedUrlSet.has(url) && !lazyOnDemandUrls.has(url)) return false;
+    if (fetch) ensureCharacterUrl(url);
+    waiting = true;
+  }
+  return waiting;
+}
+
 /** A streamed url that has not arrived yet must degrade, never throw: return
  *  null so the caller falls back (base weapon / no ranged override) and kick
  *  the fetch so the cosmetic appears on the next swap or view rebuild. */
@@ -763,6 +838,9 @@ export async function prepareCharacterProfileAssets(target: Readonly<GfxSettings
     (url) => !nextStreamedSet.has(url),
   );
   await Promise.all(requiredGltf.map(prepareCharacterUrl));
+  // the armor sets in memory, at the tier every character of the new profile draws first
+  // (woc_armor_core.ts: low, or the medium file the local player's high pack is laid over)
+  await prepareWocArmorTier(wocArmorTierFor(target, 'crowd'));
   const nextSignature = nextStreamedUrls.join('|');
   if (nextSignature !== streamedUrls.join('|')) streamedStarted = false;
   streamedUrls = nextStreamedUrls;
@@ -838,6 +916,17 @@ export function ensureSkinTexture(key: string, skinIndex: number): Promise<void>
     pending.push(loadSkinTexInto(emisUrl, skinEmisTexByUrl));
   if (pending.length === 0) return null;
   return Promise.all(pending).then(() => undefined);
+}
+
+/** A body atlas by URL (a WOC manifest's under-armor swap), or null until the
+ *  KTX2 is resident; the same cache the skin atlases live in. */
+export function atlasTextureByUrl(url: string): THREE.Texture | null {
+  return skinTexByUrl.get(url) ?? null;
+}
+
+/** Ensure a body atlas named by URL is loaded (null = already resident). */
+export function ensureAtlasByUrl(url: string): Promise<void> | null {
+  return skinTexByUrl.has(url) ? null : loadSkinTexInto(url, skinTexByUrl);
 }
 
 /** Resolved emissive (glow) map for a visual key + skin index, or null when the
@@ -953,7 +1042,9 @@ export function mountAssetsReady(visualKey: string): boolean {
 
 /** Dev-channel residency accounting sources (see assets/residency_budget.ts). */
 export function characterResidencySources(): { parsedScenes: THREE.Object3D[] } {
-  return { parsedScenes: [...gltfByUrl.values()].map((g) => g.scene) };
+  return {
+    parsedScenes: [...[...gltfByUrl.values()].map((g) => g.scene), ...wocArmorResidentScenes()],
+  };
 }
 
 function resolvedGltf(url: string): GLTF {
@@ -994,11 +1085,21 @@ function optimizedScene(url: string): THREE.Object3D {
     }
   }
   const root = cloneSkinned(source.scene);
-  mergeSkinnedParts(root, animatedNodeNames(clips));
+  // A WOC body merges by material WITHIN a manifest part only: the female
+  // pack's boots and gauntlets share one leather material, and a merge across
+  // them would weld two independently toggleable slots into one draw.
+  const woc = Object.values(VISUALS).find((d) => d.url === url && d.wocCharacter)?.wocCharacter;
+  mergeSkinnedParts(
+    root,
+    animatedNodeNames(clips),
+    woc ? { partitionKey: (mesh) => wocMergePartition(woc, mesh.name) } : undefined,
+  );
   // After the merge, so only what the merge could not fold is rebaked, and
-  // before the palette pass, which reads the (now single) skeleton.
+  // before the palette pass, which reads the (now single) skeleton. A WOC base
+  // keeps its whole palette: streamed armor binds to bones the body never
+  // fetches (woc_armor_bind.ts).
   shareRigSkeleton(root);
-  optimizeSkinGpuLayout(root);
+  optimizeSkinGpuLayout(root, { keepPalette: woc !== undefined });
   primeSkinnedSortSpheres(root);
   optimizedSceneCache.set(url, root);
   return root;
@@ -1467,6 +1568,31 @@ export interface AssembleOptions {
    *  the maps it would otherwise mint are the two procedural textures a
    *  peer's first sight of an unseen style already pays in pieces. */
   skipDecals?: boolean;
+  /** The WOC armor files to attach (woc_armor_dressing.ts). Omitted: the manifest's own sets
+   *  at the live tier, the default kit (whatever is resident; the rest streams). Empty: the
+   *  bare body, for a throwaway whose bake must never pin a set's materials. */
+  wocArmor?: readonly WocArmorFile[];
+  /** How much armor texture detail a WOC body draws (woc_armor_core.ts wocArmorTierFor).
+   *  Omitted: full, the local player's own character and every body built directly (a
+   *  preview, a portrait). The world view passes crowd for every other character
+   *  (createCharacterVisual): the medium file where full detail draws high. */
+  wocArmorDetail?: WocArmorDetail;
+  /** The geometry level a WOC body draws (woc_lod_core.ts). Omitted: the level its detail
+   *  draws under the live graphics profile (wocBuildLod). The far LOD bakes pass `far`. */
+  wocLod?: GeometryLodLevel;
+  /** False: a SPECULATIVE build (the zone prewarm's rig of every class) uses only the
+   *  streamed files already resident and fetches none, so warming shaders never pulls a
+   *  body or an armor set nobody wears. */
+  fetchStreamed?: boolean;
+}
+
+/** The geometry level a WOC body of these options draws (woc_lod_core.ts): an explicit
+ *  `wocLod`, else its detail's under the live graphics profile. One answer for the model
+ *  assembleModel builds and the dressings the visual keeps attaching to it. `?woclod=off`
+ *  draws level 0 everywhere, the far bakes included: the before arm of a crowd capture. */
+export function wocBuildLod(opts?: AssembleOptions): GeometryLodLevel {
+  if (renderLayerDisabled('woclod')) return 'lod0';
+  return opts?.wocLod ?? wocLodLevelFor(GFX, opts?.wocArmorDetail);
 }
 
 /** The compose's decal step: both decals attached, or deferred (see
@@ -1694,10 +1820,37 @@ export function assembleModel(
   }
   const root = cloneSkinned(optimizedScene(def.url));
   shareRigSkeleton(root);
+  // A WOC body's armor is its own streamed file per set, bound to this clone's
+  // skeleton by bone name (woc_armor_bind.ts); attached before the passes below
+  // so its pieces are tagged and dressed with the rest of the body.
+  if (def.wocCharacter) {
+    // every piece at the geometry level this body draws, the body first (woc_lod_core.ts)
+    const lod = wocBuildLod(opts);
+    if (lod !== 'lod0') applyGeometryLod(root, lod);
+    attachWocArmorAtBuild(
+      root,
+      def.wocCharacter,
+      opts?.wocArmor,
+      opts?.fetchStreamed !== false,
+      opts?.wocArmorDetail,
+      lod,
+    );
+    // the modular head's resident files (woc_head_packs.ts), hidden until the visual
+    // dresses it
+    hangWocHeadAtBuild(root, def.wocCharacter.fit, lod);
+  }
   // tag the character's own meshes (body + accessories share one texture atlas)
-  // so a skin override hits them but not the separate weapons attached below
+  // so a skin override hits them but not the separate weapons attached below.
+  // A WOC body carries one atlas per part (face, hair, each armor piece), so
+  // an atlas override there targets ONLY the skinned body nodes (and the
+  // merged mesh rig_merge minted from them), never the face or the plate.
+  const wocAtlasTargets = def.wocCharacter
+    ? new Set(def.wocCharacter.baseNodes.flatMap((n) => [n, `${n}_bodymerged`]))
+    : null;
   root.traverse((o) => {
-    if ((o as THREE.Mesh).isMesh) o.userData.bodyMesh = true;
+    if (!(o as THREE.Mesh).isMesh) return;
+    o.userData.bodyMesh = true;
+    if (wocAtlasTargets) o.userData.skinAtlasTarget = wocAtlasTargets.has(o.name);
   });
   // KayKit characters ship every accessory mesh visible; keep only the kit
   if (def.show) {
@@ -1708,6 +1861,18 @@ export function assembleModel(
         o.visible = false;
       }
     });
+  }
+  // A WOC modular body ships every part on the one rig: dress it in the
+  // manifest's default kit here (portraits, previews and the shared far bake
+  // wear it), and CharacterVisual re-dresses a live entity from its worn
+  // equipment on its first diff (setWocEquipment), a visibility flip per part.
+  if (def.wocCharacter) {
+    const manifest = def.wocCharacter;
+    applyWocPartVisibility(
+      resolveWocPartNodes(root, manifest),
+      manifest,
+      wocVisibleParts(manifest, wocDefaultAppearance(manifest), wocDefaultWorn(manifest)),
+    );
   }
   // Two-state prop mobs (the dragonkin egg) ship BOTH state meshes at the
   // origin: seed the ALIVE state (hide the corpse shell); CharacterVisual's
@@ -1791,7 +1956,7 @@ function attachAllProps(
     const bone = attachTargetBone(root, att, stowed);
     if (!bone) continue;
     const swapKind = isOffhandSwap ? 'offhand' : isWeapon ? 'mainhand' : null;
-    const payload = attachProp(root, bone, att, swapKind, stowed);
+    const payload = attachProp(root, bone, att, swapKind, stowed, def.rightShoulderSheathe);
     if ((isWeapon && mainhandSkinned) || (isOffhandSwap && offhandSkinned)) payloads.push(payload);
   }
   return payloads;
@@ -1833,7 +1998,7 @@ export function setHeldWeapon(
       : (rangedSkinAttachDef(base, weaponSkinId) ?? base);
     const bone = attachTargetBone(root, att, stowed);
     if (!bone) continue;
-    payloads.push(attachProp(root, bone, att, 'mainhand', stowed));
+    payloads.push(attachProp(root, bone, att, 'mainhand', stowed, def.rightShoulderSheathe));
   }
   return payloads;
 }
@@ -1863,7 +2028,7 @@ export function setHeldOffhand(
   const att = offhandAttachDef(base, offhandItemId, weaponSkinId);
   if (!att) return [];
   const bone = attachTargetBone(root, att, stowed);
-  return bone ? [attachProp(root, bone, att, 'offhand', stowed)] : [];
+  return bone ? [attachProp(root, bone, att, 'offhand', stowed, def.rightShoulderSheathe)] : [];
 }
 
 /** A standalone display clone of a weapon-skin model for the armory inspect
@@ -2078,6 +2243,8 @@ export function tintedMaterial(
   // AUTHORED_HELD_MODELS prop for a weapon): keeps its shipped response
   // instead of the kit polish, and takes the low-tier floor through its map.
   authored = false,
+  // VisualDef.envSheen (body only): the non-metal share of the sky reflection.
+  envSheen?: number,
 ): THREE.Material {
   // A source with no color property (the weapon-skin fresnel shell's
   // ShaderMaterial) has nothing this factory can tint, lift, or polish.
@@ -2099,7 +2266,7 @@ export function tintedMaterial(
   // suffix, whichever derived first would hand its Lambert clone to the
   // other, and the low-tier emissiveMap would land on a player form
   // (tests/tinted_material.test.ts pins the partition).
-  const key = `${src.uuid}|${tint ?? 'n'}|${tint === null ? 0 : strength}|${GFX.standardMaterials ? 's' : 'l'}|${skinTex ? skinTex.uuid : 'n'}|${emisTex ? emisTex.uuid : 'n'}|${role}|${mount}|${shapeKey}|${selfIllumination}|${envMapIntensity ?? 'n'}|${matte ? 'm' : 'n'}|${authored ? 'a' : 'n'}`;
+  const key = `${src.uuid}|${tint ?? 'n'}|${tint === null ? 0 : strength}|${GFX.standardMaterials ? 's' : 'l'}|${skinTex ? skinTex.uuid : 'n'}|${emisTex ? emisTex.uuid : 'n'}|${role}|${mount}|${shapeKey}|${selfIllumination}|${envMapIntensity ?? 'n'}|${matte ? 'm' : 'n'}|${authored ? 'a' : 'n'}|${envSheen ?? 'n'}`;
   const build = () =>
     buildTintedClone(
       src as THREE.MeshStandardMaterial,
@@ -2112,6 +2279,7 @@ export function tintedMaterial(
       envMapIntensity,
       matte,
       authored,
+      envSheen,
     );
   if (claims) {
     if (claims.has(key)) {
@@ -2146,6 +2314,7 @@ function buildTintedClone(
   envMapIntensity?: number,
   matte = false,
   authored = false,
+  envSheen?: number,
 ): THREE.Material {
   const src: THREE.Material = s;
   let mat: THREE.MeshStandardMaterial | THREE.MeshLambertMaterial | THREE.MeshBasicMaterial;
@@ -2261,6 +2430,7 @@ function buildTintedClone(
       std.needsUpdate = true;
     }
     if (envMapIntensity !== undefined) std.envMapIntensity = envMapIntensity;
+    if (envSheen !== undefined) applyEnvSheen(std, envSheen);
   }
   if (!GFX.standardMaterials) applyLowReadabilityLift(mat, role, authored);
   return mat;
@@ -2269,6 +2439,11 @@ function buildTintedClone(
 function tintFor(def: VisualDef, entityColor: number): number | null {
   if (def.tint === undefined) return null;
   return def.tint === 'entity' ? entityColor : def.tint;
+}
+
+/** Original materials for a same-kind compile twin; never a prior atlas tint. */
+export function characterSourceMaterials(mesh: THREE.Mesh): THREE.Material | THREE.Material[] {
+  return sourceMaterials.get(mesh) ?? mesh.material;
 }
 
 /** Swap every mesh material in an assembled clone for the shared tinted
@@ -2310,9 +2485,11 @@ export function applyMaterials(
     // tagged it for an AUTHORED_HELD_MODELS prop.
     const authored =
       role === 'weapon' ? mesh.userData.authoredSurface === true : (def.authoredAtlas ?? false);
-    // skin/emissive override only touches the character's own atlas meshes, not weapons
-    const sk = skinTex && mesh.userData.bodyMesh ? skinTex : null;
-    const em = emisTex && mesh.userData.bodyMesh ? emisTex : null;
+    // skin/emissive override only touches the character's own atlas meshes, not
+    // weapons (and on a WOC body only its skinned body nodes: skinAtlasTarget)
+    const atlasTarget = mesh.userData.skinAtlasTarget ?? mesh.userData.bodyMesh;
+    const sk = skinTex && atlasTarget ? skinTex : null;
+    const em = emisTex && atlasTarget ? emisTex : null;
     const shapeKey = meshProgramShapeKey(mesh);
     if (Array.isArray(source)) {
       mesh.material = source.map((m) =>
@@ -2330,6 +2507,7 @@ export function applyMaterials(
           role === 'body' ? def.envMapIntensity : undefined,
           role === 'body' && (def.matte ?? false),
           authored,
+          role === 'body' ? def.envSheen : undefined,
         ),
       );
     } else {
@@ -2347,6 +2525,7 @@ export function applyMaterials(
         role === 'body' ? def.envMapIntensity : undefined,
         role === 'body' && (def.matte ?? false),
         authored,
+        role === 'body' ? def.envSheen : undefined,
       );
     }
     attachSharedDepthMaterials(mesh, mesh.material);
@@ -2387,6 +2566,7 @@ export function tintedFarMaterials(
       isBody[i] ? def.envMapIntensity : undefined,
       isBody[i] && (def.matte ?? false),
       isBody[i] && (def.authoredAtlas ?? false),
+      isBody[i] ? def.envSheen : undefined,
     ),
   );
 }
@@ -2432,6 +2612,8 @@ export function resetCharacterProfileCaches(): void {
   optimizedSceneCache.clear();
   matCache.reset();
   clearSharedDepthMaterials();
+  clearIdleWocHeadMerges();
+  clearIdleWocArmorMerges();
   prepared.clear();
 }
 
@@ -2466,7 +2648,9 @@ export function prepareVisual(key: string): PreparedVisual {
   // The modular paladin mirrors the classic clip map (attackByAbility includes
   // the synthesized Verdict and Sweep names), so it needs the same synthesis:
   // its animUrls lead with the class GLB, which supplies both source clips.
-  if (key === 'player_paladin' || key === modularVisualKey('paladin')) {
+  // The WOC paladin body ships its own vocabulary and no KayKit source clips:
+  // the synthesis is the KayKit paladin's (and its modular derivative's).
+  if ((key === 'player_paladin' || key === modularVisualKey('paladin')) && !def.wocCharacter) {
     const verdictBase = clips.get(PALADIN_SYNTHESIZED_CLIP_SOURCES[PALADIN_TEMPLARS_VERDICT_CLIP]);
     if (!verdictBase) throw new Error('Paladin Templar Verdict requires 2H_Melee_Attack_Chop');
     clips.set(PALADIN_TEMPLARS_VERDICT_CLIP, createPaladinTemplarsVerdictClip(verdictBase));
@@ -2477,13 +2661,24 @@ export function prepareVisual(key: string): PreparedVisual {
     clips.set(PALADIN_BASTION_SWEEP_CLIP, createPaladinBastionSweepClip(sweepBase));
   }
 
-  prepareWarriorAbilityClips(key, clips, def.clips.attackByAbility);
-  prepareWarriorActionFallbacks(key, clips, gltf.scene);
+  // These prepared gestures use KayKit axes and cannot bind to the WOC rig.
+  if (!def.wocCharacter) {
+    prepareWarriorAbilityClips(key, clips, def.clips.attackByAbility);
+    prepareWarriorActionFallbacks(key, clips, gltf.scene);
+  }
   // Pose a throwaway clone mid-idle, measure it, and bake the static mesh. No
   // face decals on a modular throwaway: the flatten drops them (farBakeMeshes),
   // and the default look's scalp decal would otherwise be minted and thrown
   // away per modular key, on the far crossing that first prepares the key.
-  const temp = assembleModel(def, null, null, null, { skipDecals: true });
+  // A WOC body is measured and baked bare (wocArmor: []): the cached far bake of a
+  // key lives as long as the session, and must never pin a streamed set's
+  // materials (woc_far_bake.ts bakes the worn kit, and holds its files). Its far
+  // level is what the bake freezes (the measure reads every vertex either way).
+  const temp = assembleModel(def, null, null, null, {
+    skipDecals: true,
+    wocArmor: [],
+    wocLod: WOC_FAR_BAKE_LOD,
+  });
   const idle = clips.get(def.clips.idle);
   if (idle) {
     const mixer = new THREE.AnimationMixer(temp);
@@ -2500,20 +2695,51 @@ export function prepareVisual(key: string): PreparedVisual {
     temp.updateMatrixWorld(true);
   }
 
-  // body bounds from the skinned meshes only (weapons would skew the height)
+  // A WOC modular body is measured as its canonical anatomy: the skinned body
+  // with every armor piece hidden, up to the pinned crown of its fit
+  // (WOC_ANATOMY_TOP, applied to the bounds below), and at REST: the mixer's
+  // stop above put the rig's own transforms back, and the world update just
+  // below reads them. The base file ends at the
+  // neck (its head is a streamed pack, hung hidden until its look draws), so
+  // the body alone would size the character to its neck and stretch it a fifth
+  // too tall; measuring a hung head or the worn kit would let a hairstyle or a
+  // tall helm shrink the whole body. The default kit is put back before the
+  // far bake below.
+  const wocParts = def.wocCharacter ? resolveWocPartNodes(temp, def.wocCharacter) : null;
+  if (def.wocCharacter && wocParts) {
+    applyWocPartVisibility(wocParts, def.wocCharacter, wocAnatomyParts(def.wocCharacter));
+    temp.updateMatrixWorld(true);
+  }
+  // body bounds from the skinned meshes only (weapons would skew the height);
+  // a WOC body also counts its rigid anatomy parts, never a held prop
   const bounds = new THREE.Box3();
   const v = new THREE.Vector3();
   temp.traverse((o) => {
-    const sm = o as THREE.SkinnedMesh;
-    if (!sm.isSkinnedMesh || !meshChainVisible(sm, temp)) return;
-    const pos = sm.geometry.getAttribute('position');
+    const mesh = o as THREE.Mesh;
+    if (!mesh.isMesh || !meshChainVisible(mesh, temp)) return;
+    const sm = mesh as unknown as THREE.SkinnedMesh;
+    if (!sm.isSkinnedMesh && !(def.wocCharacter && !mesh.userData.weaponMesh)) return;
+    const pos = mesh.geometry.getAttribute('position') as THREE.BufferAttribute | undefined;
+    if (!pos) return;
     for (let i = 0; i < pos.count; i++) {
-      v.fromBufferAttribute(pos as THREE.BufferAttribute, i);
-      sm.applyBoneTransform(i, v);
-      v.applyMatrix4(sm.matrixWorld);
+      v.fromBufferAttribute(pos, i);
+      if (sm.isSkinnedMesh) sm.applyBoneTransform(i, v);
+      v.applyMatrix4(mesh.matrixWorld);
       bounds.expandByPoint(v);
     }
   });
+  if (def.wocCharacter && !bounds.isEmpty()) {
+    bounds.max.y = Math.max(bounds.max.y, WOC_ANATOMY_TOP[def.wocCharacter.fit]);
+  }
+  if (def.wocCharacter && wocParts) {
+    const manifest = def.wocCharacter;
+    applyWocPartVisibility(
+      wocParts,
+      manifest,
+      wocVisibleParts(manifest, wocDefaultAppearance(manifest), wocDefaultWorn(manifest)),
+    );
+    temp.updateMatrixWorld(true);
+  }
   // Non-skinned models (procedural form GLBs animated by node transforms, with no
   // skeleton — e.g. the chicken-cow Travel Form) contribute no skinned meshes, so
   // the pass above leaves bounds empty; rawHeight then collapses to 1e-3 and
@@ -2816,10 +3042,12 @@ function meshChainVisible(o: THREE.Object3D, stopAt: THREE.Object3D): boolean {
  *  facts)`. Two slots therefore resolve alike for EVERY look exactly when their
  *  source material and their name facts agree, which is what this key states.
  *  (The temp's material identity already implies the source's: the recolour
- *  cache keys on the source uuid.) */
-function farBakeGroupKey(mesh: THREE.Mesh): string {
+ *  cache keys on the source uuid.) A WOC bake adds the head-tint partition on
+ *  top of the default, and answers ONE key of its own for every head piece its
+ *  merged head material can draw (woc_far_bake.ts). */
+export function farBakeGroupKey(mesh: THREE.Mesh): string {
   const mat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
-  return `${mat?.uuid ?? 'none'}|${mesh.userData.bodyMesh ? 1 : 0}`;
+  return `${mat?.uuid ?? 'none'}|${(mesh.userData.skinAtlasTarget ?? mesh.userData.bodyMesh) ? 1 : 0}`;
 }
 
 /** The composed arm of the key above. */
@@ -2842,6 +3070,10 @@ export interface StaticPoseBake {
    *  the group draws. The identity map before coalescing, and the indirection a
    *  composed body resolves its per-character materials through. */
   slots: number[];
+  /** Every index of the `meshes` walk in the order its vertices sit in `geo`
+   *  (groups concatenated): how a caller that adds a per-vertex value after the
+   *  bake (the WOC far head's slot attribute) finds one source mesh's vertices. */
+  order: number[];
 }
 
 /** Bake every visible mesh of a posed clone into one static BufferGeometry
@@ -2851,7 +3083,7 @@ export interface StaticPoseBake {
  *  mesh" the crowd LOD counts on really is close to one draw instead of a group
  *  per source primitive. Groups keep the order of their FIRST member, so the
  *  slot map stays readable and a bake is deterministic. */
-function bakeStaticPose(
+export function bakeStaticPose(
   norm: THREE.Matrix4,
   meshes: THREE.Mesh[],
   groupKey: (mesh: THREE.Mesh) => string = farBakeGroupKey,
@@ -2899,10 +3131,10 @@ function bakeStaticPose(
     geos.push(out);
     // GLTFLoader emits one Mesh per primitive — materials are never arrays here
     mats.push(Array.isArray(mesh.material) ? mesh.material[0] : mesh.material);
-    isBody.push(!!mesh.userData.bodyMesh);
+    isBody.push(!!(mesh.userData.skinAtlasTarget ?? mesh.userData.bodyMesh));
   }
 
-  if (geos.length === 0) return { geo: null, mats: [], isBody: [], slots: [] };
+  if (geos.length === 0) return { geo: null, mats: [], isBody: [], slots: [], order: [] };
   // uv presence must agree for merging. PAD the parts that lack one rather
   // than dropping it everywhere: a composed body always carries colour-only
   // face parts (head, ears, eyes, mouth, brows) with no uv at all, and the old
@@ -2923,7 +3155,7 @@ function bakeStaticPose(
           grouping.mergeOrder.map((i) => geos[i]),
           true,
         );
-  if (!geo) return { geo: null, mats: [], isBody: [], slots: [] };
+  if (!geo) return { geo: null, mats: [], isBody: [], slots: [], order: [] };
   // mergeGeometries emitted one group per INPUT (and a single geometry keeps
   // whatever groups it arrived with); rewrite them as one group per coalesced
   // run, whose material index is the run's own index.
@@ -2937,5 +3169,6 @@ function bakeStaticPose(
     mats: grouping.slots.map((i) => mats[i]),
     isBody: grouping.slots.map((i) => isBody[i]),
     slots: [...grouping.slots],
+    order: [...grouping.mergeOrder],
   };
 }

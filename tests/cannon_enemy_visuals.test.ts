@@ -7,6 +7,7 @@ import { type CannonEnemyKind, TICK_RATE, type VehicleSession } from '../src/sim
 
 interface MockActor {
   key: string;
+  opts: unknown;
   root: THREE.Group;
   update: ReturnType<typeof vi.fn>;
   dispose: ReturnType<typeof vi.fn>;
@@ -20,7 +21,12 @@ vi.mock('../src/render/characters', () => ({
     dispose = vi.fn();
     setShadow = vi.fn();
     setProxyShadow = vi.fn();
-    constructor(readonly key: string) {
+    readonly opts: unknown;
+    constructor(
+      readonly key: string,
+      ...rest: unknown[]
+    ) {
+      this.opts = rest[6];
       if (actors.made.length === actors.failAt) throw new Error('model assembly failed');
       actors.made.push(this);
     }
@@ -88,6 +94,8 @@ describe('existing animated cannon enemy models', () => {
       'npc_knight',
       'mob_bruiser',
     ]);
+    // a crowd in the world: the armored actors' class body draws the crowd's armor detail
+    for (const actor of actors.made) expect(actor.opts).toEqual({ wocArmorDetail: 'crowd' });
     const s = session();
     s.encounter.enemies = [1, 2].map((id) => ({
       id,

@@ -691,6 +691,36 @@ describe('FctPainter.stagedShape: the damage spawn seam', () => {
     expect(painter.stagedShape(harvest, 10, hit())?.delaySec).toBe(FURY_AUDIO.red_harvest.times[1]);
   });
 
+  it("holds a melee swing's number for the blade contact the renderer recorded (contact staging)", () => {
+    const facet = recordingFacet();
+    const swing = { sourceId: 7, abilityId: null };
+    const other = { sourceId: 8, abilityId: null };
+    const painter = new FctPainter(
+      facet.writers,
+      fakeEl('div') as unknown as HTMLElement,
+      () => ({ x: 0, y: 0, behind: false }),
+      () => 1,
+      {
+        cap: 8,
+        doc: fakeDoc,
+        random: () => 0.5,
+        contactDelaySec: (s) => (s === swing ? 0.125 : 0),
+      },
+    );
+    expect(painter.stagedShape(swing, 10, hit())?.delaySec).toBe(0.125);
+    // an event with no recorded contact floats at once, exactly as before
+    expect(painter.stagedShape(other, 10, hit())?.delaySec).toBeUndefined();
+    // an authored beat and a contact: the later one wins (Red Harvest's first beat, 0.15)
+    const both = new FctPainter(
+      facet.writers,
+      fakeEl('div') as unknown as HTMLElement,
+      () => ({ x: 0, y: 0, behind: false }),
+      () => 1,
+      { cap: 8, doc: fakeDoc, random: () => 0.5, contactDelaySec: () => 0.1 },
+    );
+    expect(both.stagedShape(harvest, 10, hit())?.delaySec).toBe(FURY_AUDIO.red_harvest.times[0]);
+  });
+
   it('keeps the avoidance words on the same beats as the blades that whiffed', () => {
     const painter = shapePainter();
     const miss = hit({ damageKind: 'dodge', isPlayerSource: false, isPlayerTarget: true });

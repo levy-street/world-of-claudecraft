@@ -9751,6 +9751,168 @@ export const fr_CA: EnTranslations = {
     "body": "Corps",
     "genderMale": "Homme",
     "genderFemale": "Femme",
+    "bodyTypeA": "Type A",
+    "bodyTypeB": "Type B",
+    "wocHead": {
+      "hair": {
+        "swept": "Swept",
+        "long": "Long",
+        "mohawk": "Mohawk",
+        "quiff": "Cropped Quiff",
+        "undercut": "Undercut",
+        "topknot": "Topknot",
+        "shoulder": "Shoulder Length",
+        "bald": "Bald",
+        "waves": "Waves",
+        "ponytail": "High Ponytail",
+        "braid": "Braid",
+        "bob": "Bob",
+        "crown": "Braided Crown",
+        "twins": "Twin Braids",
+        "curls": "Curly Updo"
+      },
+      "beard": {
+        "none": "Clean Shaven",
+        "moustache": "Moustache",
+        "handlebar": "Handlebar",
+        "goatee": "Goatee",
+        "chin": "Chin Beard",
+        "boxed": "Boxed Beard",
+        "long": "Long Beard",
+        "chops": "Mutton Chops",
+        "chinstrap": "Chinstrap"
+      },
+      "nose": {
+        "default": "Classic",
+        "broad": "Broad",
+        "aquiline": "Aquiline",
+        "button": "Button",
+        "soft": "Soft"
+      },
+      "mouth": {
+        "default": "Classic",
+        "full": "Full",
+        "smirk": "Smirk",
+        "relaxed": "Relaxed",
+        "cupids_bow": "Cupid's Bow",
+        "narrow": "Narrow",
+        "thin": "Thin",
+        "rounded": "Rounded"
+      },
+      "brows": {
+        "default": "Classic",
+        "slim": "Slim",
+        "arched": "Arched",
+        "soft": "Soft",
+        "straight": "Straight",
+        "relaxed": "Relaxed",
+        "soft_arch": "Soft Arch",
+        "rounded": "Rounded"
+      },
+      "ears": {
+        "default": "Classic",
+        "large": "Large",
+        "pointed": "Pointed",
+        "round": "Round"
+      },
+      "eyes": {
+        "default": "Classic",
+        "almond": "Almond",
+        "hooded": "Hooded"
+      }
+    },
+    "wocBuilder": {
+      "cat": {
+        "bodyType": "Body Type",
+        "skinTone": "Skin Tone",
+        "face": "Face",
+        "eyesBrows": "Eyes and Brows",
+        "eyeColor": "Eye Color",
+        "hairstyle": "Hairstyle",
+        "facialHair": "Facial Hair",
+        "hairColor": "Hair Color",
+        "browColor": "Eyebrow Color",
+        "piercings": "Piercings"
+      },
+      "section": {
+        "hair": "Hairstyle",
+        "nose": "Nose",
+        "mouth": "Lips",
+        "brows": "Brow Shape",
+        "ears": "Ears",
+        "eyes": "Eye Shape"
+      },
+      "slider": {
+        "eyeSpacing": "Eye Spacing",
+        "eyeSize": "Eye Size",
+        "eyeTilt": "Eye Tilt",
+        "browHeight": "Brow Height",
+        "chinWidth": "Chin Width",
+        "bodyScale": "Body Size"
+      },
+      "bodyGlyph": {
+        "a": "A",
+        "b": "B"
+      },
+      "piercing": {
+        "none": "None",
+        "lobes": "Lobes",
+        "ears": "Full Ears",
+        "brow": "Brow",
+        "nose": "Nostril",
+        "septum": "Septum",
+        "lip": "Lip",
+        "full": "Full Set"
+      },
+      "skin": {
+        "porcelain": "Porcelain",
+        "ivory": "Ivory",
+        "rose": "Rose",
+        "peach": "Peach",
+        "fair": "Fair",
+        "beige": "Beige",
+        "sand": "Sand",
+        "honey": "Honey",
+        "olive": "Olive",
+        "caramel": "Caramel",
+        "tan": "Tan",
+        "bronze": "Bronze",
+        "chestnut": "Chestnut",
+        "umber": "Umber",
+        "mahogany": "Mahogany",
+        "ebony": "Ebony"
+      },
+      "eye": {
+        "brown": "Brown",
+        "darkBrown": "Dark Brown",
+        "hazel": "Hazel",
+        "amber": "Amber",
+        "green": "Green",
+        "teal": "Teal",
+        "blue": "Blue",
+        "paleBlue": "Pale Blue",
+        "grey": "Grey",
+        "violet": "Violet"
+      },
+      "hairColor": {
+        "platinum": "Platinum",
+        "blonde": "Blonde",
+        "golden": "Golden",
+        "copper": "Copper",
+        "red": "Red",
+        "auburn": "Auburn",
+        "lightBrown": "Light Brown",
+        "brown": "Brown",
+        "darkBrown": "Dark Brown",
+        "black": "Black",
+        "silver": "Silver",
+        "white": "White"
+      },
+      "matchHair": "Match Hair",
+      "resetDefault": "Reset to Default",
+      "customColorAria": "Pick a custom color",
+      "customSkinAria": "Pick a custom skin tone"
+    },
     "hair": "Cheveux",
     "brows": "Sourcils",
     "skinTone": "Teint de peau",

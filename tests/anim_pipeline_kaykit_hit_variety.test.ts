@@ -106,11 +106,17 @@ describe('KayKit hit-reaction stagger (issue #2889 round 2)', () => {
 
     // Spot-check the two entries that already had an animUrls array before
     // this task (must be APPENDED to, not overwritten).
-    const hunterBlock = manifestBlock('player_hunter: swims({', 'player_rogue: swims({');
+    const hunterBlock = manifestBlock(
+      'export const KAYKIT_HUNTER: VisualDef = swims({',
+      'export const KAYKIT_ROGUE',
+    );
     expect(hunterBlock).toContain('bow_anims.glb');
     expect(hunterBlock).toContain('ranger_hit_variety_anims.glb');
 
-    const mageBlock = manifestBlock('player_mage: swims({', 'player_warlock: swims({');
+    const mageBlock = manifestBlock(
+      'export const KAYKIT_MAGE: VisualDef = swims({',
+      'export const KAYKIT_WARLOCK',
+    );
     expect(mageBlock).toContain('mage_ability_anims.glb');
     expect(mageBlock).toContain('mage_hit_variety_anims.glb');
 

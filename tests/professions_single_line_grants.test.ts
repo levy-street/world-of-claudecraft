@@ -71,7 +71,11 @@ interface GrantLineHarness {
     craftSkills: Record<string, number>;
     gatheringProficiency: Record<string, number>;
   };
-  renderer: { handleEvent: ReturnType<typeof vi.fn> };
+  renderer: {
+    handleEvent: ReturnType<typeof vi.fn>;
+    // the event sound waits for a swing's blade contact (contact_queue.ts); none here
+    atContact: (ev: unknown, fn: () => void) => void;
+  };
   playEventSfx: ReturnType<typeof vi.fn>;
   meters: { onEvent: ReturnType<typeof vi.fn> };
   isNythraxisEvent: ReturnType<typeof vi.fn>;
@@ -99,7 +103,7 @@ function makeHud(): GrantLineHarness {
     craftSkills: {},
     gatheringProficiency: {},
   };
-  hud.renderer = { handleEvent: vi.fn() };
+  hud.renderer = { handleEvent: vi.fn(), atContact: (_ev: unknown, fn: () => void) => fn() };
   hud.playEventSfx = vi.fn();
   hud.meters = { onEvent: vi.fn() };
   hud.isNythraxisEvent = vi.fn(() => false);

@@ -700,7 +700,13 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '164b585f770570b773faa8e35c466bcd4ab2840a6572507aa9528bc52572cbc5';
+  // Re-minted at the release/v0.45.0 sync into the character branch (WOC split character
+  // files, blade-contact timing; remint_polish_provenance.mjs on the merged tree): the merged
+  // renderer leaf matches neither parent. No capture was retaken.
+  // Re-minted for the WOC crowd-draw work: the renderer leaf hands the background work
+  // queue to each character visual with the far bake gate. No capture was retaken.
+  // Re-minted for WOC armor detail: the renderer leaf passes each view whether it is the local player's own. No capture was retaken.
+  'dbef51d97275023192d5102bb30d9dde5cfb9f6840b3d7ba7646806aa81f75b5';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

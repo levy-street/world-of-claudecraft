@@ -203,6 +203,12 @@ rules, all CI-enforced:
 - **Never `dispose()` a shared GLB-cache texture that may still be drawn.** With the
   KTX2 mip release (`assets/ktx2_mip_release.ts`) its CPU data is full-shape stubs and
   its restore source drops on dispose, so a later re-upload renders black.
+- **A geometry's coarser levels are index lists in `assets/geometry_lod.ts`** (filled by
+  the loader's `WOC_lod` plugin, `assets/woc_lod_plugin.ts`). A level draws through a
+  variant over the source's own attribute objects, which goes with its source's dispose
+  and never alone; a transform keeps a level only through `carryGeometryLod` or
+  `mergeGeometryLod`, so anything else derived from a geometry carries no levels (it draws
+  the one index it was given). The WOC flows that use them are in `characters/CLAUDE.md`.
 - **`preload.ts` is the boot gate, and it has TWO lanes.** `startGame` awaits
   `assetsReady()` either way, so `build*()` still reads resolved assets
   synchronously; the lanes differ only in WHEN the fetch starts. A new module-load
