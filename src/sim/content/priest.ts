@@ -117,7 +117,7 @@ export const PRIEST_ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 20,
     cost: 250,
     castTime: 7,
-    cooldown: 300,
+    cooldown: 0,
     range: 0,
     school: 'holy',
     requiresTarget: false,

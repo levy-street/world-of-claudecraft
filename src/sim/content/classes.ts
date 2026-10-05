@@ -2641,8 +2641,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // requiresOutOfCombat is a real gate: the engaged pass (combat/engaged_combat.ts)
   // holds everyone a live mob still carries on its hate table, and an engaged boss
   // holds every nearby member of its attackers' group, so a backline caster cannot
-  // drop combat mid-fight by idling through the 5s linger. The five-minute cooldown
-  // is the throttle across encounters (and after a wipe, once the boss resets).
+  // drop combat mid-fight by idling through the 5s linger.
   collective_reversal: {
     id: 'collective_reversal',
     name: 'Collective Reversal',
@@ -2651,7 +2650,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     specs: ['arcane'],
     cost: 250,
     castTime: 7,
-    cooldown: 300,
+    cooldown: 0,
     range: 0,
     school: 'arcane',
     requiresTarget: false,
@@ -4875,12 +4874,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Heal a friendly target for $d, then jump to up to 2 allies within 12 yards. Each jump heals for 50% of the previous target. Each ally reached consumes your remaining Mending Current and immediately heals for 125% of the amount consumed. The initial heal increases with Spell Power. (Spiritcall signature)',
   },
-  // ---- Spiritmend out-of-combat mass resurrection, the Chronomancy
-  // collective_reversal twin. requiresOutOfCombat is a real gate (the engaged pass in
-  // combat/engaged_combat.ts holds a backline healer in combat for the whole
-  // encounter), and the five-minute cooldown is the throttle across encounters. Kept
-  // equal to collective_reversal so the two mass rezzes cannot be played against each
-  // other; both are pinned to that equality.
+  // ---- Spiritmend out-of-combat mass resurrection. Like Collective Reversal,
+  // the combat hold prevents casting during an active encounter.
   ancestor_return: {
     id: 'ancestor_return',
     name: "Ancestors' Return",
@@ -4889,7 +4884,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 20,
     cost: 250,
     castTime: 7,
-    cooldown: 300,
+    cooldown: 0,
     range: 0,
     school: 'nature',
     requiresTarget: false,
@@ -8141,8 +8136,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       'Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for $b% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom.',
   },
 
-  // Groveheart resurrection parity: the combat single revive and the
-  // out-of-combat group revive share the five-minute healer cooldown.
+  // Groveheart combat resurrection retains its five-minute cooldown.
   wildwake: {
     id: 'wildwake',
     name: 'Wildwake',
@@ -8169,7 +8163,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 20,
     cost: 250,
     castTime: 7,
-    cooldown: 300,
+    cooldown: 0,
     range: 0,
     school: 'nature',
     requiresTarget: false,
