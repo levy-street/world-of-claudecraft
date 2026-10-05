@@ -11,6 +11,7 @@ import {
   abilityDisplayDescription,
   abilityEffectText,
   abilityScalesWithWeapon,
+  formatAbilityNumber,
 } from '../src/ui/ability_description';
 
 const FORGEBREAKER: WeaponInfo = { min: 77, max: 115, speed: 3.6 };
@@ -170,6 +171,30 @@ describe('Tolling Hammer tooltip', () => {
     expect(raid.damage).not.toBe(leveling.damage);
     expect(raid.text).toContain(raid.damage);
     expect(raid.text).not.toMatch(/\{\w+\}|\$d/);
+  });
+
+  it.each([
+    ['a leveling green', GREEN, 140],
+    ['Forgebreaker', FORGEBREAKER, 537],
+  ])('prints the exact lowest and highest combat hit with %s', (_label, weapon, attackPower) => {
+    function hit(maximum: boolean): number {
+      const { sim, target } = setup(weapon, attackPower);
+      sim.player.spellPower = 50;
+      sim.rng.range = (min, max) => (maximum ? max : min);
+      const before = target.hp;
+      sim.ctx.runEffects(
+        sim.player,
+        required(sim.ctx.players.get(sim.player.id)),
+        target,
+        hammer(sim),
+      );
+      return before - target.hp;
+    }
+    const { sim } = setup(weapon, attackPower);
+    sim.player.spellPower = 50;
+    const res = hammer(sim);
+    const shown = abilityEffectText(res, abilityScalingOf(sim.player));
+    expect(shown).toBe(`${formatAbilityNumber(hit(false))} to ${formatAbilityNumber(hit(true))}`);
   });
 
   it('names weapon damage, Attack Power, and Spell Power as the scaling stats', () => {
