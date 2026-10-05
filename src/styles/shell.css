@@ -3663,7 +3663,7 @@
       box-shadow 0.12s,
       color 0.12s;
   }
-  .skin-swatch:hover,
+  .skin-swatch:where(:not(:disabled)):hover,
   .skin-swatch:focus-visible {
     border-color: rgba(255, 255, 255, 0.5);
     color: #fff;
@@ -3672,6 +3672,16 @@
     border-color: var(--class-color, #33c1f1);
     color: #fff;
     box-shadow: 0 0 9px var(--class-color, #33c1f1);
+  }
+  /* A swatch that takes no click right now (the Combat Mech while
+     COMBAT_MECH_WEARABLE in src/ui/hud/cosmetics is off). It stays in the row,
+     greyed, so the owner still sees the chroma. The hover lift above is
+     withheld through :where, which leaves an enabled swatch's specificity as
+     it was. */
+  .skin-swatch:disabled {
+    cursor: var(--cursor-arrow);
+    opacity: 0.4;
+    filter: grayscale(0.7);
   }
   .skin-unequip-btn {
     min-height: 34px;
