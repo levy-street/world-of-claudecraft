@@ -8855,6 +8855,8 @@ function scaleEffect(
         ...eff,
         min: Math.round(eff.min * dmgMult + flat),
         max: Math.round(eff.max * dmgMult + flat),
+        // The weapon share scales like weaponStrike's weaponMult above.
+        ...(eff.weaponMult === undefined ? {} : { weaponMult: eff.weaponMult * dmgMult }),
       };
     case 'dot': {
       // A directPct rider snapshots an already-scaled direct hit; scaling the

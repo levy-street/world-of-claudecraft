@@ -12173,6 +12173,7 @@ export const de_DE: EnTranslations = {
       "edictExplosion": "Während Aufstieg aktiv ist, verursacht die Explosion {damage} physischen Schaden im Umkreis von {radius} m, verringert bei mehr als {cap} Zielen. Dieser Schaden steigt mit der Angriffskraft.",
       "edictDamage": "Schlägt für {weaponPercent}% Waffenschaden plus {damage} physischen Schaden zu. Waffenschaden schließt Angriffskraft ein.",
       "verdictDamage": "Letztes Edikt detoniert für {verdictSingleDamage} heiligen Schaden. Morgensturz detoniert für {verdictAreaDamage} heiligen Schaden im Umkreis von {verdictAreaRadius} m, verringert bei mehr als {verdictAreaCap} Zielen. Keine der beiden Detonationen skaliert mit der Zaubermacht. Nur ein Gegner kann dein Mal tragen.",
+      "weaponScaledSpell": "Damage increases with your weapon damage, Attack Power, and Spell Power.",
       "finisherDamage": "{base} plus {perCombo} pro Combopunkt"
     },
     "resources": {

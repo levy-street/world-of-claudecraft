@@ -12173,6 +12173,7 @@ export const pt_BR: EnTranslations = {
       "edictExplosion": "Enquanto a Ascensão estiver ativa, a explosão causa {damage} de dano Físico num raio de {radius} m, reduzido acima de {cap} alvos. Esse dano aumenta com o poder de ataque.",
       "edictDamage": "Golpeia causando {weaponPercent}% de dano da arma mais {damage} de dano Físico. O dano da arma inclui o poder de ataque.",
       "verdictDamage": "O Édito Final detona causando {verdictSingleDamage} de dano Sagrado. A Queda da Alvorada detona causando {verdictAreaDamage} de dano Sagrado num raio de {verdictAreaRadius} m, reduzido acima de {verdictAreaCap} alvos. Nenhuma das detonações é ampliada pelo poder de feitiço. Apenas um inimigo pode carregar sua marca.",
+      "weaponScaledSpell": "Damage increases with your weapon damage, Attack Power, and Spell Power.",
       "finisherDamage": "{base} mais {perCombo} por ponto de combo"
     },
     "resources": {

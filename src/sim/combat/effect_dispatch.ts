@@ -276,6 +276,7 @@ import { applyTemporalHourglass } from './temporal_hourglass';
 import { warlockFearBreakThreshold } from './warlock_fear';
 import { applyBlacktideReturnSpeed } from './warlock_talents';
 import { placeOrRecallUmbralAnchor } from './warlock_utility';
+import { weaponScaledDamageRange } from './weapon_scaled_damage';
 
 export { SWEEP_MULT } from './area_echo';
 
@@ -859,7 +860,19 @@ export function runEffects(
           // Shatter (combat/frost_mage.ts): bonus spell crit chance against a
           // target this cast treats as frozen. 0 for everyone else.
           (isSpell && frozen.treatAsFrozen ? SHATTER_CRIT_BONUS : 0);
-        let dmg = ctx.rng.range(eff.min, eff.max);
+        // A weaponMult effect (Tolling Hammer) widens the authored range by a
+        // share of the weapon hit; one draw either way, so the stream is unchanged.
+        const rollRange =
+          eff.weaponMult === undefined
+            ? eff
+            : weaponScaledDamageRange(
+                eff.min,
+                eff.max,
+                p.weapon,
+                ctx.effectiveAttackPower(p),
+                eff.weaponMult,
+              );
+        let dmg = ctx.rng.range(rollRange.min, rollRange.max);
         // The flat rider scales with the school's rating: Spell Power for spells,
         // Ranged AP for hunter shots, melee Attack Power for physical specials.
         // abilityScalingPower picks the rating; powerScale (inside directHitBonus)

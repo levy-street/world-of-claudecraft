@@ -12173,6 +12173,7 @@ export const it_IT: EnTranslations = {
       "edictExplosion": "Mentre Ascensione è attiva, l'esplosione infligge {damage} danni Fisici entro {radius} m, ridotti oltre {cap} bersagli. Questo danno aumenta con la potenza d'attacco.",
       "edictDamage": "Colpisce per il {weaponPercent}% del danno dell'arma più {damage} danni Fisici. Il danno dell'arma include la potenza d'attacco.",
       "verdictDamage": "Editto Finale detona infliggendo {verdictSingleDamage} danni Sacri. Caduta dell'Alba detona infliggendo {verdictAreaDamage} danni Sacri entro {verdictAreaRadius} m, ridotti oltre {verdictAreaCap} bersagli. Nessuna delle due detonazioni aumenta con il Potere Magico. Solo un nemico alla volta può portare il tuo marchio.",
+      "weaponScaledSpell": "Damage increases with your weapon damage, Attack Power, and Spell Power.",
       "finisherDamage": "{base} più {perCombo} per punto combo"
     },
     "resources": {

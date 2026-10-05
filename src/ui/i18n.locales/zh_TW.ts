@@ -425,6 +425,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '神聖昇華生效期間，爆炸對 {radius} 公尺內造成 {damage} 點物理傷害，超過 {cap} 個目標時傷害降低。此傷害隨攻擊強度提升。',
   'abilityUi.tooltip.verdictDamage':
     '終末敕令引爆造成 {verdictSingleDamage} 點神聖傷害。黎明墜擊引爆對 {verdictAreaRadius} 公尺內造成 {verdictAreaDamage} 點神聖傷害，超過 {verdictAreaCap} 個目標時傷害降低。兩種引爆都不會隨法術強度提升。你的印記同一時間只能存在於一名敵人身上。',
+  'abilityUi.tooltip.weaponScaledSpell': '傷害會隨你的武器傷害、攻擊強度與法術強度提升。',
   'hud.core.deathRecap': '死亡回顧',
   'hud.core.deathRecapClose': '關閉',
   'hud.core.deathRecapCrit': '爆擊',

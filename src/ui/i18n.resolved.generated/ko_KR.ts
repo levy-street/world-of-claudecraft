@@ -12173,6 +12173,7 @@ export const ko_KR: EnTranslations = {
       "edictExplosion": "신성한 승천이 활성화된 동안 폭발이 {radius}m 이내의 적에게 {damage}의 물리 피해를 입히며, 대상이 {cap}명을 넘으면 피해가 감소합니다. 이 피해는 공격력에 따라 증가합니다.",
       "edictDamage": "무기 피해의 {weaponPercent}%에 {damage}의 물리 피해를 더해 입힙니다. 무기 피해에는 공격력이 포함됩니다.",
       "verdictDamage": "최후의 칙령이 폭발해 {verdictSingleDamage}의 신성 피해를 입힙니다. 여명 강하는 폭발해 {verdictAreaRadius}m 이내의 적에게 {verdictAreaDamage}의 신성 피해를 입히며, 대상이 {verdictAreaCap}명을 넘으면 피해가 감소합니다. 두 폭발 모두 주문력에 따라 증가하지 않습니다. 한 번에 적 하나만 표식을 지닐 수 있습니다.",
+      "weaponScaledSpell": "피해량은 무기 피해, 공격력, 주문력에 따라 증가합니다.",
       "finisherDamage": "기본 {base}, 연계 점수당 {perCombo}"
     },
     "resources": {

@@ -518,8 +518,9 @@ describe('Paladin core abilities', () => {
     expect(resolve(retribution, 'faithforged_guard').effects).toEqual([
       { type: 'selfBuff', kind: 'paladin_debt_of_light', value: 210, duration: 8 },
     ]);
+    // Weapon-scaled: Ascension's 1.3 reaches the weapon share (0.72 x 1.2 x 1.3).
     expect(resolve(retribution, 'hammer_of_wrath').effects).toEqual([
-      { type: 'directDamage', min: 234, max: 281 },
+      { type: 'directDamage', min: 0, max: 0, weaponMult: expect.closeTo(1.1232, 10) },
     ]);
     expect(resolve(retribution, 'guardian_covenant').effects).toEqual([
       { type: 'buffTarget', kind: 'buff_dr', value: 0.3, duration: 8 },

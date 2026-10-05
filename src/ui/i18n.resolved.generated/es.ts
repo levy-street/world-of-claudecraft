@@ -12173,6 +12173,7 @@ export const es: EnTranslations = {
       "edictExplosion": "Mientras Ascensión esté activa, la explosión inflige {damage} de daño Físico en un radio de {radius} m, reducido más allá de {cap} objetivos. Este daño aumenta con el poder de ataque.",
       "edictDamage": "Golpea infligiendo un {weaponPercent}% del daño del arma más {damage} de daño Físico. El daño del arma incluye el poder de ataque.",
       "verdictDamage": "Edicto Final detona infligiendo {verdictSingleDamage} de daño Sagrado. Caída del Alba detona infligiendo {verdictAreaDamage} de daño Sagrado en un radio de {verdictAreaRadius} m, reducido más allá de {verdictAreaCap} objetivos. Ninguna de las dos detonaciones escala con el poder con hechizos. Solo un enemigo puede llevar tu marca.",
+      "weaponScaledSpell": "Damage increases with your weapon damage, Attack Power, and Spell Power.",
       "finisherDamage": "{base} más {perCombo} por punto de combo"
     },
     "resources": {

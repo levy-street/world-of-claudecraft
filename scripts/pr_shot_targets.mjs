@@ -3957,6 +3957,71 @@ export const TARGETS = [
     },
   },
   {
+    // Tolling Hammer scales with the weapon hit, so its spellbook tooltip is
+    // shot with a level 20 green and with Forgebreaker to show the live range.
+    key: 'tolling-hammer-tooltip',
+    label: 'Tolling Hammer tooltip with a leveling green and with Forgebreaker',
+    when: ['combat/weapon_scaled_damage', 'dawnreaver_damage_tooltip_core'],
+    variants: [
+      { key: 'emberfang-warblade', weaponId: 'emberfang_warblade' },
+      { key: 'forgebreaker', weaponId: 'varkhul_forgebreaker' },
+    ].map((variant) => ({
+      ...variant,
+      charClass: 'paladin',
+      charName: 'Dawnreaver',
+      beforeLoad: lowGraphicsSeed,
+    })),
+    async capture(page, variant) {
+      await page.keyboard.press('Escape');
+      await wait(400);
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+      });
+      await wait(300);
+      const known = await page.evaluate((weaponId) => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return false;
+        sim.setPlayerLevel?.(20, player.id);
+        sim.setSpec?.('retribution');
+        sim.addItem?.(weaponId, 1);
+        sim.equipItem?.(weaponId);
+        game.hud.toggleSpellbook?.();
+        return !!sim.resolvedAbility?.('hammer_of_wrath');
+      }, variant.weaponId);
+      if (!known) throw new Error('Tolling Hammer is not known at level 20 Retribution');
+      const open = await pollForSize(page, '#spellbook', 20, 250);
+      if (!open) throw new Error('spellbook did not open');
+      await page.evaluate(() => {
+        const row = document.querySelector('.spell-row[data-ability-id="hammer_of_wrath"]');
+        row?.scrollIntoView({ block: 'center' });
+        row?.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+        row?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+      });
+      await wait(500);
+      const clip = await page.evaluate(() => {
+        const tip = document.querySelector('#tooltip');
+        const row = document.querySelector('.spell-row[data-ability-id="hammer_of_wrath"]');
+        if (!tip || !row || getComputedStyle(tip).display === 'none') return null;
+        if (!tip.textContent?.includes('Tolling Hammer')) return null;
+        const a = tip.getBoundingClientRect();
+        const b = row.getBoundingClientRect();
+        const x = Math.max(0, Math.min(a.left, b.left) - 8);
+        const y = Math.max(0, Math.min(a.top, b.top) - 8);
+        return {
+          x,
+          y,
+          width: Math.max(a.right, b.right) + 8 - x,
+          height: Math.max(a.bottom, b.bottom) + 8 - y,
+        };
+      });
+      if (!clip) throw new Error('Tolling Hammer tooltip did not appear through the hover path');
+      return { clip };
+    },
+  },
+  {
     key: 'tank-defensive-cds',
     // Widened past the tank when Dawnreaver grew a defensive of its own: the recipe
     // is the same (learn it, arm it, shoot the spellbook row plus the armed slot),

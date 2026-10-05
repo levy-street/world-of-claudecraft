@@ -12173,6 +12173,7 @@ export const da_DK: EnTranslations = {
       "edictExplosion": "Mens Ophøjelse er aktiv, eksplosionen behandler {damage} fysisk skade inden for {radius} m, reduceret ud over {cap} mål. Denne skade stiger med angrebskraft.",
       "edictDamage": "Slag for {weaponPercent}% våbenskade plus {damage} fysisk skade. Våbenskade omfatter angrebskraft.",
       "verdictDamage": "Sidste Påbud detonerer for {verdictSingleDamage} hellig skade. Daggryfald detonerer for {verdictAreaDamage} hellig skade inden for {verdictAreaRadius} m, reduceret ud over {verdictAreaCap} mål. Ingen detonering skaleres med stavekraft. Kun en fjende kan bære dit mærke.",
+      "weaponScaledSpell": "Damage increases with your weapon damage, Attack Power, and Spell Power.",
       "finisherDamage": "{base} plus {perCombo} per combopoint"
     },
     "resources": {

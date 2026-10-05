@@ -12173,6 +12173,7 @@ export const pl_PL: EnTranslations = {
       "edictExplosion": "Gdy Wzniesienie jest aktywne, eksplozja zadaje {damage} obrażeń Fizycznych w promieniu {radius} m, zmniejszone poza {cap} celami. Te obrażenia zwiększają się z Mocą Ataku.",
       "edictDamage": "Uderz za {weaponPercent}% obrażeń z broni plus {damage} obrażeń Fizycznych. Obrażenia z broni zawierają Moc Ataku.",
       "verdictDamage": "Ostatni Edykt detonuje za {verdictSingleDamage} obrażeń Świętych. Upadek Świtu detonuje za {verdictAreaDamage} obrażeń Świętych w promieniu {verdictAreaRadius} m, zmniejszone poza {verdictAreaCap} celami. Żadna z detonacji nie skaluje się z Mocą Zaklęć. Tylko jeden wróg może nosić twoją znakę.",
+      "weaponScaledSpell": "Damage increases with your weapon damage, Attack Power, and Spell Power.",
       "finisherDamage": "{base} plus {perCombo} za punkt kombinacji"
     },
     "resources": {

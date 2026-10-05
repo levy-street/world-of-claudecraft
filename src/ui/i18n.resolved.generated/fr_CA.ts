@@ -12173,6 +12173,7 @@ export const fr_CA: EnTranslations = {
       "edictExplosion": "Tant qu'Ascension est active, l'explosion inflige {damage} points de dégâts physiques dans un rayon de {radius} m, réduits au-delà de {cap} cibles. Ces dégâts augmentent avec la puissance d'attaque.",
       "edictDamage": "Frappe pour {weaponPercent}% des dégâts de l'arme plus {damage} points de dégâts physiques. Les dégâts de l'arme incluent la puissance d'attaque.",
       "verdictDamage": "L'Édit final détone pour {verdictSingleDamage} points de dégâts Sacrés. La Chute de l'aube détone pour {verdictAreaDamage} points de dégâts Sacrés dans un rayon de {verdictAreaRadius} m, réduits au-delà de {verdictAreaCap} cibles. Aucune des deux détonations n'augmente avec la puissance des sorts. Un seul ennemi peut porter votre marque.",
+      "weaponScaledSpell": "Damage increases with your weapon damage, Attack Power, and Spell Power.",
       "finisherDamage": "{base} plus {perCombo} par point de combo"
     },
     "resources": {

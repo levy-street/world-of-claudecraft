@@ -12173,6 +12173,7 @@ export const tr_TR: EnTranslations = {
       "edictExplosion": "Yüceltme etkinken, patlama {radius} metre içinde {damage} Fiziksel hasar verir, {cap} hedefi aşarsa azalır. Bu hasar Saldırı Gücü ile artar.",
       "edictDamage": "{weaponPercent}% silah hasarı artı {damage} Fiziksel hasar için vuruş. Silah hasarı Saldırı Gücünü içerir.",
       "verdictDamage": "Son Ferman {verdictSingleDamage} Kutsal hasar için tetiklenir. Şafak Düşüşü {verdictAreaRadius} metre içinde {verdictAreaDamage} Kutsal hasar için tetiklenir, {verdictAreaCap} hedefi aşarsa azalır. Her iki tetiklemede de Büyü Gücü uygulanmaz. Yalnızca bir düşman senin işaretini taşıyabilir.",
+      "weaponScaledSpell": "Damage increases with your weapon damage, Attack Power, and Spell Power.",
       "finisherDamage": "{base} artı her kombo puanı için {perCombo}"
     },
     "resources": {

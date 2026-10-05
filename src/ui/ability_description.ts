@@ -30,6 +30,7 @@ import {
   abilitySecondaryEffect,
   abilityTemporalHourglassValues,
   auraBuffDisplayValue,
+  directDamageRollRange,
 } from './ability_damage';
 import { formatAbilityImbueDamage } from './ability_imbue_text';
 import type { AuraEffectInput } from './aura_effect';
@@ -39,6 +40,15 @@ import {
 } from './dawnreaver_damage_tooltip_core';
 import { type AbilitySpecNoteField, tEntity, tEntityOptional } from './entity_i18n';
 import { formatNumber, type InterpolationValues, t } from './i18n';
+
+/** A spell whose direct hit carries a weapon share (Tolling Hammer): its
+ *  description names weapon damage, Attack Power and Spell Power as the
+ *  scaling stats, since a Holy hit growing with the weapon is not obvious. */
+export function abilityScalesWithWeapon(res: ResolvedAbility): boolean {
+  return res.effects.some(
+    (effect) => effect.type === 'directDamage' && effect.weaponMult !== undefined,
+  );
+}
 
 /** The tooltip's number format for every ability figure (damage, seconds, costs). */
 export function formatAbilityNumber(value: number): string {
@@ -66,8 +76,9 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
       case 'directDamage': {
         const mult = primary.damageMult ?? 1;
         const bonus = scaling ? abilityDamageBonus(res, primary, scaling) * mult : 0;
+        const roll = directDamageRollRange(primary, scaling);
         return (
-          abilityAmountRange(primary.min * mult, primary.max * mult) +
+          abilityAmountRange(roll.min * mult, roll.max * mult) +
           (bonus > 0
             ? ` ${t('hudChrome.abilityScaling.bonus', { value: formatAbilityNumber(bonus) })}`
             : '')
@@ -365,7 +376,9 @@ export function abilityDisplayDescription(
       ? `${text} ${t('abilityUi.tooltip.edictDamage', values)}${values.edictExplosion}`
       : dawnreaver.verdict
         ? `${text} ${t('abilityUi.tooltip.verdictDamage', values)}`
-        : text;
+        : abilityScalesWithWeapon(res)
+          ? `${text} ${t('abilityUi.tooltip.weaponScaledSpell')}`
+          : text;
   const note = spec ? res.def.specNotes?.[spec] : undefined;
   if (!note) return description;
   return `${description} ${tEntity({

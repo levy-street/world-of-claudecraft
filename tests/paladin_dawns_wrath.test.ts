@@ -259,7 +259,9 @@ describe("Retribution Paladin Dawn's Wrath", () => {
       autoAura: 8,
       finalHp: 49785,
       finalAura: 8,
-      hammerHp: 49365,
+      // Weapon-scaled Hammer, starter 2 to 5 weapon at 2.6, 120 AP, 16 SP:
+      // (0.864 x (2 + 22.29) + 0.3284 x 2.59 + 8) x 1.2 Wrath x 1.75 = 63.
+      hammerHp: 49722,
       procActive: false,
       hammerCooldown: 0,
       devotion: 2,
@@ -279,6 +281,8 @@ describe("Retribution Paladin Dawn's Wrath", () => {
         type: 'directDamage',
         min: base.effects[0].type === 'directDamage' ? base.effects[0].min : undefined,
         max: base.effects[0].type === 'directDamage' ? base.effects[0].max : undefined,
+        weaponMult:
+          base.effects[0].type === 'directDamage' ? base.effects[0].weaponMult : undefined,
         damageMult: 1.2,
       }),
     ]);
@@ -289,6 +293,9 @@ describe("Retribution Paladin Dawn's Wrath", () => {
       damageSim.targetEntity(target.id);
       if (empoweredCast) grantDawnsWrath(damageSim.ctx, damageSim.player);
       damageSim.player.spellPower = 70;
+      // Forgebreaker's weapon and a raid-level 400 AP keep the rounding pin decisive.
+      damageSim.player.weapon = { min: 77, max: 115, speed: 3.6 };
+      damageSim.player.attackPower = 400;
       damageSim.rng.next = () => 0.5;
       damageSim.rng.chance = (chance) => chance > 0.5;
       const hpBefore = target.hp;
@@ -297,10 +304,11 @@ describe("Retribution Paladin Dawn's Wrath", () => {
     }
 
     const normalDamage = castDamage(false);
+    // (0.864 x (96 + 400 / 14 x 3.6) + 36 SP rider) = 207.81, x 1.75 = 364.
     // Both factors apply before the final round; scaling the rounded normal hit
-    // would introduce a second rounding step and overstate this empowered hit.
-    expect(normalDamage).toBe(410);
-    expect(castDamage(true)).toBe(491);
+    // (364 x 1.2 = 437) would introduce a second rounding step and overstate it.
+    expect(normalDamage).toBe(364);
+    expect(castDamage(true)).toBe(436);
   });
 
   it('bypasses a running Hammer cooldown without clearing or restarting it', () => {
