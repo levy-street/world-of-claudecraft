@@ -74,7 +74,9 @@ export interface IWorldQuests {
   rerollWorldQuest?(questId: string): boolean;
   questState(questId: string): QuestState;
   acceptQuest(questId: string, selection?: string): void;
-  turnInQuest(questId: string): void;
+  /** `rewardChoice` is the picked choose-one reward (QuestDef.choiceRewards); the
+   *  server refuses a choice quest without one. */
+  turnInQuest(questId: string, rewardChoice?: string): void;
   abandonQuest(questId: string): void;
   rotateWorldQuestPuzzleTile(questId: string, tileIndex: number): void;
   swapWorldQuestMatch3Tiles(questId: string, fromIndex: number, toIndex: number): void;

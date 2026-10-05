@@ -750,6 +750,7 @@ import {
   onRecipeCraftedForQuests,
 } from './quests/quest_credit';
 import { migrateRestoredQuestProgress } from './quests/quest_progress_migration';
+import { defaultRewardChoice } from './quests/quest_reward_choice';
 import { createRiftInstance } from './rift/instance_state';
 import { type NaturalRiftPortal, updateRiftPortals as updateRiftPortalsImpl } from './rift/portals';
 import {
@@ -8921,7 +8922,7 @@ export class Sim {
         isQuestTurnInNpc(quest, npc.templateId) &&
         meta.questLog.get(qid)?.state === 'ready'
       ) {
-        this.turnInQuest(qid, meta.entityId);
+        this.turnInQuest(qid, defaultRewardChoice(quest, meta.cls), meta.entityId);
         return;
       }
     }
@@ -9000,8 +9001,8 @@ export class Sim {
   dropWorldQuestDeliveryCargo(pid = this.playerId): boolean {
     return dropWorldQuestDeliveryCargoForPlayer(this.ctx, pid);
   }
-  turnInQuest(questId: string, pid?: number): void {
-    questCommands.turnInQuest(this.ctx, questId, pid);
+  turnInQuest(questId: string, choiceOrPid?: string | number, pid?: number): void {
+    questCommands.turnInQuest(this.ctx, questId, choiceOrPid, pid);
   }
   completeQuestForDev(questId: string, pid?: number): boolean {
     return completeQuestForDev(this.ctx, questId, pid);

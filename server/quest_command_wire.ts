@@ -9,6 +9,20 @@ export function acceptQuestWire(sim: Sim, msg: QuestWireMessage, pid: number): b
   return true;
 }
 
+// The choose-one pick rides the turn-in as `choice`. Anything but a short
+// string is dropped, and the sim then refuses a choice quest with "Choose a
+// reward first." instead of granting a default the player never picked.
+const MAX_REWARD_CHOICE_LENGTH = 64;
+
+export function turnInQuestWire(sim: Sim, msg: QuestWireMessage, pid: number): void {
+  if (typeof msg.quest !== 'string') return;
+  const choice =
+    typeof msg.choice === 'string' && msg.choice.length <= MAX_REWARD_CHOICE_LENGTH
+      ? msg.choice
+      : undefined;
+  sim.turnInQuest(msg.quest, choice, pid);
+}
+
 export function abandonQuestWire(sim: Sim, msg: QuestWireMessage, pid: number): boolean {
   if (typeof msg.quest !== 'string') return false;
   sim.abandonQuest(msg.quest, pid);

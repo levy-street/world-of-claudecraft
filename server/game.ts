@@ -6388,7 +6388,7 @@ export class GameServer {
       case 'turnin':
         if (typeof msg.quest === 'string') {
           const beforeDone = sim.meta(pid)?.questsDone.has(msg.quest) ?? false;
-          sim.turnInQuest(msg.quest, pid);
+          questWire.turnInQuestWire(sim, msg, pid);
           const afterDone = sim.meta(pid)?.questsDone.has(msg.quest) ?? false;
           if (!beforeDone && afterDone) {
             void dailyRewardService
