@@ -871,8 +871,9 @@ const KOBOLD_ENEMY7: ClipMap = {
 // overwrite-by-name merge would replace his authored Idle/Walk/Run/Attack/
 // Death with the Digger's (the mob_kobold_digger trap below).
 // tests/character_clipmaps.test.ts now gates track BINDING as well as names.
-// He is a one-off rare, so this is his own constant rather than a widened
-// ENEMY7, which mob_ogre also reads.
+// Two rares read it (Grix, and Thornpeak's Ironvein Foreman through MOB_KEYS),
+// both taking hits with no reaction clip until that bake lands, so it stays
+// its own constant rather than a widened ENEMY7, which mob_ogre also reads.
 const GRIX: ClipMap = {
   ...ENEMY7,
   hit: [],
@@ -2732,10 +2733,12 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.04,
   },
   // The authored kobold body (the Kolbolds v02 artist drop, combined by
-  // tmp/kobold_build.mjs). Zone 1's Deeprock Diggers and their Tunnelking ONLY:
-  // the `burrower` family default deliberately stays mob_kobold (goblin.glb),
-  // because the other ten burrowers on it are sprites, gnomes and wretches that
-  // would every one of them read as a giant rat.
+  // tmp/kobold_build.mjs). The two kobold camps ONLY, per template in MOB_KEYS
+  // (zone 1's Deeprock Diggers, zone 3's Deeprock Tunnelers and the Ironvein
+  // Sappers): the `burrower` family default deliberately stays mob_kobold
+  // (goblin.glb), because the other burrowers on it are sprites, gnomes,
+  // bandits and wretches, not kobolds, and would every one of them read as a
+  // giant rat.
   //
   // `clips` is KOBOLD_DIGGER (ENEMY7 with the hit slot narrowed to the native
   // HitRecieve): the GLB carries Idle/Walk/Run/Attack/HitRecieve/Death, so
@@ -2757,6 +2760,9 @@ export const VISUALS: Record<string, VisualDef> = {
   // the planted foot trails the body 2.8x; measured, the run pushes to its 1.6
   // clamp and the walk lands near an exact foot match. Re-measure on any new
   // drop: v01's cycles gave 1.31/2.22, and its Walk was 1.00s against v02's 1.13s.
+  // Thornpeak's Tunnelers and Sappers need no refs of their own: they share
+  // the Diggers' 0.85 scale and chase at 7 and 7.5 yd/s, far past the run
+  // clamp, so the cycle saturates exactly as it does for the Diggers.
   mob_kobold_digger: {
     url: `${CREATURES}/kobold.glb`,
     authoredAtlas: true, // baked Tripo/contributor atlas: low-tier floor rides the map
@@ -2788,13 +2794,20 @@ export const VISUALS: Record<string, VisualDef> = {
   //
   // No `tint`, deliberately, even though his template DOES carry a colour
   // (0xb9770e in zone1.ts). On the shared goblin/kobold bodies the entity tint is
-  // what separates one template from the next; Grix is a one-off with authored
-  // art (crown, robes, the shovel) and washing an amber over it only muddies it.
-  // His template colour still earns its keep elsewhere: the minimap/nameplate
+  // what separates one template from the next; this is authored art (crown,
+  // robes, the shovel) and washing an amber over it only muddies it. His
+  // template colour still earns its keep elsewhere: the minimap/nameplate
   // surfaces read it. Same reasoning as mob_water_elemental's untinted body.
   //
+  // Thornpeak's Ironvein Foreman (MOB_KEYS) wears this same def, so the two
+  // kobold camp bosses render identically apart from their nameplates, and the
+  // Foreman's 0xb0823a is likewise minimap/nameplate only. A tinted variant
+  // would be its own def over grix.glb, never a tint added here.
+  //
   // walkRef/runRef MEASURED (tmp/grix_gait_measure.mjs) at his template scale of
-  // 1.0: natural 1.23 and 2.31 yd/s against a 7 yd/s chase.
+  // 1.0: natural 1.23 and 2.31 yd/s against a 7 yd/s chase. The Foreman needs
+  // no refs of his own: he chases at the same 7 yd/s, which asks for 3x the
+  // clip's natural run, so the cycle sits on the 1.6 run clamp either way.
   mob_grix: {
     url: `${CREATURES}/grix.glb`,
     authoredAtlas: true, // baked Tripo/contributor atlas: low-tier floor rides the map
@@ -4512,15 +4525,25 @@ const MOB_KEYS: Record<string, string> = {
   dragonkin_egg: 'mob_dragon_egg',
   // Grubjaw the Glutton: his own body now, not the shared troll stand-in.
   grubjaw: 'mob_grubjaw',
-  // Eastbrook Vale's kobolds: the authored rat body, not the goblin stand-in
-  // the `burrower` family still falls back to. Scoped to the two zone-1
-  // templates on purpose (see mob_kobold_digger): the family also carries the
-  // hedge gnome and the willow/fen/harvest sprites, and repointing the family
-  // would turn all of them into rats. Zone 3's deeprock_kobold and the Ironvein
-  // pair are the natural next adopters, but they are a separate call.
+  // The kobold camps: the authored rat body, not the goblin stand-in the
+  // `burrower` family still falls back to. Scoped per template on purpose (see
+  // mob_kobold_digger): the family also carries the hedge gnome, the
+  // willow/fen/harvest sprites, Galecrest's bandits and Farshore's wretches,
+  // none of them kobolds, and repointing the family would turn all of them
+  // into rats.
   tunnel_rat: 'mob_kobold_digger',
   // Grix has his own body now (mob_grix), so he no longer shares the Diggers'.
   grix_the_tunnelking: 'mob_grix',
+  // Thornpeak's Deeprock Burrows (zone 3), the same camp shape as Eastbrook's:
+  // the Deeprock Tunnelers and the Ironvein Sappers the Foreman summons wear
+  // the Diggers' body, and the Foreman (the camp's rare elite) wears the
+  // Tunnelking's, crown and shovel included. Template data (names, colours,
+  // scales, stats) is untouched: this is the model only.
+  // tests/thornpeak_burrower_visuals.test.ts pins these rows, and that the
+  // seven burrowers still on the fallback stay there.
+  deeprock_kobold: 'mob_kobold_digger',
+  ironvein_sapper: 'mob_kobold_digger',
+  ironvein_foreman: 'mob_grix',
   // Ambient Highwatch stable horse: the Valorsteed mount model (mob_stable_horse
   // above) so it renders as an animated horse, not a humanoid.
   stable_horse: 'mob_stable_horse',
