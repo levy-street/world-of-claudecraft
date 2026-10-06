@@ -1,7 +1,9 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { ITEMS, NPCS, QUESTS } from '../src/sim/data';
+import { canEquipItem } from '../src/sim/equipment_rules';
 import {
   defaultRewardChoice,
+  questFixedReward,
   questRewardChoices,
   resolveRewardChoice,
 } from '../src/sim/quests/quest_reward_choice';
@@ -24,8 +26,8 @@ const MAIL_STR = piece('hedgerow_hauberk');
 const MAIL_INT = piece('hedgerow_chainmail');
 const CHOICES = [CLOTH_INT.id, LEATHER_AGI.id, LEATHER_STR.id, MAIL_STR.id, MAIL_INT.id];
 
-const quest = (choiceRewards?: string[]): QuestDef =>
-  ({ ...Object.values(QUESTS)[0], choiceRewards }) as QuestDef;
+const quest = (choiceRewards?: string[], itemRewards: QuestDef['itemRewards'] = {}): QuestDef =>
+  ({ ...Object.values(QUESTS)[0], choiceRewards, itemRewards }) as QuestDef;
 
 describe('choose-one quest rewards: the shared resolver', () => {
   it('offers each class only what it can wear', () => {
@@ -77,6 +79,63 @@ describe('choose-one quest rewards: the shared resolver', () => {
       itemId: undefined,
     });
   });
+
+  it('folds an authored gear reward into the list instead of granting it beside it', () => {
+    // The Old Wolf authors Greyjaw's Pelt Leggings (cloth, so every class
+    // reaches them through its reward archetype) and carries its band's choice
+    // set: one list, one pick, no second reward.
+    const greyjaw = QUESTS.q_greyjaw;
+    expect(greyjaw.choiceRewards?.length).toBeGreaterThan(0);
+    const classes: PlayerClass[] = [
+      'warrior',
+      'paladin',
+      'hunter',
+      'rogue',
+      'priest',
+      'shaman',
+      'mage',
+      'warlock',
+      'druid',
+    ];
+    for (const cls of classes) {
+      const offered = questRewardChoices(greyjaw, cls);
+      expect(offered[0], cls).toBe('greyjaw_pelt_cloak');
+      expect(offered.slice(1), cls).toEqual(
+        (greyjaw.choiceRewards ?? []).filter((id) => canEquipItem(cls, ITEMS[id])),
+      );
+      expect(questFixedReward(greyjaw, cls), cls).toBeUndefined();
+    }
+    // Without a choice list the authored piece is still the fixed reward.
+    const plain = { ...greyjaw, choiceRewards: undefined } as QuestDef;
+    expect(questFixedReward(plain, 'warrior')).toBe('greyjaw_pelt_cloak');
+    expect(questRewardChoices(plain, 'warrior')).toEqual([]);
+  });
+
+  it('keeps a non-gear authored reward fixed beside the choice', () => {
+    const q = quest(CHOICES, { warrior: 'greyjaw_fang' });
+    expect(ITEMS.greyjaw_fang.slot).toBeUndefined();
+    expect(questFixedReward(q, 'warrior')).toBe('greyjaw_fang');
+    expect(questRewardChoices(q, 'warrior')).toEqual(CHOICES);
+  });
+
+  it('preselects only a piece the spec uses, though an off-role authored piece stays on offer', () => {
+    // The strongest druid-wearable Intellect weapon with no Strength or Agility:
+    // the archetype gear a balance druid wants and a feral cat must not be handed.
+    const casterWeapon = Object.values(ITEMS)
+      .filter(
+        (i) =>
+          i.weapon &&
+          (i.stats?.int ?? 0) > 0 &&
+          !i.stats?.str &&
+          !i.stats?.agi &&
+          canEquipItem('druid', i),
+      )
+      .sort((a, b) => (b.stats?.int ?? 0) - (a.stats?.int ?? 0))[0];
+    expect(casterWeapon).toBeDefined();
+    const q = quest(CHOICES, { druid: casterWeapon.id });
+    expect(questRewardChoices(q, 'druid')).toContain(casterWeapon.id);
+    expect(defaultRewardChoice(q, 'druid', 'feral')).toBe(LEATHER_STR.id);
+  });
 });
 
 describe('choose-one quest rewards: the turn-in grant', () => {
@@ -85,8 +144,10 @@ describe('choose-one quest rewards: the turn-in grant', () => {
     return !q.retired && q.objectives.every((o) => o.type === 'kill') && NPCS[q.turnInNpcId];
   }) as string;
   const original = QUESTS[questId].choiceRewards;
+  const originalItems = QUESTS[questId].itemRewards;
   afterEach(() => {
     QUESTS[questId].choiceRewards = original;
+    QUESTS[questId].itemRewards = originalItems;
   });
 
   function readyAtTurnIn(cls: PlayerClass): Sim {
@@ -124,6 +185,20 @@ describe('choose-one quest rewards: the turn-in grant', () => {
     const sim = readyAtTurnIn('mage');
     sim.turnInQuest(questId);
     expect(sim.countItem(CLOTH_INT.id)).toBe(1);
+  });
+
+  it('grants one pick, never the authored gear piece on top of it', () => {
+    QUESTS[questId].choiceRewards = CHOICES;
+    QUESTS[questId].itemRewards = { warrior: 'greyjaw_pelt_cloak' };
+    const picksChoice = readyAtTurnIn('warrior');
+    picksChoice.turnInQuest(questId, LEATHER_AGI.id);
+    expect(picksChoice.countItem(LEATHER_AGI.id)).toBe(1);
+    expect(picksChoice.countItem('greyjaw_pelt_cloak')).toBe(0);
+
+    const picksAuthored = readyAtTurnIn('warrior');
+    picksAuthored.turnInQuest(questId, 'greyjaw_pelt_cloak');
+    expect(picksAuthored.countItem('greyjaw_pelt_cloak')).toBe(1);
+    expect(CHOICES.every((id) => picksAuthored.countItem(id) === 0)).toBe(true);
   });
 
   it('refuses a piece the class is not offered and keeps the quest ready', () => {

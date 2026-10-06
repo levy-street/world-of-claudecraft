@@ -1,9 +1,10 @@
 import { isOnProvingShore } from '../../../sim/content/proving_shore';
-import { DELVES, ITEMS, NPCS, QUESTS, questRewardItem } from '../../../sim/data';
+import { DELVES, ITEMS, NPCS, QUESTS } from '../../../sim/data';
 import { CHRONICLER_TEMPLATE_IDS } from '../../../sim/deeds';
 import { craftsForPairTarget } from '../../../sim/professions/archetype';
 import { professionQuestSelectionTargets } from '../../../sim/quests/profession_quest_effects';
 import { npcQuestMarkerKind, type QuestMarkerKind } from '../../../sim/quests/quest_marker_kind';
+import { questFixedReward } from '../../../sim/quests/quest_reward_choice';
 import { dist2d, type Entity, type ItemDef, questObjectiveRequired } from '../../../sim/types';
 import { WEEKLY_KEEPER_ID } from '../../../sim/weekly_rewards';
 import type { IWorld } from '../../../world_api';
@@ -848,7 +849,9 @@ export class QuestDialogController {
     const quest = QUESTS[questId];
     let html = `<div class="qd-sub">${esc(t('questUi.detail.rewards'))}</div>`;
     html += `<div class="qd-obj">${esc(t('questUi.detail.xpReward', { xp: this.deps.text.number(quest.xpReward) }))} &nbsp; ${this.deps.text.money(quest.copperReward)}</div>`;
-    const rewardItemId = questRewardItem(quest, world.cfg.playerClass);
+    // Authored gear joins the choice list below; only a non-gear authored reward
+    // (or any authored reward on a quest without choices) is a fixed row.
+    const rewardItemId = questFixedReward(quest, world.cfg.playerClass);
     if (rewardItemId) {
       const item = ITEMS[rewardItemId];
       html += `<div class="qd-reward-row" data-reward><span class="qd-reward-label">${esc(t('questUi.detail.itemReward'))}</span><span class="ui-socket ui-socket--bag">${this.deps.itemIcon(item)}</span><span class="qd-reward-name" style="color:${QUALITY_COLOR[item.quality ?? 'common'] ?? 'var(--color-quality-default)'}">${esc(itemDisplayName(item))}</span></div>`;
@@ -865,7 +868,7 @@ export class QuestDialogController {
   }
 
   private attachRewardTooltip(questId: string): void {
-    const rewardItemId = questRewardItem(QUESTS[questId], this.deps.world().cfg.playerClass);
+    const rewardItemId = questFixedReward(QUESTS[questId], this.deps.world().cfg.playerClass);
     const row = this.deps.element.querySelector<HTMLElement>('[data-reward]');
     if (row && rewardItemId) {
       this.deps.attachTooltip(row, () => this.deps.itemTooltip(ITEMS[rewardItemId]));
