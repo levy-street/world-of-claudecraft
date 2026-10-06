@@ -12,6 +12,10 @@ vi.mock('../src/render/characters/portrait', () => ({
   portraitsReady: vi.fn(() => false),
   visualPortraitDataUrl: vi.fn(() => null),
 }));
+// portrait_chip also re-exports from this barrel, which starts GLB preloads.
+vi.mock('../src/render/characters', () => ({
+  modularLookFor: () => null,
+}));
 
 import {
   INVESTIGATION_CLUES,
