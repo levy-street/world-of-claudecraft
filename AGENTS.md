@@ -22,6 +22,10 @@ Never revert, discard, stage, commit, push, file an issue, post a review, or mut
 remote system unless the user authorized that action. If a commit is requested, stage
 only this task's files and follow the scoped Conventional Commit rule in `CLAUDE.md`.
 
+When the user asks to push changes as a PR, open a non-draft PR by default. Create
+a draft PR only when the user explicitly requests one. Document failed or pending
+checks in the PR description; do not infer a draft request from the QA status.
+
 ## Work effectively
 
 - Keep the main thread responsible for integration and final verification.
