@@ -861,7 +861,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.hillwarn.description': '立即發出山丘通告；山丘會在完整的警示時間過後升起。',
   'devCommand.actions.hillwarn.label': '山丘倒數',
   'entities.abilities.lava_burst.description':
-    '造成 {damage} 點火焰傷害。對受你燼焰震擊灼燒的目標必定造成致命一擊。熔岩湧動：燼焰震擊每次造成傷害都有 20% 機率重置此技能的冷卻，並使你在 10 秒內的下一個 Magma Burst 變為瞬發。傷害隨法術強度提升。（雷霆召喚）',
+    '造成 {damage} 點火焰傷害。命中可給予 1 點雷霆。對受你燼焰震擊灼燒的目標必定造成致命一擊。致命一擊時額外造成相當於一般傷害 24% 的傷害。熔岩湧動：燼焰震擊每次造成傷害都有 20% 機率重置此技能的冷卻，並使你在 10 秒內的下一個 Magma Burst 變為瞬發。傷害隨法術強度提升。（雷霆召喚）',
   'entities.abilities.lava_burst.name': 'Magma Burst',
   'entities.abilities.lightning_overload.description':
     '被動：電弧箭與叉狀閃電有 20% 機率觸發 Arc Overload，再次擊中其首個目標，造成 50% 的傷害，並獲得 1 點雷霆。（雷霆召喚）',
@@ -4942,7 +4942,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '以閃電環繞你 10 分鐘。接下來針對你的 3 次近戰攻擊會對攻擊者造成 {buff} 點自然傷害，最多每 5 秒一次。',
   'entities.abilities.flame_shock.name': '燼焰震擊',
   'entities.abilities.flame_shock.description':
-    '造成 {damage} 點火焰傷害，隨後在 12 秒內造成 {overTime} 點火焰傷害。首次命中隨法術強度提升。',
+    '造成 {damage} 點火焰傷害，隨後在 {duration} 秒內造成 {overTime} 點火焰傷害。首次命中隨法術強度提升。',
   'entities.abilities.flametongue_weapon.name': '焰烙武器',
   'entities.abilities.flametongue_weapon.description':
     '為你的武器附魔 30 分鐘。每次揮擊額外造成 {damage} 點火焰傷害。',
@@ -15256,7 +15256,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '一聲呼哨激勵你的隊伍，使攻擊、施法和引導速度提高10%，持續10秒。近期受過群體加速激勵的盟友過於疲憊，無法受益。（潛行者天賦）',
   'entities.abilities.thieves_chorus.name': '盜賊合唱',
   'entities.abilities.thunder_reservoir.description':
-    '被動：奧術閃電與天穹連鎖會獲得雷霆，最多5層。達到5層時，大地震擊造成的傷害提高125%，或裂地震波造成的傷害提高100%，隨後消耗全部雷霆。（雷霆召喚）',
+    '被動：奧術閃電、天穹連鎖與 Magma Burst 會獲得雷霆，最多5層。達到5層時，大地震擊造成的傷害提高125%，或裂地震波造成的傷害提高100%，隨後消耗全部雷霆。（雷霆召喚）',
   'entities.abilities.thunder_reservoir.name': '雷霆蓄能',
   'entities.abilities.tidecall.description':
     '為一個友方目標恢復{damage}點生命值。治療量隨法術強度提高。將過量治療前的完整治療量加入癒合水流，最多為目標最大生命值的30%。',

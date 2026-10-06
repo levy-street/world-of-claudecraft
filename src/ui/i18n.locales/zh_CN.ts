@@ -866,7 +866,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.hillwarn.description': '立即宣布山丘出现；倒计时结束后山丘升起。',
   'devCommand.actions.hillwarn.label': '山丘倒计时',
   'entities.abilities.lava_burst.description':
-    '造成{damage}点火焰伤害。对被你的余烬震击点燃的目标必定造成暴击。岩浆涌动：余烬震击每次跳动都有20%几率重置本技能的冷却时间，并使你接下来10秒内的下一次岩浆爆发变为瞬发。伤害随法术强度提升。（唤雷）',
+    '造成{damage}点火焰伤害。命中可给予 1 点雷霆。对被你的余烬震击点燃的目标必定造成暴击。暴击时额外造成相当于普通伤害24%的伤害。岩浆涌动：余烬震击每次跳动都有20%几率重置本技能的冷却时间，并使你接下来10秒内的下一次岩浆爆发变为瞬发。伤害随法术强度提升。（唤雷）',
   'entities.abilities.lava_burst.name': '岩浆爆发',
   'entities.abilities.lightning_overload.description':
     '被动：电弧箭和叉状闪电有20%几率触发超载，对其首个目标再次造成50%的已造成伤害，并获得1点雷霆。（唤雷）',
@@ -4940,7 +4940,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '以闪电环绕你 10 分钟。接下来针对你的 3 次近战攻击会对攻击者造成 {buff} 点自然伤害，最多每 5 秒一次。',
   'entities.abilities.flame_shock.name': '余烬震击',
   'entities.abilities.flame_shock.description':
-    '造成 {damage} 点火焰伤害，随后在 12 秒内造成 {overTime} 点火焰伤害。首次命中随法术强度提升。',
+    '造成 {damage} 点火焰伤害，随后在 {duration} 秒内造成 {overTime} 点火焰伤害。首次命中随法术强度提升。',
   'entities.abilities.flametongue_weapon.name': '焰烙武器',
   'entities.abilities.flametongue_weapon.description':
     '为你的武器附魔 30 分钟。每次挥击额外造成 {damage} 点火焰伤害。',
@@ -15252,7 +15252,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '一声呼哨激励你的队伍，使攻击、施法和引导速度提高10%，持续10秒。近期受过群体加速激励的盟友过于疲惫，无法受益。（潜行者天赋）',
   'entities.abilities.thieves_chorus.name': '盗贼合唱',
   'entities.abilities.thunder_reservoir.description':
-    '被动：奥术闪电和天穹连锁会获得雷霆，最多5层。达到5层时，大地震击造成的伤害提高125%，或裂地震波造成的伤害提高100%，随后消耗全部雷霆。（雷霆召唤）',
+    '被动：奥术闪电、天穹连锁和岩浆爆发会获得雷霆，最多5层。达到5层时，大地震击造成的伤害提高125%，或裂地震波造成的伤害提高100%，随后消耗全部雷霆。（雷霆召唤）',
   'entities.abilities.thunder_reservoir.name': '雷霆蓄能',
   'entities.abilities.tidecall.description':
     '为一个友方目标恢复{damage}点生命值。治疗量随法术强度提高。将过量治疗前的完整治疗量加入愈合水流，最多为目标最大生命值的30%。',

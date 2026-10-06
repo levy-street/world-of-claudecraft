@@ -13765,7 +13765,7 @@ export const it_IT: EnTranslations = {
       },
       "thunder_reservoir": {
         "name": "Riserva di Tuono",
-        "description": "Passiva: il Dardo Folgorante e il Fulmine Biforcuto concedono Tuono, fino a 5. Con 5 Tuono, la Scossa Tellurica infligge il 125% di danni in più oppure il Terremoto il 100% in più, e poi consuma tutto il Tuono. (Richiamo del Tuono)"
+        "description": "Passiva: il Dardo Folgorante, il Fulmine Biforcuto e lo Scoppio di Magma concedono Tuono, fino a 5. Con 5 Tuono, la Scossa Tellurica infligge il 125% di danni in più oppure il Terremoto il 100% in più, e poi consuma tutto il Tuono. (Richiamo del Tuono)"
       },
       "lightning_overload": {
         "name": "Sovraccarico Folgorante",
@@ -13773,7 +13773,7 @@ export const it_IT: EnTranslations = {
       },
       "lava_burst": {
         "name": "Scoppio di Magma",
-        "description": "Infligge {damage} danni da Fuoco. Va sempre a segno come colpo critico su un bersaglio che sta bruciando per la tua Scossa di Braci. Ondata di Magma: ogni tick di Scossa di Braci ha il 20% di probabilità di azzerare questo tempo di recupero e rendere istantaneo il tuo prossimo Scoppio di Magma entro 10 sec. Il danno aumenta con il Potere Magico. (Richiamo del Tuono)"
+        "description": "Infligge {damage} danni da Fuoco. Un colpo a segno concede 1 Tuono. Va sempre a segno come colpo critico su un bersaglio che sta bruciando per la tua Scossa di Braci. Un colpo critico infligge un ulteriore 24% dei danni normali. Ondata di Magma: ogni tick di Scossa di Braci ha il 20% di probabilità di azzerare questo tempo di recupero e rendere istantaneo il tuo prossimo Scoppio di Magma entro 10 sec. Il danno aumenta con il Potere Magico. (Richiamo del Tuono)"
       },
       "thunderstorm": {
         "name": "Frangitempesta",
@@ -13797,7 +13797,7 @@ export const it_IT: EnTranslations = {
       },
       "flame_shock": {
         "name": "Scossa di Braci",
-        "description": "Infligge {damage} danni da Fuoco, poi {overTime} danni da Fuoco nell'arco di 12 sec. Il colpo iniziale aumenta con il Potere Magico."
+        "description": "Infligge {damage} danni da Fuoco, poi {overTime} danni da Fuoco nell'arco di {duration} sec. Il colpo iniziale aumenta con il Potere Magico."
       },
       "flametongue_weapon": {
         "name": "Arma Marchiofuoco",

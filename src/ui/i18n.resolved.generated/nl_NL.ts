@@ -13765,7 +13765,7 @@ export const nl_NL: EnTranslations = {
       },
       "thunder_reservoir": {
         "name": "Donderreservoir",
-        "description": "Passief: de Boogbliksem en de Gevorkte bliksem verlenen Donder, tot 5. Bij 5 Donder richt de Aardse Schok 125% meer schade aan of de Aardbeving 100% meer, en dan wordt alle Donder verbruikt. (Donderroep)"
+        "description": "Passief: de Boogbliksem, de Gevorkte bliksem en Magma Burst verlenen Donder, tot 5. Bij 5 Donder richt de Aardse Schok 125% meer schade aan of de Aardbeving 100% meer, en dan wordt alle Donder verbruikt. (Donderroep)"
       },
       "lightning_overload": {
         "name": "Overbelasting",
@@ -13773,7 +13773,7 @@ export const nl_NL: EnTranslations = {
       },
       "lava_burst": {
         "name": "Magma Burst",
-        "description": "Veroorzaak {damage} Vuurschade. Slaat altijd kritiek toe op doelen die branden van jouw Sintelschok. Magmastroom: elke Sintelschok-slag heeft 20% kans dit afkoelingseffect opnieuw in te stellen en je volgende Magma Burst binnen 10 sec onmiddellijk uit te voeren. Schade neemt toe met Spreukenkracht. (Donderoproep)"
+        "description": "Veroorzaak {damage} Vuurschade. Een treffer verleent 1 Donder. Slaat altijd kritiek toe op doelen die branden van jouw Sintelschok. Een kritieke treffer doet 24% van de normale schade extra. Magmastroom: elke Sintelschok-slag heeft 20% kans dit afkoelingseffect opnieuw in te stellen en je volgende Magma Burst binnen 10 sec onmiddellijk uit te voeren. Schade neemt toe met Spreukenkracht. (Donderoproep)"
       },
       "thunderstorm": {
         "name": "Stormbreuk",
@@ -13797,7 +13797,7 @@ export const nl_NL: EnTranslations = {
       },
       "flame_shock": {
         "name": "Sintelschok",
-        "description": "Brengt {damage} Vuurschade toe, daarna in 12 sec {overTime} Vuurschade. De eerste treffer stijgt met de Spreukkracht."
+        "description": "Brengt {damage} Vuurschade toe, daarna in {duration} sec {overTime} Vuurschade. De eerste treffer stijgt met de Spreukkracht."
       },
       "flametongue_weapon": {
         "name": "Vuurbrand-Wapen",

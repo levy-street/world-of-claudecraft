@@ -2259,7 +2259,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "I ladri hanno nascosto il loro oro rubato per tutto il mio labirinto, e ora le ombre lo custodiscono. Recupera ogni borsa di monete. Evita i guardiani, oppure prendi una fiammella radiosa per bandirli. Tre vite perse ti riportano all'ingresso, ma le borse che hai raccolto restano al sicuro.",
   'entities.abilities.lava_burst.name': 'Scoppio di Magma',
   'entities.abilities.lava_burst.description':
-    'Infligge {damage} danni da Fuoco. Va sempre a segno come colpo critico su un bersaglio che sta bruciando per la tua Scossa di Braci. Ondata di Magma: ogni tick di Scossa di Braci ha il 20% di probabilità di azzerare questo tempo di recupero e rendere istantaneo il tuo prossimo Scoppio di Magma entro 10 sec. Il danno aumenta con il Potere Magico. (Richiamo del Tuono)',
+    'Infligge {damage} danni da Fuoco. Un colpo a segno concede 1 Tuono. Va sempre a segno come colpo critico su un bersaglio che sta bruciando per la tua Scossa di Braci. Un colpo critico infligge un ulteriore 24% dei danni normali. Ondata di Magma: ogni tick di Scossa di Braci ha il 20% di probabilità di azzerare questo tempo di recupero e rendere istantaneo il tuo prossimo Scoppio di Magma entro 10 sec. Il danno aumenta con il Potere Magico. (Richiamo del Tuono)',
   'entities.abilities.lightning_overload.name': 'Sovraccarico Folgorante',
   'entities.abilities.lightning_overload.description':
     'Passiva: Dardo Folgorante e Fulmine Biforcuto hanno il 20% di probabilità di andare in Sovraccarico, colpendo di nuovo il primo bersaglio per il 50% dei danni inflitti e concedendo 1 Tuono. (Richiamo del Tuono)',
@@ -9496,7 +9496,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Vi circonda di fulmini per 10 min. I 3 attacchi in mischia successivi contro di voi infliggono {buff} danni da Natura all'attaccante, al massimo una volta ogni 5 sec.",
   'entities.abilities.flame_shock.name': 'Scossa di Braci',
   'entities.abilities.flame_shock.description':
-    "Infligge {damage} danni da Fuoco, poi {overTime} danni da Fuoco nell'arco di 12 sec. Il colpo iniziale aumenta con il Potere Magico.",
+    "Infligge {damage} danni da Fuoco, poi {overTime} danni da Fuoco nell'arco di {duration} sec. Il colpo iniziale aumenta con il Potere Magico.",
   'entities.abilities.flametongue_weapon.name': 'Arma Marchiofuoco',
   'entities.abilities.flametongue_weapon.description':
     'Permea la vostra arma per 30 min. Ogni colpo infligge {damage} danni da Fuoco aggiuntivi.',
@@ -16375,7 +16375,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stormsurge.description':
     'Passiva: mentre il Colpo Ancestrale è in recupero, consumare un Presagio di Tempesta ha il 25% di probabilità di azzerarlo. Se i primi 3 tentativi falliscono, il 4° lo azzera sempre. (Spirito Guerriero)',
   'entities.abilities.thunder_reservoir.description':
-    'Passiva: il Dardo Folgorante e il Fulmine Biforcuto concedono Tuono, fino a 5. Con 5 Tuono, la Scossa Tellurica infligge il 125% di danni in più oppure il Terremoto il 100% in più, e poi consuma tutto il Tuono. (Richiamo del Tuono)',
+    'Passiva: il Dardo Folgorante, il Fulmine Biforcuto e lo Scoppio di Magma concedono Tuono, fino a 5. Con 5 Tuono, la Scossa Tellurica infligge il 125% di danni in più oppure il Terremoto il 100% in più, e poi consuma tutto il Tuono. (Richiamo del Tuono)',
   'entities.abilities.tidecall.description':
     'Cura un bersaglio alleato di {damage}. La cura aumenta con il potere magico. Aggiunge la cura completa prima delle cure in eccesso alla Corrente Risanatrice, fino al 30% della salute massima del bersaglio.',
   'entities.abilities.unleash_weapon.description':

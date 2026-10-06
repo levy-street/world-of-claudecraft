@@ -13765,7 +13765,7 @@ export const vi_VN: EnTranslations = {
       },
       "thunder_reservoir": {
         "name": "Bể Sấm",
-        "description": "Bị động: Tia Hồ Quang và Sét Rẽ Nhánh ban Sấm, tối đa 5. Ở 5 Sấm, Địa Giật gây thêm 125% sát thương hoặc Động Đất gây thêm 100%, rồi tiêu hết Sấm. (Gọi Sấm)"
+        "description": "Bị động: Tia Hồ Quang, Sét Rẽ Nhánh và Magma Burst ban Sấm, tối đa 5. Ở 5 Sấm, Địa Giật gây thêm 125% sát thương hoặc Động Đất gây thêm 100%, rồi tiêu hết Sấm. (Gọi Sấm)"
       },
       "lightning_overload": {
         "name": "Arc Overload",
@@ -13773,7 +13773,7 @@ export const vi_VN: EnTranslations = {
       },
       "lava_burst": {
         "name": "Magma Burst",
-        "description": "Gây {damage} sát thương Lửa. Luôn đánh bại một lần quan trọng một mục tiêu cháy với Giật Tàn Lửa của bạn. Magma Surge: mỗi khắc Giật Tàn Lửa có cơ hội 20% để đặt lại cooldown này và làm cho Magma Burst tiếp theo của bạn trong vòng 10 giây tức thời. Sát thương tăng với Sức Mạnh Phép. (Thundercall)"
+        "description": "Gây {damage} sát thương Lửa. Một cú trúng ban 1 Sấm. Luôn đánh bại một lần quan trọng một mục tiêu cháy với Giật Tàn Lửa của bạn. Đòn chí mạng gây thêm 24% sát thương thông thường. Magma Surge: mỗi khắc Giật Tàn Lửa có cơ hội 20% để đặt lại cooldown này và làm cho Magma Burst tiếp theo của bạn trong vòng 10 giây tức thời. Sát thương tăng với Sức Mạnh Phép. (Thundercall)"
       },
       "thunderstorm": {
         "name": "Stormbreak",
@@ -13797,7 +13797,7 @@ export const vi_VN: EnTranslations = {
       },
       "flame_shock": {
         "name": "Giật Tàn Lửa",
-        "description": "Gây {damage} sát thương Hỏa, rồi {overTime} sát thương Hỏa trong 12 giây. Cú trúng đầu tiên tăng theo Sức Mạnh Phép Thuật."
+        "description": "Gây {damage} sát thương Hỏa, rồi {overTime} sát thương Hỏa trong {duration} giây. Cú trúng đầu tiên tăng theo Sức Mạnh Phép Thuật."
       },
       "flametongue_weapon": {
         "name": "Vũ Khí Khắc Hỏa",
