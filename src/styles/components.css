@@ -880,6 +880,11 @@
     text-align: left;
     font: inherit;
   }
+  /* Icon and name stay on one line (the name wraps within its column); beats
+     the generic reward-row wrap below on specificity. */
+  .qd-reward-row.qd-reward-choice {
+    flex-wrap: nowrap;
+  }
   button.qd-reward-choice {
     cursor: var(--cursor-point);
   }

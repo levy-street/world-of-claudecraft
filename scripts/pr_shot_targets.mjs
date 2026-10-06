@@ -14392,6 +14392,13 @@ export const TARGETS = [
       });
       await wait(600);
       await sweepOverlays(page, 4);
+      // The dialog focuses the checked card, whose focus opens its tooltip; drop
+      // focus and park the pointer so the shot shows the whole card grid.
+      await page.mouse.move(2, 2);
+      await page.evaluate(() => {
+        if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+      });
+      await wait(400);
       await page.evaluate(
         () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
       );
