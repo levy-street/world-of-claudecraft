@@ -877,8 +877,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "0c8f2ef1",
-      "events": "9af200fb",
+      "state": "c3194c03",
+      "events": "c0a26536",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -921,9 +921,9 @@
             "itemsDiscovered": [
               "baked_bread",
               "boar_hide",
+              "brookwatch_sabatons",
               "eastbrook_buckler",
               "recruit_tunic",
-              "saltbitten_pauldrons",
               "worn_sword"
             ]
           },
@@ -951,7 +951,7 @@
             },
             {
               "count": 1,
-              "itemId": "saltbitten_pauldrons"
+              "itemId": "brookwatch_sabatons"
             }
           ],
           "lifetimeXp": 350,
@@ -1049,7 +1049,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 1011,
-      "state": "af7e62ed",
+      "state": "51c596df",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1093,9 +1093,9 @@
             "itemsDiscovered": [
               "baked_bread",
               "boar_hide",
+              "brookwatch_sabatons",
               "eastbrook_buckler",
               "recruit_tunic",
-              "saltbitten_pauldrons",
               "worn_sword"
             ]
           },
@@ -1123,7 +1123,7 @@
             },
             {
               "count": 1,
-              "itemId": "saltbitten_pauldrons"
+              "itemId": "brookwatch_sabatons"
             }
           ],
           "lifetimeXp": 350,
