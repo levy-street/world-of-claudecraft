@@ -19189,6 +19189,234 @@ export const en_XA: EnTranslations = {
       "highgale_cord": {
         "name": "[Ĥíĝĥĝáļé Çóŕð]"
       },
+      "breakwater_mantle": {
+        "name": "[Ɓŕéáķŵáţéŕ Ɱáñţļé]"
+      },
+      "breakwater_shoulderpads": {
+        "name": "[Ɓŕéáķŵáţéŕ Šĥóúļðéŕþáðš]"
+      },
+      "breakwater_spaulders": {
+        "name": "[Ɓŕéáķŵáţéŕ Šþáúļðéŕš]"
+      },
+      "gravebell_treads": {
+        "name": "[Ĝŕáʋéƀéļļ Ţŕéáðš]"
+      },
+      "gravebell_greaves": {
+        "name": "[Ĝŕáʋéƀéļļ Ĝŕéáʋéš]"
+      },
+      "cryptbound_tunic": {
+        "name": "[Çŕýþţƀóúñð Ţúñíç]"
+      },
+      "cryptbound_chainmail": {
+        "name": "[Çŕýþţƀóúñð Çĥáíñɱáíļ]"
+      },
+      "oathbroken_leggings": {
+        "name": "[Óáţĥƀŕóķéñ Ļéĝĝíñĝš]"
+      },
+      "oathbroken_breeches": {
+        "name": "[Óáţĥƀŕóķéñ Ɓŕééçĥéš]"
+      },
+      "oathbroken_legwraps": {
+        "name": "[Óáţĥƀŕóķéñ Ļéĝŵŕáþš]"
+      },
+      "oathbroken_legguards": {
+        "name": "[Óáţĥƀŕóķéñ Ļéĝĝúáŕðš]"
+      },
+      "oathbroken_chausses": {
+        "name": "[Óáţĥƀŕóķéñ Çĥáúššéš]"
+      },
+      "seamist_legwraps": {
+        "name": "[Šéáɱíšţ Ļéĝŵŕáþš]"
+      },
+      "seamist_chausses": {
+        "name": "[Šéáɱíšţ Çĥáúššéš]"
+      },
+      "warmonger_treads": {
+        "name": "[Ŵáŕɱóñĝéŕ Ţŕéáðš]"
+      },
+      "warmonger_greaves": {
+        "name": "[Ŵáŕɱóñĝéŕ Ĝŕéáʋéš]"
+      },
+      "sparkglass_leggings": {
+        "name": "[Šþáŕķĝļášš Ļéĝĝíñĝš]"
+      },
+      "sparkglass_breeches": {
+        "name": "[Šþáŕķĝļášš Ɓŕééçĥéš]"
+      },
+      "sparkglass_legwraps": {
+        "name": "[Šþáŕķĝļášš Ļéĝŵŕáþš]"
+      },
+      "sparkglass_legguards": {
+        "name": "[Šþáŕķĝļášš Ļéĝĝúáŕðš]"
+      },
+      "sparkglass_chausses": {
+        "name": "[Šþáŕķĝļášš Çĥáúššéš]"
+      },
+      "stillhymn_treads": {
+        "name": "[Šţíļļĥýɱñ Ţŕéáðš]"
+      },
+      "stillhymn_greaves": {
+        "name": "[Šţíļļĥýɱñ Ĝŕéáʋéš]"
+      },
+      "pearlglow_headguard": {
+        "name": "[Þéáŕļĝļóŵ Ĥéáðĝúáŕð]"
+      },
+      "pearlglow_coif": {
+        "name": "[Þéáŕļĝļóŵ Çóíƒ]"
+      },
+      "sealkeeper_gloves": {
+        "name": "[Šéáļķééþéŕ Ĝļóʋéš]"
+      },
+      "sealkeeper_grips": {
+        "name": "[Šéáļķééþéŕ Ĝŕíþš]"
+      },
+      "sealkeeper_handwraps": {
+        "name": "[Šéáļķééþéŕ Ĥáñðŵŕáþš]"
+      },
+      "sealkeeper_gauntlets": {
+        "name": "[Šéáļķééþéŕ Ĝáúñţļéţš]"
+      },
+      "sealkeeper_handguards": {
+        "name": "[Šéáļķééþéŕ Ĥáñðĝúáŕðš]"
+      },
+      "fetterbound_leggings": {
+        "name": "[Ƒéţţéŕƀóúñð Ļéĝĝíñĝš]"
+      },
+      "fetterbound_breeches": {
+        "name": "[Ƒéţţéŕƀóúñð Ɓŕééçĥéš]"
+      },
+      "fetterbound_legwraps": {
+        "name": "[Ƒéţţéŕƀóúñð Ļéĝŵŕáþš]"
+      },
+      "fetterbound_legguards": {
+        "name": "[Ƒéţţéŕƀóúñð Ļéĝĝúáŕðš]"
+      },
+      "fetterbound_chausses": {
+        "name": "[Ƒéţţéŕƀóúñð Çĥáúššéš]"
+      },
+      "shroudcaller_tunic": {
+        "name": "[Šĥŕóúðçáļļéŕ Ţúñíç]"
+      },
+      "shroudcaller_chainmail": {
+        "name": "[Šĥŕóúðçáļļéŕ Çĥáíñɱáíļ]"
+      },
+      "wyrmshadow_tunic": {
+        "name": "[Ŵýŕɱšĥáðóŵ Ţúñíç]"
+      },
+      "wyrmshadow_chainmail": {
+        "name": "[Ŵýŕɱšĥáðóŵ Çĥáíñɱáíļ]"
+      },
+      "cinderbrood_shoulderpads": {
+        "name": "[Çíñðéŕƀŕóóð Šĥóúļðéŕþáðš]"
+      },
+      "cinderbrood_shoulderguards": {
+        "name": "[Çíñðéŕƀŕóóð Šĥóúļðéŕĝúáŕðš]"
+      },
+      "cinderbrood_pauldrons": {
+        "name": "[Çíñðéŕƀŕóóð Þáúļðŕóñš]"
+      },
+      "hoarfrost_mantle": {
+        "name": "[Ĥóáŕƒŕóšţ Ɱáñţļé]"
+      },
+      "hoarfrost_shoulderpads": {
+        "name": "[Ĥóáŕƒŕóšţ Šĥóúļðéŕþáðš]"
+      },
+      "hoarfrost_spaulders": {
+        "name": "[Ĥóáŕƒŕóšţ Šþáúļðéŕš]"
+      },
+      "blackmere_mantle": {
+        "name": "[Ɓļáçķɱéŕé Ɱáñţļé]"
+      },
+      "blackmere_shoulderpads": {
+        "name": "[Ɓļáçķɱéŕé Šĥóúļðéŕþáðš]"
+      },
+      "blackmere_shoulderguards": {
+        "name": "[Ɓļáçķɱéŕé Šĥóúļðéŕĝúáŕðš]"
+      },
+      "blackmere_pauldrons": {
+        "name": "[Ɓļáçķɱéŕé Þáúļðŕóñš]"
+      },
+      "blackmere_spaulders": {
+        "name": "[Ɓļáçķɱéŕé Šþáúļðéŕš]"
+      },
+      "reedhush_mantle": {
+        "name": "[Ŕééðĥúšĥ Ɱáñţļé]"
+      },
+      "reedhush_shoulderpads": {
+        "name": "[Ŕééðĥúšĥ Šĥóúļðéŕþáðš]"
+      },
+      "reedhush_shoulderguards": {
+        "name": "[Ŕééðĥúšĥ Šĥóúļðéŕĝúáŕðš]"
+      },
+      "reedhush_pauldrons": {
+        "name": "[Ŕééðĥúšĥ Þáúļðŕóñš]"
+      },
+      "reedhush_spaulders": {
+        "name": "[Ŕééðĥúšĥ Šþáúļðéŕš]"
+      },
+      "cairnking_mantle": {
+        "name": "[Çáíŕñķíñĝ Ɱáñţļé]"
+      },
+      "cairnking_shoulderpads": {
+        "name": "[Çáíŕñķíñĝ Šĥóúļðéŕþáðš]"
+      },
+      "cairnking_shoulderguards": {
+        "name": "[Çáíŕñķíñĝ Šĥóúļðéŕĝúáŕðš]"
+      },
+      "cairnking_pauldrons": {
+        "name": "[Çáíŕñķíñĝ Þáúļðŕóñš]"
+      },
+      "cairnking_spaulders": {
+        "name": "[Çáíŕñķíñĝ Šþáúļðéŕš]"
+      },
+      "palehunt_mantle": {
+        "name": "[Þáļéĥúñţ Ɱáñţļé]"
+      },
+      "palehunt_shoulderpads": {
+        "name": "[Þáļéĥúñţ Šĥóúļðéŕþáðš]"
+      },
+      "palehunt_shoulderguards": {
+        "name": "[Þáļéĥúñţ Šĥóúļðéŕĝúáŕðš]"
+      },
+      "palehunt_pauldrons": {
+        "name": "[Þáļéĥúñţ Þáúļðŕóñš]"
+      },
+      "palehunt_spaulders": {
+        "name": "[Þáļéĥúñţ Šþáúļðéŕš]"
+      },
+      "jadeshrine_mantle": {
+        "name": "[Ĵáðéšĥŕíñé Ɱáñţļé]"
+      },
+      "jadeshrine_shoulderpads": {
+        "name": "[Ĵáðéšĥŕíñé Šĥóúļðéŕþáðš]"
+      },
+      "jadeshrine_shoulderguards": {
+        "name": "[Ĵáðéšĥŕíñé Šĥóúļðéŕĝúáŕðš]"
+      },
+      "jadeshrine_pauldrons": {
+        "name": "[Ĵáðéšĥŕíñé Þáúļðŕóñš]"
+      },
+      "jadeshrine_spaulders": {
+        "name": "[Ĵáðéšĥŕíñé Šþáúļðéŕš]"
+      },
+      "gildhedge_mantle": {
+        "name": "[Ĝíļðĥéðĝé Ɱáñţļé]"
+      },
+      "gildhedge_shoulderpads": {
+        "name": "[Ĝíļðĥéðĝé Šĥóúļðéŕþáðš]"
+      },
+      "gildhedge_spaulders": {
+        "name": "[Ĝíļðĥéðĝé Šþáúļðéŕš]"
+      },
+      "saltwrack_mantle": {
+        "name": "[Šáļţŵŕáçķ Ɱáñţļé]"
+      },
+      "saltwrack_shoulderpads": {
+        "name": "[Šáļţŵŕáçķ Šĥóúļðéŕþáðš]"
+      },
+      "saltwrack_spaulders": {
+        "name": "[Šáļţŵŕáçķ Šþáúļðéŕš]"
+      },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
       },

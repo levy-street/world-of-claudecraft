@@ -19189,6 +19189,234 @@ export const ko_KR: EnTranslations = {
       "highgale_cord": {
         "name": "높바람 허리끈"
       },
+      "breakwater_mantle": {
+        "name": "방파제 어깨걸이"
+      },
+      "breakwater_shoulderpads": {
+        "name": "방파제 어깨덧대"
+      },
+      "breakwater_spaulders": {
+        "name": "방파제 어깨보호구"
+      },
+      "gravebell_treads": {
+        "name": "무덤종 덧신"
+      },
+      "gravebell_greaves": {
+        "name": "무덤종 경갑"
+      },
+      "cryptbound_tunic": {
+        "name": "묘실속박 튜닉"
+      },
+      "cryptbound_chainmail": {
+        "name": "묘실속박 사슬옷"
+      },
+      "oathbroken_leggings": {
+        "name": "맹세파기 각반"
+      },
+      "oathbroken_breeches": {
+        "name": "맹세파기 가죽바지"
+      },
+      "oathbroken_legwraps": {
+        "name": "맹세파기 다리싸개"
+      },
+      "oathbroken_legguards": {
+        "name": "맹세파기 다리갑옷"
+      },
+      "oathbroken_chausses": {
+        "name": "맹세파기 사슬각반"
+      },
+      "seamist_legwraps": {
+        "name": "바다안개 다리싸개"
+      },
+      "seamist_chausses": {
+        "name": "바다안개 사슬각반"
+      },
+      "warmonger_treads": {
+        "name": "전쟁광 덧신"
+      },
+      "warmonger_greaves": {
+        "name": "전쟁광 경갑"
+      },
+      "sparkglass_leggings": {
+        "name": "불꽃수정 각반"
+      },
+      "sparkglass_breeches": {
+        "name": "불꽃수정 가죽바지"
+      },
+      "sparkglass_legwraps": {
+        "name": "불꽃수정 다리싸개"
+      },
+      "sparkglass_legguards": {
+        "name": "불꽃수정 다리갑옷"
+      },
+      "sparkglass_chausses": {
+        "name": "불꽃수정 사슬각반"
+      },
+      "stillhymn_treads": {
+        "name": "고요찬가 덧신"
+      },
+      "stillhymn_greaves": {
+        "name": "고요찬가 경갑"
+      },
+      "pearlglow_headguard": {
+        "name": "진주빛 머리보호대"
+      },
+      "pearlglow_coif": {
+        "name": "진주빛 사슬두건"
+      },
+      "sealkeeper_gloves": {
+        "name": "봉인지기 장갑"
+      },
+      "sealkeeper_grips": {
+        "name": "봉인지기 손아귀"
+      },
+      "sealkeeper_handwraps": {
+        "name": "봉인지기 손싸개"
+      },
+      "sealkeeper_gauntlets": {
+        "name": "봉인지기 건틀릿"
+      },
+      "sealkeeper_handguards": {
+        "name": "봉인지기 손보호구"
+      },
+      "fetterbound_leggings": {
+        "name": "족쇄속박 각반"
+      },
+      "fetterbound_breeches": {
+        "name": "족쇄속박 가죽바지"
+      },
+      "fetterbound_legwraps": {
+        "name": "족쇄속박 다리싸개"
+      },
+      "fetterbound_legguards": {
+        "name": "족쇄속박 다리갑옷"
+      },
+      "fetterbound_chausses": {
+        "name": "족쇄속박 사슬각반"
+      },
+      "shroudcaller_tunic": {
+        "name": "수의소환자 튜닉"
+      },
+      "shroudcaller_chainmail": {
+        "name": "수의소환자 사슬옷"
+      },
+      "wyrmshadow_tunic": {
+        "name": "용그림자 튜닉"
+      },
+      "wyrmshadow_chainmail": {
+        "name": "용그림자 사슬옷"
+      },
+      "cinderbrood_shoulderpads": {
+        "name": "잿불무리 어깨덧대"
+      },
+      "cinderbrood_shoulderguards": {
+        "name": "잿불무리 어깨받이"
+      },
+      "cinderbrood_pauldrons": {
+        "name": "잿불무리 어깨갑옷"
+      },
+      "hoarfrost_mantle": {
+        "name": "서리꽃 어깨걸이"
+      },
+      "hoarfrost_shoulderpads": {
+        "name": "서리꽃 어깨덧대"
+      },
+      "hoarfrost_spaulders": {
+        "name": "서리꽃 어깨보호구"
+      },
+      "blackmere_mantle": {
+        "name": "검은호수 어깨걸이"
+      },
+      "blackmere_shoulderpads": {
+        "name": "검은호수 어깨덧대"
+      },
+      "blackmere_shoulderguards": {
+        "name": "검은호수 어깨받이"
+      },
+      "blackmere_pauldrons": {
+        "name": "검은호수 어깨갑옷"
+      },
+      "blackmere_spaulders": {
+        "name": "검은호수 어깨보호구"
+      },
+      "reedhush_mantle": {
+        "name": "갈대고요 어깨걸이"
+      },
+      "reedhush_shoulderpads": {
+        "name": "갈대고요 어깨덧대"
+      },
+      "reedhush_shoulderguards": {
+        "name": "갈대고요 어깨받이"
+      },
+      "reedhush_pauldrons": {
+        "name": "갈대고요 어깨갑옷"
+      },
+      "reedhush_spaulders": {
+        "name": "갈대고요 어깨보호구"
+      },
+      "cairnking_mantle": {
+        "name": "돌무덤왕 어깨걸이"
+      },
+      "cairnking_shoulderpads": {
+        "name": "돌무덤왕 어깨덧대"
+      },
+      "cairnking_shoulderguards": {
+        "name": "돌무덤왕 어깨받이"
+      },
+      "cairnking_pauldrons": {
+        "name": "돌무덤왕 어깨갑옷"
+      },
+      "cairnking_spaulders": {
+        "name": "돌무덤왕 어깨보호구"
+      },
+      "palehunt_mantle": {
+        "name": "창백한사냥 어깨걸이"
+      },
+      "palehunt_shoulderpads": {
+        "name": "창백한사냥 어깨덧대"
+      },
+      "palehunt_shoulderguards": {
+        "name": "창백한사냥 어깨받이"
+      },
+      "palehunt_pauldrons": {
+        "name": "창백한사냥 어깨갑옷"
+      },
+      "palehunt_spaulders": {
+        "name": "창백한사냥 어깨보호구"
+      },
+      "jadeshrine_mantle": {
+        "name": "비취사당 어깨걸이"
+      },
+      "jadeshrine_shoulderpads": {
+        "name": "비취사당 어깨덧대"
+      },
+      "jadeshrine_shoulderguards": {
+        "name": "비취사당 어깨받이"
+      },
+      "jadeshrine_pauldrons": {
+        "name": "비취사당 어깨갑옷"
+      },
+      "jadeshrine_spaulders": {
+        "name": "비취사당 어깨보호구"
+      },
+      "gildhedge_mantle": {
+        "name": "금빛울타리 어깨걸이"
+      },
+      "gildhedge_shoulderpads": {
+        "name": "금빛울타리 어깨덧대"
+      },
+      "gildhedge_spaulders": {
+        "name": "금빛울타리 어깨보호구"
+      },
+      "saltwrack_mantle": {
+        "name": "소금난파 어깨걸이"
+      },
+      "saltwrack_shoulderpads": {
+        "name": "소금난파 어깨덧대"
+      },
+      "saltwrack_spaulders": {
+        "name": "소금난파 어깨보호구"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },

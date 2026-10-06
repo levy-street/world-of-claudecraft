@@ -19189,6 +19189,234 @@ export const ja_JP: EnTranslations = {
       "highgale_cord": {
         "name": "高き疾風のコード"
       },
+      "breakwater_mantle": {
+        "name": "防波堤のマント"
+      },
+      "breakwater_shoulderpads": {
+        "name": "防波堤のショルダーパッド"
+      },
+      "breakwater_spaulders": {
+        "name": "防波堤のスポルダー"
+      },
+      "gravebell_treads": {
+        "name": "墓鐘の短靴"
+      },
+      "gravebell_greaves": {
+        "name": "墓鐘のグリーブ"
+      },
+      "cryptbound_tunic": {
+        "name": "墓所縛りのチュニック"
+      },
+      "cryptbound_chainmail": {
+        "name": "墓所縛りのチェーンメイル"
+      },
+      "oathbroken_leggings": {
+        "name": "誓い破りのレギンス"
+      },
+      "oathbroken_breeches": {
+        "name": "誓い破りのブリーチーズ"
+      },
+      "oathbroken_legwraps": {
+        "name": "誓い破りのレッグラップ"
+      },
+      "oathbroken_legguards": {
+        "name": "誓い破りのレグガード"
+      },
+      "oathbroken_chausses": {
+        "name": "誓い破りのチョース"
+      },
+      "seamist_legwraps": {
+        "name": "海霧のレッグラップ"
+      },
+      "seamist_chausses": {
+        "name": "海霧のチョース"
+      },
+      "warmonger_treads": {
+        "name": "戦狂いの短靴"
+      },
+      "warmonger_greaves": {
+        "name": "戦狂いのグリーブ"
+      },
+      "sparkglass_leggings": {
+        "name": "火花水晶のレギンス"
+      },
+      "sparkglass_breeches": {
+        "name": "火花水晶のブリーチーズ"
+      },
+      "sparkglass_legwraps": {
+        "name": "火花水晶のレッグラップ"
+      },
+      "sparkglass_legguards": {
+        "name": "火花水晶のレグガード"
+      },
+      "sparkglass_chausses": {
+        "name": "火花水晶のチョース"
+      },
+      "stillhymn_treads": {
+        "name": "静寂の聖歌の短靴"
+      },
+      "stillhymn_greaves": {
+        "name": "静寂の聖歌のグリーブ"
+      },
+      "pearlglow_headguard": {
+        "name": "真珠の輝きのヘッドガード"
+      },
+      "pearlglow_coif": {
+        "name": "真珠の輝きのコイフ"
+      },
+      "sealkeeper_gloves": {
+        "name": "封印守りの手甲"
+      },
+      "sealkeeper_grips": {
+        "name": "封印守りのグリップ"
+      },
+      "sealkeeper_handwraps": {
+        "name": "封印守りのハンドラップ"
+      },
+      "sealkeeper_gauntlets": {
+        "name": "封印守りの籠手"
+      },
+      "sealkeeper_handguards": {
+        "name": "封印守りのハンドガード"
+      },
+      "fetterbound_leggings": {
+        "name": "枷縛りのレギンス"
+      },
+      "fetterbound_breeches": {
+        "name": "枷縛りのブリーチーズ"
+      },
+      "fetterbound_legwraps": {
+        "name": "枷縛りのレッグラップ"
+      },
+      "fetterbound_legguards": {
+        "name": "枷縛りのレグガード"
+      },
+      "fetterbound_chausses": {
+        "name": "枷縛りのチョース"
+      },
+      "shroudcaller_tunic": {
+        "name": "屍衣呼びのチュニック"
+      },
+      "shroudcaller_chainmail": {
+        "name": "屍衣呼びのチェーンメイル"
+      },
+      "wyrmshadow_tunic": {
+        "name": "竜影のチュニック"
+      },
+      "wyrmshadow_chainmail": {
+        "name": "竜影のチェーンメイル"
+      },
+      "cinderbrood_shoulderpads": {
+        "name": "残り火の眷属のショルダーパッド"
+      },
+      "cinderbrood_shoulderguards": {
+        "name": "残り火の眷属のショルダーガード"
+      },
+      "cinderbrood_pauldrons": {
+        "name": "残り火の眷属の肩甲"
+      },
+      "hoarfrost_mantle": {
+        "name": "霧氷のマント"
+      },
+      "hoarfrost_shoulderpads": {
+        "name": "霧氷のショルダーパッド"
+      },
+      "hoarfrost_spaulders": {
+        "name": "霧氷のスポルダー"
+      },
+      "blackmere_mantle": {
+        "name": "黒き湖のマント"
+      },
+      "blackmere_shoulderpads": {
+        "name": "黒き湖のショルダーパッド"
+      },
+      "blackmere_shoulderguards": {
+        "name": "黒き湖のショルダーガード"
+      },
+      "blackmere_pauldrons": {
+        "name": "黒き湖の肩甲"
+      },
+      "blackmere_spaulders": {
+        "name": "黒き湖のスポルダー"
+      },
+      "reedhush_mantle": {
+        "name": "葦の静けさのマント"
+      },
+      "reedhush_shoulderpads": {
+        "name": "葦の静けさのショルダーパッド"
+      },
+      "reedhush_shoulderguards": {
+        "name": "葦の静けさのショルダーガード"
+      },
+      "reedhush_pauldrons": {
+        "name": "葦の静けさの肩甲"
+      },
+      "reedhush_spaulders": {
+        "name": "葦の静けさのスポルダー"
+      },
+      "cairnking_mantle": {
+        "name": "塚の王のマント"
+      },
+      "cairnking_shoulderpads": {
+        "name": "塚の王のショルダーパッド"
+      },
+      "cairnking_shoulderguards": {
+        "name": "塚の王のショルダーガード"
+      },
+      "cairnking_pauldrons": {
+        "name": "塚の王の肩甲"
+      },
+      "cairnking_spaulders": {
+        "name": "塚の王のスポルダー"
+      },
+      "palehunt_mantle": {
+        "name": "蒼白の狩りのマント"
+      },
+      "palehunt_shoulderpads": {
+        "name": "蒼白の狩りのショルダーパッド"
+      },
+      "palehunt_shoulderguards": {
+        "name": "蒼白の狩りのショルダーガード"
+      },
+      "palehunt_pauldrons": {
+        "name": "蒼白の狩りの肩甲"
+      },
+      "palehunt_spaulders": {
+        "name": "蒼白の狩りのスポルダー"
+      },
+      "jadeshrine_mantle": {
+        "name": "翡翠の祠のマント"
+      },
+      "jadeshrine_shoulderpads": {
+        "name": "翡翠の祠のショルダーパッド"
+      },
+      "jadeshrine_shoulderguards": {
+        "name": "翡翠の祠のショルダーガード"
+      },
+      "jadeshrine_pauldrons": {
+        "name": "翡翠の祠の肩甲"
+      },
+      "jadeshrine_spaulders": {
+        "name": "翡翠の祠のスポルダー"
+      },
+      "gildhedge_mantle": {
+        "name": "金の生垣のマント"
+      },
+      "gildhedge_shoulderpads": {
+        "name": "金の生垣のショルダーパッド"
+      },
+      "gildhedge_spaulders": {
+        "name": "金の生垣のスポルダー"
+      },
+      "saltwrack_mantle": {
+        "name": "塩の難破のマント"
+      },
+      "saltwrack_shoulderpads": {
+        "name": "塩の難破のショルダーパッド"
+      },
+      "saltwrack_spaulders": {
+        "name": "塩の難破のスポルダー"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },

@@ -19189,6 +19189,234 @@ export const en_CA: EnTranslations = {
       "highgale_cord": {
         "name": "Highgale Cord"
       },
+      "breakwater_mantle": {
+        "name": "Breakwater Mantle"
+      },
+      "breakwater_shoulderpads": {
+        "name": "Breakwater Shoulderpads"
+      },
+      "breakwater_spaulders": {
+        "name": "Breakwater Spaulders"
+      },
+      "gravebell_treads": {
+        "name": "Gravebell Treads"
+      },
+      "gravebell_greaves": {
+        "name": "Gravebell Greaves"
+      },
+      "cryptbound_tunic": {
+        "name": "Cryptbound Tunic"
+      },
+      "cryptbound_chainmail": {
+        "name": "Cryptbound Chainmail"
+      },
+      "oathbroken_leggings": {
+        "name": "Oathbroken Leggings"
+      },
+      "oathbroken_breeches": {
+        "name": "Oathbroken Breeches"
+      },
+      "oathbroken_legwraps": {
+        "name": "Oathbroken Legwraps"
+      },
+      "oathbroken_legguards": {
+        "name": "Oathbroken Legguards"
+      },
+      "oathbroken_chausses": {
+        "name": "Oathbroken Chausses"
+      },
+      "seamist_legwraps": {
+        "name": "Seamist Legwraps"
+      },
+      "seamist_chausses": {
+        "name": "Seamist Chausses"
+      },
+      "warmonger_treads": {
+        "name": "Warmonger Treads"
+      },
+      "warmonger_greaves": {
+        "name": "Warmonger Greaves"
+      },
+      "sparkglass_leggings": {
+        "name": "Sparkglass Leggings"
+      },
+      "sparkglass_breeches": {
+        "name": "Sparkglass Breeches"
+      },
+      "sparkglass_legwraps": {
+        "name": "Sparkglass Legwraps"
+      },
+      "sparkglass_legguards": {
+        "name": "Sparkglass Legguards"
+      },
+      "sparkglass_chausses": {
+        "name": "Sparkglass Chausses"
+      },
+      "stillhymn_treads": {
+        "name": "Stillhymn Treads"
+      },
+      "stillhymn_greaves": {
+        "name": "Stillhymn Greaves"
+      },
+      "pearlglow_headguard": {
+        "name": "Pearlglow Headguard"
+      },
+      "pearlglow_coif": {
+        "name": "Pearlglow Coif"
+      },
+      "sealkeeper_gloves": {
+        "name": "Sealkeeper Gloves"
+      },
+      "sealkeeper_grips": {
+        "name": "Sealkeeper Grips"
+      },
+      "sealkeeper_handwraps": {
+        "name": "Sealkeeper Handwraps"
+      },
+      "sealkeeper_gauntlets": {
+        "name": "Sealkeeper Gauntlets"
+      },
+      "sealkeeper_handguards": {
+        "name": "Sealkeeper Handguards"
+      },
+      "fetterbound_leggings": {
+        "name": "Fetterbound Leggings"
+      },
+      "fetterbound_breeches": {
+        "name": "Fetterbound Breeches"
+      },
+      "fetterbound_legwraps": {
+        "name": "Fetterbound Legwraps"
+      },
+      "fetterbound_legguards": {
+        "name": "Fetterbound Legguards"
+      },
+      "fetterbound_chausses": {
+        "name": "Fetterbound Chausses"
+      },
+      "shroudcaller_tunic": {
+        "name": "Shroudcaller Tunic"
+      },
+      "shroudcaller_chainmail": {
+        "name": "Shroudcaller Chainmail"
+      },
+      "wyrmshadow_tunic": {
+        "name": "Wyrmshadow Tunic"
+      },
+      "wyrmshadow_chainmail": {
+        "name": "Wyrmshadow Chainmail"
+      },
+      "cinderbrood_shoulderpads": {
+        "name": "Cinderbrood Shoulderpads"
+      },
+      "cinderbrood_shoulderguards": {
+        "name": "Cinderbrood Shoulderguards"
+      },
+      "cinderbrood_pauldrons": {
+        "name": "Cinderbrood Pauldrons"
+      },
+      "hoarfrost_mantle": {
+        "name": "Hoarfrost Mantle"
+      },
+      "hoarfrost_shoulderpads": {
+        "name": "Hoarfrost Shoulderpads"
+      },
+      "hoarfrost_spaulders": {
+        "name": "Hoarfrost Spaulders"
+      },
+      "blackmere_mantle": {
+        "name": "Blackmere Mantle"
+      },
+      "blackmere_shoulderpads": {
+        "name": "Blackmere Shoulderpads"
+      },
+      "blackmere_shoulderguards": {
+        "name": "Blackmere Shoulderguards"
+      },
+      "blackmere_pauldrons": {
+        "name": "Blackmere Pauldrons"
+      },
+      "blackmere_spaulders": {
+        "name": "Blackmere Spaulders"
+      },
+      "reedhush_mantle": {
+        "name": "Reedhush Mantle"
+      },
+      "reedhush_shoulderpads": {
+        "name": "Reedhush Shoulderpads"
+      },
+      "reedhush_shoulderguards": {
+        "name": "Reedhush Shoulderguards"
+      },
+      "reedhush_pauldrons": {
+        "name": "Reedhush Pauldrons"
+      },
+      "reedhush_spaulders": {
+        "name": "Reedhush Spaulders"
+      },
+      "cairnking_mantle": {
+        "name": "Cairnking Mantle"
+      },
+      "cairnking_shoulderpads": {
+        "name": "Cairnking Shoulderpads"
+      },
+      "cairnking_shoulderguards": {
+        "name": "Cairnking Shoulderguards"
+      },
+      "cairnking_pauldrons": {
+        "name": "Cairnking Pauldrons"
+      },
+      "cairnking_spaulders": {
+        "name": "Cairnking Spaulders"
+      },
+      "palehunt_mantle": {
+        "name": "Palehunt Mantle"
+      },
+      "palehunt_shoulderpads": {
+        "name": "Palehunt Shoulderpads"
+      },
+      "palehunt_shoulderguards": {
+        "name": "Palehunt Shoulderguards"
+      },
+      "palehunt_pauldrons": {
+        "name": "Palehunt Pauldrons"
+      },
+      "palehunt_spaulders": {
+        "name": "Palehunt Spaulders"
+      },
+      "jadeshrine_mantle": {
+        "name": "Jadeshrine Mantle"
+      },
+      "jadeshrine_shoulderpads": {
+        "name": "Jadeshrine Shoulderpads"
+      },
+      "jadeshrine_shoulderguards": {
+        "name": "Jadeshrine Shoulderguards"
+      },
+      "jadeshrine_pauldrons": {
+        "name": "Jadeshrine Pauldrons"
+      },
+      "jadeshrine_spaulders": {
+        "name": "Jadeshrine Spaulders"
+      },
+      "gildhedge_mantle": {
+        "name": "Gildhedge Mantle"
+      },
+      "gildhedge_shoulderpads": {
+        "name": "Gildhedge Shoulderpads"
+      },
+      "gildhedge_spaulders": {
+        "name": "Gildhedge Spaulders"
+      },
+      "saltwrack_mantle": {
+        "name": "Saltwrack Mantle"
+      },
+      "saltwrack_shoulderpads": {
+        "name": "Saltwrack Shoulderpads"
+      },
+      "saltwrack_spaulders": {
+        "name": "Saltwrack Spaulders"
+      },
       "conjured_water4": {
         "name": "Conjured Springwater"
       },

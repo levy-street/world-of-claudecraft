@@ -148,13 +148,15 @@ const build = await buildItemArtAudit({
     // + the 245 choose-one leveling quest armor paintings
     // (quest-leveling-gear-icons-2026-10-06): 1709 / 1727 on 38 sheet pages,
     // measured with `node scripts/item_art_audit.mjs --verify-only`.
-    catalogCount: 1709,
-    liveItemCount: 1727,
+    // + the 76 quest blue reward rares (quest-blue-rewards-icons-2026-10-07):
+    // 1785 / 1803 on 39 sheet pages, measured the same way.
+    catalogCount: 1785,
+    liveItemCount: 1803,
     pendingArtCount: 135,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,
     heroicWeaponArtAliases: 19,
-    sheetPageCount: 38,
+    sheetPageCount: 39,
     groupCount: 26,
   },
 });
