@@ -1,10 +1,16 @@
+import type { CourierDispatchRequest, CourierInfo } from '../sim/courier';
 import type { MaterialComposition } from '../sim/material_sources';
 import type { MaterialStackSelection } from '../sim/material_stack_selection';
 import type { AccountBankInfo } from '../world_api/bank';
-import { decodeAccountBankInfo } from './account_bank_wire';
+import {
+  accountBankTransferPayload,
+  decodeAccountBankInfo,
+  selectAccountBankMirror,
+} from './account_bank_wire';
 import { resolveInitialActionBarLayout } from './action_bar_restore';
 import { CharacterRequests } from './character_requests';
 import { applyCharacterRoster, type CharacterMembership } from './character_roster';
+import { applyCourierSelfWire } from './courier_wire';
 import { materialStorageTransferPayload } from './material_storage_command';
 import { decodeWeeklyRewardInfo, sendWeekly, type WeeklyRewardInfo } from './weekly_rewards_wire';
 
@@ -1247,6 +1253,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // (`s.bank`, delta-omitted). Null away from a banker (proximity-gated by the
   // server), so it only rides the wire while the player stands at a bursar. ---
   bankInfo: BankInfo | null = null;
+  courierInfo: CourierInfo | null = null;
   accountBankInfo: AccountBankInfo | null = null;
   // --- IWorldBank: Materials Vault contents view, the per-material store beside
   // the slot bank, mirrored from the snapshot self (`s.vault`, delta-omitted).
@@ -3190,6 +3197,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this,
         s.tal,
         arena?.match?.fiesta?.augments ?? [],
+        e.membershipActive,
       );
       this.talents = presentation.talents;
       this.loadouts = presentation.loadouts;
@@ -3218,6 +3226,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       // module, where the delta contract, the by-reference adoption rationale,
       // and each key's malformed policy (vault clears, the rest retain) live.
       applyBankSelfWire(this, s);
+      applyCourierSelfWire(this, s);
       if (s.weeklyRewards !== undefined)
         this.weeklyRewardInfo = decodeWeeklyRewardInfo(s.weeklyRewards);
       applyGuildBankSelfWire(this, s, () => this.guildBankLogMirror.reset());
@@ -4602,29 +4611,14 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.cmd({ cmd: 'account_bank_list' });
   }
   selectAccountBank(characterId: number): void {
-    if (this.accountBankInfo)
-      this.accountBankInfo = {
-        ...this.accountBankInfo,
-        selectedCharacterId: characterId,
-        bank: null,
-      };
+    this.accountBankInfo = selectAccountBankMirror(this.accountBankInfo, characterId);
     this.cmd({ cmd: 'account_bank_select', characterId });
   }
-  accountBankTransfer(
-    characterId: number,
-    direction: 'deposit' | 'withdraw',
-    slotIndex: number,
-    count?: number,
-    expectedSlot?: InvSlot,
-  ): void {
-    this.cmd({
-      cmd: 'account_bank_transfer',
-      characterId,
-      direction,
-      slotIndex,
-      count,
-      expectedSlot,
-    });
+  accountBankTransfer(...args: Parameters<typeof accountBankTransferPayload>): void {
+    this.cmd({ cmd: 'account_bank_transfer', ...accountBankTransferPayload(...args) });
+  }
+  courierDispatch(request: CourierDispatchRequest): void {
+    this.cmd({ cmd: 'courier_dispatch', ...request });
   }
   bankBuySlots(): void {
     this.cmd({ cmd: 'bank_buy_slots' });

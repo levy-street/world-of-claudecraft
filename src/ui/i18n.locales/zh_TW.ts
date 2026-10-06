@@ -13,6 +13,28 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.courier.title': '信使',
+  'hudChrome.courier.close': '關閉信使',
+  'hudChrome.courier.ready': '準備配送',
+  'hudChrome.courier.outbound': '正在飛往銀行',
+  'hudChrome.courier.returning': '正帶著物品返回',
+  'hudChrome.courier.waiting': '等待歸還物品',
+  'hudChrome.courier.bags': '存入銀行',
+  'hudChrome.courier.bank': '從銀行取出',
+  'hudChrome.courier.cargo': '信使背包',
+  'hudChrome.courier.empty': '沒有物品',
+  'hudChrome.courier.send': '派出信使',
+  'hudChrome.courier.selected': '已選 {count} / {limit} 組',
+  'hudChrome.courier.select': '選擇{item}，{count}',
+  'hudChrome.courier.selectedItem': '取消選擇{item}，{count}',
+  'hudChrome.courier.instructions':
+    '請選擇整組物品。信使會先存入物品，再取出您指定的物品。任務物品無法寄送。',
+  'hudChrome.courier.membership': '續訂會員後即可開始新的配送。',
+  'hudChrome.courier.cargoSafe': '背包有空位前，信使會保管所攜帶的物品。',
+  'hudChrome.courier.unavailable': '召喚信使以安排配送。',
+  'entities.abilities.courier.name': '信使',
+  'entities.abilities.courier.description':
+    '召喚一頭會飛的驢，在您的背包和最近的銀行之間運送物品。飛行速度為普通跑步速度的250%。每次最多可選擇24組物品。開始新的配送需要會員資格。',
   // Membership additions: same-change non-Latin coverage (M16).
   'hudChrome.wocStore.subscription.benefitsTitle': '有效會員權益',
   'hudChrome.wocStore.subscription.benefitBank': '在任意銀行員處存取您其他角色的銀行。',

@@ -1,0 +1,10 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/courier_donkey/courier_donkey.glb",
+      "out": "models/creatures/courier_donkey.glb",
+      "type": "static",
+      "keepExtras": true
+    }
+  ]
+}

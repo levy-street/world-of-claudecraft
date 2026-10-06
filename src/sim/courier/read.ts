@@ -1,0 +1,64 @@
+import { bankPools, personalBankInfoFor } from '../bank';
+import { membershipActive } from '../membership';
+import type { PlayerMeta } from '../sim';
+import type { SimContext } from '../sim_context';
+import { cloneInvSlot } from '../types';
+import type { CourierInfo, CourierPose, CourierState } from './types';
+
+// Derived read cache only. PlayerMeta owns all authoritative state and weak keys
+// release entries with the resident character; no history survives logout.
+const snapshots = new WeakMap<
+  PlayerMeta,
+  { key: string; state: CourierState; info: CourierInfo }
+>();
+
+export function courierPoseFor(ctx: SimContext, pid: number): CourierPose | null {
+  const meta = ctx.players.get(pid);
+  const state = meta?.courier;
+  return state && meta
+    ? {
+        phase: state.phase,
+        x: state.x,
+        z: state.z,
+        bankerId: state.bankerId,
+        inventoryRevision: meta.wireRev,
+      }
+    : null;
+}
+export function courierWireRevisionFor(ctx: SimContext, pid: number): string | null {
+  const meta = ctx.players.get(pid);
+  const state = meta?.courier;
+  return meta && state
+    ? `${state.revision}:${state.phase === 'ready' ? meta.bankWireRev : 0}:${membershipActive(meta, ctx.time)}`
+    : null;
+}
+export function courierInfoFor(ctx: SimContext, pid: number): CourierInfo | null {
+  const meta = ctx.players.get(pid);
+  const state = meta?.courier;
+  if (!meta || !state) return null;
+  const key = courierWireRevisionFor(ctx, pid)!;
+  const cached = snapshots.get(meta);
+  if (cached?.key === key && cached.state === state) {
+    cached.info.x = state.x;
+    cached.info.z = state.z;
+    cached.info.inventoryRevision = meta.wireRev;
+    return cached.info;
+  }
+  const pools = bankPools(meta.bank);
+  const info: CourierInfo = {
+    ...courierPoseFor(ctx, pid)!,
+    cargo: state.cargo.map(cloneInvSlot),
+    withdrawals: state.withdrawals.map((s) => ({ ...s })),
+    revision: state.revision + meta.bankWireRev,
+    active: membershipActive(meta, ctx.time),
+    bankSlots: state.phase === 'ready' ? meta.bank.inventory.map(cloneInvSlot) : [],
+    bankCapacity: pools.general + pools.materials,
+    inventoryRevision: meta.wireRev,
+    bankRevision: meta.bankWireRev,
+  };
+  snapshots.set(meta, { key, state, info });
+  return info;
+}
+export function courierBankInfoFor(ctx: SimContext, pid: number) {
+  return ctx.players.get(pid)?.courier ? personalBankInfoFor(ctx, pid) : null;
+}

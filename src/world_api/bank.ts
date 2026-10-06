@@ -1,3 +1,4 @@
+import type { CourierDispatchRequest, CourierInfo } from '../sim/courier';
 import type { MaterialSourceTransferSelection } from '../sim/material_source_transfer_selection';
 import type { InvSlot } from '../sim/types';
 import type { WeeklyRewardInfo } from '../sim/weekly_rewards';
@@ -103,6 +104,8 @@ export interface VaultSpecialRef {
 }
 
 export interface IWorldBank {
+  readonly courierInfo: CourierInfo | null;
+  courierDispatch(request: CourierDispatchRequest): void;
   readonly accountBankInfo: AccountBankInfo | null;
   requestAccountBanks(): void;
   selectAccountBank(characterId: number): void;

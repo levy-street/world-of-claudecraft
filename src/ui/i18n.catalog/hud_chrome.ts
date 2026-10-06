@@ -1,3 +1,4 @@
+import { courierStrings } from './courier';
 // i18n source catalog - in-game HUD chrome strings that were previously hard-coded
 // at their call sites (emote wheel/editor, swing timer, rest indicator, mobile
 // controls, minimap/compass/clock widgets, DPS/HPS meters formatting). English
@@ -13,6 +14,7 @@ import { professionTrainerStrings } from './profession_trainers';
 import { weeklyRewardStrings } from './weekly_rewards';
 
 export const hudChromeStrings = {
+  courier: courierStrings,
   framePresets: {
     apply: 'Apply',
     pickerLabel: 'Frame Presets: {name}',

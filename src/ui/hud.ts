@@ -179,6 +179,7 @@ import { bagSlotsLineKey, bagsWindowShown } from './bags_view';
 import { BagsWindow, dismissBagPrompts } from './bags_window';
 import { BankWindow } from './bank_window';
 import { makeBankWindowFocus } from './bank_window_focus';
+import { closeBankBags, openBankCompanion, undockBagCompanions } from './bank_window_lifecycle';
 import {
   type BannerClass,
   type BannerEnqueueOutcome,
@@ -448,6 +449,7 @@ import { ReadyCheckLeaderWindow } from './hud/chat/ready_check_leader_window';
 import { type CooldownManagerController, mountCooldowns } from './hud/cooldown_manager';
 import { CosmeticsWindow } from './hud/cosmetics';
 import { SkinEventController } from './hud/cosmetics/skin_event_controller';
+import { CourierWindow } from './hud/courier';
 import {
   CrossHotbarController,
   type CrossHotbarHold,
@@ -3648,6 +3650,9 @@ export class Hud {
       case 'bank-window':
         this.closeBank();
         break;
+      case 'courier-window':
+        this.courierWindow.close();
+        break;
       case 'weekly-quests-window':
         this.weeklyQuestsWindow.close();
         break;
@@ -5375,6 +5380,16 @@ export class Hud {
     // Repaint inventory through the same coordinator as authoritative snapshots.
     onInventoryChanged: () => this.onInventoryChanged(),
   });
+  private readonly courierWindow = new CourierWindow($('#courier-window'), {
+    ...this.presentationBag,
+    ...this.windowFocus('#courier-window'),
+    info: () => this.sim.courierInfo,
+    inventory: () => this.sim.inventory,
+    dispatch: (request) => this.sim.courierDispatch(request),
+    closeOthers: () => this.closeOtherWindows('#courier-window'),
+    hideTooltip: () => this.hideTooltip(),
+    onClosed: () => {},
+  });
   // Book of Deeds window painter (deeds_view.ts core + deeds_window.ts
   // painter): the deed catalog browser and title picker over the IWorldDeeds
   // facet. A standalone trapping window (windowFocus), not a docked
@@ -6948,6 +6963,7 @@ export class Hud {
     if (this.townFocusOpen) this.renderTownFocus();
     if (this.marketWindow.isOpen) this.marketWindow.render();
     if (this.bankWindow.isOpen) this.bankWindow.render();
+    if (this.courierWindow.isOpen()) this.courierWindow.render(true);
     if (this.deedsWindow.isOpen) this.deedsWindow.render();
     if (this.reliquaryWindow.isOpen) this.reliquaryWindow.render();
     if (this.professionsWindow.isOpen) this.professionsWindow.render();
@@ -9578,6 +9594,7 @@ export class Hud {
     if (slowHud && this.wocMarketWindow.isOpen) this.wocMarketWindow.refreshIfChanged();
     // The bank closes itself when the bank mirror goes null (left the banker).
     if (slowHud && this.bankWindow.isOpen) this.bankWindow.refreshIfChanged();
+    if (slowHud && this.courierWindow.isOpen()) this.courierWindow.refreshIfChanged();
     // The store's charter fit gate reads live ladder state that no store event
     // observes, so an open store notices a rung bought behind it (ruling 21).
     if (slowHud && this.dailyRewardsWindow.isOpen) this.dailyRewardsWindow.refreshIfChanged();
@@ -12087,6 +12104,9 @@ export class Hud {
         case 'bank':
         case 'weekly_rewards':
           this.openBank(ev.type === 'weekly_rewards' ? 'rewards' : undefined);
+          break;
+        case 'courier':
+          this.courierWindow.open();
           break;
         case 'riftForge':
           // Interact at the Riftwright: open the Rift Forge window (which
@@ -15623,18 +15643,13 @@ export class Hud {
     // Weekly rewards own the screen; ordinary bank storage keeps its bags companion.
     if (this.vendorOpen) this.closeVendor();
     if (this.openHeroicVendorNpcId !== null) this.closeHeroicVendor();
-    if (
-      this.bankWindow.isOpen &&
-      document.body.classList.contains('weekly-vault-open') !== (tab === 'rewards')
-    )
-      this.closeBank();
-    if (tab === 'rewards') this.bagsWindow.close();
-    document.body.classList.toggle('weekly-vault-open', tab === 'rewards');
-    document.body.classList.toggle('bank-open', tab !== 'rewards');
-    this.bankWindow.open(tab);
-    if (tab === 'rewards') return;
-    this.renderBags();
-    $('#bags').style.display = 'flex';
+    openBankCompanion(
+      this.bankWindow,
+      $('#bags'),
+      () => this.bagsWindow.close(),
+      () => this.renderBags(),
+      tab,
+    );
   }
 
   closeBank(): void {
@@ -15642,22 +15657,11 @@ export class Hud {
   }
 
   private onBankClosed(): void {
-    const closeMobileBags = touchBagsShown(document.body.classList, $('#bags').style.display);
-    document.body.classList.remove('bank-open', 'weekly-vault-open'); // bags (if still open) re-centres
-    if (closeMobileBags) {
-      // Mirror closeVendor's teardown backstop: a discard/sell/deposit prompt may hold
-      // #bags inert (installPromptDialog) and this mobile path hides the grid without
-      // running the prompt's dismiss(), so clear inert AND remove the prompt node too
-      // (a hidden #bags is never inert and never owns a live prompt; an orphan would
-      // keep promptModalOpen() gating game keys).
-      dismissBagPrompts();
-      const bags = $('#bags');
-      bags.style.display = 'none';
-      bags.inert = false;
-      this.cancelPetFeed();
-    } else if ($('#bags').style.display !== 'none') {
-      this.renderBags();
-    }
+    closeBankBags(
+      $('#bags'),
+      () => this.cancelPetFeed(),
+      () => this.renderBags(),
+    );
   }
 
   get bankWindowOpen(): boolean {
@@ -15672,19 +15676,7 @@ export class Hud {
   // Desktop deliberately keeps the docked offset until the bank closes (the
   // recorded vendor-family behavior); toggleBags re-adds the class on re-open.
   private onBagsClosed(): void {
-    if (document.body.classList.contains('mobile-touch') && this.bankWindow.isOpen) {
-      document.body.classList.remove('bank-open');
-    }
-    // The market cluster undocks the same way: a bags-only close (the bags x-btn
-    // or the tray toggle; the market keeps its own x-btn, bags is only its
-    // optional Sell-tab companion) must not leave the still-open market pinned
-    // to the left half of the mobile 50/50 pairing with nothing on the right.
-    // Dropping the class lets the standalone mobile sheet rule take the full
-    // width back; mobile-only exactly like the bank arm above (desktop
-    // deliberately keeps the docked offset until the market closes).
-    if (document.body.classList.contains('mobile-touch') && this.marketWindow.isOpen) {
-      document.body.classList.remove('market-open');
-    }
+    undockBagCompanions(this.bankWindow.isOpen, this.marketWindow.isOpen);
     // The char-sheet companion undocks too: with the bags gone the sheet takes the
     // full screen back rather than staying a half-width orphan.
     this.syncCharBagsPairing();

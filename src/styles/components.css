@@ -26485,4 +26485,64 @@
   .frame-preset-loadouts .tal-lo-item {
     min-height: 40px;
   }
+  /* ---------- courier ---------- */
+  #courier-window {
+    width: min(680px, 100%);
+    max-height: calc(100dvh - 48px);
+  }
+  #courier-window .courier-columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+  #courier-window .courier-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  #courier-window .courier-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    min-height: 40px;
+    height: auto;
+    text-align: start;
+    white-space: normal;
+  }
+  #courier-window .courier-item-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  #courier-window .courier-item-label img {
+    width: 32px;
+    height: 32px;
+    flex: none;
+  }
+  #courier-window .courier-item span:first-child {
+    overflow-wrap: anywhere;
+  }
+  #courier-window .courier-cargo {
+    padding: 0;
+    list-style: none;
+  }
+  #courier-window .courier-cargo li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  #courier-window .ui-win-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  #courier-window .courier-send,
+  #courier-window .x-btn {
+    min-height: 40px;
+    min-width: 40px;
+  }
 }

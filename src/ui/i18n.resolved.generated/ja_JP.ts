@@ -347,6 +347,26 @@ export const ja_JP: EnTranslations = {
     }
   },
   "hudChrome": {
+    "courier": {
+      "title": "配達員",
+      "close": "配達員を閉じる",
+      "ready": "配達の準備完了",
+      "outbound": "銀行へ飛行中",
+      "returning": "アイテムを持って帰還中",
+      "waiting": "アイテムを返すため待機中",
+      "bags": "銀行へ送る",
+      "bank": "銀行から取り出す",
+      "cargo": "配達員の荷物",
+      "empty": "アイテムなし",
+      "send": "配達員を送る",
+      "selected": "{count} / {limit} スタック選択中",
+      "select": "{item}、{count}を選択",
+      "selectedItem": "{item}、{count}の選択を解除",
+      "instructions": "スタック全体を選択してください。配達員は預け入れた後、指定したアイテムを引き出します。クエストアイテムは送れません。",
+      "membership": "次の配達にはメンバーシップの更新が必要です。",
+      "cargoSafe": "バッグに空きができるまで、配達員がアイテムを保管します。",
+      "unavailable": "配達員を召喚して配達を計画しましょう。"
+    },
     "framePresets": {
       "apply": "適用",
       "pickerLabel": "フレームプリセット：{name}",
@@ -13119,6 +13139,10 @@ export const ja_JP: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "courier": {
+        "name": "配達員",
+        "description": "空飛ぶロバを召喚し、バッグと最寄りの銀行の間で荷物を運びます。通常の走行速度の250%で飛びます。1回につき最大24スタックを選択できます。新しい配達にはメンバーシップが必要です。"
+      },
       "sport_kick": {
         "name": "キック",
         "description": "狙った地点へボールをグラウンダーで蹴り出す。"

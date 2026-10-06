@@ -26,6 +26,7 @@ export function setMembership(ctx: SimContext, pid: number, remainingSeconds: nu
   if (p.membershipActive === active) return;
   p.membershipActive = active;
   meta.wireRev++;
+  ctx.refreshKnownAbilities(meta, false);
   if (active) {
     claimMembershipArmour(ctx, pid, true);
     perfectMembershipArmour(meta, p.level);
@@ -37,6 +38,7 @@ export function updateMembership(ctx: SimContext, meta: PlayerMeta, p: Entity): 
   if (p.membershipActive && !membershipActive(meta, ctx.time)) {
     p.membershipActive = false;
     meta.wireRev++;
+    ctx.refreshKnownAbilities(meta, false);
     recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   }
 }
@@ -51,6 +53,7 @@ export function claimMembershipArmour(ctx: SimContext, pid?: number, quiet = fal
     ...Object.values(meta.equipment),
     ...meta.inventory.map((slot) => slot.itemId),
     ...meta.bank.inventory.map((slot) => slot.itemId),
+    ...(meta.courier?.cargo.map((slot) => slot.itemId) ?? []),
   ]);
   for (const slot of MEMBERSHIP_ARMOUR_SLOTS) {
     const itemId = `membership_${slot}`;

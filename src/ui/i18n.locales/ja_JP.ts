@@ -13,6 +13,28 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.courier.title': '配達員',
+  'hudChrome.courier.close': '配達員を閉じる',
+  'hudChrome.courier.ready': '配達の準備完了',
+  'hudChrome.courier.outbound': '銀行へ飛行中',
+  'hudChrome.courier.returning': 'アイテムを持って帰還中',
+  'hudChrome.courier.waiting': 'アイテムを返すため待機中',
+  'hudChrome.courier.bags': '銀行へ送る',
+  'hudChrome.courier.bank': '銀行から取り出す',
+  'hudChrome.courier.cargo': '配達員の荷物',
+  'hudChrome.courier.empty': 'アイテムなし',
+  'hudChrome.courier.send': '配達員を送る',
+  'hudChrome.courier.selected': '{count} / {limit} スタック選択中',
+  'hudChrome.courier.select': '{item}、{count}を選択',
+  'hudChrome.courier.selectedItem': '{item}、{count}の選択を解除',
+  'hudChrome.courier.instructions':
+    'スタック全体を選択してください。配達員は預け入れた後、指定したアイテムを引き出します。クエストアイテムは送れません。',
+  'hudChrome.courier.membership': '次の配達にはメンバーシップの更新が必要です。',
+  'hudChrome.courier.cargoSafe': 'バッグに空きができるまで、配達員がアイテムを保管します。',
+  'hudChrome.courier.unavailable': '配達員を召喚して配達を計画しましょう。',
+  'entities.abilities.courier.name': '配達員',
+  'entities.abilities.courier.description':
+    '空飛ぶロバを召喚し、バッグと最寄りの銀行の間で荷物を運びます。通常の走行速度の250%で飛びます。1回につき最大24スタックを選択できます。新しい配達にはメンバーシップが必要です。',
   // Membership additions: same-change non-Latin coverage (M16).
   'hudChrome.wocStore.subscription.benefitsTitle': '有効なメンバーシップの特典',
   'hudChrome.wocStore.subscription.benefitBank':

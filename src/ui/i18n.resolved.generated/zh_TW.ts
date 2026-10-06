@@ -347,6 +347,26 @@ export const zh_TW: EnTranslations = {
     }
   },
   "hudChrome": {
+    "courier": {
+      "title": "信使",
+      "close": "關閉信使",
+      "ready": "準備配送",
+      "outbound": "正在飛往銀行",
+      "returning": "正帶著物品返回",
+      "waiting": "等待歸還物品",
+      "bags": "存入銀行",
+      "bank": "從銀行取出",
+      "cargo": "信使背包",
+      "empty": "沒有物品",
+      "send": "派出信使",
+      "selected": "已選 {count} / {limit} 組",
+      "select": "選擇{item}，{count}",
+      "selectedItem": "取消選擇{item}，{count}",
+      "instructions": "請選擇整組物品。信使會先存入物品，再取出您指定的物品。任務物品無法寄送。",
+      "membership": "續訂會員後即可開始新的配送。",
+      "cargoSafe": "背包有空位前，信使會保管所攜帶的物品。",
+      "unavailable": "召喚信使以安排配送。"
+    },
     "framePresets": {
       "apply": "套用",
       "pickerLabel": "框架預設：{name}",
@@ -13119,6 +13139,10 @@ export const zh_TW: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "courier": {
+        "name": "信使",
+        "description": "召喚一頭會飛的驢，在您的背包和最近的銀行之間運送物品。飛行速度為普通跑步速度的250%。每次最多可選擇24組物品。開始新的配送需要會員資格。"
+      },
       "sport_kick": {
         "name": "踢球",
         "description": "沿地面把球踢向瞄準點。"

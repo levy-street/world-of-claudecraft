@@ -347,6 +347,26 @@ export const ko_KR: EnTranslations = {
     }
   },
   "hudChrome": {
+    "courier": {
+      "title": "배달부",
+      "close": "배달부 닫기",
+      "ready": "배달 준비 완료",
+      "outbound": "은행으로 비행 중",
+      "returning": "아이템을 가지고 돌아오는 중",
+      "waiting": "아이템 반환을 위해 대기 중",
+      "bags": "은행에 보낼 아이템",
+      "bank": "은행에서 가져올 아이템",
+      "cargo": "배달부 소지품",
+      "empty": "아이템 없음",
+      "send": "배달부 보내기",
+      "selected": "{count} / {limit} 묶음 선택됨",
+      "select": "{item}, {count} 선택",
+      "selectedItem": "{item}, {count} 선택 해제",
+      "instructions": "묶음 전체를 선택하세요. 배달부가 먼저 맡긴 뒤 요청한 아이템을 찾습니다. 퀘스트 아이템은 보낼 수 없습니다.",
+      "membership": "새 배달을 시작하려면 멤버십을 갱신하세요.",
+      "cargoSafe": "가방에 공간이 생길 때까지 배달부가 아이템을 보관합니다.",
+      "unavailable": "배달부를 소환하여 배달을 계획하세요."
+    },
     "framePresets": {
       "apply": "적용",
       "pickerLabel": "프레임 프리셋: {name}",
@@ -13119,6 +13139,10 @@ export const ko_KR: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "courier": {
+        "name": "배달부",
+        "description": "날아다니는 당나귀를 소환하여 가방과 가장 가까운 은행 사이에서 아이템을 운반합니다. 일반 달리기 속도의 250%로 비행합니다. 한 번에 최대 24묶음을 선택할 수 있습니다. 새 배달을 시작하려면 멤버십이 필요합니다."
+      },
       "sport_kick": {
         "name": "킥",
         "description": "조준 지점을 향해 공을 땅볼로 차 보냅니다."

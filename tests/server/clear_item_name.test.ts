@@ -188,6 +188,34 @@ describe('clearItemNameBodyError / clearItemNameTarget', () => {
 });
 
 describe('stripLegendaryNames', () => {
+  it('clears every named courier cargo copy only for an all target, preserving custody', () => {
+    const cargo = Array.from({ length: 24 }, (_, index) => ({
+      itemId: 'wyrmfall_pendant',
+      count: 1,
+      instance: namedCopy(`Cargo${index}`),
+    }));
+    const state = stateWith({
+      courier: {
+        phase: 'returning',
+        x: 17.5,
+        z: 2,
+        bankerId: 9,
+        revision: 3,
+        retryRemaining: 0,
+        withdrawals: [],
+        cargo,
+      },
+    });
+    const expected = structuredClone(state);
+    for (const slot of expected.courier!.cargo) delete slot.instance!.name;
+    expect(stripLegendaryNames(state, { kind: 'bag', bag: 0, itemId: 'wyrmfall_pendant' })).toBe(0);
+    expect(stripLegendaryNames(state, { kind: 'slot', slot: 'neck' })).toBe(0);
+    expect(cargo[23].instance.name).toBe('Cargo23');
+    expect(stripLegendaryNames(state, { kind: 'all' })).toBe(24);
+    expect(state).toEqual(expected);
+    expect(stripLegendaryNames(state, { kind: 'all' })).toBe(0);
+  });
+
   it('strips a retired bagged item by its saved id while preserving an untargeted sibling', () => {
     const retired = 'retired_masterwrought_blade_v1';
     expect(Object.hasOwn(ITEMS, retired)).toBe(false);
@@ -477,18 +505,17 @@ describe('runClearItemName (the endpoint body over injected deps)', () => {
 });
 
 describe('the strip walks exactly the payload-bearing regions the rename sweep walks', () => {
-  // The five-region claim, tied MECHANICALLY to its precedent rather than
-  // restated as a hand count: a sixth payload-bearing CharacterState region
+  // The payload-region claim is tied mechanically to its precedent: a new region
   // added to rekeyInstanceSigner (src/sim/character_rename.ts) without a
   // matching arm here reds this, where the hand-counted sweep test above
-  // would stay green at five. toolEffectSlots is the rename walk's one
+  // would otherwise remain green. toolEffectSlots is the rename walk's one
   // non-payload region (it rekeys a craftedBy string), excluded by name.
   const regionReads = (source: string): string[] =>
     Array.from(
       new Set(
         Array.from(
           source.matchAll(
-            /\bstate\.(inventory|bank\??\.inventory|vendorBuyback|equipmentInstances?|toolEffectSlots)\b/g,
+            /\bstate\.(inventory|bank\??\.inventory|courier\??\.cargo|vendorBuyback|equipmentInstances?|toolEffectSlots)\b/g,
           ),
         )
           .map((m) => m[1].replace('?', ''))
@@ -505,13 +532,14 @@ describe('the strip walks exactly the payload-bearing regions the rename sweep w
   );
   const PAYLOAD_REGIONS = [
     'bank.inventory',
+    'courier.cargo',
     'equipmentInstance',
     'equipmentInstances',
     'inventory',
     'vendorBuyback',
   ];
 
-  it('the strip reads the five payload regions, and the rename walk reads those plus toolEffectSlots', () => {
+  it('the strip and rename sweeps both read courier cargo beside the existing payload regions', () => {
     const stripBody = stripSource.slice(
       stripSource.indexOf('export function stripLegendaryNames('),
     );

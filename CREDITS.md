@@ -511,3 +511,11 @@ Membership item paintings (`public/ui/items/membership_*.webp`) were created sep
 with OpenAI's built-in image generation for World of ClaudeCraft. Project-generated
 art, project asset, rights reserved. Exact prompts, retained-source hashes, shipping
 hashes, and review evidence: `docs/achievements/membership-items-2026-10-05/accepted-art.json`.
+
+### Membership courier
+
+- `public/models/creatures/courier_donkey.glb`: original procedural flying donkey
+  authored for World of ClaudeCraft from the user's feature description, 2026-10-07.
+  No third-party mesh, texture, or reference image. Deterministic factory and export
+  source: `scripts/assets/courier_donkey/`. The optimized asset retains two articulated
+  feather wings and uses vertex colour without embedded textures.

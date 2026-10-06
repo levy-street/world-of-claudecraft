@@ -13,6 +13,28 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.courier.title': '배달부',
+  'hudChrome.courier.close': '배달부 닫기',
+  'hudChrome.courier.ready': '배달 준비 완료',
+  'hudChrome.courier.outbound': '은행으로 비행 중',
+  'hudChrome.courier.returning': '아이템을 가지고 돌아오는 중',
+  'hudChrome.courier.waiting': '아이템 반환을 위해 대기 중',
+  'hudChrome.courier.bags': '은행에 보낼 아이템',
+  'hudChrome.courier.bank': '은행에서 가져올 아이템',
+  'hudChrome.courier.cargo': '배달부 소지품',
+  'hudChrome.courier.empty': '아이템 없음',
+  'hudChrome.courier.send': '배달부 보내기',
+  'hudChrome.courier.selected': '{count} / {limit} 묶음 선택됨',
+  'hudChrome.courier.select': '{item}, {count} 선택',
+  'hudChrome.courier.selectedItem': '{item}, {count} 선택 해제',
+  'hudChrome.courier.instructions':
+    '묶음 전체를 선택하세요. 배달부가 먼저 맡긴 뒤 요청한 아이템을 찾습니다. 퀘스트 아이템은 보낼 수 없습니다.',
+  'hudChrome.courier.membership': '새 배달을 시작하려면 멤버십을 갱신하세요.',
+  'hudChrome.courier.cargoSafe': '가방에 공간이 생길 때까지 배달부가 아이템을 보관합니다.',
+  'hudChrome.courier.unavailable': '배달부를 소환하여 배달을 계획하세요.',
+  'entities.abilities.courier.name': '배달부',
+  'entities.abilities.courier.description':
+    '날아다니는 당나귀를 소환하여 가방과 가장 가까운 은행 사이에서 아이템을 운반합니다. 일반 달리기 속도의 250%로 비행합니다. 한 번에 최대 24묶음을 선택할 수 있습니다. 새 배달을 시작하려면 멤버십이 필요합니다.',
   // Membership additions: same-change non-Latin coverage (M16).
   'hudChrome.wocStore.subscription.benefitsTitle': '활성 멤버십 혜택',
   'hudChrome.wocStore.subscription.benefitBank':

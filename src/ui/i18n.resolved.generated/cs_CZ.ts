@@ -347,6 +347,26 @@ export const cs_CZ: EnTranslations = {
     }
   },
   "hudChrome": {
+    "courier": {
+      "title": "Courier",
+      "close": "Close courier",
+      "ready": "Ready for a delivery",
+      "outbound": "Flying to the bank",
+      "returning": "Bringing your items back",
+      "waiting": "Waiting to return your items",
+      "bags": "Send to bank",
+      "bank": "Bring from bank",
+      "cargo": "Courier inventory",
+      "empty": "No items",
+      "send": "Send courier",
+      "selected": "{count} / {limit} stacks selected",
+      "select": "Select {item}, {count}",
+      "selectedItem": "Deselect {item}, {count}",
+      "instructions": "Select whole stacks. Your courier deposits them first, then collects your requested items. Quest items cannot be sent.",
+      "membership": "Renew your membership to start another trip.",
+      "cargoSafe": "Carried items stay with the courier until there is room in your bags.",
+      "unavailable": "Summon your courier to plan a delivery."
+    },
     "framePresets": {
       "apply": "Použít",
       "pickerLabel": "Předvolby rámečků: {name}",
@@ -13119,6 +13139,10 @@ export const cs_CZ: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "courier": {
+        "name": "Courier",
+        "description": "Summon a flying donkey to carry items between your bags and the nearest bank. It flies at 250% of normal running speed. Choose up to 24 stacks per trip. Membership is required to start a new trip."
+      },
       "sport_kick": {
         "name": "Kop",
         "description": "Pošli míč po zemi směrem k zaměřovanému bodu."

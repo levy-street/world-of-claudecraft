@@ -1054,6 +1054,8 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   // cost with one of each too. Interleaving a read BETWEEN the writes is what
   // would make this thrash, and nothing here does.)
   { file: 'bank_window.ts', reflowAllow: { '.scrollTop': 6 }, driverAllow: {} },
+  // Preserve the single courier body scroll offset only across a changed render.
+  { file: 'hud/courier/courier_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   // The scroll pair and the rAF both belonged to the mount picker's
   // scroll-the-selected-card-into-view path, which went away when reins became
   // usable items and the picker was deleted. The sheet now reads nothing and

@@ -27,6 +27,13 @@ export function perfectMembershipArmour(meta: PlayerMeta, level: number): boolea
     bankChanged = changed = true;
   }
   if (bankChanged) bumpBankWireRev(meta);
+  let courierChanged = false;
+  for (const item of meta.courier?.cargo ?? []) {
+    if (!isMembershipArmour(item.itemId) || item.instance?.perfected) continue;
+    item.instance = { ...item.instance, perfected: true };
+    courierChanged = changed = true;
+  }
+  if (courierChanged && meta.courier) meta.courier.revision++;
   if (changed) meta.wireRev++;
   return equipmentChanged;
 }

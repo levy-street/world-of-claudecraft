@@ -1,4 +1,4 @@
-import type { AccountBankInfo } from '../world_api/bank';
+import type { AccountBankInfo, IWorldBank } from '../world_api/bank';
 import { decodeBankInfoWire } from './bank_snapshot_wire';
 import { isRecord } from './vault_snapshot_wire';
 
@@ -31,4 +31,19 @@ export function decodeAccountBankInfo(value: unknown): AccountBankInfo | null {
     bank,
     ...(typeof value.error === 'string' ? { error: value.error.slice(0, 128) } : {}),
   };
+}
+
+/** Selecting a tab clears only its stale contents while the owner response loads. */
+export function selectAccountBankMirror(
+  info: AccountBankInfo | null,
+  characterId: number,
+): AccountBankInfo | null {
+  return info ? { ...info, selectedCharacterId: characterId, bank: null } : null;
+}
+export function accountBankTransferPayload(
+  ...[characterId, direction, slotIndex, count, expectedSlot]: Parameters<
+    IWorldBank['accountBankTransfer']
+  >
+) {
+  return { characterId, direction, slotIndex, count, expectedSlot };
 }

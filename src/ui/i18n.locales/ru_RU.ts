@@ -13,6 +13,28 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.courier.title': 'Курьер',
+  'hudChrome.courier.close': 'Закрыть курьера',
+  'hudChrome.courier.ready': 'Готов к доставке',
+  'hudChrome.courier.outbound': 'Летит в банк',
+  'hudChrome.courier.returning': 'Возвращается с предметами',
+  'hudChrome.courier.waiting': 'Ожидает передачи предметов',
+  'hudChrome.courier.bags': 'Отправить в банк',
+  'hudChrome.courier.bank': 'Забрать из банка',
+  'hudChrome.courier.cargo': 'Груз курьера',
+  'hudChrome.courier.empty': 'Нет предметов',
+  'hudChrome.courier.send': 'Отправить курьера',
+  'hudChrome.courier.selected': 'Выбрано стопок: {count} / {limit}',
+  'hudChrome.courier.select': 'Выбрать: {item}, {count}',
+  'hudChrome.courier.selectedItem': 'Снять выбор: {item}, {count}',
+  'hudChrome.courier.instructions':
+    'Выберите целые стопки. Курьер сначала положит их в банк, затем заберёт выбранные предметы. Предметы заданий отправлять нельзя.',
+  'hudChrome.courier.membership': 'Продлите подписку, чтобы начать новую доставку.',
+  'hudChrome.courier.cargoSafe': 'Курьер хранит предметы, пока в ваших сумках не появится место.',
+  'hudChrome.courier.unavailable': 'Призовите курьера, чтобы подготовить доставку.',
+  'entities.abilities.courier.name': 'Курьер',
+  'entities.abilities.courier.description':
+    'Призывает летающего осла для перевозки предметов между вашими сумками и ближайшим банком. Он летит со скоростью 250% от обычного бега. За рейс можно выбрать до 24 стопок. Для новой доставки нужна подписка.',
   // Membership additions: same-change non-Latin coverage (M16).
   'hudChrome.wocStore.subscription.benefitsTitle': 'Преимущества действующего членства',
   'hudChrome.wocStore.subscription.benefitBank':

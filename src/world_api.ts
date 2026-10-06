@@ -947,6 +947,7 @@ export const COMMAND_NAMES = [
   'account_bank_select',
   'account_bank_transfer',
   'membership_claim_armour',
+  'courier_dispatch',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -1251,6 +1252,7 @@ export const COMMAND_FACETS = {
   delve_rite_choose: 'IWorldDelves',
   // IWorldBank: the per-character deposit box (snake_case wire strings, by design).
   // bankInfo is a proximity-gated snapshot read (no send, untagged).
+  courier_dispatch: 'IWorldBank',
   bank_deposit: 'IWorldBank',
   account_bank_list: 'IWorldBank',
   account_bank_select: 'IWorldBank',

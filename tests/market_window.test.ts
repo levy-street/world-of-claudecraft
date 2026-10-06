@@ -366,9 +366,13 @@ describe('market_window: mobile pairing (hud.mobile.css)', () => {
     // the pairing with nothing on the right: dropping the class lets the
     // standalone mobile sheet rule take the full width back, mirroring the
     // bank undock in onBagsClosed. toggleBags re-docks on re-open.
-    expect(hud).toMatch(
-      /private onBagsClosed\(\): void \{[\s\S]{0,1200}?contains\('mobile-touch'\) && this\.marketWindow\.isOpen[\s\S]{0,120}?classList\.remove\('market-open'\);/,
+    expect(hud).toContain('undockBagCompanions(this.bankWindow.isOpen, this.marketWindow.isOpen)');
+    const lifecycle = readFileSync(
+      new URL('../src/ui/bank_window_lifecycle.ts', import.meta.url),
+      'utf8',
     );
+    expect(lifecycle).toContain("if (!classes.contains('mobile-touch')) return;");
+    expect(lifecycle).toContain("if (marketOpen) classes.remove('market-open');");
     expect(hud).toMatch(
       /this\.bagsWindow\.noteOpener\(\);[\s\S]{0,700}?if \(this\.marketWindow\.isOpen\) document\.body\.classList\.add\('market-open'\);/,
     );

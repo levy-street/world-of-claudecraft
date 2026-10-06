@@ -196,6 +196,7 @@ import {
   consumeCosmeticOpToken,
   createCosmeticOpGuard,
 } from './cosmetic_op_guard';
+import * as courierWire from './courier_wire';
 import { stampCuratorStanding } from './curator_standing';
 import { dailyRewardService } from './daily_rewards';
 import type { AccountChatMuteStatus, AccountCosmetics, RequestMetadata } from './db';
@@ -591,6 +592,7 @@ export const SIM_LAP_PHASES = [
   'p.autoAtk',
   'p.regen',
   'p.auras',
+  'p.courier',
   'mob.update',
   'mob.auras',
   'ent.misc',
@@ -647,6 +649,7 @@ export const SELF_WIRE_PHASES = [
   'market',
   'mail',
   'bank', // bank + bpsl + vault + cvault + guildBank (mixed postures: bisect a spike)
+  'courier', // owner-only pose and revision-gated cargo/bank
   'loot', // lroll, lrollg, mloot
   'delve',
   'prof', // prof, cprof, mst
@@ -1031,6 +1034,7 @@ export interface ClientSession
   lastMailRev: number | null;
   lastMailRebuildTick: number;
   // Personal bank projection: revision + composed-price gated (bank_wire.ts).
+  lastCourierWireRevision: string | number | null;
   lastBankWirePid: number | null;
   lastBankWireRev: number | null;
   lastBankWirePrice: number | null;
@@ -1672,24 +1676,10 @@ export class GameServer {
           }
           this.simLapMark = t;
         },
-        (pid, takes, vaultUpgrades) => {
-          const session = this.clients.get(pid);
-          const meta = this.sim.meta(pid);
-          if (
-            !session ||
-            session.pid !== pid ||
-            session.left ||
-            session.escrowQuarantined ||
-            meta?.characterId !== session.characterId ||
-            session.bankLedgerJournal.outbox.owner.characterId !== session.characterId ||
-            session.bankLedgerJournal.outbox.owner.accountId !== session.accountId
-          ) {
-            return null;
-          }
-          return session.bankVaultLedgerGuard.reserveVaultConsumption(takes.length, () =>
-            session.bankLedgerJournal.reserveVaultConsumption(takes, vaultUpgrades),
-          );
-        },
+        ...courierWire.storageAdmissionsFor(
+          () => this.sim,
+          (pid) => this.clients.get(pid),
+        ),
       ),
     );
     this.vault = new VaultGameServices({
@@ -3369,6 +3359,7 @@ export class GameServer {
       lastMailWireTick: -MAIL_WIRE_INTERVAL_TICKS,
       lastMailRev: null,
       lastMailRebuildTick: 0,
+      lastCourierWireRevision: null,
       lastBankWirePid: null,
       lastBankWireRev: null,
       lastBankWirePrice: null,
@@ -6197,6 +6188,9 @@ export class GameServer {
     if (questWire.isWorldQuestWireCommand(command))
       return void questWire.dispatchWorldQuestWire(sim, msg, pid);
     switch (command) {
+      case 'courier_dispatch':
+        courierWire.dispatchCourierCommand(sim, msg, pid);
+        break;
       case 'account_bank_list':
       case 'account_bank_select':
       case 'account_bank_transfer':
@@ -8615,6 +8609,8 @@ export class GameServer {
     emitVaultSelfKeys(maybe, this.sim, session, anchorSession.pid);
     emitGuildAndWeeklySelfKeys(maybe, this.sim, session.pid, anchorSession.pid);
     selfLap?.('self.bank');
+    courierWire.emitCourierSelfKeys(maybe, this.sim, session);
+    selfLap?.('self.courier');
     // open need-greed rolls this player can still answer, so a client that
     // missed the transient lootRoll event re-shows the prompt from state. Stays
     // per-tick (it's interactive state that appears from others' actions).

@@ -5705,6 +5705,8 @@ const ALL_DELTA_KEYS = [
   'corder',
   'corpse',
   'cosmetics',
+  'courier',
+  'courierData',
   'cprof',
   'crat',
   'crit',
@@ -5846,6 +5848,8 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   cluh: 'clueHunt',
   corder: 'commissionOrders',
   cosmetics: 'accountCosmetics',
+  courier: 'courierInfo',
+  courierData: 'courierInfo',
   cprof: 'craftingIdentity',
   crat: 'critRating',
   crit: 'critChance',
@@ -6002,6 +6006,17 @@ function dirtyEveryDeltaField(): {
   const banker = sim.entities.get(sim.bankerIds[0]);
   if (banker) banker.pos = { ...p.pos };
   meta.bank.inventory = [{ itemId: 'wolf_fang', count: 2 }];
+  // The courier's pose and revision-gated custody blob recombine into one owner mirror.
+  meta.courier = {
+    phase: 'returning',
+    x: 17,
+    z: 29,
+    bankerId: null,
+    cargo: [{ itemId: 'wolf_fang', count: 3 }],
+    withdrawals: [],
+    revision: 7,
+    retryRemaining: 0,
+  };
   // `vault`: vaultInfoFor shares the bank's proximity gate (the bursar relocated
   // above covers it), so only the contents need dirtying. Stocked AND upgraded,
   // because a locked empty vault still encodes as a non-null all-zero object:
@@ -6629,6 +6644,17 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.marketCollectPending).toBe(true); // mktU -> marketCollectPending (truthy bit)
     expect(client.bankInfo).not.toBeNull(); // bank -> bankInfo
     expect(client.bankInfo?.slots).toEqual([{ itemId: 'wolf_fang', count: 2 }]); // bank contents mirror
+    expect(client.courierInfo).toMatchObject({
+      phase: 'returning',
+      x: 17,
+      z: 29,
+      bankerId: null,
+      cargo: [{ itemId: 'wolf_fang', count: 3 }],
+      withdrawals: [],
+      revision: 7,
+      bankSlots: [],
+    });
+    expect(client.courierInfo).not.toHaveProperty('retryRemaining');
     // vault -> vaultInfo: the owner-only Materials Vault clone survives whole,
     // both derived numbers included (rung 2 of the 40-per-rung ladder, priced
     // from the rung-2 literal in src/sim/materials_vault.ts).
@@ -7043,6 +7069,56 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.activeMobileStationCrafts).toBe(EMPTY_MST_CRAFTS);
   });
 
+  it('round-trips courier pose updates without resending custody and clears both on removal', () => {
+    const { server, fc, leader } = dirtyEveryDeltaField();
+    const client = bareClient(leader.pid);
+    broadcast(server);
+    const initial = lastSnap(fc.sent);
+    expect(initial.self.courier).toEqual({
+      phase: 'returning',
+      x: 17,
+      z: 29,
+      bankerId: null,
+      inventoryRevision: 0,
+    });
+    expect(initial.self.courierData).toMatchObject({
+      cargo: [{ itemId: 'wolf_fang', count: 3 }],
+      revision: 7,
+    });
+    expect(initial.self.courierData).not.toHaveProperty('x');
+    expect(
+      initial.ents.every(
+        (entry: Record<string, unknown>) => !('courier' in entry) && !('courierData' in entry),
+      ),
+    ).toBe(true);
+    (client as any).applySnapshot(initial);
+    const cargo = client.courierInfo!.cargo;
+    const meta = server.sim.meta(leader.pid)!;
+    meta.courier!.x = 41;
+    fc.sent.length = 0;
+    broadcast(server);
+    const moved = lastSnap(fc.sent);
+    expect(moved.self.courier).toEqual({
+      phase: 'returning',
+      x: 41,
+      z: 29,
+      bankerId: null,
+      inventoryRevision: 0,
+    });
+    expect(moved.self).not.toHaveProperty('courierData');
+    (client as any).applySnapshot(moved);
+    expect(client.courierInfo!.x).toBe(41);
+    expect(client.courierInfo!.cargo).toBe(cargo);
+    meta.courier = undefined;
+    fc.sent.length = 0;
+    broadcast(server);
+    const ended = lastSnap(fc.sent);
+    expect(ended.self.courier).toBeNull();
+    expect(ended.self.courierData).toBeNull();
+    (client as any).applySnapshot(ended);
+    expect(client.courierInfo).toBeNull();
+  });
+
   it('omits all delta keys on a no-op re-broadcast and preserves the prior mirror', () => {
     const { server, fc, leader, memberPid } = dirtyEveryDeltaField();
     broadcast(server);
@@ -7057,6 +7133,7 @@ describe('full self-state snapshot delta fixture', () => {
     const partyRef = client.partyInfo;
     const delveRunRef = client.delveRun;
     const vaultRef = client.vaultInfo;
+    const courierRef = client.courierInfo;
 
     // a second broadcast with NO intervening sim.tick() and no state mutation: the
     // maybe() closure sees byte-identical JSON for every registered key and omits every one
@@ -7086,6 +7163,7 @@ describe('full self-state snapshot delta fixture', () => {
     // an omitted `vault` must leave an open vault window's mirror alone, not
     // reset it to null (the omission-is-unchanged half of the delta contract)
     expect(client.vaultInfo).toBe(vaultRef);
+    expect(client.courierInfo).toBe(courierRef);
     expect(client.markerFor(memberPid)).toBe(3);
     expect(client.delveMarks).toBe(7);
     expect(client.honor).toBe(321);
@@ -7152,7 +7230,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 114 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 116 unique keys in sorted order', () => {
     // 109 plus the release batch's pending Town Focus and Spell Crit core keys.
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
@@ -7210,8 +7288,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The release batch's pending Town Focus and the Spell Crit sheet cell's
     // shared crit core scb (server/self_scalar_wire.ts), at the third
     // release/v0.44.0 base merge, for 111.
-    expect(ALL_DELTA_KEYS).toHaveLength(114);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(114);
+    // Courier adds its small pose and separately revision-gated custody data.
+    expect(ALL_DELTA_KEYS).toHaveLength(116);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(116);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7333,6 +7412,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     expect(scraped.has('bpsl')).toBe(true);
     expect(scraped.has('vault')).toBe(true);
     expect(scraped.has('cvault')).toBe(true);
+    expect(scraped.has('courier')).toBe(true);
+    expect(scraped.has('courierData')).toBe(true);
     // ...and the narrowing really narrows. A member `emit` is not a delta call,
     // and asserting it on a synthetic source keeps the claim honest even while
     // neither emitter file happens to contain one.
@@ -7381,7 +7462,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The Weekly Vault's weeklyRewards self key (PR 4052) makes 107.
     // The World PvP readout wpvp and the King of the Hill readout hill make 109.
     // The release batch's pending Town Focus and Spell Crit core keys make 111.
-    expect(scraped.size).toBe(114);
+    expect(scraped.size).toBe(116);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7460,6 +7541,8 @@ describe('delta-key contract pins (anti-drift)', () => {
       // The farming own-plot delta: the wire key and the IWorld name share no
       // stem, so a typo on either side would decode onto nothing at all.
       fplot: 'myFarmPlots',
+      courier: 'courierInfo',
+      courierData: 'courierInfo',
     };
     for (const [terse, iworld] of Object.entries(required)) {
       expect(TERSE_TO_IWORLD[terse], `rename ${terse} -> ${iworld} drifted`).toBe(iworld);
