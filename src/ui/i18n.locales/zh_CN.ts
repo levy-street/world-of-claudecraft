@@ -4986,6 +4986,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wrath.description': '投掷一道自然能量箭，造成 {damage} 点自然伤害。',
   'entities.abilities.healing_touch.name': '野性愈合',
   'entities.abilities.healing_touch.description': '为一个友方目标恢复 {damage} 点生命值。',
+  'entities.abilities.healing_touch.specNote_restoration':
+    '每次完成施放累积1层繁茂（最多3层）。已累积的繁茂会缩短此法术的施法时间：1层时2.2秒，2层时1.9秒，3层时1.5秒。',
   'entities.abilities.mark_of_the_wild.name': '野性守护',
   'entities.abilities.mark_of_the_wild.description':
     '为一个友方目标施加野性守护，使护甲提高 {buff}，持续 30 分钟。',
@@ -5173,7 +5175,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '释放一股原始涌动。豹形态下，能量恢复速度提高100%，持续10秒。巨熊形态下，立即产生50点怒气。（野性专精招牌）',
   'entities.abilities.swiftmend.name': '迅捷治愈',
   'entities.abilities.swiftmend.description':
-    '消耗友方目标身上的一个持续治疗效果，治疗其 {damage} 点生命。野性绽放与二度绽放的播撒会累加青翠；在 5 层青翠时，此按钮会变为盛放，立即为每一位带有你持续治疗效果的盟友治疗这些效果所剩余量的 60%。（恢复标志技能）',
+    '消耗友方目标身上的一个持续治疗效果，治疗其 {damage} 点生命。每次施放野性绽放、二度绽放或野性愈合累积1层繁茂；在 3 层繁茂时，此按钮会变为盛放，立即为每一位带有你持续治疗效果的盟友治疗这些效果所剩余量的 60%。（恢复标志技能）',
   'entities.abilities.crusader_strike.name': '十字军打击',
   'entities.abilities.crusader_strike.description':
     '打击目标，造成武器伤害外加 {damage} 点神圣伤害。（圣骑士天赋）',
@@ -15131,7 +15133,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '为敌人标记15秒，储存你与你的亡灵所造成伤害的20%。再次施放可将其引爆。若被标记的敌人死亡，印记会在6码内爆炸，并生成1枚灵魂碎片。',
   'entities.abilities.ossuary_mark.name': '骸骨印记',
   'entities.abilities.overbloom.description':
-    '消耗你的5层繁茂：每个持有你的持续治疗效果的盟友立即恢复这些效果剩余治疗量的{buff}%，这些效果随之移除，并为目标种下一个新的野性绽放。',
+    '消耗你的3层繁茂：每个持有你的持续治疗效果的盟友立即恢复这些效果剩余治疗量的{buff}%，这些效果随之移除，并为目标种下一个新的野性绽放。',
   'entities.abilities.overbloom.name': '盛放',
   'entities.abilities.pack_command.description':
     '命令你的活体宠物发动攻击。命中后产生 20 点集中值和一层兽群凶性。',
@@ -15173,9 +15175,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.redharvest.description':
     '消耗你的3层古血：造成{damage}点伤害，立即引爆你的剐削与血裂的全部剩余伤害，移除这两个流血效果，并恢复{rage}点能量。无需连击点也可使用。',
   'entities.abilities.redharvest.name': '血收',
-  'entities.abilities.regrowth.specNote_restoration': '种下新的绽放会累积1层繁茂（最多5层）。',
+  'entities.abilities.regrowth.specNote_restoration':
+    '每次施放累积1层繁茂（最多3层），刷新仍在生效的绽放也算。',
   'entities.abilities.rejuvenation.specNote_restoration':
-    '种下新的绽放会累积1层繁茂（最多5层）。繁茂达到5层时，迅捷治愈变为盛放。',
+    '每次施放累积1层繁茂（最多3层），刷新仍在生效的绽放也算。繁茂达到3层时，迅捷治愈变为盛放。',
   'entities.abilities.rip.specNote_feral': '命中的这一击累积1层古血（最多3层）。',
   'entities.abilities.ruinous_brand.description':
     '为敌人烙印15秒。你接下来的3个直接法术会对被烙印的敌人回响25%的伤害；若对其他目标施放，则会向其复制50%的伤害。毁灭箭的回响伤害同样视为暴击，但不会因此再叠加额外的暴击伤害加成。',
@@ -16267,7 +16270,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.venomRitual':
     '毒祭：第{stacks}/{max}层。卑劣突刺、邪恶斩击与毒镖各累积1层。达到{max}层时，长眠变为蚀毒撕裂',
   'hudChrome.auraEffect.verdance':
-    '繁茂：第{stacks}/{max}层。每种下一个新的野性绽放或二度绽放累积1层。达到{max}层时，迅捷治愈变为盛放',
+    '繁茂：第{stacks}/{max}层。每施放一次野性绽放、二度绽放或野性愈合累积1层，每层都会缩短野性愈合的施法时间。达到{max}层时，迅捷治愈变为盛放',
   'hudChrome.auraEffect.warlockAnchor': '在 {range} 码内再次施放可返回此处并消耗锚点',
   'hudChrome.auraEffect.wintersChill': '剩余 {charges} 层：符合条件的法术视此目标为冻结状态',
   'hudChrome.paladin.ascensionLastAnnouncement': '升华的最后一次充能',

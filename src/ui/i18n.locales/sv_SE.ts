@@ -7812,6 +7812,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Läker ett vänligt mål för {damage}. Läkningen ökar med Besvärjelsekraft.',
   'entities.abilities.heal.name': 'Högtidlig bön',
   'entities.abilities.healing_touch.description': 'Läker ett vänligt mål för {damage}.',
+  'entities.abilities.healing_touch.specNote_restoration':
+    'Varje fullbordad kastning ger 1 Grönska (max 3). Samlad Grönska förkortar denna kastning: 2,2 sek vid 1 Grönska, 1,9 sek vid 2 och 1,5 sek vid 3.',
   'entities.abilities.healing_touch.name': 'Vildläkning',
   'entities.abilities.healing_wave.description':
     'Läker ett vänligt mål för {damage}. Läkningen ökar med Besvärjelsekraft. Återställning: sparar 50% av den fulla läkningen före överläkning som Läkande ström i 12 sek, upp till 30% av målets maximala hälsa.',
@@ -16102,7 +16104,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Endast i Månugglaform. Slår för {damage} arkan skada, lägger till ett Månflod-steg och förlänger din Månstorm med 6 sek, upp till {duration} sek per användning. Vid full Månflod blir Månfrö Månsvall.',
   'entities.abilities.overbloom.name': 'Överblomning',
   'entities.abilities.overbloom.description':
-    'Förbrukar 5 Grönska. Skördar varje läkning över tid du äger på alla allierade för {buff}% av dess återstående läkning, tar bort de effekterna och planterar en färsk Vildblomning på målet.',
+    'Förbrukar 3 Grönska. Skördar varje läkning över tid du äger på alla allierade för {buff}% av dess återstående läkning, tar bort de effekterna och planterar en färsk Vildblomning på målet.',
   'entities.abilities.redharvest.name': 'Röd Skörd',
   'entities.abilities.redharvest.description':
     'Förbrukar dina 3 Gammalt Blod: ett slag för {damage} som omedelbart ger all skada som dina Flå och Riv upp ännu skulle ha gett, tar bort båda blödningarna och återställer {rage} energi. Fungerar utan kombopoäng.',
@@ -16116,7 +16118,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.oldBlood':
     'Gammalt Blod: steg {stacks} av {max}. Träffande Katt- och Bruin-slag delar detta förråd; vid {max} förvandlas Blodsbett eller Benkross',
   'hudChrome.auraEffect.verdance':
-    'Grönska {stacks}/{max}. Varje NY Vildblomning eller Andra blomningen du planterar ger 1. Vid {max} blir Snabb läkning Överblomning',
+    'Grönska {stacks}/{max}. Varje Vildblomning, Andra blomningen eller Vildläkning du kastar ger 1, och varje Grönska förkortar Vildläknings kasttid. Vid {max} blir Snabb läkning Överblomning',
   'hudChrome.continentMap.levels': 'Nivåer {min} till {max}',
   'hudChrome.continentMap.summary': 'Världskarta. Välj en zon för att öppna dess karta.',
   'hudChrome.continentMap.title': 'Världskarta',
@@ -16425,10 +16427,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.regrowth.description':
     'Läker ett vänligt mål för {damage} och ytterligare en mängd under 21 sek.',
   'entities.abilities.regrowth.specNote_restoration':
-    'Att plantera en NY blomning lägger till 1 Grönska (max 5).',
+    'Varje kastning ger 1 Grönska (max 3), även när den förnyar en blomning som redan verkar.',
   'entities.abilities.rejuvenation.description': 'Läker målet för {damage} under 12 sek.',
   'entities.abilities.rejuvenation.specNote_restoration':
-    'Att plantera en NY blomning lägger till 1 Grönska (max 5). Vid 5 Grönska blir Snabb läkning Överblomning.',
+    'Varje kastning ger 1 Grönska (max 3), även när den förnyar en blomning som redan verkar. Vid 3 Grönska blir Snabb läkning Överblomning.',
   'entities.abilities.rip.description':
     'Avslutande drag som får målet att blöda var 2:e sek, i 24 sek: 36 skada plus 24 per förbrukat kombopoäng (5 kombopoäng: {damage} totalt). Endast i Kattform.',
   'entities.abilities.rip.specNote_feral': 'Det landade slaget lägger till 1 Gammalt Blod (max 3).',
@@ -16471,7 +16473,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stealth.specNote_subtlety':
     'Varje öppnare du använder från Skymningsslöja lägger till 1 Skymningsförråd (max 3).',
   'entities.abilities.swiftmend.description':
-    'Förbrukar en läkning över tid-effekt på ett vänligt mål för att läka dem för {damage}. Plantering av Vildblomning och Andra blomningen lägger till Grönska; vid 5 Grönska blir denna knapp Överblomning, som skördar varje läkning över tid du äger på alla allierade och omedelbart läker dem för 60% av dess återstående läkning. (Groveheart-motorn)',
+    'Förbrukar en läkning över tid-effekt på ett vänligt mål för att läka dem för {damage}. Varje kastning av Vildblomning, Andra blomningen och Vildläkning ger 1 Grönska; vid 3 Grönska blir denna knapp Överblomning, som omedelbart läker varje allierad som bär dina läkning över tid-effekter för 60% av vad de effekterna hade kvar. (Groveheart-motorn)',
   'entities.abilities.swipe.description':
     'Svep dina klor genom närliggande fiender för {damage} skada. Orsakar extra hot. Endast i Bruinform.',
   'entities.abilities.swipe.specNote_feral':

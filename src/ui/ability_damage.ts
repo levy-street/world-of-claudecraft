@@ -24,6 +24,7 @@ import {
   abilityScalingPower,
   absorbBonus,
   channelTickBonus,
+  coefficientCastTime,
   directHealBonus,
   directHitBonus,
   dotTickBonus,
@@ -134,8 +135,9 @@ export function abilityDamageBonus(
       return 0;
     case 'heal':
       // Combat adds the direct-heal rider (full cast-time coefficient off Spell
-      // Power, no AP scale-down) to every direct heal in effect_dispatch.
-      return directHealBonus(scaling.healPower, res.castTime, false, out.healing);
+      // Power, no AP scale-down) to every direct heal in effect_dispatch,
+      // reading the same coefficient cast time (Verdance keeps Wildmend's).
+      return directHealBonus(scaling.healPower, coefficientCastTime(res), false, out.healing);
     case 'absorb':
       return absorbBonus(scaling.healPower, eff.spellPowerCoeff ?? 0, out.absorb);
     case 'hot': {

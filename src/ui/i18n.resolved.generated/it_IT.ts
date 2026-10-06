@@ -4000,7 +4000,7 @@ export const it_IT: EnTranslations = {
       "duskEconomy": "Le abilità costano il {pct}% di energia in meno",
       "moontide": "Marea Lunare: stadio {stacks} di {max}. I lanci di Dardo Silvano, Caduta Celeste e Seme Lunare la riempiono in Forma di Lunagufo; a {max}, Seme Lunare diventa Ondata Lunare e Caduta Celeste diventa Scia Solare, ed entrambe la spendono",
       "oldBlood": "Sangue Antico: stadio {stacks} di {max}. I colpi a segno in Gatto e Bruin condividono questa riserva; a {max}, Morso Cruento o Frantumaossa si trasforma",
-      "verdance": "Verzura {stacks}/{max}. Ogni nuova Fioritura Selvaggia o Seconda Fioritura che pianti aggiunge 1. A {max}, Rapidità di Guarigione diventa Sovrafioritura",
+      "verdance": "Verzura {stacks}/{max}. Ogni Fioritura Selvaggia, Seconda Fioritura o Rammendo Selvaggio che lanci aggiunge 1, e ogni Verzura accorcia il lancio di Rammendo Selvaggio. A {max}, Rapidità di Guarigione diventa Sovrafioritura",
       "freeExecute": "La tua prossima abilità di esecuzione idonea non costa nulla",
       "resourceSap": "Ripristina {value} della tua risorsa attuale ogni {interval} sec",
       "nextAttackCrit": "Il tuo prossimo attacco è garantito come colpo critico",
@@ -13930,7 +13930,8 @@ export const it_IT: EnTranslations = {
       },
       "healing_touch": {
         "name": "Rammendo Selvaggio",
-        "description": "Cura un bersaglio alleato di {damage}."
+        "description": "Cura un bersaglio alleato di {damage}.",
+        "specNote_restoration": "Ogni lancio completato aggiunge 1 Verzura (massimo 3). La Verzura accumulata accorcia questo lancio: 2,2 s con 1 Verzura, 1,9 s con 2 e 1,5 s con 3."
       },
       "mark_of_the_wild": {
         "name": "Custodia Selvaggia",
@@ -13948,7 +13949,7 @@ export const it_IT: EnTranslations = {
       "rejuvenation": {
         "name": "Fioritura Selvaggia",
         "description": "Cura il bersaglio di {damage} in 12 s.",
-        "specNote_restoration": "Piantare una NUOVA fioritura aggiunge 1 Verzura (massimo 5). A 5 Verzura, Rapidità di Guarigione diventa Sovrafioritura."
+        "specNote_restoration": "Ogni lancio aggiunge 1 Verzura (massimo 3), anche quando rinnova una fioritura già attiva. A 3 Verzura, Rapidità di Guarigione diventa Sovrafioritura."
       },
       "thorns": {
         "name": "Guardia di Rovi",
@@ -13997,7 +13998,7 @@ export const it_IT: EnTranslations = {
       "regrowth": {
         "name": "Seconda Fioritura",
         "description": "Cura un bersaglio amico di {damage} e di un importo aggiuntivo in 21 s.",
-        "specNote_restoration": "Piantare una NUOVA fioritura aggiunge 1 Verzura (massimo 5)."
+        "specNote_restoration": "Ogni lancio aggiunge 1 Verzura (massimo 3), anche quando rinnova una fioritura già attiva."
       },
       "barkskin": {
         "name": "Scorza di Quercia",
@@ -14267,7 +14268,7 @@ export const it_IT: EnTranslations = {
       },
       "swiftmend": {
         "name": "Rapidità di Guarigione",
-        "description": "Consuma una cura nel tempo su un bersaglio amico per curarlo di {damage}. Piantare Fioritura Selvaggia e Seconda Fioritura aggiunge Verzura; a 5 Verzura questo pulsante diventa Sovrafioritura, che cura istantaneamente ogni alleato che porta le tue cure nel tempo per il 60% di quanto restava di quegli effetti. (firma Groveheart)"
+        "description": "Consuma una cura nel tempo su un bersaglio amico per curarlo di {damage}. Ogni lancio di Fioritura Selvaggia, Seconda Fioritura e Rammendo Selvaggio aggiunge 1 Verzura; a 3 Verzura questo pulsante diventa Sovrafioritura, che cura istantaneamente ogni alleato che porta le tue cure nel tempo per il 60% di quanto restava di quegli effetti. (firma Groveheart)"
       },
       "moonlash": {
         "name": "Ondata Lunare",
@@ -14295,7 +14296,7 @@ export const it_IT: EnTranslations = {
       },
       "overbloom": {
         "name": "Sovrafioritura",
-        "description": "Consuma 5 Verzura. Raccoglie ogni tua cura nel tempo su tutti gli alleati per il {buff}% della cura restante, rimuove quegli effetti e pianta una Fioritura Selvaggia fresca sul bersaglio."
+        "description": "Consuma 3 Verzura. Raccoglie ogni tua cura nel tempo su tutti gli alleati per il {buff}% della cura restante, rimuove quegli effetti e pianta una Fioritura Selvaggia fresca sul bersaglio."
       },
       "summon_imp": {
         "name": "Evoca Emberkin",

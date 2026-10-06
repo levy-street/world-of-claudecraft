@@ -438,11 +438,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
     'Cada golpe que conecta añade 1 de Sangre Antigua (máx. 3).',
   'entities.abilities.regrowth.description':
     'Sana a un objetivo amistoso por {damage} y una cantidad adicional durante 21 s.',
-  'entities.abilities.regrowth.specNote_restoration':
-    'Plantar una NUEVA floración añade 1 de Verdor (máx. 5).',
   'entities.abilities.rejuvenation.description': 'Sana al objetivo por {damage} durante 12 s.',
-  'entities.abilities.rejuvenation.specNote_restoration':
-    'Plantar una NUEVA floración añade 1 de Verdor (máx. 5). Con 5 de Verdor, Alivio presto se convierte en Sobrefloración.',
   'entities.abilities.rip.description':
     'Movimiento de remate que hace sangrar al objetivo cada 2 s durante 24 s: 36 de daño más 24 por punto de combo gastado (5 puntos de combo: {damage} en total). Solo en Forma de lobo.',
   'entities.abilities.ruinous_brand.description':
@@ -470,7 +466,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stealth.description':
     'Te oculta entre las sombras: los enemigos apenas te perciben, pero te mueves un 50% más lento. Atacar o recibir daño rompe el Velo Crepuscular. Vuelve a lanzarlo para salir de él.',
   'entities.abilities.swiftmend.description':
-    'Consume un efecto de sanación periódica en un objetivo amistoso para sanarlo por {damage}. Las plantaciones de Floración Silvestre y Segundo Florecer añaden Verdor; con 5 de Verdor este botón se convierte en Sobrefloración, que sana al instante a todos los aliados que lleven tus efectos de sanación periódica por el 60% de su sanación restante. (habilidad distintiva de Restauración)',
+    'Consume un efecto de sanación periódica en un objetivo amistoso para sanarlo por {damage}. Cada lanzamiento de Floración Silvestre, Segundo Florecer y Cura Silvestre añade 1 de Verdor; con 3 de Verdor este botón se convierte en Sobrefloración, que sana al instante a todos los aliados que lleven tus efectos de sanación periódica por el 60% de su sanación restante. (habilidad distintiva de Restauración)',
   'entities.abilities.swipe.description':
     'Barre con tus garras a los enemigos cercanos infligiendo {damage} de daño. Causa amenaza adicional. Solo en forma de Bruin.',
   'entities.abilities.swipe.specNote_feral':

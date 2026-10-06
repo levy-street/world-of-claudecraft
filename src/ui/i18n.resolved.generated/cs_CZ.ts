@@ -4000,7 +4000,7 @@ export const cs_CZ: EnTranslations = {
       "duskEconomy": "Schopnosti stojí o {pct}% méně energie",
       "moontide": "Měsíční příliv: stupeň {stacks} z {max}. Sesílání Šípu divočiny, Pádu nebes a Měsíčního semene ho plní v Podobě měsíčního křídla; při {max} se Měsíční semeno mění v Měsíční vzedmutí a Pád nebes ve Sluneční brázdu a obojí ho čerpá",
       "oldBlood": "Stará krev: stupeň {stacks} z {max}. Zasažené kočičí a medvědí údery sdílejí tuto zásobu; při {max} se promění Krvavý skus nebo Drcení kostí",
-      "verdance": "Zeleň {stacks}/{max}. Každý NOVĚ zasazený Divoký květ nebo Druhý květ přidá 1. Při {max} se Rychlé zhojení mění v Překvět",
+      "verdance": "Zeleň {stacks}/{max}. Každé seslání Divokého květu, Druhého květu nebo Divokého zhojení přidá 1 a každá Zeleň zkrátí seslání Divokého zhojení. Při {max} se Rychlé zhojení mění v Překvět",
       "freeExecute": "Tvá příští způsobilá dorážecí schopnost nic nestojí",
       "resourceSap": "Obnoví {value} tvého aktuálního zdroje každých {interval} s",
       "nextAttackCrit": "Tvůj příští útok je zaručeně kritický zásah",
@@ -13930,7 +13930,8 @@ export const cs_CZ: EnTranslations = {
       },
       "healing_touch": {
         "name": "Divoké zhojení",
-        "description": "Vyléčí spojenecký cíl za {damage}."
+        "description": "Vyléčí spojenecký cíl za {damage}.",
+        "specNote_restoration": "Každé dokončené seslání přidá 1 Zeleň (max 3). Nastřádaná Zeleň zkracuje toto seslání: 2,2 s při 1 Zeleni, 1,9 s při 2 a 1,5 s při 3."
       },
       "mark_of_the_wild": {
         "name": "Ochrana divočiny",
@@ -13948,7 +13949,7 @@ export const cs_CZ: EnTranslations = {
       "rejuvenation": {
         "name": "Divoký květ",
         "description": "Vyléčí cíl za {damage} po dobu 12 s.",
-        "specNote_restoration": "Zasazení NOVÉHO květu přidá 1 Bujnost (max 5). Při 5 Bujnosti se Rychlé zhojení změní na Překvět."
+        "specNote_restoration": "Každé seslání přidá 1 Zeleň (max 3), i když jen obnoví květ, který už působí. Při 3 Zeleni se Rychlé zhojení změní na Překvět."
       },
       "thorns": {
         "name": "Ostružinová stráž",
@@ -13997,7 +13998,7 @@ export const cs_CZ: EnTranslations = {
       "regrowth": {
         "name": "Druhý květ",
         "description": "Vyléčí přátelský cíl za {damage} a další množství po dobu 21 s.",
-        "specNote_restoration": "Zasazení NOVÉHO květu přidá 1 Bujnost (max 5)."
+        "specNote_restoration": "Každé seslání přidá 1 Zeleň (max 3), i když jen obnoví květ, který už působí."
       },
       "barkskin": {
         "name": "Dubová kůže",
@@ -14267,7 +14268,7 @@ export const cs_CZ: EnTranslations = {
       },
       "swiftmend": {
         "name": "Rychlé zhojení",
-        "description": "Spotřebuje na spřáteleném cíli léčivý efekt v čase a vyléčí ho o {damage}. Výsadby Divokého květu a Druhého květu přidávají Zeleň; při 5 Zeleni se z tohoto tlačítka stane Překvět, který okamžitě vyléčí každého spojence nesoucího tvé léčivé efekty v čase o 60 % toho, co těmto efektům zbývalo. (Charakteristika Srdce háje)"
+        "description": "Spotřebuje na spřáteleném cíli léčivý efekt v čase a vyléčí ho o {damage}. Každé seslání Divokého květu, Druhého květu a Divokého zhojení přidá 1 Zeleň; při 3 Zeleni se z tohoto tlačítka stane Překvět, který okamžitě vyléčí každého spojence nesoucího tvé léčivé efekty v čase o 60 % toho, co těmto efektům zbývalo. (Charakteristika Srdce háje)"
       },
       "moonlash": {
         "name": "Měsíční vzedmutí",
@@ -14295,7 +14296,7 @@ export const cs_CZ: EnTranslations = {
       },
       "overbloom": {
         "name": "Překvět",
-        "description": "Spotřebuje 5 Zeleně. Sklidí každé tvé léčení v čase na všech spojencích za {buff}% zbývajícího léčení, odstraní tyto efekty a zasadí na cíl čerstvý Divoký květ."
+        "description": "Spotřebuje 3 Zeleně. Sklidí každé tvé léčení v čase na všech spojencích za {buff}% zbývajícího léčení, odstraní tyto efekty a zasadí na cíl čerstvý Divoký květ."
       },
       "summon_imp": {
         "name": "Vyvolat Žhavorozeného",

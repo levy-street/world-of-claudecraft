@@ -5201,6 +5201,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '自然エネルギーの矢を放ち、{damage} の自然ダメージを与えます。',
   'entities.abilities.healing_touch.name': '野生の癒し',
   'entities.abilities.healing_touch.description': '味方対象の体力を {damage} 回復します。',
+  'entities.abilities.healing_touch.specNote_restoration':
+    '詠唱を完了するたびに翠成が1段階進む（最大3）。蓄えた翠成がこの詠唱を短縮する：翠成1で2.2秒、2で1.9秒、3で1.5秒。',
   'entities.abilities.mark_of_the_wild.name': 'ワイルドワード',
   'entities.abilities.mark_of_the_wild.description':
     '味方対象にワイルドワードを付与し、30分間アーマーを{buff}増加させます。',
@@ -5396,7 +5398,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '原初の力を解き放ちます。キャットフォームでは、10秒間エネルギーの再生速度が100%上昇します。ブルーインフォームでは、即座に怒りを50生成します。（フェラル特性のシグネチャ）',
   'entities.abilities.swiftmend.name': 'スウィフトメンド',
   'entities.abilities.swiftmend.description':
-    '味方の対象にかかった継続回復効果を消費し、{damage}回復します。野生の芽吹きと二度目の開花の植え付けは青翠を貯め、青翠5でこのボタンは満開となり、あなたの継続回復効果を帯びた味方全員を、それらの効果の残量の60%だけ即座に回復します。（回復の象徴）',
+    '味方の対象にかかった継続回復効果を消費し、{damage}回復します。野生の芽吹き、二度目の開花、野生の癒しを詠唱するたびに翠成が1段階進み、翠成3でこのボタンは満開となり、あなたの継続回復効果を帯びた味方全員を、それらの効果の残量の60%だけ即座に回復します。（回復の象徴）',
   'entities.abilities.crusader_strike.name': 'クルセイダー ストライク',
   'entities.abilities.crusader_strike.description':
     '対象を攻撃し、武器ダメージに加えて {damage} の聖なるダメージを与えます。（パラディンのタレント）',
@@ -15869,7 +15871,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '敵に15秒間の印を刻み、自分と自分のアンデッドが与えたダメージの20%を蓄積する。もう一度使用すると起爆する。印のついた敵が死亡すると6ヤード以内で爆発し、魂の欠片を1個生成する。',
   'entities.abilities.ossuary_mark.name': '納骨の印',
   'entities.abilities.overbloom.description':
-    '翠成を5消費する：自身の継続回復効果を持つすべての味方が、その効果の残り回復量の{buff}%分を即座に回復し、効果は除去され、対象には新しい野生の芽吹きが植えられる。',
+    '翠成を3消費する：自身の継続回復効果を持つすべての味方が、その効果の残り回復量の{buff}%分を即座に回復し、効果は除去され、対象には新しい野生の芽吹きが植えられる。',
   'entities.abilities.overbloom.name': '満開',
   'entities.abilities.pack_command.description':
     '生きたペットに攻撃を命じます。命中すると集中値を20生成し、群れの獰猛さを1段階得ます。',
@@ -15912,9 +15914,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '古き血を3消費する：{damage}のダメージを与え、皮剥ぎと血の亀裂が与えるはずだった残りダメージを即座にすべて与え、両方の出血を除去し、エネルギーを{rage}回復する。コンボポイントが0でも使用できる。',
   'entities.abilities.redharvest.name': '血の収穫',
   'entities.abilities.regrowth.specNote_restoration':
-    '新しい花を植えると翠成が1段階進む（最大5）。',
+    '詠唱するたびに翠成が1段階進む（最大3）。すでに効果中の花を上書きした場合も含む。',
   'entities.abilities.rejuvenation.specNote_restoration':
-    '新しい花を植えると翠成が1段階進む（最大5）。翠成が5段階のとき、スウィフトメンドは満開に変化する。',
+    '詠唱するたびに翠成が1段階進む（最大3）。すでに効果中の花を上書きした場合も含む。翠成が3段階のとき、スウィフトメンドは満開に変化する。',
   'entities.abilities.rip.specNote_feral': '命中した一撃が古き血を1蓄える（最大3）。',
   'entities.abilities.ruinous_brand.description':
     '敵に15秒間の烙印を刻みます。次の3回の直接呪文は、烙印のついた敵に対して25%のダメージで反響し、別の対象に使用した場合はその敵へ50%のダメージを複製します。破滅の矢の反響も、追加のクリティカルダメージ倍率を伴わずにクリティカルヒットとして扱われます。',
@@ -17079,7 +17081,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.venomRitual':
     '毒の儀式:{stacks}/{max}段階。「卑劣な突き」「邪悪な斬撃」「毒針」で1段階ずつ進む。{max}段階で「永の眠り」が「毒裂き」に変化する',
   'hudChrome.auraEffect.verdance':
-    '翠成：{stacks}/{max}段階。新しく植えた野生の芽吹きまたは二度目の開花ごとに1段階進む。{max}段階でスウィフトメンドが満開に変化する',
+    '翠成：{stacks}/{max}段階。野生の芽吹き、二度目の開花、野生の癒しを詠唱するたびに1段階進み、1段階ごとに野生の癒しの詠唱時間が短くなる。{max}段階でスウィフトメンドが満開に変化する',
   'hudChrome.auraEffect.warlockAnchor':
     '{range}ヤード以内で再使用するとここへ戻り、アンカーを消費する',
   'hudChrome.auraEffect.wintersChill':

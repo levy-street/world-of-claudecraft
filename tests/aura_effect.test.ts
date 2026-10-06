@@ -472,9 +472,9 @@ describe('auraEffectDescriptor', () => {
       key: 'hudChrome.auraEffect.oldBlood',
       nums: { stacks: 3, max: 3 },
     });
-    expect(desc({ id: 'verdance', kind: 'verdance', value: 0, stacks: 5 })).toEqual({
+    expect(desc({ id: 'verdance', kind: 'verdance', value: 0, stacks: 3 })).toEqual({
       key: 'hudChrome.auraEffect.verdance',
-      nums: { stacks: 5, max: 5 },
+      nums: { stacks: 3, max: 3 },
     });
   });
 

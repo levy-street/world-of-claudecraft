@@ -6287,6 +6287,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description: 'Heals a friendly target for $d.',
+    specNotes: {
+      // The three cast times are VERDANCE_WILDMEND_CAST_TIMES
+      // (combat/druid_engines.ts), pinned to this note by
+      // tests/druid_engines.test.ts.
+      restoration:
+        'Each completed cast adds 1 Verdance (max 3). Banked Verdance shortens this cast: 2.2 sec at 1 Verdance, 1.9 sec at 2, and 1.5 sec at 3.',
+    },
   },
   mark_of_the_wild: {
     id: 'mark_of_the_wild',
@@ -6419,7 +6426,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description: 'Heals the target for $d over 12 sec.',
     specNotes: {
       restoration:
-        'Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Fleetmend becomes Overbloom.',
+        'Each cast adds 1 Verdance (max 3), including a refresh of a bloom already ticking. At 3 Verdance, Fleetmend becomes Overbloom.',
     },
   },
   thorns: {
@@ -6783,7 +6790,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ],
     description: 'Heals a friendly target for $d and an additional amount over 21 sec.',
     specNotes: {
-      restoration: 'Planting a NEW bloom adds 1 Verdance (max 5).',
+      restoration:
+        'Each cast adds 1 Verdance (max 3), including a refresh of a bloom already ticking.',
     },
   },
   barkskin: {
@@ -7990,9 +7998,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     targetType: 'friendly',
     effects: [{ type: 'consumeAura', auraKind: 'hot', heal: { min: 105, max: 125 } }],
-    actionReplacement: { abilityId: 'overbloom', auraKind: 'verdance', minStacks: 5 },
+    actionReplacement: { abilityId: 'overbloom', auraKind: 'verdance', minStacks: 3 },
     description:
-      'Consumes a heal-over-time effect on a friendly target to heal them for $d. Wildbloom and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)',
+      'Consumes a heal-over-time effect on a friendly target to heal them for $d. Wildbloom, Second Bloom, and Wildmend casts each add 1 Verdance; at 3 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)',
   },
   moonlash: {
     id: 'moonlash',
@@ -8132,13 +8140,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     targetType: 'friendly',
     requiresAuraKind: 'verdance',
-    requiresAuraStacks: 5,
+    requiresAuraStacks: 3,
     effects: [{ type: 'druidOverbloom', harvestPct: 0.6 }],
     // The harvest fraction is the $b splice (the resolved druidOverbloom
     // harvestPct, see abilityBuffValue): Grovespring 4pc wearers read 75
     // there, everyone else the base 60.
     description:
-      'Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for $b% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom.',
+      'Spends your 3 Verdance: every ally carrying your heal-over-time effects is instantly healed for $b% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom.',
   },
 
   // Groveheart resurrection parity: the combat single revive and the

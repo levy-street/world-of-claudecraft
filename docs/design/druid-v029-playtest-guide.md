@@ -113,9 +113,10 @@ rage refund.
 
 ## Groveheart
 
-Cast Wildbloom and Second Bloom deliberately across injured allies. Only casts
-that plant a new owned HoT add Verdance; refreshing the same owned HoT must not.
-Five plants transform Swiftmend into Overbloom. Let several owned HoTs retain
+Cast Wildbloom, Second Bloom, and Wildmend across injured allies. Every cast
+adds Verdance, including a refresh of the same owned HoT. Each stage should
+shorten the next Wildmend (2.2, 1.9, then 1.5 sec before haste), and three
+stages transform Swiftmend into Overbloom. Let several owned HoTs retain
 meaningful duration before spending: every affected ally should receive one
 immediate harvest heal, the old HoTs should disappear, and a fresh Wildbloom
 should appear on the selected target. With Seedspread, each harvested ally

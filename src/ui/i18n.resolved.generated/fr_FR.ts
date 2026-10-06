@@ -4000,7 +4000,7 @@ export const fr_FR: EnTranslations = {
       "duskEconomy": "Les capacités coûtent {pct}% d'énergie en moins",
       "moontide": "Marée lunaire : cran {stacks} sur {max}. Les incantations de Trait sauvage, Chute céleste et Graine lunaire la remplissent en Forme de sélénien ; à {max}, Graine lunaire devient Déferlante lunaire et Chute céleste devient Sillage solaire, et l'une ou l'autre la dépense",
       "oldBlood": "Sang ancien : cran {stacks} sur {max}. Les frappes portées en chat et en Bruin partagent cette réserve ; à {max}, Morsure sanglante ou Brise-os se transforme",
-      "verdance": "Verdoyance : cran {stacks} sur {max}. Les incantations achevées de Floraison sauvage et de Seconde floraison la remplissent ; à {max}, Prompte guérison devient Surfloraison",
+      "verdance": "Verdoyance : cran {stacks} sur {max}. Chaque Floraison sauvage, Seconde floraison ou Soin sauvage que vous lancez ajoute 1 cran, et chaque cran raccourcit l'incantation de Soin sauvage ; à {max}, Prompte guérison devient Surfloraison",
       "freeExecute": "Votre prochaine capacité d'exécution éligible ne coûte rien",
       "resourceSap": "Restaure {value} de votre ressource actuelle toutes les {interval} s",
       "nextAttackCrit": "Votre prochaine attaque est un coup critique garanti",
@@ -13930,7 +13930,8 @@ export const fr_FR: EnTranslations = {
       },
       "healing_touch": {
         "name": "Soin sauvage",
-        "description": "Rend {damage} points de vie à une cible alliée."
+        "description": "Rend {damage} points de vie à une cible alliée.",
+        "specNote_restoration": "Chaque incantation achevée ajoute 1 Verdoyance (maximum 3). La Verdoyance accumulée raccourcit cette incantation : 2,2 s à 1 Verdoyance, 1,9 s à 2 et 1,5 s à 3."
       },
       "mark_of_the_wild": {
         "name": "Garde sauvage",
@@ -13948,7 +13949,7 @@ export const fr_FR: EnTranslations = {
       "rejuvenation": {
         "name": "Floraison sauvage",
         "description": "Soigne la cible de {damage} sur 12 s.",
-        "specNote_restoration": "Planter une NOUVELLE floraison ajoute 1 Verdoyance (maximum 5). À 5 Verdoyance, Prompte guérison devient Surfloraison."
+        "specNote_restoration": "Chaque incantation ajoute 1 Verdoyance (maximum 3), même lorsqu'elle renouvelle une floraison déjà active. À 3 Verdoyance, Prompte guérison devient Surfloraison."
       },
       "thorns": {
         "name": "Garde de ronces",
@@ -13997,7 +13998,7 @@ export const fr_FR: EnTranslations = {
       "regrowth": {
         "name": "Seconde floraison",
         "description": "Soigne une cible alliée de {damage} et d'un montant supplémentaire sur 21 s.",
-        "specNote_restoration": "Planter une NOUVELLE floraison ajoute 1 Verdoyance (maximum 5)."
+        "specNote_restoration": "Chaque incantation ajoute 1 Verdoyance (maximum 3), même lorsqu'elle renouvelle une floraison déjà active."
       },
       "barkskin": {
         "name": "Peau de chêne",
@@ -14267,7 +14268,7 @@ export const fr_FR: EnTranslations = {
       },
       "swiftmend": {
         "name": "Prompte guérison",
-        "description": "Consomme un effet de soin sur la durée présent sur une cible alliée pour la soigner de {damage}. Les plantations de Floraison sauvage et de Seconde floraison ajoutent de la Verdoyance ; à 5 Verdoyance, ce bouton devient Surfloraison, qui soigne instantanément chaque allié portant vos effets de soin sur la durée pour 60% de ce qu'il leur restait. (signature Cœur sylvestre)"
+        "description": "Consomme un effet de soin sur la durée présent sur une cible alliée pour la soigner de {damage}. Chaque incantation de Floraison sauvage, de Seconde floraison et de Soin sauvage ajoute 1 Verdoyance ; à 3 Verdoyance, ce bouton devient Surfloraison, qui soigne instantanément chaque allié portant vos effets de soin sur la durée pour 60% de ce qu'il leur restait. (signature Cœur sylvestre)"
       },
       "moonlash": {
         "name": "Déferlante lunaire",
@@ -14295,7 +14296,7 @@ export const fr_FR: EnTranslations = {
       },
       "overbloom": {
         "name": "Surfloraison",
-        "description": "Consomme 5 Verdoyance. Récolte chaque soin sur la durée que vous possédez sur tous les alliés pour {buff}% de ses soins restants, retire ces effets et plante une Floraison sauvage fraîche sur la cible."
+        "description": "Consomme 3 Verdoyance. Récolte chaque soin sur la durée que vous possédez sur tous les alliés pour {buff}% de ses soins restants, retire ces effets et plante une Floraison sauvage fraîche sur la cible."
       },
       "summon_imp": {
         "name": "Invoquer un Emberkin",

@@ -1173,7 +1173,15 @@ const classAbilityNamesEn = {
             'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, Moonseed becomes Moonsurge and Skyfall becomes Sunwake.',
         },
       ],
-      ['healing_touch', 'Wildmend', 'Heals a friendly target for {damage}.'],
+      [
+        'healing_touch',
+        'Wildmend',
+        'Heals a friendly target for {damage}.',
+        {
+          restoration:
+            'Each completed cast adds 1 Verdance (max 3). Banked Verdance shortens this cast: 2.2 sec at 1 Verdance, 1.9 sec at 2, and 1.5 sec at 3.',
+        },
+      ],
       [
         'mark_of_the_wild',
         'Wildward',
@@ -1196,7 +1204,7 @@ const classAbilityNamesEn = {
         'Heals the target for {damage} over 12 sec.',
         {
           restoration:
-            'Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Fleetmend becomes Overbloom.',
+            'Each cast adds 1 Verdance (max 3), including a refresh of a bloom already ticking. At 3 Verdance, Fleetmend becomes Overbloom.',
         },
       ],
       [
@@ -1259,7 +1267,10 @@ const classAbilityNamesEn = {
         'regrowth',
         'Second Bloom',
         'Heals a friendly target for {damage} and an additional amount over 21 sec.',
-        { restoration: 'Planting a NEW bloom adds 1 Verdance (max 5).' },
+        {
+          restoration:
+            'Each cast adds 1 Verdance (max 3), including a refresh of a bloom already ticking.',
+        },
       ],
       ['barkskin', 'Oakhide', 'Your skin hardens like bark, increasing armor by 20% for 15 sec.'],
       // Tank defensive cooldowns (paladin / druid), one distinct mechanic each.
@@ -1584,7 +1595,7 @@ const classAbilityNamesEn = {
       [
         'swiftmend',
         'Fleetmend',
-        'Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Wildbloom and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)',
+        'Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Wildbloom, Second Bloom, and Wildmend casts each add 1 Verdance; at 3 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)',
       ],
       [
         'moonlash',
@@ -1619,7 +1630,7 @@ const classAbilityNamesEn = {
       [
         'overbloom',
         'Overbloom',
-        'Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom.',
+        'Spends your 3 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom.',
       ],
       [
         'summon_imp',

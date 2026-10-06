@@ -54,6 +54,7 @@ import { primaryHealingMultiplier } from '../spec_output_tuning';
 import {
   abilityScalingPower,
   absorbBonus,
+  coefficientCastTime,
   directHealBonus,
   directHitBonus,
   dotTickBonus,
@@ -1370,7 +1371,8 @@ export function runEffects(
         const rolledAmount = ctx.rng.range(eff.min, eff.max);
         const baseHealAmount =
           eff.casterMaxHpPct === undefined
-            ? rolledAmount + directHealBonus(p.healPower, res.castTime, false, talentHealMult)
+            ? rolledAmount +
+              directHealBonus(p.healPower, coefficientCastTime(res), false, talentHealMult)
             : Math.round(p.maxHp * eff.casterMaxHpPct);
         // The cast-scoped multiplier (see the runEffects parameter note): the
         // === 1 guard keeps every unmarked cast's arithmetic byte-identical.
@@ -1564,9 +1566,6 @@ export function runEffects(
       }
       case 'hot': {
         const hotTarget = target ?? p;
-        const plantsHot = !hotTarget.auras.some(
-          (aura) => aura.kind === 'hot' && aura.id === ability.id && aura.sourceId === p.id,
-        );
         // A HoT that RIDES a direct heal (Regrowth-style) does NOT also scale here:
         // the direct component already took the cast-time coefficient, so scaling the
         // rider too would double-dip. Only pure HoTs (Rejuvenation) take the rider.
@@ -1604,7 +1603,8 @@ export function runEffects(
           sourceId: p.id,
           school: ability.school,
         });
-        if (plantsHot) druidEngineOnHotPlanted(ctx, p, ability.id);
+        // A refresh of the caster's own ticking bloom banks Verdance too.
+        druidEngineOnHotPlanted(ctx, p, ability.id);
         break;
       }
       case 'absorb': {

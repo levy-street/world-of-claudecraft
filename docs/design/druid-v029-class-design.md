@@ -89,9 +89,18 @@ tank form and Cat has a full damage budget.
 
 ## Groveheart
 
-Completed Wildbloom and Second Bloom casts that plant a new owned HoT add one
-Verdance, to five. HoT ticks and casts that refresh an existing owned HoT do not
-add stages. At full Verdance, Swiftmend becomes Overbloom.
+Every completed Wildbloom, Second Bloom, and Wildmend cast adds one Verdance, to
+three (`VERDANCE_STAGES`). A Wildbloom or Second Bloom that refreshes an existing
+owned HoT counts the same as a fresh plant; HoT ticks never add stages. At full
+Verdance, Swiftmend becomes Overbloom.
+
+Banked Verdance speeds Wildmend to a defined pre-haste cast time
+(`VERDANCE_WILDMEND_CAST_TIMES`): 2.2 sec at one, 1.9 sec at two, 1.5 sec at
+three. The rule lives in the shared ability resolution chain, so the tooltip,
+the cast bar, and the server's cast start agree, and it never lengthens a cast
+that already resolves faster.
+
+Gladesong (the level 17 major cooldown) costs 240 mana on a 60 sec cooldown.
 
 Overbloom removes every HoT the caster owns on every friendly ally and
 immediately heals each ally for 60% of that HoT's remaining healing. Overhealing

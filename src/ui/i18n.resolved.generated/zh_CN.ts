@@ -4000,7 +4000,7 @@ export const zh_CN: EnTranslations = {
       "duskEconomy": "技能的能量消耗降低{pct}%",
       "moontide": "月潮：第{stacks}/{max}层。月翼形态下，野性弹、天陨与月种的施法各累积1层。达到{max}层时：月种变为月涌，天陨变为日醒，使用任意一个都会消耗全部3层",
       "oldBlood": "古血：第{stacks}/{max}层。裂爪、剐削、血裂、血噬、横扫利爪与碎骨击的命中各累积1层。达到{max}层时：豹形态下血噬变为血收，巨熊形态下碎骨击变为碎髓",
-      "verdance": "繁茂：第{stacks}/{max}层。每种下一个新的野性绽放或二度绽放累积1层。达到{max}层时，迅捷治愈变为盛放",
+      "verdance": "繁茂：第{stacks}/{max}层。每施放一次野性绽放、二度绽放或野性愈合累积1层，每层都会缩短野性愈合的施法时间。达到{max}层时，迅捷治愈变为盛放",
       "freeExecute": "下一个符合条件的斩杀技能不消耗资源",
       "resourceSap": "每 {interval} 秒恢复 {value} 点当前资源",
       "nextAttackCrit": "下一次攻击必定暴击",
@@ -13930,7 +13930,8 @@ export const zh_CN: EnTranslations = {
       },
       "healing_touch": {
         "name": "野性愈合",
-        "description": "为一个友方目标恢复 {damage} 点生命值。"
+        "description": "为一个友方目标恢复 {damage} 点生命值。",
+        "specNote_restoration": "每次完成施放累积1层繁茂（最多3层）。已累积的繁茂会缩短此法术的施法时间：1层时2.2秒，2层时1.9秒，3层时1.5秒。"
       },
       "mark_of_the_wild": {
         "name": "野性守护",
@@ -13948,7 +13949,7 @@ export const zh_CN: EnTranslations = {
       "rejuvenation": {
         "name": "野性绽放",
         "description": "在 12 秒内为目标恢复 {damage} 点生命值。",
-        "specNote_restoration": "种下新的绽放会累积1层繁茂（最多5层）。繁茂达到5层时，迅捷治愈变为盛放。"
+        "specNote_restoration": "每次施放累积1层繁茂（最多3层），刷新仍在生效的绽放也算。繁茂达到3层时，迅捷治愈变为盛放。"
       },
       "thorns": {
         "name": "荆棘守护",
@@ -13997,7 +13998,7 @@ export const zh_CN: EnTranslations = {
       "regrowth": {
         "name": "二度绽放",
         "description": "为一个友方目标恢复 {damage} 点生命值，并在 21 秒内额外恢复一定生命值。",
-        "specNote_restoration": "种下新的绽放会累积1层繁茂（最多5层）。"
+        "specNote_restoration": "每次施放累积1层繁茂（最多3层），刷新仍在生效的绽放也算。"
       },
       "barkskin": {
         "name": "橡树皮",
@@ -14267,7 +14268,7 @@ export const zh_CN: EnTranslations = {
       },
       "swiftmend": {
         "name": "迅捷治愈",
-        "description": "消耗友方目标身上的一个持续治疗效果，治疗其 {damage} 点生命。野性绽放与二度绽放的播撒会累加青翠；在 5 层青翠时，此按钮会变为盛放，立即为每一位带有你持续治疗效果的盟友治疗这些效果所剩余量的 60%。（恢复标志技能）"
+        "description": "消耗友方目标身上的一个持续治疗效果，治疗其 {damage} 点生命。每次施放野性绽放、二度绽放或野性愈合累积1层繁茂；在 3 层繁茂时，此按钮会变为盛放，立即为每一位带有你持续治疗效果的盟友治疗这些效果所剩余量的 60%。（恢复标志技能）"
       },
       "moonlash": {
         "name": "月涌",
@@ -14295,7 +14296,7 @@ export const zh_CN: EnTranslations = {
       },
       "overbloom": {
         "name": "盛放",
-        "description": "消耗你的5层繁茂：每个持有你的持续治疗效果的盟友立即恢复这些效果剩余治疗量的{buff}%，这些效果随之移除，并为目标种下一个新的野性绽放。"
+        "description": "消耗你的3层繁茂：每个持有你的持续治疗效果的盟友立即恢复这些效果剩余治疗量的{buff}%，这些效果随之移除，并为目标种下一个新的野性绽放。"
       },
       "summon_imp": {
         "name": "召唤烬裔",

@@ -2,8 +2,9 @@
 // display caller (docs/design/class-balance-v042.md): action-slot
 // replacement, the spec-gated resolvers, one post-transform talent-mod bake
 // keyed by the final id, then the Ascension/Radiant Resonance presentation
-// transforms (effect magnitudes and cast time). `mods` is the caller's own
-// precomputed TalentModifiers, never recomputed here.
+// transforms (effect magnitudes and cast time) and Groveheart's Verdance
+// Wildmend cast time. `mods` is the caller's own precomputed TalentModifiers,
+// never recomputed here.
 //
 // applyAbilityCostTail below is the resource-cost tail (draining curse
 // cost_tax, the Measured Fury arms discount, Aether Surge's per-charge ramp):
@@ -18,7 +19,7 @@ import type { ResolvedAbility } from '../sim';
 import type { Entity, PlayerClass } from '../types';
 import { resolveActionReplacement } from './action_replacement';
 import { aetherSurgeCostMult } from './chronomancy';
-import { bruinRushMakesCatFormFree } from './druid_engines';
+import { bruinRushMakesCatFormFree, verdanceWildmendCastTime } from './druid_engines';
 import { resolveColdsightAbilityForSpec } from './hunter_coldsight';
 import { resolveHunterSharedAbilityForTalents } from './hunter_shared';
 import { radiantResonanceCastTime } from './paladin_radiant_resonance';
@@ -53,7 +54,20 @@ export function resolveAbilityChain(
   // mods carries the worn-set flags (Dawnforged 4pc: instant empowered Dawn's
   // Embrace). known.def.id, not the transformed found.def.id, is the ability
   // actually requested: the same identity radiantResonanceCastTime checks.
-  const castTime = radiantResonanceCastTime(actor, known.def.id, ascensionResolved.castTime, mods);
+  const resonanceCastTime = radiantResonanceCastTime(
+    actor,
+    known.def.id,
+    ascensionResolved.castTime,
+    mods,
+  );
+  // Banked Verdance speeds Wildmend (combat/druid_engines.ts); identity
+  // for every other ability and for a druid with no Verdance. Only the cast
+  // gets faster: scalingCastTime keeps the heal's Spell Power coefficient on
+  // the cast time from before the speed-up.
+  const castTime = verdanceWildmendCastTime(actor, known.def.id, resonanceCastTime);
+  if (castTime !== resonanceCastTime) {
+    return { ...ascensionResolved, castTime, scalingCastTime: resonanceCastTime };
+  }
   return castTime === ascensionResolved.castTime
     ? ascensionResolved
     : { ...ascensionResolved, castTime };

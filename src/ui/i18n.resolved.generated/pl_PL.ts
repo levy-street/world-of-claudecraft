@@ -4000,7 +4000,7 @@ export const pl_PL: EnTranslations = {
       "duskEconomy": "Umiejętności kosztują o {pct}% mniej energii",
       "moontide": "Księżycowy przypływ: stopień {stacks} z {max}. Rzucenia Dzikiego pocisku, Spadającego nieba i Księżycowego nasienia napełniają go w Postaci księżycowej sowy; przy {max} Księżycowe nasienie staje się Księżycowym przyborem, a Spadające niebo Słonecznym śladem, i oba go zużywają",
       "oldBlood": "Stara Krew: stopień {stacks} z {max}. Trafione ciosy kota i Bruina dzielą tę rezerwę; przy {max} przemienia się Krwawe ukąszenie lub Kruszenie kości",
-      "verdance": "Zieleń {stacks}/{max}. Każdy NOWO zasadzony Dziki rozkwit lub Drugi rozkwit dodaje 1. Przy {max} Szybkie uzdrowienie zmienia się w Nadrozkwit",
+      "verdance": "Zieleń {stacks}/{max}. Każde rzucenie Dzikiego rozkwitu, Drugiego rozkwitu lub Dzikiego ukojenia dodaje 1, a każdy punkt skraca czas rzucania Dzikiego ukojenia. Przy {max} Szybkie uzdrowienie zmienia się w Nadrozkwit",
       "freeExecute": "Twoja następna dostępna zdolność dobijająca nic nie kosztuje",
       "resourceSap": "Przywraca {value} twojego obecnego zasobu co {interval} s",
       "nextAttackCrit": "Twój następny atak na pewno będzie trafieniem krytycznym",
@@ -13930,7 +13930,8 @@ export const pl_PL: EnTranslations = {
       },
       "healing_touch": {
         "name": "Dzikie ukojenie",
-        "description": "Leczy sprzymierzony cel o {damage}."
+        "description": "Leczy sprzymierzony cel o {damage}.",
+        "specNote_restoration": "Każde ukończone rzucenie dodaje 1 Zieleń (maks. 3). Zgromadzona Zieleń skraca to rzucenie: 2,2 s przy 1 Zieleni, 1,9 s przy 2 i 1,5 s przy 3."
       },
       "mark_of_the_wild": {
         "name": "Dzika osłona",
@@ -13948,7 +13949,7 @@ export const pl_PL: EnTranslations = {
       "rejuvenation": {
         "name": "Dziki rozkwit",
         "description": "Leczy cel za {damage} w ciągu 12 sekund.",
-        "specNote_restoration": "Zasadzenie NOWEGO rozkwitu dodaje 1 Zieleń (maks. 5). Przy 5 Zieleni, Szybkie uzdrowienie zmienia się w Nadrozkwit."
+        "specNote_restoration": "Każde rzucenie dodaje 1 Zieleń (maks. 3), także gdy odnawia rozkwit, który już działa. Przy 3 Zieleni Szybkie uzdrowienie zmienia się w Nadrozkwit."
       },
       "thorns": {
         "name": "Cierniowa straż",
@@ -13997,7 +13998,7 @@ export const pl_PL: EnTranslations = {
       "regrowth": {
         "name": "Drugi rozkwit",
         "description": "Leczy przyjazny cel za {damage} oraz dodatkową ilość w ciągu 21 sekund.",
-        "specNote_restoration": "Zasadzenie NOWEGO rozkwitu dodaje 1 Zieleń (maks. 5)."
+        "specNote_restoration": "Każde rzucenie dodaje 1 Zieleń (maks. 3), także gdy odnawia rozkwit, który już działa."
       },
       "barkskin": {
         "name": "Dębowa skóra",
@@ -14267,7 +14268,7 @@ export const pl_PL: EnTranslations = {
       },
       "swiftmend": {
         "name": "Szybkie uzdrowienie",
-        "description": "Zużywa efekt leczenia w czasie na przyjaznym celu, aby uleczyć go za {damage}. Zasadzenia Dzikiego rozkwitu i Drugiego rozkwitu dodają Zieleń; przy 5 Zieleni ten przycisk zmienia się w Nadrozkwit, który natychmiast leczy każdego sojusznika noszącego twoje efekty leczenia w czasie za 60% tego, co z nich zostało. (Sygnatura Serca Gaju)"
+        "description": "Zużywa efekt leczenia w czasie na przyjaznym celu, aby uleczyć go za {damage}. Każde rzucenie Dzikiego rozkwitu, Drugiego rozkwitu i Dzikiego ukojenia dodaje 1 Zieleń; przy 3 Zieleni ten przycisk zmienia się w Nadrozkwit, który natychmiast leczy każdego sojusznika noszącego twoje efekty leczenia w czasie za 60% tego, co z nich zostało. (Sygnatura Serca Gaju)"
       },
       "moonlash": {
         "name": "Księżycowy przybór",
@@ -14295,7 +14296,7 @@ export const pl_PL: EnTranslations = {
       },
       "overbloom": {
         "name": "Nadrozkwit",
-        "description": "Zużywa 5 Zieleni. Zbiera każde twoje leczenie w czasie na wszystkich sojusznikach za {buff}% pozostałego leczenia, usuwa te efekty i sadzi świeży Dziki rozkwit na celu."
+        "description": "Zużywa 3 punkty Zieleni. Zbiera każde twoje leczenie w czasie na wszystkich sojusznikach za {buff}% pozostałego leczenia, usuwa te efekty i sadzi świeży Dziki rozkwit na celu."
       },
       "summon_imp": {
         "name": "Przywołanie Emberkina",

@@ -2,7 +2,8 @@
 // Moongrove fills one Moontide bank toward a CHOSEN payoff (Moonsurge on the
 // Moonseed button or Sunwake on the Skyfall button, either spend clears it),
 // Wildfang shares Old Blood across Cat and Bruin forms, and Groveheart
-// grows Verdance toward Overbloom.
+// grows Verdance toward Overbloom (every Wildbloom, Second Bloom, or Wildmend
+// cast adds 1, and each banked Verdance speeds Wildmend's cast).
 
 import { DRUID_CHOICE_ROWS } from '../content/choice_rows_classic';
 import {
@@ -32,8 +33,17 @@ export const VERDANCE_ID = 'verdance';
 
 export const MOONTIDE_STAGES = 3;
 export const OLD_BLOOD_STAGES = 3;
-export const VERDANCE_STAGES = 5;
+export const VERDANCE_STAGES = 3;
 const ENGINE_BACKING_DURATION = 3600;
+
+// Groveheart rework: each banked Verdance speeds Wildmend to a DEFINED cast
+// time, indexed by stacks minus one (1 Verdance 2.2 sec, 2 Verdance 1.9 sec,
+// 3 Verdance 1.5 sec). Roughly 0.3 sec per stack off the Groveheart Wildmend
+// (the 3.0 sec rank cast less the spec's 16% baseline), landing exactly on
+// 1.5 at the cap. Pre-haste values: spell haste still divides the result at
+// cast start like every other cast time.
+export const WILDMEND_ID = 'healing_touch';
+export const VERDANCE_WILDMEND_CAST_TIMES: readonly number[] = [2.2, 1.9, 1.5];
 
 export const HIGHMOON_TITHE_PCT = 0.15;
 export const WILD_APEX_MULT = 1.25;
@@ -150,6 +160,33 @@ const OLD_BLOOD_STRIKE_IDS = new Set([
   'lunge',
 ]);
 const VERDANCE_SOWING_IDS = new Set(['rejuvenation', 'regrowth']);
+
+// Banked Verdance on this actor. Reads the aura list by kind only (the same
+// read the Fleetmend to Overbloom replacement rule makes), so the Sim and the
+// online client mirror agree.
+function verdanceStacks(actor: Pick<Entity, 'auras'>): number {
+  for (const aura of actor.auras) {
+    if (aura.kind === 'verdance') return aura.stacks ?? 1;
+  }
+  return 0;
+}
+
+/** Wildmend's cast time with banked Verdance folded in (the shared
+ *  resolution chain in combat/ability_resolution.ts calls this, so the
+ *  tooltip, the cast bar, and the server's cast start all read one number).
+ *  Min-combined: a resolve that is already faster than the defined time is
+ *  never stretched. Every other ability, and a druid with no Verdance, gets
+ *  its cast time back unchanged. Draws no rng. */
+export function verdanceWildmendCastTime(
+  actor: Pick<Entity, 'auras'>,
+  abilityId: string,
+  castTime: number,
+): number {
+  if (abilityId !== WILDMEND_ID || castTime <= 0) return castTime;
+  const stacks = Math.min(verdanceStacks(actor), VERDANCE_WILDMEND_CAST_TIMES.length);
+  if (stacks <= 0) return castTime;
+  return Math.min(castTime, VERDANCE_WILDMEND_CAST_TIMES[stacks - 1]);
+}
 
 function specOf(ctx: SimContext, player: Entity): string | null {
   if (player.kind !== 'player') return null;
@@ -394,8 +431,19 @@ export function druidEngineOnCast(
     }
     return;
   }
+
+  // Groveheart: every completed Wildmend banks 1 Verdance (max 3). This
+  // funnel runs after runEffects, so the heal has already landed at the
+  // current cast time and the speed-up reaches the NEXT Wildmend. Draws no rng.
+  if (spec === 'restoration' && abilityId === WILDMEND_ID) {
+    addStage(ctx, player, VERDANCE_ID, 'Verdance', 'verdance', VERDANCE_STAGES);
+  }
 }
 
+// Every Wildbloom or Second Bloom application banks 1 Verdance, a fresh
+// plant and a refresh of one already ticking alike (the Groveheart rework
+// dropped the old new-plant-only rule, so a druid never has to let a bloom
+// fall off to keep the engine growing).
 export function druidEngineOnHotPlanted(ctx: SimContext, player: Entity, abilityId: string): void {
   if (!VERDANCE_SOWING_IDS.has(abilityId)) return;
   const meta = player.kind === 'player' ? ctx.players.get(player.id) : undefined;
