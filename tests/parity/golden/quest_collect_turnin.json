@@ -877,8 +877,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "a97ea209",
-      "events": "f0effc69",
+      "state": "0c8f2ef1",
+      "events": "9af200fb",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -923,6 +923,7 @@
               "boar_hide",
               "eastbrook_buckler",
               "recruit_tunic",
+              "saltbitten_pauldrons",
               "worn_sword"
             ]
           },
@@ -947,6 +948,10 @@
             {
               "count": 5,
               "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "saltbitten_pauldrons"
             }
           ],
           "lifetimeXp": 350,
@@ -1044,7 +1049,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 1011,
-      "state": "81741fed",
+      "state": "af7e62ed",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1090,6 +1095,7 @@
               "boar_hide",
               "eastbrook_buckler",
               "recruit_tunic",
+              "saltbitten_pauldrons",
               "worn_sword"
             ]
           },
@@ -1114,6 +1120,10 @@
             {
               "count": 5,
               "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "saltbitten_pauldrons"
             }
           ],
           "lifetimeXp": 350,

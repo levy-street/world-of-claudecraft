@@ -550,8 +550,8 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 1019,
-      "state": "3fa7e17b",
-      "events": "56a52c4f",
+      "state": "a957887c",
+      "events": "034565e2",
       "rng": {
         "draws": 40,
         "digest": "73f698f7"
@@ -601,6 +601,7 @@
               "baked_bread",
               "eastbrook_buckler",
               "recruit_tunic",
+              "saltbitten_legguards",
               "worn_sword"
             ]
           },
@@ -631,6 +632,7 @@
           "entityId": 1003,
           "equipment": {
             "chest": "recruit_tunic",
+            "legs": "saltbitten_legguards",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
@@ -677,7 +679,7 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 82,
+          "attackPower": 84,
           "auras": [
             {
               "duration": 3600,
@@ -699,13 +701,13 @@
           "fallStartY": -0.498062,
           "fiveSecondRule": 99.4,
           "healPower": 5,
-          "hp": 50000,
+          "hp": 442,
           "id": 1003,
           "inCombat": true,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
+          "maxHp": 442,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -727,11 +729,11 @@
           "spellPower": 5,
           "stats": {
             "agi": 29,
-            "armor": 270,
+            "armor": 293,
             "int": 10,
             "spi": 11,
             "sta": 41,
-            "str": 41
+            "str": 42
           },
           "templateId": "warrior",
           "weapon": {
@@ -746,7 +748,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1019,
-      "state": "d527aa8e",
+      "state": "aedc2ca7",
       "events": "741638a5",
       "rng": {
         "draws": 40,
@@ -797,6 +799,7 @@
               "baked_bread",
               "eastbrook_buckler",
               "recruit_tunic",
+              "saltbitten_legguards",
               "worn_sword"
             ]
           },
@@ -827,6 +830,7 @@
           "entityId": 1003,
           "equipment": {
             "chest": "recruit_tunic",
+            "legs": "saltbitten_legguards",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
@@ -873,7 +877,7 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 82,
+          "attackPower": 84,
           "auras": [
             {
               "duration": 3600,
@@ -895,13 +899,13 @@
           "fallStartY": -0.498062,
           "fiveSecondRule": 99.5,
           "healPower": 5,
-          "hp": 50000,
+          "hp": 442,
           "id": 1003,
           "inCombat": true,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
+          "maxHp": 442,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -923,11 +927,11 @@
           "spellPower": 5,
           "stats": {
             "agi": 29,
-            "armor": 270,
+            "armor": 293,
             "int": 10,
             "spi": 11,
             "sta": 41,
-            "str": 41
+            "str": 42
           },
           "templateId": "warrior",
           "weapon": {
