@@ -18454,90 +18454,6 @@ export const pt_BR: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Cajado de Guerra da Vanguarda"
       },
-      "saltbitten_robe": {
-        "name": "Saltbitten Robe"
-      },
-      "saltbitten_leggings": {
-        "name": "Saltbitten Leggings"
-      },
-      "saltbitten_slippers": {
-        "name": "Saltbitten Slippers"
-      },
-      "saltbitten_hood": {
-        "name": "Saltbitten Hood"
-      },
-      "saltbitten_gloves": {
-        "name": "Saltbitten Gloves"
-      },
-      "saltbitten_mantle": {
-        "name": "Saltbitten Mantle"
-      },
-      "saltbitten_sash": {
-        "name": "Saltbitten Sash"
-      },
-      "saltbitten_jerkin": {
-        "name": "Saltbitten Jerkin"
-      },
-      "saltbitten_breeches": {
-        "name": "Saltbitten Breeches"
-      },
-      "saltbitten_boots": {
-        "name": "Saltbitten Boots"
-      },
-      "saltbitten_cap": {
-        "name": "Saltbitten Cap"
-      },
-      "saltbitten_grips": {
-        "name": "Saltbitten Grips"
-      },
-      "saltbitten_shoulderpads": {
-        "name": "Saltbitten Shoulderpads"
-      },
-      "saltbitten_belt": {
-        "name": "Saltbitten Belt"
-      },
-      "saltbitten_hauberk": {
-        "name": "Saltbitten Hauberk"
-      },
-      "saltbitten_legguards": {
-        "name": "Saltbitten Legguards"
-      },
-      "saltbitten_sabatons": {
-        "name": "Saltbitten Sabatons"
-      },
-      "saltbitten_helm": {
-        "name": "Saltbitten Helm"
-      },
-      "saltbitten_gauntlets": {
-        "name": "Saltbitten Gauntlets"
-      },
-      "saltbitten_pauldrons": {
-        "name": "Saltbitten Pauldrons"
-      },
-      "saltbitten_girdle": {
-        "name": "Saltbitten Girdle"
-      },
-      "saltbitten_chainmail": {
-        "name": "Saltbitten Chainmail"
-      },
-      "saltbitten_chausses": {
-        "name": "Saltbitten Chausses"
-      },
-      "saltbitten_greaves": {
-        "name": "Saltbitten Greaves"
-      },
-      "saltbitten_coif": {
-        "name": "Saltbitten Coif"
-      },
-      "saltbitten_handguards": {
-        "name": "Saltbitten Handguards"
-      },
-      "saltbitten_spaulders": {
-        "name": "Saltbitten Spaulders"
-      },
-      "saltbitten_cord": {
-        "name": "Saltbitten Cord"
-      },
       "brookwatch_robe": {
         "name": "Brookwatch Robe"
       },
@@ -19113,27 +19029,6 @@ export const pt_BR: EnTranslations = {
       },
       "highgale_greaves": {
         "name": "Highgale Greaves"
-      },
-      "saltbitten_tunic": {
-        "name": "Saltbitten Tunic"
-      },
-      "saltbitten_legwraps": {
-        "name": "Saltbitten Legwraps"
-      },
-      "saltbitten_treads": {
-        "name": "Saltbitten Treads"
-      },
-      "saltbitten_headguard": {
-        "name": "Saltbitten Headguard"
-      },
-      "saltbitten_handwraps": {
-        "name": "Saltbitten Handwraps"
-      },
-      "saltbitten_shoulderguards": {
-        "name": "Saltbitten Shoulderguards"
-      },
-      "saltbitten_waistguard": {
-        "name": "Saltbitten Waistguard"
       },
       "brookwatch_tunic": {
         "name": "Brookwatch Tunic"

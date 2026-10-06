@@ -4350,11 +4350,9 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
 //     (mail feet, common, armor 38, a 46 bill); the counter item is itself
 //     dead beside the sabatons, so a 100-copper craft door onto it was a
 //     nugget sink, not a discount route. No other uncrafted mail foot sits
-//     in (12, 100] apart from the two Saltbitten choose-one quest pieces
-//     (saltbitten_sabatons and saltbitten_greaves, sellValue 87), which are
-//     quest-only rewards and never a trophy craft target; stretching a bill
-//     to admit bogiron_hauberk (300) was rejected at the build; armorcrafting
-//     keeps no trophy row and the nugget returns to poor trash).
+//     in (12, 100], and stretching a bill to admit bogiron_hauberk (300) was
+//     rejected at the build; armorcrafting keeps no trophy row and the
+//     nugget returns to poor trash).
 //   RECORDED CONSEQUENCE (found by the 11l QA, the maintainer's to heal):
 //     with bandit_bandana, tallow_candle and mudfin_scale promoted, zone 1
 //     (Eastbrook Vale, levels 1 to 7) carries NO poor mob drop, so a

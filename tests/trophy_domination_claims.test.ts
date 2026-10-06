@@ -19,7 +19,6 @@
 // (qr-19-jewelcrafting-exclusion-stale, 2026-09-01), and its arm below pins the
 // live census the amended record now states.
 import { describe, expect, it } from 'vitest';
-import { QUEST_LEVELING_GEAR_ITEMS } from '../src/sim/content/quest_leveling_gear';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import { expectedStatBudget } from '../src/sim/item_level';
@@ -31,17 +30,9 @@ import { expectDefined } from './helpers/defined';
 const CRAFTED = new Set(ALL_RECIPES.map((r) => r.resultItemId));
 
 /** Uncrafted, and authored: a generated heroic variant is not an authorable
- *  trophy output, and counting them would drift the census with generation.
- *  The choose-one leveling quest pieces (content/quest_leveling_gear.ts) are
- *  quest-only rewards, never a trophy craft target, so they sit outside every
- *  census too (the bogiron arm below pins the two that land in its band). */
+ *  trophy output, and counting them would drift the census with generation. */
 function uncrafted(def: ItemDef): boolean {
-  return (
-    !CRAFTED.has(def.id) &&
-    def.heroicOf === undefined &&
-    def.heroic !== true &&
-    !QUEST_LEVELING_GEAR_ITEMS[def.id]
-  );
+  return !CRAFTED.has(def.id) && def.heroicOf === undefined && def.heroic !== true;
 }
 
 /** The header's band shape: strictly above the trophy's sellValue, at most the
@@ -194,18 +185,6 @@ describe('the bogiron nugget armorcrafting exclusion, recomputed', () => {
         inBand(d, 12, 100),
     );
     expect(inBandFeet.map((d) => d.id)).toEqual(['hobnail_boots']);
-    // The two Saltbitten quest choice pieces sit in the band too (sellValue 87)
-    // and are left out above as quest-only rewards, not craft targets.
-    const questFeet = Object.values(QUEST_LEVELING_GEAR_ITEMS)
-      .filter(
-        (d) =>
-          (d as { armorType?: string }).armorType === 'mail' &&
-          d.slot === 'feet' &&
-          inBand(d, 12, 100),
-      )
-      .map((d) => d.id)
-      .sort();
-    expect(questFeet).toEqual(['saltbitten_greaves', 'saltbitten_sabatons']);
     const boots = ITEMS.hobnail_boots;
     const sabatons = ITEMS.coppermail_sabatons;
     expect(CRAFTED.has(sabatons.id), 'the sabatons are a trainer row').toBe(true);

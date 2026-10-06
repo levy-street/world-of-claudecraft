@@ -11,391 +11,6 @@
 import type { ItemDef } from '../types';
 
 export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
-  // Saltbitten (the Proving Shore): item level 4, chest budget 2.
-  saltbitten_robe: {
-    id: 'saltbitten_robe',
-    name: 'Saltbitten Robe',
-    kind: 'armor',
-    armorType: 'cloth',
-    slot: 'chest',
-    quality: 'uncommon',
-    stats: { armor: 13, sta: 1, int: 2 },
-    sellValue: 169,
-  },
-  // Saltbitten (the Proving Shore): item level 3, legs budget 1.
-  saltbitten_leggings: {
-    id: 'saltbitten_leggings',
-    name: 'Saltbitten Leggings',
-    kind: 'armor',
-    armorType: 'cloth',
-    slot: 'legs',
-    quality: 'uncommon',
-    stats: { armor: 9, int: 1 },
-    sellValue: 120,
-  },
-  // Saltbitten (the Proving Shore): item level 3, feet budget 1.
-  saltbitten_slippers: {
-    id: 'saltbitten_slippers',
-    name: 'Saltbitten Slippers',
-    kind: 'armor',
-    armorType: 'cloth',
-    slot: 'feet',
-    quality: 'uncommon',
-    stats: { armor: 6, int: 1 },
-    sellValue: 87,
-  },
-  // Saltbitten (the Proving Shore): item level 3, helmet budget 1.
-  saltbitten_hood: {
-    id: 'saltbitten_hood',
-    name: 'Saltbitten Hood',
-    kind: 'armor',
-    armorType: 'cloth',
-    slot: 'helmet',
-    quality: 'uncommon',
-    stats: { armor: 8, int: 1 },
-    sellValue: 113,
-  },
-  // Saltbitten (the Proving Shore): item level 3, gloves budget 1.
-  saltbitten_gloves: {
-    id: 'saltbitten_gloves',
-    name: 'Saltbitten Gloves',
-    kind: 'armor',
-    armorType: 'cloth',
-    slot: 'gloves',
-    quality: 'uncommon',
-    stats: { armor: 7, int: 1 },
-    sellValue: 93,
-  },
-  // Saltbitten (the Proving Shore): item level 4, shoulder budget 1.
-  saltbitten_mantle: {
-    id: 'saltbitten_mantle',
-    name: 'Saltbitten Mantle',
-    kind: 'armor',
-    armorType: 'cloth',
-    slot: 'shoulder',
-    quality: 'uncommon',
-    stats: { armor: 10, int: 1 },
-    sellValue: 127,
-  },
-  // Saltbitten (the Proving Shore): item level 4, waist budget 1.
-  saltbitten_sash: {
-    id: 'saltbitten_sash',
-    name: 'Saltbitten Sash',
-    kind: 'armor',
-    armorType: 'cloth',
-    slot: 'waist',
-    quality: 'uncommon',
-    stats: { armor: 9, int: 1 },
-    sellValue: 118,
-  },
-  // Saltbitten (the Proving Shore): item level 4, chest budget 2.
-  saltbitten_jerkin: {
-    id: 'saltbitten_jerkin',
-    name: 'Saltbitten Jerkin',
-    kind: 'armor',
-    armorType: 'leather',
-    slot: 'chest',
-    quality: 'uncommon',
-    stats: { armor: 23, agi: 1, sta: 1 },
-    sellValue: 169,
-  },
-  // Saltbitten (the Proving Shore): item level 3, legs budget 1.
-  saltbitten_breeches: {
-    id: 'saltbitten_breeches',
-    name: 'Saltbitten Breeches',
-    kind: 'armor',
-    armorType: 'leather',
-    slot: 'legs',
-    quality: 'uncommon',
-    stats: { armor: 15, agi: 1 },
-    sellValue: 120,
-  },
-  // Saltbitten (the Proving Shore): item level 3, feet budget 1.
-  saltbitten_boots: {
-    id: 'saltbitten_boots',
-    name: 'Saltbitten Boots',
-    kind: 'armor',
-    armorType: 'leather',
-    slot: 'feet',
-    quality: 'uncommon',
-    stats: { armor: 11, agi: 1 },
-    sellValue: 87,
-  },
-  // Saltbitten (the Proving Shore): item level 3, helmet budget 1.
-  saltbitten_cap: {
-    id: 'saltbitten_cap',
-    name: 'Saltbitten Cap',
-    kind: 'armor',
-    armorType: 'leather',
-    slot: 'helmet',
-    quality: 'uncommon',
-    stats: { armor: 14, agi: 1 },
-    sellValue: 113,
-  },
-  // Saltbitten (the Proving Shore): item level 3, gloves budget 1.
-  saltbitten_grips: {
-    id: 'saltbitten_grips',
-    name: 'Saltbitten Grips',
-    kind: 'armor',
-    armorType: 'leather',
-    slot: 'gloves',
-    quality: 'uncommon',
-    stats: { armor: 12, agi: 1 },
-    sellValue: 93,
-  },
-  // Saltbitten (the Proving Shore): item level 4, shoulder budget 1.
-  saltbitten_shoulderpads: {
-    id: 'saltbitten_shoulderpads',
-    name: 'Saltbitten Shoulderpads',
-    kind: 'armor',
-    armorType: 'leather',
-    slot: 'shoulder',
-    quality: 'uncommon',
-    stats: { armor: 17, agi: 1 },
-    sellValue: 127,
-  },
-  // Saltbitten (the Proving Shore): item level 4, waist budget 1.
-  saltbitten_belt: {
-    id: 'saltbitten_belt',
-    name: 'Saltbitten Belt',
-    kind: 'armor',
-    armorType: 'leather',
-    slot: 'waist',
-    quality: 'uncommon',
-    stats: { armor: 16, agi: 1 },
-    sellValue: 118,
-  },
-  // Saltbitten (the Proving Shore): item level 4, chest budget 2.
-  saltbitten_tunic: {
-    id: 'saltbitten_tunic',
-    name: 'Saltbitten Tunic',
-    kind: 'armor',
-    armorType: 'leather',
-    slot: 'chest',
-    quality: 'uncommon',
-    stats: { armor: 23, str: 1, sta: 1 },
-    sellValue: 169,
-  },
-  // Saltbitten (the Proving Shore): item level 3, legs budget 1.
-  saltbitten_legwraps: {
-    id: 'saltbitten_legwraps',
-    name: 'Saltbitten Legwraps',
-    kind: 'armor',
-    armorType: 'leather',
-    slot: 'legs',
-    quality: 'uncommon',
-    stats: { armor: 15, str: 1 },
-    sellValue: 120,
-  },
-  // Saltbitten (the Proving Shore): item level 3, feet budget 1.
-  saltbitten_treads: {
-    id: 'saltbitten_treads',
-    name: 'Saltbitten Treads',
-    kind: 'armor',
-    armorType: 'leather',
-    slot: 'feet',
-    quality: 'uncommon',
-    stats: { armor: 11, str: 1 },
-    sellValue: 87,
-  },
-  // Saltbitten (the Proving Shore): item level 3, helmet budget 1.
-  saltbitten_headguard: {
-    id: 'saltbitten_headguard',
-    name: 'Saltbitten Headguard',
-    kind: 'armor',
-    armorType: 'leather',
-    slot: 'helmet',
-    quality: 'uncommon',
-    stats: { armor: 14, str: 1 },
-    sellValue: 113,
-  },
-  // Saltbitten (the Proving Shore): item level 3, gloves budget 1.
-  saltbitten_handwraps: {
-    id: 'saltbitten_handwraps',
-    name: 'Saltbitten Handwraps',
-    kind: 'armor',
-    armorType: 'leather',
-    slot: 'gloves',
-    quality: 'uncommon',
-    stats: { armor: 12, str: 1 },
-    sellValue: 93,
-  },
-  // Saltbitten (the Proving Shore): item level 4, shoulder budget 1.
-  saltbitten_shoulderguards: {
-    id: 'saltbitten_shoulderguards',
-    name: 'Saltbitten Shoulderguards',
-    kind: 'armor',
-    armorType: 'leather',
-    slot: 'shoulder',
-    quality: 'uncommon',
-    stats: { armor: 17, str: 1 },
-    sellValue: 127,
-  },
-  // Saltbitten (the Proving Shore): item level 4, waist budget 1.
-  saltbitten_waistguard: {
-    id: 'saltbitten_waistguard',
-    name: 'Saltbitten Waistguard',
-    kind: 'armor',
-    armorType: 'leather',
-    slot: 'waist',
-    quality: 'uncommon',
-    stats: { armor: 16, str: 1 },
-    sellValue: 118,
-  },
-  // Saltbitten (the Proving Shore): item level 4, chest budget 2.
-  saltbitten_hauberk: {
-    id: 'saltbitten_hauberk',
-    name: 'Saltbitten Hauberk',
-    kind: 'armor',
-    armorType: 'mail',
-    slot: 'chest',
-    quality: 'uncommon',
-    stats: { armor: 34, str: 1, sta: 1 },
-    sellValue: 169,
-  },
-  // Saltbitten (the Proving Shore): item level 3, legs budget 1.
-  saltbitten_legguards: {
-    id: 'saltbitten_legguards',
-    name: 'Saltbitten Legguards',
-    kind: 'armor',
-    armorType: 'mail',
-    slot: 'legs',
-    quality: 'uncommon',
-    stats: { armor: 23, str: 1 },
-    sellValue: 120,
-  },
-  // Saltbitten (the Proving Shore): item level 3, feet budget 1.
-  saltbitten_sabatons: {
-    id: 'saltbitten_sabatons',
-    name: 'Saltbitten Sabatons',
-    kind: 'armor',
-    armorType: 'mail',
-    slot: 'feet',
-    quality: 'uncommon',
-    stats: { armor: 17, str: 1 },
-    sellValue: 87,
-  },
-  // Saltbitten (the Proving Shore): item level 3, helmet budget 1.
-  saltbitten_helm: {
-    id: 'saltbitten_helm',
-    name: 'Saltbitten Helm',
-    kind: 'armor',
-    armorType: 'mail',
-    slot: 'helmet',
-    quality: 'uncommon',
-    stats: { armor: 22, str: 1 },
-    sellValue: 113,
-  },
-  // Saltbitten (the Proving Shore): item level 3, gloves budget 1.
-  saltbitten_gauntlets: {
-    id: 'saltbitten_gauntlets',
-    name: 'Saltbitten Gauntlets',
-    kind: 'armor',
-    armorType: 'mail',
-    slot: 'gloves',
-    quality: 'uncommon',
-    stats: { armor: 18, str: 1 },
-    sellValue: 93,
-  },
-  // Saltbitten (the Proving Shore): item level 4, shoulder budget 1.
-  saltbitten_pauldrons: {
-    id: 'saltbitten_pauldrons',
-    name: 'Saltbitten Pauldrons',
-    kind: 'armor',
-    armorType: 'mail',
-    slot: 'shoulder',
-    quality: 'uncommon',
-    stats: { armor: 25, str: 1 },
-    sellValue: 127,
-  },
-  // Saltbitten (the Proving Shore): item level 4, waist budget 1.
-  saltbitten_girdle: {
-    id: 'saltbitten_girdle',
-    name: 'Saltbitten Girdle',
-    kind: 'armor',
-    armorType: 'mail',
-    slot: 'waist',
-    quality: 'uncommon',
-    stats: { armor: 24, str: 1 },
-    sellValue: 118,
-  },
-  // Saltbitten (the Proving Shore): item level 4, chest budget 2.
-  saltbitten_chainmail: {
-    id: 'saltbitten_chainmail',
-    name: 'Saltbitten Chainmail',
-    kind: 'armor',
-    armorType: 'mail',
-    slot: 'chest',
-    quality: 'uncommon',
-    stats: { armor: 34, sta: 1, int: 2 },
-    sellValue: 169,
-  },
-  // Saltbitten (the Proving Shore): item level 3, legs budget 1.
-  saltbitten_chausses: {
-    id: 'saltbitten_chausses',
-    name: 'Saltbitten Chausses',
-    kind: 'armor',
-    armorType: 'mail',
-    slot: 'legs',
-    quality: 'uncommon',
-    stats: { armor: 23, int: 1 },
-    sellValue: 120,
-  },
-  // Saltbitten (the Proving Shore): item level 3, feet budget 1.
-  saltbitten_greaves: {
-    id: 'saltbitten_greaves',
-    name: 'Saltbitten Greaves',
-    kind: 'armor',
-    armorType: 'mail',
-    slot: 'feet',
-    quality: 'uncommon',
-    stats: { armor: 17, int: 1 },
-    sellValue: 87,
-  },
-  // Saltbitten (the Proving Shore): item level 3, helmet budget 1.
-  saltbitten_coif: {
-    id: 'saltbitten_coif',
-    name: 'Saltbitten Coif',
-    kind: 'armor',
-    armorType: 'mail',
-    slot: 'helmet',
-    quality: 'uncommon',
-    stats: { armor: 22, int: 1 },
-    sellValue: 113,
-  },
-  // Saltbitten (the Proving Shore): item level 3, gloves budget 1.
-  saltbitten_handguards: {
-    id: 'saltbitten_handguards',
-    name: 'Saltbitten Handguards',
-    kind: 'armor',
-    armorType: 'mail',
-    slot: 'gloves',
-    quality: 'uncommon',
-    stats: { armor: 18, int: 1 },
-    sellValue: 93,
-  },
-  // Saltbitten (the Proving Shore): item level 4, shoulder budget 1.
-  saltbitten_spaulders: {
-    id: 'saltbitten_spaulders',
-    name: 'Saltbitten Spaulders',
-    kind: 'armor',
-    armorType: 'mail',
-    slot: 'shoulder',
-    quality: 'uncommon',
-    stats: { armor: 25, int: 1 },
-    sellValue: 127,
-  },
-  // Saltbitten (the Proving Shore): item level 4, waist budget 1.
-  saltbitten_cord: {
-    id: 'saltbitten_cord',
-    name: 'Saltbitten Cord',
-    kind: 'armor',
-    armorType: 'mail',
-    slot: 'waist',
-    quality: 'uncommon',
-    stats: { armor: 24, int: 1 },
-    sellValue: 118,
-  },
   // Brookwatch (Eastbrook Vale): item level 6, chest budget 2.
   brookwatch_robe: {
     id: 'brookwatch_robe',
@@ -407,7 +22,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 20, sta: 1, int: 2 },
     sellValue: 200,
   },
-  // Brookwatch (Eastbrook Vale): item level 6, legs budget 2.
+  // Brookwatch (Eastbrook Vale): item level 5, legs budget 2.
   brookwatch_leggings: {
     id: 'brookwatch_leggings',
     name: 'Brookwatch Leggings',
@@ -415,10 +30,10 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'legs',
     quality: 'uncommon',
-    stats: { armor: 18, sta: 1, int: 2 },
-    sellValue: 180,
+    stats: { armor: 15, sta: 1, int: 2 },
+    sellValue: 154,
   },
-  // Brookwatch (Eastbrook Vale): item level 6, feet budget 2.
+  // Brookwatch (Eastbrook Vale): item level 5, feet budget 1.
   brookwatch_slippers: {
     id: 'brookwatch_slippers',
     name: 'Brookwatch Slippers',
@@ -426,10 +41,10 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'feet',
     quality: 'uncommon',
-    stats: { armor: 13, sta: 1, int: 2 },
-    sellValue: 130,
+    stats: { armor: 11, int: 1 },
+    sellValue: 111,
   },
-  // Brookwatch (Eastbrook Vale): item level 5, helmet budget 2.
+  // Brookwatch (Eastbrook Vale): item level 6, helmet budget 2.
   brookwatch_hood: {
     id: 'brookwatch_hood',
     name: 'Brookwatch Hood',
@@ -437,10 +52,10 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 14, sta: 1, int: 2 },
-    sellValue: 146,
+    stats: { armor: 17, sta: 1, int: 2 },
+    sellValue: 170,
   },
-  // Brookwatch (Eastbrook Vale): item level 5, gloves budget 1.
+  // Brookwatch (Eastbrook Vale): item level 6, gloves budget 2.
   brookwatch_gloves: {
     id: 'brookwatch_gloves',
     name: 'Brookwatch Gloves',
@@ -448,8 +63,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 11, int: 1 },
-    sellValue: 120,
+    stats: { armor: 14, sta: 1, int: 2 },
+    sellValue: 140,
   },
   // Brookwatch (Eastbrook Vale): item level 6, shoulder budget 2.
   brookwatch_mantle: {
@@ -484,7 +99,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 34, agi: 1, sta: 1 },
     sellValue: 200,
   },
-  // Brookwatch (Eastbrook Vale): item level 6, legs budget 2.
+  // Brookwatch (Eastbrook Vale): item level 5, legs budget 2.
   brookwatch_breeches: {
     id: 'brookwatch_breeches',
     name: 'Brookwatch Breeches',
@@ -492,10 +107,10 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'legs',
     quality: 'uncommon',
-    stats: { armor: 31, agi: 1, sta: 1 },
-    sellValue: 180,
+    stats: { armor: 25, agi: 1, sta: 1 },
+    sellValue: 154,
   },
-  // Brookwatch (Eastbrook Vale): item level 6, feet budget 2.
+  // Brookwatch (Eastbrook Vale): item level 5, feet budget 1.
   brookwatch_boots: {
     id: 'brookwatch_boots',
     name: 'Brookwatch Boots',
@@ -503,10 +118,10 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'feet',
     quality: 'uncommon',
-    stats: { armor: 22, agi: 1, sta: 1 },
-    sellValue: 130,
+    stats: { armor: 18, agi: 1 },
+    sellValue: 111,
   },
-  // Brookwatch (Eastbrook Vale): item level 5, helmet budget 2.
+  // Brookwatch (Eastbrook Vale): item level 6, helmet budget 2.
   brookwatch_cap: {
     id: 'brookwatch_cap',
     name: 'Brookwatch Cap',
@@ -514,10 +129,10 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 24, agi: 1, sta: 1 },
-    sellValue: 146,
+    stats: { armor: 29, agi: 1, sta: 1 },
+    sellValue: 170,
   },
-  // Brookwatch (Eastbrook Vale): item level 5, gloves budget 1.
+  // Brookwatch (Eastbrook Vale): item level 6, gloves budget 2.
   brookwatch_grips: {
     id: 'brookwatch_grips',
     name: 'Brookwatch Grips',
@@ -525,8 +140,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 20, agi: 1 },
-    sellValue: 120,
+    stats: { armor: 24, agi: 1, sta: 1 },
+    sellValue: 140,
   },
   // Brookwatch (Eastbrook Vale): item level 6, shoulder budget 2.
   brookwatch_shoulderpads: {
@@ -561,7 +176,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 34, str: 1, sta: 1 },
     sellValue: 200,
   },
-  // Brookwatch (Eastbrook Vale): item level 6, legs budget 2.
+  // Brookwatch (Eastbrook Vale): item level 5, legs budget 2.
   brookwatch_legwraps: {
     id: 'brookwatch_legwraps',
     name: 'Brookwatch Legwraps',
@@ -569,10 +184,10 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'legs',
     quality: 'uncommon',
-    stats: { armor: 31, str: 1, sta: 1 },
-    sellValue: 180,
+    stats: { armor: 25, str: 1, sta: 1 },
+    sellValue: 154,
   },
-  // Brookwatch (Eastbrook Vale): item level 6, feet budget 2.
+  // Brookwatch (Eastbrook Vale): item level 5, feet budget 1.
   brookwatch_treads: {
     id: 'brookwatch_treads',
     name: 'Brookwatch Treads',
@@ -580,10 +195,10 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'feet',
     quality: 'uncommon',
-    stats: { armor: 22, str: 1, sta: 1 },
-    sellValue: 130,
+    stats: { armor: 18, str: 1 },
+    sellValue: 111,
   },
-  // Brookwatch (Eastbrook Vale): item level 5, helmet budget 2.
+  // Brookwatch (Eastbrook Vale): item level 6, helmet budget 2.
   brookwatch_headguard: {
     id: 'brookwatch_headguard',
     name: 'Brookwatch Headguard',
@@ -591,10 +206,10 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 24, str: 1, sta: 1 },
-    sellValue: 146,
+    stats: { armor: 29, str: 1, sta: 1 },
+    sellValue: 170,
   },
-  // Brookwatch (Eastbrook Vale): item level 5, gloves budget 1.
+  // Brookwatch (Eastbrook Vale): item level 6, gloves budget 2.
   brookwatch_handwraps: {
     id: 'brookwatch_handwraps',
     name: 'Brookwatch Handwraps',
@@ -602,8 +217,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 20, str: 1 },
-    sellValue: 120,
+    stats: { armor: 24, str: 1, sta: 1 },
+    sellValue: 140,
   },
   // Brookwatch (Eastbrook Vale): item level 6, shoulder budget 2.
   brookwatch_shoulderguards: {
@@ -638,7 +253,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 51, str: 1, sta: 1 },
     sellValue: 200,
   },
-  // Brookwatch (Eastbrook Vale): item level 6, legs budget 2.
+  // Brookwatch (Eastbrook Vale): item level 5, legs budget 2.
   brookwatch_legguards: {
     id: 'brookwatch_legguards',
     name: 'Brookwatch Legguards',
@@ -646,10 +261,10 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'legs',
     quality: 'uncommon',
-    stats: { armor: 46, str: 1, sta: 1 },
-    sellValue: 180,
+    stats: { armor: 38, str: 1, sta: 1 },
+    sellValue: 154,
   },
-  // Brookwatch (Eastbrook Vale): item level 6, feet budget 2.
+  // Brookwatch (Eastbrook Vale): item level 5, feet budget 1.
   brookwatch_sabatons: {
     id: 'brookwatch_sabatons',
     name: 'Brookwatch Sabatons',
@@ -657,10 +272,10 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'feet',
     quality: 'uncommon',
-    stats: { armor: 33, str: 1, sta: 1 },
-    sellValue: 130,
+    stats: { armor: 28, str: 1 },
+    sellValue: 111,
   },
-  // Brookwatch (Eastbrook Vale): item level 5, helmet budget 2.
+  // Brookwatch (Eastbrook Vale): item level 6, helmet budget 2.
   brookwatch_helm: {
     id: 'brookwatch_helm',
     name: 'Brookwatch Helm',
@@ -668,10 +283,10 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 36, str: 1, sta: 1 },
-    sellValue: 146,
+    stats: { armor: 43, str: 1, sta: 1 },
+    sellValue: 170,
   },
-  // Brookwatch (Eastbrook Vale): item level 5, gloves budget 1.
+  // Brookwatch (Eastbrook Vale): item level 6, gloves budget 2.
   brookwatch_gauntlets: {
     id: 'brookwatch_gauntlets',
     name: 'Brookwatch Gauntlets',
@@ -679,8 +294,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 30, str: 1 },
-    sellValue: 120,
+    stats: { armor: 36, str: 1, sta: 1 },
+    sellValue: 140,
   },
   // Brookwatch (Eastbrook Vale): item level 6, shoulder budget 2.
   brookwatch_pauldrons: {
@@ -715,7 +330,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 51, sta: 1, int: 2 },
     sellValue: 200,
   },
-  // Brookwatch (Eastbrook Vale): item level 6, legs budget 2.
+  // Brookwatch (Eastbrook Vale): item level 5, legs budget 2.
   brookwatch_chausses: {
     id: 'brookwatch_chausses',
     name: 'Brookwatch Chausses',
@@ -723,10 +338,10 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'legs',
     quality: 'uncommon',
-    stats: { armor: 46, sta: 1, int: 2 },
-    sellValue: 180,
+    stats: { armor: 38, sta: 1, int: 2 },
+    sellValue: 154,
   },
-  // Brookwatch (Eastbrook Vale): item level 6, feet budget 2.
+  // Brookwatch (Eastbrook Vale): item level 5, feet budget 1.
   brookwatch_greaves: {
     id: 'brookwatch_greaves',
     name: 'Brookwatch Greaves',
@@ -734,10 +349,10 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'feet',
     quality: 'uncommon',
-    stats: { armor: 33, sta: 1, int: 2 },
-    sellValue: 130,
+    stats: { armor: 28, int: 1 },
+    sellValue: 111,
   },
-  // Brookwatch (Eastbrook Vale): item level 5, helmet budget 2.
+  // Brookwatch (Eastbrook Vale): item level 6, helmet budget 2.
   brookwatch_coif: {
     id: 'brookwatch_coif',
     name: 'Brookwatch Coif',
@@ -745,10 +360,10 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'helmet',
     quality: 'uncommon',
-    stats: { armor: 36, sta: 1, int: 2 },
-    sellValue: 146,
+    stats: { armor: 43, sta: 1, int: 2 },
+    sellValue: 170,
   },
-  // Brookwatch (Eastbrook Vale): item level 5, gloves budget 1.
+  // Brookwatch (Eastbrook Vale): item level 6, gloves budget 2.
   brookwatch_handguards: {
     id: 'brookwatch_handguards',
     name: 'Brookwatch Handguards',
@@ -756,8 +371,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'gloves',
     quality: 'uncommon',
-    stats: { armor: 30, int: 1 },
-    sellValue: 120,
+    stats: { armor: 36, sta: 1, int: 2 },
+    sellValue: 140,
   },
   // Brookwatch (Eastbrook Vale): item level 6, shoulder budget 2.
   brookwatch_spaulders: {

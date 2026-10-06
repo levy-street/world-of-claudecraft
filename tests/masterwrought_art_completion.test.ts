@@ -824,9 +824,9 @@ describe('Masterwrought art completion evidence', () => {
     // 17 (faction-ladder-icons-2026-09-23): 1,322. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,323.
     // + the trinket slot's 18 (trinket-slot-icons-2026-09-23, PR 4173): 1,341. Warfare Season 2's four painted
     // weapons (warfare-season2-weapons-2026-09-25): 1,345, likewise outside it.
-    // + the 280 choose-one leveling quest armor paintings
-    // (quest-leveling-gear-icons-2026-10-06): 1,744, likewise outside it.
-    expect(currentOwnerIds).toHaveLength(1744);
+    // + the 245 choose-one leveling quest armor paintings
+    // (quest-leveling-gear-icons-2026-10-06): 1,709, likewise outside it.
+    expect(currentOwnerIds).toHaveLength(1709);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -967,7 +967,7 @@ describe('Masterwrought art completion evidence', () => {
         .filter(({ batchId }) => batchId === 'quest-leveling-gear-icons-2026-10-06')
         .flatMap(({ itemIds }) => itemIds),
     );
-    expect(questGearIds.size).toBe(280);
+    expect(questGearIds.size).toBe(245);
     expect(datedIds.filter((id) => questGearIds.has(id))).toEqual([]);
 
     // Strip all six later additive waves (Crucible professions, the Field Kit, the

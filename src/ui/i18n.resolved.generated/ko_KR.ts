@@ -18454,90 +18454,6 @@ export const ko_KR: EnTranslations = {
       "vanguard_warstaff": {
         "name": "선봉대의 전투지팡이"
       },
-      "saltbitten_robe": {
-        "name": "소금기 밴 로브"
-      },
-      "saltbitten_leggings": {
-        "name": "소금기 밴 각반"
-      },
-      "saltbitten_slippers": {
-        "name": "소금기 밴 슬리퍼"
-      },
-      "saltbitten_hood": {
-        "name": "소금기 밴 두건"
-      },
-      "saltbitten_gloves": {
-        "name": "소금기 밴 장갑"
-      },
-      "saltbitten_mantle": {
-        "name": "소금기 밴 어깨걸이"
-      },
-      "saltbitten_sash": {
-        "name": "소금기 밴 장식띠"
-      },
-      "saltbitten_jerkin": {
-        "name": "소금기 밴 웃옷"
-      },
-      "saltbitten_breeches": {
-        "name": "소금기 밴 가죽바지"
-      },
-      "saltbitten_boots": {
-        "name": "소금기 밴 장화"
-      },
-      "saltbitten_cap": {
-        "name": "소금기 밴 모자"
-      },
-      "saltbitten_grips": {
-        "name": "소금기 밴 손아귀"
-      },
-      "saltbitten_shoulderpads": {
-        "name": "소금기 밴 어깨덧대"
-      },
-      "saltbitten_belt": {
-        "name": "소금기 밴 허리띠"
-      },
-      "saltbitten_hauberk": {
-        "name": "소금기 밴 사슬갑옷"
-      },
-      "saltbitten_legguards": {
-        "name": "소금기 밴 다리갑옷"
-      },
-      "saltbitten_sabatons": {
-        "name": "소금기 밴 쇠장화"
-      },
-      "saltbitten_helm": {
-        "name": "소금기 밴 투구"
-      },
-      "saltbitten_gauntlets": {
-        "name": "소금기 밴 건틀릿"
-      },
-      "saltbitten_pauldrons": {
-        "name": "소금기 밴 어깨갑옷"
-      },
-      "saltbitten_girdle": {
-        "name": "소금기 밴 허리갑"
-      },
-      "saltbitten_chainmail": {
-        "name": "소금기 밴 사슬옷"
-      },
-      "saltbitten_chausses": {
-        "name": "소금기 밴 사슬각반"
-      },
-      "saltbitten_greaves": {
-        "name": "소금기 밴 경갑"
-      },
-      "saltbitten_coif": {
-        "name": "소금기 밴 사슬두건"
-      },
-      "saltbitten_handguards": {
-        "name": "소금기 밴 손보호구"
-      },
-      "saltbitten_spaulders": {
-        "name": "소금기 밴 어깨보호구"
-      },
-      "saltbitten_cord": {
-        "name": "소금기 밴 허리끈"
-      },
       "brookwatch_robe": {
         "name": "개울감시 로브"
       },
@@ -19113,27 +19029,6 @@ export const ko_KR: EnTranslations = {
       },
       "highgale_greaves": {
         "name": "높바람 경갑"
-      },
-      "saltbitten_tunic": {
-        "name": "소금기 밴 튜닉"
-      },
-      "saltbitten_legwraps": {
-        "name": "소금기 밴 다리싸개"
-      },
-      "saltbitten_treads": {
-        "name": "소금기 밴 덧신"
-      },
-      "saltbitten_headguard": {
-        "name": "소금기 밴 머리보호대"
-      },
-      "saltbitten_handwraps": {
-        "name": "소금기 밴 손싸개"
-      },
-      "saltbitten_shoulderguards": {
-        "name": "소금기 밴 어깨받이"
-      },
-      "saltbitten_waistguard": {
-        "name": "소금기 밴 허리보호대"
       },
       "brookwatch_tunic": {
         "name": "개울감시 튜닉"

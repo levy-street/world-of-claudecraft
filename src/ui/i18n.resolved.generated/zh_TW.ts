@@ -18454,90 +18454,6 @@ export const zh_TW: EnTranslations = {
       "vanguard_warstaff": {
         "name": "先鋒之戰杖"
       },
-      "saltbitten_robe": {
-        "name": "鹽蝕長袍"
-      },
-      "saltbitten_leggings": {
-        "name": "鹽蝕腿甲衣"
-      },
-      "saltbitten_slippers": {
-        "name": "鹽蝕軟靴"
-      },
-      "saltbitten_hood": {
-        "name": "鹽蝕兜帽"
-      },
-      "saltbitten_gloves": {
-        "name": "鹽蝕手套"
-      },
-      "saltbitten_mantle": {
-        "name": "鹽蝕披肩"
-      },
-      "saltbitten_sash": {
-        "name": "鹽蝕束帶"
-      },
-      "saltbitten_jerkin": {
-        "name": "鹽蝕皮甲"
-      },
-      "saltbitten_breeches": {
-        "name": "鹽蝕及膝褲"
-      },
-      "saltbitten_boots": {
-        "name": "鹽蝕靴子"
-      },
-      "saltbitten_cap": {
-        "name": "鹽蝕便帽"
-      },
-      "saltbitten_grips": {
-        "name": "鹽蝕掌套"
-      },
-      "saltbitten_shoulderpads": {
-        "name": "鹽蝕肩墊"
-      },
-      "saltbitten_belt": {
-        "name": "鹽蝕腰帶"
-      },
-      "saltbitten_hauberk": {
-        "name": "鹽蝕鎖衣"
-      },
-      "saltbitten_legguards": {
-        "name": "鹽蝕腿護"
-      },
-      "saltbitten_sabatons": {
-        "name": "鹽蝕甲靴"
-      },
-      "saltbitten_helm": {
-        "name": "鹽蝕頭盔"
-      },
-      "saltbitten_gauntlets": {
-        "name": "鹽蝕甲手"
-      },
-      "saltbitten_pauldrons": {
-        "name": "鹽蝕肩甲"
-      },
-      "saltbitten_girdle": {
-        "name": "鹽蝕腰飾"
-      },
-      "saltbitten_chainmail": {
-        "name": "鹽蝕鎖甲"
-      },
-      "saltbitten_chausses": {
-        "name": "鹽蝕腿甲"
-      },
-      "saltbitten_greaves": {
-        "name": "鹽蝕脛甲"
-      },
-      "saltbitten_coif": {
-        "name": "鹽蝕頭罩"
-      },
-      "saltbitten_handguards": {
-        "name": "鹽蝕護手"
-      },
-      "saltbitten_spaulders": {
-        "name": "鹽蝕肩鎧"
-      },
-      "saltbitten_cord": {
-        "name": "鹽蝕腰繩"
-      },
       "brookwatch_robe": {
         "name": "溪衛長袍"
       },
@@ -19113,27 +19029,6 @@ export const zh_TW: EnTranslations = {
       },
       "highgale_greaves": {
         "name": "高風脛甲"
-      },
-      "saltbitten_tunic": {
-        "name": "鹽蝕短衣"
-      },
-      "saltbitten_legwraps": {
-        "name": "鹽蝕綁腿"
-      },
-      "saltbitten_treads": {
-        "name": "鹽蝕踏靴"
-      },
-      "saltbitten_headguard": {
-        "name": "鹽蝕護頭"
-      },
-      "saltbitten_handwraps": {
-        "name": "鹽蝕裹手"
-      },
-      "saltbitten_shoulderguards": {
-        "name": "鹽蝕護肩"
-      },
-      "saltbitten_waistguard": {
-        "name": "鹽蝕護腰"
       },
       "brookwatch_tunic": {
         "name": "溪衛短衣"

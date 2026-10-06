@@ -864,13 +864,13 @@ describe('item-art audit builder', () => {
       // painted weapons, re-measured with `--verify-only` on the merged tree.
       // 1464 / 1482 at the 2026-09-28 release/v0.44.0 merge into feature/buried-hoards
       // (the hoard boss loot and map paintings on 36 sheet pages), re-measured the same way.
-      // 1744 / 1762 with the 280 choose-one leveling quest armor paintings
+      // 1709 / 1727 with the 245 choose-one leveling quest armor paintings
       // (quest-leveling-gear-icons-2026-10-06), re-measured with `--verify-only`.
-      catalogSha256: '3aaeef789f7355c170dd26185f600cabd80905b2c270885454ee8557c8962c9c',
-      catalogBytes: 951326,
+      catalogSha256: '5159b0ef933103677fc2923c33d79fb2b1c313dc50e4c06c60e44297d4361492',
+      catalogBytes: 932704,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1744,
-      liveItemCount: 1762,
+      catalogCount: 1709,
+      liveItemCount: 1727,
       generatedHeroicDefinitions: 78,
       heroicDefinitionsWithOwnWebp: 59,
       heroicWeaponArtAliases: 19,
@@ -888,7 +888,7 @@ describe('item-art audit builder', () => {
         identity: 38,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '0c0d7bab8f151ebf9275ccf949663d030847d68a1c1193d7b5a30e2995c81ecd',
+      shippingCatalogSha256: '1686a43822050231a3cf9a74aefab0e69349ed6a4d76500614fd17797dfea442',
       machineChecksPassed: true,
       verdict: null,
     });

@@ -550,8 +550,8 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 1019,
-      "state": "a957887c",
-      "events": "034565e2",
+      "state": "2f1d226a",
+      "events": "3fed41be",
       "rng": {
         "draws": 40,
         "digest": "73f698f7"
@@ -599,9 +599,9 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "brookwatch_hauberk",
               "eastbrook_buckler",
               "recruit_tunic",
-              "saltbitten_legguards",
               "worn_sword"
             ]
           },
@@ -631,8 +631,7 @@
           "delveDaily": {},
           "entityId": 1003,
           "equipment": {
-            "chest": "recruit_tunic",
-            "legs": "saltbitten_legguards",
+            "chest": "brookwatch_hauberk",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
@@ -649,6 +648,10 @@
             {
               "count": 5,
               "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "recruit_tunic"
             }
           ],
           "lifetimeXp": 27850,
@@ -701,13 +704,13 @@
           "fallStartY": -0.498062,
           "fiveSecondRule": 99.4,
           "healPower": 5,
-          "hp": 442,
+          "hp": 452,
           "id": 1003,
           "inCombat": true,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
-          "maxHp": 442,
+          "maxHp": 452,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -729,10 +732,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 29,
-            "armor": 293,
+            "armor": 301,
             "int": 10,
             "spi": 11,
-            "sta": 41,
+            "sta": 42,
             "str": 42
           },
           "templateId": "warrior",
@@ -748,7 +751,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1019,
-      "state": "aedc2ca7",
+      "state": "dc4a6e41",
       "events": "741638a5",
       "rng": {
         "draws": 40,
@@ -797,9 +800,9 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "brookwatch_hauberk",
               "eastbrook_buckler",
               "recruit_tunic",
-              "saltbitten_legguards",
               "worn_sword"
             ]
           },
@@ -829,8 +832,7 @@
           "delveDaily": {},
           "entityId": 1003,
           "equipment": {
-            "chest": "recruit_tunic",
-            "legs": "saltbitten_legguards",
+            "chest": "brookwatch_hauberk",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
@@ -847,6 +849,10 @@
             {
               "count": 5,
               "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "recruit_tunic"
             }
           ],
           "lifetimeXp": 27850,
@@ -899,13 +905,13 @@
           "fallStartY": -0.498062,
           "fiveSecondRule": 99.5,
           "healPower": 5,
-          "hp": 442,
+          "hp": 452,
           "id": 1003,
           "inCombat": true,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
-          "maxHp": 442,
+          "maxHp": 452,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -927,10 +933,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 29,
-            "armor": 293,
+            "armor": 301,
             "int": 10,
             "spi": 11,
-            "sta": 41,
+            "sta": 42,
             "str": 42
           },
           "templateId": "warrior",
