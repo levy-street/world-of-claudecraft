@@ -18875,88 +18875,88 @@ export const ko_KR: EnTranslations = {
         "name": "가시첨탑 허리끈"
       },
       "hollowveil_robe": {
-        "name": "안개장막 로브"
+        "name": "그늘장막 로브"
       },
       "hollowveil_leggings": {
-        "name": "안개장막 각반"
+        "name": "그늘장막 각반"
       },
       "hollowveil_slippers": {
-        "name": "안개장막 슬리퍼"
+        "name": "그늘장막 슬리퍼"
       },
       "hollowveil_hood": {
-        "name": "안개장막 두건"
+        "name": "그늘장막 두건"
       },
       "hollowveil_gloves": {
-        "name": "안개장막 장갑"
+        "name": "그늘장막 장갑"
       },
       "hollowveil_mantle": {
-        "name": "안개장막 어깨걸이"
+        "name": "그늘장막 어깨걸이"
       },
       "hollowveil_sash": {
-        "name": "안개장막 장식띠"
+        "name": "그늘장막 장식띠"
       },
       "hollowveil_jerkin": {
-        "name": "안개장막 웃옷"
+        "name": "그늘장막 웃옷"
       },
       "hollowveil_breeches": {
-        "name": "안개장막 가죽바지"
+        "name": "그늘장막 가죽바지"
       },
       "hollowveil_boots": {
-        "name": "안개장막 장화"
+        "name": "그늘장막 장화"
       },
       "hollowveil_cap": {
-        "name": "안개장막 모자"
+        "name": "그늘장막 모자"
       },
       "hollowveil_grips": {
-        "name": "안개장막 손아귀"
+        "name": "그늘장막 손아귀"
       },
       "hollowveil_shoulderpads": {
-        "name": "안개장막 어깨덧대"
+        "name": "그늘장막 어깨덧대"
       },
       "hollowveil_belt": {
-        "name": "안개장막 허리띠"
+        "name": "그늘장막 허리띠"
       },
       "hollowveil_hauberk": {
-        "name": "안개장막 사슬갑옷"
+        "name": "그늘장막 사슬갑옷"
       },
       "hollowveil_legguards": {
-        "name": "안개장막 다리갑옷"
+        "name": "그늘장막 다리갑옷"
       },
       "hollowveil_sabatons": {
-        "name": "안개장막 쇠장화"
+        "name": "그늘장막 쇠장화"
       },
       "hollowveil_helm": {
-        "name": "안개장막 투구"
+        "name": "그늘장막 투구"
       },
       "hollowveil_gauntlets": {
-        "name": "안개장막 건틀릿"
+        "name": "그늘장막 건틀릿"
       },
       "hollowveil_pauldrons": {
-        "name": "안개장막 어깨갑옷"
+        "name": "그늘장막 어깨갑옷"
       },
       "hollowveil_girdle": {
-        "name": "안개장막 허리갑"
+        "name": "그늘장막 허리갑"
       },
       "hollowveil_chainmail": {
-        "name": "안개장막 사슬옷"
+        "name": "그늘장막 사슬옷"
       },
       "hollowveil_chausses": {
-        "name": "안개장막 사슬각반"
+        "name": "그늘장막 사슬각반"
       },
       "hollowveil_greaves": {
-        "name": "안개장막 경갑"
+        "name": "그늘장막 경갑"
       },
       "hollowveil_coif": {
-        "name": "안개장막 사슬두건"
+        "name": "그늘장막 사슬두건"
       },
       "hollowveil_handguards": {
-        "name": "안개장막 손보호구"
+        "name": "그늘장막 손보호구"
       },
       "hollowveil_spaulders": {
-        "name": "안개장막 어깨보호구"
+        "name": "그늘장막 어깨보호구"
       },
       "hollowveil_cord": {
-        "name": "안개장막 허리끈"
+        "name": "그늘장막 허리끈"
       },
       "trailwarden_robe": {
         "name": "길지킴이 로브"
@@ -19220,25 +19220,25 @@ export const ko_KR: EnTranslations = {
         "name": "가시첨탑 허리보호대"
       },
       "hollowveil_tunic": {
-        "name": "안개장막 튜닉"
+        "name": "그늘장막 튜닉"
       },
       "hollowveil_legwraps": {
-        "name": "안개장막 다리싸개"
+        "name": "그늘장막 다리싸개"
       },
       "hollowveil_treads": {
-        "name": "안개장막 덧신"
+        "name": "그늘장막 덧신"
       },
       "hollowveil_headguard": {
-        "name": "안개장막 머리보호대"
+        "name": "그늘장막 머리보호대"
       },
       "hollowveil_handwraps": {
-        "name": "안개장막 손싸개"
+        "name": "그늘장막 손싸개"
       },
       "hollowveil_shoulderguards": {
-        "name": "안개장막 어깨받이"
+        "name": "그늘장막 어깨받이"
       },
       "hollowveil_waistguard": {
-        "name": "안개장막 허리보호대"
+        "name": "그늘장막 허리보호대"
       },
       "trailwarden_tunic": {
         "name": "길지킴이 튜닉"
