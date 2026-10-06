@@ -2784,6 +2784,11 @@ export const id_ID: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardTitles": "Earn permanent titles after {thresholds} of played time with World PvP on in the open world or in PvP instances. Logout, death, PvE instances and sanctuaries pause the timer. Switching off resets it.",
+      "rewardPaused": "Current PvP streak: {time} played (paused in a sanctuary)",
+      "rewardPausedDead": "Current PvP streak: {time} played (paused while dead)",
+      "rewardPausedInstance": "Current PvP streak: {time} played (paused inside PvE instances)",
+      "rewardProgress": "Current PvP streak: {time} played",
       "tab": "Pertempuran Dunia PvP",
       "title": "Pertempuran Dunia PvP",
       "blurb": "Naikkan bendera mu untuk melawan pemain lain yang sudah naikkan bendera di mana saja di dunia terbuka. Kalahkan satu dan ambil bagian dari uang mereka, ditambah Kehormatan untuk perlengkapan Perang. Arena Pertempuran dan Arena masih membayar lebih banyak.",

@@ -816,6 +816,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     'PvP 깃발이 내려가 있지만, 자유 전투 지역에서는 여전히 공격하거나 공격받을 수 있습니다.',
   'hudChrome.worldPvp.statusOn':
     'PvP 깃발이 올라가 있습니다. 깃발을 올린 플레이어가 당신을 공격할 수 있습니다.',
+  'hudChrome.worldPvp.rewardTitles':
+    '월드 PvP를 켠 상태로 오픈 월드 또는 PvP 인스턴스에서 플레이한 시간이 {thresholds}에 도달하면 영구 칭호를 얻습니다. 로그아웃, 사망, PvE 인스턴스 및 성역에서는 타이머가 일시 정지됩니다. PvP를 끄면 시간이 초기화됩니다.',
+  'hudChrome.worldPvp.rewardPaused': '현재 PvP 유지 시간: {time} (성역에서 일시 정지)',
+  'hudChrome.worldPvp.rewardPausedDead': '현재 PvP 유지 시간: {time} (사망 상태에서 일시 정지)',
+  'hudChrome.worldPvp.rewardPausedInstance':
+    '현재 PvP 유지 시간: {time} (PvE 인스턴스에서 일시 정지)',
+  'hudChrome.worldPvp.rewardProgress': '현재 PvP 유지 시간: {time}',
   'hudChrome.worldPvp.tab': '월드 PvP',
   'hudChrome.worldPvp.title': '월드 PvP',
   'hudChrome.worldPvp.zoneContested': '분쟁 지역: 이곳에서는 깃발을 올린 플레이어만 싸웁니다.',

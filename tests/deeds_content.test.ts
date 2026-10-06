@@ -146,8 +146,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // 10 and the tenth at 25: +35).
     // 318 / 3535 with the release's Eastbrook ferry round trip
     // (exp_harbor_to_harbor at renown 5) at the fourth release/v0.44.0 base merge.
-    expect(DEED_ORDER.length).toBe(319);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3545);
+    expect(DEED_ORDER.length).toBe(324);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3645);
   });
 
   it('ships the audited per-category counts', () => {
@@ -181,7 +181,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // release side added independently. UNION MERGE: base plus both deltas.
       collection: 41,
       // Release's Thornhollow battlegrounds plus the WARFARE honor ladder.
-      pvp: 35,
+      pvp: 40,
       // +2 bank socket ladder deeds (soc_strongbox_outfitter,
       // soc_four_bags_deep; Bank Storage phase 06).
       social: 20,
@@ -409,6 +409,11 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // The release's Eastbrook ferry round trip, appended last at the fourth
       // release/v0.44.0 base merge.
       'exp_harbor_to_harbor',
+      'pvp_flag_1h',
+      'pvp_flag_3h',
+      'pvp_flag_6h',
+      'pvp_flag_24h',
+      'pvp_flag_168h',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -806,11 +811,11 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // faction standing Champion titles (Riftwarden, Dawnkeeper, Forgemaster)
     // three more, and the Clue Scroll tenth-casket title (Treasure Hunter)
     // one more.
-    expect(titles.length).toBe(51);
+    expect(titles.length).toBe(56);
     expect(borders.length).toBe(4);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(51);
+    expect(new Set(titleTexts).size).toBe(56);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual([
       'curators_gilt',
@@ -1040,7 +1045,9 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // shipped trigger or renown value was touched.
   // Re-baselined at the 2026-09-28 release merge into feature/buried-hoards: one NEW
   // deed (cmb_coinsack_caught) joins; no existing trigger or renown changed.
-  const FROZEN_CATALOG_SHA256 = '765c2ea13a8a87d5b43a3f725ab56e1c58464f850dc2ec0e10048adc12f67829';
+  // Five World PvP title deeds append on release/v0.45.0: +100 Renown.
+  // Their removal reproduces the previous frozen digest below.
+  const FROZEN_CATALOG_SHA256 = '6198459f4d457d0d4a98be051e9c1dc22b5af2d2ac723ebb83dac6d3d1897c99';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1107,22 +1114,30 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // after exp_clue_ten_caskets at the fourth release/v0.44.0 base merge; the
   // previous mint is the clue pair's 0d91bc68... literal (rotated down here),
   // and stripping the one id must reproduce it exactly.
+  // Five World PvP title deeds now append after the Coinsack and ferry pair.
+  // Stripping only those five reproduces the previous 319-deed mint.
   const PRE_APPEND_CATALOG_SHA256 =
-    '0d91bc68e18b88a6b0c4dc7088c118d556b3bbec0be1617506b36b8172123eb6';
-  const APPENDED_SINCE: readonly string[] = ['cmb_coinsack_caught', 'exp_harbor_to_harbor'];
+    '765c2ea13a8a87d5b43a3f725ab56e1c58464f850dc2ec0e10048adc12f67829';
+  const APPENDED_SINCE: readonly string[] = [
+    'pvp_flag_1h',
+    'pvp_flag_3h',
+    'pvp_flag_6h',
+    'pvp_flag_24h',
+    'pvp_flag_168h',
+  ];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
     for (const id of APPENDED_SINCE) {
       expect(DEED_ORDER.includes(id), `${id} is in the live catalog`).toBe(true);
     }
-    // The ferry round trip sits at the true tail after the Clue Scroll casket
-    // pair. Pin its two predecessors too: this is an append into a
+    // The World PvP title ladder sits at the true tail after the Coinsack
+    // and ferry pair. Pin its two predecessors too: this is an append into a
     // known seat, never a scattered insert or a retro-edit (the digest below
     // proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'exp_clue_first_casket',
-      'exp_clue_ten_caskets',
+      'cmb_coinsack_caught',
+      'exp_harbor_to_harbor',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1341,9 +1356,9 @@ describe('table shape', () => {
     // raid block (whose flawless task was the previous final entry).
     // The one-time Forgebreaker quest's hidden celebration appends after it,
     // then the world-quest block, then the faction standing ladder, then the
-    // Clue Scroll casket pair, then the release's ferry round trip as the
-    // final entry.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('exp_harbor_to_harbor');
+    // Clue Scroll casket pair, then the Coinsack and ferry deeds, then the
+    // five World PvP titles ending in Indomitable.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('pvp_flag_168h');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

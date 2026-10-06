@@ -1689,7 +1689,10 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 9827 and the
     // branch 9965; the two sides' additions compose to 9840 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 9840,
+    // PvP played-time rewards: pet reconnect reconciliation moved to the
+    // disconnected-player helper alongside the transient timer pause marker.
+    // Measured 9839 lines, exact count and zero slack.
+    ceiling: 9839,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

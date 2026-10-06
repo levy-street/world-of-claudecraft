@@ -2784,6 +2784,11 @@ export const da_DK: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardTitles": "Earn permanent titles after {thresholds} of played time with World PvP on in the open world or in PvP instances. Logout, death, PvE instances and sanctuaries pause the timer. Switching off resets it.",
+      "rewardPaused": "Current PvP streak: {time} played (paused in a sanctuary)",
+      "rewardPausedDead": "Current PvP streak: {time} played (paused while dead)",
+      "rewardPausedInstance": "Current PvP streak: {time} played (paused inside PvE instances)",
+      "rewardProgress": "Current PvP streak: {time} played",
       "tab": "Verden PvP",
       "title": "Verden PvP",
       "blurb": "Sæt din markering op for at kæmpe mod andre markerede spillere hvor som helst i den åbne verden. Besejr en og tag en andel af deres pengepung, plus Ære til Krigsførelsesudstyr. Slagmarker og Arenaer betaler stadig mere.",

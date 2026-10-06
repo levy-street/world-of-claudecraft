@@ -5554,10 +5554,10 @@ export class Hud {
   private readonly arenaWindow = new ArenaWindow({
     root: () => $('#arena-window'),
     world: () => this.sim,
+    writers: this.writerFacet,
     closeOthers: () => this.closeOtherWindows('#arena-window'),
     ...this.windowFocus('#arena-window'),
   });
-
   private readonly dungeonFinderWindow = new DungeonFinderWindow({
     ...this.presentationBag,
     root: () => $('#dungeon-finder-window'),

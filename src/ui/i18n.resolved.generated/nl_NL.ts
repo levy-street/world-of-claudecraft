@@ -2784,6 +2784,11 @@ export const nl_NL: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardTitles": "Earn permanent titles after {thresholds} of played time with World PvP on in the open world or in PvP instances. Logout, death, PvE instances and sanctuaries pause the timer. Switching off resets it.",
+      "rewardPaused": "Current PvP streak: {time} played (paused in a sanctuary)",
+      "rewardPausedDead": "Current PvP streak: {time} played (paused while dead)",
+      "rewardPausedInstance": "Current PvP streak: {time} played (paused inside PvE instances)",
+      "rewardProgress": "Current PvP streak: {time} played",
       "tab": "Wereldgevecht",
       "title": "Wereldgevecht",
       "blurb": "Hef je vlag op om ergens in de openbare wereld tegen andere gevlagde spelers te vechten. Versla er een en krijg een deel van hun beurs, plus Eer voor Oorlogsuitrusting. Gevechtsgebieden en Arena's brengen nog meer op.",

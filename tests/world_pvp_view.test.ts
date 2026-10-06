@@ -6,7 +6,7 @@
 // re-localize the flag's notices and kill lines (src/ui/sim_i18n.ts).
 
 import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { applySocialSelfWire, type SocialSelfMirrors } from '../src/net/social_self_wire';
 import { ZONES } from '../src/sim/data';
 import {
@@ -27,6 +27,7 @@ import {
   worldPvpKillLine,
 } from '../src/sim/pvp/world_pvp';
 import type { Entity } from '../src/sim/types';
+import { ArenaWindow } from '../src/ui/arena_window';
 import {
   buildWorldPvpWindowView,
   disarmClockText,
@@ -36,13 +37,14 @@ import {
   worldPvpBodyHtml,
 } from '../src/ui/hud/world_pvp';
 import { setLanguage } from '../src/ui/i18n';
+import { makeWriterFacet } from '../src/ui/painter_host';
 import {
   isPvpHostilePlayer,
   isPvpHostileTargetId,
   type PvpHostileWorld,
 } from '../src/ui/pvp_hostile_core';
 import { localizeSimText } from '../src/ui/sim_i18n';
-import type { WorldPvpInfo } from '../src/world_api';
+import type { IWorld, WorldPvpInfo } from '../src/world_api';
 
 // Thornpeak Heights (contested), the Drakelands (free-for-all) and
 // Eastbrook Vale (a sanctuary), by the zone table's own rectangles.
@@ -672,5 +674,136 @@ describe('the World PvP tab: the free-for-all tone', () => {
     expect(at).toBeGreaterThan(-1);
     const rule = css.slice(at, css.indexOf('}', at));
     expect(rule).toContain('var(--color-hostile)');
+  });
+});
+
+describe('World PvP reward display', () => {
+  it('updates the real window clock without replacing scrolled content or focused controls', () => {
+    setLanguage('en');
+    const root = document.createElement('div');
+    document.body.append(root);
+    const world = {
+      worldPvpInfo: info({ flagged: true, rewardSeconds: 3600 }),
+      honor: 0,
+      arenaInfo: null,
+      bgInfo: null,
+    } as unknown as IWorld;
+    const panel = new ArenaWindow({
+      root: () => root,
+      world: () => world,
+      writers: makeWriterFacet(
+        new WeakMap(),
+        new WeakMap(),
+        new WeakMap(),
+        new WeakMap(),
+        () => {},
+        () => {},
+      ),
+      closeOthers: () => {},
+      captureFocus: () => null,
+      restoreFocus: () => {},
+    });
+    panel.openTab('world');
+    const progress = root.querySelector<HTMLElement>('[data-pvp-reward-progress]')!;
+    const queries = vi.spyOn(root, 'querySelector');
+    const allQueries = vi.spyOn(root, 'querySelectorAll');
+    const reads = vi.spyOn(progress, 'textContent', 'get');
+    const writes = vi.spyOn(progress, 'textContent', 'set');
+    const formatters = vi.spyOn(Intl, 'NumberFormat');
+    for (let i = 0; i < 10; i++) panel.render();
+    expect(queries).not.toHaveBeenCalled();
+    expect(allQueries).not.toHaveBeenCalled();
+    expect(reads).not.toHaveBeenCalled();
+    expect(writes).not.toHaveBeenCalled();
+    expect(formatters).not.toHaveBeenCalled();
+    queries.mockRestore();
+    allQueries.mockRestore();
+    reads.mockRestore();
+    writes.mockRestore();
+    formatters.mockRestore();
+    const content = root.querySelector<HTMLElement>('.arena-layout')!;
+    const button = root.querySelector<HTMLButtonElement>('[data-act="pvp-disable"]')!;
+    root.scrollTop = 150;
+    content.scrollTop = 120;
+    button.focus();
+    world.worldPvpInfo!.rewardSeconds = 3660;
+    panel.render();
+    expect(root.querySelector('.arena-layout')).toBe(content);
+    expect(root.scrollTop).toBe(150);
+    expect(content.scrollTop).toBe(120);
+    expect(document.activeElement).toBe(button);
+    expect(root.querySelector('[data-pvp-reward-progress]')!.textContent).toBe(
+      'Current PvP streak: 1:01 played',
+    );
+    world.worldPvpInfo!.rewardPause = 'dead';
+    panel.render();
+    expect(root.querySelector('.arena-layout')).toBe(content);
+    expect(document.activeElement).toBe(button);
+    expect(root.querySelector('[data-pvp-reward-progress]')!.textContent).toBe(
+      'Current PvP streak: 1:01 played (paused while dead)',
+    );
+    world.worldPvpInfo!.rewardPause = null;
+    panel.render();
+    expect(root.querySelector('[data-pvp-reward-progress]')!.textContent).toBe(
+      'Current PvP streak: 1:01 played',
+    );
+    root.remove();
+  });
+
+  it('uses sanctuary pause fallback only when an older server omits the cause', () => {
+    setLanguage('en');
+    const view = (rewardPause: WorldPvpInfo['rewardPause']) =>
+      buildWorldPvpWindowView({
+        info: info({ flagged: true, zone: 'sanctuary', rewardSeconds: 120, rewardPause }),
+        honor: 0,
+        confirming: false,
+      });
+    expect(view(undefined)).toMatchObject({ rewardPause: 'sanctuary' });
+    expect(worldPvpBodyHtml(view(undefined))).toContain(
+      'Current PvP streak: 0:02 played (paused in a sanctuary)',
+    );
+    expect(view(null)).toMatchObject({ rewardPause: null });
+  });
+
+  it('names the pause cause the sim sends, where instance ground still reads contested', () => {
+    setLanguage('en');
+    const view = (rewardPause: WorldPvpInfo['rewardPause']) =>
+      buildWorldPvpWindowView({
+        info: info({ flagged: true, zone: 'contested', rewardSeconds: 120, rewardPause }),
+        honor: 0,
+        confirming: false,
+      });
+    expect(view('instance')).toMatchObject({ action: 'disable', rewardPause: 'instance' });
+    expect(worldPvpBodyHtml(view('instance'))).toContain(
+      'Current PvP streak: 0:02 played (paused inside PvE instances)',
+    );
+    expect(worldPvpBodyHtml(view('dead'))).toContain(
+      'Current PvP streak: 0:02 played (paused while dead)',
+    );
+    expect(worldPvpBodyHtml(view(null))).toContain('Current PvP streak: 0:02 played<');
+    // An older server sends no cause: contested ground there was never paused.
+    expect(view(undefined)).toMatchObject({ rewardPause: null });
+  });
+
+  it('displays the title streak rules, without progress in the repaint signature', () => {
+    setLanguage('en');
+    const first = buildWorldPvpWindowView({
+      info: info({ flagged: true, rewardSeconds: 3600 }),
+      honor: 0,
+      confirming: false,
+    });
+    const next = buildWorldPvpWindowView({
+      info: info({ flagged: true, rewardSeconds: 3601 }),
+      honor: 0,
+      confirming: false,
+    });
+    expect(first.sig).toBe(next.sig);
+    const html = worldPvpBodyHtml(first);
+    expect(html).not.toContain('more experience and faction reputation');
+    expect(html).toContain('with World PvP on in the open world or in PvP instances');
+    expect(html).toContain('Logout, death, PvE instances and sanctuaries pause the timer');
+    expect(html).toContain('Switching off resets it');
+    expect(html).toContain('Current PvP streak: 1:00 played');
+    expect(html).toContain('7 days');
   });
 });

@@ -820,6 +820,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'PvPフラグは下がっていますが、無差別戦闘地帯では引き続き攻撃することも、攻撃されることもあります。',
   'hudChrome.worldPvp.statusOn':
     'PvPフラグは立っています。フラグを立てたプレイヤーから攻撃を受ける可能性があります。',
+  'hudChrome.worldPvp.rewardTitles':
+    'ワールドPvPを有効にした状態で、オープンワールドまたはPvPインスタンスでのプレイ時間が{thresholds}に達すると、永続的な称号を獲得します。ログアウト中、死亡中、PvEインスタンス内、聖域ではタイマーが停止します。PvPを無効にするとリセットされます。',
+  'hudChrome.worldPvp.rewardPaused': '現在のPvP継続時間：{time}（聖域で一時停止中）',
+  'hudChrome.worldPvp.rewardPausedDead': '現在のPvP継続時間：{time}（死亡中のため一時停止中）',
+  'hudChrome.worldPvp.rewardPausedInstance':
+    '現在のPvP継続時間：{time}（PvEインスタンス内で一時停止中）',
+  'hudChrome.worldPvp.rewardProgress': '現在のPvP継続時間：{time}',
   'hudChrome.worldPvp.tab': 'ワールドPvP',
   'hudChrome.worldPvp.title': 'ワールドPvP',
   'hudChrome.worldPvp.zoneContested': '係争地：ここで戦えるのはフラグを立てたプレイヤーのみです。',

@@ -9,25 +9,115 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.worldPvp.rewardPaused",
+    "hudChrome.worldPvp.rewardPausedDead",
+    "hudChrome.worldPvp.rewardPausedInstance",
+    "hudChrome.worldPvp.rewardProgress",
+    "hudChrome.worldPvp.rewardTitles"
+  ],
+  "es_ES": [
+    "hudChrome.worldPvp.rewardPaused",
+    "hudChrome.worldPvp.rewardPausedDead",
+    "hudChrome.worldPvp.rewardPausedInstance",
+    "hudChrome.worldPvp.rewardProgress",
+    "hudChrome.worldPvp.rewardTitles"
+  ],
+  "fr_FR": [
+    "hudChrome.worldPvp.rewardPaused",
+    "hudChrome.worldPvp.rewardPausedDead",
+    "hudChrome.worldPvp.rewardPausedInstance",
+    "hudChrome.worldPvp.rewardProgress",
+    "hudChrome.worldPvp.rewardTitles"
+  ],
+  "fr_CA": [
+    "hudChrome.worldPvp.rewardPaused",
+    "hudChrome.worldPvp.rewardPausedDead",
+    "hudChrome.worldPvp.rewardPausedInstance",
+    "hudChrome.worldPvp.rewardProgress",
+    "hudChrome.worldPvp.rewardTitles"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.worldPvp.rewardPaused",
+    "hudChrome.worldPvp.rewardPausedDead",
+    "hudChrome.worldPvp.rewardPausedInstance",
+    "hudChrome.worldPvp.rewardProgress",
+    "hudChrome.worldPvp.rewardTitles"
+  ],
+  "de_DE": [
+    "hudChrome.worldPvp.rewardPaused",
+    "hudChrome.worldPvp.rewardPausedDead",
+    "hudChrome.worldPvp.rewardPausedInstance",
+    "hudChrome.worldPvp.rewardProgress",
+    "hudChrome.worldPvp.rewardTitles"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.worldPvp.rewardPaused",
+    "hudChrome.worldPvp.rewardPausedDead",
+    "hudChrome.worldPvp.rewardPausedInstance",
+    "hudChrome.worldPvp.rewardProgress",
+    "hudChrome.worldPvp.rewardTitles"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.worldPvp.rewardPaused",
+    "hudChrome.worldPvp.rewardPausedDead",
+    "hudChrome.worldPvp.rewardPausedInstance",
+    "hudChrome.worldPvp.rewardProgress",
+    "hudChrome.worldPvp.rewardTitles"
+  ],
+  "nl_NL": [
+    "hudChrome.worldPvp.rewardPaused",
+    "hudChrome.worldPvp.rewardPausedDead",
+    "hudChrome.worldPvp.rewardPausedInstance",
+    "hudChrome.worldPvp.rewardProgress",
+    "hudChrome.worldPvp.rewardTitles"
+  ],
+  "pl_PL": [
+    "hudChrome.worldPvp.rewardPaused",
+    "hudChrome.worldPvp.rewardPausedDead",
+    "hudChrome.worldPvp.rewardPausedInstance",
+    "hudChrome.worldPvp.rewardProgress",
+    "hudChrome.worldPvp.rewardTitles"
+  ],
+  "id_ID": [
+    "hudChrome.worldPvp.rewardPaused",
+    "hudChrome.worldPvp.rewardPausedDead",
+    "hudChrome.worldPvp.rewardPausedInstance",
+    "hudChrome.worldPvp.rewardProgress",
+    "hudChrome.worldPvp.rewardTitles"
+  ],
+  "tr_TR": [
+    "hudChrome.worldPvp.rewardPaused",
+    "hudChrome.worldPvp.rewardPausedDead",
+    "hudChrome.worldPvp.rewardPausedInstance",
+    "hudChrome.worldPvp.rewardProgress",
+    "hudChrome.worldPvp.rewardTitles"
+  ],
+  "sv_SE": [
+    "hudChrome.worldPvp.rewardPaused",
+    "hudChrome.worldPvp.rewardPausedDead",
+    "hudChrome.worldPvp.rewardPausedInstance",
+    "hudChrome.worldPvp.rewardProgress",
+    "hudChrome.worldPvp.rewardTitles"
+  ],
+  "vi_VN": [
+    "hudChrome.worldPvp.rewardPaused",
+    "hudChrome.worldPvp.rewardPausedDead",
+    "hudChrome.worldPvp.rewardPausedInstance",
+    "hudChrome.worldPvp.rewardProgress",
+    "hudChrome.worldPvp.rewardTitles"
+  ],
+  "da_DK": [
+    "hudChrome.worldPvp.rewardPaused",
+    "hudChrome.worldPvp.rewardPausedDead",
+    "hudChrome.worldPvp.rewardPausedInstance",
+    "hudChrome.worldPvp.rewardProgress",
+    "hudChrome.worldPvp.rewardTitles"
+  ]
 };

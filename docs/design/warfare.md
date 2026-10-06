@@ -433,6 +433,21 @@ them. A flag takes `WORLD_PVP_DISARM_SECONDS` (300, the classic five minutes) to
 come down and the drop waits for combat to end, so switching off can never fizzle
 the blow already on its way. Raising it needs `WORLD_PVP_MIN_LEVEL` (10).
 
+World PvP also tracks a capped played-time streak for five permanent cosmetic
+titles: Bold at 1 hour (5 Renown), Defiant at 3 hours (10), Dauntless at 6 hours
+(10), Unyielding at 24 hours (25), and Indomitable at 168 hours (50).
+`world_pvp_rewards.ts` advances the timer using simulation ticks while the flag
+is fully armed. Alive, connected players accumulate time in contested or
+free-for-all open-world ground and in registered battleground, ranked arena,
+Fiesta and Yumi arena matches, including preparation and the result countdown.
+Membership in the live match map is required; instance coordinates alone never
+qualify. Sanctuary, PvE instances, death (including ghost travel) and logout
+pause the streak. Disconnect grace also pauses it until reconnect. The precise
+tick total survives character saves; offline time never counts, and it caps at
+168 hours. Requesting World PvP off resets progress immediately, even if the
+disarm countdown is later cancelled. Earned deeds and titles remain permanent.
+The World PvP panel shows elapsed whole minutes and the current pause reason.
+
 Three kinds of ground, declared per zone as `ZoneDef.worldPvp` (data-as-code in
 `src/sim/content/`) and resolved by `worldPvpZonePolicyAt` through the strict
 rectangle containment, so the instance plane reads as contested rather than as

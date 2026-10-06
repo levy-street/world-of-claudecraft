@@ -12,10 +12,16 @@
 
 export type WorldPvpZone = 'sanctuary' | 'contested' | 'ffa';
 
+export type WorldPvpRewardPause = 'dead' | 'instance' | 'sanctuary';
+
 export interface WorldPvpInfo {
   /** Attackable by, and able to attack, other flagged players right now.
    *  Stays true through the whole disarm countdown. */
   flagged: boolean;
+  /** Played seconds rounded down to whole minutes; absent on older servers. */
+  rewardSeconds?: number;
+  /** Why the armed streak is paused. Null while it ticks or no flag is armed. */
+  rewardPause?: WorldPvpRewardPause | null;
   /** Seconds until the flag drops after /pvp off, or null when it is not
    *  switching off (armed for good, or not flagged). */
   disarmRemaining: number | null;

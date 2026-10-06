@@ -250,6 +250,12 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       // The release's Eastbrook ferry round trip rides the deed_cat_exploration crest
       // until its commissioned art lands (docs/design/deeds.md, Icons).
       'exp_harbor_to_harbor',
+      // World PvP streak titles currently use the PvP category crest.
+      'pvp_flag_1h',
+      'pvp_flag_3h',
+      'pvp_flag_6h',
+      'pvp_flag_24h',
+      'pvp_flag_168h',
     ]);
     // RE-PINNED at this merge of release/v0.42.0 into feature/masterwrought:
     // 300 live (counted directly off the resolved src/sim/content/deeds.ts
@@ -262,7 +268,8 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     // 318 with the release's ferry round trip, the pending ledger's last row,
     // so the painted count still holds at 289. 319 with the Buried Hoards Coinsack
     // catch (2026-09-28 merge), also pending: still 289 painted.
-    expect(DEED_ORDER).toHaveLength(319);
+    // Five World PvP streak deeds join the explicit art-pending ledger.
+    expect(DEED_ORDER).toHaveLength(324);
     expect(DEED_IMAGE_IDS.size).toBe(289);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(

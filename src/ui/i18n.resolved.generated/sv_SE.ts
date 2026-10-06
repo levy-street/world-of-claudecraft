@@ -2784,6 +2784,11 @@ export const sv_SE: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardTitles": "Earn permanent titles after {thresholds} of played time with World PvP on in the open world or in PvP instances. Logout, death, PvE instances and sanctuaries pause the timer. Switching off resets it.",
+      "rewardPaused": "Current PvP streak: {time} played (paused in a sanctuary)",
+      "rewardPausedDead": "Current PvP streak: {time} played (paused while dead)",
+      "rewardPausedInstance": "Current PvP streak: {time} played (paused inside PvE instances)",
+      "rewardProgress": "Current PvP streak: {time} played",
       "tab": "Världskamp",
       "title": "Världskamp",
       "blurb": "Höj din flagga för att slåss med andra flaggade spelare var som helst i den öppna världen. Besegra en och ta del av deras börse, plus Heder mot Krigsförskap. Slagfälten och Arenorna betalar fortfarande mer.",

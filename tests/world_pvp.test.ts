@@ -224,6 +224,8 @@ describe('the /pvp flag lifecycle', () => {
     expect(sim.worldPvpInfoFor(a)).toEqual({
       flagged: false,
       disarmRemaining: null,
+      rewardSeconds: 0,
+      rewardPause: null,
       kills: 0,
       deaths: 0,
       levelLocked: false,

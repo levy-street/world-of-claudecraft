@@ -110,6 +110,18 @@ ratings.
   `nextId` nor the shared rng stream moves
   (`tests/warfare_vendor_npc.test.ts` asserts both). His stock is the one
   canonical `content/pvp_honor.ts` table, shared with FURY.
+- `world_pvp_rewards_rules.ts` owns the five literal played-time thresholds,
+  the seven-day counter cap and saved-tick sanitization.
+- `world_pvp_rewards.ts` advances one bounded scalar per connected, armed
+  player per tick and grants permanent deeds only at five threshold crossings.
+  Dead players, disconnect grace, leaving players, sanctuaries and PvE
+  instances pause it. Arena (ranked, Fiesta and Protect Yumi) and battleground
+  membership keeps time running while alive, including prep and return holds;
+  membership uses two keyed probes rather than scanning match collections.
+  `worldPvpInfoFor` shares the pause predicate and sends whole played minutes
+  as seconds, while saves retain precise ticks. Reward leaf imports are direct
+  because exporting the system through the barrel would introduce a runtime
+  cycle through entity/deed initialization.
 - Import the directory's public API through `src/sim/pvp/index.ts`, with ONE
   deliberate exception: `warfare_quartermaster.ts` is NOT re-exported there
   (see the comment in `index.ts`). It needs `createNpc` from `../entity` at

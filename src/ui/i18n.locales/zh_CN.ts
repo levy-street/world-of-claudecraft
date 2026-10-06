@@ -787,6 +787,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.statusOffFfa':
     '你的 PvP 旗帜已降下，但在自由混战地带你仍然可以攻击他人或被攻击。',
   'hudChrome.worldPvp.statusOn': '你的 PvP 旗帜已升起。已开启旗帜的玩家可以攻击你。',
+  'hudChrome.worldPvp.rewardTitles':
+    '开启世界PvP时，在开放世界或PvP副本中的游戏时间达到{thresholds}后可获得永久称号。退出游戏、死亡、PvE副本和安全区会暂停计时。关闭PvP会重置计时。',
+  'hudChrome.worldPvp.rewardPaused': '当前PvP连续游戏时间：{time}（在安全区暂停）',
+  'hudChrome.worldPvp.rewardPausedDead': '当前PvP连续游戏时间：{time}（死亡期间暂停）',
+  'hudChrome.worldPvp.rewardPausedInstance': '当前PvP连续游戏时间：{time}（在PvE副本中暂停）',
+  'hudChrome.worldPvp.rewardProgress': '当前PvP连续游戏时间：{time}',
   'hudChrome.worldPvp.tab': '世界 PvP',
   'hudChrome.worldPvp.title': '世界 PvP',
   'hudChrome.worldPvp.zoneContested': '争夺地带：只有已开启旗帜的玩家才能在此交战。',

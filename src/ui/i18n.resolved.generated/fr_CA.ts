@@ -2784,6 +2784,11 @@ export const fr_CA: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardTitles": "Earn permanent titles after {thresholds} of played time with World PvP on in the open world or in PvP instances. Logout, death, PvE instances and sanctuaries pause the timer. Switching off resets it.",
+      "rewardPaused": "Current PvP streak: {time} played (paused in a sanctuary)",
+      "rewardPausedDead": "Current PvP streak: {time} played (paused while dead)",
+      "rewardPausedInstance": "Current PvP streak: {time} played (paused inside PvE instances)",
+      "rewardProgress": "Current PvP streak: {time} played",
       "tab": "JcJ mondial",
       "title": "JcJ mondial",
       "blurb": "Levez votre drapeau pour combattre d'autres joueurs marqués partout dans le monde ouvert. Vainquez-en un et prenez une part de sa bourse, plus de l'Honneur pour l'équipement de Guerre. Les champs de bataille et les arènes rapportent toujours davantage.",

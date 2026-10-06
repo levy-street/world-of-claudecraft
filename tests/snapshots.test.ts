@@ -10241,3 +10241,45 @@ describe('mount skin identity round trip', () => {
     }
   });
 });
+
+describe('World PvP played-time pause wire round-trip', () => {
+  it.each(['dead', 'instance'] as const)(
+    'mirrors nonzero progress and the %s pause from the authoritative snapshot',
+    (pause) => {
+      const server = new GameServer();
+      const fc = fakeWs();
+      const session = joinServer(server, fc, 101, 'Flagbearer');
+      const sim = server.sim;
+      sim.setPlayerLevel(20, session.pid);
+      const player = sim.entities.get(session.pid)!;
+      player.pos = { x: 60, y: terrainHeight(60, 700, sim.cfg.seed), z: 700 };
+      player.prevPos = { ...player.pos };
+      sim.setWorldPvpFlag(true, session.pid);
+      expect(sim.players.get(session.pid)!.worldPvp!.flagged).toBe(true);
+      sim.players.get(session.pid)!.worldPvp!.rewardTicks = 73 * 60 * 20 + 19;
+      const client = bareClient(session.pid);
+      if (pause === 'dead') player.dead = true;
+      else expect(sim.enterDungeon('hollow_crypt', session.pid)).toBe(true);
+      broadcast(server);
+      const snap = lastSnap(fc.sent);
+      expect(snap.self.wpvp).toMatchObject({
+        flagged: true,
+        rewardSeconds: 4380,
+        rewardPause: pause,
+      });
+      (client as unknown as SnapshotApplier).applySnapshot(snap);
+      expect(client.worldPvpInfo).toEqual(snap.self.wpvp);
+      expect(client.worldPvpInfo).toMatchObject({ rewardSeconds: 4380, rewardPause: pause });
+
+      // A later delta clears the paused state without losing the played clock.
+      player.dead = false;
+      player.pos = { x: 60, y: terrainHeight(60, 700, sim.cfg.seed), z: 700 };
+      sim.tickCount += 10; // The existing wpvp wire cadence is twice a second.
+      broadcast(server);
+      const resumed = lastSnap(fc.sent);
+      expect(resumed.self.wpvp).toMatchObject({ rewardSeconds: 4380, rewardPause: null });
+      (client as unknown as SnapshotApplier).applySnapshot(resumed);
+      expect(client.worldPvpInfo).toEqual(resumed.self.wpvp);
+    },
+  );
+});

@@ -5831,6 +5831,8 @@ export interface Entity extends ClientMirroredEntityFields {
    *  unflagged, so an unflagged character samples and serializes exactly as
    *  before the flag existed. */
   pvpFlag?: boolean;
+  /** Host-only disconnect grace marker; absent for offline/headless players. Never persisted. */
+  pvpRewardsPaused?: boolean;
   /** WARFARE Vitality switch (src/sim/pvp/vitality.ts): false while the player
    *  stands in a PvE instance (a dungeon, raid, delve or rift floor), so honor
    *  gear's health bonus never reaches raid content. Absent means the open

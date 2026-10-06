@@ -235,7 +235,10 @@ import {
 } from './deeds_records';
 import { appendBookOfDeedsWire } from './deeds_wire';
 import { stampDevBadge } from './dev_badge_stamp';
-import { stopDisconnectedPlayerInput } from './disconnected_player_input';
+import {
+  resumeConnectedPlayerInput,
+  stopDisconnectedPlayerInput,
+} from './disconnected_player_input';
 import { enqueueActivity } from './discord_activity';
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
 import { enqueueLinkChange } from './discord_link_changes';
@@ -3705,11 +3708,7 @@ export class GameServer {
       player.petSpecialCommandsSupported =
         session.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION;
     }
-    if (session.petSpecialWireVersion === 0) {
-      for (const entity of this.sim.entities.values()) {
-        if (entity.ownerId === session.pid) entity.petAutoSkill = false;
-      }
-    }
+    resumeConnectedPlayerInput(this.sim, session.pid, session.petSpecialWireVersion !== 0);
     session.timerWireCache = new StableSelfTimerWireCache();
     session.sentEnts = new Map();
     session.selfHeavyDirty = true;

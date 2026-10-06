@@ -2784,6 +2784,11 @@ export const ko_KR: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardTitles": "월드 PvP를 켠 상태로 오픈 월드 또는 PvP 인스턴스에서 플레이한 시간이 {thresholds}에 도달하면 영구 칭호를 얻습니다. 로그아웃, 사망, PvE 인스턴스 및 성역에서는 타이머가 일시 정지됩니다. PvP를 끄면 시간이 초기화됩니다.",
+      "rewardPaused": "현재 PvP 유지 시간: {time} (성역에서 일시 정지)",
+      "rewardPausedDead": "현재 PvP 유지 시간: {time} (사망 상태에서 일시 정지)",
+      "rewardPausedInstance": "현재 PvP 유지 시간: {time} (PvE 인스턴스에서 일시 정지)",
+      "rewardProgress": "현재 PvP 유지 시간: {time}",
       "tab": "월드 PvP",
       "title": "월드 PvP",
       "blurb": "깃발을 올리면 열린 세계 어디서든 깃발을 올린 다른 플레이어와 싸울 수 있습니다. 상대를 쓰러뜨리면 소지금의 일부와 워페어 장비를 위한 명예를 얻습니다. 전장과 투기장은 여전히 더 많은 보상을 줍니다.",

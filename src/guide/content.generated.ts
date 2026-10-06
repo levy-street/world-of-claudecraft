@@ -6004,6 +6004,46 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "exploration",
     "renown": 5,
     "feat": false
+  },
+  {
+    "id": "pvp_flag_1h",
+    "name": "Bold",
+    "category": "pvp",
+    "renown": 5,
+    "feat": false,
+    "rewardTitle": "Bold"
+  },
+  {
+    "id": "pvp_flag_3h",
+    "name": "Defiant",
+    "category": "pvp",
+    "renown": 10,
+    "feat": false,
+    "rewardTitle": "Defiant"
+  },
+  {
+    "id": "pvp_flag_6h",
+    "name": "Dauntless",
+    "category": "pvp",
+    "renown": 10,
+    "feat": false,
+    "rewardTitle": "Dauntless"
+  },
+  {
+    "id": "pvp_flag_24h",
+    "name": "Unyielding",
+    "category": "pvp",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "Unyielding"
+  },
+  {
+    "id": "pvp_flag_168h",
+    "name": "Indomitable",
+    "category": "pvp",
+    "renown": 50,
+    "feat": false,
+    "rewardTitle": "Indomitable"
   }
 ];
 
@@ -7365,6 +7405,26 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "title",
         "name": "Treasure Hunter"
+      },
+      {
+        "kind": "title",
+        "name": "Bold"
+      },
+      {
+        "kind": "title",
+        "name": "Defiant"
+      },
+      {
+        "kind": "title",
+        "name": "Dauntless"
+      },
+      {
+        "kind": "title",
+        "name": "Unyielding"
+      },
+      {
+        "kind": "title",
+        "name": "Indomitable"
       }
     ]
   },

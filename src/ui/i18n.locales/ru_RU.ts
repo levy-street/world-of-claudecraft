@@ -835,6 +835,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.statusOffFfa':
     'Ваш флаг PvP опущен, но на территории свободного боя вы всё равно можете атаковать и быть атакованным.',
   'hudChrome.worldPvp.statusOn': 'Ваш флаг PvP поднят. Игроки с флагом могут атаковать вас.',
+  'hudChrome.worldPvp.rewardTitles':
+    'Постоянные титулы выдаются за {thresholds} игрового времени с включенным мировым PvP в открытом мире или PvP-инстансах. Выход из игры, смерть, PvE-инстансы и святилища приостанавливают таймер. Отключение PvP сбрасывает его.',
+  'hudChrome.worldPvp.rewardPaused':
+    'Текущая серия PvP: {time} игрового времени (приостановлена в святилище)',
+  'hudChrome.worldPvp.rewardPausedDead':
+    'Текущая серия PvP: {time} игрового времени (приостановлена, пока вы мертвы)',
+  'hudChrome.worldPvp.rewardPausedInstance':
+    'Текущая серия PvP: {time} игрового времени (приостановлена в PvE-инстансах)',
+  'hudChrome.worldPvp.rewardProgress': 'Текущая серия PvP: {time} игрового времени',
   'hudChrome.worldPvp.tab': 'Мировое PvP',
   'hudChrome.worldPvp.title': 'Мировое PvP',
   'hudChrome.worldPvp.zoneContested': 'Спорная территория: здесь сражаются только игроки с флагом.',

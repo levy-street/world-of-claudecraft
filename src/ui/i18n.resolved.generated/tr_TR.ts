@@ -2784,6 +2784,11 @@ export const tr_TR: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardTitles": "Earn permanent titles after {thresholds} of played time with World PvP on in the open world or in PvP instances. Logout, death, PvE instances and sanctuaries pause the timer. Switching off resets it.",
+      "rewardPaused": "Current PvP streak: {time} played (paused in a sanctuary)",
+      "rewardPausedDead": "Current PvP streak: {time} played (paused while dead)",
+      "rewardPausedInstance": "Current PvP streak: {time} played (paused inside PvE instances)",
+      "rewardProgress": "Current PvP streak: {time} played",
       "tab": "Dünya PvP",
       "title": "Dünya PvP",
       "blurb": "Bayrağını kaldır ve bayraklı diğer oyuncularla açık dünyada savaş. Birini yene ve hazinesinin bir kısmını al, ayrıca Savaş donanımına karşı Onur kazan. Muharebe Alanları ve Arenalar daha çok ödeme yapar.",

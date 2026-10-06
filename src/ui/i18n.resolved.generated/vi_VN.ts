@@ -2784,6 +2784,11 @@ export const vi_VN: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardTitles": "Earn permanent titles after {thresholds} of played time with World PvP on in the open world or in PvP instances. Logout, death, PvE instances and sanctuaries pause the timer. Switching off resets it.",
+      "rewardPaused": "Current PvP streak: {time} played (paused in a sanctuary)",
+      "rewardPausedDead": "Current PvP streak: {time} played (paused while dead)",
+      "rewardPausedInstance": "Current PvP streak: {time} played (paused inside PvE instances)",
+      "rewardProgress": "Current PvP streak: {time} played",
       "tab": "World PvP",
       "title": "World PvP",
       "blurb": "Nâng cờ của bạn lên để chiến đấu với những người chơi khác có cờ ở bất kỳ nơi nào trên thế giới mở. Đánh bại một người và lấy một phần số tiền của họ, cộng với Danh Dự dành cho trang bị Chiến Tranh. Chiến Trường và Đấu Trường vẫn trả lương cao hơn.",

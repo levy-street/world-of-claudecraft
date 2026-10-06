@@ -2784,6 +2784,11 @@ export const zh_CN: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardTitles": "开启世界PvP时，在开放世界或PvP副本中的游戏时间达到{thresholds}后可获得永久称号。退出游戏、死亡、PvE副本和安全区会暂停计时。关闭PvP会重置计时。",
+      "rewardPaused": "当前PvP连续游戏时间：{time}（在安全区暂停）",
+      "rewardPausedDead": "当前PvP连续游戏时间：{time}（死亡期间暂停）",
+      "rewardPausedInstance": "当前PvP连续游戏时间：{time}（在PvE副本中暂停）",
+      "rewardProgress": "当前PvP连续游戏时间：{time}",
       "tab": "世界 PvP",
       "title": "世界 PvP",
       "blurb": "升起旗帜后，你可以在开放世界的任何地方与其他已开启旗帜的玩家战斗。击败一人可分得对方钱袋中的一部分，外加用于兑换战争装备的荣誉。战场和竞技场仍然给予更多回报。",

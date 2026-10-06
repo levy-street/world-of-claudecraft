@@ -2784,6 +2784,11 @@ export const it_IT: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardTitles": "Earn permanent titles after {thresholds} of played time with World PvP on in the open world or in PvP instances. Logout, death, PvE instances and sanctuaries pause the timer. Switching off resets it.",
+      "rewardPaused": "Current PvP streak: {time} played (paused in a sanctuary)",
+      "rewardPausedDead": "Current PvP streak: {time} played (paused while dead)",
+      "rewardPausedInstance": "Current PvP streak: {time} played (paused inside PvE instances)",
+      "rewardProgress": "Current PvP streak: {time} played",
       "tab": "PvP Mondiale",
       "title": "PvP Mondiale",
       "blurb": "Alza la tua bandiera per combattere altri giocatori contrassegnati ovunque nel mondo aperto. Sconfiggine uno e prendi una quota della sua borsa, più Onore per l'equipaggiamento da Guerra. I campi di battaglia e le arene pagano comunque di più.",
