@@ -272,12 +272,12 @@ describe('CosmeticsWindow', () => {
     expect(el.querySelectorAll('.cos-tab[tabindex="0"]')).toHaveLength(1);
   });
 
-  it('hints when the character owns no mount and skips a repaint on an unchanged snapshot', () => {
+  it('allows cosmetic selection without reins and skips unchanged repaint', () => {
     const world = fakeWorld();
     world.ownedMounts = () => [];
     const { w, el } = makeWindow(world);
     w.open();
-    expect(el.querySelector('.cos-hint')).toBeTruthy();
+    expect(el.querySelector('.cos-hint')).toBeNull();
     const before = el.innerHTML;
     w.refreshIfChanged();
     expect(el.innerHTML).toBe(before);

@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { isBlocked, moverHeight, resolveMovement } from '../src/sim/colliders';
-import { mountMoveSpeedPct } from '../src/sim/content/mounts';
 import { BUILTIN_WORLD, DELVES, DUNGEON_FLOOR_Y } from '../src/sim/data';
 import {
   clampDelveDoorSolids,
@@ -576,12 +575,11 @@ describe('moveSpeedMult: Cat Form passive speed', () => {
     expect(moveSpeedMult(p, 0)).toBeCloseTo(0.575);
   });
 
-  it('mount speed stays additive: form_cat plus a +60% mount yields 1.75', () => {
+  it('mount speed stays additive: form_cat plus basic riding yields 1.85', () => {
     const p = makeSim().player;
-    expect(mountMoveSpeedPct('valorsteed')).toBe(0.6);
     p.auras.push(cat(p));
     p.mountKey = 'valorsteed';
-    expect(moveSpeedMult(p, 0)).toBeCloseTo(1.75);
+    expect(moveSpeedMult(p, 0)).toBeCloseTo(1.85);
   });
 
   it('the client dep shape and the live Sim agree on Cat speed', () => {

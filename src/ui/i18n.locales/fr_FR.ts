@@ -4156,29 +4156,14 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.mountsPage.collectBody':
     "Au-delà du comptoir de Marla, les rênes se trouvent plutôt qu'elles ne s'achètent. Elles tombent des derniers boss des donjons à cinq joueurs et du raid en héroïque, ainsi que des failles nettoyées, où plus la faille que vous terminez est difficile, plus les rênes qu'elle peut laisser derrière elle sont rares. Ce sont des trouvailles rares par conception, et aucune expédition n'en garantit une, si bien que la bonne façon de chasser une monture est d'emporter cette quête avec vous sur les expéditions que vous faisiez déjà. Cette page ne vous dira pas quelle monture pend à quel boss : cette part-là est à vous de la découvrir.",
   'guide.mountsPage.collectHeading': "D'où viennent les montures les plus rares",
-  'guide.mountsPage.firstBody':
-    "Le Destrier de Bravoure est la seule monture vendue où que ce soit dans le monde. Une fois l'Équitation apprise, Marla vous vend les Rênes du Destrier de Bravoure pour 10 pièces d'or, et ces rênes sont à vous pour de bon. Toute autre monture se gagne de par le monde, si bien que ce cheval est le point de départ de presque tous les cavaliers.",
   'guide.mountsPage.firstHeading': 'Votre première monture',
-  'guide.mountsPage.goodsBody':
-    "Une monture est un objet, ce qui en fait quelque chose que l'économie peut faire circuler. Vous possédez une monture tant que ses rênes se trouvent dans vos sacs ou votre banque, mais des rênes mises en banque vous laissent la monture sans vous permettre de la chevaucher : pour appeler la bête, il faut porter les rênes sur vous. Les rênes de joueur ne sont jamais liées à l'âme, elles s'échangent donc, voyagent par courrier et s'annoncent sur le Marché mondial comme n'importe quelle autre trouvaille, sauf mention contraire sur l'objet lui-même. Deux choses valent la peine d'être sues avant de vous en séparer : aucun marchand ne rachètera jamais un jeu de rênes, si bien qu'une monture est un achat que vous gardez ou que vous transmettez plutôt qu'un bien à revendre contre pièces, et si les rênes quittent à la fois vos sacs et votre banque pendant que vous êtes en selle, échangées, envoyées par courrier ou vendues sur le marché, la monture part avec elles et vous êtes déposé là où vous vous trouvez.",
   'guide.mountsPage.goodsHeading': 'Les rênes sont des biens ordinaires',
   'guide.mountsPage.heading': 'Montures et équitation',
-  'guide.mountsPage.intro':
-    'Une monture est un moyen plus rapide de traverser le monde, rien de plus. Vous apprenez à monter aux écuries, achetez votre premier jeu de rênes, et toute route est plus courte à partir de là.',
-  'guide.mountsPage.learnBody':
-    "L'Équitation est une compétence que vous achetez une fois pour toutes, et elle s'ouvre au niveau {level}. Marla Hitchen, la Maîtresse d'écurie, tient les Écuries du Galecrest sur les landes, et elle vend l'Entraînement d'équitation pour 80 pièces d'or. Cet unique achat est ce qui vous permet de monter en selle, et il reste acquis pour de bon.\n\nUne fois que vous l'avez, Marla a une quête pour vous : Leçons d'équitation. Acceptez-la, suivez le repère jusqu'au carré lumineux derrière l'arche de départ, et appuyez sur Démarrer la course. Elle vous prête un Destrier de Bravoure d'entraînement pour la leçon, si bien que la leçon elle-même ne vous coûte rien. Faites le parcours, terminez-le, et retournez la voir pour toucher votre pièce et votre expérience. Le destrier prêté retourne à l'écurie ensuite, si bien que la leçon vous apprend la selle plutôt que de vous offrir un cheval.",
   'guide.mountsPage.learnHeading': 'Apprendre à monter',
   'guide.mountsPage.raceBody':
     "Le parcours de saut d'obstacles dans l'enclos de Marla est ouvert à tous, à tout moment, pas seulement pendant la leçon. Montez en selle, tenez-vous sur le carré lumineux derrière l'arche, et appuyez sur Démarrer la course. Un compte à rebours vous immobilise, puis le chronomètre démarre : franchissez les sept obstacles et revenez à cheval par l'arche avant qu'il ne s'écoule.\n\nUn obstacle ne compte que si vous êtes réellement en l'air au-dessus de la barre, un simple passage en dessous ne validant rien. Vous pouvez les prendre dans n'importe quel ordre et par n'importe quel côté, et en rater un n'est pas la fin du monde : faites demi-tour et retentez-le. Mourir, descendre de monture ou quitter l'enclos met fin à la tentative, tout comme laisser le chronomètre s'épuiser, ce qui vous démonte sur place ; l'annuler vous-même se contente d'arrêter le chronomètre. Rien ne vous empêche d'en commencer une autre. Il n'y a ni frais, ni temps de recharge, ni récompense au-delà du temps lui-même, et n'importe quel nombre de cavaliers peut faire le parcours en même temps sans se gêner mutuellement.",
   'guide.mountsPage.raceHeading': 'La course des écuries',
-  'guide.mountsPage.rideBody':
-    "Il n'y a pas de fenêtre de montures ni de favori à définir, car les rênes sont la monture. Utilisez un jeu de rênes depuis vos sacs ou depuis un emplacement de barre d'action, et vous montez cette monture. L'invocation prend un instant, un appel bref plutôt qu'instantané, elle ne vous sauvera donc pas d'un mauvais pull. Descendre est instantané et jamais bloqué.\n\nUtilisez les rênes que vous montez déjà et vous rangez cette monture. Utilisez un autre jeu en étant déjà monté et vous basculez directement dessus, sans rien à invoquer entre les deux. La touche Monter / Descendre, la touche d'accent grave par défaut, ne sert jamais qu'à descendre : c'est le chemin du bas, pas celui du haut. La seule exception est la leçon d'équitation, où cette même touche appelle le destrier que Marla vous prête, puisqu'un cheval emprunté n'a pas de rênes sur lesquelles cliquer. Sur téléphone ou tablette, le bouton Montures du menu Plus fonctionne dans les deux sens, mais il appelle le premier jeu de rênes qui se trouve dans vos sacs plutôt qu'un jeu que vous choisissez, alors touchez les rênes elles-mêmes pour obtenir une monture précise.",
   'guide.mountsPage.rideHeading': 'Monter en selle et en descendre',
-  'guide.mountsPage.speedBody':
-    "La vitesse est la seule chose qui distingue une monture d'une autre. Le Destrier de Bravoure que vous achetez à Marla fixe l'allure de base, et les montures que vous collectez de par le monde vont plus vite que lui : plus les rênes sont rares, plus la monture est rapide, par paliers nets plutôt que par une progression continue. Il n'existe pas de second rang d'Équitation à apprendre, ni de mise à niveau à acheter ensuite. Vous payez l'Équitation une seule fois, et à partir de là, ce sont les rênes que vous utilisez qui décident de votre vitesse de déplacement.",
-  'guide.mountsPage.speedHeading': 'Vitesse et paliers',
-  'guide.mountsPage.whatBody':
-    "Une monture est une bête que vous chevauchez, et ce qu'elle vous offre, c'est de la vitesse. Aucune armure, aucun dégât, aucune caractéristique : elle vous porte plus vite sur le sol, et vous fait bondir un peu plus haut quand vous sautez, et c'est là tout le marché. Toutes les montures du jeu sont des montures terrestres, il n'y a donc pas de vol, et aucune d'elles ne nage.",
   'guide.mountsPage.whatHeading': "Ce qu'est une monture",
   'guide.mountsPage.whereBody':
     "Les Écuries du Galecrest sont indiquées sur la carte de La Crête du Vent, sur les landes entre le Surplomb et les Champs d'Épaves. Marla se tient près de la grange, face au terrain de course.",
@@ -4220,8 +4205,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Les failles sont la seule chose qui attend le plafond lui-même. Elles se déchirent dans les royaumes selon leur propre calendrier, classées de C à S, et chaque groupe du monde se lance dans la course pour être celui qui nettoie chacune d'elles. Les tableaux de plongée continuent eux aussi de tourner, et leur difficulté la plus corsée mérite un nouveau regard une fois votre équipement à niveau.",
   'guide.progression.journeyBodyCount':
     "Le monde est une seule terre continue de {zones} zones. Trois d'entre elles forment la route sur laquelle vous montez en niveau, disposées du sud au nord : vous commencez dans la vallée verdoyante, poursuivez à travers le marais et finissez sur les pics froids et élevés. Suivez le fil des quêtes et la contrée vous porte de l'une à l'autre. Une île se trouve au large des côtes de la vallée pour les premiers niveaux, et le reste des royaumes s'ouvre à partir de cette même route, conçu pour les personnages qui ont déjà achevé cette ascension.",
-  'guide.progression.ridingBody':
-    "L'Équitation fait partie de ce qui vous attend au bout de l'ascension. Au niveau {level}, une Maîtresse d'écurie vous enseigne cette compétence pour une belle somme d'or, et une leçon sur le parcours d'entraînement vous vaut votre premier jeu de rênes. Une monture ne confère aucune puissance : elle rend simplement le monde plus petit, ce qui, après une longue marche vers le nord, est une récompense en soi.",
   'guide.progression.ridingTitle': 'Apprendre à monter',
   'guide.questsPage.availableBody':
     "Les quêtes s'enchaînent. La plupart ne sont proposées qu'une fois que vous avez rendu celle qui les précède, et beaucoup exigent aussi un niveau minimum, si bien qu'un PNJ qui n'a rien pour vous aujourd'hui peut en avoir beaucoup après vos prochains niveaux, ou une fois que vous aurez rendu la quête que vous portez déjà. Quelques-unes ont leur propre condition, comme les Leçons d'équitation, qui ne s'ouvrent qu'une fois l'entraînement d'équitation acheté. Les quêtes de groupe le précisent d'emblée en indiquant combien de joueurs elles vous suggèrent d'amener. Certains travaux sont répétables : vous pouvez les reprendre après un délai, et le marqueur au-dessus du donneur vous indique quand l'un d'eux est revenu.",
@@ -15140,12 +15123,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_shadowjump_toad': 'Kama-Kage, le Crapaud Saute-Ombre',
   'hudChrome.mounts.name_stormfeather_griffin': 'Plume-d’Orage Toise-Ciel',
   'hudChrome.mounts.name_thunderstrut_gobbler': 'Pavane-Tonnerre, le Grand Dindon',
-  'hudChrome.mounts.desc_valorsteed':
-    'Un destrier robuste au pied sûr qui accroît la vitesse de déplacement.',
-  'hudChrome.mounts.desc_grag_bear':
-    'Un ours robuste au pied sûr qui accroît la vitesse de déplacement.',
-  'hudChrome.mounts.desc_stalkglider_snail':
-    'Un escargot vaillant à combustion lente qui accroît la vitesse de déplacement.',
   'hudChrome.mounts.desc_aether_hover_cycle':
     'Une puissante moto magitech conçue pour des déplacements de combat rapides en vol rasant.',
   'hudChrome.mounts.desc_shadowjump_toad':
@@ -15160,12 +15137,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.emptyDropHint':
     'Les montures plus rares sont lâchées par les boss de donjon et de raid.',
   'hudChrome.mounts.clickManage': 'Cliquez pour choisir votre monture',
-  'hudChrome.mounts.useToRide': 'Utiliser pour invoquer cette monture.',
   'hudChrome.mountTraining.begin': 'Commencer la leçon',
   'hudChrome.mountTraining.mountPrompt':
     "Appuyez sur {key} pour monter le Valorsteed d'entraînement.",
-  'hudChrome.mountTraining.ownedMountPrompt':
-    'Vos rênes sont dans vos sacs. Utilisez-les pour chevaucher.',
   'hudChrome.mountTraining.returnToMarla':
     'Retournez voir Marla aux écuries pour acheter les rênes de votre Valorsteed pour 10 po.',
   'hudChrome.mountTraining.ridePrompt':
@@ -19349,10 +19323,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.mechEmpty': 'Aucun chroma de Méca de combat ne vous appartient encore.',
   'hudChrome.cosmetics.mechIntro':
     'Le Méca de combat remplace le corps de ce personnage. Un seul chroma est équipé à la fois.',
-  'hudChrome.cosmetics.mountsIntro':
-    'Un habillage de monture recouvre la monture chevauchée par ce personnage. Il ne modifie jamais sa vitesse.',
-  'hudChrome.cosmetics.mountsNoMount':
-    'Obtenez d’abord une monture : un habillage a besoin d’une monture à recouvrir.',
   'hudChrome.cosmetics.owned': 'Possédé',
   'hudChrome.cosmetics.scopeAccount': 'Compte',
   'hudChrome.cosmetics.scopeCharacter': 'Personnage',

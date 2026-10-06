@@ -191,6 +191,7 @@ const baseEnTable = {
   'error.ridingTrainLevel': 'You must be level 20 to learn Riding.',
   'error.ridingWrongNpc': 'You must speak to Marla Hitchen to learn Riding.',
   'log.ridingLearned': 'You have learned Riding. You can now summon and ride a mount.',
+  'log.advancedRidingLearned': 'You have learned Advanced Riding. Your mount speed is increased by 100%.',
   // Riding lesson (src/sim/mounts_training.ts). The shared "Too far away." /
   // "Not enough money." / "You can't do that while dead." refusals are reused
   // verbatim and already registered above.
@@ -8088,6 +8089,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.ridingTrainLevel': '你必须达到等级20才能学习骑乘术。',
     'error.ridingWrongNpc': '你必须和玛拉·希肯交谈才能学习骑乘术。',
     'log.ridingLearned': '你已学会骑乘术，现在可以召唤并骑乘坐骑。',
+    'log.advancedRidingLearned': '你已学会高级骑术。骑乘移动速度提高100%。',
     'error.ridingQuestUntrained': '你必须先学习骑乘术才能参加这个课程。',
     'error.invalidBuild': '无效的天赋配置。',
     'error.unknownSpec': '未知的专精。',
@@ -8938,6 +8940,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.ridingTrainLevel': '你必須達到等級 20 才能學習騎乘術。',
     'error.ridingWrongNpc': '你必須和瑪拉·希肯交談才能學習騎乘術。',
     'log.ridingLearned': '你已學會騎乘術，現在可以召喚並騎乘坐騎。',
+    'log.advancedRidingLearned': '你已學會進階騎術。騎乘移動速度提高100%。',
     'error.ridingQuestUntrained': '你必須先學習騎乘術才能參加這個課程。',
     'error.invalidBuild': '無效的天賦配置。',
     'error.unknownSpec': '未知的專精。',
@@ -9796,6 +9799,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.ridingTrainLevel': '기승술을 배우려면 20레벨이 되어야 합니다.',
     'error.ridingWrongNpc': '기승술을 배우려면 마를라 히첸과 이야기해야 합니다.',
     'log.ridingLearned': '기승술을 습득했습니다. 이제 탈것을 소환하고 탈 수 있습니다.',
+    'log.advancedRidingLearned': '고급 기승을 배웠습니다. 탈것에 탄 동안 이동 속도가 100% 증가합니다.',
     'error.ridingQuestUntrained': '이 수업을 받으려면 먼저 기승술을 배워야 합니다.',
     'error.invalidBuild': '잘못된 특성 구성입니다.',
     'error.unknownSpec': '알 수 없는 전문화입니다.',
@@ -10696,6 +10700,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.ridingTrainLevel': '騎乗術を習得するにはレベル20が必要です。',
     'error.ridingWrongNpc': '騎乗術を習得するにはマーラ・ヒッチェンに話しかけてください。',
     'log.ridingLearned': '騎乗術を習得しました。マウントを召喚して乗れるようになりました。',
+    'log.advancedRidingLearned': '上級騎乗を習得しました。騎乗中の移動速度が100%上昇します。',
     'error.ridingQuestUntrained': 'このレッスンを受けるには、まず騎乗術を習得してください。',
     'error.invalidBuild': '無効なタレントビルドです。',
     'error.unknownSpec': '不明な専門化です。',
@@ -12206,6 +12211,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.hoardWhiteoutGust': 'Rajada de Neblina Branca',
   },
   ru_RU: {
+    'log.advancedRidingLearned': 'Вы освоили продвинутую верховую езду. Скорость передвижения верхом повышена на 100%.',
     'log.passingStoneKneel': 'Вы сжимаете в ладони Камень Ухода, и берег отпускает вас.',
     'aura.craftedMomentum': 'Импульс мастера',
     'aura.craftedShelter': 'Укрытие мастера',

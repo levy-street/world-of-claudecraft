@@ -9,7 +9,7 @@
 // entry for why).
 
 import * as THREE from 'three';
-import { isMountSkinId, MOUNT_SKIN_IDS, type MountSkinId } from '../sim/content/mount_skins';
+import { isStoreMountSkinId, MOUNT_SKIN_IDS, type MountSkinId } from '../sim/content/mount_skins';
 import { DEFAULT_MOUNT, type MountKey } from '../sim/content/mounts';
 import { type CharacterVisual, createMountVisual } from './characters';
 import { mountAssetsReady, preloadMountAssets } from './characters/assets';
@@ -78,9 +78,15 @@ export function mountPrewarmKeys(
  *  account's mount skins (src/sim/content/mount_skins.ts). */
 export function mountPrewarmKeysFor(world: {
   ownedMounts(): readonly MountKey[];
-  accountCosmetics: { mountSkinIds: readonly string[] };
+  accountCosmetics: {
+    mountSkinIds: readonly string[];
+    collectibleMountSkinIds?: readonly string[];
+  };
 }): MountPrewarmKey[] {
-  return mountPrewarmKeys(world.ownedMounts(), world.accountCosmetics.mountSkinIds);
+  return mountPrewarmKeys(world.ownedMounts(), [
+    ...world.accountCosmetics.mountSkinIds,
+    ...(world.accountCosmetics.collectibleMountSkinIds ?? []),
+  ]);
 }
 
 /** A catalog mount key or a mount skin id: both name one lazy mount visual. */
@@ -88,7 +94,7 @@ export type MountPrewarmKey = MountKey | MountSkinId;
 
 /** The visual spec a prewarm key names: a skin's or a catalog mount's. */
 export function mountPrewarmSpec(key: MountPrewarmKey): MountVisualSpec {
-  return isMountSkinId(key) ? MOUNT_SKIN_VISUAL_SPECS[key] : MOUNT_VISUAL_SPECS[key];
+  return isStoreMountSkinId(key) ? MOUNT_SKIN_VISUAL_SPECS[key] : MOUNT_VISUAL_SPECS[key];
 }
 
 function createReadyMountPrewarmVisual(key: MountPrewarmKey): CharacterVisual | null {

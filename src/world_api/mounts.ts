@@ -15,15 +15,17 @@ export interface IWorldMounts {
   /** Whether the player has purchased the riding skill from Marla (80g).
    *  Required before summoning any mount. */
   ridingTrained(): boolean;
+  /** Character riding rank: untrained, +70% speed, or +100% speed. */
+  ridingTrainingTier(): 0 | 1 | 2;
   /** Dismount if riding (instant, never gated). Does nothing when unmounted:
    *  summoning a specific mount is an item use, not a keybind. The one exception
    *  is an in-progress riding lesson, which lends the unowned training steed. */
   toggleMounted(): void;
-  /** Purchase the riding skill from Marla the stables trainer for 80 gold (800000
-   *  copper). One-time: once ridingTrained is true it never reverts. Requires the
+  /** Purchase the next riding rank from Marla: 80 gold for +70% speed, then
+   *  1000 gold for +100% speed. Training is permanent and per character. Requires the
    *  player to be level 20, alive, and standing near Marla. Emits an error toast on
    *  failure (not enough money, wrong NPC, wrong level). */
-  learnRiding(npcId: number): void;
+  learnRiding(npcId: number, expectedTier?: 0 | 1): void;
   /** Legacy start for a riding-lesson attempt at Stablemaster Marla, gating
    *  reins_valorsteed's q_riding_lessons quest reward. Current lesson completion
    *  comes from finishing the show-jumping race on the lent training Valorsteed.

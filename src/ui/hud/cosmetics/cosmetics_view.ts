@@ -11,7 +11,11 @@
 // body, and account state for the weapon-skin loadout. Each card model says
 // which, so the badge is never inferred in markup.
 
-import { MOUNT_SKIN_IDS, MOUNT_SKINS, type MountSkinId } from '../../../sim/content/mount_skins';
+import {
+  ALL_MOUNT_SKIN_IDS,
+  type MountSkinId,
+  mountSkinDef,
+} from '../../../sim/content/mount_skins';
 import type { MountRarity } from '../../../sim/content/mounts';
 import { MECH_CHROMAS } from '../../../sim/content/skins';
 import {
@@ -91,12 +95,12 @@ export interface MechChromaCard {
 /** Every catalog mount skin in store order, owned or not, so the tab doubles
  *  as the catalog a player has not bought into yet. */
 export function mountSkinCards(s: CosmeticsSnapshot): MountSkinCard[] {
-  return MOUNT_SKIN_IDS.map((id) => {
+  return ALL_MOUNT_SKIN_IDS.map((id) => {
     const owned = s.ownedMountSkins.includes(id);
     const worn = owned && s.wornMountSkin === id;
     return {
       id,
-      rarity: MOUNT_SKINS[id].rarity,
+      rarity: mountSkinDef(id)!.rarity,
       owned,
       worn,
       action: !owned ? null : worn ? 'takeOff' : 'wear',

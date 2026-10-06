@@ -95,6 +95,36 @@ function heroicDeps(overrides: Partial<Parameters<typeof renderHeroicVendorWindo
 }
 
 describe('renderVendorWindow / renderHeroicVendorWindow: dialog root (accessible name, #2808)', () => {
+  it('keeps repeated riding purchases bound to the rank displayed on their row', () => {
+    const calls: (VendorBuyOptions | undefined)[] = [];
+    const el = document.createElement('div');
+    const goods: VendorGoodsRow = {
+      itemId: 'riding_training',
+      item: item('riding_training'),
+      ridingRank: 1,
+      price: { copper: 800_000, honor: 0 },
+      quantity: 1,
+      affordable: true,
+      requirementUnmet: false,
+    };
+    const view: VendorView = {
+      goods: [goods],
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+      multiple: 1,
+    };
+    renderVendorWindow(el, 'Trainer', view, deps({ onBuy: (_id, opts) => calls.push(opts) }));
+    const row = requireElement<HTMLButtonElement>(el, '.vendor-item');
+    row.click();
+    row.dispatchEvent(new MouseEvent('click', { bubbles: true, ctrlKey: true }));
+    expect(calls).toEqual([{ expectedRidingTier: 0 }, { expectedRidingTier: 0 }]);
+    goods.ridingRank = 2;
+    goods.price.copper = 10_000_000;
+    renderVendorWindow(el, 'Trainer', view, deps({ onBuy: (_id, opts) => calls.push(opts) }));
+    requireElement<HTMLButtonElement>(el, '.vendor-item').click();
+    expect(calls[2]).toEqual({ expectedRidingTier: 1 });
+  });
   it('renderVendorWindow marks #vendor-window as a labeled dialog', () => {
     const view: VendorView = {
       goods: [],

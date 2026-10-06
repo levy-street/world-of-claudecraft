@@ -26,6 +26,7 @@ import {
   STABLE_TIMER_WIRE_VERSION,
 } from '../src/world_api';
 import { sanitizeAppearance } from '../src/world_api/appearance';
+import type { AccountMountItemsRow } from './account_mount_items_core';
 import type {
   AccountChatMuteStatus,
   AccountCosmetics,
@@ -116,6 +117,7 @@ export interface WsAuthDeps {
   ) => { fbp?: string | null; fbc?: string | null };
   metaEventSourceUrl: (req: http.IncomingMessage) => string | undefined;
   loadAccountCosmetics: (accountId: number) => Promise<AccountCosmetics>;
+  loadAccountMountItems?: (accountId: number) => Promise<AccountMountItemsRow[]>;
   /** The account ledger load (server/account_ledger_db.ts): which characters
    *  on the account earned each deed and found each relic. */
   loadAccountLedger: (accountId: number) => Promise<AccountLedger>;
@@ -362,17 +364,19 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       }
       // The account ledger rides beside the cosmetics: both are account-wide
       // state the join hands the sim, so one round trip covers the pair.
-      const [accountCosmetics, accountLedger] = await Promise.all([
+      const [accountCosmetics, accountLedger, accountMountItems] = await Promise.all([
         loadAccountCosmetics(accountId),
         // A cosmetic table must never gate login: a failed read joins with a
         // fresh ledger (the sim's own default) and the next join retries.
         loadAccountLedger(accountId).catch(() => freshAccountLedger()),
+        deps.loadAccountMountItems?.(accountId).catch(() => undefined),
       ]);
       const joinMeta = {
         ...meta,
         ...metaRequestUserData(req, meta),
         sourceUrl: metaEventSourceUrl(req),
         accountCosmetics,
+        accountMountItems,
         accountLedger,
         isAdmin,
         adminPermissions,

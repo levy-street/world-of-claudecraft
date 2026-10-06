@@ -221,6 +221,7 @@ export function blankEntity(id: number): Entity {
     skinCatalog: 'class',
     skin: 0,
     mountKey: '',
+    ridingTier: 0,
     mountCastRemaining: 0,
     mountCastKey: '',
     mainhandItemId: null,

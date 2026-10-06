@@ -40,6 +40,11 @@ function setup() {
 }
 
 describe('durable mount skin grants', () => {
+  it('never turns a collectible reins projection into a permanent paid grant', () => {
+    const { service } = setup();
+    service.grantMountSkins(7, ['valorsteed', 'grag_bear']);
+    expect(persist).not.toHaveBeenCalled();
+  });
   it('never mirrors a retired skin the economy ledger still grants', () => {
     // The service's grant ledger keeps the Rallycart RXT rows as dormant data
     // after the skin left the catalog; the mirror filters them like any id the
@@ -115,5 +120,50 @@ describe('durable mount skin grants', () => {
       [1, 'mech_bird'],
       [1, null],
     ]);
+  });
+});
+
+describe('replaceable collectible mount cosmetics', () => {
+  it('fans revocation to indexed characters, updates simulation ownership, clears worn looks, and dirties snapshots', () => {
+    const metas = new Map(
+      [1, 2].map((pid) => [
+        pid,
+        {
+          questsDone: new Set<string>(),
+          questLog: new Map(),
+          accountMountSkinIds: [] as readonly string[],
+          mountSkinId: pid === 1 ? 'valorsteed' : 'mech_bird',
+        },
+      ]),
+    );
+    const sessions = [1, 2].map((pid) => ({
+      pid,
+      accountId: 7,
+      accountCosmetics: { ...base(), mountSkinIds: ['mech_bird'] },
+      selfHeavyDirty: false,
+    }));
+    const setMountSkin = vi.fn();
+    const realmSessions = vi.fn(() => {
+      throw new Error('indexed fanout must not scan realm');
+    });
+    const service = new AccountCosmeticsService({
+      sim: () => ({ meta: (pid: number) => metas.get(pid), setMountSkin }) as never,
+      sessions: realmSessions,
+      resyncQuests: vi.fn(),
+    });
+    service.remember(7, sessions[0].accountCosmetics);
+    service.setCollectibleMountSkins(7, ['valorsteed'], sessions);
+    expect(metas.get(2)?.accountMountSkinIds).toEqual(['mech_bird', 'valorsteed']);
+    expect(setMountSkin).not.toHaveBeenCalled();
+    service.setCollectibleMountSkins(7, [], sessions);
+    expect(setMountSkin).toHaveBeenCalledExactlyOnceWith(1, null);
+    expect(sessions.map((session) => session.accountCosmetics.collectibleMountSkinIds)).toEqual([
+      [],
+      [],
+    ]);
+    expect(sessions.every((session) => session.selfHeavyDirty)).toBe(true);
+    expect(metas.get(1)?.accountMountSkinIds).toEqual(['mech_bird']);
+    expect(realmSessions).not.toHaveBeenCalled();
+    expect(persist).not.toHaveBeenCalled();
   });
 });

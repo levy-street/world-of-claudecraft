@@ -4044,29 +4044,14 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.mountsPage.collectBody':
     "Naast Marla's toonbank vind je teugels eerder dan dat je ze koopt. Ze vallen van de eindbazen van de kerkers voor vijf spelers en de raid op heroïsch, en uit het voltooien van rifts, waar geldt: hoe zwaarder de rift die je afrondt, hoe zeldzamer de teugels die hij kan achterlaten. Het zijn bewust zeldzame vondsten en geen enkele run garandeert er een, dus de vriendelijke manier om op een rijdier te jagen is de jacht mee te nemen op de runs die je toch al maakte. Deze pagina vertelt je niet van welke baas welk rijdier valt: dat deel mag je zelf ontdekken.",
   'guide.mountsPage.collectHeading': 'Waar de zeldzamere rijdieren vandaan komen',
-  'guide.mountsPage.firstBody':
-    'De Moedros is het enige rijdier dat ergens in de wereld wordt verkocht. Zodra je Rijden hebt geleerd, verkoopt Marla je de Moedros-teugels voor 10 goud, en die teugels zijn voorgoed van jou. Elk ander rijdier verdien je in de wereld zelf, dus het paard is waar bijna elke ruiter begint.',
   'guide.mountsPage.firstHeading': 'Je eerste rijdier',
-  'guide.mountsPage.goodsBody':
-    'Een rijdier is een voorwerp, wat het tot iets maakt dat de economie kan verplaatsen. Je bezit een rijdier zolang de teugels ervan in je tassen of je bank liggen, al houden gebankte teugels het rijdier wel van jou zonder dat je ermee kunt rijden: om het beest op te roepen moet je de teugels bij je dragen. Teugels van spelers zijn niet zielgebonden, dus ze worden verhandeld, reizen per post en staan op de Wereldmarkt zoals elke andere vondst, tenzij het voorwerp zelf iets anders zegt. Twee dingen zijn de moeite waard om te weten voordat je er een van de hand doet: geen enkele handelaar zal ooit een set teugels terugkopen, dus een rijdier is een aankoop die je houdt of doorgeeft in plaats van verzilvert, en als de teugels zowel je tassen als je bank verlaten terwijl je rijdt, weggeruild, per post verstuurd, of op de markt verkocht, dan gaat het rijdier met ze mee en word je neergezet waar je op dat moment staat.',
   'guide.mountsPage.goodsHeading': 'Teugels zijn gewone handelswaar',
   'guide.mountsPage.heading': 'Rijdieren en rijden',
-  'guide.mountsPage.intro':
-    'Een rijdier is een snellere manier om de wereld door te trekken, en dat is alles wat het is. Je leert rijden bij de stallen, koopt je eerste set teugels, en elke weg daarna is korter.',
-  'guide.mountsPage.learnBody':
-    'Rijden is een vaardigheid die je één keer koopt, en ze gaat open op niveau {level}. Marla Hitchen, de stalmeesteres, houdt de Windkam-Stallen op de winderige heuvels, en ze verkoopt Rijtraining voor 80 goud. Die ene aankoop is wat je überhaupt op een rijdier laat zitten, en ze blijft voorgoed van jou.\n\nZodra je die hebt, heeft Marla een quest voor je: Rijlessen. Neem hem aan, volg de markering naar het gloeiende vak achter de startboog, en druk op Race Starten. Ze leent je een trainings-Moedros voor de les, dus de les zelf kost je niets. Rijd het parcours, maak het af, en ga terug naar haar voor je munten en ervaring. De geleende ros gaat daarna terug de stal in, dus de les leert je het zadel in plaats van je een paard cadeau te doen.',
   'guide.mountsPage.learnHeading': 'Leren rijden',
   'guide.mountsPage.raceBody':
     "Het springparcours in Marla's wei staat open voor iedereen, op elk moment, niet alleen tijdens de les. Stijg op, ga op het gloeiende vak achter de boog staan, en druk op Race Starten. Een aftelling houdt je stil, en dan begint de klok te lopen: neem alle zeven sprongen en rijd terug door de boog voordat de tijd om is.\n\nEen sprong telt alleen als je daadwerkelijk door de lucht over de lat gaat, dus er simpelweg onderdoor rijden telt niet mee. Je mag ze in elke volgorde nemen en van beide kanten, en een gemiste sprong is niet het einde van de wereld: draai bij en probeer het opnieuw. Doodgaan, afstappen of de wei verlaten beëindigt de poging, en hetzelfde geldt voor de klok laten aflopen, wat je uit het zadel zet waar je op dat moment staat; hem zelf annuleren stopt gewoon de klok. Niets houdt je tegen om opnieuw te beginnen. Er zijn geen kosten, geen afkoeltijd en geen prijs behalve de tijd zelf, en elk aantal ruiters kan tegelijk het parcours afleggen zonder elkaar in de weg te zitten.",
   'guide.mountsPage.raceHeading': 'De stallenrace',
-  'guide.mountsPage.rideBody':
-    'Er is geen rijdierenvenster en geen favoriet om in te stellen, want de teugels zijn het rijdier. Gebruik een set teugels uit je tassen of vanaf een vak op je actiebalk en je rijdt dat rijdier. Oproepen duurt een moment, een korte roep in plaats van een directe, dus het redt je niet van een slechte pull. Afstappen is direct en nooit geblokkeerd.\n\nGebruik de teugels waarop je al rijdt en je zet dat rijdier weg. Gebruik een andere set terwijl je bereden bent en je wisselt er direct naartoe, zonder dat er tussendoor iets wordt opgeroepen. De toets Opstijgen / Afstijgen, standaard de backtick-toets, haalt je er altijd alleen maar af: het is de weg naar beneden, niet naar boven. De ene uitzondering is de rijles, waar diezelfde toets de ros oproept die Marla je leent, aangezien een geleend paard geen teugels heeft om op te klikken. Op een telefoon of tablet werkt de knop Rijdieren in de balk Meer beide kanten op, al roept die de eerste set teugels op die in je tassen ligt in plaats van een die je zelf kiest, dus tik op de teugels zelf wanneer je een bepaald rijdier wilt.',
   'guide.mountsPage.rideHeading': 'Opstijgen en afstijgen',
-  'guide.mountsPage.speedBody':
-    'Snelheid is het enige dat het ene rijdier van het andere onderscheidt. De Moedros die je van Marla koopt zet het basistempo, en de rijdieren die je in de wereld verzamelt rijden daarboven: hoe zeldzamer de teugels, hoe sneller de rit, in een paar duidelijke stappen in plaats van een vloeiende glijbaan. Er is geen tweede rang van Rijden om te trainen en geen upgrade om achteraf te kopen. Je betaalt eenmalig voor Rijden, en vanaf dan bepalen de teugels die je gebruikte hoe snel je reist.',
-  'guide.mountsPage.speedHeading': 'Snelheid en rangen',
-  'guide.mountsPage.whatBody':
-    'Een rijdier is een beest waarop je rijdt, en wat het je geeft is snelheid. Geen pantser, geen schade, geen statistieken: het draagt je sneller over de grond, en springt een beetje hoger wanneer je springt, en dat is de hele afspraak. Elk rijdier in het spel is een rijdier op de grond, dus er is geen vliegen, en geen van hen zwemt.',
   'guide.mountsPage.whatHeading': 'Wat een rijdier is',
   'guide.mountsPage.whereBody':
     'De Windkam-Stallen staan gemarkeerd op de kaart van De Windkam, op de winderige heuvels tussen de Scheur en de Wrakvelden. Marla staat naast de stal, met haar gezicht naar de racewei.',
@@ -4103,8 +4088,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Rifts zijn het enige dat wacht tot de limiet zelf. Ze scheuren open in de rijken op hun eigen schema, gerangschikt van C tot S, en elke groep ter wereld racet om degene te zijn die elke rift sluit. De delveborden blijven ook doorgaan, en hun zwaardere moeilijkheidsgraad is een nieuwe blik waard zodra je uitrusting is bijgetrokken.',
   'guide.progression.journeyBodyCount':
     'De wereld is één aaneengesloten land van {zones} zones. Drie daarvan vormen de weg waarop je levelt, gelegen van zuid naar noord: je begint in de groene vallei, baant je een weg door het moeras en eindigt in de koude hoge toppen. Volg het questspoor en het land draagt je van het ene naar het andere. Voor de kust van de vallei ligt een eiland voor de vroege niveaus, en de overige rijken openen zich vanaf diezelfde weg, gebouwd voor personages die de klim al hebben gemaakt.',
-  'guide.progression.ridingBody':
-    'Rijden is een van de dingen die aan het einde van de klim op je wachten. Op niveau {level} leert een stalmeester je de vaardigheid voor een fors bedrag aan goud, en een les op het trainingsparcours levert je je eerste set teugels op. Een rijdier geeft helemaal geen kracht; het maakt de wereld alleen kleiner, wat na een lange wandeling naar het noorden zijn eigen soort beloning is.',
   'guide.progression.ridingTitle': 'Leren rijden',
   'guide.questsPage.availableBody':
     'Quests komen in ketens. De meeste worden pas aangeboden zodra je de vorige hebt ingeleverd, en veel vragen ook een minimumniveau, dus een NPC die vandaag niets voor je heeft, kan na je volgende paar niveaus of zodra je de quest afsluit die je al draagt, ineens genoeg te bieden hebben. Enkele hebben een eigen voorwaarde, zoals de rijlessen, die pas opengaan nadat je de rijvaardigheid hebt gekocht. Groepsquests zeggen dat vooraf, door te vermelden hoeveel spelers ze aanraden mee te nemen. Sommige klussen zijn herhaalbaar: je kunt ze na een wachttijd opnieuw aannemen, en de markering boven de gever vertelt je wanneer er weer een is teruggekeerd.',
@@ -16199,17 +16182,12 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.close': 'Sluiten',
   'hudChrome.mounts.desc_aether_hover_cycle':
     'Een krachtige magitech-motor, ontworpen voor snelle, laag zwevende verplaatsing tijdens gevechten.',
-  'hudChrome.mounts.desc_grag_bear': 'Een sterke, standvastige beer die extra reissnelheid geeft.',
   'hudChrome.mounts.desc_shadowjump_toad':
     'Een enorme, standvastige reuzenpad, getraind in bliksemsnelle schaduwsprongen die elk terrein overbruggen.',
-  'hudChrome.mounts.desc_stalkglider_snail':
-    'Een taaie, langzaam brandende slak die extra reissnelheid geeft.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Een koninklijke stormgriffioen die met runenbeslagen klauwen over de grond sluipt, vleugels opgevouwen.',
   'hudChrome.mounts.desc_thunderstrut_gobbler':
     'Een kolossale, uit de storm geboren kalkoen die vanaf de Ontwakende Piek naar beneden stapt, staart gespreid als een onweerswolk.',
-  'hudChrome.mounts.desc_valorsteed':
-    'Een sterk, standvastig strijdros dat extra reissnelheid geeft.',
   'hudChrome.mounts.dismount': 'Afstijgen',
   'hudChrome.mounts.emptyDropHint':
     'Zeldzamere rijdieren vallen van heroische kerkerbazen en het voltooien van Rifts.',
@@ -16232,7 +16210,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.selected': 'Geselecteerd',
   'hudChrome.mounts.spec_speed': '+{pct}% extra mobiliteit',
   'hudChrome.mounts.title': 'Rijdieren',
-  'hudChrome.mounts.useToRide': 'Gebruik om dit rijdier op te roepen.',
   'hudChrome.mountRace.cancelButton': 'Race Annuleren',
   'hudChrome.mountRace.finished': 'Gefinisht in {seconds}s!',
   'hudChrome.mountRace.go': 'GA!',
@@ -16250,8 +16227,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.toggleAria': 'Schakel tussen de wereldkaart en de gebiedskaart',
   'hudChrome.mountTraining.begin': 'Les Beginnen',
   'hudChrome.mountTraining.mountPrompt': 'Druk op {key} om op de trainings-Moedros te stijgen.',
-  'hudChrome.mountTraining.ownedMountPrompt':
-    'Je teugels zitten in je tassen. Gebruik ze om te rijden.',
   'hudChrome.mountTraining.returnToMarla':
     'Keer terug naar Marla bij de stallen om je Moedros-teugels te kopen voor 10 goud.',
   'hudChrome.mountTraining.ridePrompt':
@@ -18591,10 +18566,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.mechEmpty': 'Nog geen gevechtsmech-chroma’s in bezit.',
   'hudChrome.cosmetics.mechIntro':
     'De gevechtsmech vervangt het lichaam van dit personage. Er wordt telkens één chroma gedragen.',
-  'hudChrome.cosmetics.mountsIntro':
-    'Een rijdier-skin wordt over het rijdier getekend waarop dit personage rijdt. De snelheid verandert nooit.',
-  'hudChrome.cosmetics.mountsNoMount':
-    'Bezit eerst een rijdier: een skin heeft iets nodig om op te rijden.',
   'hudChrome.cosmetics.owned': 'In bezit',
   'hudChrome.cosmetics.scopeAccount': 'Account',
   'hudChrome.cosmetics.scopeCharacter': 'Personage',

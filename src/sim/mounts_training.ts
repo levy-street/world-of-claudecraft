@@ -27,6 +27,7 @@
 import { MOUNT_RACE_START_PLATFORM, STABLE_PADDOCK, TRAINING_MOUNT_KEY } from './content/mounts';
 import { QUESTS } from './data';
 import { forceDismount, forceTrainingMount } from './mounts';
+import { BASIC_RIDING_FEE_COPPER, ridingTrainingFee, ridingTrainingTier } from './riding_training';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import {
@@ -45,7 +46,7 @@ export const MOUNT_TRAIN_MIN_LEVEL = 20;
 // its historical context documented.
 export const MOUNT_TRAIN_FEE_COPPER = 1_000_000; // 100 gold (legacy)
 // Riding skill purchase from Marla: 80 gold.
-export const RIDING_SKILL_FEE_COPPER = 800_000; // 80 gold in copper
+export const RIDING_SKILL_FEE_COPPER = BASIC_RIDING_FEE_COPPER;
 // The lesson's play area: the paddock rect plus a small margin (which also covers
 // Marla, who stands just north of the fence at z=708). Straying beyond it during
 // the lesson abandons the attempt. This replaces the old fixed radius around
@@ -85,16 +86,22 @@ function findStablemaster(ctx: SimContext): Entity | null {
   return null;
 }
 
-/** Purchase the riding skill from Marla for 80 gold. Server-authoritative: checks
- *  level 20, proximity to Marla, sufficient copper, and that the skill is not
- *  already owned. On success sets ridingTrained = true, charges 80g, and emits
+/** Purchase the next riding rank from Marla (80g basic, 1000g advanced).
+ *  Checks level 20, proximity, sufficient copper, and that a rank remains.
+ *  On success advances the character's training, charges its fee, and emits
  *  a notice toast. The npcId param identifies which NPC the client is interacting
  *  with (validated against the stablemaster template). */
-export function learnRiding(ctx: SimContext, npcId: number, pid?: number): void {
+export function learnRiding(
+  ctx: SimContext,
+  npcId: number,
+  pid?: number,
+  expectedTier: 0 | 1 = 0,
+): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e } = r;
-  if (meta.ridingTrained) {
+  const tier = ridingTrainingTier(meta);
+  if (tier === 2 || tier !== expectedTier) {
     ctx.error(meta.entityId, 'You have already learned Riding.');
     return;
   }
@@ -115,13 +122,21 @@ export function learnRiding(ctx: SimContext, npcId: number, pid?: number): void 
     ctx.error(meta.entityId, 'Too far away.');
     return;
   }
-  if (meta.copper < RIDING_SKILL_FEE_COPPER) {
+  const fee = ridingTrainingFee(tier);
+  if (meta.copper < fee) {
     ctx.error(meta.entityId, 'Not enough money.');
     return;
   }
-  meta.copper -= RIDING_SKILL_FEE_COPPER;
+  meta.copper -= fee;
   meta.ridingTrained = true;
-  ctx.notice(meta.entityId, NOTICE_RIDING_LEARNED);
+  meta.ridingTier = tier === 0 ? 1 : 2;
+  e.ridingTier = meta.ridingTier;
+  ctx.notice(
+    meta.entityId,
+    tier === 0
+      ? NOTICE_RIDING_LEARNED
+      : 'You have learned Advanced Riding. Your mount speed is increased by 100%.',
+  );
 }
 
 /** Whether this player still needs to clear the course for the accepted riding

@@ -3979,29 +3979,14 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.mountsPage.collectBody':
     'Ud over Marlas disk findes tøjler snarere end købes. De falder fra de sidste bosser i fangehullerne for fem spillere og raidet på heroisk, og fra Rift-rydninger, hvor jo hårdere den Rift, du fuldfører, desto sjældnere de tøjler, den kan efterlade. De er sjældne fund med vilje, og ingen tur lover én, så den skånsomme måde at jage et ridedyr på er at tage jagten med på de ture, du alligevel skulle på. Denne side fortæller dig ikke, hvilket ridedyr der hænger på hvilken boss: den del må du selv finde ud af.',
   'guide.mountsPage.collectHeading': 'Hvor de sjældnere ridedyr kommer fra',
-  'guide.mountsPage.firstBody':
-    'Valorsteed er det eneste ridedyr, der sælges noget sted i verden. Når du har lært Ridning, sælger Marla dig Tøjler til Valorsteed for 10 guld, og de tøjler er dine at beholde. Ethvert andet ridedyr optjenes ude i verden, så hesten er, hvor næsten enhver rytter starter.',
   'guide.mountsPage.firstHeading': 'Dit første ridedyr',
-  'guide.mountsPage.goodsBody':
-    'Et ridedyr er en genstand, hvilket gør det til noget, økonomien kan flytte rundt på. Du ejer et ridedyr, så længe dets tøjler ligger i dine tasker eller din bank, selvom tøjler i banken holder ridedyret dit uden at lade dig ride det: for at tilkalde dyret skal du bære tøjlerne på dig. Spillertøjler bærer ingen sjælebinding, så de handles, rejser med posten og kan sættes til salg på Verdensmarkedet som ethvert andet fund, medmindre selve genstanden siger andet. To ting er værd at vide, før du skiller dig af med et sæt: ingen handlende køber nogensinde et sæt tøjler tilbage, så et ridedyr er et køb, du beholder eller giver videre snarere end veksler til mønt, og forlader tøjlerne både dine tasker og din bank, mens du rider, handlet væk, sendt med posten eller solgt på markedet, følger ridedyret med, og du bliver sat af, dér hvor du står.',
   'guide.mountsPage.goodsHeading': 'Tøjler er almindelige varer',
   'guide.mountsPage.heading': 'Ridedyr og ridning',
-  'guide.mountsPage.intro':
-    'Et ridedyr er en hurtigere måde at komme rundt i verden på, og det er alt, det er. Du lærer at ride ved staldene, køber dit første sæt tøjler, og enhver vej derefter er kortere.',
-  'guide.mountsPage.learnBody':
-    'Ridning er en færdighed, du køber én gang, og den åbner ved niveau {level}. Marla Hitchen, staldmesteren, holder til på Stormkammens Stalde ude på bakkerne, og hun sælger Ridetræning for 80 guld. Det ene køb er, hvad der overhovedet lader dig sidde på et ridedyr, og det følger dig for altid.\n\nNår du har det, har Marla et opdrag til dig: Ridelektioner. Tag det, følg markøren til det glødende felt bag startbuen, og tryk Start Løb. Hun låner dig en trænings-Valorsteed til lektionen, så selve lektionen koster dig intet. Rid banen, gennemfør den, og gå tilbage til hende for dine mønter og din erfaring. Det lånte dyr går tilbage i stalden bagefter, så lektionen lærer dig sædet snarere end at give dig en hest.',
   'guide.mountsPage.learnHeading': 'At lære at ride',
   'guide.mountsPage.raceBody':
     'Spring-banen i Marlas fold er åben for enhver, når som helst, ikke kun under lektionen. Sæt dig på et ridedyr, stå på det glødende felt bag buen, og tryk Start Løb. En nedtælling holder dig stille, så løber uret: ryd alle syv spring, og rid tilbage ud gennem buen, før tiden løber ud.\n\nEt spring tæller kun, hvis du reelt er i luften over bommen, så en let gennemridning rydder ingenting. Du må tage dem i en hvilken som helst rækkefølge og fra begge sider, og et forbigået spring er ikke verdens undergang: vend om, og tag det igen. At dø, stige af eller forlade folden afslutter forsøget, og det samme gør at lade uret løbe ud, hvilket sætter dig af sadlen, dér hvor du står; annullerer du det selv, stopper det blot uret. Intet forhindrer dig i at starte et nyt. Der er intet gebyr, ingen nedkølingstid og ingen præmie ud over selve tiden, og et vilkårligt antal ryttere kan gennemføre banen samtidig uden at komme i vejen for hinanden.',
   'guide.mountsPage.raceHeading': 'Staldenes løb',
-  'guide.mountsPage.rideBody':
-    'Der er intet ridedyrsvindue og ingen favorit at indstille, for tøjlerne ER ridedyret. Brug et sæt tøjler fra dine tasker eller fra en handlingsbjælkeplads, og du rider det ridedyr. At tilkalde tager et øjeblik, et kort kald snarere end et øjeblikkeligt, så det redder dig ikke fra et dårligt træk. At stige af er øjeblikkeligt og aldrig blokeret.\n\nBrug de tøjler, du allerede rider på, og du sætter det ridedyr væk igen. Brug et andet sæt, mens du er monteret, og du skifter direkte til det, uden noget at tilkalde imellem. Tasten Stig op / Stig af, som standard tasten med accent grave, gør kun én ting: den sætter dig af. Den er vejen ned, ikke vejen op. Den ene undtagelse er ridelektionen, hvor den samme tast tilkalder det dyr, Marla låner dig, da en lånt hest ikke har tøjler at klikke på. På en telefon eller tablet virker Ridedyr-knappen i Mere-bakken begge veje, selvom den tilkalder det første sæt tøjler i dine tasker snarere end et, du selv vælger, så tryk på selve tøjlerne, når du vil have et bestemt ridedyr.',
   'guide.mountsPage.rideHeading': 'At stige op og stige af',
-  'guide.mountsPage.speedBody':
-    'Fart er det eneste, der skiller ét ridedyr fra et andet. Valorsteed, du køber af Marla, sætter grundtempoet, og de ridedyr, du samler ude i verden, ligger over det: jo sjældnere tøjlerne, desto hurtigere ridet, i nogle få tydelige trin snarere end en jævn glidning. Der er intet andet ridetrin at træne og ingen opgradering at købe bagefter. Du betaler for Ridning én gang, og derfra afgør de tøjler, du bruger, hvor hurtigt du rejser.',
-  'guide.mountsPage.speedHeading': 'Fart og trin',
-  'guide.mountsPage.whatBody':
-    'Et ridedyr er et dyr, du rider på, og det, det giver dig, er fart. Ingen rustning, ingen skade, ingen egenskaber: det bærer dig hen over jorden hurtigere og springer en anelse højere, når du hopper, og det er hele handlen. Ethvert ridedyr i spillet er et landridedyr, så der er ingen flyvning, og ingen af dem svømmer.',
   'guide.mountsPage.whatHeading': 'Hvad et ridedyr er',
   'guide.mountsPage.whereBody':
     'Stormkammens Stalde er markeret på kortet over Stormkammen, ude på bakkerne mellem Klippeskæret og Vragmarkerne. Marla står ved siden af laden med front mod løbsbanen.',
@@ -4038,8 +4023,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Rifter er det ene, der venter på selve loftet. De flænger op ude i rigerne efter deres egen tidsplan, rangeret fra C til S, og enhver gruppe i verden kappes om at være den, der lukker hver enkelt af dem. Delve-tavlerne bliver også ved, og deres hårdere sværhedsgrad er et nyt kig værd, når dit udstyr har indhentet dem.',
   'guide.progression.journeyBodyCount':
     'Verden er ét sammenhængende land med {zones} zoner. Tre af dem er den vej, du niveauopstiger på, lagt fra syd til nord: du starter i den grønne dal, presser videre gennem sumpen og slutter i de kolde høje tinder. Følg opdragsstien, og landet bærer dig fra den ene til den næste. En ø ligger ud for dalens kyst til de tidlige niveauer, og resten af rigerne åbner sig fra samme vej, bygget til karakterer, der allerede har klaret opstigningen.',
-  'guide.progression.ridingBody':
-    'Ridning er en af de ting, der venter for enden af opstigningen. Ved niveau {level} lærer en staldmester dig færdigheden for en solid sum guld, og en lektion ude på træningsbanen giver dig dit første sæt tøjler. Et ridedyr giver ingen magt overhovedet; det gør blot verden mindre, hvilket efter en lang vandring mod nord er sin egen slags belønning.',
   'guide.progression.ridingTitle': 'At lære at ride',
   'guide.questsPage.availableBody':
     'Opdrag kommer i kæder. De fleste tilbydes først, når du har afleveret det forudgående, og mange kræver også et minimumsniveau, så en NPC uden noget til dig i dag kan have masser, når du har taget nogle flere niveauer, eller når du afleverer det opdrag, du allerede bærer på. Nogle få har deres eget vilkår, som Ridelektionerne, der først åbner, når du har købt ridefærdigheden. Gruppeopdrag siger det ligeud ved at angive, hvor mange spillere de anbefaler, du tager med. Nogle opgaver er gentagelige: du kan tage dem igen efter en ventetid, og mærket over giveren fortæller dig, når en er kommet tilbage.',
@@ -15980,16 +15963,12 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.close': 'Luk',
   'hudChrome.mounts.desc_aether_hover_cycle':
     'En kraftfuld magitek-cykel designet til hurtig, lavtsvævende forflytning i kamp.',
-  'hudChrome.mounts.desc_grag_bear': 'En hårdfør, sikker bjørn, der giver øget rejsehastighed.',
   'hudChrome.mounts.desc_shadowjump_toad':
     'En enorm, sikker kæmpetudse, trænet i lynhurtige skyggehop, der dækker ethvert terræn.',
-  'hudChrome.mounts.desc_stalkglider_snail':
-    'En robust, langsomt forbrændende snegl, der giver øget rejsehastighed.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'En kongelig stormgrif, der bevæger sig hen over jorden på runebeslåede kløer, med sammenfoldede vinger.',
   'hudChrome.mounts.desc_thunderstrut_gobbler':
     'En kolossal, stormudklækket kalkun, der spankulerer ned fra Den Opvågnende Tinde, med halen udfoldet som en tordensky.',
-  'hudChrome.mounts.desc_valorsteed': 'En hårdfør, sikker ganger, der giver øget rejsehastighed.',
   'hudChrome.mounts.dismount': 'Stig af',
   'hudChrome.mounts.emptyDropHint':
     'Sjældnere ridedyr droppes fra heroiske fangehulsbosser og gennemførte Rifter.',
@@ -16012,7 +15991,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.selected': 'Valgt',
   'hudChrome.mounts.spec_speed': '+{pct}% ekstra mobilitet',
   'hudChrome.mounts.title': 'Ridedyr',
-  'hudChrome.mounts.useToRide': 'Brug for at tilkalde dette ridedyr.',
   'hudChrome.mountRace.cancelButton': 'Annuller Løb',
   'hudChrome.mountRace.finished': 'Gennemført på {seconds}s!',
   'hudChrome.mountRace.go': 'AFSTED!',
@@ -16030,7 +16008,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.toggleAria': 'Skift mellem verdenskortet, zonekortet og instanskortet',
   'hudChrome.mountTraining.begin': 'Begynd Lektion',
   'hudChrome.mountTraining.mountPrompt': 'Tryk på {key} for at stige op på trænings-Modgangeren.',
-  'hudChrome.mountTraining.ownedMountPrompt': 'Dine tøjler er i dine tasker. Brug dem til at ride.',
   'hudChrome.mountTraining.returnToMarla':
     'Vend tilbage til Marla ved staldene for at købe dine Modganger-tøjler for 10 guld.',
   'hudChrome.mountTraining.ridePrompt':
@@ -18334,9 +18311,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.mechEmpty': 'Du ejer endnu ingen farvevarianter til kampmechen.',
   'hudChrome.cosmetics.mechIntro':
     'Kampmechen erstatter denne figurs krop. Én farvevariant bæres ad gangen.',
-  'hudChrome.cosmetics.mountsIntro':
-    'Et ridedyrsskind tegnes over det ridedyr, denne figur rider på. Det ændrer aldrig hastigheden.',
-  'hudChrome.cosmetics.mountsNoMount': 'Få først et ridedyr: et skind behøver noget at ride på.',
   'hudChrome.cosmetics.owned': 'Ejet',
   'hudChrome.cosmetics.scopeAccount': 'Konto',
   'hudChrome.cosmetics.scopeCharacter': 'Figur',

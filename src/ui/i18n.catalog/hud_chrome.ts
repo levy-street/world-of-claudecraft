@@ -2193,7 +2193,8 @@ export const hudChromeStrings = {
     // Reins are usable items: the bag tooltip tells the player to use them. There
     // is no per-mount level gate and no picker, so the old requiresLevel /
     // pickFirst / keybindHint lines went with them.
-    useToRide: 'Use to summon this mount.',
+    useToRide:
+      "Use to wear this appearance and summon your mount. Keep this item in any character's bags or bank to share the appearance across your account. Riding training determines speed.",
     // The empty state, shown when the player owns no mount yet: a heading plus
     // how to earn a first one (the stablemaster's riding lessons) and the rarer
     // boss-drop mounts.
@@ -2222,9 +2223,9 @@ export const hudChromeStrings = {
     name_lanternback_troll: 'Grumbol the Lanternback',
     name_chimeglass_tortoise: 'Tolliver the Chimeglass',
     name_rickshaw_mount: 'Bonebound Rickshaw',
-    desc_valorsteed: 'A hardy, sure-footed steed that provides enhanced travel speed.',
-    desc_grag_bear: 'A hardy, sure-footed bear that provides enhanced travel speed.',
-    desc_stalkglider_snail: 'A hearty, slow-burning snail that provides enhanced travel speed.',
+    desc_valorsteed: 'A hardy, sure-footed steed with a leather saddle.',
+    desc_grag_bear: 'A hardy, sure-footed bear fitted with a heavy saddle.',
+    desc_stalkglider_snail: 'A hearty, slow-burning snail with a mossy shell.',
     desc_aether_hover_cycle:
       'A powerful magitech bike designed for swift, low-hovering combat traversal.',
     desc_shadowjump_toad:
@@ -2262,7 +2263,7 @@ export const hudChromeStrings = {
     // Shown once the riding lesson is turned in and the reward reins land in the
     // bags. It must teach the ITEM, not a keybind: summoning your own mount is a
     // bag / action-bar click now.
-    ownedMountPrompt: 'Your reins are in your bags. Use them to ride.',
+    ownedMountPrompt: 'Choose your mount in Cosmetics. Use Mount / Dismount to ride.',
     ridePrompt: 'Follow the glowing marker to the start line, then press Start Race.',
     begin: 'Begin Lesson',
     success: 'You have tamed the Valorsteed.',

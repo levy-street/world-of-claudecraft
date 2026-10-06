@@ -3962,29 +3962,14 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.mountsPage.collectBody':
     "Marla'nın tezgahının ötesinde dizginler satın alınmaz, bulunur. Beş oyunculu zindanların ve kahramanca akının son patronlarından, ayrıca yarık temizlemelerinden düşerler; tamamladığın yarık ne kadar zorluysa bırakabileceği dizginler de o kadar nadirdir. Tasarım gereği nadir bulgulardır ve hiçbir koşu bir tane söz vermez, bu yüzden bir binek avlamanın nazik yolu, avı zaten yaptığın koşulara katmaktır. Bu sayfa sana hangi bineğin hangi patrona asılı olduğunu söylemeyecek: o kısmı kendin keşfedeceksin.",
   'guide.mountsPage.collectHeading': 'Daha nadir binekler nereden gelir',
-  'guide.mountsPage.firstBody':
-    "Yiğit Küheylan, dünyada herhangi bir yerde satılan tek binektir. Binicilik'i öğrendikten sonra Marla sana Yiğit Küheylan'ın dizginlerini 10 altına satar ve o dizginler senin olarak kalır. Diğer her binek dünyada kazanılır, bu yüzden neredeyse her binicinin başladığı yer bu attır.",
   'guide.mountsPage.firstHeading': 'İlk bineğin',
-  'guide.mountsPage.goodsBody':
-    "Bir binek bir eşyadır, bu da onu ekonominin taşıyabileceği bir şey yapar. Dizginleri çantalarında ya da bankanda durduğu sürece bir bineğe sahip olursun; bankadaki dizginler ise bineği senin yapmaya devam eder ama binmene izin vermez: yaratığı çağırmak için dizginleri üzerinde taşıman gerekir. Oyuncu dizginleri ruha bağlı değildir, bu yüzden eşyanın kendisi aksini söylemedikçe diğer her bulgu gibi takas edilir, postayla gönderilir ve Dünya Pazarı'nda listelenir. Bir bineği elden çıkarmadan önce bilinmeye değer iki şey vardır: hiçbir tüccar bir dizgin takımını asla geri satın almaz, bu yüzden bir binek nakde çevrilen değil, sakladığın ya da devrettiğin bir satın almadır; ve dizginler binekliyken hem çantalarından hem bankandan ayrılırsa, takas edilir, postalanır ya da pazarda satılırsa, binek de onlarla birlikte gider ve durduğun yerde inersin.",
   'guide.mountsPage.goodsHeading': 'Dizginler sıradan bir maldır',
   'guide.mountsPage.heading': 'Binekler ve binicilik',
-  'guide.mountsPage.intro':
-    'Bir binek, dünyada daha hızlı ilerlemenin bir yoludur, hepsi bu kadar. Binmeyi ahırda öğrenirsin, ilk dizginlerini satın alırsın, ve ondan sonraki her yol kısalır.',
-  'guide.mountsPage.learnBody':
-    "Binicilik bir kez satın aldığın bir yetenektir ve seviye {level}'de açılır. Ahır Ustası Marla Hitchen, kırlardaki Fırtına Sırtı Ahırları'nı işletir ve Binicilik Eğitimi'ni 80 altına satar. Seni bir bineğe oturtan tek satın alma budur ve kalıcı olarak seninle kalır.\n\nOna sahip olduğunda Marla'nın senin için bir görevi vardır: Binicilik Dersleri. Görevi al, işareti başlangıç kemerinin arkasındaki parlayan kareye kadar takip et ve Yarışı Başlat'a bas. Ders için sana eğitim amaçlı bir Yiğit Küheylan ödünç verir, bu yüzden dersin kendisi sana hiçbir şeye mal olmaz. Parkuru koş, bitir ve altınların ile tecrüben için ona geri dön. Ödünç verilen küheylan dersten sonra ahıra geri döner, bu yüzden ders sana bir at vermek yerine eyerde durmayı öğretir.",
   'guide.mountsPage.learnHeading': 'Binmeyi öğrenmek',
   'guide.mountsPage.raceBody':
     "Marla'nın padoğundaki engel atlama parkuru, yalnızca ders sırasında değil, herkese her zaman açıktır. Bir bineğe bin, kemerin arkasındaki parlayan karenin üzerinde dur ve Yarışı Başlat'a bas. Bir geri sayım seni sabit tutar, sonra saat işlemeye başlar: yedi atlayışın hepsini geç ve süre dolmadan kemerden geri çık.\n\nBir atlayış yalnızca gerçekten çitin üzerinde havadaysan sayılır, bu yüzden kolay bir geçiş hiçbir şey saydırmaz. Onları istediğin sırayla ve her iki yandan da alabilirsin, ve kaçırdığın biri dünyanın sonu değildir: geri dön ve tekrar dene. Ölmek, inmek ya da padoktan ayrılmak denemeyi bitirir, süresinin dolmasına izin vermek de öyle; bu seni bulunduğun yerde eyerden indirir, kendin iptal etmek ise yalnızca saati durdurur. Hiçbir şey yeni bir tane başlatmanı engellemez. Ne ücret, ne bekleme süresi, ne de sürenin kendisi dışında bir ödül vardır, ve istediğin kadar binici parkuru aynı anda birbirinin yoluna çıkmadan koşabilir.",
   'guide.mountsPage.raceHeading': 'Ahır yarışı',
-  'guide.mountsPage.rideBody':
-    "Bir binek penceresi ya da ayarlanacak bir favori yoktur, çünkü binek dizginlerin kendisidir. Çantalarındaki ya da bir eylem çubuğu yuvasındaki bir dizgin takımını kullan, o bineğe binersin. Çağırma bir an sürer, anında değil kısa bir çağrıdır, bu yüzden seni kötü bir çekmeden kurtarmaz. İnmek ise anındadır ve hiçbir zaman engellenmez.\n\nZaten bindiğin dizginleri kullanırsan o bineği geri koyarsın. Binekliyken farklı bir takım kullanırsan arada hiçbir şey çağırmadan doğrudan ona geçersin. Bin / İn tuşu, varsayılan olarak ters tırnak (`) tuşu, seni yalnızca indirir: bu aşağı inme yoludur, yukarı çıkma yolu değil. Tek istisna binicilik dersidir; orada aynı tuş, Marla'nın sana ödünç verdiği küheylanı çağırır, çünkü ödünç bir atın tıklanacak dizgini yoktur. Telefon ya da tablette, Daha Fazla tepsisindeki Bin düğmesi her iki yönde de çalışır, ama seçtiğin bir dizgin yerine çantandaki ilk dizgin takımını çağırır, bu yüzden belirli bir bineği istediğinde dizginlerin kendisine dokun.",
   'guide.mountsPage.rideHeading': 'Binmek ve inmek',
-  'guide.mountsPage.speedBody':
-    "Hız, bir bineği diğerinden ayıran tek şeydir. Marla'dan satın aldığın Yiğit Küheylan temel hızı belirler, dünyada topladığın binekler ise onun üzerine çıkar: dizginler ne kadar nadirse, biniş o kadar hızlıdır, düz bir kayma yerine birkaç belirgin basamakla. Eğitilecek ikinci bir binicilik rütbesi yoktur ve sonradan satın alınacak bir yükseltme de yoktur. Binicilik için yalnızca bir kez ödersin, ondan sonra kullandığın dizginler ne kadar hızlı seyahat ettiğine karar verir.",
-  'guide.mountsPage.speedHeading': 'Hız ve kademeler',
-  'guide.mountsPage.whatBody':
-    'Bir binek, üzerine bindiğin bir yaratıktır ve sana verdiği tek şey hızdır. Zırh yok, hasar yok, nitelik yok: seni yerde daha hızlı taşır, zıpladığında biraz daha yükseğe sıçratır, ve anlaşmanın tamamı budur. Oyundaki her binek bir kara bineğidir, bu yüzden uçma yoktur ve hiçbiri yüzmez.',
   'guide.mountsPage.whatHeading': 'Bir binek nedir',
   'guide.mountsPage.whereBody':
     'Fırtına Sırtı Ahırları, Fırtına Sırtı haritasında, Uçurum ile Enkaz Tarlaları arasındaki kırlarda işaretlidir. Marla ahırın yanında, yarış sahasına bakar şekilde durur.',
@@ -4021,8 +4006,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Yarıklar, tavanın kendisini bekleyen tek şeydir. Diyarlarda kendi programlarına göre yırtılıp açılırlar, C'den S'ye kadar derecelendirilirler, ve dünyadaki her grup her birini kapatan taraf olmak için yarışır. Mağara panoları da işlemeye devam eder, ve teçhizatın yetiştiğinde onların daha zor kademesine bir kez daha bakmaya değer.",
   'guide.progression.journeyBodyCount':
     'Dünya, {zones} bölgeden oluşan tek bir kesintisiz topraktır. Bunlardan üçü, güneyden kuzeye uzanan, seviye atladığın yoldur, her biri bir basamak daha yüksektir: yeşil vadide başlar, bataklığı aşarak ilerler ve soğuk yüce zirvelerde bitirirsin. Görev izini takip et, toprak seni birinden diğerine taşır. Vadi kıyısının açığında erken seviyeler için bir ada durur, ve diyarların geri kalanı aynı yoldan açılır, zaten bu tırmanışı tamamlamış karakterler için inşa edilmiştir.',
-  'guide.progression.ridingBody':
-    "Binicilik, tırmanışın sonunda seni bekleyen şeylerden biridir. Seviye {level}'de bir ahır ustası sana bu yeteneği ciddi bir miktar altın karşılığında öğretir, ve eğitim parkurundaki bir ders sana ilk dizginlerini kazandırır. Bir binek hiçbir güç vermez; sadece dünyayı küçültür, ki bu da kuzeye uzun bir yürüyüşten sonra kendi başına bir ödüldür.",
   'guide.progression.ridingTitle': 'Binmeyi öğrenmek',
   'guide.questsPage.availableBody':
     "Görevler zincirler halinde gelir. Çoğu ancak kendinden öncekini teslim ettikten sonra sunulur, ve birçoğu ayrıca bir asgari seviye ister, bu yüzden bugün sana verecek bir şeyi olmayan bir NPC'nin birkaç seviye sonra ya da zaten taşıdığın görevi kapattığında bolca işi olabilir. Birkaçının, binicilik becerisini satın aldıktan sonra ancak açılan binicilik dersleri gibi kendi koşulu vardır. Grup görevleri, kaç oyuncu getirmeni önerdiklerini baştan listeleyerek bunu belirtir. Bazı işler tekrarlanabilir: bir bekleyişten sonra onları yeniden alabilirsin, ve verenin üzerindeki işaret bir tanesinin ne zaman geri geldiğini gösterir.",
@@ -16145,8 +16128,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mountRace.toFinish': 'Kemerden geri dön!',
   'hudChrome.mountTraining.begin': 'Derse Başla',
   'hudChrome.mountTraining.mountPrompt': 'Eğitim Yiğit Küheylanına binmek için {key} tuşuna bas.',
-  'hudChrome.mountTraining.ownedMountPrompt':
-    'Dizginlerin çantalarında. Binmek için onları kullan.',
   'hudChrome.mountTraining.returnToMarla':
     "Yiğit Küheylan dizginlerini 10 altına satın almak için ahırdaki Marla'ya dön.",
   'hudChrome.mountTraining.ridePrompt':
@@ -16156,18 +16137,12 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.close': 'Kapat',
   'hudChrome.mounts.desc_aether_hover_cycle':
     'Savaşta hızlı, alçaktan süzülerek hareket etmek için tasarlanmış güçlü bir büyü-teknoloji motosikleti.',
-  'hudChrome.mounts.desc_grag_bear':
-    'Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir ayı.',
   'hudChrome.mounts.desc_shadowjump_toad':
     'Her arazi türünü aşan, şimşek hızındaki gölgeli sıçramalarla eğitilmiş, dev ve sağlam adımlı bir kurbağa.',
-  'hudChrome.mounts.desc_stalkglider_snail':
-    'Gelişmiş seyahat hızı sağlayan, dayanıklı ve yavaş yanan bir salyangoz.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Rün nallı pençeleriyle yerde süzülen, kanatları katlı, asil bir fırtına grifonu.',
   'hudChrome.mounts.desc_thunderstrut_gobbler':
     "Uyanan Zirve'den kabararak inen, kuyruğu bir fırtına bulutu gibi açılmış devasa bir fırtına hindisi.",
-  'hudChrome.mounts.desc_valorsteed':
-    'Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir küheylan.',
   'hudChrome.mounts.dismount': 'İn',
   'hudChrome.mounts.emptyDropHint':
     'Daha nadir binekler, kahramanca zindan patronlarından ve Yarık tamamlamalarından düşer.',
@@ -16190,7 +16165,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.selected': 'Seçildi',
   'hudChrome.mounts.spec_speed': '+{pct}% ekstra hareket kabiliyeti',
   'hudChrome.mounts.title': 'Binekler',
-  'hudChrome.mounts.useToRide': 'Bu bineği çağırmak için kullan.',
   'hudChrome.unstuck.alreadyActive': 'Kurtulma zaten geri sayıyor.',
   'hudChrome.unstuck.alreadySafe': 'Zaten güvenli ve ulaşılabilir bir konumdasın.',
   'hudChrome.unstuck.busy': 'Kurtulmayı kullanmadan önce mevcut eylemini bitir.',
@@ -18389,10 +18363,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.mechEmpty': 'Henüz Combat Mech renk varyantın yok.',
   'hudChrome.cosmetics.mechIntro':
     'Combat Mech bu karakterin bedeninin yerini alır. Aynı anda bir renk varyantı giyilir.',
-  'hudChrome.cosmetics.mountsIntro':
-    'Binek görünümü, bu karakterin bindiği bineğin üzerine çizilir. Hızı asla değiştirmez.',
-  'hudChrome.cosmetics.mountsNoMount':
-    'Önce bir binek edin: görünümün üzerine uygulanacağı bir binek gerekir.',
   'hudChrome.cosmetics.owned': 'Sahip olunan',
   'hudChrome.cosmetics.scopeAccount': 'Hesap',
   'hudChrome.cosmetics.scopeCharacter': 'Karakter',

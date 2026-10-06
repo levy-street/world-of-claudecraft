@@ -4,7 +4,11 @@
 // supplies the skins themselves (model and rarity) and the apply rules
 // decide which skins the player can attach right now. DOM-free and unit-tested.
 
-import { MOUNT_SKIN_IDS, type MountSkinId } from '../sim/content/mount_skins';
+import {
+  isStoreMountSkinId,
+  MOUNT_SKIN_IDS,
+  type StoreMountSkinId,
+} from '../sim/content/mount_skins';
 import {
   eligibleClassesForWeaponSkinType,
   skinnableWeaponTypesFor,
@@ -133,7 +137,7 @@ export function buildArmorySections(
 export interface StoreMountRow {
   /** The mount skin id, which is also the kind 'skin' economy SKU item id. */
   itemId: string;
-  skinId: MountSkinId;
+  skinId: StoreMountSkinId;
   /** Claudium cost from the economy service, or null when the SKU is unavailable. */
   costClaudium: number | null;
   /** The economy service has this SKU with a valid price, so Buy can succeed. */
@@ -148,7 +152,9 @@ export interface StoreMountRow {
 export const MOUNT_SKIN_ART_DIR = '/ui/store/mount_skins';
 
 export function mountSkinArt(skinId: string): string {
-  return `${MOUNT_SKIN_ART_DIR}/${skinId}.webp`;
+  return isStoreMountSkinId(skinId)
+    ? `${MOUNT_SKIN_ART_DIR}/${skinId}.webp`
+    : `/ui/items/reins_${skinId}.webp`;
 }
 
 /** Rows for the store's Machine Stable section: every catalog mount skin

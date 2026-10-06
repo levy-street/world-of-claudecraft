@@ -7,7 +7,7 @@
 // for a reins item and the cast bar's summon line. Neither is a picker, and
 // neither should have to import one.
 
-import { MOUNT_SKINS, type MountSkinId } from '../sim/content/mount_skins';
+import { mountSkinDef } from '../sim/content/mount_skins';
 import { MOUNTS } from '../sim/content/mounts';
 import { type TranslationKey, t } from './i18n';
 
@@ -56,14 +56,16 @@ export function mountDisplayName(key: string): string {
 // be catalog mounts (the Mech Bird, the Chimeglass Tortoise, the Bonebound
 // Rickshaw) keep the hudChrome.mounts.name_*/desc_* keys they shipped with, so
 // no locale row moves; a brand-new skin adds its pair here.
-export const MOUNT_SKIN_NAME_KEYS: Record<MountSkinId, TranslationKey> = {
+export const MOUNT_SKIN_NAME_KEYS: Record<string, TranslationKey> = {
+  ...MOUNT_NAME_KEYS,
   mech_bird: 'hudChrome.mounts.name_mech_bird',
   chimeglass_tortoise: 'hudChrome.mounts.name_chimeglass_tortoise',
   rickshaw_mount: 'hudChrome.mounts.name_rickshaw_mount',
   goblin_rocket_sled: 'hudChrome.mounts.name_goblin_rocket_sled',
 };
 
-export const MOUNT_SKIN_DESC_KEYS: Record<MountSkinId, TranslationKey> = {
+export const MOUNT_SKIN_DESC_KEYS: Record<string, TranslationKey> = {
+  ...MOUNT_DESC_KEYS,
   mech_bird: 'hudChrome.mounts.desc_mech_bird',
   chimeglass_tortoise: 'hudChrome.mounts.desc_chimeglass_tortoise',
   rickshaw_mount: 'hudChrome.mounts.desc_rickshaw_mount',
@@ -74,9 +76,7 @@ export const MOUNT_SKIN_DESC_KEYS: Record<MountSkinId, TranslationKey> = {
  *  and finally the raw id so an unmapped skin can never render blank. */
 export function mountSkinDisplayName(id: string): string {
   const nameKey = (MOUNT_SKIN_NAME_KEYS as Record<string, TranslationKey | undefined>)[id];
-  return nameKey
-    ? t(nameKey)
-    : ((MOUNT_SKINS as Record<string, { name: string } | undefined>)[id]?.name ?? id);
+  return nameKey ? t(nameKey) : (mountSkinDef(id)?.name ?? id);
 }
 
 /** The localized mount-skin flavor line ('' for an unmapped id). */

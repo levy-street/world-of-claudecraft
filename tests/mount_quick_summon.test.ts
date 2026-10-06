@@ -10,18 +10,16 @@ describe('mobileMountAction (mobile Mount/Dismount quick-access button)', () => 
     });
   });
 
-  it('summons the reins of the first owned mount when unmounted', () => {
+  it('uses the trained mount toggle without selecting a bagged cosmetic', () => {
     expect(mobileMountAction('', ['valorsteed'])).toEqual({
-      kind: 'summon',
-      itemId: 'reins_valorsteed',
+      kind: 'fallback',
     });
   });
 
-  it('picks the first entry in catalog order when several mounts are owned, never a later one', () => {
+  it('preserves the selected cosmetic when several reins are bagged', () => {
     const owned: MountKey[] = ['grag_bear', 'valorsteed'];
     expect(mobileMountAction('', owned)).toEqual({
-      kind: 'summon',
-      itemId: 'reins_grag_bear',
+      kind: 'fallback',
     });
   });
 

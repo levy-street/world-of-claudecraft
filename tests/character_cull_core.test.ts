@@ -16,7 +16,7 @@ import {
   skinnedCullSphereRadius,
 } from '../src/render/character_cull_core';
 import { applySkinnedCullBounds } from '../src/render/characters/skinned_cull_bounds';
-import { MOUNTS } from '../src/sim/content/mounts';
+import { ridingMoveSpeedPct } from '../src/sim/riding_training';
 import { RUN_SPEED } from '../src/sim/types';
 
 const RIG_HEIGHT = 1.8;
@@ -135,12 +135,12 @@ describe('character cull: the colour pass', () => {
     expect(bits(p, 0, edge + CHARACTER_CULL_MARGIN * 4, -20) & CHARACTER_CULL_DRAWS).toBe(0);
   });
 
-  it('derives the margin from the run speed and the best mount in the catalog', () => {
-    const bestMount = Math.max(...Object.values(MOUNTS).map((m) => m.moveSpeedPct));
+  it('covers advanced riding speed independent of the cosmetic catalog', () => {
+    const bestMount = ridingMoveSpeedPct(2);
     expect(bestMount).toBeGreaterThan(0);
     // One yard of animation drift plus one 20 fps frame at mounted run speed.
     expect(CHARACTER_CULL_MARGIN).toBeCloseTo(1 + (RUN_SPEED * (1 + bestMount)) / 20, 10);
-    expect(CHARACTER_CULL_MARGIN).toBeCloseTo(1.63, 10);
+    expect(CHARACTER_CULL_MARGIN).toBeCloseTo(1.7, 10);
   });
 
   it('grows the sphere with the entity scale, not just the authored height', () => {

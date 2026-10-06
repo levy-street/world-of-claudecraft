@@ -198,3 +198,24 @@ describe('Guide route rendering', () => {
     }
   });
 });
+
+describe('mount guide follows character training and revocable cosmetics', () => {
+  it('renders the current training speeds and account item ownership without old rarity-speed claims', () => {
+    setLanguage('en');
+    const html = pageFor('mounts')!.render({
+      params: [],
+      sub: 'mounts',
+      titleKey: 'guide.nav.mounts',
+    });
+    expect(html).toContain('70% faster mounted movement');
+    expect(html).toContain('100% faster mounted movement');
+    expect(html).toContain('1,000 gold');
+    expect(html).toContain('any character');
+    expect(html).toContain('personal bank');
+    expect(html).toContain('removes the appearance from Cosmetics');
+    expect(html).toContain('stays mounted at their trained speed');
+    expect(html).toContain('sold to a merchant for 10 gold');
+    expect(html).not.toContain('the rarer the reins, the quicker the ride');
+    expect(html).not.toContain('There is no second rank');
+  });
+});

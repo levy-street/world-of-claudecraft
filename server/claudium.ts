@@ -14,7 +14,7 @@
 // until the legacy ladder is removed.
 
 import type * as http from 'node:http';
-import { isMountSkinId } from '../src/sim/content/mount_skins';
+import { isStoreMountSkinId } from '../src/sim/content/mount_skins';
 import { isKnownStorageSkuId } from '../src/sim/content/storage_charters';
 import { WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import {
@@ -188,7 +188,7 @@ function noteWeaponSkinGrants(accountId: number, skinIds: string[]): void {
 }
 
 function noteMountSkinGrants(accountId: number, skinIds: string[]): void {
-  const known = skinIds.filter(isMountSkinId);
+  const known = skinIds.filter(isStoreMountSkinId);
   if (known.length === 0) return;
   if (claudiumRuntime) {
     claudiumRuntime.grantMountSkins(accountId, known);
@@ -203,7 +203,7 @@ function noteMountSkinGrants(accountId: number, skinIds: string[]): void {
 /** The kind 'skin' allowlist: a weapon skin OR a mount skin, two disjoint
  *  registries behind one SKU family (docs/claudium-store.md). */
 function isKnownSkinSkuId(itemId: string): boolean {
-  return isKnownWeaponSkinId(itemId) || isMountSkinId(itemId);
+  return isKnownWeaponSkinId(itemId) || isStoreMountSkinId(itemId);
 }
 
 export async function handleClaudiumStripeWebhook(
@@ -306,7 +306,7 @@ export async function handleClaudiumApi(
     // entitlement table even if the service ever set the flag on one: the
     // filter just above admits a row only under its OWN family's registry, and
     // noteWeaponSkinGrants / noteMountSkinGrants re-filter their input through
-    // isKnownWeaponSkinId / isMountSkinId. Reaching either would take an id
+    // isKnownWeaponSkinId / isStoreMountSkinId. Reaching either would take an id
     // carried by two registries, and all three are disjoint
     // (tests/server/storage_gates.test.ts pins the tampered owned:true storage
     // row never reaching the mirror). The two skin mirrors receive the SAME

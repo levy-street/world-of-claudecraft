@@ -1,35 +1,17 @@
 import { gliderActionsLocked } from './glider_action_lock';
 import { shadowActionsLocked } from './shadow_action_lock';
-// Rideable ground mounts: collection + mount/dismount rules, a sibling sim
-// system behind the SimContext seam (module-first; sim.ts keeps thin delegates).
-//
-// Collection model: EVERY catalog mount is owned while its reins item (ItemDef
-// kind 'mount') sits in the player's bags or bank. Player reins are NOT
-// soulbound: ownership travels with the item, so a reins can be traded,
-// mailed, or listed away (and the mount with it). The horse (DEFAULT_MOUNT)
-// is no longer free: it has its own reins item too, sold by the stablemaster,
-// so a fresh player owns nothing until they buy or loot a mount.
-// There is NO persisted "selected mount": reins are usable items, so you ride by
-// using the reins (summonMountItem, reached through items.ts useItem) and the
-// item you clicked IS the choice. The live "riding X right now" state is
-// Entity.mountKey ('' dismounted), which the wire mirrors like `skin` so every
-// host (renderer, other clients, the online self extrapolator) reads the same
-// field the speed hook uses.
-//
-// Summoning is not instant: mounting channels a short summon (updateMountTransition,
-// driven per tick and interruptible by combat or water). DISMOUNTING is instant
-// from every path, with no channel at all. Swapping straight from one mount to
-// another is instant too: there is nothing to put away. Rules: summoning requires
-// the riding skill FIRST, then ownership, and is blocked inside a Thornhollow
-// Fields match (every state) and while in combat, dead, or a released spirit;
-// dismounting is never gated; death and water force-dismount instantly. There is
-// no per-mount level gate. Every mount is a ground mount, no flying: nothing here
-// touches the vertical axis.
-//
-// `src/sim`-pure and rng-free.
+// Ground riding rules, shared by all hosts. Riding training owns speed and
+// access; reins only provide a revocable cosmetic appearance. The keybind
+// summons a neutral trained mount wearing the selected mount skin.
 
 import { normalizeMountSkinId } from './content/mount_skins';
-import { MOUNT_KEYS, type MountKey, mountDef, TRAINING_MOUNT_KEY } from './content/mounts';
+import {
+  DEFAULT_MOUNT,
+  MOUNT_KEYS,
+  type MountKey,
+  mountDef,
+  TRAINING_MOUNT_KEY,
+} from './content/mounts';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
 import { onShipDeck } from './ship_deck_presence';
@@ -45,12 +27,9 @@ import { hasWorldQuestDeliveryCargo } from './world_quest_delivery';
 // instant from every path (forceDismount), so there is no matching constant.
 export const MOUNT_SUMMON_SECONDS = 1.5;
 
-// Cadence (in ticks) of the while-mounted ownership re-validation in
-// updateMountTransition. The check is two container scans per mounted player,
-// so it runs on an id-staggered cadence instead of every tick; the worst-case
-// dismount delay (MOUNT_OWNERSHIP_REVALIDATE_TICKS ticks, 200ms) is
-// unobservable next to the 1.5s summon channel. tickCount and entity ids are
-// identical on every host, so the stagger is deterministic.
+// Cosmetic ownership re-validation cadence. Online reads the host's bounded
+// account projection; offline scans the acting character's bags and bank.
+// Tick/entity staggering is deterministic and draws no rng.
 export const MOUNT_OWNERSHIP_REVALIDATE_TICKS = 4;
 
 // The reins itemId per catalog mount, derived once from the merged ITEMS table
@@ -78,6 +57,7 @@ export function mountItemId(key: string): string | null {
  *  never owned. A fresh player owns nothing. */
 export function mountOwned(meta: PlayerMeta, key: string): boolean {
   if (!mountDef(key)) return false;
+  if (meta.accountMountSkinIds !== undefined) return meta.accountMountSkinIds.includes(key);
   const itemId = mountItemId(key);
   if (!itemId) return false;
   return (
@@ -98,24 +78,16 @@ function collectMountKeys(slots: readonly { itemId: string }[]): MountKey[] {
   return MOUNT_KEYS.filter((key) => owned.has(key));
 }
 
-/** The owned subset of the catalog, in catalog order. Empty for a fresh player.
- *  Single pass over bags + bank: the server rebuilds this per snapshot, so it
- *  never scans the containers once per catalog mount. */
+/** Online uses the host's authoritative account item projection. Offline
+ * derives ownership from the acting character's bags and bank. */
 export function ownedMounts(meta: PlayerMeta): MountKey[] {
+  if (meta.accountMountSkinIds !== undefined) {
+    return MOUNT_KEYS.filter((key) => meta.accountMountSkinIds!.includes(key));
+  }
   return collectMountKeys([...meta.inventory, ...meta.bank.inventory]);
 }
 
-/** The owned subset of the catalog whose reins are in BAGS right now (never
- *  the bank), in catalog order. `summonMountItem` (routed through
- *  `IWorldInventory.useItem`) can only click a bagged item: `useItem` gates on
- *  `Sim.countItem`, which is bags-only by design (a bank withdrawal is a
- *  separate, deliberate step). A picker built from the wider `ownedMounts()`
- *  (bags + bank) can therefore hand `useItem` an itemId it will refuse with
- *  "You don't have that item.", or skip past a bagged mount that sorts after
- *  a bank-only one in catalog order. Callers that must resolve an itemId to
- *  actually SUMMON (the mobile quick-action button; `mount_quick_summon.ts`)
- *  use this instead of `ownedMounts()`; a picker that only ever DISPLAYS the
- *  collection (the Mounts window) still wants the wider bags+bank list. */
+/** Local bag-only reins subset, retained for item-based consumers. */
 export function bagOwnedMounts(inventory: readonly { itemId: string }[]): MountKey[] {
   return collectMountKeys(inventory);
 }
@@ -245,6 +217,8 @@ export function setMountSkin(ctx: SimContext, pid: number, skinId: string | null
   if (skinId !== null && next === null) return false;
   meta.mountSkinId = next;
   e.mountSkinId = next;
+  if (next === null && e.mountKey) e.mountKey = DEFAULT_MOUNT;
+  if (next === null && e.mountCastKey) e.mountCastKey = DEFAULT_MOUNT;
   return true;
 }
 
@@ -261,7 +235,7 @@ export function summonMountItem(ctx: SimContext, pid: number, key: string): bool
   const def = mountDef(key);
   if (!def) return false;
   // Clicking the reins you are currently riding puts the mount away.
-  if (e.mountKey === def.key) {
+  if (e.mountKey && (e.mountSkinId ?? e.mountKey) === def.key) {
     forceDismount(ctx, e);
     return true;
   }
@@ -299,6 +273,11 @@ export function summonMountItem(ctx: SimContext, pid: number, key: string): bool
     ctx.error(pid, ABOARD_SHIP_MSG);
     return false;
   }
+  if (isNonSpellCast(e.castingAbility)) {
+    ctx.error(pid, 'You are busy.');
+    return false;
+  }
+  setMountSkin(ctx, pid, def.key);
   // Swapping between mounts is instant: the player is already mounted, so there
   // is nothing to summon, only a model to change.
   if (e.mountKey) {
@@ -314,14 +293,8 @@ export function summonMountItem(ctx: SimContext, pid: number, key: string): bool
   return true;
 }
 
-/** The Mount/Dismount keybind. It has exactly two jobs now that reins are items:
- *  dismount INSTANTLY when riding (never gated, no channel), and summon the
- *  LESSON steed while a riding lesson is in progress, which is the one mount a
- *  player can ride without owning it and therefore the one with no reins to
- *  click. Summoning a mount you own is not here: that is summonMountItem, driven
- *  by useItem. An unmounted press outside a lesson deliberately does nothing, so
- *  no implicit "selected mount" can grow back. Returns true when it dismounted or
- *  started the lesson summon, false otherwise. */
+/** Summon the trained ride with the selected cosmetic, or dismount instantly.
+ * The riding lesson lends the same neutral mount before training is complete. */
 export function toggleMount(ctx: SimContext, pid: number): boolean {
   const meta = ctx.players.get(pid);
   const e = ctx.entities.get(pid);
@@ -348,58 +321,36 @@ export function toggleMount(ctx: SimContext, pid: number): boolean {
     ctx.error(pid, RIDING_UNTRAINED_MSG);
     return false;
   }
-  // Riding-lesson tutorial: while a lesson is in progress the Mount/Dismount
-  // toggle summons the training Valorsteed even though it is UNOWNED (teaching the
-  // Z keybind is the whole point). Runs the normal summon channel; it never touches
-  // the persisted pick and skips the ownership/level gates (begin already required
-  // level 20). Combat/water still cancel the channel via updateMountTransition.
-  if (meta.mountTraining?.state === 'IN_PROGRESS') {
-    // Same standing battleground rule, same position in the order as
-    // summonMountItem: the lesson steed is still a mount, and a lesson left
-    // running when the queue popped must not become a way to ride the field.
-    if (bgInMatch(ctx, pid)) {
-      ctx.error(pid, IN_BATTLEGROUND_MSG);
-      return false;
-    }
-    if (hasWorldQuestDeliveryCargo(e)) {
-      ctx.error(pid, CARRYING_FREIGHT_MSG);
-      return false;
-    }
-    if (e.dead || e.ghost) return false;
-    if (e.inCombat) {
-      ctx.error(pid, "You can't do that while in combat.");
-      return false;
-    }
-    if (onShipDeck(ctx, e)) {
-      ctx.error(pid, ABOARD_SHIP_MSG);
-      return false;
-    }
-    // The profession-cast interlock's third route: the lesson summon is the
-    // one mount path that skips useItem (no reins exist for the training
-    // steed), so it carries the busy refusal the reins click gets for free.
-    if (isNonSpellCast(e.castingAbility)) {
-      ctx.error(pid, 'You are busy.');
-      return false;
-    }
-    cancelFormsAndGhostWolf(ctx, e);
-    e.mountCastRemaining = MOUNT_SUMMON_SECONDS;
-    e.mountCastKey = TRAINING_MOUNT_KEY;
-    return true;
+  if (bgInMatch(ctx, pid)) {
+    ctx.error(pid, IN_BATTLEGROUND_MSG);
+    return false;
   }
-  // Summoning your OWN mount is not a keybind action any more: reins are items,
-  // so you ride by clicking the reins (bags or an action-bar slot), which routes
-  // to summonMountItem. There is deliberately no "selected mount" to fall back
-  // on, so an unmounted press outside a lesson does nothing.
-  return false;
+  if (hasWorldQuestDeliveryCargo(e)) {
+    ctx.error(pid, CARRYING_FREIGHT_MSG);
+    return false;
+  }
+  if (e.dead || e.ghost) return false;
+  if (e.inCombat) {
+    ctx.error(pid, "You can't do that while in combat.");
+    return false;
+  }
+  if (onShipDeck(ctx, e)) {
+    ctx.error(pid, ABOARD_SHIP_MSG);
+    return false;
+  }
+  if (isNonSpellCast(e.castingAbility)) {
+    ctx.error(pid, 'You are busy.');
+    return false;
+  }
+  cancelFormsAndGhostWolf(ctx, e);
+  e.mountCastRemaining = MOUNT_SUMMON_SECONDS;
+  e.mountCastKey = DEFAULT_MOUNT;
+  return true;
 }
 
-/** Per-tick driver for the mount summon/dismount channel (called from the
- *  coordinator's per-player loop). `swimming` is whether the entity is in
- *  fishable/deep water this tick. Water and death force an instant dismount;
- *  losing the reins dismounts too (ownership is re-validated while mounted,
- *  on a short deterministic stagger); a summon channel cancels on entering
- *  combat or water; a finished channel applies the mount (re-validating
- *  ownership) or the dismount. */
+/** Advance the summon channel and revoke unavailable collectible appearances.
+ * Water dismounts instantly; combat/water cancel a summon. Riding access and
+ * speed remain trained character state when a collectible item disappears. */
 export function updateMountTransition(ctx: SimContext, e: Entity, swimming: boolean): void {
   const meta = ctx.players.get(e.id);
   // (a) Water force-dismounts instantly: no ground mount swims. Also clears any
@@ -411,21 +362,16 @@ export function updateMountTransition(ctx: SimContext, e: Entity, swimming: bool
     if (meta) recalcFor(ctx, e, meta);
     return;
   }
-  // (a2) Ownership re-validation while mounted. Reins are transferable items,
-  // so the ridden mount can leave the player's possession mid-ride (traded,
-  // mailed, listed, deposited): the ride must follow the item, or one reins
-  // could keep a chain of players mounted. The lent training steed is the one
-  // sanctioned unowned ride. Draws no rng (a pure bags+bank scan), and the
-  // id-staggered cadence keeps the per-tick cost flat across mounted players.
+  // Only the cosmetic follows the item. Losing reins never removes training
+  // or dismounts a character; the neutral trained ride remains available.
   if (
-    e.mountKey &&
     meta &&
+    e.mountSkinId &&
+    mountDef(e.mountSkinId) &&
     ctx.tickCount % MOUNT_OWNERSHIP_REVALIDATE_TICKS === e.id % MOUNT_OWNERSHIP_REVALIDATE_TICKS &&
-    !mountOwned(meta, e.mountKey) &&
-    !trainingSummon(meta, e.mountKey)
+    !mountOwned(meta, e.mountSkinId)
   ) {
-    forceDismount(ctx, e);
-    return;
+    setMountSkin(ctx, e.id, null);
   }
   // (b) Advance an in-flight summon/dismount channel.
   if ((e.mountCastRemaining ?? 0) > 0) {
@@ -444,7 +390,7 @@ export function updateMountTransition(ctx: SimContext, e: Entity, swimming: bool
       } else if (
         mountDef(target) &&
         meta &&
-        (mountOwned(meta, target) || trainingSummon(meta, target)) &&
+        (meta.ridingTrained || trainingSummon(meta, target)) &&
         // a channel that ends on a ship's deck lapses (the summon was refused
         // aboard; this covers one finished standing on the gangway's lip)
         !onShipDeck(ctx, e)
@@ -453,7 +399,10 @@ export function updateMountTransition(ctx: SimContext, e: Entity, swimming: bool
         // shapeshifts cast while channeling), so the player is never
         // simultaneously mounted and shapeshifted at completion.
         cancelFormsAndGhostWolf(ctx, e);
-        e.mountKey = target;
+        if (e.mountSkinId && mountDef(e.mountSkinId) && !mountOwned(meta, e.mountSkinId)) {
+          setMountSkin(ctx, e.id, null);
+        }
+        e.mountKey = e.mountSkinId ? target : DEFAULT_MOUNT;
       }
       // A summon whose reins vanished mid-channel leaves the player unmounted.
       e.mountCastRemaining = 0;

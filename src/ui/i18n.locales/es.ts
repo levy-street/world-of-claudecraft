@@ -3845,29 +3845,14 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.mountsPage.collectBody':
     'Más allá del mostrador de Marla, las riendas se encuentran, no se compran. Salen de los últimos jefes de las mazmorras de cinco jugadores y de la banda en heroico, y de brechas despejadas, donde cuanto más difícil sea la brecha que termines, más raras pueden ser las riendas que deje. Son hallazgos raros a propósito y ninguna partida promete una, así que la forma sensata de cazar una montura es llevar esa caza de fondo en las partidas que ibas a hacer de todos modos. Esta página no te dirá qué montura cuelga de qué jefe: esa parte te toca descubrirla a ti.',
   'guide.mountsPage.collectHeading': 'De dónde vienen las monturas más raras',
-  'guide.mountsPage.firstBody':
-    'El Corcel del Valor es la única montura que se vende en cualquier parte del mundo. En cuanto hayas aprendido Equitación, Marla te venderá las Riendas del Corcel del Valor por 10 de oro, y esas riendas son tuyas para quedártelas. Cualquier otra montura se gana ahí fuera, en el mundo, así que el caballo es donde empieza casi cualquier jinete.',
   'guide.mountsPage.firstHeading': 'Tu primera montura',
-  'guide.mountsPage.goodsBody':
-    'Una montura es un objeto, lo que la convierte en algo que la economía puede mover. Eres dueño de una montura mientras sus riendas estén en tus bolsas o en tu bóveda, aunque unas riendas guardadas en la bóveda mantienen la montura como tuya sin dejarte montarla: para invocar a la bestia tienes que llevar las riendas encima. Las riendas de jugador no llevan ningún vínculo, así que se intercambian, viajan por correo y se publican en el Mercado Mundial como cualquier otro hallazgo, salvo que el propio objeto diga lo contrario. Vale la pena saber dos cosas antes de desprenderte de una: ningún vendedor te recomprará jamás un par de riendas, así que una montura es una compra que conservas o regalas, no que conviertes en monedas, y si las riendas salen a la vez de tus bolsas y de tu bóveda mientras estás montado, ya sea porque las intercambias, las envías por correo o las vendes en el mercado, la montura se va con ellas y te deja de pie justo donde estés.',
   'guide.mountsPage.goodsHeading': 'Las riendas son bienes ordinarios',
   'guide.mountsPage.heading': 'Monturas y equitación',
-  'guide.mountsPage.intro':
-    'Una montura es una forma más rápida de cruzar el mundo, y no es más que eso. Aprendes a montar en los establos, compras tu primer par de riendas, y a partir de ahí cada camino se acorta.',
-  'guide.mountsPage.learnBody':
-    'La Equitación es una habilidad que compras una sola vez, y se desbloquea en el nivel {level}. Marla Hitchen, la caballeriza mayor, regenta los Establos del Galecrest en los páramos, y vende el Entrenamiento de Monta por 80 de oro. Esa única compra es lo que te permite montar, sin más, y la conservas para siempre.\n\nEn cuanto la tengas, Marla te ofrece una misión: Lecciones de equitación. Acéptala, sigue el marcador hasta el cuadrado brillante detrás del arco de salida, y pulsa Iniciar Carrera. Ella te presta un Corcel del Valor de entrenamiento para la lección, así que la lección en sí no te cuesta nada. Recorre el circuito, termínalo, y vuelve con ella a por tus monedas y tu experiencia. El corcel prestado vuelve al establo después, así que la lección te enseña a manejarte en la silla, en lugar de regalarte un caballo.',
   'guide.mountsPage.learnHeading': 'Aprender a montar',
   'guide.mountsPage.raceBody':
     'El circuito de salto en el corral de Marla está abierto para cualquiera, en cualquier momento, no solo durante la lección. Monta, ponte de pie sobre el cuadrado brillante detrás del arco, y pulsa Iniciar Carrera. Una cuenta atrás te mantiene inmóvil, y luego el cronómetro corre: supera los siete obstáculos y vuelve a cruzar el arco antes de que se acabe la arena.\n\nUn obstáculo solo cuenta si estás de verdad en el aire por encima de la barra, así que pasar por debajo sin saltar no despeja nada. Puedes tomarlos en cualquier orden y desde cualquiera de los dos lados, y fallar uno no es el fin del mundo: da la vuelta y vuelve a intentarlo. Morir, desmontar o salir del corral termina el intento, y lo mismo pasa si dejas que el cronómetro llegue a cero, lo que te baja de la silla justo donde estés; cancelarlo tú mismo solo detiene el cronómetro. Nada te impide empezar otro intento. No hay tarifa, ni tiempo de reutilización, ni más recompensa que el propio tiempo, y cualquier número de jinetes puede correr el circuito a la vez sin estorbarse entre sí.',
   'guide.mountsPage.raceHeading': 'La carrera de los establos',
-  'guide.mountsPage.rideBody':
-    'No hay ventana de monturas ni favorito que fijar, porque las riendas son la montura. Usa un par de riendas desde tus bolsas o desde una ranura de la barra de acción y montas esa montura. Invocarla lleva un instante, una llamada breve en vez de instantánea, así que no te salvará si atraes mal a un grupo de enemigos. Desmontar es instantáneo y nunca se bloquea.\n\nUsa las riendas que ya estás montando y guardas esa montura. Usa un par distinto mientras estás montado y cambias directamente a ella, sin nada que invocar por en medio. La tecla Montar / Desmontar, la tecla de acento grave (`) de forma predeterminada, solo sirve para bajarte: es el camino de bajada, no el de subida. La única excepción es la lección de equitación, donde esa misma tecla llama al corcel que te presta Marla, ya que un caballo prestado no tiene riendas que pulsar. En un teléfono o una tableta, el botón Monturas de la bandeja Más funciona en ambos sentidos, aunque llama al primer par de riendas que encuentre en tus bolsas en lugar de uno que elijas tú, así que toca las riendas mismas cuando quieras una montura concreta.',
   'guide.mountsPage.rideHeading': 'Montar y desmontar',
-  'guide.mountsPage.speedBody':
-    'La velocidad es lo único que diferencia una montura de otra. El Corcel del Valor que le compras a Marla marca el ritmo base, y las monturas que consigues por el mundo lo superan: cuanto más raras son las riendas, más rápida es la montura, en unos pocos escalones claros en vez de una progresión suave. No hay una segunda categoría de Equitación que entrenar ni una mejora que comprar después. Pagas la Equitación una sola vez, y desde ese momento las riendas que uses deciden lo rápido que viajas.',
-  'guide.mountsPage.speedHeading': 'Velocidad y niveles',
-  'guide.mountsPage.whatBody':
-    'Una montura es una bestia que cabalgas, y lo que te da es velocidad. Sin armadura, sin daño, sin características: te lleva por el terreno más rápido y salta un poco más alto cuando tú saltas, y ahí se acaba el trato. Toda montura del juego es una montura terrestre, así que no hay monturas voladoras, y ninguna de ellas nada.',
   'guide.mountsPage.whatHeading': 'Qué es una montura',
   'guide.mountsPage.whereBody':
     'Los Establos del Galecrest están marcados en el mapa de La Cresta del Vendaval, en los páramos entre el Shear y los Wreckfields. Marla está junto al establo, mirando hacia el corral de carreras.',
@@ -3904,8 +3889,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Las Brechas son lo único que espera hasta el propio límite de nivel. Se abren en los reinos según su propio calendario, clasificadas de la C a la S, y cada grupo del mundo corre por ser el que cierre cada una. Los tablones de Expediciones también siguen en marcha, y su dificultad Heroica merece otro vistazo en cuanto tu equipo se haya puesto a la altura.',
   'guide.progression.journeyBodyCount':
     'El mundo es una sola tierra continua de {zones} zonas. Tres de ellas son el camino en el que subes de nivel, dispuestas de sur a norte: empiezas en el verde valle, avanzas por la ciénaga y terminas en los fríos picos elevados. Sigue el rastro de misiones y la tierra te lleva de una a la siguiente. Una isla se asienta frente a la costa del valle para los primeros niveles, y el resto de los reinos se abren desde ese mismo camino, hechos para personajes que ya han completado el ascenso.',
-  'guide.progression.ridingBody':
-    'La Equitación es una de las cosas que esperan al final del ascenso. En el nivel {level}, una caballeriza mayor te enseñará la habilidad por una buena suma de oro, y una lección en el circuito de entrenamiento te consigue tu primer par de riendas. Una montura no otorga ningún poder; sin más, hace que el mundo se sienta más pequeño, lo cual, después de una larga caminata hacia el norte, es una recompensa en sí misma.',
   'guide.progression.ridingTitle': 'Aprender a montar',
   'guide.questsPage.availableBody':
     'Las misiones vienen en cadenas. La mayoría solo se ofrecen una vez que has entregado la anterior, y muchas piden también un nivel mínimo, así que un PNJ que hoy no tiene nada para ti puede tener bastante después de tus próximos niveles o en cuanto cierres la misión que ya llevas encima. Unas pocas tienen una condición propia, como las lecciones de equitación, que se abren solo después de haber comprado la habilidad de Equitación. Las misiones de grupo lo avisan desde el principio, indicando cuántos jugadores sugieren llevar. Algunas misiones son repetibles: puedes volver a aceptarlas tras una espera, y el marcador sobre quien te la dio avisa cuando alguna ha vuelto a estar disponible.',
@@ -14447,12 +14430,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_shadowjump_toad': 'Kama-Kage, el Sapo Saltasombras',
   'hudChrome.mounts.name_stormfeather_griffin': 'Plumatormenta Alcanzacielos',
   'hudChrome.mounts.name_thunderstrut_gobbler': 'Pavoneatruenos, el Gran Pavo',
-  'hudChrome.mounts.desc_valorsteed':
-    'Un corcel resistente y de paso firme que aumenta la velocidad de viaje.',
-  'hudChrome.mounts.desc_grag_bear':
-    'Un oso resistente y de paso firme que aumenta la velocidad de viaje.',
-  'hudChrome.mounts.desc_stalkglider_snail':
-    'Un caracol recio y de combustión lenta que aumenta la velocidad de viaje.',
   'hudChrome.mounts.desc_aether_hover_cycle':
     'Una potente moto magitecnológica diseñada para desplazamientos de combate veloces a baja altura.',
   'hudChrome.mounts.desc_shadowjump_toad':
@@ -14467,12 +14444,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.emptyDropHint':
     'Las monturas más raras las sueltan los jefes de mazmorras y bandas.',
   'hudChrome.mounts.clickManage': 'Haz clic para elegir tu montura',
-  'hudChrome.mounts.useToRide': 'Usar para invocar esta montura.',
   'hudChrome.mountTraining.begin': 'Comenzar Lección',
   'hudChrome.mountTraining.mountPrompt':
     'Pulsa {key} para montar el Corcel del Valor de entrenamiento.',
-  'hudChrome.mountTraining.ownedMountPrompt':
-    'Tus riendas están en tus bolsas. Úsalas para montar.',
   'hudChrome.mountTraining.returnToMarla':
     'Vuelve con Marla en los establos para comprar tus riendas del Corcel del Valor por 10po.',
   'hudChrome.mountTraining.ridePrompt':
@@ -18608,10 +18582,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.mechEmpty': 'Aún no tienes cromas de Mecano de combate.',
   'hudChrome.cosmetics.mechIntro':
     'El Mecano de combate reemplaza el cuerpo de este personaje. Solo se lleva un croma a la vez.',
-  'hudChrome.cosmetics.mountsIntro':
-    'Una apariencia de montura se dibuja sobre la montura que cabalgue este personaje. Nunca cambia la velocidad.',
-  'hudChrome.cosmetics.mountsNoMount':
-    'Consigue primero una montura: una apariencia necesita algo que montar.',
   'hudChrome.cosmetics.owned': 'En propiedad',
   'hudChrome.cosmetics.scopeAccount': 'Cuenta',
   'hudChrome.cosmetics.scopeCharacter': 'Personaje',

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
+import { ALL_MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import { MECH_CHROMAS } from '../src/sim/content/skins';
 import {
   COSMETICS_TABS,
@@ -44,7 +44,7 @@ describe('cosmetics tabs', () => {
 describe('mount skin cards', () => {
   it('lists every catalog skin in store order, unowned ones as store-only', () => {
     const cards = mountSkinCards(snap());
-    expect(cards.map((c) => c.id)).toEqual([...MOUNT_SKIN_IDS]);
+    expect(cards.map((c) => c.id)).toEqual([...ALL_MOUNT_SKIN_IDS]);
     for (const card of cards) {
       expect(card.owned).toBe(false);
       expect(card.worn).toBe(false);
@@ -62,6 +62,23 @@ describe('mount skin cards', () => {
     const tortoise = cards.find((c) => c.id === 'chimeglass_tortoise');
     expect(bird).toMatchObject({ owned: true, worn: true, action: 'takeOff', rarity: 'epic' });
     expect(tortoise).toMatchObject({ owned: true, worn: false, action: 'wear', rarity: 'epic' });
+  });
+
+  it('offers collectible skins from account item ownership and revokes the worn state when ownership disappears', () => {
+    const owned = mountSkinCards(
+      snap({ ownedMountSkins: ['grag_bear'], wornMountSkin: 'grag_bear' }),
+    );
+    expect(owned.find((c) => c.id === 'grag_bear')).toMatchObject({
+      owned: true,
+      worn: true,
+      action: 'takeOff',
+    });
+    const revoked = mountSkinCards(snap({ ownedMountSkins: [], wornMountSkin: 'grag_bear' }));
+    expect(revoked.find((c) => c.id === 'grag_bear')).toMatchObject({
+      owned: false,
+      worn: false,
+      action: null,
+    });
   });
 
   it('never reports a worn skin the account does not own', () => {

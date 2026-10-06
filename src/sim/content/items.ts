@@ -354,9 +354,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 140,
   },
   // Riding Training: the stablemaster's service entry. Buying it never puts an
-  // item in the bags; items.ts buyItem delegates to learnRiding (80 gold,
-  // level 20, once), which sets PlayerMeta.ridingTrained. The buyValue mirrors
-  // RIDING_SKILL_FEE_COPPER so the vendor window shows the real price.
+  // item in the bags; buyItem delegates to learnRiding. The vendor resolves
+  // the next rank's price: 80 gold for basic, then 1000 gold for advanced riding.
   riding_training: {
     id: 'riding_training',
     name: 'Riding Training',
@@ -373,18 +372,16 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // (src/sim/mounts.ts mountOwned), and like every player reins it can trade
   // hands. The buy path's mountOwned gate therefore only stops duplicates in
   // your own containers: buy, give away, buy again is allowed, making this an
-  // elastic market good with a 10g vendor floor (deliberate; no copper mint,
-  // since it never sells back). noVendorSell + sellValue 0: an accidental
-  // 0-copper sale that buyback rotation could eat would destroy the mount.
+  // elastic market good with a 10g vendor floor. Selling the last account copy
+  // revokes its cosmetic until the reins are acquired again (including buyback).
   reins_valorsteed: {
     id: 'reins_valorsteed',
     name: 'Reins of the Valorsteed',
     kind: 'mount',
     mount: 'valorsteed',
     quality: 'common',
-    noVendorSell: true,
     noDiscard: true,
-    sellValue: 0,
+    sellValue: 100_000,
     buyValue: 100_000, // 10 gold in copper
   },
   // Collectible mount (Morthen the Gravecaller, The Hollow Crypt). Owning the

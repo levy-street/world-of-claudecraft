@@ -279,6 +279,9 @@ describe('Claudium spend entitlement mirroring', () => {
     { itemId: 'guildmark_arming_sword', kind: 'item' },
     { itemId: 'retired_placeholder_hat', kind: 'skin' },
     { itemId: '__proto__', kind: 'skin' },
+    { itemId: 'constructor', kind: 'skin' },
+    { itemId: 'valorsteed', kind: 'skin' },
+    { itemId: 'grag_bear', kind: 'skin' },
   ])('rejects unsupported store spend $itemId/$kind before debiting Claudium', async (body) => {
     const res = new FakeRes();
 
@@ -299,6 +302,7 @@ describe('Claudium spend entitlement mirroring', () => {
       reason: 'unknown_item',
     });
     expect(spendMock).not.toHaveBeenCalled();
+    expect(grantMountSkins).not.toHaveBeenCalled();
   });
 
   it('rejects a string expected cost before calling the monetary service', async () => {
@@ -426,6 +430,40 @@ describe('Claudium spend entitlement mirroring', () => {
     });
     expect(storeMock).toHaveBeenCalledWith(7);
     expect(grantWeaponSkins).toHaveBeenCalledWith(7, ['guildmark_arming_sword']);
+  });
+
+  it('filters collectible appearances out of paid store rows and permanent grant reconciliation', async () => {
+    storeMock.mockResolvedValue({
+      available: true,
+      items: ['valorsteed', 'grag_bear', '__proto__', 'constructor', 'mech_bird'].map((itemId) => ({
+        itemId,
+        name: itemId,
+        kind: 'skin',
+        costClaudium: 1200,
+        owned: true,
+      })),
+    });
+    const res = new FakeRes();
+    await handleClaudiumApi(
+      makeReq({ method: 'GET', url: '/api/claudium/store' }),
+      res as never,
+      7,
+    );
+    expect(responseJson(res)).toEqual({
+      available: true,
+      items: [
+        {
+          itemId: 'mech_bird',
+          name: 'mech_bird',
+          kind: 'skin',
+          costClaudium: 1200,
+          owned: true,
+        },
+      ],
+    });
+    expect(grantMountSkins).toHaveBeenCalledWith(7, ['mech_bird']);
+    expect(grantMountSkins).toHaveBeenCalledTimes(1);
+    expect(grantWeaponSkins).not.toHaveBeenCalled();
   });
 
   it('accepts a mount skin SKU (kind skin) and mirrors it through the mount skin hook only', () => {

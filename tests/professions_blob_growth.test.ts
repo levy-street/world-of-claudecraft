@@ -255,6 +255,7 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   'pendingSkinItemId',
   'mountTrainingFeePaid',
   'ridingTrained',
+  'ridingTier',
   'pbeBoostKit',
   'delveMarks',
   'delveClears',
@@ -815,6 +816,7 @@ function armNonProfessionsFields(sim: Sim): void {
   // Riding + the PBE kit stamp.
   meta.mountTrainingFeePaid = true;
   meta.ridingTrained = true;
+  meta.ridingTier = 2;
   meta.pbeBoostKit = 1;
   // Both worn cosmetics, through the real validators (they refuse anything
   // unearned or of the wrong reward kind, so the deeds are earned first).
@@ -1235,6 +1237,7 @@ describe('the professions blob growth bound (phase 16)', () => {
       'vcupWins',
       'vcupBetNet',
       'ridingTrained',
+      'ridingTier',
       'pbeBoostKit',
       'activeTitle',
       'activeBorder',
@@ -2442,7 +2445,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // itemsDiscovered (+2,889), the hoardGoblinKills counter (+26), and the 32
         // hoard gear reliquary.firstFind rows plus the conquerors_buried_hoards page
         // (+1,761), Blaine's itemization; MEASURED on the 2026-09-28 merged tree.
-        4711,
+        4711 +
+        // Advanced riding adds the sparse scalar ,"ridingTier":2 (15 bytes).
+        15,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2526,7 +2531,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // ferry deed and its visit marks, which this counterfactual keeps).
       // 226,238 -> 231,729 at the 2026-09-28 Buried Hoards merge (+5,491: the
       // +247 knownRecipes, +533 and +4,711 attributed above, all kept here).
-    ).toBe(231729);
+      // Advanced riding contributes 15 bytes for the armed ridingTier scalar.
+    ).toBe(231744);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2554,7 +2560,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 214,207 -> 227,703 at the second release/v0.44.0 base merge (+13,496).
       // 227,703 -> 227,857 at the fourth release/v0.44.0 base merge (+154).
       // 227,857 -> 233,348 at the 2026-09-28 Buried Hoards merge (+5,491, kept).
-    ).toBe(233348);
+      // Advanced riding contributes the same 15 bytes here.
+    ).toBe(233363);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2645,8 +2652,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // attributed in the growth equation above; no container or ceiling changed
     // shape. Floor at measurement minus 380, edge at measurement plus one:
     // 232980..233361.
-    expect(bytes, reMint).toBeGreaterThan(232980);
-    expect(bytes, reMint).toBeLessThan(233361);
+    // RE-BASED for advanced riding: 233,375 bytes, up exactly 15 for the
+    // sparse ridingTier scalar. No containers changed; the same 381-byte
+    // band is measurement minus 380 through measurement plus one.
+    expect(bytes, reMint).toBeGreaterThan(232995);
+    expect(bytes, reMint).toBeLessThan(233376);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

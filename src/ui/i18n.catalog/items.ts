@@ -212,6 +212,10 @@ const itemStringsEn = {
       levelClass: 'Level {level} {className}',
     },
     vendor: {
+      basicRiding: 'Riding Training',
+      advancedRiding: 'Advanced Riding Training',
+      ridingSpeed:
+        'Increase your movement speed while mounted by {speed}%. Applies to every mount.',
       goodsTitle: '{name}: Goods',
       close: 'Close vendor',
       hint: 'Click an item in your bags to sell it while this window is open.',

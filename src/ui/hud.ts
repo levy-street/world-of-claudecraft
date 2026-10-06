@@ -729,7 +729,7 @@ import { bindMobileFrameLongPress as bindMobileFrameLongPressCore } from './mobi
 import { isCompactTouchHud, touchBagsShown } from './mobile_hud_layout';
 import { MobileMoreDialogController } from './mobile_more_dialog';
 import { moneyHtml } from './money_html';
-import { MOUNT_DESC_KEYS, mountSpecLines } from './mount_labels';
+import { MOUNT_DESC_KEYS } from './mount_labels';
 import { MountRaceControls } from './mount_race_controls';
 import { MountRaceStrip } from './mount_race_strip';
 import { type FrameDimension, MovableFrame } from './movable_frame';
@@ -6649,10 +6649,6 @@ export class Hud {
       if (mountDef) {
         const descKey = MOUNT_DESC_KEYS[mountDef.key];
         if (descKey) html += `<div class="tt-desc">${esc(t(descKey))}</div>`;
-        for (const line of mountSpecLines({
-          speedPct: Math.round(mountDef.moveSpeedPct * 100),
-        }))
-          html += `<div class="tt-green">${esc(line)}</div>`;
         // No per-mount level gate any more: the only requirement is the riding
         // skill, so the tooltip says how to ride instead of quoting a level.
         html += `<div class="tt-sub">${esc(t('hudChrome.mounts.useToRide'))}</div>`;
@@ -14674,12 +14670,9 @@ export class Hud {
         ITEMS,
         {
           copper: this.sim.copper,
+          ridingTier: this.sim.ridingTrainingTier(),
           honor: this.sim.honor,
-          // The advisory half of the vendor row gate. An IWorld member both
-          // worlds already implement (Sim reads PlayerMeta, ClientWorld mirrors
-          // the self-delta), so the locked state resolves client-side with no
-          // new wire field, exactly as the delve shop resolves its lock badge
-          // from the mirrored clears map.
+          // Both hosts expose authoritative proficiency for advisory vendor gates.
           gatheringProficiency: this.sim.gatheringProficiency,
           factions: this.sim.factions,
           factionCurrencies: this.sim.factionCurrencies,
