@@ -262,10 +262,24 @@ This supersedes the v0.44.0 row above that says Magma Burst grants no Thunder.
 |---|---|
 | Magma Burst Thunder | A Magma Burst hit banks 1 Thunder (`MAGMA_BURST_THUNDER`, `thundercallOnMagmaBurstImpact`). It stays flat inside Primal Mastery, like Skybranch; the doubled grant remains Arc Bolt's. |
 | Magma Burst cost | Thundercall spec baseline `costPct: -0.35` on `lava_burst`, Arc Bolt's discount (70 to 46 Mana at rank 2). |
-| Cinder Jolt duration | Thundercall's Cinder Jolt burns 18 sec, the Cataclysm Flame Shock (`THUNDERCALL_CINDER_JOLT_DURATION`), at the same rounded damage per tick, through `resolveThundercallAbility` in the ability resolution chain. Other specs keep 12 sec. |
+| Lava Flows | The Wrath Lava Flows talent at 3/3: Magma Burst's critical strike multiplier gains 0.24 (`MAGMA_BURST_CRIT_BONUS`, `magmaBurstCritBonus` at the crit site), so a crit deals an extra 24 percent of the normal hit (1.5 to 1.74 before gear). |
+| Cinder Jolt duration | Thundercall's Cinder Jolt burns 27 sec, Cataclysm's 18 sec Flame Shock with the Glyph of Flame Shock's +50 percent (`THUNDERCALL_CINDER_JOLT_DURATION`), at the same rounded damage per tick, through `resolveThundercallAbility` in the ability resolution chain. Other specs keep 12 sec. |
 
-No rng draw is added or moved; the parity goldens do not change. Pinned by
-`tests/shaman_thundercall_rework.test.ts` ("Thundercall v0.45 rotation fix").
+No new rng draw site: the longer Cinder Jolt rolls Magma Surge on its extra ticks, and Lava Flows
+draws nothing. The parity goldens do not change. Pinned by `tests/shaman_thundercall_rework.test.ts`
+("Thundercall v0.45 rotation fix").
+
+Measured and rejected: Magma Burst granting 2 Thunder added nothing (the bank sits at its cap of 5
+while the shared cooldown holds Earthen Jolt), and letting Magma Burst trigger Arc Overload matched
+the longer Cinder Jolt on its own, so the simpler, classic-sourced duration was kept.
+
+### Role band
+
+Owner decision, 2026-10-07: the full kit rotation should clearly beat Arc Bolt plus Earthen Jolt,
+which the 1.1x Thundercall ceiling against Vespers did not allow (the 60 sec fixture lands near
+1.17x). The ceiling in `tests/owned_class_balance_role_bands.test.ts` and its mirror, the 0.9x
+Vespers floor in `tests/owned_class_balance_dps_probes.test.ts`, are removed; the 0.83 floor and
+the Vespers 1.2x ceiling stay.
 
 ### Bench (owned-class probe, Stormkindled 4pc, level 20 dummy, 8 seeds, DPS)
 
@@ -274,12 +288,12 @@ after. "At 5" spends Earthen Jolt on a full bank; "on cooldown" spends any bank.
 
 | Fight | Kit before | Kit after | Bolt plus Jolt, at 5 | Bolt plus Jolt, on cooldown |
 |---|---|---|---|---|
-| 30 sec | 205.4 | 208.2 | 209.5 | 207.0 |
-| 60 sec | 208.6 | 224.7 | 214.2 | 220.8 |
-| 3 min | 200.1 | 220.3 | 216.0 | 220.1 |
-| 5 min | 159.9 | 177.0 | 178.0 | 175.2 |
-| 3 min, no set (Nythraxis kit) | 175.7 | 182.1 | 184.5 | 178.0 |
+| 30 sec | 205.4 | 229.8 | 209.5 | 207.0 |
+| 60 sec | 208.6 | 237.6 | 214.2 | 220.8 |
+| 3 min | 200.1 | 232.3 | 216.0 | 220.1 |
+| 5 min | 159.9 | 185.2 | 178.0 | 175.2 |
+| 3 min, no set (Nythraxis kit) | 175.7 | 190.7 | 184.5 | 178.0 |
 
-The kit rotation moves from clearly behind to level with the best two-button play from 3 min on,
-and ahead at 60 sec. The best single-target play gains at most about 5 DPS, so the role bands do
-not move. Seed spread is about 10 DPS per cell, so differences under about 3 DPS are noise.
+The kit rotation now leads the best two-button play by 17 DPS at 60 sec, 12 at 3 min and 7 at
+5 min, and Elemental's best single-target play rises by the same margins. Seed spread is about
+10 DPS per cell, so differences under about 3 DPS are noise.
