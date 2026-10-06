@@ -351,17 +351,18 @@ describe('nythraxis hitch bench script', () => {
     expect(SCRIPT).toContain("JSON.stringify({ t: 'logout' })");
   });
 
-  it('records that the entry zone already warmed the Aldric model, so the aldric row is not read as proof', () => {
-    const manifest = readFileSync(
-      new URL('../src/render/characters/manifest.ts', import.meta.url),
-      'utf8',
-    );
+  it('records that the entry zone already warmed the Aldric model, so the aldric row is not read as proof', async () => {
+    const { visualKeyFor } = await import('../src/render/characters/manifest');
     // Eastbrook's brother_aldric is a static zone NPC and shares this key with
-    // the raid Aldric, so world entry compiles it before any leg starts.
-    expect(manifest).toContain(`${NYTHRAXIS_ALDRIC_TEMPLATE_ID}: '${NYTHRAXIS_ALDRIC_VISUAL_KEY}'`);
-    expect(manifest).toContain(
-      `if (e.templateId.startsWith('brother_aldric')) return '${NYTHRAXIS_ALDRIC_VISUAL_KEY}'`,
+    // the raid Aldric (his authored look on the priest's WOC body), so world entry
+    // builds it before any leg starts.
+    expect(visualKeyFor({ kind: 'npc', templateId: NYTHRAXIS_ALDRIC_TEMPLATE_ID })).toBe(
+      NYTHRAXIS_ALDRIC_VISUAL_KEY,
     );
+    expect(visualKeyFor({ kind: 'npc', templateId: 'brother_aldric' })).toBe(
+      NYTHRAXIS_ALDRIC_VISUAL_KEY,
+    );
+    expect(NYTHRAXIS_ALDRIC_VISUAL_KEY).toBe('player_priest');
     const zone1 = readFileSync(new URL('../src/sim/content/zone1.ts', import.meta.url), 'utf8');
     expect(zone1).toContain("id: 'brother_aldric'");
     // The encounter prewarm deliberately warms no NPC at all: this row is the

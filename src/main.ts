@@ -342,7 +342,6 @@ import { assetsReady, beginDeferredPreloads } from './render/assets/preload';
 import { battlegroundAssetPrewarm } from './render/battleground';
 import {
   CharacterPreview,
-  npcLookFor,
   type PreviewAppearance,
   setModularLookProvider,
 } from './render/characters';
@@ -1482,12 +1481,10 @@ async function startGame(
     // paperdoll eye toggle), so peers see the owner's choice. Per-entity
     // wire JSON is normalized at compose time (visual build, not per frame):
     // hostile or stale payloads clamp to a valid body.
-    // Non-players compose too: NPCs resolve authored looks by templateId
-    // (static data on every host; the why lives in characters/npc_looks.ts).
+    // Only players compose: an NPC wears its authored look on a WOC body, which
+    // the visual factory resolves by templateId (characters/npc_looks.ts).
     setModularLookProvider((e) =>
-      e.kind === 'player'
-        ? inWorldLookFor(e, armorSetForEntity(e.id === world.playerId))
-        : npcLookFor(e.templateId, e.kind),
+      e.kind === 'player' ? inWorldLookFor(e, armorSetForEntity(e.id === world.playerId)) : null,
     );
     // Helmet visibility belongs to each character's saved state: creator
     // toggle first, then paperdoll eye. Do not re-assert the old device-wide

@@ -203,20 +203,6 @@ describe('authored surfaces', () => {
     expect(isAuthoredHeldModelUrl(itemOffhandModelUrl('varkhul_emberward') ?? '')).toBe(true);
   });
 
-  it('routes the harbormaster gear through the authored arm, from its own directory', () => {
-    // vertex-coloured felt, brass and leather: the weapon polish would glaze them to one sheen
-    for (const key of ['harbormaster_tricorne', 'harbormaster_spyglass']) {
-      expect(AUTHORED_HELD_MODELS.has(key), key).toBe(true);
-      expect(isAuthoredHeldModelUrl(`models/chars/npc_gear/${key}.glb`), key).toBe(true);
-    }
-    for (const att of VISUALS.npc_modular_harbormaster.attach ?? []) {
-      expect(isAuthoredHeldModelUrl(att.url), att.url).toBe(true);
-    }
-    // the directory alone opts nothing in, and no other models/chars path matches
-    expect(isAuthoredHeldModelUrl('models/chars/npc_gear/some_other_hat.glb')).toBe(false);
-    expect(isAuthoredHeldModelUrl('models/chars/modular/harbormaster_tricorne.glb')).toBe(false);
-  });
-
   it('leaves every other held model on the polish', () => {
     // the class defaults, the shields, an adv-set piece, and an authored PBR
     // craft weapon that was never reported: none of them are opted out
@@ -229,7 +215,11 @@ describe('authored surfaces', () => {
     // a creature or player GLB can never match the held-model set
     expect(isAuthoredHeldModelUrl('models/creatures/ogre.glb')).toBe(false);
     expect(isAuthoredHeldModelUrl('')).toBe(false);
-    expect(AUTHORED_HELD_MODELS.size).toBe(4);
+    // ...and only a model under models/weapons/ can: the worn-gear directory the
+    // harbormaster's set once opted in is no arm of the rule any more
+    expect(isAuthoredHeldModelUrl('models/chars/npc_gear/hammer_varkhul.glb')).toBe(false);
+    expect(isAuthoredHeldModelUrl('models/weapons/hammer_varkhul.glb')).toBe(true);
+    expect(AUTHORED_HELD_MODELS.size).toBe(2);
   });
 
   it('flags exactly the replaced creature and mount rigs, never a player body', () => {

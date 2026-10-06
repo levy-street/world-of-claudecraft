@@ -40,6 +40,7 @@ import { CharacterSurfaceResponse } from '../src/render/characters/surface_respo
 import { CharacterVisual } from '../src/render/characters/visual';
 import { WocAtlasSwap } from '../src/render/characters/woc_atlas_swap';
 import { codeWithoutLineComments } from './helpers/code_without_line_comments';
+import { landWocBodies } from './helpers/woc_streamed';
 
 type AssetsModule = typeof import('../src/render/characters/assets');
 
@@ -649,6 +650,9 @@ describe('peekModularFarBake and modularFarBake', () => {
     }));
     const assetsModule = (await import('../src/render/characters/assets')) as AssetsModule;
     await assetsModule.charactersReady();
+    // The part library left the boot preload when the world's NPCs stopped composing
+    // from it (its def is lazyPreload): ask for it the way a host does and let it land.
+    await landWocBodies(assetsModule, [MODULAR_WARRIOR_KEY]);
     return assetsModule;
   }
 

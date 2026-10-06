@@ -745,8 +745,10 @@ describe('outfit colorways', () => {
     }
   });
 
-  // Harbormaster Tamsin's sea coat (npc_looks.ts): an NPC-only material colorway. Navy
-  // broadcloth, brass where the coat's pale steel buttons and cuffs were, dark leather.
+  // The composed library's NPC-only material colorway, authored as Harbormaster Tamsin's
+  // sea coat: navy broadcloth, brass where the coat's pale steel buttons and cuffs were,
+  // dark leather. Nobody wears it since every NPC moved to a WOC class body
+  // (characters/npc_looks.ts); it stays with the library it belongs to.
   it('compiles the NPC-only admiralty colorway to navy cloth, brass steel and dark leather', () => {
     expect(NPC_MATERIAL_COLORWAY_IDS).toEqual(['admiralty']);
     expect(OUTFIT_COLORWAY_IDS as readonly string[]).not.toContain('admiralty');

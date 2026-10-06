@@ -171,12 +171,6 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   `registerWeapon` returns the held-model decision as a follow-up action);
   `tests/authored_surfaces.test.ts` scans the shipped GLBs and fails any
   authored atlas that is neither flagged nor on its explicit legacy list.
-- Worn NPC gear: an `NPC_MODULAR_PROP_ATTACH` entry need not be a hand prop. The
-  `harbormaster` set parents GLBs to the `head` and `hips` bones with an identity
-  transform, so each is authored in that bone's BIND frame
-  (`scripts/assets/harbormaster_gear/`, fitted with its `extract_reference.mjs`); it rides
-  the authored arm (`AUTHORED_HELD_MODELS`) and, like every prop, is left out of the
-  composed far bake. Pinned by `tests/harbormaster_gear_asset.test.ts`.
 - `stonebound_shell_core.ts`: the Stonebound weapon-shell style. Wireframe on any
   antialiased frame; a solid translucent sheath when NO AA pass runs (Low, and the
   memory-constrained WebKit profiles), because a one-pixel GPU wireframe crawls
@@ -658,11 +652,57 @@ Every drawable is a `VisualDef` in `VISUALS` (player classes, creature families,
 humanoid mobs, NPCs, forms). Dispatch precedence in `visualKeyFor`: players to
 `player_<class>` (or `player_mech` for the mech skin catalog); mobs to
 `MOB_KEYS[templateId]`, then `FAMILY_KEYS[MOBS[id].family]` (the family ids
-live in `manifest.ts`), falling back to `mob_bandit`; NPCs to `NPC_KEYS`. Forms
+live in `manifest.ts`), falling back to `mob_bandit`, except the quest
+escortees, which the sim makes mobs and which take their authored look first
+(`MOB_LOOK_IDS`, the next paragraph); NPCs to the WOC def of
+their authored class and body type (`npcLookFor`, the next paragraph), and only
+an NPC with no authored look to its stock rig in `NPC_KEYS`. Forms
 (`form_sheep`/`form_bear`/`form_cat`/`form_travel`) are passed explicitly by the renderer;
 `characterFormAssetKey` (`form_visual_selection_core.ts`) then splits the shared cat slot at
 construction, so a shaman's `ghost_wolf` aura resolves to `form_ghost_wolf` (the tinted
 `wolf_basic.glb`) while the druid's `form_cat` loads its own `druid_cat_form.glb`.
+
+**Every world NPC is a WOC body** (`npc_looks.ts`, pure data): the body, kit and
+clips of one player class, wearing a look the creator's face builder could have
+made (a body type, one piece per head slot, a piercing preset, four colours, the
+five face controls, a body size). Nothing about it is NPC-only art, so an NPC
+draws through the path a player of that class does (the same prepared key,
+programs, armor files, merged head and far bake). Unlike a player it is POOLED
+(`visual_pool.ts`), and a parked body keeps its merged stand-ins and far bake
+until the pool evicts it, so the pool cap bounds that memory rather than the
+idle caps. Measured so far: draw calls and triangles in four hubs, on the high
+tier and on the lowest preset (the table is on the change's screenshots page,
+the `npcs` page beside the character pack's captures); frame times and a
+physical phone are not. The three NPC-specific facts all live in
+`createCharacterVisual`: the look is handed in at birth (`setWocHeadLook`,
+`setBodyScale`: nothing diffs an NPC per frame, `live_look_diff.ts` dresses
+players only); the kit is the class's default with the HEAD BARE
+(`setWocDefaultEquipment(true)`: no helm or hood ever covers an NPC's face); and
+its fixed props (`manifest.ts` `NPC_PROP_ATTACH`, picked by the look's `props`)
+REPLACE the class def's own hands through the weapon-layout override
+(`npcHeldProps`: an attach list with no swap slot, or the body would hold the
+class's default weapons). A prop rides no def of its own, so `manifestUrls`
+names every prop url for the boot gate; the one prop that is also an Armory
+weapon-skin model (the brasscrown walking staff) streams on demand like every
+skin, and the first NPC that holds it builds fail-soft once it lands. Nothing
+else about an NPC is a new lane: the zone prewarm seeds the first NPC of each
+class body into the pool (real residents, so they ask for their own files),
+and a pooled body finds the renderer's work queue by its gate. Authoring rules
+(the class is the kit the NPC wore before, colours are solved against the old
+face, the eye controls carry character) are the header of `npc_looks.ts`;
+`tests/npc_looks.test.ts` pins the roster and `tests/npc_woc_body.test.ts` the
+body through the real factory.
+The four quest escortees wear a roster row too, although the sim makes them
+mobs so the escort driver can walk them: `MOB_LOOK_IDS` names them one by one,
+because one templateId can be an NPC and a mob at once (Sexton Marrow), and
+that mob keeps its mob body. A unit frame draws the same face the world does:
+`npcPortraitSourceFor` (`manifest.ts`) hands `src/ui/nonplayer_portrait_core.ts`
+the body key and the look's head, and the painter asks the live headshot lane
+for it (`portrait.ts` `visualPortraitDataUrl`, the capture a player's frame
+asks for, the crest while it runs), so no portrait file is committed for a
+character with a look and a row edit changes its portrait with it. The
+escortees keep their rows in the committed mob portrait ledger (every mob has
+one), drawn by that pipeline from the class body; no frame shows those files.
 
 ## Animation
 - `AnimState` (the renderer-derived input) and `BaseState`
@@ -729,12 +769,15 @@ told so, which drops a far bake still queued for it) are
   never match again and every despawn minted a dead retained entry: the C1
   memory ratchet); scale is applied at the view group and color at acquire
   time. NPC `skin` STAYS in the key: it picks a texture atlas at construction,
-  and the skin set is small and static so keys stay bounded.
+  and the skin set is small and static so keys stay bounded. An NPC's authored
+  look needs no term: it is a pure function of the templateId, so a pooled body
+  only ever returns to the NPC it was built for.
 
 ## Adding things (module-first: where NEW work lands, and its test)
 - **New family/key:** a declarative `VisualDef` in `VISUALS` (existing `ClipMap`
   or a new factory if the rig's clip names differ), wired via
-  `FAMILY_KEYS`/`MOB_KEYS`/`NPC_KEYS`. `manifestUrls()` auto-preloads `url` +
+  `FAMILY_KEYS`/`MOB_KEYS` (a new NPC is NOT a new key: it is a row in
+  `npc_looks.ts`, on the WOC body of its class). `manifestUrls()` auto-preloads `url` +
   `attach[].url` + `animUrls` (skipping `lazyPreload` defs), so drop the GLB
   under `public/models/...` and run the media-manifest build.
 - **New animation state:** add the field to `AnimState`, extend `BaseState` +
@@ -750,6 +793,12 @@ told so, which drops a far bake still queued for it) are
   test first (workflow: root CLAUDE.md + the `extract-and-test` skill).
 
 ## Modular bodies (`player_warrior_modular`)
+Dormant in the shipped world: every class is a WOC body (`woc_parts_core.ts`
+`classBodyComposes`) and so is every NPC (`npc_looks.ts`), so nothing a player
+can reach composes from this library, and every `_modular` def (the warrior's
+included) is `lazyPreload`: the library is fetched if a build ever asks (the dev
+outfit audit rig). The section below is how it works when something does.
+
 A `VisualDef` with `modular: true` points at a PART LIBRARY, not a finished
 character: `models/chars/modular/warrior_modular.glb` carries both base bodies,
 their underclothing, every hair/brow, and every class kit (`ARMOR_SETS`) cut

@@ -666,7 +666,8 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   Warm nothing whose cost you have not measured: Brother Aldric was in this
   spec until an A/B from a start zone that had never compiled his model showed
   his spawn linking ZERO programs (the player bodies on screen already carry
-  them). Varkhul's rig is the measured opposite (the harvest caught its body
+  them; that was his old stock rig, and the spawn has not been measured again on
+  the priest's WOC body he wears now). Varkhul's rig is the measured opposite (the harvest caught its body
   programs linking live at the pull), so the Varkhul set stages it first,
   through the live view's own factory, beside a held Forgestorm warning twin
   (each storm disposes its warnings, and a program no material uses survives

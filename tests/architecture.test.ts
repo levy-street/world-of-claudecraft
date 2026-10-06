@@ -332,6 +332,9 @@ const UI_PURE_CORES = [
   // Which body a player entity's frame shows (mech, composed, stock) and the
   // matching rule for a landed portrait; unit_portrait_painter.ts draws it.
   'src/ui/player_portrait_core.ts',
+  // Its sibling for everyone else a frame can hold: an authored face, committed
+  // mob art or the crest, and the matching rule for a landed face.
+  'src/ui/nonplayer_portrait_core.ts',
   'src/ui/xp_bar.ts',
   'src/ui/absorb_bar.ts',
   'src/ui/party_frames.ts',

@@ -11,12 +11,13 @@ import { composedLookPiecesFor, type LookPieceQueue, type LookPieces } from './l
 import {
   mechHeldWeaponOverride,
   modularVisualKey,
+  npcHeldProps,
   VISUALS,
   type VisualDef,
   visualKeyFor,
 } from './manifest';
 import { MODULAR_WARRIOR_KEY, type ModularLook, wocBodyScaleOf } from './modular';
-import { npcModularKeyFor } from './npc_looks';
+import { npcLookFor } from './npc_looks';
 import { CharacterVisual } from './visual';
 import { ensureWocHeadForAppearance } from './woc_head_packs';
 
@@ -39,16 +40,16 @@ export type { AnimState, FarBakeGate } from './visual';
 export { CharacterVisual, setWeaponVfxViewportHeight } from './visual';
 
 // A composed (modular) body is opt-in per entity: the app installs a provider
-// that maps an entity to its authored look, and anything it does not claim
-// keeps the fixed class rig it has always used.
-//
-// EVERY player composes now, not just the local one: the look rides the `app`
-// identity wire field (set at join from the character's own column), so the
-// provider answers for peers from server truth. A character authored before the
-// creator carries no look and keeps its class rig, which is what the provider
-// returning null still means. The seam stays a seam because the RULE for what a
-// given entity wears is app-level (see src/render/characters/player_look_core.ts),
-// while this module only needs the answer.
+// that maps a PLAYER to its authored look, and anything it does not claim
+// keeps the fixed class rig it has always used. Every class is a WOC body now
+// (woc_parts_core.ts classBodyComposes), so the provider answers null for each
+// of them and nothing in the shipped world composes; the seam stays for a
+// class that ever does. The look itself still rides the `app` identity wire
+// field (set at join from the character's own column), which is what a WOC
+// body's modular head reads. The RULE for what an entity wears is app-level
+// (see src/render/characters/player_look_core.ts), while this module only
+// needs the answer. An NPC never composes either: its authored look rides the
+// WOC def of its class (npc_looks.ts, the factory below).
 let modularLookProvider: ((e: Entity) => ModularLook | null) | null = null;
 
 /** Install (or clear, with null) the entity-to-look mapping. */
@@ -63,14 +64,11 @@ export function modularLookFor(e: Entity): ModularLook | null {
   return modularLookProvider?.(e) ?? null;
 }
 
-/** The composed-body visual key for an entity the look provider claimed: the
+/** The composed-body visual key for a player the look provider claimed: the
  *  class's own modular def (its clips, ability mapping and hand layout), with
- *  the warrior's as the fallback for a templateId without one. A claimed
- *  NON-player (a world NPC or an NPC-bodied quest actor) resolves its authored
- *  prop-set def instead: the class fallback would hand a villager the
- *  warrior's default sword and swing set. */
+ *  the warrior's as the fallback for a templateId without one. Only a player
+ *  composes: an NPC wears its authored look on a WOC body (npc_looks.ts). */
 export function modularKeyFor(e: Entity): string {
-  if (e.kind !== 'player') return npcModularKeyFor(e.templateId);
   const key = modularVisualKey(e.templateId as PlayerClass);
   return VISUALS[key] ? key : MODULAR_WARRIOR_KEY;
 }
@@ -136,13 +134,19 @@ export function createCharacterVisual(
   // The class-agnostic Combat Mech adopts the wearer's independent mainhand and
   // offhand layout. e.templateId is the player's class on every host, so this
   // matches offline and online.
-  const weaponOverride =
-    !formKey && key === 'player_mech' && e.kind === 'player'
+  // An NPC, or a quest escortee the sim makes a mob (npc_looks.ts MOB_LOOK_IDS), wears
+  // an authored look on its class's WOC body (visualKeyFor names the def): its fixed
+  // props take the place of the class's own hands.
+  const npcLook = formKey ? null : npcLookFor(e.templateId, e.kind);
+  const weaponOverride = npcLook
+    ? npcHeldProps(npcLook.props)
+    : !formKey && key === 'player_mech' && e.kind === 'player'
       ? mechHeldWeaponOverride(e.templateId as PlayerClass)
       : null;
   // A WOC body's own head files (its type's core, hairstyle and facial hair: a player's
-  // look, the type's default on a mob) are asked for beside its base, and the body NEVER
-  // waits for a hairstyle or a beard: a player with no body at all is the worse sight. It
+  // look, an authored one on an NPC or escortee, the type's default on any other mob)
+  // are asked for beside its base, and the body NEVER waits for a hairstyle or a beard:
+  // a player with no body at all is the worse sight. It
   // is built as soon as its head CORE is resident, with whatever pieces of its look are
   // resident too (AssembleOptions.wocHead), and draws at once, the bare head standing in
   // for a hairstyle or a beard still on the wire (or one whose fetch failed), which joins
@@ -154,7 +158,7 @@ export function createCharacterVisual(
   // caller's retry cooldown; a core that is missing anyway (a host that built a world
   // without the entry gate) leaves the body drawing without a head until it lands.
   const wocFit = formKey ? undefined : VISUALS[key]?.wocCharacter?.fit;
-  const wocHeadApp = e.kind === 'player' ? e.modularAppearance : null;
+  const wocHeadApp = e.kind === 'player' ? e.modularAppearance : (npcLook?.app ?? null);
   if (wocFit && opts?.fetchStreamed !== false) ensureWocHeadForAppearance(wocFit, wocHeadApp);
   try {
     // The world path, and the only one with a point-light budget: its weapon
@@ -187,6 +191,14 @@ export function createCharacterVisual(
     if (!formKey && e.kind === 'player') {
       visual.setWocHeadLook(e.modularAppearance);
       visual.setBodyScale(wocBodyScaleOf(e.modularAppearance));
+    }
+    // ...and an NPC its authored one, in its class kit with the head bare, so no
+    // helm or hood ever covers the face. Nothing diffs an NPC per frame
+    // (live_look_diff.ts dresses players only): its look never changes.
+    if (npcLook) {
+      visual.setWocHeadLook(npcLook.app);
+      visual.setBodyScale(wocBodyScaleOf(npcLook.app));
+      visual.setWocDefaultEquipment(true);
     }
     return visual;
   } catch (err) {

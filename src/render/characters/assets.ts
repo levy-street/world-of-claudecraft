@@ -615,9 +615,12 @@ const allPreloadUrls = characterPreloadUrls(false);
 // Measured on an iPhone 17 Pro, decoding the full set inside the entry gate put
 // WebContent at 1.54 GB before the renderer ever existed. Desktop keeps these
 // actionable bodies critical: until a creature GLB arrives, its view, nameplate,
-// and click target do not exist. Weapons and NPC bodies also stay in the gate:
-// the char-select preview builds CharacterVisual DIRECTLY (not through the
-// fail-soft factory), so a missing held-weapon GLB there would throw.
+// and click target do not exist. Weapons also stay in the gate (the props an NPC
+// holds among them, bar the one that is an Armory skin model and streams on demand;
+// an NPC's BODY is a WOC class body, whose files world entry awaits,
+// woc_entry_preload.ts): the char-select preview builds CharacterVisual
+// DIRECTLY (not through the fail-soft factory), so a missing held-weapon GLB
+// there would throw.
 const STREAMED_URL_PREFIXES = ['models/creatures/', 'models/chars/enemies/'];
 // Armory weapon-SKIN models stay out of the gate too (64 of the 78 weapon
 // files), but remain on demand instead of joining the bulk post-entry stream.
@@ -2204,10 +2207,11 @@ function applyLowReadabilityLift(
     // polish (and its cream lift) is skipped outright: deliberate, the tiers
     // trade colour accuracy for readability in different places.
     if (authored && lambert.map) lambert.emissiveMap = lambert.map;
-    // An authored VERTEX-coloured held prop (the harbormaster's gear) has no map to scale
-    // the floor through, and three never multiplies emissive by vertex colour: the uniform
-    // floor would film its dark felt grey. Its albedo lives in the vertices, so it takes no
-    // floor. Held props only: an authoredAtlas body keeps the floor it always had.
+    // An authored VERTEX-coloured held prop has no map to scale the floor through, and
+    // three never multiplies emissive by vertex colour: the uniform floor would film a
+    // dark authored surface grey. Its albedo lives in the vertices, so it takes no floor.
+    // Held props only: an authoredAtlas body keeps the floor it always had. (Written for
+    // the harbormaster's worn gear, since retired: no shipped prop takes this arm today.)
     else if (authored && role === 'weapon' && lambert.vertexColors) lambert.emissive.setScalar(0);
   }
 }

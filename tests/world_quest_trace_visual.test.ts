@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import { visualKeyFor } from '../src/render/characters/manifest';
+import { npcLookFor } from '../src/render/characters/npc_looks';
 import { CONSTRAINED_PREWARM_KEEP } from '../src/render/prewarm_policy';
 import {
   buildWorldQuestTraceStandIn,
@@ -260,12 +261,14 @@ describe('world quest tracing visual', () => {
     expect(manifest).toContain('required: true');
     expect(manifest).toContain('await this.createMandatoryLandmarkViews(');
   });
-  it('reuses the robed instructor and village apprentice rigs without new assets', () => {
-    expect(visualKeyFor({ kind: 'npc', templateId: 'calligraphy_instructor' } as never)).toBe(
-      'npc_villager_robed',
-    );
-    for (const templateId of ['calligraphy_apprentice_1', 'calligraphy_apprentice_2']) {
-      expect(visualKeyFor({ kind: 'npc', templateId } as never)).toBe('npc_villager');
+  it('dresses the instructor and both apprentices as mages, on the class body', () => {
+    for (const [templateId, key] of [
+      ['calligraphy_instructor', 'player_mage'],
+      ['calligraphy_apprentice_1', 'player_mage_female'],
+      ['calligraphy_apprentice_2', 'player_mage'],
+    ] as const) {
+      expect(npcLookFor(templateId)?.cls, templateId).toBe('mage');
+      expect(visualKeyFor({ kind: 'npc', templateId } as never), templateId).toBe(key);
     }
   });
   it('draws personal gold preview, then only start ring and actual blue walked trail', () => {

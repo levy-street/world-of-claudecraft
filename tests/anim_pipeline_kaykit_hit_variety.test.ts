@@ -97,12 +97,10 @@ describe('KayKit hit-reaction stagger (issue #2889 round 2)', () => {
     // unscoped count every time one of them lands.
     const donorPattern = new RegExp(DONOR_GLBS.map((p) => p.split('/').pop()).join('|'), 'g');
     const occurrences = [...MANIFEST_SRC.matchAll(donorPattern)].length;
-    // 37 since the composed-NPC defs landed: the `npc_modular_<propSet>` loop
-    // is one more kaykit() consumer, and it wires the rogue donor exactly as
-    // this test requires (its bodies would otherwise have no Hit_B_Stagger).
-    // One literal in the loop covers every derived def, so the count moved by
-    // one rather than by the number of prop sets.
-    expect(occurrences).toBe(37);
+    // 36 again since the composed-NPC defs left (every NPC rides a WOC class
+    // body now, npc_looks.ts): their `npc_modular_<propSet>` loop was one more
+    // kaykit() consumer and wired the rogue donor with one literal.
+    expect(occurrences).toBe(36);
 
     // Spot-check the two entries that already had an animUrls array before
     // this task (must be APPENDED to, not overwritten).

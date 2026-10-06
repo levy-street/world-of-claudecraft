@@ -136,6 +136,9 @@ describe('the shared-skeleton rebind is wired into every assemble path', () => {
     assets = (await import('../src/render/characters/assets')) as AssetsModule;
     await assets.charactersReady();
     await landWocBodies(assets);
+    // The part library is fetched on demand too (its def is lazyPreload since the
+    // world's NPCs stopped composing from it): ask for it the way a host does.
+    await landWocBodies(assets, [MODULAR_WARRIOR_KEY]);
   });
 
   afterEach(() => {

@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "b25d28de103b407d001e67da38e4285b165d954c579101160d575fd1a609ff93",
+  "rendererFingerprint": "834f83a2a633156c4476ea7d1bf1cd4c38a30edc9c5600dabd8e6fa570e482d2",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "darwin",
@@ -14,7 +14,7 @@
     "gpuVendor": "Google Inc. (Google)",
     "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
     "browserMajor": "154",
-    "browserVersion": "Chrome/154.0.8037.95",
+    "browserVersion": "Chrome/154.0.8037.98",
     "requestedBackend": "swiftshader",
     "fingerprint": "eb33696ebd57b9bd455a558171e6f73b227c0ce886b7e6e83677bc1aed3c14fe"
   },
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5430251,
-      "sha256": "222d291ddf60ea97e0744c9145ab72dc02bf9b9a9cda4237b4842878419c28d8",
+      "bytes": 5465516,
+      "sha256": "b8866941adde79d5f2e585ba75f6ee0c37b66cbe747bf090b79991a49fae3c96",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -155,34 +155,75 @@
       "id": "apprentice_wren",
       "family": "humanoid",
       "finderEncounter": false,
-      "visualKey": "npc_villager",
+      "visualKey": "player_mage_female",
       "renderSpec": {
         "model": {
-          "url": "models/chars/players/rogue.glb",
-          "path": "public/models/chars/players/rogue.glb",
-          "bytes": 477976,
-          "sha256": "821bf642863cb49cb9c87514cef48852271f2b518fc52807a1df86cb283a044d"
+          "url": "models/chars/players/woc/base_female.glb",
+          "path": "public/models/chars/players/woc/base_female.glb",
+          "bytes": 361116,
+          "sha256": "0607207379de015dcb63ca620c492566d6df85fa243ab9198c5214fa96ecaa11"
         },
         "idle": "Idle",
-        "height": 2.6,
+        "height": 2.8600000000000003,
         "yaw": null,
         "hover": null,
-        "show": [],
-        "attach": [],
+        "show": null,
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/staff.glb",
+              "path": "public/models/weapons/staff.glb",
+              "bytes": 36168,
+              "sha256": "0958a09b353f4e1228c67e318b130625db647f67b6a8c6a1dcd9d3f3aeff523a"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/spellbook_open.glb",
+              "path": "public/models/weapons/spellbook_open.glb",
+              "bytes": 35136,
+              "sha256": "e564abd17649ec4fa471dfbfdfd1d0668987f1844ee925d8bde17b9f2ec1d6e0"
+            },
+            "bone": "handslot.l",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
         "weaponFix": null,
-        "tintStrength": 0.35
+        "tintStrength": null,
+        "animations": [
+          {
+            "url": "models/chars/players/woc/anims_female.glb",
+            "path": "public/models/chars/players/woc/anims_female.glb",
+            "bytes": 682864,
+            "sha256": "c3fb145a09bfbbbf902097297aff9aca8ed5475aa16d9dbbf8b1819689f1e258"
+          }
+        ],
+        "armor": [
+          {
+            "url": "models/chars/players/woc/armor/female_mage_medium.glb",
+            "path": "public/models/chars/players/woc/armor/female_mage_medium.glb",
+            "bytes": 604816,
+            "sha256": "e1e49d77a189a11be188029eec9d02008352f6d50cba893a27e7fab95062e694"
+          }
+        ]
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#c8a2c8",
-        "strength": 0.35
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "be03c9531956fd8977de6cbebc617f0b1b8d40ca23ff354a3f5351f33a388c8e",
+      "sourceFingerprint": "1306b907fe1f92744b11d83437e24380d2b0e1051c3624faa0a2790a042de695",
       "output": {
         "path": "public/ui/mobs/apprentice_wren.webp",
-        "bytes": 2758,
-        "sha256": "f3a098000bee47793b197dae0d51c7ca9448f3c2a3459059d10f99595cf7b294"
+        "bytes": 2854,
+        "sha256": "a7666ba1f82ab975aee8a4f583b4deb88ac79b3471784f8df78b90e03dcec125"
       }
     },
     {
@@ -733,34 +774,75 @@
       "id": "castaway_navigator",
       "family": "humanoid",
       "finderEncounter": false,
-      "visualKey": "npc_villager",
+      "visualKey": "player_rogue",
       "renderSpec": {
         "model": {
-          "url": "models/chars/players/rogue.glb",
-          "path": "public/models/chars/players/rogue.glb",
-          "bytes": 477976,
-          "sha256": "821bf642863cb49cb9c87514cef48852271f2b518fc52807a1df86cb283a044d"
+          "url": "models/chars/players/woc/base_male.glb",
+          "path": "public/models/chars/players/woc/base_male.glb",
+          "bytes": 342888,
+          "sha256": "aa836571b31f2c4f6b4aa3f9162d013ae921169a471a60942c18542f75e55d77"
         },
         "idle": "Idle",
-        "height": 2.6,
+        "height": 2.8600000000000003,
         "yaw": null,
         "hover": null,
-        "show": [],
-        "attach": [],
+        "show": null,
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/dagger.glb",
+              "path": "public/models/weapons/dagger.glb",
+              "bytes": 35340,
+              "sha256": "b3c3c662c3d9505f727480d0bb1a9dcb26f88550985516f5159ea22b16a86e56"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/dagger.glb",
+              "path": "public/models/weapons/dagger.glb",
+              "bytes": 35340,
+              "sha256": "b3c3c662c3d9505f727480d0bb1a9dcb26f88550985516f5159ea22b16a86e56"
+            },
+            "bone": "handslot.l",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
         "weaponFix": null,
-        "tintStrength": 0.35
+        "tintStrength": null,
+        "animations": [
+          {
+            "url": "models/chars/players/woc/anims_male.glb",
+            "path": "public/models/chars/players/woc/anims_male.glb",
+            "bytes": 666128,
+            "sha256": "5058a87ff20deb937da00b7bccdb074385af111fa6bfaf5b4a4d9388da6904ea"
+          }
+        ],
+        "armor": [
+          {
+            "url": "models/chars/players/woc/armor/male_rogue_medium.glb",
+            "path": "public/models/chars/players/woc/armor/male_rogue_medium.glb",
+            "bytes": 609428,
+            "sha256": "3919570bffe2acfdeab02691ca7995f98307a01a06cc07b5a2ecce1cc2ee779e"
+          }
+        ]
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#4a7a9c",
-        "strength": 0.35
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "41c6a493d45dce5b7d8b71128a3cc6b2b97c9e0678bde108f17f74924bc8a64d",
+      "sourceFingerprint": "3a1a92d04d1a614553070e5f4ac90a671a8a40adbe829328a0738b596689a980",
       "output": {
         "path": "public/ui/mobs/castaway_navigator.webp",
-        "bytes": 2628,
-        "sha256": "d4f0bf6105904dd5ddaa573e09d8cdf6da1fc17db0ab2c4b9106f7052d1e0f78"
+        "bytes": 2192,
+        "sha256": "1650811331dd1609e155a17da9151423b38c1892289c165c408cb456bf0764e1"
       }
     },
     {
@@ -2097,34 +2179,75 @@
       "id": "fisher_bram",
       "family": "humanoid",
       "finderEncounter": false,
-      "visualKey": "npc_villager",
+      "visualKey": "player_rogue",
       "renderSpec": {
         "model": {
-          "url": "models/chars/players/rogue.glb",
-          "path": "public/models/chars/players/rogue.glb",
-          "bytes": 477976,
-          "sha256": "821bf642863cb49cb9c87514cef48852271f2b518fc52807a1df86cb283a044d"
+          "url": "models/chars/players/woc/base_male.glb",
+          "path": "public/models/chars/players/woc/base_male.glb",
+          "bytes": 342888,
+          "sha256": "aa836571b31f2c4f6b4aa3f9162d013ae921169a471a60942c18542f75e55d77"
         },
         "idle": "Idle",
-        "height": 2.6,
+        "height": 2.8600000000000003,
         "yaw": null,
         "hover": null,
-        "show": [],
-        "attach": [],
+        "show": null,
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/dagger.glb",
+              "path": "public/models/weapons/dagger.glb",
+              "bytes": 35340,
+              "sha256": "b3c3c662c3d9505f727480d0bb1a9dcb26f88550985516f5159ea22b16a86e56"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/dagger.glb",
+              "path": "public/models/weapons/dagger.glb",
+              "bytes": 35340,
+              "sha256": "b3c3c662c3d9505f727480d0bb1a9dcb26f88550985516f5159ea22b16a86e56"
+            },
+            "bone": "handslot.l",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
         "weaponFix": null,
-        "tintStrength": 0.35
+        "tintStrength": null,
+        "animations": [
+          {
+            "url": "models/chars/players/woc/anims_male.glb",
+            "path": "public/models/chars/players/woc/anims_male.glb",
+            "bytes": 666128,
+            "sha256": "5058a87ff20deb937da00b7bccdb074385af111fa6bfaf5b4a4d9388da6904ea"
+          }
+        ],
+        "armor": [
+          {
+            "url": "models/chars/players/woc/armor/male_rogue_medium.glb",
+            "path": "public/models/chars/players/woc/armor/male_rogue_medium.glb",
+            "bytes": 609428,
+            "sha256": "3919570bffe2acfdeab02691ca7995f98307a01a06cc07b5a2ecce1cc2ee779e"
+          }
+        ]
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#4a6a8a",
-        "strength": 0.35
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "8f05317f1fd7602c48f1eec1c2e4e3d20befda55a1b8091bfeb208e273b8f66f",
+      "sourceFingerprint": "3a1a92d04d1a614553070e5f4ac90a671a8a40adbe829328a0738b596689a980",
       "output": {
         "path": "public/ui/mobs/fisher_bram.webp",
-        "bytes": 2602,
-        "sha256": "4e4961e7e5f7b1ee42892ebc11667ba3a3bc114680fad339d9fac56eb3c890fd"
+        "bytes": 2192,
+        "sha256": "1650811331dd1609e155a17da9151423b38c1892289c165c408cb456bf0764e1"
       }
     },
     {
@@ -2887,34 +3010,75 @@
       "id": "gravedigger_mosley",
       "family": "humanoid",
       "finderEncounter": false,
-      "visualKey": "npc_villager",
+      "visualKey": "player_rogue",
       "renderSpec": {
         "model": {
-          "url": "models/chars/players/rogue.glb",
-          "path": "public/models/chars/players/rogue.glb",
-          "bytes": 477976,
-          "sha256": "821bf642863cb49cb9c87514cef48852271f2b518fc52807a1df86cb283a044d"
+          "url": "models/chars/players/woc/base_male.glb",
+          "path": "public/models/chars/players/woc/base_male.glb",
+          "bytes": 342888,
+          "sha256": "aa836571b31f2c4f6b4aa3f9162d013ae921169a471a60942c18542f75e55d77"
         },
         "idle": "Idle",
-        "height": 2.6,
+        "height": 2.8600000000000003,
         "yaw": null,
         "hover": null,
-        "show": [],
-        "attach": [],
+        "show": null,
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/dagger.glb",
+              "path": "public/models/weapons/dagger.glb",
+              "bytes": 35340,
+              "sha256": "b3c3c662c3d9505f727480d0bb1a9dcb26f88550985516f5159ea22b16a86e56"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/dagger.glb",
+              "path": "public/models/weapons/dagger.glb",
+              "bytes": 35340,
+              "sha256": "b3c3c662c3d9505f727480d0bb1a9dcb26f88550985516f5159ea22b16a86e56"
+            },
+            "bone": "handslot.l",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
         "weaponFix": null,
-        "tintStrength": 0.35
+        "tintStrength": null,
+        "animations": [
+          {
+            "url": "models/chars/players/woc/anims_male.glb",
+            "path": "public/models/chars/players/woc/anims_male.glb",
+            "bytes": 666128,
+            "sha256": "5058a87ff20deb937da00b7bccdb074385af111fa6bfaf5b4a4d9388da6904ea"
+          }
+        ],
+        "armor": [
+          {
+            "url": "models/chars/players/woc/armor/male_rogue_medium.glb",
+            "path": "public/models/chars/players/woc/armor/male_rogue_medium.glb",
+            "bytes": 609428,
+            "sha256": "3919570bffe2acfdeab02691ca7995f98307a01a06cc07b5a2ecce1cc2ee779e"
+          }
+        ]
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#8a7a5a",
-        "strength": 0.35
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "46fd70447b034cd4d00e066a456d2c44d5e41792b4dea8b83a1aca1fa693ab6c",
+      "sourceFingerprint": "3a1a92d04d1a614553070e5f4ac90a671a8a40adbe829328a0738b596689a980",
       "output": {
         "path": "public/ui/mobs/gravedigger_mosley.webp",
-        "bytes": 2710,
-        "sha256": "ba0f0bcf7b9f33b6a0236087517b902f292964f0bca37cf1855da6ac9d71073b"
+        "bytes": 2192,
+        "sha256": "1650811331dd1609e155a17da9151423b38c1892289c165c408cb456bf0764e1"
       }
     },
     {

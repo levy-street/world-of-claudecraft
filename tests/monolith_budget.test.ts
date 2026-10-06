@@ -541,7 +541,12 @@ const MONOLITHS: MonolithRow[] = [
     // parent pins for the record, the release 18093 and the branch 18201 (shared
     // turntable subject orchestration moved to preview_subject.ts); wc -l on the merged
     // tree. Exact count, zero slack.
-    ceiling: 18059,
+    // LOWERED 18059 -> 18054 with the NPC face portraits: the "what does a
+    // non-player frame show" rule (authored face, committed mob art or crest)
+    // moved out of drawNonPlayerPortrait into src/ui/nonplayer_portrait_core.ts,
+    // paying for the listener arm that repaints a landed face. Exact count,
+    // zero slack.
+    ceiling: 18054,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1449,7 +1454,10 @@ const MONOLITHS: MonolithRow[] = [
     // parent pins for the record, the release 11140 and the branch 11258 (roster
     // preview mapping in preview_appearance.ts); wc -l on the merged tree. Exact count,
     // zero slack.
-    ceiling: 10961,
+    // LOWERED 10961 -> 10958: the modular look provider answers for players only now
+    // (every world NPC rides a WOC class body, characters/npc_looks.ts), which took
+    // the NPC arm and its import out of the coordinator. Exact count, zero slack.
+    ceiling: 10958,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

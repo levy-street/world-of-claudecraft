@@ -14,11 +14,14 @@ import {
   KAYKIT_WARLOCK,
   manifestUrls,
   manifestUrlsForGraphics,
+  NPC_PROP_ATTACH,
+  playerVisualKey,
   SKINS,
   VISUALS,
   visibleAttachmentsForGraphics,
   visualKeyFor,
 } from '../src/render/characters/manifest';
+import { npcLookFor } from '../src/render/characters/npc_looks';
 import { MOBS, NPCS } from '../src/sim/data';
 
 function expectedClipNames(clips: ClipMap): string[] {
@@ -134,34 +137,58 @@ async function glbRenderableContract(path: string): Promise<{
 }
 
 describe('character visual manifest', () => {
-  it('keeps Bursar Fernando in his likeness atlas (the Eastbrook banker easter egg)', () => {
+  it('keeps Bursar Fernando in his likeness (the Eastbrook banker easter egg)', () => {
     // The maintainer-approved easter egg: black shoulder-length hair and light
-    // brown skin ride a repainted rogue palette resolved at skin index 0 (NPCs
-    // always resolve skin 0; the mech precedent for a real index-0 texture).
-    // The def must stay TINT-FREE: an entity tint would wash the repaint back
-    // toward the gold villager look. Do not "clean up" any of the three.
+    // brown skin. He wears it as an authored look on the rogue's body now
+    // (npc_looks.ts), a face the creator can make: the hair long and black, the
+    // skin a light brown, clean shaven.
     const key = visualKeyFor({
       kind: 'npc',
       templateId: 'bursar_fernando',
     } as never);
-    expect(key).toBe('npc_fernando');
+    expect(key).toBe('player_rogue');
+    const look = npcLookFor('bursar_fernando');
+    expect(look?.app.gender).toBe('male');
+    expect(look?.app.headHair).toBe('long');
+    expect(look?.app.headBeard).toBe('none');
+    expect(look?.app.hairLight).toBeLessThanOrEqual(0.1);
+    expect(look?.app.skinHue).toBeGreaterThanOrEqual(15);
+    expect(look?.app.skinHue).toBeLessThanOrEqual(40);
+    expect(look?.app.skinLight).toBeGreaterThanOrEqual(0.35);
+    expect(look?.app.skinLight).toBeLessThanOrEqual(0.6);
+    // His stock rig (the fallback for an NPC with no authored look) keeps the
+    // repainted rogue palette at skin index 0, and stays TINT-FREE: an entity
+    // tint would wash the repaint back toward the gold villager look. Do not
+    // "clean up" either.
     expect(VISUALS.npc_fernando.tint).toBeUndefined();
     const atlas = SKINS.npc_fernando?.[0];
     expect(atlas).toBe('textures/skins/rogue/fernando.png');
     expect(existsSync(fileURLToPath(new URL(`../public/${atlas}`, import.meta.url)))).toBe(true);
   });
 
-  it('resolves all three Chroniclers to the shared scholarly-mage visual', () => {
-    // One def, three tints: the per-NPC NpcDef color carries each identity,
-    // so the def must keep tint 'entity', and the three colors must stay
-    // pairwise distinct and off the bursar gold and auctioneer amethyst.
+  it('resolves all three Chroniclers to the mage body, staff and open tome in hand', () => {
+    // Three scholars, one class: each wears an authored look on the mage's body
+    // (npc_looks.ts) and holds the staff and the open spellbook.
     for (const templateId of [
       'chronicler_saul',
       'chronicler_osric_fenn',
       'chronicler_edda_hartwell',
     ]) {
-      expect(visualKeyFor({ kind: 'npc', templateId } as never)).toBe('npc_chronicler');
+      const look = npcLookFor(templateId);
+      expect(look?.cls, templateId).toBe('mage');
+      expect(look?.props, templateId).toBe('tome');
+      expect(visualKeyFor({ kind: 'npc', templateId } as never), templateId).toBe(
+        playerVisualKey('mage', look?.app),
+      );
     }
+    expect(NPC_PROP_ATTACH.tome.map((a) => a.url)).toEqual([
+      'models/weapons/staff.glb',
+      'models/weapons/spellbook_open.glb',
+    ]);
+    // Their stock rig (the fallback for an NPC with no authored look): one def,
+    // three tints. The per-NPC NpcDef color carries each identity, so the def
+    // must keep tint 'entity', and the three colors must stay pairwise distinct
+    // and off the bursar gold and auctioneer amethyst.
     const visual = VISUALS.npc_chronicler;
     expect(visual.url).toBe('models/chars/players/mage.glb');
     expect(visual.show).toEqual(['Mage_Hat']);

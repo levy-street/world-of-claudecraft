@@ -79,31 +79,42 @@ const CORRECTED_PORTRAITS = {
   ],
 } as const;
 
-// These portraits all resolve through entity-tinted visuals. The escortees shared one stale
-// green hooded render, while Cindraleth, Grubjaw, and the Wreck Warden retained older model
-// stand-ins. Pin the tint inputs as well as each visual/model and deterministic output.
-const CORRECTED_TINTED_PORTRAITS = {
-  gravedigger_mosley: [
-    'npc_villager',
-    'models/chars/players/rogue.glb',
-    0x8a7a5a,
-    0.35,
-    'ba0f0bcf7b9f33b6a0236087517b902f292964f0bca37cf1855da6ac9d71073b',
+// The quest escortees draw on the WOC body of the class their roster look names
+// (src/render/characters/npc_looks.ts MOB_LOOK_IDS), no longer on the entity-tinted stock
+// villager three of them were pinned on here. Their ledger portrait is therefore that
+// class body as the portrait pipeline draws it: untinted, in the class's whole kit, so
+// the three on the rogue's body share one image. The unit frames show each one's live
+// face instead (manifest.ts npcPortraitSourceFor); the files stay because the ledger
+// holds a row for every MOBS template. Pin the body, the absence of a tint and the
+// deterministic output: a dispatch that slid back to a tinted stock rig, or a body
+// change that left the old render behind, fails here.
+const ESCORTEE_CLASS_BODY_PORTRAITS = {
+  apprentice_wren: [
+    'player_mage_female',
+    'models/chars/players/woc/base_female.glb',
+    'a7666ba1f82ab975aee8a4f583b4deb88ac79b3471784f8df78b90e03dcec125',
   ],
   castaway_navigator: [
-    'npc_villager',
-    'models/chars/players/rogue.glb',
-    0x4a7a9c,
-    0.35,
-    'd4f0bf6105904dd5ddaa573e09d8cdf6da1fc17db0ab2c4b9106f7052d1e0f78',
+    'player_rogue',
+    'models/chars/players/woc/base_male.glb',
+    '1650811331dd1609e155a17da9151423b38c1892289c165c408cb456bf0764e1',
   ],
   fisher_bram: [
-    'npc_villager',
-    'models/chars/players/rogue.glb',
-    0x4a6a8a,
-    0.35,
-    '4e4961e7e5f7b1ee42892ebc11667ba3a3bc114680fad339d9fac56eb3c890fd',
+    'player_rogue',
+    'models/chars/players/woc/base_male.glb',
+    '1650811331dd1609e155a17da9151423b38c1892289c165c408cb456bf0764e1',
   ],
+  gravedigger_mosley: [
+    'player_rogue',
+    'models/chars/players/woc/base_male.glb',
+    '1650811331dd1609e155a17da9151423b38c1892289c165c408cb456bf0764e1',
+  ],
+} as const;
+
+// These portraits all resolve through entity-tinted visuals: Cindraleth, Grubjaw, and the
+// Wreck Warden had retained older model stand-ins. Pin the tint inputs as well as each
+// visual/model and deterministic output.
+const CORRECTED_TINTED_PORTRAITS = {
   cindraleth_maw_matriarch: [
     'mob_dragonkin_matriarch',
     'models/creatures/dragonkin_elite.glb',
@@ -216,6 +227,29 @@ describe('targetPortraitUrl', () => {
       } as never);
       expect(currentVisual, `${mobId} visual key`).toBe(visualKey);
       expect(VISUALS[currentVisual]?.url, `${mobId} model`).toBe(model);
+      const hash = createHash('sha256')
+        .update(readFileSync(resolve(process.cwd(), `public/ui/mobs/${mobId}.webp`)))
+        .digest('hex');
+      expect(hash, `${mobId} rerender`).toBe(acceptedHash);
+    }
+  });
+
+  it('keeps the escortee portraits synchronized with the class body each one draws', () => {
+    for (const [mobId, [visualKey, model, acceptedHash]] of Object.entries(
+      ESCORTEE_CLASS_BODY_PORTRAITS,
+    )) {
+      const mob = MOBS[mobId];
+      expect(mob, `${mobId} fixture`).toBeDefined();
+      const currentVisual = visualKeyFor({
+        kind: 'mob',
+        templateId: mobId,
+        family: mob?.family,
+      } as never);
+      expect(currentVisual, `${mobId} visual key`).toBe(visualKey);
+      expect(VISUALS[currentVisual]?.url, `${mobId} model`).toBe(model);
+      expect(VISUALS[currentVisual]?.wocCharacter, `${mobId} class body`).toBeDefined();
+      // a class body takes no entity tint: the template colour never reaches this render
+      expect(VISUALS[currentVisual]?.tint, `${mobId} tint source`).toBeUndefined();
       const hash = createHash('sha256')
         .update(readFileSync(resolve(process.cwd(), `public/ui/mobs/${mobId}.webp`)))
         .digest('hex');

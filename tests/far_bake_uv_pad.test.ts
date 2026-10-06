@@ -7,6 +7,7 @@ import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { padMissingUv } from '../src/render/characters/far_bake_uv_pad';
 import { DEFAULT_LOOK, MODULAR_WARRIOR_KEY } from '../src/render/characters/modular';
+import { landWocBodies } from './helpers/woc_streamed';
 
 type AssetsModule = typeof import('../src/render/characters/assets');
 
@@ -84,6 +85,9 @@ async function loadAssets(): Promise<AssetsModule> {
   }));
   const assets = (await import('../src/render/characters/assets')) as AssetsModule;
   await assets.charactersReady();
+  // The part library left the boot preload when the world's NPCs stopped composing
+  // from it (its def is lazyPreload): ask for it the way a host does and let it land.
+  await landWocBodies(assets, [MODULAR_WARRIOR_KEY]);
   return assets;
 }
 

@@ -323,9 +323,10 @@ describe('tinted character materials', () => {
   });
 
   it('drops the low-tier floor from an authored VERTEX-coloured prop, which has no map to scale it', () => {
-    // The harbormaster's gear (scripts/assets/harbormaster_gear/) carries its albedo in its
-    // vertices; three never multiplies emissive by vertex colour, so the uniform floor would
-    // film the dark navy felt grey. Only the authored tag drops it: a kit prop keeps it.
+    // A vertex-coloured authored prop carries its albedo in its vertices; three never
+    // multiplies emissive by vertex colour, so the uniform floor would film a dark surface
+    // grey. Only the authored tag drops it: a kit prop keeps it. (The rule was written for
+    // the harbormaster's worn gear, since retired with every NPC's move to a WOC body.)
     const restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials: false });
     try {
       const derive = (authored: boolean) => {

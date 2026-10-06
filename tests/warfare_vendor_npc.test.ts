@@ -9,6 +9,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
+import { npcLookFor } from '../src/render/characters/npc_looks';
 import { type Collider, queryOpenWorldColliders } from '../src/sim/colliders';
 import { STATIONS } from '../src/sim/content/professions';
 import {
@@ -270,18 +271,21 @@ describe('Warmarshal Draven Kole: the placement clears all three suites', () => 
 });
 
 describe('Warmarshal Draven Kole: presentation registrations', () => {
-  it('renders as the armored knight, and drags FURY off the villager fallback with him', () => {
-    // The NPC model map's fallback is SILENT: an unmapped id resolves to the
-    // tinted villager body and no other test asserts a row exists. That is
-    // exactly how both WARFARE vendors ended up looking like townsfolk.
-    for (const templateId of [WARFARE_QUARTERMASTER_NPC_ID, FURY_NPC_ID]) {
+  it('renders in plate, and keeps FURY off the villager fallback with him', () => {
+    // The NPC stock-rig fallback is SILENT: an NPC with no authored look resolves
+    // to the tinted villager body. That is exactly how both WARFARE vendors once
+    // ended up looking like townsfolk, so each is pinned to a plate class body.
+    // Kole wore the gold plate (the paladin's), FURY the silver (the warrior's).
+    for (const [templateId, cls] of [
+      [WARFARE_QUARTERMASTER_NPC_ID, 'paladin'],
+      [FURY_NPC_ID, 'warrior'],
+    ] as const) {
+      expect(npcLookFor(templateId)?.cls, templateId).toBe(cls);
       const key = visualKeyFor({ kind: 'npc', templateId } as never);
-      expect(key, templateId).toBe('npc_knight');
+      expect(key, templateId).toBe(`player_${cls}`);
       expect(key, templateId).not.toBe('npc_villager');
+      expect(VISUALS[key].wocCharacter?.fit, templateId).toBe('male');
     }
-    // An existing armored visual, reused: no new asset, so no clipmap obligation.
-    expect(VISUALS.npc_knight.url).toBe('models/chars/players/knight.glb');
-    expect(VISUALS.npc_knight.show).toEqual(['Knight_Helmet', 'Knight_Cape']);
   });
 
   it('resolves its greeting to a declared voice', async () => {

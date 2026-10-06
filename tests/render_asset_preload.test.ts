@@ -5,6 +5,7 @@ import {
   manifestUrlsForGraphics,
   modularVisualKey,
   VISUALS,
+  visualKeyFor,
 } from '../src/render/characters/manifest';
 import { DEFAULT_APPEARANCE, MODULAR_WARRIOR_KEY } from '../src/render/characters/modular';
 import { charselectLook, inWorldLookFor } from '../src/render/characters/player_look_core';
@@ -125,15 +126,43 @@ describe('composed player defs nobody can reach stay out of the boot download', 
     }
   });
 
-  it('fetches every one on demand except the library fallback', () => {
+  it('fetches every one on demand, the library fallback included', () => {
     // MODULAR_WARRIOR_KEY is what modularKeyFor hands a composed player whose class has no
-    // def of its own, so it keeps building synchronously.
+    // def of its own. It stayed in the boot gate while every world NPC composed from the
+    // same part library; each rides a WOC class body now (characters/npc_looks.ts), so
+    // nothing in the world builds from the library and it is on demand with the rest.
     expect(composedKeys).toContain(MODULAR_WARRIOR_KEY);
-    expect(VISUALS[MODULAR_WARRIOR_KEY].lazyPreload).toBeFalsy();
-    expect([...onDemand].sort()).toEqual(
-      composedKeys.filter((key) => key !== MODULAR_WARRIOR_KEY).sort(),
+    expect([...onDemand].sort()).toEqual([...composedKeys].sort());
+    const library = 'models/chars/modular/warrior_modular.glb';
+    expect(VISUALS[MODULAR_WARRIOR_KEY].url).toBe(library);
+    expect(boot.has(library)).toBe(false);
+    // no boot def names the library any more (an NPC def that did would put it back)
+    const holders = Object.entries(VISUALS)
+      .filter(([, def]) => !def.lazyPreload && def.url === library)
+      .map(([key]) => key);
+    expect(holders).toEqual([]);
+    // 3,477,500 B at the move: fail if the file this saves quietly stops being the library
+    expect(statSync(`public/${library}`).size).toBeGreaterThan(3_000_000);
+  });
+
+  it('fetches the two stock NPC rigs no boot def names on demand too', () => {
+    // Brother Aldric's and Brother Halven's old bodies: each wears an authored look on a
+    // WOC class body now, and no other boot def names these files, so they left the gate.
+    for (const [key, file] of [
+      ['npc_aldric', 'models/chars/players/mage_classic.glb'],
+      ['npc_reliquary_keeper', 'models/chars/players/paladin.glb'],
+    ] as const) {
+      expect(VISUALS[key].lazyPreload, key).toBe(true);
+      expect(VISUALS[key].url, key).toBe(file);
+      expect(boot.has(file), file).toBe(false);
+    }
+    // and neither is what its NPC draws
+    expect(visualKeyFor({ kind: 'npc', templateId: 'brother_aldric' } as never)).toBe(
+      'player_priest',
     );
-    for (const url of urlsOf(MODULAR_WARRIOR_KEY)) expect(boot.has(url), url).toBe(true);
+    expect(visualKeyFor({ kind: 'npc', templateId: 'brother_halven' } as never)).toBe(
+      'player_paladin',
+    );
   });
 
   it('downloads none of the files only those defs name', () => {

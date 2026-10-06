@@ -36,7 +36,7 @@ import {
   type PreviewFramingName,
 } from '../render/characters';
 import { preloadMechAssets } from '../render/characters/assets';
-import { playerVisualKey } from '../render/characters/manifest';
+import { npcPortraitSourceFor, playerVisualKey } from '../render/characters/manifest';
 import { helmSlotAvailableForEntity } from '../render/characters/player_look_core';
 import {
   composedPortraitKey,
@@ -732,6 +732,7 @@ import { MOUNT_DESC_KEYS, mountSpecLines } from './mount_labels';
 import { MountRaceControls } from './mount_race_controls';
 import { MountRaceStrip } from './mount_race_strip';
 import { type FrameDimension, MovableFrame } from './movable_frame';
+import { nonPlayerPortraitSubject, nonPlayerPortraitUpdateFrames } from './nonplayer_portrait_core';
 import { presentNoticeboardEvent } from './noticeboard_event';
 import { NoticeboardPopup } from './noticeboard_popup';
 import { NPC_WINDOW_CLOSE_RANGE, nearbyServiceNpc } from './npc_service_range';
@@ -882,7 +883,6 @@ import {
   targetPortraitKey,
 } from './target_frame_descriptor';
 import { targetOfTargetId } from './target_of_target';
-import { targetPortraitSourceId, targetPortraitUrl } from './target_portrait_view';
 import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
 import { TargetSwingTimerBars } from './target_swing_timer_bars';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
@@ -913,7 +913,6 @@ import { svgIcon } from './ui_icons';
 import { getUiScale } from './ui_scale';
 import { newUnitFrameBuffer, type UnitFrameDescriptor, unitFrameViewInto } from './unit_frame';
 import { UnitFramePainter } from './unit_frame_painter';
-import { crestIdForEntity } from './unit_portrait';
 import { UnitPortraitPainter } from './unit_portrait_painter';
 import { resolveUnitTooltipSeat } from './unit_tooltip_seat';
 import { knownItemIconHtml } from './unknown_item_icon';
@@ -2652,18 +2651,25 @@ export class Hud {
       this.totFramePainter.invalidatePortrait();
     });
     onPortraitUpdate((visualKey, skin, key) => {
-      // Every frame that holds a player repaints on exactly the capture its
-      // subject is waiting on (player_portrait_core.ts): the composed key
-      // for an authored face, the chroma atlas for a mech wearer, the (class,
-      // skin) pair otherwise. The target frames reuse their painter's identity
-      // gate through invalidatePortrait, so the repaint rides the next paint.
+      // Every frame repaints on exactly the capture its subject is waiting on.
+      // A player (player_portrait_core.ts): the composed key for an authored
+      // face, the chroma atlas for a mech wearer, the (class, skin) pair
+      // otherwise. Anyone else (nonplayer_portrait_core.ts): the body their
+      // authored face is drawn on. The target frames reuse their painter's
+      // identity gate through invalidatePortrait, so the repaint rides the next paint.
+      const update = { visualKey, skin, key };
       const framed = (subject: Entity | null): boolean =>
-        subject?.kind === 'player' &&
-        portraitUpdateFrames(
-          playerPortraitSubject(subject, PLAYER_PORTRAIT_LOOKUPS),
-          { visualKey, skin, key },
-          composedPortraitKey,
-        );
+        !!subject &&
+        (subject.kind === 'player'
+          ? portraitUpdateFrames(
+              playerPortraitSubject(subject, PLAYER_PORTRAIT_LOOKUPS),
+              update,
+              composedPortraitKey,
+            )
+          : nonPlayerPortraitUpdateFrames(
+              nonPlayerPortraitSubject(subject, npcPortraitSourceFor),
+              update,
+            ));
       if (framed(this.sim.player)) this.drawPlayerFramePortrait();
       if (framed(this.targetPortraitSubject)) this.targetFramePainter.invalidatePortrait();
       if (framed(this.totPortraitSubject)) this.totFramePainter.invalidatePortrait();
@@ -6028,7 +6034,7 @@ export class Hud {
   // gate ONLY when the target identity changes (or after invalidatePortrait), never
   // per frame, and reads the subject set just before that frame's paint() call. A
   // player target shows its real 3D headshot (rendered locally from the synced
-  // identity); mobs use committed model portraits and NPCs use their crest.
+  // identity); anyone else what nonplayer_portrait_core.ts resolves for them.
   private drawTargetPortrait(): void {
     const target = this.targetPortraitSubject;
     if (!target) return;
@@ -6037,18 +6043,7 @@ export class Hud {
   }
 
   private drawNonPlayerPortrait(canvas: HTMLCanvasElement, entity: Entity): void {
-    const isMobEntity = entity.kind === 'mob';
-    const sourceId = targetPortraitSourceId(entity.templateId, isMobEntity);
-    const template = MOBS[entity.templateId] ?? (sourceId ? MOBS[sourceId] : undefined);
-    const crestId = crestIdForEntity(entity.kind, template?.family);
-    const faceUrl = targetPortraitUrl(entity.templateId, isMobEntity);
-    if (faceUrl) {
-      this.portraits.drawHeadshot(canvas, faceUrl, () => {
-        this.portraits.drawCrest(canvas, crestId);
-      });
-      return;
-    }
-    this.portraits.drawCrest(canvas, crestId);
+    this.portraits.drawNonPlayer(canvas, nonPlayerPortraitSubject(entity, npcPortraitSourceFor));
   }
 
   // Redraw the target-of-target portrait canvas, the twin of drawTargetPortrait for

@@ -59,7 +59,7 @@ import {
 } from '../hoard_boss_gestures_core';
 import type { LocoGaitThresholds } from '../locomotion';
 import { VARKHUL_FORGING_STRIKE_TIMESCALE } from '../varkhul_forge_hammer';
-import { NPC_PROP_SET_IDS, type NpcPropSet } from './npc_looks';
+import { NPC_PROP_SET_IDS, type NpcLook, type NpcPropSet, npcLookFor } from './npc_looks';
 import type { WeaponLoadout } from './weapon_loadout_core';
 import { type WocFit, wocAnimsUrl, wocBaseUrl } from './woc_armor_core';
 import {
@@ -1472,8 +1472,6 @@ const FORMS = 'models/chars/forms';
 const CREATURES = 'models/creatures';
 const PROPS = 'models/props';
 const WEAPONS = 'models/weapons';
-/** Worn NPC gear, attached to a body bone rather than held (npc_looks.ts `harbormaster`). */
-const NPC_GEAR = 'models/chars/npc_gear';
 const MOUNTS_DIR = 'models/mounts';
 
 /** Exported for the authored-surface guard (tests/authored_surfaces.test.ts),
@@ -1524,16 +1522,12 @@ export const ITEM_OFFHAND_MODELS: Readonly<Record<string, string>> = {
 export const AUTHORED_HELD_MODELS: ReadonlySet<string> = new Set([
   'hammer_varkhul', // Varkhul Forgebreaker (Ignivar raid legendary)
   'varkhul_emberward', // Varkhul Emberward (Ignivar raid legendary)
-  // Harbormaster Tamsin's worn gear (scripts/assets/harbormaster_gear/): felt, brass and
-  // leather authored per material, which the weapon polish would glaze to one sheen
-  'harbormaster_tricorne',
-  'harbormaster_spyglass',
 ]);
 
 /** True when a held-prop GLB url resolves to one of AUTHORED_HELD_MODELS (a held weapon
- *  under models/weapons/, or worn NPC gear under models/chars/npc_gear/). */
+ *  under models/weapons/). */
 export function isAuthoredHeldModelUrl(url: string): boolean {
-  const m = /^models\/(?:weapons|chars\/npc_gear)\/([^/]+)\.glb$/.exec(url);
+  const m = /^models\/weapons\/([^/]+)\.glb$/.exec(url);
   return m !== null && AUTHORED_HELD_MODELS.has(m[1]);
 }
 
@@ -3828,12 +3822,15 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 0xc9b98a,
     tintStrength: 0.3, // brown-robed brothers of the chapel
   },
-  // Brother Aldric keeps his pre-v0.7 model (the old chars/mage.glb, restored as
-  // mage_classic.glb with the staff built into the mesh). Aldric-only — every
-  // other npc_mage uses the new KayKit full-pack model from #396.
+  // Brother Aldric's pre-v0.7 model (the old chars/mage.glb, restored as
+  // mage_classic.glb with the staff built into the mesh). He wears an authored
+  // look on the priest's WOC body now (npc_looks.ts), so this is only his stock
+  // rig: nothing in the world draws it, and its files are fetched on demand
+  // rather than in every client's boot download (they are named by no other def).
   npc_aldric: {
     url: `${PLAYERS}/mage_classic.glb`,
     animUrls: [`${PLAYERS}/mage_classic_hit_variety_anims.glb`],
+    lazyPreload: true,
     height: HUMANOID_H,
     clips: kaykit(['2H_Melee_Attack_Chop']),
     show: ['2H_Staff'],
@@ -3888,9 +3885,12 @@ export const VISUALS: Record<string, VisualDef> = {
   // door. Uses the KayKit paladin, one of the newer full-pack adventurer models
   // (unused elsewhere), for a sturdier, holier silhouette than the old hooded
   // rogue. Ships its accessories (helm/cape/shield) by default (no show filter).
+  // He wears an authored look on the paladin's WOC body now (npc_looks.ts), so
+  // this is only his stock rig: fetched on demand, like npc_aldric above.
   npc_reliquary_keeper: {
     url: `${PLAYERS}/paladin.glb`,
     animUrls: [`${PLAYERS}/paladin_hit_variety_anims.glb`],
+    lazyPreload: true,
     height: HUMANOID_H,
     clips: kaykit(['1H_Melee_Attack_Chop']),
   },
@@ -5187,10 +5187,11 @@ export const KAYKIT_BASELINES: Partial<Record<PlayerClass, VisualDef>> = {
 // def, and the def is `lazyPreload`: the KayKit class rig and donor clip GLBs
 // only it names stay out of every client's boot download and are fetched if a
 // build ever asks (assets.ts visualAssetsResident; the dev outfit audit rig,
-// src/dev/outfit_audit.ts, is the one caller left). The warrior's stays in the
-// boot gate: it is the library's own fallback key (MODULAR_WARRIOR_KEY, what
-// modularKeyFor hands a composed player whose class has no def), and it costs
-// the boot nothing while mob_vision_aldren names the same files.
+// src/dev/outfit_audit.ts, is the one caller left). That holds for the warrior's
+// too, the library's own fallback key (MODULAR_WARRIOR_KEY): it stayed in the
+// boot gate while every world NPC composed from the same part library, and no
+// NPC does any more (each rides a WOC class body, npc_looks.ts), so the library
+// file itself is on demand with the rest.
 for (const cls of ALL_CLASSES) {
   const classDef = VISUALS[`player_${cls}`];
   const {
@@ -5204,7 +5205,7 @@ for (const cls of ALL_CLASSES) {
     url: `${MODULAR}/warrior_modular.glb`,
     modular: true,
     animUrls: [base.url, ...(base.animUrls ?? [])],
-    ...(classDef.wocCharacter && cls !== 'warrior' ? { lazyPreload: true } : {}),
+    ...(classDef.wocCharacter ? { lazyPreload: true } : {}),
   };
 }
 
@@ -5214,17 +5215,15 @@ export function modularVisualKey(cls: PlayerClass): string {
 }
 
 // ---------------------------------------------------------------------------
-// NPC modular bodies: one `npc_modular_<propSet>` def per held-prop set
-// (npc_looks.ts authors WHICH set each NPC carries; this loop owns the
-// geometry). NPC gear never changes, so every prop is a FIXED attach (no
-// weaponSlots): with none, a composed NPC would inherit the warrior def's
-// default sword through modularKeyFor's class fallback. Clips ride the rogue
-// GLB exactly like npc_villager's fixed rig, so a composed villager idles,
-// walks, sits and dies with the same base clip set the town always used.
-// Driven by NPC_PROP_SET_IDS rather than a local list so a new prop set in
-// npc_looks.ts cannot ship without its def (tests/npc_looks.test.ts pins it).
+// NPC held props: one fixed attach list per prop set (npc_looks.ts authors
+// WHICH set each NPC carries; this table owns the geometry). An NPC rides a
+// player class's WOC def (visualKeyFor) and NPC gear never changes, so its
+// props replace that def's hands outright: a fixed attach list with no weapon
+// slot (npcHeldProps), or the body would hold the class's own default weapons.
+// Keyed by NpcPropSet, so a new prop set in npc_looks.ts cannot ship without
+// its row.
 // ---------------------------------------------------------------------------
-const NPC_MODULAR_PROP_ATTACH: Record<NpcPropSet, AttachDef[]> = {
+export const NPC_PROP_ATTACH: Readonly<Record<NpcPropSet, readonly AttachDef[]>> = {
   none: [],
   staff: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
   walking_staff: [{ url: `${WEAPONS}/brasscrown_walking_staff.glb`, bone: 'handslot.r' }],
@@ -5244,23 +5243,21 @@ const NPC_MODULAR_PROP_ATTACH: Record<NpcPropSet, AttachDef[]> = {
   scythe: [{ url: `${WEAPONS}/scythe.glb`, bone: 'handslot.r' }],
   knife: [{ url: `${WEAPONS}/whittler_s_knife.glb`, bone: 'handslot.r' }],
   spear: [{ url: `${WEAPONS}/spear_a.glb`, bone: 'handslot.r' }],
-  // worn, not held: each GLB is authored in its bone's bind frame and rides it with an
-  // identity transform (scripts/assets/harbormaster_gear/build_harbormaster_gear.py)
-  harbormaster: [
-    { url: `${NPC_GEAR}/harbormaster_tricorne.glb`, bone: 'head' },
-    { url: `${NPC_GEAR}/harbormaster_spyglass.glb`, bone: 'hips' },
-  ],
 };
 
-for (const propSet of NPC_PROP_SET_IDS) {
-  VISUALS[`npc_modular_${propSet}`] = {
-    url: `${MODULAR}/warrior_modular.glb`,
-    modular: true,
-    height: HUMANOID_H,
-    clips: kaykit(['1H_Melee_Attack_Chop']),
-    animUrls: [`${PLAYERS}/rogue.glb`, `${PLAYERS}/rogue_hit_variety_anims.glb`],
-    attach: NPC_MODULAR_PROP_ATTACH[propSet],
-  };
+// One layout object per prop set, minted once: a stable identity for every
+// body that holds the set.
+const NPC_HELD_PROPS = Object.fromEntries(
+  NPC_PROP_SET_IDS.map((propSet): [NpcPropSet, WeaponLayoutOverride] => [
+    propSet,
+    { attach: [...NPC_PROP_ATTACH[propSet]], weaponSlots: undefined, offhandSlot: undefined },
+  ]),
+) as Record<NpcPropSet, WeaponLayoutOverride>;
+
+/** The hands of an NPC that carries `propSet`: its fixed props in place of the
+ *  class def's own weapons, with no swap slot (an NPC equips nothing). */
+export function npcHeldProps(propSet: NpcPropSet): WeaponLayoutOverride {
+  return NPC_HELD_PROPS[propSet];
 }
 
 // ---------------------------------------------------------------------------
@@ -5416,7 +5413,6 @@ const MOB_KEYS: Record<string, string> = {
   necromancy_skeletal_warrior: 'skel_minion',
   necromancy_bone_mage: 'skel_mage',
   necromancy_gravewing: 'mob_gravewing',
-  brother_aldric_raid: 'npc_aldric',
   hollow_acolyte: 'skel_mage',
   sexton_marrow: 'skel_mage',
   morthen: 'skel_boss',
@@ -5455,9 +5451,6 @@ const MOB_KEYS: Record<string, string> = {
   duskwisp: 'mob_duskwisp',
   ice_wisp: 'mob_ghost',
   frostmane_yeti: 'mob_yeti',
-  // Frostveil quest pass: Wren renders as a tinted villager (escort NPC, mob-kind
-  // so the escort driver can walk her); the howlers ride the beast/wolf fallback.
-  apprentice_wren: 'npc_villager',
   sporeling_gatherer: 'mob_glub',
   corrupted_sporeling: 'mob_glub',
   mushroom_pixie: 'mob_mushroom_pixie',
@@ -5476,11 +5469,6 @@ const MOB_KEYS: Record<string, string> = {
   wood_wraith: 'mob_ghost',
   gravenbark_shambler: 'mob_treant',
   pale_huntsman: 'skel_rogue',
-  // Mosley is an escortee (mob-kind so the escort driver can walk him), and
-  // every escortee needs an explicit body: the humanoid family default is the
-  // hooded outlaw, so the townsfolk you walk home would read as the bandits you
-  // are protecting them from. Tinted villager, exactly like Wren above.
-  gravedigger_mosley: 'npc_villager',
   // the Palmreach: coral crabs, jungle boars, and the carved-stone guardian
   // (the canopy weavers take the spider family default)
   tide_scuttler: 'mob_crab',
@@ -5496,13 +5484,8 @@ const MOB_KEYS: Record<string, string> = {
   the_topiary_bull: 'mob_bull',
   moor_ram: 'mob_alpaca',
   shoal_scuttler: 'mob_crab',
-  // Navigator Suli, the Palmreach escortee (see gravedigger_mosley above).
-  castaway_navigator: 'npc_villager',
   // The Wreck Warden walks as Mogger's hulking bruiser body, not a skeleton.
   the_wreck_warden: 'mob_bruiser',
-  // the Farshore: Bram is the isle's escortee (see gravedigger_mosley above);
-  // its wretches, stalkers and horrors keep their family fallbacks.
-  fisher_bram: 'npc_villager',
   // The Infernal Citadel: the pact cult reads as robed casters, not the `undead`
   // family's default skeleton minion. Its demons keep the family fallback
   // (mob_demonalt), re-tinted deep red by the templates.
@@ -5549,6 +5532,8 @@ const FAMILY_KEYS: Record<string, string> = {
   reptile: 'mob_spearjaw',
 };
 
+// Fallback only: the stock rig of an NPC with NO row in npc_looks.ts (none ships),
+// so the rows and their comments name the old bodies, not what the world draws.
 const NPC_KEYS: Record<string, string> = {
   infiltrator_captain: 'npc_knight',
   infiltrator_nella: 'npc_knight',
@@ -5628,18 +5613,68 @@ export function playerVisualKey(cls: string, appearance: BodyPick): string {
   return base;
 }
 
+// The renderer asks for every NPC view's key every frame (its base-visual diff),
+// so the key of a look is minted once and read back by the look's own identity.
+const npcBodyKeys = new WeakMap<NpcLook, string>();
+function npcBodyKey(look: NpcLook): string {
+  let key = npcBodyKeys.get(look);
+  if (key === undefined) {
+    key = playerVisualKey(look.cls, look.app);
+    npcBodyKeys.set(look, key);
+  }
+  return key;
+}
+
+/** What a unit frame's portrait draws for a character with an authored look: the
+ *  class body the look names and the face it wears on it, the two things the live
+ *  headshot lane keys on (portrait.ts visualPortraitDataUrl). */
+export interface NpcPortraitSource {
+  readonly visualKey: string;
+  readonly head: NpcLook['app'];
+}
+
+const npcPortraitSources = new WeakMap<NpcLook, NpcPortraitSource>();
+/** The portrait source for the template and entity kind a frame holds, null for one
+ *  with no authored look (it keeps its crest, or its committed art). One object per
+ *  look, so a frame that asks on every repaint allocates nothing. */
+export function npcPortraitSourceFor(
+  templateId: string,
+  kind: Entity['kind'],
+): NpcPortraitSource | null {
+  const look = npcLookFor(templateId, kind);
+  if (!look) return null;
+  let source = npcPortraitSources.get(look);
+  if (!source) {
+    source = { visualKey: npcBodyKey(look), head: look.app };
+    npcPortraitSources.set(look, source);
+  }
+  return source;
+}
+
 export function visualKeyFor(e: Entity): string {
   if (e.kind === 'player') {
     if (isMechWearer(e)) return 'player_mech';
     return playerVisualKey(e.templateId, e.modularAppearance);
   }
   if (e.kind === 'mob') {
+    // A quest escortee is a mob only so the escort driver can walk it. It draws as
+    // the townsperson it is: its roster look on the WOC body of its class, exactly
+    // as an NPC does (npc_looks.ts MOB_LOOK_IDS). It must never reach the tables
+    // below: the humanoid family default is the hooded outlaw, so the townsfolk you
+    // walk home would read as the bandits you protect them from. For every other
+    // mob this is one set read (npcLookFor), then the tables as before.
+    const look = npcLookFor(e.templateId, e.kind);
+    if (look) return npcBodyKey(look);
     const override = MOB_KEYS[e.templateId];
     if (override) return override;
     const family = MOBS[e.templateId]?.family;
     return (family && FAMILY_KEYS[family]) || 'mob_bandit';
   }
-  // npcs — Brother Aldric recurs in every hub under suffixed ids
+  // An NPC wears an authored look on the WOC body of its class and body type
+  // (npc_looks.ts), the very def a player of that class draws. One with no
+  // authored look (none ships: tests/npc_looks.test.ts) falls back to a stock rig.
+  const look = npcLookFor(e.templateId, e.kind);
+  if (look) return npcBodyKey(look);
   if (e.templateId.startsWith('brother_aldric')) return 'npc_aldric';
   return NPC_KEYS[e.templateId] ?? 'npc_villager';
 }
@@ -5674,6 +5709,11 @@ export function manifestUrls(): string[] {
     for (const url of def.animUrls ?? []) urls.add(url);
     for (const a of def.attach ?? []) urls.add(a.url);
   }
+  // The props an NPC holds ride no def of their own (npcHeldProps), so they are
+  // named here for the boot gate. One is also an Armory weapon-skin model (the
+  // brasscrown walking staff), which assets.ts streams on demand like every skin:
+  // the first NPC that holds it builds fail-soft once it lands, as before.
+  for (const attach of Object.values(NPC_PROP_ATTACH)) for (const a of attach) urls.add(a.url);
   // Equipped-weapon models a player may swap to at runtime (any nearby player's
   // gear), so they are resolved-and-ready when setWeapon attaches them.
   for (const url of itemWeaponModelUrls()) urls.add(url);

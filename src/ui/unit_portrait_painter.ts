@@ -10,6 +10,7 @@
 // lives in unit_portrait.ts (and is unit-tested there).
 // ---------------------------------------------------------------------------
 
+import type { NpcPortraitSource } from '../render/characters/manifest';
 import type { ModularLook } from '../render/characters/modular';
 import {
   cachedPortraitDataUrl,
@@ -20,6 +21,7 @@ import {
 import type { PlayerClass } from '../sim/types';
 import { crestIconUrl } from './crest_icon_art';
 import { iconCanvas } from './icons';
+import { FACE_PORTRAIT_SKIN, type NonPlayerPortraitSubject } from './nonplayer_portrait_core';
 import type { PlayerPortraitSubject } from './player_portrait_core';
 import {
   CREST_OVERSCAN,
@@ -167,6 +169,30 @@ export class UnitPortraitPainter {
       if (url) this.drawHeadshot(canvas, url);
       else this.drawCrest(canvas, `class_${subject.cls}`);
     }
+  }
+
+  /** Paint whatever a frame holding a non-player shows, as resolved by
+   *  nonplayer_portrait_core.ts: the same rule for the target, target-of-target
+   *  and pet frames. A face is the live headshot of the character's own head on
+   *  its class body, the capture a player's frame asks for (drawPlayer's class
+   *  arm). Its interim is the crest, never the body's default face: that face
+   *  is nobody the player is looking at. A decode failure falls back to the
+   *  crest too. Answers whether the subject's own image was painted: false is
+   *  the crest standing in, which for a face means its capture is still owed. */
+  drawNonPlayer(
+    canvas: HTMLCanvasElement,
+    subject: NonPlayerPortraitSubject<NpcPortraitSource['head']>,
+  ): boolean {
+    const crest = (): void => this.drawCrest(canvas, subject.crestId);
+    const url =
+      subject.kind === 'face'
+        ? visualPortraitDataUrl(subject.visualKey, FACE_PORTRAIT_SKIN, 'headshot', subject.head)
+        : subject.kind === 'art'
+          ? subject.url
+          : null;
+    if (url) this.drawHeadshot(canvas, url, crest);
+    else crest();
+    return url !== null;
   }
 
   /**

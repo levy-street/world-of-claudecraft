@@ -632,7 +632,8 @@ export class CharacterVisual {
     return true;
   }
 
-  /** Roster previews have no equipped-item snapshot; keep the manifest kit. */
+  /** Roster previews have no equipped-item snapshot; keep the manifest kit. A world
+   *  NPC is dressed the same way at birth, its head slot empty (characters/index.ts). */
   setWocDefaultEquipment(helmHidden: boolean): boolean {
     const manifest = this.def.wocCharacter;
     if (!manifest || this.disposed) return false;
@@ -767,7 +768,7 @@ export class CharacterVisual {
     // one it waits for the file's prepare unit and attaches as a unit of its own (the
     // same scheduleWocWork, and so the same priority, as the merged stand-ins' mounts).
     const queued = (): WocArmorDressingHost['schedule'] =>
-      this.workQueue ? this.scheduleWocWork : undefined;
+      this.queuedWorkQueue() ? this.scheduleWocWork : undefined;
     return {
       model: this.model,
       adopt: (container) => this.adoptWocArmor(container),
@@ -814,13 +815,22 @@ export class CharacterVisual {
    * queue refuses (shut down by a graphics rebuild) is dropped: the views go with it.
    */
   private readonly scheduleWocWork = (work: () => void, label: string): void => {
-    const queue = this.workQueue;
+    const queue = this.queuedWorkQueue();
     if (!queue) {
       work();
       return;
     }
     void queue.run(work, GPU_WORK_PRIORITY.VISIBLE_PREWARM, label).catch(() => undefined);
   };
+
+  /** The queue this body's own units ride: the one it was handed, else the one its gate
+   *  came with (rendererWorkQueue). A pooled body is handed its gate alone, and one taken
+   *  before the renderer had paired that gate with its queue would otherwise fold its
+   *  merged head and attach its armor on the spot, inside a live frame. Pooled WOC bodies
+   *  are the norm since every world NPC rides one (npc_looks.ts). */
+  private queuedWorkQueue(): CharacterWorkQueue | null {
+    return this.workQueue ?? this.rendererWorkQueue();
+  }
 
   /** The head dressing's view of this visual (woc_head_dressing.ts). */
   private wocHeadHost(): import('./woc_head_dressing').WocHeadDressingHost {
@@ -1654,6 +1664,11 @@ export class CharacterVisual {
       this.wocBirthDressed = true;
       this.redressWoc();
     }
+    // A body in its default kit is dressed once and never diffed again (an NPC: the
+    // renderer's worn-set diff, which heals a failed under-armor atlas for a player every
+    // frame, is the players'): its failed atlas is asked for again from here, on the same
+    // cooldown, so the wrong cloth never stays for as long as the body is in view.
+    if (this.wocDefaultDressed) this.wocAtlas.retryFailed();
     // The head went live (or a file of it failed): the body draws from this frame on.
     if (this.wocHeadAwaited) this.syncWocHeadWait();
     // A transparent effect whose clones finished linking: swap them in HERE,

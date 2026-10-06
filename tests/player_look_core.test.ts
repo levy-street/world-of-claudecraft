@@ -140,7 +140,7 @@ describe('inWorldLookFor and charselectLook (no class composes any more)', () =>
   });
 
   // The composer itself still answers for the library's own consumers (the
-  // composed-body test bed, NPC modular looks): the caller-supplied armour set
+  // composed-body test bed): the caller-supplied armour set
   // is what it wears, never a local override.
   it('composes from the CALLER-supplied armour set', () => {
     const app = { gender: 'male' };
