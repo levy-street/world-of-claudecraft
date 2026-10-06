@@ -3,7 +3,10 @@
 // from players, escapes 20 seconds after the first blow (or after two minutes
 // untouched), and pays everyone in the room the room chest's copper if killed.
 import { describe, expect, it, vi } from 'vitest';
-import { VAULT_GUEST_PAYOUTS_PER_CYCLE } from '../src/sim/content/treasure_maps';
+import {
+  type TreasureMapRarity,
+  VAULT_GUEST_PAYOUTS_PER_CYCLE,
+} from '../src/sim/content/treasure_maps';
 import { riftInstanceOrigin } from '../src/sim/data';
 import { HOARD_GOBLIN_ESCAPE_CAST } from '../src/sim/rift/hoard_control_cast_ids';
 import {
@@ -76,14 +79,15 @@ describe('the Coinsack Scurrier', () => {
     expect(hoardGoblinCopper(20, 'legendary')).toBe(78_000);
   });
 
-  it('rolls its 15% on every hoard, and an ordinary rift never draws for it', () => {
+  it('rolls once on every hoard, and an ordinary rift never draws for it', () => {
     const { sim, inst } = hoard('mushroom rare');
     const spots = [{ x: 0, z: 10, level: 20 }];
     const chance = vi.spyOn(sim.ctx.rng, 'chance');
     // A losing roll: drawn once at the goblin's odds, and no goblin.
     chance.mockReturnValueOnce(false);
     maybeSpawnHoardGoblin(sim.ctx, inst, spots);
-    expect(chance).toHaveBeenLastCalledWith(HOARD_GOBLIN_CHANCE);
+    expect(chance).toHaveBeenLastCalledWith(HOARD_GOBLIN_CHANCE.rare);
+    expect(chance).toHaveBeenCalledTimes(1);
     expect(inst.hoardGoblin).toBeUndefined();
     // A winning roll spawns one at the room spot.
     chance.mockReturnValueOnce(true);
@@ -96,6 +100,36 @@ describe('the Coinsack Scurrier', () => {
     maybeSpawnHoardGoblin(sim.ctx, rift, spots);
     expect(chance.mock.calls.length).toBe(calls);
     expect(rift.hoardGoblin).toBeUndefined();
+    chance.mockRestore();
+  });
+
+  it.each<[TreasureMapRarity, number]>([
+    ['common', 0.03],
+    ['rare', 0.07],
+    ['epic', 0.11],
+    ['legendary', 0.15],
+  ])('spawns below the %s threshold of %s, but not at it', (rarity, threshold) => {
+    const { sim, inst } = hoard('mushroom rare');
+    inst.vault!.rarity = rarity;
+    const spots = [{ x: 0, z: 10, level: 20 }];
+    const next = vi.spyOn(sim.ctx.rng, 'next');
+    next.mockReturnValueOnce(threshold);
+    maybeSpawnHoardGoblin(sim.ctx, inst, spots);
+    expect(inst.hoardGoblin).toBeUndefined();
+    expect(next).toHaveBeenCalledTimes(1);
+    next.mockReturnValueOnce(threshold - 0.000001);
+    maybeSpawnHoardGoblin(sim.ctx, inst, spots);
+    expect(inst.hoardGoblin).toBeDefined();
+    expect(sim.entities.get(inst.hoardGoblin!.id)?.templateId).toBe(HOARD_GOBLIN_TEMPLATE_ID);
+    next.mockRestore();
+  });
+
+  it('still draws the rarity roll when the dev flag forces a losing roll to spawn', () => {
+    const { sim, inst } = hoard('mushroom common goblin');
+    const chance = vi.spyOn(sim.ctx.rng, 'chance').mockReturnValueOnce(false);
+    maybeSpawnHoardGoblin(sim.ctx, inst, [{ x: 0, z: 10, level: 20 }]);
+    expect(chance).toHaveBeenCalledExactlyOnceWith(0.03);
+    expect(inst.hoardGoblin).toBeDefined();
     chance.mockRestore();
   });
 

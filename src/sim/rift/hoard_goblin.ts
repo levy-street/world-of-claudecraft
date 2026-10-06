@@ -16,6 +16,7 @@
 
 import { CASKET_MATERIAL_POOL, treasureCasketCopper } from '../clue_casket';
 import {
+  type TreasureMapRarity,
   VAULT_GUEST_PAYOUTS_PER_CYCLE,
   VAULT_PAYOUTS,
   vaultHealthFactor,
@@ -31,8 +32,13 @@ import { HOARD_GOBLIN_ESCAPE_CAST } from './hoard_control_cast_ids';
 import type { RiftInstance } from './types';
 
 export const HOARD_GOBLIN_TEMPLATE_ID = 'hoard_coinsack_scurrier';
-/** Odds a hoard room holds one. */
-export const HOARD_GOBLIN_CHANCE = 0.15;
+/** Odds a hoard room holds one, increasing with its map rarity. */
+export const HOARD_GOBLIN_CHANCE: Readonly<Record<TreasureMapRarity, number>> = Object.freeze({
+  common: 0.03,
+  rare: 0.07,
+  epic: 0.11,
+  legendary: 0.15,
+});
 /** Seconds from the first blow until it escapes with the gold. */
 export const HOARD_GOBLIN_ESCAPE_SEC = 20;
 /** Seconds it lingers untouched before it leaves on its own. */
@@ -73,7 +79,7 @@ export function maybeSpawnHoardGoblin(
   delete inst.hoardGoblin;
   const vault = inst.vault;
   if (!vault) return;
-  const rolled = ctx.rng.chance(HOARD_GOBLIN_CHANCE);
+  const rolled = ctx.rng.chance(HOARD_GOBLIN_CHANCE[vault.rarity]);
   if (!rolled && !vault.forceGoblin) return;
   if (spots.length === 0) return;
   const template = MOBS[HOARD_GOBLIN_TEMPLATE_ID];

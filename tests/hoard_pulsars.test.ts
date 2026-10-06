@@ -36,6 +36,8 @@ function encounter(rarity: Rarity = 'rare') {
     id: -1,
     vaultOwnerPid: sim.player.id,
     vaultRarity: rarity,
+    // Keep the incidental goblin's spot draw fixed across spawn-rate tuning.
+    devForceHoardGoblin: true,
   });
   const inst = sim.riftInstances.find((entry) => entry.partyKey !== null);
   if (!inst || inst.bossId === null) throw new Error('missing hoard');
