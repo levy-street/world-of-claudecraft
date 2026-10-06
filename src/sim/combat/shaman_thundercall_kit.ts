@@ -10,9 +10,10 @@
 //   resets Magma Burst and makes the next one instant.
 // - Stormbreak: the Wrath Thunderstorm's 8% maximum Mana return.
 //
-// v0.45 rotation fix: Magma Burst banks Thunder, and Cinder Jolt runs the
-// Cataclysm-era 18 sec, so the Cinder Jolt and Magma Burst loop feeds the
-// Earthen Jolt vent instead of starving it.
+// v0.45 rotation fix: Magma Burst banks Thunder and carries the Wrath Lava
+// Flows crit bonus, and Cinder Jolt runs 27 sec (Cataclysm's 18 sec Flame Shock
+// with its glyph), so the Cinder Jolt and Magma Burst loop feeds the Earthen
+// Jolt vent and beats plain Arc Bolt plus Earthen Jolt instead of starving it.
 //
 // Every rng draw here is gated on a Thundercall caster who KNOWS the relevant
 // ability, so no other build's draw stream moves. Design and numbers:
@@ -32,13 +33,17 @@ export const ARC_OVERLOAD_DAMAGE_FRACTION = 0.5;
 export const ARC_OVERLOAD_THUNDER = 1;
 export const MAGMA_BURST_ABILITY_ID = 'lava_burst';
 export const MAGMA_BURST_THUNDER = 1;
+// Wrath Lava Flows at 3/3: added to Magma Burst's critical strike multiplier,
+// so a crit deals an extra 24% of the normal hit (1.5 to 1.74 before gear).
+export const MAGMA_BURST_CRIT_BONUS = 0.24;
 export const MAGMA_SURGE_CHANCE = 0.2;
 export const MAGMA_SURGE_DURATION = 10;
 export const STORMBREAK_ABILITY_ID = 'thunderstorm';
 export const STORMBREAK_MANA_FRACTION = 0.08;
-// The Cataclysm Flame Shock duration. Cinder Jolt shares the shock cooldown
-// with Earthen Jolt, so a longer DoT claims that cooldown less often.
-export const THUNDERCALL_CINDER_JOLT_DURATION = 18;
+// Cataclysm's 18 sec Flame Shock with the Glyph of Flame Shock's +50%. Cinder
+// Jolt shares the shock cooldown with Earthen Jolt, so a longer DoT claims that
+// cooldown less often.
+export const THUNDERCALL_CINDER_JOLT_DURATION = 27;
 
 const CINDER_JOLT_DOT_ID = 'flame_shock';
 const OVERLOAD_ABILITIES: ReadonlySet<string> = new Set(['lightning_bolt', 'chain_lightning']);
@@ -139,6 +144,13 @@ export function resolveThundercallAbility(
       };
     }),
   };
+}
+
+/** Lava Flows: the extra crit multiplier a Thundercall's Magma Burst adds at the
+ *  crit site (combat/effect_dispatch.ts); 0 for every other ability or spec. */
+export function magmaBurstCritBonus(ctx: SimContext, player: Entity, abilityId: string): number {
+  if (abilityId !== MAGMA_BURST_ABILITY_ID || thundercallMeta(ctx, player) === null) return 0;
+  return MAGMA_BURST_CRIT_BONUS;
 }
 
 /** Magma Burst always crits a target burning with the caster's own Cinder Jolt. */

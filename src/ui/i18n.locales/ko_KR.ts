@@ -895,7 +895,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '지금 언덕을 예고합니다. 예고 시간이 다 지나면 솟아오릅니다.',
   'devCommand.actions.hillwarn.label': '언덕 카운트다운',
   'entities.abilities.lava_burst.description':
-    '{damage}의 화염 피해를 입힙니다. 명중하면 천둥을 1 얻습니다. 대상이 잉걸 충격으로 불타고 있으면 항상 치명타로 적중합니다. 마그마 급증: 잉걸 충격이 피해를 줄 때마다 20% 확률로 이 재사용 대기시간을 초기화하고, 10초 안에 시전하는 다음 마그마 폭발을 즉시 시전 가능하게 합니다. 피해량은 주문력에 따라 증가합니다. (천둥소환)',
+    '{damage}의 화염 피해를 입힙니다. 명중하면 천둥을 1 얻습니다. 대상이 잉걸 충격으로 불타고 있으면 항상 치명타로 적중합니다. 치명타는 일반 피해의 24%를 추가로 입힙니다. 마그마 급증: 잉걸 충격이 피해를 줄 때마다 20% 확률로 이 재사용 대기시간을 초기화하고, 10초 안에 시전하는 다음 마그마 폭발을 즉시 시전 가능하게 합니다. 피해량은 주문력에 따라 증가합니다. (천둥소환)',
   'entities.abilities.lava_burst.name': 'Magma Burst',
   'entities.abilities.lightning_overload.description':
     '지속 효과: 전격 화살과 갈래 번개는 20% 확률로 과부하가 발동하여 첫 번째 대상에게 입힌 피해의 50%만큼 다시 적중시키고 천둥을 1 얻습니다. (천둥소환)',

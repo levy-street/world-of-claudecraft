@@ -13773,7 +13773,7 @@ export const zh_TW: EnTranslations = {
       },
       "lava_burst": {
         "name": "Magma Burst",
-        "description": "造成 {damage} 點火焰傷害。命中可給予 1 點雷霆。對受你燼焰震擊灼燒的目標必定造成致命一擊。熔岩湧動：燼焰震擊每次造成傷害都有 20% 機率重置此技能的冷卻，並使你在 10 秒內的下一個 Magma Burst 變為瞬發。傷害隨法術強度提升。（雷霆召喚）"
+        "description": "造成 {damage} 點火焰傷害。命中可給予 1 點雷霆。對受你燼焰震擊灼燒的目標必定造成致命一擊。致命一擊時額外造成相當於一般傷害 24% 的傷害。熔岩湧動：燼焰震擊每次造成傷害都有 20% 機率重置此技能的冷卻，並使你在 10 秒內的下一個 Magma Burst 變為瞬發。傷害隨法術強度提升。（雷霆召喚）"
       },
       "thunderstorm": {
         "name": "Stormbreak",

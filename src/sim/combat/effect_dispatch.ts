@@ -260,6 +260,7 @@ import {
 } from './shaman_thundercall';
 import {
   applyStormbreakMana,
+  magmaBurstCritBonus,
   magmaBurstGuaranteedCrit,
   rollArcOverload,
   thundercallOnMagmaBurstImpact,
@@ -904,7 +905,12 @@ export function runEffects(
           // override against the caster's own Cinder Jolt; the roll is still drawn.
           magmaBurstGuaranteedCrit(ctx, p, ability.id, target);
         if (sureCrit) sureCritRolled = true;
-        if (crit) dmg *= (isSpell ? 1.5 : 2) + (isSpell ? p.critDmgSpellBonus : p.critDmgPhysBonus);
+        if (crit)
+          dmg *=
+            (isSpell ? 1.5 : 2) +
+            (isSpell ? p.critDmgSpellBonus : p.critDmgPhysBonus) +
+            // Lava Flows (combat/shaman_thundercall_kit.ts): Magma Burst only.
+            magmaBurstCritBonus(ctx, p, ability.id);
         if (isSpell) dmg *= spellDamageMultFromAuras(p);
         if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
         // Aether Surge (Chronomancy Phase 3): each held Arcane Charge scales the

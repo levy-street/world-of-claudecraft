@@ -1834,7 +1834,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.hillwarn.description': 'Şimdi bir tepe duyur; tam uyarıdan sonra yükselir.',
   'devCommand.actions.hillwarn.label': 'Tepe geri sayımı',
   'entities.abilities.lava_burst.description':
-    '{damage} Ateş hasarı ver. İsabet 1 Gök Gürültüsü verir. Her zaman yanmakta olan bir hedefi kritik olarak vur.',
+    "{damage} Ateş hasarı ver. İsabet 1 Gök Gürültüsü verir. Her zaman yanmakta olan bir hedefi kritik olarak vur. Kritik vuruş, normal hasarın %24'ü kadar ek hasar verir.",
   'entities.abilities.lava_burst.name': 'Magma Patlaması',
   'entities.abilities.lightning_overload.description':
     'Pasif: Arc Bolt ve Çatallı Yıldırım, İkinci Darbe yapan hedefleri vurma şansı %20.',
