@@ -12,7 +12,7 @@ export function setPlayerLevel(ctx: SimContext, level: number, pid?: number): vo
   r.e.level = Math.max(1, Math.min(MAX_LEVEL, level));
   // Keep lifetimeXp consistent with the level so post-cap progression starts
   // from a sane baseline (virtualLevel never falls below the real level). Only
-  // ever raises it — lifetimeXp is monotonic.
+  // ever raises it; lifetimeXp is monotonic.
   r.meta.lifetimeXp = Math.max(r.meta.lifetimeXp, xpToReachLevel(r.e.level));
   // Re-bake the flat talent mods at the new level before the stat + ability pass:
   // spec mastery magnitudes scale with level (min(1, level/20)), so a dev/GM level
