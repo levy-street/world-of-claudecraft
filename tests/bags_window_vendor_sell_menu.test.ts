@@ -142,9 +142,25 @@ describe('bags_window vendor right-click menu (Sell all)', () => {
   });
 
   it('an item the vendor refuses (noVendorSell) never opens the menu on a plain right-click', () => {
-    const { root, menuCalls } = harness([{ itemId: 'reins_valorsteed', count: 1 }]);
+    const { root, menuCalls } = harness([{ itemId: 'reins_grag_bear', count: 1 }]);
     rightClickFirstCell(root);
     expect(menuCalls).toEqual([]);
+  });
+
+  it('horse reins open the sell menu and sell through the confirmation prompt', () => {
+    const sold: Array<[string, number | undefined]> = [];
+    const { root, menuCalls } = harness(
+      [{ itemId: 'reins_valorsteed', count: 1 }],
+      (itemId, count) => sold.push([itemId, count]),
+    );
+    rightClickFirstCell(root);
+    expect(menuCalls).toHaveLength(1);
+    expect(menuCalls[0].itemId).toBe('reins_valorsteed');
+    expect(menuCalls[0].vendorSellCount).toBe(1);
+    menuCalls[0].runSellAll?.();
+    expect(sold).toEqual([]);
+    confirmQuantityPrompt();
+    expect(sold).toEqual([['reins_valorsteed', 1]]);
   });
 
   it('Sell all on common+ stacks opens the existing quantity prompt before selling', () => {
