@@ -44,6 +44,10 @@ import type { CharacterState, PetState } from './character_state';
 import { restoreCharacterStorage, savedCharacterStorage } from './character_storage';
 import type { TreasureMapProgress } from './content/treasure_maps';
 import type { FactionId } from './factions';
+import {
+  type PendingDifficultyChange,
+  setDungeonDifficulty as setDungeonDifficultyImpl,
+} from './instances/difficulty_selection';
 import type { ItemCopyAnchor } from './item_copy_anchor';
 import * as treasureVaultMod from './treasure_vault';
 import type { CannonActionId, CannonPoint, VehicleSession } from './types';
@@ -868,7 +872,6 @@ import {
   type ItemInstancePayload,
   type ItemUseResult,
   isConsuming,
-  isDungeonDifficulty,
   isEquipSlot,
   isNonSpellCast,
   isPetClass,
@@ -2019,6 +2022,7 @@ export class Sim {
   private channelSubs = new Map<number, Set<JoinableChannel>>();
   // dungeon instances
   instances: InstanceSlot[] = [];
+  pendingDifficultyChanges = new Map<number, PendingDifficultyChange>();
   dungeonResetLocks = new Map<string, { availableAt: number; claimId: number }>();
   // procedural rift instances (separate slot pool + coordinate band from dungeons)
   riftInstances: RiftInstance[] = [];
@@ -3697,6 +3701,7 @@ export class Sim {
   }
 
   removePlayer(pid: number): void {
+    this.pendingDifficultyChanges.delete(pid);
     vehicleMod.leaveVehicle(this.ctx, pid);
     const meta = this.players.get(pid);
     if (!meta) return;
@@ -4972,6 +4977,9 @@ export class Sim {
       },
       set dungeonDoorIds(v) {
         sim.dungeonDoorIds = v;
+      },
+      get pendingDifficultyChanges() {
+        return sim.pendingDifficultyChanges;
       },
       get instances() {
         return sim.instances;
@@ -10588,29 +10596,7 @@ export class Sim {
   }
 
   setDungeonDifficulty(difficulty: DungeonDifficulty, pid?: number): void {
-    if (!isDungeonDifficulty(difficulty)) return;
-    const r = this.resolve(pid);
-    if (!r) return;
-    const party = this.partyOf(r.meta.entityId);
-    if (party && party.leader !== r.meta.entityId) {
-      this.error(r.meta.entityId, 'You are not the party leader.');
-      return;
-    }
-    // Only the SETTER's own preference is stamped: members mirror the party via
-    // dungeonDifficultyForPid while grouped and keep their own prior preference
-    // after leaving, so a stale stamp can never leak into another group.
-    if (difficulty === 'normal') delete r.meta.dungeonDifficulty;
-    else r.meta.dungeonDifficulty = difficulty;
-    if (party) {
-      if (difficulty === 'normal') delete party.dungeonDifficulty;
-      else party.dungeonDifficulty = difficulty;
-    }
-    this.error(
-      r.meta.entityId,
-      difficulty === 'heroic'
-        ? 'Dungeon difficulty set to Heroic.'
-        : 'Dungeon difficulty set to Normal.',
-    );
+    setDungeonDifficultyImpl(this.ctx, difficulty, pid);
   }
 
   // Owned by instances/dungeons (heroic final-boss reward + lockout settlement);

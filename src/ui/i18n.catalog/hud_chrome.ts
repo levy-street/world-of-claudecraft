@@ -4613,6 +4613,9 @@ export const hudChromeStrings = {
     resetDone: 'All instances have been reset.',
     resetNone: 'You have no instances to reset.',
     resetOccupied: 'You cannot reset instances while someone is still inside.',
+    queuedOccupied:
+      'Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.',
+    queuedCancelled: 'Queued difficulty change cancelled because the party or leader changed.',
     resetSameDifficulty:
       'Change dungeon difficulty before resetting these instances. Empty instances reset on their own after 5 minutes.',
     resetLoot: 'You cannot reset instances while loot remains inside.',

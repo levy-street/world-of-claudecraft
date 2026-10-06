@@ -325,6 +325,7 @@ function makeFakeHost() {
     instances: [],
     riftInstances: [],
     riftPortalIds: null,
+    pendingDifficultyChanges: new Map(),
     dungeonResetLocks: new Map(),
     arenaMatches: new Map(),
     duels: new Map(),

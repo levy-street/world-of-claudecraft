@@ -2435,6 +2435,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dungeonDifficulty.resetDone': '所有副本已重置。',
   'hudChrome.dungeonDifficulty.resetNone': '你没有可重置的副本。',
   'hudChrome.dungeonDifficulty.resetOccupied': '仍有人在副本内时无法重置副本。',
+  'hudChrome.dungeonDifficulty.queuedOccupied':
+    '难度变更已加入队列，因为仍有人或其尸体留在副本内。副本清空后将应用变更。',
+  'hudChrome.dungeonDifficulty.queuedCancelled': '由于队伍或队长发生变化，已取消排队中的难度变更。',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':
     '切换地下城难度后才能重置这些副本。空置副本会在5分钟后自动重置。',
   'hudChrome.dungeonDifficulty.resetUsage': '切换难度后，使用 /dungeon reset 放弃你的空置副本。',

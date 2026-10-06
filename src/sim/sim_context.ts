@@ -1,3 +1,4 @@
+import type { PendingDifficultyChange } from './instances/difficulty_selection';
 // SimContext: the shared seam every extracted game-system module talks to instead
 // of reaching into the 17.5k-line `Sim` monolith.
 //
@@ -196,6 +197,8 @@ export interface SimContextPrimitives {
   // reads/finds/iterates it and mutates slot fields in place; the array identity
   // stays Sim-owned (like delayedEvents/groundAoEs), so this is a live read-only view.
   readonly instances: InstanceSlot[];
+  // Session-only leader requests, one per initiating player, cleared on departure.
+  readonly pendingDifficultyChanges: Map<number, PendingDifficultyChange>;
   // Session-only manual-reset cooldowns keyed by durable character identity and
   // dungeon id. Unlike party instance keys, these survive relogs and party reforming.
   readonly dungeonResetLocks: Map<string, { availableAt: number; claimId: number }>;
@@ -450,9 +453,9 @@ export interface SimContextCallbacks {
   // (N1, the delve slice, quest spawns, the interaction dispatchers) reaches them
   // through the seam; implemented in instances/dungeons, Sim keeps thin delegates so
   // existing `this.enterDungeon` etc. call sites resolve unchanged.
-  // dungeonDifficulty/setDungeonDifficulty are the heroic-selection commands: the
-  // body-stays-on-Sim kind (party/meta state lives on Sim), exposed so the chat
-  // slash command and instances/dungeons reach them through the seam.
+  // dungeonDifficulty reads the live preference; setDungeonDifficulty is owned by
+  // instances/difficulty_selection. The chat command and instance modules reach
+  // both through the seam.
   // awardHeroicMarks is owned by instances/dungeons: the C1 death hub calls it
   // once per death to settle a heroic final boss's direct participant rewards
   // and whole-claim realm-reset lockout together (no rng draws).
@@ -1330,6 +1333,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     set dungeonDoorIds(v) {
       host.dungeonDoorIds = v;
+    },
+    get pendingDifficultyChanges() {
+      return host.pendingDifficultyChanges;
     },
     get instances() {
       return host.instances;

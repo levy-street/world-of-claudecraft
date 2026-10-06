@@ -9,25 +9,70 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.dungeonDifficulty.queuedCancelled",
+    "hudChrome.dungeonDifficulty.queuedOccupied"
+  ],
+  "es_ES": [
+    "hudChrome.dungeonDifficulty.queuedCancelled",
+    "hudChrome.dungeonDifficulty.queuedOccupied"
+  ],
+  "fr_FR": [
+    "hudChrome.dungeonDifficulty.queuedCancelled",
+    "hudChrome.dungeonDifficulty.queuedOccupied"
+  ],
+  "fr_CA": [
+    "hudChrome.dungeonDifficulty.queuedCancelled",
+    "hudChrome.dungeonDifficulty.queuedOccupied"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.dungeonDifficulty.queuedCancelled",
+    "hudChrome.dungeonDifficulty.queuedOccupied"
+  ],
+  "de_DE": [
+    "hudChrome.dungeonDifficulty.queuedCancelled",
+    "hudChrome.dungeonDifficulty.queuedOccupied"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.dungeonDifficulty.queuedCancelled",
+    "hudChrome.dungeonDifficulty.queuedOccupied"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.dungeonDifficulty.queuedCancelled",
+    "hudChrome.dungeonDifficulty.queuedOccupied"
+  ],
+  "nl_NL": [
+    "hudChrome.dungeonDifficulty.queuedCancelled",
+    "hudChrome.dungeonDifficulty.queuedOccupied"
+  ],
+  "pl_PL": [
+    "hudChrome.dungeonDifficulty.queuedCancelled",
+    "hudChrome.dungeonDifficulty.queuedOccupied"
+  ],
+  "id_ID": [
+    "hudChrome.dungeonDifficulty.queuedCancelled",
+    "hudChrome.dungeonDifficulty.queuedOccupied"
+  ],
+  "tr_TR": [
+    "hudChrome.dungeonDifficulty.queuedCancelled",
+    "hudChrome.dungeonDifficulty.queuedOccupied"
+  ],
+  "sv_SE": [
+    "hudChrome.dungeonDifficulty.queuedCancelled",
+    "hudChrome.dungeonDifficulty.queuedOccupied"
+  ],
+  "vi_VN": [
+    "hudChrome.dungeonDifficulty.queuedCancelled",
+    "hudChrome.dungeonDifficulty.queuedOccupied"
+  ],
+  "da_DK": [
+    "hudChrome.dungeonDifficulty.queuedCancelled",
+    "hudChrome.dungeonDifficulty.queuedOccupied"
+  ]
 };

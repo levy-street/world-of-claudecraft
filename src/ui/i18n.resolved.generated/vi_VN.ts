@@ -3599,6 +3599,8 @@ export const vi_VN: EnTranslations = {
       "resetDone": "Tất cả phụ bản đã được đặt lại.",
       "resetNone": "Bạn không có phụ bản nào để đặt lại.",
       "resetOccupied": "Bạn không thể đặt lại phụ bản khi vẫn còn người ở bên trong.",
+      "queuedOccupied": "Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.",
+      "queuedCancelled": "Queued difficulty change cancelled because the party or leader changed.",
       "resetSameDifficulty": "Hãy đổi độ khó hầm ngục trước khi đặt lại các phụ bản này. Phụ bản trống sẽ tự đặt lại sau 5 phút.",
       "resetLoot": "Bạn không thể đặt lại phụ bản khi vẫn còn chiến lợi phẩm bên trong.",
       "resetConfirmTitle": "Đặt Lại Tất Cả Phụ Bản?",

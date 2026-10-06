@@ -3599,6 +3599,8 @@ export const nl_NL: EnTranslations = {
       "resetDone": "Alle instanties zijn gereset.",
       "resetNone": "Je hebt geen instanties om te resetten.",
       "resetOccupied": "Je kunt instanties niet resetten zolang er nog iemand binnen is.",
+      "queuedOccupied": "Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.",
+      "queuedCancelled": "Queued difficulty change cancelled because the party or leader changed.",
       "resetSameDifficulty": "Wijzig de kerkermoeilijkheid voordat je deze instanties reset. Lege instanties resetten zichzelf na 5 minuten.",
       "resetLoot": "Je kunt instanties niet resetten zolang er nog buit binnen ligt.",
       "resetConfirmTitle": "Alle instanties resetten?",

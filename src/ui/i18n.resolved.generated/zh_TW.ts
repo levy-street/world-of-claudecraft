@@ -3599,6 +3599,8 @@ export const zh_TW: EnTranslations = {
       "resetDone": "所有地城副本已重置。",
       "resetNone": "你沒有可重置的地城副本。",
       "resetOccupied": "仍有人在地城副本內時無法重置。",
+      "queuedOccupied": "難度變更已加入佇列，因為仍有人或其屍體留在地城副本內。副本清空後將套用變更。",
+      "queuedCancelled": "由於隊伍或隊長發生變更，已取消佇列中的難度變更。",
       "resetSameDifficulty": "切換地城難度後才能重置這些副本。空置的地城副本會在5分鐘後自動重置。",
       "resetLoot": "地城副本內仍有戰利品時無法重置。",
       "resetConfirmTitle": "重置所有地城副本？",

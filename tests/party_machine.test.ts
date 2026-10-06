@@ -30,6 +30,7 @@ function makeCtx() {
   const clock = { time: 0 };
 
   const ctx = {
+    pendingDifficultyChanges: new Map(),
     get time() {
       return clock.time;
     },

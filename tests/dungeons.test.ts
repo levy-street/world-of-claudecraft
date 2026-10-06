@@ -56,6 +56,20 @@ const DUNGEON_TEST_WORLD: WorldContent = {
   groundObjects: [],
 };
 
+// Seed a divergent preference without issuing a switch. These tests exercise
+// the entry mismatch recovery and explicit Reset All guards independently of
+// difficulty_selection.test.ts, which drives the live automatic switch.
+function selectDifficultyWithoutSwitch(
+  sim: AnySim,
+  difficulty: 'normal' | 'heroic',
+  pid: number,
+): void {
+  const meta = sim.players.get(pid)!;
+  meta.dungeonDifficulty = difficulty;
+  const party = sim.partyOf(pid);
+  if (party) party.dungeonDifficulty = difficulty;
+}
+
 function makeSim(seed = 99): AnySim {
   return new Sim({
     seed,
@@ -519,7 +533,7 @@ describe('dungeons: heroic difficulty', () => {
     enterDungeon(sim.ctx, 'hollow_crypt', pid);
     const inst = claimedDungeon(sim, 'hollow_crypt', 'normal');
     leaveDungeon(sim.ctx, pid);
-    sim.setDungeonDifficulty('heroic', pid);
+    selectDifficultyWithoutSwitch(sim, 'heroic', pid);
 
     sim.drainEvents();
     enterDungeon(sim.ctx, 'hollow_crypt', pid);
@@ -539,7 +553,7 @@ describe('dungeons: heroic difficulty', () => {
 
     // Matching difficulty re-entry stays quiet.
     leaveDungeon(sim.ctx, pid);
-    sim.setDungeonDifficulty('normal', pid);
+    selectDifficultyWithoutSwitch(sim, 'normal', pid);
     sim.drainEvents();
     enterDungeon(sim.ctx, 'hollow_crypt', pid);
     expect(
@@ -910,7 +924,7 @@ describe('dungeons: heroic difficulty', () => {
     enterDungeon(sim.ctx, 'hollow_crypt', pid);
     const normalInst = claimedDungeon(sim, 'hollow_crypt', 'normal');
     leaveDungeon(sim.ctx, pid);
-    sim.setDungeonDifficulty('heroic', pid);
+    selectDifficultyWithoutSwitch(sim, 'heroic', pid);
     const meta = sim.players.get(pid);
     expect(meta).toBeTruthy();
     meta?.raidLockouts.set('hollow_crypt:heroic', Number.MAX_SAFE_INTEGER);
@@ -958,7 +972,7 @@ describe('dungeons: heroic difficulty', () => {
     enterDungeon(sim.ctx, 'hollow_crypt', leader);
     const inst = claimedDungeon(sim, 'hollow_crypt', 'normal');
     leaveDungeon(sim.ctx, leader);
-    sim.setDungeonDifficulty('heroic', leader);
+    selectDifficultyWithoutSwitch(sim, 'heroic', leader);
     sim.drainEvents();
 
     sim.resetDungeonInstances(member);
@@ -1190,7 +1204,7 @@ describe('dungeons: heroic difficulty', () => {
     // claimed difficulty is fixed for the instance's life. This is also the
     // ghost corpse-run path, so a dead member can never be stranded in a fresh
     // parallel instance by a mid-run flip.
-    sim.setDungeonDifficulty('heroic', pid);
+    selectDifficultyWithoutSwitch(sim, 'heroic', pid);
     enterDungeon(sim.ctx, 'hollow_crypt', pid);
     expect(claimedDungeon(sim, 'hollow_crypt', 'heroic')).toBeUndefined();
     expect(normalInst.partyKey).not.toBeNull();
@@ -2940,7 +2954,7 @@ describe('dungeons: raid lockout gate', () => {
     enterDungeon(sim.ctx, 'nythraxis_boss_arena', leader);
     const inst = claimedDungeon(sim, 'nythraxis_boss_arena', 'normal');
     teleport(sim, sim.entities.get(leader) as AnyEntity, 0, 0);
-    sim.setDungeonDifficulty('heroic', leader);
+    selectDifficultyWithoutSwitch(sim, 'heroic', leader);
 
     sim.drainEvents();
     enterDungeon(sim.ctx, 'nythraxis_boss_arena', leader);
@@ -2965,11 +2979,11 @@ describe('dungeons: raid lockout gate', () => {
     const leader = attunedRaid(sim);
     enterDungeon(sim.ctx, 'nythraxis_boss_arena', leader);
     teleport(sim, sim.entities.get(leader) as AnyEntity, 0, 0);
-    sim.setDungeonDifficulty('heroic', leader);
+    selectDifficultyWithoutSwitch(sim, 'heroic', leader);
     sim.resetDungeonInstances(leader);
     const inst = claimedDungeon(sim, 'nythraxis_boss_arena', 'heroic');
     teleport(sim, sim.entities.get(leader) as AnyEntity, 0, 0);
-    sim.setDungeonDifficulty('normal', leader);
+    selectDifficultyWithoutSwitch(sim, 'normal', leader);
 
     sim.drainEvents();
     enterDungeon(sim.ctx, 'nythraxis_boss_arena', leader);
@@ -3028,7 +3042,7 @@ describe('dungeons: raid lockout gate', () => {
       enterDungeon(sim.ctx, 'nythraxis_boss_arena', m);
     }
     for (const m of members) teleport(sim, sim.entities.get(m) as AnyEntity, 0, 0);
-    sim.setDungeonDifficulty('heroic', leader);
+    selectDifficultyWithoutSwitch(sim, 'heroic', leader);
     sim.resetDungeonInstances(leader);
     const inst = claimedDungeon(sim, 'nythraxis_boss_arena', 'heroic');
     expect(inst).toBeDefined();
@@ -3043,7 +3057,7 @@ describe('dungeons: raid lockout gate', () => {
       expect(sim.dungeonResetLocks.has(`char:${700 + m}:nythraxis_boss_arena`)).toBe(false);
     }
     expect(sim.dungeonResetLocks.size).toBe(0);
-    sim.setDungeonDifficulty('normal', leader);
+    selectDifficultyWithoutSwitch(sim, 'normal', leader);
     sim.drainEvents();
 
     sim.resetDungeonInstances(leader);
@@ -3188,13 +3202,13 @@ describe('dungeons: raid lockout gate', () => {
       expect(enterDungeon(sim.ctx, 'ignivar_forge_lift', m)).toBe(true);
     }
     for (const m of members) teleport(sim, sim.entities.get(m) as AnyEntity, 0, 0);
-    sim.setDungeonDifficulty('heroic', leader);
+    selectDifficultyWithoutSwitch(sim, 'heroic', leader);
     sim.resetDungeonInstances(leader);
     const lift = claimedDungeon(sim, 'ignivar_forge_lift', 'heroic');
     expect(lift).toBeDefined();
     expect(lift.resetAvailableAt).toBeLessThanOrEqual(sim.time);
     expect(sim.dungeonResetLocks.size).toBe(0);
-    sim.setDungeonDifficulty('normal', leader);
+    selectDifficultyWithoutSwitch(sim, 'normal', leader);
     sim.drainEvents();
 
     sim.resetDungeonInstances(leader);

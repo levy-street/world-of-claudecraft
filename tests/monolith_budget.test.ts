@@ -1207,7 +1207,8 @@ const MONOLITHS: MonolithRow[] = [
     // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
-    ceiling: 11642,
+    // Difficulty selection moved behind its SimContext sibling.
+    ceiling: 11622,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

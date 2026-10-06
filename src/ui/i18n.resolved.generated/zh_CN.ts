@@ -3599,6 +3599,8 @@ export const zh_CN: EnTranslations = {
       "resetDone": "所有副本已重置。",
       "resetNone": "你没有可重置的副本。",
       "resetOccupied": "仍有人在副本内时无法重置副本。",
+      "queuedOccupied": "难度变更已加入队列，因为仍有人或其尸体留在副本内。副本清空后将应用变更。",
+      "queuedCancelled": "由于队伍或队长发生变化，已取消排队中的难度变更。",
       "resetSameDifficulty": "切换地下城难度后才能重置这些副本。空置副本会在5分钟后自动重置。",
       "resetLoot": "副本内仍有战利品时无法重置。",
       "resetConfirmTitle": "重置所有副本？",

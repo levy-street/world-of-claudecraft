@@ -3599,6 +3599,8 @@ export const sv_SE: EnTranslations = {
       "resetDone": "Alla instanser har återställts.",
       "resetNone": "Du har inga instanser att återställa.",
       "resetOccupied": "Du kan inte återställa instanser medan någon fortfarande är kvar inuti.",
+      "queuedOccupied": "Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.",
+      "queuedCancelled": "Queued difficulty change cancelled because the party or leader changed.",
       "resetSameDifficulty": "Ändra fängelsehålans svårighetsgrad innan du återställer dessa instanser. Tomma instanser återställs automatiskt efter 5 minuter.",
       "resetLoot": "Du kan inte återställa instanser medan byte finns kvar inuti.",
       "resetConfirmTitle": "Återställ alla instanser?",

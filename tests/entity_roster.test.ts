@@ -123,6 +123,7 @@ function makeCtx() {
     instances: [],
     riftInstances: [],
     riftPortalIds: null,
+    pendingDifficultyChanges: new Map(),
     dungeonResetLocks: new Map(),
     get arenaMatches() {
       return arenaMatches;

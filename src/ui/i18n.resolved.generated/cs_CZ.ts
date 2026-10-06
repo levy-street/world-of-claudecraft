@@ -3599,6 +3599,8 @@ export const cs_CZ: EnTranslations = {
       "resetDone": "Všechny instance byly resetovány.",
       "resetNone": "Nemáš žádné instance k resetování.",
       "resetOccupied": "Instance nelze resetovat, dokud je někdo stále uvnitř.",
+      "queuedOccupied": "Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.",
+      "queuedCancelled": "Queued difficulty change cancelled because the party or leader changed.",
       "resetSameDifficulty": "Před resetováním těchto instancí změň obtížnost dungeonu. Prázdné instance se po 5 minutách resetují samy.",
       "resetLoot": "Instance nelze resetovat, dokud uvnitř zůstává kořist.",
       "resetConfirmTitle": "Resetovat všechny instance?",

@@ -3599,6 +3599,8 @@ export const da_DK: EnTranslations = {
       "resetDone": "Alle instanser er blevet nulstillet.",
       "resetNone": "Du har ingen instanser at nulstille.",
       "resetOccupied": "Du kan ikke nulstille instanser, mens nogen stadig er derinde.",
+      "queuedOccupied": "Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.",
+      "queuedCancelled": "Queued difficulty change cancelled because the party or leader changed.",
       "resetSameDifficulty": "Skift fangekældersværhedsgrad, før du nulstiller disse instanser. Tomme instanser nulstilles automatisk efter 5 minutter.",
       "resetLoot": "Du kan ikke nulstille instanser, mens der stadig er bytte derinde.",
       "resetConfirmTitle": "Nulstil alle instanser?",

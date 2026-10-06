@@ -3599,6 +3599,8 @@ export const id_ID: EnTranslations = {
       "resetDone": "Semua instans telah direset.",
       "resetNone": "Tidak ada instans yang dapat kamu reset.",
       "resetOccupied": "Kamu tidak dapat mereset instans selama masih ada seseorang di dalamnya.",
+      "queuedOccupied": "Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.",
+      "queuedCancelled": "Queued difficulty change cancelled because the party or leader changed.",
       "resetSameDifficulty": "Ubah kesulitan dungeon sebelum mereset instans ini. Instans kosong akan direset otomatis setelah 5 menit.",
       "resetLoot": "Kamu tidak dapat mereset instans selama masih ada jarahan di dalamnya.",
       "resetConfirmTitle": "Reset Semua Instans?",

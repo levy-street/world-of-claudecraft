@@ -21161,6 +21161,14 @@ const RULES: Rule[] = [
     build: () => t('hudChrome.dungeonDifficulty.resetOccupied'),
   },
   {
+    re: /^Difficulty change queued because someone or their corpse is still inside\. It will apply when the instances are clear\.$/,
+    build: () => t('hudChrome.dungeonDifficulty.queuedOccupied'),
+  },
+  {
+    re: /^Queued difficulty change cancelled because the party or leader changed\.$/,
+    build: () => t('hudChrome.dungeonDifficulty.queuedCancelled'),
+  },
+  {
     re: /^Change dungeon difficulty before resetting these instances\. Empty instances reset on their own after 5 minutes\.$/,
     build: () => t('hudChrome.dungeonDifficulty.resetSameDifficulty'),
   },

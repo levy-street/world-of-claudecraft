@@ -2512,6 +2512,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dungeonDifficulty.resetNone': '초기화할 인스턴스가 없습니다.',
   'hudChrome.dungeonDifficulty.resetOccupied':
     '아직 안에 플레이어가 있으면 인스턴스를 초기화할 수 없습니다.',
+  'hudChrome.dungeonDifficulty.queuedOccupied':
+    '아직 인스턴스 안에 플레이어 또는 그 시체가 있어 난이도 변경을 대기열에 등록했습니다. 인스턴스가 비면 변경이 적용됩니다.',
+  'hudChrome.dungeonDifficulty.queuedCancelled':
+    '파티 또는 파티장이 변경되어 대기 중인 난이도 변경이 취소되었습니다.',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':
     '인스턴스를 초기화하기 전에 던전 난이도를 변경하세요. 비어 있는 인스턴스는 5분 후 자동으로 초기화됩니다.',
   'hudChrome.dungeonDifficulty.resetUsage':

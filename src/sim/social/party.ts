@@ -16,6 +16,7 @@
 // render/ui/game/net, no Math.random/Date.now), so it runs unchanged in Node, the
 // browser, and the headless RL env (enforced by tests/architecture.test.ts).
 
+import { cancelPendingDifficultyChange } from '../instances/difficulty_selection';
 import { revokeMasterLooterAuthority } from '../loot/loot_roll';
 import { effectiveMasterLooter } from '../loot_master';
 import type { Party } from '../sim';
@@ -199,6 +200,7 @@ export class PartyMachine {
         ...(dungeonDifficulty ? { dungeonDifficulty } : {}),
       };
       this.parties.set(party.id, party);
+      cancelPendingDifficultyChange(this.ctx, invite.fromPid);
       this.partyByPid.set(invite.fromPid, party.id);
     }
     if (party.members.length >= this.partyCapacity(party)) {
@@ -208,6 +210,7 @@ export class PartyMachine {
     const raidGroup = this.nextRaidGroupFor(party);
     party.members.push(r.meta.entityId);
     party.raidGroups.set(r.meta.entityId, raidGroup);
+    cancelPendingDifficultyChange(this.ctx, r.meta.entityId);
     this.partyByPid.set(r.meta.entityId, party.id);
     rememberSoulwellPartyEligibility(this.ctx, party);
     this.ctx.inheritDungeonResetLocks(r.meta.entityId);
@@ -282,6 +285,7 @@ export class PartyMachine {
       party.leader,
       party.members,
     );
+    cancelPendingDifficultyChange(this.ctx, party.leader);
     party.leader = targetPid;
     const newLeader = this.ctx.players.get(targetPid);
     for (const mPid of party.members) {
@@ -469,6 +473,7 @@ export class PartyMachine {
         ...(dungeonDifficulty ? { dungeonDifficulty } : {}),
       };
       this.parties.set(party.id, party);
+      cancelPendingDifficultyChange(this.ctx, baseUnit.leaderPid);
       this.partyByPid.set(baseUnit.leaderPid, party.id);
       // Same deed credit the invite path grants (acceptInvite): a finder group is a
       // party the player joined, so it counts toward partiesJoined.
@@ -499,6 +504,7 @@ export class PartyMachine {
         const raidGroup = this.nextRaidGroupFor(party);
         party.members.push(pid);
         party.raidGroups.set(pid, raidGroup);
+        cancelPendingDifficultyChange(this.ctx, pid);
         this.partyByPid.set(pid, party.id);
         rememberSoulwellPartyEligibility(this.ctx, party);
         // A finder merge is a join like any other: without this, a
@@ -562,6 +568,7 @@ export class PartyMachine {
   }
 
   removeFromParty(pid: number, verb: string): void {
+    cancelPendingDifficultyChange(this.ctx, pid);
     const party = this.partyOf(pid);
     if (!party) return;
     // Revoke any pending master-loot curate-phase assign authority the departing
@@ -601,6 +608,7 @@ export class PartyMachine {
     }
     if (party.members.length <= 1) {
       for (const mPid of party.members) {
+        cancelPendingDifficultyChange(this.ctx, mPid);
         this.partyByPid.delete(mPid);
         // The members left behind lose their group too, so any curate-phase roll
         // they still master is orphaned: without this it would sit invisible to

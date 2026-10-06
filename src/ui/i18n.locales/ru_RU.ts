@@ -2546,6 +2546,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dungeonDifficulty.resetNone': 'Нет подземелий для сброса.',
   'hudChrome.dungeonDifficulty.resetOccupied':
     'Нельзя сбросить подземелья, пока внутри кто-то находится.',
+  'hudChrome.dungeonDifficulty.queuedOccupied':
+    'Смена сложности поставлена в очередь: внутри подземелья ещё есть игрок или его тело. Изменение применится, когда подземелья освободятся.',
+  'hudChrome.dungeonDifficulty.queuedCancelled':
+    'Ожидающая смена сложности отменена, поскольку изменились группа или её лидер.',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':
     'Смените сложность подземелья перед сбросом этих подземелий. Пустые подземелья сбрасываются сами через 5 минут.',
   'hudChrome.dungeonDifficulty.resetUsage':
