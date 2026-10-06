@@ -85,9 +85,12 @@ const WS_UPGRADE_PATH = '/ws';
 
 // Every failed handshake check sends exactly one {t:'error'} frame (the shape the
 // client parses in online.ts onMessage), then closes the socket. Centralizes both
-// the frame shape and the send-then-close ordering in one place.
+// the frame shape and the send-then-close ordering in one place. The frame goes
+// out uncompressed: a compressed send makes ws allocate the socket's ~256 KiB
+// deflate stream (server/ws_compression.ts), which a client that never answers
+// the close would hold for ws's close timeout, so rejected sockets never get one.
 function rejectHandshake(ws: WebSocket, error: string): void {
-  ws.send(JSON.stringify({ t: 'error', error }));
+  ws.send(JSON.stringify({ t: 'error', error }), { compress: false });
   ws.close();
 }
 

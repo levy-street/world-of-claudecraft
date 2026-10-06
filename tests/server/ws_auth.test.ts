@@ -159,10 +159,12 @@ const authRaw = (over: Record<string, unknown> = {}) =>
   JSON.stringify({ t: ONLINE_WORLD_AUTH_TYPE, token: 'tok', character: 7, ...over });
 
 const errorFrame = (error: string) => JSON.stringify({ t: 'error', error });
+// rejectHandshake sends its frame uncompressed (no deflate stream for a rejected socket).
+const NO_COMPRESS = { compress: false };
 
 function expectSendThenClose(ws: FakeWs, frame: string) {
   expect(ws.send).toHaveBeenCalledTimes(1);
-  expect(ws.send).toHaveBeenCalledWith(frame);
+  expect(ws.send).toHaveBeenCalledWith(frame, NO_COMPRESS);
   expect(ws.close).toHaveBeenCalledTimes(1);
   // ws.send must fire before ws.close on every reject path.
   expect(ws.send.mock.invocationCallOrder[0]).toBeLessThan(ws.close.mock.invocationCallOrder[0]);
@@ -503,7 +505,10 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
     await authenticateWebSocket(asWs(ws), authRaw(), req);
     // isAdmin short-circuits the gate, so the join proceeds and no refusal frame is sent.
     expect(game.join).toHaveBeenCalledTimes(1);
-    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('too many connections from your network'));
+    expect(ws.send).not.toHaveBeenCalledWith(
+      errorFrame('too many connections from your network'),
+      NO_COMPRESS,
+    );
   });
 
   it('9. forwards a game.join error frame', async () => {
@@ -662,7 +667,7 @@ describe('createWsAuth: realm admission cap', () => {
     const { authenticateWebSocket } = createWsAuth(deps);
     await authenticateWebSocket(asWs(ws), authRaw(), req);
     expect(game.join).toHaveBeenCalledTimes(1);
-    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('realm is full'));
+    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('realm is full'), NO_COMPRESS);
   });
 
   it('c. a cap of 0 disables the gate even far past any count', async () => {
@@ -672,7 +677,7 @@ describe('createWsAuth: realm admission cap', () => {
     const { authenticateWebSocket } = createWsAuth(deps);
     await authenticateWebSocket(asWs(ws), authRaw(), req);
     expect(game.join).toHaveBeenCalledTimes(1);
-    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('realm is full'));
+    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('realm is full'), NO_COMPRESS);
   });
 
   it('d. staff bypass the cap, mirroring the per-IP exemption', async () => {
@@ -683,7 +688,7 @@ describe('createWsAuth: realm admission cap', () => {
     const { authenticateWebSocket } = createWsAuth(deps);
     await authenticateWebSocket(asWs(ws), authRaw(), req);
     expect(game.join).toHaveBeenCalledTimes(1);
-    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('realm is full'));
+    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('realm is full'), NO_COMPRESS);
   });
 
   it('e. admits a fresh join one below the cap (the boundary just under refusal)', async () => {
@@ -693,7 +698,7 @@ describe('createWsAuth: realm admission cap', () => {
     const { authenticateWebSocket } = createWsAuth(deps);
     await authenticateWebSocket(asWs(ws), authRaw(), req);
     expect(game.join).toHaveBeenCalledTimes(1);
-    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('realm is full'));
+    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('realm is full'), NO_COMPRESS);
   });
 
   it('f. admits exactly one of two concurrent fresh joins racing for the last slot', async () => {
@@ -722,7 +727,7 @@ describe('createWsAuth: realm admission cap', () => {
     // admission the winner holds fills the last slot before the loser's cap check.
     expect(game.join).toHaveBeenCalledTimes(1);
     expectSendThenClose(ws2, errorFrame('realm is full'));
-    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('realm is full'));
+    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('realm is full'), NO_COMPRESS);
     logSpy.mockRestore();
   });
 
@@ -898,7 +903,7 @@ describe('createWsAuth: realm admission cap', () => {
     const ws3 = new FakeWs();
     await authenticateWebSocket(asWs(ws3), authRaw({ character: 23 }), req);
     expect(game.join).toHaveBeenCalledTimes(1);
-    expect(ws3.send).not.toHaveBeenCalledWith(errorFrame('realm is full'));
+    expect(ws3.send).not.toHaveBeenCalledWith(errorFrame('realm is full'), NO_COMPRESS);
     logSpy.mockRestore();
   });
 
@@ -915,10 +920,10 @@ describe('createWsAuth: realm admission cap', () => {
     const { authenticateWebSocket } = createWsAuth(deps);
     const ws1 = new FakeWs();
     await authenticateWebSocket(asWs(ws1), authRaw({ character: 31 }), req);
-    expect(ws1.send).not.toHaveBeenCalledWith(errorFrame('realm is full'));
+    expect(ws1.send).not.toHaveBeenCalledWith(errorFrame('realm is full'), NO_COMPRESS);
     const ws2 = new FakeWs();
     await authenticateWebSocket(asWs(ws2), authRaw({ character: 32 }), req);
-    expect(ws2.send).not.toHaveBeenCalledWith(errorFrame('realm is full'));
+    expect(ws2.send).not.toHaveBeenCalledWith(errorFrame('realm is full'), NO_COMPRESS);
     expect(game.join).toHaveBeenCalledTimes(2);
     logSpy.mockRestore();
   });
@@ -1400,7 +1405,7 @@ describe('createWsAuth: onConnection', () => {
     expect(game.join).toHaveBeenCalledTimes(1);
     // The timer was cleared, so advancing past it produces no timeout frame.
     vi.advanceTimersByTime(10_000);
-    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('authentication timed out'));
+    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('authentication timed out'), NO_COMPRESS);
   });
 
   it('converts a rejected handshake into the retryable authTimedOut frame while the socket is open, then flushes', async () => {

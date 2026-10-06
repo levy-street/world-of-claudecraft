@@ -14,9 +14,10 @@
 // even a solo player's sub-1KiB frame is mostly a repeat of the previous tick.
 //
 // The knobs, tuned against those frames:
-// - level 3: a few percent of one core at today's payload rate (it runs on the
-//   libuv threadpool, off the tick loop); level 6 saves a little more for about
-//   60% more compression CPU.
+// - level 3: a few percent of one core at today's payload rate. The zlib work
+//   runs on the libuv threadpool; ws's per-send stream and framing bookkeeping
+//   stays on the main thread. Level 6 saves a little more for about 60% more
+//   compression CPU.
 // - window bits stay at the zlib default (15): 13 would save about 100 KiB of
 //   zlib state per connection but give back about a fifth of the saving.
 //
@@ -29,6 +30,10 @@
 // - threadpool: compression jobs share libuv's pool (4 threads unless
 //   UV_THREADPOOL_SIZE says otherwise) with scrypt password hashing
 //   (server/auth.ts), so a burst of password logins can delay snapshot sends.
+// - pre-auth inflate: a client may send compressed frames before it signs in.
+//   ws inflates one frame at a time per socket, each capped at maxPayload, and
+//   a rejected socket is answered uncompressed so it never allocates a deflate
+//   stream (rejectHandshake in server/ws_auth.ts).
 //
 // Inbound is unchanged in size: ws hands the server's maxPayload to the
 // extension, so the 16 KiB cap (server/CLAUDE.md) also bounds a client message's

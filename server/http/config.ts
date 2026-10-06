@@ -290,8 +290,9 @@ const ORIGIN_CHECK_ENFORCE_ENV = 'API_ORIGIN_CHECK_ENFORCE';
 const PROVISION_TEST_ACCOUNTS_ENV = 'PROVISION_TEST_ACCOUNTS';
 const WS_PERMESSAGE_DEFLATE_ENV = 'WS_PERMESSAGE_DEFLATE';
 
-// The recognized boolean-flag vocabulary shared by REQUIRE_WEB_LOGIN and the two
-// API enforce flags (matches web_login_guard.ts / content_type.ts / origin_check.ts:
+// The recognized boolean-flag vocabulary shared by REQUIRE_WEB_LOGIN, the two API
+// enforce flags, PROVISION_TEST_ACCOUNTS and WS_PERMESSAGE_DEFLATE (matches
+// web_login_guard.ts / content_type.ts / origin_check.ts:
 // '1'/'true' => on, '0'/'false' => off, compared case-insensitively). Unset or
 // empty means "not set" and the flag's own default applies; any OTHER set value is
 // garbage and fails fast at boot.

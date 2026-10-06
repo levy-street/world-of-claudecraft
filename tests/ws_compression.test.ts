@@ -226,6 +226,19 @@ describe('permessage-deflate on the wire', () => {
     expect(repeat.length).toBeLessThan(tiny.length / 4);
   });
 
+  it('sends a compress: false frame uncompressed on a compressed connection', async () => {
+    // The pre-auth reject path (rejectHandshake) relies on this: an uncompressed
+    // send never touches the socket's deflate stream, so ws never allocates one.
+    const { port, serverSocket } = await startServer(true);
+    const client = await rawClient(port, true);
+    const ws = await serverSocket;
+    const frame = snapshotFrame(100);
+    ws.send(frame, { compress: false });
+    const [received] = await client.nextFrames(1);
+    expect(received.compressed).toBe(false);
+    expect(received.length).toBe(frame.length);
+  });
+
   it('falls back to plain frames for a client that does not offer it', async () => {
     const { port, serverSocket } = await startServer(true);
     const client = await rawClient(port, false);
