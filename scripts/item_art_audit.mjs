@@ -145,13 +145,16 @@ const build = await buildItemArtAudit({
     // feature/buried-hoards: the release's faction ladder, trinket slot and
     // Warfare Season 2 compose with the hoard paintings: 1464 / 1482, with the
     // release's 135 pending rows (trinkets and Season 2), on 36 sheet pages.
-    catalogCount: 1464,
-    liveItemCount: 1482,
+    // + the 280 choose-one leveling quest armor paintings
+    // (quest-leveling-gear-icons-2026-10-06): 1744 / 1762 on 38 sheet pages,
+    // measured with `node scripts/item_art_audit.mjs --verify-only`.
+    catalogCount: 1744,
+    liveItemCount: 1762,
     pendingArtCount: 135,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,
     heroicWeaponArtAliases: 19,
-    sheetPageCount: 36,
+    sheetPageCount: 38,
     groupCount: 26,
   },
 });
