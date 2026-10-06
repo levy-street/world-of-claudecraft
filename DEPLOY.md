@@ -796,6 +796,12 @@ For off-box safety, sync the directory to S3 occasionally:
   works when the server actually sees the variable: `docker-compose.yml`
   forwards it through the per-key `environment` block, so a deploy template
   that renders its own compose must carry the same line.
+- `WS_PERMESSAGE_DEFLATE` is a kill switch, not an opt-in: outbound game
+  WebSocket frames are compressed (permessage-deflate) by default. Set it to
+  `0` (or `false`) to send them uncompressed on a realm
+  (`server/ws_compression.ts`); any other set value fails fast at boot. Like
+  `RIFT_FORGE_ENABLED`, it reaches the server only through the compose
+  `environment` block.
 - **Community test profile**: on a disposable public test realm, set
   `PROVISION_TEST_ACCOUNTS=1` in the host `.env`, then restart the game
   container. The flag gives newly created accounts nine level-20 characters,

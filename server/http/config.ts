@@ -92,6 +92,10 @@ export interface Config {
   readonly provisionTestAccounts: boolean;
   readonly turnstileSecret: string;
   readonly maxWsPerIpHard: number;
+  // permessage-deflate on the game WebSocket (server/ws_compression.ts). ON by
+  // default: WS_PERMESSAGE_DEFLATE=0 (or false) is the kill switch; unset, empty,
+  // 1 and true keep it on, and any other set value fails fast like the other flags.
+  readonly wsPerMessageDeflate: boolean;
   // The realm player admission cap: the WS handshake (server/ws_auth.ts) refuses a
   // fresh join once the realm holds this many sessions, and /api/status advertises
   // it so the client realm list can display honestly. The raw value is trimmed
@@ -284,9 +288,11 @@ const REQUIRE_WEB_LOGIN_ENV = 'REQUIRE_WEB_LOGIN';
 const CONTENT_TYPE_ENFORCE_ENV = 'API_CONTENT_TYPE_ENFORCE';
 const ORIGIN_CHECK_ENFORCE_ENV = 'API_ORIGIN_CHECK_ENFORCE';
 const PROVISION_TEST_ACCOUNTS_ENV = 'PROVISION_TEST_ACCOUNTS';
+const WS_PERMESSAGE_DEFLATE_ENV = 'WS_PERMESSAGE_DEFLATE';
 
-// The recognized boolean-flag vocabulary shared by REQUIRE_WEB_LOGIN and the two
-// API enforce flags (matches web_login_guard.ts / content_type.ts / origin_check.ts:
+// The recognized boolean-flag vocabulary shared by REQUIRE_WEB_LOGIN, the two API
+// enforce flags, PROVISION_TEST_ACCOUNTS and WS_PERMESSAGE_DEFLATE (matches
+// web_login_guard.ts / content_type.ts / origin_check.ts:
 // '1'/'true' => on, '0'/'false' => off, compared case-insensitively). Unset or
 // empty means "not set" and the flag's own default applies; any OTHER set value is
 // garbage and fails fast at boot.
@@ -323,6 +329,13 @@ function validateBooleanFlag(env: NodeJS.ProcessEnv, key: string): void {
 function resolveBooleanFlag(env: NodeJS.ProcessEnv, key: string): boolean {
   const value = (env[key] ?? '').toLowerCase();
   return value === '1' || value === 'true';
+}
+
+// The default-ON twin of resolveBooleanFlag, for kill switches: only an explicit
+// '0'/'false' turns the flag off. validateBooleanFlag has already thrown on garbage.
+function resolveDefaultOnFlag(env: NodeJS.ProcessEnv, key: string): boolean {
+  const value = (env[key] ?? '').toLowerCase();
+  return value !== '0' && value !== 'false';
 }
 
 // Resolve REQUIRE_WEB_LOGIN to a boolean, mirroring web_login_guard.ts
@@ -404,6 +417,7 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
   validateBooleanFlag(env, CONTENT_TYPE_ENFORCE_ENV);
   validateBooleanFlag(env, ORIGIN_CHECK_ENFORCE_ENV);
   validateBooleanFlag(env, PROVISION_TEST_ACCOUNTS_ENV);
+  validateBooleanFlag(env, WS_PERMESSAGE_DEFLATE_ENV);
   validatePublicOrigin(env);
   validateRealms(env);
 
@@ -422,6 +436,7 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     provisionTestAccounts: resolveBooleanFlag(env, PROVISION_TEST_ACCOUNTS_ENV),
     turnstileSecret: env.TURNSTILE_SECRET ?? DEFAULT_TURNSTILE_SECRET,
     maxWsPerIpHard: numberOr(env.MAX_WS_PER_IP_HARD, DEFAULT_MAX_WS_PER_IP_HARD),
+    wsPerMessageDeflate: resolveDefaultOnFlag(env, WS_PERMESSAGE_DEFLATE_ENV),
     // Trimmed so a whitespace-only value reads as unset -> the default, never as
     // the explicit 0 that disables the cap (see the Config field comment). Scoped
     // to the fail-dangerous keys: the two RETENTION_SWEEP_* reads below share this
