@@ -235,3 +235,51 @@ moves.
 - A Fire Elemental cooldown (the Wrath Fire Elemental Totem) through the existing guardian summon
   path, as its own PR.
 - A class-wide totem system is a separate design pass.
+
+## v0.45.0 rotation fix
+
+Status: implementation PR against `release/v0.45.0`. Player report, 2026-10-07: the v0.44 kit
+rotation (Cinder Jolt kept up for guaranteed Magma Burst crits) parsed 240 to 250 DPS on the
+training dummy, while plain Arc Bolt plus Earthen Jolt held about 300.
+
+### Diagnosis
+
+The owned-class probe (`scripts/owned_class_balance_probe.ts`) reproduced the direction, with the
+kit rotation 16 to 20 DPS behind Arc Bolt plus Earthen Jolt from 3 min on. The causes:
+
+- Cinder Jolt shares the shock cooldown with Earthen Jolt, so every refresh blocks a vent for
+  6 sec, and neither Cinder Jolt nor Magma Burst banked Thunder.
+- Magma Burst paid its full 70 Mana while Arc Bolt carries a 35 percent Thundercall discount, so
+  the kit loop ran out of Mana inside a 3 min fight.
+- With unlimited Mana the gap shrank to about 5 DPS: Mana was the larger cost, the shared cooldown
+  the smaller.
+
+### Changes
+
+This supersedes the v0.44.0 row above that says Magma Burst grants no Thunder.
+
+| Change | Behavior |
+|---|---|
+| Magma Burst Thunder | A Magma Burst hit banks 1 Thunder (`MAGMA_BURST_THUNDER`, `thundercallOnMagmaBurstImpact`). It stays flat inside Primal Mastery, like Skybranch; the doubled grant remains Arc Bolt's. |
+| Magma Burst cost | Thundercall spec baseline `costPct: -0.35` on `lava_burst`, Arc Bolt's discount (70 to 46 Mana at rank 2). |
+| Cinder Jolt duration | Thundercall's Cinder Jolt burns 18 sec, the Cataclysm Flame Shock (`THUNDERCALL_CINDER_JOLT_DURATION`), at the same rounded damage per tick, through `resolveThundercallAbility` in the ability resolution chain. Other specs keep 12 sec. |
+
+No rng draw is added or moved; the parity goldens do not change. Pinned by
+`tests/shaman_thundercall_rework.test.ts` ("Thundercall v0.45 rotation fix").
+
+### Bench (owned-class probe, Stormkindled 4pc, level 20 dummy, 8 seeds, DPS)
+
+Arc Bolt plus Earthen Jolt casts neither changed spell, so its numbers are the same before and
+after. "At 5" spends Earthen Jolt on a full bank; "on cooldown" spends any bank.
+
+| Fight | Kit before | Kit after | Bolt plus Jolt, at 5 | Bolt plus Jolt, on cooldown |
+|---|---|---|---|---|
+| 30 sec | 205.4 | 208.2 | 209.5 | 207.0 |
+| 60 sec | 208.6 | 224.7 | 214.2 | 220.8 |
+| 3 min | 200.1 | 220.3 | 216.0 | 220.1 |
+| 5 min | 159.9 | 177.0 | 178.0 | 175.2 |
+| 3 min, no set (Nythraxis kit) | 175.7 | 182.1 | 184.5 | 178.0 |
+
+The kit rotation moves from clearly behind to level with the best two-button play from 3 min on,
+and ahead at 60 sec. The best single-target play gains at most about 5 DPS, so the role bands do
+not move. Seed spread is about 10 DPS per cell, so differences under about 3 DPS are noise.
