@@ -250,7 +250,7 @@ export class QuestLogWindow {
   }
 
   private renderDetail(detail: HTMLElement, d: QuestDetailModel, playerName: string): void {
-    let html = `<div class="qd-sub ql-detail-title">${esc(questTitle(d.questId))}${this.questSuggestedPlayersHtml(d.suggestedPlayers)}</div>`;
+    let html = `<div class="qd-sub ql-detail-title" id="ql-detail-title">${esc(questTitle(d.questId))}${this.questSuggestedPlayersHtml(d.suggestedPlayers)}</div>`;
     html += d.objectives
       .map(
         (o) =>
@@ -275,6 +275,12 @@ export class QuestLogWindow {
     html += `<div class="qd-obj quest-return">${esc(t('questUi.log.returnTo', { name: giver ? npcDisplayName(giver.id) : '?' }))}</div>`;
     const body = document.createElement('div');
     body.className = 'ql-detail-body';
+    // The detail can outgrow its pane (a long reward list), and its rows are not
+    // focusable, so the scroll region itself is the keyboard stop, named by the
+    // quest title (axe scrollable-region-focusable; the char window precedent).
+    body.tabIndex = 0;
+    body.setAttribute('role', 'region');
+    body.setAttribute('aria-labelledby', 'ql-detail-title');
     body.innerHTML = html;
     detail.replaceChildren(body);
     const rewardRow = body.querySelector('[data-reward]') as HTMLElement | null;
