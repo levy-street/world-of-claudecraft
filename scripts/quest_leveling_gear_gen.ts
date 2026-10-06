@@ -1,20 +1,21 @@
 // Authoring tool for the choose-one leveling gear: every eligible quest offers a
-// four-way choice (cloth caster, leather agility, mail strength, mail caster) of
-// one armor slot, from the set of its level band.
+// five-way choice (cloth caster, leather agility, leather strength, mail strength,
+// mail caster) of one armor slot, from the set of its level band.
 //
 //   npx tsx scripts/quest_leveling_gear_gen.ts [--prompts <file.json>]
 //
 // Writes two declarative content tables (re-run after adding quests or changing
 // a band, then review the diff):
 //   src/sim/content/quest_leveling_gear.ts   the item records, stats baked
-//   src/sim/content/quest_choice_rewards.ts  quest id -> its four choices
+//   src/sim/content/quest_choice_rewards.ts  quest id -> its five choices
 // and, with --prompts, a JSON of per-item icon briefs for the art batch.
 //
 // Stats are never invented: an item's level is the one src/sim/item_level.ts
 // derives from the quests that offer it (their hardest kill or collect source,
 // or minLevel), its primary stats are that level's uncommon slot budget put on
-// the stamina model (normalizeToStaminaModel), and armor and sell value are the
-// shipped catalog's median per item level for the armor type and slot.
+// the stamina model (normalizeToStaminaModel), armor is the shipped chest line
+// of the armor type times the slot weight, and sell value is the median of the
+// shipped greens within a few item levels.
 
 import { writeFileSync } from 'node:fs';
 import { QUEST_CHOICE_REWARDS } from '../src/sim/content/quest_choice_rewards';
@@ -141,6 +142,24 @@ const ROLES: readonly Role[] = [
       feet: 'Boots',
     },
     look: 'supple tooled leather with stitched seams and buckles',
+  },
+  {
+    // Feral druids (cat AP is 2 per Strength) and rogues (Strength and Agility
+    // both feed AP); measured: +30 Strength is +23 DPS for a level 20 cat,
+    // +30 Agility nothing.
+    key: 'leather_str',
+    armorType: 'leather',
+    profile: { str: 3, agi: 1, sta: 1 },
+    nouns: {
+      helmet: 'Headguard',
+      shoulder: 'Shoulderguards',
+      chest: 'Tunic',
+      waist: 'Waistguard',
+      legs: 'Legwraps',
+      gloves: 'Handwraps',
+      feet: 'Treads',
+    },
+    look: 'thick hardened leather with riveted studs and heavy stitching',
   },
   {
     key: 'mail_str',
@@ -278,9 +297,6 @@ function medianOf(values: number[]): number {
 }
 interface Peer {
   ilvl: number;
-  armorType: string;
-  slot: string;
-  armorPerIlvl: number;
   sellPerSlot: number;
 }
 const peers: Peer[] = [];
@@ -291,9 +307,6 @@ for (const item of Object.values(ITEMS)) {
   if (!ilvl) continue;
   peers.push({
     ilvl,
-    armorType: item.armorType,
-    slot: item.slot,
-    armorPerIlvl: (item.stats?.armor ?? 0) / ilvl,
     sellPerSlot: item.sellValue / (SLOT_STAT_MULT[item.slot] ?? 1),
   });
 }
@@ -311,16 +324,30 @@ function localMedian(pool: Peer[], ilvl: number, pick: (p: Peer) => number): num
   if (all.length === 0) throw new Error('no shipped peers to price against');
   return medianOf(all);
 }
-const armorFor = (armorType: string, slot: Slot, ilvl: number) => {
-  const sameSlot = peers.filter((p) => p.armorType === armorType && p.slot === slot);
-  // Too few same-slot peers: read the chest line and apply the slot weight.
-  const pool =
-    sameSlot.length >= 3
-      ? sameSlot
-      : peers.filter((p) => p.armorType === armorType && p.slot === 'chest');
-  const scale = sameSlot.length >= 3 ? 1 : (SLOT_STAT_MULT[slot] ?? 1);
-  return Math.max(1, Math.round(localMedian(pool, ilvl, (p) => p.armorPerIlvl) * ilvl * scale));
-};
+// Armor per item level, the content/hoard_loot.ts derivation over the leveling
+// window: the median armor/item-level of every shipped CHEST of the armor type
+// at item level 24 or below, any quality (10 to 15 pieces per type), times the
+// slot weight items.ts documents for armor. The other slots have one to five
+// shipped pieces each in that window, too few to keep mail above leather above
+// cloth slot by slot.
+const LEVELING_ARMOR_WINDOW = 24;
+const chestArmorPerIlvl = new Map<string, number>();
+for (const armorType of ['cloth', 'leather', 'mail']) {
+  const ratios: number[] = [];
+  for (const item of Object.values(ITEMS)) {
+    if (item.kind !== 'armor' || item.armorType !== armorType || item.slot !== 'chest') continue;
+    const ilvl = itemLevel(item);
+    const armor = item.stats?.armor ?? 0;
+    if (ilvl && ilvl <= LEVELING_ARMOR_WINDOW && armor > 0) ratios.push(armor / ilvl);
+  }
+  if (ratios.length < 5) throw new Error(`too few shipped ${armorType} chests to price armor`);
+  chestArmorPerIlvl.set(armorType, medianOf(ratios));
+}
+const armorFor = (armorType: string, slot: Slot, ilvl: number) =>
+  Math.max(
+    1,
+    Math.round((chestArmorPerIlvl.get(armorType) ?? 0) * (SLOT_STAT_MULT[slot] ?? 1) * ilvl),
+  );
 const sellFor = (slot: Slot, ilvl: number) =>
   Math.max(
     5,
@@ -399,10 +426,10 @@ const statsLiteral = (s: Partial<CoreStats>) =>
     .map((k) => `${k}: ${s[k]}`)
     .join(', ')} }`;
 
-let items = `// Choose-one leveling gear: the four-way armor choice every leveling quest
+let items = `// Choose-one leveling gear: the five-way armor choice every leveling quest
 // offers (content/quest_choice_rewards.ts). One set per level band and armor
-// role (cloth caster, leather agility, mail strength, mail caster) in every
-// armor slot.
+// role (cloth caster, leather agility, leather strength, mail strength, mail
+// caster) in every armor slot.
 //
 // Generated by scripts/quest_leveling_gear_gen.ts: re-run it rather than editing
 // a record by hand. Each item's level is the one src/sim/item_level.ts derives
@@ -421,9 +448,9 @@ for (const b of built) {
 items += '};\n';
 writeFileSync('src/sim/content/quest_leveling_gear.ts', items);
 
-let choices = `// Choose-one leveling rewards: quest id -> the four pieces it offers (cloth
-// caster, leather agility, mail strength, mail caster) of one armor slot from
-// its level band's set (content/quest_leveling_gear.ts). Merged onto
+let choices = `// Choose-one leveling rewards: quest id -> the five pieces it offers (cloth
+// caster, leather agility, leather strength, mail strength, mail caster) of one
+// armor slot from its level band's set (content/quest_leveling_gear.ts). Merged onto
 // QuestDef.choiceRewards by data.ts; the player is offered what their class can
 // wear (quests/quest_reward_choice.ts).
 //

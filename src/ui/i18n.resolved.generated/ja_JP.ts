@@ -19114,6 +19114,174 @@ export const ja_JP: EnTranslations = {
       "highgale_greaves": {
         "name": "高き疾風のグリーブ"
       },
+      "saltbitten_tunic": {
+        "name": "塩かじりのチュニック"
+      },
+      "saltbitten_legwraps": {
+        "name": "塩かじりのレッグラップ"
+      },
+      "saltbitten_treads": {
+        "name": "塩かじりの短靴"
+      },
+      "saltbitten_headguard": {
+        "name": "塩かじりのヘッドガード"
+      },
+      "saltbitten_handwraps": {
+        "name": "塩かじりのハンドラップ"
+      },
+      "saltbitten_shoulderguards": {
+        "name": "塩かじりのショルダーガード"
+      },
+      "saltbitten_waistguard": {
+        "name": "塩かじりのウエストガード"
+      },
+      "brookwatch_tunic": {
+        "name": "小川監視のチュニック"
+      },
+      "brookwatch_legwraps": {
+        "name": "小川監視のレッグラップ"
+      },
+      "brookwatch_treads": {
+        "name": "小川監視の短靴"
+      },
+      "brookwatch_headguard": {
+        "name": "小川監視のヘッドガード"
+      },
+      "brookwatch_handwraps": {
+        "name": "小川監視のハンドラップ"
+      },
+      "brookwatch_shoulderguards": {
+        "name": "小川監視のショルダーガード"
+      },
+      "brookwatch_waistguard": {
+        "name": "小川監視のウエストガード"
+      },
+      "hedgerow_tunic": {
+        "name": "垣根のチュニック"
+      },
+      "hedgerow_legwraps": {
+        "name": "垣根のレッグラップ"
+      },
+      "hedgerow_treads": {
+        "name": "垣根の短靴"
+      },
+      "hedgerow_headguard": {
+        "name": "垣根のヘッドガード"
+      },
+      "hedgerow_handwraps": {
+        "name": "垣根のハンドラップ"
+      },
+      "hedgerow_shoulderguards": {
+        "name": "垣根のショルダーガード"
+      },
+      "hedgerow_waistguard": {
+        "name": "垣根のウエストガード"
+      },
+      "bogwalker_tunic": {
+        "name": "泥沼行きのチュニック"
+      },
+      "bogwalker_legwraps": {
+        "name": "泥沼行きのレッグラップ"
+      },
+      "bogwalker_treads": {
+        "name": "泥沼行きの短靴"
+      },
+      "bogwalker_headguard": {
+        "name": "泥沼行きのヘッドガード"
+      },
+      "bogwalker_handwraps": {
+        "name": "泥沼行きのハンドラップ"
+      },
+      "bogwalker_shoulderguards": {
+        "name": "泥沼行きのショルダーガード"
+      },
+      "bogwalker_waistguard": {
+        "name": "泥沼行きのウエストガード"
+      },
+      "thornspire_tunic": {
+        "name": "棘塔のチュニック"
+      },
+      "thornspire_legwraps": {
+        "name": "棘塔のレッグラップ"
+      },
+      "thornspire_treads": {
+        "name": "棘塔の短靴"
+      },
+      "thornspire_headguard": {
+        "name": "棘塔のヘッドガード"
+      },
+      "thornspire_handwraps": {
+        "name": "棘塔のハンドラップ"
+      },
+      "thornspire_shoulderguards": {
+        "name": "棘塔のショルダーガード"
+      },
+      "thornspire_waistguard": {
+        "name": "棘塔のウエストガード"
+      },
+      "hollowveil_tunic": {
+        "name": "空洞の帳のチュニック"
+      },
+      "hollowveil_legwraps": {
+        "name": "空洞の帳のレッグラップ"
+      },
+      "hollowveil_treads": {
+        "name": "空洞の帳の短靴"
+      },
+      "hollowveil_headguard": {
+        "name": "空洞の帳のヘッドガード"
+      },
+      "hollowveil_handwraps": {
+        "name": "空洞の帳のハンドラップ"
+      },
+      "hollowveil_shoulderguards": {
+        "name": "空洞の帳のショルダーガード"
+      },
+      "hollowveil_waistguard": {
+        "name": "空洞の帳のウエストガード"
+      },
+      "trailwarden_tunic": {
+        "name": "径守のチュニック"
+      },
+      "trailwarden_legwraps": {
+        "name": "径守のレッグラップ"
+      },
+      "trailwarden_treads": {
+        "name": "径守の短靴"
+      },
+      "trailwarden_headguard": {
+        "name": "径守のヘッドガード"
+      },
+      "trailwarden_handwraps": {
+        "name": "径守のハンドラップ"
+      },
+      "trailwarden_shoulderguards": {
+        "name": "径守のショルダーガード"
+      },
+      "trailwarden_waistguard": {
+        "name": "径守のウエストガード"
+      },
+      "highgale_tunic": {
+        "name": "高き疾風のチュニック"
+      },
+      "highgale_legwraps": {
+        "name": "高き疾風のレッグラップ"
+      },
+      "highgale_treads": {
+        "name": "高き疾風の短靴"
+      },
+      "highgale_headguard": {
+        "name": "高き疾風のヘッドガード"
+      },
+      "highgale_handwraps": {
+        "name": "高き疾風のハンドラップ"
+      },
+      "highgale_shoulderguards": {
+        "name": "高き疾風のショルダーガード"
+      },
+      "highgale_waistguard": {
+        "name": "高き疾風のウエストガード"
+      },
       "highgale_coif": {
         "name": "高き疾風のコイフ"
       },

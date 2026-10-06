@@ -18488,7 +18488,7 @@ export const zh_TW: EnTranslations = {
         "name": "鹽蝕便帽"
       },
       "saltbitten_grips": {
-        "name": "鹽蝕握把"
+        "name": "鹽蝕掌套"
       },
       "saltbitten_shoulderpads": {
         "name": "鹽蝕肩墊"
@@ -18572,7 +18572,7 @@ export const zh_TW: EnTranslations = {
         "name": "溪衛便帽"
       },
       "brookwatch_grips": {
-        "name": "溪衛握把"
+        "name": "溪衛掌套"
       },
       "brookwatch_shoulderpads": {
         "name": "溪衛肩墊"
@@ -18656,7 +18656,7 @@ export const zh_TW: EnTranslations = {
         "name": "樹籬便帽"
       },
       "hedgerow_grips": {
-        "name": "樹籬握把"
+        "name": "樹籬掌套"
       },
       "hedgerow_shoulderpads": {
         "name": "樹籬肩墊"
@@ -18740,7 +18740,7 @@ export const zh_TW: EnTranslations = {
         "name": "沼行便帽"
       },
       "bogwalker_grips": {
-        "name": "沼行握把"
+        "name": "沼行掌套"
       },
       "bogwalker_shoulderpads": {
         "name": "沼行肩墊"
@@ -18824,7 +18824,7 @@ export const zh_TW: EnTranslations = {
         "name": "棘尖便帽"
       },
       "thornspire_grips": {
-        "name": "棘尖握把"
+        "name": "棘尖掌套"
       },
       "thornspire_shoulderpads": {
         "name": "棘尖肩墊"
@@ -18908,7 +18908,7 @@ export const zh_TW: EnTranslations = {
         "name": "空幕便帽"
       },
       "hollowveil_grips": {
-        "name": "空幕握把"
+        "name": "空幕掌套"
       },
       "hollowveil_shoulderpads": {
         "name": "空幕肩墊"
@@ -18992,7 +18992,7 @@ export const zh_TW: EnTranslations = {
         "name": "徑衛便帽"
       },
       "trailwarden_grips": {
-        "name": "徑衛握把"
+        "name": "徑衛掌套"
       },
       "trailwarden_shoulderpads": {
         "name": "徑衛肩墊"
@@ -19076,7 +19076,7 @@ export const zh_TW: EnTranslations = {
         "name": "高風便帽"
       },
       "highgale_grips": {
-        "name": "高風握把"
+        "name": "高風掌套"
       },
       "highgale_shoulderpads": {
         "name": "高風肩墊"
@@ -19113,6 +19113,174 @@ export const zh_TW: EnTranslations = {
       },
       "highgale_greaves": {
         "name": "高風脛甲"
+      },
+      "saltbitten_tunic": {
+        "name": "鹽蝕短衣"
+      },
+      "saltbitten_legwraps": {
+        "name": "鹽蝕綁腿"
+      },
+      "saltbitten_treads": {
+        "name": "鹽蝕踏靴"
+      },
+      "saltbitten_headguard": {
+        "name": "鹽蝕護頭"
+      },
+      "saltbitten_handwraps": {
+        "name": "鹽蝕裹手"
+      },
+      "saltbitten_shoulderguards": {
+        "name": "鹽蝕護肩"
+      },
+      "saltbitten_waistguard": {
+        "name": "鹽蝕護腰"
+      },
+      "brookwatch_tunic": {
+        "name": "溪衛短衣"
+      },
+      "brookwatch_legwraps": {
+        "name": "溪衛綁腿"
+      },
+      "brookwatch_treads": {
+        "name": "溪衛踏靴"
+      },
+      "brookwatch_headguard": {
+        "name": "溪衛護頭"
+      },
+      "brookwatch_handwraps": {
+        "name": "溪衛裹手"
+      },
+      "brookwatch_shoulderguards": {
+        "name": "溪衛護肩"
+      },
+      "brookwatch_waistguard": {
+        "name": "溪衛護腰"
+      },
+      "hedgerow_tunic": {
+        "name": "樹籬短衣"
+      },
+      "hedgerow_legwraps": {
+        "name": "樹籬綁腿"
+      },
+      "hedgerow_treads": {
+        "name": "樹籬踏靴"
+      },
+      "hedgerow_headguard": {
+        "name": "樹籬護頭"
+      },
+      "hedgerow_handwraps": {
+        "name": "樹籬裹手"
+      },
+      "hedgerow_shoulderguards": {
+        "name": "樹籬護肩"
+      },
+      "hedgerow_waistguard": {
+        "name": "樹籬護腰"
+      },
+      "bogwalker_tunic": {
+        "name": "沼行短衣"
+      },
+      "bogwalker_legwraps": {
+        "name": "沼行綁腿"
+      },
+      "bogwalker_treads": {
+        "name": "沼行踏靴"
+      },
+      "bogwalker_headguard": {
+        "name": "沼行護頭"
+      },
+      "bogwalker_handwraps": {
+        "name": "沼行裹手"
+      },
+      "bogwalker_shoulderguards": {
+        "name": "沼行護肩"
+      },
+      "bogwalker_waistguard": {
+        "name": "沼行護腰"
+      },
+      "thornspire_tunic": {
+        "name": "棘尖短衣"
+      },
+      "thornspire_legwraps": {
+        "name": "棘尖綁腿"
+      },
+      "thornspire_treads": {
+        "name": "棘尖踏靴"
+      },
+      "thornspire_headguard": {
+        "name": "棘尖護頭"
+      },
+      "thornspire_handwraps": {
+        "name": "棘尖裹手"
+      },
+      "thornspire_shoulderguards": {
+        "name": "棘尖護肩"
+      },
+      "thornspire_waistguard": {
+        "name": "棘尖護腰"
+      },
+      "hollowveil_tunic": {
+        "name": "空幕短衣"
+      },
+      "hollowveil_legwraps": {
+        "name": "空幕綁腿"
+      },
+      "hollowveil_treads": {
+        "name": "空幕踏靴"
+      },
+      "hollowveil_headguard": {
+        "name": "空幕護頭"
+      },
+      "hollowveil_handwraps": {
+        "name": "空幕裹手"
+      },
+      "hollowveil_shoulderguards": {
+        "name": "空幕護肩"
+      },
+      "hollowveil_waistguard": {
+        "name": "空幕護腰"
+      },
+      "trailwarden_tunic": {
+        "name": "徑衛短衣"
+      },
+      "trailwarden_legwraps": {
+        "name": "徑衛綁腿"
+      },
+      "trailwarden_treads": {
+        "name": "徑衛踏靴"
+      },
+      "trailwarden_headguard": {
+        "name": "徑衛護頭"
+      },
+      "trailwarden_handwraps": {
+        "name": "徑衛裹手"
+      },
+      "trailwarden_shoulderguards": {
+        "name": "徑衛護肩"
+      },
+      "trailwarden_waistguard": {
+        "name": "徑衛護腰"
+      },
+      "highgale_tunic": {
+        "name": "高風短衣"
+      },
+      "highgale_legwraps": {
+        "name": "高風綁腿"
+      },
+      "highgale_treads": {
+        "name": "高風踏靴"
+      },
+      "highgale_headguard": {
+        "name": "高風護頭"
+      },
+      "highgale_handwraps": {
+        "name": "高風裹手"
+      },
+      "highgale_shoulderguards": {
+        "name": "高風護肩"
+      },
+      "highgale_waistguard": {
+        "name": "高風護腰"
       },
       "highgale_coif": {
         "name": "高風頭罩"

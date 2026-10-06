@@ -19114,6 +19114,174 @@ export const ru_RU: EnTranslations = {
       "highgale_greaves": {
         "name": "Наголенники буревого гребня"
       },
+      "saltbitten_tunic": {
+        "name": "Туника просоленного берега"
+      },
+      "saltbitten_legwraps": {
+        "name": "Обмотки просоленного берега"
+      },
+      "saltbitten_treads": {
+        "name": "Башмаки просоленного берега"
+      },
+      "saltbitten_headguard": {
+        "name": "Наголовник просоленного берега"
+      },
+      "saltbitten_handwraps": {
+        "name": "Наручные обмотки просоленного берега"
+      },
+      "saltbitten_shoulderguards": {
+        "name": "Наплечные щитки просоленного берега"
+      },
+      "saltbitten_waistguard": {
+        "name": "Опояска просоленного берега"
+      },
+      "brookwatch_tunic": {
+        "name": "Туника дозора у ручья"
+      },
+      "brookwatch_legwraps": {
+        "name": "Обмотки дозора у ручья"
+      },
+      "brookwatch_treads": {
+        "name": "Башмаки дозора у ручья"
+      },
+      "brookwatch_headguard": {
+        "name": "Наголовник дозора у ручья"
+      },
+      "brookwatch_handwraps": {
+        "name": "Наручные обмотки дозора у ручья"
+      },
+      "brookwatch_shoulderguards": {
+        "name": "Наплечные щитки дозора у ручья"
+      },
+      "brookwatch_waistguard": {
+        "name": "Опояска дозора у ручья"
+      },
+      "hedgerow_tunic": {
+        "name": "Туника живой изгороди"
+      },
+      "hedgerow_legwraps": {
+        "name": "Обмотки живой изгороди"
+      },
+      "hedgerow_treads": {
+        "name": "Башмаки живой изгороди"
+      },
+      "hedgerow_headguard": {
+        "name": "Наголовник живой изгороди"
+      },
+      "hedgerow_handwraps": {
+        "name": "Наручные обмотки живой изгороди"
+      },
+      "hedgerow_shoulderguards": {
+        "name": "Наплечные щитки живой изгороди"
+      },
+      "hedgerow_waistguard": {
+        "name": "Опояска живой изгороди"
+      },
+      "bogwalker_tunic": {
+        "name": "Туника болотного странника"
+      },
+      "bogwalker_legwraps": {
+        "name": "Обмотки болотного странника"
+      },
+      "bogwalker_treads": {
+        "name": "Башмаки болотного странника"
+      },
+      "bogwalker_headguard": {
+        "name": "Наголовник болотного странника"
+      },
+      "bogwalker_handwraps": {
+        "name": "Наручные обмотки болотного странника"
+      },
+      "bogwalker_shoulderguards": {
+        "name": "Наплечные щитки болотного странника"
+      },
+      "bogwalker_waistguard": {
+        "name": "Опояска болотного странника"
+      },
+      "thornspire_tunic": {
+        "name": "Туника тернового шпиля"
+      },
+      "thornspire_legwraps": {
+        "name": "Обмотки тернового шпиля"
+      },
+      "thornspire_treads": {
+        "name": "Башмаки тернового шпиля"
+      },
+      "thornspire_headguard": {
+        "name": "Наголовник тернового шпиля"
+      },
+      "thornspire_handwraps": {
+        "name": "Наручные обмотки тернового шпиля"
+      },
+      "thornspire_shoulderguards": {
+        "name": "Наплечные щитки тернового шпиля"
+      },
+      "thornspire_waistguard": {
+        "name": "Опояска тернового шпиля"
+      },
+      "hollowveil_tunic": {
+        "name": "Туника сокрытой лощины"
+      },
+      "hollowveil_legwraps": {
+        "name": "Обмотки сокрытой лощины"
+      },
+      "hollowveil_treads": {
+        "name": "Башмаки сокрытой лощины"
+      },
+      "hollowveil_headguard": {
+        "name": "Наголовник сокрытой лощины"
+      },
+      "hollowveil_handwraps": {
+        "name": "Наручные обмотки сокрытой лощины"
+      },
+      "hollowveil_shoulderguards": {
+        "name": "Наплечные щитки сокрытой лощины"
+      },
+      "hollowveil_waistguard": {
+        "name": "Опояска сокрытой лощины"
+      },
+      "trailwarden_tunic": {
+        "name": "Туника стража троп"
+      },
+      "trailwarden_legwraps": {
+        "name": "Обмотки стража троп"
+      },
+      "trailwarden_treads": {
+        "name": "Башмаки стража троп"
+      },
+      "trailwarden_headguard": {
+        "name": "Наголовник стража троп"
+      },
+      "trailwarden_handwraps": {
+        "name": "Наручные обмотки стража троп"
+      },
+      "trailwarden_shoulderguards": {
+        "name": "Наплечные щитки стража троп"
+      },
+      "trailwarden_waistguard": {
+        "name": "Опояска стража троп"
+      },
+      "highgale_tunic": {
+        "name": "Туника буревого гребня"
+      },
+      "highgale_legwraps": {
+        "name": "Обмотки буревого гребня"
+      },
+      "highgale_treads": {
+        "name": "Башмаки буревого гребня"
+      },
+      "highgale_headguard": {
+        "name": "Наголовник буревого гребня"
+      },
+      "highgale_handwraps": {
+        "name": "Наручные обмотки буревого гребня"
+      },
+      "highgale_shoulderguards": {
+        "name": "Наплечные щитки буревого гребня"
+      },
+      "highgale_waistguard": {
+        "name": "Опояска буревого гребня"
+      },
       "highgale_coif": {
         "name": "Койф буревого гребня"
       },

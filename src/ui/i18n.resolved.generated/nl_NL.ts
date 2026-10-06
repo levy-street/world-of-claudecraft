@@ -19114,6 +19114,174 @@ export const nl_NL: EnTranslations = {
       "highgale_greaves": {
         "name": "Highgale Greaves"
       },
+      "saltbitten_tunic": {
+        "name": "Saltbitten Tunic"
+      },
+      "saltbitten_legwraps": {
+        "name": "Saltbitten Legwraps"
+      },
+      "saltbitten_treads": {
+        "name": "Saltbitten Treads"
+      },
+      "saltbitten_headguard": {
+        "name": "Saltbitten Headguard"
+      },
+      "saltbitten_handwraps": {
+        "name": "Saltbitten Handwraps"
+      },
+      "saltbitten_shoulderguards": {
+        "name": "Saltbitten Shoulderguards"
+      },
+      "saltbitten_waistguard": {
+        "name": "Saltbitten Waistguard"
+      },
+      "brookwatch_tunic": {
+        "name": "Brookwatch Tunic"
+      },
+      "brookwatch_legwraps": {
+        "name": "Brookwatch Legwraps"
+      },
+      "brookwatch_treads": {
+        "name": "Brookwatch Treads"
+      },
+      "brookwatch_headguard": {
+        "name": "Brookwatch Headguard"
+      },
+      "brookwatch_handwraps": {
+        "name": "Brookwatch Handwraps"
+      },
+      "brookwatch_shoulderguards": {
+        "name": "Brookwatch Shoulderguards"
+      },
+      "brookwatch_waistguard": {
+        "name": "Brookwatch Waistguard"
+      },
+      "hedgerow_tunic": {
+        "name": "Hedgerow Tunic"
+      },
+      "hedgerow_legwraps": {
+        "name": "Hedgerow Legwraps"
+      },
+      "hedgerow_treads": {
+        "name": "Hedgerow Treads"
+      },
+      "hedgerow_headguard": {
+        "name": "Hedgerow Headguard"
+      },
+      "hedgerow_handwraps": {
+        "name": "Hedgerow Handwraps"
+      },
+      "hedgerow_shoulderguards": {
+        "name": "Hedgerow Shoulderguards"
+      },
+      "hedgerow_waistguard": {
+        "name": "Hedgerow Waistguard"
+      },
+      "bogwalker_tunic": {
+        "name": "Bogwalker Tunic"
+      },
+      "bogwalker_legwraps": {
+        "name": "Bogwalker Legwraps"
+      },
+      "bogwalker_treads": {
+        "name": "Bogwalker Treads"
+      },
+      "bogwalker_headguard": {
+        "name": "Bogwalker Headguard"
+      },
+      "bogwalker_handwraps": {
+        "name": "Bogwalker Handwraps"
+      },
+      "bogwalker_shoulderguards": {
+        "name": "Bogwalker Shoulderguards"
+      },
+      "bogwalker_waistguard": {
+        "name": "Bogwalker Waistguard"
+      },
+      "thornspire_tunic": {
+        "name": "Thornspire Tunic"
+      },
+      "thornspire_legwraps": {
+        "name": "Thornspire Legwraps"
+      },
+      "thornspire_treads": {
+        "name": "Thornspire Treads"
+      },
+      "thornspire_headguard": {
+        "name": "Thornspire Headguard"
+      },
+      "thornspire_handwraps": {
+        "name": "Thornspire Handwraps"
+      },
+      "thornspire_shoulderguards": {
+        "name": "Thornspire Shoulderguards"
+      },
+      "thornspire_waistguard": {
+        "name": "Thornspire Waistguard"
+      },
+      "hollowveil_tunic": {
+        "name": "Hollowveil Tunic"
+      },
+      "hollowveil_legwraps": {
+        "name": "Hollowveil Legwraps"
+      },
+      "hollowveil_treads": {
+        "name": "Hollowveil Treads"
+      },
+      "hollowveil_headguard": {
+        "name": "Hollowveil Headguard"
+      },
+      "hollowveil_handwraps": {
+        "name": "Hollowveil Handwraps"
+      },
+      "hollowveil_shoulderguards": {
+        "name": "Hollowveil Shoulderguards"
+      },
+      "hollowveil_waistguard": {
+        "name": "Hollowveil Waistguard"
+      },
+      "trailwarden_tunic": {
+        "name": "Trailwarden Tunic"
+      },
+      "trailwarden_legwraps": {
+        "name": "Trailwarden Legwraps"
+      },
+      "trailwarden_treads": {
+        "name": "Trailwarden Treads"
+      },
+      "trailwarden_headguard": {
+        "name": "Trailwarden Headguard"
+      },
+      "trailwarden_handwraps": {
+        "name": "Trailwarden Handwraps"
+      },
+      "trailwarden_shoulderguards": {
+        "name": "Trailwarden Shoulderguards"
+      },
+      "trailwarden_waistguard": {
+        "name": "Trailwarden Waistguard"
+      },
+      "highgale_tunic": {
+        "name": "Highgale Tunic"
+      },
+      "highgale_legwraps": {
+        "name": "Highgale Legwraps"
+      },
+      "highgale_treads": {
+        "name": "Highgale Treads"
+      },
+      "highgale_headguard": {
+        "name": "Highgale Headguard"
+      },
+      "highgale_handwraps": {
+        "name": "Highgale Handwraps"
+      },
+      "highgale_shoulderguards": {
+        "name": "Highgale Shoulderguards"
+      },
+      "highgale_waistguard": {
+        "name": "Highgale Waistguard"
+      },
       "highgale_coif": {
         "name": "Highgale Coif"
       },

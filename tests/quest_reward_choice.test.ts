@@ -9,28 +9,20 @@ import { Sim } from '../src/sim/sim';
 import type { ItemDef, PlayerClass, QuestDef } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
-// One existing green per role: the four-way choice every leveling quest offers.
-function pick(armorType: string, stat: 'str' | 'agi' | 'int'): ItemDef {
-  const found = Object.values(ITEMS).find(
-    (it) =>
-      it.kind === 'armor' &&
-      it.armorType === armorType &&
-      it.quality === 'uncommon' &&
-      it.slot === 'chest' &&
-      (it.stats?.[stat] ?? 0) > 0 &&
-      Object.entries(it.stats ?? {}).every(
-        ([k, v]) => k === stat || k === 'sta' || k === 'spi' || k === 'armor' || (v ?? 0) <= 0,
-      ),
-  );
-  if (!found) throw new Error(`no uncommon ${armorType} chest with ${stat}`);
+// One leveling green per role (the Hedgerow chest set): the five-way choice
+// every leveling quest offers.
+function piece(id: string): ItemDef {
+  const found = ITEMS[id];
+  if (!found) throw new Error(`no item ${id}`);
   return found;
 }
 
-const CLOTH_INT = pick('cloth', 'int');
-const LEATHER_AGI = pick('leather', 'agi');
-const MAIL_STR = pick('mail', 'str');
-const MAIL_INT = pick('mail', 'int');
-const CHOICES = [CLOTH_INT.id, LEATHER_AGI.id, MAIL_STR.id, MAIL_INT.id];
+const CLOTH_INT = piece('hedgerow_robe');
+const LEATHER_AGI = piece('hedgerow_jerkin');
+const LEATHER_STR = piece('hedgerow_tunic');
+const MAIL_STR = piece('hedgerow_hauberk');
+const MAIL_INT = piece('hedgerow_chainmail');
+const CHOICES = [CLOTH_INT.id, LEATHER_AGI.id, LEATHER_STR.id, MAIL_STR.id, MAIL_INT.id];
 
 const quest = (choiceRewards?: string[]): QuestDef =>
   ({ ...Object.values(QUESTS)[0], choiceRewards }) as QuestDef;
@@ -38,7 +30,11 @@ const quest = (choiceRewards?: string[]): QuestDef =>
 describe('choose-one quest rewards: the shared resolver', () => {
   it('offers each class only what it can wear', () => {
     expect(questRewardChoices(quest(CHOICES), 'mage')).toEqual([CLOTH_INT.id]);
-    expect(questRewardChoices(quest(CHOICES), 'rogue')).toEqual([CLOTH_INT.id, LEATHER_AGI.id]);
+    expect(questRewardChoices(quest(CHOICES), 'rogue')).toEqual([
+      CLOTH_INT.id,
+      LEATHER_AGI.id,
+      LEATHER_STR.id,
+    ]);
     expect(questRewardChoices(quest(CHOICES), 'warrior')).toEqual(CHOICES);
     expect(questRewardChoices(quest(), 'warrior')).toEqual([]);
   });
@@ -51,8 +47,12 @@ describe('choose-one quest rewards: the shared resolver', () => {
       ['paladin', 'retribution', MAIL_STR.id],
       ['paladin', null, MAIL_STR.id],
       ['shaman', 'elemental', MAIL_INT.id],
-      ['druid', 'feral', LEATHER_AGI.id],
+      // Enhancement and feral attack power is 2 per Strength (measured).
+      ['shaman', 'enhancement', MAIL_STR.id],
+      ['shaman', null, MAIL_STR.id],
+      ['druid', 'feral', LEATHER_STR.id],
       ['druid', 'balance', CLOTH_INT.id],
+      ['rogue', 'combat', LEATHER_AGI.id],
       ['hunter', null, LEATHER_AGI.id],
       ['priest', null, CLOTH_INT.id],
     ];

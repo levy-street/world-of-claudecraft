@@ -15,14 +15,45 @@
 //
 // The default pick (a turn-in that names no choice: the interact key, the RL
 // env, the dev completer, a client from before the picker) is the offered item
-// that best fits the player's spec, scored with the same per-spec stat weights
-// the dev kit uses (content/dev_kit_roles.ts). Before a spec is chosen, each
-// class reads its usual leveling spec.
+// that best fits the player's spec, by the stat weights below. Before a spec is
+// chosen, each class reads its usual leveling spec.
 
-import { DEV_KIT_ROLES, devKitRole } from '../content/dev_kit_roles';
 import { ITEMS } from '../data';
 import { canEquipItem } from '../equipment_rules';
-import type { ItemDef, PlayerClass, QuestDef } from '../types';
+import type { CoreStats, ItemDef, PlayerClass, QuestDef } from '../types';
+
+type StatWeights = Partial<Record<'str' | 'agi' | 'int' | 'spi', number>>;
+
+// What each spec's output actually scales with, read off the stat derivation
+// (entity.ts recalcPlayerStats: melee AP is 2 per Strength for warrior, paladin,
+// shaman and druid, Strength plus Agility for rogue and hunter; hunter ranged AP
+// is 2 per Agility; spell power is 0.5 per Intellect; Agility otherwise adds
+// 0.05% crit per point) and measured on the leveling bench (+30 of one stat at
+// levels 12 and 20, 2026-10-06): an enhancement shaman gained +19.7 DPS from
+// Strength and +6.2 from Agility, a feral cat +23.7 from Strength and nothing
+// from Agility, every caster spec only from Intellect. Healers weigh Spirit for
+// regen. The dev kit's role weights (content/dev_kit_roles.ts) are not used:
+// they read enhancement and feral as Agility specs.
+const STR_MELEE: StatWeights = { str: 1, agi: 0.15 };
+const STR_HYBRID: StatWeights = { str: 1, agi: 0.4, int: 0.4 };
+const AGI_MELEE: StatWeights = { agi: 1, str: 0.8 };
+const AGI_RANGED: StatWeights = { agi: 1, str: 0.1 };
+const CASTER: StatWeights = { int: 1, spi: 0.2 };
+const HEALER: StatWeights = { int: 1, spi: 0.5 };
+
+export const QUEST_REWARD_SPEC_WEIGHTS: Readonly<
+  Record<PlayerClass, Readonly<Record<string, StatWeights>>>
+> = {
+  warrior: { arms: STR_MELEE, fury: STR_MELEE, prot: STR_MELEE },
+  paladin: { holy: HEALER, protection: STR_MELEE, retribution: STR_HYBRID },
+  hunter: { beast_mastery: AGI_RANGED, marksmanship: AGI_RANGED, survival: AGI_RANGED },
+  rogue: { assassination: AGI_MELEE, combat: AGI_MELEE, subtlety: AGI_MELEE },
+  priest: { discipline: HEALER, holy: HEALER, shadow: CASTER },
+  shaman: { elemental: CASTER, enhancement: STR_HYBRID, restoration: HEALER },
+  mage: { arcane: CASTER, fire: CASTER, frost: CASTER },
+  warlock: { affliction: CASTER, demonology: CASTER, destruction: CASTER },
+  druid: { balance: CASTER, feral: STR_MELEE, restoration: HEALER },
+};
 
 // The spec a class levels as before it picks one (talents open at level 5).
 const LEVELING_SPEC: Readonly<Record<PlayerClass, string>> = {
@@ -40,6 +71,11 @@ const LEVELING_SPEC: Readonly<Record<PlayerClass, string>> = {
 // Armor breaks a stat tie in favor of the heavier piece the class can wear.
 const ARMOR_TIEBREAK = 0.001;
 
+export function specStatWeights(cls: PlayerClass, spec: string | null | undefined): StatWeights {
+  const table = QUEST_REWARD_SPEC_WEIGHTS[cls];
+  return (spec ? table[spec] : undefined) ?? table[LEVELING_SPEC[cls]];
+}
+
 export function questRewardChoices(quest: QuestDef, cls: PlayerClass): readonly string[] {
   const all = (quest.choiceRewards ?? []).filter((id) => ITEMS[id] !== undefined);
   const wearable = all.filter((id) => canEquipItem(cls, ITEMS[id]));
@@ -51,13 +87,9 @@ export function questHasRewardChoice(quest: QuestDef, cls: PlayerClass): boolean
 }
 
 function specFitScore(item: ItemDef, cls: PlayerClass, spec: string | null | undefined): number {
-  const role =
-    (spec ? devKitRole(cls, spec) : null) ??
-    devKitRole(cls, LEVELING_SPEC[cls]) ??
-    DEV_KIT_ROLES[cls][0];
   let score = 0;
-  for (const [stat, weight] of Object.entries(role.weights)) {
-    score += (weight ?? 0) * (item.stats?.[stat as keyof typeof role.weights] ?? 0);
+  for (const [stat, weight] of Object.entries(specStatWeights(cls, spec))) {
+    score += (weight ?? 0) * (item.stats?.[stat as keyof CoreStats] ?? 0);
   }
   return score + (item.stats?.armor ?? 0) * ARMOR_TIEBREAK;
 }
