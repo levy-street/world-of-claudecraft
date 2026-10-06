@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { PROVING_SHORE_QUESTS } from '../src/sim/content/proving_shore';
 import { QUEST_CHOICE_REWARDS } from '../src/sim/content/quest_choice_rewards';
 import { QUEST_LEVELING_GEAR_ITEMS } from '../src/sim/content/quest_leveling_gear';
 import { DUNGEONS, ITEMS, MOBS, QUESTS } from '../src/sim/data';
@@ -23,10 +24,13 @@ const raidMobs = new Set(
     .flatMap((d) => d.spawns.map((s) => s.mobId)),
 );
 
-// The generator's eligibility (scripts/quest_leveling_gear_gen.ts): retired and
-// repeatable quests, raid quests and quests above the level cap are left out.
+// The generator's eligibility (scripts/quest_leveling_gear_gen.ts): tutorial
+// island, retired and repeatable quests, raid quests and quests above the level
+// cap are left out.
 function levelingQuest(q: QuestDef): boolean {
   if (q.retired || q.repeatable) return false;
+  // The tutorial island keeps its own rewards (owner call, 2026-10-07).
+  if (PROVING_SHORE_QUESTS[q.id]) return false;
   const raid = q.objectives.some(
     (o) =>
       (o.type === 'kill' && raidMobs.has(o.targetMobId)) ||
@@ -52,6 +56,14 @@ function mainStat(stats: Partial<Record<string, number>>): 'str' | 'agi' | 'int'
 }
 
 describe('choose-one leveling gear', () => {
+  it('leaves every tutorial island quest without a choice', () => {
+    const offered = Object.keys(PROVING_SHORE_QUESTS).filter(
+      (id) => QUESTS[id]?.choiceRewards?.length,
+    );
+    expect(offered).toEqual([]);
+    expect(Object.keys(PROVING_SHORE_QUESTS).length).toBeGreaterThan(0);
+  });
+
   it('is offered by every quest a player levels through', () => {
     const missing = Object.values(QUESTS)
       .filter(levelingQuest)

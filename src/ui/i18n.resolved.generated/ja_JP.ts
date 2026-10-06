@@ -18454,90 +18454,6 @@ export const ja_JP: EnTranslations = {
       "vanguard_warstaff": {
         "name": "ヴァンガードの戦杖"
       },
-      "saltbitten_robe": {
-        "name": "塩かじりのローブ"
-      },
-      "saltbitten_leggings": {
-        "name": "塩かじりのレギンス"
-      },
-      "saltbitten_slippers": {
-        "name": "塩かじりのスリッパー"
-      },
-      "saltbitten_hood": {
-        "name": "塩かじりのフード"
-      },
-      "saltbitten_gloves": {
-        "name": "塩かじりの手甲"
-      },
-      "saltbitten_mantle": {
-        "name": "塩かじりのマント"
-      },
-      "saltbitten_sash": {
-        "name": "塩かじりのサッシュ"
-      },
-      "saltbitten_jerkin": {
-        "name": "塩かじりのジャーキン"
-      },
-      "saltbitten_breeches": {
-        "name": "塩かじりのブリーチーズ"
-      },
-      "saltbitten_boots": {
-        "name": "塩かじりのブーツ"
-      },
-      "saltbitten_cap": {
-        "name": "塩かじりのキャップ"
-      },
-      "saltbitten_grips": {
-        "name": "塩かじりのグリップ"
-      },
-      "saltbitten_shoulderpads": {
-        "name": "塩かじりのショルダーパッド"
-      },
-      "saltbitten_belt": {
-        "name": "塩かじりのベルト"
-      },
-      "saltbitten_hauberk": {
-        "name": "塩かじりのホーバーク"
-      },
-      "saltbitten_legguards": {
-        "name": "塩かじりのレグガード"
-      },
-      "saltbitten_sabatons": {
-        "name": "塩かじりのサバトン"
-      },
-      "saltbitten_helm": {
-        "name": "塩かじりのヘルム"
-      },
-      "saltbitten_gauntlets": {
-        "name": "塩かじりの籠手"
-      },
-      "saltbitten_pauldrons": {
-        "name": "塩かじりの肩甲"
-      },
-      "saltbitten_girdle": {
-        "name": "塩かじりのガードル"
-      },
-      "saltbitten_chainmail": {
-        "name": "塩かじりのチェーンメイル"
-      },
-      "saltbitten_chausses": {
-        "name": "塩かじりのチョース"
-      },
-      "saltbitten_greaves": {
-        "name": "塩かじりのグリーブ"
-      },
-      "saltbitten_coif": {
-        "name": "塩かじりのコイフ"
-      },
-      "saltbitten_handguards": {
-        "name": "塩かじりのハンドガード"
-      },
-      "saltbitten_spaulders": {
-        "name": "塩かじりのスポルダー"
-      },
-      "saltbitten_cord": {
-        "name": "塩かじりのコード"
-      },
       "brookwatch_robe": {
         "name": "小川監視のローブ"
       },
@@ -19113,27 +19029,6 @@ export const ja_JP: EnTranslations = {
       },
       "highgale_greaves": {
         "name": "高き疾風のグリーブ"
-      },
-      "saltbitten_tunic": {
-        "name": "塩かじりのチュニック"
-      },
-      "saltbitten_legwraps": {
-        "name": "塩かじりのレッグラップ"
-      },
-      "saltbitten_treads": {
-        "name": "塩かじりの短靴"
-      },
-      "saltbitten_headguard": {
-        "name": "塩かじりのヘッドガード"
-      },
-      "saltbitten_handwraps": {
-        "name": "塩かじりのハンドラップ"
-      },
-      "saltbitten_shoulderguards": {
-        "name": "塩かじりのショルダーガード"
-      },
-      "saltbitten_waistguard": {
-        "name": "塩かじりのウエストガード"
       },
       "brookwatch_tunic": {
         "name": "小川監視のチュニック"

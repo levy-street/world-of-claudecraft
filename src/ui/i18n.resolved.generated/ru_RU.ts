@@ -18454,90 +18454,6 @@ export const ru_RU: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Боевой посох Авангарда"
       },
-      "saltbitten_robe": {
-        "name": "Одеяние просоленного берега"
-      },
-      "saltbitten_leggings": {
-        "name": "Штаны просоленного берега"
-      },
-      "saltbitten_slippers": {
-        "name": "Туфли просоленного берега"
-      },
-      "saltbitten_hood": {
-        "name": "Капюшон просоленного берега"
-      },
-      "saltbitten_gloves": {
-        "name": "Перчатки просоленного берега"
-      },
-      "saltbitten_mantle": {
-        "name": "Оплечье просоленного берега"
-      },
-      "saltbitten_sash": {
-        "name": "Кушак просоленного берега"
-      },
-      "saltbitten_jerkin": {
-        "name": "Куртка просоленного берега"
-      },
-      "saltbitten_breeches": {
-        "name": "Бриджи просоленного берега"
-      },
-      "saltbitten_boots": {
-        "name": "Сапоги просоленного берега"
-      },
-      "saltbitten_cap": {
-        "name": "Шапка просоленного берега"
-      },
-      "saltbitten_grips": {
-        "name": "Хваты просоленного берега"
-      },
-      "saltbitten_shoulderpads": {
-        "name": "Плечевые накладки просоленного берега"
-      },
-      "saltbitten_belt": {
-        "name": "Ремень просоленного берега"
-      },
-      "saltbitten_hauberk": {
-        "name": "Хауберк просоленного берега"
-      },
-      "saltbitten_legguards": {
-        "name": "Набедренники просоленного берега"
-      },
-      "saltbitten_sabatons": {
-        "name": "Сабатоны просоленного берега"
-      },
-      "saltbitten_helm": {
-        "name": "Шлем просоленного берега"
-      },
-      "saltbitten_gauntlets": {
-        "name": "Рукавицы просоленного берега"
-      },
-      "saltbitten_pauldrons": {
-        "name": "Наплечья просоленного берега"
-      },
-      "saltbitten_girdle": {
-        "name": "Пояс просоленного берега"
-      },
-      "saltbitten_chainmail": {
-        "name": "Кольчуга просоленного берега"
-      },
-      "saltbitten_chausses": {
-        "name": "Шоссы просоленного берега"
-      },
-      "saltbitten_greaves": {
-        "name": "Наголенники просоленного берега"
-      },
-      "saltbitten_coif": {
-        "name": "Койф просоленного берега"
-      },
-      "saltbitten_handguards": {
-        "name": "Латные перчатки просоленного берега"
-      },
-      "saltbitten_spaulders": {
-        "name": "Наплечники просоленного берега"
-      },
-      "saltbitten_cord": {
-        "name": "Шнур просоленного берега"
-      },
       "brookwatch_robe": {
         "name": "Одеяние дозора у ручья"
       },
@@ -19113,27 +19029,6 @@ export const ru_RU: EnTranslations = {
       },
       "highgale_greaves": {
         "name": "Наголенники буревого гребня"
-      },
-      "saltbitten_tunic": {
-        "name": "Туника просоленного берега"
-      },
-      "saltbitten_legwraps": {
-        "name": "Обмотки просоленного берега"
-      },
-      "saltbitten_treads": {
-        "name": "Башмаки просоленного берега"
-      },
-      "saltbitten_headguard": {
-        "name": "Наголовник просоленного берега"
-      },
-      "saltbitten_handwraps": {
-        "name": "Наручные обмотки просоленного берега"
-      },
-      "saltbitten_shoulderguards": {
-        "name": "Наплечные щитки просоленного берега"
-      },
-      "saltbitten_waistguard": {
-        "name": "Опояска просоленного берега"
       },
       "brookwatch_tunic": {
         "name": "Туника дозора у ручья"

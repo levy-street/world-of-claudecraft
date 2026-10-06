@@ -18454,90 +18454,6 @@ export const en_XA: EnTranslations = {
       "vanguard_warstaff": {
         "name": "[Ʋáñĝúáŕð'š Ŵáŕšţáƒƒ]"
       },
-      "saltbitten_robe": {
-        "name": "[Šáļţƀíţţéñ Ŕóƀé]"
-      },
-      "saltbitten_leggings": {
-        "name": "[Šáļţƀíţţéñ Ļéĝĝíñĝš]"
-      },
-      "saltbitten_slippers": {
-        "name": "[Šáļţƀíţţéñ Šļíþþéŕš]"
-      },
-      "saltbitten_hood": {
-        "name": "[Šáļţƀíţţéñ Ĥóóð]"
-      },
-      "saltbitten_gloves": {
-        "name": "[Šáļţƀíţţéñ Ĝļóʋéš]"
-      },
-      "saltbitten_mantle": {
-        "name": "[Šáļţƀíţţéñ Ɱáñţļé]"
-      },
-      "saltbitten_sash": {
-        "name": "[Šáļţƀíţţéñ Šášĥ]"
-      },
-      "saltbitten_jerkin": {
-        "name": "[Šáļţƀíţţéñ Ĵéŕķíñ]"
-      },
-      "saltbitten_breeches": {
-        "name": "[Šáļţƀíţţéñ Ɓŕééçĥéš]"
-      },
-      "saltbitten_boots": {
-        "name": "[Šáļţƀíţţéñ Ɓóóţš]"
-      },
-      "saltbitten_cap": {
-        "name": "[Šáļţƀíţţéñ Çáþ]"
-      },
-      "saltbitten_grips": {
-        "name": "[Šáļţƀíţţéñ Ĝŕíþš]"
-      },
-      "saltbitten_shoulderpads": {
-        "name": "[Šáļţƀíţţéñ Šĥóúļðéŕþáðš]"
-      },
-      "saltbitten_belt": {
-        "name": "[Šáļţƀíţţéñ Ɓéļţ]"
-      },
-      "saltbitten_hauberk": {
-        "name": "[Šáļţƀíţţéñ Ĥáúƀéŕķ]"
-      },
-      "saltbitten_legguards": {
-        "name": "[Šáļţƀíţţéñ Ļéĝĝúáŕðš]"
-      },
-      "saltbitten_sabatons": {
-        "name": "[Šáļţƀíţţéñ Šáƀáţóñš]"
-      },
-      "saltbitten_helm": {
-        "name": "[Šáļţƀíţţéñ Ĥéļɱ]"
-      },
-      "saltbitten_gauntlets": {
-        "name": "[Šáļţƀíţţéñ Ĝáúñţļéţš]"
-      },
-      "saltbitten_pauldrons": {
-        "name": "[Šáļţƀíţţéñ Þáúļðŕóñš]"
-      },
-      "saltbitten_girdle": {
-        "name": "[Šáļţƀíţţéñ Ĝíŕðļé]"
-      },
-      "saltbitten_chainmail": {
-        "name": "[Šáļţƀíţţéñ Çĥáíñɱáíļ]"
-      },
-      "saltbitten_chausses": {
-        "name": "[Šáļţƀíţţéñ Çĥáúššéš]"
-      },
-      "saltbitten_greaves": {
-        "name": "[Šáļţƀíţţéñ Ĝŕéáʋéš]"
-      },
-      "saltbitten_coif": {
-        "name": "[Šáļţƀíţţéñ Çóíƒ]"
-      },
-      "saltbitten_handguards": {
-        "name": "[Šáļţƀíţţéñ Ĥáñðĝúáŕðš]"
-      },
-      "saltbitten_spaulders": {
-        "name": "[Šáļţƀíţţéñ Šþáúļðéŕš]"
-      },
-      "saltbitten_cord": {
-        "name": "[Šáļţƀíţţéñ Çóŕð]"
-      },
       "brookwatch_robe": {
         "name": "[Ɓŕóóķŵáţçĥ Ŕóƀé]"
       },
@@ -19113,27 +19029,6 @@ export const en_XA: EnTranslations = {
       },
       "highgale_greaves": {
         "name": "[Ĥíĝĥĝáļé Ĝŕéáʋéš]"
-      },
-      "saltbitten_tunic": {
-        "name": "[Šáļţƀíţţéñ Ţúñíç]"
-      },
-      "saltbitten_legwraps": {
-        "name": "[Šáļţƀíţţéñ Ļéĝŵŕáþš]"
-      },
-      "saltbitten_treads": {
-        "name": "[Šáļţƀíţţéñ Ţŕéáðš]"
-      },
-      "saltbitten_headguard": {
-        "name": "[Šáļţƀíţţéñ Ĥéáðĝúáŕð]"
-      },
-      "saltbitten_handwraps": {
-        "name": "[Šáļţƀíţţéñ Ĥáñðŵŕáþš]"
-      },
-      "saltbitten_shoulderguards": {
-        "name": "[Šáļţƀíţţéñ Šĥóúļðéŕĝúáŕðš]"
-      },
-      "saltbitten_waistguard": {
-        "name": "[Šáļţƀíţţéñ Ŵáíšţĝúáŕð]"
       },
       "brookwatch_tunic": {
         "name": "[Ɓŕóóķŵáţçĥ Ţúñíç]"
