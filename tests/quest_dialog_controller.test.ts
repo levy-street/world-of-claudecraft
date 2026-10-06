@@ -1,6 +1,18 @@
 // @vitest-environment happy-dom
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+// This suite tests dialog behavior and craft-name text, not WebGL portraits.
+// Keep renderer asset fetches from outliving happy-dom and rejecting in Node.
+vi.mock('../src/render/characters/portrait', () => ({
+  modularPortraitDataUrl: vi.fn(() => null),
+  onPortraitsReady: vi.fn(),
+  onPortraitUpdate: vi.fn(),
+  playerPortraitDataUrl: vi.fn(() => null),
+  portraitsReady: vi.fn(() => false),
+  visualPortraitDataUrl: vi.fn(() => null),
+}));
+
 import {
   INVESTIGATION_CLUES,
   INVESTIGATION_NPC_IDS,
