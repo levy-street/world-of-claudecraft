@@ -25,7 +25,7 @@
 
 import { bagPools, bagsFullError, consumeOneScratch, countStacked, fitsAll } from '../bags';
 import { WISP_MAZE_QUEST_ID } from '../content/world_quest_wisp_maze';
-import { ITEMS, QUESTS, questRewardItemId } from '../data';
+import { ITEMS, QUESTS } from '../data';
 import { formatMoney } from '../format_money';
 import { removePreferFungible } from '../items';
 import type { ArchetypeState } from '../professions/archetype';
@@ -56,7 +56,7 @@ import {
 } from './profession_quest_effects';
 import { playerHoldsQuestItem } from './quest_item_presence';
 import { grantQuestRecipeReward, validateQuestRecipeReward } from './quest_recipe_rewards';
-import { defaultRewardChoice, resolveRewardChoice } from './quest_reward_choice';
+import { defaultRewardChoice, questFixedReward, resolveRewardChoice } from './quest_reward_choice';
 
 // Pure quest-state computation, shared by the sim and the network client. Relocated
 // from sim.ts (W4) and re-exported from sim.ts so the ClientWorld import
@@ -400,7 +400,7 @@ export function turnInQuest(
   // handed in, so simulate the hand-in on a scratch copy before committing.
   // The fixed reward and the chosen one are checked together (fitsAll), so two
   // one-slot items against one free slot correctly refuse.
-  const rewardItems = [questRewardItemId(quest, meta.cls), choice.itemId].filter(
+  const rewardItems = [questFixedReward(quest, meta.cls), choice.itemId].filter(
     (id): id is string => id !== undefined,
   );
   if (rewardItems.length > 0) {
@@ -501,7 +501,7 @@ export function turnInQuestCore(
       pid: meta.entityId,
     });
   }
-  const rewardItem = questRewardItemId(quest, meta.cls);
+  const rewardItem = questFixedReward(quest, meta.cls);
   if (rewardItem) ctx.addItem(rewardItem, 1, meta.entityId);
   const chosen = rewardChoice ?? defaultRewardChoice(quest, meta.cls, meta.talents.spec);
   if (chosen) ctx.addItem(chosen, 1, meta.entityId);

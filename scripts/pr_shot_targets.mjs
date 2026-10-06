@@ -14359,17 +14359,26 @@ export const TARGETS = [
       'sim/content/quest_choice_rewards',
     ],
     // A warrior (the offline default) wears every armor weight, so the turn-in
-    // shows all four cards with the spec default checked. The quest is forced
-    // ready in the offline log and the player parked beside the marshal.
+    // shows every card with the spec default checked. The quest is forced ready
+    // in the offline log (its collect items in the bags) and the player parked
+    // beside the marshal. The old-wolf variant shoots The Old Wolf, whose
+    // authored Greyjaw's Pelt Leggings sit in the same list as the band set.
     variants: [
       { key: 'desktop', beforeLoad: lowGraphicsSeed },
       { key: 'compact', mobile: true, tier: 'compact', beforeLoad: lowGraphicsSeed },
+      {
+        key: 'old-wolf-desktop',
+        quest: { id: 'q_greyjaw', counts: [1], collect: 'greyjaw_fang' },
+        beforeLoad: lowGraphicsSeed,
+      },
     ],
     async capture(page, variant) {
+      const quest = variant.quest ?? { id: 'q_wolves', counts: [8] };
+      const questId = quest.id;
       await awaitWorldPainted(page);
       await dismissArrivalGreeting(page);
       if (variant.mobile) await enterTouchTier(page, variant.tier);
-      const setup = await page.evaluate(() => {
+      const setup = await page.evaluate((quest) => {
         const game = window.__game;
         const sim = game?.sim;
         if (!sim) return { ok: false, reason: 'no sim' };
@@ -14377,19 +14386,20 @@ export const TARGETS = [
           (e) => e.kind === 'npc' && e.templateId === 'marshal_redbrook',
         );
         if (!marshal) return { ok: false, reason: 'no marshal_redbrook entity' };
-        sim.questLog.set('q_wolves', { questId: 'q_wolves', counts: [8], state: 'ready' });
+        if (quest.collect) sim.addItem(quest.collect, 1);
+        sim.questLog.set(quest.id, { questId: quest.id, counts: quest.counts, state: 'ready' });
         const p = sim.player;
         p.pos = sim.groundPos(marshal.pos.x + 1.5, marshal.pos.z);
         p.prevPos = { ...p.pos };
         sim.rebucket?.(p);
         game.hud.openQuestDialog(marshal.id);
         return { ok: true };
-      });
+      }, quest);
       if (!setup.ok) throw new Error(`quest-reward-choice setup failed: ${setup.reason}`);
       if (!(await pollForSize(page, '#quest-dialog'))) throw new Error('quest dialog did not open');
-      await page.evaluate(() => {
-        document.querySelector('#quest-dialog [data-quest="q_wolves"]')?.click();
-      });
+      await page.evaluate((questId) => {
+        document.querySelector(`#quest-dialog [data-quest="${questId}"]`)?.click();
+      }, questId);
       await wait(600);
       await sweepOverlays(page, 4);
       // The dialog focuses the checked card, whose focus opens its tooltip; drop

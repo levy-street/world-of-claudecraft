@@ -13,13 +13,21 @@
 // whose whole list is out of the class's reach falls back to the full list, so
 // a choice quest never turns into a quest with no reward at all.
 //
+// A choice quest that also authors a per-class GEAR reward (QuestDef.itemRewards,
+// via questRewardItem) offers that piece as one more card in the same list, so
+// the player picks one reward rather than receiving the authored piece AND a
+// choice; a non-gear authored reward (a quest item a later quest needs) stays a
+// fixed grant beside the choice. questFixedReward is the one read of which.
+//
 // The default pick (a turn-in that names no choice: the interact key, the RL
 // env, the dev completer, a client from before the picker) is the offered item
-// that best fits the player's spec, by the stat weights below. Before a spec is
-// chosen, each class reads its usual leveling spec.
+// that best fits the player's spec, by the stat weights below plus weapon damage
+// for the weapon-using specs. Before a spec is chosen, each class reads its
+// usual leveling spec.
 
-import { ITEMS } from '../data';
+import { ITEMS, questRewardItem } from '../data';
 import { canEquipItem } from '../equipment_rules';
+import { WEAPON_DPS_WEIGHT } from '../item_level';
 import type { CoreStats, ItemDef, PlayerClass, QuestDef } from '../types';
 
 type StatWeights = Partial<Record<'str' | 'agi' | 'int' | 'spi', number>>;
@@ -76,8 +84,25 @@ export function specStatWeights(cls: PlayerClass, spec: string | null | undefine
   return (spec ? table[spec] : undefined) ?? table[LEVELING_SPEC[cls]];
 }
 
+function isGear(id: string | undefined): id is string {
+  return id !== undefined && ITEMS[id]?.slot !== undefined;
+}
+
+/** The authored reward granted beside the choice: the whole authored reward on a
+ *  quest without choices, only a non-gear one on a quest with them (gear joins
+ *  the choice list instead). */
+export function questFixedReward(quest: QuestDef, cls: PlayerClass): string | undefined {
+  const authored = questRewardItem(quest, cls);
+  if (!quest.choiceRewards?.length) return authored;
+  return isGear(authored) ? undefined : authored;
+}
+
 export function questRewardChoices(quest: QuestDef, cls: PlayerClass): readonly string[] {
-  const all = (quest.choiceRewards ?? []).filter((id) => ITEMS[id] !== undefined);
+  const generated = (quest.choiceRewards ?? []).filter((id) => ITEMS[id] !== undefined);
+  if (generated.length === 0) return [];
+  const authored = questRewardItem(quest, cls);
+  const all =
+    isGear(authored) && !generated.includes(authored) ? [authored, ...generated] : generated;
   const wearable = all.filter((id) => canEquipItem(cls, ITEMS[id]));
   return wearable.length > 0 ? wearable : all;
 }
@@ -87,22 +112,48 @@ export function questHasRewardChoice(quest: QuestDef, cls: PlayerClass): boolean
 }
 
 function specFitScore(item: ItemDef, cls: PlayerClass, spec: string | null | undefined): number {
+  const weights = specStatWeights(cls, spec);
   let score = 0;
-  for (const [stat, weight] of Object.entries(specStatWeights(cls, spec))) {
+  for (const [stat, weight] of Object.entries(weights)) {
     score += (weight ?? 0) * (item.stats?.[stat as keyof CoreStats] ?? 0);
+  }
+  // A weapon-using spec (its main stat is Strength or Agility) values a weapon's
+  // damage at the realized-power weight item_level.ts uses (itemScore).
+  const physical = (weights.str ?? 0) >= 1 || (weights.agi ?? 0) >= 1;
+  if (physical && item.weapon) {
+    score += WEAPON_DPS_WEIGHT * ((item.weapon.min + item.weapon.max) / 2 / item.weapon.speed);
   }
   return score + (item.stats?.armor ?? 0) * ARMOR_TIEBREAK;
 }
 
-/** The pick a turn-in that names no choice takes: the offered item that best fits the spec. */
+const PRIMARY_OFFENSE = ['str', 'agi', 'int', 'spi'] as const;
+
+/** Every primary stat the item carries (stamina aside) is one the spec uses. */
+export function isOnRoleForSpec(
+  item: ItemDef,
+  cls: PlayerClass,
+  spec: string | null | undefined,
+): boolean {
+  const weights = specStatWeights(cls, spec);
+  return PRIMARY_OFFENSE.every(
+    (stat) => (item.stats?.[stat] ?? 0) <= 0 || (weights[stat] ?? 0) > 0,
+  );
+}
+
+/** The pick a turn-in that names no choice takes: the offered item that best fits
+ *  the spec. Only on-role pieces are preselected (a feral cat is never handed the
+ *  caster staff its archetype authored, though the staff stays on offer); a list
+ *  with none falls back to the best of everything. */
 export function defaultRewardChoice(
   quest: QuestDef,
   cls: PlayerClass,
   spec?: string | null,
 ): string | undefined {
+  const offered = questRewardChoices(quest, cls);
+  const onRole = offered.filter((id) => isOnRoleForSpec(ITEMS[id], cls, spec));
   let best: string | undefined;
   let bestScore = Number.NEGATIVE_INFINITY;
-  for (const id of questRewardChoices(quest, cls)) {
+  for (const id of onRole.length > 0 ? onRole : offered) {
     const score = specFitScore(ITEMS[id], cls, spec);
     if (score > bestScore) {
       best = id;

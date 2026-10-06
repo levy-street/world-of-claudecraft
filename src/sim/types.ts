@@ -4642,10 +4642,12 @@ export interface QuestDef {
   xpReward: number;
   copperReward: number;
   itemRewards: Partial<Record<PlayerClass, string>>;
-  // Choose-one rewards (classic): the player picks ONE of these at turn-in, on
-  // top of any fixed itemRewards. Offered per class through the shared resolver
-  // (quests/quest_reward_choice.ts: only what the class can wear), validated by
-  // the server at turn-in. Typically one piece per armor type or role.
+  // Choose-one rewards (classic): the player picks ONE of these at turn-in. An
+  // authored GEAR itemRewards piece joins the same list rather than being granted
+  // on top; a non-gear one stays a fixed grant. Offered per class through the
+  // shared resolver (quests/quest_reward_choice.ts: only what the class can
+  // wear), validated by the server at turn-in. Typically one piece per armor
+  // type or role.
   choiceRewards?: string[];
   // Teaches through acquisition source 'quest' on a successful turn-in.
   // The recipe's own craft skill floor is checked before any rewards or
