@@ -312,6 +312,9 @@ describe('command facet tags (W10)', () => {
 // reuse of these. Append-only: never edit a tag.
 const BANK_TAGS: Readonly<Record<string, string>> = {
   bank_deposit: 'IWorldBank',
+  account_bank_list: 'IWorldBank',
+  account_bank_select: 'IWorldBank',
+  account_bank_transfer: 'IWorldBank',
   bank_withdraw: 'IWorldBank',
   bank_buy_slots: 'IWorldBank',
   // The Materials Vault: the per-material material store beside the slot bank.

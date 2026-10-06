@@ -554,6 +554,7 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'last_keep_signet',
     'linen_pouch',
     'loombound_reagent_satchel',
+    'membership_token',
     'mistcallers_duffel',
     'moonpale_scale',
     'necromancers_reagent_satchel',

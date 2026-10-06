@@ -3827,6 +3827,10 @@
     border-color: #8d7138;
     box-shadow: 0 24px 80px rgb(0 0 0 / 72%);
   }
+  .membership-token-card .ui-btn {
+    min-height: 40px;
+  }
+
   .woc-store-tabs {
     display: flex;
     gap: 2px;
@@ -10344,6 +10348,24 @@
     gap: 4px;
     margin: 6px 0 2px;
     flex: none;
+  }
+  .account-bank-panel .bank-tabs {
+    overflow-x: auto;
+    max-width: 100%;
+  }
+  .account-bank-panel > .ui-btn {
+    min-height: 40px;
+  }
+  .account-bank-tab {
+    flex: none;
+    min-height: 40px;
+  }
+  .account-bank-panel h3 {
+    font-size: 13px;
+    margin: var(--spacing-sm) 0;
+  }
+  .account-bank-panel .bank-item:disabled {
+    opacity: 0.5;
   }
   .bank-tab {
     flex: 1;

@@ -13,6 +13,60 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  // Membership additions: same-change non-Latin coverage (M16).
+  'hudChrome.wocStore.subscription.benefitsTitle': '有效會員權益',
+  'hudChrome.wocStore.subscription.benefitBank': '在任意銀行員處存取您其他角色的銀行。',
+  'hudChrome.wocStore.subscription.benefitSlots': '額外解鎖10個角色欄位。',
+  'hudChrome.wocStore.subscription.benefitArmour':
+    '領取屬性適配您職業與專精的靈魂綁定護甲。護甲隨角色等級成長，在20級時達到物品等級25。裝備全套可多獲得20%經驗。',
+  'hudChrome.wocStore.subscription.benefitTax': '拍賣場稅費減半。',
+  'hudChrome.wocStore.subscription.benefitExpiry':
+    '會員到期後，額外欄位中的角色和護甲加成會鎖定，續訂後恢復。基礎欄位中的角色仍可正常遊玩。',
+  'character.membershipRequired': '續訂會員後即可使用此角色。',
+  'character.membershipSlots': '開通會員以解鎖角色欄位',
+  'character.emptySlot': '可用角色欄位',
+  'hudChrome.bank.accountTab': '其他角色',
+  'hudChrome.bank.accountArmour': '領取會員護甲',
+  'hudChrome.bank.accountMembership': '會員有效期間，可在此存取您其他角色的銀行。',
+  'hudChrome.bank.accountCharacters': '角色銀行',
+  'hudChrome.bank.accountEmpty': '建立另一個角色後，即可在此使用該角色的銀行。',
+  'hudChrome.bank.accountSelect': '選擇一個角色以載入其銀行。',
+  'hudChrome.bank.accountUnavailable': '此銀行暫不可用。請重新選擇該角色以重新整理。',
+  'hudChrome.bank.accountDeposit': '您的背包：存入此銀行',
+  'hudChrome.bank.accountWithdraw': '所選銀行：取出到您的背包',
+  'hudChrome.bank.accountDepositHint': '點擊將此堆物品存入所選角色的銀行。',
+  'hudChrome.bank.accountWithdrawHint': '點擊將此堆物品取出到您的背包。',
+  'hudChrome.bank.accountBound': '靈魂綁定、已鎖定及任務物品無法在角色間轉移。',
+  'hudChrome.wocStore.subscription.tokenTitle': '可交易會員代幣',
+  'hudChrome.wocStore.subscription.tokenTerms':
+    '一次支付{price}，獲得30天會員代幣。代幣將郵寄給此角色，可兌換為會員時長，也可在拍賣場出售。',
+  'hudChrome.wocStore.subscription.tokenBuy': '購買會員代幣',
+  'hudChrome.wocStore.subscription.tokenClaim': '領取已購買的代幣',
+  'hudChrome.wocStore.subscription.tokenPending':
+    '付款後請返回此角色領取代幣。若付款仍在處理中，請稍後重試。',
+  'hudChrome.wocStore.subscription.tokenDelivered': '您的代幣已透過郵件送達。',
+  'itemUi.tooltip.membershipToken':
+    '使用：消耗此代幣，為您的帳號增加{days}天會員時長。現有剩餘時長會保留。兌換前可交易此代幣或在拍賣場出售。',
+  'itemUi.tooltip.membershipAdaptive': '屬性和護甲會隨您的職業與專精調整。',
+  'itemUi.tooltip.membershipScaling':
+    '物品等級與您的角色等級一致。達到20級時，此護甲會完善為物品等級25。',
+  'itemUi.tooltip.membershipPerfected': '已完善：物品等級{level}。',
+  'itemUi.tooltip.membershipFullSet':
+    '裝備全部{pieces}件會員護甲，經驗獲取量提高{percent}%。需要有效會員資格。',
+  'itemUi.tooltip.membershipRequired': '會員到期後，護甲屬性和套裝加成會停用，續訂後恢復。',
+  'itemUi.tooltip.membershipDormant': '未啟用：續訂會員以恢復護甲屬性和套裝加成。',
+  'entities.items.membership_token.name': '會員代幣（30天）',
+  'entities.items.membership_helmet.name': '會員頭盔',
+  'entities.items.membership_shoulder.name': '會員肩甲',
+  'entities.items.membership_chest.name': '會員胸甲',
+  'entities.items.membership_waist.name': '會員腰帶',
+  'entities.items.membership_legs.name': '會員腿甲',
+  'entities.items.membership_gloves.name': '會員護手',
+  'entities.items.membership_feet.name': '會員戰靴',
+  'entities.letters.membership_token_delivery.sender': '渡鴉郵驛',
+  'entities.letters.membership_token_delivery.subject': '您的會員代幣',
+  'entities.letters.membership_token_delivery.body':
+    '您購買的代幣已隨信附上。兌換可為帳號增加30天會員時長，也可與其他冒險者交易。',
   'hudChrome.wocStore.subscription.title': '遊戲訂閱',
   'hudChrome.wocStore.subscription.price': '每月 {price}',
   'hudChrome.wocStore.subscription.terms':
@@ -18679,4 +18733,27 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_balance.bonus2': '纏縛根鬚的施法時間縮短0.5秒。',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '施放纏縛根鬚後，你可以在移動中施法，並使移動速度提高20%，持續4秒。每20秒最多觸發一次。',
+  'hudChrome.wocStore.subscription.monthlyTitle': '月度會員',
+  'hudChrome.wocStore.subscription.annualTitle': '12個月會員禮包',
+  'hudChrome.wocStore.subscription.annualPrice': '12個月共{price}，一次付清',
+  'hudChrome.wocStore.subscription.annualTerms':
+    '每年以相同價格續訂。透過Stripe使用法定貨幣付款。可在帳單設定中取消。',
+  'hudChrome.wocStore.subscription.paidReward':
+    '每次付費可獲得{amount} Claudium，價值{value}。免費試用期間不發放Claudium。',
+  'hudChrome.wocStore.subscription.annualMount':
+    '付款後，請使用購買禮包的角色從郵件中領取靈魂綁定的坦克坐騎鑰匙。坦克暫時代替禮包坐騎。',
+  'hudChrome.wocStore.subscription.trialTerms':
+    '每個帳號可免費試用一次，共{days}天。需要提供付款方式。除非取消，否則試用結束時將收取{price}。試用期間不發放Claudium或禮包坐騎。',
+  'hudChrome.wocStore.subscription.startTrial': '開始7天免費試用',
+  'hudChrome.wocStore.subscription.annualClaim': '領取禮包坐騎',
+  'hudChrome.wocStore.subscription.annualPending':
+    '付款後，請返回購買禮包的角色領取坐騎。如果付款正在處理或仍在試用期，請在付費成功後重試。',
+  'hudChrome.wocStore.subscription.annualDelivered': '禮包坐騎鑰匙已透過郵件送達。',
+  'hudChrome.wocStore.subscription.resumeCheckout': '繼續結帳',
+  'entities.letters.membership_annual_reward.sender': '鴉羽郵局',
+  'entities.letters.membership_annual_reward.subject': '您的年度會員坐騎',
+  'entities.letters.membership_annual_reward.body':
+    '您的年度會員付款已完成。坦克坐騎鑰匙隨信附上。請將鑰匙保留在背包或銀行中以擁有此坐騎。會員到期後它仍歸您所有。需要騎術技能。',
+  'hudChrome.wocStore.subscription.checkoutClosed':
+    '此結帳流程已結束，且沒有待領取獎勵。請重新選擇會員方案，開始新的結帳流程。',
 };

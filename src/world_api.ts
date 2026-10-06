@@ -309,7 +309,13 @@ export type {
   ActionBarSlotAction,
   StoredActionBarLayout,
 } from './world_api/action_bar';
-export type { BankBonusSource, BankInfo, VaultInfo, VaultSpecialRef } from './world_api/bank';
+export type {
+  AccountBankInfo,
+  BankBonusSource,
+  BankInfo,
+  VaultInfo,
+  VaultSpecialRef,
+} from './world_api/bank';
 export type {
   BgFlagInfo,
   BgInfo,
@@ -937,6 +943,10 @@ export const COMMAND_NAMES = [
   // Guild custom ranks (docs/prd/guild-custom-ranks.md): the Guild Master
   // replaces the guild's rank ladder (titles, order, permissions).
   'guild_set_ranks',
+  'account_bank_list',
+  'account_bank_select',
+  'account_bank_transfer',
+  'membership_claim_armour',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -1242,6 +1252,10 @@ export const COMMAND_FACETS = {
   // IWorldBank: the per-character deposit box (snake_case wire strings, by design).
   // bankInfo is a proximity-gated snapshot read (no send, untagged).
   bank_deposit: 'IWorldBank',
+  account_bank_list: 'IWorldBank',
+  account_bank_select: 'IWorldBank',
+  account_bank_transfer: 'IWorldBank',
+  membership_claim_armour: 'IWorldInventory',
   bank_withdraw: 'IWorldBank',
   bank_buy_slots: 'IWorldBank',
   // The Materials Vault rides the SAME facet as the personal bank (same bursars,

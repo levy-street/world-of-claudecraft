@@ -45,6 +45,8 @@ import { restoreCharacterStorage, savedCharacterStorage } from './character_stor
 import type { TreasureMapProgress } from './content/treasure_maps';
 import type { FactionId } from './factions';
 import type { ItemCopyAnchor } from './item_copy_anchor';
+import * as membershipMod from './membership';
+import { setPlayerLevel as setPlayerLevelImpl } from './progression/level';
 import * as treasureVaultMod from './treasure_vault';
 import type { CannonActionId, CannonPoint, VehicleSession } from './types';
 import * as vehicleMod from './vehicles';
@@ -1303,6 +1305,8 @@ export type JoinableChannel = (typeof JOINABLE_CHANNELS)[number];
 // Per-player progression and bags. The entity holds combat state; this holds
 // everything that belongs to the character sheet.
 export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState {
+  /** Host-only membership deadline in sim seconds. Never restored from a save. */
+  membershipExpiresAt?: number;
   entityId: number;
   // Stable database character id when running on the server. Offline/sim-only
   // callers fall back to entityId for systems that need a rename-proof owner key.
@@ -5779,34 +5783,34 @@ export class Sim {
     r.e.cheaterMark = undefined;
   }
 
+  // Host account entitlement; the character blob has no authority over this value.
+  setMembership(pid: number, remainingSeconds: number): void {
+    membershipMod.setMembership(this.ctx, pid, remainingSeconds);
+  }
+
+  membershipActiveFor(pid: number): boolean {
+    const meta = this.players.get(pid);
+    return !!meta && membershipMod.membershipActive(meta, this.time);
+  }
+
+  readonly accountBankInfo: import('../world_api/bank').AccountBankInfo | null = null;
+  requestAccountBanks(): void {}
+  selectAccountBank(_characterId: number): void {}
+  accountBankTransfer(
+    _characterId: number,
+    _direction: 'deposit' | 'withdraw',
+    _slotIndex: number,
+    _count?: number,
+    _expectedSlot?: InvSlot,
+  ): void {}
+
+  claimMembershipArmour(pid?: number): void {
+    membershipMod.claimMembershipArmour(this.ctx, pid);
+  }
+
   // Dev/test convenience: jump a player to a level (learns abilities, recalcs stats).
   setPlayerLevel(level: number, pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    r.e.level = Math.max(1, Math.min(MAX_LEVEL, level));
-    // Keep lifetimeXp consistent with the level so post-cap progression starts
-    // from a sane baseline (virtualLevel never falls below the real level). Only
-    // ever raises it — lifetimeXp is monotonic.
-    r.meta.lifetimeXp = Math.max(r.meta.lifetimeXp, xpToReachLevel(r.e.level));
-    // Re-bake the flat talent mods at the new level before the stat + ability pass:
-    // spec mastery magnitudes scale with level (min(1, level/20)), so a dev/GM level
-    // jump must strengthen (or weaken) the mastery, exactly like the live ding path
-    // (combat/damage.ts grantXp). Without this a level-jumped character keeps the
-    // mastery baked at the OLD level.
-    const m = r.meta;
-    m.talentMods = computeCharacterModifiers(m.cls, m.talents, r.e.level, m.equipment);
-    recalcPlayerStats(
-      r.e,
-      r.meta.cls,
-      r.meta.equipment,
-      this.playerMods(r.meta),
-      r.meta.equipmentInstance,
-    );
-    r.e.hp = r.e.maxHp;
-    if (r.e.resourceType === 'mana') r.e.resource = r.e.maxResource;
-    this.refreshKnownAbilities(r.meta, false);
-    this.syncPetLevel(r.e);
-    deedsMod.markDeedsDirty(this.ctx, r.meta.entityId); // level/lifetimeXp predicates re-check
+    setPlayerLevelImpl(this.ctx, level, pid);
   }
 
   // -------------------------------------------------------------------------
@@ -5968,6 +5972,7 @@ export class Sim {
     for (const meta of this.players.values()) {
       const p = this.entities.get(meta.entityId);
       if (!p) continue;
+      membershipMod.updateMembership(this.ctx, meta, p);
       if (p.dead) worldQuestMod.updateWorldQuests(this.ctx, meta, p);
       vehicleMod.tickVehicle(this.ctx, meta, p);
       if (!p.dead) {

@@ -354,6 +354,11 @@ export const IWORLD_MEMBERS = [
   { name: 'mailMarkRead', kind: 'method' },
   // --- personal bank: proximity-gated contents read + deposit/withdraw/buy commands ---
   { name: 'bankInfo', kind: 'data' },
+  { name: 'accountBankInfo', kind: 'data' },
+  { name: 'requestAccountBanks', kind: 'method' },
+  { name: 'selectAccountBank', kind: 'method' },
+  { name: 'accountBankTransfer', kind: 'method' },
+  { name: 'claimMembershipArmour', kind: 'method' },
   { name: 'bankDeposit', kind: 'method' },
   { name: 'bankWithdraw', kind: 'method' },
   { name: 'bankBuySlots', kind: 'method' },
@@ -937,9 +942,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // merge: 420/124/296.
     // Plus the release's transport facet (the Eastbrook ferry's ferryView
     // method) at the fourth release/v0.44.0 base merge: 421/124/297.
-    expect(IWORLD_MEMBERS.length).toBe(424);
-    expect(DATA_MEMBERS.length).toBe(126);
-    expect(METHOD_MEMBERS.length).toBe(298);
+    expect(IWORLD_MEMBERS.length).toBe(429);
+    expect(DATA_MEMBERS.length).toBe(127);
+    expect(METHOD_MEMBERS.length).toBe(302);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -957,6 +962,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'acceptLinkedQuest',
       'acceptQuest',
       'accountAdmin',
+      'accountBankInfo',
+      'accountBankTransfer',
       'accountCosmetics',
       'accountDeeds',
       'accountFlair',
@@ -1029,6 +1036,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'chooseWeeklyQuest',
       'civicServicePlacements',
       'claimEventSkin',
+      'claimMembershipArmour',
       'claimWeeklyReward',
       'clearGatheringGoal',
       'clearMarker',
@@ -1261,6 +1269,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'renamePet',
       'renown',
       'reportTelemetry',
+      'requestAccountBanks',
       'rerollWorldQuest',
       'resetWorldQuestMatch3',
       'resetWorldQuestPuzzle',
@@ -1281,6 +1290,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'saveActionBarLayout',
       'saveLoadout',
       'searchCharacters',
+      'selectAccountBank',
       'selectTalentRow',
       'sellAllJunk',
       'sellItem',
@@ -1380,6 +1390,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
   it('the sorted data-kind set is exactly the pinned contract', () => {
     expect(DATA_MEMBERS.map((m) => m.name).sort()).toEqual([
       'accountAdmin',
+      'accountBankInfo',
       'accountCosmetics',
       'accountDeeds',
       'actionBarReadOnly',
@@ -1516,6 +1527,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'acceptCommissionOrder',
       'acceptLinkedQuest',
       'acceptQuest',
+      'accountBankTransfer',
       'accountFlair',
       'accuseWorldQuestSuspect',
       'activeLootRolls',
@@ -1558,6 +1570,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'chat',
       'chooseWeeklyQuest',
       'claimEventSkin',
+      'claimMembershipArmour',
       'claimWeeklyReward',
       'clearGatheringGoal',
       'clearMarker',
@@ -1725,6 +1738,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'reliquaryRarity',
       'renamePet',
       'reportTelemetry',
+      'requestAccountBanks',
       'rerollWorldQuest',
       'resetWorldQuestMatch3',
       'resetWorldQuestPuzzle',
@@ -1742,6 +1756,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'saveActionBarLayout',
       'saveLoadout',
       'searchCharacters',
+      'selectAccountBank',
       'selectTalentRow',
       'sellAllJunk',
       'sellItem',
@@ -1975,6 +1990,7 @@ const FACET_LOOT = [
 type _ExhaustLoot = AssertNever<Exclude<keyof IWorldLoot, (typeof FACET_LOOT)[number]>>;
 
 const FACET_INVENTORY = [
+  'claimMembershipArmour',
   'inventory',
   'bags',
   'bagCapacity',
@@ -2250,6 +2266,10 @@ const FACET_MAIL = [
 type _ExhaustMail = AssertNever<Exclude<keyof IWorldMail, (typeof FACET_MAIL)[number]>>;
 
 const FACET_BANK = [
+  'accountBankInfo',
+  'requestAccountBanks',
+  'selectAccountBank',
+  'accountBankTransfer',
   'weeklyRewardInfo',
   'claimWeeklyReward',
   'openWeeklyReward',
@@ -2621,8 +2641,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
     // Mirrors the IWORLD_MEMBERS.length pin above (411); this pin and the one above
     // must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(424);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(424);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(429);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(429);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

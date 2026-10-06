@@ -11,6 +11,7 @@ import type { VendorBuyOptions } from '../sim/vendor_buy_stack';
 export type RiftForgeOutcome = RiftForgeResult | Promise<boolean>;
 
 export interface IWorldInventory {
+  claimMembershipArmour(): void;
   inventory: InvSlot[];
   // The 4 equippable bag sockets (kind:'bag' item ids, null = empty socket).
   bags: (string | null)[];

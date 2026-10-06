@@ -46,6 +46,7 @@ import { ENCHANTS } from '../src/sim/content/enchants';
 import { FARM_CROPS } from '../src/sim/content/farm_crops';
 import { FARM_BED_IDS } from '../src/sim/content/farm_patches';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
+import { MEMBERSHIP_ITEMS } from '../src/sim/content/membership';
 import {
   CRAFT_RING,
   GATHERING_PROFESSION_IDS,
@@ -2151,6 +2152,25 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // pure content-table arithmetic with no shape question in them: `deeds`
     // (10,369), `questsDone` (4,620) and `raidLockouts` (541).
     const bytes = Buffer.byteLength(JSON.stringify(s2), 'utf8');
+    // Membership adds eight discoverable item ids and no character entitlement
+    // fields. Isolate the measured content-only growth from the settled save:
+    // 233,360 -> 233,515 bytes, all 155 bytes in itemsDiscovered. Removing only
+    // those ids must reproduce the preceding measurement exactly.
+    const membershipIds = new Set(Object.keys(MEMBERSHIP_ITEMS));
+    const withoutMembership: CharacterState = {
+      ...s2,
+      deedStats: {
+        ...s2.deedStats,
+        itemsDiscovered: (s2.deedStats?.itemsDiscovered ?? []).filter(
+          (id) => !membershipIds.has(id),
+        ),
+      },
+    };
+    expect(membershipIds.size).toBe(8);
+    const beforeMembershipBytes = Buffer.byteLength(JSON.stringify(withoutMembership), 'utf8');
+    expect(beforeMembershipBytes).toBe(233360);
+    expect(bytes - beforeMembershipBytes).toBe(155);
+    expect(fieldBytes(s2, 'deedStats') - fieldBytes(withoutMembership, 'deedStats')).toBe(155);
     const reMint =
       'the whole-character band is a RE-MEASURE obligation, not a budget: ' +
       'record the measured value in the ledger above with what moved it, then re-base ' +
@@ -2442,7 +2462,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // itemsDiscovered (+2,889), the hoardGoblinKills counter (+26), and the 32
         // hoard gear reliquary.firstFind rows plus the conquerors_buried_hoards page
         // (+1,761), Blaine's itemization; MEASURED on the 2026-09-28 merged tree.
-        4711,
+        4711 +
+        // Membership's eight discoverable item ids, isolated from s2 above.
+        155,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2488,7 +2510,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       deeds: 743,
       // deedStats +4,648 and reliquary +8,848 at the second release/v0.44.0 base
       // merge: Warfare Season 2's 139 item ids (the 13,496 attributed above).
-      deedStats: 9427,
+      // Membership item discovery adds exactly 155 bytes, measured above.
+      deedStats: 9582,
       reliquary: 11501,
     });
     // Removing field_kit AND the Bramblehide release content reproduces the
@@ -2526,7 +2549,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // ferry deed and its visit marks, which this counterfactual keeps).
       // 226,238 -> 231,729 at the 2026-09-28 Buried Hoards merge (+5,491: the
       // +247 knownRecipes, +533 and +4,711 attributed above, all kept here).
-    ).toBe(231729);
+      // Membership's eight discovered item ids remain here: +155 bytes.
+    ).toBe(231884);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2554,7 +2578,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 214,207 -> 227,703 at the second release/v0.44.0 base merge (+13,496).
       // 227,703 -> 227,857 at the fourth release/v0.44.0 base merge (+154).
       // 227,857 -> 233,348 at the 2026-09-28 Buried Hoards merge (+5,491, kept).
-    ).toBe(233348);
+      // Membership's eight discovered item ids remain here: +155 bytes.
+    ).toBe(233503);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2645,8 +2670,12 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // attributed in the growth equation above; no container or ceiling changed
     // shape. Floor at measurement minus 380, edge at measurement plus one:
     // 232980..233361.
-    expect(bytes, reMint).toBeGreaterThan(232980);
-    expect(bytes, reMint).toBeLessThan(233361);
+    // RE-BASED for memberships: measured 233,515 bytes, exactly +155 from
+    // eight ids in deedStats.itemsDiscovered, isolated above. No container,
+    // persisted entitlement field, or ceiling changed. The same 381-byte band
+    // moves to measurement minus 380 and measurement plus one.
+    expect(bytes, reMint).toBeGreaterThan(233135);
+    expect(bytes, reMint).toBeLessThan(233516);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

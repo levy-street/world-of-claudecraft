@@ -258,13 +258,22 @@ describe('main.ts resume wiring', () => {
     );
   });
 
-  it('the roster consume gate requires the marker realm to match the api realm', () => {
+  it('consumes resume only for the matching realm and an unlocked character', () => {
+    // Keep the realm lookup and shared entry policy in the same block: a
+    // colliding id in another realm or a membership-locked character must
+    // clear the marker without entering. The shared policy's locked/takeover
+    // behavior is exercised by membership_character_ui.test.ts.
     expect(mainTs).toContain(
-      'resume.realm === api.realm ? chars.find((c) => c.id === resume.characterId) : undefined',
-    );
-    // a missing character or realm mismatch clears the persisted marker
-    expect(mainTs).toContain(
-      'if (target) {\n        void enterWorld(target);\n        return;\n      }\n      clearPlayMarker();',
+      [
+        'pendingResume = null;',
+        '      const target =',
+        '        resume.realm === api.realm ? chars.find((c) => c.id === resume.characterId) : undefined;',
+        "      if (target && charselectPrimaryAction(target).kind !== 'disabled') {",
+        '        void enterWorld(target);',
+        '        return;',
+        '      }',
+        '      clearPlayMarker();',
+      ].join('\n'),
     );
   });
 

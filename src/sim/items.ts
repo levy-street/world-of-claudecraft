@@ -1,3 +1,4 @@
+import { MEMBERSHIP_TOKEN_ID } from './content/membership';
 import { gliderActionsLocked } from './glider_action_lock';
 import { shadowActionsLocked } from './shadow_action_lock';
 import { useCartographersInk, useTreasureMap } from './treasure_vault';
@@ -845,6 +846,8 @@ export function useItem(
   if (!r) return;
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
+  // Redemption is a durable account operation owned by the online host.
+  if (itemId === MEMBERSHIP_TOKEN_ID) return;
   if (
     meta.vehicle ||
     wispMazeActionsLocked(meta.worldQuestLog) ||

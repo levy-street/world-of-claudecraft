@@ -468,9 +468,14 @@ import {
 import { BreathBar } from './ui/breath_bar';
 import { assembleBugReportMeta } from './ui/bug_report';
 import { cameraPromptOpen, dismissCameraPrompt } from './ui/camera_prompt';
-import { deleteCharButtonHtml, normalizeDeleteConfirmation } from './ui/char_delete_button';
+import { normalizeDeleteConfirmation } from './ui/char_delete_button';
+import {
+  canCreateMembershipCharacter,
+  characterRowHtml,
+  membershipSlotsHtml,
+} from './ui/character_membership_view';
 import { resetComposedRows, trackComposedChipRow } from './ui/charselect_composed_refresh';
-import { charselectHintsHtml, wireCharselectRow } from './ui/charselect_hints';
+import { wireCharselectRow } from './ui/charselect_hints';
 import { loadCharselectNews } from './ui/charselect_news';
 import { CharselectRedesignEditor } from './ui/charselect_redesign';
 import { ChatCommandMenu } from './ui/chat_command_menu';
@@ -6454,7 +6459,7 @@ async function refreshCharacters(): Promise<void> {
       pendingResume = null;
       const target =
         resume.realm === api.realm ? chars.find((c) => c.id === resume.characterId) : undefined;
-      if (target) {
+      if (target && charselectPrimaryAction(target).kind !== 'disabled') {
         void enterWorld(target);
         return;
       }
@@ -6474,13 +6479,6 @@ async function refreshCharacters(): Promise<void> {
       row.setAttribute('aria-selected', 'false');
       row.dataset.class = c.class;
       row.dataset.skin = String(c.skin ?? 0);
-      const className = classDisplayName(c.class);
-      const statusText = c.online ? '' : c.forceRename ? ` (${t('character.renameRequired')})` : '';
-      // One-shot redesign token (server-decided: pre-creator character, token
-      // unspent). Rendered on every action arm; gone for good once spent.
-      const rerollBtn = c.appearanceRerollAvailable
-        ? `<button type="button" class="btn reroll-char-btn" title="${esc(t('character.redesignHint'))}" aria-label="${esc(t('character.redesignTitle', { name: c.name }))}">${esc(t('character.redesign'))}</button>`
-        : '';
       // The chip draws the character's REAL body: their authored modular look
       // (or the mech cosmetic), matching the 3D stage and the world.
       const chipHtml = () =>
@@ -6496,19 +6494,8 @@ async function refreshCharacters(): Promise<void> {
       // repaints its own chip once the assets land and again once the composed
       // capture behind it lands (the crest shows until then).
       if (charselectLook(c)) trackComposedChipRow(row, chipHtml, () => hydratePortraits(row));
-      row.innerHTML = `${chipHtml()}
-        <div class="char-id">
-          <span class="char-name">${esc(c.name)}</span>
-          <span class="char-sub">${esc(t('character.levelClass', { level: c.level, className }))}${esc(statusText)}</span>
-          ${charselectHintsHtml(c, Date.now())}
-        </div>
-        ${
-          c.forceRename
-            ? `<input class="rename-input" placeholder="${esc(t('character.newNamePlaceholder'))}" maxlength="16" /><span class="char-actions"><button class="btn rename-btn">${esc(t('character.rename'))}</button>${rerollBtn}${deleteCharButtonHtml(c.online)}</span>`
-            : c.online
-              ? `<span class="char-actions"><button class="btn take-over-btn" title="${esc(t('character.takeOverConfirm'))}" aria-label="${esc(t('character.takeOverConfirm'))}">${esc(t('character.takeOver'))}</button>${rerollBtn}${deleteCharButtonHtml(true)}</span>`
-              : `<span class="char-actions"><button class="btn enter-world-btn">${esc(t('auth.enterWorld'))}</button>${rerollBtn}${deleteCharButtonHtml(false)}</span>`
-        }`;
+      row.innerHTML = characterRowHtml(c, chipHtml(), Date.now());
+      row.classList.toggle('membership-locked', c.membershipLocked === true);
 
       row.querySelector('.delete-char-btn')?.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -6603,6 +6590,15 @@ async function refreshCharacters(): Promise<void> {
       listEl.appendChild(row);
     }
 
+    listEl.insertAdjacentHTML(
+      'beforeend',
+      membershipSlotsHtml(chars, api.characterMembership.active),
+    );
+    ($('#btn-new-character') as HTMLButtonElement).disabled = !canCreateMembershipCharacter(
+      chars,
+      api.characterMembership.active,
+      api.characterLimit,
+    );
     hydratePortraits(listEl);
 
     // Select first character by default if present, else show a default showcase.
@@ -6657,6 +6653,7 @@ function fatalOverlay(
 // passed so enterWorld owns its loading/disabled state and restores it if entry
 // is aborted before it begins.
 async function takeOverAndEnter(c: CharacterSummary, btn: HTMLButtonElement): Promise<void> {
+  if (charselectPrimaryAction(c).kind !== 'takeover') return;
   if (!window.confirm(t('character.takeOverConfirm'))) return;
   $('#charselect-error').textContent = '';
   btn.disabled = true;
@@ -6705,6 +6702,7 @@ function syncCharselectEnterButton(): void {
 }
 
 async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Promise<void> {
+  if (charselectPrimaryAction(c).kind === 'disabled') return;
   stopShaderWarmup();
   try {
     if (button) {

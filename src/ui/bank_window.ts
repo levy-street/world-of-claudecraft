@@ -22,6 +22,7 @@ import { ITEMS } from '../sim/data';
 import { guildBankRungsBought } from '../sim/guild_bank';
 import { vaultMaterialIds } from '../sim/materials_vault';
 import type { IWorld } from '../world_api';
+import { renderAccountBank } from './account_bank_window';
 import {
   BAG_CATEGORIES,
   BAG_SORTS,
@@ -39,7 +40,7 @@ import { type BankScrollOffsets, planBankScrollRestore } from './bank_chrome_lay
 import { filterBankSlots } from './bank_filter';
 import { annotateGuildFocusKeys, annotateVaultFocusKeys } from './bank_focus_keys';
 import { bankSlotDisplayName } from './bank_item_name_core';
-import { bankMeterAriaLabel, bankMeterTooltipHtml } from './bank_meter_view';
+import { buildBankMeter } from './bank_meter_painter';
 import { showQuantityPrompt } from './bank_quantity_prompt';
 import { BankRungPurchase } from './bank_rung_purchase_core';
 import {
@@ -480,6 +481,8 @@ export class BankWindow {
     this.opened = true;
     this.lastSig = '';
     this.openedAt = performance.now();
+    if (!initialTab && this.deps.world().player?.membershipActive)
+      this.deps.world().requestAccountBanks?.();
     // Reset the one-per-open re-prompt cap on the way IN too: close() alone
     // leaves a refusal that resolved after the close holding the next open's cap.
     this.rungPurchase.resetRepromptCap();
@@ -643,18 +646,23 @@ export class BankWindow {
       `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(bankWindowTitle(this.tab))} <span class="panel-subtitle ui-win-sub">${this.tab === 'rewards' ? '' : esc(t('hudChrome.bank.subtitle'))}</span></span>` +
       `<button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hudChrome.bank.close'))}">${svgIcon('close')}</button></div>`;
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
-    if (this.tab !== 'rewards' && (guildAvailable || vaultAvailable)) {
+    const accountAvailable = this.deps.world().player?.membershipActive === true;
+    if (!accountAvailable && this.tab === 'account') this.tab = 'personal';
+    if (this.tab !== 'rewards' && (guildAvailable || vaultAvailable || accountAvailable)) {
       el.insertAdjacentHTML(
         'beforeend',
         bankTabsHtml(this.tab, {
           guild: guildAvailable,
+          account: accountAvailable,
           vault: vaultAvailable,
         }),
       );
       wireTabStrip(el, 'bank-tab', (id, focusFollow) => {
-        if (id !== 'personal' && id !== 'guild' && id !== 'vault') return;
+        if (id !== 'personal' && id !== 'guild' && id !== 'vault' && id !== 'account') return;
         if (this.tab !== id) audio.click();
         this.tab = id;
+        if (id === 'account' && !this.deps.world().accountBankInfo)
+          this.deps.world().requestAccountBanks();
         this.render();
         if (focusFollow) focusActiveTab(this.deps.root(), 'bank-tab', 'on');
       });
@@ -671,6 +679,13 @@ export class BankWindow {
     if (this.tab !== 'rewards') this.weeklyPane.close();
     if (this.tab === 'rewards') {
       this.weeklyPane.renderInto(el);
+      this.restoreScroll(el, prevScroll);
+      if (hadFocus) this.restoreControlFocus(el, focusKey);
+      return;
+    }
+    if (this.tab === 'account') {
+      renderAccountBank(el, this.deps, () => this.render());
+      el.querySelector('#bank-tab-account')?.setAttribute('aria-controls', 'account-bank-panel');
       this.restoreScroll(el, prevScroll);
       if (hadFocus) this.restoreControlFocus(el, focusKey);
       return;
@@ -953,6 +968,9 @@ export class BankWindow {
       // Personal tab was otherwise re-requesting it every TTL for a pane nobody
       // was looking at.
       this.tab === 'guild' && g !== null ? this.guildPane.readAndRequestLog() : null,
+      this.deps.world().accountBankInfo,
+      this.deps.world().player?.membershipActive,
+      this.tab === 'account' ? this.deps.world().inventory : null,
     ]);
     if (sig === this.lastSig) return;
     this.lastSig = sig;
@@ -1404,54 +1422,9 @@ export class BankWindow {
     return wrap;
   }
 
-  // The capacity meter: a non-actionable readout (no click, no peek guard) of
-  // the summed display pair plus the two wire-fed pool segments. Geometry goes
-  // out as unitless custom properties (each pool's share of the total, and its
-  // fill CLAMPED to [0,1]; the model's fraction stays honest past 1) so the
-  // stylesheet owns every visual decision. The materials segment always
-  // renders; a zero share collapses it in CSS.
   private buildMeter(meter: BankMeterModel): HTMLElement {
-    const el = document.createElement('div');
-    el.className = 'bank-meter';
-    // Focusable readout: the pool lines and the materials note live only in
-    // the tooltip, whose host serves hover, long-press, AND focusin; without
-    // a tab stop a keyboard-only user could never reach them. role=group
-    // makes the aria-label conformant on the composite (bonus-section idiom).
-    // The focus key keeps a parked reader on the meter across mirror-driven
-    // rebuilds; the close-button fallback would silently defeat the tab stop.
-    el.setAttribute('role', 'group');
-    el.tabIndex = 0;
+    const el = buildBankMeter(meter, this.deps.attachTooltip);
     el.dataset.focusKey = 'bank:meter';
-    const share = (capacity: number): string =>
-      String(meter.total > 0 ? capacity / meter.total : 0);
-    const fill = (fraction: number): string => String(Math.min(1, Math.max(0, fraction)));
-    el.style.setProperty('--bank-meter-general-share', share(meter.general.capacity));
-    el.style.setProperty('--bank-meter-materials-share', share(meter.materials.capacity));
-    el.style.setProperty('--bank-meter-general-fill', fill(meter.general.fraction));
-    el.style.setProperty('--bank-meter-materials-fill', fill(meter.materials.fraction));
-    const track = document.createElement('div');
-    track.className = 'bank-meter-track';
-    for (const seg of ['bank-meter-seg-general', 'bank-meter-seg-materials']) {
-      const segment = document.createElement('div');
-      segment.className = seg;
-      const segFill = document.createElement('div');
-      segFill.className = 'bank-meter-fill';
-      segment.appendChild(segFill);
-      track.appendChild(segment);
-    }
-    el.appendChild(track);
-    const text = document.createElement('span');
-    text.className = 'bank-meter-text';
-    text.textContent = t('hudChrome.bank.meterLabel', {
-      used: this.fmt(meter.used),
-      total: this.fmt(meter.total),
-    });
-    el.appendChild(text);
-    // Both the accessible name and the tooltip body are pure copy over this
-    // same model (bank_meter_view.ts); the window keeps the ATTACH, which is
-    // the half that owns DOM.
-    el.setAttribute('aria-label', bankMeterAriaLabel(meter));
-    this.deps.attachTooltip(el, () => bankMeterTooltipHtml(meter));
     return el;
   }
 

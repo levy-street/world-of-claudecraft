@@ -59,6 +59,7 @@ export { SALVAGE_MATERIAL_BY_QUALITY } from './salvage_materials';
 export function isSalvageable(def: ItemDef | undefined): boolean {
   return (
     !!def &&
+    !def.noSalvage &&
     (def.kind === 'weapon' || def.kind === 'armor' || def.kind === 'held_offhand') &&
     !!def.quality &&
     def.quality !== 'poor'

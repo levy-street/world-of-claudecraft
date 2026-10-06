@@ -23,6 +23,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { MEMBERSHIP_XP_MULTIPLIER } from '../content/membership';
 import { ABILITIES, DELVES, GROUP_XP_BONUS, ITEMS, MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { recalcPlayerStats } from '../entity';
@@ -36,6 +37,9 @@ import {
 } from '../instances/dungeons';
 import { isImmuneInPlace } from '../instances/instance_combat_hold';
 import { isKillParticipant, killParticipationPos } from '../loot/kill_participation';
+import { membershipActive } from '../membership';
+import { wearsMembershipArmour } from '../membership_armour';
+import { perfectMembershipArmour } from '../membership_armour_progression';
 import { applyBossCorpseHold } from '../mob/boss_corpse_hold';
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
 import { isEvadingWildMob } from '../mob/evade_immunity';
@@ -1923,6 +1927,9 @@ export function grantXp(
     meta.restedXp -= restedBonus;
     amount += restedBonus;
   }
+  if (membershipActive(meta, ctx.time) && wearsMembershipArmour(meta.equipment)) {
+    amount = Math.floor(amount * MEMBERSHIP_XP_MULTIPLIER);
+  }
   // Lifetime XP accrues for EVERY award, including at the cap — this is what
   // makes post-cap progression work. It feeds the virtual level, the
   // leaderboard, and cosmetic milestones. The level bar below only advances
@@ -1943,6 +1950,7 @@ export function grantXp(
   while (p.level < MAX_LEVEL && meta.xp >= xpForLevel(p.level)) {
     meta.xp -= xpForLevel(p.level);
     p.level++;
+    perfectMembershipArmour(meta, p.level);
     meta.counters.levelUps++;
     // Re-bake the flat talent mods at the new level BEFORE the stat pass: spec mastery
     // magnitudes scale with level (min(1, level/20) in accumulate), so a ding must

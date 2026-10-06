@@ -1155,6 +1155,8 @@ interface BaseItemDef {
   buyValue?: number; // copper (vendor sells at this)
   questId?: string;
   noVendorSell?: boolean;
+  /** Reclaimable rewards must not turn into unlimited salvage/disenchant materials. */
+  noSalvage?: boolean;
   noDiscard?: boolean;
   noMarketList?: boolean;
   // Soulbound: the item is bound to its owner. It cannot be traded, mailed,
@@ -5285,6 +5287,8 @@ export interface Entity extends ClientMirroredEntityFields {
   // respec, loadout, level, and load path refreshes it. The sim never reads
   // it; it rides the identity wire for the mouseover tooltip's spec line.
   specId?: string | null;
+  /** Trusted live entitlement mirror, never loaded from character state. */
+  membershipActive?: boolean;
   pos: Vec3;
   prevPos: Vec3; // for render interpolation
   facing: number; // radians, 0 = +Z

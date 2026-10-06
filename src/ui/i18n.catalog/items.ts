@@ -74,6 +74,17 @@ const itemStringsEn = {
       parry: 'Parry',
     },
     tooltip: {
+      membershipToken:
+        'Use: Consume this token to add {days} days of membership to your account. Any remaining membership time is kept. This token can be traded or sold at the auction house before redemption.',
+      membershipAdaptive: 'Stats and armor adapt to your class and specialization.',
+      membershipScaling:
+        'Item level matches your level. At level 20, this armor perfects at item level 25.',
+      membershipPerfected: 'Perfected: item level {level}.',
+      membershipFullSet:
+        'Equip all {pieces} membership armor pieces to gain {percent}% more experience. Requires an active membership.',
+      membershipRequired:
+        'Armor stats and set benefits stop when membership expires and return when you renew.',
+      membershipDormant: 'Inactive: renew your membership to restore armor stats and set benefits.',
       qualityKind: '{quality} {kind}',
       currentlyEquipped: 'Currently equipped',
       ifYouEquip: 'If you equip this',
@@ -4334,6 +4345,14 @@ function itemTranslations(names: readonly string[]): ItemEntityTranslations {
 function itemTranslationsEn(names: readonly string[]) {
   return {
     ...itemTranslations(names),
+    membership_token: { name: 'Membership Token (30 Days)' },
+    membership_helmet: { name: 'Membership Helm' },
+    membership_shoulder: { name: 'Membership Pauldrons' },
+    membership_chest: { name: 'Membership Cuirass' },
+    membership_waist: { name: 'Membership Girdle' },
+    membership_legs: { name: 'Membership Legguards' },
+    membership_gloves: { name: 'Membership Gauntlets' },
+    membership_feet: { name: 'Membership Boots' },
     conjured_water4: { name: 'Conjured Springwater' },
     conjured_bread4: { name: 'Conjured Feastloaf' },
     soul_stone: { name: 'Soul Stone' },

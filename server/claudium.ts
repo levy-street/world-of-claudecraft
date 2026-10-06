@@ -14,6 +14,7 @@
 // until the legacy ladder is removed.
 
 import type * as http from 'node:http';
+import { MEMBERSHIP_TOKEN_SKU } from '../src/membership_token_contract';
 import { isMountSkinId } from '../src/sim/content/mount_skins';
 import { isKnownStorageSkuId } from '../src/sim/content/storage_charters';
 import { WEAPON_SKINS } from '../src/sim/content/weapon_skins';
@@ -58,6 +59,12 @@ import {
 } from './http/middleware/rate_limit';
 import type { Ctx, RateLimitOutcome, RouteDef } from './http/types';
 import { json, readBinaryBody, readBody } from './http_util';
+import { gameMembershipAnnualClaim, membershipAnnualRecipient } from './membership_annual_store';
+import {
+  gameMembershipTokenCheckout,
+  gameMembershipTokenClaim,
+  gameMembershipTokenOffer,
+} from './membership_token_store';
 import {
   type ClaudiumMutationAction,
   claudiumMutationRateLimited,
@@ -65,7 +72,6 @@ import {
   publicReadRateLimited,
 } from './ratelimit';
 import { STORAGE_KEY_PATTERN, STORAGE_MAX_EXPECTED_COST_CLAUDIUM } from './storage_purchases';
-
 import { gameSubscriptionLink, gameSubscriptionSnapshot } from './subscription_proxy';
 
 const STRIPE_WEBHOOK_MAX_BYTES = 1024 * 1024;
@@ -120,7 +126,10 @@ function claudiumMutationAction(req: http.IncomingMessage): ClaudiumMutationActi
   if (
     path === '/api/claudium/purchase' ||
     path === '/api/claudium/subscription/checkout' ||
-    path === '/api/claudium/subscription/portal'
+    path === '/api/claudium/subscription/portal' ||
+    path === '/api/claudium/subscription/annual/claim' ||
+    path === '/api/claudium/membership-token/checkout' ||
+    path === '/api/claudium/membership-token/claim'
   )
     return 'purchase';
   if (path === '/api/claudium/native/quote') return 'quote';
@@ -137,7 +146,9 @@ export function claudiumPreAuthMutationRateLimited(
 ): RateLimitOutcome | null {
   if (
     req.method === 'GET' &&
-    new URL(req.url ?? '/', 'http://localhost').pathname === '/api/claudium/subscription'
+    ['/api/claudium/subscription', '/api/claudium/membership-token'].includes(
+      new URL(req.url ?? '/', 'http://localhost').pathname,
+    )
   )
     return publicReadRateLimited(req);
   const action = claudiumMutationAction(req);
@@ -254,6 +265,33 @@ export async function handleClaudiumApi(
     if (!outcome.allowed) return json(res, 429, { error: 'rate_limited' });
   }
 
+  if (req.method === 'GET' && path === '/api/claudium/membership-token') {
+    return json(res, 200, {
+      sku: MEMBERSHIP_TOKEN_SKU,
+      ...(await gameMembershipTokenOffer(accountId)),
+    });
+  }
+  if (req.method === 'POST' && path === '/api/claudium/membership-token/checkout') {
+    return json(
+      res,
+      200,
+      await gameMembershipTokenCheckout(accountId, await readBody(req).catch(() => null)),
+    );
+  }
+  if (req.method === 'POST' && path === '/api/claudium/membership-token/claim') {
+    return json(
+      res,
+      200,
+      await gameMembershipTokenClaim(accountId, await readBody(req).catch(() => null)),
+    );
+  }
+  if (req.method === 'POST' && path === '/api/claudium/subscription/annual/claim') {
+    return json(
+      res,
+      200,
+      await gameMembershipAnnualClaim(accountId, await readBody(req).catch(() => null)),
+    );
+  }
   if (req.method === 'GET' && path === '/api/claudium/subscription') {
     return json(res, 200, {
       plan: GAME_SUBSCRIPTION_PLAN,
@@ -265,7 +303,12 @@ export async function handleClaudiumApi(
     return json(
       res,
       200,
-      await gameSubscriptionLink(accountId, 'checkout', await readBody(req).catch(() => null)),
+      await gameSubscriptionLink(
+        accountId,
+        'checkout',
+        await readBody(req).catch(() => null),
+        membershipAnnualRecipient(accountId),
+      ),
     );
   }
   if (req.method === 'POST' && path === '/api/claudium/subscription/portal') {
@@ -537,6 +580,56 @@ function claudiumHandler(ctx: Ctx): Promise<void> {
 }
 
 export const routes: RouteDef[] = [
+  {
+    method: 'POST',
+    path: '/api/claudium/subscription/annual/claim',
+    surface: 'api',
+    middleware: [
+      rateLimit(CLAUDIUM_PURCHASE_PRE_AUTH_POLICY),
+      activeGuard,
+      rateLimit(CLAUDIUM_PURCHASE_POLICY),
+    ],
+    handler: claudiumHandler,
+  },
+  {
+    method: 'GET',
+    path: '/api/claudium/membership-token',
+    surface: 'api',
+    middleware: [
+      async (ctx, next) => {
+        if (!publicReadRateLimited(ctx.req).allowed) {
+          json(ctx.res, 429, { error: 'rate_limited' });
+          return;
+        }
+        await next();
+      },
+      activeGuard,
+    ],
+    handler: claudiumHandler,
+  },
+  {
+    method: 'POST',
+    path: '/api/claudium/membership-token/checkout',
+    surface: 'api',
+    middleware: [
+      rateLimit(CLAUDIUM_PURCHASE_PRE_AUTH_POLICY),
+      activeGuard,
+      rateLimit(CLAUDIUM_PURCHASE_POLICY),
+    ],
+    handler: claudiumHandler,
+  },
+  {
+    method: 'POST',
+    path: '/api/claudium/membership-token/claim',
+    surface: 'api',
+    middleware: [
+      rateLimit(CLAUDIUM_PURCHASE_PRE_AUTH_POLICY),
+      activeGuard,
+      rateLimit(CLAUDIUM_PURCHASE_POLICY),
+    ],
+    handler: claudiumHandler,
+  },
+
   {
     method: 'GET',
     path: '/api/claudium/subscription',

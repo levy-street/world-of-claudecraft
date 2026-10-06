@@ -103,6 +103,16 @@ export interface VaultSpecialRef {
 }
 
 export interface IWorldBank {
+  readonly accountBankInfo: AccountBankInfo | null;
+  requestAccountBanks(): void;
+  selectAccountBank(characterId: number): void;
+  accountBankTransfer(
+    characterId: number,
+    direction: 'deposit' | 'withdraw',
+    slotIndex: number,
+    count?: number,
+    expectedSlot?: InvSlot,
+  ): void;
   readonly weeklyRewardInfo: WeeklyRewardInfo | null;
   claimWeeklyReward(choice: string): void;
   openWeeklyReward(choice: string, table?: string | readonly string[]): void;
@@ -188,4 +198,12 @@ export interface IWorldBank {
   // client-side send gate agrees with the sim's admission gate in BOTH hosts;
   // owner-only on the wire, never part of the entity broadcast.
   craftVaultStock: Record<string, number> | null;
+}
+
+/** Deliberately requested account view; only the selected character's bank is loaded. */
+export interface AccountBankInfo {
+  characters: { characterId: number; name: string }[];
+  selectedCharacterId: number | null;
+  bank: BankInfo | null;
+  error?: string;
 }

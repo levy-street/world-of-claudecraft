@@ -1,3 +1,4 @@
+import { membershipTokenOffer } from '../membership_token_contract';
 import {
   GAME_SUBSCRIPTION_PLAN,
   SUBSCRIPTION_LINK_OFF,
@@ -13,11 +14,11 @@ export function createSubscriptionStoreHooks(cfg: {
   token(): string | null;
   base?: string;
 }): SubscriptionStoreHooks {
-  async function request(path: string, body?: unknown): Promise<unknown> {
+  async function request(path: string, body?: unknown, family = 'subscription'): Promise<unknown> {
     const token = cfg.token();
     if (!token) return null;
     try {
-      const response = await fetch(apiUrl(`/api/claudium/subscription${path}`, cfg.base ?? ''), {
+      const response = await fetch(apiUrl(`/api/claudium/${family}${path}`, cfg.base ?? ''), {
         method: body === undefined ? 'GET' : 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         ...(body === undefined ? {} : { body: JSON.stringify(body) }),
@@ -30,14 +31,44 @@ export function createSubscriptionStoreHooks(cfg: {
     }
   }
   return {
+    async tokenOffer() {
+      return membershipTokenOffer(await request('', undefined, 'membership-token'));
+    },
+    async tokenCheckout(idempotencyKey) {
+      return subscriptionLink(
+        await request('/checkout', { rail: 'stripe', idempotencyKey }, 'membership-token'),
+        'checkout',
+      );
+    },
+    async tokenClaim(idempotencyKey) {
+      const result = await request('/claim', { idempotencyKey }, 'membership-token');
+      return {
+        delivered:
+          !!result &&
+          typeof result === 'object' &&
+          (result as { delivered?: unknown }).delivered === true,
+      };
+    },
     async snapshot() {
       return subscriptionSnapshot(await request('')) ?? { ...SUBSCRIPTION_OFF };
     },
-    async link(action, idempotencyKey) {
+    async annualMountClaim(idempotencyKey) {
+      const result = await request(
+        '/annual/claim',
+        idempotencyKey === undefined ? {} : { idempotencyKey },
+      );
+      return {
+        delivered:
+          !!result &&
+          typeof result === 'object' &&
+          (result as { delivered?: unknown }).delivered === true,
+      };
+    },
+    async link(action, idempotencyKey, plan = GAME_SUBSCRIPTION_PLAN) {
       return (
         subscriptionLink(
           await request(`/${action}`, {
-            plan: GAME_SUBSCRIPTION_PLAN,
+            plan,
             rail: 'stripe',
             idempotencyKey,
           }),

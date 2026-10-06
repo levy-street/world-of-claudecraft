@@ -565,6 +565,19 @@ interface ScannedPainter {
 // pooled node, both at build; fct also forces ONE documented offsetWidth reflow to restart
 // the float animation on a recycled node.
 const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
+  // Bank meter construction runs only behind BankWindow's unchanged-data guard.
+  // No driver or layout reads; these writes initialize newly created nodes.
+  {
+    file: 'bank_meter_painter.ts',
+    allow: {
+      '.className': 5,
+      '.setAttribute': 2,
+      '.textContent': 1,
+      '.style': 4,
+      '.setProperty': 4,
+    },
+    reflowAllow: {},
+  },
   { file: 'micro_menu_state_painter.ts', allow: {}, reflowAllow: {} },
   // Sixteen construction-only class assignments; all update writes use the shared facet.
   {

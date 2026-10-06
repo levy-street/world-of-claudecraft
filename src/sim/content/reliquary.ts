@@ -291,8 +291,8 @@ export const RELIQUARY_HORIZON_MOUNTS = [
 // def in content/zone3.ts), so a quest hint there would name a door that hands
 // out nothing.
 //
-// Drakemaw Raptor, Lanternback Troll and Dreadspark Groundshaker have no
-// player acquisition path. The Viridian Valestrider is the Rift Watch
+// Dreadspark Groundshaker is the annual membership bundle's paid mount reward.
+// The Viridian Valestrider is the Rift Watch
 // quartermaster's Champion row (content/faction_vendors.ts). Paid mount skins
 // are deliberately absent here.
 //
@@ -307,6 +307,7 @@ const MOUNT_SOURCES: Readonly<
   // never encodes meaning in the shape).
   valorsteed: fromVendor('stablemaster_marla'),
   avian_strider: fromVendor('npc_rift_watch_quartermaster'),
+  terrorspark_groundshaker: fromStore(),
   stormfeather_griffin: [
     fromBoss('morthen'),
     fromBoss('nythraxis_scourge_of_thornpeak'),

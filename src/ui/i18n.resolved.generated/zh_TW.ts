@@ -828,6 +828,31 @@ export const zh_TW: EnTranslations = {
     "wocStore": {
       "subscription": {
         "title": "遊戲訂閱",
+        "monthlyTitle": "月度會員",
+        "annualTitle": "12個月會員禮包",
+        "annualPrice": "12個月共{price}，一次付清",
+        "annualTerms": "每年以相同價格續訂。透過Stripe使用法定貨幣付款。可在帳單設定中取消。",
+        "paidReward": "每次付費可獲得{amount} Claudium，價值{value}。免費試用期間不發放Claudium。",
+        "annualMount": "付款後，請使用購買禮包的角色從郵件中領取靈魂綁定的坦克坐騎鑰匙。坦克暫時代替禮包坐騎。",
+        "trialTerms": "每個帳號可免費試用一次，共{days}天。需要提供付款方式。除非取消，否則試用結束時將收取{price}。試用期間不發放Claudium或禮包坐騎。",
+        "startTrial": "開始7天免費試用",
+        "resumeCheckout": "繼續結帳",
+        "checkoutClosed": "此結帳流程已結束，且沒有待領取獎勵。請重新選擇會員方案，開始新的結帳流程。",
+        "annualClaim": "領取禮包坐騎",
+        "annualPending": "付款後，請返回購買禮包的角色領取坐騎。如果付款正在處理或仍在試用期，請在付費成功後重試。",
+        "annualDelivered": "禮包坐騎鑰匙已透過郵件送達。",
+        "tokenTitle": "可交易會員代幣",
+        "benefitsTitle": "有效會員權益",
+        "benefitBank": "在任意銀行員處存取您其他角色的銀行。",
+        "benefitSlots": "額外解鎖10個角色欄位。",
+        "benefitArmour": "領取屬性適配您職業與專精的靈魂綁定護甲。護甲隨角色等級成長，在20級時達到物品等級25。裝備全套可多獲得20%經驗。",
+        "benefitTax": "拍賣場稅費減半。",
+        "benefitExpiry": "會員到期後，額外欄位中的角色和護甲加成會鎖定，續訂後恢復。基礎欄位中的角色仍可正常遊玩。",
+        "tokenTerms": "一次支付{price}，獲得30天會員代幣。代幣將郵寄給此角色，可兌換為會員時長，也可在拍賣場出售。",
+        "tokenBuy": "購買會員代幣",
+        "tokenClaim": "領取已購買的代幣",
+        "tokenPending": "付款後請返回此角色領取代幣。若付款仍在處理中，請稍後重試。",
+        "tokenDelivered": "您的代幣已透過郵件送達。",
         "price": "每月 {price}",
         "terms": "每月自動續訂。透過 Stripe 使用法定貨幣付款。可在帳單設定中取消。",
         "subscribe": "訂閱",
@@ -4900,6 +4925,18 @@ export const zh_TW: EnTranslations = {
       "vaultCannotDeposit": "無法存入材料倉庫",
       "tabsAria": "銀行標籤頁",
       "personalTab": "個人",
+      "accountTab": "其他角色",
+      "accountArmour": "領取會員護甲",
+      "accountMembership": "會員有效期間，可在此存取您其他角色的銀行。",
+      "accountCharacters": "角色銀行",
+      "accountEmpty": "建立另一個角色後，即可在此使用該角色的銀行。",
+      "accountSelect": "選擇一個角色以載入其銀行。",
+      "accountUnavailable": "此銀行暫不可用。請重新選擇該角色以重新整理。",
+      "accountDeposit": "您的背包：存入此銀行",
+      "accountWithdraw": "所選銀行：取出到您的背包",
+      "accountDepositHint": "點擊將此堆物品存入所選角色的銀行。",
+      "accountWithdrawHint": "點擊將此堆物品取出到您的背包。",
+      "accountBound": "靈魂綁定、已鎖定及任務物品無法在角色間轉移。",
       "guildTab": "公會",
       "guildCapacityAria": "公會銀行格已用：{used}/{total}",
       "guildEmpty": "公會銀行是空的。",
@@ -11238,6 +11275,9 @@ export const zh_TW: EnTranslations = {
   "character": {
     "loading": "正在載入...",
     "noneYet": "還沒有角色。請在下方建立一個。",
+    "membershipRequired": "續訂會員後即可使用此角色。",
+    "membershipSlots": "開通會員以解鎖角色欄位",
+    "emptySlot": "可用角色欄位",
     "levelClass": "{level} 級 {className}",
     "inWorld": "在世界中",
     "takeOver": "接管",
@@ -12773,6 +12813,13 @@ export const zh_TW: EnTranslations = {
       "parry": "招架"
     },
     "tooltip": {
+      "membershipToken": "使用：消耗此代幣，為您的帳號增加{days}天會員時長。現有剩餘時長會保留。兌換前可交易此代幣或在拍賣場出售。",
+      "membershipAdaptive": "屬性和護甲會隨您的職業與專精調整。",
+      "membershipScaling": "物品等級與您的角色等級一致。達到20級時，此護甲會完善為物品等級25。",
+      "membershipPerfected": "已完善：物品等級{level}。",
+      "membershipFullSet": "裝備全部{pieces}件會員護甲，經驗獲取量提高{percent}%。需要有效會員資格。",
+      "membershipRequired": "會員到期後，護甲屬性和套裝加成會停用，續訂後恢復。",
+      "membershipDormant": "未啟用：續訂會員以恢復護甲屬性和套裝加成。",
       "qualityKind": "{quality}{kind}",
       "currentlyEquipped": "目前已裝備",
       "ifYouEquip": "裝備後",
@@ -18471,6 +18518,30 @@ export const zh_TW: EnTranslations = {
       "vanguard_warstaff": {
         "name": "先鋒之戰杖"
       },
+      "membership_token": {
+        "name": "會員代幣（30天）"
+      },
+      "membership_helmet": {
+        "name": "會員頭盔"
+      },
+      "membership_shoulder": {
+        "name": "會員肩甲"
+      },
+      "membership_chest": {
+        "name": "會員胸甲"
+      },
+      "membership_waist": {
+        "name": "會員腰帶"
+      },
+      "membership_legs": {
+        "name": "會員腿甲"
+      },
+      "membership_gloves": {
+        "name": "會員護手"
+      },
+      "membership_feet": {
+        "name": "會員戰靴"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -23951,6 +24022,16 @@ export const zh_TW: EnTranslations = {
         "sender": "交易所經紀人",
         "subject": "你的交易所購得之物",
         "body": "交易已結清，貨物歸你所有。隨信的包裹裝著你所購買的那一件物品：自掛單之時起，它便由交易所託管，直到你的付款結清為止。\n\n這筆交易的紀錄已存入交易所帳冊。\n\n- 交易所經紀人"
+      },
+      "membership_token_delivery": {
+        "sender": "渡鴉郵驛",
+        "subject": "您的會員代幣",
+        "body": "您購買的代幣已隨信附上。兌換可為帳號增加30天會員時長，也可與其他冒險者交易。"
+      },
+      "membership_annual_reward": {
+        "sender": "鴉羽郵局",
+        "subject": "您的年度會員坐騎",
+        "body": "您的年度會員付款已完成。坦克坐騎鑰匙隨信附上。請將鑰匙保留在背包或銀行中以擁有此坐騎。會員到期後它仍歸您所有。需要騎術技能。"
       },
       "woc_market_return": {
         "sender": "交易所經紀人",

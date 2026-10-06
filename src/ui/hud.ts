@@ -85,7 +85,6 @@ import {
 import { specialRoleColor } from '../sim/discord_roles';
 import { canEquipItem, isUniqueEquipped, weaponHand } from '../sim/equipment_rules';
 import type { FactionId } from '../sim/factions';
-import { isItemLevelEligible, itemInstanceLevel, itemScore } from '../sim/item_level';
 import type { Ante, PickAction } from '../sim/lockpick';
 import type { MaterialComposition } from '../sim/material_sources';
 import { petCanForceTaunt } from '../sim/pet/pet_taunt_gate';
@@ -654,6 +653,7 @@ import {
   vendorSellTooltipLine,
 } from './item_instance_tooltip';
 import { itemKindLabel, itemQualityLabel } from './item_kind_label';
+import { itemLevelTooltipLines } from './item_level_tooltip';
 import { itemNameColor } from './item_name_color';
 import {
   equippedSetTooltipPieces,
@@ -704,6 +704,13 @@ import { marketCollectIndicatorView } from './market_view';
 import { MarketWindow } from './market_window';
 import { masterwroughtTooltipLines } from './masterwrought_cap_view';
 import { closeMaterialSourcesDialog, openMaterialSourcesDialog } from './material_sources_dialog';
+import {
+  type MembershipTooltipWearer,
+  membershipItemTooltipLines,
+  membershipTooltipEquipment,
+  membershipTooltipInstance,
+  membershipTooltipItem,
+} from './membership_item_tooltip';
 import { Meters } from './meters';
 import { MicroMenuStatePainter, microMenuWindowOpen } from './micro_menu_state_painter';
 import { createMicroMenuStateView } from './micro_menu_state_view';
@@ -854,7 +861,6 @@ import {
   MOTD_RESULT_FALLBACK_KEY,
   MOTD_RESULT_KEYS,
 } from './result_code_keys';
-import { itemLevelReadout } from './rift_band_tooltip';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
 import {
@@ -5712,6 +5718,8 @@ export class Hud {
   // context), so the painter mounts it through mountInspectPreview.
   private readonly inspectWindow = new InspectWindow({
     ...this.presentationBag,
+    itemTooltip: (item, instance, wearer) =>
+      this.itemTooltip(item, false, instance, undefined, wearer),
     root: () => $('#inspect-window'),
     closeOthers: () => this.closeOtherWindows('#inspect-window'),
     hideTooltip: () => this.hideTooltip(),
@@ -6435,7 +6443,11 @@ export class Hud {
     compare = true,
     instance?: ItemInstancePayload,
     materialSources?: MaterialComposition,
+    inspectedWearer?: MembershipTooltipWearer,
   ): string {
+    const wearer = inspectedWearer ?? this.sim.player;
+    item = membershipTooltipItem(item, this.sim, inspectedWearer);
+    instance = membershipTooltipInstance(item, instance, wearer.membershipActive === true);
     // Quest items are a purpose class, not a quality tier: title and kind use
     // quest gold, and the kind line is "Quest Item" alone (never "Common Quest
     // Item"). Story lines (related quest, progress, rules, orphaned) come from
@@ -6497,7 +6509,12 @@ export class Hud {
       if (armorTypeKey) {
         // Red armor type = the viewing player's class cannot wear this armor weight
         // (e.g. a mage hovering Mail), so they know it is not for them at a glance.
-        const badClass = canEquipItem(this.sim.cfg.playerClass, item) ? '' : ' tt-armor-bad';
+        const badClass = canEquipItem(
+          (inspectedWearer?.templateId ?? this.sim.cfg.playerClass) as PlayerClass,
+          item,
+        )
+          ? ''
+          : ' tt-armor-bad';
         html += `<div class="tt-sub tt-row"><span>${esc(slotName)}</span><span class="tt-armor${badClass}">${esc(t(armorTypeKey))}</span></div>`;
         if (uniqueTag) {
           html += `<div class="tt-sub" style="color:var(--gold)">${esc(uniqueTag)}</div>`;
@@ -6521,36 +6538,12 @@ export class Hud {
           html += `<div class="tt-sub" style="color:var(--gold)">${esc(t(line.key, line.values))}</div>`;
       }
     }
-    // Optional item-level readout (off by default; src/sim/item_level.ts derives it
-    // from where the item drops). Read live, so toggling it takes effect on the next
-    // hover. Combat gear only: sourceless items (vendor/starter) have no level, and
-    // non-combat items never get the line. A quality-rolled copy ALWAYS shows it
-    // (deliberate: its badge means "+N item levels", so the readout is the badge's
-    // legend, not the optional setting). A Riftbound band or quality copy is priced
-    // by its payload, not its stat-free shell, so its level/score come from
-    // itemLevelReadout; itemInstanceLevel/itemScore stay the source for the rest.
-    if (
-      isItemLevelEligible(item) &&
-      (instance?.lootQuality || this.optionsHooks?.settings.get('showItemLevel'))
-    ) {
-      let readout: { level: number; score: number } | undefined;
-      if (instance?.rift || instance?.lootQuality) {
-        readout = itemLevelReadout(item, instance);
-      } else {
-        const level = itemInstanceLevel(item, instance);
-        readout = level === undefined ? undefined : { level, score: itemScore(item) };
-      }
-      if (readout) {
-        html += `<div class="tt-stat" style="color:var(--gold)">${esc(
-          t('hudChrome.options.itemLevelLine', { level: itemNumber(readout.level) }),
-        )}</div>`;
-        html += `<div class="tt-sub">${esc(
-          t('hudChrome.options.itemScoreLine', {
-            score: itemNumber(readout.score, 1),
-          }),
-        )}</div>`;
-      }
-    }
+    html += itemLevelTooltipLines(
+      item,
+      instance,
+      this.optionsHooks?.settings.get('showItemLevel') === true,
+      wearer.level,
+    );
     // Bound-to-owner marker (marks and other soulbound tokens): shown like the
     // classic "Soulbound" line so a player can see it cannot be traded or destroyed.
     if (item.soulbound) {
@@ -6573,6 +6566,7 @@ export class Hud {
     // rules, incl. never claiming a quality-rank upgrade).
     html += instanceBadgeLines(instance);
     html += itemCombatTooltipLines(item, instance);
+    html += membershipItemTooltipLines(item, wearer.level, wearer.membershipActive === true);
     if (item.foodHp)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useFood', { amount: itemNumber(item.foodHp), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
     if (item.drinkMana)
@@ -6662,7 +6656,7 @@ export class Hud {
     if (requiredClasses) {
       html += `<div class="tt-sub">${esc(t('itemUi.tooltip.classes', { classes: requiredClasses.map(classDisplayName).join(', ') }))}</div>`;
     }
-    html += itemRequiredLevelLine(item, this.sim.player.level);
+    html += itemRequiredLevelLine(item, wearer.level);
     html += this.itemProcBlock(item) + trinketTooltipLines(item, this.sim.player);
     html += this.itemSetBlock(item);
     html += materialMakersMarkLines(item, instance, materialSources);
@@ -6774,8 +6768,8 @@ export class Hud {
   private itemCompareBlock(item: ItemDef, instance?: ItemInstancePayload): string {
     return itemCompareBlocksHtml(
       item,
-      { equipment: this.sim.equipment, instances: this.sim.equipmentInstances },
-      (id) => ITEMS[id],
+      membershipTooltipEquipment(this.sim),
+      (id) => ITEMS[id] && membershipTooltipItem(ITEMS[id], this.sim),
       (equipped, worn) => this.itemTooltip(equipped, false, worn),
       instance,
     );

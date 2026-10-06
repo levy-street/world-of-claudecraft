@@ -88,7 +88,7 @@ function setup() {
     hasSessionForCharacter: vi.fn((_characterId: number) => false),
     join: vi.fn(() => session),
     clients: { size: 1 },
-    sim: { resetDay: '2026-09-24' },
+    sim: { resetDay: '2026-09-24', setMembership: vi.fn() },
     handleMessage: vi.fn(),
     leave: vi.fn(async () => {}),
     socketClosed: vi.fn(() => true),
@@ -205,6 +205,69 @@ function gameSourceCode(): string {
     .readFileSync(path.resolve(process.cwd(), 'server/game.ts'), 'utf8')
     .replace(/(^|[^:])\/\/.*$/gm, '$1');
 }
+
+describe('membership character admission', () => {
+  it.each([false, true])(
+    'refuses an expired premium slot on fresh or resumed join (resume=%s)',
+    async (resume) => {
+      const { ws, deps, req, game } = setup();
+      vi.mocked(deps.getCharacter).mockResolvedValue(baseChar({ membership_slot: true }));
+      game.hasSessionForCharacter.mockReturnValue(resume);
+      deps.getMembership = async () => ({
+        active: false,
+        expiresAt: 1,
+        authorizedUntil: 0,
+        recurringExpiresAt: null,
+      });
+      await createWsAuth(deps).authenticateWebSocket(asWs(ws), authRaw(), req);
+      expectSendThenClose(ws, errorFrame('membership required for this character'));
+      expect(game.join).not.toHaveBeenCalled();
+      expect(deps.acquireCharacterLease).not.toHaveBeenCalled();
+    },
+  );
+
+  it('stamps a renewed premium slot with bounded authorization time', async () => {
+    const { ws, deps, req, game } = setup();
+    const now = Date.now();
+    vi.mocked(deps.getCharacter).mockResolvedValue(baseChar({ membership_slot: true }));
+    deps.getMembership = async () => ({
+      active: true,
+      expiresAt: now + 90_000,
+      authorizedUntil: now + 30_000,
+      recurringExpiresAt: null,
+    });
+    await createWsAuth(deps).authenticateWebSocket(asWs(ws), authRaw(), req);
+    expect(game.join).toHaveBeenCalledOnce();
+    expect(game.sim.setMembership).toHaveBeenCalledWith(1, expect.any(Number));
+    expect(game.sim.setMembership.mock.calls[0][1]).toBeGreaterThan(0);
+    expect(game.sim.setMembership.mock.calls[0][1]).toBeLessThanOrEqual(30);
+  });
+
+  it('releases a fresh lease if membership expires during the handshake', async () => {
+    const { ws, deps, req, game } = setup();
+    let now = 1000;
+    const clock = vi.spyOn(Date, 'now').mockImplementation(() => now);
+    try {
+      vi.mocked(deps.getCharacter).mockResolvedValue(baseChar({ membership_slot: true }));
+      deps.getMembership = async () => ({
+        active: true,
+        expiresAt: 1500,
+        authorizedUntil: 31_000,
+        recurringExpiresAt: null,
+      });
+      vi.mocked(deps.guestPayoutsForCycle).mockImplementation(async () => {
+        now = 2000;
+        return 0;
+      });
+      await createWsAuth(deps).authenticateWebSocket(asWs(ws), authRaw(), req);
+      expectSendThenClose(ws, errorFrame('membership required for this character'));
+      expect(deps.releaseCharacterLease).toHaveBeenCalledOnce();
+      expect(game.join).not.toHaveBeenCalled();
+    } finally {
+      clock.mockRestore();
+    }
+  });
+});
 
 describe('createWsAuth: authenticateWebSocket reject paths', () => {
   it('1. rejects unparseable JSON with "bad auth message" and logs the parse error', async () => {

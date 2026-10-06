@@ -13,6 +13,60 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  // Membership additions: same-change non-Latin coverage (M16).
+  'hudChrome.wocStore.subscription.benefitsTitle': '有效会员权益',
+  'hudChrome.wocStore.subscription.benefitBank': '在任意银行员处访问您其他角色的银行。',
+  'hudChrome.wocStore.subscription.benefitSlots': '额外解锁10个角色栏位。',
+  'hudChrome.wocStore.subscription.benefitArmour':
+    '领取属性适配您职业与专精的灵魂绑定护甲。护甲随角色等级成长，在20级时达到物品等级25。装备全套可多获得20%经验。',
+  'hudChrome.wocStore.subscription.benefitTax': '拍卖行税费减半。',
+  'hudChrome.wocStore.subscription.benefitExpiry':
+    '会员到期后，额外栏位中的角色和护甲加成会锁定，续订后恢复。基础栏位中的角色仍可正常游玩。',
+  'character.membershipRequired': '续订会员后即可使用此角色。',
+  'character.membershipSlots': '开通会员以解锁角色栏位',
+  'character.emptySlot': '可用角色栏位',
+  'hudChrome.bank.accountTab': '其他角色',
+  'hudChrome.bank.accountArmour': '领取会员护甲',
+  'hudChrome.bank.accountMembership': '会员有效期间，可在此访问您其他角色的银行。',
+  'hudChrome.bank.accountCharacters': '角色银行',
+  'hudChrome.bank.accountEmpty': '创建另一个角色后，即可在此使用该角色的银行。',
+  'hudChrome.bank.accountSelect': '选择一个角色以加载其银行。',
+  'hudChrome.bank.accountUnavailable': '此银行暂不可用。请重新选择该角色以刷新。',
+  'hudChrome.bank.accountDeposit': '您的背包：存入此银行',
+  'hudChrome.bank.accountWithdraw': '所选银行：取出到您的背包',
+  'hudChrome.bank.accountDepositHint': '点击将此堆物品存入所选角色的银行。',
+  'hudChrome.bank.accountWithdrawHint': '点击将此堆物品取出到您的背包。',
+  'hudChrome.bank.accountBound': '灵魂绑定、已锁定及任务物品无法在角色间转移。',
+  'hudChrome.wocStore.subscription.tokenTitle': '可交易会员代币',
+  'hudChrome.wocStore.subscription.tokenTerms':
+    '一次支付{price}，获得30天会员代币。代币将邮寄给此角色，可兑换为会员时长，也可在拍卖行出售。',
+  'hudChrome.wocStore.subscription.tokenBuy': '购买会员代币',
+  'hudChrome.wocStore.subscription.tokenClaim': '领取已购买的代币',
+  'hudChrome.wocStore.subscription.tokenPending':
+    '付款后请返回此角色领取代币。若付款仍在处理中，请稍后重试。',
+  'hudChrome.wocStore.subscription.tokenDelivered': '您的代币已通过邮件送达。',
+  'itemUi.tooltip.membershipToken':
+    '使用：消耗此代币，为您的账号增加{days}天会员时长。现有剩余时长会保留。兑换前可交易此代币或在拍卖行出售。',
+  'itemUi.tooltip.membershipAdaptive': '属性和护甲会随您的职业与专精调整。',
+  'itemUi.tooltip.membershipScaling':
+    '物品等级与您的角色等级一致。达到20级时，此护甲会完善为物品等级25。',
+  'itemUi.tooltip.membershipPerfected': '已完善：物品等级{level}。',
+  'itemUi.tooltip.membershipFullSet':
+    '装备全部{pieces}件会员护甲，经验获取量提高{percent}%。需要有效会员资格。',
+  'itemUi.tooltip.membershipRequired': '会员到期后，护甲属性和套装加成会停用，续订后恢复。',
+  'itemUi.tooltip.membershipDormant': '未激活：续订会员以恢复护甲属性和套装加成。',
+  'entities.items.membership_token.name': '会员代币（30天）',
+  'entities.items.membership_helmet.name': '会员头盔',
+  'entities.items.membership_shoulder.name': '会员肩甲',
+  'entities.items.membership_chest.name': '会员胸甲',
+  'entities.items.membership_waist.name': '会员腰带',
+  'entities.items.membership_legs.name': '会员腿甲',
+  'entities.items.membership_gloves.name': '会员护手',
+  'entities.items.membership_feet.name': '会员战靴',
+  'entities.letters.membership_token_delivery.sender': '渡鸦邮驿',
+  'entities.letters.membership_token_delivery.subject': '您的会员代币',
+  'entities.letters.membership_token_delivery.body':
+    '您购买的代币已随信附上。兑换可为账号增加30天会员时长，也可与其他冒险者交易。',
   'hudChrome.wocStore.subscription.title': '游戏订阅',
   'hudChrome.wocStore.subscription.price': '每月 {price}',
   'hudChrome.wocStore.subscription.terms':
@@ -18661,4 +18715,27 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_balance.bonus2': '缠缚根须的施法时间缩短0.5秒。',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '施放缠缚根须后，你可以在移动中施法，并使移动速度提高20%，持续4秒。每20秒最多触发一次。',
+  'hudChrome.wocStore.subscription.monthlyTitle': '月度会员',
+  'hudChrome.wocStore.subscription.annualTitle': '12个月会员礼包',
+  'hudChrome.wocStore.subscription.annualPrice': '12个月共{price}，一次付清',
+  'hudChrome.wocStore.subscription.annualTerms':
+    '每年以相同价格续订。通过Stripe使用法定货币付款。可在账单设置中取消。',
+  'hudChrome.wocStore.subscription.paidReward':
+    '每次付费可获得{amount} Claudium，价值{value}。免费试用期间不发放Claudium。',
+  'hudChrome.wocStore.subscription.annualMount':
+    '付款后，请使用购买礼包的角色从邮件中领取灵魂绑定的坦克坐骑钥匙。坦克暂时代替礼包坐骑。',
+  'hudChrome.wocStore.subscription.trialTerms':
+    '每个账户可免费试用一次，共{days}天。需要提供付款方式。除非取消，否则试用结束时将收取{price}。试用期间不发放Claudium或礼包坐骑。',
+  'hudChrome.wocStore.subscription.startTrial': '开始7天免费试用',
+  'hudChrome.wocStore.subscription.annualClaim': '领取礼包坐骑',
+  'hudChrome.wocStore.subscription.annualPending':
+    '付款后，请返回购买礼包的角色领取坐骑。如果付款正在处理或仍在试用期，请在付费成功后重试。',
+  'hudChrome.wocStore.subscription.annualDelivered': '礼包坐骑钥匙已通过邮件送达。',
+  'hudChrome.wocStore.subscription.resumeCheckout': '继续结账',
+  'entities.letters.membership_annual_reward.sender': '鸦羽邮局',
+  'entities.letters.membership_annual_reward.subject': '您的年度会员坐骑',
+  'entities.letters.membership_annual_reward.body':
+    '您的年度会员付款已完成。坦克坐骑钥匙随信附上。请将钥匙保留在背包或银行中以拥有此坐骑。会员到期后它仍归您所有。需要骑术技能。',
+  'hudChrome.wocStore.subscription.checkoutClosed':
+    '此结账流程已结束，且没有待领取奖励。请重新选择会员方案，开始新的结账流程。',
 };

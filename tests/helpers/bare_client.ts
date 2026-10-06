@@ -128,6 +128,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.mailInfo = null;
   c.mailUnread = 0;
   c.bankInfo = null;
+  c.accountBankInfo = null;
   c.bankPurchasedSlots = null;
   c.vaultInfo = null;
   c.weeklyRewardInfo = null;

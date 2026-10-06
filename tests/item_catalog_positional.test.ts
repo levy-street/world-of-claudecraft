@@ -50,10 +50,27 @@ describe('the positional item-name catalog stays aligned with its ids', () => {
       else dupes.push(`${id} at ${first} and ${i}`);
     });
     expect(dupes, 'a duplicate id consumes two name slots and shifts the tail').toEqual([]);
-    // Every parsed id reached the built table, and the table adds only the three
-    // en-only extras itemTranslationsEn appends after the positional walk.
+    // Every parsed id reached the built table. Pin the named additions outside
+    // the positional walk so new content cannot silently shift existing rows.
     for (const id of ids) expect(rows[id], `${id} missing from the built table`).toBeTruthy();
-    expect(Object.keys(rows).length - ids.length).toBe(3);
+    const positional = new Set(ids);
+    expect(
+      Object.keys(rows)
+        .filter((id) => !positional.has(id))
+        .sort(),
+    ).toEqual([
+      'conjured_bread4',
+      'conjured_water4',
+      'membership_chest',
+      'membership_feet',
+      'membership_gloves',
+      'membership_helmet',
+      'membership_legs',
+      'membership_shoulder',
+      'membership_token',
+      'membership_waist',
+      'soul_stone',
+    ]);
   });
 
   it('every position pairs with its own item, not its neighbour', () => {

@@ -13,6 +13,68 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  // Membership additions: same-change non-Latin coverage (M16).
+  'hudChrome.wocStore.subscription.benefitsTitle': '有効なメンバーシップの特典',
+  'hudChrome.wocStore.subscription.benefitBank':
+    'どの銀行員からでも、ほかのキャラクターの銀行を利用できます。',
+  'hudChrome.wocStore.subscription.benefitSlots': 'キャラクター枠を10個追加で解放します。',
+  'hudChrome.wocStore.subscription.benefitArmour':
+    'クラスと専門化に合った能力値を持つ魂縛の防具を受け取れます。レベルに合わせて成長し、レベル20でアイテムレベル25になります。全身に装備すると獲得経験値が20%増加します。',
+  'hudChrome.wocStore.subscription.benefitTax': 'オークションの通常の手数料が半額になります。',
+  'hudChrome.wocStore.subscription.benefitExpiry':
+    'メンバーシップが切れると、追加枠のキャラクターと防具の特典は更新するまで利用できなくなります。基本枠のキャラクターは引き続き遊べます。',
+  'character.membershipRequired': 'このキャラクターで遊ぶにはメンバーシップを更新してください。',
+  'character.membershipSlots': 'メンバーシップでキャラクター枠を解放',
+  'character.emptySlot': '利用可能なキャラクター枠',
+  'hudChrome.bank.accountTab': 'ほかのキャラクター',
+  'hudChrome.bank.accountArmour': 'メンバーシップ防具を受け取る',
+  'hudChrome.bank.accountMembership':
+    'メンバーシップが有効な間、ここからほかのキャラクターの銀行を利用できます。',
+  'hudChrome.bank.accountCharacters': 'キャラクターの銀行',
+  'hudChrome.bank.accountEmpty': '別のキャラクターを作成すると、その銀行をここで利用できます。',
+  'hudChrome.bank.accountSelect': 'キャラクターを選んで銀行を読み込んでください。',
+  'hudChrome.bank.accountUnavailable':
+    'この銀行は利用できません。キャラクターを選び直して更新してください。',
+  'hudChrome.bank.accountDeposit': '自分のバッグ：この銀行に預ける',
+  'hudChrome.bank.accountWithdraw': '選択中の銀行：自分のバッグに引き出す',
+  'hudChrome.bank.accountDepositHint':
+    'クリックすると、このスタックを選択中のキャラクターの銀行に預けます。',
+  'hudChrome.bank.accountWithdrawHint':
+    'クリックすると、このスタックを自分のバッグに引き出します。',
+  'hudChrome.bank.accountBound':
+    '魂縛、ロック済み、クエスト用のアイテムはキャラクター間で移動できません。',
+  'hudChrome.wocStore.subscription.tokenTitle': '取引可能なメンバーシップトークン',
+  'hudChrome.wocStore.subscription.tokenTerms':
+    '{price}の一括払いで30日分。このキャラクターに郵便で届きます。使用してメンバーシップ期間を追加するか、オークションで売却できます。',
+  'hudChrome.wocStore.subscription.tokenBuy': 'メンバーシップトークンを購入',
+  'hudChrome.wocStore.subscription.tokenClaim': '購入したトークンを受け取る',
+  'hudChrome.wocStore.subscription.tokenPending':
+    '支払い後、このキャラクターに戻ってトークンを受け取ってください。支払い処理中の場合は、少し待ってから再試行してください。',
+  'hudChrome.wocStore.subscription.tokenDelivered': 'トークンが郵便で届きました。',
+  'itemUi.tooltip.membershipToken':
+    '使用：このトークンを消費し、アカウントのメンバーシップ期間に{days}日を追加します。残りの期間は失われません。使用前なら取引やオークションでの売却が可能です。',
+  'itemUi.tooltip.membershipAdaptive': '能力値と防具の種類がクラスと専門化に合わせて変わります。',
+  'itemUi.tooltip.membershipScaling':
+    'アイテムレベルは自分のレベルに合わせて上がります。レベル20になると完成し、アイテムレベル25になります。',
+  'itemUi.tooltip.membershipPerfected': '完成：アイテムレベル{level}。',
+  'itemUi.tooltip.membershipFullSet':
+    'メンバーシップ防具を全{pieces}部位装備すると、獲得経験値が{percent}%増加します。有効なメンバーシップが必要です。',
+  'itemUi.tooltip.membershipRequired':
+    'メンバーシップが切れると防具の能力値とセット効果は無効になり、更新すると再び有効になります。',
+  'itemUi.tooltip.membershipDormant':
+    '無効：メンバーシップを更新すると、防具の能力値とセット効果が戻ります。',
+  'entities.items.membership_token.name': 'メンバーシップトークン（30日）',
+  'entities.items.membership_helmet.name': 'メンバーシップの兜',
+  'entities.items.membership_shoulder.name': 'メンバーシップの肩当て',
+  'entities.items.membership_chest.name': 'メンバーシップの胸当て',
+  'entities.items.membership_waist.name': 'メンバーシップの腰帯',
+  'entities.items.membership_legs.name': 'メンバーシップの脚甲',
+  'entities.items.membership_gloves.name': 'メンバーシップの手甲',
+  'entities.items.membership_feet.name': 'メンバーシップの長靴',
+  'entities.letters.membership_token_delivery.sender': 'レイヴンポスト',
+  'entities.letters.membership_token_delivery.subject': 'メンバーシップトークンのお届け',
+  'entities.letters.membership_token_delivery.body':
+    '購入したトークンを同封しました。使用するとアカウントのメンバーシップ期間に30日が追加されます。ほかの冒険者と取引することもできます。',
   'hudChrome.wocStore.subscription.title': 'ゲームの定期購入',
   'hudChrome.wocStore.subscription.price': '月額 {price}',
   'hudChrome.wocStore.subscription.terms':
@@ -19635,4 +19697,27 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_balance.bonus2': '絡み根の詠唱時間が0.5秒短縮される。',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '絡み根を詠唱すると、移動しながら詠唱でき、移動速度が4秒間20%上昇する。20秒に1回しか発生しない。',
+  'hudChrome.wocStore.subscription.monthlyTitle': '月額メンバーシップ',
+  'hudChrome.wocStore.subscription.annualTitle': '12か月メンバーシップセット',
+  'hudChrome.wocStore.subscription.annualPrice': '12か月分を一括で{price}',
+  'hudChrome.wocStore.subscription.annualTerms':
+    '同じ料金で毎年更新されます。Stripeで法定通貨を使ってお支払いください。請求設定で解約できます。',
+  'hudChrome.wocStore.subscription.paidReward':
+    '支払いのたびに{value}相当のClaudiumを{amount}獲得します。無料体験中はClaudiumを獲得できません。',
+  'hudChrome.wocStore.subscription.annualMount':
+    '支払い後、購入したキャラクターで郵便から魂に縛られた戦車の鍵を受け取れます。戦車はセット用騎乗動物の仮モデルです。',
+  'hudChrome.wocStore.subscription.trialTerms':
+    '1アカウントにつき1回、{days}日間無料で体験できます。支払い方法の登録が必要です。解約しない場合、体験終了時に{price}が請求されます。体験中はClaudiumやセットの騎乗動物を獲得できません。',
+  'hudChrome.wocStore.subscription.startTrial': '7日間の無料体験を開始',
+  'hudChrome.wocStore.subscription.annualClaim': 'セットの騎乗動物を受け取る',
+  'hudChrome.wocStore.subscription.annualPending':
+    '支払い後、購入したキャラクターに戻って騎乗動物を受け取ってください。支払い処理中や無料体験中の場合は、課金後に再試行してください。',
+  'hudChrome.wocStore.subscription.annualDelivered': 'セットの騎乗動物の鍵が郵便で届きました。',
+  'hudChrome.wocStore.subscription.resumeCheckout': '購入手続きを再開',
+  'entities.letters.membership_annual_reward.sender': 'レイヴンポスト',
+  'entities.letters.membership_annual_reward.subject': '年間メンバーシップの騎乗動物',
+  'entities.letters.membership_annual_reward.body':
+    '年間メンバーシップの支払いが完了しました。戦車の鍵を同封しました。所有するには鍵をバッグか銀行に保管してください。メンバーシップが終了しても所有権は維持されます。騎乗スキルが必要です。',
+  'hudChrome.wocStore.subscription.checkoutClosed':
+    'この購入手続きは終了しており、未受領の特典はありません。メンバーシッププランをもう一度選び、新しい購入手続きを開始してください。',
 };

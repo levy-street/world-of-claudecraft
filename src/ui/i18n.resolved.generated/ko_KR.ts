@@ -828,6 +828,31 @@ export const ko_KR: EnTranslations = {
     "wocStore": {
       "subscription": {
         "title": "게임 정기 구독",
+        "monthlyTitle": "월간 멤버십",
+        "annualTitle": "12개월 멤버십 묶음",
+        "annualPrice": "12개월 이용료 {price} 선불",
+        "annualTerms": "같은 가격으로 매년 갱신됩니다. Stripe에서 법정 화폐로 결제하세요. 결제 설정에서 취소할 수 있습니다.",
+        "paidReward": "결제할 때마다 {value} 상당의 Claudium {amount}개를 받습니다. 무료 체험 중에는 Claudium이 지급되지 않습니다.",
+        "annualMount": "결제 후 구매한 캐릭터로 우편에서 영혼 귀속 전차 탈것 열쇠를 받으세요. 전차는 묶음 탈것의 임시 모델입니다.",
+        "trialTerms": "계정당 한 번 {days}일간 무료로 체험하세요. 결제 수단 등록이 필요합니다. 취소하지 않으면 체험 종료 시 {price}가 청구됩니다. 체험 중에는 Claudium이나 묶음 탈것이 지급되지 않습니다.",
+        "startTrial": "7일 무료 체험 시작",
+        "resumeCheckout": "결제 계속하기",
+        "checkoutClosed": "이 결제는 종료되었으며 미수령 보상이 없습니다. 멤버십 요금제를 다시 선택하여 새 결제를 시작하세요.",
+        "annualClaim": "묶음 탈것 받기",
+        "annualPending": "결제 후 구매한 캐릭터로 돌아와 탈것을 받으세요. 결제 처리 중이거나 체험 중이면 유료 결제가 완료된 뒤 다시 시도하세요.",
+        "annualDelivered": "묶음 탈것 열쇠가 우편으로 배송되었습니다.",
+        "tokenTitle": "거래 가능한 멤버십 토큰",
+        "benefitsTitle": "활성 멤버십 혜택",
+        "benefitBank": "어느 은행원에게서든 다른 캐릭터의 은행을 이용할 수 있습니다.",
+        "benefitSlots": "캐릭터 슬롯 10개를 추가로 잠금 해제합니다.",
+        "benefitArmour": "직업과 전문화에 맞는 능력치를 지닌 귀속 방어구를 받으세요. 캐릭터 레벨에 따라 성장하며 20레벨에 아이템 레벨 25가 됩니다. 전체 세트를 착용하면 경험치 획득량이 20% 증가합니다.",
+        "benefitTax": "경매장 수수료가 일반 수수료의 절반으로 줄어듭니다.",
+        "benefitExpiry": "멤버십이 만료되면 추가 슬롯의 캐릭터와 방어구 보너스가 갱신할 때까지 잠깁니다. 기본 슬롯의 캐릭터는 계속 플레이할 수 있습니다.",
+        "tokenTerms": "{price}를 한 번 결제하면 30일 이용권을 받습니다. 이 캐릭터에게 우편으로 전달됩니다. 사용하여 멤버십 기간을 추가하거나 경매장에서 판매하세요.",
+        "tokenBuy": "멤버십 토큰 구매",
+        "tokenClaim": "구매한 토큰 받기",
+        "tokenPending": "결제 후 이 캐릭터로 돌아와 토큰을 받으세요. 결제가 아직 처리 중이면 잠시 후 다시 시도하세요.",
+        "tokenDelivered": "토큰이 우편으로 전달되었습니다.",
         "price": "월 {price}",
         "terms": "매월 자동 갱신됩니다. Stripe에서 법정 화폐로 결제하세요. 결제 설정에서 취소할 수 있습니다.",
         "subscribe": "구독하기",
@@ -4900,6 +4925,18 @@ export const ko_KR: EnTranslations = {
       "vaultCannotDeposit": "보관소에 넣을 수 없습니다",
       "tabsAria": "은행 탭",
       "personalTab": "개인",
+      "accountTab": "다른 캐릭터",
+      "accountArmour": "멤버십 방어구 받기",
+      "accountMembership": "멤버십이 활성화되어 있으면 여기서 다른 캐릭터의 은행을 이용할 수 있습니다.",
+      "accountCharacters": "캐릭터 은행",
+      "accountEmpty": "다른 캐릭터를 만들면 여기서 해당 캐릭터의 은행을 이용할 수 있습니다.",
+      "accountSelect": "은행을 불러올 캐릭터를 선택하세요.",
+      "accountUnavailable": "이 은행을 이용할 수 없습니다. 캐릭터를 다시 선택하여 새로고침하세요.",
+      "accountDeposit": "내 가방: 이 은행에 보관",
+      "accountWithdraw": "선택한 은행: 내 가방으로 인출",
+      "accountDepositHint": "클릭하면 이 묶음을 선택한 캐릭터의 은행에 보관합니다.",
+      "accountWithdrawHint": "클릭하면 이 묶음을 내 가방으로 인출합니다.",
+      "accountBound": "귀속 아이템, 잠긴 아이템, 퀘스트 아이템은 캐릭터 간에 이동할 수 없습니다.",
       "guildTab": "길드",
       "guildCapacityAria": "사용 중인 길드 은행 칸: {total}칸 중 {used}칸",
       "guildEmpty": "길드 은행이 비어 있습니다.",
@@ -11238,6 +11275,9 @@ export const ko_KR: EnTranslations = {
   "character": {
     "loading": "불러오는 중...",
     "noneYet": "아직 캐릭터가 없습니다. 아래에서 하나를 만드세요.",
+    "membershipRequired": "이 캐릭터로 플레이하려면 멤버십을 갱신하세요.",
+    "membershipSlots": "멤버십으로 캐릭터 슬롯 잠금 해제",
+    "emptySlot": "사용 가능한 캐릭터 슬롯",
     "levelClass": "{level}레벨 {className}",
     "inWorld": "세계에 있음",
     "takeOver": "넘겨받기",
@@ -12773,6 +12813,13 @@ export const ko_KR: EnTranslations = {
       "parry": "무기 막기"
     },
     "tooltip": {
+      "membershipToken": "사용: 이 토큰을 소모하여 계정의 멤버십 기간에 {days}일을 추가합니다. 남은 멤버십 기간은 유지됩니다. 사용 전에는 거래하거나 경매장에서 판매할 수 있습니다.",
+      "membershipAdaptive": "능력치와 방어구가 직업 및 전문화에 맞게 바뀝니다.",
+      "membershipScaling": "아이템 레벨이 캐릭터 레벨에 맞춰 증가합니다. 20레벨에 도달하면 방어구가 완성되어 아이템 레벨이 25가 됩니다.",
+      "membershipPerfected": "완성됨: 아이템 레벨 {level}.",
+      "membershipFullSet": "멤버십 방어구 {pieces}부위를 모두 착용하면 경험치 획득량이 {percent}% 증가합니다. 활성 멤버십이 필요합니다.",
+      "membershipRequired": "멤버십이 만료되면 방어구 능력치와 세트 효과가 비활성화되며, 갱신하면 다시 활성화됩니다.",
+      "membershipDormant": "비활성: 멤버십을 갱신하면 방어구 능력치와 세트 효과가 복구됩니다.",
       "qualityKind": "{quality} {kind}",
       "currentlyEquipped": "현재 착용 중",
       "ifYouEquip": "이것을 착용하면",
@@ -18471,6 +18518,30 @@ export const ko_KR: EnTranslations = {
       "vanguard_warstaff": {
         "name": "선봉대의 전투지팡이"
       },
+      "membership_token": {
+        "name": "멤버십 토큰 (30일)"
+      },
+      "membership_helmet": {
+        "name": "멤버십 투구"
+      },
+      "membership_shoulder": {
+        "name": "멤버십 견갑"
+      },
+      "membership_chest": {
+        "name": "멤버십 흉갑"
+      },
+      "membership_waist": {
+        "name": "멤버십 허리띠"
+      },
+      "membership_legs": {
+        "name": "멤버십 다리보호구"
+      },
+      "membership_gloves": {
+        "name": "멤버십 건틀릿"
+      },
+      "membership_feet": {
+        "name": "멤버십 장화"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },
@@ -23951,6 +24022,16 @@ export const ko_KR: EnTranslations = {
         "sender": "거래소 중개인",
         "subject": "거래소 구매 물품",
         "body": "거래가 정산되어 물품은 이제 당신의 것입니다. 동봉된 소포에는 당신이 값을 치른 바로 그 물건이 들어 있습니다. 등록된 순간부터 대금이 정산될 때까지 거래소가 보관해 왔습니다.\n\n이 거래의 기록은 거래소 장부에 남습니다.\n\n- 거래소 중개인"
+      },
+      "membership_token_delivery": {
+        "sender": "레이븐포스트",
+        "subject": "멤버십 토큰 배송",
+        "body": "구매하신 토큰을 동봉했습니다. 사용하면 계정의 멤버십 기간에 30일이 추가되며, 다른 모험가와 거래할 수도 있습니다."
+      },
+      "membership_annual_reward": {
+        "sender": "까마귀 우편",
+        "subject": "연간 멤버십 탈것",
+        "body": "연간 멤버십 결제가 완료되었습니다. 전차 탈것 열쇠가 동봉되어 있습니다. 탈것을 소유하려면 열쇠를 가방이나 은행에 보관하세요. 멤버십이 만료되어도 소유권은 유지됩니다. 타기 기술이 필요합니다."
       },
       "woc_market_return": {
         "sender": "거래소 중개인",

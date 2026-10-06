@@ -9,7 +9,7 @@ import type { Entity } from '../src/sim/types';
 
 type IdentitySlice = Pick<
   Entity,
-  'guild' | 'pledgeGuild' | 'guildTier' | 'title' | 'border' | 'specId'
+  'guild' | 'pledgeGuild' | 'guildTier' | 'title' | 'border' | 'specId' | 'membershipActive'
 >;
 
 const encode = (slice: IdentitySlice): Record<string, unknown> => {
@@ -26,6 +26,7 @@ const NONE: IdentitySlice = {
   title: null,
   border: null,
   specId: null,
+  membershipActive: false,
 };
 
 describe('player identity wire', () => {
@@ -43,6 +44,7 @@ describe('player identity wire', () => {
         title: 'deed_title',
         border: 'deed_border',
         specId: 'holy',
+        membershipActive: false,
       }),
     ).toEqual({
       gd: 'Order of Dawn',
@@ -65,6 +67,7 @@ describe('player identity wire', () => {
       title: 'deed_title',
       border: 'deed_border',
       specId: 'restoration',
+      membershipActive: true,
     };
     expect(decodePlayerIdentityWire(encode(full))).toEqual(full);
     const pledged: IdentitySlice = { ...NONE, pledgeGuild: 'Dawnwardens', guildTier: 1 };
@@ -75,6 +78,14 @@ describe('player identity wire', () => {
     const specced = decodePlayerIdentityWire(encode({ ...NONE, specId: 'arms' }));
     expect(specced.specId).toBe('arms');
     expect(decodePlayerIdentityWire(encode({ ...NONE, specId: null })).specId).toBeNull();
+  });
+
+  it('shows worn membership benefits to peers and clears them on expiry', () => {
+    expect(encode({ ...NONE, membershipActive: true })).toEqual({ mba: true });
+    expect(decodePlayerIdentityWire({ mba: true }).membershipActive).toBe(true);
+    for (const mba of [undefined, false, 1, 'true']) {
+      expect(decodePlayerIdentityWire({ mba }).membershipActive).toBe(false);
+    }
   });
 
   it('reads a malformed spec value as no spec rather than printing it', () => {

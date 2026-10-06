@@ -19,10 +19,12 @@ export interface PlayerIdentityWire {
   title: string | null;
   border: string | null;
   specId: string | null;
+  membershipActive: boolean;
 }
 
 export function decodePlayerIdentityWire(w: Record<string, unknown>): PlayerIdentityWire {
   return {
+    membershipActive: w.mba === true,
     guild: (w.gd as string | undefined) ?? '',
     pledgeGuild: (w.pg as string | undefined) ?? '',
     guildTier: (w.gt as number | undefined) ?? 0,

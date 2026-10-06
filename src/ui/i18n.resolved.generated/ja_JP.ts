@@ -828,6 +828,31 @@ export const ja_JP: EnTranslations = {
     "wocStore": {
       "subscription": {
         "title": "ゲームの定期購入",
+        "monthlyTitle": "月額メンバーシップ",
+        "annualTitle": "12か月メンバーシップセット",
+        "annualPrice": "12か月分を一括で{price}",
+        "annualTerms": "同じ料金で毎年更新されます。Stripeで法定通貨を使ってお支払いください。請求設定で解約できます。",
+        "paidReward": "支払いのたびに{value}相当のClaudiumを{amount}獲得します。無料体験中はClaudiumを獲得できません。",
+        "annualMount": "支払い後、購入したキャラクターで郵便から魂に縛られた戦車の鍵を受け取れます。戦車はセット用騎乗動物の仮モデルです。",
+        "trialTerms": "1アカウントにつき1回、{days}日間無料で体験できます。支払い方法の登録が必要です。解約しない場合、体験終了時に{price}が請求されます。体験中はClaudiumやセットの騎乗動物を獲得できません。",
+        "startTrial": "7日間の無料体験を開始",
+        "resumeCheckout": "購入手続きを再開",
+        "checkoutClosed": "この購入手続きは終了しており、未受領の特典はありません。メンバーシッププランをもう一度選び、新しい購入手続きを開始してください。",
+        "annualClaim": "セットの騎乗動物を受け取る",
+        "annualPending": "支払い後、購入したキャラクターに戻って騎乗動物を受け取ってください。支払い処理中や無料体験中の場合は、課金後に再試行してください。",
+        "annualDelivered": "セットの騎乗動物の鍵が郵便で届きました。",
+        "tokenTitle": "取引可能なメンバーシップトークン",
+        "benefitsTitle": "有効なメンバーシップの特典",
+        "benefitBank": "どの銀行員からでも、ほかのキャラクターの銀行を利用できます。",
+        "benefitSlots": "キャラクター枠を10個追加で解放します。",
+        "benefitArmour": "クラスと専門化に合った能力値を持つ魂縛の防具を受け取れます。レベルに合わせて成長し、レベル20でアイテムレベル25になります。全身に装備すると獲得経験値が20%増加します。",
+        "benefitTax": "オークションの通常の手数料が半額になります。",
+        "benefitExpiry": "メンバーシップが切れると、追加枠のキャラクターと防具の特典は更新するまで利用できなくなります。基本枠のキャラクターは引き続き遊べます。",
+        "tokenTerms": "{price}の一括払いで30日分。このキャラクターに郵便で届きます。使用してメンバーシップ期間を追加するか、オークションで売却できます。",
+        "tokenBuy": "メンバーシップトークンを購入",
+        "tokenClaim": "購入したトークンを受け取る",
+        "tokenPending": "支払い後、このキャラクターに戻ってトークンを受け取ってください。支払い処理中の場合は、少し待ってから再試行してください。",
+        "tokenDelivered": "トークンが郵便で届きました。",
         "price": "月額 {price}",
         "terms": "毎月自動更新されます。Stripe で法定通貨によるお支払いができます。請求設定から解約できます。",
         "subscribe": "定期購入する",
@@ -4900,6 +4925,18 @@ export const ja_JP: EnTranslations = {
       "vaultCannotDeposit": "保管庫には預けられません",
       "tabsAria": "銀行タブ",
       "personalTab": "個人",
+      "accountTab": "ほかのキャラクター",
+      "accountArmour": "メンバーシップ防具を受け取る",
+      "accountMembership": "メンバーシップが有効な間、ここからほかのキャラクターの銀行を利用できます。",
+      "accountCharacters": "キャラクターの銀行",
+      "accountEmpty": "別のキャラクターを作成すると、その銀行をここで利用できます。",
+      "accountSelect": "キャラクターを選んで銀行を読み込んでください。",
+      "accountUnavailable": "この銀行は利用できません。キャラクターを選び直して更新してください。",
+      "accountDeposit": "自分のバッグ：この銀行に預ける",
+      "accountWithdraw": "選択中の銀行：自分のバッグに引き出す",
+      "accountDepositHint": "クリックすると、このスタックを選択中のキャラクターの銀行に預けます。",
+      "accountWithdrawHint": "クリックすると、このスタックを自分のバッグに引き出します。",
+      "accountBound": "魂縛、ロック済み、クエスト用のアイテムはキャラクター間で移動できません。",
       "guildTab": "ギルド",
       "guildCapacityAria": "使用中のギルド銀行スロット: {total}個中{used}個",
       "guildEmpty": "ギルド銀行は空です。",
@@ -11238,6 +11275,9 @@ export const ja_JP: EnTranslations = {
   "character": {
     "loading": "読み込み中...",
     "noneYet": "まだキャラクターがいません。下で作成してください。",
+    "membershipRequired": "このキャラクターで遊ぶにはメンバーシップを更新してください。",
+    "membershipSlots": "メンバーシップでキャラクター枠を解放",
+    "emptySlot": "利用可能なキャラクター枠",
     "levelClass": "レベル{level} {className}",
     "inWorld": "世界にいます",
     "takeOver": "引き継ぐ",
@@ -12773,6 +12813,13 @@ export const ja_JP: EnTranslations = {
       "parry": "受け流し"
     },
     "tooltip": {
+      "membershipToken": "使用：このトークンを消費し、アカウントのメンバーシップ期間に{days}日を追加します。残りの期間は失われません。使用前なら取引やオークションでの売却が可能です。",
+      "membershipAdaptive": "能力値と防具の種類がクラスと専門化に合わせて変わります。",
+      "membershipScaling": "アイテムレベルは自分のレベルに合わせて上がります。レベル20になると完成し、アイテムレベル25になります。",
+      "membershipPerfected": "完成：アイテムレベル{level}。",
+      "membershipFullSet": "メンバーシップ防具を全{pieces}部位装備すると、獲得経験値が{percent}%増加します。有効なメンバーシップが必要です。",
+      "membershipRequired": "メンバーシップが切れると防具の能力値とセット効果は無効になり、更新すると再び有効になります。",
+      "membershipDormant": "無効：メンバーシップを更新すると、防具の能力値とセット効果が戻ります。",
       "qualityKind": "{quality} {kind}",
       "currentlyEquipped": "現在の装備",
       "ifYouEquip": "これを装備すると",
@@ -18471,6 +18518,30 @@ export const ja_JP: EnTranslations = {
       "vanguard_warstaff": {
         "name": "ヴァンガードの戦杖"
       },
+      "membership_token": {
+        "name": "メンバーシップトークン（30日）"
+      },
+      "membership_helmet": {
+        "name": "メンバーシップの兜"
+      },
+      "membership_shoulder": {
+        "name": "メンバーシップの肩当て"
+      },
+      "membership_chest": {
+        "name": "メンバーシップの胸当て"
+      },
+      "membership_waist": {
+        "name": "メンバーシップの腰帯"
+      },
+      "membership_legs": {
+        "name": "メンバーシップの脚甲"
+      },
+      "membership_gloves": {
+        "name": "メンバーシップの手甲"
+      },
+      "membership_feet": {
+        "name": "メンバーシップの長靴"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },
@@ -23951,6 +24022,16 @@ export const ja_JP: EnTranslations = {
         "sender": "取引所仲買人",
         "subject": "取引所でのご購入品",
         "body": "取引は決済され、品物はあなたのものです。同封の小包には、あなたが代金を支払ったまさにその品が入っています。出品の瞬間から支払いが確定するまで、取引所が責任を持って預かっていました。\n\nこの取引の記録は取引所の台帳に残ります。\n\n- 取引所仲買人"
+      },
+      "membership_token_delivery": {
+        "sender": "レイヴンポスト",
+        "subject": "メンバーシップトークンのお届け",
+        "body": "購入したトークンを同封しました。使用するとアカウントのメンバーシップ期間に30日が追加されます。ほかの冒険者と取引することもできます。"
+      },
+      "membership_annual_reward": {
+        "sender": "レイヴンポスト",
+        "subject": "年間メンバーシップの騎乗動物",
+        "body": "年間メンバーシップの支払いが完了しました。戦車の鍵を同封しました。所有するには鍵をバッグか銀行に保管してください。メンバーシップが終了しても所有権は維持されます。騎乗スキルが必要です。"
       },
       "woc_market_return": {
         "sender": "取引所仲買人",
