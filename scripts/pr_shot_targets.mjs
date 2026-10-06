@@ -14361,14 +14361,21 @@ export const TARGETS = [
     // A warrior (the offline default) wears every armor weight, so the turn-in
     // shows every card with the spec default checked. The quest is forced ready
     // in the offline log (its collect items in the bags) and the player parked
-    // beside the marshal. The old-wolf variant shoots The Old Wolf, whose
-    // authored Greyjaw's Pelt Leggings sit in the same list as the band set.
+    // beside the quest's turn-in NPC (the marshal by default). The old-wolf
+    // variant shoots The Old Wolf, whose authored Greyjaw's Pelt Leggings sit in
+    // the same list as the band set; the olen variant a dungeon-boss quest, whose
+    // authored blue sits beside the rares generated for the other roles.
     variants: [
       { key: 'desktop', beforeLoad: lowGraphicsSeed },
       { key: 'compact', mobile: true, tier: 'compact', beforeLoad: lowGraphicsSeed },
       {
         key: 'old-wolf-desktop',
         quest: { id: 'q_greyjaw', counts: [1], collect: 'greyjaw_fang' },
+        beforeLoad: lowGraphicsSeed,
+      },
+      {
+        key: 'olen-desktop',
+        quest: { id: 'q_olen', counts: [1], npc: 'scout_maren' },
         beforeLoad: lowGraphicsSeed,
       },
     ],
@@ -14382,10 +14389,11 @@ export const TARGETS = [
         const game = window.__game;
         const sim = game?.sim;
         if (!sim) return { ok: false, reason: 'no sim' };
+        const npcId = quest.npc ?? 'marshal_redbrook';
         const marshal = [...sim.entities.values()].find(
-          (e) => e.kind === 'npc' && e.templateId === 'marshal_redbrook',
+          (e) => e.kind === 'npc' && e.templateId === npcId,
         );
-        if (!marshal) return { ok: false, reason: 'no marshal_redbrook entity' };
+        if (!marshal) return { ok: false, reason: `no ${npcId} entity` };
         if (quest.collect) sim.addItem(quest.collect, 1);
         sim.questLog.set(quest.id, { questId: quest.id, counts: quest.counts, state: 'ready' });
         const p = sim.player;

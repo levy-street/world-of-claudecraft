@@ -140,20 +140,46 @@ export function isOnRoleForSpec(
   );
 }
 
+const MAIN_STATS = ['str', 'agi', 'int'] as const;
+const ARMOR_RANK: Readonly<Record<string, number>> = { cloth: 0, leather: 1, mail: 2, plate: 3 };
+
+// The offense stat a stat line or weight table leads with.
+function leadStat(stats: Partial<Record<string, number>> | undefined): string | undefined {
+  let lead: string | undefined;
+  for (const stat of MAIN_STATS) {
+    if ((stats?.[stat] ?? 0) > (lead ? (stats?.[lead] ?? 0) : 0)) lead = stat;
+  }
+  return lead;
+}
+
+// Keep `pool` narrowed to the ids `keep` accepts, unless that accepts none.
+function narrow(pool: readonly string[], keep: (id: string) => boolean): readonly string[] {
+  const kept = pool.filter(keep);
+  return kept.length > 0 ? kept : pool;
+}
+
 /** The pick a turn-in that names no choice takes: the offered item that best fits
  *  the spec. Only on-role pieces are preselected (a feral cat is never handed the
- *  caster staff its archetype authored, though the staff stays on offer); a list
- *  with none falls back to the best of everything. */
+ *  caster staff its archetype authored, though the staff stays on offer); among
+ *  those, the pieces led by the spec's main stat, then the heaviest armor of them
+ *  (weapons ride along), so a warrior defaults to the mail piece rather than a
+ *  leather one that carries a point more Strength. Each step falls back to the
+ *  wider list when it would leave nothing. */
 export function defaultRewardChoice(
   quest: QuestDef,
   cls: PlayerClass,
   spec?: string | null,
 ): string | undefined {
   const offered = questRewardChoices(quest, cls);
-  const onRole = offered.filter((id) => isOnRoleForSpec(ITEMS[id], cls, spec));
+  const main = leadStat(specStatWeights(cls, spec));
+  let pool = narrow(offered, (id) => isOnRoleForSpec(ITEMS[id], cls, spec));
+  pool = narrow(pool, (id) => leadStat(ITEMS[id].stats) === main);
+  const rank = (id: string) => ARMOR_RANK[ITEMS[id].armorType ?? ''] ?? -1;
+  const heaviest = Math.max(...pool.map(rank));
+  pool = narrow(pool, (id) => !ITEMS[id].armorType || rank(id) === heaviest);
   let best: string | undefined;
   let bestScore = Number.NEGATIVE_INFINITY;
-  for (const id of onRole.length > 0 ? onRole : offered) {
+  for (const id of pool) {
     const score = specFitScore(ITEMS[id], cls, spec);
     if (score > bestScore) {
       best = id;

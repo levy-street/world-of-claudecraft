@@ -19189,6 +19189,234 @@ export const zh_TW: EnTranslations = {
       "highgale_cord": {
         "name": "高風腰繩"
       },
+      "breakwater_mantle": {
+        "name": "防波披肩"
+      },
+      "breakwater_shoulderpads": {
+        "name": "防波肩墊"
+      },
+      "breakwater_spaulders": {
+        "name": "防波肩鎧"
+      },
+      "gravebell_treads": {
+        "name": "墓鐘踏靴"
+      },
+      "gravebell_greaves": {
+        "name": "墓鐘脛甲"
+      },
+      "cryptbound_tunic": {
+        "name": "墓縛短衣"
+      },
+      "cryptbound_chainmail": {
+        "name": "墓縛鎖甲"
+      },
+      "oathbroken_leggings": {
+        "name": "背誓腿甲衣"
+      },
+      "oathbroken_breeches": {
+        "name": "背誓及膝褲"
+      },
+      "oathbroken_legwraps": {
+        "name": "背誓綁腿"
+      },
+      "oathbroken_legguards": {
+        "name": "背誓腿護"
+      },
+      "oathbroken_chausses": {
+        "name": "背誓腿甲"
+      },
+      "seamist_legwraps": {
+        "name": "海霧綁腿"
+      },
+      "seamist_chausses": {
+        "name": "海霧腿甲"
+      },
+      "warmonger_treads": {
+        "name": "戰狂踏靴"
+      },
+      "warmonger_greaves": {
+        "name": "戰狂脛甲"
+      },
+      "sparkglass_leggings": {
+        "name": "火花晶腿甲衣"
+      },
+      "sparkglass_breeches": {
+        "name": "火花晶及膝褲"
+      },
+      "sparkglass_legwraps": {
+        "name": "火花晶綁腿"
+      },
+      "sparkglass_legguards": {
+        "name": "火花晶腿護"
+      },
+      "sparkglass_chausses": {
+        "name": "火花晶腿甲"
+      },
+      "stillhymn_treads": {
+        "name": "寂詠踏靴"
+      },
+      "stillhymn_greaves": {
+        "name": "寂詠脛甲"
+      },
+      "pearlglow_headguard": {
+        "name": "珠輝護頭"
+      },
+      "pearlglow_coif": {
+        "name": "珠輝頭罩"
+      },
+      "sealkeeper_gloves": {
+        "name": "守印手套"
+      },
+      "sealkeeper_grips": {
+        "name": "守印掌套"
+      },
+      "sealkeeper_handwraps": {
+        "name": "守印裹手"
+      },
+      "sealkeeper_gauntlets": {
+        "name": "守印甲手"
+      },
+      "sealkeeper_handguards": {
+        "name": "守印護手"
+      },
+      "fetterbound_leggings": {
+        "name": "鐐縛腿甲衣"
+      },
+      "fetterbound_breeches": {
+        "name": "鐐縛及膝褲"
+      },
+      "fetterbound_legwraps": {
+        "name": "鐐縛綁腿"
+      },
+      "fetterbound_legguards": {
+        "name": "鐐縛腿護"
+      },
+      "fetterbound_chausses": {
+        "name": "鐐縛腿甲"
+      },
+      "shroudcaller_tunic": {
+        "name": "喚殮短衣"
+      },
+      "shroudcaller_chainmail": {
+        "name": "喚殮鎖甲"
+      },
+      "wyrmshadow_tunic": {
+        "name": "龍影短衣"
+      },
+      "wyrmshadow_chainmail": {
+        "name": "龍影鎖甲"
+      },
+      "cinderbrood_shoulderpads": {
+        "name": "燼巢肩墊"
+      },
+      "cinderbrood_shoulderguards": {
+        "name": "燼巢護肩"
+      },
+      "cinderbrood_pauldrons": {
+        "name": "燼巢肩甲"
+      },
+      "hoarfrost_mantle": {
+        "name": "白霜披肩"
+      },
+      "hoarfrost_shoulderpads": {
+        "name": "白霜肩墊"
+      },
+      "hoarfrost_spaulders": {
+        "name": "白霜肩鎧"
+      },
+      "blackmere_mantle": {
+        "name": "黑沼披肩"
+      },
+      "blackmere_shoulderpads": {
+        "name": "黑沼肩墊"
+      },
+      "blackmere_shoulderguards": {
+        "name": "黑沼護肩"
+      },
+      "blackmere_pauldrons": {
+        "name": "黑沼肩甲"
+      },
+      "blackmere_spaulders": {
+        "name": "黑沼肩鎧"
+      },
+      "reedhush_mantle": {
+        "name": "葦寂披肩"
+      },
+      "reedhush_shoulderpads": {
+        "name": "葦寂肩墊"
+      },
+      "reedhush_shoulderguards": {
+        "name": "葦寂護肩"
+      },
+      "reedhush_pauldrons": {
+        "name": "葦寂肩甲"
+      },
+      "reedhush_spaulders": {
+        "name": "葦寂肩鎧"
+      },
+      "cairnking_mantle": {
+        "name": "塚王披肩"
+      },
+      "cairnking_shoulderpads": {
+        "name": "塚王肩墊"
+      },
+      "cairnking_shoulderguards": {
+        "name": "塚王護肩"
+      },
+      "cairnking_pauldrons": {
+        "name": "塚王肩甲"
+      },
+      "cairnking_spaulders": {
+        "name": "塚王肩鎧"
+      },
+      "palehunt_mantle": {
+        "name": "蒼獵披肩"
+      },
+      "palehunt_shoulderpads": {
+        "name": "蒼獵肩墊"
+      },
+      "palehunt_shoulderguards": {
+        "name": "蒼獵護肩"
+      },
+      "palehunt_pauldrons": {
+        "name": "蒼獵肩甲"
+      },
+      "palehunt_spaulders": {
+        "name": "蒼獵肩鎧"
+      },
+      "jadeshrine_mantle": {
+        "name": "玉祠披肩"
+      },
+      "jadeshrine_shoulderpads": {
+        "name": "玉祠肩墊"
+      },
+      "jadeshrine_shoulderguards": {
+        "name": "玉祠護肩"
+      },
+      "jadeshrine_pauldrons": {
+        "name": "玉祠肩甲"
+      },
+      "jadeshrine_spaulders": {
+        "name": "玉祠肩鎧"
+      },
+      "gildhedge_mantle": {
+        "name": "金籬披肩"
+      },
+      "gildhedge_shoulderpads": {
+        "name": "金籬肩墊"
+      },
+      "gildhedge_spaulders": {
+        "name": "金籬肩鎧"
+      },
+      "saltwrack_mantle": {
+        "name": "鹽骸披肩"
+      },
+      "saltwrack_shoulderpads": {
+        "name": "鹽骸肩墊"
+      },
+      "saltwrack_spaulders": {
+        "name": "鹽骸肩鎧"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },

@@ -17,7 +17,8 @@ import { MAX_LEVEL, type PlayerClass, type QuestDef } from '../src/sim/types';
 // Every quest a player levels through offers a choose-one armor reward
 // (content/quest_choice_rewards.ts, from content/quest_leveling_gear.ts), so
 // every class gets a gear option on every quest, not only the archetype whose
-// fixed reward happens to fit.
+// fixed reward happens to fit. A quest that rewards a blue offers blues: its
+// authored piece plus a rare for every role that piece does not serve.
 
 const raidMobs = new Set(
   Object.values(DUNGEONS)
@@ -48,6 +49,13 @@ function levelingQuest(q: QuestDef): boolean {
   );
   return Math.max(q.minLevel ?? 0, ...sources) <= MAX_LEVEL;
 }
+
+const BLUE = new Set(['rare', 'epic', 'legendary']);
+// The authored per-archetype gear blues of a quest (QuestDef.itemRewards).
+const authoredBlues = (q: QuestDef) =>
+  [...new Set(Object.values(q.itemRewards))]
+    .map((id) => ITEMS[id as string])
+    .filter((i) => i?.slot !== undefined && BLUE.has(i.quality ?? ''));
 
 // The offense stat a weight table or a stat line leads with.
 function mainStat(stats: Partial<Record<string, number>>): 'str' | 'agi' | 'int' {
@@ -88,16 +96,52 @@ describe('choose-one leveling gear', () => {
         for (const spec of Object.keys(specs)) {
           const main = mainStat(specStatWeights(cls, spec));
           const offered = questRewardChoices(quest, cls);
-          // The band's own piece for the role is always on offer.
-          const bandPiece = offered.find(
-            (id) => QUEST_LEVELING_GEAR_ITEMS[id] && (ITEMS[id].stats?.[main] ?? 0) > 0,
+          // An on-role piece with the main stat is always on offer: the band's
+          // own piece for the role, or on a blue quest the authored blue or the
+          // rare generated for the role.
+          const fitting = offered.find(
+            (id) => (ITEMS[id].stats?.[main] ?? 0) > 0 && isOnRoleForSpec(ITEMS[id], cls, spec),
           );
           // And the preselected card never carries a stat the spec does not use.
           const pick = defaultRewardChoice(quest, cls, spec);
-          if (!bandPiece || !pick || !offered.includes(pick)) {
-            gaps.push(`${questId} ${cls}/${spec} offered ${bandPiece ?? 'nothing'}`);
+          if (!fitting || !pick || !offered.includes(pick)) {
+            gaps.push(`${questId} ${cls}/${spec} offered ${fitting ?? 'nothing'}`);
           } else if (!isOnRoleForSpec(ITEMS[pick], cls, spec)) {
             gaps.push(`${questId} ${cls}/${spec} defaults off-role to ${pick}`);
+          }
+        }
+      }
+    }
+    expect(gaps).toEqual([]);
+  });
+
+  it('preselects a blue with the main stat for every spec on a quest that rewards one', () => {
+    // Fairness on dungeon-boss and elite quests: a holy paladin or a feral druid
+    // handed their archetype's off-role blue still gets a rare at the quest's
+    // level, and nobody's default is a green.
+    const blueQuests = Object.keys(QUEST_CHOICE_REWARDS).filter(
+      (id) => authoredBlues(QUESTS[id]).length > 0,
+    );
+    expect(blueQuests.length).toBeGreaterThan(0);
+    const gaps: string[] = [];
+    for (const questId of blueQuests) {
+      const quest = QUESTS[questId];
+      // Only rares are generated for it, at the quest's own rare item level.
+      const floor = Math.min(...authoredBlues(quest).map((i) => itemLevel(i) ?? 0));
+      for (const id of QUEST_CHOICE_REWARDS[questId]) {
+        expect(ITEMS[id].quality, id).toBe('rare');
+        expect(itemLevel(ITEMS[id]) ?? 0, id).toBeGreaterThanOrEqual(floor);
+      }
+      for (const [cls, specs] of Object.entries(QUEST_REWARD_SPEC_WEIGHTS) as [
+        PlayerClass,
+        (typeof QUEST_REWARD_SPEC_WEIGHTS)[PlayerClass],
+      ][]) {
+        for (const spec of Object.keys(specs)) {
+          const pick = defaultRewardChoice(quest, cls, spec);
+          const item = pick ? ITEMS[pick] : undefined;
+          const main = mainStat(specStatWeights(cls, spec));
+          if (!item || !BLUE.has(item.quality ?? '') || !((item.stats?.[main] ?? 0) > 0)) {
+            gaps.push(`${questId} ${cls}/${spec} defaults to ${pick} (${item?.quality})`);
           }
         }
       }
@@ -140,7 +184,7 @@ describe('choose-one leveling gear', () => {
       expect(ilvl, `${item.id} item level`).toBeDefined();
       const check = checkStaminaModel(
         item.stats,
-        primaryStatBudget(ilvl ?? 0, 'uncommon', item.slot ?? 'chest'),
+        primaryStatBudget(ilvl ?? 0, item.quality, item.slot ?? 'chest'),
       );
       expect(check.onLine && check.meetsFloor, `${item.id} on its budget line`).toBe(true);
       expect(item.stats?.armor ?? 0, `${item.id} armor`).toBeGreaterThan(0);

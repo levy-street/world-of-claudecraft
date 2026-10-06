@@ -111,6 +111,33 @@ describe('choose-one quest rewards: the shared resolver', () => {
     expect(questRewardChoices(plain, 'warrior')).toEqual([]);
   });
 
+  it('gives every spec of a dungeon-boss quest a blue, the warrior its authored mail', () => {
+    // The Grand Necromancer authors a mail Strength chest (warrior archetype), a
+    // caster staff (mage) and an Agility leather chest (rogue); the generator adds
+    // the rares the paladin healer and the feral cat would otherwise lack. A
+    // warrior keeps the authored mail even though the Strength leather rare
+    // carries more Strength: the default prefers the heaviest armor among the
+    // pieces led by the spec's main stat.
+    const velkhar = QUESTS.q_velkhar;
+    const cases: [PlayerClass, string, string][] = [
+      ['warrior', 'arms', 'boneguard_breastplate'],
+      ['paladin', 'retribution', 'boneguard_breastplate'],
+      ['paladin', 'holy', 'shroudcaller_chainmail'],
+      ['shaman', 'elemental', 'shroudcaller_chainmail'],
+      ['druid', 'feral', 'shroudcaller_tunic'],
+      ['rogue', 'combat', 'shadowmeld_tunic'],
+      ['mage', 'frost', 'staff_of_velkhar'],
+    ];
+    for (const [cls, spec, expected] of cases) {
+      const pick = defaultRewardChoice(velkhar, cls, spec);
+      expect(pick, `${cls} ${spec}`).toBe(expected);
+      expect(ITEMS[pick ?? ''].quality, `${cls} ${spec}`).toBe('rare');
+    }
+    expect(ITEMS.shroudcaller_tunic.stats?.str ?? 0).toBeGreaterThan(
+      ITEMS.boneguard_breastplate.stats?.str ?? 0,
+    );
+  });
+
   it('keeps a non-gear authored reward fixed beside the choice', () => {
     const q = quest(CHOICES, { warrior: 'greyjaw_fang' });
     expect(ITEMS.greyjaw_fang.slot).toBeUndefined();

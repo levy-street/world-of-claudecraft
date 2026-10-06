@@ -1,6 +1,8 @@
 // Choose-one leveling rewards: quest id -> the five pieces it offers (cloth
 // caster, leather agility, leather strength, mail strength, mail caster) of one
-// armor slot from its level band's set (content/quest_leveling_gear.ts). Merged onto
+// armor slot from its level band's set (content/quest_leveling_gear.ts), or, on a
+// quest that rewards a blue, the rares for the roles that blue does not serve
+// (the blue itself joins the list through the resolver). Merged onto
 // QuestDef.choiceRewards by data.ts; the player is offered what their class can
 // wear (quests/quest_reward_choice.ts).
 //
@@ -53,11 +55,11 @@ export const QUEST_CHOICE_REWARDS: Readonly<Record<string, readonly string[]>> =
     'trailwarden_cord',
   ],
   q_af_the_meredark: [
-    'highgale_robe',
-    'highgale_jerkin',
-    'highgale_tunic',
-    'highgale_hauberk',
-    'highgale_chainmail',
+    'blackmere_mantle',
+    'blackmere_shoulderpads',
+    'blackmere_shoulderguards',
+    'blackmere_pauldrons',
+    'blackmere_spaulders',
   ],
   q_af_what_took_the_moorings: [
     'highgale_sash',
@@ -186,11 +188,9 @@ export const QUEST_CHOICE_REWARDS: Readonly<Record<string, readonly string[]>> =
     'trailwarden_coif',
   ],
   q_dk_matriarch_of_the_maw: [
-    'highgale_hood',
-    'highgale_cap',
-    'highgale_headguard',
-    'highgale_helm',
-    'highgale_coif',
+    'cinderbrood_shoulderpads',
+    'cinderbrood_shoulderguards',
+    'cinderbrood_pauldrons',
   ],
   q_dk_scales_of_the_maw: [
     'highgale_slippers',
@@ -220,13 +220,7 @@ export const QUEST_CHOICE_REWARDS: Readonly<Record<string, readonly string[]>> =
     'hollowveil_sabatons',
     'hollowveil_greaves',
   ],
-  q_drogmar: [
-    'hollowveil_slippers',
-    'hollowveil_boots',
-    'hollowveil_treads',
-    'hollowveil_sabatons',
-    'hollowveil_greaves',
-  ],
+  q_drogmar: ['warmonger_treads', 'warmonger_greaves'],
   q_drowned: [
     'bogwalker_sash',
     'bogwalker_belt',
@@ -248,13 +242,7 @@ export const QUEST_CHOICE_REWARDS: Readonly<Record<string, readonly string[]>> =
     'thornspire_girdle',
     'thornspire_cord',
   ],
-  q_drowned_moon: [
-    'hollowveil_hood',
-    'hollowveil_cap',
-    'hollowveil_headguard',
-    'hollowveil_helm',
-    'hollowveil_coif',
-  ],
+  q_drowned_moon: ['pearlglow_headguard', 'pearlglow_coif'],
   q_eg_bloom_clippings: [
     'highgale_robe',
     'highgale_jerkin',
@@ -262,13 +250,7 @@ export const QUEST_CHOICE_REWARDS: Readonly<Record<string, readonly string[]>> =
     'highgale_hauberk',
     'highgale_chainmail',
   ],
-  q_eg_bull_of_the_court: [
-    'highgale_slippers',
-    'highgale_boots',
-    'highgale_treads',
-    'highgale_sabatons',
-    'highgale_greaves',
-  ],
+  q_eg_bull_of_the_court: ['gildhedge_mantle', 'gildhedge_shoulderpads', 'gildhedge_spaulders'],
   q_eg_four_statues: [
     'highgale_leggings',
     'highgale_breeches',
@@ -388,13 +370,7 @@ export const QUEST_CHOICE_REWARDS: Readonly<Record<string, readonly string[]>> =
     'brookwatch_girdle',
     'brookwatch_cord',
   ],
-  q_fs_the_great_break: [
-    'hedgerow_gloves',
-    'hedgerow_grips',
-    'hedgerow_handwraps',
-    'hedgerow_gauntlets',
-    'hedgerow_handguards',
-  ],
+  q_fs_the_great_break: ['breakwater_mantle', 'breakwater_shoulderpads', 'breakwater_spaulders'],
   q_fs_the_three_bells: [
     'brookwatch_leggings',
     'brookwatch_breeches',
@@ -416,13 +392,7 @@ export const QUEST_CHOICE_REWARDS: Readonly<Record<string, readonly string[]>> =
     'trailwarden_hauberk',
     'trailwarden_chainmail',
   ],
-  q_fv_frostmane_tyrant: [
-    'highgale_mantle',
-    'highgale_shoulderpads',
-    'highgale_shoulderguards',
-    'highgale_pauldrons',
-    'highgale_spaulders',
-  ],
+  q_fv_frostmane_tyrant: ['hoarfrost_mantle', 'hoarfrost_shoulderpads', 'hoarfrost_spaulders'],
   q_fv_howl_above: [
     'highgale_gloves',
     'highgale_grips',
@@ -528,13 +498,7 @@ export const QUEST_CHOICE_REWARDS: Readonly<Record<string, readonly string[]>> =
     'highgale_hauberk',
     'highgale_chainmail',
   ],
-  q_gc_the_wreck_warden: [
-    'highgale_slippers',
-    'highgale_boots',
-    'highgale_treads',
-    'highgale_sabatons',
-    'highgale_greaves',
-  ],
+  q_gc_the_wreck_warden: ['saltwrack_mantle', 'saltwrack_shoulderpads', 'saltwrack_spaulders'],
   q_gc_wind_against_the_wick: [
     'highgale_sash',
     'highgale_belt',
@@ -577,13 +541,7 @@ export const QUEST_CHOICE_REWARDS: Readonly<Record<string, readonly string[]>> =
     'brookwatch_pauldrons',
     'brookwatch_spaulders',
   ],
-  q_gravewyrm: [
-    'highgale_slippers',
-    'highgale_boots',
-    'highgale_treads',
-    'highgale_sabatons',
-    'highgale_greaves',
-  ],
+  q_gravewyrm: ['wyrmshadow_tunic', 'wyrmshadow_chainmail'],
   q_greyjaw: [
     'brookwatch_sash',
     'brookwatch_belt',
@@ -612,13 +570,7 @@ export const QUEST_CHOICE_REWARDS: Readonly<Record<string, readonly string[]>> =
     'bogwalker_sabatons',
     'bogwalker_greaves',
   ],
-  q_hollow: [
-    'bogwalker_hood',
-    'bogwalker_cap',
-    'bogwalker_headguard',
-    'bogwalker_helm',
-    'bogwalker_coif',
-  ],
+  q_hollow: ['cryptbound_tunic', 'cryptbound_chainmail'],
   q_hollow_first_of_the_herd: [
     'hollowveil_sash',
     'hollowveil_belt',
@@ -662,11 +614,11 @@ export const QUEST_CHOICE_REWARDS: Readonly<Record<string, readonly string[]>> =
     'bogwalker_greaves',
   ],
   q_kazzix: [
-    'hollowveil_sash',
-    'hollowveil_belt',
-    'hollowveil_waistguard',
-    'hollowveil_girdle',
-    'hollowveil_cord',
+    'sparkglass_leggings',
+    'sparkglass_breeches',
+    'sparkglass_legwraps',
+    'sparkglass_legguards',
+    'sparkglass_chausses',
   ],
   q_kobold_tunnels: [
     'thornspire_robe',
@@ -676,11 +628,11 @@ export const QUEST_CHOICE_REWARDS: Readonly<Record<string, readonly string[]>> =
     'thornspire_chainmail',
   ],
   q_korgath: [
-    'highgale_robe',
-    'highgale_jerkin',
-    'highgale_tunic',
-    'highgale_hauberk',
-    'highgale_chainmail',
+    'fetterbound_leggings',
+    'fetterbound_breeches',
+    'fetterbound_legwraps',
+    'fetterbound_legguards',
+    'fetterbound_chausses',
   ],
   q_mine: [
     'hedgerow_robe',
@@ -689,13 +641,7 @@ export const QUEST_CHOICE_REWARDS: Readonly<Record<string, readonly string[]>> =
     'hedgerow_hauberk',
     'hedgerow_chainmail',
   ],
-  q_mistcaller: [
-    'thornspire_leggings',
-    'thornspire_breeches',
-    'thornspire_legwraps',
-    'thornspire_legguards',
-    'thornspire_chausses',
-  ],
+  q_mistcaller: ['seamist_legwraps', 'seamist_chausses'],
   q_mogger: [
     'hedgerow_slippers',
     'hedgerow_boots',
@@ -767,11 +713,11 @@ export const QUEST_CHOICE_REWARDS: Readonly<Record<string, readonly string[]>> =
     'highgale_spaulders',
   ],
   q_nb_the_barrow_king: [
-    'highgale_slippers',
-    'highgale_boots',
-    'highgale_treads',
-    'highgale_sabatons',
-    'highgale_greaves',
+    'cairnking_mantle',
+    'cairnking_shoulderpads',
+    'cairnking_shoulderguards',
+    'cairnking_pauldrons',
+    'cairnking_spaulders',
   ],
   q_nb_wool_by_moonlight: [
     'highgale_sash',
@@ -851,11 +797,11 @@ export const QUEST_CHOICE_REWARDS: Readonly<Record<string, readonly string[]>> =
     'thornspire_cord',
   ],
   q_olen: [
-    'thornspire_robe',
-    'thornspire_jerkin',
-    'thornspire_tunic',
-    'thornspire_hauberk',
-    'thornspire_chainmail',
+    'oathbroken_leggings',
+    'oathbroken_breeches',
+    'oathbroken_legwraps',
+    'oathbroken_legguards',
+    'oathbroken_chausses',
   ],
   q_palecoil: [
     'thornspire_robe',
@@ -886,11 +832,11 @@ export const QUEST_CHOICE_REWARDS: Readonly<Record<string, readonly string[]>> =
     'trailwarden_handguards',
   ],
   q_pr_idol_guardian: [
-    'highgale_slippers',
-    'highgale_boots',
-    'highgale_treads',
-    'highgale_sabatons',
-    'highgale_greaves',
+    'jadeshrine_mantle',
+    'jadeshrine_shoulderpads',
+    'jadeshrine_shoulderguards',
+    'jadeshrine_pauldrons',
+    'jadeshrine_spaulders',
   ],
   q_pr_scuttler_cull: [
     'highgale_hood',
@@ -1026,19 +972,13 @@ export const QUEST_CHOICE_REWARDS: Readonly<Record<string, readonly string[]>> =
     'hollowveil_spaulders',
   ],
   q_seal_restored: [
-    'hollowveil_robe',
-    'hollowveil_jerkin',
-    'hollowveil_tunic',
-    'hollowveil_hauberk',
-    'hollowveil_chainmail',
+    'sealkeeper_gloves',
+    'sealkeeper_grips',
+    'sealkeeper_handwraps',
+    'sealkeeper_gauntlets',
+    'sealkeeper_handguards',
   ],
-  q_sexton: [
-    'bogwalker_robe',
-    'bogwalker_jerkin',
-    'bogwalker_tunic',
-    'bogwalker_hauberk',
-    'bogwalker_chainmail',
-  ],
+  q_sexton: ['gravebell_treads', 'gravebell_greaves'],
   q_shard_cores: [
     'hollowveil_mantle',
     'hollowveil_shoulderpads',
@@ -1060,13 +1000,7 @@ export const QUEST_CHOICE_REWARDS: Readonly<Record<string, readonly string[]>> =
     'hedgerow_hauberk',
     'hedgerow_chainmail',
   ],
-  q_silence_the_choir: [
-    'hollowveil_slippers',
-    'hollowveil_boots',
-    'hollowveil_treads',
-    'hollowveil_sabatons',
-    'hollowveil_greaves',
-  ],
+  q_silence_the_choir: ['stillhymn_treads', 'stillhymn_greaves'],
   q_spiders: [
     'brookwatch_mantle',
     'brookwatch_shoulderpads',
@@ -1179,13 +1113,7 @@ export const QUEST_CHOICE_REWARDS: Readonly<Record<string, readonly string[]>> =
     'thornspire_legguards',
     'thornspire_chausses',
   ],
-  q_velkhar: [
-    'highgale_leggings',
-    'highgale_breeches',
-    'highgale_legwraps',
-    'highgale_legguards',
-    'highgale_chausses',
-  ],
+  q_velkhar: ['shroudcaller_tunic', 'shroudcaller_chainmail'],
   q_voice_below: [
     'trailwarden_mantle',
     'trailwarden_shoulderpads',
@@ -1215,11 +1143,11 @@ export const QUEST_CHOICE_REWARDS: Readonly<Record<string, readonly string[]>> =
     'hollowveil_coif',
   ],
   q_wf_croakers_hush: [
-    'highgale_gloves',
-    'highgale_grips',
-    'highgale_handwraps',
-    'highgale_gauntlets',
-    'highgale_handguards',
+    'reedhush_mantle',
+    'reedhush_shoulderpads',
+    'reedhush_shoulderguards',
+    'reedhush_pauldrons',
+    'reedhush_spaulders',
   ],
   q_wf_eels_for_the_smokehouse: [
     'highgale_slippers',
@@ -1306,11 +1234,11 @@ export const QUEST_CHOICE_REWARDS: Readonly<Record<string, readonly string[]>> =
     'highgale_chainmail',
   ],
   q_ww_horn_of_the_huntsman: [
-    'highgale_slippers',
-    'highgale_boots',
-    'highgale_treads',
-    'highgale_sabatons',
-    'highgale_greaves',
+    'palehunt_mantle',
+    'palehunt_shoulderpads',
+    'palehunt_shoulderguards',
+    'palehunt_pauldrons',
+    'palehunt_spaulders',
   ],
   q_ww_silk_in_the_eaves: [
     'highgale_hood',

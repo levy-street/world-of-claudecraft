@@ -2,6 +2,13 @@
 // five-way choice (cloth caster, leather agility, leather strength, mail strength,
 // mail caster) of one armor slot, from the set of its level band.
 //
+// A quest that already rewards a blue (a dungeon boss or an elite, authored per
+// reward archetype in QuestDef.itemRewards) offers blues instead: its authored
+// piece joins the list (quests/quest_reward_choice.ts), and this tool adds a rare
+// for every role whose specs that piece does not serve (a wearable, on-role piece
+// carrying the spec's main stat), named for the quest, at the quest's own rare
+// item level. Those quests take no green band piece.
+//
 //   npx tsx scripts/quest_leveling_gear_gen.ts [--prompts <file.json>]
 //
 // Writes two declarative content tables (re-run after adding quests or changing
@@ -21,7 +28,18 @@ import { writeFileSync } from 'node:fs';
 import { PROVING_SHORE_QUESTS } from '../src/sim/content/proving_shore';
 import { QUEST_CHOICE_REWARDS } from '../src/sim/content/quest_choice_rewards';
 import { QUEST_LEVELING_GEAR_ITEMS } from '../src/sim/content/quest_leveling_gear';
-import { CAMPS, DUNGEONS, ITEMS, MOBS, NPCS, QUEST_ORDER, QUESTS, zoneAt } from '../src/sim/data';
+import {
+  CAMPS,
+  DUNGEONS,
+  ITEMS,
+  MOBS,
+  NPCS,
+  QUEST_ORDER,
+  QUESTS,
+  questRewardItem,
+  zoneAt,
+} from '../src/sim/data';
+import { canEquipItem, maxArmorTypeForClass } from '../src/sim/equipment_rules';
 import { normalizeToStaminaModel, primaryStatBudget, SLOT_STAT_MULT } from '../src/sim/item_budget';
 import {
   itemFromRaid,
@@ -29,7 +47,12 @@ import {
   itemSourceLevel,
   resetItemLevelCache,
 } from '../src/sim/item_level';
-import type { CoreStats, EquipSlot, ItemDef, QuestDef } from '../src/sim/types';
+import {
+  isOnRoleForSpec,
+  QUEST_REWARD_SPEC_WEIGHTS,
+  specStatWeights,
+} from '../src/sim/quests/quest_reward_choice';
+import type { CoreStats, EquipSlot, ItemDef, PlayerClass, QuestDef } from '../src/sim/types';
 import { MAX_LEVEL } from '../src/sim/types';
 
 // A re-run starts from the shipped catalog WITHOUT this tool's previous output
@@ -99,6 +122,144 @@ const BANDS: readonly Band[] = [
     palette: 'storm blue, gilded trim, wind-swept cloth, bright steel',
   },
 ];
+
+// The themes of the blue quests' rares, one per quest (a quest that authors a blue
+// and has no theme here stops the run). Named for the quest's boss or place but
+// never echoing its authored piece, so the two cards read apart.
+const BLUE_THEMES: Readonly<Record<string, Band>> = {
+  q_hollow: {
+    top: 0,
+    theme: 'Cryptbound',
+    region: 'the Hollow Crypt, where Morthen raised the dead',
+    palette: 'grave-dust grey, bone white, tarnished bronze, sickly green candle glow',
+  },
+  q_sexton: {
+    top: 0,
+    theme: 'Gravebell',
+    region: 'the Hollow Crypt bell tower of Sexton Marrow',
+    palette: 'bell bronze, funeral black, verdigris, pale bone',
+  },
+  q_olen: {
+    top: 0,
+    theme: 'Oathbroken',
+    region: 'the Sunken Bastion of the fallen Knight-Commander Olen',
+    palette: 'drowned steel, kelp green, tarnished silver, faded knightly blue',
+  },
+  q_mistcaller: {
+    top: 0,
+    theme: 'Seamist',
+    region: 'the fog-bound halls of the Sunken Bastion',
+    palette: 'sea-mist grey, pearl white, deep teal, wet silver',
+  },
+  q_drogmar: {
+    top: 0,
+    theme: 'Warmonger',
+    region: "Warlord Drogmar's ogre war camp",
+    palette: 'blood red war paint, rough iron, crude bone, scorched hide',
+  },
+  q_kazzix: {
+    top: 0,
+    theme: 'Sparkglass',
+    region: 'the crystal lair of Kazzix the Shardlord',
+    palette: 'electric violet crystal, storm grey, crackling blue light',
+  },
+  q_korgath: {
+    top: 0,
+    theme: 'Fetterbound',
+    region: 'the Gravewyrm Sanctum, where Korgath was bound',
+    palette: 'black iron fetters, ember orange runes, ash grey',
+  },
+  q_velkhar: {
+    top: 0,
+    theme: 'Shroudcaller',
+    region: 'the necromancer halls of the Gravewyrm Sanctum',
+    palette: 'necrotic purple, black velvet, bone ivory, ghostly green',
+  },
+  q_gravewyrm: {
+    top: 0,
+    theme: 'Wyrmshadow',
+    region: 'the Gravewyrm Sanctum, lair of Korzul',
+    palette: 'bleached dragon bone, dark scale green, gold-ringed spikes',
+  },
+  q_silence_the_choir: {
+    top: 0,
+    theme: 'Stillhymn',
+    region: 'the Drowned Temple choir of Choirmother Selthe',
+    palette: 'sunken marble, deep sea blue, pearl, faded gold leaf',
+  },
+  q_drowned_moon: {
+    top: 0,
+    theme: 'Pearlglow',
+    region: 'the moonlit sanctum of the Drowned Temple',
+    palette: 'moonlit silver, abyssal blue, luminous pale aqua, pearl',
+  },
+  q_seal_restored: {
+    top: 0,
+    theme: 'Sealkeeper',
+    region: 'the restored warden seal',
+    palette: 'warden green, gold runes, ancient stone grey',
+  },
+  q_dk_matriarch_of_the_maw: {
+    top: 0,
+    theme: 'Cinderbrood',
+    region: 'the lair of the Maw Matriarch',
+    palette: 'molten ember red, obsidian black, smouldering orange scales',
+  },
+  q_fv_frostmane_tyrant: {
+    top: 0,
+    theme: 'Hoarfrost',
+    region: "the Rimemane Tyrant's frozen den",
+    palette: 'glacier blue, white fur, hoarfrost silver',
+  },
+  q_af_the_meredark: {
+    top: 0,
+    theme: 'Blackmere',
+    region: 'the black waters of the Meredark',
+    palette: 'inky black water, bog green glow, tarnished pewter',
+  },
+  q_wf_croakers_hush: {
+    top: 0,
+    theme: 'Reedhush',
+    region: "the Croaker's reed ponds",
+    palette: 'reed green, lotus pink, pond-water blue',
+  },
+  q_nb_the_barrow_king: {
+    top: 0,
+    theme: 'Cairnking',
+    region: 'the barrow of the Barrow King',
+    palette: 'ancient gold, grave moss, cold blue spectral light',
+  },
+  q_ww_horn_of_the_huntsman: {
+    top: 0,
+    theme: 'Palehunt',
+    region: 'the woods of the Pale Huntsman',
+    palette: 'ghost pale white, antler bone, dark forest green',
+  },
+  q_pr_idol_guardian: {
+    top: 0,
+    theme: 'Jadeshrine',
+    region: 'the shrine of the sunken idol',
+    palette: 'jade green, sun-gold, carved temple stone',
+  },
+  q_eg_bull_of_the_court: {
+    top: 0,
+    theme: 'Gildhedge',
+    region: 'the topiary Fountain Court',
+    palette: 'clipped hedge green, marble white, fountain blue, gilt',
+  },
+  q_gc_the_wreck_warden: {
+    top: 0,
+    theme: 'Saltwrack',
+    region: 'the shipwreck graveyard of the Wreck Warden',
+    palette: 'barnacled driftwood, rusted anchor iron, sea-salt white',
+  },
+  q_fs_the_great_break: {
+    top: 0,
+    theme: 'Breakwater',
+    region: 'the shattered coast of the Great Break',
+    palette: 'storm-wet slate, sea-foam white, cracked stone',
+  },
+};
 
 interface Role {
   key: string;
@@ -260,6 +421,56 @@ const quests = Object.values(QUESTS)
   );
 
 // ---------------------------------------------------------------------------
+// Blue quests: the roles their authored blue leaves without one
+// ---------------------------------------------------------------------------
+
+const BLUE_QUALITIES = new Set<ItemDef['quality']>(['rare', 'epic', 'legendary']);
+const isBlueGear = (item: ItemDef | undefined): item is ItemDef =>
+  item?.slot !== undefined && BLUE_QUALITIES.has(item.quality);
+const authoredBlues = (q: QuestDef): ItemDef[] =>
+  [...new Set(Object.values(q.itemRewards))].map((id) => ITEMS[id as string]).filter(isBlueGear);
+
+type MainStat = 'str' | 'agi' | 'int';
+function mainStatOf(cls: PlayerClass, spec: string): MainStat {
+  const w = specStatWeights(cls, spec);
+  return (['str', 'agi', 'int'] as const).reduce((a, b) => ((w[b] ?? 0) > (w[a] ?? 0) ? b : a));
+}
+const ARMOR_RANK = { cloth: 0, leather: 1, mail: 2 } as const;
+// The role a spec levels in: the heaviest armor its class wears among the roles
+// built on its main stat (a holy paladin is mail Intellect, a feral druid leather
+// Strength), the same pairing the band sets' spec defaults land on.
+function roleForSpec(cls: PlayerClass, spec: string): Role {
+  const main = mainStatOf(cls, spec);
+  const cap = ARMOR_RANK[maxArmorTypeForClass(cls) as keyof typeof ARMOR_RANK] ?? 0;
+  const fits = ROLES.filter(
+    (r) => (r.profile[main] ?? 0) >= 3 && ARMOR_RANK[r.armorType] <= cap,
+  ).sort((a, b) => ARMOR_RANK[b.armorType] - ARMOR_RANK[a.armorType]);
+  if (!fits[0]) throw new Error(`no role for ${cls} ${spec}`);
+  return fits[0];
+}
+// A spec is served when its class's authored piece is a blue it can wear, uses
+// only stats the spec wants, and carries its main stat.
+function servedByAuthored(q: QuestDef, cls: PlayerClass, spec: string): boolean {
+  const id = questRewardItem(q, cls);
+  const item = id ? ITEMS[id] : undefined;
+  if (!isBlueGear(item)) return false;
+  return (
+    canEquipItem(cls, item) &&
+    isOnRoleForSpec(item, cls, spec) &&
+    (item.stats?.[mainStatOf(cls, spec)] ?? 0) > 0
+  );
+}
+function missingRoles(q: QuestDef): Role[] {
+  const missing = new Set<Role>();
+  for (const cls of Object.keys(QUEST_REWARD_SPEC_WEIGHTS) as PlayerClass[]) {
+    for (const spec of Object.keys(QUEST_REWARD_SPEC_WEIGHTS[cls])) {
+      if (!servedByAuthored(q, cls, spec)) missing.add(roleForSpec(cls, spec));
+    }
+  }
+  return ROLES.filter((r) => missing.has(r));
+}
+
+// ---------------------------------------------------------------------------
 // Assignment: band by level, slot by rotation within the band
 // ---------------------------------------------------------------------------
 
@@ -267,9 +478,43 @@ const itemId = (band: Band, role: Role, slot: Slot) =>
   `${band.theme}_${role.nouns[slot]}`.toLowerCase().replace(/[^a-z]+/g, '_');
 const itemName = (band: Band, role: Role, slot: Slot) => `${band.theme} ${role.nouns[slot]}`;
 
+// Blue quests offer their own rares: the slot of the authored armor piece, or (a
+// weapon-only quest) the next slot of a rotation along the blue quests.
+interface BlueSpec {
+  questId: string;
+  theme: Band;
+  roles: Role[];
+  slot: Slot;
+}
+const blueSpecs: BlueSpec[] = [];
+let weaponCursor = 0;
+for (const { q } of quests) {
+  const authored = authoredBlues(q);
+  if (authored.length === 0) continue;
+  const theme = BLUE_THEMES[q.id];
+  if (!theme) throw new Error(`${q.id} rewards a blue but has no BLUE_THEMES entry`);
+  const armorSlot = authored
+    .filter((i) => i.kind === 'armor')
+    .map((i) => i.slot as string)
+    .find(isArmorSlot);
+  const slot = armorSlot ?? SLOTS[weaponCursor++ % SLOTS.length];
+  const roles = missingRoles(q);
+  if (roles.length === 0) throw new Error(`${q.id}: its authored blues already serve every spec`);
+  blueSpecs.push({ questId: q.id, theme, roles, slot });
+}
+function isArmorSlot(slot: string): slot is Slot {
+  return (SLOTS as readonly string[]).includes(slot);
+}
+const blueQuestIds = new Set(blueSpecs.map((b) => b.questId));
+for (const id of Object.keys(BLUE_THEMES)) {
+  if (!blueQuestIds.has(id)) throw new Error(`BLUE_THEMES ${id} is not a blue quest any more`);
+}
+
 // Quests with a concrete source take the rotation first, so every slot of every
 // band is offered by at least one quest item_level.ts can price (a talk or
-// delivery quest has no level of its own); the unsourced quests continue it.
+// delivery quest has no level of its own); the unsourced quests continue it. A
+// blue quest keeps its turn in the rotation but takes no green, so adding or
+// removing a blue never reshuffles the other quests' slots.
 const sourced = quests.filter(({ q }) => sourceLevel(q) !== undefined);
 const unsourced = quests.filter(({ q }) => sourceLevel(q) === undefined);
 const assignment = new Map<string, string[]>();
@@ -278,10 +523,17 @@ for (const { q, level } of [...sourced, ...unsourced]) {
   const band = BANDS.find((b) => level <= b.top) ?? BANDS[BANDS.length - 1];
   const i = bandCursor.get(band) ?? 0;
   bandCursor.set(band, i + 1);
+  if (blueQuestIds.has(q.id)) continue;
   const slot = SLOTS[i % SLOTS.length];
   assignment.set(
     q.id,
     ROLES.map((role) => itemId(band, role, slot)),
+  );
+}
+for (const b of blueSpecs) {
+  assignment.set(
+    b.questId,
+    b.roles.map((role) => itemId(b.theme, role, b.slot)),
   );
 }
 
@@ -297,17 +549,25 @@ interface Peer {
   ilvl: number;
   sellPerSlot: number;
 }
-const peers: Peer[] = [];
-for (const item of Object.values(ITEMS)) {
-  if (item.kind !== 'armor' || !item.armorType || !item.slot || item.slot === 'offhand') continue;
-  if (item.quality !== 'uncommon') continue;
-  const ilvl = itemLevel(item);
-  if (!ilvl) continue;
-  peers.push({
-    ilvl,
-    sellPerSlot: item.sellValue / (SLOT_STAT_MULT[item.slot] ?? 1),
-  });
+// Shipped armor of one quality, the sell-value peers of the pieces built at it.
+function peersOf(quality: ItemDef['quality']): Peer[] {
+  const pool: Peer[] = [];
+  for (const item of Object.values(ITEMS)) {
+    if (item.kind !== 'armor' || !item.armorType || !item.slot || item.slot === 'offhand') continue;
+    if (item.quality !== quality) continue;
+    const ilvl = itemLevel(item);
+    if (!ilvl) continue;
+    pool.push({
+      ilvl,
+      sellPerSlot: item.sellValue / (SLOT_STAT_MULT[item.slot] ?? 1),
+    });
+  }
+  return pool;
 }
+const peersByQuality = new Map<ItemDef['quality'], Peer[]>([
+  ['uncommon', peersOf('uncommon')],
+  ['rare', peersOf('rare')],
+]);
 // The median over the shipped peers nearest `ilvl` (within 2 item levels,
 // widening by 2 until at least three qualify), so each band reads its own
 // level's peers rather than one ratio stretched across the whole range.
@@ -346,10 +606,13 @@ const armorFor = (armorType: string, slot: Slot, ilvl: number) =>
     1,
     Math.round((chestArmorPerIlvl.get(armorType) ?? 0) * (SLOT_STAT_MULT[slot] ?? 1) * ilvl),
   );
-const sellFor = (slot: Slot, ilvl: number) =>
+const sellFor = (quality: ItemDef['quality'], slot: Slot, ilvl: number) =>
   Math.max(
     5,
-    Math.round(localMedian(peers, ilvl, (p) => p.sellPerSlot) * (SLOT_STAT_MULT[slot] ?? 1)),
+    Math.round(
+      localMedian(peersByQuality.get(quality) ?? [], ilvl, (p) => p.sellPerSlot) *
+        (SLOT_STAT_MULT[slot] ?? 1),
+    ),
   );
 
 // ---------------------------------------------------------------------------
@@ -383,6 +646,24 @@ for (const band of BANDS) {
     }
   }
 }
+for (const b of blueSpecs) {
+  for (const role of b.roles) {
+    const id = itemId(b.theme, role, b.slot);
+    if (ITEMS[id] || built.some((x) => x.id === id))
+      throw new Error(`item id ${id} already exists`);
+    const item = {
+      id,
+      name: itemName(b.theme, role, b.slot),
+      kind: 'armor',
+      armorType: role.armorType,
+      slot: b.slot,
+      quality: 'rare',
+      stats: {},
+      sellValue: 0,
+    } as ItemDef;
+    built.push({ id, band: b.theme, role, slot: b.slot, item });
+  }
+}
 const names = new Set(Object.values(ITEMS).map((i) => i.name.toLowerCase()));
 for (const b of built) {
   if (names.has(b.item.name.toLowerCase()))
@@ -403,12 +684,12 @@ for (const b of built) {
     unpriced.push(b.id);
     ilvl = b.band.top + 1;
   }
-  const budget = primaryStatBudget(ilvl, 'uncommon', b.slot);
+  const budget = primaryStatBudget(ilvl, b.item.quality, b.slot);
   b.item.stats = {
     ...normalizeToStaminaModel(b.role.profile, budget),
     armor: armorFor(b.role.armorType, b.slot, ilvl),
   };
-  b.item.sellValue = sellFor(b.slot, ilvl);
+  b.item.sellValue = sellFor(b.item.quality, b.slot, ilvl);
   (b.item as ItemDef & { _ilvl?: number; _budget?: number })._ilvl = ilvl;
   (b.item as ItemDef & { _ilvl?: number; _budget?: number })._budget = budget;
 }
@@ -425,14 +706,15 @@ const statsLiteral = (s: Partial<CoreStats>) =>
     .join(', ')} }`;
 
 let items = `// Choose-one leveling gear: the five-way armor choice every leveling quest
-// offers (content/quest_choice_rewards.ts). One set per level band and armor
-// role (cloth caster, leather agility, leather strength, mail strength, mail
-// caster) in every armor slot.
+// offers (content/quest_choice_rewards.ts). One green set per level band and
+// armor role (cloth caster, leather agility, leather strength, mail strength,
+// mail caster) in every armor slot, plus the rares a quest that already rewards
+// a blue offers to the roles its authored piece does not serve.
 //
 // Generated by scripts/quest_leveling_gear_gen.ts: re-run it rather than editing
 // a record by hand. Each item's level is the one src/sim/item_level.ts derives
-// from the quests that offer it; its stats are that level's uncommon slot budget
-// on the stamina model, and its armor and sell value the catalog median.
+// from the quests that offer it; its stats are that level's slot budget for its
+// quality on the stamina model, and its armor and sell value the catalog median.
 
 import type { ItemDef } from '../types';
 
@@ -441,14 +723,16 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
 for (const b of built) {
   const ext = b.item as ItemDef & { _ilvl: number; _budget: number };
   items += `  // ${b.band.theme} (${b.band.region}): item level ${ext._ilvl}, ${b.slot} budget ${ext._budget}.\n`;
-  items += `  ${b.id}: {\n    id: '${b.id}',\n    name: '${b.item.name}',\n    kind: 'armor',\n    armorType: '${b.role.armorType}',\n    slot: '${b.slot}',\n    quality: 'uncommon',\n    stats: ${statsLiteral(b.item.stats ?? {})},\n    sellValue: ${b.item.sellValue},\n  },\n`;
+  items += `  ${b.id}: {\n    id: '${b.id}',\n    name: '${b.item.name}',\n    kind: 'armor',\n    armorType: '${b.role.armorType}',\n    slot: '${b.slot}',\n    quality: '${b.item.quality}',\n    stats: ${statsLiteral(b.item.stats ?? {})},\n    sellValue: ${b.item.sellValue},\n  },\n`;
 }
 items += '};\n';
 writeFileSync('src/sim/content/quest_leveling_gear.ts', items);
 
 let choices = `// Choose-one leveling rewards: quest id -> the five pieces it offers (cloth
 // caster, leather agility, leather strength, mail strength, mail caster) of one
-// armor slot from its level band's set (content/quest_leveling_gear.ts). Merged onto
+// armor slot from its level band's set (content/quest_leveling_gear.ts), or, on a
+// quest that rewards a blue, the rares for the roles that blue does not serve
+// (the blue itself joins the list through the resolver). Merged onto
 // QuestDef.choiceRewards by data.ts; the player is offered what their class can
 // wear (quests/quest_reward_choice.ts).
 //
@@ -483,6 +767,9 @@ if (promptsIdx > 0) {
 
 const perBand = BANDS.map((b) => `${b.theme}<=${b.top}:${bandCursor.get(b) ?? 0}`).join(' ');
 console.log(`quests ${assignment.size} | items ${built.length} | quests per band ${perBand}`);
+console.log(
+  `blue quests ${blueSpecs.length} | rares ${blueSpecs.reduce((n, b) => n + b.roles.length, 0)}`,
+);
 console.log(
   `items without a sourced quest (priced at band top): ${unpriced.length} ${unpriced.join(' ')}`,
 );

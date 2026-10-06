@@ -19189,6 +19189,234 @@ export const ru_RU: EnTranslations = {
       "highgale_cord": {
         "name": "Шнур буревого гребня"
       },
+      "breakwater_mantle": {
+        "name": "Оплечье волнолома"
+      },
+      "breakwater_shoulderpads": {
+        "name": "Плечевые накладки волнолома"
+      },
+      "breakwater_spaulders": {
+        "name": "Наплечники волнолома"
+      },
+      "gravebell_treads": {
+        "name": "Башмаки погребального колокола"
+      },
+      "gravebell_greaves": {
+        "name": "Наголенники погребального колокола"
+      },
+      "cryptbound_tunic": {
+        "name": "Туника склепных уз"
+      },
+      "cryptbound_chainmail": {
+        "name": "Кольчуга склепных уз"
+      },
+      "oathbroken_leggings": {
+        "name": "Штаны нарушенной клятвы"
+      },
+      "oathbroken_breeches": {
+        "name": "Бриджи нарушенной клятвы"
+      },
+      "oathbroken_legwraps": {
+        "name": "Обмотки нарушенной клятвы"
+      },
+      "oathbroken_legguards": {
+        "name": "Набедренники нарушенной клятвы"
+      },
+      "oathbroken_chausses": {
+        "name": "Шоссы нарушенной клятвы"
+      },
+      "seamist_legwraps": {
+        "name": "Обмотки морского тумана"
+      },
+      "seamist_chausses": {
+        "name": "Шоссы морского тумана"
+      },
+      "warmonger_treads": {
+        "name": "Башмаки поджигателя войны"
+      },
+      "warmonger_greaves": {
+        "name": "Наголенники поджигателя войны"
+      },
+      "sparkglass_leggings": {
+        "name": "Штаны искрящегося стекла"
+      },
+      "sparkglass_breeches": {
+        "name": "Бриджи искрящегося стекла"
+      },
+      "sparkglass_legwraps": {
+        "name": "Обмотки искрящегося стекла"
+      },
+      "sparkglass_legguards": {
+        "name": "Набедренники искрящегося стекла"
+      },
+      "sparkglass_chausses": {
+        "name": "Шоссы искрящегося стекла"
+      },
+      "stillhymn_treads": {
+        "name": "Башмаки безмолвного гимна"
+      },
+      "stillhymn_greaves": {
+        "name": "Наголенники безмолвного гимна"
+      },
+      "pearlglow_headguard": {
+        "name": "Наголовник жемчужного сияния"
+      },
+      "pearlglow_coif": {
+        "name": "Койф жемчужного сияния"
+      },
+      "sealkeeper_gloves": {
+        "name": "Перчатки хранителя печати"
+      },
+      "sealkeeper_grips": {
+        "name": "Хваты хранителя печати"
+      },
+      "sealkeeper_handwraps": {
+        "name": "Наручные обмотки хранителя печати"
+      },
+      "sealkeeper_gauntlets": {
+        "name": "Рукавицы хранителя печати"
+      },
+      "sealkeeper_handguards": {
+        "name": "Латные перчатки хранителя печати"
+      },
+      "fetterbound_leggings": {
+        "name": "Штаны тяжких оков"
+      },
+      "fetterbound_breeches": {
+        "name": "Бриджи тяжких оков"
+      },
+      "fetterbound_legwraps": {
+        "name": "Обмотки тяжких оков"
+      },
+      "fetterbound_legguards": {
+        "name": "Набедренники тяжких оков"
+      },
+      "fetterbound_chausses": {
+        "name": "Шоссы тяжких оков"
+      },
+      "shroudcaller_tunic": {
+        "name": "Туника призывателя саванов"
+      },
+      "shroudcaller_chainmail": {
+        "name": "Кольчуга призывателя саванов"
+      },
+      "wyrmshadow_tunic": {
+        "name": "Туника тени змея"
+      },
+      "wyrmshadow_chainmail": {
+        "name": "Кольчуга тени змея"
+      },
+      "cinderbrood_shoulderpads": {
+        "name": "Плечевые накладки пепельного выводка"
+      },
+      "cinderbrood_shoulderguards": {
+        "name": "Наплечные щитки пепельного выводка"
+      },
+      "cinderbrood_pauldrons": {
+        "name": "Наплечья пепельного выводка"
+      },
+      "hoarfrost_mantle": {
+        "name": "Оплечье изморози"
+      },
+      "hoarfrost_shoulderpads": {
+        "name": "Плечевые накладки изморози"
+      },
+      "hoarfrost_spaulders": {
+        "name": "Наплечники изморози"
+      },
+      "blackmere_mantle": {
+        "name": "Оплечье чёрного озера"
+      },
+      "blackmere_shoulderpads": {
+        "name": "Плечевые накладки чёрного озера"
+      },
+      "blackmere_shoulderguards": {
+        "name": "Наплечные щитки чёрного озера"
+      },
+      "blackmere_pauldrons": {
+        "name": "Наплечья чёрного озера"
+      },
+      "blackmere_spaulders": {
+        "name": "Наплечники чёрного озера"
+      },
+      "reedhush_mantle": {
+        "name": "Оплечье тихого камыша"
+      },
+      "reedhush_shoulderpads": {
+        "name": "Плечевые накладки тихого камыша"
+      },
+      "reedhush_shoulderguards": {
+        "name": "Наплечные щитки тихого камыша"
+      },
+      "reedhush_pauldrons": {
+        "name": "Наплечья тихого камыша"
+      },
+      "reedhush_spaulders": {
+        "name": "Наплечники тихого камыша"
+      },
+      "cairnking_mantle": {
+        "name": "Оплечье курганного короля"
+      },
+      "cairnking_shoulderpads": {
+        "name": "Плечевые накладки курганного короля"
+      },
+      "cairnking_shoulderguards": {
+        "name": "Наплечные щитки курганного короля"
+      },
+      "cairnking_pauldrons": {
+        "name": "Наплечья курганного короля"
+      },
+      "cairnking_spaulders": {
+        "name": "Наплечники курганного короля"
+      },
+      "palehunt_mantle": {
+        "name": "Оплечье бледной охоты"
+      },
+      "palehunt_shoulderpads": {
+        "name": "Плечевые накладки бледной охоты"
+      },
+      "palehunt_shoulderguards": {
+        "name": "Наплечные щитки бледной охоты"
+      },
+      "palehunt_pauldrons": {
+        "name": "Наплечья бледной охоты"
+      },
+      "palehunt_spaulders": {
+        "name": "Наплечники бледной охоты"
+      },
+      "jadeshrine_mantle": {
+        "name": "Оплечье нефритового святилища"
+      },
+      "jadeshrine_shoulderpads": {
+        "name": "Плечевые накладки нефритового святилища"
+      },
+      "jadeshrine_shoulderguards": {
+        "name": "Наплечные щитки нефритового святилища"
+      },
+      "jadeshrine_pauldrons": {
+        "name": "Наплечья нефритового святилища"
+      },
+      "jadeshrine_spaulders": {
+        "name": "Наплечники нефритового святилища"
+      },
+      "gildhedge_mantle": {
+        "name": "Оплечье золочёной изгороди"
+      },
+      "gildhedge_shoulderpads": {
+        "name": "Плечевые накладки золочёной изгороди"
+      },
+      "gildhedge_spaulders": {
+        "name": "Наплечники золочёной изгороди"
+      },
+      "saltwrack_mantle": {
+        "name": "Оплечье солёных обломков"
+      },
+      "saltwrack_shoulderpads": {
+        "name": "Плечевые накладки солёных обломков"
+      },
+      "saltwrack_spaulders": {
+        "name": "Наплечники солёных обломков"
+      },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
       },
