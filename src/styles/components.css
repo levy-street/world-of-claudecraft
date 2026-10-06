@@ -860,6 +860,52 @@
   .qd-reward-name {
     font-size: 12px;
   }
+  /* Choose-one quest rewards: one card per offered piece. In the turn-in
+     dialog each card is a radio button (the harvest-preference radio look);
+     in the quest log and on the accept step they are a static preview. */
+  .qd-reward-choice-heading {
+    display: block;
+    margin-top: var(--spacing-sm);
+  }
+  .qd-reward-choices {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-xs);
+  }
+  .qd-reward-choice {
+    margin-top: 0;
+    min-height: 40px;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    text-align: left;
+    font: inherit;
+  }
+  /* Icon and name stay on one line (the name wraps within its column); beats
+     the generic reward-row wrap below on specificity. */
+  .qd-reward-row.qd-reward-choice {
+    flex-wrap: nowrap;
+  }
+  button.qd-reward-choice {
+    cursor: var(--cursor-point);
+  }
+  button.qd-reward-choice:hover {
+    border-color: var(--color-accent);
+  }
+  .qd-reward-choice:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .qd-reward-choice[aria-checked="true"] {
+    border-color: var(--color-accent);
+    box-shadow: inset 3px 0 0 var(--color-accent);
+    background: color-mix(in srgb, var(--color-accent) 12%, var(--panel-base));
+  }
+  @media (forced-colors: active) {
+    .qd-reward-choice[aria-checked="true"] {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+  }
   .qd-list-item {
     display: block;
     width: 100%;
@@ -2745,6 +2791,10 @@
     min-height: 0;
     overflow-y: auto;
     padding-right: var(--spacing-xs);
+  }
+  .ql-detail-body:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
   }
   .ql-detail-actions {
     display: flex;

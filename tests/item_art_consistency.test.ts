@@ -8,6 +8,7 @@ import { validateAcceptedArtManifest } from '../scripts/lib/icon_asset_audit.mjs
 import { ITEM_ART_AUDIT_RENDERER_FINGERPRINT } from '../scripts/lib/item_art_audit.mjs';
 import { heroicVariantId } from '../src/sim/content/heroic_variants';
 import { HOARD_ITEMS } from '../src/sim/content/hoard_loot';
+import { QUEST_LEVELING_GEAR_ITEMS } from '../src/sim/content/quest_leveling_gear';
 import { ITEMS } from '../src/sim/data';
 import { ITEM_ART_PENDING } from '../src/ui/icons';
 
@@ -853,7 +854,7 @@ describe('item-art consistency accepted-art provenance', () => {
     // The Emissary's Cache chest: 1,322. The Clue Scroll items (clue_scroll,
     // treasure_casket): 1,323. The faction ladder rework's 17 new rows
     // (13 periphery pieces + 4 formulas): 1,340. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,341. the trinket slot's 18 trinkets (PR 4173): 1,359. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s 139 honor items: 1,498.
-    expect(Object.keys(ITEMS)).toHaveLength(1617);
+    expect(Object.keys(ITEMS)).toHaveLength(1897);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -1017,9 +1018,11 @@ describe('item-art consistency accepted-art provenance', () => {
     // Scroll icons (clue-scroll-icons-2026-09-17, two SVG compositions) join:
     // 1,305. The faction ladder icons (faction-ladder-icons-2026-09-23, 17 SVG
     // compositions) join: 1,322. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,323. the trinket slot's 18 trinkets (PR 4173): 1,341. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s four painted weapons: 1,345.
-    expect(new Set(currentOwnerIds).size).toBe(1464);
-    expect(shippingIds).toHaveLength(1464);
-    expect(Object.keys(ITEMS)).toHaveLength(1617);
+    // + the 280 choose-one leveling quest armor paintings
+    // (quest-leveling-gear-icons-2026-10-06): 1,744 owners over 1,897 items.
+    expect(new Set(currentOwnerIds).size).toBe(1744);
+    expect(shippingIds).toHaveLength(1744);
+    expect(Object.keys(ITEMS)).toHaveLength(1897);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1156,6 +1159,13 @@ describe('item-art consistency accepted-art provenance', () => {
       .flatMap(({ itemIds }) => itemIds);
     expect(hoardLootBatchIds).toHaveLength(96);
     expect(sorted(hoardLootBatchIds)).toEqual(sorted(Object.keys(HOARD_ITEMS)));
+    // The choose-one leveling quest armor (quest-leveling-gear-icons-2026-10-06):
+    // one painting per generated item id, pinned against the live table.
+    const questGearBatchIds = mapping.generatedBatches
+      .filter(({ batchId }) => batchId === 'quest-leveling-gear-icons-2026-10-06')
+      .flatMap(({ itemIds }) => itemIds);
+    expect(questGearBatchIds).toHaveLength(280);
+    expect(sorted(questGearBatchIds)).toEqual(sorted(Object.keys(QUEST_LEVELING_GEAR_ITEMS)));
     // The OSSBrain PR #3781 reconcile's two reins owners are additive beyond
     // this whole historical chain too, the same way the Field Kit is.
     expect(
@@ -1169,6 +1179,7 @@ describe('item-art consistency accepted-art provenance', () => {
         ...factionRewardBatchIds,
         ...treasureMapBatchIds,
         ...hoardLootBatchIds,
+        ...questGearBatchIds,
         'field_kit',
         'reins_goblin_rocket_sled',
         'reins_rallycart_rxt',
@@ -1348,8 +1359,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // batch (clue-scroll-icons-2026-09-17) = 35. The faction ladder rework adds
     // its batch (faction-ladder-icons-2026-09-23) = 36. The trinket slot's icon batch
     // (trinket-slot-icons-2026-09-23) = 37. Warfare Season 2's weapon
-    // batch (warfare-season2-weapons-2026-09-25) = 38.
-    expect(mapping.generatedBatches).toHaveLength(41);
+    // batch (warfare-season2-weapons-2026-09-25) = 38. The choose-one leveling
+    // quest gear batch (quest-leveling-gear-icons-2026-10-06) joins at 42.
+    expect(mapping.generatedBatches).toHaveLength(42);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1418,14 +1430,16 @@ describe('item-art consistency accepted-art provenance', () => {
     // trinket-slot-icons-2026-09-23 batch adds its 18 trinkets: 811. Warfare
     // Season 2's weapon batch adds 4: 815. The Buried Hoards branch's three
     // batches (18 faction reward paintings, 5 treasure-map family, 96 hoard boss
-    // loot) add 119 at the 2026-09-28 release merge: 934.
-    expect(priorGeneratedIds).toHaveLength(934);
+    // loot) add 119 at the 2026-09-28 release merge: 934. The choose-one
+    // leveling quest armor batch (quest-leveling-gear-icons-2026-10-06) adds 280:
+    // 1214.
+    expect(priorGeneratedIds).toHaveLength(1214);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1464);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1464);
+    expect(allCurrentOwnerIds).toHaveLength(1744);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1744);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1439,7 +1453,8 @@ describe('item-art consistency accepted-art provenance', () => {
       // + the 18 trinkets (trinket-slot-icons-2026-09-23) = 811.
       // + the 4 Warfare Season 2 weapons = 815.
       // + the Buried Hoards branch's 119 paintings (three batches) = 934.
-      priorGenerated: 934,
+      // + the 280 choose-one leveling quest armor paintings = 1214.
+      priorGenerated: 1214,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1517,6 +1532,7 @@ describe('item-art consistency accepted-art provenance', () => {
                 'faction-rewards-icons-2026-09-17',
                 'buried-hoard-treasure-maps-2026-09-19',
                 'hoard-boss-loot-icons-2026-09-20',
+                'quest-leveling-gear-icons-2026-10-06',
               ].includes(batchId),
           )
           .flatMap(({ itemIds }) => itemIds),
@@ -1666,10 +1682,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // Plus the world-quest branch's four quest-item owners at the release/v0.43.0
     // merge = 1302. Plus the weekly emissary's cache chest = 1303. Plus the two
     // Clue Scroll owners = 1305. Plus the 17 faction ladder owners
-    // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464.
-    if (ownerIds.length !== 1464)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1464`);
-    if (fileIds.length !== 1464) violations.push(`shipping WebP count: ${fileIds.length} != 1464`);
+    // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464. Plus the 280 choose-one leveling quest armor paintings (quest-leveling-gear-icons-2026-10-06) = 1744.
+    if (ownerIds.length !== 1744)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1744`);
+    if (fileIds.length !== 1744) violations.push(`shipping WebP count: ${fileIds.length} != 1744`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

@@ -14351,6 +14351,61 @@ export const TARGETS = [
     },
   },
   {
+    key: 'quest-reward-choice',
+    label: 'Choose-one quest reward cards at turn-in (Wolves at the Gate, Marshal Redbrook)',
+    when: [
+      'ui/hud/quest/quest_reward_choice_view',
+      'ui/hud/quest/quest_dialog_controller',
+      'sim/content/quest_choice_rewards',
+    ],
+    // A warrior (the offline default) wears every armor weight, so the turn-in
+    // shows all four cards with the spec default checked. The quest is forced
+    // ready in the offline log and the player parked beside the marshal.
+    variants: [
+      { key: 'desktop', beforeLoad: lowGraphicsSeed },
+      { key: 'compact', mobile: true, tier: 'compact', beforeLoad: lowGraphicsSeed },
+    ],
+    async capture(page, variant) {
+      await awaitWorldPainted(page);
+      await dismissArrivalGreeting(page);
+      if (variant.mobile) await enterTouchTier(page, variant.tier);
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const marshal = [...sim.entities.values()].find(
+          (e) => e.kind === 'npc' && e.templateId === 'marshal_redbrook',
+        );
+        if (!marshal) return { ok: false, reason: 'no marshal_redbrook entity' };
+        sim.questLog.set('q_wolves', { questId: 'q_wolves', counts: [8], state: 'ready' });
+        const p = sim.player;
+        p.pos = sim.groundPos(marshal.pos.x + 1.5, marshal.pos.z);
+        p.prevPos = { ...p.pos };
+        sim.rebucket?.(p);
+        game.hud.openQuestDialog(marshal.id);
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`quest-reward-choice setup failed: ${setup.reason}`);
+      if (!(await pollForSize(page, '#quest-dialog'))) throw new Error('quest dialog did not open');
+      await page.evaluate(() => {
+        document.querySelector('#quest-dialog [data-quest="q_wolves"]')?.click();
+      });
+      await wait(600);
+      await sweepOverlays(page, 4);
+      // The dialog focuses the checked card, whose focus opens its tooltip; drop
+      // focus and park the pointer so the shot shows the whole card grid.
+      await page.mouse.move(2, 2);
+      await page.evaluate(() => {
+        if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+      });
+      await wait(400);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      return { clip: '#quest-dialog' };
+    },
+  },
+  {
     key: 'gossip-crafting-shortcut',
     label: "Station master gossip Crafting shortcut (crafting window to the master's craft)",
     when: ['ui/hud/quest/master_craft_core.ts', 'ui/hud/quest/quest_dialog_controller.ts'],

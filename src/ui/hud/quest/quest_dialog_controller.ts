@@ -14,11 +14,13 @@ import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import type { FocusTrapHandle } from '../../focus_manager';
+import { captureFocusKey, findFocusKey } from '../../focus_restore';
 import { type TranslationKey, t } from '../../i18n';
 import { QUALITY_COLOR } from '../../icons';
 import { NPC_WINDOW_CLOSE_RANGE } from '../../npc_service_range';
 import type { PainterHostPresentation } from '../../painter_host';
 import { clueHuntTitle } from '../../quest_event_view';
+import { rovingTarget } from '../../roving_index';
 import { svgIcon } from '../../ui_icons';
 import {
   isWorldQuestInstructorOrEscort,
@@ -38,6 +40,7 @@ import { clueReplyKey, clueTalkFor } from './clue_talk_row_core';
 import { gossipMenuIsEmpty } from './gossip_menu';
 import { masterCraftTarget } from './master_craft_core';
 import { PROF_INTRO_QUEST_ID, professionIntroHintVisible } from './prof_intro_hint_core';
+import { questRewardChoiceHtml, questRewardChoiceModel } from './quest_reward_choice_view';
 
 /** One string per offerable-row set, for cheap open-dialog change detection
  *  (the refreshIfChanged staleness signature). */
@@ -130,6 +133,9 @@ export class QuestDialogController {
   private lastClueRowSig = '';
   private trap: FocusTrapHandle | null = null;
   private openedAt = 0;
+  // The choose-one reward the player checked in the open quest's dialog, kept
+  // across re-renders so a refresh never snaps the check back to the default.
+  private rewardPick: { questId: string; itemId: string } | null = null;
   private voiceNpcId: number | null = null;
   private openState = false;
 
@@ -293,7 +299,10 @@ export class QuestDialogController {
       return;
     }
     if (this.detailQuestId && QUESTS[this.detailQuestId]) {
+      // A focused reward card keeps focus across the rebuild (its focus key).
+      const focusKey = captureFocusKey(this.deps.element);
       this.renderQuestDetail(npc, this.detailQuestId);
+      if (focusKey) findFocusKey(this.deps.element, focusKey)?.focus();
     } else {
       this.renderGossip(npc);
     }
@@ -764,7 +773,7 @@ export class QuestDialogController {
         : { text: t('hudChrome.crafting.noProfessionChoice'), crestUrl: null };
       html += `<label class="qd-profession-choice">${esc(t('hudChrome.crafting.professionChoice'))}<select class="ui-input" data-profession-selection aria-label="${esc(t('hudChrome.crafting.professionChoice'))}">${options}</select></label><div class="qd-profession-preview ui-card" data-profession-preview></div>`;
     }
-    html += this.rewardsHtml(questId);
+    html += this.rewardsHtml(questId, state === 'ready');
     this.deps.element.innerHTML = html;
     const professionSelect = this.deps.element.querySelector<HTMLSelectElement>(
       '[data-profession-selection]',
@@ -813,7 +822,7 @@ export class QuestDialogController {
       if (this.coachGlow()) button.classList.add('qd-coach');
       button.addEventListener('click', () => {
         const liveWorld = this.deps.world();
-        liveWorld.turnInQuest(questId);
+        liveWorld.turnInQuest(questId, this.rewardChoices(questId)?.selected ?? undefined);
         liveWorld.reportTelemetry('quest_turnin', {
           timeMs: this.deps.now() - this.openedAt,
         });
@@ -828,7 +837,13 @@ export class QuestDialogController {
     this.showAndFocus();
   }
 
-  private rewardsHtml(questId: string): string {
+  private rewardChoices(questId: string) {
+    const world = this.deps.world();
+    const picked = this.rewardPick?.questId === questId ? this.rewardPick.itemId : null;
+    return questRewardChoiceModel(questId, world.cfg.playerClass, world.talents.spec, picked);
+  }
+
+  private rewardsHtml(questId: string, chooseNow = false): string {
     const world = this.deps.world();
     const quest = QUESTS[questId];
     let html = `<div class="qd-sub">${esc(t('questUi.detail.rewards'))}</div>`;
@@ -838,6 +853,14 @@ export class QuestDialogController {
       const item = ITEMS[rewardItemId];
       html += `<div class="qd-reward-row" data-reward><span class="qd-reward-label">${esc(t('questUi.detail.itemReward'))}</span><span class="ui-socket ui-socket--bag">${this.deps.itemIcon(item)}</span><span class="qd-reward-name" style="color:${QUALITY_COLOR[item.quality ?? 'common'] ?? 'var(--color-quality-default)'}">${esc(itemDisplayName(item))}</span></div>`;
     }
+    const choices = this.rewardChoices(questId);
+    if (choices) {
+      html += questRewardChoiceHtml(
+        choices,
+        { itemIcon: (it) => this.deps.itemIcon(it) },
+        chooseNow,
+      );
+    }
     return html;
   }
 
@@ -846,6 +869,42 @@ export class QuestDialogController {
     const row = this.deps.element.querySelector<HTMLElement>('[data-reward]');
     if (row && rewardItemId) {
       this.deps.attachTooltip(row, () => this.deps.itemTooltip(ITEMS[rewardItemId]));
+    }
+    const choiceRows = this.deps.element.querySelectorAll<HTMLElement>('[data-reward-choice]');
+    for (const choiceRow of choiceRows) {
+      const itemId = choiceRow.dataset.rewardChoice ?? '';
+      if (!ITEMS[itemId]) continue;
+      this.deps.attachTooltip(choiceRow, () => this.deps.itemTooltip(ITEMS[itemId]));
+      if (choiceRow.getAttribute('role') !== 'radio') continue;
+      choiceRow.addEventListener('click', () =>
+        this.checkRewardCard(questId, choiceRows, choiceRow),
+      );
+      // Roving radio group: arrows on both axes plus Home/End move the check and
+      // the focus together (the house pattern, src/ui/roving_index.ts).
+      choiceRow.addEventListener('keydown', (e) => {
+        const cards = [...choiceRows];
+        const next = rovingTarget(e.key, cards.indexOf(choiceRow), cards.length, 'both');
+        if (next === null) return;
+        e.preventDefault();
+        cards[next].focus();
+        this.checkRewardCard(questId, choiceRows, cards[next]);
+      });
+    }
+  }
+
+  private checkRewardCard(
+    questId: string,
+    cards: NodeListOf<HTMLElement>,
+    picked: HTMLElement,
+  ): void {
+    const itemId = picked.dataset.rewardChoice ?? '';
+    if (!ITEMS[itemId]) return;
+    this.rewardPick = { questId, itemId };
+    for (const card of cards) {
+      const checked = card === picked;
+      card.classList.toggle('is-selected', checked);
+      card.setAttribute('aria-checked', String(checked));
+      card.tabIndex = checked ? 0 : -1;
     }
   }
 

@@ -220,7 +220,8 @@ function buildSourceIndex(): Map<string, ItemSource> {
       }
     }
     consider(quest.minLevel, false);
-    for (const itemId of Object.values(quest.itemRewards))
+    // Choose-one rewards come from the same quest, so they price at the same source.
+    for (const itemId of [...Object.values(quest.itemRewards), ...(quest.choiceRewards ?? [])])
       bump(itemId, source?.level, source?.raid ?? false);
   }
   // Heroic Quartermaster stock: the marks-vendor jewelry never drops from a mob,
