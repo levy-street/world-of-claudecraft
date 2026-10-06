@@ -262,6 +262,7 @@ import {
   applyStormbreakMana,
   magmaBurstGuaranteedCrit,
   rollArcOverload,
+  thundercallOnMagmaBurstImpact,
 } from './shaman_thundercall_kit';
 import { runUnleashWeapon } from './shaman_unleash_weapon';
 import {
@@ -948,6 +949,7 @@ export function runEffects(
           consumeThunderVent(ctx, p, ability.id, target, finalDamage);
           applyStoneboundJolt(ctx, p, target);
         }
+        if (ability.id === 'lava_burst') thundercallOnMagmaBurstImpact(ctx, p);
         if (ability.id === 'solar_invocation') {
           ctx.emit({
             type: 'spellfx',

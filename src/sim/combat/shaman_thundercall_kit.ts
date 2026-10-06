@@ -10,11 +10,17 @@
 //   resets Magma Burst and makes the next one instant.
 // - Stormbreak: the Wrath Thunderstorm's 8% maximum Mana return.
 //
+// v0.45 rotation fix: Magma Burst banks Thunder, and Cinder Jolt runs the
+// Cataclysm-era 18 sec, so the Cinder Jolt and Magma Burst loop feeds the
+// Earthen Jolt vent instead of starving it.
+//
 // Every rng draw here is gated on a Thundercall caster who KNOWS the relevant
 // ability, so no other build's draw stream moves. Design and numbers:
-// docs/prd/shaman-thundercall-elemental-v028.md ("v0.44.0 rework").
+// docs/prd/shaman-thundercall-elemental-v028.md ("v0.44.0 rework" and
+// "v0.45.0 rotation fix").
 
 import { STORMKINDLED_2PC_ARC_OVERLOAD_CHANCE } from '../content/ignivar_set_bonuses';
+import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Aura, Entity } from '../types';
 import { wearsSetBonus } from './set_bonus_wearer';
@@ -25,10 +31,14 @@ export const ARC_OVERLOAD_CHANCE = 0.2;
 export const ARC_OVERLOAD_DAMAGE_FRACTION = 0.5;
 export const ARC_OVERLOAD_THUNDER = 1;
 export const MAGMA_BURST_ABILITY_ID = 'lava_burst';
+export const MAGMA_BURST_THUNDER = 1;
 export const MAGMA_SURGE_CHANCE = 0.2;
 export const MAGMA_SURGE_DURATION = 10;
 export const STORMBREAK_ABILITY_ID = 'thunderstorm';
 export const STORMBREAK_MANA_FRACTION = 0.08;
+// The Cataclysm Flame Shock duration. Cinder Jolt shares the shock cooldown
+// with Earthen Jolt, so a longer DoT claims that cooldown less often.
+export const THUNDERCALL_CINDER_JOLT_DURATION = 18;
 
 const CINDER_JOLT_DOT_ID = 'flame_shock';
 const OVERLOAD_ABILITIES: ReadonlySet<string> = new Set(['lightning_bolt', 'chain_lightning']);
@@ -98,6 +108,37 @@ export function rollArcOverload(
   );
   addThunderCharges(ctx, player, ARC_OVERLOAD_THUNDER);
   return true;
+}
+
+/** Called only after Magma Burst has resolved a valid direct-damage impact,
+ *  the same point Arc Bolt banks its Thunder. Draws no rng. */
+export function thundercallOnMagmaBurstImpact(ctx: SimContext, player: Entity): void {
+  addThunderCharges(ctx, player, MAGMA_BURST_THUNDER);
+}
+
+/** Thundercall's Cinder Jolt DoT runs THUNDERCALL_CINDER_JOLT_DURATION at the
+ *  same damage per tick, so the total grows with the tick count. The total is
+ *  built from the rounded tick effect_dispatch.ts deals, so the tooltip total is
+ *  exactly what lands. Every other spec and ability passes through untouched.
+ *  Shared by the sim and every display caller (combat/ability_resolution.ts). */
+export function resolveThundercallAbility(
+  resolved: ResolvedAbility,
+  meta: Pick<PlayerMeta, 'cls' | 'talents'>,
+): ResolvedAbility {
+  if (meta.cls !== 'shaman' || meta.talents.spec !== 'elemental') return resolved;
+  if (resolved.def.id !== CINDER_JOLT_DOT_ID) return resolved;
+  return {
+    ...resolved,
+    effects: resolved.effects.map((effect) => {
+      if (effect.type !== 'dot') return effect;
+      const perTick = Math.round(effect.total / (effect.duration / effect.interval));
+      return {
+        ...effect,
+        total: perTick * (THUNDERCALL_CINDER_JOLT_DURATION / effect.interval),
+        duration: THUNDERCALL_CINDER_JOLT_DURATION,
+      };
+    }),
+  };
 }
 
 /** Magma Burst always crits a target burning with the caster's own Cinder Jolt. */

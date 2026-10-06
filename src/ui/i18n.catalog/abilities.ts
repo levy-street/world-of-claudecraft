@@ -971,7 +971,7 @@ const classAbilityNamesEn = {
       [
         'thunder_reservoir',
         'Thunder Reservoir',
-        'Passive: Arc Bolt and Skybranch grant Thunder, up to 5. Earthen Jolt consumes all Thunder and deals 25% more damage per Thunder (125% at 5). Faultwake consumes all Thunder and deals 20% more damage per Thunder (100% at 5). (Thundercall)',
+        'Passive: Arc Bolt, Skybranch, and Magma Burst grant Thunder, up to 5. Earthen Jolt consumes all Thunder and deals 25% more damage per Thunder (125% at 5). Faultwake consumes all Thunder and deals 20% more damage per Thunder (100% at 5). (Thundercall)',
       ],
       [
         'lightning_overload',
@@ -981,7 +981,7 @@ const classAbilityNamesEn = {
       [
         'lava_burst',
         'Magma Burst',
-        'Deal {damage} Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)',
+        'Deal {damage} Fire damage. A hit grants 1 Thunder. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)',
       ],
       [
         'thunderstorm',
@@ -1011,7 +1011,7 @@ const classAbilityNamesEn = {
       [
         'flame_shock',
         'Cinder Jolt',
-        'Deal {damage} Fire damage, then {overTime} Fire damage over 12 sec. The initial hit increases with Spell Power.',
+        'Deal {damage} Fire damage, then {overTime} Fire damage over {duration} sec. The initial hit increases with Spell Power.',
       ],
       [
         'flametongue_weapon',

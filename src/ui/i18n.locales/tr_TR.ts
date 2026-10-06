@@ -1834,7 +1834,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.hillwarn.description': 'Şimdi bir tepe duyur; tam uyarıdan sonra yükselir.',
   'devCommand.actions.hillwarn.label': 'Tepe geri sayımı',
   'entities.abilities.lava_burst.description':
-    '{damage} Ateş hasarı ver. Her zaman yanmakta olan bir hedefi kritik olarak vur.',
+    '{damage} Ateş hasarı ver. İsabet 1 Gök Gürültüsü verir. Her zaman yanmakta olan bir hedefi kritik olarak vur.',
   'entities.abilities.lava_burst.name': 'Magma Patlaması',
   'entities.abilities.lightning_overload.description':
     'Pasif: Arc Bolt ve Çatallı Yıldırım, İkinci Darbe yapan hedefleri vurma şansı %20.',
@@ -7871,7 +7871,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flamestrike.description':
     'Hedef alanda bir alev patlaması yaratır ve patlamaya yakalanan düşmanlara {damage} Ateş hasarı verir.',
   'entities.abilities.flame_shock.description':
-    '{damage} Ateş hasarı, ardından 12 sn boyunca {overTime} Ateş hasarı verir. İlk isabet Büyü Gücü ile artar.',
+    '{damage} Ateş hasarı, ardından {duration} sn boyunca {overTime} Ateş hasarı verir. İlk isabet Büyü Gücü ile artar.',
   'entities.abilities.flame_shock.name': 'Köz Sarsıntısı',
   'entities.abilities.flametongue_weapon.description':
     'Silahına 30 dakika boyunca işler. Her savurma {damage} ek Ateş hasarı verir.',
@@ -16028,7 +16028,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stormsurge.description':
     "Pasif: Ata Vuruşu beklemedeyken bir Fırtına Alameti tüketmenin onu sıfırlama ihtimali 25%. İlk 3 şans başarısız olursa 4.'sü her zaman sıfırlar. (Savaş Ruhu)",
   'entities.abilities.thunder_reservoir.description':
-    'Pasif: Ark Oku ve Çatallı Yıldırım Gök Gürültüsü verir, en fazla 5. 5 Gök Gürültüsünde Toprak Sarsıntısı 125% daha fazla hasar verir ya da Deprem 100% daha fazla verir, ardından tüm Gök Gürültüsünü tüketir. (Gök Gürültüsü Çağrısı)',
+    'Pasif: Ark Oku, Çatallı Yıldırım ve Magma Patlaması Gök Gürültüsü verir, en fazla 5. 5 Gök Gürültüsünde Toprak Sarsıntısı 125% daha fazla hasar verir ya da Deprem 100% daha fazla verir, ardından tüm Gök Gürültüsünü tüketir. (Gök Gürültüsü Çağrısı)',
   'entities.abilities.tidecall.description':
     'Dost bir hedefi {damage} kadar iyileştirir. İyileştirme büyü gücüyle artar. Taşma öncesi tam iyileştirmeyi, hedefin azami canının 30% kadarına dek Onarım Akıntısına ekler.',
   'entities.abilities.unleash_weapon.description':
