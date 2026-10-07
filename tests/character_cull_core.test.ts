@@ -140,7 +140,7 @@ describe('character cull: the colour pass', () => {
     expect(bestMount).toBeGreaterThan(0);
     // One yard of animation drift plus one 20 fps frame at mounted run speed.
     expect(CHARACTER_CULL_MARGIN).toBeCloseTo(1 + (RUN_SPEED * (1 + bestMount)) / 20, 10);
-    expect(CHARACTER_CULL_MARGIN).toBeCloseTo(1.7, 10);
+    expect(CHARACTER_CULL_MARGIN).toBeCloseTo(1.735, 10);
   });
 
   it('grows the sphere with the entity scale, not just the authored height', () => {

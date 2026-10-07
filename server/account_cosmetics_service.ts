@@ -7,6 +7,7 @@
 // persistence in server/account_cosmetics_db.ts (re-exported by ./db, which is
 // what keeps every test double on one import).
 import { isStoreMountSkinId } from '../src/sim/content/mount_skins';
+import { mountDef } from '../src/sim/content/mounts';
 import { withWeaponSkinApplied } from '../src/sim/content/weapon_skin_rules';
 import { isWeaponSkinType, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import type { Entity, SkinCatalog, WeaponSkinLoadout, WeaponSkinType } from '../src/sim/types';
@@ -42,6 +43,7 @@ export interface CosmeticsSim {
         questsDone: Set<string>;
         questLog: Map<string, unknown>;
         accountMountSkinIds?: readonly string[];
+        accountMountItemsHydrated?: boolean;
         mountSkinId?: string | null;
       }
     | null
@@ -116,6 +118,7 @@ export class AccountCosmeticsService {
     accountId: number,
     ids: string[],
     sessions: Iterable<CosmeticsSession>,
+    authoritative = true,
   ): void {
     const merged = this.remember(accountId, {
       ...(this.byAccount.get(accountId) ?? EMPTY_LIVE_ACCOUNT_COSMETICS),
@@ -130,7 +133,13 @@ export class AccountCosmeticsService {
       const meta = sim.meta(session.pid);
       if (!meta) continue;
       meta.accountMountSkinIds = owned;
-      if (!wornMountSkinAllowed(merged, meta.mountSkinId)) sim.setMountSkin(session.pid, null);
+      meta.accountMountItemsHydrated = authoritative;
+      if (
+        (authoritative || !mountDef(meta.mountSkinId ?? '')) &&
+        !wornMountSkinAllowed(merged, meta.mountSkinId)
+      ) {
+        sim.setMountSkin(session.pid, null);
+      }
     }
   }
 

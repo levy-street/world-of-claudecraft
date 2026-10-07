@@ -23,7 +23,8 @@ describeDb('account mount item projection (real Postgres)', () => {
     db = await import('../server/db');
     mounts = await import('../server/account_mount_items_db');
     await db.pool.query(`
-      CREATE TABLE characters (id SERIAL PRIMARY KEY, account_id INT, realm TEXT, state JSONB);
+      CREATE TABLE characters (id SERIAL PRIMARY KEY, account_id INT, realm TEXT, state JSONB,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now());
       CREATE INDEX characters_account ON characters(account_id);
     `);
   }, 60_000);
@@ -118,7 +119,7 @@ describeDb('account mount item projection (real Postgres)', () => {
     const responseBytes = Buffer.byteLength(JSON.stringify(projected));
     expect(projected).toHaveLength(20);
     expect(projected.every((row) => row.mountSkinIds.length <= MOUNT_ITEM_IDS.length)).toBe(true);
-    expect(responseBytes).toBeLessThan(6_000);
+    expect(responseBytes).toBeLessThan(8_000);
     console.log(
       'account mount item projection with 20 full target characters, 3200 slot rows, and 1000 unrelated characters:',
       plan['Execution Time'],
@@ -127,5 +128,85 @@ describeDb('account mount item projection (real Postgres)', () => {
       '; response bytes:',
       responseBytes,
     );
+    const versions = Object.fromEntries(projected.map((row) => [row.characterId, row.version!]));
+    const loops = (node: Record<string, any>): number =>
+      (node['Function Name'] === 'jsonb_to_record' ? node['Actual Loops'] : 0) +
+      (node.Plans ?? []).reduce((sum: number, child: Record<string, any>) => sum + loops(child), 0);
+    const explainRefresh = async () => {
+      const result = await db.pool.query(
+        `EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) ${mounts.ACCOUNT_MOUNT_ITEMS_REFRESH_SQL}`,
+        [1, MOUNT_ITEM_IDS, versions],
+      );
+      return result.rows[0]['QUERY PLAN'][0];
+    };
+    const quiet = await explainRefresh();
+    expect(loops(quiet.Plan)).toBe(0);
+    expect(JSON.stringify(quiet)).toContain('characters_account');
+    expect(
+      (await mounts.refreshAccountMountItems(1, versions)).every(
+        (row) => row.mountSkinIds === undefined,
+      ),
+    ).toBe(true);
+    // Same timestamp, new transaction version must still invalidate the row.
+    await db.pool.query("UPDATE characters SET state = '{}'::jsonb WHERE id = $1", [
+      projected[0].characterId,
+    ]);
+    const dirty = await explainRefresh();
+    expect(loops(dirty.Plan)).toBe(1);
+    const refreshed = await mounts.refreshAccountMountItems(1, versions);
+    expect(refreshed.filter((row) => row.mountSkinIds !== undefined)).toEqual([
+      { characterId: projected[0].characterId, version: expect.any(String), mountSkinIds: [] },
+    ]);
+    console.log(
+      'incremental mount projection: quiet',
+      quiet['Execution Time'],
+      'ms, 0 JSONB expansions; dirty',
+      dirty['Execution Time'],
+      'ms, 1 JSONB expansion',
+    );
+  });
+
+  it('detects late/backward and microsecond versions, new rows and deletions without a timestamp cutoff', async () => {
+    const inserted = await db.pool.query(
+      "INSERT INTO characters (account_id, realm, state, updated_at) VALUES (20001, 'east', $1, '2026-01-01 00:00:00.000001+00') RETURNING id",
+      [{ inventory: [{ itemId: 'reins_valorsteed', count: 1 }], bank: { inventory: 'malformed' } }],
+    );
+    const id = inserted.rows[0].id;
+    let rows = await mounts.loadAccountMountItems(20001);
+    let known = Object.fromEntries(rows.map((row) => [row.characterId, row.version!]));
+    await db.pool.query(
+      "UPDATE characters SET updated_at = '2026-01-01 00:00:00.000002+00' WHERE id = $1",
+      [id],
+    );
+    rows = (await mounts.refreshAccountMountItems(20001, known)) as typeof rows;
+    expect(rows[0].mountSkinIds).toEqual(['valorsteed']);
+    known = { [id]: rows[0].version! };
+    await db.pool.query(
+      "UPDATE characters SET updated_at = '2025-12-31+00', state = $2 WHERE id = $1",
+      [id, { inventory: 'malformed', bank: { inventory: [] } }],
+    );
+    expect((await mounts.refreshAccountMountItems(20001, known))[0].mountSkinIds).toEqual([]);
+    await db.pool.query(
+      "INSERT INTO characters (account_id, realm, state) VALUES (20001, 'west', $1)",
+      [{ bank: { inventory: [{ itemId: 'reins_grag_bear', count: 1 }] } }],
+    );
+    await db.pool.query('DELETE FROM characters WHERE id = $1', [id]);
+    const final = await mounts.refreshAccountMountItems(20001, known);
+    expect(final).toHaveLength(1);
+    expect(final[0].characterId).not.toBe(id);
+    expect(final[0].mountSkinIds).toEqual(['grag_bear']);
+  });
+
+  it('treats malformed scalar and array save roots as empty ownership', async () => {
+    await db.pool.query(
+      "INSERT INTO characters (account_id, realm, state) VALUES (20002, 'east', '42'::jsonb), (20002, 'west', '[1,2]'::jsonb)",
+    );
+    expect((await mounts.loadAccountMountItems(20002)).map((row) => row.mountSkinIds)).toEqual([
+      [],
+      [],
+    ]);
+    expect(
+      (await mounts.refreshAccountMountItems(20002, {})).map((row) => row.mountSkinIds),
+    ).toEqual([[], []]);
   });
 });

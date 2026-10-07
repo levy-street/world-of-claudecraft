@@ -77,11 +77,17 @@ describe('character riding ranks', () => {
       expect(moveSpeedMult(sim.player)).toBeCloseTo(1.7);
     }
     sim.buyItem(marlaOf(sim).id, 'riding_training', { expectedRidingTier: 1 });
+    expect(sim.tick()).toContainEqual(
+      expect.objectContaining({
+        type: 'log',
+        text: 'You have learned Advanced Riding. Your mount speed is increased by 110%.',
+      }),
+    );
     expect(sim.ridingTrainingTier()).toBe(2);
     expect(meta.copper).toBe(0);
     for (const key of MOUNT_KEYS) {
       sim.player.mountKey = key;
-      expect(moveSpeedMult(sim.player)).toBeCloseTo(2);
+      expect(moveSpeedMult(sim.player)).toBeCloseTo(2.1);
     }
     meta.copper = ADVANCED_RIDING_FEE_COPPER;
     sim.learnRiding(marlaOf(sim).id, 1);

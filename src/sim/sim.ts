@@ -661,7 +661,11 @@ import { sanitizeRemovedZone1Content } from './removed_zone1_content';
 import type { ResolvedAbility } from './resolved_ability';
 import { freshCounters, type RewardCounters } from './reward_counters';
 import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
-import { restoreRidingTraining, ridingTrainingTier as ridingTierOf } from './riding_training';
+import {
+  type RidingPlayerState,
+  restoreRidingTraining,
+  ridingTrainingTier as ridingTierOf,
+} from './riding_training';
 import { Rng } from './rng';
 import { resolveSavedPosExit } from './saved_pos_exit';
 import { persistedResource } from './serialize_resource';
@@ -1304,7 +1308,7 @@ export type JoinableChannel = (typeof JOINABLE_CHANNELS)[number];
 
 // Per-player progression and bags. The entity holds combat state; this holds
 // everything that belongs to the character sheet.
-export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState {
+export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState, RidingPlayerState {
   entityId: number;
   // Stable database character id when running on the server. Offline/sim-only
   // callers fall back to entityId for systems that need a rename-proof owner key.
@@ -1369,13 +1373,6 @@ export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState {
   // never persisted, and absent/false preserves the classic follow-through
   // default.
   stopAutoAttackOnTargetSwitch?: boolean;
-  // Legacy 100g lesson payment, preserved for basic riding grandfathering.
-  mountTrainingFeePaid?: boolean;
-  // Basic riding legacy flag; advanced progression adds ridingTier.
-  ridingTrained?: boolean;
-  ridingTier?: 1 | 2;
-  // Host-supplied collectible ownership from this account's other characters.
-  accountMountSkinIds?: readonly string[];
   // PBE boost kit version already applied to this character (server/
   // pbe_boost.ts, PBE_BOOST_ACCOUNTS=1 only). Optional and absent outside the
   // PBE so live saves round-trip byte-equal; the world-join top-up re-kits

@@ -21,7 +21,7 @@ export const HITCH_CROWD_PARKING_SPACING = 6;
 export const HITCH_CROWD_PARKING_TOLERANCE = 2;
 // This second verified-empty meadow is farther than the open-world interest
 // drop radius from parking. The camera starts here, then the roster arrives in
-// batches. The 51-unit envelope covers the mounted movement during measurement.
+// batches. The 54-unit envelope covers the mounted movement during measurement.
 export const HITCH_CROWD_INFLUX_LOCATION = Object.freeze({
   name: 'northern Veiled Hollow influx meadow',
   x: -113,
@@ -29,9 +29,9 @@ export const HITCH_CROWD_INFLUX_LOCATION = Object.freeze({
 });
 export const HITCH_CROWD_INFLUX_X = HITCH_CROWD_INFLUX_LOCATION.x;
 export const HITCH_CROWD_INFLUX_Z = HITCH_CROWD_INFLUX_LOCATION.z;
-export const HITCH_CROWD_INFLUX_MOTION_RADIUS = 51;
-// Advanced riding covers 42 yards during the 3-second measurement, plus
-// this collision-tested 9-yard starting ring: a 51-yard verified safe envelope.
+export const HITCH_CROWD_INFLUX_MOTION_RADIUS = 54;
+// Advanced riding covers 44.1 yards during the 3-second measurement, plus
+// this collision-tested 9-yard starting ring: a rounded-up 54-yard verified safe envelope.
 export const HITCH_CROWD_INFLUX_START_RADIUS = 9;
 export const HITCH_CROWD_INFLUX_MOVE_INTERVAL_MS = 250;
 export const HITCH_CROWD_INFLUX_MOVE_STEPS = 12;

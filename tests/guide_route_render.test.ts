@@ -208,7 +208,7 @@ describe('mount guide follows character training and revocable cosmetics', () =>
       titleKey: 'guide.nav.mounts',
     });
     expect(html).toContain('70% faster mounted movement');
-    expect(html).toContain('100% faster mounted movement');
+    expect(html).toContain('110% faster mounted movement');
     expect(html).toContain('1,000 gold');
     expect(html).toContain('any character');
     expect(html).toContain('personal bank');

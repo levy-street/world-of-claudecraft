@@ -295,7 +295,7 @@ describe('SelfMotionPredictor', () => {
     const upgraded = lab.predictor.step(lab.self, frame);
     const alreadyAdvanced = reference.step(referenceSelf, frame);
     expect(upgraded).toEqual(alreadyAdvanced);
-    expect((upgraded?.z ?? 0) - lab.self.pos.z).toBeCloseTo(RUN_SPEED * 2 * 0.05);
+    expect((upgraded?.z ?? 0) - lab.self.pos.z).toBeCloseTo(RUN_SPEED * 2.1 * 0.05);
     expect(lab.self.pos).toEqual(lab.srv.player.pos);
   });
   it('recognizes only the local completed-unstuck event as an authoritative discontinuity', () => {

@@ -40,6 +40,16 @@ function setup() {
 }
 
 describe('durable mount skin grants', () => {
+  it('keeps an alt-backed selection while item ownership is provisional, then revokes on authoritative absence', () => {
+    const { service, sessions, sim } = setup();
+    sim.meta = () => ({ mountSkinId: 'grag_bear', accountMountSkinIds: [] }) as never;
+    service.setCollectibleMountSkins(7, [], sessions, false);
+    expect(sim.setMountSkin).not.toHaveBeenCalled();
+    service.setCollectibleMountSkins(7, [], sessions, true);
+    expect(sim.setMountSkin).toHaveBeenCalledWith(1, null);
+    expect(sim.setMountSkin).toHaveBeenCalledWith(2, null);
+  });
+
   it('never turns a collectible reins projection into a permanent paid grant', () => {
     const { service } = setup();
     service.grantMountSkins(7, ['valorsteed', 'grag_bear']);

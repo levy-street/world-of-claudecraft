@@ -1,4 +1,5 @@
-// One process-wide SQL budget shared by join hydration and periodic refresh.
+// One process-wide SQL budget for full join hydration. Periodic refresh has
+// its own serial admission behind the realm's major-background-work gate.
 // Four active account reads, at most 512 queued accounts, and one promise per
 // account. Queued accounts wait at most two seconds; excess or expired reads
 // reject and can retry on the normal cadence. The existing query timeout bounds

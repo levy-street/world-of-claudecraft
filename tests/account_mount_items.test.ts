@@ -252,7 +252,7 @@ describe('revocable account mount items', () => {
     expect(fail).toHaveBeenCalledTimes(2);
   });
 
-  it('bounds concurrent projection reads even when many accounts join at once', async () => {
+  it('serializes periodic projection reads even when many accounts join at once', async () => {
     const resolvers: (() => void)[] = [];
     const load = vi.fn(
       () =>
@@ -265,10 +265,10 @@ describe('revocable account mount items', () => {
       load,
     );
     for (let id = 1; id <= 100; id++) service.join(session(id, id));
-    expect(load).toHaveBeenCalledTimes(4);
+    expect(load).toHaveBeenCalledTimes(1);
     resolvers[0]();
     await settle();
-    expect(load).toHaveBeenCalledTimes(5);
+    expect(load).toHaveBeenCalledTimes(2);
   });
 
   it('authorizes from every live account character without a SQL read and permits remote changes after leave settles', async () => {

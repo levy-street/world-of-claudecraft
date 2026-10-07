@@ -1208,7 +1208,7 @@ const MONOLITHS: MonolithRow[] = [
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
     // Lowered after mount progression/identity extraction; exact current size.
-    ceiling: 11631,
+    ceiling: 11628,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1432,7 +1432,7 @@ const MONOLITHS: MonolithRow[] = [
     // Colorblind Mode's interface body-class extraction also composes with
     // those release-line extractions. Release reconciliation: measured merged
     // tree at 11140 lines, preserving both extraction sets.
-    ceiling: 11140,
+    ceiling: 10953,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1691,7 +1691,7 @@ const MONOLITHS: MonolithRow[] = [
     // branch 9965; the two sides' additions compose to 9840 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
     // Lowered after mount progression/identity extraction; exact current size.
-    ceiling: 9771,
+    ceiling: 9770,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

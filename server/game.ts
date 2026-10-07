@@ -113,7 +113,7 @@ import { AccountCosmeticsService } from './account_cosmetics_service';
 import { reconcileAccountRelics, recordRelicFinds } from './account_ledger_records';
 import { AccountLedgerService } from './account_ledger_service';
 import type { AccountMountItemsRow } from './account_mount_items_core';
-import { AccountMountItemsService } from './account_mount_items_service';
+import { createRealmMountItemsService } from './account_mount_items_runtime';
 import { type ActivityDetectDeps, detectActivityEvent } from './activity_detect';
 import { recordOnlineSample } from './admin_db';
 import { type AdminGuildBankView, adminGuildBankView } from './admin_guild_bank_view';
@@ -1410,13 +1410,12 @@ export class GameServer {
     sessions: () => this.clients.values(),
     resyncQuests: (session) => this.resyncQuests(session as ClientSession),
   });
-  private readonly mountItems = new AccountMountItemsService({
-    meta: (pid) => this.sim.meta(pid),
-    setCollectible: (accountId, ids, sessions) =>
-      this.cosmetics.setCollectibleMountSkins(accountId, ids, sessions as Iterable<ClientSession>),
-    onError: (err) => console.error('failed to refresh account mount items:', err),
-    onWorkMs: (ms) => this.tickProfiler.add('mountItems', ms),
-  });
+  private readonly mountItems = createRealmMountItemsService(
+    () => this.sim,
+    this.cosmetics,
+    () => this.backgroundDbGate,
+    (ms) => this.tickProfiler.add('mountItems', ms),
+  );
   private readonly ledger = new AccountLedgerService({
     sim: () => this.sim,
     sessions: () => this.clients.values(),

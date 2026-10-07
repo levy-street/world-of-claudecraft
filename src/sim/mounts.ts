@@ -368,6 +368,7 @@ export function updateMountTransition(ctx: SimContext, e: Entity, swimming: bool
     meta &&
     e.mountSkinId &&
     mountDef(e.mountSkinId) &&
+    meta.accountMountItemsHydrated !== false &&
     ctx.tickCount % MOUNT_OWNERSHIP_REVALIDATE_TICKS === e.id % MOUNT_OWNERSHIP_REVALIDATE_TICKS &&
     !mountOwned(meta, e.mountSkinId)
   ) {
@@ -399,7 +400,12 @@ export function updateMountTransition(ctx: SimContext, e: Entity, swimming: bool
         // shapeshifts cast while channeling), so the player is never
         // simultaneously mounted and shapeshifted at completion.
         cancelFormsAndGhostWolf(ctx, e);
-        if (e.mountSkinId && mountDef(e.mountSkinId) && !mountOwned(meta, e.mountSkinId)) {
+        if (
+          e.mountSkinId &&
+          mountDef(e.mountSkinId) &&
+          meta.accountMountItemsHydrated !== false &&
+          !mountOwned(meta, e.mountSkinId)
+        ) {
           setMountSkin(ctx, e.id, null);
         }
         e.mountKey = e.mountSkinId ? target : DEFAULT_MOUNT;

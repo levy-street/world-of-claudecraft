@@ -42,9 +42,20 @@ describe('cosmetics tabs', () => {
 });
 
 describe('mount skin cards', () => {
+  it('hides mounts without acquisition sources until owned, including their wear controls', () => {
+    const ids = ['terrorspark_groundshaker', 'drakemaw_raptor'];
+    expect(mountSkinCards(snap()).filter((card) => ids.includes(card.id))).toEqual([]);
+    const cards = mountSkinCards(snap({ ownedMountSkins: ids, wornMountSkin: ids[0] }));
+    expect(cards.find((card) => card.id === ids[0])?.action).toBe('takeOff');
+    expect(cards.find((card) => card.id === ids[1])?.action).toBe('wear');
+  });
   it('lists every catalog skin in store order, unowned ones as store-only', () => {
     const cards = mountSkinCards(snap());
-    expect(cards.map((c) => c.id)).toEqual([...ALL_MOUNT_SKIN_IDS]);
+    expect(cards.map((c) => c.id)).toEqual(
+      ALL_MOUNT_SKIN_IDS.filter(
+        (id) => !['terrorspark_groundshaker', 'drakemaw_raptor'].includes(id),
+      ),
+    );
     for (const card of cards) {
       expect(card.owned).toBe(false);
       expect(card.worn).toBe(false);

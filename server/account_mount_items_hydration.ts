@@ -1,7 +1,6 @@
 // A handshake can hold SQL rows while awaiting leases and other auth work.
 // Fence those rows across final character saves without retaining tombstones
 // for every account that has ever logged in. Rows are tagged only in a WeakMap.
-import type { AccountMountItemsRow } from './account_mount_items_core';
 
 export const ACCOUNT_MOUNT_ITEMS_MAX_HYDRATION_TOKENS = 4_096;
 interface Token {
@@ -14,7 +13,7 @@ interface Stamp {
   revision: number;
 }
 const tokens = new Map<number, Token>();
-const stamps = new WeakMap<AccountMountItemsRow[], Stamp>();
+const stamps = new WeakMap<object, Stamp>();
 
 function tokenFor(accountId: number): Token {
   const current = tokens.get(accountId);
@@ -38,7 +37,7 @@ function tokenFor(accountId: number): Token {
 /** Capture BEFORE SQL begins, stamp the exact returned array upon completion. */
 export function captureAccountMountItemsHydration(
   accountId: number,
-): (rows: AccountMountItemsRow[]) => AccountMountItemsRow[] {
+): <T extends object>(rows: T[]) => T[] {
   const token = tokenFor(accountId);
   const revision = token.revision;
   return (rows) => {
@@ -54,9 +53,9 @@ export function invalidateAccountMountItemsHydration(accountId: number): void {
 /** Untagged rows preserve the existing direct-join/test fixture contract. */
 export function accountMountItemsHydrationFresh(
   accountId: number,
-  rows: readonly AccountMountItemsRow[],
+  rows: readonly object[],
 ): boolean {
-  const stamp = stamps.get(rows as AccountMountItemsRow[]);
+  const stamp = stamps.get(rows);
   return (
     !stamp ||
     (stamp.accountId === accountId && stamp.token.valid && stamp.token.revision === stamp.revision)

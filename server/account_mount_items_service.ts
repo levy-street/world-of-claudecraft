@@ -1,16 +1,18 @@
 import {
+  type AccountMountItemsRefreshRow,
   type AccountMountItemsRow,
   accountMountSkinIds,
   characterMountSkinIds,
+  mergeAccountMountItemsRows,
 } from './account_mount_items_core';
+import { refreshAccountMountItems } from './account_mount_items_db';
 import {
   accountMountItemsHydrationFresh,
+  captureAccountMountItemsHydration,
   invalidateAccountMountItemsHydration,
 } from './account_mount_items_hydration';
-import {
-  ACCOUNT_MOUNT_ITEMS_MAX_READS,
-  loadAccountMountItemsBounded,
-} from './account_mount_items_loader';
+import { loadAccountMountItemsBounded } from './account_mount_items_loader';
+import type { BackgroundDbPermit } from './background_db_gate';
 
 export const ACCOUNT_MOUNT_ITEMS_REFRESH_MS = 30_000;
 export { ACCOUNT_MOUNT_ITEMS_MAX_READS } from './account_mount_items_loader';
@@ -28,7 +30,13 @@ export interface MountItemsMeta {
 }
 export interface AccountMountItemsHost {
   meta(pid: number): MountItemsMeta | null | undefined;
-  setCollectible(accountId: number, ids: string[], sessions: Iterable<MountItemsSession>): void;
+  setCollectible(
+    accountId: number,
+    ids: string[],
+    sessions: Iterable<MountItemsSession>,
+    authoritative: boolean,
+  ): void;
+  tryAcquireRefreshPermit?(): BackgroundDbPermit | null | undefined;
   onError?(err: unknown): void;
   onWorkMs?(durationMs: number): void;
 }
@@ -36,6 +44,8 @@ interface AccountState {
   sessions: Set<MountItemsSession>;
   departing: Set<number>;
   saved: Map<number, readonly string[]>;
+  versions: Map<number, string>;
+  hydrationKnown: boolean;
   live: Map<number, readonly string[]>;
   revisions: Map<number, [number, number]>;
   published: string;
@@ -55,6 +65,12 @@ export class AccountMountItemsService {
   constructor(
     private readonly host: AccountMountItemsHost,
     private readonly load = loadAccountMountItemsBounded,
+    private readonly refresh: (
+      accountId: number,
+      knownVersions: Readonly<Record<string, string>>,
+    ) => Promise<AccountMountItemsRefreshRow[]> = load === loadAccountMountItemsBounded
+      ? refreshAccountMountItems
+      : load,
   ) {}
 
   join(session: MountItemsSession, rows?: readonly AccountMountItemsRow[]): void {
@@ -64,6 +80,8 @@ export class AccountMountItemsService {
         sessions: new Set(),
         departing: new Set(),
         saved: new Map(),
+        versions: new Map(),
+        hydrationKnown: false,
         live: new Map(),
         revisions: new Map(),
         published: '',
@@ -77,6 +95,12 @@ export class AccountMountItemsService {
     if (rows && accountMountItemsHydrationFresh(session.accountId, rows)) {
       state.snapshotRevision++;
       state.saved = new Map(rows.map((row) => [row.characterId, row.mountSkinIds]));
+      state.versions = new Map(
+        rows.flatMap((row) =>
+          row.version === undefined ? [] : [[row.characterId, row.version] as const],
+        ),
+      );
+      state.hydrationKnown = true;
       state.nextRefresh = Date.now() + ACCOUNT_MOUNT_ITEMS_REFRESH_MS;
     } else if (rows) {
       state.nextRefresh = 0;
@@ -143,6 +167,7 @@ export class AccountMountItemsService {
     if ([...state.sessions].some((session) => session.characterId === characterId)) return;
     const ids = state.live.get(characterId);
     if (ids) state.saved.set(characterId, ids);
+    state.versions.delete(characterId);
     state.live.delete(characterId);
     // A read launched before the final save settled may carry its preimage.
     state.snapshotRevision++;
@@ -158,20 +183,28 @@ export class AccountMountItemsService {
     const key = ids.join(',');
     if (!force && state.published === key) return;
     state.published = key;
-    this.host.setCollectible(accountId, ids, state.sessions);
+    this.host.setCollectible(accountId, ids, state.sessions, state.hydrationKnown);
   }
 
-  private drain(): void {
-    while (this.activeReads < ACCOUNT_MOUNT_ITEMS_MAX_READS && this.pending.size > 0) {
+  private drain(deferred = false): void {
+    while (this.activeReads < 1 && this.pending.size > 0) {
       const next = this.pending.entries().next().value;
       if (!next) return;
       const [accountId, state] = next;
       this.pending.delete(accountId);
-      if (this.accounts.get(accountId) !== state) continue;
+      if (this.accounts.get(accountId) !== state || state.sessions.size === 0) continue;
+      const permit = this.host.tryAcquireRefreshPermit?.();
+      if (permit === null) continue; // Refused work retries on the next cadence, never queues on the gate.
       state.loading = true;
       this.activeReads++;
       const snapshotRevision = state.snapshotRevision;
-      void this.load(accountId)
+      const stamp = captureAccountMountItemsHydration(accountId);
+      // Probes are billed by the broadcast driver. Queued launches from a
+      // promise completion need their own synchronous preparation measurement.
+      const launchStarted = deferred ? performance.now() : 0;
+      const versions = Object.fromEntries(state.versions);
+      const run = async () => stamp(await this.refresh(accountId, versions));
+      void run()
         .then((rows) => {
           const started = performance.now();
           try {
@@ -183,8 +216,10 @@ export class AccountMountItemsService {
               state.nextRefresh = 0;
               return;
             }
-            state.saved = new Map(rows.map((row) => [row.characterId, row.mountSkinIds]));
-            this.publish(accountId, state);
+            const firstHydration = !state.hydrationKnown;
+            const changed = mergeAccountMountItemsRows(state.saved, state.versions, rows);
+            state.hydrationKnown = true;
+            if (changed || firstHydration) this.publish(accountId, state, firstHydration);
           } finally {
             this.host.onWorkMs?.(performance.now() - started);
           }
@@ -196,8 +231,10 @@ export class AccountMountItemsService {
         .finally(() => {
           state.loading = false;
           this.activeReads--;
-          this.drain();
+          permit?.release();
+          this.drain(true);
         });
+      if (deferred) this.host.onWorkMs?.(performance.now() - launchStarted);
     }
   }
 }

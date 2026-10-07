@@ -138,7 +138,7 @@ describe('pet_scaling: heel speed', () => {
   });
 
   it('scales with advanced riding too', () => {
-    const fastest = RUN_SPEED * 2;
+    const fastest = RUN_SPEED * 2.1;
     expect(petHeelSpeed(8, fastest)).toBeGreaterThan(fastest);
   });
 
@@ -433,7 +433,7 @@ describe('pet_scaling: heeling a walking or mounted owner', () => {
   it.each([
     [0, 1],
     [1, 1.7],
-    [2, 2],
+    [2, 2.1],
   ] as const)('closes on a rank %i owner instead of falling behind', (ridingTier, speedMult) => {
     const sim = new Sim({ seed: SEED, playerClass: 'hunter', noPlayer: true }) as AnySim;
     const pid = sim.addPlayer('hunter', 'Rider') as number;

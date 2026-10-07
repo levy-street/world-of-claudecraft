@@ -21,7 +21,7 @@ export function ridingTrainingFee(tier: RidingTier): number {
 
 // An untrained lesson participant uses the basic lesson horse's speed.
 export function ridingMoveSpeedPct(tier: number): number {
-  return tier === 2 ? 1 : 0.7;
+  return tier === 2 ? 1.1 : 0.7;
 }
 
 export function restoreRidingTraining(
@@ -48,4 +48,17 @@ export function restoreRidingTraining(
     meta.ridingTrained = true;
   }
   return ridingTrainingTier(meta);
+}
+
+/** Character progression and transient host ownership authority. */
+export interface RidingPlayerState {
+  // Legacy 100g lesson payment, preserved for basic riding grandfathering.
+  mountTrainingFeePaid?: boolean;
+  // Basic riding legacy flag; advanced progression adds ridingTier.
+  ridingTrained?: boolean;
+  ridingTier?: 1 | 2;
+  // Host-supplied collectible ownership from this account's other characters.
+  accountMountSkinIds?: readonly string[];
+  // False until a successful complete account item projection has arrived.
+  accountMountItemsHydrated?: boolean;
 }

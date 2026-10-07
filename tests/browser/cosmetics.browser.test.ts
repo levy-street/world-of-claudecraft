@@ -123,7 +123,9 @@ describe('cosmetics accessibility and interaction', () => {
   it('wears a skin held by an alternate character and removes the action after its last item is gone', async () => {
     await page.viewport(1280, 900);
     const { root, world, win } = mountWindow();
-    expect(root.querySelectorAll('.cos-mount').length).toBe(ALL_MOUNT_SKIN_IDS.length);
+    expect(root.querySelectorAll('.cos-mount').length).toBe(ALL_MOUNT_SKIN_IDS.length - 2);
+    expect(root.querySelector('[data-id="terrorspark_groundshaker"]')).toBeNull();
+    expect(root.querySelector('[data-id="drakemaw_raptor"]')).toBeNull();
     const wear = root.querySelector<HTMLButtonElement>(
       '[data-act="wear-mount"][data-id="grag_bear"]',
     )!;

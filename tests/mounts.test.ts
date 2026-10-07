@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
+import { EMPTY_LIVE_ACCOUNT_COSMETICS } from '../server/account_cosmetics_live';
+import { AccountCosmeticsService } from '../server/account_cosmetics_service';
 import { CASKET_MOUNT_CHANCE, CASKET_MOUNT_REINS_ITEM_ID } from '../src/sim/clue_casket';
 
 // Mock the db layer so importing server/game (for wireEntity) needs no Postgres,
@@ -174,7 +176,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
         expect(item.noVendorSell).toBe(key !== 'valorsteed' ? true : undefined);
       }
       expect(item.noDiscard).toBe(true);
-      expect(item.sellValue).toBe(key === 'valorsteed' ? 100_000 : 0);
+      expect(item.sellValue).toBe(key === 'valorsteed' ? 25_000 : 0);
       // The item's name color matches the card's rarity tier.
       expect(item.quality).toBe(MOUNTS[key].rarity);
     }
@@ -455,7 +457,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
   });
 
   it('bagOwnedMounts is bags-only: a bank-only reins does not count (#2739 followup)', () => {
-    // The mobile quick-summon button (src/ui/mount_quick_summon.ts) picks from
+    // The mobile quick-summon button (the shared mount toggle) picks from
     // this list, not the wider ownedMounts(), because it hands the result
     // straight to useItem, which gates on countItem (bags only). A bank-only
     // reins must therefore be invisible here even though ownedMounts() (bags +
@@ -766,7 +768,7 @@ describe('mount reins transfer (not soulbound: the collection trades hands)', ()
     );
   });
 
-  it('selling horse reins pays 10 gold and removes the cosmetic', () => {
+  it('selling horse reins pays 2.5 gold and removes the cosmetic', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Seller');
     const marla = [...sim.entities.values()].find((e) => e.templateId === 'stablemaster_marla')!;
@@ -779,7 +781,7 @@ describe('mount reins transfer (not soulbound: the collection trades hands)', ()
     const before = sim.players.get(pid)!.copper;
     sellItem(sim.ctx, 'reins_valorsteed', 1, pid);
     expect(sim.countItem('reins_valorsteed', pid)).toBe(0);
-    expect(sim.players.get(pid)!.copper).toBe(before + 100_000);
+    expect(sim.players.get(pid)!.copper).toBe(before + 25_000);
     revalidateWindow(sim, pid);
     expect(player.mountSkinId).toBeNull();
   });
@@ -1788,6 +1790,33 @@ describe('mount skins preserve gameplay', () => {
 });
 
 describe('collectible mount cosmetics', () => {
+  it('keeps a selected alt-backed skin through real revalidation and summon completion until hydration succeeds', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    const meta = sim.meta(pid)!;
+    const player = sim.entities.get(pid)!;
+    meta.mountSkinId = player.mountSkinId = 'grag_bear';
+    const sessions = [
+      { accountId: 4001, pid, accountCosmetics: { ...EMPTY_LIVE_ACCOUNT_COSMETICS } },
+    ];
+    const service = new AccountCosmeticsService({
+      sim: () => sim,
+      sessions: () => sessions,
+      resyncQuests: vi.fn(),
+    });
+    service.setCollectibleMountSkins(4001, [], sessions, false);
+    sim.tickCount = pid;
+    updateMountTransition(sim.ctx, player, false);
+    expect(player.mountSkinId).toBe('grag_bear');
+    expect(mountOwned(meta, 'grag_bear')).toBe(false);
+    expect(toggleMount(sim.ctx, pid)).toBe(true);
+    finishTransition(sim, pid);
+    expect(player.mountSkinId).toBe('grag_bear');
+    expect(player.mountKey).toBe(DEFAULT_MOUNT);
+    service.setCollectibleMountSkins(4001, [], sessions, true);
+    expect(player.mountSkinId).toBeNull();
+    expect(meta.mountSkinId).toBeNull();
+  });
   it('treats an online account projection as authoritative without scanning bags or bank', () => {
     const sim = makeWorld();
     const pid = join(sim);
@@ -1828,13 +1857,13 @@ describe('collectible mount cosmetics', () => {
     expect(e.mountSkinId).toBe('grag_bear');
     expect(moveSpeedMult(e)).toBeCloseTo(1.7);
     e.ridingTier = 2;
-    expect(moveSpeedMult(e)).toBeCloseTo(2);
+    expect(moveSpeedMult(e)).toBeCloseTo(2.1);
     meta.accountMountSkinIds = [];
     sim.tickCount = e.id;
     updateMountTransition(sim.ctx, e, false);
     expect(e.mountSkinId).toBeNull();
     expect(e.mountKey).toBe(DEFAULT_MOUNT);
-    expect(moveSpeedMult(e)).toBeCloseTo(2);
+    expect(moveSpeedMult(e)).toBeCloseTo(2.1);
     sim.changeMountSkin('grag_bear');
     expect(e.mountSkinId).toBeNull();
   });

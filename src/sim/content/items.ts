@@ -381,7 +381,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     mount: 'valorsteed',
     quality: 'common',
     noDiscard: true,
-    sellValue: 100_000,
+    sellValue: 25_000,
     buyValue: 100_000, // 10 gold in copper
   },
   // Collectible mount (Morthen the Gravecaller, The Hollow Crypt). Owning the

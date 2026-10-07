@@ -95,7 +95,11 @@ export interface MechChromaCard {
 /** Every catalog mount skin in store order, owned or not, so the tab doubles
  *  as the catalog a player has not bought into yet. */
 export function mountSkinCards(s: CosmeticsSnapshot): MountSkinCard[] {
-  return ALL_MOUNT_SKIN_IDS.map((id) => {
+  return ALL_MOUNT_SKIN_IDS.filter(
+    (id) =>
+      s.ownedMountSkins.includes(id) ||
+      !['terrorspark_groundshaker', 'drakemaw_raptor'].includes(id),
+  ).map((id) => {
     const owned = s.ownedMountSkins.includes(id);
     const worn = owned && s.wornMountSkin === id;
     return {

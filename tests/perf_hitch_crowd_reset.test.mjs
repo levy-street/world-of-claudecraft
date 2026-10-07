@@ -265,7 +265,7 @@ describe('crowd-influx run reset', () => {
     }).toEqual({
       x: -113,
       z: 1413,
-      motionRadius: 51,
+      motionRadius: 54,
       startRadius: 9,
       moveIntervalMs: 250,
       moveSteps: 12,

@@ -27,7 +27,12 @@
 import { MOUNT_RACE_START_PLATFORM, STABLE_PADDOCK, TRAINING_MOUNT_KEY } from './content/mounts';
 import { QUESTS } from './data';
 import { forceDismount, forceTrainingMount } from './mounts';
-import { BASIC_RIDING_FEE_COPPER, ridingTrainingFee, ridingTrainingTier } from './riding_training';
+import {
+  BASIC_RIDING_FEE_COPPER,
+  ridingMoveSpeedPct,
+  ridingTrainingFee,
+  ridingTrainingTier,
+} from './riding_training';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import {
@@ -135,7 +140,7 @@ export function learnRiding(
     meta.entityId,
     tier === 0
       ? NOTICE_RIDING_LEARNED
-      : 'You have learned Advanced Riding. Your mount speed is increased by 100%.',
+      : `You have learned Advanced Riding. Your mount speed is increased by ${Math.round(ridingMoveSpeedPct(2) * 100)}%.`,
   );
 }
 
