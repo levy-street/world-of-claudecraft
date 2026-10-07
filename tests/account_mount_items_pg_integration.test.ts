@@ -182,7 +182,7 @@ describeDb('account mount item projection (real Postgres)', () => {
     expect(rows[0].mountSkinIds).toEqual(['valorsteed']);
     known = { [id]: rows[0].version! };
     await db.pool.query(
-      "UPDATE characters SET updated_at = '2025-12-31+00', state = $2 WHERE id = $1",
+      "UPDATE characters SET updated_at = '2025-12-31 00:00:00+00', state = $2 WHERE id = $1",
       [id, { inventory: 'malformed', bank: { inventory: [] } }],
     );
     expect((await mounts.refreshAccountMountItems(20001, known))[0].mountSkinIds).toEqual([]);

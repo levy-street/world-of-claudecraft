@@ -457,11 +457,8 @@ describe('mount reins items (the collection: owning the item is owning the mount
   });
 
   it('bagOwnedMounts is bags-only: a bank-only reins does not count (#2739 followup)', () => {
-    // The mobile quick-summon button (the shared mount toggle) picks from
-    // this list, not the wider ownedMounts(), because it hands the result
-    // straight to useItem, which gates on countItem (bags only). A bank-only
-    // reins must therefore be invisible here even though ownedMounts() (bags +
-    // bank) reports it, or the button would offer a summon useItem refuses.
+    // Item-use callers need bags-only possession; a bank-only reins can
+    // grant an appearance through ownedMounts() without being usable in bags.
     const sim = makeWorld();
     const pid = join(sim, 20);
     const meta = sim.players.get(pid)!;
