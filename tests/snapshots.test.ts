@@ -3051,9 +3051,10 @@ describe('autosaves', () => {
   it('holds each character save under the shared major-producer permit', async () => {
     const gate = createBackgroundDbGate(3, 2); // one admitted producer
     const server = new GameServer(undefined, gate);
-    joinServer(server, fakeWs(), 1, 'Testa');
-    joinServer(server, fakeWs(), 2, 'Testb');
-    joinServer(server, fakeWs(), 3, 'Testc');
+    // A completed join projection isolates save admission from ownership refreshes.
+    joinServer(server, fakeWs(), 1, 'Testa', 'warrior', { accountMountItems: [] });
+    joinServer(server, fakeWs(), 2, 'Testb', 'warrior', { accountMountItems: [] });
+    joinServer(server, fakeWs(), 3, 'Testc', 'warrior', { accountMountItems: [] });
     let releaseDb!: () => void;
     const dbHold = new Promise<void>((resolve) => {
       releaseDb = resolve;
@@ -3082,7 +3083,7 @@ describe('autosaves', () => {
   it('joins the character FIFO before taking the shared DB permit', async () => {
     const gate = createBackgroundDbGate(1, 0); // the supported one-lane edge
     const server = new GameServer(undefined, gate);
-    const session = joinServer(server, fakeWs(), 1, 'Testa');
+    const session = joinServer(server, fakeWs(), 1, 'Testa', 'warrior', { accountMountItems: [] });
     const order: string[] = [];
     let markHeadStarted!: () => void;
     const headStarted = new Promise<void>((resolve) => {
@@ -3204,7 +3205,7 @@ describe('autosaves', () => {
   it('gates WOC dirty-book preflush and mail persistence at their innermost DB calls', async () => {
     const gate = createBackgroundDbGate(1, 0);
     const server = new GameServer(undefined, gate);
-    const session = joinServer(server, fakeWs(), 1, 'Testa');
+    const session = joinServer(server, fakeWs(), 1, 'Testa', 'warrior', { accountMountItems: [] });
     const guildId = 914;
     server.sim.loadGuildBank(guildId, {
       treasury: 0,
@@ -6909,9 +6910,13 @@ describe('full self-state snapshot delta fixture', () => {
     const server = new GameServer();
     const ownerWire = fakeWs();
     const wearerWire = fakeWs();
-    const owner = server.join(ownerWire.ws, 890, 891, 'ReinsOwner', 'warrior', null, false, {});
+    const owner = server.join(ownerWire.ws, 890, 891, 'ReinsOwner', 'warrior', null, false, {
+      accountMountItems: [],
+    });
     // GM session exemption permits two live characters in this account fixture.
-    const wearer = server.join(wearerWire.ws, 890, 892, 'ReinsWearer', 'warrior', null, true, {});
+    const wearer = server.join(wearerWire.ws, 890, 892, 'ReinsWearer', 'warrior', null, true, {
+      accountMountItems: [],
+    });
     if ('error' in owner || 'error' in wearer) throw new Error('join failed');
     const sim = server.sim;
     const client = bareClient(wearer.pid);
