@@ -6726,16 +6726,15 @@
   }
   /* The ghost hint's desktop size wraps to two lines on a phone and lands on the
      subzone banner; a smaller size keeps it to one line in landscape and clear of
-     the compass strip in both orientations. */
-  body.mobile-touch #ghost-hint {
+     the compass strip in both orientations. The header column carries the
+     position and width cap; its Recap button follows the hint down. */
+  body.mobile-touch #ghost-header {
     top: 52px;
-    font-size: 14px;
+    gap: 6px;
     max-width: calc(var(--app-vw) / var(--ui-scale, 1) - 96px);
   }
-  /* The ghost Recap button follows the smaller phone hint up so it sits just under
-     that one line instead of leaving a gap. */
-  body.mobile-touch #ghost-recap-btn {
-    top: 76px;
+  body.mobile-touch #ghost-hint {
+    font-size: 14px;
   }
   /* The death and ghost panels are authored at min(360px, 100vw - 32px), but
      they live inside #ui, which carries zoom: var(--ui-scale). A raw vw length

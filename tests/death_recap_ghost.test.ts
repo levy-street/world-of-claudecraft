@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
-// The Death Recap stays reachable for the whole ghost run. Releasing spirit hides
-// the corpse overlay and its Recap button, so a standalone #ghost-recap-btn takes
-// over until the player is alive again (src/ui/hud/death).
+// The Death Recap stays reachable for the whole corpse run. Releasing spirit hides
+// the corpse overlay and its Recap button, so a standalone #ghost-recap-btn under
+// the ghost hint takes over until the player is alive again (src/ui/hud/death).
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
@@ -26,11 +26,13 @@ describe('ghost Death Recap: the view core', () => {
     expect(v.ghostRecap).toBe(true);
   });
 
-  it('keeps the ghost Recap for a battleground ghost waiting on the wave', () => {
+  it('suppresses it for a battleground ghost, like the hint (the wave is the way back)', () => {
     const v = createDeathPromptView();
+    updateDeathPromptView(v, true, true, false, false, at, farCorpse, false);
+    expect(v.ghostRecap, 'open-world control').toBe(true);
     updateDeathPromptView(v, true, true, false, true, at, farCorpse, false);
     expect(v.ghostHint).toBe(false);
-    expect(v.ghostRecap).toBe(true);
+    expect(v.ghostRecap).toBe(false);
   });
 
   it('hides it on a fresh corpse (the overlay has its own Recap) and once alive', () => {
@@ -103,18 +105,32 @@ describe('ghost Death Recap: the painter', () => {
 });
 
 describe('ghost Death Recap: markup, wiring and layout', () => {
-  it('ships the hidden, localized ghost Recap button in both entries, outside every nav root', () => {
+  it('ships the hidden, localized ghost Recap button under the hint in both entries', () => {
     for (const entry of ['../index.html', '../play.html']) {
+      // happy-dom cannot parse the whole entry page, so parse the ghost markup run:
+      // #ghost-prompt (the nav root) through the end of #ghost-header.
       const html = read(entry);
-      expect(html, entry).toContain(
-        '<button type="button" class="btn ui-btn" id="ghost-recap-btn" style="display: none" data-i18n="hud.core.deathRecapTitle">Death Recap</button>',
+      const from = html.indexOf('<div id="ghost-prompt"');
+      const headerAt = html.indexOf('<div id="ghost-header">');
+      expect(from, entry).toBeGreaterThan(-1);
+      expect(headerAt, entry).toBeGreaterThan(from);
+      const doc = document.createElement('div');
+      doc.innerHTML = html.slice(
+        from,
+        html.indexOf('</div>', html.indexOf('</button>', headerAt)) + 6,
       );
-      // Not inside #ghost-prompt: that pad-nav root only appears in corpse reach,
-      // and a standing button there would take gamepad focus for the whole run.
-      const prompt = html.indexOf('<div id="ghost-prompt"');
-      const promptEnd = html.indexOf('</div>\n    </div>', prompt);
-      const btn = html.indexOf('id="ghost-recap-btn"');
-      expect(btn > promptEnd || btn < prompt, entry).toBe(true);
+      const btn = doc.querySelector<HTMLElement>('#ghost-recap-btn');
+      expect(btn, entry).not.toBeNull();
+      expect(btn?.tagName, entry).toBe('BUTTON');
+      expect(btn?.getAttribute('type'), entry).toBe('button');
+      expect(btn?.getAttribute('data-i18n'), entry).toBe('hud.core.deathRecapTitle');
+      expect(btn?.style.display, entry).toBe('none');
+      // One column with the hint, after it, so the button follows a wrapped hint down.
+      expect(btn?.parentElement, entry).toBe(doc.querySelector('#ghost-header'));
+      expect(btn?.previousElementSibling?.id, entry).toBe('ghost-hint');
+      // Outside every pad-nav root: #ghost-prompt only appears in corpse reach, and
+      // a standing button inside a root would take gamepad focus for the whole run.
+      expect(btn?.closest('[data-pad-nav-root]'), entry).toBeNull();
     }
   });
 
@@ -130,14 +146,20 @@ describe('ghost Death Recap: markup, wiring and layout', () => {
     );
   });
 
-  it('centres the button with translate so the .ui-btn press transform cannot shove it', () => {
+  it('stacks hint and button in one pointer-inert column; only the button takes input', () => {
     const css = read('../src/styles/hud.css');
-    const start = css.indexOf('#ghost-recap-btn {');
-    expect(start).toBeGreaterThan(-1);
-    const rule = css.slice(start, css.indexOf('}', start));
-    expect(rule).toContain('position: absolute');
-    expect(rule).toContain('translate: -50% 0');
-    expect(rule).not.toContain('transform:');
-    expect(read('../src/styles/hud.mobile.css')).toContain('body.mobile-touch #ghost-recap-btn {');
+    const rule = (sel: string) => {
+      const start = css.indexOf(`${sel} {`);
+      expect(start, sel).toBeGreaterThan(-1);
+      return css.slice(start, css.indexOf('}', start));
+    };
+    const header = rule('#ghost-header');
+    expect(header).toContain('position: absolute');
+    expect(header).toContain('flex-direction: column');
+    expect(header).toContain('pointer-events: none');
+    // The hint no longer carries its own absolute offset (that drifted from the button).
+    expect(rule('#ghost-hint')).not.toContain('position:');
+    expect(rule('#ghost-recap-btn')).toContain('pointer-events: auto');
+    expect(read('../src/styles/hud.mobile.css')).toContain('body.mobile-touch #ghost-header {');
   });
 });

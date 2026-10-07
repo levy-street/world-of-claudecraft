@@ -10971,20 +10971,33 @@
   #ghost-prompt .btn {
     pointer-events: auto;
   }
-  /* Ghost hint: the standing top-center line for the whole ghost run ("run to
-     your body or talk to the Pale Keeper"). Sits under the compass strip in the
-     #arena-status band and reads like the zone banner (light text, no plate),
-     pointer-inert so it never eats a click meant for the world. The letter
-     spacing and title shadow come from the ui-cin primitive on the element. */
-  #ghost-hint {
-    --color-text-light: var(--color-white);
+  /* Ghost header: the top-center column for the ghost run, holding the hint and
+     the Death Recap button. Sits under the compass strip in the #arena-status band.
+     One flex column, so the button follows the hint down when a localized hint
+     wraps. max-content width with a viewport cap keeps the absolute box from
+     shrink-wrapping against the left: 50% offset. Pointer-inert except the button. */
+  #ghost-header {
     position: absolute;
     left: 50%;
     top: 74px;
     transform: translateX(-50%);
-    display: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
     width: max-content;
     max-width: calc(100vw - 48px);
+    pointer-events: none;
+    z-index: 30;
+  }
+  /* Ghost hint: the standing line for the whole ghost run ("run to your body or
+     talk to the Pale Keeper"). Reads like the zone banner (light text, no plate),
+     pointer-inert so it never eats a click meant for the world. The letter
+     spacing and title shadow come from the ui-cin primitive on the element. */
+  #ghost-hint {
+    --color-text-light: var(--color-white);
+    display: none;
+    max-width: 100%;
     box-sizing: border-box;
     color: var(--color-text-light);
     font-size: 20px;
@@ -10992,19 +11005,11 @@
     line-height: 1.2;
     text-align: center;
     pointer-events: none;
-    z-index: 30;
   }
-  /* Ghost Death Recap: a small standalone button under the ghost hint for the whole
-     ghost run, since releasing hides the overlay's Recap. A bare button, no plate,
-     like the ghost prompt; only the button itself takes pointer input. */
+  /* Ghost Death Recap: a bare button under the hint (no plate, like the ghost
+     prompt), the only part of the header that takes pointer input. */
   #ghost-recap-btn {
-    position: absolute;
-    left: 50%;
-    top: 108px;
-    /* translate rather than transform, since .ui-btn:active owns transform for
-       its press nudge. */
-    translate: -50% 0;
-    z-index: 30;
+    pointer-events: auto;
   }
   /* Interact affordance: a small, NON-BLOCKING line shown only while an interact
      press is ambiguous between two farming targets in reach (a placed feast over
