@@ -20410,12 +20410,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualPrice': '{price} за 12 месяцев, оплата сразу',
   'hudChrome.wocStore.subscription.annualTerms':
     'Ежегодное продление по той же цене. Оплата обычной валютой через Stripe. Отмена в настройках платежей.',
-  'hudChrome.wocStore.subscription.paidReward':
-    'Каждый оплаченный период приносит {amount} Claudium стоимостью {value}. Во время бесплатного пробного периода Claudium не начисляется.',
   'hudChrome.wocStore.subscription.annualMount':
     'После оплаты получите привязанный к персонажу ключ от танка по почте на персонаже, купившем набор. Танк временно заменяет ездовое животное набора.',
   'hudChrome.wocStore.subscription.trialTerms':
-    'Бесплатный пробный период на {days} дней доступен один раз на аккаунт. Требуется способ оплаты. Если не отменить подписку, по окончании будет списано {price}. Во время пробного периода Claudium и транспорт набора не выдаются.',
+    'Бесплатный пробный период на {days} дней доступен один раз на аккаунт. Требуется способ оплаты. Если не отменить подписку, по окончании будет списано {price}.',
   'hudChrome.wocStore.subscription.startTrial': 'Начать пробные 7 дней',
   'hudChrome.wocStore.subscription.annualClaim': 'Получить транспорт набора',
   'hudChrome.wocStore.subscription.annualPending':

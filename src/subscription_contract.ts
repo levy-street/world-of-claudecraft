@@ -7,11 +7,10 @@ export const GAME_SUBSCRIPTION_PRICE = {
   interval: 'month',
 } as const;
 export const GAME_SUBSCRIPTION_PLANS = {
-  game_monthly: { plan: 'game_monthly', price: GAME_SUBSCRIPTION_PRICE, claudium: 500 },
+  game_monthly: { plan: 'game_monthly', price: GAME_SUBSCRIPTION_PRICE },
   game_annual: {
     plan: 'game_annual',
     price: { currency: 'usd', unitAmount: 5000, interval: 'year' },
-    claudium: 6000,
   },
 } as const;
 export type GameSubscriptionPlan = keyof typeof GAME_SUBSCRIPTION_PLANS;
@@ -111,11 +110,7 @@ export function subscriptionSnapshot(value: unknown): SubscriptionSnapshot {
         return { ...SUBSCRIPTION_OFF };
       const candidate = offer as Record<string, unknown>;
       const plan = candidate.plan;
-      if (
-        !validOffer(plan, candidate.price) ||
-        candidate.claudium !== GAME_SUBSCRIPTION_PLANS[plan].claudium ||
-        plans.some((row) => row.plan === plan)
-      )
+      if (!validOffer(plan, candidate.price) || plans.some((row) => row.plan === plan))
         return { ...SUBSCRIPTION_OFF };
       plans.push(GAME_SUBSCRIPTION_PLANS[plan]);
     }

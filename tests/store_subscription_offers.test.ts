@@ -3,7 +3,7 @@ import { GAME_SUBSCRIPTION_PLANS, SUBSCRIPTION_OFF } from '../src/subscription_c
 import { subscriptionOffersHtml } from '../src/ui/store_subscription_offers';
 
 describe('membership plan offers', () => {
-  it('shows exact paid value, annual renewal and trial charges for advertised plans', () => {
+  it('shows membership prices, annual mount and trial terms without currency rewards', () => {
     const html = subscriptionOffersHtml(
       {
         ...SUBSCRIPTION_OFF,
@@ -20,16 +20,16 @@ describe('membership plan offers', () => {
     for (const text of [
       '$5.00 per month',
       '$50.00 for 12 months',
-      '$60.00',
-      '6,000 Claudium',
-      '500 Claudium',
       'Renews yearly',
       'once per account',
       'payment method is required',
-      'No Claudium or bundle mount',
       'soulbound tank mount',
     ])
       expect(html).toContain(text);
+    expect(html).not.toContain('Claudium');
+    const monthly = html.split('data-subscription-plan="game_annual"')[0];
+    expect(monthly).not.toContain('mount');
+    expect(html).not.toContain('$60.00');
     expect(html.match(/data-subscription-action="checkout"/g)).toHaveLength(2);
   });
   it('does not promise trial or rewards through a legacy monthly service', () => {

@@ -24,8 +24,9 @@ and membership expiry returning the bank to its Personal tab.
 
 ## Trial and annual bundle extension
 
-The extension captures use the same production renderers with both offers and
-trial eligibility enabled. All three viewport sizes have no browser errors or
+The extension captures were refreshed after membership currency rewards were
+removed. They use the production subscription renderer, window shell and styles
+with both offers and trial eligibility enabled. All three viewport sizes have no browser errors or
 horizontal overflow; checkout controls are 40 pixels high and keyboard reachable.
 [Forced-colors evidence](extension-shop-forced-colors.png) shows readable labels,
 visible borders and the keyboard focus outline on the monthly checkout control.

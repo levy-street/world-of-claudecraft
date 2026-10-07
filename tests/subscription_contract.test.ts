@@ -36,7 +36,7 @@ describe('subscription wire contract', () => {
       expect(subscriptionSnapshot({ ...valid, accountId })).toEqual(SUBSCRIPTION_OFF);
     expect(subscriptionSnapshot(valid).accountId).toBeUndefined();
   });
-  it('requires exact advertised annual prices, rewards and lifetime trial metadata', () => {
+  it('requires exact advertised annual prices and lifetime trial metadata', () => {
     const annual = {
       ...valid,
       ...GAME_SUBSCRIPTION_PLANS.game_annual,
@@ -51,7 +51,6 @@ describe('subscription wire contract', () => {
     });
     for (const patch of [
       { price: { ...annual.price, unitAmount: 6000 } },
-      { plans: [{ ...GAME_SUBSCRIPTION_PLANS.game_annual, claudium: 5000 }] },
       { plans: [GAME_SUBSCRIPTION_PLANS.game_monthly] },
       { plans: [GAME_SUBSCRIPTION_PLANS.game_annual, GAME_SUBSCRIPTION_PLANS.game_annual] },
       { plans: [] },
@@ -66,6 +65,20 @@ describe('subscription wire contract', () => {
     expect(subscriptionSnapshot({ ...valid, trialEligible: true, trialDays: 7 })).toEqual(
       SUBSCRIPTION_OFF,
     );
+  });
+  it('strips legacy currency rewards while retaining validated prices and trial offers', () => {
+    const snapshot = subscriptionSnapshot({
+      ...valid,
+      plans: [
+        { ...GAME_SUBSCRIPTION_PLANS.game_monthly, claudium: 500 },
+        { ...GAME_SUBSCRIPTION_PLANS.game_annual, claudium: 6000 },
+      ],
+      trialEligible: true,
+      trialDays: 7,
+    });
+    expect(snapshot.available).toBe(true);
+    expect(snapshot.plans).toEqual(Object.values(GAME_SUBSCRIPTION_PLANS));
+    for (const offer of snapshot.plans!) expect(offer).not.toHaveProperty('claudium');
   });
   it('requires exactly the USD 5 monthly plan before offering billing', () => {
     expect(subscriptionSnapshot(valid).canCheckout).toBe(true);

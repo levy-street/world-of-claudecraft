@@ -6,9 +6,33 @@ before publication to PR #4281.
 See [membership design and deployment contract](membership.md) and
 [desktop/mobile evidence](../screenshots/membership/README.md).
 
+## Currency reward removal
+
+The current offers preserve USD 5 monthly and USD 50 annual pricing, the trial,
+and the paid annual mount. The store no longer advertises a currency reward, and
+legacy service reward fields are discarded by the validated game contract.
+The companion service removes future credits while preserving historical payment
+identities and existing balances. Verified refunds can still reverse actual old
+credits; deploying the new code alone does not debit them.
+
+Current checks:
+
+- `npx --no-install vitest run tests/subscription_contract.test.ts tests/subscription_sdk.test.ts tests/subscription_checkout_intents.test.ts tests/store_subscription.test.ts tests/store_subscription_offers.test.ts tests/server/subscription.test.ts tests/server/subscription_annual_proxy.test.ts tests/i18n_completeness.test.ts --maxWorkers=2`: 71 passed.
+- `npx --no-install tsc --noEmit`: passed.
+- `npx --no-install turbo run check:types build:env build:server build:bot build:bundle`: all seven tasks passed.
+- Final offer/localization/CI regression (`subscription_contract`,
+  `store_subscription_offers`, `i18n_completeness`, `ci_workflow`): 52 passed.
+  Includes the CI checkout entry missing for the earlier referral-armour screenshots.
+- `npx --no-install vitest run --config vitest.browser.config.ts tests/browser/membership_bank.browser.test.ts tests/browser/store_purchase_prompt_stacking.browser.test.ts`: five passed.
+- Companion service `npm test` with disposable PostgreSQL 16.15: 746 passed,
+  zero failures or skips. Includes both historical reward amounts, migration,
+  replay, refunds, annual mounts, and bounded invoice-history persistence.
+- Refreshed desktop, portrait, landscape and forced-colors component screenshots.
+  Both checkout controls remain 40px high; no horizontal overflow or page errors.
+
 ## Focused verification
 
-The 2026-10-06 extension adds paid Claudium rewards, the seven-day trial and the
+The 2026-10-06 extension adds the seven-day trial and the
 annual tank-mount bundle. Its final focused command is recorded below; all
 18 files passed, with 571 tests passed and three existing skips:
 
