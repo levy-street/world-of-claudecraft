@@ -6009,6 +6009,7 @@ function dirtyEveryDeltaField(): {
   // The courier's pose and revision-gated custody blob recombine into one owner mirror.
   meta.courier = {
     phase: 'returning',
+    travelDistance: 8,
     x: 17,
     z: 29,
     bankerId: null,
@@ -7079,6 +7080,8 @@ describe('full self-state snapshot delta fixture', () => {
       x: 17,
       z: 29,
       bankerId: null,
+      travelDistance: 8,
+      remainingDistance: 0,
       inventoryRevision: 0,
     });
     expect(initial.self.courierData).toMatchObject({
@@ -7086,6 +7089,8 @@ describe('full self-state snapshot delta fixture', () => {
       revision: 7,
     });
     expect(initial.self.courierData).not.toHaveProperty('x');
+    expect(initial.self.courierData).not.toHaveProperty('travelDistance');
+    expect(initial.self.courierData).not.toHaveProperty('remainingDistance');
     expect(
       initial.ents.every(
         (entry: Record<string, unknown>) => !('courier' in entry) && !('courierData' in entry),
@@ -7103,6 +7108,8 @@ describe('full self-state snapshot delta fixture', () => {
       x: 41,
       z: 29,
       bankerId: null,
+      travelDistance: 8,
+      remainingDistance: 0,
       inventoryRevision: 0,
     });
     expect(moved.self).not.toHaveProperty('courierData');

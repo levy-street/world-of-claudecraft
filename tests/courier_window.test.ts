@@ -17,6 +17,8 @@ function rig() {
     x: 0,
     z: 0,
     bankerId: 1,
+    travelDistance: 0,
+    remainingDistance: 0,
     inventoryRevision: 1,
     bankRevision: 1,
     cargo: [],

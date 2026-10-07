@@ -514,8 +514,8 @@ hashes, and review evidence: `docs/achievements/membership-items-2026-10-05/acce
 
 ### Membership courier
 
-- `public/models/creatures/courier_donkey.glb`: original procedural flying donkey
-  authored for World of ClaudeCraft from the user's feature description, 2026-10-07.
-  No third-party mesh, texture, or reference image. Deterministic factory and export
-  source: `scripts/assets/courier_donkey/`. The optimized asset retains two articulated
-  feather wings and uses vertex colour without embedded textures.
+- `public/models/creatures/courier_donkey.glb`: user-supplied `winged_mail_donkey.glb`,
+  received 2026-10-07 for the membership courier. Authorship and license were not
+  supplied. The original donor and reproducible import pipeline are retained in
+  `scripts/assets/courier_donkey/`. The character-safe optimizer preserves the
+  47-joint rig and Idle/Run/Fly clips; the 1024px color map uses KTX2/Basis compression.

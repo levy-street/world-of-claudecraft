@@ -87,6 +87,8 @@ export function emitCourierSelfKeys(
         z: _z,
         bankerId: _bankerId,
         inventoryRevision: _inventoryRevision,
+        travelDistance: _travelDistance,
+        remainingDistance: _remainingDistance,
         ...data
       } = info;
       emit('courierData', data);

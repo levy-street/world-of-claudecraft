@@ -23,6 +23,8 @@ export interface CourierState {
   x: number;
   z: number;
   bankerId: number | null;
+  /** Distance from this leg's start, saturated at the 8-unit takeoff ramp. */
+  travelDistance: number;
   cargo: InvSlot[];
   withdrawals: CourierSelection[];
   revision: number;
@@ -35,10 +37,15 @@ export type CourierBankExchange = (
   withdraw: () => void,
 ) => boolean;
 export interface CourierInfo extends Omit<CourierState, 'retryRemaining'> {
+  /** Current authoritative target distance; zero while grounded or paused. */
+  remainingDistance: number;
   active: boolean;
   bankSlots: InvSlot[];
   bankCapacity: number;
   inventoryRevision: number;
   bankRevision: number;
 }
-export type CourierPose = Pick<CourierInfo, 'phase' | 'x' | 'z' | 'bankerId' | 'inventoryRevision'>;
+export type CourierPose = Pick<
+  CourierInfo,
+  'phase' | 'x' | 'z' | 'bankerId' | 'inventoryRevision' | 'travelDistance' | 'remainingDistance'
+>;

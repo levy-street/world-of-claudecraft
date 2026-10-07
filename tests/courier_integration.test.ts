@@ -55,7 +55,7 @@ describe('courier live simulation integration', () => {
     expect(mountOwned(meta, 'valorsteed')).toBe(true);
     expect(ownedMounts(meta)).toContain('valorsteed');
     expect(bagOwnedMounts(meta.inventory)).not.toContain('valorsteed');
-    for (let i = 0; i < 42; i++) {
+    for (let i = 0; i < 200 && meta.courier?.phase !== 'ready'; i++) {
       sim.tick();
       expect(player.mountKey).toBe('valorsteed');
     }
@@ -70,13 +70,13 @@ describe('courier live simulation integration', () => {
       },
       pid,
     );
-    for (let i = 0; i < 21; i++) sim.tick();
+    for (let i = 0; i < 100 && meta.courier?.phase !== 'returning'; i++) sim.tick();
     expect(meta.courier?.phase).toBe('returning');
     expect(meta.courier?.cargo[0].itemId).toBe('reins_valorsteed');
     expect(mountOwned(meta, 'valorsteed')).toBe(true);
     expect(ownedMounts(meta)).toContain('valorsteed');
     expect(bagOwnedMounts(meta.inventory)).not.toContain('valorsteed');
-    for (let i = 0; i < 21; i++) {
+    for (let i = 0; i < 100 && meta.courier?.phase !== 'ready'; i++) {
       sim.tick();
       expect(player.mountKey).toBe('valorsteed');
     }
@@ -203,12 +203,18 @@ describe('courier live simulation integration', () => {
       (s) => s.itemId === 'membership_helmet',
     );
     expect(copies).toHaveLength(1);
+    for (let i = 0; i < 15; i++) sim.tick();
+    expect(meta.courier!.travelDistance).toBeGreaterThan(3);
+    expect(meta.courier!.travelDistance).toBeLessThan(8);
     const saved = sim.serializeCharacter(pid)!;
+    expect(saved.courier!.travelDistance).toBe(meta.courier!.travelDistance);
     expect(saved.courier?.cargo[0].instance?.perfected).toBe(true);
     const restored = makeSim();
     const next = restored.addPlayer('warrior', 'Restored', { state: saved });
     expect(restored.players.get(next)?.courier?.cargo).toEqual(meta.courier!.cargo);
     expect(restored.players.get(next)?.courier?.phase).toBe('outbound');
+    expect(restored.players.get(next)?.courier?.travelDistance).toBe(saved.courier!.travelDistance);
+    expect(restored.courierPoseFor(next)?.travelDistance).toBe(saved.courier!.travelDistance);
     expect(restored.membershipActiveFor(next)).toBe(false);
   });
 });

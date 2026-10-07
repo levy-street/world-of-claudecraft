@@ -18,6 +18,7 @@ export function courierSummon(ctx: SimContext, pid?: number): boolean {
       x: e.pos.x,
       z: e.pos.z,
       bankerId: null,
+      travelDistance: 0,
       cargo: [],
       withdrawals: [],
       revision: 1,
@@ -94,6 +95,7 @@ export function courierDispatch(
   state.x = e.pos.x;
   state.z = e.pos.z;
   state.phase = 'outbound';
+  state.travelDistance = 0;
   state.retryRemaining = 0;
   state.revision++;
   ctx.onInventoryChangedForQuests(meta);

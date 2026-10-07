@@ -1,6 +1,7 @@
 // Small courier pose and revision-gated cargo arrive independently. Omission
 // retains the previous value; malformed frames never replace a valid mirror.
 import type { CourierInfo, CourierPose } from '../sim/courier';
+import { COURIER_FLIGHT_DISTANCE } from '../sim/courier/motion';
 import { isRecord, isWireBankSlot } from './vault_snapshot_wire';
 
 type Pose = CourierPose;
@@ -11,11 +12,25 @@ export function decodeCourierPose(value: unknown): Pose | null | undefined {
   if (
     !isRecord(value) ||
     Object.keys(value).some(
-      (k) => !['phase', 'x', 'z', 'bankerId', 'inventoryRevision'].includes(k),
+      (k) =>
+        ![
+          'phase',
+          'x',
+          'z',
+          'bankerId',
+          'inventoryRevision',
+          'travelDistance',
+          'remainingDistance',
+        ].includes(k),
     ) ||
     !PHASES.has(value.phase as string) ||
     !Number.isSafeInteger(value.inventoryRevision) ||
     (value.inventoryRevision as number) < 0 ||
+    !Number.isFinite(value.travelDistance) ||
+    (value.travelDistance as number) < 0 ||
+    (value.travelDistance as number) > COURIER_FLIGHT_DISTANCE ||
+    !Number.isFinite(value.remainingDistance) ||
+    (value.remainingDistance as number) < 0 ||
     !Number.isFinite(value.x) ||
     !Number.isFinite(value.z) ||
     (value.bankerId !== null &&

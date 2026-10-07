@@ -171,6 +171,21 @@ describe('live courier server wiring', () => {
     (client as any).applySnapshot(unchanged);
     expect(client.courierInfo).toBe(before);
     expect(sim.meta(observer.pid)?.courier).toBeUndefined();
+    heavyRead.mockClear();
+    for (let i = 0; i < 15; i++) updateCourier(sim.ctx, meta, player);
+    broadcast(server);
+    const moving = lastSnap(socket.sent);
+    expect(moving.self.courierData).toBeUndefined();
+    expect(moving.self.courier.travelDistance).toBeGreaterThan(3);
+    expect(moving.self.courier.travelDistance).toBeLessThan(8);
+    expect(moving.self.courier.remainingDistance).toBeGreaterThan(8);
+    (client as any).applySnapshot(moving);
+    expect(client.courierInfo?.travelDistance).toBe(meta.courier!.travelDistance);
+    const destination = sim.entities.get(meta.courier!.bankerId!)!;
+    expect(client.courierInfo?.remainingDistance).toBeCloseTo(
+      Math.hypot(destination.pos.x - meta.courier!.x, destination.pos.z - meta.courier!.z),
+    );
+    expect(heavyRead).not.toHaveBeenCalled();
     const state = meta.courier!;
     const banker = sim.entities.get(state.bankerId!)!;
     state.x = banker.pos.x;

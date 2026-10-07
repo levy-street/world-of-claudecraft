@@ -49,7 +49,12 @@ function fixture() {
     for (let i = 0; i < count; i++) updateCourier(ctx, meta, player);
   };
   courierSummon(ctx, 1);
-  return { ctx, meta, player, banker, tick };
+  const until = (done: () => boolean) => {
+    for (let i = 0; i < 400 && !done(); i++) tick();
+    expect(done()).toBe(true);
+  };
+  const finish = () => until(() => ['ready', 'waiting'].includes(meta.courier!.phase));
+  return { ctx, meta, player, banker, tick, until, finish };
 }
 const selection = (slots: InvSlot[], index = 0) => ({
   index,
@@ -148,7 +153,7 @@ describe('membership courier custody', () => {
           1,
         ),
       ).toBe(true);
-      f.tick(40);
+      f.finish();
       expect(phases[0][0].count).toBe(5);
       expect(phases[1][0].count).toBe(3);
       expect(f.meta.inventory).toEqual([bank]);
@@ -195,7 +200,7 @@ describe('membership courier custody', () => {
     expect(courierInfoFor(f.ctx, 1)).not.toBe(first);
     expect(bankMap).toHaveBeenCalledTimes(2);
   });
-  it('travels at 17.5 units/second, deposits at the banker and delivers only on return', () => {
+  it('runs before takeoff, deposits only at the banker and delivers only on return', () => {
     const f = fixture();
     f.meta.inventory = [food(3)];
     f.meta.bank.inventory = [meat(2)];
@@ -212,13 +217,14 @@ describe('membership courier custody', () => {
     expect(f.meta.inventory).toEqual([]);
     expect(f.meta.bank.inventory).toEqual([meat(2)]);
     f.tick(10);
-    expect(f.meta.courier!.x).toBeCloseTo(8.75);
+    expect(f.meta.courier!.x).toBeGreaterThan(3.5);
+    expect(f.meta.courier!.x).toBeLessThan(8.75);
     expect(f.meta.courier!.phase).toBe('outbound');
-    f.tick(10);
+    f.until(() => f.meta.courier!.phase === 'returning');
     expect(f.meta.bank.inventory).toEqual([food(3)]);
     expect(f.meta.courier!.cargo).toEqual([meat(2)]);
     expect(f.meta.inventory).toEqual([]);
-    f.tick(20);
+    f.finish();
     expect(f.meta.inventory).toEqual([meat(2)]);
     expect(f.meta.courier!.phase).toBe('ready');
   });
@@ -232,7 +238,7 @@ describe('membership courier custody', () => {
     expect(f.meta.courier!.bankerId).toBe(3);
     f.tick(8);
     f.player.pos.z = 7;
-    f.tick(20);
+    f.finish();
     expect(f.meta.courier!.phase).toBe('ready');
     expect(f.meta.courier!.z).toBe(7);
   });
@@ -247,10 +253,10 @@ describe('membership courier custody', () => {
     };
     f.meta.bank.inventory = [slot];
     courierDispatch(f.ctx, { deposits: [], withdrawals: [selection(f.meta.bank.inventory)] }, 1);
-    f.tick(20);
+    f.until(() => f.meta.courier!.phase === 'returning');
     const snapshot = savedCourierState(f.meta.courier!);
     f.meta.courier = sanitizeCourierState(snapshot, f.meta.name, [], 1);
-    f.tick(20);
+    f.finish();
     expect(f.meta.inventory).toEqual([slot]);
     expect(snapshot.cargo).toEqual([slot]);
   });
@@ -267,10 +273,10 @@ describe('membership courier custody', () => {
     };
     f.meta.inventory = [slot];
     courierDispatch(f.ctx, { deposits: [selection(f.meta.inventory)], withdrawals: [] }, 1);
-    f.tick(40);
+    f.finish();
     expect(f.meta.bank.inventory[0].materialSources).toEqual(slot.materialSources);
     courierDispatch(f.ctx, { deposits: [], withdrawals: [selection(f.meta.bank.inventory)] }, 1);
-    f.tick(40);
+    f.finish();
     expect(f.meta.inventory[0].materialSources).toEqual(slot.materialSources);
     expect(f.meta.inventory[0].count).toBe(3);
   });
@@ -281,7 +287,7 @@ describe('membership courier custody', () => {
     f.meta.bank.inventory = Array.from({ length: 24 }, () => meat(20));
     courierDispatch(f.ctx, { deposits: [selection(f.meta.inventory)], withdrawals: [] }, 1);
     f.meta.inventory = Array.from({ length: 16 }, () => meat(20));
-    f.tick(40);
+    f.finish();
     expect(f.meta.courier!.phase).toBe('waiting');
     expect(f.meta.courier!.cargo).toEqual([food()]);
     const rev = f.meta.courier!.revision;
@@ -306,7 +312,8 @@ describe('membership courier custody', () => {
     });
     Object.assign(f.ctx, { courierBankExchange: hook });
     courierDispatch(f.ctx, { deposits: [selection(f.meta.inventory)], withdrawals: [] }, 1);
-    f.tick(39);
+    f.until(() => hook.mock.calls.length === 1);
+    f.tick(19);
     expect(hook).toHaveBeenCalledTimes(1);
     expect(f.meta.bank.inventory).toEqual([]);
     expect(f.meta.courier!.cargo).toEqual([food()]);
@@ -328,7 +335,8 @@ describe('membership courier custody', () => {
     });
     const admit = vi.fn(() => false);
     Object.assign(f.ctx, { courierBankExchange: admit });
-    f.tick(40);
+    f.until(() => admit.mock.calls.length === 1);
+    f.tick(20);
     expect(admit).toHaveBeenCalledTimes(2);
     expect(f.meta.courier!.phase).toBe('outbound');
   });
@@ -338,7 +346,7 @@ describe('membership courier custody', () => {
     f.meta.bank.inventory = [food()];
     courierDispatch(f.ctx, { deposits: [], withdrawals: [selection(f.meta.bank.inventory)] }, 1);
     f.meta.membershipExpiresAt = 0;
-    f.tick(40);
+    f.finish();
     expect(f.meta.inventory).toEqual([food()]);
     expect(
       courierDispatch(f.ctx, { deposits: [selection(f.meta.inventory)], withdrawals: [] }, 1),
@@ -361,7 +369,7 @@ describe('membership courier custody', () => {
     f.tick(100);
     expect(f.meta.inventory).toEqual([]);
     f.player.dead = false;
-    f.tick(20);
+    f.finish();
     expect(f.meta.inventory).toEqual([food()]);
     f.player.pos.x = INSTANCE_X_BASE + 900;
     expect(
@@ -378,7 +386,7 @@ describe('membership courier custody', () => {
     f.meta.bank.inventory = [meat()];
     courierDispatch(f.ctx, { deposits: [], withdrawals: [selection(f.meta.bank.inventory)] }, 1);
     f.meta.bank.inventory[0].count = 2;
-    f.tick(40);
+    f.finish();
     expect(f.meta.bank.inventory).toEqual([meat(2)]);
     expect(f.meta.inventory).toEqual([food(3)]);
   });
@@ -414,7 +422,7 @@ describe('membership courier custody', () => {
     f.meta.inventory = [food()];
     courierDispatch(f.ctx, { deposits: [selection(f.meta.inventory)], withdrawals: [] }, 1);
     f.ctx.bankerIds.length = 0;
-    f.tick(40);
+    f.finish();
     expect(f.meta.inventory).toEqual([food()]);
     expect(f.meta.bank.inventory).toEqual([]);
     expect(f.meta.courier!.phase).toBe('ready');
@@ -440,9 +448,9 @@ describe('membership courier custody', () => {
     f.tick(5);
     const save = savedCourierState(f.meta.courier!);
     f.meta.courier = sanitizeCourierState(save);
-    expect(f.meta.courier!.x).toBeCloseTo(17.5 * DT * 5);
+    expect(f.meta.courier!.x).toBeCloseTo(7 * DT * 5);
     expect(f.meta.courier!.cargo[0]).not.toBe(save.cargo[0]);
-    f.tick(35);
+    f.finish();
     expect(f.meta.bank.inventory).toEqual([food(4)]);
     expect(save.cargo).toEqual([food(4)]);
   });
@@ -483,7 +491,8 @@ describe('membership courier custody', () => {
     };
     expect(courierDispatch(f.ctx, request, 1)).toBe(true);
     f.banker.pos.z = 8.123456789;
-    f.tick(7);
+    f.tick(25);
+    expect(f.meta.courier!.travelDistance).toBe(8);
     perfectMembershipArmour(f.meta, 20);
     const saved = savedCourierState(f.meta.courier!);
     expect(courierPayloadFits(saved)).toBe(true);
@@ -501,7 +510,7 @@ describe('membership courier custody', () => {
     expect(
       courierDispatch(f.ctx, { deposits: [], withdrawals: [selection(f.meta.bank.inventory)] }, 1),
     ).toBe(true);
-    f.tick(40);
+    f.finish();
     expect(f.meta.inventory).toEqual([]);
     expect(f.meta.bank.inventory).toEqual([slot]);
     expect(f.meta.courier!.cargo).toEqual([]);

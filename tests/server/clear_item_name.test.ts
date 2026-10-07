@@ -200,6 +200,7 @@ describe('stripLegendaryNames', () => {
         x: 17.5,
         z: 2,
         bankerId: 9,
+        travelDistance: 8,
         revision: 3,
         retryRemaining: 0,
         withdrawals: [],

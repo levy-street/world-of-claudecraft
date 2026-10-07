@@ -1,37 +1,53 @@
 import * as THREE from 'three';
+import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import {
   type CourierVisualInfo,
+  type CourierVisualPose,
   courierFacing,
   courierVisualPoseInto,
 } from './courier_visual_core';
 import { attachSceneGroupGated } from './gated_scene_attach';
-import { surfaceMat } from './gfx';
 
 const COURIER_MODEL_URL = '/models/creatures/courier_donkey.glb';
+/** Horse buddy's grounded height in PR #4240: base 0.75 times buddy scale 1.701. */
+export const COURIER_HEIGHT = 1.27575;
 let source: THREE.Group | null = null;
+let sourceClips: THREE.AnimationClip[] = [];
 if (typeof window !== 'undefined') {
   registerDeferredPreload(() =>
     loadGltf(COURIER_MODEL_URL).then((gltf) => {
       source = gltf.scene;
+      sourceClips = gltf.animations;
     }),
   );
 }
 
-/** One self-owned decorative courier, outside the combat-entity and targeting maps.
- * The HUD's journey state stays visible while this cosmetic model compiles. */
+/** Clone before removing the authored hover: game travel owns all altitude. */
+export function courierAnimationClips(
+  clips: readonly THREE.AnimationClip[],
+): THREE.AnimationClip[] {
+  return clips.map((original) => {
+    const clip = original.clone();
+    if (clip.name === 'Fly')
+      clip.tracks = clip.tracks.filter((track) => track.name !== 'root.position');
+    return clip;
+  });
+}
+
+/** One self-owned decorative courier, outside the combat and targeting maps. */
 export class CourierVisual {
   readonly root = new THREE.Group();
   private model: THREE.Group | null = null;
-  private left: THREE.Object3D | undefined;
-  private right: THREE.Object3D | undefined;
+  private mixer: THREE.AnimationMixer | null = null;
+  private readonly actions = new Map<string, THREE.AnimationAction>();
   private disposed = false;
-  private elapsed = 0;
   private previousX = 0;
   private previousZ = 0;
   private hasPosition = false;
-  private readonly pose = { lift: 2, wing: 0, pitch: 0 };
+  private movingHold = 0;
+  private readonly pose: CourierVisualPose = { lift: 0, flight: 0, moving: false };
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -41,44 +57,63 @@ export class CourierVisual {
     this.root.name = 'courier:self';
   }
 
+  private createModel(): boolean {
+    if (!source) return false;
+    const model = clone(source) as THREE.Group;
+    this.model = model;
+    this.mixer = new THREE.AnimationMixer(model);
+    for (const clip of courierAnimationClips(sourceClips)) {
+      const action = this.mixer.clipAction(clip).play();
+      action.setEffectiveWeight(clip.name === 'Idle' ? 1 : 0);
+      this.actions.set(clip.name, action);
+    }
+    // Match the existing character adapter's posed bounds, not the rig's bind pose.
+    this.mixer.update(0.5);
+    model.updateMatrixWorld(true);
+    const bounds = new THREE.Box3();
+    const point = new THREE.Vector3();
+    model.traverse((node) => {
+      const mesh = node as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      mesh.castShadow = false;
+      mesh.receiveShadow = true;
+      const skin = mesh as THREE.SkinnedMesh;
+      if (skin.isSkinnedMesh) skin.skeleton.update();
+      const positions = mesh.geometry.getAttribute('position');
+      for (let i = 0; i < positions.count; i++) {
+        point.fromBufferAttribute(positions, i);
+        if (skin.isSkinnedMesh) skin.applyBoneTransform(i, point);
+        bounds.expandByPoint(point.applyMatrix4(mesh.matrixWorld));
+      }
+      // Animated wings can extend beyond the bind-pose box. This is one mesh.
+      mesh.frustumCulled = false;
+    });
+    const scale = COURIER_HEIGHT / Math.max(0.001, bounds.max.y - bounds.min.y);
+    model.scale.multiplyScalar(scale);
+    model.position.y -= bounds.min.y * scale;
+    this.root.add(model);
+    void attachSceneGroupGated(this.scene, this.root, this.compileGate, () => this.disposed).catch(
+      () => {},
+    );
+    return true;
+  }
+
   update(info: CourierVisualInfo | null, dt: number, reducedMotion: boolean): void {
     if (this.disposed) return;
     if (!info) {
       if (this.model) this.model.visible = false;
       this.hasPosition = false;
+      this.movingHold = 0;
       return;
     }
-    if (!this.model) {
-      if (!source) return;
-      // Clone transforms only: the loader's geometry and materials are immutable.
-      this.model = source.clone(true);
-      this.model.traverse((node) => {
-        const mesh = node as THREE.Mesh;
-        if (!mesh.isMesh) return;
-        mesh.material = surfaceMat({
-          color: 0xffffff,
-          vertexColors: true,
-          roughness: 0.9,
-          metalness: 0,
-        });
-        mesh.castShadow = false;
-        mesh.receiveShadow = true;
-      });
-      this.left = this.model.getObjectByName('WingLeft');
-      this.right = this.model.getObjectByName('WingRight');
-      this.root.add(this.model);
-      // The inner visibility remains authoritative even if a late gate resolves
-      // after cancellation of a journey. Disposal cancels the outer reveal too.
-      void attachSceneGroupGated(
-        this.scene,
-        this.root,
-        this.compileGate,
-        () => this.disposed,
-      ).catch(() => {});
-    }
-    this.model.visible = true;
-    this.elapsed += Math.max(0, Math.min(dt, 0.1));
-    courierVisualPoseInto(this.pose, info.phase, this.elapsed, reducedMotion);
+    if (!this.model && !this.createModel()) return;
+    this.model!.visible = true;
+    const elapsed = Math.max(0, Math.min(dt, 0.1));
+    const moved =
+      this.hasPosition && Math.hypot(info.x - this.previousX, info.z - this.previousZ) > 0.001;
+    // Snapshots arrive slower than render frames; keep the follow-owner run between samples.
+    this.movingHold = moved ? 0.15 : Math.max(0, this.movingHold - elapsed);
+    courierVisualPoseInto(this.pose, info, this.movingHold > 0);
     if (this.hasPosition) {
       this.root.rotation.y = courierFacing(
         this.previousX,
@@ -92,33 +127,40 @@ export class CourierVisual {
     this.previousZ = info.z;
     this.hasPosition = true;
     this.root.position.set(info.x, this.groundAt(info.x, info.z) + this.pose.lift, info.z);
-    this.model.rotation.x = this.pose.pitch;
-    if (this.left) {
-      this.left.rotation.z = -this.pose.wing;
-      this.left.updateMatrix();
-    }
-    if (this.right) {
-      this.right.rotation.z = this.pose.wing;
-      this.right.updateMatrix();
-    }
-    this.model.updateMatrix();
+    this.actions.get('Idle')?.setEffectiveWeight(this.pose.moving ? 0 : 1);
+    this.actions.get('Run')?.setEffectiveWeight(this.pose.moving ? 1 - this.pose.flight : 0);
+    this.actions.get('Fly')?.setEffectiveWeight(this.pose.moving ? this.pose.flight : 0);
+    // Reduced motion freezes the clip cycle, while weights still convey ground/flight state.
+    this.mixer?.update(reducedMotion ? 0 : elapsed);
+    this.model!.updateMatrix();
     this.root.updateMatrix();
   }
 
   dispose(): void {
     this.disposed = true;
+    if (this.model) {
+      this.mixer?.stopAllAction();
+      this.mixer?.uncacheRoot(this.model);
+      const skeletons = new Set<THREE.Skeleton>();
+      this.model.traverse((node) => {
+        const mesh = node as THREE.SkinnedMesh;
+        if (mesh.isSkinnedMesh) skeletons.add(mesh.skeleton);
+      });
+      for (const skeleton of skeletons) skeleton.dispose();
+    }
+    this.actions.clear();
+    this.mixer = null;
     this.root.removeFromParent();
     this.root.clear();
     this.model = null;
-    this.left = undefined;
-    this.right = undefined;
-    // Geometry belongs to the loader cache; materials belong to surfaceMat.
+    // Geometry, materials and compressed textures remain owned by the immutable loader cache.
   }
 }
 
 export const courierPreloadInternalsForTest = {
   modelUrl: COURIER_MODEL_URL,
-  setSourceForTest(value: THREE.Group | null): void {
+  setSourceForTest(value: THREE.Group | null, clips: THREE.AnimationClip[] = []): void {
     source = value;
+    sourceClips = clips;
   },
 };

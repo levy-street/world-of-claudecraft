@@ -24,6 +24,8 @@ const info = (): CourierInfo => ({
   x: 10,
   z: 20,
   bankerId: null,
+  travelDistance: 0,
+  remainingDistance: 0,
   cargo: [],
   withdrawals: [],
   revision: 1,
@@ -46,6 +48,8 @@ function host() {
           x: value.x,
           z: value.z,
           bankerId: value.bankerId,
+          travelDistance: value.travelDistance,
+          remainingDistance: value.remainingDistance,
           inventoryRevision: value.inventoryRevision,
         },
     ),
@@ -136,15 +140,25 @@ describe('courier wire validation and owner mirror', () => {
     applyCourierSelfWire(target, frame);
     expect(target.courierInfo).toEqual(info());
     frame = {};
-    set({ ...info(), x: 11 });
+    set({ ...info(), x: 11, travelDistance: 8, remainingDistance: 100 });
     for (let n = 0; n < 100; n++) emitCourierSelfKeys(emit, sim, session);
     expect(frame).toEqual({
-      courier: { phase: 'ready', x: 11, z: 20, bankerId: null, inventoryRevision: 1 },
+      courier: {
+        phase: 'ready',
+        x: 11,
+        z: 20,
+        bankerId: null,
+        inventoryRevision: 1,
+        travelDistance: 8,
+        remainingDistance: 100,
+      },
     });
     expect(sim.courierInfoFor).toHaveBeenCalledTimes(1);
     expect(sim.courierInfoFor).toHaveBeenCalledWith(17);
     applyCourierSelfWire(target, frame);
     expect(target.courierInfo?.x).toBe(11);
+    expect(target.courierInfo?.travelDistance).toBe(8);
+    expect(target.courierInfo?.remainingDistance).toBe(100);
     expect(target.courierInfo?.bankSlots).toEqual([{ itemId: 'wolf_fang', count: 3 }]);
     frame = {};
     set({ ...info(), bankSlots: [], revision: 2 }, '2:2:true');
@@ -157,6 +171,35 @@ describe('courier wire validation and owner mirror', () => {
     applyCourierSelfWire(target, frame);
     expect(target.courierInfo).toBeNull();
   });
+  it.each([
+    { travelDistance: -1 },
+    { travelDistance: 8.01 },
+    { travelDistance: Infinity },
+    { travelDistance: NaN },
+    { travelDistance: undefined },
+    { travelDistance: '8' },
+    { remainingDistance: -1 },
+    { remainingDistance: Infinity },
+    { remainingDistance: NaN },
+    { remainingDistance: undefined },
+    { remainingDistance: '0' },
+  ])('rejects malformed scalar motion metadata without changing the mirror: %j', (patch) => {
+    const pose = {
+      phase: 'outbound',
+      x: 1,
+      z: 2,
+      bankerId: 2,
+      inventoryRevision: 1,
+      travelDistance: 8,
+      remainingDistance: 100,
+    };
+    expect(decodeCourierPose(pose)).toEqual(pose);
+    const target = { courierInfo: info() as CourierInfo | null };
+    const before = target.courierInfo;
+    applyCourierSelfWire(target, { courier: { ...pose, ...patch } });
+    expect(target.courierInfo).toBe(before);
+    expect(decodeCourierPose({ ...pose, ...patch })).toBeUndefined();
+  });
   it('retains omitted data and refuses malformed nested rows or pose', () => {
     const target = { courierInfo: info() as CourierInfo | null };
     applyCourierSelfWire(target, {});
@@ -168,7 +211,8 @@ describe('courier wire validation and owner mirror', () => {
     expect(
       decodeCourierPose({ phase: 'unknown', x: 1, z: 2, bankerId: null, inventoryRevision: 1 }),
     ).toBeUndefined();
-    const { phase, x, z, bankerId, inventoryRevision, ...data } = info();
+    const { phase, x, z, bankerId, inventoryRevision, travelDistance, remainingDistance, ...data } =
+      info();
     expect(
       decodeCourierData({ ...data, cargo: [{ itemId: 'wolf_fang', count: -1 }] }),
     ).toBeUndefined();

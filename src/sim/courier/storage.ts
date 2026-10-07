@@ -1,6 +1,7 @@
 import { sanitizeBankState } from '../bank';
 import { cloneInvSlot } from '../types';
 import { courierPayloadFits } from './identity';
+import { COURIER_FLIGHT_DISTANCE } from './motion';
 import { COURIER_CAPACITY, COURIER_CUSTODY_BYTES, type CourierState } from './types';
 
 export function savedCourierState(state: CourierState): CourierState {
@@ -50,6 +51,10 @@ export function sanitizeCourierState(
     x: geometry ? r.x! : 0,
     z: geometry ? r.z! : 0,
     bankerId: Number.isSafeInteger(r.bankerId) && r.bankerId! > 0 ? r.bankerId! : null,
+    travelDistance:
+      Number.isFinite(r.travelDistance) && r.travelDistance! >= 0
+        ? Math.min(COURIER_FLIGHT_DISTANCE, r.travelDistance!)
+        : 0,
     cargo,
     withdrawals,
     revision: Number.isSafeInteger(r.revision) && r.revision! >= 0 ? r.revision! : 0,

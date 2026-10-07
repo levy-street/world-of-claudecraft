@@ -1,10 +1,11 @@
 {
   "items": [
     {
-      "src": "tmp/asset_src/courier_donkey/courier_donkey.glb",
+      "src": "scripts/assets/courier_donkey/source/winged_mail_donkey.glb",
       "out": "models/creatures/courier_donkey.glb",
-      "type": "static",
-      "keepExtras": true
+      "type": "character",
+      "keepClips": ["Idle", "Run", "Fly"],
+      "maxTex": 1024
     }
   ]
 }

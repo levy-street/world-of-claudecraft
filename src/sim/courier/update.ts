@@ -7,12 +7,8 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { cloneInvSlot, DT, type Entity, type InvSlot } from '../types';
 import { courierPayloadFits, courierSlotFingerprint } from './identity';
-import {
-  COURIER_ADMISSION_BYTES,
-  COURIER_CAPACITY,
-  COURIER_SPEED,
-  type CourierState,
-} from './types';
+import { travelCourier } from './motion';
+import { COURIER_ADMISSION_BYTES, COURIER_CAPACITY, type CourierState } from './types';
 
 function withdrawOriginal(
   source: InvSlot[],
@@ -34,21 +30,6 @@ function withdrawOriginal(
   } else {
     moveBetweenContainers(source, index, original.count, cargo, pools, original.materialSources);
   }
-}
-
-function travel(state: CourierState, x: number, z: number): boolean {
-  const dx = x - state.x;
-  const dz = z - state.z;
-  const distance = Math.hypot(dx, dz);
-  const step = COURIER_SPEED * DT;
-  if (distance <= step) {
-    state.x = x;
-    state.z = z;
-    return true;
-  }
-  state.x += (dx / distance) * step;
-  state.z += (dz / distance) * step;
-  return false;
 }
 
 function exchange(ctx: SimContext, meta: PlayerMeta, state: CourierState): boolean {
@@ -93,6 +74,7 @@ function exchange(ctx: SimContext, meta: PlayerMeta, state: CourierState): boole
   bumpBankWireRev(meta);
   state.withdrawals = [];
   state.phase = 'returning';
+  state.travelDistance = 0;
   state.revision++;
   return true;
 }
@@ -102,7 +84,7 @@ export function updateCourier(ctx: SimContext, meta: PlayerMeta, player: Entity)
   const state = meta.courier;
   if (!state) return;
   if (state.phase === 'ready') {
-    if (player.pos.x < INSTANCE_X_BASE) travel(state, player.pos.x, player.pos.z);
+    if (player.pos.x < INSTANCE_X_BASE) travelCourier(state, player.pos.x, player.pos.z, false);
     return;
   }
   state.retryRemaining = Math.max(0, state.retryRemaining - DT);
@@ -110,15 +92,17 @@ export function updateCourier(ctx: SimContext, meta: PlayerMeta, player: Entity)
     const banker = state.bankerId === null ? undefined : ctx.entities.get(state.bankerId);
     if (!banker || banker.kind !== 'npc' || banker.dead) {
       state.phase = 'returning';
+      state.travelDistance = 0;
       state.withdrawals = [];
       state.revision++;
       return;
     }
-    if (!travel(state, banker.pos.x, banker.pos.z) || state.retryRemaining > 0) return;
+    if (!travelCourier(state, banker.pos.x, banker.pos.z) || state.retryRemaining > 0) return;
     // A saved entity id may resolve to a different NPC after a content release.
     // Validate the static banker anchor only at arrival, never during flight.
     if (!ctx.bankerIds.includes(banker.id)) {
       state.phase = 'returning';
+      state.travelDistance = 0;
       state.withdrawals = [];
       state.revision++;
       return;
@@ -128,7 +112,11 @@ export function updateCourier(ctx: SimContext, meta: PlayerMeta, player: Entity)
   }
   // Private instance coordinates must never redirect the overworld courier.
   if (player.pos.x >= INSTANCE_X_BASE || player.dead) return;
-  if (!travel(state, player.pos.x, player.pos.z) || state.retryRemaining > 0) return;
+  if (
+    !travelCourier(state, player.pos.x, player.pos.z, state.phase === 'returning') ||
+    state.retryRemaining > 0
+  )
+    return;
   let delivered = 0;
   for (let i = state.cargo.length - 1; i >= 0; i--) {
     delivered += moveBetweenContainers(
@@ -142,6 +130,7 @@ export function updateCourier(ctx: SimContext, meta: PlayerMeta, player: Entity)
   const phase = state.cargo.length > 0 ? 'waiting' : 'ready';
   if (state.phase !== phase || delivered > 0) state.revision++;
   state.phase = phase;
+  state.travelDistance = 0;
   state.retryRemaining = state.cargo.length > 0 ? 1 : 0;
   if (delivered > 0) ctx.onInventoryChangedForQuests(meta);
 }
