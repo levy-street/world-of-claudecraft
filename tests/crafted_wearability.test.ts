@@ -191,7 +191,9 @@ describe('crafted wearability: the level-20 shelf is unmoved (masterwrought R5 s
     // Re-pinned 768 -> 814 by the quest blue rewards: the 46 rares generated for
     // the twelve level-20 quests that reward a blue (content/quest_leveling_gear.ts)
     // source at 20 and join on the same gate; no existing shelf row moved.
-    expect(shelf.length).toBe(814);
+    // Re-pinned 814 -> 832 by the leather caster role and the own-armor rule:
+    // 18 more level-20 quest rares on the same gate.
+    expect(shelf.length).toBe(832);
     for (const def of shelf) {
       expect(requiredLevelFor(def), `${def.id} shelf gate`).toBe(20);
     }

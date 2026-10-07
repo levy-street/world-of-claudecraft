@@ -19417,6 +19417,231 @@ export const en_XA: EnTranslations = {
       "saltwrack_spaulders": {
         "name": "[Šáļţŵŕáçķ Šþáúļðéŕš]"
       },
+      "brookwatch_vest": {
+        "name": "[Ɓŕóóķŵáţçĥ Ʋéšţ]"
+      },
+      "brookwatch_trousers": {
+        "name": "[Ɓŕóóķŵáţçĥ Ţŕóúšéŕš]"
+      },
+      "brookwatch_moccasins": {
+        "name": "[Ɓŕóóķŵáţçĥ Ɱóççášíñš]"
+      },
+      "brookwatch_cowl": {
+        "name": "[Ɓŕóóķŵáţçĥ Çóŵļ]"
+      },
+      "brookwatch_mitts": {
+        "name": "[Ɓŕóóķŵáţçĥ Ɱíţţš]"
+      },
+      "brookwatch_epaulets": {
+        "name": "[Ɓŕóóķŵáţçĥ Éþáúļéţš]"
+      },
+      "brookwatch_cinch": {
+        "name": "[Ɓŕóóķŵáţçĥ Çíñçĥ]"
+      },
+      "hedgerow_vest": {
+        "name": "[Ĥéðĝéŕóŵ Ʋéšţ]"
+      },
+      "hedgerow_trousers": {
+        "name": "[Ĥéðĝéŕóŵ Ţŕóúšéŕš]"
+      },
+      "hedgerow_moccasins": {
+        "name": "[Ĥéðĝéŕóŵ Ɱóççášíñš]"
+      },
+      "hedgerow_cowl": {
+        "name": "[Ĥéðĝéŕóŵ Çóŵļ]"
+      },
+      "hedgerow_mitts": {
+        "name": "[Ĥéðĝéŕóŵ Ɱíţţš]"
+      },
+      "hedgerow_epaulets": {
+        "name": "[Ĥéðĝéŕóŵ Éþáúļéţš]"
+      },
+      "hedgerow_cinch": {
+        "name": "[Ĥéðĝéŕóŵ Çíñçĥ]"
+      },
+      "bogwalker_vest": {
+        "name": "[Ɓóĝŵáļķéŕ Ʋéšţ]"
+      },
+      "bogwalker_trousers": {
+        "name": "[Ɓóĝŵáļķéŕ Ţŕóúšéŕš]"
+      },
+      "bogwalker_moccasins": {
+        "name": "[Ɓóĝŵáļķéŕ Ɱóççášíñš]"
+      },
+      "bogwalker_cowl": {
+        "name": "[Ɓóĝŵáļķéŕ Çóŵļ]"
+      },
+      "bogwalker_mitts": {
+        "name": "[Ɓóĝŵáļķéŕ Ɱíţţš]"
+      },
+      "bogwalker_epaulets": {
+        "name": "[Ɓóĝŵáļķéŕ Éþáúļéţš]"
+      },
+      "bogwalker_cinch": {
+        "name": "[Ɓóĝŵáļķéŕ Çíñçĥ]"
+      },
+      "thornspire_vest": {
+        "name": "[Ţĥóŕñšþíŕé Ʋéšţ]"
+      },
+      "thornspire_trousers": {
+        "name": "[Ţĥóŕñšþíŕé Ţŕóúšéŕš]"
+      },
+      "thornspire_moccasins": {
+        "name": "[Ţĥóŕñšþíŕé Ɱóççášíñš]"
+      },
+      "thornspire_cowl": {
+        "name": "[Ţĥóŕñšþíŕé Çóŵļ]"
+      },
+      "thornspire_mitts": {
+        "name": "[Ţĥóŕñšþíŕé Ɱíţţš]"
+      },
+      "thornspire_epaulets": {
+        "name": "[Ţĥóŕñšþíŕé Éþáúļéţš]"
+      },
+      "thornspire_cinch": {
+        "name": "[Ţĥóŕñšþíŕé Çíñçĥ]"
+      },
+      "hollowveil_vest": {
+        "name": "[Ĥóļļóŵʋéíļ Ʋéšţ]"
+      },
+      "hollowveil_trousers": {
+        "name": "[Ĥóļļóŵʋéíļ Ţŕóúšéŕš]"
+      },
+      "hollowveil_moccasins": {
+        "name": "[Ĥóļļóŵʋéíļ Ɱóççášíñš]"
+      },
+      "hollowveil_cowl": {
+        "name": "[Ĥóļļóŵʋéíļ Çóŵļ]"
+      },
+      "hollowveil_mitts": {
+        "name": "[Ĥóļļóŵʋéíļ Ɱíţţš]"
+      },
+      "hollowveil_epaulets": {
+        "name": "[Ĥóļļóŵʋéíļ Éþáúļéţš]"
+      },
+      "hollowveil_cinch": {
+        "name": "[Ĥóļļóŵʋéíļ Çíñçĥ]"
+      },
+      "trailwarden_vest": {
+        "name": "[Ţŕáíļŵáŕðéñ Ʋéšţ]"
+      },
+      "trailwarden_trousers": {
+        "name": "[Ţŕáíļŵáŕðéñ Ţŕóúšéŕš]"
+      },
+      "trailwarden_moccasins": {
+        "name": "[Ţŕáíļŵáŕðéñ Ɱóççášíñš]"
+      },
+      "trailwarden_cowl": {
+        "name": "[Ţŕáíļŵáŕðéñ Çóŵļ]"
+      },
+      "trailwarden_mitts": {
+        "name": "[Ţŕáíļŵáŕðéñ Ɱíţţš]"
+      },
+      "trailwarden_epaulets": {
+        "name": "[Ţŕáíļŵáŕðéñ Éþáúļéţš]"
+      },
+      "trailwarden_cinch": {
+        "name": "[Ţŕáíļŵáŕðéñ Çíñçĥ]"
+      },
+      "highgale_vest": {
+        "name": "[Ĥíĝĥĝáļé Ʋéšţ]"
+      },
+      "highgale_trousers": {
+        "name": "[Ĥíĝĥĝáļé Ţŕóúšéŕš]"
+      },
+      "highgale_moccasins": {
+        "name": "[Ĥíĝĥĝáļé Ɱóççášíñš]"
+      },
+      "highgale_cowl": {
+        "name": "[Ĥíĝĥĝáļé Çóŵļ]"
+      },
+      "highgale_mitts": {
+        "name": "[Ĥíĝĥĝáļé Ɱíţţš]"
+      },
+      "highgale_epaulets": {
+        "name": "[Ĥíĝĥĝáļé Éþáúļéţš]"
+      },
+      "highgale_cinch": {
+        "name": "[Ĥíĝĥĝáļé Çíñçĥ]"
+      },
+      "breakwater_shoulderguards": {
+        "name": "[Ɓŕéáķŵáţéŕ Šĥóúļðéŕĝúáŕðš]"
+      },
+      "breakwater_pauldrons": {
+        "name": "[Ɓŕéáķŵáţéŕ Þáúļðŕóñš]"
+      },
+      "breakwater_epaulets": {
+        "name": "[Ɓŕéáķŵáţéŕ Éþáúļéţš]"
+      },
+      "gravebell_moccasins": {
+        "name": "[Ĝŕáʋéƀéļļ Ɱóççášíñš]"
+      },
+      "oathbroken_trousers": {
+        "name": "[Óáţĥƀŕóķéñ Ţŕóúšéŕš]"
+      },
+      "sparkglass_trousers": {
+        "name": "[Šþáŕķĝļášš Ţŕóúšéŕš]"
+      },
+      "stillhymn_moccasins": {
+        "name": "[Šţíļļĥýɱñ Ɱóççášíñš]"
+      },
+      "sealkeeper_mitts": {
+        "name": "[Šéáļķééþéŕ Ɱíţţš]"
+      },
+      "fetterbound_trousers": {
+        "name": "[Ƒéţţéŕƀóúñð Ţŕóúšéŕš]"
+      },
+      "wyrmshadow_vest": {
+        "name": "[Ŵýŕɱšĥáðóŵ Ʋéšţ]"
+      },
+      "cinderbrood_spaulders": {
+        "name": "[Çíñðéŕƀŕóóð Šþáúļðéŕš]"
+      },
+      "cinderbrood_epaulets": {
+        "name": "[Çíñðéŕƀŕóóð Éþáúļéţš]"
+      },
+      "hoarfrost_shoulderguards": {
+        "name": "[Ĥóáŕƒŕóšţ Šĥóúļðéŕĝúáŕðš]"
+      },
+      "hoarfrost_pauldrons": {
+        "name": "[Ĥóáŕƒŕóšţ Þáúļðŕóñš]"
+      },
+      "hoarfrost_epaulets": {
+        "name": "[Ĥóáŕƒŕóšţ Éþáúļéţš]"
+      },
+      "blackmere_epaulets": {
+        "name": "[Ɓļáçķɱéŕé Éþáúļéţš]"
+      },
+      "reedhush_epaulets": {
+        "name": "[Ŕééðĥúšĥ Éþáúļéţš]"
+      },
+      "cairnking_epaulets": {
+        "name": "[Çáíŕñķíñĝ Éþáúļéţš]"
+      },
+      "palehunt_epaulets": {
+        "name": "[Þáļéĥúñţ Éþáúļéţš]"
+      },
+      "jadeshrine_epaulets": {
+        "name": "[Ĵáðéšĥŕíñé Éþáúļéţš]"
+      },
+      "gildhedge_shoulderguards": {
+        "name": "[Ĝíļðĥéðĝé Šĥóúļðéŕĝúáŕðš]"
+      },
+      "gildhedge_pauldrons": {
+        "name": "[Ĝíļðĥéðĝé Þáúļðŕóñš]"
+      },
+      "gildhedge_epaulets": {
+        "name": "[Ĝíļðĥéðĝé Éþáúļéţš]"
+      },
+      "saltwrack_shoulderguards": {
+        "name": "[Šáļţŵŕáçķ Šĥóúļðéŕĝúáŕðš]"
+      },
+      "saltwrack_pauldrons": {
+        "name": "[Šáļţŵŕáçķ Þáúļðŕóñš]"
+      },
+      "saltwrack_epaulets": {
+        "name": "[Šáļţŵŕáçķ Éþáúļéţš]"
+      },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
       },

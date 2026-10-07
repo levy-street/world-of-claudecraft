@@ -868,11 +868,13 @@ describe('item-art audit builder', () => {
       // (quest-leveling-gear-icons-2026-10-06), re-measured with `--verify-only`.
       // 1785 / 1803 with the 76 quest blue reward rares
       // (quest-blue-rewards-icons-2026-10-07), re-measured the same way.
-      catalogSha256: 'afd99abc95437d60ad420e7e0ab3ddda6a7b1ff0e6b071c079d89b3dc3fb76e0',
-      catalogBytes: 974005,
+      // 1860 / 1878 with the 75 quest role-fill paintings (quest-role-fill-icons-2026-10-07),
+      // re-measured the same way.
+      catalogSha256: 'b44a0b34b5610132e50da12e841a0c968ae9e39519147fd2ef46180931bb8a93',
+      catalogBytes: 1013773,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1785,
-      liveItemCount: 1803,
+      catalogCount: 1860,
+      liveItemCount: 1878,
       generatedHeroicDefinitions: 78,
       heroicDefinitionsWithOwnWebp: 59,
       heroicWeaponArtAliases: 19,
@@ -890,7 +892,7 @@ describe('item-art audit builder', () => {
         identity: 39,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: 'e59715fdfcbe8011e5a4bbd7a9a27024b5ea5f156085357e4543604177b16eed',
+      shippingCatalogSha256: '908f3a1ed6041d2e40222f719241231127baa1c00a612cf6f2929caa7e1af3df',
       machineChecksPassed: true,
       verdict: null,
     });

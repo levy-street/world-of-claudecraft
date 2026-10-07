@@ -24,7 +24,15 @@ const LEATHER_AGI = piece('hedgerow_jerkin');
 const LEATHER_STR = piece('hedgerow_tunic');
 const MAIL_STR = piece('hedgerow_hauberk');
 const MAIL_INT = piece('hedgerow_chainmail');
-const CHOICES = [CLOTH_INT.id, LEATHER_AGI.id, LEATHER_STR.id, MAIL_STR.id, MAIL_INT.id];
+const LEATHER_INT = piece('hedgerow_vest');
+const CHOICES = [
+  CLOTH_INT.id,
+  LEATHER_AGI.id,
+  LEATHER_STR.id,
+  MAIL_STR.id,
+  MAIL_INT.id,
+  LEATHER_INT.id,
+];
 
 const quest = (choiceRewards?: string[], itemRewards: QuestDef['itemRewards'] = {}): QuestDef =>
   ({ ...Object.values(QUESTS)[0], choiceRewards, itemRewards }) as QuestDef;
@@ -36,6 +44,7 @@ describe('choose-one quest rewards: the shared resolver', () => {
       CLOTH_INT.id,
       LEATHER_AGI.id,
       LEATHER_STR.id,
+      LEATHER_INT.id,
     ]);
     expect(questRewardChoices(quest(CHOICES), 'warrior')).toEqual(CHOICES);
     expect(questRewardChoices(quest(), 'warrior')).toEqual([]);
@@ -53,7 +62,10 @@ describe('choose-one quest rewards: the shared resolver', () => {
       ['shaman', 'enhancement', MAIL_STR.id],
       ['shaman', null, MAIL_STR.id],
       ['druid', 'feral', LEATHER_STR.id],
-      ['druid', 'balance', CLOTH_INT.id],
+      // Balance and restoration druids: Intellect in their own leather.
+      ['druid', 'balance', LEATHER_INT.id],
+      ['druid', 'restoration', LEATHER_INT.id],
+      ['druid', null, LEATHER_INT.id],
       ['rogue', 'combat', LEATHER_AGI.id],
       ['hunter', null, LEATHER_AGI.id],
       ['priest', null, CLOTH_INT.id],
@@ -136,6 +148,24 @@ describe('choose-one quest rewards: the shared resolver', () => {
     expect(ITEMS.shroudcaller_tunic.stats?.str ?? 0).toBeGreaterThan(
       ITEMS.boneguard_breastplate.stats?.str ?? 0,
     );
+  });
+
+  it("adds a rare in the spec's own armor when the authored blue is a lighter piece", () => {
+    // The Rimemane Tyrant hands every class a cloth Strength mantle; a warrior
+    // or a feral cat gets a Strength rare in its own armor, a balance druid an
+    // Intellect one in leather, and the mantle stays on offer.
+    const tyrant = QUESTS.q_fv_frostmane_tyrant;
+    expect(ITEMS.frostmane_mantle.armorType).toBe('cloth');
+    const cases: [PlayerClass, string, string][] = [
+      ['warrior', 'arms', 'hoarfrost_pauldrons'],
+      ['druid', 'feral', 'hoarfrost_shoulderguards'],
+      ['druid', 'balance', 'hoarfrost_epaulets'],
+      ['mage', 'frost', 'hoarfrost_mantle'],
+    ];
+    for (const [cls, spec, expected] of cases) {
+      expect(questRewardChoices(tyrant, cls), cls).toContain('frostmane_mantle');
+      expect(defaultRewardChoice(tyrant, cls, spec), `${cls} ${spec}`).toBe(expected);
+    }
   });
 
   it('keeps a non-gear authored reward fixed beside the choice', () => {
