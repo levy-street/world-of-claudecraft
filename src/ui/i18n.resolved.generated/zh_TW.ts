@@ -8299,7 +8299,7 @@ export const zh_TW: EnTranslations = {
       "honorFinalNoteSoldBack": "榮譽購買一經完成便無法反悔。買回清單裡只會有你賣出過的東西：以錢幣買下的東西通常還能按出售價格賣回，若你再次改變心意，也能從那份清單裡把它取回；但戰爭套裝在你買下的那一刻便靈魂綁定，因此它永遠無法交易、郵寄，也無法賣回換取任何東西，也就永遠不會出現在那份清單裡。商店會因此請你再確認一次：按下去之前，先把那件裝備看清楚。",
       "warfareHeading": "戰爭套裝",
       "warfareBody": "每一件戰爭裝備都帶有戰爭攻擊等級與戰爭防禦等級，而這兩項數值對怪物完全沒有作用。它們只在你與其他玩家交手時生效，無論是決鬥、競技場，還是戰場：攻擊等級會增加你造成的傷害，防禦等級則削減你承受的傷害，兩者各有自己的上限。每個護甲系列同時也是一套套裝，而它的套裝效果同樣是戰爭等級，或是只對玩家生效的效果，因此一身榮譽裝備打起地城首領來一文不值。",
-      "warfareBodyStatsStay": "每一件戰爭裝備都帶有戰爭攻擊等級與戰爭防禦等級，而這兩項數值對怪物完全沒有作用。它們只在你與其他玩家交手時生效，無論是決鬥、競技場，還是戰場：攻擊等級會增加你造成的傷害，防禦等級則削減你承受的傷害，兩者各有自己的上限。每個護甲系列同時也是一套套裝，而它的套裝效果同樣是戰爭等級，或是只對玩家生效的效果，因此一身榮譽裝備的套裝效果打起地城首領來一文不值。裝備本身仍帶有一般的屬性、護甲值與武器傷害，而這些在任何地方都有效；面對怪物時沉寂下來的，是戰爭等級與套裝效果。",
+      "warfareBodyStatsStay": "每一件戰爭裝備都帶有戰爭攻擊等級與戰爭防禦等級，而這兩項數值對怪物完全沒有作用。它們只在你與其他玩家交手時生效，無論是決鬥、競技場，還是戰場：攻擊等級會增加你造成的傷害，防禦等級則削減你承受的傷害，兩者各有自己的上限。每個護甲系列同時也是一套套裝，而它的套裝效果同樣是戰爭等級，或是只對玩家生效的效果，因此一身榮譽裝備的套裝效果打起地城首領來一文不值。裝備本身仍帶有一般的屬性、護甲值與武器傷害，而這些在任何地方都有效；面對怪物時沉寂下來的，是戰爭等級與套裝效果。但有一個例外在任何地方都有效：穿戴施法者套裝的兩件後，受到傷害不再延遲你的施法。",
       "warfareTradeBody": "這正是刻意設下的取捨。戰爭套裝是為了與玩家作戰而打造的，並不是繞過地城品級的捷徑：同一個部位的戰爭裝備，永遠不會帶有地城史詩裝的那些戰鬥屬性，而它所帶來的一切都只花在其他玩家身上。若你想在競技場裡站得住腳，就去買它。若你想更快清完英雄地城，那就到地城裡去掙你的裝備。",
       "warfareTradeBodyRatingSpent": "這正是刻意設下的取捨。戰爭套裝是為了與玩家作戰而打造的，並不是繞過地城品級的捷徑：同一個部位的戰爭裝備，永遠不會帶有地城史詩裝的那些戰鬥屬性，而它轉而帶有的戰爭等級與套裝效果，則全都花在其他玩家身上。若你想在競技場裡站得住腳，就去買它。若你想更快清完英雄地城，那就到地城裡去掙你的裝備。",
       "vanguardHeading": "先鋒裝備：戰爭套裝第二季",
@@ -24174,7 +24174,7 @@ export const zh_TW: EnTranslations = {
       },
       "vanguard_druid_balance": {
         "name": "星衛法衣",
-        "bonus2": "纏縛根鬚的施法時間縮短0.5秒。",
+        "bonus2": "纏縛根鬚的施法時間縮短0.5秒。受到傷害不再延遲你的施法。",
         "bonus4": "施放纏縛根鬚後，你可以在移動中施法，並使移動速度提高20%，持續4秒。每20秒最多觸發一次。"
       },
       "vanguard_druid_feral": {
@@ -24184,7 +24184,7 @@ export const zh_TW: EnTranslations = {
       },
       "vanguard_druid_restoration": {
         "name": "薊花法衣",
-        "bonus2": "2件：Fleetmend冷卻縮短1秒。",
+        "bonus2": "2件：Fleetmend冷卻縮短1秒。受到傷害不再延遲你的施法。",
         "bonus4": "4件：Fleetmend還會使移動速度提高30%，持續3秒。"
       },
       "vanguard_hunter_beast_mastery": {
@@ -24204,22 +24204,22 @@ export const zh_TW: EnTranslations = {
       },
       "vanguard_mage_arcane": {
         "name": "先鋒套裝：Hourbinder Vestments",
-        "bonus2": "2件：Temporal Barrier冷卻縮短2秒。",
+        "bonus2": "2件：Temporal Barrier冷卻縮短2秒。受到傷害不再延遲你的施法。",
         "bonus4": "4件：Temporal Barrier還會使受護盾目標移動速度提高20%，持續3秒。"
       },
       "vanguard_mage_fire": {
         "name": "先鋒套裝：Emberlash Regalia",
-        "bonus2": "2件：Cinderfall回復快3秒。",
+        "bonus2": "2件：Cinderfall回復快3秒。受到傷害不再延遲你的施法。",
         "bonus4": "4件：施放Cinderfall使Blazing Barrier剩餘冷卻縮短2秒。"
       },
       "vanguard_mage_frost": {
         "name": "先鋒套裝：Rimewarden Garb",
-        "bonus2": "2件：Icebind冷卻縮短2秒。",
+        "bonus2": "2件：Icebind冷卻縮短2秒。受到傷害不再延遲你的施法。",
         "bonus4": "4件：施放Icebind使Flitstep剩餘冷卻縮短5秒。"
       },
       "vanguard_paladin_holy": {
         "name": "先鋒套裝：Sunvigil Regalia",
-        "bonus2": "2件：Life Covenant冷卻縮短30秒。",
+        "bonus2": "2件：Life Covenant冷卻縮短30秒。受到傷害不再延遲你的施法。",
         "bonus4": "4件：Life Covenant還會為盟友提供相當於最大生命值8%的護盾，持續6秒。"
       },
       "vanguard_paladin_protection": {
@@ -24234,17 +24234,17 @@ export const zh_TW: EnTranslations = {
       },
       "vanguard_priest_discipline": {
         "name": "先鋒套裝：Veilpsalm Raiment",
-        "bonus2": "2件：Terror Canticle冷卻縮短3秒。",
+        "bonus2": "2件：Terror Canticle冷卻縮短3秒。受到傷害不再延遲你的施法。",
         "bonus4": "4件：Psalm of Warding被完全消耗時，受護盾盟友移動速度提高20%，持續3秒。每8秒最多一次。"
       },
       "vanguard_priest_holy": {
         "name": "先鋒套裝：Gracewing Raiment",
-        "bonus2": "2件：Veilstep冷卻縮短6秒。",
+        "bonus2": "2件：Veilstep冷卻縮短6秒。受到傷害不再延遲你的施法。",
         "bonus4": "4件：Veilstep還會為你提供相當於最大生命值8%的護盾，持續6秒。"
       },
       "vanguard_priest_shadow": {
         "name": "先鋒套裝：Duskhymn Regalia",
-        "bonus2": "2件：Litany of Woe引導期間還會使目標移動速度降低30%。",
+        "bonus2": "2件：Litany of Woe引導期間還會使目標移動速度降低30%。受到傷害不再延遲你的施法。",
         "bonus4": "4件：Call Tithefiend還會為你提供相當於最大生命值10%的護盾，持續8秒。"
       },
       "vanguard_rogue_assassination": {
@@ -24264,7 +24264,7 @@ export const zh_TW: EnTranslations = {
       },
       "vanguard_shaman_elemental": {
         "name": "先鋒套裝：Tempestwrit Battlemail",
-        "bonus2": "2件：Unleash Weapon冷卻縮短3秒。",
+        "bonus2": "2件：Unleash Weapon冷卻縮短3秒。受到傷害不再延遲你的施法。",
         "bonus4": "4件：Unleash Weapon可移動施法並使移動速度提高20%，持續4秒。每20秒最多一次。"
       },
       "vanguard_shaman_enhancement": {
@@ -24274,22 +24274,22 @@ export const zh_TW: EnTranslations = {
       },
       "vanguard_shaman_restoration": {
         "name": "先鋒套裝：Brineward Chainmail",
-        "bonus2": "2件：對生命值低於50%的盟友施放Mending Waters快0.5秒。",
+        "bonus2": "2件：對生命值低於50%的盟友施放Mending Waters快0.5秒。受到傷害不再延遲你的施法。",
         "bonus4": "4件：Tidecall還會提供相當於你最大生命值5%的護盾，持續6秒。"
       },
       "vanguard_warlock_affliction": {
         "name": "先鋒套裝：Dreadquill Vestments",
-        "bonus2": "2件：Harrow施法時間縮短0.3秒。",
+        "bonus2": "2件：Harrow施法時間縮短0.3秒。受到傷害不再延遲你的施法。",
         "bonus4": "4件：Consume治療量提高30%，且可移動引導。"
       },
       "vanguard_warlock_demonology": {
         "name": "先鋒套裝：Marrowbound Regalia",
-        "bonus2": "2件：Bone Armor冷卻縮短10秒。",
+        "bonus2": "2件：Bone Armor冷卻縮短10秒。受到傷害不再延遲你的施法。",
         "bonus4": "4件：Reaping Command使Bone Armor剩餘冷卻縮短2秒。"
       },
       "vanguard_warlock_destruction": {
         "name": "先鋒套裝：Slagcrown Vestments",
-        "bonus2": "2件：Cinderhide冷卻縮短30秒。",
+        "bonus2": "2件：Cinderhide冷卻縮短30秒。受到傷害不再延遲你的施法。",
         "bonus4": "4件：每第二次Conflagrate使8秒內下一次Ruinbolt瞬發。"
       },
       "vanguard_warrior_arms": {
@@ -24320,7 +24320,7 @@ export const zh_TW: EnTranslations = {
       },
       "warfare_cinderweave": {
         "name": "燼織法衣",
-        "bonus2": "戰爭防禦等級提高 40。",
+        "bonus2": "戰爭防禦等級提高 40。受到傷害不再延遲你的施法。",
         "bonus4": "戰爭攻擊等級提高 40，且敵對玩家對你施加的控制效果持續時間縮短 15%。",
         "bonus7": "戰爭攻擊與防禦等級提高 80。你的法術有 15% 的機率給予餘燼守護，在 8 秒內吸收 120 點傷害。"
       },
@@ -24332,13 +24332,13 @@ export const zh_TW: EnTranslations = {
       },
       "warfare_stormbound": {
         "name": "縛雷法衣",
-        "bonus2": "戰爭防禦等級提高 40。",
+        "bonus2": "戰爭防禦等級提高 40。受到傷害不再延遲你的施法。",
         "bonus4": "戰爭攻擊等級提高 40，且敵對玩家對你施加的控制效果持續時間縮短 15%。",
         "bonus7": "戰爭攻擊與防禦等級提高 80。你的法術有 15% 的機率給予餘燼守護，在 8 秒內吸收 120 點傷害。"
       },
       "warfare_thornhide": {
         "name": "荊棘皮甲",
-        "bonus2": "戰爭防禦等級提高 40。",
+        "bonus2": "戰爭防禦等級提高 40。受到傷害不再延遲你的施法。",
         "bonus4": "戰爭攻擊等級提高 40，且敵對玩家對你施加的控制效果持續時間縮短 15%。",
         "bonus7": "戰爭攻擊與防禦等級提高 80。你的法術有 15% 的機率給予荊棘守護，使閃避提高 15%，持續 6 秒。"
       },

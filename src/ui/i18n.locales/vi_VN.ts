@@ -1854,7 +1854,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Gọi một tiếng sấm sét xuống, gây {damage} sát thương Tự Nhiên tới các kẻ thù trong vòng 10 yard và làm chậm họ 50% trong 5 giây. Hồi phục 8% Mana tối đa của bạn. Sát thương tăng với Sức Mạnh Phép. (Thundercall)',
   'entities.abilities.thunderstorm.name': 'Stormbreak',
   'entities.itemSets.vanguard_druid_balance.bonus2':
-    'Thời gian truyền tải Rễ Siết Chặt giảm 0,5 giây.',
+    'Thời gian truyền tải Rễ Siết Chặt giảm 0,5 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'Truyền tải Rễ Siết Chặt cho phép bạn truyền tải khi đang di chuyển và tăng tốc độ di chuyển của bạn 20 phần trăm trong 4 giây. Không thể xảy ra nhiều hơn một lần mỗi 20 giây.',
   'entities.itemSets.vanguard_druid_balance.name': 'Starwarden Raiment',
@@ -1862,7 +1862,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_feral.bonus4':
     'Cú Lao Bruin bảo vệ bạn với 6 phần trăm sức khỏe tối đa của bạn trong 6 giây.',
   'entities.itemSets.vanguard_druid_feral.name': 'Bloodmane Hide',
-  'entities.itemSets.vanguard_druid_restoration.bonus2': 'Cooldown Fleetmend giảm 1 giây.',
+  'entities.itemSets.vanguard_druid_restoration.bonus2':
+    'Cooldown Fleetmend giảm 1 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_druid_restoration.bonus4':
     'Fleetmend cũng tăng tốc độ di chuyển của bạn 30 phần trăm trong 3 giây.',
   'entities.itemSets.vanguard_druid_restoration.name': 'Thistlebloom Vestment',
@@ -1877,19 +1878,23 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_hunter_survival.bonus2': 'Cooldown Móc Máu giảm 3 giây.',
   'entities.itemSets.vanguard_hunter_survival.bonus4': 'Móc Máu cấp 1 Đà Săn.',
   'entities.itemSets.vanguard_hunter_survival.name': 'Snaretooth Harness',
-  'entities.itemSets.vanguard_mage_arcane.bonus2': 'Cooldown Lá Chắn Thời Gian giảm 2 giây.',
+  'entities.itemSets.vanguard_mage_arcane.bonus2':
+    'Cooldown Lá Chắn Thời Gian giảm 2 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_mage_arcane.bonus4':
     'Lá Chắn Thời Gian cũng tăng tốc độ di chuyển của mục tiêu được bảo vệ 20 phần trăm trong 3 giây.',
   'entities.itemSets.vanguard_mage_arcane.name': "Hourbinder's Vestments",
-  'entities.itemSets.vanguard_mage_fire.bonus2': 'Mưa Tàn Lửa nạp lại 3 giây nhanh hơn.',
+  'entities.itemSets.vanguard_mage_fire.bonus2':
+    'Mưa Tàn Lửa nạp lại 3 giây nhanh hơn. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_mage_fire.bonus4':
     'Truyền tải Mưa Tàn Lửa giảm cooldown còn lại của Lá Chắn Rực Lửa 2 giây.',
   'entities.itemSets.vanguard_mage_fire.name': 'Emberlash Regalia',
-  'entities.itemSets.vanguard_mage_frost.bonus2': 'Cooldown Trói Băng giảm 2 giây.',
+  'entities.itemSets.vanguard_mage_frost.bonus2':
+    'Cooldown Trói Băng giảm 2 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_mage_frost.bonus4':
     'Truyền tải Trói Băng giảm cooldown còn lại của Bước Chớp Nhoáng 5 giây.',
   'entities.itemSets.vanguard_mage_frost.name': 'Rimewarden Garb',
-  'entities.itemSets.vanguard_paladin_holy.bonus2': 'Cooldown Giao Ước Sinh Mệnh giảm 30 giây.',
+  'entities.itemSets.vanguard_paladin_holy.bonus2':
+    'Cooldown Giao Ước Sinh Mệnh giảm 30 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     'Giao Ước Sinh Mệnh cũng bảo vệ đồng minh với 8 phần trăm sức khỏe tối đa của họ trong 6 giây.',
   'entities.itemSets.vanguard_paladin_holy.name': 'Sunvigil Regalia',
@@ -1901,16 +1906,18 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_paladin_retribution.bonus4':
     'Gọi Valkyrie đặt lại cooldown của Sắc Lệnh Cuối, và Sắc Lệnh Cuối tiếp theo của bạn trong vòng 6 giây gây 15 phần trăm sát thương nhiều hơn.',
   'entities.itemSets.vanguard_paladin_retribution.name': 'Lightbrand Warplate',
-  'entities.itemSets.vanguard_priest_discipline.bonus2': 'Cooldown Terror Canticle giảm 3 giây.',
+  'entities.itemSets.vanguard_priest_discipline.bonus2':
+    'Cooldown Terror Canticle giảm 3 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
     'Khi Psalm of Warding của bạn được sử dụng hết, đồng minh được bảo vệ có tốc độ di chuyển 20 phần trăm trong 3 giây. Không thể xảy ra nhiều hơn một lần mỗi 8 giây.',
   'entities.itemSets.vanguard_priest_discipline.name': 'Veilpsalm Raiment',
-  'entities.itemSets.vanguard_priest_holy.bonus2': 'Cooldown Veilstep giảm 6 giây.',
+  'entities.itemSets.vanguard_priest_holy.bonus2':
+    'Cooldown Veilstep giảm 6 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_priest_holy.bonus4':
     'Veilstep cũng bảo vệ bạn với 8 phần trăm sức khỏe tối đa của bạn trong 6 giây.',
   'entities.itemSets.vanguard_priest_holy.name': 'Gracewing Raiment',
   'entities.itemSets.vanguard_priest_shadow.bonus2':
-    'Kinh Cầu Thống Khổ cũng làm chậm di chuyển của mục tiêu 30 phần trăm trong khi bạn truyền tải nó.',
+    'Kinh Cầu Thống Khổ cũng làm chậm di chuyển của mục tiêu 30 phần trăm trong khi bạn truyền tải nó. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_priest_shadow.bonus4':
     'Gọi Tithefiend cũng bảo vệ bạn với 10 phần trăm sức khỏe tối đa của bạn trong 8 giây.',
   'entities.itemSets.vanguard_priest_shadow.name': 'Duskhymn Regalia',
@@ -1927,7 +1934,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_rogue_subtlety.bonus4':
     'Thụi Bụng cấp 2 điểm combo bổ sung khi được sử dụng từ Smokefade.',
   'entities.itemSets.vanguard_rogue_subtlety.name': 'Shadewalk Leathers',
-  'entities.itemSets.vanguard_shaman_elemental.bonus2': 'Cooldown Unleash Weapon giảm 3 giây.',
+  'entities.itemSets.vanguard_shaman_elemental.bonus2':
+    'Cooldown Unleash Weapon giảm 3 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
     'Unleash Weapon cho phép bạn truyền tải khi đang di chuyển và tăng tốc độ di chuyển của bạn 20 phần trăm trong 4 giây. Không thể xảy ra nhiều hơn một lần mỗi 20 giây.',
   'entities.itemSets.vanguard_shaman_elemental.name': 'Tempestwrit Battlemail',
@@ -1937,20 +1945,22 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Ancestral Strike giảm cooldown còn lại của Xuất Thần Nguyên Tố 4 giây.',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Galeborn Warmail',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    'Dòng Nước Hàn Gắn truyền tải 0,5 giây nhanh hơn trên một đồng minh dưới 50 phần trăm sức khỏe.',
+    'Dòng Nước Hàn Gắn truyền tải 0,5 giây nhanh hơn trên một đồng minh dưới 50 phần trăm sức khỏe. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     'Tidecall cũng bảo vệ mục tiêu của nó với 5 phần trăm sức khỏe tối đa của bạn trong 6 giây.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Brineward Chainmail',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'Thời gian truyền tải Giày Vò giảm 0,3 giây.',
+    'Thời gian truyền tải Giày Vò giảm 0,3 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Nuốt Chửng chữa lành bạn 30 phần trăm nhiều hơn và có thể được truyền tải khi di chuyển.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Dreadquill Vestments',
-  'entities.itemSets.vanguard_warlock_demonology.bonus2': 'Cooldown Giáp Xương giảm 10 giây.',
+  'entities.itemSets.vanguard_warlock_demonology.bonus2':
+    'Cooldown Giáp Xương giảm 10 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_warlock_demonology.bonus4':
     'Reaping Command giảm cooldown còn lại của Giáp Xương 2 giây.',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Marrowbound Regalia',
-  'entities.itemSets.vanguard_warlock_destruction.bonus2': 'Cooldown Da Than Hồng giảm 30 giây.',
+  'entities.itemSets.vanguard_warlock_destruction.bonus2':
+    'Cooldown Da Than Hồng giảm 30 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     'Cứ hai lần Bùng Cháy làm cho Tia Hủy Diệt tiếp theo của bạn trong vòng 8 giây tức thời.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Slagcrown Vestments',
@@ -4677,7 +4687,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_ashstalker.bonus7':
     'Tăng Điểm Tấn Công và Phòng Thủ Chiến Tranh thêm 80. Hạ một người chơi thù địch ban Bước Tro, tăng tốc độ di chuyển thêm 40% trong 6 giây.',
   'entities.itemSets.warfare_ashstalker.name': 'Bộ Ashstalker',
-  'entities.itemSets.warfare_cinderweave.bonus2': 'Tăng Điểm Phòng Thủ Chiến Tranh thêm 40.',
+  'entities.itemSets.warfare_cinderweave.bonus2':
+    'Tăng Điểm Phòng Thủ Chiến Tranh thêm 40. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.warfare_cinderweave.bonus4':
     'Tăng Điểm Tấn Công Chiến Tranh thêm 40, và khống chế do người chơi thù địch giáng lên bạn kéo dài ngắn hơn 15%.',
   'entities.itemSets.warfare_cinderweave.bonus7':
@@ -4689,13 +4700,15 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_furyforged.bonus7':
     'Tăng Điểm Tấn Công và Phòng Thủ Chiến Tranh thêm 80. Hạ một người chơi thù địch ban Lời Thề Không Vỡ, hấp thụ 200 sát thương trong 10 giây.',
   'entities.itemSets.warfare_furyforged.name': 'Bộ Chiến Furyforged',
-  'entities.itemSets.warfare_stormbound.bonus2': 'Tăng Điểm Phòng Thủ Chiến Tranh thêm 40.',
+  'entities.itemSets.warfare_stormbound.bonus2':
+    'Tăng Điểm Phòng Thủ Chiến Tranh thêm 40. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.warfare_stormbound.bonus4':
     'Tăng Điểm Tấn Công Chiến Tranh thêm 40, và khống chế do người chơi thù địch giáng lên bạn kéo dài ngắn hơn 15%.',
   'entities.itemSets.warfare_stormbound.bonus7':
     'Tăng Điểm Tấn Công và Phòng Thủ Chiến Tranh thêm 80. Phép của bạn có 15% cơ hội ban Hộ Vệ Than Hồng, hấp thụ 120 sát thương trong 8 giây.',
   'entities.itemSets.warfare_stormbound.name': 'Áo Lễ Stormbound',
-  'entities.itemSets.warfare_thornhide.bonus2': 'Tăng Điểm Phòng Thủ Chiến Tranh thêm 40.',
+  'entities.itemSets.warfare_thornhide.bonus2':
+    'Tăng Điểm Phòng Thủ Chiến Tranh thêm 40. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.warfare_thornhide.bonus4':
     'Tăng Điểm Tấn Công Chiến Tranh thêm 40, và khống chế do người chơi thù địch giáng lên bạn kéo dài ngắn hơn 15%.',
   'entities.itemSets.warfare_thornhide.bonus7':
@@ -19376,7 +19389,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'Thắng trận xếp hạng nhận Danh Dự, tiền tệ PvP. Một trận thua chơi đến hết vẫn nhận phần nhỏ hơn, hòa cũng vậy, nên thứ thực sự mất khi thua chỉ là điểm xếp hạng. Danh Dự thưởng cho những trận đấu thực sự: đánh bại cùng một đối thủ hoặc đội lần nữa trong cùng ngày không nhận thêm gì, thua họ lần nữa cũng vậy. Trong ngày thắng nhiều, giai đoạn đầu nhận đủ thưởng, sau đó thưởng mỗi trận thắng giảm một nửa, rồi giảm thêm một nửa khi thắng nhiều hơn nữa và giữ ở mức đó. Đối thủ bỏ cuộc vẫn làm thay đổi điểm xếp hạng nhưng không cho Danh Dự. Ngày được tính theo máy chủ: chuyển ngày vào giờ đặt lại mỗi đêm, cùng mốc xóa mọi giới hạn hằng ngày.',
   'guide.arenaPage.warfareBodyStatsStay':
-    'Mọi món Chiến Trận đều có Điểm Tấn Công Chiến Trận và Điểm Phòng Thủ Chiến Trận; hai chỉ số này hoàn toàn không tác dụng với quái vật. Chúng chỉ áp dụng khi đánh người chơi khác trong đấu tay đôi, đấu trường hoặc chiến trường: Tấn Công tăng sát thương gây ra, Phòng Thủ giảm sát thương nhận vào, mỗi loại có giới hạn riêng. Mỗi dòng giáp cũng là một bộ; thưởng bộ cũng là điểm Chiến Trận hoặc hiệu ứng chỉ tác dụng với người chơi, nên thưởng của cả bộ Danh Dự không có tác dụng với trùm phó bản. Bản thân các món vẫn có chỉ số thường, giáp và sát thương vũ khí hoạt động ở mọi nơi; chỉ điểm Chiến Trận và thưởng bộ ngừng tác dụng khi đánh quái.',
+    'Mọi món Chiến Trận đều có Điểm Tấn Công Chiến Trận và Điểm Phòng Thủ Chiến Trận; hai chỉ số này hoàn toàn không tác dụng với quái vật. Chúng chỉ áp dụng khi đánh người chơi khác trong đấu tay đôi, đấu trường hoặc chiến trường: Tấn Công tăng sát thương gây ra, Phòng Thủ giảm sát thương nhận vào, mỗi loại có giới hạn riêng. Mỗi dòng giáp cũng là một bộ; thưởng bộ cũng là điểm Chiến Trận hoặc hiệu ứng chỉ tác dụng với người chơi, nên thưởng của cả bộ Danh Dự không có tác dụng với trùm phó bản. Bản thân các món vẫn có chỉ số thường, giáp và sát thương vũ khí hoạt động ở mọi nơi; chỉ điểm Chiến Trận và thưởng bộ ngừng tác dụng khi đánh quái. Có một ngoại lệ hoạt động ở mọi nơi: hai món của một bộ dành cho người thi triển phép còn khiến sát thương phải chịu không làm chậm việc thi triển phép nữa.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'Đó là sự đánh đổi có chủ đích. Trang bị Chiến Trận dành cho việc đấu với người chơi, không phải đường tắt vượt các bậc phó bản: một món Chiến Trận không có những điểm chỉ số chiến đấu mà món sử thi phó bản cùng ô có; thay vào đó, điểm Chiến Trận và thưởng bộ của nó được dành hoàn toàn cho đối thủ là người chơi. Muốn đứng vững trong đấu trường thì hãy mua. Muốn vượt phó bản anh hùng nhanh hơn thì hãy kiếm trang bị trong phó bản.',
   'guide.controls.harvestJournal': 'Nhật Ký Thu Hoạch',

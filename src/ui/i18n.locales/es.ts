@@ -1606,7 +1606,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_druid_balance_shoulder.name': 'Hombreras Guardaestrellas',
   'entities.itemSets.vanguard_druid_balance.name': 'Vestimenta Guardaestrellas',
   'entities.itemSets.vanguard_druid_balance.bonus2':
-    'El tiempo de lanzamiento de Raíces Aferradoras se reduce 0,5 s.',
+    'El tiempo de lanzamiento de Raíces Aferradoras se reduce 0,5 s. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'Lanzar Raíces Aferradoras te permite lanzar hechizos en movimiento y aumenta tu velocidad de movimiento un 20% durante 4 s. No puede ocurrir más de una vez cada 20 s.',
   'entities.items.vanguard_druid_feral_chest.name': 'Túnica Crinsangre',
@@ -1626,7 +1626,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_druid_restoration_shoulder.name': 'Manto Florcardo',
   'entities.itemSets.vanguard_druid_restoration.name': 'Vestimenta Florcardo',
   'entities.itemSets.vanguard_druid_restoration.bonus2':
-    'El tiempo de reutilización de Alivio Presto se reduce 1 s.',
+    'El tiempo de reutilización de Alivio Presto se reduce 1 s. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.vanguard_druid_restoration.bonus4':
     'Alivio Presto también aumenta tu velocidad de movimiento un 30% durante 3 s.',
   'entities.items.vanguard_hunter_beast_mastery_chest.name': 'Jubón Guardamanada',
@@ -1666,7 +1666,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_mage_arcane_shoulder.name': 'Amito Atahoras',
   'entities.itemSets.vanguard_mage_arcane.name': 'Vestiduras Atahoras',
   'entities.itemSets.vanguard_mage_arcane.bonus2':
-    'El tiempo de reutilización de Barrera Temporal se reduce 2 s.',
+    'El tiempo de reutilización de Barrera Temporal se reduce 2 s. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.vanguard_mage_arcane.bonus4':
     'Barrera Temporal también aumenta la velocidad de movimiento del objetivo protegido un 20% durante 3 s.',
   'entities.items.vanguard_mage_fire_chest.name': 'Vestiduras Azoteascuas',
@@ -1675,7 +1675,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_mage_fire_legs.name': 'Perneras Azoteascuas',
   'entities.items.vanguard_mage_fire_shoulder.name': 'Manto Azoteascuas',
   'entities.itemSets.vanguard_mage_fire.name': 'Galas Azoteascuas',
-  'entities.itemSets.vanguard_mage_fire.bonus2': 'Lluvia de Ascuas se recarga 3 s más rápido.',
+  'entities.itemSets.vanguard_mage_fire.bonus2':
+    'Lluvia de Ascuas se recarga 3 s más rápido. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.vanguard_mage_fire.bonus4':
     'Lanzar Lluvia de Ascuas reduce 2 s el tiempo de reutilización restante de Barrera Llameante.',
   'entities.items.vanguard_mage_frost_chest.name': 'Vestimenta Guardaescarcha',
@@ -1685,7 +1686,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_mage_frost_shoulder.name': 'Hombreras Guardaescarcha',
   'entities.itemSets.vanguard_mage_frost.name': 'Atuendo Guardaescarcha',
   'entities.itemSets.vanguard_mage_frost.bonus2':
-    'El tiempo de reutilización de Atadura de Hielo se reduce 2 s.',
+    'El tiempo de reutilización de Atadura de Hielo se reduce 2 s. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.vanguard_mage_frost.bonus4':
     'Lanzar Atadura de Hielo reduce 5 s el tiempo de reutilización restante de Paso Fugaz.',
   'entities.items.vanguard_paladin_holy_chest.name': 'Cota Velasol',
@@ -1695,7 +1696,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_paladin_holy_shoulder.name': 'Manto Velasol',
   'entities.itemSets.vanguard_paladin_holy.name': 'Galas Velasol',
   'entities.itemSets.vanguard_paladin_holy.bonus2':
-    'El tiempo de reutilización de Pacto de Vida se reduce 30 s.',
+    'El tiempo de reutilización de Pacto de Vida se reduce 30 s. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     'Pacto de Vida también otorga a tu aliado un escudo por el 8% de su salud máxima durante 6 s.',
   'entities.items.vanguard_paladin_protection_chest.name': 'Peto Votoescudo',
@@ -1725,7 +1726,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_priest_discipline_shoulder.name': 'Manto Salmovelo',
   'entities.itemSets.vanguard_priest_discipline.name': 'Vestimenta Salmovelo',
   'entities.itemSets.vanguard_priest_discipline.bonus2':
-    'El tiempo de reutilización de Alarido Psíquico se reduce 3 s.',
+    'El tiempo de reutilización de Alarido Psíquico se reduce 3 s. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
     'Cuando tu Salmo de Protección se consume por completo, el aliado protegido gana un 20% de velocidad de movimiento durante 3 s. No puede ocurrir más de una vez cada 8 s.',
   'entities.items.vanguard_priest_holy_chest.name': 'Vestidura Alagracia',
@@ -1735,7 +1736,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_priest_holy_shoulder.name': 'Manto Alagracia',
   'entities.itemSets.vanguard_priest_holy.name': 'Vestimenta Alagracia',
   'entities.itemSets.vanguard_priest_holy.bonus2':
-    'El tiempo de reutilización de Paso del Velo se reduce 6 s.',
+    'El tiempo de reutilización de Paso del Velo se reduce 6 s. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.vanguard_priest_holy.bonus4':
     'Paso del Velo también te otorga un escudo por el 8% de tu salud máxima durante 6 s.',
   'entities.items.vanguard_priest_shadow_chest.name': 'Vestidura Himnocaso',
@@ -1745,7 +1746,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_priest_shadow_shoulder.name': 'Manto Himnocaso',
   'entities.itemSets.vanguard_priest_shadow.name': 'Galas Himnocaso',
   'entities.itemSets.vanguard_priest_shadow.bonus2':
-    'Letanía de Aflicción también ralentiza el movimiento del objetivo un 30% mientras la canalizas.',
+    'Letanía de Aflicción también ralentiza el movimiento del objetivo un 30% mientras la canalizas. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.vanguard_priest_shadow.bonus4':
     'Invocar Diezmademonio también te otorga un escudo por el 10% de tu salud máxima durante 8 s.',
   'entities.items.vanguard_rogue_assassination_chest.name': 'Túnica Cortenoche',
@@ -1784,7 +1785,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_shaman_elemental_shoulder.name': 'Hombreras Escritormenta',
   'entities.itemSets.vanguard_shaman_elemental.name': 'Cota de Batalla Escritormenta',
   'entities.itemSets.vanguard_shaman_elemental.bonus2':
-    'El tiempo de reutilización de Desatar Arma se reduce 3 s.',
+    'El tiempo de reutilización de Desatar Arma se reduce 3 s. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
     'Desatar Arma te permite lanzar hechizos en movimiento y aumenta tu velocidad de movimiento un 20% durante 4 s. No puede ocurrir más de una vez cada 20 s.',
   'entities.items.vanguard_shaman_enhancement_chest.name': 'Malla Vendavalnato',
@@ -1804,7 +1805,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_shaman_restoration_shoulder.name': 'Manto Guardamar',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Malla Guardamar',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    'Aguas Reparadoras se lanza 0,5 s más rápido sobre un aliado por debajo del 50% de salud.',
+    'Aguas Reparadoras se lanza 0,5 s más rápido sobre un aliado por debajo del 50% de salud. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     'Llamada de la Marea también otorga a su objetivo un escudo por el 5% de tu salud máxima durante 6 s.',
   'entities.items.vanguard_warlock_affliction_chest.name': 'Vestidura Plumapavor',
@@ -1814,7 +1815,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_warlock_affliction_shoulder.name': 'Manto Plumapavor',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Vestiduras Plumapavor',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'El tiempo de lanzamiento de Espanto se reduce 0,3 s.',
+    'El tiempo de lanzamiento de Espanto se reduce 0,3 s. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Consumir te sana un 30% más y puede canalizarse en movimiento.',
   'entities.items.vanguard_warlock_demonology_chest.name': 'Vestidura Atamédula',
@@ -1824,7 +1825,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_warlock_demonology_shoulder.name': 'Hombreras Atamédula',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Galas Atamédula',
   'entities.itemSets.vanguard_warlock_demonology.bonus2':
-    'El tiempo de reutilización de Armadura de Huesos se reduce 10 s.',
+    'El tiempo de reutilización de Armadura de Huesos se reduce 10 s. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.vanguard_warlock_demonology.bonus4':
     'Mandato: siega reduce 2 s el tiempo de reutilización restante de Armadura de Huesos.',
   'entities.items.vanguard_warlock_destruction_chest.name': 'Vestiduras Coronaescoria',
@@ -1834,7 +1835,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_warlock_destruction_shoulder.name': 'Manto Coronaescoria',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Vestiduras Coronaescoria',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    'El tiempo de reutilización de Piel de Escoria se reduce 30 s.',
+    'El tiempo de reutilización de Piel de Escoria se reduce 30 s. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     'Cada segundo lanzamiento de Conflagrar hace que tu próxima Descarga de Ruina en los 8 s siguientes sea instantánea.',
   'entities.items.vanguard_warrior_arms_chest.name': 'Cota Estelahoja',
@@ -4543,7 +4544,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_ashstalker.bonus7':
     'Aumenta el Ataque y la Defensa de Pericia bélica en 80. Matar a un jugador hostil otorga Paso de Ceniza, aumentando la velocidad de movimiento un 40% durante 6 s.',
   'entities.itemSets.warfare_ashstalker.name': 'Equipo Ashstalker',
-  'entities.itemSets.warfare_cinderweave.bonus2': 'Aumenta la Defensa de Pericia bélica en 40.',
+  'entities.itemSets.warfare_cinderweave.bonus2':
+    'Aumenta la Defensa de Pericia bélica en 40. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.warfare_cinderweave.bonus4':
     'Aumenta el Ataque de Pericia bélica en 40, y el control de masas que te lanzan jugadores hostiles dura un 15% menos.',
   'entities.itemSets.warfare_cinderweave.bonus7':
@@ -4555,13 +4557,15 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_furyforged.bonus7':
     'Aumenta el Ataque y la Defensa de Pericia bélica en 80. Matar a un jugador hostil otorga Juramento Inquebrantado, absorbiendo 200 de daño durante 10 s.',
   'entities.itemSets.warfare_furyforged.name': 'Equipo de batalla Furyforged',
-  'entities.itemSets.warfare_stormbound.bonus2': 'Aumenta la Defensa de Pericia bélica en 40.',
+  'entities.itemSets.warfare_stormbound.bonus2':
+    'Aumenta la Defensa de Pericia bélica en 40. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.warfare_stormbound.bonus4':
     'Aumenta el Ataque de Pericia bélica en 40, y el control de masas que te lanzan jugadores hostiles dura un 15% menos.',
   'entities.itemSets.warfare_stormbound.bonus7':
     'Aumenta el Ataque y la Defensa de Pericia bélica en 80. Tus hechizos tienen un 15% de probabilidad de otorgar Guarda de Ascua, absorbiendo 120 de daño durante 8 s.',
   'entities.itemSets.warfare_stormbound.name': 'Vestiduras Stormbound',
-  'entities.itemSets.warfare_thornhide.bonus2': 'Aumenta la Defensa de Pericia bélica en 40.',
+  'entities.itemSets.warfare_thornhide.bonus2':
+    'Aumenta la Defensa de Pericia bélica en 40. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.warfare_thornhide.bonus4':
     'Aumenta el Ataque de Pericia bélica en 40, y el control de masas que te lanzan jugadores hostiles dura un 15% menos.',
   'entities.itemSets.warfare_thornhide.bonus7':
@@ -19533,7 +19537,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'Una victoria puntuada paga Honor, la moneda de jugador contra jugador, y una derrota que juegas hasta el final también paga una parte menor, igual que un empate, así que la clasificación es lo único que realmente cuesta una derrota. El Honor recompensa partidas reales: vencer al mismo rival o equipo otra vez el mismo día no paga más, ni tampoco volver a perder contra ellos. Un día de victorias largo paga completo durante su primer tramo y luego reduce a la mitad el pago, vuelve a reducirlo más adelante y se queda así. Una partida que el rival abandona aún mueve tu clasificación, pero no paga Honor. El día pertenece al reino y cambia a la hora del reinicio nocturno, el mismo límite en que se reinician los bloqueos diarios.',
   'guide.arenaPage.warfareBodyStatsStay':
-    'Cada pieza de Guerra lleva índice de Ofensiva de Guerra e índice de Defensa de Guerra, y esos índices no hacen nada contra monstruos. Solo se aplican al luchar contra otro jugador, en duelo, arena o campo de batalla: la Ofensiva aumenta el daño que infliges y la Defensa reduce el daño que recibes, cada una hasta su propio límite. Cada familia de armadura también es un conjunto, y sus bonificaciones son índices o efectos de Guerra que solo funcionan contra jugadores, así que las bonificaciones de un conjunto completo de Honor no sirven contra un jefe de mazmorra. Las piezas mantienen sus estadísticas normales, armadura y daño de arma, que sí funcionan en todas partes; contra monstruos solo se apagan los índices de Guerra y sus bonificaciones.',
+    'Cada pieza de Guerra lleva índice de Ofensiva de Guerra e índice de Defensa de Guerra, y esos índices no hacen nada contra monstruos. Solo se aplican al luchar contra otro jugador, en duelo, arena o campo de batalla: la Ofensiva aumenta el daño que infliges y la Defensa reduce el daño que recibes, cada una hasta su propio límite. Cada familia de armadura también es un conjunto, y sus bonificaciones son índices o efectos de Guerra que solo funcionan contra jugadores, así que las bonificaciones de un conjunto completo de Honor no sirven contra un jefe de mazmorra. Las piezas mantienen sus estadísticas normales, armadura y daño de arma, que sí funcionan en todas partes; contra monstruos solo se apagan los índices de Guerra y sus bonificaciones. Hay una excepción que funciona en todas partes: dos piezas de un conjunto de lanzador hacen además que el daño recibido ya no retrase tus hechizos.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'Ese es el intercambio deliberado. El equipo de Guerra está hecho para combatir jugadores, no para saltarse los niveles de mazmorra: una pieza de Guerra nunca lleva los índices de combate que tendría un épico de mazmorra en el mismo hueco, y los índices y bonificaciones de Guerra que sí lleva se gastan por completo contra otros jugadores. Si quieres competir en arena, cómpralo. Si quieres limpiar heroicas más rápido, consigue tu equipo en las mazmorras.',
   'guide.controls.harvestJournal': 'Diario de cosecha',

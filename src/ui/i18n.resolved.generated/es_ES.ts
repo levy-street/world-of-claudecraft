@@ -8299,7 +8299,7 @@ export const es_ES: EnTranslations = {
       "honorFinalNoteSoldBack": "Las compras de Honor son definitivas. La lista de recompra solo contiene lo que vendiste: una compra con monedas normalmente puede venderse por su precio de venta y recuperarse de la lista si vuelves a cambiar de idea, pero el equipo de Guerra se liga al alma en cuanto lo compras, así que nunca puede intercambiarse, enviarse por correo ni venderse, y nunca llega a esa lista. La tienda pide confirmación por eso: lee la pieza antes de pulsar.",
       "warfareHeading": "Equipo de guerra",
       "warfareBody": "Toda pieza de equipo de guerra lleva Índice de Ofensiva y de Defensa de Pericia Bélica, y esos dos índices no sirven de nada contra monstruos. Solo se aplican cuando luchas contra otro jugador, en un duelo, en la arena o en el campo de batalla, donde la Ofensiva se suma al daño que infliges y la Defensa reduce el daño que recibes, cada una hasta su propio tope. Cada familia de armadura es también un conjunto, y sus bonificaciones de conjunto son igualmente índice de Pericia Bélica o efectos que solo funcionan contra jugadores, así que un equipo de honor completo no vale nada contra un jefe de mazmorra.",
-      "warfareBodyStatsStay": "Cada pieza de Guerra lleva índice de Ofensiva de Guerra e índice de Defensa de Guerra, y esos índices no hacen nada contra monstruos. Solo se aplican al luchar contra otro jugador, en duelo, arena o campo de batalla: la Ofensiva aumenta el daño que infliges y la Defensa reduce el daño que recibes, cada una hasta su propio límite. Cada familia de armadura también es un conjunto, y sus bonificaciones son índices o efectos de Guerra que solo funcionan contra jugadores, así que las bonificaciones de un conjunto completo de Honor no sirven contra un jefe de mazmorra. Las piezas mantienen sus estadísticas normales, armadura y daño de arma, que sí funcionan en todas partes; contra monstruos solo se apagan los índices de Guerra y sus bonificaciones.",
+      "warfareBodyStatsStay": "Cada pieza de Guerra lleva índice de Ofensiva de Guerra e índice de Defensa de Guerra, y esos índices no hacen nada contra monstruos. Solo se aplican al luchar contra otro jugador, en duelo, arena o campo de batalla: la Ofensiva aumenta el daño que infliges y la Defensa reduce el daño que recibes, cada una hasta su propio límite. Cada familia de armadura también es un conjunto, y sus bonificaciones son índices o efectos de Guerra que solo funcionan contra jugadores, así que las bonificaciones de un conjunto completo de Honor no sirven contra un jefe de mazmorra. Las piezas mantienen sus estadísticas normales, armadura y daño de arma, que sí funcionan en todas partes; contra monstruos solo se apagan los índices de Guerra y sus bonificaciones. Hay una excepción que funciona en todas partes: dos piezas de un conjunto de lanzador hacen además que el daño recibido ya no retrase tus hechizos.",
       "warfareTradeBody": "Ese es el intercambio deliberado. El equipo de guerra está pensado para luchar contra jugadores, no como atajo para saltarte los niveles de mazmorra: una pieza de guerra nunca lleva los índices de combate que sí lleva un objeto épico de mazmorra en el mismo hueco, y cuanto aporta se gasta en otros jugadores. Si quieres defenderte bien en la arena, cómpralo. Si quieres superar las heroicas más rápido, gánate tu equipo en las mazmorras.",
       "warfareTradeBodyRatingSpent": "Ese es el intercambio deliberado. El equipo de Guerra está hecho para combatir jugadores, no para saltarse los niveles de mazmorra: una pieza de Guerra nunca lleva los índices de combate que tendría un épico de mazmorra en el mismo hueco, y los índices y bonificaciones de Guerra que sí lleva se gastan por completo contra otros jugadores. Si quieres competir en arena, cómpralo. Si quieres limpiar heroicas más rápido, consigue tu equipo en las mazmorras.",
       "vanguardHeading": "Equipo de Vanguardia: Guerra, temporada 2",
@@ -24174,7 +24174,7 @@ export const es_ES: EnTranslations = {
       },
       "vanguard_druid_balance": {
         "name": "Vestimenta Guardaestrellas",
-        "bonus2": "El tiempo de lanzamiento de Raíces Aferradoras se reduce 0,5 s.",
+        "bonus2": "El tiempo de lanzamiento de Raíces Aferradoras se reduce 0,5 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Lanzar Raíces Aferradoras te permite lanzar hechizos en movimiento y aumenta tu velocidad de movimiento un 20% durante 4 s. No puede ocurrir más de una vez cada 20 s."
       },
       "vanguard_druid_feral": {
@@ -24184,7 +24184,7 @@ export const es_ES: EnTranslations = {
       },
       "vanguard_druid_restoration": {
         "name": "Vestimenta Florcardo",
-        "bonus2": "El tiempo de reutilización de Alivio Presto se reduce 1 s.",
+        "bonus2": "El tiempo de reutilización de Alivio Presto se reduce 1 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Alivio Presto también aumenta tu velocidad de movimiento un 30% durante 3 s."
       },
       "vanguard_hunter_beast_mastery": {
@@ -24204,22 +24204,22 @@ export const es_ES: EnTranslations = {
       },
       "vanguard_mage_arcane": {
         "name": "Vestiduras Atahoras",
-        "bonus2": "El tiempo de reutilización de Barrera Temporal se reduce 2 s.",
+        "bonus2": "El tiempo de reutilización de Barrera Temporal se reduce 2 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Barrera Temporal también aumenta la velocidad de movimiento del objetivo protegido un 20% durante 3 s."
       },
       "vanguard_mage_fire": {
         "name": "Galas Azoteascuas",
-        "bonus2": "Lluvia de Ascuas se recarga 3 s más rápido.",
+        "bonus2": "Lluvia de Ascuas se recarga 3 s más rápido. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Lanzar Lluvia de Ascuas reduce 2 s el tiempo de reutilización restante de Barrera Llameante."
       },
       "vanguard_mage_frost": {
         "name": "Atuendo Guardaescarcha",
-        "bonus2": "El tiempo de reutilización de Atadura de Hielo se reduce 2 s.",
+        "bonus2": "El tiempo de reutilización de Atadura de Hielo se reduce 2 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Lanzar Atadura de Hielo reduce 5 s el tiempo de reutilización restante de Paso Fugaz."
       },
       "vanguard_paladin_holy": {
         "name": "Galas Velasol",
-        "bonus2": "El tiempo de reutilización de Pacto de Vida se reduce 30 s.",
+        "bonus2": "El tiempo de reutilización de Pacto de Vida se reduce 30 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Pacto de Vida también otorga a tu aliado un escudo por el 8% de su salud máxima durante 6 s."
       },
       "vanguard_paladin_protection": {
@@ -24234,17 +24234,17 @@ export const es_ES: EnTranslations = {
       },
       "vanguard_priest_discipline": {
         "name": "Vestimenta Salmovelo",
-        "bonus2": "El tiempo de reutilización de Alarido Psíquico se reduce 3 s.",
+        "bonus2": "El tiempo de reutilización de Alarido Psíquico se reduce 3 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Cuando tu Salmo de Protección se consume por completo, el aliado protegido gana un 20% de velocidad de movimiento durante 3 s. No puede ocurrir más de una vez cada 8 s."
       },
       "vanguard_priest_holy": {
         "name": "Vestimenta Alagracia",
-        "bonus2": "El tiempo de reutilización de Paso del Velo se reduce 6 s.",
+        "bonus2": "El tiempo de reutilización de Paso del Velo se reduce 6 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Paso del Velo también te otorga un escudo por el 8% de tu salud máxima durante 6 s."
       },
       "vanguard_priest_shadow": {
         "name": "Galas Himnocaso",
-        "bonus2": "Letanía de Aflicción también ralentiza el movimiento del objetivo un 30% mientras la canalizas.",
+        "bonus2": "Letanía de Aflicción también ralentiza el movimiento del objetivo un 30% mientras la canalizas. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Invocar Diezmademonio también te otorga un escudo por el 10% de tu salud máxima durante 8 s."
       },
       "vanguard_rogue_assassination": {
@@ -24264,7 +24264,7 @@ export const es_ES: EnTranslations = {
       },
       "vanguard_shaman_elemental": {
         "name": "Cota de Batalla Escritormenta",
-        "bonus2": "El tiempo de reutilización de Desatar Arma se reduce 3 s.",
+        "bonus2": "El tiempo de reutilización de Desatar Arma se reduce 3 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Desatar Arma te permite lanzar hechizos en movimiento y aumenta tu velocidad de movimiento un 20% durante 4 s. No puede ocurrir más de una vez cada 20 s."
       },
       "vanguard_shaman_enhancement": {
@@ -24274,22 +24274,22 @@ export const es_ES: EnTranslations = {
       },
       "vanguard_shaman_restoration": {
         "name": "Malla Guardamar",
-        "bonus2": "Aguas Reparadoras se lanza 0,5 s más rápido sobre un aliado por debajo del 50% de salud.",
+        "bonus2": "Aguas Reparadoras se lanza 0,5 s más rápido sobre un aliado por debajo del 50% de salud. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Llamada de la Marea también otorga a su objetivo un escudo por el 5% de tu salud máxima durante 6 s."
       },
       "vanguard_warlock_affliction": {
         "name": "Vestiduras Plumapavor",
-        "bonus2": "El tiempo de lanzamiento de Espanto se reduce 0,3 s.",
+        "bonus2": "El tiempo de lanzamiento de Espanto se reduce 0,3 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Consumir te sana un 30% más y puede canalizarse en movimiento."
       },
       "vanguard_warlock_demonology": {
         "name": "Galas Atamédula",
-        "bonus2": "El tiempo de reutilización de Armadura de Huesos se reduce 10 s.",
+        "bonus2": "El tiempo de reutilización de Armadura de Huesos se reduce 10 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Mandato: siega reduce 2 s el tiempo de reutilización restante de Armadura de Huesos."
       },
       "vanguard_warlock_destruction": {
         "name": "Vestiduras Coronaescoria",
-        "bonus2": "El tiempo de reutilización de Piel de Escoria se reduce 30 s.",
+        "bonus2": "El tiempo de reutilización de Piel de Escoria se reduce 30 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Cada segundo lanzamiento de Conflagrar hace que tu próxima Descarga de Ruina en los 8 s siguientes sea instantánea."
       },
       "vanguard_warrior_arms": {
@@ -24320,7 +24320,7 @@ export const es_ES: EnTranslations = {
       },
       "warfare_cinderweave": {
         "name": "Equipo de batalla Cinderweave",
-        "bonus2": "Aumenta la Defensa de Pericia bélica en 40.",
+        "bonus2": "Aumenta la Defensa de Pericia bélica en 40. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Aumenta el Ataque de Pericia bélica en 40, y el control de masas que te lanzan jugadores hostiles dura un 15% menos.",
         "bonus7": "Aumenta el Ataque y la Defensa de Pericia bélica en 80. Tus hechizos tienen un 15% de probabilidad de otorgar Guarda de Ascua, absorbiendo 120 de daño durante 8 s."
       },
@@ -24332,13 +24332,13 @@ export const es_ES: EnTranslations = {
       },
       "warfare_stormbound": {
         "name": "Vestiduras Stormbound",
-        "bonus2": "Aumenta la Defensa de Pericia bélica en 40.",
+        "bonus2": "Aumenta la Defensa de Pericia bélica en 40. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Aumenta el Ataque de Pericia bélica en 40, y el control de masas que te lanzan jugadores hostiles dura un 15% menos.",
         "bonus7": "Aumenta el Ataque y la Defensa de Pericia bélica en 80. Tus hechizos tienen un 15% de probabilidad de otorgar Guarda de Ascua, absorbiendo 120 de daño durante 8 s."
       },
       "warfare_thornhide": {
         "name": "Atuendo Thornhide",
-        "bonus2": "Aumenta la Defensa de Pericia bélica en 40.",
+        "bonus2": "Aumenta la Defensa de Pericia bélica en 40. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Aumenta el Ataque de Pericia bélica en 40, y el control de masas que te lanzan jugadores hostiles dura un 15% menos.",
         "bonus7": "Aumenta el Ataque y la Defensa de Pericia bélica en 80. Tus hechizos tienen un 15% de probabilidad de otorgar Guarda de Espinas, aumentando la esquiva un 15% durante 6 s."
       },

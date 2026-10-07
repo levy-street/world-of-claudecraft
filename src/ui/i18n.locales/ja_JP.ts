@@ -10344,7 +10344,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_ashstalker.bonus7':
     'ウォーフェア攻撃・防御レーティングが80上がります。敵対プレイヤーを倒すと灰の歩みを得て、移動速度が6秒間40%上がります。',
   'entities.itemSets.warfare_cinderweave.name': 'シンダーウィーヴの法衣',
-  'entities.itemSets.warfare_cinderweave.bonus2': 'ウォーフェア防御レーティングが40上がります。',
+  'entities.itemSets.warfare_cinderweave.bonus2':
+    'ウォーフェア防御レーティングが40上がります。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.warfare_cinderweave.bonus4':
     'ウォーフェア攻撃レーティングが40上がり、敵対プレイヤーがあなたにかける行動制御の持続が15%短くなります。',
   'entities.itemSets.warfare_cinderweave.bonus7':
@@ -10356,13 +10357,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_furyforged.bonus7':
     'ウォーフェア攻撃・防御レーティングが80上がります。敵対プレイヤーを倒すと不断の誓いを得て、10秒間200のダメージを吸収します。',
   'entities.itemSets.warfare_stormbound.name': 'ストームバウンドの法衣',
-  'entities.itemSets.warfare_stormbound.bonus2': 'ウォーフェア防御レーティングが40上がります。',
+  'entities.itemSets.warfare_stormbound.bonus2':
+    'ウォーフェア防御レーティングが40上がります。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.warfare_stormbound.bonus4':
     'ウォーフェア攻撃レーティングが40上がり、敵対プレイヤーがあなたにかける行動制御の持続が15%短くなります。',
   'entities.itemSets.warfare_stormbound.bonus7':
     'ウォーフェア攻撃・防御レーティングが80上がります。呪文に15%の確率で燠火の守りが宿り、8秒間120のダメージを吸収します。',
   'entities.itemSets.warfare_thornhide.name': 'ソーンハイドの装束',
-  'entities.itemSets.warfare_thornhide.bonus2': 'ウォーフェア防御レーティングが40上がります。',
+  'entities.itemSets.warfare_thornhide.bonus2':
+    'ウォーフェア防御レーティングが40上がります。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.warfare_thornhide.bonus4':
     'ウォーフェア攻撃レーティングが40上がり、敵対プレイヤーがあなたにかける行動制御の持続が15%短くなります。',
   'entities.itemSets.warfare_thornhide.bonus7':
@@ -18284,7 +18287,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'ランクマッチに勝てば、プレイヤー対プレイヤーの通貨である名誉が支払われ、最後まで戦い抜いた負け試合にもそれより少ない額の名誉が支払われます。引き分けも同様です。ですから、負けて本当に失うものはレーティングだけです。名誉は本物の試合に報いるためのものです。同じ日に同じ相手や同じチームをもう一度倒しても追加の支払いはなく（もう一度負けても同じです）、勝ち続けた長い一日でも最初の何勝かまでは満額が支払われ、その後は一勝あたりが半分になり、さらに勝ち進むともう一度半分になってそこで下げ止まり、相手が棄権した試合はレーティングこそ動きますが名誉はまったく支払われません。この「一日」はワールド自身の一日で、ワールドの夜間リセット時刻に切り替わります。日次のロックアウトがすべて解けるのと同じ境目です。',
   'guide.arenaPage.warfareBodyStatsStay':
-    'ウォーフェアの品はどれもウォーフェア攻撃レーティングとウォーフェア防御レーティングを備えていますが、この二つはモンスター相手にはまったく働きません。効くのは他のプレイヤーと戦うときだけ、決闘、アリーナ、戦場においてのみで、攻撃は与えるダメージを上乗せし、防御は受けるダメージを削り、それぞれに固有の上限があります。各防具系統はセットでもあり、そのセットボーナスもまた、ウォーフェアのレーティングか、プレイヤーにしか働かない効果です。ですから名誉で揃えた一式のセットボーナスは、ダンジョンのボスの前では何の足しにもなりません。品そのものは、通常のステータス、防御力、武器ダメージを変わらず備えており、それらはどこでも働きます。モンスター相手に黙り込むのは、ウォーフェアのレーティングとセットボーナスのほうなのです。',
+    'ウォーフェアの品はどれもウォーフェア攻撃レーティングとウォーフェア防御レーティングを備えていますが、この二つはモンスター相手にはまったく働きません。効くのは他のプレイヤーと戦うときだけ、決闘、アリーナ、戦場においてのみで、攻撃は与えるダメージを上乗せし、防御は受けるダメージを削り、それぞれに固有の上限があります。各防具系統はセットでもあり、そのセットボーナスもまた、ウォーフェアのレーティングか、プレイヤーにしか働かない効果です。ですから名誉で揃えた一式のセットボーナスは、ダンジョンのボスの前では何の足しにもなりません。品そのものは、通常のステータス、防御力、武器ダメージを変わらず備えており、それらはどこでも働きます。モンスター相手に黙り込むのは、ウォーフェアのレーティングとセットボーナスのほうなのです。ただし例外が一つあり、どこでも有効です。術者用セットを2つ装備すると、被ダメージで詠唱が遅れなくなります。',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'それは意図された取り引きです。ウォーフェア装備はプレイヤーと戦うために作られたものであって、ダンジョンの段階を飛び越える近道ではありません。ウォーフェアの品が、同じ部位のダンジョン産エピックほどの戦闘レーティングを備えることは決してなく、その代わりに備えているウォーフェアのレーティングとセットボーナスは、すべて他のプレイヤーに向けて費やされます。アリーナで渡り合いたいなら買いましょう。ヒロイックをより速く駆け抜けたいなら、装備はダンジョンで勝ち取りましょう。',
   'guide.social.calendarBodyDoubleHonor':
@@ -19513,7 +19516,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_warrior_prot.bonus4':
     '4点：Faultlineで受けるダメージが6秒間10%低下。',
   'entities.itemSets.vanguard_paladin_holy.name': 'ヴァンガード：Sunvigil Regalia',
-  'entities.itemSets.vanguard_paladin_holy.bonus2': '2点：Life Covenantのクールダウンが30秒短縮。',
+  'entities.itemSets.vanguard_paladin_holy.bonus2':
+    '2点：Life Covenantのクールダウンが30秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     '4点：Life Covenantが対象に最大体力8%のシールドを6秒付与。',
   'entities.itemSets.vanguard_paladin_protection.name': 'ヴァンガード：Shieldvow Bastion',
@@ -19554,20 +19558,21 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '4点：SmokefadeからのGut Punchがコンボポイントを追加で2得る。',
   'entities.itemSets.vanguard_priest_discipline.name': 'ヴァンガード：Veilpsalm Raiment',
   'entities.itemSets.vanguard_priest_discipline.bonus2':
-    '2点：Terror Canticleのクールダウンが3秒短縮。',
+    '2点：Terror Canticleのクールダウンが3秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
     '4点：Psalm of Warding消費時、守られた味方の移動速度が3秒間20%上昇。8秒に1回まで。',
   'entities.itemSets.vanguard_priest_holy.name': 'ヴァンガード：Gracewing Raiment',
-  'entities.itemSets.vanguard_priest_holy.bonus2': '2点：Veilstepのクールダウンが6秒短縮。',
+  'entities.itemSets.vanguard_priest_holy.bonus2':
+    '2点：Veilstepのクールダウンが6秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_priest_holy.bonus4': '4点：Veilstepが最大体力8%のシールドを6秒付与。',
   'entities.itemSets.vanguard_priest_shadow.name': 'ヴァンガード：Duskhymn Regalia',
   'entities.itemSets.vanguard_priest_shadow.bonus2':
-    '2点：Litany of Woeの詠唱中、対象の移動速度も30%低下。',
+    '2点：Litany of Woeの詠唱中、対象の移動速度も30%低下。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_priest_shadow.bonus4':
     '4点：Call Tithefiendが最大体力10%のシールドを8秒付与。',
   'entities.itemSets.vanguard_shaman_elemental.name': 'ヴァンガード：Tempestwrit Battlemail',
   'entities.itemSets.vanguard_shaman_elemental.bonus2':
-    '2点：Unleash Weaponのクールダウンが3秒短縮。',
+    '2点：Unleash Weaponのクールダウンが3秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
     '4点：Unleash Weaponで移動詠唱可能になり、4秒間移動速度20%上昇。20秒に1回まで。',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'ヴァンガード：Galeborn Warmail',
@@ -19577,33 +19582,37 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '4点：Ancestral StrikeでElemental Tranceの残りクールダウンが4秒短縮。',
   'entities.itemSets.vanguard_shaman_restoration.name': 'ヴァンガード：Brineward Chainmail',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    '2点：体力50%未満の味方へのMending Watersが0.5秒速くなる。',
+    '2点：体力50%未満の味方へのMending Watersが0.5秒速くなる。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     '4点：Tidecallが対象にあなたの最大体力5%のシールドを6秒付与。',
   'entities.itemSets.vanguard_mage_arcane.name': 'ヴァンガード：Hourbinder Vestments',
-  'entities.itemSets.vanguard_mage_arcane.bonus2': '2点：Temporal Barrierのクールダウンが2秒短縮。',
+  'entities.itemSets.vanguard_mage_arcane.bonus2':
+    '2点：Temporal Barrierのクールダウンが2秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_mage_arcane.bonus4':
     '4点：Temporal Barrierが守った対象の移動速度を3秒間20%上昇。',
   'entities.itemSets.vanguard_mage_fire.name': 'ヴァンガード：Emberlash Regalia',
-  'entities.itemSets.vanguard_mage_fire.bonus2': '2点：Cinderfallの再使用が3秒速くなる。',
+  'entities.itemSets.vanguard_mage_fire.bonus2':
+    '2点：Cinderfallの再使用が3秒速くなる。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_mage_fire.bonus4':
     '4点：Cinderfall詠唱でBlazing Barrierの残りクールダウンが2秒短縮。',
   'entities.itemSets.vanguard_mage_frost.name': 'ヴァンガード：Rimewarden Garb',
-  'entities.itemSets.vanguard_mage_frost.bonus2': '2点：Icebindのクールダウンが2秒短縮。',
+  'entities.itemSets.vanguard_mage_frost.bonus2':
+    '2点：Icebindのクールダウンが2秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_mage_frost.bonus4':
     '4点：Icebind詠唱でFlitstepの残りクールダウンが5秒短縮。',
   'entities.itemSets.vanguard_warlock_affliction.name': 'ヴァンガード：Dreadquill Vestments',
-  'entities.itemSets.vanguard_warlock_affliction.bonus2': '2点：Harrowの詠唱時間が0.3秒短縮。',
+  'entities.itemSets.vanguard_warlock_affliction.bonus2':
+    '2点：Harrowの詠唱時間が0.3秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     '4点：Consumeの回復量が30%上昇し、移動中にチャネル可能。',
   'entities.itemSets.vanguard_warlock_demonology.name': 'ヴァンガード：Marrowbound Regalia',
   'entities.itemSets.vanguard_warlock_demonology.bonus2':
-    '2点：Bone Armorのクールダウンが10秒短縮。',
+    '2点：Bone Armorのクールダウンが10秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_warlock_demonology.bonus4':
     '4点：Reaping CommandでBone Armorの残りクールダウンが2秒短縮。',
   'entities.itemSets.vanguard_warlock_destruction.name': 'ヴァンガード：Slagcrown Vestments',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    '2点：Cinderhideのクールダウンが30秒短縮。',
+    '2点：Cinderhideのクールダウンが30秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     '4点：2回ごとのConflagrateで8秒以内の次のRuinboltが即時発動。',
   'entities.itemSets.vanguard_druid_feral.name': '血たてがみの皮装',
@@ -19611,10 +19620,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_feral.bonus4':
     '4点：Bruin Rushが最大体力6%のシールドを6秒付与。',
   'entities.itemSets.vanguard_druid_restoration.name': 'アザミ花の祭服',
-  'entities.itemSets.vanguard_druid_restoration.bonus2': '2点：Fleetmendのクールダウンが1秒短縮。',
+  'entities.itemSets.vanguard_druid_restoration.bonus2':
+    '2点：Fleetmendのクールダウンが1秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_druid_restoration.bonus4': '4点：Fleetmendで移動速度が3秒間30%上昇。',
   'entities.itemSets.vanguard_druid_balance.name': '星守りの装束',
-  'entities.itemSets.vanguard_druid_balance.bonus2': '絡み根の詠唱時間が0.5秒短縮される。',
+  'entities.itemSets.vanguard_druid_balance.bonus2':
+    '絡み根の詠唱時間が0.5秒短縮される。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '絡み根を詠唱すると、移動しながら詠唱でき、移動速度が4秒間20%上昇する。20秒に1回しか発生しない。',
 };

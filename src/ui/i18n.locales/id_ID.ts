@@ -1884,7 +1884,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Panggil sambaran petir, berikan {damage} kerusakan Alam kepada musuh dalam 10 yard dan perlambat mereka sebesar 50% selama 5 detik. Pulihkan 8% dari Mana maksimal-mu. Kerusakan meningkat dengan Kekuatan Mantra.',
   'entities.abilities.thunderstorm.name': 'Putus Badai',
   'entities.itemSets.vanguard_druid_balance.bonus2':
-    'Waktu jentikan Akar Cengkeram dikurangi 0.5 detik.',
+    'Waktu jentikan Akar Cengkeram dikurangi 0.5 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'Melempar Akar Cengkeram membiarkanmu menyampaikan sambil bergerak dan meningkatkan kecepatan gerakmu sebesar 20 persen selama 4 detik. Tidak dapat terjadi lebih dari sekali setiap 20 detik.',
   'entities.itemSets.vanguard_druid_balance.name': 'Gaun Penjaga Bintang',
@@ -1892,7 +1892,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_feral.bonus4':
     'Terjangan Bruin melindungimu sebesar 6 persen dari kesehatan maksimal-mu selama 6 detik.',
   'entities.itemSets.vanguard_druid_feral.name': 'Kulit Bersurai Darah',
-  'entities.itemSets.vanguard_druid_restoration.bonus2': 'Jeda Pemulihan Cepat dikurangi 1 detik.',
+  'entities.itemSets.vanguard_druid_restoration.bonus2':
+    'Jeda Pemulihan Cepat dikurangi 1 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_druid_restoration.bonus4':
     'Pemulihan Cepat juga meningkatkan kecepatan gerakmu sebesar 30 persen selama 3 detik.',
   'entities.itemSets.vanguard_druid_restoration.name': 'Jubah Mekar Thistle',
@@ -1908,19 +1909,23 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_hunter_survival.bonus2': 'Jeda Kait Darah dikurangi 3 detik.',
   'entities.itemSets.vanguard_hunter_survival.bonus4': 'Kait Darah memberikan 1 Momentum Berburu.',
   'entities.itemSets.vanguard_hunter_survival.name': 'Pengaman Gigi Jebakan',
-  'entities.itemSets.vanguard_mage_arcane.bonus2': 'Jeda Penghalang Waktu dikurangi 2 detik.',
+  'entities.itemSets.vanguard_mage_arcane.bonus2':
+    'Jeda Penghalang Waktu dikurangi 2 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_mage_arcane.bonus4':
     'Penghalang Waktu juga meningkatkan kecepatan gerak target yang dilindungi sebesar 20 persen selama 3 detik.',
   'entities.itemSets.vanguard_mage_arcane.name': 'Gaun Pengikatan Jam',
-  'entities.itemSets.vanguard_mage_fire.bonus2': 'Guguran Bara diisi ulang 3 detik lebih cepat.',
+  'entities.itemSets.vanguard_mage_fire.bonus2':
+    'Guguran Bara diisi ulang 3 detik lebih cepat. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_mage_fire.bonus4':
     'Melempar Guguran Bara mengurangi jeda tersisa Penghalang Membara sebesar 2 detik.',
   'entities.itemSets.vanguard_mage_fire.name': 'Perhiasan Cambuk Bara',
-  'entities.itemSets.vanguard_mage_frost.bonus2': 'Jeda Belenggu Es dikurangi 2 detik.',
+  'entities.itemSets.vanguard_mage_frost.bonus2':
+    'Jeda Belenggu Es dikurangi 2 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_mage_frost.bonus4':
     'Melempar Belenggu Es mengurangi jeda tersisa Langkah Lincah sebesar 5 detik.',
   'entities.itemSets.vanguard_mage_frost.name': 'Pakaian Penjaga Rime',
-  'entities.itemSets.vanguard_paladin_holy.bonus2': 'Jeda Perjanjian Kehidupan dikurangi 30 detik.',
+  'entities.itemSets.vanguard_paladin_holy.bonus2':
+    'Jeda Perjanjian Kehidupan dikurangi 30 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     'Perjanjian Kehidupan juga melindungi sekutu sebesar 8 persen dari kesehatan maksimal mereka selama 6 detik.',
   'entities.itemSets.vanguard_paladin_holy.name': 'Perhiasan Vigil Surya',
@@ -1933,16 +1938,18 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_paladin_retribution.bonus4':
     'Panggilan Valkyrie mengatur ulang jeda Titah Terakhir, dan Titah Terakhir berikutnya dalam 6 detik pendaratan memberikan 15 persen lebih banyak kerusakan.',
   'entities.itemSets.vanguard_paladin_retribution.name': 'Pelat Perang Merek Cahaya',
-  'entities.itemSets.vanguard_priest_discipline.bonus2': 'Jeda Jerit Psikis dikurangi 3 detik.',
+  'entities.itemSets.vanguard_priest_discipline.bonus2':
+    'Jeda Jerit Psikis dikurangi 3 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
     'Ketika Mazmur Penangkal-mu sepenuhnya dikonsumsi, sekutu yang dilindungi mendapat 20 persen kecepatan gerak selama 3 detik. Tidak dapat terjadi lebih dari sekali setiap 8 detik.',
   'entities.itemSets.vanguard_priest_discipline.name': 'Gaun Mazmur Veil',
-  'entities.itemSets.vanguard_priest_holy.bonus2': 'Jeda Langkah Tabir dikurangi 6 detik.',
+  'entities.itemSets.vanguard_priest_holy.bonus2':
+    'Jeda Langkah Tabir dikurangi 6 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_priest_holy.bonus4':
     'Langkah Tabir juga melindungimu sebesar 8 persen dari kesehatan maksimal-mu selama 6 detik.',
   'entities.itemSets.vanguard_priest_holy.name': 'Gaun Bersayap Karunia',
   'entities.itemSets.vanguard_priest_shadow.bonus2':
-    'Litani Nestapa juga memperlambat gerakan target 30 persen saat kamu menyalurkannya.',
+    'Litani Nestapa juga memperlambat gerakan target 30 persen saat kamu menyalurkannya. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_priest_shadow.bonus4':
     'Panggil Iblis Persepuluhan juga melindungimu sebesar 10 persen dari kesehatan maksimal-mu selama 8 detik.',
   'entities.itemSets.vanguard_priest_shadow.name': 'Perhiasan Himne Senja',
@@ -1959,7 +1966,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_rogue_subtlety.bonus4':
     'Pukulan Ulu Hati memberikan 2 poin combo tambahan saat digunakan dari Luruh Asap.',
   'entities.itemSets.vanguard_rogue_subtlety.name': 'Kulit Berjalan Bayangan',
-  'entities.itemSets.vanguard_shaman_elemental.bonus2': 'Jeda Lepaskan Senjata dikurangi 3 detik.',
+  'entities.itemSets.vanguard_shaman_elemental.bonus2':
+    'Jeda Lepaskan Senjata dikurangi 3 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
     'Lepaskan Senjata membiarkanmu menyampaikan sambil bergerak dan meningkatkan kecepatan gerakmu sebesar 20 persen selama 4 detik. Tidak dapat terjadi lebih dari sekali setiap 20 detik.',
   'entities.itemSets.vanguard_shaman_elemental.name': 'Perang Tulis Badai',
@@ -1969,20 +1977,22 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Serangan Leluhur mengurangi jeda tersisa Elemental Trance sebesar 4 detik.',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Perang Berasal Badai',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    'Air Pemulih melempar 0.5 detik lebih cepat pada sekutu di bawah 50 persen kesehatan.',
+    'Air Pemulih melempar 0.5 detik lebih cepat pada sekutu di bawah 50 persen kesehatan. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     'Panggilan Pasang juga melindungi targetnya sebesar 5 persen dari kesehatan maksimal-mu selama 6 detik.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Perang Garam Brineward',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'Waktu jentikan Cekaman dikurangi 0.3 detik.',
+    'Waktu jentikan Cekaman dikurangi 0.3 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Melahap menyembuhkan 30 persen lebih banyak dan dapat disalurkan sambil bergerak.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Gaun Bulu Dread',
-  'entities.itemSets.vanguard_warlock_demonology.bonus2': 'Jeda Bone Armor dikurangi 10 detik.',
+  'entities.itemSets.vanguard_warlock_demonology.bonus2':
+    'Jeda Bone Armor dikurangi 10 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_warlock_demonology.bonus4':
     'Reaping Command mengurangi jeda tersisa Bone Armor sebesar 2 detik.',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Perhiasan Terikat Sumsum',
-  'entities.itemSets.vanguard_warlock_destruction.bonus2': 'Jeda Cinderhide dikurangi 30 detik.',
+  'entities.itemSets.vanguard_warlock_destruction.bonus2':
+    'Jeda Cinderhide dikurangi 30 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     'Setiap Kobaran Api kedua membuat Baut Reruntuhan berikutnya dalam 8 detik instan.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Gaun Mahkota Terak',
@@ -4716,7 +4726,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Meningkatkan Peringkat Serangan dan Pertahanan Perang sebesar 80. Membunuh pemain lawan memberi Langkah Abu, yang meningkatkan kecepatan gerak sebesar 40% selama 6 dtk.',
   'entities.itemSets.warfare_ashstalker.name': 'Perlengkapan Ashstalker',
   'entities.itemSets.warfare_cinderweave.bonus2':
-    'Meningkatkan Peringkat Pertahanan Perang sebesar 40.',
+    'Meningkatkan Peringkat Pertahanan Perang sebesar 40. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.warfare_cinderweave.bonus4':
     'Meningkatkan Peringkat Serangan Perang sebesar 40, dan kendali massa yang dirapal pemain lawan padamu bertahan 15% lebih singkat.',
   'entities.itemSets.warfare_cinderweave.bonus7':
@@ -4730,14 +4740,14 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Meningkatkan Peringkat Serangan dan Pertahanan Perang sebesar 80. Membunuh pemain lawan memberi Sumpah Tak Terpatahkan, yang menyerap 200 kerusakan selama 10 dtk.',
   'entities.itemSets.warfare_furyforged.name': 'Perlengkapan Tempur Furyforged',
   'entities.itemSets.warfare_stormbound.bonus2':
-    'Meningkatkan Peringkat Pertahanan Perang sebesar 40.',
+    'Meningkatkan Peringkat Pertahanan Perang sebesar 40. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.warfare_stormbound.bonus4':
     'Meningkatkan Peringkat Serangan Perang sebesar 40, dan kendali massa yang dirapal pemain lawan padamu bertahan 15% lebih singkat.',
   'entities.itemSets.warfare_stormbound.bonus7':
     'Meningkatkan Peringkat Serangan dan Pertahanan Perang sebesar 80. Mantramu punya peluang 15% memberi Jaga Bara, yang menyerap 120 kerusakan selama 8 dtk.',
   'entities.itemSets.warfare_stormbound.name': 'Jubah Stormbound',
   'entities.itemSets.warfare_thornhide.bonus2':
-    'Meningkatkan Peringkat Pertahanan Perang sebesar 40.',
+    'Meningkatkan Peringkat Pertahanan Perang sebesar 40. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.warfare_thornhide.bonus4':
     'Meningkatkan Peringkat Serangan Perang sebesar 40, dan kendali massa yang dirapal pemain lawan padamu bertahan 15% lebih singkat.',
   'entities.itemSets.warfare_thornhide.bonus7':
@@ -19524,7 +19534,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'Kemenangan berperingkat membayar Kehormatan, mata uang pemain melawan pemain, dan kekalahan yang kamu mainkan sampai selesai tetap membayar bagian yang lebih kecil, begitu juga hasil seri, jadi rating adalah satu-satunya hal yang benar-benar hilang karena kalah. Kehormatan dimaksudkan untuk memberi hadiah pada pertandingan sungguhan: mengalahkan lawan atau tim yang sama lagi pada hari yang sama tidak memberi bayaran tambahan, begitu juga kalah dari mereka lagi, hari kemenangan panjang membayar penuh untuk rentang kemenangan awal lalu membagi dua bayaran kemenangan, membaginya lagi lebih dalam dan bertahan di sana, dan pertandingan yang dibatalkan lawan tetap mengubah ratingmu tetapi sama sekali tidak membayar Kehormatan. Hari itu milik realm sendiri: berganti saat reset malam realm, batas yang sama ketika semua penguncian harian dibersihkan.',
   'guide.arenaPage.warfareBodyStatsStay':
-    'Setiap perlengkapan Perang membawa Rating Serangan Perang dan Rating Pertahanan Perang, dan kedua rating itu sama sekali tidak berpengaruh melawan monster. Keduanya hanya berlaku saat kamu melawan pemain lain, dalam duel, arena, atau medan pertempuran, saat Serangan menambah kerusakan yang kamu berikan dan Pertahanan mengurangi kerusakan yang kamu terima, masing-masing hingga batasnya sendiri. Setiap keluarga zirah juga merupakan set, dan bonus setnya juga berupa rating Perang atau efek yang hanya bekerja melawan pemain, jadi bonus set lengkap Kehormatan tidak berarti apa-apa pada bos dungeon. Potongannya sendiri tetap membawa statistik biasa, zirah, dan kerusakan senjata yang bekerja di mana-mana; rating Perang dan bonus setlah yang diam terhadap monster.',
+    'Setiap perlengkapan Perang membawa Rating Serangan Perang dan Rating Pertahanan Perang, dan kedua rating itu sama sekali tidak berpengaruh melawan monster. Keduanya hanya berlaku saat kamu melawan pemain lain, dalam duel, arena, atau medan pertempuran, saat Serangan menambah kerusakan yang kamu berikan dan Pertahanan mengurangi kerusakan yang kamu terima, masing-masing hingga batasnya sendiri. Setiap keluarga zirah juga merupakan set, dan bonus setnya juga berupa rating Perang atau efek yang hanya bekerja melawan pemain, jadi bonus set lengkap Kehormatan tidak berarti apa-apa pada bos dungeon. Potongannya sendiri tetap membawa statistik biasa, zirah, dan kerusakan senjata yang bekerja di mana-mana; rating Perang dan bonus setlah yang diam terhadap monster. Satu pengecualian berlaku di mana saja: dua bagian set perapal juga membuat kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'Itulah pertukaran yang disengaja. Perlengkapan Perang dibuat untuk melawan pemain, bukan jalan pintas melewati tingkatan dungeon: perlengkapan Perang tidak pernah membawa rating pertarungan yang dimiliki epik dungeon pada slot yang sama, dan rating Perang serta bonus set yang dibawanya sepenuhnya digunakan untuk melawan pemain lain. Jika ingin bertahan di arena, belilah. Jika ingin menuntaskan mode heroik lebih cepat, dapatkan perlengkapanmu di dungeon.',
   'guide.controls.harvestJournal': 'Jurnal Panen',

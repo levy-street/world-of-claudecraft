@@ -8299,7 +8299,7 @@ export const nl_NL: EnTranslations = {
       "honorFinalNoteSoldBack": "Aankopen met Eer zijn definitief. De terugkooplijst bevat alleen wat je hebt verkocht: een aankoop met munten kan meestal voor de verkoopprijs worden teruggekocht en uit die lijst worden teruggehaald als je opnieuw van gedachten verandert, maar Oorlogsuitrusting bindt aan je ziel zodra je haar koopt en kan dus nooit worden verhandeld, verstuurd of voor iets worden terugverkocht, en komt nooit op die lijst. De winkel vraagt je daarom om te bevestigen: bekijk het stuk voordat je erop drukt.",
       "warfareHeading": "Oorlogvoeringsuitrusting",
       "warfareBody": "Elk Oorlogvoeringsstuk draagt Oorlogvoering-Aanvalswaardering en Oorlogvoering-Verdedigingswaardering, en die twee waarderingen doen helemaal niets tegen monsters. Ze werken alleen als je tegen een andere speler vecht, in een duel, in de arena, of op het slagveld, waar Aanval wordt opgeteld bij de schade die je toebrengt en Verdediging de schade vermindert die je oploopt, allebei tot hun eigen plafond. Elke harnasfamilie is ook een set, en de setbonussen ervan zijn eveneens Oorlogvoering-waarderingen of effecten die alleen tegen spelers werken, dus een volledige eer-uitrusting is niets waard tegen een kerkerbaas.",
-      "warfareBodyStatsStay": "Elk Oorlogsstuk draagt een aanvals- en verdedigingsrating voor Oorlogsvoering, en die twee ratings doen helemaal niets tegen monsters. Ze gelden alleen wanneer je tegen een andere speler vecht, in een duel, de arena of het slagveld. Aanval verhoogt daar de schade die je toebrengt en Verdediging verlaagt de schade die je ontvangt, elk tot zijn eigen plafond. Elke pantserfamilie is ook een verzameling en haar setbonussen zijn eveneens ratings of effecten voor Oorlogsvoering die alleen tegen spelers werken, dus de setbonussen van een volledige Eerset tellen niets tegen een kerkerbaas. De stukken zelf dragen nog steeds hun gewone statistieken, pantser en wapenschade, en die werken overal. Het zijn de ratings en setbonussen voor Oorlogsvoering die tegen een monster stilvallen.",
+      "warfareBodyStatsStay": "Elk Oorlogsstuk draagt een aanvals- en verdedigingsrating voor Oorlogsvoering, en die twee ratings doen helemaal niets tegen monsters. Ze gelden alleen wanneer je tegen een andere speler vecht, in een duel, de arena of het slagveld. Aanval verhoogt daar de schade die je toebrengt en Verdediging verlaagt de schade die je ontvangt, elk tot zijn eigen plafond. Elke pantserfamilie is ook een verzameling en haar setbonussen zijn eveneens ratings of effecten voor Oorlogsvoering die alleen tegen spelers werken, dus de setbonussen van een volledige Eerset tellen niets tegen een kerkerbaas. De stukken zelf dragen nog steeds hun gewone statistieken, pantser en wapenschade, en die werken overal. Het zijn de ratings en setbonussen voor Oorlogsvoering die tegen een monster stilvallen. Eén uitzondering werkt overal: twee delen van een spreukwerkersset zorgen er ook voor dat opgelopen schade je spreuken niet meer vertraagt.",
       "warfareTradeBody": "Dat is de bewuste ruil. Oorlogvoeringsuitrusting is gebouwd om tegen spelers te vechten, niet als kortere weg langs de kerkerniveaus: een stuk Oorlogvoeringsuitrusting draagt nooit de gevechtswaarderingen die een episch kerkerstuk in dezelfde gleuf wel heeft, en alles wat het wel meebrengt, wordt besteed aan andere spelers. Wil je jezelf staande houden in de arena, koop het dan. Wil je heroïsche kerkers sneller uitspelen, verdien je uitrusting dan in de kerkers.",
       "warfareTradeBodyRatingSpent": "Dat is de bewuste ruil. Oorlogsuitrusting is gemaakt om tegen spelers te vechten, niet als sluiproute langs de kerkerlagen. Een Oorlogsstuk draagt nooit de gevechtsratings die een episch kerkerstuk op dezelfde plek heeft, en de rating en setbonussen voor Oorlogsvoering die het in plaats daarvan draagt, worden volledig tegen andere spelers ingezet. Als je je in de arena wilt weren, koop het dan. Als je heroïsche kerkers sneller wilt voltooien, verdien je uitrusting dan in de kerkers.",
       "vanguardHeading": "Voortocht-uitrusting: Oorlogsseizoen 2",
@@ -24174,7 +24174,7 @@ export const nl_NL: EnTranslations = {
       },
       "vanguard_druid_balance": {
         "name": "Sterrenwacht Gewaad",
-        "bonus2": "Werptijd van Grijpende Wortels is 0.5 sec korter.",
+        "bonus2": "Werptijd van Grijpende Wortels is 0.5 sec korter. Opgelopen schade vertraagt je spreuken niet meer.",
         "bonus4": "Grijpende Wortels casten laat je bewegen en verhoogt je bewegingssnelheid 20% voor 4 sec. Kan niet meer dan eens per 20 sec gebeuren."
       },
       "vanguard_druid_feral": {
@@ -24184,7 +24184,7 @@ export const nl_NL: EnTranslations = {
       },
       "vanguard_druid_restoration": {
         "name": "Distelbloeiem Gewaad",
-        "bonus2": "Afkoelingseffect van Vleegheling is 1 sec korter.",
+        "bonus2": "Afkoelingseffect van Vleegheling is 1 sec korter. Opgelopen schade vertraagt je spreuken niet meer.",
         "bonus4": "Vleegheling verhoogt je bewegingssnelheid ook 30% voor 3 sec."
       },
       "vanguard_hunter_beast_mastery": {
@@ -24204,22 +24204,22 @@ export const nl_NL: EnTranslations = {
       },
       "vanguard_mage_arcane": {
         "name": "Uurbinder Gewaden",
-        "bonus2": "Afkoelingseffect van Tijdbarriere is 2 sec korter.",
+        "bonus2": "Afkoelingseffect van Tijdbarriere is 2 sec korter. Opgelopen schade vertraagt je spreuken niet meer.",
         "bonus4": "Tijdbarriere verhoogt bewegingssnelheid van het afgeschermde doel ook 20% voor 3 sec."
       },
       "vanguard_mage_fire": {
         "name": "Gloeiende Gliering",
-        "bonus2": "Sintelval laadt 3 sec sneller op.",
+        "bonus2": "Sintelval laadt 3 sec sneller op. Opgelopen schade vertraagt je spreuken niet meer.",
         "bonus4": "Sintelval casten vermindert het resterende afkoelingseffect van Vlammende barriere 2 sec."
       },
       "vanguard_mage_frost": {
         "name": "Rijpwacht Mantel",
-        "bonus2": "Afkoelingseffect van IJsboei is 2 sec korter.",
+        "bonus2": "Afkoelingseffect van IJsboei is 2 sec korter. Opgelopen schade vertraagt je spreuken niet meer.",
         "bonus4": "IJsboei casten vermindert het resterende afkoelingseffect van Flitsstap 5 sec."
       },
       "vanguard_paladin_holy": {
         "name": "Zonnewacht Gliering",
-        "bonus2": "Afkoelingseffect van Verbond van Leven is 30 sec korter.",
+        "bonus2": "Afkoelingseffect van Verbond van Leven is 30 sec korter. Opgelopen schade vertraagt je spreuken niet meer.",
         "bonus4": "Verbond van Leven beschermt de bondgenoot ook voor 8% van hun maximale gezondheid voor 6 sec."
       },
       "vanguard_paladin_protection": {
@@ -24234,17 +24234,17 @@ export const nl_NL: EnTranslations = {
       },
       "vanguard_priest_discipline": {
         "name": "Sluierpsalm Gewaad",
-        "bonus2": "Afkoelingseffect van Terrorkantilene is 3 sec korter.",
+        "bonus2": "Afkoelingseffect van Terrorkantilene is 3 sec korter. Opgelopen schade vertraagt je spreuken niet meer.",
         "bonus4": "Wanneer je Psalm van Bewaking volledig is gebruikt, krijgt het afgeschermde gilde 20% bewegingssnelheid voor 3 sec. Kan niet meer dan eens per 8 sec gebeuren."
       },
       "vanguard_priest_holy": {
         "name": "Genadsvleugel Gewaad",
-        "bonus2": "Afkoelingseffect van Sluierstap is 6 sec korter.",
+        "bonus2": "Afkoelingseffect van Sluierstap is 6 sec korter. Opgelopen schade vertraagt je spreuken niet meer.",
         "bonus4": "Sluierstap beschermt je ook voor 8% van je maximale gezondheid voor 6 sec."
       },
       "vanguard_priest_shadow": {
         "name": "Schemerhymne Gliering",
-        "bonus2": "Litanie van Leed vertraagt beweging van het doel ook 30% terwijl je het canaliseren.",
+        "bonus2": "Litanie van Leed vertraagt beweging van het doel ook 30% terwijl je het canaliseren. Opgelopen schade vertraagt je spreuken niet meer.",
         "bonus4": "Roep Tithefiend beschermt je ook voor 10% van je maximale gezondheid voor 8 sec."
       },
       "vanguard_rogue_assassination": {
@@ -24264,7 +24264,7 @@ export const nl_NL: EnTranslations = {
       },
       "vanguard_shaman_elemental": {
         "name": "Onweergeschrift Strijdpantser",
-        "bonus2": "Afkoelingseffect van Wapen Losmaken is 3 sec korter.",
+        "bonus2": "Afkoelingseffect van Wapen Losmaken is 3 sec korter. Opgelopen schade vertraagt je spreuken niet meer.",
         "bonus4": "Wapen Losmaken laat je bewegen en verhoogt je bewegingssnelheid 20% voor 4 sec. Kan niet meer dan eens per 20 sec gebeuren."
       },
       "vanguard_shaman_enhancement": {
@@ -24274,22 +24274,22 @@ export const nl_NL: EnTranslations = {
       },
       "vanguard_shaman_restoration": {
         "name": "Ziltwacht Kettingpantser",
-        "bonus2": "Helende Wateren casten 0.5 sec sneller op een bondgenoot onder 50% gezondheid.",
+        "bonus2": "Helende Wateren casten 0.5 sec sneller op een bondgenoot onder 50% gezondheid. Opgelopen schade vertraagt je spreuken niet meer.",
         "bonus4": "Tidenoproep beschermt zijn doel ook voor 5% van je maximale gezondheid voor 6 sec."
       },
       "vanguard_warlock_affliction": {
         "name": "Angstqvill Gewaden",
-        "bonus2": "Werptijd van Teisteren is 0.3 sec korter.",
+        "bonus2": "Werptijd van Teisteren is 0.3 sec korter. Opgelopen schade vertraagt je spreuken niet meer.",
         "bonus4": "Verteren geneest je 30% meer en kan gekanaliseerd worden terwijl je beweegt."
       },
       "vanguard_warlock_demonology": {
         "name": "Merggebonden Gliering",
-        "bonus2": "Afkoelingseffect van Beenaarmering is 10 sec korter.",
+        "bonus2": "Afkoelingseffect van Beenaarmering is 10 sec korter. Opgelopen schade vertraagt je spreuken niet meer.",
         "bonus4": "Oogstcommando vermindert het resterende afkoelingseffect van Beenaarmering 2 sec."
       },
       "vanguard_warlock_destruction": {
         "name": "Slakkenkroon Gewaden",
-        "bonus2": "Afkoelingseffect van Cinderhide is 30 sec korter.",
+        "bonus2": "Afkoelingseffect van Cinderhide is 30 sec korter. Opgelopen schade vertraagt je spreuken niet meer.",
         "bonus4": "Elke tweede Ontvlamming maakt je volgende Ruinenschicht binnen 8 sec onmiddellijk."
       },
       "vanguard_warrior_arms": {
@@ -24320,7 +24320,7 @@ export const nl_NL: EnTranslations = {
       },
       "warfare_cinderweave": {
         "name": "Sintelgeweven Regalia",
-        "bonus2": "Verhoogt de Oorlogvoering-Verdedigingswaardering met 40.",
+        "bonus2": "Verhoogt de Oorlogvoering-Verdedigingswaardering met 40. Opgelopen schade vertraagt je spreuken niet meer.",
         "bonus4": "Verhoogt de Oorlogvoering-Aanvalswaardering met 40, en beheersing die vijandige spelers op u leggen duurt 15% korter.",
         "bonus7": "Verhoogt de Oorlogvoering-Aanvals- en Verdedigingswaardering met 80. Uw spreuken hebben 15% kans om Sintelwacht te verlenen, wat 8 sec lang 120 schade absorbeert."
       },
@@ -24332,13 +24332,13 @@ export const nl_NL: EnTranslations = {
       },
       "warfare_stormbound": {
         "name": "Stormgebonden Gewaden",
-        "bonus2": "Verhoogt de Oorlogvoering-Verdedigingswaardering met 40.",
+        "bonus2": "Verhoogt de Oorlogvoering-Verdedigingswaardering met 40. Opgelopen schade vertraagt je spreuken niet meer.",
         "bonus4": "Verhoogt de Oorlogvoering-Aanvalswaardering met 40, en beheersing die vijandige spelers op u leggen duurt 15% korter.",
         "bonus7": "Verhoogt de Oorlogvoering-Aanvals- en Verdedigingswaardering met 80. Uw spreuken hebben 15% kans om Sintelwacht te verlenen, wat 8 sec lang 120 schade absorbeert."
       },
       "warfare_thornhide": {
         "name": "Doornhuid-Kledij",
-        "bonus2": "Verhoogt de Oorlogvoering-Verdedigingswaardering met 40.",
+        "bonus2": "Verhoogt de Oorlogvoering-Verdedigingswaardering met 40. Opgelopen schade vertraagt je spreuken niet meer.",
         "bonus4": "Verhoogt de Oorlogvoering-Aanvalswaardering met 40, en beheersing die vijandige spelers op u leggen duurt 15% korter.",
         "bonus7": "Verhoogt de Oorlogvoering-Aanvals- en Verdedigingswaardering met 80. Uw spreuken hebben 15% kans om Doornwacht te verlenen, wat het ontwijken 6 sec lang met 15% verhoogt."
       },

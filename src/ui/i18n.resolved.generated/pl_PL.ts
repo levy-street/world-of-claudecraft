@@ -8299,7 +8299,7 @@ export const pl_PL: EnTranslations = {
       "honorFinalNoteSoldBack": "Zakupy za honor są ostateczne. Lista odkupienia zawiera tylko to, co sprzedasz: zakup za monety zwykle można sprzedać po cenie sprzedaży i odzyskać z tej listy, jeśli znów zmienisz zdanie, ale sprzęt Wojny wiąże się z duszą natychmiast po zakupie, więc nie można go wymienić, wysłać pocztą ani odkupić za żadną cenę i nigdy nie trafia na tę listę. Sklep prosi o potwierdzenie z tego powodu: przeczytaj opis przed kliknięciem.",
       "warfareHeading": "Ekwipunek działań wojennych",
       "warfareBody": "Każdy element działań wojennych niesie Ocenę Ataku Działań Wojennych i Ocenę Obrony Działań Wojennych, a te dwie oceny nie robią zupełnie nic przeciwko potworom. Działają wyłącznie wtedy, gdy walczysz z innym graczem: w pojedynku, na arenie lub na polu bitwy, gdzie Atak dodaje do zadawanych przez ciebie obrażeń, a Obrona ścina obrażenia, które otrzymujesz, każda do własnego pułapu. Każda rodzina pancerza jest też zestawem, a jej bonusy zestawu to również ocena działań wojennych albo efekty działające wyłącznie przeciwko graczom, więc pełny komplet honorowy jest wart tyle co nic na bossie w lochu.",
-      "warfareBodyStatsStay": "Każda część sprzętu Wojny ma Ofensywę wojenną i ocenę Obrony wojennej, a te dwie oceny nie działają w ogóle przeciw potworom. Działają wyłącznie podczas walki z innym graczem, w pojedynku, na arenie albo na polu bitwy, gdzie Ofensywa zwiększa zadawane obrażenia, a Obrona zmniejsza otrzymywane, każda do własnego limitu. Każda rodzina pancerza jest także zestawem, a jej premie zestawu również są ocenami Wojny lub efektami działającymi wyłącznie przeciw graczom, więc pełna premia zestawu za honor nie ma znaczenia przeciw bossowi lochu. Same części nadal mają zwykłe statystyki, pancerz i obrażenia broni, które działają wszędzie; przeciw potworowi wyciszają się tylko oceny Wojny i premie zestawu.",
+      "warfareBodyStatsStay": "Każda część sprzętu Wojny ma Ofensywę wojenną i ocenę Obrony wojennej, a te dwie oceny nie działają w ogóle przeciw potworom. Działają wyłącznie podczas walki z innym graczem, w pojedynku, na arenie albo na polu bitwy, gdzie Ofensywa zwiększa zadawane obrażenia, a Obrona zmniejsza otrzymywane, każda do własnego limitu. Każda rodzina pancerza jest także zestawem, a jej premie zestawu również są ocenami Wojny lub efektami działającymi wyłącznie przeciw graczom, więc pełna premia zestawu za honor nie ma znaczenia przeciw bossowi lochu. Same części nadal mają zwykłe statystyki, pancerz i obrażenia broni, które działają wszędzie; przeciw potworowi wyciszają się tylko oceny Wojny i premie zestawu. Jeden wyjątek działa wszędzie: dwie części zestawu dla rzucających zaklęcia sprawiają też, że otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
       "warfareTradeBody": "To celowy kompromis. Ekwipunek działań wojennych jest stworzony do walki z graczami, a nie jako skrót omijający kolejne poziomy lochów: element działań wojennych nigdy nie niesie takich statystyk bojowych, jakie ma epicki przedmiot z lochu w tym samym slocie, a wszystko, co ze sobą przynosi, jest przeznaczone przeciwko innym graczom. Jeśli chcesz poradzić sobie na arenie, kup go. Jeśli chcesz szybciej przechodzić heroiczne lochy, zdobywaj ekwipunek w lochach.",
       "warfareTradeBodyRatingSpent": "To zamierzona wymiana. Sprzęt Wojny służy do walki z graczami, a nie do omijania poziomów lochów: część sprzętu Wojny nigdy nie ma ocen bojowych, które ma epicki przedmiot z lochu w tym samym miejscu, lecz zamiast tego całą swoją ocenę Wojny i premie zestawu przeznacza na innych graczy. Jeśli chcesz utrzymać się na arenie, kup go. Jeśli chcesz szybciej czyścić tryby heroiczne, zdobądź sprzęt w lochach.",
       "vanguardHeading": "Zbroja Awangardy: Sezon Wojenki 2",
@@ -24174,7 +24174,7 @@ export const pl_PL: EnTranslations = {
       },
       "vanguard_druid_balance": {
         "name": "Szata Strażnika Gwiazd",
-        "bonus2": "Czas rzucania Chwytających Korzeni jest zmniejszony o 0.5 sek.",
+        "bonus2": "Czas rzucania Chwytających Korzeni jest zmniejszony o 0.5 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
         "bonus4": "Rzucanie Chwytających Korzeni pozwala Ci rzucać zaklęcia podczas ruchu i zwiększa Twoją prędkość ruchu o 20 procent na 4 sek. Nie może się zdarzyć częściej niż raz na 20 sek."
       },
       "vanguard_druid_feral": {
@@ -24184,7 +24184,7 @@ export const pl_PL: EnTranslations = {
       },
       "vanguard_druid_restoration": {
         "name": "Szata Ostów w Rozkwicie",
-        "bonus2": "Regeneracja umiejętności Fleetmend jest zmniejszona o 1 sek.",
+        "bonus2": "Regeneracja umiejętności Fleetmend jest zmniejszona o 1 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
         "bonus4": "Fleetmend również zwiększa Twoją prędkość ruchu o 30 procent na 3 sek."
       },
       "vanguard_hunter_beast_mastery": {
@@ -24204,22 +24204,22 @@ export const pl_PL: EnTranslations = {
       },
       "vanguard_mage_arcane": {
         "name": "Szata Wiązacza Godzin",
-        "bonus2": "Regeneracja umiejętności Bariera Czasowa jest zmniejszona o 2 sek.",
+        "bonus2": "Regeneracja umiejętności Bariera Czasowa jest zmniejszona o 2 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
         "bonus4": "Bariera Czasowa również zwiększa prędkość ruchu chronionego celu o 20 procent na 3 sek."
       },
       "vanguard_mage_fire": {
         "name": "Regalia Żarowego Bича",
-        "bonus2": "Deszcz Żaru ładuje się 3 sek szybciej.",
+        "bonus2": "Deszcz Żaru ładuje się 3 sek szybciej. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
         "bonus4": "Rzucanie Deszczu Żaru zmniejsza pozostałą regenerację umiejętności Płonącej Bariery o 2 sek."
       },
       "vanguard_mage_frost": {
         "name": "Szata Strażnika Szronu",
-        "bonus2": "Regeneracja umiejętności Lodowych Okowów jest zmniejszona o 2 sek.",
+        "bonus2": "Regeneracja umiejętności Lodowych Okowów jest zmniejszona o 2 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
         "bonus4": "Rzucanie Lodowych Okowów zmniejsza pozostałą regenerację umiejętności Mignięcia o 5 sek."
       },
       "vanguard_paladin_holy": {
         "name": "Regalia Czuwania Słońca",
-        "bonus2": "Regeneracja umiejętności Przymierza Życia jest zmniejszona o 30 sek.",
+        "bonus2": "Regeneracja umiejętności Przymierza Życia jest zmniejszona o 30 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
         "bonus4": "Przymierze Życia również chroni sojusznika tarczą na 8 procent ich maksymalnego zdrowia na 6 sek."
       },
       "vanguard_paladin_protection": {
@@ -24234,17 +24234,17 @@ export const pl_PL: EnTranslations = {
       },
       "vanguard_priest_discipline": {
         "name": "Szata Kantyka Zasłon",
-        "bonus2": "Regeneracja umiejętności Kantyka Terroru jest zmniejszona o 3 sek.",
+        "bonus2": "Regeneracja umiejętności Kantyka Terroru jest zmniejszona o 3 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
         "bonus4": "Gdy Twój Psalm Ochrony jest w pełni pochłonięty, chroniony sojusznik zyskuje 20 procent prędkości ruchu na 3 sek. Nie może się zdarzyć częściej niż raz na 8 sek."
       },
       "vanguard_priest_holy": {
         "name": "Szata Skrzydeł Łaski",
-        "bonus2": "Regeneracja umiejętności Kroku Zasłony jest zmniejszona o 6 sek.",
+        "bonus2": "Regeneracja umiejętności Kroku Zasłony jest zmniejszona o 6 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
         "bonus4": "Krok Zasłony również chroni Ciebie tarczą na 8 procent maksymalnego zdrowia na 6 sek."
       },
       "vanguard_priest_shadow": {
         "name": "Regalia Kantyka Mroku",
-        "bonus2": "Litania Niedoli również spowalnia ruch celu o 30 procent, gdy ją canujesz.",
+        "bonus2": "Litania Niedoli również spowalnia ruch celu o 30 procent, gdy ją canujesz. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
         "bonus4": "Wezwanie Dziesięcinika również chroni Ciebie tarczą na 10 procent maksymalnego zdrowia na 8 sek."
       },
       "vanguard_rogue_assassination": {
@@ -24264,7 +24264,7 @@ export const pl_PL: EnTranslations = {
       },
       "vanguard_shaman_elemental": {
         "name": "Pancerz Bitewny Pisma Burzy",
-        "bonus2": "Regeneracja umiejętności Uwolnij Broń jest zmniejszona o 3 sek.",
+        "bonus2": "Regeneracja umiejętności Uwolnij Broń jest zmniejszona o 3 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
         "bonus4": "Uwolnij Broń pozwala Ci rzucać zaklęcia podczas ruchu i zwiększa Twoją prędkość ruchu o 20 procent na 4 sek. Nie może się zdarzyć częściej niż raz na 20 sek."
       },
       "vanguard_shaman_enhancement": {
@@ -24274,22 +24274,22 @@ export const pl_PL: EnTranslations = {
       },
       "vanguard_shaman_restoration": {
         "name": "Pancerz Kolczasty Gwardy Słoni",
-        "bonus2": "Kojące Wody rzucają się 0.5 sek szybciej na sojusznika poniżej 50 procent zdrowia.",
+        "bonus2": "Kojące Wody rzucają się 0.5 sek szybciej na sojusznika poniżej 50 procent zdrowia. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
         "bonus4": "Wezwanie Pływu również chroni cel tarczą na 5 procent maksymalnego zdrowia na 6 sek."
       },
       "vanguard_warlock_affliction": {
         "name": "Szata Pióra Grozy",
-        "bonus2": "Czas rzucania Trwogi jest zmniejszony o 0.3 sek.",
+        "bonus2": "Czas rzucania Trwogi jest zmniejszony o 0.3 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
         "bonus4": "Pochłonięcie uzdrawia Ciebie o 30 procent więcej i może być kanalizowane podczas ruchu."
       },
       "vanguard_warlock_demonology": {
         "name": "Regalia Związana Szpikiem",
-        "bonus2": "Regeneracja umiejętności Pancerza Kości jest zmniejszona o 10 sek.",
+        "bonus2": "Regeneracja umiejętności Pancerza Kości jest zmniejszona o 10 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
         "bonus4": "Rozkaz Żniwiarz zmniejsza pozostałą regenerację umiejętności Pancerza Kości o 2 sek."
       },
       "vanguard_warlock_destruction": {
         "name": "Szata Korony Żużla",
-        "bonus2": "Regeneracja umiejętności Cinderhide jest zmniejszona o 30 sek.",
+        "bonus2": "Regeneracja umiejętności Cinderhide jest zmniejszona o 30 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
         "bonus4": "Każdy drugi Pożoga sprawia, że Twój następny Pocisk Ruiny w ciągu 8 sek jest natychmiastowy."
       },
       "vanguard_warrior_arms": {
@@ -24320,7 +24320,7 @@ export const pl_PL: EnTranslations = {
       },
       "warfare_cinderweave": {
         "name": "Regalia Cinderweave",
-        "bonus2": "Zwiększa Obronę wojenną o 40.",
+        "bonus2": "Zwiększa Obronę wojenną o 40. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
         "bonus4": "Zwiększa Atak wojenny o 40, a kontrola rzucana na ciebie przez wrogich graczy trwa o 15% krócej.",
         "bonus7": "Zwiększa Atak i Obronę wojenną o 80. Twoje zaklęcia mają 15% szansy dać Żarową Straż, która pochłania 120 obrażeń przez 8 s."
       },
@@ -24332,13 +24332,13 @@ export const pl_PL: EnTranslations = {
       },
       "warfare_stormbound": {
         "name": "Szaty Stormbound",
-        "bonus2": "Zwiększa Obronę wojenną o 40.",
+        "bonus2": "Zwiększa Obronę wojenną o 40. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
         "bonus4": "Zwiększa Atak wojenny o 40, a kontrola rzucana na ciebie przez wrogich graczy trwa o 15% krócej.",
         "bonus7": "Zwiększa Atak i Obronę wojenną o 80. Twoje zaklęcia mają 15% szansy dać Żarową Straż, która pochłania 120 obrażeń przez 8 s."
       },
       "warfare_thornhide": {
         "name": "Strój Thornhide",
-        "bonus2": "Zwiększa Obronę wojenną o 40.",
+        "bonus2": "Zwiększa Obronę wojenną o 40. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
         "bonus4": "Zwiększa Atak wojenny o 40, a kontrola rzucana na ciebie przez wrogich graczy trwa o 15% krócej.",
         "bonus7": "Zwiększa Atak i Obronę wojenną o 80. Twoje zaklęcia mają 15% szansy dać Cierniową Straż, która zwiększa unik o 15% na 6 s."
       },

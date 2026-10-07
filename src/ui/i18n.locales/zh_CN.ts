@@ -9933,7 +9933,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_ashstalker.bonus7':
     '战争攻击与防御等级提高 80。击杀敌对玩家可获得灰烬之步，使移动速度提高 40%，持续 6 秒。',
   'entities.itemSets.warfare_cinderweave.name': '烬织法衣',
-  'entities.itemSets.warfare_cinderweave.bonus2': '战争防御等级提高 40。',
+  'entities.itemSets.warfare_cinderweave.bonus2': '战争防御等级提高 40。受到伤害不再延迟你的施法。',
   'entities.itemSets.warfare_cinderweave.bonus4':
     '战争攻击等级提高 40，且敌对玩家对你施加的控制效果持续时间缩短 15%。',
   'entities.itemSets.warfare_cinderweave.bonus7':
@@ -9945,13 +9945,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_furyforged.bonus7':
     '战争攻击与防御等级提高 80。击杀敌对玩家可获得不破之誓，在 10 秒内吸收 200 点伤害。',
   'entities.itemSets.warfare_stormbound.name': '缚雷法衣',
-  'entities.itemSets.warfare_stormbound.bonus2': '战争防御等级提高 40。',
+  'entities.itemSets.warfare_stormbound.bonus2': '战争防御等级提高 40。受到伤害不再延迟你的施法。',
   'entities.itemSets.warfare_stormbound.bonus4':
     '战争攻击等级提高 40，且敌对玩家对你施加的控制效果持续时间缩短 15%。',
   'entities.itemSets.warfare_stormbound.bonus7':
     '战争攻击与防御等级提高 80。你的法术有 15% 的几率给予余烬守护，在 8 秒内吸收 120 点伤害。',
   'entities.itemSets.warfare_thornhide.name': '荆棘皮甲',
-  'entities.itemSets.warfare_thornhide.bonus2': '战争防御等级提高 40。',
+  'entities.itemSets.warfare_thornhide.bonus2': '战争防御等级提高 40。受到伤害不再延迟你的施法。',
   'entities.itemSets.warfare_thornhide.bonus4':
     '战争攻击等级提高 40，且敌对玩家对你施加的控制效果持续时间缩短 15%。',
   'entities.itemSets.warfare_thornhide.bonus7':
@@ -17387,7 +17387,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     '一场排位胜利会发放荣誉，也就是玩家对战的货币，而一场打到终场的落败仍会发放其中较小的一份，平局亦然，因此评分才是落败真正让你付出的唯一代价。荣誉意在奖励真刀真枪的对局：同一天里再次击败同一个对手或同一支队伍不会再有额外收益（再次败给他们也一样），连胜的一天里开头的若干场胜利照旧足额发放，此后每场胜利只给一半，打得更久后再减半，并就此稳住，而对手认输的比赛虽然照样影响评分，却完全不给荣誉。这一天属于国度自己：它在国度的夜间重置时刻翻篇，也正是所有每日锁定一并解除的那道界线。',
   'guide.arenaPage.warfareBodyStatsStay':
-    '每一件战争装备都带有战争进攻等级与战争防御等级，而这两项等级对怪物毫无作用。它们只在你与其他玩家交手时生效，无论是决斗、竞技场还是战场：进攻提高你造成的伤害，防御削减你受到的伤害，各自都有自己的上限。每个护甲系列同时也是一套套装，它的套装效果同样是只对玩家生效的战争等级或效果，因此一整身荣誉装备的套装效果在地下城首领面前一文不值。装备本身仍带有普通属性、护甲与武器伤害，这些在任何地方都照常生效；面对怪物时哑火的，只是战争等级与套装效果。',
+    '每一件战争装备都带有战争进攻等级与战争防御等级，而这两项等级对怪物毫无作用。它们只在你与其他玩家交手时生效，无论是决斗、竞技场还是战场：进攻提高你造成的伤害，防御削减你受到的伤害，各自都有自己的上限。每个护甲系列同时也是一套套装，它的套装效果同样是只对玩家生效的战争等级或效果，因此一整身荣誉装备的套装效果在地下城首领面前一文不值。装备本身仍带有普通属性、护甲与武器伤害，这些在任何地方都照常生效；面对怪物时哑火的，只是战争等级与套装效果。但有一个例外在任何地方都有效：穿戴施法者套装的两件后，受到伤害不再延迟你的施法。',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     '这正是刻意为之的取舍。战争套装是为与玩家交战而生的，不是绕过地下城品级的捷径：在同一个部位上，一件战争装备永远不会带有同部位地下城史诗所拥有的战斗属性，而它转而带有的战争等级与套装效果，则全都花在其他玩家身上。想在竞技场里站得住脚，就去买它；想更快地打通英雄难度，就去地下城里挣你的装备。',
   'guide.social.calendarBodyDoubleHonor':
@@ -18555,7 +18555,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_warrior_prot.bonus2': '断层的冷却时间缩短5秒。',
   'entities.itemSets.vanguard_warrior_prot.bonus4': '断层还会使你受到的伤害降低10%，持续6秒。',
   'entities.itemSets.vanguard_paladin_holy.name': '先锋套装：日誓圣衣',
-  'entities.itemSets.vanguard_paladin_holy.bonus2': '生命誓约的冷却时间缩短30秒。',
+  'entities.itemSets.vanguard_paladin_holy.bonus2':
+    '生命誓约的冷却时间缩短30秒。受到伤害不再延迟你的施法。',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     '生命誓约还会为盟友提供相当于其最大生命值8%的护盾，持续6秒。',
   'entities.itemSets.vanguard_paladin_protection.name': '先锋套装：盾誓堡垒',
@@ -18587,19 +18588,23 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_rogue_subtlety.bonus2': '烟隐的冷却时间缩短60秒。',
   'entities.itemSets.vanguard_rogue_subtlety.bonus4': '从烟隐中使用腹击时额外奖励2个连击点。',
   'entities.itemSets.vanguard_priest_discipline.name': '先锋套装：帷咏法衣',
-  'entities.itemSets.vanguard_priest_discipline.bonus2': '恐惧圣歌的冷却时间缩短3秒。',
+  'entities.itemSets.vanguard_priest_discipline.bonus2':
+    '恐惧圣歌的冷却时间缩短3秒。受到伤害不再延迟你的施法。',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
     '你的守护圣咏被完全消耗时，受护盾保护的盟友移动速度提高20%，持续3秒。每8秒最多触发一次。',
   'entities.itemSets.vanguard_priest_holy.name': '先锋套装：恩翼法衣',
-  'entities.itemSets.vanguard_priest_holy.bonus2': '帷步的冷却时间缩短6秒。',
+  'entities.itemSets.vanguard_priest_holy.bonus2':
+    '帷步的冷却时间缩短6秒。受到伤害不再延迟你的施法。',
   'entities.itemSets.vanguard_priest_holy.bonus4':
     '帷步还会为你提供相当于最大生命值8%的护盾，持续6秒。',
   'entities.itemSets.vanguard_priest_shadow.name': '先锋套装：暮咏礼服',
-  'entities.itemSets.vanguard_priest_shadow.bonus2': '悲歌还会在引导期间使目标移动速度降低30%。',
+  'entities.itemSets.vanguard_priest_shadow.bonus2':
+    '悲歌还会在引导期间使目标移动速度降低30%。受到伤害不再延迟你的施法。',
   'entities.itemSets.vanguard_priest_shadow.bonus4':
     '召唤什一魔还会为你提供相当于最大生命值10%的护盾，持续8秒。',
   'entities.itemSets.vanguard_shaman_elemental.name': '先锋套装：风暴铭甲',
-  'entities.itemSets.vanguard_shaman_elemental.bonus2': '释放武器的冷却时间缩短3秒。',
+  'entities.itemSets.vanguard_shaman_elemental.bonus2':
+    '释放武器的冷却时间缩短3秒。受到伤害不再延迟你的施法。',
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
     '释放武器使你可以在移动中施法，并使移动速度提高20%，持续4秒。每20秒最多触发一次。',
   'entities.itemSets.vanguard_shaman_enhancement.name': '先锋套装：风裔战甲',
@@ -18609,28 +18614,34 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '先祖打击使元素恍惚的剩余冷却时间缩短4秒。',
   'entities.itemSets.vanguard_shaman_restoration.name': '先锋套装：盐潮链甲',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    '对生命值低于50%的盟友施放愈合之水加快0.5秒。',
+    '对生命值低于50%的盟友施放愈合之水加快0.5秒。受到伤害不再延迟你的施法。',
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     '潮唤还会为目标提供相当于你最大生命值5%的护盾，持续6秒。',
   'entities.itemSets.vanguard_mage_arcane.name': '先锋套装：缚时法衣',
-  'entities.itemSets.vanguard_mage_arcane.bonus2': '时光屏障的冷却时间缩短2秒。',
+  'entities.itemSets.vanguard_mage_arcane.bonus2':
+    '时光屏障的冷却时间缩短2秒。受到伤害不再延迟你的施法。',
   'entities.itemSets.vanguard_mage_arcane.bonus4':
     '时光屏障还会使受护盾保护的目标移动速度提高20%，持续3秒。',
   'entities.itemSets.vanguard_mage_fire.name': '先锋套装：烬鞭礼服',
-  'entities.itemSets.vanguard_mage_fire.bonus2': '余烬坠落恢复速度加快3秒。',
+  'entities.itemSets.vanguard_mage_fire.bonus2':
+    '余烬坠落恢复速度加快3秒。受到伤害不再延迟你的施法。',
   'entities.itemSets.vanguard_mage_fire.bonus4': '施放余烬坠落会使炽焰屏障的剩余冷却时间缩短2秒。',
   'entities.itemSets.vanguard_mage_frost.name': '先锋套装：霜卫衣装',
-  'entities.itemSets.vanguard_mage_frost.bonus2': '冰缚的冷却时间缩短2秒。',
+  'entities.itemSets.vanguard_mage_frost.bonus2':
+    '冰缚的冷却时间缩短2秒。受到伤害不再延迟你的施法。',
   'entities.itemSets.vanguard_mage_frost.bonus4': '施放冰缚会使疾步的剩余冷却时间缩短5秒。',
   'entities.itemSets.vanguard_warlock_affliction.name': '先锋套装：惧羽法衣',
-  'entities.itemSets.vanguard_warlock_affliction.bonus2': '折磨的施法时间缩短0.3秒。',
+  'entities.itemSets.vanguard_warlock_affliction.bonus2':
+    '折磨的施法时间缩短0.3秒。受到伤害不再延迟你的施法。',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     '吞噬为你多治疗30%，并且可以在移动中引导。',
   'entities.itemSets.vanguard_warlock_demonology.name': '先锋套装：骨缚礼服',
-  'entities.itemSets.vanguard_warlock_demonology.bonus2': '骨甲的冷却时间缩短10秒。',
+  'entities.itemSets.vanguard_warlock_demonology.bonus2':
+    '骨甲的冷却时间缩短10秒。受到伤害不再延迟你的施法。',
   'entities.itemSets.vanguard_warlock_demonology.bonus4': '收割指令使骨甲的剩余冷却时间缩短2秒。',
   'entities.itemSets.vanguard_warlock_destruction.name': '先锋套装：渣冠法衣',
-  'entities.itemSets.vanguard_warlock_destruction.bonus2': '烬皮的冷却时间缩短30秒。',
+  'entities.itemSets.vanguard_warlock_destruction.bonus2':
+    '烬皮的冷却时间缩短30秒。受到伤害不再延迟你的施法。',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     '每第二次烧燃会使你8秒内的下一次毁灭箭变为瞬发。',
   'entities.itemSets.vanguard_druid_feral.name': '血鬃兽皮',
@@ -18638,10 +18649,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_feral.bonus4':
     '熊冲为你提供相当于最大生命值6%的护盾，持续6秒。',
   'entities.itemSets.vanguard_druid_restoration.name': '蓟花法衣',
-  'entities.itemSets.vanguard_druid_restoration.bonus2': '迅愈的冷却时间缩短1秒。',
+  'entities.itemSets.vanguard_druid_restoration.bonus2':
+    '迅愈的冷却时间缩短1秒。受到伤害不再延迟你的施法。',
   'entities.itemSets.vanguard_druid_restoration.bonus4': '迅愈还会使你的移动速度提高30%，持续3秒。',
   'entities.itemSets.vanguard_druid_balance.name': '星卫法衣',
-  'entities.itemSets.vanguard_druid_balance.bonus2': '缠缚根须的施法时间缩短0.5秒。',
+  'entities.itemSets.vanguard_druid_balance.bonus2':
+    '缠缚根须的施法时间缩短0.5秒。受到伤害不再延迟你的施法。',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '施放缠缚根须后，你可以在移动中施法，并使移动速度提高20%，持续4秒。每20秒最多触发一次。',
 };

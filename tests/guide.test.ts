@@ -6165,6 +6165,12 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
         if (proc) expect(proc.pvpOnly, `${setId} ${tier.pieces}pc proc`).toBe(true);
         for (const [key, value] of Object.entries(rest)) {
           if (value === undefined) continue;
+          // The one tier that works everywhere: the caster families' 2-piece
+          // pushback immunity, which the prose names as its exception.
+          if (key === 'castPushbackReduction' && tier.pieces === 2) {
+            expect(body).toContain('two pieces of a caster set also stop damage from delaying');
+            continue;
+          }
           expect(
             ['pvpOffenseRating', 'pvpDefenseRating', 'ccDurationReduction'],
             `${setId} ${tier.pieces}pc ${key}`,

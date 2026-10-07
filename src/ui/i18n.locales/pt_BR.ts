@@ -2107,7 +2107,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Ladrões esconderam seu ouro roubado por todo o meu labirinto, e agora as sombras o protegem. Recupere todas as bolsas de moedas. Evite os guardiões, ou pegue um lampejo radiante para bani-los. Perder três vidas te devolve à entrada, mas as bolsas que você já recolheu permanecem seguras.',
   'entities.itemSets.vanguard_druid_balance.name': 'Vestimenta do Guarda-Estelar',
   'entities.itemSets.vanguard_druid_balance.bonus2':
-    'O tempo de conjuração de Raízes Agarradoras é reduzido em 0,5 s.',
+    'O tempo de conjuração de Raízes Agarradoras é reduzido em 0,5 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'Conjurar Raízes Agarradoras permite conjurar em movimento e aumenta sua velocidade de movimento em 20% por 4 s. Não pode ocorrer mais de uma vez a cada 20 s.',
   'entities.itemSets.vanguard_druid_feral.name': 'Pelagem da Juba de Sangue',
@@ -2117,7 +2117,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Investida de Bruin te escuda em 6% da sua vida máxima por 6 s.',
   'entities.itemSets.vanguard_druid_restoration.name': 'Veste da Flor de Cardo',
   'entities.itemSets.vanguard_druid_restoration.bonus2':
-    'O tempo de recarga de Recuperação Rápida é reduzido em 1 s.',
+    'O tempo de recarga de Recuperação Rápida é reduzido em 1 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_druid_restoration.bonus4':
     'Recuperação Rápida também aumenta sua velocidade de movimento em 30% por 3 s.',
   'entities.itemSets.vanguard_hunter_beast_mastery.name': 'Arreios do Guarda da Matilha',
@@ -2137,22 +2137,22 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Gancho Sangrento concede 1 de Ímpeto de Caça.',
   'entities.itemSets.vanguard_mage_arcane.name': 'Vestes do Vínculo das Horas',
   'entities.itemSets.vanguard_mage_arcane.bonus2':
-    'O tempo de recarga de Barreira Temporal é reduzido em 2 s.',
+    'O tempo de recarga de Barreira Temporal é reduzido em 2 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_mage_arcane.bonus4':
     'Barreira Temporal também aumenta a velocidade de movimento do alvo escudado em 20% por 3 s.',
   'entities.itemSets.vanguard_mage_fire.name': 'Regália do Chicote de Brasa',
   'entities.itemSets.vanguard_mage_fire.bonus2':
-    'O tempo de recarga de Chuva de Brasas é reduzido em 3 s.',
+    'O tempo de recarga de Chuva de Brasas é reduzido em 3 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_mage_fire.bonus4':
     'Conjurar Chuva de Brasas reduz o tempo de recarga restante de Barreira Flamejante em 2 s.',
   'entities.itemSets.vanguard_mage_frost.name': 'Traje do Guarda da Geada',
   'entities.itemSets.vanguard_mage_frost.bonus2':
-    'O tempo de recarga de Grilhão de Gelo é reduzido em 2 s.',
+    'O tempo de recarga de Grilhão de Gelo é reduzido em 2 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_mage_frost.bonus4':
     'Conjurar Grilhão de Gelo reduz em 5 s o tempo de recarga restante de Passo Ligeiro.',
   'entities.itemSets.vanguard_paladin_holy.name': 'Regália da Vigília Solar',
   'entities.itemSets.vanguard_paladin_holy.bonus2':
-    'O tempo de recarga de Pacto da Vida é reduzido em 30 s.',
+    'O tempo de recarga de Pacto da Vida é reduzido em 30 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     'Pacto da Vida também escuda o aliado em 8% da vida máxima dele por 6 s.',
   'entities.itemSets.vanguard_paladin_protection.name': 'Bastião do Voto do Escudo',
@@ -2167,17 +2167,17 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Chamado da Valquíria reinicia o tempo de recarga de Édito Final, e seu próximo Édito Final conjurado em até 6 s causa 15% mais dano.',
   'entities.itemSets.vanguard_priest_discipline.name': 'Vestimenta do Salmo do Véu',
   'entities.itemSets.vanguard_priest_discipline.bonus2':
-    'O tempo de recarga de Grito Psíquico é reduzido em 3 s.',
+    'O tempo de recarga de Grito Psíquico é reduzido em 3 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
     'Quando seu Salmo de Proteção é totalmente consumido, o aliado escudado ganha 20% de velocidade de movimento por 3 s. Não pode ocorrer mais de uma vez a cada 8 s.',
   'entities.itemSets.vanguard_priest_holy.name': 'Vestimenta da Asa da Graça',
   'entities.itemSets.vanguard_priest_holy.bonus2':
-    'O tempo de recarga de Passo do Véu é reduzido em 6 s.',
+    'O tempo de recarga de Passo do Véu é reduzido em 6 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_priest_holy.bonus4':
     'Passo do Véu também te escuda em 8% da sua vida máxima por 6 s.',
   'entities.itemSets.vanguard_priest_shadow.name': 'Regália do Hino do Crepúsculo',
   'entities.itemSets.vanguard_priest_shadow.bonus2':
-    'Litania da Aflição também reduz a velocidade de movimento do alvo em 30% enquanto você a canaliza.',
+    'Litania da Aflição também reduz a velocidade de movimento do alvo em 30% enquanto você a canaliza. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_priest_shadow.bonus4':
     'Invocar Demônio do Dízimo também te escuda em 10% da sua vida máxima por 8 s.',
   'entities.itemSets.vanguard_rogue_assassination.name': 'Couros do Corte Noturno',
@@ -2197,7 +2197,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Soco no Estômago concede 2 pontos de combo adicionais quando usado a partir de Fumaça Dissipante.',
   'entities.itemSets.vanguard_shaman_elemental.name': 'Malha de Batalha do Desígnio da Tempestade',
   'entities.itemSets.vanguard_shaman_elemental.bonus2':
-    'O tempo de recarga de Desencadear Arma é reduzido em 3 s.',
+    'O tempo de recarga de Desencadear Arma é reduzido em 3 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
     'Desencadear Arma permite conjurar em movimento e aumenta sua velocidade de movimento em 20% por 4 s. Não pode ocorrer mais de uma vez a cada 20 s.',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Malha de Guerra do Filho do Vendaval',
@@ -2207,22 +2207,22 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Golpe Ancestral reduz em 4 s o tempo de recarga restante de Elemental Trance.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Cota de Malha do Guarda da Salmoura',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    'Águas Restauradoras é conjurada 0,5 s mais rápido em um aliado abaixo de 50% de vida.',
+    'Águas Restauradoras é conjurada 0,5 s mais rápido em um aliado abaixo de 50% de vida. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     'Chamado da Maré também escuda seu alvo em 5% da sua vida máxima por 6 s.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Vestes da Pena do Pavor',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'O tempo de conjuração de Atormentar é reduzido em 0,3 s.',
+    'O tempo de conjuração de Atormentar é reduzido em 0,3 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Consumir cura 30% a mais e pode ser canalizado em movimento.',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Regália do Vínculo da Medula',
   'entities.itemSets.vanguard_warlock_demonology.bonus2':
-    'O tempo de recarga de Bone Armor é reduzido em 10 s.',
+    'O tempo de recarga de Bone Armor é reduzido em 10 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_warlock_demonology.bonus4':
     'Reaping Command reduz em 2 s o tempo de recarga restante de Bone Armor.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Vestes da Coroa de Escória',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    'O tempo de recarga de Cinderhide é reduzido em 30 s.',
+    'O tempo de recarga de Cinderhide é reduzido em 30 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     'A cada segunda conjuração de Conflagrar, sua próxima Seta da Ruína em até 8 s se torna instantânea.',
   'entities.itemSets.vanguard_warrior_arms.name': 'Equipamento de Batalha do Rastro da Lâmina',
@@ -4762,7 +4762,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_ashstalker.bonus7':
     'Aumenta o Ataque e a Defesa de Guerra em 80. Matar um jogador hostil concede Passo de Cinzas, aumentando a velocidade de movimento em 40% por 6 s.',
   'entities.itemSets.warfare_ashstalker.name': 'Equipamento Ashstalker',
-  'entities.itemSets.warfare_cinderweave.bonus2': 'Aumenta a Defesa de Guerra em 40.',
+  'entities.itemSets.warfare_cinderweave.bonus2':
+    'Aumenta a Defesa de Guerra em 40. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.warfare_cinderweave.bonus4':
     'Aumenta o Ataque de Guerra em 40, e o controle de grupo lançado sobre vós por jogadores hostis dura 15% menos.',
   'entities.itemSets.warfare_cinderweave.bonus7':
@@ -4774,13 +4775,15 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_furyforged.bonus7':
     'Aumenta o Ataque e a Defesa de Guerra em 80. Matar um jogador hostil concede Juramento Inquebrado, absorvendo 200 de dano por 10 s.',
   'entities.itemSets.warfare_furyforged.name': 'Traje de Batalha Furyforged',
-  'entities.itemSets.warfare_stormbound.bonus2': 'Aumenta a Defesa de Guerra em 40.',
+  'entities.itemSets.warfare_stormbound.bonus2':
+    'Aumenta a Defesa de Guerra em 40. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.warfare_stormbound.bonus4':
     'Aumenta o Ataque de Guerra em 40, e o controle de grupo lançado sobre vós por jogadores hostis dura 15% menos.',
   'entities.itemSets.warfare_stormbound.bonus7':
     'Aumenta o Ataque e a Defesa de Guerra em 80. Vossas magias têm 15% de chance de conceder Guarda de Brasa, absorvendo 120 de dano por 8 s.',
   'entities.itemSets.warfare_stormbound.name': 'Vestes Stormbound',
-  'entities.itemSets.warfare_thornhide.bonus2': 'Aumenta a Defesa de Guerra em 40.',
+  'entities.itemSets.warfare_thornhide.bonus2':
+    'Aumenta a Defesa de Guerra em 40. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.warfare_thornhide.bonus4':
     'Aumenta o Ataque de Guerra em 40, e o controle de grupo lançado sobre vós por jogadores hostis dura 15% menos.',
   'entities.itemSets.warfare_thornhide.bonus7':
@@ -19563,7 +19566,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'Uma vitória ranqueada paga Honra, a moeda de jogador contra jogador, e uma derrota jogada até o fim ainda paga uma parte menor, assim como um empate, então a classificação é o único custo real de uma derrota. Honra deve recompensar partidas reais: vencer o mesmo oponente ou a mesma equipe outra vez no mesmo dia não paga nada além, nem perder para eles novamente, uma longa sequência de vitórias paga por inteiro no primeiro trecho e depois reduz pela metade o pagamento de uma vitória, reduzindo-o de novo mais adiante e permanecendo assim, e uma partida abandonada pelo oponente ainda move sua classificação, mas não paga Honra. O dia é do reino: ele reinicia na hora do reset noturno, o mesmo limite em que toda restrição diária é liberada.',
   'guide.arenaPage.warfareBodyStatsStay':
-    'Cada peça de Guerra traz Classificação de Ofensiva de Guerra e Classificação de Defesa de Guerra, e essas duas classificações não fazem absolutamente nada contra monstros. Elas só se aplicam quando você luta contra outro jogador, em um duelo, na arena ou no campo de batalha, onde a Ofensiva aumenta o dano causado e a Defesa reduz o dano recebido, cada uma até seu próprio limite. Cada família de armadura também é um conjunto, e seus bônus igualmente são classificações de Guerra ou efeitos que só funcionam contra jogadores, então os bônus de conjunto de um traje completo de Honra não contam contra um chefe de masmorra. As próprias peças ainda trazem atributos comuns, armadura e dano de arma, que funcionam em qualquer lugar; são as classificações de Guerra e os bônus de conjunto que ficam inativos contra monstros.',
+    'Cada peça de Guerra traz Classificação de Ofensiva de Guerra e Classificação de Defesa de Guerra, e essas duas classificações não fazem absolutamente nada contra monstros. Elas só se aplicam quando você luta contra outro jogador, em um duelo, na arena ou no campo de batalha, onde a Ofensiva aumenta o dano causado e a Defesa reduz o dano recebido, cada uma até seu próprio limite. Cada família de armadura também é um conjunto, e seus bônus igualmente são classificações de Guerra ou efeitos que só funcionam contra jogadores, então os bônus de conjunto de um traje completo de Honra não contam contra um chefe de masmorra. As próprias peças ainda trazem atributos comuns, armadura e dano de arma, que funcionam em qualquer lugar; são as classificações de Guerra e os bônus de conjunto que ficam inativos contra monstros. Há uma exceção que funciona em todo lugar: duas peças de um conjunto de conjurador também fazem com que o dano recebido não atrase mais suas conjurações.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'Essa é a troca deliberada. O equipamento de Guerra foi feito para lutar contra jogadores, não para pular os níveis das masmorras: uma peça de Guerra nunca traz as classificações de combate que um épico de masmorra no mesmo espaço traz, e as classificações de Guerra e os bônus de conjunto que ela traz são gastos inteiramente contra outros jogadores. Se quiser se garantir na arena, compre-o. Se quiser limpar heroicas mais rápido, conquiste seu equipamento nas masmorras.',
   'guide.controls.harvestJournal': 'Diário de Colheita',

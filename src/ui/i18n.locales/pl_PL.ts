@@ -1879,7 +1879,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Przywołaj grzmot, zadając {damage} obrażeń Natury wrogom w promieniu 10 jardów i spowalniając ich o 50% na 5 sek. Przywraca 8% maksymalnej Many. Obrażenia rosną wraz z Mocą Zaklęć.',
   'entities.abilities.thunderstorm.name': 'Łamacz Burzy',
   'entities.itemSets.vanguard_druid_balance.bonus2':
-    'Czas rzucania Chwytających Korzeni jest zmniejszony o 0.5 sek.',
+    'Czas rzucania Chwytających Korzeni jest zmniejszony o 0.5 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'Rzucanie Chwytających Korzeni pozwala Ci rzucać zaklęcia podczas ruchu i zwiększa Twoją prędkość ruchu o 20 procent na 4 sek. Nie może się zdarzyć częściej niż raz na 20 sek.',
   'entities.itemSets.vanguard_druid_balance.name': 'Szata Strażnika Gwiazd',
@@ -1889,7 +1889,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Szarża Bruina chroni Ciebie tarczą na 6 procent maksymalnego zdrowia na 6 sek.',
   'entities.itemSets.vanguard_druid_feral.name': 'Skóra Krwawej Grzywy',
   'entities.itemSets.vanguard_druid_restoration.bonus2':
-    'Regeneracja umiejętności Fleetmend jest zmniejszona o 1 sek.',
+    'Regeneracja umiejętności Fleetmend jest zmniejszona o 1 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_druid_restoration.bonus4':
     'Fleetmend również zwiększa Twoją prędkość ruchu o 30 procent na 3 sek.',
   'entities.itemSets.vanguard_druid_restoration.name': 'Szata Ostów w Rozkwicie',
@@ -1908,21 +1908,22 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_hunter_survival.bonus4': 'Krwawy Hak przyznaje 1 Rozpęd Łowów.',
   'entities.itemSets.vanguard_hunter_survival.name': 'Zbroja Sidełkowatych Zębów',
   'entities.itemSets.vanguard_mage_arcane.bonus2':
-    'Regeneracja umiejętności Bariera Czasowa jest zmniejszona o 2 sek.',
+    'Regeneracja umiejętności Bariera Czasowa jest zmniejszona o 2 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_mage_arcane.bonus4':
     'Bariera Czasowa również zwiększa prędkość ruchu chronionego celu o 20 procent na 3 sek.',
   'entities.itemSets.vanguard_mage_arcane.name': 'Szata Wiązacza Godzin',
-  'entities.itemSets.vanguard_mage_fire.bonus2': 'Deszcz Żaru ładuje się 3 sek szybciej.',
+  'entities.itemSets.vanguard_mage_fire.bonus2':
+    'Deszcz Żaru ładuje się 3 sek szybciej. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_mage_fire.bonus4':
     'Rzucanie Deszczu Żaru zmniejsza pozostałą regenerację umiejętności Płonącej Bariery o 2 sek.',
   'entities.itemSets.vanguard_mage_fire.name': 'Regalia Żarowego Bича',
   'entities.itemSets.vanguard_mage_frost.bonus2':
-    'Regeneracja umiejętności Lodowych Okowów jest zmniejszona o 2 sek.',
+    'Regeneracja umiejętności Lodowych Okowów jest zmniejszona o 2 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_mage_frost.bonus4':
     'Rzucanie Lodowych Okowów zmniejsza pozostałą regenerację umiejętności Mignięcia o 5 sek.',
   'entities.itemSets.vanguard_mage_frost.name': 'Szata Strażnika Szronu',
   'entities.itemSets.vanguard_paladin_holy.bonus2':
-    'Regeneracja umiejętności Przymierza Życia jest zmniejszona o 30 sek.',
+    'Regeneracja umiejętności Przymierza Życia jest zmniejszona o 30 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     'Przymierze Życia również chroni sojusznika tarczą na 8 procent ich maksymalnego zdrowia na 6 sek.',
   'entities.itemSets.vanguard_paladin_holy.name': 'Regalia Czuwania Słońca',
@@ -1937,17 +1938,17 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Wezwanie Walkir resetuje regenerację umiejętności Ostatniego Edyktu, a Twój następny Ostatni Edykt w ciągu 6 sek od trafienia zadaje 15 procent więcej obrażeń.',
   'entities.itemSets.vanguard_paladin_retribution.name': 'Zbroja Wojenna Znaku Światła',
   'entities.itemSets.vanguard_priest_discipline.bonus2':
-    'Regeneracja umiejętności Kantyka Terroru jest zmniejszona o 3 sek.',
+    'Regeneracja umiejętności Kantyka Terroru jest zmniejszona o 3 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
     'Gdy Twój Psalm Ochrony jest w pełni pochłonięty, chroniony sojusznik zyskuje 20 procent prędkości ruchu na 3 sek. Nie może się zdarzyć częściej niż raz na 8 sek.',
   'entities.itemSets.vanguard_priest_discipline.name': 'Szata Kantyka Zasłon',
   'entities.itemSets.vanguard_priest_holy.bonus2':
-    'Regeneracja umiejętności Kroku Zasłony jest zmniejszona o 6 sek.',
+    'Regeneracja umiejętności Kroku Zasłony jest zmniejszona o 6 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_priest_holy.bonus4':
     'Krok Zasłony również chroni Ciebie tarczą na 8 procent maksymalnego zdrowia na 6 sek.',
   'entities.itemSets.vanguard_priest_holy.name': 'Szata Skrzydeł Łaski',
   'entities.itemSets.vanguard_priest_shadow.bonus2':
-    'Litania Niedoli również spowalnia ruch celu o 30 procent, gdy ją canujesz.',
+    'Litania Niedoli również spowalnia ruch celu o 30 procent, gdy ją canujesz. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_priest_shadow.bonus4':
     'Wezwanie Dziesięcinika również chroni Ciebie tarczą na 10 procent maksymalnego zdrowia na 8 sek.',
   'entities.itemSets.vanguard_priest_shadow.name': 'Regalia Kantyka Mroku',
@@ -1967,7 +1968,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Cios w Brzuch przyznaje 2 dodatkowe punkty kombinacji, gdy jest używany z Zanęty Dymu.',
   'entities.itemSets.vanguard_rogue_subtlety.name': 'Skóry Marszu Cieni',
   'entities.itemSets.vanguard_shaman_elemental.bonus2':
-    'Regeneracja umiejętności Uwolnij Broń jest zmniejszona o 3 sek.',
+    'Regeneracja umiejętności Uwolnij Broń jest zmniejszona o 3 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
     'Uwolnij Broń pozwala Ci rzucać zaklęcia podczas ruchu i zwiększa Twoją prędkość ruchu o 20 procent na 4 sek. Nie może się zdarzyć częściej niż raz na 20 sek.',
   'entities.itemSets.vanguard_shaman_elemental.name': 'Pancerz Bitewny Pisma Burzy',
@@ -1977,22 +1978,22 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Atak Przodków zmniejsza pozostałą regenerację umiejętności Transu Żywiołowego o 4 sek.',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Pancerz Bitewny Wytworzony z Wichru',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    'Kojące Wody rzucają się 0.5 sek szybciej na sojusznika poniżej 50 procent zdrowia.',
+    'Kojące Wody rzucają się 0.5 sek szybciej na sojusznika poniżej 50 procent zdrowia. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     'Wezwanie Pływu również chroni cel tarczą na 5 procent maksymalnego zdrowia na 6 sek.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Pancerz Kolczasty Gwardy Słoni',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'Czas rzucania Trwogi jest zmniejszony o 0.3 sek.',
+    'Czas rzucania Trwogi jest zmniejszony o 0.3 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Pochłonięcie uzdrawia Ciebie o 30 procent więcej i może być kanalizowane podczas ruchu.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Szata Pióra Grozy',
   'entities.itemSets.vanguard_warlock_demonology.bonus2':
-    'Regeneracja umiejętności Pancerza Kości jest zmniejszona o 10 sek.',
+    'Regeneracja umiejętności Pancerza Kości jest zmniejszona o 10 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_warlock_demonology.bonus4':
     'Rozkaz Żniwiarz zmniejsza pozostałą regenerację umiejętności Pancerza Kości o 2 sek.',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Regalia Związana Szpikiem',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    'Regeneracja umiejętności Cinderhide jest zmniejszona o 30 sek.',
+    'Regeneracja umiejętności Cinderhide jest zmniejszona o 30 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     'Każdy drugi Pożoga sprawia, że Twój następny Pocisk Ruiny w ciągu 8 sek jest natychmiastowy.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Szata Korony Żużla',
@@ -4722,7 +4723,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_ashstalker.bonus7':
     'Zwiększa Atak i Obronę wojenną o 80. Zabicie wrogiego gracza daje Popielny Krok, który zwiększa szybkość ruchu o 40% na 6 s.',
   'entities.itemSets.warfare_ashstalker.name': 'Zestaw Ashstalker',
-  'entities.itemSets.warfare_cinderweave.bonus2': 'Zwiększa Obronę wojenną o 40.',
+  'entities.itemSets.warfare_cinderweave.bonus2':
+    'Zwiększa Obronę wojenną o 40. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.warfare_cinderweave.bonus4':
     'Zwiększa Atak wojenny o 40, a kontrola rzucana na ciebie przez wrogich graczy trwa o 15% krócej.',
   'entities.itemSets.warfare_cinderweave.bonus7':
@@ -4734,13 +4736,15 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_furyforged.bonus7':
     'Zwiększa Atak i Obronę wojenną o 80. Zabicie wrogiego gracza daje Niezłomną Przysięgę, która pochłania 200 obrażeń przez 10 s.',
   'entities.itemSets.warfare_furyforged.name': 'Rynsztunek bojowy Furyforged',
-  'entities.itemSets.warfare_stormbound.bonus2': 'Zwiększa Obronę wojenną o 40.',
+  'entities.itemSets.warfare_stormbound.bonus2':
+    'Zwiększa Obronę wojenną o 40. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.warfare_stormbound.bonus4':
     'Zwiększa Atak wojenny o 40, a kontrola rzucana na ciebie przez wrogich graczy trwa o 15% krócej.',
   'entities.itemSets.warfare_stormbound.bonus7':
     'Zwiększa Atak i Obronę wojenną o 80. Twoje zaklęcia mają 15% szansy dać Żarową Straż, która pochłania 120 obrażeń przez 8 s.',
   'entities.itemSets.warfare_stormbound.name': 'Szaty Stormbound',
-  'entities.itemSets.warfare_thornhide.bonus2': 'Zwiększa Obronę wojenną o 40.',
+  'entities.itemSets.warfare_thornhide.bonus2':
+    'Zwiększa Obronę wojenną o 40. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.warfare_thornhide.bonus4':
     'Zwiększa Atak wojenny o 40, a kontrola rzucana na ciebie przez wrogich graczy trwa o 15% krócej.',
   'entities.itemSets.warfare_thornhide.bonus7':
@@ -19409,7 +19413,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'Zwycięstwo rankingowe daje Honor, walutę gracz kontra gracz, a porażka rozegrana do końca nadal daje jego mniejszą część, podobnie jak remis, więc jedynym prawdziwym kosztem porażki jest ranking. Honor ma nagradzać prawdziwe mecze: ponowne pokonanie tego samego przeciwnika albo tej samej drużyny tego samego dnia nie daje nic więcej, podobnie jak ponowna porażka z nimi. Długi dzień zwycięstw płaci pełną stawkę za pierwszy ciąg wygranych, potem ją zmniejsza o połowę, a jeszcze głębiej zmniejsza ponownie i pozostaje na tym poziomie. Mecz poddany przez przeciwnika nadal zmienia twój ranking, ale nie daje w ogóle Honoru. Ten dzień należy do królestwa i kończy się o nocnej godzinie resetu, tej samej granicy, przy której czyszczą się wszystkie dzienne blokady.',
   'guide.arenaPage.warfareBodyStatsStay':
-    'Każda część sprzętu Wojny ma Ofensywę wojenną i ocenę Obrony wojennej, a te dwie oceny nie działają w ogóle przeciw potworom. Działają wyłącznie podczas walki z innym graczem, w pojedynku, na arenie albo na polu bitwy, gdzie Ofensywa zwiększa zadawane obrażenia, a Obrona zmniejsza otrzymywane, każda do własnego limitu. Każda rodzina pancerza jest także zestawem, a jej premie zestawu również są ocenami Wojny lub efektami działającymi wyłącznie przeciw graczom, więc pełna premia zestawu za honor nie ma znaczenia przeciw bossowi lochu. Same części nadal mają zwykłe statystyki, pancerz i obrażenia broni, które działają wszędzie; przeciw potworowi wyciszają się tylko oceny Wojny i premie zestawu.',
+    'Każda część sprzętu Wojny ma Ofensywę wojenną i ocenę Obrony wojennej, a te dwie oceny nie działają w ogóle przeciw potworom. Działają wyłącznie podczas walki z innym graczem, w pojedynku, na arenie albo na polu bitwy, gdzie Ofensywa zwiększa zadawane obrażenia, a Obrona zmniejsza otrzymywane, każda do własnego limitu. Każda rodzina pancerza jest także zestawem, a jej premie zestawu również są ocenami Wojny lub efektami działającymi wyłącznie przeciw graczom, więc pełna premia zestawu za honor nie ma znaczenia przeciw bossowi lochu. Same części nadal mają zwykłe statystyki, pancerz i obrażenia broni, które działają wszędzie; przeciw potworowi wyciszają się tylko oceny Wojny i premie zestawu. Jeden wyjątek działa wszędzie: dwie części zestawu dla rzucających zaklęcia sprawiają też, że otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'To zamierzona wymiana. Sprzęt Wojny służy do walki z graczami, a nie do omijania poziomów lochów: część sprzętu Wojny nigdy nie ma ocen bojowych, które ma epicki przedmiot z lochu w tym samym miejscu, lecz zamiast tego całą swoją ocenę Wojny i premie zestawu przeznacza na innych graczy. Jeśli chcesz utrzymać się na arenie, kup go. Jeśli chcesz szybciej czyścić tryby heroiczne, zdobądź sprzęt w lochach.',
   'guide.controls.harvestJournal': 'Dziennik zbiorów',

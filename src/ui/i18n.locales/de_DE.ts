@@ -1926,7 +1926,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunderstorm.name': 'Stormbreak',
   'entities.itemSets.vanguard_druid_balance.name': 'Sternwächter-Gewand',
   'entities.itemSets.vanguard_druid_balance.bonus2':
-    'Die Zauberzeit von Greifende Wurzeln wird um 0,5 Sek. verkürzt.',
+    'Die Zauberzeit von Greifende Wurzeln wird um 0,5 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'Greifende Wurzeln lässt dich während des Wirkens umherlaufen und erhöht dein Lauftempo 4 Sek. lang um 20 Prozent. Kann höchstens einmal alle 20 Sek. auftreten.',
   'entities.items.vanguard_druid_balance_chest.name': 'Sternwächter-Weste',
@@ -1946,7 +1946,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_druid_feral_shoulder.name': 'Blutmähnen-Schulterpolster',
   'entities.itemSets.vanguard_druid_restoration.name': 'Distelblüten-Gewand',
   'entities.itemSets.vanguard_druid_restoration.bonus2':
-    'Die Abklingzeit von Rasche Heilung wird um 1 Sek. verkürzt.',
+    'Die Abklingzeit von Rasche Heilung wird um 1 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_druid_restoration.bonus4':
     'Rasche Heilung erhöht zudem dein Lauftempo 3 Sek. lang um 30 Prozent.',
   'entities.items.vanguard_druid_restoration_chest.name': 'Distelblüten-Weste',
@@ -1985,7 +1985,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_hunter_survival_shoulder.name': 'Fallenzahn-Schulterstücke',
   'entities.itemSets.vanguard_mage_arcane.name': 'Gewänder des Stundenbinders',
   'entities.itemSets.vanguard_mage_arcane.bonus2':
-    'Die Abklingzeit von Temporale Barriere wird um 2 Sek. verkürzt.',
+    'Die Abklingzeit von Temporale Barriere wird um 2 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_mage_arcane.bonus4':
     'Temporale Barriere erhöht zudem 3 Sek. lang das Lauftempo des geschildeten Ziels um 20 Prozent.',
   'entities.items.vanguard_mage_arcane_chest.name': 'Robe des Stundenbinders',
@@ -1995,7 +1995,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_mage_arcane_shoulder.name': 'Schultertuch des Stundenbinders',
   'entities.itemSets.vanguard_mage_fire.name': 'Glutpeitschen-Ornat',
   'entities.itemSets.vanguard_mage_fire.bonus2':
-    'Die Abklingzeit von Glutsturz wird um 3 Sek. verkürzt.',
+    'Die Abklingzeit von Glutsturz wird um 3 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_mage_fire.bonus4':
     'Das Wirken von Glutsturz verringert die verbleibende Abklingzeit von Flammende Barriere um 2 Sek.',
   'entities.items.vanguard_mage_fire_chest.name': 'Glutpeitschen-Roben',
@@ -2005,7 +2005,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_mage_fire_shoulder.name': 'Glutpeitschen-Schultermantel',
   'entities.itemSets.vanguard_mage_frost.name': 'Reifwächter-Tracht',
   'entities.itemSets.vanguard_mage_frost.bonus2':
-    'Die Abklingzeit von Eisfessel wird um 2 Sek. verkürzt.',
+    'Die Abklingzeit von Eisfessel wird um 2 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_mage_frost.bonus4':
     'Das Wirken von Eisfessel verringert die verbleibende Abklingzeit von Flitzschritt um 5 Sek.',
   'entities.items.vanguard_mage_frost_chest.name': 'Reifwächter-Gewand',
@@ -2015,7 +2015,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_mage_frost_shoulder.name': 'Reifwächter-Schulterpolster',
   'entities.itemSets.vanguard_paladin_holy.name': 'Sonnenwacht-Ornat',
   'entities.itemSets.vanguard_paladin_holy.bonus2':
-    'Die Abklingzeit von Bund des Lebens wird um 30 Sek. verkürzt.',
+    'Die Abklingzeit von Bund des Lebens wird um 30 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     'Bund des Lebens gewährt dem Verbündeten zudem 6 Sek. lang einen Schild in Höhe von 8 Prozent seiner maximalen Gesundheit.',
   'entities.items.vanguard_paladin_holy_chest.name': 'Sonnenwacht-Halsberge',
@@ -2045,7 +2045,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_paladin_retribution_shoulder.name': 'Lichtbrand-Schulterstücke',
   'entities.itemSets.vanguard_priest_discipline.name': 'Schleierpsalm-Gewand',
   'entities.itemSets.vanguard_priest_discipline.bonus2':
-    'Die Abklingzeit von Schreckensschrei wird um 3 Sek. verkürzt.',
+    'Die Abklingzeit von Schreckensschrei wird um 3 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
     'Wird dein Psalm der Abschirmung vollständig verbraucht, erhält der geschildete Verbündete 3 Sek. lang 20 Prozent mehr Lauftempo. Kann höchstens einmal alle 8 Sek. auftreten.',
   'entities.items.vanguard_priest_discipline_chest.name': 'Schleierpsalm-Robe',
@@ -2055,7 +2055,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_priest_discipline_shoulder.name': 'Schleierpsalm-Schultermantel',
   'entities.itemSets.vanguard_priest_holy.name': 'Gnadenschwingen-Gewand',
   'entities.itemSets.vanguard_priest_holy.bonus2':
-    'Die Abklingzeit von Schleierschritt wird um 6 Sek. verkürzt.',
+    'Die Abklingzeit von Schleierschritt wird um 6 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_priest_holy.bonus4':
     'Schleierschritt gewährt dir zudem 6 Sek. lang einen Schild in Höhe von 8 Prozent deiner maximalen Gesundheit.',
   'entities.items.vanguard_priest_holy_chest.name': 'Gnadenschwingen-Robe',
@@ -2065,7 +2065,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_priest_holy_shoulder.name': 'Gnadenschwingen-Schultermantel',
   'entities.itemSets.vanguard_priest_shadow.name': 'Dämmerhymnen-Ornat',
   'entities.itemSets.vanguard_priest_shadow.bonus2':
-    'Litanei des Leids verlangsamt zudem das Lauftempo des Ziels um 30 Prozent, solange du sie kanalisierst.',
+    'Litanei des Leids verlangsamt zudem das Lauftempo des Ziels um 30 Prozent, solange du sie kanalisierst. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_priest_shadow.bonus4':
     'Zehntteufel rufen gewährt dir zudem 8 Sek. lang einen Schild in Höhe von 10 Prozent deiner maximalen Gesundheit.',
   'entities.items.vanguard_priest_shadow_chest.name': 'Dämmerhymnen-Robe',
@@ -2104,7 +2104,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_rogue_subtlety_shoulder.name': 'Schattenwandel-Schulterpolster',
   'entities.itemSets.vanguard_shaman_elemental.name': 'Sturmschrift-Kampfkettenhemd',
   'entities.itemSets.vanguard_shaman_elemental.bonus2':
-    'Die Abklingzeit von Waffe entfesseln wird um 3 Sek. verkürzt.',
+    'Die Abklingzeit von Waffe entfesseln wird um 3 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
     'Waffe entfesseln lässt dich während des Wirkens umherlaufen und erhöht dein Lauftempo 4 Sek. lang um 20 Prozent. Kann höchstens einmal alle 20 Sek. auftreten.',
   'entities.items.vanguard_shaman_elemental_chest.name': 'Sturmschrift-Halsberge',
@@ -2124,7 +2124,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_shaman_enhancement_shoulder.name': 'Sturmgeboren-Schulterstücke',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Brandungswacht-Kettenhemd',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    'Heilende Wasser wird 0,5 Sek. schneller gewirkt, wenn das Ziel unter 50 Prozent Gesundheit hat.',
+    'Heilende Wasser wird 0,5 Sek. schneller gewirkt, wenn das Ziel unter 50 Prozent Gesundheit hat. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     'Gezeitenruf gewährt seinem Ziel zudem 6 Sek. lang einen Schild in Höhe von 5 Prozent deiner maximalen Gesundheit.',
   'entities.items.vanguard_shaman_restoration_chest.name': 'Brandungswacht-Halsberge',
@@ -2134,7 +2134,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_shaman_restoration_shoulder.name': 'Brandungswacht-Schultermantel',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Furchtfeder-Gewänder',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'Die Zauberzeit von Heimsuchung wird um 0,3 Sek. verkürzt.',
+    'Die Zauberzeit von Heimsuchung wird um 0,3 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Verzehren heilt dich um 30 Prozent mehr und kann während der Bewegung kanalisiert werden.',
   'entities.items.vanguard_warlock_affliction_chest.name': 'Furchtfeder-Robe',
@@ -2144,7 +2144,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_warlock_affliction_shoulder.name': 'Furchtfeder-Schultermantel',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Markgebundenes Ornat',
   'entities.itemSets.vanguard_warlock_demonology.bonus2':
-    'Die Abklingzeit von Bone Armor wird um 10 Sek. verkürzt.',
+    'Die Abklingzeit von Bone Armor wird um 10 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_warlock_demonology.bonus4':
     'Reaping Command verringert die verbleibende Abklingzeit von Bone Armor um 2 Sek.',
   'entities.items.vanguard_warlock_demonology_chest.name': 'Markgebundene Robe',
@@ -2154,7 +2154,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_warlock_demonology_shoulder.name': 'Markgebundene Schulterstücke',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Schlackenkronen-Gewänder',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    'Die Abklingzeit von Cinderhide wird um 30 Sek. verkürzt.',
+    'Die Abklingzeit von Cinderhide wird um 30 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     'Jede zweite Feuersbrunst lässt deinen nächsten Verderbensblitz innerhalb von 8 Sek. sofort wirken.',
   'entities.items.vanguard_warlock_destruction_chest.name': 'Schlackenkronen-Roben',
@@ -4803,7 +4803,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Erhöht Kriegsführungs-Angriffs- und Verteidigungswertung um 80. Das Töten eines feindlichen Spielers gewährt Ascheschritt, was das Bewegungstempo 6 Sek. lang um 40% erhöht.',
   'entities.itemSets.warfare_ashstalker.name': 'Aschenpirscher-Ausrüstung',
   'entities.itemSets.warfare_cinderweave.bonus2':
-    'Erhöht Kriegsführungs-Verteidigungswertung um 40.',
+    'Erhöht Kriegsführungs-Verteidigungswertung um 40. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.warfare_cinderweave.bonus4':
     'Erhöht Kriegsführungs-Angriffswertung um 40, und von feindlichen Spielern auf Euch gewirkte Massenkontrolle hält 15% kürzer an.',
   'entities.itemSets.warfare_cinderweave.bonus7':
@@ -4817,13 +4817,14 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Erhöht Kriegsführungs-Angriffs- und Verteidigungswertung um 80. Das Töten eines feindlichen Spielers gewährt Ungebrochenen Eid, was 10 Sek. lang 200 Schaden absorbiert.',
   'entities.itemSets.warfare_furyforged.name': 'Zorngeschmiedete Kriegstracht',
   'entities.itemSets.warfare_stormbound.bonus2':
-    'Erhöht Kriegsführungs-Verteidigungswertung um 40.',
+    'Erhöht Kriegsführungs-Verteidigungswertung um 40. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.warfare_stormbound.bonus4':
     'Erhöht Kriegsführungs-Angriffswertung um 40, und von feindlichen Spielern auf Euch gewirkte Massenkontrolle hält 15% kürzer an.',
   'entities.itemSets.warfare_stormbound.bonus7':
     'Erhöht Kriegsführungs-Angriffs- und Verteidigungswertung um 80. Eure Zauber haben eine Chance von 15%, Glutwacht zu gewähren, was 8 Sek. lang 120 Schaden absorbiert.',
   'entities.itemSets.warfare_stormbound.name': 'Sturmgebundene Gewänder',
-  'entities.itemSets.warfare_thornhide.bonus2': 'Erhöht Kriegsführungs-Verteidigungswertung um 40.',
+  'entities.itemSets.warfare_thornhide.bonus2':
+    'Erhöht Kriegsführungs-Verteidigungswertung um 40. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.warfare_thornhide.bonus4':
     'Erhöht Kriegsführungs-Angriffswertung um 40, und von feindlichen Spielern auf Euch gewirkte Massenkontrolle hält 15% kürzer an.',
   'entities.itemSets.warfare_thornhide.bonus7':
@@ -19737,7 +19738,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'Ein gewerteter Sieg zahlt Ehre, die Währung für Spieler gegen Spieler. Eine Niederlage, die du bis zum Ende spielst, zahlt trotzdem einen kleineren Anteil, ebenso ein Unentschieden, daher ist die Wertung der einzige echte Verlust einer Niederlage. Ehre soll echte Matches belohnen: Ein Sieg gegen denselben Gegner oder dasselbe Team am selben Tag zahlt nicht noch einmal, und eine weitere Niederlage gegen sie ebenfalls nicht. Ein langer Siegestag zahlt für den ersten Abschnitt die volle Belohnung, danach halbiert sich der Siegwert und später noch einmal, bevor er auf dieser Stufe bleibt. Ein Match, das der Gegner aufgibt, bewegt deine Wertung, zahlt aber überhaupt keine Ehre. Der Tag gehört zum Reich und wechselt zur nächtlichen Resetstunde, an der auch jede tägliche Sperre gelöscht wird.',
   'guide.arenaPage.warfareBodyStatsStay':
-    'Jedes Kriegsführungsstück trägt Kriegsführungs-Offensivwertung und Kriegsführungs-Defensivwertung. Beide Werte wirken überhaupt nicht gegen Monster. Sie gelten nur, wenn du einen anderen Spieler bekämpfst, im Duell, in der Arena oder auf dem Schlachtfeld: Offensivwertung erhöht deinen verursachten Schaden, Defensivwertung senkt deinen erlittenen Schaden, jeweils bis zur eigenen Obergrenze. Jede Rüstungsfamilie ist außerdem ein Set, dessen Boni ebenfalls Kriegsführungswerte oder Effekte enthalten, die nur gegen Spieler wirken. Die Setboni einer vollständigen Ehrenausrüstung zählen daher gegen einen Dungeonboss nicht. Die gewöhnlichen Werte, Rüstung und Waffenschaden der Stücke gelten weiterhin überall; nur Kriegsführungswerte und Setboni schweigen gegen Monster.',
+    'Jedes Kriegsführungsstück trägt Kriegsführungs-Offensivwertung und Kriegsführungs-Defensivwertung. Beide Werte wirken überhaupt nicht gegen Monster. Sie gelten nur, wenn du einen anderen Spieler bekämpfst, im Duell, in der Arena oder auf dem Schlachtfeld: Offensivwertung erhöht deinen verursachten Schaden, Defensivwertung senkt deinen erlittenen Schaden, jeweils bis zur eigenen Obergrenze. Jede Rüstungsfamilie ist außerdem ein Set, dessen Boni ebenfalls Kriegsführungswerte oder Effekte enthalten, die nur gegen Spieler wirken. Die Setboni einer vollständigen Ehrenausrüstung zählen daher gegen einen Dungeonboss nicht. Die gewöhnlichen Werte, Rüstung und Waffenschaden der Stücke gelten weiterhin überall; nur Kriegsführungswerte und Setboni schweigen gegen Monster. Eine Ausnahme wirkt überall: Zwei Teile eines Zauberwirker-Sets sorgen außerdem dafür, dass erlittener Schaden dein Zauberwirken nicht mehr verzögert.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'Kriegsführungsausrüstung ist für Spieler gegen Spieler gedacht und überspringt keine Dungeonstufen. Sie trägt nicht die Kampfbewertungen eines Dungeonepics, sondern investiert ihre Bewertungen und Setboni vollständig in Kämpfe gegen Spieler. Für die Arena kaufst du sie, für schnellere heroische Dungeons verdienst du deine Ausrüstung dort.',
   'guide.controls.harvestJournal': 'Erntejournal',

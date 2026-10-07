@@ -8299,7 +8299,7 @@ export const cs_CZ: EnTranslations = {
       "honorFinalNoteSoldBack": "Nákupy za čest jsou konečné. Seznam zpětného odkupu obsahuje jen to, co jsi prodal(a): nákup za mince lze obvykle prodat zpět za prodejní cenu a znovu získat ze seznamu, když si to rozmyslíš, ale Válečnická výbava se v okamžiku nákupu váže na duši, takže ji nelze obchodovat, posílat poštou ani za cokoli prodat zpět a do seznamu se nikdy nedostane. Obchod proto žádá potvrzení: před stisknutím si kus přečti.",
       "warfareHeading": "Válečnická výbava",
       "warfareBody": "Každý válečnický kus nese hodnocení útoku i obrany ve Válečnictví, a tato dvě hodnocení proti nestvůrám nic neudělají. Uplatní se jen v boji proti jinému hráči, v duelu, v aréně nebo na bojišti, kde Útok přidává k poškození, které způsobíš, a Obrana snižuje poškození, které utrpíš, každé až po svůj vlastní strop. Každá rodina zbroje je zároveň sada a její sadové bonusy jsou stejně tak hodnocení ve Válečnictví nebo efekty, které fungují jen proti hráčům, takže plná válečnická výbava je na dungeonovém bossovi k ničemu.",
-      "warfareBodyStatsStay": "Každý kus Válečnictví nese útočné a obranné hodnocení Válečnictví a tato dvě hodnocení proti nestvůrám nedělají vůbec nic. Platí jen při boji s jiným hráčem, v souboji, aréně nebo na bojišti, kde útok přidává k tvému způsobenému poškození a obrana snižuje poškození, které utržíš, vždy až ke své vlastní hranici. Každá rodina zbroje je také sada a její bonusy jsou rovněž hodnocení Válečnictví nebo účinky fungující jen proti hráčům, takže bonusy celé čestné výbavy se proti bossovi dungeonu nepočítají. Samotné kusy stále nesou běžné statistiky, zbroj a poškození zbraně a ty fungují všude; proti nestvůře mlčí jen hodnocení Válečnictví a bonusy sady.",
+      "warfareBodyStatsStay": "Každý kus Válečnictví nese útočné a obranné hodnocení Válečnictví a tato dvě hodnocení proti nestvůrám nedělají vůbec nic. Platí jen při boji s jiným hráčem, v souboji, aréně nebo na bojišti, kde útok přidává k tvému způsobenému poškození a obrana snižuje poškození, které utržíš, vždy až ke své vlastní hranici. Každá rodina zbroje je také sada a její bonusy jsou rovněž hodnocení Válečnictví nebo účinky fungující jen proti hráčům, takže bonusy celé čestné výbavy se proti bossovi dungeonu nepočítají. Samotné kusy stále nesou běžné statistiky, zbroj a poškození zbraně a ty fungují všude; proti nestvůře mlčí jen hodnocení Válečnictví a bonusy sady. Jedna výjimka platí všude: dva kusy sady pro sesilatele navíc zajistí, že utržené poškození nezpožďuje sesílání kouzel.",
       "warfareTradeBody": "To je záměrný kompromis. Válečnická výbava je stavěná na boj proti hráčům, ne jako zkratka kolem dungeonových stupňů: válečnický kus nikdy nenese bojová hodnocení, jaká má epický dungeonový kus na stejném slotu, a všechno, co přináší, je určeno proti ostatním hráčům. Pokud chceš obstát v aréně, kup si ji. Pokud chceš rychleji čistit hrdinské dungeony, vydobuď si výbavu v dungeonech.",
       "warfareTradeBodyRatingSpent": "To je záměrný obchod. Válečnická výbava je stavěná na boj s hráči, ne jako zkratka přes dungeonové stupně: kus Válečnictví nikdy nenese bojová hodnocení, která má epický dungeonový kus ve stejném slotu, a hodnocení Válečnictví i bonusy sady, které nese místo nich, se utrácejí výhradně proti hráčům. Chceš-li obstát v aréně, kup si ji. Chceš-li rychleji čistit hrdinské dungeony, získávej výbavu v dungeonech.",
       "vanguardHeading": "Výbava Předvoje: Válečnictví, sezóna 2",
@@ -24174,7 +24174,7 @@ export const cs_CZ: EnTranslations = {
       },
       "vanguard_druid_balance": {
         "name": "Roucho Hvězdostrážce",
-        "bonus2": "Sesílání Svazujících kořenů je o 0.5 s kratší.",
+        "bonus2": "Sesílání Svazujících kořenů je o 0.5 s kratší. Utržené poškození již nezpožďuje sesílání kouzel.",
         "bonus4": "Seslání Svazujících kořenů ti dovolí sesílat za pohybu a zvýší tvou rychlost pohybu o 20 % na 4 s."
       },
       "vanguard_druid_feral": {
@@ -24184,7 +24184,7 @@ export const cs_CZ: EnTranslations = {
       },
       "vanguard_druid_restoration": {
         "name": "Roucho Bodlákokvětu",
-        "bonus2": "Čas obnovy Rychlého zhojení je kratší o 1 s.",
+        "bonus2": "Čas obnovy Rychlého zhojení je kratší o 1 s. Utržené poškození již nezpožďuje sesílání kouzel.",
         "bonus4": "Rychlé zhojení navíc zvýší tvou rychlost pohybu o 30 % na 3 s."
       },
       "vanguard_hunter_beast_mastery": {
@@ -24204,22 +24204,22 @@ export const cs_CZ: EnTranslations = {
       },
       "vanguard_mage_arcane": {
         "name": "Šat Časovazače",
-        "bonus2": "Čas obnovy Časové bariéry je kratší o 2 s.",
+        "bonus2": "Čas obnovy Časové bariéry je kratší o 2 s. Utržené poškození již nezpožďuje sesílání kouzel.",
         "bonus4": "Časová bariéra navíc zvýší rychlost pohybu chráněného cíle o 20 % na 3 s."
       },
       "vanguard_mage_fire": {
         "name": "Regálie Žhavobiče",
-        "bonus2": "Pád škváry se dobíjí o 3 s rychleji.",
+        "bonus2": "Pád škváry se dobíjí o 3 s rychleji. Utržené poškození již nezpožďuje sesílání kouzel.",
         "bonus4": "Seslání Pádu škváry sníží zbývající čas obnovy Ohnivé bariéry o 2 s."
       },
       "vanguard_mage_frost": {
         "name": "Oděv Jinovatkostrážce",
-        "bonus2": "Čas obnovy Ledového spoutání je kratší o 2 s.",
+        "bonus2": "Čas obnovy Ledového spoutání je kratší o 2 s. Utržené poškození již nezpožďuje sesílání kouzel.",
         "bonus4": "Seslání Ledového spoutání sníží zbývající čas obnovy Kroku mihotání o 5 s."
       },
       "vanguard_paladin_holy": {
         "name": "Regálie Slunostráže",
-        "bonus2": "Čas obnovy Úmluvy života je kratší o 30 s.",
+        "bonus2": "Čas obnovy Úmluvy života je kratší o 30 s. Utržené poškození již nezpožďuje sesílání kouzel.",
         "bonus4": "Úmluva života navíc pohltí spojenci 8 % jeho maximálního zdraví na 6 s."
       },
       "vanguard_paladin_protection": {
@@ -24234,17 +24234,17 @@ export const cs_CZ: EnTranslations = {
       },
       "vanguard_priest_discipline": {
         "name": "Háv Závojožalmu",
-        "bonus2": "Čas obnovy Výkřiku hrůzy je kratší o 3 s.",
+        "bonus2": "Čas obnovy Výkřiku hrůzy je kratší o 3 s. Utržené poškození již nezpožďuje sesílání kouzel.",
         "bonus4": "Když se tvůj Žalm ochrany zcela spotřebuje, chráněný spojenec získá 20 % rychlosti pohybu na 3 s. Nemůže nastat víc než jednou za 8 s."
       },
       "vanguard_priest_holy": {
         "name": "Háv Milokřídla",
-        "bonus2": "Čas obnovy Kroku závoje je kratší o 6 s.",
+        "bonus2": "Čas obnovy Kroku závoje je kratší o 6 s. Utržené poškození již nezpožďuje sesílání kouzel.",
         "bonus4": "Krok závoje tě navíc zaštítí a pohltí 8 % tvého maximálního zdraví na 6 s."
       },
       "vanguard_priest_shadow": {
         "name": "Regálie Soumrakohymny",
-        "bonus2": "Litanie běd navíc zpomalí pohyb cíle o 30 %, dokud ji kanáluješ.",
+        "bonus2": "Litanie běd navíc zpomalí pohyb cíle o 30 %, dokud ji kanáluješ. Utržené poškození již nezpožďuje sesílání kouzel.",
         "bonus4": "Přivolej desátkového běsa: navíc tě zaštítí a pohltí 10 % tvého maximálního zdraví na 8 s."
       },
       "vanguard_rogue_assassination": {
@@ -24264,7 +24264,7 @@ export const cs_CZ: EnTranslations = {
       },
       "vanguard_shaman_elemental": {
         "name": "Bojová zbroj Bouřeznaku",
-        "bonus2": "Vypusť zbraň: čas obnovy je kratší o 3 s.",
+        "bonus2": "Vypusť zbraň: čas obnovy je kratší o 3 s. Utržené poškození již nezpožďuje sesílání kouzel.",
         "bonus4": "Vypusť zbraň: dovolí ti sesílat za pohybu a zvýší tvou rychlost pohybu o 20 % na 4 s. Nemůže nastat víc než jednou za 20 s."
       },
       "vanguard_shaman_enhancement": {
@@ -24274,22 +24274,22 @@ export const cs_CZ: EnTranslations = {
       },
       "vanguard_shaman_restoration": {
         "name": "Drátěná košile Solankostráže",
-        "bonus2": "Léčivé vody se sesílají o 0.5 s rychleji na spojence pod 50 % zdraví.",
+        "bonus2": "Léčivé vody se sesílají o 0.5 s rychleji na spojence pod 50 % zdraví. Utržené poškození již nezpožďuje sesílání kouzel.",
         "bonus4": "Volání přílivu navíc zaštítí svůj cíl a pohltí 5 % tvého maximálního zdraví na 6 s."
       },
       "vanguard_warlock_affliction": {
         "name": "Šat Děsopera",
-        "bonus2": "Sesílání Děsu je o 0.3 s kratší.",
+        "bonus2": "Sesílání Děsu je o 0.3 s kratší. Utržené poškození již nezpožďuje sesílání kouzel.",
         "bonus4": "Vysát: uzdraví tě o 30 % více a lze jej kanálovat i za pohybu."
       },
       "vanguard_warlock_demonology": {
         "name": "Regálie Dřeňopouta",
-        "bonus2": "Čas obnovy Bone Armor je kratší o 10 s.",
+        "bonus2": "Čas obnovy Bone Armor je kratší o 10 s. Utržené poškození již nezpožďuje sesílání kouzel.",
         "bonus4": "Reaping Command sníží zbývající čas obnovy Bone Armor o 2 s."
       },
       "vanguard_warlock_destruction": {
         "name": "Šat Struskokoruny",
-        "bonus2": "Čas obnovy Cinderhide je kratší o 30 s.",
+        "bonus2": "Čas obnovy Cinderhide je kratší o 30 s. Utržené poškození již nezpožďuje sesílání kouzel.",
         "bonus4": "Každé druhé Vzplanutí udělá tvůj příští Zkázný šíp do 8 s okamžitým."
       },
       "vanguard_warrior_arms": {
@@ -24320,7 +24320,7 @@ export const cs_CZ: EnTranslations = {
       },
       "warfare_cinderweave": {
         "name": "Regálie žhavotkaní",
-        "bonus2": "Zvyšuje Válečnickou obranu o 40.",
+        "bonus2": "Zvyšuje Válečnickou obranu o 40. Utržené poškození již nezpožďuje sesílání kouzel.",
         "bonus4": "Zvyšuje Válečnický útok o 40 a ovládání seslané na tebe nepřátelskými hráči trvá o 15 % kratší dobu.",
         "bonus7": "Zvyšuje Válečnický útok a obranu o 80. Tvá kouzla mají 15% šanci udělit Žhavou stráž, která po 8 s pohltí 120 poškození."
       },
@@ -24332,13 +24332,13 @@ export const cs_CZ: EnTranslations = {
       },
       "warfare_stormbound": {
         "name": "Bouří svázané roucho",
-        "bonus2": "Zvyšuje Válečnickou obranu o 40.",
+        "bonus2": "Zvyšuje Válečnickou obranu o 40. Utržené poškození již nezpožďuje sesílání kouzel.",
         "bonus4": "Zvyšuje Válečnický útok o 40 a ovládání seslané na tebe nepřátelskými hráči trvá o 15 % kratší dobu.",
         "bonus7": "Zvyšuje Válečnický útok a obranu o 80. Tvá kouzla mají 15% šanci udělit Žhavou stráž, která po 8 s pohltí 120 poškození."
       },
       "warfare_thornhide": {
         "name": "Oděv z trnité kůže",
-        "bonus2": "Zvyšuje Válečnickou obranu o 40.",
+        "bonus2": "Zvyšuje Válečnickou obranu o 40. Utržené poškození již nezpožďuje sesílání kouzel.",
         "bonus4": "Zvyšuje Válečnický útok o 40 a ovládání seslané na tebe nepřátelskými hráči trvá o 15 % kratší dobu.",
         "bonus7": "Zvyšuje Válečnický útok a obranu o 80. Tvá kouzla mají 15% šanci udělit Trnovou stráž, která zvýší uhýbání o 15 % na 6 s."
       },

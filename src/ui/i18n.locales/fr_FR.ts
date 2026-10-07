@@ -1934,7 +1934,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Appelle un coup de tonnerre, infligeant {damage} points de dégâts de Nature aux ennemis dans un rayon de 10 mètres et les ralentissant de 50 % pendant 5 s. Restaure 8 % de votre mana maximum. Les dégâts augmentent avec la puissance des sorts. (Thundercall)',
   'entities.abilities.thunderstorm.name': 'Stormbreak',
   'entities.itemSets.vanguard_druid_balance.bonus2':
-    "Le temps d'incantation de Racines agrippantes est réduit de 0,5 s.",
+    "Le temps d'incantation de Racines agrippantes est réduit de 0,5 s. Les dégâts subis ne retardent plus vos incantations.",
   'entities.itemSets.vanguard_druid_balance.bonus4':
     "Lancer Racines agrippantes vous permet d'incanter en mouvement et augmente votre vitesse de déplacement de 20 % pendant 4 s. Ne peut se produire plus d'une fois toutes les 20 s.",
   'entities.itemSets.vanguard_druid_balance.name': 'Tenue du Garde-étoiles',
@@ -1944,7 +1944,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Ruée de Bruin vous octroie un bouclier égal à 6 % de vos points de vie maximum pendant 6 s.',
   'entities.itemSets.vanguard_druid_feral.name': 'Peau de Crin-sang',
   'entities.itemSets.vanguard_druid_restoration.bonus2':
-    'Le temps de recharge de Prompte guérison est réduit de 1 s.',
+    'Le temps de recharge de Prompte guérison est réduit de 1 s. Les dégâts subis ne retardent plus vos incantations.',
   'entities.itemSets.vanguard_druid_restoration.bonus4':
     'Prompte guérison augmente aussi votre vitesse de déplacement de 30 % pendant 3 s.',
   'entities.itemSets.vanguard_druid_restoration.name': 'Tenue de Fleur-de-chardon',
@@ -1963,21 +1963,22 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_hunter_survival.bonus4': 'Croc sanglant accorde 1 Élan de chasse.',
   'entities.itemSets.vanguard_hunter_survival.name': 'Harnais Croc-piège',
   'entities.itemSets.vanguard_mage_arcane.bonus2':
-    'Le temps de recharge de Barrière temporelle est réduit de 2 s.',
+    'Le temps de recharge de Barrière temporelle est réduit de 2 s. Les dégâts subis ne retardent plus vos incantations.',
   'entities.itemSets.vanguard_mage_arcane.bonus4':
     'Barrière temporelle augmente aussi de 20 % la vitesse de déplacement de la cible protégée pendant 3 s.',
   'entities.itemSets.vanguard_mage_arcane.name': "Tenue du Lieur d'Heures",
-  'entities.itemSets.vanguard_mage_fire.bonus2': 'Pluie de braises se recharge 3 s plus vite.',
+  'entities.itemSets.vanguard_mage_fire.bonus2':
+    'Pluie de braises se recharge 3 s plus vite. Les dégâts subis ne retardent plus vos incantations.',
   'entities.itemSets.vanguard_mage_fire.bonus4':
     'Lancer Pluie de braises réduit de 2 s le temps de recharge restant de Barrière flamboyante.',
   'entities.itemSets.vanguard_mage_fire.name': 'Tenue Fouet-de-braise',
   'entities.itemSets.vanguard_mage_frost.bonus2':
-    "Le temps de recharge d'Entrave de glace est réduit de 2 s.",
+    "Le temps de recharge d'Entrave de glace est réduit de 2 s. Les dégâts subis ne retardent plus vos incantations.",
   'entities.itemSets.vanguard_mage_frost.bonus4':
     'Lancer Entrave de glace réduit de 5 s le temps de recharge restant de Pas fulgurant.',
   'entities.itemSets.vanguard_mage_frost.name': 'Tenue du Garde-givre',
   'entities.itemSets.vanguard_paladin_holy.bonus2':
-    'Le temps de recharge de Pacte de vie est réduit de 30 s.',
+    'Le temps de recharge de Pacte de vie est réduit de 30 s. Les dégâts subis ne retardent plus vos incantations.',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     "Pacte de vie octroie aussi à l'allié un bouclier égal à 8 % de ses points de vie maximum pendant 6 s.",
   'entities.itemSets.vanguard_paladin_holy.name': 'Tenue Veille-soleil',
@@ -1992,17 +1993,17 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "L'Appel de la valkyrie réinitialise le temps de recharge d'Édit final, et votre prochain Édit final lancé dans les 6 s qui suivent inflige 15 % de dégâts en plus.",
   'entities.itemSets.vanguard_paladin_retribution.name': 'Armure de guerre Marque-de-lumière',
   'entities.itemSets.vanguard_priest_discipline.bonus2':
-    'Le temps de recharge de Cri psychique est réduit de 3 s.',
+    'Le temps de recharge de Cri psychique est réduit de 3 s. Les dégâts subis ne retardent plus vos incantations.',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
     "Quand votre Psaume de protection est entièrement consommé, l'allié protégé gagne 20 % de vitesse de déplacement pendant 3 s. Ne peut se produire plus d'une fois toutes les 8 s.",
   'entities.itemSets.vanguard_priest_discipline.name': 'Tenue Psaume-voilé',
   'entities.itemSets.vanguard_priest_holy.bonus2':
-    'Le temps de recharge de Pas du voile est réduit de 6 s.',
+    'Le temps de recharge de Pas du voile est réduit de 6 s. Les dégâts subis ne retardent plus vos incantations.',
   'entities.itemSets.vanguard_priest_holy.bonus4':
     'Pas du voile vous octroie aussi un bouclier égal à 8 % de vos points de vie maximum pendant 6 s.',
   'entities.itemSets.vanguard_priest_holy.name': 'Tenue Aile-de-grâce',
   'entities.itemSets.vanguard_priest_shadow.bonus2':
-    'Litanie du malheur ralentit aussi de 30 % le déplacement de la cible tant que vous la canalisez.',
+    'Litanie du malheur ralentit aussi de 30 % le déplacement de la cible tant que vous la canalisez. Les dégâts subis ne retardent plus vos incantations.',
   'entities.itemSets.vanguard_priest_shadow.bonus4':
     'Invoquer un Démon de dîme vous octroie aussi un bouclier égal à 10 % de vos points de vie maximum pendant 8 s.',
   'entities.itemSets.vanguard_priest_shadow.name': 'Tenue Hymne-du-crépuscule',
@@ -2022,7 +2023,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Coup au ventre accorde 2 points de combo supplémentaires quand il est utilisé depuis Disparition enfumée.',
   'entities.itemSets.vanguard_rogue_subtlety.name': "Cuirs Marche-d'ombre",
   'entities.itemSets.vanguard_shaman_elemental.bonus2':
-    "Le temps de recharge de Déchaîner l'arme est réduit de 3 s.",
+    "Le temps de recharge de Déchaîner l'arme est réduit de 3 s. Les dégâts subis ne retardent plus vos incantations.",
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
     "Déchaîner l'arme vous permet d'incanter en mouvement et augmente votre vitesse de déplacement de 20 % pendant 4 s. Ne peut se produire plus d'une fois toutes les 20 s.",
   'entities.itemSets.vanguard_shaman_elemental.name': 'Mailles de guerre Écrit-de-tempête',
@@ -2032,22 +2033,22 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Frappe ancestrale réduit de 4 s le temps de recharge restant de Transe élémentaire.',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Mailles de guerre Né-du-vent',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    "Eaux guérisseuses s'incante 0,5 s plus vite sur un allié sous 50 % de points de vie.",
+    "Eaux guérisseuses s'incante 0,5 s plus vite sur un allié sous 50 % de points de vie. Les dégâts subis ne retardent plus vos incantations.",
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     'Appel des marées octroie aussi à sa cible un bouclier égal à 5 % de vos points de vie maximum pendant 6 s.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Cotte de mailles Garde-saumâtre',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    "Le temps d'incantation de Tourment est réduit de 0,3 s.",
+    "Le temps d'incantation de Tourment est réduit de 0,3 s. Les dégâts subis ne retardent plus vos incantations.",
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Consumer vous soigne 30 % de plus et peut être canalisé en mouvement.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Tenue Plume-de-terreur',
   'entities.itemSets.vanguard_warlock_demonology.bonus2':
-    "Le temps de recharge d'Armure d'os est réduit de 10 s.",
+    "Le temps de recharge d'Armure d'os est réduit de 10 s. Les dégâts subis ne retardent plus vos incantations.",
   'entities.itemSets.vanguard_warlock_demonology.bonus4':
     "Commandement de la moisson réduit de 2 s le temps de recharge restant d'Armure d'os.",
   'entities.itemSets.vanguard_warlock_demonology.name': 'Tenue Lié-à-la-moelle',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    'Le temps de recharge de Peau de braise est réduit de 30 s.',
+    'Le temps de recharge de Peau de braise est réduit de 30 s. Les dégâts subis ne retardent plus vos incantations.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     'Un Conflagration sur deux rend votre prochain Trait de ruine instantané dans les 8 s qui suivent.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Tenue Couronne-de-scories',
@@ -4862,7 +4863,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Augmente de 80 les scores d'Attaque et de Défense d'Art de la guerre. Tuer un joueur hostile accorde Pas de cendre, augmentant la vitesse de déplacement de 40% pendant 6 s.",
   'entities.itemSets.warfare_ashstalker.name': 'Équipement du traque-cendres',
   'entities.itemSets.warfare_cinderweave.bonus2':
-    "Augmente de 40 le score de Défense d'Art de la guerre.",
+    "Augmente de 40 le score de Défense d'Art de la guerre. Les dégâts subis ne retardent plus vos incantations.",
   'entities.itemSets.warfare_cinderweave.bonus4':
     "Augmente de 40 le score d'Attaque d'Art de la guerre, et le contrôle lancé sur vous par des joueurs hostiles dure 15% de moins.",
   'entities.itemSets.warfare_cinderweave.bonus7':
@@ -4876,14 +4877,14 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Augmente de 80 les scores d'Attaque et de Défense d'Art de la guerre. Tuer un joueur hostile accorde Serment inbrisé, absorbant 200 points de dégâts pendant 10 s.",
   'entities.itemSets.warfare_furyforged.name': 'Tenue de guerre forgée par la fureur',
   'entities.itemSets.warfare_stormbound.bonus2':
-    "Augmente de 40 le score de Défense d'Art de la guerre.",
+    "Augmente de 40 le score de Défense d'Art de la guerre. Les dégâts subis ne retardent plus vos incantations.",
   'entities.itemSets.warfare_stormbound.bonus4':
     "Augmente de 40 le score d'Attaque d'Art de la guerre, et le contrôle lancé sur vous par des joueurs hostiles dure 15% de moins.",
   'entities.itemSets.warfare_stormbound.bonus7':
     "Augmente de 80 les scores d'Attaque et de Défense d'Art de la guerre. Vos sorts ont 15% de chances d'accorder Garde de braise, absorbant 120 points de dégâts pendant 8 s.",
   'entities.itemSets.warfare_stormbound.name': "Vêtements liés à l'orage",
   'entities.itemSets.warfare_thornhide.bonus2':
-    "Augmente de 40 le score de Défense d'Art de la guerre.",
+    "Augmente de 40 le score de Défense d'Art de la guerre. Les dégâts subis ne retardent plus vos incantations.",
   'entities.itemSets.warfare_thornhide.bonus4':
     "Augmente de 40 le score d'Attaque d'Art de la guerre, et le contrôle lancé sur vous par des joueurs hostiles dure 15% de moins.",
   'entities.itemSets.warfare_thornhide.bonus7':
@@ -19805,7 +19806,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'Une victoire classée rapporte de l’Honneur, la monnaie joueur contre joueur, et une défaite jouée jusqu’au bout en rapporte encore une petite part, comme un match nul. La cote est donc le seul vrai coût d’une défaite. L’Honneur récompense les vrais matchs : battre le même adversaire ou la même équipe une seconde fois le même jour ne rapporte plus rien, pas plus qu’une nouvelle défaite contre eux. Une longue journée de victoires paie entièrement la première série, puis les gains sont divisés par deux, puis encore par deux plus loin, où ils restent. Un match abandonné par l’adversaire modifie quand même votre cote mais ne rapporte aucun Honneur. La journée du royaume se réinitialise à l’heure nocturne habituelle, la même limite qui efface les verrouillages quotidiens.',
   'guide.arenaPage.warfareBodyStatsStay':
-    'Chaque pièce de guerre porte une cote d’offensive de guerre et une cote de défense de guerre, et ces cotes n’ont absolument aucun effet contre les monstres. Elles ne s’appliquent que lorsque vous combattez un autre joueur, en duel, dans l’arène ou sur le champ de bataille : l’offensive augmente les dégâts infligés et la défense réduit les dégâts reçus, chacune jusqu’à son propre plafond. Chaque famille d’armure est aussi un ensemble, dont les bonus sont également des cotes ou des effets qui ne fonctionnent que contre les joueurs. Les bonus d’un équipement d’honneur complet ne comptent donc pas contre un boss de donjon. Les pièces gardent leurs statistiques ordinaires, leur armure et leurs dégâts d’arme, qui fonctionnent partout ; seules les cotes et les bonus d’ensemble restent inactifs contre les monstres.',
+    "Chaque pièce de guerre porte une cote d’offensive de guerre et une cote de défense de guerre, et ces cotes n’ont absolument aucun effet contre les monstres. Elles ne s’appliquent que lorsque vous combattez un autre joueur, en duel, dans l’arène ou sur le champ de bataille : l’offensive augmente les dégâts infligés et la défense réduit les dégâts reçus, chacune jusqu’à son propre plafond. Chaque famille d’armure est aussi un ensemble, dont les bonus sont également des cotes ou des effets qui ne fonctionnent que contre les joueurs. Les bonus d’un équipement d’honneur complet ne comptent donc pas contre un boss de donjon. Les pièces gardent leurs statistiques ordinaires, leur armure et leurs dégâts d’arme, qui fonctionnent partout ; seules les cotes et les bonus d’ensemble restent inactifs contre les monstres. Une exception fonctionne partout : deux pièces d'un ensemble de lanceur de sorts empêchent aussi les dégâts subis de retarder vos incantations.",
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'C’est le compromis voulu. L’équipement de guerre sert à combattre les joueurs et ne permet pas de sauter les paliers de donjon : une pièce de guerre ne porte jamais les cotes de combat d’un épique de donjon dans le même emplacement, et les cotes et bonus qu’elle porte sont entièrement consacrés aux autres joueurs. Pour tenir votre rang dans l’arène, achetez-le. Pour terminer les donjons héroïques plus vite, gagnez votre équipement dans les donjons.',
   'guide.controls.harvestJournal': 'Journal des récoltes',

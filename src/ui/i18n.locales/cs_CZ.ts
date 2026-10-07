@@ -1855,7 +1855,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Přivolá úder hromu, který způsobí {damage} přírodního poškození nepřátelům do 10 yardů a zpomalí je o 50 % na 5 s. Obnoví 8 % tvé maximální many. Poškození roste se silou kouzel. (Volání hromu)',
   'entities.abilities.thunderstorm.name': 'Stormbreak',
   'entities.itemSets.vanguard_druid_balance.bonus2':
-    'Sesílání Svazujících kořenů je o 0.5 s kratší.',
+    'Sesílání Svazujících kořenů je o 0.5 s kratší. Utržené poškození již nezpožďuje sesílání kouzel.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'Seslání Svazujících kořenů ti dovolí sesílat za pohybu a zvýší tvou rychlost pohybu o 20 % na 4 s.',
   'entities.itemSets.vanguard_druid_balance.name': 'Roucho Hvězdostrážce',
@@ -1864,7 +1864,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Medvědí výpad tě zaštítí a pohltí 6 % tvého maximálního zdraví na 6 s.',
   'entities.itemSets.vanguard_druid_feral.name': 'Krvohřívová kůže',
   'entities.itemSets.vanguard_druid_restoration.bonus2':
-    'Čas obnovy Rychlého zhojení je kratší o 1 s.',
+    'Čas obnovy Rychlého zhojení je kratší o 1 s. Utržené poškození již nezpožďuje sesílání kouzel.',
   'entities.itemSets.vanguard_druid_restoration.bonus4':
     'Rychlé zhojení navíc zvýší tvou rychlost pohybu o 30 % na 3 s.',
   'entities.itemSets.vanguard_druid_restoration.name': 'Roucho Bodlákokvětu',
@@ -1881,19 +1881,23 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_hunter_survival.bonus2': 'Čas obnovy Krvavého háku je kratší o 3 s.',
   'entities.itemSets.vanguard_hunter_survival.bonus4': 'Krvavý hák udělí 1 Lovecký spád.',
   'entities.itemSets.vanguard_hunter_survival.name': 'Postroj Osidlozubu',
-  'entities.itemSets.vanguard_mage_arcane.bonus2': 'Čas obnovy Časové bariéry je kratší o 2 s.',
+  'entities.itemSets.vanguard_mage_arcane.bonus2':
+    'Čas obnovy Časové bariéry je kratší o 2 s. Utržené poškození již nezpožďuje sesílání kouzel.',
   'entities.itemSets.vanguard_mage_arcane.bonus4':
     'Časová bariéra navíc zvýší rychlost pohybu chráněného cíle o 20 % na 3 s.',
   'entities.itemSets.vanguard_mage_arcane.name': 'Šat Časovazače',
-  'entities.itemSets.vanguard_mage_fire.bonus2': 'Pád škváry se dobíjí o 3 s rychleji.',
+  'entities.itemSets.vanguard_mage_fire.bonus2':
+    'Pád škváry se dobíjí o 3 s rychleji. Utržené poškození již nezpožďuje sesílání kouzel.',
   'entities.itemSets.vanguard_mage_fire.bonus4':
     'Seslání Pádu škváry sníží zbývající čas obnovy Ohnivé bariéry o 2 s.',
   'entities.itemSets.vanguard_mage_fire.name': 'Regálie Žhavobiče',
-  'entities.itemSets.vanguard_mage_frost.bonus2': 'Čas obnovy Ledového spoutání je kratší o 2 s.',
+  'entities.itemSets.vanguard_mage_frost.bonus2':
+    'Čas obnovy Ledového spoutání je kratší o 2 s. Utržené poškození již nezpožďuje sesílání kouzel.',
   'entities.itemSets.vanguard_mage_frost.bonus4':
     'Seslání Ledového spoutání sníží zbývající čas obnovy Kroku mihotání o 5 s.',
   'entities.itemSets.vanguard_mage_frost.name': 'Oděv Jinovatkostrážce',
-  'entities.itemSets.vanguard_paladin_holy.bonus2': 'Čas obnovy Úmluvy života je kratší o 30 s.',
+  'entities.itemSets.vanguard_paladin_holy.bonus2':
+    'Čas obnovy Úmluvy života je kratší o 30 s. Utržené poškození již nezpožďuje sesílání kouzel.',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     'Úmluva života navíc pohltí spojenci 8 % jeho maximálního zdraví na 6 s.',
   'entities.itemSets.vanguard_paladin_holy.name': 'Regálie Slunostráže',
@@ -1908,16 +1912,17 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Volání valkýry obnoví čas obnovy Posledního ediktu a tvůj příští Poslední edikt seslaný do 6 s od dopadu způsobí o 15 % vyšší poškození.',
   'entities.itemSets.vanguard_paladin_retribution.name': 'Válečná zbroj Světlocejchu',
   'entities.itemSets.vanguard_priest_discipline.bonus2':
-    'Čas obnovy Výkřiku hrůzy je kratší o 3 s.',
+    'Čas obnovy Výkřiku hrůzy je kratší o 3 s. Utržené poškození již nezpožďuje sesílání kouzel.',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
     'Když se tvůj Žalm ochrany zcela spotřebuje, chráněný spojenec získá 20 % rychlosti pohybu na 3 s. Nemůže nastat víc než jednou za 8 s.',
   'entities.itemSets.vanguard_priest_discipline.name': 'Háv Závojožalmu',
-  'entities.itemSets.vanguard_priest_holy.bonus2': 'Čas obnovy Kroku závoje je kratší o 6 s.',
+  'entities.itemSets.vanguard_priest_holy.bonus2':
+    'Čas obnovy Kroku závoje je kratší o 6 s. Utržené poškození již nezpožďuje sesílání kouzel.',
   'entities.itemSets.vanguard_priest_holy.bonus4':
     'Krok závoje tě navíc zaštítí a pohltí 8 % tvého maximálního zdraví na 6 s.',
   'entities.itemSets.vanguard_priest_holy.name': 'Háv Milokřídla',
   'entities.itemSets.vanguard_priest_shadow.bonus2':
-    'Litanie běd navíc zpomalí pohyb cíle o 30 %, dokud ji kanáluješ.',
+    'Litanie běd navíc zpomalí pohyb cíle o 30 %, dokud ji kanáluješ. Utržené poškození již nezpožďuje sesílání kouzel.',
   'entities.itemSets.vanguard_priest_shadow.bonus4':
     'Přivolej desátkového běsa: navíc tě zaštítí a pohltí 10 % tvého maximálního zdraví na 8 s.',
   'entities.itemSets.vanguard_priest_shadow.name': 'Regálie Soumrakohymny',
@@ -1934,7 +1939,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_rogue_subtlety.bonus4':
     'Rána do břicha udělí o 2 combo body navíc, když je použita z Kouřového kroku.',
   'entities.itemSets.vanguard_rogue_subtlety.name': 'Kůže Stínochodu',
-  'entities.itemSets.vanguard_shaman_elemental.bonus2': 'Vypusť zbraň: čas obnovy je kratší o 3 s.',
+  'entities.itemSets.vanguard_shaman_elemental.bonus2':
+    'Vypusť zbraň: čas obnovy je kratší o 3 s. Utržené poškození již nezpožďuje sesílání kouzel.',
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
     'Vypusť zbraň: dovolí ti sesílat za pohybu a zvýší tvou rychlost pohybu o 20 % na 4 s. Nemůže nastat víc než jednou za 20 s.',
   'entities.itemSets.vanguard_shaman_elemental.name': 'Bojová zbroj Bouřeznaku',
@@ -1944,20 +1950,22 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Úder předků sníží zbývající čas obnovy Elemental Trance o 4 s.',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Vichrozrozená bojová košile',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    'Léčivé vody se sesílají o 0.5 s rychleji na spojence pod 50 % zdraví.',
+    'Léčivé vody se sesílají o 0.5 s rychleji na spojence pod 50 % zdraví. Utržené poškození již nezpožďuje sesílání kouzel.',
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     'Volání přílivu navíc zaštítí svůj cíl a pohltí 5 % tvého maximálního zdraví na 6 s.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Drátěná košile Solankostráže',
-  'entities.itemSets.vanguard_warlock_affliction.bonus2': 'Sesílání Děsu je o 0.3 s kratší.',
+  'entities.itemSets.vanguard_warlock_affliction.bonus2':
+    'Sesílání Děsu je o 0.3 s kratší. Utržené poškození již nezpožďuje sesílání kouzel.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Vysát: uzdraví tě o 30 % více a lze jej kanálovat i za pohybu.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Šat Děsopera',
-  'entities.itemSets.vanguard_warlock_demonology.bonus2': 'Čas obnovy Bone Armor je kratší o 10 s.',
+  'entities.itemSets.vanguard_warlock_demonology.bonus2':
+    'Čas obnovy Bone Armor je kratší o 10 s. Utržené poškození již nezpožďuje sesílání kouzel.',
   'entities.itemSets.vanguard_warlock_demonology.bonus4':
     'Reaping Command sníží zbývající čas obnovy Bone Armor o 2 s.',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Regálie Dřeňopouta',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    'Čas obnovy Cinderhide je kratší o 30 s.',
+    'Čas obnovy Cinderhide je kratší o 30 s. Utržené poškození již nezpožďuje sesílání kouzel.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     'Každé druhé Vzplanutí udělá tvůj příští Zkázný šíp do 8 s okamžitým.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Šat Struskokoruny',
@@ -4660,7 +4668,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_ashstalker.bonus7':
     'Zvyšuje Válečnický útok a obranu o 80. Zabití nepřátelského hráče udělí Popelný krok, který zvýší rychlost pohybu o 40 % na 6 s.',
   'entities.itemSets.warfare_ashstalker.name': 'Výbava Popelného stopaře',
-  'entities.itemSets.warfare_cinderweave.bonus2': 'Zvyšuje Válečnickou obranu o 40.',
+  'entities.itemSets.warfare_cinderweave.bonus2':
+    'Zvyšuje Válečnickou obranu o 40. Utržené poškození již nezpožďuje sesílání kouzel.',
   'entities.itemSets.warfare_cinderweave.bonus4':
     'Zvyšuje Válečnický útok o 40 a ovládání seslané na tebe nepřátelskými hráči trvá o 15 % kratší dobu.',
   'entities.itemSets.warfare_cinderweave.bonus7':
@@ -4672,13 +4681,15 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_furyforged.bonus7':
     'Zvyšuje Válečnický útok a obranu o 80. Zabití nepřátelského hráče udělí Nezlomenou přísahu, která po 10 s pohltí 200 poškození.',
   'entities.itemSets.warfare_furyforged.name': 'Bojová výbava kovaná zuřivostí',
-  'entities.itemSets.warfare_stormbound.bonus2': 'Zvyšuje Válečnickou obranu o 40.',
+  'entities.itemSets.warfare_stormbound.bonus2':
+    'Zvyšuje Válečnickou obranu o 40. Utržené poškození již nezpožďuje sesílání kouzel.',
   'entities.itemSets.warfare_stormbound.bonus4':
     'Zvyšuje Válečnický útok o 40 a ovládání seslané na tebe nepřátelskými hráči trvá o 15 % kratší dobu.',
   'entities.itemSets.warfare_stormbound.bonus7':
     'Zvyšuje Válečnický útok a obranu o 80. Tvá kouzla mají 15% šanci udělit Žhavou stráž, která po 8 s pohltí 120 poškození.',
   'entities.itemSets.warfare_stormbound.name': 'Bouří svázané roucho',
-  'entities.itemSets.warfare_thornhide.bonus2': 'Zvyšuje Válečnickou obranu o 40.',
+  'entities.itemSets.warfare_thornhide.bonus2':
+    'Zvyšuje Válečnickou obranu o 40. Utržené poškození již nezpožďuje sesílání kouzel.',
   'entities.itemSets.warfare_thornhide.bonus4':
     'Zvyšuje Válečnický útok o 40 a ovládání seslané na tebe nepřátelskými hráči trvá o 15 % kratší dobu.',
   'entities.itemSets.warfare_thornhide.bonus7':
@@ -19202,7 +19213,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'Hodnocené vítězství vyplácí Čest, měnu hráč proti hráči, a dohraný zápas, který prohraješ, stále vyplatí její menší podíl, stejně jako remíza, takže prohra tě doopravdy stojí jen hodnocení. Čest má odměňovat skutečné zápasy: opakované poražení stejného soupeře nebo týmu ve stejný den už nic dalšího nevyplatí a stejně tak další prohra s nimi. Dlouhý vítězný den platí první sérii výher celou odměnou, potom ji půlí, dál ji půlí znovu a na této hodnotě zůstane. Zápas, který soupeř vzdá, ti sice posune hodnocení, ale nevyplatí vůbec žádnou Čest. Den patří vlastnímu času říše a přetočí se při nočním resetu říše, stejné hranici, kdy se mažou všechny denní uzamčení.',
   'guide.arenaPage.warfareBodyStatsStay':
-    'Každý kus Válečnictví nese útočné a obranné hodnocení Válečnictví a tato dvě hodnocení proti nestvůrám nedělají vůbec nic. Platí jen při boji s jiným hráčem, v souboji, aréně nebo na bojišti, kde útok přidává k tvému způsobenému poškození a obrana snižuje poškození, které utržíš, vždy až ke své vlastní hranici. Každá rodina zbroje je také sada a její bonusy jsou rovněž hodnocení Válečnictví nebo účinky fungující jen proti hráčům, takže bonusy celé čestné výbavy se proti bossovi dungeonu nepočítají. Samotné kusy stále nesou běžné statistiky, zbroj a poškození zbraně a ty fungují všude; proti nestvůře mlčí jen hodnocení Válečnictví a bonusy sady.',
+    'Každý kus Válečnictví nese útočné a obranné hodnocení Válečnictví a tato dvě hodnocení proti nestvůrám nedělají vůbec nic. Platí jen při boji s jiným hráčem, v souboji, aréně nebo na bojišti, kde útok přidává k tvému způsobenému poškození a obrana snižuje poškození, které utržíš, vždy až ke své vlastní hranici. Každá rodina zbroje je také sada a její bonusy jsou rovněž hodnocení Válečnictví nebo účinky fungující jen proti hráčům, takže bonusy celé čestné výbavy se proti bossovi dungeonu nepočítají. Samotné kusy stále nesou běžné statistiky, zbroj a poškození zbraně a ty fungují všude; proti nestvůře mlčí jen hodnocení Válečnictví a bonusy sady. Jedna výjimka platí všude: dva kusy sady pro sesilatele navíc zajistí, že utržené poškození nezpožďuje sesílání kouzel.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'To je záměrný obchod. Válečnická výbava je stavěná na boj s hráči, ne jako zkratka přes dungeonové stupně: kus Válečnictví nikdy nenese bojová hodnocení, která má epický dungeonový kus ve stejném slotu, a hodnocení Válečnictví i bonusy sady, které nese místo nich, se utrácejí výhradně proti hráčům. Chceš-li obstát v aréně, kup si ji. Chceš-li rychleji čistit hrdinské dungeony, získávej výbavu v dungeonech.',
   'guide.controls.harvestJournal': 'Sklizňový deník',

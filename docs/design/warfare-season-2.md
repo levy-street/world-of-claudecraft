@@ -31,7 +31,9 @@ cheaper entry tier:
 
 Season 2 combines the two. **Every 2-piece bonus is PvP utility, and every 4-piece builds on
 its own 2-piece.** The 2-piece bends a mobility, control or defensive button. The 4-piece
-adds a follow-up that fires off that button.
+adds a follow-up that fires off that button. The caster sets (Intellect pieces:
+`VANGUARD_CASTER_SET_IDS` in `content/vanguard_set_bonuses.ts`) also grant immunity to
+damage cast pushback at two pieces, the rider the Season 1 caster families carry.
 
 ## The PvE promise: never better than the raid tier in raids
 

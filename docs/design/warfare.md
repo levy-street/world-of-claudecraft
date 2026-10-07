@@ -215,9 +215,15 @@ Breakpoints are 2, 4 and 7 of the seven armor pieces, the same in every family:
 
 | Tier | Bonus |
 | --- | --- |
-| 2 pieces | +40 Warfare Defense Rating |
+| 2 pieces | +40 Warfare Defense Rating (the caster families, Stormbound, Cinderweave and Thornhide, also grant immunity to damage cast pushback) |
 | 4 pieces | +40 Warfare Offense Rating, and crowd control cast on you by hostile players lasts 15 percent less |
 | 7 pieces | +80 Warfare Offense and Defense Rating, plus the family signature |
+
+The caster families' pushback immunity (`PVP_CASTER_SET_2PC_PUSHBACK_REDUCTION` in
+`content/item_sets.ts`) is the one set effect that is not PvP-gated: it folds into
+`Entity.castPushbackReduction` like any stat-set knob, so it works against monsters
+too. The Season 2 caster sets carry the same rider. Pinned by
+`tests/pvp_caster_set_pushback.test.ts`.
 
 The 4-piece wording is deliberate: no pet applies hard crowd control today (pet
 abilities apply slows, damage over time and a spell-vulnerability mark, none of

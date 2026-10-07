@@ -1857,7 +1857,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Kald en tordenskrald ned, der påfører {damage} Naturskade til fjender inden 10 yards og bremser dem med 50% i 5 sek. Gendanner 8% af din maksimale Mana. Skade stiger med Stavekraft. (Tordenråb)',
   'entities.abilities.thunderstorm.name': 'Stormbryder',
   'entities.itemSets.vanguard_druid_balance.bonus2':
-    'Gribende Rødders kasttid reduceres med 0,5 sek.',
+    'Gribende Rødders kasttid reduceres med 0,5 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'Kasting af Gribende Rødder lader dig kaste mens du bevæger dig og øger din bevægelseshastighed med 20 procent i 4 sek. Kan ikke forekomme mere end én gang hver 20 sek.',
   'entities.itemSets.vanguard_druid_balance.name': 'Stjernevogter Gevandter',
@@ -1866,7 +1866,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Bruin-storm skjolder dig for 6 procent af din maksimale sundhed i 6 sek.',
   'entities.itemSets.vanguard_druid_feral.name': 'Blodhane Hud',
   'entities.itemSets.vanguard_druid_restoration.bonus2':
-    'Flugtlægning nedtælling reduceres med 1 sek.',
+    'Flugtlægning nedtælling reduceres med 1 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_druid_restoration.bonus4':
     'Flugtlægning øger også din bevægelseshastighed med 30 procent i 3 sek.',
   'entities.itemSets.vanguard_druid_restoration.name': 'Tidstel Blomst Gevandter',
@@ -1884,19 +1884,22 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_hunter_survival.bonus4': 'Blodkrog tildeler 1 Jagtfart.',
   'entities.itemSets.vanguard_hunter_survival.name': 'Fælde-tand Seletøj',
   'entities.itemSets.vanguard_mage_arcane.bonus2':
-    'Tidslig Barriere nedtælling reduceres med 2 sek.',
+    'Tidslig Barriere nedtælling reduceres med 2 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_mage_arcane.bonus4':
     'Tidslig Barriere øger også den skjermede måls bevægelseshastighed med 20 procent i 3 sek.',
   'entities.itemSets.vanguard_mage_arcane.name': 'Timeværn Gevandter',
-  'entities.itemSets.vanguard_mage_fire.bonus2': 'Gløderfald oplades 3 sek hurtigere.',
+  'entities.itemSets.vanguard_mage_fire.bonus2':
+    'Gløderfald oplades 3 sek hurtigere. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_mage_fire.bonus4':
     'Kasting af Gløderfald reducerer Flammende barriere resterende nedtælling med 2 sek.',
   'entities.itemSets.vanguard_mage_fire.name': 'Glødepisk Kongeligt gevandter',
-  'entities.itemSets.vanguard_mage_frost.bonus2': 'Isbinding nedtælling reduceres med 2 sek.',
+  'entities.itemSets.vanguard_mage_frost.bonus2':
+    'Isbinding nedtælling reduceres med 2 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_mage_frost.bonus4':
     'Kasting af Isbinding reducerer Flittrin resterende nedtælling med 5 sek.',
   'entities.itemSets.vanguard_mage_frost.name': 'Rimevægter Gevandter',
-  'entities.itemSets.vanguard_paladin_holy.bonus2': 'Livets Pagt nedtælling reduceres med 30 sek.',
+  'entities.itemSets.vanguard_paladin_holy.bonus2':
+    'Livets Pagt nedtælling reduceres med 30 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     'Livets Pagt skjolder også allierede for 8 procent af deres maksimale sundhed i 6 sek.',
   'entities.itemSets.vanguard_paladin_holy.name': 'Solbevagt Regalia',
@@ -1910,16 +1913,17 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Valkyriens Kald nulstiller Sidste Påbuds nedtælling, og din næste Sidste Påbud inden 6 sek efter landing påfører 15 procent mere skade.',
   'entities.itemSets.vanguard_paladin_retribution.name': 'Lysmærke Krigs-pladeudstyr',
   'entities.itemSets.vanguard_priest_discipline.bonus2':
-    'Terror Kantike nedtælling reduceres med 3 sek.',
+    'Terror Kantike nedtælling reduceres med 3 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
     'Når din Psalme for værn er fuldt forbrugt, får den skjermede allierede 20 procent bevægelseshastighed i 3 sek. Kan ikke forekomme mere end én gang hver 8 sek.',
   'entities.itemSets.vanguard_priest_discipline.name': 'Slørpsalm Gevandter',
-  'entities.itemSets.vanguard_priest_holy.bonus2': 'Slørspring nedtælling reduceres med 6 sek.',
+  'entities.itemSets.vanguard_priest_holy.bonus2':
+    'Slørspring nedtælling reduceres med 6 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_priest_holy.bonus4':
     'Slørspring skjolder også dig for 8 procent af din maksimale sundhed i 6 sek.',
   'entities.itemSets.vanguard_priest_holy.name': 'Vinger af Nåde Gevandter',
   'entities.itemSets.vanguard_priest_shadow.bonus2':
-    'Jammerens Litani bremser også målets bevægelse med 30 procent mens du kanaliserer den.',
+    'Jammerens Litani bremser også målets bevægelse med 30 procent mens du kanaliserer den. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_priest_shadow.bonus4':
     'Kald Tiende-afgud skjolder også dig for 10 procent af din maksimale sundhed i 8 sek.',
   'entities.itemSets.vanguard_priest_shadow.name': 'Tusmørke Hymne Regalia',
@@ -1936,7 +1940,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Maveslag tildeler 2 yderligere kombinationspunkter når brugt fra Røgfamling.',
   'entities.itemSets.vanguard_rogue_subtlety.name': 'Skygget Læder',
   'entities.itemSets.vanguard_shaman_elemental.bonus2':
-    'Løsriv Våben nedtælling reduceres med 3 sek.',
+    'Løsriv Våben nedtælling reduceres med 3 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
     'Løsriv Våben lader dig kaste mens du bevæger dig og øger din bevægelseshastighed med 20 procent i 4 sek. Kan ikke forekomme mere end én gang hver 20 sek.',
   'entities.itemSets.vanguard_shaman_elemental.name': 'Stormskrift Kampmail',
@@ -1946,21 +1950,22 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Forfædrenes Slag reducerer Elementær Trance resterende nedtælling med 4 sek.',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Stormfødt Krigsmail',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    'Lægende Vande kaster 0,5 sek hurtigere på en allierede under 50 procent sundhed.',
+    'Lægende Vande kaster 0,5 sek hurtigere på en allierede under 50 procent sundhed. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     'Tidevandskald skjolder også sit mål for 5 procent af din maksimale sundhed i 6 sek.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Saltbølge Kædemail',
-  'entities.itemSets.vanguard_warlock_affliction.bonus2': 'Hjemsøg kasttid reduceres med 0,3 sek.',
+  'entities.itemSets.vanguard_warlock_affliction.bonus2':
+    'Hjemsøg kasttid reduceres med 0,3 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Fortær heler dig for 30 procent mere og kan kanaliseres mens du bevæger dig.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Dread Quill Gevandter',
   'entities.itemSets.vanguard_warlock_demonology.bonus2':
-    'Knoglerustning nedtælling reduceres med 10 sek.',
+    'Knoglerustning nedtælling reduceres med 10 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_warlock_demonology.bonus4':
     'Høsting Kommando reducerer Knoglerustning resterende nedtælling med 2 sek.',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Marvbundet Regalia',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    'Cinderhide nedtælling reduceres med 30 sek.',
+    'Cinderhide nedtælling reduceres med 30 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     'Hver anden Antændelse gør din næste Undergangslyn inden 8 sek øjeblikkelig.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Slagkrone Gevandter',
@@ -4659,7 +4664,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_ashstalker.bonus7':
     'Øger Krigsførelsesangreb og Krigsførelsesforsvar med 80. At dræbe en fjendtlig spiller giver Askeskridt, hvilket øger bevægelseshastigheden med 40% i 6 sek.',
   'entities.itemSets.warfare_ashstalker.name': 'Askejæger-udstyr',
-  'entities.itemSets.warfare_cinderweave.bonus2': 'Øger Krigsførelsesforsvar med 40.',
+  'entities.itemSets.warfare_cinderweave.bonus2':
+    'Øger Krigsførelsesforsvar med 40. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.warfare_cinderweave.bonus4':
     'Øger Krigsførelsesangreb med 40, og kontrol, som fjendtlige spillere lægger på jer, varer 15% kortere.',
   'entities.itemSets.warfare_cinderweave.bonus7':
@@ -4671,13 +4677,15 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_furyforged.bonus7':
     'Øger Krigsførelsesangreb og Krigsførelsesforsvar med 80. At dræbe en fjendtlig spiller giver Ubrudt Ed, hvilket absorberer 200 skade i 10 sek.',
   'entities.itemSets.warfare_furyforged.name': 'Raseresmedet kampudstyr',
-  'entities.itemSets.warfare_stormbound.bonus2': 'Øger Krigsførelsesforsvar med 40.',
+  'entities.itemSets.warfare_stormbound.bonus2':
+    'Øger Krigsførelsesforsvar med 40. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.warfare_stormbound.bonus4':
     'Øger Krigsførelsesangreb med 40, og kontrol, som fjendtlige spillere lægger på jer, varer 15% kortere.',
   'entities.itemSets.warfare_stormbound.bonus7':
     'Øger Krigsførelsesangreb og Krigsførelsesforsvar med 80. Jeres besværgelser har 15% chance for at give Gløderværn, hvilket absorberer 120 skade i 8 sek.',
   'entities.itemSets.warfare_stormbound.name': 'Stormbundne klæder',
-  'entities.itemSets.warfare_thornhide.bonus2': 'Øger Krigsførelsesforsvar med 40.',
+  'entities.itemSets.warfare_thornhide.bonus2':
+    'Øger Krigsførelsesforsvar med 40. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.warfare_thornhide.bonus4':
     'Øger Krigsførelsesangreb med 40, og kontrol, som fjendtlige spillere lægger på jer, varer 15% kortere.',
   'entities.itemSets.warfare_thornhide.bonus7':
@@ -19278,7 +19286,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'En sejr i ranglisten giver Ære, spiller-mod-spiller-valutaen, og et nederlag, du spiller til ende, giver stadig en mindre andel, ligesom uafgjort gør, så rang er det eneste, et nederlag virkelig koster dig. Ære skal belønne rigtige kampe: at besejre den samme modstander eller det samme hold igen samme dag giver ikke mere (og det gør et nyt nederlag mod dem heller ikke), en lang sejrsdag giver fuld betaling for dagens første række sejre og halverer derefter sejrsbetalingen, halverer den igen længere inde og bliver der, og en kamp, som modstanderen opgiver, flytter stadig din rang, men giver slet ingen Ære. Dagen følger rigets egen tid: Den skifter ved rigets natlige nulstilling, den samme grænse hvor alle daglige lockouts ryddes.',
   'guide.arenaPage.warfareBodyStatsStay':
-    'Hvert krigsstykke har Krigsoffensiv og Krigsforsvarsvurdering, og de to vurderinger gør slet intet mod monstre. De gælder kun, når du kæmper mod en anden spiller, i en duel, arenaen eller slagmarken, hvor Offensiv øger den skade, du gør, og Forsvar mindsker den skade, du tager, hver op til sin egen grænse. Hver rustningsfamilie er også et sæt, og sættets bonusser er ligeledes krigsvurderinger eller effekter, der kun virker mod spillere, så et komplet æressætets sætbonusser tæller intet mod en dungeonboss. Selve delene har stadig deres almindelige egenskaber, rustning og våbenskade, og de virker overalt. Det er krigsvurderingerne og sætbonusserne, der bliver tavse mod et monster.',
+    'Hvert krigsstykke har Krigsoffensiv og Krigsforsvarsvurdering, og de to vurderinger gør slet intet mod monstre. De gælder kun, når du kæmper mod en anden spiller, i en duel, arenaen eller slagmarken, hvor Offensiv øger den skade, du gør, og Forsvar mindsker den skade, du tager, hver op til sin egen grænse. Hver rustningsfamilie er også et sæt, og sættets bonusser er ligeledes krigsvurderinger eller effekter, der kun virker mod spillere, så et komplet æressætets sætbonusser tæller intet mod en dungeonboss. Selve delene har stadig deres almindelige egenskaber, rustning og våbenskade, og de virker overalt. Det er krigsvurderingerne og sætbonusserne, der bliver tavse mod et monster. Én undtagelse virker overalt: to dele af et besværgersæt gør også, at skade ikke længere forsinker dine besværgelser.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'Det er den tilsigtede handel. Krigsudstyr er bygget til at kæmpe mod spillere, ikke som en genvej forbi dungeon-niveauerne: Et krigsstykke har aldrig de kampratings, som en dungeon-episk genstand i samme plads har, og de krigsvurderinger og sætbonusser, det i stedet har, bruges fuldstændigt på andre spillere. Hvis du vil kunne klare dig i arenaen, så køb det. Hvis du vil rydde heroiske dungeons hurtigere, så tjen dit udstyr i dungeons.',
   'guide.controls.harvestJournal': 'Høstjournal',
