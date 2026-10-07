@@ -12,6 +12,9 @@
 //   hint line names both ways back, and a small prompt offers Resurrect at Corpse
 //   only within the corpse reach. Both are suppressed in a battleground match,
 //   where the wave is the one way back.
+// - The Death Recap stays reachable for the WHOLE ghost run (a battleground
+//   ghost included): releasing hides the corpse overlay and its Recap button, so
+//   a small standalone button takes over until the player is alive again.
 //
 // Allocation-light: the caller owns one view from createDeathPromptView() and
 // this rewrites its fields in place every frame.
@@ -29,6 +32,8 @@ export interface DeathPromptView {
   ghostHint: boolean;
   /** The ghost's Resurrect at Corpse prompt (corpse in reach). */
   ghostPrompt: boolean;
+  /** The ghost's Death Recap button (the whole spirit run). */
+  ghostRecap: boolean;
 }
 
 export function createDeathPromptView(): DeathPromptView {
@@ -38,6 +43,7 @@ export function createDeathPromptView(): DeathPromptView {
     pvpResurrect: false,
     ghostHint: false,
     ghostPrompt: false,
+    ghostRecap: false,
   };
 }
 
@@ -63,5 +69,6 @@ export function updateDeathPromptView(
     !inBgMatch &&
     corpsePos !== null &&
     Math.hypot(pos.x - corpsePos.x, pos.z - corpsePos.z) <= CORPSE_REZ_RANGE;
+  out.ghostRecap = spirit;
   return out;
 }

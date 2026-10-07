@@ -249,6 +249,7 @@ describe('updateDeathPromptView', () => {
       pvpResurrect: true,
       ghostHint: false,
       ghostPrompt: false,
+      ghostRecap: false,
     });
     updateDeathPromptView(v, true, false, false, false, at, null, false);
     expect(v.overlay).toBe(true);
@@ -269,6 +270,7 @@ describe('updateDeathPromptView', () => {
       pvpResurrect: false,
       ghostHint: true,
       ghostPrompt: true,
+      ghostRecap: true,
     });
     updateDeathPromptView(v, true, true, false, false, at, { x: 40, z: 0 }, false);
     expect(v.ghostPrompt, 'out of corpse reach').toBe(false);

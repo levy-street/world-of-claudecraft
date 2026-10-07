@@ -10994,6 +10994,18 @@
     pointer-events: none;
     z-index: 30;
   }
+  /* Ghost Death Recap: a small standalone button under the ghost hint for the whole
+     ghost run, since releasing hides the overlay's Recap. A bare button, no plate,
+     like the ghost prompt; only the button itself takes pointer input. */
+  #ghost-recap-btn {
+    position: absolute;
+    left: 50%;
+    top: 108px;
+    /* translate rather than transform, since .ui-btn:active owns transform for
+       its press nudge. */
+    translate: -50% 0;
+    z-index: 30;
+  }
   /* Interact affordance: a small, NON-BLOCKING line shown only while an interact
      press is ambiguous between two farming targets in reach (a placed feast over
      a garden bed). Sits just above the ghost prompt's band and below the action

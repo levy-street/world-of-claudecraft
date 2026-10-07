@@ -700,6 +700,9 @@
          the spirit is out (hud.ts shows it for a ghost outside a battleground match).
          Pointer-inert, so it never eats a click meant for the world. -->
     <div id="ghost-hint" class="ui-cin" role="status" aria-live="polite" data-i18n="hudChrome.death.ghostHint">Run to the location of your death or talk to the Pale Keeper to revive</div>
+    <!-- Ghost Death Recap: releasing hides the overlay's Recap button, so this small
+         button keeps the recap reachable for the whole ghost run (src/ui/hud/death). -->
+    <button type="button" class="btn ui-btn" id="ghost-recap-btn" style="display: none" data-i18n="hud.core.deathRecapTitle">Death Recap</button>
     <!-- Interact affordance: a small non-blocking line, hidden until an interact press
          is ambiguous between two farming targets in reach (a placed feast over a garden
          bed). role=status so a screen reader hears the ambiguity the sighted line shows;
