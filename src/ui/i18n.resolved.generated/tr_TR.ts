@@ -19512,6 +19512,231 @@ export const tr_TR: EnTranslations = {
       "saltwrack_spaulders": {
         "name": "Saltwrack Spaulders"
       },
+      "brookwatch_vest": {
+        "name": "Brookwatch Vest"
+      },
+      "brookwatch_trousers": {
+        "name": "Brookwatch Trousers"
+      },
+      "brookwatch_moccasins": {
+        "name": "Brookwatch Moccasins"
+      },
+      "brookwatch_cowl": {
+        "name": "Brookwatch Cowl"
+      },
+      "brookwatch_mitts": {
+        "name": "Brookwatch Mitts"
+      },
+      "brookwatch_epaulets": {
+        "name": "Brookwatch Epaulets"
+      },
+      "brookwatch_cinch": {
+        "name": "Brookwatch Cinch"
+      },
+      "hedgerow_vest": {
+        "name": "Hedgerow Vest"
+      },
+      "hedgerow_trousers": {
+        "name": "Hedgerow Trousers"
+      },
+      "hedgerow_moccasins": {
+        "name": "Hedgerow Moccasins"
+      },
+      "hedgerow_cowl": {
+        "name": "Hedgerow Cowl"
+      },
+      "hedgerow_mitts": {
+        "name": "Hedgerow Mitts"
+      },
+      "hedgerow_epaulets": {
+        "name": "Hedgerow Epaulets"
+      },
+      "hedgerow_cinch": {
+        "name": "Hedgerow Cinch"
+      },
+      "bogwalker_vest": {
+        "name": "Bogwalker Vest"
+      },
+      "bogwalker_trousers": {
+        "name": "Bogwalker Trousers"
+      },
+      "bogwalker_moccasins": {
+        "name": "Bogwalker Moccasins"
+      },
+      "bogwalker_cowl": {
+        "name": "Bogwalker Cowl"
+      },
+      "bogwalker_mitts": {
+        "name": "Bogwalker Mitts"
+      },
+      "bogwalker_epaulets": {
+        "name": "Bogwalker Epaulets"
+      },
+      "bogwalker_cinch": {
+        "name": "Bogwalker Cinch"
+      },
+      "thornspire_vest": {
+        "name": "Thornspire Vest"
+      },
+      "thornspire_trousers": {
+        "name": "Thornspire Trousers"
+      },
+      "thornspire_moccasins": {
+        "name": "Thornspire Moccasins"
+      },
+      "thornspire_cowl": {
+        "name": "Thornspire Cowl"
+      },
+      "thornspire_mitts": {
+        "name": "Thornspire Mitts"
+      },
+      "thornspire_epaulets": {
+        "name": "Thornspire Epaulets"
+      },
+      "thornspire_cinch": {
+        "name": "Thornspire Cinch"
+      },
+      "hollowveil_vest": {
+        "name": "Hollowveil Vest"
+      },
+      "hollowveil_trousers": {
+        "name": "Hollowveil Trousers"
+      },
+      "hollowveil_moccasins": {
+        "name": "Hollowveil Moccasins"
+      },
+      "hollowveil_cowl": {
+        "name": "Hollowveil Cowl"
+      },
+      "hollowveil_mitts": {
+        "name": "Hollowveil Mitts"
+      },
+      "hollowveil_epaulets": {
+        "name": "Hollowveil Epaulets"
+      },
+      "hollowveil_cinch": {
+        "name": "Hollowveil Cinch"
+      },
+      "trailwarden_vest": {
+        "name": "Trailwarden Vest"
+      },
+      "trailwarden_trousers": {
+        "name": "Trailwarden Trousers"
+      },
+      "trailwarden_moccasins": {
+        "name": "Trailwarden Moccasins"
+      },
+      "trailwarden_cowl": {
+        "name": "Trailwarden Cowl"
+      },
+      "trailwarden_mitts": {
+        "name": "Trailwarden Mitts"
+      },
+      "trailwarden_epaulets": {
+        "name": "Trailwarden Epaulets"
+      },
+      "trailwarden_cinch": {
+        "name": "Trailwarden Cinch"
+      },
+      "highgale_vest": {
+        "name": "Highgale Vest"
+      },
+      "highgale_trousers": {
+        "name": "Highgale Trousers"
+      },
+      "highgale_moccasins": {
+        "name": "Highgale Moccasins"
+      },
+      "highgale_cowl": {
+        "name": "Highgale Cowl"
+      },
+      "highgale_mitts": {
+        "name": "Highgale Mitts"
+      },
+      "highgale_epaulets": {
+        "name": "Highgale Epaulets"
+      },
+      "highgale_cinch": {
+        "name": "Highgale Cinch"
+      },
+      "breakwater_shoulderguards": {
+        "name": "Breakwater Shoulderguards"
+      },
+      "breakwater_pauldrons": {
+        "name": "Breakwater Pauldrons"
+      },
+      "breakwater_epaulets": {
+        "name": "Breakwater Epaulets"
+      },
+      "gravebell_moccasins": {
+        "name": "Gravebell Moccasins"
+      },
+      "oathbroken_trousers": {
+        "name": "Oathbroken Trousers"
+      },
+      "sparkglass_trousers": {
+        "name": "Sparkglass Trousers"
+      },
+      "stillhymn_moccasins": {
+        "name": "Stillhymn Moccasins"
+      },
+      "sealkeeper_mitts": {
+        "name": "Sealkeeper Mitts"
+      },
+      "fetterbound_trousers": {
+        "name": "Fetterbound Trousers"
+      },
+      "wyrmshadow_vest": {
+        "name": "Wyrmshadow Vest"
+      },
+      "cinderbrood_spaulders": {
+        "name": "Cinderbrood Spaulders"
+      },
+      "cinderbrood_epaulets": {
+        "name": "Cinderbrood Epaulets"
+      },
+      "hoarfrost_shoulderguards": {
+        "name": "Hoarfrost Shoulderguards"
+      },
+      "hoarfrost_pauldrons": {
+        "name": "Hoarfrost Pauldrons"
+      },
+      "hoarfrost_epaulets": {
+        "name": "Hoarfrost Epaulets"
+      },
+      "blackmere_epaulets": {
+        "name": "Blackmere Epaulets"
+      },
+      "reedhush_epaulets": {
+        "name": "Reedhush Epaulets"
+      },
+      "cairnking_epaulets": {
+        "name": "Cairnking Epaulets"
+      },
+      "palehunt_epaulets": {
+        "name": "Palehunt Epaulets"
+      },
+      "jadeshrine_epaulets": {
+        "name": "Jadeshrine Epaulets"
+      },
+      "gildhedge_shoulderguards": {
+        "name": "Gildhedge Shoulderguards"
+      },
+      "gildhedge_pauldrons": {
+        "name": "Gildhedge Pauldrons"
+      },
+      "gildhedge_epaulets": {
+        "name": "Gildhedge Epaulets"
+      },
+      "saltwrack_shoulderguards": {
+        "name": "Saltwrack Shoulderguards"
+      },
+      "saltwrack_pauldrons": {
+        "name": "Saltwrack Pauldrons"
+      },
+      "saltwrack_epaulets": {
+        "name": "Saltwrack Epaulets"
+      },
       "membership_token": {
         "name": "Membership Token (30 Days)"
       },

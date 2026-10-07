@@ -19512,6 +19512,231 @@ export const ko_KR: EnTranslations = {
       "saltwrack_spaulders": {
         "name": "소금난파 어깨보호구"
       },
+      "brookwatch_vest": {
+        "name": "개울감시 조끼"
+      },
+      "brookwatch_trousers": {
+        "name": "개울감시 바지"
+      },
+      "brookwatch_moccasins": {
+        "name": "개울감시 모카신"
+      },
+      "brookwatch_cowl": {
+        "name": "개울감시 카울"
+      },
+      "brookwatch_mitts": {
+        "name": "개울감시 벙어리장갑"
+      },
+      "brookwatch_epaulets": {
+        "name": "개울감시 견장"
+      },
+      "brookwatch_cinch": {
+        "name": "개울감시 조임띠"
+      },
+      "hedgerow_vest": {
+        "name": "산울타리 조끼"
+      },
+      "hedgerow_trousers": {
+        "name": "산울타리 바지"
+      },
+      "hedgerow_moccasins": {
+        "name": "산울타리 모카신"
+      },
+      "hedgerow_cowl": {
+        "name": "산울타리 카울"
+      },
+      "hedgerow_mitts": {
+        "name": "산울타리 벙어리장갑"
+      },
+      "hedgerow_epaulets": {
+        "name": "산울타리 견장"
+      },
+      "hedgerow_cinch": {
+        "name": "산울타리 조임띠"
+      },
+      "bogwalker_vest": {
+        "name": "늪방랑자 조끼"
+      },
+      "bogwalker_trousers": {
+        "name": "늪방랑자 바지"
+      },
+      "bogwalker_moccasins": {
+        "name": "늪방랑자 모카신"
+      },
+      "bogwalker_cowl": {
+        "name": "늪방랑자 카울"
+      },
+      "bogwalker_mitts": {
+        "name": "늪방랑자 벙어리장갑"
+      },
+      "bogwalker_epaulets": {
+        "name": "늪방랑자 견장"
+      },
+      "bogwalker_cinch": {
+        "name": "늪방랑자 조임띠"
+      },
+      "thornspire_vest": {
+        "name": "가시첨탑 조끼"
+      },
+      "thornspire_trousers": {
+        "name": "가시첨탑 바지"
+      },
+      "thornspire_moccasins": {
+        "name": "가시첨탑 모카신"
+      },
+      "thornspire_cowl": {
+        "name": "가시첨탑 카울"
+      },
+      "thornspire_mitts": {
+        "name": "가시첨탑 벙어리장갑"
+      },
+      "thornspire_epaulets": {
+        "name": "가시첨탑 견장"
+      },
+      "thornspire_cinch": {
+        "name": "가시첨탑 조임띠"
+      },
+      "hollowveil_vest": {
+        "name": "그늘장막 조끼"
+      },
+      "hollowveil_trousers": {
+        "name": "그늘장막 바지"
+      },
+      "hollowveil_moccasins": {
+        "name": "그늘장막 모카신"
+      },
+      "hollowveil_cowl": {
+        "name": "그늘장막 카울"
+      },
+      "hollowveil_mitts": {
+        "name": "그늘장막 벙어리장갑"
+      },
+      "hollowveil_epaulets": {
+        "name": "그늘장막 견장"
+      },
+      "hollowveil_cinch": {
+        "name": "그늘장막 조임띠"
+      },
+      "trailwarden_vest": {
+        "name": "길지킴이 조끼"
+      },
+      "trailwarden_trousers": {
+        "name": "길지킴이 바지"
+      },
+      "trailwarden_moccasins": {
+        "name": "길지킴이 모카신"
+      },
+      "trailwarden_cowl": {
+        "name": "길지킴이 카울"
+      },
+      "trailwarden_mitts": {
+        "name": "길지킴이 벙어리장갑"
+      },
+      "trailwarden_epaulets": {
+        "name": "길지킴이 견장"
+      },
+      "trailwarden_cinch": {
+        "name": "길지킴이 조임띠"
+      },
+      "highgale_vest": {
+        "name": "높바람 조끼"
+      },
+      "highgale_trousers": {
+        "name": "높바람 바지"
+      },
+      "highgale_moccasins": {
+        "name": "높바람 모카신"
+      },
+      "highgale_cowl": {
+        "name": "높바람 카울"
+      },
+      "highgale_mitts": {
+        "name": "높바람 벙어리장갑"
+      },
+      "highgale_epaulets": {
+        "name": "높바람 견장"
+      },
+      "highgale_cinch": {
+        "name": "높바람 조임띠"
+      },
+      "breakwater_shoulderguards": {
+        "name": "방파제 어깨받이"
+      },
+      "breakwater_pauldrons": {
+        "name": "방파제 어깨갑옷"
+      },
+      "breakwater_epaulets": {
+        "name": "방파제 견장"
+      },
+      "gravebell_moccasins": {
+        "name": "무덤종 모카신"
+      },
+      "oathbroken_trousers": {
+        "name": "맹세파기 바지"
+      },
+      "sparkglass_trousers": {
+        "name": "불꽃수정 바지"
+      },
+      "stillhymn_moccasins": {
+        "name": "고요찬가 모카신"
+      },
+      "sealkeeper_mitts": {
+        "name": "봉인지기 벙어리장갑"
+      },
+      "fetterbound_trousers": {
+        "name": "족쇄속박 바지"
+      },
+      "wyrmshadow_vest": {
+        "name": "용그림자 조끼"
+      },
+      "cinderbrood_spaulders": {
+        "name": "잿불무리 어깨보호구"
+      },
+      "cinderbrood_epaulets": {
+        "name": "잿불무리 견장"
+      },
+      "hoarfrost_shoulderguards": {
+        "name": "서리꽃 어깨받이"
+      },
+      "hoarfrost_pauldrons": {
+        "name": "서리꽃 어깨갑옷"
+      },
+      "hoarfrost_epaulets": {
+        "name": "서리꽃 견장"
+      },
+      "blackmere_epaulets": {
+        "name": "검은호수 견장"
+      },
+      "reedhush_epaulets": {
+        "name": "갈대고요 견장"
+      },
+      "cairnking_epaulets": {
+        "name": "돌무덤왕 견장"
+      },
+      "palehunt_epaulets": {
+        "name": "창백한사냥 견장"
+      },
+      "jadeshrine_epaulets": {
+        "name": "비취사당 견장"
+      },
+      "gildhedge_shoulderguards": {
+        "name": "금빛울타리 어깨받이"
+      },
+      "gildhedge_pauldrons": {
+        "name": "금빛울타리 어깨갑옷"
+      },
+      "gildhedge_epaulets": {
+        "name": "금빛울타리 견장"
+      },
+      "saltwrack_shoulderguards": {
+        "name": "소금난파 어깨받이"
+      },
+      "saltwrack_pauldrons": {
+        "name": "소금난파 어깨갑옷"
+      },
+      "saltwrack_epaulets": {
+        "name": "소금난파 견장"
+      },
       "membership_token": {
         "name": "멤버십 토큰 (30일)"
       },

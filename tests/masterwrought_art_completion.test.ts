@@ -830,7 +830,9 @@ describe('Masterwrought art completion evidence', () => {
     // outside it.
     // + the 8 membership and 7 referral paintings (PR 4281): 1,800, likewise
     // outside it.
-    expect(currentOwnerIds).toHaveLength(1800);
+    // + the 75 quest role-fill paintings (quest-role-fill-icons-2026-10-07): 1,860, likewise outside
+    // it.
+    expect(currentOwnerIds).toHaveLength(1875);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -965,18 +967,20 @@ describe('Masterwrought art completion evidence', () => {
     expect(datedIds.filter((id) => hoardBranchIds.has(id))).toEqual([]);
     expect(currentOwnerIds.filter((id) => hoardBranchIds.has(id))).toHaveLength(119);
     // The choose-one leveling quest armor (quest-leveling-gear-icons-2026-10-06)
-    // and its rares (quest-blue-rewards-icons-2026-10-07), additive beyond the
-    // dated completion union like the hoard batches.
+    // and its rares (quest-blue-rewards-icons-2026-10-07) and role fill
+    // (quest-role-fill-icons-2026-10-07), additive beyond the dated completion union like the hoard
+    // batches.
     const questGearIds = new Set(
       mapping.generatedBatches
         .filter(
           ({ batchId }) =>
             batchId === 'quest-leveling-gear-icons-2026-10-06' ||
-            batchId === 'quest-blue-rewards-icons-2026-10-07',
+            batchId === 'quest-blue-rewards-icons-2026-10-07' ||
+            batchId === 'quest-role-fill-icons-2026-10-07',
         )
         .flatMap(({ itemIds }) => itemIds),
     );
-    expect(questGearIds.size).toBe(321);
+    expect(questGearIds.size).toBe(396);
     expect(datedIds.filter((id) => questGearIds.has(id))).toEqual([]);
 
     // Membership paintings are additive; they do not amend the dated approval.

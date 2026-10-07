@@ -854,7 +854,7 @@ describe('item-art consistency accepted-art provenance', () => {
     // The Emissary's Cache chest: 1,322. The Clue Scroll items (clue_scroll,
     // treasure_casket): 1,323. The faction ladder rework's 17 new rows
     // (13 periphery pieces + 4 formulas): 1,340. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,341. the trinket slot's 18 trinkets (PR 4173): 1,359. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s 139 honor items: 1,498.
-    expect(Object.keys(ITEMS)).toHaveLength(1953);
+    expect(Object.keys(ITEMS)).toHaveLength(2028);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -1024,9 +1024,12 @@ describe('item-art consistency accepted-art provenance', () => {
     // 1,938 items.
     // + the 8 membership and 7 referral paintings (PR 4281): 1,800 owners over
     // 1,953 items.
-    expect(new Set(currentOwnerIds).size).toBe(1800);
-    expect(shippingIds).toHaveLength(1800);
-    expect(Object.keys(ITEMS)).toHaveLength(1953);
+    // + the 75 quest role-fill paintings (quest-role-fill-icons-2026-10-07): 1,860 owners over
+    // 2,013 items.
+    // Both on the membership integration: 1,875 owners over 2,028 items.
+    expect(new Set(currentOwnerIds).size).toBe(1875);
+    expect(shippingIds).toHaveLength(1875);
+    expect(Object.keys(ITEMS)).toHaveLength(2028);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1164,16 +1167,18 @@ describe('item-art consistency accepted-art provenance', () => {
     expect(hoardLootBatchIds).toHaveLength(96);
     expect(sorted(hoardLootBatchIds)).toEqual(sorted(Object.keys(HOARD_ITEMS)));
     // The choose-one leveling quest armor (quest-leveling-gear-icons-2026-10-06)
-    // and its rares (quest-blue-rewards-icons-2026-10-07): one painting per
-    // generated item id, pinned against the live table.
+    // and its rares (quest-blue-rewards-icons-2026-10-07) and role fill
+    // (quest-role-fill-icons-2026-10-07): one painting per generated item id, pinned against the
+    // live table.
     const questGearBatchIds = mapping.generatedBatches
       .filter(
         ({ batchId }) =>
           batchId === 'quest-leveling-gear-icons-2026-10-06' ||
-          batchId === 'quest-blue-rewards-icons-2026-10-07',
+          batchId === 'quest-blue-rewards-icons-2026-10-07' ||
+          batchId === 'quest-role-fill-icons-2026-10-07',
       )
       .flatMap(({ itemIds }) => itemIds);
-    expect(questGearBatchIds).toHaveLength(321);
+    expect(questGearBatchIds).toHaveLength(396);
     expect(sorted(questGearBatchIds)).toEqual(sorted(Object.keys(QUEST_LEVELING_GEAR_ITEMS)));
     const membershipBatchIds = mapping.generatedBatches
       .filter(({ batchId }) => batchId === 'membership-items-2026-10-05')
@@ -1415,9 +1420,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // (trinket-slot-icons-2026-09-23) = 37. Warfare Season 2's weapon
     // batch (warfare-season2-weapons-2026-09-25) = 38. The choose-one leveling
     // quest gear batch (quest-leveling-gear-icons-2026-10-06) joins at 42, and its
-    // rares (quest-blue-rewards-icons-2026-10-07) at 43; the membership and referral batches
-    // (PR 4281) bring it to 45.
-    expect(mapping.generatedBatches).toHaveLength(45);
+    // rares (quest-blue-rewards-icons-2026-10-07) at 43, the role fill
+    // (quest-role-fill-icons-2026-10-07) at 44; the membership and referral
+    // batches (PR 4281) bring it to 46.
+    expect(mapping.generatedBatches).toHaveLength(46);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1488,14 +1494,16 @@ describe('item-art consistency accepted-art provenance', () => {
     // batches (18 faction reward paintings, 5 treasure-map family, 96 hoard boss
     // loot) add 119 at the 2026-09-28 release merge: 934. The choose-one
     // leveling quest armor batch (quest-leveling-gear-icons-2026-10-06) adds 245:
-    // 1179. Its rares (quest-blue-rewards-icons-2026-10-07) add 76: 1255. Membership adds 8 and referral armour 7: 1270.
-    expect(priorGeneratedIds).toHaveLength(1270);
+    // 1179. Its rares (quest-blue-rewards-icons-2026-10-07) add 76: 1255. The
+    // role fill (quest-role-fill-icons-2026-10-07) adds 75: 1330. Membership adds 8
+    // and referral armour 7: 1345.
+    expect(priorGeneratedIds).toHaveLength(1345);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1800);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1800);
+    expect(allCurrentOwnerIds).toHaveLength(1875);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1875);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1511,8 +1519,9 @@ describe('item-art consistency accepted-art provenance', () => {
       // + the Buried Hoards branch's 119 paintings (three batches) = 934.
       // + the 245 choose-one leveling quest armor paintings = 1179.
       // + the 76 quest blue reward rares = 1255.
-      // + 8 membership paintings + 7 referral paintings = 1270.
-      priorGenerated: 1270,
+      // + the 75 quest role-fill paintings = 1330.
+      // + 8 membership paintings + 7 referral paintings = 1345.
+      priorGenerated: 1345,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1594,6 +1603,7 @@ describe('item-art consistency accepted-art provenance', () => {
                 'quest-blue-rewards-icons-2026-10-07',
                 'membership-items-2026-10-05',
                 'referral-items-2026-10-07',
+                'quest-role-fill-icons-2026-10-07',
               ].includes(batchId),
           )
           .flatMap(({ itemIds }) => itemIds),
@@ -1743,10 +1753,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // Plus the world-quest branch's four quest-item owners at the release/v0.43.0
     // merge = 1302. Plus the weekly emissary's cache chest = 1303. Plus the two
     // Clue Scroll owners = 1305. Plus the 17 faction ladder owners
-    // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464. Plus the 245 choose-one leveling quest armor paintings (quest-leveling-gear-icons-2026-10-06) = 1709. Plus the 76 quest blue reward rares (quest-blue-rewards-icons-2026-10-07) = 1785. Plus the 8 membership paintings and the 7 referral paintings = 1800.
-    if (ownerIds.length !== 1800)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1800`);
-    if (fileIds.length !== 1800) violations.push(`shipping WebP count: ${fileIds.length} != 1800`);
+    // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464. Plus the 245 choose-one leveling quest armor paintings (quest-leveling-gear-icons-2026-10-06) = 1709. Plus the 76 quest blue reward rares (quest-blue-rewards-icons-2026-10-07) = 1785. Plus the 75 quest role-fill paintings (quest-role-fill-icons-2026-10-07) = 1860. Plus the 8 membership paintings and the 7 referral paintings = 1875.
+    if (ownerIds.length !== 1875)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1875`);
+    if (fileIds.length !== 1875) violations.push(`shipping WebP count: ${fileIds.length} != 1875`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

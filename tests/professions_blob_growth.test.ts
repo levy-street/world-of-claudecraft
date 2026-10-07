@@ -2165,15 +2165,15 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     };
     expect(referralIds.size).toBe(7);
     const beforeReferralBytes = Buffer.byteLength(JSON.stringify(withoutReferral), 'utf8');
-    // 240,222 on the membership integration: the release's 233,515 plus the
-    // quest gear (+5,019) and quest blues (+1,688) underneath.
-    expect(beforeReferralBytes).toBe(240222);
+    // 241,763 on the membership integration: the release's 233,515 plus the
+    // quest gear (+5,019), quest blues (+1,688) and role fill (+1,541) underneath.
+    expect(beforeReferralBytes).toBe(241763);
     expect(bytes - beforeReferralBytes).toBe(122);
     expect(fieldBytes(s2, 'deedStats') - fieldBytes(withoutReferral, 'deedStats')).toBe(122);
     // Membership adds eight discoverable item ids and no character entitlement
     // fields. Isolate the measured content-only growth from the settled save:
-    // 233,360 -> 233,515 bytes, all 155 bytes in itemsDiscovered (240,067 ->
-    // 240,222 with the quest gear and blues underneath). Removing only those ids
+    // 233,360 -> 233,515 bytes, all 155 bytes in itemsDiscovered (241,608 ->
+    // 241,763 with the quest gear, blues and role fill underneath). Removing only those ids
     // must reproduce the preceding measurement exactly.
     const membershipIds = new Set(Object.keys(MEMBERSHIP_ITEMS));
     const withoutMembership: CharacterState = {
@@ -2187,7 +2187,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     };
     expect(membershipIds.size).toBe(8);
     const beforeMembershipBytes = Buffer.byteLength(JSON.stringify(withoutMembership), 'utf8');
-    expect(beforeMembershipBytes).toBe(240067);
+    expect(beforeMembershipBytes).toBe(241608);
     expect(beforeReferralBytes - beforeMembershipBytes).toBe(155);
     expect(
       fieldBytes(withoutReferral, 'deedStats') - fieldBytes(withoutMembership, 'deedStats'),
@@ -2499,6 +2499,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // 76 x 3; quest rares carry no Reliquary pages either). Predicted from the
         // literals BEFORE the run and MEASURED equal (82,223 to 83,911).
         1688 +
+        // Plus 1,541 at the quest role fill: the 49 leather caster greens and the
+        // 26 rares of the own-armor rule (1,541 = the ids' characters plus 75 x 3,
+        // no Reliquary pages). Predicted from the literals BEFORE the run and
+        // MEASURED equal (83,911 to 85,452).
+        1541 +
         // Membership's eight discoverable item ids, isolated from withoutReferral above.
         155,
     );
@@ -2548,9 +2553,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // merge: Warfare Season 2's 139 item ids (the 13,496 attributed above).
       // deedStats 9,427 -> 14,446 at the choose-one leveling quest gear: its
       // 245 item ids (the +5,019 above), then -> 16,134 at the quest blue
-      // rewards' 76 rare ids (the +1,688 above), then -> 16,289 with membership
-      // item discovery (+155, measured above).
-      deedStats: 16289,
+      // rewards' 76 rare ids (the +1,688 above), then -> 17,675 at the quest
+      // role fill's 75 ids (the +1,541 above).
+      // Then -> 17,830 with membership item discovery (+155, measured above).
+      deedStats: 17830,
       reliquary: 11501,
     });
     // Removing field_kit AND the Bramblehide release content reproduces the
@@ -2591,8 +2597,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 231,729 -> 236,748 at the choose-one leveling quest gear (+5,019, the
       // 245 item ids attributed above, kept here).
       // 236,748 -> 238,436 at the quest blue rewards (+1,688, the 76 rare ids).
-      // Membership's eight discovered item ids remain here: +155 bytes (238,591).
-    ).toBe(238591);
+      // 238,436 -> 239,977 at the quest role fill (+1,541, the 75 ids).
+      // Membership's eight discovered item ids remain here: +155 bytes (240,132).
+    ).toBe(240132);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2622,8 +2629,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 227,857 -> 233,348 at the 2026-09-28 Buried Hoards merge (+5,491, kept).
       // 233,348 -> 238,367 at the choose-one leveling quest gear (+5,019, kept).
       // 238,367 -> 240,055 at the quest blue rewards (+1,688, kept).
-      // Membership's eight discovered item ids remain here: +155 bytes (240,210).
-    ).toBe(240210);
+      // 240,055 -> 241,596 at the quest role fill (+1,541, kept).
+      // Membership's eight discovered item ids remain here: +155 bytes (241,751).
+    ).toBe(241751);
     const priorContent = withoutCrucibleContent(withoutReferral);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2733,12 +2741,17 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // RE-BASED for referral armour: measured 233,637 bytes, exactly +122
     // from the seven discovery ids isolated above. Trusted inviter/account
     // entitlement stays outside CharacterState. Preserve the same 381-byte band.
-    // RE-BASED at the membership integration (quest gear, quest blues, memberships
-    // and referral armour together): 240,344 bytes = 233,360 + 5,019 + 1,688 + 155
-    // + 122, each attributed above. Floor at measurement minus 380, edge at
-    // measurement plus one: 239964..240345.
-    expect(bytes, reMint).toBeGreaterThan(239964);
-    expect(bytes, reMint).toBeLessThan(240345);
+    // RE-BASED at the quest role fill: 241,608 bytes, up 1,541 from 240,067:
+    // the 75 leather caster and own-armor ids in deedStats.itemsDiscovered,
+    // attributed above (predicted and measured equal); no container or ceiling
+    // changed shape. Floor at measurement minus 380, edge at measurement plus
+    // one: 241228..241609.
+    // RE-BASED at the membership integration (quest gear, quest blues, the role
+    // fill, memberships and referral armour together): 241,885 bytes = 233,360 +
+    // 5,019 + 1,688 + 1,541 + 155 + 122, each attributed above. Floor at
+    // measurement minus 380, edge at measurement plus one: 241505..241886.
+    expect(bytes, reMint).toBeGreaterThan(241505);
+    expect(bytes, reMint).toBeLessThan(241886);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

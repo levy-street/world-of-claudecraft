@@ -19512,6 +19512,231 @@ export const ru_RU: EnTranslations = {
       "saltwrack_spaulders": {
         "name": "Наплечники солёных обломков"
       },
+      "brookwatch_vest": {
+        "name": "Жилет дозора у ручья"
+      },
+      "brookwatch_trousers": {
+        "name": "Брюки дозора у ручья"
+      },
+      "brookwatch_moccasins": {
+        "name": "Мокасины дозора у ручья"
+      },
+      "brookwatch_cowl": {
+        "name": "Куколь дозора у ручья"
+      },
+      "brookwatch_mitts": {
+        "name": "Митенки дозора у ручья"
+      },
+      "brookwatch_epaulets": {
+        "name": "Эполеты дозора у ручья"
+      },
+      "brookwatch_cinch": {
+        "name": "Подпояска дозора у ручья"
+      },
+      "hedgerow_vest": {
+        "name": "Жилет живой изгороди"
+      },
+      "hedgerow_trousers": {
+        "name": "Брюки живой изгороди"
+      },
+      "hedgerow_moccasins": {
+        "name": "Мокасины живой изгороди"
+      },
+      "hedgerow_cowl": {
+        "name": "Куколь живой изгороди"
+      },
+      "hedgerow_mitts": {
+        "name": "Митенки живой изгороди"
+      },
+      "hedgerow_epaulets": {
+        "name": "Эполеты живой изгороди"
+      },
+      "hedgerow_cinch": {
+        "name": "Подпояска живой изгороди"
+      },
+      "bogwalker_vest": {
+        "name": "Жилет болотного странника"
+      },
+      "bogwalker_trousers": {
+        "name": "Брюки болотного странника"
+      },
+      "bogwalker_moccasins": {
+        "name": "Мокасины болотного странника"
+      },
+      "bogwalker_cowl": {
+        "name": "Куколь болотного странника"
+      },
+      "bogwalker_mitts": {
+        "name": "Митенки болотного странника"
+      },
+      "bogwalker_epaulets": {
+        "name": "Эполеты болотного странника"
+      },
+      "bogwalker_cinch": {
+        "name": "Подпояска болотного странника"
+      },
+      "thornspire_vest": {
+        "name": "Жилет тернового шпиля"
+      },
+      "thornspire_trousers": {
+        "name": "Брюки тернового шпиля"
+      },
+      "thornspire_moccasins": {
+        "name": "Мокасины тернового шпиля"
+      },
+      "thornspire_cowl": {
+        "name": "Куколь тернового шпиля"
+      },
+      "thornspire_mitts": {
+        "name": "Митенки тернового шпиля"
+      },
+      "thornspire_epaulets": {
+        "name": "Эполеты тернового шпиля"
+      },
+      "thornspire_cinch": {
+        "name": "Подпояска тернового шпиля"
+      },
+      "hollowveil_vest": {
+        "name": "Жилет сокрытой лощины"
+      },
+      "hollowveil_trousers": {
+        "name": "Брюки сокрытой лощины"
+      },
+      "hollowveil_moccasins": {
+        "name": "Мокасины сокрытой лощины"
+      },
+      "hollowveil_cowl": {
+        "name": "Куколь сокрытой лощины"
+      },
+      "hollowveil_mitts": {
+        "name": "Митенки сокрытой лощины"
+      },
+      "hollowveil_epaulets": {
+        "name": "Эполеты сокрытой лощины"
+      },
+      "hollowveil_cinch": {
+        "name": "Подпояска сокрытой лощины"
+      },
+      "trailwarden_vest": {
+        "name": "Жилет стража троп"
+      },
+      "trailwarden_trousers": {
+        "name": "Брюки стража троп"
+      },
+      "trailwarden_moccasins": {
+        "name": "Мокасины стража троп"
+      },
+      "trailwarden_cowl": {
+        "name": "Куколь стража троп"
+      },
+      "trailwarden_mitts": {
+        "name": "Митенки стража троп"
+      },
+      "trailwarden_epaulets": {
+        "name": "Эполеты стража троп"
+      },
+      "trailwarden_cinch": {
+        "name": "Подпояска стража троп"
+      },
+      "highgale_vest": {
+        "name": "Жилет буревого гребня"
+      },
+      "highgale_trousers": {
+        "name": "Брюки буревого гребня"
+      },
+      "highgale_moccasins": {
+        "name": "Мокасины буревого гребня"
+      },
+      "highgale_cowl": {
+        "name": "Куколь буревого гребня"
+      },
+      "highgale_mitts": {
+        "name": "Митенки буревого гребня"
+      },
+      "highgale_epaulets": {
+        "name": "Эполеты буревого гребня"
+      },
+      "highgale_cinch": {
+        "name": "Подпояска буревого гребня"
+      },
+      "breakwater_shoulderguards": {
+        "name": "Наплечные щитки волнолома"
+      },
+      "breakwater_pauldrons": {
+        "name": "Наплечья волнолома"
+      },
+      "breakwater_epaulets": {
+        "name": "Эполеты волнолома"
+      },
+      "gravebell_moccasins": {
+        "name": "Мокасины погребального колокола"
+      },
+      "oathbroken_trousers": {
+        "name": "Брюки нарушенной клятвы"
+      },
+      "sparkglass_trousers": {
+        "name": "Брюки искрящегося стекла"
+      },
+      "stillhymn_moccasins": {
+        "name": "Мокасины безмолвного гимна"
+      },
+      "sealkeeper_mitts": {
+        "name": "Митенки хранителя печати"
+      },
+      "fetterbound_trousers": {
+        "name": "Брюки тяжких оков"
+      },
+      "wyrmshadow_vest": {
+        "name": "Жилет тени змея"
+      },
+      "cinderbrood_spaulders": {
+        "name": "Наплечники пепельного выводка"
+      },
+      "cinderbrood_epaulets": {
+        "name": "Эполеты пепельного выводка"
+      },
+      "hoarfrost_shoulderguards": {
+        "name": "Наплечные щитки изморози"
+      },
+      "hoarfrost_pauldrons": {
+        "name": "Наплечья изморози"
+      },
+      "hoarfrost_epaulets": {
+        "name": "Эполеты изморози"
+      },
+      "blackmere_epaulets": {
+        "name": "Эполеты чёрного озера"
+      },
+      "reedhush_epaulets": {
+        "name": "Эполеты тихого камыша"
+      },
+      "cairnking_epaulets": {
+        "name": "Эполеты курганного короля"
+      },
+      "palehunt_epaulets": {
+        "name": "Эполеты бледной охоты"
+      },
+      "jadeshrine_epaulets": {
+        "name": "Эполеты нефритового святилища"
+      },
+      "gildhedge_shoulderguards": {
+        "name": "Наплечные щитки золочёной изгороди"
+      },
+      "gildhedge_pauldrons": {
+        "name": "Наплечья золочёной изгороди"
+      },
+      "gildhedge_epaulets": {
+        "name": "Эполеты золочёной изгороди"
+      },
+      "saltwrack_shoulderguards": {
+        "name": "Наплечные щитки солёных обломков"
+      },
+      "saltwrack_pauldrons": {
+        "name": "Наплечья солёных обломков"
+      },
+      "saltwrack_epaulets": {
+        "name": "Эполеты солёных обломков"
+      },
       "membership_token": {
         "name": "Жетон членства (30 дней)"
       },

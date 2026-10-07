@@ -152,13 +152,17 @@ const build = await buildItemArtAudit({
     // 1785 / 1803 on 39 sheet pages, measured the same way.
     // + PR 4281's 8 membership and 7 referral paintings on the membership
     // integration: 1800 / 1818 on 39 sheet pages, measured the same way.
-    catalogCount: 1800,
-    liveItemCount: 1818,
+    // + the 75 quest role-fill paintings (quest-role-fill-icons-2026-10-07):
+    // 1860 / 1878 on 39 sheet pages, measured the same way.
+    // Both on the membership integration: 1875 / 1893 on 40 sheet pages, measured
+    // the same way.
+    catalogCount: 1875,
+    liveItemCount: 1893,
     pendingArtCount: 135,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,
     heroicWeaponArtAliases: 19,
-    sheetPageCount: 39,
+    sheetPageCount: 40,
     groupCount: 26,
   },
 });
