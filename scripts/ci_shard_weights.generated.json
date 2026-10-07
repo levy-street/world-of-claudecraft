@@ -2,8 +2,8 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4817,
-    "harvestedFiles": 3948,
+    "files": 4816,
+    "harvestedFiles": 3947,
     "carried": {
       "tests/ability_imbue_text.test.ts": {
         "ms": 1954,
@@ -10429,7 +10429,6 @@
   "tests/mount_preview_framing_core.test.ts": 4,
   "tests/mount_preview_lifecycle.test.ts": 6,
   "tests/mount_prewarm.test.ts": 432,
-  "tests/mount_quick_summon.test.ts": 9,
   "tests/mount_race.test.ts": 6716,
   "tests/mount_race_ui.test.ts": 13,
   "tests/mount_race_view.test.ts": 9,
