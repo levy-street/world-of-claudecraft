@@ -25,6 +25,20 @@ export interface LetterDef {
   delaySeconds?: number;
 }
 
+export const MEMBERSHIP_TOKEN_LETTER: LetterDef = {
+  letterId: 'membership_token_delivery',
+  senderName: 'The Ravenpost',
+  subject: 'Your membership token',
+  body: 'Your purchased token is enclosed. Redeem it to add 30 days of membership to your account, or trade it with another adventurer.',
+};
+
+export const MEMBERSHIP_ANNUAL_LETTER: LetterDef = {
+  letterId: 'membership_annual_reward',
+  senderName: 'The Ravenpost',
+  subject: 'Your annual membership mount',
+  body: 'Your annual membership payment is complete. Your tank mount key is enclosed. Keep the key in your bags or bank to own this mount. It remains yours after membership expires. Riding skill is required.',
+};
+
 // The one-time service letter. Sent to every character that has never been
 // welcomed (new characters right away, pre-mail characters on their next
 // login), so it doubles as the feature announcement.
@@ -600,6 +614,8 @@ export function authoredLettersById(): Record<string, LetterDef> {
     [WOC_MARKET_RETURN_LETTER.letterId]: WOC_MARKET_RETURN_LETTER,
     [WOC_MARKET_SOLD_LETTER.letterId]: WOC_MARKET_SOLD_LETTER,
     [HOARD_REWARD_LETTER.letterId]: HOARD_REWARD_LETTER,
+    [MEMBERSHIP_TOKEN_LETTER.letterId]: MEMBERSHIP_TOKEN_LETTER,
+    [MEMBERSHIP_ANNUAL_LETTER.letterId]: MEMBERSHIP_ANNUAL_LETTER,
   };
   for (const letter of Object.values(QUEST_LETTERS)) byId[letter.letterId] = letter;
   for (const letter of Object.values(GUILD_TREND_LETTERS)) byId[letter.letterId] = letter;

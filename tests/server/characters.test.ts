@@ -70,7 +70,16 @@ type DbOverrides = Parameters<typeof setCharactersDbOverrides>[0];
 
 /** Every override stays Postgres-free now that signer rekeys always read fresh state. */
 function setCharactersDbForTests(overrides: DbOverrides): void {
-  setCharactersDbOverrides({ rekeyOfflineCharacterSigner: async () => true, ...overrides });
+  setCharactersDbOverrides({
+    getMembership: async () => ({
+      active: false,
+      expiresAt: null,
+      authorizedUntil: 0,
+      recurringExpiresAt: null,
+    }),
+    rekeyOfflineCharacterSigner: async () => true,
+    ...overrides,
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -399,9 +408,13 @@ describe('character list handlers', () => {
 
     const expected = {
       realm: REALM,
+      membership: { active: false, expiresAt: null },
+      characterLimit: 10,
       characters: [
         {
           id: 1,
+          membershipSlot: false,
+          membershipLocked: false,
           name: 'Aaa',
           class: 'warrior',
           level: 10,
@@ -426,6 +439,8 @@ describe('character list handlers', () => {
         },
         {
           id: 2,
+          membershipSlot: false,
+          membershipLocked: false,
           name: 'Bbb',
           class: 'mage',
           level: 5,

@@ -7,13 +7,13 @@
 // read as a second unrelated top level to a screen reader). Their
 // aria-controls are stamped below, once each panel exists.
 // Pure bank-pane tab markup; panel relationships are completed by the window.
-export type BankTabId = 'personal' | 'vault' | 'guild' | 'rewards';
+export type BankTabId = 'personal' | 'vault' | 'guild' | 'rewards' | 'account';
 
 import { t } from './i18n';
 import { tabStripHtml, tabStripModel } from './tab_strip_view';
 export function bankTabsHtml(
   selected: BankTabId,
-  available: { guild: boolean; vault: boolean },
+  available: { guild: boolean; vault: boolean; account?: boolean },
 ): string {
   if (selected === 'rewards') return '';
   return tabStripHtml(
@@ -24,6 +24,9 @@ export function bankTabsHtml(
       selectedClass: 'on is-on',
       tabs: [
         { id: 'personal', label: t('hudChrome.bank.personalTab') },
+        ...(available.account
+          ? [{ id: 'account', label: t('hudChrome.bank.accountTab'), buttonId: 'bank-tab-account' }]
+          : []),
         // The two conditional tabs carry stable button ids so their
         // panels can point aria-labelledby back at them. The vault sits
         // between Personal and Guild: both personal stores first, the

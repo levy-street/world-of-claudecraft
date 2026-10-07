@@ -58,7 +58,6 @@ import { shouldDrawLegacyCastSparkle, syncAbilityVfxCast } from './ability_vfx_r
 import { ABILITY_VFX_SPECS } from './ability_vfx_specs';
 import { AbyssalRiftFx } from './abyssal_rift_fx';
 import { ActionCamRig } from './action_cam_core';
-import { AfflictionFamiliar } from './affliction_familiar';
 import { type AmberFeaturesView, buildAmberFeatures } from './amber_features';
 import { createAmbienceState, sampleAmbienceInto } from './ambience_state_core';
 import { isVisuallyDead } from './anim_state';
@@ -455,6 +454,7 @@ import {
 } from './link_rate_budget';
 import { runWorldGateTouchLane } from './linked_program_touch_lane';
 import * as liveProgramWatch from './live_program_watch';
+import { LocalPlayerVisuals } from './local_player_visuals';
 import {
   type LocoState,
   type LocoTrack,
@@ -797,7 +797,6 @@ import {
   trackLocalPos,
 } from './travel_speed_fx';
 import { TravelSpeedFxPainter } from './travel_speed_fx_painter';
-import { UmbralAnchorMarker } from './umbral_anchor_marker';
 import { UnderwaterView } from './underwater';
 import { createPrewarmGroupSlot, createVariantPrewarmSlot } from './variant_prewarm_slot';
 import { routeVarkhulForgeHammer } from './varkhul_forge_hammer';
@@ -2260,8 +2259,7 @@ export class Renderer {
       LOW_GFX ? 90 : 190,
       LOW_GFX ? 325 : 700,
     );
-    setRenderCategory(this.umbralAnchorMarker.group, 'vfx');
-    this.scene.add(this.umbralAnchorMarker.group);
+    this.localVisuals.attach();
     this.detailFogFar = (this.scene.fog as THREE.Fog).far;
 
     // The biome haze field, built BEFORE any surface that samples it (the
@@ -8651,9 +8649,9 @@ export class Renderer {
   // Affliction's primary and Coven eyes remain actionable on every graphics tier.
   private readonly evilEyeMarkers = new EvilEyeMarkers();
   private readonly burningPactMarkers = new BurningPactMarkers();
-  private readonly umbralAnchorMarker = new UmbralAnchorMarker(this.groundSample);
-  // The approved Maledict Eye is cosmetic: one local, non-targetable Affliction familiar.
-  private readonly afflictionFamiliar = new AfflictionFamiliar(() => this.worldCompileGate());
+  private readonly localVisuals = new LocalPlayerVisuals(this.scene, this.groundSample, () =>
+    this.worldCompileGate(),
+  );
   // Delve module interiors build asynchronously; the tracker also retires a
   // position's stale geometry when a new run puts a different module there
   // (see delve_interior_tracker.ts).
@@ -11579,13 +11577,14 @@ export class Renderer {
     this.yumiTeamMarkers.update(this.sim, this.views);
     this.evilEyeMarkers.update(this.sim, this.views, this.reducedMotion());
     this.burningPactMarkers.update(this.sim, this.views, this.reducedMotion());
-    this.umbralAnchorMarker.update(
-      this.sim.entities.get(this.sim.playerId),
-      this.time,
+    this.localVisuals.update(
+      this.sim,
+      this.views,
       this.reducedMotion(),
+      this.time,
+      dt,
       this.lowGfx,
     );
-    this.afflictionFamiliar.update(this.sim, this.views, this.reducedMotion(), this.time);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'vfx', worldStart);
 
     this.camYaw += deckCameraTurn(sim, this.camBoom, this.lastLocalPos, this.camMirror);
@@ -12036,6 +12035,7 @@ export class Renderer {
   dispose(): void {
     setBuildSpanSink(null);
     this.cancelTerrainStreaming();
+    this.localVisuals.dispose();
     this.nameplatePainter.dispose();
     this.travelSpeedFx.dispose();
     this.worldGuidance?.dispose();

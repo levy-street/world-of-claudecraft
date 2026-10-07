@@ -218,4 +218,12 @@ export const ENTITY_GATE_STAND_INS: readonly EntityGateStandIn[] = [
     standIn:
       "the station ENTITY itself, whose own view (the invisible click proxy the feast also gets, quest_objects.ts buildGroundQuestObject with no item) and nameplate (nameplate_view.ts feastNear, which admits a mobile-station templateId within INTERACT_RANGE + 1) never ride this gate, so the owner's name and the tool read on approach whatever the link state; the crafting gate itself reads the sim slot, never the prop, so a held cluster delays decoration only, bounded by GATED_ATTACH_WATCHDOG_MS",
   },
+  {
+    gate: 'attachSceneGroupGated',
+    file: 'src/render/courier_visual.ts',
+    callSite: 'void attachSceneGroupGated(',
+    hides: 'the owner-only cosmetic flying donkey while its material compiles',
+    standIn:
+      'the Courier window status and cargo remain available through the action bar; transport uses authoritative simulation state independently of the model',
+  },
 ];

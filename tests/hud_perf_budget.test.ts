@@ -565,6 +565,19 @@ interface ScannedPainter {
 // pooled node, both at build; fct also forces ONE documented offsetWidth reflow to restart
 // the float animation on a recycled node.
 const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
+  // Bank meter construction runs only behind BankWindow's unchanged-data guard.
+  // No driver or layout reads; these writes initialize newly created nodes.
+  {
+    file: 'bank_meter_painter.ts',
+    allow: {
+      '.className': 5,
+      '.setAttribute': 2,
+      '.textContent': 1,
+      '.style': 4,
+      '.setProperty': 4,
+    },
+    reflowAllow: {},
+  },
   { file: 'micro_menu_state_painter.ts', allow: {}, reflowAllow: {} },
   // Sixteen construction-only class assignments; all update writes use the shared facet.
   {
@@ -1041,6 +1054,8 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   // cost with one of each too. Interleaving a read BETWEEN the writes is what
   // would make this thrash, and nothing here does.)
   { file: 'bank_window.ts', reflowAllow: { '.scrollTop': 6 }, driverAllow: {} },
+  // Preserve the single courier body scroll offset only across a changed render.
+  { file: 'hud/courier/courier_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   // The scroll pair and the rAF both belonged to the mount picker's
   // scroll-the-selected-card-into-view path, which went away when reins became
   // usable items and the picker was deleted. The sheet now reads nothing and

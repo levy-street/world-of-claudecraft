@@ -1,3 +1,4 @@
+import { courierStrings } from './courier';
 // i18n source catalog - in-game HUD chrome strings that were previously hard-coded
 // at their call sites (emote wheel/editor, swing timer, rest indicator, mobile
 // controls, minimap/compass/clock widgets, DPS/HPS meters formatting). English
@@ -13,6 +14,7 @@ import { professionTrainerStrings } from './profession_trainers';
 import { weeklyRewardStrings } from './weekly_rewards';
 
 export const hudChromeStrings = {
+  courier: courierStrings,
   framePresets: {
     apply: 'Apply',
     pickerLabel: 'Frame Presets: {name}',
@@ -545,6 +547,59 @@ export const hudChromeStrings = {
     },
   },
   wocStore: {
+    subscription: {
+      title: 'Game subscription',
+      monthlyTitle: 'Monthly membership',
+      annualTitle: '12-month membership bundle',
+      annualPrice: '{price} for 12 months, paid upfront',
+      annualTerms:
+        'Renews yearly at the same price. Pay with fiat through Stripe. Cancel in billing settings.',
+      annualMount:
+        'After payment, collect a soulbound tank mount key by mail on the character that purchased this bundle. The tank is a placeholder for the bundle mount.',
+      trialTerms:
+        'Try membership free for {days} days, once per account. A payment method is required. You will be charged {price} when the trial ends unless you cancel.',
+      startTrial: 'Start 7-day free trial',
+      resumeCheckout: 'Resume checkout',
+      checkoutClosed:
+        'This checkout has closed without an outstanding reward. Choose a membership plan again to start a new checkout.',
+      annualClaim: 'Collect bundle mount',
+      annualPending:
+        'Return to the purchasing character after payment to collect the bundle mount. If payment is processing or the trial is active, try again after the paid charge.',
+      annualDelivered: 'Your bundle mount key has been delivered by mail.',
+      tokenTitle: 'Tradable membership token',
+      benefitsTitle: 'Active membership benefits',
+      benefitBank: "Access your other characters' banks at any banker.",
+      benefitSlots: 'Unlock 10 additional character slots.',
+      benefitArmour:
+        'Claim soulbound armour with stats for your class and specialisation. It scales with your level and reaches item level 25 at level 20. Wear the full set for 20% more XP.',
+      benefitTax: 'Pay half the normal auction house tax.',
+      benefitExpiry:
+        'When membership ends, characters in the additional slots and armour bonuses are locked until renewal. Your base character slots remain playable.',
+      tokenTerms:
+        '{price} once for 30 days. Delivered by mail to this character. Redeem it to add membership time, or sell it at the auction house.',
+      tokenBuy: 'Buy membership token',
+      tokenClaim: 'Collect purchased token',
+      tokenPending:
+        'After payment, return to this character and collect your token. If payment is still processing, try again shortly.',
+      tokenDelivered: 'Your token has been delivered by mail.',
+      price: '{price} per month',
+      terms: 'Renews monthly. Pay with fiat through Stripe. Cancel in billing settings.',
+      subscribe: 'Subscribe',
+      manage: 'Manage subscription',
+      ending: 'Cancels at the end of the billing period',
+      error: 'Could not open billing. Allow popups and try again.',
+      status: {
+        none: 'Not subscribed',
+        incomplete: 'Payment incomplete',
+        incomplete_expired: 'Checkout expired',
+        trialing: 'Trial',
+        active: 'Active',
+        past_due: 'Payment overdue',
+        canceled: 'Canceled',
+        unpaid: 'Unpaid',
+        paused: 'Paused',
+      },
+    },
     title: 'WOC Store',
     close: 'Close WOC Store',
     tabsLabel: 'WOC Store sections',
@@ -6737,6 +6792,19 @@ export const hudChromeStrings = {
     // M16: the five non-Latin fills land in this same change.)
     tabsAria: 'Bank tabs',
     personalTab: 'Personal',
+    accountTab: 'Other characters',
+    accountArmour: 'Claim membership armour',
+    referralArmour: 'Claim friendship armour',
+    accountMembership: "An active membership lets you access your other characters' banks here.",
+    accountCharacters: 'Character banks',
+    accountEmpty: 'Create another character to use their bank here.',
+    accountSelect: 'Select a character to load their bank.',
+    accountUnavailable: 'This bank is unavailable. Select the character again to refresh.',
+    accountDeposit: 'Your bags: deposit into this bank',
+    accountWithdraw: 'Selected bank: withdraw into your bags',
+    accountDepositHint: 'Click to deposit this stack into the selected character bank.',
+    accountWithdrawHint: 'Click to withdraw this stack into your bags.',
+    accountBound: 'Soulbound, locked and quest items cannot move between characters.',
     guildTab: 'Guild',
     guildCapacityAria: 'Guild bank slots used: {used} of {total}',
     guildEmpty: 'The guild bank is empty.',

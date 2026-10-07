@@ -25,5 +25,7 @@ export function writePlayerIdentityWire(e: Entity, out: Record<string, unknown>)
   if (e.guildTier) out.gt = e.guildTier; // guild colour tier (sim/guild_tier.ts)
   if (e.title) out.title = e.title; // Book of Deeds active title (a deed id; the client localizes)
   if (e.border) out.border = e.border; // Book of Deeds nameplate border (a deed id; the client resolves the slug)
+  if (e.referralInviterName) out.ran = e.referralInviterName; // bounded display name; account IDs stay host-only
+  if (e.membershipActive) out.mba = true; // active adaptive armour, no billing details
   if (e.specId) out.spc = e.specId; // chosen talent spec (a spec id; the client localizes)
 }

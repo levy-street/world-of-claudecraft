@@ -9,7 +9,14 @@ import type { Entity } from '../src/sim/types';
 
 type IdentitySlice = Pick<
   Entity,
-  'guild' | 'pledgeGuild' | 'guildTier' | 'title' | 'border' | 'specId'
+  | 'guild'
+  | 'pledgeGuild'
+  | 'guildTier'
+  | 'title'
+  | 'border'
+  | 'specId'
+  | 'membershipActive'
+  | 'referralInviterName'
 >;
 
 const encode = (slice: IdentitySlice): Record<string, unknown> => {
@@ -26,9 +33,21 @@ const NONE: IdentitySlice = {
   title: null,
   border: null,
   specId: null,
+  membershipActive: false,
 };
 
 describe('player identity wire', () => {
+  it('round-trips only the inviter display name and clears absent or malformed names', () => {
+    const wire = encode({ ...NONE, referralInviterName: 'Aldric' });
+    expect(wire).toEqual({ ran: 'Aldric' });
+    expect(decodePlayerIdentityWire(wire).referralInviterName).toBe('Aldric');
+    const player = { ...decodePlayerIdentityWire(wire) };
+    Object.assign(player, decodePlayerIdentityWire({}));
+    expect(player.referralInviterName).toBeUndefined();
+    for (const ran of [false, 42, {}, [], '', ' ', 'a'.repeat(33)]) {
+      expect(decodePlayerIdentityWire({ ran }).referralInviterName).toBeUndefined();
+    }
+  });
   it('ships no bytes for an unguilded, untitled, unspecced player', () => {
     expect(encode(NONE)).toEqual({});
     expect(decodePlayerIdentityWire({})).toEqual(NONE);
@@ -43,6 +62,7 @@ describe('player identity wire', () => {
         title: 'deed_title',
         border: 'deed_border',
         specId: 'holy',
+        membershipActive: false,
       }),
     ).toEqual({
       gd: 'Order of Dawn',
@@ -65,6 +85,7 @@ describe('player identity wire', () => {
       title: 'deed_title',
       border: 'deed_border',
       specId: 'restoration',
+      membershipActive: true,
     };
     expect(decodePlayerIdentityWire(encode(full))).toEqual(full);
     const pledged: IdentitySlice = { ...NONE, pledgeGuild: 'Dawnwardens', guildTier: 1 };
@@ -75,6 +96,14 @@ describe('player identity wire', () => {
     const specced = decodePlayerIdentityWire(encode({ ...NONE, specId: 'arms' }));
     expect(specced.specId).toBe('arms');
     expect(decodePlayerIdentityWire(encode({ ...NONE, specId: null })).specId).toBeNull();
+  });
+
+  it('shows worn membership benefits to peers and clears them on expiry', () => {
+    expect(encode({ ...NONE, membershipActive: true })).toEqual({ mba: true });
+    expect(decodePlayerIdentityWire({ mba: true }).membershipActive).toBe(true);
+    for (const mba of [undefined, false, 1, 'true']) {
+      expect(decodePlayerIdentityWire({ mba }).membershipActive).toBe(false);
+    }
   });
 
   it('reads a malformed spec value as no spec rather than printing it', () => {

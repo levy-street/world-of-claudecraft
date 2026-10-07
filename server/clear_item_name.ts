@@ -8,7 +8,7 @@
 // Maker's Bond boundTo stamp in perfecting.ts; a craft-time head start is
 // unbound but never Perfected, so every Perfected copy is bound) and the
 // unbind service refuses a Perfecting-bound copy outright (commission.ts,
-// unbind_perfecting), which is what makes the five-region character walk
+// unbind_perfecting), which is what makes the owned-container character walk
 // below provably exhaustive for every legal writer: no guild bank, market
 // listing, mail parcel, or other character can ever hold a named copy, so
 // stripping the one character strips every copy there is. (The proof's
@@ -58,6 +58,7 @@
 // the corrected state is durable. The initial online check remains the local
 // operator guard; the transaction is the cross-process authority.
 
+import { COURIER_CAPACITY } from '../src/sim/courier/types';
 import type { CharacterState } from '../src/sim/sim';
 import { type EquipSlot, isEquipSlot } from '../src/sim/types';
 
@@ -197,7 +198,7 @@ function stripName(instance: { name?: string } | undefined): boolean {
 
 /**
  * Delete ItemInstancePayload.name at `target` across the persisted blob's
- * payload-bearing regions: carried inventory, bank inventory, the vendor
+ * payload-bearing regions: carried inventory, bank inventory, courier cargo, the vendor
  * buyback ring, and the equipped-instance map under BOTH its spellings (the
  * rekeyInstanceSigner region walk; a slot target touches only the equipment
  * maps, a bag target only its exact cell when the item id still matches).
@@ -222,6 +223,11 @@ export function stripLegendaryNames(state: CharacterState, target: ClearItemName
     if (stripName(slot.instance)) cleared++;
   }
   for (const slot of state.bank?.inventory ?? []) {
+    if (stripName(slot.instance)) cleared++;
+  }
+  // Cargo remains owned by this character while travelling. The load path
+  // refuses more than COURIER_CAPACITY stacks; bound this raw-blob walk too.
+  for (const slot of (state.courier?.cargo ?? []).slice(0, COURIER_CAPACITY)) {
     if (stripName(slot.instance)) cleared++;
   }
   for (const slot of state.vendorBuyback ?? []) {

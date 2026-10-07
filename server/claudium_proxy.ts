@@ -272,7 +272,7 @@ async function callServiceDetailed<T>(req: ServiceRequest): Promise<ServiceCallO
   }
 }
 
-async function callService<T>(req: ServiceRequest): Promise<T | null> {
+export async function callService<T>(req: ServiceRequest): Promise<T | null> {
   return (await callServiceDetailed<T>(req)).data;
 }
 

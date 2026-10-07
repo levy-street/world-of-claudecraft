@@ -6,6 +6,7 @@
 import type { SavedBankState } from './bank';
 import type { SavedLoadout, TalentAllocation } from './content/talents';
 import type { SavedCooldowns } from './cooldown_persist';
+import type { CourierState } from './courier';
 import type { SavedDeedStats } from './deeds';
 import type { PlayerEquipment } from './entity';
 import type { JailState } from './jail';
@@ -99,6 +100,8 @@ export interface CharacterState {
   // SavedBankState socket fields are optional and written only once a socket is
   // unlocked, so pre-socket and zero-socket saves stay byte-equal.
   bank?: SavedBankState;
+  /** Forward-only cargo custody. Do not roll back to a binary that drops it. */
+  courier?: CourierState;
   // Per-character Materials Vault (JSONB; optional so pre-vault saves load cleanly,
   // defaulting to the empty locked vault). sanitizeVaultState is the one load path
   // (never destroys stock; tolerates an over-capacity count).

@@ -1,4 +1,5 @@
 import { STORAGE_SKU_LIST } from '../sim/content/storage_charters';
+import type { SubscriptionStoreHooks } from '../subscription_contract';
 import type { DailyRewardHistory, DailyRewardStatus, IWorld } from '../world_api';
 import { armorySectionHtml } from './armory_card_view';
 import { ArmoryInspect } from './armory_inspect';
@@ -44,7 +45,9 @@ import {
   StoreFocusStash,
 } from './store_focus_policy';
 import { armoryInspectDeps, mountInspectDeps } from './store_inspect_deps';
+import type { dailyRewardsStoreSnapshot } from './store_snapshot_adapter';
 import { storeSpendControllers } from './store_spend_controllers';
+import { StoreSubscription } from './store_subscription';
 import { StoreSurfaceRuntime } from './store_surface_runtime';
 import { usdDollarsText } from './usd_text';
 import {
@@ -99,6 +102,7 @@ interface CharterNotice {
 export type { StoreSpendResult };
 
 export interface DailyRewardsWindowDeps {
+  subscriptionHooks?(): SubscriptionStoreHooks | undefined;
   root(): HTMLElement;
   world(): IWorld;
   closeOthers(): void;
@@ -110,11 +114,7 @@ export interface DailyRewardsWindowDeps {
   onStatus?(status: DailyRewardStatus): void;
   onWalletConnect?(): void;
   storeEnabled?(): boolean;
-  storeSnapshot?(): Promise<{
-    available: boolean;
-    balance: number | null;
-    items: WocStoreItemInput[];
-  }>;
+  storeSnapshot?(): Promise<ReturnType<typeof dailyRewardsStoreSnapshot>>;
   spendStoreItem?(
     itemId: string,
     kind: 'cosmetic' | 'skin' | 'item' | 'storage',
@@ -147,6 +147,7 @@ export class DailyRewardsWindow {
   private mountInspect: MountInspect | null = null;
   private armoryGraphicsRestoreSkinId: string | null = null;
   private mountGraphicsRestoreSkinId: string | null = null;
+  private readonly subscription = new StoreSubscription(() => this.deps.subscriptionHooks?.());
   private storeLoading = false;
   private storeReady = false;
   private previewFetched = false;
@@ -473,6 +474,7 @@ export class DailyRewardsWindow {
     this.storeError = false;
     this.storeRuntime.setLoading(this.storeLoading);
     try {
+      if (!opts.background) await this.subscription.refresh();
       const snapshot = (await this.deps.storeSnapshot?.()) ?? {
         available: false,
         balance: null,
@@ -590,6 +592,7 @@ export class DailyRewardsWindow {
       `<div class="woc-store-hero"><div><span>${esc(t('hudChrome.wocStore.armoryEyebrow'))}</span><h2>${esc(t('hudChrome.wocStore.armoryTitle'))}</h2><p>${esc(t('hudChrome.wocStore.armoryBody'))}</p></div>` +
       `<div class="woc-store-balance"><img src="/claudium/icons/claudium_coin_64.webp" alt=""><span>${esc(t('hudChrome.wocStore.balance'))}</span><strong>${balance}</strong><button type="button" data-buy-claudium${focusKeyAttr('topup')}>${esc(t('hudChrome.wocStore.buyClaudium'))}</button></div></div>` +
       notice +
+      this.subscription.html() +
       this.storeSpend.mounts.sectionHtml() +
       this.charterNoticeHtml() +
       armory +
@@ -668,7 +671,8 @@ export class DailyRewardsWindow {
     });
     const wiped = this.replaceStoreBody(
       body,
-      `<div class="dr-empty dr-error" role="alert">${esc(t('hudChrome.wocStore.error'))}</div>`,
+      `<div class="dr-empty dr-error" role="alert">${esc(t('hudChrome.wocStore.error'))}</div>` +
+        this.subscription.html(),
     );
     // An ELIDED repaint destroyed no control, so its target is still mounted and
     // the stash is still the right return place: same rule as the normal path.
@@ -710,6 +714,7 @@ export class DailyRewardsWindow {
     // the card they just used. Same idiom as the bank window's grid repaint.
     const scrollTop = body.scrollTop;
     body.innerHTML = markup;
+    this.subscription.bind(body);
     body.scrollTop = scrollTop;
     this.paintedStoreBody = body;
     this.paintedStoreMarkup = markup;
