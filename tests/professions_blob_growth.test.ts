@@ -2442,7 +2442,22 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // itemsDiscovered (+2,889), the hoardGoblinKills counter (+26), and the 32
         // hoard gear reliquary.firstFind rows plus the conquerors_buried_hoards page
         // (+1,761), Blaine's itemization; MEASURED on the 2026-09-28 merged tree.
-        4711,
+        4711 +
+        // Plus 5,019 at the choose-one leveling quest gear: its 245 item ids in
+        // deedStats.itemsDiscovered (5,019 = the ids' characters plus 245 x 3 of
+        // quoting and comma; greens carry no Reliquary pages). Predicted from the
+        // literals BEFORE the run and MEASURED equal (77,204 to 82,223).
+        5019 +
+        // Plus 1,688 at the quest blue rewards: the 76 rare item ids generated for
+        // the quests that already reward a blue (1,688 = the ids' characters plus
+        // 76 x 3; quest rares carry no Reliquary pages either). Predicted from the
+        // literals BEFORE the run and MEASURED equal (82,223 to 83,911).
+        1688 +
+        // Plus 1,541 at the quest role fill: the 49 leather caster greens and the
+        // 26 rares of the own-armor rule (1,541 = the ids' characters plus 75 x 3,
+        // no Reliquary pages). Predicted from the literals BEFORE the run and
+        // MEASURED equal (83,911 to 85,452).
+        1541,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2488,7 +2503,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       deeds: 743,
       // deedStats +4,648 and reliquary +8,848 at the second release/v0.44.0 base
       // merge: Warfare Season 2's 139 item ids (the 13,496 attributed above).
-      deedStats: 9427,
+      // deedStats 9,427 -> 14,446 at the choose-one leveling quest gear: its
+      // 245 item ids (the +5,019 above), then -> 16,134 at the quest blue
+      // rewards' 76 rare ids (the +1,688 above), then -> 17,675 at the quest
+      // role fill's 75 ids (the +1,541 above).
+      deedStats: 17675,
       reliquary: 11501,
     });
     // Removing field_kit AND the Bramblehide release content reproduces the
@@ -2526,7 +2545,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // ferry deed and its visit marks, which this counterfactual keeps).
       // 226,238 -> 231,729 at the 2026-09-28 Buried Hoards merge (+5,491: the
       // +247 knownRecipes, +533 and +4,711 attributed above, all kept here).
-    ).toBe(231729);
+      // 231,729 -> 236,748 at the choose-one leveling quest gear (+5,019, the
+      // 245 item ids attributed above, kept here).
+      // 236,748 -> 238,436 at the quest blue rewards (+1,688, the 76 rare ids).
+      // 238,436 -> 239,977 at the quest role fill (+1,541, the 75 ids).
+    ).toBe(239977);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2554,7 +2577,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 214,207 -> 227,703 at the second release/v0.44.0 base merge (+13,496).
       // 227,703 -> 227,857 at the fourth release/v0.44.0 base merge (+154).
       // 227,857 -> 233,348 at the 2026-09-28 Buried Hoards merge (+5,491, kept).
-    ).toBe(233348);
+      // 233,348 -> 238,367 at the choose-one leveling quest gear (+5,019, kept).
+      // 238,367 -> 240,055 at the quest blue rewards (+1,688, kept).
+      // 240,055 -> 241,596 at the quest role fill (+1,541, kept).
+    ).toBe(241596);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2645,8 +2671,23 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // attributed in the growth equation above; no container or ceiling changed
     // shape. Floor at measurement minus 380, edge at measurement plus one:
     // 232980..233361.
-    expect(bytes, reMint).toBeGreaterThan(232980);
-    expect(bytes, reMint).toBeLessThan(233361);
+    // RE-BASED at the choose-one leveling quest gear: 238,379 bytes, up 5,019
+    // from 233,360: its 245 item ids in deedStats.itemsDiscovered, attributed in
+    // the growth equation above (predicted from the literals and measured
+    // equal); no container or ceiling changed shape. Floor at measurement minus
+    // 380, edge at measurement plus one: 237999..238380.
+    // RE-BASED at the quest blue rewards: 240,067 bytes, up 1,688 from 238,379:
+    // the 76 rare item ids in deedStats.itemsDiscovered, attributed above
+    // (predicted and measured equal); no container or ceiling changed shape.
+    // Floor at measurement minus 380, edge at measurement plus one:
+    // 239687..240068.
+    // RE-BASED at the quest role fill: 241,608 bytes, up 1,541 from 240,067:
+    // the 75 leather caster and own-armor ids in deedStats.itemsDiscovered,
+    // attributed above (predicted and measured equal); no container or ceiling
+    // changed shape. Floor at measurement minus 380, edge at measurement plus
+    // one: 241228..241609.
+    expect(bytes, reMint).toBeGreaterThan(241228);
+    expect(bytes, reMint).toBeLessThan(241609);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

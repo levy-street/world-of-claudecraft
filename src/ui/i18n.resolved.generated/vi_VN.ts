@@ -12309,6 +12309,8 @@ export const vi_VN: EnTranslations = {
       "rewards": "Phần Thưởng",
       "xpReward": "{xp} kinh nghiệm",
       "itemReward": "Vật phẩm thưởng:",
+      "chooseReward": "Choose your reward:",
+      "rewardChoices": "You will be able to choose one of these rewards:",
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "Yêu Cầu Cấp {level}"
     },
@@ -12686,6 +12688,7 @@ export const vi_VN: EnTranslations = {
       "incomplete": "Nhiệm vụ đó chưa hoàn thành.",
       "giverMissing": "Người giao nhiệm vụ không ở gần đây.",
       "turnInMissing": "Nơi nộp nhiệm vụ không ở gần đây.",
+      "rewardNotOffered": "That reward is not offered.",
       "tooFar": "Quá xa.",
       "escortAway": "Người bạn cần hộ tống hiện không có ở đó. Họ sẽ trở lại sớm."
     }
@@ -18450,6 +18453,1194 @@ export const vi_VN: EnTranslations = {
       },
       "vanguard_warstaff": {
         "name": "Trượng Chiến Vanguard"
+      },
+      "brookwatch_robe": {
+        "name": "Brookwatch Robe"
+      },
+      "brookwatch_leggings": {
+        "name": "Brookwatch Leggings"
+      },
+      "brookwatch_slippers": {
+        "name": "Brookwatch Slippers"
+      },
+      "brookwatch_hood": {
+        "name": "Brookwatch Hood"
+      },
+      "brookwatch_gloves": {
+        "name": "Brookwatch Gloves"
+      },
+      "brookwatch_mantle": {
+        "name": "Brookwatch Mantle"
+      },
+      "brookwatch_sash": {
+        "name": "Brookwatch Sash"
+      },
+      "brookwatch_jerkin": {
+        "name": "Brookwatch Jerkin"
+      },
+      "brookwatch_breeches": {
+        "name": "Brookwatch Breeches"
+      },
+      "brookwatch_boots": {
+        "name": "Brookwatch Boots"
+      },
+      "brookwatch_cap": {
+        "name": "Brookwatch Cap"
+      },
+      "brookwatch_grips": {
+        "name": "Brookwatch Grips"
+      },
+      "brookwatch_shoulderpads": {
+        "name": "Brookwatch Shoulderpads"
+      },
+      "brookwatch_belt": {
+        "name": "Brookwatch Belt"
+      },
+      "brookwatch_hauberk": {
+        "name": "Brookwatch Hauberk"
+      },
+      "brookwatch_legguards": {
+        "name": "Brookwatch Legguards"
+      },
+      "brookwatch_sabatons": {
+        "name": "Brookwatch Sabatons"
+      },
+      "brookwatch_helm": {
+        "name": "Brookwatch Helm"
+      },
+      "brookwatch_gauntlets": {
+        "name": "Brookwatch Gauntlets"
+      },
+      "brookwatch_pauldrons": {
+        "name": "Brookwatch Pauldrons"
+      },
+      "brookwatch_girdle": {
+        "name": "Brookwatch Girdle"
+      },
+      "brookwatch_chainmail": {
+        "name": "Brookwatch Chainmail"
+      },
+      "brookwatch_chausses": {
+        "name": "Brookwatch Chausses"
+      },
+      "brookwatch_greaves": {
+        "name": "Brookwatch Greaves"
+      },
+      "brookwatch_coif": {
+        "name": "Brookwatch Coif"
+      },
+      "brookwatch_handguards": {
+        "name": "Brookwatch Handguards"
+      },
+      "brookwatch_spaulders": {
+        "name": "Brookwatch Spaulders"
+      },
+      "brookwatch_cord": {
+        "name": "Brookwatch Cord"
+      },
+      "hedgerow_robe": {
+        "name": "Hedgerow Robe"
+      },
+      "hedgerow_leggings": {
+        "name": "Hedgerow Leggings"
+      },
+      "hedgerow_slippers": {
+        "name": "Hedgerow Slippers"
+      },
+      "hedgerow_hood": {
+        "name": "Hedgerow Hood"
+      },
+      "hedgerow_gloves": {
+        "name": "Hedgerow Gloves"
+      },
+      "hedgerow_mantle": {
+        "name": "Hedgerow Mantle"
+      },
+      "hedgerow_sash": {
+        "name": "Hedgerow Sash"
+      },
+      "hedgerow_jerkin": {
+        "name": "Hedgerow Jerkin"
+      },
+      "hedgerow_breeches": {
+        "name": "Hedgerow Breeches"
+      },
+      "hedgerow_boots": {
+        "name": "Hedgerow Boots"
+      },
+      "hedgerow_cap": {
+        "name": "Hedgerow Cap"
+      },
+      "hedgerow_grips": {
+        "name": "Hedgerow Grips"
+      },
+      "hedgerow_shoulderpads": {
+        "name": "Hedgerow Shoulderpads"
+      },
+      "hedgerow_belt": {
+        "name": "Hedgerow Belt"
+      },
+      "hedgerow_hauberk": {
+        "name": "Hedgerow Hauberk"
+      },
+      "hedgerow_legguards": {
+        "name": "Hedgerow Legguards"
+      },
+      "hedgerow_sabatons": {
+        "name": "Hedgerow Sabatons"
+      },
+      "hedgerow_helm": {
+        "name": "Hedgerow Helm"
+      },
+      "hedgerow_gauntlets": {
+        "name": "Hedgerow Gauntlets"
+      },
+      "hedgerow_pauldrons": {
+        "name": "Hedgerow Pauldrons"
+      },
+      "hedgerow_girdle": {
+        "name": "Hedgerow Girdle"
+      },
+      "hedgerow_chainmail": {
+        "name": "Hedgerow Chainmail"
+      },
+      "hedgerow_chausses": {
+        "name": "Hedgerow Chausses"
+      },
+      "hedgerow_greaves": {
+        "name": "Hedgerow Greaves"
+      },
+      "hedgerow_coif": {
+        "name": "Hedgerow Coif"
+      },
+      "hedgerow_handguards": {
+        "name": "Hedgerow Handguards"
+      },
+      "hedgerow_spaulders": {
+        "name": "Hedgerow Spaulders"
+      },
+      "hedgerow_cord": {
+        "name": "Hedgerow Cord"
+      },
+      "bogwalker_robe": {
+        "name": "Bogwalker Robe"
+      },
+      "bogwalker_leggings": {
+        "name": "Bogwalker Leggings"
+      },
+      "bogwalker_slippers": {
+        "name": "Bogwalker Slippers"
+      },
+      "bogwalker_hood": {
+        "name": "Bogwalker Hood"
+      },
+      "bogwalker_gloves": {
+        "name": "Bogwalker Gloves"
+      },
+      "bogwalker_mantle": {
+        "name": "Bogwalker Mantle"
+      },
+      "bogwalker_sash": {
+        "name": "Bogwalker Sash"
+      },
+      "bogwalker_jerkin": {
+        "name": "Bogwalker Jerkin"
+      },
+      "bogwalker_breeches": {
+        "name": "Bogwalker Breeches"
+      },
+      "bogwalker_boots": {
+        "name": "Bogwalker Boots"
+      },
+      "bogwalker_cap": {
+        "name": "Bogwalker Cap"
+      },
+      "bogwalker_grips": {
+        "name": "Bogwalker Grips"
+      },
+      "bogwalker_shoulderpads": {
+        "name": "Bogwalker Shoulderpads"
+      },
+      "bogwalker_belt": {
+        "name": "Bogwalker Belt"
+      },
+      "bogwalker_hauberk": {
+        "name": "Bogwalker Hauberk"
+      },
+      "bogwalker_legguards": {
+        "name": "Bogwalker Legguards"
+      },
+      "bogwalker_sabatons": {
+        "name": "Bogwalker Sabatons"
+      },
+      "bogwalker_helm": {
+        "name": "Bogwalker Helm"
+      },
+      "bogwalker_gauntlets": {
+        "name": "Bogwalker Gauntlets"
+      },
+      "bogwalker_pauldrons": {
+        "name": "Bogwalker Pauldrons"
+      },
+      "bogwalker_girdle": {
+        "name": "Bogwalker Girdle"
+      },
+      "bogwalker_chainmail": {
+        "name": "Bogwalker Chainmail"
+      },
+      "bogwalker_chausses": {
+        "name": "Bogwalker Chausses"
+      },
+      "bogwalker_greaves": {
+        "name": "Bogwalker Greaves"
+      },
+      "bogwalker_coif": {
+        "name": "Bogwalker Coif"
+      },
+      "bogwalker_handguards": {
+        "name": "Bogwalker Handguards"
+      },
+      "bogwalker_spaulders": {
+        "name": "Bogwalker Spaulders"
+      },
+      "bogwalker_cord": {
+        "name": "Bogwalker Cord"
+      },
+      "thornspire_robe": {
+        "name": "Thornspire Robe"
+      },
+      "thornspire_leggings": {
+        "name": "Thornspire Leggings"
+      },
+      "thornspire_slippers": {
+        "name": "Thornspire Slippers"
+      },
+      "thornspire_hood": {
+        "name": "Thornspire Hood"
+      },
+      "thornspire_gloves": {
+        "name": "Thornspire Gloves"
+      },
+      "thornspire_mantle": {
+        "name": "Thornspire Mantle"
+      },
+      "thornspire_sash": {
+        "name": "Thornspire Sash"
+      },
+      "thornspire_jerkin": {
+        "name": "Thornspire Jerkin"
+      },
+      "thornspire_breeches": {
+        "name": "Thornspire Breeches"
+      },
+      "thornspire_boots": {
+        "name": "Thornspire Boots"
+      },
+      "thornspire_cap": {
+        "name": "Thornspire Cap"
+      },
+      "thornspire_grips": {
+        "name": "Thornspire Grips"
+      },
+      "thornspire_shoulderpads": {
+        "name": "Thornspire Shoulderpads"
+      },
+      "thornspire_belt": {
+        "name": "Thornspire Belt"
+      },
+      "thornspire_hauberk": {
+        "name": "Thornspire Hauberk"
+      },
+      "thornspire_legguards": {
+        "name": "Thornspire Legguards"
+      },
+      "thornspire_sabatons": {
+        "name": "Thornspire Sabatons"
+      },
+      "thornspire_helm": {
+        "name": "Thornspire Helm"
+      },
+      "thornspire_gauntlets": {
+        "name": "Thornspire Gauntlets"
+      },
+      "thornspire_pauldrons": {
+        "name": "Thornspire Pauldrons"
+      },
+      "thornspire_girdle": {
+        "name": "Thornspire Girdle"
+      },
+      "thornspire_chainmail": {
+        "name": "Thornspire Chainmail"
+      },
+      "thornspire_chausses": {
+        "name": "Thornspire Chausses"
+      },
+      "thornspire_greaves": {
+        "name": "Thornspire Greaves"
+      },
+      "thornspire_coif": {
+        "name": "Thornspire Coif"
+      },
+      "thornspire_handguards": {
+        "name": "Thornspire Handguards"
+      },
+      "thornspire_spaulders": {
+        "name": "Thornspire Spaulders"
+      },
+      "thornspire_cord": {
+        "name": "Thornspire Cord"
+      },
+      "hollowveil_robe": {
+        "name": "Hollowveil Robe"
+      },
+      "hollowveil_leggings": {
+        "name": "Hollowveil Leggings"
+      },
+      "hollowveil_slippers": {
+        "name": "Hollowveil Slippers"
+      },
+      "hollowveil_hood": {
+        "name": "Hollowveil Hood"
+      },
+      "hollowveil_gloves": {
+        "name": "Hollowveil Gloves"
+      },
+      "hollowveil_mantle": {
+        "name": "Hollowveil Mantle"
+      },
+      "hollowveil_sash": {
+        "name": "Hollowveil Sash"
+      },
+      "hollowveil_jerkin": {
+        "name": "Hollowveil Jerkin"
+      },
+      "hollowveil_breeches": {
+        "name": "Hollowveil Breeches"
+      },
+      "hollowveil_boots": {
+        "name": "Hollowveil Boots"
+      },
+      "hollowveil_cap": {
+        "name": "Hollowveil Cap"
+      },
+      "hollowveil_grips": {
+        "name": "Hollowveil Grips"
+      },
+      "hollowveil_shoulderpads": {
+        "name": "Hollowveil Shoulderpads"
+      },
+      "hollowveil_belt": {
+        "name": "Hollowveil Belt"
+      },
+      "hollowveil_hauberk": {
+        "name": "Hollowveil Hauberk"
+      },
+      "hollowveil_legguards": {
+        "name": "Hollowveil Legguards"
+      },
+      "hollowveil_sabatons": {
+        "name": "Hollowveil Sabatons"
+      },
+      "hollowveil_helm": {
+        "name": "Hollowveil Helm"
+      },
+      "hollowveil_gauntlets": {
+        "name": "Hollowveil Gauntlets"
+      },
+      "hollowveil_pauldrons": {
+        "name": "Hollowveil Pauldrons"
+      },
+      "hollowveil_girdle": {
+        "name": "Hollowveil Girdle"
+      },
+      "hollowveil_chainmail": {
+        "name": "Hollowveil Chainmail"
+      },
+      "hollowveil_chausses": {
+        "name": "Hollowveil Chausses"
+      },
+      "hollowveil_greaves": {
+        "name": "Hollowveil Greaves"
+      },
+      "hollowveil_coif": {
+        "name": "Hollowveil Coif"
+      },
+      "hollowveil_handguards": {
+        "name": "Hollowveil Handguards"
+      },
+      "hollowveil_spaulders": {
+        "name": "Hollowveil Spaulders"
+      },
+      "hollowveil_cord": {
+        "name": "Hollowveil Cord"
+      },
+      "trailwarden_robe": {
+        "name": "Trailwarden Robe"
+      },
+      "trailwarden_leggings": {
+        "name": "Trailwarden Leggings"
+      },
+      "trailwarden_slippers": {
+        "name": "Trailwarden Slippers"
+      },
+      "trailwarden_hood": {
+        "name": "Trailwarden Hood"
+      },
+      "trailwarden_gloves": {
+        "name": "Trailwarden Gloves"
+      },
+      "trailwarden_mantle": {
+        "name": "Trailwarden Mantle"
+      },
+      "trailwarden_sash": {
+        "name": "Trailwarden Sash"
+      },
+      "trailwarden_jerkin": {
+        "name": "Trailwarden Jerkin"
+      },
+      "trailwarden_breeches": {
+        "name": "Trailwarden Breeches"
+      },
+      "trailwarden_boots": {
+        "name": "Trailwarden Boots"
+      },
+      "trailwarden_cap": {
+        "name": "Trailwarden Cap"
+      },
+      "trailwarden_grips": {
+        "name": "Trailwarden Grips"
+      },
+      "trailwarden_shoulderpads": {
+        "name": "Trailwarden Shoulderpads"
+      },
+      "trailwarden_belt": {
+        "name": "Trailwarden Belt"
+      },
+      "trailwarden_hauberk": {
+        "name": "Trailwarden Hauberk"
+      },
+      "trailwarden_legguards": {
+        "name": "Trailwarden Legguards"
+      },
+      "trailwarden_sabatons": {
+        "name": "Trailwarden Sabatons"
+      },
+      "trailwarden_helm": {
+        "name": "Trailwarden Helm"
+      },
+      "trailwarden_gauntlets": {
+        "name": "Trailwarden Gauntlets"
+      },
+      "trailwarden_pauldrons": {
+        "name": "Trailwarden Pauldrons"
+      },
+      "trailwarden_girdle": {
+        "name": "Trailwarden Girdle"
+      },
+      "trailwarden_chainmail": {
+        "name": "Trailwarden Chainmail"
+      },
+      "trailwarden_chausses": {
+        "name": "Trailwarden Chausses"
+      },
+      "trailwarden_greaves": {
+        "name": "Trailwarden Greaves"
+      },
+      "trailwarden_coif": {
+        "name": "Trailwarden Coif"
+      },
+      "trailwarden_handguards": {
+        "name": "Trailwarden Handguards"
+      },
+      "trailwarden_spaulders": {
+        "name": "Trailwarden Spaulders"
+      },
+      "trailwarden_cord": {
+        "name": "Trailwarden Cord"
+      },
+      "highgale_robe": {
+        "name": "Highgale Robe"
+      },
+      "highgale_leggings": {
+        "name": "Highgale Leggings"
+      },
+      "highgale_slippers": {
+        "name": "Highgale Slippers"
+      },
+      "highgale_hood": {
+        "name": "Highgale Hood"
+      },
+      "highgale_gloves": {
+        "name": "Highgale Gloves"
+      },
+      "highgale_mantle": {
+        "name": "Highgale Mantle"
+      },
+      "highgale_sash": {
+        "name": "Highgale Sash"
+      },
+      "highgale_jerkin": {
+        "name": "Highgale Jerkin"
+      },
+      "highgale_breeches": {
+        "name": "Highgale Breeches"
+      },
+      "highgale_boots": {
+        "name": "Highgale Boots"
+      },
+      "highgale_cap": {
+        "name": "Highgale Cap"
+      },
+      "highgale_grips": {
+        "name": "Highgale Grips"
+      },
+      "highgale_shoulderpads": {
+        "name": "Highgale Shoulderpads"
+      },
+      "highgale_belt": {
+        "name": "Highgale Belt"
+      },
+      "highgale_hauberk": {
+        "name": "Highgale Hauberk"
+      },
+      "highgale_legguards": {
+        "name": "Highgale Legguards"
+      },
+      "highgale_sabatons": {
+        "name": "Highgale Sabatons"
+      },
+      "highgale_helm": {
+        "name": "Highgale Helm"
+      },
+      "highgale_gauntlets": {
+        "name": "Highgale Gauntlets"
+      },
+      "highgale_pauldrons": {
+        "name": "Highgale Pauldrons"
+      },
+      "highgale_girdle": {
+        "name": "Highgale Girdle"
+      },
+      "highgale_chainmail": {
+        "name": "Highgale Chainmail"
+      },
+      "highgale_chausses": {
+        "name": "Highgale Chausses"
+      },
+      "highgale_greaves": {
+        "name": "Highgale Greaves"
+      },
+      "brookwatch_tunic": {
+        "name": "Brookwatch Tunic"
+      },
+      "brookwatch_legwraps": {
+        "name": "Brookwatch Legwraps"
+      },
+      "brookwatch_treads": {
+        "name": "Brookwatch Treads"
+      },
+      "brookwatch_headguard": {
+        "name": "Brookwatch Headguard"
+      },
+      "brookwatch_handwraps": {
+        "name": "Brookwatch Handwraps"
+      },
+      "brookwatch_shoulderguards": {
+        "name": "Brookwatch Shoulderguards"
+      },
+      "brookwatch_waistguard": {
+        "name": "Brookwatch Waistguard"
+      },
+      "hedgerow_tunic": {
+        "name": "Hedgerow Tunic"
+      },
+      "hedgerow_legwraps": {
+        "name": "Hedgerow Legwraps"
+      },
+      "hedgerow_treads": {
+        "name": "Hedgerow Treads"
+      },
+      "hedgerow_headguard": {
+        "name": "Hedgerow Headguard"
+      },
+      "hedgerow_handwraps": {
+        "name": "Hedgerow Handwraps"
+      },
+      "hedgerow_shoulderguards": {
+        "name": "Hedgerow Shoulderguards"
+      },
+      "hedgerow_waistguard": {
+        "name": "Hedgerow Waistguard"
+      },
+      "bogwalker_tunic": {
+        "name": "Bogwalker Tunic"
+      },
+      "bogwalker_legwraps": {
+        "name": "Bogwalker Legwraps"
+      },
+      "bogwalker_treads": {
+        "name": "Bogwalker Treads"
+      },
+      "bogwalker_headguard": {
+        "name": "Bogwalker Headguard"
+      },
+      "bogwalker_handwraps": {
+        "name": "Bogwalker Handwraps"
+      },
+      "bogwalker_shoulderguards": {
+        "name": "Bogwalker Shoulderguards"
+      },
+      "bogwalker_waistguard": {
+        "name": "Bogwalker Waistguard"
+      },
+      "thornspire_tunic": {
+        "name": "Thornspire Tunic"
+      },
+      "thornspire_legwraps": {
+        "name": "Thornspire Legwraps"
+      },
+      "thornspire_treads": {
+        "name": "Thornspire Treads"
+      },
+      "thornspire_headguard": {
+        "name": "Thornspire Headguard"
+      },
+      "thornspire_handwraps": {
+        "name": "Thornspire Handwraps"
+      },
+      "thornspire_shoulderguards": {
+        "name": "Thornspire Shoulderguards"
+      },
+      "thornspire_waistguard": {
+        "name": "Thornspire Waistguard"
+      },
+      "hollowveil_tunic": {
+        "name": "Hollowveil Tunic"
+      },
+      "hollowveil_legwraps": {
+        "name": "Hollowveil Legwraps"
+      },
+      "hollowveil_treads": {
+        "name": "Hollowveil Treads"
+      },
+      "hollowveil_headguard": {
+        "name": "Hollowveil Headguard"
+      },
+      "hollowveil_handwraps": {
+        "name": "Hollowveil Handwraps"
+      },
+      "hollowveil_shoulderguards": {
+        "name": "Hollowveil Shoulderguards"
+      },
+      "hollowveil_waistguard": {
+        "name": "Hollowveil Waistguard"
+      },
+      "trailwarden_tunic": {
+        "name": "Trailwarden Tunic"
+      },
+      "trailwarden_legwraps": {
+        "name": "Trailwarden Legwraps"
+      },
+      "trailwarden_treads": {
+        "name": "Trailwarden Treads"
+      },
+      "trailwarden_headguard": {
+        "name": "Trailwarden Headguard"
+      },
+      "trailwarden_handwraps": {
+        "name": "Trailwarden Handwraps"
+      },
+      "trailwarden_shoulderguards": {
+        "name": "Trailwarden Shoulderguards"
+      },
+      "trailwarden_waistguard": {
+        "name": "Trailwarden Waistguard"
+      },
+      "highgale_tunic": {
+        "name": "Highgale Tunic"
+      },
+      "highgale_legwraps": {
+        "name": "Highgale Legwraps"
+      },
+      "highgale_treads": {
+        "name": "Highgale Treads"
+      },
+      "highgale_headguard": {
+        "name": "Highgale Headguard"
+      },
+      "highgale_handwraps": {
+        "name": "Highgale Handwraps"
+      },
+      "highgale_shoulderguards": {
+        "name": "Highgale Shoulderguards"
+      },
+      "highgale_waistguard": {
+        "name": "Highgale Waistguard"
+      },
+      "highgale_coif": {
+        "name": "Highgale Coif"
+      },
+      "highgale_handguards": {
+        "name": "Highgale Handguards"
+      },
+      "highgale_spaulders": {
+        "name": "Highgale Spaulders"
+      },
+      "highgale_cord": {
+        "name": "Highgale Cord"
+      },
+      "breakwater_mantle": {
+        "name": "Breakwater Mantle"
+      },
+      "breakwater_shoulderpads": {
+        "name": "Breakwater Shoulderpads"
+      },
+      "breakwater_spaulders": {
+        "name": "Breakwater Spaulders"
+      },
+      "gravebell_treads": {
+        "name": "Gravebell Treads"
+      },
+      "gravebell_greaves": {
+        "name": "Gravebell Greaves"
+      },
+      "cryptbound_tunic": {
+        "name": "Cryptbound Tunic"
+      },
+      "cryptbound_chainmail": {
+        "name": "Cryptbound Chainmail"
+      },
+      "oathbroken_leggings": {
+        "name": "Oathbroken Leggings"
+      },
+      "oathbroken_breeches": {
+        "name": "Oathbroken Breeches"
+      },
+      "oathbroken_legwraps": {
+        "name": "Oathbroken Legwraps"
+      },
+      "oathbroken_legguards": {
+        "name": "Oathbroken Legguards"
+      },
+      "oathbroken_chausses": {
+        "name": "Oathbroken Chausses"
+      },
+      "seamist_legwraps": {
+        "name": "Seamist Legwraps"
+      },
+      "seamist_chausses": {
+        "name": "Seamist Chausses"
+      },
+      "warmonger_treads": {
+        "name": "Warmonger Treads"
+      },
+      "warmonger_greaves": {
+        "name": "Warmonger Greaves"
+      },
+      "sparkglass_leggings": {
+        "name": "Sparkglass Leggings"
+      },
+      "sparkglass_breeches": {
+        "name": "Sparkglass Breeches"
+      },
+      "sparkglass_legwraps": {
+        "name": "Sparkglass Legwraps"
+      },
+      "sparkglass_legguards": {
+        "name": "Sparkglass Legguards"
+      },
+      "sparkglass_chausses": {
+        "name": "Sparkglass Chausses"
+      },
+      "stillhymn_treads": {
+        "name": "Stillhymn Treads"
+      },
+      "stillhymn_greaves": {
+        "name": "Stillhymn Greaves"
+      },
+      "pearlglow_headguard": {
+        "name": "Pearlglow Headguard"
+      },
+      "pearlglow_coif": {
+        "name": "Pearlglow Coif"
+      },
+      "sealkeeper_gloves": {
+        "name": "Sealkeeper Gloves"
+      },
+      "sealkeeper_grips": {
+        "name": "Sealkeeper Grips"
+      },
+      "sealkeeper_handwraps": {
+        "name": "Sealkeeper Handwraps"
+      },
+      "sealkeeper_gauntlets": {
+        "name": "Sealkeeper Gauntlets"
+      },
+      "sealkeeper_handguards": {
+        "name": "Sealkeeper Handguards"
+      },
+      "fetterbound_leggings": {
+        "name": "Fetterbound Leggings"
+      },
+      "fetterbound_breeches": {
+        "name": "Fetterbound Breeches"
+      },
+      "fetterbound_legwraps": {
+        "name": "Fetterbound Legwraps"
+      },
+      "fetterbound_legguards": {
+        "name": "Fetterbound Legguards"
+      },
+      "fetterbound_chausses": {
+        "name": "Fetterbound Chausses"
+      },
+      "shroudcaller_tunic": {
+        "name": "Shroudcaller Tunic"
+      },
+      "shroudcaller_chainmail": {
+        "name": "Shroudcaller Chainmail"
+      },
+      "wyrmshadow_tunic": {
+        "name": "Wyrmshadow Tunic"
+      },
+      "wyrmshadow_chainmail": {
+        "name": "Wyrmshadow Chainmail"
+      },
+      "cinderbrood_shoulderpads": {
+        "name": "Cinderbrood Shoulderpads"
+      },
+      "cinderbrood_shoulderguards": {
+        "name": "Cinderbrood Shoulderguards"
+      },
+      "cinderbrood_pauldrons": {
+        "name": "Cinderbrood Pauldrons"
+      },
+      "hoarfrost_mantle": {
+        "name": "Hoarfrost Mantle"
+      },
+      "hoarfrost_shoulderpads": {
+        "name": "Hoarfrost Shoulderpads"
+      },
+      "hoarfrost_spaulders": {
+        "name": "Hoarfrost Spaulders"
+      },
+      "blackmere_mantle": {
+        "name": "Blackmere Mantle"
+      },
+      "blackmere_shoulderpads": {
+        "name": "Blackmere Shoulderpads"
+      },
+      "blackmere_shoulderguards": {
+        "name": "Blackmere Shoulderguards"
+      },
+      "blackmere_pauldrons": {
+        "name": "Blackmere Pauldrons"
+      },
+      "blackmere_spaulders": {
+        "name": "Blackmere Spaulders"
+      },
+      "reedhush_mantle": {
+        "name": "Reedhush Mantle"
+      },
+      "reedhush_shoulderpads": {
+        "name": "Reedhush Shoulderpads"
+      },
+      "reedhush_shoulderguards": {
+        "name": "Reedhush Shoulderguards"
+      },
+      "reedhush_pauldrons": {
+        "name": "Reedhush Pauldrons"
+      },
+      "reedhush_spaulders": {
+        "name": "Reedhush Spaulders"
+      },
+      "cairnking_mantle": {
+        "name": "Cairnking Mantle"
+      },
+      "cairnking_shoulderpads": {
+        "name": "Cairnking Shoulderpads"
+      },
+      "cairnking_shoulderguards": {
+        "name": "Cairnking Shoulderguards"
+      },
+      "cairnking_pauldrons": {
+        "name": "Cairnking Pauldrons"
+      },
+      "cairnking_spaulders": {
+        "name": "Cairnking Spaulders"
+      },
+      "palehunt_mantle": {
+        "name": "Palehunt Mantle"
+      },
+      "palehunt_shoulderpads": {
+        "name": "Palehunt Shoulderpads"
+      },
+      "palehunt_shoulderguards": {
+        "name": "Palehunt Shoulderguards"
+      },
+      "palehunt_pauldrons": {
+        "name": "Palehunt Pauldrons"
+      },
+      "palehunt_spaulders": {
+        "name": "Palehunt Spaulders"
+      },
+      "jadeshrine_mantle": {
+        "name": "Jadeshrine Mantle"
+      },
+      "jadeshrine_shoulderpads": {
+        "name": "Jadeshrine Shoulderpads"
+      },
+      "jadeshrine_shoulderguards": {
+        "name": "Jadeshrine Shoulderguards"
+      },
+      "jadeshrine_pauldrons": {
+        "name": "Jadeshrine Pauldrons"
+      },
+      "jadeshrine_spaulders": {
+        "name": "Jadeshrine Spaulders"
+      },
+      "gildhedge_mantle": {
+        "name": "Gildhedge Mantle"
+      },
+      "gildhedge_shoulderpads": {
+        "name": "Gildhedge Shoulderpads"
+      },
+      "gildhedge_spaulders": {
+        "name": "Gildhedge Spaulders"
+      },
+      "saltwrack_mantle": {
+        "name": "Saltwrack Mantle"
+      },
+      "saltwrack_shoulderpads": {
+        "name": "Saltwrack Shoulderpads"
+      },
+      "saltwrack_spaulders": {
+        "name": "Saltwrack Spaulders"
+      },
+      "brookwatch_vest": {
+        "name": "Brookwatch Vest"
+      },
+      "brookwatch_trousers": {
+        "name": "Brookwatch Trousers"
+      },
+      "brookwatch_moccasins": {
+        "name": "Brookwatch Moccasins"
+      },
+      "brookwatch_cowl": {
+        "name": "Brookwatch Cowl"
+      },
+      "brookwatch_mitts": {
+        "name": "Brookwatch Mitts"
+      },
+      "brookwatch_epaulets": {
+        "name": "Brookwatch Epaulets"
+      },
+      "brookwatch_cinch": {
+        "name": "Brookwatch Cinch"
+      },
+      "hedgerow_vest": {
+        "name": "Hedgerow Vest"
+      },
+      "hedgerow_trousers": {
+        "name": "Hedgerow Trousers"
+      },
+      "hedgerow_moccasins": {
+        "name": "Hedgerow Moccasins"
+      },
+      "hedgerow_cowl": {
+        "name": "Hedgerow Cowl"
+      },
+      "hedgerow_mitts": {
+        "name": "Hedgerow Mitts"
+      },
+      "hedgerow_epaulets": {
+        "name": "Hedgerow Epaulets"
+      },
+      "hedgerow_cinch": {
+        "name": "Hedgerow Cinch"
+      },
+      "bogwalker_vest": {
+        "name": "Bogwalker Vest"
+      },
+      "bogwalker_trousers": {
+        "name": "Bogwalker Trousers"
+      },
+      "bogwalker_moccasins": {
+        "name": "Bogwalker Moccasins"
+      },
+      "bogwalker_cowl": {
+        "name": "Bogwalker Cowl"
+      },
+      "bogwalker_mitts": {
+        "name": "Bogwalker Mitts"
+      },
+      "bogwalker_epaulets": {
+        "name": "Bogwalker Epaulets"
+      },
+      "bogwalker_cinch": {
+        "name": "Bogwalker Cinch"
+      },
+      "thornspire_vest": {
+        "name": "Thornspire Vest"
+      },
+      "thornspire_trousers": {
+        "name": "Thornspire Trousers"
+      },
+      "thornspire_moccasins": {
+        "name": "Thornspire Moccasins"
+      },
+      "thornspire_cowl": {
+        "name": "Thornspire Cowl"
+      },
+      "thornspire_mitts": {
+        "name": "Thornspire Mitts"
+      },
+      "thornspire_epaulets": {
+        "name": "Thornspire Epaulets"
+      },
+      "thornspire_cinch": {
+        "name": "Thornspire Cinch"
+      },
+      "hollowveil_vest": {
+        "name": "Hollowveil Vest"
+      },
+      "hollowveil_trousers": {
+        "name": "Hollowveil Trousers"
+      },
+      "hollowveil_moccasins": {
+        "name": "Hollowveil Moccasins"
+      },
+      "hollowveil_cowl": {
+        "name": "Hollowveil Cowl"
+      },
+      "hollowveil_mitts": {
+        "name": "Hollowveil Mitts"
+      },
+      "hollowveil_epaulets": {
+        "name": "Hollowveil Epaulets"
+      },
+      "hollowveil_cinch": {
+        "name": "Hollowveil Cinch"
+      },
+      "trailwarden_vest": {
+        "name": "Trailwarden Vest"
+      },
+      "trailwarden_trousers": {
+        "name": "Trailwarden Trousers"
+      },
+      "trailwarden_moccasins": {
+        "name": "Trailwarden Moccasins"
+      },
+      "trailwarden_cowl": {
+        "name": "Trailwarden Cowl"
+      },
+      "trailwarden_mitts": {
+        "name": "Trailwarden Mitts"
+      },
+      "trailwarden_epaulets": {
+        "name": "Trailwarden Epaulets"
+      },
+      "trailwarden_cinch": {
+        "name": "Trailwarden Cinch"
+      },
+      "highgale_vest": {
+        "name": "Highgale Vest"
+      },
+      "highgale_trousers": {
+        "name": "Highgale Trousers"
+      },
+      "highgale_moccasins": {
+        "name": "Highgale Moccasins"
+      },
+      "highgale_cowl": {
+        "name": "Highgale Cowl"
+      },
+      "highgale_mitts": {
+        "name": "Highgale Mitts"
+      },
+      "highgale_epaulets": {
+        "name": "Highgale Epaulets"
+      },
+      "highgale_cinch": {
+        "name": "Highgale Cinch"
+      },
+      "breakwater_shoulderguards": {
+        "name": "Breakwater Shoulderguards"
+      },
+      "breakwater_pauldrons": {
+        "name": "Breakwater Pauldrons"
+      },
+      "breakwater_epaulets": {
+        "name": "Breakwater Epaulets"
+      },
+      "gravebell_moccasins": {
+        "name": "Gravebell Moccasins"
+      },
+      "oathbroken_trousers": {
+        "name": "Oathbroken Trousers"
+      },
+      "sparkglass_trousers": {
+        "name": "Sparkglass Trousers"
+      },
+      "stillhymn_moccasins": {
+        "name": "Stillhymn Moccasins"
+      },
+      "sealkeeper_mitts": {
+        "name": "Sealkeeper Mitts"
+      },
+      "fetterbound_trousers": {
+        "name": "Fetterbound Trousers"
+      },
+      "wyrmshadow_vest": {
+        "name": "Wyrmshadow Vest"
+      },
+      "cinderbrood_spaulders": {
+        "name": "Cinderbrood Spaulders"
+      },
+      "cinderbrood_epaulets": {
+        "name": "Cinderbrood Epaulets"
+      },
+      "hoarfrost_shoulderguards": {
+        "name": "Hoarfrost Shoulderguards"
+      },
+      "hoarfrost_pauldrons": {
+        "name": "Hoarfrost Pauldrons"
+      },
+      "hoarfrost_epaulets": {
+        "name": "Hoarfrost Epaulets"
+      },
+      "blackmere_epaulets": {
+        "name": "Blackmere Epaulets"
+      },
+      "reedhush_epaulets": {
+        "name": "Reedhush Epaulets"
+      },
+      "cairnking_epaulets": {
+        "name": "Cairnking Epaulets"
+      },
+      "palehunt_epaulets": {
+        "name": "Palehunt Epaulets"
+      },
+      "jadeshrine_epaulets": {
+        "name": "Jadeshrine Epaulets"
+      },
+      "gildhedge_shoulderguards": {
+        "name": "Gildhedge Shoulderguards"
+      },
+      "gildhedge_pauldrons": {
+        "name": "Gildhedge Pauldrons"
+      },
+      "gildhedge_epaulets": {
+        "name": "Gildhedge Epaulets"
+      },
+      "saltwrack_shoulderguards": {
+        "name": "Saltwrack Shoulderguards"
+      },
+      "saltwrack_pauldrons": {
+        "name": "Saltwrack Pauldrons"
+      },
+      "saltwrack_epaulets": {
+        "name": "Saltwrack Epaulets"
       },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"

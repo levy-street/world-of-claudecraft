@@ -9000,8 +9000,8 @@ export class Sim {
   dropWorldQuestDeliveryCargo(pid = this.playerId): boolean {
     return dropWorldQuestDeliveryCargoForPlayer(this.ctx, pid);
   }
-  turnInQuest(questId: string, pid?: number): void {
-    questCommands.turnInQuest(this.ctx, questId, pid);
+  turnInQuest(questId: string, choiceOrPid?: string | number, pid?: number): void {
+    questCommands.turnInQuest(this.ctx, questId, choiceOrPid, pid);
   }
   completeQuestForDev(questId: string, pid?: number): boolean {
     return completeQuestForDev(this.ctx, questId, pid);

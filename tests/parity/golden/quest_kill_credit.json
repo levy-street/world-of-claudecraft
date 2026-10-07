@@ -550,8 +550,8 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 1019,
-      "state": "3fa7e17b",
-      "events": "56a52c4f",
+      "state": "2f1d226a",
+      "events": "3fed41be",
       "rng": {
         "draws": 40,
         "digest": "73f698f7"
@@ -599,6 +599,7 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "brookwatch_hauberk",
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
@@ -630,7 +631,7 @@
           "delveDaily": {},
           "entityId": 1003,
           "equipment": {
-            "chest": "recruit_tunic",
+            "chest": "brookwatch_hauberk",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
@@ -647,6 +648,10 @@
             {
               "count": 5,
               "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "recruit_tunic"
             }
           ],
           "lifetimeXp": 27850,
@@ -677,7 +682,7 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 82,
+          "attackPower": 84,
           "auras": [
             {
               "duration": 3600,
@@ -699,13 +704,13 @@
           "fallStartY": -0.498062,
           "fiveSecondRule": 99.4,
           "healPower": 5,
-          "hp": 50000,
+          "hp": 452,
           "id": 1003,
           "inCombat": true,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
+          "maxHp": 452,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -727,11 +732,11 @@
           "spellPower": 5,
           "stats": {
             "agi": 29,
-            "armor": 270,
+            "armor": 301,
             "int": 10,
             "spi": 11,
-            "sta": 41,
-            "str": 41
+            "sta": 42,
+            "str": 42
           },
           "templateId": "warrior",
           "weapon": {
@@ -746,7 +751,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1019,
-      "state": "d527aa8e",
+      "state": "dc4a6e41",
       "events": "741638a5",
       "rng": {
         "draws": 40,
@@ -795,6 +800,7 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "brookwatch_hauberk",
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
@@ -826,7 +832,7 @@
           "delveDaily": {},
           "entityId": 1003,
           "equipment": {
-            "chest": "recruit_tunic",
+            "chest": "brookwatch_hauberk",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
@@ -843,6 +849,10 @@
             {
               "count": 5,
               "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "recruit_tunic"
             }
           ],
           "lifetimeXp": 27850,
@@ -873,7 +883,7 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 82,
+          "attackPower": 84,
           "auras": [
             {
               "duration": 3600,
@@ -895,13 +905,13 @@
           "fallStartY": -0.498062,
           "fiveSecondRule": 99.5,
           "healPower": 5,
-          "hp": 50000,
+          "hp": 452,
           "id": 1003,
           "inCombat": true,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
+          "maxHp": 452,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -923,11 +933,11 @@
           "spellPower": 5,
           "stats": {
             "agi": 29,
-            "armor": 270,
+            "armor": 301,
             "int": 10,
             "spi": 11,
-            "sta": 41,
-            "str": 41
+            "sta": 42,
+            "str": 42
           },
           "templateId": "warrior",
           "weapon": {
