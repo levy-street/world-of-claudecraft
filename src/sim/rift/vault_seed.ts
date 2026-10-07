@@ -25,6 +25,12 @@ export const VAULT_ZONE_IDS = Object.freeze([
   'wraithwood',
   'palmreach',
   'galecrest',
+  'eastbrook_vale',
+  'mirefen_marsh',
+  'thornpeak_heights',
+  'veiled_hollow',
+  'evergarden',
+  'farshore_isle',
 ] as const);
 
 export type VaultZoneId = (typeof VAULT_ZONE_IDS)[number];
