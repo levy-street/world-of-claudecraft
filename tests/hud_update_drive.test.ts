@@ -844,12 +844,11 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the spirit-mode body class that drains the world to greyscale',
   },
   {
-    call: 'this.setDisplay',
+    call: 'paintDeathScreens',
     band: 'frame',
     gate: '',
-    sites: 4,
     surface: 'chrome',
-    why: 'the death screens through the elided writer: the full-screen death overlay, its PvP Resurrect button, the standing ghost hint line and the ghost prompt (its one corpse button), each shown or hidden by the pure death view core (src/ui/hud/death; a battleground spirit gets neither ghost surface because the respawn wave is its only way back)',
+    why: 'the death screens through the elided writer facet (src/ui/hud/death/death_screen_painter.ts): the full-screen death overlay, its PvP Resurrect button, the standing ghost hint line, the ghost prompt (its one corpse button) and the ghost Death Recap button, each shown or hidden by the pure death view core (a battleground spirit gets no ghost surface because the respawn wave is its only way back)',
   },
   {
     call: 'syncDeathControllerHints',
