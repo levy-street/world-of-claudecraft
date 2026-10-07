@@ -6133,6 +6133,7 @@ export const pl_PL: EnTranslations = {
       "sourceActivityMasterworkCraft": "Zdobywana przez wykonanie arcydzieła",
       "sourceActivityRiftFirstClear": "Przyznawana każdemu członkowi drużyny, która zdobędzie pierwsze przejście rankingowej Szczeliny",
       "sourceActivityBuriedHoard": "Znaleziono w skrzyni nagrody Zakopanych Skarbów, skarbcu do którego prowadzi mapa skarbu",
+      "sourceActivityWeeklyVaultPvp": "Chosen from the PvP row of the Weekly Vault",
       "cellMissingSourceAria": "{name}, jeszcze nieznaleziona, {source}",
       "cellOwnedClearsAria": "{name}, skatalogowana, znaleziona po raz pierwszy przy przejściu {count}",
       "searchPlaceholder": "Szukaj relikwii",

@@ -6133,6 +6133,7 @@ export const fr_CA: EnTranslations = {
       "sourceActivityMasterworkCraft": "Obtenue en fabriquant un chef-d'œuvre",
       "sourceActivityRiftFirstClear": "Attribuée à chaque membre du groupe qui remporte la première conquête d'une Faille classée",
       "sourceActivityBuriedHoard": "Trouvé dans le coffre de récompense d'un Butin enfoui, le coffre qu'une carte au trésor mène",
+      "sourceActivityWeeklyVaultPvp": "Chosen from the PvP row of the Weekly Vault",
       "cellMissingSourceAria": "{name}, pas encore trouvée, {source}",
       "cellOwnedClearsAria": "{name}, cataloguée, trouvée pour la première fois à la conquête {count}",
       "searchPlaceholder": "Rechercher des reliques",

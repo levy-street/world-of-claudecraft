@@ -339,6 +339,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.legendary_riptide_handwraps.name': '지존의 이안류 손싸개',
   'hudChrome.reliquary.sourceActivityBuriedHoard':
     '보물 지도가 이끄는 묻힌 보물의 보상 상자에서 획득',
+  'hudChrome.reliquary.sourceActivityWeeklyVaultPvp': '주간 금고의 PvP 줄에서 선택해 획득',
   'clues.hunt_drakelands_gate_ashes.reply.1':
     '바람이 동쪽 모래언덕에서 재를 싣고 왔어. 텅 빈 모래에서는 재가 날아오지 않아. 주둔지 창고지기가 순찰을 전부 기록해 두지. 누가 먹을 걸 가져다주면 입을 열 거야.',
   'clues.hunt_drakelands_gate_ashes.reply.2':

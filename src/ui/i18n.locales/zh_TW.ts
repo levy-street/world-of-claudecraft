@@ -335,6 +335,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.legendary_riptide_handwraps.name': '至尊激流裹手',
   'hudChrome.reliquary.sourceActivityBuriedHoard':
     '在埋藏寶藏的獎勵寶箱中找到，即藏寶圖所指引的寶庫',
+  'hudChrome.reliquary.sourceActivityWeeklyVaultPvp': '從每週寶庫的PvP欄位中選取',
   'clues.hunt_drakelands_gate_ashes.reply.1':
     '風從東邊的沙丘吹來，帶著灰燼，而空蕩蕩的沙地不會吹出灰燼。駐軍倉庫的塞拉記著每一次巡邏。只要有人給她帶點吃的，她就會開口。',
   'clues.hunt_drakelands_gate_ashes.reply.2':

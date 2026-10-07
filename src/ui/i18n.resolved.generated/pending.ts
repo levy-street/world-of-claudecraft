@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ],
+  "es_ES": [
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ],
+  "fr_FR": [
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ],
+  "fr_CA": [
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ],
+  "de_DE": [
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ],
+  "nl_NL": [
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ],
+  "pl_PL": [
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ],
+  "id_ID": [
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ],
+  "tr_TR": [
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ],
+  "sv_SE": [
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ],
+  "vi_VN": [
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ],
+  "da_DK": [
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ]
 };

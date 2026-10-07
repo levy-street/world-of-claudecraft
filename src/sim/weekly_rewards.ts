@@ -3,7 +3,7 @@
 import { bagsFullError } from './bags';
 import { HEROIC_DUNGEON_TUNING } from './content/dungeon_difficulty';
 import { HEROIC_BOSS_LOOT } from './content/heroic_loot';
-import { FURY_STOCK } from './content/pvp_honor';
+import { SEASON2_STOCK } from './content/pvp_honor_season2';
 import { DUNGEONS, ITEMS, MOBS } from './data';
 import { createNpc } from './entity';
 import { VARKHUL_BOSS_ID } from './ignivar_raid_ids';
@@ -415,8 +415,13 @@ export function weeklyLootPool(
   raidUnlocks?: readonly number[],
 ): string[] {
   const ids = new Set<string>();
-  if (pool === 'pvp') for (const id of FURY_STOCK) ids.add(id);
-  else if (pool === 'world') {
+  if (pool === 'pvp') {
+    // The PvP row pays Warfare Season 2 only (the Warfare entry tier stays an
+    // honor purchase); the class filter below keeps it to the viewer's own
+    // three spec sets and the season weapons it can wield. Pinned by
+    // tests/warfare_season2.test.ts.
+    for (const id of SEASON2_STOCK) ids.add(id);
+  } else if (pool === 'world') {
     // The world row is the catch-up shelf: every Normal drop of the previous raid
     // tier (Nythraxis, item level 29), ungated by kills because world quests earn
     // it, not the raid. The tier is pinned by tests/weekly_vault_world_row.test.ts.

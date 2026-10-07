@@ -6133,6 +6133,7 @@ export const cs_CZ: EnTranslations = {
       "sourceActivityMasterworkCraft": "Získáno vytvořením mistrovského díla",
       "sourceActivityRiftFirstClear": "Uděleno každému členu družiny, která zvládne první průchod hodnocenou trhlinou",
       "sourceActivityBuriedHoard": "Nalezeno v odměnném truhlici pohřbeného pokladu, trezoru který mapu vede",
+      "sourceActivityWeeklyVaultPvp": "Chosen from the PvP row of the Weekly Vault",
       "cellMissingSourceAria": "{name}, dosud nenalezeno, {source}",
       "cellOwnedClearsAria": "{name}, zkatalogizováno, poprvé nalezeno při průchodu {count}",
       "searchPlaceholder": "Hledat relikvie",

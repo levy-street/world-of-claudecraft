@@ -6133,6 +6133,7 @@ export const en_XA: EnTranslations = {
       "sourceActivityMasterworkCraft": "[Éáŕñéð ƀý çŕáƒţíñĝ á ɱášţéŕŵóŕķ]",
       "sourceActivityRiftFirstClear": "[Áŵáŕðéð ţó éʋéŕý ɱéɱƀéŕ óƒ ţĥé þáŕţý ţĥáţ ŵíñš á ŕáñķéð Ŕíƒţ'š ƒíŕšţ çļéáŕ]",
       "sourceActivityBuriedHoard": "[Ƒóúñð íñ ţĥé ŕéŵáŕð çĥéšţ óƒ á Ɓúŕíéð Ĥóáŕð, ţĥé ʋáúļţ á ţŕéášúŕé ɱáþ ļéáðš ţó]",
+      "sourceActivityWeeklyVaultPvp": "[Çĥóšéñ ƒŕóɱ ţĥé ÞʋÞ ŕóŵ óƒ ţĥé Ŵééķļý Ʋáúļţ]",
       "cellMissingSourceAria": "[{name}, ñóţ ýéţ ƒóúñð, {source}]",
       "cellOwnedClearsAria": "[{name}, çáţáļóĝúéð, ƒíŕšţ ƒóúñð óñ çļéáŕ {count}]",
       "searchPlaceholder": "[Šéáŕçĥ ŕéļíçš]",
