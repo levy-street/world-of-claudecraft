@@ -19724,12 +19724,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualPrice': '12か月分を一括で{price}',
   'hudChrome.wocStore.subscription.annualTerms':
     '同じ料金で毎年更新されます。Stripeで法定通貨を使ってお支払いください。請求設定で解約できます。',
-  'hudChrome.wocStore.subscription.paidReward':
-    '支払いのたびに{value}相当のClaudiumを{amount}獲得します。無料体験中はClaudiumを獲得できません。',
   'hudChrome.wocStore.subscription.annualMount':
     '支払い後、購入したキャラクターで郵便から魂に縛られた戦車の鍵を受け取れます。戦車はセット用騎乗動物の仮モデルです。',
   'hudChrome.wocStore.subscription.trialTerms':
-    '1アカウントにつき1回、{days}日間無料で体験できます。支払い方法の登録が必要です。解約しない場合、体験終了時に{price}が請求されます。体験中はClaudiumやセットの騎乗動物を獲得できません。',
+    '1アカウントにつき1回、{days}日間無料で体験できます。支払い方法の登録が必要です。解約しない場合、体験終了時に{price}が請求されます。',
   'hudChrome.wocStore.subscription.startTrial': '7日間の無料体験を開始',
   'hudChrome.wocStore.subscription.annualClaim': 'セットの騎乗動物を受け取る',
   'hudChrome.wocStore.subscription.annualPending':

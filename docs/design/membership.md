@@ -18,27 +18,25 @@ remain stored but cannot enter the world until renewal. Other-character bank
 transfers require a banker and an offline target character in the same realm.
 Soulbound, quest and locked copies cannot cross character banks.
 
-## Paid rewards, trial and yearly bundle
+## Pricing, trial and yearly bundle
 
-The monthly subscription costs USD 5 and credits 500 Claudium (USD 5 value) after
-each verified payment. The yearly bundle costs USD 50, credits 6,000 Claudium
-(USD 60 value) per paid annual invoice, and supplies the existing Dreadspark
-Groundshaker tank as the placeholder mount. Its soulbound ignition key is mailed
+The monthly subscription costs USD 5. The yearly bundle costs USD 50 and
+supplies the existing Dreadspark Groundshaker tank as the placeholder mount. Its soulbound ignition key is mailed
 to the character used for checkout. Riding skill is required; keeping the key in
 bags or bank preserves ownership after membership expires. The initial annual
 payment grants the mount once; renewal and receipt retries cannot duplicate it.
 
 Both recurring plans offer one seven-day, card-required trial per account. The
-trial activates game benefits until its verified deadline but grants no Claudium
-or mount. After the trial the chosen plan charges and renews monthly or yearly
-until canceled. Tradable token purchases/redemptions do not award Claudium.
+trial activates game benefits until its verified deadline but grants no mount. After the trial the chosen plan charges and renews monthly or yearly
+until canceled. Membership payments and tradable token purchases/redemptions
+do not award Claudium.
 
 The game fixes all prices and selects the annual recipient from the authenticated
 live session. `POST /api/claudium/subscription/annual/claim` verifies the service's
 original paid-invoice receipt and uses the existing bounded custody delivery path.
 Subscription checkout reminders are persisted separately per account and plan;
 opening the store retries receipt collection without creating another checkout.
-Trial/currency/annual offers require the new validated service capability metadata.
+Trial/annual offers require the new validated service capability metadata.
 
 Ordinary gold auction listings record the seller's reduced fee when listed, so
 offline settlement keeps the agreed fee. Immediate order fills use the seller's
@@ -80,7 +78,9 @@ different contract and does not supply these endpoints. The companion implementa
 is now present locally on `codex/membership-billing`, based on service master
 `d5e3bcfda6c95f640e19dd05e52fd4727354fcfe`. Its `service/docs/MEMBERSHIP.md`
 documents configuration, payment verification and operator recovery. Subscription
-and token fulfillment use separate receipts; paid recurring invoices credit the existing Claudium ledger.
+and token fulfillment use separate receipts. Paid recurring invoices verify membership
+and annual mount eligibility without crediting currency. Deploy the companion service
+with all old membership writers drained before enabling the updated game offers.
 
 This game repository does not contain the external economy service. Deploy and
 verify its companion implementation before enabling token sales. Its

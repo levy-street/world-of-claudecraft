@@ -12,7 +12,6 @@ export function subscriptionOffersHtml(
   pendingMonthly = false,
   canDiscoverAnnual = false,
 ): string {
-  const modern = state.plans !== undefined;
   const recoverable = ['none', 'incomplete'].includes(state.status);
   const offers =
     state.canCheckout || (recoverable && (pendingAnnual || pendingMonthly))
@@ -28,9 +27,6 @@ export function subscriptionOffersHtml(
         `<div data-subscription-plan="${offer.plan}"><h3>${esc(t(annual ? 'hudChrome.wocStore.subscription.annualTitle' : 'hudChrome.wocStore.subscription.monthlyTitle'))}</h3>` +
         `<p>${esc(t(annual ? 'hudChrome.wocStore.subscription.annualPrice' : 'hudChrome.wocStore.subscription.price', { price }))}</p>` +
         `<p>${esc(t(annual ? 'hudChrome.wocStore.subscription.annualTerms' : 'hudChrome.wocStore.subscription.terms'))}</p>` +
-        (modern
-          ? `<p>${esc(t('hudChrome.wocStore.subscription.paidReward', { amount: formatNumber(offer.claudium), value: usdText(offer.claudium) }))}</p>`
-          : '') +
         (annual ? `<p>${esc(t('hudChrome.wocStore.subscription.annualMount'))}</p>` : '') +
         (state.canCheckout && state.trialEligible
           ? `<p>${esc(t('hudChrome.wocStore.subscription.trialTerms', { days: formatNumber(state.trialDays ?? 7), price }))}</p>`

@@ -14465,7 +14465,6 @@ export type TranslationKeyFlat =
   | 'hudChrome.wocStore.subscription.error'
   | 'hudChrome.wocStore.subscription.manage'
   | 'hudChrome.wocStore.subscription.monthlyTitle'
-  | 'hudChrome.wocStore.subscription.paidReward'
   | 'hudChrome.wocStore.subscription.price'
   | 'hudChrome.wocStore.subscription.resumeCheckout'
   | 'hudChrome.wocStore.subscription.startTrial'

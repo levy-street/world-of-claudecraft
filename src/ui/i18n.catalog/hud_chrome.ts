@@ -554,12 +554,10 @@ export const hudChromeStrings = {
       annualPrice: '{price} for 12 months, paid upfront',
       annualTerms:
         'Renews yearly at the same price. Pay with fiat through Stripe. Cancel in billing settings.',
-      paidReward:
-        'Each paid charge grants {amount} Claudium, worth {value}. No Claudium is granted during the free trial.',
       annualMount:
         'After payment, collect a soulbound tank mount key by mail on the character that purchased this bundle. The tank is a placeholder for the bundle mount.',
       trialTerms:
-        'Try membership free for {days} days, once per account. A payment method is required. You will be charged {price} when the trial ends unless you cancel. No Claudium or bundle mount is awarded during the trial.',
+        'Try membership free for {days} days, once per account. A payment method is required. You will be charged {price} when the trial ends unless you cancel.',
       startTrial: 'Start 7-day free trial',
       resumeCheckout: 'Resume checkout',
       checkoutClosed:

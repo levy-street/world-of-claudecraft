@@ -19707,12 +19707,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualPrice': '12개월 이용료 {price} 선불',
   'hudChrome.wocStore.subscription.annualTerms':
     '같은 가격으로 매년 갱신됩니다. Stripe에서 법정 화폐로 결제하세요. 결제 설정에서 취소할 수 있습니다.',
-  'hudChrome.wocStore.subscription.paidReward':
-    '결제할 때마다 {value} 상당의 Claudium {amount}개를 받습니다. 무료 체험 중에는 Claudium이 지급되지 않습니다.',
   'hudChrome.wocStore.subscription.annualMount':
     '결제 후 구매한 캐릭터로 우편에서 영혼 귀속 전차 탈것 열쇠를 받으세요. 전차는 묶음 탈것의 임시 모델입니다.',
   'hudChrome.wocStore.subscription.trialTerms':
-    '계정당 한 번 {days}일간 무료로 체험하세요. 결제 수단 등록이 필요합니다. 취소하지 않으면 체험 종료 시 {price}가 청구됩니다. 체험 중에는 Claudium이나 묶음 탈것이 지급되지 않습니다.',
+    '계정당 한 번 {days}일간 무료로 체험하세요. 결제 수단 등록이 필요합니다. 취소하지 않으면 체험 종료 시 {price}가 청구됩니다.',
   'hudChrome.wocStore.subscription.startTrial': '7일 무료 체험 시작',
   'hudChrome.wocStore.subscription.annualClaim': '묶음 탈것 받기',
   'hudChrome.wocStore.subscription.annualPending':

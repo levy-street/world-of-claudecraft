@@ -18760,12 +18760,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualPrice': '12個月共{price}，一次付清',
   'hudChrome.wocStore.subscription.annualTerms':
     '每年以相同價格續訂。透過Stripe使用法定貨幣付款。可在帳單設定中取消。',
-  'hudChrome.wocStore.subscription.paidReward':
-    '每次付費可獲得{amount} Claudium，價值{value}。免費試用期間不發放Claudium。',
   'hudChrome.wocStore.subscription.annualMount':
     '付款後，請使用購買禮包的角色從郵件中領取靈魂綁定的坦克坐騎鑰匙。坦克暫時代替禮包坐騎。',
   'hudChrome.wocStore.subscription.trialTerms':
-    '每個帳號可免費試用一次，共{days}天。需要提供付款方式。除非取消，否則試用結束時將收取{price}。試用期間不發放Claudium或禮包坐騎。',
+    '每個帳號可免費試用一次，共{days}天。需要提供付款方式。除非取消，否則試用結束時將收取{price}。',
   'hudChrome.wocStore.subscription.startTrial': '開始7天免費試用',
   'hudChrome.wocStore.subscription.annualClaim': '領取禮包坐騎',
   'hudChrome.wocStore.subscription.annualPending':
