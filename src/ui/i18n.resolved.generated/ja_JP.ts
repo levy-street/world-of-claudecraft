@@ -19417,6 +19417,231 @@ export const ja_JP: EnTranslations = {
       "saltwrack_spaulders": {
         "name": "塩の難破のスポルダー"
       },
+      "brookwatch_vest": {
+        "name": "小川監視のベスト"
+      },
+      "brookwatch_trousers": {
+        "name": "小川監視のトラウザー"
+      },
+      "brookwatch_moccasins": {
+        "name": "小川監視のモカシン"
+      },
+      "brookwatch_cowl": {
+        "name": "小川監視のカウル"
+      },
+      "brookwatch_mitts": {
+        "name": "小川監視のミトン"
+      },
+      "brookwatch_epaulets": {
+        "name": "小川監視のエポレット"
+      },
+      "brookwatch_cinch": {
+        "name": "小川監視のシンチ"
+      },
+      "hedgerow_vest": {
+        "name": "垣根のベスト"
+      },
+      "hedgerow_trousers": {
+        "name": "垣根のトラウザー"
+      },
+      "hedgerow_moccasins": {
+        "name": "垣根のモカシン"
+      },
+      "hedgerow_cowl": {
+        "name": "垣根のカウル"
+      },
+      "hedgerow_mitts": {
+        "name": "垣根のミトン"
+      },
+      "hedgerow_epaulets": {
+        "name": "垣根のエポレット"
+      },
+      "hedgerow_cinch": {
+        "name": "垣根のシンチ"
+      },
+      "bogwalker_vest": {
+        "name": "泥沼行きのベスト"
+      },
+      "bogwalker_trousers": {
+        "name": "泥沼行きのトラウザー"
+      },
+      "bogwalker_moccasins": {
+        "name": "泥沼行きのモカシン"
+      },
+      "bogwalker_cowl": {
+        "name": "泥沼行きのカウル"
+      },
+      "bogwalker_mitts": {
+        "name": "泥沼行きのミトン"
+      },
+      "bogwalker_epaulets": {
+        "name": "泥沼行きのエポレット"
+      },
+      "bogwalker_cinch": {
+        "name": "泥沼行きのシンチ"
+      },
+      "thornspire_vest": {
+        "name": "棘塔のベスト"
+      },
+      "thornspire_trousers": {
+        "name": "棘塔のトラウザー"
+      },
+      "thornspire_moccasins": {
+        "name": "棘塔のモカシン"
+      },
+      "thornspire_cowl": {
+        "name": "棘塔のカウル"
+      },
+      "thornspire_mitts": {
+        "name": "棘塔のミトン"
+      },
+      "thornspire_epaulets": {
+        "name": "棘塔のエポレット"
+      },
+      "thornspire_cinch": {
+        "name": "棘塔のシンチ"
+      },
+      "hollowveil_vest": {
+        "name": "空洞の帳のベスト"
+      },
+      "hollowveil_trousers": {
+        "name": "空洞の帳のトラウザー"
+      },
+      "hollowveil_moccasins": {
+        "name": "空洞の帳のモカシン"
+      },
+      "hollowveil_cowl": {
+        "name": "空洞の帳のカウル"
+      },
+      "hollowveil_mitts": {
+        "name": "空洞の帳のミトン"
+      },
+      "hollowveil_epaulets": {
+        "name": "空洞の帳のエポレット"
+      },
+      "hollowveil_cinch": {
+        "name": "空洞の帳のシンチ"
+      },
+      "trailwarden_vest": {
+        "name": "径守のベスト"
+      },
+      "trailwarden_trousers": {
+        "name": "径守のトラウザー"
+      },
+      "trailwarden_moccasins": {
+        "name": "径守のモカシン"
+      },
+      "trailwarden_cowl": {
+        "name": "径守のカウル"
+      },
+      "trailwarden_mitts": {
+        "name": "径守のミトン"
+      },
+      "trailwarden_epaulets": {
+        "name": "径守のエポレット"
+      },
+      "trailwarden_cinch": {
+        "name": "径守のシンチ"
+      },
+      "highgale_vest": {
+        "name": "高き疾風のベスト"
+      },
+      "highgale_trousers": {
+        "name": "高き疾風のトラウザー"
+      },
+      "highgale_moccasins": {
+        "name": "高き疾風のモカシン"
+      },
+      "highgale_cowl": {
+        "name": "高き疾風のカウル"
+      },
+      "highgale_mitts": {
+        "name": "高き疾風のミトン"
+      },
+      "highgale_epaulets": {
+        "name": "高き疾風のエポレット"
+      },
+      "highgale_cinch": {
+        "name": "高き疾風のシンチ"
+      },
+      "breakwater_shoulderguards": {
+        "name": "防波堤のショルダーガード"
+      },
+      "breakwater_pauldrons": {
+        "name": "防波堤の肩甲"
+      },
+      "breakwater_epaulets": {
+        "name": "防波堤のエポレット"
+      },
+      "gravebell_moccasins": {
+        "name": "墓鐘のモカシン"
+      },
+      "oathbroken_trousers": {
+        "name": "誓い破りのトラウザー"
+      },
+      "sparkglass_trousers": {
+        "name": "火花水晶のトラウザー"
+      },
+      "stillhymn_moccasins": {
+        "name": "静寂の聖歌のモカシン"
+      },
+      "sealkeeper_mitts": {
+        "name": "封印守りのミトン"
+      },
+      "fetterbound_trousers": {
+        "name": "枷縛りのトラウザー"
+      },
+      "wyrmshadow_vest": {
+        "name": "竜影のベスト"
+      },
+      "cinderbrood_spaulders": {
+        "name": "残り火の眷属のスポルダー"
+      },
+      "cinderbrood_epaulets": {
+        "name": "残り火の眷属のエポレット"
+      },
+      "hoarfrost_shoulderguards": {
+        "name": "霧氷のショルダーガード"
+      },
+      "hoarfrost_pauldrons": {
+        "name": "霧氷の肩甲"
+      },
+      "hoarfrost_epaulets": {
+        "name": "霧氷のエポレット"
+      },
+      "blackmere_epaulets": {
+        "name": "黒き湖のエポレット"
+      },
+      "reedhush_epaulets": {
+        "name": "葦の静けさのエポレット"
+      },
+      "cairnking_epaulets": {
+        "name": "塚の王のエポレット"
+      },
+      "palehunt_epaulets": {
+        "name": "蒼白の狩りのエポレット"
+      },
+      "jadeshrine_epaulets": {
+        "name": "翡翠の祠のエポレット"
+      },
+      "gildhedge_shoulderguards": {
+        "name": "金の生垣のショルダーガード"
+      },
+      "gildhedge_pauldrons": {
+        "name": "金の生垣の肩甲"
+      },
+      "gildhedge_epaulets": {
+        "name": "金の生垣のエポレット"
+      },
+      "saltwrack_shoulderguards": {
+        "name": "塩の難破のショルダーガード"
+      },
+      "saltwrack_pauldrons": {
+        "name": "塩の難破の肩甲"
+      },
+      "saltwrack_epaulets": {
+        "name": "塩の難破のエポレット"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },

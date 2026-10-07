@@ -19417,6 +19417,231 @@ export const zh_TW: EnTranslations = {
       "saltwrack_spaulders": {
         "name": "鹽骸肩鎧"
       },
+      "brookwatch_vest": {
+        "name": "溪衛背心"
+      },
+      "brookwatch_trousers": {
+        "name": "溪衛長褲"
+      },
+      "brookwatch_moccasins": {
+        "name": "溪衛鹿皮鞋"
+      },
+      "brookwatch_cowl": {
+        "name": "溪衛風帽"
+      },
+      "brookwatch_mitts": {
+        "name": "溪衛露指手套"
+      },
+      "brookwatch_epaulets": {
+        "name": "溪衛肩飾"
+      },
+      "brookwatch_cinch": {
+        "name": "溪衛束腰"
+      },
+      "hedgerow_vest": {
+        "name": "樹籬背心"
+      },
+      "hedgerow_trousers": {
+        "name": "樹籬長褲"
+      },
+      "hedgerow_moccasins": {
+        "name": "樹籬鹿皮鞋"
+      },
+      "hedgerow_cowl": {
+        "name": "樹籬風帽"
+      },
+      "hedgerow_mitts": {
+        "name": "樹籬露指手套"
+      },
+      "hedgerow_epaulets": {
+        "name": "樹籬肩飾"
+      },
+      "hedgerow_cinch": {
+        "name": "樹籬束腰"
+      },
+      "bogwalker_vest": {
+        "name": "沼行背心"
+      },
+      "bogwalker_trousers": {
+        "name": "沼行長褲"
+      },
+      "bogwalker_moccasins": {
+        "name": "沼行鹿皮鞋"
+      },
+      "bogwalker_cowl": {
+        "name": "沼行風帽"
+      },
+      "bogwalker_mitts": {
+        "name": "沼行露指手套"
+      },
+      "bogwalker_epaulets": {
+        "name": "沼行肩飾"
+      },
+      "bogwalker_cinch": {
+        "name": "沼行束腰"
+      },
+      "thornspire_vest": {
+        "name": "棘尖背心"
+      },
+      "thornspire_trousers": {
+        "name": "棘尖長褲"
+      },
+      "thornspire_moccasins": {
+        "name": "棘尖鹿皮鞋"
+      },
+      "thornspire_cowl": {
+        "name": "棘尖風帽"
+      },
+      "thornspire_mitts": {
+        "name": "棘尖露指手套"
+      },
+      "thornspire_epaulets": {
+        "name": "棘尖肩飾"
+      },
+      "thornspire_cinch": {
+        "name": "棘尖束腰"
+      },
+      "hollowveil_vest": {
+        "name": "空幕背心"
+      },
+      "hollowveil_trousers": {
+        "name": "空幕長褲"
+      },
+      "hollowveil_moccasins": {
+        "name": "空幕鹿皮鞋"
+      },
+      "hollowveil_cowl": {
+        "name": "空幕風帽"
+      },
+      "hollowveil_mitts": {
+        "name": "空幕露指手套"
+      },
+      "hollowveil_epaulets": {
+        "name": "空幕肩飾"
+      },
+      "hollowveil_cinch": {
+        "name": "空幕束腰"
+      },
+      "trailwarden_vest": {
+        "name": "徑衛背心"
+      },
+      "trailwarden_trousers": {
+        "name": "徑衛長褲"
+      },
+      "trailwarden_moccasins": {
+        "name": "徑衛鹿皮鞋"
+      },
+      "trailwarden_cowl": {
+        "name": "徑衛風帽"
+      },
+      "trailwarden_mitts": {
+        "name": "徑衛露指手套"
+      },
+      "trailwarden_epaulets": {
+        "name": "徑衛肩飾"
+      },
+      "trailwarden_cinch": {
+        "name": "徑衛束腰"
+      },
+      "highgale_vest": {
+        "name": "高風背心"
+      },
+      "highgale_trousers": {
+        "name": "高風長褲"
+      },
+      "highgale_moccasins": {
+        "name": "高風鹿皮鞋"
+      },
+      "highgale_cowl": {
+        "name": "高風風帽"
+      },
+      "highgale_mitts": {
+        "name": "高風露指手套"
+      },
+      "highgale_epaulets": {
+        "name": "高風肩飾"
+      },
+      "highgale_cinch": {
+        "name": "高風束腰"
+      },
+      "breakwater_shoulderguards": {
+        "name": "防波護肩"
+      },
+      "breakwater_pauldrons": {
+        "name": "防波肩甲"
+      },
+      "breakwater_epaulets": {
+        "name": "防波肩飾"
+      },
+      "gravebell_moccasins": {
+        "name": "墓鐘鹿皮鞋"
+      },
+      "oathbroken_trousers": {
+        "name": "背誓長褲"
+      },
+      "sparkglass_trousers": {
+        "name": "火花晶長褲"
+      },
+      "stillhymn_moccasins": {
+        "name": "寂詠鹿皮鞋"
+      },
+      "sealkeeper_mitts": {
+        "name": "守印露指手套"
+      },
+      "fetterbound_trousers": {
+        "name": "鐐縛長褲"
+      },
+      "wyrmshadow_vest": {
+        "name": "龍影背心"
+      },
+      "cinderbrood_spaulders": {
+        "name": "燼巢肩鎧"
+      },
+      "cinderbrood_epaulets": {
+        "name": "燼巢肩飾"
+      },
+      "hoarfrost_shoulderguards": {
+        "name": "白霜護肩"
+      },
+      "hoarfrost_pauldrons": {
+        "name": "白霜肩甲"
+      },
+      "hoarfrost_epaulets": {
+        "name": "白霜肩飾"
+      },
+      "blackmere_epaulets": {
+        "name": "黑沼肩飾"
+      },
+      "reedhush_epaulets": {
+        "name": "葦寂肩飾"
+      },
+      "cairnking_epaulets": {
+        "name": "塚王肩飾"
+      },
+      "palehunt_epaulets": {
+        "name": "蒼獵肩飾"
+      },
+      "jadeshrine_epaulets": {
+        "name": "玉祠肩飾"
+      },
+      "gildhedge_shoulderguards": {
+        "name": "金籬護肩"
+      },
+      "gildhedge_pauldrons": {
+        "name": "金籬肩甲"
+      },
+      "gildhedge_epaulets": {
+        "name": "金籬肩飾"
+      },
+      "saltwrack_shoulderguards": {
+        "name": "鹽骸護肩"
+      },
+      "saltwrack_pauldrons": {
+        "name": "鹽骸肩甲"
+      },
+      "saltwrack_epaulets": {
+        "name": "鹽骸肩飾"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },

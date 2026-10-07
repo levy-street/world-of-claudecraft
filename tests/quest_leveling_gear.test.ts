@@ -149,12 +149,13 @@ describe('choose-one leveling gear', () => {
     expect(gaps).toEqual([]);
   });
 
-  it('gives the Strength hybrids their Strength piece in their heaviest armor', () => {
+  it('gives the hybrids their main stat in their heaviest armor', () => {
     // Measured, not assumed: enhancement and feral attack power is 2 per
     // Strength (+30 Strength was +19.7 and +23.7 DPS at level 20, +30 Agility
-    // +6.2 and nothing), so neither may default to the Agility leather. Pinned
-    // on the quests whose list is the band set alone; a quest that also offers
-    // its authored piece may preselect that piece when it fits the spec better.
+    // +6.2 and nothing), so neither may default to the Agility leather; balance
+    // and restoration druids take Intellect in leather, never the cloth robe.
+    // Pinned on the quests whose list is the band set alone; a quest that also
+    // offers its authored piece may preselect that piece when it fits better.
     const cases: [PlayerClass, string, string, 'str' | 'agi' | 'int'][] = [
       ['shaman', 'enhancement', 'mail', 'str'],
       ['druid', 'feral', 'leather', 'str'],
@@ -162,6 +163,9 @@ describe('choose-one leveling gear', () => {
       ['rogue', 'combat', 'leather', 'agi'],
       ['hunter', 'beast_mastery', 'leather', 'agi'],
       ['shaman', 'restoration', 'mail', 'int'],
+      ['druid', 'balance', 'leather', 'int'],
+      ['druid', 'restoration', 'leather', 'int'],
+      ['priest', 'holy', 'cloth', 'int'],
     ];
     let pinned = 0;
     for (const questId of Object.keys(QUEST_CHOICE_REWARDS)) {
