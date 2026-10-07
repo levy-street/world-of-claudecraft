@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { nextWeeklyRaidResetMs } from '../src/reset_calendar';
 import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
+import { SEASON2_SETS, SEASON2_STOCK } from '../src/sim/content/pvp_honor_season2';
 import { BUILTIN_WORLD, ITEMS, MOBS, NPCS } from '../src/sim/data';
 import { prepareWeeklyVaultPlaytest } from '../src/sim/dev/weekly_vault_playtest';
 import { createMob } from '../src/sim/entity';
@@ -124,6 +125,34 @@ describe('weekly vault choices', () => {
       }
     },
   );
+
+  // The PvP row pays Warfare Season 2 only, for the character's class
+  // (tests/warfare_season2.test.ts pins the pool itself): every choice rolls a
+  // piece of the warrior's own sets or a season weapon, and the claim grants it.
+  it('rolls and grants only Warfare Season 2 for the character class from PvP choices', () => {
+    const { sim, pid, meta } = make(42, true, 'warrior');
+    const season2 = new Set(SEASON2_STOCK);
+    meta.weeklyRewards = emptyWeeklyRewards(WEEK);
+    meta.weeklyRewards.vaults = [
+      { resetAtMs: 1000, choices: [{ pool: 'pvp' }, { pool: 'pvp' }, { pool: 'pvp' }] },
+    ];
+    for (let i = 0; i < 3; i++) openSelected(sim, `1000:${i}`, pid);
+    const rolled = meta.weeklyRewards.vaults[0].choices.map((choice) => choice.itemId!);
+    expect(rolled).toHaveLength(3);
+    for (const itemId of rolled) {
+      expect(season2.has(itemId), itemId).toBe(true);
+      const sets = SEASON2_SETS.filter((set) => set.itemIds.includes(itemId));
+      expect(
+        sets.every((set) => set.cls === 'warrior'),
+        itemId,
+      ).toBe(true);
+    }
+    const itemId = rolled[1];
+    sim.claimWeeklyReward('1000:1', pid);
+    expect(meta.weeklyRewards.vaults).toHaveLength(0);
+    expect(sim.ctx.countItem(itemId, pid)).toBe(1);
+    expect(meta.deedStats.itemsDiscovered.has(itemId)).toBe(true);
+  });
 
   it('keeps a concealed legacy world reward openable even when its pool is fully reserved', () => {
     const { sim, pid, meta } = make();

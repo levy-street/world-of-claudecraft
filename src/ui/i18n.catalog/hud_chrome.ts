@@ -8934,6 +8934,10 @@ export const hudChromeStrings = {
     // chest, never from the keeper's own loot, and at the tier the map buys.
     sourceActivityBuriedHoard:
       'Found in the reward chest of a Buried Hoard, the vault a treasure map leads to',
+    // Warfare Season 2 (content/pvp_honor_season2.ts): the PvP row of the Weekly
+    // Vault rolls only Season 2 (weeklyLootPool('pvp')), beside the honor
+    // quartermasters that sell it.
+    sourceActivityWeeklyVaultPvp: 'Chosen from the PvP row of the Weekly Vault',
     // The aria label folds the lines through formatList (Intl.ListFormat), so
     // there is no join key to translate: CLDR owns the separators per locale,
     // including the final-conjunction shapes a pairwise key cannot express.

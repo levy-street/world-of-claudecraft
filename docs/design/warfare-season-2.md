@@ -102,6 +102,11 @@ everywhere. These rules hold them together:
   Kole in Highwatch). The shop lists a Season 2 group first: the viewer's own three spec
   sets (the sets are class-locked, so the shop shows only what the viewer can wear), then the
   season weapons the viewer can wield. The entry tier follows as its own group, unfiltered.
+- **The Weekly Vault:** the PvP row (1, 3 and 5 ranked arena or rated battleground wins a
+  week) rolls Season 2 and nothing else, class-filtered like every vault row, so a character
+  rolls only its own three spec sets and the season weapons it can wield (`weeklyLootPool` in
+  `src/sim/weekly_rewards.ts`; amended 2026-10-07). The Reliquary's Vanguard Gallery names
+  both quartermasters and the `weekly_vault_pvp` activity on every slot.
 - **Art:** the four weapons ship painted icons (the `warfare-season2-weapons-2026-09-25`
   batch in `public/ui/items/mapping.json`) and held models on shipped GLBs. The 135 armor
   pieces sit on `ITEM_ART_PENDING` (pinned in `tests/item_icons.test.ts`) and draw their

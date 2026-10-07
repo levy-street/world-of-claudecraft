@@ -110,7 +110,8 @@ import {
   RIFT_GREEN_MOUNT_REINS,
 } from '../src/sim/rift/progression';
 import { Rng } from '../src/sim/rng';
-import { DEED_STAT_KEYS, type ItemDef, type PlayerClass } from '../src/sim/types';
+import { ALL_CLASSES, DEED_STAT_KEYS, type ItemDef, type PlayerClass } from '../src/sim/types';
+import { weeklyLootPool } from '../src/sim/weekly_rewards';
 
 const CONQUEROR_PAGES = RELIQUARY_PAGES.filter((p) => p.shelf === 'conquerors');
 const PROFESSION_PAGES = RELIQUARY_PAGES.filter((p) => p.shelf === 'professions');
@@ -2842,6 +2843,10 @@ const ACTIVITY_AWARDS: Readonly<Record<string, readonly string[]>> = {
   // (at the tier the map buys, each tier discovering its piece through
   // ItemDef.relicOf) when an entrant opens a hoard's reward chest.
   buried_hoard: HOARD_BASE_ITEM_IDS,
+  // Derived from the live PvP row of the Weekly Vault over every class
+  // (weeklyLootPool('pvp'), which a PvP-row choice rolls on open and
+  // claimWeeklyReward grants): Warfare Season 2, the Vanguard Gallery's stock.
+  weekly_vault_pvp: [...new Set(ALL_CLASSES.flatMap((cls) => weeklyLootPool('pvp', cls)))],
 };
 
 /**
@@ -3219,7 +3224,8 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // The two honor quartermasters, on every slot of both pages (Phase 21).
   conquerors_warfare_gallery: 2,
   conquerors_warfare_armory: 2,
-  conquerors_vanguard_gallery: 2,
+  // Warfare Season 2: both quartermasters plus the Weekly Vault's PvP row.
+  conquerors_vanguard_gallery: 3,
   // The retired vault is deliberately sourceless (excludeFromCompletion:
   // retired relics have no door to name), so it resolves to zero sources.
   horizons_vault_of_ages: 0,
@@ -3838,6 +3844,7 @@ describe('Reliquary source hints resolve against live content', () => {
       'masterwork_craft',
       'rift_first_clear',
       'buried_hoard',
+      'weekly_vault_pvp',
     ]);
   });
 

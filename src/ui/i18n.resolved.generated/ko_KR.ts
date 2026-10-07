@@ -6133,6 +6133,7 @@ export const ko_KR: EnTranslations = {
       "sourceActivityMasterworkCraft": "걸작 제작으로 획득",
       "sourceActivityRiftFirstClear": "등급 균열의 최초 클리어를 차지한 파티 전원에게 수여",
       "sourceActivityBuriedHoard": "보물 지도가 이끄는 묻힌 보물의 보상 상자에서 획득",
+      "sourceActivityWeeklyVaultPvp": "주간 금고의 PvP 줄에서 선택해 획득",
       "cellMissingSourceAria": "{name}, 아직 없음, {source}",
       "cellOwnedClearsAria": "{name}, 수록됨, 첫 획득은 클리어 {count}회차",
       "searchPlaceholder": "성물 검색",
