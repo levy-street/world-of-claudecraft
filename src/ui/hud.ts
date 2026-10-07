@@ -85,7 +85,6 @@ import {
 import { specialRoleColor } from '../sim/discord_roles';
 import { canEquipItem, isUniqueEquipped, weaponHand } from '../sim/equipment_rules';
 import type { FactionId } from '../sim/factions';
-import { isItemLevelEligible, itemInstanceLevel, itemScore } from '../sim/item_level';
 import type { Ante, PickAction } from '../sim/lockpick';
 import type { MaterialComposition } from '../sim/material_sources';
 import { petCanForceTaunt } from '../sim/pet/pet_taunt_gate';
@@ -129,6 +128,7 @@ import {
   xpUntilNextPrestige,
 } from '../sim/types';
 import { maxBuyCount } from '../sim/vendor_buy_stack';
+import type { SubscriptionStoreHooks } from '../subscription_contract';
 import {
   type CharacterProfile,
   type DailyRewardStatus,
@@ -179,6 +179,7 @@ import { bagSlotsLineKey, bagsWindowShown } from './bags_view';
 import { BagsWindow, dismissBagPrompts } from './bags_window';
 import { BankWindow } from './bank_window';
 import { makeBankWindowFocus } from './bank_window_focus';
+import { closeBankBags, openBankCompanion, undockBagCompanions } from './bank_window_lifecycle';
 import {
   type BannerClass,
   type BannerEnqueueOutcome,
@@ -448,6 +449,7 @@ import { ReadyCheckLeaderWindow } from './hud/chat/ready_check_leader_window';
 import { type CooldownManagerController, mountCooldowns } from './hud/cooldown_manager';
 import { CosmeticsWindow } from './hud/cosmetics';
 import { SkinEventController } from './hud/cosmetics/skin_event_controller';
+import { CourierWindow } from './hud/courier';
 import {
   CrossHotbarController,
   type CrossHotbarHold,
@@ -653,6 +655,7 @@ import {
   vendorSellTooltipLine,
 } from './item_instance_tooltip';
 import { itemKindLabel, itemQualityLabel } from './item_kind_label';
+import { itemLevelTooltipLines } from './item_level_tooltip';
 import { itemNameColor } from './item_name_color';
 import {
   equippedSetTooltipPieces,
@@ -703,6 +706,13 @@ import { marketCollectIndicatorView } from './market_view';
 import { MarketWindow } from './market_window';
 import { masterwroughtTooltipLines } from './masterwrought_cap_view';
 import { closeMaterialSourcesDialog, openMaterialSourcesDialog } from './material_sources_dialog';
+import {
+  type MembershipTooltipWearer,
+  membershipItemTooltipLines,
+  membershipTooltipEquipment,
+  membershipTooltipInstance,
+  membershipTooltipItem,
+} from './membership_item_tooltip';
 import { Meters } from './meters';
 import { MicroMenuStatePainter, microMenuWindowOpen } from './micro_menu_state_painter';
 import { createMicroMenuStateView } from './micro_menu_state_view';
@@ -853,7 +863,6 @@ import {
   MOTD_RESULT_FALLBACK_KEY,
   MOTD_RESULT_KEYS,
 } from './result_code_keys';
-import { itemLevelReadout } from './rift_band_tooltip';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
 import {
@@ -869,6 +878,7 @@ import { stackSizeTooltipLine } from './stack_size_tooltip_view';
 import { type StatTooltipI18n, statCellHtml, statTooltipHtml } from './stat_tooltip_view';
 import { clearOpenStoreResult, MODAL_PROMPT_SELECTOR } from './store_decision_prompt';
 import { mountStorePromoCard, type StorePromoCardController } from './store_promo_card';
+import { dailyRewardsStoreSnapshot } from './store_snapshot_adapter';
 import { nearestSubzone } from './subzone';
 import { SwingTimerBars } from './swing_timer_bars';
 import { localizeSystemText } from './system_text_i18n';
@@ -1020,6 +1030,7 @@ export interface ReportHooks {
  * purchase / cosmetic-redeem flows. All values originate in the economy service.
  */
 export interface ClaudiumHooks {
+  subscription?: SubscriptionStoreHooks;
   balance(): Promise<number | null>;
   storeSnapshot(): Promise<{
     available: boolean;
@@ -3639,6 +3650,9 @@ export class Hud {
       case 'bank-window':
         this.closeBank();
         break;
+      case 'courier-window':
+        this.courierWindow.close();
+        break;
       case 'weekly-quests-window':
         this.weeklyQuestsWindow.close();
         break;
@@ -5366,6 +5380,16 @@ export class Hud {
     // Repaint inventory through the same coordinator as authoritative snapshots.
     onInventoryChanged: () => this.onInventoryChanged(),
   });
+  private readonly courierWindow = new CourierWindow($('#courier-window'), {
+    ...this.presentationBag,
+    ...this.windowFocus('#courier-window'),
+    info: () => this.sim.courierInfo,
+    inventory: () => this.sim.inventory,
+    dispatch: (request) => this.sim.courierDispatch(request),
+    closeOthers: () => this.closeOtherWindows('#courier-window'),
+    hideTooltip: () => this.hideTooltip(),
+    onClosed: () => {},
+  });
   // Book of Deeds window painter (deeds_view.ts core + deeds_window.ts
   // painter): the deed catalog browser and title picker over the IWorldDeeds
   // facet. A standalone trapping window (windowFocus), not a docked
@@ -5709,6 +5733,8 @@ export class Hud {
   // context), so the painter mounts it through mountInspectPreview.
   private readonly inspectWindow = new InspectWindow({
     ...this.presentationBag,
+    itemTooltip: (item, instance, wearer) =>
+      this.itemTooltip(item, false, instance, undefined, wearer),
     root: () => $('#inspect-window'),
     closeOthers: () => this.closeOtherWindows('#inspect-window'),
     hideTooltip: () => this.hideTooltip(),
@@ -5858,15 +5884,12 @@ export class Hud {
     onClose: () => this.dailyRewardsLauncher.refresh(true),
     onWalletConnect: requestWalletVerify,
     ...this.claudiumPurchase,
+    subscriptionHooks: () => this.claudiumHooks?.subscription,
     storeSnapshot: async () => {
       const snapshot = await this.claudiumHooks?.storeSnapshot();
       if (!snapshot) return { available: false, balance: null, items: [] };
       this.claudiumBalance.set(snapshot.balance);
-      return {
-        available: snapshot.available,
-        balance: snapshot.balance,
-        items: [...snapshot.storeItems],
-      };
+      return dailyRewardsStoreSnapshot(snapshot);
     },
     ...this.windowFocus('#daily-rewards-window'),
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
@@ -6435,7 +6458,11 @@ export class Hud {
     compare = true,
     instance?: ItemInstancePayload,
     materialSources?: MaterialComposition,
+    inspectedWearer?: MembershipTooltipWearer,
   ): string {
+    const wearer = inspectedWearer ?? this.sim.player;
+    item = membershipTooltipItem(item, this.sim, inspectedWearer);
+    instance = membershipTooltipInstance(item, instance, wearer);
     // Quest items are a purpose class, not a quality tier: title and kind use
     // quest gold, and the kind line is "Quest Item" alone (never "Common Quest
     // Item"). Story lines (related quest, progress, rules, orphaned) come from
@@ -6497,7 +6524,12 @@ export class Hud {
       if (armorTypeKey) {
         // Red armor type = the viewing player's class cannot wear this armor weight
         // (e.g. a mage hovering Mail), so they know it is not for them at a glance.
-        const badClass = canEquipItem(this.sim.cfg.playerClass, item) ? '' : ' tt-armor-bad';
+        const badClass = canEquipItem(
+          (inspectedWearer?.templateId ?? this.sim.cfg.playerClass) as PlayerClass,
+          item,
+        )
+          ? ''
+          : ' tt-armor-bad';
         html += `<div class="tt-sub tt-row"><span>${esc(slotName)}</span><span class="tt-armor${badClass}">${esc(t(armorTypeKey))}</span></div>`;
         if (uniqueTag) {
           html += `<div class="tt-sub" style="color:var(--gold)">${esc(uniqueTag)}</div>`;
@@ -6521,36 +6553,12 @@ export class Hud {
           html += `<div class="tt-sub" style="color:var(--gold)">${esc(t(line.key, line.values))}</div>`;
       }
     }
-    // Optional item-level readout (off by default; src/sim/item_level.ts derives it
-    // from where the item drops). Read live, so toggling it takes effect on the next
-    // hover. Combat gear only: sourceless items (vendor/starter) have no level, and
-    // non-combat items never get the line. A quality-rolled copy ALWAYS shows it
-    // (deliberate: its badge means "+N item levels", so the readout is the badge's
-    // legend, not the optional setting). A Riftbound band or quality copy is priced
-    // by its payload, not its stat-free shell, so its level/score come from
-    // itemLevelReadout; itemInstanceLevel/itemScore stay the source for the rest.
-    if (
-      isItemLevelEligible(item) &&
-      (instance?.lootQuality || this.optionsHooks?.settings.get('showItemLevel'))
-    ) {
-      let readout: { level: number; score: number } | undefined;
-      if (instance?.rift || instance?.lootQuality) {
-        readout = itemLevelReadout(item, instance);
-      } else {
-        const level = itemInstanceLevel(item, instance);
-        readout = level === undefined ? undefined : { level, score: itemScore(item) };
-      }
-      if (readout) {
-        html += `<div class="tt-stat" style="color:var(--gold)">${esc(
-          t('hudChrome.options.itemLevelLine', { level: itemNumber(readout.level) }),
-        )}</div>`;
-        html += `<div class="tt-sub">${esc(
-          t('hudChrome.options.itemScoreLine', {
-            score: itemNumber(readout.score, 1),
-          }),
-        )}</div>`;
-      }
-    }
+    html += itemLevelTooltipLines(
+      item,
+      instance,
+      this.optionsHooks?.settings.get('showItemLevel') === true,
+      wearer.level,
+    );
     // Bound-to-owner marker (marks and other soulbound tokens): shown like the
     // classic "Soulbound" line so a player can see it cannot be traded or destroyed.
     if (item.soulbound) {
@@ -6573,6 +6581,7 @@ export class Hud {
     // rules, incl. never claiming a quality-rank upgrade).
     html += instanceBadgeLines(instance);
     html += itemCombatTooltipLines(item, instance);
+    html += membershipItemTooltipLines(item, wearer);
     if (item.foodHp)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useFood', { amount: itemNumber(item.foodHp), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
     if (item.drinkMana)
@@ -6662,7 +6671,7 @@ export class Hud {
     if (requiredClasses) {
       html += `<div class="tt-sub">${esc(t('itemUi.tooltip.classes', { classes: requiredClasses.map(classDisplayName).join(', ') }))}</div>`;
     }
-    html += itemRequiredLevelLine(item, this.sim.player.level);
+    html += itemRequiredLevelLine(item, wearer.level);
     html += this.itemProcBlock(item) + trinketTooltipLines(item, this.sim.player);
     html += this.itemSetBlock(item);
     html += materialMakersMarkLines(item, instance, materialSources);
@@ -6774,8 +6783,8 @@ export class Hud {
   private itemCompareBlock(item: ItemDef, instance?: ItemInstancePayload): string {
     return itemCompareBlocksHtml(
       item,
-      { equipment: this.sim.equipment, instances: this.sim.equipmentInstances },
-      (id) => ITEMS[id],
+      membershipTooltipEquipment(this.sim),
+      (id) => ITEMS[id] && membershipTooltipItem(ITEMS[id], this.sim),
       (equipped, worn) => this.itemTooltip(equipped, false, worn),
       instance,
     );
@@ -6954,6 +6963,7 @@ export class Hud {
     if (this.townFocusOpen) this.renderTownFocus();
     if (this.marketWindow.isOpen) this.marketWindow.render();
     if (this.bankWindow.isOpen) this.bankWindow.render();
+    if (this.courierWindow.isOpen()) this.courierWindow.render(true);
     if (this.deedsWindow.isOpen) this.deedsWindow.render();
     if (this.reliquaryWindow.isOpen) this.reliquaryWindow.render();
     if (this.professionsWindow.isOpen) this.professionsWindow.render();
@@ -9584,6 +9594,7 @@ export class Hud {
     if (slowHud && this.wocMarketWindow.isOpen) this.wocMarketWindow.refreshIfChanged();
     // The bank closes itself when the bank mirror goes null (left the banker).
     if (slowHud && this.bankWindow.isOpen) this.bankWindow.refreshIfChanged();
+    if (slowHud && this.courierWindow.isOpen()) this.courierWindow.refreshIfChanged();
     // The store's charter fit gate reads live ladder state that no store event
     // observes, so an open store notices a rung bought behind it (ruling 21).
     if (slowHud && this.dailyRewardsWindow.isOpen) this.dailyRewardsWindow.refreshIfChanged();
@@ -12093,6 +12104,9 @@ export class Hud {
         case 'bank':
         case 'weekly_rewards':
           this.openBank(ev.type === 'weekly_rewards' ? 'rewards' : undefined);
+          break;
+        case 'courier':
+          this.courierWindow.open();
           break;
         case 'riftForge':
           // Interact at the Riftwright: open the Rift Forge window (which
@@ -15629,18 +15643,13 @@ export class Hud {
     // Weekly rewards own the screen; ordinary bank storage keeps its bags companion.
     if (this.vendorOpen) this.closeVendor();
     if (this.openHeroicVendorNpcId !== null) this.closeHeroicVendor();
-    if (
-      this.bankWindow.isOpen &&
-      document.body.classList.contains('weekly-vault-open') !== (tab === 'rewards')
-    )
-      this.closeBank();
-    if (tab === 'rewards') this.bagsWindow.close();
-    document.body.classList.toggle('weekly-vault-open', tab === 'rewards');
-    document.body.classList.toggle('bank-open', tab !== 'rewards');
-    this.bankWindow.open(tab);
-    if (tab === 'rewards') return;
-    this.renderBags();
-    $('#bags').style.display = 'flex';
+    openBankCompanion(
+      this.bankWindow,
+      $('#bags'),
+      () => this.bagsWindow.close(),
+      () => this.renderBags(),
+      tab,
+    );
   }
 
   closeBank(): void {
@@ -15648,22 +15657,11 @@ export class Hud {
   }
 
   private onBankClosed(): void {
-    const closeMobileBags = touchBagsShown(document.body.classList, $('#bags').style.display);
-    document.body.classList.remove('bank-open', 'weekly-vault-open'); // bags (if still open) re-centres
-    if (closeMobileBags) {
-      // Mirror closeVendor's teardown backstop: a discard/sell/deposit prompt may hold
-      // #bags inert (installPromptDialog) and this mobile path hides the grid without
-      // running the prompt's dismiss(), so clear inert AND remove the prompt node too
-      // (a hidden #bags is never inert and never owns a live prompt; an orphan would
-      // keep promptModalOpen() gating game keys).
-      dismissBagPrompts();
-      const bags = $('#bags');
-      bags.style.display = 'none';
-      bags.inert = false;
-      this.cancelPetFeed();
-    } else if ($('#bags').style.display !== 'none') {
-      this.renderBags();
-    }
+    closeBankBags(
+      $('#bags'),
+      () => this.cancelPetFeed(),
+      () => this.renderBags(),
+    );
   }
 
   get bankWindowOpen(): boolean {
@@ -15678,19 +15676,7 @@ export class Hud {
   // Desktop deliberately keeps the docked offset until the bank closes (the
   // recorded vendor-family behavior); toggleBags re-adds the class on re-open.
   private onBagsClosed(): void {
-    if (document.body.classList.contains('mobile-touch') && this.bankWindow.isOpen) {
-      document.body.classList.remove('bank-open');
-    }
-    // The market cluster undocks the same way: a bags-only close (the bags x-btn
-    // or the tray toggle; the market keeps its own x-btn, bags is only its
-    // optional Sell-tab companion) must not leave the still-open market pinned
-    // to the left half of the mobile 50/50 pairing with nothing on the right.
-    // Dropping the class lets the standalone mobile sheet rule take the full
-    // width back; mobile-only exactly like the bank arm above (desktop
-    // deliberately keeps the docked offset until the market closes).
-    if (document.body.classList.contains('mobile-touch') && this.marketWindow.isOpen) {
-      document.body.classList.remove('market-open');
-    }
+    undockBagCompanions(this.bankWindow.isOpen, this.marketWindow.isOpen);
     // The char-sheet companion undocks too: with the bags gone the sheet takes the
     // full screen back rather than staying a half-width orphan.
     this.syncCharBagsPairing();

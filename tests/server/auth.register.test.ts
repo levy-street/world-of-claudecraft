@@ -320,6 +320,51 @@ describe('register handler', () => {
     expect(captures).toEqual([{ id: 7, profile: { locale: 'pt_BR', marketingOptIn: true } }]);
   });
 
+  it('waits for referral capture before returning credentials for the first join', async () => {
+    let finish!: () => void;
+    let started!: () => void;
+    const began = new Promise<void>((resolve) => {
+      started = resolve;
+    });
+    const pending = new Promise<void>((resolve) => {
+      finish = resolve;
+    });
+    installDb({
+      captureReferral: async () => {
+        started();
+        await pending;
+      },
+    });
+    let completed = false;
+    const response = runHandler({
+      username: 'newhero',
+      password: 'secret123',
+      email: 'a@b.co',
+      ref: 'aldric',
+    }).then((value) => {
+      completed = true;
+      return value;
+    });
+    await began;
+    // Let all nested handler/response microtasks settle. A single microtask can
+    // falsely pass even when capture has been changed back to fire-and-forget.
+    await new Promise<void>((resolve) => setImmediate(resolve));
+    expect(completed).toBe(false);
+    finish();
+    expect((await response).status).toBe(200);
+  });
+
+  it('still completes registration when referral capture fails', async () => {
+    installDb({
+      captureReferral: async () => {
+        throw new Error('unavailable');
+      },
+    });
+    expect(
+      (await runHandler({ username: 'newhero', password: 'secret123', email: 'a@b.co' })).status,
+    ).toBe(200);
+  });
+
   it('fires the best-effort suspicious-registration report and referral capture', async () => {
     let suspicious = 0;
     let referral = 0;

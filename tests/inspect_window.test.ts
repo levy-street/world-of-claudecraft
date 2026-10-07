@@ -360,7 +360,11 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
 
   // Captured per openWith call: the tooltip payload each socket row hands the
   // Hud dep, so the SELF-override pin below can see exactly what a hover reads.
-  const tooltipCalls: Array<{ itemId: string; instance: ItemInstancePayload | undefined }> = [];
+  const tooltipCalls: Array<{
+    itemId: string;
+    instance: ItemInstancePayload | undefined;
+    wearer: InspectEntity;
+  }> = [];
   const attachedTooltips: Array<{ el: HTMLElement; build: () => string }> = [];
   const mountPreview = vi.fn();
   const openWith = (
@@ -401,8 +405,8 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
       // srcs and is a recorded hygiene follow-up, not this line.
       itemIcon: (item, quality) => knownItemIconHtml(item, quality),
       moneyHtml: () => '',
-      itemTooltip: (item, instance) => {
-        tooltipCalls.push({ itemId: item.id, instance });
+      itemTooltip: (item, instance, wearer) => {
+        tooltipCalls.push({ itemId: item.id, instance, wearer });
         return '';
       },
       attachTooltip: (el, build) => {
@@ -682,6 +686,26 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
     probe.style.boxShadow = qualityGlowShadow(QUALITY_COLOR.legendary);
     expect(probe.style.boxShadow).not.toBe('');
     expect(icon?.style.boxShadow).toBe(probe.style.boxShadow);
+  });
+
+  it('passes the inspected wearer to lazy adaptive armour tooltips, including expiry updates', () => {
+    const wearer: InspectEntity = {
+      ...baseEntity,
+      templateId: 'mage',
+      level: 20,
+      specId: 'arcane',
+      membershipActive: true,
+      equippedItems: { chest: 'membership_chest' },
+    };
+    openWith(wearer);
+    for (const attached of attachedTooltips) attached.build();
+    const call = tooltipCalls.find((c) => c.itemId === 'membership_chest');
+    expect(call?.wearer).toBe(wearer);
+    expect(call?.wearer.specId).toBe('arcane');
+    expect(call?.wearer.level).toBe(20);
+    wearer.membershipActive = false;
+    for (const attached of attachedTooltips) attached.build();
+    expect(tooltipCalls.at(-1)?.wearer.membershipActive).toBe(false);
   });
 
   it('a def-only row keeps the def name and def quality (the negative)', () => {

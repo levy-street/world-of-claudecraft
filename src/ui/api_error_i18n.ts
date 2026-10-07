@@ -366,6 +366,8 @@ export function userFacingApiError(err: unknown): string {
   if (normalized === 'character name is not allowed')
     return t('errors.api.characterNameNotAllowed');
   if (normalized === 'invalid class') return t('errors.api.invalidClass');
+  if (normalized === 'membership required for this character')
+    return t('character.membershipRequired');
   if (normalized === 'character limit reached') return t('errors.api.characterLimit');
   if (normalized === 'that name is taken') return t('errors.api.nameTaken');
   if (

@@ -97,6 +97,7 @@ function renderQuestFixture(): {
       world: () =>
         ({
           cfg: { playerClass: 'warrior' },
+          talents: { spec: null },
           player: { name: 'Aurelia' },
           questLog,
           questsDone: new Set<string>(),

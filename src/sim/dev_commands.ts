@@ -24,7 +24,7 @@ import { armWorldQuestInvestigationForDev } from './dev_world_quest_investigatio
 import { armWorldQuestShadowForDev } from './dev_world_quest_shadow';
 import { armWorldQuestTracingForDev } from './dev_world_quest_tracing';
 import { armWorldQuestWispMazeForDev } from './dev_world_quest_wisp_maze';
-import { createGroundObject, createMob } from './entity';
+import { createGroundObject } from './entity';
 import { awardFactionReputation, FACTION_IDS } from './factions';
 import {
   ignivarDevRaidTravelRoster,
@@ -33,6 +33,7 @@ import {
 } from './ignivar_dev_raid';
 import { IGNIVAR_FORGE_APPROACH_ID, IGNIVAR_RAID_ARENA_ID } from './ignivar_raid_ids';
 import { enterDungeon, instanceInfoAt } from './instances/dungeons';
+import { spawnOpenWorldMob } from './mob/open_world_tuning';
 import { mountItemId, mountOwned } from './mounts';
 import { MOUNT_TRAIN_MIN_LEVEL } from './mounts_training';
 import {
@@ -93,7 +94,7 @@ export function spawnMobsForDev(
       player.pos.x + Math.sin(angle) * radius,
       player.pos.z + Math.cos(angle) * radius,
     );
-    const mob = createMob(ctx.nextId++, template, level, pos);
+    const mob = spawnOpenWorldMob(ctx.nextId++, template, level, pos);
     mob.devSpawnOwnerId = pid;
     ctx.addEntity(mob);
     ids.push(mob.id);

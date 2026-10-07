@@ -864,29 +864,38 @@ describe('item-art audit builder', () => {
       // painted weapons, re-measured with `--verify-only` on the merged tree.
       // 1464 / 1482 at the 2026-09-28 release/v0.44.0 merge into feature/buried-hoards
       // (the hoard boss loot and map paintings on 36 sheet pages), re-measured the same way.
-      catalogSha256: 'e3f58abc4acad903941898542c592ca749451e776bdb34935821a6e79e32e7c6',
-      catalogBytes: 801291,
+      // 1709 / 1727 with the 245 choose-one leveling quest armor paintings
+      // (quest-leveling-gear-icons-2026-10-06), re-measured with `--verify-only`.
+      // 1785 / 1803 with the 76 quest blue reward rares
+      // (quest-blue-rewards-icons-2026-10-07), re-measured the same way.
+      // 1800 / 1818 with PR 4281's 8 membership and 7 referral paintings on the
+      // membership integration, re-measured the same way.
+      // 1860 / 1878 with the 75 quest role-fill paintings (quest-role-fill-icons-2026-10-07),
+      // re-measured the same way.
+      // 1875 / 1893 with both on the membership integration, re-measured.
+      catalogSha256: '613614d391b80492a0a4e1ac49e0d05f29c32810b45af5ded813554d2c3fd7eb',
+      catalogBytes: 1022344,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1464,
-      liveItemCount: 1482,
+      catalogCount: 1875,
+      liveItemCount: 1893,
       generatedHeroicDefinitions: 78,
       heroicDefinitionsWithOwnWebp: 59,
       heroicWeaponArtAliases: 19,
       groupCount: 26,
-      sheetPageCount: 36,
-      sheetCount: 288,
+      sheetPageCount: 40,
+      sheetCount: 320,
       sheetModeCounts: {
-        '128-color': 36,
-        '40-color': 36,
-        '28-color': 36,
-        '22-color': 36,
-        '28-grayscale': 36,
-        '64-circle': 36,
-        'small-multiview': 36,
-        identity: 36,
+        '128-color': 40,
+        '40-color': 40,
+        '28-color': 40,
+        '22-color': 40,
+        '28-grayscale': 40,
+        '64-circle': 40,
+        'small-multiview': 40,
+        identity: 40,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '53d42dd05b8370ad9bf62c5b1d779efc05f02f28fe129a7fe8b53c1b863557fc',
+      shippingCatalogSha256: 'bc7c2c65694e373ace38f20fcaecf1c71d709cb8e33dd67f2506c954081d7be4',
       machineChecksPassed: true,
       verdict: null,
     });

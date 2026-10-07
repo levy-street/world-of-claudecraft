@@ -10,7 +10,7 @@
 // stay unclassified, so a future junk item must be classified here explicitly
 // instead of drifting in or out silently.
 import { readdirSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS } from '../src/sim/content/crucible_professions';
@@ -236,6 +236,7 @@ const ALLOWED_UNCLASSIFIED_JUNK = [
   'guardian_core',
   'harvest_feast',
   'last_keep_signet',
+  'membership_token',
   // Retired premium reins remain inert saved items, with no use or material role.
   'reins_chimeglass_tortoise',
   'reins_goblin_rocket_sled',
@@ -920,8 +921,8 @@ describe('no src/sim importer (presentation-only taxonomy scope)', () => {
     // that lost recursion cannot clear 300), AND the sweep must have reached
     // the two biggest nested directories by name.
     expect(scanned.length).toBeGreaterThan(300);
-    expect(scanned.some((f) => f.includes(`${join(simRoot, 'professions')}/`))).toBe(true);
-    expect(scanned.some((f) => f.includes(`${join(simRoot, 'content')}/`))).toBe(true);
+    expect(scanned.some((f) => f.includes(`${join(simRoot, 'professions')}${sep}`))).toBe(true);
+    expect(scanned.some((f) => f.includes(`${join(simRoot, 'content')}${sep}`))).toBe(true);
     expect(symlinked).toEqual([]);
     for (const guard of guards) {
       expect(scanned, guard.moduleSelf).toContain(guard.moduleSelf);

@@ -347,6 +347,26 @@ export const en_XA: EnTranslations = {
     }
   },
   "hudChrome": {
+    "courier": {
+      "title": "[Çóúŕíéŕ]",
+      "close": "[Çļóšé çóúŕíéŕ]",
+      "ready": "[Ŕéáðý ƒóŕ á ðéļíʋéŕý]",
+      "outbound": "[Ƒļýíñĝ ţó ţĥé ƀáñķ]",
+      "returning": "[Ɓŕíñĝíñĝ ýóúŕ íţéɱš ƀáçķ]",
+      "waiting": "[Ŵáíţíñĝ ţó ŕéţúŕñ ýóúŕ íţéɱš]",
+      "bags": "[Šéñð ţó ƀáñķ]",
+      "bank": "[Ɓŕíñĝ ƒŕóɱ ƀáñķ]",
+      "cargo": "[Çóúŕíéŕ íñʋéñţóŕý]",
+      "empty": "[Ñó íţéɱš]",
+      "send": "[Šéñð çóúŕíéŕ]",
+      "selected": "[{count} / {limit} šţáçķš šéļéçţéð]",
+      "select": "[Šéļéçţ {item}, {count}]",
+      "selectedItem": "[Ðéšéļéçţ {item}, {count}]",
+      "instructions": "[Šéļéçţ ŵĥóļé šţáçķš. Ýóúŕ çóúŕíéŕ ðéþóšíţš ţĥéɱ ƒíŕšţ, ţĥéñ çóļļéçţš ýóúŕ ŕéɋúéšţéð íţéɱš. Ɋúéšţ íţéɱš çáññóţ ƀé šéñţ.]",
+      "membership": "[Ŕéñéŵ ýóúŕ ɱéɱƀéŕšĥíþ ţó šţáŕţ áñóţĥéŕ ţŕíþ.]",
+      "cargoSafe": "[Çáŕŕíéð íţéɱš šţáý ŵíţĥ ţĥé çóúŕíéŕ úñţíļ ţĥéŕé íš ŕóóɱ íñ ýóúŕ ƀáĝš.]",
+      "unavailable": "[Šúɱɱóñ ýóúŕ çóúŕíéŕ ţó þļáñ á ðéļíʋéŕý.]"
+    },
     "framePresets": {
       "apply": "[Áþþļý]",
       "pickerLabel": "[Ƒŕáɱé Þŕéšéţš: {name}]",
@@ -826,6 +846,50 @@ export const en_XA: EnTranslations = {
       }
     },
     "wocStore": {
+      "subscription": {
+        "title": "[Ĝáɱé šúƀšçŕíþţíóñ]",
+        "monthlyTitle": "[Ɱóñţĥļý ɱéɱƀéŕšĥíþ]",
+        "annualTitle": "[12-ɱóñţĥ ɱéɱƀéŕšĥíþ ƀúñðļé]",
+        "annualPrice": "[{price} ƒóŕ 12 ɱóñţĥš, þáíð úþƒŕóñţ]",
+        "annualTerms": "[Ŕéñéŵš ýéáŕļý áţ ţĥé šáɱé þŕíçé. Þáý ŵíţĥ ƒíáţ ţĥŕóúĝĥ Šţŕíþé. Çáñçéļ íñ ƀíļļíñĝ šéţţíñĝš.]",
+        "annualMount": "[Áƒţéŕ þáýɱéñţ, çóļļéçţ á šóúļƀóúñð ţáñķ ɱóúñţ ķéý ƀý ɱáíļ óñ ţĥé çĥáŕáçţéŕ ţĥáţ þúŕçĥášéð ţĥíš ƀúñðļé. Ţĥé ţáñķ íš á þļáçéĥóļðéŕ ƒóŕ ţĥé ƀúñðļé ɱóúñţ.]",
+        "trialTerms": "[Ţŕý ɱéɱƀéŕšĥíþ ƒŕéé ƒóŕ {days} ðáýš, óñçé þéŕ áççóúñţ. Á þáýɱéñţ ɱéţĥóð íš ŕéɋúíŕéð. Ýóú ŵíļļ ƀé çĥáŕĝéð {price} ŵĥéñ ţĥé ţŕíáļ éñðš úñļéšš ýóú çáñçéļ.]",
+        "startTrial": "[Šţáŕţ 7-ðáý ƒŕéé ţŕíáļ]",
+        "resumeCheckout": "[Ŕéšúɱé çĥéçķóúţ]",
+        "checkoutClosed": "[Ţĥíš çĥéçķóúţ ĥáš çļóšéð ŵíţĥóúţ áñ óúţšţáñðíñĝ ŕéŵáŕð. Çĥóóšé á ɱéɱƀéŕšĥíþ þļáñ áĝáíñ ţó šţáŕţ á ñéŵ çĥéçķóúţ.]",
+        "annualClaim": "[Çóļļéçţ ƀúñðļé ɱóúñţ]",
+        "annualPending": "[Ŕéţúŕñ ţó ţĥé þúŕçĥášíñĝ çĥáŕáçţéŕ áƒţéŕ þáýɱéñţ ţó çóļļéçţ ţĥé ƀúñðļé ɱóúñţ. Íƒ þáýɱéñţ íš þŕóçéššíñĝ óŕ ţĥé ţŕíáļ íš áçţíʋé, ţŕý áĝáíñ áƒţéŕ ţĥé þáíð çĥáŕĝé.]",
+        "annualDelivered": "[Ýóúŕ ƀúñðļé ɱóúñţ ķéý ĥáš ƀééñ ðéļíʋéŕéð ƀý ɱáíļ.]",
+        "tokenTitle": "[Ţŕáðáƀļé ɱéɱƀéŕšĥíþ ţóķéñ]",
+        "benefitsTitle": "[Áçţíʋé ɱéɱƀéŕšĥíþ ƀéñéƒíţš]",
+        "benefitBank": "[Áççéšš ýóúŕ óţĥéŕ çĥáŕáçţéŕš' ƀáñķš áţ áñý ƀáñķéŕ.]",
+        "benefitSlots": "[Úñļóçķ 10 áððíţíóñáļ çĥáŕáçţéŕ šļóţš.]",
+        "benefitArmour": "[Çļáíɱ šóúļƀóúñð áŕɱóúŕ ŵíţĥ šţáţš ƒóŕ ýóúŕ çļášš áñð šþéçíáļíšáţíóñ. Íţ šçáļéš ŵíţĥ ýóúŕ ļéʋéļ áñð ŕéáçĥéš íţéɱ ļéʋéļ 25 áţ ļéʋéļ 20. Ŵéáŕ ţĥé ƒúļļ šéţ ƒóŕ 20% ɱóŕé ẊÞ.]",
+        "benefitTax": "[Þáý ĥáļƒ ţĥé ñóŕɱáļ áúçţíóñ ĥóúšé ţáẋ.]",
+        "benefitExpiry": "[Ŵĥéñ ɱéɱƀéŕšĥíþ éñðš, çĥáŕáçţéŕš íñ ţĥé áððíţíóñáļ šļóţš áñð áŕɱóúŕ ƀóñúšéš áŕé ļóçķéð úñţíļ ŕéñéŵáļ. Ýóúŕ ƀášé çĥáŕáçţéŕ šļóţš ŕéɱáíñ þļáýáƀļé.]",
+        "tokenTerms": "[{price} óñçé ƒóŕ 30 ðáýš. Ðéļíʋéŕéð ƀý ɱáíļ ţó ţĥíš çĥáŕáçţéŕ. Ŕéðééɱ íţ ţó áðð ɱéɱƀéŕšĥíþ ţíɱé, óŕ šéļļ íţ áţ ţĥé áúçţíóñ ĥóúšé.]",
+        "tokenBuy": "[Ɓúý ɱéɱƀéŕšĥíþ ţóķéñ]",
+        "tokenClaim": "[Çóļļéçţ þúŕçĥášéð ţóķéñ]",
+        "tokenPending": "[Áƒţéŕ þáýɱéñţ, ŕéţúŕñ ţó ţĥíš çĥáŕáçţéŕ áñð çóļļéçţ ýóúŕ ţóķéñ. Íƒ þáýɱéñţ íš šţíļļ þŕóçéššíñĝ, ţŕý áĝáíñ šĥóŕţļý.]",
+        "tokenDelivered": "[Ýóúŕ ţóķéñ ĥáš ƀééñ ðéļíʋéŕéð ƀý ɱáíļ.]",
+        "price": "[{price} þéŕ ɱóñţĥ]",
+        "terms": "[Ŕéñéŵš ɱóñţĥļý. Þáý ŵíţĥ ƒíáţ ţĥŕóúĝĥ Šţŕíþé. Çáñçéļ íñ ƀíļļíñĝ šéţţíñĝš.]",
+        "subscribe": "[Šúƀšçŕíƀé]",
+        "manage": "[Ɱáñáĝé šúƀšçŕíþţíóñ]",
+        "ending": "[Çáñçéļš áţ ţĥé éñð óƒ ţĥé ƀíļļíñĝ þéŕíóð]",
+        "error": "[Çóúļð ñóţ óþéñ ƀíļļíñĝ. Áļļóŵ þóþúþš áñð ţŕý áĝáíñ.]",
+        "status": {
+          "none": "[Ñóţ šúƀšçŕíƀéð]",
+          "incomplete": "[Þáýɱéñţ íñçóɱþļéţé]",
+          "incomplete_expired": "[Çĥéçķóúţ éẋþíŕéð]",
+          "trialing": "[Ţŕíáļ]",
+          "active": "[Áçţíʋé]",
+          "past_due": "[Þáýɱéñţ óʋéŕðúé]",
+          "canceled": "[Çáñçéļéð]",
+          "unpaid": "[Úñþáíð]",
+          "paused": "[Þáúšéð]"
+        }
+      },
       "title": "[ŴÓÇ Šţóŕé]",
       "close": "[Çļóšé ŴÓÇ Šţóŕé]",
       "tabsLabel": "[ŴÓÇ Šţóŕé šéçţíóñš]",
@@ -4880,6 +4944,19 @@ export const en_XA: EnTranslations = {
       "vaultCannotDeposit": "[Çáññóţ ĝó íñ ţĥé ʋáúļţ]",
       "tabsAria": "[Ɓáñķ ţáƀš]",
       "personalTab": "[Þéŕšóñáļ]",
+      "accountTab": "[Óţĥéŕ çĥáŕáçţéŕš]",
+      "accountArmour": "[Çļáíɱ ɱéɱƀéŕšĥíþ áŕɱóúŕ]",
+      "referralArmour": "[Çļáíɱ ƒŕíéñðšĥíþ áŕɱóúŕ]",
+      "accountMembership": "[Áñ áçţíʋé ɱéɱƀéŕšĥíþ ļéţš ýóú áççéšš ýóúŕ óţĥéŕ çĥáŕáçţéŕš' ƀáñķš ĥéŕé.]",
+      "accountCharacters": "[Çĥáŕáçţéŕ ƀáñķš]",
+      "accountEmpty": "[Çŕéáţé áñóţĥéŕ çĥáŕáçţéŕ ţó úšé ţĥéíŕ ƀáñķ ĥéŕé.]",
+      "accountSelect": "[Šéļéçţ á çĥáŕáçţéŕ ţó ļóáð ţĥéíŕ ƀáñķ.]",
+      "accountUnavailable": "[Ţĥíš ƀáñķ íš úñáʋáíļáƀļé. Šéļéçţ ţĥé çĥáŕáçţéŕ áĝáíñ ţó ŕéƒŕéšĥ.]",
+      "accountDeposit": "[Ýóúŕ ƀáĝš: ðéþóšíţ íñţó ţĥíš ƀáñķ]",
+      "accountWithdraw": "[Šéļéçţéð ƀáñķ: ŵíţĥðŕáŵ íñţó ýóúŕ ƀáĝš]",
+      "accountDepositHint": "[Çļíçķ ţó ðéþóšíţ ţĥíš šţáçķ íñţó ţĥé šéļéçţéð çĥáŕáçţéŕ ƀáñķ.]",
+      "accountWithdrawHint": "[Çļíçķ ţó ŵíţĥðŕáŵ ţĥíš šţáçķ íñţó ýóúŕ ƀáĝš.]",
+      "accountBound": "[Šóúļƀóúñð, ļóçķéð áñð ɋúéšţ íţéɱš çáññóţ ɱóʋé ƀéţŵééñ çĥáŕáçţéŕš.]",
       "guildTab": "[Ĝúíļð]",
       "guildCapacityAria": "[Ĝúíļð ƀáñķ šļóţš úšéð: {used} óƒ {total}]",
       "guildEmpty": "[Ţĥé ĝúíļð ƀáñķ íš éɱþţý.]",
@@ -11218,6 +11295,9 @@ export const en_XA: EnTranslations = {
   "character": {
     "loading": "[Ļóáðíñĝ...]",
     "noneYet": "[Ñó çĥáŕáçţéŕš ýéţ. Çŕéáţé óñé ƀéļóŵ.]",
+    "membershipRequired": "[Ŕéñéŵ ýóúŕ ɱéɱƀéŕšĥíþ ţó þļáý ţĥíš çĥáŕáçţéŕ.]",
+    "membershipSlots": "[Úñļóçķ šļóţš ŵíţĥ á ɱéɱƀéŕšĥíþ]",
+    "emptySlot": "[Áʋáíļáƀļé çĥáŕáçţéŕ šļóţ]",
     "levelClass": "[Ļéʋéļ {level} {className}]",
     "inWorld": "[íñ ŵóŕļð]",
     "takeOver": "[Ţáķé Óʋéŕ]",
@@ -12309,6 +12389,8 @@ export const en_XA: EnTranslations = {
       "rewards": "[Ŕéŵáŕðš]",
       "xpReward": "[{xp} éẋþéŕíéñçé]",
       "itemReward": "[Íţéɱ ŕéŵáŕð:]",
+      "chooseReward": "[Çĥóóšé ýóúŕ ŕéŵáŕð:]",
+      "rewardChoices": "[Ýóú ŵíļļ ƀé áƀļé ţó çĥóóšé óñé óƒ ţĥéšé ŕéŵáŕðš:]",
       "objectiveProgress": "[{label}: {current}/{total}]",
       "requiresLevel": "[Ŕéɋúíŕéš Ļéʋéļ {level}]"
     },
@@ -12686,6 +12768,7 @@ export const en_XA: EnTranslations = {
       "incomplete": "[Ţĥáţ ɋúéšţ íš ñóţ çóɱþļéţé.]",
       "giverMissing": "[Ţĥáţ ɋúéšţ ĝíʋéŕ íš ñóţ ñéáŕƀý.]",
       "turnInMissing": "[Ţĥáţ ɋúéšţ ţúŕñ-íñ íš ñóţ ñéáŕƀý.]",
+      "rewardNotOffered": "[Ţĥáţ ŕéŵáŕð íš ñóţ óƒƒéŕéð.]",
       "tooFar": "[Ţóó ƒáŕ áŵáý.]",
       "escortAway": "[Ýóúŕ éšçóŕţ íš ñóţ áţ ţĥéíŕ þóšţ ŕíĝĥţ ñóŵ. Ţĥéý ŵíļļ ŕéţúŕñ ţĥéŕé šĥóŕţļý.]"
     }
@@ -12753,6 +12836,17 @@ export const en_XA: EnTranslations = {
       "parry": "[Þáŕŕý]"
     },
     "tooltip": {
+      "referralFullSet": "[Éɋúíþ áļļ {pieces} ƒŕíéñðšĥíþ áŕɱóŕ þíéçéš ţó ĝáíñ {percent}% ɱóŕé éẋþéŕíéñçé ŵĥíļé íñ á þáŕţý ŵíţĥ {member}. Ţĥéíŕ ɱéɱƀéŕšĥíþ ɱúšţ ƀé áçţíʋé.]",
+      "referralInviter": "[ţĥé ɱéɱƀéŕ ŵĥó íñʋíţéð ýóú]",
+      "referralRetained": "[Áŕɱóŕ šţáţš ķééþ šçáļíñĝ éʋéñ ŵĥéñ ýóú áŕé ñóţ íñ á þáŕţý ŵíţĥ ýóúŕ íñʋíţéŕ.]",
+      "referralDormant": "[Íñáçţíʋé: ţĥíš áççóúñţ ĥáš ñóţ ŕéçéíʋéð ƒŕíéñðšĥíþ áŕɱóŕ ţĥŕóúĝĥ á ɱéɱƀéŕ ŕéƒéŕŕáļ.]",
+      "membershipToken": "[Úšé: Çóñšúɱé ţĥíš ţóķéñ ţó áðð {days} ðáýš óƒ ɱéɱƀéŕšĥíþ ţó ýóúŕ áççóúñţ. Áñý ŕéɱáíñíñĝ ɱéɱƀéŕšĥíþ ţíɱé íš ķéþţ. Ţĥíš ţóķéñ çáñ ƀé ţŕáðéð óŕ šóļð áţ ţĥé áúçţíóñ ĥóúšé ƀéƒóŕé ŕéðéɱþţíóñ.]",
+      "membershipAdaptive": "[Šţáţš áñð áŕɱóŕ áðáþţ ţó ýóúŕ çļášš áñð šþéçíáļížáţíóñ.]",
+      "membershipScaling": "[Íţéɱ ļéʋéļ ɱáţçĥéš ýóúŕ ļéʋéļ. Áţ ļéʋéļ 20, ţĥíš áŕɱóŕ þéŕƒéçţš áţ íţéɱ ļéʋéļ 25.]",
+      "membershipPerfected": "[Þéŕƒéçţéð: íţéɱ ļéʋéļ {level}.]",
+      "membershipFullSet": "[Éɋúíþ áļļ {pieces} ɱéɱƀéŕšĥíþ áŕɱóŕ þíéçéš ţó ĝáíñ {percent}% ɱóŕé éẋþéŕíéñçé. Ŕéɋúíŕéš áñ áçţíʋé ɱéɱƀéŕšĥíþ.]",
+      "membershipRequired": "[Áŕɱóŕ šţáţš áñð šéţ ƀéñéƒíţš šţóþ ŵĥéñ ɱéɱƀéŕšĥíþ éẋþíŕéš áñð ŕéţúŕñ ŵĥéñ ýóú ŕéñéŵ.]",
+      "membershipDormant": "[Íñáçţíʋé: ŕéñéŵ ýóúŕ ɱéɱƀéŕšĥíþ ţó ŕéšţóŕé áŕɱóŕ šţáţš áñð šéţ ƀéñéƒíţš.]",
       "qualityKind": "[{quality} {kind}]",
       "currentlyEquipped": "[Çúŕŕéñţļý éɋúíþþéð]",
       "ifYouEquip": "[Íƒ ýóú éɋúíþ ţĥíš]",
@@ -13052,6 +13146,10 @@ export const en_XA: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "courier": {
+        "name": "[Çóúŕíéŕ]",
+        "description": "[Šúɱɱóñ á ƒļýíñĝ ðóñķéý ţó çáŕŕý íţéɱš ƀéţŵééñ ýóúŕ ƀáĝš áñð ţĥé ñéáŕéšţ ƀáñķ. Íţ ƒļíéš áţ 250% óƒ ñóŕɱáļ ŕúññíñĝ šþééð. Çĥóóšé úþ ţó 24 šţáçķš þéŕ ţŕíþ. Ɱéɱƀéŕšĥíþ íš ŕéɋúíŕéð ţó šţáŕţ á ñéŵ ţŕíþ.]"
+      },
       "sport_kick": {
         "name": "[Ķíçķ]",
         "description": "[Ķñóçķ ţĥé ƀáļļ áļóñĝ ţĥé ĝŕóúñð ţóŵáŕð ţĥé áíɱ þóíñţ.]"
@@ -18450,6 +18548,1239 @@ export const en_XA: EnTranslations = {
       },
       "vanguard_warstaff": {
         "name": "[Ʋáñĝúáŕð'š Ŵáŕšţáƒƒ]"
+      },
+      "brookwatch_robe": {
+        "name": "[Ɓŕóóķŵáţçĥ Ŕóƀé]"
+      },
+      "brookwatch_leggings": {
+        "name": "[Ɓŕóóķŵáţçĥ Ļéĝĝíñĝš]"
+      },
+      "brookwatch_slippers": {
+        "name": "[Ɓŕóóķŵáţçĥ Šļíþþéŕš]"
+      },
+      "brookwatch_hood": {
+        "name": "[Ɓŕóóķŵáţçĥ Ĥóóð]"
+      },
+      "brookwatch_gloves": {
+        "name": "[Ɓŕóóķŵáţçĥ Ĝļóʋéš]"
+      },
+      "brookwatch_mantle": {
+        "name": "[Ɓŕóóķŵáţçĥ Ɱáñţļé]"
+      },
+      "brookwatch_sash": {
+        "name": "[Ɓŕóóķŵáţçĥ Šášĥ]"
+      },
+      "brookwatch_jerkin": {
+        "name": "[Ɓŕóóķŵáţçĥ Ĵéŕķíñ]"
+      },
+      "brookwatch_breeches": {
+        "name": "[Ɓŕóóķŵáţçĥ Ɓŕééçĥéš]"
+      },
+      "brookwatch_boots": {
+        "name": "[Ɓŕóóķŵáţçĥ Ɓóóţš]"
+      },
+      "brookwatch_cap": {
+        "name": "[Ɓŕóóķŵáţçĥ Çáþ]"
+      },
+      "brookwatch_grips": {
+        "name": "[Ɓŕóóķŵáţçĥ Ĝŕíþš]"
+      },
+      "brookwatch_shoulderpads": {
+        "name": "[Ɓŕóóķŵáţçĥ Šĥóúļðéŕþáðš]"
+      },
+      "brookwatch_belt": {
+        "name": "[Ɓŕóóķŵáţçĥ Ɓéļţ]"
+      },
+      "brookwatch_hauberk": {
+        "name": "[Ɓŕóóķŵáţçĥ Ĥáúƀéŕķ]"
+      },
+      "brookwatch_legguards": {
+        "name": "[Ɓŕóóķŵáţçĥ Ļéĝĝúáŕðš]"
+      },
+      "brookwatch_sabatons": {
+        "name": "[Ɓŕóóķŵáţçĥ Šáƀáţóñš]"
+      },
+      "brookwatch_helm": {
+        "name": "[Ɓŕóóķŵáţçĥ Ĥéļɱ]"
+      },
+      "brookwatch_gauntlets": {
+        "name": "[Ɓŕóóķŵáţçĥ Ĝáúñţļéţš]"
+      },
+      "brookwatch_pauldrons": {
+        "name": "[Ɓŕóóķŵáţçĥ Þáúļðŕóñš]"
+      },
+      "brookwatch_girdle": {
+        "name": "[Ɓŕóóķŵáţçĥ Ĝíŕðļé]"
+      },
+      "brookwatch_chainmail": {
+        "name": "[Ɓŕóóķŵáţçĥ Çĥáíñɱáíļ]"
+      },
+      "brookwatch_chausses": {
+        "name": "[Ɓŕóóķŵáţçĥ Çĥáúššéš]"
+      },
+      "brookwatch_greaves": {
+        "name": "[Ɓŕóóķŵáţçĥ Ĝŕéáʋéš]"
+      },
+      "brookwatch_coif": {
+        "name": "[Ɓŕóóķŵáţçĥ Çóíƒ]"
+      },
+      "brookwatch_handguards": {
+        "name": "[Ɓŕóóķŵáţçĥ Ĥáñðĝúáŕðš]"
+      },
+      "brookwatch_spaulders": {
+        "name": "[Ɓŕóóķŵáţçĥ Šþáúļðéŕš]"
+      },
+      "brookwatch_cord": {
+        "name": "[Ɓŕóóķŵáţçĥ Çóŕð]"
+      },
+      "hedgerow_robe": {
+        "name": "[Ĥéðĝéŕóŵ Ŕóƀé]"
+      },
+      "hedgerow_leggings": {
+        "name": "[Ĥéðĝéŕóŵ Ļéĝĝíñĝš]"
+      },
+      "hedgerow_slippers": {
+        "name": "[Ĥéðĝéŕóŵ Šļíþþéŕš]"
+      },
+      "hedgerow_hood": {
+        "name": "[Ĥéðĝéŕóŵ Ĥóóð]"
+      },
+      "hedgerow_gloves": {
+        "name": "[Ĥéðĝéŕóŵ Ĝļóʋéš]"
+      },
+      "hedgerow_mantle": {
+        "name": "[Ĥéðĝéŕóŵ Ɱáñţļé]"
+      },
+      "hedgerow_sash": {
+        "name": "[Ĥéðĝéŕóŵ Šášĥ]"
+      },
+      "hedgerow_jerkin": {
+        "name": "[Ĥéðĝéŕóŵ Ĵéŕķíñ]"
+      },
+      "hedgerow_breeches": {
+        "name": "[Ĥéðĝéŕóŵ Ɓŕééçĥéš]"
+      },
+      "hedgerow_boots": {
+        "name": "[Ĥéðĝéŕóŵ Ɓóóţš]"
+      },
+      "hedgerow_cap": {
+        "name": "[Ĥéðĝéŕóŵ Çáþ]"
+      },
+      "hedgerow_grips": {
+        "name": "[Ĥéðĝéŕóŵ Ĝŕíþš]"
+      },
+      "hedgerow_shoulderpads": {
+        "name": "[Ĥéðĝéŕóŵ Šĥóúļðéŕþáðš]"
+      },
+      "hedgerow_belt": {
+        "name": "[Ĥéðĝéŕóŵ Ɓéļţ]"
+      },
+      "hedgerow_hauberk": {
+        "name": "[Ĥéðĝéŕóŵ Ĥáúƀéŕķ]"
+      },
+      "hedgerow_legguards": {
+        "name": "[Ĥéðĝéŕóŵ Ļéĝĝúáŕðš]"
+      },
+      "hedgerow_sabatons": {
+        "name": "[Ĥéðĝéŕóŵ Šáƀáţóñš]"
+      },
+      "hedgerow_helm": {
+        "name": "[Ĥéðĝéŕóŵ Ĥéļɱ]"
+      },
+      "hedgerow_gauntlets": {
+        "name": "[Ĥéðĝéŕóŵ Ĝáúñţļéţš]"
+      },
+      "hedgerow_pauldrons": {
+        "name": "[Ĥéðĝéŕóŵ Þáúļðŕóñš]"
+      },
+      "hedgerow_girdle": {
+        "name": "[Ĥéðĝéŕóŵ Ĝíŕðļé]"
+      },
+      "hedgerow_chainmail": {
+        "name": "[Ĥéðĝéŕóŵ Çĥáíñɱáíļ]"
+      },
+      "hedgerow_chausses": {
+        "name": "[Ĥéðĝéŕóŵ Çĥáúššéš]"
+      },
+      "hedgerow_greaves": {
+        "name": "[Ĥéðĝéŕóŵ Ĝŕéáʋéš]"
+      },
+      "hedgerow_coif": {
+        "name": "[Ĥéðĝéŕóŵ Çóíƒ]"
+      },
+      "hedgerow_handguards": {
+        "name": "[Ĥéðĝéŕóŵ Ĥáñðĝúáŕðš]"
+      },
+      "hedgerow_spaulders": {
+        "name": "[Ĥéðĝéŕóŵ Šþáúļðéŕš]"
+      },
+      "hedgerow_cord": {
+        "name": "[Ĥéðĝéŕóŵ Çóŕð]"
+      },
+      "bogwalker_robe": {
+        "name": "[Ɓóĝŵáļķéŕ Ŕóƀé]"
+      },
+      "bogwalker_leggings": {
+        "name": "[Ɓóĝŵáļķéŕ Ļéĝĝíñĝš]"
+      },
+      "bogwalker_slippers": {
+        "name": "[Ɓóĝŵáļķéŕ Šļíþþéŕš]"
+      },
+      "bogwalker_hood": {
+        "name": "[Ɓóĝŵáļķéŕ Ĥóóð]"
+      },
+      "bogwalker_gloves": {
+        "name": "[Ɓóĝŵáļķéŕ Ĝļóʋéš]"
+      },
+      "bogwalker_mantle": {
+        "name": "[Ɓóĝŵáļķéŕ Ɱáñţļé]"
+      },
+      "bogwalker_sash": {
+        "name": "[Ɓóĝŵáļķéŕ Šášĥ]"
+      },
+      "bogwalker_jerkin": {
+        "name": "[Ɓóĝŵáļķéŕ Ĵéŕķíñ]"
+      },
+      "bogwalker_breeches": {
+        "name": "[Ɓóĝŵáļķéŕ Ɓŕééçĥéš]"
+      },
+      "bogwalker_boots": {
+        "name": "[Ɓóĝŵáļķéŕ Ɓóóţš]"
+      },
+      "bogwalker_cap": {
+        "name": "[Ɓóĝŵáļķéŕ Çáþ]"
+      },
+      "bogwalker_grips": {
+        "name": "[Ɓóĝŵáļķéŕ Ĝŕíþš]"
+      },
+      "bogwalker_shoulderpads": {
+        "name": "[Ɓóĝŵáļķéŕ Šĥóúļðéŕþáðš]"
+      },
+      "bogwalker_belt": {
+        "name": "[Ɓóĝŵáļķéŕ Ɓéļţ]"
+      },
+      "bogwalker_hauberk": {
+        "name": "[Ɓóĝŵáļķéŕ Ĥáúƀéŕķ]"
+      },
+      "bogwalker_legguards": {
+        "name": "[Ɓóĝŵáļķéŕ Ļéĝĝúáŕðš]"
+      },
+      "bogwalker_sabatons": {
+        "name": "[Ɓóĝŵáļķéŕ Šáƀáţóñš]"
+      },
+      "bogwalker_helm": {
+        "name": "[Ɓóĝŵáļķéŕ Ĥéļɱ]"
+      },
+      "bogwalker_gauntlets": {
+        "name": "[Ɓóĝŵáļķéŕ Ĝáúñţļéţš]"
+      },
+      "bogwalker_pauldrons": {
+        "name": "[Ɓóĝŵáļķéŕ Þáúļðŕóñš]"
+      },
+      "bogwalker_girdle": {
+        "name": "[Ɓóĝŵáļķéŕ Ĝíŕðļé]"
+      },
+      "bogwalker_chainmail": {
+        "name": "[Ɓóĝŵáļķéŕ Çĥáíñɱáíļ]"
+      },
+      "bogwalker_chausses": {
+        "name": "[Ɓóĝŵáļķéŕ Çĥáúššéš]"
+      },
+      "bogwalker_greaves": {
+        "name": "[Ɓóĝŵáļķéŕ Ĝŕéáʋéš]"
+      },
+      "bogwalker_coif": {
+        "name": "[Ɓóĝŵáļķéŕ Çóíƒ]"
+      },
+      "bogwalker_handguards": {
+        "name": "[Ɓóĝŵáļķéŕ Ĥáñðĝúáŕðš]"
+      },
+      "bogwalker_spaulders": {
+        "name": "[Ɓóĝŵáļķéŕ Šþáúļðéŕš]"
+      },
+      "bogwalker_cord": {
+        "name": "[Ɓóĝŵáļķéŕ Çóŕð]"
+      },
+      "thornspire_robe": {
+        "name": "[Ţĥóŕñšþíŕé Ŕóƀé]"
+      },
+      "thornspire_leggings": {
+        "name": "[Ţĥóŕñšþíŕé Ļéĝĝíñĝš]"
+      },
+      "thornspire_slippers": {
+        "name": "[Ţĥóŕñšþíŕé Šļíþþéŕš]"
+      },
+      "thornspire_hood": {
+        "name": "[Ţĥóŕñšþíŕé Ĥóóð]"
+      },
+      "thornspire_gloves": {
+        "name": "[Ţĥóŕñšþíŕé Ĝļóʋéš]"
+      },
+      "thornspire_mantle": {
+        "name": "[Ţĥóŕñšþíŕé Ɱáñţļé]"
+      },
+      "thornspire_sash": {
+        "name": "[Ţĥóŕñšþíŕé Šášĥ]"
+      },
+      "thornspire_jerkin": {
+        "name": "[Ţĥóŕñšþíŕé Ĵéŕķíñ]"
+      },
+      "thornspire_breeches": {
+        "name": "[Ţĥóŕñšþíŕé Ɓŕééçĥéš]"
+      },
+      "thornspire_boots": {
+        "name": "[Ţĥóŕñšþíŕé Ɓóóţš]"
+      },
+      "thornspire_cap": {
+        "name": "[Ţĥóŕñšþíŕé Çáþ]"
+      },
+      "thornspire_grips": {
+        "name": "[Ţĥóŕñšþíŕé Ĝŕíþš]"
+      },
+      "thornspire_shoulderpads": {
+        "name": "[Ţĥóŕñšþíŕé Šĥóúļðéŕþáðš]"
+      },
+      "thornspire_belt": {
+        "name": "[Ţĥóŕñšþíŕé Ɓéļţ]"
+      },
+      "thornspire_hauberk": {
+        "name": "[Ţĥóŕñšþíŕé Ĥáúƀéŕķ]"
+      },
+      "thornspire_legguards": {
+        "name": "[Ţĥóŕñšþíŕé Ļéĝĝúáŕðš]"
+      },
+      "thornspire_sabatons": {
+        "name": "[Ţĥóŕñšþíŕé Šáƀáţóñš]"
+      },
+      "thornspire_helm": {
+        "name": "[Ţĥóŕñšþíŕé Ĥéļɱ]"
+      },
+      "thornspire_gauntlets": {
+        "name": "[Ţĥóŕñšþíŕé Ĝáúñţļéţš]"
+      },
+      "thornspire_pauldrons": {
+        "name": "[Ţĥóŕñšþíŕé Þáúļðŕóñš]"
+      },
+      "thornspire_girdle": {
+        "name": "[Ţĥóŕñšþíŕé Ĝíŕðļé]"
+      },
+      "thornspire_chainmail": {
+        "name": "[Ţĥóŕñšþíŕé Çĥáíñɱáíļ]"
+      },
+      "thornspire_chausses": {
+        "name": "[Ţĥóŕñšþíŕé Çĥáúššéš]"
+      },
+      "thornspire_greaves": {
+        "name": "[Ţĥóŕñšþíŕé Ĝŕéáʋéš]"
+      },
+      "thornspire_coif": {
+        "name": "[Ţĥóŕñšþíŕé Çóíƒ]"
+      },
+      "thornspire_handguards": {
+        "name": "[Ţĥóŕñšþíŕé Ĥáñðĝúáŕðš]"
+      },
+      "thornspire_spaulders": {
+        "name": "[Ţĥóŕñšþíŕé Šþáúļðéŕš]"
+      },
+      "thornspire_cord": {
+        "name": "[Ţĥóŕñšþíŕé Çóŕð]"
+      },
+      "hollowveil_robe": {
+        "name": "[Ĥóļļóŵʋéíļ Ŕóƀé]"
+      },
+      "hollowveil_leggings": {
+        "name": "[Ĥóļļóŵʋéíļ Ļéĝĝíñĝš]"
+      },
+      "hollowveil_slippers": {
+        "name": "[Ĥóļļóŵʋéíļ Šļíþþéŕš]"
+      },
+      "hollowveil_hood": {
+        "name": "[Ĥóļļóŵʋéíļ Ĥóóð]"
+      },
+      "hollowveil_gloves": {
+        "name": "[Ĥóļļóŵʋéíļ Ĝļóʋéš]"
+      },
+      "hollowveil_mantle": {
+        "name": "[Ĥóļļóŵʋéíļ Ɱáñţļé]"
+      },
+      "hollowveil_sash": {
+        "name": "[Ĥóļļóŵʋéíļ Šášĥ]"
+      },
+      "hollowveil_jerkin": {
+        "name": "[Ĥóļļóŵʋéíļ Ĵéŕķíñ]"
+      },
+      "hollowveil_breeches": {
+        "name": "[Ĥóļļóŵʋéíļ Ɓŕééçĥéš]"
+      },
+      "hollowveil_boots": {
+        "name": "[Ĥóļļóŵʋéíļ Ɓóóţš]"
+      },
+      "hollowveil_cap": {
+        "name": "[Ĥóļļóŵʋéíļ Çáþ]"
+      },
+      "hollowveil_grips": {
+        "name": "[Ĥóļļóŵʋéíļ Ĝŕíþš]"
+      },
+      "hollowveil_shoulderpads": {
+        "name": "[Ĥóļļóŵʋéíļ Šĥóúļðéŕþáðš]"
+      },
+      "hollowveil_belt": {
+        "name": "[Ĥóļļóŵʋéíļ Ɓéļţ]"
+      },
+      "hollowveil_hauberk": {
+        "name": "[Ĥóļļóŵʋéíļ Ĥáúƀéŕķ]"
+      },
+      "hollowveil_legguards": {
+        "name": "[Ĥóļļóŵʋéíļ Ļéĝĝúáŕðš]"
+      },
+      "hollowveil_sabatons": {
+        "name": "[Ĥóļļóŵʋéíļ Šáƀáţóñš]"
+      },
+      "hollowveil_helm": {
+        "name": "[Ĥóļļóŵʋéíļ Ĥéļɱ]"
+      },
+      "hollowveil_gauntlets": {
+        "name": "[Ĥóļļóŵʋéíļ Ĝáúñţļéţš]"
+      },
+      "hollowveil_pauldrons": {
+        "name": "[Ĥóļļóŵʋéíļ Þáúļðŕóñš]"
+      },
+      "hollowveil_girdle": {
+        "name": "[Ĥóļļóŵʋéíļ Ĝíŕðļé]"
+      },
+      "hollowveil_chainmail": {
+        "name": "[Ĥóļļóŵʋéíļ Çĥáíñɱáíļ]"
+      },
+      "hollowveil_chausses": {
+        "name": "[Ĥóļļóŵʋéíļ Çĥáúššéš]"
+      },
+      "hollowveil_greaves": {
+        "name": "[Ĥóļļóŵʋéíļ Ĝŕéáʋéš]"
+      },
+      "hollowveil_coif": {
+        "name": "[Ĥóļļóŵʋéíļ Çóíƒ]"
+      },
+      "hollowveil_handguards": {
+        "name": "[Ĥóļļóŵʋéíļ Ĥáñðĝúáŕðš]"
+      },
+      "hollowveil_spaulders": {
+        "name": "[Ĥóļļóŵʋéíļ Šþáúļðéŕš]"
+      },
+      "hollowveil_cord": {
+        "name": "[Ĥóļļóŵʋéíļ Çóŕð]"
+      },
+      "trailwarden_robe": {
+        "name": "[Ţŕáíļŵáŕðéñ Ŕóƀé]"
+      },
+      "trailwarden_leggings": {
+        "name": "[Ţŕáíļŵáŕðéñ Ļéĝĝíñĝš]"
+      },
+      "trailwarden_slippers": {
+        "name": "[Ţŕáíļŵáŕðéñ Šļíþþéŕš]"
+      },
+      "trailwarden_hood": {
+        "name": "[Ţŕáíļŵáŕðéñ Ĥóóð]"
+      },
+      "trailwarden_gloves": {
+        "name": "[Ţŕáíļŵáŕðéñ Ĝļóʋéš]"
+      },
+      "trailwarden_mantle": {
+        "name": "[Ţŕáíļŵáŕðéñ Ɱáñţļé]"
+      },
+      "trailwarden_sash": {
+        "name": "[Ţŕáíļŵáŕðéñ Šášĥ]"
+      },
+      "trailwarden_jerkin": {
+        "name": "[Ţŕáíļŵáŕðéñ Ĵéŕķíñ]"
+      },
+      "trailwarden_breeches": {
+        "name": "[Ţŕáíļŵáŕðéñ Ɓŕééçĥéš]"
+      },
+      "trailwarden_boots": {
+        "name": "[Ţŕáíļŵáŕðéñ Ɓóóţš]"
+      },
+      "trailwarden_cap": {
+        "name": "[Ţŕáíļŵáŕðéñ Çáþ]"
+      },
+      "trailwarden_grips": {
+        "name": "[Ţŕáíļŵáŕðéñ Ĝŕíþš]"
+      },
+      "trailwarden_shoulderpads": {
+        "name": "[Ţŕáíļŵáŕðéñ Šĥóúļðéŕþáðš]"
+      },
+      "trailwarden_belt": {
+        "name": "[Ţŕáíļŵáŕðéñ Ɓéļţ]"
+      },
+      "trailwarden_hauberk": {
+        "name": "[Ţŕáíļŵáŕðéñ Ĥáúƀéŕķ]"
+      },
+      "trailwarden_legguards": {
+        "name": "[Ţŕáíļŵáŕðéñ Ļéĝĝúáŕðš]"
+      },
+      "trailwarden_sabatons": {
+        "name": "[Ţŕáíļŵáŕðéñ Šáƀáţóñš]"
+      },
+      "trailwarden_helm": {
+        "name": "[Ţŕáíļŵáŕðéñ Ĥéļɱ]"
+      },
+      "trailwarden_gauntlets": {
+        "name": "[Ţŕáíļŵáŕðéñ Ĝáúñţļéţš]"
+      },
+      "trailwarden_pauldrons": {
+        "name": "[Ţŕáíļŵáŕðéñ Þáúļðŕóñš]"
+      },
+      "trailwarden_girdle": {
+        "name": "[Ţŕáíļŵáŕðéñ Ĝíŕðļé]"
+      },
+      "trailwarden_chainmail": {
+        "name": "[Ţŕáíļŵáŕðéñ Çĥáíñɱáíļ]"
+      },
+      "trailwarden_chausses": {
+        "name": "[Ţŕáíļŵáŕðéñ Çĥáúššéš]"
+      },
+      "trailwarden_greaves": {
+        "name": "[Ţŕáíļŵáŕðéñ Ĝŕéáʋéš]"
+      },
+      "trailwarden_coif": {
+        "name": "[Ţŕáíļŵáŕðéñ Çóíƒ]"
+      },
+      "trailwarden_handguards": {
+        "name": "[Ţŕáíļŵáŕðéñ Ĥáñðĝúáŕðš]"
+      },
+      "trailwarden_spaulders": {
+        "name": "[Ţŕáíļŵáŕðéñ Šþáúļðéŕš]"
+      },
+      "trailwarden_cord": {
+        "name": "[Ţŕáíļŵáŕðéñ Çóŕð]"
+      },
+      "highgale_robe": {
+        "name": "[Ĥíĝĥĝáļé Ŕóƀé]"
+      },
+      "highgale_leggings": {
+        "name": "[Ĥíĝĥĝáļé Ļéĝĝíñĝš]"
+      },
+      "highgale_slippers": {
+        "name": "[Ĥíĝĥĝáļé Šļíþþéŕš]"
+      },
+      "highgale_hood": {
+        "name": "[Ĥíĝĥĝáļé Ĥóóð]"
+      },
+      "highgale_gloves": {
+        "name": "[Ĥíĝĥĝáļé Ĝļóʋéš]"
+      },
+      "highgale_mantle": {
+        "name": "[Ĥíĝĥĝáļé Ɱáñţļé]"
+      },
+      "highgale_sash": {
+        "name": "[Ĥíĝĥĝáļé Šášĥ]"
+      },
+      "highgale_jerkin": {
+        "name": "[Ĥíĝĥĝáļé Ĵéŕķíñ]"
+      },
+      "highgale_breeches": {
+        "name": "[Ĥíĝĥĝáļé Ɓŕééçĥéš]"
+      },
+      "highgale_boots": {
+        "name": "[Ĥíĝĥĝáļé Ɓóóţš]"
+      },
+      "highgale_cap": {
+        "name": "[Ĥíĝĥĝáļé Çáþ]"
+      },
+      "highgale_grips": {
+        "name": "[Ĥíĝĥĝáļé Ĝŕíþš]"
+      },
+      "highgale_shoulderpads": {
+        "name": "[Ĥíĝĥĝáļé Šĥóúļðéŕþáðš]"
+      },
+      "highgale_belt": {
+        "name": "[Ĥíĝĥĝáļé Ɓéļţ]"
+      },
+      "highgale_hauberk": {
+        "name": "[Ĥíĝĥĝáļé Ĥáúƀéŕķ]"
+      },
+      "highgale_legguards": {
+        "name": "[Ĥíĝĥĝáļé Ļéĝĝúáŕðš]"
+      },
+      "highgale_sabatons": {
+        "name": "[Ĥíĝĥĝáļé Šáƀáţóñš]"
+      },
+      "highgale_helm": {
+        "name": "[Ĥíĝĥĝáļé Ĥéļɱ]"
+      },
+      "highgale_gauntlets": {
+        "name": "[Ĥíĝĥĝáļé Ĝáúñţļéţš]"
+      },
+      "highgale_pauldrons": {
+        "name": "[Ĥíĝĥĝáļé Þáúļðŕóñš]"
+      },
+      "highgale_girdle": {
+        "name": "[Ĥíĝĥĝáļé Ĝíŕðļé]"
+      },
+      "highgale_chainmail": {
+        "name": "[Ĥíĝĥĝáļé Çĥáíñɱáíļ]"
+      },
+      "highgale_chausses": {
+        "name": "[Ĥíĝĥĝáļé Çĥáúššéš]"
+      },
+      "highgale_greaves": {
+        "name": "[Ĥíĝĥĝáļé Ĝŕéáʋéš]"
+      },
+      "brookwatch_tunic": {
+        "name": "[Ɓŕóóķŵáţçĥ Ţúñíç]"
+      },
+      "brookwatch_legwraps": {
+        "name": "[Ɓŕóóķŵáţçĥ Ļéĝŵŕáþš]"
+      },
+      "brookwatch_treads": {
+        "name": "[Ɓŕóóķŵáţçĥ Ţŕéáðš]"
+      },
+      "brookwatch_headguard": {
+        "name": "[Ɓŕóóķŵáţçĥ Ĥéáðĝúáŕð]"
+      },
+      "brookwatch_handwraps": {
+        "name": "[Ɓŕóóķŵáţçĥ Ĥáñðŵŕáþš]"
+      },
+      "brookwatch_shoulderguards": {
+        "name": "[Ɓŕóóķŵáţçĥ Šĥóúļðéŕĝúáŕðš]"
+      },
+      "brookwatch_waistguard": {
+        "name": "[Ɓŕóóķŵáţçĥ Ŵáíšţĝúáŕð]"
+      },
+      "hedgerow_tunic": {
+        "name": "[Ĥéðĝéŕóŵ Ţúñíç]"
+      },
+      "hedgerow_legwraps": {
+        "name": "[Ĥéðĝéŕóŵ Ļéĝŵŕáþš]"
+      },
+      "hedgerow_treads": {
+        "name": "[Ĥéðĝéŕóŵ Ţŕéáðš]"
+      },
+      "hedgerow_headguard": {
+        "name": "[Ĥéðĝéŕóŵ Ĥéáðĝúáŕð]"
+      },
+      "hedgerow_handwraps": {
+        "name": "[Ĥéðĝéŕóŵ Ĥáñðŵŕáþš]"
+      },
+      "hedgerow_shoulderguards": {
+        "name": "[Ĥéðĝéŕóŵ Šĥóúļðéŕĝúáŕðš]"
+      },
+      "hedgerow_waistguard": {
+        "name": "[Ĥéðĝéŕóŵ Ŵáíšţĝúáŕð]"
+      },
+      "bogwalker_tunic": {
+        "name": "[Ɓóĝŵáļķéŕ Ţúñíç]"
+      },
+      "bogwalker_legwraps": {
+        "name": "[Ɓóĝŵáļķéŕ Ļéĝŵŕáþš]"
+      },
+      "bogwalker_treads": {
+        "name": "[Ɓóĝŵáļķéŕ Ţŕéáðš]"
+      },
+      "bogwalker_headguard": {
+        "name": "[Ɓóĝŵáļķéŕ Ĥéáðĝúáŕð]"
+      },
+      "bogwalker_handwraps": {
+        "name": "[Ɓóĝŵáļķéŕ Ĥáñðŵŕáþš]"
+      },
+      "bogwalker_shoulderguards": {
+        "name": "[Ɓóĝŵáļķéŕ Šĥóúļðéŕĝúáŕðš]"
+      },
+      "bogwalker_waistguard": {
+        "name": "[Ɓóĝŵáļķéŕ Ŵáíšţĝúáŕð]"
+      },
+      "thornspire_tunic": {
+        "name": "[Ţĥóŕñšþíŕé Ţúñíç]"
+      },
+      "thornspire_legwraps": {
+        "name": "[Ţĥóŕñšþíŕé Ļéĝŵŕáþš]"
+      },
+      "thornspire_treads": {
+        "name": "[Ţĥóŕñšþíŕé Ţŕéáðš]"
+      },
+      "thornspire_headguard": {
+        "name": "[Ţĥóŕñšþíŕé Ĥéáðĝúáŕð]"
+      },
+      "thornspire_handwraps": {
+        "name": "[Ţĥóŕñšþíŕé Ĥáñðŵŕáþš]"
+      },
+      "thornspire_shoulderguards": {
+        "name": "[Ţĥóŕñšþíŕé Šĥóúļðéŕĝúáŕðš]"
+      },
+      "thornspire_waistguard": {
+        "name": "[Ţĥóŕñšþíŕé Ŵáíšţĝúáŕð]"
+      },
+      "hollowveil_tunic": {
+        "name": "[Ĥóļļóŵʋéíļ Ţúñíç]"
+      },
+      "hollowveil_legwraps": {
+        "name": "[Ĥóļļóŵʋéíļ Ļéĝŵŕáþš]"
+      },
+      "hollowveil_treads": {
+        "name": "[Ĥóļļóŵʋéíļ Ţŕéáðš]"
+      },
+      "hollowveil_headguard": {
+        "name": "[Ĥóļļóŵʋéíļ Ĥéáðĝúáŕð]"
+      },
+      "hollowveil_handwraps": {
+        "name": "[Ĥóļļóŵʋéíļ Ĥáñðŵŕáþš]"
+      },
+      "hollowveil_shoulderguards": {
+        "name": "[Ĥóļļóŵʋéíļ Šĥóúļðéŕĝúáŕðš]"
+      },
+      "hollowveil_waistguard": {
+        "name": "[Ĥóļļóŵʋéíļ Ŵáíšţĝúáŕð]"
+      },
+      "trailwarden_tunic": {
+        "name": "[Ţŕáíļŵáŕðéñ Ţúñíç]"
+      },
+      "trailwarden_legwraps": {
+        "name": "[Ţŕáíļŵáŕðéñ Ļéĝŵŕáþš]"
+      },
+      "trailwarden_treads": {
+        "name": "[Ţŕáíļŵáŕðéñ Ţŕéáðš]"
+      },
+      "trailwarden_headguard": {
+        "name": "[Ţŕáíļŵáŕðéñ Ĥéáðĝúáŕð]"
+      },
+      "trailwarden_handwraps": {
+        "name": "[Ţŕáíļŵáŕðéñ Ĥáñðŵŕáþš]"
+      },
+      "trailwarden_shoulderguards": {
+        "name": "[Ţŕáíļŵáŕðéñ Šĥóúļðéŕĝúáŕðš]"
+      },
+      "trailwarden_waistguard": {
+        "name": "[Ţŕáíļŵáŕðéñ Ŵáíšţĝúáŕð]"
+      },
+      "highgale_tunic": {
+        "name": "[Ĥíĝĥĝáļé Ţúñíç]"
+      },
+      "highgale_legwraps": {
+        "name": "[Ĥíĝĥĝáļé Ļéĝŵŕáþš]"
+      },
+      "highgale_treads": {
+        "name": "[Ĥíĝĥĝáļé Ţŕéáðš]"
+      },
+      "highgale_headguard": {
+        "name": "[Ĥíĝĥĝáļé Ĥéáðĝúáŕð]"
+      },
+      "highgale_handwraps": {
+        "name": "[Ĥíĝĥĝáļé Ĥáñðŵŕáþš]"
+      },
+      "highgale_shoulderguards": {
+        "name": "[Ĥíĝĥĝáļé Šĥóúļðéŕĝúáŕðš]"
+      },
+      "highgale_waistguard": {
+        "name": "[Ĥíĝĥĝáļé Ŵáíšţĝúáŕð]"
+      },
+      "highgale_coif": {
+        "name": "[Ĥíĝĥĝáļé Çóíƒ]"
+      },
+      "highgale_handguards": {
+        "name": "[Ĥíĝĥĝáļé Ĥáñðĝúáŕðš]"
+      },
+      "highgale_spaulders": {
+        "name": "[Ĥíĝĥĝáļé Šþáúļðéŕš]"
+      },
+      "highgale_cord": {
+        "name": "[Ĥíĝĥĝáļé Çóŕð]"
+      },
+      "breakwater_mantle": {
+        "name": "[Ɓŕéáķŵáţéŕ Ɱáñţļé]"
+      },
+      "breakwater_shoulderpads": {
+        "name": "[Ɓŕéáķŵáţéŕ Šĥóúļðéŕþáðš]"
+      },
+      "breakwater_spaulders": {
+        "name": "[Ɓŕéáķŵáţéŕ Šþáúļðéŕš]"
+      },
+      "gravebell_treads": {
+        "name": "[Ĝŕáʋéƀéļļ Ţŕéáðš]"
+      },
+      "gravebell_greaves": {
+        "name": "[Ĝŕáʋéƀéļļ Ĝŕéáʋéš]"
+      },
+      "cryptbound_tunic": {
+        "name": "[Çŕýþţƀóúñð Ţúñíç]"
+      },
+      "cryptbound_chainmail": {
+        "name": "[Çŕýþţƀóúñð Çĥáíñɱáíļ]"
+      },
+      "oathbroken_leggings": {
+        "name": "[Óáţĥƀŕóķéñ Ļéĝĝíñĝš]"
+      },
+      "oathbroken_breeches": {
+        "name": "[Óáţĥƀŕóķéñ Ɓŕééçĥéš]"
+      },
+      "oathbroken_legwraps": {
+        "name": "[Óáţĥƀŕóķéñ Ļéĝŵŕáþš]"
+      },
+      "oathbroken_legguards": {
+        "name": "[Óáţĥƀŕóķéñ Ļéĝĝúáŕðš]"
+      },
+      "oathbroken_chausses": {
+        "name": "[Óáţĥƀŕóķéñ Çĥáúššéš]"
+      },
+      "seamist_legwraps": {
+        "name": "[Šéáɱíšţ Ļéĝŵŕáþš]"
+      },
+      "seamist_chausses": {
+        "name": "[Šéáɱíšţ Çĥáúššéš]"
+      },
+      "warmonger_treads": {
+        "name": "[Ŵáŕɱóñĝéŕ Ţŕéáðš]"
+      },
+      "warmonger_greaves": {
+        "name": "[Ŵáŕɱóñĝéŕ Ĝŕéáʋéš]"
+      },
+      "sparkglass_leggings": {
+        "name": "[Šþáŕķĝļášš Ļéĝĝíñĝš]"
+      },
+      "sparkglass_breeches": {
+        "name": "[Šþáŕķĝļášš Ɓŕééçĥéš]"
+      },
+      "sparkglass_legwraps": {
+        "name": "[Šþáŕķĝļášš Ļéĝŵŕáþš]"
+      },
+      "sparkglass_legguards": {
+        "name": "[Šþáŕķĝļášš Ļéĝĝúáŕðš]"
+      },
+      "sparkglass_chausses": {
+        "name": "[Šþáŕķĝļášš Çĥáúššéš]"
+      },
+      "stillhymn_treads": {
+        "name": "[Šţíļļĥýɱñ Ţŕéáðš]"
+      },
+      "stillhymn_greaves": {
+        "name": "[Šţíļļĥýɱñ Ĝŕéáʋéš]"
+      },
+      "pearlglow_headguard": {
+        "name": "[Þéáŕļĝļóŵ Ĥéáðĝúáŕð]"
+      },
+      "pearlglow_coif": {
+        "name": "[Þéáŕļĝļóŵ Çóíƒ]"
+      },
+      "sealkeeper_gloves": {
+        "name": "[Šéáļķééþéŕ Ĝļóʋéš]"
+      },
+      "sealkeeper_grips": {
+        "name": "[Šéáļķééþéŕ Ĝŕíþš]"
+      },
+      "sealkeeper_handwraps": {
+        "name": "[Šéáļķééþéŕ Ĥáñðŵŕáþš]"
+      },
+      "sealkeeper_gauntlets": {
+        "name": "[Šéáļķééþéŕ Ĝáúñţļéţš]"
+      },
+      "sealkeeper_handguards": {
+        "name": "[Šéáļķééþéŕ Ĥáñðĝúáŕðš]"
+      },
+      "fetterbound_leggings": {
+        "name": "[Ƒéţţéŕƀóúñð Ļéĝĝíñĝš]"
+      },
+      "fetterbound_breeches": {
+        "name": "[Ƒéţţéŕƀóúñð Ɓŕééçĥéš]"
+      },
+      "fetterbound_legwraps": {
+        "name": "[Ƒéţţéŕƀóúñð Ļéĝŵŕáþš]"
+      },
+      "fetterbound_legguards": {
+        "name": "[Ƒéţţéŕƀóúñð Ļéĝĝúáŕðš]"
+      },
+      "fetterbound_chausses": {
+        "name": "[Ƒéţţéŕƀóúñð Çĥáúššéš]"
+      },
+      "shroudcaller_tunic": {
+        "name": "[Šĥŕóúðçáļļéŕ Ţúñíç]"
+      },
+      "shroudcaller_chainmail": {
+        "name": "[Šĥŕóúðçáļļéŕ Çĥáíñɱáíļ]"
+      },
+      "wyrmshadow_tunic": {
+        "name": "[Ŵýŕɱšĥáðóŵ Ţúñíç]"
+      },
+      "wyrmshadow_chainmail": {
+        "name": "[Ŵýŕɱšĥáðóŵ Çĥáíñɱáíļ]"
+      },
+      "cinderbrood_shoulderpads": {
+        "name": "[Çíñðéŕƀŕóóð Šĥóúļðéŕþáðš]"
+      },
+      "cinderbrood_shoulderguards": {
+        "name": "[Çíñðéŕƀŕóóð Šĥóúļðéŕĝúáŕðš]"
+      },
+      "cinderbrood_pauldrons": {
+        "name": "[Çíñðéŕƀŕóóð Þáúļðŕóñš]"
+      },
+      "hoarfrost_mantle": {
+        "name": "[Ĥóáŕƒŕóšţ Ɱáñţļé]"
+      },
+      "hoarfrost_shoulderpads": {
+        "name": "[Ĥóáŕƒŕóšţ Šĥóúļðéŕþáðš]"
+      },
+      "hoarfrost_spaulders": {
+        "name": "[Ĥóáŕƒŕóšţ Šþáúļðéŕš]"
+      },
+      "blackmere_mantle": {
+        "name": "[Ɓļáçķɱéŕé Ɱáñţļé]"
+      },
+      "blackmere_shoulderpads": {
+        "name": "[Ɓļáçķɱéŕé Šĥóúļðéŕþáðš]"
+      },
+      "blackmere_shoulderguards": {
+        "name": "[Ɓļáçķɱéŕé Šĥóúļðéŕĝúáŕðš]"
+      },
+      "blackmere_pauldrons": {
+        "name": "[Ɓļáçķɱéŕé Þáúļðŕóñš]"
+      },
+      "blackmere_spaulders": {
+        "name": "[Ɓļáçķɱéŕé Šþáúļðéŕš]"
+      },
+      "reedhush_mantle": {
+        "name": "[Ŕééðĥúšĥ Ɱáñţļé]"
+      },
+      "reedhush_shoulderpads": {
+        "name": "[Ŕééðĥúšĥ Šĥóúļðéŕþáðš]"
+      },
+      "reedhush_shoulderguards": {
+        "name": "[Ŕééðĥúšĥ Šĥóúļðéŕĝúáŕðš]"
+      },
+      "reedhush_pauldrons": {
+        "name": "[Ŕééðĥúšĥ Þáúļðŕóñš]"
+      },
+      "reedhush_spaulders": {
+        "name": "[Ŕééðĥúšĥ Šþáúļðéŕš]"
+      },
+      "cairnking_mantle": {
+        "name": "[Çáíŕñķíñĝ Ɱáñţļé]"
+      },
+      "cairnking_shoulderpads": {
+        "name": "[Çáíŕñķíñĝ Šĥóúļðéŕþáðš]"
+      },
+      "cairnking_shoulderguards": {
+        "name": "[Çáíŕñķíñĝ Šĥóúļðéŕĝúáŕðš]"
+      },
+      "cairnking_pauldrons": {
+        "name": "[Çáíŕñķíñĝ Þáúļðŕóñš]"
+      },
+      "cairnking_spaulders": {
+        "name": "[Çáíŕñķíñĝ Šþáúļðéŕš]"
+      },
+      "palehunt_mantle": {
+        "name": "[Þáļéĥúñţ Ɱáñţļé]"
+      },
+      "palehunt_shoulderpads": {
+        "name": "[Þáļéĥúñţ Šĥóúļðéŕþáðš]"
+      },
+      "palehunt_shoulderguards": {
+        "name": "[Þáļéĥúñţ Šĥóúļðéŕĝúáŕðš]"
+      },
+      "palehunt_pauldrons": {
+        "name": "[Þáļéĥúñţ Þáúļðŕóñš]"
+      },
+      "palehunt_spaulders": {
+        "name": "[Þáļéĥúñţ Šþáúļðéŕš]"
+      },
+      "jadeshrine_mantle": {
+        "name": "[Ĵáðéšĥŕíñé Ɱáñţļé]"
+      },
+      "jadeshrine_shoulderpads": {
+        "name": "[Ĵáðéšĥŕíñé Šĥóúļðéŕþáðš]"
+      },
+      "jadeshrine_shoulderguards": {
+        "name": "[Ĵáðéšĥŕíñé Šĥóúļðéŕĝúáŕðš]"
+      },
+      "jadeshrine_pauldrons": {
+        "name": "[Ĵáðéšĥŕíñé Þáúļðŕóñš]"
+      },
+      "jadeshrine_spaulders": {
+        "name": "[Ĵáðéšĥŕíñé Šþáúļðéŕš]"
+      },
+      "gildhedge_mantle": {
+        "name": "[Ĝíļðĥéðĝé Ɱáñţļé]"
+      },
+      "gildhedge_shoulderpads": {
+        "name": "[Ĝíļðĥéðĝé Šĥóúļðéŕþáðš]"
+      },
+      "gildhedge_spaulders": {
+        "name": "[Ĝíļðĥéðĝé Šþáúļðéŕš]"
+      },
+      "saltwrack_mantle": {
+        "name": "[Šáļţŵŕáçķ Ɱáñţļé]"
+      },
+      "saltwrack_shoulderpads": {
+        "name": "[Šáļţŵŕáçķ Šĥóúļðéŕþáðš]"
+      },
+      "saltwrack_spaulders": {
+        "name": "[Šáļţŵŕáçķ Šþáúļðéŕš]"
+      },
+      "brookwatch_vest": {
+        "name": "[Ɓŕóóķŵáţçĥ Ʋéšţ]"
+      },
+      "brookwatch_trousers": {
+        "name": "[Ɓŕóóķŵáţçĥ Ţŕóúšéŕš]"
+      },
+      "brookwatch_moccasins": {
+        "name": "[Ɓŕóóķŵáţçĥ Ɱóççášíñš]"
+      },
+      "brookwatch_cowl": {
+        "name": "[Ɓŕóóķŵáţçĥ Çóŵļ]"
+      },
+      "brookwatch_mitts": {
+        "name": "[Ɓŕóóķŵáţçĥ Ɱíţţš]"
+      },
+      "brookwatch_epaulets": {
+        "name": "[Ɓŕóóķŵáţçĥ Éþáúļéţš]"
+      },
+      "brookwatch_cinch": {
+        "name": "[Ɓŕóóķŵáţçĥ Çíñçĥ]"
+      },
+      "hedgerow_vest": {
+        "name": "[Ĥéðĝéŕóŵ Ʋéšţ]"
+      },
+      "hedgerow_trousers": {
+        "name": "[Ĥéðĝéŕóŵ Ţŕóúšéŕš]"
+      },
+      "hedgerow_moccasins": {
+        "name": "[Ĥéðĝéŕóŵ Ɱóççášíñš]"
+      },
+      "hedgerow_cowl": {
+        "name": "[Ĥéðĝéŕóŵ Çóŵļ]"
+      },
+      "hedgerow_mitts": {
+        "name": "[Ĥéðĝéŕóŵ Ɱíţţš]"
+      },
+      "hedgerow_epaulets": {
+        "name": "[Ĥéðĝéŕóŵ Éþáúļéţš]"
+      },
+      "hedgerow_cinch": {
+        "name": "[Ĥéðĝéŕóŵ Çíñçĥ]"
+      },
+      "bogwalker_vest": {
+        "name": "[Ɓóĝŵáļķéŕ Ʋéšţ]"
+      },
+      "bogwalker_trousers": {
+        "name": "[Ɓóĝŵáļķéŕ Ţŕóúšéŕš]"
+      },
+      "bogwalker_moccasins": {
+        "name": "[Ɓóĝŵáļķéŕ Ɱóççášíñš]"
+      },
+      "bogwalker_cowl": {
+        "name": "[Ɓóĝŵáļķéŕ Çóŵļ]"
+      },
+      "bogwalker_mitts": {
+        "name": "[Ɓóĝŵáļķéŕ Ɱíţţš]"
+      },
+      "bogwalker_epaulets": {
+        "name": "[Ɓóĝŵáļķéŕ Éþáúļéţš]"
+      },
+      "bogwalker_cinch": {
+        "name": "[Ɓóĝŵáļķéŕ Çíñçĥ]"
+      },
+      "thornspire_vest": {
+        "name": "[Ţĥóŕñšþíŕé Ʋéšţ]"
+      },
+      "thornspire_trousers": {
+        "name": "[Ţĥóŕñšþíŕé Ţŕóúšéŕš]"
+      },
+      "thornspire_moccasins": {
+        "name": "[Ţĥóŕñšþíŕé Ɱóççášíñš]"
+      },
+      "thornspire_cowl": {
+        "name": "[Ţĥóŕñšþíŕé Çóŵļ]"
+      },
+      "thornspire_mitts": {
+        "name": "[Ţĥóŕñšþíŕé Ɱíţţš]"
+      },
+      "thornspire_epaulets": {
+        "name": "[Ţĥóŕñšþíŕé Éþáúļéţš]"
+      },
+      "thornspire_cinch": {
+        "name": "[Ţĥóŕñšþíŕé Çíñçĥ]"
+      },
+      "hollowveil_vest": {
+        "name": "[Ĥóļļóŵʋéíļ Ʋéšţ]"
+      },
+      "hollowveil_trousers": {
+        "name": "[Ĥóļļóŵʋéíļ Ţŕóúšéŕš]"
+      },
+      "hollowveil_moccasins": {
+        "name": "[Ĥóļļóŵʋéíļ Ɱóççášíñš]"
+      },
+      "hollowveil_cowl": {
+        "name": "[Ĥóļļóŵʋéíļ Çóŵļ]"
+      },
+      "hollowveil_mitts": {
+        "name": "[Ĥóļļóŵʋéíļ Ɱíţţš]"
+      },
+      "hollowveil_epaulets": {
+        "name": "[Ĥóļļóŵʋéíļ Éþáúļéţš]"
+      },
+      "hollowveil_cinch": {
+        "name": "[Ĥóļļóŵʋéíļ Çíñçĥ]"
+      },
+      "trailwarden_vest": {
+        "name": "[Ţŕáíļŵáŕðéñ Ʋéšţ]"
+      },
+      "trailwarden_trousers": {
+        "name": "[Ţŕáíļŵáŕðéñ Ţŕóúšéŕš]"
+      },
+      "trailwarden_moccasins": {
+        "name": "[Ţŕáíļŵáŕðéñ Ɱóççášíñš]"
+      },
+      "trailwarden_cowl": {
+        "name": "[Ţŕáíļŵáŕðéñ Çóŵļ]"
+      },
+      "trailwarden_mitts": {
+        "name": "[Ţŕáíļŵáŕðéñ Ɱíţţš]"
+      },
+      "trailwarden_epaulets": {
+        "name": "[Ţŕáíļŵáŕðéñ Éþáúļéţš]"
+      },
+      "trailwarden_cinch": {
+        "name": "[Ţŕáíļŵáŕðéñ Çíñçĥ]"
+      },
+      "highgale_vest": {
+        "name": "[Ĥíĝĥĝáļé Ʋéšţ]"
+      },
+      "highgale_trousers": {
+        "name": "[Ĥíĝĥĝáļé Ţŕóúšéŕš]"
+      },
+      "highgale_moccasins": {
+        "name": "[Ĥíĝĥĝáļé Ɱóççášíñš]"
+      },
+      "highgale_cowl": {
+        "name": "[Ĥíĝĥĝáļé Çóŵļ]"
+      },
+      "highgale_mitts": {
+        "name": "[Ĥíĝĥĝáļé Ɱíţţš]"
+      },
+      "highgale_epaulets": {
+        "name": "[Ĥíĝĥĝáļé Éþáúļéţš]"
+      },
+      "highgale_cinch": {
+        "name": "[Ĥíĝĥĝáļé Çíñçĥ]"
+      },
+      "breakwater_shoulderguards": {
+        "name": "[Ɓŕéáķŵáţéŕ Šĥóúļðéŕĝúáŕðš]"
+      },
+      "breakwater_pauldrons": {
+        "name": "[Ɓŕéáķŵáţéŕ Þáúļðŕóñš]"
+      },
+      "breakwater_epaulets": {
+        "name": "[Ɓŕéáķŵáţéŕ Éþáúļéţš]"
+      },
+      "gravebell_moccasins": {
+        "name": "[Ĝŕáʋéƀéļļ Ɱóççášíñš]"
+      },
+      "oathbroken_trousers": {
+        "name": "[Óáţĥƀŕóķéñ Ţŕóúšéŕš]"
+      },
+      "sparkglass_trousers": {
+        "name": "[Šþáŕķĝļášš Ţŕóúšéŕš]"
+      },
+      "stillhymn_moccasins": {
+        "name": "[Šţíļļĥýɱñ Ɱóççášíñš]"
+      },
+      "sealkeeper_mitts": {
+        "name": "[Šéáļķééþéŕ Ɱíţţš]"
+      },
+      "fetterbound_trousers": {
+        "name": "[Ƒéţţéŕƀóúñð Ţŕóúšéŕš]"
+      },
+      "wyrmshadow_vest": {
+        "name": "[Ŵýŕɱšĥáðóŵ Ʋéšţ]"
+      },
+      "cinderbrood_spaulders": {
+        "name": "[Çíñðéŕƀŕóóð Šþáúļðéŕš]"
+      },
+      "cinderbrood_epaulets": {
+        "name": "[Çíñðéŕƀŕóóð Éþáúļéţš]"
+      },
+      "hoarfrost_shoulderguards": {
+        "name": "[Ĥóáŕƒŕóšţ Šĥóúļðéŕĝúáŕðš]"
+      },
+      "hoarfrost_pauldrons": {
+        "name": "[Ĥóáŕƒŕóšţ Þáúļðŕóñš]"
+      },
+      "hoarfrost_epaulets": {
+        "name": "[Ĥóáŕƒŕóšţ Éþáúļéţš]"
+      },
+      "blackmere_epaulets": {
+        "name": "[Ɓļáçķɱéŕé Éþáúļéţš]"
+      },
+      "reedhush_epaulets": {
+        "name": "[Ŕééðĥúšĥ Éþáúļéţš]"
+      },
+      "cairnking_epaulets": {
+        "name": "[Çáíŕñķíñĝ Éþáúļéţš]"
+      },
+      "palehunt_epaulets": {
+        "name": "[Þáļéĥúñţ Éþáúļéţš]"
+      },
+      "jadeshrine_epaulets": {
+        "name": "[Ĵáðéšĥŕíñé Éþáúļéţš]"
+      },
+      "gildhedge_shoulderguards": {
+        "name": "[Ĝíļðĥéðĝé Šĥóúļðéŕĝúáŕðš]"
+      },
+      "gildhedge_pauldrons": {
+        "name": "[Ĝíļðĥéðĝé Þáúļðŕóñš]"
+      },
+      "gildhedge_epaulets": {
+        "name": "[Ĝíļðĥéðĝé Éþáúļéţš]"
+      },
+      "saltwrack_shoulderguards": {
+        "name": "[Šáļţŵŕáçķ Šĥóúļðéŕĝúáŕðš]"
+      },
+      "saltwrack_pauldrons": {
+        "name": "[Šáļţŵŕáçķ Þáúļðŕóñš]"
+      },
+      "saltwrack_epaulets": {
+        "name": "[Šáļţŵŕáçķ Éþáúļéţš]"
+      },
+      "membership_token": {
+        "name": "[Ɱéɱƀéŕšĥíþ Ţóķéñ (30 Ðáýš)]"
+      },
+      "referral_helmet": {
+        "name": "[Ƒŕíéñðšĥíþ Ĥéļɱ]"
+      },
+      "referral_shoulder": {
+        "name": "[Ƒŕíéñðšĥíþ Þáúļðŕóñš]"
+      },
+      "referral_chest": {
+        "name": "[Ƒŕíéñðšĥíþ Çúíŕášš]"
+      },
+      "referral_waist": {
+        "name": "[Ƒŕíéñðšĥíþ Ĝíŕðļé]"
+      },
+      "referral_legs": {
+        "name": "[Ƒŕíéñðšĥíþ Ļéĝĝúáŕðš]"
+      },
+      "referral_gloves": {
+        "name": "[Ƒŕíéñðšĥíþ Ĝáúñţļéţš]"
+      },
+      "referral_feet": {
+        "name": "[Ƒŕíéñðšĥíþ Ɓóóţš]"
+      },
+      "membership_helmet": {
+        "name": "[Ɱéɱƀéŕšĥíþ Ĥéļɱ]"
+      },
+      "membership_shoulder": {
+        "name": "[Ɱéɱƀéŕšĥíþ Þáúļðŕóñš]"
+      },
+      "membership_chest": {
+        "name": "[Ɱéɱƀéŕšĥíþ Çúíŕášš]"
+      },
+      "membership_waist": {
+        "name": "[Ɱéɱƀéŕšĥíþ Ĝíŕðļé]"
+      },
+      "membership_legs": {
+        "name": "[Ɱéɱƀéŕšĥíþ Ļéĝĝúáŕðš]"
+      },
+      "membership_gloves": {
+        "name": "[Ɱéɱƀéŕšĥíþ Ĝáúñţļéţš]"
+      },
+      "membership_feet": {
+        "name": "[Ɱéɱƀéŕšĥíþ Ɓóóţš]"
       },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
@@ -23931,6 +25262,16 @@ export const en_XA: EnTranslations = {
         "sender": "[Ţĥé Éẋçĥáñĝé Ɓŕóķéŕ]",
         "subject": "[Ýóúŕ Éẋçĥáñĝé þúŕçĥášé]",
         "body": "[Ţĥé šáļé íš šéţţļéð áñð ţĥé ĝóóðš áŕé ýóúŕš. Ţĥé áţţáçĥéð þáŕçéļ çáŕŕíéš ţĥé éẋáçţ íţéɱ ýóú þáíð ƒóŕ, ĥéļð íñ éšçŕóŵ ƒŕóɱ ţĥé ɱóɱéñţ íţ ŵáš ļíšţéð úñţíļ ýóúŕ þáýɱéñţ çļéáŕéð.\n\nÁ ŕéçóŕð óƒ ţĥé šáļé ļíʋéš íñ ţĥé Éẋçĥáñĝé ļéðĝéŕ.\n\n- Ţĥé Éẋçĥáñĝé Ɓŕóķéŕ]"
+      },
+      "membership_token_delivery": {
+        "sender": "[Ţĥé Ŕáʋéñþóšţ]",
+        "subject": "[Ýóúŕ ɱéɱƀéŕšĥíþ ţóķéñ]",
+        "body": "[Ýóúŕ þúŕçĥášéð ţóķéñ íš éñçļóšéð. Ŕéðééɱ íţ ţó áðð 30 ðáýš óƒ ɱéɱƀéŕšĥíþ ţó ýóúŕ áççóúñţ, óŕ ţŕáðé íţ ŵíţĥ áñóţĥéŕ áðʋéñţúŕéŕ.]"
+      },
+      "membership_annual_reward": {
+        "sender": "[Ţĥé Ŕáʋéñþóšţ]",
+        "subject": "[Ýóúŕ áññúáļ ɱéɱƀéŕšĥíþ ɱóúñţ]",
+        "body": "[Ýóúŕ áññúáļ ɱéɱƀéŕšĥíþ þáýɱéñţ íš çóɱþļéţé. Ýóúŕ ţáñķ ɱóúñţ ķéý íš éñçļóšéð. Ķééþ ţĥé ķéý íñ ýóúŕ ƀáĝš óŕ ƀáñķ ţó óŵñ ţĥíš ɱóúñţ. Íţ ŕéɱáíñš ýóúŕš áƒţéŕ ɱéɱƀéŕšĥíþ éẋþíŕéš. Ŕíðíñĝ šķíļļ íš ŕéɋúíŕéð.]"
       },
       "woc_market_return": {
         "sender": "[Ţĥé Éẋçĥáñĝé Ɓŕóķéŕ]",

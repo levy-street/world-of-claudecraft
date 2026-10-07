@@ -347,6 +347,26 @@ export const ja_JP: EnTranslations = {
     }
   },
   "hudChrome": {
+    "courier": {
+      "title": "配達員",
+      "close": "配達員を閉じる",
+      "ready": "配達の準備完了",
+      "outbound": "銀行へ飛行中",
+      "returning": "アイテムを持って帰還中",
+      "waiting": "アイテムを返すため待機中",
+      "bags": "銀行へ送る",
+      "bank": "銀行から取り出す",
+      "cargo": "配達員の荷物",
+      "empty": "アイテムなし",
+      "send": "配達員を送る",
+      "selected": "{count} / {limit} スタック選択中",
+      "select": "{item}、{count}を選択",
+      "selectedItem": "{item}、{count}の選択を解除",
+      "instructions": "スタック全体を選択してください。配達員は預け入れた後、指定したアイテムを引き出します。クエストアイテムは送れません。",
+      "membership": "次の配達にはメンバーシップの更新が必要です。",
+      "cargoSafe": "バッグに空きができるまで、配達員がアイテムを保管します。",
+      "unavailable": "配達員を召喚して配達を計画しましょう。"
+    },
     "framePresets": {
       "apply": "適用",
       "pickerLabel": "フレームプリセット：{name}",
@@ -826,6 +846,50 @@ export const ja_JP: EnTranslations = {
       }
     },
     "wocStore": {
+      "subscription": {
+        "title": "ゲームの定期購入",
+        "monthlyTitle": "月額メンバーシップ",
+        "annualTitle": "12か月メンバーシップセット",
+        "annualPrice": "12か月分を一括で{price}",
+        "annualTerms": "同じ料金で毎年更新されます。Stripeで法定通貨を使ってお支払いください。請求設定で解約できます。",
+        "annualMount": "支払い後、購入したキャラクターで郵便から魂に縛られた戦車の鍵を受け取れます。戦車はセット用騎乗動物の仮モデルです。",
+        "trialTerms": "1アカウントにつき1回、{days}日間無料で体験できます。支払い方法の登録が必要です。解約しない場合、体験終了時に{price}が請求されます。",
+        "startTrial": "7日間の無料体験を開始",
+        "resumeCheckout": "購入手続きを再開",
+        "checkoutClosed": "この購入手続きは終了しており、未受領の特典はありません。メンバーシッププランをもう一度選び、新しい購入手続きを開始してください。",
+        "annualClaim": "セットの騎乗動物を受け取る",
+        "annualPending": "支払い後、購入したキャラクターに戻って騎乗動物を受け取ってください。支払い処理中や無料体験中の場合は、課金後に再試行してください。",
+        "annualDelivered": "セットの騎乗動物の鍵が郵便で届きました。",
+        "tokenTitle": "取引可能なメンバーシップトークン",
+        "benefitsTitle": "有効なメンバーシップの特典",
+        "benefitBank": "どの銀行員からでも、ほかのキャラクターの銀行を利用できます。",
+        "benefitSlots": "キャラクター枠を10個追加で解放します。",
+        "benefitArmour": "クラスと専門化に合った能力値を持つ魂縛の防具を受け取れます。レベルに合わせて成長し、レベル20でアイテムレベル25になります。全身に装備すると獲得経験値が20%増加します。",
+        "benefitTax": "オークションの通常の手数料が半額になります。",
+        "benefitExpiry": "メンバーシップが切れると、追加枠のキャラクターと防具の特典は更新するまで利用できなくなります。基本枠のキャラクターは引き続き遊べます。",
+        "tokenTerms": "{price}の一括払いで30日分。このキャラクターに郵便で届きます。使用してメンバーシップ期間を追加するか、オークションで売却できます。",
+        "tokenBuy": "メンバーシップトークンを購入",
+        "tokenClaim": "購入したトークンを受け取る",
+        "tokenPending": "支払い後、このキャラクターに戻ってトークンを受け取ってください。支払い処理中の場合は、少し待ってから再試行してください。",
+        "tokenDelivered": "トークンが郵便で届きました。",
+        "price": "月額 {price}",
+        "terms": "毎月自動更新されます。Stripe で法定通貨によるお支払いができます。請求設定から解約できます。",
+        "subscribe": "定期購入する",
+        "manage": "定期購入を管理",
+        "ending": "現在の請求期間の終了時に解約されます",
+        "error": "請求ページを開けませんでした。ポップアップを許可して再試行してください。",
+        "status": {
+          "none": "未登録",
+          "incomplete": "支払い未完了",
+          "incomplete_expired": "決済の有効期限切れ",
+          "trialing": "試用中",
+          "active": "有効",
+          "past_due": "支払い期限超過",
+          "canceled": "解約済み",
+          "unpaid": "未払い",
+          "paused": "一時停止中"
+        }
+      },
       "title": "WOCストア",
       "close": "WOCストアを閉じる",
       "tabsLabel": "WOCストアのセクション",
@@ -4880,6 +4944,19 @@ export const ja_JP: EnTranslations = {
       "vaultCannotDeposit": "保管庫には預けられません",
       "tabsAria": "銀行タブ",
       "personalTab": "個人",
+      "accountTab": "ほかのキャラクター",
+      "accountArmour": "メンバーシップ防具を受け取る",
+      "referralArmour": "友情の防具を受け取る",
+      "accountMembership": "メンバーシップが有効な間、ここからほかのキャラクターの銀行を利用できます。",
+      "accountCharacters": "キャラクターの銀行",
+      "accountEmpty": "別のキャラクターを作成すると、その銀行をここで利用できます。",
+      "accountSelect": "キャラクターを選んで銀行を読み込んでください。",
+      "accountUnavailable": "この銀行は利用できません。キャラクターを選び直して更新してください。",
+      "accountDeposit": "自分のバッグ：この銀行に預ける",
+      "accountWithdraw": "選択中の銀行：自分のバッグに引き出す",
+      "accountDepositHint": "クリックすると、このスタックを選択中のキャラクターの銀行に預けます。",
+      "accountWithdrawHint": "クリックすると、このスタックを自分のバッグに引き出します。",
+      "accountBound": "魂縛、ロック済み、クエスト用のアイテムはキャラクター間で移動できません。",
       "guildTab": "ギルド",
       "guildCapacityAria": "使用中のギルド銀行スロット: {total}個中{used}個",
       "guildEmpty": "ギルド銀行は空です。",
@@ -11218,6 +11295,9 @@ export const ja_JP: EnTranslations = {
   "character": {
     "loading": "読み込み中...",
     "noneYet": "まだキャラクターがいません。下で作成してください。",
+    "membershipRequired": "このキャラクターで遊ぶにはメンバーシップを更新してください。",
+    "membershipSlots": "メンバーシップでキャラクター枠を解放",
+    "emptySlot": "利用可能なキャラクター枠",
     "levelClass": "レベル{level} {className}",
     "inWorld": "世界にいます",
     "takeOver": "引き継ぐ",
@@ -12309,6 +12389,8 @@ export const ja_JP: EnTranslations = {
       "rewards": "報酬",
       "xpReward": "経験値 {xp}",
       "itemReward": "アイテム報酬:",
+      "chooseReward": "報酬を選択：",
+      "rewardChoices": "これらの報酬から1つを選べます：",
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "レベル{level}が必要"
     },
@@ -12686,6 +12768,7 @@ export const ja_JP: EnTranslations = {
       "incomplete": "そのクエストは完了していません。",
       "giverMissing": "そのクエストの依頼主が近くにいません。",
       "turnInMissing": "そのクエストの報告先が近くにいません。",
+      "rewardNotOffered": "その報酬は提供されていません。",
       "tooFar": "遠すぎます。",
       "escortAway": "護衛する相手は今その場所にいません。しばらくすれば戻ってきます。"
     }
@@ -12753,6 +12836,17 @@ export const ja_JP: EnTranslations = {
       "parry": "受け流し"
     },
     "tooltip": {
+      "referralFullSet": "友情の防具を全{pieces}部位装備し、{member}とパーティーを組むと経験値が{percent}%増加します。招待者のメンバーシップが有効である必要があります。",
+      "referralInviter": "あなたを招待したメンバー",
+      "referralRetained": "招待者とパーティーを組んでいなくても、防具の能力値はレベルに応じて成長します。",
+      "referralDormant": "無効：このアカウントはメンバーの招待による友情の防具を獲得していません。",
+      "membershipToken": "使用：このトークンを消費し、アカウントのメンバーシップ期間に{days}日を追加します。残りの期間は失われません。使用前なら取引やオークションでの売却が可能です。",
+      "membershipAdaptive": "能力値と防具の種類がクラスと専門化に合わせて変わります。",
+      "membershipScaling": "アイテムレベルは自分のレベルに合わせて上がります。レベル20になると完成し、アイテムレベル25になります。",
+      "membershipPerfected": "完成：アイテムレベル{level}。",
+      "membershipFullSet": "メンバーシップ防具を全{pieces}部位装備すると、獲得経験値が{percent}%増加します。有効なメンバーシップが必要です。",
+      "membershipRequired": "メンバーシップが切れると防具の能力値とセット効果は無効になり、更新すると再び有効になります。",
+      "membershipDormant": "無効：メンバーシップを更新すると、防具の能力値とセット効果が戻ります。",
       "qualityKind": "{quality} {kind}",
       "currentlyEquipped": "現在の装備",
       "ifYouEquip": "これを装備すると",
@@ -13052,6 +13146,10 @@ export const ja_JP: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "courier": {
+        "name": "配達員",
+        "description": "空飛ぶロバを召喚し、バッグと最寄りの銀行の間で荷物を運びます。通常の走行速度の250%で飛びます。1回につき最大24スタックを選択できます。新しい配達にはメンバーシップが必要です。"
+      },
       "sport_kick": {
         "name": "キック",
         "description": "狙った地点へボールをグラウンダーで蹴り出す。"
@@ -18450,6 +18548,1239 @@ export const ja_JP: EnTranslations = {
       },
       "vanguard_warstaff": {
         "name": "ヴァンガードの戦杖"
+      },
+      "brookwatch_robe": {
+        "name": "小川監視のローブ"
+      },
+      "brookwatch_leggings": {
+        "name": "小川監視のレギンス"
+      },
+      "brookwatch_slippers": {
+        "name": "小川監視のスリッパー"
+      },
+      "brookwatch_hood": {
+        "name": "小川監視のフード"
+      },
+      "brookwatch_gloves": {
+        "name": "小川監視の手甲"
+      },
+      "brookwatch_mantle": {
+        "name": "小川監視のマント"
+      },
+      "brookwatch_sash": {
+        "name": "小川監視のサッシュ"
+      },
+      "brookwatch_jerkin": {
+        "name": "小川監視のジャーキン"
+      },
+      "brookwatch_breeches": {
+        "name": "小川監視のブリーチーズ"
+      },
+      "brookwatch_boots": {
+        "name": "小川監視のブーツ"
+      },
+      "brookwatch_cap": {
+        "name": "小川監視のキャップ"
+      },
+      "brookwatch_grips": {
+        "name": "小川監視のグリップ"
+      },
+      "brookwatch_shoulderpads": {
+        "name": "小川監視のショルダーパッド"
+      },
+      "brookwatch_belt": {
+        "name": "小川監視のベルト"
+      },
+      "brookwatch_hauberk": {
+        "name": "小川監視のホーバーク"
+      },
+      "brookwatch_legguards": {
+        "name": "小川監視のレグガード"
+      },
+      "brookwatch_sabatons": {
+        "name": "小川監視のサバトン"
+      },
+      "brookwatch_helm": {
+        "name": "小川監視のヘルム"
+      },
+      "brookwatch_gauntlets": {
+        "name": "小川監視の籠手"
+      },
+      "brookwatch_pauldrons": {
+        "name": "小川監視の肩甲"
+      },
+      "brookwatch_girdle": {
+        "name": "小川監視のガードル"
+      },
+      "brookwatch_chainmail": {
+        "name": "小川監視のチェーンメイル"
+      },
+      "brookwatch_chausses": {
+        "name": "小川監視のチョース"
+      },
+      "brookwatch_greaves": {
+        "name": "小川監視のグリーブ"
+      },
+      "brookwatch_coif": {
+        "name": "小川監視のコイフ"
+      },
+      "brookwatch_handguards": {
+        "name": "小川監視のハンドガード"
+      },
+      "brookwatch_spaulders": {
+        "name": "小川監視のスポルダー"
+      },
+      "brookwatch_cord": {
+        "name": "小川監視のコード"
+      },
+      "hedgerow_robe": {
+        "name": "垣根のローブ"
+      },
+      "hedgerow_leggings": {
+        "name": "垣根のレギンス"
+      },
+      "hedgerow_slippers": {
+        "name": "垣根のスリッパー"
+      },
+      "hedgerow_hood": {
+        "name": "垣根のフード"
+      },
+      "hedgerow_gloves": {
+        "name": "垣根の手甲"
+      },
+      "hedgerow_mantle": {
+        "name": "垣根のマント"
+      },
+      "hedgerow_sash": {
+        "name": "垣根のサッシュ"
+      },
+      "hedgerow_jerkin": {
+        "name": "垣根のジャーキン"
+      },
+      "hedgerow_breeches": {
+        "name": "垣根のブリーチーズ"
+      },
+      "hedgerow_boots": {
+        "name": "垣根のブーツ"
+      },
+      "hedgerow_cap": {
+        "name": "垣根のキャップ"
+      },
+      "hedgerow_grips": {
+        "name": "垣根のグリップ"
+      },
+      "hedgerow_shoulderpads": {
+        "name": "垣根のショルダーパッド"
+      },
+      "hedgerow_belt": {
+        "name": "垣根のベルト"
+      },
+      "hedgerow_hauberk": {
+        "name": "垣根のホーバーク"
+      },
+      "hedgerow_legguards": {
+        "name": "垣根のレグガード"
+      },
+      "hedgerow_sabatons": {
+        "name": "垣根のサバトン"
+      },
+      "hedgerow_helm": {
+        "name": "垣根のヘルム"
+      },
+      "hedgerow_gauntlets": {
+        "name": "垣根の籠手"
+      },
+      "hedgerow_pauldrons": {
+        "name": "垣根の肩甲"
+      },
+      "hedgerow_girdle": {
+        "name": "垣根のガードル"
+      },
+      "hedgerow_chainmail": {
+        "name": "垣根のチェーンメイル"
+      },
+      "hedgerow_chausses": {
+        "name": "垣根のチョース"
+      },
+      "hedgerow_greaves": {
+        "name": "垣根のグリーブ"
+      },
+      "hedgerow_coif": {
+        "name": "垣根のコイフ"
+      },
+      "hedgerow_handguards": {
+        "name": "垣根のハンドガード"
+      },
+      "hedgerow_spaulders": {
+        "name": "垣根のスポルダー"
+      },
+      "hedgerow_cord": {
+        "name": "垣根のコード"
+      },
+      "bogwalker_robe": {
+        "name": "泥沼行きのローブ"
+      },
+      "bogwalker_leggings": {
+        "name": "泥沼行きのレギンス"
+      },
+      "bogwalker_slippers": {
+        "name": "泥沼行きのスリッパー"
+      },
+      "bogwalker_hood": {
+        "name": "泥沼行きのフード"
+      },
+      "bogwalker_gloves": {
+        "name": "泥沼行きの手甲"
+      },
+      "bogwalker_mantle": {
+        "name": "泥沼行きのマント"
+      },
+      "bogwalker_sash": {
+        "name": "泥沼行きのサッシュ"
+      },
+      "bogwalker_jerkin": {
+        "name": "泥沼行きのジャーキン"
+      },
+      "bogwalker_breeches": {
+        "name": "泥沼行きのブリーチーズ"
+      },
+      "bogwalker_boots": {
+        "name": "泥沼行きのブーツ"
+      },
+      "bogwalker_cap": {
+        "name": "泥沼行きのキャップ"
+      },
+      "bogwalker_grips": {
+        "name": "泥沼行きのグリップ"
+      },
+      "bogwalker_shoulderpads": {
+        "name": "泥沼行きのショルダーパッド"
+      },
+      "bogwalker_belt": {
+        "name": "泥沼行きのベルト"
+      },
+      "bogwalker_hauberk": {
+        "name": "泥沼行きのホーバーク"
+      },
+      "bogwalker_legguards": {
+        "name": "泥沼行きのレグガード"
+      },
+      "bogwalker_sabatons": {
+        "name": "泥沼行きのサバトン"
+      },
+      "bogwalker_helm": {
+        "name": "泥沼行きのヘルム"
+      },
+      "bogwalker_gauntlets": {
+        "name": "泥沼行きの籠手"
+      },
+      "bogwalker_pauldrons": {
+        "name": "泥沼行きの肩甲"
+      },
+      "bogwalker_girdle": {
+        "name": "泥沼行きのガードル"
+      },
+      "bogwalker_chainmail": {
+        "name": "泥沼行きのチェーンメイル"
+      },
+      "bogwalker_chausses": {
+        "name": "泥沼行きのチョース"
+      },
+      "bogwalker_greaves": {
+        "name": "泥沼行きのグリーブ"
+      },
+      "bogwalker_coif": {
+        "name": "泥沼行きのコイフ"
+      },
+      "bogwalker_handguards": {
+        "name": "泥沼行きのハンドガード"
+      },
+      "bogwalker_spaulders": {
+        "name": "泥沼行きのスポルダー"
+      },
+      "bogwalker_cord": {
+        "name": "泥沼行きのコード"
+      },
+      "thornspire_robe": {
+        "name": "棘塔のローブ"
+      },
+      "thornspire_leggings": {
+        "name": "棘塔のレギンス"
+      },
+      "thornspire_slippers": {
+        "name": "棘塔のスリッパー"
+      },
+      "thornspire_hood": {
+        "name": "棘塔のフード"
+      },
+      "thornspire_gloves": {
+        "name": "棘塔の手甲"
+      },
+      "thornspire_mantle": {
+        "name": "棘塔のマント"
+      },
+      "thornspire_sash": {
+        "name": "棘塔のサッシュ"
+      },
+      "thornspire_jerkin": {
+        "name": "棘塔のジャーキン"
+      },
+      "thornspire_breeches": {
+        "name": "棘塔のブリーチーズ"
+      },
+      "thornspire_boots": {
+        "name": "棘塔のブーツ"
+      },
+      "thornspire_cap": {
+        "name": "棘塔のキャップ"
+      },
+      "thornspire_grips": {
+        "name": "棘塔のグリップ"
+      },
+      "thornspire_shoulderpads": {
+        "name": "棘塔のショルダーパッド"
+      },
+      "thornspire_belt": {
+        "name": "棘塔のベルト"
+      },
+      "thornspire_hauberk": {
+        "name": "棘塔のホーバーク"
+      },
+      "thornspire_legguards": {
+        "name": "棘塔のレグガード"
+      },
+      "thornspire_sabatons": {
+        "name": "棘塔のサバトン"
+      },
+      "thornspire_helm": {
+        "name": "棘塔のヘルム"
+      },
+      "thornspire_gauntlets": {
+        "name": "棘塔の籠手"
+      },
+      "thornspire_pauldrons": {
+        "name": "棘塔の肩甲"
+      },
+      "thornspire_girdle": {
+        "name": "棘塔のガードル"
+      },
+      "thornspire_chainmail": {
+        "name": "棘塔のチェーンメイル"
+      },
+      "thornspire_chausses": {
+        "name": "棘塔のチョース"
+      },
+      "thornspire_greaves": {
+        "name": "棘塔のグリーブ"
+      },
+      "thornspire_coif": {
+        "name": "棘塔のコイフ"
+      },
+      "thornspire_handguards": {
+        "name": "棘塔のハンドガード"
+      },
+      "thornspire_spaulders": {
+        "name": "棘塔のスポルダー"
+      },
+      "thornspire_cord": {
+        "name": "棘塔のコード"
+      },
+      "hollowveil_robe": {
+        "name": "空洞の帳のローブ"
+      },
+      "hollowveil_leggings": {
+        "name": "空洞の帳のレギンス"
+      },
+      "hollowveil_slippers": {
+        "name": "空洞の帳のスリッパー"
+      },
+      "hollowveil_hood": {
+        "name": "空洞の帳のフード"
+      },
+      "hollowveil_gloves": {
+        "name": "空洞の帳の手甲"
+      },
+      "hollowveil_mantle": {
+        "name": "空洞の帳のマント"
+      },
+      "hollowveil_sash": {
+        "name": "空洞の帳のサッシュ"
+      },
+      "hollowveil_jerkin": {
+        "name": "空洞の帳のジャーキン"
+      },
+      "hollowveil_breeches": {
+        "name": "空洞の帳のブリーチーズ"
+      },
+      "hollowveil_boots": {
+        "name": "空洞の帳のブーツ"
+      },
+      "hollowveil_cap": {
+        "name": "空洞の帳のキャップ"
+      },
+      "hollowveil_grips": {
+        "name": "空洞の帳のグリップ"
+      },
+      "hollowveil_shoulderpads": {
+        "name": "空洞の帳のショルダーパッド"
+      },
+      "hollowveil_belt": {
+        "name": "空洞の帳のベルト"
+      },
+      "hollowveil_hauberk": {
+        "name": "空洞の帳のホーバーク"
+      },
+      "hollowveil_legguards": {
+        "name": "空洞の帳のレグガード"
+      },
+      "hollowveil_sabatons": {
+        "name": "空洞の帳のサバトン"
+      },
+      "hollowveil_helm": {
+        "name": "空洞の帳のヘルム"
+      },
+      "hollowveil_gauntlets": {
+        "name": "空洞の帳の籠手"
+      },
+      "hollowveil_pauldrons": {
+        "name": "空洞の帳の肩甲"
+      },
+      "hollowveil_girdle": {
+        "name": "空洞の帳のガードル"
+      },
+      "hollowveil_chainmail": {
+        "name": "空洞の帳のチェーンメイル"
+      },
+      "hollowveil_chausses": {
+        "name": "空洞の帳のチョース"
+      },
+      "hollowveil_greaves": {
+        "name": "空洞の帳のグリーブ"
+      },
+      "hollowveil_coif": {
+        "name": "空洞の帳のコイフ"
+      },
+      "hollowveil_handguards": {
+        "name": "空洞の帳のハンドガード"
+      },
+      "hollowveil_spaulders": {
+        "name": "空洞の帳のスポルダー"
+      },
+      "hollowveil_cord": {
+        "name": "空洞の帳のコード"
+      },
+      "trailwarden_robe": {
+        "name": "径守のローブ"
+      },
+      "trailwarden_leggings": {
+        "name": "径守のレギンス"
+      },
+      "trailwarden_slippers": {
+        "name": "径守のスリッパー"
+      },
+      "trailwarden_hood": {
+        "name": "径守のフード"
+      },
+      "trailwarden_gloves": {
+        "name": "径守の手甲"
+      },
+      "trailwarden_mantle": {
+        "name": "径守のマント"
+      },
+      "trailwarden_sash": {
+        "name": "径守のサッシュ"
+      },
+      "trailwarden_jerkin": {
+        "name": "径守のジャーキン"
+      },
+      "trailwarden_breeches": {
+        "name": "径守のブリーチーズ"
+      },
+      "trailwarden_boots": {
+        "name": "径守のブーツ"
+      },
+      "trailwarden_cap": {
+        "name": "径守のキャップ"
+      },
+      "trailwarden_grips": {
+        "name": "径守のグリップ"
+      },
+      "trailwarden_shoulderpads": {
+        "name": "径守のショルダーパッド"
+      },
+      "trailwarden_belt": {
+        "name": "径守のベルト"
+      },
+      "trailwarden_hauberk": {
+        "name": "径守のホーバーク"
+      },
+      "trailwarden_legguards": {
+        "name": "径守のレグガード"
+      },
+      "trailwarden_sabatons": {
+        "name": "径守のサバトン"
+      },
+      "trailwarden_helm": {
+        "name": "径守のヘルム"
+      },
+      "trailwarden_gauntlets": {
+        "name": "径守の籠手"
+      },
+      "trailwarden_pauldrons": {
+        "name": "径守の肩甲"
+      },
+      "trailwarden_girdle": {
+        "name": "径守のガードル"
+      },
+      "trailwarden_chainmail": {
+        "name": "径守のチェーンメイル"
+      },
+      "trailwarden_chausses": {
+        "name": "径守のチョース"
+      },
+      "trailwarden_greaves": {
+        "name": "径守のグリーブ"
+      },
+      "trailwarden_coif": {
+        "name": "径守のコイフ"
+      },
+      "trailwarden_handguards": {
+        "name": "径守のハンドガード"
+      },
+      "trailwarden_spaulders": {
+        "name": "径守のスポルダー"
+      },
+      "trailwarden_cord": {
+        "name": "径守のコード"
+      },
+      "highgale_robe": {
+        "name": "高き疾風のローブ"
+      },
+      "highgale_leggings": {
+        "name": "高き疾風のレギンス"
+      },
+      "highgale_slippers": {
+        "name": "高き疾風のスリッパー"
+      },
+      "highgale_hood": {
+        "name": "高き疾風のフード"
+      },
+      "highgale_gloves": {
+        "name": "高き疾風の手甲"
+      },
+      "highgale_mantle": {
+        "name": "高き疾風のマント"
+      },
+      "highgale_sash": {
+        "name": "高き疾風のサッシュ"
+      },
+      "highgale_jerkin": {
+        "name": "高き疾風のジャーキン"
+      },
+      "highgale_breeches": {
+        "name": "高き疾風のブリーチーズ"
+      },
+      "highgale_boots": {
+        "name": "高き疾風のブーツ"
+      },
+      "highgale_cap": {
+        "name": "高き疾風のキャップ"
+      },
+      "highgale_grips": {
+        "name": "高き疾風のグリップ"
+      },
+      "highgale_shoulderpads": {
+        "name": "高き疾風のショルダーパッド"
+      },
+      "highgale_belt": {
+        "name": "高き疾風のベルト"
+      },
+      "highgale_hauberk": {
+        "name": "高き疾風のホーバーク"
+      },
+      "highgale_legguards": {
+        "name": "高き疾風のレグガード"
+      },
+      "highgale_sabatons": {
+        "name": "高き疾風のサバトン"
+      },
+      "highgale_helm": {
+        "name": "高き疾風のヘルム"
+      },
+      "highgale_gauntlets": {
+        "name": "高き疾風の籠手"
+      },
+      "highgale_pauldrons": {
+        "name": "高き疾風の肩甲"
+      },
+      "highgale_girdle": {
+        "name": "高き疾風のガードル"
+      },
+      "highgale_chainmail": {
+        "name": "高き疾風のチェーンメイル"
+      },
+      "highgale_chausses": {
+        "name": "高き疾風のチョース"
+      },
+      "highgale_greaves": {
+        "name": "高き疾風のグリーブ"
+      },
+      "brookwatch_tunic": {
+        "name": "小川監視のチュニック"
+      },
+      "brookwatch_legwraps": {
+        "name": "小川監視のレッグラップ"
+      },
+      "brookwatch_treads": {
+        "name": "小川監視の短靴"
+      },
+      "brookwatch_headguard": {
+        "name": "小川監視のヘッドガード"
+      },
+      "brookwatch_handwraps": {
+        "name": "小川監視のハンドラップ"
+      },
+      "brookwatch_shoulderguards": {
+        "name": "小川監視のショルダーガード"
+      },
+      "brookwatch_waistguard": {
+        "name": "小川監視のウエストガード"
+      },
+      "hedgerow_tunic": {
+        "name": "垣根のチュニック"
+      },
+      "hedgerow_legwraps": {
+        "name": "垣根のレッグラップ"
+      },
+      "hedgerow_treads": {
+        "name": "垣根の短靴"
+      },
+      "hedgerow_headguard": {
+        "name": "垣根のヘッドガード"
+      },
+      "hedgerow_handwraps": {
+        "name": "垣根のハンドラップ"
+      },
+      "hedgerow_shoulderguards": {
+        "name": "垣根のショルダーガード"
+      },
+      "hedgerow_waistguard": {
+        "name": "垣根のウエストガード"
+      },
+      "bogwalker_tunic": {
+        "name": "泥沼行きのチュニック"
+      },
+      "bogwalker_legwraps": {
+        "name": "泥沼行きのレッグラップ"
+      },
+      "bogwalker_treads": {
+        "name": "泥沼行きの短靴"
+      },
+      "bogwalker_headguard": {
+        "name": "泥沼行きのヘッドガード"
+      },
+      "bogwalker_handwraps": {
+        "name": "泥沼行きのハンドラップ"
+      },
+      "bogwalker_shoulderguards": {
+        "name": "泥沼行きのショルダーガード"
+      },
+      "bogwalker_waistguard": {
+        "name": "泥沼行きのウエストガード"
+      },
+      "thornspire_tunic": {
+        "name": "棘塔のチュニック"
+      },
+      "thornspire_legwraps": {
+        "name": "棘塔のレッグラップ"
+      },
+      "thornspire_treads": {
+        "name": "棘塔の短靴"
+      },
+      "thornspire_headguard": {
+        "name": "棘塔のヘッドガード"
+      },
+      "thornspire_handwraps": {
+        "name": "棘塔のハンドラップ"
+      },
+      "thornspire_shoulderguards": {
+        "name": "棘塔のショルダーガード"
+      },
+      "thornspire_waistguard": {
+        "name": "棘塔のウエストガード"
+      },
+      "hollowveil_tunic": {
+        "name": "空洞の帳のチュニック"
+      },
+      "hollowveil_legwraps": {
+        "name": "空洞の帳のレッグラップ"
+      },
+      "hollowveil_treads": {
+        "name": "空洞の帳の短靴"
+      },
+      "hollowveil_headguard": {
+        "name": "空洞の帳のヘッドガード"
+      },
+      "hollowveil_handwraps": {
+        "name": "空洞の帳のハンドラップ"
+      },
+      "hollowveil_shoulderguards": {
+        "name": "空洞の帳のショルダーガード"
+      },
+      "hollowveil_waistguard": {
+        "name": "空洞の帳のウエストガード"
+      },
+      "trailwarden_tunic": {
+        "name": "径守のチュニック"
+      },
+      "trailwarden_legwraps": {
+        "name": "径守のレッグラップ"
+      },
+      "trailwarden_treads": {
+        "name": "径守の短靴"
+      },
+      "trailwarden_headguard": {
+        "name": "径守のヘッドガード"
+      },
+      "trailwarden_handwraps": {
+        "name": "径守のハンドラップ"
+      },
+      "trailwarden_shoulderguards": {
+        "name": "径守のショルダーガード"
+      },
+      "trailwarden_waistguard": {
+        "name": "径守のウエストガード"
+      },
+      "highgale_tunic": {
+        "name": "高き疾風のチュニック"
+      },
+      "highgale_legwraps": {
+        "name": "高き疾風のレッグラップ"
+      },
+      "highgale_treads": {
+        "name": "高き疾風の短靴"
+      },
+      "highgale_headguard": {
+        "name": "高き疾風のヘッドガード"
+      },
+      "highgale_handwraps": {
+        "name": "高き疾風のハンドラップ"
+      },
+      "highgale_shoulderguards": {
+        "name": "高き疾風のショルダーガード"
+      },
+      "highgale_waistguard": {
+        "name": "高き疾風のウエストガード"
+      },
+      "highgale_coif": {
+        "name": "高き疾風のコイフ"
+      },
+      "highgale_handguards": {
+        "name": "高き疾風のハンドガード"
+      },
+      "highgale_spaulders": {
+        "name": "高き疾風のスポルダー"
+      },
+      "highgale_cord": {
+        "name": "高き疾風のコード"
+      },
+      "breakwater_mantle": {
+        "name": "防波堤のマント"
+      },
+      "breakwater_shoulderpads": {
+        "name": "防波堤のショルダーパッド"
+      },
+      "breakwater_spaulders": {
+        "name": "防波堤のスポルダー"
+      },
+      "gravebell_treads": {
+        "name": "墓鐘の短靴"
+      },
+      "gravebell_greaves": {
+        "name": "墓鐘のグリーブ"
+      },
+      "cryptbound_tunic": {
+        "name": "墓所縛りのチュニック"
+      },
+      "cryptbound_chainmail": {
+        "name": "墓所縛りのチェーンメイル"
+      },
+      "oathbroken_leggings": {
+        "name": "誓い破りのレギンス"
+      },
+      "oathbroken_breeches": {
+        "name": "誓い破りのブリーチーズ"
+      },
+      "oathbroken_legwraps": {
+        "name": "誓い破りのレッグラップ"
+      },
+      "oathbroken_legguards": {
+        "name": "誓い破りのレグガード"
+      },
+      "oathbroken_chausses": {
+        "name": "誓い破りのチョース"
+      },
+      "seamist_legwraps": {
+        "name": "海霧のレッグラップ"
+      },
+      "seamist_chausses": {
+        "name": "海霧のチョース"
+      },
+      "warmonger_treads": {
+        "name": "戦狂いの短靴"
+      },
+      "warmonger_greaves": {
+        "name": "戦狂いのグリーブ"
+      },
+      "sparkglass_leggings": {
+        "name": "火花水晶のレギンス"
+      },
+      "sparkglass_breeches": {
+        "name": "火花水晶のブリーチーズ"
+      },
+      "sparkglass_legwraps": {
+        "name": "火花水晶のレッグラップ"
+      },
+      "sparkglass_legguards": {
+        "name": "火花水晶のレグガード"
+      },
+      "sparkglass_chausses": {
+        "name": "火花水晶のチョース"
+      },
+      "stillhymn_treads": {
+        "name": "静寂の聖歌の短靴"
+      },
+      "stillhymn_greaves": {
+        "name": "静寂の聖歌のグリーブ"
+      },
+      "pearlglow_headguard": {
+        "name": "真珠の輝きのヘッドガード"
+      },
+      "pearlglow_coif": {
+        "name": "真珠の輝きのコイフ"
+      },
+      "sealkeeper_gloves": {
+        "name": "封印守りの手甲"
+      },
+      "sealkeeper_grips": {
+        "name": "封印守りのグリップ"
+      },
+      "sealkeeper_handwraps": {
+        "name": "封印守りのハンドラップ"
+      },
+      "sealkeeper_gauntlets": {
+        "name": "封印守りの籠手"
+      },
+      "sealkeeper_handguards": {
+        "name": "封印守りのハンドガード"
+      },
+      "fetterbound_leggings": {
+        "name": "枷縛りのレギンス"
+      },
+      "fetterbound_breeches": {
+        "name": "枷縛りのブリーチーズ"
+      },
+      "fetterbound_legwraps": {
+        "name": "枷縛りのレッグラップ"
+      },
+      "fetterbound_legguards": {
+        "name": "枷縛りのレグガード"
+      },
+      "fetterbound_chausses": {
+        "name": "枷縛りのチョース"
+      },
+      "shroudcaller_tunic": {
+        "name": "屍衣呼びのチュニック"
+      },
+      "shroudcaller_chainmail": {
+        "name": "屍衣呼びのチェーンメイル"
+      },
+      "wyrmshadow_tunic": {
+        "name": "竜影のチュニック"
+      },
+      "wyrmshadow_chainmail": {
+        "name": "竜影のチェーンメイル"
+      },
+      "cinderbrood_shoulderpads": {
+        "name": "残り火の眷属のショルダーパッド"
+      },
+      "cinderbrood_shoulderguards": {
+        "name": "残り火の眷属のショルダーガード"
+      },
+      "cinderbrood_pauldrons": {
+        "name": "残り火の眷属の肩甲"
+      },
+      "hoarfrost_mantle": {
+        "name": "霧氷のマント"
+      },
+      "hoarfrost_shoulderpads": {
+        "name": "霧氷のショルダーパッド"
+      },
+      "hoarfrost_spaulders": {
+        "name": "霧氷のスポルダー"
+      },
+      "blackmere_mantle": {
+        "name": "黒き湖のマント"
+      },
+      "blackmere_shoulderpads": {
+        "name": "黒き湖のショルダーパッド"
+      },
+      "blackmere_shoulderguards": {
+        "name": "黒き湖のショルダーガード"
+      },
+      "blackmere_pauldrons": {
+        "name": "黒き湖の肩甲"
+      },
+      "blackmere_spaulders": {
+        "name": "黒き湖のスポルダー"
+      },
+      "reedhush_mantle": {
+        "name": "葦の静けさのマント"
+      },
+      "reedhush_shoulderpads": {
+        "name": "葦の静けさのショルダーパッド"
+      },
+      "reedhush_shoulderguards": {
+        "name": "葦の静けさのショルダーガード"
+      },
+      "reedhush_pauldrons": {
+        "name": "葦の静けさの肩甲"
+      },
+      "reedhush_spaulders": {
+        "name": "葦の静けさのスポルダー"
+      },
+      "cairnking_mantle": {
+        "name": "塚の王のマント"
+      },
+      "cairnking_shoulderpads": {
+        "name": "塚の王のショルダーパッド"
+      },
+      "cairnking_shoulderguards": {
+        "name": "塚の王のショルダーガード"
+      },
+      "cairnking_pauldrons": {
+        "name": "塚の王の肩甲"
+      },
+      "cairnking_spaulders": {
+        "name": "塚の王のスポルダー"
+      },
+      "palehunt_mantle": {
+        "name": "蒼白の狩りのマント"
+      },
+      "palehunt_shoulderpads": {
+        "name": "蒼白の狩りのショルダーパッド"
+      },
+      "palehunt_shoulderguards": {
+        "name": "蒼白の狩りのショルダーガード"
+      },
+      "palehunt_pauldrons": {
+        "name": "蒼白の狩りの肩甲"
+      },
+      "palehunt_spaulders": {
+        "name": "蒼白の狩りのスポルダー"
+      },
+      "jadeshrine_mantle": {
+        "name": "翡翠の祠のマント"
+      },
+      "jadeshrine_shoulderpads": {
+        "name": "翡翠の祠のショルダーパッド"
+      },
+      "jadeshrine_shoulderguards": {
+        "name": "翡翠の祠のショルダーガード"
+      },
+      "jadeshrine_pauldrons": {
+        "name": "翡翠の祠の肩甲"
+      },
+      "jadeshrine_spaulders": {
+        "name": "翡翠の祠のスポルダー"
+      },
+      "gildhedge_mantle": {
+        "name": "金の生垣のマント"
+      },
+      "gildhedge_shoulderpads": {
+        "name": "金の生垣のショルダーパッド"
+      },
+      "gildhedge_spaulders": {
+        "name": "金の生垣のスポルダー"
+      },
+      "saltwrack_mantle": {
+        "name": "塩の難破のマント"
+      },
+      "saltwrack_shoulderpads": {
+        "name": "塩の難破のショルダーパッド"
+      },
+      "saltwrack_spaulders": {
+        "name": "塩の難破のスポルダー"
+      },
+      "brookwatch_vest": {
+        "name": "小川監視のベスト"
+      },
+      "brookwatch_trousers": {
+        "name": "小川監視のトラウザー"
+      },
+      "brookwatch_moccasins": {
+        "name": "小川監視のモカシン"
+      },
+      "brookwatch_cowl": {
+        "name": "小川監視のカウル"
+      },
+      "brookwatch_mitts": {
+        "name": "小川監視のミトン"
+      },
+      "brookwatch_epaulets": {
+        "name": "小川監視のエポレット"
+      },
+      "brookwatch_cinch": {
+        "name": "小川監視のシンチ"
+      },
+      "hedgerow_vest": {
+        "name": "垣根のベスト"
+      },
+      "hedgerow_trousers": {
+        "name": "垣根のトラウザー"
+      },
+      "hedgerow_moccasins": {
+        "name": "垣根のモカシン"
+      },
+      "hedgerow_cowl": {
+        "name": "垣根のカウル"
+      },
+      "hedgerow_mitts": {
+        "name": "垣根のミトン"
+      },
+      "hedgerow_epaulets": {
+        "name": "垣根のエポレット"
+      },
+      "hedgerow_cinch": {
+        "name": "垣根のシンチ"
+      },
+      "bogwalker_vest": {
+        "name": "泥沼行きのベスト"
+      },
+      "bogwalker_trousers": {
+        "name": "泥沼行きのトラウザー"
+      },
+      "bogwalker_moccasins": {
+        "name": "泥沼行きのモカシン"
+      },
+      "bogwalker_cowl": {
+        "name": "泥沼行きのカウル"
+      },
+      "bogwalker_mitts": {
+        "name": "泥沼行きのミトン"
+      },
+      "bogwalker_epaulets": {
+        "name": "泥沼行きのエポレット"
+      },
+      "bogwalker_cinch": {
+        "name": "泥沼行きのシンチ"
+      },
+      "thornspire_vest": {
+        "name": "棘塔のベスト"
+      },
+      "thornspire_trousers": {
+        "name": "棘塔のトラウザー"
+      },
+      "thornspire_moccasins": {
+        "name": "棘塔のモカシン"
+      },
+      "thornspire_cowl": {
+        "name": "棘塔のカウル"
+      },
+      "thornspire_mitts": {
+        "name": "棘塔のミトン"
+      },
+      "thornspire_epaulets": {
+        "name": "棘塔のエポレット"
+      },
+      "thornspire_cinch": {
+        "name": "棘塔のシンチ"
+      },
+      "hollowveil_vest": {
+        "name": "空洞の帳のベスト"
+      },
+      "hollowveil_trousers": {
+        "name": "空洞の帳のトラウザー"
+      },
+      "hollowveil_moccasins": {
+        "name": "空洞の帳のモカシン"
+      },
+      "hollowveil_cowl": {
+        "name": "空洞の帳のカウル"
+      },
+      "hollowveil_mitts": {
+        "name": "空洞の帳のミトン"
+      },
+      "hollowveil_epaulets": {
+        "name": "空洞の帳のエポレット"
+      },
+      "hollowveil_cinch": {
+        "name": "空洞の帳のシンチ"
+      },
+      "trailwarden_vest": {
+        "name": "径守のベスト"
+      },
+      "trailwarden_trousers": {
+        "name": "径守のトラウザー"
+      },
+      "trailwarden_moccasins": {
+        "name": "径守のモカシン"
+      },
+      "trailwarden_cowl": {
+        "name": "径守のカウル"
+      },
+      "trailwarden_mitts": {
+        "name": "径守のミトン"
+      },
+      "trailwarden_epaulets": {
+        "name": "径守のエポレット"
+      },
+      "trailwarden_cinch": {
+        "name": "径守のシンチ"
+      },
+      "highgale_vest": {
+        "name": "高き疾風のベスト"
+      },
+      "highgale_trousers": {
+        "name": "高き疾風のトラウザー"
+      },
+      "highgale_moccasins": {
+        "name": "高き疾風のモカシン"
+      },
+      "highgale_cowl": {
+        "name": "高き疾風のカウル"
+      },
+      "highgale_mitts": {
+        "name": "高き疾風のミトン"
+      },
+      "highgale_epaulets": {
+        "name": "高き疾風のエポレット"
+      },
+      "highgale_cinch": {
+        "name": "高き疾風のシンチ"
+      },
+      "breakwater_shoulderguards": {
+        "name": "防波堤のショルダーガード"
+      },
+      "breakwater_pauldrons": {
+        "name": "防波堤の肩甲"
+      },
+      "breakwater_epaulets": {
+        "name": "防波堤のエポレット"
+      },
+      "gravebell_moccasins": {
+        "name": "墓鐘のモカシン"
+      },
+      "oathbroken_trousers": {
+        "name": "誓い破りのトラウザー"
+      },
+      "sparkglass_trousers": {
+        "name": "火花水晶のトラウザー"
+      },
+      "stillhymn_moccasins": {
+        "name": "静寂の聖歌のモカシン"
+      },
+      "sealkeeper_mitts": {
+        "name": "封印守りのミトン"
+      },
+      "fetterbound_trousers": {
+        "name": "枷縛りのトラウザー"
+      },
+      "wyrmshadow_vest": {
+        "name": "竜影のベスト"
+      },
+      "cinderbrood_spaulders": {
+        "name": "残り火の眷属のスポルダー"
+      },
+      "cinderbrood_epaulets": {
+        "name": "残り火の眷属のエポレット"
+      },
+      "hoarfrost_shoulderguards": {
+        "name": "霧氷のショルダーガード"
+      },
+      "hoarfrost_pauldrons": {
+        "name": "霧氷の肩甲"
+      },
+      "hoarfrost_epaulets": {
+        "name": "霧氷のエポレット"
+      },
+      "blackmere_epaulets": {
+        "name": "黒き湖のエポレット"
+      },
+      "reedhush_epaulets": {
+        "name": "葦の静けさのエポレット"
+      },
+      "cairnking_epaulets": {
+        "name": "塚の王のエポレット"
+      },
+      "palehunt_epaulets": {
+        "name": "蒼白の狩りのエポレット"
+      },
+      "jadeshrine_epaulets": {
+        "name": "翡翠の祠のエポレット"
+      },
+      "gildhedge_shoulderguards": {
+        "name": "金の生垣のショルダーガード"
+      },
+      "gildhedge_pauldrons": {
+        "name": "金の生垣の肩甲"
+      },
+      "gildhedge_epaulets": {
+        "name": "金の生垣のエポレット"
+      },
+      "saltwrack_shoulderguards": {
+        "name": "塩の難破のショルダーガード"
+      },
+      "saltwrack_pauldrons": {
+        "name": "塩の難破の肩甲"
+      },
+      "saltwrack_epaulets": {
+        "name": "塩の難破のエポレット"
+      },
+      "membership_token": {
+        "name": "メンバーシップトークン（30日）"
+      },
+      "referral_helmet": {
+        "name": "友情の兜"
+      },
+      "referral_shoulder": {
+        "name": "友情の肩当て"
+      },
+      "referral_chest": {
+        "name": "友情の胸当て"
+      },
+      "referral_waist": {
+        "name": "友情の帯"
+      },
+      "referral_legs": {
+        "name": "友情の脚甲"
+      },
+      "referral_gloves": {
+        "name": "友情の手甲"
+      },
+      "referral_feet": {
+        "name": "友情のブーツ"
+      },
+      "membership_helmet": {
+        "name": "メンバーシップの兜"
+      },
+      "membership_shoulder": {
+        "name": "メンバーシップの肩当て"
+      },
+      "membership_chest": {
+        "name": "メンバーシップの胸当て"
+      },
+      "membership_waist": {
+        "name": "メンバーシップの腰帯"
+      },
+      "membership_legs": {
+        "name": "メンバーシップの脚甲"
+      },
+      "membership_gloves": {
+        "name": "メンバーシップの手甲"
+      },
+      "membership_feet": {
+        "name": "メンバーシップの長靴"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"
@@ -23931,6 +25262,16 @@ export const ja_JP: EnTranslations = {
         "sender": "取引所仲買人",
         "subject": "取引所でのご購入品",
         "body": "取引は決済され、品物はあなたのものです。同封の小包には、あなたが代金を支払ったまさにその品が入っています。出品の瞬間から支払いが確定するまで、取引所が責任を持って預かっていました。\n\nこの取引の記録は取引所の台帳に残ります。\n\n- 取引所仲買人"
+      },
+      "membership_token_delivery": {
+        "sender": "レイヴンポスト",
+        "subject": "メンバーシップトークンのお届け",
+        "body": "購入したトークンを同封しました。使用するとアカウントのメンバーシップ期間に30日が追加されます。ほかの冒険者と取引することもできます。"
+      },
+      "membership_annual_reward": {
+        "sender": "レイヴンポスト",
+        "subject": "年間メンバーシップの騎乗動物",
+        "body": "年間メンバーシップの支払いが完了しました。戦車の鍵を同封しました。所有するには鍵をバッグか銀行に保管してください。メンバーシップが終了しても所有権は維持されます。騎乗スキルが必要です。"
       },
       "woc_market_return": {
         "sender": "取引所仲買人",

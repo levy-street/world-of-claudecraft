@@ -55,6 +55,11 @@ const GATE_CALL_SITES: readonly {
   marker: string;
 }[] = [
   {
+    gate: 'attachSceneGroupGated',
+    file: 'src/render/courier_visual.ts',
+    marker: 'void attachSceneGroupGated(',
+  },
+  {
     gate: 'gateViewOnCompile',
     file: 'src/render/renderer.ts',
     marker: 'this.gateViewOnCompile(',

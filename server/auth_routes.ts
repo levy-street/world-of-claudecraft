@@ -327,8 +327,8 @@ async function registerHandler(ctx: Ctx): Promise<void> {
     })
     .catch((err) => logger.error({ err }, 'suspicious registration report failed'));
   // Capture the referral when this account signed up via a card link (?ref=<slug>).
-  // Best-effort: never block or fail registration on it.
-  void authDb
+  // Await before returning credentials so first join sees the grant; errors stay best-effort.
+  await authDb
     .captureReferral(account.id, body.ref)
     .catch((err) => logger.error({ err }, 'referral capture failed'));
   // PBE only (PBE_BOOST_ACCOUNTS=1): pre-populate the fresh account with one

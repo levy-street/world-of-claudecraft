@@ -10,6 +10,12 @@ import { canDualWield, isShieldItem } from './equipment_rules';
 import { activeItemInstanceStats } from './item_instance_stats';
 import { meetsLevelRequirement } from './item_level_req';
 import { lootQualityWeapon } from './loot_quality';
+import {
+  isMembershipArmour,
+  isReferralArmour,
+  membershipArmourItem,
+  referralArmourItem,
+} from './membership_armour';
 import { pvpFractionsFromRatings, pvpVitalityFromRating } from './pvp';
 import type {
   Entity,
@@ -342,8 +348,17 @@ export function recalcPlayerStats(
   for (const slot of ALL_EQUIP_SLOTS) {
     const itemId = equipment[slot];
     if (!itemId) continue;
-    const item = ITEMS[itemId];
-    if (!item) continue;
+    const baseItem = ITEMS[itemId];
+    if (!baseItem) continue;
+    if (isMembershipArmour(itemId) && !e.membershipActive) continue;
+    if (isReferralArmour(itemId) && !e.referralInviterName) continue;
+    const item = referralArmourItem(
+      membershipArmourItem(baseItem, cls, mods?.spec, lvl, !!e.membershipActive),
+      cls,
+      mods?.spec,
+      lvl,
+      !!e.referralInviterName,
+    );
     // Gear above the wearer's level is inert: it stays equipped (still rendered
     // and occupying the slot, see the render mirrors below) but grants no stats,
     // armor, spell power, or set pieces until the character reaches its required

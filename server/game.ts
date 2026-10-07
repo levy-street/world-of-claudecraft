@@ -5,7 +5,6 @@ import {
   type AccountFlair,
   type ChatSenderFlair,
   EMPTY_ACCOUNT_FLAIR,
-  hasStreamerLink,
   wireStreamerLinks,
 } from '../src/sim/account_flair';
 import type { AccountLedger } from '../src/sim/account_ledger';
@@ -112,6 +111,7 @@ import { ownedWeaponSkinLoadout } from './account_cosmetics_live';
 import { AccountCosmeticsService } from './account_cosmetics_service';
 import { reconcileAccountRelics, recordRelicFinds } from './account_ledger_records';
 import { AccountLedgerService } from './account_ledger_service';
+import { addAccountPlayer } from './account_player_join';
 import { type ActivityDetectDeps, detectActivityEvent } from './activity_detect';
 import { recordOnlineSample } from './admin_db';
 import { type AdminGuildBankView, adminGuildBankView } from './admin_guild_bank_view';
@@ -197,6 +197,7 @@ import {
   consumeCosmeticOpToken,
   createCosmeticOpGuard,
 } from './cosmetic_op_guard';
+import * as courierWire from './courier_wire';
 import { stampCuratorStanding } from './curator_standing';
 import { dailyRewardService } from './daily_rewards';
 import type { AccountChatMuteStatus, AccountCosmetics, RequestMetadata } from './db';
@@ -249,6 +250,7 @@ import {
   harvestBandForNode,
   harvestTierForNode,
 } from './economy_telemetry';
+import { identityFields } from './entity_identity_wire';
 import { isUpdateDue } from './entity_update_cadence';
 // Imported from the mirror modules DIRECTLY (not the ./steam or ./epic
 // barrels), the same way deeds_records imports onDeedRecorded: the barrels
@@ -256,7 +258,6 @@ import { isUpdateDue } from './entity_update_cadence';
 // every test that partial-mocks the db, the known overlay-mock breakage class.
 // Dual fan-out (D21): Steam and Epic reconcile independently.
 import { reconcileOnLogin as reconcileEpicOnLogin } from './epic/mirror';
-import { equippedInstanceWire } from './equipped_instance_wire';
 import { eventAnchor, shouldDeliverCombatEventToViewer } from './event_delivery';
 import { assembleEventsFrame, filterRoutableEvents, serializeEventFragments } from './event_frame';
 import { buildEventPidIndex, forEachSelectedEventIndex } from './event_pid_index';
@@ -345,6 +346,8 @@ import { rearmMailPartitionsOnFailure, writeDirtyMailPartitions } from './mail_p
 import { dispatchMarketCommand, marketWirePromptCommand } from './market_commands';
 import { dispatchInventoryGroupingCommand } from './material_stack_wire';
 import { EMPTY_ACCOUNT_COSMETICS, reconcileWornMechChromaForJoin } from './mech_chroma_reconcile';
+import { configureMembershipBatchDatabase } from './membership_batch';
+import { MembershipGameServices } from './membership_game_services';
 import {
   applyMobScanTick,
   createMobScanTickStats,
@@ -402,7 +405,6 @@ import type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types'
 import { dispatchPerfectItemCommand } from './perfect_item_command';
 import { parsePerfectingSwapCommand } from './perfecting_swap_command';
 import { runPeriodicSaveFlush } from './periodic_save_flush';
-import { writePlayerIdentityWire } from './player_identity_wire';
 import { VaultGameServices, type VaultMailSaveCapture } from './vault_game_services';
 import { dispatchVehicleCommand } from './vehicle_command_wire';
 import { dispatchWeeklyRewardCommand } from './weekly_reward_open';
@@ -591,6 +593,7 @@ export const SIM_LAP_PHASES = [
   'p.autoAtk',
   'p.regen',
   'p.auras',
+  'p.courier',
   'mob.update',
   'mob.auras',
   'ent.misc',
@@ -647,6 +650,7 @@ export const SELF_WIRE_PHASES = [
   'market',
   'mail',
   'bank', // bank + bpsl + vault + cvault + guildBank (mixed postures: bisect a spike)
+  'courier', // owner-only pose and revision-gated cargo/bank
   'loot', // lroll, lrollg, mloot
   'delve',
   'prof', // prof, cprof, mst
@@ -1031,6 +1035,7 @@ export interface ClientSession
   lastMailRev: number | null;
   lastMailRebuildTick: number;
   // Personal bank projection: revision + composed-price gated (bank_wire.ts).
+  lastCourierWireRevision: string | number | null;
   lastBankWirePid: number | null;
   lastBankWireRev: number | null;
   lastBankWirePrice: number | null;
@@ -1112,6 +1117,7 @@ export interface ClientSession
   // value its book half could not, so letting it save is the mint the refusal
   // exists to prevent. It is kicked and reloads from its durable row.
   escrowQuarantined: boolean;
+  membershipSlot?: boolean;
   // How many leading log entries per guild an IN-FLIGHT escrow save captured.
   // The post-commit release consumes exactly that many by index, so the cap's
   // compaction must leave that prefix alone while the write is awaited or the
@@ -1259,104 +1265,6 @@ type RememberedChat =
 // Identity fields rarely change, so they ride only in "full" records: on an
 // entity's first snapshot for a session and again whenever one of them
 // changes. The client treats their absence in a record as "unchanged".
-function identityFields(e: Entity): Record<string, unknown> {
-  const out: Record<string, unknown> = { k: e.kind, tid: e.templateId, nm: e.name, lv: e.level };
-  if (e.skinCatalog === 'mech') out.cat = 'mech';
-  if (e.skin) out.sk = e.skin;
-  // Active rideable mount ('' omitted). This identity field is intentionally
-  // distinct from the self-only persisted pick (`mntSel`): using `mnt` for both
-  // made the appended self delta overwrite the live riding state in JSON.
-  if (e.mountKey) out.mnt = e.mountKey;
-  if (e.mainhandItemId) out.mh = e.mainhandItemId; // equipped mainhand → held weapon model (render-only)
-  if (e.offhandItemId) out.oh = e.offhandItemId; // equipped offhand → held weapon model (render-only)
-  if (e.weaponSkinId) out.wsk = e.weaponSkinId; // active weapon-skin cosmetic (render-only, like mh)
-  if (e.mountSkinId) out.msk = e.mountSkinId; // worn mount-skin cosmetic (render-only, like wsk)
-  // Full worn set, for the inspect-another-player window. Players only and only
-  // when something is equipped; rides the identity record (first appearance +
-  // on change), never the per-tick dynamic fields. Render-only, like `mh`.
-  if (e.kind === 'player') {
-    // The authored modular look (`app`) is NOT built here. It is ~0.6 KB for a
-    // default look (1489 bytes at its hard bound, APPEARANCE_MAX_WIRE_BYTES)
-    // and changes at most once a session, and everything in this record is
-    // JSON.stringify'd once per entity per TICK (wireCacheFor), so composing it
-    // into the object would re-serialize half a kilobyte 20 times a second per
-    // online player to produce the same bytes. It is serialized once per entity
-    // instead (EntityWireCache.appJson) and spliced into the cached identity
-    // JSON; the self record picks it up through the `maybeRaw` delta channel in
-    // bcastSelf, which already exists for heavy, rarely-changing fields.
-    // appearanceWireJson() is the one place that string is minted.
-    const eq = e.equippedItems;
-    for (const _ in eq) {
-      out.eq = eq;
-      break;
-    }
-    // Per-slot ItemInstancePayloads of the worn set (masterwork/enchant rolls),
-    // for the inspect window (Professions 2.0). Same sparse rule as
-    // `eq` above: players only, only when at least one worn piece carries a
-    // payload, riding the identity record (wireCacheFor diffs the identity
-    // JSON, so an equip/unequip of an instanced piece re-emits automatically).
-    // Data minimization: only the inspect fields (signer, enchant, rolled,
-    // name, perfected, and a Riftbound band's rift record: its rank, upgrades,
-    // and gems, which the band tooltip's item level and rank lines read) leave
-    // the server; boundTo, charges, and the bindOnTrade arm are gameplay state
-    // no inspecting client needs and never ride this key. The pub allowlist
-    // below is what enforces this, so a new non-cosmetic ItemInstancePayload
-    // field is excluded by construction; the owner still sees their own
-    // payload in full via the self `inv` mirror. 2026-08-27: `name` (the
-    // player-chosen legendary name, Masterwrought phase 13) is the FIRST
-    // cosmetic JOIN since the rule was written. The visible Perfected marker
-    // also exposes loot quality; binding and custody stay private.
-    const eqi = equippedInstanceWire(e);
-    if (eqi) out.eqi = eqi;
-  }
-  if (e.holderTier) out.ht = e.holderTier; // $WOC holder-tier flair (cosmetic)
-  if (e.holderBalance) out.hb = Math.round(e.holderBalance); // exact $WOC, for inspect
-  if (e.discordTier) out.dt = e.discordTier; // Discord status-tier flair (cosmetic)
-  if (e.discordAvatar) out.dav = e.discordAvatar; // Discord PFP (linked indicator)
-  if (e.discordName) out.dnm = e.discordName; // Discord handle / nickname (nameplate)
-  if (e.discordJoined) out.dj = e.discordJoined; // Discord join epoch ms (member since)
-  if (e.discordRole) out.dr = e.discordRole; // top staff/special role key (name color + tag)
-  if (e.devTier) out.dvt = e.devTier; // developer-badge tier (cosmetic)
-  if (e.devMergedPrs) out.dvc = e.devMergedPrs; // merged-PR count, for inspect/card
-  if (e.githubLogin) out.dgl = e.githubLogin; // GitHub login (inspect readout + profile link)
-  // Curator standing (cosmetic): rank plus the character-scoped completion pair
-  // behind it, for the inspect card's Reliquary line and the rank-5 sigil.
-  // Sparse like the flair above: refreshCuratorStanding only stamps them for a
-  // ranked character, so an unranked player ships nothing and a full record
-  // with the keys absent resets the mirror. The pair NESTS under the rank so
-  // all-or-nothing is structural at the encoder, not a convention the
-  // refresher must remember.
-  if (e.curatorRank) {
-    out.crk = e.curatorRank; // Curator rank 1-5
-    if (e.relicsOwned) out.cro = e.relicsOwned; // character-scoped relics owned
-    // relicsTotal is the one player-INDEPENDENT number of the three: it is the
-    // character-scoped catalog size, so a client could derive it from its own
-    // content tables and never ask. It rides the wire anyway because a
-    // MIXED-VERSION client must not print a total that disagrees with the
-    // server's catalog: the denominator on the card is whatever the server counted
-    // when it stamped the pair, so an older or newer client shows the server's
-    // completion rather than a locally-derived one that quietly differs.
-    if (e.relicsTotal) out.crt = e.relicsTotal; // character-scoped relic total
-  }
-  if (e.aiAccount) out.ai = 1; // operator-set AI-operated mark (name prefix)
-  // Operator-applied Cheater tag. A bare flag, not the remaining budget: every
-  // nearby client needs to RENDER the tag, but only the wearer needs the
-  // countdown, and the wearer already has it on the mark's own aura.
-  if (e.cheaterMark) out.chm = 1;
-  // Official streamer's platform links (player menu). Already gated by
-  // wireStreamerLinks at the point they were set on the entity, so an account whose
-  // streamer flag is off has none here, whatever is stored against it.
-  if (e.streamerLinks && hasStreamerLink(e.streamerLinks)) out.slk = e.streamerLinks;
-  writePlayerIdentityWire(e, out); // guild, pledge, guild tier, deed title/border, spec
-  if (e.dungeonId) out.dgn = e.dungeonId;
-  if (e.riftTier) out.rt = e.riftTier; // ranked rift portal badge (render-only)
-  if (e.vaultRarity) out.vr = e.vaultRarity; // buried-hoard rarity (render-only)
-  if (e.objectItemId) out.obj = e.objectItemId;
-  if (e.scale !== 1) out.sc = e.scale;
-  if (e.color !== 0xffffff) out.c = e.color;
-  return out;
-}
-
 // Dynamic fields are re-sent whole in every full or lite record, so the
 // conditional ones keep their absent-means-unset semantics.
 function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> {
@@ -1502,6 +1410,7 @@ export class GameServer {
   sim: Sim;
   clients = new Map<number, ClientSession>(); // by pid
   private readonly vault: VaultGameServices; // Buried Hoard vault wiring (vault_game_services.ts)
+  readonly membership: MembershipGameServices;
   private activityDeps: ActivityDetectDeps<ClientSession> | null = null; // built lazily once
   private readonly sessionsByCharacterId = new Map<number, ClientSession>();
   private readonly storageRecoverySweep = new RecoverySweep(this.sessionsByCharacterId);
@@ -1670,6 +1579,7 @@ export class GameServer {
     'bcastSelf',
     'social',
     'saves',
+    'membership',
     'lateness',
     ...SIM_LAP_PHASES,
     ...SIM_MOB_ZONE_PHASES,
@@ -1767,24 +1677,10 @@ export class GameServer {
           }
           this.simLapMark = t;
         },
-        (pid, takes, vaultUpgrades) => {
-          const session = this.clients.get(pid);
-          const meta = this.sim.meta(pid);
-          if (
-            !session ||
-            session.pid !== pid ||
-            session.left ||
-            session.escrowQuarantined ||
-            meta?.characterId !== session.characterId ||
-            session.bankLedgerJournal.outbox.owner.characterId !== session.characterId ||
-            session.bankLedgerJournal.outbox.owner.accountId !== session.accountId
-          ) {
-            return null;
-          }
-          return session.bankVaultLedgerGuard.reserveVaultConsumption(takes.length, () =>
-            session.bankLedgerJournal.reserveVaultConsumption(takes, vaultUpgrades),
-          );
-        },
+        ...courierWire.storageAdmissionsFor(
+          () => this.sim,
+          (pid) => this.clients.get(pid),
+        ),
       ),
     );
     this.vault = new VaultGameServices({
@@ -1800,6 +1696,24 @@ export class GameServer {
       saveInBackground: (session) => this.saveCharacterWithBackgroundPermit(session),
       save: (session) => this.saveCharacter(session),
       kick: (session, message, reason) => void this.kickSession(session, message, reason),
+    });
+    configureMembershipBatchDatabase((job) => this.withBackgroundDbPermit(job));
+    this.membership = new MembershipGameServices({
+      sim: this.sim,
+      session: (id) => this.sessionByCharacterId(id),
+      enqueue: (id, job, signal) =>
+        this.characterSaveQueues.enqueueCancellable(id, signal, () =>
+          this.withBackgroundDbPermit(job, signal),
+        ),
+      capture: (id) => this.serializeCharacterForPersist(id),
+      conflict: (id) => this.hasCharacterOnlySaveConflict(id),
+      acknowledge: (save) => this.acknowledgeCharacterSaveEffects(save),
+      quarantine: (pid, id, kind, surface) => this.escrowSessionLost(pid, id, kind, surface),
+      send: (s, message) => this.send(s, message),
+      kick: (s, message) => void this.kickSession(s, message, 'membership expired'),
+      observeCost: (ms) => this.tickProfiler.add('membership', ms),
+      database: (job, signal) => this.withBackgroundDbPermit(job, signal),
+      mailWrite: (job, signal) => this.enqueueMarketWriteForSave(signal, job),
     });
     this.riftUpgrader = new RiftUpgradeCoordinator(riftUpgraderConfigFromEnv());
     this.riftAssets = new RiftAssetCoordinator(riftAssetConfigFromEnv());
@@ -3274,14 +3188,7 @@ export class GameServer {
     for (const s of linkdeadOthers) {
       void this.leave(s, 'replaced by a new character login');
     }
-    const pid = this.sim.addPlayer(cls, name, {
-      state: state ?? undefined,
-      characterId,
-      accountLedger: meta.accountLedger,
-      bankBonus: meta.bankBonus,
-      appearance: meta.appearance ?? null,
-      tutorialGreetingSent: state === null,
-    });
+    const pid = addAccountPlayer(this.sim, accountId, characterId, cls, name, state, meta);
     const player = this.sim.entities.get(pid);
     this.vault.applyGuestUsage(pid, meta.vaultGuestUsage);
     if (player) {
@@ -3446,6 +3353,7 @@ export class GameServer {
       lastMailWireTick: -MAIL_WIRE_INTERVAL_TICKS,
       lastMailRev: null,
       lastMailRebuildTick: 0,
+      lastCourierWireRevision: null,
       lastBankWirePid: null,
       lastBankWireRev: null,
       lastBankWirePrice: null,
@@ -3483,6 +3391,7 @@ export class GameServer {
     this.ipSessionCounts.set(sessionIp, (this.ipSessionCounts.get(sessionIp) ?? 0) + 1);
     this.clients.set(pid, session);
     this.sessionsByCharacterId.set(characterId, session);
+    this.membership.onJoin(session);
     this.vault.onJoin(pid, characterId);
     this.peakOnline = Math.max(this.peakOnline, this.clients.size);
     void this.recordOnlineSnapshot();
@@ -3856,6 +3765,7 @@ export class GameServer {
     // cached until it has naturally refilled, so reconnect cannot reset it.
     session.bankVaultLedgerGuard.release();
     this.clients.delete(session.pid);
+    this.membership.onLeave(session);
     if (![...this.clients.values()].some((live) => live.accountId === session.accountId)) {
       this.generalChatQuota.forgetAccount(session.accountId);
     }
@@ -5982,6 +5892,7 @@ export class GameServer {
     const cmd = this.messageCommand(msg);
     // Fence projected vault loot until its character+mail save or recovery.
     if (this.vault.guard.isLocked(session.characterId)) return;
+    if (this.membership.isBusy(session.accountId)) return;
     // Economy telemetry: sample the acting player's copper across this one
     // dispatch, so a command's own credit or debit is attributed to its
     // economic surface with no sim-side signal and no gameplay effect. Two
@@ -6271,6 +6182,15 @@ export class GameServer {
     if (questWire.isWorldQuestWireCommand(command))
       return void questWire.dispatchWorldQuestWire(sim, msg, pid);
     switch (command) {
+      case 'courier_dispatch':
+        courierWire.dispatchCourierCommand(sim, msg, pid);
+        break;
+      case 'account_bank_list':
+      case 'account_bank_select':
+      case 'account_bank_transfer':
+      case 'membership_claim_armour':
+        this.membership.dispatch(session, command, msg);
+        break;
       case 'castSlot':
         if (typeof msg.slot === 'number') sim.castAbilityBySlot(msg.slot | 0, pid);
         break;
@@ -6388,7 +6308,7 @@ export class GameServer {
       case 'turnin':
         if (typeof msg.quest === 'string') {
           const beforeDone = sim.meta(pid)?.questsDone.has(msg.quest) ?? false;
-          sim.turnInQuest(msg.quest, pid);
+          questWire.turnInQuestWire(sim, msg, pid);
           const afterDone = sim.meta(pid)?.questsDone.has(msg.quest) ?? false;
           if (!beforeDone && afterDone) {
             void dailyRewardService
@@ -6440,6 +6360,13 @@ export class GameServer {
         break;
       case 'use':
         if (typeof msg.item === 'string') {
+          if (msg.item === 'membership_token') {
+            void this.membership.redeem(
+              session,
+              Number.isInteger(msg.slot) ? Number(msg.slot) : undefined,
+            );
+            break;
+          }
           // The bag index the client named, re-validated in the sim against ITS
           // OWN inventory: an unrecognized value reads as undefined (the legacy
           // id-only path), never as index 0.
@@ -8676,6 +8603,8 @@ export class GameServer {
     emitVaultSelfKeys(maybe, this.sim, session, anchorSession.pid);
     emitGuildAndWeeklySelfKeys(maybe, this.sim, session.pid, anchorSession.pid);
     selfLap?.('self.bank');
+    courierWire.emitCourierSelfKeys(maybe, this.sim, session);
+    selfLap?.('self.courier');
     // open need-greed rolls this player can still answer, so a client that
     // missed the transient lootRoll event re-shows the prompt from state. Stays
     // per-tick (it's interactive state that appears from others' actions).

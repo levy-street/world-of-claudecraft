@@ -9,10 +9,9 @@
 //
 // Cards are stored as bytes in Postgres (shared by every realm process), so a
 // shared link resolves no matter which realm serves the request. Referral
-// capture only records the relationship; reward payout is out of scope.
+// capture freezes the relationship and the member armour grant at signup.
 import type http from 'node:http';
 import {
-  accountForSlug,
   getCharacter,
   getPlayerCardBySlug,
   getPlayerCardMetaBySlug,
@@ -22,9 +21,11 @@ import {
 } from './db';
 import { logger } from './http/logger';
 import { isUniqueViolation, json, parsePngInfo, readBinaryBody } from './http_util';
+import { getMembership } from './membership_service';
 import { PLAYERCARD_NEW } from './player_card.newlocales';
 import { recordUsageMetric } from './provider_usage';
 import { REALM_PUBLIC_ORIGIN } from './realm';
+import { referralInviterForSlug } from './referral_armour_db';
 
 // A composited card is ~1200×630 @2× PNG - comfortably under this bound, which
 // is generous enough to never reject a legitimate upload yet caps memory.
@@ -823,7 +824,17 @@ function missingCardHtml(origin: string, locale: PublicCardLocale): string {
 export async function captureReferral(refereeAccountId: number, ref: unknown): Promise<void> {
   const slug = typeof ref === 'string' ? ref.trim().toLowerCase() : '';
   if (!isValidSlug(slug)) return;
-  const referrer = await accountForSlug(slug);
-  if (referrer === null || referrer === refereeAccountId) return;
-  await recordReferral(refereeAccountId, referrer, slug);
+  const inviter = await referralInviterForSlug(slug);
+  if (!inviter || inviter.inviterAccountId === refereeAccountId) return;
+  const membership = await getMembership(inviter.inviterAccountId);
+  const now = Date.now();
+  const eligible =
+    membership.active && membership.authorizedUntil > now && (membership.expiresAt ?? 0) > now;
+  await recordReferral(
+    refereeAccountId,
+    inviter.inviterAccountId,
+    slug,
+    eligible,
+    inviter.inviterName,
+  );
 }

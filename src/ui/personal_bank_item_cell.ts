@@ -10,7 +10,7 @@ import { bagFineMark } from './bag_fine_mark_view';
 import { bagInstanceGlyphKind } from './bag_instance_glyph_view';
 import type { BankSlotModel } from './bank_view';
 import { esc } from './esc';
-import { t } from './i18n';
+import { type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import {
   cornerMarkHtml,
@@ -53,6 +53,7 @@ export function buildPersonalBankItemCell(
   countLabel: string,
   onWithdraw: (slotIndex: number, partial: boolean) => void,
   render: () => void,
+  transfer?: { wholeStack: true; hintKey: TranslationKey },
 ): HTMLElement {
   const item = knownItemDef(ITEMS, slot.itemId);
   const cell = document.createElement('button');
@@ -96,14 +97,16 @@ export function buildPersonalBankItemCell(
     onWithdraw(slot.slotIndex, event.shiftKey);
   });
   deps.attachTooltip(cell, () => {
-    const partial = slot.showCount
-      ? `<div class="tt-sub">${esc(t('hudChrome.bank.withdrawPartialHint'))}</div>`
-      : '';
+    const partial =
+      !transfer && slot.showCount
+        ? `<div class="tt-sub">${esc(t('hudChrome.bank.withdrawPartialHint'))}</div>`
+        : '';
     const body = item
       ? deps.itemTooltip(item, slot.instance, displayedSources)
       : `<div class="tt-title">${esc(slot.itemId)}</div><div class="tt-sub">${esc(t('itemUi.bags.unknownItem'))}</div>`;
-    return `${body}<div class="tt-sub">${esc(t('hudChrome.bank.withdrawHint'))}</div>${partial}`;
+    return `${body}<div class="tt-sub">${esc(t(transfer?.hintKey ?? 'hudChrome.bank.withdrawHint'))}</div>${partial}`;
   });
+  if (transfer) return cell;
   const itemName = parts?.name ?? slot.itemId;
   // The exact-source withdraw session is captured the moment the affordance
   // fires (right-click on desktop, the touch-only Sources button otherwise),

@@ -537,7 +537,7 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 18081 and the
     // branch 18235; the two sides' additions compose to 18093 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 18093,
+    ceiling: 18079,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1207,7 +1207,13 @@ const MONOLITHS: MonolithRow[] = [
     // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
-    ceiling: 11642,
+    // Membership host facades replace the extracted progression/level.ts body.
+    // Referral armour authority fields live in the sibling host-authority type.
+    // INTEGRATION-ONLY (feature/membership-integration): 11637 is PR 4281's own
+    // count; the open-world mob curve (PR 4382) adds its spawn import and the
+    // respawn selector line, 11639 merged. Not a release re-pin: whichever of
+    // 4281 and 4382 lands second needs a two-line extraction or a maintainer raise.
+    ceiling: 11639,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1431,7 +1437,8 @@ const MONOLITHS: MonolithRow[] = [
     // Colorblind Mode's interface body-class extraction also composes with
     // those release-line extractions. Release reconciliation: measured merged
     // tree at 11140 lines, preserving both extraction sets.
-    ceiling: 11140,
+    // Subscription foundation moves the store snapshot adapter into subscription_sdk.
+    ceiling: 10958,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1689,7 +1696,8 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 9827 and the
     // branch 9965; the two sides' additions compose to 9840 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 9840,
+    // Referral admission extracts account-bound addPlayer into account_player_join.ts.
+    ceiling: 9769,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1868,7 +1876,7 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 5354 and the
     // branch 5426; the two sides' additions compose to 5356 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 5356,
+    ceiling: 5347,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -2034,7 +2042,8 @@ const MONOLITHS: MonolithRow[] = [
     // server/guild_board_db.ts beside the new officer-roster read. Merged with
     // the DEEDS_SCHEMA / ACCOUNT_LEDGER_SCHEMA move above; exact merged count,
     // zero slack.
-    ceiling: 4641,
+    // Referral inserts and eligibility hydration live in referral_armour_db.ts.
+    ceiling: 4497,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {
@@ -2402,7 +2411,8 @@ const MONOLITHS: MonolithRow[] = [
     // below both parent pins. Exact merged count, zero slack.
     // Held by extracting the pane tab model and markup to bank_tabs_view.
     // Weekly reward host binding now lives with the weekly pane.
-    ceiling: 1810,
+    // Account panel eligibility and request guards moved beside its painter.
+    ceiling: 1782,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/CLAUDE.md)',
   },
   {

@@ -145,13 +145,24 @@ const build = await buildItemArtAudit({
     // feature/buried-hoards: the release's faction ladder, trinket slot and
     // Warfare Season 2 compose with the hoard paintings: 1464 / 1482, with the
     // release's 135 pending rows (trinkets and Season 2), on 36 sheet pages.
-    catalogCount: 1464,
-    liveItemCount: 1482,
+    // + the 245 choose-one leveling quest armor paintings
+    // (quest-leveling-gear-icons-2026-10-06): 1709 / 1727 on 38 sheet pages,
+    // measured with `node scripts/item_art_audit.mjs --verify-only`.
+    // + the 76 quest blue reward rares (quest-blue-rewards-icons-2026-10-07):
+    // 1785 / 1803 on 39 sheet pages, measured the same way.
+    // + PR 4281's 8 membership and 7 referral paintings on the membership
+    // integration: 1800 / 1818 on 39 sheet pages, measured the same way.
+    // + the 75 quest role-fill paintings (quest-role-fill-icons-2026-10-07):
+    // 1860 / 1878 on 39 sheet pages, measured the same way.
+    // Both on the membership integration: 1875 / 1893 on 40 sheet pages, measured
+    // the same way.
+    catalogCount: 1875,
+    liveItemCount: 1893,
     pendingArtCount: 135,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,
     heroicWeaponArtAliases: 19,
-    sheetPageCount: 36,
+    sheetPageCount: 40,
     groupCount: 26,
   },
 });

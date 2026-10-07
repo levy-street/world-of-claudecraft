@@ -1,3 +1,4 @@
+import type { CourierBankExchange } from './courier';
 import { cloneLootQuality, type LootQualityDescriptor } from './loot_quality/types';
 import type { LocalGathererIdentity } from './material_gatherer';
 import { cloneMaterialData, cloneMaterialPayload } from './material_payload_identity';
@@ -1155,6 +1156,8 @@ interface BaseItemDef {
   buyValue?: number; // copper (vendor sells at this)
   questId?: string;
   noVendorSell?: boolean;
+  /** Reclaimable rewards must not turn into unlimited salvage/disenchant materials. */
+  noSalvage?: boolean;
   noDiscard?: boolean;
   noMarketList?: boolean;
   // Soulbound: the item is bound to its owner. It cannot be traded, mailed,
@@ -4642,6 +4645,13 @@ export interface QuestDef {
   xpReward: number;
   copperReward: number;
   itemRewards: Partial<Record<PlayerClass, string>>;
+  // Choose-one rewards (classic): the player picks ONE of these at turn-in. An
+  // authored GEAR itemRewards piece joins the same list rather than being granted
+  // on top; a non-gear one stays a fixed grant. Offered per class through the
+  // shared resolver (quests/quest_reward_choice.ts: only what the class can
+  // wear), validated by the server at turn-in. Typically one piece per armor
+  // type or role.
+  choiceRewards?: string[];
   // Teaches through acquisition source 'quest' on a successful turn-in.
   // The recipe's own craft skill floor is checked before any rewards or
   // consumption, so an early hand-in cannot lose the recipe.
@@ -5285,6 +5295,10 @@ export interface Entity extends ClientMirroredEntityFields {
   // respec, loadout, level, and load path refreshes it. The sim never reads
   // it; it rides the identity wire for the mouseover tooltip's spec line.
   specId?: string | null;
+  /** Trusted live entitlement mirror, never loaded from character state. */
+  membershipActive?: boolean;
+  /** Trusted referral gear entitlement and inviter display, never loaded from a save. */
+  referralInviterName?: string;
   pos: Vec3;
   prevPos: Vec3; // for render interpolation
   facing: number; // radians, 0 = +Z
@@ -6731,6 +6745,7 @@ export type DamageEventKind = 'hit' | 'miss' | 'dodge' | 'parry' | 'block' | 're
 // `pid` (when present) marks a personal event that should only be delivered to
 // that player entity's owner; events without pid are world-visible.
 export type SimEvent = { pid?: number } & (
+  | { type: 'courier'; playerId: number }
   | {
       type: 'damage';
       sourceId: number;
@@ -9074,6 +9089,7 @@ export interface SimConfig {
   // before a craft or enchant consumes from the Materials Vault. Offline and
   // headless hosts omit it and receive an inert successful reservation.
   vaultConsumptionAdmission?: VaultConsumptionAdmission;
+  courierBankExchange?: CourierBankExchange;
   // The material-gatherer identity for the player this constructor MINTS (the
   // primary offline/headless character), allocated by the HOST outside the sim
   // and passed in whole (src/sim/material_gatherer.ts). A VALUE, never a

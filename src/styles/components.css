@@ -860,6 +860,52 @@
   .qd-reward-name {
     font-size: 12px;
   }
+  /* Choose-one quest rewards: one card per offered piece. In the turn-in
+     dialog each card is a radio button (the harvest-preference radio look);
+     in the quest log and on the accept step they are a static preview. */
+  .qd-reward-choice-heading {
+    display: block;
+    margin-top: var(--spacing-sm);
+  }
+  .qd-reward-choices {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-xs);
+  }
+  .qd-reward-choice {
+    margin-top: 0;
+    min-height: 40px;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    text-align: left;
+    font: inherit;
+  }
+  /* Icon and name stay on one line (the name wraps within its column); beats
+     the generic reward-row wrap below on specificity. */
+  .qd-reward-row.qd-reward-choice {
+    flex-wrap: nowrap;
+  }
+  button.qd-reward-choice {
+    cursor: var(--cursor-point);
+  }
+  button.qd-reward-choice:hover {
+    border-color: var(--color-accent);
+  }
+  .qd-reward-choice:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .qd-reward-choice[aria-checked="true"] {
+    border-color: var(--color-accent);
+    box-shadow: inset 3px 0 0 var(--color-accent);
+    background: color-mix(in srgb, var(--color-accent) 12%, var(--panel-base));
+  }
+  @media (forced-colors: active) {
+    .qd-reward-choice[aria-checked="true"] {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+  }
   .qd-list-item {
     display: block;
     width: 100%;
@@ -2746,6 +2792,10 @@
     overflow-y: auto;
     padding-right: var(--spacing-xs);
   }
+  .ql-detail-body:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
   .ql-detail-actions {
     display: flex;
     justify-content: flex-end;
@@ -3827,6 +3877,10 @@
     border-color: #8d7138;
     box-shadow: 0 24px 80px rgb(0 0 0 / 72%);
   }
+  .membership-token-card .ui-btn {
+    min-height: 40px;
+  }
+
   .woc-store-tabs {
     display: flex;
     gap: 2px;
@@ -3940,6 +3994,13 @@
     padding: 9px 12px;
     color: var(--color-accent);
     background: var(--color-primary-glow);
+  }
+  [data-subscription-section] .ui-btn {
+    min-height: 40px;
+    min-width: 40px;
+  }
+  [data-subscription-section] p {
+    margin-block: var(--spacing-sm);
   }
   .woc-store-balance {
     z-index: 1;
@@ -10337,6 +10398,24 @@
     gap: 4px;
     margin: 6px 0 2px;
     flex: none;
+  }
+  .account-bank-panel .bank-tabs {
+    overflow-x: auto;
+    max-width: 100%;
+  }
+  .account-bank-panel > .ui-btn {
+    min-height: 40px;
+  }
+  .account-bank-tab {
+    flex: none;
+    min-height: 40px;
+  }
+  .account-bank-panel h3 {
+    font-size: 13px;
+    margin: var(--spacing-sm) 0;
+  }
+  .account-bank-panel .bank-item:disabled {
+    opacity: 0.5;
   }
   .bank-tab {
     flex: 1;
@@ -26455,5 +26534,65 @@
   }
   .frame-preset-loadouts .tal-lo-item {
     min-height: 40px;
+  }
+  /* ---------- courier ---------- */
+  #courier-window {
+    width: min(680px, 100%);
+    max-height: calc(100dvh - 48px);
+  }
+  #courier-window .courier-columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+  #courier-window .courier-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  #courier-window .courier-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    min-height: 40px;
+    height: auto;
+    text-align: start;
+    white-space: normal;
+  }
+  #courier-window .courier-item-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  #courier-window .courier-item-label img {
+    width: 32px;
+    height: 32px;
+    flex: none;
+  }
+  #courier-window .courier-item span:first-child {
+    overflow-wrap: anywhere;
+  }
+  #courier-window .courier-cargo {
+    padding: 0;
+    list-style: none;
+  }
+  #courier-window .courier-cargo li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  #courier-window .ui-win-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  #courier-window .courier-send,
+  #courier-window .x-btn {
+    min-height: 40px;
+    min-width: 40px;
   }
 }

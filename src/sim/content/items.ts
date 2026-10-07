@@ -412,11 +412,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noVendorSell: true,
     sellValue: 0,
   },
-  // Developer-only mount. It is intentionally absent from vendors, quests,
-  // creature loot, heroic loot, and Rift reward pools. Use /dev mounts or
-  // /dev give reins_terrorspark_groundshaker while the feature remains under development.
-  // Unlike the player reins it STAYS soulbound: it has no acquisition path, so
-  // tradability would turn a dev grant into an economy leak.
+  // Annual membership bundle reward, delivered only after verified payment.
+  // The tank is the placeholder mount. Its permanent reins stay soulbound.
   reins_terrorspark_groundshaker: {
     id: 'reins_terrorspark_groundshaker',
     name: 'Ignition Key: Dreadspark Groundshaker',
@@ -424,6 +421,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     mount: 'terrorspark_groundshaker',
     quality: 'epic',
     soulbound: true,
+    noVendorSell: true,
     noDiscard: true,
     sellValue: 0,
   },

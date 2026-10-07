@@ -4,7 +4,7 @@ import { shadowActionsLocked } from './shadow_action_lock';
 // system behind the SimContext seam (module-first; sim.ts keeps thin delegates).
 //
 // Collection model: EVERY catalog mount is owned while its reins item (ItemDef
-// kind 'mount') sits in the player's bags or bank. Player reins are NOT
+// kind 'mount') sits in the player's bags, bank or personal courier cargo. Player reins are NOT
 // soulbound: ownership travels with the item, so a reins can be traded,
 // mailed, or listed away (and the mount with it). The horse (DEFAULT_MOUNT)
 // is no longer free: it has its own reins item too, sold by the stablemaster,
@@ -72,7 +72,7 @@ export function mountItemId(key: string): string | null {
 }
 
 /** Whether the player owns the mount: any catalog mount (the horse included)
- *  while its reins item sits in bags or bank. Reins are not soulbound, so
+ *  while its reins item sits in bags, bank or personal courier cargo. Reins are not soulbound, so
  *  ownership travels with the item (a traded-away reins is a lost mount, and
  *  a summon channel re-validates ownership at completion). Unknown keys are
  *  never owned. A fresh player owns nothing. */
@@ -82,12 +82,13 @@ export function mountOwned(meta: PlayerMeta, key: string): boolean {
   if (!itemId) return false;
   return (
     meta.inventory.some((s) => s.itemId === itemId) ||
+    !!meta.courier?.cargo.some((s) => s.itemId === itemId) ||
     meta.bank.inventory.some((s) => s.itemId === itemId)
   );
 }
 
 /** The catalog subset present in `slots`, in catalog order. Shared by
- *  `ownedMounts` (bags + bank) and `bagOwnedMounts` (bags only, #2739
+ *  `ownedMounts` (bags + bank + courier) and `bagOwnedMounts` (bags only, #2739
  *  followup): a single pass collecting reins itemIds into mount keys. */
 function collectMountKeys(slots: readonly { itemId: string }[]): MountKey[] {
   const owned = new Set<string>();
@@ -99,10 +100,14 @@ function collectMountKeys(slots: readonly { itemId: string }[]): MountKey[] {
 }
 
 /** The owned subset of the catalog, in catalog order. Empty for a fresh player.
- *  Single pass over bags + bank: the server rebuilds this per snapshot, so it
+ *  Single pass over bags + bank + bounded courier cargo: the server rebuilds this per snapshot, so it
  *  never scans the containers once per catalog mount. */
 export function ownedMounts(meta: PlayerMeta): MountKey[] {
-  return collectMountKeys([...meta.inventory, ...meta.bank.inventory]);
+  return collectMountKeys([
+    ...meta.inventory,
+    ...meta.bank.inventory,
+    ...(meta.courier?.cargo ?? []),
+  ]);
 }
 
 /** The owned subset of the catalog whose reins are in BAGS right now (never

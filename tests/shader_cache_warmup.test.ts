@@ -809,12 +809,14 @@ describe('the src/main.ts wiring', () => {
     expect(mainSource).toContain("if (el === '#charselect-panel') {\n    startShaderWarmup();");
   });
 
-  it('stops it as the first thing EVERY world entry does, online and offline', () => {
+  it('stops warm-up before any accepted world entry setup, online and offline', () => {
     // Both entries build the renderer through startGame; a corpus still
     // paying out one program per frame there would share the main thread
     // with the world build, which is the one thing this arm must never do.
+    // The pure character policy may reject entry while staying at character
+    // select. Only that exact no-side-effect guard may precede the stop.
     expect(mainSource).toMatch(
-      /async function enterWorld\([^)]*\): Promise<void> \{\n {2}stopShaderWarmup\(\);/,
+      /async function enterWorld\([^)]*\): Promise<void> \{\n {2}if \(charselectPrimaryAction\(c\)\.kind === 'disabled'\) return;\n {2}stopShaderWarmup\(\);/,
     );
     expect(mainSource).toMatch(
       /async function startOffline\([^)]*\): Promise<void> \{\n {2}stopShaderWarmup\(\);/,
