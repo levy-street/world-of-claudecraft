@@ -148,7 +148,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_vanguard_gallery: {
     name: 'Galleria dell’Avanguardia',
-    desc: 'I set di specializzazione e le armi della stagione 2 di Guerra, ottenuti dalla fila PvP del Forziere Settimanale.',
+    desc: 'I set di specializzazione e le armi della stagione 2 di Guerra, acquistati con l’onore.',
   },
   horizons_vault_of_ages: {
     name: 'Camera del Tesoro delle Ere',

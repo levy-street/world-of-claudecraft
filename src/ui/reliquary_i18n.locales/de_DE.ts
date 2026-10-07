@@ -148,7 +148,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_vanguard_gallery: {
     name: 'Vorhutgalerie',
-    desc: 'Die Spezialisierungssets und Waffen der Kriegsführung, Saison 2, gewonnen aus der PvP-Reihe des Wöchentlichen Tresors.',
+    desc: 'Die Spezialisierungssets und Waffen der Kriegsführung, Saison 2, mit Ehre erworben.',
   },
   horizons_vault_of_ages: {
     name: 'Gewölbe der Zeitalter',

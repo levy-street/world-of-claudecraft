@@ -335,7 +335,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.legendary_riptide_handwraps.name': '至尊激流裹手',
   'hudChrome.reliquary.sourceActivityBuriedHoard':
     '在埋藏寶藏的獎勵寶箱中找到，即藏寶圖所指引的寶庫',
-  'hudChrome.reliquary.sourceActivityWeeklyVaultPvp': '從每週寶庫的PvP欄位中選取',
   'clues.hunt_drakelands_gate_ashes.reply.1':
     '風從東邊的沙丘吹來，帶著灰燼，而空蕩蕩的沙地不會吹出灰燼。駐軍倉庫的塞拉記著每一次巡邏。只要有人給她帶點吃的，她就會開口。',
   'clues.hunt_drakelands_gate_ashes.reply.2':
@@ -1012,8 +1011,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.glider_apprentice.name': '絲凱',
   'guide.arenaPage.vanguardBody':
     '先鋒裝備是戰爭裝備的第二季，由同樣兩位軍需官在原本品級之上一併販售，原本品級依然在架上。每個專精都有自己專屬的先鋒套裝，共五件：頭部、肩部、胸部、腿部與手部，商店只會列出你的職業能穿的三套先鋒套裝，其後才是你能揮舞的先鋒武器。先鋒裝備件帶有與原本品級相同的戰爭評級，只是物品等級更高，而每套套裝都有兩件式與四件式加成，會改變你專精的一項技能。與原本的套裝不同，這些加成在任何地方都會生效，連對付怪物也不例外，但它們是為了對抗玩家而打造的，所以在團隊副本中，團隊套裝依然是更好的選擇。',
-  'guide.arenaPage.vanguardBodyWeeklyVault':
-    '先鋒裝備是戰爭裝備的第二季，它並不販售：唯一的取得方式是每週寶庫的PvP欄位，贏得積分競技場或積分戰場比賽即可填滿該欄位，而原本品級依然由兩位軍需官在架上販售。每個專精都有自己專屬的先鋒套裝，共五件：頭部、肩部、胸部、腿部與手部，PvP選項只會提供你的職業能穿的套裝與你能揮舞的先鋒武器，並與原本品級的裝備一同出現。先鋒裝備件帶有與原本品級相同的戰爭評級，只是物品等級更高，而每套套裝都有兩件式與四件式加成，會改變你專精的一項技能。與原本的套裝不同，這些加成在任何地方都會生效，連對付怪物也不例外，但它們是為了對抗玩家而打造的，所以在團隊副本中，團隊套裝依然是更好的選擇。',
   'guide.arenaPage.vanguardHeading': '先鋒裝備：戰爭套裝第二季',
   'guide.settingsPage.ifColorblindMode':
     '將尼思拉克西斯的地面危害（墓穴爆發的警示圈、墓穴烈焰與靈魂之火的火池、墓火直線，以及靈魂撕裂的標記）重新著色為色盲友善的配色，色相與亮度分明，讓重疊的圓圈仍能分辨邊緣。大小、計時與位置一律不變。',

@@ -148,7 +148,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_vanguard_gallery: {
     name: 'Galeria da Vanguarda',
-    desc: 'Os conjuntos de especialização e as armas da temporada 2 de Guerra, obtidos na fileira PvP do Cofre Semanal.',
+    desc: 'Os conjuntos de especialização e as armas da temporada 2 de Guerra, comprados com honra.',
   },
   horizons_vault_of_ages: {
     name: 'Câmara das Eras',

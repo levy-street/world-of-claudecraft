@@ -42,7 +42,6 @@ import {
   WARFARE_ITEMS,
   WARFARE_TRINKET_STOCK,
 } from '../src/sim/content/pvp_honor';
-import { SEASON2_STOCK } from '../src/sim/content/pvp_honor_season2';
 import {
   isCataloguedRelicItem,
   isCataloguedRelicMark,
@@ -111,8 +110,7 @@ import {
   RIFT_GREEN_MOUNT_REINS,
 } from '../src/sim/rift/progression';
 import { Rng } from '../src/sim/rng';
-import { ALL_CLASSES, DEED_STAT_KEYS, type ItemDef, type PlayerClass } from '../src/sim/types';
-import { weeklyLootPool } from '../src/sim/weekly_rewards';
+import { DEED_STAT_KEYS, type ItemDef, type PlayerClass } from '../src/sim/types';
 
 const CONQUEROR_PAGES = RELIQUARY_PAGES.filter((p) => p.shelf === 'conquerors');
 const PROFESSION_PAGES = RELIQUARY_PAGES.filter((p) => p.shelf === 'professions');
@@ -2844,14 +2842,6 @@ const ACTIVITY_AWARDS: Readonly<Record<string, readonly string[]>> = {
   // (at the tier the map buys, each tier discovering its piece through
   // ItemDef.relicOf) when an entrant opens a hoard's reward chest.
   buried_hoard: HOARD_BASE_ITEM_IDS,
-  // Derived from the live PvP row of the Weekly Vault over every class
-  // (weeklyLootPool('pvp'), which a PvP-row choice rolls on open and
-  // claimWeeklyReward grants), restricted to Warfare Season 2: the row is
-  // Season 2's ONLY source, while the entry tier it also rolls keeps the
-  // quartermasters as its named route.
-  weekly_vault_pvp: [...new Set(ALL_CLASSES.flatMap((cls) => weeklyLootPool('pvp', cls)))].filter(
-    (id) => SEASON2_STOCK.includes(id),
-  ),
 };
 
 /**
@@ -3229,8 +3219,7 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // The two honor quartermasters, on every slot of both pages (Phase 21).
   conquerors_warfare_gallery: 2,
   conquerors_warfare_armory: 2,
-  // Warfare Season 2: the PvP row of the Weekly Vault, its only source.
-  conquerors_vanguard_gallery: 1,
+  conquerors_vanguard_gallery: 2,
   // The retired vault is deliberately sourceless (excludeFromCompletion:
   // retired relics have no door to name), so it resolves to zero sources.
   horizons_vault_of_ages: 0,
@@ -3849,7 +3838,6 @@ describe('Reliquary source hints resolve against live content', () => {
       'masterwork_craft',
       'rift_first_clear',
       'buried_hoard',
-      'weekly_vault_pvp',
     ]);
   });
 

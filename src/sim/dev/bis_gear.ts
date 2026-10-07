@@ -82,7 +82,7 @@ export function bestEpicGearFor(
     (item) =>
       item.quality === 'epic' &&
       (item.kind === 'armor' || item.kind === 'weapon') &&
-      // Raid best-in-slot: Warfare Season 2 (PvP vault) gear is never a pick, so the
+      // Raid best-in-slot: Warfare Season 2 honor gear is never a pick, so the
       // tank and weapon guards that compare it against this stay honest.
       !SEASON2_STOCK_IDS.has(item.id) &&
       collectionFitsRole(item, cls as PlayerClass, collectionRole),

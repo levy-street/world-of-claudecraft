@@ -148,7 +148,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_vanguard_gallery: {
     name: 'Galerie Předvoje',
-    desc: 'Sady specializací a zbraně Války z 2. sezóny, získané z řady PvP v Týdenním trezoru.',
+    desc: 'Sady specializací a zbraně Války z 2. sezóny, koupené za čest.',
   },
   horizons_vault_of_ages: {
     name: 'Klenotnice věků',

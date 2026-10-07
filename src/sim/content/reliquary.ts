@@ -114,17 +114,12 @@ export const RELIQUARY_STORE_SOURCE_ID = 'woc_store' as const;
  *   keeper's table (content/hoard_loot.ts rollHoardBossDrop) when an entrant
  *   opens the hoard's reward chest. The piece is never on the keeper's own mob
  *   loot, so a boss hint would name a door that does not hold it.
- * - weekly_vault_pvp: src/sim/weekly_rewards.ts weeklyLootPool('pvp') is the ONLY
- *   source of Warfare Season 2 (content/pvp_honor_season2.ts): a PvP-row choice
- *   in the Weekly Vault rolls it on open and claimWeeklyReward grants it. No
- *   quartermaster sells it, so a vendor hint would name a door that is shut.
  */
 export const RELIQUARY_ACTIVITY_SOURCE_IDS = [
   'corpse_harvest',
   'masterwork_craft',
   'rift_first_clear',
   'buried_hoard',
-  'weekly_vault_pvp',
 ] as const;
 export type ReliquaryActivitySourceId = (typeof RELIQUARY_ACTIVITY_SOURCE_IDS)[number];
 
@@ -969,10 +964,9 @@ const WARFARE_ARMORY_ITEM_IDS = [
   ...FURY_STOCK.filter((id) => WARFARE_ITEMS[id].set === undefined),
   ...WARFARE_TRINKET_STOCK,
 ];
-// Warfare Season 2 ("Vanguard", content/pvp_honor_season2.ts) is not sold: its
-// only source is the PvP row of the Weekly Vault, so every slot names that one
-// activity. Its 27 spec sets and four weapons fill one page, in stock order
-// (class, then spec, each helmet to gloves, then the weapons).
+// Warfare Season 2 ("Vanguard", content/pvp_honor_season2.ts) is sold by the same
+// two quartermasters: its 27 spec sets and four weapons fill one page, in stock
+// order (class, then spec, each helmet to gloves, then the weapons).
 const VANGUARD_GALLERY_ITEM_IDS = [...SEASON2_STOCK];
 
 /**
@@ -1951,16 +1945,14 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     id: 'conquerors_vanguard_gallery',
     shelf: 'conquerors',
     name: 'Vanguard Gallery',
-    desc: 'The Warfare Season 2 spec sets and weapons, won from the PvP row of the Weekly Vault.',
+    desc: 'The Warfare Season 2 spec sets and weapons, bought with honor.',
     clearSource: { kind: 'none' },
-    // Class-personal stock (each set is class-locked and the vault rolls only the
+    // Class-personal stock (each set is class-locked and the shop lists only the
     // viewer's own class), so no single character can fill it: outside both
     // completion pairs, the Riftbound precedent, so the Conquerors capstone never
     // needs a character of every class.
     excludeFromCompletion: 'personal',
-    relics: items(
-      ...VANGUARD_GALLERY_ITEM_IDS.map((id) => [id, fromActivity('weekly_vault_pvp')] as const),
-    ),
+    relics: items(...VANGUARD_GALLERY_ITEM_IDS.map((id) => [id, WARFARE_VENDOR_HINTS] as const)),
   },
 ]);
 

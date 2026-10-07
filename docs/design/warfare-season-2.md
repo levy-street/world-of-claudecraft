@@ -5,14 +5,10 @@ the set rows live in `src/sim/content/vanguard_item_sets.ts`, and the bonuses in
 `src/sim/content/vanguard_set_bonuses*.ts` plus the class combat modules. Where a bonus text
 below differs from the shipped tooltip, the tooltip (the set row) is the source of truth.
 
-Amended (2026-10-07, owner ruling): Season 2 is no longer sold for honor. Its only source is the
-PvP row of the Weekly Vault (see "Where it comes from" below); the honor prices this doc records
-were removed from the items.
-
 ## What Season 2 is
 
-A new, top tier of Warfare gear above today's Warfare gear, which stays on sale for honor as
-the entry tier. Season 2 itself is won from the PvP row of the Weekly Vault, not bought:
+A new, top tier of honor gear sold beside today's Warfare gear, which stays on sale as the
+cheaper entry tier:
 
 - **27 sets, one per spec:** 9 classes, 3 specs each, 5 armor pieces per set (helmet,
   shoulder, chest, legs, gloves), the same five slots and the same 2-piece and 4-piece
@@ -88,23 +84,9 @@ everywhere. These rules hold them together:
     unchanged. `tests/warfare_season2.test.ts` ("the PvP promise") pins the caps and a
     health floor over Season 1.
 
-## Where it comes from (was "Prices and stock")
+## Prices and stock
 
-- **The PvP row of the Weekly Vault, and nothing else.** No vendor sells it, no mob drops it
-  and no quest rewards it. A PvP-row choice (earned by 1, 3 and 5 ranked arena or rated
-  battleground wins; `docs/design/weekly-vault.md`) rolls from the entry tier plus Season 2,
-  filtered to the character's class like every vault row, so a class only ever rolls its own
-  three spec sets and the season weapons it can wield (`weeklyLootPool` in
-  `src/sim/weekly_rewards.ts`). The pieces carry no `priceHonor`, stay soulbound with no sell
-  value, and the Reliquary's Vanguard Gallery names the `weekly_vault_pvp` activity on every
-  slot. Pinned by `tests/warfare_season2.test.ts`.
-- **What that trades.** Every eligible piece in the row is equally likely, so Season 2 shares the
-  odds with the entry tier the class can wear, and a full four-piece bonus takes many weeks of
-  PvP choices. The vault also caps a roll at the character's level plus three, so a character
-  more than three levels below Season 2's required level rolls only entry-tier pieces. Honor
-  itself now buys only the entry tier and the two trinkets.
-- **Historical: the honor prices it shipped with** (removed 2026-10-07). Armor, per slot, 1.5
-  times the entry tier:
+- **Armor, per slot, 1.5 times the entry tier:**
 
   | Slot | Honor |
   |---|---|
@@ -114,13 +96,12 @@ everywhere. These rules hold them together:
   | Legs | 1,575 |
   | Gloves | 825 |
 
-  A full set cost 6,600 Honor.
-- **Weapons:** 1,800 Honor each (historical).
-- **Where it was sold:** both honor quartermasters (FURY in Eastbrook Vale, Warmarshal Draven
-  Kole in Highwatch) until 2026-10-07. The shop view
-  (`src/ui/hud/vendor/warfare_vendor_view.ts`) still knows how to list a Season 2 group first
-  (the viewer's own three spec sets, then the season weapons the viewer can wield), but the
-  live stock carries none of it, so the shop shows the entry tier only.
+  A full set costs 6,600 Honor.
+- **Weapons:** 1,800 Honor each.
+- **Where it is sold:** both honor quartermasters (FURY in Eastbrook Vale, Warmarshal Draven
+  Kole in Highwatch). The shop lists a Season 2 group first: the viewer's own three spec
+  sets (the sets are class-locked, so the shop shows only what the viewer can wear), then the
+  season weapons the viewer can wield. The entry tier follows as its own group, unfiltered.
 - **Art:** the four weapons ship painted icons (the `warfare-season2-weapons-2026-09-25`
   batch in `public/ui/items/mapping.json`) and held models on shipped GLBs. The 135 armor
   pieces sit on `ITEM_ART_PENDING` (pinned in `tests/item_icons.test.ts`) and draw their

@@ -172,7 +172,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_vanguard_gallery: {
     name: '先锋展厅',
-    desc: '战争第二赛季的专精套装与武器，从每周宝库的PvP栏位中获得。',
+    desc: '战争第二赛季的专精套装与武器，用荣誉购买。',
   },
   // Vault of Ages (Phase 21): composed from the shipped vault noun (the
   // col_reliquary_complete title reads 宝库策展人).

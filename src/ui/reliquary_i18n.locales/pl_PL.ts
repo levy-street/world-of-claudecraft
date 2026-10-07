@@ -148,7 +148,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_vanguard_gallery: {
     name: 'Galeria Awangardy',
-    desc: 'Zestawy specjalizacji i bronie Wojny z 2. sezonu, zdobywane z rzędu PvP w Tygodniowym Skarbcu.',
+    desc: 'Zestawy specjalizacji i bronie Wojny z 2. sezonu, kupowane za honor.',
   },
   horizons_vault_of_ages: {
     name: 'Skarbiec Wieków',

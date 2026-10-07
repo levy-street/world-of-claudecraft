@@ -335,7 +335,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.legendary_riptide_handwraps.name': '至尊激流裹手',
   'hudChrome.reliquary.sourceActivityBuriedHoard':
     '在埋藏宝藏的奖励宝箱中找到，即藏宝图所指引的宝库',
-  'hudChrome.reliquary.sourceActivityWeeklyVaultPvp': '从每周宝库的PvP栏位中选取',
   'clues.hunt_drakelands_gate_ashes.reply.1':
     '风从东边的沙丘吹来，带着灰烬，而空荡荡的沙地不会吹出灰烬。驻军仓库的塞拉记着每一次巡逻。只要有人给她带点吃的，她就会开口。',
   'clues.hunt_drakelands_gate_ashes.reply.2':
@@ -877,8 +876,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunderstorm.name': '碎风暴',
   'guide.arenaPage.vanguardBody':
     '先锋套装是战争套装的第二个赛季，由同样的两位军需官在原有品级之上出售，原品级仍照常在售。每个专精都有自己专属的五件先锋套装，涵盖头部、肩部、胸部、腿部与双手，商店只会列出你的职业能穿的三套装备，随后是你能使用的先锋武器。先锋装备带有与原有品级相同的战争等级，只是物品等级更高，并且每套装备都有两条套装效果，分别在凑齐两件与四件时触发，会改变你某个专精技能的效果。与原有套装不同，这些效果在任何场合都会生效，包括对怪物，但它们是为对抗玩家而设计的，因此在团队副本里，团队副本套装仍是更好的选择。',
-  'guide.arenaPage.vanguardBodyWeeklyVault':
-    '先锋套装是战争套装的第二个赛季，它并不出售：唯一的获取途径是每周宝库的PvP栏位，赢得评级竞技场或评级战场比赛即可填充该栏位，而原有品级仍由两位军需官照常出售。每个专精都有自己专属的五件先锋套装，涵盖头部、肩部、胸部、腿部与双手，PvP选项只会提供你的职业能穿的套装和你能使用的先锋武器，并与原有品级的装备一同出现。先锋装备带有与原有品级相同的战争等级，只是物品等级更高，并且每套装备都有两条套装效果，分别在凑齐两件与四件时触发，会改变你某个专精技能的效果。与原有套装不同，这些效果在任何场合都会生效，包括对怪物，但它们是为对抗玩家而设计的，因此在团队副本里，团队副本套装仍是更好的选择。',
   'guide.arenaPage.vanguardHeading': '先锋套装：战争第二赛季',
   'guide.settingsPage.ifColorblindMode':
     '将尼思拉克西斯的地面危险标识（坟场爆裂的预警圆环、坟场烈焰与灵魂之火的地面毒池、墓火直线，以及灵魂撕裂标记）重新上色为色盲安全配色，各标识色相与明暗分明，让重叠的圆圈也能分清边界。大小、计时与位置始终不变。',

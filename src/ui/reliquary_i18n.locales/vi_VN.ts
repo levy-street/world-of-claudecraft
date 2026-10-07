@@ -148,7 +148,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_vanguard_gallery: {
     name: 'Phòng Trưng Bày Tiên Phong',
-    desc: 'Các bộ trang bị chuyên môn và vũ khí Chiến Tranh mùa 2, nhận từ hàng PvP của Kho Tuần.',
+    desc: 'Các bộ trang bị chuyên môn và vũ khí Chiến Tranh mùa 2, mua bằng danh dự.',
   },
   horizons_vault_of_ages: {
     name: 'Kho Báu Ngàn Năm',

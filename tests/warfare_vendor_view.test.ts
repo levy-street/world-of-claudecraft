@@ -10,7 +10,6 @@
 import { describe, expect, it } from 'vitest';
 import { ITEM_SETS } from '../src/sim/content/item_sets';
 import { FURY_STOCK, HONOR_QUARTERMASTER_STOCK } from '../src/sim/content/pvp_honor';
-import { SEASON2_STOCK } from '../src/sim/content/pvp_honor_season2';
 import { ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { InvSlot, ItemDef, ItemSet } from '../src/sim/types';
@@ -515,47 +514,11 @@ describe('buildWarfareVendorView over the shipped WARFARE stock', () => {
   });
 });
 
-// Warfare Season 2 left the quartermasters (owner ruling 2026-10-07: its only
-// source is the PvP row of the Weekly Vault), so the live stock carries none of
-// it and the pieces carry no honor price. The view keeps its Season 2 grouping
-// (class filter, spec names, the group heading) dormant, so these cases drive
-// it over a fixture that prices the Season 2 pieces and appends them to the
-// stock: the shape the shop would show if Season 2 ever went back on sale.
-const PRICED_SEASON2_STOCK: readonly string[] = [...HONOR_QUARTERMASTER_STOCK, ...SEASON2_STOCK];
-const PRICED_SEASON2_ITEMS: Readonly<Record<string, ItemDef>> = {
-  ...ITEMS,
-  ...Object.fromEntries(SEASON2_STOCK.map((id) => [id, { ...ITEMS[id], priceHonor: 1 }])),
-};
-
-describe('buildWarfareVendorView over the live honor stock', () => {
-  it('lists only the entry tier: Season 2 is not sold', () => {
-    for (const viewerClass of [undefined, 'mage', 'warrior']) {
-      const view = buildWarfareVendorView(
-        HONOR_QUARTERMASTER_STOCK,
-        ITEMS,
-        ITEM_SETS,
-        viewer({ viewerClass }),
-      );
-      expect(view.sections.every((s) => s.group === 'entry')).toBe(true);
-      expect(view.sections.map((s) => s.key)).toEqual([
-        ...WARFARE_SHOP_SET_ORDER,
-        WARFARE_SHOP_JEWELRY_KEY,
-        WARFARE_SHOP_WEAPONS_KEY,
-      ]);
-    }
-  });
-
-  it('drops a Season 2 id even if a stock names it, because it carries no honor price', () => {
-    const view = buildWarfareVendorView(PRICED_SEASON2_STOCK, ITEMS, ITEM_SETS, viewer());
-    expect(view.sections.some((s) => s.group === 'season2')).toBe(false);
-  });
-});
-
-describe('buildWarfareVendorView over a priced Season 2 fixture (Season 2 first)', () => {
+describe('buildWarfareVendorView over the full honor stock (Warfare Season 2 first)', () => {
   it("lists the viewer's three Season 2 spec sets and usable weapons, then the entry tier", () => {
     const view = buildWarfareVendorView(
-      PRICED_SEASON2_STOCK,
-      PRICED_SEASON2_ITEMS,
+      HONOR_QUARTERMASTER_STOCK,
+      ITEMS,
       ITEM_SETS,
       viewer({ viewerClass: 'mage' }),
     );
@@ -604,8 +567,8 @@ describe('buildWarfareVendorView over a priced Season 2 fixture (Season 2 first)
     ];
     for (const cls of classes) {
       const view = buildWarfareVendorView(
-        PRICED_SEASON2_STOCK,
-        PRICED_SEASON2_ITEMS,
+        HONOR_QUARTERMASTER_STOCK,
+        ITEMS,
         ITEM_SETS,
         viewer({ viewerClass: cls }),
       );
@@ -616,12 +579,7 @@ describe('buildWarfareVendorView over a priced Season 2 fixture (Season 2 first)
   });
 
   it('filters nothing when the class is unknown', () => {
-    const view = buildWarfareVendorView(
-      PRICED_SEASON2_STOCK,
-      PRICED_SEASON2_ITEMS,
-      ITEM_SETS,
-      viewer(),
-    );
+    const view = buildWarfareVendorView(HONOR_QUARTERMASTER_STOCK, ITEMS, ITEM_SETS, viewer());
     expect(view.sections.filter((s) => s.group === 'season2' && s.kind === 'set')).toHaveLength(27);
   });
 });
@@ -629,8 +587,8 @@ describe('buildWarfareVendorView over a priced Season 2 fixture (Season 2 first)
 describe('buildWarfareVendorView names the spec of each Season 2 set', () => {
   it('carries the class and spec on Season 2 sets and nothing on the entry tier', () => {
     const view = buildWarfareVendorView(
-      PRICED_SEASON2_STOCK,
-      PRICED_SEASON2_ITEMS,
+      HONOR_QUARTERMASTER_STOCK,
+      ITEMS,
       ITEM_SETS,
       viewer({ viewerClass: 'warrior' }),
     );

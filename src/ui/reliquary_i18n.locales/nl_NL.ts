@@ -148,7 +148,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_vanguard_gallery: {
     name: 'Voorhoedegalerij',
-    desc: 'De specialisatiesets en wapens van Oorlogsvoering seizoen 2, gewonnen uit de PvP-rij van de Weeklijkse Kluis.',
+    desc: 'De specialisatiesets en wapens van Oorlogsvoering seizoen 2, gekocht met eer.',
   },
   horizons_vault_of_ages: {
     name: 'Schatkamer der Eeuwen',

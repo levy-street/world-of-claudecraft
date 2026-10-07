@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { nextWeeklyRaidResetMs } from '../src/reset_calendar';
 import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
-import { SEASON2_SETS, SEASON2_STOCK } from '../src/sim/content/pvp_honor_season2';
 import { BUILTIN_WORLD, ITEMS, MOBS, NPCS } from '../src/sim/data';
 import { prepareWeeklyVaultPlaytest } from '../src/sim/dev/weekly_vault_playtest';
 import { createMob } from '../src/sim/entity';
@@ -125,32 +124,6 @@ describe('weekly vault choices', () => {
       }
     },
   );
-
-  // Warfare Season 2 is won only here (tests/warfare_season2.test.ts pins that
-  // no vendor sells it): a PvP choice rolls a piece and the claim grants it.
-  it('rolls and grants a Warfare Season 2 piece from a PvP choice', () => {
-    const { sim, pid, meta } = make(42, true, 'warrior');
-    const season2 = new Set(SEASON2_STOCK);
-    meta.weeklyRewards = emptyWeeklyRewards(WEEK);
-    meta.weeklyRewards.vaults = [{ resetAtMs: 1000, choices: [{ pool: 'pvp' }] }];
-    vi.spyOn(sim.ctx.rng, 'pick').mockImplementation(
-      (items) => items.find((id) => season2.has(id as string)) ?? items[0],
-    );
-    openSelected(sim, '1000:0', pid);
-    const itemId = meta.weeklyRewards.vaults[0].choices[0].itemId!;
-    expect(season2.has(itemId), itemId).toBe(true);
-    // Class-locked: the warrior rolls a warrior set piece or a weapon it wields.
-    const sets = SEASON2_SETS.filter((set) => set.itemIds.includes(itemId));
-    expect(
-      sets.every((set) => set.cls === 'warrior'),
-      itemId,
-    ).toBe(true);
-    expect(meta.deedStats.itemsDiscovered.has(itemId)).toBe(false);
-    sim.claimWeeklyReward('1000:0', pid);
-    expect(meta.weeklyRewards.vaults).toHaveLength(0);
-    expect(sim.ctx.countItem(itemId, pid)).toBe(1);
-    expect(meta.deedStats.itemsDiscovered.has(itemId)).toBe(true);
-  });
 
   it('keeps a concealed legacy world reward openable even when its pool is fully reserved', () => {
     const { sim, pid, meta } = make();

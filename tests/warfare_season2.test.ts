@@ -1,29 +1,28 @@
-// Warfare Season 2 ("Vanguard"): the stock shape, its one source (the PvP row
-// of the Weekly Vault, never an honor vendor), the stat, armor and rating
+// Warfare Season 2 ("Vanguard"): the stock shape, the stat, armor and rating
 // rules that keep honor gear under the raid tier in PvE, the set rows, and the
 // tank guard (docs/design/warfare-season-2.md, "The PvE promise").
 import { describe, expect, it } from 'vitest';
 import { ABILITIES } from '../src/sim/content/classes';
-import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { DEV_KIT_ROLES } from '../src/sim/content/dev_kit_roles';
-import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { ITEM_SETS } from '../src/sim/content/item_sets';
-import { FURY_STOCK, HONOR_QUARTERMASTER_STOCK } from '../src/sim/content/pvp_honor';
+import { HONOR_QUARTERMASTER_STOCK } from '../src/sim/content/pvp_honor';
 import {
   SEASON2_ARMOR_FRACTION,
   SEASON2_ARMOR_SLOTS,
   SEASON2_DEFENSE_RATING_MULT,
   SEASON2_OFFENSE_RATING_MULT,
+  SEASON2_PRICES,
   SEASON2_SETS,
   SEASON2_SOURCE_LEVEL,
   SEASON2_STAT_FRACTION,
   SEASON2_STOCK,
   SEASON2_WEAPON_IDS,
+  SEASON2_WEAPON_PRICE,
 } from '../src/sim/content/pvp_honor_season2';
 import { RELIQUARY_PAGES_BY_ID } from '../src/sim/content/reliquary';
 import type { TalentAllocation } from '../src/sim/content/talents';
 import { VANGUARD_SET_ENGINE_BONUSES } from '../src/sim/content/vanguard_set_bonuses';
-import { ALL_RECIPES, DUNGEON_X_THRESHOLD, ITEMS, MOBS, NPCS, QUESTS } from '../src/sim/data';
+import { DUNGEON_X_THRESHOLD, ITEMS, NPCS } from '../src/sim/data';
 import { bestEpicGearFor } from '../src/sim/dev/bis_gear';
 import { canEquipItem, maxArmorTypeForClass } from '../src/sim/equipment_rules';
 import {
@@ -35,14 +34,12 @@ import {
 import { expectedLineBudget, itemLevel } from '../src/sim/item_level';
 import { Sim } from '../src/sim/sim';
 import {
-  ALL_CLASSES,
   armorReduction,
   type Entity,
   type EquipSlot,
   type ItemDef,
   type PlayerClass,
 } from '../src/sim/types';
-import { WEEKLY_POOL_IDS, weeklyLootPool } from '../src/sim/weekly_rewards';
 
 const ARMOR_TYPE: Record<string, string> = {
   warrior: 'mail',
@@ -64,7 +61,7 @@ const armorPieces = (): ItemDef[] =>
   SEASON2_STOCK.map((id) => ITEMS[id]).filter((it) => it.kind === 'armor');
 
 describe('the Season 2 stock', () => {
-  it('is one five-piece set per spec plus four weapons', () => {
+  it('is one five-piece set per spec plus four weapons, sold by both quartermasters', () => {
     expect(SEASON2_SETS).toHaveLength(27);
     expect(SEASON2_WEAPON_IDS).toHaveLength(4);
     expect(SEASON2_STOCK).toHaveLength(27 * 5 + 4);
@@ -72,6 +69,11 @@ describe('the Season 2 stock', () => {
       roles.map((r) => `vanguard_${cls}_${r.spec}`),
     );
     expect(SEASON2_SETS.map((s) => s.setId).sort()).toEqual([...new Set(specs)].sort());
+    for (const npcId of ['fury', 'warmarshal_draven_kole']) {
+      const sold = new Set(NPCS[npcId]?.vendorItems ?? []);
+      for (const id of SEASON2_STOCK) expect(sold.has(id), `${npcId} sells ${id}`).toBe(true);
+    }
+    expect(HONOR_QUARTERMASTER_STOCK.slice(-SEASON2_STOCK.length)).toEqual([...SEASON2_STOCK]);
   });
 
   it('fills the raid slots, locked to its class, in its class armor type, at item level 35', () => {
@@ -107,85 +109,20 @@ describe('the Season 2 stock', () => {
       expect(it.sellValue, id).toBe(0);
     }
   });
-});
 
-// Owner ruling 2026-10-07: Season 2 is won only from the PvP row of the Weekly
-// Vault. The honor quartermasters stopped selling it, so no piece carries an
-// honor price and no vendor, mob or quest names it.
-describe('the Season 2 source: the PvP row of the Weekly Vault, and nothing else', () => {
-  const season2 = new Set(SEASON2_STOCK);
-
-  it('is not sold by any vendor and carries no honor price', () => {
-    for (const npcId of ['fury', 'warmarshal_draven_kole']) {
-      // The quartermasters still sell the entry tier: the anti-vacuity half.
-      expect(NPCS[npcId]?.vendorItems, npcId).toEqual([...HONOR_QUARTERMASTER_STOCK]);
-    }
-    expect(HONOR_QUARTERMASTER_STOCK.slice(0, FURY_STOCK.length)).toEqual([...FURY_STOCK]);
-    expect(HONOR_QUARTERMASTER_STOCK.filter((id) => season2.has(id))).toEqual([]);
-    for (const [npcId, npc] of Object.entries(NPCS)) {
-      const sold = (npc.vendorItems ?? []).filter((id) => season2.has(id));
-      expect(sold, `${npcId} sells Season 2`).toEqual([]);
-    }
-    for (const id of SEASON2_STOCK) {
-      expect(ITEMS[id].priceHonor, id).toBeUndefined();
-      expect(ITEMS[id].buyValue, id).toBeUndefined();
-    }
-  });
-
-  it('drops from no mob (world bosses and heroic bosses included), crafts from no recipe, and rewards from no quest or delve shop', () => {
-    // World boss loot rolls off the boss's own MOBS loot table, so this covers it.
-    for (const [mobId, mob] of Object.entries(MOBS)) {
-      const dropped = (mob.loot ?? []).filter((e) => e.itemId && season2.has(e.itemId));
-      expect(dropped, mobId).toEqual([]);
-    }
-    for (const [mobId, rows] of Object.entries(HEROIC_BOSS_LOOT)) {
-      const dropped = rows.filter((e) => e.itemId && season2.has(e.itemId));
-      expect(dropped, `heroic ${mobId}`).toEqual([]);
-    }
-    for (const [delveId, rows] of Object.entries(DELVE_SHOPS)) {
-      const sold = rows.filter((e) => season2.has(e.itemId));
-      expect(sold, `delve shop ${delveId}`).toEqual([]);
-    }
-    const crafted = ALL_RECIPES.filter((r) => season2.has(r.resultItemId)).map((r) => r.id);
-    expect(crafted).toEqual([]);
-    for (const [questId, quest] of Object.entries(QUESTS)) {
-      const rewards = JSON.stringify(quest.itemRewards ?? {});
-      for (const id of SEASON2_STOCK) expect(rewards.includes(`"${id}"`), questId).toBe(false);
-    }
-  });
-
-  it.each(ALL_CLASSES)('rolls every %s set and wieldable weapon from the PvP row', (cls) => {
-    const pvp = new Set(weeklyLootPool('pvp', cls));
-    const own = SEASON2_SETS.filter((set) => set.cls === cls).flatMap((set) => set.itemIds);
-    expect(own).toHaveLength(15);
-    for (const id of own) expect(pvp.has(id), `${cls} rolls ${id}`).toBe(true);
-    // Class locks hold: another class's set never enters this pool.
-    const foreign = SEASON2_SETS.filter((set) => set.cls !== cls).flatMap((set) => set.itemIds);
-    for (const id of foreign) expect(pvp.has(id), `${cls} refused ${id}`).toBe(false);
-    const weapons = SEASON2_WEAPON_IDS.filter((id) => pvp.has(id));
-    for (const id of weapons) expect(canEquipItem(cls, ITEMS[id]), id).toBe(true);
-    // The entry tier stays in the row beside Season 2.
-    expect(
-      FURY_STOCK.some((id) => pvp.has(id)),
-      `${cls} entry tier`,
-    ).toBe(true);
-  });
-
-  it('every Season 2 weapon reaches at least one class through the PvP row', () => {
-    for (const id of SEASON2_WEAPON_IDS) {
-      expect(
-        ALL_CLASSES.some((cls) => weeklyLootPool('pvp', cls).includes(id)),
-        id,
-      ).toBe(true);
-    }
-  });
-
-  it.each(ALL_CLASSES)('no other Weekly Vault row offers Season 2 to a %s', (cls) => {
-    for (const pool of WEEKLY_POOL_IDS) {
-      if (pool === 'pvp') continue;
-      const leaked = weeklyLootPool(pool, cls).filter((id) => season2.has(id));
-      expect(leaked, pool).toEqual([]);
-    }
+  it('prices every slot at 1.5 times the entry tier, a full set at 6,600 Honor', () => {
+    expect({ ...SEASON2_PRICES }).toEqual({
+      helmet: 1350,
+      shoulder: 1050,
+      chest: 1800,
+      legs: 1575,
+      gloves: 825,
+    });
+    for (const it of armorPieces())
+      expect(it.priceHonor, it.id).toBe(SEASON2_PRICES[it.slot ?? '']);
+    for (const id of SEASON2_WEAPON_IDS)
+      expect(ITEMS[id].priceHonor, id).toBe(SEASON2_WEAPON_PRICE);
+    expect(Object.values(SEASON2_PRICES).reduce((a, b) => a + b, 0)).toBe(6600);
   });
 });
 
@@ -259,12 +196,7 @@ describe('the stat rules (the honor discount at item level 35)', () => {
     const ratingsOf = (w: ItemDef) =>
       (w.critRating ?? 0) + (w.hitRating ?? 0) + (w.hasteRating ?? 0);
     const raid = Object.values(ITEMS).filter(
-      (w) =>
-        w.kind === 'weapon' &&
-        w.quality === 'epic' &&
-        !w.priceHonor &&
-        !SEASON2_STOCK.includes(w.id) &&
-        itemLevel(w) === 35,
+      (w) => w.kind === 'weapon' && w.quality === 'epic' && !w.priceHonor && itemLevel(w) === 35,
     );
     for (const id of SEASON2_WEAPON_IDS) {
       const w = ITEMS[id];
@@ -517,17 +449,10 @@ describe('the Reliquary page: class-personal stock outside completion', () => {
   it('lists every Season 2 item but never gates the Conquerors capstone', () => {
     const page = RELIQUARY_PAGES_BY_ID.conquerors_vanguard_gallery;
     expect(page.shelf).toBe('conquerors');
-    // The sets are class-locked and the vault rolls only the viewer's own class,
+    // The sets are class-locked and the shop lists only the viewer's own class,
     // so no single character can fill the page: the Riftbound precedent.
     expect(page.excludeFromCompletion).toBe('personal');
     const listed = new Set(page.relics.map((r) => (r as { itemId?: string }).itemId));
     for (const id of SEASON2_STOCK) expect(listed.has(id), id).toBe(true);
-    // Every slot names the Weekly Vault's PvP row, never a quartermaster.
-    for (const relic of page.relics) {
-      expect(relic.source, JSON.stringify(relic)).toEqual({
-        sourceKind: 'activity',
-        sourceId: 'weekly_vault_pvp',
-      });
-    }
   });
 });
