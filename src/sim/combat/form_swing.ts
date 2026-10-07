@@ -56,20 +56,46 @@ export function isCatForm(e: Entity): boolean {
   return false;
 }
 
+// Bruin Form (Groveheart rework pass 2): bears were rage-starved, so a bear
+// swings twice as fast (half the weapon's interval) for half the damage per
+// swing, and each white swing mints double rage. White DPS and white threat
+// stay where they were; rage per second doubles. Rage is minted from damage
+// dealt (combat/damage.ts), which is why the rage arm needs its own factor:
+// half the damage at twice the cadence alone would leave rage unchanged.
+export const BEAR_FORM_SWING_MULT = 0.5;
+export const BEAR_FORM_AUTO_DAMAGE_MULT = 0.5;
+export const BEAR_FORM_AUTO_RAGE_MULT = 2;
+
+export function isBearForm(e: Pick<Entity, 'auras'>): boolean {
+  for (const a of e.auras) if (a.kind === 'form_bear') return true;
+  return false;
+}
+
 // Effective base swing speed in seconds, BEFORE haste/slow auras
 // (`swingIntervalMult`). Cat Form ignores the equipped weapon and swings at
-// the fixed cat cadence; every other entity swings at its own weapon speed.
+// the fixed cat cadence; Bruin Form swings at half its weapon's speed; every
+// other entity swings at its own weapon speed.
 export function baseSwingSpeed(e: Entity): number {
-  return isCatForm(e) ? CAT_FORM_SWING_SPEED : e.weapon.speed;
+  if (isCatForm(e)) return CAT_FORM_SWING_SPEED;
+  return isBearForm(e) ? e.weapon.speed * BEAR_FORM_SWING_MULT : e.weapon.speed;
 }
 
 // Cat Form auto-attacks rescale the carried weapon's per-swing roll to the
 // fixed paw cadence, the same shape as the instant normalization below: the
 // roll times CAT_FORM_SWING_SPEED over speed reads as the weapon's authored
 // dps delivered at the cat cadence, so a slow big-roll weapon cannot inflate
-// the fast swings and white DPS is weapon-speed independent.
+// the fast swings and white DPS is weapon-speed independent. Bruin Form halves
+// the roll to match its doubled cadence (the Attack Power term already follows
+// baseSwingSpeed), so a bear's white DPS is unchanged.
 export function catAutoWeaponRollMult(e: Entity, weapon: WeaponInfo): number {
-  return isCatForm(e) ? CAT_FORM_SWING_SPEED / Math.max(0.1, weapon.speed) : 1;
+  if (isCatForm(e)) return CAT_FORM_SWING_SPEED / Math.max(0.1, weapon.speed);
+  return isBearForm(e) ? BEAR_FORM_AUTO_DAMAGE_MULT : 1;
+}
+
+// The rage multiplier on a white swing's damage-to-rage mint: double in Bruin
+// Form, neutral for everyone else.
+export function formAutoRageMult(e: Pick<Entity, 'auras'>): number {
+  return isBearForm(e) ? BEAR_FORM_AUTO_RAGE_MULT : 1;
 }
 
 // The feral form damage multiplier for a swing by this entity: the tuning

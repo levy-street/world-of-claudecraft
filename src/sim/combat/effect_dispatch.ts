@@ -54,6 +54,7 @@ import { primaryHealingMultiplier } from '../spec_output_tuning';
 import {
   abilityScalingPower,
   absorbBonus,
+  coefficientCastTime,
   directHealBonus,
   directHitBonus,
   dotTickBonus,
@@ -480,6 +481,9 @@ export function runEffects(
   const ability = res.def;
   const benisonChoirMult = consumeBenisonPrayers(ctx, p, ability.id);
   let benisonPrayerBuilt = false;
+  // The resolved (pre-critical) amount of this cast's direct heal, read by a
+  // later 'hot' effect that carries closingHealFromDirect (Second Bloom).
+  let directHealAmount: number | undefined;
   // The cast-scoped heal multiplier the heal and hot arms below apply to the
   // WHOLE resolved amount: the caller's mark times the Nature's Boon power the
   // resolved copy carries (combat/druid_natures_boon.ts, stamped in
@@ -1371,7 +1375,8 @@ export function runEffects(
         const rolledAmount = ctx.rng.range(eff.min, eff.max);
         const baseHealAmount =
           eff.casterMaxHpPct === undefined
-            ? rolledAmount + directHealBonus(p.healPower, res.castTime, false, talentHealMult)
+            ? rolledAmount +
+              directHealBonus(p.healPower, coefficientCastTime(res), false, talentHealMult)
             : Math.round(p.maxHp * eff.casterMaxHpPct);
         // The cast-scoped multiplier (see the runEffects parameter note): the
         // === 1 guard keeps every unmarked cast's arithmetic byte-identical.
@@ -1383,6 +1388,7 @@ export function runEffects(
           eff.casterMaxHpPct === undefined
             ? scalePrimaryHealing(castHealAmount, primaryHealMult)
             : castHealAmount;
+        directHealAmount = healAmount;
         if (eff.canCrit === false) ctx.rng.chance(0);
         // Only this direct-heal effect opts into Beacon transfer. Derived,
         // periodic, chained, area, and self-heal effects remain ineligible.
@@ -1565,9 +1571,6 @@ export function runEffects(
       }
       case 'hot': {
         const hotTarget = target ?? p;
-        const plantsHot = !hotTarget.auras.some(
-          (aura) => aura.kind === 'hot' && aura.id === ability.id && aura.sourceId === p.id,
-        );
         // A HoT that RIDES a direct heal (Regrowth-style) does NOT also scale here:
         // the direct component already took the cast-time coefficient, so scaling the
         // rider too would double-dip. Only pure HoTs (Rejuvenation) take the rider.
@@ -1604,8 +1607,12 @@ export function runEffects(
           tickTimer: eff.interval,
           sourceId: p.id,
           school: ability.school,
+          ...(eff.closingHealFromDirect === true && directHealAmount !== undefined
+            ? { closingHeal: directHealAmount }
+            : {}),
         });
-        if (plantsHot) druidEngineOnHotPlanted(ctx, p, ability.id);
+        // A refresh of the caster's own ticking bloom banks Verdance too.
+        druidEngineOnHotPlanted(ctx, p, ability.id);
         break;
       }
       case 'absorb': {
@@ -2186,16 +2193,17 @@ export function runEffects(
       case 'druidMarrowbreakGuard': {
         if (!druidMarrowbreakUsesGuard(p, eff.belowFrac)) break;
         const mult = druidApexPayoffMult(ctx, p, ability.id);
-        ctx.applyAura(p, {
-          id: 'marrowbreak_guard',
-          name: ability.name,
-          kind: 'absorb',
-          remaining: 8,
-          duration: 8,
-          value: Math.round(p.maxHp * eff.absorbPctMaxHp * mult),
-          sourceId: p.id,
-          school: 'nature',
-        });
+        // An instant self-heal for a slice of maximum health (it used to be an
+        // 8 sec absorb). It cannot critically strike, so it draws no rng.
+        ctx.applyHeal(
+          p,
+          p,
+          Math.round(p.maxHp * eff.healPctMaxHp * mult),
+          ability.name,
+          ability.id,
+          false,
+          false,
+        );
         if (p.resourceType === 'rage') {
           p.resource = Math.min(p.maxResource, p.resource + eff.rage);
         }

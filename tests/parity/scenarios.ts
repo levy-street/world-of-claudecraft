@@ -6759,17 +6759,18 @@ function grixRespawnWindow(): Scenario {
 
 // Cat Form AUTO attacks, the arm druid_engines deliberately does not drive
 // (it scripts specials only): the fixed 1.0s cat cadence swings against a
-// bear-form control on the same staff swinging at the weapon speed. The cat
-// lane lands ~1.8x the swings (and rng draws) of the bear lane over the same
-// window, so a regression in the cat swing timer or the normalized mainhand
-// roll moves this golden's draw digest, not just its state hashes.
+// bear-form control on the same staff swinging at HALF the weapon speed (the
+// Groveheart rework pass 2 Bruin cadence, half damage per swing). The two
+// lanes swing at different fixed cadences, so a regression in either swing
+// timer or in the normalized mainhand roll moves this golden's draw digest,
+// not just its state hashes.
 function catFormAutoSwing(): Scenario {
   return {
     name: 'cat_form_auto_swing',
     coverage: [
       'class:druid (Wildfang cat + Bruin control)',
       'Cat Form fixed-cadence auto-attack: 1.0s swing timer, normalized mainhand weapon roll',
-      'bear-form control swinging at the equipped weapon speed on the same loadout',
+      'bear-form control swinging at half the equipped weapon speed on the same loadout',
     ],
     sampleEvery: 5,
     build: () => new Sim({ seed: 2931, playerClass: 'druid', noPlayer: true, autoEquip: true }),

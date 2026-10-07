@@ -6287,6 +6287,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description: 'Heals a friendly target for $d.',
+    specNotes: {
+      // The three cast times are VERDANCE_WILDMEND_CAST_TIMES
+      // (combat/druid_engines.ts), pinned to this note by
+      // tests/druid_engines.test.ts.
+      restoration:
+        "Each completed cast adds 1 Verdance (max 3). Banked Verdance shortens this cast: 2.2 sec at 1 Verdance, 1.9 sec at 2, and 1.5 sec at 3. Nature's Boon makes it instant, free, and 25% stronger.",
+    },
   },
   mark_of_the_wild: {
     id: 'mark_of_the_wild',
@@ -6419,7 +6426,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description: 'Heals the target for $d over 12 sec.',
     specNotes: {
       restoration:
-        'Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Fleetmend becomes Overbloom.',
+        'Each cast adds 1 Verdance (max 3), including a refresh of a bloom already ticking. At 3 Verdance, Fleetmend becomes Overbloom.',
     },
   },
   thorns: {
@@ -6491,7 +6498,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'form_bear', value: 0.65, duration: 3600 }],
     description:
-      'Shapeshift into a bear: armor +110%, maximum health +30%, greatly increased attack power, your attacks build rage and generate 30% more threat. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form.',
+      'Shapeshift into a bear: armor +110%, maximum health +30%, greatly increased attack power, your attacks build rage and generate 30% more threat. You swing twice as fast for half the damage per swing, and each swing builds double rage. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form.',
   },
   bear_charge: {
     id: 'bear_charge',
@@ -6548,7 +6555,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       'A mauling attack that increases melee damage by $d and causes a high amount of threat. Activates on your next swing. Bruin Form only.',
     specNotes: {
       feral:
-        'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead shields you for 18% of your maximum health and refunds 15 rage.',
+        'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead heals you for 18% of your maximum health and refunds 15 rage.',
     },
   },
   growl: {
@@ -6768,7 +6775,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [
       { type: 'heal', min: 52, max: 62 },
-      { type: 'hot', total: 49, duration: 21, interval: 3 },
+      { type: 'hot', total: 49, duration: 15, interval: 3, closingHealFromDirect: true },
     ],
     ranks: [
       {
@@ -6777,13 +6784,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 72,
         effects: [
           { type: 'heal', min: 75, max: 90 },
-          { type: 'hot', total: 71, duration: 21, interval: 3 },
+          { type: 'hot', total: 71, duration: 15, interval: 3, closingHealFromDirect: true },
         ],
       },
     ],
-    description: 'Heals a friendly target for $d and an additional amount over 21 sec.',
+    description:
+      'Heals a friendly target for $d and an additional amount over 15 sec. If the effect runs its full duration, it heals the target again for the same amount as the initial heal.',
     specNotes: {
-      restoration: 'Planting a NEW bloom adds 1 Verdance (max 5).',
+      restoration:
+        'Each cast adds 1 Verdance (max 3), including a refresh of a bloom already ticking.',
     },
   },
   barkskin: {
@@ -7990,9 +7999,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     targetType: 'friendly',
     effects: [{ type: 'consumeAura', auraKind: 'hot', heal: { min: 105, max: 125 } }],
-    actionReplacement: { abilityId: 'overbloom', auraKind: 'verdance', minStacks: 5 },
+    actionReplacement: { abilityId: 'overbloom', auraKind: 'verdance', minStacks: 3 },
     description:
-      'Consumes a heal-over-time effect on a friendly target to heal them for $d. Wildbloom and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)',
+      'Consumes a heal-over-time effect on a friendly target to heal them for $d. Wildbloom, Second Bloom, and Wildmend casts each add 1 Verdance; at 3 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)',
   },
   moonlash: {
     id: 'moonlash',
@@ -8113,10 +8122,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     threat: { flat: 110, mult: 2 },
     effects: [
       { type: 'directDamage', min: 78, max: 96 },
-      { type: 'druidMarrowbreakGuard', belowFrac: 0.5, absorbPctMaxHp: 0.18, rage: 15 },
+      { type: 'druidMarrowbreakGuard', belowFrac: 0.5, healPctMaxHp: 0.18, rage: 15 },
     ],
     description:
-      'Spends your 3 Old Blood for a heavy, high-threat strike of $d damage. Below half health it instead shields you for 18% of your maximum health for 8 sec and refunds 15 rage.',
+      'Spends your 3 Old Blood for a heavy, high-threat strike of $d damage. Below half health it instead heals you for 18% of your maximum health and refunds 15 rage.',
   },
   overbloom: {
     id: 'overbloom',
@@ -8132,13 +8141,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     targetType: 'friendly',
     requiresAuraKind: 'verdance',
-    requiresAuraStacks: 5,
+    requiresAuraStacks: 3,
     effects: [{ type: 'druidOverbloom', harvestPct: 0.6 }],
     // The harvest fraction is the $b splice (the resolved druidOverbloom
     // harvestPct, see abilityBuffValue): Grovespring 4pc wearers read 75
     // there, everyone else the base 60.
     description:
-      'Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for $b% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom.',
+      'Spends your 3 Verdance: every ally carrying your heal-over-time effects is instantly healed for $b% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom.',
   },
 
   // Groveheart resurrection parity: the combat single revive and the

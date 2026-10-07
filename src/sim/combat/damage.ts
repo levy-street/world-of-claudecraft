@@ -111,6 +111,7 @@ import {
   igniteOnCrit,
   PERSONAL_BARRIER_IDS,
 } from './fire_mage';
+import { formAutoRageMult } from './form_swing';
 import { clearFieldcraftState } from './hunter_fieldcraft';
 import { clearPacklordState } from './hunter_packlord';
 import {
@@ -1218,10 +1219,15 @@ export function dealDamage(
       // here, a hidden ~20% income buff that co-fed the fury overpower incident.
       const baseRage = rageFromDealing(amount, source.level);
       const talentMult = isWarrior ? 1 + ctx.playerMods(meta).global.autoRagePct : 1;
+      // Bruin Form white swings mint double rage (combat/form_swing.ts): the
+      // bear swings twice as fast for half the damage, so rage per second
+      // doubles while white damage does not.
       source.resource = Math.min(
         source.maxResource,
         source.resource +
-          baseRage * (isWarrior ? talentMult * rageGenAuraMult(source) * seasonedCrit : 1),
+          baseRage *
+            (isWarrior ? talentMult * rageGenAuraMult(source) * seasonedCrit : 1) *
+            formAutoRageMult(source),
       );
     }
   }

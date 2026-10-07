@@ -259,7 +259,7 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       // feeds the autos in both forms; the paired offensive physical ability
       // bonus (+0.15, form attacks and bleeds) lives ONLY in
       // spec_output_tuning.ts, never CAT_FORM_DAMAGE_MULT/Wild Apex/armor/
-      // Marrowbreak's shield.
+      // Marrowbreak's heal.
       stats: { armorPct: 0.23, staPct: 0.25, apPct: 0.1 },
       global: { threatPct: 0.2 },
       ability: [

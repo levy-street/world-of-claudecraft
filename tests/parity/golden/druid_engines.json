@@ -9,8 +9,8 @@
     "Old Blood landed-strike bank across Wolf and Bruin with both payoffs",
     "Verdance completed-HoT bank and Overbloom harvest"
   ],
-  "draws": 10727,
-  "drawDigest": "b73c70df",
+  "draws": 10714,
+  "drawDigest": "347f8414",
   "frames": [
     {
       "tick": 0,
@@ -1872,85 +1872,85 @@
       "state": "8f7d3088",
       "events": "e4333285",
       "rng": {
-        "draws": 9455,
-        "digest": "b6861768"
+        "draws": 9456,
+        "digest": "30b78a5f"
       }
     },
     {
       "tick": 1100,
       "time": 55,
       "nextId": 1014,
-      "state": "7a653cc7",
-      "events": "49cdb0db",
+      "state": "bcf319d7",
+      "events": "36399040",
       "rng": {
-        "draws": 9596,
-        "digest": "1a557503"
+        "draws": 9594,
+        "digest": "a2a445a9"
       }
     },
     {
       "tick": 1120,
       "time": 56,
       "nextId": 1014,
-      "state": "6deaa44c",
+      "state": "66432c5f",
       "events": "8a500c1f",
       "rng": {
-        "draws": 9769,
-        "digest": "90e913fb"
+        "draws": 9768,
+        "digest": "e7fb2417"
       }
     },
     {
       "tick": 1140,
       "time": 57,
       "nextId": 1014,
-      "state": "5488d685",
+      "state": "f2e54afa",
       "events": "390d7b51",
       "rng": {
-        "draws": 9953,
-        "digest": "f24b2c21"
+        "draws": 9947,
+        "digest": "01773f24"
       }
     },
     {
       "tick": 1160,
       "time": 58,
       "nextId": 1014,
-      "state": "7fba4622",
-      "events": "5bf0bbf7",
+      "state": "5209f06a",
+      "events": "0e561987",
       "rng": {
-        "draws": 10144,
-        "digest": "456cbe85"
+        "draws": 10154,
+        "digest": "87971ceb"
       }
     },
     {
       "tick": 1180,
       "time": 59,
       "nextId": 1014,
-      "state": "ad22a41f",
-      "events": "ed572663",
+      "state": "0f2c1a69",
+      "events": "b648245a",
       "rng": {
-        "draws": 10315,
-        "digest": "6b687322"
+        "draws": 10312,
+        "digest": "961e1b69"
       }
     },
     {
       "tick": 1200,
       "time": 60,
       "nextId": 1014,
-      "state": "2c704405",
-      "events": "3cc970d1",
+      "state": "8962122b",
+      "events": "a13f77e5",
       "rng": {
-        "draws": 10499,
-        "digest": "47487796"
+        "draws": 10506,
+        "digest": "33981fbe"
       }
     },
     {
       "tick": 1220,
       "time": 61,
       "nextId": 1014,
-      "state": "46cbae57",
-      "events": "5cef8f2b",
+      "state": "ddeeaa96",
+      "events": "00ea4219",
       "rng": {
-        "draws": 10694,
-        "digest": "b4582545"
+        "draws": 10677,
+        "digest": "d54d06d7"
       }
     },
     {
@@ -1958,10 +1958,10 @@
       "time": 61.25,
       "nextId": 1014,
       "state": "96c64675",
-      "events": "a9c46f8d",
+      "events": "9f3ff5f5",
       "rng": {
-        "draws": 10727,
-        "digest": "b73c70df"
+        "draws": 10714,
+        "digest": "347f8414"
       },
       "label": "groveheart-harvest",
       "players": [
@@ -2603,8 +2603,8 @@
       "state": "96c64675",
       "events": "741638a5",
       "rng": {
-        "draws": 10727,
-        "digest": "b73c70df"
+        "draws": 10714,
+        "digest": "347f8414"
       },
       "label": "final",
       "players": [

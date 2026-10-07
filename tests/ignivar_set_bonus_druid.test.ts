@@ -608,29 +608,27 @@ describe('Cinderbark 4pc: Marrowbreak hits harder and the guard keeps the strike
     expect(sim.resolvedAbility('maul')?.def.id).toBe('marrowbreak');
     sim.player.gcdRemaining = 0;
     sim.player.resource = 20;
+    const hpBefore = sim.player.hp;
     sim.castAbility('maul');
-    return { sim, target };
+    return { sim, target, hpBefore };
   }
 
   it('below half health a wearer keeps the guard AND lands the strike with its threat', () => {
-    const { sim, target } = marrowbreakBelowHalf(true);
+    const { sim, target, hpBefore } = marrowbreakBelowHalf(true);
     expect(target.hp).toBeLessThan(target.maxHp);
     // The authored snap threat (flat 110, mult 2) rides the restored strike.
     expect(target.threat.get(sim.player.id) ?? 0).toBeGreaterThan(110);
-    const guard = expectDefined(sim.player.auras.find((aura) => aura.id === 'marrowbreak_guard'));
-    expect(guard.kind).toBe('absorb');
-    expect(guard.value).toBe(Math.round(sim.player.maxHp * 0.18));
-    expect(guard.duration).toBe(8);
+    // The guard heals for 18% of maximum health (no shield since pass 2).
+    expect(sim.player.hp).toBe(hpBefore + Math.round(sim.player.maxHp * 0.18));
     // Cost 15 spent, the guard's 15 rage refunded: parity at 20.
     expect(sim.player.resource).toBe(20);
   });
 
   it('below half health a non-wearer still gets the replacement (no strike, no threat)', () => {
-    const { sim, target } = marrowbreakBelowHalf(false);
+    const { sim, target, hpBefore } = marrowbreakBelowHalf(false);
     expect(target.hp).toBe(target.maxHp);
     expect(target.threat.get(sim.player.id)).toBeUndefined();
-    const guard = expectDefined(sim.player.auras.find((aura) => aura.id === 'marrowbreak_guard'));
-    expect(guard.value).toBe(Math.round(sim.player.maxHp * 0.18));
+    expect(sim.player.hp).toBe(hpBefore + Math.round(sim.player.maxHp * 0.18));
     expect(sim.player.resource).toBe(20);
   });
 
@@ -639,13 +637,14 @@ describe('Cinderbark 4pc: Marrowbreak hits harder and the guard keeps the strike
     const hpAfterFirst = target.hp;
     expect(hpAfterFirst).toBeLessThan(target.maxHp);
     sim.unequipItem('helmet'); // 4 worn pieces -> 3: the 4pc tier drops
-    sim.player.auras = sim.player.auras.filter((aura) => aura.id !== 'marrowbreak_guard');
+    sim.player.hp = Math.round(sim.player.maxHp * 0.4);
     bankOldBlood(sim, 3);
     sim.player.gcdRemaining = 0;
     sim.player.resource = 20;
+    const hpBeforeSecond = sim.player.hp;
     sim.castAbility('maul');
     expect(target.hp).toBe(hpAfterFirst); // the guard replaced the strike again
-    expect(sim.player.auras.some((aura) => aura.id === 'marrowbreak_guard')).toBe(true);
+    expect(sim.player.hp).toBe(hpBeforeSecond + Math.round(sim.player.maxHp * 0.18));
   });
 });
 
@@ -821,7 +820,7 @@ describe('the wearer literals against the authored copy', () => {
     const extend = ABILITIES.moonseed.effects.find((eff) => eff.type === 'extendDot');
     expect(extend && 'maxBonus' in extend ? extend.maxBonus : 0).toBe(6);
     const guard = ABILITIES.marrowbreak.effects.find((eff) => eff.type === 'druidMarrowbreakGuard');
-    expect(guard).toMatchObject({ belowFrac: 0.5, absorbPctMaxHp: 0.18, rage: 15 });
+    expect(guard).toMatchObject({ belowFrac: 0.5, healPctMaxHp: 0.18, rage: 15 });
     expect(ABILITIES.marrowbreak.threat).toEqual({ flat: 110, mult: 2 });
     const overbloom = ABILITIES.overbloom.effects.find((eff) => eff.type === 'druidOverbloom');
     expect(overbloom && 'harvestPct' in overbloom ? overbloom.harvestPct : 0).toBe(0.6);

@@ -20,7 +20,7 @@ import { meetsLevelRequirement } from '../item_level_req';
 import type { SimContext } from '../sim_context';
 import { duelJustEndedBetween } from '../social/duel';
 import type { Entity, WeaponProc, WeaponProcEffect, WeaponProcTrigger } from '../types';
-import { baseSwingSpeed, isCatForm } from './form_swing';
+import { baseSwingSpeed, isBearForm, isCatForm } from './form_swing';
 import { runTrinketTrigger } from './trinkets';
 
 // Roll every proc on the wielder's equipped mainhand that matches `trigger`, and
@@ -81,9 +81,13 @@ export function runWeaponProcs(
   const enchantProc = enchant?.weaponProc;
   if (!enchant || !enchantProc) return;
   // Cat Form has a fixed natural cadence; a slow carried stat stick must not
-  // multiply its proc frequency. Bear and ordinary swings keep item base speed.
+  // multiply its proc frequency. Bruin Form swings at half its weapon's speed,
+  // so it reads its real cadence too, or its doubled swing rate would double the
+  // procs per minute. Ordinary swings keep item base speed.
   const baseSpeed =
-    meleeHand === 'mainhand' && isCatForm(wielder) ? baseSwingSpeed(wielder) : item.weapon.speed;
+    meleeHand === 'mainhand' && (isCatForm(wielder) || isBearForm(wielder))
+      ? baseSwingSpeed(wielder)
+      : item.weapon.speed;
   const chance = Math.min(1, Math.max(0, (enchantProc.ppm * baseSpeed) / 60));
   if (!ctx.rng.chance(chance)) return;
   // ONE buff per wielder, keyed by the enchant alone: a dual-wielder with both

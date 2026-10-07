@@ -348,6 +348,18 @@ describe("3. Nature's Boon", () => {
     // test (which forces the roll through armBoon) stays green.
     const { sim, player } = rig('feral');
     const ctx = rawCtx(sim);
+    // In Cat Form: the per-swing chance scales with the swing's base interval
+    // (4 procs per minute), and the cat's fixed 1.0 sec swing is the 1-in-15.
+    player.auras.push({
+      id: 'cat_form',
+      name: 'Cat Form',
+      kind: 'form_cat',
+      remaining: 3600,
+      duration: 3600,
+      value: 0,
+      sourceId: player.id,
+      school: 'nature',
+    });
     const swings = 600;
     let armed = 0;
     for (let swing = 0; swing < swings; swing++) {

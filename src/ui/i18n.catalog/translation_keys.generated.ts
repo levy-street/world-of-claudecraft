@@ -1742,6 +1742,7 @@ export type TranslationKeyFlat =
   | 'entities.abilities.healing_stream.name'
   | 'entities.abilities.healing_touch.description'
   | 'entities.abilities.healing_touch.name'
+  | 'entities.abilities.healing_touch.specNote_restoration'
   | 'entities.abilities.healing_wave.description'
   | 'entities.abilities.healing_wave.name'
   | 'entities.abilities.hemorrhage.description'

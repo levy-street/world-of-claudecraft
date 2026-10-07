@@ -1176,7 +1176,15 @@ const classAbilityNamesEn = {
             'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, Moonseed becomes Moonsurge and Skyfall becomes Sunwake.',
         },
       ],
-      ['healing_touch', 'Wildmend', 'Heals a friendly target for {damage}.'],
+      [
+        'healing_touch',
+        'Wildmend',
+        'Heals a friendly target for {damage}.',
+        {
+          restoration:
+            "Each completed cast adds 1 Verdance (max 3). Banked Verdance shortens this cast: 2.2 sec at 1 Verdance, 1.9 sec at 2, and 1.5 sec at 3. Nature's Boon makes it instant, free, and 25% stronger.",
+        },
+      ],
       [
         'mark_of_the_wild',
         'Wildward',
@@ -1199,7 +1207,7 @@ const classAbilityNamesEn = {
         'Heals the target for {damage} over 12 sec.',
         {
           restoration:
-            'Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Fleetmend becomes Overbloom.',
+            'Each cast adds 1 Verdance (max 3), including a refresh of a bloom already ticking. At 3 Verdance, Fleetmend becomes Overbloom.',
         },
       ],
       [
@@ -1211,7 +1219,7 @@ const classAbilityNamesEn = {
       [
         'bear_form',
         'Bruin Form',
-        'Shapeshift into a bear: armor +110%, maximum health +30%, greatly increased attack power, your attacks build rage and generate 30% more threat. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form.',
+        'Shapeshift into a bear: armor +110%, maximum health +30%, greatly increased attack power, your attacks build rage and generate 30% more threat. You swing twice as fast for half the damage per swing, and each swing builds double rage. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form.',
       ],
       [
         'maul',
@@ -1219,7 +1227,7 @@ const classAbilityNamesEn = {
         'A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Activates on your next swing. Bruin Form only.',
         {
           feral:
-            'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead shields you for 18% of your maximum health and refunds 15 rage.',
+            'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead heals you for 18% of your maximum health and refunds 15 rage.',
         },
       ],
       [
@@ -1261,8 +1269,11 @@ const classAbilityNamesEn = {
       [
         'regrowth',
         'Second Bloom',
-        'Heals a friendly target for {damage} and an additional amount over 21 sec.',
-        { restoration: 'Planting a NEW bloom adds 1 Verdance (max 5).' },
+        'Heals a friendly target for {damage} and an additional amount over 15 sec. If the effect runs its full duration, it heals the target again for the same amount as the initial heal.',
+        {
+          restoration:
+            'Each cast adds 1 Verdance (max 3), including a refresh of a bloom already ticking.',
+        },
       ],
       ['barkskin', 'Oakhide', 'Your skin hardens like bark, increasing armor by 20% for 15 sec.'],
       // Tank defensive cooldowns (paladin / druid), one distinct mechanic each.
@@ -1587,7 +1598,7 @@ const classAbilityNamesEn = {
       [
         'swiftmend',
         'Fleetmend',
-        'Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Wildbloom and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)',
+        'Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Wildbloom, Second Bloom, and Wildmend casts each add 1 Verdance; at 3 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)',
       ],
       [
         'moonlash',
@@ -1607,7 +1618,7 @@ const classAbilityNamesEn = {
       [
         'marrowbreak',
         'Marrowbreak',
-        'Spends your 3 Old Blood for a heavy, high-threat strike of {damage} damage. Below half health it instead shields you for 18% of your maximum health for 8 sec and refunds 15 rage.',
+        'Spends your 3 Old Blood for a heavy, high-threat strike of {damage} damage. Below half health it instead heals you for 18% of your maximum health and refunds 15 rage.',
       ],
       [
         'wildwake',
@@ -1622,7 +1633,7 @@ const classAbilityNamesEn = {
       [
         'overbloom',
         'Overbloom',
-        'Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom.',
+        'Spends your 3 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom.',
       ],
       [
         'summon_imp',
