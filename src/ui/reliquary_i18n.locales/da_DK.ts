@@ -148,7 +148,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_vanguard_gallery: {
     name: 'Fortropsgalleri',
-    desc: 'Krigsførelsens sæson 2-sæt for hver specialisering og våben, købt for ære.',
+    desc: 'Krigsførelsens sæson 2-sæt for hver specialisering og våben, vundet fra PvP-rækken i Det Ugentlige Hvælving.',
   },
   horizons_vault_of_ages: {
     name: 'Tidsaldrenes hvælving',

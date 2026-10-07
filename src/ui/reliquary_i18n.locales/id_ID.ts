@@ -148,7 +148,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_vanguard_gallery: {
     name: 'Galeri Garda Depan',
-    desc: 'Set spesialisasi dan senjata Peperangan Musim 2, dibeli dengan kehormatan.',
+    desc: 'Set spesialisasi dan senjata Peperangan Musim 2, didapat dari baris PvP di Gudang Mingguan.',
   },
   horizons_vault_of_ages: {
     name: 'Ruang Simpan Zaman',

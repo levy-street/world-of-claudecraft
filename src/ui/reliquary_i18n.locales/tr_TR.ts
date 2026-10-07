@@ -148,7 +148,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_vanguard_gallery: {
     name: 'Öncü Galerisi',
-    desc: 'Savaş 2. sezonun uzmanlık setleri ve silahları, onurla satın alınır.',
+    desc: 'Savaş 2. sezonun uzmanlık setleri ve silahları, Haftalık Kasa’nın PvP sırasından kazanılır.',
   },
   horizons_vault_of_ages: {
     name: 'Çağlar Hazinesi',

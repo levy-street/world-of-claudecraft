@@ -171,7 +171,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_vanguard_gallery: {
     name: 'Галерея Авангарда',
-    desc: 'Комплекты специализаций и оружие второго сезона Боевой мощи, покупаются за честь.',
+    desc: 'Комплекты специализаций и оружие второго сезона Боевой мощи, добываемые из PvP-ряда Еженедельного хранилища.',
   },
   // Vault of Ages (Phase 21): composed from the shipped vault noun (the
   // col_reliquary_complete title reads Хранитель Сокровищницы).

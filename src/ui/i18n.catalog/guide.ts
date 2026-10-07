@@ -2276,6 +2276,13 @@ export const guideStrings = {
     vanguardHeading: 'Vanguard gear: Warfare Season 2',
     vanguardBody:
       "Vanguard gear is the second season of Warfare gear, sold by the same two quartermasters above the original tier, which stays on sale. Every spec has its own Vanguard set of five pieces, for the head, shoulders, chest, legs and hands, and the shop lists only the three sets your class can wear, followed by the Vanguard weapons you can wield. A Vanguard piece carries the same Warfare ratings as the original tier at a higher item level, and each set has two bonuses, at two and four pieces, that change one of your spec's abilities. Unlike the original sets, those bonuses work everywhere, monsters included, but they are built for fighting players, so a raid set stays the better choice inside a raid.",
+    // The Weekly Vault ruling (2026-10-07): Season 2 left the quartermasters and
+    // is now won only from the PvP row of the Weekly Vault (weeklyLootPool in
+    // src/sim/weekly_rewards.ts). vanguardBody, which said it was sold, is
+    // retired in scripts/i18n_retired_keys.mjs; this successor says where it
+    // comes from and keeps the rest of the prose.
+    vanguardBodyWeeklyVault:
+      "Vanguard gear is the second season of Warfare gear, and it is not sold: the only way to get it is the PvP row of the Weekly Vault, filled by winning ranked arena or rated battleground matches, while the original tier stays on sale at the two quartermasters. Every spec has its own Vanguard set of five pieces, for the head, shoulders, chest, legs and hands, and a PvP choice only ever offers the sets your class can wear and the Vanguard weapons you can wield, alongside original-tier pieces. A Vanguard piece carries the same Warfare ratings as the original tier at a higher item level, and each set has two bonuses, at two and four pieces, that change one of your spec's abilities. Unlike the original sets, those bonuses work everywhere, monsters included, but they are built for fighting players, so a raid set stays the better choice inside a raid.",
   },
 
   // The Thornhollow Fields 5v5 capture-the-flag battleground page

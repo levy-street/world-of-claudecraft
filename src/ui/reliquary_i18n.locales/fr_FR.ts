@@ -148,7 +148,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_vanguard_gallery: {
     name: 'Galerie de l’Avant-garde',
-    desc: 'Les ensembles de spécialisation et les armes de la saison 2 de Guerre, achetés avec l’honneur.',
+    desc: 'Les ensembles de spécialisation et les armes de la saison 2 de Guerre, obtenus dans la rangée JcJ du Coffre hebdomadaire.',
   },
   horizons_vault_of_ages: {
     name: 'Chambre forte des âges',

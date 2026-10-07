@@ -173,7 +173,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_vanguard_gallery: {
     name: 'ヴァンガードギャラリー',
-    desc: 'ウォーフェア・シーズン2の専門化セットと武器。名誉で購入します。',
+    desc: 'ウォーフェア・シーズン2の専門化セットと武器。週間宝物庫のPvP枠から手に入ります。',
   },
   // Vault of Ages (Phase 21): composed from the shipped vault noun (the
   // col_reliquary_complete title reads 宝物庫のキュレーター).

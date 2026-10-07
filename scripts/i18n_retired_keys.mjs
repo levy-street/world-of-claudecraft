@@ -305,6 +305,12 @@ export const RETIRED_KEYS = [
   'guide.combat.unstuckBody',
   'guide.commandsPage.unstuck',
   'guide.glossary.unstuckDef',
+  // -- v0.45.0 Season 2 to the Weekly Vault. Warfare Season 2 left the honor
+  // quartermasters and is won only from the PvP row of the Weekly Vault, so this
+  // row (which said the quartermasters sell it) was superseded by
+  // vanguardBodyWeeklyVault rather than reworded, and its five non-Latin fills
+  // rode the same change.
+  'guide.arenaPage.vanguardBody',
 ];
 
 export const RETIRED_KEY_SET = new Set(RETIRED_KEYS);

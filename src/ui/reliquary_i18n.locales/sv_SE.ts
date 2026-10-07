@@ -148,7 +148,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_vanguard_gallery: {
     name: 'Förtruppsgalleri',
-    desc: 'Krigföringens säsong 2-set för varje specialisering och vapen, köpta för ära.',
+    desc: 'Krigföringens säsong 2-set för varje specialisering och vapen, vunna från PvP-raden i det veckovisa valvet.',
   },
   horizons_vault_of_ages: {
     name: 'Tidsåldrarnas valv',

@@ -9,25 +9,70 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "guide.arenaPage.vanguardBodyWeeklyVault",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ],
+  "es_ES": [
+    "guide.arenaPage.vanguardBodyWeeklyVault",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ],
+  "fr_FR": [
+    "guide.arenaPage.vanguardBodyWeeklyVault",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ],
+  "fr_CA": [
+    "guide.arenaPage.vanguardBodyWeeklyVault",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "guide.arenaPage.vanguardBodyWeeklyVault",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ],
+  "de_DE": [
+    "guide.arenaPage.vanguardBodyWeeklyVault",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "guide.arenaPage.vanguardBodyWeeklyVault",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "guide.arenaPage.vanguardBodyWeeklyVault",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ],
+  "nl_NL": [
+    "guide.arenaPage.vanguardBodyWeeklyVault",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ],
+  "pl_PL": [
+    "guide.arenaPage.vanguardBodyWeeklyVault",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ],
+  "id_ID": [
+    "guide.arenaPage.vanguardBodyWeeklyVault",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ],
+  "tr_TR": [
+    "guide.arenaPage.vanguardBodyWeeklyVault",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ],
+  "sv_SE": [
+    "guide.arenaPage.vanguardBodyWeeklyVault",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ],
+  "vi_VN": [
+    "guide.arenaPage.vanguardBodyWeeklyVault",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ],
+  "da_DK": [
+    "guide.arenaPage.vanguardBodyWeeklyVault",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
+  ]
 };

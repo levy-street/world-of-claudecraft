@@ -173,7 +173,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_vanguard_gallery: {
     name: '선봉대 갤러리',
-    desc: '명예로 구입하는 워페어 시즌 2 전문화 세트와 무기.',
+    desc: '주간 금고의 PvP 줄에서 얻는 워페어 시즌 2 전문화 세트와 무기.',
   },
   // Vault of Ages (Phase 21): composed from the shipped vault noun (the
   // col_reliquary_complete title reads 보물고의 큐레이터).

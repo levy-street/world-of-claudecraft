@@ -46,7 +46,6 @@ import {
   SET_WARFARE_STORMBOUND,
   SET_WARFARE_THORNHIDE,
 } from './item_sets';
-import { SEASON2_STOCK } from './pvp_honor_season2';
 
 export const FURY_NPC_ID = 'fury';
 // Reserved so adding FURY does not shift the deterministic nextId sequence used
@@ -874,15 +873,14 @@ export const FURY_STOCK: readonly string[] = Object.keys(WARFARE_ITEMS);
 // honor purchase.
 export const WARFARE_TRINKET_STOCK: readonly string[] = ['medallion_of_defiance', 'duelists_brand'];
 
-// What both honor quartermasters sell: the Warfare entry tier above, then Warfare
-// Season 2 (content/pvp_honor_season2.ts), the item-level-35 spec sets and
-// weapons, with the two honor trinkets between them (the release pins the entry
-// tier as the head of the list and Season 2 as its tail). FURY_STOCK keeps
-// meaning the entry tier everywhere it is read.
+// What both honor quartermasters sell: the Warfare entry tier above, then the
+// two honor trinkets. Warfare Season 2 (content/pvp_honor_season2.ts) is NOT
+// sold for honor: its only source is the PvP row of the Weekly Vault
+// (weeklyLootPool in src/sim/weekly_rewards.ts). FURY_STOCK keeps meaning the
+// entry tier everywhere it is read.
 export const HONOR_QUARTERMASTER_STOCK: readonly string[] = [
   ...FURY_STOCK,
   ...WARFARE_TRINKET_STOCK,
-  ...SEASON2_STOCK,
 ];
 
 export const FURY_NPC: NpcDef = {

@@ -36,7 +36,10 @@ content and equipment tiers:
   previous raid tier (Nythraxis, item level 29), ungated by raid kills and with no
   Heroic rung, filtered to what the character's class can wear.
 - PvP: 1, 3 and 5 ranked arena or rated battleground wins. Practice matches,
-  developer-ended battlegrounds and forfeits do not count.
+  developer-ended battlegrounds and forfeits do not count. The row pays Warfare
+  gear: the honor quartermasters' entry tier plus Warfare Season 2 ("Vanguard"),
+  filtered to what the character's class can wear. This row is Season 2's only
+  source; no vendor sells it (`docs/design/warfare-season-2.md`).
 
 The window shows actual candidates with quality, item level and tooltips; current
 progress and exact eligible loot pools remain below. New rolls exclude every item
