@@ -4,7 +4,9 @@
 // tank guard (docs/design/warfare-season-2.md, "The PvE promise").
 import { describe, expect, it } from 'vitest';
 import { ABILITIES } from '../src/sim/content/classes';
+import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { DEV_KIT_ROLES } from '../src/sim/content/dev_kit_roles';
+import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { ITEM_SETS } from '../src/sim/content/item_sets';
 import { FURY_STOCK, HONOR_QUARTERMASTER_STOCK } from '../src/sim/content/pvp_honor';
 import {
@@ -21,7 +23,7 @@ import {
 import { RELIQUARY_PAGES_BY_ID } from '../src/sim/content/reliquary';
 import type { TalentAllocation } from '../src/sim/content/talents';
 import { VANGUARD_SET_ENGINE_BONUSES } from '../src/sim/content/vanguard_set_bonuses';
-import { DUNGEON_X_THRESHOLD, ITEMS, MOBS, NPCS, QUESTS } from '../src/sim/data';
+import { ALL_RECIPES, DUNGEON_X_THRESHOLD, ITEMS, MOBS, NPCS, QUESTS } from '../src/sim/data';
 import { bestEpicGearFor } from '../src/sim/dev/bis_gear';
 import { canEquipItem, maxArmorTypeForClass } from '../src/sim/equipment_rules';
 import {
@@ -130,11 +132,22 @@ describe('the Season 2 source: the PvP row of the Weekly Vault, and nothing else
     }
   });
 
-  it('drops from no mob and rewards from no quest', () => {
+  it('drops from no mob (world bosses and heroic bosses included), crafts from no recipe, and rewards from no quest or delve shop', () => {
+    // World boss loot rolls off the boss's own MOBS loot table, so this covers it.
     for (const [mobId, mob] of Object.entries(MOBS)) {
       const dropped = (mob.loot ?? []).filter((e) => e.itemId && season2.has(e.itemId));
       expect(dropped, mobId).toEqual([]);
     }
+    for (const [mobId, rows] of Object.entries(HEROIC_BOSS_LOOT)) {
+      const dropped = rows.filter((e) => e.itemId && season2.has(e.itemId));
+      expect(dropped, `heroic ${mobId}`).toEqual([]);
+    }
+    for (const [delveId, rows] of Object.entries(DELVE_SHOPS)) {
+      const sold = rows.filter((e) => season2.has(e.itemId));
+      expect(sold, `delve shop ${delveId}`).toEqual([]);
+    }
+    const crafted = ALL_RECIPES.filter((r) => season2.has(r.resultItemId)).map((r) => r.id);
+    expect(crafted).toEqual([]);
     for (const [questId, quest] of Object.entries(QUESTS)) {
       const rewards = JSON.stringify(quest.itemRewards ?? {});
       for (const id of SEASON2_STOCK) expect(rewards.includes(`"${id}"`), questId).toBe(false);

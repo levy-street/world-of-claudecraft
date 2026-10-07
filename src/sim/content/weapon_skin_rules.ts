@@ -166,7 +166,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   riftwarden_voidblade: 'sword',
   dawnkeeper_consecrated_mace: 'mace',
   forgemaster_crag_cleaver: 'axe',
-  // Warfare Season 2 honor weapons (content/pvp_honor_season2.ts).
+  // Warfare Season 2 weapons (Weekly Vault PvP row) (content/pvp_honor_season2.ts).
   vanguard_verdict_greatsword: 'sword',
   vanguard_oath_blade: 'sword',
   vanguard_fang_dagger: 'dagger',

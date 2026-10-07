@@ -98,6 +98,11 @@ everywhere. These rules hold them together:
   `src/sim/weekly_rewards.ts`). The pieces carry no `priceHonor`, stay soulbound with no sell
   value, and the Reliquary's Vanguard Gallery names the `weekly_vault_pvp` activity on every
   slot. Pinned by `tests/warfare_season2.test.ts`.
+- **What that trades.** Every eligible piece in the row is equally likely, so Season 2 shares the
+  odds with the entry tier the class can wear, and a full four-piece bonus takes many weeks of
+  PvP choices. The vault also caps a roll at the character's level plus three, so a character
+  more than three levels below Season 2's required level rolls only entry-tier pieces. Honor
+  itself now buys only the entry tier and the two trinkets.
 - **Historical: the honor prices it shipped with** (removed 2026-10-07). Armor, per slot, 1.5
   times the entry tier:
 

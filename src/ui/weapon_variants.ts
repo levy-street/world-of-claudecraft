@@ -175,7 +175,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   forgefire_spire: 'adv_staff',
   wand_of_quenched_sparks: 'adv_wand',
 
-  // ---- Warfare Season 2 honor weapons (pvp_honor_season2.ts) ------------------
+  // ---- Warfare Season 2 vault weapons (pvp_honor_season2.ts) ------------------
   // Held models reuse shipped GLBs.
   vanguard_verdict_greatsword: 'adv_sword_2handed',
   vanguard_oath_blade: 'adv_sword_1handed',
