@@ -13142,7 +13142,7 @@ export const pt_BR: EnTranslations = {
       },
       "trailbreak": {
         "name": "Quebra-Trilha",
-        "description": "Salta 12 metros para trás. Se você tiver Ímpeto de Caça, ele é renovado e prepara a Reentrada por 12 s."
+        "description": "Salta 25 metros para trás e liberta você de enraizamentos e lentidões de movimento. Se você tiver Ímpeto de Caça, ele é renovado e prepara a Reentrada por 12 s."
       },
       "wildheart": {
         "name": "Coração Selvagem",
@@ -13709,7 +13709,7 @@ export const pt_BR: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "Forma do Corcel",
-        "description": "Assumi o aspecto do corcel e aumentai vossa velocidade de movimento em 30% por 30 min. Enquanto estiver ativo, sofrer dano vos desnorteia, reduzindo vossa velocidade de movimento pela metade por 4 s (cada acerto renova a duração)."
+        "description": "Assumi o aspecto do corcel e aumentai vossa velocidade de movimento em 30% por 30 min. Enquanto estiver ativo, sofrer dano vos desnorteia, reduzindo vossa velocidade de movimento pela metade por 2 s (cada acerto renova a duração)."
       },
       "aimed_shot": {
         "name": "Puxada Longa",

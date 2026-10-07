@@ -353,7 +353,7 @@ the class-owner review, but the combat purpose of each choice should remain inta
 
 | Choice | Starting effect | Player reason to choose it |
 |---|---|---|
-| Tactical Retreat | Trailbreak gains a second charge. Using it removes roots and movement slows. | Reliable escape and melee re-entry control. |
+| Tactical Retreat | Trailbreak gains a second charge (every Trailbreak removes roots and movement slows since the v0.45 mobility pass). | Reliable escape and melee re-entry control. |
 | Enduring Courser | Activating Courser's Guise grants 60% movement speed for 3 seconds, then returns to its normal speed. Taking damage ends only the burst, not the aspect. The burst can occur once every 20 seconds. | Long movement and predictable repositioning. |
 | Predator's Pace | A successful Focus generator grants 20% movement speed for 3 seconds. This can occur once every 8 seconds. | Movement that follows the normal rotation without another button. |
 
@@ -458,3 +458,24 @@ against the shared-row and mobile-responsiveness rules above.
 - No shared option is dead for any specialization.
 - The required rotation fits a mobile action layout and has no short reaction checks.
 - PBE Wave C validates pet trigger safety, melee uptime, Focus pacing, and PvP control edges.
+
+## Mobility pass (v0.45)
+
+An owner retune of the shared Hunter movement kit, applied on top of the design above:
+
+- Courser's Guise's damage daze lasts 2 seconds (was 4), still refreshed, never stacked, by each
+  hit (`COURSER_DAZE_DURATION` in `src/sim/combat/hunter_shared.ts`).
+- Trailbreak leaps 25 yards (was 12) on a 20-second cooldown (was 15). Every Trailbreak, not only
+  Tactical Retreat's, removes the Hunter's breakable roots and movement slows
+  (`onHunterTrailbreak`); encounter-owned unbreakable control is untouched, and an unbreakable root
+  still refuses the cast. Tactical Retreat keeps its second charge, and the Farsight 2-piece's
+  4-second cut now reads 20 to 16.
+- Every Hunter ability that had an 8-yard minimum range now has 4 yards: Measured Shot, Fell Shot,
+  Venom Barb, Rattling Shot, Long Draw, Fevered Draw, Splitshot, Startle Shot, Bloodhook, Drakesting,
+  and Hushing Shot. Auto Shot's dead zone is 4 yards too (`CLASSES.hunter.ranged.minRange`, was 8),
+  and the row sweep (`scripts/lib/sweep_engagement.mjs`) stations a Hunter outside it. Auto Shot is
+  resolved before the melee swing, so between 4 yards and melee reach a Hunter auto-attacks with
+  the bow; inside 4 yards it swings its melee weapon.
+
+Pinned by `tests/hunter_mobility_pass.test.ts`, `tests/cheetah_daze.test.ts`, and
+`tests/hunter_trailbreak_terrain.test.ts`.

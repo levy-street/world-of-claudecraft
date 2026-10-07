@@ -13142,7 +13142,7 @@ export const vi_VN: EnTranslations = {
       },
       "trailbreak": {
         "name": "Cắt Dấu",
-        "description": "Nhảy lùi 12 mét. Nếu bạn có Đà Săn, nó được làm mới và nạp sẵn Tái Nhập trong 12 giây."
+        "description": "Nhảy lùi 25 mét và thoát khỏi hiệu ứng trói chân cùng làm chậm di chuyển. Nếu bạn có Đà Săn, nó được làm mới và nạp sẵn Tái Nhập trong 12 giây."
       },
       "wildheart": {
         "name": "Tim Hoang Dã",
@@ -13709,7 +13709,7 @@ export const vi_VN: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "Lốt Tuấn Mã",
-        "description": "Khoác lên lốt tuấn mã, tăng tốc độ di chuyển của bạn thêm 30% trong 30 phút. Trong khi hiệu ứng còn hoạt động, nhận sát thương sẽ khiến bạn choáng váng, giảm một nửa tốc độ di chuyển trong 4 giây (mỗi đòn trúng làm mới hiệu ứng choáng váng này)."
+        "description": "Khoác lên lốt tuấn mã, tăng tốc độ di chuyển của bạn thêm 30% trong 30 phút. Trong khi hiệu ứng còn hoạt động, nhận sát thương sẽ khiến bạn choáng váng, giảm một nửa tốc độ di chuyển trong 2 giây (mỗi đòn trúng làm mới hiệu ứng choáng váng này)."
       },
       "aimed_shot": {
         "name": "Kéo Cung Dài",

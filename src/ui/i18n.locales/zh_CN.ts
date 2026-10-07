@@ -4884,7 +4884,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '化身为貂的形态，将你的躲闪几率提高 8%，持续 30 分钟。',
   'entities.abilities.aspect_of_the_cheetah.name': '骏马之姿',
   'entities.abilities.aspect_of_the_cheetah.description':
-    '化身为骏马的形态，将你的移动速度提高 30%，持续 30 分钟。生效期间，受到伤害会使你昏乱，移动速度降低 50%，持续 4 秒（每次命中都会刷新昏乱状态）。',
+    '化身为骏马的形态，将你的移动速度提高 30%，持续 30 分钟。生效期间，受到伤害会使你昏乱，移动速度降低 50%，持续 2 秒（每次命中都会刷新昏乱状态）。',
   'entities.abilities.aimed_shot.name': '引弓长射',
   'entities.abilities.aimed_shot.description':
     '射击目标，造成 {damage} 点物理伤害。伤害随远程攻击强度提升。',
@@ -15258,7 +15258,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '为一个友方目标恢复{damage}点生命值。治疗量随法术强度提高。将过量治疗前的完整治疗量加入愈合水流，最多为目标最大生命值的30%。',
   'entities.abilities.tidecall.name': '潮汐召唤',
   'entities.abilities.trailbreak.description':
-    '向后跃开且不丢失专精状态。野战技艺还会为下一次重返战场做好准备。',
+    '向后跃出25码，并解除定身和移动减速效果。若你拥有狩猎势能，则将其刷新，并使你获得蓄势返场，持续12秒。',
   'entities.abilities.trailbreak.name': '断迹',
   'entities.abilities.umbral_anchor.description':
     '首次施放：在脚下锚定暗影，持续5分钟。在40码内再次施放可返回锚点，消耗锚点并触发45秒冷却。',

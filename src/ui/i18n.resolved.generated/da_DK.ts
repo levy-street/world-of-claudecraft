@@ -13142,7 +13142,7 @@ export const da_DK: EnTranslations = {
       },
       "trailbreak": {
         "name": "Sporbrud",
-        "description": "Spring 12 meter baglæns. Har du Jagtfart, fornyes den og gør Genindtræden klar i 12 sek."
+        "description": "Spring 25 meter baglæns og bryd fri af rodfæstelser og bevægelsesnedsættelser. Har du Jagtfart, fornyes den og gør Genindtræden klar i 12 sek."
       },
       "wildheart": {
         "name": "Vildhjerte",
@@ -13709,7 +13709,7 @@ export const da_DK: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "Gangerens Skikkelse",
-        "description": "Antag gangerens skikkelse og øg jeres bevægelseshastighed med 30% i 30 min. Mens den er aktiv, omtåger skade dig, så din bevægelseshastighed reduceres med 50% i 4 sek. (hvert træf genopfrisker omtågningen)."
+        "description": "Antag gangerens skikkelse og øg jeres bevægelseshastighed med 30% i 30 min. Mens den er aktiv, omtåger skade dig, så din bevægelseshastighed reduceres med 50% i 2 sek. (hvert træf genopfrisker omtågningen)."
       },
       "aimed_shot": {
         "name": "Langt Optræk",

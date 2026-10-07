@@ -13142,7 +13142,7 @@ export const fr_FR: EnTranslations = {
       },
       "trailbreak": {
         "name": "Brise-piste",
-        "description": "Bondissez de 12 mètres en arrière. Si vous avez l'Élan de chasse, il est rafraîchi et prépare la Rentrée pendant 12 s."
+        "description": "Bondissez de 25 mètres en arrière et libérez-vous des immobilisations et des ralentissements. Si vous avez l'Élan de chasse, il est rafraîchi et prépare la Rentrée pendant 12 s."
       },
       "wildheart": {
         "name": "Cœur sauvage",
@@ -13709,7 +13709,7 @@ export const fr_FR: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "Aspect du coursier",
-        "description": "Adopte l'aspect du coursier et augmente votre vitesse de déplacement de 30% pendant 30 min. Tant que cet aspect est actif, subir des dégâts vous étourdit, réduisant de moitié votre vitesse de déplacement pendant 4 s (chaque coup renouvelle l'étourdissement)."
+        "description": "Adopte l'aspect du coursier et augmente votre vitesse de déplacement de 30% pendant 30 min. Tant que cet aspect est actif, subir des dégâts vous étourdit, réduisant de moitié votre vitesse de déplacement pendant 2 s (chaque coup renouvelle l'étourdissement)."
       },
       "aimed_shot": {
         "name": "Tir tendu",

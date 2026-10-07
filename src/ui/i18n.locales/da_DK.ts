@@ -7624,7 +7624,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Skyder målet for {damage} Arkan skade. Skaden stiger med angrebsstyrke på afstand.',
   'entities.abilities.arcane_shot.name': 'Grumt Skud',
   'entities.abilities.aspect_of_the_cheetah.description':
-    'Antag gangerens skikkelse og øg jeres bevægelseshastighed med 30% i 30 min. Mens den er aktiv, omtåger skade dig, så din bevægelseshastighed reduceres med 50% i 4 sek. (hvert træf genopfrisker omtågningen).',
+    'Antag gangerens skikkelse og øg jeres bevægelseshastighed med 30% i 30 min. Mens den er aktiv, omtåger skade dig, så din bevægelseshastighed reduceres med 50% i 2 sek. (hvert træf genopfrisker omtågningen).',
   'entities.abilities.aspect_of_the_cheetah.name': 'Gangerens Skikkelse',
   'entities.abilities.aspect_of_the_hawk.description':
     'Antag kærhøgens skikkelse og øg jeres angrebsstyrke med {buff} i 30 min.',
@@ -15672,7 +15672,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stampede.description':
     'Tilkalder 3 bæster i 12 sek. Hvert angriber hvert 2. sek. for {damage} fysisk skade. Den viste skade inkluderer 8% af din afstandsangrebskraft før kæledyrsskadebonusser. Bæsterne fastlåser Flokvildskabet ved tilkaldelsen og får 10% skade per stak. Mens Vildt Spring er under nedkøling, har vellykkede Flokbefalinger 20% chance for at nulstille det, garanteret efter 5 mislykkede chancer. Det kan ikke nulstilles, mens bæsterne er aktive. (Flokherre)',
   'entities.abilities.trailbreak.description':
-    'Spring 12 meter baglæns. Har du Jagtfart, fornyes den og gør Genindtræden klar i 12 sek.',
+    'Spring 25 meter baglæns og bryd fri af rodfæstelser og bevægelsesnedsættelser. Har du Jagtfart, fornyes den og gør Genindtræden klar i 12 sek.',
   'entities.abilities.unleash_beast.description':
     'Forbruger 3 Flokvildskab, efter at dit kæledyr har slået for 83 til 105 fysisk skade og rystet enhver fjende inden for 6 meter for 26 til 34. Slaget og rystelsen bruger Flokvildskabets fulde kæledyrsskadebonus på 30% og stiger med kæledyrets angrebskraft. I de følgende 8 sek. gør kæledyret 25% mere skade, angriber 35% hurtigere og får Grumt Skud til at ramme op til 2 nærliggende fjender.',
   'entities.abilities.wildheart.description': 'Genopretter straks 30% af din maksimale sundhed.',

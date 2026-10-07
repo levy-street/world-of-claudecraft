@@ -9442,7 +9442,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Assumete l'aspetto della martora e aumentate la vostra probabilità di schivata dell'8% per 30 min.",
   'entities.abilities.aspect_of_the_cheetah.name': 'Sembianze del Corsiero',
   'entities.abilities.aspect_of_the_cheetah.description':
-    "Assumete l'aspetto del corsiero e aumentate la vostra velocità di movimento del 30% per 30 min. Mentre è attivo, subire danni vi frastorna, dimezzando la vostra velocità di movimento per 4 sec (ogni colpo rinnova lo stordimento).",
+    "Assumete l'aspetto del corsiero e aumentate la vostra velocità di movimento del 30% per 30 min. Mentre è attivo, subire danni vi frastorna, dimezzando la vostra velocità di movimento per 2 sec (ogni colpo rinnova lo stordimento).",
   'entities.abilities.aimed_shot.name': 'Tiro Teso',
   'entities.abilities.aimed_shot.description':
     "Colpisce il bersaglio per {damage} danni Fisici. Il danno aumenta con la potenza d'attacco a distanza.",
@@ -16347,7 +16347,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stampede.description':
     "Evoca 3 bestie per 12 s. Ognuna attacca ogni 2 s per {damage} danni Fisici. I danni mostrati includono l'8% della tua potenza d'attacco a distanza prima dei bonus ai danni del famiglio. Le bestie fissano la Ferocia del Branco all'evocazione, guadagnando il 10% di danni per accumulo. Mentre Fuggifuggi è in recupero, i Comandi del Branco riusciti hanno il 20% di probabilità di azzerarlo, garantito dopo 5 tentativi falliti. Non può azzerarsi mentre le bestie sono attive. (Signore del Branco)",
   'entities.abilities.trailbreak.description':
-    "Balza 12 metri all'indietro. Se hai Slancio di Caccia, lo rinnova e prepara il Rientro per 12 s.",
+    "Balza 25 metri all'indietro e liberati da immobilizzazioni e rallentamenti. Se hai Slancio di Caccia, lo rinnova e prepara il Rientro per 12 s.",
   'entities.abilities.unleash_beast.description':
     "Consuma 3 Ferocia del Branco dopo che il tuo famiglio ha colpito per 83-105 danni Fisici e scosso ogni nemico entro 6 metri per 26-34. Il colpo e la scossa usano il bonus completo del 30% ai danni del famiglio della Ferocia del Branco e aumentano con la potenza d'attacco del famiglio. Per gli 8 s successivi il famiglio infligge il 25% di danni in più, attacca il 35% più velocemente e fa sì che il Tiro Nefasto colpisca fino a 2 nemici vicini.",
   'entities.abilities.wildheart.description':

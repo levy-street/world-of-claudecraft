@@ -13142,7 +13142,7 @@ export const nl_NL: EnTranslations = {
       },
       "trailbreak": {
         "name": "Spoorbreuk",
-        "description": "Spring 12 meter achterwaarts. Als je Jachtvaart hebt, wordt die vernieuwd en maakt de Terugkeer 12 sec. gereed."
+        "description": "Spring 25 meter achterwaarts en bevrijd je van wortels en vertragingen. Als je Jachtvaart hebt, wordt die vernieuwd en maakt de Terugkeer 12 sec. gereed."
       },
       "wildheart": {
         "name": "Wildhart",
@@ -13709,7 +13709,7 @@ export const nl_NL: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "Gedaante van de Renner",
-        "description": "Neem de gedaante van de renner aan en verhoog uw bewegingssnelheid 30 min lang met 30%. Zolang actief, verdooft opgelopen schade u, wat uw bewegingssnelheid 4 sec lang halveert (elke treffer vernieuwt de verdoving)."
+        "description": "Neem de gedaante van de renner aan en verhoog uw bewegingssnelheid 30 min lang met 30%. Zolang actief, verdooft opgelopen schade u, wat uw bewegingssnelheid 2 sec lang halveert (elke treffer vernieuwt de verdoving)."
       },
       "aimed_shot": {
         "name": "Lange Trek",

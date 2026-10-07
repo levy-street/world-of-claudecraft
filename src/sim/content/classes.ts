@@ -61,7 +61,7 @@ export interface ClassDef {
   // Consumables in a fresh character's bags: every class carries food; the
   // mana classes also carry water. Saved characters load their own bags.
   startItems: { itemId: string; count: number }[];
-  // hunters: auto shot (8yd deadzone). casters: wand (wand:true → no deadzone,
+  // hunters: auto shot (4yd deadzone). casters: wand (wand:true → no deadzone,
   // fires a magic-school bolt so they don't run into melee to auto-attack, #94)
   ranged?: WeaponInfo & {
     maxRange: number;
@@ -364,7 +364,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     startWeapon: 'rusty_hatchet',
     startChest: 'footpad_jerkin',
     startItems: START_RATIONS,
-    ranged: { min: 5, max: 9, speed: 2.3, maxRange: 35, minRange: 8 },
+    ranged: { min: 5, max: 9, speed: 2.3, maxRange: 35, minRange: 4 },
     abilities: [
       'raptor_strike',
       'pack_command',
@@ -3938,7 +3938,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 1.5,
     cooldown: 0,
     range: 35,
-    minRange: 8,
+    minRange: 4,
     school: 'physical',
     projectile: true,
     scalesWith: 'ranged',
@@ -3988,7 +3988,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 0,
     range: 35,
-    minRange: 8,
+    minRange: 4,
     school: 'nature',
     scalesWith: 'ranged',
     requiresTarget: true,
@@ -4019,7 +4019,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 6,
     range: 35,
-    minRange: 8,
+    minRange: 4,
     school: 'arcane',
     scalesWith: 'ranged',
     requiresTarget: true,
@@ -4044,7 +4044,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 12,
     range: 35,
-    minRange: 8,
+    minRange: 4,
     school: 'physical',
     projectile: true, // a fired shot: damage/slow resolve when the bolt lands
     // A fired shot: its flat damage scales off Ranged AP like the other shots,
@@ -4163,7 +4163,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     exclusiveGroup: 'aspect',
     effects: [{ type: 'selfBuff', kind: 'buff_speed', value: 1.3, duration: 1800 }],
     description:
-      "Adopt Courser's Guise, increasing your movement speed by 30% for 30 min. While active, taking damage dazes you, halving your movement speed for 4 sec (each hit refreshes the daze).",
+      "Adopt Courser's Guise, increasing your movement speed by 30% for 30 min. While active, taking damage dazes you, halving your movement speed for 2 sec (each hit refreshes the daze).",
   },
   pack_rally: {
     id: 'pack_rally',
@@ -4194,7 +4194,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 2.5,
     cooldown: 0,
     range: 35,
-    minRange: 8,
+    minRange: 4,
     school: 'physical',
     projectile: true, // a fired shot: damage resolves when the arrow lands
     scalesWith: 'ranged',
@@ -4215,7 +4215,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     channel: { duration: 2.4, ticks: 6 },
     cooldown: 12,
     range: 35,
-    minRange: 8,
+    minRange: 4,
     school: 'physical',
     projectile: true,
     scalesWith: 'ranged',
@@ -4278,14 +4278,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 4,
     cost: 0,
     castTime: 0,
-    cooldown: 15,
+    cooldown: 20,
     range: 0,
     school: 'physical',
     requiresTarget: false,
     offGcd: true,
-    effects: [{ type: 'hunterTrailbreak', distance: 12 }],
+    effects: [{ type: 'hunterTrailbreak', distance: 25 }],
     description:
-      'Leap 12 yards backward. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec.',
+      'Leap 25 yards backward and break free of roots and movement slows. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec.',
   },
   wildheart: {
     id: 'wildheart',
@@ -7653,7 +7653,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 15,
     range: 25,
-    minRange: 8,
+    minRange: 4,
     school: 'physical',
     requiresTarget: true,
     effects: [
@@ -7692,7 +7692,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 60,
     range: 30,
-    minRange: 8,
+    minRange: 4,
     school: 'nature',
     scalesWith: 'ranged',
     requiresTarget: true,
@@ -8223,7 +8223,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 20,
     range: 35,
-    minRange: 8,
+    minRange: 4,
     school: 'physical',
     scalesWith: 'ranged',
     requiresTarget: true,

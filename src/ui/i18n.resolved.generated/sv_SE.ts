@@ -13142,7 +13142,7 @@ export const sv_SE: EnTranslations = {
       },
       "trailbreak": {
         "name": "Spårbrott",
-        "description": "Hoppa 12 meter bakåt. Om du har Jaktfart förnyas den och laddar Återkomsten i 12 sek."
+        "description": "Hoppa 25 meter bakåt och bryt dig fri från rotfästningar och förflyttningssänkningar. Om du har Jaktfart förnyas den och laddar Återkomsten i 12 sek."
       },
       "wildheart": {
         "name": "Vildhjärta",
@@ -13709,7 +13709,7 @@ export const sv_SE: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "Springarens skepnad",
-        "description": "Anta springarens skepnad och öka er förflyttningshastighet med 30% i 30 min. Medan den är aktiv omtöcknar skada er och halverar er förflyttningshastighet i 4 sek. (varje träff förnyar omtöckningen)"
+        "description": "Anta springarens skepnad och öka er förflyttningshastighet med 30% i 30 min. Medan den är aktiv omtöcknar skada er och halverar er förflyttningshastighet i 2 sek. (varje träff förnyar omtöckningen)"
       },
       "aimed_shot": {
         "name": "Långt drag",

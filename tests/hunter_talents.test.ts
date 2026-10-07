@@ -90,7 +90,7 @@ function ready(sim: Sim, abilityId: string): void {
 }
 
 describe('Hunter v0.29 choice-row mechanics', () => {
-  it('Tactical Retreat gives Trailbreak two uses and clears ordinary movement locks', () => {
+  it('Tactical Retreat gives Trailbreak two uses (which still clear ordinary movement locks)', () => {
     const sim = hunter('survival', { 5: 'hun_r5_tactical_retreat' }, 2920);
     expect(sim.resolvedAbility('trailbreak')?.charges).toBe(2);
     sim.player.auras.push(aura('test_root', 'root'), aura('test_slow', 'slow'));

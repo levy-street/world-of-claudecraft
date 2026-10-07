@@ -13142,7 +13142,7 @@ export const pl_PL: EnTranslations = {
       },
       "trailbreak": {
         "name": "Zerwanie Tropu",
-        "description": "Skacz 12 metrów w tył. Jeśli masz Rozpęd Łowów, zostaje odnowiony i przygotowuje Powrót na 12 s."
+        "description": "Skacz 25 metrów w tył i uwolnij się od unieruchomień oraz spowolnień ruchu. Jeśli masz Rozpęd Łowów, zostaje odnowiony i przygotowuje Powrót na 12 s."
       },
       "wildheart": {
         "name": "Dzikie Serce",
@@ -13709,7 +13709,7 @@ export const pl_PL: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "Postać rumaka",
-        "description": "Przyjmij postać rumaka, zwiększając swoją szybkość ruchu o 30% na 30 min. Gdy jest aktywna, otrzymanie obrażeń oszałamia cię, zmniejszając twoją prędkość ruchu o połowę na 4 sek. (każde trafienie odświeża oszołomienie)."
+        "description": "Przyjmij postać rumaka, zwiększając swoją szybkość ruchu o 30% na 30 min. Gdy jest aktywna, otrzymanie obrażeń oszałamia cię, zmniejszając twoją prędkość ruchu o połowę na 2 sek. (każde trafienie odświeża oszołomienie)."
       },
       "aimed_shot": {
         "name": "Długie naciągnięcie",

@@ -2,14 +2,15 @@
 //
 // The row-build sweep used to walk EVERY class to melee reach. That is harmless
 // for a caster (no damaging spell in the game has a minimum range) but it silently
-// broke the hunter, whose whole ranged kit carries `minRange: 8`: Auto Shot, Fell
-// Shot, Venom Barb, Long Draw, Splitshot and Hushing Shot all refuse to fire inside
-// eight yards, so the sweep was measuring a hunter as a bad melee class and
-// reporting the result as its DPS.
+// broke the hunter, whose ranged kit refuses to fire point blank: Auto Shot's dead
+// zone and the shots' minimum range (Fell Shot, Venom Barb, Long Draw, Splitshot,
+// Hushing Shot, ...) were eight yards then and are four now, so the sweep was
+// measuring a hunter as a bad melee class and reporting the result as its DPS.
 //
 // The rule below is deliberately narrow: a class stands at melee reach unless its
-// own damaging kit declares a minimum range, so every class whose numbers were
-// already correct keeps standing exactly where it stood.
+// own damaging kit, or its non-wand ranged auto-attack, declares a minimum range,
+// so every class whose numbers were already correct keeps standing exactly where
+// it stood.
 
 /**
  * The effect types that count as damage. Shared with the sweep so the standoff rule
@@ -46,12 +47,13 @@ export const DEAD_ZONE_MARGIN = 2;
  *
  * @param {Array<{ minRange?: number, range?: number }>} abilityDefs
  *   the damaging ability definitions the class knows at the tested level
- * @param {{ maxRange?: number } | null | undefined} rangedProfile
- *   the class `ranged` block, when it has one
+ * @param {{ maxRange?: number, minRange?: number, wand?: boolean } | null | undefined} rangedProfile
+ *   the class `ranged` block, when it has one (a wand ignores its minimum range,
+ *   exactly as the sim's ranged auto-attack does)
  * @returns {number} yards from the dummy
  */
 export function engagementDistance(abilityDefs, rangedProfile) {
-  let floor = 0;
+  let floor = rangedProfile && !rangedProfile.wand ? (rangedProfile.minRange ?? 0) : 0;
   for (const def of abilityDefs ?? []) {
     const min = def?.minRange ?? 0;
     if (min > floor) floor = min;

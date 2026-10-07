@@ -13142,7 +13142,7 @@ export const tr_TR: EnTranslations = {
       },
       "trailbreak": {
         "name": "İz Kırma",
-        "description": "12 metre geriye sıçrar. Av İvmen varsa tazelenir ve Dönüşü 12 sn hazırlar."
+        "description": "25 metre geriye sıçrar ve kökleme ile hareket yavaşlatma etkilerinden kurtulursun. Av İvmen varsa tazelenir ve Dönüşü 12 sn hazırlar."
       },
       "wildheart": {
         "name": "Yaban Yürek",
@@ -13709,7 +13709,7 @@ export const tr_TR: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "Küheylan Sureti",
-        "description": "Küheylan suretine bürünerek hareket hızını 30 dakika boyunca %30 artırırsın. Etkin olduğu sürece, hasar almak seni sersemletir ve hareket hızını 4 saniyeliğine yarıya indirir (her isabet sersemlemeyi yeniler)."
+        "description": "Küheylan suretine bürünerek hareket hızını 30 dakika boyunca %30 artırırsın. Etkin olduğu sürece, hasar almak seni sersemletir ve hareket hızını 2 saniyeliğine yarıya indirir (her isabet sersemlemeyi yeniler)."
       },
       "aimed_shot": {
         "name": "Uzun Çekiş",

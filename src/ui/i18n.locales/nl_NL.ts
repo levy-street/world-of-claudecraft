@@ -7909,7 +7909,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Schiet het doelwit voor {damage} Arcane schade. De schade stijgt met de aanvalskracht op afstand.',
   'entities.abilities.arcane_shot.name': 'Boosaardig Schot',
   'entities.abilities.aspect_of_the_cheetah.description':
-    'Neem de gedaante van de renner aan en verhoog uw bewegingssnelheid 30 min lang met 30%. Zolang actief, verdooft opgelopen schade u, wat uw bewegingssnelheid 4 sec lang halveert (elke treffer vernieuwt de verdoving).',
+    'Neem de gedaante van de renner aan en verhoog uw bewegingssnelheid 30 min lang met 30%. Zolang actief, verdooft opgelopen schade u, wat uw bewegingssnelheid 2 sec lang halveert (elke treffer vernieuwt de verdoving).',
   'entities.abilities.aspect_of_the_cheetah.name': 'Gedaante van de Renner',
   'entities.abilities.aspect_of_the_hawk.description':
     'Neem de gedaante van de blauwe kiekendief aan en verhoog uw aanvalskracht 30 min lang met {buff}.',
@@ -15891,7 +15891,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stampede.description':
     'Roept 12 sec. lang 3 beesten op. Elk valt elke 2 sec. aan voor {damage} fysieke schade. De getoonde schade bevat 8% van je afstandsaanvalskracht vóór huisdierschadebonussen. De beesten leggen de Roedelfelheid vast bij het oproepen en winnen 10% schade per stapel. Terwijl de Stormloop afkoelt, hebben geslaagde Roedelbevelen 20% kans om hem te herstellen, gegarandeerd na 5 mislukte kansen. Hij kan niet herstellen zolang de beesten actief zijn. (Roedelheer)',
   'entities.abilities.trailbreak.description':
-    'Spring 12 meter achterwaarts. Als je Jachtvaart hebt, wordt die vernieuwd en maakt de Terugkeer 12 sec. gereed.',
+    'Spring 25 meter achterwaarts en bevrijd je van wortels en vertragingen. Als je Jachtvaart hebt, wordt die vernieuwd en maakt de Terugkeer 12 sec. gereed.',
   'entities.abilities.unleash_beast.description':
     'Verbruikt 3 Roedelfelheid nadat je huisdier heeft toegeslagen voor 83 tot 105 fysieke schade en elke vijand binnen 6 meter heeft geschud voor 26 tot 34. De slag en de schok gebruiken de volledige huisdierschadebonus van 30% van Roedelfelheid en stijgen met de aanvalskracht van het huisdier. De volgende 8 sec. richt het huisdier 25% meer schade aan, valt 35% sneller aan en laat het Boosaardig Schot tot 2 nabije vijanden raken.',
   'entities.abilities.wildheart.description': 'Herstelt direct 30% van je maximale gezondheid.',

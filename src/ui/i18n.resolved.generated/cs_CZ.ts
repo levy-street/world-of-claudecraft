@@ -13142,7 +13142,7 @@ export const cs_CZ: EnTranslations = {
       },
       "trailbreak": {
         "name": "Zlom stopy",
-        "description": "Skoč 12 metrů vzad. Máš-li Lovecký spád, obnoví se a připraví Návrat na 12 s."
+        "description": "Skoč 25 metrů vzad a vymaň se ze znehybnění i zpomalení pohybu. Máš-li Lovecký spád, obnoví se a připraví Návrat na 12 s."
       },
       "wildheart": {
         "name": "Divoké srdce",
@@ -13709,7 +13709,7 @@ export const cs_CZ: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "Podoba běžce",
-        "description": "Přijmeš podobu běžce, která zvýší tvou rychlost pohybu o 30 % na 30 min. Dokud je aktivní, utrpěné poškození tě omámí a na 4 s ti sníží rychlost pohybu na polovinu (každý zásah tento efekt obnoví)."
+        "description": "Přijmeš podobu běžce, která zvýší tvou rychlost pohybu o 30 % na 30 min. Dokud je aktivní, utrpěné poškození tě omámí a na 2 s ti sníží rychlost pohybu na polovinu (každý zásah tento efekt obnoví)."
       },
       "aimed_shot": {
         "name": "Dlouhý nátah",

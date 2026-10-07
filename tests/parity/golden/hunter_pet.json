@@ -8,8 +8,8 @@
     "updateRangedPetAttack friendly pet arm (~8093/8217)",
     "updateRangedPetAttack hostile-mob arm (~6776)"
   ],
-  "draws": 736,
-  "drawDigest": "f1d98be7",
+  "draws": 728,
+  "drawDigest": "6d6daf6a",
   "frames": [
     {
       "tick": 0,
@@ -158,8 +158,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 1014,
-      "state": "31d16a38",
-      "events": "c7ba0784",
+      "state": "36f701b1",
+      "events": "77020cde",
       "rng": {
         "draws": 10,
         "digest": "cc772239"
@@ -169,7 +169,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1014,
-      "state": "e6b34b3d",
+      "state": "698a842a",
       "events": "741638a5",
       "rng": {
         "draws": 10,
@@ -180,55 +180,55 @@
       "tick": 60,
       "time": 3,
       "nextId": 1014,
-      "state": "4a8274cf",
+      "state": "d11cc40b",
       "events": "a6d3161a",
       "rng": {
-        "draws": 174,
-        "digest": "4d2cc9f8"
+        "draws": 176,
+        "digest": "15018acf"
       }
     },
     {
       "tick": 80,
       "time": 4,
       "nextId": 1014,
-      "state": "614f0dba",
+      "state": "ae5455be",
       "events": "741638a5",
       "rng": {
-        "draws": 339,
-        "digest": "677bcb20"
+        "draws": 337,
+        "digest": "aa157f40"
       }
     },
     {
       "tick": 100,
       "time": 5,
       "nextId": 1014,
-      "state": "f4e95cab",
-      "events": "64bac9ac",
+      "state": "99e16bfa",
+      "events": "c0d07af7",
       "rng": {
-        "draws": 533,
-        "digest": "db23c13c"
+        "draws": 522,
+        "digest": "cc08c92e"
       }
     },
     {
       "tick": 120,
       "time": 6,
       "nextId": 1014,
-      "state": "59b09a3a",
+      "state": "47fcb9ab",
       "events": "741638a5",
       "rng": {
-        "draws": 736,
-        "digest": "f1d98be7"
+        "draws": 728,
+        "digest": "6d6daf6a"
       }
     },
     {
       "tick": 120,
       "time": 6,
       "nextId": 1014,
-      "state": "59b09a3a",
+      "state": "47fcb9ab",
       "events": "741638a5",
       "rng": {
-        "draws": 736,
-        "digest": "f1d98be7"
+        "draws": 728,
+        "digest": "6d6daf6a"
       },
       "label": "final",
       "players": [
@@ -256,14 +256,14 @@
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 48,
+            "damageDealt": 51,
             "damageTaken": 51
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 48
+              "damageDealt": 51
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -337,7 +337,7 @@
           "aiState": "idle",
           "attackPower": 83,
           "autoAttack": true,
-          "combatTimer": 1.35,
+          "combatTimer": 1.6,
           "comboUntil": -1,
           "critChance": 0.079,
           "detonateTimer": "Infinity",
@@ -380,7 +380,7 @@
             "sta": 41,
             "str": 25
           },
-          "swingTimer": 0.9,
+          "swingTimer": 0.65,
           "targetId": 1012,
           "templateId": "hunter",
           "weapon": {
@@ -400,7 +400,7 @@
           "facing": 1.570796,
           "fallStartY": -2,
           "fiveSecondRule": 99,
-          "hp": 56,
+          "hp": 52,
           "id": 1011,
           "inCombat": true,
           "kind": "mob",
@@ -438,7 +438,7 @@
           "aggroTargetId": 1011,
           "aiState": "attack",
           "autoAttack": true,
-          "combatTimer": 1.35,
+          "combatTimer": 1.6,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -447,12 +447,12 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49898,
+          "hp": 49899,
           "id": 1012,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": -89,
+            "x": -90.2,
             "y": -2,
             "z": -58
           },
@@ -464,7 +464,7 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -89,
+            "x": -90.2,
             "y": -2,
             "z": -58
           },
@@ -484,11 +484,11 @@
           "threat": [
             [
               1003,
-              48
+              51
             ],
             [
               1011,
-              54
+              50
             ]
           ],
           "weapon": {

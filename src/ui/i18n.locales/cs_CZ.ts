@@ -10190,7 +10190,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Střelí cíl za {damage} arkánového poškození. Poškození roste s útočnou silou na dálku.',
   'entities.abilities.arcane_shot.name': 'Prokletý výstřel',
   'entities.abilities.aspect_of_the_cheetah.description':
-    'Přijmeš podobu běžce, která zvýší tvou rychlost pohybu o 30 % na 30 min. Dokud je aktivní, utrpěné poškození tě omámí a na 4 s ti sníží rychlost pohybu na polovinu (každý zásah tento efekt obnoví).',
+    'Přijmeš podobu běžce, která zvýší tvou rychlost pohybu o 30 % na 30 min. Dokud je aktivní, utrpěné poškození tě omámí a na 2 s ti sníží rychlost pohybu na polovinu (každý zásah tento efekt obnoví).',
   'entities.abilities.aspect_of_the_cheetah.name': 'Podoba běžce',
   'entities.abilities.aspect_of_the_hawk.description':
     'Přijmeš podobu motáka, která zvýší tvou útočnou sílu o {buff} na 30 min.',
@@ -15911,7 +15911,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stampede.description':
     'Přivolá 3 bestie na 12 s. Každá útočí každé 2 s za {damage} Fyzického poškození. Zobrazené poškození zahrnuje 8% tvé síly útoku na dálku před bonusy k poškození společníka. Bestie zafixují Zuřivost smečky při přivolání a získají 10% poškození za nános. Zatímco je Úprk v obnově, úspěšné Povely smečky mají 20% šanci jej resetovat, zaručeně po 5 neúspěšných šancích. Nemůže se resetovat, dokud jsou bestie aktivní. (Pán smečky)',
   'entities.abilities.trailbreak.description':
-    'Skoč 12 metrů vzad. Máš-li Lovecký spád, obnoví se a připraví Návrat na 12 s.',
+    'Skoč 25 metrů vzad a vymaň se ze znehybnění i zpomalení pohybu. Máš-li Lovecký spád, obnoví se a připraví Návrat na 12 s.',
   'entities.abilities.unleash_beast.description':
     'Spotřebuje 3 Zuřivosti smečky poté, co tvůj společník udeří za 83 až 105 Fyzického poškození a otřese každým nepřítelem do 6 metrů za 26 až 34. Úder i otřes používají plný 30% bonus k poškození společníka ze Zuřivosti smečky a rostou se silou útoku společníka. Po následujících 8 s společník způsobuje o 25% větší poškození, útočí o 35% rychleji a Prokletý výstřel zasáhne až 2 blízké nepřátele.',
   'entities.abilities.wildheart.description': 'Okamžitě obnoví 30% tvého maximálního zdraví.',

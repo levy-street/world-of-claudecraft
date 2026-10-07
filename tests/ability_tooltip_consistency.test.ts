@@ -33,7 +33,7 @@ import {
 const NUMBER_ALLOWLIST: Record<string, number[]> = {
   // Courser's Guise daze lasts COURSER_DAZE_DURATION (combat/hunter_shared.ts),
   // a fixed constant applied by the damage hook, not an ability effect field.
-  aspect_of_the_cheetah: [4],
+  aspect_of_the_cheetah: [2],
   // Grace Devotion's mana cadence is stamped by effect_dispatch from its effect kind.
   grace_devotion: [5],
   // The Soul Stone heal fraction is SOUL_STONE_HEAL_PCT_MAX (src/sim/soulwell.ts),
@@ -119,7 +119,9 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   revive_pet: [35],
   // Fieldcraft's Focus, Momentum, and re-entry rules live in hunter_fieldcraft.ts.
   raptor_strike: [1, 3, 8, 15],
-  trailbreak: [15, 18, 24],
+  // Trailbreak's "arm Re-entry for 12 sec" is the Armed Re-entry window that
+  // trailbreak() stamps (the leap distance used to be 12 too, which hid it).
+  trailbreak: [12, 15, 18, 24],
   // The Priest spec relationship rules are post-damage hooks rather than ability effects.
   smite: [15, 30],
   // 10 = VESPERS_DOT_DAMAGE_MULT (1.1), applied by resolveVespersAbility at
