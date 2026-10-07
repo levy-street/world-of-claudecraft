@@ -32,6 +32,7 @@ describe('loadConfig', () => {
     expect(cfg.provisionTestAccounts).toBe(false);
     expect(cfg.turnstileSecret).toBe('');
     expect(cfg.maxWsPerIpHard).toBe(20);
+    expect(cfg.wsPerMessageDeflate).toBe(true);
     expect(cfg.maxPlayersPerRealm).toBe(5000);
     expect(cfg.githubRepo).toBe('levy-street/world-of-claudecraft');
     expect(cfg.githubToken).toBe('');
@@ -208,6 +209,22 @@ describe('loadConfig', () => {
     expect(() => loadConfig({ ...MIN_ENV, PROVISION_TEST_ACCOUNTS: 'yes' })).toThrow(
       /PROVISION_TEST_ACCOUNTS/,
     );
+  });
+
+  it('keeps WS_PERMESSAGE_DEFLATE on unless explicitly turned off', () => {
+    const on = (value?: string) =>
+      loadConfig(
+        value === undefined ? { ...MIN_ENV } : { ...MIN_ENV, WS_PERMESSAGE_DEFLATE: value },
+      ).wsPerMessageDeflate;
+    // Compose forwards an unset switch as the empty string, which must stay on.
+    expect(on()).toBe(true);
+    expect(on('')).toBe(true);
+    expect(on('1')).toBe(true);
+    expect(on('TRUE')).toBe(true);
+    expect(on('0')).toBe(false);
+    expect(on('false')).toBe(false);
+    expect(on('FALSE')).toBe(false);
+    expect(() => on('off')).toThrow(/WS_PERMESSAGE_DEFLATE/);
   });
 
   it('ignores the retired COMMUNITY_TEST_RIFTS flag entirely', () => {

@@ -510,6 +510,7 @@ import { bustWorldQuestLeaderboardCaches, worldQuestScoresIdle } from './world_q
 import { pruneWorldQuestScoresBatch } from './world_quest_scores_db';
 import { createWsAuth } from './ws_auth';
 import { bufferHandshakeMessages } from './ws_buffer';
+import { wsPerMessageDeflateOptions } from './ws_compression';
 
 // The one validated boot Config, loaded ONCE and memoized. Boot-consumed values
 // (port, retention, dispatch, ws cap) thread directly off the local `config` in
@@ -3797,8 +3798,14 @@ export async function startServer(): Promise<http.Server> {
 
   // cap frame size: the largest legitimate client message is a small JSON
   // command; without this the ws default (~100 MiB) lets one socket force a
-  // huge allocation + parse before any field-level validation runs
-  const wss = new WebSocketServer({ noServer: true, maxPayload: WS_MAX_PAYLOAD_BYTES });
+  // huge allocation + parse before any field-level validation runs. Outbound
+  // frames are deflated (server/ws_compression.ts); maxPayload also caps a
+  // compressed client message's inflated length, so the cap holds either way.
+  const wss = new WebSocketServer({
+    noServer: true,
+    maxPayload: WS_MAX_PAYLOAD_BYTES,
+    perMessageDeflate: wsPerMessageDeflateOptions(config.wsPerMessageDeflate),
+  });
   const wsAuth = createWsAuth({
     game,
     accountAndScopeForToken,
