@@ -22,7 +22,7 @@ import { ITEMS } from '../sim/data';
 import { guildBankRungsBought } from '../sim/guild_bank';
 import { vaultMaterialIds } from '../sim/materials_vault';
 import type { IWorld } from '../world_api';
-import { renderAccountBank } from './account_bank_window';
+import * as accountBank from './account_bank_window';
 import {
   BAG_CATEGORIES,
   BAG_SORTS,
@@ -481,8 +481,7 @@ export class BankWindow {
     this.opened = true;
     this.lastSig = '';
     this.openedAt = performance.now();
-    if (!initialTab && this.deps.world().player?.membershipActive)
-      this.deps.world().requestAccountBanks?.();
+    if (!initialTab) accountBank.request(this.deps.world(), true);
     // Reset the one-per-open re-prompt cap on the way IN too: close() alone
     // leaves a refusal that resolved after the close holding the next open's cap.
     this.rungPurchase.resetRepromptCap();
@@ -646,7 +645,7 @@ export class BankWindow {
       `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(bankWindowTitle(this.tab))} <span class="panel-subtitle ui-win-sub">${this.tab === 'rewards' ? '' : esc(t('hudChrome.bank.subtitle'))}</span></span>` +
       `<button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hudChrome.bank.close'))}">${svgIcon('close')}</button></div>`;
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
-    const accountAvailable = this.deps.world().player?.membershipActive === true;
+    const accountAvailable = accountBank.available(this.deps.world());
     if (!accountAvailable && this.tab === 'account') this.tab = 'personal';
     if (this.tab !== 'rewards' && (guildAvailable || vaultAvailable || accountAvailable)) {
       el.insertAdjacentHTML(
@@ -661,8 +660,7 @@ export class BankWindow {
         if (id !== 'personal' && id !== 'guild' && id !== 'vault' && id !== 'account') return;
         if (this.tab !== id) audio.click();
         this.tab = id;
-        if (id === 'account' && !this.deps.world().accountBankInfo)
-          this.deps.world().requestAccountBanks();
+        if (id === 'account') accountBank.request(this.deps.world());
         this.render();
         if (focusFollow) focusActiveTab(this.deps.root(), 'bank-tab', 'on');
       });
@@ -684,7 +682,7 @@ export class BankWindow {
       return;
     }
     if (this.tab === 'account') {
-      renderAccountBank(el, this.deps, () => this.render());
+      accountBank.renderAccountBank(el, this.deps, () => this.render());
       el.querySelector('#bank-tab-account')?.setAttribute('aria-controls', 'account-bank-panel');
       this.restoreScroll(el, prevScroll);
       if (hadFocus) this.restoreControlFocus(el, focusKey);
@@ -970,6 +968,7 @@ export class BankWindow {
       this.tab === 'guild' && g !== null ? this.guildPane.readAndRequestLog() : null,
       this.deps.world().accountBankInfo,
       this.deps.world().player?.membershipActive,
+      this.deps.world().player?.referralInviterName,
       this.tab === 'account' ? this.deps.world().inventory : null,
     ]);
     if (sig === this.lastSig) return;

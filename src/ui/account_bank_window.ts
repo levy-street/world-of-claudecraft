@@ -15,6 +15,16 @@ import {
 import { wireTabStrip } from './tab_strip_painter';
 import { tabStripHtml, tabStripModel } from './tab_strip_view';
 
+export function available(world: IWorld): boolean {
+  return world.player?.membershipActive === true || !!world.player?.referralInviterName;
+}
+
+/** The referral claim panel is available without granting member bank reads. */
+export function request(world: IWorld, force = false): void {
+  if (world.player?.membershipActive && (force || !world.accountBankInfo))
+    world.requestAccountBanks?.();
+}
+
 /** The parent bank owns invalidation, focus restoration and the one open-time request. */
 export function renderAccountBank(
   root: HTMLElement,
@@ -28,16 +38,20 @@ export function renderAccountBank(
   pane.setAttribute('role', 'tabpanel');
   pane.setAttribute('aria-labelledby', 'bank-tab-account');
   root.appendChild(pane);
-  if (deps.world().player.membershipActive) {
+  if (deps.world().player.membershipActive || deps.world().player.referralInviterName) {
     const claim = document.createElement('button');
     claim.type = 'button';
     claim.className = 'btn ui-btn';
-    claim.textContent = t('hudChrome.bank.accountArmour');
+    claim.textContent = t(
+      deps.world().player.membershipActive
+        ? 'hudChrome.bank.accountArmour'
+        : 'hudChrome.bank.referralArmour',
+    );
     claim.dataset.focusKey = 'account-armour';
     claim.addEventListener('click', () => deps.world().claimMembershipArmour());
     pane.appendChild(claim);
   }
-  if (!info) {
+  if (deps.world().player.membershipActive !== true || !info) {
     pane.insertAdjacentHTML('beforeend', `<p>${esc(t('hudChrome.bank.accountMembership'))}</p>`);
     return;
   }

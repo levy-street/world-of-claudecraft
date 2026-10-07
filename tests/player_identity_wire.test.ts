@@ -9,7 +9,14 @@ import type { Entity } from '../src/sim/types';
 
 type IdentitySlice = Pick<
   Entity,
-  'guild' | 'pledgeGuild' | 'guildTier' | 'title' | 'border' | 'specId' | 'membershipActive'
+  | 'guild'
+  | 'pledgeGuild'
+  | 'guildTier'
+  | 'title'
+  | 'border'
+  | 'specId'
+  | 'membershipActive'
+  | 'referralInviterName'
 >;
 
 const encode = (slice: IdentitySlice): Record<string, unknown> => {
@@ -30,6 +37,17 @@ const NONE: IdentitySlice = {
 };
 
 describe('player identity wire', () => {
+  it('round-trips only the inviter display name and clears absent or malformed names', () => {
+    const wire = encode({ ...NONE, referralInviterName: 'Aldric' });
+    expect(wire).toEqual({ ran: 'Aldric' });
+    expect(decodePlayerIdentityWire(wire).referralInviterName).toBe('Aldric');
+    const player = { ...decodePlayerIdentityWire(wire) };
+    Object.assign(player, decodePlayerIdentityWire({}));
+    expect(player.referralInviterName).toBeUndefined();
+    for (const ran of [false, 42, {}, [], '', ' ', 'a'.repeat(33)]) {
+      expect(decodePlayerIdentityWire({ ran }).referralInviterName).toBeUndefined();
+    }
+  });
   it('ships no bytes for an unguilded, untitled, unspecced player', () => {
     expect(encode(NONE)).toEqual({});
     expect(decodePlayerIdentityWire({})).toEqual(NONE);

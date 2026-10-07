@@ -124,6 +124,10 @@ import { MARKET_SOLD_VOLUME_SCHEMA } from './market_sold_volume_db';
 import { materialSourceConnection } from './material_source_connection';
 import { applyMaterialSourceSchema, applyMaterialSourceWriterGuard } from './material_source_host';
 import { MEMBERSHIP_SCHEMA } from './membership_db';
+import { REFERRAL_ARMOUR_SCHEMA } from './referral_armour_db';
+
+export { recordReferral } from './referral_armour_db';
+
 import { MEMBERSHIP_TOKEN_RECEIPTS_SCHEMA } from './membership_token_delivery_db';
 import { OAUTH_SCHEMA } from './oauth_db';
 import { runOfflineCharacterSave } from './offline_character_save_db';
@@ -1263,7 +1267,9 @@ export async function ensureSchema(): Promise<void> {
     await client.query('SET LOCAL statement_timeout = 0');
     await client.query('SELECT pg_advisory_xact_lock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
     await client.query(SCHEMA);
-    await client.query(MEMBERSHIP_SCHEMA + MEMBERSHIP_TOKEN_RECEIPTS_SCHEMA);
+    await client.query(
+      MEMBERSHIP_SCHEMA + MEMBERSHIP_TOKEN_RECEIPTS_SCHEMA + REFERRAL_ARMOUR_SCHEMA,
+    );
     // The material source audit's anchor + journal pair: after SCHEMA (it
     // FK-references characters), before the growth budget that must count it.
     await applyMaterialSourceSchema(client);
@@ -2642,21 +2648,6 @@ export async function getPlayerCardMetaBySlug(
 export async function accountForSlug(slug: string): Promise<number | null> {
   const res = await pool.query('SELECT account_id FROM player_cards WHERE slug = $1', [slug]);
   return res.rows[0]?.account_id ?? null;
-}
-
-// Record that `referee` joined via `referrer`'s `slug`. Idempotent: only the
-// first referral for a given referee is kept (PK on referee_account_id).
-export async function recordReferral(
-  refereeAccountId: number,
-  referrerAccountId: number,
-  slug: string,
-): Promise<void> {
-  await pool.query(
-    `INSERT INTO referrals (referee_account_id, referrer_account_id, slug)
-     VALUES ($1, $2, $3)
-     ON CONFLICT (referee_account_id) DO NOTHING`,
-    [refereeAccountId, referrerAccountId, slug],
-  );
 }
 
 export async function referralCountForAccount(accountId: number): Promise<number> {

@@ -6796,6 +6796,7 @@ export const hudChromeStrings = {
     personalTab: 'Personal',
     accountTab: 'Other characters',
     accountArmour: 'Claim membership armour',
+    referralArmour: 'Claim friendship armour',
     accountMembership: "An active membership lets you access your other characters' banks here.",
     accountCharacters: 'Character banks',
     accountEmpty: 'Create another character to use their bank here.',

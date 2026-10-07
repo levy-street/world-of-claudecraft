@@ -519,3 +519,8 @@ hashes, and review evidence: `docs/achievements/membership-items-2026-10-05/acce
   supplied. The original donor and reproducible import pipeline are retained in
   `scripts/assets/courier_donkey/`. The character-safe optimizer preserves the
   47-joint rig and Idle/Run/Fly clips; the 1024px color map uses KTX2/Basis compression.
+
+Friendship armour paintings (`public/ui/items/referral_*.webp`) were created separately
+with OpenAI's built-in image generation for World of ClaudeCraft. Project-generated
+art, project asset, rights reserved. Exact prompts, retained-source hashes, shipping
+hashes, and review evidence: `docs/achievements/referral-items-2026-10-07/accepted-art.json`.

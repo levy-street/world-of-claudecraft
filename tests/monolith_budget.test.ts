@@ -1208,7 +1208,8 @@ const MONOLITHS: MonolithRow[] = [
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
     // Membership host facades replace the extracted progression/level.ts body.
-    ceiling: 11638,
+    // Referral armour authority fields live in the sibling host-authority type.
+    ceiling: 11637,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1691,7 +1692,8 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 9827 and the
     // branch 9965; the two sides' additions compose to 9840 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 9775,
+    // Referral admission extracts account-bound addPlayer into account_player_join.ts.
+    ceiling: 9769,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -2036,7 +2038,8 @@ const MONOLITHS: MonolithRow[] = [
     // server/guild_board_db.ts beside the new officer-roster read. Merged with
     // the DEEDS_SCHEMA / ACCOUNT_LEDGER_SCHEMA move above; exact merged count,
     // zero slack.
-    ceiling: 4506,
+    // Referral inserts and eligibility hydration live in referral_armour_db.ts.
+    ceiling: 4497,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {
@@ -2404,7 +2407,8 @@ const MONOLITHS: MonolithRow[] = [
     // below both parent pins. Exact merged count, zero slack.
     // Held by extracting the pane tab model and markup to bank_tabs_view.
     // Weekly reward host binding now lives with the weekly pane.
-    ceiling: 1783,
+    // Account panel eligibility and request guards moved beside its painter.
+    ceiling: 1782,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/CLAUDE.md)',
   },
   {

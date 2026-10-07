@@ -8,6 +8,7 @@ import {
   MEMBERSHIP_SPEC_PROFILE,
 } from './content/membership';
 import { SEASON2_ARMOR_FRACTION, SEASON2_ITEMS } from './content/pvp_honor_season2';
+import { REFERRAL_ITEMS } from './content/referral';
 import { maxArmorTypeForClass } from './equipment_rules';
 import {
   casterLaneSpTotal,
@@ -22,8 +23,15 @@ export function isMembershipArmour(itemId: string): boolean {
   return MEMBERSHIP_ITEMS[itemId]?.kind === 'armor';
 }
 
-function isMembershipArmourDefinition(item: ItemDef): item is ArmorItemDef {
-  return item.kind === 'armor' && isMembershipArmour(item.id);
+export function isReferralArmour(itemId: string): boolean {
+  return REFERRAL_ITEMS[itemId]?.kind === 'armor';
+}
+export function isScalingArmour(itemId: string): boolean {
+  return isMembershipArmour(itemId) || isReferralArmour(itemId);
+}
+
+function isArmourDefinition(item: ItemDef, matches: (id: string) => boolean): item is ArmorItemDef {
+  return item.kind === 'armor' && matches(item.id);
 }
 
 export function membershipItemLevel(level: number): number {
@@ -37,7 +45,28 @@ export function membershipArmourItem(
   level: number,
   active: boolean,
 ): ItemDef {
-  if (!isMembershipArmourDefinition(item)) return item;
+  if (!isArmourDefinition(item, isMembershipArmour)) return item;
+  return scalingArmourItem(item, cls, spec, level, active);
+}
+
+export function referralArmourItem(
+  item: ItemDef,
+  cls: PlayerClass,
+  spec: string | null | undefined,
+  level: number,
+  active: boolean,
+): ItemDef {
+  if (!isArmourDefinition(item, isReferralArmour)) return item;
+  return scalingArmourItem(item, cls, spec, level, active);
+}
+
+function scalingArmourItem(
+  item: ArmorItemDef,
+  cls: PlayerClass,
+  spec: string | null | undefined,
+  level: number,
+  active: boolean,
+): ItemDef {
   const armorType = maxArmorTypeForClass(cls);
   if (!active) return { ...item, armorType, stats: {}, spellPower: 0, healPower: 0 };
   const profile = MEMBERSHIP_SPEC_PROFILE[`${cls}_${spec}`] ?? MEMBERSHIP_DEFAULT_PROFILE[cls];
@@ -83,4 +112,8 @@ export function membershipArmourItem(
 
 export function wearsMembershipArmour(equipment: Partial<Record<string, string>>): boolean {
   return MEMBERSHIP_ARMOUR_SLOTS.every((slot) => equipment[slot] === `membership_${slot}`);
+}
+
+export function wearsReferralArmour(equipment: Partial<Record<string, string>>): boolean {
+  return MEMBERSHIP_ARMOUR_SLOTS.every((slot) => equipment[slot] === `referral_${slot}`);
 }

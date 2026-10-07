@@ -365,6 +365,7 @@ describe('i18n Localization Key Coverage', () => {
   const interpolationValues: Record<string, string | number> = {
     days: 30,
     pieces: 7,
+    member: 'Aldric',
     active: 3,
     area: 'Eastbrook',
     ability: 'Fireball',

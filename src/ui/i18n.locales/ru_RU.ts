@@ -20105,4 +20105,19 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Годовое членство оплачено. Ключ от танка приложен к письму. Храните ключ в сумке или банке, чтобы владеть транспортом. Он останется вашим после окончания членства. Требуется навык верховой езды.',
   'hudChrome.wocStore.subscription.checkoutClosed':
     'Это оформление завершено, неполученных наград нет. Выберите план членства ещё раз, чтобы начать новое оформление.',
+  'itemUi.tooltip.referralFullSet':
+    'Наденьте все {pieces} предметов доспехов дружбы, чтобы получать на {percent}% больше опыта в группе с {member}. Подписка пригласившего должна быть активна.',
+  'itemUi.tooltip.referralInviter': 'пригласившим вас участником',
+  'itemUi.tooltip.referralRetained':
+    'Характеристики доспехов растут с уровнем, даже когда вы не в группе с пригласившим вас игроком.',
+  'itemUi.tooltip.referralDormant':
+    'Неактивно: этот аккаунт не получил доспехи дружбы по приглашению подписчика.',
+  'entities.items.referral_helmet.name': 'Шлем дружбы',
+  'entities.items.referral_shoulder.name': 'Наплечники дружбы',
+  'entities.items.referral_chest.name': 'Кираса дружбы',
+  'entities.items.referral_waist.name': 'Пояс дружбы',
+  'entities.items.referral_legs.name': 'Поножи дружбы',
+  'entities.items.referral_gloves.name': 'Рукавицы дружбы',
+  'entities.items.referral_feet.name': 'Сапоги дружбы',
+  'hudChrome.bank.referralArmour': 'Получить доспехи дружбы',
 };

@@ -59,6 +59,7 @@ import {
   worldPvpOnPlayerDamaged,
   worldPvpOnPlayerDeath,
 } from '../pvp';
+import { referralArmourXpActive } from '../referral_armour';
 import { resolveRespawnSeconds } from '../respawn_policy';
 import { aurasSurvivingDeath } from '../resurrection';
 import { computeCharacterModifiers } from '../set_bonus_mods';
@@ -1927,7 +1928,10 @@ export function grantXp(
     meta.restedXp -= restedBonus;
     amount += restedBonus;
   }
-  if (membershipActive(meta, ctx.time) && wearsMembershipArmour(meta.equipment)) {
+  if (
+    (membershipActive(meta, ctx.time) && wearsMembershipArmour(meta.equipment)) ||
+    referralArmourXpActive(ctx, meta)
+  ) {
     amount = Math.floor(amount * MEMBERSHIP_XP_MULTIPLIER);
   }
   // Lifetime XP accrues for EVERY award, including at the cap — this is what

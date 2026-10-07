@@ -6462,7 +6462,7 @@ export class Hud {
   ): string {
     const wearer = inspectedWearer ?? this.sim.player;
     item = membershipTooltipItem(item, this.sim, inspectedWearer);
-    instance = membershipTooltipInstance(item, instance, wearer.membershipActive === true);
+    instance = membershipTooltipInstance(item, instance, wearer);
     // Quest items are a purpose class, not a quality tier: title and kind use
     // quest gold, and the kind line is "Quest Item" alone (never "Common Quest
     // Item"). Story lines (related quest, progress, rules, orphaned) come from
@@ -6581,7 +6581,7 @@ export class Hud {
     // rules, incl. never claiming a quality-rank upgrade).
     html += instanceBadgeLines(instance);
     html += itemCombatTooltipLines(item, instance);
-    html += membershipItemTooltipLines(item, wearer.level, wearer.membershipActive === true);
+    html += membershipItemTooltipLines(item, wearer);
     if (item.foodHp)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useFood', { amount: itemNumber(item.foodHp), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
     if (item.drinkMana)

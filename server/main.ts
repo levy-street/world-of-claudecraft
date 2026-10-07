@@ -415,6 +415,7 @@ import {
 import { createPgRateLimitStore } from './ratelimit_db';
 import { isPublicCorsPath, publicOriginFromRequest, REALM, REALM_DIRECTORY } from './realm';
 import { publishRealmBuilderRoll } from './realm_builder';
+import { referralArmourForAccount } from './referral_armour_db';
 import { configureReliquaryRuntime } from './reliquary';
 import { reliquaryRarityCounts } from './reliquary_rarity_db';
 import { resolveReportTarget } from './report_target';
@@ -1746,8 +1747,8 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         ...meta,
       }).catch((err) => logger.error({ err }, 'suspicious registration report failed'));
       // Capture the referral when this account signed up via a card link
-      // (?ref=<slug>). Best-effort: never block or fail registration on it.
-      void captureReferral(account.id, body.ref).catch((err) =>
+      // (?ref=<slug>). Await before returning credentials; errors stay best-effort.
+      await captureReferral(account.id, body.ref).catch((err) =>
         logger.error({ err }, 'referral capture failed'),
       );
       // emailMissing is always false here (email is required above); sent so the
@@ -3835,6 +3836,7 @@ export async function startServer(): Promise<http.Server> {
   const wsAuth = createWsAuth({
     game,
     getMembership,
+    referralArmourForAccount,
     accountAndScopeForToken,
     moderationStatusForAccount,
     getCharacter,

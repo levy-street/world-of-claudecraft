@@ -4947,6 +4947,7 @@ export const nl_NL: EnTranslations = {
       "personalTab": "Persoonlijk",
       "accountTab": "Other characters",
       "accountArmour": "Claim membership armour",
+      "referralArmour": "Claim friendship armour",
       "accountMembership": "An active membership lets you access your other characters' banks here.",
       "accountCharacters": "Character banks",
       "accountEmpty": "Create another character to use their bank here.",
@@ -12833,6 +12834,10 @@ export const nl_NL: EnTranslations = {
       "parry": "Pareren"
     },
     "tooltip": {
+      "referralFullSet": "Equip all {pieces} friendship armor pieces to gain {percent}% more experience while in a party with {member}. Their membership must be active.",
+      "referralInviter": "the member who invited you",
+      "referralRetained": "Armor stats keep scaling even when you are not in a party with your inviter.",
+      "referralDormant": "Inactive: this account has not received friendship armor through a member referral.",
       "membershipToken": "Use: Consume this token to add {days} days of membership to your account. Any remaining membership time is kept. This token can be traded or sold at the auction house before redemption.",
       "membershipAdaptive": "Stats and armor adapt to your class and specialization.",
       "membershipScaling": "Item level matches your level. At level 20, this armor perfects at item level 25.",
@@ -18544,6 +18549,27 @@ export const nl_NL: EnTranslations = {
       },
       "membership_token": {
         "name": "Membership Token (30 Days)"
+      },
+      "referral_helmet": {
+        "name": "Friendship Helm"
+      },
+      "referral_shoulder": {
+        "name": "Friendship Pauldrons"
+      },
+      "referral_chest": {
+        "name": "Friendship Cuirass"
+      },
+      "referral_waist": {
+        "name": "Friendship Girdle"
+      },
+      "referral_legs": {
+        "name": "Friendship Legguards"
+      },
+      "referral_gloves": {
+        "name": "Friendship Gauntlets"
+      },
+      "referral_feet": {
+        "name": "Friendship Boots"
       },
       "membership_helmet": {
         "name": "Membership Helm"

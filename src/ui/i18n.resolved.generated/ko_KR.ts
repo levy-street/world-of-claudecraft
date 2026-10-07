@@ -4947,6 +4947,7 @@ export const ko_KR: EnTranslations = {
       "personalTab": "개인",
       "accountTab": "다른 캐릭터",
       "accountArmour": "멤버십 방어구 받기",
+      "referralArmour": "우정 방어구 받기",
       "accountMembership": "멤버십이 활성화되어 있으면 여기서 다른 캐릭터의 은행을 이용할 수 있습니다.",
       "accountCharacters": "캐릭터 은행",
       "accountEmpty": "다른 캐릭터를 만들면 여기서 해당 캐릭터의 은행을 이용할 수 있습니다.",
@@ -12833,6 +12834,10 @@ export const ko_KR: EnTranslations = {
       "parry": "무기 막기"
     },
     "tooltip": {
+      "referralFullSet": "우정 방어구 {pieces}개를 모두 착용하고 {member} 님과 파티를 맺으면 경험치를 {percent}% 더 얻습니다. 초대자의 멤버십이 활성 상태여야 합니다.",
+      "referralInviter": "나를 초대한 회원",
+      "referralRetained": "초대자와 파티를 맺지 않아도 방어구 능력치는 레벨에 따라 성장합니다.",
+      "referralDormant": "비활성: 이 계정은 회원 초대를 통해 우정 방어구를 받지 않았습니다.",
       "membershipToken": "사용: 이 토큰을 소모하여 계정의 멤버십 기간에 {days}일을 추가합니다. 남은 멤버십 기간은 유지됩니다. 사용 전에는 거래하거나 경매장에서 판매할 수 있습니다.",
       "membershipAdaptive": "능력치와 방어구가 직업 및 전문화에 맞게 바뀝니다.",
       "membershipScaling": "아이템 레벨이 캐릭터 레벨에 맞춰 증가합니다. 20레벨에 도달하면 방어구가 완성되어 아이템 레벨이 25가 됩니다.",
@@ -18544,6 +18549,27 @@ export const ko_KR: EnTranslations = {
       },
       "membership_token": {
         "name": "멤버십 토큰 (30일)"
+      },
+      "referral_helmet": {
+        "name": "우정의 투구"
+      },
+      "referral_shoulder": {
+        "name": "우정의 어깨갑옷"
+      },
+      "referral_chest": {
+        "name": "우정의 흉갑"
+      },
+      "referral_waist": {
+        "name": "우정의 허리띠"
+      },
+      "referral_legs": {
+        "name": "우정의 다리갑옷"
+      },
+      "referral_gloves": {
+        "name": "우정의 건틀릿"
+      },
+      "referral_feet": {
+        "name": "우정의 장화"
       },
       "membership_helmet": {
         "name": "멤버십 투구"

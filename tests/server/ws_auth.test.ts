@@ -18,6 +18,10 @@ import { GeneralChatRateLimitLiveState } from '../../server/general_chat_quota';
 import { isConnectionRefused as realIsConnectionRefused } from '../../server/ip_block';
 import { createWsAuth, type WsAuthDeps } from '../../server/ws_auth';
 import { bufferHandshakeMessages } from '../../server/ws_buffer';
+
+const referralSetter = vi.hoisted(() => vi.fn());
+vi.mock('../../src/sim/referral_armour', () => ({ setReferralArmour: referralSetter }));
+
 import { freshAccountLedger } from '../../src/sim/account_ledger';
 import { DUNGEON_ENTRY_FACING_WIRE_VERSION, ONLINE_WORLD_AUTH_TYPE } from '../../src/world_api';
 
@@ -205,6 +209,57 @@ function gameSourceCode(): string {
     .readFileSync(path.resolve(process.cwd(), 'server/game.ts'), 'utf8')
     .replace(/(^|[^:])\/\/.*$/gm, '$1');
 }
+
+describe('referral armour fresh admission', () => {
+  beforeEach(() => referralSetter.mockReset());
+
+  it('loads exactly once before leasing and applies after membership authority', async () => {
+    const { ws, deps, req, game } = setup();
+    const entitlement = { inviterAccountId: 10, inviterName: 'Aldric' };
+    deps.referralArmourForAccount = vi.fn(async () => entitlement);
+    deps.getMembership = async () => ({
+      active: false,
+      expiresAt: null,
+      authorizedUntil: 0,
+      recurringExpiresAt: null,
+    });
+    await createWsAuth(deps).authenticateWebSocket(
+      asWs(ws),
+      authRaw({ inviterAccountId: 99 }),
+      req,
+    );
+    expect(deps.referralArmourForAccount).toHaveBeenCalledExactlyOnceWith(1);
+    expect(vi.mocked(deps.referralArmourForAccount).mock.invocationCallOrder[0]).toBeLessThan(
+      vi.mocked(deps.acquireCharacterLease).mock.invocationCallOrder[0],
+    );
+    expect(referralSetter).toHaveBeenCalledWith(undefined, 1, entitlement);
+    expect(game.sim.setMembership.mock.invocationCallOrder[0]).toBeLessThan(
+      referralSetter.mock.invocationCallOrder[0],
+    );
+    expect(deps.getCharacter).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not read or replace the live grant on resume', async () => {
+    const { ws, deps, req, game } = setup();
+    game.hasSessionForCharacter.mockReturnValue(true);
+    deps.referralArmourForAccount = vi.fn(async () => null);
+    await createWsAuth(deps).authenticateWebSocket(asWs(ws), authRaw(), req);
+    expect(deps.referralArmourForAccount).not.toHaveBeenCalled();
+    expect(referralSetter).not.toHaveBeenCalled();
+  });
+
+  it('fails a broken entitlement read before acquiring any lease', async () => {
+    const { ws, deps, req, game } = setup();
+    deps.referralArmourForAccount = async () => {
+      throw new Error('referral database unavailable');
+    };
+    await expect(
+      createWsAuth(deps).authenticateWebSocket(asWs(ws), authRaw(), req),
+    ).rejects.toThrow('referral database unavailable');
+    expect(deps.acquireCharacterLease).not.toHaveBeenCalled();
+    expect(game.join).not.toHaveBeenCalled();
+  });
+});
 
 describe('membership character admission', () => {
   it.each([false, true])(

@@ -4947,6 +4947,7 @@ export const zh_TW: EnTranslations = {
       "personalTab": "個人",
       "accountTab": "其他角色",
       "accountArmour": "領取會員護甲",
+      "referralArmour": "領取友誼護甲",
       "accountMembership": "會員有效期間，可在此存取您其他角色的銀行。",
       "accountCharacters": "角色銀行",
       "accountEmpty": "建立另一個角色後，即可在此使用該角色的銀行。",
@@ -12833,6 +12834,10 @@ export const zh_TW: EnTranslations = {
       "parry": "招架"
     },
     "tooltip": {
+      "referralFullSet": "穿戴全部{pieces}件友誼護甲，與{member}組隊時獲得額外{percent}%經驗。邀請人的會員資格必須有效。",
+      "referralInviter": "邀請你的會員",
+      "referralRetained": "即使未與邀請人組隊，護甲屬性仍會隨等級提升。",
+      "referralDormant": "未啟用：此帳號尚未透過會員邀請獲得友誼護甲。",
       "membershipToken": "使用：消耗此代幣，為您的帳號增加{days}天會員時長。現有剩餘時長會保留。兌換前可交易此代幣或在拍賣場出售。",
       "membershipAdaptive": "屬性和護甲會隨您的職業與專精調整。",
       "membershipScaling": "物品等級與您的角色等級一致。達到20級時，此護甲會完善為物品等級25。",
@@ -18544,6 +18549,27 @@ export const zh_TW: EnTranslations = {
       },
       "membership_token": {
         "name": "會員代幣（30天）"
+      },
+      "referral_helmet": {
+        "name": "友誼頭盔"
+      },
+      "referral_shoulder": {
+        "name": "友誼肩甲"
+      },
+      "referral_chest": {
+        "name": "友誼胸甲"
+      },
+      "referral_waist": {
+        "name": "友誼腰帶"
+      },
+      "referral_legs": {
+        "name": "友誼腿甲"
+      },
+      "referral_gloves": {
+        "name": "友誼護手"
+      },
+      "referral_feet": {
+        "name": "友誼戰靴"
       },
       "membership_helmet": {
         "name": "會員頭盔"

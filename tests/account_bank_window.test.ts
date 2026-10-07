@@ -55,6 +55,14 @@ function setup(selected = false) {
 }
 
 describe('other character banks', () => {
+  it('hides stale member bank data after expiry while retaining the friendship claim', () => {
+    const { world, root, repaint, deps } = setup(true);
+    Object.assign(world.player, { membershipActive: false, referralInviterName: 'Aldric' });
+    renderAccountBank(root, deps, repaint);
+    expect(root.querySelector('[data-focus-key="account-armour"]')).not.toBeNull();
+    expect(root.querySelector('.account-bank-tab')).toBeNull();
+    expect(root.querySelector('.bank-grid')).toBeNull();
+  });
   it('loads contents only after selecting a character and escapes account names', () => {
     const { world, root, repaint, deps } = setup();
     renderAccountBank(root, deps, repaint);
@@ -96,6 +104,36 @@ describe('other character banks', () => {
     root.querySelector<HTMLButtonElement>('[data-focus-key="account-armour"]')!.click();
     expect(world.claimMembershipArmour).toHaveBeenCalledOnce();
   });
+  it('lets an entitled nonmember retry the friendship grant without requesting member bank data', () => {
+    const { world, root, deps } = setup();
+    Object.assign(world, {
+      accountBankInfo: null,
+      bankInfo: bank([]),
+      vaultInfo: null,
+      guildBankInfo: null,
+      bags: [null, null, null, null],
+      copper: 0,
+    });
+    Object.assign(world.player, { membershipActive: false, referralInviterName: 'Aldric' });
+    const win = new BankWindow({
+      ...deps,
+      root: () => root,
+      closeOthers: vi.fn(),
+      captureFocus: () => null,
+      restoreFocus: vi.fn(),
+      onClosed: vi.fn(),
+      moneyHtml: () => '',
+    } as BankWindowDeps);
+    win.open();
+    root.querySelector<HTMLButtonElement>('[data-tab="account"]')!.click();
+    const claim = root.querySelector<HTMLButtonElement>('[data-focus-key="account-armour"]')!;
+    expect(claim.textContent).toBe('Claim friendship armour');
+    claim.click();
+    expect(world.claimMembershipArmour).toHaveBeenCalledOnce();
+    expect(world.requestAccountBanks).not.toHaveBeenCalled();
+    win.close();
+  });
+
   it('requests member banks once per opening and returns to Personal immediately on expiry', () => {
     const { world, root, deps } = setup(true);
     Object.assign(world, {

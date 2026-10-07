@@ -7145,6 +7145,30 @@
         "membership_feet",
         "membership_token"
       ]
+    },
+    {
+      "batchId": "referral-items-2026-10-07",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "The canonical woc-item-icon-v1 written contract; no source images were supplied.",
+      "commonPrompt": "Seven individually generated Friendship armour paintings: silver steel, gold trim, midnight-blue underlayers, interlocking plain gold rings, top-left light and opaque charcoal-umber ground.",
+      "provenanceRecords": [
+        "docs/achievements/referral-items-2026-10-07/accepted-art.json"
+      ],
+      "itemIds": [
+        "referral_helmet",
+        "referral_shoulder",
+        "referral_chest",
+        "referral_waist",
+        "referral_legs",
+        "referral_gloves",
+        "referral_feet"
+      ]
     }
   ]
 }

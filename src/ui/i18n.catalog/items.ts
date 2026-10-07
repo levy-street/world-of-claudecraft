@@ -74,6 +74,14 @@ const itemStringsEn = {
       parry: 'Parry',
     },
     tooltip: {
+      referralFullSet:
+        'Equip all {pieces} friendship armor pieces to gain {percent}% more experience while in a party with {member}. Their membership must be active.',
+      referralInviter: 'the member who invited you',
+      referralRetained:
+        'Armor stats keep scaling even when you are not in a party with your inviter.',
+      referralDormant:
+        'Inactive: this account has not received friendship armor through a member referral.',
+
       membershipToken:
         'Use: Consume this token to add {days} days of membership to your account. Any remaining membership time is kept. This token can be traded or sold at the auction house before redemption.',
       membershipAdaptive: 'Stats and armor adapt to your class and specialization.',
@@ -4346,6 +4354,13 @@ function itemTranslationsEn(names: readonly string[]) {
   return {
     ...itemTranslations(names),
     membership_token: { name: 'Membership Token (30 Days)' },
+    referral_helmet: { name: 'Friendship Helm' },
+    referral_shoulder: { name: 'Friendship Pauldrons' },
+    referral_chest: { name: 'Friendship Cuirass' },
+    referral_waist: { name: 'Friendship Girdle' },
+    referral_legs: { name: 'Friendship Legguards' },
+    referral_gloves: { name: 'Friendship Gauntlets' },
+    referral_feet: { name: 'Friendship Boots' },
     membership_helmet: { name: 'Membership Helm' },
     membership_shoulder: { name: 'Membership Pauldrons' },
     membership_chest: { name: 'Membership Cuirass' },

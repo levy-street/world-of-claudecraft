@@ -19742,4 +19742,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '年間メンバーシップの支払いが完了しました。戦車の鍵を同封しました。所有するには鍵をバッグか銀行に保管してください。メンバーシップが終了しても所有権は維持されます。騎乗スキルが必要です。',
   'hudChrome.wocStore.subscription.checkoutClosed':
     'この購入手続きは終了しており、未受領の特典はありません。メンバーシッププランをもう一度選び、新しい購入手続きを開始してください。',
+  'itemUi.tooltip.referralFullSet':
+    '友情の防具を全{pieces}部位装備し、{member}とパーティーを組むと経験値が{percent}%増加します。招待者のメンバーシップが有効である必要があります。',
+  'itemUi.tooltip.referralInviter': 'あなたを招待したメンバー',
+  'itemUi.tooltip.referralRetained':
+    '招待者とパーティーを組んでいなくても、防具の能力値はレベルに応じて成長します。',
+  'itemUi.tooltip.referralDormant':
+    '無効：このアカウントはメンバーの招待による友情の防具を獲得していません。',
+  'entities.items.referral_helmet.name': '友情の兜',
+  'entities.items.referral_shoulder.name': '友情の肩当て',
+  'entities.items.referral_chest.name': '友情の胸当て',
+  'entities.items.referral_waist.name': '友情の帯',
+  'entities.items.referral_legs.name': '友情の脚甲',
+  'entities.items.referral_gloves.name': '友情の手甲',
+  'entities.items.referral_feet.name': '友情のブーツ',
+  'hudChrome.bank.referralArmour': '友情の防具を受け取る',
 };

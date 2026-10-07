@@ -5290,6 +5290,8 @@ export interface Entity extends ClientMirroredEntityFields {
   specId?: string | null;
   /** Trusted live entitlement mirror, never loaded from character state. */
   membershipActive?: boolean;
+  /** Trusted referral gear entitlement and inviter display, never loaded from a save. */
+  referralInviterName?: string;
   pos: Vec3;
   prevPos: Vec3; // for render interpolation
   facing: number; // radians, 0 = +Z

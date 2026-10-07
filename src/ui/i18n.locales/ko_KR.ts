@@ -19725,4 +19725,19 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '연간 멤버십 결제가 완료되었습니다. 전차 탈것 열쇠가 동봉되어 있습니다. 탈것을 소유하려면 열쇠를 가방이나 은행에 보관하세요. 멤버십이 만료되어도 소유권은 유지됩니다. 타기 기술이 필요합니다.',
   'hudChrome.wocStore.subscription.checkoutClosed':
     '이 결제는 종료되었으며 미수령 보상이 없습니다. 멤버십 요금제를 다시 선택하여 새 결제를 시작하세요.',
+  'itemUi.tooltip.referralFullSet':
+    '우정 방어구 {pieces}개를 모두 착용하고 {member} 님과 파티를 맺으면 경험치를 {percent}% 더 얻습니다. 초대자의 멤버십이 활성 상태여야 합니다.',
+  'itemUi.tooltip.referralInviter': '나를 초대한 회원',
+  'itemUi.tooltip.referralRetained':
+    '초대자와 파티를 맺지 않아도 방어구 능력치는 레벨에 따라 성장합니다.',
+  'itemUi.tooltip.referralDormant':
+    '비활성: 이 계정은 회원 초대를 통해 우정 방어구를 받지 않았습니다.',
+  'entities.items.referral_helmet.name': '우정의 투구',
+  'entities.items.referral_shoulder.name': '우정의 어깨갑옷',
+  'entities.items.referral_chest.name': '우정의 흉갑',
+  'entities.items.referral_waist.name': '우정의 허리띠',
+  'entities.items.referral_legs.name': '우정의 다리갑옷',
+  'entities.items.referral_gloves.name': '우정의 건틀릿',
+  'entities.items.referral_feet.name': '우정의 장화',
+  'hudChrome.bank.referralArmour': '우정 방어구 받기',
 };

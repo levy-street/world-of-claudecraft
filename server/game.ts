@@ -111,6 +111,7 @@ import { ownedWeaponSkinLoadout } from './account_cosmetics_live';
 import { AccountCosmeticsService } from './account_cosmetics_service';
 import { reconcileAccountRelics, recordRelicFinds } from './account_ledger_records';
 import { AccountLedgerService } from './account_ledger_service';
+import { addAccountPlayer } from './account_player_join';
 import { type ActivityDetectDeps, detectActivityEvent } from './activity_detect';
 import { recordOnlineSample } from './admin_db';
 import { type AdminGuildBankView, adminGuildBankView } from './admin_guild_bank_view';
@@ -3187,14 +3188,7 @@ export class GameServer {
     for (const s of linkdeadOthers) {
       void this.leave(s, 'replaced by a new character login');
     }
-    const pid = this.sim.addPlayer(cls, name, {
-      state: state ?? undefined,
-      characterId,
-      accountLedger: meta.accountLedger,
-      bankBonus: meta.bankBonus,
-      appearance: meta.appearance ?? null,
-      tutorialGreetingSent: state === null,
-    });
+    const pid = addAccountPlayer(this.sim, accountId, characterId, cls, name, state, meta);
     const player = this.sim.entities.get(pid);
     this.vault.applyGuestUsage(pid, meta.vaultGuestUsage);
     if (player) {

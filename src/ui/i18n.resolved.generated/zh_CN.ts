@@ -4947,6 +4947,7 @@ export const zh_CN: EnTranslations = {
       "personalTab": "个人",
       "accountTab": "其他角色",
       "accountArmour": "领取会员护甲",
+      "referralArmour": "领取友谊护甲",
       "accountMembership": "会员有效期间，可在此访问您其他角色的银行。",
       "accountCharacters": "角色银行",
       "accountEmpty": "创建另一个角色后，即可在此使用该角色的银行。",
@@ -12833,6 +12834,10 @@ export const zh_CN: EnTranslations = {
       "parry": "招架"
     },
     "tooltip": {
+      "referralFullSet": "穿戴全部{pieces}件友谊护甲，与{member}组队时获得额外{percent}%经验。邀请人的会员资格必须有效。",
+      "referralInviter": "邀请你的会员",
+      "referralRetained": "即使未与邀请人组队，护甲属性仍会随等级提升。",
+      "referralDormant": "未激活：此账号尚未通过会员邀请获得友谊护甲。",
       "membershipToken": "使用：消耗此代币，为您的账号增加{days}天会员时长。现有剩余时长会保留。兑换前可交易此代币或在拍卖行出售。",
       "membershipAdaptive": "属性和护甲会随您的职业与专精调整。",
       "membershipScaling": "物品等级与您的角色等级一致。达到20级时，此护甲会完善为物品等级25。",
@@ -18544,6 +18549,27 @@ export const zh_CN: EnTranslations = {
       },
       "membership_token": {
         "name": "会员代币（30天）"
+      },
+      "referral_helmet": {
+        "name": "友谊头盔"
+      },
+      "referral_shoulder": {
+        "name": "友谊肩甲"
+      },
+      "referral_chest": {
+        "name": "友谊胸甲"
+      },
+      "referral_waist": {
+        "name": "友谊腰带"
+      },
+      "referral_legs": {
+        "name": "友谊腿甲"
+      },
+      "referral_gloves": {
+        "name": "友谊护手"
+      },
+      "referral_feet": {
+        "name": "友谊战靴"
       },
       "membership_helmet": {
         "name": "会员头盔"

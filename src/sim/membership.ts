@@ -1,9 +1,8 @@
 // Trusted host entitlement, measured against the deterministic sim clock. Never
 // loaded from CharacterState. Stored armour carries no authority of its own.
-import { bagPools, canGrantCopies } from './bags';
-import { MEMBERSHIP_ARMOUR_SLOTS } from './content/membership';
 import { recalcPlayerStats } from './entity';
 import { perfectMembershipArmour } from './membership_armour_progression';
+import { claimScalingArmour } from './scaling_armour_claim';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { Entity } from './types';
@@ -45,24 +44,12 @@ export function updateMembership(ctx: SimContext, meta: PlayerMeta, p: Entity): 
 
 export function claimMembershipArmour(ctx: SimContext, pid?: number, quiet = false): void {
   const resolved = ctx.resolve(pid);
-  if (!resolved || !membershipActive(resolved.meta, ctx.time) || resolved.e.dead) return;
-  const { meta } = resolved;
-  // Seven ids, bounded by existing character containers; run only on an explicit
-  // claim or host entitlement change. Partial claims are safe to retry.
-  const owned = new Set([
-    ...Object.values(meta.equipment),
-    ...meta.inventory.map((slot) => slot.itemId),
-    ...meta.bank.inventory.map((slot) => slot.itemId),
-    ...(meta.courier?.cargo.map((slot) => slot.itemId) ?? []),
-  ]);
-  for (const slot of MEMBERSHIP_ARMOUR_SLOTS) {
-    const itemId = `membership_${slot}`;
-    if (owned.has(itemId)) continue;
-    if (!canGrantCopies(meta.inventory, bagPools(meta.bags), itemId, 1)) {
-      if (!quiet) ctx.error(meta.entityId, 'Your bags are full.');
-      return;
-    }
-    if (resolved.e.level >= 20) ctx.addItemInstance(itemId, { perfected: true }, meta.entityId);
-    else ctx.addItem(itemId, 1, meta.entityId);
-  }
+  if (!resolved || resolved.e.dead) return;
+  if (
+    membershipActive(resolved.meta, ctx.time) &&
+    !claimScalingArmour(ctx, resolved.meta.entityId, 'membership', quiet)
+  )
+    return;
+  if (resolved.meta.referralArmour)
+    claimScalingArmour(ctx, resolved.meta.entityId, 'referral', quiet);
 }

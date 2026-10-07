@@ -4947,6 +4947,7 @@ export const ja_JP: EnTranslations = {
       "personalTab": "個人",
       "accountTab": "ほかのキャラクター",
       "accountArmour": "メンバーシップ防具を受け取る",
+      "referralArmour": "友情の防具を受け取る",
       "accountMembership": "メンバーシップが有効な間、ここからほかのキャラクターの銀行を利用できます。",
       "accountCharacters": "キャラクターの銀行",
       "accountEmpty": "別のキャラクターを作成すると、その銀行をここで利用できます。",
@@ -12833,6 +12834,10 @@ export const ja_JP: EnTranslations = {
       "parry": "受け流し"
     },
     "tooltip": {
+      "referralFullSet": "友情の防具を全{pieces}部位装備し、{member}とパーティーを組むと経験値が{percent}%増加します。招待者のメンバーシップが有効である必要があります。",
+      "referralInviter": "あなたを招待したメンバー",
+      "referralRetained": "招待者とパーティーを組んでいなくても、防具の能力値はレベルに応じて成長します。",
+      "referralDormant": "無効：このアカウントはメンバーの招待による友情の防具を獲得していません。",
       "membershipToken": "使用：このトークンを消費し、アカウントのメンバーシップ期間に{days}日を追加します。残りの期間は失われません。使用前なら取引やオークションでの売却が可能です。",
       "membershipAdaptive": "能力値と防具の種類がクラスと専門化に合わせて変わります。",
       "membershipScaling": "アイテムレベルは自分のレベルに合わせて上がります。レベル20になると完成し、アイテムレベル25になります。",
@@ -18544,6 +18549,27 @@ export const ja_JP: EnTranslations = {
       },
       "membership_token": {
         "name": "メンバーシップトークン（30日）"
+      },
+      "referral_helmet": {
+        "name": "友情の兜"
+      },
+      "referral_shoulder": {
+        "name": "友情の肩当て"
+      },
+      "referral_chest": {
+        "name": "友情の胸当て"
+      },
+      "referral_waist": {
+        "name": "友情の帯"
+      },
+      "referral_legs": {
+        "name": "友情の脚甲"
+      },
+      "referral_gloves": {
+        "name": "友情の手甲"
+      },
+      "referral_feet": {
+        "name": "友情のブーツ"
       },
       "membership_helmet": {
         "name": "メンバーシップの兜"

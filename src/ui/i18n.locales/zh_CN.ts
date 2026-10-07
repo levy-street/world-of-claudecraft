@@ -18760,4 +18760,17 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '您的年度会员付款已完成。坦克坐骑钥匙随信附上。请将钥匙保留在背包或银行中以拥有此坐骑。会员到期后它仍归您所有。需要骑术技能。',
   'hudChrome.wocStore.subscription.checkoutClosed':
     '此结账流程已结束，且没有待领取奖励。请重新选择会员方案，开始新的结账流程。',
+  'itemUi.tooltip.referralFullSet':
+    '穿戴全部{pieces}件友谊护甲，与{member}组队时获得额外{percent}%经验。邀请人的会员资格必须有效。',
+  'itemUi.tooltip.referralInviter': '邀请你的会员',
+  'itemUi.tooltip.referralRetained': '即使未与邀请人组队，护甲属性仍会随等级提升。',
+  'itemUi.tooltip.referralDormant': '未激活：此账号尚未通过会员邀请获得友谊护甲。',
+  'entities.items.referral_helmet.name': '友谊头盔',
+  'entities.items.referral_shoulder.name': '友谊肩甲',
+  'entities.items.referral_chest.name': '友谊胸甲',
+  'entities.items.referral_waist.name': '友谊腰带',
+  'entities.items.referral_legs.name': '友谊腿甲',
+  'entities.items.referral_gloves.name': '友谊护手',
+  'entities.items.referral_feet.name': '友谊战靴',
+  'hudChrome.bank.referralArmour': '领取友谊护甲',
 };

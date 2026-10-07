@@ -77,6 +77,7 @@ export interface InspectEntity {
   level: number;
   specId?: string | null;
   membershipActive?: boolean;
+  referralInviterName?: string;
   skin?: number;
   /** Which catalog `skin` indexes into (the wire `cat` identity field). */
   skinCatalog?: SkinCatalog;

@@ -49,6 +49,7 @@ import type { ItemCopyAnchor } from './item_copy_anchor';
 import * as membershipMod from './membership';
 import { refreshKnownAbilities } from './progression/known_abilities';
 import { setPlayerLevel as setPlayerLevelImpl } from './progression/level';
+import type { HostArmourAuthority } from './referral_armour';
 import * as treasureVaultMod from './treasure_vault';
 import type { CannonActionId, CannonPoint, VehicleSession } from './types';
 import * as vehicleMod from './vehicles';
@@ -1305,10 +1306,8 @@ export type JoinableChannel = (typeof JOINABLE_CHANNELS)[number];
 
 // Per-player progression and bags. The entity holds combat state; this holds
 // everything that belongs to the character sheet.
-export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState {
+export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState, HostArmourAuthority {
   courier?: courierMod.CourierState;
-  /** Host-only membership deadline in sim seconds. Never restored from a save. */
-  membershipExpiresAt?: number;
   entityId: number;
   // Stable database character id when running on the server. Offline/sim-only
   // callers fall back to entityId for systems that need a rename-proof owner key.

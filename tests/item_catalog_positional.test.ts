@@ -69,6 +69,13 @@ describe('the positional item-name catalog stays aligned with its ids', () => {
       'membership_shoulder',
       'membership_token',
       'membership_waist',
+      'referral_chest',
+      'referral_feet',
+      'referral_gloves',
+      'referral_helmet',
+      'referral_legs',
+      'referral_shoulder',
+      'referral_waist',
       'soul_stone',
     ]);
   });

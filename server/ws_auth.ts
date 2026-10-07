@@ -17,6 +17,7 @@ import type * as http from 'node:http';
 import type { WebSocket, WebSocketServer } from 'ws';
 import { MEMBERSHIP_OFF, membershipCharacterLocked } from '../src/membership_contract';
 import { type AccountLedger, freshAccountLedger } from '../src/sim/account_ledger';
+import { setReferralArmour } from '../src/sim/referral_armour';
 import { worldQuestCycleForResetDay } from '../src/sim/world_quest_rotation';
 import {
   type BankBonusSource,
@@ -38,6 +39,7 @@ import type { GameServer } from './game';
 import { noteClientFrame } from './keepalive_sweep';
 import type { MembershipAuthorization } from './membership_service';
 import { negotiateMovementWireVersion } from './movement_wire_version';
+import type { ReferralArmourEntitlement } from './referral_armour_db';
 import { kickStoragePurchaseRecovery } from './storage_purchases';
 import type { HandshakeFlushMode } from './ws_buffer';
 
@@ -98,6 +100,7 @@ function rejectHandshake(ws: WebSocket, error: string): void {
 export interface WsAuthDeps {
   game: GameServer;
   getMembership?: (accountId: number) => Promise<MembershipAuthorization>;
+  referralArmourForAccount?: (accountId: number) => Promise<ReferralArmourEntitlement | null>;
   accountAndScopeForToken: (
     token: string,
   ) => Promise<{ accountId: number; scope: TokenScope } | null>;
@@ -423,6 +426,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       pendingLeaseJoins.add(character.id);
       try {
         let admittedCharacter = character;
+        let referralArmour: ReferralArmourEntitlement | null | undefined;
         let leaseNonce: string | undefined;
         let result: ReturnType<GameServer['join']>;
         if (game.hasSessionForCharacter(character.id)) {
@@ -499,6 +503,9 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
             // Computed BEFORE the lease acquire so the lease-held window stays tight; a bare
             // await means a DB error fails the handshake exactly like a getCharacter failure.
             const bankBonus = await bankBonusForAccount(accountId);
+            // Fixed account-PK read, before the lease; resumes retain live authority.
+            if (deps.referralArmourForAccount)
+              referralArmour = await deps.referralArmourForAccount(accountId);
             leaseNonce = randomUUID();
             const leased = await acquireCharacterLease(character.id, accountId, leaseNonce);
             if (!leased) {
@@ -634,6 +641,8 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
               : 0,
           );
         }
+        if (referralArmour !== undefined)
+          setReferralArmour(game.sim.ctx, session.pid, referralArmour);
         console.log(
           `+ ${admittedCharacter.name} (${admittedCharacter.class}) joined, ${game.clients.size} online`,
         );
