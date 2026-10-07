@@ -13,6 +13,108 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.courier.title': '배달부',
+  'hudChrome.courier.close': '배달부 닫기',
+  'hudChrome.courier.ready': '배달 준비 완료',
+  'hudChrome.courier.outbound': '은행으로 비행 중',
+  'hudChrome.courier.returning': '아이템을 가지고 돌아오는 중',
+  'hudChrome.courier.waiting': '아이템 반환을 위해 대기 중',
+  'hudChrome.courier.bags': '은행에 보낼 아이템',
+  'hudChrome.courier.bank': '은행에서 가져올 아이템',
+  'hudChrome.courier.cargo': '배달부 소지품',
+  'hudChrome.courier.empty': '아이템 없음',
+  'hudChrome.courier.send': '배달부 보내기',
+  'hudChrome.courier.selected': '{count} / {limit} 묶음 선택됨',
+  'hudChrome.courier.select': '{item}, {count} 선택',
+  'hudChrome.courier.selectedItem': '{item}, {count} 선택 해제',
+  'hudChrome.courier.instructions':
+    '묶음 전체를 선택하세요. 배달부가 먼저 맡긴 뒤 요청한 아이템을 찾습니다. 퀘스트 아이템은 보낼 수 없습니다.',
+  'hudChrome.courier.membership': '새 배달을 시작하려면 멤버십을 갱신하세요.',
+  'hudChrome.courier.cargoSafe': '가방에 공간이 생길 때까지 배달부가 아이템을 보관합니다.',
+  'hudChrome.courier.unavailable': '배달부를 소환하여 배달을 계획하세요.',
+  'entities.abilities.courier.name': '배달부',
+  'entities.abilities.courier.description':
+    '날아다니는 당나귀를 소환하여 가방과 가장 가까운 은행 사이에서 아이템을 운반합니다. 일반 달리기 속도의 250%로 비행합니다. 한 번에 최대 24묶음을 선택할 수 있습니다. 새 배달을 시작하려면 멤버십이 필요합니다.',
+  // Membership additions: same-change non-Latin coverage (M16).
+  'hudChrome.wocStore.subscription.benefitsTitle': '활성 멤버십 혜택',
+  'hudChrome.wocStore.subscription.benefitBank':
+    '어느 은행원에게서든 다른 캐릭터의 은행을 이용할 수 있습니다.',
+  'hudChrome.wocStore.subscription.benefitSlots': '캐릭터 슬롯 10개를 추가로 잠금 해제합니다.',
+  'hudChrome.wocStore.subscription.benefitArmour':
+    '직업과 전문화에 맞는 능력치를 지닌 귀속 방어구를 받으세요. 캐릭터 레벨에 따라 성장하며 20레벨에 아이템 레벨 25가 됩니다. 전체 세트를 착용하면 경험치 획득량이 20% 증가합니다.',
+  'hudChrome.wocStore.subscription.benefitTax':
+    '경매장 수수료가 일반 수수료의 절반으로 줄어듭니다.',
+  'hudChrome.wocStore.subscription.benefitExpiry':
+    '멤버십이 만료되면 추가 슬롯의 캐릭터와 방어구 보너스가 갱신할 때까지 잠깁니다. 기본 슬롯의 캐릭터는 계속 플레이할 수 있습니다.',
+  'character.membershipRequired': '이 캐릭터로 플레이하려면 멤버십을 갱신하세요.',
+  'character.membershipSlots': '멤버십으로 캐릭터 슬롯 잠금 해제',
+  'character.emptySlot': '사용 가능한 캐릭터 슬롯',
+  'hudChrome.bank.accountTab': '다른 캐릭터',
+  'hudChrome.bank.accountArmour': '멤버십 방어구 받기',
+  'hudChrome.bank.accountMembership':
+    '멤버십이 활성화되어 있으면 여기서 다른 캐릭터의 은행을 이용할 수 있습니다.',
+  'hudChrome.bank.accountCharacters': '캐릭터 은행',
+  'hudChrome.bank.accountEmpty':
+    '다른 캐릭터를 만들면 여기서 해당 캐릭터의 은행을 이용할 수 있습니다.',
+  'hudChrome.bank.accountSelect': '은행을 불러올 캐릭터를 선택하세요.',
+  'hudChrome.bank.accountUnavailable':
+    '이 은행을 이용할 수 없습니다. 캐릭터를 다시 선택하여 새로고침하세요.',
+  'hudChrome.bank.accountDeposit': '내 가방: 이 은행에 보관',
+  'hudChrome.bank.accountWithdraw': '선택한 은행: 내 가방으로 인출',
+  'hudChrome.bank.accountDepositHint': '클릭하면 이 묶음을 선택한 캐릭터의 은행에 보관합니다.',
+  'hudChrome.bank.accountWithdrawHint': '클릭하면 이 묶음을 내 가방으로 인출합니다.',
+  'hudChrome.bank.accountBound':
+    '귀속 아이템, 잠긴 아이템, 퀘스트 아이템은 캐릭터 간에 이동할 수 없습니다.',
+  'hudChrome.wocStore.subscription.tokenTitle': '거래 가능한 멤버십 토큰',
+  'hudChrome.wocStore.subscription.tokenTerms':
+    '{price}를 한 번 결제하면 30일 이용권을 받습니다. 이 캐릭터에게 우편으로 전달됩니다. 사용하여 멤버십 기간을 추가하거나 경매장에서 판매하세요.',
+  'hudChrome.wocStore.subscription.tokenBuy': '멤버십 토큰 구매',
+  'hudChrome.wocStore.subscription.tokenClaim': '구매한 토큰 받기',
+  'hudChrome.wocStore.subscription.tokenPending':
+    '결제 후 이 캐릭터로 돌아와 토큰을 받으세요. 결제가 아직 처리 중이면 잠시 후 다시 시도하세요.',
+  'hudChrome.wocStore.subscription.tokenDelivered': '토큰이 우편으로 전달되었습니다.',
+  'itemUi.tooltip.membershipToken':
+    '사용: 이 토큰을 소모하여 계정의 멤버십 기간에 {days}일을 추가합니다. 남은 멤버십 기간은 유지됩니다. 사용 전에는 거래하거나 경매장에서 판매할 수 있습니다.',
+  'itemUi.tooltip.membershipAdaptive': '능력치와 방어구가 직업 및 전문화에 맞게 바뀝니다.',
+  'itemUi.tooltip.membershipScaling':
+    '아이템 레벨이 캐릭터 레벨에 맞춰 증가합니다. 20레벨에 도달하면 방어구가 완성되어 아이템 레벨이 25가 됩니다.',
+  'itemUi.tooltip.membershipPerfected': '완성됨: 아이템 레벨 {level}.',
+  'itemUi.tooltip.membershipFullSet':
+    '멤버십 방어구 {pieces}부위를 모두 착용하면 경험치 획득량이 {percent}% 증가합니다. 활성 멤버십이 필요합니다.',
+  'itemUi.tooltip.membershipRequired':
+    '멤버십이 만료되면 방어구 능력치와 세트 효과가 비활성화되며, 갱신하면 다시 활성화됩니다.',
+  'itemUi.tooltip.membershipDormant':
+    '비활성: 멤버십을 갱신하면 방어구 능력치와 세트 효과가 복구됩니다.',
+  'entities.items.membership_token.name': '멤버십 토큰 (30일)',
+  'entities.items.membership_helmet.name': '멤버십 투구',
+  'entities.items.membership_shoulder.name': '멤버십 견갑',
+  'entities.items.membership_chest.name': '멤버십 흉갑',
+  'entities.items.membership_waist.name': '멤버십 허리띠',
+  'entities.items.membership_legs.name': '멤버십 다리보호구',
+  'entities.items.membership_gloves.name': '멤버십 건틀릿',
+  'entities.items.membership_feet.name': '멤버십 장화',
+  'entities.letters.membership_token_delivery.sender': '레이븐포스트',
+  'entities.letters.membership_token_delivery.subject': '멤버십 토큰 배송',
+  'entities.letters.membership_token_delivery.body':
+    '구매하신 토큰을 동봉했습니다. 사용하면 계정의 멤버십 기간에 30일이 추가되며, 다른 모험가와 거래할 수도 있습니다.',
+  'hudChrome.wocStore.subscription.title': '게임 정기 구독',
+  'hudChrome.wocStore.subscription.price': '월 {price}',
+  'hudChrome.wocStore.subscription.terms':
+    '매월 자동 갱신됩니다. Stripe에서 법정 화폐로 결제하세요. 결제 설정에서 취소할 수 있습니다.',
+  'hudChrome.wocStore.subscription.subscribe': '구독하기',
+  'hudChrome.wocStore.subscription.manage': '구독 관리',
+  'hudChrome.wocStore.subscription.ending': '현재 결제 기간이 끝나면 취소됩니다',
+  'hudChrome.wocStore.subscription.error':
+    '결제 페이지를 열 수 없습니다. 팝업을 허용한 후 다시 시도하세요.',
+  'hudChrome.wocStore.subscription.status.none': '구독 안 함',
+  'hudChrome.wocStore.subscription.status.incomplete': '결제 미완료',
+  'hudChrome.wocStore.subscription.status.incomplete_expired': '결제 유효 기간 만료',
+  'hudChrome.wocStore.subscription.status.trialing': '체험 중',
+  'hudChrome.wocStore.subscription.status.active': '활성',
+  'hudChrome.wocStore.subscription.status.past_due': '결제 기한 초과',
+  'hudChrome.wocStore.subscription.status.canceled': '취소됨',
+  'hudChrome.wocStore.subscription.status.unpaid': '미납',
+  'hudChrome.wocStore.subscription.status.paused': '일시 중지됨',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}분',
   'abilityUi.cast.hoard_cast_rime_beam': '상고대 광선',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount} {currency}',
@@ -19924,4 +20026,42 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '옭아매는 뿌리의 시전 시간이 0.5초 감소합니다.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '옭아매는 뿌리를 시전하면 이동 중에도 시전할 수 있고 이동 속도가 4초 동안 20% 증가합니다. 20초에 한 번만 발동합니다.',
+  'hudChrome.wocStore.subscription.monthlyTitle': '월간 멤버십',
+  'hudChrome.wocStore.subscription.annualTitle': '12개월 멤버십 묶음',
+  'hudChrome.wocStore.subscription.annualPrice': '12개월 이용료 {price} 선불',
+  'hudChrome.wocStore.subscription.annualTerms':
+    '같은 가격으로 매년 갱신됩니다. Stripe에서 법정 화폐로 결제하세요. 결제 설정에서 취소할 수 있습니다.',
+  'hudChrome.wocStore.subscription.paidReward':
+    '결제할 때마다 {value} 상당의 Claudium {amount}개를 받습니다. 무료 체험 중에는 Claudium이 지급되지 않습니다.',
+  'hudChrome.wocStore.subscription.annualMount':
+    '결제 후 구매한 캐릭터로 우편에서 영혼 귀속 전차 탈것 열쇠를 받으세요. 전차는 묶음 탈것의 임시 모델입니다.',
+  'hudChrome.wocStore.subscription.trialTerms':
+    '계정당 한 번 {days}일간 무료로 체험하세요. 결제 수단 등록이 필요합니다. 취소하지 않으면 체험 종료 시 {price}가 청구됩니다. 체험 중에는 Claudium이나 묶음 탈것이 지급되지 않습니다.',
+  'hudChrome.wocStore.subscription.startTrial': '7일 무료 체험 시작',
+  'hudChrome.wocStore.subscription.annualClaim': '묶음 탈것 받기',
+  'hudChrome.wocStore.subscription.annualPending':
+    '결제 후 구매한 캐릭터로 돌아와 탈것을 받으세요. 결제 처리 중이거나 체험 중이면 유료 결제가 완료된 뒤 다시 시도하세요.',
+  'hudChrome.wocStore.subscription.annualDelivered': '묶음 탈것 열쇠가 우편으로 배송되었습니다.',
+  'hudChrome.wocStore.subscription.resumeCheckout': '결제 계속하기',
+  'entities.letters.membership_annual_reward.sender': '까마귀 우편',
+  'entities.letters.membership_annual_reward.subject': '연간 멤버십 탈것',
+  'entities.letters.membership_annual_reward.body':
+    '연간 멤버십 결제가 완료되었습니다. 전차 탈것 열쇠가 동봉되어 있습니다. 탈것을 소유하려면 열쇠를 가방이나 은행에 보관하세요. 멤버십이 만료되어도 소유권은 유지됩니다. 타기 기술이 필요합니다.',
+  'hudChrome.wocStore.subscription.checkoutClosed':
+    '이 결제는 종료되었으며 미수령 보상이 없습니다. 멤버십 요금제를 다시 선택하여 새 결제를 시작하세요.',
+  'itemUi.tooltip.referralFullSet':
+    '우정 방어구 {pieces}개를 모두 착용하고 {member} 님과 파티를 맺으면 경험치를 {percent}% 더 얻습니다. 초대자의 멤버십이 활성 상태여야 합니다.',
+  'itemUi.tooltip.referralInviter': '나를 초대한 회원',
+  'itemUi.tooltip.referralRetained':
+    '초대자와 파티를 맺지 않아도 방어구 능력치는 레벨에 따라 성장합니다.',
+  'itemUi.tooltip.referralDormant':
+    '비활성: 이 계정은 회원 초대를 통해 우정 방어구를 받지 않았습니다.',
+  'entities.items.referral_helmet.name': '우정의 투구',
+  'entities.items.referral_shoulder.name': '우정의 어깨갑옷',
+  'entities.items.referral_chest.name': '우정의 흉갑',
+  'entities.items.referral_waist.name': '우정의 허리띠',
+  'entities.items.referral_legs.name': '우정의 다리갑옷',
+  'entities.items.referral_gloves.name': '우정의 건틀릿',
+  'entities.items.referral_feet.name': '우정의 장화',
+  'hudChrome.bank.referralArmour': '우정 방어구 받기',
 };

@@ -828,7 +828,9 @@ describe('Masterwrought art completion evidence', () => {
     // (quest-leveling-gear-icons-2026-10-06): 1,709, likewise outside it.
     // + the 76 quest blue reward rares (quest-blue-rewards-icons-2026-10-07): 1,785, likewise
     // outside it.
-    expect(currentOwnerIds).toHaveLength(1785);
+    // + the 8 membership and 7 referral paintings (PR 4281): 1,800, likewise
+    // outside it.
+    expect(currentOwnerIds).toHaveLength(1800);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -977,6 +979,42 @@ describe('Masterwrought art completion evidence', () => {
     expect(questGearIds.size).toBe(321);
     expect(datedIds.filter((id) => questGearIds.has(id))).toEqual([]);
 
+    // Membership paintings are additive; they do not amend the dated approval.
+    const membershipIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => batchId === 'membership-items-2026-10-05')
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect(sorted([...membershipIds])).toEqual([
+      'membership_chest',
+      'membership_feet',
+      'membership_gloves',
+      'membership_helmet',
+      'membership_legs',
+      'membership_shoulder',
+      'membership_token',
+      'membership_waist',
+    ]);
+    expect(datedIds.filter((id) => membershipIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => membershipIds.has(id))).toHaveLength(8);
+
+    const referralIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => batchId === 'referral-items-2026-10-07')
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect(sorted([...referralIds])).toEqual([
+      'referral_chest',
+      'referral_feet',
+      'referral_gloves',
+      'referral_helmet',
+      'referral_legs',
+      'referral_shoulder',
+      'referral_waist',
+    ]);
+    expect(datedIds.filter((id) => referralIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => referralIds.has(id))).toHaveLength(7);
+
     // Strip all six later additive waves (Crucible professions, the Field Kit, the
     // Nythraxis gap-fill weapon renders, Roots' Bramblehide/gap-fill paintings,
     // the OSSBrain mount reins, the Valestrider's reins, the world-quest,
@@ -1004,7 +1042,9 @@ describe('Masterwrought art completion evidence', () => {
         id !== 'reins_avian_strider' &&
         !season2WeaponIds.has(id) &&
         !hoardBranchIds.has(id) &&
-        !questGearIds.has(id),
+        !questGearIds.has(id) &&
+        !membershipIds.has(id) &&
+        !referralIds.has(id),
     );
     expect(completionOwnerIds).toHaveLength(1209);
     expect(sorted(completionOwnerIds)).toEqual(completionDatedIds);

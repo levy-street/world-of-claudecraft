@@ -194,6 +194,7 @@ const FANOUT_ARMS: readonly string[] = [
   'this.renderTownFocus|this.townFocusOpen',
   'this.marketWindow.render|this.marketWindow.isOpen',
   'this.bankWindow.render|this.bankWindow.isOpen',
+  'this.courierWindow.render|this.courierWindow.isOpen()',
   'this.deedsWindow.render|this.deedsWindow.isOpen',
   'this.professionsWindow.render|this.professionsWindow.isOpen',
   // The journal's relocalize gates itself (isOpen inside) and additionally
@@ -342,6 +343,12 @@ interface AnsweredSurface extends GatedModule {
 }
 
 const ANSWERED: readonly AnsweredSurface[] = [
+  {
+    file: 'hud/courier/courier_window.ts',
+    memos: ['cheapSignature', 'lastSignature'],
+    answer: 'this.courierWindow.render',
+    why: 'phase, membership, custody, bank contents and selection are locale-independent; the open-window arm forces one render while retaining the selected stacks',
+  },
   {
     file: 'hud/loot/loot_window_controller.ts',
     memos: ['corpseSig', 'harvestStatusSig'],

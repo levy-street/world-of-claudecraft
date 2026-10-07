@@ -2556,6 +2556,21 @@
     transition: background-color var(--transition-speed);
     border-radius: var(--radius-sm);
   }
+  .membership-locked {
+    color: var(--color-text-muted);
+    background: var(--color-bg-input);
+  }
+  .char-row.membership-locked .char-name,
+  .char-row.membership-locked .char-sub {
+    color: var(--color-text-muted);
+  }
+  .membership-slot {
+    min-height: 48px;
+    cursor: default;
+  }
+  .membership-slot .char-sub {
+    white-space: normal;
+  }
   .char-row:hover {
     background: rgba(255, 255, 255, 0.02);
   }

@@ -43,8 +43,13 @@ import { campSpawnOffset } from './camp_scatter';
 import type { CharacterState, PetState } from './character_state';
 import { restoreCharacterStorage, savedCharacterStorage } from './character_storage';
 import type { TreasureMapProgress } from './content/treasure_maps';
+import * as courierMod from './courier';
 import type { FactionId } from './factions';
 import type { ItemCopyAnchor } from './item_copy_anchor';
+import * as membershipMod from './membership';
+import { refreshKnownAbilities } from './progression/known_abilities';
+import { setPlayerLevel as setPlayerLevelImpl } from './progression/level';
+import type { HostArmourAuthority } from './referral_armour';
 import * as treasureVaultMod from './treasure_vault';
 import type { CannonActionId, CannonPoint, VehicleSession } from './types';
 import * as vehicleMod from './vehicles';
@@ -205,7 +210,6 @@ import type { DelveShopGate, DelveShopOffer } from './data';
 import {
   ABILITIES,
   ALL_RECIPES,
-  abilitiesKnownAt,
   arenaOrigin,
   CLASSES,
   DELVE_COMPANIONS,
@@ -1303,7 +1307,8 @@ export type JoinableChannel = (typeof JOINABLE_CHANNELS)[number];
 
 // Per-player progression and bags. The entity holds combat state; this holds
 // everything that belongs to the character sheet.
-export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState {
+export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState, HostArmourAuthority {
+  courier?: courierMod.CourierState;
   entityId: number;
   // Stable database character id when running on the server. Offline/sim-only
   // callers fall back to entityId for systems that need a rename-proof owner key.
@@ -2256,7 +2261,7 @@ export class Sim {
     // S0b seam: the shared SimContext every extracted slice routes through. Built
     // once here (the rng now exists); a live view + bound callbacks, it draws no rng
     // and mutates nothing, so it cannot perturb the construction draws below.
-    this.ctx = this.buildSimContext(cfg.vaultConsumptionAdmission);
+    this.ctx = this.buildSimContext(cfg.vaultConsumptionAdmission, cfg.courierBankExchange);
     ferryMod.syncFerryGates(this.ctx); // this world's own deck gates before any placement query
     // Movement-kernel deps (MV1): pure binding, no rng draws, no construction effects.
     this.playerMotionDeps = {
@@ -4888,7 +4893,10 @@ export class Sim {
   // routes straight back to the Sim method of the same name (the callback registry
   // in 02-WORKING-MEMORY.md). As a later slice owns one of these, it reimplements the
   // callback in its own module without renaming it here, so consumers never change.
-  private buildSimContext(reserveVaultConsumption = inertVaultConsumptionAdmission): SimContext {
+  private buildSimContext(
+    reserveVaultConsumption = inertVaultConsumptionAdmission,
+    courierBankExchange?: courierMod.CourierBankExchange,
+  ): SimContext {
     const sim = this;
     const host: SimContextHost = {
       get rng() {
@@ -5039,6 +5047,7 @@ export class Sim {
         return sim.storagePrices;
       },
       reserveVaultConsumption,
+      courierBankExchange,
       // A2: duel + arena state stays on Sim, exposed as live views (backing fields
       // mutated in place / the queues reassigned by the matchmaker filter).
       get trades() {
@@ -5680,36 +5689,7 @@ export class Sim {
   }
 
   private refreshKnownAbilities(meta: PlayerMeta, announce: boolean): void {
-    const e = this.entities.get(meta.entityId);
-    if (!e) return;
-    const before = new Map(meta.known.map((k) => [k.def.id, k.rank]));
-    // (Frost's second Ice Block charge is resolved inside abilitiesKnownAt, the
-    // shared known-list builder, so ClientWorld's recomputed list matches.)
-    // questsDone gates quest-earned abilities (paladin recall_the_fallen); it is
-    // restored before this runs at load, so a returning character keeps them.
-    meta.known = abilitiesKnownAt(meta.cls, e.level, meta.talentMods, meta.questsDone);
-    if (announce) {
-      for (const k of meta.known) {
-        const prev = before.get(k.def.id);
-        if (prev === undefined || prev < k.rank) {
-          this.emit({
-            type: 'learnAbility',
-            abilityId: k.def.id,
-            rank: k.rank,
-            pid: meta.entityId,
-          });
-          this.emit({
-            type: 'log',
-            pid: meta.entityId,
-            text:
-              prev === undefined
-                ? `You have learned a new ability: ${k.def.name}.`
-                : `Your ${k.def.name} has improved to Rank ${k.rank}.`,
-            color: '#ffd100',
-          });
-        }
-      }
-    }
+    refreshKnownAbilities(this.ctx, meta, announce);
   }
 
   // Mark a player as a GM: invulnerable (see dealDamage). Server-side only —
@@ -5781,34 +5761,34 @@ export class Sim {
     r.e.cheaterMark = undefined;
   }
 
+  // Host account entitlement; the character blob has no authority over this value.
+  setMembership(pid: number, remainingSeconds: number): void {
+    membershipMod.setMembership(this.ctx, pid, remainingSeconds);
+  }
+
+  membershipActiveFor(pid: number): boolean {
+    const meta = this.players.get(pid);
+    return !!meta && membershipMod.membershipActive(meta, this.time);
+  }
+
+  readonly accountBankInfo: import('../world_api/bank').AccountBankInfo | null = null;
+  requestAccountBanks(): void {}
+  selectAccountBank(_characterId: number): void {}
+  accountBankTransfer(
+    _characterId: number,
+    _direction: 'deposit' | 'withdraw',
+    _slotIndex: number,
+    _count?: number,
+    _expectedSlot?: InvSlot,
+  ): void {}
+
+  claimMembershipArmour(pid?: number): void {
+    membershipMod.claimMembershipArmour(this.ctx, pid);
+  }
+
   // Dev/test convenience: jump a player to a level (learns abilities, recalcs stats).
   setPlayerLevel(level: number, pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    r.e.level = Math.max(1, Math.min(MAX_LEVEL, level));
-    // Keep lifetimeXp consistent with the level so post-cap progression starts
-    // from a sane baseline (virtualLevel never falls below the real level). Only
-    // ever raises it — lifetimeXp is monotonic.
-    r.meta.lifetimeXp = Math.max(r.meta.lifetimeXp, xpToReachLevel(r.e.level));
-    // Re-bake the flat talent mods at the new level before the stat + ability pass:
-    // spec mastery magnitudes scale with level (min(1, level/20)), so a dev/GM level
-    // jump must strengthen (or weaken) the mastery, exactly like the live ding path
-    // (combat/damage.ts grantXp). Without this a level-jumped character keeps the
-    // mastery baked at the OLD level.
-    const m = r.meta;
-    m.talentMods = computeCharacterModifiers(m.cls, m.talents, r.e.level, m.equipment);
-    recalcPlayerStats(
-      r.e,
-      r.meta.cls,
-      r.meta.equipment,
-      this.playerMods(r.meta),
-      r.meta.equipmentInstance,
-    );
-    r.e.hp = r.e.maxHp;
-    if (r.e.resourceType === 'mana') r.e.resource = r.e.maxResource;
-    this.refreshKnownAbilities(r.meta, false);
-    this.syncPetLevel(r.e);
-    deedsMod.markDeedsDirty(this.ctx, r.meta.entityId); // level/lifetimeXp predicates re-check
+    setPlayerLevelImpl(this.ctx, level, pid);
   }
 
   // -------------------------------------------------------------------------
@@ -5970,6 +5950,9 @@ export class Sim {
     for (const meta of this.players.values()) {
       const p = this.entities.get(meta.entityId);
       if (!p) continue;
+      membershipMod.updateMembership(this.ctx, meta, p);
+      courierMod.updateCourier(this.ctx, meta, p);
+      lap?.('p.courier');
       if (p.dead) worldQuestMod.updateWorldQuests(this.ctx, meta, p);
       vehicleMod.tickVehicle(this.ctx, meta, p);
       if (!p.dead) {
@@ -10749,6 +10732,24 @@ export class Sim {
 
   get bankInfo(): import('../world_api').BankInfo | null {
     return this.primaryId === -1 ? null : this.bankInfoFor(this.primaryId);
+  }
+  get courierInfo() {
+    return courierMod.courierInfoFor(this.ctx, this.primaryId);
+  }
+  courierInfoFor(pid: number) {
+    return courierMod.courierInfoFor(this.ctx, pid);
+  }
+  courierBankInfoFor(pid: number) {
+    return courierMod.courierBankInfoFor(this.ctx, pid);
+  }
+  courierPoseFor(pid: number) {
+    return courierMod.courierPoseFor(this.ctx, pid);
+  }
+  courierWireRevisionFor(pid: number) {
+    return courierMod.courierWireRevisionFor(this.ctx, pid);
+  }
+  courierDispatch(request: courierMod.CourierDispatchRequest, pid?: number): void {
+    courierMod.courierDispatch(this.ctx, request, pid);
   }
 
   get weeklyRewardInfo(): weeklyMod.WeeklyRewardInfo | null {

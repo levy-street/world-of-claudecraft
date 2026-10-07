@@ -868,11 +868,13 @@ describe('item-art audit builder', () => {
       // (quest-leveling-gear-icons-2026-10-06), re-measured with `--verify-only`.
       // 1785 / 1803 with the 76 quest blue reward rares
       // (quest-blue-rewards-icons-2026-10-07), re-measured the same way.
-      catalogSha256: 'afd99abc95437d60ad420e7e0ab3ddda6a7b1ff0e6b071c079d89b3dc3fb76e0',
-      catalogBytes: 974005,
+      // 1800 / 1818 with PR 4281's 8 membership and 7 referral paintings on the
+      // membership integration, re-measured the same way.
+      catalogSha256: '219610769e80ead90622dc35a43bf6ac251d8379a805b9f6343bab0358ad8a3e',
+      catalogBytes: 981844,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1785,
-      liveItemCount: 1803,
+      catalogCount: 1800,
+      liveItemCount: 1818,
       generatedHeroicDefinitions: 78,
       heroicDefinitionsWithOwnWebp: 59,
       heroicWeaponArtAliases: 19,
@@ -890,7 +892,7 @@ describe('item-art audit builder', () => {
         identity: 39,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: 'e59715fdfcbe8011e5a4bbd7a9a27024b5ea5f156085357e4543604177b16eed',
+      shippingCatalogSha256: '0d13f68b16d0c6963eb4fd4f45f9bfd8417a82f4223d5a707d5f0ea4328ba639',
       machineChecksPassed: true,
       verdict: null,
     });

@@ -506,3 +506,21 @@ something this file marks as restricted, ask first: tony@levystreet.com.
   Provenance: `docs/design/buried-hoard-entrance/asset-provenance.md`.
 
 Weekly Vault milestone illustrations (public/ui/weekly-vault/) are project-generated art made with OpenAI's built-in image generation for World of ClaudeCraft. Matching square front-face doors with antique-gold trim and corners, plus bronze empty, silver Normal, or gold Heroic center accents; completed doors remain closed with matching light glowing through their seams. Project asset, with the project only.
+
+Membership item paintings (`public/ui/items/membership_*.webp`) were created separately
+with OpenAI's built-in image generation for World of ClaudeCraft. Project-generated
+art, project asset, rights reserved. Exact prompts, retained-source hashes, shipping
+hashes, and review evidence: `docs/achievements/membership-items-2026-10-05/accepted-art.json`.
+
+### Membership courier
+
+- `public/models/creatures/courier_donkey.glb`: user-supplied `winged_mail_donkey.glb`,
+  received 2026-10-07 for the membership courier. Authorship and license were not
+  supplied. The original donor and reproducible import pipeline are retained in
+  `scripts/assets/courier_donkey/`. The character-safe optimizer preserves the
+  47-joint rig and Idle/Run/Fly clips; the 1024px color map uses KTX2/Basis compression.
+
+Friendship armour paintings (`public/ui/items/referral_*.webp`) were created separately
+with OpenAI's built-in image generation for World of ClaudeCraft. Project-generated
+art, project asset, rights reserved. Exact prompts, retained-source hashes, shipping
+hashes, and review evidence: `docs/achievements/referral-items-2026-10-07/accepted-art.json`.

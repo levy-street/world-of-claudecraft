@@ -16,6 +16,15 @@ vi.mock('pg', () => ({
     return { query: dbMock.query, connect: dbMock.connect };
   },
 }));
+vi.mock('../server/membership_service', () => ({
+  getMembership: async () => ({
+    active: false,
+    expiresAt: null,
+    authorizedUntil: 0,
+    recurringExpiresAt: null,
+  }),
+  trustedRecurringMembershipExpiry: () => null,
+}));
 vi.mock('../server/admin_guilds_read', () => ({
   bustAdminGuildListReads: dbMock.bustGuildList,
 }));
@@ -925,7 +934,8 @@ describe('createCharacterCapped appearance column', () => {
 
     await createCharacterCapped(7, 'Designed', 'mage', 10, null, { gender: 'female' });
     let insert = client.query.mock.calls.find((c: any[]) => /INSERT INTO characters/i.test(c[0]))!;
-    expect(insert[0]).toMatch(/appearance\)/);
+    expect(insert[0]).toMatch(/appearance, membership_slot\)/);
+    expect(insert[1][6]).toBe(false);
     expect(insert[1][5]).toBe(JSON.stringify({ gender: 'female' }));
 
     client.query.mockClear();
@@ -1468,8 +1478,9 @@ describe('createCharacterCapped', () => {
     dbMock.connect.mockResolvedValue(client as any);
     client.query
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // BEGIN
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // transaction bounds
       .mockResolvedValueOnce({ rows: [{ id: 7 }], rowCount: 1 } as any)
-      .mockResolvedValueOnce({ rows: [{ n: 9 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [{ n: 9, base: 9 }], rowCount: 1 } as any)
       .mockResolvedValueOnce({
         rows: [
           {
@@ -1492,13 +1503,14 @@ describe('createCharacterCapped', () => {
 
     expect(row?.id).toBe(42);
     expect(client.query.mock.calls[0][0]).toBe('BEGIN');
-    expect(client.query.mock.calls[1][0]).toContain('FOR UPDATE');
-    expect(client.query.mock.calls[1][1]).toEqual([7]);
-    expect(client.query.mock.calls[2][0]).toContain('count(*)::int');
-    expect(client.query.mock.calls[2][1]).toEqual([7, REALM]);
-    expect(client.query.mock.calls[3][0]).toMatch(/INSERT INTO characters/);
-    expect(client.query.mock.calls[4][0]).toContain('INSERT INTO player_account_facts');
-    expect(client.query.mock.calls[5][0]).toBe('COMMIT');
+    expect(client.query.mock.calls[1][0]).toContain("lock_timeout = '2s'");
+    expect(client.query.mock.calls[2][0]).toContain('FOR UPDATE');
+    expect(client.query.mock.calls[2][1]).toEqual([7]);
+    expect(client.query.mock.calls[3][0]).toContain('count(*)::int');
+    expect(client.query.mock.calls[3][1]).toEqual([7, REALM]);
+    expect(client.query.mock.calls[4][0]).toMatch(/INSERT INTO characters/);
+    expect(client.query.mock.calls[5][0]).toContain('INSERT INTO player_account_facts');
+    expect(client.query.mock.calls[6][0]).toBe('COMMIT');
     expect(client.release).toHaveBeenCalledTimes(1);
   });
 
@@ -1507,16 +1519,20 @@ describe('createCharacterCapped', () => {
     dbMock.connect.mockResolvedValue(client as any);
     client.query
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // BEGIN
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // transaction bounds
       .mockResolvedValueOnce({ rows: [{ id: 7 }], rowCount: 1 } as any)
-      .mockResolvedValueOnce({ rows: [{ n: 10 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [{ n: 10, base: 10 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // no prepaid membership
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // ROLLBACK
 
     await expect(createCharacterCapped(7, 'Overflow', 'warrior', 10)).resolves.toBeNull();
 
     expect(client.query.mock.calls.map((c) => c[0])).toEqual([
       'BEGIN',
+      "SET LOCAL lock_timeout = '2s'; SET LOCAL statement_timeout = '5s'; SET LOCAL idle_in_transaction_session_timeout = '10s'",
       'SELECT id FROM accounts WHERE id = $1 FOR UPDATE',
-      'SELECT count(*)::int AS n FROM characters WHERE account_id = $1 AND realm = $2',
+      'SELECT count(*)::int AS n, count(*) FILTER (WHERE NOT membership_slot)::int AS base FROM characters WHERE account_id = $1 AND realm = $2',
+      'SELECT prepaid_until FROM account_memberships WHERE account_id = $1',
       'ROLLBACK',
     ]);
     expect(client.release).toHaveBeenCalledTimes(1);
@@ -1527,8 +1543,9 @@ describe('createCharacterCapped', () => {
     dbMock.connect.mockResolvedValue(client as any);
     client.query
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // BEGIN
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // transaction bounds
       .mockResolvedValueOnce({ rows: [{ id: 7 }], rowCount: 1 } as any)
-      .mockResolvedValueOnce({ rows: [{ n: 3 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [{ n: 3, base: 3 }], rowCount: 1 } as any)
       .mockRejectedValueOnce(new Error('duplicate name'))
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // ROLLBACK
 
@@ -1547,19 +1564,21 @@ describe('createCharacterCapped', () => {
     dbMock.connect.mockResolvedValue(client as any);
     client.query
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // BEGIN
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // transaction bounds
       .mockResolvedValueOnce({ rows: [{ id: 7 }], rowCount: 1 } as any)
-      .mockResolvedValueOnce({ rows: [{ n: 0 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [{ n: 0, base: 0 }], rowCount: 1 } as any)
       .mockResolvedValueOnce({ rows: [{ id: 51, level: 1 }], rowCount: 1 } as any)
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // player metric facts
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // COMMIT
 
     const row = await createCharacterCapped(7, 'Defaulted', 'mage', 10, null, null);
 
-    const insert = client.query.mock.calls[3];
+    const insert = client.query.mock.calls[4];
     expect(String(insert[0])).toContain(
-      'INSERT INTO characters (account_id, name, class, realm, state, appearance) VALUES ($1, $2, $3, $4, $5, $6)',
+      'INSERT INTO characters (account_id, name, class, realm, state, appearance, membership_slot) VALUES ($1, $2, $3, $4, $5, $6, $7)',
     );
-    expect(insert[1]).toHaveLength(6);
+    expect(insert[1]).toHaveLength(7);
+    expect(insert[1][6]).toBe(false);
     expect(String(insert[0])).toContain(
       'RETURNING id, account_id, name, class, level, state, is_gm, force_rename, appearance',
     );
@@ -1575,8 +1594,9 @@ describe('createCharacterCapped', () => {
     dbMock.connect.mockResolvedValue(client as any);
     client.query
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // BEGIN
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // transaction bounds
       .mockResolvedValueOnce({ rows: [{ id: 7 }], rowCount: 1 } as any)
-      .mockResolvedValueOnce({ rows: [{ n: 0 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [{ n: 0, base: 0 }], rowCount: 1 } as any)
       .mockResolvedValueOnce({ rows: [{ id: 52, level: 20 }], rowCount: 1 } as any)
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // player metric facts
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // COMMIT
@@ -1584,12 +1604,21 @@ describe('createCharacterCapped', () => {
     const state = { level: 20 } as any;
     const row = await createCharacterCapped(7, 'Boosted', 'mage', 10, state, null, 20);
 
-    const insert = client.query.mock.calls[3];
+    const insert = client.query.mock.calls[4];
     expect(String(insert[0])).toContain(
-      'INSERT INTO characters (account_id, name, class, realm, state, appearance, level) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+      'INSERT INTO characters (account_id, name, class, realm, state, appearance, membership_slot, level) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
     );
     // Parameterized, never interpolated, and the blob rides the same insert.
-    expect(insert[1]).toEqual([7, 'Boosted', 'mage', REALM, JSON.stringify(state), null, 20]);
+    expect(insert[1]).toEqual([
+      7,
+      'Boosted',
+      'mage',
+      REALM,
+      JSON.stringify(state),
+      null,
+      false,
+      20,
+    ]);
     // The RETURNING row reports the level that actually landed, which is what
     // lets the boost prove its second write is unnecessary rather than assume it.
     expect(row?.level).toBe(20);
@@ -1608,8 +1637,9 @@ describe('character roster feed enqueues', () => {
     dbMock.connect.mockResolvedValue(client as any);
     client.query
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // BEGIN
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // transaction bounds
       .mockResolvedValueOnce({ rows: [{ id: 7 }], rowCount: 1 } as any)
-      .mockResolvedValueOnce({ rows: [{ n: 2 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [{ n: 2, base: 2 }], rowCount: 1 } as any)
       .mockResolvedValueOnce({ rows: [{ id: 42, account_id: 7 }], rowCount: 1 } as any)
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // player metric facts
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // COMMIT
@@ -1624,8 +1654,10 @@ describe('character roster feed enqueues', () => {
     dbMock.connect.mockResolvedValue(client as any);
     client.query
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // BEGIN
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // transaction bounds
       .mockResolvedValueOnce({ rows: [{ id: 7 }], rowCount: 1 } as any)
-      .mockResolvedValueOnce({ rows: [{ n: 10 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [{ n: 10, base: 10 }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // no prepaid membership
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // ROLLBACK
 
     await expect(createCharacterCapped(7, 'Overflow', 'warrior', 10)).resolves.toBeNull();

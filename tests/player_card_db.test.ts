@@ -9,25 +9,37 @@ const dbMock = vi.hoisted(() => {
   return { query: vi.fn() };
 });
 vi.mock('pg', () => ({
-  Pool: vi.fn(function Pool() { return { query: dbMock.query }; }),
+  Pool: vi.fn(function Pool() {
+    return { query: dbMock.query };
+  }),
 }));
 
-import { slugAvailable, primarySlugForAccount, referralCountForAccount, recordReferral } from '../server/db';
+import {
+  primarySlugForAccount,
+  recordReferral,
+  referralCountForAccount,
+  slugAvailable,
+} from '../server/db';
 
 // per-test control over what the mocked DB returns, routed by SQL substring
-let slugLookupRows: any[] = [];   // SELECT character_id FROM player_cards WHERE slug
-let primarySlugRows: any[] = [];  // SELECT slug FROM player_cards ... ORDER BY updated_at
+let slugLookupRows: any[] = []; // SELECT character_id FROM player_cards WHERE slug
+let primarySlugRows: any[] = []; // SELECT slug FROM player_cards ... ORDER BY updated_at
 let referralCountRows: any[] = []; // SELECT count(*)::int AS n FROM referrals
 
 beforeEach(() => {
-  slugLookupRows = []; primarySlugRows = []; referralCountRows = [];
+  slugLookupRows = [];
+  primarySlugRows = [];
+  referralCountRows = [];
   dbMock.query.mockReset();
   dbMock.query.mockImplementation((sql: string) => {
     // The real queries are multi-line; collapse whitespace so routing is robust.
     const s = String(sql).replace(/\s+/g, ' ').trim();
-    if (s.includes('SELECT character_id FROM player_cards WHERE slug')) return Promise.resolve({ rows: slugLookupRows });
-    if (s.includes('SELECT slug FROM player_cards WHERE account_id')) return Promise.resolve({ rows: primarySlugRows });
-    if (s.includes('count(*)::int AS n FROM referrals')) return Promise.resolve({ rows: referralCountRows });
+    if (s.includes('SELECT character_id FROM player_cards WHERE slug'))
+      return Promise.resolve({ rows: slugLookupRows });
+    if (s.includes('SELECT slug FROM player_cards WHERE account_id'))
+      return Promise.resolve({ rows: primarySlugRows });
+    if (s.includes('count(*)::int AS n FROM referrals'))
+      return Promise.resolve({ rows: referralCountRows });
     if (s.includes('INSERT INTO referrals')) return Promise.resolve({ rows: [] });
     return Promise.resolve({ rows: [] });
   });
@@ -82,10 +94,14 @@ describe('referralCountForAccount', () => {
 describe('recordReferral', () => {
   it('inserts the referral idempotently with [referee, referrer, slug]', async () => {
     await recordReferral(11, 22, 'champ');
-    const insert = dbMock.query.mock.calls.find((c) => String(c[0]).includes('INSERT INTO referrals'));
+    const insert = dbMock.query.mock.calls.find((c) =>
+      String(c[0]).includes('INSERT INTO referrals'),
+    );
     expect(insert).toBeDefined();
     // Idempotency guard: only the first referral per referee is kept (PK on referee_account_id).
-    expect(String(insert?.[0]).replace(/\s+/g, ' ')).toContain('ON CONFLICT (referee_account_id) DO NOTHING');
-    expect(insert?.[1]).toEqual([11, 22, 'champ']);
+    expect(String(insert?.[0]).replace(/\s+/g, ' ')).toContain(
+      'ON CONFLICT (referee_account_id) DO NOTHING',
+    );
+    expect(insert?.[1]).toEqual([11, 22, 'champ', false, '']);
   });
 });

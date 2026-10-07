@@ -150,8 +150,10 @@ const build = await buildItemArtAudit({
     // measured with `node scripts/item_art_audit.mjs --verify-only`.
     // + the 76 quest blue reward rares (quest-blue-rewards-icons-2026-10-07):
     // 1785 / 1803 on 39 sheet pages, measured the same way.
-    catalogCount: 1785,
-    liveItemCount: 1803,
+    // + PR 4281's 8 membership and 7 referral paintings on the membership
+    // integration: 1800 / 1818 on 39 sheet pages, measured the same way.
+    catalogCount: 1800,
+    liveItemCount: 1818,
     pendingArtCount: 135,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,

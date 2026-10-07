@@ -15,7 +15,13 @@
 // char_view's arrays via the pure core, so inspect inherits the sheet's 6/6 split.
 
 import { ITEMS } from '../sim/data';
-import type { EquipSlot, ItemInstancePayload, PlayerClass, SkinCatalog } from '../sim/types';
+import type {
+  EquipSlot,
+  ItemDef,
+  ItemInstancePayload,
+  PlayerClass,
+  SkinCatalog,
+} from '../sim/types';
 import { attachAvatarFallback } from './avatar_fallback';
 import type { PaperdollSlot } from './char_view';
 import { CURATOR_SIGIL_GLOW, curatorSigilBadgeClass, curatorSigilDataUrl } from './curator_sigil';
@@ -69,6 +75,9 @@ export interface InspectEntity {
   templateId: string;
   name: string;
   level: number;
+  specId?: string | null;
+  membershipActive?: boolean;
+  referralInviterName?: string;
   skin?: number;
   /** Which catalog `skin` indexes into (the wire `cat` identity field). */
   skinCatalog?: SkinCatalog;
@@ -109,7 +118,13 @@ export interface InspectRemoteProfile {
 /** Hud-supplied glue. The presentation bag (icon/tooltip) plus world-free window
  *  concerns: focus capture/return, and the shared turntable mount (Hud owns the
  *  single WebGL preview lifecycle, so it re-parents the canvas into the stage). */
-export interface InspectWindowDeps extends PainterHostPresentation {
+export interface InspectWindowDeps extends Omit<PainterHostPresentation, 'itemTooltip'> {
+  /** Resolve adaptive equipment against its wearer, never the viewing player. */
+  itemTooltip(
+    item: ItemDef,
+    instance: ItemInstancePayload | undefined,
+    wearer: InspectEntity,
+  ): string;
   root(): HTMLElement;
   closeOthers(): void;
   hideTooltip(): void;
@@ -261,10 +276,10 @@ export class InspectWindow {
     }
     const leftCol = el.querySelector('#inspect-equip-left');
     const rightCol = el.querySelector('#inspect-equip-right');
-    for (const cell of model.gear.left) leftCol?.appendChild(this.buildSlotRow(cell));
-    for (const cell of model.gear.right) rightCol?.appendChild(this.buildSlotRow(cell));
+    for (const cell of model.gear.left) leftCol?.appendChild(this.buildSlotRow(cell, e));
+    for (const cell of model.gear.right) rightCol?.appendChild(this.buildSlotRow(cell, e));
     const weaponsRow = el.querySelector('#inspect-equip-weapons');
-    for (const cell of model.gear.weapons) weaponsRow?.appendChild(this.buildSlotRow(cell));
+    for (const cell of model.gear.weapons) weaponsRow?.appendChild(this.buildSlotRow(cell, e));
     const stage = el.querySelector<HTMLElement>('#inspect-model-preview');
     if (stage) {
       this.deps.mountPreview(stage, {
@@ -325,7 +340,7 @@ export class InspectWindow {
   // effective quality (row color, icon rim, glow) and a promoted copy's
   // player-chosen name replaces the def name. The chosen name is
   // player-authored text, so it is esc'd raw, never through t().
-  private buildSlotRow(cell: PaperdollSlot): HTMLElement {
+  private buildSlotRow(cell: PaperdollSlot, wearer: InspectEntity): HTMLElement {
     const { slot, item, instance } = cell;
     const row = document.createElement('div');
     row.className = 'equip-slot';
@@ -339,7 +354,9 @@ export class InspectWindow {
     if (item) {
       const iconEl = row.querySelector<HTMLImageElement>('.item-icon');
       if (iconEl) iconEl.style.boxShadow = qualityGlowShadow(qColor);
-      this.deps.attachTooltip(row, () => this.deps.itemTooltip(item, instance ?? undefined));
+      this.deps.attachTooltip(row, () =>
+        this.deps.itemTooltip(item, instance ?? undefined, wearer),
+      );
     }
     return row;
   }

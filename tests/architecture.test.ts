@@ -209,6 +209,7 @@ describe('live graphics profile architecture', () => {
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  'src/ui/hud/courier/courier_core.ts',
   'src/ui/frame_presets_core.ts',
   'src/ui/frame_menu_core.ts',
   'src/ui/loot_quality_view.ts',
@@ -452,6 +453,8 @@ const UI_PURE_CORES = [
   'src/ui/vault_view.ts',
   'src/ui/weekly_rewards_view.ts',
   'src/ui/bank_tabs_view.ts',
+  'src/ui/character_membership_view.ts',
+  'src/ui/account_bank_view.ts',
   'src/ui/vault_search.ts',
   'src/ui/guild_bank_log_view.ts',
   'src/ui/guild_bank_view.ts',
@@ -793,6 +796,7 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // post_bloom_shader_core is the host-agnostic GLSL source patch for the
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
+  'src/render/courier_visual_core.ts',
   'src/render/action_cam_core.ts',
   'src/render/ambience_state_core.ts',
   'src/render/ability_vfx/cast_admission_core.ts',
@@ -2689,6 +2693,8 @@ const UI_DOM_MODULES = [
   'src/ui/bank_quantity_prompt.ts',
   'src/ui/bank_status_line.ts',
   'src/ui/bank_window.ts',
+  'src/ui/bank_window_lifecycle.ts',
+  'src/ui/account_bank_window.ts',
   'src/ui/bank_window_focus.ts',
   'src/ui/breath_bar.ts',
   'src/ui/calendar_window.ts',
@@ -2734,6 +2740,7 @@ const UI_DOM_MODULES = [
   // carries or the by-name sweep that would drop this very row. The double
   // coverage is the deliberate one this file's own header describes.
   'src/ui/daily_rewards_spin_controller.ts',
+  'src/ui/store_subscription.ts',
   'src/ui/daily_rewards_window.ts',
   'src/ui/deeds_window.ts',
   'src/ui/desktop_update_toast.ts',

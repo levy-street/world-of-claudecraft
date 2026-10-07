@@ -347,6 +347,26 @@ export const de_DE: EnTranslations = {
     }
   },
   "hudChrome": {
+    "courier": {
+      "title": "Courier",
+      "close": "Close courier",
+      "ready": "Ready for a delivery",
+      "outbound": "Flying to the bank",
+      "returning": "Bringing your items back",
+      "waiting": "Waiting to return your items",
+      "bags": "Send to bank",
+      "bank": "Bring from bank",
+      "cargo": "Courier inventory",
+      "empty": "No items",
+      "send": "Send courier",
+      "selected": "{count} / {limit} stacks selected",
+      "select": "Select {item}, {count}",
+      "selectedItem": "Deselect {item}, {count}",
+      "instructions": "Select whole stacks. Your courier deposits them first, then collects your requested items. Quest items cannot be sent.",
+      "membership": "Renew your membership to start another trip.",
+      "cargoSafe": "Carried items stay with the courier until there is room in your bags.",
+      "unavailable": "Summon your courier to plan a delivery."
+    },
     "framePresets": {
       "apply": "Anwenden",
       "pickerLabel": "Fenstervorlagen: {name}",
@@ -826,6 +846,51 @@ export const de_DE: EnTranslations = {
       }
     },
     "wocStore": {
+      "subscription": {
+        "title": "Game subscription",
+        "monthlyTitle": "Monthly membership",
+        "annualTitle": "12-month membership bundle",
+        "annualPrice": "{price} for 12 months, paid upfront",
+        "annualTerms": "Renews yearly at the same price. Pay with fiat through Stripe. Cancel in billing settings.",
+        "paidReward": "Each paid charge grants {amount} Claudium, worth {value}. No Claudium is granted during the free trial.",
+        "annualMount": "After payment, collect a soulbound tank mount key by mail on the character that purchased this bundle. The tank is a placeholder for the bundle mount.",
+        "trialTerms": "Try membership free for {days} days, once per account. A payment method is required. You will be charged {price} when the trial ends unless you cancel. No Claudium or bundle mount is awarded during the trial.",
+        "startTrial": "Start 7-day free trial",
+        "resumeCheckout": "Resume checkout",
+        "checkoutClosed": "This checkout has closed without an outstanding reward. Choose a membership plan again to start a new checkout.",
+        "annualClaim": "Collect bundle mount",
+        "annualPending": "Return to the purchasing character after payment to collect the bundle mount. If payment is processing or the trial is active, try again after the paid charge.",
+        "annualDelivered": "Your bundle mount key has been delivered by mail.",
+        "tokenTitle": "Tradable membership token",
+        "benefitsTitle": "Active membership benefits",
+        "benefitBank": "Access your other characters' banks at any banker.",
+        "benefitSlots": "Unlock 10 additional character slots.",
+        "benefitArmour": "Claim soulbound armour with stats for your class and specialisation. It scales with your level and reaches item level 25 at level 20. Wear the full set for 20% more XP.",
+        "benefitTax": "Pay half the normal auction house tax.",
+        "benefitExpiry": "When membership ends, characters in the additional slots and armour bonuses are locked until renewal. Your base character slots remain playable.",
+        "tokenTerms": "{price} once for 30 days. Delivered by mail to this character. Redeem it to add membership time, or sell it at the auction house.",
+        "tokenBuy": "Buy membership token",
+        "tokenClaim": "Collect purchased token",
+        "tokenPending": "After payment, return to this character and collect your token. If payment is still processing, try again shortly.",
+        "tokenDelivered": "Your token has been delivered by mail.",
+        "price": "{price} per month",
+        "terms": "Renews monthly. Pay with fiat through Stripe. Cancel in billing settings.",
+        "subscribe": "Subscribe",
+        "manage": "Manage subscription",
+        "ending": "Cancels at the end of the billing period",
+        "error": "Could not open billing. Allow popups and try again.",
+        "status": {
+          "none": "Not subscribed",
+          "incomplete": "Payment incomplete",
+          "incomplete_expired": "Checkout expired",
+          "trialing": "Trial",
+          "active": "Active",
+          "past_due": "Payment overdue",
+          "canceled": "Canceled",
+          "unpaid": "Unpaid",
+          "paused": "Paused"
+        }
+      },
       "title": "WOC-Shop",
       "close": "WOC-Shop schließen",
       "tabsLabel": "Bereiche des WOC-Shops",
@@ -4880,6 +4945,19 @@ export const de_DE: EnTranslations = {
       "vaultCannotDeposit": "Kann nicht in den Tresor gelegt werden",
       "tabsAria": "Bank-Reiter",
       "personalTab": "Persönlich",
+      "accountTab": "Other characters",
+      "accountArmour": "Claim membership armour",
+      "referralArmour": "Claim friendship armour",
+      "accountMembership": "An active membership lets you access your other characters' banks here.",
+      "accountCharacters": "Character banks",
+      "accountEmpty": "Create another character to use their bank here.",
+      "accountSelect": "Select a character to load their bank.",
+      "accountUnavailable": "This bank is unavailable. Select the character again to refresh.",
+      "accountDeposit": "Your bags: deposit into this bank",
+      "accountWithdraw": "Selected bank: withdraw into your bags",
+      "accountDepositHint": "Click to deposit this stack into the selected character bank.",
+      "accountWithdrawHint": "Click to withdraw this stack into your bags.",
+      "accountBound": "Soulbound, locked and quest items cannot move between characters.",
       "guildTab": "Gilde",
       "guildCapacityAria": "Belegte Gildenbankfächer: {used} von {total}",
       "guildEmpty": "Die Gildenbank ist leer.",
@@ -11218,6 +11296,9 @@ export const de_DE: EnTranslations = {
   "character": {
     "loading": "Lädt...",
     "noneYet": "Noch keine Charaktere. Erstelle unten einen.",
+    "membershipRequired": "Renew your membership to play this character.",
+    "membershipSlots": "Unlock slots with a membership",
+    "emptySlot": "Available character slot",
     "levelClass": "Stufe {level} {className}",
     "inWorld": "in der Welt",
     "takeOver": "Übernehmen",
@@ -12756,6 +12837,17 @@ export const de_DE: EnTranslations = {
       "parry": "Parieren"
     },
     "tooltip": {
+      "referralFullSet": "Equip all {pieces} friendship armor pieces to gain {percent}% more experience while in a party with {member}. Their membership must be active.",
+      "referralInviter": "the member who invited you",
+      "referralRetained": "Armor stats keep scaling even when you are not in a party with your inviter.",
+      "referralDormant": "Inactive: this account has not received friendship armor through a member referral.",
+      "membershipToken": "Use: Consume this token to add {days} days of membership to your account. Any remaining membership time is kept. This token can be traded or sold at the auction house before redemption.",
+      "membershipAdaptive": "Stats and armor adapt to your class and specialization.",
+      "membershipScaling": "Item level matches your level. At level 20, this armor perfects at item level 25.",
+      "membershipPerfected": "Perfected: item level {level}.",
+      "membershipFullSet": "Equip all {pieces} membership armor pieces to gain {percent}% more experience. Requires an active membership.",
+      "membershipRequired": "Armor stats and set benefits stop when membership expires and return when you renew.",
+      "membershipDormant": "Inactive: renew your membership to restore armor stats and set benefits.",
       "qualityKind": "{quality} {kind}",
       "currentlyEquipped": "Derzeit angelegt",
       "ifYouEquip": "Wenn Ihr dies anlegt",
@@ -13055,6 +13147,10 @@ export const de_DE: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "courier": {
+        "name": "Courier",
+        "description": "Summon a flying donkey to carry items between your bags and the nearest bank. It flies at 250% of normal running speed. Choose up to 24 stacks per trip. Membership is required to start a new trip."
+      },
       "sport_kick": {
         "name": "Tritt",
         "description": "Stoß den Ball flach über den Boden zum Zielpunkt."
@@ -19417,6 +19513,51 @@ export const de_DE: EnTranslations = {
       "saltwrack_spaulders": {
         "name": "Saltwrack Spaulders"
       },
+      "membership_token": {
+        "name": "Membership Token (30 Days)"
+      },
+      "referral_helmet": {
+        "name": "Friendship Helm"
+      },
+      "referral_shoulder": {
+        "name": "Friendship Pauldrons"
+      },
+      "referral_chest": {
+        "name": "Friendship Cuirass"
+      },
+      "referral_waist": {
+        "name": "Friendship Girdle"
+      },
+      "referral_legs": {
+        "name": "Friendship Legguards"
+      },
+      "referral_gloves": {
+        "name": "Friendship Gauntlets"
+      },
+      "referral_feet": {
+        "name": "Friendship Boots"
+      },
+      "membership_helmet": {
+        "name": "Membership Helm"
+      },
+      "membership_shoulder": {
+        "name": "Membership Pauldrons"
+      },
+      "membership_chest": {
+        "name": "Membership Cuirass"
+      },
+      "membership_waist": {
+        "name": "Membership Girdle"
+      },
+      "membership_legs": {
+        "name": "Membership Legguards"
+      },
+      "membership_gloves": {
+        "name": "Membership Gauntlets"
+      },
+      "membership_feet": {
+        "name": "Membership Boots"
+      },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"
       },
@@ -24897,6 +25038,16 @@ export const de_DE: EnTranslations = {
         "sender": "Der Börsenmakler",
         "subject": "Euer Kauf an der Börse",
         "body": "Der Verkauf ist abgeschlossen, und die Ware gehört Euch. Das beigefügte Paket trägt genau den Gegenstand, für den Ihr bezahlt habt, verwahrt vom Moment der Einstellung bis zum Eingang Eurer Zahlung.\n\nEin Eintrag über den Verkauf steht im Hauptbuch der Börse.\n\n- Der Börsenmakler"
+      },
+      "membership_token_delivery": {
+        "sender": "The Ravenpost",
+        "subject": "Your membership token",
+        "body": "Your purchased token is enclosed. Redeem it to add 30 days of membership to your account, or trade it with another adventurer."
+      },
+      "membership_annual_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your annual membership mount",
+        "body": "Your annual membership payment is complete. Your tank mount key is enclosed. Keep the key in your bags or bank to own this mount. It remains yours after membership expires. Riding skill is required."
       },
       "woc_market_return": {
         "sender": "Der Börsenmakler",

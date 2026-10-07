@@ -741,6 +741,8 @@ const LETTER_IDS = [
   // $WOC Exchange custody letters (the server-side marketplace,
   // WOC_MARKET_*_LETTER in src/sim/content/letters.ts).
   'woc_market_delivery',
+  'membership_token_delivery',
+  'membership_annual_reward',
   'woc_market_return',
   'woc_market_sold',
   'hoard_vault_reward',

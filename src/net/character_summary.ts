@@ -11,6 +11,9 @@ export interface CharacterSummary {
   level: number;
   skin: number;
   online: boolean;
+  /** Server-owned stable slot assignment; sorting never changes membership access. */
+  membershipLocked?: boolean;
+  membershipSlot?: boolean;
   forceRename: boolean;
   lastPlayed?: string | null;
   playtimeSeconds?: number;

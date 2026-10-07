@@ -196,7 +196,7 @@ export interface MarketOrderHost {
   previewPlainBucketCount(meta: PlayerMeta, itemId: string, want: number): number;
   /** Escrow `want` plain units out of `meta`'s bags into provenance buckets. */
   escrowPlainBuckets(meta: PlayerMeta, itemId: string, want: number): InvSlot[];
-  cutPct(): number; // the Merchant's cut, as a fraction (MARKET_CUT)
+  cutPct(meta: PlayerMeta): number; // the Merchant's cut, as a fraction (MARKET_CUT)
   minPrice(): number;
   maxPrice(): number;
 }
@@ -401,7 +401,7 @@ export class MarketOrderBook {
       });
     }
     const gross = units * order.unitPrice;
-    const proceeds = Math.max(0, Math.floor(gross * (1 - this.host.cutPct())));
+    const proceeds = Math.max(0, Math.floor(gross * (1 - this.host.cutPct(meta))));
     const col = this.host.collectionFor(this.host.playerKey(meta));
     col.copper += proceeds;
     recordSale(col.sales, {
