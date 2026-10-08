@@ -182,3 +182,9 @@ PASS
 pnpm exec biome check server/main.ts src/sim/sim.ts tests/report_reward_mail_admission.test.ts
 PASS: no errors
 ```
+
+CI also exposed the missing `report-rewards` screenshot subtree in the five
+sparse test-job checkouts. The workflow inventory and its parity pin now include
+that subtree. Locally, `npx vitest run tests/ci_workflow.test.ts --maxWorkers=1`
+passed 26 cases; the complete source-reference scan exceeded the unchanged
+20-second timeout on Windows in both attempts. Linux CI validates this inventory.

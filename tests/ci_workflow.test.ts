@@ -355,6 +355,7 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/r35-admin-professions-inspector/',
       '            /docs/screenshots/release-v036-skill-normalization-2026-08-10/',
       '            /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/',
+      '            /docs/screenshots/report-rewards/',
       '            /docs/screenshots/target-dots/',
       '            /docs/screenshots/touch-ui-rework/',
       '            /docs/screenshots/vault-fine-mark/',
