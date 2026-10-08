@@ -654,6 +654,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '同時に表示するバーの数です（0＝無制限、ウィンドウの高さに自動調整）。',
   'hudChrome.meters.noDeathEvents': '死亡前に記録されたイベントはありません',
   'hudChrome.meters.noDetailedData': '詳細データがありません',
+  'hudChrome.meters.detailHealSubtitle':
+    '有効：{effective} | 過剰回復：{overheal}（{overhealPercent}） | ヒット数：{hits}（クリティカル {critPercent}）',
+  'hudChrome.meters.detailHitSubtitle':
+    'ヒット数：{hits} | クリティカル：{crits}（{critPercent}） | 平均：{average} | 最小/最大：{min} / {max}',
   'hudChrome.meters.noTargetData': 'この対象のプレイヤーデータがありません',
   'hudChrome.meters.numCompact': '数値：省略表記（k/M）',
   'hudChrome.meters.numDetailed': '数値：詳細表記',

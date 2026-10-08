@@ -652,6 +652,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '동시에 표시할 막대 수입니다 (0 = 무제한, 창 높이에 맞춰 자동 조정).',
   'hudChrome.meters.noDeathEvents': '사망 이전에 기록된 이벤트가 없습니다',
   'hudChrome.meters.noDetailedData': '상세 데이터 없음',
+  'hudChrome.meters.detailHealSubtitle':
+    '유효: {effective} | 초과 치유: {overheal} ({overhealPercent}) | 타격: {hits} (치명타 {critPercent})',
+  'hudChrome.meters.detailHitSubtitle':
+    '타격: {hits} | 치명타: {crits} ({critPercent}) | 평균: {average} | 최소/최대: {min} / {max}',
   'hudChrome.meters.noTargetData': '이 대상에 대한 플레이어 데이터가 없습니다',
   'hudChrome.meters.numCompact': '숫자: 축약 (k/M)',
   'hudChrome.meters.numDetailed': '숫자: 상세',

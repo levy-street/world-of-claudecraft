@@ -1853,6 +1853,8 @@ export const en_XA: EnTranslations = {
       "reportSent": "[Ŕéþóŕţ çóþíéð áñð šéñţ ţó çĥáţ]",
       "reportNoData": "[Ñó ðáţá ŕéçóŕðéð.]",
       "noDetailedData": "[Ñó ðéţáíļéð ðáţá]",
+      "detailHealSubtitle": "[Éƒƒéçţíʋé: {effective} | Óʋéŕĥéáļ: {overheal} ({overhealPercent}) | Ĥíţš: {hits} ({critPercent} çŕíţ)]",
+      "detailHitSubtitle": "[Ĥíţš: {hits} | Çŕíţš: {crits} ({critPercent}) | Áʋéŕáĝé: {average} | Ɱíñ/Ɱáẋ: {min} / {max}]",
       "noDeathEvents": "[Ñó éʋéñţš ļóĝĝéð ƀéƒóŕé ðéáţĥ]",
       "killedBy": "[Ķíļļéð ƀý {killer} ({ability})]",
       "lethalHit": "[Ļéţĥáļ Ĥíţ]",

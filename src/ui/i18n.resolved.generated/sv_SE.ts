@@ -1853,6 +1853,8 @@ export const sv_SE: EnTranslations = {
       "reportSent": "Rapport kopierad och skickad till chat",
       "reportNoData": "Ingen data registrerad.",
       "noDetailedData": "Ingen detaljerad data",
+      "detailHealSubtitle": "Effective: {effective} | Overheal: {overheal} ({overhealPercent}) | Hits: {hits} ({critPercent} crit)",
+      "detailHitSubtitle": "Hits: {hits} | Crits: {crits} ({critPercent}) | Average: {average} | Min/Max: {min} / {max}",
       "noDeathEvents": "Inga händelser loggade före död",
       "killedBy": "Dödad av {killer} ({ability})",
       "lethalHit": "Dödande träff",

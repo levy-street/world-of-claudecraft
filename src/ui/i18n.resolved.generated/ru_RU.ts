@@ -1853,6 +1853,8 @@ export const ru_RU: EnTranslations = {
       "reportSent": "Отчёт скопирован и отправлен в чат",
       "reportNoData": "Данные не записаны.",
       "noDetailedData": "Нет подробных данных",
+      "detailHealSubtitle": "Эффективное исцеление: {effective} | Избыточное исцеление: {overheal} ({overhealPercent}) | Попаданий: {hits} ({critPercent} крит.)",
+      "detailHitSubtitle": "Попаданий: {hits} | Крит. ударов: {crits} ({critPercent}) | Среднее: {average} | Мин./макс.: {min} / {max}",
       "noDeathEvents": "Перед гибелью не записано событий",
       "killedBy": "Убит: {killer} ({ability})",
       "lethalHit": "Смертельный удар",

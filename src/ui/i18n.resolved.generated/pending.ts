@@ -9,25 +9,70 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.meters.detailHealSubtitle",
+    "hudChrome.meters.detailHitSubtitle"
+  ],
+  "es_ES": [
+    "hudChrome.meters.detailHealSubtitle",
+    "hudChrome.meters.detailHitSubtitle"
+  ],
+  "fr_FR": [
+    "hudChrome.meters.detailHealSubtitle",
+    "hudChrome.meters.detailHitSubtitle"
+  ],
+  "fr_CA": [
+    "hudChrome.meters.detailHealSubtitle",
+    "hudChrome.meters.detailHitSubtitle"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.meters.detailHealSubtitle",
+    "hudChrome.meters.detailHitSubtitle"
+  ],
+  "de_DE": [
+    "hudChrome.meters.detailHealSubtitle",
+    "hudChrome.meters.detailHitSubtitle"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.meters.detailHealSubtitle",
+    "hudChrome.meters.detailHitSubtitle"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.meters.detailHealSubtitle",
+    "hudChrome.meters.detailHitSubtitle"
+  ],
+  "nl_NL": [
+    "hudChrome.meters.detailHealSubtitle",
+    "hudChrome.meters.detailHitSubtitle"
+  ],
+  "pl_PL": [
+    "hudChrome.meters.detailHealSubtitle",
+    "hudChrome.meters.detailHitSubtitle"
+  ],
+  "id_ID": [
+    "hudChrome.meters.detailHealSubtitle",
+    "hudChrome.meters.detailHitSubtitle"
+  ],
+  "tr_TR": [
+    "hudChrome.meters.detailHealSubtitle",
+    "hudChrome.meters.detailHitSubtitle"
+  ],
+  "sv_SE": [
+    "hudChrome.meters.detailHealSubtitle",
+    "hudChrome.meters.detailHitSubtitle"
+  ],
+  "vi_VN": [
+    "hudChrome.meters.detailHealSubtitle",
+    "hudChrome.meters.detailHitSubtitle"
+  ],
+  "da_DK": [
+    "hudChrome.meters.detailHealSubtitle",
+    "hudChrome.meters.detailHitSubtitle"
+  ]
 };

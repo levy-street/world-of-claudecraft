@@ -1853,6 +1853,8 @@ export const ko_KR: EnTranslations = {
       "reportSent": "보고서가 복사되어 채팅으로 전송되었습니다",
       "reportNoData": "기록된 데이터가 없습니다.",
       "noDetailedData": "상세 데이터 없음",
+      "detailHealSubtitle": "유효: {effective} | 초과 치유: {overheal} ({overhealPercent}) | 타격: {hits} (치명타 {critPercent})",
+      "detailHitSubtitle": "타격: {hits} | 치명타: {crits} ({critPercent}) | 평균: {average} | 최소/최대: {min} / {max}",
       "noDeathEvents": "사망 이전에 기록된 이벤트가 없습니다",
       "killedBy": "{killer}에게 살해당함 ({ability})",
       "lethalHit": "치명적인 일격",

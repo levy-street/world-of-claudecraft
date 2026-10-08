@@ -1853,6 +1853,8 @@ export const nl_NL: EnTranslations = {
       "reportSent": "Rapport gekopieerd en naar chat verzonden",
       "reportNoData": "Geen gegevens opgenomen.",
       "noDetailedData": "Geen gedetailleerde gegevens",
+      "detailHealSubtitle": "Effective: {effective} | Overheal: {overheal} ({overhealPercent}) | Hits: {hits} ({critPercent} crit)",
+      "detailHitSubtitle": "Hits: {hits} | Crits: {crits} ({critPercent}) | Average: {average} | Min/Max: {min} / {max}",
       "noDeathEvents": "Geen gebeurtenissen geregistreerd voor dood",
       "killedBy": "Gedood door {killer} ({ability})",
       "lethalHit": "Dodelijke treffer",

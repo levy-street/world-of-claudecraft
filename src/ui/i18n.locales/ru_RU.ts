@@ -668,6 +668,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Одновременно отображаемые полосы (0 = без ограничений, автоподбор по высоте окна).',
   'hudChrome.meters.noDeathEvents': 'Перед гибелью не записано событий',
   'hudChrome.meters.noDetailedData': 'Нет подробных данных',
+  'hudChrome.meters.detailHealSubtitle':
+    'Эффективное исцеление: {effective} | Избыточное исцеление: {overheal} ({overhealPercent}) | Попаданий: {hits} ({critPercent} крит.)',
+  'hudChrome.meters.detailHitSubtitle':
+    'Попаданий: {hits} | Крит. ударов: {crits} ({critPercent}) | Среднее: {average} | Мин./макс.: {min} / {max}',
   'hudChrome.meters.noTargetData': 'Нет данных об игроках по этой цели',
   'hudChrome.meters.numCompact': 'Числа: сокращённые (тыс./млн)',
   'hudChrome.meters.numDetailed': 'Числа: подробные',

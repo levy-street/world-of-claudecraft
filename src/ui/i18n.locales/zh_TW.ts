@@ -632,6 +632,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.maxRowsDesc': '同時顯示的長條數（0 = 不限，自動配合視窗高度）。',
   'hudChrome.meters.noDeathEvents': '死亡前沒有記錄任何事件',
   'hudChrome.meters.noDetailedData': '沒有詳細資料',
+  'hudChrome.meters.detailHealSubtitle':
+    '有效：{effective} | 過量治療：{overheal}（{overhealPercent}） | 命中：{hits}（{critPercent} 致命一擊）',
+  'hudChrome.meters.detailHitSubtitle':
+    '命中：{hits} | 致命一擊：{crits}（{critPercent}） | 平均：{average} | 最小/最大：{min} / {max}',
   'hudChrome.meters.noTargetData': '此目標沒有玩家資料',
   'hudChrome.meters.numCompact': '數字：簡寫（k/M）',
   'hudChrome.meters.numDetailed': '數字：詳細',

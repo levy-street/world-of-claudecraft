@@ -1853,6 +1853,8 @@ export const ja_JP: EnTranslations = {
       "reportSent": "レポートをコピーしてチャットに送信しました",
       "reportNoData": "記録されたデータがありません。",
       "noDetailedData": "詳細データがありません",
+      "detailHealSubtitle": "有効：{effective} | 過剰回復：{overheal}（{overhealPercent}） | ヒット数：{hits}（クリティカル {critPercent}）",
+      "detailHitSubtitle": "ヒット数：{hits} | クリティカル：{crits}（{critPercent}） | 平均：{average} | 最小/最大：{min} / {max}",
       "noDeathEvents": "死亡前に記録されたイベントはありません",
       "killedBy": "{killer}（{ability}）に倒された",
       "lethalHit": "致死の一撃",

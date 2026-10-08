@@ -1853,6 +1853,8 @@ export const en_CA: EnTranslations = {
       "reportSent": "Report copied and sent to chat",
       "reportNoData": "No data recorded.",
       "noDetailedData": "No detailed data",
+      "detailHealSubtitle": "Effective: {effective} | Overheal: {overheal} ({overhealPercent}) | Hits: {hits} ({critPercent} crit)",
+      "detailHitSubtitle": "Hits: {hits} | Crits: {crits} ({critPercent}) | Average: {average} | Min/Max: {min} / {max}",
       "noDeathEvents": "No events logged before death",
       "killedBy": "Killed by {killer} ({ability})",
       "lethalHit": "Lethal Hit",

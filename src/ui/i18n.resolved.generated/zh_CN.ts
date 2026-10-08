@@ -1853,6 +1853,8 @@ export const zh_CN: EnTranslations = {
       "reportSent": "报告已复制并发送到聊天",
       "reportNoData": "未记录任何数据。",
       "noDetailedData": "没有详细数据",
+      "detailHealSubtitle": "有效：{effective} | 过量治疗：{overheal}（{overhealPercent}） | 命中：{hits}（{critPercent} 暴击）",
+      "detailHitSubtitle": "命中：{hits} | 暴击：{crits}（{critPercent}） | 平均：{average} | 最小/最大：{min} / {max}",
       "noDeathEvents": "死亡前没有记录到任何事件",
       "killedBy": "死于{killer}（{ability}）",
       "lethalHit": "致命打击",

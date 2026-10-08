@@ -2002,6 +2002,13 @@ export const hudChromeStrings = {
     reportSent: 'Report copied and sent to chat',
     reportNoData: 'No data recorded.',
     noDetailedData: 'No detailed data',
+    // The ability drill-down subtitle. Effective is the healing that landed;
+    // the overheal percent is its share of total output (effective + overheal).
+    // Wordy (M16): the five non-Latin fills land in this same change.
+    detailHealSubtitle:
+      'Effective: {effective} | Overheal: {overheal} ({overhealPercent}) | Hits: {hits} ({critPercent} crit)',
+    detailHitSubtitle:
+      'Hits: {hits} | Crits: {crits} ({critPercent}) | Average: {average} | Min/Max: {min} / {max}',
     noDeathEvents: 'No events logged before death',
     killedBy: 'Killed by {killer} ({ability})',
     lethalHit: 'Lethal Hit',

@@ -1853,6 +1853,8 @@ export const cs_CZ: EnTranslations = {
       "reportSent": "Report zkopírován a odeslán do chatu",
       "reportNoData": "Nebyla zaznamenána žádná data.",
       "noDetailedData": "Žádná podrobná data",
+      "detailHealSubtitle": "Effective: {effective} | Overheal: {overheal} ({overhealPercent}) | Hits: {hits} ({critPercent} crit)",
+      "detailHitSubtitle": "Hits: {hits} | Crits: {crits} ({critPercent}) | Average: {average} | Min/Max: {min} / {max}",
       "noDeathEvents": "Před smrtí nebyly zaznamenány žádné události",
       "killedBy": "Zabit(a): {killer} ({ability})",
       "lethalHit": "Smrtící zásah",

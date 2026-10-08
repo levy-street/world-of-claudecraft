@@ -1853,6 +1853,8 @@ export const zh_TW: EnTranslations = {
       "reportSent": "報告已複製並傳送至聊天",
       "reportNoData": "未記錄任何資料。",
       "noDetailedData": "沒有詳細資料",
+      "detailHealSubtitle": "有效：{effective} | 過量治療：{overheal}（{overhealPercent}） | 命中：{hits}（{critPercent} 致命一擊）",
+      "detailHitSubtitle": "命中：{hits} | 致命一擊：{crits}（{critPercent}） | 平均：{average} | 最小/最大：{min} / {max}",
       "noDeathEvents": "死亡前沒有記錄任何事件",
       "killedBy": "死於 {killer}（{ability}）",
       "lethalHit": "致命一擊",

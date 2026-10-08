@@ -1853,6 +1853,8 @@ export const id_ID: EnTranslations = {
       "reportSent": "Laporan disalin dan dikirim ke obrolan",
       "reportNoData": "Tidak ada data tercatat.",
       "noDetailedData": "Tidak ada data terperinci",
+      "detailHealSubtitle": "Effective: {effective} | Overheal: {overheal} ({overhealPercent}) | Hits: {hits} ({critPercent} crit)",
+      "detailHitSubtitle": "Hits: {hits} | Crits: {crits} ({critPercent}) | Average: {average} | Min/Max: {min} / {max}",
       "noDeathEvents": "Tidak ada peristiwa tercatat sebelum kematian",
       "killedBy": "Dibunuh oleh {killer} ({ability})",
       "lethalHit": "Pukulan Mematikan",

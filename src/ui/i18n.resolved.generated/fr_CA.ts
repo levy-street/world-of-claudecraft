@@ -1853,6 +1853,8 @@ export const fr_CA: EnTranslations = {
       "reportSent": "Rapport copié et envoyé dans la discussion",
       "reportNoData": "Aucune donnée enregistrée.",
       "noDetailedData": "Aucune donnée détaillée",
+      "detailHealSubtitle": "Effective: {effective} | Overheal: {overheal} ({overhealPercent}) | Hits: {hits} ({critPercent} crit)",
+      "detailHitSubtitle": "Hits: {hits} | Crits: {crits} ({critPercent}) | Average: {average} | Min/Max: {min} / {max}",
       "noDeathEvents": "Aucun événement enregistré avant la mort",
       "killedBy": "Tué par {killer} ({ability})",
       "lethalHit": "Coup fatal",
