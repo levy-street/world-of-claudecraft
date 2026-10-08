@@ -665,7 +665,7 @@ import { bindActionDisplayName } from './keybind_action_names_core';
 import { knownItemDef, ownEntry } from './known_item';
 import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
-import { chatBubbleKind, isCombatFlavorLog } from './log_event_route';
+import { logEventFeedback } from './log_event_feedback_core';
 import { lootQualityReceiptBody } from './loot_quality_receipt';
 import { lootQualityAriaName } from './loot_quality_view';
 import { lootRollWinBanner } from './loot_roll_win_view';
@@ -13193,20 +13193,16 @@ export class Hud {
         }
         case 'log': {
           const text = localizeSystemText(this.bankWindow.observeStorageText(ev.text));
-          // Route mob/boss combat-flavor chatter to the Combat Log tab instead of
-          // General/Chat (see log_event_route.ts): pid-scoped personal narrative and
-          // entityId-anchored actionable mechanic telegraphs both stay in General/Chat,
-          // so new players standing near a busy fight aren't drowned out by ambient
-          // mob barks while a mechanic's only cue is never buried. A narrative line
-          // still gets its floating world chat bubble below.
-          if (isCombatFlavorLog(ev.entityId, ev.pid, ev.telegraph))
-            this.combatLog(text, ev.color ?? HUD_LOG.PLAIN);
-          else this.log(text, ev.color ?? HUD_LOG.PLAIN);
+          const feedback = logEventFeedback(ev);
+          if (feedback.combat) this.combatLog(text, ev.color ?? HUD_LOG.PLAIN);
+          else
+            this.log(text, ev.color ?? HUD_LOG.PLAIN, undefined, undefined, !!feedback.bannerKey);
+          if (feedback.bannerKey) this.showCelebrationBanner(t(feedback.bannerKey), 'deed');
           if (ev.text === CHEAT_DEATH_SAVE_TEXT) audio.fiestaRevive();
           // Sundering completion cue: raw-English match pre-localization (the
           // fiestaRevive precedent; weld: profession_event_lines_core.ts).
           if (isSunderCompletionLog(ev.text)) audio.sunderComplete();
-          const bubble = chatBubbleKind(ev.text);
+          const bubble = feedback.bubble;
           if (ev.entityId !== undefined && bubble !== null)
             this.renderer.showChatBubble(ev.entityId, text, bubble === 'yell');
           break;

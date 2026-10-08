@@ -209,7 +209,6 @@ import {
   loadAccountFlair,
   loadGuildBankRow,
   loadGuildBankRows,
-  loadMailState,
   loadMarketState,
   loadRiftState,
   openPlaySession,
@@ -340,7 +339,7 @@ import {
 } from './list_read_guard';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
 import { isPickAction } from './lockpick_action';
-import { mergeCustodyParcelOverlay } from './mail_custody_overlay';
+import { loadRealmMail } from './mail_load';
 import { rearmMailPartitionsOnFailure, writeDirtyMailPartitions } from './mail_partition_rearm';
 import { dispatchMarketCommand, marketWirePromptCommand } from './market_commands';
 import { dispatchInventoryGroupingCommand } from './material_stack_wire';
@@ -424,6 +423,7 @@ import * as questWire from './quest_command_wire';
 import * as questSnap from './quest_snapshot_wire';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './realm_readout_memo';
+import { createReportRewardsMeasure, createSystemNoticeSender } from './report_rewards_game';
 import { RiftAssetCoordinator, riftAssetConfigFromEnv } from './rift_assets';
 import { dispatchRiftCommand } from './rift_forge_dispatch';
 import { refusedRiftForgeCommand } from './rift_forge_gate';
@@ -1670,6 +1670,7 @@ export class GameServer {
     'bcastSelf',
     'social',
     'saves',
+    'reportRewards',
     'lateness',
     ...SIM_LAP_PHASES,
     ...SIM_MOB_ZONE_PHASES,
@@ -4616,15 +4617,8 @@ export class GameServer {
     }
   }
 
-  async loadMail(): Promise<void> {
-    try {
-      this.sim.loadMail(await loadMailState());
-      // Only after a SUCCESSFUL load: replay the durable custody parcel rows
-      // the last crash window left (book-once dedupes the ones the blob has).
-      await mergeCustodyParcelOverlay(this.sim);
-    } catch (err) {
-      console.error('failed to load mail:', err);
-    }
+  loadMail(): Promise<boolean> {
+    return loadRealmMail(this.sim);
   }
 
   async saveMail(sample?: TickProfilerSample): Promise<void> {
@@ -9557,9 +9551,10 @@ export class GameServer {
     return true;
   }
 
-  private sendSystemNotice(session: ClientSession, text: string): void {
-    this.send(session, { t: 'events', list: [{ type: 'log', text, color: '#ffd100' }] });
-  }
+  readonly sendSystemNotice = createSystemNoticeSender((session, frame) =>
+    this.send(session, frame),
+  );
+  readonly measureReportRewards = createReportRewardsMeasure(() => this.tickProfiler);
 
   // Fan a non-retro deed unlock out to its two audiences, the earner's online
   // guildmates and followers (marquee deeds) and the Discord activity feed

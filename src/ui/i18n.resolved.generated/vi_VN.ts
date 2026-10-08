@@ -347,6 +347,9 @@ export const vi_VN: EnTranslations = {
     }
   },
   "hudChrome": {
+    "reportReward": {
+      "banned": "An account you reported has been banned"
+    },
     "framePresets": {
       "apply": "Áp Dụng",
       "pickerLabel": "Cấu Hình Khung: {name}",
@@ -23946,6 +23949,11 @@ export const vi_VN: EnTranslations = {
         "sender": "Bưu Điện Quạ",
         "subject": "Phần thưởng kho báu của bạn",
         "body": "Kho báu đã bị phá, nhưng phần của bạn không được lấy ra từ hộp. Những chỉ quạ đã mang nó đến cho bạn ở đây, với hàng hóa và tiền bạc bạn kiếm được.\n\n- Bưu Điện Quạ"
+      },
+      "bot_report_reward": {
+        "sender": "Game Moderation",
+        "subject": "An account you reported has been banned",
+        "body": "An account you reported has been banned.\n\nThank you for helping us keep the game fair. Your report helped protect the community from unfair play.\n\nGame Moderation"
       }
     },
     "itemSets": {

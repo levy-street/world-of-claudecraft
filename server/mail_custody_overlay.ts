@@ -32,6 +32,7 @@
 // rows an operator never resolved, and rows for realms no process serves).
 
 import {
+  BOT_REPORT_REWARD_LETTER,
   HOARD_REWARD_LETTER,
   type LetterDef,
   WOC_MARKET_DELIVERY_LETTER,
@@ -66,7 +67,12 @@ CREATE TABLE IF NOT EXISTS mail_custody_watermark (
 );
 `;
 
-export type CustodyParcelLetter = 'delivery' | 'return' | 'sold_notice' | 'vault_reward';
+export type CustodyParcelLetter =
+  | 'delivery'
+  | 'return'
+  | 'sold_notice'
+  | 'vault_reward'
+  | 'report_reward';
 
 /** The letter templates by overlay kind. A replayed parcel uses the same
  *  static letter and its own stored coin and item payload. */
@@ -75,6 +81,7 @@ export const CUSTODY_PARCEL_LETTERS: Record<CustodyParcelLetter, LetterDef> = {
   return: WOC_MARKET_RETURN_LETTER,
   sold_notice: WOC_MARKET_SOLD_LETTER,
   vault_reward: HOARD_REWARD_LETTER,
+  report_reward: BOT_REPORT_REWARD_LETTER,
 };
 
 export interface CustodyParcelRow {
@@ -297,7 +304,7 @@ export async function pruneMailCustodyParcelsBatch(batchSize: number): Promise<n
       WHERE ctid IN (
         SELECT ctid FROM mail_custody_parcels
          WHERE created_at < now() - ($1 || ' days')::interval
-           AND letter <> 'vault_reward'
+           AND letter NOT IN ('vault_reward', 'report_reward')
          LIMIT $2)`,
     [String(MAIL_CUSTODY_RESIDUE_RETENTION_DAYS), Math.max(1, Math.floor(batchSize))],
   );
@@ -309,7 +316,8 @@ function isCustodyParcelLetter(value: unknown): value is CustodyParcelLetter {
     value === 'delivery' ||
     value === 'return' ||
     value === 'sold_notice' ||
-    value === 'vault_reward'
+    value === 'vault_reward' ||
+    value === 'report_reward'
   );
 }
 

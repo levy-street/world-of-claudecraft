@@ -16,8 +16,10 @@ import {
   getLanguage,
   type InterpolationValues,
   type SupportedLanguage,
+  t,
   tPlural,
 } from './i18n';
+import { REPORT_REWARD_KEY, REPORT_REWARD_TEXT } from './log_event_feedback_core';
 import { SERVER_NEW } from './server_i18n.newlocales';
 import { IN_GAME_MODERATION_MESSAGES } from './server_i18n_moderation';
 
@@ -2826,6 +2828,7 @@ const RULES: Rule[] = [
 
 // Returns the localized form of a server message, or null if it is not one of ours.
 export function localizeServerText(text: string): string | null {
+  if (text === REPORT_REWARD_TEXT) return t(REPORT_REWARD_KEY);
   const restart = RESTART_MESSAGES[text]?.[getLanguage()];
   if (restart) return restart;
   const exactKey = EXACT[text];

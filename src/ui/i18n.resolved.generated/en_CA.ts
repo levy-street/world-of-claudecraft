@@ -347,6 +347,9 @@ export const en_CA: EnTranslations = {
     }
   },
   "hudChrome": {
+    "reportReward": {
+      "banned": "An account you reported has been banned"
+    },
     "framePresets": {
       "apply": "Apply",
       "pickerLabel": "Frame Presets: {name}",
@@ -9109,7 +9112,7 @@ export const en_CA: EnTranslations = {
       "guildBankRulesBody": "The item store starts closed. An officer opens it out of their own pocket, and the guild can pay from the treasury to widen it later. Quest items, anything soulbound, and gear the Market will not take stay out of it, the same as the mail and the Market, so the bank is for goods that can still change hands.",
       "discordLinkBody": "The Discord panel in game goes the other way too. Link your Discord account to it and the community roles you hold there follow you into the world: a colored name over your head, and a tag on the chat lines of the staff roles, so you can always tell a real moderator from someone borrowing the name. Linking also tracks a status that climbs as you take part. None of it grants any power in the game.",
       "moderationHeading": "Reporting a player",
-      "moderationBody": "If a player is out of line, right-click their name and choose Report Player. Pick a reason, from harassment to spam to cheating, add a line about what happened, and send it: the report goes to the moderators to read. A report is a note to them, not a punishment in itself. Sending one does not silence, kick, or jail anyone, and no reply comes back telling you what was decided. Blocking them stops the bother while you wait.",
+      "moderationBody": "If a player is out of line, right-click their name and choose Report Player. Pick a reason, from harassment to spam to cheating, add a line about what happened, and send it: the report goes to the moderators to read. A report is a note to them, not a punishment in itself. Sending one does not silence, kick, or jail anyone. If an account you reported is banned, you receive an on-screen notice and a thank-you letter. Blocking them stops the bother while you wait.",
       "jailBody": "Moderators keep the peace, and a player who will not let others enjoy the game can be moved to a jail cell. A sentence always has a set length, though a moderator can end it early, and it runs on the clock whether or not you stay logged in.",
       "chatMore": "More on the chat window and the rest of the interface",
       "jailHeading": "Moderators and the jail"
@@ -23946,6 +23949,11 @@ export const en_CA: EnTranslations = {
         "sender": "The Ravenpost",
         "subject": "Your vault reward",
         "body": "The vault was cleared, but your share was not collected from the chest. The ravens have brought it to you here, with the goods and coin you earned attached.\n\n- The Ravenpost"
+      },
+      "bot_report_reward": {
+        "sender": "Game Moderation",
+        "subject": "An account you reported has been banned",
+        "body": "An account you reported has been banned.\n\nThank you for helping us keep the game fair. Your report helped protect the community from unfair play.\n\nGame Moderation"
       }
     },
     "itemSets": {

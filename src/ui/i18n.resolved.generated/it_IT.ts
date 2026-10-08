@@ -347,6 +347,9 @@ export const it_IT: EnTranslations = {
     }
   },
   "hudChrome": {
+    "reportReward": {
+      "banned": "An account you reported has been banned"
+    },
     "framePresets": {
       "apply": "Applica",
       "pickerLabel": "Preset di riquadri: {name}",
@@ -23946,6 +23949,11 @@ export const it_IT: EnTranslations = {
         "sender": "Il Servizio del Corvo",
         "subject": "La tua ricompensa da volta",
         "body": "La volta è stata sgomberata, ma la tua parte non è stata riscossa dal forziere. I corvi te l'hanno portata qui, insieme alle merci e alle monete che hai guadagnato.\n\n- Il Servizio del Corvo"
+      },
+      "bot_report_reward": {
+        "sender": "Game Moderation",
+        "subject": "An account you reported has been banned",
+        "body": "An account you reported has been banned.\n\nThank you for helping us keep the game fair. Your report helped protect the community from unfair play.\n\nGame Moderation"
       }
     },
     "itemSets": {

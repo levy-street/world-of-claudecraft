@@ -347,6 +347,9 @@ export const pl_PL: EnTranslations = {
     }
   },
   "hudChrome": {
+    "reportReward": {
+      "banned": "An account you reported has been banned"
+    },
     "framePresets": {
       "apply": "Zastosuj",
       "pickerLabel": "Ustawienia ramki: {name}",
@@ -23946,6 +23949,11 @@ export const pl_PL: EnTranslations = {
         "sender": "Krucze Poczty",
         "subject": "Twoja nagroda ze skarbnicy",
         "body": "Skarbiec został czyszczony, ale twój udział nie został zebrany ze skrzyni. Kruki przyniosły go do ciebie tutaj, razem z dobrami i monetami, które zarabiłeś.\n\n- Krucze Poczty"
+      },
+      "bot_report_reward": {
+        "sender": "Game Moderation",
+        "subject": "An account you reported has been banned",
+        "body": "An account you reported has been banned.\n\nThank you for helping us keep the game fair. Your report helped protect the community from unfair play.\n\nGame Moderation"
       }
     },
     "itemSets": {

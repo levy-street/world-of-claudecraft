@@ -347,6 +347,9 @@ export const fr_CA: EnTranslations = {
     }
   },
   "hudChrome": {
+    "reportReward": {
+      "banned": "An account you reported has been banned"
+    },
     "framePresets": {
       "apply": "Appliquer",
       "pickerLabel": "Préréglages de cadres : {name}",
@@ -23946,6 +23949,11 @@ export const fr_CA: EnTranslations = {
         "sender": "La Posternoire",
         "subject": "Votre récompense du coffre",
         "body": "Le coffre a été vidé, mais votre part n'a pas été collectée du coffre. Les corbeaux l'ont amenée jusqu'à vous ici, avec les biens et les pièces que vous avez gagnés."
+      },
+      "bot_report_reward": {
+        "sender": "Game Moderation",
+        "subject": "An account you reported has been banned",
+        "body": "An account you reported has been banned.\n\nThank you for helping us keep the game fair. Your report helped protect the community from unfair play.\n\nGame Moderation"
       }
     },
     "itemSets": {

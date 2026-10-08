@@ -317,7 +317,7 @@ describe('the bake set', () => {
     const [sql, params] = query.mock.calls[0];
     expect(sql).toMatch(/DELETE FROM mail_custody_parcels/);
     expect(sql).toMatch(/created_at < now\(\) - \(\$1 \|\| ' days'\)::interval/);
-    expect(sql).toMatch(/letter <> 'vault_reward'/);
+    expect(sql).toMatch(/letter NOT IN \('vault_reward', 'report_reward'\)/);
     expect(sql).toMatch(/LIMIT \$2/);
     expect(params).toEqual(['30', 500]);
   });
@@ -382,6 +382,32 @@ describe('mergeCustodyParcelOverlay', () => {
       copper: 0,
     }));
   }
+
+  it('replays attachment-free report mail and deduplicates its persisted letter on restart', async () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const reward = {
+      ...overlayRows(['report_reward:123'], 'report_reward', [])[0],
+      copper: '0',
+    };
+    mockStaleDelete(0);
+    query.mockResolvedValueOnce({ rows: [reward] });
+    expect((await mergeCustodyParcelOverlay(sim)).replayed).toBe(1);
+    expect(sim.postOffice.mail[0]).toMatchObject({
+      custodyRef: 'report_reward:123',
+      letterId: 'bot_report_reward',
+      subject: 'An account you reported has been banned',
+      copper: 0,
+      items: [],
+    });
+    const restarted = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    restarted.loadMail(JSON.parse(JSON.stringify(sim.serializeMail())));
+    resetCustodyParcelOverlayForTests();
+    mockStaleDelete(0);
+    query.mockResolvedValueOnce({ rows: [reward] });
+    expect((await mergeCustodyParcelOverlay(restarted)).present).toBe(1);
+    expect(restarted.postOffice.mail).toHaveLength(1);
+    expect(restarted.postOffice.mail[0].copper).toBe(0);
+  });
 
   it('replays a vault reward with its exact coin and items into the real post office', async () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
@@ -762,9 +788,11 @@ describe('bake and merge wiring order', () => {
   });
 
   it('game.loadMail merges the overlay only after a successful book load', () => {
-    const body = boundedBody(gameSrc, 'async loadMail(): Promise<void>', 'async saveMail(');
-    const loadAt = body.indexOf('this.sim.loadMail(await loadMailState())');
-    const mergeAt = body.indexOf('mergeCustodyParcelOverlay(this.sim)');
+    const delegate = boundedBody(gameSrc, 'loadMail(): Promise<boolean>', 'async saveMail(');
+    expect(delegate).toContain('return loadRealmMail(this.sim)');
+    const body = readFileSync(new URL('../../server/mail_load.ts', import.meta.url), 'utf8');
+    const loadAt = body.indexOf('book.loadMail(await loadMailState())');
+    const mergeAt = body.indexOf('mergeCustodyParcelOverlay(book)');
     const catchAt = body.indexOf('catch');
     for (const at of [loadAt, mergeAt, catchAt]) {
       expect(at).toBeGreaterThan(-1);

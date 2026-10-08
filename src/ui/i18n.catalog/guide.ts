@@ -3909,7 +3909,7 @@ export const guideStrings = {
     // Reporting a player, and what moderation actually does.
     moderationHeading: 'Reporting a player',
     moderationBody:
-      'If a player is out of line, right-click their name and choose Report Player. Pick a reason, from harassment to spam to cheating, add a line about what happened, and send it: the report goes to the moderators to read. A report is a note to them, not a punishment in itself. Sending one does not silence, kick, or jail anyone, and no reply comes back telling you what was decided. Blocking them stops the bother while you wait.',
+      'If a player is out of line, right-click their name and choose Report Player. Pick a reason, from harassment to spam to cheating, add a line about what happened, and send it: the report goes to the moderators to read. A report is a note to them, not a punishment in itself. Sending one does not silence, kick, or jail anyone. If an account you reported is banned, you receive an on-screen notice and a thank-you letter. Blocking them stops the bother while you wait.',
     jailBody:
       'Moderators keep the peace, and a player who will not let others enjoy the game can be moved to a jail cell. A sentence always has a set length, though a moderator can end it early, and it runs on the clock whether or not you stay logged in.',
 

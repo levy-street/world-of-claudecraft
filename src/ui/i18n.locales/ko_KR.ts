@@ -13,6 +13,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.reportReward.banned': '신고하신 계정이 이용 정지되었습니다',
+  'entities.letters.bot_report_reward.sender': '게임 운영팀',
+  'entities.letters.bot_report_reward.subject': '신고하신 계정이 이용 정지되었습니다',
+  'entities.letters.bot_report_reward.body':
+    '신고하신 계정이 이용 정지되었습니다.\n\n공정한 게임 환경을 지키는 데 도움을 주셔서 감사합니다. 보내 주신 신고가 불공정한 행위로부터 커뮤니티를 보호하는 데 도움이 되었습니다.\n\n게임 운영팀',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}분',
   'abilityUi.cast.hoard_cast_rime_beam': '상고대 광선',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount} {currency}',

@@ -347,6 +347,9 @@ export const de_DE: EnTranslations = {
     }
   },
   "hudChrome": {
+    "reportReward": {
+      "banned": "An account you reported has been banned"
+    },
     "framePresets": {
       "apply": "Anwenden",
       "pickerLabel": "Fenstervorlagen: {name}",
@@ -23946,6 +23949,11 @@ export const de_DE: EnTranslations = {
         "sender": "Die Rabenpflicht",
         "subject": "Deine Tresor-Belohnung",
         "body": "Der Tresor wurde geleert, aber dein Anteil wurde nicht aus der Kiste eingesammelt. Die Raben haben ihn dir hier gebracht, zusammen mit den Waren und Münzen, die du verdient hast.\n\n- Die Rabenpflicht"
+      },
+      "bot_report_reward": {
+        "sender": "Game Moderation",
+        "subject": "An account you reported has been banned",
+        "body": "An account you reported has been banned.\n\nThank you for helping us keep the game fair. Your report helped protect the community from unfair play.\n\nGame Moderation"
       }
     },
     "itemSets": {

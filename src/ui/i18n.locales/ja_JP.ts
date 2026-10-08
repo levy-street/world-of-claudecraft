@@ -13,6 +13,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.reportReward.banned': 'あなたが通報したアカウントが利用停止になりました',
+  'entities.letters.bot_report_reward.sender': 'ゲーム運営',
+  'entities.letters.bot_report_reward.subject': 'あなたが通報したアカウントが利用停止になりました',
+  'entities.letters.bot_report_reward.body':
+    'あなたが通報したアカウントが利用停止になりました。\n\n公平なゲーム環境を守るためにご協力いただき、ありがとうございます。あなたの通報が、不公平な行為からコミュニティを守る助けになりました。\n\nゲーム運営',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}分',
   'abilityUi.cast.hoard_cast_rime_beam': '霜光線',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount}{currency}',
