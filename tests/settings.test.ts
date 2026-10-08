@@ -207,6 +207,23 @@ describe('Settings', () => {
     expect(s.set('cameraFov', 75)).toBe(75);
   });
 
+  it('starts Ambience at the stored Sound Effects level for a profile saved before the split', () => {
+    // A fresh profile gets the documented default.
+    expect(new Settings().get('ambientVolume')).toBe(SETTING_RANGES.ambientVolume.def);
+    // A pre-split profile only has sfxVolume (which used to drive ambience too):
+    // the new slider starts there, so a player who had muted SFX stays muted.
+    localStorage.setItem('woc_settings', JSON.stringify({ sfxVolume: 0 }));
+    expect(new Settings().get('ambientVolume')).toBe(0);
+    localStorage.setItem('woc_settings', JSON.stringify({ sfxVolume: 0.35 }));
+    expect(new Settings().get('ambientVolume')).toBe(0.35);
+    // Once the player has set Ambience it is independent of Sound Effects.
+    localStorage.setItem('woc_settings', JSON.stringify({ sfxVolume: 0.35, ambientVolume: 1 }));
+    const s = new Settings();
+    expect(s.get('ambientVolume')).toBe(1);
+    s.set('sfxVolume', 0.1);
+    expect(new Settings().get('ambientVolume')).toBe(1);
+  });
+
   it('clamps a stored historical Insane shadow dial (2) down to High on load', () => {
     // The Shadow Quality ladder is capped at High (the dial's 4096 map, above
     // the High tier's own 2560 base): the retired Insane rung persisted 2,

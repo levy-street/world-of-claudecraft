@@ -4,7 +4,8 @@
 // attenuate with distance and pan with direction relative to the camera.
 //
 // Decoupled, like audio/music/voice: its own AudioContext + AudioListener,
-// driven by the `sfxVolume` setting. Efficient by construction: one decoded
+// driven by the `sfxVolume` (effects) and `ambientVolume` (environment beds)
+// settings, one gain bus each (see sfx_mix_bus.ts). Efficient by construction: one decoded
 // AudioBuffer per clip shared across every source, startup-only preloading with
 // lazy context loads, a hard concurrency cap, a per-key cooldown, and a tiny
 // pool of persistent looping sources for ambience and sustained spell casts.
@@ -30,10 +31,11 @@ import {
   SFX_RUNTIME_PACK_URL,
   type SfxEntry,
 } from './sfx_manifest.generated';
+import { sfxMixBus } from './sfx_mix_bus';
 import { loadRuntimeSfxPack } from './sfx_runtime_pack';
 import { type WaterElementalCue, waterElementalSamples } from './water_elemental_audio';
 
-const SAMPLE_GAIN = 0.85; // base level for sampled clips; sfxVolume multiplies this
+const SAMPLE_GAIN = 0.85; // base level for sampled clips; each bus volume multiplies this
 /** Per-call level for the movement one-shots (jump / land / splash / swim). */
 const MOVE_GAIN = 0.7;
 const SWIM_GAIN = 0.5;
@@ -237,6 +239,9 @@ interface AmbientPointSource {
 class Sfx {
   private ctx: AudioContext | null = null;
   private master: GainNode | null = null;
+  // The environment bus (ambientVolume): biome/weather beds and stationary world
+  // emitters, routed by sfxMixBus. Everything else plays through `master`.
+  private ambientBus: GainNode | null = null;
   private clips: Record<string, SfxEntry> = SFX_CLIPS;
   private clipsReady: Promise<void> | null = null;
   private buffers = new Map<string, AudioBuffer>();
@@ -248,6 +253,7 @@ class Sfx {
   private pendingLoopLoads = new Map<string, string>();
   private pendingLoopVariants = new Map<string, number>();
   private vol = 0.8;
+  private ambientVol = 0.8;
   private active = 0;
   private lastPlay = new Map<string, number>();
   private lastPlayPruneAt = 0;
@@ -299,6 +305,13 @@ class Sfx {
     if (this.master) this.master.gain.value = SAMPLE_GAIN * this.vol;
   }
 
+  /** Set the ambience volume (0..1): the `ambientVolume` slider, independent of
+   *  the effects volume above. */
+  setAmbientVolume(v: number): void {
+    this.ambientVol = Math.min(1, Math.max(0, v));
+    if (this.ambientBus) this.ambientBus.gain.value = SAMPLE_GAIN * this.ambientVol;
+  }
+
   /** Enable/disable per-footfall step clips. Off by default (the `footstepSfx`
    *  setting): while off, `footstep()` is a silent no-op for self and other
    *  entities alike. Jump/land/splash/swim and combat SFX are unaffected. */
@@ -316,6 +329,9 @@ class Sfx {
       this.master = this.ctx.createGain();
       this.master.gain.value = SAMPLE_GAIN * this.vol;
       this.master.connect(this.ctx.destination);
+      this.ambientBus = this.ctx.createGain();
+      this.ambientBus.gain.value = SAMPLE_GAIN * this.ambientVol;
+      this.ambientBus.connect(this.ctx.destination);
       resumeWhenAllowed(this.ctx);
       const l = this.ctx.listener;
       if (l.upX) {
@@ -344,6 +360,12 @@ class Sfx {
 
   private entry(key: string): SfxEntry | undefined {
     return this.clips[key];
+  }
+
+  /** The output bus `key` connects to: the ambience bus for environment clips,
+   *  the effects master for everything else. Null before init. */
+  private busFor(key: string): GainNode | null {
+    return sfxMixBus(key, this.entry(key)?.category) === 'ambient' ? this.ambientBus : this.master;
   }
 
   private authoredPlaybackRate(key: string): number {
@@ -620,7 +642,7 @@ class Sfx {
    *  see src/ui/mob_idle_sfx.ts) needs this instead of firing blind. */
   playAt(key: string, x: number, y: number, z: number, opts?: PlayOpts): boolean {
     const ctx = this.ctx,
-      master = this.master;
+      master = this.busFor(key);
     if (!ctx || !master) return false;
     if (this.tooFar(x, z)) return false;
     const variantIndex = this.nextVariantIndex(key);
@@ -885,7 +907,7 @@ class Sfx {
     immediate = false,
   ): void {
     const ctx = this.ctx,
-      master = this.master;
+      master = this.busFor(key);
     if (!ctx || !master) return;
     const positional = x !== undefined && y !== undefined && z !== undefined;
     let slot = this.loops.get(id);

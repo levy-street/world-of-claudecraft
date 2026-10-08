@@ -899,12 +899,13 @@ export function buildGraphicsControls(s: OptionsSettingsSource, env: OptionsEnv)
 // Audio panel (cluster 4)
 // ---------------------------------------------------------------------------
 
-/** Body control rows for the Audio sub-panel: three volume sliders, the bespoke
+/** Body control rows for the Audio sub-panel: four volume sliders, the bespoke
  *  music on/off toggle (reads the live MusicDirector), then the three audio bool
  *  toggles. The painter appends the footer. */
 export function buildAudioControls(s: OptionsSettingsSource): OptionsControl[] {
   return [
     slider(s, 'sfxVolume', 'hud.options.soundEffects'),
+    slider(s, 'ambientVolume', 'hudChrome.options.ambienceVolume'),
     slider(s, 'musicVolume', 'hud.options.musicVolume'),
     slider(s, 'voiceVolume', 'hud.options.voiceVolume'),
     { control: 'musicToggle', labelKey: 'hud.options.music' },

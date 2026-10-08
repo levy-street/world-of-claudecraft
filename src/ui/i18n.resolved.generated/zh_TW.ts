@@ -2164,6 +2164,7 @@ export const zh_TW: EnTranslations = {
       "interfaceModeDesktop": "桌面",
       "interfaceModeTouch": "觸控",
       "interfaceModeNote": "自動會根據你的裝置選擇桌面或觸控操作。選擇桌面可強制使用鍵盤與滑鼠（適合有鍵盤的平板），選擇觸控則使用螢幕上的操作控制項。",
+      "ambienceVolume": "環境音量",
       "footstepSounds": "腳步聲",
       "interfaceSounds": "介面與回饋音效",
       "clickFeedback": "點擊標記",

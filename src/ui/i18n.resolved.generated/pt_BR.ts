@@ -2164,6 +2164,7 @@ export const pt_BR: EnTranslations = {
       "interfaceModeDesktop": "Desktop",
       "interfaceModeTouch": "Touch",
       "interfaceModeNote": "Auto escolhe os controles Desktop ou Touch conforme o seu dispositivo. Escolha Desktop para forçar teclado e mouse (útil em um tablet com teclado), ou Touch para os controles na tela.",
+      "ambienceVolume": "Ambience Volume",
       "footstepSounds": "Sons de passos",
       "interfaceSounds": "Sons da interface e de resposta",
       "clickFeedback": "Marcador de clique",

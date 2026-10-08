@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.options.ambienceVolume"
+  ],
+  "es_ES": [
+    "hudChrome.options.ambienceVolume"
+  ],
+  "fr_FR": [
+    "hudChrome.options.ambienceVolume"
+  ],
+  "fr_CA": [
+    "hudChrome.options.ambienceVolume"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.options.ambienceVolume"
+  ],
+  "de_DE": [
+    "hudChrome.options.ambienceVolume"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.options.ambienceVolume"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.options.ambienceVolume"
+  ],
+  "nl_NL": [
+    "hudChrome.options.ambienceVolume"
+  ],
+  "pl_PL": [
+    "hudChrome.options.ambienceVolume"
+  ],
+  "id_ID": [
+    "hudChrome.options.ambienceVolume"
+  ],
+  "tr_TR": [
+    "hudChrome.options.ambienceVolume"
+  ],
+  "sv_SE": [
+    "hudChrome.options.ambienceVolume"
+  ],
+  "vi_VN": [
+    "hudChrome.options.ambienceVolume"
+  ],
+  "da_DK": [
+    "hudChrome.options.ambienceVolume"
+  ]
 };

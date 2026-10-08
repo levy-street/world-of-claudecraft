@@ -2164,6 +2164,7 @@ export const vi_VN: EnTranslations = {
       "interfaceModeDesktop": "Máy Tính",
       "interfaceModeTouch": "Cảm Ứng",
       "interfaceModeNote": "Tự Động chọn điều khiển máy tính hoặc cảm ứng theo thiết bị của bạn. Chọn Máy Tính để buộc dùng bàn phím và chuột (hữu ích trên máy tính bảng có bàn phím), hoặc Cảm Ứng để dùng các điều khiển trên màn hình.",
+      "ambienceVolume": "Ambience Volume",
       "footstepSounds": "Âm Thanh Bước Chân",
       "interfaceSounds": "Âm Thanh Giao Diện và Phản Hồi",
       "clickFeedback": "Dấu Nhấp Chuột",

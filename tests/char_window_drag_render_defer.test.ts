@@ -18,6 +18,14 @@ import { describe, expect, it, vi } from 'vitest';
 import { CharWindow, type CharWindowDeps } from '../src/ui/char_window';
 import { ItemDragState } from '../src/ui/item_drag_state';
 
+// Keep portrait asset requests pending so real Three loaders cannot outlive
+// happy-dom teardown. The actual portrait pending fallback still renders.
+vi.mock('../src/render/assets/loader', () => ({
+  loadGltf: vi.fn(() => new Promise(() => undefined)),
+  loadKtx2Texture: vi.fn(() => new Promise(() => undefined)),
+  loadTexture: vi.fn(() => new Promise(() => undefined)),
+}));
+
 function harness() {
   let canvasContext: unknown;
   canvasContext = new Proxy({}, { get: () => () => canvasContext, set: () => true });

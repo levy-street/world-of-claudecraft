@@ -3096,6 +3096,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.gfxSectionTouch': 'Сенсорное управление',
   'hudChrome.options.gfxCustomNote':
     'Изменение любого регулятора переключает пресет качества на «Расширенное»: собственный набор на основе базы «Высокое», начинающийся с уровней, показанных для текущего пресета.',
+  'hudChrome.options.ambienceVolume': 'Громкость окружения',
   'hudChrome.options.footstepSounds': 'Звуки шагов',
   'hudChrome.options.interfaceSounds': 'Звуки интерфейса и откликов',
   'hudChrome.options.clickFeedback': 'Метка клика',

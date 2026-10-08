@@ -3045,6 +3045,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.gfxSectionTouch': '터치 조작',
   'hudChrome.options.gfxCustomNote':
     '다이얼을 조정하면 품질 프리셋이 고급으로 전환됩니다. "높음" 품질 기반 위에 현재 프리셋에 표시된 수준에서 시작하는 사용자 지정 조합입니다.',
+  'hudChrome.options.ambienceVolume': '환경음 음량',
   'hudChrome.options.footstepSounds': '발소리',
   'hudChrome.options.interfaceSounds': '인터페이스 및 피드백 소리',
   'hudChrome.options.clickFeedback': '클릭 표시',

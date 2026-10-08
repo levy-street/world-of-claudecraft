@@ -2164,6 +2164,7 @@ export const tr_TR: EnTranslations = {
       "interfaceModeDesktop": "Masaüstü",
       "interfaceModeTouch": "Dokunmatik",
       "interfaceModeNote": "Otomatik, cihazınıza göre masaüstü veya dokunmatik denetimleri seçer. Klavye ve fareyi zorlamak için Masaüstü'nü seçin (klavyeli bir tablette kullanışlıdır) ya da ekran üzeri denetimler için Dokunmatik'i seçin.",
+      "ambienceVolume": "Ambience Volume",
       "footstepSounds": "Ayak Sesleri",
       "interfaceSounds": "Arayüz ve Geri Bildirim Sesleri",
       "clickFeedback": "Tıklama İşareti",

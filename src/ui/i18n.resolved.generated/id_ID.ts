@@ -2164,6 +2164,7 @@ export const id_ID: EnTranslations = {
       "interfaceModeDesktop": "Desktop",
       "interfaceModeTouch": "Sentuh",
       "interfaceModeNote": "Otomatis memilih kontrol desktop atau sentuh dari perangkat Anda. Pilih Desktop untuk memaksa keyboard dan mouse (berguna pada tablet dengan keyboard), atau Sentuh untuk kontrol di layar.",
+      "ambienceVolume": "Ambience Volume",
       "footstepSounds": "Suara Langkah Kaki",
       "interfaceSounds": "Suara Antarmuka dan Umpan Balik",
       "clickFeedback": "Penanda Klik",

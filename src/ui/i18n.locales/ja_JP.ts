@@ -3060,6 +3060,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.gfxSectionTouch': 'タッチ操作',
   'hudChrome.options.gfxCustomNote':
     'ダイヤルを変更すると画質プリセットが「詳細」に切り替わります。「高」品質ベースの上に、現在のプリセットに表示されているレベルを起点として組み立てるカスタム設定です。',
+  'hudChrome.options.ambienceVolume': '環境音の音量',
   'hudChrome.options.footstepSounds': '足音',
   'hudChrome.options.interfaceSounds': 'インターフェースとフィードバック音',
   'hudChrome.options.clickFeedback': 'クリックマーカー',

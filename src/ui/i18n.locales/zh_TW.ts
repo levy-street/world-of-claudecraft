@@ -2950,6 +2950,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.gfxSectionTouch': '觸控操作',
   'hudChrome.options.gfxCustomNote':
     '調整任一細節旋鈕會將畫質預設切換為「進階」：一套基於「高」畫質基礎、以目前預設所示等級為起點的自訂組合。',
+  'hudChrome.options.ambienceVolume': '環境音量',
   'hudChrome.options.footstepSounds': '腳步聲',
   'hudChrome.options.interfaceSounds': '介面與回饋音效',
   'hudChrome.options.clickFeedback': '點擊標記',

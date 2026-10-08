@@ -2553,6 +2553,9 @@ async function startGame(
         audio.setVolume(v);
         sfx.setVolume(v);
         break;
+      case 'ambientVolume':
+        sfx.setAmbientVolume(v);
+        break;
       case 'musicVolume':
         music.setVolume(v);
         break;

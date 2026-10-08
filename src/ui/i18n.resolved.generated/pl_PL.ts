@@ -2164,6 +2164,7 @@ export const pl_PL: EnTranslations = {
       "interfaceModeDesktop": "Komputer",
       "interfaceModeTouch": "Dotyk",
       "interfaceModeNote": "Tryb Auto dobiera sterowanie komputerowe lub dotykowe na podstawie urządzenia. Wybierz Komputer, aby wymusić klawiaturę i mysz (przydatne na tablecie z klawiaturą), lub Dotyk, aby korzystać ze sterowania ekranowego.",
+      "ambienceVolume": "Ambience Volume",
       "footstepSounds": "Dźwięki kroków",
       "interfaceSounds": "Dźwięki interfejsu i reakcji",
       "clickFeedback": "Znacznik kliknięcia",

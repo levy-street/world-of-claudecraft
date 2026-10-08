@@ -25,6 +25,11 @@ const LEGACY_STOCK_FRAME_WIDTHS: Partial<Record<string, number>> = {
 export const SETTING_RANGES = {
   cameraSpeed: { min: 0.25, max: 1.25, def: 0.7 },
   sfxVolume: { min: 0, max: 1, def: 0.8 },
+  // The environment beds (wind, birds, rain, water, dungeon air, campfires,
+  // forges), split off sfxVolume onto their own bus
+  // (src/game/sfx_mix_bus.ts). A profile saved before the split inherits its
+  // stored sfxVolume (INHERITED_NUMERIC_DEFAULTS), so nobody's mix jumps.
+  ambientVolume: { min: 0, max: 1, def: 0.8 },
   musicVolume: { min: 0, max: 1, def: 0.8 },
   // Pre-rendered NPC voice-line clips (public/audio/voice). Slightly louder than
   // SFX by default so dialogue reads over ambient combat noise.
@@ -711,6 +716,15 @@ function clampNumeric(key: NumericSettingKey, v: number): number {
   return Math.min(r.max, Math.max(r.min, v));
 }
 
+/**
+ * Load-time only: a numeric key split off an older one starts from the stored
+ * value of the key it was split from when the profile has no value of its own,
+ * so the split never changes what a player already hears or sees.
+ */
+const INHERITED_NUMERIC_DEFAULTS: Partial<Record<NumericSettingKey, NumericSettingKey>> = {
+  ambientVolume: 'sfxVolume',
+};
+
 /** Load-time only: see LEGACY_STOCK_FRAME_WIDTHS. */
 function migrateStoredNumeric(key: NumericSettingKey, v: number): number {
   return LEGACY_STOCK_FRAME_WIDTHS[key] === v ? SETTING_RANGES[key].def : v;
@@ -771,6 +785,12 @@ export class Settings {
         typeof v === 'number'
           ? clampNumeric(key, migrateStoredNumeric(key, v))
           : SETTING_RANGES[key].def;
+    }
+    for (const [key, from] of Object.entries(INHERITED_NUMERIC_DEFAULTS) as [
+      NumericSettingKey,
+      NumericSettingKey,
+    ][]) {
+      if (typeof raw[key] !== 'number' && typeof raw[from] === 'number') out[key] = out[from];
     }
     for (const key of BOOL_KEYS) {
       const v = raw[key];
