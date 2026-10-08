@@ -2923,7 +2923,9 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
       sweep([UNMAPPED_TEMPLATE_ID, MIXED_TEMPLATE_ID, MIXED2_TEMPLATE_ID]),
     );
     expect(fixtures).toEqual({ extracted: 13, unmappedOffered: 9 });
-  });
+    // Same per-subset fresh-Sim sweep as the #2513 test above, so the same
+    // budget: a loaded CI shard pushed it past the 20 s default.
+  }, 60_000);
 
   it('keeps every mixed template harvestable, so the gate is not a blanket refusal', () => {
     const mixedTemplates = () =>

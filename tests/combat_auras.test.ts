@@ -210,10 +210,86 @@ describe('auras: updateAuras expiry / HoT / top guard', () => {
     expect(heals[0]).toMatchObject({ hot: true, abilityId: 'rejuvenation', amount: 100 });
   });
 
+  // A tick on a full-health target heals nothing, but its overheal still has to
+  // reach the meters and the combat parse, so it emits amount 0 with the whole
+  // tick as overheal, flagged hot so every client surface treats it as passive.
+  it('a HoT tick on a full-health target emits heal2 with amount 0 and the tick as overheal', () => {
+    const sim = makeSim();
+    const mob = spawnMob(sim, 1000);
+    mob.auras.push(aura('hot', 100, { id: 'rejuvenation', tickInterval: DT }));
+    sim.drainEvents();
+    updateAuras(sim.ctx, mob);
+    expect(mob.hp).toBe(1000);
+    const heals = (sim.drainEvents() as any[]).filter((e) => e.type === 'heal2');
+    expect(heals).toHaveLength(1);
+    expect(heals[0]).toMatchObject({
+      hot: true,
+      abilityId: 'rejuvenation',
+      amount: 0,
+      overheal: 100,
+      crit: false,
+    });
+    expect(heals[0].absorbed).toBeUndefined();
+  });
+
+  it('a DoT leech tick on a full-health caster emits a passive amount-0 heal2 with the overheal', () => {
+    const sim = makeSim();
+    const p = sim.player;
+    p.hp = p.maxHp;
+    const mob = spawnMob(sim, 100000);
+    mob.auras.push(
+      aura('dot', 100, {
+        id: 'leech_dot_test',
+        name: 'Siphon',
+        leechPct: 0.5,
+        tickInterval: DT,
+        sourceId: p.id,
+        school: 'shadow',
+      }),
+    );
+    sim.drainEvents();
+    updateAuras(sim.ctx, mob);
+    expect(p.hp).toBe(p.maxHp);
+    const heals = (sim.drainEvents() as any[]).filter((e) => e.type === 'heal2');
+    expect(heals).toHaveLength(1);
+    expect(heals[0]).toMatchObject({
+      sourceId: p.id,
+      targetId: p.id,
+      ability: 'Siphon',
+      amount: 0,
+      hot: true,
+    });
+    expect(heals[0].overheal).toBeGreaterThan(0);
+  });
+
+  it('a DoT leech tick that lands keeps its established shape (no hot flag)', () => {
+    const sim = makeSim();
+    const p = sim.player;
+    p.hp = p.maxHp - 10;
+    const mob = spawnMob(sim, 100000);
+    mob.auras.push(
+      aura('dot', 100, {
+        id: 'leech_dot_test',
+        name: 'Siphon',
+        leechPct: 0.5,
+        tickInterval: DT,
+        sourceId: p.id,
+        school: 'shadow',
+      }),
+    );
+    sim.drainEvents();
+    updateAuras(sim.ctx, mob);
+    const heals = (sim.drainEvents() as any[]).filter((e) => e.type === 'heal2');
+    expect(heals).toHaveLength(1);
+    expect(heals[0]).toMatchObject({ amount: 10 });
+    expect(heals[0].overheal).toBeGreaterThan(0);
+    expect(heals[0].hot).toBeUndefined();
+  });
+
   it('applying a hot-kind aura emits one sound-only heal2 (amount:0) at the same moment, distinct from a later tick', () => {
     const sim = makeSim();
     const mob = spawnMob(sim, 1000);
-    mob.hp = 500; // below max, or the tick heals for 0 and never emits
+    mob.hp = 500; // below max, so the tick lands a real heal
     sim.drainEvents();
     sim.ctx.applyAura(mob, aura('hot', 40, { id: 'renew', tickInterval: DT }));
     const onApply = (sim.drainEvents() as any[]).filter((e) => e.type === 'heal2');

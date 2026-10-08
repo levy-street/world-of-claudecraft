@@ -7446,10 +7446,12 @@ export type SimEvent = { pid?: number } & (
       // health" and "a blight ate the whole heal", and those need opposite
       // feedback. See src/ui/heal_landing_feedback_core.ts.
       absorbed?: number;
-      // Set only by a HoT's periodic tick (auras.ts), never a direct cast or the
-      // one-shot application emit below: the client uses this to silence the
+      // Set only by a periodic tick (auras.ts), never a direct cast or the
+      // one-shot application emit below: every HoT tick, plus a DoT leech tick
+      // that landed as pure overheal. The client uses this to silence the
       // repeated per-tick sound (see hud.ts), since a HoT fires this every couple
-      // seconds for its whole duration and the full heal_impact hit read as spam.
+      // seconds for its whole duration and the full heal_impact hit read as spam;
+      // the meters and the parse recorder treat a hot tick as passive activity.
       hot?: boolean;
       // The aura's ability id (Aura.id), set on both the per-tick emit and the
       // one-shot application emit (Sim.applyAura) so the client can except one
@@ -7465,8 +7467,9 @@ export type SimEvent = { pid?: number } & (
       // Healing lost to the missing-hp clamp (parse fidelity 7.1), omitted
       // when zero. Computed AFTER heal-absorb consumption, so absorbed and
       // overheal never double-count the same lost healing. Set at every
-      // clamped heal2 emit site; a tick whose heal fully overheals without
-      // draining a heal-absorb shield still emits nothing.
+      // clamped heal2 emit site. A HoT or DoT-leech tick that fully overheals
+      // still emits (amount 0, hot: true); a few other periodic heals (Temporal
+      // Hourglass, Demon Heal, Drain Life) still emit nothing in that case.
       overheal?: number;
     }
   // One absorb shield soaking part of one hit. Emitted per shield drained

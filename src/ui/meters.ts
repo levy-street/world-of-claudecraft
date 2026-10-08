@@ -286,21 +286,13 @@ export function inferSpecFromAbility(cls: string | null, ability: string | null)
   return classSpecs[key] ?? null;
 }
 
-function addBreakdown(
+// The ability's breakdown entry, created empty on first use.
+function breakdownEntry(
   map: Map<string, BreakdownEntry>,
   petName: string | null,
   ability: string | null,
-  amount: number,
-  opts?: {
-    crit?: boolean;
-    absorbed?: number;
-    overheal?: number;
-    targetName?: string;
-    sourceName?: string;
-    abilityId?: string | null;
-    interruptedSpell?: string;
-  },
-): void {
+  abilityId: string | null | undefined,
+): BreakdownEntry {
   const key = breakdownKey(petName, ability);
   let entry = map.get(key);
   if (!entry) {
@@ -314,7 +306,7 @@ function addBreakdown(
     Object.defineProperty(entry, 'overheal', { value: 0, writable: true, enumerable: false });
     Object.defineProperty(entry, 'absorbed', { value: 0, writable: true, enumerable: false });
     Object.defineProperty(entry, 'abilityId', {
-      value: opts?.abilityId ?? null,
+      value: abilityId ?? null,
       writable: true,
       enumerable: false,
     });
@@ -335,7 +327,25 @@ function addBreakdown(
     });
     map.set(key, entry);
   }
+  return entry;
+}
 
+function addBreakdown(
+  map: Map<string, BreakdownEntry>,
+  petName: string | null,
+  ability: string | null,
+  amount: number,
+  opts?: {
+    crit?: boolean;
+    absorbed?: number;
+    overheal?: number;
+    targetName?: string;
+    sourceName?: string;
+    abilityId?: string | null;
+    interruptedSpell?: string;
+  },
+): void {
+  const entry = breakdownEntry(map, petName, ability, opts?.abilityId);
   entry.amount += amount;
   entry.hits = (entry.hits ?? 0) + 1;
   if (opts?.crit) {
@@ -828,7 +838,12 @@ export class MeterData {
       const targetEntity = world.entities.get(ev.targetId);
       const targetName = targetEntity?.name ?? `#${ev.targetId}`;
 
-      if (targetInParty) {
+      // A periodic tick that landed as pure overheal (a HoT on a full-health
+      // target) would only add a "+0" row that pushes real damage out of the
+      // short death recap, so it stays out.
+      const passiveOverhealTick =
+        ev.type === 'heal2' && ev.hot === true && ev.amount === 0 && !(ev.absorbed ?? 0);
+      if (targetInParty && !passiveOverhealTick) {
         const hpBefore = targetEntity?.hp;
         const maxHp = targetEntity?.maxHp;
         const hpAfter = Math.min(maxHp ?? (hpBefore ?? 0) + ev.amount, (hpBefore ?? 0) + ev.amount);
@@ -884,6 +899,21 @@ export class MeterData {
             overheal: 'overheal' in ev ? ev.overheal : undefined,
             targetName,
           });
+        }
+      } else if (
+        sourceInParty &&
+        ev.type === 'heal2' &&
+        ev.amount === 0 &&
+        (ev.overheal ?? 0) > 0
+      ) {
+        // A heal that landed entirely as overheal (a direct heal on a full-health
+        // target) healed nothing, so it adds no healing, hit, or crit; only its
+        // overheal counts toward the ability's overheal share.
+        const who = this.attribute(world, ev.sourceId, partyPids);
+        for (const enc of [this.current, this.allTime]) {
+          const t = this.tally(enc, who.pid, who.name, who.cls, partyPids, who.spec);
+          const entry = breakdownEntry(t.healByAbility, who.petName, ev.ability, ev.abilityId);
+          entry.overheal = (entry.overheal ?? 0) + (ev.overheal ?? 0);
         }
       }
     } else if (

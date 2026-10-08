@@ -3,6 +3,19 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+
+// This suite exercises the character sheet DOM, not WebGL portraits. Importing
+// the real portrait module starts GLB fetches that can outlive happy-dom
+// teardown and throw ProgressEvent errors in Node (the same boundary
+// tests/inspect_window.test.ts keeps inert), so the portrait chip stays a stub.
+vi.mock('../src/ui/portrait_chip', () => ({
+  hydratePortraits: () => undefined,
+  isComposedPortraitKey: () => false,
+  modularLookFor: () => null,
+  onPortraitUpdate: () => () => undefined,
+  portraitChipHtml: () => '',
+}));
+
 import { CRAFT_RING } from '../src/sim/content/professions';
 import { ITEMS } from '../src/sim/data';
 import { itemCopyPin } from '../src/sim/item_copy_ref';

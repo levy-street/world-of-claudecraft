@@ -421,11 +421,15 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
               const intended = Math.round(tickDamage * a.leechPct * ctx.healingTakenMult(src));
               const landing = consumeHealAbsorb(ctx, src, intended);
               const absorbed = intended - landing;
-              const healed = Math.min(landing, src.maxHp - src.hp);
+              const healed = Math.min(landing, Math.max(0, src.maxHp - src.hp));
               onCraftedCollectionHeal(ctx, src, src, landing - healed);
-              if (healed > 0 || absorbed > 0) {
+              const overheal = landing - healed;
+              if (healed > 0 || absorbed > 0 || overheal > 0) {
                 if (healed > 0) src.hp += healed;
-                const overheal = landing - healed;
+                // A tick that landed as pure overheal still reports it for the
+                // meters and the parse, flagged hot so the client treats it as a
+                // silent passive tick; every other leech tick keeps its shape.
+                const passive = healed === 0 && absorbed === 0;
                 ctx.emit({
                   type: 'heal2',
                   sourceId: src.id,
@@ -433,6 +437,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
                   amount: healed,
                   crit: false,
                   ability: a.name,
+                  ...(passive ? { hot: true } : {}),
                   ...(absorbed > 0 ? { absorbed } : {}),
                   ...(overheal > 0 ? { overheal } : {}),
                 });
@@ -454,12 +459,14 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           const intended = Math.round(a.value * ctx.healingTakenMult(e));
           const landing = consumeHealAbsorb(ctx, e, intended);
           const absorbed = intended - landing;
-          const healed = Math.min(landing, e.maxHp - e.hp);
+          const healed = Math.min(landing, Math.max(0, e.maxHp - e.hp));
           const healer = ctx.entities.get(a.sourceId);
           if (healer) onCraftedCollectionHeal(ctx, healer, e, landing - healed);
-          if (healed > 0 || absorbed > 0) {
+          const overheal = landing - healed;
+          // A tick on a full-health target emits too (amount 0, the whole tick as
+          // overheal) so overheal totals cover the at-full-health case.
+          if (healed > 0 || absorbed > 0 || overheal > 0) {
             if (healed > 0) e.hp += healed;
-            const overheal = landing - healed;
             ctx.emit({
               type: 'heal2',
               sourceId: a.sourceId,
