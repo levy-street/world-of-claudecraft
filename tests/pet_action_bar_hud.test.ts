@@ -60,7 +60,7 @@ interface PetBarHarness {
   pendingPetFeed: boolean;
   petModeMenuOpen: boolean;
   peekGuard: { consume(): boolean };
-  attachTooltip(): void;
+  attachTooltip(el: HTMLElement, html: () => string, isSpell?: () => boolean): void;
   hideTooltip(): void;
   hasPetFood(): boolean;
   cancelPetFeed(): void;
@@ -154,8 +154,14 @@ describe('Hud Warlock pet signature bar', () => {
     const hud = makeHud('emberkin');
     hud.renderPetBar(hud.sim.entities.get(2) ?? null);
 
-    const felbolt = document.querySelector<HTMLButtonElement>('[title="Felbolt"]');
+    const felbolt = document.querySelector<HTMLButtonElement>(
+      '[data-focus-key="emberkin_felbolt"]',
+    );
     expect(felbolt).not.toBeNull();
+    expect(felbolt?.getAttribute('aria-label')).toBe('Felbolt');
+    expect(felbolt?.hasAttribute('title')).toBe(false);
+    const spellKind = vi.mocked(hud.attachTooltip).mock.calls.find(([el]) => el === felbolt)?.[2];
+    expect(spellKind?.()).toBe(true);
     // Shared socket pins keep pet state and icon structure on the common visual recipe.
     expect(felbolt?.classList.contains('ui-socket')).toBe(true);
     expect(felbolt?.querySelector('.ui-socket-art')).not.toBeNull();
@@ -177,7 +183,7 @@ describe('Hud Warlock pet signature bar', () => {
       document.querySelector<HTMLElement>('[data-focus-key="stance-menu"] .icon-label')?.style
         .backgroundImage,
     ).toContain('mock:ability:pet_defensive');
-    expect(document.querySelector('[title="Taunt"]')).toBeNull();
+    expect(document.querySelector('[data-focus-key="pet_growl"]')).toBeNull();
     expect(felbolt?.getAttribute('aria-description')).toBe(
       'Autocast on. Right-click, touch-hold, or press Shift+Enter to turn it off.',
     );
@@ -210,12 +216,14 @@ describe('Hud Warlock pet signature bar', () => {
     const hud = makeHud('gloomshade');
     hud.renderPetBar(hud.sim.entities.get(2) ?? null);
 
-    const chain = document.querySelector<HTMLButtonElement>('[title="Abyssal Chain"]');
+    const chain = document.querySelector<HTMLButtonElement>(
+      '[data-focus-key="gloomshade_abyssal_chain"]',
+    );
     expect(chain).not.toBeNull();
     expect(chain?.querySelector<HTMLElement>('.icon-label')?.style.backgroundImage).toContain(
       'mock:ability:gloomshade_abyssal_chain',
     );
-    expect(document.querySelector('[title="Taunt"]')).not.toBeNull();
+    expect(document.querySelector('[data-focus-key="pet_growl"]')).not.toBeNull();
 
     chain?.dispatchEvent(pointerEvent('pointerdown'));
     vi.advanceTimersByTime(2100);
@@ -262,7 +270,9 @@ describe('Hud Warlock pet signature bar', () => {
     const hud = makeHud('emberkin', true, { petSkillTimer: 7.2, petAutoSkill: false });
     hud.renderPetBar(hud.sim.entities.get(2) ?? null);
 
-    const felbolt = document.querySelector<HTMLButtonElement>('[title="Felbolt"]');
+    const felbolt = document.querySelector<HTMLButtonElement>(
+      '[data-focus-key="emberkin_felbolt"]',
+    );
     expect(felbolt?.classList.contains('cooldown')).toBe(true);
     expect(felbolt?.querySelector('.cdtext')?.textContent).toBe('8');
     expect(felbolt?.getAttribute('aria-label')).toBe('Felbolt, 8 seconds remaining');
@@ -279,20 +289,20 @@ describe('Hud Warlock pet signature bar', () => {
   it('fails closed and hides signature buttons without negotiated server support', () => {
     const emberkin = makeHud('emberkin', false);
     emberkin.renderPetBar(emberkin.sim.entities.get(2) ?? null);
-    expect(document.querySelector('[title="Felbolt"]')).toBeNull();
-    expect(document.querySelector('[title="Taunt"]')).toBeNull();
+    expect(document.querySelector('[data-focus-key="emberkin_felbolt"]')).toBeNull();
+    expect(document.querySelector('[data-focus-key="pet_growl"]')).toBeNull();
 
     document.body.innerHTML = '<div id="petbar"></div>';
     const gloomshade = makeHud('gloomshade', false);
     gloomshade.renderPetBar(gloomshade.sim.entities.get(2) ?? null);
-    expect(document.querySelector('[title="Abyssal Chain"]')).toBeNull();
-    expect(document.querySelector('[title="Taunt"]')).not.toBeNull();
+    expect(document.querySelector('[data-focus-key="gloomshade_abyssal_chain"]')).toBeNull();
+    expect(document.querySelector('[data-focus-key="pet_growl"]')).not.toBeNull();
   });
 
   it('restores the same action focus across a cooldown repaint', () => {
     const hud = makeHud('emberkin');
     hud.renderPetBar(hud.sim.entities.get(2) ?? null);
-    const first = document.querySelector<HTMLButtonElement>('[title="Felbolt"]');
+    const first = document.querySelector<HTMLButtonElement>('[data-focus-key="emberkin_felbolt"]');
     first?.focus();
 
     const pet = hud.sim.entities.get(2);
@@ -300,7 +310,9 @@ describe('Hud Warlock pet signature bar', () => {
     pet.petSkillTimer = 7.2;
     hud.renderPetBar(hud.sim.entities.get(2) ?? null);
 
-    const replacement = document.querySelector<HTMLButtonElement>('[title="Felbolt"]');
+    const replacement = document.querySelector<HTMLButtonElement>(
+      '[data-focus-key="emberkin_felbolt"]',
+    );
     expect(document.activeElement).toBe(replacement);
     expect(replacement?.dataset.focusKey).toBe('emberkin_felbolt');
     expect(replacement?.dataset.suppressFocusTooltip).toBe('true');
