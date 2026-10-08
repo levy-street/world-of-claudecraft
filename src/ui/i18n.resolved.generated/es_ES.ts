@@ -13799,6 +13799,10 @@ export const es_ES: EnTranslations = {
         "name": "Letanía de Aflicción",
         "description": "Canaliza durante 3 s, infligiendo {damage} de daño de Sombra cada segundo. El daño aumenta con el poder con hechizos."
       },
+      "vampiric_touch": {
+        "name": "Toque vampírico",
+        "description": "Inflige {damage} de daño de Sombras durante 15 s, una vez cada 3 s. El daño aumenta con el poder con hechizos y los pulsos pueden ser críticos. Cada pulso reparte una sanación equivalente al 20% de la vida perdida por el enemigo entre tú y los miembros heridos de tu grupo a 30 yardas o menos; en una banda, solo recibe esta sanación tu subgrupo. Si tienes al menos 2 cargas de Diezmo sombrío, aplicar el efecto consume 2 para aumentar todo su daño un 30%."
+      },
       "flash_heal": {
         "name": "Plegaria Urgente",
         "description": "Sana a un objetivo aliado en {damage}. La sanación aumenta con el poder con hechizos."

@@ -13799,6 +13799,10 @@ export const de_DE: EnTranslations = {
         "name": "Litanei des Leids",
         "description": "Kanalisiert 3 Sek. lang und verursacht jede Sekunde {damage} Schattenschaden. Der Schaden steigt mit der Zaubermacht."
       },
+      "vampiric_touch": {
+        "name": "Vampiric Touch",
+        "description": "Deal {damage} Shadow damage over 15 sec, once every 3 sec. Damage increases with Spell Power and ticks can critically strike. Each tick shares healing equal to 20% of the health lost by the enemy among you and injured party members within 30 yards; in a raid, only your subgroup receives this healing. If you have at least 2 Gloomtithe charges, applying this effect consumes 2 to increase all its damage by 30%."
+      },
       "flash_heal": {
         "name": "Dringendes Gebet",
         "description": "Heilt ein freundliches Ziel um {damage}. Die Heilung steigt mit der Zaubermacht."

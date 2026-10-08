@@ -3201,6 +3201,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   heal: r('holy', 'holyGold', ['cross'], ['sparkle']),
   flash_heal: r('holy', 'holyGold', ['cross'], ['motion']),
   mind_flay: r('shadow', 'shadowPurple', ['eye'], ['motion']),
+  vampiric_touch: r('shadow', 'shadowPurple', ['hand', { p: 'heart', ...BR }], ['drips', 'glow']),
   // shaman
   frost_shock: r('frost', 'ice', ['snowflake'], ['motion']),
   ghost_wolf: r('nature', 'leafGreen', ['paw'], ['glow']),
@@ -4546,6 +4547,7 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'scouring_mercy',
   'seraphic_vigil',
   'summon_tithefiend',
+  'vampiric_touch',
   'martyrs_aegis',
   'choir_of_deliverance',
   'prayer_of_returning',

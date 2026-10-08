@@ -19684,4 +19684,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'このワールドクエストの報酬を獲得したとき、バッグがいっぱいでした。そのため、カラスがここまで届けました。空きを作ってから、どのワタリガラスの石柱でも受け取れます。\n\n- カラス便',
   'questUi.logs.worldQuestRewardMailed':
     'バッグがいっぱいです。報酬はメールボックスに送られました: {items}。',
+  'entities.abilities.vampiric_touch.name': '吸血の接触',
+  'entities.abilities.vampiric_touch.description':
+    '15秒間、3秒ごとに合計{damage}の暗影ダメージを与える。ダメージは呪文威力で増加し、各回のダメージはクリティカル可能。各回で敵が実際に失ったHPの20%を回復量とし、自分と30ヤード以内の負傷したパーティメンバーに均等に分配する。レイドでは自分のサブグループのみが対象。闇の献納が2チャージ以上ある場合、効果の付与時に2チャージを消費し、効果全体のダメージを30%増加させる。',
 };

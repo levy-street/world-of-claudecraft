@@ -13777,7 +13777,7 @@ export const en_CA: EnTranslations = {
       },
       "shadow_word_pain": {
         "name": "Dirge of Decay",
-        "description": "Deal {damage} total Shadow damage over 18 sec, once every 3 sec. Damage increases with Spell Power. Vespers already includes 10% more damage and grants 1 Gloomtithe per tick on your Effigy. Reapplying your active Dirge to an enemy mob refreshes your existing Dirges on all living hostile mobs within 30 yards of you and in line of sight. This does not spread Dirge to new targets."
+        "description": "Deal {damage} total Shadow damage over 18 sec, once every 3 sec. Damage increases with Spell Power. Vespers ticks can critically strike, using your spell critical chance and critical damage bonus. Vespers already includes 10% more damage and grants 1 Gloomtithe per tick on your Effigy. Reapplying your active Dirge to an enemy mob refreshes your existing Dirges on all living hostile mobs within 30 yards of you and in line of sight. This does not spread Dirge to new targets."
       },
       "power_word_shield": {
         "name": "Psalm of Warding",
@@ -13797,7 +13797,11 @@ export const en_CA: EnTranslations = {
       },
       "mind_flay": {
         "name": "Litany of Woe",
-        "description": "Channel for 3 sec, dealing {damage} Shadow damage each second. Damage increases with Spell Power."
+        "description": "Channel for 3 sec, dealing {damage} Shadow damage each second. Damage increases with Spell Power. Vespers ticks can critically strike, using your spell critical chance and critical damage bonus."
+      },
+      "vampiric_touch": {
+        "name": "Vampiric Touch",
+        "description": "Deal {damage} Shadow damage over 15 sec, once every 3 sec. Damage increases with Spell Power and ticks can critically strike. Each tick shares healing equal to 20% of the health lost by the enemy among you and injured party members within 30 yards; in a raid, only your subgroup receives this healing. If you have at least 2 Gloomtithe charges, applying this effect consumes 2 to increase all its damage by 30%."
       },
       "flash_heal": {
         "name": "Urgent Prayer",
@@ -14798,7 +14802,7 @@ export const en_CA: EnTranslations = {
       },
       "summon_tithefiend": {
         "name": "Call Tithefiend",
-        "description": "Consume all Gloomtithe to summon a Tithefiend. It lasts 6, 8, 10, 12, or 15 sec at 1 to 5 stacks and attacks every 2 sec. Each attack deals 20 to 24 Shadow damage plus 8 per extra stack and increases with your Spell Power. At 5 stacks, the fiend grows larger and deals 25% more damage. It prefers your Effigy. Each hit restores 1% maximum Mana and echoes 15% of its damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)"
+        "description": "Consume all Gloomtithe to summon a Tithefiend. It lasts 6, 8, 10, 12, or 15 sec at 1 to 5 stacks and attacks every 2 sec. Each attack deals 20 to 24 Shadow damage plus 8 per extra stack and increases with your Spell Power. At 5 stacks, the fiend grows larger and deals 25% more damage. It attacks only enemies within 35 yards that have your Dirge of Decay, preferring your Effigy. Without a target, it waits until one becomes available or its duration ends. Each hit restores 1% maximum Mana and echoes 15% of its damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)"
       },
       "martyrs_aegis": {
         "name": "Martyr's Aegis",

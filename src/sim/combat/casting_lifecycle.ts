@@ -2,6 +2,7 @@ import { BENISON_4PC_WHISPER_HEAL_BONUS } from '../content/ignivar_set_bonuses';
 import { gliderActionsLocked } from '../glider_action_lock';
 import { shadowActionsLocked } from '../shadow_action_lock';
 import { BENISON_WHISPER_AURA_ID } from './priest/benison_dawnweave';
+import { shadowPeriodicHit } from './priest/periodic_crit';
 // Player cast lifecycle, extracted from the Sim monolith (C4a).
 //
 // This module owns how a cast STARTS (castAbility/castAbilityBySlot: the
@@ -2599,8 +2600,14 @@ function applyChannelTick(
         const completionDoom = isFinalConsumePulse
           ? afflictionDrainCompletionDoom(ctx, src, tgt)
           : 0;
-        const dmg = Math.round(ctx.rng.range(eff.min, eff.max) + channelSp);
-        ctx.dealDamage(src, tgt, dmg, false, res.def.school, res.def.name, 'hit');
+        const periodicHit = shadowPeriodicHit(
+          ctx,
+          src,
+          res.def.id,
+          Math.round(ctx.rng.range(eff.min, eff.max) + channelSp),
+        );
+        const dmg = periodicHit.amount;
+        ctx.dealDamage(src, tgt, dmg, periodicHit.crit, res.def.school, res.def.name, 'hit');
         if (doom > 0) gainDoom(ctx, src, doom);
         if (!src.dead) {
           const intended = Math.round(

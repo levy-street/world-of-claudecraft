@@ -13799,6 +13799,10 @@ export const id_ID: EnTranslations = {
         "name": "Litani Nestapa",
         "description": "Menyalurkan selama 3 dtk, memberi {damage} kerusakan Bayangan setiap detik. Kerusakan meningkat dengan Kekuatan Mantra."
       },
+      "vampiric_touch": {
+        "name": "Vampiric Touch",
+        "description": "Deal {damage} Shadow damage over 15 sec, once every 3 sec. Damage increases with Spell Power and ticks can critically strike. Each tick shares healing equal to 20% of the health lost by the enemy among you and injured party members within 30 yards; in a raid, only your subgroup receives this healing. If you have at least 2 Gloomtithe charges, applying this effect consumes 2 to increase all its damage by 30%."
+      },
       "flash_heal": {
         "name": "Doa Mendesak",
         "description": "Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Mantra."

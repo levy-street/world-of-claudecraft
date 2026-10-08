@@ -13799,6 +13799,10 @@ export const nl_NL: EnTranslations = {
         "name": "Litanie van Leed",
         "description": "Kanaliseert 3 sec lang en brengt elke seconde {damage} Schaduwschade toe. De schade stijgt met de Spreukkracht."
       },
+      "vampiric_touch": {
+        "name": "Vampiric Touch",
+        "description": "Deal {damage} Shadow damage over 15 sec, once every 3 sec. Damage increases with Spell Power and ticks can critically strike. Each tick shares healing equal to 20% of the health lost by the enemy among you and injured party members within 30 yards; in a raid, only your subgroup receives this healing. If you have at least 2 Gloomtithe charges, applying this effect consumes 2 to increase all its damage by 30%."
+      },
       "flash_heal": {
         "name": "Dringend Gebed",
         "description": "Geneest een bevriend doelwit voor {damage}. De genezing stijgt met de Spreukkracht."

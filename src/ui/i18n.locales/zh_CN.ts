@@ -18708,4 +18708,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.letters.world_quest_reward.body':
     '你获得这份世界任务奖励时背包已满，所以渡鸦把它送到了这里。腾出空间后，可在任意渡鸦石柱领取。\n\n- 渡鸦邮局',
   'questUi.logs.worldQuestRewardMailed': '你的背包已满。奖励已寄送到你的邮箱：{items}。',
+  'entities.abilities.vampiric_touch.name': '吸血之触',
+  'entities.abilities.vampiric_touch.description':
+    '在15秒内造成{damage}点暗影伤害，每3秒一次。伤害随法术强度提升，每次伤害均可暴击。每次伤害将敌人实际损失生命值的20%转化为治疗，平均分配给你和30码内受伤的小队成员；在团队中，仅治疗你所在的小队。若你拥有至少2层幽暗什一，施加此效果会消耗2层，使其全部伤害提高30%。',
 };

@@ -2218,6 +2218,8 @@ export type TranslationKeyFlat =
   | 'entities.abilities.unleash_weapon.name'
   | 'entities.abilities.valkyrs_calling.description'
   | 'entities.abilities.valkyrs_calling.name'
+  | 'entities.abilities.vampiric_touch.description'
+  | 'entities.abilities.vampiric_touch.name'
   | 'entities.abilities.vanish.description'
   | 'entities.abilities.vanish.name'
   | 'entities.abilities.veilbound_march.description'

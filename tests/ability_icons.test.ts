@@ -130,11 +130,12 @@ describe('ability icons', () => {
     // 473: plus the Buried Hoards Clockwork Shock Bomb glyph (the 2026-09-28
     // release/v0.44.0 merge into feature/buried-hoards).
     // 474: plus the Scratch glyph (the Cat Form sweep builder).
-    expect(ids).toHaveLength(474);
+    // 475: plus the Vampiric Touch glyph for the Shadow Priest curse.
+    expect(ids).toHaveLength(475);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
-    expect(hash).toBe('13a833e557cfdfef50e465d9eaf547ff8e1e1245494b02e3d503fcc0d0aa37bd');
+    expect(hash).toBe('906b5ee55babda1b8d210753ec3ad8be2167b94a29907a70c7d3dc9a1c12e9df');
   });
 });

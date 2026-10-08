@@ -13799,6 +13799,10 @@ export const da_DK: EnTranslations = {
         "name": "Jammerens Litani",
         "description": "Kanaliserer i 3 sek. og volder {damage} Skyggeskade hvert sekund. Skaden stiger med Besværgelseskraft."
       },
+      "vampiric_touch": {
+        "name": "Vampiric Touch",
+        "description": "Deal {damage} Shadow damage over 15 sec, once every 3 sec. Damage increases with Spell Power and ticks can critically strike. Each tick shares healing equal to 20% of the health lost by the enemy among you and injured party members within 30 yards; in a raid, only your subgroup receives this healing. If you have at least 2 Gloomtithe charges, applying this effect consumes 2 to increase all its damage by 30%."
+      },
       "flash_heal": {
         "name": "Hastende Bøn",
         "description": "Helbreder et venligt mål for {damage}. Helbredelsen stiger med Besværgelseskraft."

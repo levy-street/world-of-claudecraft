@@ -13799,6 +13799,10 @@ export const cs_CZ: EnTranslations = {
         "name": "Litanie běd",
         "description": "Sesílá 3 s a každou vteřinu působí {damage} stínového poškození. Poškození roste se silou kouzel."
       },
+      "vampiric_touch": {
+        "name": "Vampiric Touch",
+        "description": "Deal {damage} Shadow damage over 15 sec, once every 3 sec. Damage increases with Spell Power and ticks can critically strike. Each tick shares healing equal to 20% of the health lost by the enemy among you and injured party members within 30 yards; in a raid, only your subgroup receives this healing. If you have at least 2 Gloomtithe charges, applying this effect consumes 2 to increase all its damage by 30%."
+      },
       "flash_heal": {
         "name": "Naléhavá modlitba",
         "description": "Vyléčí spřátelený cíl o {damage}. Léčení roste se silou kouzel."

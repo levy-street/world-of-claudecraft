@@ -19661,4 +19661,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이 전역 퀘스트 보상을 획득했을 때 가방이 가득 차 있어서 까마귀가 이곳으로 배달했습니다. 공간을 비운 뒤 아무 까마귀 석주에서나 받으세요.\n\n- 까마귀 우편국',
   'questUi.logs.worldQuestRewardMailed':
     '가방이 가득 찼습니다. 보상이 우편함으로 발송되었습니다: {items}.',
+  'entities.abilities.vampiric_touch.name': '흡혈의 손길',
+  'entities.abilities.vampiric_touch.description':
+    '15초 동안 3초마다 총 {damage}의 암흑 피해를 입힙니다. 피해는 주문력에 따라 증가하며 각 피해는 치명타가 될 수 있습니다. 매번 적이 실제로 잃은 생명력의 20%를 치유량으로 전환하여 자신과 30미터 내의 부상당한 파티원에게 균등하게 나눕니다. 공격대에서는 자신의 하위 파티만 치유합니다. 암흑 십일조가 2회 이상 충전되어 있으면 효과를 적용할 때 2회를 소모하여 전체 피해를 30% 증가시킵니다.',
 };
