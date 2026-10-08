@@ -463,7 +463,12 @@ import {
   crossHotbarResolvers,
   crossHotbarSeedActions,
 } from './hud/cross_hotbar';
-import { createDeathPromptView, updateDeathPromptView } from './hud/death';
+import {
+  createDeathPromptView,
+  deathScreenEls,
+  paintDeathScreens,
+  updateDeathPromptView,
+} from './hud/death';
 import { DelveBoardController } from './hud/delve/delve_board_controller';
 import { DelveMapPainter } from './hud/delve/delve_map_painter';
 import { DelveTrackerController } from './hud/delve/delve_tracker_controller';
@@ -1605,19 +1610,16 @@ export class Hud {
   // The party-frames container, resolved once (was re-queried every frame); the
   // keyed-pool party painter owns its children.
   private partyFramesEl = $('#party-frames');
-  private deathOverlayEl = $('#death-overlay');
   private releaseSpiritBtnEl = $('#release-btn');
   private deathRecapBtnEl = $('#death-recap-btn');
   private deathRecapDialog!: DeathRecapDialog;
-  private ghostPromptEl = $('#ghost-prompt');
   private resurrectionPromptEl: HTMLElement | null = null;
   private guildInvitePromptEl: HTMLElement | null = null;
   private promptSequence = 0;
   private resurrectCorpseBtnEl = $('#resurrect-corpse-btn');
-  private pvpResurrectBtnEl = $('#pvp-resurrect-btn');
   private deathView = createDeathPromptView();
-  // The standing top-of-screen ghost line (both ways back); shown for a ghost only.
-  private ghostHintEl = $('#ghost-hint');
+  // The overlay, ghost hint, ghost prompt and ghost Recap button (painted per frame).
+  private deathEls = deathScreenEls(document);
   // Cached once (was re-queried every frame): the near-death screen-edge overlay.
   private lowHealthVignetteEl = document.getElementById('low-health-vignette');
   private hotWriteCache: SingleSlotCache = new WeakMap(); // WeakMap rationale: painter_host.ts
@@ -2712,8 +2714,9 @@ export class Hud {
     bindTouchTap(this.deathRecapBtnEl, () => {
       this.deathRecapDialog.toggle();
     });
+    bindTouchTap(this.deathEls.ghostRecapBtn, () => this.deathRecapDialog.toggle());
     bindTouchTap(this.resurrectCorpseBtnEl, () => this.sim.resurrectAtCorpse());
-    bindTouchTap(this.pvpResurrectBtnEl, () => this.sim.pvpResurrect());
+    bindTouchTap(this.deathEls.pvpResurrectBtn, () => this.sim.pvpResurrect());
     document.addEventListener('pointerdown', (ev) => {
       const target = ev.target as Node | null;
       if (!target) return;
@@ -9353,10 +9356,7 @@ export class Hud {
       if (this.deathRecapDialog.isOpen()) this.deathRecapDialog.close();
     }
     document.body.classList.toggle('spirit-mode', death.spiritMode);
-    this.setDisplay(this.deathOverlayEl, death.overlay ? 'flex' : 'none');
-    this.setDisplay(this.pvpResurrectBtnEl, death.pvpResurrect ? '' : 'none');
-    this.setDisplay(this.ghostHintEl, death.ghostHint ? 'block' : 'none');
-    this.setDisplay(this.ghostPromptEl, death.ghostPrompt ? 'flex' : 'none');
+    paintDeathScreens(this.writerFacet, this.deathEls, death);
 
     const inDungeon = p.pos.x > DUNGEON_X_THRESHOLD;
     const currentZone = zoneAt(p.pos.x, p.pos.z);

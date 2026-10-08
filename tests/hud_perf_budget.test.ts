@@ -588,6 +588,7 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'proc_overlay_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'aura_overlay_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/cooldown_manager/cooldown_manager_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/death/death_screen_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'cast_bar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'unit_frame_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'paladin_devotion_painter.ts', allow: {}, reflowAllow: {} },
