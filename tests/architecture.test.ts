@@ -361,6 +361,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/quest/master_craft_core.ts',
   // The world quest entry banner model (the #banner 'worldQuest' plate).
   'src/ui/hud/quest/world_quest_banner_view.ts',
+  'src/ui/hud/quest/quest_reward_choice_view.ts',
   'src/ui/quest_marker_tags.ts',
   'src/ui/hud/delve/delve_map.ts',
   'src/ui/hud/rift/rift_map_core.ts',

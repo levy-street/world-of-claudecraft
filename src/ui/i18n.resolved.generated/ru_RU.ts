@@ -12309,6 +12309,8 @@ export const ru_RU: EnTranslations = {
       "rewards": "Награды",
       "xpReward": "{xp} опыта",
       "itemReward": "Предметная награда:",
+      "chooseReward": "Выберите награду:",
+      "rewardChoices": "Вы сможете выбрать одну из этих наград:",
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "Требуется уровень {level}"
     },
@@ -12686,6 +12688,7 @@ export const ru_RU: EnTranslations = {
       "incomplete": "Это задание не завершено.",
       "giverMissing": "Выдавший это задание не рядом.",
       "turnInMissing": "Место сдачи этого задания не рядом.",
+      "rewardNotOffered": "Эта награда не предлагается.",
       "tooFar": "Слишком далеко.",
       "escortAway": "Тот, кого вы должны сопроводить, сейчас не на месте. Он скоро туда вернётся."
     }
@@ -18450,6 +18453,1194 @@ export const ru_RU: EnTranslations = {
       },
       "vanguard_warstaff": {
         "name": "Боевой посох Авангарда"
+      },
+      "brookwatch_robe": {
+        "name": "Одеяние дозора у ручья"
+      },
+      "brookwatch_leggings": {
+        "name": "Штаны дозора у ручья"
+      },
+      "brookwatch_slippers": {
+        "name": "Туфли дозора у ручья"
+      },
+      "brookwatch_hood": {
+        "name": "Капюшон дозора у ручья"
+      },
+      "brookwatch_gloves": {
+        "name": "Перчатки дозора у ручья"
+      },
+      "brookwatch_mantle": {
+        "name": "Оплечье дозора у ручья"
+      },
+      "brookwatch_sash": {
+        "name": "Кушак дозора у ручья"
+      },
+      "brookwatch_jerkin": {
+        "name": "Куртка дозора у ручья"
+      },
+      "brookwatch_breeches": {
+        "name": "Бриджи дозора у ручья"
+      },
+      "brookwatch_boots": {
+        "name": "Сапоги дозора у ручья"
+      },
+      "brookwatch_cap": {
+        "name": "Шапка дозора у ручья"
+      },
+      "brookwatch_grips": {
+        "name": "Хваты дозора у ручья"
+      },
+      "brookwatch_shoulderpads": {
+        "name": "Плечевые накладки дозора у ручья"
+      },
+      "brookwatch_belt": {
+        "name": "Ремень дозора у ручья"
+      },
+      "brookwatch_hauberk": {
+        "name": "Хауберк дозора у ручья"
+      },
+      "brookwatch_legguards": {
+        "name": "Набедренники дозора у ручья"
+      },
+      "brookwatch_sabatons": {
+        "name": "Сабатоны дозора у ручья"
+      },
+      "brookwatch_helm": {
+        "name": "Шлем дозора у ручья"
+      },
+      "brookwatch_gauntlets": {
+        "name": "Рукавицы дозора у ручья"
+      },
+      "brookwatch_pauldrons": {
+        "name": "Наплечья дозора у ручья"
+      },
+      "brookwatch_girdle": {
+        "name": "Пояс дозора у ручья"
+      },
+      "brookwatch_chainmail": {
+        "name": "Кольчуга дозора у ручья"
+      },
+      "brookwatch_chausses": {
+        "name": "Шоссы дозора у ручья"
+      },
+      "brookwatch_greaves": {
+        "name": "Наголенники дозора у ручья"
+      },
+      "brookwatch_coif": {
+        "name": "Койф дозора у ручья"
+      },
+      "brookwatch_handguards": {
+        "name": "Латные перчатки дозора у ручья"
+      },
+      "brookwatch_spaulders": {
+        "name": "Наплечники дозора у ручья"
+      },
+      "brookwatch_cord": {
+        "name": "Шнур дозора у ручья"
+      },
+      "hedgerow_robe": {
+        "name": "Одеяние живой изгороди"
+      },
+      "hedgerow_leggings": {
+        "name": "Штаны живой изгороди"
+      },
+      "hedgerow_slippers": {
+        "name": "Туфли живой изгороди"
+      },
+      "hedgerow_hood": {
+        "name": "Капюшон живой изгороди"
+      },
+      "hedgerow_gloves": {
+        "name": "Перчатки живой изгороди"
+      },
+      "hedgerow_mantle": {
+        "name": "Оплечье живой изгороди"
+      },
+      "hedgerow_sash": {
+        "name": "Кушак живой изгороди"
+      },
+      "hedgerow_jerkin": {
+        "name": "Куртка живой изгороди"
+      },
+      "hedgerow_breeches": {
+        "name": "Бриджи живой изгороди"
+      },
+      "hedgerow_boots": {
+        "name": "Сапоги живой изгороди"
+      },
+      "hedgerow_cap": {
+        "name": "Шапка живой изгороди"
+      },
+      "hedgerow_grips": {
+        "name": "Хваты живой изгороди"
+      },
+      "hedgerow_shoulderpads": {
+        "name": "Плечевые накладки живой изгороди"
+      },
+      "hedgerow_belt": {
+        "name": "Ремень живой изгороди"
+      },
+      "hedgerow_hauberk": {
+        "name": "Хауберк живой изгороди"
+      },
+      "hedgerow_legguards": {
+        "name": "Набедренники живой изгороди"
+      },
+      "hedgerow_sabatons": {
+        "name": "Сабатоны живой изгороди"
+      },
+      "hedgerow_helm": {
+        "name": "Шлем живой изгороди"
+      },
+      "hedgerow_gauntlets": {
+        "name": "Рукавицы живой изгороди"
+      },
+      "hedgerow_pauldrons": {
+        "name": "Наплечья живой изгороди"
+      },
+      "hedgerow_girdle": {
+        "name": "Пояс живой изгороди"
+      },
+      "hedgerow_chainmail": {
+        "name": "Кольчуга живой изгороди"
+      },
+      "hedgerow_chausses": {
+        "name": "Шоссы живой изгороди"
+      },
+      "hedgerow_greaves": {
+        "name": "Наголенники живой изгороди"
+      },
+      "hedgerow_coif": {
+        "name": "Койф живой изгороди"
+      },
+      "hedgerow_handguards": {
+        "name": "Латные перчатки живой изгороди"
+      },
+      "hedgerow_spaulders": {
+        "name": "Наплечники живой изгороди"
+      },
+      "hedgerow_cord": {
+        "name": "Шнур живой изгороди"
+      },
+      "bogwalker_robe": {
+        "name": "Одеяние болотного странника"
+      },
+      "bogwalker_leggings": {
+        "name": "Штаны болотного странника"
+      },
+      "bogwalker_slippers": {
+        "name": "Туфли болотного странника"
+      },
+      "bogwalker_hood": {
+        "name": "Капюшон болотного странника"
+      },
+      "bogwalker_gloves": {
+        "name": "Перчатки болотного странника"
+      },
+      "bogwalker_mantle": {
+        "name": "Оплечье болотного странника"
+      },
+      "bogwalker_sash": {
+        "name": "Кушак болотного странника"
+      },
+      "bogwalker_jerkin": {
+        "name": "Куртка болотного странника"
+      },
+      "bogwalker_breeches": {
+        "name": "Бриджи болотного странника"
+      },
+      "bogwalker_boots": {
+        "name": "Сапоги болотного странника"
+      },
+      "bogwalker_cap": {
+        "name": "Шапка болотного странника"
+      },
+      "bogwalker_grips": {
+        "name": "Хваты болотного странника"
+      },
+      "bogwalker_shoulderpads": {
+        "name": "Плечевые накладки болотного странника"
+      },
+      "bogwalker_belt": {
+        "name": "Ремень болотного странника"
+      },
+      "bogwalker_hauberk": {
+        "name": "Хауберк болотного странника"
+      },
+      "bogwalker_legguards": {
+        "name": "Набедренники болотного странника"
+      },
+      "bogwalker_sabatons": {
+        "name": "Сабатоны болотного странника"
+      },
+      "bogwalker_helm": {
+        "name": "Шлем болотного странника"
+      },
+      "bogwalker_gauntlets": {
+        "name": "Рукавицы болотного странника"
+      },
+      "bogwalker_pauldrons": {
+        "name": "Наплечья болотного странника"
+      },
+      "bogwalker_girdle": {
+        "name": "Пояс болотного странника"
+      },
+      "bogwalker_chainmail": {
+        "name": "Кольчуга болотного странника"
+      },
+      "bogwalker_chausses": {
+        "name": "Шоссы болотного странника"
+      },
+      "bogwalker_greaves": {
+        "name": "Наголенники болотного странника"
+      },
+      "bogwalker_coif": {
+        "name": "Койф болотного странника"
+      },
+      "bogwalker_handguards": {
+        "name": "Латные перчатки болотного странника"
+      },
+      "bogwalker_spaulders": {
+        "name": "Наплечники болотного странника"
+      },
+      "bogwalker_cord": {
+        "name": "Шнур болотного странника"
+      },
+      "thornspire_robe": {
+        "name": "Одеяние тернового шпиля"
+      },
+      "thornspire_leggings": {
+        "name": "Штаны тернового шпиля"
+      },
+      "thornspire_slippers": {
+        "name": "Туфли тернового шпиля"
+      },
+      "thornspire_hood": {
+        "name": "Капюшон тернового шпиля"
+      },
+      "thornspire_gloves": {
+        "name": "Перчатки тернового шпиля"
+      },
+      "thornspire_mantle": {
+        "name": "Оплечье тернового шпиля"
+      },
+      "thornspire_sash": {
+        "name": "Кушак тернового шпиля"
+      },
+      "thornspire_jerkin": {
+        "name": "Куртка тернового шпиля"
+      },
+      "thornspire_breeches": {
+        "name": "Бриджи тернового шпиля"
+      },
+      "thornspire_boots": {
+        "name": "Сапоги тернового шпиля"
+      },
+      "thornspire_cap": {
+        "name": "Шапка тернового шпиля"
+      },
+      "thornspire_grips": {
+        "name": "Хваты тернового шпиля"
+      },
+      "thornspire_shoulderpads": {
+        "name": "Плечевые накладки тернового шпиля"
+      },
+      "thornspire_belt": {
+        "name": "Ремень тернового шпиля"
+      },
+      "thornspire_hauberk": {
+        "name": "Хауберк тернового шпиля"
+      },
+      "thornspire_legguards": {
+        "name": "Набедренники тернового шпиля"
+      },
+      "thornspire_sabatons": {
+        "name": "Сабатоны тернового шпиля"
+      },
+      "thornspire_helm": {
+        "name": "Шлем тернового шпиля"
+      },
+      "thornspire_gauntlets": {
+        "name": "Рукавицы тернового шпиля"
+      },
+      "thornspire_pauldrons": {
+        "name": "Наплечья тернового шпиля"
+      },
+      "thornspire_girdle": {
+        "name": "Пояс тернового шпиля"
+      },
+      "thornspire_chainmail": {
+        "name": "Кольчуга тернового шпиля"
+      },
+      "thornspire_chausses": {
+        "name": "Шоссы тернового шпиля"
+      },
+      "thornspire_greaves": {
+        "name": "Наголенники тернового шпиля"
+      },
+      "thornspire_coif": {
+        "name": "Койф тернового шпиля"
+      },
+      "thornspire_handguards": {
+        "name": "Латные перчатки тернового шпиля"
+      },
+      "thornspire_spaulders": {
+        "name": "Наплечники тернового шпиля"
+      },
+      "thornspire_cord": {
+        "name": "Шнур тернового шпиля"
+      },
+      "hollowveil_robe": {
+        "name": "Одеяние сокрытой лощины"
+      },
+      "hollowveil_leggings": {
+        "name": "Штаны сокрытой лощины"
+      },
+      "hollowveil_slippers": {
+        "name": "Туфли сокрытой лощины"
+      },
+      "hollowveil_hood": {
+        "name": "Капюшон сокрытой лощины"
+      },
+      "hollowveil_gloves": {
+        "name": "Перчатки сокрытой лощины"
+      },
+      "hollowveil_mantle": {
+        "name": "Оплечье сокрытой лощины"
+      },
+      "hollowveil_sash": {
+        "name": "Кушак сокрытой лощины"
+      },
+      "hollowveil_jerkin": {
+        "name": "Куртка сокрытой лощины"
+      },
+      "hollowveil_breeches": {
+        "name": "Бриджи сокрытой лощины"
+      },
+      "hollowveil_boots": {
+        "name": "Сапоги сокрытой лощины"
+      },
+      "hollowveil_cap": {
+        "name": "Шапка сокрытой лощины"
+      },
+      "hollowveil_grips": {
+        "name": "Хваты сокрытой лощины"
+      },
+      "hollowveil_shoulderpads": {
+        "name": "Плечевые накладки сокрытой лощины"
+      },
+      "hollowveil_belt": {
+        "name": "Ремень сокрытой лощины"
+      },
+      "hollowveil_hauberk": {
+        "name": "Хауберк сокрытой лощины"
+      },
+      "hollowveil_legguards": {
+        "name": "Набедренники сокрытой лощины"
+      },
+      "hollowveil_sabatons": {
+        "name": "Сабатоны сокрытой лощины"
+      },
+      "hollowveil_helm": {
+        "name": "Шлем сокрытой лощины"
+      },
+      "hollowveil_gauntlets": {
+        "name": "Рукавицы сокрытой лощины"
+      },
+      "hollowveil_pauldrons": {
+        "name": "Наплечья сокрытой лощины"
+      },
+      "hollowveil_girdle": {
+        "name": "Пояс сокрытой лощины"
+      },
+      "hollowveil_chainmail": {
+        "name": "Кольчуга сокрытой лощины"
+      },
+      "hollowveil_chausses": {
+        "name": "Шоссы сокрытой лощины"
+      },
+      "hollowveil_greaves": {
+        "name": "Наголенники сокрытой лощины"
+      },
+      "hollowveil_coif": {
+        "name": "Койф сокрытой лощины"
+      },
+      "hollowveil_handguards": {
+        "name": "Латные перчатки сокрытой лощины"
+      },
+      "hollowveil_spaulders": {
+        "name": "Наплечники сокрытой лощины"
+      },
+      "hollowveil_cord": {
+        "name": "Шнур сокрытой лощины"
+      },
+      "trailwarden_robe": {
+        "name": "Одеяние стража троп"
+      },
+      "trailwarden_leggings": {
+        "name": "Штаны стража троп"
+      },
+      "trailwarden_slippers": {
+        "name": "Туфли стража троп"
+      },
+      "trailwarden_hood": {
+        "name": "Капюшон стража троп"
+      },
+      "trailwarden_gloves": {
+        "name": "Перчатки стража троп"
+      },
+      "trailwarden_mantle": {
+        "name": "Оплечье стража троп"
+      },
+      "trailwarden_sash": {
+        "name": "Кушак стража троп"
+      },
+      "trailwarden_jerkin": {
+        "name": "Куртка стража троп"
+      },
+      "trailwarden_breeches": {
+        "name": "Бриджи стража троп"
+      },
+      "trailwarden_boots": {
+        "name": "Сапоги стража троп"
+      },
+      "trailwarden_cap": {
+        "name": "Шапка стража троп"
+      },
+      "trailwarden_grips": {
+        "name": "Хваты стража троп"
+      },
+      "trailwarden_shoulderpads": {
+        "name": "Плечевые накладки стража троп"
+      },
+      "trailwarden_belt": {
+        "name": "Ремень стража троп"
+      },
+      "trailwarden_hauberk": {
+        "name": "Хауберк стража троп"
+      },
+      "trailwarden_legguards": {
+        "name": "Набедренники стража троп"
+      },
+      "trailwarden_sabatons": {
+        "name": "Сабатоны стража троп"
+      },
+      "trailwarden_helm": {
+        "name": "Шлем стража троп"
+      },
+      "trailwarden_gauntlets": {
+        "name": "Рукавицы стража троп"
+      },
+      "trailwarden_pauldrons": {
+        "name": "Наплечья стража троп"
+      },
+      "trailwarden_girdle": {
+        "name": "Пояс стража троп"
+      },
+      "trailwarden_chainmail": {
+        "name": "Кольчуга стража троп"
+      },
+      "trailwarden_chausses": {
+        "name": "Шоссы стража троп"
+      },
+      "trailwarden_greaves": {
+        "name": "Наголенники стража троп"
+      },
+      "trailwarden_coif": {
+        "name": "Койф стража троп"
+      },
+      "trailwarden_handguards": {
+        "name": "Латные перчатки стража троп"
+      },
+      "trailwarden_spaulders": {
+        "name": "Наплечники стража троп"
+      },
+      "trailwarden_cord": {
+        "name": "Шнур стража троп"
+      },
+      "highgale_robe": {
+        "name": "Одеяние буревого гребня"
+      },
+      "highgale_leggings": {
+        "name": "Штаны буревого гребня"
+      },
+      "highgale_slippers": {
+        "name": "Туфли буревого гребня"
+      },
+      "highgale_hood": {
+        "name": "Капюшон буревого гребня"
+      },
+      "highgale_gloves": {
+        "name": "Перчатки буревого гребня"
+      },
+      "highgale_mantle": {
+        "name": "Оплечье буревого гребня"
+      },
+      "highgale_sash": {
+        "name": "Кушак буревого гребня"
+      },
+      "highgale_jerkin": {
+        "name": "Куртка буревого гребня"
+      },
+      "highgale_breeches": {
+        "name": "Бриджи буревого гребня"
+      },
+      "highgale_boots": {
+        "name": "Сапоги буревого гребня"
+      },
+      "highgale_cap": {
+        "name": "Шапка буревого гребня"
+      },
+      "highgale_grips": {
+        "name": "Хваты буревого гребня"
+      },
+      "highgale_shoulderpads": {
+        "name": "Плечевые накладки буревого гребня"
+      },
+      "highgale_belt": {
+        "name": "Ремень буревого гребня"
+      },
+      "highgale_hauberk": {
+        "name": "Хауберк буревого гребня"
+      },
+      "highgale_legguards": {
+        "name": "Набедренники буревого гребня"
+      },
+      "highgale_sabatons": {
+        "name": "Сабатоны буревого гребня"
+      },
+      "highgale_helm": {
+        "name": "Шлем буревого гребня"
+      },
+      "highgale_gauntlets": {
+        "name": "Рукавицы буревого гребня"
+      },
+      "highgale_pauldrons": {
+        "name": "Наплечья буревого гребня"
+      },
+      "highgale_girdle": {
+        "name": "Пояс буревого гребня"
+      },
+      "highgale_chainmail": {
+        "name": "Кольчуга буревого гребня"
+      },
+      "highgale_chausses": {
+        "name": "Шоссы буревого гребня"
+      },
+      "highgale_greaves": {
+        "name": "Наголенники буревого гребня"
+      },
+      "brookwatch_tunic": {
+        "name": "Туника дозора у ручья"
+      },
+      "brookwatch_legwraps": {
+        "name": "Обмотки дозора у ручья"
+      },
+      "brookwatch_treads": {
+        "name": "Башмаки дозора у ручья"
+      },
+      "brookwatch_headguard": {
+        "name": "Наголовник дозора у ручья"
+      },
+      "brookwatch_handwraps": {
+        "name": "Наручные обмотки дозора у ручья"
+      },
+      "brookwatch_shoulderguards": {
+        "name": "Наплечные щитки дозора у ручья"
+      },
+      "brookwatch_waistguard": {
+        "name": "Опояска дозора у ручья"
+      },
+      "hedgerow_tunic": {
+        "name": "Туника живой изгороди"
+      },
+      "hedgerow_legwraps": {
+        "name": "Обмотки живой изгороди"
+      },
+      "hedgerow_treads": {
+        "name": "Башмаки живой изгороди"
+      },
+      "hedgerow_headguard": {
+        "name": "Наголовник живой изгороди"
+      },
+      "hedgerow_handwraps": {
+        "name": "Наручные обмотки живой изгороди"
+      },
+      "hedgerow_shoulderguards": {
+        "name": "Наплечные щитки живой изгороди"
+      },
+      "hedgerow_waistguard": {
+        "name": "Опояска живой изгороди"
+      },
+      "bogwalker_tunic": {
+        "name": "Туника болотного странника"
+      },
+      "bogwalker_legwraps": {
+        "name": "Обмотки болотного странника"
+      },
+      "bogwalker_treads": {
+        "name": "Башмаки болотного странника"
+      },
+      "bogwalker_headguard": {
+        "name": "Наголовник болотного странника"
+      },
+      "bogwalker_handwraps": {
+        "name": "Наручные обмотки болотного странника"
+      },
+      "bogwalker_shoulderguards": {
+        "name": "Наплечные щитки болотного странника"
+      },
+      "bogwalker_waistguard": {
+        "name": "Опояска болотного странника"
+      },
+      "thornspire_tunic": {
+        "name": "Туника тернового шпиля"
+      },
+      "thornspire_legwraps": {
+        "name": "Обмотки тернового шпиля"
+      },
+      "thornspire_treads": {
+        "name": "Башмаки тернового шпиля"
+      },
+      "thornspire_headguard": {
+        "name": "Наголовник тернового шпиля"
+      },
+      "thornspire_handwraps": {
+        "name": "Наручные обмотки тернового шпиля"
+      },
+      "thornspire_shoulderguards": {
+        "name": "Наплечные щитки тернового шпиля"
+      },
+      "thornspire_waistguard": {
+        "name": "Опояска тернового шпиля"
+      },
+      "hollowveil_tunic": {
+        "name": "Туника сокрытой лощины"
+      },
+      "hollowveil_legwraps": {
+        "name": "Обмотки сокрытой лощины"
+      },
+      "hollowveil_treads": {
+        "name": "Башмаки сокрытой лощины"
+      },
+      "hollowveil_headguard": {
+        "name": "Наголовник сокрытой лощины"
+      },
+      "hollowveil_handwraps": {
+        "name": "Наручные обмотки сокрытой лощины"
+      },
+      "hollowveil_shoulderguards": {
+        "name": "Наплечные щитки сокрытой лощины"
+      },
+      "hollowveil_waistguard": {
+        "name": "Опояска сокрытой лощины"
+      },
+      "trailwarden_tunic": {
+        "name": "Туника стража троп"
+      },
+      "trailwarden_legwraps": {
+        "name": "Обмотки стража троп"
+      },
+      "trailwarden_treads": {
+        "name": "Башмаки стража троп"
+      },
+      "trailwarden_headguard": {
+        "name": "Наголовник стража троп"
+      },
+      "trailwarden_handwraps": {
+        "name": "Наручные обмотки стража троп"
+      },
+      "trailwarden_shoulderguards": {
+        "name": "Наплечные щитки стража троп"
+      },
+      "trailwarden_waistguard": {
+        "name": "Опояска стража троп"
+      },
+      "highgale_tunic": {
+        "name": "Туника буревого гребня"
+      },
+      "highgale_legwraps": {
+        "name": "Обмотки буревого гребня"
+      },
+      "highgale_treads": {
+        "name": "Башмаки буревого гребня"
+      },
+      "highgale_headguard": {
+        "name": "Наголовник буревого гребня"
+      },
+      "highgale_handwraps": {
+        "name": "Наручные обмотки буревого гребня"
+      },
+      "highgale_shoulderguards": {
+        "name": "Наплечные щитки буревого гребня"
+      },
+      "highgale_waistguard": {
+        "name": "Опояска буревого гребня"
+      },
+      "highgale_coif": {
+        "name": "Койф буревого гребня"
+      },
+      "highgale_handguards": {
+        "name": "Латные перчатки буревого гребня"
+      },
+      "highgale_spaulders": {
+        "name": "Наплечники буревого гребня"
+      },
+      "highgale_cord": {
+        "name": "Шнур буревого гребня"
+      },
+      "breakwater_mantle": {
+        "name": "Оплечье волнолома"
+      },
+      "breakwater_shoulderpads": {
+        "name": "Плечевые накладки волнолома"
+      },
+      "breakwater_spaulders": {
+        "name": "Наплечники волнолома"
+      },
+      "gravebell_treads": {
+        "name": "Башмаки погребального колокола"
+      },
+      "gravebell_greaves": {
+        "name": "Наголенники погребального колокола"
+      },
+      "cryptbound_tunic": {
+        "name": "Туника склепных уз"
+      },
+      "cryptbound_chainmail": {
+        "name": "Кольчуга склепных уз"
+      },
+      "oathbroken_leggings": {
+        "name": "Штаны нарушенной клятвы"
+      },
+      "oathbroken_breeches": {
+        "name": "Бриджи нарушенной клятвы"
+      },
+      "oathbroken_legwraps": {
+        "name": "Обмотки нарушенной клятвы"
+      },
+      "oathbroken_legguards": {
+        "name": "Набедренники нарушенной клятвы"
+      },
+      "oathbroken_chausses": {
+        "name": "Шоссы нарушенной клятвы"
+      },
+      "seamist_legwraps": {
+        "name": "Обмотки морского тумана"
+      },
+      "seamist_chausses": {
+        "name": "Шоссы морского тумана"
+      },
+      "warmonger_treads": {
+        "name": "Башмаки поджигателя войны"
+      },
+      "warmonger_greaves": {
+        "name": "Наголенники поджигателя войны"
+      },
+      "sparkglass_leggings": {
+        "name": "Штаны искрящегося стекла"
+      },
+      "sparkglass_breeches": {
+        "name": "Бриджи искрящегося стекла"
+      },
+      "sparkglass_legwraps": {
+        "name": "Обмотки искрящегося стекла"
+      },
+      "sparkglass_legguards": {
+        "name": "Набедренники искрящегося стекла"
+      },
+      "sparkglass_chausses": {
+        "name": "Шоссы искрящегося стекла"
+      },
+      "stillhymn_treads": {
+        "name": "Башмаки безмолвного гимна"
+      },
+      "stillhymn_greaves": {
+        "name": "Наголенники безмолвного гимна"
+      },
+      "pearlglow_headguard": {
+        "name": "Наголовник жемчужного сияния"
+      },
+      "pearlglow_coif": {
+        "name": "Койф жемчужного сияния"
+      },
+      "sealkeeper_gloves": {
+        "name": "Перчатки хранителя печати"
+      },
+      "sealkeeper_grips": {
+        "name": "Хваты хранителя печати"
+      },
+      "sealkeeper_handwraps": {
+        "name": "Наручные обмотки хранителя печати"
+      },
+      "sealkeeper_gauntlets": {
+        "name": "Рукавицы хранителя печати"
+      },
+      "sealkeeper_handguards": {
+        "name": "Латные перчатки хранителя печати"
+      },
+      "fetterbound_leggings": {
+        "name": "Штаны тяжких оков"
+      },
+      "fetterbound_breeches": {
+        "name": "Бриджи тяжких оков"
+      },
+      "fetterbound_legwraps": {
+        "name": "Обмотки тяжких оков"
+      },
+      "fetterbound_legguards": {
+        "name": "Набедренники тяжких оков"
+      },
+      "fetterbound_chausses": {
+        "name": "Шоссы тяжких оков"
+      },
+      "shroudcaller_tunic": {
+        "name": "Туника призывателя саванов"
+      },
+      "shroudcaller_chainmail": {
+        "name": "Кольчуга призывателя саванов"
+      },
+      "wyrmshadow_tunic": {
+        "name": "Туника тени змея"
+      },
+      "wyrmshadow_chainmail": {
+        "name": "Кольчуга тени змея"
+      },
+      "cinderbrood_shoulderpads": {
+        "name": "Плечевые накладки пепельного выводка"
+      },
+      "cinderbrood_shoulderguards": {
+        "name": "Наплечные щитки пепельного выводка"
+      },
+      "cinderbrood_pauldrons": {
+        "name": "Наплечья пепельного выводка"
+      },
+      "hoarfrost_mantle": {
+        "name": "Оплечье изморози"
+      },
+      "hoarfrost_shoulderpads": {
+        "name": "Плечевые накладки изморози"
+      },
+      "hoarfrost_spaulders": {
+        "name": "Наплечники изморози"
+      },
+      "blackmere_mantle": {
+        "name": "Оплечье чёрного озера"
+      },
+      "blackmere_shoulderpads": {
+        "name": "Плечевые накладки чёрного озера"
+      },
+      "blackmere_shoulderguards": {
+        "name": "Наплечные щитки чёрного озера"
+      },
+      "blackmere_pauldrons": {
+        "name": "Наплечья чёрного озера"
+      },
+      "blackmere_spaulders": {
+        "name": "Наплечники чёрного озера"
+      },
+      "reedhush_mantle": {
+        "name": "Оплечье тихого камыша"
+      },
+      "reedhush_shoulderpads": {
+        "name": "Плечевые накладки тихого камыша"
+      },
+      "reedhush_shoulderguards": {
+        "name": "Наплечные щитки тихого камыша"
+      },
+      "reedhush_pauldrons": {
+        "name": "Наплечья тихого камыша"
+      },
+      "reedhush_spaulders": {
+        "name": "Наплечники тихого камыша"
+      },
+      "cairnking_mantle": {
+        "name": "Оплечье курганного короля"
+      },
+      "cairnking_shoulderpads": {
+        "name": "Плечевые накладки курганного короля"
+      },
+      "cairnking_shoulderguards": {
+        "name": "Наплечные щитки курганного короля"
+      },
+      "cairnking_pauldrons": {
+        "name": "Наплечья курганного короля"
+      },
+      "cairnking_spaulders": {
+        "name": "Наплечники курганного короля"
+      },
+      "palehunt_mantle": {
+        "name": "Оплечье бледной охоты"
+      },
+      "palehunt_shoulderpads": {
+        "name": "Плечевые накладки бледной охоты"
+      },
+      "palehunt_shoulderguards": {
+        "name": "Наплечные щитки бледной охоты"
+      },
+      "palehunt_pauldrons": {
+        "name": "Наплечья бледной охоты"
+      },
+      "palehunt_spaulders": {
+        "name": "Наплечники бледной охоты"
+      },
+      "jadeshrine_mantle": {
+        "name": "Оплечье нефритового святилища"
+      },
+      "jadeshrine_shoulderpads": {
+        "name": "Плечевые накладки нефритового святилища"
+      },
+      "jadeshrine_shoulderguards": {
+        "name": "Наплечные щитки нефритового святилища"
+      },
+      "jadeshrine_pauldrons": {
+        "name": "Наплечья нефритового святилища"
+      },
+      "jadeshrine_spaulders": {
+        "name": "Наплечники нефритового святилища"
+      },
+      "gildhedge_mantle": {
+        "name": "Оплечье золочёной изгороди"
+      },
+      "gildhedge_shoulderpads": {
+        "name": "Плечевые накладки золочёной изгороди"
+      },
+      "gildhedge_spaulders": {
+        "name": "Наплечники золочёной изгороди"
+      },
+      "saltwrack_mantle": {
+        "name": "Оплечье солёных обломков"
+      },
+      "saltwrack_shoulderpads": {
+        "name": "Плечевые накладки солёных обломков"
+      },
+      "saltwrack_spaulders": {
+        "name": "Наплечники солёных обломков"
+      },
+      "brookwatch_vest": {
+        "name": "Жилет дозора у ручья"
+      },
+      "brookwatch_trousers": {
+        "name": "Брюки дозора у ручья"
+      },
+      "brookwatch_moccasins": {
+        "name": "Мокасины дозора у ручья"
+      },
+      "brookwatch_cowl": {
+        "name": "Куколь дозора у ручья"
+      },
+      "brookwatch_mitts": {
+        "name": "Митенки дозора у ручья"
+      },
+      "brookwatch_epaulets": {
+        "name": "Эполеты дозора у ручья"
+      },
+      "brookwatch_cinch": {
+        "name": "Подпояска дозора у ручья"
+      },
+      "hedgerow_vest": {
+        "name": "Жилет живой изгороди"
+      },
+      "hedgerow_trousers": {
+        "name": "Брюки живой изгороди"
+      },
+      "hedgerow_moccasins": {
+        "name": "Мокасины живой изгороди"
+      },
+      "hedgerow_cowl": {
+        "name": "Куколь живой изгороди"
+      },
+      "hedgerow_mitts": {
+        "name": "Митенки живой изгороди"
+      },
+      "hedgerow_epaulets": {
+        "name": "Эполеты живой изгороди"
+      },
+      "hedgerow_cinch": {
+        "name": "Подпояска живой изгороди"
+      },
+      "bogwalker_vest": {
+        "name": "Жилет болотного странника"
+      },
+      "bogwalker_trousers": {
+        "name": "Брюки болотного странника"
+      },
+      "bogwalker_moccasins": {
+        "name": "Мокасины болотного странника"
+      },
+      "bogwalker_cowl": {
+        "name": "Куколь болотного странника"
+      },
+      "bogwalker_mitts": {
+        "name": "Митенки болотного странника"
+      },
+      "bogwalker_epaulets": {
+        "name": "Эполеты болотного странника"
+      },
+      "bogwalker_cinch": {
+        "name": "Подпояска болотного странника"
+      },
+      "thornspire_vest": {
+        "name": "Жилет тернового шпиля"
+      },
+      "thornspire_trousers": {
+        "name": "Брюки тернового шпиля"
+      },
+      "thornspire_moccasins": {
+        "name": "Мокасины тернового шпиля"
+      },
+      "thornspire_cowl": {
+        "name": "Куколь тернового шпиля"
+      },
+      "thornspire_mitts": {
+        "name": "Митенки тернового шпиля"
+      },
+      "thornspire_epaulets": {
+        "name": "Эполеты тернового шпиля"
+      },
+      "thornspire_cinch": {
+        "name": "Подпояска тернового шпиля"
+      },
+      "hollowveil_vest": {
+        "name": "Жилет сокрытой лощины"
+      },
+      "hollowveil_trousers": {
+        "name": "Брюки сокрытой лощины"
+      },
+      "hollowveil_moccasins": {
+        "name": "Мокасины сокрытой лощины"
+      },
+      "hollowveil_cowl": {
+        "name": "Куколь сокрытой лощины"
+      },
+      "hollowveil_mitts": {
+        "name": "Митенки сокрытой лощины"
+      },
+      "hollowveil_epaulets": {
+        "name": "Эполеты сокрытой лощины"
+      },
+      "hollowveil_cinch": {
+        "name": "Подпояска сокрытой лощины"
+      },
+      "trailwarden_vest": {
+        "name": "Жилет стража троп"
+      },
+      "trailwarden_trousers": {
+        "name": "Брюки стража троп"
+      },
+      "trailwarden_moccasins": {
+        "name": "Мокасины стража троп"
+      },
+      "trailwarden_cowl": {
+        "name": "Куколь стража троп"
+      },
+      "trailwarden_mitts": {
+        "name": "Митенки стража троп"
+      },
+      "trailwarden_epaulets": {
+        "name": "Эполеты стража троп"
+      },
+      "trailwarden_cinch": {
+        "name": "Подпояска стража троп"
+      },
+      "highgale_vest": {
+        "name": "Жилет буревого гребня"
+      },
+      "highgale_trousers": {
+        "name": "Брюки буревого гребня"
+      },
+      "highgale_moccasins": {
+        "name": "Мокасины буревого гребня"
+      },
+      "highgale_cowl": {
+        "name": "Куколь буревого гребня"
+      },
+      "highgale_mitts": {
+        "name": "Митенки буревого гребня"
+      },
+      "highgale_epaulets": {
+        "name": "Эполеты буревого гребня"
+      },
+      "highgale_cinch": {
+        "name": "Подпояска буревого гребня"
+      },
+      "breakwater_shoulderguards": {
+        "name": "Наплечные щитки волнолома"
+      },
+      "breakwater_pauldrons": {
+        "name": "Наплечья волнолома"
+      },
+      "breakwater_epaulets": {
+        "name": "Эполеты волнолома"
+      },
+      "gravebell_moccasins": {
+        "name": "Мокасины погребального колокола"
+      },
+      "oathbroken_trousers": {
+        "name": "Брюки нарушенной клятвы"
+      },
+      "sparkglass_trousers": {
+        "name": "Брюки искрящегося стекла"
+      },
+      "stillhymn_moccasins": {
+        "name": "Мокасины безмолвного гимна"
+      },
+      "sealkeeper_mitts": {
+        "name": "Митенки хранителя печати"
+      },
+      "fetterbound_trousers": {
+        "name": "Брюки тяжких оков"
+      },
+      "wyrmshadow_vest": {
+        "name": "Жилет тени змея"
+      },
+      "cinderbrood_spaulders": {
+        "name": "Наплечники пепельного выводка"
+      },
+      "cinderbrood_epaulets": {
+        "name": "Эполеты пепельного выводка"
+      },
+      "hoarfrost_shoulderguards": {
+        "name": "Наплечные щитки изморози"
+      },
+      "hoarfrost_pauldrons": {
+        "name": "Наплечья изморози"
+      },
+      "hoarfrost_epaulets": {
+        "name": "Эполеты изморози"
+      },
+      "blackmere_epaulets": {
+        "name": "Эполеты чёрного озера"
+      },
+      "reedhush_epaulets": {
+        "name": "Эполеты тихого камыша"
+      },
+      "cairnking_epaulets": {
+        "name": "Эполеты курганного короля"
+      },
+      "palehunt_epaulets": {
+        "name": "Эполеты бледной охоты"
+      },
+      "jadeshrine_epaulets": {
+        "name": "Эполеты нефритового святилища"
+      },
+      "gildhedge_shoulderguards": {
+        "name": "Наплечные щитки золочёной изгороди"
+      },
+      "gildhedge_pauldrons": {
+        "name": "Наплечья золочёной изгороди"
+      },
+      "gildhedge_epaulets": {
+        "name": "Эполеты золочёной изгороди"
+      },
+      "saltwrack_shoulderguards": {
+        "name": "Наплечные щитки солёных обломков"
+      },
+      "saltwrack_pauldrons": {
+        "name": "Наплечья солёных обломков"
+      },
+      "saltwrack_epaulets": {
+        "name": "Эполеты солёных обломков"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"

@@ -864,29 +864,35 @@ describe('item-art audit builder', () => {
       // painted weapons, re-measured with `--verify-only` on the merged tree.
       // 1464 / 1482 at the 2026-09-28 release/v0.44.0 merge into feature/buried-hoards
       // (the hoard boss loot and map paintings on 36 sheet pages), re-measured the same way.
-      catalogSha256: 'e3f58abc4acad903941898542c592ca749451e776bdb34935821a6e79e32e7c6',
-      catalogBytes: 801291,
+      // 1709 / 1727 with the 245 choose-one leveling quest armor paintings
+      // (quest-leveling-gear-icons-2026-10-06), re-measured with `--verify-only`.
+      // 1785 / 1803 with the 76 quest blue reward rares
+      // (quest-blue-rewards-icons-2026-10-07), re-measured the same way.
+      // 1860 / 1878 with the 75 quest role-fill paintings (quest-role-fill-icons-2026-10-07),
+      // re-measured the same way.
+      catalogSha256: 'b44a0b34b5610132e50da12e841a0c968ae9e39519147fd2ef46180931bb8a93',
+      catalogBytes: 1013773,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1464,
-      liveItemCount: 1482,
+      catalogCount: 1860,
+      liveItemCount: 1878,
       generatedHeroicDefinitions: 78,
       heroicDefinitionsWithOwnWebp: 59,
       heroicWeaponArtAliases: 19,
       groupCount: 26,
-      sheetPageCount: 36,
-      sheetCount: 288,
+      sheetPageCount: 39,
+      sheetCount: 312,
       sheetModeCounts: {
-        '128-color': 36,
-        '40-color': 36,
-        '28-color': 36,
-        '22-color': 36,
-        '28-grayscale': 36,
-        '64-circle': 36,
-        'small-multiview': 36,
-        identity: 36,
+        '128-color': 39,
+        '40-color': 39,
+        '28-color': 39,
+        '22-color': 39,
+        '28-grayscale': 39,
+        '64-circle': 39,
+        'small-multiview': 39,
+        identity: 39,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '53d42dd05b8370ad9bf62c5b1d779efc05f02f28fe129a7fe8b53c1b863557fc',
+      shippingCatalogSha256: '908f3a1ed6041d2e40222f719241231127baa1c00a612cf6f2929caa7e1af3df',
       machineChecksPassed: true,
       verdict: null,
     });

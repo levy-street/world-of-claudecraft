@@ -14,8 +14,8 @@
 // SimContext in a module WeakMap, transient by design, like the rift ambush.
 
 import { MOBS } from './data';
-import { createMob } from './entity';
 import { applyDungeonSpawnMinibossTuning } from './instances/dungeon_spawn_miniboss';
+import { spawnOpenWorldMob } from './mob/open_world_tuning';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { Entity, MobTemplate, WorldQuestBannerId, WorldQuestDef } from './types';
@@ -122,7 +122,7 @@ export function summonWorldQuestChampion(
     quest.area.x + WORLD_QUEST_CHAMPION_TUNING.offsetYards,
     quest.area.z + WORLD_QUEST_CHAMPION_TUNING.offsetYards,
   );
-  const mob = createMob(ctx.nextId++, template, level, pos);
+  const mob = spawnOpenWorldMob(ctx.nextId++, template, level, pos);
   mob.summonedAdd = true;
   mob.runScoped = true;
   applyDungeonSpawnMinibossTuning(mob, {

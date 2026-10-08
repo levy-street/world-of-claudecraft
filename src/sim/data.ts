@@ -205,6 +205,8 @@ import {
   PROVING_SHORE_ROADS,
   PROVING_SHORE_ZONE,
 } from './content/proving_shore';
+import { QUEST_CHOICE_REWARDS } from './content/quest_choice_rewards';
+import { QUEST_LEVELING_GEAR_ITEMS } from './content/quest_leveling_gear';
 import {
   REALM_CAMPS,
   REALM_ITEMS,
@@ -426,6 +428,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   WORLD_QUEST_ITEMS,
   FACTION_VENDOR_ITEMS,
   HOARD_ITEMS,
+  QUEST_LEVELING_GEAR_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -552,6 +555,13 @@ export const QUESTS: Record<string, QuestDef> = {
   ...IGNIVAR_RAID_LORE_QUESTS,
   ...HUB_PRACTICE_QUESTS,
 };
+
+// The choose-one leveling gear rides on the quest records (QuestDef.choiceRewards),
+// so the resolver, the turn-in, item levels and the dialogs all read one field.
+for (const [questId, itemIds] of Object.entries(QUEST_CHOICE_REWARDS)) {
+  const quest = QUESTS[questId];
+  if (quest && !quest.choiceRewards) quest.choiceRewards = [...itemIds];
+}
 
 export const QUEST_ORDER: string[] = [
   ...ZONE1_QUEST_ORDER,

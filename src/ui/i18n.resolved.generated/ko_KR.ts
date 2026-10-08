@@ -12309,6 +12309,8 @@ export const ko_KR: EnTranslations = {
       "rewards": "보상",
       "xpReward": "경험치 {xp}",
       "itemReward": "아이템 보상:",
+      "chooseReward": "보상을 선택하세요:",
+      "rewardChoices": "다음 보상 중 하나를 선택할 수 있습니다:",
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "{level}레벨 필요"
     },
@@ -12686,6 +12688,7 @@ export const ko_KR: EnTranslations = {
       "incomplete": "그 퀘스트는 완료되지 않았습니다.",
       "giverMissing": "그 퀘스트를 주는 대상이 근처에 없습니다.",
       "turnInMissing": "그 퀘스트를 보고할 대상이 근처에 없습니다.",
+      "rewardNotOffered": "해당 보상은 제공되지 않습니다.",
       "tooFar": "너무 멉니다.",
       "escortAway": "호송할 대상이 지금 자리에 없습니다. 잠시 후 그곳으로 돌아옵니다."
     }
@@ -18450,6 +18453,1194 @@ export const ko_KR: EnTranslations = {
       },
       "vanguard_warstaff": {
         "name": "선봉대의 전투지팡이"
+      },
+      "brookwatch_robe": {
+        "name": "개울감시 로브"
+      },
+      "brookwatch_leggings": {
+        "name": "개울감시 각반"
+      },
+      "brookwatch_slippers": {
+        "name": "개울감시 슬리퍼"
+      },
+      "brookwatch_hood": {
+        "name": "개울감시 두건"
+      },
+      "brookwatch_gloves": {
+        "name": "개울감시 장갑"
+      },
+      "brookwatch_mantle": {
+        "name": "개울감시 어깨걸이"
+      },
+      "brookwatch_sash": {
+        "name": "개울감시 장식띠"
+      },
+      "brookwatch_jerkin": {
+        "name": "개울감시 웃옷"
+      },
+      "brookwatch_breeches": {
+        "name": "개울감시 가죽바지"
+      },
+      "brookwatch_boots": {
+        "name": "개울감시 장화"
+      },
+      "brookwatch_cap": {
+        "name": "개울감시 모자"
+      },
+      "brookwatch_grips": {
+        "name": "개울감시 손아귀"
+      },
+      "brookwatch_shoulderpads": {
+        "name": "개울감시 어깨덧대"
+      },
+      "brookwatch_belt": {
+        "name": "개울감시 허리띠"
+      },
+      "brookwatch_hauberk": {
+        "name": "개울감시 사슬갑옷"
+      },
+      "brookwatch_legguards": {
+        "name": "개울감시 다리갑옷"
+      },
+      "brookwatch_sabatons": {
+        "name": "개울감시 쇠장화"
+      },
+      "brookwatch_helm": {
+        "name": "개울감시 투구"
+      },
+      "brookwatch_gauntlets": {
+        "name": "개울감시 건틀릿"
+      },
+      "brookwatch_pauldrons": {
+        "name": "개울감시 어깨갑옷"
+      },
+      "brookwatch_girdle": {
+        "name": "개울감시 허리갑"
+      },
+      "brookwatch_chainmail": {
+        "name": "개울감시 사슬옷"
+      },
+      "brookwatch_chausses": {
+        "name": "개울감시 사슬각반"
+      },
+      "brookwatch_greaves": {
+        "name": "개울감시 경갑"
+      },
+      "brookwatch_coif": {
+        "name": "개울감시 사슬두건"
+      },
+      "brookwatch_handguards": {
+        "name": "개울감시 손보호구"
+      },
+      "brookwatch_spaulders": {
+        "name": "개울감시 어깨보호구"
+      },
+      "brookwatch_cord": {
+        "name": "개울감시 허리끈"
+      },
+      "hedgerow_robe": {
+        "name": "산울타리 로브"
+      },
+      "hedgerow_leggings": {
+        "name": "산울타리 각반"
+      },
+      "hedgerow_slippers": {
+        "name": "산울타리 슬리퍼"
+      },
+      "hedgerow_hood": {
+        "name": "산울타리 두건"
+      },
+      "hedgerow_gloves": {
+        "name": "산울타리 장갑"
+      },
+      "hedgerow_mantle": {
+        "name": "산울타리 어깨걸이"
+      },
+      "hedgerow_sash": {
+        "name": "산울타리 장식띠"
+      },
+      "hedgerow_jerkin": {
+        "name": "산울타리 웃옷"
+      },
+      "hedgerow_breeches": {
+        "name": "산울타리 가죽바지"
+      },
+      "hedgerow_boots": {
+        "name": "산울타리 장화"
+      },
+      "hedgerow_cap": {
+        "name": "산울타리 모자"
+      },
+      "hedgerow_grips": {
+        "name": "산울타리 손아귀"
+      },
+      "hedgerow_shoulderpads": {
+        "name": "산울타리 어깨덧대"
+      },
+      "hedgerow_belt": {
+        "name": "산울타리 허리띠"
+      },
+      "hedgerow_hauberk": {
+        "name": "산울타리 사슬갑옷"
+      },
+      "hedgerow_legguards": {
+        "name": "산울타리 다리갑옷"
+      },
+      "hedgerow_sabatons": {
+        "name": "산울타리 쇠장화"
+      },
+      "hedgerow_helm": {
+        "name": "산울타리 투구"
+      },
+      "hedgerow_gauntlets": {
+        "name": "산울타리 건틀릿"
+      },
+      "hedgerow_pauldrons": {
+        "name": "산울타리 어깨갑옷"
+      },
+      "hedgerow_girdle": {
+        "name": "산울타리 허리갑"
+      },
+      "hedgerow_chainmail": {
+        "name": "산울타리 사슬옷"
+      },
+      "hedgerow_chausses": {
+        "name": "산울타리 사슬각반"
+      },
+      "hedgerow_greaves": {
+        "name": "산울타리 경갑"
+      },
+      "hedgerow_coif": {
+        "name": "산울타리 사슬두건"
+      },
+      "hedgerow_handguards": {
+        "name": "산울타리 손보호구"
+      },
+      "hedgerow_spaulders": {
+        "name": "산울타리 어깨보호구"
+      },
+      "hedgerow_cord": {
+        "name": "산울타리 허리끈"
+      },
+      "bogwalker_robe": {
+        "name": "늪방랑자 로브"
+      },
+      "bogwalker_leggings": {
+        "name": "늪방랑자 각반"
+      },
+      "bogwalker_slippers": {
+        "name": "늪방랑자 슬리퍼"
+      },
+      "bogwalker_hood": {
+        "name": "늪방랑자 두건"
+      },
+      "bogwalker_gloves": {
+        "name": "늪방랑자 장갑"
+      },
+      "bogwalker_mantle": {
+        "name": "늪방랑자 어깨걸이"
+      },
+      "bogwalker_sash": {
+        "name": "늪방랑자 장식띠"
+      },
+      "bogwalker_jerkin": {
+        "name": "늪방랑자 웃옷"
+      },
+      "bogwalker_breeches": {
+        "name": "늪방랑자 가죽바지"
+      },
+      "bogwalker_boots": {
+        "name": "늪방랑자 장화"
+      },
+      "bogwalker_cap": {
+        "name": "늪방랑자 모자"
+      },
+      "bogwalker_grips": {
+        "name": "늪방랑자 손아귀"
+      },
+      "bogwalker_shoulderpads": {
+        "name": "늪방랑자 어깨덧대"
+      },
+      "bogwalker_belt": {
+        "name": "늪방랑자 허리띠"
+      },
+      "bogwalker_hauberk": {
+        "name": "늪방랑자 사슬갑옷"
+      },
+      "bogwalker_legguards": {
+        "name": "늪방랑자 다리갑옷"
+      },
+      "bogwalker_sabatons": {
+        "name": "늪방랑자 쇠장화"
+      },
+      "bogwalker_helm": {
+        "name": "늪방랑자 투구"
+      },
+      "bogwalker_gauntlets": {
+        "name": "늪방랑자 건틀릿"
+      },
+      "bogwalker_pauldrons": {
+        "name": "늪방랑자 어깨갑옷"
+      },
+      "bogwalker_girdle": {
+        "name": "늪방랑자 허리갑"
+      },
+      "bogwalker_chainmail": {
+        "name": "늪방랑자 사슬옷"
+      },
+      "bogwalker_chausses": {
+        "name": "늪방랑자 사슬각반"
+      },
+      "bogwalker_greaves": {
+        "name": "늪방랑자 경갑"
+      },
+      "bogwalker_coif": {
+        "name": "늪방랑자 사슬두건"
+      },
+      "bogwalker_handguards": {
+        "name": "늪방랑자 손보호구"
+      },
+      "bogwalker_spaulders": {
+        "name": "늪방랑자 어깨보호구"
+      },
+      "bogwalker_cord": {
+        "name": "늪방랑자 허리끈"
+      },
+      "thornspire_robe": {
+        "name": "가시첨탑 로브"
+      },
+      "thornspire_leggings": {
+        "name": "가시첨탑 각반"
+      },
+      "thornspire_slippers": {
+        "name": "가시첨탑 슬리퍼"
+      },
+      "thornspire_hood": {
+        "name": "가시첨탑 두건"
+      },
+      "thornspire_gloves": {
+        "name": "가시첨탑 장갑"
+      },
+      "thornspire_mantle": {
+        "name": "가시첨탑 어깨걸이"
+      },
+      "thornspire_sash": {
+        "name": "가시첨탑 장식띠"
+      },
+      "thornspire_jerkin": {
+        "name": "가시첨탑 웃옷"
+      },
+      "thornspire_breeches": {
+        "name": "가시첨탑 가죽바지"
+      },
+      "thornspire_boots": {
+        "name": "가시첨탑 장화"
+      },
+      "thornspire_cap": {
+        "name": "가시첨탑 모자"
+      },
+      "thornspire_grips": {
+        "name": "가시첨탑 손아귀"
+      },
+      "thornspire_shoulderpads": {
+        "name": "가시첨탑 어깨덧대"
+      },
+      "thornspire_belt": {
+        "name": "가시첨탑 허리띠"
+      },
+      "thornspire_hauberk": {
+        "name": "가시첨탑 사슬갑옷"
+      },
+      "thornspire_legguards": {
+        "name": "가시첨탑 다리갑옷"
+      },
+      "thornspire_sabatons": {
+        "name": "가시첨탑 쇠장화"
+      },
+      "thornspire_helm": {
+        "name": "가시첨탑 투구"
+      },
+      "thornspire_gauntlets": {
+        "name": "가시첨탑 건틀릿"
+      },
+      "thornspire_pauldrons": {
+        "name": "가시첨탑 어깨갑옷"
+      },
+      "thornspire_girdle": {
+        "name": "가시첨탑 허리갑"
+      },
+      "thornspire_chainmail": {
+        "name": "가시첨탑 사슬옷"
+      },
+      "thornspire_chausses": {
+        "name": "가시첨탑 사슬각반"
+      },
+      "thornspire_greaves": {
+        "name": "가시첨탑 경갑"
+      },
+      "thornspire_coif": {
+        "name": "가시첨탑 사슬두건"
+      },
+      "thornspire_handguards": {
+        "name": "가시첨탑 손보호구"
+      },
+      "thornspire_spaulders": {
+        "name": "가시첨탑 어깨보호구"
+      },
+      "thornspire_cord": {
+        "name": "가시첨탑 허리끈"
+      },
+      "hollowveil_robe": {
+        "name": "그늘장막 로브"
+      },
+      "hollowveil_leggings": {
+        "name": "그늘장막 각반"
+      },
+      "hollowveil_slippers": {
+        "name": "그늘장막 슬리퍼"
+      },
+      "hollowveil_hood": {
+        "name": "그늘장막 두건"
+      },
+      "hollowveil_gloves": {
+        "name": "그늘장막 장갑"
+      },
+      "hollowveil_mantle": {
+        "name": "그늘장막 어깨걸이"
+      },
+      "hollowveil_sash": {
+        "name": "그늘장막 장식띠"
+      },
+      "hollowveil_jerkin": {
+        "name": "그늘장막 웃옷"
+      },
+      "hollowveil_breeches": {
+        "name": "그늘장막 가죽바지"
+      },
+      "hollowveil_boots": {
+        "name": "그늘장막 장화"
+      },
+      "hollowveil_cap": {
+        "name": "그늘장막 모자"
+      },
+      "hollowveil_grips": {
+        "name": "그늘장막 손아귀"
+      },
+      "hollowveil_shoulderpads": {
+        "name": "그늘장막 어깨덧대"
+      },
+      "hollowveil_belt": {
+        "name": "그늘장막 허리띠"
+      },
+      "hollowveil_hauberk": {
+        "name": "그늘장막 사슬갑옷"
+      },
+      "hollowveil_legguards": {
+        "name": "그늘장막 다리갑옷"
+      },
+      "hollowveil_sabatons": {
+        "name": "그늘장막 쇠장화"
+      },
+      "hollowveil_helm": {
+        "name": "그늘장막 투구"
+      },
+      "hollowveil_gauntlets": {
+        "name": "그늘장막 건틀릿"
+      },
+      "hollowveil_pauldrons": {
+        "name": "그늘장막 어깨갑옷"
+      },
+      "hollowveil_girdle": {
+        "name": "그늘장막 허리갑"
+      },
+      "hollowveil_chainmail": {
+        "name": "그늘장막 사슬옷"
+      },
+      "hollowveil_chausses": {
+        "name": "그늘장막 사슬각반"
+      },
+      "hollowveil_greaves": {
+        "name": "그늘장막 경갑"
+      },
+      "hollowveil_coif": {
+        "name": "그늘장막 사슬두건"
+      },
+      "hollowveil_handguards": {
+        "name": "그늘장막 손보호구"
+      },
+      "hollowveil_spaulders": {
+        "name": "그늘장막 어깨보호구"
+      },
+      "hollowveil_cord": {
+        "name": "그늘장막 허리끈"
+      },
+      "trailwarden_robe": {
+        "name": "길지킴이 로브"
+      },
+      "trailwarden_leggings": {
+        "name": "길지킴이 각반"
+      },
+      "trailwarden_slippers": {
+        "name": "길지킴이 슬리퍼"
+      },
+      "trailwarden_hood": {
+        "name": "길지킴이 두건"
+      },
+      "trailwarden_gloves": {
+        "name": "길지킴이 장갑"
+      },
+      "trailwarden_mantle": {
+        "name": "길지킴이 어깨걸이"
+      },
+      "trailwarden_sash": {
+        "name": "길지킴이 장식띠"
+      },
+      "trailwarden_jerkin": {
+        "name": "길지킴이 웃옷"
+      },
+      "trailwarden_breeches": {
+        "name": "길지킴이 가죽바지"
+      },
+      "trailwarden_boots": {
+        "name": "길지킴이 장화"
+      },
+      "trailwarden_cap": {
+        "name": "길지킴이 모자"
+      },
+      "trailwarden_grips": {
+        "name": "길지킴이 손아귀"
+      },
+      "trailwarden_shoulderpads": {
+        "name": "길지킴이 어깨덧대"
+      },
+      "trailwarden_belt": {
+        "name": "길지킴이 허리띠"
+      },
+      "trailwarden_hauberk": {
+        "name": "길지킴이 사슬갑옷"
+      },
+      "trailwarden_legguards": {
+        "name": "길지킴이 다리갑옷"
+      },
+      "trailwarden_sabatons": {
+        "name": "길지킴이 쇠장화"
+      },
+      "trailwarden_helm": {
+        "name": "길지킴이 투구"
+      },
+      "trailwarden_gauntlets": {
+        "name": "길지킴이 건틀릿"
+      },
+      "trailwarden_pauldrons": {
+        "name": "길지킴이 어깨갑옷"
+      },
+      "trailwarden_girdle": {
+        "name": "길지킴이 허리갑"
+      },
+      "trailwarden_chainmail": {
+        "name": "길지킴이 사슬옷"
+      },
+      "trailwarden_chausses": {
+        "name": "길지킴이 사슬각반"
+      },
+      "trailwarden_greaves": {
+        "name": "길지킴이 경갑"
+      },
+      "trailwarden_coif": {
+        "name": "길지킴이 사슬두건"
+      },
+      "trailwarden_handguards": {
+        "name": "길지킴이 손보호구"
+      },
+      "trailwarden_spaulders": {
+        "name": "길지킴이 어깨보호구"
+      },
+      "trailwarden_cord": {
+        "name": "길지킴이 허리끈"
+      },
+      "highgale_robe": {
+        "name": "높바람 로브"
+      },
+      "highgale_leggings": {
+        "name": "높바람 각반"
+      },
+      "highgale_slippers": {
+        "name": "높바람 슬리퍼"
+      },
+      "highgale_hood": {
+        "name": "높바람 두건"
+      },
+      "highgale_gloves": {
+        "name": "높바람 장갑"
+      },
+      "highgale_mantle": {
+        "name": "높바람 어깨걸이"
+      },
+      "highgale_sash": {
+        "name": "높바람 장식띠"
+      },
+      "highgale_jerkin": {
+        "name": "높바람 웃옷"
+      },
+      "highgale_breeches": {
+        "name": "높바람 가죽바지"
+      },
+      "highgale_boots": {
+        "name": "높바람 장화"
+      },
+      "highgale_cap": {
+        "name": "높바람 모자"
+      },
+      "highgale_grips": {
+        "name": "높바람 손아귀"
+      },
+      "highgale_shoulderpads": {
+        "name": "높바람 어깨덧대"
+      },
+      "highgale_belt": {
+        "name": "높바람 허리띠"
+      },
+      "highgale_hauberk": {
+        "name": "높바람 사슬갑옷"
+      },
+      "highgale_legguards": {
+        "name": "높바람 다리갑옷"
+      },
+      "highgale_sabatons": {
+        "name": "높바람 쇠장화"
+      },
+      "highgale_helm": {
+        "name": "높바람 투구"
+      },
+      "highgale_gauntlets": {
+        "name": "높바람 건틀릿"
+      },
+      "highgale_pauldrons": {
+        "name": "높바람 어깨갑옷"
+      },
+      "highgale_girdle": {
+        "name": "높바람 허리갑"
+      },
+      "highgale_chainmail": {
+        "name": "높바람 사슬옷"
+      },
+      "highgale_chausses": {
+        "name": "높바람 사슬각반"
+      },
+      "highgale_greaves": {
+        "name": "높바람 경갑"
+      },
+      "brookwatch_tunic": {
+        "name": "개울감시 튜닉"
+      },
+      "brookwatch_legwraps": {
+        "name": "개울감시 다리싸개"
+      },
+      "brookwatch_treads": {
+        "name": "개울감시 덧신"
+      },
+      "brookwatch_headguard": {
+        "name": "개울감시 머리보호대"
+      },
+      "brookwatch_handwraps": {
+        "name": "개울감시 손싸개"
+      },
+      "brookwatch_shoulderguards": {
+        "name": "개울감시 어깨받이"
+      },
+      "brookwatch_waistguard": {
+        "name": "개울감시 허리보호대"
+      },
+      "hedgerow_tunic": {
+        "name": "산울타리 튜닉"
+      },
+      "hedgerow_legwraps": {
+        "name": "산울타리 다리싸개"
+      },
+      "hedgerow_treads": {
+        "name": "산울타리 덧신"
+      },
+      "hedgerow_headguard": {
+        "name": "산울타리 머리보호대"
+      },
+      "hedgerow_handwraps": {
+        "name": "산울타리 손싸개"
+      },
+      "hedgerow_shoulderguards": {
+        "name": "산울타리 어깨받이"
+      },
+      "hedgerow_waistguard": {
+        "name": "산울타리 허리보호대"
+      },
+      "bogwalker_tunic": {
+        "name": "늪방랑자 튜닉"
+      },
+      "bogwalker_legwraps": {
+        "name": "늪방랑자 다리싸개"
+      },
+      "bogwalker_treads": {
+        "name": "늪방랑자 덧신"
+      },
+      "bogwalker_headguard": {
+        "name": "늪방랑자 머리보호대"
+      },
+      "bogwalker_handwraps": {
+        "name": "늪방랑자 손싸개"
+      },
+      "bogwalker_shoulderguards": {
+        "name": "늪방랑자 어깨받이"
+      },
+      "bogwalker_waistguard": {
+        "name": "늪방랑자 허리보호대"
+      },
+      "thornspire_tunic": {
+        "name": "가시첨탑 튜닉"
+      },
+      "thornspire_legwraps": {
+        "name": "가시첨탑 다리싸개"
+      },
+      "thornspire_treads": {
+        "name": "가시첨탑 덧신"
+      },
+      "thornspire_headguard": {
+        "name": "가시첨탑 머리보호대"
+      },
+      "thornspire_handwraps": {
+        "name": "가시첨탑 손싸개"
+      },
+      "thornspire_shoulderguards": {
+        "name": "가시첨탑 어깨받이"
+      },
+      "thornspire_waistguard": {
+        "name": "가시첨탑 허리보호대"
+      },
+      "hollowveil_tunic": {
+        "name": "그늘장막 튜닉"
+      },
+      "hollowveil_legwraps": {
+        "name": "그늘장막 다리싸개"
+      },
+      "hollowveil_treads": {
+        "name": "그늘장막 덧신"
+      },
+      "hollowveil_headguard": {
+        "name": "그늘장막 머리보호대"
+      },
+      "hollowveil_handwraps": {
+        "name": "그늘장막 손싸개"
+      },
+      "hollowveil_shoulderguards": {
+        "name": "그늘장막 어깨받이"
+      },
+      "hollowveil_waistguard": {
+        "name": "그늘장막 허리보호대"
+      },
+      "trailwarden_tunic": {
+        "name": "길지킴이 튜닉"
+      },
+      "trailwarden_legwraps": {
+        "name": "길지킴이 다리싸개"
+      },
+      "trailwarden_treads": {
+        "name": "길지킴이 덧신"
+      },
+      "trailwarden_headguard": {
+        "name": "길지킴이 머리보호대"
+      },
+      "trailwarden_handwraps": {
+        "name": "길지킴이 손싸개"
+      },
+      "trailwarden_shoulderguards": {
+        "name": "길지킴이 어깨받이"
+      },
+      "trailwarden_waistguard": {
+        "name": "길지킴이 허리보호대"
+      },
+      "highgale_tunic": {
+        "name": "높바람 튜닉"
+      },
+      "highgale_legwraps": {
+        "name": "높바람 다리싸개"
+      },
+      "highgale_treads": {
+        "name": "높바람 덧신"
+      },
+      "highgale_headguard": {
+        "name": "높바람 머리보호대"
+      },
+      "highgale_handwraps": {
+        "name": "높바람 손싸개"
+      },
+      "highgale_shoulderguards": {
+        "name": "높바람 어깨받이"
+      },
+      "highgale_waistguard": {
+        "name": "높바람 허리보호대"
+      },
+      "highgale_coif": {
+        "name": "높바람 사슬두건"
+      },
+      "highgale_handguards": {
+        "name": "높바람 손보호구"
+      },
+      "highgale_spaulders": {
+        "name": "높바람 어깨보호구"
+      },
+      "highgale_cord": {
+        "name": "높바람 허리끈"
+      },
+      "breakwater_mantle": {
+        "name": "방파제 어깨걸이"
+      },
+      "breakwater_shoulderpads": {
+        "name": "방파제 어깨덧대"
+      },
+      "breakwater_spaulders": {
+        "name": "방파제 어깨보호구"
+      },
+      "gravebell_treads": {
+        "name": "무덤종 덧신"
+      },
+      "gravebell_greaves": {
+        "name": "무덤종 경갑"
+      },
+      "cryptbound_tunic": {
+        "name": "묘실속박 튜닉"
+      },
+      "cryptbound_chainmail": {
+        "name": "묘실속박 사슬옷"
+      },
+      "oathbroken_leggings": {
+        "name": "맹세파기 각반"
+      },
+      "oathbroken_breeches": {
+        "name": "맹세파기 가죽바지"
+      },
+      "oathbroken_legwraps": {
+        "name": "맹세파기 다리싸개"
+      },
+      "oathbroken_legguards": {
+        "name": "맹세파기 다리갑옷"
+      },
+      "oathbroken_chausses": {
+        "name": "맹세파기 사슬각반"
+      },
+      "seamist_legwraps": {
+        "name": "바다안개 다리싸개"
+      },
+      "seamist_chausses": {
+        "name": "바다안개 사슬각반"
+      },
+      "warmonger_treads": {
+        "name": "전쟁광 덧신"
+      },
+      "warmonger_greaves": {
+        "name": "전쟁광 경갑"
+      },
+      "sparkglass_leggings": {
+        "name": "불꽃수정 각반"
+      },
+      "sparkglass_breeches": {
+        "name": "불꽃수정 가죽바지"
+      },
+      "sparkglass_legwraps": {
+        "name": "불꽃수정 다리싸개"
+      },
+      "sparkglass_legguards": {
+        "name": "불꽃수정 다리갑옷"
+      },
+      "sparkglass_chausses": {
+        "name": "불꽃수정 사슬각반"
+      },
+      "stillhymn_treads": {
+        "name": "고요찬가 덧신"
+      },
+      "stillhymn_greaves": {
+        "name": "고요찬가 경갑"
+      },
+      "pearlglow_headguard": {
+        "name": "진주빛 머리보호대"
+      },
+      "pearlglow_coif": {
+        "name": "진주빛 사슬두건"
+      },
+      "sealkeeper_gloves": {
+        "name": "봉인지기 장갑"
+      },
+      "sealkeeper_grips": {
+        "name": "봉인지기 손아귀"
+      },
+      "sealkeeper_handwraps": {
+        "name": "봉인지기 손싸개"
+      },
+      "sealkeeper_gauntlets": {
+        "name": "봉인지기 건틀릿"
+      },
+      "sealkeeper_handguards": {
+        "name": "봉인지기 손보호구"
+      },
+      "fetterbound_leggings": {
+        "name": "족쇄속박 각반"
+      },
+      "fetterbound_breeches": {
+        "name": "족쇄속박 가죽바지"
+      },
+      "fetterbound_legwraps": {
+        "name": "족쇄속박 다리싸개"
+      },
+      "fetterbound_legguards": {
+        "name": "족쇄속박 다리갑옷"
+      },
+      "fetterbound_chausses": {
+        "name": "족쇄속박 사슬각반"
+      },
+      "shroudcaller_tunic": {
+        "name": "수의소환자 튜닉"
+      },
+      "shroudcaller_chainmail": {
+        "name": "수의소환자 사슬옷"
+      },
+      "wyrmshadow_tunic": {
+        "name": "용그림자 튜닉"
+      },
+      "wyrmshadow_chainmail": {
+        "name": "용그림자 사슬옷"
+      },
+      "cinderbrood_shoulderpads": {
+        "name": "잿불무리 어깨덧대"
+      },
+      "cinderbrood_shoulderguards": {
+        "name": "잿불무리 어깨받이"
+      },
+      "cinderbrood_pauldrons": {
+        "name": "잿불무리 어깨갑옷"
+      },
+      "hoarfrost_mantle": {
+        "name": "서리꽃 어깨걸이"
+      },
+      "hoarfrost_shoulderpads": {
+        "name": "서리꽃 어깨덧대"
+      },
+      "hoarfrost_spaulders": {
+        "name": "서리꽃 어깨보호구"
+      },
+      "blackmere_mantle": {
+        "name": "검은호수 어깨걸이"
+      },
+      "blackmere_shoulderpads": {
+        "name": "검은호수 어깨덧대"
+      },
+      "blackmere_shoulderguards": {
+        "name": "검은호수 어깨받이"
+      },
+      "blackmere_pauldrons": {
+        "name": "검은호수 어깨갑옷"
+      },
+      "blackmere_spaulders": {
+        "name": "검은호수 어깨보호구"
+      },
+      "reedhush_mantle": {
+        "name": "갈대고요 어깨걸이"
+      },
+      "reedhush_shoulderpads": {
+        "name": "갈대고요 어깨덧대"
+      },
+      "reedhush_shoulderguards": {
+        "name": "갈대고요 어깨받이"
+      },
+      "reedhush_pauldrons": {
+        "name": "갈대고요 어깨갑옷"
+      },
+      "reedhush_spaulders": {
+        "name": "갈대고요 어깨보호구"
+      },
+      "cairnking_mantle": {
+        "name": "돌무덤왕 어깨걸이"
+      },
+      "cairnking_shoulderpads": {
+        "name": "돌무덤왕 어깨덧대"
+      },
+      "cairnking_shoulderguards": {
+        "name": "돌무덤왕 어깨받이"
+      },
+      "cairnking_pauldrons": {
+        "name": "돌무덤왕 어깨갑옷"
+      },
+      "cairnking_spaulders": {
+        "name": "돌무덤왕 어깨보호구"
+      },
+      "palehunt_mantle": {
+        "name": "창백한사냥 어깨걸이"
+      },
+      "palehunt_shoulderpads": {
+        "name": "창백한사냥 어깨덧대"
+      },
+      "palehunt_shoulderguards": {
+        "name": "창백한사냥 어깨받이"
+      },
+      "palehunt_pauldrons": {
+        "name": "창백한사냥 어깨갑옷"
+      },
+      "palehunt_spaulders": {
+        "name": "창백한사냥 어깨보호구"
+      },
+      "jadeshrine_mantle": {
+        "name": "비취사당 어깨걸이"
+      },
+      "jadeshrine_shoulderpads": {
+        "name": "비취사당 어깨덧대"
+      },
+      "jadeshrine_shoulderguards": {
+        "name": "비취사당 어깨받이"
+      },
+      "jadeshrine_pauldrons": {
+        "name": "비취사당 어깨갑옷"
+      },
+      "jadeshrine_spaulders": {
+        "name": "비취사당 어깨보호구"
+      },
+      "gildhedge_mantle": {
+        "name": "금빛울타리 어깨걸이"
+      },
+      "gildhedge_shoulderpads": {
+        "name": "금빛울타리 어깨덧대"
+      },
+      "gildhedge_spaulders": {
+        "name": "금빛울타리 어깨보호구"
+      },
+      "saltwrack_mantle": {
+        "name": "소금난파 어깨걸이"
+      },
+      "saltwrack_shoulderpads": {
+        "name": "소금난파 어깨덧대"
+      },
+      "saltwrack_spaulders": {
+        "name": "소금난파 어깨보호구"
+      },
+      "brookwatch_vest": {
+        "name": "개울감시 조끼"
+      },
+      "brookwatch_trousers": {
+        "name": "개울감시 바지"
+      },
+      "brookwatch_moccasins": {
+        "name": "개울감시 모카신"
+      },
+      "brookwatch_cowl": {
+        "name": "개울감시 카울"
+      },
+      "brookwatch_mitts": {
+        "name": "개울감시 벙어리장갑"
+      },
+      "brookwatch_epaulets": {
+        "name": "개울감시 견장"
+      },
+      "brookwatch_cinch": {
+        "name": "개울감시 조임띠"
+      },
+      "hedgerow_vest": {
+        "name": "산울타리 조끼"
+      },
+      "hedgerow_trousers": {
+        "name": "산울타리 바지"
+      },
+      "hedgerow_moccasins": {
+        "name": "산울타리 모카신"
+      },
+      "hedgerow_cowl": {
+        "name": "산울타리 카울"
+      },
+      "hedgerow_mitts": {
+        "name": "산울타리 벙어리장갑"
+      },
+      "hedgerow_epaulets": {
+        "name": "산울타리 견장"
+      },
+      "hedgerow_cinch": {
+        "name": "산울타리 조임띠"
+      },
+      "bogwalker_vest": {
+        "name": "늪방랑자 조끼"
+      },
+      "bogwalker_trousers": {
+        "name": "늪방랑자 바지"
+      },
+      "bogwalker_moccasins": {
+        "name": "늪방랑자 모카신"
+      },
+      "bogwalker_cowl": {
+        "name": "늪방랑자 카울"
+      },
+      "bogwalker_mitts": {
+        "name": "늪방랑자 벙어리장갑"
+      },
+      "bogwalker_epaulets": {
+        "name": "늪방랑자 견장"
+      },
+      "bogwalker_cinch": {
+        "name": "늪방랑자 조임띠"
+      },
+      "thornspire_vest": {
+        "name": "가시첨탑 조끼"
+      },
+      "thornspire_trousers": {
+        "name": "가시첨탑 바지"
+      },
+      "thornspire_moccasins": {
+        "name": "가시첨탑 모카신"
+      },
+      "thornspire_cowl": {
+        "name": "가시첨탑 카울"
+      },
+      "thornspire_mitts": {
+        "name": "가시첨탑 벙어리장갑"
+      },
+      "thornspire_epaulets": {
+        "name": "가시첨탑 견장"
+      },
+      "thornspire_cinch": {
+        "name": "가시첨탑 조임띠"
+      },
+      "hollowveil_vest": {
+        "name": "그늘장막 조끼"
+      },
+      "hollowveil_trousers": {
+        "name": "그늘장막 바지"
+      },
+      "hollowveil_moccasins": {
+        "name": "그늘장막 모카신"
+      },
+      "hollowveil_cowl": {
+        "name": "그늘장막 카울"
+      },
+      "hollowveil_mitts": {
+        "name": "그늘장막 벙어리장갑"
+      },
+      "hollowveil_epaulets": {
+        "name": "그늘장막 견장"
+      },
+      "hollowveil_cinch": {
+        "name": "그늘장막 조임띠"
+      },
+      "trailwarden_vest": {
+        "name": "길지킴이 조끼"
+      },
+      "trailwarden_trousers": {
+        "name": "길지킴이 바지"
+      },
+      "trailwarden_moccasins": {
+        "name": "길지킴이 모카신"
+      },
+      "trailwarden_cowl": {
+        "name": "길지킴이 카울"
+      },
+      "trailwarden_mitts": {
+        "name": "길지킴이 벙어리장갑"
+      },
+      "trailwarden_epaulets": {
+        "name": "길지킴이 견장"
+      },
+      "trailwarden_cinch": {
+        "name": "길지킴이 조임띠"
+      },
+      "highgale_vest": {
+        "name": "높바람 조끼"
+      },
+      "highgale_trousers": {
+        "name": "높바람 바지"
+      },
+      "highgale_moccasins": {
+        "name": "높바람 모카신"
+      },
+      "highgale_cowl": {
+        "name": "높바람 카울"
+      },
+      "highgale_mitts": {
+        "name": "높바람 벙어리장갑"
+      },
+      "highgale_epaulets": {
+        "name": "높바람 견장"
+      },
+      "highgale_cinch": {
+        "name": "높바람 조임띠"
+      },
+      "breakwater_shoulderguards": {
+        "name": "방파제 어깨받이"
+      },
+      "breakwater_pauldrons": {
+        "name": "방파제 어깨갑옷"
+      },
+      "breakwater_epaulets": {
+        "name": "방파제 견장"
+      },
+      "gravebell_moccasins": {
+        "name": "무덤종 모카신"
+      },
+      "oathbroken_trousers": {
+        "name": "맹세파기 바지"
+      },
+      "sparkglass_trousers": {
+        "name": "불꽃수정 바지"
+      },
+      "stillhymn_moccasins": {
+        "name": "고요찬가 모카신"
+      },
+      "sealkeeper_mitts": {
+        "name": "봉인지기 벙어리장갑"
+      },
+      "fetterbound_trousers": {
+        "name": "족쇄속박 바지"
+      },
+      "wyrmshadow_vest": {
+        "name": "용그림자 조끼"
+      },
+      "cinderbrood_spaulders": {
+        "name": "잿불무리 어깨보호구"
+      },
+      "cinderbrood_epaulets": {
+        "name": "잿불무리 견장"
+      },
+      "hoarfrost_shoulderguards": {
+        "name": "서리꽃 어깨받이"
+      },
+      "hoarfrost_pauldrons": {
+        "name": "서리꽃 어깨갑옷"
+      },
+      "hoarfrost_epaulets": {
+        "name": "서리꽃 견장"
+      },
+      "blackmere_epaulets": {
+        "name": "검은호수 견장"
+      },
+      "reedhush_epaulets": {
+        "name": "갈대고요 견장"
+      },
+      "cairnking_epaulets": {
+        "name": "돌무덤왕 견장"
+      },
+      "palehunt_epaulets": {
+        "name": "창백한사냥 견장"
+      },
+      "jadeshrine_epaulets": {
+        "name": "비취사당 견장"
+      },
+      "gildhedge_shoulderguards": {
+        "name": "금빛울타리 어깨받이"
+      },
+      "gildhedge_pauldrons": {
+        "name": "금빛울타리 어깨갑옷"
+      },
+      "gildhedge_epaulets": {
+        "name": "금빛울타리 견장"
+      },
+      "saltwrack_shoulderguards": {
+        "name": "소금난파 어깨받이"
+      },
+      "saltwrack_pauldrons": {
+        "name": "소금난파 어깨갑옷"
+      },
+      "saltwrack_epaulets": {
+        "name": "소금난파 견장"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

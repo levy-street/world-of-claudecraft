@@ -3576,10 +3576,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.pendingQuestCommands.set(questId, 'accept');
     this.cmd({ cmd: 'accept', quest: questId, selection });
   }
-  turnInQuest(questId: string): void {
+  turnInQuest(questId: string, rewardChoice?: string): void {
     if (!this.canSendCommand()) return;
     this.pendingQuestCommands.set(questId, 'turnin');
-    this.cmd({ cmd: 'turnin', quest: questId });
+    this.cmd({ cmd: 'turnin', quest: questId, choice: rewardChoice });
   }
   abandonQuest(questId: string): void {
     if (!this.canSendCommand()) return;

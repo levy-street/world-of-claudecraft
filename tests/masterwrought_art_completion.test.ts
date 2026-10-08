@@ -824,7 +824,13 @@ describe('Masterwrought art completion evidence', () => {
     // 17 (faction-ladder-icons-2026-09-23): 1,322. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,323.
     // + the trinket slot's 18 (trinket-slot-icons-2026-09-23, PR 4173): 1,341. Warfare Season 2's four painted
     // weapons (warfare-season2-weapons-2026-09-25): 1,345, likewise outside it.
-    expect(currentOwnerIds).toHaveLength(1464);
+    // + the 245 choose-one leveling quest armor paintings
+    // (quest-leveling-gear-icons-2026-10-06): 1,709, likewise outside it.
+    // + the 76 quest blue reward rares (quest-blue-rewards-icons-2026-10-07): 1,785, likewise
+    // outside it.
+    // + the 75 quest role-fill paintings (quest-role-fill-icons-2026-10-07): 1,860, likewise outside
+    // it.
+    expect(currentOwnerIds).toHaveLength(1860);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -958,6 +964,22 @@ describe('Masterwrought art completion evidence', () => {
     expect(hoardBranchIds.size).toBe(119);
     expect(datedIds.filter((id) => hoardBranchIds.has(id))).toEqual([]);
     expect(currentOwnerIds.filter((id) => hoardBranchIds.has(id))).toHaveLength(119);
+    // The choose-one leveling quest armor (quest-leveling-gear-icons-2026-10-06)
+    // and its rares (quest-blue-rewards-icons-2026-10-07) and role fill
+    // (quest-role-fill-icons-2026-10-07), additive beyond the dated completion union like the hoard
+    // batches.
+    const questGearIds = new Set(
+      mapping.generatedBatches
+        .filter(
+          ({ batchId }) =>
+            batchId === 'quest-leveling-gear-icons-2026-10-06' ||
+            batchId === 'quest-blue-rewards-icons-2026-10-07' ||
+            batchId === 'quest-role-fill-icons-2026-10-07',
+        )
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect(questGearIds.size).toBe(396);
+    expect(datedIds.filter((id) => questGearIds.has(id))).toEqual([]);
 
     // Strip all six later additive waves (Crucible professions, the Field Kit, the
     // Nythraxis gap-fill weapon renders, Roots' Bramblehide/gap-fill paintings,
@@ -985,7 +1007,8 @@ describe('Masterwrought art completion evidence', () => {
         id !== 'emissary_cache' &&
         id !== 'reins_avian_strider' &&
         !season2WeaponIds.has(id) &&
-        !hoardBranchIds.has(id),
+        !hoardBranchIds.has(id) &&
+        !questGearIds.has(id),
     );
     expect(completionOwnerIds).toHaveLength(1209);
     expect(sorted(completionOwnerIds)).toEqual(completionDatedIds);

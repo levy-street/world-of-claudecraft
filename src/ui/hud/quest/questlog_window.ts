@@ -34,6 +34,7 @@ import type { PainterHostPresentation } from '../../painter_host';
 import { questMapLocation } from '../../quest_map_location_core';
 import { QuestTrackingState, sharedQuestTracking } from '../../quest_tracking_core';
 import { svgIcon } from '../../ui_icons';
+import { questRewardChoiceHtml, questRewardChoiceModel } from './quest_reward_choice_view';
 import { buildQuestLogView, type QuestDetailModel } from './questlog_view';
 
 /**
@@ -249,7 +250,7 @@ export class QuestLogWindow {
   }
 
   private renderDetail(detail: HTMLElement, d: QuestDetailModel, playerName: string): void {
-    let html = `<div class="qd-sub ql-detail-title">${esc(questTitle(d.questId))}${this.questSuggestedPlayersHtml(d.suggestedPlayers)}</div>`;
+    let html = `<div class="qd-sub ql-detail-title" id="ql-detail-title">${esc(questTitle(d.questId))}${this.questSuggestedPlayersHtml(d.suggestedPlayers)}</div>`;
     html += d.objectives
       .map(
         (o) =>
@@ -265,16 +266,33 @@ export class QuestLogWindow {
       // itemNameColor, exactly as chat links and loot names paint it.
       html += `<div class="qd-reward-row ui-card" data-reward><span class="qd-reward-label">${esc(t('questUi.detail.itemReward'))}</span><span class="qd-reward-socket ui-socket ui-socket--bag">${this.deps.itemIcon(item)}</span><span class="qd-reward-name q-${item.quality ?? 'common'}" style="color:${itemNameColor(item)}">${esc(itemDisplayName(item))}</span></div>`;
     }
+    const world = this.deps.world();
+    const choices = questRewardChoiceModel(d.questId, world.cfg.playerClass, world.talents.spec);
+    if (choices) {
+      html += questRewardChoiceHtml(choices, { itemIcon: (it) => this.deps.itemIcon(it) }, false);
+    }
     const giver = NPCS[d.turnInNpcId];
     html += `<div class="qd-obj quest-return">${esc(t('questUi.log.returnTo', { name: giver ? npcDisplayName(giver.id) : '?' }))}</div>`;
     const body = document.createElement('div');
     body.className = 'ql-detail-body';
+    // The detail can outgrow its pane (a long reward list), and its rows are not
+    // focusable, so the scroll region itself is the keyboard stop, named by the
+    // quest title (axe scrollable-region-focusable; the char window precedent).
+    body.tabIndex = 0;
+    body.setAttribute('role', 'region');
+    body.setAttribute('aria-labelledby', 'ql-detail-title');
     body.innerHTML = html;
     detail.replaceChildren(body);
     const rewardRow = body.querySelector('[data-reward]') as HTMLElement | null;
     if (rewardRow && d.rewardItemId) {
       const itemId = d.rewardItemId;
       this.deps.attachTooltip(rewardRow, () => this.deps.itemTooltip(ITEMS[itemId]));
+    }
+    for (const choiceRow of body.querySelectorAll<HTMLElement>('[data-reward-choice]')) {
+      const choiceId = choiceRow.dataset.rewardChoice ?? '';
+      if (ITEMS[choiceId]) {
+        this.deps.attachTooltip(choiceRow, () => this.deps.itemTooltip(ITEMS[choiceId]));
+      }
     }
     const actions = document.createElement('div');
     actions.className = 'ql-detail-actions';

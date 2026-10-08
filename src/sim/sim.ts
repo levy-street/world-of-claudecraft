@@ -372,6 +372,7 @@ import {
   updateMob as updateMobFn,
 } from './mob/locomotion';
 import { runMobSwingAffixes } from './mob/mob_swing';
+import { spawnOpenWorldMob } from './mob/open_world_tuning';
 import { applyPlayerDummyVitals } from './mob/practice_dummies';
 import { questGateBlocksAggro, questGateBlocksCombat } from './mob/quest_gated_aggro';
 import {
@@ -2380,7 +2381,7 @@ export class Sim {
         const safe = projectOutsideDungeonDoors(grounded.x, grounded.z);
         const pos = this.groundPos(safe.x, safe.z);
         const level = campRng.int(template.minLevel, template.maxLevel);
-        const mob = createMob(this.nextId++, template, level, pos);
+        const mob = spawnOpenWorldMob(this.nextId++, template, level, pos);
         mob.facing = campRng.range(-Math.PI, Math.PI);
         mob.prevFacing = mob.facing;
         mob.wanderTimer = wanderPause(campRng, mob, 2, 10);
@@ -2587,7 +2588,8 @@ export class Sim {
       if (pending.timer > 0) continue;
       const template = MOBS[pending.templateId];
       if (template) {
-        const mob = createMob(this.nextId++, template, pending.level, { ...pending.pos });
+        const spawn = pending.dungeonId ? createMob : spawnOpenWorldMob;
+        const mob = spawn(this.nextId++, template, pending.level, { ...pending.pos });
         mob.facing = pending.facing;
         mob.prevFacing = pending.facing;
         mob.dungeonId = pending.dungeonId;
@@ -9000,8 +9002,8 @@ export class Sim {
   dropWorldQuestDeliveryCargo(pid = this.playerId): boolean {
     return dropWorldQuestDeliveryCargoForPlayer(this.ctx, pid);
   }
-  turnInQuest(questId: string, pid?: number): void {
-    questCommands.turnInQuest(this.ctx, questId, pid);
+  turnInQuest(questId: string, choiceOrPid?: string | number, pid?: number): void {
+    questCommands.turnInQuest(this.ctx, questId, choiceOrPid, pid);
   }
   completeQuestForDev(questId: string, pid?: number): boolean {
     return completeQuestForDev(this.ctx, questId, pid);
