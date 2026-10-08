@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4817,
+    "files": 4816,
     "harvestedFiles": 3948,
     "carried": {
       "tests/ability_imbue_text.test.ts": {
@@ -2466,15 +2466,6 @@
         "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
         "runs": [
           1517
-        ]
-      },
-      "tests/harbormaster_gear_asset.test.ts": {
-        "ms": 63,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "Eastbrook ferry suites absent from the last green full CI harvest; single-worker local Vitest run on the release/v0.44.0 merge, pending a green full-mode CI refresh.",
-        "runs": [
-          63
         ]
       },
       "tests/harvest_choreography.test.ts": {
@@ -9619,7 +9610,6 @@
   "tests/harbor_route_marker_core.test.ts": 8,
   "tests/harbor_route_marker_render.test.ts": 106,
   "tests/harbor_route_markers.test.ts": 1517,
-  "tests/harbormaster_gear_asset.test.ts": 63,
   "tests/harvest_admission.test.ts": 14,
   "tests/harvest_body_pick.test.ts": 11,
   "tests/harvest_choreography.test.ts": 9,

@@ -127,8 +127,12 @@ export function buildEntityPrewarmGroup(
 }
 
 // Every NPC visual MODEL once (NPCs were not prewarmed at all, entering a zone hub
-// compiled their shaders live). Most NPCs share a handful of models (npc_knight,
-// npc_mage, ...), so dedup by model key (visualKeyFor) builds each only once.
+// compiled their shaders live). An NPC rides the WOC body of its class and body
+// type (characters/npc_looks.ts), so the model key (visualKeyFor) is one of the
+// class-body keys the players draw with, and the dedup builds the first NPC of
+// each: its body is seeded into the pool under that NPC's own template id. These
+// are NOT speculative rigs: each is a resident of the zone, built to be drawn, so
+// it asks for its own hairstyle and class set like any body entering view.
 export function buildNpcPrewarmGroup(
   host: object,
   zone: ZoneDef,
@@ -188,6 +192,11 @@ export function buildNpcPrewarmGroup(
   return { group, pooled, warmed, planned: npcIds.length, trimmed };
 }
 
+/** A player prewarm rig is speculative: it warms the files already resident and fetches no
+ *  streamed body or armor set (a WOC class set streams when someone wears it). The NPC
+ *  group above seeds real residents instead, and so does not pass this. */
+const SPECULATIVE = { fetchStreamed: false } as const;
+
 export function buildPlayerPrewarmGroup(
   host: object,
   deadline: number,
@@ -246,7 +255,8 @@ export function buildPlayerPrewarmGroup(
       }
       const color = CLASSES[cls]?.color ?? 0xffffff;
       const entity = h.prewarmEntity('player', cls, color, 1, skin, -11_000 - idx);
-      const visual = createCharacterVisual(entity);
+      // speculative: warm what is resident, never fetch a streamed body or armor set
+      const visual = createCharacterVisual(entity, undefined, SPECULATIVE);
       // assets unavailable: skip the seed
       if (!visual) continue;
       visual.root.visible = true;
@@ -271,7 +281,7 @@ export function buildPlayerPrewarmGroup(
     }
     const color = CLASSES[cls]?.color ?? 0xffffff;
     const entity = h.prewarmEntity('player', cls, color, 1, 0, -11_500 - idx);
-    const visual = createCharacterVisual(entity);
+    const visual = createCharacterVisual(entity, undefined, SPECULATIVE);
     if (!visual) continue;
     visual.root.visible = true;
     visual.setAuraGlow(0xffffff, 0.02);

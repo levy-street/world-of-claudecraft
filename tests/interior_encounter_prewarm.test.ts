@@ -148,9 +148,10 @@ describe('interior encounter prewarm spec', () => {
   it('warms Soul Rend overlays at arena entry, not boot, and warms no encounter NPC', () => {
     const spec = INTERIOR_ENCOUNTER_PREWARM.nythraxis;
     expect(spec).toBeDefined();
-    // Aldric is deliberately absent: measured cold (parked in a start zone that
-    // never compiled npc_aldric), his 70% spawn linked ZERO programs because
-    // the player bodies on screen already carry them.
+    // Aldric is deliberately absent: measured cold on his old stock rig (parked
+    // in a start zone that never compiled it), his 70% spawn linked ZERO programs
+    // because the player bodies on screen already carried them. He rides the
+    // priest's WOC body now, a player's own def.
     expect(Object.keys(spec).sort()).toEqual([
       'nythraxisGraveVisuals',
       'soulRendLivePlayerVisuals',

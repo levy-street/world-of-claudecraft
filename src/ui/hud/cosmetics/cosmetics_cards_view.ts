@@ -152,14 +152,19 @@ function mechCardHtml(card: MechChromaCard): string {
   const state = card.worn
     ? `<span class="cos-state worn">${esc(t('hudChrome.cosmetics.worn'))}</span>`
     : `<span class="cos-state owned">${esc(t('hudChrome.cosmetics.owned'))}</span>`;
+  // An unavailable card keeps its Wear button in place, disabled, so the card
+  // does not reflow when the mech comes back. The label borrows the store's
+  // already translated "Unavailable" while the switch is off.
+  const unavailable = card.action === 'unavailable';
   const action =
     card.action === 'takeOff'
       ? actionButton('takeoff-mech', card.id, t('hudChrome.cosmetics.takeOff'))
       : actionButton(
           'wear-mech',
           card.id,
-          t('hudChrome.cosmetics.wear'),
+          unavailable ? t('hudChrome.wocStore.unavailable') : t('hudChrome.cosmetics.wear'),
           ` data-index="${card.index}"`,
+          unavailable,
         );
   return (
     `<article class="cos-card ui-card cos-mech rarity-${esc(card.rank)} owned${card.worn ? ' worn' : ''}" ` +

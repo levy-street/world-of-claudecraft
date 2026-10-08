@@ -134,6 +134,9 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/ability_vfx/shells.ts': 1,
   // the armour-dye sRGB<->linear pair (bases clamped with max(c, 0))
   'src/render/characters/armor_dye.ts': 2,
+  // the WOC head tint's sRGB<->linear pair and the skin transfer's softened
+  // colour offset (bases clamped with max(x, 0))
+  'src/render/characters/woc_head_tint.ts': 3,
   'src/render/dungeon.ts': 1,
   'src/render/foliage_shader_core.ts': 1,
   'src/render/hoard_entrance.ts': 3,

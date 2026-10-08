@@ -320,6 +320,30 @@ describe('PooledVisualLifecycle (the renderer take/store halves)', () => {
     lifecycle.store('mob:wolf', stubVisual());
     expect(pool.size).toBe(2);
   });
+
+  it('store tells a visual it is parked, before the pool can evict it; a visual with nothing to drop needs no hook', () => {
+    // guards: a body streamed out with a far bake still queued for it kept its place in
+    // the line, ahead of the looks visible bodies were waiting on
+    const pool = new CharacterVisualPool<ReturnType<typeof stubVisual>>();
+    const lifecycle = new PooledVisualLifecycle(pool, {
+      farBakeGate: () => null,
+      maxPooled: () => 0,
+    });
+    const order: string[] = [];
+    const waiting = {
+      ...stubVisual(),
+      parked: vi.fn(() => order.push('parked')),
+      dispose: vi.fn(() => order.push('dispose')),
+    };
+    // cap 0: pooling is off, so the incoming visual is disposed by the store itself
+    lifecycle.store('mob:wolf', waiting);
+    expect(waiting.parked).toHaveBeenCalledTimes(1);
+    expect(order).toEqual(['parked', 'dispose']);
+    // the hook is optional: a visual without one parks as before
+    const plain = stubVisual();
+    expect(() => lifecycle.store('mob:bear', plain)).not.toThrow();
+    expect(plain.dispose).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe('CharacterVisual.setEntityColor', () => {

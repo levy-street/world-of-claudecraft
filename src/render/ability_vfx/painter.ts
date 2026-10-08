@@ -782,7 +782,16 @@ export class AbilityVfx {
       else return false;
     }
     const spec = abilityVfxSpecFor(appearance);
-    if (!spec) return false;
+    if (!spec) {
+      // A newly linked class ability may have no gallery entry yet. Its
+      // authored completion still owns the rig; ordinary tick cues do not.
+      if (
+        ev.attackAnimation !== 'ranged-shot' &&
+        (ev.fx === 'selfCast' || ev.fx === 'projectile' || ev.fx === 'heavyBolt')
+      )
+        this.releaseGesture(ev.sourceId, ability);
+      return false;
+    }
     // Claimed and drawn as nothing: the generic arm would link cold too. Two
     // reads survive the refusal, for the same reason the point-anchored ring
     // survives it in handleSpellfxAt below, and neither costs a cast program.
@@ -816,7 +825,7 @@ export class AbilityVfx {
       if (!full?.physical && !claimsSelfCastVfx(arch, targeted, !!full, !!full?.spirit)) {
         // A listed pure-DoT completion (Rip on the cat rig) still owns its
         // authored finisher; every other DoT keeps its no-gesture completion.
-        if (ownsDotCompletionGesture(arch, ability)) {
+        if (ownsDotCompletionGesture(arch, ability) || ability === 'startle_shot') {
           this.releaseGesture(ev.sourceId, ability);
         }
         return false;

@@ -35,6 +35,8 @@ describe('loadGltf retries a transient failure before rejecting', () => {
       GLTFLoader: class {
         setMeshoptDecoder(): void {}
         setKTX2Loader(): void {}
+        // the WOC_lod plugin rides every loader (loader.ts)
+        register(): void {}
         load(
           _url: string,
           onLoad: (g: unknown) => void,
@@ -61,6 +63,8 @@ describe('loadGltf retries a transient failure before rejecting', () => {
       GLTFLoader: class {
         setMeshoptDecoder(): void {}
         setKTX2Loader(): void {}
+        // the WOC_lod plugin rides every loader (loader.ts)
+        register(): void {}
         load(_url: string, _onLoad: unknown, _onProgress: unknown, onError: () => void): void {
           calls++;
           onError();

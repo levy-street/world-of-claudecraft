@@ -1958,7 +1958,8 @@ describe('Nythraxis raid encounter', () => {
     expect(boss.nythraxis?.deathlessTimer).toBeGreaterThan(19);
     expect(boss.nythraxis?.deathlessTimer).toBeLessThanOrEqual(20);
     expect(tank.auras.some((a) => a.id === 'nythraxis_transition_stun')).toBe(false);
-    expect(visualKeyFor(aldric!)).toBe('npc_aldric');
+    // he wears his authored look on the priest's WOC body (characters/npc_looks.ts)
+    expect(visualKeyFor(aldric!)).toBe('player_priest');
   });
 
   it('stuns active Nythraxis adds for the full Aldric transition', () => {

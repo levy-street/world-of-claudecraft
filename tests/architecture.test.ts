@@ -333,6 +333,9 @@ const UI_PURE_CORES = [
   // Which body a player entity's frame shows (mech, composed, stock) and the
   // matching rule for a landed portrait; unit_portrait_painter.ts draws it.
   'src/ui/player_portrait_core.ts',
+  // Its sibling for everyone else a frame can hold: an authored face, committed
+  // mob art or the crest, and the matching rule for a landed face.
+  'src/ui/nonplayer_portrait_core.ts',
   'src/ui/xp_bar.ts',
   'src/ui/absorb_bar.ts',
   'src/ui/party_frames.ts',
@@ -848,6 +851,7 @@ const RENDER_PURE_CORES = [
   'src/render/ship_wake_core.ts',
   'src/render/water_approach_core.ts',
   'src/render/view_candidate_scan_core.ts',
+  'src/render/required_views_core.ts',
   'src/render/wisp_maze_core.ts',
   // the maze kit's dressing plan (hedge piece per wall cell, gates, lanterns)
   'src/render/wisp_maze_kit_core.ts',
@@ -903,6 +907,12 @@ const RENDER_PURE_CORES = [
   'src/render/initial_frame_core.ts',
   'src/render/character_cull_core.ts',
   'src/render/characters/anim_state_entity_core.ts',
+  'src/render/characters/combat_brace_core.ts',
+  'src/render/characters/weapon_loadout_core.ts',
+  'src/render/characters/held_item_size_core.ts',
+  'src/render/characters/attack_swing_core.ts',
+  'src/render/characters/woc_armor_core.ts',
+  'src/render/characters/woc_armor_merge_core.ts',
   'src/render/characters/death_grounding_core.ts',
   'src/render/characters/stonebound_shell_core.ts',
   'src/render/characters/form_adornment_core.ts',
@@ -918,6 +928,7 @@ const RENDER_PURE_CORES = [
   'src/render/characters/portrait_prewarm_core.ts',
   'src/render/characters/portrait_readback_core.ts',
   'src/render/characters/preview_open_gate_core.ts',
+  'src/render/characters/preview_armor_detail_core.ts',
   'src/render/characters/soul_rend_prewarm_core.ts',
   'src/render/characters/design_code_core.ts',
   'src/render/view_vfx_pose_core.ts',
@@ -945,6 +956,21 @@ const RENDER_PURE_CORES = [
   'src/render/ability_vfx_core.ts',
   'src/render/characters/player_look_core.ts',
   'src/render/characters/far_lod_reveal_core.ts',
+  'src/render/characters/woc_parts_core.ts',
+  'src/render/characters/woc_entry_core.ts',
+  'src/render/characters/woc_crowd_prefetch_core.ts',
+  'src/render/characters/woc_idle_cache_core.ts',
+  'src/render/characters/woc_head_look_core.ts',
+  'src/render/characters/woc_head_stream_core.ts',
+  'src/render/characters/woc_head_merge_core.ts',
+  'src/render/characters/woc_head_merge_proof_core.ts',
+  'src/render/characters/woc_far_head_core.ts',
+  'src/render/characters/woc_shadow_stand_in_core.ts',
+  'src/render/characters/woc_skin_tint_core.ts',
+  'src/render/characters/woc_tint_hsv_core.ts',
+  'src/render/characters/woc_lod_core.ts',
+  'src/render/assets/load_queue_core.ts',
+  'src/render/assets/geometry_lod_core.ts',
   'src/render/ability_vfx_longbuff_core.ts',
   'src/render/arena_water_band_core.ts',
   'src/render/biome_haze_field_core.ts',
@@ -2688,6 +2714,8 @@ const UI_DOM_MODULES = [
   'src/ui/hud/vehicle/forge_action_bar_controller.ts',
   'src/ui/account_portal_dom.ts',
   'src/ui/appearance_customizer.ts',
+  // The WOC face builder's painter (its rules are woc_head_builder_model.ts).
+  'src/ui/woc_head_builder.ts',
   // Owns browser state on purpose: it mints the reticle tick ring's root and
   // mounts it, which is exactly the work it exists to keep out of hud.ts. The
   // RULES it wires up are all in the pure cores (reticle_ticks_core,

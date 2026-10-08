@@ -6,12 +6,15 @@ import { SkinEventController } from '../src/ui/hud/cosmetics/skin_event_controll
 import type { IWorld } from '../src/world_api';
 
 const playerPortraitDataUrl = vi.hoisted(() => vi.fn<() => string | null>(() => null));
+const visualPortraitDataUrl = vi.hoisted(() =>
+  vi.fn<(key: string, skin: number) => string | null>(() => null),
+);
 vi.mock('../src/render/characters/portrait', () => ({
   playerPortraitDataUrl,
-  visualPortraitDataUrl: () => null,
+  visualPortraitDataUrl,
 }));
 
-function harness(reduceMotion = false) {
+function harness(reduceMotion = false, gender?: 'male' | 'female') {
   const scheduled = new Map<number, { callback: () => void; delay: number }>();
   let timerId = 0;
   const clearTimeout = vi.fn((id: number) => scheduled.delete(id));
@@ -46,10 +49,11 @@ function harness(reduceMotion = false) {
     document,
     window,
     world: () =>
-      ({ cfg: { playerClass: 'warrior' }, claimEventSkin }) as unknown as Pick<
-        IWorld,
-        'cfg' | 'claimEventSkin'
-      >,
+      ({
+        cfg: { playerClass: 'warrior' },
+        player: { modularAppearance: { gender } },
+        claimEventSkin,
+      }) as unknown as Pick<IWorld, 'cfg' | 'claimEventSkin'>,
     closeTop,
     hideTooltip: vi.fn(),
     onPortraitsReady: vi.fn(),
@@ -85,6 +89,8 @@ describe('SkinEventController', () => {
     document.body.innerHTML = '';
     playerPortraitDataUrl.mockReset();
     playerPortraitDataUrl.mockReturnValue(null);
+    visualPortraitDataUrl.mockReset();
+    visualPortraitDataUrl.mockReturnValue(null);
   });
 
   it('closes stacked surfaces, opens a trapped wheel, and owns timed teardown', () => {
@@ -145,9 +151,23 @@ describe('SkinEventController', () => {
     const swatch = document.querySelector<HTMLButtonElement>('.se-swatch[data-skin="1"]');
     expect(swatch?.querySelector('img')).toBeNull();
 
-    playerPortraitDataUrl.mockReturnValue('data:image/png;base64,ready');
+    visualPortraitDataUrl.mockReturnValue('data:image/png;base64,ready');
     test.portraitUpdate('player_warrior', 1);
 
     expect(swatch?.querySelector('img')?.src).toBe('data:image/png;base64,ready');
+  });
+
+  it('requests female skin portraits and hydrates only the matching body update', () => {
+    const test = harness(false, 'female');
+    test.controller.open('rare');
+    [...test.scheduled.values()][0].callback();
+    expect(visualPortraitDataUrl).toHaveBeenCalledWith('player_warrior_female', 1);
+    expect(playerPortraitDataUrl).not.toHaveBeenCalled();
+    const swatch = document.querySelector<HTMLButtonElement>('.se-swatch[data-skin="1"]');
+    visualPortraitDataUrl.mockReturnValue('data:image/png;base64,female');
+    test.portraitUpdate('player_warrior', 1);
+    expect(swatch?.querySelector('img')).toBeNull();
+    test.portraitUpdate('player_warrior_female', 1);
+    expect(swatch?.querySelector('img')?.src).toBe('data:image/png;base64,female');
   });
 });

@@ -1,3 +1,4 @@
+import type { LocoState, LocoStrafe } from '../locomotion';
 import type { AuraIdFact } from './aura_idle_core';
 
 /** Renderer-derived animation inputs (same facts the old pose machine used). */
@@ -21,6 +22,10 @@ export interface AnimState {
   backwards: boolean;
   /** use reversed forward locomotion instead of an authored walkBack clip */
   reverseBackpedal?: boolean;
+  /** Moving sideways across facing (a Q/E strafe): which way, or null. Only a
+   *  rig that ships both strafe clips plays it (desiredBaseState); optional so
+   *  the fixed scratches that never strafe (previews, portraits) stay valid. */
+  strafe?: LocoStrafe;
   dead: boolean;
   casting: boolean;
   /** The ability id driving `casting`, or null. Presentation that must tell a
@@ -71,6 +76,10 @@ export type BaseState =
   | 'walk'
   | 'walkBack'
   | 'run'
+  /** Running sideways across facing (a Q/E strafe): the rig's authored side
+   *  runs instead of the forward Run sliding across the ground. */
+  | 'strafeLeft'
+  | 'strafeRight'
   | 'cast'
   | 'spin'
   | 'swim'
@@ -461,6 +470,13 @@ export function desiredBaseState(
   hasCombatIdleClip = false,
   hasProwlIdleClip = false,
   hasProwlWalkClip = false,
+  /** The rig fought moments ago (combat_brace_core.ts): brace as if engaged. */
+  braced = false,
+  /** The LOADED rig plays BOTH strafe clips: the walkBack rule, the machine
+   *  never enters a state nothing is playing. */
+  hasStrafeClips = false,
+  /** Defaults TRUE (the wade rule's shape): a rig with no sleep clip passes false. Last,
+   *  so the brace and strafe callers keep their positions. */
   hasSleepClip = true,
 ): BaseState {
   // In bed. Same rule as wade: a rig with no sleep clip must not enter the state at
@@ -485,6 +501,13 @@ export function desiredBaseState(
     if (s.wading && hasWadeClip) return 'wade';
     if (s.stealthed && hasProwlWalkClip) return 'prowlWalk';
     if (s.backwards && hasWalkBackClip && !s.reverseBackpedal) return 'walkBack';
+    // Sideways at the run gait plays the side run instead of sliding the
+    // forward cycle across the ground. A slow sideways walk keeps the walk, and
+    // a backpedal never strafes (a rig that covers it with its forward cycle,
+    // no walkBack clip or a reversed one, keeps doing so).
+    if (s.strafe && s.running && !s.backwards && hasStrafeClips) {
+      return s.strafe === 'left' ? 'strafeLeft' : 'strafeRight';
+    }
     return s.running ? 'run' : 'walk';
   }
   // Standing still. A body that is currently fighting someone holds its braced
@@ -494,7 +517,7 @@ export function desiredBaseState(
   // wade follow: baseAction() falls back to idle for a rig without one, and the
   // machine must not sit in a state nothing is playing.
   if (s.stealthed && hasProwlIdleClip) return 'prowlIdle';
-  if (s.combat && hasCombatIdleClip) return 'combatIdle';
+  if ((s.combat || braced) && hasCombatIdleClip) return 'combatIdle';
   return 'idle';
 }
 
@@ -536,6 +559,11 @@ export function gaitWindDownTimeScale(from: number, elapsed: number, fade: numbe
   return from * (1 - clamp(elapsed / brake, 0, 1));
 }
 
+/** A side run (the strafe states): they blend in and out on a short crossfade (visual.ts). */
+export function isStrafeState(state: BaseState): boolean {
+  return state === 'strafeLeft' || state === 'strafeRight';
+}
+
 export function locomotionTimeScale(
   baseState: BaseState,
   s: Pick<AnimState, 'speed' | 'backwards' | 'reverseBackpedal'>,
@@ -546,6 +574,8 @@ export function locomotionTimeScale(
   runTimeScaleMin = 0.6,
   walkMax = DEFAULT_WALK_TIME_SCALE_MAX,
   runMax = DEFAULT_RUN_TIME_SCALE_MAX,
+  /** the speed the side runs were authored at (VisualDef.strafeRef) */
+  strafeRef = runRef,
 ): number | null {
   if (baseState === 'swim' || baseState === 'swimSurface') {
     // Stroke rate follows swim speed: the slow opening strokes of a dive read as
@@ -561,6 +591,11 @@ export function locomotionTimeScale(
     const stalkScale = clamp(s.speed / prowlRef, 0.6, 1.8);
     return s.backwards ? -stalkScale : stalkScale;
   }
+  // A side run is a run turned sideways: matched and clamped like the run, and
+  // never reversed (each side has its own clip, and a backpedal never strafes).
+  if (baseState === 'strafeLeft' || baseState === 'strafeRight') {
+    return clamp(s.speed / strafeRef, runTimeScaleMin, runMax);
+  }
   if (baseState === 'walk' || baseState === 'walkBack') {
     timeScale = clamp(s.speed / (baseState === 'walkBack' ? walkBackRef : walkRef), 0.6, walkMax);
   } else if (baseState === 'wade') {
@@ -575,6 +610,22 @@ export function locomotionTimeScale(
     return null;
   }
   return s.reverseBackpedal && s.backwards && baseState !== 'walkBack' ? -timeScale : timeScale;
+}
+
+/**
+ * Feed one displayed frame's travel direction into the pose inputs: the
+ * backpedal, how this rig plays it (`reverseBackpedal`: its forward cycle run
+ * in reverse, the ghost wolf), and the strafe. One call so the renderer's sync
+ * loop sets every direction fact the machine reads in one place.
+ */
+export function applyLocoDirection(
+  s: AnimState,
+  loco: Pick<LocoState, 'backwards' | 'strafe'>,
+  reverseBackpedal: boolean,
+): void {
+  s.backwards = loco.backwards;
+  s.reverseBackpedal = reverseBackpedal;
+  s.strafe = loco.strafe;
 }
 
 function clamp(v: number, lo: number, hi: number): number {

@@ -36,8 +36,7 @@ import {
   type PreviewFramingName,
 } from '../render/characters';
 import { preloadMechAssets } from '../render/characters/assets';
-import { mechHeldWeaponOverride } from '../render/characters/manifest';
-import type { ModularLook } from '../render/characters/modular';
+import { npcPortraitSourceFor, playerVisualKey } from '../render/characters/manifest';
 import { helmSlotAvailableForEntity } from '../render/characters/player_look_core';
 import {
   composedPortraitKey,
@@ -638,7 +637,7 @@ import {
 } from './i18n';
 import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
 import { type InputDialogOpts, showInputDialog } from './input_controller';
-import { InspectWindow } from './inspect_window';
+import { InspectWindow, type InspectWindowDeps } from './inspect_window';
 import { InterfaceUnlock, restoreFrameHome } from './interface_unlock';
 import { frameRowLabelKey, HUD_FRAME_SPECS, hudFrameActive } from './interface_unlock_core';
 import { buildPartySampleMembers } from './interface_unlock_menu_core';
@@ -750,6 +749,7 @@ import { MOUNT_DESC_KEYS, mountSpecLines } from './mount_labels';
 import { MountRaceControls } from './mount_race_controls';
 import { MountRaceStrip } from './mount_race_strip';
 import { type FrameDimension, MovableFrame } from './movable_frame';
+import { nonPlayerPortraitSubject, nonPlayerPortraitUpdateFrames } from './nonplayer_portrait_core';
 import { presentNoticeboardEvent } from './noticeboard_event';
 import { NoticeboardPopup } from './noticeboard_popup';
 import { NPC_WINDOW_CLOSE_RANGE, nearbyServiceNpc } from './npc_service_range';
@@ -800,6 +800,7 @@ import {
 } from './preview_prewarm_core';
 import { buildHudPreviewPrewarmUnits } from './preview_prewarm_wiring';
 import { armPreviewOpen, previewTouchQueueOf } from './preview_stand_in';
+import { applyPreviewSubject, type PreviewSubject, wocPreviewKey } from './preview_subject';
 import { procAuraConsumeSelfNoteText, procAuraGainSelfNoteText } from './proc_fct_notes';
 import { buildProcOverlay } from './proc_overlay_dom';
 import { ProcOverlayPainter } from './proc_overlay_painter';
@@ -899,7 +900,6 @@ import {
   targetPortraitKey,
 } from './target_frame_descriptor';
 import { targetOfTargetId } from './target_of_target';
-import { targetPortraitSourceId, targetPortraitUrl } from './target_portrait_view';
 import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
 import { TargetSwingTimerBars } from './target_swing_timer_bars';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
@@ -930,7 +930,6 @@ import { svgIcon } from './ui_icons';
 import { getUiScale } from './ui_scale';
 import { newUnitFrameBuffer, type UnitFrameDescriptor, unitFrameViewInto } from './unit_frame';
 import { UnitFramePainter } from './unit_frame_painter';
-import { crestIdForEntity } from './unit_portrait';
 import { UnitPortraitPainter } from './unit_portrait_painter';
 import { resolveUnitTooltipSeat } from './unit_tooltip_seat';
 import { knownItemIconHtml } from './unknown_item_icon';
@@ -1094,6 +1093,7 @@ const PLAYER_PORTRAIT_KEY = 'player';
 const PLAYER_PORTRAIT_LOOKUPS = {
   lookFor: (e: Entity) => modularLookFor(e),
   visualKeyFor: (e: Entity) => modularKeyFor(e),
+  classVisualKeyFor: (e: Entity) => playerVisualKey(e.templateId, e.modularAppearance),
 };
 // The modal one-shots that stay above every banded window AND the mobile
 // window backdrop (z 85): the confirm/input prompt plus the confirm-dialog
@@ -2649,18 +2649,25 @@ export class Hud {
       this.totFramePainter.invalidatePortrait();
     });
     onPortraitUpdate((visualKey, skin, key) => {
-      // Every frame that holds a player repaints on exactly the capture its
-      // subject is waiting on (player_portrait_core.ts): the composed key
-      // for an authored face, the chroma atlas for a mech wearer, the (class,
-      // skin) pair otherwise. The target frames reuse their painter's identity
-      // gate through invalidatePortrait, so the repaint rides the next paint.
+      // Every frame repaints on exactly the capture its subject is waiting on.
+      // A player (player_portrait_core.ts): the composed key for an authored
+      // face, the chroma atlas for a mech wearer, the (class, skin) pair
+      // otherwise. Anyone else (nonplayer_portrait_core.ts): the body their
+      // authored face is drawn on. The target frames reuse their painter's
+      // identity gate through invalidatePortrait, so the repaint rides the next paint.
+      const update = { visualKey, skin, key };
       const framed = (subject: Entity | null): boolean =>
-        subject?.kind === 'player' &&
-        portraitUpdateFrames(
-          playerPortraitSubject(subject, PLAYER_PORTRAIT_LOOKUPS),
-          { visualKey, skin, key },
-          composedPortraitKey,
-        );
+        !!subject &&
+        (subject.kind === 'player'
+          ? portraitUpdateFrames(
+              playerPortraitSubject(subject, PLAYER_PORTRAIT_LOOKUPS),
+              update,
+              composedPortraitKey,
+            )
+          : nonPlayerPortraitUpdateFrames(
+              nonPlayerPortraitSubject(subject, npcPortraitSourceFor),
+              update,
+            ));
       if (framed(this.sim.player)) this.drawPlayerFramePortrait();
       if (framed(this.targetPortraitSubject)) this.targetFramePainter.invalidatePortrait();
       if (framed(this.totPortraitSubject)) this.totFramePainter.invalidatePortrait();
@@ -4693,7 +4700,7 @@ export class Hud {
     getUiScale,
     // Tier the pool cap / TTL from the STATIC preset (data-fx-level), never the
     // governor. spawn() reads this per event.
-    { getFxTier: () => this.fxTier() },
+    { getFxTier: () => this.fxTier(), contactDelaySec: (s) => this.renderer.contactDelayFor(s) },
   );
   // First unit-frame painter instance; heraldry hosts are captured once. The name
   // stays login-owned, and player dead/range state is absent, so no stateClasses.
@@ -6042,7 +6049,7 @@ export class Hud {
   // gate ONLY when the target identity changes (or after invalidatePortrait), never
   // per frame, and reads the subject set just before that frame's paint() call. A
   // player target shows its real 3D headshot (rendered locally from the synced
-  // identity); mobs use committed model portraits and NPCs use their crest.
+  // identity); anyone else what nonplayer_portrait_core.ts resolves for them.
   private drawTargetPortrait(): void {
     const target = this.targetPortraitSubject;
     if (!target) return;
@@ -6051,18 +6058,7 @@ export class Hud {
   }
 
   private drawNonPlayerPortrait(canvas: HTMLCanvasElement, entity: Entity): void {
-    const isMobEntity = entity.kind === 'mob';
-    const sourceId = targetPortraitSourceId(entity.templateId, isMobEntity);
-    const template = MOBS[entity.templateId] ?? (sourceId ? MOBS[sourceId] : undefined);
-    const crestId = crestIdForEntity(entity.kind, template?.family);
-    const faceUrl = targetPortraitUrl(entity.templateId, isMobEntity);
-    if (faceUrl) {
-      this.portraits.drawHeadshot(canvas, faceUrl, () => {
-        this.portraits.drawCrest(canvas, crestId);
-      });
-      return;
-    }
-    this.portraits.drawCrest(canvas, crestId);
+    this.portraits.drawNonPlayer(canvas, nonPlayerPortraitSubject(entity, npcPortraitSourceFor));
   }
 
   // Redraw the target-of-target portrait canvas, the twin of drawTargetPortrait for
@@ -10880,9 +10876,9 @@ export class Hud {
           return;
         }
         if (src?.kind === 'mob') this.playAttackerSfx(src);
-        // a struck mob vocalizes its aggro alert the first time it's engaged
-        // (camp engage), whether you hit it or it hits you.
-        if (tgt.kind === 'mob') this.ensureMobEngaged(tgt);
+        // a struck mob vocalizes its aggro alert the first time it's engaged (camp engage), whether
+        // you hit it or it hits you; never on the corpse a held killing blow lands on.
+        if (tgt.kind === 'mob' && !tgt.dead && tgt.hp > 0) this.ensureMobEngaged(tgt);
         const impact = impactCueForDamage(ev, tgt);
         if (shouldPlayCombatImpactForTarget(tgt)) {
           if (impact) this.combat(impact, tp.x, tp.y, tp.z, 1.0, { cooldown: 0.05 });
@@ -11132,7 +11128,7 @@ export class Hud {
       // visual effects (swings, projectiles, glows) — for everyone nearby,
       // not just events involving this player
       this.renderer.handleEvent(ev);
-      this.playEventSfx(ev); // positional sound for nearby combat/creatures
+      this.renderer.atContact(ev, this.playEventSfx, this); // lands with the blade
       this.meters.onEvent(ev);
       if (this.isNythraxisEvent(ev)) this.lastNythraxisCombatEventAt = performance.now();
       if (applyQuestEventPresentation(this, ev)) continue;
@@ -11162,13 +11158,13 @@ export class Hud {
                 {
                   ...absorbShape,
                   text: t('hudChrome.fct.absorbed', {
-                    amount: formatNumber(ev.absorbed ?? 0, {
-                      maximumFractionDigits: 0,
-                    }),
+                    amount: formatNumber(ev.absorbed ?? 0, { maximumFractionDigits: 0 }),
                   }),
                   target: tgt,
                 },
                 now,
+                // the strike it reports: held with that strike's number, for the blade's contact
+                ev,
               );
           }
           if (
@@ -16235,23 +16231,7 @@ export class Hud {
    *  overlay, the inspect stage) via setContainer, so only one WebGL context
    *  exists; every mount re-asserts its own framing, so the sheet and the inspect
    *  stage can trade the camera without inheriting each other's framing. */
-  private mountSharedPreview(
-    container: HTMLElement,
-    opts: {
-      cls: PlayerClass;
-      skin: number;
-      previewKey?: string;
-      mainhand: string | null;
-      offhand: string | null;
-      /** The active Armory weapon-skin cosmetic (null = the item's own model). */
-      weaponSkinId: string | null;
-      framing: PreviewFramingName;
-      /** Compose the turntable from this authored look instead of mounting the
-       *  stock class rig. Set for the SELF sheet, whose body must match the one
-       *  the world draws; null for a stage showing someone else. */
-      look?: ModularLook | null;
-    },
-  ): void {
+  private mountSharedPreview(container: HTMLElement, opts: PreviewSubject): void {
     if (!this.charPreviewCanvas) this.charPreviewCanvas = document.createElement('canvas');
     if (!this.charPreview) {
       container.appendChild(this.charPreviewCanvas);
@@ -16261,27 +16241,7 @@ export class Hud {
     } else {
       this.charPreview.setContainer(container);
     }
-    if (opts.look) {
-      // The composed body wins over the class rig, exactly as it does in the
-      // world: same face, hair, kit and helmet choice, holding the real hands.
-      this.charPreview.setModular(
-        opts.look.app,
-        opts.look.worn,
-        opts.cls,
-        opts.mainhand,
-        opts.offhand,
-      );
-    } else if (opts.previewKey) {
-      // Mech is class-agnostic; mirror the wearer class's hand layout so the
-      // paperdoll matches the in-world render.
-      const override = opts.previewKey === 'player_mech' ? mechHeldWeaponOverride(opts.cls) : null;
-      this.charPreview.setVisualKey(opts.previewKey, opts.mainhand, override, opts.offhand);
-    } else {
-      this.charPreview.setClass(opts.cls, opts.mainhand, opts.offhand);
-    }
-    this.charPreview.setSkin(opts.skin);
-    this.charPreview.setWeaponSkin(opts.weaponSkinId);
-    this.charPreview.setFraming(opts.framing);
+    applyPreviewSubject(this.charPreview, opts);
     armPreviewOpen(this.charPreview, container, { cls: opts.cls, skin: opts.skin }, this.renderer);
   }
 
@@ -16301,11 +16261,18 @@ export class Hud {
     // and wins over the authored look, matching createCharacterVisual's own
     // precedence in-world (composing over it hid a purchased cosmetic).
     const look = previewKey === 'player_mech' ? null : modularLookFor(this.sim.player);
+    const app = this.sim.player.modularAppearance;
     this.mountSharedPreview(container, {
       cls,
       skin,
-      previewKey,
+      // A WOC body follows the creation pick and wears its head, colours, size; mech stays.
+      previewKey:
+        previewKey === 'player_mech' ? previewKey : (wocPreviewKey(cls, app) ?? previewKey),
+      wocAppearance: previewKey === 'player_mech' ? undefined : app,
       look,
+      // A WOC body wears what the sheet's own slots hold, helm eye included.
+      wornEquipment: this.sim.equipment,
+      helmHidden: this.sim.player.helmHidden,
       mainhand,
       offhand: this.sim.equipment.offhand ?? null,
       // The paperdoll wears the world's Armory skin: one shared rule (class + hands + loadout).
@@ -16327,17 +16294,7 @@ export class Hud {
    *  and only while this stage is still the live inspect target. */
   private mountInspectPreview(
     container: HTMLElement,
-    params: {
-      cls: PlayerClass;
-      skin: number;
-      skinCatalog: SkinCatalog;
-      mainhand: string | null;
-      offhand: string | null;
-      /** The inspected player's server-resolved active weapon skin (wire wsk). */
-      weaponSkinId: string | null;
-      /** Their authored look; the mech wins over it as it does in the world. */
-      look: ModularLook | null;
-    },
+    params: Parameters<InspectWindowDeps['mountPreview']>[1],
   ): void {
     const preview = activeCharacterAppearancePreview(params.cls, params.skin, params.skinCatalog);
     const mech = preview.visualKey === 'player_mech';
@@ -16345,11 +16302,14 @@ export class Hud {
       this.mountSharedPreview(container, {
         cls: params.cls,
         skin: preview.skin,
-        previewKey: mech ? preview.visualKey : undefined,
+        previewKey: mech ? preview.visualKey : wocPreviewKey(params.cls, params.appearance),
+        wocAppearance: mech ? undefined : params.appearance,
         look: mech ? null : params.look,
         mainhand: params.mainhand,
         offhand: params.offhand,
         weaponSkinId: params.weaponSkinId,
+        wornEquipment: params.wornEquipment,
+        helmHidden: params.helmHidden,
         framing: 'inspect',
       });
     if (!mech) {
@@ -17125,7 +17085,7 @@ export class Hud {
     el.classList.remove(CTX_MENU_PICKER_CLASS);
     this.ctxMenuOpener = opener;
     const party = this.sim.partyInfo;
-    let html = `<div class="ctx-title ctx-title-player">${portraitChipHtml({ cls: this.sim.cfg.playerClass, skin: this.sim.player.skin ?? 0, name: this.sim.player.name, variant: 'sm', catalog: this.sim.player.skinCatalog })}<span class="ctx-title-name">${esc(this.sim.player.name)}</span></div>`;
+    let html = `<div class="ctx-title ctx-title-player">${portraitChipHtml({ cls: this.sim.cfg.playerClass, skin: this.sim.player.skin ?? 0, name: this.sim.player.name, variant: 'sm', catalog: this.sim.player.skinCatalog, appearance: this.sim.player.modularAppearance })}<span class="ctx-title-name">${esc(this.sim.player.name)}</span></div>`;
     // Party membership actions (convert, loot, leave), the dungeon-difficulty
     // toggle, the reset-dungeons action, and close, resolved by the pure
     // selfPlayerContextActions. Leaving the party lives here now, not a
@@ -17241,6 +17201,7 @@ export class Hud {
           name,
           variant: 'sm',
           catalog: ent?.skinCatalog,
+          appearance: ent?.modularAppearance,
           look: ent ? modularLookFor(ent) : null,
         })
       : '';

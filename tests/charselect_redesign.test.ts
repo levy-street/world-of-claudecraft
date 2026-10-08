@@ -84,13 +84,14 @@ describe('opening', () => {
     expect(mainhand).toBe('dagger');
   });
 
-  it('seeds the helm from the character rather than forcing it open', () => {
-    // The toggle is a SAVED preference now, not a turntable preview, so opening
-    // the editor must not decide it. A character wearing its helm opens wearing
-    // it, and Save is a no-op on this field unless the player moves the row.
+  it('previews a WOC body bare-headed whatever the saved helm preference', () => {
+    // The face builder has no helm row and the face being redesigned must
+    // show, so the DRAFT preview always drops the head piece on a WOC body.
+    // The preference itself is untouched (the save tests below pin that Save
+    // posts the helm the character was opened with).
     const shown = fakeDeps();
     editorWith(shown).open({ ...TARGET, helmHidden: false });
-    expect((shown.previewModular.mock.calls[0][1] as { head?: unknown }).head).not.toBeNull();
+    expect((shown.previewModular.mock.calls[0][1] as { head?: unknown }).head).toBeNull();
 
     const hidden = fakeDeps();
     editorWith(hidden).open({ ...TARGET, helmHidden: true });
@@ -342,11 +343,12 @@ describe('saving', () => {
     const editor = editorWith(deps);
     editor.open(TARGET);
     const before = deps.previewModular.mock.calls.at(-1)![0] as { gender: string };
-    const flipTo = before.gender === 'female' ? 'Male' : 'Female';
+    // The body pick is labelled by body type (Type A / Type B), never gender.
+    const flipTo = before.gender === 'female' ? 'Type A' : 'Type B';
     const btn = [...document.querySelectorAll('#charselect-reroll-host button')].find(
-      (b) => b.textContent?.trim() === flipTo,
+      (b) => b.querySelector('.whb-opt-label')?.textContent?.trim() === flipTo,
     ) as HTMLButtonElement;
-    expect(btn, 'gender control not found in the mounted customizer').toBeTruthy();
+    expect(btn, 'body-type control not found in the mounted builder').toBeTruthy();
     btn.click();
     const previewed = deps.previewModular.mock.calls.at(-1)![0] as { gender: string };
     expect(previewed.gender).not.toBe(before.gender); // the draft really moved
@@ -364,7 +366,7 @@ describe('saving', () => {
     const editor = editorWith(deps);
     editor.open(TARGET);
     const btn = [...document.querySelectorAll('#charselect-reroll-host button')].find(
-      (b) => b.textContent?.trim() === 'Female',
+      (b) => b.querySelector('.whb-opt-label')?.textContent?.trim() === 'Type B',
     ) as HTMLButtonElement;
     btn.click();
     const authored = deps.previewModular.mock.calls.at(-1)![0];

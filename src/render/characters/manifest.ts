@@ -61,7 +61,30 @@ import type { LocoGaitThresholds } from '../locomotion';
 import { VARKHUL_FORGING_STRIKE_TIMESCALE } from '../varkhul_forge_hammer';
 import type { ChargeGlowSpec } from './charge_glow_core';
 import type { EyeGlowSpec } from './eye_glow_core';
-import { NPC_PROP_SET_IDS, type NpcPropSet } from './npc_looks';
+import { NPC_PROP_SET_IDS, type NpcLook, type NpcPropSet, npcLookFor } from './npc_looks';
+import type { WeaponLoadout } from './weapon_loadout_core';
+import { type WocFit, wocAnimsUrl, wocBaseUrl } from './woc_armor_core';
+import {
+  WOC_DRUID_FEMALE_MANIFEST,
+  WOC_DRUID_MANIFEST,
+  WOC_HUNTER_FEMALE_MANIFEST,
+  WOC_HUNTER_MANIFEST,
+  WOC_MAGE_FEMALE_MANIFEST,
+  WOC_MAGE_MANIFEST,
+  WOC_PALADIN_FEMALE_MANIFEST,
+  WOC_PALADIN_MANIFEST,
+  WOC_PRIEST_FEMALE_MANIFEST,
+  WOC_PRIEST_MANIFEST,
+  WOC_ROGUE_FEMALE_MANIFEST,
+  WOC_ROGUE_MANIFEST,
+  WOC_SHAMAN_FEMALE_MANIFEST,
+  WOC_SHAMAN_MANIFEST,
+  WOC_WARLOCK_FEMALE_MANIFEST,
+  WOC_WARLOCK_MANIFEST,
+  WOC_WARRIOR_FEMALE_MANIFEST,
+  WOC_WARRIOR_MANIFEST,
+  type WocCharacterManifest,
+} from './woc_character_manifest';
 
 export interface EmoteClipSpec {
   clips: readonly string[];
@@ -81,6 +104,17 @@ export interface ClipMap {
    *  given clip's own cadence falls as the pool grows. A clip that has to show
    *  up on a schedule belongs in `idleBeat` instead. */
   idleVariants?: string[];
+  /** How often the `idleVariants` pool fires on this rig: a floor plus a per-fire
+   *  jitter, seconds of standing still. Absent = the shared 5 s beat (visual.ts
+   *  IDLE_VARIANT_MIN), tuned for a mount that is meant to be always mid-fidget. */
+  idleVariantCadence?: { everySec: number; jitterSec?: number };
+  /** Clip substitutions while the hands hold a given loadout (weapon_loadout_core.ts):
+   *  'twohand' = a two-hand weapon (held in one fist on the WOC bodies), 'single' = a one-hand
+   *  weapon with an empty off hand (the free hand stays down), 'dual' = a weapon in each hand.
+   *  Every clip name the rig plays resolves through the active map (base states, one-shots,
+   *  per-ability and per-hand entries); '' suppresses a clip under that loadout, and a variant
+   *  the GLB lacks falls back to the named clip. Absent = the named clips whatever is held. */
+  loadoutSwaps?: Partial<Record<WeaponLoadout, Readonly<Record<string, string>>>>;
   /** A signature idle on a FIXED cadence, scheduled independently of the
    *  `idleVariants` pool. Same contract as a fidget (one-shot, must end on the
    *  idle pose, cancelled the moment the rig stops standing still); the
@@ -112,6 +146,10 @@ export interface ClipMap {
   rushArrival?: string;
   /** one-shot swing clips, rotated per attack */
   attack: string[];
+  /** Contact autos on a rig whose ordinary attack is a ranged shot. */
+  meleeAttack?: string[];
+  /** A caster's typed wand projectile launch, independent of melee equipment. */
+  wandAttack?: string;
   /** Optional per-ability swing or cast-gesture override. */
   attackByAbility?: Record<string, string>;
   /** Playback rate for authored per-ability clips that must keep exact timing. */
@@ -194,6 +232,12 @@ export interface ClipMap {
    *  edge. A rig without it keeps looping `jump` exactly as before. */
   land?: string;
   walkBack?: string;
+  /** The side runs, played while the body runs sideways across its facing (a
+   *  Q/E strafe keeps facing and slides the body at the full run speed), in
+   *  place of the forward run sliding across the ground. A rig enters the state
+   *  only when BOTH load (anim_state.desiredBaseState). Absent = the run. */
+  strafeLeft?: string;
+  strafeRight?: string;
   /** one-shot played on respawn (skeleton awaken / boss taunt) */
   flourish?: string;
   /** Looping sleep pose for a mob that keeps hours (MobTemplate.slumber): played for
@@ -209,8 +253,49 @@ export interface ClipMap {
   /** arm gesture for the Z-key sheathe toggle; the held-prop swap lands at its
    *  midpoint (see visual.ts setWeaponStowed). Absent = snap with no gesture. */
   stow?: string;
+  /** Fraction of the `stow` clip at which the held prop swaps hands for the
+   *  back (the hand's over-the-shoulder peak). Absent = the KayKit chop's
+   *  0.28; the WOC chop peaks later since its 2026-09-16 wind-up retime. */
+  stowSwapFraction?: number;
+  /** The `stow` clip is an authored sheathe (reach, swap, recover): it plays
+   *  whole at 1x with no procedural arm raise, the prop still swapping at
+   *  stowSwapFraction. Absent = the KayKit chop-windup treatment (sped up, cut
+   *  at the swap, an additive arm lift toward the shoulder). */
+  stowPlaysWhole?: boolean;
+  /** Seconds into the two-strike `attackByHand.dualwield` clip at which the
+   *  offhand strike begins. The sim swings each hand as its own event, so with
+   *  this set a mainhand swing plays the clip up to the cut and an offhand
+   *  swing plays from it (CharacterVisual mints the halves at construction,
+   *  clip_split.ts); absent = the whole clip per swing, as every KayKit rig. */
+  dualWieldSplit?: number;
+  /** Both-hands clips for two dual-wield swings landing in the same render frame (matched
+   *  weapon speeds keep both hands on one sim tick), cycled in order: the second swing of the
+   *  frame replaces the half the first one started (attack_swing_core.ts pickDualSwing).
+   *  Absent = the whole `attackByHand.dualwield` clip. */
+  dualWieldPair?: readonly string[];
+  /** Seconds from a clip's first frame to each blade contact, in hand order, for every melee
+   *  clip that lands a blow (split halves under their minted names). A swing starts on its
+   *  damage event, so the target's flinch, the impact spark and sound, and the damage number
+   *  are held until the listed contact (attack_swing_core.ts contactDelaySec; the FCT painter
+   *  and contact_queue.ts). Absent or unlisted = the effects play at once. */
+  contacts?: Readonly<Record<string, readonly number[]>>;
+  /** Clips minted at load by cutting a GLB clip in two at `at` seconds, under
+   *  the given names, for a cast that must HOLD one half and release the other
+   *  (the hunter's timed shots: the aim half is the generic cast clip held at
+   *  its end, the release half the per-ability one-shot the damage event
+   *  plays, so the raise never replays under the shot). clip_split.ts. */
+  clipSplits?: readonly { clip: string; at: number; names: readonly [string, string] }[];
   /** player-facing overhead emote one-shots; clips are sourced from the GLB. */
   emote?: Partial<Record<OverheadEmoteId, EmoteClipSpec>>;
+  /** An authored ledge-climb one-shot (the WOC warrior's 0.3 s Climb): played
+   *  once at 1x from the grab and clamped on its ending stance while the sim
+   *  finishes the pull; the procedural climb pose yields to it entirely.
+   *  Absent = the hand-posed climb (CharacterVisual.applyClimbPose). */
+  climb?: string;
+  /** The overhead emote a shout cast plays (CharacterVisual.playShout, reached
+   *  from both the ability painter and the generic castFx arm). Absent = cheer;
+   *  null = no roar gesture at all (the VFX ring and wave still play). */
+  shoutEmote?: OverheadEmoteId | null;
 }
 
 export interface AttachDef {
@@ -228,6 +313,10 @@ export interface AttachDef {
    *  this on an attach that should showcase in the guide (the shield classes'
    *  offhand bases deliberately stay unflagged). */
   swapOnly?: boolean;
+  /** The size the prop draws at about its hand, on top of its model's own fit: set by the
+   *  swap path from the equipped ITEM (held_item_size_core.ts: a common or uncommon weapon
+   *  draws a fifth smaller). Absent is 1. */
+  size?: number;
 }
 
 export interface VisualDef {
@@ -250,6 +339,10 @@ export interface VisualDef {
   selfIllumination?: number;
   /** Optional per-visual multiplier for scene environment reflections. */
   envMapIntensity?: number;
+  /** How much of the sky environment's reflection the body's NON-METAL surfaces keep
+   *  (standard tiers; env_sheen.ts). A dark authored atlas reads that albedo-free
+   *  reflection as one grey film over cloth, leather and skin; metal keeps its own. */
+  envSheen?: number;
   /** Force a fully diffuse surface response on the body materials: zero
    *  metalness, full roughness, and the metallic/roughness maps dropped, so
    *  the key/hemisphere/torch lights cannot lay a specular sheen over the
@@ -272,6 +365,14 @@ export interface VisualDef {
    * identity. Always on, independent of what it happens to be casting.
    */
   eyeGlow?: EyeGlowSpec;
+  /** The rig's `stow` gesture reaches over the RIGHT shoulder (the WOC Sheathe), so
+   *  an upper-back carry sits behind that shoulder for a right-hand prop
+   *  (back_grips.ts backGripFor). Absent = the table's left-shoulder carry. */
+  rightShoulderSheathe?: boolean;
+  /** Hide every held or sheathed weapon prop while the body swims (the props
+   *  come back the moment it leaves the water). The WOC body has no tuned
+   *  on-back pose yet, so its auto-sheathed kit floated over the stroke. */
+  hideWeaponsWhileSwimming?: boolean;
   /** KayKit chars ship every accessory visible: non-skinned mesh nodes to KEEP.
    *  undefined = keep everything (creature GLBs have no accessories). */
   show?: string[];
@@ -312,6 +413,9 @@ export interface VisualDef {
    *  time on their own review rather than all at once. Most valuable on a rig
    *  whose cadence is pushed well past 1 (see runTimeScaleMax). */
   gaitWindDown?: boolean;
+  /** u/s the strafe clips (ClipMap.strafeLeft/strafeRight) were authored at.
+   *  Absent = runRef: a side run is timed like the forward run. */
+  strafeRef?: number;
   prowlRef?: number;
   /** Opt-in gait coverage for short quadrupeds; other rigs keep global thresholds. */
   gait?: LocoGaitThresholds;
@@ -372,6 +476,12 @@ export interface VisualDef {
   /** The muster's training effigy (src/sim/muster_effigy.ts): the model carries the
    *  plank hide and lantern the effigy rig drives per viewer (effigy_rig.ts). */
   effigy?: boolean;
+  /** This body is a WOC modular character (the artist's handoff rig): every
+   *  part, face piece and armor piece rides ONE file and is shown or hidden per
+   *  instance from this manifest (woc_parts_core.ts), never composed from the
+   *  KayKit modular library. The class keeps its fixed `player_<class>` def on
+   *  every surface (WOC_BODY_CLASSES in woc_parts_core.ts). */
+  wocCharacter?: WocCharacterManifest;
 }
 
 /** The slice of a VisualDef that decides how held weapons attach (which bones, and
@@ -428,6 +538,166 @@ const kaykit = (attack: string[], idle = 'Idle'): ClipMap => ({
   // shoulder toward the back, which reads as grabbing/planting the hilt.
   stow: '1H_Melee_Attack_Chop',
   emote: KAYKIT_EMOTES,
+});
+
+// ---------------------------------------------------------------------------
+// The WOC modular character rig (the split files, woc_armor_core.ts: a base and
+// an animation library per body fit, one armor file per set, fit and tier): its
+// own 34-joint skeleton (the 2026-09-24 animation rig: the handoff's bone names
+// plus neck, clavicles and the waist-plate ring) and its own 51-clip vocabulary,
+// built by scripts/assets/woc_character/build_woc_split.mjs. Every one-shot is authored
+// to open and close on the pose the game blends it from: the combat clips on
+// Combat_Idle, the emotes and fidgets on Idle. Jump is a takeoff that ends on a
+// holdable airborne pose, so the rig takes the held-jump treatment (Jump clamps
+// in the air, Land fires on touchdown, Fall flails on a long drop). Walk, Run and
+// Walk_Back are authored at their game speeds (2.2, 7 and 4.55 yd/s).
+// NEVER layer a KayKit donor GLB onto this rig: the bone NAMES match, so a
+// Rig_Medium clip binds, but its bind pose does not, and it poses the body wrong.
+// ---------------------------------------------------------------------------
+const WOC_EMOTES: Partial<Record<OverheadEmoteId, EmoteClipSpec>> = {
+  wave: { clips: ['Wave'] },
+  laugh: { clips: ['Laugh'] },
+  question: { clips: ['Question'] },
+  cheer: { clips: ['Cheer'] },
+  // Dance is a seamless loop: two passes.
+  dance: { clips: ['Dance'], repeats: 2 },
+  point: { clips: ['Point'] },
+  flex: { clips: ['Flex'] },
+  salute: { clips: ['Salute'] },
+  cry: { clips: ['Cry'] },
+  bow: { clips: ['Bow'] },
+  clap: { clips: ['Clap'] },
+  roar: { clips: ['Roar'] },
+  kneel: { clips: ['Kneel'] },
+};
+
+// One-hand weapon, empty off hand: the one-hand combat clips present the off hand forward as
+// if a shield were strapped to it; these keep the free hand down.
+const WOC_SINGLE: Readonly<Record<string, string>> = {
+  Combat_Idle: 'Combat_Idle_Single',
+  '1H_Chop': '1H_Chop_Single',
+  '1H_Slash': '1H_Slash_Single',
+  Hit: 'Hit_Single',
+};
+
+// Two-hand weapon: no two-hand stance (owner call, 2026-09-30: "just have the same animations as
+// the Sword and shield stance without holding up the shield hand"). A two-hander stays in one
+// fist like a one-hand sword everywhere: out of combat the one-hand clips (idle, every gait, the
+// jump), in combat the single set above, and the heavy chop (the auto attack through
+// attackByHand.twohand, Mortal Strike, Execute, Final Edict...) as the single set's chop, since
+// 2H_Chop takes both fists onto the grip. A one-hand weapon or a staff keeps its 2H_Chop. The
+// both-fists *_2H clips (Combat_Idle_2H, Hit_2H, Chop_2H, Slash_2H) left the animation library
+// with the same call (the 2026-09-30 Blender re-export).
+const WOC_TWO_HAND: Readonly<Record<string, string>> = {
+  ...WOC_SINGLE,
+  '2H_Chop': '1H_Chop_Single',
+};
+
+// Dual wield: a blade in each hand (weapon_loadout_core 'dual'). The two blades cross in front
+// of the chest (the backpedal's carry, 2026-09-28 owner call) and every combat clip opens and
+// closes on that X: the stance, its hit reaction, and the ability strikes routed through the
+// one-hand names (chop family: the thrust; slash family: the X-slash). The auto attack is the
+// fast Dual_Chop halves (attackByHand.dualwield) and its both-hands pairs (dualWieldPair).
+const WOC_DUAL: Readonly<Record<string, string>> = {
+  Combat_Idle: 'Combat_Idle_Dual',
+  Hit: 'Hit_Dual',
+  '1H_Chop': 'Dual_Stab',
+  '1H_Slash': 'Dual_Cross',
+  // The heavy chop (Execute, Slam, Mortal Strike...) with a weapon in each hand, a Titan's
+  // Grip pair of two-handers included (2026-09-29): the X-slash, never both fists on one grip.
+  '2H_Chop': 'Dual_Cross',
+};
+
+// Blade contact times (seconds from the first frame, hand order) of the WOC melee clips, per
+// body: the frame of the striking blade's peak speed inside the clip's strike window, measured
+// off the baked clips (claude-animation-20260924 scripts/contact_times.py) and re-measured from
+// the shipped animation library by tests/woc_character.test.ts. ClipMap.contacts.
+export const WOC_CONTACTS: Readonly<Record<string, readonly number[]>> = {
+  '1H_Chop': [0.458],
+  '1H_Chop_Single': [0.458],
+  '1H_Slash': [0.458],
+  '1H_Slash_Single': [0.458],
+  '2H_Chop': [0.642],
+  Dual_Chop: [0.125, 0.525],
+  'Dual_Chop#main': [0.125],
+  'Dual_Chop#off': [0.125],
+  Dual_Cross: [0.125, 0.092],
+  Dual_Stab: [0.108],
+  Block: [0.358],
+};
+
+/** The female body's contacts (its own clips: the same keys, its own reach and timing). */
+export const WOC_CONTACTS_FEMALE: Readonly<Record<string, readonly number[]>> = {
+  '1H_Chop': [0.475],
+  '1H_Chop_Single': [0.475],
+  '1H_Slash': [0.442],
+  '1H_Slash_Single': [0.442],
+  '2H_Chop': [0.708],
+  Dual_Chop: [0.125, 0.525],
+  'Dual_Chop#main': [0.125],
+  'Dual_Chop#off': [0.125],
+  Dual_Cross: [0.125, 0.108],
+  Dual_Stab: [0.108],
+  Block: [0.358],
+};
+
+/** A WOC body's files (woc_armor_core.ts): its fit's shared base and animation
+ *  library, out of the boot gate (lazyPreload). The launcher fetches a fit when
+ *  a preview first shows it, and world entry loads both fits before the
+ *  Renderer exists (woc_entry_preload.ts), so no player body in the world waits
+ *  on them. Its armor streams per set, at the graphics setting's texture tier
+ *  (woc_armor_dressing.ts). */
+/** The share of the sky reflection a WOC body's cloth, leather and skin keep (VisualDef.envSheen):
+ *  measured in game against the dark authored atlases, where the full reflection read as a
+ *  grey film at noon and a quarter keeps a hint of sky without it. */
+const WOC_ENV_SHEEN = 0.25;
+
+function wocBody(fit: WocFit): Pick<VisualDef, 'url' | 'animUrls' | 'lazyPreload'> {
+  return { url: wocBaseUrl(fit), animUrls: [wocAnimsUrl(fit)], lazyPreload: true };
+}
+
+const woc = (attack: string[]): ClipMap => ({
+  idle: 'Idle',
+  // A look around now and then while standing (never mid-fight: an engaged body holds
+  // Combat_Idle instead).
+  idleVariants: ['Idle_Look'],
+  idleVariantCadence: { everySec: 14, jitterSec: 8 },
+  combatIdle: 'Combat_Idle',
+  walk: 'Walk',
+  run: 'Run',
+  walkBack: 'Walk_Back',
+  // The side runs for a Q/E strafe, authored at the 7 yd/s run (strafeRef = runRef).
+  strafeLeft: 'Strafe_Left',
+  strafeRight: 'Strafe_Right',
+  attack,
+  wandAttack: 'Cast_Shoot',
+  hit: ['Hit'],
+  death: 'Death',
+  cast: 'Cast_Loop',
+  sitDown: 'Sit_Down',
+  sitIdle: 'Sit_Idle',
+  // Swim carries the whole prone posture and its own bob, so it rides the
+  // AUTHORED lane (no procedural pitch: visual.ts keys that on a surface stroke
+  // being present) at any depth; a swimmer who stops treads water.
+  swim: 'Swim',
+  swimSurface: 'Swim',
+  swimIdle: 'Swim_Idle',
+  jump: 'Jump',
+  fall: 'Fall',
+  land: 'Land',
+  // The authored ledge vault owns the climb (no procedural pose).
+  climb: 'Climb',
+  // The over-the-right-shoulder sheathe: the prop swaps at 46% of the clip, the
+  // hand at the right shoulder with the weapon point-down behind the back (the
+  // def's rightShoulderSheathe puts the carry on that side, back_grips.ts).
+  stow: 'Sheathe',
+  stowSwapFraction: 0.46,
+  stowPlaysWhole: true,
+  emote: WOC_EMOTES,
+  loadoutSwaps: { twohand: WOC_TWO_HAND, single: WOC_SINGLE, dual: WOC_DUAL },
+  // two swings in one frame: the X-slash, then the one-two of the whole Dual_Chop
+  dualWieldPair: ['Dual_Cross', 'Dual_Chop'],
+  contacts: WOC_CONTACTS,
 });
 
 const skeletonClips = (attack: string[], flourish = 'Skeletons_Awaken_Standing'): ClipMap => ({
@@ -1427,27 +1697,29 @@ const FORMS = 'models/chars/forms';
 const CREATURES = 'models/creatures';
 const PROPS = 'models/props';
 const WEAPONS = 'models/weapons';
-/** Worn NPC gear, attached to a body bone rather than held (npc_looks.ts `harbormaster`). */
-const NPC_GEAR = 'models/chars/npc_gear';
 const MOUNTS_DIR = 'models/mounts';
 
 /** Exported for the authored-surface guard (tests/authored_surfaces.test.ts),
  *  which sweeps every shipped held model; render code resolves through
  *  itemOffhandModelUrl, never this table directly. */
 export const ITEM_OFFHAND_MODELS: Readonly<Record<string, string>> = {
-  eastbrook_buckler: 'shield_round',
-  highwatch_wallshield: 'shield_square',
-  bonewrought_bulwark: 'shield_square',
-  duskforged_bulwark: 'shield_square', // crafted apex tower shield (masterwrought); bulwarks share shield_square
-  pearlward_aegis: 'shield_round', // the first caster (int/spi) shield
+  eastbrook_buckler: 'shield_starter', // the warrior and paladin starting shield
+  highwatch_wallshield: 'shield_field_steel', // the common heater shield (field set)
+  // A shield draws the set one rarity down, like the weapons (src/ui/weapon_variants.ts):
+  // a rare shield the common ones, an epic shield the rare set's (the pointed shield `_a`
+  // for the walls and bulwarks, the round shield `_b` for wards, barriers and bucklers).
+  bonewrought_bulwark: 'shield_rare_a_teal',
+  duskforged_bulwark: 'shield_rare_a_violet', // crafted apex tower shield (masterwrought)
+  pearlward_aegis: 'shield_field_steel', // the first caster (int/spi) shield
   // The Buried Hoard shields, one row per map-rarity tier (the tier clones are
-  // their own items, not heroicOf copies, so none inherits a row).
-  glacier_hewn_bulwark: 'shield_square',
-  rare_glacier_hewn_bulwark: 'shield_square',
-  legendary_glacier_hewn_bulwark: 'shield_square',
-  storm_tuned_buckler: 'shield_round',
-  rare_storm_tuned_buckler: 'shield_round',
-  legendary_storm_tuned_buckler: 'shield_round',
+  // their own items, not heroicOf copies, so none inherits a row). Each tier draws by
+  // its item quality: the base and the `legendary_` clone are both epic items.
+  glacier_hewn_bulwark: 'shield_rare_a_glacier',
+  rare_glacier_hewn_bulwark: 'shield_field_steel',
+  legendary_glacier_hewn_bulwark: 'shield_rare_a_deepice',
+  storm_tuned_buckler: 'shield_rare_b_teal',
+  rare_storm_tuned_buckler: 'shield_starter',
+  legendary_storm_tuned_buckler: 'shield_rare_b_teal',
   // The inscription tomes: the first held_offhand item models, procedural GLBs
   // from scripts/assets/inscription_tomes (VAR_BOOK grips). The phase 09 apex
   // grimoire joined the family at phase 18, and with it left the conscious
@@ -1457,10 +1729,10 @@ export const ITEM_OFFHAND_MODELS: Readonly<Record<string, string>> = {
   sunpetal_grimoire: 'tome_sunpetal',
   voidbound_grimoire: 'tome_voidbound',
   // Crucible raid shields (content/ignivar_loot.ts): tank wall + healer barrier.
-  bulwark_of_the_inner_crucible: 'shield_square',
-  ember_wardens_barrier: 'shield_round',
-  votive_ward_of_the_deathless_court: 'shield_round', // Nythraxis gap-fill healer shield
-  templar_dawn_shield: 'shield_square', // Church Order quartermaster's mail shield (faction_vendors.ts)
+  bulwark_of_the_inner_crucible: 'shield_rare_a_crucible',
+  ember_wardens_barrier: 'shield_rare_b_ember',
+  votive_ward_of_the_deathless_court: 'shield_rare_b_violet', // Nythraxis gap-fill healer shield
+  templar_dawn_shield: 'shield_rare_a_dawn', // Church Order quartermaster's mail shield (faction_vendors.ts)
   varkhul_emberward: 'varkhul_emberward', // Ignivar raid legendary (Varkhul drop)
 };
 
@@ -1482,17 +1754,159 @@ export const AUTHORED_HELD_MODELS: ReadonlySet<string> = new Set([
   'hammer_varkhul', // Varkhul Forgebreaker (Ignivar raid legendary)
   'shardpike_spear', // Skerrit's Shardpike (Balgath quest tool)
   'varkhul_emberward', // Varkhul Emberward (Ignivar raid legendary)
-  // Harbormaster Tamsin's worn gear (scripts/assets/harbormaster_gear/): felt, brass and
-  // leather authored per material, which the weapon polish would glaze to one sheen
-  'harbormaster_tricorne',
-  'harbormaster_spyglass',
+  // The starter weapons (painted atlases of their own, no kit palette)
+  'sword_starter',
+  'dagger_starter',
+  'hammer_starter',
+  'axe_starter',
+  'staff_starter',
+  'shield_starter',
+  'crossbow_starter',
+  'spellbook_starter',
+  // The common and uncommon field weapons (the same painted pipeline as the starters)
+  'sword_field_iron',
+  'sword_field_steel',
+  'sword_field_bronze',
+  'sword_field_2h_iron',
+  'sword_field_2h_steel',
+  'dagger_field_iron',
+  'dagger_field_steel',
+  'dagger_field_bronze',
+  'hammer_field_iron',
+  'hammer_field_steel',
+  'hammer_field_bronze',
+  'hammer_field_2h_iron',
+  'hammer_field_2h_steel',
+  'axe_field_iron',
+  'axe_field_steel',
+  'axe_field_bronze',
+  'staff_field_iron',
+  'staff_field_steel',
+  'staff_field_bronze',
+  'spear_field_iron',
+  'wand_field_iron',
+  'wand_field_steel',
+  'shield_field_steel',
+  // The rare weapons (the same painted pipeline)
+  'sword_rare_a_teal',
+  'sword_rare_a_ember',
+  'sword_rare_a_violet',
+  'sword_rare_b_teal',
+  'sword_rare_b_ember',
+  'sword_rare_b_violet',
+  'dagger_rare_a_teal',
+  'dagger_rare_a_ember',
+  'dagger_rare_a_violet',
+  'dagger_rare_b_teal',
+  'dagger_rare_b_ember',
+  'dagger_rare_b_violet',
+  'hammer_rare_a_teal',
+  'hammer_rare_a_ember',
+  'hammer_rare_b_teal',
+  'hammer_rare_b_ember',
+  'hammer_rare_b_violet',
+  'axe_rare_a_teal',
+  'axe_rare_b_ember',
+  'staff_rare_a_teal',
+  'staff_rare_a_violet',
+  'staff_rare_b_teal',
+  'staff_rare_b_ember',
+  'staff_rare_b_violet',
+  'spear_rare_a_teal',
+  'spear_rare_b_ember',
+  'wand_rare_a_teal',
+  'wand_rare_b_ember',
+  'wand_rare_b_violet',
+  'shield_rare_a_teal',
+  // ...and the rare looks the epic items brought in when they took the rare set
+  'axe_rare_a_ember',
+  'axe_rare_a_violet',
+  'staff_rare_a_ember',
+  'shield_rare_a_violet',
+  'shield_rare_b_teal',
+  'shield_rare_b_ember',
+  'shield_rare_b_violet',
+  // ...and the repainted finishes that give each epic item sharing a design a look of its own
+  'sword_rare_a_jade',
+  'sword_rare_a_spectral',
+  'sword_rare_a_molten',
+  'sword_rare_a_royal',
+  'sword_rare_a_ivory',
+  'sword_rare_a_anvil',
+  'dagger_rare_a_frost',
+  'dagger_rare_a_bone',
+  'staff_rare_a_obsidian',
+  'shield_rare_a_glacier',
+  'shield_rare_a_deepice',
+  'shield_rare_a_dawn',
+  'shield_rare_a_crucible',
+  // The epic weapons and shields (the same pack convention)
+  'sword_epic_deathless_crucible_heart',
+  'sword_epic_deathless_spectral_teal',
+  'sword_epic_ossuary_ivory_amethyst',
+  'sword_epic_ossuary_wyrm_teal',
+  'sword_epic_tusk_ivory_jade',
+  'sword_epic_tusk_predator_steel',
+  'dagger_epic_cinder_coal_ember',
+  'dagger_epic_dragonfang_basin_jade',
+  'dagger_epic_dragonfang_ivory_violet',
+  'dagger_epic_dragonfang_moonlit_pearl',
+  'dagger_epic_marrow_ivory_amber',
+  'hammer_epic_spring_verdant_ivory',
+  'hammer_epic_wildwood_living_forest',
+  'hammer_epic_wildwood_scorched_resin',
+  'axe_epic_gravecleaver_fossil_gravegreen',
+  'axe_epic_gravecleaver_slag_ember',
+  'staff_epic_gravewyrm_bone_emerald',
+  'staff_epic_hexwood_basin_turquoise',
+  'staff_epic_hexwood_last_spring',
+  'staff_epic_moonfang_bone_moon',
+  'staff_epic_moonfang_lunar_tide',
+  'wand_epic_deathless_quenched_ember',
+  'wand_epic_deathless_royal_amethyst',
+  'wand_epic_deathless_storm_crystal',
+  'shield_epic_crucible_heat_blue_iron',
+  'shield_epic_votive_bone_votive',
+  'shield_epic_votive_ember_warden',
 ]);
 
 /** True when a held-prop GLB url resolves to one of AUTHORED_HELD_MODELS (a held weapon
- *  under models/weapons/, or worn NPC gear under models/chars/npc_gear/). */
+ *  under models/weapons/). */
 export function isAuthoredHeldModelUrl(url: string): boolean {
-  const m = /^models\/(?:weapons|chars\/npc_gear)\/([^/]+)\.glb$/.exec(url);
+  const m = /^models\/weapons\/([^/]+)\.glb$/.exec(url);
   return m !== null && AUTHORED_HELD_MODELS.has(m[1]);
+}
+
+/** Held models that are broad flat plates: a shield's faces, an open book's spread.
+ *  The character rim (gfx.ts addRimGlow) is a fresnel term, made to trace the
+ *  silhouette of a rounded form. A plate turned edge-on to the camera is ONE surface
+ *  at ONE grazing angle, so the rim's cool tint lands on the whole face at once and
+ *  reads as a purple-grey film over the painted texture (owner report on the starter
+ *  shield's inner face; a live A/B with only the rim removed gave the wood back, by
+ *  day and at dusk). These draw without the rim. The standard tier's alone: the low
+ *  tier has no rim to drop. */
+export const RIMLESS_HELD_MODELS: ReadonlySet<string> = new Set([
+  'shield_starter',
+  'spellbook_starter',
+  'shield_field_steel',
+  'shield_rare_a_teal',
+  'shield_rare_a_violet',
+  'shield_rare_a_glacier',
+  'shield_rare_a_deepice',
+  'shield_rare_a_dawn',
+  'shield_rare_a_crucible',
+  'shield_rare_b_teal',
+  'shield_rare_b_ember',
+  'shield_rare_b_violet',
+  'shield_epic_crucible_heat_blue_iron',
+  'shield_epic_votive_bone_votive',
+  'shield_epic_votive_ember_warden',
+]);
+
+/** True when a held-prop GLB url resolves to one of RIMLESS_HELD_MODELS. */
+export function isRimlessHeldModelUrl(url: string): boolean {
+  const m = /^models\/weapons\/([^/]+)\.glb$/.exec(url);
+  return m !== null && RIMLESS_HELD_MODELS.has(m[1]);
 }
 
 function itemModelKey(
@@ -1649,76 +2063,21 @@ function mechEmissiveUrl(c: MechChroma): string | null {
 // to the body material's .map (same UVs). Classes sharing a model share its skin
 // set. Players only — mobs/npcs keep their default look. See public/textures/skins/.
 export const SKINS: Record<string, (string | null)[]> = {
-  player_warrior: [
-    null,
-    `${SKINS_DIR}/knight/alt_a.png`,
-    `${SKINS_DIR}/knight/alt_b.png`,
-    `${SKINS_DIR}/knight/alt_c.png`,
-    `${SKINS_DIR}/knight/alt_suit_prismatic.png`,
-    `${SKINS_DIR}/knight/alt_suit_chrome.png`,
-  ],
-  player_paladin: [
-    null,
-    `${SKINS_DIR}/paladin/alt_a.png`,
-    `${SKINS_DIR}/paladin/alt_suit_prismatic.png`,
-    `${SKINS_DIR}/paladin/alt_suit_chrome.png`,
-  ],
-  player_hunter: [
-    null,
-    `${SKINS_DIR}/ranger/alt_a.png`,
-    `${SKINS_DIR}/ranger/alt_b.png`,
-    `${SKINS_DIR}/ranger/alt_c.png`,
-    `${SKINS_DIR}/ranger/alt_suit_prismatic.png`,
-    `${SKINS_DIR}/ranger/alt_suit_chrome.png`,
-  ],
-  player_rogue: [
-    null,
-    `${SKINS_DIR}/rogue/alt_a.png`,
-    `${SKINS_DIR}/rogue/alt_b.png`,
-    `${SKINS_DIR}/rogue/alt_c.png`,
-    `${SKINS_DIR}/rogue/alt_suit_prismatic.png`,
-    `${SKINS_DIR}/rogue/alt_suit_chrome.png`,
-  ],
-  player_priest: [
-    null,
-    `${SKINS_DIR}/mage/alt_a.png`,
-    `${SKINS_DIR}/mage/alt_b.png`,
-    `${SKINS_DIR}/mage/alt_c.png`,
-    `${SKINS_DIR}/mage/alt_suit_prismatic.png`,
-    `${SKINS_DIR}/mage/alt_suit_chrome.png`,
-  ],
-  player_mage: [
-    null,
-    `${SKINS_DIR}/mage/alt_a.png`,
-    `${SKINS_DIR}/mage/alt_b.png`,
-    `${SKINS_DIR}/mage/alt_c.png`,
-    `${SKINS_DIR}/mage/alt_suit_prismatic.png`,
-    `${SKINS_DIR}/mage/alt_suit_chrome.png`,
-  ],
-  player_warlock: [
-    null,
-    `${SKINS_DIR}/mage/alt_a.png`,
-    `${SKINS_DIR}/mage/alt_b.png`,
-    `${SKINS_DIR}/mage/alt_c.png`,
-    `${SKINS_DIR}/mage/alt_suit_prismatic.png`,
-    `${SKINS_DIR}/mage/alt_suit_chrome.png`,
-  ],
-  player_shaman: [
-    null,
-    `${SKINS_DIR}/barbarian/alt_a.png`,
-    `${SKINS_DIR}/barbarian/alt_b.png`,
-    `${SKINS_DIR}/barbarian/alt_c.png`,
-    `${SKINS_DIR}/barbarian/alt_suit_prismatic.png`,
-    `${SKINS_DIR}/barbarian/alt_suit_chrome.png`,
-  ],
-  player_druid: [
-    null,
-    `${SKINS_DIR}/druid/alt_a.png`,
-    `${SKINS_DIR}/druid/alt_b.png`,
-    `${SKINS_DIR}/druid/alt_c.png`,
-    `${SKINS_DIR}/druid/alt_suit_prismatic.png`,
-    `${SKINS_DIR}/druid/alt_suit_chrome.png`,
-  ],
+  // The WOC warrior body carries its own authored atlases; the knight alt
+  // atlases are KayKit-UV art and would paint garbage on it. Six null slots
+  // keep SKIN_COUNTS.warrior (a saved skin index stays valid, and resolves
+  // to the authored look).
+  player_warrior: [null, null, null, null, null, null],
+  // The WOC paladin body has no KayKit atlas variants (the knight atlases are
+  // KayKit UVs); four identical slots keep the skin picker's shape.
+  player_paladin: [null, null, null, null],
+  player_hunter: [null, null, null, null, null, null],
+  player_rogue: [null, null, null, null, null, null],
+  player_priest: [null, null, null, null, null, null],
+  player_mage: [null, null, null, null, null, null],
+  player_warlock: [null, null, null, null, null, null],
+  player_shaman: [null, null, null, null, null, null],
+  player_druid: [null, null, null, null, null, null],
   // Combat Mech chromas — every index is a real full-model texture (no null
   // default; the embedded base texture is not one of the rewards).
   player_mech: MECH_CHROMAS.map(mechChromaUrl),
@@ -1782,545 +2141,503 @@ export const NYTHRAXIS_BONE_SPIKE_CLICK_RADIUS = 2.6;
 
 export const VISUALS: Record<string, VisualDef> = {
   // -- player classes ------------------------------------------------------
-  player_warrior: swims({
-    url: `${PLAYERS}/knight.glb`,
-    // Every clip knight.glb ships is already wired somewhere in this block
-    // (idle/walk/attack/hit/emotes account for the full shipped library, no
-    // spare donor pose), so Vaulting Charge (issue #2889 batch, verified against
-    // the warrior's real kit in src/sim/content/classes.ts, not assumed) is
-    // authored by pose-sample-and-blend (scripts/build_warrior_ability_anims.mjs)
-    // instead of pointed at an unused clip.
-    animUrls: [
-      `${PLAYERS}/knight_hit_variety_anims.glb`,
-      `${PLAYERS}/warrior_ability_anims.glb`,
-      `${PLAYERS}/warrior_fury_anims.glb`,
-      `${PLAYERS}/warrior_contact_anims.glb`,
-    ],
-    height: HUMANOID_H,
+  // The WOC warrior: the artist's modular character handoff on its own 34-joint
+  // `WOC_Armored_Rig`: the male base and animation library, dressed from the
+  // warrior armor set (woc_armor_core.ts). Its 51 clips are the ONLY clips this
+  // body plays: no KayKit donor GLB (the hit-variety, ability and swim lanes
+  // ride Rig_Medium's bind pose) is layered on. Every part (body, face pieces,
+  // each armor piece) is a named node the renderer shows or hides per instance
+  // from `wocCharacter` (woc_parts_core.ts); equipped items select their armor
+  // pieces across the six armor slots.
+  player_warrior: {
+    // the male base and animation library, streamed on demand (woc_armor_core.ts)
+    url: `${PLAYERS}/woc/base_male.glb`,
+    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
+    lazyPreload: true,
+    // A tenth taller than the KayKit-sized roster (the artist's body reads
+    // small at the shared height); the held weapons scale with the rig.
+    height: HUMANOID_H * 1.1,
+    authoredAtlas: true,
+    envSheen: WOC_ENV_SHEEN,
+    wocCharacter: WOC_WARRIOR_MANIFEST,
+    hideWeaponsWhileSwimming: true,
+    // The refined strikes are authored with their own wind-up/strike/recovery
+    // timing and are meant to play at 1x (handoff INTEGRATION.md), not the
+    // KayKit-era 1.3x speed-up playAttack defaults to.
+    attackTimeScale: 1,
+    // The stroke rides its hips 1.33 world units above the origin, which the sim
+    // seats 0.75 under the line: this leaves the chest at the surface and the
+    // hips 0.07 under it (measured, tmp/woc/swim_measure.mjs). The upright
+    // Swim_Idle tread keeps its hips at standing height, so it sinks further
+    // to put the waterline at the chest.
+    swimRise: { stroke: -0.65, tread: -1.0 },
+    // The backpedal is authored at its game speed (0.65 x the 7 yd/s run).
+    walkBackRef: 4.55,
+    rightShoulderSheathe: true,
     clips: {
-      ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
-      attackByHand: {
-        twohand: '2H_Melee_Attack_Chop',
-        dualwield: 'Dualwield_Melee_Attack_Chop',
-      },
-      castByAbility: { bladestorm: 'Warrior_Bladestorm_Loop' },
-      rush: 'Warrior_Rush_Loop',
-      rushArrival: 'Warrior_Onrush_Arrival',
-      castTimeScaleByAbility: { bladestorm: 1 },
-      attackTimeScaleByAbility: { heroic_leap: 1 },
+      ...woc(['1H_Chop', '1H_Slash']),
+      // Instant casts play no gesture on this body (owner call): the six
+      // shouts keep their ring and wave, the roar animation is off.
+      shoutEmote: null,
+      attackByHand: { twohand: '2H_Chop', dualwield: 'Dual_Chop' },
+      // Dual_Chop is two self-contained fast strikes from the crossed guard, 24
+      // frames at 60 fps each (2026-09-28): the cut at 0.4 s lands exactly on the
+      // guard between them, and each blade lands ~0.125 s into its half
+      // (WOC_CONTACTS; tests/woc_character.test.ts measures both off the library).
+      dualWieldSplit: 0.4,
+      // Every warrior ability the KayKit body routed keeps its entry; the clips
+      // are this rig's own vocabulary (verified against the shipped GLB by
+      // tests/character_clipmaps.test.ts and tests/warrior_render_contract.test.ts).
       attackByAbility: {
-        charge: 'Warrior_Rush_Loop',
-        intervene: 'Warrior_Rush_Loop',
-        mortal_strike: 'Warrior_Maiming_Strike',
-        execute: 'Warrior_Early_Grave',
-        slam: 'Warrior_Brute_Swing',
-        red_harvest: 'Fury_Red_Harvest',
-        breachmaker: 'Warrior_Breachmaker',
-        // Native shield drive with a planted lower body and a held contact.
-        // scripts/build_warrior_contact_anims.mjs bakes foot locking offline.
-        shield_slam: 'Warrior_Shieldcrack',
-        raging_gale: 'Fury_Twinstrike',
-        bloodthirst: 'Warrior_Bloodletting',
-        battle_shout: 'Warrior_Iron_Bellow',
-        demoralizing_shout: 'Warrior_Direhowl',
-        emboldening_roar: 'Warrior_Emboldening_Roar',
-        defiant_bellow: 'Warrior_Defiant_Bellow',
-        rallying_cry: 'Warrior_Valor_Roar',
-        intimidating_shout: 'Warrior_Intimidating_Shout',
-        piercing_howl: 'Warrior_Piercing_Howl',
-        // Reaping Arc turns through all surrounding enemies; Revenge is frontal.
-        cleave: 'Warrior_Reaping_Arc',
-        revenge: 'Warrior_Revenge',
-        thunder_clap: 'Warrior_Quaking_Blow',
-        faultline: 'Warrior_Faultline',
-        heroic_strike: 'Warrior_Reaver_Strike',
-        overpower: 'Warrior_Redhand',
-        hamstring: 'Warrior_Hobbling_Cut',
-        sunder_armor: 'Warrior_Armor_Shear',
-        storm_bolt: 'Warrior_Storm_Bolt',
-        sanguine_aura: 'Warrior_Sanguine_Aura',
-        sweeping_strikes: 'Warrior_Widening_Arc',
-        battle_stance: 'Warrior_Battle_Stance',
-        defensive_stance: 'Warrior_Guarded_Stance',
-        berserker_stance: 'Warrior_Berserker_Stance',
-        raised_guard: 'Warrior_Raised_Guard',
-        iron_resolve: 'Warrior_Iron_Resolve',
-        // Jawcrack drives the held weapon's guard into the interrupt:
-        // planted feet and a compact contact hold preserve both grips.
-        pummel: 'Warrior_Jawcrack',
-        // Vaulting Charge is a position-targeted jump, not a swing: the bespoke
-        // pose-sample-and-blend clip (coil, airborne, driven two-hand slam on
-        // landing). It carries no castFx and resolves no target entity, so it
-        // completes through the renderer's generic 'selfCast' cue, which only
-        // draws a body gesture via this exact attackByAbility entry
-        // (CharacterVisual.hasAttackClipOverride, src/render/ability_vfx/
-        // painter.ts's non-contact 'selfCast' branch); with no entry it plays
-        // nothing at all on the body.
-        heroic_leap: 'Warrior_Heroic_Leap',
-        // A decisive cut followed by an upright, confident recovery.
-        victory_rush: 'Warrior_Victory_Rush',
-        // Native resource ceremonies: inward clench, outward pressure release,
-        // and an aggressive opening of both arms. Each recovers inside a GCD.
-        taunt: 'Warrior_Goad',
-        furious_mending: 'Warrior_Furious_Mending',
-        whirlwind: 'Warrior_Bladed_Gyre',
-        bloodrage: 'Warrior_Blood_Toll',
-        berserker_rage: 'Warrior_Seething_Fury',
-        recklessness: 'Warrior_Recklessness',
-        // The actual blade supplies its distinct defensive presentation.
-        die_by_sword: 'Warrior_Sword_Guard',
-        // A planted rise carries Avatar's physical transformation.
-        avatar: 'Warrior_Avatar',
+        mortal_strike: '2H_Chop',
+        execute: '2H_Chop',
+        slam: '2H_Chop',
+        red_harvest: '2H_Chop',
+        breachmaker: '2H_Chop',
+        // Shieldcrack braces behind the offhand shield: the rig's guard (the
+        // KayKit body had a synthesized shield bash; this rig ships none).
+        shield_slam: 'Block',
+        raging_gale: 'Dual_Chop',
+        bloodthirst: 'Dual_Chop',
+        // Reaping Arc and Revenge sweep the frontal arc: the sideways slash,
+        // never the top-to-bottom chop (owner: "sideways sword sweep").
+        cleave: '1H_Slash',
+        revenge: '1H_Slash',
+        thunder_clap: '1H_Chop',
+        faultline: '1H_Chop',
+        heroic_strike: '1H_Slash',
+        overpower: '1H_Slash',
+        hamstring: '1H_Slash',
+        // Jawcrack is a bare-fist interrupt; this rig has no punch, so the
+        // quick chop stands in.
+        pummel: '1H_Chop',
+        // Vaulting Charge completes through the renderer's generic 'selfCast'
+        // cue, which only draws a body gesture via this exact entry: the
+        // two-hand slam reads as the landing (no bespoke leap on this rig).
+        heroic_leap: '2H_Chop',
+        // Victor's Surge is a real weapon strike: the decisive one-hand slash.
+        victory_rush: '1H_Slash',
+        // Deliberately absent (owner call: instant casts play no animation on
+        // this body): sanguine_aura, raised_guard, die_by_sword, berserker_rage,
+        // recklessness, avatar, piercing_howl. With no entry the ability
+        // painter draws no gesture and the generic cast arm stays silent
+        // (CharacterVisual.playAttack gestureOnly); only real strikes swing.
       },
     },
-    show: ['Knight_Helmet', 'Knight_Cape'], // v2 knight dropped the built-in Badge_Shield mesh
     attach: [
       { url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' },
       { url: `${WEAPONS}/shield_round.glb`, bone: 'handslot.l' },
     ],
     weaponSlots: [0],
     offhandSlot: 1,
-  }),
-  player_paladin: swims({
-    url: `${PLAYERS}/paladin.glb`,
-    height: HUMANOID_H,
+  },
+  // The paladin rides the SAME WOC body, appearance parts and 51 clips as the
+  // warrior (its build takes the warrior pack's base and appearance; only the
+  // armor pack differs) and dresses from `armor_paladin.glb`. Same owner rules
+  // as the warrior: instant casts play no gesture, only real strikes swing.
+  player_paladin: {
+    // the male base and animation library, streamed on demand (woc_armor_core.ts)
+    url: `${PLAYERS}/woc/base_male.glb`,
+    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
+    lazyPreload: true,
+    height: HUMANOID_H * 1.1,
+    authoredAtlas: true,
+    envSheen: WOC_ENV_SHEEN,
+    wocCharacter: WOC_PALADIN_MANIFEST,
+    hideWeaponsWhileSwimming: true,
+    attackTimeScale: 1,
+    swimRise: { stroke: -0.65, tread: -1.0 },
+    // The backpedal is authored at its game speed (0.65 x the 7 yd/s run).
+    walkBackRef: 4.55,
+    rightShoulderSheathe: true,
     clips: {
-      ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
-      attackByHand: { twohand: '2H_Melee_Attack_Chop' },
-      // Ability-specific clips: the composed union of the overhaul's
-      // Dawnreaver entries (final_edict/sunward_disc/bastion_sweep) and the
-      // #2889 follow-up batch mapped by the ability's EFFECT TYPE (groundAoE,
-      // stun, absorb/defensive selfBuff, buffTarget/aura selfBuff, heal).
-      // The batch's judgement row is dropped: the overhaul retired that id
-      // (final_edict is its successor and carries the Verdict clip). Not
-      // every ability is listed; unlisted ids keep the default chop.
+      ...woc(['1H_Chop', '1H_Slash']),
+      shoutEmote: null,
+      attackByHand: { twohand: '2H_Chop', dualwield: 'Dual_Chop' },
+      dualWieldSplit: 0.4,
+      // Only the weapon strikes: Crusader Strike and Vowkeeper Strike are
+      // one-hand blows, Final Edict the decisive two-hand chop; the two
+      // interrupts stand in with the quick chop like the warrior's Jawcrack.
+      // Every instant cast (auras, blessings, wards, shocks, hammers, the
+      // taunts, Consecration, Bastion Sweep, Sunward Disc) has no entry on
+      // purpose: no gesture, no emote. Timed heals ride the cast loop.
       attackByAbility: {
-        final_edict: 'Paladin_Templars_Verdict_1H',
-        sunward_disc: 'Spellcast_Raise',
-        bastion_sweep: 'Paladin_Bastion_Sweep',
-        consecration: 'Cast_Consecrate',
-        hammer_of_justice: 'Cast_HammerBash',
-        divine_protection: 'Cast_Ward',
-        sacred_bulwark: 'Cast_Ward',
-        blessing_of_might: 'Cast_Blessing',
-        devotion_aura: 'Cast_Blessing',
-        retribution_aura: 'Cast_Blessing',
-        righteous_fury: 'Cast_Blessing',
-        holy_light: 'Cast_HolyMend',
-        flash_of_light: 'Cast_HolyMend',
-        lay_on_hands: 'Cast_HolyMend',
+        crusader_strike: '1H_Chop',
+        vowkeeper_strike: '1H_Slash',
+        final_edict: '2H_Chop',
+        hushbrand: '1H_Chop',
+        rebuke: '1H_Chop',
+        mercy_lance: 'Cast_Shoot',
       },
-      attackTimeScaleByAbility: { final_edict: 1, sunward_disc: 1.8, bastion_sweep: 1 },
     },
-    // Ability-specific clips (scripts/build_paladin_ability_anims.mjs): a
-    // mesh-free clip donor GLB baked off this rig's own poses.
-    animUrls: [`${PLAYERS}/paladin_hit_variety_anims.glb`, `${PLAYERS}/paladin_ability_anims.glb`],
-    // dedicated paladin model (helmeted variant) — ships its own Cape + Helmet
-    // meshes and texture, so no show-list/tint. Shield + paladin hammer arrive
-    // in the weapons pass; the gripped axe holds the slot until then.
     attach: [
       { url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' },
       { url: `${WEAPONS}/shield_square.glb`, bone: 'handslot.l' },
     ],
     weaponSlots: [0],
     offhandSlot: 1,
-  }),
-  player_hunter: swims({
-    url: `${PLAYERS}/ranger.glb`,
-    height: HUMANOID_H,
+  },
+  // The hunter on the WOC body (equipment set of 2026-09-18). The auto shot and
+  // every instant shot play the artist's crossbow clip; a timed shot aims from
+  // its raise and holds the crossbow up until the cast lands, then the release
+  // half (the shot and the lowering) plays at the damage event, so the raise
+  // never replays under the shot (clipSplits). The clip is a snap shot
+  // (2026-09-29): the sim launches the bolt on the attack event, so the
+  // crossbow is up and aimed by 0.13 s and fires straight after the 0.17 s
+  // split, instead of the old 0.62 s raise that fired long after the bolt.
+  // Melee strikes swing the blade. Aspects, traps and pet commands play nothing.
+  player_hunter: {
+    // the male base and animation library, streamed on demand (woc_armor_core.ts)
+    url: `${PLAYERS}/woc/base_male.glb`,
+    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
+    lazyPreload: true,
+    height: HUMANOID_H * 1.1,
+    authoredAtlas: true,
+    envSheen: WOC_ENV_SHEEN,
+    wocCharacter: WOC_HUNTER_MANIFEST,
+    hideWeaponsWhileSwimming: true,
+    attackTimeScale: 1,
+    swimRise: { stroke: -0.65, tread: -1.0 },
+    // The backpedal is authored at its game speed (0.65 x the 7 yd/s run).
+    walkBackRef: 4.55,
+    rightShoulderSheathe: true,
     clips: {
-      ...kaykit(['2H_Ranged_Shoot']),
-      // Ability-specific attacks (scripts/build_hunter_ability_anims.mjs,
-      // issue #2889): the hunter had zero attackByAbility overrides across
-      // its kit, so every ability played the same crossbow-shoulder shot.
-      // The three melee abilities (range 0) get a bespoke swing each; the
-      // ranged shots split into a quick snap (every instant no-cast-time
-      // shot) versus the slow full draw Long Draw's own 3.0s cast time
-      // names; Volley gets its own rapid-pulse barrage. The three aspect
-      // toggles plus Fevered Draw are self-buffs with no swing to author, so
-      // they point straight at ranger.glb's own already-baked
-      // 'Spellcast_Raise' clip, the same no-bake pattern player_warrior's
-      // sanguine_aura already uses. Not every ability in the kit is listed:
-      // this batch's representative slice (tame_beast/dismiss_pet/revive_pet
-      // are pet-command channels with no combat swing to author, matching
-      // batch 1's own utility/summon exclusions for the mage).
+      ...woc(['Ranged_Shoot']),
+      meleeAttack: ['1H_Chop', '1H_Slash'],
+      shoutEmote: null,
+      clipSplits: [
+        { clip: 'Ranged_Shoot', at: 0.17, names: ['Ranged_Shoot#aim', 'Ranged_Shoot#release'] },
+      ],
+      cast: 'Ranged_Shoot#aim',
+      castHoldPointSeconds: 0.15,
+      castByAbility: {
+        volley: 'Ranged_Shoot',
+        rapid_fire: 'Ranged_Shoot',
+        tame_beast: 'Cast_Loop',
+        revive_pet: 'Cast_Loop',
+      },
       attackByAbility: {
-        raptor_strike: 'Hunter_Melee_Gut',
-        mongoose_bite: 'Hunter_Melee_Counter',
-        wing_clip: 'Hunter_Melee_Clip',
-        serpent_sting: 'Hunter_Shot_Snap',
-        arcane_shot: 'Hunter_Shot_Snap',
-        concussive_shot: 'Hunter_Shot_Snap',
-        counter_shot: 'Hunter_Shot_Snap',
-        aimed_shot: 'Hunter_Shot_LongDraw',
-        volley: 'Hunter_Shot_Volley',
-        aspect_of_the_hawk: 'Spellcast_Raise',
-        aspect_of_the_monkey: 'Spellcast_Raise',
-        aspect_of_the_cheetah: 'Spellcast_Raise',
-        rapid_fire: 'Spellcast_Raise',
+        aimed_shot: 'Ranged_Shoot#release',
+        measured_shot: 'Ranged_Shoot#release',
+        arcane_shot: 'Ranged_Shoot',
+        serpent_sting: 'Ranged_Shoot',
+        wyvern_sting: 'Ranged_Shoot',
+        raptor_strike: '1H_Chop',
+        mongoose_bite: '1H_Slash',
+        wing_clip: '1H_Slash',
+        bloodhook: '1H_Slash',
+        counter_shot: 'Ranged_Shoot',
+        startle_shot: 'Ranged_Shoot',
+        concussive_shot: 'Ranged_Shoot',
+        multi_shot: 'Ranged_Shoot',
+        shrapnel_charge: 'Ranged_Shoot',
       },
     },
-    // Bow-draw clips for the Season 1 bow skins (scripts/build_bow_anims.mjs):
-    // with a bow displayed the shot plays a draw instead of the crossbow
-    // shoulder-aim (visual.ts weaponSkinAttackClips). The cast-time hold pose
-    // (bow_hold_anim.glb) and the ability-specific attack clips
-    // (scripts/build_hunter_ability_anims.mjs) ride the same mesh-free donor
-    // GLB mechanism, appended alongside: all GLBs' clips load together.
-    animUrls: [
-      `${PLAYERS}/bow_anims.glb`,
-      `${PLAYERS}/bow_hold_anim.glb`,
-      `${PLAYERS}/hunter_ability_anims.glb`,
-      `${PLAYERS}/ranger_hit_variety_anims.glb`,
-    ],
-    // dedicated ranger model — the quiver is a built-in mesh, so it's no longer
-    // a separate chest attachment
-    attach: [{ url: `${WEAPONS}/crossbow_1handed.glb`, bone: 'handslot.r' }],
-  }),
-  player_rogue: swims({
-    url: `${PLAYERS}/rogue.glb`,
-    height: HUMANOID_H,
+    attach: [{ url: `${WEAPONS}/crossbow_starter.glb`, bone: 'handslot.r' }],
+  },
+  // The rogue on the WOC body: every strike, opener and finisher is a weapon
+  // blow, so the physical damage event swings the artist's clips (the dual
+  // halves alternate when two blades are drawn) and needs no per-ability
+  // entry; stealth, sprint, poisons and the cooldowns play nothing.
+  player_rogue: {
+    // the male base and animation library, streamed on demand (woc_armor_core.ts)
+    url: `${PLAYERS}/woc/base_male.glb`,
+    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
+    lazyPreload: true,
+    height: HUMANOID_H * 1.1,
+    authoredAtlas: true,
+    envSheen: WOC_ENV_SHEEN,
+    wocCharacter: WOC_ROGUE_MANIFEST,
+    hideWeaponsWhileSwimming: true,
+    attackTimeScale: 1,
+    swimRise: { stroke: -0.65, tread: -1.0 },
+    // The backpedal is authored at its game speed (0.65 x the 7 yd/s run).
+    walkBackRef: 4.55,
+    rightShoulderSheathe: true,
     clips: {
-      ...kaykit(['Dualwield_Melee_Attack_Chop']),
+      ...woc(['1H_Chop', '1H_Slash']),
+      shoutEmote: null,
+      attackByHand: { dualwield: 'Dual_Chop' },
+      dualWieldSplit: 0.4,
+      // The one-hand names resolve through the loadout: with a blade in each hand the chop
+      // family plays the thrust (Dual_Stab) and the slash family the X-slash (Dual_Cross);
+      // with one blade the free-hand single set. Sinister Strike, Hemorrhage and the rest of
+      // the builders swing the fast Dual_Chop halves like the auto attack.
       attackByAbility: {
-        // Throat Wire is a wire strangle, not a dagger swing: the synthesized
-        // two-handed choke (scripts/_add_garrote_choke_anim.mjs) reaches to
-        // neck height and yanks back to the chest with a brief hold.
-        garrote: 'Garrote_Choke',
-        // Boot is a kick, not a swing: the synthesized snap kick
-        // (scripts/_add_boot_kick_anim.mjs) chambers the knee and fires the
-        // leg forward at gut height.
-        kick: 'Kick_A',
-        // Dirt Toss throws dirt, not daggers: the synthesized crouch-scoop
-        // and underhand fling (scripts/_add_dirt_throw_anim.mjs).
-        blind: 'Dirt_Throw',
-        // Rest of the kit (scripts/build_rogue_ability_anims.mjs, issue
-        // #2889): pose-sample-and-blend clips off rogue.glb's own donor
-        // poses. Wicked Slash is the combo-builder poke; Eye Jab and Sap
-        // share its silhouette since both are instant single-target
-        // debilitating strikes with no unique read of their own.
-        sinister_strike: 'Rogue_Quick_Strike',
-        gouge: 'Rogue_Quick_Strike',
-        sap: 'Rogue_Quick_Strike',
-        // Craven Thrust drives the dagger in from behind.
-        backstab: 'Rogue_Backstab',
-        // Lurker's Strike is the kit's biggest single hit (2.5x weapon,
-        // stealth-gated): its own bigger, more telegraphed lunge.
-        ambush: 'Rogue_Ambush',
-        // Gut Punch and Low Blow both land at gut/kidney height.
-        cheap_shot: 'Rogue_Low_Blow',
-        kidney_shot: 'Rogue_Low_Blow',
-        // Combo-spending finishers read as one decisive two-blade cut.
-        eviscerate: 'Rogue_Finisher_Slash',
-        rupture: 'Rogue_Finisher_Slash',
-        expose_armor: 'Rogue_Finisher_Slash',
-        // Ghostfoot is a defensive dodge buff: rogue.glb's own already-baked
-        // 'Block' guard, no bake needed (the pattern player_warrior's
-        // raised_guard already uses).
-        evasion: 'Block',
-        // Cutthroat Tempo, Smokefade, Quickened Blood, and Duskveil are all
-        // self-buff/stealth toggles with no combat swing to author: rogue.
-        // glb's own already-baked 'Spellcast_Raise', the pattern player_
-        // warrior's sanguine_aura and the hunter batch's aspect toggles both
-        // use. Adder's Bite and Festering Venom (the poison weapon imbues)
-        // are excluded, the same call the mage batch made for its own
-        // utility/summon abilities.
-        slice_and_dice: 'Spellcast_Raise',
-        vanish: 'Spellcast_Raise',
-        adrenaline_rush: 'Spellcast_Raise',
-        stealth: 'Spellcast_Raise',
+        venom_dart: 'Cast_Shoot',
+        crippling_poison: '1H_Slash',
+        rupture: '1H_Slash',
+        eviscerate: '1H_Slash',
+        expose_armor: '1H_Slash',
+        backstab: '1H_Chop',
+        ambush: '1H_Chop',
+        gouge: '1H_Chop',
+        cheap_shot: '1H_Chop',
+        kidney_shot: '1H_Chop',
       },
     },
-    // Ability-specific attack clips (scripts/build_rogue_ability_anims.mjs).
-    animUrls: [`${PLAYERS}/rogue_hit_variety_anims.glb`, `${PLAYERS}/rogue_ability_anims.glb`],
-    show: ['Rogue_Cape'],
     attach: [
       { url: `${WEAPONS}/dagger.glb`, bone: 'handslot.r' },
       { url: `${WEAPONS}/dagger.glb`, bone: 'handslot.l' },
     ],
     weaponSlots: [0],
     offhandSlot: 1,
-  }),
-  player_priest: swims({
-    url: `${PLAYERS}/mage.glb`,
-    animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
-    height: HUMANOID_H,
+  },
+  // The priest on the WOC body (the Holy Priest set). Smite and Mind Blast
+  // release through the throw; the heals lower the arm; Mind Flay, Mind Sear
+  // and the Choir channel the cast loop. The halo rides the head bone at the
+  // hood's tip, sized to this rig (the KayKit 1.45 cleared the mage hat).
+  player_priest: {
+    // the male base and animation library, streamed on demand (woc_armor_core.ts)
+    url: `${PLAYERS}/woc/base_male.glb`,
+    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
+    lazyPreload: true,
+    height: HUMANOID_H * 1.1,
+    authoredAtlas: true,
+    envSheen: WOC_ENV_SHEEN,
+    wocCharacter: WOC_PRIEST_MANIFEST,
+    hideWeaponsWhileSwimming: true,
+    attackTimeScale: 1,
+    swimRise: { stroke: -0.65, tread: -1.0 },
+    // The backpedal is authored at its game speed (0.65 x the 7 yd/s run).
+    walkBackRef: 4.55,
+    rightShoulderSheathe: true,
     clips: {
-      ...kaykit(['2H_Melee_Attack_Chop']),
-      attackByAbility: {
-        // Lingering Grace is a blessing, not a staff swing: the one-hand
-        // raise (a stock mage.glb clip) reads as the priest offering the HoT.
-        renew: 'Spellcast_Raise',
+      ...woc(['2H_Chop']),
+      shoutEmote: null,
+      // A timed cast raises the casting arm (Cast_Raise) and holds it at the
+      // top until the cast lands: a bolt then releases through the throw
+      // (Cast_Shoot, attackByAbility below), anything else (heals, wards,
+      // summons, conjures) lowers the arm through the clip's own recovery.
+      // Channels weave the artist's cast loop. Every instant is silent: no
+      // gesture, no emote.
+      cast: 'Cast_Raise',
+      castHoldPointSeconds: 1.0,
+      castPlayOut: ['Cast_Raise'],
+      castByAbility: {
+        mind_flay: 'Cast_Loop',
+        mind_sear: 'Cast_Loop',
+        choir_of_deliverance: 'Cast_Loop',
       },
+      attackByAbility: { smite: 'Cast_Shoot', mind_blast: 'Cast_Shoot' },
     },
-    // The priest's Light: a warm golden halo ring above the crown. The mage
-    // model's pointed hat is canon here, and at the default lift the ring
-    // plane crosses the hat cone where it is wide, clipping through it; +0.15
-    // raises the plane to the cone tip, where the default-size ring clears it
-    // on every side (tuned by screenshot against the current mage.glb; a hat
-    // reshape in an asset update means re-tuning). Kept just below the hat's
-    // bounding-box top so portrait/turntable framing is unchanged for priests.
     halo: 0xffd766,
-    haloUpOffset: 1.45,
-    // show is a no-op for the hat/cape: the current mage.glb rigs every
-    // accessory as a SkinnedMesh, and the allowlist filter (assets.ts) only
-    // hides non-skinned nodes, so the hat always renders. Sanctioned look.
-    show: [],
-    // The offhand slot renders ONLY an equipped, model-mapped offhand item
-    // (the phase 06 inscription tomes are the first): offhandAttachDef skips
-    // the slot entirely when the offhand is empty or unmapped, so the empty
-    // hand look is unchanged. The base url never renders and is already in
-    // the preload set via the warlock's fixed spellbook; swapOnly keeps it
-    // out of the wiki figures too.
+    haloUpOffset: 0.28,
+    haloRadius: 0.2,
     attach: [
       { url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' },
       { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l', swapOnly: true },
     ],
     weaponSlots: [0],
     offhandSlot: 1,
-    // Faint warm lift only, to tell this apart from the mage/warlock models it
-    // shares mage.glb with. The whole rig is ONE merged material/atlas (skin,
-    // hair, and robe together), so this lerp multiplies the entire body, not
-    // just the cloth. Measured: 0xf0e9d6 is near white, so even at 0.5 the old
-    // strength only shifted the body by roughly (0.983, 0.980, 0.956), a
-    // near-no-op (issue #2678); dropped to 0.12 anyway for consistency with
-    // shaman/warlock, where the saturated tints DID flatten the face and
-    // hands at their old strengths. Kept at the same faint-wash strength the
-    // manifest already uses elsewhere (mob_troll) to differentiate a shared
-    // model without hiding its base texture.
-    tint: 0xf0e9d6,
-    tintStrength: 0.12,
-  }),
-  player_shaman: swims({
-    url: `${PLAYERS}/barbarian.glb`,
-    height: HUMANOID_H,
+  },
+  // The shaman on the WOC body: weapon strikes (Stormstrike, the imbued auto
+  // attack, two-hand and dual-wield swings) ride the blade clips; Lightning
+  // Bolt and Chain Lightning release through the throw; the heals, Ghost Wolf
+  // and Ancestor Return lower the arm. Shocks, totems, shields and imbues play
+  // nothing.
+  player_shaman: {
+    // the male base and animation library, streamed on demand (woc_armor_core.ts)
+    url: `${PLAYERS}/woc/base_male.glb`,
+    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
+    lazyPreload: true,
+    height: HUMANOID_H * 1.1,
+    authoredAtlas: true,
+    envSheen: WOC_ENV_SHEEN,
+    wocCharacter: WOC_SHAMAN_MANIFEST,
+    hideWeaponsWhileSwimming: true,
+    attackTimeScale: 1,
+    swimRise: { stroke: -0.65, tread: -1.0 },
+    // The backpedal is authored at its game speed (0.65 x the 7 yd/s run).
+    walkBackRef: 4.55,
+    rightShoulderSheathe: true,
     clips: {
-      ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
-      attackByHand: { twohand: '2H_Melee_Attack_Chop' },
-      // Ability-specific spellcasts (scripts/build_shaman_ability_anims.mjs,
-      // issue #2889): the shaman had zero attackByAbility overrides across
-      // its kit, so every spell played the same melee chop/slice. Mapped by
-      // school (src/sim/content/classes.ts): Cast_Bolt is the class's
-      // signature nature bolt (its longest cast, 1.5 to 3.0s); Earthen/
-      // Cinder/Rime Jolt are all instant (0s cast) and differ only in damage
-      // school, so they share Cast_Shock's snappy point-and-release;
-      // Mending Waters and the Spiritcall signature Chain Heal share
-      // Cast_Heal's sustained mending channel instead of a sharp release;
-      // Earthquake borrows the two-hand chop's committed downswing energy
-      // for Cast_Quake, the same "slam and radiate outward" read the mage's
-      // Cast_Nova makes; Ancestral Strike (physical) gets its own charged
-      // diagonal slice, Storm_Strike. The weapon imbues (Stonebound,
-      // Pyrebrand, Rimebound Weapon) and the short self buffs (Shadewolf,
-      // Primal Mastery) have no swing to author, so they read fine on the
-      // rig's existing Spellcast_Raise gesture, the same no-bake call the
-      // priest's renew and the warlock's sanguine_aura make; Thunder
-      // Ward reads as a defensive ward instead, so it reuses Block, the
-      // same call the warrior's raised_guard makes. This covers every
-      // ability tagged class: 'shaman' in classes.ts.
-      attackByAbility: {
-        lightning_bolt: 'Cast_Bolt',
-        earth_shock: 'Cast_Shock',
-        flame_shock: 'Cast_Shock',
-        frost_shock: 'Cast_Shock',
-        healing_wave: 'Cast_Heal',
-        chain_heal: 'Cast_Heal',
-        earthquake: 'Cast_Quake',
-        stormstrike: 'Storm_Strike',
-        rockbiter_weapon: 'Spellcast_Raise',
-        flametongue_weapon: 'Spellcast_Raise',
-        frostbrand_weapon: 'Spellcast_Raise',
-        ghost_wolf: 'Spellcast_Raise',
-        elemental_mastery: 'Spellcast_Raise',
-        lightning_shield: 'Block',
-      },
+      ...woc(['1H_Chop', '1H_Slash']),
+      shoutEmote: null,
+      attackByHand: { twohand: '2H_Chop', dualwield: 'Dual_Chop' },
+      dualWieldSplit: 0.4,
+      // A timed cast raises the casting arm (Cast_Raise) and holds it at the
+      // top until the cast lands: a bolt then releases through the throw
+      // (Cast_Shoot, attackByAbility below), anything else (heals, wards,
+      // summons, conjures) lowers the arm through the clip's own recovery.
+      // Channels weave the artist's cast loop. Every instant is silent: no
+      // gesture, no emote.
+      cast: 'Cast_Raise',
+      castHoldPointSeconds: 1.0,
+      castPlayOut: ['Cast_Raise'],
+      attackByAbility: { lightning_bolt: 'Cast_Shoot', chain_lightning: 'Cast_Shoot' },
     },
-    // Ability-specific spellcast clips (scripts/build_shaman_ability_anims.mjs):
-    // a mesh-free clip donor GLB baked off this rig's own spellcasting poses.
-    // The hit-variety donor (scripts/build_hit_variety_anims.mjs, second
-    // KayKit hit-reaction clip, issue #2889 area B) ships alongside it on the
-    // same rig, so both donors are listed here.
-    animUrls: [`${PLAYERS}/barbarian_hit_variety_anims.glb`, `${PLAYERS}/shaman_ability_anims.glb`],
-    show: ['Barbarian_BearHat'], // v2 barbarian renamed Hat→BearHat and dropped the round shield mesh
     attach: [
       { url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' },
       { url: `${WEAPONS}/shield_round.glb`, bone: 'handslot.l' },
     ],
     weaponSlots: [0],
     offhandSlot: 1,
-    // Faint cool lift only: barbarian.glb is one merged material for the whole
-    // body (skin, fur, and leather together), so this lerp hits the face and
-    // hands as hard as the cloth. 0.4 (the class default strength) desaturated
-    // the whole model into a blue-grey wash on character create (issue #2678);
-    // dropped further to 0.12, the same faint-wash strength the manifest
-    // already uses elsewhere (mob_troll) to differentiate a shared model
-    // without hiding its base texture.
-    tint: 0x6f8fc9,
-    tintStrength: 0.12,
-  }),
-  player_mage: swims({
-    url: `${PLAYERS}/mage.glb`,
-    height: HUMANOID_H,
+  },
+  // The mage on the WOC body. Bolts, the timed ground spells and the timed
+  // crowd control release through the throw; Arcane Missiles and Evocation
+  // channel the cast loop; barriers, procs, Blink and the instant novas play
+  // nothing. The Hourglass keeps a throw because the ability painter forces a
+  // gesture on hostile crowd control, and a throw beats the staff swing it
+  // would fall back to.
+  player_mage: {
+    // the male base and animation library, streamed on demand (woc_armor_core.ts)
+    url: `${PLAYERS}/woc/base_male.glb`,
+    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
+    lazyPreload: true,
+    height: HUMANOID_H * 1.1,
+    authoredAtlas: true,
+    envSheen: WOC_ENV_SHEEN,
+    wocCharacter: WOC_MAGE_MANIFEST,
+    hideWeaponsWhileSwimming: true,
+    attackTimeScale: 1,
+    swimRise: { stroke: -0.65, tread: -1.0 },
+    // The backpedal is authored at its game speed (0.65 x the 7 yd/s run).
+    walkBackRef: 4.55,
+    rightShoulderSheathe: true,
     clips: {
-      ...kaykit(['2H_Melee_Attack_Chop']),
-      // Ability-specific spellcasts (scripts/build_mage_ability_anims.mjs,
-      // issue #2889): the mage had zero attackByAbility overrides across its
-      // kit, so every spell played the same melee chop. Mapped by school
-      // (src/sim/content/classes.ts) to the school's signature spells;
-      // Polymorph names its own clip (the one ability the clip is written
-      // for by name), and the point-blank AoE bursts (Frost Nova, Arcane
-      // Explosion, Dragon's Breath) share Cast_Nova's "slam and radiate
-      // outward" read regardless of school. Not every ability in the kit is
-      // listed: this is the first batch's representative slice, not
-      // exhaustive coverage (utility/buff/summon abilities keep the default
-      // chop until a later batch).
+      ...woc(['2H_Chop']),
+      shoutEmote: null,
+      // A timed cast raises the casting arm (Cast_Raise) and holds it at the
+      // top until the cast lands: a bolt then releases through the throw
+      // (Cast_Shoot, attackByAbility below), anything else (heals, wards,
+      // summons, conjures) lowers the arm through the clip's own recovery.
+      // Channels weave the artist's cast loop. Every instant is silent: no
+      // gesture, no emote.
+      cast: 'Cast_Raise',
+      castHoldPointSeconds: 1.0,
+      castPlayOut: ['Cast_Raise'],
+      castByAbility: { arcane_missiles: 'Cast_Loop', evocation: 'Cast_Loop' },
       attackByAbility: {
-        fireball: 'Cast_Fire',
-        scorch: 'Cast_Fire',
-        fire_blast: 'Cast_Fire',
-        pyroblast: 'Cast_Fire',
-        combustion: 'Cast_Fire',
-        meteor: 'Cast_Fire',
-        flamestrike: 'Cast_Fire',
-        fireball_form: 'Cast_Fire',
-        frostbolt: 'Cast_Frost',
-        ice_lance: 'Cast_Frost',
-        frozen_orb: 'Cast_Frost',
-        blizzard: 'Cast_Frost',
-        glacial_spike: 'Cast_Frost',
-        ice_barrier: 'Cast_Frost',
-        arcane_missiles: 'Cast_Arcane',
-        arcane_surge: 'Cast_Arcane',
-        arcane_intellect: 'Cast_Arcane',
-        temporal_barrier: 'Cast_Arcane',
-        temporal_echo: 'Cast_Arcane',
-        temporal_cascade: 'Cast_Arcane',
-        frost_nova: 'Cast_Nova',
-        arcane_explosion: 'Cast_Nova',
-        dragons_breath: 'Cast_Nova',
-        polymorph: 'Cast_Polymorph',
+        fireball: 'Cast_Shoot',
+        frostbolt: 'Cast_Shoot',
+        flurry: 'Cast_Shoot',
+        glacial_spike: 'Cast_Shoot',
+        pyroblast: 'Cast_Shoot',
+        arcane_surge: 'Cast_Shoot',
+        scorch: 'Cast_Shoot',
+        flamestrike: 'Cast_Shoot',
+        blizzard: 'Cast_Shoot',
+        rings_of_frost: 'Cast_Shoot',
+        polymorph: 'Cast_Shoot',
+        temporal_hourglass: 'Cast_Shoot',
+        glacial_front: 'Cast_Shoot',
+        dragons_breath: 'Cast_Shoot',
       },
     },
-    // Ability-specific spellcast clips (scripts/build_mage_ability_anims.mjs):
-    // a mesh-free clip donor GLB baked off this rig's own spellcasting poses.
-    animUrls: [`${PLAYERS}/mage_ability_anims.glb`, `${PLAYERS}/mage_hit_variety_anims.glb`],
-    // The hat and cape render regardless of this list: the current mage.glb
-    // rigs every accessory as a SkinnedMesh, and the show allowlist
-    // (assets.ts) only hides non-skinned nodes. The hatted silhouette is the
-    // sanctioned mage look; listing Mage_Cape is inert but kept as intent.
-    show: ['Mage_Cape'],
-    // Offhand slot: renders only an equipped model-mapped offhand (the
-    // inscription tomes); empty stays empty. See the priest note.
     attach: [
       { url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' },
       { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l', swapOnly: true },
     ],
     weaponSlots: [0],
     offhandSlot: 1,
-  }),
-  player_warlock: swims({
-    url: `${PLAYERS}/mage.glb`,
-    height: HUMANOID_H,
+  },
+  // The warlock on the WOC body: the wand auto attack is the throw itself,
+  // every timed bolt and curse releases through it, Drain Life channels the
+  // cast loop, the summons lower the arm. Life Tap, Demon Skin, the pet
+  // commands and every other instant play nothing.
+  player_warlock: {
+    // the male base and animation library, streamed on demand (woc_armor_core.ts)
+    url: `${PLAYERS}/woc/base_male.glb`,
+    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
+    lazyPreload: true,
+    height: HUMANOID_H * 1.1,
+    authoredAtlas: true,
+    envSheen: WOC_ENV_SHEEN,
+    wocCharacter: WOC_WARLOCK_MANIFEST,
+    hideWeaponsWhileSwimming: true,
+    attackTimeScale: 1,
+    swimRise: { stroke: -0.65, tread: -1.0 },
+    // The backpedal is authored at its game speed (0.65 x the 7 yd/s run).
+    walkBackRef: 4.55,
+    rightShoulderSheathe: true,
     clips: {
-      ...kaykit(['Spellcast_Shoot']), // wand zap reads better than a staff bonk
-      // Ability-specific spellcasts (scripts/build_warlock_ability_anims.mjs,
-      // issue #2889): the warlock had zero attackByAbility overrides across
-      // its kit, so every spell played the same wand zap. Mapped by school
-      // (src/sim/content/classes.ts): shadow curses get the decisive clawed
-      // point (Warlock_Cast_Shadow), fire gets the scrappier ignite flick
-      // (Warlock_Cast_Fire), the life-drain channel gets its own sustained
-      // pull (Warlock_Cast_Drain), and every instant-cast (castTime 0)
-      // ability, regardless of mechanic, shares one fast decisive gesture
-      // (Warlock_Cast_Burst), the same call the mage batch made folding
-      // three different AoE mechanics into one Cast_Nova. This maps the
-      // whole non-pet kit: the seven summon_* pet abilities are channels
-      // with no combat swing to author, excluded the same way the hunter
-      // batch excluded tame_beast/dismiss_pet/revive_pet.
+      ...woc(['Cast_Shoot']),
+      meleeAttack: ['1H_Chop', '1H_Slash'],
+      shoutEmote: null,
+      // A timed cast raises the casting arm (Cast_Raise) and holds it at the
+      // top until the cast lands: a bolt then releases through the throw
+      // (Cast_Shoot, attackByAbility below), anything else (heals, wards,
+      // summons, conjures) lowers the arm through the clip's own recovery.
+      // Channels weave the artist's cast loop. Every instant is silent: no
+      // gesture, no emote.
+      cast: 'Cast_Raise',
+      castHoldPointSeconds: 1.0,
+      castPlayOut: ['Cast_Raise'],
+      castByAbility: { drain_life: 'Cast_Loop' },
       attackByAbility: {
-        shadow_bolt: 'Warlock_Cast_Shadow',
-        corruption: 'Warlock_Cast_Shadow',
-        curse_of_agony: 'Warlock_Cast_Shadow',
-        immolate: 'Warlock_Cast_Fire',
-        searing_pain: 'Warlock_Cast_Fire',
-        rain_of_fire: 'Warlock_Cast_Fire',
-        drain_life: 'Warlock_Cast_Drain',
-        shadowburn: 'Warlock_Cast_Burst',
-        fear: 'Warlock_Cast_Burst',
-        life_tap: 'Warlock_Cast_Burst',
-        demon_skin: 'Warlock_Cast_Burst',
-        spell_lock: 'Warlock_Cast_Burst',
+        shadow_bolt: 'Cast_Shoot',
+        immolate: 'Cast_Shoot',
+        corruption: 'Cast_Shoot',
+        soul_lance: 'Cast_Shoot',
+        searing_pain: 'Cast_Shoot',
+        soul_harvest: 'Cast_Shoot',
+        chaos_bolt: 'Cast_Shoot',
+        fear: 'Cast_Shoot',
+        needle_of_fate: 'Cast_Shoot',
       },
     },
-    // Ability-specific spellcast clips (scripts/build_warlock_ability_anims.mjs):
-    // a mesh-free clip donor GLB baked off this same mage.glb rig's own
-    // poses, but its OWN clip names and timing, not a reuse of the mage's
-    // mage_ability_anims.glb (the two GLBs are wired onto different
-    // VisualDefs and never load together).
-    animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`, `${PLAYERS}/warlock_ability_anims.glb`],
-    show: [],
     attach: [
       { url: `${WEAPONS}/wand.glb`, bone: 'handslot.r' },
       {
-        url: `${WEAPONS}/spellbook_open.glb`,
+        // The starter spellbook, laid out like the open kit book it replaced. This
+        // rig carries no Spellbook_open accessory node (the kit rigs' seat for the
+        // book), so the book sits on the hand slot itself; half a turn about its
+        // spine opens it toward the warlock instead of away from him (owner call).
+        // The turn is the hand's alone: the carry takes its pose from back_grips.
+        url: `${WEAPONS}/spellbook_starter.glb`,
         bone: 'handslot.l',
-        gripRef: 'Spellbook_open',
+        rotationY: Math.PI,
       },
     ],
-    weaponSlots: [0], // mainhand (wand) swaps; spellbook offhand stays
-    // Faint violet lift only, to tell this apart from the mage/priest models
-    // it shares mage.glb with (same one-material-per-rig caveat as those two:
-    // this multiplies skin and hair along with the robe). 0.45 read as a
-    // saturated full-body purple wash on character create (issue #2678);
-    // dropped further to 0.12, the same faint-wash strength the manifest
-    // already uses elsewhere (mob_troll) to differentiate a shared model
-    // without hiding its base texture.
-    tint: 0x8d5fd3,
-    tintStrength: 0.12,
-  }),
-  player_druid: swims({
-    url: `${PLAYERS}/druid.glb`,
-    height: HUMANOID_H,
+    weaponSlots: [0],
+  },
+  // The druid on the WOC body (the caster form; bear, cat and travel forms are
+  // their own visuals). Wrath and Starfire release through the throw, Roots and
+  // Hibernate too, Hurricane channels the cast loop, the heals lower the arm.
+  // Moonfire, Faerie Fire, the buffs and the shapeshifts play nothing.
+  player_druid: {
+    // the male base and animation library, streamed on demand (woc_armor_core.ts)
+    url: `${PLAYERS}/woc/base_male.glb`,
+    animUrls: [`${PLAYERS}/woc/anims_male.glb`],
+    lazyPreload: true,
+    height: HUMANOID_H * 1.1,
+    authoredAtlas: true,
+    envSheen: WOC_ENV_SHEEN,
+    wocCharacter: WOC_DRUID_MANIFEST,
+    hideWeaponsWhileSwimming: true,
+    attackTimeScale: 1,
+    swimRise: { stroke: -0.65, tread: -1.0 },
+    // The backpedal is authored at its game speed (0.65 x the 7 yd/s run).
+    walkBackRef: 4.55,
+    rightShoulderSheathe: true,
     clips: {
-      ...kaykit(['2H_Melee_Attack_Chop']),
-      // Ability-specific spellcasts (scripts/build_druid_ability_anims.mjs,
-      // issue #2889): the druid's caster kit had zero attackByAbility
-      // overrides, so every nature/arcane spell played the same staff chop.
-      // Scope is the caster side only, bear/cat/travel forms already have
-      // their own dedicated ClipMap constants and are untouched here. Mapped
-      // primarily by school (src/sim/content/classes.ts), the same signal
-      // batch 1 used for the mage; named exceptions cover heal, root/CC, and
-      // channel roles, since the nature school alone spans very different
-      // actions. Not every ability in the kit is listed: shapeshift and
-      // melee-form abilities keep their own clips, and this is a
-      // representative slice of the caster kit, not exhaustive coverage.
+      ...woc(['2H_Chop']),
+      shoutEmote: null,
+      // A timed cast raises the casting arm (Cast_Raise) and holds it at the
+      // top until the cast lands: a bolt then releases through the throw
+      // (Cast_Shoot, attackByAbility below), anything else (heals, wards,
+      // summons, conjures) lowers the arm through the clip's own recovery.
+      // Channels weave the artist's cast loop. Every instant is silent: no
+      // gesture, no emote.
+      cast: 'Cast_Raise',
+      castHoldPointSeconds: 1.0,
+      castPlayOut: ['Cast_Raise'],
+      castByAbility: { hurricane: 'Cast_Loop', tranquility: 'Cast_Loop' },
       attackByAbility: {
-        wrath: 'Cast_Nature',
-        faerie_fire: 'Cast_Nature',
-        thorns: 'Cast_Nature',
-        mark_of_the_wild: 'Cast_Nature',
-        insect_swarm: 'Cast_Nature',
-        moonfire: 'Cast_Starfall',
-        starfire: 'Cast_Starfall',
-        healing_touch: 'Cast_Nurture',
-        regrowth: 'Cast_Nurture',
-        rejuvenation: 'Cast_Nurture',
-        entangling_roots: 'Cast_Roots',
-        hibernate: 'Cast_Roots',
-        hurricane: 'Cast_Storm',
+        wrath: 'Cast_Shoot',
+        starfire: 'Cast_Shoot',
+        entangling_roots: 'Cast_Shoot',
+        hibernate: 'Cast_Shoot',
       },
     },
-    // Ability-specific spellcast clips (scripts/build_druid_ability_anims.mjs):
-    // a mesh-free clip donor GLB baked off this rig's own spellcasting poses,
-    // alongside the hit-variety donor.
-    animUrls: [`${PLAYERS}/druid_hit_variety_anims.glb`, `${PLAYERS}/druid_ability_anims.glb`],
-    // dedicated druid model (own texture, ships a Backpack mesh)
-    // Offhand slot: renders only an equipped model-mapped offhand (the
-    // inscription tomes); empty stays empty. See the priest note.
     attach: [
       { url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' },
       { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l', swapOnly: true },
     ],
     weaponSlots: [0],
     offhandSlot: 1,
-  }),
+  },
 
   // -- cosmetic body skin (class-agnostic; both the skin preview and a live
   //    player whose skinCatalog === 'mech', see visualKeyFor) ----------------
@@ -2331,7 +2648,7 @@ export const VISUALS: Record<string, VisualDef> = {
     // player class; its GLB shipped with no clips, so the full KayKit set is
     // baked in from knight.glb (scripts/bake_mech_anims.mjs) — these names now
     // resolve like any other class. Lazy-loaded; see preloadMechAssets().
-    clips: kaykit(['1H_Melee_Attack_Chop']),
+    clips: { ...kaykit(['1H_Melee_Attack_Chop']), wandAttack: 'Spellcast_Shoot' },
     // Same bow-draw donor the hunter loads. The mech is the one body that shows
     // a HUNTER's equipped weapon, so it is also the one body besides the hunter
     // that can display a bow skin, and Bow_Draw_Shot targets the same KayKit
@@ -3940,7 +4257,8 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: { ...kaykit(['1H_Melee_Attack_Chop']), combatIdle: 'Block', combatIdleHold: true },
     show: ['Knight_Helmet'],
     attach: [
-      { url: `${WEAPONS}/spear_a.glb`, bone: 'handslot.r' },
+      // spear_a left with the character pack; the pack's NPC spear (NPC_PROP_ATTACH.spear).
+      { url: `${WEAPONS}/spear_rare_b_ember.glb`, bone: 'handslot.r' },
       { url: `${WEAPONS}/shield_round.glb`, bone: 'handslot.l' },
     ],
     tint: 'entity',
@@ -3966,7 +4284,8 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: { ...kaykit(['1H_Melee_Attack_Chop']), combatIdle: 'Block', combatIdleHold: true },
     show: ['Paladin_Helmet', 'Paladin_Cape'],
     attach: [
-      { url: `${WEAPONS}/hammer_a.glb`, bone: 'handslot.r' },
+      // hammer_a left with the character pack; the pack's NPC hammer (NPC_PROP_ATTACH.hammer).
+      { url: `${WEAPONS}/hammer_rare_b_ember.glb`, bone: 'handslot.r' },
       { url: `${WEAPONS}/shield_badge.glb`, bone: 'handslot.l' },
     ],
     tint: 'entity',
@@ -4016,12 +4335,15 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 0xc9b98a,
     tintStrength: 0.3, // brown-robed brothers of the chapel
   },
-  // Brother Aldric keeps his pre-v0.7 model (the old chars/mage.glb, restored as
-  // mage_classic.glb with the staff built into the mesh). Aldric-only — every
-  // other npc_mage uses the new KayKit full-pack model from #396.
+  // Brother Aldric's pre-v0.7 model (the old chars/mage.glb, restored as
+  // mage_classic.glb with the staff built into the mesh). He wears an authored
+  // look on the priest's WOC body now (npc_looks.ts), so this is only his stock
+  // rig: nothing in the world draws it, and its files are fetched on demand
+  // rather than in every client's boot download (they are named by no other def).
   npc_aldric: {
     url: `${PLAYERS}/mage_classic.glb`,
     animUrls: [`${PLAYERS}/mage_classic_hit_variety_anims.glb`],
+    lazyPreload: true,
     height: HUMANOID_H,
     clips: kaykit(['2H_Melee_Attack_Chop']),
     show: ['2H_Staff'],
@@ -4076,9 +4398,12 @@ export const VISUALS: Record<string, VisualDef> = {
   // door. Uses the KayKit paladin, one of the newer full-pack adventurer models
   // (unused elsewhere), for a sturdier, holier silhouette than the old hooded
   // rogue. Ships its accessories (helm/cape/shield) by default (no show filter).
+  // He wears an authored look on the paladin's WOC body now (npc_looks.ts), so
+  // this is only his stock rig: fetched on demand, like npc_aldric above.
   npc_reliquary_keeper: {
     url: `${PLAYERS}/paladin.glb`,
     animUrls: [`${PLAYERS}/paladin_hit_variety_anims.glb`],
+    lazyPreload: true,
     height: HUMANOID_H,
     clips: kaykit(['1H_Melee_Attack_Chop']),
   },
@@ -4812,8 +5137,8 @@ export const VISUALS: Record<string, VisualDef> = {
 // synthesized per-class attacks (Shield_Bash, Garrote_Choke, Kick_A, ...)
 // exist only there, and every player body shares KayKit's Rig_Medium, so its
 // clips bind onto the modular skeleton by node name, the swim/bow clip packs
-// are the precedent. No extra fetch: the class GLB is already preloaded as the
-// fixed rig every OTHER entity still wears.
+// are the precedent. Which of these defs still preload at boot is decided where
+// they are generated, below.
 //
 // Deliberately dropped from the class def:
 //  - `show`: the composed body has no baked accessory meshes to allowlist;
@@ -4823,21 +5148,640 @@ export const VISUALS: Record<string, VisualDef> = {
 //    colour belongs to the player's skin/hair wheels, and a tint over the
 //    picked skin tone repaints exactly what the player chose.
 // ---------------------------------------------------------------------------
+// The retired fixed KayKit warrior rig (knight.glb), kept for two NON-player
+// consumers now that the playable warrior rides the WOC body:
+//  - the modular library's own `player_warrior_modular` def below: a class on
+//    a WOC body (WOC_BODY_CLASSES) never composes, so that def is unreachable
+//    for its own players, but the library's fallback key (MODULAR_WARRIOR_KEY)
+//    and the composed-body test bed still name it, and it must keep deriving
+//    from a Rig_Medium rig (the WOC clips would bind onto the library's bones
+//    by name against the wrong bind pose, and drag the WOC part manifest along);
+//  - the Nythraxis phase-2 court's vision of Captain Aldren (mob_vision_aldren),
+//    which borrowed the warrior's key and keeps the knight look it shipped with.
+export const KAYKIT_KNIGHT_WARRIOR: VisualDef = swims({
+  url: `${PLAYERS}/knight.glb`,
+  // Every clip knight.glb ships is already wired somewhere in this block
+  // (idle/walk/attack/hit/emotes account for the full shipped library, no
+  // spare donor pose), so Vaulting Charge (issue #2889 batch, verified against
+  // the warrior's real kit in src/sim/content/classes.ts, not assumed) is
+  // authored by pose-sample-and-blend (scripts/build_warrior_ability_anims.mjs)
+  // instead of pointed at an unused clip.
+  animUrls: [
+    `${PLAYERS}/knight_hit_variety_anims.glb`,
+    `${PLAYERS}/warrior_ability_anims.glb`,
+    `${PLAYERS}/warrior_fury_anims.glb`,
+    `${PLAYERS}/warrior_contact_anims.glb`,
+  ],
+  height: HUMANOID_H,
+  clips: {
+    ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    attackByHand: {
+      twohand: '2H_Melee_Attack_Chop',
+      dualwield: 'Dualwield_Melee_Attack_Chop',
+    },
+    castByAbility: { bladestorm: 'Warrior_Bladestorm_Loop' },
+    rush: 'Warrior_Rush_Loop',
+    rushArrival: 'Warrior_Onrush_Arrival',
+    castTimeScaleByAbility: { bladestorm: 1 },
+    attackTimeScaleByAbility: { heroic_leap: 1 },
+    attackByAbility: {
+      charge: 'Warrior_Rush_Loop',
+      intervene: 'Warrior_Rush_Loop',
+      mortal_strike: 'Warrior_Maiming_Strike',
+      execute: 'Warrior_Early_Grave',
+      slam: 'Warrior_Brute_Swing',
+      red_harvest: 'Fury_Red_Harvest',
+      breachmaker: 'Warrior_Breachmaker',
+      // Native shield drive with a planted lower body and a held contact.
+      // scripts/build_warrior_contact_anims.mjs bakes foot locking offline.
+      shield_slam: 'Warrior_Shieldcrack',
+      raging_gale: 'Fury_Twinstrike',
+      bloodthirst: 'Warrior_Bloodletting',
+      battle_shout: 'Warrior_Iron_Bellow',
+      demoralizing_shout: 'Warrior_Direhowl',
+      emboldening_roar: 'Warrior_Emboldening_Roar',
+      defiant_bellow: 'Warrior_Defiant_Bellow',
+      rallying_cry: 'Warrior_Valor_Roar',
+      intimidating_shout: 'Warrior_Intimidating_Shout',
+      piercing_howl: 'Warrior_Piercing_Howl',
+      // Reaping Arc turns through all surrounding enemies; Revenge is frontal.
+      cleave: 'Warrior_Reaping_Arc',
+      revenge: 'Warrior_Revenge',
+      thunder_clap: 'Warrior_Quaking_Blow',
+      faultline: 'Warrior_Faultline',
+      heroic_strike: 'Warrior_Reaver_Strike',
+      overpower: 'Warrior_Redhand',
+      hamstring: 'Warrior_Hobbling_Cut',
+      sunder_armor: 'Warrior_Armor_Shear',
+      storm_bolt: 'Warrior_Storm_Bolt',
+      sanguine_aura: 'Warrior_Sanguine_Aura',
+      sweeping_strikes: 'Warrior_Widening_Arc',
+      battle_stance: 'Warrior_Battle_Stance',
+      defensive_stance: 'Warrior_Guarded_Stance',
+      berserker_stance: 'Warrior_Berserker_Stance',
+      raised_guard: 'Warrior_Raised_Guard',
+      iron_resolve: 'Warrior_Iron_Resolve',
+      // Jawcrack drives the held weapon's guard into the interrupt:
+      // planted feet and a compact contact hold preserve both grips.
+      pummel: 'Warrior_Jawcrack',
+      // Vaulting Charge is a position-targeted jump, not a swing: the bespoke
+      // pose-sample-and-blend clip (coil, airborne, driven two-hand slam on
+      // landing). It carries no castFx and resolves no target entity, so it
+      // completes through the renderer's generic 'selfCast' cue, which only
+      // draws a body gesture via this exact attackByAbility entry
+      // (CharacterVisual.hasAttackClipOverride, src/render/ability_vfx/
+      // painter.ts's non-contact 'selfCast' branch); with no entry it plays
+      // nothing at all on the body.
+      heroic_leap: 'Warrior_Heroic_Leap',
+      // A decisive cut followed by an upright, confident recovery.
+      victory_rush: 'Warrior_Victory_Rush',
+      // Native resource ceremonies: inward clench, outward pressure release,
+      // and an aggressive opening of both arms. Each recovers inside a GCD.
+      taunt: 'Warrior_Goad',
+      furious_mending: 'Warrior_Furious_Mending',
+      whirlwind: 'Warrior_Bladed_Gyre',
+      bloodrage: 'Warrior_Blood_Toll',
+      berserker_rage: 'Warrior_Seething_Fury',
+      recklessness: 'Warrior_Recklessness',
+      // The actual blade supplies its distinct defensive presentation.
+      die_by_sword: 'Warrior_Sword_Guard',
+      // A planted rise carries Avatar's physical transformation.
+      avatar: 'Warrior_Avatar',
+    },
+  },
+  show: ['Knight_Helmet', 'Knight_Cape'], // v2 knight dropped the built-in Badge_Shield mesh
+  attach: [
+    { url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' },
+    { url: `${WEAPONS}/shield_round.glb`, bone: 'handslot.l' },
+  ],
+  weaponSlots: [0],
+  offhandSlot: 1,
+});
+// The KayKit paladin as it shipped before the WOC body took the class (the
+// dedicated helmeted model, its donor clip GLBs and the two synthesized attack
+// clips). Kept as the `player_paladin_modular` baseline the modular loop below
+// derives from, so the creation turntable and every KayKit-composed path keep
+// a fully bound clip map; it draws no player anymore.
+export const KAYKIT_PALADIN: VisualDef = swims({
+  url: `${PLAYERS}/paladin.glb`,
+  height: HUMANOID_H,
+  clips: {
+    ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    attackByHand: { twohand: '2H_Melee_Attack_Chop' },
+    // Ability-specific clips: the composed union of the overhaul's
+    // Dawnreaver entries (final_edict/sunward_disc/bastion_sweep) and the
+    // #2889 follow-up batch mapped by the ability's EFFECT TYPE (groundAoE,
+    // stun, absorb/defensive selfBuff, buffTarget/aura selfBuff, heal).
+    // The batch's judgement row is dropped: the overhaul retired that id
+    // (final_edict is its successor and carries the Verdict clip). Not
+    // every ability is listed; unlisted ids keep the default chop.
+    attackByAbility: {
+      final_edict: 'Paladin_Templars_Verdict_1H',
+      sunward_disc: 'Spellcast_Raise',
+      bastion_sweep: 'Paladin_Bastion_Sweep',
+      consecration: 'Cast_Consecrate',
+      hammer_of_justice: 'Cast_HammerBash',
+      divine_protection: 'Cast_Ward',
+      sacred_bulwark: 'Cast_Ward',
+      blessing_of_might: 'Cast_Blessing',
+      devotion_aura: 'Cast_Blessing',
+      retribution_aura: 'Cast_Blessing',
+      righteous_fury: 'Cast_Blessing',
+      holy_light: 'Cast_HolyMend',
+      flash_of_light: 'Cast_HolyMend',
+      lay_on_hands: 'Cast_HolyMend',
+    },
+    attackTimeScaleByAbility: { final_edict: 1, sunward_disc: 1.8, bastion_sweep: 1 },
+  },
+  // Ability-specific clips (scripts/build_paladin_ability_anims.mjs): a
+  // mesh-free clip donor GLB baked off this rig's own poses.
+  animUrls: [`${PLAYERS}/paladin_hit_variety_anims.glb`, `${PLAYERS}/paladin_ability_anims.glb`],
+  // dedicated paladin model (helmeted variant): ships its own Cape + Helmet
+  // meshes and texture, so no show-list/tint. Shield + paladin hammer arrive
+  // in the weapons pass; the gripped axe holds the slot until then.
+  attach: [
+    { url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' },
+    { url: `${WEAPONS}/shield_square.glb`, bone: 'handslot.l' },
+  ],
+  weaponSlots: [0],
+  offhandSlot: 1,
+});
+
+VISUALS.mob_vision_aldren = { ...KAYKIT_KNIGHT_WARRIOR, show: ['Knight_Helmet', 'Knight_Cape'] };
+
+// The KayKit class rigs as they shipped before the WOC bodies took the seven
+// remaining classes (2026-09-18 equipment sets): their donor clip GLBs and
+// per-ability clip maps intact. Each is the `player_<class>_modular` baseline
+// the modular loop below derives from, so the composed-body paths keep a fully
+// bound clip map; none draws a player anymore.
+export const KAYKIT_HUNTER: VisualDef = swims({
+  url: `${PLAYERS}/ranger.glb`,
+  height: HUMANOID_H,
+  clips: {
+    ...kaykit(['2H_Ranged_Shoot']),
+    // Ability-specific attacks (scripts/build_hunter_ability_anims.mjs,
+    // issue #2889): the hunter had zero attackByAbility overrides across
+    // its kit, so every ability played the same crossbow-shoulder shot.
+    // The three melee abilities (range 0) get a bespoke swing each; the
+    // ranged shots split into a quick snap (every instant no-cast-time
+    // shot) versus the slow full draw Long Draw's own 3.0s cast time
+    // names; Volley gets its own rapid-pulse barrage. The three aspect
+    // toggles plus Fevered Draw are self-buffs with no swing to author, so
+    // they point straight at ranger.glb's own already-baked
+    // 'Spellcast_Raise' clip, the same no-bake pattern player_warrior's
+    // sanguine_aura already uses. Not every ability in the kit is listed:
+    // this batch's representative slice (tame_beast/dismiss_pet/revive_pet
+    // are pet-command channels with no combat swing to author, matching
+    // batch 1's own utility/summon exclusions for the mage).
+    attackByAbility: {
+      raptor_strike: 'Hunter_Melee_Gut',
+      mongoose_bite: 'Hunter_Melee_Counter',
+      wing_clip: 'Hunter_Melee_Clip',
+      serpent_sting: 'Hunter_Shot_Snap',
+      arcane_shot: 'Hunter_Shot_Snap',
+      concussive_shot: 'Hunter_Shot_Snap',
+      counter_shot: 'Hunter_Shot_Snap',
+      aimed_shot: 'Hunter_Shot_LongDraw',
+      volley: 'Hunter_Shot_Volley',
+      aspect_of_the_hawk: 'Spellcast_Raise',
+      aspect_of_the_monkey: 'Spellcast_Raise',
+      aspect_of_the_cheetah: 'Spellcast_Raise',
+      rapid_fire: 'Spellcast_Raise',
+    },
+  },
+  // Bow-draw clips for the Season 1 bow skins (scripts/build_bow_anims.mjs):
+  // with a bow displayed the shot plays a draw instead of the crossbow
+  // shoulder-aim (visual.ts weaponSkinAttackClips). The cast-time hold pose
+  // (bow_hold_anim.glb) and the ability-specific attack clips
+  // (scripts/build_hunter_ability_anims.mjs) ride the same mesh-free donor
+  // GLB mechanism, appended alongside: all GLBs' clips load together.
+  animUrls: [
+    `${PLAYERS}/bow_anims.glb`,
+    `${PLAYERS}/bow_hold_anim.glb`,
+    `${PLAYERS}/hunter_ability_anims.glb`,
+    `${PLAYERS}/ranger_hit_variety_anims.glb`,
+  ],
+  // dedicated ranger model: the quiver is a built-in mesh, so it's no longer
+  // a separate chest attachment
+  attach: [{ url: `${WEAPONS}/crossbow_1handed.glb`, bone: 'handslot.r' }],
+});
+export const KAYKIT_ROGUE: VisualDef = swims({
+  url: `${PLAYERS}/rogue.glb`,
+  height: HUMANOID_H,
+  clips: {
+    ...kaykit(['Dualwield_Melee_Attack_Chop']),
+    attackByAbility: {
+      // Throat Wire is a wire strangle, not a dagger swing: the synthesized
+      // two-handed choke (scripts/_add_garrote_choke_anim.mjs) reaches to
+      // neck height and yanks back to the chest with a brief hold.
+      garrote: 'Garrote_Choke',
+      // Boot is a kick, not a swing: the synthesized snap kick
+      // (scripts/_add_boot_kick_anim.mjs) chambers the knee and fires the
+      // leg forward at gut height.
+      kick: 'Kick_A',
+      // Dirt Toss throws dirt, not daggers: the synthesized crouch-scoop
+      // and underhand fling (scripts/_add_dirt_throw_anim.mjs).
+      blind: 'Dirt_Throw',
+      // Rest of the kit (scripts/build_rogue_ability_anims.mjs, issue
+      // #2889): pose-sample-and-blend clips off rogue.glb's own donor
+      // poses. Wicked Slash is the combo-builder poke; Eye Jab and Sap
+      // share its silhouette since both are instant single-target
+      // debilitating strikes with no unique read of their own.
+      sinister_strike: 'Rogue_Quick_Strike',
+      gouge: 'Rogue_Quick_Strike',
+      sap: 'Rogue_Quick_Strike',
+      // Craven Thrust drives the dagger in from behind.
+      backstab: 'Rogue_Backstab',
+      // Lurker's Strike is the kit's biggest single hit (2.5x weapon,
+      // stealth-gated): its own bigger, more telegraphed lunge.
+      ambush: 'Rogue_Ambush',
+      // Gut Punch and Low Blow both land at gut/kidney height.
+      cheap_shot: 'Rogue_Low_Blow',
+      kidney_shot: 'Rogue_Low_Blow',
+      // Combo-spending finishers read as one decisive two-blade cut.
+      eviscerate: 'Rogue_Finisher_Slash',
+      rupture: 'Rogue_Finisher_Slash',
+      expose_armor: 'Rogue_Finisher_Slash',
+      // Ghostfoot is a defensive dodge buff: rogue.glb's own already-baked
+      // 'Block' guard, no bake needed (the pattern player_warrior's
+      // raised_guard already uses).
+      evasion: 'Block',
+      // Cutthroat Tempo, Smokefade, Quickened Blood, and Duskveil are all
+      // self-buff/stealth toggles with no combat swing to author: rogue.
+      // glb's own already-baked 'Spellcast_Raise', the pattern player_
+      // warrior's sanguine_aura and the hunter batch's aspect toggles both
+      // use. Adder's Bite and Festering Venom (the poison weapon imbues)
+      // are excluded, the same call the mage batch made for its own
+      // utility/summon abilities.
+      slice_and_dice: 'Spellcast_Raise',
+      vanish: 'Spellcast_Raise',
+      adrenaline_rush: 'Spellcast_Raise',
+      stealth: 'Spellcast_Raise',
+    },
+  },
+  // Ability-specific attack clips (scripts/build_rogue_ability_anims.mjs).
+  animUrls: [`${PLAYERS}/rogue_hit_variety_anims.glb`, `${PLAYERS}/rogue_ability_anims.glb`],
+  show: ['Rogue_Cape'],
+  attach: [
+    { url: `${WEAPONS}/dagger.glb`, bone: 'handslot.r' },
+    { url: `${WEAPONS}/dagger.glb`, bone: 'handslot.l' },
+  ],
+  weaponSlots: [0],
+  offhandSlot: 1,
+});
+export const KAYKIT_PRIEST: VisualDef = swims({
+  url: `${PLAYERS}/mage.glb`,
+  animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
+  height: HUMANOID_H,
+  clips: {
+    ...kaykit(['2H_Melee_Attack_Chop']),
+    attackByAbility: {
+      // Lingering Grace is a blessing, not a staff swing: the one-hand
+      // raise (a stock mage.glb clip) reads as the priest offering the HoT.
+      renew: 'Spellcast_Raise',
+    },
+  },
+  // The priest's Light: a warm golden halo ring above the crown. The mage
+  // model's pointed hat is canon here, and at the default lift the ring
+  // plane crosses the hat cone where it is wide, clipping through it; +0.15
+  // raises the plane to the cone tip, where the default-size ring clears it
+  // on every side (tuned by screenshot against the current mage.glb; a hat
+  // reshape in an asset update means re-tuning). Kept just below the hat's
+  // bounding-box top so portrait/turntable framing is unchanged for priests.
+  halo: 0xffd766,
+  haloUpOffset: 1.45,
+  // show is a no-op for the hat/cape: the current mage.glb rigs every
+  // accessory as a SkinnedMesh, and the allowlist filter (assets.ts) only
+  // hides non-skinned nodes, so the hat always renders. Sanctioned look.
+  show: [],
+  // The offhand slot renders ONLY an equipped, model-mapped offhand item
+  // (the phase 06 inscription tomes are the first): offhandAttachDef skips
+  // the slot entirely when the offhand is empty or unmapped, so the empty
+  // hand look is unchanged. The base url never renders and is already in
+  // the preload set via the warlock's fixed spellbook; swapOnly keeps it
+  // out of the wiki figures too.
+  attach: [
+    { url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' },
+    { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l', swapOnly: true },
+  ],
+  weaponSlots: [0],
+  offhandSlot: 1,
+  // Faint warm lift only, to tell this apart from the mage/warlock models it
+  // shares mage.glb with. The whole rig is ONE merged material/atlas (skin,
+  // hair, and robe together), so this lerp multiplies the entire body, not
+  // just the cloth. Measured: 0xf0e9d6 is near white, so even at 0.5 the old
+  // strength only shifted the body by roughly (0.983, 0.980, 0.956), a
+  // near-no-op (issue #2678); dropped to 0.12 anyway for consistency with
+  // shaman/warlock, where the saturated tints DID flatten the face and
+  // hands at their old strengths. Kept at the same faint-wash strength the
+  // manifest already uses elsewhere (mob_troll) to differentiate a shared
+  // model without hiding its base texture.
+  tint: 0xf0e9d6,
+  tintStrength: 0.12,
+});
+export const KAYKIT_SHAMAN: VisualDef = swims({
+  url: `${PLAYERS}/barbarian.glb`,
+  height: HUMANOID_H,
+  clips: {
+    ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    attackByHand: { twohand: '2H_Melee_Attack_Chop' },
+    // Ability-specific spellcasts (scripts/build_shaman_ability_anims.mjs,
+    // issue #2889): the shaman had zero attackByAbility overrides across
+    // its kit, so every spell played the same melee chop/slice. Mapped by
+    // school (src/sim/content/classes.ts): Cast_Bolt is the class's
+    // signature nature bolt (its longest cast, 1.5 to 3.0s); Earthen/
+    // Cinder/Rime Jolt are all instant (0s cast) and differ only in damage
+    // school, so they share Cast_Shock's snappy point-and-release;
+    // Mending Waters and the Spiritcall signature Chain Heal share
+    // Cast_Heal's sustained mending channel instead of a sharp release;
+    // Earthquake borrows the two-hand chop's committed downswing energy
+    // for Cast_Quake, the same "slam and radiate outward" read the mage's
+    // Cast_Nova makes; Ancestral Strike (physical) gets its own charged
+    // diagonal slice, Storm_Strike. The weapon imbues (Stonebound,
+    // Pyrebrand, Rimebound Weapon) and the short self buffs (Shadewolf,
+    // Primal Mastery) have no swing to author, so they read fine on the
+    // rig's existing Spellcast_Raise gesture, the same no-bake call the
+    // priest's renew and the warlock's sanguine_aura make; Thunder
+    // Ward reads as a defensive ward instead, so it reuses Block, the
+    // same call the warrior's raised_guard makes. This covers every
+    // ability tagged class: 'shaman' in classes.ts.
+    attackByAbility: {
+      lightning_bolt: 'Cast_Bolt',
+      earth_shock: 'Cast_Shock',
+      flame_shock: 'Cast_Shock',
+      frost_shock: 'Cast_Shock',
+      healing_wave: 'Cast_Heal',
+      chain_heal: 'Cast_Heal',
+      earthquake: 'Cast_Quake',
+      stormstrike: 'Storm_Strike',
+      rockbiter_weapon: 'Spellcast_Raise',
+      flametongue_weapon: 'Spellcast_Raise',
+      frostbrand_weapon: 'Spellcast_Raise',
+      ghost_wolf: 'Spellcast_Raise',
+      elemental_mastery: 'Spellcast_Raise',
+      lightning_shield: 'Block',
+    },
+  },
+  // Ability-specific spellcast clips (scripts/build_shaman_ability_anims.mjs):
+  // a mesh-free clip donor GLB baked off this rig's own spellcasting poses.
+  // The hit-variety donor (scripts/build_hit_variety_anims.mjs, second
+  // KayKit hit-reaction clip, issue #2889 area B) ships alongside it on the
+  // same rig, so both donors are listed here.
+  animUrls: [`${PLAYERS}/barbarian_hit_variety_anims.glb`, `${PLAYERS}/shaman_ability_anims.glb`],
+  show: ['Barbarian_BearHat'], // v2 barbarian renamed Hat→BearHat and dropped the round shield mesh
+  attach: [
+    { url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' },
+    { url: `${WEAPONS}/shield_round.glb`, bone: 'handslot.l' },
+  ],
+  weaponSlots: [0],
+  offhandSlot: 1,
+  // Faint cool lift only: barbarian.glb is one merged material for the whole
+  // body (skin, fur, and leather together), so this lerp hits the face and
+  // hands as hard as the cloth. 0.4 (the class default strength) desaturated
+  // the whole model into a blue-grey wash on character create (issue #2678);
+  // dropped further to 0.12, the same faint-wash strength the manifest
+  // already uses elsewhere (mob_troll) to differentiate a shared model
+  // without hiding its base texture.
+  tint: 0x6f8fc9,
+  tintStrength: 0.12,
+});
+export const KAYKIT_MAGE: VisualDef = swims({
+  url: `${PLAYERS}/mage.glb`,
+  height: HUMANOID_H,
+  clips: {
+    ...kaykit(['2H_Melee_Attack_Chop']),
+    // Ability-specific spellcasts (scripts/build_mage_ability_anims.mjs,
+    // issue #2889): the mage had zero attackByAbility overrides across its
+    // kit, so every spell played the same melee chop. Mapped by school
+    // (src/sim/content/classes.ts) to the school's signature spells;
+    // Polymorph names its own clip (the one ability the clip is written
+    // for by name), and the point-blank AoE bursts (Frost Nova, Arcane
+    // Explosion, Dragon's Breath) share Cast_Nova's "slam and radiate
+    // outward" read regardless of school. Not every ability in the kit is
+    // listed: this is the first batch's representative slice, not
+    // exhaustive coverage (utility/buff/summon abilities keep the default
+    // chop until a later batch).
+    attackByAbility: {
+      fireball: 'Cast_Fire',
+      scorch: 'Cast_Fire',
+      fire_blast: 'Cast_Fire',
+      pyroblast: 'Cast_Fire',
+      combustion: 'Cast_Fire',
+      meteor: 'Cast_Fire',
+      flamestrike: 'Cast_Fire',
+      fireball_form: 'Cast_Fire',
+      frostbolt: 'Cast_Frost',
+      ice_lance: 'Cast_Frost',
+      frozen_orb: 'Cast_Frost',
+      blizzard: 'Cast_Frost',
+      glacial_spike: 'Cast_Frost',
+      ice_barrier: 'Cast_Frost',
+      arcane_missiles: 'Cast_Arcane',
+      arcane_surge: 'Cast_Arcane',
+      arcane_intellect: 'Cast_Arcane',
+      temporal_barrier: 'Cast_Arcane',
+      temporal_echo: 'Cast_Arcane',
+      temporal_cascade: 'Cast_Arcane',
+      frost_nova: 'Cast_Nova',
+      arcane_explosion: 'Cast_Nova',
+      dragons_breath: 'Cast_Nova',
+      polymorph: 'Cast_Polymorph',
+    },
+  },
+  // Ability-specific spellcast clips (scripts/build_mage_ability_anims.mjs):
+  // a mesh-free clip donor GLB baked off this rig's own spellcasting poses.
+  animUrls: [`${PLAYERS}/mage_ability_anims.glb`, `${PLAYERS}/mage_hit_variety_anims.glb`],
+  // The hat and cape render regardless of this list: the current mage.glb
+  // rigs every accessory as a SkinnedMesh, and the show allowlist
+  // (assets.ts) only hides non-skinned nodes. The hatted silhouette is the
+  // sanctioned mage look; listing Mage_Cape is inert but kept as intent.
+  show: ['Mage_Cape'],
+  // Offhand slot: renders only an equipped model-mapped offhand (the
+  // inscription tomes); empty stays empty. See the priest note.
+  attach: [
+    { url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' },
+    { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l', swapOnly: true },
+  ],
+  weaponSlots: [0],
+  offhandSlot: 1,
+});
+export const KAYKIT_WARLOCK: VisualDef = swims({
+  url: `${PLAYERS}/mage.glb`,
+  height: HUMANOID_H,
+  clips: {
+    ...kaykit(['Spellcast_Shoot']), // wand zap reads better than a staff bonk
+    // Ability-specific spellcasts (scripts/build_warlock_ability_anims.mjs,
+    // issue #2889): the warlock had zero attackByAbility overrides across
+    // its kit, so every spell played the same wand zap. Mapped by school
+    // (src/sim/content/classes.ts): shadow curses get the decisive clawed
+    // point (Warlock_Cast_Shadow), fire gets the scrappier ignite flick
+    // (Warlock_Cast_Fire), the life-drain channel gets its own sustained
+    // pull (Warlock_Cast_Drain), and every instant-cast (castTime 0)
+    // ability, regardless of mechanic, shares one fast decisive gesture
+    // (Warlock_Cast_Burst), the same call the mage batch made folding
+    // three different AoE mechanics into one Cast_Nova. This maps the
+    // whole non-pet kit: the seven summon_* pet abilities are channels
+    // with no combat swing to author, excluded the same way the hunter
+    // batch excluded tame_beast/dismiss_pet/revive_pet.
+    attackByAbility: {
+      shadow_bolt: 'Warlock_Cast_Shadow',
+      corruption: 'Warlock_Cast_Shadow',
+      curse_of_agony: 'Warlock_Cast_Shadow',
+      immolate: 'Warlock_Cast_Fire',
+      searing_pain: 'Warlock_Cast_Fire',
+      rain_of_fire: 'Warlock_Cast_Fire',
+      drain_life: 'Warlock_Cast_Drain',
+      shadowburn: 'Warlock_Cast_Burst',
+      fear: 'Warlock_Cast_Burst',
+      life_tap: 'Warlock_Cast_Burst',
+      demon_skin: 'Warlock_Cast_Burst',
+      spell_lock: 'Warlock_Cast_Burst',
+    },
+  },
+  // Ability-specific spellcast clips (scripts/build_warlock_ability_anims.mjs):
+  // a mesh-free clip donor GLB baked off this same mage.glb rig's own
+  // poses, but its OWN clip names and timing, not a reuse of the mage's
+  // mage_ability_anims.glb (the two GLBs are wired onto different
+  // VisualDefs and never load together).
+  animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`, `${PLAYERS}/warlock_ability_anims.glb`],
+  show: [],
+  attach: [
+    { url: `${WEAPONS}/wand.glb`, bone: 'handslot.r' },
+    {
+      url: `${WEAPONS}/spellbook_open.glb`,
+      bone: 'handslot.l',
+      gripRef: 'Spellbook_open',
+    },
+  ],
+  weaponSlots: [0], // mainhand (wand) swaps; spellbook offhand stays
+  // Faint violet lift only, to tell this apart from the mage/priest models
+  // it shares mage.glb with (same one-material-per-rig caveat as those two:
+  // this multiplies skin and hair along with the robe). 0.45 read as a
+  // saturated full-body purple wash on character create (issue #2678);
+  // dropped further to 0.12, the same faint-wash strength the manifest
+  // already uses elsewhere (mob_troll) to differentiate a shared model
+  // without hiding its base texture.
+  tint: 0x8d5fd3,
+  tintStrength: 0.12,
+});
+export const KAYKIT_DRUID: VisualDef = swims({
+  url: `${PLAYERS}/druid.glb`,
+  height: HUMANOID_H,
+  clips: {
+    ...kaykit(['2H_Melee_Attack_Chop']),
+    // Ability-specific spellcasts (scripts/build_druid_ability_anims.mjs,
+    // issue #2889): the druid's caster kit had zero attackByAbility
+    // overrides, so every nature/arcane spell played the same staff chop.
+    // Scope is the caster side only, bear/cat/travel forms already have
+    // their own dedicated ClipMap constants and are untouched here. Mapped
+    // primarily by school (src/sim/content/classes.ts), the same signal
+    // batch 1 used for the mage; named exceptions cover heal, root/CC, and
+    // channel roles, since the nature school alone spans very different
+    // actions. Not every ability in the kit is listed: shapeshift and
+    // melee-form abilities keep their own clips, and this is a
+    // representative slice of the caster kit, not exhaustive coverage.
+    attackByAbility: {
+      wrath: 'Cast_Nature',
+      faerie_fire: 'Cast_Nature',
+      thorns: 'Cast_Nature',
+      mark_of_the_wild: 'Cast_Nature',
+      insect_swarm: 'Cast_Nature',
+      moonfire: 'Cast_Starfall',
+      starfire: 'Cast_Starfall',
+      healing_touch: 'Cast_Nurture',
+      regrowth: 'Cast_Nurture',
+      rejuvenation: 'Cast_Nurture',
+      entangling_roots: 'Cast_Roots',
+      hibernate: 'Cast_Roots',
+      hurricane: 'Cast_Storm',
+    },
+  },
+  // Ability-specific spellcast clips (scripts/build_druid_ability_anims.mjs):
+  // a mesh-free clip donor GLB baked off this rig's own spellcasting poses,
+  // alongside the hit-variety donor.
+  animUrls: [`${PLAYERS}/druid_hit_variety_anims.glb`, `${PLAYERS}/druid_ability_anims.glb`],
+  // dedicated druid model (own texture, ships a Backpack mesh)
+  // Offhand slot: renders only an equipped model-mapped offhand (the
+  // inscription tomes); empty stays empty. See the priest note.
+  attach: [
+    { url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' },
+    { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l', swapOnly: true },
+  ],
+  weaponSlots: [0],
+  offhandSlot: 1,
+});
+/** The female fit of a WOC class def: the class def to the letter (the same clips,
+ *  owner rules and hands) on the female base, its own armor manifest, and the
+ *  female clips' own blade contacts. Chosen by playerVisualKey. */
+function wocFemale(male: VisualDef, manifest: WocCharacterManifest): VisualDef {
+  return {
+    ...male,
+    ...wocBody('female'),
+    wocCharacter: manifest,
+    clips: { ...male.clips, contacts: WOC_CONTACTS_FEMALE },
+  };
+}
+VISUALS.player_warrior_female = wocFemale(VISUALS.player_warrior, WOC_WARRIOR_FEMALE_MANIFEST);
+SKINS.player_warrior_female = [null, null, null, null, null, null];
+VISUALS.player_paladin_female = wocFemale(VISUALS.player_paladin, WOC_PALADIN_FEMALE_MANIFEST);
+SKINS.player_paladin_female = [null, null, null, null];
+VISUALS.player_hunter_female = wocFemale(VISUALS.player_hunter, WOC_HUNTER_FEMALE_MANIFEST);
+SKINS.player_hunter_female = [null, null, null, null, null, null];
+VISUALS.player_rogue_female = wocFemale(VISUALS.player_rogue, WOC_ROGUE_FEMALE_MANIFEST);
+SKINS.player_rogue_female = [null, null, null, null, null, null];
+VISUALS.player_mage_female = wocFemale(VISUALS.player_mage, WOC_MAGE_FEMALE_MANIFEST);
+SKINS.player_mage_female = [null, null, null, null, null, null];
+VISUALS.player_priest_female = wocFemale(VISUALS.player_priest, WOC_PRIEST_FEMALE_MANIFEST);
+SKINS.player_priest_female = [null, null, null, null, null, null];
+VISUALS.player_warlock_female = wocFemale(VISUALS.player_warlock, WOC_WARLOCK_FEMALE_MANIFEST);
+SKINS.player_warlock_female = [null, null, null, null, null, null];
+VISUALS.player_druid_female = wocFemale(VISUALS.player_druid, WOC_DRUID_FEMALE_MANIFEST);
+SKINS.player_druid_female = [null, null, null, null, null, null];
+VISUALS.player_shaman_female = wocFemale(VISUALS.player_shaman, WOC_SHAMAN_FEMALE_MANIFEST);
+SKINS.player_shaman_female = [null, null, null, null, null, null];
+
+/** The KayKit def each WOC-bodied class derives its `_modular` fallback from. */
+export const KAYKIT_BASELINES: Partial<Record<PlayerClass, VisualDef>> = {
+  warrior: KAYKIT_KNIGHT_WARRIOR,
+  paladin: KAYKIT_PALADIN,
+  hunter: KAYKIT_HUNTER,
+  rogue: KAYKIT_ROGUE,
+  priest: KAYKIT_PRIEST,
+  shaman: KAYKIT_SHAMAN,
+  mage: KAYKIT_MAGE,
+  warlock: KAYKIT_WARLOCK,
+  druid: KAYKIT_DRUID,
+};
+
 // Driven by ALL_CLASSES rather than a local copy: a tenth class would otherwise
 // get no modular def at all and fall back to the warrior's clips through
 // modularKeyFor, silently, with no test able to see it.
+//
+// A class on a WOC body never composes (woc_parts_core.ts classBodyComposes: the
+// look provider, the roster look, the creation turntable and the portrait chip
+// all answer null for it), so nothing a player can reach builds its `_modular`
+// def, and the def is `lazyPreload`: the KayKit class rig and donor clip GLBs
+// only it names stay out of every client's boot download and are fetched if a
+// build ever asks (assets.ts visualAssetsResident; the dev outfit audit rig,
+// src/dev/outfit_audit.ts, is the one caller left). That holds for the warrior's
+// too, the library's own fallback key (MODULAR_WARRIOR_KEY): it stayed in the
+// boot gate while every world NPC composed from the same part library, and no
+// NPC does any more (each rides a WOC class body, npc_looks.ts), so the library
+// file itself is on demand with the rest.
 for (const cls of ALL_CLASSES) {
+  const classDef = VISUALS[`player_${cls}`];
   const {
     show: _show,
     tint: _tint,
     tintStrength: _tintStrength,
     ...base
-  } = VISUALS[`player_${cls}`];
+  } = classDef.wocCharacter ? (KAYKIT_BASELINES[cls] ?? KAYKIT_KNIGHT_WARRIOR) : classDef;
   VISUALS[`player_${cls}_modular`] = {
     ...base,
     url: `${MODULAR}/warrior_modular.glb`,
     modular: true,
     animUrls: [base.url, ...(base.animUrls ?? [])],
+    ...(classDef.wocCharacter ? { lazyPreload: true } : {}),
   };
 }
 
@@ -4847,53 +5791,56 @@ export function modularVisualKey(cls: PlayerClass): string {
 }
 
 // ---------------------------------------------------------------------------
-// NPC modular bodies: one `npc_modular_<propSet>` def per held-prop set
-// (npc_looks.ts authors WHICH set each NPC carries; this loop owns the
-// geometry). NPC gear never changes, so every prop is a FIXED attach (no
-// weaponSlots): with none, a composed NPC would inherit the warrior def's
-// default sword through modularKeyFor's class fallback. Clips ride the rogue
-// GLB exactly like npc_villager's fixed rig, so a composed villager idles,
-// walks, sits and dies with the same base clip set the town always used.
-// Driven by NPC_PROP_SET_IDS rather than a local list so a new prop set in
-// npc_looks.ts cannot ship without its def (tests/npc_looks.test.ts pins it).
+// NPC held props: one fixed attach list per prop set (npc_looks.ts authors
+// WHICH set each NPC carries; this table owns the geometry). An NPC rides a
+// player class's WOC def (visualKeyFor) and NPC gear never changes, so its
+// props replace that def's hands outright: a fixed attach list with no weapon
+// slot (npcHeldProps), or the body would hold the class's own default weapons.
+// Keyed by NpcPropSet, so a new prop set in npc_looks.ts cannot ship without
+// its row.
 // ---------------------------------------------------------------------------
-const NPC_MODULAR_PROP_ATTACH: Record<NpcPropSet, AttachDef[]> = {
+export const NPC_PROP_ATTACH: Readonly<Record<NpcPropSet, readonly AttachDef[]>> = {
   none: [],
-  staff: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
+  // The generic weapons an NPC holds are the rare set's (one finish per prop set: which
+  // one is a matter of looks only), so no world NPC carries a kit weapon. The named
+  // props below them (walking staff, oak stave, wood axe, knife) are their own models.
+  staff: [{ url: `${WEAPONS}/staff_rare_a_teal.glb`, bone: 'handslot.r' }],
   walking_staff: [{ url: `${WEAPONS}/brasscrown_walking_staff.glb`, bone: 'handslot.r' }],
   oak_stave: [{ url: `${WEAPONS}/knotted_oak_stave.glb`, bone: 'handslot.r' }],
+  // the open book is the starter one, turned to open toward its reader like the warlock's
   tome: [
-    { url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' },
-    { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l', gripRef: 'Spellbook_open' },
+    { url: `${WEAPONS}/staff_rare_b_violet.glb`, bone: 'handslot.r' },
+    { url: `${WEAPONS}/spellbook_starter.glb`, bone: 'handslot.l', rotationY: Math.PI },
   ],
-  crossbow: [{ url: `${WEAPONS}/crossbow_1handed.glb`, bone: 'handslot.r' }],
-  hammer: [{ url: `${WEAPONS}/hammer_a.glb`, bone: 'handslot.r' }],
+  // no rare crossbow exists: the starter one
+  crossbow: [{ url: `${WEAPONS}/crossbow_starter.glb`, bone: 'handslot.r' }],
+  // the war maul, at the one-hand length its family clamp gives it
+  hammer: [{ url: `${WEAPONS}/hammer_rare_b_ember.glb`, bone: 'handslot.r' }],
   woodaxe: [{ url: `${WEAPONS}/notched_woodaxe.glb`, bone: 'handslot.r' }],
   sword_shield: [
-    { url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' },
-    { url: `${WEAPONS}/shield_round.glb`, bone: 'handslot.l' },
+    { url: `${WEAPONS}/sword_rare_a_teal.glb`, bone: 'handslot.r' },
+    { url: `${WEAPONS}/shield_rare_a_teal.glb`, bone: 'handslot.l' },
   ],
-  sword: [{ url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' }],
-  scythe: [{ url: `${WEAPONS}/scythe.glb`, bone: 'handslot.r' }],
+  sword: [{ url: `${WEAPONS}/sword_rare_b_teal.glb`, bone: 'handslot.r' }],
+  // the glaive stands in for the scythe
+  scythe: [{ url: `${WEAPONS}/spear_rare_a_teal.glb`, bone: 'handslot.r' }],
   knife: [{ url: `${WEAPONS}/whittler_s_knife.glb`, bone: 'handslot.r' }],
-  spear: [{ url: `${WEAPONS}/spear_a.glb`, bone: 'handslot.r' }],
-  // worn, not held: each GLB is authored in its bone's bind frame and rides it with an
-  // identity transform (scripts/assets/harbormaster_gear/build_harbormaster_gear.py)
-  harbormaster: [
-    { url: `${NPC_GEAR}/harbormaster_tricorne.glb`, bone: 'head' },
-    { url: `${NPC_GEAR}/harbormaster_spyglass.glb`, bone: 'hips' },
-  ],
+  spear: [{ url: `${WEAPONS}/spear_rare_b_ember.glb`, bone: 'handslot.r' }],
 };
 
-for (const propSet of NPC_PROP_SET_IDS) {
-  VISUALS[`npc_modular_${propSet}`] = {
-    url: `${MODULAR}/warrior_modular.glb`,
-    modular: true,
-    height: HUMANOID_H,
-    clips: kaykit(['1H_Melee_Attack_Chop']),
-    animUrls: [`${PLAYERS}/rogue.glb`, `${PLAYERS}/rogue_hit_variety_anims.glb`],
-    attach: NPC_MODULAR_PROP_ATTACH[propSet],
-  };
+// One layout object per prop set, minted once: a stable identity for every
+// body that holds the set.
+const NPC_HELD_PROPS = Object.fromEntries(
+  NPC_PROP_SET_IDS.map((propSet): [NpcPropSet, WeaponLayoutOverride] => [
+    propSet,
+    { attach: [...NPC_PROP_ATTACH[propSet]], weaponSlots: undefined, offhandSlot: undefined },
+  ]),
+) as Record<NpcPropSet, WeaponLayoutOverride>;
+
+/** The hands of an NPC that carries `propSet`: its fixed props in place of the
+ *  class def's own weapons, with no swap slot (an NPC equips nothing). */
+export function npcHeldProps(propSet: NpcPropSet): WeaponLayoutOverride {
+  return NPC_HELD_PROPS[propSet];
 }
 
 // ---------------------------------------------------------------------------
@@ -5057,7 +6004,6 @@ const MOB_KEYS: Record<string, string> = {
   necromancy_skeletal_warrior: 'skel_minion',
   necromancy_bone_mage: 'skel_mage',
   necromancy_gravewing: 'mob_gravewing',
-  brother_aldric_raid: 'npc_aldric',
   hollow_acolyte: 'skel_mage',
   sexton_marrow: 'skel_mage',
   morthen: 'skel_boss',
@@ -5081,7 +6027,8 @@ const MOB_KEYS: Record<string, string> = {
   muster_chaplain: 'npc_muster_chaplain',
   muster_drillmaster: 'npc_muster_drillmaster',
   muster_effigy: 'mob_muster_effigy',
-  vision_aldren_warrior: 'player_warrior',
+  // The playable warrior moved to the WOC body; the vision keeps its knight look.
+  vision_aldren_warrior: 'mob_vision_aldren',
   vision_malric_mage: 'player_mage',
   vision_deathstalker_voss: 'player_rogue',
   // the Veiled Hollow: stags use the real stag rig instead of the beast-family
@@ -5101,9 +6048,6 @@ const MOB_KEYS: Record<string, string> = {
   duskwisp: 'mob_duskwisp',
   ice_wisp: 'mob_ghost',
   frostmane_yeti: 'mob_yeti',
-  // Frostveil quest pass: Wren renders as a tinted villager (escort NPC, mob-kind
-  // so the escort driver can walk her); the howlers ride the beast/wolf fallback.
-  apprentice_wren: 'npc_villager',
   sporeling_gatherer: 'mob_glub',
   corrupted_sporeling: 'mob_glub',
   mushroom_pixie: 'mob_mushroom_pixie',
@@ -5122,11 +6066,6 @@ const MOB_KEYS: Record<string, string> = {
   wood_wraith: 'mob_ghost',
   gravenbark_shambler: 'mob_treant',
   pale_huntsman: 'skel_rogue',
-  // Mosley is an escortee (mob-kind so the escort driver can walk him), and
-  // every escortee needs an explicit body: the humanoid family default is the
-  // hooded outlaw, so the townsfolk you walk home would read as the bandits you
-  // are protecting them from. Tinted villager, exactly like Wren above.
-  gravedigger_mosley: 'npc_villager',
   // the Palmreach: coral crabs, jungle boars, and the carved-stone guardian
   // (the canopy weavers take the spider family default)
   tide_scuttler: 'mob_crab',
@@ -5142,13 +6081,8 @@ const MOB_KEYS: Record<string, string> = {
   the_topiary_bull: 'mob_bull',
   moor_ram: 'mob_alpaca',
   shoal_scuttler: 'mob_crab',
-  // Navigator Suli, the Palmreach escortee (see gravedigger_mosley above).
-  castaway_navigator: 'npc_villager',
   // The Wreck Warden walks as Mogger's hulking bruiser body, not a skeleton.
   the_wreck_warden: 'mob_bruiser',
-  // the Farshore: Bram is the isle's escortee (see gravedigger_mosley above);
-  // its wretches, stalkers and horrors keep their family fallbacks.
-  fisher_bram: 'npc_villager',
   // The Infernal Citadel: the pact cult reads as robed casters, not the `undead`
   // family's default skeleton minion. Its demons keep the family fallback
   // (mob_demonalt), re-tinted deep red by the templates.
@@ -5195,6 +6129,8 @@ const FAMILY_KEYS: Record<string, string> = {
   reptile: 'mob_spearjaw',
 };
 
+// Fallback only: the stock rig of an NPC with NO row in npc_looks.ts (none ships),
+// so the rows and their comments name the old bodies, not what the world draws.
 const NPC_KEYS: Record<string, string> = {
   infiltrator_captain: 'npc_knight',
   infiltrator_nella: 'npc_knight',
@@ -5258,18 +6194,86 @@ const NPC_KEYS: Record<string, string> = {
   huntsman_deral: 'npc_scout',
 };
 
+/** The fixed-rig visual key of a player of `cls` with the creation pick
+ *  `appearance` (the Body tab's male/female segment rides
+ *  ModularAppearance.gender). A WOC-bodied class that ships a female body def
+ *  (`player_<cls>_female`, a wocCharacter def) uses it for a female pick;
+ *  every other case is the class def, and an unknown class the warrior's. The
+ *  ONE rule the world, the creation turntable, the sheet, the inspect stage
+ *  and the Armory try-on all resolve through. */
+export type BodyPick = { readonly gender?: unknown } | null | undefined;
+
+export function playerVisualKey(cls: string, appearance: BodyPick): string {
+  const base = `player_${cls}`;
+  if (!VISUALS[base]) return 'player_warrior';
+  if (appearance?.gender === 'female' && VISUALS[`${base}_female`]?.wocCharacter) {
+    return `${base}_female`;
+  }
+  return base;
+}
+
+// The renderer asks for every NPC view's key every frame (its base-visual diff),
+// so the key of a look is minted once and read back by the look's own identity.
+const npcBodyKeys = new WeakMap<NpcLook, string>();
+function npcBodyKey(look: NpcLook): string {
+  let key = npcBodyKeys.get(look);
+  if (key === undefined) {
+    key = playerVisualKey(look.cls, look.app);
+    npcBodyKeys.set(look, key);
+  }
+  return key;
+}
+
+/** What a unit frame's portrait draws for a character with an authored look: the
+ *  class body the look names and the face it wears on it, the two things the live
+ *  headshot lane keys on (portrait.ts visualPortraitDataUrl). */
+export interface NpcPortraitSource {
+  readonly visualKey: string;
+  readonly head: NpcLook['app'];
+}
+
+const npcPortraitSources = new WeakMap<NpcLook, NpcPortraitSource>();
+/** The portrait source for the template and entity kind a frame holds, null for one
+ *  with no authored look (it keeps its crest, or its committed art). One object per
+ *  look, so a frame that asks on every repaint allocates nothing. */
+export function npcPortraitSourceFor(
+  templateId: string,
+  kind: Entity['kind'],
+): NpcPortraitSource | null {
+  const look = npcLookFor(templateId, kind);
+  if (!look) return null;
+  let source = npcPortraitSources.get(look);
+  if (!source) {
+    source = { visualKey: npcBodyKey(look), head: look.app };
+    npcPortraitSources.set(look, source);
+  }
+  return source;
+}
+
 export function visualKeyFor(e: Entity): string {
   if (e.kind === 'player') {
     if (isMechWearer(e)) return 'player_mech';
-    return VISUALS[`player_${e.templateId}`] ? `player_${e.templateId}` : 'player_warrior';
+    return playerVisualKey(e.templateId, e.modularAppearance);
   }
   if (e.kind === 'mob') {
+    // A quest escortee is a mob only so the escort driver can walk it. It draws as
+    // the townsperson it is: its roster look on the WOC body of its class, exactly
+    // as an NPC does (npc_looks.ts MOB_LOOK_IDS). It must never reach the tables
+    // below: the humanoid family default is the hooded outlaw, so the townsfolk you
+    // walk home would read as the bandits you protect them from. For every other
+    // mob this is one set read (npcLookFor), then the tables as before.
+    const look = npcLookFor(e.templateId, e.kind);
+    if (look) return npcBodyKey(look);
     const override = MOB_KEYS[e.templateId];
     if (override) return override;
     const family = MOBS[e.templateId]?.family;
     return (family && FAMILY_KEYS[family]) || 'mob_bandit';
   }
-  // npcs — Brother Aldric recurs in every hub under suffixed ids
+  // An NPC wears an authored look on the WOC body of its class and body type
+  // (npc_looks.ts), the very def a player of that class draws. One with no
+  // authored look (none ships: tests/npc_looks.test.ts) falls back to a stock rig.
+  const look = npcLookFor(e.templateId, e.kind);
+  if (look) return npcBodyKey(look);
   if (e.templateId.startsWith('brother_aldric')) return 'npc_aldric';
   return NPC_KEYS[e.templateId] ?? 'npc_villager';
 }
@@ -5295,11 +6299,20 @@ export function mechHeldWeaponOverride(cls: PlayerClass): WeaponLayoutOverride |
 export function manifestUrls(): string[] {
   const urls = new Set<string>();
   for (const def of Object.values(VISUALS)) {
+    // A WOC body streams its base and library, never the weapons it holds: a held prop
+    // attaches synchronously at build, so those stay in the boot gate in their own right
+    // (the warlock's wand is held by no other boot def).
+    if (def.wocCharacter) for (const a of def.attach ?? []) urls.add(a.url);
     if (def.lazyPreload) continue; // fetched on demand, not at boot
     urls.add(def.url);
     for (const url of def.animUrls ?? []) urls.add(url);
     for (const a of def.attach ?? []) urls.add(a.url);
   }
+  // The props an NPC holds ride no def of their own (npcHeldProps), so they are
+  // named here for the boot gate. One is also an Armory weapon-skin model (the
+  // brasscrown walking staff), which assets.ts streams on demand like every skin:
+  // the first NPC that holds it builds fail-soft once it lands, as before.
+  for (const attach of Object.values(NPC_PROP_ATTACH)) for (const a of attach) urls.add(a.url);
   // Equipped-weapon models a player may swap to at runtime (any nearby player's
   // gear), so they are resolved-and-ready when setWeapon attaches them.
   for (const url of itemWeaponModelUrls()) urls.add(url);

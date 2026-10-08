@@ -2,6 +2,7 @@
 // full-body one-shot keep ownership of the rig while ordinary melee damage is
 // still allowed to resolve underneath them.
 
+import { ABILITIES } from '../../sim/data';
 import { isBleedContinuation } from '../melee_impact_core';
 import { playerAttackAnimationAlreadyStarted } from './skin_attack';
 import { attackAbilityId } from './weapon_attack_style_core';
@@ -29,6 +30,36 @@ export interface AttackClipOverrideSource {
   readonly isPerformingAbility?: boolean;
 }
 
+// These outcomes have no primary ability id: the originating action already
+// played, or a wound ticks independently. They remain visible as damage/VFX.
+const SECONDARY_PHYSICAL_LABELS = new Set([
+  'Bloodhook Wound',
+  'Shrapnel Wound',
+  'Hunting Momentum',
+  'Overdraw',
+  'Chain Reaction',
+  'Second Shadow',
+]);
+
+export function isPlayerDamageContinuation(
+  label?: string | null,
+  primaryId?: string | null,
+): boolean {
+  if (!label || primaryId) return false;
+  const id = attackAbilityId(label);
+  return (
+    SECONDARY_PHYSICAL_LABELS.has(label) ||
+    isBleedContinuation(id) ||
+    !!(id && ABILITIES[id]?.effects.some((effect) => effect.type === 'dot'))
+  );
+}
+
+/** This timed, non-projectile cast emits only direct damage at completion.
+ * Its clip must release there; ordinary spell hits already released at launch. */
+export function damageCarriesCastRelease(primaryId?: string | null): boolean {
+  return primaryId === 'mercy_lance';
+}
+
 /**
  * Resolve the gate above from the live source entity and its active visual,
  * moved verbatim from the renderer's damage-event arm: an authored full-body
@@ -42,7 +73,16 @@ export function damageEventStartsAttackAnimation(
   abilityLabel?: string | null,
   primaryAbilityId?: string | null,
   selfTargeted = false,
+  damageKind = 'hit',
 ): boolean {
+  const sourceAbility = primaryAbilityId ?? attackAbilityId(abilityLabel ?? null);
+  if (source?.kind === 'player' && sourceAbility && ABILITIES[sourceAbility]?.channel) return false;
+  if (
+    source?.kind === 'player' &&
+    damageKind === 'hit' &&
+    isPlayerDamageContinuation(abilityLabel, primaryAbilityId)
+  )
+    return false;
   if (source?.kind === 'player' && source.templateId === 'warrior') {
     if (!abilityLabel && !primaryAbilityId && sourceVisual?.isPerformingAbility) return false;
     // Every pulse, including the last one after castStop, belongs to the channel.

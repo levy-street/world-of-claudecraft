@@ -1,5 +1,7 @@
 import type * as THREE from 'three';
 import { ABILITIES, ITEMS } from '../sim/data';
+import type { Entity, SimEvent } from '../sim/types';
+import { groundHeight } from '../sim/world';
 import type { IWorld } from '../world_api';
 import { AbilityVfx, AbilityVfxFx } from './ability_vfx';
 import { resumeActiveAbilityKit } from './ability_vfx/active_kit_prewarm';
@@ -11,6 +13,7 @@ import { CAST_VFX_ENGINE } from './cast_vfx_family';
 import type { CastVfxReadiness } from './cast_vfx_readiness_core';
 import type { CharacterVisual } from './characters/visual';
 import { createOnrushArrivalHandler } from './characters/warrior_rush_pose';
+import type { GlacialFrontVisual } from './glacial_front_visual';
 import { impactContact } from './impact_contact';
 import type { LightPulses } from './light_pulses';
 import type { EntityView } from './renderer';
@@ -134,7 +137,7 @@ export function createRendererAbilityPresentation(h: PresentationHost) {
       setAuraGlow: (id, color, intensity) => visual(id)?.setAuraGlow(color, intensity),
       playShoutAnim: (id) => {
         const rig = visual(id);
-        if (rig && !rig.isMidOneShot) rig.playEmote('cheer', 1);
+        if (rig && !rig.isMidOneShot) rig.playShout(1);
       },
       isMob: (id) => h.world().entities.get(id)?.kind === 'mob',
       castingAbilityOf: (id) => h.world().entities.get(id)?.castingAbility ?? null,
@@ -178,4 +181,29 @@ export function createRendererAbilityPresentation(h: PresentationHost) {
     );
   };
   return { fx, painter };
+}
+
+/** Shared empowered cone release: retain the ability identity on the rig cue. */
+export function presentEmpoweredCone(
+  ev: Extract<SimEvent, { type: 'spellfx' }>,
+  source: Pick<Entity, 'pos' | 'facing'> | undefined,
+  seed: number,
+  visual: Pick<GlacialFrontVisual, 'spawn'>,
+  triggerAttack: (id: number, abilityId?: string) => void,
+): boolean {
+  if (ev.fx !== 'frostCone' && ev.fx !== 'fireCone') return false;
+  if (source) {
+    visual.spawn(
+      source.pos.x,
+      groundHeight(source.pos.x, source.pos.z, seed),
+      source.pos.z,
+      source.facing,
+      ev.range ?? (ev.fx === 'fireCone' ? 6 : 7),
+      ev.level ?? 1,
+      ev.angle ?? (ev.fx === 'fireCone' ? 55 : 70),
+      ev.fx,
+    );
+    triggerAttack(ev.sourceId, ev.ability);
+  }
+  return true;
 }

@@ -9887,6 +9887,168 @@ export const ko_KR: EnTranslations = {
     "body": "체형",
     "genderMale": "남성",
     "genderFemale": "여성",
+    "bodyTypeA": "Type A",
+    "bodyTypeB": "Type B",
+    "wocHead": {
+      "hair": {
+        "swept": "넘긴 머리",
+        "long": "Long",
+        "mohawk": "모히칸",
+        "quiff": "짧은 리젠트",
+        "undercut": "투블럭 컷",
+        "topknot": "상투 머리",
+        "shoulder": "어깨 길이 머리",
+        "bald": "Bald",
+        "waves": "웨이브",
+        "ponytail": "하이 포니테일",
+        "braid": "땋은 머리",
+        "bob": "Bob",
+        "crown": "왕관 땋기",
+        "twins": "양갈래 땋은 머리",
+        "curls": "곱슬 올림머리"
+      },
+      "beard": {
+        "none": "수염 없음",
+        "moustache": "콧수염",
+        "handlebar": "카이저 수염",
+        "goatee": "염소수염",
+        "chin": "턱수염",
+        "boxed": "짧게 다듬은 수염",
+        "long": "긴 수염",
+        "chops": "구레나룻 수염",
+        "chinstrap": "턱선 수염"
+      },
+      "nose": {
+        "default": "클래식",
+        "broad": "넓은 코",
+        "aquiline": "매부리코",
+        "button": "작고 둥근 코",
+        "soft": "Soft"
+      },
+      "mouth": {
+        "default": "클래식",
+        "full": "Full",
+        "smirk": "한쪽 미소",
+        "relaxed": "편안한 입술",
+        "cupids_bow": "큐피드 입술",
+        "narrow": "좁은 입술",
+        "thin": "Thin",
+        "rounded": "둥근 입술"
+      },
+      "brows": {
+        "default": "클래식",
+        "slim": "Slim",
+        "arched": "아치형 눈썹",
+        "soft": "Soft",
+        "straight": "일자 눈썹",
+        "relaxed": "편안한 눈썹",
+        "soft_arch": "Soft Arch",
+        "rounded": "둥근 눈썹"
+      },
+      "ears": {
+        "default": "클래식",
+        "large": "큰귀",
+        "pointed": "뾰족귀",
+        "round": "둥근귀"
+      },
+      "eyes": {
+        "default": "클래식",
+        "almond": "아몬드형",
+        "hooded": "속쌍꺼풀"
+      }
+    },
+    "wocBuilder": {
+      "cat": {
+        "bodyType": "Body Type",
+        "skinTone": "Skin Tone",
+        "face": "Face",
+        "eyesBrows": "눈과 눈썹",
+        "eyeColor": "눈 색깔",
+        "hairstyle": "헤어스타일",
+        "facialHair": "수염",
+        "hairColor": "머리 색",
+        "browColor": "눈썹 색",
+        "piercings": "피어싱"
+      },
+      "section": {
+        "hair": "헤어스타일",
+        "nose": "Nose",
+        "mouth": "Lips",
+        "brows": "눈썹 모양",
+        "ears": "Ears",
+        "eyes": "눈 모양"
+      },
+      "slider": {
+        "eyeSpacing": "눈 간격",
+        "eyeSize": "Eye Size",
+        "eyeTilt": "Eye Tilt",
+        "browHeight": "눈썹 높이",
+        "chinWidth": "턱 너비",
+        "bodyScale": "Body Size"
+      },
+      "bodyGlyph": {
+        "a": "A",
+        "b": "B"
+      },
+      "piercing": {
+        "none": "None",
+        "lobes": "귓불",
+        "ears": "Full Ears",
+        "brow": "Brow",
+        "nose": "콧볼",
+        "septum": "셉텀",
+        "lip": "Lip",
+        "full": "Full Set"
+      },
+      "skin": {
+        "porcelain": "포슬린",
+        "ivory": "아이보리",
+        "rose": "Rose",
+        "peach": "피치",
+        "fair": "Fair",
+        "beige": "베이지",
+        "sand": "Sand",
+        "honey": "허니",
+        "olive": "올리브",
+        "caramel": "캐러멜",
+        "tan": "Tan",
+        "bronze": "브론즈",
+        "chestnut": "체스트넛",
+        "umber": "엄버",
+        "mahogany": "마호가니",
+        "ebony": "에보니"
+      },
+      "eye": {
+        "brown": "갈색",
+        "darkBrown": "짙은 갈색",
+        "hazel": "헤이즐",
+        "amber": "호박색",
+        "green": "초록색",
+        "teal": "Teal",
+        "blue": "Blue",
+        "paleBlue": "Pale Blue",
+        "grey": "Grey",
+        "violet": "보라색"
+      },
+      "hairColor": {
+        "platinum": "플래티넘",
+        "blonde": "금발",
+        "golden": "골드",
+        "copper": "구릿빛",
+        "red": "Red",
+        "auburn": "적갈색",
+        "lightBrown": "밝은 갈색",
+        "brown": "갈색",
+        "darkBrown": "짙은 갈색",
+        "black": "검은색",
+        "silver": "은색",
+        "white": "흰색"
+      },
+      "matchHair": "머리 색에 맞추기",
+      "resetDefault": "기본값으로 초기화",
+      "customColorAria": "사용자 지정 색상 선택",
+      "customSkinAria": "사용자 지정 피부색 선택"
+    },
     "hair": "헤어",
     "brows": "눈썹",
     "skinTone": "피부색",

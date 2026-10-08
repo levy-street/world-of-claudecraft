@@ -702,8 +702,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Courier integration changes only the renderer leaf. No capture or measurement changed.
   // Re-minted at the v0.45.0 integration (membership integration + the Mirefen world-boss
-  // branch; remint_polish_provenance.mjs on the merged tree, no capture was retaken).
-  'e5e0ec7acbfa17883e5e6436c1d1f12e5d65d7908c942c95d5bbc212300d03d2';
+  // branch + the character pack; remint_polish_provenance.mjs on the merged tree, no
+  // capture was retaken).
+  'f916cca0fb1eb27e3a0392c6da3e2e0f5f070392755b616c10d5088943913848';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

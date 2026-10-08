@@ -2,7 +2,7 @@
 // offline client, parks a stage NPC on a fixed sunny spot, cycles it through
 // EVERY authored look id (retagging templateId and forcing the base-visual
 // rebuild), and screenshots a full-body and a close framing of each, so every
-// composed face, haircut and kit can be reviewed against the NPC's role.
+// face, haircut and kit can be reviewed against the NPC's role.
 //
 //   node scripts/npc_looks_shot.mjs [--only id1,id2] [--url http://localhost:5173]
 //
@@ -21,8 +21,7 @@ const argOf = (flag) => {
   return i >= 0 ? args[i + 1] : null;
 };
 const BASE_URL = argOf('--url') ?? process.env.GAME_URL ?? 'http://localhost:5173';
-// Low tier (SwiftShader's default) drops the outfit-dye shader layer by
-// design; pass --gfx high to verify colorways at the tier real hardware runs.
+// Pass --gfx high to review the looks at the tier real hardware runs.
 const GFX = argOf('--gfx');
 const URL = GFX ? `${BASE_URL}?gfx=${GFX}` : BASE_URL;
 const ONLY = argOf('--only')?.split(',').filter(Boolean) ?? null;
@@ -71,8 +70,7 @@ console.log(JSON.stringify(ids.map((id) => ({
 }
 
 // --town visits placed NPCs by templateId and never reads the roster, so it
-// can shoot an id the roster deliberately omits (Brother Aldric keeps his
-// fixed rig, so verifying HIM is exactly a town shot).
+// can also shoot an NPC that has no row.
 const targets = ONLY ? roster.filter((r) => ONLY.includes(r.id)) : roster;
 if (!TOWN && targets.length === 0) throw new Error('no targets matched');
 
@@ -92,9 +90,7 @@ page.on('pageerror', (e) => console.log('PAGEERROR:', e.message));
 
 // Standing capture rule: seed the LOWEST graphics preset before the app boots,
 // so every rig shoots the same tier and an unseeded default cannot drift the
-// comparison. Composed faces, hair, builds and props all read at this tier;
-// the outfit-dye shader layer does not (it is a high-tier-only richness the
-// player path sheds the same way), so use --gfx high to review colorways.
+// comparison. Faces, hair, builds and props all read at this tier.
 await page.evaluateOnNewDocument(() => {
   try {
     localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 1 }));
@@ -247,7 +243,7 @@ for (const t of targets) {
       }
       // The per-frame base-visual diff keys on the FIXED rig key, which two
       // NPCs can share; blank the stored key so the swap always rebuilds and
-      // the composed look for the new templateId is what gets built.
+      // the look for the new templateId is what gets built.
       const v = g.renderer.views?.get?.(stageId);
       if (v) v.visualKey = '__npc_looks_shot__';
     },

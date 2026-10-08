@@ -163,15 +163,25 @@ describe('held weapon models', () => {
   });
 
   it('itemWeaponModelUrl resolves mapped items and ignores everything else', () => {
-    expect(itemWeaponModelUrl('worn_sword')).toBe('models/weapons/sword_a.glb');
-    expect(itemWeaponModelUrl('fen_reaver_glaive')).toBe('models/weapons/scythe.glb');
-    expect(itemWeaponModelUrl('eastbrook_greatsword')).toBe('models/weapons/adv_sword_2handed.glb');
-    expect(itemWeaponModelUrl('highwatch_greatsword')).toBe('models/weapons/adv_sword_2handed.glb');
+    expect(itemWeaponModelUrl('worn_sword')).toBe('models/weapons/sword_starter.glb');
+    expect(itemWeaponModelUrl('fen_reaver_glaive')).toBe('models/weapons/spear_field_iron.glb');
+    expect(itemWeaponModelUrl('eastbrook_greatsword')).toBe(
+      'models/weapons/sword_field_2h_iron.glb',
+    );
+    expect(itemWeaponModelUrl('highwatch_greatsword')).toBe(
+      'models/weapons/sword_field_2h_steel.glb',
+    );
+    expect(itemWeaponModelUrl('vanguard_verdict_greatsword')).toBe(
+      'models/weapons/sword_rare_a_royal.glb',
+    );
     expect(itemWeaponModelUrl('deathless_greatblade')).toBe(
-      'models/weapons/adv_sword_2handed_color.glb',
+      'models/weapons/sword_rare_a_spectral.glb',
     );
     expect(itemWeaponModelUrl('heroic_wyrmfang_greatblade')).toBe(
-      'models/weapons/adv_sword_2handed_color.glb',
+      'models/weapons/sword_rare_a_ember.glb',
+    );
+    expect(itemWeaponModelUrl('kingsbane_last_oath')).toBe(
+      'models/weapons/sword_epic_deathless_crucible_heart.glb',
     );
     expect(itemWeaponModelUrl('chest_armor_not_a_weapon')).toBeNull();
     expect(itemWeaponModelUrl(null)).toBeNull();
@@ -294,10 +304,20 @@ describe('held weapon models', () => {
   });
 
   it('resolves actual offhands independently from the mainhand model', () => {
-    expect(itemOffhandModelUrl('eastbrook_buckler')).toBe('models/weapons/shield_round.glb');
-    expect(itemOffhandModelUrl('highwatch_wallshield')).toBe('models/weapons/shield_square.glb');
-    expect(itemOffhandModelUrl('rusty_dagger')).toBe('models/weapons/dagger_a.glb');
-    expect(itemOffhandModelUrl('heroic_fang_of_korzul')).toBe('models/weapons/dagger_c.glb');
+    expect(itemOffhandModelUrl('eastbrook_buckler')).toBe('models/weapons/shield_starter.glb');
+    expect(itemOffhandModelUrl('highwatch_wallshield')).toBe(
+      'models/weapons/shield_field_steel.glb',
+    );
+    expect(itemOffhandModelUrl('bonewrought_bulwark')).toBe(
+      'models/weapons/shield_rare_a_teal.glb',
+    );
+    expect(itemOffhandModelUrl('duskforged_bulwark')).toBe(
+      'models/weapons/shield_rare_a_violet.glb',
+    );
+    expect(itemOffhandModelUrl('rusty_dagger')).toBe('models/weapons/dagger_starter.glb');
+    expect(itemOffhandModelUrl('heroic_fang_of_korzul')).toBe(
+      'models/weapons/dagger_rare_b_violet.glb',
+    );
     expect(itemOffhandModelUrl('chest_armor_not_an_offhand')).toBeNull();
     expect(itemOffhandModelUrl(null)).toBeNull();
     expect(itemOffhandModelUrl(undefined)).toBeNull();
@@ -308,6 +328,8 @@ describe('held weapon models', () => {
     for (const url of [
       itemOffhandModelUrl('eastbrook_buckler'),
       itemOffhandModelUrl('highwatch_wallshield'),
+      itemOffhandModelUrl('bonewrought_bulwark'),
+      itemOffhandModelUrl('pearlward_aegis'),
     ]) {
       expect(url).not.toBeNull();
       if (!url) continue;
@@ -402,7 +424,7 @@ describe('held weapon models', () => {
       const def = VISUALS[key];
       // both hunter bodies: the fixed rig and its composed (modular) variant
       // share the class hand layout, so both keep the crossbow
-      if (key === 'player_hunter' || key === 'player_hunter_modular') {
+      if (key.startsWith('player_hunter')) {
         expect(def.weaponSlots, 'hunter must keep its crossbow').toBeUndefined();
       } else {
         expect(def.weaponSlots?.includes(0), `${key} should swap its mainhand`).toBe(true);

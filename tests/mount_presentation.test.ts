@@ -174,6 +174,7 @@ describe('borrowRiderLocomotion', () => {
       falling: true,
       backwards: true,
       reverseBackpedal: true,
+      strafe: 'left',
       dead: true,
       casting: true,
       spinning: true,
@@ -206,6 +207,7 @@ describe('borrowRiderLocomotion', () => {
       running: true,
       airborne: true,
       backwards: true,
+      strafe: 'left',
       swimming: true,
     });
     // Rider-only facts never reach the mount's gait clips.

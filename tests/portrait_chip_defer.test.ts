@@ -9,12 +9,17 @@ vi.mock('../src/render/characters/portrait', () => ({
   // 'priest' stands for a class whose headshot is not cached yet: that chip
   // falls back to the crest, which is the other arm of the fallback line.
   playerPortraitDataUrl: (cls: string) => (cls === 'priest' ? null : portraitUrl),
-  visualPortraitDataUrl: (key: string) => (key === 'player_mech' ? mechUrl : portraitUrl),
+  visualPortraitDataUrl: (key: string) =>
+    key === 'player_priest' ? null : key === 'player_mech' ? mechUrl : portraitUrl,
   modularPortraitDataUrl: () => portraitUrl,
   portraitsReady: () => true,
   composedPortraitKey: () => 'player_mage_modular:mod:sig:headshot',
   isComposedPortraitKey: (key?: string) => key?.includes(':mod:') === true,
   cachedPortraitByKey: () => null,
+  // no fixture here carries a head: every chip keys like the stock body
+  visualPortraitKey: (visualKey: string, skin = 0, framing = 'headshot') =>
+    `${visualKey}:${skin}:${framing}`,
+  isHeadPortraitKey: () => false,
 }));
 // Additive, never bare (the reliquary_window_behavior lesson): only the
 // members the fixture steers stay overridden; the rest passes through.

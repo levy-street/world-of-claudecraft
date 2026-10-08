@@ -12,6 +12,7 @@ import { MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import { MECH_CHROMAS } from '../src/sim/content/skins';
 import { WEAPON_SKIN_LIST } from '../src/sim/content/weapon_skins';
 import { CosmeticsWindow } from '../src/ui/hud/cosmetics/cosmetics_window';
+import { t } from '../src/ui/i18n';
 
 vi.mock('../src/game/audio', () => ({ audio: { click: vi.fn() } }));
 
@@ -241,13 +242,22 @@ describe('CosmeticsWindow', () => {
     expect(world.changeWeaponSkin).toHaveBeenLastCalledWith(null, 'sword');
   });
 
-  it('wears and takes off a mech chroma through changeSkin / unequipMechChroma', () => {
+  // The Combat Mech is switched off (COMBAT_MECH_WEARABLE in cosmetics_view.ts):
+  // an owned chroma keeps its card, but Wear is disabled and labelled
+  // unavailable. Taking a worn one off still works. When the switch flips back,
+  // the click below goes back to expecting changeSkin(0, 'mech').
+  it('shows Wear disabled on an owned mech chroma, and still takes a worn one off', () => {
     const world = fakeWorld();
     const { w, el } = makeWindow(world);
     w.open('mech');
     const id = MECH_CHROMAS[0].id;
-    action(el, 'wear-mech', id)?.click();
-    expect(world.changeSkin).toHaveBeenCalledWith(0, 'mech');
+    const wear = action(el, 'wear-mech', id);
+    expect(wear).not.toBeNull();
+    expect(wear?.disabled).toBe(true);
+    expect(wear?.getAttribute('aria-disabled')).toBe('true');
+    expect(wear?.textContent).toBe(t('hudChrome.wocStore.unavailable'));
+    wear?.click();
+    expect(world.changeSkin).not.toHaveBeenCalled();
     world.player.skinCatalog = 'mech';
     world.player.skin = 0;
     w.refreshIfChanged();

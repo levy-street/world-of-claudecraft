@@ -21,8 +21,8 @@ export function identityFields(e: Entity): Record<string, unknown> {
   // when something is equipped; rides the identity record (first appearance +
   // on change), never the per-tick dynamic fields. Render-only, like `mh`.
   if (e.kind === 'player') {
-    // The authored modular look (`app`) is NOT built here. It is ~0.6 KB for a
-    // default look (1489 bytes at its hard bound, APPEARANCE_MAX_WIRE_BYTES)
+    // The authored modular look (`app`) is NOT built here. It is ~0.9 KB for a
+    // default look (2154 bytes at its hard bound, APPEARANCE_MAX_WIRE_BYTES)
     // and changes at most once a session, and everything in this record is
     // JSON.stringify'd once per entity per TICK (wireCacheFor), so composing it
     // into the object would re-serialize half a kilobyte 20 times a second per

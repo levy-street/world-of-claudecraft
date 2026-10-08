@@ -1,54 +1,58 @@
-// Authored character-creator looks for EVERY world NPC, pure data + resolution,
-// no three.js (the manifest.ts contract). Each entry composes the modular part
-// library (modular.ts) exactly the way a player-authored appearance does, so a
-// named NPC reads as a person with a face, a haircut and a wardrobe that match
-// their role, instead of one of four stock rigs shared by a whole town.
+// Authored looks for EVERY world NPC, pure data + resolution, no three.js (the
+// manifest.ts contract). An NPC is a WOC body: the body, kit and clips of one
+// player class (woc_parts_core.ts), wearing a look the character creator's face
+// builder could have made (src/ui/woc_head_builder_model.ts): a body type, one
+// piece per head slot, a piercing preset, four colours, the five face controls
+// and a body size. Nothing here is NPC-only art: every value is one a player
+// can reach in the creator, so a town reads as a crowd of people, each with a
+// face of their own, on the same bodies the players wear.
+//
+// Each look is a recreation of the face the NPC wore before, on the composed
+// KayKit bodies (2026-10): shot face on, then rebuilt in the creator beside it.
 //
 // Authoring language (kept consistent so hubs read as communities):
-// - Gender follows the shipped voice casting (scripts/voices/npc_voice_prompts.mjs)
-//   and quest-text pronouns; where neither speaks, the name's fiction decides.
-// - Skin/hair/eye colours are HSL in the same ranges the creation UI offers, so
-//   every look here is one a player could have authored.
-// - Zones carry a palette: the Vale is warm and rustic, the Marsh drab greens,
-//   Highwatch garrison steel and azure, the Veiled Hollow silver and violet on
-//   pointed ears, Frostveil pale furs, the Drakelands ash and ember, Amberfall
-//   gold, Wraithwood mourning onyx, Palmreach sun-dark skin and bone jewellery.
-// - `worn` mixes the class kits per slot (a look, not a class): head is bare by
-//   default so the authored face and hair show; the few helmed looks are the
-//   point (FURY's closed visor, the chroniclers' scholar hat, Brosk's fur cap).
-// - `props` picks a fixed held-prop def (manifest.ts NPC_MODULAR_PROP_SETS):
-//   NPC gear never changes, so props are authored attaches, never weapon swaps.
-//   An attach is not only a held item: the `harbormaster` set is WORN gear (a
-//   tricorne and pipe on the head bone, a spyglass on the hips bone),
-//   Blender-authored in each bone's bind frame (scripts/assets/harbormaster_gear/).
-// - `outfit` may name an NPC-only colorway (modular.ts NPC_MATERIAL_COLORWAY_IDS,
-//   Tamsin's navy-and-brass `admiralty`): normalizeNpcAppearance keeps it where
-//   the player normalizer would clamp it, so no player can ever wear one.
+// - `cls` is the class whose kit the NPC wore before: the robe is a mage, the
+//   leaf kit a druid, the ranger tunic a hunter, the rogue tunic a rogue, the
+//   silver plate a warrior, the gold plate a paladin, and the fur and bare chest
+//   kit a warrior. A priest only where the NPC is one by name or by nature
+//   (Brother Aldric, Vicar Creel, the Pale Keeper).
+// - Bare headed, always: the dressing leaves every NPC's head slot empty, so no
+//   helm or hood ever covers the authored face and hair.
+// - Colours are the stored HSL the builder writes, and they were SOLVED, never
+//   copied: the same value draws brighter on these heads than it did on the old
+//   bodies, so each skin and hair colour is the one whose render lands on the
+//   old face's measured colour. Brows wear the hair colour.
+// - `headShape` carries character. Where the old face had an eye shape (wide,
+//   narrow, droopy, cat, wide set) the matching control is pushed; a cast of
+//   comic regulars has it pushed to the stop; every other face keeps a small
+//   offset of its own, so no two NPCs share a pair of eyes.
+// - `bodyScale` follows the old build where one was authored (the smiths stand
+//   tall, Tinker Gizzel does not), else a per-NPC roll inside the creator's
+//   range. A row may carry none: that body draws at the creator's default size.
+// - Piercings stand in for the old jewellery, and for a few rogues who earned one.
+// - `props` picks a fixed held-prop set (manifest.ts NPC_PROP_ATTACH): NPC gear
+//   never changes, so props are authored attaches, never weapon swaps.
 //
-// tests/npc_looks.test.ts pins: every NpcDef id resolves to a look EXCEPT
-// Brother Aldric (see aldricKeepsHisRig), every authored value survives
-// normalizeNpcAppearance unchanged (a typo'd style id would silently clamp to the
-// default), and no two NPCs share an appearance.
+// The quest escortees wear a look too, though the sim makes them MOBS so the
+// escort driver can walk them: MOB_LOOK_IDS below names each one, and nothing
+// else that is a mob ever wears a look.
+//
+// tests/npc_looks.test.ts pins: every NpcDef id resolves to a look, every
+// authored value is one the look's own head type offers and survives
+// normalizeAppearance unchanged (a typo'd id would silently fall back to the
+// type's default face), no two NPCs share an appearance, and the mob-kind ids
+// that wear a look are exactly the escortees.
 
-import { SHADOW_GUARDS } from '../../sim/content/world_quest_shadow';
-import type { EntityKind } from '../../sim/types';
+import type { EntityKind, PlayerClass } from '../../sim/types';
 import {
-  type ArmorLoadout,
-  type ArmorSetId,
-  type BodyShape,
-  type FaceShape,
-  fullSet,
   type ModularAppearance,
-  type ModularLook,
-  NEUTRAL_BODY,
-  NEUTRAL_FACE,
-  NPC_MATERIAL_COLORWAY_IDS,
+  NEUTRAL_HEAD_SHAPE,
   normalizeAppearance,
+  type WocHeadShape,
 } from './modular';
 
-/** Fixed held-prop sets, one derived `npc_modular_<id>` VisualDef each (see
- *  NPC_MODULAR_PROP_SETS in manifest.ts). Data here, geometry there, so this
- *  module stays free of asset paths and the manifest owns every VisualDef. */
+/** Fixed held-prop sets (the attach lists live in manifest.ts NPC_PROP_ATTACH).
+ *  Data here, geometry there, so this module stays free of asset paths. */
 export type NpcPropSet =
   | 'none'
   | 'staff'
@@ -62,8 +66,7 @@ export type NpcPropSet =
   | 'sword'
   | 'scythe'
   | 'knife'
-  | 'spear'
-  | 'harbormaster';
+  | 'spear';
 
 export const NPC_PROP_SET_IDS: readonly NpcPropSet[] = [
   'none',
@@ -79,2520 +82,2610 @@ export const NPC_PROP_SET_IDS: readonly NpcPropSet[] = [
   'scythe',
   'knife',
   'spear',
-  'harbormaster',
 ];
 
+/** The appearance fields a WOC body draws (the face builder's record). */
+export type NpcFace = Pick<
+  ModularAppearance,
+  | 'gender'
+  | 'headHair'
+  | 'headBeard'
+  | 'headBrows'
+  | 'headEyes'
+  | 'headNose'
+  | 'headMouth'
+  | 'headEars'
+  | 'headPiercing'
+  | 'skinHue'
+  | 'skinSat'
+  | 'skinLight'
+  | 'hairHue'
+  | 'hairSat'
+  | 'hairLight'
+  | 'browHue'
+  | 'browSat'
+  | 'browLight'
+  | 'eyeHue'
+  | 'eyeSat'
+  | 'eyeLight'
+> &
+  Partial<Pick<ModularAppearance, 'headShape' | 'bodyScale'>>;
+
 export interface NpcLookDef {
-  app: Partial<ModularAppearance>;
-  worn: ArmorLoadout;
+  /** The class whose WOC body, kit and clips the NPC wears. */
+  cls: PlayerClass;
+  app: NpcFace;
   props: NpcPropSet;
+}
+
+/** A resolved look: the class, the normalized appearance its head and body
+ *  size draw from, and the held props. */
+export interface NpcLook {
+  readonly cls: PlayerClass;
+  readonly app: ModularAppearance;
+  readonly props: NpcPropSet;
 }
 
 // --- authoring helpers -------------------------------------------------------
 
-const face = (o: Partial<FaceShape>): FaceShape => ({ ...NEUTRAL_FACE, ...o });
-const body = (o: Partial<BodyShape>): BodyShape => ({ ...NEUTRAL_BODY, ...o });
+/** One piece per head slot, then the piercing preset (the last two default). */
+const head = (
+  hairStyle: string,
+  beard: string,
+  brows: string,
+  eyeShape: string,
+  nose: string,
+  mouth: string,
+  ears = 'default',
+  piercing = 'none',
+) => ({
+  headHair: hairStyle,
+  headBeard: beard,
+  headBrows: brows,
+  headEyes: eyeShape,
+  headNose: nose,
+  headMouth: mouth,
+  headEars: ears,
+  headPiercing: piercing,
+});
 const skin = (h: number, s: number, l: number) => ({ skinHue: h, skinSat: s, skinLight: l });
-/** Hair colour, with the lashes dyed to match (the default lash colour is the
- *  stock brown, which reads wrong under white or silver hair). */
+/** Hair colour, with the brows dyed to match (the builder's "match hair"). */
 const hair = (h: number, s: number, l: number) => ({
   hairHue: h,
   hairSat: s,
   hairLight: l,
-  lashHue: h,
-  lashSat: s,
-  lashLight: l,
+  browHue: h,
+  browSat: s,
+  browLight: l,
 });
 const eyes = (h: number, s: number, l: number) => ({ eyeHue: h, eyeSat: s, eyeLight: l });
-
-/** A full kit with the head bare (the authored face is the point); override
- *  slots to mix sets or strip a piece (`arms: null` reads as rolled sleeves). */
-const kit = (set: ArmorSetId, over: Partial<ArmorLoadout> = {}): ArmorLoadout => ({
-  ...fullSet(set),
-  head: null,
-  ...over,
-});
+/** The face controls, each at its rest value unless named. */
+const shape = (o: Partial<WocHeadShape>): WocHeadShape => ({ ...NEUTRAL_HEAD_SHAPE, ...o });
 
 // --- the roster --------------------------------------------------------------
 
 export const NPC_LOOKS: Record<string, NpcLookDef> = {
+  // Flightmaster Zephyr, Windrider Instructor.
   glider_instructor: {
+    cls: 'hunter',
     app: {
       gender: 'male',
-      hair: 'crew',
-      brows: 'thick',
-      eyeShape: 'almond',
-      ...hair(31, 0.25, 0.25),
-      ...skin(29, 0.4, 0.5),
+      ...head('quiff', 'none', 'relaxed', 'almond', 'default', 'default'),
+      ...skin(30, 0.45, 0.47),
+      ...hair(30, 0.3, 0.18),
       ...eyes(194, 0.48, 0.43),
-      face: face({ cheeks: 0.12, chin: 0.15 }),
-      outfit: 'azure',
+      headShape: shape({ eyeSpacing: 0.6, eyeSize: -0.09, eyeTilt: 0.5, chinWidth: 0.57 }),
+      bodyScale: 1.01,
     },
-    worn: kit('ranger'),
     props: 'none',
   },
+  // Skye, Zephyrs Apprentice.
   glider_apprentice: {
+    cls: 'hunter',
     app: {
       gender: 'female',
-      hair: 'warriorbraid',
-      brows: 'angled',
-      eyeShape: 'almond',
-      ...hair(34, 0.65, 0.4),
-      ...skin(24, 0.35, 0.65),
+      ...head('braid', 'none', 'default', 'almond', 'soft', 'default', 'default', 'lobes'),
+      ...skin(29, 0.28, 0.58),
+      ...hair(36, 0.72, 0.26),
       ...eyes(180, 0.4, 0.48),
-      face: face({ cheeks: -0.1, chin: -0.12 }),
-      outfit: 'teal',
+      headShape: shape({ eyeSpacing: 0.32, eyeSize: 0.8, eyeTilt: -0.29, chinWidth: 0.67 }),
+      bodyScale: 0.98,
     },
-    worn: kit('ranger'),
     props: 'none',
   },
-  // Keeper Liora: the Evergarden maze warden, mossy and unhurried.
+  // Keeper Liora, Warden of the Hedge Maze.
   wisp_maze_keeper: {
+    cls: 'hunter',
     app: {
       gender: 'female',
-      hair: 'warriorbraid',
-      brows: 'angled',
-      eyeShape: 'almond',
-      ...hair(96, 0.35, 0.3),
-      ...skin(26, 0.38, 0.6),
+      ...head('braid', 'none', 'default', 'almond', 'soft', 'default'),
+      ...skin(27, 0.36, 0.55),
+      ...hair(95, 0.56, 0.18),
       ...eyes(150, 0.45, 0.45),
-      face: face({ cheeks: 0.05, chin: -0.05 }),
-      outfit: 'teal',
+      headShape: shape({ eyeSpacing: 0.25, eyeSize: 0.22, eyeTilt: 0.3, chinWidth: 0.6 }),
+      bodyScale: 1.03,
     },
-    worn: kit('ranger'),
     props: 'none',
   },
+  // Scout Valerie, Covert Operations.
   shadow_cloak_scout: {
+    cls: 'rogue',
     app: {
       gender: 'female',
-      hair: 'warriorbraid',
-      brows: 'angled',
-      eyeShape: 'almond',
-      ...hair(23, 0.45, 0.17),
-      ...skin(27, 0.42, 0.53),
+      ...head('braid', 'none', 'default', 'almond', 'soft', 'default', 'default', 'lip'),
+      ...skin(27, 0.38, 0.48),
+      ...hair(13, 0.55, 0.12),
       ...eyes(165, 0.4, 0.4),
-      face: face({ cheeks: -0.12, chin: 0.1 }),
-      outfit: 'violet',
+      headShape: shape({ eyeSpacing: 0.24, eyeSize: -0.09, eyeTilt: 0.15, chinWidth: 0.67 }),
     },
-    worn: kit('rogue'),
     props: 'knife',
   },
-  ...Object.fromEntries(
-    SHADOW_GUARDS.map((guard, index): [string, NpcLookDef] => [
-      guard.npc.id,
-      {
-        app: {
-          gender: 'male',
-          hair: 'crew',
-          brows: 'thick',
-          eyeShape: 'narrow',
-          ...hair(21 + index * 3, 0.3, 0.23),
-          ...skin(25, 0.4, 0.43 + index * 0.025),
-          ...eyes(30 + index * 15, 0.3, 0.35),
-          outfit: guard.sentry ? 'gold' : 'onyx',
-        },
-        worn: kit(guard.sentry ? 'knight' : 'rogue', guard.sentry ? { head: 'knight' } : {}),
-        props: guard.sentry ? 'spear' : 'sword',
-      },
-    ]),
-  ),
-  // === Eastbrook Vale: the starter valley, warm and rustic =================
-  // The Merchant: gold on black, a man who owns the market and dresses like it.
-  the_merchant: {
+  // Dispatch Guard, Dispatch Carrier.
+  shadow_guard_north: {
+    cls: 'rogue',
     app: {
       gender: 'male',
-      hair: 'sweptback',
-      ...hair(26, 0.35, 0.1),
-      beard: 'goatee',
-      brows: 'sharp',
-      eyeShape: 'narrow',
-      ...eyes(46, 0.55, 0.4),
-      ...skin(27, 0.45, 0.55),
-      mouth: 'smile',
-      face: face({ smirk: 0.4, chin: 0.2 }),
-      earrings: 'moon',
-      earringMaterial: 'gold',
-      outfit: 'onyx',
+      ...head('quiff', 'none', 'relaxed', 'almond', 'default', 'default'),
+      ...skin(24, 0.44, 0.42),
+      ...hair(17, 0.46, 0.16),
+      ...eyes(30, 0.3, 0.35),
+      headShape: shape({ eyeSpacing: -1, eyeSize: -0.3, eyeTilt: 0.14, chinWidth: 0.62 }),
+      bodyScale: 1.02,
     },
-    worn: kit('rogue'),
-    props: 'none',
+    props: 'sword',
   },
-  // Marshal Redbrook: the name is the colorway; a greying soldier holding a town.
-  marshal_redbrook: {
+  // Dispatch Guard, Dispatch Carrier.
+  shadow_guard_south: {
+    cls: 'rogue',
     app: {
       gender: 'male',
-      hair: 'crewcut',
-      ...hair(20, 0.15, 0.35),
-      beard: 'shortbox',
-      brows: 'angled',
-      eyeShape: 'sharp',
-      ...eyes(200, 0.35, 0.3),
-      ...skin(25, 0.45, 0.55),
-      face: face({ jaw: 0.4, brow: 0.2 }),
-      body: body({ shoulders: 0.2 }),
-      outfit: 'crimson',
+      ...head('mohawk', 'none', 'relaxed', 'almond', 'default', 'default', 'default', 'septum'),
+      ...skin(26, 0.45, 0.43),
+      ...hair(23, 0.46, 0.16),
+      ...eyes(45, 0.3, 0.35),
+      headShape: shape({
+        eyeSpacing: 0.02,
+        eyeSize: 1,
+        eyeTilt: 0.26,
+        browHeight: 0.6,
+        chinWidth: 0.62,
+      }),
+      bodyScale: 0.97,
     },
-    worn: kit('knight'),
-    props: 'sword_shield',
+    props: 'sword',
   },
-  // Trader Wilkes: round-faced, easy smile, sleeves rolled off the leathers.
-  trader_wilkes: {
+  // Dispatch Guard, Dispatch Carrier.
+  shadow_guard_east: {
+    cls: 'rogue',
     app: {
       gender: 'male',
-      hair: 'sidepart',
-      ...hair(28, 0.5, 0.4),
-      beard: 'scruff',
-      brows: 'soft',
-      eyeShape: 'round',
-      ...eyes(140, 0.35, 0.3),
-      ...skin(26, 0.5, 0.62),
-      mouth: 'smile',
-      face: face({ cheeks: 0.35 }),
-      body: body({ chest: 0.15, hips: 0.1 }),
+      ...head('undercut', 'none', 'slim', 'almond', 'default', 'default', 'default', 'lip'),
+      ...skin(23, 0.43, 0.47),
+      ...hair(23, 0.45, 0.16),
+      ...eyes(60, 0.3, 0.35),
+      headShape: shape({ eyeSpacing: 1, eyeSize: -0.8, eyeTilt: 0.09, chinWidth: 0.62 }),
+      bodyScale: 1.04,
     },
-    worn: kit('rogue', { arms: null }),
-    props: 'none',
+    props: 'sword',
   },
-  // Apothecary Lin: neat, small, dark-haired; watches where everyone steps.
-  apothecary_lin: {
-    app: {
-      gender: 'female',
-      hair: 'lowbun',
-      ...hair(20, 0.4, 0.06),
-      brows: 'thin',
-      eyeShape: 'doe',
-      ...eyes(30, 0.4, 0.2),
-      ...skin(30, 0.35, 0.62),
-      mouth: 'lips',
-      body: body({ shoulders: -0.15, hands: -0.1 }),
-      outfit: 'forest',
-    },
-    worn: kit('druid'),
-    props: 'none',
-  },
-  // Brother Aldric is DELIBERATELY ABSENT, in every hub (see ALDRIC_KEEPS_HIS_RIG
-  // below). He keeps the pre-v0.7 `npc_aldric` model with the staff built into
-  // the mesh: the community adopted that exact silhouette, so recomposing him
-  // would be a regression, not an upgrade, however good the composed body looks.
-  // Smith Haldren: the Vale armorer, all shoulders, horseshoe moustache.
-  smith_haldren: {
+  // Dispatch Guard, Dispatch Carrier.
+  shadow_guard_west: {
+    cls: 'rogue',
     app: {
       gender: 'male',
-      hair: 'crew',
-      ...hair(22, 0.45, 0.15),
-      beard: 'horseshoe',
-      brows: 'bushy',
-      eyeShape: 'almond',
-      ...eyes(28, 0.45, 0.25),
-      ...skin(24, 0.5, 0.5),
-      face: face({ jaw: 0.3 }),
-      body: body({ shoulders: 0.35, chest: 0.3, hands: 0.2 }),
-      outfit: 'ember',
+      ...head('bald', 'none', 'default', 'almond', 'default', 'default', 'default', 'full'),
+      ...skin(26, 0.45, 0.48),
+      ...hair(23, 0.44, 0.16),
+      ...eyes(75, 0.3, 0.35),
+      headShape: shape({
+        eyeSpacing: 0.4,
+        eyeSize: -1,
+        eyeTilt: 0.12,
+        browHeight: -0.7,
+        chinWidth: 0.62,
+      }),
+      bodyScale: 0.96,
     },
-    worn: kit('barbarian'),
-    props: 'hammer',
+    props: 'sword',
   },
-  // Fisherman Brandt, Old Salt: grey, weathered, grinning about the fish-men.
-  fisherman_brandt: {
+  // Lantern Sentry, True Sight.
+  shadow_sentry_south: {
+    cls: 'warrior',
     app: {
       gender: 'male',
-      hair: 'crew',
-      ...hair(30, 0.05, 0.6),
-      beard: 'full',
-      brows: 'bushy',
-      eyeShape: 'droopy',
-      ...eyes(190, 0.4, 0.4),
-      ...skin(24, 0.5, 0.48),
-      mouth: 'grin',
-      face: face({ cheeks: -0.2, nose: 0.3 }),
-      outfit: 'teal',
+      ...head('quiff', 'chinstrap', 'relaxed', 'almond', 'default', 'default'),
+      ...skin(25, 0.39, 0.52),
+      ...hair(33, 0.44, 0.16),
+      ...eyes(90, 0.3, 0.35),
+      headShape: shape({
+        eyeSpacing: -0.18,
+        eyeSize: -0.8,
+        eyeTilt: -1,
+        browHeight: 0.4,
+        chinWidth: 0.62,
+      }),
+      bodyScale: 1.03,
     },
-    worn: kit('rogue', { arms: null }),
     props: 'spear',
   },
-  // Foreman Odell: dust-choked and exasperated, balding, heavy-browed.
-  foreman_odell: {
+  // Lantern Sentry, True Sight.
+  shadow_sentry_north: {
+    cls: 'warrior',
     app: {
       gender: 'male',
-      hair: 'buzz',
-      ...hair(24, 0.3, 0.25),
-      beard: 'mutton',
-      brows: 'thick',
-      eyeShape: 'sharp',
-      ...eyes(30, 0.4, 0.35),
-      ...skin(26, 0.45, 0.45),
-      mouth: 'frown',
-      face: face({ jaw: 0.5, brow: 0.3, nose: 0.2 }),
-      body: body({ shoulders: 0.25, chest: 0.2 }),
-      outfit: 'onyx',
-    },
-    worn: kit('barbarian'),
-    props: 'hammer',
-  },
-  // Bursar Fernando: the Gilded Strongbox uniform is gold over dark leathers;
-  // his likeness keeps the black shoulder-length hair and light brown skin the
-  // old bespoke atlas painted.
-  bursar_fernando: {
-    app: {
-      gender: 'male',
-      hair: 'chinbob',
-      ...hair(20, 0.35, 0.05),
-      brows: 'arched',
-      eyeShape: 'almond',
-      ...eyes(25, 0.5, 0.35),
-      ...skin(27, 0.5, 0.45),
-      mouth: 'smile',
-      earrings: 'stud',
-      earringMaterial: 'gold',
-      outfit: 'gilded',
-    },
-    worn: kit('rogue'),
-    props: 'none',
-  },
-  // Card Master, Dealer of Chance: slick, moustached, one gold hoop, loud coat.
-  card_master: {
-    app: {
-      gender: 'male',
-      hair: 'sidepart',
-      ...hair(24, 0.4, 0.08),
-      beard: 'stache',
-      brows: 'arched',
-      eyeShape: 'cat',
-      ...eyes(280, 0.5, 0.35),
-      ...skin(26, 0.45, 0.5),
-      mouth: 'grin',
-      face: face({ smirk: 0.55 }),
-      earrings: 'hoop',
-      earringMaterial: 'gold',
-      outfit: 'magenta',
-    },
-    worn: kit('rogue'),
-    props: 'none',
-  },
-  // Groundskeeper Bram: sandy, grinning referee of the Sowfield truce.
-  groundskeeper_bram: {
-    app: {
-      gender: 'male',
-      hair: 'messy',
-      ...hair(38, 0.5, 0.45),
-      beard: 'scruff',
-      brows: 'soft',
-      eyeShape: 'round',
-      ...eyes(140, 0.45, 0.35),
-      ...skin(26, 0.5, 0.55),
-      mouth: 'grin',
-      face: face({ cheeks: 0.2 }),
-      body: body({ hands: 0.3, shoulders: 0.15 }),
-      outfit: 'forest',
-    },
-    worn: kit('druid'),
-    props: 'scythe',
-  },
-  // Saul the Chronicler: grey, ledger-minded, twice-told stories by the fire.
-  chronicler_saul: {
-    app: {
-      gender: 'male',
-      hair: 'crew',
-      ...hair(28, 0.08, 0.55),
-      beard: 'full',
-      brows: 'round',
-      eyeShape: 'round',
-      ...eyes(210, 0.35, 0.4),
-      ...skin(26, 0.4, 0.55),
-      mouth: 'smile',
-      face: face({ cheeks: -0.15 }),
-      outfit: 'royal',
-    },
-    worn: kit('mage', { head: 'mage' }),
-    props: 'tome',
-  },
-  // Forgemistress Darva: red warrior braid, forge-built shoulders, amber eyes.
-  forgemistress_darva: {
-    app: {
-      gender: 'female',
-      hair: 'warriorbraid',
-      ...hair(8, 0.7, 0.32),
-      brows: 'sharp',
-      eyeShape: 'almond',
-      ...eyes(30, 0.55, 0.45),
-      mouth: 'lips',
-      ...skin(24, 0.5, 0.5),
-      face: face({ jaw: 0.25, brow: 0.15 }),
-      body: body({ shoulders: 0.3, chest: 0.15, hands: 0.15 }),
-      earrings: 'cuff',
-      earringMaterial: 'iron',
-      outfit: 'ember',
-    },
-    worn: kit('barbarian'),
-    props: 'hammer',
-  },
-  // Cook Marlow: bald, big, chin-tuft, whites like a proper kitchen master.
-  cook_marlow: {
-    app: {
-      gender: 'male',
-      hair: 'bald',
-      ...hair(24, 0.4, 0.2),
-      beard: 'chinpuff',
-      brows: 'round',
-      eyeShape: 'round',
-      ...eyes(28, 0.5, 0.28),
-      ...skin(24, 0.5, 0.6),
-      mouth: 'smile',
-      face: face({ cheeks: 0.55, chin: 0.2 }),
-      body: body({ chest: 0.3, hips: 0.3, hands: 0.2 }),
-      outfit: 'ivory',
-    },
-    worn: kit('druid'),
-    props: 'knife',
-  },
-  // Farmer Jessica, the Eastbrook Allotment Keeper: sun-warm, sleeves rolled,
-  // a scythe over the shoulder and a smile for a first-furrow farmhand.
-  farmer_jessica: {
-    app: {
-      gender: 'female',
-      hair: 'lowbun',
-      ...hair(20, 0.55, 0.3),
-      brows: 'soft',
-      eyeShape: 'round',
-      ...eyes(90, 0.45, 0.35),
-      mouth: 'smile',
-      ...skin(26, 0.5, 0.55),
-      face: face({ cheeks: 0.35, chin: 0.1 }),
-      body: body({ hands: 0.2 }),
-      outfit: 'forest',
-    },
-    worn: kit('druid', { arms: null }),
-    props: 'scythe',
-  },
-  // Farmer Teasel, the Fen Paddy Farmer: grey, lean, and weathered by the
-  // marsh water; a walking staff for the bunds between the rice beds.
-  farmer_teasel: {
-    app: {
-      gender: 'male',
-      hair: 'sweptback',
-      ...hair(230, 0.08, 0.75),
-      beard: 'scruff',
-      brows: 'flat',
-      eyeShape: 'narrow',
-      ...eyes(210, 0.35, 0.5),
-      mouth: 'neutral',
-      ...skin(22, 0.45, 0.42),
-      face: face({ jaw: 0.3, brow: 0.2 }),
-      body: body({ shoulders: 0.15, hands: 0.25 }),
-      outfit: 'teal',
-    },
-    worn: kit('ranger', { arms: null }),
-    props: 'walking_staff',
-  },
-  // Farmer Hollis, the Highwatch Terrace Farmer: stocky as the drystone he
-  // stacks, a woodaxe for the brush that creeps onto the terraces.
-  farmer_hollis: {
-    app: {
-      gender: 'male',
-      hair: 'crew',
-      ...hair(14, 0.5, 0.22),
-      beard: 'full',
-      brows: 'bushy',
-      eyeShape: 'sharp',
-      ...eyes(40, 0.5, 0.3),
-      mouth: 'grin',
-      ...skin(20, 0.55, 0.35),
-      face: face({ chin: 0.3, cheeks: 0.2 }),
-      body: body({ shoulders: 0.35, chest: 0.25, hands: 0.25 }),
-      outfit: 'crimson',
-    },
-    worn: kit('barbarian', { arms: null }),
-    props: 'woodaxe',
-  },
-  // Farmer Verbena, the Parterre Gardener: the Evergarden showcase kept as
-  // trim as her hedges; lavender-silver hair up and out of the topiary.
-  farmer_verbena: {
-    app: {
-      gender: 'female',
-      hair: 'highbun',
-      ...hair(280, 0.25, 0.7),
-      brows: 'arched',
-      eyeShape: 'doe',
-      ...eyes(300, 0.4, 0.55),
-      mouth: 'lips',
-      ...skin(28, 0.4, 0.65),
-      face: face({ brow: 0.1, cheeks: 0.25 }),
-      body: body({ hips: 0.1 }),
-      outfit: 'emerald',
-    },
-    worn: kit('mage', { arms: null }),
-    props: 'none',
-  },
-  // Weaver Ottilie: auburn braid crown, steady hands at the loom.
-  weaver_ottilie: {
-    app: {
-      gender: 'female',
-      hair: 'braidcrown',
-      ...hair(16, 0.6, 0.35),
-      brows: 'soft',
-      eyeShape: 'doe',
-      ...eyes(140, 0.4, 0.35),
-      ...skin(26, 0.45, 0.65),
-      mouth: 'lips',
-      lipstick: 'rose',
-      body: body({ hands: -0.1 }),
-      outfit: 'rose',
-    },
-    worn: kit('druid'),
-    props: 'none',
-  },
-  // Tinker Gizzel: small, rusty-haired, verdigris-stained, springs everywhere.
-  tinker_gizzel: {
-    app: {
-      gender: 'male',
-      hair: 'curlyafro',
-      ...hair(15, 0.7, 0.35),
-      beard: 'goatee',
-      brows: 'worried',
-      eyeShape: 'wide',
-      ...eyes(95, 0.5, 0.4),
-      ...skin(27, 0.45, 0.55),
-      mouth: 'grin',
-      face: face({ nose: 0.3, ears: 0.4 }),
-      body: body({
-        shoulders: -0.3,
-        chest: -0.25,
-        hips: -0.25,
-        hands: -0.2,
-        elbows: -0.2,
-        knees: -0.2,
-        feet: -0.2,
+      ...head('swept', 'none', 'rounded', 'almond', 'default', 'default'),
+      ...skin(27, 0.4, 0.53),
+      ...hair(34, 0.46, 0.16),
+      ...eyes(105, 0.3, 0.35),
+      headShape: shape({
+        eyeSpacing: 0.35,
+        eyeSize: 0.9,
+        eyeTilt: -0.09,
+        browHeight: 0.8,
+        chinWidth: 0.62,
       }),
-      earrings: 'runic',
-      earringMaterial: 'copper',
-      outfit: 'verdigris',
+      bodyScale: 0.98,
     },
-    worn: kit('rogue'),
-    props: 'hammer',
+    props: 'spear',
   },
-  // Brother Halven, Reliquary Keeper (and his marsh posting): a devout
-  // guardian in pale plate, calm as the crypt he keeps.
-  brother_halven: {
+  // Lantern Watchman, True Sight.
+  shadow_watch_west: {
+    cls: 'warrior',
     app: {
       gender: 'male',
-      hair: 'crew',
-      ...hair(24, 0.4, 0.2),
-      beard: 'shortbox',
-      brows: 'soft',
-      eyeShape: 'almond',
-      ...eyes(210, 0.3, 0.35),
-      ...skin(26, 0.4, 0.55),
-      face: face({ brow: 0.1 }),
-      body: body({ shoulders: 0.15 }),
-      outfit: 'ivory',
+      ...head('mohawk', 'moustache', 'relaxed', 'almond', 'default', 'default', 'default', 'brow'),
+      ...skin(26, 0.4, 0.57),
+      ...hair(34, 0.46, 0.16),
+      ...eyes(120, 0.3, 0.35),
+      headShape: shape({ eyeSpacing: 1, eyeSize: -0.8, eyeTilt: 0.6, chinWidth: 0.62 }),
+      bodyScale: 1.05,
     },
-    worn: kit('paladin'),
+    props: 'spear',
+  },
+  // Lantern Watchman, True Sight.
+  shadow_watch_east: {
+    cls: 'warrior',
+    app: {
+      gender: 'male',
+      ...head('bald', 'boxed', 'relaxed', 'almond', 'default', 'default'),
+      ...skin(26, 0.4, 0.59),
+      ...hair(40, 0.45, 0.16),
+      ...eyes(135, 0.3, 0.35),
+      headShape: shape({ eyeSpacing: -1, eyeSize: -0.5, eyeTilt: -0.24, chinWidth: 0.62 }),
+      bodyScale: 0.95,
+    },
+    props: 'spear',
+  },
+
+  // === Eastbrook Vale: the starter valley, warm and rustic =================
+  // The Merchant, Keeper of the World Market.
+  the_merchant: {
+    cls: 'rogue',
+    app: {
+      gender: 'male',
+      ...head('undercut', 'goatee', 'slim', 'almond', 'default', 'smirk', 'default', 'lobes'),
+      ...skin(29, 0.44, 0.52),
+      ...hair(40, 0.75, 0.03),
+      ...eyes(46, 0.55, 0.4),
+      headShape: shape({
+        eyeSpacing: -0.3,
+        eyeSize: -0.8,
+        eyeTilt: 0.8,
+        browHeight: 0.3,
+        chinWidth: 0.62,
+      }),
+    },
+    props: 'none',
+  },
+  // Marshal Redbrook, Town Marshal.
+  marshal_redbrook: {
+    cls: 'warrior',
+    app: {
+      gender: 'male',
+      ...head('quiff', 'boxed', 'default', 'almond', 'broad', 'default'),
+      ...skin(26, 0.48, 0.53),
+      ...hair(29, 0.15, 0.25),
+      ...eyes(200, 0.35, 0.3),
+      headShape: shape({
+        eyeSpacing: 0.14,
+        eyeSize: 0.16,
+        eyeTilt: 0.7,
+        browHeight: -0.24,
+        chinWidth: 0.38,
+      }),
+      bodyScale: 1.03,
+    },
+    props: 'sword_shield',
+  },
+  // Trader Wilkes, Provisioner.
+  trader_wilkes: {
+    cls: 'rogue',
+    app: {
+      gender: 'male',
+      ...head('swept', 'chinstrap', 'soft_arch', 'default', 'default', 'smirk'),
+      ...skin(26, 0.46, 0.57),
+      ...hair(29, 0.54, 0.3),
+      ...eyes(140, 0.35, 0.3),
+      headShape: shape({
+        eyeSpacing: 1,
+        eyeSize: 0.5,
+        eyeTilt: 0.26,
+        browHeight: 0.4,
+        chinWidth: 0.36,
+      }),
+      bodyScale: 0.97,
+    },
+    props: 'none',
+  },
+  // Apothecary Lin, Herbalist.
+  apothecary_lin: {
+    cls: 'druid',
+    app: {
+      gender: 'female',
+      ...head('shoulder', 'none', 'relaxed', 'default', 'soft', 'full'),
+      ...skin(29, 0.31, 0.57),
+      ...hair(3, 0.66, 0.03),
+      ...eyes(30, 0.4, 0.2),
+      headShape: shape({ eyeSpacing: -0.4, eyeSize: 0.9, eyeTilt: 0.26, chinWidth: 0.62 }),
+      bodyScale: 0.95,
+    },
+    props: 'none',
+  },
+  // Brother Aldric, Priest of the Vale.
+  brother_aldric: {
+    cls: 'priest',
+    app: {
+      gender: 'male',
+      ...head('long', 'none', 'relaxed', 'default', 'default', 'default'),
+      ...skin(25, 0.5, 0.63),
+      ...hair(220, 0.1, 0.05),
+      ...eyes(25, 0.4, 0.1),
+      headShape: shape({
+        eyeSpacing: 0.1,
+        eyeSize: 0.35,
+        eyeTilt: -0.15,
+        browHeight: -0.25,
+        chinWidth: 0.5,
+      }),
+      bodyScale: 0.99,
+    },
     props: 'staff',
   },
-  // FURY, Honor Quartermaster: the arena's closed crimson visor. The one Vale
-  // look that keeps the full helm; whatever face is under it stays its secret.
-  fury: {
+  // Smith Haldren, Armorer & Weaponsmith.
+  smith_haldren: {
+    cls: 'warrior',
     app: {
       gender: 'male',
-      hair: 'bald',
-      ...hair(0, 0.5, 0.1),
-      brows: 'sharp',
-      eyeShape: 'narrow',
-      ...eyes(0, 0.8, 0.35),
-      ...skin(20, 0.4, 0.35),
-      mouth: 'frown',
-      body: body({ shoulders: 0.35, chest: 0.25 }),
-      outfit: 'bloodforged',
+      ...head('bald', 'handlebar', 'default', 'almond', 'broad', 'default'),
+      ...skin(24, 0.54, 0.48),
+      ...hair(31, 0.75, 0.07),
+      ...eyes(28, 0.45, 0.25),
+      headShape: shape({ eyeSpacing: 0.3, eyeSize: -0.4, eyeTilt: -0.15, chinWidth: 0.44 }),
+      bodyScale: 1.05,
     },
-    worn: kit('knight', { head: 'knight' }),
-    props: 'sword_shield',
+    props: 'hammer',
   },
-  // Warden Coalfast, Redoubt Commander: black steel, salt-grey beard, no give.
-  warden_coalfast: {
+  // Fisherman Brandt, Old Salt.
+  fisherman_brandt: {
+    cls: 'rogue',
     app: {
       gender: 'male',
-      hair: 'buzz',
-      ...hair(30, 0.08, 0.5),
-      beard: 'full',
-      brows: 'flat',
-      eyeShape: 'sharp',
-      ...eyes(210, 0.3, 0.3),
-      ...skin(25, 0.4, 0.5),
-      mouth: 'frown',
-      face: face({ jaw: 0.35, brow: 0.25 }),
-      body: body({ shoulders: 0.25 }),
-      outfit: 'onyx',
+      ...head('bald', 'boxed', 'default', 'hooded', 'aquiline', 'smirk'),
+      ...skin(25, 0.54, 0.46),
+      ...hair(9, 0.04, 0.5),
+      ...eyes(190, 0.4, 0.4),
+      headShape: shape({
+        eyeSpacing: 0.6,
+        eyeSize: 0.16,
+        eyeTilt: -1,
+        browHeight: 0.6,
+        chinWidth: 0.71,
+      }),
+      bodyScale: 1.01,
     },
-    worn: kit('knight'),
-    props: 'sword_shield',
+    props: 'spear',
   },
-  // Riftwatch Ollun, Breach Scholar: unkempt, stubbled, always half-listening.
-  riftwatch_ollun: {
+  // Foreman Odell, Mine Foreman.
+  foreman_odell: {
+    cls: 'warrior',
     app: {
       gender: 'male',
-      hair: 'messy',
-      ...hair(26, 0.45, 0.3),
-      beard: 'stubble',
-      brows: 'worried',
-      eyeShape: 'wideset',
-      ...eyes(185, 0.5, 0.4),
-      ...skin(26, 0.4, 0.6),
-      mouth: 'open',
-      face: face({ brow: -0.2 }),
-      outfit: 'teal',
+      ...head('bald', 'chops', 'relaxed', 'almond', 'broad', 'default'),
+      ...skin(28, 0.51, 0.43),
+      ...hair(23, 0.34, 0.18),
+      ...eyes(30, 0.4, 0.35),
+      headShape: shape({
+        eyeSpacing: -0.8,
+        eyeSize: -1,
+        eyeTilt: 0.7,
+        browHeight: -0.9,
+        chinWidth: 0.22,
+      }),
+      bodyScale: 1.03,
     },
-    worn: kit('mage'),
+    props: 'hammer',
+  },
+  // Bursar Fernando, The Gilded Strongbox.
+  bursar_fernando: {
+    cls: 'rogue',
+    app: {
+      gender: 'male',
+      ...head('long', 'none', 'arched', 'almond', 'default', 'full', 'default', 'lobes'),
+      ...skin(29, 0.57, 0.42),
+      ...hair(3, 0.65, 0.03),
+      ...eyes(25, 0.5, 0.35),
+      headShape: shape({
+        eyeSpacing: -0.39,
+        eyeSize: 0.4,
+        eyeTilt: 0.4,
+        browHeight: 0.3,
+        chinWidth: 0.62,
+      }),
+      bodyScale: 0.98,
+    },
+    props: 'none',
+  },
+  // Card Master, Dealer of Chance.
+  card_master: {
+    cls: 'rogue',
+    app: {
+      gender: 'male',
+      ...head('swept', 'moustache', 'arched', 'almond', 'default', 'smirk', 'default', 'lobes'),
+      ...skin(27, 0.5, 0.48),
+      ...hair(20, 0.75, 0.03),
+      ...eyes(280, 0.5, 0.35),
+      headShape: shape({
+        eyeSpacing: -0.9,
+        eyeSize: -0.03,
+        eyeTilt: 1,
+        browHeight: 0.5,
+        chinWidth: 0.62,
+      }),
+      bodyScale: 1.02,
+    },
+    props: 'none',
+  },
+  // groundskeeper_bram.
+  groundskeeper_bram: {
+    cls: 'druid',
+    app: {
+      gender: 'male',
+      ...head('swept', 'none', 'soft_arch', 'default', 'default', 'smirk'),
+      ...skin(27, 0.5, 0.51),
+      ...hair(41, 0.62, 0.32),
+      ...eyes(140, 0.45, 0.35),
+      headShape: shape({
+        eyeSpacing: 0.5,
+        eyeSize: 0.6,
+        eyeTilt: -0.2,
+        browHeight: 0.5,
+        chinWidth: 0.53,
+      }),
+      bodyScale: 1.03,
+    },
+    props: 'scythe',
+  },
+  // Saul the Chronicler, The Vale Chronicle.
+  chronicler_saul: {
+    cls: 'mage',
+    app: {
+      gender: 'male',
+      ...head('quiff', 'boxed', 'rounded', 'default', 'default', 'full'),
+      ...skin(27, 0.38, 0.52),
+      ...hair(41, 0.04, 0.4),
+      ...eyes(210, 0.35, 0.4),
+      headShape: shape({
+        eyeSpacing: -0.24,
+        eyeSize: 0.4,
+        eyeTilt: 0.09,
+        browHeight: 0.4,
+        chinWidth: 0.69,
+      }),
+    },
     props: 'tome',
   },
-  // Riftwright Maelis, Rift Forgemaster: violet-lit, soot-dark skin, hair
-  // cropped for the forge, eyes that catch the rift light; a hammer at hand.
-  riftwright_maelis: {
+  // Forgemistress Darva, Master of the Forge.
+  forgemistress_darva: {
+    cls: 'warrior',
     app: {
       gender: 'female',
-      hair: 'pixie',
-      ...hair(275, 0.45, 0.35),
-      brows: 'flat',
-      eyeShape: 'almond',
-      ...eyes(280, 0.6, 0.55),
-      ...skin(24, 0.35, 0.3),
-      mouth: 'smile',
-      face: face({ jaw: 0.1, brow: 0.1 }),
-      body: body({ shoulders: 0.15, hands: 0.2 }),
-      outfit: 'violet',
+      ...head('topknot', 'none', 'default', 'almond', 'soft', 'full', 'default', 'ears'),
+      ...skin(25, 0.54, 0.45),
+      ...hair(3, 0.68, 0.25),
+      ...eyes(30, 0.55, 0.45),
+      headShape: shape({
+        eyeSpacing: -0.28,
+        eyeSize: 0.06,
+        eyeTilt: 0.6,
+        browHeight: -0.18,
+        chinWidth: 0.47,
+      }),
+      bodyScale: 1.04,
     },
-    worn: kit('knight', { head: null }),
     props: 'hammer',
   },
-  // Quartermaster Edda, Redoubt Armorer: steel and salt, hair tied back for work.
-  quartermaster_edda: {
+  // Cook Marlow, Master of the Kitchens.
+  cook_marlow: {
+    cls: 'druid',
+    app: {
+      gender: 'male',
+      ...head('bald', 'chin', 'rounded', 'default', 'default', 'smirk'),
+      ...skin(26, 0.49, 0.57),
+      ...hair(31, 0.72, 0.12),
+      ...eyes(28, 0.5, 0.28),
+      headShape: shape({
+        eyeSpacing: 0.9,
+        eyeSize: 0.8,
+        eyeTilt: -0.01,
+        browHeight: 0.6,
+        chinWidth: 0.05,
+      }),
+      bodyScale: 1.04,
+    },
+    props: 'knife',
+  },
+  // Farmer Jessica, Allotment Keeper.
+  farmer_jessica: {
+    cls: 'druid',
     app: {
       gender: 'female',
-      hair: 'lowpony',
-      ...hair(40, 0.25, 0.55),
-      brows: 'flat',
-      eyeShape: 'almond',
+      ...head('braid', 'none', 'soft', 'default', 'button', 'relaxed'),
+      ...skin(27, 0.5, 0.49),
+      ...hair(25, 0.73, 0.18),
+      ...eyes(90, 0.45, 0.35),
+      headShape: shape({
+        eyeSpacing: -0.2,
+        eyeSize: 0.5,
+        eyeTilt: 0.29,
+        browHeight: 0.3,
+        chinWidth: 0.46,
+      }),
+    },
+    props: 'scythe',
+  },
+  // Farmer Teasel, Fen Paddy Farmer.
+  farmer_teasel: {
+    cls: 'hunter',
+    app: {
+      gender: 'male',
+      ...head('swept', 'boxed', 'relaxed', 'almond', 'broad', 'default'),
+      ...skin(24, 0.5, 0.4),
+      ...hair(245, 0.04, 0.6),
+      ...eyes(210, 0.35, 0.5),
+      headShape: shape({
+        eyeSpacing: 0.41,
+        eyeSize: -0.8,
+        eyeTilt: 0.08,
+        browHeight: -0.24,
+        chinWidth: 0.44,
+      }),
+      bodyScale: 1.01,
+    },
+    props: 'walking_staff',
+  },
+  // Farmer Hollis, Highwatch Terrace Farmer.
+  farmer_hollis: {
+    cls: 'warrior',
+    app: {
+      gender: 'male',
+      ...head('quiff', 'boxed', 'default', 'almond', 'default', 'smirk'),
+      ...skin(22, 0.63, 0.32),
+      ...hair(17, 0.66, 0.14),
+      ...eyes(40, 0.5, 0.3),
+      headShape: shape({
+        eyeSpacing: -0.5,
+        eyeSize: 0.16,
+        eyeTilt: 0.7,
+        browHeight: 0.3,
+        chinWidth: 0.3,
+      }),
+      bodyScale: 1.05,
+    },
+    props: 'woodaxe',
+  },
+  // Farmer Verbena, Parterre Gardener.
+  farmer_verbena: {
+    cls: 'mage',
+    app: {
+      gender: 'female',
+      ...head('curls', 'none', 'soft_arch', 'default', 'button', 'full'),
+      ...skin(29, 0.38, 0.59),
+      ...hair(286, 0.11, 0.5),
+      ...eyes(300, 0.4, 0.55),
+      headShape: shape({
+        eyeSpacing: 0.11,
+        eyeSize: 0.9,
+        eyeTilt: 0.1,
+        browHeight: -0.12,
+        chinWidth: 0.51,
+      }),
+    },
+    props: 'none',
+  },
+  // Weaver Ottilie, Master of the Loom.
+  weaver_ottilie: {
+    cls: 'druid',
+    app: {
+      gender: 'female',
+      ...head('crown', 'none', 'soft', 'default', 'soft', 'cupids_bow', 'default', 'lobes'),
+      ...skin(26, 0.38, 0.59),
+      ...hair(15, 0.63, 0.25),
+      ...eyes(140, 0.4, 0.35),
+      headShape: shape({ eyeSpacing: 0.43, eyeSize: 0.9, eyeTilt: -0.2, chinWidth: 0.62 }),
+      bodyScale: 1.02,
+    },
+    props: 'none',
+  },
+  // Tinker Gizzel, Master of the Toolworks.
+  tinker_gizzel: {
+    cls: 'rogue',
+    app: {
+      gender: 'male',
+      ...head('swept', 'goatee', 'rounded', 'default', 'aquiline', 'smirk', 'large', 'ears'),
+      ...skin(26, 0.5, 0.54),
+      ...hair(15, 0.73, 0.25),
+      ...eyes(95, 0.5, 0.4),
+      headShape: shape({
+        eyeSpacing: 1,
+        eyeSize: 1,
+        eyeTilt: 0.17,
+        browHeight: 1,
+        chinWidth: 0.62,
+      }),
+      bodyScale: 0.95,
+    },
+    props: 'hammer',
+  },
+  // Brother Halven, Reliquary Keeper.
+  brother_halven: {
+    cls: 'paladin',
+    app: {
+      gender: 'male',
+      ...head('quiff', 'boxed', 'soft_arch', 'almond', 'default', 'default'),
+      ...skin(27, 0.38, 0.52),
+      ...hair(31, 0.72, 0.12),
       ...eyes(210, 0.3, 0.35),
-      ...skin(25, 0.4, 0.55),
-      face: face({ jaw: 0.2 }),
-      body: body({ shoulders: 0.2, hands: 0.15 }),
+      headShape: shape({
+        eyeSpacing: 0.29,
+        eyeSize: 0.12,
+        eyeTilt: -0.25,
+        browHeight: -0.12,
+        chinWidth: 0.62,
+      }),
+      bodyScale: 1.01,
     },
-    worn: kit('knight'),
+    props: 'staff',
+  },
+  // FURY, Honor Quartermaster.
+  fury: {
+    cls: 'warrior',
+    app: {
+      gender: 'male',
+      ...head('bald', 'none', 'default', 'almond', 'default', 'default', 'default', 'septum'),
+      ...skin(25, 0.49, 0.32),
+      ...hair(3, 0.7, 0.07),
+      ...eyes(0, 0.8, 0.35),
+      headShape: shape({
+        eyeSpacing: -0.5,
+        eyeSize: -0.8,
+        eyeTilt: 0.04,
+        browHeight: -1,
+        chinWidth: 0.18,
+      }),
+      bodyScale: 1.05,
+    },
+    props: 'sword_shield',
+  },
+  // Warden Coalfast, Redoubt Commander.
+  warden_coalfast: {
+    cls: 'warrior',
+    app: {
+      gender: 'male',
+      ...head('quiff', 'boxed', 'relaxed', 'almond', 'broad', 'default'),
+      ...skin(27, 0.46, 0.48),
+      ...hair(10, 0.04, 0.4),
+      ...eyes(210, 0.3, 0.3),
+      headShape: shape({
+        eyeSpacing: 0.15,
+        eyeSize: -0.29,
+        eyeTilt: 0.7,
+        browHeight: -0.5,
+        chinWidth: 0.41,
+      }),
+      bodyScale: 1.02,
+    },
+    props: 'sword_shield',
+  },
+  // Riftwatch Ollun, Breach Scholar.
+  riftwatch_ollun: {
+    cls: 'mage',
+    app: {
+      gender: 'male',
+      ...head('swept', 'none', 'rounded', 'default', 'default', 'default'),
+      ...skin(29, 0.38, 0.57),
+      ...hair(31, 0.66, 0.2),
+      ...eyes(185, 0.5, 0.4),
+      headShape: shape({
+        eyeSpacing: 1,
+        eyeSize: 0.5,
+        eyeTilt: 0.16,
+        browHeight: 0.8,
+        chinWidth: 0.62,
+      }),
+    },
+    props: 'tome',
+  },
+  // Riftwright Maelis, Rift Forgemaster.
+  riftwright_maelis: {
+    cls: 'warrior',
+    app: {
+      gender: 'female',
+      ...head('undercut', 'none', 'straight', 'almond', 'soft', 'relaxed', 'default', 'brow'),
+      ...skin(22, 0.4, 0.27),
+      ...hair(280, 0.45, 0.25),
+      ...eyes(280, 0.6, 0.55),
+      headShape: shape({
+        eyeSpacing: -0.33,
+        eyeSize: -0.11,
+        eyeTilt: -0.14,
+        browHeight: 0.18,
+        chinWidth: 0.56,
+      }),
+      bodyScale: 1.01,
+    },
     props: 'hammer',
   },
-  // Mender Saul, Field Surgeon: tired eyes, clean ivory, kind and clinical.
+  // Quartermaster Edda, Redoubt Armorer.
+  quartermaster_edda: {
+    cls: 'warrior',
+    app: {
+      gender: 'female',
+      ...head('ponytail', 'none', 'straight', 'almond', 'soft', 'default'),
+      ...skin(25, 0.38, 0.5),
+      ...hair(40, 0.15, 0.4),
+      ...eyes(210, 0.3, 0.35),
+      headShape: shape({ eyeSpacing: -0.13, eyeSize: 0.09, eyeTilt: 0.23, chinWidth: 0.5 }),
+      bodyScale: 1.02,
+    },
+    props: 'hammer',
+  },
+  // Mender Saul, Field Surgeon.
   mender_saul: {
+    cls: 'mage',
     app: {
       gender: 'male',
-      hair: 'sidepart',
-      ...hair(26, 0.4, 0.3),
-      brows: 'worried',
-      eyeShape: 'sleepy',
+      ...head('swept', 'none', 'rounded', 'hooded', 'default', 'default'),
+      ...skin(30, 0.38, 0.57),
+      ...hair(37, 0.7, 0.18),
       ...eyes(140, 0.3, 0.35),
-      ...skin(26, 0.4, 0.6),
-      face: face({ cheeks: -0.2 }),
-      outfit: 'ivory',
+      headShape: shape({
+        eyeSpacing: -0.24,
+        eyeSize: -0.5,
+        eyeTilt: -0.6,
+        browHeight: 0.4,
+        chinWidth: 0.71,
+      }),
     },
-    worn: kit('mage'),
     props: 'none',
   },
-  // Bellkeeper Tam: young, alert, an ear always on the watchbell.
+  // Bellkeeper Tam, Watchbell Keeper.
   bellkeeper_tam: {
+    cls: 'rogue',
     app: {
       gender: 'male',
-      hair: 'quiff',
-      ...hair(38, 0.55, 0.5),
-      brows: 'soft',
-      eyeShape: 'wide',
+      ...head('quiff', 'none', 'soft_arch', 'default', 'default', 'default', 'large'),
+      ...skin(24, 0.46, 0.61),
+      ...hair(37, 0.57, 0.4),
       ...eyes(200, 0.5, 0.4),
-      ...skin(26, 0.45, 0.62),
-      body: body({ shoulders: -0.1, chest: -0.1 }),
-      outfit: 'azure',
+      headShape: shape({
+        eyeSpacing: 0.06,
+        eyeSize: 1,
+        eyeTilt: 0.1,
+        browHeight: 0.7,
+        chinWidth: 0.62,
+      }),
+      bodyScale: 0.96,
     },
-    worn: kit('rogue'),
     props: 'none',
   },
-  // Frightened Nell: pale, mussed, worried; she does not go to the shore now.
+  // Frightened Nell, Gullhaven Fisher.
   fisher_nell: {
+    cls: 'rogue',
     app: {
       gender: 'female',
-      hair: 'asymbob',
-      ...hair(26, 0.35, 0.4),
-      brows: 'worried',
-      eyeShape: 'droopy',
+      ...head('bob', 'none', 'relaxed', 'hooded', 'soft', 'narrow'),
+      ...skin(24, 0.25, 0.67),
+      ...hair(34, 0.48, 0.25),
       ...eyes(200, 0.3, 0.5),
-      ...skin(26, 0.3, 0.72),
-      mouth: 'frown',
-      face: face({ brow: -0.3, cheeks: -0.2 }),
-      body: body({ shoulders: -0.2 }),
-      outfit: 'teal',
+      headShape: shape({
+        eyeSpacing: -0.22,
+        eyeSize: 1,
+        eyeTilt: -0.8,
+        browHeight: 1,
+        chinWidth: 0.71,
+      }),
+      bodyScale: 0.95,
     },
-    worn: kit('rogue', { hands: null }),
     props: 'none',
   },
-  // The Pale Keeper: the graveyard angel. White on white on white; the
-  // renderer's spirit-healer branches keep her translucent and shimmering.
+  // The Pale Keeper, Warden of the Dead.
   spirit_healer: {
+    cls: 'priest',
     app: {
       gender: 'female',
-      hair: 'longwavy',
-      ...hair(220, 0.04, 0.95),
-      brows: 'soft',
-      eyeShape: 'doe',
-      ...eyes(210, 0.3, 0.75),
+      ...head('waves', 'none', 'soft', 'default', 'soft', 'full'),
       ...skin(220, 0.1, 0.93),
-      mouth: 'lips',
-      face: face({ cheeks: -0.1 }),
-      outfit: 'ivory',
+      ...hair(354, 0.04, 0.7),
+      ...eyes(210, 0.3, 0.75),
+      headShape: shape({ eyeSpacing: -0.31, eyeSize: 0.9, eyeTilt: -0.18, chinWidth: 0.67 }),
+      bodyScale: 1.02,
     },
-    worn: kit('mage'),
     props: 'none',
   },
-  // PTR dev vendor: dev-only free-epics stall; dressed like a patch note.
+  // ptr_dev_vendor.
   ptr_dev_vendor: {
+    cls: 'rogue',
     app: {
       gender: 'male',
-      hair: 'mohawk',
-      ...hair(320, 0.8, 0.5),
-      beard: 'wizard',
+      ...head('mohawk', 'long', 'soft_arch', 'almond', 'default', 'smirk', 'default', 'full'),
+      ...skin(26, 0.5, 0.55),
+      ...hair(320, 0.74, 0.4),
       ...eyes(185, 0.8, 0.5),
-      ...skin(27, 0.45, 0.55),
-      mouth: 'grin',
-      earrings: 'runic',
-      earringMaterial: 'amethyst',
-      outfit: 'magenta',
+      headShape: shape({ eyeSpacing: 1, eyeSize: 1, eyeTilt: 1, browHeight: 0.3, chinWidth: 0.62 }),
+      bodyScale: 1.04,
     },
-    worn: kit('rogue'),
     props: 'none',
   },
 
   // === Mirefen Marsh: Fenbridge, Bridgemere, Willowweep; drab and damp ======
-  // Warden Fenwick: mud-dulled plate, a gate that holds because he does.
+  // Warden Fenwick, Warden of Fenbridge.
   warden_fenwick: {
+    cls: 'warrior',
     app: {
       gender: 'male',
-      hair: 'crew',
-      ...hair(22, 0.35, 0.18),
-      beard: 'scruff',
-      brows: 'angled',
-      eyeShape: 'narrow',
+      ...head('quiff', 'chinstrap', 'default', 'almond', 'broad', 'default'),
+      ...skin(26, 0.43, 0.46),
+      ...hair(23, 0.55, 0.12),
       ...eyes(95, 0.35, 0.3),
-      ...skin(25, 0.4, 0.5),
-      face: face({ jaw: 0.3, brow: 0.2 }),
-      body: body({ shoulders: 0.2 }),
-      outfit: 'forest',
+      headShape: shape({
+        eyeSpacing: 0.4,
+        eyeSize: -0.8,
+        eyeTilt: -0.04,
+        browHeight: -0.24,
+        chinWidth: 0.44,
+      }),
+      bodyScale: 1.02,
     },
-    worn: kit('knight'),
     props: 'sword_shield',
   },
   // Maben Skerrit, the Socketwright: seventy, bald, bench-stooped, squinting at
   // close work since before the Foreman wore his eye; verdigris and copper, bare
   // hands for the setting, and a grievance he keeps as sharp as his graver.
+  // Carried onto the WOC body at the v0.45.0 integration with the same mapping the
+  // character branch used for the rest of the roster (full beard -> boxed, sleepy ->
+  // hooded, hoop earrings -> lobes, his rogue kit -> the rogue body).
   socketwright_skerrit: {
+    cls: 'rogue',
     app: {
       gender: 'male',
-      hair: 'bald',
-      ...hair(32, 0.12, 0.58),
-      beard: 'full',
-      brows: 'bushy',
-      eyeShape: 'sleepy',
-      ...eyes(88, 0.3, 0.26),
+      ...head('bald', 'boxed', 'default', 'hooded', 'default', 'default', 'default', 'lobes'),
       ...skin(26, 0.4, 0.46),
-      mouth: 'frown',
-      face: face({ eyes: -0.25, brow: 0.25, cheeks: -0.35, nose: 0.2 }),
-      body: body({ shoulders: -0.25, chest: -0.2, hands: 0.25 }),
-      earrings: 'hoop',
-      earringMaterial: 'copper',
-      outfit: 'verdigris',
+      ...hair(32, 0.12, 0.58),
+      ...eyes(88, 0.3, 0.26),
+      bodyScale: 0.98,
     },
-    worn: kit('rogue', { hands: null }),
     props: 'knife',
   },
-  // Provisioner Hale: two dry things out of three on a good day, and a wry
-  // grin about it.
+  // Provisioner Hale, Provisioner.
   provisioner_hale: {
+    cls: 'rogue',
     app: {
       gender: 'male',
-      hair: 'buzz',
-      ...hair(26, 0.3, 0.3),
-      beard: 'mutton',
-      brows: 'round',
-      eyeShape: 'droopy',
-      ...eyes(30, 0.4, 0.25),
-      ...skin(26, 0.45, 0.55),
-      mouth: 'grin',
-      face: face({ cheeks: 0.15, nose: 0.15 }),
-    },
-    worn: kit('rogue'),
-    props: 'none',
-  },
-  // Herbalist Yara: twin braids, sleeves off, eyes on the webs in the thicket.
-  herbalist_yara: {
-    app: {
-      gender: 'female',
-      hair: 'twinbraids',
-      ...hair(22, 0.55, 0.22),
-      brows: 'soft',
-      eyeShape: 'round',
-      ...eyes(120, 0.45, 0.35),
+      ...head('bald', 'chops', 'rounded', 'hooded', 'broad', 'smirk'),
       ...skin(26, 0.5, 0.55),
-      body: body({ hands: -0.1 }),
-      outfit: 'forest',
+      ...hair(31, 0.46, 0.2),
+      ...eyes(30, 0.4, 0.25),
+      headShape: shape({
+        eyeSpacing: 0.5,
+        eyeSize: 0.07,
+        eyeTilt: -1,
+        browHeight: 0.3,
+        chinWidth: 0.55,
+      }),
     },
-    worn: kit('druid', { arms: null }),
     props: 'none',
   },
-  // Scout Maren (Vale fen and her Highwatch posting): quiet feet, short blade,
-  // hair up and out of the way.
-  scout_maren: {
+  // Herbalist Yara, Herbalist.
+  herbalist_yara: {
+    cls: 'druid',
     app: {
       gender: 'female',
-      hair: 'highpony',
-      ...hair(22, 0.5, 0.18),
-      brows: 'thin',
-      eyeShape: 'almond',
-      ...eyes(95, 0.45, 0.42),
-      ...skin(25, 0.45, 0.52),
-      face: face({ jaw: 0.1 }),
-      body: body({ shoulders: 0.1, hips: -0.1 }),
-      outfit: 'forest',
+      ...head('twins', 'none', 'soft', 'default', 'soft', 'default'),
+      ...skin(27, 0.5, 0.49),
+      ...hair(29, 0.75, 0.12),
+      ...eyes(120, 0.45, 0.35),
+      headShape: shape({ eyeSpacing: 0.3, eyeSize: 0.25, eyeTilt: -0.2, chinWidth: 0.62 }),
     },
-    worn: kit('ranger'),
+    props: 'none',
+  },
+  // Scout Maren, Marshal's Scout.
+  scout_maren: {
+    cls: 'hunter',
+    app: {
+      gender: 'female',
+      ...head('ponytail', 'none', 'relaxed', 'almond', 'soft', 'default'),
+      ...skin(24, 0.46, 0.47),
+      ...hair(17, 0.65, 0.12),
+      ...eyes(95, 0.45, 0.42),
+      headShape: shape({ eyeSpacing: -0.08, eyeSize: -0.05, eyeTilt: 0.06, chinWidth: 0.56 }),
+    },
     props: 'crossbow',
   },
-  // Bursar Petra Vell: clean ledgers, cleaner vaults, not a hair out of place.
+  // Bursar Petra Vell, The Gilded Strongbox.
   bursar_petra_vell: {
+    cls: 'rogue',
     app: {
       gender: 'female',
-      hair: 'lowbun',
-      ...hair(22, 0.4, 0.08),
-      brows: 'arched',
-      eyeShape: 'almond',
+      ...head('crown', 'none', 'soft_arch', 'almond', 'soft', 'full', 'default', 'lobes'),
+      ...skin(27, 0.38, 0.55),
+      ...hair(9, 0.75, 0.03),
       ...eyes(210, 0.4, 0.35),
-      ...skin(27, 0.4, 0.6),
-      mouth: 'lips',
-      lipstick: 'nude',
-      earrings: 'stud',
-      earringMaterial: 'gold',
-      outfit: 'gilded',
+      headShape: shape({ eyeSpacing: 0.19, eyeSize: 0.29, eyeTilt: 0.5, chinWidth: 0.62 }),
+      bodyScale: 1.01,
     },
-    worn: kit('rogue'),
     props: 'none',
   },
-  // Chronicler Osric Fenn: damp pages, grey curtains of hair, marsh-green robes.
+  // Chronicler Osric Fenn, The Marsh Chronicle.
   chronicler_osric_fenn: {
+    cls: 'mage',
     app: {
       gender: 'male',
-      hair: 'curtains',
-      ...hair(28, 0.15, 0.45),
-      beard: 'goatee',
-      brows: 'worried',
-      eyeShape: 'droopy',
+      ...head('long', 'goatee', 'rounded', 'hooded', 'aquiline', 'default'),
+      ...skin(26, 0.38, 0.53),
+      ...hair(40, 0.15, 0.32),
       ...eyes(95, 0.35, 0.35),
-      ...skin(26, 0.35, 0.55),
-      face: face({ cheeks: -0.25 }),
-      outfit: 'forest',
+      headShape: shape({
+        eyeSpacing: 0.38,
+        eyeSize: -0.1,
+        eyeTilt: -1,
+        browHeight: 0.7,
+        chinWidth: 0.9,
+      }),
     },
-    worn: kit('mage', { head: 'mage' }),
     props: 'tome',
   },
-  // Tanner Hesk: topknot, horseshoe, forearms that live in the vats.
+  // Tanner Hesk, Master of the Tannery.
   tanner_hesk: {
+    cls: 'warrior',
     app: {
       gender: 'male',
-      hair: 'topknot',
-      ...hair(24, 0.5, 0.2),
-      beard: 'horseshoe',
-      brows: 'thick',
-      eyeShape: 'almond',
+      ...head(
+        'topknot',
+        'handlebar',
+        'relaxed',
+        'almond',
+        'default',
+        'default',
+        'default',
+        'lobes',
+      ),
+      ...skin(25, 0.53, 0.46),
+      ...hair(30, 0.75, 0.12),
       ...eyes(28, 0.45, 0.25),
-      ...skin(24, 0.5, 0.48),
-      face: face({ jaw: 0.2 }),
-      body: body({ shoulders: 0.2, hands: 0.3 }),
-      outfit: 'ember',
+      headShape: shape({ eyeSpacing: 0.11, eyeSize: 0.22, eyeTilt: 0.28, chinWidth: 0.5 }),
+      bodyScale: 1.02,
     },
-    worn: kit('barbarian'),
     props: 'knife',
   },
-  // Waykeeper Pell of the Amberfen Steps: hospitable without fuss.
+  // Waykeeper Pell, Keeper of the Amberfen Steps.
   waykeeper_pell: {
+    cls: 'druid',
     app: {
       gender: 'female',
-      hair: 'halfbun',
-      ...hair(24, 0.55, 0.3),
-      brows: 'soft',
-      eyeShape: 'round',
+      ...head('curls', 'none', 'soft', 'default', 'button', 'relaxed'),
+      ...skin(26, 0.38, 0.55),
+      ...hair(30, 0.75, 0.18),
       ...eyes(140, 0.4, 0.35),
-      ...skin(26, 0.45, 0.6),
-      mouth: 'smile',
-      face: face({ cheeks: 0.2 }),
-      outfit: 'ember',
+      headShape: shape({
+        eyeSpacing: 0.06,
+        eyeSize: 0.25,
+        eyeTilt: 0.17,
+        browHeight: 0.3,
+        chinWidth: 0.53,
+      }),
+      bodyScale: 0.96,
     },
-    worn: kit('druid'),
     props: 'walking_staff',
   },
-  // Bridgewright Alden: every plank his, stubble and shoulders to keep them.
+  // Bridgewright Alden, Master of the Fenway.
   bridgewright_alden: {
+    cls: 'warrior',
     app: {
       gender: 'male',
-      hair: 'crew',
-      ...hair(26, 0.45, 0.25),
-      beard: 'stubblebeard',
-      brows: 'bushy',
-      eyeShape: 'almond',
+      ...head('quiff', 'chinstrap', 'default', 'almond', 'default', 'default'),
+      ...skin(26, 0.56, 0.48),
+      ...hair(24, 0.57, 0.18),
       ...eyes(30, 0.4, 0.25),
-      ...skin(25, 0.5, 0.5),
-      face: face({ jaw: 0.25 }),
-      body: body({ shoulders: 0.3, hands: 0.25 }),
+      headShape: shape({ eyeSpacing: -0.32, eyeSize: 0.03, eyeTilt: -0.3, chinWidth: 0.47 }),
+      bodyScale: 1.02,
     },
-    worn: kit('barbarian'),
     props: 'hammer',
   },
-  // Netter Maris: smoked eel built this town; sun-browned and pleased about it.
+  // Netter Maris, Eel-Netter of Bridgemere.
   netter_maris: {
+    cls: 'rogue',
     app: {
       gender: 'female',
-      hair: 'sidepony',
-      ...hair(20, 0.45, 0.15),
-      brows: 'soft',
-      eyeShape: 'almond',
+      ...head('ponytail', 'none', 'soft', 'almond', 'soft', 'thin', 'default', 'nose'),
+      ...skin(23, 0.58, 0.42),
+      ...hair(20, 0.75, 0.07),
       ...eyes(185, 0.5, 0.4),
-      ...skin(24, 0.55, 0.45),
-      mouth: 'grin',
-      face: face({ cheeks: 0.15, smirk: 0.2 }),
-      body: body({ shoulders: 0.15, hands: 0.15 }),
-      outfit: 'teal',
+      headShape: shape({
+        eyeSpacing: 0.27,
+        eyeSize: 0.4,
+        eyeTilt: 0.23,
+        browHeight: 0.3,
+        chinWidth: 0.55,
+      }),
+      bodyScale: 1.01,
     },
-    worn: kit('rogue', { arms: null }),
     props: 'spear',
   },
-  // Mother Sedge, Fen-Witch of Willowweep: grey-veiled, bone septum ring,
-  // cat eyes that heard you from the willows.
+  // Mother Sedge, Fen-Witch of Willowweep.
   mother_sedge: {
+    cls: 'mage',
     app: {
       gender: 'female',
-      hair: 'longcenterpart',
-      ...hair(100, 0.08, 0.7),
-      brows: 'thin',
-      eyeShape: 'cat',
+      ...head('shoulder', 'none', 'relaxed', 'almond', 'default', 'default', 'default', 'septum'),
+      ...skin(24, 0.25, 0.57),
+      ...hair(96, 0.04, 0.5),
       ...eyes(95, 0.6, 0.45),
-      ...skin(28, 0.3, 0.6),
-      mouth: 'neutral',
-      face: face({ cheeks: -0.5, chin: 0.2, nose: 0.2 }),
-      body: body({ shoulders: -0.2, chest: -0.15 }),
-      earrings: 'septum',
-      earringMaterial: 'bone',
-      outfit: 'onyx',
+      headShape: shape({ eyeSpacing: 1, eyeSize: 0.5, eyeTilt: 1, chinWidth: 0.95 }),
+      bodyScale: 0.98,
     },
-    worn: kit('mage'),
     props: 'oak_stave',
   },
-  // Watcher Maren of the Windway: hair braided against the wind that takes hats.
+  // Watcher Maren, The Windway Watch.
   watcher_maren: {
+    cls: 'hunter',
     app: {
       gender: 'female',
-      hair: 'fantasybraid',
-      ...hair(42, 0.45, 0.5),
-      brows: 'flat',
-      eyeShape: 'sharp',
+      ...head('braid', 'none', 'straight', 'almond', 'soft', 'default'),
+      ...skin(26, 0.4, 0.5),
+      ...hair(47, 0.56, 0.32),
       ...eyes(200, 0.45, 0.4),
-      ...skin(25, 0.45, 0.55),
-      face: face({ brow: 0.1 }),
-      body: body({ shoulders: 0.15 }),
-      outfit: 'azure',
+      headShape: shape({
+        eyeSpacing: 0.39,
+        eyeSize: -0.15,
+        eyeTilt: 0.7,
+        browHeight: -0.12,
+        chinWidth: 0.62,
+      }),
+      bodyScale: 1.01,
     },
-    worn: kit('ranger'),
     props: 'crossbow',
   },
-  // Harbormaster Odile: blunt fringe, blunt manner; counts every soul.
+  // Harbormaster Odile, Harbormaster of Wickharbor.
   harbormaster_odile: {
+    cls: 'rogue',
     app: {
       gender: 'female',
-      hair: 'bluntbangs',
-      ...hair(20, 0.4, 0.07),
-      brows: 'sharp',
-      eyeShape: 'sharp',
+      ...head('bob', 'none', 'default', 'almond', 'soft', 'full'),
+      ...skin(26, 0.38, 0.5),
+      ...hair(9, 0.75, 0.03),
       ...eyes(210, 0.45, 0.35),
-      ...skin(26, 0.4, 0.55),
-      mouth: 'lips',
-      lipstick: 'berry',
-      face: face({ brow: 0.2, jaw: 0.15 }),
-      outfit: 'azure',
+      headShape: shape({
+        eyeSpacing: 0.23,
+        eyeSize: 0.28,
+        eyeTilt: 0.7,
+        browHeight: -0.3,
+        chinWidth: 0.53,
+      }),
+      bodyScale: 1.04,
     },
-    worn: kit('rogue'),
     props: 'none',
   },
-  // Keeper Bram of the Old Beacon: nine and thirty years, all of them white.
+  // Keeper Bram, Keeper of the Old Beacon.
   keeper_bram: {
+    cls: 'rogue',
     app: {
       gender: 'male',
-      hair: 'bald',
-      ...hair(40, 0.06, 0.75),
-      beard: 'full',
-      brows: 'bushy',
-      eyeShape: 'round',
+      ...head('bald', 'boxed', 'default', 'default', 'broad', 'full'),
+      ...skin(27, 0.5, 0.48),
+      ...hair(10, 0.04, 0.6),
       ...eyes(200, 0.35, 0.45),
-      ...skin(25, 0.45, 0.5),
-      mouth: 'smile',
-      face: face({ cheeks: -0.2, nose: 0.2 }),
-      outfit: 'teal',
+      headShape: shape({
+        eyeSpacing: 0.45,
+        eyeSize: 0.5,
+        eyeTilt: -0.26,
+        browHeight: 0.5,
+        chinWidth: 0.71,
+      }),
+      bodyScale: 1.01,
     },
-    worn: kit('rogue'),
     props: 'walking_staff',
   },
 
   // === Thornpeak Heights: the Highwatch garrison, steel and azure ==========
-  // Captain Thessaly: two hundred years of wall, one immovable captain.
+  // Captain Thessaly, Highwatch Captain.
   captain_thessaly: {
+    cls: 'warrior',
     app: {
       gender: 'female',
-      hair: 'lowbun',
-      ...hair(24, 0.35, 0.12),
-      brows: 'angled',
-      eyeShape: 'sharp',
+      ...head('crown', 'none', 'default', 'almond', 'soft', 'default'),
+      ...skin(26, 0.39, 0.47),
+      ...hair(3, 0.7, 0.07),
       ...eyes(210, 0.4, 0.35),
-      ...skin(25, 0.4, 0.52),
-      face: face({ jaw: 0.3, brow: 0.2 }),
-      body: body({ shoulders: 0.25 }),
-      outfit: 'azure',
+      headShape: shape({
+        eyeSpacing: 0.14,
+        eyeSize: -0.01,
+        eyeTilt: 0.7,
+        browHeight: -0.24,
+        chinWidth: 0.44,
+      }),
+      bodyScale: 1.02,
     },
-    worn: kit('knight'),
     props: 'sword_shield',
   },
-  // Quartermaster Bree: short of wool, hardtack, steel, and patience.
+  // Quartermaster Bree, Highwatch Quartermaster.
   quartermaster_bree: {
+    cls: 'rogue',
     app: {
       gender: 'female',
-      hair: 'highbun',
-      ...hair(30, 0.5, 0.4),
-      brows: 'worried',
-      eyeShape: 'almond',
+      ...head('curls', 'none', 'relaxed', 'almond', 'soft', 'default'),
+      ...skin(28, 0.38, 0.52),
+      ...hair(37, 0.69, 0.25),
       ...eyes(30, 0.4, 0.3),
-      ...skin(26, 0.45, 0.58),
-      mouth: 'neutral',
-      face: face({ brow: -0.15 }),
-      body: body({ hands: 0.1 }),
+      headShape: shape({
+        eyeSpacing: 0.35,
+        eyeSize: 0.5,
+        eyeTilt: -0.15,
+        browHeight: 0.8,
+        chinWidth: 0.62,
+      }),
     },
-    worn: kit('rogue'),
     props: 'none',
   },
-  // Armorer Hode: viking beard, knight plate over smith leathers.
+  // Armorer Hode, Master Armorer.
   armorer_hode: {
+    cls: 'warrior',
     app: {
       gender: 'male',
-      hair: 'buzz',
-      ...hair(18, 0.5, 0.3),
-      beard: 'vikingb',
-      brows: 'bushy',
-      eyeShape: 'almond',
+      ...head('bald', 'long', 'default', 'almond', 'broad', 'default'),
+      ...skin(25, 0.5, 0.47),
+      ...hair(22, 0.67, 0.2),
       ...eyes(28, 0.5, 0.25),
-      ...skin(24, 0.45, 0.5),
-      face: face({ jaw: 0.3 }),
-      body: body({ shoulders: 0.35, chest: 0.25, hands: 0.2 }),
-      outfit: 'ember',
+      headShape: shape({ eyeSpacing: -0.41, eyeSize: -0.5, eyeTilt: -0.21, chinWidth: 0.44 }),
+      bodyScale: 1.05,
     },
-    worn: kit('barbarian', { chest: 'knight', arms: 'knight' }),
     props: 'hammer',
   },
-  // Quartermaster Vex: heroic-marks broker; obsidian plate, bone stud, a face
-  // that has seen the heroic depths it sells proof of.
+  // Quartermaster Vex, Heroic Quartermaster.
   heroic_quartermaster: {
+    cls: 'warrior',
     app: {
       gender: 'male',
-      hair: 'mohawk',
-      ...hair(20, 0.3, 0.08),
-      beard: 'scruff',
-      brows: 'sharp',
-      eyeShape: 'narrow',
+      ...head('mohawk', 'chinstrap', 'slim', 'almond', 'broad', 'default', 'default', 'brow'),
+      ...skin(23, 0.47, 0.37),
+      ...hair(10, 0.75, 0.03),
       ...eyes(0, 0.5, 0.3),
-      ...skin(22, 0.4, 0.42),
-      mouth: 'frown',
-      face: face({ jaw: 0.3, brow: 0.3, smirk: 0.2 }),
-      body: body({ shoulders: 0.25, chest: 0.15 }),
-      earrings: 'bone',
-      earringMaterial: 'bone',
-      outfit: 'obsidian',
+      headShape: shape({
+        eyeSpacing: -0.36,
+        eyeSize: -0.8,
+        eyeTilt: 0.28,
+        browHeight: -0.6,
+        chinWidth: 0.44,
+      }),
+      bodyScale: 1.03,
     },
-    worn: kit('paladin', { chest: 'knight' }),
     props: 'sword',
   },
-  // Warmarshal Draven Kole: honor is the only coin; blood-forged plate, grey
-  // horseshoe, a face like a shut gate.
+  // Warmarshal Draven Kole, Master of the Warfare Stores.
   warmarshal_draven_kole: {
+    cls: 'paladin',
     app: {
       gender: 'male',
-      hair: 'crewcut',
-      ...hair(30, 0.06, 0.5),
-      beard: 'horseshoe',
-      brows: 'flat',
-      eyeShape: 'narrow',
+      ...head('quiff', 'handlebar', 'relaxed', 'almond', 'broad', 'default'),
+      ...skin(26, 0.46, 0.43),
+      ...hair(10, 0.04, 0.4),
       ...eyes(20, 0.4, 0.35),
-      ...skin(24, 0.4, 0.45),
-      mouth: 'frown',
-      face: face({ jaw: 0.5, brow: 0.4, nose: 0.15 }),
-      body: body({ shoulders: 0.3, chest: 0.2 }),
-      outfit: 'bloodforged',
+      headShape: shape({
+        eyeSpacing: 0.01,
+        eyeSize: -0.8,
+        eyeTilt: 0.21,
+        browHeight: -0.8,
+        chinWidth: 0.32,
+      }),
+      bodyScale: 1.03,
     },
-    worn: kit('paladin'),
     props: 'sword_shield',
   },
-  // Loremaster Caddis: grey sidepart, restless mountains, sleepless reading.
+  // Loremaster Caddis, Loremaster.
   loremaster_caddis: {
+    cls: 'mage',
     app: {
       gender: 'male',
-      hair: 'sidepart',
-      ...hair(30, 0.08, 0.6),
-      beard: 'goatee',
-      brows: 'round',
-      eyeShape: 'sleepy',
+      ...head('swept', 'goatee', 'rounded', 'hooded', 'default', 'default'),
+      ...skin(26, 0.39, 0.57),
+      ...hair(9, 0.04, 0.5),
       ...eyes(210, 0.35, 0.4),
-      ...skin(26, 0.4, 0.58),
-      face: face({ cheeks: -0.2, brow: -0.1 }),
-      outfit: 'royal',
+      headShape: shape({
+        eyeSpacing: -0.11,
+        eyeSize: -0.5,
+        eyeTilt: -0.5,
+        browHeight: 0.4,
+        chinWidth: 0.71,
+      }),
+      bodyScale: 1.03,
     },
-    worn: kit('mage', { head: 'mage' }),
     props: 'tome',
   },
-  // Auctioneer Voss: pompadour, moustache, gold chain; the market as theatre.
+  // Auctioneer Voss, Keeper of the World Market.
   auctioneer_voss: {
+    cls: 'rogue',
     app: {
       gender: 'male',
-      hair: 'pompadour',
-      ...hair(24, 0.55, 0.3),
-      beard: 'stache',
-      brows: 'arched',
-      eyeShape: 'almond',
+      ...head('swept', 'moustache', 'arched', 'almond', 'default', 'smirk', 'default', 'ears'),
+      ...skin(26, 0.48, 0.53),
+      ...hair(20, 0.61, 0.23),
       ...eyes(46, 0.5, 0.4),
-      ...skin(26, 0.45, 0.55),
-      mouth: 'grin',
-      face: face({ smirk: 0.4, cheeks: 0.1 }),
-      earrings: 'chain',
-      earringMaterial: 'gold',
-      outfit: 'gilded',
+      headShape: shape({
+        eyeSpacing: -0.31,
+        eyeSize: 0.7,
+        eyeTilt: 0.5,
+        browHeight: 1,
+        chinWidth: 0.57,
+      }),
+      bodyScale: 0.99,
     },
-    worn: kit('rogue'),
     props: 'none',
   },
-  // Bursar Aldous Crane: scrupulously polite, mildly pained, gaunt as a ledger.
+  // Bursar Aldous Crane, The Gilded Strongbox.
   bursar_aldous_crane: {
+    cls: 'rogue',
     app: {
       gender: 'male',
-      hair: 'buzz',
-      ...hair(30, 0.06, 0.55),
-      brows: 'thin',
-      eyeShape: 'narrow',
+      ...head('bald', 'none', 'slim', 'almond', 'aquiline', 'default'),
+      ...skin(29, 0.38, 0.58),
+      ...hair(41, 0.04, 0.4),
       ...eyes(30, 0.3, 0.3),
-      ...skin(26, 0.35, 0.6),
-      mouth: 'frown',
-      face: face({ cheeks: -0.5, chin: -0.1, nose: 0.2 }),
-      body: body({ shoulders: -0.2, chest: -0.2 }),
-      outfit: 'gilded',
+      headShape: shape({
+        eyeSpacing: -1,
+        eyeSize: -0.8,
+        eyeTilt: -0.17,
+        browHeight: 0.5,
+        chinWidth: 1,
+      }),
+      bodyScale: 1.05,
     },
-    worn: kit('rogue'),
     props: 'none',
   },
-  // Marla Hitchen, Stablemaster: wind-tangled, no-nonsense, reins-callused.
+  // Marla Hitchen, Stablemaster.
   stablemaster_marla: {
+    cls: 'hunter',
     app: {
       gender: 'female',
-      hair: 'layered',
-      ...hair(38, 0.5, 0.4),
-      brows: 'flat',
-      eyeShape: 'almond',
+      ...head('waves', 'none', 'straight', 'almond', 'soft', 'default'),
+      ...skin(27, 0.5, 0.49),
+      ...hair(42, 0.67, 0.25),
       ...eyes(140, 0.4, 0.35),
-      ...skin(26, 0.5, 0.55),
-      face: face({ jaw: 0.15 }),
-      body: body({ shoulders: 0.15, hands: 0.25 }),
+      headShape: shape({ eyeSpacing: -0.43, eyeSize: -0.09, eyeTilt: -0.1, chinWidth: 0.53 }),
+      bodyScale: 1.01,
     },
-    worn: kit('ranger'),
     props: 'none',
   },
-  // Chronicler Zenzie: the Peaks remember; silver bob, sky-blue robes.
+  // Chronicler Zenzie, The Peaks Chronicle.
   chronicler_edda_hartwell: {
+    cls: 'mage',
     app: {
       gender: 'female',
-      hair: 'wavybob',
-      ...hair(220, 0.06, 0.85),
-      brows: 'arched',
-      eyeShape: 'cat',
+      ...head('bob', 'none', 'soft_arch', 'almond', 'soft', 'relaxed'),
+      ...skin(27, 0.38, 0.57),
+      ...hair(216, 0.04, 0.6),
       ...eyes(210, 0.5, 0.45),
-      ...skin(27, 0.4, 0.62),
-      mouth: 'smile',
-      outfit: 'azure',
+      headShape: shape({
+        eyeSpacing: -0.31,
+        eyeSize: 0.3,
+        eyeTilt: 1,
+        browHeight: 0.3,
+        chinWidth: 0.62,
+      }),
     },
-    worn: kit('mage', { head: 'mage' }),
     props: 'tome',
   },
-  // Alchemist Verane: measured twice, poured once; precise to the eyelash.
+  // Alchemist Verane, Master of the Apothecary.
   alchemist_verane: {
+    cls: 'mage',
     app: {
       gender: 'female',
-      hair: 'highbun',
-      ...hair(280, 0.25, 0.15),
-      brows: 'thin',
-      eyeShape: 'narrow',
+      ...head('topknot', 'none', 'relaxed', 'almond', 'soft', 'full', 'default', 'nose'),
+      ...skin(29, 0.31, 0.54),
+      ...hair(280, 0.46, 0.07),
       ...eyes(280, 0.5, 0.4),
-      ...skin(27, 0.35, 0.6),
-      mouth: 'lips',
-      eyeshadow: 'plum',
-      face: face({ brow: 0.1 }),
-      outfit: 'violet',
+      headShape: shape({
+        eyeSpacing: -0.6,
+        eyeSize: -0.8,
+        eyeTilt: 0.5,
+        browHeight: -0.12,
+        chinWidth: 0.62,
+      }),
     },
-    worn: kit('mage'),
     props: 'none',
   },
-  // Ondrel Vane, Tidewatcher: thirty nights at the mere, and tonight it is open.
+  // Ondrel Vane, Tidewatcher.
   tidewatcher_ondrel: {
+    cls: 'rogue',
     app: {
       gender: 'male',
-      hair: 'longpart',
-      ...hair(220, 0.15, 0.15),
-      beard: 'stubble',
-      brows: 'worried',
-      eyeShape: 'sleepy',
+      ...head('shoulder', 'none', 'rounded', 'hooded', 'aquiline', 'default'),
+      ...skin(26, 0.38, 0.53),
+      ...hair(278, 0.08, 0.07),
       ...eyes(185, 0.55, 0.45),
-      ...skin(26, 0.35, 0.55),
-      face: face({ cheeks: -0.3, brow: -0.2 }),
-      outfit: 'teal',
+      headShape: shape({
+        eyeSpacing: -0.38,
+        eyeSize: -0.6,
+        eyeTilt: -0.6,
+        browHeight: 0.7,
+        chinWidth: 0.76,
+      }),
     },
-    worn: kit('rogue'),
     props: 'none',
   },
-  // Strandwatcher Pell: out of the black trees at last; sun-dark, sword kept.
+  // Strandwatcher Pell, Watcher of the Tanglemouth.
   strandwatcher_pell: {
+    cls: 'hunter',
     app: {
       gender: 'male',
-      hair: 'buzz',
-      ...hair(20, 0.4, 0.06),
-      beard: 'scruff',
-      brows: 'flat',
-      eyeShape: 'almond',
+      ...head('mohawk', 'chinstrap', 'relaxed', 'almond', 'default', 'default', 'default', 'lobes'),
+      ...skin(26, 0.61, 0.27),
+      ...hair(3, 0.7, 0.03),
       ...eyes(28, 0.5, 0.25),
-      ...skin(22, 0.5, 0.32),
-      face: face({ jaw: 0.2 }),
-      body: body({ shoulders: 0.15 }),
-      outfit: 'teal',
+      headShape: shape({ eyeSpacing: 0.32, eyeSize: 0.29, eyeTilt: -0.11, chinWidth: 0.5 }),
+      bodyScale: 1.01,
     },
-    worn: kit('rogue', { chest: 'ranger' }),
     props: 'sword',
   },
-  // Salvage-Boss Ryna: wreck-line muscle, bone hoop, salt-cropped black hair.
+  // Salvage-Boss Ryna, Mistress of the Wreck Line.
   salvage_boss_ryna: {
+    cls: 'warrior',
     app: {
       gender: 'female',
-      hair: 'fauxhawk',
-      ...hair(20, 0.4, 0.08),
-      brows: 'angled',
-      eyeShape: 'sharp',
+      ...head('undercut', 'none', 'default', 'almond', 'soft', 'thin', 'default', 'full'),
+      ...skin(26, 0.61, 0.33),
+      ...hair(9, 0.75, 0.03),
       ...eyes(185, 0.5, 0.4),
-      ...skin(23, 0.5, 0.38),
-      mouth: 'grin',
-      face: face({ jaw: 0.25, smirk: 0.25 }),
-      body: body({ shoulders: 0.3, chest: 0.15, hands: 0.2 }),
-      earrings: 'bonehoop',
-      earringMaterial: 'bone',
-      outfit: 'teal',
+      headShape: shape({
+        eyeSpacing: 0.23,
+        eyeSize: -0.11,
+        eyeTilt: 0.7,
+        browHeight: 0.3,
+        chinWidth: 0.47,
+      }),
+      bodyScale: 1.03,
     },
-    worn: kit('barbarian'),
     props: 'woodaxe',
   },
-  // Pearl-Mother Isha, Elder of the Divers: white crown braid, pearl moons.
+  // Pearl-Mother Isha, Elder of the Divers.
   pearlmother_isha: {
+    cls: 'druid',
     app: {
       gender: 'female',
-      hair: 'braidcrown',
-      ...hair(40, 0.05, 0.85),
-      brows: 'soft',
-      eyeShape: 'doe',
+      ...head('crown', 'none', 'soft', 'default', 'default', 'relaxed', 'default', 'ears'),
+      ...skin(29, 0.69, 0.22),
+      ...hair(41, 0.04, 0.6),
       ...eyes(185, 0.45, 0.45),
-      ...skin(22, 0.5, 0.28),
-      mouth: 'smile',
-      face: face({ cheeks: -0.25 }),
-      earrings: 'moonstar',
-      earringMaterial: 'pearl',
-      outfit: 'ivory',
+      headShape: shape({
+        eyeSpacing: 0.39,
+        eyeSize: 0.9,
+        eyeTilt: -0.21,
+        browHeight: 0.3,
+        chinWidth: 0.73,
+      }),
     },
-    worn: kit('druid'),
     props: 'walking_staff',
   },
-  // Okku, The Man Who Went In: wiry, bald, grey-bearded, listening for drums.
+  // Okrim, The Man Who Went In.
   hermit_okku: {
+    cls: 'warrior',
     app: {
       gender: 'male',
-      hair: 'bald',
-      ...hair(30, 0.06, 0.65),
-      beard: 'wizard',
-      brows: 'worried',
-      eyeShape: 'wide',
+      ...head('bald', 'long', 'rounded', 'default', 'aquiline', 'default', 'default', 'septum'),
+      ...skin(26, 0.61, 0.32),
+      ...hair(41, 0.04, 0.5),
       ...eyes(95, 0.4, 0.35),
-      ...skin(22, 0.5, 0.35),
-      mouth: 'neutral',
-      face: face({ cheeks: -0.5, nose: 0.2, brow: -0.2 }),
-      body: body({ shoulders: -0.25, chest: -0.3, hips: -0.2 }),
-      earrings: 'bone',
-      earringMaterial: 'bone',
+      headShape: shape({
+        eyeSpacing: 0.8,
+        eyeSize: 1,
+        eyeTilt: -0.23,
+        browHeight: 0.9,
+        chinWidth: 0.85,
+      }),
+      bodyScale: 0.95,
     },
-    worn: kit('barbarian', { chest: null, arms: null, hands: null }),
     props: 'walking_staff',
   },
-  // Gatewarden Pell of the Evergarden: verdigris plate, garden-gate polite.
+  // Gatewarden Pell, Keeper of the Garden Gate.
   gatewarden_pell: {
+    cls: 'warrior',
     app: {
       gender: 'male',
-      hair: 'crew',
-      ...hair(44, 0.5, 0.55),
-      brows: 'soft',
-      eyeShape: 'round',
+      ...head('quiff', 'none', 'soft_arch', 'default', 'default', 'full'),
+      ...skin(29, 0.38, 0.57),
+      ...hair(46, 0.47, 0.4),
       ...eyes(140, 0.45, 0.4),
-      ...skin(26, 0.4, 0.6),
-      mouth: 'smile',
-      outfit: 'verdigris',
+      headShape: shape({
+        eyeSpacing: -0.4,
+        eyeSize: 0.25,
+        eyeTilt: 0.13,
+        browHeight: 0.3,
+        chinWidth: 0.62,
+      }),
     },
-    worn: kit('knight'),
     props: 'sword',
   },
-  // Head Gardener Amaranth: shadows under the eyes; someone must stay awake.
+  // Head Gardener Amaranth, Head Gardener of the Evergarden.
   head_gardener_amaranth: {
+    cls: 'mage',
     app: {
       gender: 'female',
-      hair: 'longcenterpart',
-      ...hair(150, 0.3, 0.12),
-      brows: 'soft',
-      eyeShape: 'droopy',
+      ...head('shoulder', 'none', 'soft', 'hooded', 'default', 'default'),
+      ...skin(24, 0.25, 0.67),
+      ...hair(133, 0.66, 0.03),
       ...eyes(140, 0.55, 0.45),
-      ...skin(26, 0.25, 0.72),
-      mouth: 'neutral',
-      eyeshadow: 'smoke',
-      face: face({ cheeks: -0.3, brow: -0.2 }),
-      outfit: 'emerald',
+      headShape: shape({
+        eyeSpacing: -0.3,
+        eyeSize: 0.24,
+        eyeTilt: -0.9,
+        browHeight: 0.4,
+        chinWidth: 0.76,
+      }),
     },
-    worn: kit('mage'),
     props: 'none',
   },
-  // Wickmother Sorrel of the Hedgewick Inn: copper curls, cordial on the fire.
+  // Wickmother Sorrel, Keeper of the Hedgewick Inn.
   wickmother_sorrel: {
+    cls: 'druid',
     app: {
       gender: 'female',
-      hair: 'curls',
-      ...hair(14, 0.65, 0.4),
-      brows: 'round',
-      eyeShape: 'round',
+      ...head('curls', 'none', 'rounded', 'default', 'button', 'relaxed', 'default', 'lobes'),
+      ...skin(26, 0.41, 0.57),
+      ...hair(16, 0.72, 0.26),
       ...eyes(140, 0.4, 0.35),
-      ...skin(26, 0.5, 0.62),
-      mouth: 'smile',
-      blush: 'peach',
-      face: face({ cheeks: 0.4 }),
-      body: body({ hips: 0.15, chest: 0.1 }),
-      outfit: 'rose',
+      headShape: shape({
+        eyeSpacing: 0.5,
+        eyeSize: 0.6,
+        eyeTilt: -0.11,
+        browHeight: 0.3,
+        chinWidth: 0.15,
+      }),
+      bodyScale: 1.01,
     },
-    worn: kit('druid'),
     props: 'none',
   },
-  // Salvager Edda: flat-voiced wreckfield picker, axe over one shoulder.
+  // Salvager Edda, Wreckfield Salvager.
   salvager_edda: {
+    cls: 'rogue',
     app: {
       gender: 'female',
-      hair: 'lowpony',
-      ...hair(26, 0.4, 0.3),
-      brows: 'flat',
-      eyeShape: 'almond',
+      ...head('ponytail', 'none', 'straight', 'almond', 'soft', 'default', 'default', 'nose'),
+      ...skin(26, 0.5, 0.45),
+      ...hair(33, 0.63, 0.18),
       ...eyes(200, 0.3, 0.35),
-      ...skin(25, 0.45, 0.5),
-      mouth: 'neutral',
-      face: face({ jaw: 0.1 }),
-      body: body({ shoulders: 0.2, hands: 0.15 }),
-      outfit: 'onyx',
+      headShape: shape({ eyeSpacing: 0.45, eyeSize: -0.11, chinWidth: 0.56 }),
+      bodyScale: 1.02,
     },
-    worn: kit('rogue'),
     props: 'woodaxe',
   },
 
   // === The Veiled Hollow and its night towns: silver, violet, pointed ears ==
-  // Keeper Saelwyn: ageless keeper of the boughs; violet-silver braid, cat eyes.
+  // Keeper Saelwyn, Keeper of the Hollow.
   keeper_saelwyn: {
+    cls: 'mage',
     app: {
       gender: 'female',
-      hair: 'fantasybraid',
-      ...hair(250, 0.15, 0.6),
-      brows: 'arched',
-      eyeShape: 'cat',
+      ...head('braid', 'none', 'soft_arch', 'almond', 'button', 'full', 'pointed', 'ears'),
+      ...skin(29, 0.25, 0.62),
+      ...hair(271, 0.08, 0.4),
       ...eyes(280, 0.6, 0.45),
-      ...skin(28, 0.3, 0.68),
-      mouth: 'lips',
-      lipstick: 'rose',
-      ears: 'pointed',
-      earrings: 'moonstar',
-      earringMaterial: 'silver',
-      face: face({ cheeks: 0.2, chin: -0.1 }),
-      outfit: 'emerald',
+      headShape: shape({ eyeSpacing: -0.41, eyeSize: -0.18, eyeTilt: 1, chinWidth: 0.53 }),
     },
-    worn: kit('mage'),
     props: 'staff',
   },
-  // Loremother Bryn, Voice of the Shrine: white crown braid, listening lights.
+  // Loremother Bryn, Voice of the Shrine.
   loremother_bryn: {
+    cls: 'mage',
     app: {
       gender: 'female',
-      hair: 'braidcrown',
-      ...hair(240, 0.06, 0.88),
-      brows: 'soft',
-      eyeShape: 'doe',
+      ...head('crown', 'none', 'soft', 'default', 'soft', 'relaxed', 'pointed'),
+      ...skin(27, 0.25, 0.59),
+      ...hair(333, 0.04, 0.6),
       ...eyes(210, 0.4, 0.55),
-      ...skin(27, 0.3, 0.65),
-      mouth: 'smile',
-      ears: 'pointed',
-      face: face({ cheeks: -0.2 }),
-      outfit: 'violet',
+      headShape: shape({
+        eyeSpacing: 0.37,
+        eyeSize: 0.9,
+        eyeTilt: -0.01,
+        browHeight: 0.3,
+        chinWidth: 0.71,
+      }),
+      bodyScale: 1.05,
     },
-    worn: kit('mage'),
     props: 'walking_staff',
   },
-  // Provisioner Fenna: a human trader at home under the boughs; warm bread.
+  // Provisioner Fenna, Eldershine Provisioner.
   provisioner_fenna: {
+    cls: 'druid',
     app: {
       gender: 'female',
-      hair: 'chinbob',
-      ...hair(24, 0.55, 0.3),
-      brows: 'soft',
-      eyeShape: 'round',
+      ...head('bob', 'none', 'soft', 'default', 'button', 'relaxed'),
+      ...skin(26, 0.38, 0.55),
+      ...hair(30, 0.75, 0.18),
       ...eyes(140, 0.4, 0.35),
-      ...skin(26, 0.45, 0.6),
-      mouth: 'smile',
-      face: face({ cheeks: 0.25 }),
-      outfit: 'forest',
+      headShape: shape({
+        eyeSpacing: -0.43,
+        eyeSize: 0.25,
+        eyeTilt: -0.18,
+        browHeight: 0.3,
+        chinWidth: 0.51,
+      }),
+      bodyScale: 1.03,
     },
-    worn: kit('druid'),
     props: 'none',
   },
-  // Wardsmith Orun, Keeper of the Old Forges: verdigris on old bronze work.
+  // Wardsmith Orun, Keeper of the Old Forges.
   wardsmith_orun: {
+    cls: 'warrior',
     app: {
       gender: 'male',
-      hair: 'topknot',
-      ...hair(22, 0.4, 0.1),
-      beard: 'shortbox',
-      brows: 'thick',
-      eyeShape: 'almond',
+      ...head('topknot', 'boxed', 'relaxed', 'almond', 'default', 'default', 'default', 'ears'),
+      ...skin(27, 0.51, 0.42),
+      ...hair(10, 0.6, 0.07),
       ...eyes(95, 0.45, 0.35),
-      ...skin(25, 0.45, 0.45),
-      face: face({ jaw: 0.25, brow: 0.15 }),
-      body: body({ shoulders: 0.3, chest: 0.2, hands: 0.2 }),
-      earrings: 'cuff',
-      earringMaterial: 'bronze',
-      outfit: 'verdigris',
+      headShape: shape({
+        eyeSpacing: 0.09,
+        eyeSize: 0.2,
+        eyeTilt: 0.15,
+        browHeight: -0.18,
+        chinWidth: 0.47,
+      }),
+      bodyScale: 1.03,
     },
-    worn: kit('barbarian', { arms: 'knight' }),
     props: 'hammer',
   },
-  // Archivist Tullo, Reader of Stones: fresh ears for waiting monuments.
+  // Archivist Tullo, Reader of Stones.
   archivist_tullo: {
+    cls: 'mage',
     app: {
       gender: 'male',
-      hair: 'crew',
-      ...hair(28, 0.15, 0.4),
-      brows: 'round',
-      eyeShape: 'narrow',
+      ...head('quiff', 'none', 'rounded', 'almond', 'default', 'default'),
+      ...skin(26, 0.4, 0.57),
+      ...hair(19, 0.15, 0.32),
       ...eyes(210, 0.35, 0.4),
-      ...skin(26, 0.4, 0.58),
-      face: face({ cheeks: -0.15, brow: -0.1 }),
-      outfit: 'royal',
+      headShape: shape({
+        eyeSpacing: -0.34,
+        eyeSize: -0.8,
+        eyeTilt: 0.2,
+        browHeight: 0.12,
+        chinWidth: 0.69,
+      }),
+      bodyScale: 0.97,
     },
-    worn: kit('mage', { head: 'mage' }),
     props: 'tome',
   },
-  // Huntsman Deral, Warden of the Herds: quiet now; the valley listens back.
+  // Huntsman Deral, Warden of the Herds.
   huntsman_deral: {
+    cls: 'hunter',
     app: {
       gender: 'male',
-      hair: 'lowpony',
-      ...hair(24, 0.45, 0.25),
-      beard: 'scruff',
-      brows: 'soft',
-      eyeShape: 'almond',
+      ...head('ponytail', 'chinstrap', 'soft_arch', 'almond', 'default', 'default'),
+      ...skin(26, 0.52, 0.46),
+      ...hair(23, 0.57, 0.18),
       ...eyes(120, 0.4, 0.3),
-      ...skin(25, 0.45, 0.5),
-      mouth: 'neutral',
-      body: body({ shoulders: 0.15 }),
-      outfit: 'forest',
+      headShape: shape({ eyeSpacing: 0.45, eyeSize: -0.22, eyeTilt: 0.24, chinWidth: 0.62 }),
+      bodyScale: 1.01,
     },
-    worn: kit('ranger'),
     props: 'crossbow',
   },
-  // Lamplighter Sorrel, Keeper of the Nightgate: silver youth with a lamp pole.
+  // Lamplighter Sorrel, Keeper of the Nightgate.
   lamplighter_sorrel: {
+    cls: 'mage',
     app: {
       gender: 'male',
-      hair: 'quiff',
-      ...hair(250, 0.15, 0.55),
-      brows: 'soft',
-      eyeShape: 'wide',
+      ...head('quiff', 'none', 'soft_arch', 'default', 'default', 'full', 'pointed'),
+      ...skin(27, 0.28, 0.61),
+      ...hair(253, 0.15, 0.4),
       ...eyes(46, 0.6, 0.5),
-      ...skin(27, 0.3, 0.62),
-      mouth: 'smile',
-      ears: 'pointed',
-      outfit: 'violet',
+      headShape: shape({ eyeSpacing: -0.17, eyeSize: 0.9, browHeight: 0.3, chinWidth: 0.62 }),
+      bodyScale: 1.02,
     },
-    worn: kit('mage'),
     props: 'walking_staff',
   },
-  // Lira Dewsong, Night-Gardener of Moonrest: lavender hair, rose lips, dew.
+  // Lira Dewsong, Night-Gardener of Moonrest.
   lira_dewsong: {
+    cls: 'druid',
     app: {
       gender: 'female',
-      hair: 'longwavy',
-      ...hair(275, 0.35, 0.7),
-      brows: 'arched',
-      eyeShape: 'doe',
+      ...head('waves', 'none', 'soft_arch', 'default', 'soft', 'full', 'pointed', 'ears'),
+      ...skin(23, 0.25, 0.62),
+      ...hair(280, 0.15, 0.5),
       ...eyes(320, 0.45, 0.5),
-      ...skin(27, 0.3, 0.66),
-      mouth: 'lips',
-      lipstick: 'rose',
-      ears: 'pointed',
-      earrings: 'feather',
-      earringMaterial: 'silver',
-      outfit: 'emerald',
+      headShape: shape({ eyeSpacing: -0.2, eyeSize: 0.9, eyeTilt: 0.19, chinWidth: 0.62 }),
+      bodyScale: 1.05,
     },
-    worn: kit('druid'),
     props: 'none',
   },
-  // Weaver Amelle: moonfleece on the loom; frost-blue halfbun, ivory robes.
+  // Weaver Amelle, Moonfleece Weaver.
   weaver_amelle: {
+    cls: 'mage',
     app: {
       gender: 'female',
-      hair: 'halfbun',
-      ...hair(220, 0.2, 0.75),
-      brows: 'soft',
-      eyeShape: 'almond',
+      ...head('curls', 'none', 'soft', 'almond', 'soft', 'relaxed', 'pointed'),
+      ...skin(31, 0.25, 0.57),
+      ...hair(250, 0.04, 0.5),
       ...eyes(210, 0.4, 0.55),
-      ...skin(27, 0.3, 0.64),
-      mouth: 'smile',
-      ears: 'pointed',
-      body: body({ hands: -0.1 }),
-      outfit: 'ivory',
+      headShape: shape({
+        eyeSpacing: -0.15,
+        eyeSize: 0.14,
+        eyeTilt: -0.06,
+        browHeight: 0.3,
+        chinWidth: 0.62,
+      }),
     },
-    worn: kit('mage'),
     props: 'none',
   },
-  // Gardener Yew, The Last Gardener: mossy calm, a scythe kept working.
+  // Gardener Yew, The Last Gardener.
   gardener_yew: {
+    cls: 'druid',
     app: {
       gender: 'male',
-      hair: 'crew',
-      ...hair(90, 0.25, 0.25),
-      beard: 'stubblebeard',
-      brows: 'soft',
-      eyeShape: 'sleepy',
+      ...head('quiff', 'chinstrap', 'soft_arch', 'hooded', 'default', 'full'),
+      ...skin(27, 0.4, 0.53),
+      ...hair(95, 0.3, 0.18),
       ...eyes(140, 0.5, 0.4),
-      ...skin(26, 0.4, 0.55),
-      mouth: 'smile',
-      face: face({ brow: -0.1 }),
-      body: body({ hands: 0.2 }),
-      outfit: 'emerald',
+      headShape: shape({
+        eyeSpacing: 0.11,
+        eyeSize: -0.5,
+        eyeTilt: -0.35,
+        browHeight: 0.42,
+        chinWidth: 0.62,
+      }),
     },
-    worn: kit('druid'),
     props: 'scythe',
   },
 
   // === Wraithwood: Gallowmere and the Mournstone, mourning onyx ============
-  // Lampman Cobb: stays in the lamplight and counts who passes; so does the wood.
+  // Lampman Cobb, Keeper of the Crowgate Lanterns.
   lampman_cobb: {
+    cls: 'rogue',
     app: {
       gender: 'male',
-      hair: 'buzz',
-      ...hair(26, 0.3, 0.25),
-      beard: 'scruff',
-      brows: 'worried',
-      eyeShape: 'wide',
+      ...head('bald', 'chinstrap', 'rounded', 'default', 'default', 'default', 'default', 'nose'),
+      ...skin(28, 0.25, 0.5),
+      ...hair(26, 0.34, 0.18),
       ...eyes(46, 0.5, 0.45),
-      ...skin(26, 0.3, 0.55),
-      mouth: 'neutral',
-      face: face({ brow: -0.2, cheeks: -0.2 }),
-      outfit: 'onyx',
+      headShape: shape({
+        eyeSpacing: 0.7,
+        eyeSize: 1,
+        eyeTilt: 0.03,
+        browHeight: 0.64,
+        chinWidth: 0.71,
+      }),
     },
-    worn: kit('rogue'),
     props: 'walking_staff',
   },
-  // Sexton Marrow: gaunt keeper of deep graves; the bells are his argument.
+  // Sexton Marrow, Sexton of Gibbetmere.
   sexton_marrow: {
+    cls: 'mage',
     app: {
       gender: 'male',
-      hair: 'bald',
-      ...hair(30, 0.05, 0.5),
-      beard: 'chinpuff',
-      brows: 'thin',
-      eyeShape: 'droopy',
+      ...head('bald', 'chin', 'slim', 'hooded', 'aquiline', 'default'),
+      ...skin(30, 0.25, 0.53),
+      ...hair(9, 0.04, 0.4),
       ...eyes(95, 0.3, 0.3),
-      ...skin(28, 0.2, 0.55),
-      mouth: 'frown',
-      face: face({ cheeks: -0.6, chin: -0.2, nose: 0.25 }),
-      body: body({ shoulders: -0.25, chest: -0.25 }),
-      outfit: 'bonewrought',
+      headShape: shape({
+        eyeSpacing: -1,
+        eyeSize: -0.7,
+        eyeTilt: -0.9,
+        browHeight: -0.4,
+        chinWidth: 1,
+      }),
+      bodyScale: 0.97,
     },
-    worn: kit('mage'),
     props: 'scythe',
   },
-  // Widow Tansy, Candlewright: white bun, mourning black, not one candle out.
+  // Widow Tansy, Candlewright of Gibbetmere.
   widow_tansy: {
+    cls: 'mage',
     app: {
       gender: 'female',
-      hair: 'highbun',
-      ...hair(40, 0.05, 0.8),
-      brows: 'worried',
-      eyeShape: 'droopy',
+      ...head('curls', 'none', 'relaxed', 'hooded', 'default', 'narrow', 'default', 'lobes'),
+      ...skin(28, 0.25, 0.57),
+      ...hair(9, 0.04, 0.6),
       ...eyes(46, 0.4, 0.4),
-      ...skin(27, 0.3, 0.62),
-      mouth: 'frown',
-      face: face({ cheeks: -0.4, brow: -0.2 }),
-      body: body({ shoulders: -0.25, chest: -0.15 }),
-      outfit: 'onyx',
+      headShape: shape({
+        eyeSpacing: -0.08,
+        eyeSize: 0.09,
+        eyeTilt: -1,
+        browHeight: 0.7,
+        chinWidth: 0.8,
+      }),
+      bodyScale: 0.97,
     },
-    worn: kit('mage'),
     props: 'none',
   },
-  // Vicar Creel, Last Vicar of the Mournstone: the chapel fell; he stayed.
+  // Vicar Creel, Last Vicar of the Mournstone.
   vicar_creel: {
+    cls: 'priest',
     app: {
       gender: 'male',
-      hair: 'crew',
-      ...hair(40, 0.05, 0.75),
-      brows: 'flat',
-      eyeShape: 'narrow',
+      ...head('quiff', 'none', 'relaxed', 'almond', 'aquiline', 'default'),
+      ...skin(26, 0.29, 0.57),
+      ...hair(10, 0.04, 0.6),
       ...eyes(210, 0.25, 0.4),
-      ...skin(26, 0.3, 0.58),
-      mouth: 'neutral',
-      face: face({ cheeks: -0.35, jaw: 0.1 }),
-      outfit: 'onyx',
+      headShape: shape({ eyeSpacing: -0.11, eyeSize: -0.8, eyeTilt: -0.1, chinWidth: 0.72 }),
     },
-    worn: kit('mage'),
     props: 'staff',
   },
-  // Gravedigger Mosley: nervous chatter against the wood; shovel-shouldered.
+  // gravedigger_mosley.
   gravedigger_mosley: {
+    cls: 'rogue',
     app: {
       gender: 'male',
-      hair: 'buzz',
-      ...hair(24, 0.35, 0.2),
-      beard: 'stubble',
-      brows: 'worried',
-      eyeShape: 'wide',
+      ...head('bald', 'none', 'rounded', 'default', 'default', 'default', 'default', 'lip'),
+      ...skin(27, 0.38, 0.47),
+      ...hair(31, 0.64, 0.12),
       ...eyes(30, 0.35, 0.3),
-      ...skin(26, 0.35, 0.5),
-      mouth: 'open',
-      face: face({ brow: -0.25 }),
-      body: body({ shoulders: 0.2, hands: 0.2 }),
-      outfit: 'onyx',
+      headShape: shape({
+        eyeSpacing: 0.6,
+        eyeSize: 0.8,
+        eyeTilt: 0.03,
+        browHeight: 0.9,
+        chinWidth: 0.62,
+      }),
+      bodyScale: 1.02,
     },
-    worn: kit('rogue'),
     props: 'woodaxe',
   },
 
   // === The Frostveil Reach: Icemantle, pale furs and aurora ================
-  // Warden Kaldra: a grandmother's patience with a warden's shield.
+  // Warden Kaldra, Warden of Icemantle.
   warden_kaldra: {
+    cls: 'warrior',
     app: {
       gender: 'female',
-      hair: 'braidcrown',
-      ...hair(220, 0.05, 0.78),
-      brows: 'soft',
-      eyeShape: 'almond',
+      ...head('crown', 'none', 'soft', 'almond', 'soft', 'default'),
+      ...skin(28, 0.25, 0.62),
+      ...hair(263, 0.04, 0.6),
       ...eyes(210, 0.45, 0.5),
-      ...skin(26, 0.3, 0.68),
-      mouth: 'neutral',
-      face: face({ cheeks: -0.2, jaw: 0.15 }),
-      body: body({ shoulders: 0.2 }),
-      outfit: 'azure',
+      headShape: shape({ eyeSpacing: -0.3, eyeSize: 0.09, eyeTilt: 0.03, chinWidth: 0.62 }),
+      bodyScale: 1.02,
     },
-    worn: kit('barbarian', { chest: 'knight' }),
     props: 'sword_shield',
   },
-  // Hearthkeeper Maeve: the lodge fire never goes out; neither does she.
+  // Hearthkeeper Maeve, Keeper of the Hearth-Lodge.
   hearthkeeper_maeve: {
+    cls: 'druid',
     app: {
       gender: 'female',
-      hair: 'curls',
-      ...hair(16, 0.6, 0.35),
-      brows: 'round',
-      eyeShape: 'round',
+      ...head('curls', 'none', 'rounded', 'default', 'button', 'relaxed', 'default', 'lobes'),
+      ...skin(26, 0.39, 0.57),
+      ...hair(15, 0.63, 0.25),
       ...eyes(30, 0.45, 0.3),
-      ...skin(26, 0.45, 0.62),
-      mouth: 'smile',
-      blush: 'warm',
-      face: face({ cheeks: 0.35 }),
-      body: body({ hips: 0.1 }),
-      outfit: 'ember',
+      headShape: shape({
+        eyeSpacing: 0.39,
+        eyeSize: 0.25,
+        eyeTilt: -0.27,
+        browHeight: 0.3,
+        chinWidth: 0.46,
+      }),
     },
-    worn: kit('druid'),
     props: 'none',
   },
-  // Scout Einna: snow-pale braids, ivory leathers, back from the pass alive.
+  // Scout Einna, Snowline Scout.
   scout_einna: {
+    cls: 'hunter',
     app: {
       gender: 'female',
-      hair: 'twinbraids',
-      ...hair(45, 0.5, 0.65),
-      brows: 'flat',
-      eyeShape: 'almond',
+      ...head('twins', 'none', 'straight', 'almond', 'soft', 'default'),
+      ...skin(24, 0.25, 0.67),
+      ...hair(38, 0.3, 0.5),
       ...eyes(210, 0.5, 0.55),
-      ...skin(26, 0.3, 0.72),
-      face: face({ jaw: 0.1 }),
-      body: body({ hips: -0.1 }),
-      outfit: 'ivory',
+      headShape: shape({ eyeSpacing: 0.32, eyeSize: -0.01, eyeTilt: -0.2, chinWidth: 0.56 }),
     },
-    worn: kit('ranger'),
     props: 'crossbow',
   },
-  // Aurorist Veyla: hush; ice-white hair and eyes the colour of the lights.
+  // Aurorist Veyla, Reader of the Lights.
   aurorist_veyla: {
+    cls: 'mage',
     app: {
       gender: 'female',
-      hair: 'longcenterpart',
-      ...hair(200, 0.1, 0.88),
-      brows: 'thin',
-      eyeShape: 'wideset',
+      ...head('shoulder', 'none', 'relaxed', 'default', 'soft', 'full'),
+      ...skin(26, 0.25, 0.65),
+      ...hair(98, 0.04, 0.6),
       ...eyes(185, 0.6, 0.55),
-      ...skin(27, 0.25, 0.7),
-      mouth: 'lips',
-      outfit: 'azure',
+      headShape: shape({ eyeSpacing: 0.9, eyeSize: 0.4, eyeTilt: -0.06, chinWidth: 0.62 }),
     },
-    worn: kit('mage'),
     props: 'staff',
   },
-  // Trapper Brosk: fur cap on, full beard, a dry laugh instead of a sentence.
+  // Trapper Brosk, Shiverfen Trapper.
   trapper_brosk: {
+    cls: 'warrior',
     app: {
       gender: 'male',
-      hair: 'crew',
-      ...hair(22, 0.45, 0.25),
-      beard: 'full',
-      brows: 'bushy',
-      eyeShape: 'narrow',
+      ...head('quiff', 'boxed', 'default', 'almond', 'broad', 'full'),
+      ...skin(25, 0.5, 0.51),
+      ...hair(22, 0.57, 0.18),
       ...eyes(95, 0.35, 0.3),
-      ...skin(25, 0.45, 0.52),
-      mouth: 'smile',
-      face: face({ cheeks: 0.1, nose: 0.2 }),
-      body: body({ shoulders: 0.25, chest: 0.2 }),
+      headShape: shape({
+        eyeSpacing: 0.17,
+        eyeSize: -0.8,
+        eyeTilt: -0.29,
+        browHeight: 0.3,
+        chinWidth: 0.57,
+      }),
+      bodyScale: 1.04,
     },
-    worn: kit('barbarian', { head: 'barbarian' }),
     props: 'woodaxe',
   },
-  // Astronomer Cassian, Watcher at the Vigil: the sky never dawns, he never stops.
+  // Astronomer Cassian, Watcher at the Vigil.
   astronomer_cassian: {
+    cls: 'mage',
     app: {
       gender: 'male',
-      hair: 'sweptback',
-      ...hair(24, 0.3, 0.12),
-      beard: 'goatee',
-      brows: 'arched',
-      eyeShape: 'wideset',
+      ...head('undercut', 'goatee', 'arched', 'default', 'default', 'default', 'default', 'brow'),
+      ...skin(27, 0.38, 0.57),
+      ...hair(17, 0.65, 0.07),
       ...eyes(240, 0.5, 0.45),
-      ...skin(27, 0.35, 0.58),
-      earrings: 'moonstar',
-      earringMaterial: 'silver',
-      face: face({ cheeks: -0.15 }),
-      outfit: 'royal',
+      headShape: shape({
+        eyeSpacing: 1,
+        eyeSize: -0.03,
+        eyeTilt: 0.13,
+        browHeight: 0.4,
+        chinWidth: 0.69,
+      }),
     },
-    worn: kit('mage', { head: 'mage' }),
     props: 'tome',
   },
-  // Apprentice Wren: young, copper pixie, eyes wide at everything.
+  // apprentice_wren.
   apprentice_wren: {
+    cls: 'mage',
     app: {
       gender: 'female',
-      hair: 'pixie',
-      ...hair(14, 0.7, 0.45),
-      brows: 'round',
-      eyeShape: 'wide',
+      ...head('undercut', 'none', 'rounded', 'default', 'soft', 'relaxed', 'default', 'nose'),
+      ...skin(26, 0.38, 0.61),
+      ...hair(13, 0.73, 0.32),
       ...eyes(140, 0.5, 0.4),
-      ...skin(26, 0.45, 0.66),
-      mouth: 'smile',
-      body: body({ shoulders: -0.2, chest: -0.15, hips: -0.1 }),
-      outfit: 'azure',
+      headShape: shape({
+        eyeSpacing: 0.18,
+        eyeSize: 0.8,
+        eyeTilt: 0.05,
+        browHeight: 0.3,
+        chinWidth: 0.62,
+      }),
+      bodyScale: 0.97,
     },
-    worn: kit('mage'),
     props: 'none',
   },
 
   // === The Drakelands and Amberfall: ash, ember and gold ===================
-  // Gatecaptain Brannoc: forty years of gate; obsidian plate, grey horseshoe.
+  // Gatecaptain Brannoc, Commander of Wyrmwatch.
   gatecaptain_brannoc: {
+    cls: 'warrior',
     app: {
       gender: 'male',
-      hair: 'buzz',
-      ...hair(30, 0.08, 0.5),
-      beard: 'horseshoe',
-      brows: 'thick',
-      eyeShape: 'sharp',
+      ...head('bald', 'handlebar', 'relaxed', 'almond', 'broad', 'default'),
+      ...skin(25, 0.55, 0.4),
+      ...hair(10, 0.04, 0.4),
       ...eyes(28, 0.4, 0.3),
-      ...skin(24, 0.5, 0.42),
-      mouth: 'frown',
-      face: face({ jaw: 0.4, brow: 0.3 }),
-      body: body({ shoulders: 0.3, chest: 0.2 }),
-      outfit: 'obsidian',
+      headShape: shape({
+        eyeSpacing: 0.11,
+        eyeSize: 0.17,
+        eyeTilt: 0.7,
+        browHeight: -0.36,
+        chinWidth: 0.38,
+      }),
+      bodyScale: 1.03,
     },
-    worn: kit('knight'),
     props: 'sword_shield',
   },
-  // Quartermaster Sela: forty miles of ash behind every crate; treat them kindly.
+  // Quartermaster Sela, Keeper of the Garrison Stores.
   quartermaster_sela: {
+    cls: 'warrior',
     app: {
       gender: 'female',
-      hair: 'lowbun',
-      ...hair(22, 0.4, 0.1),
-      brows: 'flat',
-      eyeShape: 'almond',
+      ...head('crown', 'none', 'straight', 'almond', 'soft', 'default'),
+      ...skin(24, 0.57, 0.37),
+      ...hair(10, 0.75, 0.03),
       ...eyes(28, 0.45, 0.4),
-      ...skin(24, 0.5, 0.42),
-      face: face({ jaw: 0.15 }),
-      body: body({ shoulders: 0.15 }),
+      headShape: shape({ eyeSpacing: -0.41, eyeSize: -0.17, eyeTilt: -0.08, chinWidth: 0.53 }),
+      bodyScale: 1.01,
     },
-    worn: kit('knight'),
     props: 'none',
   },
-  // Scout Yerrin, Far-Dune Watcher: keep low; glass carries sound.
+  // Scout Yerrin, Far-Dune Watcher.
   scout_yerrin: {
+    cls: 'hunter',
     app: {
       gender: 'female',
-      hair: 'sidepony',
-      ...hair(20, 0.45, 0.1),
-      brows: 'flat',
-      eyeShape: 'narrow',
+      ...head('ponytail', 'none', 'straight', 'almond', 'soft', 'default', 'default', 'nose'),
+      ...skin(26, 0.65, 0.32),
+      ...hair(10, 0.75, 0.03),
       ...eyes(46, 0.5, 0.35),
-      ...skin(23, 0.55, 0.38),
-      mouth: 'neutral',
-      face: face({ brow: 0.1 }),
-      body: body({ hips: -0.1 }),
-      outfit: 'ember',
+      headShape: shape({
+        eyeSpacing: -0.45,
+        eyeSize: -0.8,
+        eyeTilt: -0.18,
+        browHeight: -0.12,
+        chinWidth: 0.62,
+      }),
     },
-    worn: kit('ranger'),
     props: 'crossbow',
   },
-  // Harbormaster Tamsin of the Wyrmwatch quays: an old sea wolf ashore. A salt-grey
-  // braid under a navy tricorne, a pipe in the corner of her mouth, a squint and
-  // wind-burnt cheeks from forty years of weather, the long buttoned coat (the mage's,
-  // dyed the NPC-only `admiralty` navy with brass buttons and cuffs) over dark leather
-  // gloves, and a spyglass on her hip. The ferry's palette.
+  // Harbormaster Tamsin, Keeper of the Wyrmwatch Quays.
   harbormaster_tamsin: {
+    cls: 'mage',
     app: {
       gender: 'female',
-      hair: 'warriorbraid',
-      ...hair(30, 0.1, 0.64),
-      brows: 'thick',
-      eyeShape: 'narrow',
+      ...head('braid', 'none', 'straight', 'almond', 'soft', 'relaxed', 'default', 'lobes'),
+      ...skin(21, 0.46, 0.37),
+      ...hair(9, 0.04, 0.5),
       ...eyes(200, 0.4, 0.4),
-      ...skin(22, 0.42, 0.4),
-      mouth: 'smile',
-      blush: 'warm',
-      face: face({ jaw: 0.15, brow: 0.3, cheeks: -0.15, smirk: 0.2 }),
-      body: body({ shoulders: 0.2 }),
-      outfit: 'admiralty',
+      headShape: shape({
+        eyeSpacing: 0.24,
+        eyeSize: -0.8,
+        eyeTilt: 0.17,
+        browHeight: -0.06,
+        chinWidth: 0.6,
+      }),
+      bodyScale: 1.02,
     },
-    worn: kit('mage', { hands: 'rogue' }),
-    props: 'harbormaster',
-  },
-  // Reeve Ottoline of Lanternmere: the harvest never ends; neither do ledgers.
-  reeve_ottoline: {
-    app: {
-      gender: 'female',
-      hair: 'highbun',
-      ...hair(16, 0.6, 0.35),
-      brows: 'arched',
-      eyeShape: 'almond',
-      ...eyes(30, 0.45, 0.4),
-      ...skin(26, 0.45, 0.58),
-      mouth: 'lips',
-      lipstick: 'nude',
-      face: face({ brow: 0.1, chin: 0.1 }),
-      outfit: 'gold',
-    },
-    worn: kit('druid'),
     props: 'none',
   },
-  // Waywatcher Sorrel of the Goldmelt: copper braid, gold leathers, few cross twice.
-  waywatcher_sorrel: {
+  // Reeve Ottoline, Reeve of Lanternmere.
+  reeve_ottoline: {
+    cls: 'druid',
     app: {
       gender: 'female',
-      hair: 'warriorbraid',
-      ...hair(14, 0.65, 0.35),
-      brows: 'flat',
-      eyeShape: 'sharp',
-      ...eyes(46, 0.55, 0.4),
-      ...skin(25, 0.5, 0.5),
-      face: face({ jaw: 0.1, brow: 0.1 }),
-      body: body({ shoulders: 0.15 }),
-      outfit: 'gold',
+      ...head('curls', 'none', 'soft_arch', 'almond', 'soft', 'full'),
+      ...skin(28, 0.38, 0.52),
+      ...hair(15, 0.63, 0.25),
+      ...eyes(30, 0.45, 0.4),
+      headShape: shape({
+        eyeSpacing: 0.41,
+        eyeSize: -0.28,
+        eyeTilt: 0.26,
+        browHeight: -0.12,
+        chinWidth: 0.62,
+      }),
+      bodyScale: 0.96,
     },
-    worn: kit('ranger'),
+    props: 'none',
+  },
+  // Waywatcher Sorrel, Watcher of the Goldmelt.
+  waywatcher_sorrel: {
+    cls: 'hunter',
+    app: {
+      gender: 'female',
+      ...head('braid', 'none', 'straight', 'almond', 'soft', 'default'),
+      ...skin(25, 0.54, 0.45),
+      ...hair(13, 0.69, 0.25),
+      ...eyes(46, 0.55, 0.4),
+      headShape: shape({
+        eyeSpacing: -0.25,
+        eyeSize: -0.3,
+        eyeTilt: 0.7,
+        browHeight: -0.12,
+        chinWidth: 0.56,
+      }),
+      bodyScale: 1.01,
+    },
     props: 'crossbow',
   },
-  // Ferrymaster Caddow: fog on the Mere; a grey poleman who respects it.
+  // Ferrymaster Caddow, Keeper of the Lantern Ferries.
   ferrymaster_caddow: {
+    cls: 'rogue',
     app: {
       gender: 'male',
-      hair: 'crew',
-      ...hair(30, 0.06, 0.6),
-      beard: 'full',
-      brows: 'bushy',
-      eyeShape: 'droopy',
+      ...head('quiff', 'boxed', 'default', 'hooded', 'broad', 'default'),
+      ...skin(27, 0.46, 0.48),
+      ...hair(9, 0.04, 0.5),
       ...eyes(200, 0.3, 0.4),
-      ...skin(25, 0.4, 0.5),
-      mouth: 'neutral',
-      face: face({ cheeks: -0.2, nose: 0.2 }),
-      outfit: 'teal',
+      headShape: shape({ eyeSpacing: -0.37, eyeSize: 0.03, eyeTilt: -0.9, chinWidth: 0.71 }),
     },
-    worn: kit('rogue'),
     props: 'walking_staff',
   },
-  // Orchardist Pomeline, Keeper of the Gilded Rows: chestnut crown, gold rows.
+  // Orchardist Pomeline, Keeper of the Gilded Rows.
   orchardist_pomeline: {
+    cls: 'druid',
     app: {
       gender: 'female',
-      hair: 'braidcrown',
-      ...hair(22, 0.55, 0.3),
-      brows: 'soft',
-      eyeShape: 'round',
+      ...head('crown', 'none', 'soft', 'default', 'button', 'relaxed'),
+      ...skin(29, 0.43, 0.52),
+      ...hair(28, 0.73, 0.18),
       ...eyes(140, 0.45, 0.35),
-      ...skin(26, 0.5, 0.58),
-      mouth: 'smile',
-      blush: 'peach',
-      face: face({ cheeks: 0.3 }),
-      outfit: 'gold',
+      headShape: shape({
+        eyeSpacing: -0.44,
+        eyeSize: 0.25,
+        eyeTilt: 0.27,
+        browHeight: 0.3,
+        chinWidth: 0.49,
+      }),
+      bodyScale: 0.97,
     },
-    worn: kit('druid'),
     props: 'none',
   },
-  // Archivist Maelin Emberward, Crucible Archivist of the hidden Ignivar
-  // forge: ash-grey bun, ember eyes that read Varkhul's records by forgelight.
+  // Archivist Maelin Emberward, Crucible Archivist.
   archivist_maelin_emberward: {
+    cls: 'mage',
     app: {
       gender: 'female',
-      hair: 'lowbun',
-      ...hair(24, 0.12, 0.55),
-      brows: 'arched',
-      eyeShape: 'narrow',
+      ...head('crown', 'none', 'soft_arch', 'almond', 'soft', 'default'),
+      ...skin(26, 0.44, 0.46),
+      ...hair(21, 0.15, 0.4),
       ...eyes(32, 0.6, 0.42),
-      ...skin(25, 0.42, 0.5),
-      mouth: 'neutral',
-      face: face({ cheeks: -0.2, brow: 0.15, eyes: 0.1 }),
-      body: body({ shoulders: -0.1 }),
-      outfit: 'ember',
+      headShape: shape({
+        eyeSpacing: 0.21,
+        eyeSize: -0.8,
+        eyeTilt: -0.25,
+        browHeight: -0.18,
+        chinWidth: 0.71,
+      }),
+      bodyScale: 0.99,
     },
-    worn: kit('mage', { head: 'mage' }),
     props: 'tome',
   },
-  // Quartermaster Bronn Emberward, the Crucible sigil broker: a forge-broad
-  // quartermaster in ember-tempered plate, hammer at hand, the counter he
-  // keeps standing a few paces from the raid door.
+  // Quartermaster Bronn Emberward, Crucible Quartermaster.
   crucible_quartermaster: {
+    cls: 'warrior',
     app: {
       gender: 'male',
-      hair: 'mohawk',
-      ...hair(18, 0.25, 0.2),
-      beard: 'scruff',
-      brows: 'sharp',
-      eyeShape: 'narrow',
+      ...head('mohawk', 'chinstrap', 'slim', 'almond', 'broad', 'default', 'default', 'septum'),
+      ...skin(25, 0.51, 0.36),
+      ...hair(27, 0.5, 0.12),
       ...eyes(30, 0.6, 0.4),
-      ...skin(24, 0.45, 0.4),
-      mouth: 'frown',
-      face: face({ jaw: 0.35, brow: 0.3 }),
-      body: body({ shoulders: 0.35, chest: 0.25, hands: 0.2 }),
-      outfit: 'ember',
+      headShape: shape({
+        eyeSpacing: -0.43,
+        eyeSize: -0.8,
+        eyeTilt: 0.26,
+        browHeight: -0.36,
+        chinWidth: 0.41,
+      }),
+      bodyScale: 1.04,
     },
-    worn: kit('paladin', { chest: 'knight', arms: 'knight' }),
     props: 'hammer',
   },
-  // Maelin's Ember Projection: the same archivist carried forward through the
-  // forge as living flame; her silhouette holds, her colours burn.
+  // Maelin's Ember Projection, Ember Projection.
   archivist_maelin_ember_projection: {
+    cls: 'mage',
     app: {
       gender: 'female',
-      hair: 'lowbun',
-      ...hair(20, 0.85, 0.6),
-      brows: 'arched',
-      eyeShape: 'narrow',
+      ...head('crown', 'none', 'soft_arch', 'almond', 'soft', 'default'),
+      ...skin(23, 0.64, 0.54),
+      ...hair(23, 0.64, 0.4),
       ...eyes(46, 0.85, 0.55),
-      ...skin(22, 0.75, 0.6),
-      mouth: 'neutral',
-      face: face({ cheeks: -0.2, brow: 0.15, eyes: 0.1 }),
-      body: body({ shoulders: -0.1 }),
-      outfit: 'ember',
+      headShape: shape({
+        eyeSpacing: 0.03,
+        eyeSize: -0.8,
+        eyeTilt: -0.29,
+        browHeight: -0.18,
+        chinWidth: 0.71,
+      }),
+      bodyScale: 0.99,
     },
-    worn: kit('mage', { head: 'mage' }),
     props: 'tome',
   },
 
   // === Faction quartermasters and the World Quest taskmaster ==============
-  // Quartermaster Vaelen (Rift Watch, Drifthaven): salt-grey braid, sea-glass
-  // eyes, ranger leathers over Palmreach sun-dark skin; a spear for the shore.
+  // Quartermaster Vaelen, Rift Watch Provisioner.
   npc_rift_watch_quartermaster: {
+    cls: 'hunter',
     app: {
       gender: 'male',
-      hair: 'warriorbraid',
-      ...hair(200, 0.12, 0.55),
-      beard: 'shortbox',
-      brows: 'flat',
-      eyeShape: 'sharp',
+      ...head('braid', 'boxed', 'relaxed', 'almond', 'default', 'default', 'default', 'ears'),
+      ...skin(28, 0.69, 0.32),
+      ...hair(199, 0.07, 0.4),
       ...eyes(185, 0.5, 0.45),
-      ...skin(23, 0.55, 0.36),
-      mouth: 'neutral',
-      face: face({ jaw: 0.2, cheeks: -0.1 }),
-      body: body({ shoulders: 0.15 }),
-      outfit: 'teal',
+      headShape: shape({ eyeSpacing: -0.3, eyeSize: 0.24, eyeTilt: 0.7, chinWidth: 0.55 }),
+      bodyScale: 1.01,
     },
-    worn: kit('ranger'),
     props: 'spear',
   },
-  // Templar Althea (Church Order, the Eastbrook chapel): gilded paladin plate,
-  // braided crown, a calm smile; sword and shield of the Dawn.
+  // Templar Althea, Church Order Quartermaster.
   npc_church_order_quartermaster: {
+    cls: 'paladin',
     app: {
       gender: 'female',
-      hair: 'braidcrown',
-      ...hair(38, 0.55, 0.62),
-      brows: 'arched',
-      eyeShape: 'almond',
+      ...head('crown', 'none', 'soft_arch', 'almond', 'soft', 'relaxed'),
+      ...skin(27, 0.38, 0.57),
+      ...hair(40, 0.4, 0.43),
       ...eyes(42, 0.5, 0.45),
-      ...skin(27, 0.42, 0.62),
-      mouth: 'smile',
-      face: face({ chin: 0.1 }),
-      body: body({ shoulders: 0.15 }),
-      outfit: 'gold',
+      headShape: shape({
+        eyeSpacing: -0.27,
+        eyeSize: -0.27,
+        eyeTilt: -0.21,
+        browHeight: 0.3,
+        chinWidth: 0.62,
+      }),
+      bodyScale: 1.01,
     },
-    worn: kit('paladin'),
     props: 'sword_shield',
   },
-  // Artificer Tobrin (Automatons, Wyrmwatch): soot-dark hair swept back, a
-  // verdigris smith's kit with the sleeves rolled, hammer in hand.
+  // Artificer Tobrin, Automaton Requisitioner.
   npc_automaton_quartermaster: {
+    cls: 'warrior',
     app: {
       gender: 'male',
-      hair: 'sweptback',
-      ...hair(20, 0.3, 0.2),
-      beard: 'goatee',
-      brows: 'thick',
-      eyeShape: 'wide',
+      ...head('undercut', 'goatee', 'relaxed', 'default', 'broad', 'smirk'),
+      ...skin(26, 0.51, 0.42),
+      ...hair(28, 0.57, 0.12),
       ...eyes(35, 0.55, 0.4),
-      ...skin(24, 0.45, 0.45),
-      mouth: 'grin',
-      face: face({ nose: 0.15, brow: 0.1 }),
-      body: body({ shoulders: 0.2, hands: 0.25 }),
-      outfit: 'verdigris',
+      headShape: shape({
+        eyeSpacing: 0.31,
+        eyeSize: 0.85,
+        eyeTilt: -0.07,
+        browHeight: 0.18,
+        chinWidth: 0.62,
+      }),
+      bodyScale: 1.02,
     },
-    worn: kit('barbarian', { arms: null }),
     props: 'hammer',
   },
-  // Taskmaster Kaelen (Eastbrook square): a clerk of assignments, crimson
-  // rogue leathers, a ledger under the arm and a pencil-line moustache.
+  // Taskmaster Kaelen, World Quest Taskmaster.
   npc_wq_taskmaster: {
+    cls: 'rogue',
     app: {
       gender: 'male',
-      hair: 'sidepart',
-      ...hair(28, 0.35, 0.28),
-      beard: 'stache',
-      brows: 'angled',
-      eyeShape: 'droopy',
+      ...head('swept', 'moustache', 'default', 'hooded', 'default', 'default'),
+      ...skin(27, 0.43, 0.54),
+      ...hair(37, 0.55, 0.18),
       ...eyes(28, 0.4, 0.3),
-      ...skin(26, 0.42, 0.55),
-      mouth: 'frown',
-      face: face({ chin: -0.1, cheeks: -0.15 }),
-      body: body({ chest: -0.1 }),
-      outfit: 'crimson',
+      headShape: shape({ eyeSpacing: -0.35, eyeSize: 0.19, eyeTilt: -0.9, chinWidth: 0.69 }),
     },
-    worn: kit('rogue'),
     props: 'tome',
   },
+
   // === Palmreach and the far shores ========================================
-  // Castaway Navigator: sun-bleached, half-dressed, still reading the stars.
+  // castaway_navigator.
   castaway_navigator: {
+    cls: 'rogue',
     app: {
       gender: 'male',
-      hair: 'longpart',
-      ...hair(45, 0.45, 0.6),
-      beard: 'scruff',
-      brows: 'soft',
-      eyeShape: 'almond',
+      ...head('shoulder', 'boxed', 'soft_arch', 'almond', 'default', 'default', 'default', 'lobes'),
+      ...skin(26, 0.65, 0.32),
+      ...hair(39, 0.3, 0.5),
       ...eyes(185, 0.55, 0.45),
-      ...skin(23, 0.55, 0.35),
-      mouth: 'neutral',
-      face: face({ cheeks: -0.2 }),
-      body: body({ chest: -0.1 }),
+      headShape: shape({ eyeSize: -0.07, eyeTilt: -0.18, chinWidth: 0.71 }),
     },
-    worn: kit('rogue', { chest: null, arms: null, hands: null }),
     props: 'none',
   },
-  // Fisher Bram, Nell's husband: thrown back by the sea; it shows.
+  // fisher_bram.
   fisher_bram: {
+    cls: 'rogue',
     app: {
       gender: 'male',
-      hair: 'messy',
-      ...hair(28, 0.2, 0.4),
-      beard: 'full',
-      brows: 'worried',
-      eyeShape: 'droopy',
+      ...head('swept', 'boxed', 'rounded', 'hooded', 'aquiline', 'default'),
+      ...skin(28, 0.46, 0.47),
+      ...hair(19, 0.15, 0.32),
       ...eyes(200, 0.3, 0.4),
-      ...skin(25, 0.4, 0.5),
-      mouth: 'frown',
-      face: face({ cheeks: -0.3, brow: -0.2 }),
-      outfit: 'teal',
+      headShape: shape({
+        eyeSpacing: -0.42,
+        eyeSize: -0.09,
+        eyeTilt: -0.9,
+        browHeight: 0.64,
+        chinWidth: 0.76,
+      }),
+      bodyScale: 0.95,
     },
-    worn: kit('rogue', { arms: null }),
     props: 'none',
   },
 
   // === The Proving Shore: the tutorial island, salt, sailcloth and sun ======
-  // The island is the first face the game shows, so its keepers read as a crew
-  // that works outdoors: sun-darkened skin, salt-bleached or weather-greyed
-  // hair, and each one's outfit colourway matched to the nameplate colour their
-  // NpcDef already carries (src/sim/content/proving_shore.ts), so the person and
-  // the marker agree. Gender follows the shipped voice casting (each line is
-  // recorded by an existing actor: Bryn on Waykeeper Pell, Nel on Captain
-  // Thessaly, Rook on Marshal Redbrook, Pell on Foreman Odell, Tam on Warden
-  // Fenwick, Finch on Quartermaster Bree, Wick on Bursar Fernando, Maren on
-  // Stablemaster Marla) and the English quest copy's pronouns.
-
-  // Wayfarer Bryn: the Eastbrook-side greeter who points at the crossing, not
-  // an islander; town clothes with a traveller's road-worn edge.
+  // Wayfarer Bryn, Harbor Guide.
   wayfarer_bryn: {
+    cls: 'hunter',
     app: {
       gender: 'female',
-      hair: 'halfbun',
-      ...hair(30, 0.42, 0.28),
-      brows: 'soft',
-      eyeShape: 'doe',
+      ...head('curls', 'none', 'soft', 'default', 'button', 'relaxed'),
+      ...skin(28, 0.38, 0.55),
+      ...hair(32, 0.57, 0.18),
       ...eyes(268, 0.3, 0.42),
-      ...skin(28, 0.42, 0.6),
-      mouth: 'smile',
-      face: face({ cheeks: 0.25, eyes: 0.15 }),
-      outfit: 'violet',
+      headShape: shape({
+        eyeSpacing: -0.14,
+        eyeSize: 0.9,
+        eyeTilt: -0.12,
+        browHeight: 0.3,
+        chinWidth: 0.51,
+      }),
+      bodyScale: 1.03,
     },
-    worn: kit('ranger', { back: null }),
     props: 'none',
   },
-  // Instructor Maren: the Proving Master who signs off the whole island; the
-  // only islander in a full kit, because the graduation is hers to give.
+  // Instructor Maren, Proving Master.
   instructor_maren: {
+    cls: 'warrior',
     app: {
       gender: 'female',
-      hair: 'warriorbraid',
-      ...hair(24, 0.28, 0.18),
-      brows: 'angled',
-      eyeShape: 'sharp',
+      ...head('topknot', 'none', 'default', 'almond', 'soft', 'default'),
+      ...skin(28, 0.47, 0.47),
+      ...hair(10, 0.3, 0.12),
       ...eyes(272, 0.38, 0.34),
-      ...skin(27, 0.46, 0.52),
-      face: face({ jaw: 0.25, brow: 0.15 }),
-      body: body({ shoulders: 0.18 }),
-      outfit: 'royal',
+      headShape: shape({
+        eyeSpacing: 0.45,
+        eyeSize: -0.16,
+        eyeTilt: 0.7,
+        browHeight: -0.18,
+        chinWidth: 0.47,
+      }),
+      bodyScale: 1.01,
     },
-    worn: kit('knight'),
     props: 'sword',
   },
-  // Quartermaster Finch: the camp stall; buys salvage all day, so she is the
-  // one islander with rolled sleeves and an apron-drab colourway.
+  // Quartermaster Finch, Camp Outfitter.
   quartermaster_finch: {
+    cls: 'rogue',
     app: {
       gender: 'female',
-      hair: 'chinbob',
-      ...hair(38, 0.5, 0.44),
-      brows: 'round',
-      eyeShape: 'round',
+      ...head('bob', 'none', 'rounded', 'default', 'button', 'thin', 'default', 'lobes'),
+      ...skin(32, 0.38, 0.58),
+      ...hair(37, 0.49, 0.32),
       ...eyes(96, 0.32, 0.36),
-      ...skin(29, 0.44, 0.64),
-      mouth: 'grin',
-      face: face({ cheeks: 0.3, nose: 0.15 }),
-      earrings: 'hoop',
-      earringMaterial: 'copper',
-      outfit: 'forest',
+      headShape: shape({
+        eyeSpacing: 0.08,
+        eyeSize: 0.25,
+        eyeTilt: 0.14,
+        browHeight: 0.3,
+        chinWidth: 0.49,
+      }),
     },
-    worn: kit('rogue', { arms: null }),
     props: 'none',
   },
-  // Bursar Wick: the Gilded Strongbox, a clerk not a fighter; robes, a ledger,
-  // and the one gold colourway on the island because the name promises it.
+  // Bursar Wick, The Gilded Strongbox.
   bursar_wick: {
+    cls: 'mage',
     app: {
       gender: 'male',
-      hair: 'sidepart',
-      ...hair(40, 0.2, 0.66),
-      beard: 'goatee',
-      brows: 'thin',
-      eyeShape: 'narrow',
+      ...head('swept', 'goatee', 'slim', 'almond', 'default', 'default', 'default', 'lobes'),
+      ...skin(26, 0.36, 0.67),
+      ...hair(41, 0.15, 0.5),
       ...eyes(44, 0.45, 0.38),
-      ...skin(30, 0.34, 0.68),
-      face: face({ chin: 0.2, cheeks: -0.2 }),
-      body: body({ shoulders: -0.15 }),
-      earrings: 'stud',
-      earringMaterial: 'gold',
-      outfit: 'gilded',
+      headShape: shape({ eyeSpacing: 0.32, eyeSize: -0.8, eyeTilt: -0.07, chinWidth: 0.71 }),
+      bodyScale: 0.99,
     },
-    worn: kit('mage'),
     props: 'tome',
   },
-  // Ferryman Odo: the oldest hand on the shore and the first voice a new player
-  // hears; weathered, white-bearded, punt pole still in his fist.
+  // Ferryman Odo, Keeper of the Crossing.
   ferryman_odo: {
+    cls: 'druid',
     app: {
       gender: 'male',
-      hair: 'longcenterpart',
-      ...hair(36, 0.08, 0.78),
-      beard: 'full',
-      brows: 'bushy',
-      eyeShape: 'droopy',
+      ...head('shoulder', 'boxed', 'default', 'hooded', 'aquiline', 'default'),
+      ...skin(26, 0.54, 0.46),
+      ...hair(42, 0.04, 0.6),
       ...eyes(206, 0.32, 0.46),
-      ...skin(26, 0.5, 0.48),
-      face: face({ jaw: 0.2, cheeks: -0.35, nose: 0.3 }),
-      body: body({ shoulders: 0.15, hands: 0.2 }),
-      outfit: 'azure',
+      headShape: shape({ eyeSpacing: 0.04, eyeSize: -0.13, eyeTilt: -0.9, chinWidth: 0.66 }),
+      bodyScale: 1.01,
     },
-    worn: kit('druid', { arms: null, back: null }),
     props: 'walking_staff',
   },
-  // Warden Tam: keeps the Gauntlet on the strand; lean, sun-cured, a spear he
-  // uses as a lane marker more than a weapon.
+  // Warden Tam, Keeper of the Gauntlet.
   warden_tam: {
+    cls: 'hunter',
     app: {
       gender: 'male',
-      hair: 'crew',
-      ...hair(22, 0.4, 0.24),
-      beard: 'stubble',
-      brows: 'flat',
-      eyeShape: 'almond',
+      ...head('quiff', 'none', 'relaxed', 'almond', 'aquiline', 'default'),
+      ...skin(24, 0.57, 0.42),
+      ...hair(17, 0.48, 0.18),
       ...eyes(32, 0.4, 0.3),
-      ...skin(25, 0.52, 0.44),
-      face: face({ jaw: 0.3, cheeks: -0.25 }),
-      body: body({ shoulders: 0.1, knees: 0.15 }),
-      outfit: 'classic',
+      headShape: shape({ eyeSpacing: 0.42, eyeSize: 0.22, eyeTilt: 0.01, chinWidth: 0.55 }),
+      bodyScale: 1.01,
     },
-    worn: kit('ranger'),
     props: 'spear',
   },
-  // Overseer Pell: clocks every Gauntlet run from the far end; a foreman's
-  // build, arms crossed, nothing in his hands but the count.
+  // Overseer Pell, Gauntlet Overseer.
   overseer_pell: {
+    cls: 'rogue',
     app: {
       gender: 'male',
-      hair: 'buzz',
-      ...hair(18, 0.22, 0.32),
-      beard: 'horseshoe',
-      brows: 'thick',
-      eyeShape: 'wideset',
+      ...head('quiff', 'handlebar', 'relaxed', 'default', 'broad', 'default'),
+      ...skin(25, 0.51, 0.47),
+      ...hair(11, 0.26, 0.25),
       ...eyes(84, 0.36, 0.32),
-      ...skin(24, 0.48, 0.5),
-      mouth: 'wide',
-      face: face({ jaw: 0.35, chin: 0.25 }),
-      body: body({ shoulders: 0.3, chest: 0.25 }),
-      outfit: 'verdigris',
+      headShape: shape({ eyeSpacing: 1, eyeSize: 0.05, eyeTilt: 0.02, chinWidth: 0.41 }),
+      bodyScale: 1.04,
     },
-    worn: kit('rogue'),
     props: 'none',
   },
-  // Drillmaster Rook: turns footwork into swordwork in the practice yard; the
-  // island's one sword-and-board silhouette, brick red to match his nameplate.
+  // Drillmaster Rook, Yard Master.
   drillmaster_rook: {
+    cls: 'warrior',
     app: {
       gender: 'male',
-      hair: 'topknot',
-      ...hair(16, 0.34, 0.2),
-      beard: 'shortbox',
-      brows: 'sharp',
-      eyeShape: 'narrow',
+      ...head('topknot', 'boxed', 'slim', 'almond', 'default', 'default', 'default', 'brow'),
+      ...skin(26, 0.57, 0.44),
+      ...hair(26, 0.62, 0.12),
       ...eyes(8, 0.42, 0.3),
-      ...skin(23, 0.5, 0.46),
-      mouth: 'frown',
-      face: face({ brow: 0.3, jaw: 0.25, smirk: -0.2 }),
-      body: body({ shoulders: 0.35, chest: 0.2, elbows: 0.15 }),
-      outfit: 'crimson',
+      headShape: shape({
+        eyeSpacing: 0.14,
+        eyeSize: -0.8,
+        eyeTilt: 0.24,
+        browHeight: -0.6,
+        chinWidth: 0.47,
+      }),
+      bodyScale: 1.04,
     },
-    worn: kit('knight'),
     props: 'sword_shield',
   },
-  // Tidewarden Nel: keeps the strand tally out where the wrecks are; salt-white
-  // hair, teal oilskins, a stave she walks the tide line with.
+  // Tidewarden Nel, Keeper of the Strand.
   tidewarden_nel: {
+    cls: 'druid',
     app: {
       gender: 'female',
-      hair: 'fantasybraid',
-      ...hair(190, 0.12, 0.82),
-      brows: 'arched',
-      eyeShape: 'cat',
+      ...head('braid', 'none', 'soft_arch', 'almond', 'soft', 'default', 'default', 'ears'),
+      ...skin(32, 0.38, 0.51),
+      ...hair(199, 0.04, 0.6),
       ...eyes(178, 0.44, 0.4),
-      ...skin(31, 0.4, 0.56),
-      face: face({ cheeks: -0.2, eyes: 0.2, chin: 0.15 }),
-      body: body({ shoulders: 0.12 }),
-      earrings: 'bonehoop',
-      earringMaterial: 'turquoise',
-      outfit: 'teal',
+      headShape: shape({ eyeSpacing: 0.31, eyeSize: 0.02, eyeTilt: 1, chinWidth: 0.71 }),
+      bodyScale: 1.01,
     },
-    worn: kit('druid'),
     props: 'oak_stave',
   },
-  // Drillmaster Hale: the Eastbrook quay's sparring master, keeper of the hub
-  // training dummy (content/practice_dummies.ts). Grey-shaved veteran in the
-  // marshal's brick red with a warhammer: Rook's trade, not his face.
+  // Drillmaster Hale, Quay Sparring Master.
   drillmaster_hale: {
+    cls: 'warrior',
     app: {
       gender: 'male',
-      hair: 'buzz',
-      ...hair(30, 0.06, 0.55),
-      beard: 'stubble',
-      brows: 'bushy',
-      eyeShape: 'narrow',
+      ...head('bald', 'none', 'default', 'almond', 'broad', 'default'),
+      ...skin(27, 0.52, 0.4),
+      ...hair(41, 0.04, 0.4),
       ...eyes(30, 0.3, 0.32),
-      ...skin(24, 0.45, 0.42),
-      mouth: 'frown',
-      face: face({ brow: 0.4, jaw: 0.35, cheeks: -0.15 }),
-      body: body({ shoulders: 0.4, chest: 0.3, elbows: 0.2 }),
-      outfit: 'crimson',
+      headShape: shape({
+        eyeSpacing: 0.24,
+        eyeSize: -0.8,
+        eyeTilt: -0.14,
+        browHeight: -0.6,
+        chinWidth: 0.48,
+      }),
+      bodyScale: 1.05,
     },
-    worn: kit('knight'),
     props: 'hammer',
   },
+
   // === World quests: instructors and the Fenbridge watch ==================
-  // Elian: a silver-haired scholar whose open face stays visible above his book.
-  // The Vault Keeper (PR 4052): the Weekly Vault's custodian at the stone hall
-  // by the harbour road, a clean-shaven steward in bank gold with a clerk's
-  // ledger, deliberately plainer than the Gilded Strongbox's bursar.
+  // Vault Keeper, Weekly Rewards.
   eastbrook_vault_keeper: {
+    cls: 'rogue',
     app: {
       gender: 'male',
-      hair: 'sweptback',
-      ...hair(34, 0.18, 0.62),
-      brows: 'arched',
-      eyeShape: 'almond',
+      ...head('swept', 'none', 'arched', 'almond', 'default', 'default'),
+      ...skin(23, 0.44, 0.52),
+      ...hair(22, 0.15, 0.5),
       ...eyes(205, 0.4, 0.45),
-      ...skin(24, 0.42, 0.52),
-      face: face({ cheeks: 0.05, chin: -0.05 }),
-      outfit: 'gold',
+      headShape: shape({
+        eyeSpacing: 0.09,
+        eyeSize: 0.5,
+        eyeTilt: -0.2,
+        browHeight: 0.5,
+        chinWidth: 0.6,
+      }),
+      bodyScale: 1.04,
     },
-    worn: kit('rogue'),
     props: 'tome',
   },
-  // Cham Pete: the weekly emissary on the Eastbrook green, a
-  // hooded ledger-keeper in the town's violet.
+  // Cham Pete, Emissary.
   weekly_emissary: {
+    cls: 'mage',
     app: {
       gender: 'male',
-      hair: 'sweptback',
-      ...hair(22, 0.12, 0.28),
-      beard: 'goatee',
-      brows: 'soft',
-      eyeShape: 'almond',
+      ...head(
+        'undercut',
+        'goatee',
+        'soft_arch',
+        'almond',
+        'default',
+        'default',
+        'default',
+        'lobes',
+      ),
+      ...skin(30, 0.38, 0.53),
+      ...hair(41, 0.15, 0.18),
       ...eyes(262, 0.55, 0.5),
-      ...skin(28, 0.35, 0.55),
-      face: face({ cheeks: -0.1, chin: 0.1 }),
-      outfit: 'violet',
+      headShape: shape({ eyeSpacing: 0.27, eyeSize: -0.18, eyeTilt: 0.09, chinWidth: 0.67 }),
+      bodyScale: 0.96,
     },
-    worn: kit('mage'),
     props: 'tome',
   },
+  // Instructor Elian, Arcane Calligraphy.
   calligraphy_instructor: {
+    cls: 'mage',
     app: {
       gender: 'male',
-      hair: 'sweptback',
-      ...hair(28, 0.08, 0.67),
-      beard: 'goatee',
-      brows: 'soft',
-      eyeShape: 'almond',
+      ...head('undercut', 'goatee', 'soft_arch', 'almond', 'default', 'default'),
+      ...skin(26, 0.38, 0.57),
+      ...hair(41, 0.04, 0.5),
       ...eyes(220, 0.35, 0.4),
-      ...skin(28, 0.38, 0.58),
-      face: face({ cheeks: -0.15, chin: 0.15 }),
-      outfit: 'violet',
+      headShape: shape({ eyeSpacing: -0.33, eyeSize: 0.16, eyeTilt: 0.04, chinWidth: 0.69 }),
     },
-    worn: kit('mage'),
     props: 'tome',
   },
-  // Apprentice Tessa is a different person from Guard Tessa below.
+  // Apprentice Tessa, Student of Calligraphy.
   calligraphy_apprentice_1: {
+    cls: 'mage',
     app: {
       gender: 'female',
-      hair: 'lowbun',
-      ...hair(24, 0.48, 0.22),
-      brows: 'thin',
-      eyeShape: 'doe',
+      ...head('ponytail', 'none', 'relaxed', 'default', 'button', 'default'),
+      ...skin(32, 0.38, 0.58),
+      ...hair(30, 0.75, 0.12),
       ...eyes(194, 0.44, 0.45),
-      ...skin(30, 0.42, 0.64),
-      face: face({ cheeks: 0.2 }),
-      body: body({ shoulders: -0.12 }),
-      outfit: 'azure',
+      headShape: shape({ eyeSpacing: 0.06, eyeSize: 1, eyeTilt: 0.15, chinWidth: 0.53 }),
+      bodyScale: 0.99,
     },
-    worn: kit('mage', { arms: null, back: null }),
     props: 'none',
   },
+  // Apprentice Pip, Student of Calligraphy.
   calligraphy_apprentice_2: {
+    cls: 'mage',
     app: {
       gender: 'male',
-      hair: 'messy',
-      ...hair(34, 0.6, 0.42),
-      brows: 'soft',
-      eyeShape: 'round',
+      ...head('swept', 'none', 'soft_arch', 'default', 'default', 'full'),
+      ...skin(29, 0.45, 0.57),
+      ...hair(33, 0.64, 0.32),
       ...eyes(105, 0.4, 0.35),
-      ...skin(27, 0.46, 0.6),
-      mouth: 'smile',
-      face: face({ cheeks: 0.25, smirk: 0.15 }),
-      outfit: 'gold',
+      headShape: shape({
+        eyeSpacing: 0.4,
+        eyeSize: 0.9,
+        eyeTilt: 0.15,
+        browHeight: 0.6,
+        chinWidth: 0.51,
+      }),
+      bodyScale: 0.95,
     },
-    worn: kit('mage', { arms: null, back: null }),
     props: 'tome',
   },
-  // Mara: tied-back hair, bare working arms, and the smith's hammer.
+  // Smith Mara, Wyrmwatch Smith.
   forge_instructor: {
+    cls: 'warrior',
     app: {
       gender: 'female',
-      hair: 'warriorbraid',
-      ...hair(18, 0.5, 0.2),
-      brows: 'thick',
-      eyeShape: 'sharp',
+      ...head('topknot', 'none', 'straight', 'almond', 'soft', 'default', 'default', 'brow'),
+      ...skin(26, 0.52, 0.43),
+      ...hair(17, 0.72, 0.12),
       ...eyes(34, 0.48, 0.32),
-      ...skin(25, 0.48, 0.48),
-      face: face({ jaw: 0.25, cheeks: 0.1 }),
-      body: body({ shoulders: 0.3, chest: 0.2, hands: 0.15 }),
-      outfit: 'ember',
+      headShape: shape({ eyeSpacing: -0.45, eyeSize: 0.05, eyeTilt: 0.7, chinWidth: 0.43 }),
+      bodyScale: 1.03,
     },
-    worn: kit('barbarian', { arms: null, back: null }),
     props: 'hammer',
   },
-  // Shared watch colours and equipment, distinct faces for questioning.
+  // Sergeant Alric, Fenbridge Watch.
   infiltrator_captain: {
+    cls: 'warrior',
     app: {
       gender: 'male',
-      hair: 'crewcut',
-      ...hair(24, 0.12, 0.42),
-      beard: 'shortbox',
-      brows: 'flat',
-      eyeShape: 'sharp',
+      ...head('quiff', 'boxed', 'relaxed', 'almond', 'default', 'default'),
+      ...skin(25, 0.38, 0.51),
+      ...hair(26, 0.15, 0.32),
       ...eyes(165, 0.3, 0.32),
-      ...skin(26, 0.4, 0.52),
-      face: face({ brow: 0.3, chin: 0.2 }),
-      body: body({ shoulders: 0.2 }),
-      outfit: 'verdigris',
+      headShape: shape({
+        eyeSpacing: 0.43,
+        eyeSize: 0.19,
+        eyeTilt: 0.7,
+        browHeight: -0.36,
+        chinWidth: 0.62,
+      }),
+      bodyScale: 1.02,
     },
-    worn: kit('knight'),
     props: 'sword_shield',
   },
+  // Guard Nella, Fenbridge Watch.
   infiltrator_nella: {
+    cls: 'warrior',
     app: {
       gender: 'female',
-      hair: 'warriorbraid',
-      ...hair(22, 0.35, 0.1),
-      brows: 'angled',
-      eyeShape: 'almond',
+      ...head('topknot', 'none', 'default', 'almond', 'soft', 'default'),
+      ...skin(27, 0.52, 0.36),
+      ...hair(10, 0.75, 0.03),
       ...eyes(125, 0.35, 0.36),
-      ...skin(27, 0.48, 0.4),
-      face: face({ jaw: 0.15, cheeks: -0.1 }),
-      body: body({ shoulders: 0.1 }),
-      outfit: 'verdigris',
+      headShape: shape({ eyeSpacing: 0.04, eyeSize: -0.24, eyeTilt: -0.1, chinWidth: 0.57 }),
+      bodyScale: 1.01,
     },
-    worn: kit('knight'),
     props: 'sword',
   },
+  // Guard Orin, Fenbridge Watch.
   infiltrator_orin: {
+    cls: 'warrior',
     app: {
       gender: 'male',
-      hair: 'sidepart',
-      ...hair(30, 0.25, 0.3),
-      beard: 'scruff',
-      brows: 'thick',
-      eyeShape: 'narrow',
+      ...head('swept', 'chinstrap', 'relaxed', 'almond', 'broad', 'default'),
+      ...skin(22, 0.38, 0.56),
+      ...hair(38, 0.41, 0.2),
       ...eyes(215, 0.3, 0.38),
-      ...skin(24, 0.43, 0.6),
-      face: face({ nose: 0.2, jaw: 0.25 }),
-      body: body({ chest: 0.15 }),
-      outfit: 'verdigris',
+      headShape: shape({ eyeSpacing: -0.09, eyeSize: -0.8, eyeTilt: -0.12, chinWidth: 0.47 }),
+      bodyScale: 1.01,
     },
-    worn: kit('knight'),
     props: 'sword',
   },
+  // Guard Bram, Fenbridge Watch.
   infiltrator_bram: {
+    cls: 'warrior',
     app: {
       gender: 'male',
-      hair: 'crew',
-      ...hair(25, 0.1, 0.55),
-      beard: 'horseshoe',
-      brows: 'bushy',
-      eyeShape: 'wideset',
+      ...head('quiff', 'handlebar', 'default', 'default', 'broad', 'default'),
+      ...skin(27, 0.5, 0.48),
+      ...hair(40, 0.12, 0.4),
       ...eyes(38, 0.35, 0.3),
-      ...skin(26, 0.46, 0.5),
-      face: face({ jaw: 0.3, cheeks: 0.15 }),
-      body: body({ shoulders: 0.3, chest: 0.2 }),
-      outfit: 'verdigris',
+      headShape: shape({ eyeSpacing: 1, eyeSize: -0.28, eyeTilt: 0.15, chinWidth: 0.37 }),
+      bodyScale: 1.03,
     },
-    worn: kit('knight'),
     props: 'sword',
   },
+  // Guard Tessa, Fenbridge Watch.
   infiltrator_tessa: {
+    cls: 'warrior',
     app: {
       gender: 'female',
-      hair: 'chinbob',
-      ...hair(15, 0.5, 0.32),
-      brows: 'flat',
-      eyeShape: 'sharp',
+      ...head('bob', 'none', 'straight', 'almond', 'soft', 'default'),
+      ...skin(29, 0.34, 0.52),
+      ...hair(22, 0.69, 0.19),
       ...eyes(185, 0.4, 0.42),
-      ...skin(28, 0.38, 0.57),
-      face: face({ chin: 0.15, cheeks: -0.2 }),
-      body: body({ shoulders: 0.15 }),
-      outfit: 'verdigris',
+      headShape: shape({ eyeSpacing: -0.28, eyeSize: -0.14, eyeTilt: 0.7, chinWidth: 0.71 }),
+      bodyScale: 1.01,
     },
-    worn: kit('knight'),
     props: 'sword',
   },
 };
-
-/**
- * The one NPC this module deliberately does NOT compose, under any of the hub
- * ids he recurs at (`brother_aldric`, `_fen`, `_highwatch`, `_raid`).
- *
- * Brother Aldric renders the pre-v0.7 `npc_aldric` model, restored on purpose
- * once already (PR #499) after a model change moved him off it. The community
- * knows him by that exact silhouette, staff baked into the mesh and all, so a
- * composed replacement would be a regression no matter how good the new body
- * is. `npcLookFor` returns null for him, which is the same "keep the fixed
- * rig" answer a pre-creator player character gets, so nothing special-cases
- * him downstream. Pinned by tests/npc_looks.test.ts.
- */
-export function aldricKeepsHisRig(templateId: string): boolean {
-  return templateId.startsWith('brother_aldric');
-}
-
-/** normalizeAppearance for an authored NPC look: the same clamps, except that an
- *  NPC-only outfit colorway (modular.ts NPC_MATERIAL_COLORWAY_IDS) survives where
- *  the player normalizer would clamp it back to the default. */
-export function normalizeNpcAppearance(app: Partial<ModularAppearance>): ModularAppearance {
-  const out = normalizeAppearance(app);
-  const outfit = app.outfit as string | undefined;
-  if (outfit && (NPC_MATERIAL_COLORWAY_IDS as readonly string[]).includes(outfit)) {
-    out.outfit = outfit as ModularAppearance['outfit'];
-  }
-  return out;
-}
 
 /** Suffixed hub ids that share one person's look (the same character recurs
  *  across zones under new templateIds). */
 function baseId(templateId: string): string {
   if (templateId === 'scout_maren_highwatch') return 'scout_maren';
   if (templateId === 'brother_halven_marsh') return 'brother_halven';
+  // Brother Aldric stands in every hub (`_fen`, `_highwatch`, `_raid`).
+  if (templateId.startsWith('brother_aldric')) return 'brother_aldric';
   return templateId;
 }
 
-// Composed looks resolve once per templateId: the table is static, and a stable
-// object identity keeps every downstream diff/cache (variant cache keys, the
-// pool, portrait caches) on the fast path.
-const resolved = new Map<string, ModularLook | null>();
+/** The mob-kind templates that wear their roster look exactly as an NPC does:
+ *  the quest escortees. The sim makes each one a mob so the escort driver can
+ *  walk it (sim/escort.ts), but it is a townsperson the player walks home, so
+ *  the world draws it as one: the class body, face, body size, bare head and
+ *  held props its row names. Named one by one on purpose, never "any mob with a
+ *  row": one templateId can be an NPC and a mob at once (Sexton Marrow is the
+ *  living sexton of Gibbetmere and, under the same id, an undead dungeon boss),
+ *  and that mob keeps its mob body. tests/npc_looks.test.ts holds this set to
+ *  the escortees the content ships. */
+export const MOB_LOOK_IDS: ReadonlySet<string> = new Set([
+  'fisher_bram',
+  'apprentice_wren',
+  'castaway_navigator',
+  'gravedigger_mosley',
+]);
 
-/** The authored look for an NPC templateId, or null for one with no entry
- *  (which keeps its fixed rig, the same null the player path uses). */
-export function npcLookFor(templateId: string, kind: EntityKind = 'npc'): ModularLook | null {
-  if (kind !== 'npc') return null;
-  if (aldricKeepsHisRig(templateId)) return null;
+// Looks resolve once per templateId, alias ids included: the table is static, a
+// stable object identity keeps every downstream diff and cache (the head
+// dressing's reference compare, the pool, the far bake's key) on the fast path,
+// and the renderer asks once per NPC or mob view per frame (manifest.ts
+// visualKeyFor), so a repeat ask is one map read with no string work.
+//
+// The cache is keyed by templateId ALONE while the answer also depends on the
+// entity kind, so npcLookFor settles the kind BEFORE it reads or writes here:
+// only an NPC, or a mob MOB_LOOK_IDS names, ever reaches the cache, and for
+// those the answer is the row whatever the kind.
+const resolved = new Map<string, NpcLook | null>();
+
+/** The authored look an entity of `kind` wears under `templateId`, or null for
+ *  one that wears none (it keeps its stock rig, manifest.ts visualKeyFor). An
+ *  NPC wears its row. A mob wears one only if MOB_LOOK_IDS names it: any other
+ *  mob keeps its mob visual, one that shares a templateId with an NPC included.
+ *  A mob's refusal is one set read and nothing more (asked per view per frame). */
+export function npcLookFor(templateId: string, kind: EntityKind = 'npc'): NpcLook | null {
+  if (kind !== 'npc' && (kind !== 'mob' || !MOB_LOOK_IDS.has(templateId))) return null;
+  const hit = resolved.get(templateId);
+  if (hit !== undefined) return hit;
   const id = baseId(templateId);
-  let look = resolved.get(id);
+  let look = id === templateId ? undefined : resolved.get(id);
   if (look === undefined) {
     const def = NPC_LOOKS[id];
-    look = def ? { app: normalizeNpcAppearance(def.app), worn: def.worn } : null;
+    look = def ? { cls: def.cls, app: normalizeAppearance(def.app), props: def.props } : null;
     resolved.set(id, look);
   }
+  resolved.set(templateId, look);
   return look;
-}
-
-/** The modular VisualDef key for a composed NPC: the prop-set def authored for
- *  them (every prop set has one, derived in manifest.ts). */
-export function npcModularKeyFor(templateId: string): string {
-  const def = NPC_LOOKS[baseId(templateId)];
-  return `npc_modular_${def?.props ?? 'none'}`;
 }

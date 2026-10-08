@@ -219,6 +219,9 @@ const INDEX_SECTIONS = [
   "World PvP (the merged PvP window's flag tab)",
   'King of the Hill (the in-zone bar over the standing hill)',
   'ui library (shared primitives)',
+  // The WOC character-creation face builder (shell.css); the barrel loads it
+  // in both entries.
+  'woc face builder',
 ];
 
 // The two index-only sections play.html does not ship, so its count is 58 (plus the
@@ -234,12 +237,14 @@ describe('css_corpus section manifest', () => {
     // The World Quests branch's vehicle bar and music override sections (72 / 70)
     // plus World PvP (the flag tab) and King of the Hill (src/ui/hud/hill/), one
     // components.css section each in both entries: 74 / 72. The courier
-    // window adds one shared section, bringing the totals to 75 / 73.
-    expect(INDEX_SECTIONS.length).toBe(75);
-    expect(PLAY_SECTIONS.length).toBe(73);
-    expect(MANIFEST.length).toBe(75);
-    expect(new Set(INDEX_SECTIONS).size).toBe(75);
-    expect(new Set(PLAY_SECTIONS).size).toBe(73);
+    // window adds one shared section (75 / 73), and the character branch's WOC
+    // face builder (shell.css, in both entries) another: 76 / 74 on the v0.45.0
+    // integration.
+    expect(INDEX_SECTIONS.length).toBe(76);
+    expect(PLAY_SECTIONS.length).toBe(74);
+    expect(MANIFEST.length).toBe(76);
+    expect(new Set(INDEX_SECTIONS).size).toBe(76);
+    expect(new Set(PLAY_SECTIONS).size).toBe(74);
   });
 
   it('captures the live corpus markers (the marker regex is non-vacuous, not a zero match)', () => {

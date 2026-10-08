@@ -1,7 +1,9 @@
-// Pure target-portrait selection. Every catalogued mob template has committed,
-// prerendered portrait art; players use their live class portrait and NPCs keep
-// their crest. Short-lived guardians are not MOBS rows, so they deliberately
-// borrow the portrait of the exact existing creature body used in-world.
+// Pure committed-portrait selection. Every catalogued mob template has committed,
+// prerendered portrait art; players use their live class portrait, and a
+// character with an authored look (every NPC) its live face, which
+// nonplayer_portrait_core.ts ranks above this art and above the crest.
+// Short-lived guardians are not MOBS rows, so they deliberately borrow the
+// portrait of the exact existing creature body used in-world.
 
 export const TRANSIENT_MOB_PORTRAIT_SOURCE_IDS: Readonly<Record<string, string>> = Object.freeze({
   guardian_tithefiend: 'rift_dread_stalker',

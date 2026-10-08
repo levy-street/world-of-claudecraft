@@ -753,6 +753,32 @@ describe('missing painted deed and Heroic weapon integration', () => {
     }
   });
 
+  // Every Heroic base's held model has changed since the accepted-art record was cut: the
+  // items moved onto the character pack's weapon sets, each drawing the set one rarity below
+  // its own (a rare base a field model, an epic base a rare one, a legendary base an epic
+  // one). The record keeps the variant each drew when it was accepted.
+  const REMODELLED_SINCE_ACCEPTED: Record<string, string> = {
+    fanglords_beastspear: 'spear_field_iron',
+    gravewyrm_thornmaul: 'hammer_field_2h_iron',
+    staff_of_velkhar: 'staff_field_iron',
+    bonewrought_greatsword: 'sword_rare_a_violet',
+    wyrmfang_greatblade: 'sword_rare_a_ember',
+    wildheart_tuskblade: 'sword_rare_a_ivory',
+    direfang_greatblade: 'sword_rare_a_violet',
+    thornpeak_wardblade: 'sword_rare_b_teal',
+    fang_of_korzul: 'dagger_rare_b_violet',
+    courtiers_bonefang: 'dagger_rare_b_teal',
+    wildheart_fangknife: 'dagger_rare_b_ember',
+    duskwhisper: 'dagger_rare_a_violet',
+    maul_of_the_scourged_wilds: 'hammer_rare_b_violet',
+    gravecourt_hewer: 'axe_rare_a_violet',
+    staff_of_the_gravewyrm: 'staff_rare_a_teal',
+    nightfangs_greatstaff: 'staff_rare_b_violet',
+    wildheart_hexwood_staff: 'staff_rare_b_ember',
+    deathless_heartwood: 'staff_epic_hexwood_basin_turquoise',
+    kingsbane_last_oath: 'sword_epic_deathless_crucible_heart',
+  };
+
   it('keeps the historical Heroic resolver record while serving its base painting today', () => {
     const accepted = manifest();
     const live = Object.values(ITEMS)
@@ -768,18 +794,26 @@ describe('missing painted deed and Heroic weapon integration', () => {
       expect(base?.kind, `${target.id} base ${target.baseId} must remain a weapon`).toBe('weapon');
       expect(Object.hasOwn(ITEM_WEAPON_VARIANTS, target.id), target.id).toBe(false);
       expect(Object.hasOwn(ITEM_WEAPON_VARIANTS, target.baseId), target.baseId).toBe(true);
-      expect(ITEM_WEAPON_VARIANTS[target.baseId]).toBe(target.variant);
+      // The record's own fields stay as accepted: one variant, its preview and its model.
       expect(target.bagIconUrl).toBe(`/ui/weapons/${target.variant}.jpg`);
       expect(target.portraitPath).toBe(`public/ui/weapons/${target.variant}.jpg`);
       expect(target.heldModelPath).toBe(`public/models/weapons/${target.variant}.glb`);
-      expect(existsSync(path.join(repoRoot, target.portraitPath))).toBe(true);
-      expect(existsSync(path.join(repoRoot, target.heldModelPath))).toBe(true);
       // The accepted-art manifest is immutable historical evidence of the old JPG lane. The
-      // current runtime intentionally supersedes only its bag/portrait URL with base-id art;
-      // the held model and legacy preview remain available to rendering/tooling.
+      // current runtime supersedes its bag/portrait URL with base-id art, and the bases
+      // have since moved onto the character pack's weapon sets
+      // (REMODELLED_SINCE_ACCEPTED): for those the record names the model the base drew
+      // when it was accepted.
+      const liveVariant = REMODELLED_SINCE_ACCEPTED[target.baseId] ?? target.variant;
+      expect(ITEM_WEAPON_VARIANTS[target.baseId], target.baseId).toBe(liveVariant);
+      expect(existsSync(path.join(repoRoot, `public/ui/weapons/${liveVariant}.jpg`))).toBe(true);
+      expect(existsSync(path.join(repoRoot, `public/models/weapons/${liveVariant}.glb`))).toBe(
+        true,
+      );
       expect(weaponIconUrl(target.id)).toBe(`/ui/items/${target.baseId}.webp`);
       expect(iconDataUrl('item', target.id)).toBe(`/ui/items/${target.baseId}.webp`);
-      expect(itemWeaponModelUrl(target.id)).toBe(`models/weapons/${target.variant}.glb`);
+      // a Heroic copy draws whatever its base draws today
+      expect(itemWeaponModelUrl(target.id)).toBe(`models/weapons/${liveVariant}.glb`);
+      expect(itemWeaponModelUrl(target.id)).toBe(itemWeaponModelUrl(target.baseId));
       expect(iconDataUrl('item', target.id)).toBe(iconDataUrl('item', target.baseId));
     }
   });

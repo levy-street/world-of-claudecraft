@@ -344,9 +344,7 @@ import { assetsReady, beginDeferredPreloads } from './render/assets/preload';
 import { battlegroundAssetPrewarm } from './render/battleground';
 import {
   CharacterPreview,
-  npcLookFor,
   type PreviewAppearance,
-  previewAppearanceForRow,
   setModularLookProvider,
 } from './render/characters';
 import {
@@ -377,6 +375,7 @@ import {
   playerPortraitDataUrl,
   resetPortraitRendererForGraphicsRebuild,
 } from './render/characters/portrait';
+import { charselectPreviewAppearance } from './render/characters/preview_appearance';
 import { attachContextRecoveryHandlers } from './render/context_loss_recovery';
 import { type RecycledRendererContext, recycleWebGL2Context } from './render/context_recycle';
 import { installWebGLContextRelease } from './render/context_release';
@@ -450,7 +449,7 @@ import {
 } from './ui/account_portal_dom';
 import { technicalErrorMessage, userFacingApiError } from './ui/api_error_i18n';
 import { formatFooterVersion } from './ui/app_version';
-import { type AppearanceCustomizer, mountAppearanceCustomizer } from './ui/appearance_customizer';
+import { type AppearanceCustomizer, mountAppearanceEditor } from './ui/appearance_editor_mount';
 import {
   appearancePanelIsStale,
   forgetAppearancePanel,
@@ -1489,12 +1488,10 @@ async function startGame(
     // paperdoll eye toggle), so peers see the owner's choice. Per-entity
     // wire JSON is normalized at compose time (visual build, not per frame):
     // hostile or stale payloads clamp to a valid body.
-    // Non-players compose too: NPCs resolve authored looks by templateId
-    // (static data on every host; the why lives in characters/npc_looks.ts).
+    // Only players compose: an NPC wears its authored look on a WOC body, which
+    // the visual factory resolves by templateId (characters/npc_looks.ts).
     setModularLookProvider((e) =>
-      e.kind === 'player'
-        ? inWorldLookFor(e, armorSetForEntity(e.id === world.playerId))
-        : npcLookFor(e.templateId, e.kind),
+      e.kind === 'player' ? inWorldLookFor(e, armorSetForEntity(e.id === world.playerId)) : null,
     );
     // Helmet visibility belongs to each character's saved state: creator
     // toggle first, then paperdoll eye. Do not re-assert the old device-wide
@@ -4962,9 +4959,9 @@ async function startGame(
       // Kick the deferred creature-body fetches now, before the settle cover and
       // the curtain fade: until a creature GLB arrives its view, nameplate, and
       // click target do not exist, so every ms the stream waits past first paint
-      // widens the pop-in window on the tight-memory profile (desktop's stream
-      // set is empty). The allocation spike the stream was deferred past has
-      // cleared by this frame.
+      // widens the pop-in window on the tight-memory profile (desktop's creature
+      // set is empty: there the same kick starts the WOC crowd prefetch). The
+      // allocation spike the stream was deferred past has cleared by this frame.
       kickCharacterPreloadStream({
         startCharacterPreloads: startStreamedCharacterPreloads,
         onCharacterPreloadsStarted: (count) => {
@@ -5470,7 +5467,7 @@ function creationLoadout(cls: PlayerClass): ArmorLoadout {
 function previewClassBody(cls: PlayerClass): void {
   if (!characterPreview) return;
   const look = modularLookForClass(cls);
-  if (look) characterPreview.setModular(look.app, look.worn, cls);
+  if (look) characterPreview.setCreationClass(look.app, look.worn, cls);
   else characterPreview.setClass(cls);
 }
 
@@ -5517,22 +5514,22 @@ function syncAppearanceUi(panelId: string, cls: PlayerClass): void {
   noteAppearancePanelMounted(panelId, () => syncAppearanceUi(panelId, panelClass()));
   appearanceUis.set(
     panelId,
-    mountAppearanceCustomizer(host, {
+    mountAppearanceEditor(host, panelClass(), {
       value: modularAppearance,
+      stage: () => characterPreview,
       onChange: (next) => {
         modularAppearance = next;
         storeAppearance(next);
         const c = panelClass();
-        characterPreview?.setModular(next, creationLoadout(c), c);
+        characterPreview?.setCreationClass(next, creationLoadout(c), c);
       },
       helm: creationHelm,
       onHelm: (on) => {
         creationHelm = on;
         const c = panelClass();
-        characterPreview?.setModular(modularAppearance, creationLoadout(c), c);
+        characterPreview?.setCreationClass(modularAppearance, creationLoadout(c), c);
       },
-      // The chips must preview against the set the composed body actually
-      // wears: the stored override when one exists, not the class default.
+      // Chips preview against the set actually worn (stored override, else class kit).
       armorSet: () => readStoredArmorSet(panelClass()),
     }),
   );
@@ -6490,6 +6487,7 @@ async function refreshCharacters(): Promise<void> {
           name: c.name,
           variant: 'sm',
           look: charselectLook(c),
+          appearance: c.appearance,
           catalog: c.skinCatalog ?? 'class',
         });
       // A composed chip cannot hydrate from data attributes, so the row
@@ -6830,23 +6828,19 @@ const activeClassDetailsTimeouts: Record<string, number | null> = {};
  *  with), the mech cosmetic or legacy rig otherwise.
  *
  *  Stays here rather than moving into the redesign module because it needs the
- *  coordinator's own singletons (the shared stage, the legacy appearance
- *  builder). The DECISION it rests on, what a roster row composes, is
- *  charselectLook, which does not, and lives in render/characters/player_look.ts
+ *  coordinator's shared stage and on-demand weapon-skin warmup.
+ *  The DECISION it rests on, what a roster row composes, is
+ *  charselectLook, which lives in render/characters/player_look_core.ts
  *  with a unit test. */
 function showCharselectCharacter(c: CharacterSummary): void {
   if (!characterPreview) return;
+  // Streamed Armory models load on demand for either kind of roster body.
+  ensureCharacterUrl(weaponSkinModelUrl(c.weaponSkinId ?? null));
   const look = charselectLook(c);
   if (!look) {
-    // Same on-demand weapon-skin warmup the composed path below performs
-    // (mech lazy-load: iOS WebKit streams Armory skins after world entry).
-    ensureCharacterUrl(weaponSkinModelUrl(c.weaponSkinId ?? null));
-    characterPreview.setAppearance(previewAppearanceForRow(c));
+    characterPreview.setAppearance(charselectPreviewAppearance(c));
     return;
   }
-  // Same on-demand weapon-skin warmup the plain-appearance arm above
-  // performs: the composed turntable holds the skinned weapon too.
-  ensureCharacterUrl(weaponSkinModelUrl(c.weaponSkinId ?? null));
   characterPreview.setModular(
     look.app,
     look.worn,
@@ -6868,9 +6862,8 @@ const redesignEditor = new CharselectRedesignEditor({
     characterPreview.setModular(app, worn, cls, mainhandItemId, offhandItemId);
     characterPreview.setWeaponSkin(weaponSkinId);
   },
-  restoreStage: () => {
-    if (charselectSelected) showCharselectCharacter(charselectSelected);
-  },
+  restoreStage: () => charselectSelected && showCharselectCharacter(charselectSelected),
+  stage: () => characterPreview,
   setPreviewName: setCharselectPreviewName,
   saveAppearance: (characterId, app, helmHidden) =>
     api.rerollAppearance(characterId, app, helmHidden).then(() => undefined),

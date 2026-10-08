@@ -191,9 +191,13 @@ async function runInteriorEncounterPrewarm(
     idx++;
   };
 
+  // Kept alive for the renderer's lifetime: never fetch a streamed WOC body or armor set for
+  // it, and attach no armor at all (a kept set would never be freed; armor compiles through
+  // its own gate when a real wearer attaches it, woc_armor_dressing.ts).
+  const KEEP_ALIVE_PLAYER = { fetchStreamed: false, wocArmor: [] } as const;
   const buildPlayerClass = (cls: PlayerClass): void => {
     const entity = host.prewarmEntity('player', cls, CLASSES[cls]?.color ?? 0xffffff, 1);
-    const visual = createCharacterVisual(entity);
+    const visual = createCharacterVisual(entity, undefined, KEEP_ALIVE_PLAYER);
     if (!visual) return;
     visual.setSoulRend(true);
     keepAlive.push(visual);
@@ -207,7 +211,7 @@ async function runInteriorEncounterPrewarm(
       CLASSES[SOUL_REND_SKIN_HOST_CLASS]?.color ?? 0xffffff,
       1,
     );
-    const visual = createCharacterVisual(entity);
+    const visual = createCharacterVisual(entity, undefined, KEEP_ALIVE_PLAYER);
     if (!visual) return;
     const payloads = visual.setWeaponSkin(skinId);
     if (!payloads || payloads.length === 0) {

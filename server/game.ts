@@ -3579,7 +3579,7 @@ export class GameServer {
       // Compared by VALUE, not identity. meta.appearance is a fresh parse of a
       // fresh row read, so it is never the same object as the one already on
       // the entity and an identity check elided nothing: every reconnect busted
-      // the memo and re-shipped the look. Serializing two ~0.6 KB documents once
+      // the memo and re-shipped the look. Serializing two ~0.9 KB documents once
       // per resume is nothing against re-minting the wire string and forcing a
       // full identity record on every player in view.
       if (e && !sameAppearance(e.modularAppearance, meta.appearance ?? null)) {
@@ -8073,8 +8073,8 @@ export class GameServer {
   /**
    * The authored modular look as JSON, minted at most ONCE per entity.
    *
-   * `app` is by far the heaviest identity field (~0.6 KB for a default look,
-   * 1489 bytes at the ceiling the sanitizer's allowlists imply, measured by
+   * `app` is by far the heaviest identity field (~0.9 KB for a default look,
+   * 2154 bytes at the ceiling the sanitizer's allowlists imply, measured by
    * tests/appearance_wire_bounds.test.ts rather than compared at runtime) and the only one
    * that a session normally never changes: it is stamped at join from the
    * character's own column, and the sole thing that moves it is a redesign the

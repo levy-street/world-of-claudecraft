@@ -1,8 +1,18 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { characterPreloadUrls, manifestUrlsForGraphics } from '../src/render/characters/manifest';
+import {
+  characterPreloadUrls,
+  manifestUrlsForGraphics,
+  modularVisualKey,
+  VISUALS,
+  visualKeyFor,
+} from '../src/render/characters/manifest';
+import { DEFAULT_APPEARANCE, MODULAR_WARRIOR_KEY } from '../src/render/characters/modular';
+import { charselectLook, inWorldLookFor } from '../src/render/characters/player_look_core';
+import { classBodyComposes } from '../src/render/characters/woc_parts_core';
 import { foliagePreloadInternalsForTest } from '../src/render/foliage';
 import { propPreloadInternalsForTest } from '../src/render/props';
+import { ALL_CLASSES, type Entity } from '../src/sim/types';
 
 // Guard against the v0.16.0 "Could not start the renderer" P0. Props (props.ts),
 // characters (characters/assets.ts), and foliage (foliage.ts) all freeze their GLB
@@ -80,6 +90,134 @@ describe('character preload set covers placement at every graphics tier (v0.16.0
     for (const importTierStandardMaterials of [false, true]) {
       expect(characterPreloadUrls(importTierStandardMaterials)).toContain(gloomshadeUrl);
     }
+  });
+});
+
+// PR 4360 review, N12. Every class is a WOC body now, so no player composes the KayKit
+// modular library any more, yet each class's composed def (`player_<class>_modular`) still
+// put the retired KayKit class rig and its donor clip GLBs in every client's boot download.
+// Those defs are fetched on demand instead. Three things must stay true for that to be safe.
+describe('composed player defs nobody can reach stay out of the boot download', () => {
+  const boot = new Set(characterPreloadUrls(false));
+  const urlsOf = (key: string): string[] => {
+    const def = VISUALS[key];
+    return [def.url, ...(def.animUrls ?? []), ...(def.attach ?? []).map((a) => a.url)];
+  };
+  const composedKeys = ALL_CLASSES.map((cls) => modularVisualKey(cls));
+  const onDemand = composedKeys.filter((key) => VISUALS[key].lazyPreload);
+
+  it('no player composes: the reason the defs are unreachable', () => {
+    // If a class ever composes again, its def must go back in the boot gate: a body built
+    // by the world or a preview resolves its files synchronously.
+    const look = { ...DEFAULT_APPEARANCE };
+    for (const cls of ALL_CLASSES) {
+      expect(classBodyComposes(cls), cls).toBe(false);
+      const entity = {
+        kind: 'player',
+        templateId: cls,
+        modularAppearance: look,
+      } as unknown as Entity;
+      expect(
+        inWorldLookFor(entity, () => 'knight'),
+        cls,
+      ).toBeNull();
+      expect(charselectLook({ class: cls, appearance: look }), cls).toBeNull();
+      expect(VISUALS[`player_${cls}`].wocCharacter, cls).toBeDefined();
+    }
+  });
+
+  it('fetches every one on demand, the library fallback included', () => {
+    // MODULAR_WARRIOR_KEY is what modularKeyFor hands a composed player whose class has no
+    // def of its own. It stayed in the boot gate while every world NPC composed from the
+    // same part library; each rides a WOC class body now (characters/npc_looks.ts), so
+    // nothing in the world builds from the library and it is on demand with the rest.
+    expect(composedKeys).toContain(MODULAR_WARRIOR_KEY);
+    expect([...onDemand].sort()).toEqual([...composedKeys].sort());
+    const library = 'models/chars/modular/warrior_modular.glb';
+    expect(VISUALS[MODULAR_WARRIOR_KEY].url).toBe(library);
+    expect(boot.has(library)).toBe(false);
+    // no boot def names the library any more (an NPC def that did would put it back)
+    const holders = Object.entries(VISUALS)
+      .filter(([, def]) => !def.lazyPreload && def.url === library)
+      .map(([key]) => key);
+    expect(holders).toEqual([]);
+    // 3,477,500 B at the move: fail if the file this saves quietly stops being the library
+    expect(statSync(`public/${library}`).size).toBeGreaterThan(3_000_000);
+  });
+
+  it('fetches the two stock NPC rigs no boot def names on demand too', () => {
+    // Brother Aldric's and Brother Halven's old bodies: each wears an authored look on a
+    // WOC class body now, and no other boot def names these files, so they left the gate.
+    for (const [key, file] of [
+      ['npc_aldric', 'models/chars/players/mage_classic.glb'],
+      ['npc_reliquary_keeper', 'models/chars/players/paladin.glb'],
+    ] as const) {
+      expect(VISUALS[key].lazyPreload, key).toBe(true);
+      expect(VISUALS[key].url, key).toBe(file);
+      expect(boot.has(file), file).toBe(false);
+    }
+    // and neither is what its NPC draws
+    expect(visualKeyFor({ kind: 'npc', templateId: 'brother_aldric' } as never)).toBe(
+      'player_priest',
+    );
+    expect(visualKeyFor({ kind: 'npc', templateId: 'brother_halven' } as never)).toBe(
+      'player_paladin',
+    );
+  });
+
+  it('downloads none of the files only those defs name', () => {
+    // the files no boot def, no item and no weapon skin still asks for
+    const heldElsewhere = new Set<string>();
+    for (const [key, def] of Object.entries(VISUALS)) {
+      if (!def.lazyPreload) for (const url of urlsOf(key)) heldElsewhere.add(url);
+      // a WOC body's held weapons are boot files in their own right (next case)
+      if (def.wocCharacter) for (const a of def.attach ?? []) heldElsewhere.add(a.url);
+    }
+    const orphaned = [...new Set(onDemand.flatMap(urlsOf))].filter(
+      (url) => !heldElsewhere.has(url) && !url.startsWith('models/weapons/'),
+    );
+    // the retired KayKit hunter rig is the largest of them
+    expect(orphaned).toContain('models/chars/players/ranger.glb');
+    for (const url of orphaned) expect(boot.has(url), `${url} still preloads at boot`).toBe(false);
+    const saved = orphaned.reduce((sum, url) => sum + statSync(`public/${url}`).size, 0);
+    // 1,254,556 B at the time of the review's census: fail if the saving quietly vanishes
+    expect(saved).toBeGreaterThan(1_000_000);
+  });
+
+  it('keeps every weapon a WOC body holds in the boot gate in its own right', () => {
+    // A held prop attaches synchronously at build, and a WOC def is lazy for its base and
+    // library only. The warlock's wand is the case that needs the rule: nothing else in the
+    // boot set asks for it, so without the rule it would be gone (shown by taking the rule's
+    // input away: the same sweep over warlock defs that are not WOC bodies).
+    const wand = 'models/weapons/wand.glb';
+    const warlocks = [VISUALS.player_warlock, VISUALS.player_warlock_female];
+    for (const def of warlocks) expect(def.attach?.map((a) => a.url)).toContain(wand);
+    expect(boot.has(wand)).toBe(true);
+    const manifests = warlocks.map((def) => def.wocCharacter);
+    try {
+      for (const def of warlocks) def.wocCharacter = undefined;
+      expect(characterPreloadUrls(false)).not.toContain(wand);
+    } finally {
+      warlocks.forEach((def, i) => {
+        def.wocCharacter = manifests[i];
+      });
+    }
+    expect(characterPreloadUrls(false)).toContain(wand);
+  });
+
+  it('keeps every prop any on-demand def holds in the boot gate', () => {
+    // The general form: `lazyPreload` takes a def's body and clip files out of the boot
+    // gate, never a prop it holds (the Combat Mech's sword, a WOC body's weapons, a composed
+    // def's class kit). A lazy def whose prop is in no boot set builds into a throw.
+    let props = 0;
+    for (const [key, def] of Object.entries(VISUALS)) {
+      if (!def.lazyPreload) continue;
+      for (const a of def.attach ?? []) {
+        props++;
+        expect(boot.has(a.url), `${key} holds ${a.url}`).toBe(true);
+      }
+    }
+    expect(props).toBeGreaterThan(20);
   });
 });
 

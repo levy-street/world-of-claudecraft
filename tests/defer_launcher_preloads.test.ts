@@ -225,6 +225,49 @@ describe('no world module fetches at import', () => {
   });
 });
 
+describe('the WOC player bodies load at world entry, never on the launcher', () => {
+  // characters/assets.ts is the one sanctioned EAGER registrant (the launcher draws the
+  // creation preview), so the scan above cannot see which lane a new task of that file
+  // rides. The player bodies' entry files (both fits' base and animation library, both head
+  // cores: about 4.4 MB) must ride the deferred one: eager, they would download and decode
+  // on the home screen, which is the defect this file exists to prevent. The behaviour is
+  // pinned through the real registry in tests/woc_entry_preload.test.ts; this is the wiring.
+  const assetsSource = stripComments(
+    readFileSync(new URL('../src/render/characters/assets.ts', import.meta.url), 'utf8'),
+  );
+
+  it('registers the entry task in the deferred lane, as a thunk', () => {
+    expect(assetsSource).toContain(
+      'registerDeferredPreload(() => loadWocEntryFiles((url) => prepareCharacterUrl(url)));',
+    );
+    // never handed to the eager lane, and never started at import
+    expect(assetsSource).not.toMatch(/(?<!Deferred)\bregisterPreload\s*\(\s*loadWocEntryFiles/);
+    expect(assetsSource.match(/loadWocEntryFiles\(/g)).toHaveLength(1);
+  });
+
+  it('is started by the lane alone: no entry point fetches the set itself', () => {
+    // the launcher's previews ask per body (visualAssetsResident), and world entry opens
+    // the lane: nothing else may start these files
+    const files = tsFilesUnder(fileURLToPath(new URL('../src', import.meta.url)));
+    expect(files.length).toBeGreaterThan(400);
+    const callers = files
+      .filter(({ full }) => {
+        // the raw text first: stripping comments off every source file is the slow part
+        const text = readFileSync(full, 'utf8');
+        return (
+          text.includes('loadWocEntryFiles(') && stripComments(text).includes('loadWocEntryFiles(')
+        );
+      })
+      .map(({ file }) => file)
+      .sort();
+    expect(callers).toEqual([
+      'render/characters/assets.ts',
+      'render/characters/woc_entry_preload.ts',
+    ]);
+    expect(mainSource).not.toContain('woc_entry_preload');
+  });
+});
+
 describe('every assetsReady host opens the lane', () => {
   // The general rule behind the two ordering pins above: ANY source that awaits
   // assetsReady() and then constructs the Renderer is a host, and a host that

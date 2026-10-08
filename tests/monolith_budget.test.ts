@@ -537,7 +537,16 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 18081 and the
     // branch 18235; the two sides' additions compose to 18093 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 18079,
+    // RE-PINNED at the release/v0.45.0 sync into the character branch (2026-10-02): both
+    // parent pins for the record, the release 18093 and the branch 18201 (shared
+    // turntable subject orchestration moved to preview_subject.ts); wc -l on the merged
+    // tree. Exact count, zero slack.
+    // LOWERED 18059 -> 18054 with the NPC face portraits: the "what does a
+    // non-player frame show" rule (authored face, committed mob art or crest)
+    // moved out of drawNonPlayerPortrait into src/ui/nonplayer_portrait_core.ts,
+    // paying for the listener arm that repaints a landed face. Exact count,
+    // zero slack.
+    ceiling: 18054,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -995,7 +1004,17 @@ const MONOLITHS: MonolithRow[] = [
     // RE-PINNED 12687 -> 12688 at the second release merge into the same branch,
     // after PR 3847 landed on the release (its renderer.ts wiring adds one line;
     // the release pin stays 12684): wc -l on the merged tree. Exact count, zero slack.
-    ceiling: 12688,
+    // RE-PINNED at the release/v0.45.0 sync into the character branch (2026-10-02): both
+    // parent pins for the record, the release 12688 and the branch 12707 (live look
+    // diffs in live_look_diff.ts, the target-cone debug mesh in
+    // target_cone_debug_mesh.ts, the melee blade-contact presentation in
+    // contact_queue.ts + melee_contact_present.ts, net of the contact timing and
+    // streamed WOC body wiring); wc -l on the merged tree. Exact count, zero slack.
+    // LOWERED 12606 -> 12598 at the PR 4360 review round: the required pair of views (the
+    // player, its target) moved into required_views_core.ts, which counts a view only when
+    // its build made one; the world-entry head start of the player bodies
+    // (characters/woc_entry_prepare.ts) came in as one awaited, announced call. Exact count.
+    ceiling: 12598,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1437,11 +1456,14 @@ const MONOLITHS: MonolithRow[] = [
     // Colorblind Mode's interface body-class extraction also composes with
     // those release-line extractions. Release reconciliation: measured merged
     // tree at 11140 lines, preserving both extraction sets.
-    // Subscription foundation moves the store snapshot adapter into subscription_sdk.
-    // v0.45.0 integration: the Mirefen world-boss branch's seven lines of main.ts wiring
-    // land on top of that 10958, so the merged tree measures 10965 (wc -l), still under
-    // the release's own 11140. INTEGRATION-ONLY pin; neither parent PR carries it.
-    ceiling: 10965,
+    // RE-PINNED at the release/v0.45.0 sync into the character branch (2026-10-02): both
+    // parent pins for the record, the release 11140 and the branch 11258 (roster
+    // preview mapping in preview_appearance.ts); wc -l on the merged tree. Exact count,
+    // zero slack.
+    // LOWERED 10961 -> 10958: the modular look provider answers for players only now
+    // (every world NPC rides a WOC class body, characters/npc_looks.ts), which took
+    // the NPC arm and its import out of the coordinator. Exact count, zero slack.
+    ceiling: 10958,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

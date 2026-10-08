@@ -366,8 +366,8 @@
   "sourceManifests": [
     {
       "path": "docs/achievements/placeholder-art-completion-2026-08-09/mob-portrait-source-manifest.json",
-      "acceptedSha256": "73a744ad2a7258d21770a3088567359588e4fbc65f240bf5b27b34bf90aa0967",
-      "acceptedBytes": 319538
+      "acceptedSha256": "83d8258a3f31c92dee4d90ebf21cc94efc0714e1cfefa9de7edaf17245b461b8",
+      "acceptedBytes": 326903
     }
   ],
   "assets": [
@@ -2131,8 +2131,8 @@
       "kind": "mobPortrait",
       "id": "castaway_navigator",
       "runtimeUrl": "/ui/mobs/castaway_navigator.webp",
-      "acceptedSha256": "d4f0bf6105904dd5ddaa573e09d8cdf6da1fc17db0ab2c4b9106f7052d1e0f78",
-      "acceptedBytes": 2628,
+      "acceptedSha256": "1650811331dd1609e155a17da9151423b38c1892289c165c408cb456bf0764e1",
+      "acceptedBytes": 2192,
       "origin": "deterministic-rerender"
     },
     {
@@ -2171,16 +2171,16 @@
       "kind": "mobPortrait",
       "id": "fisher_bram",
       "runtimeUrl": "/ui/mobs/fisher_bram.webp",
-      "acceptedSha256": "4e4961e7e5f7b1ee42892ebc11667ba3a3bc114680fad339d9fac56eb3c890fd",
-      "acceptedBytes": 2602,
+      "acceptedSha256": "1650811331dd1609e155a17da9151423b38c1892289c165c408cb456bf0764e1",
+      "acceptedBytes": 2192,
       "origin": "deterministic-rerender"
     },
     {
       "kind": "mobPortrait",
       "id": "gravedigger_mosley",
       "runtimeUrl": "/ui/mobs/gravedigger_mosley.webp",
-      "acceptedSha256": "ba0f0bcf7b9f33b6a0236087517b902f292964f0bca37cf1855da6ac9d71073b",
-      "acceptedBytes": 2710,
+      "acceptedSha256": "1650811331dd1609e155a17da9151423b38c1892289c165c408cb456bf0764e1",
+      "acceptedBytes": 2192,
       "origin": "deterministic-rerender"
     },
     {

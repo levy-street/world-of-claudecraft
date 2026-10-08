@@ -25,6 +25,10 @@ export interface GuideModelSpec {
   attach?: GuideModelAttach[];
   weaponFix?: GuideModelWeaponFix[];
   tintStrength?: number;
+  /** Clip libraries played on this model (a split WOC body's animation library). */
+  animUrls?: string[];
+  /** Armor files bound to this model's skeleton by bone name (a split WOC body's kit). */
+  armor?: string[];
 }
 
 export interface GuideClassInfo {
@@ -1258,9 +1262,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       }
     ],
     "model": "player_priest",
-    "tint": "#f0e9d6",
-    "tintStrength": 0.12,
-    "still": "/guide-stills/player_priest__f0e9d6__s12.webp"
+    "still": "/guide-stills/player_priest.webp"
   },
   {
     "id": "shaman",
@@ -1415,9 +1417,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       }
     ],
     "model": "player_shaman",
-    "tint": "#6f8fc9",
-    "tintStrength": 0.12,
-    "still": "/guide-stills/player_shaman__6f8fc9__s12.webp"
+    "still": "/guide-stills/player_shaman.webp"
   },
   {
     "id": "mage",
@@ -1902,9 +1902,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       }
     ],
     "model": "player_warlock",
-    "tint": "#8d5fd3",
-    "tintStrength": 0.12,
-    "still": "/guide-stills/player_warlock__8d5fd3__s12.webp"
+    "still": "/guide-stills/player_warlock.webp"
   },
   {
     "id": "druid",
@@ -21470,13 +21468,9 @@ export const GUIDE_PROF_PAGES: string[] = [
 
 export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
   "player_warrior": {
-    "url": "models/chars/players/knight.glb",
+    "url": "models/chars/players/woc/base_male.glb",
     "idle": "Idle",
-    "height": 2.6,
-    "show": [
-      "Knight_Helmet",
-      "Knight_Cape"
-    ],
+    "height": 2.8600000000000003,
     "attach": [
       {
         "url": "models/weapons/sword_1handed.glb",
@@ -21486,12 +21480,18 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "url": "models/weapons/shield_round.glb",
         "bone": "handslot.l"
       }
+    ],
+    "animUrls": [
+      "models/chars/players/woc/anims_male.glb"
+    ],
+    "armor": [
+      "models/chars/players/woc/armor/male_warrior_medium.glb"
     ]
   },
   "player_paladin": {
-    "url": "models/chars/players/paladin.glb",
+    "url": "models/chars/players/woc/base_male.glb",
     "idle": "Idle",
-    "height": 2.6,
+    "height": 2.8600000000000003,
     "attach": [
       {
         "url": "models/weapons/axe_1handed.glb",
@@ -21501,26 +21501,35 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "url": "models/weapons/shield_square.glb",
         "bone": "handslot.l"
       }
+    ],
+    "animUrls": [
+      "models/chars/players/woc/anims_male.glb"
+    ],
+    "armor": [
+      "models/chars/players/woc/armor/male_paladin_medium.glb"
     ]
   },
   "player_hunter": {
-    "url": "models/chars/players/ranger.glb",
+    "url": "models/chars/players/woc/base_male.glb",
     "idle": "Idle",
-    "height": 2.6,
+    "height": 2.8600000000000003,
     "attach": [
       {
-        "url": "models/weapons/crossbow_1handed.glb",
+        "url": "models/weapons/crossbow_starter.glb",
         "bone": "handslot.r"
       }
+    ],
+    "animUrls": [
+      "models/chars/players/woc/anims_male.glb"
+    ],
+    "armor": [
+      "models/chars/players/woc/armor/male_hunter_medium.glb"
     ]
   },
   "player_rogue": {
-    "url": "models/chars/players/rogue.glb",
+    "url": "models/chars/players/woc/base_male.glb",
     "idle": "Idle",
-    "height": 2.6,
-    "show": [
-      "Rogue_Cape"
-    ],
+    "height": 2.8600000000000003,
     "attach": [
       {
         "url": "models/weapons/dagger.glb",
@@ -21530,28 +21539,35 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "url": "models/weapons/dagger.glb",
         "bone": "handslot.l"
       }
+    ],
+    "animUrls": [
+      "models/chars/players/woc/anims_male.glb"
+    ],
+    "armor": [
+      "models/chars/players/woc/armor/male_rogue_medium.glb"
     ]
   },
   "player_priest": {
-    "url": "models/chars/players/mage.glb",
+    "url": "models/chars/players/woc/base_male.glb",
     "idle": "Idle",
-    "height": 2.6,
-    "show": [],
+    "height": 2.8600000000000003,
     "attach": [
       {
         "url": "models/weapons/staff.glb",
         "bone": "handslot.r"
       }
     ],
-    "tintStrength": 0.12
+    "animUrls": [
+      "models/chars/players/woc/anims_male.glb"
+    ],
+    "armor": [
+      "models/chars/players/woc/armor/male_priest_medium.glb"
+    ]
   },
   "player_shaman": {
-    "url": "models/chars/players/barbarian.glb",
+    "url": "models/chars/players/woc/base_male.glb",
     "idle": "Idle",
-    "height": 2.6,
-    "show": [
-      "Barbarian_BearHat"
-    ],
+    "height": 2.8600000000000003,
     "attach": [
       {
         "url": "models/weapons/axe_1handed.glb",
@@ -21562,49 +21578,67 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "bone": "handslot.l"
       }
     ],
-    "tintStrength": 0.12
+    "animUrls": [
+      "models/chars/players/woc/anims_male.glb"
+    ],
+    "armor": [
+      "models/chars/players/woc/armor/male_shaman_medium.glb"
+    ]
   },
   "player_mage": {
-    "url": "models/chars/players/mage.glb",
+    "url": "models/chars/players/woc/base_male.glb",
     "idle": "Idle",
-    "height": 2.6,
-    "show": [
-      "Mage_Cape"
-    ],
+    "height": 2.8600000000000003,
     "attach": [
       {
         "url": "models/weapons/staff.glb",
         "bone": "handslot.r"
       }
+    ],
+    "animUrls": [
+      "models/chars/players/woc/anims_male.glb"
+    ],
+    "armor": [
+      "models/chars/players/woc/armor/male_mage_medium.glb"
     ]
   },
   "player_warlock": {
-    "url": "models/chars/players/mage.glb",
+    "url": "models/chars/players/woc/base_male.glb",
     "idle": "Idle",
-    "height": 2.6,
-    "show": [],
+    "height": 2.8600000000000003,
     "attach": [
       {
         "url": "models/weapons/wand.glb",
         "bone": "handslot.r"
       },
       {
-        "url": "models/weapons/spellbook_open.glb",
+        "url": "models/weapons/spellbook_starter.glb",
         "bone": "handslot.l",
-        "gripRef": "Spellbook_open"
+        "rotationY": 3.141592653589793
       }
     ],
-    "tintStrength": 0.12
+    "animUrls": [
+      "models/chars/players/woc/anims_male.glb"
+    ],
+    "armor": [
+      "models/chars/players/woc/armor/male_warlock_medium.glb"
+    ]
   },
   "player_druid": {
-    "url": "models/chars/players/druid.glb",
+    "url": "models/chars/players/woc/base_male.glb",
     "idle": "Idle",
-    "height": 2.6,
+    "height": 2.8600000000000003,
     "attach": [
       {
         "url": "models/weapons/staff.glb",
         "bone": "handslot.r"
       }
+    ],
+    "animUrls": [
+      "models/chars/players/woc/anims_male.glb"
+    ],
+    "armor": [
+      "models/chars/players/woc/armor/male_druid_medium.glb"
     ]
   },
   "form_bear": {

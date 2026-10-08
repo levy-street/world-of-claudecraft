@@ -60,6 +60,8 @@
         "docs/perf/hitch/gate.json",
         "scripts/assets/wickharbor_harbor/layout.json",
         "scripts/assets/wickharbor_wharf/layout.json",
+        "scripts/assets/woc_character/export_split.json",
+        "scripts/assets/woc_character/woc_head_pack.report.json",
         "scripts/assets/wyrmwatch_harbor/layout.json"
       ],
       "formatter": {

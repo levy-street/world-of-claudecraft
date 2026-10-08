@@ -1396,8 +1396,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Courier integration reseals only renderer provenance, preserving captured measurements.
   // Re-minted at the v0.45.0 integration (membership integration + the Mirefen world-boss
-  // branch; remint_polish_provenance.mjs on the merged tree, no capture was retaken).
-  'bac1506dd6490c34883ab5d25f82da35e2e577dfb111733ff9388d10f7e582ca';
+  // branch + the character pack; remint_polish_provenance.mjs on the merged tree, no
+  // capture was retaken).
+  '9753d00a0de56c94e38e45d0256bf7ffbb9a96d9823cb8bf6aa8237d1ec53e67';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1421,8 +1422,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the v0.45.0 integration (membership integration + the Mirefen world-boss
-  // branch; remint_polish_provenance.mjs on the merged tree, no capture was retaken).
-  'e5e0ec7acbfa17883e5e6436c1d1f12e5d65d7908c942c95d5bbc212300d03d2';
+  // branch + the character pack; remint_polish_provenance.mjs on the merged tree, no
+  // capture was retaken).
+  'f916cca0fb1eb27e3a0392c6da3e2e0f5f070392755b616c10d5088943913848';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2805,9 +2807,10 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // LAST again over the re-swept evidence. No capture was retaken.
       // release/v0.44.0 base merge into PR 4193: recomputed LAST again over the
       // re-swept evidence. No capture was retaken.
-      // v0.45.0 integration (membership integration + the Mirefen world-boss branch):
-      // recomputed LAST again over the re-swept evidence. No capture was retaken.
-    ).toBe('ed11a2e57747ae87cefd48e2bc1d357c999f3577c5e9e8bc9e20b45084a76b26');
+      // v0.45.0 integration (membership integration + the Mirefen world-boss branch
+      // + the character pack): recomputed LAST again over the re-swept evidence. No
+      // capture was retaken.
+    ).toBe('af84fee5854c4b3e1551c9a32bb4d75e199ce217d317db44de4c0f1ea1beec95');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

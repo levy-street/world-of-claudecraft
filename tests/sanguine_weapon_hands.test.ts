@@ -42,7 +42,7 @@ function fixture(offhandItemId: string | null = 'deathless_greatblade') {
     weaponAuraMode: 'none',
     weaponAuraMeshes: [] as THREE.Mesh[],
     sanguineSheath: new SanguineWeaponSheath(),
-    def: { offhandSlot: 0 },
+    def: { offhandSlot: 0, clips: {} },
     stow: { attached: false },
     tintedRigClaims: new Set(),
     rebuildCasters: vi.fn(),

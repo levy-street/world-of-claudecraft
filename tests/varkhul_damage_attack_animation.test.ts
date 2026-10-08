@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { shouldStartDamageAttackAnimation } from '../src/render/characters/damage_attack_animation';
 import { Renderer } from '../src/render/renderer';
 import type { Entity, SimEvent } from '../src/sim/types';
+import { withMeleeContact } from './helpers/renderer_contact';
 
 describe('Varkhul concurrent cast and melee presentation', () => {
   it('keeps JumpSlam in control when a Warden melee hit lands during Quake', () => {
@@ -31,7 +32,7 @@ describe('Varkhul concurrent cast and melee presentation', () => {
     const triggerHit = vi.fn();
     const meleeSpark = vi.fn();
     const onDamage = vi.fn();
-    const renderer = {
+    const renderer = withMeleeContact({
       sim: { entities: new Map([[warden.id, warden]]) },
       views: new Map([[warden.id, {}]]),
       activeVisual: vi.fn(() => jumpSlamVisual),
@@ -39,7 +40,7 @@ describe('Varkhul concurrent cast and melee presentation', () => {
       triggerHit,
       vfx: { meleeSpark, drainLifeTick: vi.fn() },
       abilityVfx: { onDamage },
-    } as unknown as Renderer;
+    }) as unknown as Renderer;
     const damage: SimEvent = {
       type: 'damage',
       sourceId: warden.id,
@@ -61,7 +62,7 @@ describe('Varkhul concurrent cast and melee presentation', () => {
 
     warden.castingAbility = null;
     Renderer.prototype.handleEvent.call(renderer, damage);
-    expect(triggerAttack).toHaveBeenCalledWith(warden.id, undefined);
+    expect(triggerAttack).toHaveBeenCalledWith(warden.id, undefined, false, 'melee');
   });
 
   it('still animates ordinary mob melee and non-authored casts', () => {

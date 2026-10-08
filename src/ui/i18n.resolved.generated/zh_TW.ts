@@ -9887,6 +9887,168 @@ export const zh_TW: EnTranslations = {
     "body": "體型",
     "genderMale": "男性",
     "genderFemale": "女性",
+    "bodyTypeA": "Type A",
+    "bodyTypeB": "Type B",
+    "wocHead": {
+      "hair": {
+        "swept": "側梳",
+        "long": "Long",
+        "mohawk": "莫西干頭",
+        "quiff": "短飛機頭",
+        "undercut": "鏟青",
+        "topknot": "頭頂髮髻",
+        "shoulder": "齊肩髮",
+        "bald": "Bald",
+        "waves": "波浪捲",
+        "ponytail": "高馬尾",
+        "braid": "辮子",
+        "bob": "Bob",
+        "crown": "皇冠辮",
+        "twins": "雙辮",
+        "curls": "捲髮盤頭"
+      },
+      "beard": {
+        "none": "無鬍鬚",
+        "moustache": "上唇鬍",
+        "handlebar": "翹八字鬍",
+        "goatee": "山羊鬍",
+        "chin": "下巴鬍",
+        "boxed": "短絡腮鬍",
+        "long": "長鬍鬚",
+        "chops": "絡腮鬢角",
+        "chinstrap": "下顎線鬍"
+      },
+      "nose": {
+        "default": "經典",
+        "broad": "寬鼻",
+        "aquiline": "鷹鉤鼻",
+        "button": "小翹鼻",
+        "soft": "Soft"
+      },
+      "mouth": {
+        "default": "經典",
+        "full": "Full",
+        "smirk": "壞笑",
+        "relaxed": "放鬆",
+        "cupids_bow": "邱比特唇",
+        "narrow": "窄唇",
+        "thin": "Thin",
+        "rounded": "圓唇"
+      },
+      "brows": {
+        "default": "經典",
+        "slim": "Slim",
+        "arched": "彎眉",
+        "soft": "Soft",
+        "straight": "平眉",
+        "relaxed": "舒展眉",
+        "soft_arch": "Soft Arch",
+        "rounded": "圓眉"
+      },
+      "ears": {
+        "default": "經典",
+        "large": "大耳",
+        "pointed": "尖耳",
+        "round": "圓耳"
+      },
+      "eyes": {
+        "default": "經典",
+        "almond": "杏眼",
+        "hooded": "內雙眼"
+      }
+    },
+    "wocBuilder": {
+      "cat": {
+        "bodyType": "Body Type",
+        "skinTone": "Skin Tone",
+        "face": "Face",
+        "eyesBrows": "眼睛與眉毛",
+        "eyeColor": "瞳色",
+        "hairstyle": "髮型",
+        "facialHair": "鬍鬚",
+        "hairColor": "髮色",
+        "browColor": "眉色",
+        "piercings": "穿孔飾品"
+      },
+      "section": {
+        "hair": "髮型",
+        "nose": "Nose",
+        "mouth": "Lips",
+        "brows": "眉形",
+        "ears": "Ears",
+        "eyes": "眼型"
+      },
+      "slider": {
+        "eyeSpacing": "眼距",
+        "eyeSize": "Eye Size",
+        "eyeTilt": "Eye Tilt",
+        "browHeight": "眉毛高度",
+        "chinWidth": "下巴寬度",
+        "bodyScale": "Body Size"
+      },
+      "bodyGlyph": {
+        "a": "A",
+        "b": "B"
+      },
+      "piercing": {
+        "none": "None",
+        "lobes": "耳垂",
+        "ears": "Full Ears",
+        "brow": "Brow",
+        "nose": "鼻翼釘",
+        "septum": "鼻中隔",
+        "lip": "Lip",
+        "full": "Full Set"
+      },
+      "skin": {
+        "porcelain": "瓷白",
+        "ivory": "象牙白",
+        "rose": "Rose",
+        "peach": "蜜桃",
+        "fair": "Fair",
+        "beige": "米色",
+        "sand": "Sand",
+        "honey": "蜂蜜",
+        "olive": "橄欖",
+        "caramel": "焦糖",
+        "tan": "Tan",
+        "bronze": "古銅",
+        "chestnut": "栗褐",
+        "umber": "棕褐",
+        "mahogany": "紅木",
+        "ebony": "烏木"
+      },
+      "eye": {
+        "brown": "棕色",
+        "darkBrown": "深棕色",
+        "hazel": "榛色",
+        "amber": "琥珀色",
+        "green": "綠色",
+        "teal": "Teal",
+        "blue": "Blue",
+        "paleBlue": "Pale Blue",
+        "grey": "Grey",
+        "violet": "紫羅蘭色"
+      },
+      "hairColor": {
+        "platinum": "鉑金色",
+        "blonde": "淺金色",
+        "golden": "金黃色",
+        "copper": "銅色",
+        "red": "Red",
+        "auburn": "赤褐色",
+        "lightBrown": "淺棕色",
+        "brown": "棕色",
+        "darkBrown": "深棕色",
+        "black": "黑色",
+        "silver": "銀色",
+        "white": "白色"
+      },
+      "matchHair": "匹配髮色",
+      "resetDefault": "恢復預設",
+      "customColorAria": "選擇自訂顏色",
+      "customSkinAria": "選擇自訂膚色"
+    },
     "hair": "髮型",
     "brows": "眉毛",
     "skinTone": "膚色",

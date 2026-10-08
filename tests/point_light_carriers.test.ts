@@ -633,6 +633,10 @@ describe('every point-light producer is a carrier source', () => {
       'render/characters/makeup.ts',
       'render/characters/rig_merge.ts',
       'render/characters/stubble.ts',
+      // a merged stand-in takes the pieces it folds out of the render lists (mask 0) and
+      // puts their own masks back: never a layer a camera does not already see
+      'render/characters/woc_armor_merge.ts',
+      'render/characters/woc_head_merge.ts',
       'render/gather_nodes.ts',
       'render/point_light_carriers_core.ts',
     ]);

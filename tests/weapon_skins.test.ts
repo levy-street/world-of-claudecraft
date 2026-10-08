@@ -22,6 +22,7 @@ import { ITEMS } from '../src/sim/data';
 import { armoryCollectionStrings, armorySkinStrings } from '../src/ui/i18n.catalog/armory';
 import { ITEM_WEAPON_VARIANTS } from '../src/ui/weapon_variants';
 import { armorySkinArt } from '../src/ui/woc_store_view';
+import { failWocHeads, landWocBodies } from './helpers/woc_streamed';
 
 const ROOT = join(__dirname, '..');
 
@@ -621,9 +622,11 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
     expect(acc.count).toBe(2);
     // The hunter loads it.
     const manifestSrc = readFileSync(join(ROOT, 'src/render/characters/manifest.ts'), 'utf8');
+    // The KayKit hunter (KAYKIT_HUNTER, the `_modular` baseline since the WOC
+    // body took the class) is the rig that binds the donor.
     const hunterBlock = manifestSrc.slice(
-      manifestSrc.indexOf('player_hunter: swims({'),
-      manifestSrc.indexOf('player_rogue: swims({'),
+      manifestSrc.indexOf('export const KAYKIT_HUNTER'),
+      manifestSrc.indexOf('export const KAYKIT_ROGUE'),
     );
     expect(hunterBlock).toContain('bow_hold_anim.glb');
   });
@@ -636,13 +639,14 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
     // the SKINS table, and player defs are wrapped (`player_hunter: swims({`)
     // to layer the shared swim strokes on — so neither a bare key search nor a
     // brace anchor lands on the def. Both would slice the wrong text and pass.
-    const visualsAt = manifestSrc.indexOf('export const VISUALS');
-    expect(visualsAt).toBeGreaterThan(-1);
+    // The KayKit hunter rig moved out of VISUALS into the KAYKIT_HUNTER export
+    // (the `_modular` baseline) when the WOC body took the class; the export
+    // name is unique, so it anchors without the skin-row ambiguity.
     const hunterBlock = manifestSrc.slice(
-      manifestSrc.indexOf('player_hunter:', visualsAt),
-      manifestSrc.indexOf('player_rogue:', visualsAt),
+      manifestSrc.indexOf('export const KAYKIT_HUNTER'),
+      manifestSrc.indexOf('export const KAYKIT_ROGUE'),
     );
-    expect(hunterBlock, 'anchored on the hunter VISUAL, not its skin row').toContain('ranger.glb');
+    expect(hunterBlock, 'anchored on the KayKit hunter rig').toContain('ranger.glb');
     expect(hunterBlock).toContain('bow_anims.glb');
     // Parse the shipped GLB's JSON chunk and assert the clips are inside
     // (scripts/build_bow_anims.mjs output; regenerate from the CC0 pack).
@@ -690,10 +694,7 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
     // Wiring pin: the fallback is worthless if the coordinator still asks for
     // the substitute unconditionally.
     const src = readFileSync(join(ROOT, 'src/render/characters/visual.ts'), 'utf8');
-    const playAttack = src.slice(
-      src.indexOf('playAttack(abilityId?: string)'),
-      src.indexOf('playWhirl()'),
-    );
+    const playAttack = src.slice(src.indexOf('  playAttack('), src.indexOf('  playWhirl('));
     expect(playAttack).toContain('pickSkinAttackClips(');
     expect(playAttack).toContain('this.action(');
     expect(playAttack).not.toContain('weaponSkinAttackClips(');
@@ -803,11 +804,13 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
       loadGltf: vi.fn(() =>
         Promise.resolve({
           scene: new THREE.Group(),
+          // The live hunter is the WOC rig (2026-09-18): its shot clip, the
+          // blade clips its melee overrides name, and the bow donor's draw.
           animations: [
-            '2H_Ranged_Shoot',
-            'Hunter_Shot_LongDraw',
-            'Hunter_Melee_Gut',
-            'Spellcast_Raise',
+            'Ranged_Shoot',
+            '1H_Chop',
+            '1H_Slash',
+            'Cast_Raise',
             'Bow_Draw_Shot',
             'Idle',
             'Walk',
@@ -819,8 +822,11 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
       loadKtx2Texture: vi.fn(() => Promise.resolve(new THREE.Texture())),
       releaseGltf: vi.fn(),
     }));
-    const { charactersReady } = await import('../src/render/characters/assets');
-    await charactersReady();
+    const assets = await import('../src/render/characters/assets');
+    await assets.charactersReady();
+    await landWocBodies(assets, ['player_hunter']);
+    // the stub ships no head library: the world view's wait for the hunter's head has ended
+    failWocHeads(await import('../src/render/characters/woc_head_packs'));
     const { createCharacterVisual } = await import('../src/render/characters/index');
     const { CharacterVisual } = await import('../src/render/characters/visual');
     type ActionPeek = { current: { getClip(): { name: string } } | null };
@@ -840,9 +846,10 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
     if (!visual) return;
     expect(visual).toBeInstanceOf(CharacterVisual);
 
-    // No skin displayed: the authored ability override plays.
+    // No skin displayed: the authored ability override plays (the release
+    // half the WOC hunter mints from its shot clip, ClipMap.clipSplits).
     visual.playAttack('aimed_shot');
-    expect((visual as unknown as ActionPeek).current?.getClip().name).toBe('Hunter_Shot_LongDraw');
+    expect((visual as unknown as ActionPeek).current?.getClip().name).toBe('Ranged_Shoot#release');
 
     // A bow skin displayed: the same ability call must fall back to the
     // draw clip instead, not the crossbow-shoulder ability pose.
@@ -855,16 +862,20 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
     // precedence, since a displayed bow never changes how a melee hit is
     // thrown (second review round on PR #2958).
     visual.playAttack('raptor_strike');
-    expect((visual as unknown as ActionPeek).current?.getClip().name).toBe('Hunter_Melee_Gut');
+    expect((visual as unknown as ActionPeek).current?.getClip().name).toBe('1H_Chop');
 
-    // A self-buff aspect toggle (range-agnostic, no swing) also keeps its
-    // authored Spellcast_Raise raise/buff ceremony with the same bow skin
-    // displayed: casting Harrier's Guise or Fevered Draw must never play the
-    // draw-shot attack (Rubsey's OSSBrain review on PR #2958).
-    visual.playAttack('aspect_of_the_hawk');
-    expect((visual as unknown as ActionPeek).current?.getClip().name).toBe('Spellcast_Raise');
-    visual.playAttack('rapid_fire');
-    expect((visual as unknown as ActionPeek).current?.getClip().name).toBe('Spellcast_Raise');
+    // A self-buff aspect toggle (range-agnostic, no swing) must never play the
+    // draw-shot attack with the same bow skin displayed (Rubsey's OSSBrain
+    // review on PR #2958). On the WOC hunter every instant is silent by rule:
+    // no override exists, so the ability painter, which gates ceremonial
+    // gestures on hasAttackClipOverride, never asks for a gesture at all, and
+    // the renderer's gesture-only arm returns before any clip plays.
+    expect(visual.hasAttackClipOverride('aspect_of_the_hawk')).toBe(false);
+    expect(visual.hasAttackClipOverride('rapid_fire')).toBe(false);
+    const before = (visual as unknown as ActionPeek).current?.getClip().name;
+    visual.playAttack('aspect_of_the_hawk', true);
+    visual.playAttack('rapid_fire', true);
+    expect((visual as unknown as ActionPeek).current?.getClip().name).toBe(before);
     // A full charactersReady() reload pulls in this branch's much larger
     // manifest (release/v0.35.0's own content growth), so this single test's
     // real preload pass runs well past the 20s default under host load.
