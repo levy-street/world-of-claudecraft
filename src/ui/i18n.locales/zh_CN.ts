@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.options.spellTooltipOnHover': '悬停时显示法术提示',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}分钟',
   'abilityUi.cast.hoard_cast_rime_beam': '白霜射束',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount} {currency}',

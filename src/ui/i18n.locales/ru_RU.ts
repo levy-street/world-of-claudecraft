@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.options.spellTooltipOnHover': 'Подсказки заклинаний при наведении',
   'abilityUi.actionBar.cooldownMinutes': '{minutes} мин',
   'abilityUi.cast.hoard_cast_rime_beam': 'Луч инея',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount} {currency}',

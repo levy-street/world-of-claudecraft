@@ -2119,6 +2119,7 @@ export const cs_CZ: EnTranslations = {
       }
     },
     "options": {
+      "spellTooltipOnHover": "Spell Tooltips on Hover",
       "clickMoveLeft": "Levé kliknutí",
       "clickMoveRight": "Pravé kliknutí",
       "version": "v{version} ({build})",

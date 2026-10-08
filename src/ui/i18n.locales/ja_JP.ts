@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.options.spellTooltipOnHover': 'マウスオーバーで呪文ツールチップを表示',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}分',
   'abilityUi.cast.hoard_cast_rime_beam': '霜光線',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount}{currency}',
