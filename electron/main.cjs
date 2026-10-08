@@ -1954,7 +1954,10 @@ app.whenReady().then(() => {
   // try/catch guards the (practically impossible) double-registration race.
   const registerDisabledUpdateInstall = () => {
     try {
-      ipcMain.handle('desktop-update-check', () => 'unavailable');
+      ipcMain.handle('desktop-update-check', (event) => {
+        if (!trustedSender(event)) return null;
+        return 'unavailable';
+      });
       ipcMain.handle('desktop-update-install', (event) => {
         if (!trustedSender(event)) return null;
         log.warn('[updater] install requested but auto-update is unavailable on this build');
