@@ -11108,6 +11108,10 @@ export const nl_NL: EnTranslations = {
     "selectClass": "Selecteer een klasse.",
     "pickClass": "Kies een klasse.",
     "returnToLogin": "Terug naar inloggen",
+    "searchUpdates": "Search for updates",
+    "noUpdateFound": "No update found. Try again shortly.",
+    "updateUnavailable": "Update through your game store or download the latest client.",
+    "updateSearchFailed": "Could not check for updates. Please try again.",
     "api": {
       "tooManyAttempts": "Te veel pogingen. Wacht een minuut en probeer het opnieuw.",
       "usernameShape": "Gebruikersnaam moet 3-24 tekens lang zijn en letters, cijfers of een liggend streepje bevatten.",

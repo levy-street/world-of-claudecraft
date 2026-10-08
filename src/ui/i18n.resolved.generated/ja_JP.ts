@@ -11108,6 +11108,10 @@ export const ja_JP: EnTranslations = {
     "selectClass": "クラスを選択してください。",
     "pickClass": "クラスを選んでください。",
     "returnToLogin": "ログインへ戻る",
+    "searchUpdates": "更新を検索",
+    "noUpdateFound": "更新が見つかりませんでした。しばらくしてから再試行してください。",
+    "updateUnavailable": "ゲームストアで更新するか、最新のクライアントをダウンロードしてください。",
+    "updateSearchFailed": "更新を確認できませんでした。もう一度お試しください。",
     "api": {
       "tooManyAttempts": "試行回数が多すぎます。1分待ってから再試行してください。",
       "usernameShape": "ユーザー名は3-24文字で、英字、数字、アンダースコアを使用してください。",

@@ -11108,6 +11108,10 @@ export const sv_SE: EnTranslations = {
     "selectClass": "Var god välj en klass.",
     "pickClass": "Välj en klass.",
     "returnToLogin": "Återgå till inloggning",
+    "searchUpdates": "Search for updates",
+    "noUpdateFound": "No update found. Try again shortly.",
+    "updateUnavailable": "Update through your game store or download the latest client.",
+    "updateSearchFailed": "Could not check for updates. Please try again.",
     "api": {
       "tooManyAttempts": "För många försök. Vänta en minut och försök igen.",
       "usernameShape": "Användarnamnet måste vara 3-24 tecken och använda bokstäver, siffror eller understreck.",

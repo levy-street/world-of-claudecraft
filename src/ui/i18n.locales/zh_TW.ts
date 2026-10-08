@@ -18662,4 +18662,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_balance.bonus2': '纏縛根鬚的施法時間縮短0.5秒。',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '施放纏縛根鬚後，你可以在移動中施法，並使移動速度提高20%，持續4秒。每20秒最多觸發一次。',
+  'errors.searchUpdates': '搜尋更新',
+  'errors.noUpdateFound': '未找到更新。請稍後再試。',
+  'errors.updateUnavailable': '請透過遊戲商店更新，或下載最新用戶端。',
+  'errors.updateSearchFailed': '無法檢查更新。請重試。',
 };

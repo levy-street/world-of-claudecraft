@@ -9,25 +9,100 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "errors.noUpdateFound",
+    "errors.searchUpdates",
+    "errors.updateSearchFailed",
+    "errors.updateUnavailable"
+  ],
+  "es_ES": [
+    "errors.noUpdateFound",
+    "errors.searchUpdates",
+    "errors.updateSearchFailed",
+    "errors.updateUnavailable"
+  ],
+  "fr_FR": [
+    "errors.noUpdateFound",
+    "errors.searchUpdates",
+    "errors.updateSearchFailed",
+    "errors.updateUnavailable"
+  ],
+  "fr_CA": [
+    "errors.noUpdateFound",
+    "errors.searchUpdates",
+    "errors.updateSearchFailed",
+    "errors.updateUnavailable"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "errors.noUpdateFound",
+    "errors.searchUpdates",
+    "errors.updateSearchFailed",
+    "errors.updateUnavailable"
+  ],
+  "de_DE": [
+    "errors.noUpdateFound",
+    "errors.searchUpdates",
+    "errors.updateSearchFailed",
+    "errors.updateUnavailable"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "errors.noUpdateFound",
+    "errors.searchUpdates",
+    "errors.updateSearchFailed",
+    "errors.updateUnavailable"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "errors.noUpdateFound",
+    "errors.searchUpdates",
+    "errors.updateSearchFailed",
+    "errors.updateUnavailable"
+  ],
+  "nl_NL": [
+    "errors.noUpdateFound",
+    "errors.searchUpdates",
+    "errors.updateSearchFailed",
+    "errors.updateUnavailable"
+  ],
+  "pl_PL": [
+    "errors.noUpdateFound",
+    "errors.searchUpdates",
+    "errors.updateSearchFailed",
+    "errors.updateUnavailable"
+  ],
+  "id_ID": [
+    "errors.noUpdateFound",
+    "errors.searchUpdates",
+    "errors.updateSearchFailed",
+    "errors.updateUnavailable"
+  ],
+  "tr_TR": [
+    "errors.noUpdateFound",
+    "errors.searchUpdates",
+    "errors.updateSearchFailed",
+    "errors.updateUnavailable"
+  ],
+  "sv_SE": [
+    "errors.noUpdateFound",
+    "errors.searchUpdates",
+    "errors.updateSearchFailed",
+    "errors.updateUnavailable"
+  ],
+  "vi_VN": [
+    "errors.noUpdateFound",
+    "errors.searchUpdates",
+    "errors.updateSearchFailed",
+    "errors.updateUnavailable"
+  ],
+  "da_DK": [
+    "errors.noUpdateFound",
+    "errors.searchUpdates",
+    "errors.updateSearchFailed",
+    "errors.updateUnavailable"
+  ]
 };

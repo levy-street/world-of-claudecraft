@@ -11108,6 +11108,10 @@ export const id_ID: EnTranslations = {
     "selectClass": "Silakan pilih sebuah kelas.",
     "pickClass": "Pilih sebuah kelas.",
     "returnToLogin": "Kembali ke Halaman Masuk",
+    "searchUpdates": "Search for updates",
+    "noUpdateFound": "No update found. Try again shortly.",
+    "updateUnavailable": "Update through your game store or download the latest client.",
+    "updateSearchFailed": "Could not check for updates. Please try again.",
     "api": {
       "tooManyAttempts": "Terlalu banyak percobaan. Tunggu semenit lalu coba lagi.",
       "usernameShape": "Nama pengguna harus 3-24 karakter dan menggunakan huruf, angka, atau garis bawah.",

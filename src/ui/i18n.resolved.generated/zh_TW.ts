@@ -11108,6 +11108,10 @@ export const zh_TW: EnTranslations = {
     "selectClass": "請選擇一個職業。",
     "pickClass": "選擇一個職業。",
     "returnToLogin": "返回登入",
+    "searchUpdates": "搜尋更新",
+    "noUpdateFound": "未找到更新。請稍後再試。",
+    "updateUnavailable": "請透過遊戲商店更新，或下載最新用戶端。",
+    "updateSearchFailed": "無法檢查更新。請重試。",
     "api": {
       "tooManyAttempts": "嘗試次數過多。請等待一分鐘後再試。",
       "usernameShape": "使用者名稱必須為 3-24 個字元，並使用字母、數字或底線。",

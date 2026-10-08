@@ -18644,4 +18644,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_balance.bonus2': '缠缚根须的施法时间缩短0.5秒。',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '施放缠缚根须后，你可以在移动中施法，并使移动速度提高20%，持续4秒。每20秒最多触发一次。',
+  'errors.searchUpdates': '搜索更新',
+  'errors.noUpdateFound': '未找到更新。请稍后再试。',
+  'errors.updateUnavailable': '请通过游戏商店更新，或下载最新客户端。',
+  'errors.updateSearchFailed': '无法检查更新。请重试。',
 };

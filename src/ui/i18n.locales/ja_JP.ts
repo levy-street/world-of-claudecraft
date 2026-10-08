@@ -19617,4 +19617,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_balance.bonus2': '絡み根の詠唱時間が0.5秒短縮される。',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '絡み根を詠唱すると、移動しながら詠唱でき、移動速度が4秒間20%上昇する。20秒に1回しか発生しない。',
+  'errors.searchUpdates': '更新を検索',
+  'errors.noUpdateFound': '更新が見つかりませんでした。しばらくしてから再試行してください。',
+  'errors.updateUnavailable':
+    'ゲームストアで更新するか、最新のクライアントをダウンロードしてください。',
+  'errors.updateSearchFailed': '更新を確認できませんでした。もう一度お試しください。',
 };
