@@ -2025,6 +2025,7 @@ export const hudChromeStrings = {
     killedBy: 'Killed by {killer} ({ability})',
     lethalHit: 'Lethal Hit',
     recentCombatEvents: 'Last {count} combat events',
+    moreDeathEvents: '+{count} earlier events',
     backComparison: 'Comparison',
     comparisonNeedTwo: 'At least 2 fights are required to compare',
     backTimeline: 'Timeline',

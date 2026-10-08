@@ -17,6 +17,7 @@ const MARKUP = `
         <button type="button" class="mt-tab on" data-tab="dmg"></button>
         <button type="button" class="mt-tab" data-tab="heal"></button>
         <button type="button" class="mt-tab" data-tab="threat"></button>
+        <button type="button" class="mt-tab" data-tab="deaths"></button>
       </span>
       <button type="button" class="mt-prev"></button>
       <button type="button" class="mt-next"></button>
@@ -367,5 +368,159 @@ describe('meters panel', () => {
     meters.update();
     meters.render(true);
     expect(visibleRows()[0].tabIndex).toBe(0);
+  });
+
+  it('shows death recap and killer sequence in the deaths tab hover tooltip rather than dealt damage', () => {
+    const { meters, world, visibleRows, tooltipFor } = setup();
+
+    const hero = world.entities.get(1);
+    if (!hero) throw new Error('Hero entity missing');
+    hero.hp = 1000;
+    hero.maxHp = 1000;
+
+    // Hero deals some damage
+    meters.onEvent(dmg(1, 51, 5000, 'Pyrelance'));
+    meters.onEvent(dmg(1, 51, 3000, 'Scald'));
+
+    // Hero takes incoming damage from Gorrak (-400 HP)
+    hero.hp = 600;
+    meters.onEvent({
+      type: 'damage',
+      kind: 'hit',
+      sourceId: 51,
+      sourceName: 'Gorrak',
+      targetId: 1,
+      targetName: 'Hero',
+      amount: 400,
+      ability: 'Cleave',
+      abilityId: 'cleave',
+      crit: false,
+      school: 'physical',
+    } as SimEvent);
+    // Hero takes a lethal hit from Gorrak (-600 HP)
+    hero.hp = 0;
+    meters.onEvent({
+      type: 'damage',
+      kind: 'hit',
+      sourceId: 51,
+      sourceName: 'Gorrak',
+      targetId: 1,
+      targetName: 'Hero',
+      amount: 600,
+      ability: 'Execute',
+      abilityId: 'execute',
+      crit: true,
+      lethal: true,
+      school: 'physical',
+    } as SimEvent);
+    // Trigger playerDeath sim event
+    meters.onEvent({
+      type: 'playerDeath',
+      pid: 1,
+      killerId: 51,
+      killerAbility: 'Execute',
+    } as SimEvent);
+
+    meters.update();
+    (document.querySelector('.mt-tab[data-tab="deaths"]') as HTMLElement).click();
+
+    const rows = visibleRows();
+    expect(rows).toHaveLength(1);
+    expect(rows[0].querySelector('.mt-label')?.textContent).toBe('Hero');
+
+    const tip = tooltipFor(rows[0]);
+
+    // Must NOT contain the player's own dealt damage or abilities
+    expect(tip).not.toContain('Pyrelance');
+    expect(tip).not.toContain('Scald');
+    expect(tip).not.toContain('Hits:');
+
+    // MUST contain the killer and the lethal sequence
+    expect(tip).toContain('Gorrak (Execute)');
+    expect(tip).toContain('Gorrak: Cleave');
+    expect(tip).toContain('Gorrak: Execute');
+    expect(tip).toContain('-400');
+    expect(tip).toContain('-600');
+    expect(tip).toContain('600 -&gt; 0 HP');
+  });
+
+  it('collects all deaths across party and raid members in chronological order with getRaidDeaths', () => {
+    const { meters } = setup();
+
+    // 1. Pal (pid 2) takes lethal damage and dies
+    meters.onEvent({
+      type: 'damage',
+      kind: 'hit',
+      sourceId: 51,
+      sourceName: 'Gorrak',
+      targetId: 2,
+      targetName: 'Pal',
+      amount: 800,
+      ability: 'Cleave',
+      abilityId: 'cleave',
+      crit: false,
+      lethal: true,
+      school: 'physical',
+    } as SimEvent);
+    meters.onEvent({
+      type: 'playerDeath',
+      pid: 2,
+      killerId: 51,
+      killerAbility: 'Cleave',
+    } as SimEvent);
+
+    // 2. Hero (pid 1) takes lethal damage and dies
+    meters.onEvent({
+      type: 'damage',
+      kind: 'hit',
+      sourceId: 51,
+      sourceName: 'Gorrak',
+      targetId: 1,
+      targetName: 'Hero',
+      amount: 1000,
+      ability: 'Execute',
+      abilityId: 'execute',
+      crit: true,
+      lethal: true,
+      school: 'physical',
+    } as SimEvent);
+    meters.onEvent({
+      type: 'playerDeath',
+      pid: 1,
+      killerId: 51,
+      killerAbility: 'Execute',
+    } as SimEvent);
+
+    const raidDeaths = meters.getRaidDeaths();
+    expect(raidDeaths).toHaveLength(2);
+
+    // First death: Pal
+    expect(raidDeaths[0].pid).toBe(2);
+    expect(raidDeaths[0].playerName).toBe('Pal');
+    expect(raidDeaths[0].killerName).toBe('Gorrak');
+    expect(raidDeaths[0].killerAbility).toBe('Cleave');
+    expect(raidDeaths[0].order).toBe(1);
+
+    // Second death: Hero
+    expect(raidDeaths[1].pid).toBe(1);
+    expect(raidDeaths[1].playerName).toBe('Hero');
+    expect(raidDeaths[1].killerName).toBe('Gorrak');
+    expect(raidDeaths[1].killerAbility).toBe('Execute');
+    expect(raidDeaths[1].order).toBe(2);
+    expect(raidDeaths[1].timeRel).toBe('0.0s');
+
+    // A new fight must not pull Hero's previous death into Pal's new recap.
+    meters.data.endEncounter();
+    meters.onEvent({
+      type: 'playerDeath',
+      pid: 2,
+      killerId: 51,
+      killerAbility: 'Cleave',
+    } as SimEvent);
+    expect(meters.getRaidDeaths().map((entry) => entry.pid)).toEqual([2]);
+    meters.data.endEncounter();
+    expect(meters.getRaidDeaths().map((entry) => entry.pid)).toEqual([2]);
+    meters.data.resetAll(performance.now());
+    expect(meters.getRaidDeaths()).toEqual([]);
   });
 });

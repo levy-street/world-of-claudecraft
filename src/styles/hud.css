@@ -8160,6 +8160,13 @@
     padding: 1px 4px;
     line-height: 1.5;
   }
+  #tooltip .mt-tip-time {
+    position: relative;
+    font-size: 10px;
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
   #tooltip .mt-tip-icon {
     position: relative;
     width: 16px;
@@ -10928,6 +10935,103 @@
     position: static;
     margin: 0;
   }
+  .death-recap-roster-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: var(--death-recap-ink);
+    border-bottom: 1px solid var(--death-recap-rule);
+    overflow-x: auto;
+    flex-shrink: 0;
+  }
+  .death-recap-roster-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    background: var(--death-recap-surface);
+    border: 1px solid var(--death-recap-border);
+    border-radius: 4px;
+    color: var(--death-recap-text);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition:
+      background 0.15s,
+      border-color 0.15s,
+      color 0.15s;
+  }
+  .death-recap-roster-tab:hover {
+    background: var(--death-recap-surface-hover);
+    border-color: var(--death-recap-border-hover);
+    color: var(--death-recap-text-bright);
+  }
+  .death-recap-roster-tab:focus-visible,
+  .death-recap-player-chip:focus-visible,
+  .overview-inspect-btn:focus-visible {
+    outline: 2px solid var(--death-recap-gold-bright);
+    outline-offset: 2px;
+  }
+  .death-recap-roster-tab.active {
+    background: var(--death-recap-surface-selected);
+    border-color: var(--death-recap-gold);
+    color: var(--death-recap-gold-bright);
+    box-shadow: 0 0 6px color-mix(in srgb, var(--death-recap-gold) 20%, transparent);
+  }
+  .death-recap-roster-sep {
+    width: 1px;
+    height: 16px;
+    background: var(--death-recap-rule);
+    flex-shrink: 0;
+    margin: 0 2px;
+  }
+  .death-recap-roster-players {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    overflow-x: auto;
+  }
+  .death-recap-player-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    background: var(--death-recap-ink);
+    border: 1px solid var(--death-recap-rule);
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition:
+      background 0.15s,
+      border-color 0.15s;
+    border-left: 3px solid var(--class-color, var(--death-recap-text-muted));
+  }
+  .death-recap-player-chip:hover {
+    background: var(--death-recap-surface-hover);
+    border-color: var(--death-recap-border-hover);
+  }
+  .death-recap-player-chip.active {
+    background: var(--death-recap-surface-selected);
+    border-color: var(--death-recap-gold);
+    box-shadow: 0 0 6px color-mix(in srgb, var(--death-recap-gold) 13%, transparent);
+  }
+  .death-recap-player-chip .chip-order {
+    color: var(--death-recap-text-muted);
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .death-recap-player-chip .chip-name {
+    font-weight: 600;
+  }
+  .death-recap-player-chip .chip-time {
+    color: var(--death-recap-text-muted);
+    font-size: 10px;
+    margin-left: 2px;
+  }
   .death-recap-subbar {
     padding: 8px 14px;
     background: #151820;
@@ -10978,6 +11082,110 @@
     color: #7d8594;
     font-style: italic;
     font-size: 13px;
+  }
+  .death-recap-overview-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .overview-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: var(--death-recap-ink);
+    border: 1px solid var(--death-recap-rule);
+    border-radius: 4px;
+    transition:
+      background 0.15s,
+      border-color 0.15s;
+  }
+  .overview-row:hover {
+    background: var(--death-recap-surface-hover);
+    border-color: var(--death-recap-border-hover);
+  }
+  .overview-row.overview-first-death {
+    border-left: 3px solid var(--death-recap-danger);
+  }
+  .overview-row-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex: 1;
+  }
+  .overview-order-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--death-recap-surface-hover);
+    border: 1px solid var(--death-recap-border);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--death-recap-text);
+    flex-shrink: 0;
+  }
+  .overview-row.overview-first-death .overview-order-badge {
+    background: var(--death-recap-danger-ground);
+    border-color: var(--death-recap-danger-border);
+    color: var(--death-recap-danger);
+  }
+  .overview-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .overview-player-line {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+  .overview-player-name {
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .overview-first-tag {
+    font-size: 10px;
+    color: var(--death-recap-danger);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .overview-killer-line {
+    font-size: 11.5px;
+    color: var(--death-recap-text-muted);
+  }
+  .overview-killer-line strong {
+    color: var(--death-recap-text-bright);
+  }
+  .overview-row-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .overview-time {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--death-recap-text);
+  }
+  .overview-inspect-btn {
+    padding: 3px 10px;
+    font-size: 11px;
+    background: var(--death-recap-surface-hover);
+    border: 1px solid var(--death-recap-border);
+    border-radius: 3px;
+    color: var(--death-recap-text-bright);
+    cursor: pointer;
+  }
+  .overview-inspect-btn:hover {
+    background: var(--death-recap-surface-selected);
+    border-color: var(--death-recap-gold);
+    color: var(--death-recap-gold-bright);
   }
   .death-recap-list {
     display: flex;
@@ -11182,6 +11390,10 @@
   .death-recap-footer-close {
     min-width: 80px;
     padding: 4px 12px;
+  }
+  .death-recap-footer-back {
+    padding: 4px 12px;
+    font-size: 12px;
   }
   /* Ghost resurrect prompt: a small, NON-BLOCKING panel shown only when a spirit is in
      reach of its corpse (the Pale Keeper's raise is a conversation, not a button here).

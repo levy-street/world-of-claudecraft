@@ -7,7 +7,11 @@ import {
   formatRecapHp,
   formatRecapTime,
 } from '../src/ui/death_recap_view';
-import type { DeathRecapEvent, DeathRecapRecord } from '../src/ui/meters_death_recap';
+import type {
+  DeathRecapEvent,
+  DeathRecapRecord,
+  RaidDeathEntry,
+} from '../src/ui/meters_death_recap';
 
 describe('death_recap_view (pure presentation core)', () => {
   it('formats relative timestamps accurately', () => {
@@ -218,6 +222,66 @@ describe('death_recap_view (pure presentation core)', () => {
 });
 
 describe('DeathRecapDialog (DOM dialog controller)', () => {
+  it('opens the selected death when the same player died twice', () => {
+    const rootEl = document.createElement('div');
+    document.body.appendChild(rootEl);
+    const first: DeathRecapRecord = {
+      pid: 1,
+      playerName: 'Hero',
+      deathTime: 1000,
+      killerName: 'Warden',
+      killerAbility: 'First Blow',
+      events: [],
+    };
+    const second: DeathRecapRecord = {
+      ...first,
+      deathTime: 2000,
+      killerAbility: 'Second Blow',
+    };
+    const dialog = new DeathRecapDialog({
+      root: () => rootEl,
+      getLatestRecap: () => second,
+      getRaidDeaths: () => [
+        {
+          pid: 1,
+          playerName: 'Hero',
+          cls: 'warrior',
+          deathTime: 1000,
+          timeRel: '-1.0s',
+          order: 1,
+          killerName: 'Warden',
+          killerAbility: 'First Blow',
+          recap: first,
+        },
+        {
+          pid: 1,
+          playerName: 'Hero',
+          cls: 'warrior',
+          deathTime: 2000,
+          timeRel: '0.0s',
+          order: 2,
+          killerName: 'Warden',
+          killerAbility: 'Second Blow',
+          recap: second,
+        },
+      ],
+      attachTooltip: vi.fn(),
+      hideTooltip: vi.fn(),
+    });
+
+    dialog.open();
+    expect(rootEl.textContent).toContain('Second Blow');
+    (rootEl.querySelector('[data-select-order="1"]') as HTMLElement).click();
+    expect(rootEl.querySelector('.death-recap-subbar')?.textContent).toContain('First Blow');
+    expect(rootEl.querySelectorAll('.death-recap-player-chip.active')).toHaveLength(1);
+    expect(document.activeElement?.getAttribute('data-select-order')).toBe('1');
+    (rootEl.querySelector('[data-view-mode="overview"]') as HTMLElement).click();
+    (rootEl.querySelector('[data-inspect-order="2"]') as HTMLElement).click();
+    expect(rootEl.querySelector('.death-recap-subbar')?.textContent).toContain('Second Blow');
+    dialog.close();
+    rootEl.remove();
+  });
+
   it('opens, populates HTML with WoW-style components, and attaches tooltips', () => {
     const rootEl = document.createElement('div');
     rootEl.id = 'death-recap-dialog';
@@ -362,6 +426,187 @@ describe('DeathRecapDialog (DOM dialog controller)', () => {
     dialog.open();
     expect(dialog.isOpen()).toBe(true);
     expect(rootEl.querySelector('.death-recap-empty')).not.toBeNull();
+
+    dialog.close();
+    rootEl.remove();
+  });
+
+  it('renders raid deaths roster and switches between dead players on wipe', () => {
+    const rootEl = document.createElement('div');
+    rootEl.id = 'death-recap-dialog';
+    document.body.appendChild(rootEl);
+
+    const player1Recap: DeathRecapRecord = {
+      pid: 101,
+      playerName: 'TankHero',
+      deathTime: 10000,
+      killerName: 'Ignivar',
+      killerAbility: 'Cleave',
+      events: [
+        {
+          timestamp: 9000,
+          type: 'damage',
+          ability: 'Cleave',
+          sourceName: 'Ignivar',
+          sourceId: 50,
+          amount: 1500,
+          hpBefore: 1500,
+          hpAfter: 0,
+          maxHp: 2000,
+          lethal: true,
+        },
+      ],
+    };
+
+    const player2Recap: DeathRecapRecord = {
+      pid: 102,
+      playerName: 'PriestHealer',
+      deathTime: 15000,
+      killerName: 'Ignivar',
+      killerAbility: 'Searing Torrent',
+      events: [
+        {
+          timestamp: 14000,
+          type: 'damage',
+          ability: 'Searing Torrent',
+          sourceName: 'Ignivar',
+          sourceId: 50,
+          amount: 800,
+          hpBefore: 800,
+          hpAfter: 0,
+          maxHp: 900,
+          lethal: true,
+        },
+      ],
+    };
+
+    const player3Recap: DeathRecapRecord = {
+      pid: 100,
+      playerName: 'WarriorHero',
+      deathTime: 20000,
+      killerName: 'Ignivar',
+      killerAbility: 'Attack',
+      events: [
+        {
+          timestamp: 19500,
+          type: 'damage',
+          ability: 'Melee',
+          sourceName: 'Ignivar',
+          sourceId: 50,
+          amount: 1200,
+          hpBefore: 1200,
+          hpAfter: 0,
+          maxHp: 1200,
+          lethal: true,
+        },
+      ],
+    };
+
+    const raidDeaths: RaidDeathEntry[] = [
+      {
+        pid: 101,
+        playerName: 'TankHero',
+        cls: 'warrior',
+        deathTime: 10000,
+        timeRel: '-10.0s',
+        killerName: 'Ignivar',
+        killerAbility: 'Cleave',
+        order: 1,
+        recap: player1Recap,
+      },
+      {
+        pid: 102,
+        playerName: 'PriestHealer',
+        cls: 'priest',
+        deathTime: 15000,
+        timeRel: '-5.0s',
+        killerName: 'Ignivar',
+        killerAbility: 'Searing Torrent',
+        order: 2,
+        recap: player2Recap,
+      },
+      {
+        pid: 100,
+        playerName: 'WarriorHero',
+        cls: 'warrior',
+        deathTime: 20000,
+        timeRel: ' 0.0s',
+        killerName: 'Ignivar',
+        killerAbility: 'Attack',
+        order: 3,
+        recap: player3Recap,
+      },
+    ];
+
+    const dialog = new DeathRecapDialog({
+      root: () => rootEl,
+      getLatestRecap: () => player3Recap,
+      getRaidDeaths: () => raidDeaths,
+      attachTooltip: vi.fn(),
+      hideTooltip: vi.fn(),
+    });
+
+    dialog.open();
+    expect(dialog.isOpen()).toBe(true);
+
+    // Roster bar rendered with 3 chips + overview tab
+    const rosterBar = rootEl.querySelector('.death-recap-roster-bar');
+    expect(rosterBar).not.toBeNull();
+
+    const chips = rootEl.querySelectorAll('.death-recap-player-chip');
+    expect(chips).toHaveLength(3);
+    expect(chips[0].textContent).toContain('#1');
+    expect(chips[0].textContent).toContain('TankHero');
+    expect(chips[0].textContent).toContain('-10.0s');
+    expect(chips[1].textContent).toContain('#2');
+    expect(chips[1].textContent).toContain('PriestHealer');
+    expect(chips[2].textContent).toContain('#3');
+    expect(chips[2].textContent).toContain('WarriorHero');
+
+    // Default selected player should be player3 (WarriorHero, matched from getLatestRecap)
+    expect(chips[2].classList.contains('active')).toBe(true);
+    expect(rootEl.innerHTML).toContain('WarriorHero');
+    expect(rootEl.innerHTML).toContain('Melee');
+
+    // Click on TankHero chip (pid 101)
+    const tankChip = chips[0] as HTMLElement;
+    tankChip.click();
+
+    expect(rootEl.innerHTML).toContain('TankHero');
+    expect(rootEl.innerHTML).toContain('Cleave');
+    const updatedChips = rootEl.querySelectorAll('.death-recap-player-chip');
+    expect(updatedChips[0].classList.contains('active')).toBe(true);
+
+    // Switch to Overview mode
+    const overviewTab = rootEl.querySelector('[data-view-mode="overview"]') as HTMLElement;
+    expect(overviewTab).not.toBeNull();
+    overviewTab.click();
+
+    // Check overview list
+    const overviewRows = rootEl.querySelectorAll('.overview-row');
+    expect(overviewRows).toHaveLength(3);
+    expect(overviewRows[0].classList.contains('overview-first-death')).toBe(true);
+    expect(overviewRows[0].textContent).toContain('TankHero');
+    expect(overviewRows[0].textContent).toContain('Cleave');
+    expect(overviewRows[1].textContent).toContain('PriestHealer');
+    expect(overviewRows[2].textContent).toContain('WarriorHero');
+
+    // Click inspect on PriestHealer
+    const inspectBtn = overviewRows[1].querySelector('.overview-inspect-btn') as HTMLElement;
+    expect(inspectBtn).not.toBeNull();
+    inspectBtn.click();
+
+    // Dialog is now showing PriestHealer cards
+    expect(rootEl.innerHTML).toContain('PriestHealer');
+    expect(rootEl.innerHTML).toContain('Searing Torrent');
+
+    // Click footer back button
+    const backBtn = rootEl.querySelector('.death-recap-footer-back') as HTMLElement;
+    expect(backBtn).not.toBeNull();
+    backBtn.click();
+
+    // Back in overview mode
+    expect(rootEl.querySelectorAll('.overview-row')).toHaveLength(3);
 
     dialog.close();
     rootEl.remove();

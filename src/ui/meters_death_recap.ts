@@ -29,6 +29,19 @@ export interface DeathRecapRecord {
   events: DeathRecapEvent[];
 }
 
+export interface RaidDeathEntry {
+  pid: number;
+  playerName: string;
+  cls: string | null;
+  spec?: string | null;
+  deathTime: number; // ms
+  timeRel: string; // e.g. "-12.5s" or " 0.0s"
+  killerName?: string;
+  killerAbility?: string;
+  order: number;
+  recap: DeathRecapRecord;
+}
+
 export interface DeathRecapRowView {
   timeRel: string; // e.g. "-3.1s" or " 0.0s"
   ability: string;
