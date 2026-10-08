@@ -19,6 +19,16 @@ import { hasTranslation } from '../src/ui/i18n';
 import { ItemDragState } from '../src/ui/item_drag_state';
 import { svgIcon } from '../src/ui/ui_icons';
 
+// Importing the portrait chip starts character asset loads. Keep those pending
+// in this DOM suite: real Three loaders can outlive happy-dom teardown and
+// reject when its ProgressEvent global is gone. The painter still exercises
+// the real portrait chip's pending-asset fallback.
+vi.mock('../src/render/assets/loader', () => ({
+  loadGltf: vi.fn(() => new Promise(() => undefined)),
+  loadKtx2Texture: vi.fn(() => new Promise(() => undefined)),
+  loadTexture: vi.fn(() => new Promise(() => undefined)),
+}));
+
 // The character window painter is a DOM module. Most guards below inspect its
 // source, while the profession-art arm opts into jsdom and drives the real
 // painter. Under jsdom import.meta.url is an http URL, so resolve source from

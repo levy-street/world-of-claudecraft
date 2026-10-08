@@ -3597,6 +3597,20 @@ export const DEEDS: Record<string, DeedDef> = {
       ],
     },
   },
+  // The Evergarden wisp maze on Hard (the fifth shadow, a second chaser): a
+  // manual grant at the maze win in src/sim/world_quests.ts, on any Hard
+  // clear including a replay after the day's credit, the Arcane Calligraphy
+  // Gold precedent.
+  // Standard renown (10) for the harder tier; appended at the END per the
+  // append-only contract.
+  exp_wisp_maze_hard: {
+    id: 'exp_wisp_maze_hard',
+    name: 'Brighter Than the Shadows',
+    desc: 'Recover the stolen coin purses and escape the Evergarden maze on Hard.',
+    category: 'exploration',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

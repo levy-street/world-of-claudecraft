@@ -132,6 +132,43 @@ describe('private world-space wisp trial', () => {
     expect(meta.lifetimeXp).toBe(earnedXp);
     expect(meta.counters.questsCompleted).toBe(earned);
   });
+  it('grants the Hard deed only for a Hard win, a replay after the credited clear included', () => {
+    const { sim, meta, progress, state } = setup();
+    expect(state.difficulty).not.toBe('hard');
+    state.phase = 'won';
+    sim.tick();
+    expect(progress.state).toBe('completed');
+    expect(meta.deedsEarned.has('exp_wisp_maze')).toBe(true);
+    expect(meta.deedsEarned.has('exp_wisp_maze_hard')).toBe(false);
+    const copper = meta.copper;
+    const completed = meta.counters.questsCompleted;
+    sim.startWorldQuestActivity(WISP_MAZE_QUEST_ID, 'hard');
+    expect(progress.wispMaze?.difficulty).toBe('hard');
+    progress.wispMaze!.phase = 'won';
+    sim.tick();
+    expect(meta.deedsEarned.has('exp_wisp_maze_hard')).toBe(true);
+    // The replay earns the deed alone: no second credit and no Hard bonus copper.
+    expect(meta.copper).toBe(copper);
+    expect(meta.counters.questsCompleted).toBe(completed);
+    const renown = meta.renown;
+    for (let i = 0; i < 10; i++) sim.tick();
+    expect(meta.renown).toBe(renown);
+  });
+  it('a first clear on Hard earns both maze deeds', () => {
+    const { sim, meta, progress } = setup();
+    // Walk back out of the day's default run and pick Hard at the keeper.
+    leaveWispMaze(sim.ctx, meta, sim.player);
+    delete progress.wispMaze;
+    sim.startWorldQuestActivity(WISP_MAZE_QUEST_ID, 'hard');
+    const run = meta.worldQuestLog.get(WISP_MAZE_QUEST_ID)?.wispMaze;
+    expect(run?.difficulty).toBe('hard');
+    expect(progress.state).toBe('active');
+    run!.phase = 'won';
+    sim.tick();
+    expect(progress.state).toBe('completed');
+    expect(meta.deedsEarned.has('exp_wisp_maze')).toBe(true);
+    expect(meta.deedsEarned.has('exp_wisp_maze_hard')).toBe(true);
+  });
   it('bounds poisoned owner frames and copies collection without aliasing', () => {
     const { state } = setup();
     expect(decodeWispMazeState(state, 'wrong')).toBeUndefined();

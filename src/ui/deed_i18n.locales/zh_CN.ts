@@ -939,4 +939,8 @@ export const table: DeedLocaleTable = {
     name: '人赃俱获',
     desc: '在埋藏的宝藏中击杀钱袋窜贼，在它带着金币逃脱前。',
   },
+  exp_wisp_maze_hard: {
+    name: '比暗影更明亮',
+    desc: '在困难难度下找回被盗的钱袋，逃出常青园的迷宫。',
+  },
 };

@@ -146,8 +146,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // 10 and the tenth at 25: +35).
     // 318 / 3535 with the release's Eastbrook ferry round trip
     // (exp_harbor_to_harbor at renown 5) at the fourth release/v0.44.0 base merge.
-    expect(DEED_ORDER.length).toBe(319);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3545);
+    // 320 / 3555 with the Hard wisp maze clear (exp_wisp_maze_hard at renown 10).
+    expect(DEED_ORDER.length).toBe(320);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3555);
   });
 
   it('ships the audited per-category counts', () => {
@@ -188,7 +189,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +2 the Clue Scroll casket pair (exp_clue_first_casket and
       // exp_clue_ten_caskets, both on the clueCasketsOpened meter).
       // +1 the release's ferry round trip (exp_harbor_to_harbor).
-      exploration: 22,
+      // +1 the Hard wisp maze clear (exp_wisp_maze_hard).
+      exploration: 23,
       feat: 3,
       hidden: 10,
     });
@@ -409,6 +411,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // The release's Eastbrook ferry round trip, appended last at the fourth
       // release/v0.44.0 base merge.
       'exp_harbor_to_harbor',
+      // The Evergarden wisp maze cleared on Hard, appended last.
+      'exp_wisp_maze_hard',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -1040,7 +1044,11 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // shipped trigger or renown value was touched.
   // Re-baselined at the 2026-09-28 release merge into feature/buried-hoards: one NEW
   // deed (cmb_coinsack_caught) joins; no existing trigger or renown changed.
-  const FROZEN_CATALOG_SHA256 = '765c2ea13a8a87d5b43a3f725ab56e1c58464f850dc2ec0e10048adc12f67829';
+  // Re-baselined for the appended Hard wisp maze clear (exp_wisp_maze_hard, a
+  // manual deed), re-minted THE AUDITABLE WAY: the 765c2ea1... literal rotated
+  // down into PRE_APPEND_CATALOG_SHA256 and the proof below reproduces it
+  // exactly. No shipped trigger or renown value was touched.
+  const FROZEN_CATALOG_SHA256 = '5260310916c10eaa0fcc1b9813258b25e24be6c85809ce1edae2aeec58c8e7dc';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1107,22 +1115,27 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // after exp_clue_ten_caskets at the fourth release/v0.44.0 base merge; the
   // previous mint is the clue pair's 0d91bc68... literal (rotated down here),
   // and stripping the one id must reproduce it exactly.
+  //
+  // The Hard wisp maze clear appends exp_wisp_maze_hard after
+  // exp_harbor_to_harbor; the previous mint is the 765c2ea1... literal that
+  // folded in the Coinsack catch and the ferry round trip (rotated down here),
+  // and stripping the one id must reproduce it exactly.
   const PRE_APPEND_CATALOG_SHA256 =
-    '0d91bc68e18b88a6b0c4dc7088c118d556b3bbec0be1617506b36b8172123eb6';
-  const APPENDED_SINCE: readonly string[] = ['cmb_coinsack_caught', 'exp_harbor_to_harbor'];
+    '765c2ea13a8a87d5b43a3f725ab56e1c58464f850dc2ec0e10048adc12f67829';
+  const APPENDED_SINCE: readonly string[] = ['exp_wisp_maze_hard'];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
     for (const id of APPENDED_SINCE) {
       expect(DEED_ORDER.includes(id), `${id} is in the live catalog`).toBe(true);
     }
-    // The ferry round trip sits at the true tail after the Clue Scroll casket
-    // pair. Pin its two predecessors too: this is an append into a
-    // known seat, never a scattered insert or a retro-edit (the digest below
-    // proves it).
+    // The Hard wisp maze clear sits at the true tail after the Coinsack catch
+    // and the ferry round trip. Pin its two predecessors too: this is an
+    // append into a known seat, never a scattered insert or a retro-edit (the
+    // digest below proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'exp_clue_first_casket',
-      'exp_clue_ten_caskets',
+      'cmb_coinsack_caught',
+      'exp_harbor_to_harbor',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1341,9 +1354,9 @@ describe('table shape', () => {
     // raid block (whose flawless task was the previous final entry).
     // The one-time Forgebreaker quest's hidden celebration appends after it,
     // then the world-quest block, then the faction standing ladder, then the
-    // Clue Scroll casket pair, then the release's ferry round trip as the
-    // final entry.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('exp_harbor_to_harbor');
+    // Clue Scroll casket pair, then the release's ferry round trip, then the
+    // Hard wisp maze clear as the final entry.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('exp_wisp_maze_hard');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

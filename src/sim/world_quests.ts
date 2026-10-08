@@ -382,19 +382,24 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
     }
     if (quest.objective.type === 'wisp_maze') {
       ensureWispMazeInstructor(ctx);
-      if (existing && updateWispMaze(ctx, meta, player, existing) && existing.state === 'active') {
+      if (existing && updateWispMaze(ctx, meta, player, existing)) {
         const hard = existing.wispMaze?.difficulty === 'hard';
-        creditWorldQuest(ctx, meta, quest, existing);
-        if (hard)
-          awardWorldQuestBonusCopper(
-            ctx,
-            meta,
-            worldQuestBonusCopper(
-              WISP_MAZE_HARD_BONUS.base,
-              WISP_MAZE_HARD_BONUS.perLevel,
-              player.level,
-            ),
-          );
+        if (existing.state === 'active') {
+          creditWorldQuest(ctx, meta, quest, existing);
+          if (hard)
+            awardWorldQuestBonusCopper(
+              ctx,
+              meta,
+              worldQuestBonusCopper(
+                WISP_MAZE_HARD_BONUS.base,
+                WISP_MAZE_HARD_BONUS.perLevel,
+                player.level,
+              ),
+            );
+        }
+        // Any Hard win earns its deed, a replay after today's credit included
+        // (the calligraphy Gold rule): the deed marks the feat, not the reward.
+        if (hard) grantDeed(ctx, meta, 'exp_wisp_maze_hard');
       }
     }
     if (quest.objective.type === 'glider') {
