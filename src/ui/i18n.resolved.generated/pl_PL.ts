@@ -510,7 +510,13 @@ export const pl_PL: EnTranslations = {
       "departsIn": "Prom do {dest} odpływa za {time}",
       "castingOff": "Prom do {dest} odpływa",
       "boardHint": "Stań na jego pokładzie gdy odpływa. Przejazd jest darmowy.",
-      "sailing": "Płynę do {dest}"
+      "sailing": "Płynę do {dest}",
+      "portLabel": "{port} ferry to {dest}",
+      "portTitle": "{port} ferry port",
+      "destination": "Destination: {dest}",
+      "boardNow": "Board now",
+      "arrivesIn": "Ferry arrives in {time}",
+      "scheduleUnavailable": "Ferry timetable unavailable."
     },
     "materialStackSelectionUnavailable": "Ten wybór materiału nie jest już dostępny.",
     "vehicle": {

@@ -510,7 +510,13 @@ export const ja_JP: EnTranslations = {
       "departsIn": "{dest}行きの渡し船は{time}後に出航します",
       "castingOff": "{dest}行きの渡し船が出航します",
       "boardHint": "出航の時に甲板に立っていれば一緒に出発できます。運賃は無料です。",
-      "sailing": "{dest}へ航行中"
+      "sailing": "{dest}へ航行中",
+      "portLabel": "{port}発{dest}行きの渡し船",
+      "portTitle": "{port}の渡し船乗り場",
+      "destination": "行き先：{dest}",
+      "boardNow": "今すぐ乗船できます",
+      "arrivesIn": "渡し船の到着まで{time}",
+      "scheduleUnavailable": "渡し船の時刻表を取得できません。"
     },
     "materialStackSelectionUnavailable": "この素材の選択は利用できなくなりました。",
     "vehicle": {

@@ -510,7 +510,13 @@ export const nl_NL: EnTranslations = {
       "departsIn": "De veerboot naar {dest} vertrekt in {time}",
       "castingOff": "De veerboot naar {dest} is vertrokken",
       "boardHint": "Sta op zijn dek wanneer het vaart. De oversteek is gratis.",
-      "sailing": "Vaart naar {dest}"
+      "sailing": "Vaart naar {dest}",
+      "portLabel": "{port} ferry to {dest}",
+      "portTitle": "{port} ferry port",
+      "destination": "Destination: {dest}",
+      "boardNow": "Board now",
+      "arrivesIn": "Ferry arrives in {time}",
+      "scheduleUnavailable": "Ferry timetable unavailable."
     },
     "materialStackSelectionUnavailable": "Die materiaalkeuze is niet langer beschikbaar.",
     "vehicle": {

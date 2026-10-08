@@ -510,7 +510,13 @@ export const zh_CN: EnTranslations = {
       "departsIn": "前往{dest}的渡船将在{time}后起航",
       "castingOff": "前往{dest}的渡船正在起航",
       "boardHint": "起航时站在甲板上即可随船出发。渡船免费。",
-      "sailing": "正在驶往{dest}"
+      "sailing": "正在驶往{dest}",
+      "portLabel": "{port}至{dest}的渡船",
+      "portTitle": "{port}渡船码头",
+      "destination": "目的地：{dest}",
+      "boardNow": "现在登船",
+      "arrivesIn": "渡船将在{time}后抵达",
+      "scheduleUnavailable": "渡船时刻表暂不可用。"
     },
     "materialStackSelectionUnavailable": "该素材选择已失效。",
     "vehicle": {

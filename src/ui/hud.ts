@@ -2206,6 +2206,8 @@ export class Hud {
         station: stationNameText,
         poi: zonePoiLabel,
         rift: riftFloorLabel,
+        ferryPort: (routeId, berthId) =>
+          this.mapMarkerTooltipContent.ferryPortSemantic(routeId, berthId),
         npc: npcDisplayName,
         mob: mobDisplayName,
         worldQuest: (questId) =>
@@ -2215,6 +2217,7 @@ export class Hud {
       navigation: (marker) =>
         this.mapMarkerTooltipContent.navigation(
           this.mapMarkerInteraction.semantics.navigationText(marker),
+          marker,
         ),
       station: (marker) => this.mapMarkerTooltipContent.station(marker),
       service: (marker) => this.mapMarkerTooltipContent.service(marker),
@@ -2225,6 +2228,7 @@ export class Hud {
       questArea: (refs, count) => this.mapMarkerTooltipContent.questArea(refs, count),
       paint: (html, x, y) => this.paintTooltipAt(html, x, y),
       clearMemo: () => this.mapMarkerTooltipContent.clearMemo(),
+      hide: () => this.hideTooltip(),
     });
     this.mapMarkerArt.preload();
     this.auraOverlayController = mountAuraOverlay(this.sim, this.writerFacet, (rings) =>
@@ -3090,6 +3094,11 @@ export class Hud {
       this.toggleMapLevel();
     });
     mapCanvas.addEventListener('click', (ev) => {
+      if (
+        this.mapLevel === 'continent' &&
+        showMapTipAt(ev.clientX, ev.clientY, this.isMobileLayout())
+      )
+        return;
       if (this.mapLevel === 'zone') {
         if (this.mapMarkerInteraction.selectWorldQuestAt(mapCanvas, ev.clientX, ev.clientY)) {
           this.updateMapWindow();
@@ -3105,6 +3114,8 @@ export class Hud {
     });
     mapCanvas.addEventListener('pointermove', (ev) => {
       if (this.mapLevel !== 'continent' || ev.pointerType !== 'mouse') return;
+      if (showMapTipAt(ev.clientX, ev.clientY)) return;
+      hideMapAreaTip();
       const { cx, cy } = canvasPoint(ev.clientX, ev.clientY);
       const zoneId = continentZoneAt(this.continentRegions, cx, cy);
       if (zoneId !== this.mapHoverZone) {
@@ -3112,7 +3123,11 @@ export class Hud {
         this.updateMapWindow();
       }
       if (zoneId) {
-        this.paintTooltipAt(this.continentZoneTooltipHtml(zoneId), ev.clientX, ev.clientY);
+        this.paintTooltipAt(
+          this.mapMarkerTooltipContent.continentZone(zoneId, this.continentRegions),
+          ev.clientX,
+          ev.clientY,
+        );
         continentTipShown = true;
       } else {
         hideContinentTip();
@@ -6322,6 +6337,7 @@ export class Hud {
   }
 
   hideTooltip(): void {
+    this.mapMarkerInteraction?.stopPortRefresh();
     this.tooltipEl.style.display = 'none';
     this.tooltipEl.classList.remove('mob-tooltip');
     // Box hidden (drag start, window close, slot mutate): drop ownership so a
@@ -10581,12 +10597,7 @@ export class Hud {
     return this.mapMarkerInteraction.showAt(canvas, x, y, touch);
   }
 
-  // The map window shows the zone band the player is standing in (each band is a
-  // square); POIs and dungeon portals come from the zone/dungeon data. It redraws
-  // while open from hud.update()'s mediumHud band; the painter owns the canvas
-  // draw, the cached terrain blit, and the cadence. The delve branch is owned by
-  // delve_map_painter (paintWorldMapDelve), the overworld branch by
-  // map_window_painter; the pure geometry lives in map_window_view.ts.
+  // Clear marker ownership when entering an instance plan.
   private clearMapHitState(canvas: HTMLCanvasElement): void {
     this.mapMarkerInteraction.clear();
     this.mapView = null;
@@ -10681,17 +10692,22 @@ export class Hud {
     }
 
     if (this.mapLevel === 'continent') {
-      this.clearMapHitState(canvas); // panning/zoom belong to the per-zone level only
+      this.mapView = null; // panning/zoom belong to the per-zone level only
       const result = this.continentPainter.paintContinent(ctx, this.sim, {
         canvasSize: S,
         hoveredZoneId: this.mapHoverZone,
       });
       this.continentRegions = result.regions;
+      this.mapMarkerInteraction.setContinentPorts(result.ports);
       canvas.style.cursor = this.mapHoverZone ? 'pointer' : 'default';
       this.setText(summaryEl, t('hudChrome.continentMap.summary'));
       this.setText(
         markerSummaryEl,
-        this.mapMarkerInteraction.semantics.updateSimple(t('hudChrome.continentMap.title'), S),
+        this.mapMarkerInteraction.semantics.updatePorts(
+          result.ports,
+          t('hudChrome.continentMap.title'),
+          S,
+        ),
       );
       return;
     }
@@ -10741,22 +10757,6 @@ export class Hud {
       markerSummaryEl,
       this.mapMarkerInteraction.semantics.updateOverworld(result, zoneLabel, S),
     );
-  }
-
-  // Tooltip body for a hovered zone region on the continent overview: the zone's
-  // localized name plus its suggested level band (from the region's levelRange).
-  private continentZoneTooltipHtml(zoneId: string): string {
-    const region = this.continentRegions.find((r) => r.zoneId === zoneId);
-    let html = `<div class="tt-title">${esc(zoneDisplayName(zoneId))}</div>`;
-    if (region) {
-      html += `<div class="tt-quest-req">${esc(
-        t('hudChrome.continentMap.levels', {
-          min: formatCount(region.levelMin),
-          max: formatCount(region.levelMax),
-        }),
-      )}</div>`;
-    }
-    return html;
   }
 
   // -------------------------------------------------------------------------

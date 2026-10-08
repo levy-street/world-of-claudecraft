@@ -5,6 +5,7 @@
 import { BG_BASES } from '../sim/battleground_layout';
 import type { StationType } from '../sim/types';
 import type { DungeonMapModel } from './dungeon_map_view';
+import { ferryPortLabel } from './ferry_port_map_core';
 import {
   type BgMapModel,
   bgMapCanvasX,
@@ -597,6 +598,7 @@ export interface MapSemanticNameResolvers {
   npc(npcId: string): string;
   mob(mobId: string): string;
   worldQuest(questId: string): string;
+  ferryPort?(routeId: string, berthId: string): string;
 }
 
 export interface DelveSemanticMapModel {
@@ -1072,6 +1074,15 @@ export class MapSemanticAccessibilityCore {
         this.add(marker.mx, marker.my, 'delveEntrance', 'delve', marker.delveId);
       else if (marker.kind === 'world-passage')
         this.add(marker.mx, marker.my, 'worldPassage', 'zone', marker.destinationZoneId);
+      else if (marker.kind === 'ferry-port')
+        this.add(
+          marker.mx,
+          marker.my,
+          'pointOfInterest',
+          'literal',
+          this.names.ferryPort?.(marker.routeId, marker.berthId) ??
+            ferryPortLabel(marker.routeId, marker.berthId),
+        );
       else if (marker.kind === 'hoard-entrance') this.add(marker.mx, marker.my, 'hoardEntrance');
       else
         this.add(marker.mx, marker.my, 'riftEntrance', 'rift', marker.name, 0, marker.rank ?? '');
@@ -1183,12 +1194,29 @@ export class MapSemanticAccessibilityCore {
     return this.finish();
   }
 
+  updatePorts(ports: readonly MapNavigationMarker[], area: string, canvasSize: number): string {
+    this.begin(area, canvasSize / 2, canvasSize / 2, canvasSize);
+    for (const port of ports) {
+      if (port.kind === 'ferry-port')
+        this.add(
+          port.mx,
+          port.my,
+          'pointOfInterest',
+          'literal',
+          this.names.ferryPort?.(port.routeId, port.berthId) ??
+            ferryPortLabel(port.routeId, port.berthId),
+        );
+    }
+    return this.finish();
+  }
+
   updateSimple(area: string, canvasSize: number): string {
     this.begin(area, canvasSize / 2, canvasSize / 2, canvasSize);
     return this.finish();
   }
 
   navigationText(marker: MapNavigationMarker): string {
+    if (marker.kind === 'ferry-port') return ferryPortLabel(marker.routeId, marker.berthId);
     if (marker.kind === 'delve-entrance')
       return this.labelText('delveEntrance', 'delve', marker.delveId);
     if (marker.kind === 'world-passage')

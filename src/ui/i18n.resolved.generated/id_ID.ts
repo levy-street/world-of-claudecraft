@@ -510,7 +510,13 @@ export const id_ID: EnTranslations = {
       "departsIn": "Feri ke {dest} berangkat dalam {time}",
       "castingOff": "Feri ke {dest} sedang berlayar",
       "boardHint": "Berdiri di dek saat berlayar. Penyeberangan gratis.",
-      "sailing": "Berlayar ke {dest}"
+      "sailing": "Berlayar ke {dest}",
+      "portLabel": "{port} ferry to {dest}",
+      "portTitle": "{port} ferry port",
+      "destination": "Destination: {dest}",
+      "boardNow": "Board now",
+      "arrivesIn": "Ferry arrives in {time}",
+      "scheduleUnavailable": "Ferry timetable unavailable."
     },
     "materialStackSelectionUnavailable": "Pilihan material itu tidak lagi tersedia.",
     "vehicle": {

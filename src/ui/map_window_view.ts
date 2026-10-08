@@ -50,6 +50,7 @@ import { activeWorldQuestsForCycle } from '../sim/world_quest_rotation';
 import type { FriendInfo, IWorld } from '../world_api';
 import { buildCastlePlanMarkers, type CastlePlanMarker } from './castle_plan_core';
 import { dungeonMapActive } from './dungeon_map_view';
+import { FERRY_PORTS, type FerryPortMapMarker } from './ferry_port_map_core';
 import { viewerUsableToolTier } from './hud/professions/gathering_view';
 import { dawnholdMapActive, lastKeepMapActive } from './lastkeep_map_view';
 import { overworldDungeonPortals } from './map_dungeon_portals';
@@ -328,6 +329,7 @@ export interface MapServiceMarker {
  * identities come from authored content; Rift name/rank come only from a live
  * entity inside the host-fair disclosure range. */
 export type MapNavigationMarker =
+  | FerryPortMapMarker
   | { kind: 'hoard-entrance'; mx: number; my: number }
   | {
       kind: 'delve-entrance';
@@ -1213,6 +1215,13 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
         portalId: site.id,
         destinationZoneId: site.destinationZoneId,
       });
+    }
+  }
+  if (world.ferryView?.()) {
+    for (const port of FERRY_PORTS) {
+      if (port.zoneId !== zone.id) continue;
+      const placed = placeNavigation(port.x, port.z);
+      if (placed) navigation.push({ ...port, ...placed });
     }
   }
   for (const entity of world.entities.values()) {

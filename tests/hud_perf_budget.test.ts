@@ -832,6 +832,7 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
 // element at all: it is the mark read the M-map plate and the minimap's cached battleground
 // raster share, so it resolves nothing and reads nothing.
 const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
+  { file: 'ferry_port_map_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'continent_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'hud/delve/delve_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'hud/rift/rift_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },

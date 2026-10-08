@@ -1,3 +1,4 @@
+import { FERRY_PORTS } from '../src/ui/ferry_port_map_core';
 // Tests for the overworld map window pure core (map_window_view.ts):
 //  - the mode discriminator (delve vs overworld) under both world shapes,
 //  - the pure overworld draw model: Sim-vs-ClientWorld parity + determinism,
@@ -2452,5 +2453,36 @@ describe('building footprint corners', () => {
       expect(buildingContainsPoint(inn, inward.x, inward.z)).toBe(true);
       expect(buildingContainsPoint(inn, outward.x, outward.z)).toBe(false);
     });
+  });
+});
+
+describe('ferry ports on the zone map', () => {
+  it.each(['sim', 'client'] as const)(
+    'shows distant ports on the %s world with route identity',
+    (shape) => {
+      const world = makeOverworldWorld(shape);
+      world.ferryView = () => ({ clock: 0 }) as ReturnType<IWorld['ferryView']>;
+      for (const port of FERRY_PORTS) {
+        const zone = ZONES.find((candidate) => candidate.id === port.zoneId)!;
+        const model = buildOverworldMapModel({ ...input(world, 1), zone });
+        const marker = model.navigation.find((candidate) => candidate.kind === 'ferry-port');
+        expect(marker).toMatchObject(port);
+        expect(marker?.mx).toBeGreaterThanOrEqual(0);
+        expect(marker?.mx).toBeLessThanOrEqual(CANVAS);
+        expect(marker?.my).toBeGreaterThanOrEqual(0);
+        expect(marker?.my).toBeLessThanOrEqual(CANVAS);
+      }
+    },
+  );
+
+  it('omits ports when the world runs no ferries and when panned out of view', () => {
+    const world = makeOverworldWorld('client');
+    world.ferryView = () => null;
+    expect(
+      buildOverworldMapModel(input(world, 1)).navigation.some((m) => m.kind === 'ferry-port'),
+    ).toBe(false);
+    world.ferryView = () => ({ clock: 0 }) as ReturnType<IWorld['ferryView']>;
+    const model = buildOverworldMapModel(input(world, MAP_MAX_ZOOM));
+    expect(model.navigation.some((m) => m.kind === 'ferry-port')).toBe(false);
   });
 });

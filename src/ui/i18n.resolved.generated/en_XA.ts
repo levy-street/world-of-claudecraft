@@ -510,7 +510,13 @@ export const en_XA: EnTranslations = {
       "departsIn": "[Ţĥé ƒéŕŕý ţó {dest} ðéþáŕţš íñ {time}]",
       "castingOff": "[Ţĥé ƒéŕŕý ţó {dest} íš çášţíñĝ óƒƒ]",
       "boardHint": "[Šţáñð óñ íţš ðéçķ ŵĥéñ íţ šáíļš. Ţĥé çŕóššíñĝ íš ƒŕéé.]",
-      "sailing": "[Šáíļíñĝ ţó {dest}]"
+      "sailing": "[Šáíļíñĝ ţó {dest}]",
+      "portLabel": "[{port} ƒéŕŕý ţó {dest}]",
+      "portTitle": "[{port} ƒéŕŕý þóŕţ]",
+      "destination": "[Ðéšţíñáţíóñ: {dest}]",
+      "boardNow": "[Ɓóáŕð ñóŵ]",
+      "arrivesIn": "[Ƒéŕŕý áŕŕíʋéš íñ {time}]",
+      "scheduleUnavailable": "[Ƒéŕŕý ţíɱéţáƀļé úñáʋáíļáƀļé.]"
     },
     "materialStackSelectionUnavailable": "[Ţĥáţ ɱáţéŕíáļ šéļéçţíóñ íš ñó ļóñĝéŕ áʋáíļáƀļé.]",
     "vehicle": {

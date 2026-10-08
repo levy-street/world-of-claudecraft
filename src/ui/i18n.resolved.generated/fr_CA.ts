@@ -510,7 +510,13 @@ export const fr_CA: EnTranslations = {
       "departsIn": "Le bac pour {dest} part dans {time}",
       "castingOff": "Le bac pour {dest} appareille",
       "boardHint": "Montez sur son pont quand il prend la mer. La traversée est gratuite.",
-      "sailing": "En route vers {dest}"
+      "sailing": "En route vers {dest}",
+      "portLabel": "{port} ferry to {dest}",
+      "portTitle": "{port} ferry port",
+      "destination": "Destination: {dest}",
+      "boardNow": "Board now",
+      "arrivesIn": "Ferry arrives in {time}",
+      "scheduleUnavailable": "Ferry timetable unavailable."
     },
     "materialStackSelectionUnavailable": "Cette sélection de matériaux n’est plus disponible.",
     "vehicle": {

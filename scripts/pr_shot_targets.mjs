@@ -6825,6 +6825,51 @@ export const TARGETS = [
     },
   },
   {
+    key: 'ferry-port-map',
+    label: 'Ferry ports and live departure timetable',
+    when: ['ui/ferry_port_map', 'hud/map/map_marker_interaction_controller'],
+    variants: [
+      { key: 'zone-desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'continent-desktop', overview: true, beforeLoad: seedLowGraphicsPreset },
+      { key: 'zone-mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+      { key: 'continent-mobile', overview: true, mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page, variant) {
+      await awaitVeilSettled(page);
+      await page.evaluate(() => {
+        const { sim, hud } = window.__game;
+        sim.player.pos.x = 65;
+        sim.player.pos.z = 0;
+        hud.closeAll();
+      });
+      await wait(400);
+      await awaitVeilSettled(page);
+      await dismissEntryOverlays(page);
+      await page.evaluate(() => window.__game.hud.toggleMap());
+      if (!(await pollForSize(page, '#map-window'))) return { skip: 'map did not open' };
+      if (variant?.overview) await page.evaluate(() => window.__game.hud.setMapLevel('continent'));
+      await wait(600);
+      const point = await page.evaluate(() => {
+        const canvas = document.querySelector('#map-canvas');
+        const rect = canvas.getBoundingClientRect();
+        const marker = window.__game.hud.mapMarkerInteraction.navigation.find(
+          (port) => port.kind === 'ferry-port',
+        );
+        if (!marker) return null; // baseline capture has no ferry markers
+        return {
+          x: rect.left + (marker.mx * rect.width) / canvas.width,
+          y: rect.top + (marker.my * rect.height) / canvas.height,
+        };
+      });
+      if (point) {
+        if (variant?.mobile) await page.touchscreen.tap(point.x, point.y);
+        else await page.mouse.move(point.x, point.y);
+        await wait(1000);
+      }
+      return {};
+    },
+  },
+  {
     key: 'world-map',
     label: 'World map / zone',
     when: [

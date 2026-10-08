@@ -510,7 +510,13 @@ export const cs_CZ: EnTranslations = {
       "departsIn": "Přívoz do {dest} odplouvá za {time}",
       "castingOff": "Přívoz do {dest} odráží od mola",
       "boardHint": "Stůj na jeho palubě, když vypluje. Přeplavba je zdarma.",
-      "sailing": "Pluje do {dest}"
+      "sailing": "Pluje do {dest}",
+      "portLabel": "{port} ferry to {dest}",
+      "portTitle": "{port} ferry port",
+      "destination": "Destination: {dest}",
+      "boardNow": "Board now",
+      "arrivesIn": "Ferry arrives in {time}",
+      "scheduleUnavailable": "Ferry timetable unavailable."
     },
     "materialStackSelectionUnavailable": "Tento výběr materiálu už není dostupný.",
     "vehicle": {

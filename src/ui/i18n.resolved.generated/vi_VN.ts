@@ -510,7 +510,13 @@ export const vi_VN: EnTranslations = {
       "departsIn": "Phà đến {dest} khởi hành trong {time}",
       "castingOff": "Phà đến {dest} đang rời bến",
       "boardHint": "Đứng trên sàn của nó khi nó chuyển động. Chuyến vượt sông miễn phí.",
-      "sailing": "Đang Buồn Đến {dest}"
+      "sailing": "Đang Buồn Đến {dest}",
+      "portLabel": "{port} ferry to {dest}",
+      "portTitle": "{port} ferry port",
+      "destination": "Destination: {dest}",
+      "boardNow": "Board now",
+      "arrivesIn": "Ferry arrives in {time}",
+      "scheduleUnavailable": "Ferry timetable unavailable."
     },
     "materialStackSelectionUnavailable": "Lựa chọn nguyên liệu đó không còn khả dụng.",
     "vehicle": {

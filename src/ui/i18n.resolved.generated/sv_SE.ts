@@ -510,7 +510,13 @@ export const sv_SE: EnTranslations = {
       "departsIn": "Färjan till {dest} avgår om {time}",
       "castingOff": "Färjan till {dest} lämnar nu",
       "boardHint": "Stå på däcket när det seglar. Passagen är gratis.",
-      "sailing": "Seglande till {dest}"
+      "sailing": "Seglande till {dest}",
+      "portLabel": "{port} ferry to {dest}",
+      "portTitle": "{port} ferry port",
+      "destination": "Destination: {dest}",
+      "boardNow": "Board now",
+      "arrivesIn": "Ferry arrives in {time}",
+      "scheduleUnavailable": "Ferry timetable unavailable."
     },
     "materialStackSelectionUnavailable": "Det materialvalet är inte längre tillgängligt.",
     "vehicle": {

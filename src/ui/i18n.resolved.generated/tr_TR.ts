@@ -510,7 +510,13 @@ export const tr_TR: EnTranslations = {
       "departsIn": "{dest} için feribot {time} içinde hareket ediyor",
       "castingOff": "{dest} için feribot yelken açıyor",
       "boardHint": "Yelken açtığında kütüğünün üzerinde dur. Geçiş ücretsizdir.",
-      "sailing": "{dest} yolunda yelken açıyor"
+      "sailing": "{dest} yolunda yelken açıyor",
+      "portLabel": "{port} ferry to {dest}",
+      "portTitle": "{port} ferry port",
+      "destination": "Destination: {dest}",
+      "boardNow": "Board now",
+      "arrivesIn": "Ferry arrives in {time}",
+      "scheduleUnavailable": "Ferry timetable unavailable."
     },
     "materialStackSelectionUnavailable": "Bu malzeme seçimi artık kullanılamıyor.",
     "vehicle": {
