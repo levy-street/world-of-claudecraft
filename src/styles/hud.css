@@ -13473,12 +13473,17 @@
   }
   .cdm-btn {
     flex: none;
+    pointer-events: auto;
     opacity: var(--cdm-idle-opacity, 0.55);
     transition: opacity 0.16s ease;
   }
   .cdm-btn.is-ready,
   .cdm-btn.is-proc {
     opacity: 1;
+  }
+  /* Touch camera gestures pass through readouts outside placement mode. */
+  body.mobile-touch #cooldown-manager:not(.placement) .cdm-btn {
+    pointer-events: none;
   }
   /* A transformed button (Gorebite armed as Redharvest) or a class proc pulses
      with the action bar's own proc rim. Actionable: never tier-gated; only the

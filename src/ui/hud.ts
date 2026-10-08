@@ -166,7 +166,8 @@ import { resolveHudAuraIconId, resolveHudAuraIconUrl } from './aura_icon_runtime
 import type { AuraOverlayController } from './aura_overlay_controller';
 import { auraOverlaySettingsHooks, mountAuraOverlay } from './aura_overlay_wiring';
 import type { AuraTooltipFooterDeps } from './aura_tooltip';
-import { auraTooltipFooterHtml, renderAuraTooltipBodyHtml } from './aura_tooltip';
+import { auraTooltipFooterHtml } from './aura_tooltip';
+import { resolvedAuraTooltipBodyHtml } from './aura_tooltip_body';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import {
   type AurasDeps,
@@ -2230,7 +2231,12 @@ export class Hud {
     this.auraOverlayController = mountAuraOverlay(this.sim, this.writerFacet, (rings) =>
       this.renderer.setPlayerAuraRings(rings),
     );
-    this.cooldownManager = mountCooldowns(this.sim, this.writerFacet, this.auraOverlayController);
+    this.cooldownManager = mountCooldowns(this.sim, this.writerFacet, this.auraOverlayController, {
+      abilityTooltip: (ability) => this.abilityTooltip(ability),
+      aurasView: this.aurasViewDeps,
+      aurasPainter: this.aurasPainterDeps,
+      hideTooltip: () => this.hideTooltip(),
+    });
     this.farmPressAffordance = new FarmPressAffordanceController({
       root: $('#interact-affordance'),
       writers: this.writerFacet,
@@ -4950,7 +4956,13 @@ export class Hud {
       u.d = t('hudChrome.unitFrame.durationUnitDays');
       return u;
     },
-    auraEffectHtml: (a) => this.auraTooltipBodyHtml(a),
+    auraEffectHtml: (a) =>
+      resolvedAuraTooltipBodyHtml(
+        a,
+        this.sim.player,
+        (id) => this.previewResolvedAbility(id),
+        (aura) => this.auraEffectTooltipHtml(aura),
+      ),
     // Own-aura check for the target strip's ownFirst prominence: a missing/zero
     // sourceId (an old server's mirror) is never own, so the strip degrades to
     // the un-prioritized layout instead of misattributing another caster's dot.
@@ -6155,25 +6167,6 @@ export class Hud {
     const label = balance === null ? '--' : formatNumber(balance, { maximumFractionDigits: 0 });
     const aria = t('hudChrome.claudium.open');
     return `<button type="button" class="claudium-launcher" data-claudium-launcher title="${esc(aria)}" aria-label="${esc(aria)}"><img class="claudium-coin" src="/claudium/icons/claudium_coin_64.webp" alt=""><span class="claudium-launcher-balance">${esc(label)}</span></button>`;
-  }
-
-  // Complete aura tooltip body. A buff created by a known ability first shows that
-  // ability's localized, rank/talent-resolved description; the mechanical one-line
-  // descriptor follows when the aura kind has one. Proc-only auras without an ability
-  // definition still retain their descriptor. This keeps new ability buffs from
-  // silently degrading to name + timer just because their AuraKind is new.
-  private auraTooltipBodyHtml(a: AuraEffectInput & { id?: string }): string {
-    if (!a.id) return this.auraEffectTooltipHtml(a);
-    return renderAuraTooltipBodyHtml(a as AuraEffectInput & { id: string }, {
-      abilityDescription: (id) => {
-        const res = this.previewResolvedAbility(id);
-        if (!res) return null;
-        const scaling = abilityScalingOf(this.sim.player);
-        return abilityDisplayDescription(res, abilityEffectText(res, scaling), scaling, a);
-      },
-      effectHtml: (aura) => this.auraEffectTooltipHtml(aura),
-      escapeHtml: esc,
-    });
   }
 
   // One-line aura effect summary HTML for the buff/debuff tooltip: the pure descriptor
