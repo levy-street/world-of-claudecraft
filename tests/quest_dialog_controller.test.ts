@@ -1,6 +1,18 @@
 // @vitest-environment happy-dom
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+// The real craft-name helpers import char_window, which reaches portrait_chip.
+// Keep that unrelated renderer boundary inert: its GLB loads can otherwise
+// outlive happy-dom teardown and reject with "ProgressEvent is not defined".
+vi.mock('../src/ui/portrait_chip', () => ({
+  hydratePortraits: vi.fn(),
+  isComposedPortraitKey: vi.fn(() => false),
+  modularLookFor: vi.fn(),
+  onPortraitUpdate: vi.fn(),
+  portraitChipHtml: vi.fn(() => ''),
+}));
+
 import {
   INVESTIGATION_CLUES,
   INVESTIGATION_NPC_IDS,
