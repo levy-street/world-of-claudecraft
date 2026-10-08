@@ -627,6 +627,7 @@ const UI_PURE_CORES = [
   'src/ui/pvp_record_core.ts',
   'src/ui/pvp_tabs_view.ts',
   'src/ui/pvp_hostile_core.ts',
+  'src/ui/pvp_risk_core.ts',
   'src/ui/dungeon_finder_view.ts',
   'src/ui/yumi_match_view.ts',
   'src/ui/hud/battleground/battleground_atlas_view.ts',

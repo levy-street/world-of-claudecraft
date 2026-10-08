@@ -796,6 +796,7 @@ import {
 import { maskProfanity } from './profanity';
 import { createPromptTimeoutBar, PROMPT_TIMEOUT_MS } from './prompt_dialog';
 import { isPvpHostilePlayer, isPvpHostileTargetId } from './pvp_hostile_core';
+import { playerPvpRisk } from './pvp_risk_core';
 import {
   QUEST_ITEM_TOOLTIP_COLOR,
   type QuestItemTooltipModel,
@@ -4689,12 +4690,10 @@ export class Hud {
     // governor. spawn() reads this per event.
     { getFxTier: () => this.fxTier() },
   );
-  // First unit-frame painter instance; heraldry hosts are captured once. The name
-  // stays login-owned, and player dead/range state is absent, so no stateClasses.
-  // CSS keeps this visible, so no shownDisplay; setup owns the portrait, so no
-  // repaintPortrait.
+  // Player frame: static name/portrait, cached heraldry and self PvP risk hosts.
   private readonly playerFramePainter = new UnitFramePainter(this.writerFacet, {
     frame: this.playerFrameEl,
+    pvpRisk: { badge: $('#pf-pvp'), minimap: $('#minimap-disc') },
     level: this.pfLevelEl,
     hpFill: this.pfHpEl,
     hpText: this.pfHpTextEl,
@@ -8870,6 +8869,7 @@ export class Hud {
       playerFrame.levelText = String(p.level);
     }
     playerFrame.name = p.name;
+    playerFrame.pvpRisk = playerPvpRisk(sim);
     // SELF reads its worn border from the deeds facet, not the entity wire
     // (the wire carries other players' borders). One guarded record lookup per
     // frame, cheap enough that a signature cache would only add state.

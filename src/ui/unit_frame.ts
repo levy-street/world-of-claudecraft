@@ -87,6 +87,8 @@ export interface UnitFrameDescriptor {
   levelText: string | null;
   /** The unit's display name. */
   name: string;
+  /** Current self PvP exposure, supplied only by the player frame. */
+  pvpRisk?: boolean;
   /** The name line's title decoration (the Book of Deeds display title),
    *  PRE-LOCALIZED at the call site (the core stays i18n-free): everything the
    *  locale pattern places before the name (`titlePre`) and after it
@@ -140,6 +142,7 @@ export interface UnitFrameView {
   resText: string;
   levelText: string | null;
   name: string;
+  pvpRisk?: boolean;
   /** The pre-localized title decoration around the name ('' when untitled or
    *  the instance has no title surface). */
   titlePre: string;
@@ -188,6 +191,7 @@ const HIDDEN: UnitFrameView = {
   resText: '',
   levelText: null,
   name: '',
+  pvpRisk: false,
   titlePre: '',
   titlePost: '',
   cheaterTag: '',
@@ -257,6 +261,7 @@ export function unitFrameView(d: UnitFrameDescriptor): UnitFrameView {
     resText: d.resText,
     levelText: d.levelText,
     name: d.name,
+    pvpRisk: d.pvpRisk ?? false,
     titlePre: d.titlePre ?? '',
     titlePost: d.titlePost ?? '',
     cheaterTag: d.cheaterTag ?? '',
@@ -284,6 +289,7 @@ export function newUnitFrameBuffer(): UnitFrameBuffer {
       resText: '',
       levelText: null,
       name: '',
+      pvpRisk: false,
       titlePre: '',
       titlePost: '',
       cheaterTag: '',
@@ -325,6 +331,7 @@ export function unitFrameViewInto(buffer: UnitFrameBuffer, d: UnitFrameDescripto
     out.resText = '';
     out.levelText = null;
     out.name = '';
+    out.pvpRisk = false;
     out.titlePre = '';
     out.titlePost = '';
     out.cheaterTag = '';
@@ -358,6 +365,7 @@ export function unitFrameViewInto(buffer: UnitFrameBuffer, d: UnitFrameDescripto
   out.resText = d.resText;
   out.levelText = d.levelText;
   out.name = d.name;
+  out.pvpRisk = d.pvpRisk ?? false;
   out.titlePre = d.titlePre ?? '';
   out.titlePost = d.titlePost ?? '';
   out.cheaterTag = d.cheaterTag ?? '';
