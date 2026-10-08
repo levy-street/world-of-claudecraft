@@ -2647,6 +2647,7 @@ const UI_PAINTER_HELPERS = [
 // the English catalog, it is a maintainer fix during the release locale fill:
 // contributors do not edit those files.
 const UI_DOM_MODULES = [
+  'src/ui/tooltip_binding.ts',
   'src/ui/error_toast_controller.ts',
   'src/ui/frame_presets_live.ts',
   'src/ui/frame_editor_deps.ts',

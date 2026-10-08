@@ -888,7 +888,8 @@ import { TargetSwingTimerBars } from './target_swing_timer_bars';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
 import { toolEffectNameKey } from './tool_effect_name';
 import { toolEffectTooltipLines } from './tool_effect_tooltip';
-import { type TooltipViewport, tooltipPlacementAt } from './tooltip_clamp_core';
+import { bindTooltip } from './tooltip_binding';
+import type { TooltipViewport } from './tooltip_clamp_core';
 import { createTooltipLine } from './tooltip_line';
 import { SharedTooltipOwner } from './tooltip_owner';
 import {
@@ -897,7 +898,7 @@ import {
 } from './tooltip_paint';
 import { installTargetOfTargetControls } from './totarget_frame_controller';
 import { attachTouchFrameDrags, type TouchFrameDrags } from './touch_frame_drag';
-import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
+import { TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap } from './touch_tap';
 import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_focus_view';
 import { renderTownFocusWindow } from './town_focus_window';
@@ -2278,7 +2279,7 @@ export class Hud {
     this.deathRecapDialog = new DeathRecapDialog({
       root: () => $('#death-recap-dialog'),
       getLatestRecap: () => this.meters.getLatestDeathRecap(this.sim.playerId),
-      attachTooltip: (el, html) => this.attachTooltip(el, html),
+      attachTooltip: (el, html, isSpell) => this.attachTooltip(el, html, isSpell),
       hideTooltip: () => this.hideTooltip(),
       previewResolvedAbility: (id) => this.previewResolvedAbility(id),
       abilityTooltip: (res) => this.abilityTooltip(res),
@@ -5128,7 +5129,7 @@ export class Hud {
     moneyHtml: (copper) => moneyHtml(copper),
     itemTooltip: (item, instance, materialSources) =>
       this.itemTooltip(item, true, instance, materialSources),
-    attachTooltip: (el, html) => this.attachTooltip(el, html),
+    attachTooltip: (el, html, isSpell) => this.attachTooltip(el, html, isSpell),
   };
   // The interactive talents window. All allocation reads and mutations cross the
   // IWorld seam; the painter owns no optimistic talent state. All closures are
@@ -5925,7 +5926,7 @@ export class Hud {
     closeOthers: () => this.closeOtherWindows('#spellbook'),
     ...this.windowFocus('#spellbook'),
     hideTooltip: () => this.hideTooltip(),
-    attachTooltip: (el, html) => this.attachTooltip(el, html),
+    attachTooltip: (el, html) => this.attachTooltip(el, html, () => true),
     abilitySummary: (known) =>
       describeAbilitySummary(
         known,
@@ -6204,112 +6205,15 @@ export class Hud {
     return `<div class="tt-effect">${esc(t(effect.key as TranslationKey, values))}</div>`;
   }
 
-  attachTooltip(el: HTMLElement, html: () => string): void {
-    let touchTimer: number | undefined;
-    // tooltip box size, measured once in showAt (right after the content is set)
-    // and reused by every mousemove: the content cannot change between showAt
-    // calls, so re-reading offsetWidth/Height per mousemove only forced a reflow
-    let ttW = 0;
-    let ttH = 0;
-    const mobile = () => document.body.classList.contains('mobile-touch');
-    const clearTouchTimer = () => {
-      if (touchTimer !== undefined) window.clearTimeout(touchTimer);
-      touchTimer = undefined;
-    };
-    const showAt = (x: number, y: number, trigger: 'touch' | 'mouse' | 'focus') => {
-      // Touch-only path: showing the tooltip means the held control is being
-      // inspected, so the release click should peek, not fire its action.
-      this.peekGuard.tooltipShown(trigger);
-      const size = this.paintTooltipAt(html(), x, y);
-      // cache the measured box for the mousemove clamp below (no forced reflow)
-      ttW = size.w;
-      ttH = size.h;
-      // This element now owns the shared box, so its own mousemove keeps the
-      // cheap reposition-only path and a hover onto any other element re-resolves.
-      this.tooltipOwner.claim(el);
-    };
-    const showNearElement = () => {
-      const rect = el.getBoundingClientRect();
-      showAt(rect.right, rect.top + rect.height / 2, 'focus');
-    };
-    // A mouse click or a tap focuses the button as a side effect (the browser
-    // moves focus to whatever was pressed), which used to fire showNearElement
-    // on EVERY action-bar press, not just real keyboard (Tab) navigation. Flag
-    // the pointer press so the very next focusin it causes is skipped; Tab
-    // never fires pointerdown first, so keyboard users still get the tooltip.
-    let pointerFocusPending = false;
-    el.addEventListener('pointerdown', () => {
-      pointerFocusPending = true;
-    });
-    el.addEventListener('focusin', () => {
-      if (el.dataset.suppressFocusTooltip === 'true') {
-        delete el.dataset.suppressFocusTooltip;
-        return;
-      }
-      if (pointerFocusPending) {
-        pointerFocusPending = false;
-        return;
-      }
-      showNearElement();
-    });
-    el.addEventListener('mouseenter', () => {
-      if (mobile()) return;
-      const rect = el.getBoundingClientRect();
-      showAt(rect.right, rect.top + rect.height / 2, 'mouse');
-    });
-    el.addEventListener('mousemove', (e) => {
-      if (mobile()) return;
-      // The shared box may be showing another element's content: a drag-drop
-      // that ended inside a slot fires no mouseenter, and Firefox re-enters the
-      // drag SOURCE after a native drag, so the visible tooltip can belong to a
-      // different (or no) element while the cursor sits over this one (#1626).
-      // Repaint this element's own tooltip in that case; the common in-slot move
-      // stays on the cheap reposition-only path below.
-      if (this.tooltipOwner.needsReshow(el)) {
-        showAt(e.clientX, e.clientY, 'mouse');
-        return;
-      }
-      // reuse the box size measured in showAt: same content, no forced reflow
-      const at = tooltipPlacementAt(
-        e.clientX,
-        e.clientY,
-        { w: ttW, h: ttH },
-        this.tooltipViewport(),
-      );
-      this.tooltipEl.style.left = `${at.left}px`;
-      this.tooltipEl.style.top = `${at.top}px`;
-    });
-    el.addEventListener('mouseleave', () => {
-      clearTouchTimer();
-      this.tooltipEl.style.display = 'none';
-      // Box hidden: no element owns it, so the next move over any slot re-resolves.
-      this.tooltipOwner.release();
-    });
-    el.addEventListener('focusout', () => {
-      clearTouchTimer();
-      this.tooltipEl.style.display = 'none';
-      this.tooltipOwner.release();
-    });
-    el.addEventListener('pointerdown', (e) => {
-      if (!mobile() || e.pointerType === 'mouse') return;
-      clearTouchTimer();
-      // A fresh press: drop any stale peek and dismiss a lingering tooltip.
-      this.peekGuard.press();
-      this.tooltipEl.style.display = 'none';
-      const x = e.clientX,
-        y = e.clientY;
-      touchTimer = window.setTimeout(() => showAt(x, y, 'touch'), TOOLTIP_PEEK_MS);
-    });
-    el.addEventListener('pointerup', () => {
-      clearTouchTimer();
-      // Safari desktop never focuses a button on click, so pointerdown's flag
-      // above would otherwise never get consumed by a focusin and could wrongly
-      // swallow a later, real keyboard-focus tooltip; drop it once the press ends.
-      pointerFocusPending = false;
-    });
-    el.addEventListener('pointercancel', () => {
-      clearTouchTimer();
-      pointerFocusPending = false;
+  attachTooltip(el: HTMLElement, html: () => string, isSpell: () => boolean = () => false): void {
+    bindTooltip(el, html, {
+      peekGuard: this.peekGuard,
+      tooltipOwner: this.tooltipOwner,
+      tooltipEl: this.tooltipEl,
+      paintTooltipAt: (content, x, y) => this.paintTooltipAt(content, x, y),
+      tooltipViewport: () => this.tooltipViewport(),
+      hoverAllowed: () =>
+        !isSpell() || (this.optionsHooks?.settings.get('spellTooltipOnHover') ?? true),
     });
   }
 
@@ -7686,25 +7590,32 @@ export class Hud {
         if (e.key !== ' ' && e.key !== 'Spacebar') return;
         e.preventDefault();
       });
-      this.attachTooltip(btn, () => {
-        if (slot === 0 && this.attackSlotIsAttack()) {
-          return `<div class="tt-title">${esc(t('abilityUi.actionBar.attackName'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackTooltip'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackRemoveHint'))}</div>`;
-        }
-        const known = this.abilityForSlot(slot);
-        const clearHint = `<div class="tt-sub">${esc(t('abilityUi.actionBar.clearHint'))}</div>`;
-        if (known) return this.abilityTooltip(known) + clearHint;
-        const freed = slot === 0 && this.freedAttackSlotAbility();
-        if (freed)
-          return `<div class="tt-title">${esc(abilityDisplayName(freed.def))}</div><div class="tt-sub">${esc(t('abilityUi.tooltip.unavailable'))}</div>${clearHint}`;
-        const item = this.itemForSlot(slot);
-        if (item) {
-          const worn = item.id === this.sim.equipment.trinket;
-          return (
-            this.itemTooltip(item) + itemInBagsLine(this.inventoryCount(item.id), worn) + clearHint
-          );
-        }
-        return `<div class="tt-sub">${esc(t('abilityUi.actionBar.emptySlot'))}<br>${esc(t('abilityUi.actionBar.clearHint'))}</div>`;
-      });
+      this.attachTooltip(
+        btn,
+        () => {
+          if (slot === 0 && this.attackSlotIsAttack()) {
+            return `<div class="tt-title">${esc(t('abilityUi.actionBar.attackName'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackTooltip'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackRemoveHint'))}</div>`;
+          }
+          const known = this.abilityForSlot(slot);
+          const clearHint = `<div class="tt-sub">${esc(t('abilityUi.actionBar.clearHint'))}</div>`;
+          if (known) return this.abilityTooltip(known) + clearHint;
+          const freed = slot === 0 && this.freedAttackSlotAbility();
+          if (freed)
+            return `<div class="tt-title">${esc(abilityDisplayName(freed.def))}</div><div class="tt-sub">${esc(t('abilityUi.tooltip.unavailable'))}</div>${clearHint}`;
+          const item = this.itemForSlot(slot);
+          if (item) {
+            const worn = item.id === this.sim.equipment.trinket;
+            return (
+              this.itemTooltip(item) +
+              itemInBagsLine(this.inventoryCount(item.id), worn) +
+              clearHint
+            );
+          }
+          return `<div class="tt-sub">${esc(t('abilityUi.actionBar.emptySlot'))}<br>${esc(t('abilityUi.actionBar.clearHint'))}</div>`;
+        },
+        () =>
+          this.actionForSlot(slot)?.type === 'ability' || (slot === 0 && this.attackSlotIsAttack()),
+      );
       if (slot >= 1) {
         // drag an action onto another slot to place or swap it;
         // slot 0 (Attack) stays fixed
@@ -7997,7 +7908,7 @@ export class Hud {
           ? t('hudChrome.mobile.stanceAnchorEmptyAria')
           : t('hudChrome.mobile.stanceAnchorAria', { stance: stanceName }),
       abilityTooltip: (known) => this.abilityTooltip(known),
-      attachTooltip: (el, html) => this.attachTooltip(el, html),
+      attachTooltip: (el, html) => this.attachTooltip(el, html, () => true),
       hideTooltip: () => this.hideTooltip(),
       consumePeekGuard: () => this.peekGuard.consume(),
       clickSfx: () => audio.click(),
@@ -8243,7 +8154,6 @@ export class Hud {
       if (opts.autocast) btn.classList.add('autocast');
       if (opts.cooldownText) btn.classList.add('cooldown');
       if (opts.disabled) btn.classList.add('disabled');
-      btn.title = title;
       btn.setAttribute(
         'aria-label',
         opts.cooldownText
@@ -8385,7 +8295,11 @@ export class Hud {
         btn.addEventListener('pointerup', (event) => finishTouchHold(event, false));
         btn.addEventListener('pointercancel', (event) => finishTouchHold(event, true));
       }
-      this.attachTooltip(btn, () => tooltip);
+      this.attachTooltip(
+        btn,
+        () => tooltip,
+        () => true,
+      );
       parent.appendChild(btn);
     };
     const restorePetBarFocus = () => {

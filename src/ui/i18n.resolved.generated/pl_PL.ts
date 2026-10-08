@@ -2119,6 +2119,7 @@ export const pl_PL: EnTranslations = {
       }
     },
     "options": {
+      "spellTooltipOnHover": "Spell Tooltips on Hover",
       "clickMoveLeft": "Lewy przycisk",
       "clickMoveRight": "Prawy przycisk",
       "version": "v{version} ({build})",

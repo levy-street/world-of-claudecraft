@@ -2119,6 +2119,7 @@ export const ru_RU: EnTranslations = {
       }
     },
     "options": {
+      "spellTooltipOnHover": "Подсказки заклинаний при наведении",
       "clickMoveLeft": "Левая кнопка",
       "clickMoveRight": "Правая кнопка",
       "version": "v{version} ({build})",

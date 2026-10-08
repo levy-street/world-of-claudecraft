@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.options.spellTooltipOnHover"
+  ],
+  "es_ES": [
+    "hudChrome.options.spellTooltipOnHover"
+  ],
+  "fr_FR": [
+    "hudChrome.options.spellTooltipOnHover"
+  ],
+  "fr_CA": [
+    "hudChrome.options.spellTooltipOnHover"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.options.spellTooltipOnHover"
+  ],
+  "de_DE": [
+    "hudChrome.options.spellTooltipOnHover"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.options.spellTooltipOnHover"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.options.spellTooltipOnHover"
+  ],
+  "nl_NL": [
+    "hudChrome.options.spellTooltipOnHover"
+  ],
+  "pl_PL": [
+    "hudChrome.options.spellTooltipOnHover"
+  ],
+  "id_ID": [
+    "hudChrome.options.spellTooltipOnHover"
+  ],
+  "tr_TR": [
+    "hudChrome.options.spellTooltipOnHover"
+  ],
+  "sv_SE": [
+    "hudChrome.options.spellTooltipOnHover"
+  ],
+  "vi_VN": [
+    "hudChrome.options.spellTooltipOnHover"
+  ],
+  "da_DK": [
+    "hudChrome.options.spellTooltipOnHover"
+  ]
 };

@@ -2119,6 +2119,7 @@ export const ja_JP: EnTranslations = {
       }
     },
     "options": {
+      "spellTooltipOnHover": "マウスオーバーで呪文ツールチップを表示",
       "clickMoveLeft": "左クリック",
       "clickMoveRight": "右クリック",
       "version": "v{version} ({build})",

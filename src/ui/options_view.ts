@@ -978,6 +978,7 @@ export function buildInterfaceControls(
     { ...slider(s, 'uiScale', 'hudChrome.options.uiScale'), commitOnChange: true },
     slider(s, 'hudOpacity', 'hud.options.hudOpacity'),
     slider(s, 'tooltipScale', 'hud.options.tooltipScale'),
+    boolToggle(s, 'spellTooltipOnHover', 'hudChrome.options.spellTooltipOnHover'),
     boolToggle(s, 'frostedPanels', 'hud.options.frostedPanels'),
     boolToggle(s, 'highContrastText', 'hud.options.highContrastText'),
     boolToggle(s, 'colorblindMode', 'hud.options.colorblindMode'),
