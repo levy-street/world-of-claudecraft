@@ -6316,7 +6316,9 @@ export const ko_KR: EnTranslations = {
         "passage": "통로"
       },
       "collapseHint": "지도 사이드바 접기",
-      "expandHint": "지도 사이드바 펼치기"
+      "expandHint": "지도 사이드바 펼치기",
+      "resizeRailAria": "지도 사이드바 너비",
+      "resizeRailHint": "드래그하여 지도 사이드바 크기를 조절합니다. 두 번 클릭하면 초기화됩니다."
     },
     "arenaGate": {
       "minLevelNote": "레벨 {level} 필요"

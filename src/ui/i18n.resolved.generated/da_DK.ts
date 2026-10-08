@@ -6316,7 +6316,9 @@ export const da_DK: EnTranslations = {
         "passage": "Passage"
       },
       "collapseHint": "Skjul kortsidepanel",
-      "expandHint": "Udvid kortsidepanel"
+      "expandHint": "Udvid kortsidepanel",
+      "resizeRailAria": "Map sidebar width",
+      "resizeRailHint": "Drag to resize the map sidebar. Double-click to reset."
     },
     "arenaGate": {
       "minLevelNote": "Kræver niveau {level}"

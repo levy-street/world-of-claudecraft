@@ -6316,7 +6316,9 @@ export const ja_JP: EnTranslations = {
         "passage": "通路"
       },
       "collapseHint": "マップサイドバーを折りたたむ",
-      "expandHint": "マップサイドバーを展開"
+      "expandHint": "マップサイドバーを展開",
+      "resizeRailAria": "マップサイドバーの幅",
+      "resizeRailHint": "ドラッグしてマップサイドバーの幅を変更します。ダブルクリックで元に戻します。"
     },
     "arenaGate": {
       "minLevelNote": "レベル {level} が必要です"

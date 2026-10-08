@@ -95,7 +95,6 @@ describe('isResizableWindow', () => {
 
   it('excludes fixed-size boards, popups, and modal prompts', () => {
     for (const id of [
-      'map-window',
       'loot-window',
       'confirm-dialog',
       'mobile-extra-controls',
@@ -107,7 +106,17 @@ describe('isResizableWindow', () => {
   });
 
   it('allows the content windows', () => {
-    for (const id of ['char-window', 'quest-log-window', 'market-window', 'bags', 'spellbook']) {
+    // The world map is resizable too (its canvas follows, see
+    // src/ui/hud/map/map_canvas_size_controller.ts); the touch sheet stands the
+    // grip down at press time instead (resizeCornerWindowAt).
+    for (const id of [
+      'char-window',
+      'quest-log-window',
+      'market-window',
+      'bags',
+      'spellbook',
+      'map-window',
+    ]) {
       expect(isResizableWindow(el(id))).toBe(true);
     }
   });
@@ -126,7 +135,7 @@ describe('markResizableWindow', () => {
     const win = fake('char-window');
     markResizableWindow(win.el);
     expect(win.added).toEqual(['window-resizable']);
-    const excluded = fake('map-window');
+    const excluded = fake('loot-window');
     markResizableWindow(excluded.el);
     expect(excluded.added).toEqual([]);
   });

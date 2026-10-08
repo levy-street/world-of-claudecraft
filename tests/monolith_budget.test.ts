@@ -537,7 +537,11 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 18081 and the
     // branch 18235; the two sides' additions compose to 18093 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 18093,
+    // Lowered from 18093 by the resizable world map: the window drag-handle
+    // predicate moved out to src/ui/window_drag_handle.ts and the map canvas
+    // sizing landed as src/ui/hud/map/map_canvas_size_controller.ts behind a
+    // one-line install. Extract, then lower.
+    ceiling: 18084,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

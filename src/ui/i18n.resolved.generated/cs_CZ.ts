@@ -6316,7 +6316,9 @@ export const cs_CZ: EnTranslations = {
         "passage": "Průchod"
       },
       "collapseHint": "Sbalit boční panel mapy",
-      "expandHint": "Rozbalit boční panel mapy"
+      "expandHint": "Rozbalit boční panel mapy",
+      "resizeRailAria": "Map sidebar width",
+      "resizeRailHint": "Drag to resize the map sidebar. Double-click to reset."
     },
     "arenaGate": {
       "minLevelNote": "Vyžaduje úroveň {level}"

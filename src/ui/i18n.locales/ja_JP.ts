@@ -582,6 +582,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootQuality.itemName': '{item}、{quality}',
   'hudChrome.mapAtlas.collapseHint': 'マップサイドバーを折りたたむ',
   'hudChrome.mapAtlas.expandHint': 'マップサイドバーを展開',
+  'hudChrome.mapAtlas.resizeRailAria': 'マップサイドバーの幅',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'ドラッグしてマップサイドバーの幅を変更します。ダブルクリックで元に戻します。',
   'hudChrome.mapAtlas.worldQuests.count': '{done} / {total}',
   'hudChrome.meters.activeProfile': 'アクティブなプロファイル',
   'hudChrome.meters.activeProfileDesc':

@@ -9,25 +9,70 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.mapAtlas.resizeRailAria",
+    "hudChrome.mapAtlas.resizeRailHint"
+  ],
+  "es_ES": [
+    "hudChrome.mapAtlas.resizeRailAria",
+    "hudChrome.mapAtlas.resizeRailHint"
+  ],
+  "fr_FR": [
+    "hudChrome.mapAtlas.resizeRailAria",
+    "hudChrome.mapAtlas.resizeRailHint"
+  ],
+  "fr_CA": [
+    "hudChrome.mapAtlas.resizeRailAria",
+    "hudChrome.mapAtlas.resizeRailHint"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.mapAtlas.resizeRailAria",
+    "hudChrome.mapAtlas.resizeRailHint"
+  ],
+  "de_DE": [
+    "hudChrome.mapAtlas.resizeRailAria",
+    "hudChrome.mapAtlas.resizeRailHint"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.mapAtlas.resizeRailAria",
+    "hudChrome.mapAtlas.resizeRailHint"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.mapAtlas.resizeRailAria",
+    "hudChrome.mapAtlas.resizeRailHint"
+  ],
+  "nl_NL": [
+    "hudChrome.mapAtlas.resizeRailAria",
+    "hudChrome.mapAtlas.resizeRailHint"
+  ],
+  "pl_PL": [
+    "hudChrome.mapAtlas.resizeRailAria",
+    "hudChrome.mapAtlas.resizeRailHint"
+  ],
+  "id_ID": [
+    "hudChrome.mapAtlas.resizeRailAria",
+    "hudChrome.mapAtlas.resizeRailHint"
+  ],
+  "tr_TR": [
+    "hudChrome.mapAtlas.resizeRailAria",
+    "hudChrome.mapAtlas.resizeRailHint"
+  ],
+  "sv_SE": [
+    "hudChrome.mapAtlas.resizeRailAria",
+    "hudChrome.mapAtlas.resizeRailHint"
+  ],
+  "vi_VN": [
+    "hudChrome.mapAtlas.resizeRailAria",
+    "hudChrome.mapAtlas.resizeRailHint"
+  ],
+  "da_DK": [
+    "hudChrome.mapAtlas.resizeRailAria",
+    "hudChrome.mapAtlas.resizeRailHint"
+  ]
 };

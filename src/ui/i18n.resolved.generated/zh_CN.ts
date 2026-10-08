@@ -6316,7 +6316,9 @@ export const zh_CN: EnTranslations = {
         "passage": "通道"
       },
       "collapseHint": "收起地图侧栏",
-      "expandHint": "展开地图侧栏"
+      "expandHint": "展开地图侧栏",
+      "resizeRailAria": "地图侧栏宽度",
+      "resizeRailHint": "拖动以调整地图侧栏大小。双击可重置。"
     },
     "arenaGate": {
       "minLevelNote": "需要等级 {level}"

@@ -36,7 +36,6 @@ export interface WindowResizeDeps {
 // Windows whose body is not reflowable content: fixed-size boards/popups and
 // the modal prompts. Everything else gets the grip.
 const NON_RESIZABLE_WINDOW_IDS = new Set([
-  'map-window',
   'loot-window',
   'confirm-dialog',
   'mobile-extra-controls',
@@ -44,8 +43,53 @@ const NON_RESIZABLE_WINDOW_IDS = new Set([
   'emote-editor',
 ]);
 
+// Windows resizable on the desktop layout only. The world map becomes a fixed
+// touch sheet under body.mobile-touch (src/styles/hud.mobile.css sizes it from
+// the viewport, and its canvas is CSS-scaled on purpose), so the grip stands
+// down there. The class toggles at runtime, so this is read per press.
+const DESKTOP_ONLY_RESIZABLE_WINDOW_IDS = new Set(['map-window']);
+
 export function isResizableWindow(el: HTMLElement): boolean {
   return !NON_RESIZABLE_WINDOW_IDS.has(el.id);
+}
+
+function resizeStoodDown(el: HTMLElement): boolean {
+  return (
+    DESKTOP_ONLY_RESIZABLE_WINDOW_IDS.has(el.id) &&
+    (el.ownerDocument?.body?.classList.contains('mobile-touch') ?? false)
+  );
+}
+
+/**
+ * The resizable window whose SE corner band holds this pointer, or null. The
+ * band is measured against the CLIENT box, not the border box, so the classic
+ * scrollbar gutter stays grabbable as a scrollbar. A press on a control that
+ * must keep the corner click for itself never counts. Exported so the drag
+ * controller (window_drag.ts) leaves a corner press to the resize: the
+ * headerless map drags by its padding band, which the corner band overlaps.
+ */
+export function resizeCornerWindowAt(
+  ev: PointerEvent,
+  scale: number,
+  coarse: boolean,
+): HTMLElement | null {
+  const target = ev.target as HTMLElement | null;
+  if (!target?.closest) return null;
+  const el = target.closest<HTMLElement>('.window.panel');
+  if (!el || !el.classList.contains('window-resizable') || resizeStoodDown(el)) return null;
+  if (target.closest('button, input, textarea, select, a, [draggable="true"]')) return null;
+  const rect = el.getBoundingClientRect();
+  const corner = {
+    right: rect.left + (el.clientLeft + el.clientWidth) * scale,
+    bottom: rect.top + (el.clientTop + el.clientHeight) * scale,
+  };
+  const band = (coarse ? RESIZE_CORNER_BAND_TOUCH : RESIZE_CORNER_BAND) * scale;
+  return isInResizeCorner(corner, ev.clientX, ev.clientY, band) ? el : null;
+}
+
+/** The same coarse-pointer probe installWindowResize defaults to. */
+export function isCoarsePointerDefault(): boolean {
+  return window.matchMedia?.('(pointer: coarse)').matches ?? false;
 }
 
 /**
@@ -82,35 +126,15 @@ interface ResizeSession {
 
 /** Install the shared resize behavior. Returns a teardown (for tests). */
 export function installWindowResize(deps: WindowResizeDeps): () => void {
-  const coarse =
-    deps.isCoarsePointer ?? (() => window.matchMedia?.('(pointer: coarse)').matches ?? false);
+  const coarse = deps.isCoarsePointer ?? isCoarsePointerDefault;
 
   document.querySelectorAll<HTMLElement>('.window.panel').forEach(markResizableWindow);
 
   let session: ResizeSession | null = null;
   let hotEl: HTMLElement | null = null;
 
-  const bandVisual = () =>
-    (coarse() ? RESIZE_CORNER_BAND_TOUCH : RESIZE_CORNER_BAND) * deps.getScale();
-
-  // The window under the pointer when the pointer sits in its SE corner band
-  // (and not on a control that must keep the corner click for itself). The band
-  // is measured against the CLIENT box, not the border box, so the classic
-  // scrollbar gutter stays grabbable as a scrollbar.
-  const cornerHit = (ev: PointerEvent): HTMLElement | null => {
-    const target = ev.target as HTMLElement | null;
-    if (!target?.closest) return null;
-    const el = target.closest<HTMLElement>('.window.panel');
-    if (!el || !el.classList.contains('window-resizable')) return null;
-    if (target.closest('button, input, textarea, select, a, [draggable="true"]')) return null;
-    const rect = el.getBoundingClientRect();
-    const z = deps.getScale();
-    const corner = {
-      right: rect.left + (el.clientLeft + el.clientWidth) * z,
-      bottom: rect.top + (el.clientTop + el.clientHeight) * z,
-    };
-    return isInResizeCorner(corner, ev.clientX, ev.clientY, bandVisual()) ? el : null;
-  };
+  const cornerHit = (ev: PointerEvent): HTMLElement | null =>
+    resizeCornerWindowAt(ev, deps.getScale(), coarse());
 
   // Touch scrolling cannot be stopped from pointermove, and by the time the
   // slop is exceeded the browser has already claimed the gesture, so the

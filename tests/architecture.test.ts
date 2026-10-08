@@ -274,6 +274,12 @@ const UI_PURE_CORES = [
   // Which zone the overworld map frames (dungeon door, frozen last zone,
   // committed zone, override), lifted out of Hud.updateMapWindow.
   'src/ui/hud/map/map_zone_focus_core.ts',
+  // The resizable map's canvas backing side (map_canvas_size_controller.ts
+  // feeds it the ResizeObserver content box).
+  'src/ui/hud/map/map_canvas_size_core.ts',
+  // The atlas rail width: clamp, drag and key steps (map_rail_resize_controller.ts
+  // applies it as --map-rail-width).
+  'src/ui/hud/map/map_rail_width_core.ts',
   'src/ui/world_quest_forge_view.ts',
   'src/ui/world_quest_leaderboard_view.ts',
   'src/ui/leaderboard_podium_view.ts',
@@ -2660,6 +2666,11 @@ const UI_DOM_MODULES = [
   'src/ui/mobile_frame_long_press.ts',
   'src/ui/hud/vehicle/vehicle_action_bar_controller.ts',
   'src/ui/hud/map/minimap_objective_tap.ts',
+  // Owns a ResizeObserver over the map canvas and writes its backing store.
+  'src/ui/hud/map/map_canvas_size_controller.ts',
+  // Hud's map-window sizing wiring: a ResizeObserver over #map-window that
+  // re-reads the stored rail width once settings exist.
+  'src/ui/hud/map/map_window_sizing_wiring.ts',
   'src/ui/hud/treasure/treasure_map_window.ts',
   'src/ui/hud/vehicle/shadow_action_bar_controller.ts',
   'src/ui/hud/vehicle/forge_action_bar_controller.ts',

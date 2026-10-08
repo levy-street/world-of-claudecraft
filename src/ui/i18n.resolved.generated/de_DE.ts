@@ -6316,7 +6316,9 @@ export const de_DE: EnTranslations = {
         "passage": "Passage"
       },
       "collapseHint": "Kartenseitenleiste einklappen",
-      "expandHint": "Kartenseitenleiste ausklappen"
+      "expandHint": "Kartenseitenleiste ausklappen",
+      "resizeRailAria": "Map sidebar width",
+      "resizeRailHint": "Drag to resize the map sidebar. Double-click to reset."
     },
     "arenaGate": {
       "minLevelNote": "Erfordert Stufe {level}"

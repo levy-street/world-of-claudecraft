@@ -595,6 +595,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootQuality.itemName': '{item}, {quality}',
   'hudChrome.mapAtlas.collapseHint': 'Свернуть боковую панель карты',
   'hudChrome.mapAtlas.expandHint': 'Развернуть боковую панель карты',
+  'hudChrome.mapAtlas.resizeRailAria': 'Ширина боковой панели карты',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'Перетащите, чтобы изменить ширину боковой панели карты. Двойной щелчок сбрасывает ширину.',
   'hudChrome.mapAtlas.worldQuests.count': '{done} / {total}',
   'hudChrome.meters.activeProfile': 'Активный профиль',
   'hudChrome.meters.activeProfileDesc':

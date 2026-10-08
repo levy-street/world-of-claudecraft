@@ -6316,7 +6316,9 @@ export const en_XA: EnTranslations = {
         "passage": "[Þáššáĝé]"
       },
       "collapseHint": "[Çóļļáþšé ɱáþ šíðéƀáŕ]",
-      "expandHint": "[Éẋþáñð ɱáþ šíðéƀáŕ]"
+      "expandHint": "[Éẋþáñð ɱáþ šíðéƀáŕ]",
+      "resizeRailAria": "[Ɱáþ šíðéƀáŕ ŵíðţĥ]",
+      "resizeRailHint": "[Ðŕáĝ ţó ŕéšížé ţĥé ɱáþ šíðéƀáŕ. Ðóúƀļé-çļíçķ ţó ŕéšéţ.]"
     },
     "arenaGate": {
       "minLevelNote": "[Ŕéɋúíŕéš ļéʋéļ {level}]"

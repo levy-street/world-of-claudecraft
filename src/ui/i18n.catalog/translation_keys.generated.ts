@@ -11696,6 +11696,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.mapAtlas.level'
   | 'hudChrome.mapAtlas.noNearbyQuests'
   | 'hudChrome.mapAtlas.noTrackedQuests'
+  | 'hudChrome.mapAtlas.resizeRailAria'
+  | 'hudChrome.mapAtlas.resizeRailHint'
   | 'hudChrome.mapAtlas.showRoute'
   | 'hudChrome.mapAtlas.track'
   | 'hudChrome.mapAtlas.trackedQuests'

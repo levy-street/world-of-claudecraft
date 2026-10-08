@@ -7,6 +7,7 @@
 // while two large store windows overlapped on high-DPI Chromium displays.
 
 import { draggedWindowPosition, type WindowDragPosition } from './window_drag_core';
+import { isCoarsePointerDefault, resizeCornerWindowAt } from './window_resize';
 
 export interface WindowDragDeps {
   getScale(): number;
@@ -99,6 +100,10 @@ export function installWindowDrag(deps: WindowDragDeps): WindowDragController {
     if (!el || el.id === 'confirm-dialog') return;
     deps.bringToFront(el);
     if (session || event.button !== 0 || !target || !deps.isDragHandle(target, el)) return;
+    // A press in the window's resize corner belongs to window_resize.ts. Only
+    // the headerless map can reach here (its drag handle is the padding band
+    // the corner overlaps); every other window drags by its title bar.
+    if (resizeCornerWindowAt(event, deps.getScale(), isCoarsePointerDefault()) === el) return;
     event.preventDefault();
     deps.hideTooltip();
 

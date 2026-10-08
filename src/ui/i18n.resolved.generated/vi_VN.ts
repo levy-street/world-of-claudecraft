@@ -6316,7 +6316,9 @@ export const vi_VN: EnTranslations = {
         "passage": "lối đi; ngõ; hành lang đi qua"
       },
       "collapseHint": "Thu gọn thanh bên bản đồ",
-      "expandHint": "Mở rộng thanh bên bản đồ"
+      "expandHint": "Mở rộng thanh bên bản đồ",
+      "resizeRailAria": "Map sidebar width",
+      "resizeRailHint": "Drag to resize the map sidebar. Double-click to reset."
     },
     "arenaGate": {
       "minLevelNote": "Yêu cầu Cấp {level}"

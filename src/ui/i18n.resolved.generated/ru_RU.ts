@@ -6316,7 +6316,9 @@ export const ru_RU: EnTranslations = {
         "passage": "Проход"
       },
       "collapseHint": "Свернуть боковую панель карты",
-      "expandHint": "Развернуть боковую панель карты"
+      "expandHint": "Развернуть боковую панель карты",
+      "resizeRailAria": "Ширина боковой панели карты",
+      "resizeRailHint": "Перетащите, чтобы изменить ширину боковой панели карты. Двойной щелчок сбрасывает ширину."
     },
     "arenaGate": {
       "minLevelNote": "Требуется уровень {level}"

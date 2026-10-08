@@ -180,6 +180,11 @@ export const SETTING_RANGES = {
   // Scales the hover tooltip's text so small-screen / low-vision players can
   // read item & ability tooltips without squinting.
   tooltipScale: { min: 0.85, max: 1.5, def: 1 },
+  // The World Map atlas rail's width in author px, set by dragging (or keying)
+  // the divider between the rail and the map so long quest titles and the
+  // world-quest board stop truncating. Mirrors the range in
+  // src/ui/hud/map/map_rail_width_core.ts (pinned equal by its test).
+  mapAtlasRailWidth: { min: 240, max: 560, def: 300 },
   // Scales the combat-log / chat text independently of tooltips. The ceiling
   // is 2.5 (not the 1.4 the other comfort scales stop near) because chat is
   // 11px at stock: on a 4K display at 100% OS scaling, 1.4 still leaves it

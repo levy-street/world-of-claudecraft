@@ -568,6 +568,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootQuality.itemName': '{item}，{quality}',
   'hudChrome.mapAtlas.collapseHint': '收起地图侧栏',
   'hudChrome.mapAtlas.expandHint': '展开地图侧栏',
+  'hudChrome.mapAtlas.resizeRailAria': '地图侧栏宽度',
+  'hudChrome.mapAtlas.resizeRailHint': '拖动以调整地图侧栏大小。双击可重置。',
   'hudChrome.mapAtlas.worldQuests.count': '{done} / {total}',
   'hudChrome.meters.activeProfile': '当前配置',
   'hudChrome.meters.activeProfileDesc': '为不同的游玩场景选择或管理独立的配置。',

@@ -581,6 +581,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootQuality.itemName': '{item}, {quality}',
   'hudChrome.mapAtlas.collapseHint': '지도 사이드바 접기',
   'hudChrome.mapAtlas.expandHint': '지도 사이드바 펼치기',
+  'hudChrome.mapAtlas.resizeRailAria': '지도 사이드바 너비',
+  'hudChrome.mapAtlas.resizeRailHint':
+    '드래그하여 지도 사이드바 크기를 조절합니다. 두 번 클릭하면 초기화됩니다.',
   'hudChrome.mapAtlas.worldQuests.count': '{done} / {total}',
   'hudChrome.meters.activeProfile': '활성 프로필',
   'hudChrome.meters.activeProfileDesc':

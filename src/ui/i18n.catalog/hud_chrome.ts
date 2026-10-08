@@ -9227,6 +9227,10 @@ export const hudChromeStrings = {
     // hudChrome.deeds.collapseHint / expandHint).
     collapseHint: 'Collapse map sidebar',
     expandHint: 'Expand map sidebar',
+    // The divider between the sidebar and the map (map_rail_resize_controller.ts):
+    // its accessible name, and the hover hint saying how to use it.
+    resizeRailAria: 'Map sidebar width',
+    resizeRailHint: 'Drag to resize the map sidebar. Double-click to reset.',
   },
   // Ranked Arena's minimum-level queue gate (src/sim/social/arena.ts
   // arenaQueueJoin, 1v1/2v2 only): the arena window's disabled-queue note
