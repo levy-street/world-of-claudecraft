@@ -347,6 +347,9 @@ export const ko_KR: EnTranslations = {
     }
   },
   "hudChrome": {
+    "reportReward": {
+      "banned": "신고하신 계정이 이용 정지되었습니다"
+    },
     "framePresets": {
       "apply": "적용",
       "pickerLabel": "프레임 프리셋: {name}",
@@ -23946,6 +23949,11 @@ export const ko_KR: EnTranslations = {
         "sender": "까마귀 우편국",
         "subject": "보물 창고 보상",
         "body": "보물 창고가 공략되었지만 보물 상자에서 당신의 몫을 받지 않았습니다. 획득한 물품과 동전을 까마귀가 이곳으로 배달했습니다.\n\n- 까마귀 우편국"
+      },
+      "bot_report_reward": {
+        "sender": "게임 운영팀",
+        "subject": "신고하신 계정이 이용 정지되었습니다",
+        "body": "신고하신 계정이 이용 정지되었습니다.\n\n공정한 게임 환경을 지키는 데 도움을 주셔서 감사합니다. 보내 주신 신고가 불공정한 행위로부터 커뮤니티를 보호하는 데 도움이 되었습니다.\n\n게임 운영팀"
       }
     },
     "itemSets": {

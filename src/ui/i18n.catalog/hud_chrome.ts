@@ -13,6 +13,9 @@ import { professionTrainerStrings } from './profession_trainers';
 import { weeklyRewardStrings } from './weekly_rewards';
 
 export const hudChromeStrings = {
+  reportReward: {
+    banned: 'An account you reported has been banned',
+  },
   framePresets: {
     apply: 'Apply',
     pickerLabel: 'Frame Presets: {name}',

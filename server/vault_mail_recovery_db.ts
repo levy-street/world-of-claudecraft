@@ -1,4 +1,4 @@
-// Read one vault letter's durable source after an uncertain character+mail
+// Read one custodial reward letter's durable source after an uncertain character+mail
 // save. A live emptied letter is never proof that its character grant landed.
 
 import type { Pool } from 'pg';
@@ -12,7 +12,12 @@ export async function loadVaultMailRecovery(
   characterId: number,
   custodyRef: string,
 ): Promise<VaultMailRecoveryLetter | null> {
-  if (!Number.isSafeInteger(characterId) || characterId <= 0 || !custodyRef.startsWith('vault:'))
+  const letterId = custodyRef.startsWith('vault:')
+    ? 'hoard_vault_reward'
+    : /^report_reward:[1-9]\d*$/.test(custodyRef)
+      ? 'bot_report_reward'
+      : null;
+  if (!Number.isSafeInteger(characterId) || characterId <= 0 || !letterId)
     throw new Error('invalid vault mail recovery reference');
   const recipientKey = String(characterId);
   const client = await pool.connect();
@@ -33,14 +38,14 @@ export async function loadVaultMailRecovery(
     ]);
     const data = partition.rows[0]?.data as Partial<MailSave> | undefined;
     const saved = data?.mail?.find(
-      (letter) =>
-        letter.recipientKey === recipientKey &&
-        letter.letterId === 'hoard_vault_reward' &&
-        letter.custodyRef === custodyRef,
+      (letter) => letter.recipientKey === recipientKey && letter.custodyRef === custodyRef,
     );
+    if (saved && saved.letterId !== letterId)
+      throw new Error('custodial reward letter type mismatch during recovery');
     let source: VaultMailRecoveryLetter | null = null;
     if (saved && (saved.copper > 0 || saved.items.length > 0)) {
       source = {
+        letterId,
         recipientName: saved.recipientName,
         copper: saved.copper,
         items: saved.items,
@@ -50,12 +55,18 @@ export async function loadVaultMailRecovery(
     } else if (!saved) {
       const overlay = await client.query(
         `SELECT recipient_name, items, copper FROM mail_custody_parcels
-         WHERE realm = $1 AND recipient_key = $2 AND custody_ref = $3`,
-        [realm, recipientKey, custodyRef],
+         WHERE realm = $1 AND recipient_key = $2 AND custody_ref = $3 AND letter = $4`,
+        [
+          realm,
+          recipientKey,
+          custodyRef,
+          letterId === 'bot_report_reward' ? 'report_reward' : 'vault_reward',
+        ],
       );
       if (overlay.rowCount === 1) {
         const row = overlay.rows[0];
         source = {
+          letterId,
           recipientName: String(row.recipient_name),
           copper: Number(row.copper),
           items: row.items as VaultMailRecoveryLetter['items'],

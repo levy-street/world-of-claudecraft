@@ -347,6 +347,9 @@ export const pt_BR: EnTranslations = {
     }
   },
   "hudChrome": {
+    "reportReward": {
+      "banned": "An account you reported has been banned"
+    },
     "framePresets": {
       "apply": "Aplicar",
       "pickerLabel": "Predefinições de Quadro: {name}",
@@ -23946,6 +23949,11 @@ export const pt_BR: EnTranslations = {
         "sender": "O Correio dos Corvos",
         "subject": "Sua recompensa de cofre",
         "body": "O cofre foi esvaziado, mas sua parte não foi coletada do baú. Os corvos a trouxeram para você aqui, com os bens e moedas que você conquistou.\n\n- O Correio dos Corvos"
+      },
+      "bot_report_reward": {
+        "sender": "Game Moderation",
+        "subject": "An account you reported has been banned",
+        "body": "An account you reported has been banned.\n\nThank you for helping us keep the game fair. Your report helped protect the community from unfair play.\n\nGame Moderation"
       }
     },
     "itemSets": {

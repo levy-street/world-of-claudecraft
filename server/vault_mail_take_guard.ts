@@ -1,4 +1,4 @@
-// Fence a vault-mail take until the save that captured its character and
+// Fence a custodial reward-mail take until the save that captured its character and
 // recipient mailbox commits together. Older saves cannot release the fence.
 import type { Sim } from '../src/sim/sim';
 
@@ -58,7 +58,8 @@ export class VaultMailTakeGuard {
     save: () => void,
   ): boolean {
     const before = sim.mailInfoFor(pid)?.messages.find((mail) => mail.id === mailId);
-    if (before?.letterId !== 'hoard_vault_reward') return false;
+    if (before?.letterId !== 'hoard_vault_reward' && before?.letterId !== 'bot_report_reward')
+      return false;
     const custodyRef = sim.vaultCustodyRefFor(mailId, pid);
     if (!custodyRef) return true;
     const beforeView: MailView = {

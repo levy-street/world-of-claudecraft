@@ -347,6 +347,9 @@ export const sv_SE: EnTranslations = {
     }
   },
   "hudChrome": {
+    "reportReward": {
+      "banned": "An account you reported has been banned"
+    },
     "framePresets": {
       "apply": "Tillämpa",
       "pickerLabel": "Ramförinställningar: {name}",
@@ -23946,6 +23949,11 @@ export const sv_SE: EnTranslations = {
         "sender": "Ravenposten",
         "subject": "Din valvbelöning",
         "body": "Valvet rensades, men din andel samkades inte från kistan. Korparna har bragt det till dig här, med de varor och mynt du tjänade bifogade.\n\n- Ravenposten"
+      },
+      "bot_report_reward": {
+        "sender": "Game Moderation",
+        "subject": "An account you reported has been banned",
+        "body": "An account you reported has been banned.\n\nThank you for helping us keep the game fair. Your report helped protect the community from unfair play.\n\nGame Moderation"
       }
     },
     "itemSets": {

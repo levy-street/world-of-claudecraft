@@ -537,7 +537,8 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 18081 and the
     // branch 18235; the two sides' additions compose to 18093 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 18093,
+    // Log-event routing and bubble policy moved to log_event_feedback_core.
+    ceiling: 18089,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1689,7 +1690,9 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 9827 and the
     // branch 9965; the two sides' additions compose to 9840 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 9840,
+    // Report rewards: loadRealmMail and the notice/profiler ports are sibling modules.
+    // Measured after formatting; the game coordinator keeps only thin bindings.
+    ceiling: 9835,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

@@ -9,25 +9,100 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "entities.letters.bot_report_reward.body",
+    "entities.letters.bot_report_reward.sender",
+    "entities.letters.bot_report_reward.subject",
+    "hudChrome.reportReward.banned"
+  ],
+  "es_ES": [
+    "entities.letters.bot_report_reward.body",
+    "entities.letters.bot_report_reward.sender",
+    "entities.letters.bot_report_reward.subject",
+    "hudChrome.reportReward.banned"
+  ],
+  "fr_FR": [
+    "entities.letters.bot_report_reward.body",
+    "entities.letters.bot_report_reward.sender",
+    "entities.letters.bot_report_reward.subject",
+    "hudChrome.reportReward.banned"
+  ],
+  "fr_CA": [
+    "entities.letters.bot_report_reward.body",
+    "entities.letters.bot_report_reward.sender",
+    "entities.letters.bot_report_reward.subject",
+    "hudChrome.reportReward.banned"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "entities.letters.bot_report_reward.body",
+    "entities.letters.bot_report_reward.sender",
+    "entities.letters.bot_report_reward.subject",
+    "hudChrome.reportReward.banned"
+  ],
+  "de_DE": [
+    "entities.letters.bot_report_reward.body",
+    "entities.letters.bot_report_reward.sender",
+    "entities.letters.bot_report_reward.subject",
+    "hudChrome.reportReward.banned"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "entities.letters.bot_report_reward.body",
+    "entities.letters.bot_report_reward.sender",
+    "entities.letters.bot_report_reward.subject",
+    "hudChrome.reportReward.banned"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "entities.letters.bot_report_reward.body",
+    "entities.letters.bot_report_reward.sender",
+    "entities.letters.bot_report_reward.subject",
+    "hudChrome.reportReward.banned"
+  ],
+  "nl_NL": [
+    "entities.letters.bot_report_reward.body",
+    "entities.letters.bot_report_reward.sender",
+    "entities.letters.bot_report_reward.subject",
+    "hudChrome.reportReward.banned"
+  ],
+  "pl_PL": [
+    "entities.letters.bot_report_reward.body",
+    "entities.letters.bot_report_reward.sender",
+    "entities.letters.bot_report_reward.subject",
+    "hudChrome.reportReward.banned"
+  ],
+  "id_ID": [
+    "entities.letters.bot_report_reward.body",
+    "entities.letters.bot_report_reward.sender",
+    "entities.letters.bot_report_reward.subject",
+    "hudChrome.reportReward.banned"
+  ],
+  "tr_TR": [
+    "entities.letters.bot_report_reward.body",
+    "entities.letters.bot_report_reward.sender",
+    "entities.letters.bot_report_reward.subject",
+    "hudChrome.reportReward.banned"
+  ],
+  "sv_SE": [
+    "entities.letters.bot_report_reward.body",
+    "entities.letters.bot_report_reward.sender",
+    "entities.letters.bot_report_reward.subject",
+    "hudChrome.reportReward.banned"
+  ],
+  "vi_VN": [
+    "entities.letters.bot_report_reward.body",
+    "entities.letters.bot_report_reward.sender",
+    "entities.letters.bot_report_reward.subject",
+    "hudChrome.reportReward.banned"
+  ],
+  "da_DK": [
+    "entities.letters.bot_report_reward.body",
+    "entities.letters.bot_report_reward.sender",
+    "entities.letters.bot_report_reward.subject",
+    "hudChrome.reportReward.banned"
+  ]
 };

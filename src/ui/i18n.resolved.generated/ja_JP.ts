@@ -347,6 +347,9 @@ export const ja_JP: EnTranslations = {
     }
   },
   "hudChrome": {
+    "reportReward": {
+      "banned": "あなたが通報したアカウントが利用停止になりました"
+    },
     "framePresets": {
       "apply": "適用",
       "pickerLabel": "フレームプリセット：{name}",
@@ -23946,6 +23949,11 @@ export const ja_JP: EnTranslations = {
         "sender": "カラス便",
         "subject": "宝物庫の報酬",
         "body": "宝物庫は攻略されましたが、あなたの取り分は宝箱から受け取られていません。獲得した品とお金をカラス便がお届けします。\n\n- カラス便"
+      },
+      "bot_report_reward": {
+        "sender": "ゲーム運営",
+        "subject": "あなたが通報したアカウントが利用停止になりました",
+        "body": "あなたが通報したアカウントが利用停止になりました。\n\n公平なゲーム環境を守るためにご協力いただき、ありがとうございます。あなたの通報が、不公平な行為からコミュニティを守る助けになりました。\n\nゲーム運営"
       }
     },
     "itemSets": {

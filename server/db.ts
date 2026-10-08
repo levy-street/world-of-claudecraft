@@ -138,6 +138,7 @@ import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
 import { REALM, REALM_DIRECTORY } from './realm';
 import { REALM_BUILDER_SCHEMA } from './realm_builder_db';
 import { chooseArchiveName } from './reclaim_name';
+import { REPORT_REWARDS_SCHEMA } from './report_rewards_db';
 import { attachSchemaNoticeForwarder } from './schema_notices';
 import { SEEKER_ENTITLEMENT_SCHEMA } from './seeker_entitlement_db';
 import { SOCIAL_SCHEMA } from './social_db';
@@ -1352,6 +1353,7 @@ export async function ensureSchema(): Promise<void> {
     // bakes it. No FK on purpose: rows must survive character deletion long
     // enough for an operator to attribute them.
     await client.query(MAIL_CUSTODY_PARCELS_SCHEMA);
+    await client.query(REPORT_REWARDS_SCHEMA);
     await client.query(VAULT_REWARDS_SCHEMA);
     // Map editor tables: saved/forked custom maps and uploaded GLB assets.
     // Both FK-reference accounts(id), so they run after SCHEMA. Applied

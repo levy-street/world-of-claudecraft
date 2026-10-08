@@ -19,6 +19,7 @@
 import { bagPools, canGrantCopies, instancedCountCap } from '../bags';
 import { rekeySigner } from '../character_rename';
 import {
+  BOT_REPORT_REWARD_LETTER,
   HEROIC_MARK_LETTER,
   HOARD_REWARD_LETTER,
   isWocMarketLetterId,
@@ -231,6 +232,7 @@ export interface MailSave {
 }
 
 export interface VaultMailRecoveryLetter {
+  letterId?: 'hoard_vault_reward' | 'bot_report_reward';
   recipientName: string;
   copper: number;
   items: InvSlot[];
@@ -495,6 +497,11 @@ export class PostOffice {
 
   private storedCountFor(key: string, name: string): number {
     return this.index.countFor(key) + (name !== key ? this.index.countFor(name) : 0);
+  }
+
+  /** Reward admission uses recipient indexes, including pre-ID legacy mail. */
+  canBookReportRewardMail(characterId: number, name: string): boolean {
+    return this.storedCountFor(String(characterId), name) < MAIL_MAX_PER_RECIPIENT;
   }
 
   mailUnreadFor(pid: number): number {
@@ -1044,9 +1051,16 @@ export class PostOffice {
 
   vaultCustodyRefFor(mailId: number, pid: number): string | null {
     const r = this.ctx.resolve(pid);
-    return r?.meta
-      ? (this.deliveredFor(r.meta).find((mail) => mail.id === mailId)?.custodyRef ?? null)
-      : null;
+    const mail = r?.meta ? this.deliveredFor(r.meta).find((mail) => mail.id === mailId) : undefined;
+    // Legacy name: both custodial reward types share the paired-save fence.
+    if (mail?.letterId === 'hoard_vault_reward' && mail.custodyRef?.startsWith('vault:'))
+      return mail.custodyRef;
+    if (
+      mail?.letterId === 'bot_report_reward' &&
+      /^report_reward:[1-9]\d*$/.test(mail.custodyRef ?? '')
+    )
+      return mail.custodyRef!;
+    return null;
   }
 
   restoreVaultLetter(
@@ -1054,8 +1068,14 @@ export class PostOffice {
     custodyRef: string,
     source: VaultMailRecoveryLetter,
   ): boolean {
+    const letter = custodyRef.startsWith('vault:')
+      ? HOARD_REWARD_LETTER
+      : /^report_reward:[1-9]\d*$/.test(custodyRef)
+        ? BOT_REPORT_REWARD_LETTER
+        : null;
     if (
-      !custodyRef.startsWith('vault:') ||
+      !letter ||
+      (source.letterId !== undefined && source.letterId !== letter.letterId) ||
       !Number.isSafeInteger(source.copper) ||
       source.copper < 0
     )
@@ -1073,12 +1093,13 @@ export class PostOffice {
         (candidate) =>
           candidate.recipientKey === recipientKey && candidate.custodyRef === custodyRef,
       );
+    if (mail && mail.letterId !== letter.letterId) return false;
     if (mail) this.index.untrack(mail, this.ctx.time);
     else {
       if (
         !this.mailSystemParcel(
           { key: recipientKey, name: source.recipientName },
-          { ...HOARD_REWARD_LETTER, copper: source.copper },
+          { ...letter, copper: source.copper },
           source.items,
           custodyRef,
         )
@@ -1091,7 +1112,8 @@ export class PostOffice {
     mail.items = source.items.map(cloneInvSlot);
     mail.copper = source.copper;
     mail.read = source.read;
-    mail.vaultRewardCredited = source.vaultRewardCredited;
+    mail.vaultRewardCredited =
+      letter.letterId === 'hoard_vault_reward' ? source.vaultRewardCredited : undefined;
     mail.expiresAt = mailHoldsEscrow(mail) ? Infinity : this.emptiedExpiresAt(mail, this.ctx.time);
     mail.announced = true;
     this.index.track(mail, this.ctx.time);

@@ -13,6 +13,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.reportReward.banned': 'Аккаунт, на который вы пожаловались, заблокирован',
+  'entities.letters.bot_report_reward.sender': 'Администрация игры',
+  'entities.letters.bot_report_reward.subject': 'Аккаунт, на который вы пожаловались, заблокирован',
+  'entities.letters.bot_report_reward.body':
+    'Аккаунт, на который вы пожаловались, заблокирован.\n\nСпасибо за помощь в поддержании честной игры. Ваша жалоба помогла защитить сообщество от нечестной игры.\n\nАдминистрация игры',
   'abilityUi.actionBar.cooldownMinutes': '{minutes} мин',
   'abilityUi.cast.hoard_cast_rime_beam': 'Луч инея',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount} {currency}',

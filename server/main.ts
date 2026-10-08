@@ -261,7 +261,7 @@ import {
 import { pruneDiscordOAuthStates, pruneDiscordPendingLogins } from './discord_db';
 import { emailAccountCreated } from './email';
 import { stopEpicMirror } from './epic/mirror';
-import { GameServer } from './game';
+import { type ClientSession, GameServer } from './game';
 import {
   closeGeneralChatQuotaPool,
   createGeneralChatQuotaListener,
@@ -414,6 +414,14 @@ import { isPublicCorsPath, publicOriginFromRequest, REALM, REALM_DIRECTORY } fro
 import { publishRealmBuilderRoll } from './realm_builder';
 import { configureReliquaryRuntime } from './reliquary';
 import { reliquaryRarityCounts } from './reliquary_rarity_db';
+import { createReportRewardsDelivery } from './report_rewards';
+import {
+  claimReportRewardDelivery,
+  confirmReportRewardNotices,
+  dueReportRewards,
+  pendingReportRewardNotices,
+  retryReportRewardBatch,
+} from './report_rewards_db';
 import { resolveReportTarget } from './report_target';
 import { BUG_REPORT_MAX_BODY_BYTES, configureReportsRuntime } from './reports';
 import { createRetentionSweep, RETENTION_SWEEP_BATCH_SIZE } from './retention_sweep';
@@ -3722,7 +3730,34 @@ export async function startServer(): Promise<http.Server> {
   if (orphans > 0) console.log(`closed ${orphans} orphaned play session(s) from a previous run`);
   await pruneApplePendingLogins(pool);
   await game.loadMarket();
-  await game.loadMail();
+  const reportRewardSessions = new Map<number, ClientSession>();
+  const reportRewards = createReportRewardsDelivery(
+    {
+      due: dueReportRewards,
+      claim: claimReportRewardDelivery,
+      retry: retryReportRewardBatch,
+      notices: pendingReportRewardNotices,
+      notified: confirmReportRewardNotices,
+    },
+    {
+      book: game.sim,
+      canBook: (id, name) => game.sim.canBookReportRewardMail(id, name),
+      onlineAccounts: () => {
+        reportRewardSessions.clear();
+        for (const s of game.clients.values()) {
+          if (!s.left && !s.linkdead && s.ws.readyState === 1)
+            reportRewardSessions.set(s.accountId, s);
+        }
+        return [...reportRewardSessions.keys()];
+      },
+      notice: (accountId, text) => {
+        const session = reportRewardSessions.get(accountId);
+        return session ? game.sendSystemNotice(session, text) : false;
+      },
+      measure: (work) => game.measureReportRewards(work),
+    },
+  );
+  if (await game.loadMail()) reportRewards.start();
   // Guild bank books boot-load BEFORE listen() below, so every non-oversized
   // guild's book is live before any player can join (Guild Bank Phase 3: this
   // releases the deliberately silent-inert Phase 2 wire).
@@ -4239,6 +4274,7 @@ export async function startServer(): Promise<http.Server> {
     // Stop the app-aggregate metric collectors so no refresh query races the pool
     // close below (their intervals are unref()'d, but an in-flight tick could still
     // fire before pool.end()).
+    await reportRewards.stop();
     await businessMetrics.stop();
     await bankLedgerGrowthMonitor.stop();
     game.beginShutdown();

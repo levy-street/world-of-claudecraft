@@ -347,6 +347,9 @@ export const zh_TW: EnTranslations = {
     }
   },
   "hudChrome": {
+    "reportReward": {
+      "banned": "您檢舉的一個帳號已被封鎖"
+    },
     "framePresets": {
       "apply": "套用",
       "pickerLabel": "框架預設：{name}",
@@ -23946,6 +23949,11 @@ export const zh_TW: EnTranslations = {
         "sender": "渡鴉郵局",
         "subject": "你的寶藏獎勵",
         "body": "寶藏已被攻克，但你沒有從寶箱領取自己的那份獎勵。渡鴉已將你獲得的物品和金幣送到這裡。\n\n- 渡鴉郵局"
+      },
+      "bot_report_reward": {
+        "sender": "遊戲管理團隊",
+        "subject": "您檢舉的一個帳號已被封鎖",
+        "body": "您檢舉的一個帳號已被封鎖。\n\n感謝您協助我們維護遊戲的公平環境。您的檢舉幫助社群免受不公平行為的侵害。\n\n遊戲管理團隊"
       }
     },
     "itemSets": {

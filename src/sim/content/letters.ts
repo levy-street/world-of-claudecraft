@@ -25,6 +25,20 @@ export interface LetterDef {
   delaySeconds?: number;
 }
 
+// Sent only after moderation bans an account a player reported.
+export const BOT_REPORT_REWARD_LETTER: LetterDef = {
+  letterId: 'bot_report_reward',
+  senderName: 'Game Moderation',
+  subject: 'An account you reported has been banned',
+  body:
+    'An account you reported has been banned.\n\n' +
+    'Thank you for helping us keep the game fair. Your report helped protect ' +
+    'the community from unfair play.\n\n' +
+    'Game Moderation',
+  copper: 0,
+  delaySeconds: 0,
+};
+
 // The one-time service letter. Sent to every character that has never been
 // welcomed (new characters right away, pre-mail characters on their next
 // login), so it doubles as the feature announcement.
@@ -588,6 +602,7 @@ for (const pairId of Object.keys(MASTER_TIER_LETTERS)) {
 // row in world_entity_i18n.ts (that guard reds until it lands).
 export function authoredLettersById(): Record<string, LetterDef> {
   const byId: Record<string, LetterDef> = {
+    [BOT_REPORT_REWARD_LETTER.letterId]: BOT_REPORT_REWARD_LETTER,
     [WELCOME_LETTER.letterId]: WELCOME_LETTER,
     [HEROIC_MARK_LETTER.letterId]: HEROIC_MARK_LETTER,
     [WYRMFALL_CORE_LETTER.letterId]: WYRMFALL_CORE_LETTER,

@@ -13,6 +13,7 @@ import { normalizeCheaterMarkSeconds } from '../src/sim/moderation';
 import { CheaterMarkRefused } from './cheater_mark_api';
 import { pool, runWithStatementTimeout } from './db';
 import { REALM } from './realm';
+import { createReportRewardsIn } from './report_rewards_db';
 import { flagRegistrationBurst } from './suspicion_flags';
 import { bustWocAuthGuardAccount } from './woc_auth_guard_cache';
 
@@ -665,6 +666,9 @@ export async function moderateAccount(input: {
       reason,
       expiresAt: expiresAt ? expiresAt.toISOString() : null,
     });
+    if (input.action === 'ban') {
+      await createReportRewardsIn((text, values) => client.query(text, values), input.accountId);
+    }
     if (input.action === 'ban' || input.action === 'suspend') {
       await client.query(
         `UPDATE player_reports

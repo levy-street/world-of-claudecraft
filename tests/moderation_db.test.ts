@@ -1465,3 +1465,68 @@ describe('recordItemNameClear (the legendary-name strip audit row)', () => {
     expect(query).not.toHaveBeenCalled();
   });
 });
+
+describe('successful report ban rewards', () => {
+  it('creates no reward for an ignored report or a chat mute', async () => {
+    query.mockResolvedValue(queryResult([], 1));
+    await ignoreReport(1, 1, 'insufficient evidence');
+    expect(query.mock.calls.some(([sql]) => sql.includes('report_rewards'))).toBe(false);
+    const client = clientStub();
+    connect.mockResolvedValue(client as unknown as PoolClient);
+    await muteAccountChat({
+      accountId: 2,
+      adminAccountId: 1,
+      reason: 'spam',
+      expiresAt: new Date(Date.now() + 3600000).toISOString(),
+    });
+    expect(client.query.mock.calls.some(([sql]) => sql.includes('report_rewards'))).toBe(false);
+  });
+  it('creates claims inside the ban transaction before closing the reports', async () => {
+    const client = clientStub();
+    connect.mockResolvedValue(client as unknown as PoolClient);
+    await moderateAccount({
+      accountId: 2,
+      adminAccountId: 1,
+      action: 'ban',
+      reason: 'automated play',
+    });
+    const statements = client.query.mock.calls.map(([sql]) => sql);
+    const rewardAt = statements.findIndex((sql) => sql.includes('INSERT INTO report_rewards'));
+    expect(rewardAt).toBeGreaterThan(0);
+    expect(statements.findIndex((sql) => sql.includes('UPDATE player_reports'))).toBeGreaterThan(
+      rewardAt,
+    );
+    expect(statements.indexOf('COMMIT')).toBeGreaterThan(rewardAt);
+  });
+
+  it.each(['suspend', 'unsuspend', 'unban'] as const)(
+    'creates no reward for %s',
+    async (action) => {
+      const client = clientStub();
+      client.query.mockResolvedValue(queryResult([], 1));
+      connect.mockResolvedValue(client as unknown as PoolClient);
+      await moderateAccount({
+        accountId: 2,
+        adminAccountId: 1,
+        action,
+        reason: 'reviewed',
+        expiresAt: new Date(Date.now() + 3600000).toISOString(),
+      });
+      expect(client.query.mock.calls.some(([sql]) => sql.includes('report_rewards'))).toBe(false);
+    },
+  );
+
+  it('rolls the ban back when its reward claim write fails', async () => {
+    const client = clientStub();
+    client.query.mockImplementation(async (sql) => {
+      if (sql.includes('INSERT INTO report_rewards')) throw new Error('claim write failed');
+      return queryResult([], 1);
+    });
+    connect.mockResolvedValue(client as unknown as PoolClient);
+    await expect(
+      moderateAccount({ accountId: 2, adminAccountId: 1, action: 'ban', reason: 'automated play' }),
+    ).rejects.toThrow('claim write failed');
+    expect(client.query.mock.calls.map(([sql]) => sql)).toContain('ROLLBACK');
+    expect(client.query.mock.calls.map(([sql]) => sql)).not.toContain('COMMIT');
+  });
+});

@@ -347,6 +347,9 @@ export const zh_CN: EnTranslations = {
     }
   },
   "hudChrome": {
+    "reportReward": {
+      "banned": "您举报的一个账号已被封禁"
+    },
     "framePresets": {
       "apply": "应用",
       "pickerLabel": "框架预设：{name}",
@@ -23946,6 +23949,11 @@ export const zh_CN: EnTranslations = {
         "sender": "渡鸦邮局",
         "subject": "你的宝藏奖励",
         "body": "宝藏已被攻克，但你没有从宝箱领取自己的那份奖励。渡鸦已将你获得的物品和金币送到这里。\n\n- 渡鸦邮局"
+      },
+      "bot_report_reward": {
+        "sender": "游戏管理团队",
+        "subject": "您举报的一个账号已被封禁",
+        "body": "您举报的一个账号已被封禁。\n\n感谢您帮助我们维护游戏的公平环境。您的举报帮助社区免受不公平行为的侵害。\n\n游戏管理团队"
       }
     },
     "itemSets": {

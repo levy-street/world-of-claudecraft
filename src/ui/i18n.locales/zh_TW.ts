@@ -13,6 +13,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.reportReward.banned': '您檢舉的一個帳號已被封鎖',
+  'entities.letters.bot_report_reward.sender': '遊戲管理團隊',
+  'entities.letters.bot_report_reward.subject': '您檢舉的一個帳號已被封鎖',
+  'entities.letters.bot_report_reward.body':
+    '您檢舉的一個帳號已被封鎖。\n\n感謝您協助我們維護遊戲的公平環境。您的檢舉幫助社群免受不公平行為的侵害。\n\n遊戲管理團隊',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}分鐘',
   'abilityUi.cast.hoard_cast_rime_beam': '白霜射束',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount} {currency}',
