@@ -2167,13 +2167,15 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     const beforeReferralBytes = Buffer.byteLength(JSON.stringify(withoutReferral), 'utf8');
     // 241,763 on the membership integration: the release's 233,515 plus the
     // quest gear (+5,019), quest blues (+1,688) and role fill (+1,541) underneath.
-    expect(beforeReferralBytes).toBe(241763);
+    // 242,954 on the v0.45.0 integration: plus the Mirefen world-boss branch (+1,191).
+    expect(beforeReferralBytes).toBe(242954);
     expect(bytes - beforeReferralBytes).toBe(122);
     expect(fieldBytes(s2, 'deedStats') - fieldBytes(withoutReferral, 'deedStats')).toBe(122);
     // Membership adds eight discoverable item ids and no character entitlement
     // fields. Isolate the measured content-only growth from the settled save:
     // 233,360 -> 233,515 bytes, all 155 bytes in itemsDiscovered (241,608 ->
-    // 241,763 with the quest gear, blues and role fill underneath). Removing only those ids
+    // 241,763 with the quest gear, blues and role fill underneath; 242,799 -> 242,954 with
+    // the Mirefen world-boss branch too). Removing only those ids
     // must reproduce the preceding measurement exactly.
     const membershipIds = new Set(Object.keys(MEMBERSHIP_ITEMS));
     const withoutMembership: CharacterState = {
@@ -2187,7 +2189,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     };
     expect(membershipIds.size).toBe(8);
     const beforeMembershipBytes = Buffer.byteLength(JSON.stringify(withoutMembership), 'utf8');
-    expect(beforeMembershipBytes).toBe(241608);
+    expect(beforeMembershipBytes).toBe(242799);
     expect(beforeReferralBytes - beforeMembershipBytes).toBe(155);
     expect(
       fieldBytes(withoutReferral, 'deedStats') - fieldBytes(withoutMembership, 'deedStats'),
@@ -2389,7 +2391,109 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(
       counterfactualBytes - Buffer.byteLength(JSON.stringify(withoutDevMountRelease), 'utf8'),
     ).toBe(71);
-    const preReleaseCounterfactual = withoutBramblehideContent(withoutDevMountRelease);
+    // The Mirefen world boss (Balgath, the One-Eyed Foreman) and its quest
+    // chain: the one content mover on this branch. Attributed exactly the way
+    // withoutFieldKit, withoutBramblehideContent and withoutDevMountRelease
+    // above are, by cloning the settled state and removing only this feature's
+    // ids. It touches five top-level keys and nothing else, and each term is
+    // MEASURED, not inferred:
+    //   questsDone    +22  `"q_socketwrights_due",`, the Socketwright's Due
+    //                      quest that hands out the Shardpike.
+    //   raidLockouts  +42  `"worldboss:balgath_cyclops":<ms>,`, the world-boss
+    //                      lockout row the fixture arms for every shipped boss,
+    //                      beside the existing worldboss:thunzharr_waking_peak.
+    //   deeds         +58  cmb_balgath (27) and cmb_balgath_ten (31) as
+    //                      `"<id>":"2026-08-08",`.
+    //   deedStats    +181  the balgathKills counter the two deeds trigger on
+    //                      (22) plus the eight new item ids in the closed-world
+    //                      itemsDiscovered set (159).
+    //   reliquary    +369  seven firstFind rows (348) and the one
+    //                      conquerors_balgath illuminated page (21).
+    // skerrits_shardpike is the eighth discovered id but carries NO firstFind
+    // row: the quest tool is not a Reliquary relic, so it pays in
+    // itemsDiscovered only. Diffed against withoutDevMountRelease, like the
+    // Bramblehide block below, so none of the three release deltas can leak
+    // into another; the id sets are disjoint, so the order they compose in
+    // cannot change any term.
+    const BALGATH_ITEM_IDS = [
+      'barrowhide_pauldrons',
+      'fenwright_grips',
+      'foremans_barrowmaul',
+      'foremans_wage_band',
+      'loomshard_eye',
+      'mirelight_locket',
+      'mirestone_stride',
+      'skerrits_shardpike',
+      // The Mirefen muster rework's lent pike: `"muster_shardpike",` (19 bytes) in
+      // itemsDiscovered only, no firstFind row (a loan is not a relic).
+      'muster_shardpike',
+      // Balgath's loot: five trinkets and the Craterglass Stave, each with an
+      // itemsDiscovered id and a Reliquary firstFind row (115 + 295 bytes).
+      'knucklebone_of_balgath',
+      'muster_standard',
+      'guttered_eye',
+      'barrowstone_heart',
+      'muster_grapnel',
+      'craterglass_stave',
+    ] as const;
+    // The muster quest chain (content/mirefen_muster_quests.ts) and its drill deed.
+    const MUSTER_QUEST_IDS = ['q_muster_summons', 'q_muster_pike_drill', 'q_muster_trophy'];
+    function withoutBalgathContent(state: CharacterState): CharacterState {
+      const copy = JSON.parse(JSON.stringify(state)) as CharacterState;
+      const itemIds = new Set<string>(BALGATH_ITEM_IDS);
+      if (copy.deeds) {
+        delete copy.deeds['cmb_balgath'];
+        delete copy.deeds['cmb_balgath_ten'];
+        delete copy.deeds['cmb_point_taken'];
+      }
+      if (copy.deedStats?.counters) delete copy.deedStats.counters['balgathKills'];
+      if (copy.deedStats?.itemsDiscovered)
+        copy.deedStats.itemsDiscovered = copy.deedStats.itemsDiscovered.filter(
+          (id) => !itemIds.has(id),
+        );
+      if (copy.questsDone)
+        copy.questsDone = copy.questsDone.filter(
+          (id) => id !== 'q_socketwrights_due' && !MUSTER_QUEST_IDS.includes(id),
+        );
+      if (copy.raidLockouts) {
+        delete copy.raidLockouts['worldboss:balgath_cyclops'];
+        delete copy.raidLockouts['weeklyquest:q_muster_trophy'];
+      }
+      if (copy.reliquary) {
+        for (const id of BALGATH_ITEM_IDS) delete copy.reliquary.firstFind?.[id];
+        copy.reliquary.illuminatedPages = copy.reliquary.illuminatedPages?.filter(
+          (id) => id !== 'conquerors_balgath',
+        );
+      }
+      return copy;
+    }
+    const withoutBalgath = withoutBalgathContent(withoutDevMountRelease);
+    const balgathDelta = Object.fromEntries(
+      (['questsDone', 'raidLockouts', 'deeds', 'deedStats', 'reliquary'] as const).map((key) => [
+        key,
+        fieldBytes(withoutDevMountRelease, key) - fieldBytes(withoutBalgath, key),
+      ]),
+    );
+    // The muster quest chain adds MEASURED: questsDone +59 (its three quest ids) and deeds
+    // +31 (cmb_point_taken); its weekly is a kill credit that owns no item, so deedStats
+    // gains nothing from it, and the fixture's weekly lock is not armed, so raidLockouts
+    // is unchanged.
+    expect(balgathDelta).toEqual({
+      questsDone: 81,
+      raidLockouts: 42,
+      deeds: 89,
+      // deedStats 200 -> 315 and reliquary 369 -> 664 with Balgath's loot (six ids).
+      deedStats: 315,
+      reliquary: 664,
+    });
+    // The five keys above are the WHOLE delta: the whole-state diff matches
+    // their sum, so no other field moved with this feature.
+    expect(
+      Buffer.byteLength(JSON.stringify(withoutDevMountRelease), 'utf8') -
+        Buffer.byteLength(JSON.stringify(withoutBalgath), 'utf8'),
+    ).toBe(1191);
+    expect(Object.values(balgathDelta).reduce((sum, value) => sum + value, 0)).toBe(1191);
+    const preReleaseCounterfactual = withoutBramblehideContent(withoutBalgath);
     // The Bramblehide/Nythgap release content, attributed exactly against
     // f73615a511 (the last test-ledger commit, where the settled ceiling
     // measured 209,486): one deed (35 bytes), 28 deedStats.itemsDiscovered
@@ -2398,13 +2502,14 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // 1,548-byte total this merge's content brought in (current staged
     // measures 211,034, exactly 209,486 + 1,548). Every other professions
     // and non-professions field is byte-identical across the merge.
-    // Measured against withoutDevMountRelease, not withoutFieldKit: the two
-    // dev-mount ids isolated above must not leak into this delta, or the
-    // deedStats term would read 813 (742 + the 71 already attributed).
+    // Measured against withoutBalgath, not withoutFieldKit: the three dev-mount
+    // ids and the world-boss content isolated above must not leak into this
+    // delta, or the deedStats term would read 813 (742 + the 71 already
+    // attributed) and then more again with the world boss's own ids.
     const bramblehideDelta = Object.fromEntries(
       (['deeds', 'deedStats', 'reliquary'] as const).map((key) => [
         key,
-        fieldBytes(withoutDevMountRelease, key) - fieldBytes(preReleaseCounterfactual, key),
+        fieldBytes(withoutBalgath, key) - fieldBytes(preReleaseCounterfactual, key),
       ]),
     );
     expect(bramblehideDelta).toEqual({ deeds: 35, deedStats: 742, reliquary: 771 });
@@ -2440,6 +2545,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // Plus 13,496 for the Warfare Season 2 honor stock (139 item ids across the
     // maximal fixture's discovered-item and reliquary fields). MEASURED on the
     // release: the settled blob grew by exactly this much when the stock landed.
+    // Plus 1,209 for the Mirefen world-boss branch merged over release/v0.44.0 (799,
+    // then +410 with Balgath's loot): the five-key balgathDelta measured and summed above.
     expect(counterfactualBytes - 156144).toBe(
       Object.values(fixtureDelta).reduce((sum, value) => sum + value, 0) +
         183 +
@@ -2489,6 +2596,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // hoard gear reliquary.firstFind rows plus the conquerors_buried_hoards page
         // (+1,761), Blaine's itemization; MEASURED on the 2026-09-28 merged tree.
         4711 +
+        // Plus 1,191 for the Mirefen world-boss branch (balgathDelta above), at its
+        // release/v0.45.0 merge.
+        1191 +
         // Plus 5,019 at the choose-one leveling quest gear: its 245 item ids in
         // deedStats.itemsDiscovered (5,019 = the ids' characters plus 245 x 3 of
         // quoting and comma; greens carry no Reliquary pages). Predicted from the
@@ -2614,7 +2724,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // Season 2: exactly +13,496, the same 139 honor item ids.
     expect(
       counterfactualBytes,
-      'field_kit removed, must reproduce the current staged Crucible+hammer+Bramblehide+dev-mount baseline',
+      'field_kit removed, must reproduce the current staged Crucible+hammer+Bramblehide+dev-mount+Balgath baseline',
       // 211,370 -> 211,745 at the release/v0.43.0 merge into feature/world-quests:
       // plus the world-quest deeds and items (+375), which this baseline keeps.
       // 211,745 -> 212,103 at the wq-reputation merge (+358, the faction items).
@@ -2631,7 +2741,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 238,367 -> 240,055 at the quest blue rewards (+1,688, kept).
       // 240,055 -> 241,596 at the quest role fill (+1,541, kept).
       // Membership's eight discovered item ids remain here: +155 bytes (241,751).
-    ).toBe(241751);
+      // 241,751 -> 242,942 with the Mirefen world-boss branch on the v0.45.0
+      // integration (+1,191, the balgathDelta above: the boss content, Balgath's
+      // loot, and the muster weekly as a kill credit with no item of its own).
+    ).toBe(242942);
     const priorContent = withoutCrucibleContent(withoutReferral);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2750,8 +2863,13 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // fill, memberships and referral armour together): 241,885 bytes = 233,360 +
     // 5,019 + 1,688 + 1,541 + 155 + 122, each attributed above. Floor at
     // measurement minus 380, edge at measurement plus one: 241505..241886.
-    expect(bytes, reMint).toBeGreaterThan(241505);
-    expect(bytes, reMint).toBeLessThan(241886);
+    // RE-BASED at the v0.45.0 integration (the membership integration plus the
+    // Mirefen world-boss branch): 243,076 bytes = 241,885 + 1,191 (the
+    // balgathDelta attributed above); no container or ceiling changed shape.
+    // Floor at measurement minus 380, edge at measurement plus one:
+    // 242696..243077.
+    expect(bytes, reMint).toBeGreaterThan(242696);
+    expect(bytes, reMint).toBeLessThan(243077);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

@@ -26,6 +26,7 @@ import {
   isDelvePos,
   isRiftPos,
   isYumiMazePos,
+  MOBS,
   YUMI_MAZE_SLOT_COUNT,
   yumiMazeOrigin,
   ZONES,
@@ -68,6 +69,7 @@ import { ktx2RetainedSourceBytes } from './assets/ktx2_mip_release';
 import { formatResidencyBudget, residencyBudget } from './assets/residency_budget';
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
 import { createBackgroundGpuQueue, GPU_WORK_PRIORITY } from './background_gpu_queue';
+import { routeBalgathSpellfxAt } from './balgath_fx';
 import { attachBankerChestToNpcView } from './banker_chest';
 import type { BattlegroundView } from './battleground';
 import { BattlegroundFx } from './battleground_fx';
@@ -209,6 +211,7 @@ import { playerRangedAttackStartsAtLaunch } from './characters/skin_attack';
 import { CharacterVisualPool, characterVisualPoolKey } from './characters/visual_pool';
 import { shouldRetainPooledCharacterVisual } from './characters/visual_pool_policy';
 import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack_style_core';
+import { layoutChatBubbles } from './chat_bubble_layout';
 import {
   chosenCadenceHoldsQuality,
   chosenCadenceMissShare,
@@ -317,7 +320,7 @@ import {
 } from './environment_transition_core';
 import { EvilEyeMarkers } from './evil_eye_markers';
 import { enableAndWatchRendererExtensions } from './extension_drift_sentinel';
-import { advanceSelfFacing, releaseSelfFacing } from './facing_smooth';
+import { advanceSelfFacing, releaseSelfFacing, wrapAngle } from './facing_smooth';
 import {
   buildFarTerrain,
   FAR_VISTA_ENTRY_MAX_WAIT_MS,
@@ -568,6 +571,7 @@ import {
   syncPaladinSunVerdictVisual,
 } from './paladin_sun_verdict_visual';
 import { projectionScalePixels } from './perceptual_lod_core';
+import { buildPickOnlyObjectBody, isPickOnlyObjectTemplate } from './pick_only_objects';
 import { resolveDirectPickEntityId } from './pick_resolution';
 import { PlacedAssetsView } from './placed_assets';
 import { type PlayerAuraRingInput, PlayerAuraRings } from './player_aura_rings';
@@ -652,7 +656,6 @@ import {
   syncRaidEncounterRigVisuals,
 } from './raid_encounter_visuals';
 import { isOwnedPetHostile } from './reaction';
-import { buildRealmBuilderMonumentPickBody } from './realm_builder_monument_fx';
 import { buildRealmFlora, type RealmFloraView } from './realm_flora';
 import {
   RenderBudgetGovernor,
@@ -851,6 +854,7 @@ import { Weather } from './weather';
 import { precipForBiome } from './weather_field_core';
 import { createRendererWebGL, type WebGLPowerPreference } from './webgl_context_fallback';
 import { buildWorldAmbientSources, footstepSurfaceAt } from './world_audio';
+import { WorldBossLayer } from './world_boss_layer';
 import { WorldGuidance } from './world_guidance';
 import { syncWorldQuestCarryView, type WorldQuestCarryViewState } from './world_quest_carry_visual';
 import { surfaceDetailPrewarmTextures } from './worn_stone';
@@ -1900,6 +1904,7 @@ export class Renderer {
     range?: number,
   ) => void;
   private frozenOrbFx!: FrozenOrbFx;
+  private worldBoss!: WorldBossLayer; // Balgath's fx, far sprites, ward badges
   private mageGroundFx!: MageGroundFx;
   private varkhulForgestormVisuals?: VarkhulForgestormVisuals;
   private nythraxisMechanicVisuals?: NythraxisMechanicVisuals;
@@ -2905,6 +2910,13 @@ export class Renderer {
     // Frostglobe: the roaming ice-sphere visual, animated locally from the one
     // 'orb' release event (see src/render/frozen_orb_fx.ts).
     this.frozenOrbFx = new FrozenOrbFx(this.scene, (x, z) => groundHeight(x, z, this.sim.cfg.seed));
+    this.worldBoss = new WorldBossLayer(
+      this.scene,
+      this.groundSample,
+      this.camera,
+      (t) => this.addShake(t),
+      (x, z, y) => this.surfaceAt(x, z, y),
+    );
     this.glacialFrontVisual = new GlacialFrontVisual(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
@@ -4941,6 +4953,7 @@ export class Renderer {
     this.needleOfFateVfx.update(dt, this.reducedMotion());
     this.sentenceVfx.update(dt, this.reducedMotion());
     this.frozenOrbFx.update(dt);
+    this.worldBoss.fx.update(dt, this.reducedMotion(), this.sim.entities.values());
     this.mageGroundFx.syncWorldMeteorWarnings(this.sim);
     this.mageGroundFx.update(dt);
     this.varkhulForgestormVisuals?.syncWorld(this.sim);
@@ -7376,8 +7389,12 @@ export class Renderer {
         }
         break;
       }
+      case 'lanceBlind': // burst the reticle on the eye the thrust actually went through
+        this.views.get(ev.targetId)?.visual?.strikeEyeWardMarker();
+        break;
       case 'spellfxAt': {
         if (ev.fx === 'hoardDig') break;
+        if (routeBalgathSpellfxAt(ev, this.worldBoss?.fx, () => this.sim.entities.values())) break;
         if (ev.fx === 'soulTravel') {
           if (ev.targetId !== undefined) {
             const gy = groundHeight(ev.x, ev.z, this.sim.cfg.seed);
@@ -7894,9 +7911,9 @@ export class Renderer {
       body = built.group;
       height = built.height;
       objectMesh = body;
-    } else if (e.kind === 'object' && e.templateId === 'realm_builder_monument') {
-      // Art lives in the town view: this entity is a pick volume only.
-      const built = buildRealmBuilderMonumentPickBody();
+    } else if (e.kind === 'object' && isPickOnlyObjectTemplate(e.templateId)) {
+      // Art lives in a scenery view (town, muster camp): a pick volume only.
+      const built = buildPickOnlyObjectBody(e.templateId ?? '');
       body = built.group;
       height = built.height;
       objectMesh = body;
@@ -9854,6 +9871,7 @@ export class Renderer {
     // Contact blobs are refilled from scratch inside the loop below (null on
     // every tier that casts real shadows).
     this.blobShadows?.begin();
+    this.worldBoss.beginViews();
 
     for (const [id, v] of this.views) {
       const e = sim.entities.get(id);
@@ -9880,6 +9898,7 @@ export class Renderer {
         continue;
       }
       this.syncDrainChannelVisual(id, e);
+      this.worldBoss.markView(this.sim, p.pos, e, v.visual, dt, this.reducedMotion());
       // form swaps (polymorph sheep, druid forms), computed up front because
       // the shadow gates below must not run the base rig's proxy under a form.
       // One pass over the aura list instead of repeated .some() scans per entity per
@@ -10614,7 +10633,8 @@ export class Renderer {
         !e.dead && feetDepth >= floorSampleDepth
           ? wl - groundHeight(ax, az, this.sim.cfg.seed)
           : Number.NEGATIVE_INFINITY;
-      const swimming = isSwimmingAtDepth(v.wasSwimming, e.dead, feetDepth, floorDepth);
+      const wadeDepth = e.kind === 'mob' ? MOBS[e.templateId]?.wadeDepth : undefined;
+      const swimming = isSwimmingAtDepth(v.wasSwimming, e.dead, feetDepth, floorDepth, wadeDepth);
       // ...and the band under it, where the feet are wet but the ground is
       // still doing the work. Read off the SAME displayed depth as the swim
       // latch, so a body crossing a shoreline can never be both at once.
@@ -10800,6 +10820,7 @@ export class Renderer {
       st.reverseBackpedal = ghostWolf;
       st.dead = visuallyDead;
       st.casting = characterCasting;
+      st.asleep = e.asleep === true; // in bed (mob/slumber.ts): the sleep loop holds
       // Which ability, so the pose layer can tell a drawn shot from a pet
       // utility cast (tame_beast is a 6s cast; a bow must not sit aimed for it).
       st.castingAbility = characterCasting ? (e.castingAbility ?? null) : null;
@@ -11166,8 +11187,7 @@ export class Renderer {
         mountShown && !v.mountCompilePending && runCharacterPresentation ? this.vfx : null,
       );
 
-      const emoteId =
-        e.kind === 'player' && e.overheadEmoteId && !e.dead ? e.overheadEmoteId : null;
+      const emoteId = e.kind !== 'npc' && e.overheadEmoteId && !e.dead ? e.overheadEmoteId : null;
       const emoteKey = emoteId ? `${emoteId}:${e.overheadEmoteSeq}` : null;
       if (emoteKey !== v.lastOverheadEmoteKey) {
         const canPlayEmote =
@@ -11264,6 +11284,7 @@ export class Renderer {
       // stays in scene: three culls its colour draw on the padded sphere.
       if (!charOnScreen && (cullBits & CHARACTER_CULL_CASTS) === 0) v.group.visible = false;
     }
+    this.worldBoss.endViews();
     this.lastVisibleRigCount = visibleRigCount;
     this.blobShadows?.commit();
     this.drainWeaponSkinApplies();
@@ -11509,6 +11530,16 @@ export class Renderer {
     this.needleOfFateVfx.update(dt, this.reducedMotion());
     this.sentenceVfx.update(dt, this.reducedMotion());
     this.frozenOrbFx.update(dt);
+    this.worldBoss.fx.update(dt, this.reducedMotion(), this.sim.entities.values());
+    this.worldBoss.syncImpostors(
+      this.webgl,
+      this.sim.entities.values(),
+      p.pos,
+      this.views,
+      this.lowGfx ? NEUTRAL_DAY_GRADE : this.dnGrade,
+      now,
+      alpha,
+    );
     this.mageGroundFx.syncWorldMeteorWarnings(this.sim);
     this.mageGroundFx.update(dt);
     this.varkhulForgestormVisuals?.syncWorld(this.sim);
@@ -12043,6 +12074,7 @@ export class Renderer {
     this.nythraxisMechanicVisuals?.dispose();
     this.riftDeathZoneVisuals?.dispose();
     this.blobShadows?.dispose();
+    this.worldBoss.dispose();
   }
 
   /**
@@ -12394,41 +12426,7 @@ export class Renderer {
 
   private updateChatBubbles(): void {
     updateForgeSpeech(this.sim, this);
-    if (this.chatBubbles.size === 0) return;
-    const { width: w, height: h } = this.viewport;
-    const now = performance.now();
-    for (const [id, b] of this.chatBubbles) {
-      const e = this.sim.entities.get(id);
-      const v = e ? this.views.get(id) : undefined;
-      if (now >= b.until) {
-        b.el.remove();
-        this.chatBubbles.delete(id);
-        continue;
-      }
-      if (!e || !v) {
-        b.el.style.display = 'none';
-        continue;
-      }
-      // culled rigs (beyond ENTITY_DRAW_RANGE) stop updating group.position,
-      // so a yell from 80 to 100u away would hang frozen over empty terrain:
-      // fall back to the live entity position when the rig isn't being drawn
-      if (v.group.visible) this.tmpV.copy(v.group.position);
-      else this.tmpV.set(e.pos.x, e.pos.y, e.pos.z);
-      this.tmpV.y += (v.height + v.mountLift) * e.scale + 1.0;
-      if (!isProjectedNameplateAnchorVisible(this.camera, this.tmpV, this.tmpV2)) {
-        b.el.style.display = 'none';
-        continue;
-      }
-      this.tmpV.project(this.camera);
-      if (this.tmpV.z < -1 || this.tmpV.z > 1) {
-        b.el.style.display = 'none';
-        continue;
-      }
-      b.el.style.display = '';
-      const sx = (this.tmpV.x * 0.5 + 0.5) * w;
-      const sy = (-this.tmpV.y * 0.5 + 0.5) * h;
-      b.el.style.transform = nameplateScreenTransform(sx, sy);
-    }
+    layoutChatBubbles(this.chatBubbles, this.sim.entities, this.views, this.camera, this.viewport);
   }
 
   // Click-to-move (#95): where a screen click meets the ground. Intersects a

@@ -51,9 +51,10 @@ const damageBy = (events: SimEvent[], ability: string) =>
   events.filter((ev) => ev.type === 'damage' && ev.ability === ability);
 
 describe('the trinket catalog', () => {
-  it('ships eighteen trinkets, each with one attribute and a use', () => {
+  it('ships twenty-three trinkets, each with one attribute and a use', () => {
     const ids = Object.keys(TRINKET_ITEMS);
-    expect(ids).toHaveLength(18);
+    // The eighteen of the trinket slot plus Balgath's five (content/trinkets.ts).
+    expect(ids).toHaveLength(23);
     for (const id of ids) {
       const item = TRINKET_ITEMS[id];
       expect(item.slot).toBe('trinket');

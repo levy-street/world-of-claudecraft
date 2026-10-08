@@ -38,6 +38,9 @@ export function buildRealmSimConfig(
     // because this module is where that literal now lives.
     compulsoryTutorial: true,
     worldBossAtBoot: true,
+    // The Mirefen muster (squads, command camp, weapon rack) stands from boot, whether
+    // or not Balgath is up (src/sim/mirefen_muster.ts).
+    mirefenMuster: true,
     // Ranked rift portals spawn on the live realm (dev/test worlds opt in).
     riftPortals: true,
     // Distance-cull idle-mob AI (issue #2703): shouldSkipIdleMobTick skips a
@@ -58,6 +61,10 @@ export function buildRealmSimConfig(
     // pulled someone.
     idleMobTickRadius: PLAYER_INTEREST_DROP_RADIUS,
     lockoutNowMs: () => Date.now(),
+    // The day/night cycle the clients draw is UTC-anchored (src/sim/day_night.ts), so
+    // the realm hands the sim the same clock: the boss who sleeps at night lies down
+    // under the very sky every player sees darken, with no wire traffic to agree on it.
+    dayNightNowMs: () => Date.now(),
     // Raid lockouts end at the next 3 AM (the classic daily reset) in this realm's civil
     // time zone, so the whole realm shares one predictable reset (via REALM_RESET_TZ).
     raidResetMs: (nowMs) => nextRaidResetMs(nowMs, REALM_RESET_TIME_ZONE),

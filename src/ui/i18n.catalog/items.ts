@@ -2465,6 +2465,16 @@ const ITEM_ENTITY_IDS = [
   'marshlight_hauberk',
   'duskthorn_mantle',
   'fenshadow_maul',
+  // Mirefen world-boss spoils.
+  'foremans_barrowmaul',
+  'skerrits_shardpike',
+  'loomshard_eye',
+  'barrowhide_pauldrons',
+  'mirestone_stride',
+  // The Foreman's Wage: the world boss's level-gated personal drops for the locals.
+  'foremans_wage_band',
+  'mirelight_locket',
+  'fenwright_grips',
   'wildgrove_cinch',
   'cragward_pauldrons',
   'cragthorn_greatstaff',
@@ -3793,6 +3803,15 @@ const ITEM_ENTITY_IDS = [
   'saltwrack_shoulderguards',
   'saltwrack_pauldrons',
   'saltwrack_epaulets',
+  // The Mirefen muster's lent Shardpike (src/sim/muster_pike.ts).
+  'muster_shardpike',
+  // Balgath's trinkets (src/sim/content/trinkets.ts) and his caster staff.
+  'knucklebone_of_balgath',
+  'muster_standard',
+  'guttered_eye',
+  'barrowstone_heart',
+  'muster_grapnel',
+  'craterglass_stave',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -3802,6 +3821,17 @@ type ItemEntityTranslation = { name: string };
 type ItemEntityTranslations = Record<ItemEntityId, ItemEntityTranslation>;
 
 const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
+  // Mirefen world-boss spoils.
+  foremans_barrowmaul: "Foreman's Barrowmaul",
+  // The quest tool the world boss's level-spread mechanic runs on, not a spoil.
+  skerrits_shardpike: "Skerrit's Shardpike",
+  loomshard_eye: 'The Barrowglass Eye',
+  barrowhide_pauldrons: 'Barrowhide Pauldrons',
+  mirestone_stride: 'Mirestone Stride',
+  // The Foreman's Wage (level-gated personal drops for the locals).
+  foremans_wage_band: "Foreman's Wage Band",
+  mirelight_locket: 'Mirelight Locket',
+  fenwright_grips: 'Fenwright Grips',
   rimefang: 'Rimefang',
   marrowpoint: 'Marrowpoint',
   duskwhisper: 'Duskwhisper',
@@ -5124,6 +5154,13 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   saltwrack_shoulderguards: 'Saltwrack Shoulderguards',
   saltwrack_pauldrons: 'Saltwrack Pauldrons',
   saltwrack_epaulets: 'Saltwrack Epaulets',
+  muster_shardpike: 'Muster Shardpike',
+  knucklebone_of_balgath: 'Knucklebone of Balgath',
+  muster_standard: 'Muster Standard',
+  guttered_eye: 'The Guttered Eye',
+  barrowstone_heart: 'Barrowstone Heart',
+  muster_grapnel: 'Muster Grapnel',
+  craterglass_stave: 'Craterglass Stave',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

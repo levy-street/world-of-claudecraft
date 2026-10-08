@@ -156,6 +156,7 @@ import {
 } from './content/ignivar_raid_lore';
 import { MAGE_PET_MOBS } from './content/mage_pets';
 import { MAILBOXES } from './content/mailboxes';
+import { MUSTER_COMMANDER_NPC, MUSTER_MOBS } from './content/mirefen_muster';
 import { NECROMANCY_MOBS } from './content/necromancy';
 import {
   NIGHTBLOOM_CAMPS,
@@ -441,6 +442,7 @@ export { aggregateSetBonuses, ITEM_SETS } from './content/item_sets';
 export const MOBS: Record<string, MobTemplate> = {
   ...ZONE1_MOBS,
   ...ZONE2_MOBS,
+  ...MUSTER_MOBS,
   [INVESTIGATION_MOB.id]: INVESTIGATION_MOB,
   ...ZONE3_MOBS,
   ...PRACTICE_DUMMY_MOBS,
@@ -481,6 +483,7 @@ Object.assign(ITEMS, buildHeroicVariants(ITEMS, MOBS));
 export const NPCS: Record<string, NpcDef> = {
   ...ZONE1_NPCS,
   ...ZONE2_NPCS,
+  [MUSTER_COMMANDER_NPC.id]: MUSTER_COMMANDER_NPC,
   ...ZONE3_NPCS,
   ...TEMPLE_NPCS,
   [FURY_NPC.id]: FURY_NPC,

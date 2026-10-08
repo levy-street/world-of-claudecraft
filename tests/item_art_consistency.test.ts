@@ -854,7 +854,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // The Emissary's Cache chest: 1,322. The Clue Scroll items (clue_scroll,
     // treasure_casket): 1,323. The faction ladder rework's 17 new rows
     // (13 periphery pieces + 4 formulas): 1,340. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,341. the trinket slot's 18 trinkets (PR 4173): 1,359. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s 139 honor items: 1,498.
-    expect(Object.keys(ITEMS)).toHaveLength(2028);
+    // Plus the Mirefen world-boss branch (15 items) on the v0.45.0 integration: 2043.
+    expect(Object.keys(ITEMS)).toHaveLength(2043);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -1027,9 +1028,12 @@ describe('item-art consistency accepted-art provenance', () => {
     // + the 75 quest role-fill paintings (quest-role-fill-icons-2026-10-07): 1,860 owners over
     // 2,013 items.
     // Both on the membership integration: 1,875 owners over 2,028 items.
-    expect(new Set(currentOwnerIds).size).toBe(1875);
-    expect(shippingIds).toHaveLength(1875);
-    expect(Object.keys(ITEMS)).toHaveLength(2028);
+    // Plus the Mirefen world-boss branch (nine items: the boss spoils, both Shardpikes and the
+    // Wage rares) and Balgath's loot (five trinkets and the Craterglass Stave) on the v0.45.0
+    // integration: 1,890 owners over 2,043 items.
+    expect(new Set(currentOwnerIds).size).toBe(1890);
+    expect(shippingIds).toHaveLength(1890);
+    expect(Object.keys(ITEMS)).toHaveLength(2043);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1224,7 +1228,10 @@ describe('item-art consistency accepted-art provenance', () => {
       expect(sha256(bytes), asset.id).toBe(asset.acceptedSha256);
     }
     // The OSSBrain PR #3781 reconcile's two reins owners are additive beyond
-    // this whole historical chain too, the same way the Field Kit is.
+    // this whole historical chain too, the same way the Field Kit is, and so
+    // are the Mirefen world boss's eight spoils: their three batches
+    // (balgath-boss-icons-2026-08-18, shardpike-mechanic-icons-2026-08-20,
+    // foremans-wage-icons-2026-08-25) all postdate this dated verdict.
     expect(
       sorted([
         ...oldPassIds,
@@ -1251,6 +1258,23 @@ describe('item-art consistency accepted-art provenance', () => {
         'vanguard_oath_blade',
         'vanguard_fang_dagger',
         'vanguard_warstaff',
+        'foremans_barrowmaul',
+        'loomshard_eye',
+        'barrowhide_pauldrons',
+        'mirestone_stride',
+        'skerrits_shardpike',
+        'foremans_wage_band',
+        'mirelight_locket',
+        'fenwright_grips',
+        // The Mirefen muster rework's lent pike (muster-shardpike-icon-2026-09-26).
+        'muster_shardpike',
+        // Balgath's loot (balgath-loot-icons-2026-09-28).
+        'knucklebone_of_balgath',
+        'muster_standard',
+        'guttered_eye',
+        'barrowstone_heart',
+        'muster_grapnel',
+        'craterglass_stave',
       ]),
     ).toEqual(sorted(currentOwnerIds));
 
@@ -1422,8 +1446,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // quest gear batch (quest-leveling-gear-icons-2026-10-06) joins at 42, and its
     // rares (quest-blue-rewards-icons-2026-10-07) at 43, the role fill
     // (quest-role-fill-icons-2026-10-07) at 44; the membership and referral
-    // batches (PR 4281) bring it to 46.
-    expect(mapping.generatedBatches).toHaveLength(46);
+    // batches (PR 4281) bring it to 46. The Mirefen world-boss branch's five batches
+    // (balgath-boss, shardpike-mechanic, foremans-wage, muster-shardpike, balgath-loot)
+    // bring it to 51 on the v0.45.0 integration.
+    expect(mapping.generatedBatches).toHaveLength(51);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1496,14 +1522,15 @@ describe('item-art consistency accepted-art provenance', () => {
     // leveling quest armor batch (quest-leveling-gear-icons-2026-10-06) adds 245:
     // 1179. Its rares (quest-blue-rewards-icons-2026-10-07) add 76: 1255. The
     // role fill (quest-role-fill-icons-2026-10-07) adds 75: 1330. Membership adds 8
-    // and referral armour 7: 1345.
-    expect(priorGeneratedIds).toHaveLength(1345);
+    // and referral armour 7: 1345. The Mirefen world-boss branch's 15 batch ids: 1360.
+    expect(priorGeneratedIds).toHaveLength(1360);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1875);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1875);
+    // Plus the Mirefen world-boss branch (15 items) on the v0.45.0 integration: 1890.
+    expect(allCurrentOwnerIds).toHaveLength(1890);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1890);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1521,7 +1548,8 @@ describe('item-art consistency accepted-art provenance', () => {
       // + the 76 quest blue reward rares = 1255.
       // + the 75 quest role-fill paintings = 1330.
       // + 8 membership paintings + 7 referral paintings = 1345.
-      priorGenerated: 1345,
+      // + the Mirefen world-boss branch's 15 = 1360.
+      priorGenerated: 1360,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1550,6 +1578,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // chain too (like the Field Kit): neither the dated Masterwrought verdict
     // nor the Nythraxis/Bramblehide release batches know about them, so they
     // join the same way the Field Kit does, bringing the total to 1,283.
+    // The Mirefen world-boss forward-port's eight spoils are additive beyond
+    // the whole chain in exactly the same way (their three batches postdate
+    // every record above, which is why the frozen 2026-08-09 campaign record
+    // does not carry them), bringing the total to 1,291.
     const datedMasterwroughtVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const releaseBatchIdsForCatalog = mapping.generatedBatches
       .filter(
@@ -1620,8 +1652,26 @@ describe('item-art consistency accepted-art provenance', () => {
         'vanguard_oath_blade',
         'vanguard_fang_dagger',
         'vanguard_warstaff',
+        // The Mirefen world boss's own batches (boss spoils, Shardpike, Foreman's Wage,
+        // muster pike).
+        'foremans_barrowmaul',
+        'loomshard_eye',
+        'barrowhide_pauldrons',
+        'mirestone_stride',
+        'skerrits_shardpike',
+        'foremans_wage_band',
+        'mirelight_locket',
+        'fenwright_grips',
+        'muster_shardpike',
+        // Balgath's loot (balgath-loot-icons-2026-09-28).
+        'knucklebone_of_balgath',
+        'muster_standard',
+        'guttered_eye',
+        'barrowstone_heart',
+        'muster_grapnel',
+        'craterglass_stave',
       ]),
-      'the dated catalog plus the release batches, the world-quest, faction-vendor, faction-ladder and clue-scroll batches, the Field Kit, the OSSBrain reins icons and the Emissary Cache and the trinket icons is the full current catalog',
+      'the dated catalog plus the release batches, the Field Kit, the OSSBrain reins icons, and the Mirefen world-boss spoils is the full current catalog',
     ).toEqual(sorted(allCurrentOwnerIds));
     expect(batch?.provenanceRecords).toEqual([
       `${evidenceDir}/accepted-art.json`,
@@ -1747,16 +1797,17 @@ describe('item-art consistency accepted-art provenance', () => {
     for (const id of ownerIds) ownerCountById.set(id, (ownerCountById.get(id) ?? 0) + 1);
 
     const violations: string[] = [];
-    // Matches the mapping-owner sum above: 43 entries + 755 prior-generated
+    // Matches the mapping-owner sum above: 43 entries + 763 prior-generated
     // batch ids + 274 historical-audit batch ids + 165 Masterwrought-completion
     // batch ids + 46 Crucible-professions batch ids = 1283.
     // Plus the world-quest branch's four quest-item owners at the release/v0.43.0
     // merge = 1302. Plus the weekly emissary's cache chest = 1303. Plus the two
     // Clue Scroll owners = 1305. Plus the 17 faction ladder owners
     // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464. Plus the 245 choose-one leveling quest armor paintings (quest-leveling-gear-icons-2026-10-06) = 1709. Plus the 76 quest blue reward rares (quest-blue-rewards-icons-2026-10-07) = 1785. Plus the 75 quest role-fill paintings (quest-role-fill-icons-2026-10-07) = 1860. Plus the 8 membership paintings and the 7 referral paintings = 1875.
-    if (ownerIds.length !== 1875)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1875`);
-    if (fileIds.length !== 1875) violations.push(`shipping WebP count: ${fileIds.length} != 1875`);
+    // Plus the Mirefen world-boss branch and Balgath's loot (15 items) = 1890.
+    if (ownerIds.length !== 1890)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1890`);
+    if (fileIds.length !== 1890) violations.push(`shipping WebP count: ${fileIds.length} != 1890`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

@@ -14,6 +14,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { objectDisplayName } from '../src/render/entity_labels';
+import { isPickOnlyObjectTemplate } from '../src/render/pick_only_objects';
 import { colliderInternalsForTest } from '../src/sim/colliders';
 import {
   currentRealmBuilder,
@@ -198,13 +199,13 @@ describe('the Realm Builder monument as a static world service', () => {
     ]);
   });
 
-  it("pins the renderer arm's template-id literal to the constant", () => {
-    // renderer.ts matches on the LITERAL, exactly like the noticeboard arm
-    // beside it, so that importing the constant does not expand a one-line
-    // import into six and push the file over its monolith ceiling. That trade
-    // is only safe while the literal and the constant agree, so pin them.
+  it('routes the monument through the pick-only registry, keyed on the constant', () => {
+    // renderer.ts no longer matches a literal: its one pick-only arm asks
+    // src/render/pick_only_objects.ts, whose table is keyed on this constant, so
+    // the id the sim spawns and the id the renderer recognises cannot drift.
     const source = readFileSync(path.join(__dirname, '..', 'src/render/renderer.ts'), 'utf8');
-    expect(source).toContain(`e.templateId === '${REALM_BUILDER_MONUMENT_TEMPLATE_ID}'`);
+    expect(source).toContain('isPickOnlyObjectTemplate(e.templateId)');
+    expect(isPickOnlyObjectTemplate(REALM_BUILDER_MONUMENT_TEMPLATE_ID)).toBe(true);
   });
 
   it('spawns on the reserved id without touching the allocator or the rng', () => {

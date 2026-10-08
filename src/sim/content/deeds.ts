@@ -2866,10 +2866,11 @@ export const DEEDS: Record<string, DeedDef> = {
   // tests/deeds_content.test.ts): the capstone is a dynamic meta over a
   // growing catalog, the feat_book_complete class, and the flag is what
   // keeps it OUT of BOOK_COMPLETE_REQUIREMENTS. Two catalog slots are
-  // owner-pended today (reins_drakemaw_raptor, reins_terrorspark_groundshaker;
+  // owner-pended today (reins_lanternback_troll, reins_terrorspark_groundshaker;
   // masterwork:engineering was the third until masterwrought Phase 11o's
-  // stats-bearing copperlens_ocular made the mark earnable, 2026-08-25), so
-  // a non-feat capstone would dead-end
+  // stats-bearing copperlens_ocular made the mark earnable, 2026-08-25, and
+  // reins_drakemaw_raptor left the list when the Mirefen world boss took it),
+  // so a non-feat capstone would dead-end
   // The Whole Book for every player (the retroFallbackGrants stranded-heal
   // doctrine names exactly that failure). It stays on the Collection shelf
   // beside its ladder; grant, marquee, and feed behavior are unaffected.
@@ -3596,6 +3597,35 @@ export const DEEDS: Record<string, DeedDef> = {
         'ferry:drakelands_wickharbor',
       ],
     },
+  },
+  // Appended, never inserted: DEED_ORDER is derived from this object's key order and its
+  // indices are pinned by tests/deeds_content.test.ts, so adding a deed anywhere but the
+  // end silently re-points every later one.
+  cmb_balgath: {
+    id: 'cmb_balgath',
+    name: 'Foreman No More',
+    desc: 'Put the Buried Foreman back in his barrow.',
+    category: 'combat',
+    renown: 10,
+    trigger: { kind: 'stat', stat: 'balgathKills', count: 1 },
+  },
+  cmb_balgath_ten: {
+    id: 'cmb_balgath_ten',
+    name: 'The Mound Keeps Nothing',
+    desc: 'Bring down the Buried Foreman ten times.',
+    category: 'combat',
+    renown: 10,
+    trigger: { kind: 'stat', stat: 'balgathKills', count: 10 },
+  },
+  // The muster's pike drill (content/mirefen_muster_quests.ts): the lesson that makes a
+  // level 6 useful at the Foreman's pull. Routine Renown, earned by finishing the drill.
+  cmb_point_taken: {
+    id: 'cmb_point_taken',
+    name: 'Point Taken',
+    desc: "Put out the Straw Foreman's lantern at the muster's drill yard and make its planks count.",
+    category: 'combat',
+    renown: 5,
+    trigger: { kind: 'quest', questId: 'q_muster_pike_drill' },
   },
 };
 

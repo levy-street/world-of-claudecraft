@@ -240,3 +240,34 @@ describe('Wildfang kit pass 2 display literals (naming check in docs/design/drui
     expect(en.entities.abilities.hamstring_bite.name).toBe('Takedown');
   });
 });
+
+describe('Balgath eye-crystal rename (Loomshard is a coined word from another game)', () => {
+  it('pins the Barrowglass literals on every English layer', () => {
+    // The ids are frozen; only the display text moved.
+    expect(ITEMS.loomshard_eye.name).toBe('The Barrowglass Eye');
+    expect(en.entities.items.loomshard_eye.name).toBe('The Barrowglass Eye');
+    expect(en.hudChrome.shardpike.thrustLabel).toBe('Barrowglass Thrust');
+    expect(DICT.en['log.lanceBlinded']).toBe(
+      'Your thrust finds the Barrowglass. The Barrowhide sloughs away!',
+    );
+    expect(QUESTS.q_socketwrights_due.text).toContain('I set the Barrowglass in that socket');
+    expect(QUESTS.q_muster_summons.completionText).toContain('through the Barrowglass blinds');
+  });
+
+  it('leaves no Loomshard in any shipped player-facing English source', () => {
+    const roots = ['../src/sim/content', '../src/ui/i18n.catalog'].map((rel) =>
+      fileURLToPath(new URL(rel, import.meta.url)),
+    );
+    let scanned = 0;
+    for (const root of roots) {
+      for (const { file, full } of tsFilesUnder(root)) {
+        scanned++;
+        const source = readFileSync(full, 'utf8');
+        // Comments may name the old word to explain the rename; the code may not.
+        const code = source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+        expect(code, file).not.toMatch(/Loomshard/);
+      }
+    }
+    expect(scanned).toBeGreaterThan(50);
+  });
+});

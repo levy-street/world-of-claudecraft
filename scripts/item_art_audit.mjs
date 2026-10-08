@@ -156,8 +156,11 @@ const build = await buildItemArtAudit({
     // 1860 / 1878 on 39 sheet pages, measured the same way.
     // Both on the membership integration: 1875 / 1893 on 40 sheet pages, measured
     // the same way.
-    catalogCount: 1875,
-    liveItemCount: 1893,
+    // + the Mirefen world-boss branch's fifteen items (balgath-boss, shardpike-mechanic,
+    // foremans-wage, muster-shardpike and balgath-loot batches) on the v0.45.0
+    // integration: 1890 / 1908.
+    catalogCount: 1890,
+    liveItemCount: 1908,
     pendingArtCount: 135,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,

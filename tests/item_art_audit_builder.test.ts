@@ -873,11 +873,13 @@ describe('item-art audit builder', () => {
       // 1860 / 1878 with the 75 quest role-fill paintings (quest-role-fill-icons-2026-10-07),
       // re-measured the same way.
       // 1875 / 1893 with both on the membership integration, re-measured.
-      catalogSha256: '613614d391b80492a0a4e1ac49e0d05f29c32810b45af5ded813554d2c3fd7eb',
-      catalogBytes: 1022344,
+      // 1890 / 1908 with the Mirefen world-boss branch's fifteen items on the v0.45.0
+      // integration, re-measured.
+      catalogSha256: 'bc13db0ae26a9ba2d749b19e27e4fd026d09bf7d4203ac25abdf07322cdb91cc',
+      catalogBytes: 1030216,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1875,
-      liveItemCount: 1893,
+      catalogCount: 1890,
+      liveItemCount: 1908,
       generatedHeroicDefinitions: 78,
       heroicDefinitionsWithOwnWebp: 59,
       heroicWeaponArtAliases: 19,
@@ -895,7 +897,7 @@ describe('item-art audit builder', () => {
         identity: 40,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: 'bc7c2c65694e373ace38f20fcaecf1c71d709cb8e33dd67f2506c954081d7be4',
+      shippingCatalogSha256: '822e58ae7d8874f57e4507020a8bcc9267e076dae9e955f8bd03ae540f254628',
       machineChecksPassed: true,
       verdict: null,
     });

@@ -1835,6 +1835,43 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.interfacePage.framePetTitle': 'ペット',
   'guide.interfacePage.winBagsTitle': 'バッグ（B）',
   'guide.riftsPage.rankFmt': 'ランク{rank}',
+  'hudChrome.shardpike.braceLabel': 'シャードパイクを構える',
+  'hudChrome.shardpike.braceTooltip':
+    '石突きを地面に突き立て、穂先を上げる。横移動キーがバランス棒だ：ビームは自然に流れ、彼が地面を叩くたびに弾かれる。両端に触れさせず {set} 秒保てば穂先が定まる。固い地面が必要で、騎乗中は不可。',
+  'hudChrome.shardpike.thrustLabel': 'バロウグラス・スラスト',
+  'hudChrome.shardpike.thrustTooltip':
+    '定まった穂先を眼に突き入れ、{damage} のダメージを与える。レベルも攻撃力もパイク自体も、何一つこの値を伸ばさない。番人を盲目にしバロウハイドを剥ぎ取るので、湿地の他のあらゆる武器がようやく通るようになる。定まったパイクだけが放てる一撃で、射程 {reach} ヤード、猶予は {seconds} 秒。',
+  'hudChrome.shardpike.releaseLabel': 'シャードパイクを下ろす',
+  'hudChrome.shardpike.releaseTooltip':
+    'パイクを収める。降りるのに罰則はない：失うのは構えだけで機会そのものではなく、{rest} 秒後に再び構えられる。',
+  'hudChrome.shardpike.whyResting': 'パイクを下ろしたばかりだ。アイコンの残り時間を待て。',
+  'hudChrome.shardpike.whyAlreadyCouched': 'パイクはすでに構えている。構え直す前に下ろせ。',
+  'hudChrome.shardpike.whyNotSet': '穂先が定まっていない。まず構えて支えろ。',
+  'hudChrome.shardpike.whyNothingCouched': '下ろすものがない：パイクを構えていない。',
+  'hudChrome.shardpike.beamLabel': 'シャードパイクの均衡',
+  'hudChrome.shardpike.beamStatus': 'パイクの均衡 {balance}、定着 {set} パーセント。',
+  'hudChrome.shardpike.beamDanger': 'パイクの均衡 {balance}、取り落としかけている。',
+  'hudChrome.shardpike.promptHoldSteady': '横移動キーでパイクを支えろ',
+  'hudChrome.shardpike.promptCatchIt': '立て直せ、パイクが倒れる',
+  'hudChrome.shardpike.promptEyeOut': '眼が潰れた、残り {seconds} 秒：全力で叩き込め',
+  'hudChrome.shardpike.promptSealed': '眼は閉じている。{seconds} 秒後に再び開く',
+  'hudChrome.shardpike.promptResetting': 'パイクを構え直している、{seconds} 秒',
+  'hudChrome.shardpike.promptCloser': '番人に近づけ、あと {yards} ヤード',
+  'hudChrome.shardpike.promptBrace': 'シャードパイクを構え、そのまま支えろ',
+  'hudChrome.shardpike.promptFindBoss': 'スケリットのシャードパイク：これで番人の眼を潰せ',
+  'hudChrome.shardpike.leanRightKey': '右に傾ける（{key}）',
+  'hudChrome.shardpike.leanLeftKey': '左に傾ける（{key}）',
+  'hudChrome.shardpike.leanRight': '右に傾ける',
+  'hudChrome.shardpike.leanLeft': '左に傾ける',
+  'hudChrome.shardpike.promptHoldSteadyLean': 'パイクを支えろ：{left}と{right}で傾けろ',
+  'hudChrome.shardpike.promptFindBossMuster': '召集兵団のシャードパイク：これで監督の眼を潰せ',
+  'hudChrome.shardpike.promptTakePike': '{key}を押すか武器棚をクリックして、シャードパイクを取れ',
+  'hudChrome.shardpike.promptTakePikeClick': '武器棚をクリックしてシャードパイクを取れ',
+  'hudChrome.shardpike.promptTakePikeTap': '武器棚をタップしてシャードパイクを取れ',
+  'hudChrome.shardpike.promptPikeLevelCap': '召集軍が槍を貸すのはレベル {level} 以下の新兵だけです',
+  'hudChrome.shardpike.braceTooltipLean':
+    '石突きを地面に据え、穂先を掲げる。横移動キーか旋回キー、またはバーの上の二つのキーを押し続けて傾けろ。バーはひとりでに揺れ、彼の一撃ごとに弾かれる。{set}秒間端に触れさせなければパイクが据わる。固い地面が必要で、騎乗中は使えない。',
+  'hudChrome.shardpike.promptLabel': 'シャードパイクの指示',
   'hudChrome.comboMeter.label': 'CP',
   'hudChrome.bg.clock': '{minutes}:{seconds}',
   'hudChrome.controller.zoomIn': 'ズームイン',
@@ -2612,6 +2649,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.steamWishlist': 'ウィッシュリストの通知',
   'hudChrome.interfaceUnlock.frameNames.minimap': 'ミニマップ',
   'hudChrome.interfaceUnlock.frameNames.stanceBar': 'スタンスバー',
+  'hudChrome.interfaceUnlock.frameNames.shardpikeBar': 'シャードパイクバー',
   'hudChrome.interfaceUnlock.frameNames.playerFrame': 'プレイヤー',
   'hudChrome.interfaceUnlock.frameNames.targetFrame': 'ターゲット',
   'hudChrome.interfaceUnlock.frameNames.partyFrames': 'パーティ',
@@ -6915,6 +6953,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'トロルの塚',
   'entities.zones.mirefen_marsh.pois.6.label': 'グレイブコーラーの野営地',
   'entities.zones.mirefen_marsh.pois.7.label': '沈んだ砦',
+  'entities.zones.mirefen_marsh.pois.8.label': '塚山の領域',
+  'entities.zones.mirefen_marsh.pois.9.label': '星落ちのクレーター',
   'entities.zones.thornpeak_heights.name': 'ソーンピーク高地',
   'entities.zones.thornpeak_heights.welcome':
     'テサリー隊長がかろうじてハイウォッチの壁を保っています。',
@@ -8491,9 +8531,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.soulflame_cord.name': '魂炎の腰紐',
   'entities.items.stormcallers_waistguard.name': '嵐呼びの腰当て',
   'entities.mobs.thunzharr_waking_peak.name': 'サンザール、目覚めし峰',
+  'entities.mobs.balgath_cyclops.name': 'バルガス、単眼の監督',
+  'entities.npcs.muster_commander.name': '召集兵団の指揮官',
+  'entities.mobs.muster_sergeant.name': '召集兵団の軍曹',
+  'entities.mobs.muster_chaplain.name': '召集兵団の従軍司祭',
+  'entities.mobs.muster_footman.name': '召集兵団の歩兵',
   'entities.mobs.thunzharr_stormling.name': '目覚めた嵐の精',
   'entities.mobs.stable_horse.name': '厩舎の馬',
-  'hudChrome.worldBoss.spawn': '{name}がソーンピーク高地に立ち上がった！',
+  'hudChrome.worldBoss.spawn': '{name}が{zone}にそびえ立つ！',
+  'hudChrome.worldBoss.wake': '{name}が{zone}で目を覚ました！',
+  'hudChrome.worldBoss.sleep': '{name}は夜明けまで眠っている。',
   'entities.items.stormcallers_spaulders.name': 'ゲイルコールの肩当て',
   'entities.items.bonewrought_greatsword.name': 'ボーンロートの大剣',
   'entities.items.direfang_greatblade.name': 'ダイアファングの大刀',
@@ -10583,6 +10630,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '次の炎系ビルダーが連続でクリティカルになるとホットストリークを獲得し、クリティカルでなければヒーティングアップが解除されます',
   'hudChrome.auraEffect.tongues': '詠唱時間を{pct}%増加させる',
   'hudChrome.auraEffect.damageReduction': '受けるすべてのダメージを{pct}%軽減する',
+  'hudChrome.auraEffect.slumber': '夜明けまで眠っている。攻撃できず、誰が来ても目を覚まさない。',
   'hudChrome.auraEffect.guardianWard':
     '次に受ける敵の致死攻撃を防ぎ、代わりに体力を{pct}%まで回復する',
   'hudChrome.auraEffect.increase.ap': '攻撃力を{value}上昇させる',
@@ -14646,6 +14694,25 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.marshlight_hauberk.name': '沼灯りの鎖帷子',
   'entities.items.duskthorn_mantle.name': '暮棘のマント',
   'entities.items.fenshadow_maul.name': '沼影の大槌',
+  'entities.items.skerrits_shardpike.name': 'スケリットのシャードパイク',
+  'entities.items.muster_shardpike.name': '召集兵団のシャードパイク',
+  'entities.npcs.socketwright_skerrit.name': 'マベン・スケリット',
+  'entities.npcs.socketwright_skerrit.title': '嵌め込み職人',
+  'entities.npcs.socketwright_skerrit.greeting':
+    'あの眼を研いで彼の眼窩に据えてから四十年、一日分の払いももらっていない。番人に痛い目を見せたいのか、{className}？なら俺の仕事を狙え。',
+  'entities.quests.q_socketwrights_due.title': '嵌め込み職人の未払い',
+  'entities.quests.q_socketwrights_due.text':
+    'あの眼窩にバロウグラスを据えたのは俺だ。レンズを研ぎ、座らせ、楔で正しく固めた。塚の主たちは銅貨一枚も払わず、いま俺の仕事が湿地を踏み均して歩き回っている。俺のシャードパイクを持って行け。石突きを突き立て、穂先を据えて、どれだけかかろうと保て。腕が定まったら、それを眼に通せ。彼のまとう皮はあの欠片に縛られている、{playerName}：盲目にすれば、湿地のあらゆる刃がようやく通る。',
+  'entities.quests.q_socketwrights_due.completion':
+    '手応えがあっただろう？四十年分の利息、眼窩を通して払わせた。パイクはあんたのものだ。彼は治る、いつもそうだ。だから気が向いたらまた取り立てに行けばいい。',
+  'entities.quests.q_socketwrights_due.objectives.0.label': '番人の眼を潰す',
+  'entities.items.foremans_barrowmaul.name': '監督の塚砕き',
+  'entities.items.loomshard_eye.name': 'バロウグラスの眼',
+  'entities.items.barrowhide_pauldrons.name': '塚山の肩当て',
+  'entities.items.mirestone_stride.name': '泥石の歩み',
+  'entities.items.foremans_wage_band.name': '職長の賃金の指輪',
+  'entities.items.mirelight_locket.name': '沼灯りのロケット',
+  'entities.items.fenwright_grips.name': '沼地職人のグリップ',
   'entities.items.wildgrove_cinch.name': '野林の締め帯',
   'entities.items.cragward_pauldrons.name': '岩守りの肩甲',
   'entities.items.cragthorn_greatstaff.name': '岩棘の大杖',
@@ -18802,6 +18869,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '「フレーム編集」は、その下に積み重なるトラッカー群(追跡中のクエストとその目標、功績の進み具合、聖遺物庫のページ、製作でピン留めしたレシピ、潜っているデルヴ、参加中のリフト、そして追跡中のレシピまたは依頼)、ペットフレーム脇のペットアクションバー、周囲の敵にかけた継続的なデバフをまとめて表示する「ターゲットデバフ」フレーム、パラディンの「献身」の記章、ウォーロックの「苦痛リソースバー」、スペル発動オーバーレイ、二刀流時のオフハンド用スイングバー、そしてタブ式のダメージメーターウィンドウも緩めます。緩んでいる間はそれぞれに名前のチップが付きます。',
   'guide.interfacePage.framesGovernedTalkingHead':
     '「フレームを編集」では会話パネルも動かせるようになります。会話パネルは、話しているNPCが視界の外にいるときにそのセリフを表示するもので、ロック解除中は名前チップを表示します。',
+  'guide.interfacePage.framesGovernedShardpike':
+    '「フレームを編集」ではシャードパイクバーも動かせるようになります。シャードパイクバーは、シャードパイクを持っているあいだだけアクションバーの横に現れるクエスト道具の短い列で、ロック解除中は名前チップを表示します。戦闘中ではなく戦闘前に配置しておけます。',
   'guide.interfacePage.framesGovernedUnitTooltip':
     '「フレーム編集」ではツールチップフレームも動かせるようになります。マウスを合わせた対象のカードが表示される位置で、クリーチャーならレベルと種類、ほかのプレイヤーなら称号、ギルド、レベルとクラス、そして専門化とその役割が表示されます。好きな場所へドラッグすると、カードはそこから画面の近い端を避ける向きに広がります。「フレーム設定」の「フレームの表示・非表示」でツールチップのチェックを外すと、このカードを完全に非表示にできます。',
   'guide.interfacePage.framesGovernedAuraTracks':
@@ -18861,6 +18930,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.realmBuilder.pastEmpty': 'まだ名前が刻まれていません。',
   'hudChrome.realmBuilder.close': '閉じる',
   'worldContent.realmBuilderMonumentName': '王国建設者の記念碑',
+  'worldContent.musterRackName': '召集兵団の武器棚',
   'hudChrome.talkingHead.label': '会話',
   'hudChrome.hubLesson.target': 'まずダミーを標的にしよう。',
   'hudChrome.hubLesson.openWindow': '{meters}を開こう。',
@@ -19741,6 +19811,42 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.town.description': '名前を指定して町の中心部にテレポートします。',
   'devCommand.actions.town.label': 'タウンハブ',
   'devCommand.fields.town': '町',
+  // The Mirefen muster: the drill yard and the muster quests (M16 fills).
+  'hudChrome.shardpike.effigyBanner': '盲目にした！今こそレイド全員で叩き込め',
+  'hudChrome.shardpike.promptStrikeLantern': '今だ、ランタンを突け、残り {seconds} 秒',
+  'hudChrome.shardpike.promptLanternOut': 'ランタンが消えた、残り {seconds} 秒：自分の武器で叩け',
+  'hudChrome.shardpike.promptCloserEffigy': '藁の監督に近づけ、あと {yards} ヤード',
+  'hudChrome.auraEffect.effigyPlankHide':
+    'あらゆる打撃の {pct}% を受け流す。シャードパイクの突きで目のランタンを消すまで続く',
+  'hudChrome.auraEffect.effigyLanternOut':
+    'あなたにとって藁の監督のランタンは消えている：あなたとペットの攻撃は板の皮を無視し、全力で通る',
+  'character.lockoutWeeklyQuests': '週間クエスト',
+  'entities.mobs.muster_drillmaster.name': '召集兵団の教練係',
+  'entities.mobs.muster_effigy.name': '藁の監督',
+  'entities.npcs.muster_commander.title': 'フェンブリッジ召集兵団',
+  'entities.npcs.muster_commander.greeting':
+    'まず槍、それから全員だ、{className}。それがすべてで、それがこの陣を生かしてきた。',
+  'entities.quests.q_muster_summons.title': '召集兵団の呼び出し',
+  'entities.quests.q_muster_summons.text':
+    '割ける槍はすべて星墜の火口の周りに陣を敷かせた、{playerName}。そこから歩き出てくる奴を囲むためだ。召集兵団の指揮官は火口を見下ろす南の高台で陣を守っている。ここから南東だ。指揮官に報告しろ。奴との戦い方を教わるだろう。よく聞け。聞かなかった者たちは葦の中に沈んでいる。',
+  'entities.quests.q_muster_summons.completion':
+    'フェンウィックの使いか？よし。一度しか言わん、奴は一言も言わんからな。バルガスは我々の哨所を巡る：火口の縁、西の平地、南の高台、南西の縁の切れ目、そしてまた一周だ。立ち止まった哨所はすべて踏み潰される。鋼は奴に通らん。皮がはじき返し、奴を斬りつけるだけのレイドは疲れ果てて死ぬ。唯一の弱点は目だ。構えた槍をバロウグラスに突き通せば奴は盲目になり、盲目の間は皮が剥がれ落ちる。その時こそレイド全員で叩き込め、全力でな。やがて皮は閉じ、次の好機を待つ。まず槍、それから全員だ、{playerName}。武器棚が槍を貸すのはレベル19以下の新兵だけだ。若い者が目を潰し、古参がその好機を生かす。',
+  'entities.quests.q_muster_summons.objectives.0.label': '召集兵団の指揮官に報告する',
+  'entities.quests.q_muster_pike_drill.title': 'まず槍を',
+  'entities.quests.q_muster_pike_drill.text':
+    '口で言うのは安いが、槍は安くない。俺の隣の武器棚からシャードパイクを取れ。それから陣の西端にいる藁の監督のところへ行け。若い連中が板と藁で作った、本物の半分の大きさの人形で、目のところにランタンが入っている。槍を構え、教練係が地面を叩いている間も穂先をまっすぐ保て。本物はもっと激しく揺らすからな。腕が定まったら、穂先をランタンに通せ。板が剥がれ落ちる：そうしたら自分の武器で叩いてみろ、{playerName}。違いが分かるはずだ。武器棚が槍を貸すのはレベル19以下の新兵だけだ。',
+  'entities.quests.q_muster_pike_drill.completion':
+    '通る手応えがあっただろう？本物なら、レイド全員が振るう十四呼吸の間だ。そしてまた皮が閉じる。この教えを忘れるな。監督が必ず試してくる。',
+  'entities.quests.q_muster_pike_drill.objectives.0.label':
+    '召集兵団の武器棚からシャードパイクを取った',
+  'entities.quests.q_muster_pike_drill.objectives.1.label': '藁の監督のランタンを消した',
+  'entities.quests.q_muster_pike_drill.objectives.2.label': '板が落ちている間に当てた打撃',
+  'entities.quests.q_muster_trophy.title': '監督のかけら',
+  'entities.quests.q_muster_trophy.text':
+    '奴は毎週立ち上がり、我々は毎週また叩き伏せる。それには討伐隊が要るが、召集兵団だけでは揃えられない。次にバルガスへ挑む討伐隊を見つけて、奴を倒す手助けをしろ、{playerName}。奴を斬るもよし、斬る者を守るもよし、癒すもよし。奴と戦った者の手はすべて数に入る。奴が倒れたら、戻って私に報告しろ。召集兵団は討ち取るたびに払う。',
+  'entities.quests.q_muster_trophy.completion':
+    '再び倒したか。しかもお前はその戦いにいた。今夜のうちにフェンブリッジへ報告を送る。こんな辺境では財布も薄いが、これはお前のものだ。奴がまた立ち上がったら戻って来い。',
+  'entities.quests.q_muster_trophy.objectives.0.label': 'バルガスを討伐',
   'entities.items.bastion_sigil.name': '砦の印章',
   'entities.items.mooring_stone.name': '係留石',
   'entities.items.menders_hourglass.name': '癒し手の砂時計',
@@ -20154,4 +20260,28 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.referral_gloves.name': '友情の手甲',
   'entities.items.referral_feet.name': '友情のブーツ',
   'hudChrome.bank.referralArmour': '友情の防具を受け取る',
+  'entities.items.knucklebone_of_balgath.name': 'バルガスの拳骨',
+  'entities.items.muster_standard.name': '召集兵団の軍旗',
+  'entities.items.guttered_eye.name': '燃え尽きた眼',
+  'entities.items.barrowstone_heart.name': '塚石の心臓',
+  'entities.items.muster_grapnel.name': '召集兵団の鉤縄',
+  'entities.items.craterglass_stave.name': '隕坑硝子の杖',
+  'hudChrome.trinkets.equip.stoneHeart':
+    '致命的な攻撃を受けると、代わりに{statue}秒間石になる：ダメージを受けず、移動も行動もできない。その後、体力{restore}（最大体力の{restorePct}%）で復帰する。{icd}に1回しか発生しない。決闘とアリーナの試合では発動せず、とどめの一撃で決着がつく。',
+  'hudChrome.trinkets.use.foremanShape':
+    '{duration}秒間、監督の姿をとる：単眼の巨人となって拳で戦い、すべてのアビリティとそのダメージを保持する。防具が{armorPct}%増加し、ノックバックされなくなる。騎乗は解除される。',
+  'hudChrome.trinkets.use.musterStandard':
+    '足元に召集兵団の軍旗を立てる。{duration}秒間、{soldiers}人の召集兵があなたのそばを行軍し、あなたの対象と近接戦闘を行い、それぞれ{every}秒ごとに{damage}の物理ダメージを与える。兵はあなたの対象だけを、すでに戦闘中のときにのみ攻撃する。それぞれあなたの最大体力の{hpPct}%を持つ。{leash}ヤード以上取り残されると、すぐにあなたのそばへ戻る。軍旗が倒れたとき、またはあなたが死んだときに去る。ダメージは攻撃力または遠隔攻撃力の高いほうで増加し、設置時に決まる。',
+  'hudChrome.trinkets.use.gutteredGlare':
+    '{duration}秒間の集中：長さ{length}ヤードの光線が向いている方向へ放たれ、進路上の最大{max}体の敵に{every}秒ごとに{tick}の秘術ダメージを与える（集中全体で各敵に{total}）。向きを変えると光線が薙ぎ払う。移動または詠唱で終了する。ダメージは呪文力で増加する。',
+  'hudChrome.trinkets.use.grapnel':
+    '{range}ヤード以内の見えているパーティまたはレイドメンバーに鉤を掛け、空中を引き寄せてあなたの傍らへ運び、着地時に{heal}回復させる。敵や、乗り物・船に乗っている味方、石化している味方、解除できない効果で拘束されている味方は引き寄せられない。回復量は治癒力で増加する。',
+  'hudChrome.auraEffect.trinket.foremanShape':
+    'あなたは監督だ：防具が{armorPct}%増加し、ノックバックを受けない。',
+  'hudChrome.auraEffect.trinket.musterStandard':
+    '召集兵団の軍旗が立っている。兵たちはあなたに付き従い、あなたの対象と戦う。',
+  'hudChrome.auraEffect.trinket.gutteredGlare':
+    '光線が進路上の敵に{every}秒ごとに{tick}の秘術ダメージを与える。移動または詠唱で終了する。',
+  'hudChrome.auraEffect.trinket.stoneStatue':
+    '石になっている：ダメージを受けず、行動できない。最大体力の{pct}%で復帰する。',
 };

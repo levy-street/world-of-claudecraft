@@ -100,6 +100,9 @@ const REGISTERED_MODULES = [
   'coach_trail_materials.ts',
   'moonwing_adornment.ts',
   'gloamveil_veil.ts',
+  'balgath_ranged_fx.ts',
+  'balgath_starwake_fx.ts',
+  'effigy_rig.ts',
 ];
 
 /** A module-scope lazy cache, however the formatter wrapped it. The type
@@ -253,9 +256,11 @@ describe('the lazy-material sweep', () => {
     // the warlock meteor rocks, plus the two rig-adornment stand-ins), the
     // two excluded scenery bakes, and the rocket-sled plume pair. The
     // battleground caches are the remaining non-bundle hit. Plus the World
-    // Quests branch's calligraphy guidance bundle: 18 / 17.
-    expect(hits.length).toBeGreaterThanOrEqual(18);
-    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(17);
+    // Quests branch's calligraphy guidance bundle: 18 / 17. Plus the Mirefen
+    // world-boss branch's three (Balgath's ranged kit, his Wake of the Fallen Star and
+    // the muster effigy's rig): 21 / 20.
+    expect(hits.length).toBeGreaterThanOrEqual(21);
+    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(20);
   });
 
   it('leaves no hit unregistered and unexcluded', () => {

@@ -115,6 +115,7 @@ import { addAccountPlayer } from './account_player_join';
 import { type ActivityDetectDeps, detectActivityEvent } from './activity_detect';
 import { recordOnlineSample } from './admin_db';
 import { type AdminGuildBankView, adminGuildBankView } from './admin_guild_bank_view';
+import { type AdminLiveLocation, adminLiveLocation } from './admin_live_location';
 import { offensiveName } from './auth';
 import type { BackgroundDbGate } from './background_db_gate';
 import type { GuildBankLedgerOp } from './bank_ledger';
@@ -328,11 +329,14 @@ import {
   INTEREST_RADIUS,
   interestLimitSq,
   isStealthed,
+  LandmarkRoster,
   NPC_DROP_RADIUS,
+  queryCutoffSq,
 } from './interest_policy';
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
 import { keepaliveSweepDelayed, shouldReapSession, WS_KEEPALIVE_PING_MS } from './keepalive_sweep';
+import { lanceSelfWire, runLanceVerb } from './lance_wire';
 import { LINKDEAD_GRACE_MS, planJoin } from './linkdead';
 import {
   consumeListReadToken,
@@ -488,7 +492,7 @@ import {
 } from './who_roster';
 import { holderInfoForPubkey } from './woc_balance';
 import type { CharacterSaveArgs } from './woc_market';
-import { activeWorldBossIdsWireJson } from './world_boss_wire';
+import { activeWorldBossIdsWireJson, writeWorldBossWireFields } from './world_boss_wire';
 import { recordWorldQuestScoreEvent } from './world_quest_leaderboard';
 import { isBackpressureExceeded } from './ws_backpressure';
 
@@ -883,7 +887,6 @@ const PLAYTIME_GRANT_MS = 5 * 60_000;
 const PLAYTIME_POINTS = 10;
 const DAILY_REWARD_ACTIVITY_MS = 60_000;
 const RELAY_COOLDOWN_MS = 8_000; // min gap between a player's "!" community posts
-const ADMIN_LOCATION_POI_RADIUS = 32;
 
 export interface ClientSession
   extends MovementInputSessionState,
@@ -1207,17 +1210,7 @@ export interface AdminLiveAura {
   permanent?: boolean;
 }
 
-export interface AdminLiveLocation {
-  kind: 'overworld' | 'dungeon' | 'delve';
-  zoneId: string | null;
-  zone: string;
-  instanceId: string | null;
-  instance: string | null;
-  instanceSlot: number | null;
-  poiIndex: number | null;
-  poi: string | null;
-  poiDistance: number | null;
-}
+export type { AdminLiveLocation } from './admin_live_location';
 
 export interface AdminLivePlayer {
   pid: number;
@@ -1281,6 +1274,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   if (e.lootable) out.loot = 1;
   if (e.hostile) out.h = 1;
   if (e.afk) out.ak = 1; // /afk display bit: other clients tag the nameplate + presence dot
+  writeWorldBossWireFields(e, out); // brace / slumber / warpath bits (world_boss_wire.ts)
   if (e.pvpFlag) out.pvp = 1; // /pvp flag bit: nameplate + target-frame hostility colour
   // The target frame's resource bar: type + current/max, sent only for entities
   // that HAVE a resource (players and caster mobs; a resource-less wolf omits all
@@ -1623,6 +1617,8 @@ export class GameServer {
   // crowd, vs the comparatively tiny entity-JSON build time (`serializeMs`).
   private bcSerializeNs = 0n;
   private bcVisits = 0;
+  /** Live world-boss landmarks, rescanned on a slow cadence (server/interest_policy.ts). */
+  private landmarks = new LandmarkRoster();
   private bcSerializes = 0;
   private bcBaseSerializes = 0;
   private bcLegacySerializes = 0;
@@ -5357,69 +5353,6 @@ export class GameServer {
     );
   }
 
-  private liveLocationFor(e: Entity): AdminLiveLocation {
-    const instance = this.sim.instanceInfoAt(e.pos);
-    const dungeonId = e.dungeonId ?? instance?.dungeonId ?? null;
-    if (dungeonId) {
-      const dungeon = DUNGEONS[dungeonId];
-      const zone = dungeon
-        ? zoneAt(dungeon.doorPos.x, dungeon.doorPos.z)
-        : zoneAt(e.pos.x, e.pos.z);
-      return {
-        kind: 'dungeon',
-        zoneId: zone.id,
-        zone: zone.name,
-        instanceId: dungeonId,
-        instance: dungeon?.name ?? dungeonId,
-        instanceSlot: instance?.slot ?? null,
-        poiIndex: null,
-        poi: null,
-        poiDistance: null,
-      };
-    }
-
-    const delveRun = this.sim.delveRunForPlayer(e.id);
-    if (delveRun) {
-      const delve = DELVES[delveRun.delveId];
-      const zone = delve ? zoneAt(delve.doorPos.x, delve.doorPos.z) : zoneAt(e.pos.x, e.pos.z);
-      return {
-        kind: 'delve',
-        zoneId: zone.id,
-        zone: zone.name,
-        instanceId: delveRun.delveId,
-        instance: delve?.name ?? delveRun.delveId,
-        instanceSlot: delveRun.slot,
-        poiIndex: null,
-        poi: null,
-        poiDistance: null,
-      };
-    }
-
-    const zone = zoneAt(e.pos.x, e.pos.z);
-    let bestIndex: number | null = null;
-    let bestDistance = ADMIN_LOCATION_POI_RADIUS;
-    for (let i = 0; i < zone.pois.length; i++) {
-      const poi = zone.pois[i];
-      const distance = Math.hypot(e.pos.x - poi.x, e.pos.z - poi.z);
-      if (distance < bestDistance) {
-        bestDistance = distance;
-        bestIndex = i;
-      }
-    }
-    const poi = bestIndex === null ? null : zone.pois[bestIndex];
-    return {
-      kind: 'overworld',
-      zoneId: zone.id,
-      zone: zone.name,
-      instanceId: null,
-      instance: null,
-      instanceSlot: null,
-      poiIndex: bestIndex,
-      poi: poi?.label ?? null,
-      poiDistance: poi ? round2(bestDistance) : null,
-    };
-  }
-
   liveSessions(): AdminLivePlayer[] {
     const now = Date.now();
     const players: AdminLivePlayer[] = [];
@@ -5427,7 +5360,7 @@ export class GameServer {
       const e = this.sim.entities.get(session.pid);
       const meta = this.sim.meta(session.pid);
       if (!e || !meta) continue;
-      const location = this.liveLocationFor(e);
+      const location = adminLiveLocation(this.sim, e);
       const zone = location.instance ?? location.zone;
       const moveSpeedMultiplier = round2(this.sim.moveSpeedMult(e));
       players.push({
@@ -7824,6 +7757,12 @@ export class GameServer {
         sim.collectDelveChestLoot(msg.objectId, pid);
         break;
       }
+      // The Shardpike trial's three no-argument verbs (lance_wire.ts).
+      case 'lance_brace':
+      case 'lance_thrust':
+      case 'lance_release':
+        runLanceVerb(sim, command, pid);
+        break;
       // client telemetry should not be considered as unknown command. Used for offline stats computing.
       case 'telemetry':
         break;
@@ -7953,6 +7892,8 @@ export class GameServer {
         radius: BG_MATCH_DROP_RADIUS,
         covers: isBgPos,
       },
+      // A world boss is visible from far outside any radius this query can afford to run.
+      this.landmarks.refresh(this.sim.tickCount, this.sim.entities.values()),
     );
     if (this.perfDetailActive) this.bcastGridNs += process.hrtime.bigint() - sharedStart;
     const queryLimitSq = INTEREST_QUERY_RADIUS * INTEREST_QUERY_RADIUS;
@@ -7982,7 +7923,7 @@ export class GameServer {
           const dx = e.pos.x - anchorEntity.pos.x;
           const dz = e.pos.z - anchorEntity.pos.z;
           const d2 = dx * dx + dz * dz;
-          if (d2 > (isBgPos(anchorEntity.pos.x) ? bgQueryLimitSq : queryLimitSq)) continue;
+          if (d2 > queryCutoffSq(e, anchorEntity.pos.x, bgQueryLimitSq, queryLimitSq)) continue;
           // bcVisits counts the exact per-viewer in-range set (self included):
           // increment only AFTER the exact-d2 cutoff, never on the padded
           // per-cell candidate list. Band viewers use the wider battleground
@@ -8372,6 +8313,10 @@ export class GameServer {
     // Delta-guarded: ships on death-release and clears on resurrect. The client
     // draws the corpse marker and gates the resurrect-at-corpse button on it.
     maybe('corpse', p.corpsePos);
+    const lanceWire = lanceSelfWire(this.sim.ctx, anchorSession.pid); // lance_wire.ts
+    maybe('lance', lanceWire.lance);
+    maybe('lrest', lanceWire.lrest);
+    maybe('lguide', lanceWire.lguide);
     if (stableTimerWire) {
       maybeSerialized('auras', this.stableAuraWireFor(p).json);
       maybeSerialized(

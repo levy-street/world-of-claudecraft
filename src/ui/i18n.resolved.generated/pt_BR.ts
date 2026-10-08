@@ -533,6 +533,48 @@ export const pt_BR: EnTranslations = {
       "sailing": "Navegando para {dest}"
     },
     "materialStackSelectionUnavailable": "Essa seleção de material não está mais disponível.",
+    "shardpike": {
+      "braceLabel": "Couch the Shardpike",
+      "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "thrustLabel": "Barrowglass Thrust",
+      "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
+      "braceTooltipLean": "Plant the butt and hold the point up. Lean with your strafe or turn keys, or hold the two keys above the beam: each pushes the marker toward its side. The beam drifts on its own, and every slam he lands kicks it. Keep it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "releaseLabel": "Ground the Shardpike",
+      "releaseTooltip": "Lower the pike and step out of the brace, the same as jumping. You lose the set but pay no penalty: you can couch it again right away. Only a thrust, a fumble, a broken stance or a missed window rests the pike, for {rest} seconds.",
+      "whyResting": "The pike is being re-set after a thrust, a fumble, a broken stance or a missed window. Wait out the timer on the icon.",
+      "whyAlreadyCouched": "The pike is already couched. Ground it before you re-set.",
+      "whyNotSet": "The pike is not set. Couch it and hold it steady first.",
+      "whyNothingCouched": "Nothing to ground: the pike is not couched.",
+      "beamLabel": "Shardpike balance",
+      "beamStatus": "Pike balance {balance}, set {set} percent.",
+      "beamDanger": "Pike balance {balance}, about to fumble.",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "Hold the pike steady with your strafe keys",
+      "promptCatchIt": "Catch it, the pike is going over",
+      "promptEyeOut": "The eye is out, {seconds}s: hit him with everything",
+      "promptSealed": "His eye is shut. It opens again in {seconds}s",
+      "promptResetting": "Re-setting the pike, {seconds}s",
+      "promptCloser": "Get within reach of the Foreman, {yards} yards out",
+      "promptBrace": "Couch the Shardpike, then hold it steady",
+      "promptFindBoss": "Skerrit's Shardpike: put out the Foreman's eye with it",
+      "promptFindBossMuster": "The muster's Shardpike: put out the Foreman's eye with it",
+      "promptTakePike": "Press {key} or click the rack to take a Shardpike",
+      "promptTakePikeClick": "Click the rack to take a Shardpike",
+      "promptTakePikeTap": "Tap the rack to take a Shardpike",
+      "promptPikeLevelCap": "The muster lends its pikes only to level {level} or lower",
+      "promptHoldSteadyLean": "Hold the pike steady: lean with {left} and {right}",
+      "leanLeft": "Lean left",
+      "leanRight": "Lean right",
+      "leanLeftKey": "Lean left ({key})",
+      "leanRightKey": "Lean right ({key})",
+      "promptTally": "{count} put out",
+      "promptLabel": "Shardpike instruction",
+      "blindBanner": "BARROWHIDE BROKEN",
+      "effigyBanner": "BLINDED! NOW THE WHOLE RAID HITS HARD",
+      "promptStrikeLantern": "STRIKE THE LANTERN now, {seconds}s",
+      "promptLanternOut": "The lantern is out, {seconds}s: hit it with your own weapon",
+      "promptCloserEffigy": "Get within reach of the Straw Foreman, {yards} yards out"
+    },
     "vehicle": {
       "title": "Canhão da Guarda do Norte",
       "objective": "Defenda a guarda do norte",
@@ -3176,8 +3218,10 @@ export const pt_BR: EnTranslations = {
         "storm": "Cada feitiço que você conjura adiciona uma carga, até {max}. As cargas duram {duration} s, renovadas sempre que você ganha uma.",
         "heat": "Seus acertos de arma corpo a corpo e à distância adicionam uma carga de calor cada, até {max}. O calor dura {duration} s, renovado sempre que você ganha uma carga.",
         "ignite": "Seus acertos críticos de arma corpo a corpo e à distância incendeiam o alvo, causando {tick} de dano de Fogo a cada {every} s durante {duration} s. Um novo acerto crítico o renova. O dano aumenta com o poder de ataque ou o poder de ataque à distância, o que for maior.",
-        "guardHeat": "Cada ataque que você apara, esquiva ou bloqueia adiciona uma carga de calor, até {max}. O calor dura {duration} s, renovado sempre que você ganha uma carga."
+        "guardHeat": "Cada ataque que você apara, esquiva ou bloqueia adiciona uma carga de calor, até {max}. O calor dura {duration} s, renovado sempre que você ganha uma carga.",
+        "stoneHeart": "When a hit would kill you, you turn to stone for {statue} sec instead: you take no damage and cannot move or act, then return with {restore} health ({restorePct}% of your maximum health). Can occur once every {icd}. Never in duels or arena matches, which end at the killing blow."
       },
+      "range": "{min} to {max}",
       "use": {
         "retaliate": "Por {duration} s, um inimigo que acerta você diretamente sofre dano Físico igual a {pct}% da vida que esse acerto tirou de você. Dano periódico não ativa esse efeito.",
         "anchor": "Por {duration} s, sofra {reduction}% menos dano, mas se mova a {speed}% da velocidade. Remove atordoamentos, enraizamentos, lentificações, medos, metamorfoses, silenciamentos, cegamentos, maldições, desarmes e efeitos de incapacitação em você, e você ignora novos desses efeitos e recuos enquanto durar.",
@@ -3196,7 +3240,11 @@ export const pt_BR: EnTranslations = {
         "kindlingOrb": "Invoca um orbe de brasas ao seu lado por {duration} s. Cada feitiço que você conjura contra um inimigo faz o orbe disparar um raio contra esse inimigo causando {damage} de dano de Fogo. O dano aumenta com o poder de feitiço.",
         "pierce": "Por {duration} s, seus ataques automáticos, tiros e habilidades físicas (exceto sangramentos) também atingem o inimigo mais próximo do seu alvo num raio de {reach} jardas por {share}% do dano causado.",
         "lantern": "Coloca uma lanterna aos seus pés por {duration} s. Uma cura direta de qualquer pessoa em você ou em um membro do grupo num raio de {radius} jardas dela também cura o outro membro do grupo mais ferido dentro de sua luz em {share}% do valor curado.",
-        "heartNova": "Gaste todas as cargas de calor numa nova de fogo que causa {perHeat} de dano de Fogo por carga ({max} em {maxHeat} cargas) a cada inimigo num raio de {radius} jardas e provoca toda criatura atingida. O dano aumenta com o poder de ataque. Requer uma carga de calor."
+        "heartNova": "Gaste todas as cargas de calor numa nova de fogo que causa {perHeat} de dano de Fogo por carga ({max} em {maxHeat} cargas) a cada inimigo num raio de {radius} jardas e provoca toda criatura atingida. O dano aumenta com o poder de ataque. Requer uma carga de calor.",
+        "foremanShape": "Take the Shape of the Foreman for {duration} sec: you become the one-eyed cyclops and fight with your fists, keeping every ability and its damage. You gain {armorPct}% armor and cannot be knocked back. Dismounts you.",
+        "musterStandard": "Plant a Muster Standard at your feet. For {duration} sec, {soldiers} muster soldiers march at your side and fight your target in melee, each hitting every {every} sec for {damage} Physical damage. They attack only your target, and only once it is already in combat. Each has {hpPct}% of your maximum health. Left more than {leash} yd behind, they rejoin you at once. They leave when the standard falls or when you die. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, set when you plant it.",
+        "gutteredGlare": "Channel for {duration} sec: a beam {length} yd long bursts from you the way you face and deals {tick} Arcane damage every {every} sec to up to {max} enemies in its path ({total} to each over the full channel). Turn to sweep it; moving or casting ends it. Damage increases with Spell Power.",
+        "grapnel": "Hook a party or raid member within {range} yd that you can see and haul them through the air to your side, healing them for {heal} when they land. It cannot pull enemies, or allies in a vehicle, on a ship, turned to stone or held by an effect that cannot be broken. Healing increases with Healing Power."
       }
     },
     "questShare": {
@@ -4014,6 +4062,8 @@ export const pt_BR: EnTranslations = {
       "cooldownCap": "{used} de {cap} s de redução de recarga usados nesta janela",
       "bruinRushWindow": "A Forma de Lobo não custa mana e fixa o alvo da vossa Investida de Bruin, reduzindo sua velocidade em {pct}% por {sec} s",
       "funeralHarvestLock": "Funeral Harvest ainda não pode criar outro Fragmento de Alma",
+      "effigyPlankHide": "Turns away {pct}% of every blow, until a Shardpike thrust puts out the lantern in its eye",
+      "effigyLanternOut": "The Straw Foreman's lantern is out for you: your blows and your pet's ignore its Plank Hide and land in full",
       "leadenHexLock": "Maldição Chúmbea ainda não pode enraizar este alvo novamente",
       "forbiddenReflectionReady": "Sua próxima recarga elegível de Bruxo pode ser conjurada novamente",
       "forbiddenReflectionLock": "Reflexo Proibido ainda não pode ser preparado novamente",
@@ -4100,6 +4150,10 @@ export const pt_BR: EnTranslations = {
         "moltenIgnite": "Causa {damage} de dano de Fogo a cada {every} s. Outro acerto crítico de arma o renova.",
         "pierce": "Seus ataques automáticos, tiros e habilidades físicas (exceto sangramentos) também atingem o inimigo mais próximo do seu alvo num raio de {reach} jardas por {pct}% do dano causado.",
         "lantern": "Uma cura direta de qualquer pessoa em você ou em um membro do grupo num raio de {radius} jardas da lanterna também cura o outro membro do grupo mais ferido dentro de sua luz em {pct}% do valor curado.",
+        "foremanShape": "You are the Foreman: {armorPct}% more armor and immune to knockbacks.",
+        "musterStandard": "Your Muster Standard is planted. Its soldiers march with you and fight your target.",
+        "gutteredGlare": "The beam deals {tick} Arcane damage every {every} sec to enemies in its path. Moving or casting ends it.",
+        "stoneStatue": "Turned to stone: immune to damage and unable to act. You return with {pct}% of your maximum health.",
         "crucibleHeat": "Calor: {stacks}/{max}. Use o Coração do Crisol para gastar tudo numa nova de fogo que causa {damage} de dano de Fogo a cada inimigo num raio de {radius} jardas e provoca toda criatura atingida.",
         "crucibleHeatOther": "Calor: {stacks}/{max}. O Coração do Crisol gasta tudo numa nova de fogo num raio de {radius} jardas que causa mais dano de Fogo por carga e provoca toda criatura atingida."
       },
@@ -4135,6 +4189,7 @@ export const pt_BR: EnTranslations = {
       "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "damageReduction": "Reduz em {pct}% o dano recebido",
+      "slumber": "Adormecido até o amanhecer. Não pode ser atacado e não acordará por ninguém.",
       "guardianWard": "O próximo golpe inimigo letal restaura sua vida para {pct}% em vez de matar",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
@@ -4211,7 +4266,9 @@ export const pt_BR: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} ergue-se sobre as Alturas de Thornpeak!"
+      "spawn": "{name} se ergue sobre {zone}!",
+      "wake": "{name} despertou sobre {zone}!",
+      "sleep": "{name} dorme até o amanhecer."
     },
     "auth": {
       "appleLoginCta": "Continuar com a Apple",
@@ -4355,6 +4412,7 @@ export const pt_BR: EnTranslations = {
         "menu": "Menu",
         "minimap": "Minimapa",
         "stanceBar": "Barra de Postura",
+        "shardpikeBar": "Shardpike Bar",
         "xpBar": "Barra de XP",
         "chat": "Chat",
         "actionBarGroup": "Barras de Ação",
@@ -7505,6 +7563,7 @@ export const pt_BR: EnTranslations = {
       "framesGovernedAuraTracks": "Editar Quadros também libera as seis trilhas de aura opcionais depois que você as ativa na aba Combate das mesmas opções de Interface: trilha Meus Benefícios, trilha Recargas Defensivas, trilha Meus Escudos, trilha Recargas Ofensivas, trilha Movimento e Furtividade e trilha Meus Benefícios nos Aliados. Todas as trilhas começam desligadas, e cada uma usa seu próprio chip de nome quando está liberada.",
       "frameGroups": "{trackers} podem combinar missões, feitos, fendas, incursões, metas de coleta e o rastreamento do Relicário. {auras} podem combinar os DoTs no alvo e as seis fileiras de auras. Ative qualquer um dos grupos em Configurações de Quadros, ou deixe desativado para mover cada quadro separadamente. {tot} inclui uma barra de recurso. {focus} tem três alvos que se movem de forma independente: Shift+F1 até Shift+F3 os atribui; Ctrl+F1 até Ctrl+F3 os seleciona. Arraste o medidor de dano ou de ameaça para fora dos seus botões para movê-lo, e arraste suas bordas para redimensioná-lo, mesmo com os quadros travados. Enquanto os quadros estão destravados, Mostrar ou Ocultar Quadros tem seu próprio menu agrupado. Clique com o botão direito em um quadro destravado para Redefinir tamanho ou Opções de Quadro. Interface > Quadros também contém Configurações de Quadros e as Opções de Quadros de Grupo, que podem ser recolhidas. Travar Alvo do Alvo ao Alvo mantém esses quadros juntos. Desative para mover o Alvo do Alvo separadamente; reativar preserva a posição separada para depois. Quadros de foco atribuídos escondem seus controles de configuração; clique com o botão direito e escolha Remover Foco para restaurá-los. A conjuração ao apontar também funciona nos quadros de foco.",
       "framesGovernedTalkingHead": "Editar quadros também afrouxa o painel Diálogo, que carrega a linha falada de um NPC enquanto esse NPC está fora de sua vista; ele usa seu chip de nome enquanto está solto.",
+      "framesGovernedShardpike": "Edit Frames also loosens the Shardpike bar, the short row of quest-tool verbs that appears beside your action bars only while you are carrying the Shardpike itself; it wears its name chip while it is loose, so you can place it before the fight rather than during it.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "barsTitle": "Barras, temporizadores e texto de combate",
       "barsBody": "Sua barra de conjuração aparece no meio da tela, logo acima das suas barras de ação, sempre que você conjura ou canaliza, e mostra o nome do feitiço e o tempo restante. Seu alvo tem sua própria barra de conjuração no quadro dele, para que você veja o que está por vir e possa reagir.\n\nUma fina barra de ataque fica sob sua barra de conjuração e se enche entre os golpes da sua arma, para que um combatente corpo a corpo ou à distância veja quando o próximo acerto automático vai acontecer.\n\nSua barra de experiência ocupa toda a largura sob suas barras de ação, dividida em segmentos, com um trecho mais claro mostrando a experiência de descanso que você acumulou.\n\nNade debaixo d'água e uma barra azul de fôlego aparece no topo da tela. Ela se esvazia enquanto sua cabeça estiver submersa, pisca em vermelho quando se esgota e você começa a se afogar, e se enche rapidamente assim que você emerge à superfície. Espaço faz você nadar para cima, e a tecla Nadar para Baixo, Ctrl por padrão, leva você mais fundo.\n\nO dano e a cura sobem, em forma de pequenos números, sobre quem os recebeu, para que você acompanhe uma luta sem precisar ler texto. A aba Combate na sua janela de chat mantém o registro escrito completo.",
@@ -11307,6 +11366,7 @@ export const pt_BR: EnTranslations = {
     "lockoutRaids": "Raides",
     "lockoutDungeons": "Masmorras",
     "lockoutWorldBosses": "Chefes mundiais",
+    "lockoutWeeklyQuests": "Weekly quests",
     "takeOverConfirm": "Isto vai desconectar este personagem de outra sessão e trazê-lo para cá. Continuar?",
     "renameRequired": "renomeação necessária",
     "delete": "Excluir",
@@ -15927,6 +15987,30 @@ export const pt_BR: EnTranslations = {
       "fenshadow_maul": {
         "name": "Martelo da Sombra do Brejo"
       },
+      "foremans_barrowmaul": {
+        "name": "Malho Tumular do Capataz"
+      },
+      "skerrits_shardpike": {
+        "name": "Pique de Estilhaços de Skerrit"
+      },
+      "loomshard_eye": {
+        "name": "The Barrowglass Eye"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Ombreiras Tumulares"
+      },
+      "mirestone_stride": {
+        "name": "Passada de Pedralodo"
+      },
+      "foremans_wage_band": {
+        "name": "Anel do Salário do Capataz"
+      },
+      "mirelight_locket": {
+        "name": "Medalhão da Luz do Pântano"
+      },
+      "fenwright_grips": {
+        "name": "Manoplas do Artesão do Pântano"
+      },
       "wildgrove_cinch": {
         "name": "Cinto do Bosque Selvagem"
       },
@@ -19737,6 +19821,27 @@ export const pt_BR: EnTranslations = {
       "saltwrack_epaulets": {
         "name": "Saltwrack Epaulets"
       },
+      "muster_shardpike": {
+        "name": "Muster Shardpike"
+      },
+      "knucklebone_of_balgath": {
+        "name": "Knucklebone of Balgath"
+      },
+      "muster_standard": {
+        "name": "Muster Standard"
+      },
+      "guttered_eye": {
+        "name": "The Guttered Eye"
+      },
+      "barrowstone_heart": {
+        "name": "Barrowstone Heart"
+      },
+      "muster_grapnel": {
+        "name": "Muster Grapnel"
+      },
+      "craterglass_stave": {
+        "name": "Craterglass Stave"
+      },
       "membership_token": {
         "name": "Membership Token (30 Days)"
       },
@@ -21056,8 +21161,26 @@ export const pt_BR: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, o Pico Desperto"
       },
+      "balgath_cyclops": {
+        "name": "Balgath, the One-Eyed Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Elemental de tormenta desperto"
+      },
+      "muster_footman": {
+        "name": "Muster Footman"
+      },
+      "muster_chaplain": {
+        "name": "Muster Chaplain"
+      },
+      "muster_sergeant": {
+        "name": "Muster Sergeant"
+      },
+      "muster_drillmaster": {
+        "name": "Muster Drillmaster"
+      },
+      "muster_effigy": {
+        "name": "Straw Foreman"
       },
       "stable_horse": {
         "name": "Cavalo de estábulo"
@@ -21706,6 +21829,16 @@ export const pt_BR: EnTranslations = {
         "name": "Guardião Fenwick",
         "title": "Guardião de Fenbridge",
         "greeting": "Pare no portão, {className}. Além dos juncos, o pântano mata por nós."
+      },
+      "socketwright_skerrit": {
+        "name": "Maben Skerrit",
+        "title": "the Socketwright",
+        "greeting": "Forty years since I ground that eye and set it in his socket, and never a day paid. You want to hurt the Foreman, {className}? Aim for my work."
+      },
+      "muster_commander": {
+        "name": "Muster Commander",
+        "title": "Fenbridge Muster",
+        "greeting": "Pikes first, {className}, then everyone. That is the whole of it, and it has kept this camp alive."
       },
       "brother_aldric_fen": {
         "name": "Irmão Aldric",
@@ -22445,6 +22578,52 @@ export const pt_BR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Ordem de concentração de Fenbridge"
+          }
+        }
+      },
+      "q_muster_summons": {
+        "title": "The Muster's Summons",
+        "text": "Every spear I could spare is dug in around the Starfall Crater, {playerName}, ringing the thing that walks out of it. The Muster Commander holds the camp on the southern rise above the crater, south-east of here. Report to the Commander. You will be told how we fight him, and you will listen, because the ones who did not are in the reeds.",
+        "completion": "Fenwick's runner, is it? Good. Listen, because I say this once and he never says it at all. Balgath walks our pickets: the crater rim, the west flats, the south rise, the gap on the south-west rim, and round again, and every post he stops at, he flattens. Steel does not bite him. His hide turns it, and a raid that hacks at him only dies tired. The one weakness is his eye. A braced pike through the Barrowglass blinds him, and while he is blind his hide sloughs off: that is when the whole raid hits him, and hits hard. Then it closes over and we wait for the next chance. The rack lends its pikes to recruits of level 19 or lower: the young ones put the eye out, the veterans make the window count. Pikes first, {playerName}, then everyone.",
+        "objectives": {
+          "0": {
+            "label": "Report to the Muster Commander"
+          }
+        }
+      },
+      "q_muster_pike_drill": {
+        "title": "Pikes First",
+        "text": "Talk is cheap and pikes are not, and the rack lends them only to recruits of level 19 or lower. Take a Shardpike off the rack beside me, then walk to the Straw Foreman at the west end of camp: the lads built him out of planks and straw, half the size of the real one, with a lantern where the eye goes. Couch the pike and hold the point true while the drillmaster pounds the ground, because the real one shakes it harder. When your arms are sure, put the point through the lantern. His planks will come off: then hit him with your own weapon, {playerName}, and feel the difference.",
+        "completion": "You felt it bite, did you? On the real one that is fourteen breaths with the whole raid swinging, and then his hide closes over again. Keep the lesson. The Foreman will test it.",
+        "objectives": {
+          "0": {
+            "label": "Shardpike taken from the muster rack"
+          },
+          "1": {
+            "label": "Straw Foreman's lantern put out"
+          },
+          "2": {
+            "label": "Blows landed while its planks are down"
+          }
+        }
+      },
+      "q_muster_trophy": {
+        "title": "A Chip Off the Foreman",
+        "text": "Every week he stands back up, and every week we knock him down again. That takes a raid, and the muster cannot raise one on its own. Find the next raid that goes after Balgath and help bring him down, {playerName}. Strike him, shield the ones who do, or mend them: every hand that fights him counts. When he falls, come back and report to me. The muster pays for every kill.",
+        "completion": "Down again, and you were in the fight that did it. Fenbridge will have my report tonight. The purse is thin this far out, but it is yours. Come back when he is up again.",
+        "objectives": {
+          "0": {
+            "label": "Balgath slain"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "The Socketwright's Due",
+        "text": "I set the Barrowglass in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
+        "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
+        "objectives": {
+          "0": {
+            "label": "The Foreman's eye put out"
           }
         }
       },
@@ -24629,6 +24808,12 @@ export const pt_BR: EnTranslations = {
           },
           "7": {
             "label": "O Bastião Submerso"
+          },
+          "8": {
+            "label": "Domínio dos Túmulos"
+          },
+          "9": {
+            "label": "Cratera da Estrela Cadente"
           }
         }
       },
@@ -25722,6 +25907,7 @@ export const pt_BR: EnTranslations = {
     "mailboxName": "Caixa de correio",
     "noticeboardName": "Quadro de Avisos",
     "farmPatchName": "Canteiros de Jardim",
-    "realmBuilderMonumentName": "Monumento ao Construtor de Reino"
+    "realmBuilderMonumentName": "Monumento ao Construtor de Reino",
+    "musterRackName": "Muster Weapon Rack"
   }
 };

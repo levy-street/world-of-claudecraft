@@ -128,6 +128,10 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   nhalias_bell_maul: 'hammer_d', // mauls share hammer_d
   ironshod_maul: 'hammer_d', // crafted 2H maul
   fenshadow_maul: 'hammer_d', // feral ladder maul
+  // The Mirefen world boss's signature drop, on its own bespoke model.
+  foremans_barrowmaul: 'balgath_barrowmaul_hammer',
+  // Balgath's caster spoil, on its own bespoke model (scripts/assets/craterglass_stave/).
+  craterglass_stave: 'craterglass_stave',
   gravewyrm_thornmaul: 'hammer_d', // feral ladder maul
   maul_of_the_scourged_wilds: 'hammer_d', // feral ladder, Nythraxis raid rung
   wildsoul_maul: 'hammer_d', // feral ladder, heroic-only ilvl 31 rung
@@ -174,6 +178,13 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   staff_of_the_last_spring: 'adv_staff',
   forgefire_spire: 'adv_staff',
   wand_of_quenched_sparks: 'adv_wand',
+  // Skerrit's Shardpike: a socketwright's gem-setting tool, not a soldier's spear, so it
+  // gets its own model rather than borrowing spear_a. Unmapped it fell through to the
+  // class default attach, which meant the quest tool the Mirefen world boss's whole
+  // level-spread mechanic runs on was drawn as a plain sword.
+  skerrits_shardpike: 'shardpike_spear',
+  // The muster's lent copy off the command camp's rack: the same pike in the same hands.
+  muster_shardpike: 'shardpike_spear',
 
   // ---- Warfare Season 2 honor weapons (pvp_honor_season2.ts) ------------------
   // Held models reuse shipped GLBs.

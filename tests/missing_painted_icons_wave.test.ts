@@ -241,6 +241,8 @@ const ALLOWED_REFERENCE_ROLES = [
 // Choice-row talents, modifier art, retired summon paintings, and pet signature
 // actions are image ids without live ABILITIES rows by design.
 const PRESERVED_IMAGE_BACKED_MODIFIER_IDS = [
+  // The Shardpike bar's three verbs: painted art on a quest tool's ACTIONS, which have no
+  // ABILITIES row of their own to be image-backed from.
   'anger_management',
   'attack',
   'battle_rhythm',
@@ -254,6 +256,9 @@ const PRESERVED_IMAGE_BACKED_MODIFIER_IDS = [
   'elemental_convergence',
   'emberkin_felbolt',
   'gloomshade_abyssal_chain',
+  'lance_brace',
+  'lance_release',
+  'lance_thrust',
   'lingering_dread',
   'overflowing_power',
   'pet_aggressive',
@@ -688,8 +693,12 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // the pending side on the exploration crest.
     // 319 at the 2026-09-28 release/v0.44.0 merge into Buried Hoards: the
     // Coinsack Scurrier catch (cmb_coinsack_caught) joins the pending side.
-    expect(DEED_ORDER).toHaveLength(319);
+    // 322 with the Mirefen world-boss branch's three combat deeds, all pending.
+    expect(DEED_ORDER).toHaveLength(322);
+    expect(DEED_ART_PENDING.has('cmb_point_taken')).toBe(true);
     expect(DEED_ART_PENDING.has('hid_forgebreaker')).toBe(true);
+    expect(DEED_ART_PENDING.has('cmb_balgath')).toBe(true);
+    expect(DEED_ART_PENDING.has('cmb_balgath_ten')).toBe(true);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(

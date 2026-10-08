@@ -72,6 +72,10 @@ export const table: ReliquaryLocaleTable = {
     name: '桑扎爾，覺醒之峰',
     desc: '來自覺醒之峰世界首領的個人史詩戰利品。',
   },
+  conquerors_balgath: {
+    name: '巴爾加斯，被埋葬的工頭',
+    desc: '從迷霧沼澤古塚中拖出的戰利品。',
+  },
   conquerors_collapsed_reliquary: {
     name: '崩塌的聖物庫',
     desc: '來自坍塌的聖物庫中需開鎖寶箱的標誌性稀有物品。',

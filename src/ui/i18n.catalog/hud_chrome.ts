@@ -73,6 +73,85 @@ export const hudChromeStrings = {
     sailing: 'Sailing to {dest}',
   },
   materialStackSelectionUnavailable: 'That material selection is no longer available.',
+  // The Shardpike bar: the second action bar the Mirefen world boss's level-spread
+  // mechanic is reached through (src/ui/hud/shardpike/). Three verbs on a quest tool, not
+  // abilities, so they have no spellbook entry to borrow a name or a tooltip from.
+  //
+  // Every number in these tooltips is a {placeholder} the bar resolves from the sim's own
+  // constants (src/sim/lance_balance_core.ts). A literal here would read correctly on the
+  // day it was written and quietly lie after the first retune.
+  //
+  // The thrust window's placeholder is {seconds}, NOT {window}: a `{`-wrapped bare
+  // `window` is indistinguishable from a browser-global reach to the src/ui host-purity
+  // sweep (UI_HOST_VALUE_RE in tests/architecture.test.ts), and it flags this catalog plus
+  // every resolved locale bundle the key lands in.
+  shardpike: {
+    braceLabel: 'Couch the Shardpike',
+    braceTooltip:
+      'Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.',
+    thrustLabel: 'Barrowglass Thrust',
+    thrustTooltip:
+      'Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.',
+    // The brace tooltip once the turn keys and the on-screen keycaps lean too (the strafe
+    // keys alone left players who had bound Q/E to the action bar with no stick at all).
+    braceTooltipLean:
+      'Plant the butt and hold the point up. Lean with your strafe or turn keys, or hold the two keys above the beam: each pushes the marker toward its side. The beam drifts on its own, and every slam he lands kicks it. Keep it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.',
+    releaseLabel: 'Ground the Shardpike',
+    releaseTooltip:
+      'Lower the pike and step out of the brace, the same as jumping. You lose the set but pay no penalty: you can couch it again right away. Only a thrust, a fumble, a broken stance or a missed window rests the pike, for {rest} seconds.',
+    // Why a greyed verb is greyed (src/ui/hud/shardpike/shardpike_tooltip.ts). Deliberately
+    // clock-free: the hover card is resolved once when the pointer arrives and never
+    // refreshed, so a number in here would freeze while the one on the icon kept ticking.
+    // Each one names the fix rather than only the obstacle, since a player reading it is
+    // mid-fight and looking for the next press.
+    whyResting:
+      'The pike is being re-set after a thrust, a fumble, a broken stance or a missed window. Wait out the timer on the icon.',
+    whyAlreadyCouched: 'The pike is already couched. Ground it before you re-set.',
+    whyNotSet: 'The pike is not set. Couch it and hold it steady first.',
+    whyNothingCouched: 'Nothing to ground: the pike is not couched.',
+    beamLabel: 'Shardpike balance',
+    beamStatus: 'Pike balance {balance}, set {set} percent.',
+    beamDanger: 'Pike balance {balance}, about to fumble.',
+    // The loud one-line prompt (src/ui/hud/shardpike/shardpike_prompt_view.ts). Exactly one
+    // shows at a time, so each has to stand alone: name the action, name the target, and
+    // where a clock is the reason for waiting, show the clock. Written as commands, because
+    // a player reading this is mid-fight and looking for an instruction, not a description.
+    promptStrike: 'STRIKE THE EYE now, {seconds}s',
+    promptHoldSteady: 'Hold the pike steady with your strafe keys',
+    promptCatchIt: 'Catch it, the pike is going over',
+    promptEyeOut: 'The eye is out, {seconds}s: hit him with everything',
+    promptSealed: 'His eye is shut. It opens again in {seconds}s',
+    promptResetting: 'Re-setting the pike, {seconds}s',
+    promptCloser: 'Get within reach of the Foreman, {yards} yards out',
+    promptBrace: 'Couch the Shardpike, then hold it steady',
+    promptFindBoss: "Skerrit's Shardpike: put out the Foreman's eye with it",
+    promptFindBossMuster: "The muster's Shardpike: put out the Foreman's eye with it",
+    // Beside the muster's weapon rack with no pike in hand (shardpike_prompt_view.ts):
+    // the interact key when one is bound, the click alone when none is, the tap on touch.
+    promptTakePike: 'Press {key} or click the rack to take a Shardpike',
+    promptTakePikeClick: 'Click the rack to take a Shardpike',
+    promptTakePikeTap: 'Tap the rack to take a Shardpike',
+    // A level 20 at the rack (src/sim/muster_pike.ts MUSTER_PIKE_MAX_LEVEL): the pikes are
+    // the low levels' job, so the prompt says so instead of offering one.
+    promptPikeLevelCap: 'The muster lends its pikes only to level {level} or lower',
+    promptHoldSteadyLean: 'Hold the pike steady: lean with {left} and {right}',
+    // The two press-and-hold keycaps above the beam (shardpike_lean_view.ts): their
+    // accessible names, with the bound key when there is one.
+    leanLeft: 'Lean left',
+    leanRight: 'Lean right',
+    leanLeftKey: 'Lean left ({key})',
+    leanRightKey: 'Lean right ({key})',
+    promptTally: '{count} put out',
+    promptLabel: 'Shardpike instruction',
+    blindBanner: 'BARROWHIDE BROKEN',
+    // The drill yard's effigy, the Straw Foreman (src/sim/muster_effigy.ts): the same
+    // ladder with the lantern in its eye as the target, and the banner a landed thrust
+    // raises there (the lesson the whole yard exists to teach).
+    effigyBanner: 'BLINDED! NOW THE WHOLE RAID HITS HARD',
+    promptStrikeLantern: 'STRIKE THE LANTERN now, {seconds}s',
+    promptLanternOut: 'The lantern is out, {seconds}s: hit it with your own weapon',
+    promptCloserEffigy: 'Get within reach of the Straw Foreman, {yards} yards out',
+  },
   vehicle: {
     title: 'North Watch Cannon',
     objective: 'Defend the north watch',
@@ -3912,7 +3991,13 @@ export const hudChromeStrings = {
         'Your melee and ranged weapon critical hits set the target alight, dealing {tick} Fire damage every {every} sec for {duration} sec. A new critical hit refreshes it. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.',
       guardHeat:
         'Each attack you parry, dodge or block adds a heat stack, up to {max}. Heat lasts {duration} sec, refreshed whenever you gain a stack.',
+      // Barrowstone Heart (Balgath, combat/balgath_trinkets.ts); {icd} is a formatted
+      // cooldown ("3 min").
+      stoneHeart:
+        'When a hit would kill you, you turn to stone for {statue} sec instead: you take no damage and cannot move or act, then return with {restore} health ({restorePct}% of your maximum health). Can occur once every {icd}. Never in duels or arena matches, which end at the killing blow.',
     },
+    // A damage range; `scaled` above appends what the viewer's power adds.
+    range: '{min} to {max}',
     use: {
       retaliate:
         'For {duration} sec, an enemy that hits you directly takes Physical damage equal to {pct}% of the health that hit took from you. Periodic damage does not trigger it.',
@@ -3948,6 +4033,15 @@ export const hudChromeStrings = {
         'Set a lantern at your feet for {duration} sec. A direct heal from anyone on you or a party member within {radius} yd of it also heals the most wounded other party member in its light for {share}% of the heal.',
       heartNova:
         'Spend all heat stacks on a fire nova that deals {perHeat} Fire damage per stack ({max} at {maxHeat} stacks) to each enemy within {radius} yd and taunts every creature it hits. Damage increases with Attack Power. Requires a heat stack.',
+      // Balgath's trinkets (combat/balgath_trinkets.ts).
+      foremanShape:
+        'Take the Shape of the Foreman for {duration} sec: you become the one-eyed cyclops and fight with your fists, keeping every ability and its damage. You gain {armorPct}% armor and cannot be knocked back. Dismounts you.',
+      musterStandard:
+        'Plant a Muster Standard at your feet. For {duration} sec, {soldiers} muster soldiers march at your side and fight your target in melee, each hitting every {every} sec for {damage} Physical damage. They attack only your target, and only once it is already in combat. Each has {hpPct}% of your maximum health. Left more than {leash} yd behind, they rejoin you at once. They leave when the standard falls or when you die. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, set when you plant it.',
+      gutteredGlare:
+        'Channel for {duration} sec: a beam {length} yd long bursts from you the way you face and deals {tick} Arcane damage every {every} sec to up to {max} enemies in its path ({total} to each over the full channel). Turn to sweep it; moving or casting ends it. Damage increases with Spell Power.',
+      grapnel:
+        'Hook a party or raid member within {range} yd that you can see and haul them through the air to your side, healing them for {heal} when they land. It cannot pull enemies, or allies in a vehicle, on a ship, turned to stone or held by an effect that cannot be broken. Healing increases with Healing Power.',
     },
   },
   // Quest-link sharing: the chat-link affordance and its sim-emitted notices
@@ -5237,6 +5331,12 @@ export const hudChromeStrings = {
     bruinRushWindow:
       'Cat Form costs no mana and Pins your Bruin Rush target, slowing it by {pct}% for {sec} sec',
     funeralHarvestLock: 'Funeral Harvest cannot create another Soul Fragment yet',
+    // The drill yard's effigy (src/sim/muster_effigy.ts): its plank hide, and a player's
+    // own window on it once a Shardpike thrust has put its lantern out.
+    effigyPlankHide:
+      'Turns away {pct}% of every blow, until a Shardpike thrust puts out the lantern in its eye',
+    effigyLanternOut:
+      "The Straw Foreman's lantern is out for you: your blows and your pet's ignore its Plank Hide and land in full",
     leadenHexLock: 'Leaden Hex cannot root this target again yet',
     forbiddenReflectionReady: 'Your next eligible Warlock cooldown can be cast again',
     forbiddenReflectionLock: 'Forbidden Reflection cannot be prepared again yet',
@@ -5377,6 +5477,14 @@ export const hudChromeStrings = {
         'Your auto-attacks, shots and physical abilities (not bleeds) also strike the enemy nearest your target within {reach} yd for {pct}% of the damage dealt.',
       lantern:
         'A direct heal from anyone on you or a party member within {radius} yd of the lantern also heals the most wounded other party member in its light for {pct}% of the heal.',
+      // Balgath's trinkets (combat/balgath_trinkets.ts).
+      foremanShape: 'You are the Foreman: {armorPct}% more armor and immune to knockbacks.',
+      musterStandard:
+        'Your Muster Standard is planted. Its soldiers march with you and fight your target.',
+      gutteredGlare:
+        'The beam deals {tick} Arcane damage every {every} sec to enemies in its path. Moving or casting ends it.',
+      stoneStatue:
+        'Turned to stone: immune to damage and unable to act. You return with {pct}% of your maximum health.',
       crucibleHeat:
         'Heat: {stacks}/{max}. Use Heart of the Crucible to spend it all on a fire nova that deals {damage} Fire damage to each enemy within {radius} yd and taunts every creature it hits.',
       crucibleHeatOther:
@@ -5416,6 +5524,8 @@ export const hudChromeStrings = {
     dodge: 'Increases dodge chance by {pct}%',
     dodgeReduce: 'Reduces dodge chance by {pct}%',
     damageReduction: 'Reduces all damage taken by {pct}%',
+    // The slumbering world boss (src/sim/mob/slumber.ts): asleep from dusk to dawn.
+    slumber: 'Asleep until dawn. Cannot be attacked and will not wake for anyone.',
     guardianWard: 'The next lethal enemy hit restores you to {pct}% health instead',
     armorFlat: 'Reduces armor by {value}',
     armorFlatStacks: 'Reduces armor by {value} ({stacks} stacks)',
@@ -5518,7 +5628,11 @@ export const hudChromeStrings = {
   // world boss rises; src/ui/sim_i18n.ts re-localizes it through this key, splicing
   // the localized boss name. English-only domain so an English-only PR compiles.
   worldBoss: {
-    spawn: '{name} rises over Thornpeak Heights!',
+    spawn: '{name} rises over {zone}!',
+    // A slumbering world boss (src/sim/mob/slumber.ts): the dawn wake is the daily call
+    // to arms, the dusk line tells the realm he is gone for the night.
+    wake: '{name} wakes over {zone}!',
+    sleep: '{name} sleeps until dawn.',
   },
   // Password-reset ("forgot password") flow: the login-panel entry link, the
   // request-a-link panel, and the set-a-new-password panel (index.html +
@@ -5786,6 +5900,9 @@ export const hudChromeStrings = {
       menu: 'Menu',
       minimap: 'Minimap',
       stanceBar: 'Stance Bar',
+      // The Balgath quest tool's bar, named for the item so a player who has never
+      // taken the quest can still tell what the placeholder in the editor belongs to.
+      shardpikeBar: 'Shardpike Bar',
       xpBar: 'XP Bar',
       chat: 'Chat',
       actionBarGroup: 'Action Bars',

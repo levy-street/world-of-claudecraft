@@ -33,6 +33,7 @@ import { GATHERING_PROFESSION_IDS } from './content/professions';
 import { pointsSpent } from './content/talents';
 import { ITEMS, MOBS, zoneAt } from './data';
 import { canWearDevBadgeTitle, devBadgeTitleTier } from './dev_badge_titles';
+import { MUSTER_PIKE_MAX_LEVEL } from './lance_balance_core';
 import { LAUNCH_PAPERDOLL_SLOTS } from './launch_paperdoll_slots';
 import {
   accountReliquaryOwnership,
@@ -209,6 +210,7 @@ const ENCOUNTER_ROOM_RADIUS: Record<string, number> = {
 };
 
 const THUNZHARR_ID = 'thunzharr_waking_peak';
+const BALGATH_ID = 'balgath_cyclops';
 const WOLF_PACK_TEMPLATE = 'forest_wolf';
 const BOG_BLOAT_TEMPLATE = 'bog_bloat';
 const MENDER_TEMPLATE = 'gravecaller_mender';
@@ -1525,6 +1527,12 @@ export function retroFallbackGrants(ctx: SimContext, meta: PlayerMeta, player: E
   if (player.level >= MAX_LEVEL && meta.restedXp <= 0) {
     grantDeed(ctx, meta, 'prog_well_rested', { retro: true });
   }
+  // Stranded: the muster's rack lends its pikes to level 19 and below only (muster_pike.ts),
+  // so past that level the pike drill behind Point Taken can never be finished again, and a
+  // level never goes back down. Below the cap the drill's own turn-in stays the only grant.
+  if (player.level > MUSTER_PIKE_MAX_LEVEL && !meta.questsDone.has('q_muster_pike_drill')) {
+    grantDeed(ctx, meta, 'cmb_point_taken', { retro: true });
+  }
   // Proof: unique catalogued Reliquary fills already live on itemsDiscovered.
   // Veterans who crossed Curator rank thresholds before the rank deed bridges
   // shipped get cosmetic titles/borders on join (zero Renown; grantDeed is
@@ -1929,6 +1937,17 @@ export function onWorldBossKilledForDeeds(
   mob: Entity,
   contributors: PlayerMeta[],
 ): void {
+  // Per-boss credit, matched on template id. An explicit branch per boss rather than a
+  // table because the deeds differ in SHAPE: only Thunzharr has an unbroken-run deed, so a
+  // table would carry optionals most bosses never use.
+  if (mob.templateId === BALGATH_ID) {
+    for (const meta of contributors) {
+      grantDeed(ctx, meta, 'cmb_balgath');
+      bumpDeedStat(ctx, meta, 'balgathKills', 1);
+    }
+    ctx.deedRuntime.encounters.delete(mob.id);
+    return;
+  }
   if (mob.templateId !== THUNZHARR_ID) return;
   const st = ctx.deedRuntime.encounters.get(mob.id);
   for (const meta of contributors) {

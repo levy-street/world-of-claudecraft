@@ -28,6 +28,7 @@ import { runBlockingArrivalWarmup, settleWorldEntryCover } from './game/arrival_
 import { audio } from './game/audio';
 import { AutoLoot } from './game/autoloot';
 import { shouldRouteInteractToBgFlag } from './game/bg_flag_interact';
+import { applyBossTestDrive, parseBossTestDrive } from './game/boss_test_drive';
 import {
   BROWSER_BODY_CLASSES,
   browserBodyClasses,
@@ -5209,6 +5210,7 @@ async function startOffline(
     for (const id of usable) sim.addItem(id, 1, sim.playerId);
     if (usable[0]) sim.equipItem(usable[0], sim.playerId);
   }
+  if (bossTestDrive) applyBossTestDrive(sim, bossTestDrive, playerClass);
   // Offline characters are not persisted (a fresh name is typed each session),
   // so the only stable handle is class + name. Keybinds scope to that pair.
   void startGame(sim, sim, null, `offline:${playerClass}:${name}`, true);
@@ -10934,6 +10936,7 @@ function fadeOutHomepageMusic(durationMs = 1600): void {
 // here, boot straight into that offline world and skip the start screen. Any
 // malformed/absent request falls through to the normal home flow.
 const editorPlaytest = takeEditorPlaytestRequest();
+const bossTestDrive = import.meta.env.DEV ? parseBossTestDrive(location.search) : null;
 const startupParams = new URLSearchParams(location.search);
 const diagnosticsAutoOffline =
   import.meta.env.DEV &&
@@ -10951,6 +10954,10 @@ if (editorPlaytest) {
 } else if (diagnosticsAutoOffline) {
   startSitePresence('home');
   void startOffline('warrior', 'Diagnostics', 0);
+} else if (bossTestDrive) {
+  // ?boss=... skips the start screens: the point is to be looking at the boss.
+  startSitePresence('home');
+  void startOffline('warrior', 'Balgath', 0);
 } else {
   startSitePresence('home');
   wireStartScreens();

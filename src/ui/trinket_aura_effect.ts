@@ -253,6 +253,18 @@ export function trinketAuraEffectDescriptor(
       const use = useOf('last_flame_lantern', 'lantern');
       return { key: `${KEY}.lantern`, nums: { pct: pct(a.value), radius: use?.radius ?? 0 } };
     }
+    // Balgath's trinkets (combat/balgath_trinkets.ts): each aura carries its live number.
+    case TRINKET_AURA.foremanShape:
+      return { key: `${KEY}.foremanShape`, nums: { armorPct: round(a.value) } };
+    case TRINKET_AURA.musterStandard:
+      return { key: `${KEY}.musterStandard`, nums: {} };
+    case TRINKET_AURA.gutteredGlare:
+      return {
+        key: `${KEY}.gutteredGlare`,
+        nums: { tick: round(a.value), every: a.tickInterval ?? 0 },
+      };
+    case TRINKET_AURA.stoneStatue:
+      return { key: `${KEY}.stoneStatue`, nums: { pct: pct(a.value) } };
     case TRINKET_AURA.guardHeat: {
       const use = useOf('heart_of_the_crucible', 'heartNova');
       const max = passiveOf('heart_of_the_crucible', 'guardHeat')?.max ?? 0;

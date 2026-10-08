@@ -174,6 +174,7 @@ import {
   createAurasView,
   isToggleAuraKind,
 } from './auras_view';
+import { claudiumLauncherHtml } from './bag_currency_html';
 import { BagItemActionMenu, CTX_MENU_PICKER_CLASS } from './bag_item_action_menu';
 import { bagSlotsLineKey, bagsWindowShown } from './bags_view';
 import { BagsWindow, dismissBagPrompts } from './bags_window';
@@ -208,6 +209,7 @@ import {
   resolvePlayerSocialFlags,
   serializeIgnoreList,
 } from './chat_ignore_core';
+import { CHAT_TEMPLATE_KEYS, localizeChatBody } from './chat_templates';
 import { wireChromeFocus } from './chrome_focus_wiring';
 import { ClaudiumLauncherBalance } from './claudium_launcher_balance_core';
 import { createClaudiumPurchaseFacet } from './claudium_purchase_bridge';
@@ -274,6 +276,10 @@ import { dropdownKeyNav } from './dropdown_nav';
 import { DungeonFinderProposalPopup } from './dungeon_finder_proposal_popup';
 import { DungeonFinderWindow } from './dungeon_finder_window';
 import { emoteIconUrl } from './emote_icons';
+import {
+  emoteWheelSlotsKey,
+  emoteWheelVersionKey as emoteWheelVersionKeyFor,
+} from './emote_wheel_keys';
 import { crossHotbarActionSlot, EmpowerHold } from './empower_hold_core';
 import {
   combatAbilityName,
@@ -588,6 +594,7 @@ import { advanceFactionTierObservation } from './hud/reputation/faction_tier_cel
 import { RiftMapPainter } from './hud/rift';
 import { RiftFloorTrackerController } from './hud/rift/rift_floor_tracker_controller';
 import { RiftForgeWindow, riftForgeInReach } from './hud/rift_forge';
+import { createShardpikeBar, shardpikeBlindFeedback } from './hud/shardpike';
 import { StanceBarController } from './hud/stance';
 import { closeOpenTouchMenu } from './hud/tap_menu';
 import { createTargetDotsView, type TargetDotsInput, TargetDotsPainter } from './hud/target_dots';
@@ -1220,26 +1227,6 @@ const CRAFTING_TAB_KEY = 'woc_crafting_tab';
 // The persisted top-left keys for the movable unit frames live in
 // frame_pos_reset.ts (imported above) so the one-time reset clears the same
 // keys the MovableFrames read.
-const CHAT_TEMPLATE_KEYS = {
-  party: 'hud.chat.templates.party',
-  battleground: 'hud.chat.templates.battleground',
-  raidWarning: 'hud.chat.templates.raidWarning',
-  yell: 'hud.chat.templates.yell',
-  whisper: 'hud.chat.templates.whisper',
-  toWhisper: 'hud.chat.templates.toWhisper',
-  general: 'hud.chat.templates.general',
-  world: 'hud.chat.templates.world',
-  lfg: 'hud.chat.templates.lfg',
-  guild: 'hud.chat.templates.guild',
-  officer: 'hud.chat.templates.officer',
-  emote: 'hud.chat.templates.emote',
-  roll: 'hud.chat.templates.roll',
-  say: 'hud.chat.templates.say',
-} satisfies Record<string, TranslationKey>;
-
-function localizeChatBody(ev: Extract<SimEvent, { type: 'chat' }>): string {
-  return ev.textKey ? t(ev.textKey as TranslationKey, ev.textValues) : ev.text;
-}
 // world map: terrain is pre-rendered for the whole zone at this resolution
 // (cached per zone) and a sub-rect is blitted for the current zoom.
 const MAP_BG_RES = 480;
@@ -4260,11 +4247,11 @@ export class Hud {
   // -------------------------------------------------------------------------
 
   private emoteWheelKey(): string {
-    return `woc_emote_wheel_${this.sim.cfg.playerClass}_${this.sim.player.name}`;
+    return emoteWheelSlotsKey(this.sim.cfg.playerClass, this.sim.player.name);
   }
 
   private emoteWheelVersionKey(): string {
-    return `${this.emoteWheelKey()}_v2`;
+    return emoteWheelVersionKeyFor(this.sim.cfg.playerClass, this.sim.player.name);
   }
 
   private loadEmoteWheelSlots(): OverheadEmoteId[] {
@@ -4551,6 +4538,11 @@ export class Hud {
     this.paladinAscensionCharges,
     this.paladinAscensionStatusEl,
   );
+  private readonly shardpikeBar = createShardpikeBar(document, this.writerFacet, () => this.sim, {
+    attachTooltip: (el, html) => this.attachTooltip(el, html),
+    consumePeek: () => this.peekGuard.consume(),
+    keybinds: () => this.keybinds, // live, for the lean keycaps (hud/shardpike/)
+  });
   private readonly doomMeter = createDoomMeter(
     document,
     this.playerFrameEl.parentElement as HTMLElement,
@@ -6174,10 +6166,7 @@ export class Hud {
   private claudiumLauncherHtml(): string {
     if (!this.claudiumHooks) return '';
     this.claudiumBalance.refresh();
-    const balance = this.claudiumBalance.balance;
-    const label = balance === null ? '--' : formatNumber(balance, { maximumFractionDigits: 0 });
-    const aria = t('hudChrome.claudium.open');
-    return `<button type="button" class="claudium-launcher" data-claudium-launcher title="${esc(aria)}" aria-label="${esc(aria)}"><img class="claudium-coin" src="/claudium/icons/claudium_coin_64.webp" alt=""><span class="claudium-launcher-balance">${esc(label)}</span></button>`;
+    return claudiumLauncherHtml(this.claudiumBalance.balance);
   }
 
   // Complete aura tooltip body. A buff created by a known ability first shows that
@@ -6227,6 +6216,7 @@ export class Hud {
     return `<div class="tt-effect">${esc(t(effect.key as TranslationKey, values))}</div>`;
   }
 
+  /** Bind one element to the shared `#tooltip` box (choreography: tooltip_attach.ts). */
   attachTooltip(el: HTMLElement, html: () => string): void {
     let touchTimer: number | undefined;
     // tooltip box size, measured once in showAt (right after the content is set)
@@ -9314,6 +9304,7 @@ export class Hud {
     }
     this.cooldownManager.paint(actionBarWorld);
     this.renderPetBar(pet);
+    this.shardpikeBar.paint(p.dead);
     this.renderStanceBar();
     this.flushPendingProcAuraNotes();
     if (this.spellbookWindow.isOpen) this.spellbookWindow.tickOpen();
@@ -11502,6 +11493,9 @@ export class Hud {
           deedUnlocks.push(ev);
           break;
         }
+        case 'lanceBlind':
+          shardpikeBlindFeedback(this, ev);
+          break;
         case 'reliquaryUnlock': {
           reliquaryUnlocks.push(ev);
           break;

@@ -1829,6 +1829,44 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.interfacePage.framePetTitle': '내 소환수',
   'guide.interfacePage.winBagsTitle': '가방 (B)',
   'guide.riftsPage.rankFmt': '{rank} 등급',
+  'hudChrome.shardpike.braceLabel': '조각창 자세 잡기',
+  'hudChrome.shardpike.braceTooltip':
+    '창 밑동을 땅에 박고 창끝을 세운다. 좌우 이동 키가 균형 막대다: 빔은 저절로 흐르고, 그가 땅을 내리칠 때마다 튕긴다. 양쪽 끝에 닿지 않게 {set}초간 버티면 창이 고정된다. 단단한 땅이 필요하고, 탈것에 탄 채로는 불가능하다.',
+  'hudChrome.shardpike.thrustLabel': '배로글라스 찌르기',
+  'hudChrome.shardpike.thrustTooltip':
+    '고정된 창을 눈에 찔러 넣어 {damage}의 피해를 입힌다. 레벨도, 공격력도, 창 자체도 이 값을 키우지 못한다. 감독관을 실명시키고 무덤가죽을 벗겨내므로, 늪의 다른 모든 무기가 마침내 먹히기 시작한다. 고정된 창만이 이 일격을 낼 수 있고, 사거리는 {reach}야드, 기회는 {seconds}초 동안 열린다.',
+  'hudChrome.shardpike.releaseLabel': '조각창 내리기',
+  'hudChrome.shardpike.releaseTooltip':
+    '창을 거둔다. 물러나도 벌칙은 없다: 잃는 것은 자세뿐이고 기회 자체는 아니며, {rest}초 후 다시 자세를 잡을 수 있다.',
+  'hudChrome.shardpike.whyResting': '방금 창을 내렸다. 아이콘의 시간이 끝날 때까지 기다려라.',
+  'hudChrome.shardpike.whyAlreadyCouched': '창은 이미 자세를 잡았다. 다시 잡기 전에 내려라.',
+  'hudChrome.shardpike.whyNotSet': '창이 고정되지 않았다. 먼저 자세를 잡고 버텨라.',
+  'hudChrome.shardpike.whyNothingCouched': '내릴 것이 없다: 창의 자세를 잡지 않았다.',
+  'hudChrome.shardpike.beamLabel': '조각창 균형',
+  'hudChrome.shardpike.beamStatus': '창 균형 {balance}, 고정 {set}퍼센트.',
+  'hudChrome.shardpike.beamDanger': '창 균형 {balance}, 놓치기 직전.',
+  'hudChrome.shardpike.promptHoldSteady': '좌우 이동 키로 창을 버텨라',
+  'hudChrome.shardpike.promptCatchIt': '붙잡아라, 창이 넘어간다',
+  'hudChrome.shardpike.promptEyeOut': '눈이 터졌다, {seconds}초 남았다: 전력으로 때려라',
+  'hudChrome.shardpike.promptSealed': '그의 눈이 닫혔다. {seconds}초 후 다시 열린다',
+  'hudChrome.shardpike.promptResetting': '창을 다시 잡는 중, {seconds}초',
+  'hudChrome.shardpike.promptCloser': '감독관에게 접근하라, {yards}야드 남았다',
+  'hudChrome.shardpike.promptBrace': '조각창 자세를 잡고, 그대로 버텨라',
+  'hudChrome.shardpike.promptFindBoss': '스케릿의 조각창: 이것으로 감독관의 눈을 찔러라',
+  'hudChrome.shardpike.leanRightKey': '오른쪽으로 기울이기 ({key})',
+  'hudChrome.shardpike.leanLeftKey': '왼쪽으로 기울이기 ({key})',
+  'hudChrome.shardpike.leanRight': '오른쪽으로 기울이기',
+  'hudChrome.shardpike.leanLeft': '왼쪽으로 기울이기',
+  'hudChrome.shardpike.promptHoldSteadyLean': '창을 버텨라: {left}와 {right}로 기울여라',
+  'hudChrome.shardpike.promptFindBossMuster': '소집대의 조각창: 이것으로 감독관의 눈을 찔러라',
+  'hudChrome.shardpike.promptTakePike': '{key} 키를 누르거나 무기 거치대를 클릭해 조각창을 집어라',
+  'hudChrome.shardpike.promptTakePikeClick': '무기 거치대를 클릭해 조각창을 집어라',
+  'hudChrome.shardpike.promptTakePikeTap': '무기 거치대를 탭해 조각창을 집어라',
+  'hudChrome.shardpike.promptPikeLevelCap':
+    '소집군은 레벨 {level} 이하의 신병에게만 창을 빌려줍니다',
+  'hudChrome.shardpike.braceTooltipLean':
+    '창끝을 땅에 박고 창날을 치켜든다. 좌우 이동 키나 회전 키로, 또는 막대 위의 두 키를 누르고 있어 기울여라. 막대는 저절로 흔들리고, 그가 내려치는 일격마다 튕겨 나간다. {set}초 동안 양 끝에 닿지 않게 버티면 창이 자리 잡는다. 단단한 땅이 필요하며, 탈것 위에서는 불가능하다.',
+  'hudChrome.shardpike.promptLabel': '조각창 지시',
   'hudChrome.comboMeter.label': '연계',
   'hudChrome.bg.clock': '{minutes}:{seconds}',
   'hudChrome.controller.zoomIn': '확대',
@@ -2606,6 +2644,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.steamWishlist': '찜 목록 알림',
   'hudChrome.interfaceUnlock.frameNames.minimap': '미니맵',
   'hudChrome.interfaceUnlock.frameNames.stanceBar': '태세 바',
+  'hudChrome.interfaceUnlock.frameNames.shardpikeBar': '조각창 바',
   'hudChrome.interfaceUnlock.frameNames.playerFrame': '플레이어',
   'hudChrome.interfaceUnlock.frameNames.targetFrame': '대상',
   'hudChrome.interfaceUnlock.frameNames.partyFrames': '파티',
@@ -6882,6 +6921,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': '트롤 봉분',
   'entities.zones.mirefen_marsh.pois.6.label': '무덤부름 야영지',
   'entities.zones.mirefen_marsh.pois.7.label': '가라앉은 요새',
+  'entities.zones.mirefen_marsh.pois.8.label': '봉분의 영역',
+  'entities.zones.mirefen_marsh.pois.9.label': '별똥 분화구',
   'entities.zones.thornpeak_heights.name': '쏜피크 고지',
   'entities.zones.thornpeak_heights.welcome':
     '테살리 대장이 간신히 하이워치 성벽을 지키고 있습니다.',
@@ -8464,9 +8505,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.soulflame_cord.name': '영혼불꽃 허리끈',
   'entities.items.stormcallers_waistguard.name': '폭풍소환사의 허리보호구',
   'entities.mobs.thunzharr_waking_peak.name': '천자르, 깨어나는 봉우리',
+  'entities.mobs.balgath_cyclops.name': '발가스, 외눈의 감독관',
+  'entities.npcs.muster_commander.name': '소집대 지휘관',
+  'entities.mobs.muster_sergeant.name': '소집대 부사관',
+  'entities.mobs.muster_chaplain.name': '소집대 군목',
+  'entities.mobs.muster_footman.name': '소집대 보병',
   'entities.mobs.thunzharr_stormling.name': '깨어난 폭풍 정령',
   'entities.mobs.stable_horse.name': '마구간 말',
-  'hudChrome.worldBoss.spawn': '{name}이(가) 쏜피크 고지에 솟아올랐습니다!',
+  'hudChrome.worldBoss.spawn': '{name}이(가) {zone} 위로 일어섰습니다!',
+  'hudChrome.worldBoss.wake': '{name}이(가) {zone}에서 깨어났습니다!',
+  'hudChrome.worldBoss.sleep': '{name}이(가) 새벽까지 잠들었습니다.',
   'entities.items.stormcallers_spaulders.name': '강풍부름 어깨갑옷',
   'entities.items.bonewrought_greatsword.name': '뼈벼림 대검',
   'entities.items.direfang_greatblade.name': '흉포송곳니 대도',
@@ -10571,6 +10619,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '다음 화염 생성기가 연속으로 치명타를 적중하면 몰아치는 열기를 얻고, 치명타가 아니면 달아오름이 제거됩니다',
   'hudChrome.auraEffect.tongues': '시전 시간을 {pct}% 증가시킵니다',
   'hudChrome.auraEffect.damageReduction': '받는 모든 피해가 {pct}% 감소합니다',
+  'hudChrome.auraEffect.slumber':
+    '새벽까지 잠들어 있습니다. 공격할 수 없으며 누가 와도 깨어나지 않습니다.',
   'hudChrome.auraEffect.guardianWard':
     '다음 적의 치명적인 공격을 막고 대신 생명력을 {pct}%까지 회복합니다',
   'hudChrome.auraEffect.increase.ap': '공격력을 {value} 증가시킵니다',
@@ -14609,6 +14659,25 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.marshlight_hauberk.name': '습지빛 사슬갑옷',
   'entities.items.duskthorn_mantle.name': '황혼가시 어깨망토',
   'entities.items.fenshadow_maul.name': '늪그림자 철퇴',
+  'entities.items.skerrits_shardpike.name': '스케릿의 조각창',
+  'entities.items.muster_shardpike.name': '소집대 조각창',
+  'entities.npcs.socketwright_skerrit.name': '마벤 스케릿',
+  'entities.npcs.socketwright_skerrit.title': '박음 장인',
+  'entities.npcs.socketwright_skerrit.greeting':
+    '그 눈을 갈아 그의 눈구멍에 박아 넣은 지 사십 년, 하루치 값도 못 받았다. 감독관에게 아픔을 주고 싶나, {className}? 그렇다면 내 작품을 노려라.',
+  'entities.quests.q_socketwrights_due.title': '박음 장인의 미수금',
+  'entities.quests.q_socketwrights_due.text':
+    '그 눈구멍에 배로글라스를 박은 건 나였다. 렌즈를 갈고, 앉히고, 쐐기로 곧게 고정했지. 봉분의 주인들은 동화 한 푼 주지 않았고, 이제 내 작품이 늪을 짓밟으며 돌아다닌다. 내 조각창을 가져가라. 밑동을 박고, 창끝을 세워 얼마가 걸리든 버텨라. 팔이 확실해지면 그것을 눈에 꽂아라. 그가 걸친 가죽은 그 조각에 묶여 있다, {playerName}. 그를 실명시켜라. 그러면 늪의 모든 칼날이 마침내 먹힌다.',
+  'entities.quests.q_socketwrights_due.completion':
+    '뚫리는 느낌이 들었지? 사십 년치 이자를 눈구멍으로 받아냈다. 창은 네 것이다, 친구. 그는 낫는다, 늘 그러니까. 그러니 마음이 동할 때 또 받으러 가면 된다.',
+  'entities.quests.q_socketwrights_due.objectives.0.label': '감독관의 눈을 찌르기',
+  'entities.items.foremans_barrowmaul.name': '감독관의 봉분망치',
+  'entities.items.loomshard_eye.name': '배로글라스의 눈',
+  'entities.items.barrowhide_pauldrons.name': '봉분 어깨보호구',
+  'entities.items.mirestone_stride.name': '진흙돌 발걸음',
+  'entities.items.foremans_wage_band.name': '감독관의 임금 반지',
+  'entities.items.mirelight_locket.name': '늪빛 로켓',
+  'entities.items.fenwright_grips.name': '늪지 장인의 장갑',
   'entities.items.wildgrove_cinch.name': '야생숲 허리띠',
   'entities.items.cragward_pauldrons.name': '바위수비 어깨갑옷',
   'entities.items.cragthorn_greatstaff.name': '바위가시 대지팡이',
@@ -18760,6 +18829,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '"프레임 편집"은 그 아래 쌓이는 추적기 무리(추적 중인 퀘스트와 그 목표, 업적 진행도, 성물고 페이지, 제작에서 고정해 둔 제작법, 지금 들어와 있는 탐굴, 참여 중인 균열, 그리고 추적 중인 제작법이나 의뢰)와 소환수 프레임 옆 소환수 행동 단축바, 주변 적에게 건 약화 효과를 모아 보여주는 "대상 디버프" 프레임, 성기사의 "헌신" 메달, 흑마법사의 "고통 자원 막대", 주문 발동 오버레이, 이도류일 때의 보조 무기 공격 속도 바, 그리고 탭으로 나뉜 피해 측정기 창까지 함께 풀어 주며, 풀려 있는 동안에는 저마다 이름 칩을 달고 있습니다.',
   'guide.interfacePage.framesGovernedTalkingHead':
     '프레임 편집은 대화 패널도 해제합니다. 대화 패널은 말하는 NPC가 시야 밖에 있을 때 그 NPC의 대사를 담으며, 해제된 동안에는 자신의 이름 칩을 표시합니다.',
+  'guide.interfacePage.framesGovernedShardpike':
+    '프레임 편집은 조각창 바도 해제합니다. 조각창 바는 조각창을 들고 있는 동안에만 행동 단축바 옆에 나타나는 퀵스트 도구 행동의 짧은 줄이며, 해제된 동안에는 자신의 이름 칩을 표시합니다. 덕분에 전투 중이 아니라 전투 전에 자리를 잡아 둘 수 있습니다.',
   'guide.interfacePage.framesGovernedUnitTooltip':
     '"프레임 편집"은 툴팁 프레임도 풀어 줍니다. 마우스를 올린 대상의 카드가 나타나는 자리로, 생물이면 레벨과 종류, 다른 플레이어면 칭호, 길드, 레벨과 직업, 그리고 전문화와 그 역할이 표시됩니다. 원하는 곳으로 끌어 놓으면 카드는 그 자리에서 가장 가까운 화면 가장자리를 피하는 방향으로 펼쳐집니다. "프레임 설정"의 "프레임 표시 및 숨기기"에서 툴팁 체크를 해제하면 이 카드를 완전히 숨길 수 있습니다.',
   'guide.interfacePage.framesGovernedAuraTracks':
@@ -18818,6 +18889,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.realmBuilder.pastEmpty': '아직 명단에 이름이 없습니다.',
   'hudChrome.realmBuilder.close': '닫기',
   'worldContent.realmBuilderMonumentName': '왕국 건설자 기념비',
+  'worldContent.musterRackName': '소집대 무기 거치대',
   'hudChrome.talkingHead.label': '대화',
   'hudChrome.hubLesson.target': '먼저 허수아비를 대상으로 삼으세요.',
   'hudChrome.hubLesson.openWindow': '{meters}을(를) 여세요.',
@@ -19707,6 +19779,41 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.town.description': '이름을 사용하여 타운 허브로 순간이동합니다.',
   'devCommand.actions.town.label': '타운 허브',
   'devCommand.fields.town': '도시',
+  // The Mirefen muster: the drill yard and the muster quests (M16 fills).
+  'hudChrome.shardpike.effigyBanner': '실명시켰다! 이제 공격대 전원이 세게 친다',
+  'hudChrome.shardpike.promptStrikeLantern': '지금 등불을 찔러라, {seconds}초',
+  'hudChrome.shardpike.promptLanternOut': '등불이 꺼졌다, {seconds}초 남았다: 자신의 무기로 쳐라',
+  'hudChrome.shardpike.promptCloserEffigy': '짚 감독관에게 접근하라, {yards}야드 남았다',
+  'hudChrome.auraEffect.effigyPlankHide':
+    '모든 타격의 {pct}%를 막아낸다. 조각창 찌르기로 눈의 등불을 끌 때까지 유지된다',
+  'hudChrome.auraEffect.effigyLanternOut':
+    '당신에게는 짚 감독관의 등불이 꺼져 있다: 당신과 소환수의 공격이 판자 가죽을 무시하고 온전히 들어간다',
+  'character.lockoutWeeklyQuests': '주간 퀘스트',
+  'entities.mobs.muster_drillmaster.name': '소집대 교관',
+  'entities.mobs.muster_effigy.name': '짚 감독관',
+  'entities.npcs.muster_commander.title': '펜브리지 소집대',
+  'entities.npcs.muster_commander.greeting':
+    '먼저 창, 그다음이 모두다, {className}. 그게 전부고, 그게 이 진영을 살려 왔다.',
+  'entities.quests.q_muster_summons.title': '소집대의 부름',
+  'entities.quests.q_muster_summons.text':
+    '내줄 수 있는 창은 모두 낙성 분화구 주위에 진을 쳤다, {playerName}. 거기서 걸어 나오는 놈을 둘러싸기 위해서다. 소집대 지휘관은 분화구를 내려다보는 남쪽 둔덕의 진영을 지키고 있다. 여기서 남동쪽이다. 지휘관에게 보고해라. 놈과 싸우는 법을 듣게 될 거다. 잘 들어라. 듣지 않은 자들은 갈대밭에 누워 있다.',
+  'entities.quests.q_muster_summons.completion':
+    '펜윅의 전령인가? 좋다. 한 번만 말하겠다, 놈은 아예 말해 주지 않으니까. 발가스는 우리 초소들을 돈다: 분화구 가장자리, 서쪽 평지, 남쪽 둔덕, 남서쪽 가장자리의 틈, 그리고 다시 한 바퀴. 멈춰 선 초소는 모두 짓밟힌다. 강철은 놈에게 먹히지 않는다. 가죽이 튕겨 내고, 놈을 베기만 하는 공격대는 지쳐서 죽는다. 유일한 약점은 눈이다. 버틴 창을 배로글라스에 꿰뚫으면 놈은 눈이 멀고, 눈이 먼 동안 가죽이 벗겨진다. 그때가 공격대 전원이 세게 칠 때다. 그러고 나면 가죽이 다시 닫히고 우리는 다음 기회를 기다린다. 먼저 창, 그다음이 모두다, {playerName}. 거치대는 레벨 19 이하의 신병에게만 창을 빌려준다. 젊은 놈들이 눈을 찌르고, 노병들이 그 틈을 살린다.',
+  'entities.quests.q_muster_summons.objectives.0.label': '소집대 지휘관에게 보고',
+  'entities.quests.q_muster_pike_drill.title': '먼저 창',
+  'entities.quests.q_muster_pike_drill.text':
+    '말은 싸지만 창은 싸지 않다. 내 옆 거치대에서 조각창을 가져가라. 그다음 진영 서쪽 끝의 짚 감독관에게 가라. 녀석들이 판자와 짚으로 진짜의 절반 크기로 만든 것인데, 눈 자리에 등불이 들어 있다. 창을 세우고, 교관이 땅을 내리치는 동안에도 창끝을 곧게 유지해라. 진짜는 더 세게 흔들어 대니까. 팔이 확실해지면 창끝을 등불에 꽂아라. 판자가 떨어져 나간다: 그러면 자신의 무기로 쳐 봐라, {playerName}. 차이를 느낄 거다. 거치대는 레벨 19 이하의 신병에게만 창을 빌려준다.',
+  'entities.quests.q_muster_pike_drill.completion':
+    '먹히는 게 느껴졌지? 진짜라면 공격대 전원이 휘두르는 열네 번의 숨이다. 그리고 가죽이 다시 닫힌다. 이 교훈을 잊지 마라. 감독관이 시험할 거다.',
+  'entities.quests.q_muster_pike_drill.objectives.0.label': '소집대 거치대에서 조각창을 가져감',
+  'entities.quests.q_muster_pike_drill.objectives.1.label': '짚 감독관의 등불을 끔',
+  'entities.quests.q_muster_pike_drill.objectives.2.label': '판자가 떨어진 동안 적중한 타격',
+  'entities.quests.q_muster_trophy.title': '감독관의 부스러기',
+  'entities.quests.q_muster_trophy.text':
+    '놈은 매주 다시 일어서고, 우리는 매주 다시 쓰러뜨린다. 그러려면 공격대가 필요한데, 소집대만으로는 꾸릴 수 없다. 발가스를 치러 가는 다음 공격대를 찾아 놈을 쓰러뜨리는 걸 도와라, {playerName}. 놈을 베든, 베는 자들을 지키든, 치료하든 좋다. 놈과 싸운 손은 모두 인정된다. 놈이 쓰러지면 돌아와서 내게 보고해라. 소집대는 처치할 때마다 값을 치른다.',
+  'entities.quests.q_muster_trophy.completion':
+    '또 쓰러뜨렸군. 그리고 너도 그 싸움에 있었지. 오늘 밤 안에 펜브리지로 보고를 보내겠다. 이렇게 멀리 나와 있으니 주머니가 얇지만, 이건 네 몫이다. 놈이 다시 일어서면 돌아와라.',
+  'entities.quests.q_muster_trophy.objectives.0.label': '발가스 처치',
   'entities.items.bastion_sigil.name': '보루의 인장',
   'entities.items.mooring_stone.name': '정박석',
   'entities.items.menders_hourglass.name': '치유사의 모래시계',
@@ -20137,4 +20244,28 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.referral_gloves.name': '우정의 건틀릿',
   'entities.items.referral_feet.name': '우정의 장화',
   'hudChrome.bank.referralArmour': '우정 방어구 받기',
+  'entities.items.knucklebone_of_balgath.name': '발가스의 손마디뼈',
+  'entities.items.muster_standard.name': '소집대 군기',
+  'entities.items.guttered_eye.name': '꺼져가는 눈',
+  'entities.items.barrowstone_heart.name': '봉분석 심장',
+  'entities.items.muster_grapnel.name': '소집대 갈고리',
+  'entities.items.craterglass_stave.name': '운석유리 지팡이',
+  'hudChrome.trinkets.equip.stoneHeart':
+    '공격에 죽게 되면 대신 {statue}초 동안 돌로 변합니다. 피해를 받지 않고 이동하거나 행동할 수 없으며, 이후 생명력 {restore}(최대 생명력의 {restorePct}%)으로 돌아옵니다. {icd}마다 한 번만 발생합니다. 결투와 투기장 경기에서는 발동하지 않으며, 결정타에서 끝납니다.',
+  'hudChrome.trinkets.use.foremanShape':
+    '{duration}초 동안 감독관의 모습을 취합니다. 외눈 거인이 되어 주먹으로 싸우며, 모든 능력과 그 피해량을 유지합니다. 방어도가 {armorPct}% 증가하고 밀려나지 않습니다. 탈것에서 내립니다.',
+  'hudChrome.trinkets.use.musterStandard':
+    '발밑에 소집대 군기를 세웁니다. {duration}초 동안 소집병 {soldiers}명이 당신 곁에서 행군하며 대상과 근접전을 벌이고, 각각 {every}초마다 {damage}의 물리 피해를 줍니다. 병사들은 당신의 대상만, 그것도 이미 전투 중일 때만 공격합니다. 각각 당신 최대 생명력의 {hpPct}%를 가집니다. {leash}미터 넘게 뒤처지면 즉시 당신 곁으로 돌아옵니다. 군기가 쓰러지거나 당신이 죽으면 떠납니다. 피해량은 전투력과 원거리 전투력 중 높은 쪽에 따라 증가하며, 세울 때 정해집니다.',
+  'hudChrome.trinkets.use.gutteredGlare':
+    '{duration}초 동안 정신을 집중합니다. 길이 {length}미터의 광선이 바라보는 방향으로 뻗어 나가 경로에 있는 적 최대 {max}명에게 {every}초마다 {tick}의 비전 피해를 줍니다(전체 집중 동안 각 적에게 {total}). 몸을 돌리면 광선이 휩쓸고, 이동하거나 시전하면 끝납니다. 피해량은 주문력에 따라 증가합니다.',
+  'hudChrome.trinkets.use.grapnel':
+    '{range}미터 이내에 보이는 파티원 또는 공격대원에게 갈고리를 걸어 공중으로 끌어당겨 곁으로 데려오며, 착지할 때 생명력을 {heal} 회복시킵니다. 적이나, 탈것이나 배에 탄 아군, 돌로 변한 아군, 해제할 수 없는 효과에 붙잡힌 아군은 끌어당길 수 없습니다. 치유량은 치유력에 따라 증가합니다.',
+  'hudChrome.auraEffect.trinket.foremanShape':
+    '당신은 감독관입니다. 방어도가 {armorPct}% 증가하고 밀려나지 않습니다.',
+  'hudChrome.auraEffect.trinket.musterStandard':
+    '소집대 군기가 세워졌습니다. 병사들이 당신을 따르며 당신의 대상과 싸웁니다.',
+  'hudChrome.auraEffect.trinket.gutteredGlare':
+    '광선이 경로에 있는 적에게 {every}초마다 {tick}의 비전 피해를 줍니다. 이동하거나 시전하면 끝납니다.',
+  'hudChrome.auraEffect.trinket.stoneStatue':
+    '돌로 변했습니다. 피해를 받지 않고 행동할 수 없습니다. 최대 생명력의 {pct}%로 돌아옵니다.',
 };

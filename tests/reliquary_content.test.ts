@@ -382,11 +382,13 @@ describe('Reliquary Conqueror catalog structure', () => {
     // closeout of docs/prd/ignivar-raid-loot.md) + the Roots' Bramblehide
     // set page (the eighth epic armor family).
     // +1: conquerors_vanguard_gallery (Warfare Season 2).
-    expect(CONQUEROR_PAGES.length).toBe(34);
+    // +1: the Buried Hoards page.
+    // +1: conquerors_balgath (the Mirefen world boss).
+    expect(CONQUEROR_PAGES.length).toBe(35);
     expect(PROFESSION_PAGES.length).toBe(5);
     expect(HORIZON_PAGES.length).toBe(5);
-    // Literal: update when product adds a page.
-    expect(RELIQUARY_PAGES.length).toBe(44);
+    // Literal: update when product adds a page (45 with the Mirefen world boss page).
+    expect(RELIQUARY_PAGES.length).toBe(45);
     expect(
       RELIQUARY_PAGES.every(
         (p) => p.shelf === 'conquerors' || p.shelf === 'professions' || p.shelf === 'horizons',
@@ -471,7 +473,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Clue Scroll Treasure Hunter title joins it: 445.
     // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge) takes a horizons_mounts slot: 446.
     // the trinket slot's 18 trinkets (PR 4173): twelve item relics plus the five Crucible raid trinkets: 463.
-    expect(full).toEqual({ owned: 495, total: 495 });
+    // The seven Mirefen world boss relics (conquerors_balgath) plus his Craterglass
+    // Stave and five trinkets on the same page: 495 + 13 = 508.
+    expect(full).toEqual({ owned: 508, total: 508 });
     // The Warfare Season 2 Vanguard Gallery (135 set pieces and four weapons)
     // is class-personal and sits outside completion, so it moves neither pair.
     const character = catalogCharacterCompletion({
@@ -504,7 +508,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // 412 at the release/v0.43.0 merge: the Arcane Calligraphy gold title slot.
     // 415 with the three faction standing Champion title slots. 416 with the
     // Clue Scroll Treasure Hunter title slot. 417 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge). 434 with the trinket slot's 18 trinkets (PR 4173).
-    expect(character).toEqual({ owned: 466, total: 466 });
+    // 466 + 13 with the Mirefen world boss page's relics, staff and trinkets: 479.
+    expect(character).toEqual({ owned: 479, total: 479 });
     // The Warfare Season 2 page is class-personal, outside completion.
   });
 
@@ -568,14 +573,16 @@ describe('Reliquary Conqueror catalog structure', () => {
       // the trinket slot's 18 trinkets (PR 4173): twelve slots plus two per Crucible raid trinket: 511.
       // +139 at the second release/v0.44.0 base merge: the Warfare Season 2 page: 650.
       // +32 at the 2026-09-28 merge into feature/buried-hoards: the Buried Hoards page: 682.
-    ).toBe(682);
+      // +13 the Mirefen world boss page (seven relics, his staff and five trinkets): 695.
+    ).toBe(695);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
     // masterwrought Phase 18 gather_event:golden_harvest field note. Neither
     // branch's new content (Crucible/Forgebreaker items, Roots' Bramblehide
-    // set, the Nythraxis gap-fill drops, the two new pending mounts) is a
-    // mark, so this total is unchanged by the merge.
+    // set, the Nythraxis gap-fill drops, the two new pending mounts, the
+    // seven Mirefen world boss items) is a mark, so this total is unchanged
+    // by the merge.
     expect(
       RELIQUARY_MARK_IDS.size,
       `mark total moved; by namespace: ${[
@@ -803,7 +810,8 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // Plus the five Crucible raid trinkets (each on its boss's Normal and
     // Heroic page, one id each): 350.
     // +139: the Warfare Season 2 page (second release/v0.44.0 base merge): 489.
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(521);
+    // Plus the Mirefen world boss page's 13 items (seven relics, staff, five trinkets): 534.
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(534);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -2210,6 +2218,7 @@ describe('Reliquary growth sweeps (new content must page or opt out)', () => {
     // pages; a NEW worldBoss: true mob reds here until it is paged and mapped.
     const WORLD_BOSS_PAGES: Record<string, string> = {
       thunzharr_waking_peak: 'conquerors_thunzharr',
+      balgath_cyclops: 'conquerors_balgath',
     };
     const bossIds = Object.values(MOBS)
       .filter((m) => m.worldBoss === true)
@@ -3054,20 +3063,25 @@ const RELIC_SLOTS = RELIQUARY_PAGES.flatMap((page) =>
  * row here in the same change.
  */
 const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
-  // The five gaps are CONTENT gaps, not vocabulary gaps: no live table awards
+  // The two gaps are CONTENT gaps, not vocabulary gaps: no live table awards
   // any of them, so there is no door to name. Every other slot the catalog
   // used to leave pending turned out to be a several-doors slot rather than a
   // no-answer slot, and Phase 13b authored all of them (a relic lists every
   // comparable route it really has).
   //
-  // drakemaw_raptor: NO acquisition path exists anywhere in content, see the
-  // def comment in content/drakelands.ts. Owner call recorded 2026-08-04: the
-  // slot stays listed and sourceless until the mount gets a route.
+  // drakemaw_raptor LEFT this list on 2026-08-25: the reins now ride the
+  // Mirefen world boss's table (content/zone2.ts, the "dedicated world boss"
+  // the 2026-08-04 owner call held them back for), so its Horizons slot names
+  // that door (MOUNT_SOURCES in content/reliquary.ts).
   // terrorspark_groundshaker left this list when the annual membership
   // bundle began granting its soulbound reins through the WOC Store.
+  // lanternback_troll: DEVELOPER_MOUNTS, dev-grant only, deliberately absent
+  // from vendors, quests, mob loot, heroic loot, and the rift reins pools (see
+  // the def comments in content/mounts.ts).
   // avian_strider left this list when the Rift Watch quartermaster's Champion
-  // row gave it a route (content/faction_vendors.ts; MOUNT_SOURCES hints it).
-  horizons_mounts: ['drakemaw_raptor', 'lanternback_troll'],
+  // row gave it a route (content/faction_vendors.ts), and drakemaw_raptor when
+  // Balgath's table did (MOUNT_SOURCES hints both).
+  horizons_mounts: ['lanternback_troll'],
   // masterwork:engineering rode here as unearnable (QA ruling 2026-08-07,
   // R1 suppression on the craft's only stats-bearing output) until
   // masterwrought Phase 11o (2026-08-25) shipped copperlens_ocular, a
@@ -3159,6 +3173,8 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   conquerors_varkhul: 1,
   conquerors_varkhul_heroic: 1,
   conquerors_thunzharr: 1,
+  // One door: everything on his page comes off the boss himself.
+  conquerors_balgath: 1,
   conquerors_collapsed_reliquary: 2,
   conquerors_drowned_litany: 2,
   conquerors_set_deathlord: 4,
@@ -3185,9 +3201,12 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   professions_specimens: 7,
   professions_crucible: 3,
   professions_forgebreaker: 1,
-  // The eleven existing boss, vendor and rift doors plus the WOC Store's
-  // annual membership tank reward. Pending-ruling absences resolve to nothing.
-  horizons_mounts: 12,
+  // 13 = the four heroic bosses + the raid + Marla + rift A/B/S + the Mirefen
+  // world boss, whose reins joined his table, + the Rift Watch quartermaster
+  // (the Viridian Valestrider's Champion reins, content/faction_vendors.ts) +
+  // the WOC Store's annual membership tank reward; the one pending-ruling
+  // absence resolves to nothing.
+  horizons_mounts: 13,
   horizons_weapon_skins: 1,
   // Every title relic's source is its own deed, so the count tracks the page
   // rows: 36 + the four Phase 18 completion-ladder titles + the Grandmaster
@@ -4152,7 +4171,7 @@ describe('Reliquary source hint coverage', () => {
     ).toBe(true);
   });
 
-  it('the surviving pending rows are the three mounts content awards no route at all', () => {
+  it('the surviving pending rows are the two mounts content awards no route at all', () => {
     // The page-wide Horizons rulings are EXECUTED: mounts and skins are no
     // longer derived from the catalog lists (the derivation era ended when the
     // rulings landed), so the identity pins to RELIQUARY_HORIZON_MOUNTS and
@@ -4160,9 +4179,10 @@ describe('Reliquary source hint coverage', () => {
     // hand-listed set of CONTENT gaps, and hand-listing is the point: a new
     // mount must now be authored or deliberately added here, never auto-enrol.
     // (masterwork:engineering was a row here too until masterwrought Phase
-    // 11o's stats-bearing ocular un-pended it; see the pending-table comment.)
+    // 11o's stats-bearing ocular un-pended it; see the pending-table comment.
+    // drakemaw_raptor left it when the Mirefen world boss took its reins.)
     expect(Object.keys(SOURCE_PENDING_RULING)).toEqual(['horizons_mounts']);
-    expect(SOURCE_PENDING_RULING.horizons_mounts).toEqual(['drakemaw_raptor', 'lanternback_troll']);
+    expect(SOURCE_PENDING_RULING.horizons_mounts).toEqual(['lanternback_troll']);
     // All are still live catalog slots, so the exclusion cannot outlive them.
     for (const mountId of SOURCE_PENDING_RULING.horizons_mounts) {
       expect(RELIQUARY_HORIZON_MOUNTS, mountId).toContain(mountId);
@@ -4555,7 +4575,7 @@ describe('Reliquary source hint coverage', () => {
     expect(delveOnly.counts.vendor).toBeGreaterThanOrEqual(1);
   });
 
-  it('the five pending mounts really have ZERO live award routes (the row is justified)', () => {
+  it('the two pending mounts really have ZERO live award routes (the row is justified)', () => {
     // The surviving SOURCE_PENDING_RULING row's whole claim is "no live table
     // awards any pending mount", and the acknowledgment sweep can never check it
     // (it short-circuits on un-hinted relics). This is the inverse sweep: the
@@ -4727,11 +4747,11 @@ describe('Reliquary source hint coverage', () => {
       if (inherited === 0) offenders.push(`${page.id} defaults but every relic owns a hint`);
     }
     expect(offenders).toEqual([]);
-    // All fifteen defaults are live today (nine boss pages, the storefront
-    // on the skins page, the four Crucible raid pages, and Forgebreaker's
-    // one Weaponcrafting door); update
+    // All sixteen defaults are live today (nine boss pages, the Mirefen world
+    // boss page, the storefront on the skins page, the four Crucible raid
+    // pages, and Forgebreaker's one Weaponcrafting door); update
     // deliberately with the authoring.
-    expect(defaults).toBe(15);
+    expect(defaults).toBe(16);
   });
 });
 

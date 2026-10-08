@@ -143,6 +143,8 @@ describe('targetPortraitUrl', () => {
       guardian_stampede_0: 'old_greyjaw',
       guardian_stampede_1: 'wild_boar',
       guardian_stampede_2: 'gloam_strider',
+      guardian_muster_standard_spear: 'muster_footman',
+      guardian_muster_standard_sword: 'muster_sergeant',
     });
     for (const [guardianId, sourceId] of Object.entries(TRANSIENT_MOB_PORTRAIT_SOURCE_IDS)) {
       expect(targetPortraitSourceId(guardianId, true), guardianId).toBe(sourceId);

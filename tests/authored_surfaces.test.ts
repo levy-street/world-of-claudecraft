@@ -169,6 +169,9 @@ const AUTHORED_ATLAS_DEFS = [
   'mob_dragon_egg',
   'mount_goblin_rocket_sled',
   'mount_rallycart_rxt',
+  'mob_balgath_cyclops',
+  // The Knucklebone of Balgath's Shape of the Foreman: his own authored stone body.
+  'form_foreman',
   'mount_avian_strider',
 ];
 
@@ -204,7 +207,9 @@ describe('authored surfaces', () => {
     // a creature or player GLB can never match the held-model set
     expect(isAuthoredHeldModelUrl('models/creatures/ogre.glb')).toBe(false);
     expect(isAuthoredHeldModelUrl('')).toBe(false);
-    expect(AUTHORED_HELD_MODELS.size).toBe(4);
+    // Two Ignivar/Balgath weapon pairs plus the harbormaster's two worn props, and
+    // Balgath's Craterglass Stave.
+    expect(AUTHORED_HELD_MODELS.size).toBe(7);
   });
 
   it('flags exactly the replaced creature and mount rigs, never a player body', () => {
@@ -218,10 +223,13 @@ describe('authored surfaces', () => {
     expect(flagged).toEqual([...AUTHORED_ATLAS_DEFS].sort());
     for (const key of flagged) {
       expect(key.startsWith('player_'), key).toBe(false);
-      // and never a GLB a player body is composed from or a class rig NPCs share
-      expect(VISUALS[key].url.startsWith('models/chars/'), `${key}: ${VISUALS[key].url}`).toBe(
-        false,
-      );
+      // and never a GLB a player body is composed from or a class rig NPCs share. A
+      // shapeshift form (models/chars/forms/, e.g. the Knucklebone's Shape of the
+      // Foreman) is a whole replacement body of its own, neither of those.
+      const url = VISUALS[key].url;
+      const sharedCharGlb =
+        url.startsWith('models/chars/') && !url.startsWith('models/chars/forms/');
+      expect(sharedCharGlb, `${key}: ${url}`).toBe(false);
     }
   });
 

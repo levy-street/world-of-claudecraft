@@ -4,7 +4,21 @@ import { MOUNT_SKIN_IDS } from './content/mount_skins';
 import { MOUNT_KEYS } from './content/mounts';
 import { GATHERING_PROFESSIONS } from './content/professions';
 import { DUNGEONS, getActiveWorldContent, ITEMS, MOBS, NPCS, WORLD_QUESTS_BY_ID } from './data';
+import { isBalgathDevLootCommand, runBalgathDevLoot } from './dev/balgath_dev_loot';
+import {
+  BALGATH_DEV_MECHANICS,
+  balgathDevHelp,
+  balgathDevSlumber,
+  forceBalgathDevMechanic,
+  parseBalgathDevCommand,
+} from './dev/balgath_dev_mechanics';
+import { parseBalgathQuestDevCommand, runBalgathQuestDev } from './dev/balgath_dev_quests';
 import { equipBestInSlotForDev } from './dev/bis_gear';
+import {
+  parseServerTimeCommand,
+  restoreServerTime,
+  setServerTimePhase,
+} from './dev/day_night_override';
 import { displacePlayerForDev } from './dev/dev_displace';
 import { handleFerryDevChat } from './dev/ferry_dev';
 import { handleDevHoardTravel } from './dev/hoard_travel';
@@ -1292,6 +1306,73 @@ export function handleDevChat(
     return null;
   }
 
+  // [dev] Balgath's spoils in your bags (src/sim/dev/balgath_dev_loot.ts).
+  if (isBalgathDevLootCommand(raw)) {
+    const result = runBalgathDevLoot(ctx, pid);
+    if (!result.ok) ctx.error(pid, `[dev] ${result.message}`);
+    else emitDevLog(ctx, pid, `[dev] ${result.message}`);
+    return null;
+  }
+
+  // [dev] The muster's quest chain, solo (src/sim/dev/balgath_dev_quests.ts).
+  const balgathQuests = parseBalgathQuestDevCommand(raw);
+  if (balgathQuests) {
+    const result = runBalgathQuestDev(ctx, pid, balgathQuests);
+    if (!result.ok) ctx.error(pid, `[dev] ${result.message}`);
+    else emitDevLog(ctx, pid, `[dev] ${result.message}`);
+    return null;
+  }
+
+  // [dev] Force one of Balgath's mechanics on the nearest live Balgath, aimed at the
+  // caller (src/sim/dev/balgath_dev_mechanics.ts).
+  const balgath = parseBalgathDevCommand(raw);
+  if (balgath) {
+    if (balgath.kind === 'help') emitDevLog(ctx, pid, balgathDevHelp());
+    else if (balgath.kind === 'unknown') {
+      ctx.error(
+        pid,
+        `[dev] Unknown Balgath mechanic '${balgath.verb}'. Usage: /dev balgath <${BALGATH_DEV_MECHANICS.join('|')}|wake|sleep|quests|trophy|weekly|drill|pound|loot|help>.`,
+      );
+    } else {
+      const result =
+        balgath.kind === 'slumber'
+          ? balgathDevSlumber(ctx, pid, balgath.action)
+          : forceBalgathDevMechanic(ctx, pid, balgath.mechanic);
+      if (!result.ok) ctx.error(pid, `[dev] ${result.message}`);
+      else emitDevLog(ctx, pid, `[dev] ${result.message}`);
+    }
+    return null;
+  }
+
+  // [dev] Move the SERVER's day/night clock (src/sim/dev/day_night_override.ts).
+  const serverTime = parseServerTimeCommand(raw);
+  if (serverTime) {
+    if (serverTime === 'usage') {
+      ctx.error(pid, '[dev] Usage: /dev servertime day|night|dawn|dusk|<0..1>|auto.');
+    } else if (serverTime.kind === 'auto') {
+      const restored = restoreServerTime(ctx);
+      emitDevLog(
+        ctx,
+        pid,
+        restored
+          ? '[dev] Server day/night clock back on real time.'
+          : '[dev] The server day/night clock was already on real time.',
+      );
+    } else {
+      const mode = setServerTimePhase(ctx, serverTime.phase);
+      const flow =
+        mode === 'running'
+          ? 'it keeps running from there'
+          : 'this world had no clock, so it stays frozen there until the next /dev servertime';
+      emitDevLog(
+        ctx,
+        pid,
+        `[dev] Server day/night clock set to ${serverTime.label} (phase ${serverTime.phase.toFixed(2)}); ${flow}. Your sky is drawn from your own clock: type /daynight ${serverTime.label} to match it. /dev servertime auto restores real time.`,
+      );
+    }
+    return null;
+  }
+
   const varkhulRaidMatch = raw.match(
     /^\/(?:dev\s+varkhulraid|devvarkhulraid)(?:\s+(normal|heroic))?\s*$/i,
   );
@@ -1385,7 +1466,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev wq [name], /dev salvage, /dev clue [hunt <huntId>|solve|casket], /dev map [rarity|site|coin], /dev caravan, /dev calligraphy, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill, /dev hill [zone] | warn [zone] [seconds] | rise | end | next',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev wq [name], /dev salvage, /dev clue [hunt <huntId>|solve|casket], /dev map [rarity|site|coin], /dev caravan, /dev calligraphy, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev balgath <mechanic|wake|sleep|quests|trophy|weekly|drill|pound|loot|help>, /dev servertime <day|night|dawn|dusk|0..1|auto>, /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill, /dev hill [zone] | warn [zone] [seconds] | rise | end | next',
     );
     return null;
   }

@@ -533,6 +533,48 @@ export const tr_TR: EnTranslations = {
       "sailing": "{dest} yolunda yelken açıyor"
     },
     "materialStackSelectionUnavailable": "Bu malzeme seçimi artık kullanılamıyor.",
+    "shardpike": {
+      "braceLabel": "Couch the Shardpike",
+      "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "thrustLabel": "Barrowglass Thrust",
+      "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
+      "braceTooltipLean": "Plant the butt and hold the point up. Lean with your strafe or turn keys, or hold the two keys above the beam: each pushes the marker toward its side. The beam drifts on its own, and every slam he lands kicks it. Keep it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "releaseLabel": "Ground the Shardpike",
+      "releaseTooltip": "Lower the pike and step out of the brace, the same as jumping. You lose the set but pay no penalty: you can couch it again right away. Only a thrust, a fumble, a broken stance or a missed window rests the pike, for {rest} seconds.",
+      "whyResting": "The pike is being re-set after a thrust, a fumble, a broken stance or a missed window. Wait out the timer on the icon.",
+      "whyAlreadyCouched": "The pike is already couched. Ground it before you re-set.",
+      "whyNotSet": "The pike is not set. Couch it and hold it steady first.",
+      "whyNothingCouched": "Nothing to ground: the pike is not couched.",
+      "beamLabel": "Shardpike balance",
+      "beamStatus": "Pike balance {balance}, set {set} percent.",
+      "beamDanger": "Pike balance {balance}, about to fumble.",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "Hold the pike steady with your strafe keys",
+      "promptCatchIt": "Catch it, the pike is going over",
+      "promptEyeOut": "The eye is out, {seconds}s: hit him with everything",
+      "promptSealed": "His eye is shut. It opens again in {seconds}s",
+      "promptResetting": "Re-setting the pike, {seconds}s",
+      "promptCloser": "Get within reach of the Foreman, {yards} yards out",
+      "promptBrace": "Couch the Shardpike, then hold it steady",
+      "promptFindBoss": "Skerrit's Shardpike: put out the Foreman's eye with it",
+      "promptFindBossMuster": "The muster's Shardpike: put out the Foreman's eye with it",
+      "promptTakePike": "Press {key} or click the rack to take a Shardpike",
+      "promptTakePikeClick": "Click the rack to take a Shardpike",
+      "promptTakePikeTap": "Tap the rack to take a Shardpike",
+      "promptPikeLevelCap": "The muster lends its pikes only to level {level} or lower",
+      "promptHoldSteadyLean": "Hold the pike steady: lean with {left} and {right}",
+      "leanLeft": "Lean left",
+      "leanRight": "Lean right",
+      "leanLeftKey": "Lean left ({key})",
+      "leanRightKey": "Lean right ({key})",
+      "promptTally": "{count} put out",
+      "promptLabel": "Shardpike instruction",
+      "blindBanner": "BARROWHIDE BROKEN",
+      "effigyBanner": "BLINDED! NOW THE WHOLE RAID HITS HARD",
+      "promptStrikeLantern": "STRIKE THE LANTERN now, {seconds}s",
+      "promptLanternOut": "The lantern is out, {seconds}s: hit it with your own weapon",
+      "promptCloserEffigy": "Get within reach of the Straw Foreman, {yards} yards out"
+    },
     "vehicle": {
       "title": "Kuzey İzlemelik Topu",
       "objective": "Kuzey İzlemelik'i savun",
@@ -3176,8 +3218,10 @@ export const tr_TR: EnTranslations = {
         "storm": "Attığın her büyü en fazla {max} kadar bir yük ekler. Yükler {duration} saniye sürer, bir yük aldığında yenilenir.",
         "heat": "Yakın dövüş ve uzak saldırı vuruşların her biri en fazla {max} kadar bir ısı yığını ekler. Isı {duration} saniye sürer, bir yığın aldığında yenilenir.",
         "ignite": "Yakın dövüş ve uzak saldırı kritik vuruşları hedefi tutuşturur, {duration} saniye boyunca her {every} saniyede {tick} Ateş hasarı verirler. Yeni bir kritik vuruş bunu yeniler. Hasar Attack Power veya Ranged Attack Power, hangisi daha yüksekse artar.",
-        "guardHeat": "Bloke ettiğin, engellediğin veya tura aldığın her saldırı en fazla {max} kadar bir ısı yığını ekler. Isı {duration} saniye sürer, bir yığın aldığında yenilenir."
+        "guardHeat": "Bloke ettiğin, engellediğin veya tura aldığın her saldırı en fazla {max} kadar bir ısı yığını ekler. Isı {duration} saniye sürer, bir yığın aldığında yenilenir.",
+        "stoneHeart": "When a hit would kill you, you turn to stone for {statue} sec instead: you take no damage and cannot move or act, then return with {restore} health ({restorePct}% of your maximum health). Can occur once every {icd}. Never in duels or arena matches, which end at the killing blow."
       },
+      "range": "{min} to {max}",
       "use": {
         "retaliate": "{duration} saniye boyunca, seni doğrudan vuran bir düşman, sana vuruştan aldığın sağlığın %{pct} ye eşit Fiziksel hasara maruz kalır. Periyodik hasar bunu tetiklemez.",
         "anchor": "{duration} saniye boyunca, {reduction}% daha az hasar al ama {speed}% hızında hareket et. Seni etkileyen bayıltmaları, kökleri, yavaşlamalar, korkuları, morfu, sessizlikleri, körlemeleri, cinnahlı, silahsız bırakma ve iş hareket ettirici etkileri kaldırır ve yeni olanları ve geri tepmelerini yok sayarsın.",
@@ -3196,7 +3240,11 @@ export const tr_TR: EnTranslations = {
         "kindlingOrb": "{duration} saniye boyunca yanında bir ember küre çağır. Bir düşmana attığın her büyü ona o düşmana {damage} Ateş hasarı için bir cıvata ateşlettirir. Hasara Spell Power artar.",
         "pierce": "{duration} saniye boyunca, otomatik saldırıların, atışlarının ve fiziksel yeteneklerinin (kanama hariç) de hedefinin {reach} yd içinde en yakın düşmanı, verilen hasarın %{share} sini vur.",
         "lantern": "{duration} saniye boyunca ayaklarının dibine bir fener koy. Sen veya {radius} yd içinde bir lonca üyesine senden doğrudan bir iyileştirme de ışığı içinde en yaralı diğer lonca üyesini kalkanı açısından %{share} iyileştir.",
-        "heartNova": "Tüm ısı yığınlarını, {radius} yd içinde her düşmana {perHeat} Ateş hasarı ({maxHeat} yığınlarda {max}) ve her türleyen varlığa aşırı lütuf yapan ateş nova'sı harcayabilir. Hasara Attack Power artar. Bir ısı yığını gerektirir."
+        "heartNova": "Tüm ısı yığınlarını, {radius} yd içinde her düşmana {perHeat} Ateş hasarı ({maxHeat} yığınlarda {max}) ve her türleyen varlığa aşırı lütuf yapan ateş nova'sı harcayabilir. Hasara Attack Power artar. Bir ısı yığını gerektirir.",
+        "foremanShape": "Take the Shape of the Foreman for {duration} sec: you become the one-eyed cyclops and fight with your fists, keeping every ability and its damage. You gain {armorPct}% armor and cannot be knocked back. Dismounts you.",
+        "musterStandard": "Plant a Muster Standard at your feet. For {duration} sec, {soldiers} muster soldiers march at your side and fight your target in melee, each hitting every {every} sec for {damage} Physical damage. They attack only your target, and only once it is already in combat. Each has {hpPct}% of your maximum health. Left more than {leash} yd behind, they rejoin you at once. They leave when the standard falls or when you die. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, set when you plant it.",
+        "gutteredGlare": "Channel for {duration} sec: a beam {length} yd long bursts from you the way you face and deals {tick} Arcane damage every {every} sec to up to {max} enemies in its path ({total} to each over the full channel). Turn to sweep it; moving or casting ends it. Damage increases with Spell Power.",
+        "grapnel": "Hook a party or raid member within {range} yd that you can see and haul them through the air to your side, healing them for {heal} when they land. It cannot pull enemies, or allies in a vehicle, on a ship, turned to stone or held by an effect that cannot be broken. Healing increases with Healing Power."
       }
     },
     "questShare": {
@@ -4014,6 +4062,8 @@ export const tr_TR: EnTranslations = {
       "cooldownCap": "Bu pencerede {used} / {cap} sn bekleme süresi azaltımı kullanıldı",
       "bruinRushWindow": "Kurt Formu mana harcamaz ve Bruin Hücumu hedefini sabitleyerek {sec} saniye boyunca %{pct} yavaşlatır",
       "funeralHarvestLock": "Cenaze Hasadı henüz başka bir Ruh Parçası oluşturamaz",
+      "effigyPlankHide": "Turns away {pct}% of every blow, until a Shardpike thrust puts out the lantern in its eye",
+      "effigyLanternOut": "The Straw Foreman's lantern is out for you: your blows and your pet's ignore its Plank Hide and land in full",
       "leadenHexLock": "Kurşun Büyüsü bu hedefi henüz yeniden kökleyemez",
       "forbiddenReflectionReady": "Uygun bir sonraki Karabüyücü bekleme süren yeniden kullanılabilir",
       "forbiddenReflectionLock": "Yasak Yansıma henüz yeniden hazırlanamaz",
@@ -4100,6 +4150,10 @@ export const tr_TR: EnTranslations = {
         "moltenIgnite": "Her {every} saniyede {damage} Ateş hasarı verir. Başka bir silah kritik isabeti bunu yeniler.",
         "pierce": "Otomatik saldırılar, atışlar ve fiziksel yetenekler (kanamalar değil) ayrıca hedefine en yakın düşmana {reach} metre içinde vurur ve verilen hasarın {pct}% kadarı kadar hasar verir.",
         "lantern": "Senin veya fener ışığında {radius} metre içindeki bir taraf üyesinde kimse tarafından verilen doğrudan şifa, aynı zamanda fener ışığında en yaralı diğer taraf üyesini şifanın {pct}% kadarıyla iyileştiriyor.",
+        "foremanShape": "You are the Foreman: {armorPct}% more armor and immune to knockbacks.",
+        "musterStandard": "Your Muster Standard is planted. Its soldiers march with you and fight your target.",
+        "gutteredGlare": "The beam deals {tick} Arcane damage every {every} sec to enemies in its path. Moving or casting ends it.",
+        "stoneStatue": "Turned to stone: immune to damage and unable to act. You return with {pct}% of your maximum health.",
         "crucibleHeat": "Isı: {stacks}/{max}. Crucible Yüreğini kullan, tümünü hedefin üzerine bir ateş nova'sı için harca, {radius} metre içindeki her düşmana {damage} Ateş hasarı verir ve çarptığı her yaratığı korkutur.",
         "crucibleHeatOther": "Isı: {stacks}/{max}. Crucible Yüreği tümünü {radius} metre içinde bir ateş nova'sı için harcıyor, her yığın için daha fazla Ateş hasarı verir ve çarptığı her yaratığı korkutur."
       },
@@ -4135,6 +4189,7 @@ export const tr_TR: EnTranslations = {
       "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "damageReduction": "Alınan tüm hasarı {pct}% azaltır",
+      "slumber": "Şafağa kadar uyuyor. Saldırılamaz ve kimse için uyanmaz.",
       "guardianWard": "Seni öldürecek bir sonraki düşman darbesi engellenir ve yerine canın {pct}%'e geri döner",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
@@ -4211,7 +4266,9 @@ export const tr_TR: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name}, Dikenzirve Tepeleri'nin üzerinde yükseliyor!"
+      "spawn": "{name}, {zone} üzerinde yükseliyor!",
+      "wake": "{name}, {zone} üzerinde uyanıyor!",
+      "sleep": "{name} şafağa kadar uyuyor."
     },
     "auth": {
       "appleLoginCta": "Apple ile Devam Et",
@@ -4355,6 +4412,7 @@ export const tr_TR: EnTranslations = {
         "menu": "Menü",
         "minimap": "Mini Harita",
         "stanceBar": "Duruş Çubuğu",
+        "shardpikeBar": "Shardpike Bar",
         "xpBar": "XP Çubuğu",
         "chat": "Sohbet",
         "actionBarGroup": "Eylem Çubukları",
@@ -7505,6 +7563,7 @@ export const tr_TR: EnTranslations = {
       "framesGovernedAuraTracks": "Arayüz seçeneklerinin aynı Arayüz sekmesindeki Savaş sekmesinden açtığın altı isteğe bağlı aura izini de Çerçeveleri Düzenle gevşetir: Takviyelerim izi, Savunma Bekleme Süreleri izi, Kalkanlarım izi, Saldırı Bekleme Süreleri izi, Hareket ve Gizlilik izi ve Müttefiklerde Takviyelerim izi. Her iz varsayılan olarak kapalıdır ve gevşekken kendi ad çipini taşır.",
       "frameGroups": "{trackers} görevleri, işleri, riftleri, delveleri, toplama hedeflerini ve Hazine izlemesini birleştirebilir. {auras} Hedef noktalarını ve altı aura izini birleştirebilir. Her grubu Çerçeveler Ayarları'nda etkinleştirin ya da her çerçeveyi ayrı olarak taşımak için kapalı bırakın. {tot} kaynağı çubuğu içerir. {focus} üç bağımsız taşınabilir hedef içerir: Shift+F1 ile Shift+F3 tayin; Ctrl+F1 ile Ctrl+F3 seçin. Hasar ya da tehdit ölçüsünü düğmelerinin dışında herhangi bir yere sürükleyin ve taşınması için kenarlarını sürükleyin, çerçeveler kilitli iken de olsa. Çerçeveler kilitli değilken, Çerçeveleri Göster ya da Gizle kendi gruplanmış menüsü vardır. Kilitli olmayan çerçeve için sağ tıkla Sıfırla boyutu ya da Çerçeve Seçenekleri. Arabirim > Çerçeveler da Çerçeveler Ayarları ve daraltılabilir Puan Çerçevesi Seçenekleri içerir. Hedefin Hedefini Hedefe Kilitle, bu çerçeveleri birlikte tutar. Hedefin Hedefini ayrı olarak taşıyacak şekilde kapatın; geri açmak daha sonra için ayrı konumu saklar. Atanmış odak çerçeveleri kurulum denetimleri saklar; sağ tıkla ve Odak Ayarı'nı seç düzeltmek için. Mouseover dökme da odak çerçevelerde çalışır.",
       "framesGovernedTalkingHead": "Çerçeveleri Düzenle, NPC görüş alanınızın dışındayken bir NPC'nin konuşulan hattını taşıyan Diyalog panelini de gevşetir; gevşekken isim çipini takar.",
+      "framesGovernedShardpike": "Edit Frames also loosens the Shardpike bar, the short row of quest-tool verbs that appears beside your action bars only while you are carrying the Shardpike itself; it wears its name chip while it is loose, so you can place it before the fight rather than during it.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "barsTitle": "Çubuklar, sayaçlar ve savaş metni",
       "barsBody": "Büyü çubuğun, büyü okuduğunda ya da kanalize ettiğinde eylem çubuklarının hemen üzerinde, ekranın ortasında belirir ve büyünün adını ve kalan süreyi taşır. Hedefin de kendi çerçevesinde kendi büyü çubuğuna sahiptir, böylece neyin geldiğini görüp buna karşılık verebilirsin.\n\nBüyü çubuğunun altında ince bir vuruş çubuğu durur ve silah vuruşların arasında dolar, böylece yakın dövüş ya da menzilli bir saldırgan bir sonraki otomatik vuruşun ne zaman ineceğini görebilir.\n\nTecrübe çubuğun eylem çubuklarının altında tam genişlikte uzanır, dilimlere bölünmüştür ve biriktirdiğin dinlenmiş tecrübeyi gösteren daha açık bir bölüm taşır.\n\nSuyun altında yüzersen ekranın üstünde mavi bir nefes çubuğu belirir. Başın suyun altındayken azalır, tükendiğinde kırmızıya döner ve boğulmaya başlarsın, yüzeye çıktığın anda hızla dolar. Boşluk tuşu seni yukarı yüzdürür, varsayılan olarak Ctrl olan Aşağı Yüz tuşu ise seni derine götürür.\n\nHasar ve iyileştirme, indikleri şeyin üzerinde küçük sayılar olarak yükselir, böylece bir dövüşü metin okumadan takip edebilirsin. Sohbet kutundaki Savaş sekmesi tam yazılı kaydı tutar.",
@@ -11307,6 +11366,7 @@ export const tr_TR: EnTranslations = {
     "lockoutRaids": "Raidler",
     "lockoutDungeons": "Dungeonlar",
     "lockoutWorldBosses": "Dünya patronları",
+    "lockoutWeeklyQuests": "Weekly quests",
     "takeOverConfirm": "Bu işlem bu karakteri başka bir oturumdan koparıp buraya getirecek. Devam edilsin mi?",
     "renameRequired": "yeniden adlandırma gerekli",
     "delete": "Sil",
@@ -15927,6 +15987,30 @@ export const tr_TR: EnTranslations = {
       "fenshadow_maul": {
         "name": "Bataklık Gölgesi Balyozu"
       },
+      "foremans_barrowmaul": {
+        "name": "Ustabaşının Höyük Balyozu"
+      },
+      "skerrits_shardpike": {
+        "name": "Skerrit’in Kıymık Kargısı"
+      },
+      "loomshard_eye": {
+        "name": "The Barrowglass Eye"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Höyük Omuzlukları"
+      },
+      "mirestone_stride": {
+        "name": "Bataklıktaşı Adımı"
+      },
+      "foremans_wage_band": {
+        "name": "Ustabaşının Ücret Yüzüğü"
+      },
+      "mirelight_locket": {
+        "name": "Bataklık Işığı Madalyonu"
+      },
+      "fenwright_grips": {
+        "name": "Bataklık Ustası Eldivenleri"
+      },
       "wildgrove_cinch": {
         "name": "Vahşi Koruluk Kemeri"
       },
@@ -19737,6 +19821,27 @@ export const tr_TR: EnTranslations = {
       "saltwrack_epaulets": {
         "name": "Saltwrack Epaulets"
       },
+      "muster_shardpike": {
+        "name": "Muster Shardpike"
+      },
+      "knucklebone_of_balgath": {
+        "name": "Knucklebone of Balgath"
+      },
+      "muster_standard": {
+        "name": "Muster Standard"
+      },
+      "guttered_eye": {
+        "name": "The Guttered Eye"
+      },
+      "barrowstone_heart": {
+        "name": "Barrowstone Heart"
+      },
+      "muster_grapnel": {
+        "name": "Muster Grapnel"
+      },
+      "craterglass_stave": {
+        "name": "Craterglass Stave"
+      },
       "membership_token": {
         "name": "Membership Token (30 Days)"
       },
@@ -21056,8 +21161,26 @@ export const tr_TR: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, Uyanan Zirve"
       },
+      "balgath_cyclops": {
+        "name": "Balgath, the One-Eyed Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Uyanmış Fırtına Dölü"
+      },
+      "muster_footman": {
+        "name": "Muster Footman"
+      },
+      "muster_chaplain": {
+        "name": "Muster Chaplain"
+      },
+      "muster_sergeant": {
+        "name": "Muster Sergeant"
+      },
+      "muster_drillmaster": {
+        "name": "Muster Drillmaster"
+      },
+      "muster_effigy": {
+        "name": "Straw Foreman"
       },
       "stable_horse": {
         "name": "Ahır Atı"
@@ -21706,6 +21829,16 @@ export const tr_TR: EnTranslations = {
         "name": "Muhafız Fenwick",
         "title": "Fenbridge Muhafızı",
         "greeting": "Kapıda dur, {className}. Şu sazlıkların ötesinde, öldürme işini bataklık bizim için yapar."
+      },
+      "socketwright_skerrit": {
+        "name": "Maben Skerrit",
+        "title": "the Socketwright",
+        "greeting": "Forty years since I ground that eye and set it in his socket, and never a day paid. You want to hurt the Foreman, {className}? Aim for my work."
+      },
+      "muster_commander": {
+        "name": "Muster Commander",
+        "title": "Fenbridge Muster",
+        "greeting": "Pikes first, {className}, then everyone. That is the whole of it, and it has kept this camp alive."
       },
       "brother_aldric_fen": {
         "name": "Birader Aldric",
@@ -22445,6 +22578,52 @@ export const tr_TR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Fenbridge Toplanma Emri"
+          }
+        }
+      },
+      "q_muster_summons": {
+        "title": "The Muster's Summons",
+        "text": "Every spear I could spare is dug in around the Starfall Crater, {playerName}, ringing the thing that walks out of it. The Muster Commander holds the camp on the southern rise above the crater, south-east of here. Report to the Commander. You will be told how we fight him, and you will listen, because the ones who did not are in the reeds.",
+        "completion": "Fenwick's runner, is it? Good. Listen, because I say this once and he never says it at all. Balgath walks our pickets: the crater rim, the west flats, the south rise, the gap on the south-west rim, and round again, and every post he stops at, he flattens. Steel does not bite him. His hide turns it, and a raid that hacks at him only dies tired. The one weakness is his eye. A braced pike through the Barrowglass blinds him, and while he is blind his hide sloughs off: that is when the whole raid hits him, and hits hard. Then it closes over and we wait for the next chance. The rack lends its pikes to recruits of level 19 or lower: the young ones put the eye out, the veterans make the window count. Pikes first, {playerName}, then everyone.",
+        "objectives": {
+          "0": {
+            "label": "Report to the Muster Commander"
+          }
+        }
+      },
+      "q_muster_pike_drill": {
+        "title": "Pikes First",
+        "text": "Talk is cheap and pikes are not, and the rack lends them only to recruits of level 19 or lower. Take a Shardpike off the rack beside me, then walk to the Straw Foreman at the west end of camp: the lads built him out of planks and straw, half the size of the real one, with a lantern where the eye goes. Couch the pike and hold the point true while the drillmaster pounds the ground, because the real one shakes it harder. When your arms are sure, put the point through the lantern. His planks will come off: then hit him with your own weapon, {playerName}, and feel the difference.",
+        "completion": "You felt it bite, did you? On the real one that is fourteen breaths with the whole raid swinging, and then his hide closes over again. Keep the lesson. The Foreman will test it.",
+        "objectives": {
+          "0": {
+            "label": "Shardpike taken from the muster rack"
+          },
+          "1": {
+            "label": "Straw Foreman's lantern put out"
+          },
+          "2": {
+            "label": "Blows landed while its planks are down"
+          }
+        }
+      },
+      "q_muster_trophy": {
+        "title": "A Chip Off the Foreman",
+        "text": "Every week he stands back up, and every week we knock him down again. That takes a raid, and the muster cannot raise one on its own. Find the next raid that goes after Balgath and help bring him down, {playerName}. Strike him, shield the ones who do, or mend them: every hand that fights him counts. When he falls, come back and report to me. The muster pays for every kill.",
+        "completion": "Down again, and you were in the fight that did it. Fenbridge will have my report tonight. The purse is thin this far out, but it is yours. Come back when he is up again.",
+        "objectives": {
+          "0": {
+            "label": "Balgath slain"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "The Socketwright's Due",
+        "text": "I set the Barrowglass in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
+        "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
+        "objectives": {
+          "0": {
+            "label": "The Foreman's eye put out"
           }
         }
       },
@@ -24629,6 +24808,12 @@ export const tr_TR: EnTranslations = {
           },
           "7": {
             "label": "Batık Kale"
+          },
+          "8": {
+            "label": "Höyük Sahası"
+          },
+          "9": {
+            "label": "Yıldız Düşüşü Krateri"
           }
         }
       },
@@ -25722,6 +25907,7 @@ export const tr_TR: EnTranslations = {
     "mailboxName": "Posta Kutusu",
     "noticeboardName": "İlan Tahtası",
     "farmPatchName": "Bahçe Yatakları",
-    "realmBuilderMonumentName": "Bölge Oluşturucu Anıtı"
+    "realmBuilderMonumentName": "Bölge Oluşturucu Anıtı",
+    "musterRackName": "Muster Weapon Rack"
   }
 };

@@ -34,6 +34,7 @@ import type { SimContext } from '../sim_context';
 import { duelJustEndedBetween } from '../social/duel';
 import { type Aura, type Entity, MELEE_RANGE } from '../types';
 import { meleeSwing } from './auto_attack';
+import { isForemanShaped, useBalgathTrinket } from './balgath_trinkets';
 import { isUnbreakableControlAura } from './cc';
 import { applyHeal } from './heal';
 import { relocateSwept } from './heroic_leap';
@@ -200,6 +201,13 @@ export function useWornTrinket(
   }
   let cooldown = spec.cooldown;
   const use = spec.use;
+  // Balgath's trinkets live in their own module (combat/balgath_trinkets.ts).
+  const balgath = useBalgathTrinket(ctx, meta, p, use);
+  if (balgath === false) return false;
+  if (balgath === true) {
+    p.cooldowns.set(key, cooldown);
+    return true;
+  }
   switch (use.kind) {
     case 'retaliate': {
       ctx.applyAura(
@@ -544,6 +552,12 @@ export function mooringBlocksAura(target: Entity, aura: Aura): boolean {
 /** Whether the Mooring Stone holds its wearer against a knockback. */
 export function isMoored(target: Entity): boolean {
   return target.auras.some((held) => held.id === TRINKET_AURA.anchor);
+}
+
+/** Whether a worn trinket holds this body against a knockback (knockback.ts): the
+ *  Mooring Stone's anchor or the Knucklebone of Balgath's Shape of the Foreman. */
+export function trinketRefusesKnockback(target: Entity): boolean {
+  return isMoored(target) || isForemanShaped(target);
 }
 
 // ---- passives off the gear-proc hooks -----------------------------------------

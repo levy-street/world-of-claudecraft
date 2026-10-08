@@ -291,10 +291,19 @@ export const RELIQUARY_HORIZON_MOUNTS = [
 // def in content/zone3.ts), so a quest hint there would name a door that hands
 // out nothing.
 //
+// drakemaw_raptor is the Mirefen world boss's mount: the reins ride Balgath's
+// table as an ungrouped 1% personal drop (content/zone2.ts), the "dedicated
+// world boss" the 2026-08-04 owner call held them back for.
+//
 // Dreadspark Groundshaker is the annual membership bundle's paid mount reward.
-// The Viridian Valestrider is the Rift Watch
-// quartermaster's Champion row (content/faction_vendors.ts). Paid mount skins
-// are deliberately absent here.
+//
+// The Viridian Valestrider is the Rift Watch quartermaster's Champion row
+// (content/faction_vendors.ts).
+//
+// Grumbol the Lanternback has no player acquisition path (DEVELOPER_MOUNTS,
+// content/mounts.ts): no live table awards its reins, so its absence here IS
+// the answer, and it stays hand-listed in SOURCE_PENDING_RULING. Paid mount
+// skins are deliberately absent here.
 //
 // Keys are typed against the live mount ladder so a misspelled or renamed key
 // fails tsc at the authoring site instead of falling through to the pending
@@ -332,6 +341,7 @@ const MOUNT_SOURCES: Readonly<
   ],
   aether_hover_cycle: fromRift('S'),
   thunderstrut_gobbler: fromRift('S'),
+  drakemaw_raptor: fromBoss('balgath_cyclops'),
 };
 
 /** Mount slots carrying their MOUNT_SOURCES hints, with RELIQUARY_HORIZON_MOUNTS
@@ -1284,6 +1294,38 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       'soulflame_cord',
       'stormcallers_waistguard',
       'vestments_of_the_waking_grove',
+    ),
+  },
+  {
+    id: 'conquerors_balgath',
+    shelf: 'conquerors',
+    name: 'Balgath, the Buried Foreman',
+    desc: 'Spoils dragged back out of the Mirefen barrow-mounds.',
+    clearSource: { kind: 'deed_stat', stat: 'balgathKills' },
+    // Every relic here comes off the boss himself and nowhere else, which is what a world
+    // boss page is supposed to mean: no shared tier, no second door, no page you can
+    // complete without meeting him. The three Foreman's Wage rares are his too, but they
+    // only ever fall to a contributor at or below level 13 (LootEntry.maxPlayerLevel), so
+    // a page completed at twenty was either started as a local or finished across a trade:
+    // the wage pieces are unbound, and discovery counts on the first copy a character
+    // ever holds, however it arrived. His reins are on the Horizons mounts page, never
+    // here (the curation rule above).
+    sourceDefault: fromBoss('balgath_cyclops'),
+    relics: items(
+      'foremans_barrowmaul',
+      'barrowhide_pauldrons',
+      'mirestone_stride',
+      'loomshard_eye',
+      'foremans_wage_band',
+      'mirelight_locket',
+      'fenwright_grips',
+      // His caster's staff and his five trinkets, his own and nowhere else's.
+      'craterglass_stave',
+      'knucklebone_of_balgath',
+      'muster_standard',
+      'guttered_eye',
+      'barrowstone_heart',
+      'muster_grapnel',
     ),
   },
   // ---- Delves (rare+ uniques; mark-shop signature pieces included) ----

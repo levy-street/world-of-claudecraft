@@ -23,6 +23,7 @@ import type { GuildBankState } from './guild_bank';
 import type { InventoryGrantOptions } from './inventory_grant';
 import type { PendingLootRoll } from './loot/loot_roll';
 import type { MarketListing } from './market';
+import type { MusterArmyState } from './mirefen_muster';
 import type { MobScanCounters } from './mob/scan_counters';
 import type { CommissionOrder } from './professions/commission_order';
 import type { FeastState } from './professions/feast';
@@ -108,9 +109,12 @@ export type RuntimeSimConfig = Required<
     | 'vaultConsumptionAdmission'
     | 'courierBankExchange'
     | 'gathererIdentity'
+    // Deliberately NOT defaulted: undefined is the "no day/night clock" world
+    // (dayNightPhase() answers null), which tests and the RL env rely on.
+    | 'dayNightNowMs'
   >
 > &
-  Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds'> & {
+  Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds' | 'dayNightNowMs'> & {
     vaultOpenNeedsSave?: boolean;
     vaultRewardNeedsSave?: boolean;
   };
@@ -396,6 +400,9 @@ export interface SimContextPrimitives {
   // VALUES in place; the deeds proximity sweep resolves the witness target
   // through this instead of scanning the whole entity map every second.
   readonly worldBossEntityIds: readonly (number | null)[];
+  // The Mirefen muster around Balgath's crater (src/sim/mirefen_muster.ts): its soldiers,
+  // weapon rack and live pike loans. Sim-owned holder mutated in place; nothing persists.
+  readonly musterArmy: MusterArmyState;
   // Book of Deeds session runtime (per-attempt encounter windows, per-match
   // Vale Cup memory, the Saul talk counter). Sim-owned holder mutated in
   // place; nothing in it persists.
@@ -467,6 +474,11 @@ export interface SimContextCallbacks {
   // raid rooms' normal and heroic lockouts expire on (host-owned like raidResetMs;
   // offline/headless fall back to a flat 7-day week).
   weeklyRaidResetMs(nowMs: number): number;
+  // The world day/night phase in [0,1) (0 midnight, 0.5 noon; src/sim/day_night.ts) off
+  // the host clock SimConfig.dayNightNowMs, or null when the host supplies no such
+  // clock (tests, the RL env): null means "there is no night", and every nocturnal
+  // rule must treat it as permanent day so those worlds stay the pre-cycle world.
+  dayNightPhase(): number | null;
   instanceKeyFor(pid: number): string;
   instanceOriginOf(inst: InstanceSlot): { x: number; z: number };
   instanceClaimIdAt(pos: Vec3): number | null;
@@ -1572,6 +1584,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     get worldBossEntityIds() {
       return host.worldBossEntityIds;
     },
+    get musterArmy() {
+      return host.musterArmy;
+    },
     get deedRuntime() {
       return host.deedRuntime;
     },
@@ -1599,6 +1614,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     lockoutNowMs: host.lockoutNowMs,
     raidResetMs: host.raidResetMs,
     weeklyRaidResetMs: host.weeklyRaidResetMs,
+    dayNightPhase: host.dayNightPhase,
     instanceKeyFor: host.instanceKeyFor,
     instanceOriginOf: host.instanceOriginOf,
     instanceClaimIdAt: host.instanceClaimIdAt,

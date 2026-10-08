@@ -36,6 +36,9 @@ export interface AnimOverrideFacts {
   /** Rift ice-slide in progress (the sim glides the body at speed). Optional to
    *  match `Entity`, where it is only set on a sliding player. */
   riftSliding?: boolean;
+  /** The live aura list (ids only are read), handed to the rig by reference for
+   *  its `idleByAura` poses. */
+  auras?: readonly { id: string }[];
 }
 
 /** Mutates `st` in place. Called once per entity per frame, so it allocates
@@ -56,6 +59,8 @@ export function applyEntityAnimOverrides(
   // same way. Players have no stance clip today, and they carry their selection
   // in targetId rather than aggroTargetId, so they are unaffected either way.
   st.combat = e.aggroTargetId !== null && !visuallyDead;
+  // A held aura pose (Balgath blinded) reads the list by reference: no copy per frame.
+  st.auras = e.auras;
   st.stealthed = stealthed && !visuallyDead;
   // Ice slide: the sim glides the player at speed but they should read as FROZEN
   // (gliding stiff on the ice), not sprinting. Suppress locomotion + airborne so

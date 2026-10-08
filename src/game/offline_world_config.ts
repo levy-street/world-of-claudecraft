@@ -3,6 +3,7 @@
 import { nextRaidResetMs, nextWeeklyRaidResetMs } from '../reset_calendar';
 import { PLAYER_INTEREST_DROP_RADIUS, type PlayerClass, type SimConfig } from '../sim/types';
 import { WORLD_SEED } from '../sim/world_seed';
+import { offlineDayNightNowMs } from './daynight_dev_command';
 import { allocateOfflineGathererIdentity } from './gatherer_identity';
 
 export function offlineWorldConfig(options: {
@@ -23,8 +24,16 @@ export function offlineWorldConfig(options: {
     // Editor play-test maps opt out of the live world's entry features.
     riftPortals: options.world === undefined,
     compulsoryTutorial: options.world === undefined,
+    // The Mirefen muster camps are the built-in fen's (src/sim/mirefen_muster.ts).
+    mirefenMuster: options.world === undefined,
+    // Boot like the live realm: the world bosses are up from the first tick instead of one
+    // interval (an hour) out, so the muster never stands round an empty Starfall Crater.
+    worldBossAtBoot: options.world === undefined,
     // Match live idle-AI throttling outside the player's actionable interest.
     idleMobTickRadius: PLAYER_INTEREST_DROP_RADIUS,
+    // The sky's own UTC clock (plus the dev /daynight override), so the world boss who
+    // sleeps at night sleeps under THIS sky (src/game/daynight_dev_command.ts).
+    dayNightNowMs: offlineDayNightNowMs,
     world: options.world,
     gathererIdentity: allocateOfflineGathererIdentity() ?? undefined,
   };

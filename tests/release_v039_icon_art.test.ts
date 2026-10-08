@@ -519,11 +519,13 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     // The Buried Hoards quartermaster consumables (the 2026-09-28 release/v0.44.0
     // merge into feature/buried-hoards: potion_of_invisibility and
     // elixir_of_mana_regeneration) ship committed painted art: 122.
-    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(122);
+    // Balgath's five trinkets join the same way (the Barrowstone Heart too: its slot
+    // shows the statue's internal cooldown), painted in balgath-loot-icons-2026-09-28: 127.
+    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(127);
     expect(
       artSubjectHotbarItemIds,
       'production isHotbarItemId art-subject inventory (live minus ITEM_ART_PENDING)',
-    ).toHaveLength(122);
+    ).toHaveLength(127);
     expect(pendingHotbarItemIds, 'ITEM_ART_PENDING hotbar items').toHaveLength(0);
     expect(
       pendingHotbarItemIds.filter((id) => shippingImageExists(`/ui/items/${id}.webp`)),

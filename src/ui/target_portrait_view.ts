@@ -8,6 +8,9 @@ export const TRANSIENT_MOB_PORTRAIT_SOURCE_IDS: Readonly<Record<string, string>>
   guardian_stampede_0: 'old_greyjaw',
   guardian_stampede_1: 'wild_boar',
   guardian_stampede_2: 'gloam_strider',
+  // The Muster Standard's soldiers wear the camp soldiers' faces (combat/balgath_trinkets.ts).
+  guardian_muster_standard_spear: 'muster_footman',
+  guardian_muster_standard_sword: 'muster_sergeant',
 });
 
 // A mob whose visual comes from a procedural world renderer rather than the

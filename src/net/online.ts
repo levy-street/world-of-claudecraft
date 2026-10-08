@@ -233,7 +233,7 @@ import { decodeGuildBoardPage, emptyGuildBoardPage, guildBoardPath } from './gui
 import { decodeGuildRoster } from './guild_roster_wire';
 import { foldInputAck } from './input_ack';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
-import { inputSignature } from './input_signature';
+import { inputFacingsMatch, inputSignature } from './input_signature';
 import { copyPos, wrapAngle } from './interp_math';
 import { applyMaterialInventoryWire } from './material_inventory_wire';
 import {
@@ -288,9 +288,6 @@ export { buildWebSocketAuthMessage } from './world_auth_message';
 type LooseJson = any;
 
 type InputSendMode = 'periodic' | 'changed' | 'forced-neutral' | 'forced-facing';
-
-const inputFacingsMatch = (a: number, b: number): boolean =>
-  Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b))) <= 1e-12;
 
 interface PendingTransientInput {
   jump: boolean;
@@ -2860,6 +2857,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       e.leaping = !!w.lp;
       applyFerryWire(e, w.fry, snap ? -1 : entAlpha); // a passenger's deck spot
       e.afk = !!w.ak; // /afk display bit: drives the nameplate tag + social presence dot
+      this.applyWorldBossEntityWire(e, w); // brace, slumber, warpath (lance_wire_state.ts)
       e.pvpFlag = !!w.pvp; // /pvp flag bit: nameplate + target-frame hostility colour
       e.weaponStowed = !!w.ws;
       e.helmHidden = !!w.hh;

@@ -53,6 +53,7 @@ import {
   lootSlotVisibleTo,
   pruneCorpseLoot,
 } from './loot/loot_roll';
+import { isMusterRack, useMusterRack } from './mirefen_muster';
 import { startCorpseHarvest } from './professions/corpse_harvest_session';
 import { isQuestGatedGroundObjectHidden } from './quest_gated_entity';
 import { corpseHasDecayed } from './respawn_policy';
@@ -291,6 +292,17 @@ export function pickUpObject(
     openHoardRewardChest(ctx, obj.id, p.id);
     return true;
   }
+  // The muster's weapon rack lends a pike, it is never looted. Both client entry points
+  // (the rack click and the interact key's object arm) send THIS command, not interact,
+  // so the rack is answered here, ahead of the item-payload gate below that it would
+  // otherwise fail silently (a rack carries no objectItemId).
+  if (isMusterRack(obj)) {
+    if (dist2d(p.pos, obj.pos) > INTERACT_RANGE) {
+      ctx.error(meta.entityId, 'Too far away.');
+      return false;
+    }
+    return useMusterRack(ctx, ctx.musterArmy, meta.entityId);
+  }
   const vehicleStation = vehicleStationByEntityId(obj.id);
   if (vehicleStation) return enterVehicle(ctx, vehicleStation.id, p.id);
   const noticeboardDef = noticeboardDefByEntityId(noticeboardDefinitions, obj.id);
@@ -510,6 +522,10 @@ export function interact(
           ctx.emit({ type: 'mailbox', pid: p.id });
           return;
         }
+        if (isMusterRack(target)) {
+          useMusterRack(ctx, ctx.musterArmy, p.id);
+          return;
+        }
         if (tryStartNythraxisWardChannel(ctx, target, p)) return;
         pickUpObject(ctx, target.id, p.id, noticeboardDefinitions);
         return;
@@ -627,6 +643,10 @@ export function interact(
     }
     if (obj.templateId === 'mailbox') {
       ctx.emit({ type: 'mailbox', pid: p.id });
+      return;
+    }
+    if (isMusterRack(obj)) {
+      useMusterRack(ctx, ctx.musterArmy, p.id);
       return;
     }
     if (tryStartNythraxisWardChannel(ctx, obj, p)) return;

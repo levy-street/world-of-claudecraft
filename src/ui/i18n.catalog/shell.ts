@@ -280,6 +280,8 @@ export const shellStrings = {
       lockoutRaids: 'Raids',
       lockoutDungeons: 'Dungeons',
       lockoutWorldBosses: 'World bosses',
+      // Weekly quests locked until the weekly reset (src/sim/quests/weekly_quest_lock.ts).
+      lockoutWeeklyQuests: 'Weekly quests',
       takeOverConfirm:
         'This will disconnect this character from another session and bring it here. Continue?',
       renameRequired: 'rename required',

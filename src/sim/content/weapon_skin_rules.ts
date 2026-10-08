@@ -95,6 +95,8 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   drownedmoon_maul: 'mace',
   nhalias_bell_maul: 'mace',
   fenshadow_maul: 'mace',
+  foremans_barrowmaul: 'mace',
+  craterglass_stave: 'staff',
   gravewyrm_thornmaul: 'mace',
   maul_of_the_scourged_wilds: 'mace',
   wildsoul_maul: 'mace',
@@ -162,6 +164,12 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   staff_of_the_last_spring: 'staff',
   forgefire_spire: 'staff',
   wand_of_quenched_sparks: 'wand',
+  // A pike IS a polearm, and this row is what makes the two authorities agree: the render
+  // side already tags its model `VAR_POLEARM` (characters/assets.ts), and an unclassified
+  // weapon here reads as null, which is the mismatch tests/weapon_skins.test.ts catches. No
+  // skin targets polearms, so this is classification only, never new cosmetic surface.
+  skerrits_shardpike: 'polearm',
+  muster_shardpike: 'polearm',
   // Faction quartermaster epics (content/faction_vendors.ts).
   riftwarden_voidblade: 'sword',
   dawnkeeper_consecrated_mace: 'mace',

@@ -101,6 +101,7 @@ import { animatedNodeNames, mergeSkinnedParts } from './rig_merge';
 import { shareRigSkeleton } from './rig_shared_skeleton';
 import { attachSharedDepthMaterials, clearSharedDepthMaterials } from './shadow_depth_materials';
 import { characterMeshCastsShadow } from './shadow_policy';
+import { prepareShardpikeThrowClip } from './shardpike_throw_clip';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
 import { optimizeSkinGpuLayout } from './skin_gpu_layout';
 import { primeSkinnedSortSpheres } from './skinned_sort_spheres';
@@ -122,6 +123,9 @@ const DEFAULT_TINT_STRENGTH = 0.4;
 export const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   axe_1handed: '1H_Axe',
   axe_2handed: '2H_Axe',
+  // The muster drillmaster's stake mallet (scripts/assets/muster_effigy/): authored on the
+  // two-handed axe's grip box, so it rides the axe's grip.
+  muster_mallet: '2H_Axe',
   crossbow_1handed: '1H_Crossbow',
   crossbow_2handed: '2H_Crossbow',
   sword_1handed: '1H_Sword',
@@ -235,6 +239,9 @@ export const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   tome_voidbound: 'VAR_BOOK',
   hammer_varkhul: 'VAR_HAMMER', // Ignivar raid legendary (Varkhul drop)
   ...KAYKIT_SHIELD_ACCESSORIES,
+  balgath_barrowmaul_hammer: 'VAR_HAMMER',
+  shardpike_spear: 'VAR_POLEARM',
+  craterglass_stave: 'VAR_STAFF', // Craterglass Stave (Balgath world-boss drop)
 };
 
 // Per-family grip for the variant pack. The model origin IS the grip, so we attach
@@ -2186,6 +2193,8 @@ function buildTintedClone(
       const armorDyeFallbackHex = (s.userData as { armorDyeFallbackHex?: number })
         .armorDyeFallbackHex;
       mat = new THREE.MeshLambertMaterial({
+        // The name survives the tier swap: the eye glow finds a rig's self-lit iris by it.
+        name: s.name,
         map: s.map ?? null,
         color:
           armorDyeFallbackHex !== undefined
@@ -2479,6 +2488,7 @@ export function prepareVisual(key: string): PreparedVisual {
 
   prepareWarriorAbilityClips(key, clips, def.clips.attackByAbility);
   prepareWarriorActionFallbacks(key, clips, gltf.scene);
+  prepareShardpikeThrowClip(key, clips, gltf.scene, def.clips.idle);
   // Pose a throwaway clone mid-idle, measure it, and bake the static mesh. No
   // face decals on a modular throwaway: the flatten drops them (farBakeMeshes),
   // and the default look's scalp decal would otherwise be minted and thrown

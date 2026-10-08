@@ -155,15 +155,23 @@ describe('mob aura icon art', () => {
   it('keeps the closed live mob aura inventory in parity with painted identities', () => {
     const census = buildLiveMobAuraCensus();
 
+    // The two family counts are the CLOSED-inventory half and they do not move for a new
+    // carrier: a mob taking an existing trait adds no family and no painting. The two
+    // census counts below are facts about the live MOBS table, so content legitimately
+    // moves them, and moving one without adding the matching painted identity is exactly
+    // the drift the parity assertion two lines down catches.
+    // 108 -> 109 / 89 -> 90 (v0.44): Balgath, the One-Eyed Foreman took `stoneskin`
+    // (Barrowhide, src/sim/content/zone2.ts), the eighth carrier of that family.
     expect(LIVE_MOB_AURA_FAMILIES).toHaveLength(44);
     expect(census.populatedFamilyCount).toBe(44);
     // The Fenbridge infiltrator reuses the drowned dead's existing aura art.
     // 110 at the 2026-09-28 release/v0.44.0 merge into feature/buried-hoards:
     // the Buried Hoard Marrow Golem (rift_marrow_golem) carries frenzyOnHit,
     // whose shared blood_frenzy runtime id already resolves to painted art, so
-    // the identity count holds.
-    expect(census.carrierCount).toBe(110);
-    expect(census.identities.size).toBe(90);
+    // the identity count holds. 111 carriers and 91 identities with Balgath's
+    // Barrowhide (the Mirefen world-boss branch, release/v0.45.0 merge).
+    expect(census.carrierCount).toBe(111);
+    expect(census.identities.size).toBe(91);
     expect([...MOB_AURA_IMAGE_IDS].sort()).toEqual([...new Set(census.identities.values())].sort());
     expect(MOB_AURA_IMAGE_IDS.size).toBe(44);
     for (const [runtimeId, artIdentity] of census.identities) {

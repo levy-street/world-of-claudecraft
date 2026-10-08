@@ -1438,7 +1438,10 @@ const MONOLITHS: MonolithRow[] = [
     // those release-line extractions. Release reconciliation: measured merged
     // tree at 11140 lines, preserving both extraction sets.
     // Subscription foundation moves the store snapshot adapter into subscription_sdk.
-    ceiling: 10958,
+    // v0.45.0 integration: the Mirefen world-boss branch's seven lines of main.ts wiring
+    // land on top of that 10958, so the merged tree measures 10965 (wc -l), still under
+    // the release's own 11140. INTEGRATION-ONLY pin; neither parent PR carries it.
+    ceiling: 10965,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

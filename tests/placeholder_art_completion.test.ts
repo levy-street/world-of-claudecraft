@@ -319,6 +319,15 @@ describe('v0.36 placeholder-art completion evidence', () => {
       'vanguard_oath_blade',
       'vanguard_fang_dagger',
       'vanguard_warstaff',
+      // The Mirefen world boss's maul (balgath-boss-icons-2026-08-18) and
+      // Skerrit's Shardpike (shardpike-mechanic-icons-2026-08-20) postdate
+      // the campaign the same way, each painted in its own later batch.
+      // Every weapon added after the campaign belongs on this list.
+      'foremans_barrowmaul',
+      'skerrits_shardpike',
+      'muster_shardpike',
+      // Balgath's caster spoil (balgath-loot-icons-2026-09-28).
+      'craterglass_stave',
     ];
     expect(targets.weaponItems).toEqual(
       sorted(

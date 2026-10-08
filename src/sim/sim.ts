@@ -16,6 +16,8 @@ import type {
   DelveCompanionInfo,
   DelveRunInfo,
   GuildPledgeSettings,
+  LanceGuidanceView,
+  LanceTrialView,
   LockpickView,
   MountRaceView,
   PlayerProfessionsView,
@@ -228,6 +230,7 @@ import {
   SPIRIT_HEALER_NPC_ID,
   zoneAt,
 } from './data';
+import { dayNightPhaseOf } from './day_night';
 import { refusedWhileDead } from './dead_gate';
 import { deckFloorHeight } from './deck_floor';
 import * as deedsMod from './deeds';
@@ -299,6 +302,8 @@ import { meetsLevelRequirement } from './item_level_req';
 import { countRawInSlots, setItemLocked as setItemLockedCmd } from './item_lock';
 import * as items from './items';
 import { applyKnockback as applyKnockbackImpl } from './knockback';
+import { lanceGuidanceFor } from './lance_guidance';
+import * as lanceTrialMod from './lance_trial';
 import {
   type DeedsLeaderboardPage,
   type DevLeaderboardPage,
@@ -359,6 +364,7 @@ import {
   unequipWornMechChroma,
   unlockMechChromaFromItem,
 } from './mech_chroma_ownership';
+import { freshMusterArmy, tickMusterArmy } from './mirefen_muster';
 import * as bossMechanics from './mob/boss_mechanics';
 import {
   mobEffectiveMeleeRange as mobEffectiveMeleeRangeImpl,
@@ -377,6 +383,7 @@ import {
 } from './mob/locomotion';
 import { runMobSwingAffixes } from './mob/mob_swing';
 import { spawnOpenWorldMob } from './mob/open_world_tuning';
+import { phaseStep } from './mob/phase_step';
 import { applyPlayerDummyVitals } from './mob/practice_dummies';
 import { questGateBlocksAggro, questGateBlocksCombat } from './mob/quest_gated_aggro';
 import {
@@ -411,6 +418,7 @@ import {
   mountTrainBegin as mountTrainBeginImpl,
   tickMountTraining as tickMountTrainingImpl,
 } from './mounts_training';
+import { savedGearFor } from './muster_pike';
 import * as nythraxisReadouts from './nythraxis_raid_readouts';
 import {
   grantDevotionFromBlock,
@@ -704,11 +712,12 @@ import { updateTutorialGreeting } from './tutorial/greeting';
 import * as unstuckMod from './unstuck';
 import * as weeklyMod from './weekly_rewards';
 import {
+  freshWorldBossDawnState,
   rollWorldBossLoot as rollWorldBossLootImpl,
-  scaleWorldBossHp,
+  tickWorldBossSchedule,
   WORLD_BOSSES,
-  type WorldBossDef,
 } from './world_boss';
+import { spawnDevBoss, spawnWorldBoss } from './world_boss_spawn';
 import { spawnHarborHouseKeeper } from './wyrmwatch_harbor_house';
 
 // Same pattern for the Ravenpost mail book (server/db.ts persists it as a
@@ -1307,7 +1316,10 @@ export type JoinableChannel = (typeof JOINABLE_CHANNELS)[number];
 
 // Per-player progression and bags. The entity holds combat state; this holds
 // everything that belongs to the character sheet.
-export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState, HostArmourAuthority {
+export interface PlayerMeta
+  extends worldQuestState.WorldQuestPlayerState,
+    HostArmourAuthority,
+    lanceTrialMod.LancePlayerState {
   courier?: courierMod.CourierState;
   entityId: number;
   // Stable database character id when running on the server. Offline/sim-only
@@ -2205,6 +2217,8 @@ export class Sim {
   // the sim runs at 20 Hz wall speed, so the interval is real hours.
   private worldBossNextAt: number[] = WORLD_BOSSES.map((b) => b.intervalSeconds);
   private worldBossEntityIds: (number | null)[] = WORLD_BOSSES.map(() => null);
+  private readonly worldBossDawn = freshWorldBossDawnState(); // slumbering bosses' sunrise
+  private readonly musterArmy = freshMusterArmy(); // the Balgath pass's army (mirefen_muster.ts)
   private readonly actionBarRestore = offlineActionBarRestore();
 
   // Per-world key for the rift collision registry in colliders.ts. Allocated per
@@ -2229,10 +2243,14 @@ export class Sim {
       worldBossAtBoot: cfg.worldBossAtBoot ?? false,
       riftPortals: cfg.riftPortals ?? false,
       compulsoryTutorial: cfg.compulsoryTutorial ?? false,
+      mirefenMuster: cfg.mirefenMuster ?? false,
       lockoutNowMs: cfg.lockoutNowMs ?? (() => Math.floor(this.time * 1000)),
       raidResetMs: cfg.raidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_RAID_LOCKOUT_MS),
       weeklyRaidResetMs:
         cfg.weeklyRaidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_WEEKLY_RAID_LOCKOUT_MS),
+      // Deliberately NOT defaulted: undefined is the "no day/night clock" world
+      // (dayNightPhase() answers null), which tests and the RL env rely on.
+      dayNightNowMs: cfg.dayNightNowMs,
       // Carried through so the renderer (which reaches the Sim as IWorld) can read
       // the same custom world via sim.cfg.world. Undefined for the built-in world.
       world: cfg.world,
@@ -2565,6 +2583,11 @@ export class Sim {
     return this.cfg.lockoutNowMs?.() ?? Math.floor(this.time * 1000);
   }
 
+  // The day/night phase off the host clock, or null without one (day_night.ts).
+  dayNightPhase(): number | null {
+    return dayNightPhaseOf(this.cfg.dayNightNowMs);
+  }
+
   // -------------------------------------------------------------------------
   // Entity roster: every add/remove/teleport goes through these so the
   // spatial indexes always match the entities map
@@ -2604,68 +2627,19 @@ export class Sim {
     }
   }
 
-  // World-boss scheduler. Per WORLD_BOSSES slot: when the live boss is gone, clear
-  // the slot (and once its lootable corpse window has elapsed, remove the corpse +
-  // any stormlings it left). When the interval comes due, advance it and, if no
-  // boss is currently up, spawn a fresh one. Draws no rng and allocates no ids until
-  // a spawn actually fires (which never happens inside the short parity scenarios),
-  // so existing determinism traces are unaffected.
+  // World-boss scheduler (world_boss.ts tickWorldBossSchedule): the STATE stays here as
+  // live views, and so does the spawn primitive (createMob/addEntity/groundPos). No rng.
   private updateWorldBosses(): void {
-    for (let i = 0; i < WORLD_BOSSES.length; i++) {
-      const def = WORLD_BOSSES[i];
-      const liveId = this.worldBossEntityIds[i];
-      if (liveId !== null) {
-        const boss = this.entities.get(liveId);
-        if (!boss) {
-          this.worldBossEntityIds[i] = null;
-        } else if (!boss.dead) {
-          // Grow the HP pool with the raid size (retail-style, up to the cap).
-          scaleWorldBossHp(this.ctx, boss, def);
-        }
-        if (boss?.dead) {
-          // Lootable corpse lingers WORLD_BOSS_CORPSE_SECONDS for contributors to
-          // loot, then is removed; respawnTimer is Infinity (handleDeath) so the
-          // normal in-place respawn never fires; only this scheduler respawns it.
-          if (boss.corpseTimer <= 0) {
-            for (const addId of boss.summonedIds) this.dropEntity(addId);
-            this.dropEntity(liveId);
-            this.worldBossEntityIds[i] = null;
-          }
-        }
-      }
-      if (this.time >= this.worldBossNextAt[i]) {
-        this.worldBossNextAt[i] += def.intervalSeconds;
-        if (this.worldBossEntityIds[i] === null) {
-          this.worldBossEntityIds[i] = this.spawnWorldBoss(def);
-        }
-      }
-    }
-  }
-
-  // Spawn a world boss at its fixed point and announce it server-wide. Returns the
-  // new entity id, or null if the template is missing. Uses no rng (fixed level +
-  // facing) so the spawn does not perturb the shared draw stream.
-  private spawnWorldBoss(def: WorldBossDef): number | null {
-    const template = MOBS[def.templateId];
-    if (!template) return null;
-    const pos = this.groundPos(def.pos.x, def.pos.z);
-    const mob = createMob(this.nextId++, template, template.maxLevel, pos);
-    mob.facing = 0;
-    mob.prevFacing = 0;
-    // World bosses use participant HP scaling (see scaleWorldBossHp), so their pool
-    // starts at the def base rather than the template's level-formula HP.
-    mob.maxHp = def.hpScale.base;
-    mob.hp = def.hpScale.base;
-    this.addEntity(mob);
-    // Anchorless log (no pid, no entityId) => routeEvents broadcasts to every
-    // connected player as a system notice. Localized by sim_i18n's worldBossSpawn
-    // RULE (matched on this exact literal shape).
-    this.emit({
-      type: 'log',
-      text: `${template.name} rises over Thornpeak Heights!`,
-      color: '#ffd100',
-    });
-    return mob.id;
+    tickWorldBossSchedule(
+      this.ctx,
+      {
+        nextAt: this.worldBossNextAt,
+        entityIds: this.worldBossEntityIds,
+        ...this.worldBossDawn,
+        onMusterPass: (boss, dawn) => tickMusterArmy(this.ctx, this.musterArmy, boss, dawn),
+      },
+      (def) => spawnWorldBoss(this.ctx, def),
+    );
   }
 
   // -------------------------------------------------------------------------
@@ -3533,6 +3507,11 @@ export class Sim {
 
   // /dev vendor: spawn the free-epic Test Quartermaster next to the caller
   // (dev-command realms only). Returns the vendor entity id, or -1 on failure.
+  // Dev boss drop at an exact spot (world_boss_spawn.ts; the boss test-drive's primitive).
+  spawnDevBoss(templateId: string, x: number, z: number): number {
+    return spawnDevBoss(this.ctx, templateId, x, z);
+  }
+
   spawnDevVendor(pid?: number): number {
     const me = this.entities.get(pid ?? this.primaryId);
     if (!me) return -1;
@@ -3900,14 +3879,9 @@ export class Sim {
       resSickness: e.auras.find((a) => a.id === RESURRECTION_SICKNESS_ID)?.remaining ?? null,
       // Unstuck Sickness persists across logout for the same reason.
       unstuckSickness: e.auras.find((a) => a.id === UNSTUCK_SICKNESS_ID)?.remaining ?? null,
-      equipment: { ...meta.equipment },
-      equipmentInstance: Object.fromEntries(
-        Object.entries(meta.equipmentInstance).map(([slot, inst]) => [
-          slot,
-          cloneItemInstancePayload(inst),
-        ]),
-      ),
       ...savedCharacterStorage(meta),
+      // A lent muster pike is folded back out of every save (muster_pike.ts).
+      ...savedGearFor(meta, this.musterArmy.lent.get(pid)),
       vendorBuyback: meta.vendorBuyback.map(cloneInvSlot),
       questLog: [...meta.questLog.values()].map((q) => ({
         questId: q.questId,
@@ -5247,6 +5221,9 @@ export class Sim {
       get worldBossEntityIds() {
         return sim.worldBossEntityIds;
       },
+      get musterArmy() {
+        return sim.musterArmy;
+      },
       get deedRuntime() {
         return sim.deedRuntime;
       },
@@ -5410,6 +5387,7 @@ export class Sim {
       // weekly resets); offline/headless fall back to the flat defaults above.
       raidResetMs: (nowMs: number) => sim.cfg.raidResetMs(nowMs),
       weeklyRaidResetMs: (nowMs: number) => sim.cfg.weeklyRaidResetMs(nowMs),
+      dayNightPhase: () => sim.dayNightPhase(),
       instanceKeyFor: sim.instanceKeyFor.bind(sim),
       instanceOriginOf: sim.instanceOriginOf.bind(sim),
       instanceClaimIdAt: sim.instanceClaimIdAt.bind(sim),
@@ -5727,38 +5705,12 @@ export class Sim {
   setCheaterMark(seconds: number, pid?: number): void {
     const r = this.resolve(pid);
     if (!r) return;
-    // Garbage in, no-op out: normalize collapses NaN and non-numbers to 0, and
-    // 0 is the LIFT arm, so without this guard a corrupt budget from any caller
-    // would silently end a live sanction. Only an explicit finite value may
-    // lift; anything else leaves the mark exactly as it stands.
-    if (typeof seconds !== 'number' || !Number.isFinite(seconds)) return;
-    const mark = moderationMod.normalizeCheaterMark(seconds);
-    if (mark) {
-      this.ctx.applyAura(r.e, moderationMod.cheaterMarkAura(mark, r.e.id));
-      // Derive the flag from the POST-CONDITION, not from the intent. No
-      // applyAura guard can refuse this aura today (they gate on npc/mob kinds,
-      // or on control kinds from a foreign source, and the mark is inert and
-      // self-sourced), but an intent-set flag would survive one of them
-      // widening, and the result is a tag with no countdown: the natural-expiry
-      // hook cannot fire without an aura, so only an operator lift would clear
-      // it. Reading back costs one scan on an operator action, never per tick.
-      r.e.cheaterMark =
-        r.e.auras.some((a) => a.id === moderationMod.CHEATER_MARK_AURA_ID) || undefined;
-      return;
-    }
-    const live = r.e.auras.findIndex((a) => a.id === moderationMod.CHEATER_MARK_AURA_ID);
-    if (live >= 0) {
-      const [lifted] = r.e.auras.splice(live, 1);
-      this.emit({
-        type: 'aura',
-        targetId: r.e.id,
-        name: lifted.name,
-        gained: false,
-        sourceId: lifted.sourceId,
-        abilityId: lifted.id,
-      });
-    }
-    r.e.cheaterMark = undefined;
+    moderationMod.setCheaterMarkOn(
+      r.e,
+      seconds,
+      (a) => this.ctx.applyAura(r.e, a),
+      (ev) => this.emit(ev),
+    );
   }
 
   // Host account entitlement; the character blob has no authority over this value.
@@ -7804,15 +7756,8 @@ export class Sim {
     const step = Math.min(speed * DT, d);
     const canSwim = this.mobCanSwim(MOBS[e.templateId]);
 
-    if (ignoreObstacles) {
-      const nx = e.pos.x + Math.sin(desired) * step;
-      const nz = e.pos.z + Math.cos(desired) * step;
-      e.pos.x = nx;
-      e.pos.z = nz;
-      const g = groundHeight(nx, nz, this.cfg.seed);
-      e.pos.y = Math.max(g, swimSurfaceY(nx, nz, this.cfg.seed)); // ride the surface while phasing, don't sink under terrain/water
-      return d - step < 0.3;
-    }
+    // The straight-line step (and the keep-out circles it still obeys): mob/phase_step.ts.
+    if (ignoreObstacles) return phaseStep(e, dest, desired, step, d, this.cfg.seed);
     // Mobs have no nav mesh. Try the straight path first; only if a prop or the
     // waterline eats it do we fan the heading out and take the best slide AROUND
     // the obstacle. That lets a mob round the camp props to reach its target
@@ -7885,8 +7830,10 @@ export class Sim {
       e.kind === 'player'
         ? floorHeightAt(this.cfg.seed, bestX, bestZ, BODY_RADIUS, e.pos.y + 1e-3)
         : groundHeight(bestX, bestZ, this.cfg.seed);
+    // A body with its own wade depth (MobTemplate.wadeDepth) wades deeper than players swim.
+    const wadeDepth = MOBS[e.templateId]?.wadeDepth ?? SWIM_DEPTH;
     e.pos.y =
-      canSwim && g < waterLevelAt(bestX, bestZ, this.cfg.seed) - SWIM_DEPTH
+      canSwim && g < waterLevelAt(bestX, bestZ, this.cfg.seed) - wadeDepth
         ? swimSurfaceY(bestX, bestZ, this.cfg.seed)
         : g;
     return dist2d(e.pos, dest) < 0.3;
@@ -11293,6 +11240,31 @@ export class Sim {
 
   get lockpickState(): LockpickView | null {
     return this.lockpickViewFor(this.primaryId);
+  }
+
+  // --- The Shardpike trial (src/sim/lance_trial.ts): facade delegates + primary view ---
+  lanceBrace(pid: number = this.primaryId): void {
+    lanceTrialMod.lanceBrace(this.ctx, pid);
+  }
+
+  lanceThrust(pid: number = this.primaryId): void {
+    lanceTrialMod.lanceThrust(this.ctx, pid);
+  }
+
+  lanceRelease(pid: number = this.primaryId): void {
+    lanceTrialMod.lanceRelease(this.ctx, pid);
+  }
+
+  get lanceTrial(): LanceTrialView | null {
+    return lanceTrialMod.lanceTrialViewFor(this.ctx, this.primaryId);
+  }
+
+  get lanceRestRemaining(): number {
+    return lanceTrialMod.lanceRestRemainingFor(this.ctx, this.primaryId);
+  }
+
+  get lanceGuidance(): LanceGuidanceView | null {
+    return lanceGuidanceFor(this.ctx, this.primaryId, lanceTrialMod.LANCE_THRUST_RANGE);
   }
 
   get delveMarks(): number {

@@ -59,14 +59,18 @@ export type CharacterFormKey =
   | 'form_metamorph';
 
 /** The renderer shares one cat/wolf slot, but the two classes keep distinct
- *  assets. Resolve at construction so both stay behind the existing form gate. */
+ *  assets. Resolve at construction so both stay behind the existing form gate.
+ *  The Metamorphosis slot is shared the same way by the Knucklebone of Balgath's
+ *  Shape of the Foreman (kind `form_foreman`): its own cyclops rig, the slot's gate. */
 export function characterFormAssetKey(
   formKey: CharacterFormKey,
   auras: readonly AuraIdentity[],
-): CharacterFormKey | 'form_ghost_wolf' {
-  return formKey === 'form_cat' && auras.some((aura) => aura.id === 'ghost_wolf')
-    ? 'form_ghost_wolf'
-    : formKey;
+): CharacterFormKey | 'form_ghost_wolf' | 'form_foreman' {
+  if (formKey === 'form_cat' && auras.some((aura) => aura.id === 'ghost_wolf'))
+    return 'form_ghost_wolf';
+  if (formKey === 'form_metamorph' && auras.some((aura) => aura.kind === 'form_foreman'))
+    return 'form_foreman';
+  return formKey;
 }
 
 export function characterFormMaskForAura(aura: AuraIdentity): number {
@@ -84,6 +88,8 @@ export function characterFormMaskForAura(aura: AuraIdentity): number {
   if (aura.kind === 'form_metamorph' || aura.kind === 'form_lich') {
     return CHARACTER_FORM_FLAG.metamorph;
   }
+  // The Shape of the Foreman rides the same slot with its own rig (characterFormAssetKey).
+  if (aura.kind === 'form_foreman') return CHARACTER_FORM_FLAG.metamorph;
   return 0;
 }
 

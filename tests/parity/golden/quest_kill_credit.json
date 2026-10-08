@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1011,
-      "state": "316057a2",
+      "nextId": 1012,
+      "state": "793701e3",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -62,7 +62,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1003,
+          "entityId": 1004,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -114,7 +114,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1003
+              "sourceId": 1004
             }
           ],
           "blockChance": 0.05,
@@ -128,7 +128,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 1003,
+          "id": 1004,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -172,9 +172,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1011,
-      "state": "601fb6a8",
-      "events": "a3cf857d",
+      "nextId": 1012,
+      "state": "a9ddf68d",
+      "events": "340ae109",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -219,7 +219,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1003,
+          "entityId": 1004,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -287,7 +287,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1003
+              "sourceId": 1004
             }
           ],
           "blockChance": 0.05,
@@ -301,7 +301,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 50000,
-          "id": 1003,
+          "id": 1004,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -345,9 +345,9 @@
     {
       "tick": 8,
       "time": 0.4,
-      "nextId": 1019,
-      "state": "5102fff6",
-      "events": "02416442",
+      "nextId": 1020,
+      "state": "1d54c20d",
+      "events": "0afecc5f",
       "rng": {
         "draws": 40,
         "digest": "73f698f7"
@@ -421,7 +421,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1003,
+          "entityId": 1004,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -490,7 +490,7 @@
               "name": "Battle Stance",
               "remaining": 3599.6,
               "school": "physical",
-              "sourceId": 1003
+              "sourceId": 1004
             }
           ],
           "blockChance": 0.05,
@@ -504,7 +504,7 @@
           "fiveSecondRule": 99.4,
           "healPower": 5,
           "hp": 50000,
-          "id": 1003,
+          "id": 1004,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -549,9 +549,9 @@
     {
       "tick": 8,
       "time": 0.4,
-      "nextId": 1019,
-      "state": "2f1d226a",
-      "events": "3fed41be",
+      "nextId": 1020,
+      "state": "dc3a8391",
+      "events": "ee143ce2",
       "rng": {
         "draws": 40,
         "digest": "73f698f7"
@@ -629,7 +629,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1003,
+          "entityId": 1004,
           "equipment": {
             "chest": "brookwatch_hauberk",
             "mainhand": "worn_sword",
@@ -691,7 +691,7 @@
               "name": "Battle Stance",
               "remaining": 3599.6,
               "school": "physical",
-              "sourceId": 1003
+              "sourceId": 1004
             }
           ],
           "blockChance": 0.05,
@@ -705,7 +705,7 @@
           "fiveSecondRule": 99.4,
           "healPower": 5,
           "hp": 452,
-          "id": 1003,
+          "id": 1004,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -750,8 +750,8 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 1019,
-      "state": "dc4a6e41",
+      "nextId": 1020,
+      "state": "99e17432",
       "events": "741638a5",
       "rng": {
         "draws": 40,
@@ -830,7 +830,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1003,
+          "entityId": 1004,
           "equipment": {
             "chest": "brookwatch_hauberk",
             "mainhand": "worn_sword",
@@ -892,7 +892,7 @@
               "name": "Battle Stance",
               "remaining": 3599.5,
               "school": "physical",
-              "sourceId": 1003
+              "sourceId": 1004
             }
           ],
           "blockChance": 0.05,
@@ -906,7 +906,7 @@
           "fiveSecondRule": 99.5,
           "healPower": 5,
           "hp": 452,
-          "id": 1003,
+          "id": 1004,
           "inCombat": true,
           "kind": "player",
           "level": 10,
