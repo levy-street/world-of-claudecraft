@@ -30,7 +30,9 @@ vi.mock('../src/render/mount_glow', () => ({
 }));
 
 import type { CharacterVisual } from '../src/render/characters';
+import { weaponStowedOverlay } from '../src/render/characters/anim_state';
 import { linkPiecesOf } from '../src/render/compile_gate_pieces';
+import { ContactQueue, collapsed, heldUntilCollapse } from '../src/render/contact_queue';
 import { goblinRocketSledPlumeMaterials } from '../src/render/goblin_rocket_sled_fx';
 import { attachMountGlows, disposeMountGlows, type MountGlows } from '../src/render/mount_glow';
 import {
@@ -521,6 +523,221 @@ describe('mount transition effects', () => {
     expect(dismount.summonCall).not.toHaveBeenCalled();
     expect(dismount.engineReset).toHaveBeenCalledOnce();
     expect(dismount.preloadEngine).not.toHaveBeenCalled();
+  });
+});
+
+// A rider killed by a swing whose blade is still in the air keeps standing until it lands
+// (contact_queue.ts holdsDeath). The sim has dismounted the rider by then: death clears
+// Entity.mountKey on the tick it resolves (tests/mounts.test.ts, 'force-dismounts on death'),
+// so the live key is '' on the very first held frame. These drive the REAL mount modules in
+// the order the renderer's entity pass runs them (tests/melee_contact_wiring.test.ts pins
+// that pass's own lines): the presented key, the spec, the visual, then the transition FX.
+describe('a held kill keeps the mount until the body collapses', () => {
+  const RIDER = 7;
+
+  function heldRide() {
+    const { v } = rig();
+    v.mountVisual = null;
+    v.mountVisualKey = '';
+    const host = {
+      reconcileViewLights: vi.fn(),
+      gateSwapFlagOnCompile: (_root: THREE.Object3D, done: () => void): void => done(),
+      recordBuild: vi.fn(),
+    };
+    const view = Object.assign(v, {
+      lastMountKey: 'grag_bear',
+      wasMountCasting: false,
+      mountLift: 0,
+    });
+    const queue = new ContactQueue();
+    const glows: number[] = [];
+    const resets: number[] = [];
+    /** One frame of the renderer's mount block for an entity in the given live state.
+     *  `feed` is what the transition FX are handed: the presented key, as the renderer does,
+     *  or the live key (the wiring this suite exists to keep out). `form` is a shapeshift
+     *  that hides the mount under it, and `linking` a mount rig still behind its gate. */
+    const frame = (
+      now: number,
+      live: { dead: boolean; mountKey: string; form?: boolean; linking?: boolean },
+      feed: 'presented' | 'live' = 'presented',
+    ) => {
+      queue.tick(now);
+      const deathHeld = live.dead && queue.holdsDeath(RIDER);
+      const mountKey = heldUntilCollapse(
+        deathHeld && view.mountLift > 0,
+        live.mountKey,
+        view.lastMountKey,
+      );
+      const spec = mountVisualSpecFor(mountKey, null);
+      const shown = !!spec && !live.form && !collapsed(live.dead, deathHeld);
+      syncMountVisual(view, spec, host);
+      if (live.linking && view.mountVisual) view.mountCompilePending = true;
+      const presented = shown && !!view.mountVisual && !view.mountCompilePending;
+      view.mountLift = presented && spec ? spec.seat : 0;
+      const fed = feed === 'presented' ? mountKey : live.mountKey;
+      view.wasMountCasting = syncMountTransitionFx(view, {
+        mountCasting: false,
+        mountCastKey: '',
+        mountCastRemaining: 0,
+        mountKey: fed,
+        mountLook: fed,
+        poseAllowed: true,
+        present: true,
+        playCallPose: vi.fn(),
+        summonGlow: () => glows.push(now),
+        summonCall: vi.fn(),
+        engineReset: () => resets.push(now),
+        preloadSummon: vi.fn(),
+        preloadEngine: vi.fn(),
+      });
+      return {
+        mounted: presented,
+        seat: presented && spec ? spec.seat : 0,
+        // the weapon stays on the back while the body is presented mounted (the rider's
+        // own sheathe bit off, on dry land: only the ride stows it)
+        stowedForMount: weaponStowedOverlay(false, false, mountKey !== ''),
+        bodyDead: collapsed(live.dead, deathHeld),
+      };
+    };
+    return { view, queue, frame, glows, resets };
+  }
+
+  const ALIVE = { dead: false, mountKey: 'grag_bear' };
+  // what the sim hands the renderer from the death tick on: dead, and already dismounted
+  const KILLED = { dead: true, mountKey: '' };
+
+  it('holds the mount, the seat and the stowed weapon through the hold, then lets all go at once', () => {
+    const h = heldRide();
+    const riding = h.frame(984, ALIVE);
+    expect(riding).toEqual({
+      mounted: true,
+      seat: bear().seat,
+      stowedForMount: true,
+      bodyDead: false,
+    });
+    const steed = h.view.mountVisual;
+    expect(steed).not.toBeNull();
+    // the killing swing lands 0.4 s after its damage event
+    h.queue.note({}, 0.4, RIDER, 1000);
+    for (const now of [1000, 1016, 1200, 1399]) {
+      expect(h.frame(now, KILLED), `held at ${now}`).toEqual(riding);
+      // the very same mount: never torn down and rebuilt under the rider
+      expect(h.view.mountVisual, `held at ${now}`).toBe(steed);
+      expect(h.view.lastMountKey).toBe('grag_bear');
+    }
+    // nothing of the dismount has played yet: no shimmer, no engine reset
+    expect(h.glows).toEqual([]);
+    expect(h.resets).toEqual([]);
+    // the blade lands: the body collapses and the mount bolts on the same frame
+    expect(h.frame(1400, KILLED)).toEqual({
+      mounted: false,
+      seat: 0,
+      stowedForMount: false,
+      bodyDead: true,
+    });
+    expect(h.view.mountVisual).toBeNull();
+    expect(h.view.lastMountKey).toBe('');
+    expect(h.glows).toEqual([1400]);
+    expect(h.resets).toEqual([1400]);
+    // ...and stays gone
+    expect(h.frame(1416, KILLED).mounted).toBe(false);
+    expect(h.glows).toEqual([1400]);
+  });
+
+  it('lets the mount go on the event when no blade is in the air (a spell, a fall)', () => {
+    const h = heldRide();
+    h.frame(984, ALIVE);
+    h.queue.note({}, 0, RIDER, 1000); // no contact: nothing is held
+    expect(h.frame(1000, KILLED)).toEqual({
+      mounted: false,
+      seat: 0,
+      stowedForMount: false,
+      bodyDead: true,
+    });
+    expect(h.view.mountVisual).toBeNull();
+    expect(h.glows).toEqual([1000]);
+  });
+
+  it('never keeps a mount under a rider who simply dismounts, or summons one for a held body on foot', () => {
+    const h = heldRide();
+    h.frame(984, ALIVE);
+    // an ordinary dismount: alive, the key cleared: gone that frame
+    expect(h.frame(1000, { dead: false, mountKey: '' }).mounted).toBe(false);
+    expect(h.view.mountVisual).toBeNull();
+    // a body on foot whose death is held shows no mount: there is none to keep
+    h.queue.note({}, 0.4, RIDER, 1100);
+    expect(h.frame(1116, KILLED)).toEqual({
+      mounted: false,
+      seat: 0,
+      stowedForMount: false,
+      bodyDead: false,
+    });
+    expect(h.view.mountVisual).toBeNull();
+  });
+
+  it('holds only a mount the rider was seated on: one hidden under a form never appears', () => {
+    // A shapeshift replaces the body and hides the mount under it. The death strips the form
+    // with every aura, so a hold keyed on the entity's ride alone would summon, for the
+    // length of the hold, a mount nobody was seeing.
+    const h = heldRide();
+    const shifted = h.frame(984, { dead: false, mountKey: 'grag_bear', form: true });
+    expect(shifted.mounted).toBe(false);
+    expect(h.view.mountLift).toBe(0);
+    h.queue.note({}, 0.4, RIDER, 1000);
+    for (const now of [1000, 1016, 1399]) {
+      expect(h.frame(now, KILLED), `held at ${now}`).toEqual({
+        mounted: false,
+        seat: 0,
+        stowedForMount: false,
+        bodyDead: false,
+      });
+      // gone on the event, as the live key says: nothing of it was on screen to hold
+      expect(h.view.mountVisual, `held at ${now}`).toBeNull();
+    }
+    expect(h.glows).toEqual([1000]);
+    expect(h.frame(1400, KILLED).bodyDead).toBe(true);
+  });
+
+  it('holds only a mount the rider was seated on: one still linking is not brought in', () => {
+    const h = heldRide();
+    // summoned, its rig still behind the compile gate: the rider stands in on foot
+    const waiting = h.frame(984, { dead: false, mountKey: 'grag_bear', linking: true });
+    expect(waiting.mounted).toBe(false);
+    expect(h.view.mountVisual).not.toBeNull();
+    expect(h.view.mountLift).toBe(0);
+    h.queue.note({}, 0.4, RIDER, 1000);
+    expect(h.frame(1000, KILLED)).toEqual({
+      mounted: false,
+      seat: 0,
+      stowedForMount: false,
+      bodyDead: false,
+    });
+    expect(h.view.mountVisual).toBeNull();
+    expect(h.frame(1016, KILLED).mounted).toBe(false);
+  });
+
+  it('reads a seated rider off the seat lift, which every mount and skin sets above zero', () => {
+    // The renderer holds the ride only for `v.mountLift > 0` (the seat lift of the mount it
+    // presented the frame before): a mount whose seat were 0 would silently lose its hold.
+    for (const key of MOUNT_KEYS) {
+      expect(mountVisualSpec(key)?.seat, key).toBeGreaterThan(0);
+    }
+    for (const id of MOUNT_SKIN_IDS) {
+      expect(MOUNT_SKIN_VISUAL_SPECS[id].seat, id).toBeGreaterThan(0);
+    }
+  });
+
+  it('needs the transition FX fed the PRESENTED key: fed the live one, the hold lasts a frame', () => {
+    // Why the renderer hands syncMountTransitionFx the presented key: it is what keeps
+    // lastMountKey (the key the next held frame presents) through the hold.
+    const h = heldRide();
+    h.frame(984, ALIVE);
+    h.queue.note({}, 0.4, RIDER, 1000);
+    expect(h.frame(1000, KILLED, 'live').mounted).toBe(true);
+    // the live key overwrote the record: the shimmer already played and the mount is lost
+    expect(h.glows).toEqual([1000]);
+    expect(h.frame(1016, KILLED, 'live').mounted).toBe(false);
+    expect(h.view.mountVisual).toBeNull();
   });
 });
 

@@ -5,9 +5,12 @@
 //
 // Deliberately NOT the encounter's own NPC. Brother Aldric was the first
 // suspect and the A/B says he is innocent: entering the arena from a start zone
-// that had never compiled npc_aldric, his 70% spawn still linked ZERO programs
-// and cost 29ms, because his rig shares its programs with the player bodies
-// already on screen. Warming a model that costs nothing is work, not a fix.
+// that had never compiled his rig (the stock npc_aldric model he wore then),
+// his 70% spawn still linked ZERO programs and cost 29ms, because that rig
+// shared its programs with the player bodies already on screen. He wears his
+// authored look on the priest's WOC body now (characters/npc_looks.ts), a def
+// a player draws with (player_priest); that spawn has not been measured again.
+// Warming a model that costs nothing is work, not a fix.
 import type { PlayerClass } from '../sim/types';
 
 export interface InteriorEncounterPrewarmSpec {

@@ -20,7 +20,11 @@ import { borderAccent, borderMotifPrimitives } from '../src/ui/deed_border_view'
 import { deedName, deedTitleText } from '../src/ui/deed_i18n';
 import { QUALITY_COLOR } from '../src/ui/icons';
 import { classColorCss } from '../src/ui/inspect_view';
-import { type InspectEntity, InspectWindow } from '../src/ui/inspect_window';
+import {
+  type InspectEntity,
+  InspectWindow,
+  type InspectWindowDeps,
+} from '../src/ui/inspect_window';
 import { qualityGlowShadow } from '../src/ui/quality_glow';
 import { knownItemIconHtml } from '../src/ui/unknown_item_icon';
 
@@ -362,7 +366,7 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
   // Hud dep, so the SELF-override pin below can see exactly what a hover reads.
   const tooltipCalls: Array<{ itemId: string; instance: ItemInstancePayload | undefined }> = [];
   const attachedTooltips: Array<{ el: HTMLElement; build: () => string }> = [];
-  const mountPreview = vi.fn();
+  const mountPreview = vi.fn<InspectWindowDeps['mountPreview']>();
   const openWith = (
     e: InspectEntity,
     selfStanding?: { curatorRank: number; owned: number; total: number } | null,
@@ -435,9 +439,34 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
     // second call in one test wraps the spy in itself.
     openWith(baseEntity);
     expect(mountPreview.mock.calls.length).toBe(1);
-    const [, params] = mountPreview.mock.calls[0] as [HTMLElement, { look?: unknown }];
+    const [, params] = mountPreview.mock.calls[0];
     expect(params.look).toBeNull();
+    expect(params.appearance).toBeNull();
+    expect(params.wornEquipment).toBe(baseEntity.equippedItems);
+    expect(params.helmHidden).toBe(false);
   });
+
+  it.each([true, false])(
+    'forwards the inspected female body and worn gear with helmHidden %s',
+    (helmHidden) => {
+      const appearance = { gender: 'female' };
+      const equippedItems = {
+        helmet: 'mistveil_cord',
+        chest: 'worn_mail',
+        mainhand: 'worn_sword',
+        offhand: 'eastbrook_buckler',
+      };
+      openWith({ ...baseEntity, modularAppearance: appearance, equippedItems, helmHidden });
+      expect(mountPreview).toHaveBeenCalledTimes(1);
+      const [stage, params] = mountPreview.mock.calls[0];
+      expect(stage.id).toBe('inspect-model-preview');
+      expect(params.appearance).toBe(appearance);
+      expect(params.wornEquipment).toBe(equippedItems);
+      expect(params.helmHidden).toBe(helmHidden);
+      expect(params.mainhand).toBe('worn_sword');
+      expect(params.offhand).toBe('eastbrook_buckler');
+    },
+  );
 
   it('lets the Combat Mech win over the look on the Hud side of the mount', () => {
     // The precedence the world applies (createCharacterVisual never composes

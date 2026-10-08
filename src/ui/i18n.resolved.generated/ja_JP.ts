@@ -9751,6 +9751,168 @@ export const ja_JP: EnTranslations = {
     "body": "体型",
     "genderMale": "男性",
     "genderFemale": "女性",
+    "bodyTypeA": "Type A",
+    "bodyTypeB": "Type B",
+    "wocHead": {
+      "hair": {
+        "swept": "流し髪",
+        "long": "Long",
+        "mohawk": "モヒカン",
+        "quiff": "ショートリーゼント",
+        "undercut": "ツーブロック",
+        "topknot": "トップノット",
+        "shoulder": "ミディアム",
+        "bald": "Bald",
+        "waves": "ウェーブ",
+        "ponytail": "ハイポニーテール",
+        "braid": "三つ編み",
+        "bob": "Bob",
+        "crown": "クラウンブレイド",
+        "twins": "ツインおさげ",
+        "curls": "カールアップ"
+      },
+      "beard": {
+        "none": "ひげなし",
+        "moustache": "口ひげ",
+        "handlebar": "カイゼルひげ",
+        "goatee": "やぎひげ",
+        "chin": "あごひげ",
+        "boxed": "整えたフルひげ",
+        "long": "長いひげ",
+        "chops": "もみあげひげ",
+        "chinstrap": "チンストラップ"
+      },
+      "nose": {
+        "default": "クラシック",
+        "broad": "幅広",
+        "aquiline": "わし鼻",
+        "button": "小さな丸鼻",
+        "soft": "Soft"
+      },
+      "mouth": {
+        "default": "クラシック",
+        "full": "Full",
+        "smirk": "にやり",
+        "relaxed": "リラックス",
+        "cupids_bow": "M字リップ",
+        "narrow": "小ぶり",
+        "thin": "Thin",
+        "rounded": "丸み"
+      },
+      "brows": {
+        "default": "クラシック",
+        "slim": "Slim",
+        "arched": "アーチ眉",
+        "soft": "Soft",
+        "straight": "平行眉",
+        "relaxed": "ゆるやか",
+        "soft_arch": "Soft Arch",
+        "rounded": "丸眉"
+      },
+      "ears": {
+        "default": "クラシック",
+        "large": "大きめ",
+        "pointed": "とがり耳",
+        "round": "丸耳"
+      },
+      "eyes": {
+        "default": "クラシック",
+        "almond": "アーモンド",
+        "hooded": "奥二重"
+      }
+    },
+    "wocBuilder": {
+      "cat": {
+        "bodyType": "Body Type",
+        "skinTone": "Skin Tone",
+        "face": "Face",
+        "eyesBrows": "目と眉",
+        "eyeColor": "目の色",
+        "hairstyle": "髪型",
+        "facialHair": "ひげ",
+        "hairColor": "髪の色",
+        "browColor": "眉の色",
+        "piercings": "ピアス"
+      },
+      "section": {
+        "hair": "髪型",
+        "nose": "Nose",
+        "mouth": "Lips",
+        "brows": "眉の形",
+        "ears": "Ears",
+        "eyes": "目の形"
+      },
+      "slider": {
+        "eyeSpacing": "目の間隔",
+        "eyeSize": "Eye Size",
+        "eyeTilt": "Eye Tilt",
+        "browHeight": "眉の高さ",
+        "chinWidth": "あごの幅",
+        "bodyScale": "Body Size"
+      },
+      "bodyGlyph": {
+        "a": "A",
+        "b": "B"
+      },
+      "piercing": {
+        "none": "None",
+        "lobes": "耳たぶ",
+        "ears": "Full Ears",
+        "brow": "Brow",
+        "nose": "小鼻",
+        "septum": "セプタム",
+        "lip": "Lip",
+        "full": "Full Set"
+      },
+      "skin": {
+        "porcelain": "ポーセリン",
+        "ivory": "アイボリー",
+        "rose": "Rose",
+        "peach": "ピーチ",
+        "fair": "Fair",
+        "beige": "ベージュ",
+        "sand": "Sand",
+        "honey": "ハニー",
+        "olive": "オリーブ",
+        "caramel": "キャラメル",
+        "tan": "Tan",
+        "bronze": "ブロンズ",
+        "chestnut": "栗色",
+        "umber": "褐色",
+        "mahogany": "マホガニー",
+        "ebony": "エボニー"
+      },
+      "eye": {
+        "brown": "ブラウン",
+        "darkBrown": "ダークブラウン",
+        "hazel": "ヘーゼル",
+        "amber": "アンバー",
+        "green": "グリーン",
+        "teal": "Teal",
+        "blue": "Blue",
+        "paleBlue": "Pale Blue",
+        "grey": "Grey",
+        "violet": "バイオレット"
+      },
+      "hairColor": {
+        "platinum": "プラチナ",
+        "blonde": "ブロンド",
+        "golden": "ゴールド",
+        "copper": "カッパー",
+        "red": "Red",
+        "auburn": "オーバーン",
+        "lightBrown": "ライトブラウン",
+        "brown": "ブラウン",
+        "darkBrown": "ダークブラウン",
+        "black": "ブラック",
+        "silver": "シルバー",
+        "white": "ホワイト"
+      },
+      "matchHair": "髪の色に合わせる",
+      "resetDefault": "初期設定に戻す",
+      "customColorAria": "カスタムカラーを選択",
+      "customSkinAria": "カスタムの肌の色を選択"
+    },
     "hair": "髪型",
     "brows": "眉",
     "skinTone": "肌の色",

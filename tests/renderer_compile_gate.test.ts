@@ -3,6 +3,8 @@ import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
 import * as characters from '../src/render/characters';
+import { SerialGateLane } from '../src/render/compile_gate';
+import { compileProof } from '../src/render/compile_target_readiness';
 import {
   buildFarmPatchProps,
   FarmPatchVisuals,
@@ -940,13 +942,18 @@ describe('the far-bake compile gate handed to character visuals', () => {
     const renderer = harness();
     const sentinel = () => {};
     renderer.farBakeGate = sentinel;
+    // the work queue rides in with the gate: a visual puts off main-thread pieces on it
+    const queue = { run: vi.fn() };
+    (renderer as unknown as { backgroundGpuWork: unknown }).backgroundGpuWork = queue;
     renderer.viewCreateRetry = {
       canAttempt: () => true,
       markSucceeded: vi.fn(),
       markFailed: vi.fn(),
     };
+    // the local player is entity 7: its own armor draws full detail (woc_armor_core.ts)
+    (renderer as unknown as { sim: { playerId: number } }).sim = { playerId: 7 };
     const setFarBakeGate = vi.fn();
-    vi.spyOn(characters, 'createCharacterVisual').mockReturnValue({
+    const create = vi.spyOn(characters, 'createCharacterVisual').mockReturnValue({
       setFarBakeGate,
     } as unknown as ReturnType<typeof characters.createCharacterVisual>);
     const entity = { id: 7 } as Parameters<typeof characters.createCharacterVisual>[0];
@@ -958,7 +965,16 @@ describe('the far-bake compile gate handed to character visuals', () => {
     ).createCharacterVisualWithRetry(entity, 'view');
 
     expect(built).not.toBeNull();
-    expect(setFarBakeGate).toHaveBeenCalledWith(sentinel);
+    expect(setFarBakeGate).toHaveBeenCalledWith(sentinel, queue);
+    expect(create).toHaveBeenLastCalledWith(entity, undefined, undefined, true);
+    // any other character is built at the crowd's detail
+    const peer = { id: 8 } as Parameters<typeof characters.createCharacterVisual>[0];
+    (
+      renderer as unknown as {
+        createCharacterVisualWithRetry(e: unknown, slot: string): unknown;
+      }
+    ).createCharacterVisualWithRetry(peer, 'view');
+    expect(create).toHaveBeenLastCalledWith(peer, undefined, undefined, false);
     // and a failed build installs nothing (there is no visual to install on)
     vi.spyOn(characters, 'createCharacterVisual').mockReturnValue(null);
     setFarBakeGate.mockClear();
@@ -981,19 +997,64 @@ describe('the far-bake compile gate handed to character visuals', () => {
     // ...and one crowd bake links at a time: the gate is enqueued on the
     // renderer's SerialGateLane. The settle hands the caller a LAZY proof
     // thunk instead of an eagerly computed boolean, so a crowd bake whose
-    // settle callback ignores it (every consumer but the sanguine weapon
-    // sheath) never pays compileTargetPrepared's target traverse.
+    // settle callback ignores it never pays compileTargetPrepared's target
+    // traverse; a host without parallel compile hands no proof at all
+    // (compileProof, pinned below).
     expect(rendererSource).toContain(
       'private readonly farBakeGate: FarBakeGate = (target, onSettled) =>\n' +
         '    this.farBakeLane.enqueue(\n' +
         '      (settled) => this.gateSwapFlagOnCompile(target, settled),\n' +
-        '      () => onSettled(() => compileTargetPrepared(this.webgl.properties, target)),\n' +
+        '      () => onSettled(compileProof(this.asyncCompileSupported, this.webgl.properties, target)),\n' +
         '    );',
     );
     expect(rendererSource).toContain('private readonly farBakeLane = new SerialGateLane();');
     // Both live build paths install it: fresh builds and pool re-acquires.
-    expect(rendererSource).toContain('visual.setFarBakeGate(this.farBakeGate);');
+    expect(rendererSource).toContain(
+      'visual.setFarBakeGate(this.farBakeGate, this.backgroundGpuWork);',
+    );
     expect(rendererSource).toContain('farBakeGate: () => this.farBakeGate,');
+  });
+
+  it('on a host without parallel shader compile it settles with no compile behind it, and hands no proof', async () => {
+    // The field cannot be built on this harness (above), so its body is composed here
+    // from the very parts the source pin names: the lane, gateSwapFlagOnCompile and
+    // compileProof. What a WOC stand-in rests on (tests/woc_merge_visual.test.ts): that
+    // host's settle comes with nothing linked, and so with NO proof, never with one that
+    // could only read false.
+    const renderer = harness();
+    const compileGate = vi.fn(() => Promise.resolve());
+    renderer.compileGate = compileGate;
+    const lane = new SerialGateLane();
+    const properties = { get: (): unknown => undefined };
+    const farBakeGate = (
+      target: THREE.Object3D,
+      onSettled: (ready?: () => boolean) => void,
+    ): void =>
+      lane.enqueue(
+        (settled) => renderer.gateSwapFlagOnCompile(target, settled),
+        () =>
+          onSettled(compileProof(renderer.asyncCompileSupported as boolean, properties, target)),
+      );
+    const settles: ((() => boolean) | undefined)[] = [];
+    const material = new THREE.MeshBasicMaterial();
+    const target = new THREE.Mesh(new THREE.BoxGeometry(), material);
+    renderer.asyncCompileSupported = false;
+    farBakeGate(target, (ready) => settles.push(ready));
+    await flushGate();
+    expect(settles).toEqual([undefined]);
+    expect(compileGate).not.toHaveBeenCalled();
+    expect(lane.pending).toBe(0);
+    // with the extension the same gate compiles first, and its settle carries a proof to
+    // read (false here: nothing recorded a linked program for the target)
+    renderer.asyncCompileSupported = true;
+    farBakeGate(target, (ready) => settles.push(ready));
+    await flushGate();
+    await flushGate();
+    expect(compileGate).toHaveBeenCalledTimes(1);
+    expect(settles).toHaveLength(2);
+    expect(settles[1]?.()).toBe(false);
+    target.geometry.dispose();
+    material.dispose();
   });
 });
 

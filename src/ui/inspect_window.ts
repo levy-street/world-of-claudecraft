@@ -35,7 +35,7 @@ import {
 import { markDialogRoot } from './dialog_root';
 import { discordRoleTagLabel } from './discord_role_tag';
 import { discordStatusBadgeDataUrl, discordStatusDisplayName } from './discord_tier';
-import { classDisplayName, itemDisplayName } from './entity_i18n';
+import { classDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import {
   holderCardBadgeClass,
@@ -65,6 +65,10 @@ import { wornItemCellParts } from './worn_item_cell_view';
 
 /** The inspected entity fields the painter reads (a structural subset of the
  *  live EntityView / ClientWorld mirror; all already client-side). */
+/** The creation pick's shape (ModularAppearance's gender), kept structural so
+ *  this painter imports nothing from the render layer. */
+type BodyPick = { readonly gender?: unknown } | null | undefined;
+
 export interface InspectEntity {
   templateId: string;
   name: string;
@@ -78,6 +82,11 @@ export interface InspectEntity {
   border?: string | null;
   equippedItems: Partial<Record<EquipSlot, string>>;
   equippedInstances: Partial<Record<EquipSlot, ItemInstancePayload>>;
+  /** The paperdoll eye (the wire helm bit): a WOC body on the stage hides its
+   *  helm exactly as the world does. */
+  helmHidden?: boolean;
+  /** The creation pick (body/face), which selects a WOC class's body file. */
+  modularAppearance?: BodyPick;
   /** The server-resolved active Armory weapon skin (wire wsk), render-only. */
   weaponSkinId?: string | null;
   holderTier?: number;
@@ -133,6 +142,11 @@ export interface InspectWindowDeps extends PainterHostPresentation {
        *  so the turntable shows the face they built, not the stock class rig;
        *  null for a pre-creator character. */
       look: ModularLook | null;
+      /** The inspected player's mirrored worn set and helm-visibility bit, so
+       *  a WOC modular body on the stage wears exactly what the world draws. */
+      wornEquipment: Readonly<Partial<Record<EquipSlot, string>>>;
+      helmHidden: boolean;
+      appearance: BodyPick;
     },
   ): void;
 }
@@ -275,6 +289,9 @@ export class InspectWindow {
         offhand: e.equippedItems.offhand ?? null,
         weaponSkinId: e.weaponSkinId ?? null,
         look: look ?? null,
+        wornEquipment: e.equippedItems,
+        helmHidden: e.helmHidden ?? false,
+        appearance: e.modularAppearance ?? null,
       });
     }
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());

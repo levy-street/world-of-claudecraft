@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { PALADIN_SYNTHESIZED_CLIP_SOURCES } from '../src/render/characters/assets';
+import { clipSplitNames } from '../src/render/characters/clip_split';
 import {
   type ClipMap,
   modularVisualKey,
@@ -132,11 +133,16 @@ function loadedClipNames(def: VisualDef, standardMaterials: boolean, key?: strin
   ];
   const names = new Set<string>();
   for (const url of urls) for (const name of animationNamesOf(url)) names.add(name);
+  // Hold-and-release halves minted at load from a GLB clip (ClipMap.clipSplits,
+  // clip_split.ts): resolvable exactly when their source clip is.
+  for (const cut of def.clips.clipSplits ?? []) {
+    if (names.has(cut.clip)) for (const name of clipSplitNames(def.clips)) names.add(name);
+  }
   // The two paladin attack clips are synthesized at prepare time from a GLB
   // source clip (assets.ts's PALADIN_SYNTHESIZED_CLIP_SOURCES), for the classic
   // and modular keys alike: a synthesized name resolves exactly when its source
   // does, so a trimmed-away source still fails this gate.
-  if (key === 'player_paladin' || key === modularVisualKey('paladin')) {
+  if ((key === 'player_paladin' || key === modularVisualKey('paladin')) && !def.wocCharacter) {
     for (const [synthesized, source] of Object.entries(PALADIN_SYNTHESIZED_CLIP_SOURCES)) {
       if (names.has(source)) names.add(synthesized);
     }
@@ -167,10 +173,17 @@ function requiredClipNames(clips: ClipMap): string[] {
     clips.fall,
     clips.land,
     clips.walkBack,
+    clips.strafeLeft,
+    clips.strafeRight,
     clips.flourish,
     clips.stow,
+    clips.climb,
     ...clips.attack,
+    ...(clips.meleeAttack ?? []),
+    clips.wandAttack,
     ...(clips.idleVariants ?? []),
+    // every loadout variant the rig swaps to must ship ('' = suppressed, not a clip)
+    ...Object.values(clips.loadoutSwaps ?? {}).flatMap((m) => Object.values(m ?? {})),
     clips.idleBeat?.clip,
     ...(clips.hit ?? []),
     ...Object.values(clips.attackByAbility ?? {}),
@@ -179,6 +192,10 @@ function requiredClipNames(clips: ClipMap): string[] {
     // cast-exit play-out entries name clips: a typo would silently disable
     // the recovery and bring the snap-to-idle back
     ...(clips.castPlayOut ?? []),
+    // both-hands dual-wield swings, and every clip a blade contact is timed on (the split
+    // halves ride `<clip>#main`/`#off`, minted from their clip at load, never shipped)
+    ...(clips.dualWieldPair ?? []),
+    ...Object.keys(clips.contacts ?? {}).filter((name) => !name.includes('#')),
   ].filter((name): name is string => !!name);
 }
 
@@ -212,9 +229,13 @@ const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
   'fall',
   'land',
   'walkBack',
+  'strafeLeft',
+  'strafeRight',
   'flourish',
   'stow',
   'attack',
+  'meleeAttack',
+  'wandAttack',
   'hit',
   'attackByAbility',
   'attackTimeScaleByAbility',
@@ -224,8 +245,18 @@ const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
   'castPlayOut',
   'attackByHand',
   'emote',
+  'shoutEmote',
+  'climb',
+  'stowSwapFraction',
+  'dualWieldSplit',
+  'clipSplits',
   'idleVariants',
+  'idleVariantCadence',
   'idleBeat',
+  'loadoutSwaps',
+  'stowPlaysWhole',
+  'dualWieldPair',
+  'contacts',
 ]);
 
 /**

@@ -13,21 +13,17 @@ import { GFX } from '../gfx';
 import { applyTextureAnisotropy } from '../texture_anisotropy';
 import { classifyGltfKtx2Textures, dismissKtx2Source } from './ktx2_mip_release';
 import { ktx2Loader } from './ktx2_support';
+import { type LoadPriority, LoadQueue } from './load_queue_core';
 import { MAX_LOAD_ATTEMPTS, retryDelayMs } from './load_retry';
 import { assetUrl } from './media';
 import { assetLoadStarted, recordAssetLoad } from './stats';
 import { neutralizeGltfTransmission } from './transmission_neutralize';
+import { wocLodPlugin } from './woc_lod_plugin';
 
 let gltfLoader: GLTFLoader | null = null;
 const gltfCache = new Map<string, Promise<GLTF>>();
 const texCache = new Map<string, Promise<THREE.Texture>>();
 const ktx2TexCache = new Map<string, Promise<THREE.CompressedTexture>>();
-
-interface AssetQueue {
-  active: number;
-  limit: number;
-  pending: (() => void)[];
-}
 
 function constrainedBrowser(): boolean {
   if (typeof navigator === 'undefined') return false;
@@ -37,36 +33,40 @@ function constrainedBrowser(): boolean {
   return (coarse && narrow) || (nav.deviceMemory !== undefined && nav.deviceMemory <= 4);
 }
 
+// Keep large loader callback chains from running in one import-time burst.
+const launchLoad = (start: () => void): void => {
+  globalThis.setTimeout(start, 0);
+};
+
 const constrained = constrainedBrowser();
-const gltfQueue: AssetQueue = { active: 0, limit: constrained ? 2 : 4, pending: [] };
-const textureQueue: AssetQueue = { active: 0, limit: constrained ? 3 : 6, pending: [] };
+// Which waiting load starts next is load_queue_core.ts: a file somebody needs now ahead of
+// the bulk stream. The GLB queue carries background loads (the post-entry creature stream,
+// the crowd prefetch), and so does the texture queue for a KTX2 atlas fetched ahead of need.
+const gltfQueue = new LoadQueue(constrained ? 2 : 4, launchLoad);
+const textureQueue = new LoadQueue(constrained ? 3 : 6, launchLoad);
 // Single-slot lane for the few very large textures (the biome sky domes, about
 // 1.6 MB compressed at 2k), inherited from the Radiance path this replaced.
 // Their fetch lands on the hitch-sensitive biome-crossing path, and letting two
 // of them race the model and atlas traffic on the shared texture queue is what
 // that serialization was there to prevent.
-const largeTextureQueue: AssetQueue = { active: 0, limit: 1, pending: [] };
+const largeTextureQueue = new LoadQueue(1, launchLoad);
 
-function pumpQueue(q: AssetQueue): void {
-  while (q.active < q.limit && q.pending.length > 0) {
-    const start = q.pending.shift()!;
-    q.active++;
-    // Keep large loader callback chains from running in one import-time burst.
-    globalThis.setTimeout(start, 0);
-  }
-}
-
-function scheduleLoad<T>(q: AssetQueue, run: () => Promise<T>): Promise<T> {
+function scheduleLoad<T>(
+  q: LoadQueue,
+  run: () => Promise<T>,
+  priority?: LoadPriority,
+  key?: string,
+): Promise<T> {
   return new Promise<T>((resolve, reject) => {
-    q.pending.push(() => {
-      run()
-        .then(resolve, reject)
-        .finally(() => {
-          q.active = Math.max(0, q.active - 1);
-          pumpQueue(q);
-        });
-    });
-    pumpQueue(q);
+    q.push(
+      (background) => {
+        run()
+          .then(resolve, reject)
+          .finally(() => q.release(background));
+      },
+      priority,
+      key,
+    );
   });
 }
 
@@ -97,6 +97,8 @@ function loader(): GLTFLoader {
     // Model textures ship as KTX2 (KHR_texture_basisu): without the transcoder
     // attached, parsing any public/models GLB rejects outright.
     assembled.setKTX2Loader(ktx2Loader());
+    // The WOC character files' coarser levels of detail (woc_lod_plugin.ts).
+    assembled.register(wocLodPlugin);
     gltfLoader = assembled;
   }
   return gltfLoader;
@@ -165,33 +167,49 @@ function diagSettle(seq: number, kind: string, resolved: string, ok: boolean): v
   console.info(`[load-diag] ${seq} ${kind} ${ok ? 'done' : 'FAIL'} ${resolved}`);
 }
 
+/** How one GLB request is scheduled. Never part of the cache key: a url is one parse
+ *  however it was asked for. */
+export interface GltfLoadOptions {
+  /** `background`: speculative bulk (the post-entry creature stream, a prefetch), which
+   *  starts only while no file somebody needs now is waiting (load_queue_core.ts).
+   *  Omitted: `demand`. */
+  priority?: LoadPriority;
+}
+
 /** Load + parse a .glb once; subsequent calls share the same parsed scene.
- *  Consumers must treat the result as immutable — clone before mutating. */
-export function loadGltf(url: string): Promise<GLTF> {
+ *  Consumers must treat the result as immutable: clone before mutating.
+ *  A demand for a file whose load still waits as background work promotes it: the
+ *  same promise comes back, and its start joins the demand line. */
+export function loadGltf(url: string, opts: GltfLoadOptions = {}): Promise<GLTF> {
   const resolved = assetUrl(url);
   let p = gltfCache.get(resolved);
   if (!p) {
     const startedAt = assetLoadStarted();
-    p = scheduleLoad(gltfQueue, () => {
-      const seq = diagStart('gltf', resolved);
-      return withRetry(
-        () =>
-          new Promise<GLTF>((resolve, reject) => {
-            loader().load(resolved, resolve, undefined, () =>
-              reject(new Error(`asset load failed: ${url} (missing file or bad GLB)`)),
-            );
-          }),
-      ).then(
-        (gltf) => {
-          diagSettle(seq, 'gltf', resolved, true);
-          return gltf;
-        },
-        (err: unknown) => {
-          diagSettle(seq, 'gltf', resolved, false);
-          throw err;
-        },
-      );
-    }).then(
+    p = scheduleLoad(
+      gltfQueue,
+      () => {
+        const seq = diagStart('gltf', resolved);
+        return withRetry(
+          () =>
+            new Promise<GLTF>((resolve, reject) => {
+              loader().load(resolved, resolve, undefined, () =>
+                reject(new Error(`asset load failed: ${url} (missing file or bad GLB)`)),
+              );
+            }),
+        ).then(
+          (gltf) => {
+            diagSettle(seq, 'gltf', resolved, true);
+            return gltf;
+          },
+          (err: unknown) => {
+            diagSettle(seq, 'gltf', resolved, false);
+            throw err;
+          },
+        );
+      },
+      opts.priority,
+      resolved,
+    ).then(
       (gltf) => {
         polishGltfTextures(gltf);
         // Transmissive materials become translucent (transmission_neutralize.ts).
@@ -214,6 +232,8 @@ export function loadGltf(url: string): Promise<GLTF> {
       },
     );
     gltfCache.set(resolved, p);
+  } else if (opts.priority !== 'background') {
+    gltfQueue.promote(resolved);
   }
   return p;
 }
@@ -310,36 +330,46 @@ function ktx2CacheKey(resolved: string, opts: { repeat?: boolean }): string {
  *  `repeat` remains a runtime choice, and it discriminates the cache key
  *  exactly as it does in loadTexture. `large` picks the single-slot fetch lane
  *  and is NOT part of the cache key: it is a scheduling choice about one
- *  request, not a property of the texture two callers would disagree on. */
+ *  request, not a property of the texture two callers would disagree on.
+ *  `priority` is a scheduling choice too (load_queue_core.ts): `background` is
+ *  a fetch ahead of need, which starts only while no texture somebody needs now
+ *  is waiting, and a later demand for the same texture promotes it, as loadGltf
+ *  does for a model. */
 export function loadKtx2Texture(
   url: string,
-  opts: { repeat?: boolean; large?: boolean } = {},
+  opts: { repeat?: boolean; large?: boolean; priority?: LoadPriority } = {},
 ): Promise<THREE.CompressedTexture> {
   const resolved = assetUrl(url);
   const cacheKey = ktx2CacheKey(resolved, opts);
+  const queue = opts.large ? largeTextureQueue : textureQueue;
   let p = ktx2TexCache.get(cacheKey);
   if (!p) {
     const startedAt = assetLoadStarted();
-    p = scheduleLoad(opts.large ? largeTextureQueue : textureQueue, () => {
-      const seq = diagStart('ktx2tex', resolved);
-      return withRetry(
-        () =>
-          new Promise<THREE.CompressedTexture>((resolve, reject) => {
-            ktx2Loader().load(resolved, resolve, undefined, () =>
-              reject(new Error(`ktx2 texture load failed: ${url}`)),
-            );
-          }),
-      ).then(
-        (tex) => {
-          diagSettle(seq, 'ktx2tex', resolved, true);
-          return tex;
-        },
-        (err: unknown) => {
-          diagSettle(seq, 'ktx2tex', resolved, false);
-          throw err;
-        },
-      );
-    }).then(
+    p = scheduleLoad(
+      queue,
+      () => {
+        const seq = diagStart('ktx2tex', resolved);
+        return withRetry(
+          () =>
+            new Promise<THREE.CompressedTexture>((resolve, reject) => {
+              ktx2Loader().load(resolved, resolve, undefined, () =>
+                reject(new Error(`ktx2 texture load failed: ${url}`)),
+              );
+            }),
+        ).then(
+          (tex) => {
+            diagSettle(seq, 'ktx2tex', resolved, true);
+            return tex;
+          },
+          (err: unknown) => {
+            diagSettle(seq, 'ktx2tex', resolved, false);
+            throw err;
+          },
+        );
+      },
+      opts.priority,
+      cacheKey,
+    ).then(
       (tex) => {
         if (opts.repeat) tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
         // Standalone KTX2 atlases (character skins) draw in the character
@@ -367,6 +397,10 @@ export function loadKtx2Texture(
       },
     );
     ktx2TexCache.set(cacheKey, p);
+  } else if (opts.priority !== 'background') {
+    // wherever it waits: the lane is the first asker's, and this one may name the other
+    textureQueue.promote(cacheKey);
+    largeTextureQueue.promote(cacheKey);
   }
   return p;
 }

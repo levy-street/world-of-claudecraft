@@ -1394,7 +1394,14 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '3703e50946207ae92ff2b46d1e14673cca6c363993661222a778c5f11d56f6ce';
+  // Re-minted at the release/v0.45.0 sync into the character branch (WOC split character
+  // files, blade-contact timing; remint_polish_provenance.mjs on the merged tree): the merged
+  // renderer leaf matches neither parent. No capture was retaken.
+  // Re-minted for the WOC crowd-draw work: the renderer leaf hands the background work
+  // queue to each character visual with the far bake gate. No capture was retaken.
+  // Re-minted for WOC armor detail: the renderer leaf passes each view whether it is the local player's own. No capture was retaken.
+  // Re-minted for the PR 4360 review response: the renderer leaf moved (required views, the far-bake gate's proof, the death hold). No capture was retaken.
+  '1c111312f40d91a8532ee699b7608e9e945e0b5fd08991e04028671127317597';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1417,7 +1424,14 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '164b585f770570b773faa8e35c466bcd4ab2840a6572507aa9528bc52572cbc5';
+  // Re-minted at the release/v0.45.0 sync into the character branch (WOC split character
+  // files, blade-contact timing; remint_polish_provenance.mjs on the merged tree): the merged
+  // renderer leaf matches neither parent. No capture was retaken.
+  // Re-minted for the WOC crowd-draw work: the renderer leaf hands the background work
+  // queue to each character visual with the far bake gate. No capture was retaken.
+  // Re-minted for WOC armor detail: the renderer leaf passes each view whether it is the local player's own. No capture was retaken.
+  // Re-minted for the PR 4360 review response: the renderer leaf moved (required views, the far-bake gate's proof, the death hold). No capture was retaken.
+  'c70430294fa580de59802d4bd2c0b5eb40d5ce70c7f4746238b2a30e608a3c68';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2800,7 +2814,13 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // LAST again over the re-swept evidence. No capture was retaken.
       // release/v0.44.0 base merge into PR 4193: recomputed LAST again over the
       // re-swept evidence. No capture was retaken.
-    ).toBe('55abc96a5aead82eb4096d7915be530c7731d95d07bbc9b1181704092cff1db3');
+      // release/v0.45.0 sync into the character branch: recomputed LAST again over the
+      // re-swept evidence. No capture was retaken.
+      // WOC crowd-draw work (the renderer leaf moved): recomputed LAST again over the
+      // re-swept evidence. No capture was retaken.
+      // WOC armor detail (the renderer leaf moved): recomputed LAST again. No capture was retaken.
+      // PR 4360 review response (the renderer leaf moved): recomputed LAST again. No capture was retaken.
+    ).toBe('98a99e2c3a98dc91f86c76640e8c43cc8c7bf09f10a445fbfa82e8d8b0f2c3a0');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

@@ -23,6 +23,7 @@ import {
 } from '../src/sim/types';
 import { Hud } from '../src/ui/hud';
 import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
+import { contactAtOnce } from './helpers/renderer_contact';
 
 const SEED = 20_061;
 const EMPTY_NOTICEBOARD_EVENT = {
@@ -246,7 +247,11 @@ describe('active-world noticeboard service', () => {
         craftSkills: Record<string, number>;
         gatheringProficiency: Record<string, number>;
       };
-      renderer: { handleEvent: ReturnType<typeof vi.fn> };
+      renderer: {
+        handleEvent: ReturnType<typeof vi.fn>;
+        // the event sound waits for a swing's blade contact (contact_queue.ts); none here
+        atContact: typeof contactAtOnce;
+      };
       playEventSfx: ReturnType<typeof vi.fn>;
       meters: { onEvent: ReturnType<typeof vi.fn> };
       isNythraxisEvent: ReturnType<typeof vi.fn>;
@@ -264,7 +269,7 @@ describe('active-world noticeboard service', () => {
       craftSkills: {},
       gatheringProficiency: {},
     };
-    hud.renderer = { handleEvent: vi.fn() };
+    hud.renderer = { handleEvent: vi.fn(), atContact: contactAtOnce };
     hud.playEventSfx = vi.fn();
     hud.meters = { onEvent: vi.fn() };
     hud.isNythraxisEvent = vi.fn(() => false);

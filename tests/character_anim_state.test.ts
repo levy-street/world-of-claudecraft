@@ -5,6 +5,7 @@ import {
   type AnimState,
   advanceSwimPitch,
   advanceTreadBlend,
+  applyLocoDirection,
   castHoldStep,
   desiredBaseState,
   drivesPose,
@@ -291,6 +292,70 @@ describe('desiredBaseState', () => {
   });
 });
 
+// A Q/E strafe slides the body sideways at the full run speed. A rig that ships
+// both side runs plays them; every other rig keeps the run it always played.
+describe('desiredBaseState strafe', () => {
+  const strafing = (over: Partial<AnimState> = {}) =>
+    anim({ moving: true, running: true, speed: 7, strafe: 'left', ...over });
+  /** A rig with walkBack and both side runs (the WOC player bodies). */
+  const withSideRuns = (s: AnimState, hasWalkBack = true) =>
+    desiredBaseState(s, hasWalkBack, true, true, false, false, false, true);
+
+  it('plays the side run for the side the body travels toward', () => {
+    expect(withSideRuns(strafing())).toBe('strafeLeft');
+    expect(withSideRuns(strafing({ strafe: 'right' }))).toBe('strafeRight');
+  });
+
+  it('keeps the run for a rig without both side runs (the default)', () => {
+    expect(desiredBaseState(strafing(), true)).toBe('run');
+    expect(desiredBaseState(strafing(), true, true, true, false, false, false, false)).toBe('run');
+  });
+
+  it('keeps a slow sideways walk on the walk cycle', () => {
+    expect(withSideRuns(strafing({ running: false, speed: 2.2 }))).toBe('walk');
+  });
+
+  it('only strafes while moving: a stale side on a standing body is an idle', () => {
+    expect(withSideRuns(strafing({ moving: false, running: false, speed: 0 }))).toBe('idle');
+    expect(withSideRuns(strafing({ moving: false, running: false, combat: true }))).toBe(
+      'combatIdle',
+    );
+    expect(withSideRuns(anim({ moving: true, running: true, speed: 7, strafe: null }))).toBe('run');
+  });
+
+  it('never strafes a backpedal, whatever the rig covers it with', () => {
+    const back = strafing({ backwards: true });
+    expect(withSideRuns(back)).toBe('walkBack');
+    // no walkBack clip, or a rig that reverses its forward cycle: still the run
+    expect(withSideRuns(back, false)).toBe('run');
+    expect(withSideRuns(strafing({ backwards: true, reverseBackpedal: true }))).toBe('run');
+  });
+
+  it('yields to every higher-priority pose (one arm per competing branch)', () => {
+    expect(withSideRuns(strafing({ wading: true }))).toBe('wade');
+    expect(
+      desiredBaseState(strafing({ stealthed: true }), true, true, true, true, true, false, true),
+    ).toBe('prowlWalk');
+    expect(withSideRuns(strafing({ swimming: true }))).toBe('swimSurface');
+    expect(withSideRuns(strafing({ airborne: true }))).toBe('jump');
+    expect(withSideRuns(strafing({ spinning: true }))).toBe('spin');
+    expect(withSideRuns(strafing({ casting: true }))).toBe('cast');
+    expect(withSideRuns(strafing({ sitting: true }))).toBe('sit');
+    // stealth WITHOUT a prowl clip (every humanoid) strafes as usual
+    expect(withSideRuns(strafing({ stealthed: true }))).toBe('strafeLeft');
+  });
+});
+
+describe('applyLocoDirection', () => {
+  it('feeds every direction fact, overwriting the last entity the scratch held', () => {
+    const s = anim({ backwards: true, reverseBackpedal: true, strafe: 'right' });
+    applyLocoDirection(s, { backwards: false, strafe: 'left' }, false);
+    expect([s.backwards, s.reverseBackpedal, s.strafe]).toEqual([false, false, 'left']);
+    applyLocoDirection(s, { backwards: true, strafe: null }, true);
+    expect([s.backwards, s.reverseBackpedal, s.strafe]).toEqual([true, true, null]);
+  });
+});
+
 describe('locomotionTimeScale', () => {
   it('matches foot speed against the walk reference, clamped', () => {
     expect(locomotionTimeScale('walk', { speed: 2.2, backwards: false })).toBeCloseTo(1);
@@ -409,6 +474,36 @@ describe('locomotionTimeScale', () => {
     // an authored walkBack clip plays FORWARD; only the reversed fallback negates
     expect(locomotionTimeScale('walkBack', back)).toBeCloseTo(1);
     expect(locomotionTimeScale('walk', { ...back, backwards: false })).toBeCloseTo(1);
+  });
+
+  it('matches both side runs against strafeRef, clamped like the run', () => {
+    for (const state of ['strafeLeft', 'strafeRight'] as const) {
+      const at = (speed: number) => ({ speed, backwards: false });
+      // strafeRef is the LAST parameter, defaulting to the run's reference
+      expect(locomotionTimeScale(state, at(7)), state).toBeCloseTo(1);
+      expect(locomotionTimeScale(state, at(3.5), 2.2, 3.5), state).toBeCloseTo(1);
+      // strafeRef rides after the cadence ceilings (walkMax, runMax)
+      expect(
+        locomotionTimeScale(state, at(5), 2.2, 7, 2.2, 2.2, 0.6, undefined, undefined, 5),
+        state,
+      ).toBeCloseTo(1);
+      expect(
+        locomotionTimeScale(state, at(4), 2.2, 7, 2.2, 2.2, 0.6, undefined, undefined, 5),
+        state,
+      ).toBeCloseTo(0.8);
+      // the run's clamp: 1.6 on top, runTimeScaleMin (default 0.6) underneath
+      expect(locomotionTimeScale(state, at(99)), state).toBeCloseTo(1.6);
+      expect(locomotionTimeScale(state, at(0.5)), state).toBeCloseTo(0.6);
+      expect(locomotionTimeScale(state, at(0.5), 2.2, 7, 2.2, 2.2, 0.35), state).toBeCloseTo(0.35);
+    }
+  });
+
+  it('never reverses a side run, even for a rig that reverses its backpedal', () => {
+    const odd = { speed: 7, backwards: true, reverseBackpedal: true };
+    expect(locomotionTimeScale('strafeLeft', odd)).toBeCloseTo(1);
+    expect(locomotionTimeScale('strafeRight', odd)).toBeCloseTo(1);
+    // (the run under the same flags DOES reverse: the branch is what differs)
+    expect(locomotionTimeScale('run', odd)).toBeCloseTo(-1);
   });
 });
 

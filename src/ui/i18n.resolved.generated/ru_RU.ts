@@ -9751,6 +9751,168 @@ export const ru_RU: EnTranslations = {
     "body": "Телосложение",
     "genderMale": "Мужчина",
     "genderFemale": "Женщина",
+    "bodyTypeA": "Type A",
+    "bodyTypeB": "Type B",
+    "wocHead": {
+      "hair": {
+        "swept": "Зачёсанные",
+        "long": "Long",
+        "mohawk": "Ирокез",
+        "quiff": "Короткий кок",
+        "undercut": "Андеркат",
+        "topknot": "Пучок на макушке",
+        "shoulder": "До плеч",
+        "bald": "Bald",
+        "waves": "Волны",
+        "ponytail": "Высокий хвост",
+        "braid": "Коса",
+        "bob": "Bob",
+        "crown": "Коса-корона",
+        "twins": "Две косы",
+        "curls": "Собранные кудри"
+      },
+      "beard": {
+        "none": "Без бороды",
+        "moustache": "Усы",
+        "handlebar": "Закрученные усы",
+        "goatee": "Эспаньолка",
+        "chin": "Бородка",
+        "boxed": "Короткая борода",
+        "long": "Длинная борода",
+        "chops": "Бакенбарды",
+        "chinstrap": "Борода-ремешок"
+      },
+      "nose": {
+        "default": "Классический",
+        "broad": "Широкий",
+        "aquiline": "Орлиный",
+        "button": "Курносый",
+        "soft": "Soft"
+      },
+      "mouth": {
+        "default": "Классические",
+        "full": "Full",
+        "smirk": "Ухмылка",
+        "relaxed": "Расслабленные",
+        "cupids_bow": "Лук Купидона",
+        "narrow": "Узкие",
+        "thin": "Thin",
+        "rounded": "Округлые"
+      },
+      "brows": {
+        "default": "Классические",
+        "slim": "Slim",
+        "arched": "Дугообразные",
+        "soft": "Soft",
+        "straight": "Прямые",
+        "relaxed": "Расслабленные",
+        "soft_arch": "Soft Arch",
+        "rounded": "Округлые"
+      },
+      "ears": {
+        "default": "Классические",
+        "large": "Большие",
+        "pointed": "Острые",
+        "round": "Круглые"
+      },
+      "eyes": {
+        "default": "Классические",
+        "almond": "Миндалевидные",
+        "hooded": "С нависшими веками"
+      }
+    },
+    "wocBuilder": {
+      "cat": {
+        "bodyType": "Body Type",
+        "skinTone": "Skin Tone",
+        "face": "Face",
+        "eyesBrows": "Глаза и брови",
+        "eyeColor": "Цвет глаз",
+        "hairstyle": "Причёска",
+        "facialHair": "Борода и усы",
+        "hairColor": "Цвет волос",
+        "browColor": "Цвет бровей",
+        "piercings": "Пирсинг"
+      },
+      "section": {
+        "hair": "Причёска",
+        "nose": "Nose",
+        "mouth": "Lips",
+        "brows": "Форма бровей",
+        "ears": "Ears",
+        "eyes": "Форма глаз"
+      },
+      "slider": {
+        "eyeSpacing": "Расстояние между глазами",
+        "eyeSize": "Eye Size",
+        "eyeTilt": "Eye Tilt",
+        "browHeight": "Высота бровей",
+        "chinWidth": "Ширина подбородка",
+        "bodyScale": "Body Size"
+      },
+      "bodyGlyph": {
+        "a": "A",
+        "b": "B"
+      },
+      "piercing": {
+        "none": "None",
+        "lobes": "Мочки",
+        "ears": "Full Ears",
+        "brow": "Brow",
+        "nose": "Ноздря",
+        "septum": "Септум",
+        "lip": "Lip",
+        "full": "Full Set"
+      },
+      "skin": {
+        "porcelain": "Фарфоровый",
+        "ivory": "Слоновая кость",
+        "rose": "Rose",
+        "peach": "Персиковый",
+        "fair": "Fair",
+        "beige": "Бежевый",
+        "sand": "Sand",
+        "honey": "Медовый",
+        "olive": "Оливковый",
+        "caramel": "Карамельный",
+        "tan": "Tan",
+        "bronze": "Бронзовый",
+        "chestnut": "Каштановый",
+        "umber": "Умбра",
+        "mahogany": "Махагоновый",
+        "ebony": "Эбеновый"
+      },
+      "eye": {
+        "brown": "Карие",
+        "darkBrown": "Тёмно-карие",
+        "hazel": "Ореховые",
+        "amber": "Янтарные",
+        "green": "Зелёные",
+        "teal": "Teal",
+        "blue": "Blue",
+        "paleBlue": "Pale Blue",
+        "grey": "Grey",
+        "violet": "Фиолетовые"
+      },
+      "hairColor": {
+        "platinum": "Платиновый",
+        "blonde": "Блонд",
+        "golden": "Золотистый",
+        "copper": "Медный",
+        "red": "Red",
+        "auburn": "Тёмно-рыжий",
+        "lightBrown": "Светло-каштановый",
+        "brown": "Каштановый",
+        "darkBrown": "Тёмно-каштановый",
+        "black": "Чёрный",
+        "silver": "Серебристый",
+        "white": "Белый"
+      },
+      "matchHair": "В тон волосам",
+      "resetDefault": "Вернуть по умолчанию",
+      "customColorAria": "Выбрать свой цвет",
+      "customSkinAria": "Выбрать свой тон кожи"
+    },
     "hair": "Волосы",
     "brows": "Брови",
     "skinTone": "Тон кожи",

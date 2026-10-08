@@ -203,6 +203,12 @@ rules, all CI-enforced:
 - **Never `dispose()` a shared GLB-cache texture that may still be drawn.** With the
   KTX2 mip release (`assets/ktx2_mip_release.ts`) its CPU data is full-shape stubs and
   its restore source drops on dispose, so a later re-upload renders black.
+- **A geometry's coarser levels are index lists in `assets/geometry_lod.ts`** (filled by
+  the loader's `WOC_lod` plugin, `assets/woc_lod_plugin.ts`). A level draws through a
+  variant over the source's own attribute objects, which goes with its source's dispose
+  and never alone; a transform keeps a level only through `carryGeometryLod` or
+  `mergeGeometryLod`, so anything else derived from a geometry carries no levels (it draws
+  the one index it was given). The WOC flows that use them are in `characters/CLAUDE.md`.
 - **`preload.ts` is the boot gate, and it has TWO lanes.** `startGame` awaits
   `assetsReady()` either way, so `build*()` still reads resolved assets
   synchronously; the lanes differ only in WHEN the fetch starts. A new module-load
@@ -219,6 +225,64 @@ rules, all CI-enforced:
   only arms inside `startGame`). Guarded by `tests/defer_launcher_preloads.test.ts`,
   which also pins that the lane opens BEFORE the `assetsReady()` that gates the
   Renderer, and fails on any new eager registrant outside the two allowed files.
+- **Player bodies have a loading model of their own: nothing a body needs in order
+  to be DRAWN streams on first sight.** A player is the entity a player reacts to
+  most, so its body, nameplate and click target exist the frame it enters range
+  (the fairness rule: enemy positions are actionable), on every device and link.
+  Three tiers, the file sets in the pure `characters/woc_entry_core.ts` and
+  `characters/woc_crowd_prefetch_core.ts`:
+  - **Entry-critical, awaited.** Both body fits' base and animation library and
+    both head cores: the minimum to draw ANY player. One task in the deferred lane
+    (`characters/woc_entry_preload.ts`, registered by `characters/assets.ts`), so
+    it starts at Play, never on the launcher, and `assetsReady()` waits for it
+    before the Renderer exists. A file of it that cannot be fetched fails the
+    entry, loudly, like any critical asset.
+  - **Prefetched right after first paint, never awaited.** The rest of the crowd
+    set: every hairstyle and facial hair file, every armor set of both fits at
+    the tier OTHER characters draw, every under-armor atlas
+    (`characters/woc_crowd_prefetch.ts`, started by the same first painted frame
+    as the creature stream, `startStreamedCharacterPreloads`). Background work
+    end to end: the downloads wait behind every file somebody needs now, an
+    armor pack is prepared as a BACKGROUND unit of the work queue, nothing is
+    attached, and a failure is nobody's loss. Only on an unconstrained profile:
+    a constrained one (every phone, every iOS host) prefetches NOTHING, since
+    its page runs near its memory ceiling and no device measurement says the
+    whole crowd set fits, and neither does a browser that sends the Save-Data
+    hint. It re-plans when a preset change moves the crowd's
+    tier, and never runs on the launcher. `?woccrowdprefetch=off` (dev) switches
+    it off, the A/B arm that prices it.
+  - **On demand, each with a stand-in that draws meanwhile.** A hair or beard file
+    (the bare head), an armor set (the body's own suit), an under-armor atlas
+    (the suit's own atlas), the top detail tier (the medium file). The prefetch
+    only makes the stand-in rare; a body that meets a file before it lands draws
+    the stand-in on every profile. A new streamed piece of a player body names
+    its stand-in or joins the entry-critical set; it never holds the body back.
+  The launcher is the one place a body itself is fetched on demand: its previews
+  ask per body (`visualAssetsResident`, built on `onCharacterAssetReady`; a
+  fetch that failed is asked for again after its cooldown, so the wait ends).
+  `characters/woc_entry_prepare.ts` then runs under the curtain, ahead of the
+  prewarm's budget clock: the local player's own hair and beard get a bounded
+  chance to settle, and both fits are prepared, so neither happens in a live
+  frame. Guards: `tests/woc_entry_preload.test.ts` (the sets derived from the
+  manifest and catalog, nothing started before the lane opens, the wait and what
+  it does not wait for), `tests/woc_entry_prepare.test.ts`,
+  `tests/woc_crowd_prefetch.test.ts` (the plan per profile, nothing on a
+  constrained one, background and once, started by the first painted frame only).
+- **The load queues have two classes** (`assets/load_queue_core.ts`, the queue
+  `loader.ts` schedules on). `loadGltf(url)` is a DEMAND; `{ priority:
+  'background' }` is speculative bulk (the post-entry creature stream on the iOS
+  memory profile, the crowd prefetch above; `loadKtx2Texture` takes the same
+  option for an atlas fetched ahead of need). A waiting demand always starts
+  before any waiting background load, first come first served inside a class,
+  and a background load still waiting when its file is demanded is promoted, on
+  the same promise. Background loads never hold every slot of a queue that has
+  more than one: one stays free for a demand, which would otherwise wait out a
+  bulk download already on the wire (and its retries). So a file somebody needs
+  now never waits out a stream of files nobody has asked for. A new bulk fetch
+  passes `background`; nothing else changes for a caller. Guards:
+  `tests/load_queue_core.test.ts`,
+  `tests/render_asset_load_priority.test.ts`,
+  `tests/character_stream_priority.test.ts`.
 - **Preload sets are tier-INDEPENDENT.** They freeze at the import-time tier
   guess but placement runs against the LIVE tier, so a preload set must be a
   superset of EVERY tier's placement set or world entry crashes with "asset not
@@ -602,7 +666,8 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   Warm nothing whose cost you have not measured: Brother Aldric was in this
   spec until an A/B from a start zone that had never compiled his model showed
   his spawn linking ZERO programs (the player bodies on screen already carry
-  them). Varkhul's rig is the measured opposite (the harvest caught its body
+  them; that was his old stock rig, and the spawn has not been measured again on
+  the priest's WOC body he wears now). Varkhul's rig is the measured opposite (the harvest caught its body
   programs linking live at the pull), so the Varkhul set stages it first,
   through the live view's own factory, beside a held Forgestorm warning twin
   (each storm disposes its warnings, and a program no material uses survives
@@ -710,7 +775,12 @@ GPU work signs. Each rule names its seam and its guard.
   included. Seam: `characters/look_pieces.ts` (`composedLookPiecesFor`,
   `perfStats().lookPieces`) and `AssembleOptions.deferDecals`, guarded by
   `tests/look_pieces.test.ts`, `tests/deferred_face_decals.test.ts` and
-  `tests/renderer_look_pieces_hold.test.ts`.
+  `tests/renderer_look_pieces_hold.test.ts`. A WOC body's far LOD is the same
+  shape (`characters/woc_far_bake.ts` `queueWocFarBake`: the bake as vertex-band
+  units, one look at a time and one bake per look, then one mount unit per
+  body, the rig standing in; `tests/woc_far_queue.test.ts`): no far bake runs
+  inside `setFar`, `setProxyShadow` or `update()` for a body that has a compile
+  gate and the work queue that came with it.
 - **No material buys a second scene pass: transmission is forbidden.** A material with
   `transmission > 0` (a `MeshPhysicalMaterial`; GLTFLoader mints one for a glTF material
   carrying `KHR_materials_transmission`) makes three draw the whole opaque scene a second

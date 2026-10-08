@@ -204,6 +204,9 @@ const URL_GUARDED_SCRIPTS = [
   // The druid cat form acceptance drive: offline commands against a local Vite
   // server, no database of its own.
   'scripts/druid_cat_game_check.mjs',
+  // The WOC crowd A/B rig: it adds and dresses bot players through the sim of
+  // the page it opens, against one arm's local Vite server, no database.
+  'scripts/woc_crowd_ab.mjs',
 ] as const;
 
 // Full-line // comments are stripped before the scan: this file's own subject

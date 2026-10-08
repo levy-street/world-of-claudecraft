@@ -120,6 +120,31 @@ const LEGACY_POLISHED_HELD_MODELS = new Set([
 /** The creature and mount defs whose authored atlas showed the low-tier film. */
 const AUTHORED_ATLAS_DEFS = [
   'form_cat',
+  // The one authored PLAYER body: the WOC warrior (woc_warrior.glb, its own
+  // baked Tripo atlases on the artist's rig, never a KayKit palette), which the
+  // loop below exempts from the "never a player body" rule by its wocCharacter
+  // manifest rather than by name.
+  'player_warrior',
+  // ...and the paladin, the same WOC body under its own armor pack.
+  'player_paladin',
+  // ...and the female warrior body, the creation pick's file for the class.
+  'player_warrior_female',
+  'player_paladin_female',
+  // ...and the seven class sets of 2026-09-18, both fits.
+  'player_hunter',
+  'player_hunter_female',
+  'player_rogue',
+  'player_rogue_female',
+  'player_mage',
+  'player_mage_female',
+  'player_priest',
+  'player_priest_female',
+  'player_warlock',
+  'player_warlock_female',
+  'player_druid',
+  'player_druid_female',
+  'player_shaman',
+  'player_shaman_female',
   'mob_wolf',
   'greyjaw',
   'mob_ogre',
@@ -178,33 +203,99 @@ describe('authored surfaces', () => {
     expect(isAuthoredHeldModelUrl(itemOffhandModelUrl('varkhul_emberward') ?? '')).toBe(true);
   });
 
-  it('routes the harbormaster gear through the authored arm, from its own directory', () => {
-    // vertex-coloured felt, brass and leather: the weapon polish would glaze them to one sheen
-    for (const key of ['harbormaster_tricorne', 'harbormaster_spyglass']) {
-      expect(AUTHORED_HELD_MODELS.has(key), key).toBe(true);
-      expect(isAuthoredHeldModelUrl(`models/chars/npc_gear/${key}.glb`), key).toBe(true);
+  // The starter weapons are painted Tripo atlases with their own shading, the same kind
+  // of surface the Varkhul drops are: under the kit polish they would wear its cream lift
+  // and emissive floor as a grey film.
+  it('routes the starting kit through the authored held-model arm too', () => {
+    for (const itemId of [
+      'worn_sword',
+      'rusty_dagger',
+      'training_mace',
+      'rusty_hatchet',
+      'gnarled_staff',
+    ]) {
+      expect(isAuthoredHeldModelUrl(itemWeaponModelUrl(itemId) ?? ''), itemId).toBe(true);
     }
-    for (const att of VISUALS.npc_modular_harbormaster.attach ?? []) {
-      expect(isAuthoredHeldModelUrl(att.url), att.url).toBe(true);
+    expect(isAuthoredHeldModelUrl(itemOffhandModelUrl('eastbrook_buckler') ?? '')).toBe(true);
+    expect(isAuthoredHeldModelUrl(VISUALS.player_hunter.attach?.[0]?.url ?? '')).toBe(true);
+    expect(isAuthoredHeldModelUrl(VISUALS.player_warlock.attach?.[1]?.url ?? '')).toBe(true);
+  });
+
+  // The common and uncommon field set comes from the same painted pipeline as the starters.
+  it('routes the common and uncommon field set through the authored held-model arm too', () => {
+    for (const itemId of [
+      'eastbrook_arming_sword',
+      'eastbrook_greatsword',
+      'vale_carving_knife',
+      'bronzework_mace',
+      'ironshod_maul',
+      'copper_bearded_axe',
+      'hickory_shortstaff',
+      'ironbark_boar_spear',
+      'palecoil_rod',
+    ]) {
+      expect(isAuthoredHeldModelUrl(itemWeaponModelUrl(itemId) ?? ''), itemId).toBe(true);
     }
-    // the directory alone opts nothing in, and no other models/chars path matches
-    expect(isAuthoredHeldModelUrl('models/chars/npc_gear/some_other_hat.glb')).toBe(false);
-    expect(isAuthoredHeldModelUrl('models/chars/modular/harbormaster_tricorne.glb')).toBe(false);
+    expect(isAuthoredHeldModelUrl(itemOffhandModelUrl('highwatch_wallshield') ?? '')).toBe(true);
+  });
+
+  it('routes the rare set through the authored held-model arm too', () => {
+    for (const itemId of [
+      'thorium_warblade',
+      'moggers_shiv',
+      'crag_warden_cudgel',
+      'gravewyrm_thornmaul',
+      'arcanite_war_axe',
+      'gravecaller_staff',
+      'fen_reaver_glaive',
+      'drowned_tide_scepter',
+    ]) {
+      expect(isAuthoredHeldModelUrl(itemWeaponModelUrl(itemId) ?? ''), itemId).toBe(true);
+    }
+    expect(isAuthoredHeldModelUrl(itemOffhandModelUrl('pearlward_aegis') ?? '')).toBe(true);
+  });
+
+  it('routes the epic set through the authored held-model arm too', () => {
+    for (const itemId of [
+      'bonewrought_greatsword',
+      'fang_of_korzul',
+      'wildsoul_maul',
+      'springtouched_crozier',
+      'gravewyrm_cleaver',
+      'nightfangs_greatstaff',
+      'stormcallers_focus',
+    ]) {
+      expect(isAuthoredHeldModelUrl(itemWeaponModelUrl(itemId) ?? ''), itemId).toBe(true);
+    }
+    for (const itemId of ['bonewrought_bulwark', 'bulwark_of_the_inner_crucible']) {
+      expect(isAuthoredHeldModelUrl(itemOffhandModelUrl(itemId) ?? ''), itemId).toBe(true);
+    }
   });
 
   it('leaves every other held model on the polish', () => {
-    // the class defaults, the shields, an adv-set piece, and an authored PBR
-    // craft weapon that was never reported: none of them are opted out
-    for (const itemId of ['eastbrook_buckler', 'highwatch_wallshield']) {
-      expect(isAuthoredHeldModelUrl(itemOffhandModelUrl(itemId) ?? ''), itemId).toBe(false);
+    // the class bodies' stock hands, the kit shields, an adv-set piece, and an authored
+    // PBR craft weapon that was never reported: none of them are opted out. No item draws
+    // a kit model any more, so these are named by file.
+    for (const key of ['sword_1handed', 'staff', 'dagger', 'shield_round', 'shield_square']) {
+      expect(isAuthoredHeldModelUrl(`models/weapons/${key}.glb`), key).toBe(false);
     }
-    expect(isAuthoredHeldModelUrl('models/weapons/sword_1handed.glb')).toBe(false);
-    expect(isAuthoredHeldModelUrl('models/weapons/adv_sword_2handed.glb')).toBe(false);
+    expect(isAuthoredHeldModelUrl('models/weapons/adv_sword_2handed_color.glb')).toBe(false);
     expect(isAuthoredHeldModelUrl('models/weapons/emberfang_sword.glb')).toBe(false);
+    // every epic shield and weapon draws the rare set now, an authored one
+    for (const itemId of ['duskforged_bulwark', 'storm_tuned_buckler']) {
+      expect(isAuthoredHeldModelUrl(itemOffhandModelUrl(itemId) ?? ''), itemId).toBe(true);
+    }
+    expect(isAuthoredHeldModelUrl(itemWeaponModelUrl('first_blood_razor') ?? '')).toBe(true);
     // a creature or player GLB can never match the held-model set
     expect(isAuthoredHeldModelUrl('models/creatures/ogre.glb')).toBe(false);
     expect(isAuthoredHeldModelUrl('')).toBe(false);
-    expect(AUTHORED_HELD_MODELS.size).toBe(4);
+    // ...and only a model under models/weapons/ can: the worn-gear directory the
+    // harbormaster's set once opted in is no arm of the rule any more
+    expect(isAuthoredHeldModelUrl('models/chars/npc_gear/hammer_varkhul.glb')).toBe(false);
+    expect(isAuthoredHeldModelUrl('models/weapons/hammer_varkhul.glb')).toBe(true);
+    // the two Varkhul drops, the eight starter models, the 23 field models, the 50
+    // rare models (37 pack finishes and 13 repaints of them) and the 27 epic models
+    expect(AUTHORED_HELD_MODELS.size).toBe(110);
   });
 
   it('flags exactly the replaced creature and mount rigs, never a player body', () => {
@@ -217,6 +308,12 @@ describe('authored surfaces', () => {
       .sort();
     expect(flagged).toEqual([...AUTHORED_ATLAS_DEFS].sort());
     for (const key of flagged) {
+      // A WOC modular body IS an authored atlas on a player rig: the one
+      // sanctioned player-body flag, carried by its part manifest.
+      if (VISUALS[key].wocCharacter) {
+        expect(VISUALS[key].url.startsWith('models/chars/players/'), key).toBe(true);
+        continue;
+      }
       expect(key.startsWith('player_'), key).toBe(false);
       // and never a GLB a player body is composed from or a class rig NPCs share
       expect(VISUALS[key].url.startsWith('models/chars/'), `${key}: ${VISUALS[key].url}`).toBe(

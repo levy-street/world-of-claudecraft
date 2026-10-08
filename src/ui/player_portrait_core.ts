@@ -7,8 +7,8 @@
 // src/net/online.ts), so a PEER's authored face is as known to this client as
 // the viewer's own; a frame that draws the stock class art for a peer shows a
 // face that player never had. DOM-free and three-free on purpose: the painter
-// (unit_portrait_painter.ts) draws the answer, the Hud supplies the two lookups
-// only it wires (the look provider and the modular visual key), and the whole
+// (unit_portrait_painter.ts) draws the answer, the Hud supplies the lookups
+// only it wires (the look provider and the visual keys), and the whole
 // decision is unit-tested in tests/player_portrait_core.test.ts. The look is a
 // type parameter (the painter binds it to ModularLook) so this core imports
 // nothing from the render layer.
@@ -18,19 +18,30 @@ import { type Entity, isMechWearer, type PlayerClass } from '../sim/types';
 /** The body a player entity's portrait renders, in precedence order: a Combat
  *  Mech wearer IS the mech in the world (and their `skin` is a chroma index
  *  that means nothing to the class atlas); a player with an authored look
- *  shows the face they built; everyone else the stock art for their class. */
+ *  shows the face they built; everyone else the art for their class body,
+ *  which on a WOC body still wears the player's own modular head: `head` is
+ *  the stored appearance the portrait keys and dresses that head from
+ *  (portrait.ts visualPortraitDataUrl), absent for a player with none. */
 export type PlayerPortraitSubject<Look> =
   | { kind: 'mech'; cls: PlayerClass; chroma: number }
   | { kind: 'composed'; cls: PlayerClass; skin: number; visualKey: string; look: Look }
-  | { kind: 'class'; cls: PlayerClass; skin: number };
+  | {
+      kind: 'class';
+      cls: PlayerClass;
+      skin: number;
+      visualKey: string;
+      head?: Entity['modularAppearance'];
+    };
 
-/** The two render-layer lookups the rule needs, injected so this core never
- *  imports the character barrel (modularLookFor and modularKeyFor in the Hud). */
+/** The render-layer lookups the rule needs, injected so this core never
+ *  imports the character barrel or manifest. */
 export interface PlayerPortraitLookups<Look> {
   /** The look an entity composes with, null for a fixed class rig. */
   lookFor: (e: Entity) => Look | null;
   /** The composed-body visual key for an entity the look provider claimed. */
   visualKeyFor: (e: Entity) => string;
+  /** The fixed class body, including the player's male/female creation pick. */
+  classVisualKeyFor: (e: Entity) => string;
 }
 
 export function playerPortraitSubject<Look>(
@@ -42,7 +53,13 @@ export function playerPortraitSubject<Look>(
   if (isMechWearer(e)) return { kind: 'mech', cls, chroma: skin };
   const look = lookups.lookFor(e);
   if (look) return { kind: 'composed', cls, skin, visualKey: lookups.visualKeyFor(e), look };
-  return { kind: 'class', cls, skin };
+  return {
+    kind: 'class',
+    cls,
+    skin,
+    visualKey: lookups.classVisualKeyFor(e),
+    head: e.modularAppearance ?? undefined,
+  };
 }
 
 /** A landed portrait as onPortraitUpdate (portrait.ts) reports it. */
@@ -78,7 +95,11 @@ export function portraitUpdateFrames<Look>(
       }
       return classUpdateFrames(subject, update);
     case 'class':
-      return update.key === undefined && classUpdateFrames(subject, update);
+      return (
+        update.key === undefined &&
+        update.visualKey === subject.visualKey &&
+        update.skin === subject.skin
+      );
   }
 }
 

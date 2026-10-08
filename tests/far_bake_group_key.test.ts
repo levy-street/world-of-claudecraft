@@ -6,7 +6,11 @@
 // another slot's colours, silently.
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { farBakeGroupKeysForTest, recolorMesh } from '../src/render/characters/assets';
+import {
+  bakeStaticPose,
+  farBakeGroupKeysForTest,
+  recolorMesh,
+} from '../src/render/characters/assets';
 import {
   DEFAULT_APPEARANCE,
   KNIGHT_FULL,
@@ -88,6 +92,56 @@ describe('composedFarBakeGroupKey', () => {
     expect(composedFarBakeGroupKey(mesh('M_Torso', shared))).toBe(
       composedFarBakeGroupKey(mesh('M_ArmL', shared)),
     );
+  });
+});
+
+// A caller that adds a per-vertex value after the bake (the WOC far head's slot
+// attribute) addresses one source mesh's vertices through `order`, so it has to say
+// where the merge really put them, and the bake itself must carry nothing new.
+describe('bakeStaticPose order', () => {
+  /** One triangle whose three vertices all sit at x = `x`. */
+  function triangle(name: string, x: number, material: THREE.Material): THREE.Mesh {
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute(
+      'position',
+      new THREE.BufferAttribute(new Float32Array([x, 0, 0, x, 1, 0, x, 0, 1]), 3),
+    );
+    geo.setIndex([0, 1, 2]);
+    const m = new THREE.Mesh(geo, material);
+    m.name = name;
+    return m;
+  }
+
+  it('names the source meshes in the order their vertices sit in the merged buffer', () => {
+    const a = new THREE.MeshStandardMaterial();
+    const b = new THREE.MeshStandardMaterial();
+    // sources 0 and 2 share a material, so they coalesce and merge side by side
+    const meshes = [triangle('first', 10, a), triangle('second', 20, b), triangle('third', 30, a)];
+    const baked = bakeStaticPose(new THREE.Matrix4(), meshes);
+
+    expect(baked.order).toEqual([0, 2, 1]);
+    expect(baked.slots).toEqual([0, 1]);
+    const xs = Array.from({ length: 9 }, (_, i) => baked.geo?.getAttribute('position').getX(i));
+    expect(xs).toEqual([10, 10, 10, 30, 30, 30, 20, 20, 20]);
+  });
+
+  it('is the walk itself while nothing coalesces, and empty for an empty bake', () => {
+    const meshes = [
+      triangle('first', 1, new THREE.MeshStandardMaterial()),
+      triangle('second', 2, new THREE.MeshStandardMaterial()),
+    ];
+    expect(bakeStaticPose(new THREE.Matrix4(), meshes).order).toEqual([0, 1]);
+    expect(bakeStaticPose(new THREE.Matrix4(), [meshes[0]]).order).toEqual([0]);
+    expect(bakeStaticPose(new THREE.Matrix4(), []).order).toEqual([]);
+  });
+
+  it('bakes position, normal and nothing else onto a mesh without uv', () => {
+    // the merged head's slot attribute is the WOC bake's own addition (woc_far_bake.ts):
+    // the shared bake hands every other caller exactly what it always did
+    const baked = bakeStaticPose(new THREE.Matrix4(), [
+      triangle('only', 0, new THREE.MeshStandardMaterial()),
+    ]);
+    expect(Object.keys(baked.geo?.attributes ?? {}).sort()).toEqual(['normal', 'position']);
   });
 });
 
