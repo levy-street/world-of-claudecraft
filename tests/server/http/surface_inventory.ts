@@ -1225,6 +1225,47 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: null,
   },
+  // Account preferences are registry-only routes, shared across realms.
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/account/settings',
+    handler: 'server/account_settings.ts routes (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: 'ACCOUNT_SETTINGS_POLICY',
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/account/settings/ack',
+    handler: 'server/account_settings.ts routes (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: 'ACCOUNT_SETTINGS_POLICY',
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/account/settings/initialize',
+    handler: 'server/account_settings.ts routes (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: 'ACCOUNT_SETTINGS_POLICY',
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/account/settings/save',
+    handler: 'server/account_settings.ts routes (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: 'ACCOUNT_SETTINGS_POLICY',
+    requireOwnedExpected: null,
+  },
   // The queue-pop Discord DM opt-in toggle (server/discord_queue_pings.ts):
   // the deeds broadcasts pair's shape exactly (read-tier GET, full-scope POST).
   {

@@ -347,6 +347,14 @@ export const ko_KR: EnTranslations = {
     }
   },
   "hudChrome": {
+    "accountSettingsNotice": {
+      "title": "계정 설정",
+      "message": "이제 설정이 계정 전체에 저장됩니다. 처음 로그인하는 캐릭터의 설정이 계정 내 모든 캐릭터에 적용됩니다.",
+      "understand": "이해했습니다",
+      "continue": "계속",
+      "saving": "확인 내용을 저장하는 중...",
+      "failed": "확인 내용을 저장하지 못했습니다. 다시 시도해 주세요."
+    },
     "framePresets": {
       "apply": "적용",
       "pickerLabel": "프레임 프리셋: {name}",

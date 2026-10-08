@@ -22,6 +22,7 @@
 // loader.
 
 import { routes as accountRoutes } from '../account';
+import { routes as accountSettingsRoutes } from '../account_settings';
 import { routes as adSpendRoutes } from '../ad_spend';
 import { routes as adminRoutes } from '../admin';
 import { routes as appleAuthRoutes } from '../apple_auth';
@@ -138,6 +139,7 @@ export const apiRoutes: readonly RouteDef[] = [
   ...appleAuthRoutes,
   ...characterRoutes,
   ...accountRoutes,
+  ...accountSettingsRoutes,
   ...walletRoutes,
   ...reportsRoutes,
   ...seekerEntitlementRoutes,

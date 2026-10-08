@@ -7391,6 +7391,61 @@
     top: calc(100% + 4px);
   }
   /* generic confirm dialog (prestige) */
+  /* Account settings migration: a blocking modal in the confirm family.
+     Fluid geometry and scrolling work in phone portrait and landscape. */
+  .account-settings-notice-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+    background: var(--color-options-scrim);
+  }
+  .account-settings-notice {
+    width: 100%;
+    max-width: 480px;
+    max-height: 100%;
+    overflow-y: auto;
+    box-sizing: border-box;
+    padding: 20px;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .account-settings-notice h2 {
+    margin: 0 0 12px;
+    font-size: 20px;
+  }
+  .account-settings-notice p {
+    margin: 0 0 12px;
+  }
+  .account-settings-notice-check {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+  .account-settings-notice .ui-check {
+    flex: 0 0 18px;
+    margin: 0;
+  }
+  .account-settings-notice-status {
+    min-height: 3em;
+    padding-top: 8px;
+  }
+  .account-settings-notice .ui-btn {
+    display: block;
+    margin-left: auto;
+    min-width: 120px;
+    min-height: 44px;
+  }
+  .account-settings-notice:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
   #confirm-dialog {
     left: 50%;
     top: 50%;

@@ -9,25 +9,130 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.accountSettingsNotice.continue",
+    "hudChrome.accountSettingsNotice.failed",
+    "hudChrome.accountSettingsNotice.message",
+    "hudChrome.accountSettingsNotice.saving",
+    "hudChrome.accountSettingsNotice.title",
+    "hudChrome.accountSettingsNotice.understand"
+  ],
+  "es_ES": [
+    "hudChrome.accountSettingsNotice.continue",
+    "hudChrome.accountSettingsNotice.failed",
+    "hudChrome.accountSettingsNotice.message",
+    "hudChrome.accountSettingsNotice.saving",
+    "hudChrome.accountSettingsNotice.title",
+    "hudChrome.accountSettingsNotice.understand"
+  ],
+  "fr_FR": [
+    "hudChrome.accountSettingsNotice.continue",
+    "hudChrome.accountSettingsNotice.failed",
+    "hudChrome.accountSettingsNotice.message",
+    "hudChrome.accountSettingsNotice.saving",
+    "hudChrome.accountSettingsNotice.title",
+    "hudChrome.accountSettingsNotice.understand"
+  ],
+  "fr_CA": [
+    "hudChrome.accountSettingsNotice.continue",
+    "hudChrome.accountSettingsNotice.failed",
+    "hudChrome.accountSettingsNotice.message",
+    "hudChrome.accountSettingsNotice.saving",
+    "hudChrome.accountSettingsNotice.title",
+    "hudChrome.accountSettingsNotice.understand"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.accountSettingsNotice.continue",
+    "hudChrome.accountSettingsNotice.failed",
+    "hudChrome.accountSettingsNotice.message",
+    "hudChrome.accountSettingsNotice.saving",
+    "hudChrome.accountSettingsNotice.title",
+    "hudChrome.accountSettingsNotice.understand"
+  ],
+  "de_DE": [
+    "hudChrome.accountSettingsNotice.continue",
+    "hudChrome.accountSettingsNotice.failed",
+    "hudChrome.accountSettingsNotice.message",
+    "hudChrome.accountSettingsNotice.saving",
+    "hudChrome.accountSettingsNotice.title",
+    "hudChrome.accountSettingsNotice.understand"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.accountSettingsNotice.continue",
+    "hudChrome.accountSettingsNotice.failed",
+    "hudChrome.accountSettingsNotice.message",
+    "hudChrome.accountSettingsNotice.saving",
+    "hudChrome.accountSettingsNotice.title",
+    "hudChrome.accountSettingsNotice.understand"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.accountSettingsNotice.continue",
+    "hudChrome.accountSettingsNotice.failed",
+    "hudChrome.accountSettingsNotice.message",
+    "hudChrome.accountSettingsNotice.saving",
+    "hudChrome.accountSettingsNotice.title",
+    "hudChrome.accountSettingsNotice.understand"
+  ],
+  "nl_NL": [
+    "hudChrome.accountSettingsNotice.continue",
+    "hudChrome.accountSettingsNotice.failed",
+    "hudChrome.accountSettingsNotice.message",
+    "hudChrome.accountSettingsNotice.saving",
+    "hudChrome.accountSettingsNotice.title",
+    "hudChrome.accountSettingsNotice.understand"
+  ],
+  "pl_PL": [
+    "hudChrome.accountSettingsNotice.continue",
+    "hudChrome.accountSettingsNotice.failed",
+    "hudChrome.accountSettingsNotice.message",
+    "hudChrome.accountSettingsNotice.saving",
+    "hudChrome.accountSettingsNotice.title",
+    "hudChrome.accountSettingsNotice.understand"
+  ],
+  "id_ID": [
+    "hudChrome.accountSettingsNotice.continue",
+    "hudChrome.accountSettingsNotice.failed",
+    "hudChrome.accountSettingsNotice.message",
+    "hudChrome.accountSettingsNotice.saving",
+    "hudChrome.accountSettingsNotice.title",
+    "hudChrome.accountSettingsNotice.understand"
+  ],
+  "tr_TR": [
+    "hudChrome.accountSettingsNotice.continue",
+    "hudChrome.accountSettingsNotice.failed",
+    "hudChrome.accountSettingsNotice.message",
+    "hudChrome.accountSettingsNotice.saving",
+    "hudChrome.accountSettingsNotice.title",
+    "hudChrome.accountSettingsNotice.understand"
+  ],
+  "sv_SE": [
+    "hudChrome.accountSettingsNotice.continue",
+    "hudChrome.accountSettingsNotice.failed",
+    "hudChrome.accountSettingsNotice.message",
+    "hudChrome.accountSettingsNotice.saving",
+    "hudChrome.accountSettingsNotice.title",
+    "hudChrome.accountSettingsNotice.understand"
+  ],
+  "vi_VN": [
+    "hudChrome.accountSettingsNotice.continue",
+    "hudChrome.accountSettingsNotice.failed",
+    "hudChrome.accountSettingsNotice.message",
+    "hudChrome.accountSettingsNotice.saving",
+    "hudChrome.accountSettingsNotice.title",
+    "hudChrome.accountSettingsNotice.understand"
+  ],
+  "da_DK": [
+    "hudChrome.accountSettingsNotice.continue",
+    "hudChrome.accountSettingsNotice.failed",
+    "hudChrome.accountSettingsNotice.message",
+    "hudChrome.accountSettingsNotice.saving",
+    "hudChrome.accountSettingsNotice.title",
+    "hudChrome.accountSettingsNotice.understand"
+  ]
 };
