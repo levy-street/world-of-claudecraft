@@ -575,6 +575,25 @@ describe('the character save', () => {
     expect(restored.countItem(TREASURE_MAP_ITEM_IDS.rare, pid)).toBe(0);
   });
 
+  it('a logout inside the hoard resumes at the dig site, not the world start', () => {
+    const sim = makeSim();
+    sim.meta(sim.playerId)!.characterId = 8201;
+    const { site } = readAndDig(sim, 'common');
+    const portal = [...sim.entities.values()].find((e) => e.vaultAttemptId === '8201:1');
+    if (!portal) throw new Error('vault portal missing');
+    sim.enterRift(portal.riftSeed!, portal.riftBaseLevel!, sim.playerId, undefined, portal);
+    expect(isRiftPos(sim.player.pos.x)).toBe(true);
+    const state = sim.serializeCharacter(sim.playerId);
+    if (!state) throw new Error('Missing serialized character');
+    expect(Math.hypot(state.pos.x - site.x, state.pos.z - site.z)).toBeLessThan(12);
+
+    const restored = new Sim({ seed: 4242, playerClass: 'warrior', noPlayer: true });
+    const pid = restored.addPlayer('warrior', 'Digger', { state, characterId: 8201 });
+    const player = restored.entities.get(pid)!;
+    expect(isRiftPos(player.pos.x)).toBe(false);
+    expect(Math.hypot(player.pos.x - site.x, player.pos.z - site.z)).toBeLessThan(12);
+  });
+
   it('round-trips a read map and drops junk', () => {
     const sim = makeSim();
     sim.addItem(TREASURE_MAP_ITEM_IDS.rare, 1);

@@ -976,11 +976,12 @@ export function descendRift(ctx: SimContext, pid?: number): void {
   // while their body stays behind. An UNRELEASED body needs nothing here; it rides
   // the descent as an ordinary descender and stamps its corpse on arrival.
   //
-  // Two orphan routes this deliberately does NOT cover, because they are reached
-  // without a descent and want their own fix: a member who LOGGED OUT while dead has
-  // no live entity to sweep (their corpsePos persists and reloads onto the abandoned
-  // floor), and a run that ends by expiry or a lost race tears down without moving
-  // anything. Both leave the same stranded corpse this sweep exists to prevent.
+  // A member who LOGS OUT while dead has no live entity to sweep, but their save
+  // already moves a corpse on a live floor to the run's return spot
+  // (save_position.ts riftSaveCorpsePos). One orphan route this deliberately does
+  // NOT cover, because it is reached without a descent and wants its own fix: a run
+  // that ends by expiry or a lost race tears down without moving anything, leaving
+  // the same stranded corpse this sweep exists to prevent.
   for (const id of inst.memberIds) {
     const member = ctx.entities.get(id);
     if (!member?.corpsePos) continue;

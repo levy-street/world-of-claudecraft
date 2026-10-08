@@ -778,6 +778,7 @@ import {
   updateRiftInstances as updateRiftInstancesImpl,
   updateRiftTriggers as updateRiftTriggersImpl,
 } from './rift/runs';
+import { riftSaveCorpsePos, riftSavePlacement } from './rift/save_position';
 import type { RiftEvent, RiftInstance } from './rift/types';
 import { updateSpiritRunTriggers } from './spirit_run_triggers';
 import * as weeklyQuestMod from './weekly_quests';
@@ -3840,6 +3841,7 @@ export class Sim {
     // forces a fresh re-summon instead of laundering the summon cooldown for free.
     // Hunter pets (non-demon) persist. See pet_commands.isDemonPetState.
     const petSnapshot = this.serializePet(pid);
+    const riftExit = riftSavePlacement(this.ctx, e.pos); // a rift save resumes at its portal
     // One fold serves both persisted proficiency keys below: the live counters
     // plus any still-queued grants (foldPendingGatherGrants), so a leave-time
     // save landing between the tick that queued a grant and the tick that
@@ -3882,13 +3884,13 @@ export class Sim {
         e.resource,
         e.savedMana,
       ),
-      pos: ferryMod.ferrySavePosition(e), // never the sea: a ride saves the destination pier
-      facing: e.facing,
+      pos: riftExit?.pos ?? ferryMod.ferrySavePosition(e), // never the sea: a ride saves the destination pier
+      facing: riftExit?.facing ?? e.facing,
       // Death state: a released spirit resumes its corpse run on relog, and a
       // dead-but-unreleased corpse auto-releases on load (see addPlayer).
       dead: e.dead,
       ghost: e.ghost,
-      corpsePos: e.corpsePos ? { x: e.corpsePos.x, z: e.corpsePos.z } : null,
+      corpsePos: riftSaveCorpsePos(this.ctx, e.corpsePos),
       // The Keeper's Toll persists across logout (it cannot be shed by relogging).
       resSickness: e.auras.find((a) => a.id === RESURRECTION_SICKNESS_ID)?.remaining ?? null,
       // Unstuck Sickness persists across logout for the same reason.
