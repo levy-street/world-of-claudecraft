@@ -248,6 +248,14 @@ import { DailyRewardsWindow, type StoreSpendResult } from './daily_rewards_windo
 import { DayNightDialPainter } from './day_night_dial_painter';
 import { DeathRecapDialog } from './death_recap_dialog';
 import { deathRecapFeedback } from './death_recap_feedback';
+import {
+  createDeathScreenInputHold,
+  createDeathScreenView,
+  deathScreenInputReady,
+  deathScreenViewInto,
+  holdDeathScreenInput,
+  noteReleaseOverlayShown,
+} from './death_screen_view';
 import { decorativeArtImg } from './decorative_art';
 import { deedBorderSlug } from './deed_border_view';
 import {
@@ -1108,12 +1116,6 @@ const ABSENT_TARGET_DESCRIPTOR: UnitFrameDescriptor = {
 };
 // The HUD's i18n + number-formatting surface, handed to the pure stat-tooltip
 // view so it can render localized breakdowns without importing the i18n runtime.
-// Ghost-mode display threshold, mirroring src/sim/spirit.ts CORPSE_REZ_RANGE. The
-// server re-validates the range; this only decides whether the ghost prompt's corpse
-// button is shown, so keep it in sync. (The Pale Keeper's raise is reached by talking
-// to the Keeper, so no healer range is mirrored here any more.)
-const GHOST_CORPSE_REZ_RANGE = 35;
-
 const STAT_VIEW_DEPS: StatTooltipI18n = {
   t: (key, params) => t(key as TranslationKey, params),
   fmt: (value, opts) => formatNumber(value, opts),
@@ -1645,6 +1647,8 @@ export class Hud {
   private partyFramesEl = $('#party-frames');
   private deathOverlayEl = $('#death-overlay');
   private releaseSpiritBtnEl = $('#release-btn');
+  private deathScreenInput = createDeathScreenInputHold();
+  private deathScreen = createDeathScreenView();
   private deathRecapBtnEl = $('#death-recap-btn');
   private deathRecapDialog!: DeathRecapDialog;
   private ghostPromptEl = $('#ghost-prompt');
@@ -2740,6 +2744,7 @@ export class Hud {
     // every other touch-facing HUD button; desktop mouse/keyboard is preserved.
     bindTouchTap(this.releaseSpiritBtnEl, () => {
       if (this.sim.arenaInfo?.match) return;
+      if (!deathScreenInputReady(this.deathScreenInput, performance.now())) return;
       // Thornhollow Fields releases like the open world: the spirit rises in the keep
       // graveyard and waits for the wave (the sim routes the destination).
       this.sim.releaseSpirit();
@@ -9373,32 +9378,18 @@ export class Hud {
     // returns immediately, so this costs nothing at steady state.
     this.fctPainter.step(now);
 
-    // Death UI. A fresh corpse (dead, spirit not yet released) gets the full-screen
-    // Release overlay (a corpse cannot move, so a modal is fine; suppressed in arena).
-    // A ghost runs FREELY (no blocking overlay) and the world drains to greyscale; a
-    // A small prompt appears only in corpse reach (the server re-checks the range); the
-    // Pale Keeper's raise is reached by talking to the Keeper, and a standing top line
-    // names both ways back for the whole ghost run.
-    const ghost = p.dead && p.ghost;
-    const deadInArena = p.dead && !!this.sim.arenaInfo?.match;
-    // A battleground corpse releases like the open world, so the Release modal shows;
-    // only the corpse-run / Spirit Healer prompts are suppressed in a match
-    // (the wave is the one way back, enforced server-side too).
-    const ghostInBgMatch = !!this.sim.bgInfo?.match;
+    const arenaMatch = !!this.sim.arenaInfo?.match;
+    const death = deathScreenViewInto(this.deathScreen, p, arenaMatch, !!this.sim.bgInfo?.match);
     if (p.dead) syncDeathControllerHints(this.optionsHooks?.gamepad ?? null);
     if (!p.dead) {
       this.closeResurrectionPrompt();
       if (this.deathRecapDialog.isOpen()) this.deathRecapDialog.close();
     }
-    document.body.classList.toggle('spirit-mode', ghost);
-    this.setDisplay(this.deathOverlayEl, p.dead && !ghost && !deadInArena ? 'flex' : 'none');
-    this.setDisplay(this.ghostHintEl, ghost && !ghostInBgMatch ? 'block' : 'none');
-    if (ghost && !ghostInBgMatch) {
-      const corpseInRange = !!p.corpsePos && dist2d(p.pos, p.corpsePos) <= GHOST_CORPSE_REZ_RANGE;
-      this.setDisplay(this.ghostPromptEl, corpseInRange ? 'flex' : 'none');
-    } else {
-      this.setDisplay(this.ghostPromptEl, 'none');
-    }
+    document.body.classList.toggle('spirit-mode', death.spiritMode);
+    noteReleaseOverlayShown(this.deathScreenInput, death.releaseOverlay, now);
+    this.setDisplay(this.deathOverlayEl, death.releaseOverlay ? 'flex' : 'none');
+    this.setDisplay(this.ghostHintEl, death.ghostHint ? 'block' : 'none');
+    this.setDisplay(this.ghostPromptEl, death.ghostPrompt ? 'flex' : 'none');
 
     const inDungeon = p.pos.x > DUNGEON_X_THRESHOLD;
     const currentZone = zoneAt(p.pos.x, p.pos.z);
@@ -13224,6 +13215,7 @@ export class Hud {
           // which that host-agnostic cue facade has no access to.
           const self = sim.entities.get(sim.playerId);
           audio.playerDeath(playerVoiceCue(self?.modularAppearance, 'death', sfxHasCue));
+          holdDeathScreenInput(this.deathScreenInput, now);
           break;
         }
         case 'respawn':

@@ -314,6 +314,7 @@ const UI_PURE_CORES = [
   'src/ui/daily_rewards_chrome_view.ts',
   'src/ui/daily_rewards_launcher_core.ts',
   'src/ui/death_recap_view.ts',
+  'src/ui/death_screen_view.ts',
   'src/ui/char_bags_pairing_core.ts',
   'src/ui/empower_hold_core.ts',
   'src/ui/equip_drop_core.ts',

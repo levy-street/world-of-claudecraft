@@ -537,7 +537,10 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 18081 and the
     // branch 18235; the two sides' additions compose to 18093 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 18093,
+    // LOWERED 18093 -> 18085: the death-screen surface decisions (Release overlay,
+    // ghost hint, corpse prompt) moved to src/ui/death_screen_view.ts together with
+    // the Release input hold. Exact count, zero slack.
+    ceiling: 18085,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
