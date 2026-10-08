@@ -318,25 +318,43 @@ describe('npc held props', () => {
     const W = 'models/weapons';
     expect(NPC_PROP_ATTACH).toEqual({
       none: [],
-      staff: [{ url: `${W}/staff.glb`, bone: 'handslot.r' }],
+      staff: [{ url: `${W}/staff_rare_a_teal.glb`, bone: 'handslot.r' }],
       walking_staff: [{ url: `${W}/brasscrown_walking_staff.glb`, bone: 'handslot.r' }],
       oak_stave: [{ url: `${W}/knotted_oak_stave.glb`, bone: 'handslot.r' }],
       tome: [
-        { url: `${W}/staff.glb`, bone: 'handslot.r' },
-        { url: `${W}/spellbook_open.glb`, bone: 'handslot.l', gripRef: 'Spellbook_open' },
+        { url: `${W}/staff_rare_b_violet.glb`, bone: 'handslot.r' },
+        { url: `${W}/spellbook_starter.glb`, bone: 'handslot.l', rotationY: Math.PI },
       ],
-      crossbow: [{ url: `${W}/crossbow_1handed.glb`, bone: 'handslot.r' }],
-      hammer: [{ url: `${W}/hammer_a.glb`, bone: 'handslot.r' }],
+      crossbow: [{ url: `${W}/crossbow_starter.glb`, bone: 'handslot.r' }],
+      hammer: [{ url: `${W}/hammer_rare_b_ember.glb`, bone: 'handslot.r' }],
       woodaxe: [{ url: `${W}/notched_woodaxe.glb`, bone: 'handslot.r' }],
       sword_shield: [
-        { url: `${W}/sword_1handed.glb`, bone: 'handslot.r' },
-        { url: `${W}/shield_round.glb`, bone: 'handslot.l' },
+        { url: `${W}/sword_rare_a_teal.glb`, bone: 'handslot.r' },
+        { url: `${W}/shield_rare_a_teal.glb`, bone: 'handslot.l' },
       ],
-      sword: [{ url: `${W}/sword_1handed.glb`, bone: 'handslot.r' }],
-      scythe: [{ url: `${W}/scythe.glb`, bone: 'handslot.r' }],
+      sword: [{ url: `${W}/sword_rare_b_teal.glb`, bone: 'handslot.r' }],
+      scythe: [{ url: `${W}/spear_rare_a_teal.glb`, bone: 'handslot.r' }],
       knife: [{ url: `${W}/whittler_s_knife.glb`, bone: 'handslot.r' }],
-      spear: [{ url: `${W}/spear_a.glb`, bone: 'handslot.r' }],
+      spear: [{ url: `${W}/spear_rare_b_ember.glb`, bone: 'handslot.r' }],
     });
+  });
+
+  // No world NPC holds a kit weapon: every generic prop is one of the pack's own models
+  // (the rare set, or the starter crossbow and book, which have no rare counterpart).
+  it('holds only pack models and the named props, never a kit weapon', () => {
+    const named = new Set([
+      'brasscrown_walking_staff',
+      'knotted_oak_stave',
+      'notched_woodaxe',
+      'whittler_s_knife',
+    ]);
+    for (const [propSet, attach] of Object.entries(NPC_PROP_ATTACH)) {
+      for (const a of attach) {
+        const key = /([^/]+)\.glb$/.exec(a.url)?.[1] ?? '';
+        const pack = /_rare_[ab]_(teal|ember|violet)$/.test(key) || key.endsWith('_starter');
+        expect(pack || named.has(key), `${propSet}: ${key}`).toBe(true);
+      }
+    }
   });
 
   // An NPC rides a player class's def, whose own hands hold that class's weapons in swap

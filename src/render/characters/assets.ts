@@ -37,6 +37,7 @@ import {
   KAYKIT_SHIELD_ACCESSORIES,
   KAYKIT_SHIELD_GRIPS,
 } from './held_item_grips';
+import { heldWeaponSize } from './held_item_size_core';
 import { pruneHeldPropIdles, registerHeldPropIdle } from './held_prop_idle';
 import { composedLookReady } from './look_pieces';
 import { buildMakeupDecal } from './makeup';
@@ -44,6 +45,7 @@ import {
   type AttachDef,
   characterPreloadUrls,
   isAuthoredHeldModelUrl,
+  isRimlessHeldModelUrl,
   itemOffhandModelUrl,
   itemWeaponModelUrl,
   manifestUrlsForGraphics,
@@ -110,6 +112,7 @@ import { TINTED_MATERIAL_IDLE_CACHE_MAX, TintedMaterialCache } from './tinted_ma
 import { prepareWarriorAbilityClips } from './warrior_ability_clips';
 import { prepareWarriorActionFallbacks } from './warrior_action_fallbacks';
 import { variantGripTransform, WEAPON_GRIP_OVERRIDES } from './weapon_grip';
+import { fixedHandPropsShown } from './weapon_loadout_core';
 import { markOwnedWeaponSkinMaterials } from './weapon_skin_materials';
 import { WOC_ANATOMY_TOP, type WocArmorDetail, wocArmorTierFor } from './woc_armor_core';
 import { attachWocArmorAtBuild, type WocArmorFile } from './woc_armor_dressing';
@@ -155,46 +158,19 @@ export const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   // do NOT recenter (that would move the grip to mid-blade and make long blades
   // drag); we attach at the origin and only clamp oversized models. VAR_* keys
   // route to applyVariantGrip (no rig node matches them).
+  // That pack left the game when items and NPC props moved onto the starter, field, rare
+  // and epic sets: no item draws a model of it any more. sword_a, axe_b and staff_c stay
+  // as the asset pipeline's style references (scripts/asset_pipeline/lib/style_ref.mjs).
   sword_a: 'VAR_SWORD',
-  sword_b: 'VAR_SWORD',
-  sword_c: 'VAR_SWORD',
-  sword_d: 'VAR_SWORD',
-  sword_e: 'VAR_SWORD',
-  sword_f: 'VAR_SWORD',
-  sword_g: 'VAR_SWORD',
-  dagger_a: 'VAR_DAGGER',
-  dagger_b: 'VAR_DAGGER',
-  dagger_c: 'VAR_DAGGER',
-  staff_a: 'VAR_STAFF',
-  staff_b: 'VAR_STAFF',
   staff_c: 'VAR_STAFF',
-  staff_d: 'VAR_STAFF',
-  axe_a: 'VAR_AXE',
   axe_b: 'VAR_AXE',
-  axe_c: 'VAR_AXE',
-  axe_d: 'VAR_AXE',
-  hammer_a: 'VAR_AXE',
-  hammer_b: 'VAR_AXE',
-  hammer_c: 'VAR_AXE',
-  hammer_d: 'VAR_AXE',
   halberd: 'VAR_POLEARM',
-  // additional distinct models (KayKit Adventurers set + spears/scythe/wands) for
-  // weapon variety. adv_* swords/dagger/staff/axe share the variant-pack convention
-  // (float geo, origin-at-grip) so they reuse the same family grips.
-  adv_sword_1handed: 'VAR_SWORD',
-  adv_sword_2handed: 'VAR_SWORD',
+  // What is left of the KayKit Adventurers set, drawn by no item: the dagger is a pipeline
+  // style reference too, and the greatsword is the blade scripts/anim/
+  // warrior_weapon_clearance.mjs measures.
   adv_sword_2handed_color: 'VAR_SWORD',
   adv_dagger: 'VAR_DAGGER',
-  adv_staff: 'VAR_STAFF',
-  adv_druid_staff: 'VAR_STAFF',
-  adv_axe_1handed: 'VAR_AXE',
-  adv_axe_2handed: 'VAR_AXE',
-  spear_a: 'VAR_POLEARM',
   spear_b: 'VAR_POLEARM',
-  scythe: 'VAR_POLEARM',
-  wand_a: 'VAR_WAND',
-  wand_b: 'VAR_WAND',
-  adv_wand: 'VAR_WAND',
   emberfang_sword: 'VAR_SWORD',
   redskull_sword: 'VAR_SWORD',
   redskull_dagger: 'VAR_DAGGER',
@@ -253,6 +229,119 @@ export const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   tome_sunpetal: 'VAR_BOOK',
   tome_voidbound: 'VAR_BOOK',
   hammer_varkhul: 'VAR_HAMMER', // Ignivar raid legendary (Varkhul drop)
+  // The starter weapons every class begins with (tests/starter_weapon_models.test.ts):
+  // authored grip-origin models, so each rides its family grip like the base variants.
+  sword_starter: 'VAR_SWORD',
+  dagger_starter: 'VAR_DAGGER',
+  hammer_starter: 'VAR_MACE',
+  axe_starter: 'VAR_AXE',
+  staff_starter: 'VAR_STAFF',
+  // The hunter's fixed crossbow is laid out like the KayKit crossbow it replaced (bolt
+  // along +Z, centred), so it takes that crossbow's seat, aim and carry unchanged.
+  crossbow_starter: '1H_Crossbow',
+  // The common and uncommon "field" weapons (tests/field_weapon_models.test.ts): ten plain
+  // shapes in up to three painted looks (iron, steel, bronze), origin at the grip like
+  // the starter set. The two-handers ride a one-hand sized family (VAR_SWORD, VAR_HAMMER)
+  // and take their extra length from a per-model scale (weapon_grip.ts); the shield
+  // seats in held_item_grips.ts.
+  sword_field_iron: 'VAR_SWORD',
+  sword_field_steel: 'VAR_SWORD',
+  sword_field_bronze: 'VAR_SWORD',
+  sword_field_2h_iron: 'VAR_SWORD',
+  sword_field_2h_steel: 'VAR_SWORD',
+  dagger_field_iron: 'VAR_DAGGER',
+  dagger_field_steel: 'VAR_DAGGER',
+  dagger_field_bronze: 'VAR_DAGGER',
+  hammer_field_iron: 'VAR_MACE',
+  hammer_field_steel: 'VAR_MACE',
+  hammer_field_bronze: 'VAR_MACE',
+  hammer_field_2h_iron: 'VAR_HAMMER',
+  hammer_field_2h_steel: 'VAR_HAMMER',
+  axe_field_iron: 'VAR_AXE',
+  axe_field_steel: 'VAR_AXE',
+  axe_field_bronze: 'VAR_AXE',
+  staff_field_iron: 'VAR_STAFF',
+  staff_field_steel: 'VAR_STAFF',
+  staff_field_bronze: 'VAR_STAFF',
+  spear_field_iron: 'VAR_POLEARM',
+  wand_field_iron: 'VAR_WAND',
+  wand_field_steel: 'VAR_WAND',
+  // The rare set (tests/rare_weapon_models.test.ts): two designs per type (`_a`, `_b`),
+  // each in up to three painted finishes (teal, ember, violet), origin at the grip. Epic
+  // items draw it. A finish is either one-hand length or two-hand length, never both
+  // (a model has one size): the two-hand finishes take their length in weapon_grip.ts.
+  // Where several epic items shared one finish, the owner asked for a look apiece: those
+  // extra finishes (jade, spectral, molten and the rest) are the same designs repainted.
+  sword_rare_a_teal: 'VAR_SWORD',
+  sword_rare_a_ember: 'VAR_SWORD',
+  sword_rare_a_violet: 'VAR_SWORD',
+  sword_rare_a_jade: 'VAR_SWORD',
+  sword_rare_a_spectral: 'VAR_SWORD',
+  sword_rare_a_molten: 'VAR_SWORD',
+  sword_rare_a_royal: 'VAR_SWORD',
+  sword_rare_a_ivory: 'VAR_SWORD',
+  sword_rare_a_anvil: 'VAR_SWORD',
+  sword_rare_b_teal: 'VAR_SWORD',
+  sword_rare_b_ember: 'VAR_SWORD',
+  sword_rare_b_violet: 'VAR_SWORD',
+  dagger_rare_a_teal: 'VAR_DAGGER',
+  dagger_rare_a_ember: 'VAR_DAGGER',
+  dagger_rare_a_violet: 'VAR_DAGGER',
+  dagger_rare_a_frost: 'VAR_DAGGER',
+  dagger_rare_a_bone: 'VAR_DAGGER',
+  dagger_rare_b_teal: 'VAR_DAGGER',
+  dagger_rare_b_ember: 'VAR_DAGGER',
+  dagger_rare_b_violet: 'VAR_DAGGER',
+  hammer_rare_a_teal: 'VAR_MACE',
+  hammer_rare_a_ember: 'VAR_MACE',
+  hammer_rare_b_teal: 'VAR_HAMMER',
+  hammer_rare_b_ember: 'VAR_HAMMER',
+  hammer_rare_b_violet: 'VAR_HAMMER',
+  axe_rare_a_teal: 'VAR_AXE',
+  axe_rare_a_ember: 'VAR_AXE',
+  axe_rare_a_violet: 'VAR_AXE',
+  axe_rare_b_ember: 'VAR_AXE',
+  staff_rare_a_teal: 'VAR_STAFF',
+  staff_rare_a_ember: 'VAR_STAFF',
+  staff_rare_a_violet: 'VAR_STAFF',
+  staff_rare_a_obsidian: 'VAR_STAFF',
+  staff_rare_b_teal: 'VAR_STAFF',
+  staff_rare_b_ember: 'VAR_STAFF',
+  staff_rare_b_violet: 'VAR_STAFF',
+  spear_rare_a_teal: 'VAR_POLEARM',
+  spear_rare_b_ember: 'VAR_POLEARM',
+  wand_rare_a_teal: 'VAR_WAND',
+  wand_rare_b_ember: 'VAR_WAND',
+  wand_rare_b_violet: 'VAR_WAND',
+  // The epic set (tests/epic_weapon_models.test.ts): one design per named weapon line
+  // (`<family>_epic_<design>_<finish>`), origin at the grip. Legendary items draw it. The
+  // three greatswords and the `wildwood` maul are two-hand length on one-hand sized
+  // families and take their length back in weapon_grip.ts; the shields seat in
+  // held_item_grips.ts.
+  sword_epic_deathless_crucible_heart: 'VAR_SWORD',
+  sword_epic_deathless_spectral_teal: 'VAR_SWORD',
+  sword_epic_ossuary_ivory_amethyst: 'VAR_SWORD',
+  sword_epic_ossuary_wyrm_teal: 'VAR_SWORD',
+  sword_epic_tusk_ivory_jade: 'VAR_SWORD',
+  sword_epic_tusk_predator_steel: 'VAR_SWORD',
+  dagger_epic_cinder_coal_ember: 'VAR_DAGGER',
+  dagger_epic_dragonfang_basin_jade: 'VAR_DAGGER',
+  dagger_epic_dragonfang_ivory_violet: 'VAR_DAGGER',
+  dagger_epic_dragonfang_moonlit_pearl: 'VAR_DAGGER',
+  dagger_epic_marrow_ivory_amber: 'VAR_DAGGER',
+  hammer_epic_spring_verdant_ivory: 'VAR_MACE',
+  hammer_epic_wildwood_living_forest: 'VAR_HAMMER',
+  hammer_epic_wildwood_scorched_resin: 'VAR_HAMMER',
+  axe_epic_gravecleaver_fossil_gravegreen: 'VAR_AXE',
+  axe_epic_gravecleaver_slag_ember: 'VAR_AXE',
+  staff_epic_gravewyrm_bone_emerald: 'VAR_STAFF',
+  staff_epic_hexwood_basin_turquoise: 'VAR_STAFF',
+  staff_epic_hexwood_last_spring: 'VAR_STAFF',
+  staff_epic_moonfang_bone_moon: 'VAR_STAFF',
+  staff_epic_moonfang_lunar_tide: 'VAR_STAFF',
+  wand_epic_deathless_quenched_ember: 'VAR_WAND',
+  wand_epic_deathless_royal_amethyst: 'VAR_WAND',
+  wand_epic_deathless_storm_crystal: 'VAR_WAND',
   ...KAYKIT_SHIELD_ACCESSORIES,
 };
 
@@ -461,10 +550,13 @@ function attachProp(
   // An authored held model (manifest AUTHORED_HELD_MODELS) keeps its shipped
   // surface response through applyMaterials instead of the kit polish.
   const authoredSurface = isAuthoredHeldModelUrl(att.url);
+  // ...and a flat plate (manifest RIMLESS_HELD_MODELS) draws without the rim.
+  const rimless = isRimlessHeldModelUrl(att.url);
   payload.traverse((o) => {
     if ((o as THREE.Mesh).isMesh) {
       o.userData.weaponMesh = true;
       if (authoredSurface) o.userData.authoredSurface = true;
+      if (rimless) o.userData.rimless = true;
     }
   });
   if (swapKind === 'mainhand') {
@@ -486,6 +578,13 @@ function attachProp(
     if (ref) copyAccessoryTransform(payload, ref);
   } else if (isHandslotBone(att.bone)) {
     applyHandGrip(payload, root, att.bone, att.url);
+  }
+  // The equipped item's own size (held_item_size_core.ts), about the hand: the whole fit
+  // shrinks with the model, so a handle seated through the fist stays through it.
+  const size = att.size ?? 1;
+  if (size !== 1 && isHandslotBone(att.bone)) {
+    payload.position.multiplyScalar(size);
+    payload.scale.multiplyScalar(size);
   }
   // Sheathed: override where the prop SITS (on-back position/lean, chest-bone
   // space; the caller resolved the chest bone) but keep the SCALE the normal
@@ -512,11 +611,18 @@ function attachProp(
 // The grip resolves from the substituted model's own family
 // (KAYKIT_WEAPON_ACCESSORY + WEAPON_GRIP_OVERRIDES), so any base position/
 // rotationY/gripRef override is dropped for the substituted model.
+// Null = the hand is empty: a body that follows real equipment
+// (AssembleOptions.bareWhenUnarmed) with no weapon equipped. The class default is
+// the slot's stand-in for an equipped weapon whose id names no model, and the
+// weapon a body that equips nothing is drawn with; it was never a weapon a player
+// owns, so it does not outlive an unequip (owner report: the stock sword stayed in
+// the hand).
 function swapAttachDef(
   base: AttachDef,
   weaponItemId: string | null | undefined,
   weaponSkinId: string | null | undefined = null,
-): AttachDef {
+  bareWhenUnarmed = false,
+): AttachDef | null {
   // A DISPLAYED ranged skin takes the ranged hand rule here too, not only on
   // the fixed-attach path (rangedSkinAttachDef): the Combat Mech is a swap-slot
   // body that a hunter can wear, so a drawn bow must move to the left handslot
@@ -533,8 +639,11 @@ function swapAttachDef(
     const bone = skin ? weaponSkinAttachBone(weaponSkinHandling(skin), base.bone) : base.bone;
     return { url: skinUrl, bone };
   }
+  if (bareWhenUnarmed && !weaponItemId) return null;
   const url = itemWeaponModelUrl(weaponItemId);
-  return url ? { url, bone: base.bone } : base;
+  // the item's own model draws at the item's size; a skin above is the player's pick of
+  // model and keeps its own, as the class stand-in does
+  return url ? { url, bone: base.bone, size: heldWeaponSize(weaponItemId) } : base;
 }
 
 // The AttachDef for the actual equipped offhand. Its model is the offhand item's
@@ -551,13 +660,18 @@ function offhandAttachDef(
   // The mirrored-skin arm of offhandModelUrl can name a streamed skin GLB; the
   // item's own offhand model is always resident, so degrade to it.
   const resident = residentOrEnsure(url) ?? itemOffhandModelUrl(offhandItemId);
-  return resident ? { url: resident, bone: base.bone } : null;
+  if (!resident) return null;
+  // the item's own model at the item's size (a second weapon: a shield or a held off-hand
+  // is no weapon and keeps its own); a mirrored skin keeps the skin's
+  return resident === itemOffhandModelUrl(offhandItemId)
+    ? { url: resident, bone: base.bone, size: heldWeaponSize(offhandItemId) }
+    : { url: resident, bone: base.bone };
 }
 
 // Classes without weaponSlots keep a FIXED weapon visual (the hunter's ranged
 // crossbow). A bow/crossbow skin replaces that fixed attach instead of a
 // swappable slot, so those attaches join the swap/stale cycle too.
-const RANGED_SWAP_BASENAMES = new Set(['crossbow_1handed', 'crossbow_2handed']);
+const RANGED_SWAP_BASENAMES = new Set(['crossbow_1handed', 'crossbow_2handed', 'crossbow_starter']);
 
 function attachBasename(att: AttachDef): string {
   return modelBasename(att.url);
@@ -1662,6 +1776,16 @@ export interface AssembleOptions {
    *  dresses (the key's measure; a far bake hangs its own part set). CharacterVisual always
    *  names one: the look its host handed it (the world view's entity), else null. */
   wocHead?: WocHeadBorn;
+  /** The body's weapon slot (VisualDef.weaponSlots) follows REAL equipment: with no
+   *  weapon equipped the hand is empty. The world view names it for a player
+   *  (createCharacterVisual), and a character preview for the hands it is handed.
+   *  Omitted: a slot with no item draws the def's base weapon, which is what a body
+   *  that equips nothing holds as its look (a mob on a class body: the Nythraxis
+   *  court's visions), and what a key's measuring build and a portrait build draw.
+   *  Unarmed is BOTH hands empty: the body's own hand props (the hunter's crossbow,
+   *  the warlock's book) are left off too while the slot is empty
+   *  (weapon_loadout_core.ts fixedHandPropsShown). */
+  bareWhenUnarmed?: boolean;
 }
 
 /** The geometry level a WOC body of these options draws (woc_lod_core.ts): an explicit
@@ -1800,7 +1924,15 @@ export function assembleModular(
   recordBuildSpan('view-part:assemble:recolor', performance.now() - recolorStarted, recolorStarted);
   timeBuildSpan('view-part:assemble:morphs', () => applyMorphs(root, look));
   timeBuildSpan('view-part:assemble:props', () =>
-    attachAllProps(root, def, weaponItemId ?? null, null, false, offhandItemId ?? null),
+    attachAllProps(
+      root,
+      def,
+      weaponItemId ?? null,
+      null,
+      false,
+      offhandItemId ?? null,
+      opts?.bareWhenUnarmed,
+    ),
   );
   // The far LOD's material slots, captured HERE and nowhere else, off the SAME
   // filter (composedFarMeshes) the composed bake walks, so slot N here is group
@@ -1966,7 +2098,15 @@ export function assembleModel(
   // Low tier still downgrades body/material cost, but keeps attachments visible.
   // Built SKINLESS and drawn: CharacterVisual applies the weapon skin (and any
   // active sheathe) on its first diff, right after assembly.
-  attachAllProps(root, def, weaponItemId ?? null, null, false, offhandItemId ?? null);
+  attachAllProps(
+    root,
+    def,
+    weaponItemId ?? null,
+    null,
+    false,
+    offhandItemId ?? null,
+    opts?.bareWhenUnarmed,
+  );
   // Re-orient mis-baked built-in weapon nodes (e.g. the golem axe) in place.
   for (const fix of def.weaponFix ?? []) {
     const node =
@@ -1997,6 +2137,10 @@ function attachTargetBone(
 // or nothing while none is equipped); every other attachment is fixed (the warlock's
 // spellbook offhand), except the hunter's fixed RANGED attach, which a bow/crossbow
 // skin replaces in place. The rogue lists both hand slots so a dagger shows in both.
+// `bareWhenUnarmed` (AssembleOptions): a swappable slot with no weapon equipped
+// attaches nothing instead of the slot's base model, and the body's own hand props
+// (the hunter's crossbow, the warlock's book) are left off with it
+// (weapon_loadout_core.ts fixedHandPropsShown).
 // A manifest/bone mismatch ships without that prop. Returns the WEAPON payload roots
 // (the swap + ranged-swap ones), plus a skin-mirrored offhand payload, the set
 // rarity VFX and orientation pins ride; a NON-mirrored offhand has its own cycle
@@ -2008,6 +2152,7 @@ function attachAllProps(
   weaponSkinId: string | null,
   stowed: boolean,
   offhandItemId: string | null = null,
+  bareWhenUnarmed = false,
 ): THREE.Object3D[] {
   const attachments = visibleAttachmentsForGraphics(def);
   // A skin mirrored onto the offhand rides the same rarity-VFX + material path as
@@ -2025,8 +2170,16 @@ function attachAllProps(
     const isSwap = def.weaponSlots?.includes(i) ?? false;
     const isOffhandSwap = def.offhandSlot === i;
     const isWeapon = isSwap || isRangedSwapAttach(base);
+    if (
+      !isSwap &&
+      !isOffhandSwap &&
+      isHandslotBone(base.bone) &&
+      !fixedHandPropsShown(bareWhenUnarmed, weaponItemId)
+    ) {
+      continue;
+    }
     const att = isSwap
-      ? swapAttachDef(base, weaponItemId, weaponSkinId)
+      ? swapAttachDef(base, weaponItemId, weaponSkinId, bareWhenUnarmed)
       : isOffhandSwap
         ? offhandAttachDef(base, offhandItemId, weaponSkinId)
         : (rangedSkinAttachDef(base, weaponSkinId) ?? base);
@@ -2048,13 +2201,16 @@ function attachAllProps(
  *  (setHeldOffhand). Returns the attached weapon payload roots so the caller can
  *  hang rarity VFX off them. The caller must re-apply materials and re-snapshot the
  *  original-material map afterwards (see CharacterVisual.setWeapon), since the new
- *  weapon meshes start on the source GLB's raw materials. */
+ *  weapon meshes start on the source GLB's raw materials. `bareWhenUnarmed`
+ *  (AssembleOptions): an unequip leaves the slot empty, so the returned set can be
+ *  empty on a body that has a slot. */
 export function setHeldWeapon(
   root: THREE.Object3D,
   def: VisualDef,
   weaponItemId: string | null,
   weaponSkinId: string | null = null,
   stowed = false,
+  bareWhenUnarmed = false,
 ): THREE.Object3D[] {
   const attachments = def.attach ?? [];
   const targets: number[] = [];
@@ -2072,8 +2228,11 @@ export function setHeldWeapon(
   for (const i of targets) {
     const base = attachments[i];
     const att = def.weaponSlots?.includes(i)
-      ? swapAttachDef(base, weaponItemId, weaponSkinId)
-      : (rangedSkinAttachDef(base, weaponSkinId) ?? base);
+      ? swapAttachDef(base, weaponItemId, weaponSkinId, bareWhenUnarmed)
+      : fixedHandPropsShown(bareWhenUnarmed, weaponItemId)
+        ? (rangedSkinAttachDef(base, weaponSkinId) ?? base)
+        : null;
+    if (!att) continue;
     const bone = attachTargetBone(root, att, stowed);
     if (!bone) continue;
     payloads.push(attachProp(root, bone, att, 'mainhand', stowed, def.rightShoulderSheathe));
@@ -2148,6 +2307,7 @@ export function setWeaponsStowed(
   weaponSkinId: string | null,
   stowed: boolean,
   offhandItemId: string | null = null,
+  bareWhenUnarmed = false,
 ): THREE.Object3D[] {
   if (!def.attach?.length) return [];
   const stale: THREE.Object3D[] = [];
@@ -2156,7 +2316,15 @@ export function setWeaponsStowed(
   });
   for (const o of stale) o.removeFromParent();
   pruneHeldPropIdles(root);
-  return attachAllProps(root, def, weaponItemId, weaponSkinId, stowed, offhandItemId);
+  return attachAllProps(
+    root,
+    def,
+    weaponItemId,
+    weaponSkinId,
+    stowed,
+    offhandItemId,
+    bareWhenUnarmed,
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -2324,6 +2492,9 @@ export function tintedMaterial(
   authored = false,
   // VisualDef.envSheen (body only): the non-metal share of the sky reflection.
   envSheen?: number,
+  // False for a flat held plate (manifest RIMLESS_HELD_MODELS): no silhouette rim,
+  // which floods a face that turns edge-on to the camera.
+  rim = true,
 ): THREE.Material {
   // A source with no color property (the weapon-skin fresnel shell's
   // ShaderMaterial) has nothing this factory can tint, lift, or polish.
@@ -2345,7 +2516,7 @@ export function tintedMaterial(
   // suffix, whichever derived first would hand its Lambert clone to the
   // other, and the low-tier emissiveMap would land on a player form
   // (tests/tinted_material.test.ts pins the partition).
-  const key = `${src.uuid}|${tint ?? 'n'}|${tint === null ? 0 : strength}|${GFX.standardMaterials ? 's' : 'l'}|${skinTex ? skinTex.uuid : 'n'}|${emisTex ? emisTex.uuid : 'n'}|${role}|${mount}|${shapeKey}|${selfIllumination}|${envMapIntensity ?? 'n'}|${matte ? 'm' : 'n'}|${authored ? 'a' : 'n'}|${envSheen ?? 'n'}`;
+  const key = `${src.uuid}|${tint ?? 'n'}|${tint === null ? 0 : strength}|${GFX.standardMaterials ? 's' : 'l'}|${skinTex ? skinTex.uuid : 'n'}|${emisTex ? emisTex.uuid : 'n'}|${role}|${mount}|${shapeKey}|${selfIllumination}|${envMapIntensity ?? 'n'}|${matte ? 'm' : 'n'}|${authored ? 'a' : 'n'}|${envSheen ?? 'n'}|${rim ? 'r' : 'n'}`;
   const build = () =>
     buildTintedClone(
       src as THREE.MeshStandardMaterial,
@@ -2359,6 +2530,7 @@ export function tintedMaterial(
       matte,
       authored,
       envSheen,
+      rim,
     );
   if (claims) {
     if (claims.has(key)) {
@@ -2394,6 +2566,7 @@ function buildTintedClone(
   matte = false,
   authored = false,
   envSheen?: number,
+  rim = true,
 ): THREE.Material {
   const src: THREE.Material = s;
   let mat: THREE.MeshStandardMaterial | THREE.MeshLambertMaterial | THREE.MeshBasicMaterial;
@@ -2404,7 +2577,7 @@ function buildTintedClone(
     // rim/detail layers compose over it.
     const dyeSpec = (mat.userData as { armorDye?: ArmorDyeSpec }).armorDye;
     if (dyeSpec) attachArmorDye(mat, dyeSpec);
-    addRimGlow(mat); // dungeon silhouette rim (uRimBoost contract)
+    if (rim) addRimGlow(mat); // dungeon silhouette rim (uRimBoost contract)
     // The skeletons and the necromancer share a `Glow` eye material authored
     // at strength 1, whose two tints straddled the old bloom threshold on luma
     // weights alone: the yellow pair (0.907) lit up, the cyan pair (0.842)
@@ -2564,6 +2737,8 @@ export function applyMaterials(
     // tagged it for an AUTHORED_HELD_MODELS prop.
     const authored =
       role === 'weapon' ? mesh.userData.authoredSurface === true : (def.authoredAtlas ?? false);
+    // a flat held plate (attachProp tagged it) carries no silhouette rim
+    const rim = !(role === 'weapon' && mesh.userData.rimless === true);
     // skin/emissive override only touches the character's own atlas meshes, not
     // weapons (and on a WOC body only its skinned body nodes: skinAtlasTarget)
     const atlasTarget = mesh.userData.skinAtlasTarget ?? mesh.userData.bodyMesh;
@@ -2587,6 +2762,7 @@ export function applyMaterials(
           role === 'body' && (def.matte ?? false),
           authored,
           role === 'body' ? def.envSheen : undefined,
+          rim,
         ),
       );
     } else {
@@ -2605,6 +2781,7 @@ export function applyMaterials(
         role === 'body' && (def.matte ?? false),
         authored,
         role === 'body' ? def.envSheen : undefined,
+        rim,
       );
     }
     attachSharedDepthMaterials(mesh, mesh.material);

@@ -167,7 +167,14 @@ export function createCharacterVisual(
     // one path that opts a WOC body's armor down to the crowd's detail: anyone
     // but the local player (a body built directly keeps full detail). A WOC body
     // is born with the head pieces of its own look hung (never the library's).
-    const born: AssembleOptions = { ...opts, wocHead: wocHeadApp ?? null };
+    // A player's weapon slot follows what is equipped, so an empty slot is an empty
+    // hand; a mob drawn on a class body equips nothing and keeps the class weapon it
+    // is drawn with (the Nythraxis court's visions).
+    const born: AssembleOptions = {
+      ...opts,
+      wocHead: wocHeadApp ?? null,
+      bareWhenUnarmed: e.kind === 'player',
+    };
     const visual = new CharacterVisual(
       key,
       e.color,

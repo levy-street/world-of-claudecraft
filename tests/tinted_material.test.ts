@@ -8,7 +8,7 @@ import {
 } from '../src/render/characters/assets';
 import type { VisualDef } from '../src/render/characters/manifest';
 import { type ModularLook, normalizeAppearance } from '../src/render/characters/modular';
-import { gfxInternalsForTest } from '../src/render/gfx';
+import { gfxInternalsForTest, hasRimGlow } from '../src/render/gfx';
 import { createWeaponVfx, type WeaponVfxSpec } from '../src/render/weapon_vfx';
 import { landWocBodies } from './helpers/woc_streamed';
 
@@ -272,6 +272,52 @@ describe('tinted character materials', () => {
       expect(authored.color.getHex()).toBe(0xffffff);
       // and the two never share a cache entry
       expect(authored).not.toBe(polished);
+    } finally {
+      restoreGfx();
+    }
+  });
+
+  // The rim is a fresnel term: it traces a rounded form's silhouette, but a flat plate
+  // turned edge-on to the camera takes it over its whole face as a purple-grey film (the
+  // starter shield's inner face, owner report). A held model named in RIMLESS_HELD_MODELS
+  // is tagged by attachProp and draws without the rim; nothing else loses it.
+  it('draws a flat held plate without the silhouette rim, and everything else with it', () => {
+    const restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials: true });
+    try {
+      // ONE source material on three meshes, so the cache has to keep them apart
+      const src = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        roughness: 0.9,
+        metalness: 0,
+        map: new THREE.Texture(),
+      });
+      src.name = 'shield_starter';
+      const held = (rimless: boolean): THREE.Mesh => {
+        const mesh = new THREE.Mesh(new THREE.BufferGeometry(), src);
+        mesh.userData.weaponMesh = true;
+        mesh.userData.authoredSurface = true;
+        // the tag attachProp sets for a RIMLESS_HELD_MODELS prop
+        if (rimless) mesh.userData.rimless = true;
+        return mesh;
+      };
+      const plate = held(true);
+      const blade = held(false);
+      // a body mesh carrying the tag by accident: the rule is a held prop's alone
+      const body = new THREE.Mesh(new THREE.BufferGeometry(), src);
+      body.userData.rimless = true;
+      const root = new THREE.Group();
+      root.add(plate, blade, body);
+      applyMaterials(root, {} as VisualDef, 0xffffff);
+
+      expect(hasRimGlow(plate.material as THREE.Material)).toBe(false);
+      expect(hasRimGlow(blade.material as THREE.Material)).toBe(true);
+      expect(hasRimGlow(body.material as THREE.Material)).toBe(true);
+      // the plate never took the blade's rimmed clone out of the cache, nor gave it its own
+      expect(plate.material).not.toBe(blade.material);
+      // and it is still the authored surface, as shipped
+      const out = plate.material as THREE.MeshStandardMaterial;
+      expect(out.roughness).toBeCloseTo(0.9, 5);
+      expect(out.emissive.getHex()).toBe(0x000000);
     } finally {
       restoreGfx();
     }

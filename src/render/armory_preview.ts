@@ -156,6 +156,8 @@ export function createArmoryPreview(
   let currentAppearance = appearance;
   const pv = previewAppearanceVisual(currentAppearance);
   let appearanceSig = appearanceSignature(appearance);
+  // the player's real hands: a weapon slot with nothing equipped is an empty hand, as in
+  // the world
   let visual = new CharacterVisual(
     pv.visualKey,
     0xffffff,
@@ -163,6 +165,8 @@ export function createArmoryPreview(
     pv.weaponItemId,
     pv.weaponOverride,
     pv.offhandItemId,
+    null,
+    { bareWhenUnarmed: true },
   );
   characterGroup.add(visual.root);
   // This rig's camera matches the VFX sprite math's native 35 degree fov.
@@ -187,6 +191,8 @@ export function createArmoryPreview(
       previewTryOnMainhand(nextSkinId, nextAppearance.weaponItemId, nextAppearance.offhandItemId),
       nextAppearance.weaponOverride,
       nextAppearance.offhandItemId,
+      null,
+      { bareWhenUnarmed: true },
     );
     rig.setWeaponVfxCameraFov(35);
     if (nextSkinId) rig.setWeaponSkin(nextSkinId);

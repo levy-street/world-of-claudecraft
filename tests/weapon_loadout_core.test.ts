@@ -5,6 +5,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { type ClipMap, VISUALS } from '../src/render/characters/manifest';
 import {
+  fixedHandPropsShown,
   type LoadoutFacts,
   swappedClip,
   weaponLoadout,
@@ -108,7 +109,8 @@ describe('weaponLoadout', () => {
     ).toBeNull();
   });
 
-  it('an empty mainhand shows the class default one-hand weapon', () => {
+  // nothing equipped: the hands are empty, and the free-hand set keeps them down
+  it('an empty mainhand plays the single set', () => {
     expect(weaponLoadout(body({}))).toBe('single');
   });
 
@@ -132,6 +134,27 @@ describe('weaponLoadout', () => {
     expect(
       weaponLoadout(body({ fixedOffhand: true, mainhandItemId: 'eastbrook_greatsword' })),
     ).toBe('twohand');
+  });
+});
+
+describe('fixedHandPropsShown', () => {
+  it('a body that follows real equipment leaves its own hand props off while unarmed', () => {
+    expect(fixedHandPropsShown(true, null)).toBe(false);
+    expect(fixedHandPropsShown(true, undefined)).toBe(false);
+    expect(fixedHandPropsShown(true, '')).toBe(false);
+    expect(fixedHandPropsShown(true, 'rusty_hatchet')).toBe(true);
+  });
+
+  it('any other body always draws them (a mob on a class body, a key measuring build)', () => {
+    expect(fixedHandPropsShown(false, null)).toBe(true);
+    expect(fixedHandPropsShown(false, 'rusty_hatchet')).toBe(true);
+  });
+
+  // unarmed, the warlock's book is off, so the free-hand set plays, not the book-hand one
+  it('an unarmed body with a fixed off-hand prop left off plays the single set', () => {
+    const shown = fixedHandPropsShown(true, null);
+    expect(weaponLoadout(body({ fixedOffhand: shown && true }))).toBe('single');
+    expect(weaponLoadout(body({ fixedOffhand: true }))).toBeNull();
   });
 });
 

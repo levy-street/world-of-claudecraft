@@ -182,8 +182,8 @@ describe('character visual manifest', () => {
       );
     }
     expect(NPC_PROP_ATTACH.tome.map((a) => a.url)).toEqual([
-      'models/weapons/staff.glb',
-      'models/weapons/spellbook_open.glb',
+      'models/weapons/staff_rare_b_violet.glb',
+      'models/weapons/spellbook_starter.glb',
     ]);
     // Their stock rig (the fallback for an NPC with no authored look): one def,
     // three tints. The per-NPC NpcDef color carries each identity, so the def

@@ -68,6 +68,18 @@ export function weaponLoadout(f: LoadoutFacts): WeaponLoadout | null {
   return 'single';
 }
 
+/** Whether a body draws its OWN hand props, the ones no equipped item replaces (the hunter's
+ *  crossbow, the warlock's book). A body that follows real equipment (AssembleOptions
+ *  .bareWhenUnarmed: the world's players, the character previews) draws none of them while
+ *  its weapon slot is empty: unarmed means both hands empty, for every class. Any other body
+ *  always draws them. */
+export function fixedHandPropsShown(
+  bareWhenUnarmed: boolean,
+  mainhandItemId: string | null | undefined,
+): boolean {
+  return !(bareWhenUnarmed && !mainhandItemId);
+}
+
 /** The clip a rig plays for `name` under a swap map: the map's variant when it names one,
  *  null when it maps the clip to '' (suppressed under this loadout, e.g. a fidget authored
  *  with a free hand), else `name` itself. `has` reports whether the loaded rig carries a clip,

@@ -21433,7 +21433,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "height": 2.8600000000000003,
     "attach": [
       {
-        "url": "models/weapons/crossbow_1handed.glb",
+        "url": "models/weapons/crossbow_starter.glb",
         "bone": "handslot.r"
       }
     ],
@@ -21530,9 +21530,9 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "bone": "handslot.r"
       },
       {
-        "url": "models/weapons/spellbook_open.glb",
+        "url": "models/weapons/spellbook_starter.glb",
         "bone": "handslot.l",
-        "gripRef": "Spellbook_open"
+        "rotationY": 3.141592653589793
       }
     ],
     "animUrls": [

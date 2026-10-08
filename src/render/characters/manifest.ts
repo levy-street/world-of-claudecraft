@@ -283,6 +283,10 @@ export interface AttachDef {
    *  this on an attach that should showcase in the guide (the shield classes'
    *  offhand bases deliberately stay unflagged). */
   swapOnly?: boolean;
+  /** The size the prop draws at about its hand, on top of its model's own fit: set by the
+   *  swap path from the equipped ITEM (held_item_size_core.ts: a common or uncommon weapon
+   *  draws a fifth smaller). Absent is 1. */
+  size?: number;
 }
 
 export interface VisualDef {
@@ -1478,19 +1482,23 @@ const MOUNTS_DIR = 'models/mounts';
  *  which sweeps every shipped held model; render code resolves through
  *  itemOffhandModelUrl, never this table directly. */
 export const ITEM_OFFHAND_MODELS: Readonly<Record<string, string>> = {
-  eastbrook_buckler: 'shield_round',
-  highwatch_wallshield: 'shield_square',
-  bonewrought_bulwark: 'shield_square',
-  duskforged_bulwark: 'shield_square', // crafted apex tower shield (masterwrought); bulwarks share shield_square
-  pearlward_aegis: 'shield_round', // the first caster (int/spi) shield
+  eastbrook_buckler: 'shield_starter', // the warrior and paladin starting shield
+  highwatch_wallshield: 'shield_field_steel', // the common heater shield (field set)
+  // A shield draws the set one rarity down, like the weapons (src/ui/weapon_variants.ts):
+  // a rare shield the common ones, an epic shield the rare set's (the pointed shield `_a`
+  // for the walls and bulwarks, the round shield `_b` for wards, barriers and bucklers).
+  bonewrought_bulwark: 'shield_rare_a_teal',
+  duskforged_bulwark: 'shield_rare_a_violet', // crafted apex tower shield (masterwrought)
+  pearlward_aegis: 'shield_field_steel', // the first caster (int/spi) shield
   // The Buried Hoard shields, one row per map-rarity tier (the tier clones are
-  // their own items, not heroicOf copies, so none inherits a row).
-  glacier_hewn_bulwark: 'shield_square',
-  rare_glacier_hewn_bulwark: 'shield_square',
-  legendary_glacier_hewn_bulwark: 'shield_square',
-  storm_tuned_buckler: 'shield_round',
-  rare_storm_tuned_buckler: 'shield_round',
-  legendary_storm_tuned_buckler: 'shield_round',
+  // their own items, not heroicOf copies, so none inherits a row). Each tier draws by
+  // its item quality: the base and the `legendary_` clone are both epic items.
+  glacier_hewn_bulwark: 'shield_rare_a_glacier',
+  rare_glacier_hewn_bulwark: 'shield_field_steel',
+  legendary_glacier_hewn_bulwark: 'shield_rare_a_deepice',
+  storm_tuned_buckler: 'shield_rare_b_teal',
+  rare_storm_tuned_buckler: 'shield_starter',
+  legendary_storm_tuned_buckler: 'shield_rare_b_teal',
   // The inscription tomes: the first held_offhand item models, procedural GLBs
   // from scripts/assets/inscription_tomes (VAR_BOOK grips). The phase 09 apex
   // grimoire joined the family at phase 18, and with it left the conscious
@@ -1500,10 +1508,10 @@ export const ITEM_OFFHAND_MODELS: Readonly<Record<string, string>> = {
   sunpetal_grimoire: 'tome_sunpetal',
   voidbound_grimoire: 'tome_voidbound',
   // Crucible raid shields (content/ignivar_loot.ts): tank wall + healer barrier.
-  bulwark_of_the_inner_crucible: 'shield_square',
-  ember_wardens_barrier: 'shield_round',
-  votive_ward_of_the_deathless_court: 'shield_round', // Nythraxis gap-fill healer shield
-  templar_dawn_shield: 'shield_square', // Church Order quartermaster's mail shield (faction_vendors.ts)
+  bulwark_of_the_inner_crucible: 'shield_rare_a_crucible',
+  ember_wardens_barrier: 'shield_rare_b_ember',
+  votive_ward_of_the_deathless_court: 'shield_rare_b_violet', // Nythraxis gap-fill healer shield
+  templar_dawn_shield: 'shield_rare_a_dawn', // Church Order quartermaster's mail shield (faction_vendors.ts)
   varkhul_emberward: 'varkhul_emberward', // Ignivar raid legendary (Varkhul drop)
 };
 
@@ -1522,6 +1530,120 @@ export const ITEM_OFFHAND_MODELS: Readonly<Record<string, string>> = {
 export const AUTHORED_HELD_MODELS: ReadonlySet<string> = new Set([
   'hammer_varkhul', // Varkhul Forgebreaker (Ignivar raid legendary)
   'varkhul_emberward', // Varkhul Emberward (Ignivar raid legendary)
+  // The starter weapons (painted atlases of their own, no kit palette)
+  'sword_starter',
+  'dagger_starter',
+  'hammer_starter',
+  'axe_starter',
+  'staff_starter',
+  'shield_starter',
+  'crossbow_starter',
+  'spellbook_starter',
+  // The common and uncommon field weapons (the same painted pipeline as the starters)
+  'sword_field_iron',
+  'sword_field_steel',
+  'sword_field_bronze',
+  'sword_field_2h_iron',
+  'sword_field_2h_steel',
+  'dagger_field_iron',
+  'dagger_field_steel',
+  'dagger_field_bronze',
+  'hammer_field_iron',
+  'hammer_field_steel',
+  'hammer_field_bronze',
+  'hammer_field_2h_iron',
+  'hammer_field_2h_steel',
+  'axe_field_iron',
+  'axe_field_steel',
+  'axe_field_bronze',
+  'staff_field_iron',
+  'staff_field_steel',
+  'staff_field_bronze',
+  'spear_field_iron',
+  'wand_field_iron',
+  'wand_field_steel',
+  'shield_field_steel',
+  // The rare weapons (the same painted pipeline)
+  'sword_rare_a_teal',
+  'sword_rare_a_ember',
+  'sword_rare_a_violet',
+  'sword_rare_b_teal',
+  'sword_rare_b_ember',
+  'sword_rare_b_violet',
+  'dagger_rare_a_teal',
+  'dagger_rare_a_ember',
+  'dagger_rare_a_violet',
+  'dagger_rare_b_teal',
+  'dagger_rare_b_ember',
+  'dagger_rare_b_violet',
+  'hammer_rare_a_teal',
+  'hammer_rare_a_ember',
+  'hammer_rare_b_teal',
+  'hammer_rare_b_ember',
+  'hammer_rare_b_violet',
+  'axe_rare_a_teal',
+  'axe_rare_b_ember',
+  'staff_rare_a_teal',
+  'staff_rare_a_violet',
+  'staff_rare_b_teal',
+  'staff_rare_b_ember',
+  'staff_rare_b_violet',
+  'spear_rare_a_teal',
+  'spear_rare_b_ember',
+  'wand_rare_a_teal',
+  'wand_rare_b_ember',
+  'wand_rare_b_violet',
+  'shield_rare_a_teal',
+  // ...and the rare looks the epic items brought in when they took the rare set
+  'axe_rare_a_ember',
+  'axe_rare_a_violet',
+  'staff_rare_a_ember',
+  'shield_rare_a_violet',
+  'shield_rare_b_teal',
+  'shield_rare_b_ember',
+  'shield_rare_b_violet',
+  // ...and the repainted finishes that give each epic item sharing a design a look of its own
+  'sword_rare_a_jade',
+  'sword_rare_a_spectral',
+  'sword_rare_a_molten',
+  'sword_rare_a_royal',
+  'sword_rare_a_ivory',
+  'sword_rare_a_anvil',
+  'dagger_rare_a_frost',
+  'dagger_rare_a_bone',
+  'staff_rare_a_obsidian',
+  'shield_rare_a_glacier',
+  'shield_rare_a_deepice',
+  'shield_rare_a_dawn',
+  'shield_rare_a_crucible',
+  // The epic weapons and shields (the same pack convention)
+  'sword_epic_deathless_crucible_heart',
+  'sword_epic_deathless_spectral_teal',
+  'sword_epic_ossuary_ivory_amethyst',
+  'sword_epic_ossuary_wyrm_teal',
+  'sword_epic_tusk_ivory_jade',
+  'sword_epic_tusk_predator_steel',
+  'dagger_epic_cinder_coal_ember',
+  'dagger_epic_dragonfang_basin_jade',
+  'dagger_epic_dragonfang_ivory_violet',
+  'dagger_epic_dragonfang_moonlit_pearl',
+  'dagger_epic_marrow_ivory_amber',
+  'hammer_epic_spring_verdant_ivory',
+  'hammer_epic_wildwood_living_forest',
+  'hammer_epic_wildwood_scorched_resin',
+  'axe_epic_gravecleaver_fossil_gravegreen',
+  'axe_epic_gravecleaver_slag_ember',
+  'staff_epic_gravewyrm_bone_emerald',
+  'staff_epic_hexwood_basin_turquoise',
+  'staff_epic_hexwood_last_spring',
+  'staff_epic_moonfang_bone_moon',
+  'staff_epic_moonfang_lunar_tide',
+  'wand_epic_deathless_quenched_ember',
+  'wand_epic_deathless_royal_amethyst',
+  'wand_epic_deathless_storm_crystal',
+  'shield_epic_crucible_heat_blue_iron',
+  'shield_epic_votive_bone_votive',
+  'shield_epic_votive_ember_warden',
 ]);
 
 /** True when a held-prop GLB url resolves to one of AUTHORED_HELD_MODELS (a held weapon
@@ -1529,6 +1651,38 @@ export const AUTHORED_HELD_MODELS: ReadonlySet<string> = new Set([
 export function isAuthoredHeldModelUrl(url: string): boolean {
   const m = /^models\/weapons\/([^/]+)\.glb$/.exec(url);
   return m !== null && AUTHORED_HELD_MODELS.has(m[1]);
+}
+
+/** Held models that are broad flat plates: a shield's faces, an open book's spread.
+ *  The character rim (gfx.ts addRimGlow) is a fresnel term, made to trace the
+ *  silhouette of a rounded form. A plate turned edge-on to the camera is ONE surface
+ *  at ONE grazing angle, so the rim's cool tint lands on the whole face at once and
+ *  reads as a purple-grey film over the painted texture (owner report on the starter
+ *  shield's inner face; a live A/B with only the rim removed gave the wood back, by
+ *  day and at dusk). These draw without the rim. The standard tier's alone: the low
+ *  tier has no rim to drop. */
+export const RIMLESS_HELD_MODELS: ReadonlySet<string> = new Set([
+  'shield_starter',
+  'spellbook_starter',
+  'shield_field_steel',
+  'shield_rare_a_teal',
+  'shield_rare_a_violet',
+  'shield_rare_a_glacier',
+  'shield_rare_a_deepice',
+  'shield_rare_a_dawn',
+  'shield_rare_a_crucible',
+  'shield_rare_b_teal',
+  'shield_rare_b_ember',
+  'shield_rare_b_violet',
+  'shield_epic_crucible_heat_blue_iron',
+  'shield_epic_votive_bone_votive',
+  'shield_epic_votive_ember_warden',
+]);
+
+/** True when a held-prop GLB url resolves to one of RIMLESS_HELD_MODELS. */
+export function isRimlessHeldModelUrl(url: string): boolean {
+  const m = /^models\/weapons\/([^/]+)\.glb$/.exec(url);
+  return m !== null && RIMLESS_HELD_MODELS.has(m[1]);
 }
 
 function itemModelKey(
@@ -1948,7 +2102,7 @@ export const VISUALS: Record<string, VisualDef> = {
         shrapnel_charge: 'Ranged_Shoot',
       },
     },
-    attach: [{ url: `${WEAPONS}/crossbow_1handed.glb`, bone: 'handslot.r' }],
+    attach: [{ url: `${WEAPONS}/crossbow_starter.glb`, bone: 'handslot.r' }],
   },
   // The rogue on the WOC body: every strike, opener and finisher is a weapon
   // blow, so the physical damage event swings the artist's clips (the dual
@@ -2195,9 +2349,14 @@ export const VISUALS: Record<string, VisualDef> = {
     attach: [
       { url: `${WEAPONS}/wand.glb`, bone: 'handslot.r' },
       {
-        url: `${WEAPONS}/spellbook_open.glb`,
+        // The starter spellbook, laid out like the open kit book it replaced. This
+        // rig carries no Spellbook_open accessory node (the kit rigs' seat for the
+        // book), so the book sits on the hand slot itself; half a turn about its
+        // spine opens it toward the warlock instead of away from him (owner call).
+        // The turn is the hand's alone: the carry takes its pose from back_grips.
+        url: `${WEAPONS}/spellbook_starter.glb`,
         bone: 'handslot.l',
-        gripRef: 'Spellbook_open',
+        rotationY: Math.PI,
       },
     ],
     weaponSlots: [0],
@@ -5225,24 +5384,31 @@ export function modularVisualKey(cls: PlayerClass): string {
 // ---------------------------------------------------------------------------
 export const NPC_PROP_ATTACH: Readonly<Record<NpcPropSet, readonly AttachDef[]>> = {
   none: [],
-  staff: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
+  // The generic weapons an NPC holds are the rare set's (one finish per prop set: which
+  // one is a matter of looks only), so no world NPC carries a kit weapon. The named
+  // props below them (walking staff, oak stave, wood axe, knife) are their own models.
+  staff: [{ url: `${WEAPONS}/staff_rare_a_teal.glb`, bone: 'handslot.r' }],
   walking_staff: [{ url: `${WEAPONS}/brasscrown_walking_staff.glb`, bone: 'handslot.r' }],
   oak_stave: [{ url: `${WEAPONS}/knotted_oak_stave.glb`, bone: 'handslot.r' }],
+  // the open book is the starter one, turned to open toward its reader like the warlock's
   tome: [
-    { url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' },
-    { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l', gripRef: 'Spellbook_open' },
+    { url: `${WEAPONS}/staff_rare_b_violet.glb`, bone: 'handslot.r' },
+    { url: `${WEAPONS}/spellbook_starter.glb`, bone: 'handslot.l', rotationY: Math.PI },
   ],
-  crossbow: [{ url: `${WEAPONS}/crossbow_1handed.glb`, bone: 'handslot.r' }],
-  hammer: [{ url: `${WEAPONS}/hammer_a.glb`, bone: 'handslot.r' }],
+  // no rare crossbow exists: the starter one
+  crossbow: [{ url: `${WEAPONS}/crossbow_starter.glb`, bone: 'handslot.r' }],
+  // the war maul, at the one-hand length its family clamp gives it
+  hammer: [{ url: `${WEAPONS}/hammer_rare_b_ember.glb`, bone: 'handslot.r' }],
   woodaxe: [{ url: `${WEAPONS}/notched_woodaxe.glb`, bone: 'handslot.r' }],
   sword_shield: [
-    { url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' },
-    { url: `${WEAPONS}/shield_round.glb`, bone: 'handslot.l' },
+    { url: `${WEAPONS}/sword_rare_a_teal.glb`, bone: 'handslot.r' },
+    { url: `${WEAPONS}/shield_rare_a_teal.glb`, bone: 'handslot.l' },
   ],
-  sword: [{ url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' }],
-  scythe: [{ url: `${WEAPONS}/scythe.glb`, bone: 'handslot.r' }],
+  sword: [{ url: `${WEAPONS}/sword_rare_b_teal.glb`, bone: 'handslot.r' }],
+  // the glaive stands in for the scythe
+  scythe: [{ url: `${WEAPONS}/spear_rare_a_teal.glb`, bone: 'handslot.r' }],
   knife: [{ url: `${WEAPONS}/whittler_s_knife.glb`, bone: 'handslot.r' }],
-  spear: [{ url: `${WEAPONS}/spear_a.glb`, bone: 'handslot.r' }],
+  spear: [{ url: `${WEAPONS}/spear_rare_b_ember.glb`, bone: 'handslot.r' }],
 };
 
 // One layout object per prop set, minted once: a stable identity for every

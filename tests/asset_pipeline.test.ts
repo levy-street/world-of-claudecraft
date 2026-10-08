@@ -1132,9 +1132,10 @@ describe('asset library registry parsers', () => {
     const library = await libraryImport;
     const src = readFileSync(join(ROOT, 'src/ui/weapon_variants.ts'), 'utf8');
     const map = library.parseItemVariants(src);
-    // Known shipped facts: worn_sword maps to sword_a; dagger_a serves several items.
-    expect(map.get('sword_a')).toContain('worn_sword');
-    expect((map.get('dagger_a') ?? []).length).toBeGreaterThan(1);
+    // Known shipped facts: worn_sword maps to the starter sword; one field look serves
+    // several items.
+    expect(map.get('sword_starter')).toContain('worn_sword');
+    expect((map.get('sword_field_steel') ?? []).length).toBeGreaterThan(1);
     for (const [key, items] of map) {
       expect(key).toMatch(/^[a-z0-9_]+$/);
       expect(items.length).toBeGreaterThan(0);
@@ -1302,10 +1303,12 @@ describe('asset library registry parsers', () => {
     for (const want of ['weapons', 'creatures', 'chars/players', 'props', 'skins']) {
       expect(cats.has(want), `category ${want}`).toBe(true);
     }
-    const swordA = assets.find((a: { path: string }) => a.path === 'models/weapons/sword_a.glb');
-    expect(swordA.registration.gripFamily).toBe('VAR_SWORD');
-    expect(swordA.registration.itemIds).toContain('worn_sword');
-    expect(swordA.registration.icon).toBe('ui/weapons/sword_a.jpg');
+    const starterSword = assets.find(
+      (a: { path: string }) => a.path === 'models/weapons/sword_starter.glb',
+    );
+    expect(starterSword.registration.gripFamily).toBe('VAR_SWORD');
+    expect(starterSword.registration.itemIds).toContain('worn_sword');
+    expect(starterSword.registration.icon).toBe('ui/weapons/sword_starter.jpg');
     const knight = assets.find(
       (a: { path: string }) => a.path === 'models/chars/players/woc/base_male.glb',
     );

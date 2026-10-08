@@ -585,7 +585,9 @@ export class CharacterPreview {
     try {
       // born at the armor detail this stage draws, so a class being browsed or a peer
       // inspected never asks for a top file it will not draw; its geometry level is a
-      // preview's own whatever that detail (preview_armor_detail_core.ts)
+      // preview's own whatever that detail (preview_armor_detail_core.ts). Its hands are
+      // the ones it is handed (a character's own, or the class starters): a weapon slot
+      // handed nothing is an empty hand, as in the world.
       const detail = this.stagedArmorDetail();
       this.currentVisual = new CharacterVisual(
         visualKey,
@@ -595,7 +597,7 @@ export class CharacterPreview {
         weaponOverride,
         offhandItemId,
         look,
-        previewArmorBuildOptions(GFX, detail),
+        { ...previewArmorBuildOptions(GFX, detail), bareWhenUnarmed: true },
       );
       this.armorDetail = detail;
       this.currentVisualSig = nextSig;

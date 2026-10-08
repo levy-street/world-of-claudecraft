@@ -41,8 +41,9 @@ import { reapplySurfaceDetailToClone } from './worn_stone';
  *
  * The dye goes FIRST because that is the order the rig factory composes them:
  * characters/assets.ts buildTintedClone re-attaches the outfit dye, then calls
- * addRimGlow, then applySurfaceDetail (the three calls sit together in its
- * GFX.standardMaterials arm). No material carries both the dye and the biome
+ * addRimGlow (on every rig material but a flat held plate, which draws without
+ * the rim: manifest RIMLESS_HELD_MODELS), then applySurfaceDetail (the three
+ * calls sit together in its GFX.standardMaterials arm). No material carries both the dye and the biome
  * haze: the dye is rig-only and the haze is world-surface-only, so no source
  * in the tree orders those two against each other.
  */

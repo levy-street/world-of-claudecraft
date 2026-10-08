@@ -138,7 +138,7 @@ import { warriorActionBlend } from './warrior_action_blend';
 import { WarriorActionProps } from './warrior_action_props';
 import { WarriorBodyEffects } from './warrior_body_effects';
 import { SPIN_ATTACK_VISUAL_DURATION, weaponAttackStyle } from './weapon_attack_style_core';
-import { swappedClip, weaponLoadout } from './weapon_loadout_core';
+import { fixedHandPropsShown, swappedClip, weaponLoadout } from './weapon_loadout_core';
 import {
   disposeOwnedWeaponSkinMaterials,
   markOwnedWeaponSkinMaterials,
@@ -595,6 +595,9 @@ export class CharacterVisual {
   private skinIndex: number;
   private weaponItemId: string | null;
   private offhandItemId: string | null;
+  /** The weapon slot follows real equipment (AssembleOptions.bareWhenUnarmed): with no
+   *  weapon equipped the hand is empty, at birth and on every re-attach after it. */
+  private readonly bareWhenUnarmed: boolean;
   /** Composition inputs for a `modular` def (null for a fixed class rig).
    *  Changing a look means changing GEOMETRY, so callers rebuild the visual
    *  rather than mutating it; this is kept so they can tell whether they must. */
@@ -1371,6 +1374,7 @@ export class CharacterVisual {
     this.skinIndex = skinIndex;
     this.weaponItemId = weaponItemId;
     this.offhandItemId = offhandItemId;
+    this.bareWhenUnarmed = opts?.bareWhenUnarmed ?? false;
     this.baseHeight = prep.def.height;
 
     // model: yaw/scale/feet normalization wrapper around the skinned clone. The
@@ -3820,8 +3824,14 @@ export class CharacterVisual {
    *  payload(s) (for the caller's compile gate), or null on a no-op. */
   setWeapon(weaponItemId: string | null): THREE.Object3D[] | null {
     if (weaponItemId === this.weaponItemId) return null;
+    const ownPropsShown = fixedHandPropsShown(this.bareWhenUnarmed, this.weaponItemId);
     this.weaponItemId = weaponItemId;
     this.refreshLoadout();
+    // Arming or disarming a body that follows real equipment shows or hides its own hand
+    // props too (the hunter's crossbow, the warlock's book), which no slot swap reaches.
+    if (ownPropsShown !== fixedHandPropsShown(this.bareWhenUnarmed, weaponItemId)) {
+      return this.reattachAllHeld();
+    }
     if (!this.def.weaponSlots?.length) return null;
     return this.reattachHeldWeapon();
   }
@@ -3922,6 +3932,7 @@ export class CharacterVisual {
       this.weaponItemId,
       this.weaponSkinId,
       this.stow.attached,
+      this.bareWhenUnarmed,
     );
     const offPayloads = setHeldOffhand(
       this.model,
@@ -4004,7 +4015,8 @@ export class CharacterVisual {
           const mesh = o as THREE.Mesh;
           if (!mesh.isMesh) return;
           // cloneMaterialWithHooks, never a bare clone: a rig material carries
-          // the silhouette rim glow (assets.ts buildTintedClone), and
+          // the silhouette rim glow (assets.ts buildTintedClone; a flat held
+          // plate alone does not, and its clone must not gain one), and
           // Material.clone() drops onBeforeCompile. The bare clone therefore
           // rendered the isolated weapon WITHOUT its rim AND, since three's
           // default program cache key IS the hook source, linked a program the
@@ -4442,6 +4454,13 @@ export class CharacterVisual {
     // only be reconciled into the light budget on a later frame: raise an edge
     // the renderer consumes (consumeWeaponGraphDirty).
     this.weaponGraphDirty = true;
+    this.reattachAllHeld();
+  }
+
+  /** Strip and re-attach EVERY held prop (both slots and the body's own hand props) for
+   *  what the hands hold now and where they are carried, then run the shared re-attach
+   *  tail. Returns every prop mounted afterwards, for the caller's compile gate. */
+  private reattachAllHeld(): THREE.Object3D[] {
     this.disposeWeaponVfx();
     this.disposeWeaponSkinMaterials();
     const payloads = setWeaponsStowed(
@@ -4451,12 +4470,14 @@ export class CharacterVisual {
       this.weaponSkinId,
       this.stow.attached,
       this.offhandItemId,
+      this.bareWhenUnarmed,
     );
     // The returned set is the hands that SHOW the skin (attachAllProps); a
     // hand outside it still needs its bone-texture pass, and the whole-rig
     // sweep is idempotent (skeletons already cropped are skipped).
     configureTightBoneTextures(this.model);
     this.finishWeaponAttach(payloads);
+    return heldPropHolders(this.model);
   }
 
   /** Rebuild the shadow-caster list and original-material snapshot after the model
@@ -4826,9 +4847,10 @@ export class CharacterVisual {
       stowed: this.stow.attached,
       showsMainhand: (this.def.weaponSlots?.length ?? 0) > 0,
       showsOffhand: this.def.offhandSlot !== undefined,
-      fixedOffhand: attach.some(
-        (a, i) => a.bone === 'handslot.l' && i !== this.def.offhandSlot && !a.swapOnly,
-      ),
+      // ...unless the body leaves its own hand props off while unarmed
+      fixedOffhand:
+        fixedHandPropsShown(this.bareWhenUnarmed, this.weaponItemId) &&
+        attach.some((a, i) => a.bone === 'handslot.l' && i !== this.def.offhandSlot && !a.swapOnly),
     });
     const next = loadout ? (swaps[loadout] ?? null) : null;
     if (next === this.loadoutSwap) return;

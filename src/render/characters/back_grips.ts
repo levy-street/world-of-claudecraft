@@ -108,6 +108,22 @@ const BACK_GRIPS: Record<string, BackGripSpec> = {
   // KayKit carries (y 0.05 vs 0.2) to keep the top edge at the shoulder line
   // instead of poking past the chibi head.
   Varkhul_Bulwark: { position: [0, 0.05, -0.36], euler: [0, Math.PI, 0] },
+  // The starter buckler: the round KayKit carry. Its origin is the rear handle,
+  // which sits off the disc's centre (0.08 across, 0.24 below it, 0.03 behind), so
+  // the row is the round shield's with that offset taken back out through the
+  // half turn: the DISC lands where the KayKit disc does, centred on the spine.
+  Starter_Shield: { position: [0.08, 0, -0.29], euler: [0, Math.PI, 0] },
+  // The field heater shield: the same flat carry, point down. Its origin is the middle
+  // of the board, a full unit and a fifth tall, so it rides LOWER than the kit carries
+  // (y -0.12 against 0.2): its flat top sits at the shoulder line, not across the back
+  // of the head. It also rides FARTHER off the spine (z -0.42): a sheathed one-hander
+  // lies under it, and at the kit distance a stowed staff, axe or mace came through
+  // the board's face (measured on the live rig against ten one-hand models: -0.41 was
+  // the first distance none of them crossed the board).
+  Heater_Shield: { position: [0, -0.12, -0.42], euler: [0, Math.PI, 0] },
+  // The epic tower shield: the heater carry, lower by the 0.15 its board is taller above
+  // the middle, so its top sits at the same shoulder line.
+  Tower_Shield: { position: [0, -0.27, -0.42], euler: [0, Math.PI, 0] },
 };
 
 /** The grip families that have a tuned on-back carry. Every family the character

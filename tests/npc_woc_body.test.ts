@@ -143,11 +143,13 @@ describe('a world NPC on its WOC body', () => {
     expect(manifest.VISUALS[KEY].weaponSlots?.length ?? 0).toBeGreaterThan(0);
     // ...the NPC's body has none: its attach list IS its props
     expect(look?.props).toBe('staff');
-    expect(defOf(v).attach).toEqual([{ url: 'models/weapons/staff.glb', bone: 'handslot.r' }]);
+    expect(defOf(v).attach).toEqual([
+      { url: 'models/weapons/staff_rare_a_teal.glb', bone: 'handslot.r' },
+    ]);
     expect(defOf(v).weaponSlots).toBeUndefined();
     expect(defOf(v).offhandSlot).toBeUndefined();
     // the shared class def itself is untouched
-    expect(manifest.VISUALS[KEY].attach?.[0]?.url).not.toBe('models/weapons/staff.glb');
+    expect(manifest.VISUALS[KEY].attach?.[0]?.url).not.toBe('models/weapons/staff_rare_a_teal.glb');
   });
 
   it('asks for its own hairstyle: the bare head stands in until the file lands', async () => {

@@ -203,15 +203,89 @@ describe('authored surfaces', () => {
     expect(isAuthoredHeldModelUrl(itemOffhandModelUrl('varkhul_emberward') ?? '')).toBe(true);
   });
 
-  it('leaves every other held model on the polish', () => {
-    // the class defaults, the shields, an adv-set piece, and an authored PBR
-    // craft weapon that was never reported: none of them are opted out
-    for (const itemId of ['eastbrook_buckler', 'highwatch_wallshield']) {
-      expect(isAuthoredHeldModelUrl(itemOffhandModelUrl(itemId) ?? ''), itemId).toBe(false);
+  // The starter weapons are painted Tripo atlases with their own shading, the same kind
+  // of surface the Varkhul drops are: under the kit polish they would wear its cream lift
+  // and emissive floor as a grey film.
+  it('routes the starting kit through the authored held-model arm too', () => {
+    for (const itemId of [
+      'worn_sword',
+      'rusty_dagger',
+      'training_mace',
+      'rusty_hatchet',
+      'gnarled_staff',
+    ]) {
+      expect(isAuthoredHeldModelUrl(itemWeaponModelUrl(itemId) ?? ''), itemId).toBe(true);
     }
-    expect(isAuthoredHeldModelUrl('models/weapons/sword_1handed.glb')).toBe(false);
-    expect(isAuthoredHeldModelUrl('models/weapons/adv_sword_2handed.glb')).toBe(false);
+    expect(isAuthoredHeldModelUrl(itemOffhandModelUrl('eastbrook_buckler') ?? '')).toBe(true);
+    expect(isAuthoredHeldModelUrl(VISUALS.player_hunter.attach?.[0]?.url ?? '')).toBe(true);
+    expect(isAuthoredHeldModelUrl(VISUALS.player_warlock.attach?.[1]?.url ?? '')).toBe(true);
+  });
+
+  // The common and uncommon field set comes from the same painted pipeline as the starters.
+  it('routes the common and uncommon field set through the authored held-model arm too', () => {
+    for (const itemId of [
+      'eastbrook_arming_sword',
+      'eastbrook_greatsword',
+      'vale_carving_knife',
+      'bronzework_mace',
+      'ironshod_maul',
+      'copper_bearded_axe',
+      'hickory_shortstaff',
+      'ironbark_boar_spear',
+      'palecoil_rod',
+    ]) {
+      expect(isAuthoredHeldModelUrl(itemWeaponModelUrl(itemId) ?? ''), itemId).toBe(true);
+    }
+    expect(isAuthoredHeldModelUrl(itemOffhandModelUrl('highwatch_wallshield') ?? '')).toBe(true);
+  });
+
+  it('routes the rare set through the authored held-model arm too', () => {
+    for (const itemId of [
+      'thorium_warblade',
+      'moggers_shiv',
+      'crag_warden_cudgel',
+      'gravewyrm_thornmaul',
+      'arcanite_war_axe',
+      'gravecaller_staff',
+      'fen_reaver_glaive',
+      'drowned_tide_scepter',
+    ]) {
+      expect(isAuthoredHeldModelUrl(itemWeaponModelUrl(itemId) ?? ''), itemId).toBe(true);
+    }
+    expect(isAuthoredHeldModelUrl(itemOffhandModelUrl('pearlward_aegis') ?? '')).toBe(true);
+  });
+
+  it('routes the epic set through the authored held-model arm too', () => {
+    for (const itemId of [
+      'bonewrought_greatsword',
+      'fang_of_korzul',
+      'wildsoul_maul',
+      'springtouched_crozier',
+      'gravewyrm_cleaver',
+      'nightfangs_greatstaff',
+      'stormcallers_focus',
+    ]) {
+      expect(isAuthoredHeldModelUrl(itemWeaponModelUrl(itemId) ?? ''), itemId).toBe(true);
+    }
+    for (const itemId of ['bonewrought_bulwark', 'bulwark_of_the_inner_crucible']) {
+      expect(isAuthoredHeldModelUrl(itemOffhandModelUrl(itemId) ?? ''), itemId).toBe(true);
+    }
+  });
+
+  it('leaves every other held model on the polish', () => {
+    // the class bodies' stock hands, the kit shields, an adv-set piece, and an authored
+    // PBR craft weapon that was never reported: none of them are opted out. No item draws
+    // a kit model any more, so these are named by file.
+    for (const key of ['sword_1handed', 'staff', 'dagger', 'shield_round', 'shield_square']) {
+      expect(isAuthoredHeldModelUrl(`models/weapons/${key}.glb`), key).toBe(false);
+    }
+    expect(isAuthoredHeldModelUrl('models/weapons/adv_sword_2handed_color.glb')).toBe(false);
     expect(isAuthoredHeldModelUrl('models/weapons/emberfang_sword.glb')).toBe(false);
+    // every epic shield and weapon draws the rare set now, an authored one
+    for (const itemId of ['duskforged_bulwark', 'storm_tuned_buckler']) {
+      expect(isAuthoredHeldModelUrl(itemOffhandModelUrl(itemId) ?? ''), itemId).toBe(true);
+    }
+    expect(isAuthoredHeldModelUrl(itemWeaponModelUrl('first_blood_razor') ?? '')).toBe(true);
     // a creature or player GLB can never match the held-model set
     expect(isAuthoredHeldModelUrl('models/creatures/ogre.glb')).toBe(false);
     expect(isAuthoredHeldModelUrl('')).toBe(false);
@@ -219,7 +293,9 @@ describe('authored surfaces', () => {
     // harbormaster's set once opted in is no arm of the rule any more
     expect(isAuthoredHeldModelUrl('models/chars/npc_gear/hammer_varkhul.glb')).toBe(false);
     expect(isAuthoredHeldModelUrl('models/weapons/hammer_varkhul.glb')).toBe(true);
-    expect(AUTHORED_HELD_MODELS.size).toBe(2);
+    // the two Varkhul drops, the eight starter models, the 23 field models, the 50
+    // rare models (37 pack finishes and 13 repaints of them) and the 27 epic models
+    expect(AUTHORED_HELD_MODELS.size).toBe(110);
   });
 
   it('flags exactly the replaced creature and mount rigs, never a player body', () => {
