@@ -11108,6 +11108,10 @@ export const cs_CZ: EnTranslations = {
     "selectClass": "Vyber prosím třídu.",
     "pickClass": "Vyber třídu.",
     "returnToLogin": "Zpět na přihlášení",
+    "searchUpdates": "Search for updates",
+    "noUpdateFound": "No update found. Try again shortly.",
+    "updateUnavailable": "Update through your game store or download the latest client.",
+    "updateSearchFailed": "Could not check for updates. Please try again.",
     "api": {
       "tooManyAttempts": "Příliš mnoho pokusů. Počkej minutu a zkus to znovu.",
       "usernameShape": "Uživatelské jméno musí mít 3-24 znaků a používat písmena, číslice nebo podtržítko.",

@@ -11108,6 +11108,10 @@ export const vi_VN: EnTranslations = {
     "selectClass": "Vui lòng chọn một lớp.",
     "pickClass": "Hãy chọn một lớp.",
     "returnToLogin": "Quay Lại Đăng Nhập",
+    "searchUpdates": "Search for updates",
+    "noUpdateFound": "No update found. Try again shortly.",
+    "updateUnavailable": "Update through your game store or download the latest client.",
+    "updateSearchFailed": "Could not check for updates. Please try again.",
     "api": {
       "tooManyAttempts": "Quá nhiều lần thử. Hãy đợi một phút rồi thử lại.",
       "usernameShape": "Tên đăng nhập phải có 3-24 ký tự và chỉ dùng chữ cái, chữ số hoặc dấu gạch dưới.",

@@ -11108,6 +11108,10 @@ export const ko_KR: EnTranslations = {
     "selectClass": "직업을 선택하세요.",
     "pickClass": "직업을 고르세요.",
     "returnToLogin": "로그인으로 돌아가기",
+    "searchUpdates": "업데이트 검색",
+    "noUpdateFound": "업데이트를 찾지 못했습니다. 잠시 후 다시 시도하세요.",
+    "updateUnavailable": "게임 스토어에서 업데이트하거나 최신 클라이언트를 다운로드하세요.",
+    "updateSearchFailed": "업데이트를 확인할 수 없습니다. 다시 시도하세요.",
     "api": {
       "tooManyAttempts": "시도가 너무 많습니다. 1분 후 다시 시도하세요.",
       "usernameShape": "사용자 이름은 3-24자이며 글자, 숫자 또는 밑줄을 사용해야 합니다.",
