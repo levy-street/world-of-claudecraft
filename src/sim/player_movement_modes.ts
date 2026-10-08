@@ -5,6 +5,7 @@
 import { advanceClimb, tryStartClimb } from './climb';
 import { advanceHeroicLeap } from './combat/heroic_leap';
 import { advanceValkyrsCalling } from './combat/paladin_valkyrs_calling';
+import { advanceLanceBrace } from './lance_trial';
 import type { PlayerMotionDeps } from './player_motion';
 import { riftPlayerLift } from './rift/runs';
 import type { PlayerMeta } from './sim';
@@ -47,6 +48,10 @@ export function advanceExclusiveMovement(
   if (p.ferryRide && stepPassenger(motionDeps, p, meta.moveInput)) return true;
   if (meta.mountRace?.phase === 'countdown') return true;
   if (advanceHeroicLeap(ctx, p)) return true;
+  // A couched Shardpike owns movement while it holds (lance_trial.ts): the strafe axis
+  // becomes the balance stick and locomotion is suppressed. A shove or a fumble ends the
+  // session INSIDE the call and falls through, so the breaking tick resumes ordinary motion.
+  if (advanceLanceBrace(ctx, p, meta.moveInput)) return true;
   // A running climb owns the body; airborne descending movement may grab a
   // reachable ledge automatically. No second input or frame-perfect QTE.
   if (advanceClimb(p)) return true;

@@ -513,6 +513,48 @@ export const cs_CZ: EnTranslations = {
       "sailing": "Pluje do {dest}"
     },
     "materialStackSelectionUnavailable": "Tento výběr materiálu už není dostupný.",
+    "shardpike": {
+      "braceLabel": "Couch the Shardpike",
+      "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "thrustLabel": "Barrowglass Thrust",
+      "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
+      "braceTooltipLean": "Plant the butt and hold the point up. Lean with your strafe or turn keys, or hold the two keys above the beam: each pushes the marker toward its side. The beam drifts on its own, and every slam he lands kicks it. Keep it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "releaseLabel": "Ground the Shardpike",
+      "releaseTooltip": "Lower the pike and step out of the brace, the same as jumping. You lose the set but pay no penalty: you can couch it again right away. Only a thrust, a fumble, a broken stance or a missed window rests the pike, for {rest} seconds.",
+      "whyResting": "The pike is being re-set after a thrust, a fumble, a broken stance or a missed window. Wait out the timer on the icon.",
+      "whyAlreadyCouched": "The pike is already couched. Ground it before you re-set.",
+      "whyNotSet": "The pike is not set. Couch it and hold it steady first.",
+      "whyNothingCouched": "Nothing to ground: the pike is not couched.",
+      "beamLabel": "Shardpike balance",
+      "beamStatus": "Pike balance {balance}, set {set} percent.",
+      "beamDanger": "Pike balance {balance}, about to fumble.",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "Hold the pike steady with your strafe keys",
+      "promptCatchIt": "Catch it, the pike is going over",
+      "promptEyeOut": "The eye is out, {seconds}s: hit him with everything",
+      "promptSealed": "His eye is shut. It opens again in {seconds}s",
+      "promptResetting": "Re-setting the pike, {seconds}s",
+      "promptCloser": "Get within reach of the Foreman, {yards} yards out",
+      "promptBrace": "Couch the Shardpike, then hold it steady",
+      "promptFindBoss": "Skerrit's Shardpike: put out the Foreman's eye with it",
+      "promptFindBossMuster": "The muster's Shardpike: put out the Foreman's eye with it",
+      "promptTakePike": "Press {key} or click the rack to take a Shardpike",
+      "promptTakePikeClick": "Click the rack to take a Shardpike",
+      "promptTakePikeTap": "Tap the rack to take a Shardpike",
+      "promptPikeLevelCap": "The muster lends its pikes only to level {level} or lower",
+      "promptHoldSteadyLean": "Hold the pike steady: lean with {left} and {right}",
+      "leanLeft": "Lean left",
+      "leanRight": "Lean right",
+      "leanLeftKey": "Lean left ({key})",
+      "leanRightKey": "Lean right ({key})",
+      "promptTally": "{count} put out",
+      "promptLabel": "Shardpike instruction",
+      "blindBanner": "BARROWHIDE BROKEN",
+      "effigyBanner": "BLINDED! NOW THE WHOLE RAID HITS HARD",
+      "promptStrikeLantern": "STRIKE THE LANTERN now, {seconds}s",
+      "promptLanternOut": "The lantern is out, {seconds}s: hit it with your own weapon",
+      "promptCloserEffigy": "Get within reach of the Straw Foreman, {yards} yards out"
+    },
     "vehicle": {
       "title": "Dělo severní hlídky",
       "objective": "Braň severní hlídku",
@@ -3112,8 +3154,10 @@ export const cs_CZ: EnTranslations = {
         "storm": "Každé kouzlo, které sešleš, přidá nabití, až do {max}. Nabití trvají {duration} s a obnoví se pokaždé, když nějaké získáš.",
         "heat": "Každý tvůj úder zbraní na blízko i na dálku přidá nabití žáru, až do {max}. Žár trvá {duration} s a obnoví se pokaždé, když získáš nové nabití.",
         "ignite": "Tvé kritické zásahy zbraní na blízko i na dálku zapálí cíl a způsobí {tick} ohnivého poškození každých {every} s po dobu {duration} s. Nový kritický zásah to obnoví. Poškození roste se silou útoku nebo útočnou silou na dálku, podle toho, která je vyšší.",
-        "guardHeat": "Každý útok, který vykryješ, uhneš mu nebo ho zablokuješ, přidá nabití žáru, až do {max}. Žár trvá {duration} s a obnoví se pokaždé, když získáš nové nabití."
+        "guardHeat": "Každý útok, který vykryješ, uhneš mu nebo ho zablokuješ, přidá nabití žáru, až do {max}. Žár trvá {duration} s a obnoví se pokaždé, když získáš nové nabití.",
+        "stoneHeart": "When a hit would kill you, you turn to stone for {statue} sec instead: you take no damage and cannot move or act, then return with {restore} health ({restorePct}% of your maximum health). Can occur once every {icd}. Never in duels or arena matches, which end at the killing blow."
       },
+      "range": "{min} to {max}",
       "use": {
         "retaliate": "Po dobu {duration} s utrpí nepřítel, který tě zasáhne přímo, fyzické poškození rovné {pct} % zdraví, které ti tím zásahem vzal. Periodické poškození to nespustí.",
         "anchor": "Po dobu {duration} s utrpíš o {reduction} % méně poškození, ale pohybuješ se rychlostí {speed} %. Odstraní z tebe omráčení, zakořenění, zpomalení, strach, polymorfování, umlčení, oslepení, kletby, odzbrojení a znehybňující efekty a po dobu trvání ignoruješ nové i odhození.",
@@ -3132,7 +3176,11 @@ export const cs_CZ: EnTranslations = {
         "kindlingOrb": "Přivoláš vedle sebe žhavou kouli na {duration} s. Každé kouzlo, které sešleš na nepřítele, ji přiměje vystřelit na něj šíp za {damage} ohnivého poškození. Poškození roste se silou kouzel.",
         "pierce": "Po dobu {duration} s tvé automatické útoky, výstřely a fyzické schopnosti (kromě krvácení) zasáhnou navíc i nejbližšího nepřítele k tvému cíli v okruhu {reach} yardů za {share} % způsobeného poškození.",
         "lantern": "Umístíš si k nohám lucernu na {duration} s. Přímé léčení od kohokoli na tebe nebo na člena skupiny v okruhu {radius} yardů od ní také vyléčí nejzraněnějšího jiného člena skupiny v jejím světle za {share} % léčení.",
-        "heartNova": "Utratíš všechna nabití žáru na ohnivou novu, která způsobí {perHeat} ohnivého poškození za nabití ({max} při {maxHeat} nabitích) každému nepříteli v okruhu {radius} yardů a vyprovokuje každého tvora, kterého zasáhne. Poškození roste se silou útoku. Vyžaduje nabití žáru."
+        "heartNova": "Utratíš všechna nabití žáru na ohnivou novu, která způsobí {perHeat} ohnivého poškození za nabití ({max} při {maxHeat} nabitích) každému nepříteli v okruhu {radius} yardů a vyprovokuje každého tvora, kterého zasáhne. Poškození roste se silou útoku. Vyžaduje nabití žáru.",
+        "foremanShape": "Take the Shape of the Foreman for {duration} sec: you become the one-eyed cyclops and fight with your fists, keeping every ability and its damage. You gain {armorPct}% armor and cannot be knocked back. Dismounts you.",
+        "musterStandard": "Plant a Muster Standard at your feet. For {duration} sec, {soldiers} muster soldiers march at your side and fight your target in melee, each hitting every {every} sec for {damage} Physical damage. They attack only your target, and only once it is already in combat. Each has {hpPct}% of your maximum health. Left more than {leash} yd behind, they rejoin you at once. They leave when the standard falls or when you die. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, set when you plant it.",
+        "gutteredGlare": "Channel for {duration} sec: a beam {length} yd long bursts from you the way you face and deals {tick} Arcane damage every {every} sec to up to {max} enemies in its path ({total} to each over the full channel). Turn to sweep it; moving or casting ends it. Damage increases with Spell Power.",
+        "grapnel": "Hook a party or raid member within {range} yd that you can see and haul them through the air to your side, healing them for {heal} when they land. It cannot pull enemies, or allies in a vehicle, on a ship, turned to stone or held by an effect that cannot be broken. Healing increases with Healing Power."
       }
     },
     "questShare": {
@@ -3950,6 +3998,8 @@ export const cs_CZ: EnTranslations = {
       "cooldownCap": "Využito {used} z {cap} s snížení doby obnovy v tomto okně",
       "bruinRushWindow": "Vlčí podoba nestojí manu a přišpendlí cíl tvého Medvědího výpadu, čímž ho zpomalí o {pct} % na {sec} s",
       "funeralHarvestLock": "Funeral Harvest zatím nemůže vytvořit další Úlomek duše",
+      "effigyPlankHide": "Turns away {pct}% of every blow, until a Shardpike thrust puts out the lantern in its eye",
+      "effigyLanternOut": "The Straw Foreman's lantern is out for you: your blows and your pet's ignore its Plank Hide and land in full",
       "leadenHexLock": "Olověná kletba tento cíl zatím nemůže znovu zakořenit",
       "forbiddenReflectionReady": "Tvou příští způsobilou schopnost černokněžníka lze seslat znovu i mimo dobu obnovy",
       "forbiddenReflectionLock": "Zakázaný odraz zatím nelze znovu připravit",
@@ -4036,6 +4086,10 @@ export const cs_CZ: EnTranslations = {
         "moltenIgnite": "Způsobí {damage} ohnivého poškození každých {every} s. Další kritický zásah zbraní ho obnoví.",
         "pierce": "Tvé automatické útoky, výstřely a fyzické schopnosti (kromě krvácení) zasáhnou navíc i nejbližšího nepřítele k tvému cíli v okruhu {reach} yardů za {pct} % způsobeného poškození.",
         "lantern": "Přímé léčení od kohokoli na tebe nebo člena skupiny v okruhu {radius} yardů od lucerny také vyléčí nejzraněnějšího jiného člena skupiny v jejím světle za {pct} % léčení.",
+        "foremanShape": "You are the Foreman: {armorPct}% more armor and immune to knockbacks.",
+        "musterStandard": "Your Muster Standard is planted. Its soldiers march with you and fight your target.",
+        "gutteredGlare": "The beam deals {tick} Arcane damage every {every} sec to enemies in its path. Moving or casting ends it.",
+        "stoneStatue": "Turned to stone: immune to damage and unable to act. You return with {pct}% of your maximum health.",
         "crucibleHeat": "Žár: {stacks}/{max}. Použij Srdce tavicího kelímku a vydej všechen žár na ohnivou novu, která způsobí {damage} ohnivého poškození každému nepříteli v okruhu {radius} yardů a vyprovokuje každého tvora, kterého zasáhne.",
         "crucibleHeatOther": "Žár: {stacks}/{max}. Srdce tavicího kelímku vydá všechen žár na ohnivou novu v okruhu {radius} yardů, která způsobí větší ohnivé poškození za každé nabití a vyprovokuje každého tvora, kterého zasáhne."
       },
@@ -4071,6 +4125,7 @@ export const cs_CZ: EnTranslations = {
       "dodge": "Zvyšuje šanci na vyhnutí o {pct} %",
       "dodgeReduce": "Snižuje šanci na vyhnutí o {pct} %",
       "damageReduction": "Snižuje veškeré utrpěné poškození o {pct} %",
+      "slumber": "Spí až do úsvitu. Nelze na něj zaútočit a pro nikoho se neprobudí.",
       "guardianWard": "Příští smrtící nepřátelský útok místo toho obnoví tvoje zdraví na {pct} %",
       "armorFlat": "Snižuje brnění o {value}",
       "armorFlatStacks": "Snižuje brnění o {value} ({stacks} stacků)",
@@ -4147,7 +4202,9 @@ export const cs_CZ: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} povstává nad Thornpeak Heights!"
+      "spawn": "{name} povstává nad {zone}!",
+      "wake": "{name} se probouzí nad {zone}!",
+      "sleep": "{name} spí až do úsvitu."
     },
     "auth": {
       "appleLoginCta": "Pokračovat přes Apple",
@@ -4291,6 +4348,7 @@ export const cs_CZ: EnTranslations = {
         "menu": "Menu",
         "minimap": "Minimapa",
         "stanceBar": "Lišta postojů",
+        "shardpikeBar": "Shardpike Bar",
         "xpBar": "Lišta zkušeností",
         "chat": "Chat",
         "actionBarGroup": "Akční lišty",
@@ -7428,6 +7486,7 @@ export const cs_CZ: EnTranslations = {
       "framesGovernedAuraTracks": "Upravit rámečky po zapnutí v kartě Boj stejných možností Rozhraní uvolní také šest volitelných stop aur: stopu Mých posílení, stopu Obranných obnov, stopu Mých štítů, stopu Útočných obnov, stopu Pohybu a utajení a stopu Mých posílení na spojencích. Každá stopa je ve výchozím stavu vypnutá a po uvolnění nosí vlastní štítek se jménem.",
       "frameGroups": "{trackers} umí sloučit úkoly, skutky, trhliny, výpravy, sběračské cíle a sledování Relikviáře. {auras} umí sloučit tečky na cíli a šest stop aur. Kteroukoli skupinu zapneš v Nastavení rámů, nebo ji necháš vypnutou, abys mohl(a) přesouvat každý rám zvlášť. {tot} obsahuje i lištu zdroje. {focus} má tři nezávisle přesouvatelné cíle: Shift+F1 až Shift+F3 je přiřadí, Ctrl+F1 až Ctrl+F3 je vybere. Přetažením měřiče poškození nebo hrozby kamkoli mimo jeho tlačítka ho přesuneš, a tažením za jeho okraje ho zvětšíš nebo zmenšíš, i když jsou rámy zamčené. Dokud jsou rámy odemčené, má Zobrazit nebo skrýt rámy vlastní seskupenou nabídku. Klikni pravým tlačítkem na odemčený rám pro Resetovat velikost nebo Možnosti rámu. Rozhraní > Rámy obsahuje i Nastavení rámů a rozbalitelné Možnosti rámů skupiny. Uzamknout Cíl cíle k Cíli udrží tyto rámy pohromadě. Vypni to, abys mohl(a) přesunout Cíl cíle zvlášť; opětovné zapnutí zachová tu oddělenou pozici na později. Přiřazené rámy zaměření skrývají své ovládací prvky nastavení; klikni pravým tlačítkem a zvol Zrušit zaměření, abys je obnovil(a). Najetí myší pro sesílání funguje i na rámech zaměření.",
       "framesGovernedTalkingHead": "Edit Frames také uvolní panel Dialogue, který nese mluvený řádek NPC, když je NPC mimo váš dohled; nosí svůj jmenný čip, zatímco je uvolněný.",
+      "framesGovernedShardpike": "Edit Frames also loosens the Shardpike bar, the short row of quest-tool verbs that appears beside your action bars only while you are carrying the Shardpike itself; it wears its name chip while it is loose, so you can place it before the fight rather than during it.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "barsTitle": "Lišty, časovače a bojový text",
       "barsBody": "Tvá lišta sesílání se objeví uprostřed obrazovky, těsně nad tvými akčními lištami, kdykoli sesíláš nebo kanáluješ kouzlo, a nese jméno kouzla a zbývající čas. Tvůj cíl má na svém rámu vlastní lištu sesílání, takže vidíš, co přichází, a můžeš na to zareagovat.\n\nPod tvou lištou sesílání sedí tenká lišta švihu, která se plní mezi švihy tvé zbraně, takže útočník na blízko nebo na dálku vidí, kdy dopadne další automatický zásah.\n\nTvá lišta zkušeností běží přes celou šířku pod akčními lištami, rozdělená do úseků, se světlejším pruhem, který ukazuje naspořené odpočaté zkušenosti.\n\nPlav pod vodou a nahoře na obrazovce se objeví modrá lišta dechu. Vyprazdňuje se, dokud máš hlavu pod hladinou, jakmile dojde, zabliká červeně a začneš se topit, a jakmile se vynoříš, rychle se doplní. Mezerník tě žene nahoru a klávesa Plavat dolů, ve výchozím stavu Ctrl, tě táhne hlouběji.\n\nPoškození a léčení vyplouvají nad tím, co zasáhly, jako malá čísla, takže boj přečteš, aniž bys musel číst text. Záložka Bojový záznam v tvém chatu drží úplný písemný záznam.",
@@ -11227,6 +11286,7 @@ export const cs_CZ: EnTranslations = {
     "lockoutRaids": "Raidy",
     "lockoutDungeons": "Dungeony",
     "lockoutWorldBosses": "Světoví bossové",
+    "lockoutWeeklyQuests": "Weekly quests",
     "takeOverConfirm": "Tímto odpojíš tuto postavu z jiné relace a přesuneš ji sem. Pokračovat?",
     "renameRequired": "vyžaduje přejmenování",
     "delete": "Smazat",
@@ -15829,6 +15889,30 @@ export const cs_CZ: EnTranslations = {
       "fenshadow_maul": {
         "name": "Palice bahenního stínu"
       },
+      "foremans_barrowmaul": {
+        "name": "Předákovo mohylové kladivo"
+      },
+      "skerrits_shardpike": {
+        "name": "Skerritova střepová píka"
+      },
+      "loomshard_eye": {
+        "name": "The Barrowglass Eye"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Mohylové nárameníky"
+      },
+      "mirestone_stride": {
+        "name": "Bahnokamenný krok"
+      },
+      "foremans_wage_band": {
+        "name": "Prsten předákovy mzdy"
+      },
+      "mirelight_locket": {
+        "name": "Medailon bažinného světla"
+      },
+      "fenwright_grips": {
+        "name": "Rukavice bažinného řemeslníka"
+      },
       "wildgrove_cinch": {
         "name": "Opasek divoké hájovny"
       },
@@ -18451,6 +18535,27 @@ export const cs_CZ: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Bojová hůl Předvoje"
       },
+      "muster_shardpike": {
+        "name": "Muster Shardpike"
+      },
+      "knucklebone_of_balgath": {
+        "name": "Knucklebone of Balgath"
+      },
+      "muster_standard": {
+        "name": "Muster Standard"
+      },
+      "guttered_eye": {
+        "name": "The Guttered Eye"
+      },
+      "barrowstone_heart": {
+        "name": "Barrowstone Heart"
+      },
+      "muster_grapnel": {
+        "name": "Muster Grapnel"
+      },
+      "craterglass_stave": {
+        "name": "Craterglass Stave"
+      },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"
       },
@@ -19725,8 +19830,26 @@ export const cs_CZ: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, probouzející se štít"
       },
+      "balgath_cyclops": {
+        "name": "Balgath, the One-Eyed Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Probuzený bouřník"
+      },
+      "muster_footman": {
+        "name": "Muster Footman"
+      },
+      "muster_chaplain": {
+        "name": "Muster Chaplain"
+      },
+      "muster_sergeant": {
+        "name": "Muster Sergeant"
+      },
+      "muster_drillmaster": {
+        "name": "Muster Drillmaster"
+      },
+      "muster_effigy": {
+        "name": "Straw Foreman"
       },
       "stable_horse": {
         "name": "Stájový kůň"
@@ -20375,6 +20498,16 @@ export const cs_CZ: EnTranslations = {
         "name": "Strážce Fenwick",
         "title": "Strážce Fenbridge",
         "greeting": "Zastav se u brány, {className}. Za tím rákosím zabíjí močál za nás."
+      },
+      "socketwright_skerrit": {
+        "name": "Maben Skerrit",
+        "title": "the Socketwright",
+        "greeting": "Forty years since I ground that eye and set it in his socket, and never a day paid. You want to hurt the Foreman, {className}? Aim for my work."
+      },
+      "muster_commander": {
+        "name": "Muster Commander",
+        "title": "Fenbridge Muster",
+        "greeting": "Pikes first, {className}, then everyone. That is the whole of it, and it has kept this camp alive."
       },
       "brother_aldric_fen": {
         "name": "Bratr Aldric",
@@ -21114,6 +21247,52 @@ export const cs_CZ: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Fenbridgeský svolávací rozkaz"
+          }
+        }
+      },
+      "q_muster_summons": {
+        "title": "The Muster's Summons",
+        "text": "Every spear I could spare is dug in around the Starfall Crater, {playerName}, ringing the thing that walks out of it. The Muster Commander holds the camp on the southern rise above the crater, south-east of here. Report to the Commander. You will be told how we fight him, and you will listen, because the ones who did not are in the reeds.",
+        "completion": "Fenwick's runner, is it? Good. Listen, because I say this once and he never says it at all. Balgath walks our pickets: the crater rim, the west flats, the south rise, the gap on the south-west rim, and round again, and every post he stops at, he flattens. Steel does not bite him. His hide turns it, and a raid that hacks at him only dies tired. The one weakness is his eye. A braced pike through the Barrowglass blinds him, and while he is blind his hide sloughs off: that is when the whole raid hits him, and hits hard. Then it closes over and we wait for the next chance. The rack lends its pikes to recruits of level 19 or lower: the young ones put the eye out, the veterans make the window count. Pikes first, {playerName}, then everyone.",
+        "objectives": {
+          "0": {
+            "label": "Report to the Muster Commander"
+          }
+        }
+      },
+      "q_muster_pike_drill": {
+        "title": "Pikes First",
+        "text": "Talk is cheap and pikes are not, and the rack lends them only to recruits of level 19 or lower. Take a Shardpike off the rack beside me, then walk to the Straw Foreman at the west end of camp: the lads built him out of planks and straw, half the size of the real one, with a lantern where the eye goes. Couch the pike and hold the point true while the drillmaster pounds the ground, because the real one shakes it harder. When your arms are sure, put the point through the lantern. His planks will come off: then hit him with your own weapon, {playerName}, and feel the difference.",
+        "completion": "You felt it bite, did you? On the real one that is fourteen breaths with the whole raid swinging, and then his hide closes over again. Keep the lesson. The Foreman will test it.",
+        "objectives": {
+          "0": {
+            "label": "Shardpike taken from the muster rack"
+          },
+          "1": {
+            "label": "Straw Foreman's lantern put out"
+          },
+          "2": {
+            "label": "Blows landed while its planks are down"
+          }
+        }
+      },
+      "q_muster_trophy": {
+        "title": "A Chip Off the Foreman",
+        "text": "Every week he stands back up, and every week we knock him down again. That takes a raid, and the muster cannot raise one on its own. Find the next raid that goes after Balgath and help bring him down, {playerName}. Strike him, shield the ones who do, or mend them: every hand that fights him counts. When he falls, come back and report to me. The muster pays for every kill.",
+        "completion": "Down again, and you were in the fight that did it. Fenbridge will have my report tonight. The purse is thin this far out, but it is yours. Come back when he is up again.",
+        "objectives": {
+          "0": {
+            "label": "Balgath slain"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "The Socketwright's Due",
+        "text": "I set the Barrowglass in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
+        "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
+        "objectives": {
+          "0": {
+            "label": "The Foreman's eye put out"
           }
         }
       },
@@ -23298,6 +23477,12 @@ export const cs_CZ: EnTranslations = {
           },
           "7": {
             "label": "Potopená bašta"
+          },
+          "8": {
+            "label": "Mohylové panství"
+          },
+          "9": {
+            "label": "Kráter padlé hvězdy"
           }
         }
       },
@@ -24381,6 +24566,7 @@ export const cs_CZ: EnTranslations = {
     "mailboxName": "Poštovní schránka",
     "noticeboardName": "Vývěska",
     "farmPatchName": "Zahradní políčka",
-    "realmBuilderMonumentName": "Památník Realm Builder"
+    "realmBuilderMonumentName": "Památník Realm Builder",
+    "musterRackName": "Muster Weapon Rack"
   }
 };

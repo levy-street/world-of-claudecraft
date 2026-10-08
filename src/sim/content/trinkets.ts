@@ -92,7 +92,50 @@ export type TrinketUse =
   /** Heart of the Crucible: spend every heat stack on a fire nova within
    *  `radius`, `flat` (+ `coef` of Attack Power) fire damage per stack, that
    *  taunts every creature it hits. */
-  | { kind: 'heartNova'; radius: number; flat: number; coef: number };
+  | { kind: 'heartNova'; radius: number; flat: number; coef: number }
+  // ---- Balgath, the One-Eyed Foreman (combat/balgath_trinkets.ts) ----
+  /** Knucklebone of Balgath: take the Shape of the Foreman for `duration`: the
+   *  cyclops's body (its own abilities, same buttons, same damage), `armorPct`%
+   *  more armor and immunity to knockbacks. */
+  | { kind: 'foremanShape'; duration: number; armorPct: number }
+  /** Muster Standard: plant a standard; `soldiers` muster soldiers rally from it
+   *  for `duration`, march at your side and fight your target in melee, swinging
+   *  every `attackInterval` sec for `min` to `max` (+ `coef` of Attack Power, the
+   *  higher of melee and ranged, snapshotted when planted) Physical damage. Each
+   *  has `hpShare` of your maximum health. Left more than `leash` yd behind they
+   *  rejoin you; they leave with the standard or on your death. */
+  | {
+      kind: 'musterStandard';
+      duration: number;
+      soldiers: number;
+      attackInterval: number;
+      min: number;
+      max: number;
+      coef: number;
+      hpShare: number;
+      leash: number;
+      moveSpeed: number;
+    }
+  /** The Guttered Eye: channel a beam `length` yd straight ahead for `duration`;
+   *  every `every` sec it deals `flat` (+ `coef` of Spell Power) Arcane damage to
+   *  up to `maxTargets` enemies in the line (`halfWidth` yd either side). You may
+   *  turn to sweep it; moving ends it. */
+  | {
+      kind: 'gutteredGlare';
+      duration: number;
+      every: number;
+      length: number;
+      halfWidth: number;
+      flat: number;
+      coef: number;
+      maxTargets: number;
+    }
+  /** Muster Grapnel: hook a party or raid member within `range` yd (in line of
+   *  sight) and haul them through the air to your side in `flight` sec. */
+  | { kind: 'grapnel'; range: number; flight: number; apex: number; heal: number; coef: number }
+  /** A passive-only trinket (the Barrowstone Heart): nothing to use; the action
+   *  bar refuses the press and the tooltip prints no Use line. */
+  | { kind: 'passiveOnly' };
 
 /** What a trinket does on its own while worn. */
 export type TrinketPassive =
@@ -119,10 +162,15 @@ export type TrinketPassive =
   | { kind: 'ignite'; ticks: number; flat: number; coef: number }
   /** Heart of the Crucible: each parry, dodge or block you make adds a heat
    *  stack, up to `max`, kept for `duration`. */
-  | { kind: 'guardHeat'; max: number; duration: number };
+  | { kind: 'guardHeat'; max: number; duration: number }
+  /** Barrowstone Heart: a hit that would kill you turns you into a stone statue
+   *  for `statue` sec instead (immune to damage, unable to move or act), after
+   *  which you return at `restore` of your maximum health. Its internal cooldown
+   *  is the spec's `cooldown`. */
+  | { kind: 'stoneHeart'; statue: number; restore: number };
 
 export interface TrinketSpec {
-  /** Seconds between uses. */
+  /** Seconds between uses (for a passive-only trinket: its internal cooldown). */
   cooldown: number;
   use: TrinketUse;
   passive?: TrinketPassive;
@@ -155,6 +203,10 @@ export const TRINKET_AURA = Object.freeze({
   pierce: 'trinket_pierce',
   lantern: 'trinket_lantern',
   guardHeat: 'trinket_crucible_heat',
+  foremanShape: 'trinket_foreman_shape',
+  musterStandard: 'trinket_muster_standard',
+  gutteredGlare: 'trinket_guttered_glare',
+  stoneStatue: 'trinket_barrowstone_statue',
 });
 
 /** The Mooring Stone's self-slow rides its own aura id beside the anchor
@@ -192,6 +244,10 @@ export const TRINKET_AURA_ITEM: Readonly<Record<string, string>> = Object.freeze
   [TRINKET_AURA.pierce]: 'molten_fletching',
   [TRINKET_AURA.lantern]: 'last_flame_lantern',
   [TRINKET_AURA.guardHeat]: 'heart_of_the_crucible',
+  [TRINKET_AURA.foremanShape]: 'knucklebone_of_balgath',
+  [TRINKET_AURA.musterStandard]: 'muster_standard',
+  [TRINKET_AURA.gutteredGlare]: 'guttered_eye',
+  [TRINKET_AURA.stoneStatue]: 'barrowstone_heart',
 });
 
 /** The cooldown key a trinket's use rides in the wearer's cooldown map (wired to
@@ -263,7 +319,26 @@ export const TRINKET_ITEMS: Record<string, ItemDef> = {
   molten_fletching: trinket('molten_fletching', 'Molten Fletching', { agi: 15 }),
   last_flame_lantern: trinket('last_flame_lantern', 'Last Flame Lantern', { spi: 15 }),
   heart_of_the_crucible: trinket('heart_of_the_crucible', 'Heart of the Crucible', { sta: 15 }),
+  // Balgath, the One-Eyed Foreman (the Mirefen world boss, content/zone2.ts): five
+  // personal-loot trinkets at his item level 26 (a level-20 world boss epic), whose
+  // trinket line is 11 points on one attribute (tests/item_level.test.ts).
+  knucklebone_of_balgath: trinket('knucklebone_of_balgath', 'Knucklebone of Balgath', {
+    str: 11,
+  }),
+  muster_standard: trinket('muster_standard', 'Muster Standard', { sta: 11 }),
+  guttered_eye: trinket('guttered_eye', 'The Guttered Eye', { int: 11 }),
+  barrowstone_heart: trinket('barrowstone_heart', 'Barrowstone Heart', { sta: 11 }),
+  muster_grapnel: trinket('muster_grapnel', 'Muster Grapnel', { int: 11 }),
 };
+
+/** Balgath's five trinkets, in the order they sit in his loot table. */
+export const BALGATH_TRINKET_ITEM_IDS: readonly string[] = [
+  'knucklebone_of_balgath',
+  'muster_standard',
+  'guttered_eye',
+  'barrowstone_heart',
+  'muster_grapnel',
+];
 
 // The Crucible of the Last Spring raid trinkets, in the order they sit in their
 // bosses' loot. They drop on BOTH difficulties: in each boss's Normal-only
@@ -367,6 +442,61 @@ export const TRINKET_SPECS: Readonly<Record<string, TrinketSpec>> = Object.freez
     cooldown: 60,
     use: { kind: 'heartNova', radius: 10, flat: 8, coef: 0.05 },
     passive: { kind: 'guardHeat', max: 10, duration: 30 },
+  },
+  // Balgath's five (combat/balgath_trinkets.ts). The numbers sit beside the
+  // shipped trinkets and class kit they compete with: the soldiers' swing is the
+  // hunter Stampede's shape (a flat range plus a small power share, snapshotted)
+  // on a longer cooldown and fewer bodies.
+  knucklebone_of_balgath: {
+    cooldown: 120,
+    use: { kind: 'foremanShape', duration: 15, armorPct: 50 },
+  },
+  muster_standard: {
+    cooldown: 120,
+    use: {
+      kind: 'musterStandard',
+      duration: 15,
+      soldiers: 2,
+      attackInterval: 2,
+      min: 15,
+      max: 21,
+      coef: 0.07,
+      hpShare: 0.35,
+      leash: 40,
+      moveSpeed: 7.5,
+    },
+  },
+  // The glare is budgeted against its sister, the Muster Standard: same boss, same item
+  // level, same 2 min cooldown, so the same base damage. Two soldiers swing 7.5 times each
+  // in their 15 sec for 18 on average: 270 to one target. The glare's six ticks of 45 are
+  // that 270, front-loaded into 3 sec and laid on everything in the line. It shipped at
+  // 18 a tick (108 in all), well under the 3 sec of ordinary casting the channel costs a
+  // level 20 caster, which is why it read as a trinket that did nothing (owner playtest).
+  // The Spell Power share stays the classic one for an area channel: 3 sec / 3.5 halved
+  // for hitting many, spread over six ticks (about 0.07, rounded up to 0.08).
+  guttered_eye: {
+    cooldown: 120,
+    use: {
+      kind: 'gutteredGlare',
+      duration: 3,
+      every: 0.5,
+      length: 30,
+      halfWidth: 1.25,
+      flat: 45,
+      coef: 0.08,
+      maxTargets: 8,
+    },
+  },
+  barrowstone_heart: {
+    cooldown: 180,
+    use: { kind: 'passiveOnly' },
+    passive: { kind: 'stoneHeart', statue: 3, restore: 0.2 },
+  },
+  muster_grapnel: {
+    cooldown: 90,
+    // The haul lands with a heal: 120 plus 40% of Healing Power (about a classic rank-4
+    // Flash Heal's weight, the 1.5 / 3.5 direct-heal coefficient), on a 90 sec cooldown.
+    use: { kind: 'grapnel', range: 30, flight: 0.6, apex: 2.4, heal: 120, coef: 0.4 },
   },
 });
 

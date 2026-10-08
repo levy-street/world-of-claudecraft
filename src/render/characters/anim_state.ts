@@ -1,3 +1,5 @@
+import type { AuraIdFact } from './aura_idle_core';
+
 /** Renderer-derived animation inputs (same facts the old pose machine used). */
 export interface AnimState {
   /** horizontal speed, world units/sec */
@@ -50,9 +52,17 @@ export interface AnimState {
    *  from a mob's live aggro target or a player's targeted auto-attack, so peers brace
    *  identically with no new wire traffic. Display-only; never gates gameplay. */
   combat?: boolean;
+  /** A mob that keeps hours is in bed (Entity.asleep, mob/slumber.ts): the sleep
+   *  loop outranks every locomotion and posture state below it. */
+  asleep?: boolean;
+  /** The body's live aura list, by reference (never copied): a rig whose ClipMap
+   *  names `idleByAura` holds that loop in place of its idle while one rides
+   *  (aura_idle_core.ts). */
+  auras?: readonly AuraIdFact[];
 }
 
 export type BaseState =
+  | 'sleep'
   | 'idle'
   /** Standing, but engaged: the braced guard loop, not the relaxed idle. */
   | 'combatIdle'
@@ -151,10 +161,16 @@ export function isSwimmingAtDepth(
   dead: boolean,
   feetDepth: number,
   floorDepth: number,
+  wadeDepth?: number,
 ): boolean {
   if (dead || !Number.isFinite(feetDepth) || !Number.isFinite(floorDepth)) return false;
   const minFeetDepth = previous ? SWIM_EXIT_FEET_DEPTH : SWIM_ENTER_FEET_DEPTH;
-  const minFloorDepth = previous ? SWIM_EXIT_FLOOR_DEPTH : SWIM_ENTER_FLOOR_DEPTH;
+  // A body that WADES (MobTemplate.wadeDepth, the sim keeps its feet on the bed through
+  // this much water) swims only past that depth, whatever a human-sized swimmer would do.
+  // Without it a thirteen-yard giant in two yards of fen would latch the swim pose the
+  // moment his boots went under and be pitched prone across the surface of a puddle.
+  const minFloorDepth =
+    wadeDepth !== undefined ? wadeDepth : previous ? SWIM_EXIT_FLOOR_DEPTH : SWIM_ENTER_FLOOR_DEPTH;
   return feetDepth >= minFeetDepth && floorDepth >= minFloorDepth;
 }
 
@@ -264,6 +280,24 @@ export function waterContactFrameMode(
 ): WaterContactFrameMode {
   if (editorCamera || !visible) return 'forget';
   return contactSeen ? 'track' : 'seed';
+}
+
+// ---------------------------------------------------------------------------
+// Held guard
+//
+// A rig whose battle stance is a RAISE that ends on the held guard (ClipMap
+// combatIdleHold: the KayKit `Block`) must not loop it, or the shield drops and
+// comes back up once a second for as long as the body is braced. The base
+// action plays once and clamps on its last frame instead, the same held-base
+// treatment a sit-down or a held jump gets.
+
+/** True when this base state's clip should play ONCE and clamp (the held guard)
+ *  rather than loop. Pure: visual.ts isOnce() asks it for the combatIdle action. */
+export function combatIdleClamps(
+  baseState: BaseState,
+  combatIdleHold: boolean | undefined,
+): boolean {
+  return baseState === 'combatIdle' && combatIdleHold === true;
 }
 
 // ---------------------------------------------------------------------------
@@ -427,7 +461,12 @@ export function desiredBaseState(
   hasCombatIdleClip = false,
   hasProwlIdleClip = false,
   hasProwlWalkClip = false,
+  hasSleepClip = true,
 ): BaseState {
+  // In bed. Same rule as wade: a rig with no sleep clip must not enter the state at
+  // all, or it would hold its idle at a tempo nothing authored (baseAction falls back
+  // to idle, but the machine would still believe it was asleep).
+  if (s.asleep && hasSleepClip) return 'sleep';
   if (s.swimming) {
     // A swimmer who stops treads water rather than stroking on the spot; a
     // swimmer who moves picks the stroke for their depth: surface crawl above

@@ -185,8 +185,10 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // dispatched beside bg_flag), at the second release/v0.44.0 base merge: 243/257/14.
 // The third release/v0.44.0 base merge adds the market buy orders (three
 // commands) and guild custom ranks (guild_set_ranks): 247/261/14.
-const EXPECTED_SEND_COUNT = 247;
-const EXPECTED_DISPATCH_COUNT = 261;
+// The Mirefen world-boss branch adds the Shardpike trial's three commands (lance_brace,
+// lance_thrust, lance_release), each a send plus a dispatch: 250/264/14.
+const EXPECTED_SEND_COUNT = 250;
+const EXPECTED_DISPATCH_COUNT = 264;
 const EXPECTED_DISPATCH_ONLY_COUNT = 14;
 
 // The chat sub-channel routing switch (server/game.ts `switch

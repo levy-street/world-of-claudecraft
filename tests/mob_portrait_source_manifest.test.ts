@@ -103,7 +103,9 @@ describe('mob portrait source manifest', () => {
     // Mother of Mushrooms, the first cave boss, with her sporeling and her
     // Bloated Cap. 270: the other three cave bosses (Deeprake, the Colossal Bat,
     // the Voracious Chest) and the bat's swarm.
-    expect(liveIds).toHaveLength(270);
+    // 276: plus the Mirefen world-boss branch's six (balgath_cyclops, muster_footman,
+    // muster_chaplain, muster_sergeant, muster_drillmaster, muster_effigy).
+    expect(liveIds).toHaveLength(276);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

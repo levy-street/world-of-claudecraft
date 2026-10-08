@@ -41,7 +41,7 @@ const n = (v: number) => formatNumber(v, { maximumFractionDigits: 0 });
 
 // The whole English line set per trinket for VIEWER, written out literally so a
 // change to a number, a clause or the cooldown fails here.
-const EXPECTED: Record<string, { equip?: string; use: string }> = {
+const EXPECTED: Record<string, { equip?: string; use?: string }> = {
   bastion_sigil: {
     equip:
       'Equip: Taking damage while below 35% health grants a shield that absorbs 750 damage (15% of your maximum health) for 10 sec. Can occur once every 90 sec.',
@@ -111,6 +111,22 @@ const EXPECTED: Record<string, { equip?: string; use: string }> = {
       'Equip: Each attack you parry, dodge or block adds a heat stack, up to 10. Heat lasts 30 sec, refreshed whenever you gain a stack.',
     use: 'Use: Spend all heat stacks on a fire nova that deals 8 (+25) Fire damage per stack (330 at 10 stacks) to each enemy within 10 yd and taunts every creature it hits. Damage increases with Attack Power. Requires a heat stack. (1 min cooldown)',
   },
+  // Balgath's five (combat/balgath_trinkets.ts). The Heart is passive-only: no Use line.
+  knucklebone_of_balgath: {
+    use: 'Use: Take the Shape of the Foreman for 15 sec: you become the one-eyed cyclops and fight with your fists, keeping every ability and its damage. You gain 50% armor and cannot be knocked back. Dismounts you. (2 min cooldown)',
+  },
+  muster_standard: {
+    use: 'Use: Plant a Muster Standard at your feet. For 15 sec, 2 muster soldiers march at your side and fight your target in melee, each hitting every 2 sec for 15 to 21 (+35) Physical damage. They attack only your target, and only once it is already in combat. Each has 35% of your maximum health. Left more than 40 yd behind, they rejoin you at once. They leave when the standard falls or when you die. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, set when you plant it. (2 min cooldown)',
+  },
+  guttered_eye: {
+    use: 'Use: Channel for 3 sec: a beam 30 yd long bursts from you the way you face and deals 45 (+24) Arcane damage every 0.5 sec to up to 8 enemies in its path (414 to each over the full channel). Turn to sweep it; moving or casting ends it. Damage increases with Spell Power. (2 min cooldown)',
+  },
+  barrowstone_heart: {
+    equip: `Equip: When a hit would kill you, you turn to stone for 3 sec instead: you take no damage and cannot move or act, then return with ${n(1000)} health (20% of your maximum health). Can occur once every 3 min. Never in duels or arena matches, which end at the killing blow.`,
+  },
+  muster_grapnel: {
+    use: 'Use: Hook a party or raid member within 30 yd that you can see and haul them through the air to your side, healing them for 120 (+160) when they land. It cannot pull enemies, or allies in a vehicle, on a ship, turned to stone or held by an effect that cannot be broken. Healing increases with Healing Power. (90 sec cooldown)',
+  },
 };
 
 function wearing(itemId: string, seed = 11): Sim {
@@ -141,7 +157,7 @@ function shownTotal(text: string, before: string, after: string): number {
 }
 
 describe('trinket tooltip lines', () => {
-  it('covers exactly the eighteen trinkets', () => {
+  it("covers exactly the twenty-three trinkets (the eighteen plus Balgath's five)", () => {
     expect(Object.keys(EXPECTED).sort()).toEqual(Object.keys(TRINKET_ITEMS).sort());
     expect(Object.keys(TRINKET_SPECS).sort()).toEqual(Object.keys(TRINKET_ITEMS).sort());
   });
@@ -150,11 +166,17 @@ describe('trinket tooltip lines', () => {
     const lines = trinketTooltipLineTexts(id, VIEWER);
     const expected = EXPECTED[id];
     const passive = TRINKET_SPECS[id].passive;
+    // A passive-only trinket (the Barrowstone Heart) prints no Use line.
+    const usable = TRINKET_SPECS[id].use.kind !== 'passiveOnly';
     // An Equip line exactly when the trinket has a passive, always before the Use line.
-    expect(lines.map((l) => l.kind)).toEqual(passive ? ['equip', 'use'] : ['use']);
+    expect(lines.map((l) => l.kind)).toEqual([
+      ...(passive ? ['equip'] : []),
+      ...(usable ? ['use'] : []),
+    ]);
     expect(expected.equip !== undefined).toBe(passive !== undefined);
+    expect(expected.use !== undefined).toBe(usable);
     if (expected.equip) expect(lines[0].text).toBe(expected.equip);
-    expect(lines[lines.length - 1].text).toBe(expected.use);
+    if (expected.use) expect(lines[lines.length - 1].text).toBe(expected.use);
   });
 
   it('renders the lines as green tooltip rows, and nothing for a non-trinket', () => {

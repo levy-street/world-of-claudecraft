@@ -1,0 +1,11 @@
+{
+  "note": "The Craterglass Stave (Balgath loot, held weapon): ONE GLB, root Craterglass_Stave (origin at the grip, staff convention y -0.912 to 1.368) with Stave_Shaft, Stave_Head and the Socket_Core empty. The raw GLB comes from the deterministic Blender factory scripts/assets/craterglass_stave/model.py, driven by export_craterglass_stave.mjs, which stamps the source fingerprint and runs this spec. Vertex-coloured, texture-free (no KTX2 step), original work with no reference image.",
+  "items": [
+    {
+      "src": "tmp/asset_src/craterglass_stave/craterglass_stave.glb",
+      "out": "models/weapons/craterglass_stave.glb",
+      "type": "static",
+      "keepExtras": true
+    }
+  ]
+}

@@ -62,6 +62,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Thunzharr, de Ontwakende Piek',
     desc: 'Persoonlijke epische buit van de wereldbaas van de Ontwakende Piek.',
   },
+  conquerors_balgath: {
+    name: 'Balgath, de Begraven Opzichter',
+    desc: 'Buit teruggesleept uit de grafheuvels van Mirefen.',
+  },
   conquerors_collapsed_reliquary: {
     name: 'Het Ingestorte Reliekschrijn',
     desc: 'Kenmerkende zeldzame stukken uit de te forceren kist van het Ingestorte Reliekschrijn.',

@@ -1,0 +1,11 @@
+{
+  "note": "The Guttered Eye (Balgath loot): ONE GLB, root Guttered_Eye with Eye_Lens (the GutteredEyeGlow crystal, burnt pupil and cracks), Eye_Cage (iron socket, claws, sinew) and the Socket_Beam empty. The raw GLB comes from the deterministic Blender factory scripts/assets/guttered_eye/model.py, driven by export_guttered_eye.mjs, which stamps the source fingerprint and runs this spec. Vertex-coloured, texture-free (no KTX2 step), original work with no reference image.",
+  "items": [
+    {
+      "src": "tmp/asset_src/guttered_eye/guttered_eye.glb",
+      "out": "models/vfx/guttered_eye.glb",
+      "type": "static",
+      "keepExtras": true
+    }
+  ]
+}

@@ -18,6 +18,7 @@
 // garbage on the hot path), mirroring the speedStreaksInto / cameraSpace out-param
 // idiom elsewhere in src/render.
 
+import { MUSTER_RACK_TEMPLATE_ID } from '../sim/content/mirefen_muster';
 import { isFeastTemplateId } from '../sim/professions/feast';
 import { isMobileStationTemplateId } from '../sim/professions/mobile_station_object';
 import { HOARD_BROOD_EGG_TEMPLATE } from '../sim/rift/hoard_boss_kits';
@@ -152,6 +153,10 @@ export function nameplatePlanInto(
   const feastNear =
     (isFeastTemplateId(e.templateId) || isMobileStationTemplateId(e.templateId)) &&
     d2 <= (INTERACT_RANGE + 1) * (INTERACT_RANGE + 1);
+  // The muster's weapon rack (its art is the camp's, its entity a pick volume) labels
+  // the same way, so the one thing to click at the command camp names itself up close.
+  const rackNear =
+    e.templateId === MUSTER_RACK_TEMPLATE_ID && d2 <= (INTERACT_RANGE + 1) * (INTERACT_RANGE + 1);
 
   out.hidden =
     (isSelf && !hasOverheadEmote && !showOwnNameplate) ||
@@ -161,7 +166,7 @@ export function nameplatePlanInto(
     (isDoor && e.dungeonId === UNLABELED_DOOR_DUNGEON_ID) ||
     (!standIn &&
       (d2 > NAMEPLATE_RANGE_SQ ||
-        (e.kind === 'object' && !isDoor && !delveInteractNear && !feastNear) ||
+        (e.kind === 'object' && !isDoor && !delveInteractNear && !feastNear && !rackNear) ||
         (!showNameplates && e.kind === 'mob' && !e.dead) ||
         (!showPlayerNameplates && e.kind === 'player' && !isSelf && e.id !== player.targetId)));
   out.anchorYOffset =

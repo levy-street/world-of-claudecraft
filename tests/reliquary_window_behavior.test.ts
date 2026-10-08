@@ -79,13 +79,20 @@ vi.mock('../src/ui/icons', async (importOriginal) => ({
 // a page-level sourceDefault, so its missing cells exercise the two-part
 // "bossDungeon" source arm rather than the degenerate one.
 const PAGE_ID = 'conquerors_hollow_crypt';
-// The Horizons mounts page: seven mounts name every door that awards their
+// The Horizons mounts page: eight mounts name every door that awards their
 // reins and two remain content gaps, so it is the page that exercises BOTH the
 // hinted and the un-hinted arm at once.
 const UNHINTED_PAGE_ID = 'horizons_mounts';
 // The mount the catalog leaves un-hinted (no live table awards it), for the
 // missing cell that must render NO source line rather than an invented one.
-const UNHINTED_MOUNT_ID = 'drakemaw_raptor';
+// This was drakemaw_raptor until the Mirefen world boss gave those reins a real
+// door (a personal drop from balgath_cyclops), which turned the un-hinted arm
+// into a hinted one. lanternback_troll is the gap that remains; the catalog
+// still leaves terrorspark_groundshaker un-hinted too, so the arm has a spare.
+// The premise is asserted in the test itself, not assumed here: if the last
+// gap ever closes, that assertion reds rather than the arm quietly testing a
+// hinted relic.
+const UNHINTED_MOUNT_ID = 'lanternback_troll';
 // A Sanctum relic content really awards through three comparable doors, for the
 // multi-source tooltip and the joined aria label.
 const MULTI_SOURCE_PAGE_ID = 'conquerors_gravewyrm_sanctum';

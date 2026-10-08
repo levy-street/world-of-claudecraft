@@ -386,7 +386,10 @@ describe('the reference warrior is a CALIBRATION CONSTANT, and the catalog must 
     // the id-ordered tie lands on the first trinket the warrior can wear and
     // its stamina line (+13, 130 HP) joins the pool. The armor pin above did
     // not move; the floors are not retuned here, the same maintainer decision.
-    expect(a.maxHp, 'and its pool').toBe(2052);
+    // Re-pinned 2052 -> 2032 with Balgath's trinkets: the id-ordered tie now lands on
+    // barrowstone_heart, which sorts first and carries +11 Stamina (110 HP) instead of
+    // +13. Same tie-break, same armor pin, floors not retuned.
+    expect(a.maxHp, 'and its pool').toBe(2032);
   });
 
   it('REF_ARMOR provenance: the readings the comments quote are derived, not hand-carried', () => {

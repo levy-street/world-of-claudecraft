@@ -1,3 +1,4 @@
+import { insideRingGap } from '../boss_ring_gap';
 import { gliderActionsLocked } from '../glider_action_lock';
 import { deferHoardTerrify } from '../rift/hoard_control_casts';
 import { hasShadowCloak } from '../shadow_action_lock';
@@ -103,6 +104,11 @@ import { VARKHUL_WORK_FACING } from '../varkhul_forge_intermission';
 import { groundHeight, waterLevelAt } from '../world';
 import { MAX_AGGRO_RADIUS, MAX_WANDER_RADIUS, MIN_WANDER_RADIUS } from './aggro_ranges';
 import { isAmbientMob, updateAmbientMob } from './ambient';
+import { splashNearbyMobs } from './boss_collateral';
+import { tickBossCorpseSink } from './boss_corpse_sink';
+import { resetBossRangedMechanics, tickBossRangedMechanics } from './boss_ranged_mechanics';
+import { launchFromSlam, resetBossSlams, tickBossSlams } from './boss_slams';
+import { resetBossStarwake, tickBossStarwake } from './boss_starwake';
 import {
   cancelMobChargeDash,
   resetMobCharge,
@@ -112,9 +118,11 @@ import {
 import { holdPinnedMob, updateMobCombatProfile } from './combat_profile';
 import { applyBroodBurn } from './dragonkin_brood';
 import { resetDungeonMinibossStomp, updateDungeonMinibossStomp } from './dungeon_miniboss_stomp';
+import { tickEyeWard } from './eye_ward';
 import { idleRng, wanderPause } from './idle_rng';
 import { resetIgnivarTrashAutomaton, updateIgnivarTrashAutomaton } from './ignivar_trash_automata';
 import { immobileEvadeSnapsHome } from './immobile_evade';
+import { levelScaledMechanicDamage } from './mechanic_level_scale';
 import {
   claimMechanicSpacing,
   mechanicSlotHeld,
@@ -122,6 +130,7 @@ import {
   resetMechanicSpacing,
   tickMechanicSpacing,
 } from './mechanic_spacing';
+import { holdMusterSoldier, isMusterSoldier } from './muster_soldier';
 import { playerDummyShedHp } from './practice_dummies';
 import {
   impairedZoneFuseMult,
@@ -131,8 +140,10 @@ import {
   resetRiftMechanicWindups,
   riftEscapeWindowActive,
 } from './rift_escape_window';
+import { tickSlumber } from './slumber';
 import { rallyFleeingAllies } from './social_aggro';
 import { isTrivialTo, retargetMob, tickForcedTarget } from './targeting';
+import { resetWarpath, tickWarpath } from './warpath';
 import { emitMobYell } from './yells';
 
 // This module ENFORCES the aggro ceiling and the wander ring; the numbers themselves live
@@ -235,6 +246,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     mob.respawnTimer -= DT;
     if (mob.lootFfaTimer > 0) mob.lootFfaTimer -= DT; // owner-lock lapses, then loot goes FFA
     expireDecayedCorpseInteractions(ctx, mob);
+    // A giant's corpse sinks out of sight over the end of its window (boss_corpse_sink.ts).
+    tickBossCorpseSink(mob);
     // Death Throes: a volatile corpse counts down its fuse, then detonates once.
     if (mob.detonateTimer !== Infinity) {
       mob.detonateTimer -= DT;
@@ -310,6 +323,18 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     updateHoardGoblinMotion(ctx, mob);
     return;
   }
+
+  // The standing eye ward, reconciled with the clock every alive tick (mob/eye_ward.ts).
+  // Before the special-template early returns on purpose: the ward must exist in every
+  // state the mob can be alive in, idle included. Guarded on the template field and
+  // draws no rng, so every other mob pays one map lookup.
+  tickEyeWard(ctx, mob);
+
+  // The night's sleep (mob/slumber.ts), decided before any AI runs: a sleeper does
+  // nothing this tick (and the hostility safety net below never re-arms him), a boss
+  // walking home to bed does nothing but walk, and everyone else falls through. Guarded
+  // on the template field and the host clock, so every other mob pays one map lookup.
+  if (tickSlumber(ctx, mob) !== 'awake') return;
 
   const dummyTemplate = MOBS[mob.templateId];
   if (dummyTemplate?.dummy) {
@@ -423,6 +448,13 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   // safety net so the horses stay non-hostile.
   if (isAmbientMob(mob)) {
     updateAmbientMob(ctx, mob);
+    return;
+  }
+
+  // A muster soldier holds his post (mob/muster_soldier.ts): never hostile, never in
+  // combat, and returned before the leaked-mob safety net below re-hostiles him.
+  if (isMusterSoldier(mob)) {
+    holdMusterSoldier(ctx, mob);
     return;
   }
 
@@ -691,17 +723,46 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       // countdown itself ticks inside runMobAttackMechanics with the other
       // boss mechanics (melee-gated), so a kited boss does not bank channels.
       if (updateInfernoChannel(ctx, mob)) break;
-      const result = updateMobCombatProfile(ctx, mob, (mode) => {
-        // The anti-kite snare, loud battle cries, and the heroic charge trigger
-        // fire once per engaged tick, from either engaged state (mid-chase is
-        // the kite case they exist for). The windup ticker runs AFTER the
-        // snare: on a detonation tick the snare still sees the window open and
-        // holds, so a slow can never land the same instant as the blast.
+      // The anti-kite snare, loud battle cries, and the heroic charge trigger
+      // fire once per engaged tick, from either engaged state (mid-chase is
+      // the kite case they exist for). The windup ticker runs AFTER the
+      // snare: on a detonation tick the snare still sees the window open and
+      // holds, so a slow can never land the same instant as the blast.
+      const engagedPulse = (mode: 'normal' | 'stationary') => {
         pulseAntiKiteSnare(ctx, mob);
         pulseLoudYell(ctx, mob);
         if (mode === 'normal') tryStartMobCharge(ctx, mob);
         tickRiftMechanicWindups(ctx, mob);
-      });
+        // The aimed slams ride here rather than in the melee-gated mechanics tail for the
+        // same reason the windup ticker above does: a telegraph already drawn has to
+        // resolve wherever the boss has since walked. Starting one is still melee-gated,
+        // inside the module.
+        tickBossSlams(ctx, mob);
+        // Wake of the Fallen Star: its pools burn and a cast in flight resolves in every
+        // phase; it starts ahead of the ranged kit so the lock's next slot is its first
+        // (mob/boss_starwake.ts).
+        tickBossStarwake(ctx, mob);
+        // The ranged-punish kit, after the slams so a slam that claimed the spacing lock
+        // this tick blocks it (mob/boss_ranged_mechanics.ts).
+        tickBossRangedMechanics(ctx, mob);
+      };
+      // A boss walking a WARPATH owns the whole engaged tick while he travels to his next
+      // landmark and while he wrecks it: threat does not steer him through either, so the
+      // combat runner (which exists to close on the threat target) must not run at all.
+      // He falls through in his focus phase, which IS ordinary boss combat. The shared
+      // engaged pulses still fire in every phase: an in-flight telegraph ring has to
+      // count down and detonate wherever he now is, or leaving focus mid-windup would
+      // strand a ring on the ground that never resolves. Inert for every mob whose
+      // template declares no warpath, which today is every mob but one.
+      // An 'evaded' tick is a pull he just gave up (mob/warpath.ts warpathGiveUp): he is
+      // walking home, so, like a leash break in the combat runner, nothing else runs.
+      const warpath = tickWarpath(ctx, mob);
+      if (warpath === 'evaded') break;
+      if (warpath === 'handled') {
+        engagedPulse('normal');
+        break;
+      }
+      const result = updateMobCombatProfile(ctx, mob, engagedPulse);
       if (result === 'runAttackMechanics') runMobAttackMechanics(ctx, mob);
       break;
     }
@@ -874,7 +935,7 @@ function fireAoePulse(
   mob: Entity,
   pulse: NonNullable<MobTemplate['aoePulse']>,
   origin?: Vec3,
-): void {
+): Set<number> {
   // A windup detonation blasts from the telegraphed ring center (origin); the
   // instant path (unstamped mobs) passes nothing and keeps the live position.
   const center = origin ?? mob.pos;
@@ -890,16 +951,28 @@ function fireAoePulse(
   // (the heroic_s x4 multiplier would otherwise cross that line).
   // Mob-invariant, so computed once outside the player loop.
   const capPulse = mobInRiftInstance(ctx, mob);
+  // A ring with a safe gap (boss_ring_gap.ts, the Barrow Smash): the gap is missed.
+  const gap = pulse.safeGap;
+  const struck = new Set<number>();
   for (const meta of ctx.players.values()) {
     const pe = ctx.entities.get(meta.entityId);
-    if (pe && !pe.dead && dist2d(pe.pos, center) <= pulse.radius) {
+    if (!pe || pe.dead) continue;
+    const d = dist2d(pe.pos, center);
+    if (d <= pulse.radius && !(gap && insideRingGap(d, pulse.radius, gap))) {
+      struck.add(pe.id);
       // Heroic scaling multiplies AFTER the draw so the rng stream is
       // identical across difficulties (mechanicDamageMult, difficulty.ts).
       let dmg = Math.round(ctx.rng.range(pulse.min, pulse.max) * (mob.mechanicDamageMult ?? 1));
+      dmg = levelScaledMechanicDamage(mob, pe, dmg);
       if (capPulse) dmg = capRiftNonLethalMechanicDamage(dmg, pe.maxHp);
       ctx.dealDamage(mob, pe, dmg, false, school, pulse.name, 'hit', true);
     }
   }
+  // ...and everything else standing in it, for a template that opts in. The gap is a
+  // refuge for the PLAYERS who read the telegraph: the muster's soldiers and the wildlife
+  // take the whole blast as before, so a fight over a picket still razes it.
+  splashNearbyMobs(ctx, mob, center, pulse.radius, pulse.min, pulse.max, school, pulse.name);
+  return struck;
 }
 
 // The War Stomp slam, extracted verbatim from the driver for the same
@@ -923,11 +996,14 @@ function fireWarStomp(
       entityId: mob.id,
     });
   const capStomp = mobInRiftInstance(ctx, mob);
+  if (stomp.min !== undefined && stomp.max !== undefined)
+    splashNearbyMobs(ctx, mob, center, stomp.radius, stomp.min, stomp.max, school, stomp.name);
   for (const meta of ctx.players.values()) {
     const pe = ctx.entities.get(meta.entityId);
     if (!pe || pe.dead || dist2d(pe.pos, center) > stomp.radius) continue;
     if (stomp.min !== undefined && stomp.max !== undefined) {
       let dmg = Math.round(ctx.rng.range(stomp.min, stomp.max) * (mob.mechanicDamageMult ?? 1));
+      dmg = levelScaledMechanicDamage(mob, pe, dmg);
       if (capStomp) dmg = capRiftNonLethalMechanicDamage(dmg, pe.maxHp);
       ctx.dealDamage(mob, pe, dmg, false, school, stomp.name, 'hit', true);
     }
@@ -973,6 +1049,10 @@ function startRiftMechanicWindup(
     mob.pulseWindupX = mob.pos.x;
     mob.pulseWindupZ = mob.pos.z;
   }
+  // A template-declared telegrapher's ring also names its caster and its mechanic, so his
+  // own render layer can draw it as he means it (the Barrow Smash's safe gap,
+  // render/balgath_ring_fx.ts); a rift boss's ring stays the anonymous generic circle.
+  const named = MOBS[mob.templateId]?.telegraphedMechanics !== undefined;
   ctx.emit({
     type: 'spellfxAt',
     x: mob.pos.x,
@@ -981,8 +1061,76 @@ function startRiftMechanicWindup(
     fx: 'runeCircle',
     radius,
     duration: RIFT_MECHANIC_WINDUP_SEC,
+    ...(named
+      ? { sourceId: mob.id, ability: kind === 'stomp' ? 'mob_stomp_windup' : 'mob_pulse_windup' }
+      : {}),
   });
+  // Animate the windup, for a TEMPLATE-declared telegrapher only.
+  //
+  // The cue is the shipped 'windup' spellfx path (mob_swing.ts's brood_cleave is the
+  // precedent): the renderer routes it through triggerAttack, whose attackByAbility map
+  // picks the authored one-shot. Gated on the template rather than fired for everything
+  // that telegraphs, because a rift boss has no attackByAbility row for these ids and
+  // playAttack would fall through to its ORDINARY swing clip: every rift boss would
+  // start throwing a punch at the start of every ground ring. Rift bosses are stamped at
+  // spawn and carry no such template field, so they keep exactly the visuals they ship.
+  if (MOBS[mob.templateId]?.telegraphedMechanics !== undefined) {
+    ctx.emit({
+      type: 'spellfx',
+      sourceId: mob.id,
+      targetId: mob.id,
+      school,
+      fx: 'windup',
+      ability: kind === 'stomp' ? 'mob_stomp_windup' : 'mob_pulse_windup',
+    });
+  }
   return true;
+}
+
+/**
+ * A POSITIONED impact cue at the ring the players were shown.
+ *
+ * The shared detonations (fireWarStomp / fireAoePulse) emit an entity-anchored `spellfx`
+ * carrying no place and no size, so the renderer can only draw them ON the boss. For a
+ * telegraphed mechanic that is wrong twice over: the damage lands at the ring's snapshot
+ * centre, not wherever he has walked to since, and the effect has no radius so it cannot
+ * be drawn at the size the ring promised. This gives the renderer both, so the flash
+ * lands exactly where the ring was.
+ *
+ * Template-declared telegraphers only, for the same reason as the windup cue: a rift boss
+ * would otherwise start drawing a second, differently-placed impact it never had before.
+ */
+function emitTelegraphedImpact(
+  ctx: SimContext,
+  mob: Entity,
+  center: Vec3,
+  radius: number,
+  school: Aura['school'],
+  /** Only these players are punted, for a blast that is not a solid circle (the gap). */
+  only?: ReadonlySet<number>,
+): void {
+  if (MOBS[mob.templateId]?.telegraphedMechanics === undefined) return;
+  // sourceId, so the renderer can identify the caster EXACTLY. It cannot be inferred
+  // from the position: the whole point of a telegraphed blast is that it lands where the
+  // ring was drawn rather than where the boss now stands, so matching the event's
+  // coordinates against live bodies fails precisely when the mechanic works.
+  ctx.emit({
+    type: 'spellfxAt',
+    sourceId: mob.id,
+    x: center.x,
+    z: center.z,
+    school,
+    fx: 'nova',
+    radius,
+  });
+  // ...and PUNT everyone it caught, for a mob whose template opted into it.
+  //
+  // This sits here rather than inside fireAoePulse/fireWarStomp because those two are
+  // shared by every mob in the world and this is one boss's feel; here it is already
+  // behind the telegraphed-mechanics gate, and both detonations already route through it
+  // with the ring's true centre and radius, which is exactly what a launch needs. One
+  // hook, both slams, and nothing else in the world can reach it.
+  launchFromSlam(ctx, mob, center, radius, only);
 }
 
 // Tick the in-flight instant-mechanic windups and detonate at zero. Runs from
@@ -999,11 +1147,19 @@ function tickRiftMechanicWindups(ctx: SimContext, mob: Entity): void {
     if (mob.stompWindupRemaining === 0) {
       const stomp = MOBS[mob.templateId]?.stomp;
       if (stomp) {
-        fireWarStomp(ctx, mob, stomp, {
+        const center = {
           x: mob.stompWindupX ?? mob.pos.x,
           y: mob.pos.y,
           z: mob.stompWindupZ ?? mob.pos.z,
-        });
+        };
+        fireWarStomp(ctx, mob, stomp, center);
+        emitTelegraphedImpact(
+          ctx,
+          mob,
+          center,
+          stomp.radius,
+          (stomp.school ?? 'physical') as Aura['school'],
+        );
       }
       mob.swingTimer = Math.max(mob.swingTimer, RIFT_POST_MECHANIC_SWING_GAP_SEC);
     }
@@ -1013,15 +1169,72 @@ function tickRiftMechanicWindups(ctx: SimContext, mob: Entity): void {
     if (mob.pulseWindupRemaining === 0) {
       const pulse = MOBS[mob.templateId]?.aoePulse;
       if (pulse) {
-        fireAoePulse(ctx, mob, pulse, {
+        const center = {
           x: mob.pulseWindupX ?? mob.pos.x,
           y: mob.pos.y,
           z: mob.pulseWindupZ ?? mob.pos.z,
-        });
+        };
+        const struck = fireAoePulse(ctx, mob, pulse, center);
+        emitTelegraphedImpact(
+          ctx,
+          mob,
+          center,
+          pulse.radius,
+          (pulse.school ?? 'shadow') as Aura['school'],
+          // A gapped ring punts only whom it hit; whoever stood in the gap stays put.
+          pulse.safeGap ? struck : undefined,
+        );
       }
       mob.swingTimer = Math.max(mob.swingTimer, RIFT_POST_MECHANIC_SWING_GAP_SEC);
     }
   }
+}
+
+// Open a bigCast bar: reseed the cadence past the cast, arm the spacing lock for
+// the bar plus one window, and show the bar. Draws no rng.
+function startBigCast(
+  ctx: SimContext,
+  mob: Entity,
+  bigCast: NonNullable<MobTemplate['bigCast']>,
+): void {
+  mob.bigCastTimer = bigCast.every + bigCast.castTime;
+  claimMechanicSpacing(mob, bigCast.castTime);
+  // The bar is a telegraph: open the escape window to the authored cast
+  // time (a wall-clock deadline; a kite-frozen bar cannot pin it open).
+  openRiftEscapeWindow(ctx, mob, bigCast.castTime);
+  mob.castingAbility = bigCast.castId;
+  mob.castTotal = bigCast.castTime;
+  mob.castRemaining = bigCast.castTime;
+  mob.castTargetId = null;
+  mob.channeling = false;
+  if (bigCast.yell) emitMobYell(ctx, mob, bigCast.yell);
+}
+
+/**
+ * [dev] Start one of a telegraphed boss's own circle mechanics right now, for the
+ * /dev balgath playtest command (dev/balgath_dev_mechanics.ts): 'pulse' is his aoePulse
+ * (Barrow Smash), 'stomp' his stomp. Each runs the exact start a combat cast runs (the
+ * ring, the wind-up cue, the landing), with the spacing lock claimed afresh (overridden
+ * once) and the driver's cadence restarted so the natural rotation carries on from here.
+ * Only a template-telegraphed mob with the spawn stamp qualifies, and it refuses (false)
+ * while that same wind-up is in flight. No rng.
+ */
+export function forceTelegraphedBossMechanic(
+  ctx: SimContext,
+  mob: Entity,
+  kind: 'pulse' | 'stomp',
+): boolean {
+  const tpl = MOBS[mob.templateId];
+  if (tpl?.telegraphedMechanics === undefined || (mob.riftMechanicSpacing ?? 0) <= 0) return false;
+  const def = kind === 'pulse' ? tpl.aoePulse : tpl.stomp;
+  if (!def) return false;
+  const live = kind === 'pulse' ? mob.pulseWindupRemaining : mob.stompWindupRemaining;
+  if ((live ?? 0) > 0) return false;
+  const school = (def.school ?? (kind === 'pulse' ? 'shadow' : 'physical')) as Aura['school'];
+  if (!startRiftMechanicWindup(ctx, mob, kind, def.radius, school)) return false;
+  if (kind === 'pulse') mob.pulseTimer = def.every + RIFT_MECHANIC_WINDUP_SEC;
+  else mob.stompTimer = def.every + RIFT_MECHANIC_WINDUP_SEC;
+  return true;
 }
 
 function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
@@ -1174,17 +1387,7 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
         mob.castingAbility === null &&
         !mechanicSlotHeld(mob, 'bigCast')
       ) {
-        mob.bigCastTimer = bigCast.every + bigCast.castTime;
-        claimMechanicSpacing(mob, bigCast.castTime);
-        // The bar is a telegraph: open the escape window to the authored cast
-        // time (a wall-clock deadline; a kite-frozen bar cannot pin it open).
-        openRiftEscapeWindow(ctx, mob, bigCast.castTime);
-        mob.castingAbility = bigCast.castId;
-        mob.castTotal = bigCast.castTime;
-        mob.castRemaining = bigCast.castTime;
-        mob.castTargetId = null;
-        mob.channeling = false;
-        if (bigCast.yell) emitMobYell(ctx, mob, bigCast.yell);
+        startBigCast(ctx, mob, bigCast);
       }
     }
   }
@@ -1563,6 +1766,15 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   // An in-flight instant-mechanic windup dies with the pull too: its ground
   // ring must not detonate on the next fresh engage.
   resetRiftMechanicWindups(mob);
+  // Same for a warpath circuit: the next pull opens on his focus phase from
+  // wherever he stands, not part-way through a run to a landmark nobody is
+  // fighting him at any more.
+  resetWarpath(mob);
+  // ...and for a half-wound aimed slam, whose ring must not detonate on whoever
+  // re-pulls him.
+  resetBossSlams(mob);
+  resetBossRangedMechanics(ctx, mob);
+  resetBossStarwake(mob);
   // A mid-flight inferno channel dies with the pull; the cadence reseeds and
   // the hp gates re-arm alongside firedSummons above.
   mob.infernoTimer = MOBS[mob.templateId]?.infernoChannel?.every ?? 0;

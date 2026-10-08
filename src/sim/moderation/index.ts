@@ -9,4 +9,5 @@ export {
   isCheaterMarkActive,
   normalizeCheaterMark,
   normalizeCheaterMarkSeconds,
+  setCheaterMarkOn,
 } from './cheater_mark';

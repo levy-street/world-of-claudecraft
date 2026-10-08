@@ -513,6 +513,48 @@ export const da_DK: EnTranslations = {
       "sailing": "Sejer til {dest}"
     },
     "materialStackSelectionUnavailable": "Det materialevalg er ikke længere tilgængeligt.",
+    "shardpike": {
+      "braceLabel": "Couch the Shardpike",
+      "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "thrustLabel": "Barrowglass Thrust",
+      "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
+      "braceTooltipLean": "Plant the butt and hold the point up. Lean with your strafe or turn keys, or hold the two keys above the beam: each pushes the marker toward its side. The beam drifts on its own, and every slam he lands kicks it. Keep it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "releaseLabel": "Ground the Shardpike",
+      "releaseTooltip": "Lower the pike and step out of the brace, the same as jumping. You lose the set but pay no penalty: you can couch it again right away. Only a thrust, a fumble, a broken stance or a missed window rests the pike, for {rest} seconds.",
+      "whyResting": "The pike is being re-set after a thrust, a fumble, a broken stance or a missed window. Wait out the timer on the icon.",
+      "whyAlreadyCouched": "The pike is already couched. Ground it before you re-set.",
+      "whyNotSet": "The pike is not set. Couch it and hold it steady first.",
+      "whyNothingCouched": "Nothing to ground: the pike is not couched.",
+      "beamLabel": "Shardpike balance",
+      "beamStatus": "Pike balance {balance}, set {set} percent.",
+      "beamDanger": "Pike balance {balance}, about to fumble.",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "Hold the pike steady with your strafe keys",
+      "promptCatchIt": "Catch it, the pike is going over",
+      "promptEyeOut": "The eye is out, {seconds}s: hit him with everything",
+      "promptSealed": "His eye is shut. It opens again in {seconds}s",
+      "promptResetting": "Re-setting the pike, {seconds}s",
+      "promptCloser": "Get within reach of the Foreman, {yards} yards out",
+      "promptBrace": "Couch the Shardpike, then hold it steady",
+      "promptFindBoss": "Skerrit's Shardpike: put out the Foreman's eye with it",
+      "promptFindBossMuster": "The muster's Shardpike: put out the Foreman's eye with it",
+      "promptTakePike": "Press {key} or click the rack to take a Shardpike",
+      "promptTakePikeClick": "Click the rack to take a Shardpike",
+      "promptTakePikeTap": "Tap the rack to take a Shardpike",
+      "promptPikeLevelCap": "The muster lends its pikes only to level {level} or lower",
+      "promptHoldSteadyLean": "Hold the pike steady: lean with {left} and {right}",
+      "leanLeft": "Lean left",
+      "leanRight": "Lean right",
+      "leanLeftKey": "Lean left ({key})",
+      "leanRightKey": "Lean right ({key})",
+      "promptTally": "{count} put out",
+      "promptLabel": "Shardpike instruction",
+      "blindBanner": "BARROWHIDE BROKEN",
+      "effigyBanner": "BLINDED! NOW THE WHOLE RAID HITS HARD",
+      "promptStrikeLantern": "STRIKE THE LANTERN now, {seconds}s",
+      "promptLanternOut": "The lantern is out, {seconds}s: hit it with your own weapon",
+      "promptCloserEffigy": "Get within reach of the Straw Foreman, {yards} yards out"
+    },
     "vehicle": {
       "title": "Nordurets Kanon",
       "objective": "Forsvar norduret",
@@ -3112,8 +3154,10 @@ export const da_DK: EnTranslations = {
         "storm": "Hver stavekraft du kaster tilføjer en ladning, op til {max}. Ladninger varer {duration} sek, opdateret når du får en.",
         "heat": "Dine våben-slag hver tilføjer en varme-stak, op til {max}. Varme varer {duration} sek, opdateret når du får en stak.",
         "ignite": "Dine våben-kritiske slag tænder målet, hvilket giver {tick} Ildskade hvert {every} sek i {duration} sek. Et nyt kritisk slag opdaterer det. Skaden stiger med Angrebskraft eller Fjernkampskraft, hvilken som helst er højere.",
-        "guardHeat": "Hver gang du blokerer, undviger eller parerer et angreb, tilføjes en varme-stak, op til {max}. Varme varer {duration} sek, opdateret når du får en stak."
+        "guardHeat": "Hver gang du blokerer, undviger eller parerer et angreb, tilføjes en varme-stak, op til {max}. Varme varer {duration} sek, opdateret når du får en stak.",
+        "stoneHeart": "When a hit would kill you, you turn to stone for {statue} sec instead: you take no damage and cannot move or act, then return with {restore} health ({restorePct}% of your maximum health). Can occur once every {icd}. Never in duels or arena matches, which end at the killing blow."
       },
+      "range": "{min} to {max}",
       "use": {
         "retaliate": "I {duration} sek tager en fjende der rammer dig direkte Fysisk skade lig med {pct}% af det helbred der ramte tog fra dig. Periodisk skade udløser det ikke.",
         "anchor": "I {duration} sek modtager du {reduction}% mindre skade men bevæger dig med {speed}% hastighed. Fjerner ødelæggelser, rødder, øjeblikkelsesantal, frygt, polymorfer, stilhed, blindhed, hekse, afvæbninger og incapacitating effekter på dig, og du ignorerer nye og knockbacks mens det varer.",
@@ -3132,7 +3176,11 @@ export const da_DK: EnTranslations = {
         "kindlingOrb": "Sammenkald en glødelsekulensibryd ved siden af dig i {duration} sek. Hver stavekraft du kaster på en fjende får det til at affyre en bolt på denne fjende for {damage} Ildskade. Skaden stiger med Stavekraft.",
         "pierce": "I {duration} sek rammer dine auto-angreb, skud og fysiske evner (ikke blødninger) også den fjende tættest på dit mål inden for {reach} yd for {share}% af skaden håndteret.",
         "lantern": "Indstil en lygte ved dine fødder for {duration} sek. En direkte heling fra nogen på dig eller et fælles partiet medlem inden for {radius} yd af det helbreder også det mest såret andet fælles partiet medlem i dets lys for {share}% af helbredelsen.",
-        "heartNova": "Forbrug alle varme-stakke på en ildnovastjerne der giver {perHeat} Ildskade pr. stak ({max} ved {maxHeat} stakke) til hver fjende inden for {radius} yd og forledes hver kreatur det rammer. Skaden stiger med Angrebskraft. Kræver en varme-stak."
+        "heartNova": "Forbrug alle varme-stakke på en ildnovastjerne der giver {perHeat} Ildskade pr. stak ({max} ved {maxHeat} stakke) til hver fjende inden for {radius} yd og forledes hver kreatur det rammer. Skaden stiger med Angrebskraft. Kræver en varme-stak.",
+        "foremanShape": "Take the Shape of the Foreman for {duration} sec: you become the one-eyed cyclops and fight with your fists, keeping every ability and its damage. You gain {armorPct}% armor and cannot be knocked back. Dismounts you.",
+        "musterStandard": "Plant a Muster Standard at your feet. For {duration} sec, {soldiers} muster soldiers march at your side and fight your target in melee, each hitting every {every} sec for {damage} Physical damage. They attack only your target, and only once it is already in combat. Each has {hpPct}% of your maximum health. Left more than {leash} yd behind, they rejoin you at once. They leave when the standard falls or when you die. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, set when you plant it.",
+        "gutteredGlare": "Channel for {duration} sec: a beam {length} yd long bursts from you the way you face and deals {tick} Arcane damage every {every} sec to up to {max} enemies in its path ({total} to each over the full channel). Turn to sweep it; moving or casting ends it. Damage increases with Spell Power.",
+        "grapnel": "Hook a party or raid member within {range} yd that you can see and haul them through the air to your side, healing them for {heal} when they land. It cannot pull enemies, or allies in a vehicle, on a ship, turned to stone or held by an effect that cannot be broken. Healing increases with Healing Power."
       }
     },
     "questShare": {
@@ -3950,6 +3998,8 @@ export const da_DK: EnTranslations = {
       "cooldownCap": "{used} af {cap} sek. nedkølingsreduktion brugt i dette vindue",
       "bruinRushWindow": "Ulveform koster ingen mana og fastholder målet for jeres Bruin-storm, hvilket nedsætter dets hastighed med {pct}% i {sec} sek.",
       "funeralHarvestLock": "Funeral Harvest kan ikke skabe endnu en Sjælesplint lige nu",
+      "effigyPlankHide": "Turns away {pct}% of every blow, until a Shardpike thrust puts out the lantern in its eye",
+      "effigyLanternOut": "The Straw Foreman's lantern is out for you: your blows and your pet's ignore its Plank Hide and land in full",
       "leadenHexLock": "Blytung forbandelse kan ikke rodfæste dette mål igen lige nu",
       "forbiddenReflectionReady": "Din næste kvalificerede Heksemester-nedkøling kan kastes igen",
       "forbiddenReflectionLock": "Forbudt Spejling kan ikke forberedes igen endnu",
@@ -4036,6 +4086,10 @@ export const da_DK: EnTranslations = {
         "moltenIgnite": "Handler {damage} ildskade hver {every} sek. Et andet våbenkritisk slag genopfrisker varigheden.",
         "pierce": "Dine auto-angreb, skud og fysiske evner (ikke blødninger) rammer også fjenden nærmest dit mål inden for {reach} yd for {pct}% af den handled skade.",
         "lantern": "En direkte helbredelse fra hvem som helst på dig eller et flokmedlem inden for {radius} yd af lanternen healer alle inden for 5 yd for {pct}% mere.",
+        "foremanShape": "You are the Foreman: {armorPct}% more armor and immune to knockbacks.",
+        "musterStandard": "Your Muster Standard is planted. Its soldiers march with you and fight your target.",
+        "gutteredGlare": "The beam deals {tick} Arcane damage every {every} sec to enemies in its path. Moving or casting ends it.",
+        "stoneStatue": "Turned to stone: immune to damage and unable to act. You return with {pct}% of your maximum health.",
         "crucibleHeat": "Varme: {stacks}/{max}. Brug Cruciblehjertets kraft for at bruge det hele på en ildnova inden for {radius} m for {damage} skade.",
         "crucibleHeatOther": "Varme: {stacks}/{max}. Cruciblehjertets kraft bruger det hele på en ildnova inden for {radius} yd, der handler mere ildskade for hver stak og taunts hver kreatur, den rammer."
       },
@@ -4071,6 +4125,7 @@ export const da_DK: EnTranslations = {
       "dodge": "Erhöht Ausweichchance um {pct}%",
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
       "damageReduction": "Reducerer al skade modtaget med {pct}%",
+      "slumber": "Sover til daggry. Kan ikke angribes og vågner ikke for nogen.",
       "guardianWard": "Det næste dødelige fjendtlige slag genopretter dig til {pct}% helbred i stedet",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
@@ -4147,7 +4202,9 @@ export const da_DK: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} rejser sig over Tornetop Højder!"
+      "spawn": "{name} rejser sig over {zone}!",
+      "wake": "{name} vågner over {zone}!",
+      "sleep": "{name} sover til daggry."
     },
     "auth": {
       "appleLoginCta": "Fortsæt med Apple",
@@ -4291,6 +4348,7 @@ export const da_DK: EnTranslations = {
         "menu": "Menu",
         "minimap": "Minikort",
         "stanceBar": "Stillingsbjælke",
+        "shardpikeBar": "Shardpike Bar",
         "xpBar": "Erfaringsbjælke",
         "chat": "Chat",
         "actionBarGroup": "Handlingsbjælker",
@@ -7428,6 +7486,7 @@ export const da_DK: EnTranslations = {
       "framesGovernedAuraTracks": "Rediger rammer løsner også de seks valgfri aurabaner, når du har slået dem til fra Kamp-fanen i de samme grænsefladeindstillinger: Mine fordele-banen, Defensive nedkølinger-banen, Mine skjolde-banen, Offensive nedkølinger-banen, Bevægelse og stealth-banen samt Mine fordele på allierede-banen. Alle baner er slået fra som standard, og hver har sin egen navnebrik, mens den er løsnet.",
       "frameGroups": "{trackers} kan kombinere opgaver, bedrifter, rifter, dykkelejer, indsamlings-mål og Relikvie-sporing. {auras} kan kombinere Target-prikker og de seks aura-spor. Aktiver hver gruppe i Frames-indstillinger, eller lad det være fra for at flytte hver ramme separat. {tot} inkluderer en ressource-bar. {focus} har tre uafhængigt flytbare mål: Shift+F1 til Shift+F3 tildeler dem; Ctrl+F1 til Ctrl+F3 vælger dem. Træk skade- eller trusselsmåleren hvor som helst uden for dets knapper for at flytte det, og træk dets kanter for at tilpasse størrelse, selv mens rammer er låst. Mens rammer er låst op, har Vis eller Skjul Rammer sin egen grupperet menu. Højreklik en låst op ramme for Nulstil størrelse eller Ramme-muligheder. Interface > Frames indeholder også Frames-indstillinger og sammenfoldelig Party Frame-muligheder. Lås Target af Target til Target holder disse rammer sammen. Slå det fra for at flytte Target af Target separat; at slå det tilbage på bevarer den separate position til senere. Tildelte fokus-rammer skjuler deres setup-kontroller; højreklik og vælg Usæt fokus for at genoprette dem. Mouseover-casting fungerer også på fokus-rammer.",
       "framesGovernedTalkingHead": "Edit Frames løsner også dialogpanelet, som bærer en NPC's talte linje, mens den NPC er ude af dit syn; den bærer sin navnechip, mens den er løs.",
+      "framesGovernedShardpike": "Edit Frames also loosens the Shardpike bar, the short row of quest-tool verbs that appears beside your action bars only while you are carrying the Shardpike itself; it wears its name chip while it is loose, so you can place it before the fight rather than during it.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "barsTitle": "Bjælker, timere og kamptekst",
       "barsBody": "Din castbjælke dukker op midt på skærmen, lige over dine handlingsbjælker, når du kaster eller kanaliserer, og viser besværgelsens navn og den resterende tid. Dit mål får sin egen castbjælke på sin ramme, så du kan se, hvad der er på vej, og svare på det.\n\nEn tynd svingbjælke sidder under din castbjælke og fyldes op mellem dine våbensving, så en nærkamps- eller afstandsangriber kan se, hvornår det næste automatiske slag lander.\n\nDin erfaringsbjælke løber i fuld bredde under dine handlingsbjælker, inddelt i segmenter, med en lysere strækning, der viser den udhvilede erfaring, du har opsparet.\n\nSvøm under vandet, og en blå åndedrætsbjælke dukker op øverst på skærmen. Den tømmes, mens dit hoved er under, blinker rødt, når den løber ud, og du begynder at drukne, og fyldes hurtigt op igen, i det øjeblik du dukker op. Mellemrum svømmer dig op, og tasten Svøm ned, Ctrl som standard, tager dig dybere.\n\nSkade og helbredelse svæver op over det, de rammer, som små tal, så du kan læse en kamp uden at læse tekst. Fanen Kamp i dit chatvindue holder den fulde skriftlige log.",
@@ -11227,6 +11286,7 @@ export const da_DK: EnTranslations = {
     "lockoutRaids": "Raids",
     "lockoutDungeons": "Dødninger",
     "lockoutWorldBosses": "Verdensbosser",
+    "lockoutWeeklyQuests": "Weekly quests",
     "takeOverConfirm": "Dette afbryder denne karakter fra en anden session og henter den hertil. Fortsæt?",
     "renameRequired": "omdøbning påkrævet",
     "delete": "Slet",
@@ -15829,6 +15889,30 @@ export const da_DK: EnTranslations = {
       "fenshadow_maul": {
         "name": "Kærskygge-Hammer"
       },
+      "foremans_barrowmaul": {
+        "name": "Formandens Gravhøjshammer"
+      },
+      "skerrits_shardpike": {
+        "name": "Skerrits Skårspyd"
+      },
+      "loomshard_eye": {
+        "name": "The Barrowglass Eye"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Gravhøjsskulderværn"
+      },
+      "mirestone_stride": {
+        "name": "Mosestensskridt"
+      },
+      "foremans_wage_band": {
+        "name": "Formandens Lønring"
+      },
+      "mirelight_locket": {
+        "name": "Sumplys-medaljon"
+      },
+      "fenwright_grips": {
+        "name": "Mosebyggerens Greb"
+      },
       "wildgrove_cinch": {
         "name": "Vildlund-Livbælte"
       },
@@ -18451,6 +18535,27 @@ export const da_DK: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Fortropsens Krigsdragt"
       },
+      "muster_shardpike": {
+        "name": "Muster Shardpike"
+      },
+      "knucklebone_of_balgath": {
+        "name": "Knucklebone of Balgath"
+      },
+      "muster_standard": {
+        "name": "Muster Standard"
+      },
+      "guttered_eye": {
+        "name": "The Guttered Eye"
+      },
+      "barrowstone_heart": {
+        "name": "Barrowstone Heart"
+      },
+      "muster_grapnel": {
+        "name": "Muster Grapnel"
+      },
+      "craterglass_stave": {
+        "name": "Craterglass Stave"
+      },
       "conjured_water4": {
         "name": "Fremmanet kildevand"
       },
@@ -19725,8 +19830,26 @@ export const da_DK: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, den Vågnende Tinde"
       },
+      "balgath_cyclops": {
+        "name": "Balgath, the One-Eyed Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Vækket Stormling"
+      },
+      "muster_footman": {
+        "name": "Muster Footman"
+      },
+      "muster_chaplain": {
+        "name": "Muster Chaplain"
+      },
+      "muster_sergeant": {
+        "name": "Muster Sergeant"
+      },
+      "muster_drillmaster": {
+        "name": "Muster Drillmaster"
+      },
+      "muster_effigy": {
+        "name": "Straw Foreman"
       },
       "stable_horse": {
         "name": "Staldhest"
@@ -20375,6 +20498,16 @@ export const da_DK: EnTranslations = {
         "name": "Vogter Fenwick",
         "title": "Vogter af Fenbridge",
         "greeting": "Hold ved porten, {className}. Bag de siv klarer mosen drabet for os."
+      },
+      "socketwright_skerrit": {
+        "name": "Maben Skerrit",
+        "title": "the Socketwright",
+        "greeting": "Forty years since I ground that eye and set it in his socket, and never a day paid. You want to hurt the Foreman, {className}? Aim for my work."
+      },
+      "muster_commander": {
+        "name": "Muster Commander",
+        "title": "Fenbridge Muster",
+        "greeting": "Pikes first, {className}, then everyone. That is the whole of it, and it has kept this camp alive."
       },
       "brother_aldric_fen": {
         "name": "Broder Aldric",
@@ -21114,6 +21247,52 @@ export const da_DK: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Fenbridge Mønstringsordre"
+          }
+        }
+      },
+      "q_muster_summons": {
+        "title": "The Muster's Summons",
+        "text": "Every spear I could spare is dug in around the Starfall Crater, {playerName}, ringing the thing that walks out of it. The Muster Commander holds the camp on the southern rise above the crater, south-east of here. Report to the Commander. You will be told how we fight him, and you will listen, because the ones who did not are in the reeds.",
+        "completion": "Fenwick's runner, is it? Good. Listen, because I say this once and he never says it at all. Balgath walks our pickets: the crater rim, the west flats, the south rise, the gap on the south-west rim, and round again, and every post he stops at, he flattens. Steel does not bite him. His hide turns it, and a raid that hacks at him only dies tired. The one weakness is his eye. A braced pike through the Barrowglass blinds him, and while he is blind his hide sloughs off: that is when the whole raid hits him, and hits hard. Then it closes over and we wait for the next chance. The rack lends its pikes to recruits of level 19 or lower: the young ones put the eye out, the veterans make the window count. Pikes first, {playerName}, then everyone.",
+        "objectives": {
+          "0": {
+            "label": "Report to the Muster Commander"
+          }
+        }
+      },
+      "q_muster_pike_drill": {
+        "title": "Pikes First",
+        "text": "Talk is cheap and pikes are not, and the rack lends them only to recruits of level 19 or lower. Take a Shardpike off the rack beside me, then walk to the Straw Foreman at the west end of camp: the lads built him out of planks and straw, half the size of the real one, with a lantern where the eye goes. Couch the pike and hold the point true while the drillmaster pounds the ground, because the real one shakes it harder. When your arms are sure, put the point through the lantern. His planks will come off: then hit him with your own weapon, {playerName}, and feel the difference.",
+        "completion": "You felt it bite, did you? On the real one that is fourteen breaths with the whole raid swinging, and then his hide closes over again. Keep the lesson. The Foreman will test it.",
+        "objectives": {
+          "0": {
+            "label": "Shardpike taken from the muster rack"
+          },
+          "1": {
+            "label": "Straw Foreman's lantern put out"
+          },
+          "2": {
+            "label": "Blows landed while its planks are down"
+          }
+        }
+      },
+      "q_muster_trophy": {
+        "title": "A Chip Off the Foreman",
+        "text": "Every week he stands back up, and every week we knock him down again. That takes a raid, and the muster cannot raise one on its own. Find the next raid that goes after Balgath and help bring him down, {playerName}. Strike him, shield the ones who do, or mend them: every hand that fights him counts. When he falls, come back and report to me. The muster pays for every kill.",
+        "completion": "Down again, and you were in the fight that did it. Fenbridge will have my report tonight. The purse is thin this far out, but it is yours. Come back when he is up again.",
+        "objectives": {
+          "0": {
+            "label": "Balgath slain"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "The Socketwright's Due",
+        "text": "I set the Barrowglass in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
+        "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
+        "objectives": {
+          "0": {
+            "label": "The Foreman's eye put out"
           }
         }
       },
@@ -23298,6 +23477,12 @@ export const da_DK: EnTranslations = {
           },
           "7": {
             "label": "Den Sunkne Bastion"
+          },
+          "8": {
+            "label": "Gravhøjsområdet"
+          },
+          "9": {
+            "label": "Stjernefaldskrateret"
           }
         }
       },
@@ -24381,6 +24566,7 @@ export const da_DK: EnTranslations = {
     "mailboxName": "Postkasse",
     "noticeboardName": "Opslagstavle",
     "farmPatchName": "Havebede",
-    "realmBuilderMonumentName": "Rigsbygger-monument"
+    "realmBuilderMonumentName": "Rigsbygger-monument",
+    "musterRackName": "Muster Weapon Rack"
   }
 };

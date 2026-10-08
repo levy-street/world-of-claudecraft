@@ -63,6 +63,7 @@ import type { IWorldFarming } from '../src/world_api/farming';
 import type { IWorldGuildBank } from '../src/world_api/guild_bank';
 import type { IWorldInteraction } from '../src/world_api/interaction';
 import type { IWorldInventory } from '../src/world_api/inventory';
+import type { IWorldLanceTrial } from '../src/world_api/lance_trial';
 import type { IWorldLoot } from '../src/world_api/loot';
 import type { IWorldMail } from '../src/world_api/mail';
 import type { IWorldMarket } from '../src/world_api/market';
@@ -406,6 +407,13 @@ export const IWORLD_MEMBERS = [
   { name: 'lockpickEngage', kind: 'method' },
   { name: 'lockpickAction', kind: 'method' },
   { name: 'lockpickAbort', kind: 'method' },
+  // The Shardpike trial (world_api/lance_trial.ts).
+  { name: 'lanceTrial', kind: 'data' },
+  { name: 'lanceRestRemaining', kind: 'data' },
+  { name: 'lanceGuidance', kind: 'data' },
+  { name: 'lanceBrace', kind: 'method' },
+  { name: 'lanceThrust', kind: 'method' },
+  { name: 'lanceRelease', kind: 'method' },
   { name: 'collectDelveChestLoot', kind: 'method' },
   { name: 'delveRiteChoose', kind: 'method' },
   { name: 'delveRun', kind: 'data' },
@@ -824,6 +832,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // presentation-layer transform folded in, so the HUD/cross-hotbar/spellbook
     // can show the same resolve Sim.resolvedAbility would produce instead of a
     // raw known-array lookup.
+    // The Mirefen world boss lands on top of that with the Shardpike balance
+    // trial (world_api/lance_trial.ts, the 34th facet file): lanceTrial,
+    // lanceRestRemaining and lanceGuidance (data) plus lanceBrace,
+    // lanceThrust and lanceRelease (methods), six members in all.
     //
     // NOTE for the next merge, four syncs run now: BOTH sides of this pin move
     // it independently every cycle. Twice git merged identical numbers with no
@@ -937,9 +949,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // merge: 420/124/296.
     // Plus the release's transport facet (the Eastbrook ferry's ferryView
     // method) at the fourth release/v0.44.0 base merge: 421/124/297.
-    expect(IWORLD_MEMBERS.length).toBe(424);
-    expect(DATA_MEMBERS.length).toBe(126);
-    expect(METHOD_MEMBERS.length).toBe(298);
+    // Plus the Mirefen world-boss branch's lance_trial facet (lanceTrial,
+    // lanceRestRemaining, lanceGuidance data; lanceBrace, lanceThrust, lanceRelease
+    // methods), at the release/v0.45.0 merge: 430/129/301.
+    expect(IWORLD_MEMBERS.length).toBe(430);
+    expect(DATA_MEMBERS.length).toBe(129);
+    expect(METHOD_MEMBERS.length).toBe(301);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1153,6 +1168,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'inventory',
       'joinCardDuelQueue',
       'known',
+      'lanceBrace',
+      'lanceGuidance',
+      'lanceRelease',
+      'lanceRestRemaining',
+      'lanceThrust',
+      'lanceTrial',
       'lastCraftResult',
       'lastDisenchantResult',
       'lastEnchantResult',
@@ -1442,6 +1463,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'honor',
       'inventory',
       'known',
+      'lanceGuidance',
+      'lanceRestRemaining',
+      'lanceTrial',
       'lastCraftResult',
       'lastDisenchantResult',
       'lastEnchantResult',
@@ -1650,6 +1674,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'ignoreRemove',
       'interact',
       'joinCardDuelQueue',
+      'lanceBrace',
+      'lanceRelease',
+      'lanceThrust',
       'leaderboard',
       'learnRiding',
       'leaveCardDuelQueue',
@@ -1948,6 +1975,20 @@ const FACET_TARGETING = [
 ] as const satisfies readonly (keyof IWorldTargeting)[];
 type _ExhaustTargeting = AssertNever<
   Exclude<keyof IWorldTargeting, (typeof FACET_TARGETING)[number]>
+>;
+
+// The Shardpike trial (world_api/lance_trial.ts): the wielder's own beam and rest clock, the
+// guidance the loud prompt paints, and the three verbs.
+const FACET_LANCE_TRIAL = [
+  'lanceTrial',
+  'lanceRestRemaining',
+  'lanceGuidance',
+  'lanceBrace',
+  'lanceThrust',
+  'lanceRelease',
+] as const satisfies readonly (keyof IWorldLanceTrial)[];
+type _ExhaustLanceTrial = AssertNever<
+  Exclude<keyof IWorldLanceTrial, (typeof FACET_LANCE_TRIAL)[number]>
 >;
 
 const FACET_INTERACTION = [
@@ -2522,6 +2563,7 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   reliquary: FACET_RELIQUARY,
   actionBar: FACET_ACTION_BAR,
   farming: FACET_FARMING,
+  lanceTrial: FACET_LANCE_TRIAL,
   transport: FACET_TRANSPORT,
   worldPvp: FACET_WORLD_PVP,
 };
@@ -2540,7 +2582,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // vehicles facet.
     // 35 at the second release/v0.44.0 base merge: plus the release's world_pvp.ts.
     // 36 at the fourth release/v0.44.0 base merge: plus the release's transport.ts.
-    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(36);
+    // 37 with the Mirefen world-boss branch's lance_trial.ts.
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(37);
   });
 
   it('every facet FILE on disk is a FACET_MEMBER_ARRAYS key (none can go silently unpartitioned)', () => {
@@ -2621,8 +2664,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
     // Mirrors the IWORLD_MEMBERS.length pin above (411); this pin and the one above
     // must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(424);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(424);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(430);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(430);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

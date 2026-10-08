@@ -37,14 +37,15 @@ export type MobCombatProfileResult = 'done' | 'runAttackMechanics';
 
 type EngagedTickHook = (mode: 'normal' | 'stationary') => void;
 
-// Drop the pull and walk home: the shared evade entry used by the leash breaks
-// and the unreachable-target stall. The evade arm in locomotion.ts handles the
-// walk, the immunity lives in combat/damage.ts, and resetEvadingMob heals to
+// Drop the pull and walk home: the shared evade entry used by the leash breaks,
+// the unreachable-target stall, and a warpath boss giving up (mob/warpath.ts).
+// The evade arm in locomotion.ts handles the walk, the immunity lives in
+// combat/damage.ts, and resetEvadingMob heals to
 // full on arrival. Any in-flight cast dies with the pull: the bar would
 // otherwise freeze on an immune mob walking home, and a committed ranged
 // windup (rangedWindupReleaseTick is an ABSOLUTE tick) would fire instantly
 // on the next pull's first in-range tick.
-function startEvadeHome(mob: Entity): void {
+export function startEvadeHome(mob: Entity): void {
   mob.aiState = 'evade';
   mob.aggroTargetId = null;
   mob.autoAttack = false; // leashing home: not swinging, whatever it was doing before

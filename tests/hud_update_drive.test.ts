@@ -737,6 +737,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the pet bar; rebuilds its buttons behind a signature latch',
   },
   {
+    call: 'this.shardpikeBar.paint',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: "the world-boss trial's whole input surface: the three pike verbs, the balance beam, and the loud centre-screen instruction. Ungated and per-frame on purpose, because the beam moves every sim tick and the thrust window drains in real time; BOTH halves build once on the first visible paint and then only re-state, and the prompt additionally holds a signature latch so its text and classes are written only when the line actually changes rather than sixty times a second for a once-a-second countdown'",
+  },
+  {
     call: 'this.renderStanceBar',
     band: 'frame',
     gate: '',
@@ -1872,7 +1879,8 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // surface (51 / 96 measured on the merged tree). The release's Eastbrook
       // ferry countdown panel (hud ferryHud) is one more chrome surface at the
       // fourth release/v0.44.0 base merge (97 measured on the merged tree).
-    ).toEqual({ window: 51, chrome: 97, none: 18 });
+      // The Mirefen world-boss branch's Shardpike bar paint: chrome 98.
+    ).toEqual({ window: 51, chrome: 98, none: 18 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

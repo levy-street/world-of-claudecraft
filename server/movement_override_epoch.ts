@@ -14,6 +14,7 @@ export interface MovementOverrideSignature {
   mountRaceLocked: boolean;
   vehicleLocked?: boolean;
   climbing: boolean;
+  braced: boolean;
   moveSpeedMult: number;
 }
 
@@ -63,6 +64,7 @@ export function computeOverrideSignature(
       valkyrsCalling: false,
       mountRaceLocked: false,
       climbing: false,
+      braced: false,
       moveSpeedMult: 1,
     },
     entity,
@@ -86,6 +88,9 @@ export function fillOverrideSignature(
   target.mountRaceLocked = meta.mountRace?.phase === 'countdown';
   target.vehicleLocked = !!meta.vehicle;
   target.climbing = entity.climb != null;
+  // A couched Shardpike plants the body and turns strafe into the balance stick
+  // (src/sim/lance_trial.ts), so the client must not predict that strafe as a step.
+  target.braced = entity.bracing === true;
   target.moveSpeedMult = moveSpeedMult;
   return target;
 }
@@ -99,7 +104,8 @@ function overrideBits(signature: MovementOverrideSignature): number {
     (signature.valkyrsCalling ? 16 : 0) |
     (signature.mountRaceLocked ? 32 : 0) |
     (signature.climbing ? 64 : 0) |
-    (signature.vehicleLocked ? 128 : 0)
+    (signature.vehicleLocked ? 128 : 0) |
+    (signature.braced ? 256 : 0)
   );
 }
 

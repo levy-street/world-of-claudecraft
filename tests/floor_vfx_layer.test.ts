@@ -97,6 +97,9 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/decor_torch_fx.ts', layer: 'ground', strict: true },
   { file: 'src/render/impact_site.ts', layer: 'ground', strict: true },
   { file: 'src/render/hill_ring.ts', layer: 'ground', strict: true },
+  // Balgath's circle telegraphs (the Barrow Smash's safe gap, his solid stomp, hammer and
+  // Barrowfall): mechanics a raid must read, on the encounter band.
+  { file: 'src/render/balgath_ring_fx.ts', layer: 'encounter', strict: true },
   // A Buried Hoard boss room's additive floor light under its kit props, kept on
   // the order it shipped with (2, the ground band's second rung).
   { file: 'src/render/hoard_room_kit.ts', layer: 'ground', strict: true },
@@ -199,6 +202,21 @@ const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
   // rung, so a boss telegraph still paints over it.
   'src/render/ability_vfx/baked_impact_layers.ts',
   'src/render/ability_vfx/signature_crests.ts',
+  // The Mirefen world boss Balgath (open world, alone on his crater, never on a raid
+  // floor beside another encounter's telegraphs): his slams, boulders, debris, star and
+  // ranged kit, the eye glow and its reticle, the effigy rig, and
+  // his loot's standard, beam and rope (balgath_loot_relics.ts, all vertical or
+  // body-anchored). Moving his floor telegraphs onto the ladder is a follow-up.
+  'src/render/balgath_debris.ts',
+  'src/render/balgath_fx.ts',
+  'src/render/balgath_loot_relics.ts',
+  'src/render/balgath_ranged_fx.ts',
+  'src/render/balgath_starwake_fx.ts',
+  'src/render/characters/charge_glow.ts',
+  'src/render/characters/effigy_rig.ts',
+  'src/render/characters/eye_glow.ts',
+  'src/render/characters/eye_ward_marker.ts',
+  'src/render/eye_ward_badge.ts',
   // vertical or body-anchored class VFX
   'src/render/burning_pact_markers.ts',
   'src/render/characters/gloamveil_veil.ts',

@@ -21,6 +21,10 @@ describe('offline browser world configuration', () => {
       devCommands: true,
       riftPortals: true,
       compulsoryTutorial: true,
+      mirefenMuster: true,
+      // The realm's boot shape: the world bosses are up from the first tick, so the
+      // muster never stands round an empty crater.
+      worldBossAtBoot: true,
       idleMobTickRadius: PLAYER_INTEREST_DROP_RADIUS,
       gathererIdentity: { kind: 'offline', id: 'off:00000000-0000-4000-8000-000000000001' },
     });
@@ -42,6 +46,8 @@ describe('offline browser world configuration', () => {
     expect(config.devCommands).toBe(false);
     expect(config.riftPortals).toBe(false);
     expect(config.compulsoryTutorial).toBe(false);
+    expect(config.mirefenMuster).toBe(false);
+    expect(config.worldBossAtBoot).toBe(false);
     expect(config.gathererIdentity).toBeUndefined();
   });
 });

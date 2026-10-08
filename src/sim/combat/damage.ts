@@ -39,6 +39,9 @@ import { isKillParticipant, killParticipationPos } from '../loot/kill_participat
 import { applyBossCorpseHold } from '../mob/boss_corpse_hold';
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
 import { isEvadingWildMob } from '../mob/evade_immunity';
+import { effigyHideBypassed, noteEffigyBlow } from '../muster_effigy';
+import { EFFIGY_WARD_AURA_ID } from '../muster_effigy_core';
+import { creditMusterTrophyKill } from '../muster_trophy';
 import {
   NYTHRAXIS_BONE_SPIKE_HIT_DAMAGE,
   nythraxisBoneSpikeWardHit,
@@ -93,6 +96,7 @@ import {
   mitigateVicariousSuffering,
   onAfflictionDamage,
 } from './affliction';
+import { barrowstoneSave } from './balgath_trinkets';
 import { isUnbreakableControlAura } from './cc';
 import { stopChannelVisual } from './channel_visuals';
 import { chronomancyConvertArcaneDamage, stripTemporalEchoes } from './chronomancy';
@@ -467,6 +471,9 @@ export function dealDamage(
     let reduction = protectionConsecrationDamageReduction(ctx.groundAoEs, target);
     for (const aura of target.auras) {
       if (aura.kind === 'buff_dr') {
+        // The drill yard's plank hide lets through the blows of whoever put its lantern out
+        // (muster_effigy.ts): a per-player window on one shared effigy.
+        if (aura.id === EFFIGY_WARD_AURA_ID && effigyHideBypassed(ctx, source)) continue;
         reduction += masteredPaladinAuraValue(target, aura.id, aura.value);
       } else if (aura.kind === 'die_by_sword') reduction += aura.value;
     }
@@ -970,6 +977,15 @@ export function dealDamage(
     }
   }
 
+  // The Barrowstone Heart (combat/balgath_trinkets.ts): the last save asked, so every
+  // class and talent save above gets its turn first. A lethal hit turns the wearer to
+  // stone at 1 health instead. A guardian ward that already caught this blow has saved
+  // the wearer, so the Heart is not spent on it.
+  if (guardianWardRestore === 0) {
+    const stoned = barrowstoneSave(ctx, target, amount);
+    if (stoned !== null) amount = stoned;
+  }
+
   // A Protect Yumi cat: the yumi module owns the clamp, the sudden-death
   // taken-multiplier, tiebreak bookkeeping, and win detection. Amps and
   // absorb shields already resolved above, so a shielded cat soaks first.
@@ -1174,6 +1190,9 @@ export function dealDamage(
   // The hub dummy lesson (tutorial/dummy_drill.ts): one credit per blow that
   // actually lands on a training dummy. Zero rng.
   if (source && amount > 0) creditDummyDrill(ctx, source, target);
+  // The muster's pike drill (muster_effigy.ts): a blow on the Straw Foreman while its
+  // lantern is out for this player. Zero rng.
+  noteEffigyBlow(ctx, source, target, amount, abilityId);
 
   // Thornhollow Fields assists: remember who softened a player before the blow
   // that finishes them. Only real damage on a live player counts, and the
@@ -1893,6 +1912,8 @@ export function handleDeath(
       // World-boss deeds ride the same never-pruned contributor roster.
       deedsMod.onWorldBossKilledForDeeds(ctx, e, worldBossContribs);
       onWorldBossKilledForWeeklyQuests(ctx, worldBossContribs);
+      // The muster's weekly counts his kill for every contributor carrying it.
+      creditMusterTrophyKill(ctx, e, worldBossContribs);
     }
     // Masterwrought materials (phase 04): Wyrmfall Cores and the weekly ember
     // check for the same participation snapshot. Deliberately BELOW every loot

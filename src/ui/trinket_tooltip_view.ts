@@ -106,7 +106,11 @@ export function luckyStreakTotal(duration: number, maxHp: number): number {
   return Math.round((maxHp * GAMBLE.luckyHealShare) / ticks) * ticks;
 }
 
-function passiveLine(p: TrinketPassive, viewer: TrinketTooltipViewer): TrinketTooltipLine {
+function passiveLine(
+  p: TrinketPassive,
+  viewer: TrinketTooltipViewer,
+  icd: number,
+): TrinketTooltipLine {
   let key: TranslationKey;
   let values: InterpolationValues;
   switch (p.kind) {
@@ -156,6 +160,15 @@ function passiveLine(p: TrinketPassive, viewer: TrinketTooltipViewer): TrinketTo
       key = 'hudChrome.trinkets.equip.guardHeat';
       values = { max: n(p.max), duration: n(p.duration) };
       break;
+    case 'stoneHeart':
+      key = 'hudChrome.trinkets.equip.stoneHeart';
+      values = {
+        statue: n(p.statue),
+        restore: n(Math.round(viewer.maxHp * p.restore)),
+        restorePct: pct(p.restore),
+        icd: trinketCooldownText(icd),
+      };
+      break;
   }
   return {
     kind: 'equip',
@@ -171,6 +184,15 @@ function scaled(base: number, bonus: number, digits = 0): string {
     digits > 0 ? Math.round(bonus * 10 ** digits) / 10 ** digits : Math.round(bonus);
   if (shownBonus <= 0) return round(base);
   return t('hudChrome.trinkets.scaled', { base: round(base), bonus: round(shownBonus) });
+}
+
+/** A power-scaled damage range as "15 to 21 (+28)": the base range, then what the
+ *  viewer's power adds to both ends; just the range while that adds nothing. */
+function scaledRange(min: number, max: number, bonus: number): string {
+  const range = t('hudChrome.trinkets.range', { min: n(min), max: n(max) });
+  const shown = Math.round(bonus);
+  if (shown <= 0) return range;
+  return t('hudChrome.trinkets.scaled', { base: range, bonus: n(shown) });
 }
 
 /** The stack cap of the worn passive a use spends (tally marks, storm charges,
@@ -303,6 +325,41 @@ function useEffect(spec: TrinketSpec, u: TrinketUse, viewer: TrinketTooltipViewe
         radius: n(u.radius),
         share: pct(u.share),
       });
+    case 'foremanShape':
+      return t('hudChrome.trinkets.use.foremanShape', {
+        duration: n(u.duration),
+        armorPct: n(u.armorPct),
+      });
+    case 'musterStandard': {
+      const bonus = u.coef * trinketWeaponPower(viewer);
+      return t('hudChrome.trinkets.use.musterStandard', {
+        duration: n(u.duration),
+        soldiers: n(u.soldiers),
+        damage: scaledRange(u.min, u.max, bonus),
+        every: n(u.attackInterval),
+        hpPct: pct(u.hpShare),
+        leash: n(u.leash),
+      });
+    }
+    case 'gutteredGlare': {
+      const tick = Math.max(1, Math.round(u.flat + u.coef * viewer.spellPower));
+      const ticks = Math.round(u.duration / u.every);
+      return t('hudChrome.trinkets.use.gutteredGlare', {
+        duration: n(u.duration),
+        length: n(u.length),
+        tick: scaled(u.flat, u.coef * viewer.spellPower),
+        every: formatNumber(u.every, { maximumFractionDigits: 1 }),
+        max: n(u.maxTargets),
+        total: n(tick * ticks),
+      });
+    }
+    case 'grapnel':
+      return t('hudChrome.trinkets.use.grapnel', {
+        range: n(u.range),
+        heal: scaled(u.heal, u.coef * viewer.healPower),
+      });
+    case 'passiveOnly':
+      return '';
     case 'heartNova': {
       const perHeat = u.flat + u.coef * viewer.attackPower;
       const maxHeat = passiveMax(spec);
@@ -325,7 +382,9 @@ export function trinketTooltipLineTexts(
   const spec = trinketSpec(itemId);
   if (!spec) return [];
   const lines: TrinketTooltipLine[] = [];
-  if (spec.passive) lines.push(passiveLine(spec.passive, viewer));
+  if (spec.passive) lines.push(passiveLine(spec.passive, viewer, spec.cooldown));
+  // A passive-only trinket (the Barrowstone Heart) has nothing to use.
+  if (spec.use.kind === 'passiveOnly') return lines;
   lines.push({
     kind: 'use',
     text: t('hudChrome.trinkets.useLine', {

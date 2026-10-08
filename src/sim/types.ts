@@ -488,6 +488,11 @@ export type AuraKind =
   // Warlock Metamorphosis: a temporary demon transform (cosmetic scale + tint in render,
   // its damage/haste bonuses ride separate buff auras).
   | 'form_metamorph'
+  // The Knucklebone of Balgath's Shape of the Foreman (combat/balgath_trinkets.ts): the
+  // wearer takes the cyclops's body. value = percent more armor (folded in entity.ts,
+  // with the body's scale); knockbacks are refused in knockback.ts. NOT a class form
+  // (never in FORM_AURA_KINDS): abilities, casts and the action bar work as normal.
+  | 'form_foreman'
   // Feral (cat form): Energy regeneration multiplier while active (value = fraction, 1 = +100%).
   | 'buff_energyregen'
   | 'stealth'
@@ -1151,6 +1156,20 @@ interface BaseItemDef {
   // buyValue; both fields may coexist when a vendor charges both currencies.
   priceHonor?: number;
   use?: ItemUse;
+  /**
+   * A quest implement every class may equip, weapon-proficiency rules notwithstanding
+   * (equipment_rules.ts checks it before the archetype and rogue-two-hander gates). For
+   * tools whose POINT is being wielded by anyone (the Shardpike: 1-2 damage, its worth is
+   * the lance_trial verb), where a proficiency lockout would gate a mechanic, not power.
+   */
+  questTool?: true;
+  /**
+   * Gear LENT for one encounter (the muster pike: src/sim/muster_pike.ts). It is never
+   * the player's to keep: the bank refuses it, no save ever writes it (the lender takes
+   * it back and the displaced weapons return first), and it is always soulbound too, so
+   * trade, mail, market and vendor refuse it on the existing soulbound arms.
+   */
+  lentGear?: true;
   sellValue: number; // copper (vendor buys at this)
   buyValue?: number; // copper (vendor sells at this)
   questId?: string;
@@ -1974,6 +1993,14 @@ export interface LootEntry {
   // source level and stats; listing it here must not promote it to the
   // bespoke heroic equipment tier or seed the higher-tier rift reward pool.
   preserveSourceTier?: true;
+  // WORLD-BOSS PERSONAL LOOT ONLY (world_boss.ts rollWorldBossLoot): the entry is
+  // rolled only for a contributor whose level is at or below this. The locals' share
+  // of a boss placed in their zone: gear a level-eight can wear, which the level-twenty
+  // raid alongside them never sees in its own roll. Item level follows the gate, not
+  // the boss (item_level.ts): an item that can only ever fall to a level-13 player is
+  // level-13 content, whatever the level of the thing that dropped it. Ignored by the
+  // shared rollLoot path, so it must never appear on an ordinary mob's table.
+  maxPlayerLevel?: number;
 }
 
 export type MobFamily =
@@ -2065,6 +2092,380 @@ export interface MobTemplate {
   // the steep-wall gate. For mountain-sized movers (world bosses) that must never
   // wedge on camp furniture while closing on a target.
   phasesThroughObstacles?: boolean;
+  /**
+   * Circles a PHASING mover never walks into (mob/keep_out.ts): a straight line that
+   * would enter one bends round its edge, a target inside one is chased only to its
+   * edge, and a body that finds itself inside walks straight out. The phasing mode
+   * above ignores every wall, so this is the one way to keep a giant out of a place.
+   */
+  keepOut?: readonly { x: number; z: number; radius: number }[];
+  /**
+   * Yards of water this body walks THROUGH with its feet on the bed before it would
+   * have to swim. A giant does not float: in a fen whose lakes are a few yards deep
+   * he wades, the surface rides up his shins, and the raid on the shore watches the
+   * whole body cross rather than a head bobbing on the waterline. Above this depth he
+   * rides the surface like everyone else, so a body can never walk along the bottom of
+   * a lake deeper than it is tall. Unset keeps the shipped rule (players' swim depth
+   * for walkers, the surface for phasing movers).
+   */
+  wadeDepth?: number;
+  /**
+   * The corpse sinks into the ground over the last `seconds` of its corpse window, by
+   * `depth` yards, so a body too big to vanish cleanly sinks out of sight instead of
+   * popping out of existence (mob/boss_corpse_sink.ts). It also keeps the body lying for
+   * the WHOLE window once its loot is emptied, rather than collapsing it on the fast arm
+   * trash takes, because the sink is how it leaves. Inert for every mob without it.
+   */
+  corpseSink?: { seconds: number; depth: number };
+  /**
+   * Slumber: the mob sleeps through the night (mob/slumber.ts). At dusk, once out of
+   * combat, he walks home to his spawn point and lies down; asleep he is neutral (not
+   * attackable, never aggroes) and heals; at dawn he wakes, announces himself, and is
+   * a boss again. A fight that is running at dusk is fought to its end first.
+   *
+   * Inert for every mob without it and for every host without a day/night clock
+   * (SimConfig.dayNightNowMs): with no clock there is no night, so tests and the RL
+   * env see the pre-cycle world. The world-boss scheduler reads the same field to
+   * respawn a slain slumbering boss at the next dawn rather than on the interval.
+   */
+  slumber?: {
+    /** Aura shown on his frame while he sleeps (the raid's "come back at dawn"). */
+    auraName: string;
+    /** Yell as he lies down at dusk (optional) and as he wakes at dawn. */
+    sleepYell?: string;
+    wakeYell: string;
+    yellRange?: number;
+    /** How close to the spawn point counts as "in bed": inside it he lies down. */
+    bedRadius: number;
+    /** Seconds the AI waits after the dawn wake before he moves or acts, so the body
+     *  can stand up (the renderer's wake one-shot) without the first wander step or
+     *  chase sliding the pose across the ground. Hostile and attackable throughout;
+     *  absent means no hold. */
+    riseSeconds?: number;
+  };
+  /**
+   * Seconds of spacing between this mob's boss mechanics, and the opt-in that turns
+   * its instant AoEs (`aoePulse`, `stomp`) into TELEGRAPHED ones: a ground ring drawn
+   * at the true blast radius, a windup, then the blast measured from the ring's centre
+   * rather than from wherever the boss has since walked.
+   *
+   * Set it on any boss whose counterplay is meant to be reading the ground and stepping
+   * out. Leaving it undefined keeps the shipped instant fire, which is right for trash
+   * and for bosses whose AoE is a soak rather than a dodge.
+   *
+   * Rift bosses get the same treatment stamped per spawn instead (rift/runs.ts), which
+   * is why the entity-side field it feeds is still called `riftMechanicSpacing`.
+   */
+  telegraphedMechanics?: number;
+  /**
+   * Warpath: the boss walks a circuit of authored landmarks instead of parking in your
+   * melee range (mob/warpath.ts). He plants and fights (focus), runs to the next stop
+   * while backhanding whoever is near him and regenerating if nobody hurts him (travel),
+   * then slams the place he arrived at behind a telegraph ring (wreck), and repeats.
+   *
+   * Inert for every mob without it. Set it on a boss whose fight is meant to be an event
+   * that crosses the zone rather than a health bar standing in a field. Pair it with
+   * `canLeash: false` in mob_combat.ts: the shipped leash measures from the SPAWN, so a
+   * tethered boss walks two landmarks and evades home mid-circuit.
+   */
+  warpath?: {
+    /** Seconds planted and fighting before he leaves. The melee uptime window. */
+    focusSeconds: number;
+    /**
+     * Multiplier on moveSpeed while travelling. Tune it ABOVE a walking player and BELOW
+     * a running one: faster and melee can never touch him again, slower and there is no
+     * chase, only a follow.
+     */
+    travelSpeedMult: number;
+    /** Abandon the run after this long, so an unreachable landmark cannot soft-lock. */
+    travelTimeoutSeconds: number;
+    /** Close enough to the landmark to count as arrived. */
+    arriveRadius: number;
+    /** Seconds spent on the arrival set-piece, telegraph fuse included. */
+    wreckSeconds: number;
+    /**
+     * The circuit, walked IN ORDER and wrapping. Authored order is the pacing: each leg's
+     * length is how long that chase lasts. `yell` is his bark on setting off for that
+     * stop (variable-routed chat, English from content like every other boss bark).
+     */
+    destinations: Array<{ x: number; z: number; label: string; yell?: string }>;
+    /** Widen his barks past YELL_RANGE for a voice that carries across the zone. */
+    yellRange?: number;
+    /**
+     * Heals while nobody has hurt him recently: what makes the chase mandatory. `name`
+     * labels the green number, so the raid can read WHY the bar is climbing.
+     */
+    regen: { unharriedSeconds: number; pctPerSecond: number; name: string };
+    /**
+     * When he drops the pull and walks home to his spawn (his bed) as an ordinary evade:
+     * immune on the way, full health on arrival. `tetherRadius` is how far from the spawn
+     * he may ever be, in any phase; `playerRange` is how close a living player must be;
+     * `aloneGraceSeconds` is how long nobody may be inside that range before he gives up (a
+     * ranged raid swinging wide as he sets off must not reset him); `unharriedSeconds` is how
+     * long he waits with nobody hurting him (mob/warpath.ts).
+     */
+    giveUp: {
+      tetherRadius: number;
+      playerRange: number;
+      aloneGraceSeconds: number;
+      unharriedSeconds: number;
+    };
+    /** The travelling backhand: one random player inside `radius`, on a timer. */
+    swipe: {
+      every: number;
+      radius: number;
+      min: number;
+      max: number;
+      name: string;
+      school?: string;
+    };
+    /** The arrival slam, telegraphed for WARPATH_WRECK_FUSE_SEC before it lands. */
+    wreck: { radius: number; min: number; max: number; name: string; school?: string };
+    wreckYell?: string;
+  };
+  /**
+   * Aimed slams (mob/boss_slams.ts): a fist HAMMER dropped on a snapshot of where a
+   * player was standing, dodged by moving, and a low CLEAVE dragged across the ground in
+   * an arc in front of him, dodged by jumping and nothing else.
+   *
+   * Inert for every mob without it. They exist because the shipped boss AoE vocabulary is
+   * circles centred on the boss, all of which are dodged by walking out, so a fight built
+   * only from those teaches one skill and then repeats it.
+   */
+  slams?: {
+    /** One fist, raised and dropped where a player was standing. */
+    hammer: {
+      every: number;
+      /** Seconds the ring is shown before the fist lands. */
+      windup: number;
+      /** Small on purpose: this is dodged by stepping aside, not by leaving the fight. */
+      radius: number;
+      min: number;
+      max: number;
+      name: string;
+      school?: string;
+    };
+    /** A low arm drag across the ground in front of him. */
+    cleave: {
+      every: number;
+      windup: number;
+      /** Reach of the arc, and the max distance he will start one from. */
+      range: number;
+      /** Half-width of the arc in degrees, measured off his aim at the wind. */
+      halfArcDeg: number;
+      /** Yards per second the arm travels, which is what a player who cleared it rides. */
+      sweepSpeed: number;
+      min: number;
+      max: number;
+      name: string;
+      school?: string;
+    };
+  };
+  /**
+   * The ranged-punish kit (mob/boss_ranged_mechanics.ts): three telegraphed mechanics
+   * that reach the players who stand far from him, each on its own cadence and all three
+   * behind the same mechanic spacing lock as every other telegraph, so no two wind-ups
+   * ever share the ground. Inert for every mob without it.
+   */
+  rangedMechanics?: {
+    /** Boulders hurled at the `count` FARTHEST players standing at least `minRange` out. */
+    boulder: {
+      every: number;
+      windup: number;
+      minRange: number;
+      maxRange: number;
+      count: number;
+      radius: number;
+      min: number;
+      max: number;
+      name: string;
+      school?: string;
+    };
+    /** A ground-hugging beam down a snapshot line from him through one far player. */
+    glare: {
+      every: number;
+      windup: number;
+      minRange: number;
+      maxRange: number;
+      /** Half the beam's width in yards. */
+      halfWidth: number;
+      /** How far past the target the line runs, and the floor/ceiling of its length. */
+      overshoot: number;
+      minLength: number;
+      maxLength: number;
+      min: number;
+      max: number;
+      name: string;
+      school?: string;
+    };
+    /** A shared soak marked on one player: its damage is split by everyone inside. */
+    burden: {
+      every: number;
+      windup: number;
+      range: number;
+      radius: number;
+      /** Total damage as a fraction of EACH soaker's max health, split by the soaker count. */
+      totalFraction: number;
+      /** Soakers the marker asks for (its occupancy runes); the split itself has no cap. */
+      recommended: number;
+      name: string;
+      yell?: string;
+    };
+    /** Seconds of the shared spacing lock each one holds AFTER its wind-up. */
+    spacing: number;
+  };
+  /**
+   * Wake of the Fallen Star (mob/boss_starwake.ts): the fallen star in his crater wakes,
+   * lava fissures crawl across the fen behind a telegraph that fills, geysers burst along
+   * them and under a few players, and molten pools linger where the geysers burst. Holds
+   * the shared mechanic spacing lock for its whole wind-up, so it never shares the ground
+   * with another telegraph. Inert for every mob without it.
+   */
+  starwake?: {
+    /** Seconds between casts (ticked while planted and fighting, like his other kit). */
+    every: number;
+    /** The warning: the cast bar while the star wakes (fists in the ground, the yell). */
+    warn: number;
+    /** The fissure telegraphs crawl from their origin to their tips over this long. */
+    crawl: number;
+    /** Then they sit full on the ground this long before the eruption. */
+    hold: number;
+    /** Seconds of the spacing lock held after the eruption. */
+    spacing: number;
+    /** Where the fallen star sits (the crater centre), and the band of boss distances
+     *  inside which the fissures run FROM it rather than from under his feet. */
+    star: { x: number; z: number };
+    starMinReach: number;
+    starMaxReach: number;
+    fissures: {
+      fanCount: number;
+      fanDeg: number;
+      reachPast: number;
+      minLength: number;
+      maxLength: number;
+      ringCount: number;
+      ringLength: number;
+      jitterDeg: number;
+      /** Half the strip's width in yards. */
+      halfWidth: number;
+      min: number;
+      max: number;
+    };
+    geysers: {
+      /** Players a targeted geyser is laid under (at most), drawn from those in `range`. */
+      targets: number;
+      range: number;
+      /** A targeted geyser's radius (and its pool's). */
+      radius: number;
+      /** Each fissure's own geyser: how far down it, and its radius (and its pool's). */
+      alongFraction: number;
+      fissureRadius: number;
+      min: number;
+      max: number;
+    };
+    pool: {
+      seconds: number;
+      interval: number;
+      min: number;
+      max: number;
+      name: string;
+    };
+    /**
+     * The meteor shower the eruption calls down (mob/boss_starwake_meteors.ts): waves of
+     * Ignivar's own Falling Cinders meteors (his placement, circle, telegraph and fall) for
+     * `seconds`, round the players within `range` of him, the star and the cracks, each
+     * with its own flat hit in place of the raid's max-HP share.
+     */
+    meteors: {
+      /** Players this far from him are the shower's player anchors. */
+      range: number;
+      /** Seconds of waves from the eruption (the last wave still falls its full telegraph). */
+      seconds: number;
+      /** Seconds between waves, drawn per wave in [waveMin, waveMax]. */
+      waveMin: number;
+      waveMax: number;
+      /** Meteors per wave, drawn per wave in [perWaveMin, perWaveMax]. */
+      perWaveMin: number;
+      perWaveMax: number;
+      min: number;
+      max: number;
+      name: string;
+    };
+    /** The cast bar's name, the eruption's damage label and the mechanic's name. */
+    name: string;
+    school: string;
+    yell?: string;
+  };
+  /**
+   * Punt, rather than shove, on every heavy slam this mob lands (mob/boss_slams.ts
+   * `launchFromSlam`, called from the telegraphed detonations, the warpath arrival, and
+   * both aimed slams above).
+   *
+   * The shipped knockback slides a victim along the ground, which reads as a push. A body
+   * thrown into the AIR reads as having been hit by something enormous, and for a boss
+   * whose whole identity is his fists that difference is the fight's texture. Set it only
+   * on a mob big enough that being launched by it is believable.
+   */
+  launch?: {
+    /** Yards of ground shove, run through the shared applyKnockback rules. */
+    distance: number;
+    /** Vertical impulse in yards/sec. GRAVITY is 16, so apex is up^2/32 yards; keep the
+     * apex under FALL_SAFE_DISTANCE (12) or the boss starts dealing fall damage too. */
+    up: number;
+    /** Outward air speed carried after the shove, so they keep travelling as they rise. */
+    outSpeed: number;
+    /** Multiplier at the blast rim, easing from 1 at the epicentre. */
+    edgeScale: number;
+  };
+  /**
+   * This mob's telegraphed blasts hurt OTHER CREATURES standing in them, not just players
+   * (mob/boss_collateral.ts `splashNearbyMobs`).
+   *
+   * For a world boss loose in an inhabited zone: he craters the road, and the boars standing
+   * in the crater die with everyone else. Inert without it, so every mob shipped before this
+   * keeps hitting exactly who it hit, in the same order, drawing the same rng.
+   */
+  /**
+   * A standing mitigation ward only a MECHANIC can remove (mob/eye_ward.ts): a permanent
+   * buff_dr aura on the mob, pried open for `blindSeconds` by the Shardpike's eye thrust
+   * (lance_trial.ts), then sealed against a re-blind for `refractorySeconds` after it
+   * re-forms. The level-spread device for a world boss: low levels open the window with a
+   * fixed-damage mechanic, high levels spend it.
+   */
+  eyeWard?: {
+    /** Buff name on his frame while the ward stands. */
+    name: string;
+    /** Fraction of incoming damage the ward turns away (a buff_dr value, 0..1). */
+    reduction: number;
+    /** Seconds the ward stays down after a successful thrust. */
+    blindSeconds: number;
+    /** Seconds after the ward RE-FORMS before it can be pried again. */
+    refractorySeconds: number;
+    /** Debuff name for the open window (its remaining time is the raid's timer). */
+    blindName: string;
+    /** Bark on being blinded, broadcast to `yellRange` (default 160). */
+    blindYell?: string;
+    yellRange?: number;
+  };
+  collateral?: {
+    /**
+     * Fraction of the blast's AUTHORED midpoint a bystander takes. Below 1 because zone
+     * wildlife has a fraction of a raider's health pool and a full-strength raid mechanic
+     * would sterilize the whole zone on the first pull.
+     */
+    mult: number;
+  };
+  /**
+   * Yards at which this mob is still VISIBLE, as a far sprite, long after the renderer has
+   * stopped drawing its rig (render/boss_impostor.ts) and the server would normally have
+   * stopped sending it (server/game.ts `interestLimitSq`).
+   *
+   * For a world boss, whose whole point is being a landmark you can see from across the zone
+   * and decide to walk toward. It costs one wire entity per viewer in range and one
+   * two-triangle draw, so it is for the one creature an hour that earns it, never for an
+   * elite. Absent means the ordinary interest and draw bands, which is every other mob.
+   */
+  landmarkRange?: number;
   ccImmune?: boolean;
   // Immune to movement-speed slow auras (kind 'slow'). Distinct from ccImmune, which
   // blocks the hard control auras (stun/root/incapacitate/polymorph) but intentionally
@@ -2139,6 +2540,16 @@ export interface MobTemplate {
   // seed stream, and driven by the ambient arm (mob/ambient.ts) whose wander
   // draws a private Rng sub-stream, not ctx.rng. See src/sim/mob/ambient.ts.
   ambient?: boolean;
+  // A soldier of the Mirefen muster (src/sim/mirefen_muster.ts): friendly set dressing
+  // that holds its post. Never hostile, never in combat, un-attackable (isHostileTo reads
+  // mob.hostile) and never on anyone's hate table, so it can neither hurt a boss nor feed
+  // his loot roster or HP scaling; only a collateral boss slam (mob/boss_collateral.ts)
+  // can kill it, and the muster module stands it back up. Spawned RNG-free by that module.
+  musterSoldier?: true;
+  // Boss mechanics sized by the RECEIVING player's level (mob/mechanic_level_scale.ts):
+  // the authored ranges at `fromLevel` and below, `toMult` times them at `toLevel`, a
+  // straight line between. Players only; the boss's melee swing is never scaled.
+  mechanicLevelScale?: { fromLevel: number; toLevel: number; toMult: number };
   // Boss mechanic: periodic AoE pulse around the mob while in combat.
   aoePulse?: {
     min: number;
@@ -2148,6 +2559,10 @@ export interface MobTemplate {
     name: string;
     school?: string;
     fx?: 'nova' | 'projectile';
+    // A safe ring inside the blast (boss_ring_gap.ts): anyone standing between these two
+    // fractions of the radius is missed. Balgath's Barrow Smash only; his renderer draws
+    // the same gap from the same fractions.
+    safeGap?: { inner: number; outer: number };
   };
   // Boss mechanic: a Geddon-style stationary channel. Every `every` seconds
   // the boss roots in place, stops meleeing, and channels for `duration`,
@@ -3993,6 +4408,9 @@ export interface NpcDef {
   // mid-fight). Keeping the def in NPCS lets the online client reconstruct its
   // questIds and treat it as a turn-in NPC.
   dynamic?: boolean;
+  // A `dynamic` NPC whose owning system always raises it at `pos` (the Muster Commander,
+  // raised with the Mirefen muster): the map may mark it from the def like a placed NPC.
+  fixedPost?: boolean;
 }
 
 export interface CampDef {
@@ -4522,6 +4940,10 @@ export type QuestObjective =
       targetObjectItemId?: string;
       targetNpcId?: string;
     })
+  // A named world event this player caused, credited by the owning system module (the
+  // exemplar: 'balgath_blinded' from src/sim/lance_trial.ts). Label-only in every
+  // presentation surface, so a new event costs its emitter one credit call and nothing else.
+  | (QuestObjectiveBase & { type: 'event'; eventId: string })
   | (QuestObjectiveBase & { type: 'craft'; recipeId: string })
   | (QuestObjectiveBase & { type: 'gather' } & (
         | { nodeType: GatherNodeType; itemId?: string }
@@ -4663,6 +5085,10 @@ export interface QuestDef {
   // teach the lesson with. Enforced in computeQuestState.
   requiresUsableHealAbility?: boolean;
   minLevel?: number;
+  // The highest level that may ACCEPT it (enforced in computeQuestState, which both hosts
+  // share). A quest already in the log stays finishable. The muster's pike tutorial is the
+  // first: its pikes are lent to level 19 and below (lance_balance_core MUSTER_PIKE_MAX_LEVEL).
+  maxLevel?: number;
   retired?: boolean; // remains finishable if already accepted, but cannot be newly accepted
   // OWNERSHIP collect objectives instead of DELIVERY ones: the collect count
   // includes worn equipment and bag sockets (quests/quest_owned_count.ts) and the
@@ -4683,6 +5109,10 @@ export interface QuestDef {
   // use professions/cadence.ts WORK_ORDER_CADENCE_TICKS). Only meaningful with
   // `repeatable`; absent means no cooldown (available again immediately).
   repeatCadenceTicks?: number;
+  // Repeatable once per WEEKLY reset (the raid rooms' boundary, ctx.weeklyRaidResetMs):
+  // the turn-in writes a `weeklyquest:<id>` lockout (quests/weekly_quest_lock.ts) that
+  // keeps the quest unavailable until the reset. Only meaningful with `repeatable`.
+  weeklyReset?: boolean;
   // Typed, server-authoritative profession transition applied only by the
   // validated turn-in path. The selected target is persisted on QuestProgress.
   // `pairId` (Professions 2.0): a per-pair attune quest pins its ONE
@@ -5104,6 +5534,9 @@ export interface HeroicLeapFlight {
   abilityName: string;
   abilityId: string;
   school: AbilityDef['school'];
+  // A heal the body takes the moment it lands (the Muster Grapnel's haul,
+  // combat/balgath_trinkets.ts), snapshotted at the throw from the thrower's power.
+  landingHeal?: { sourceId: number; amount: number; name: string };
 }
 
 export interface ValkyrsCallingFlight {
@@ -5155,6 +5588,34 @@ export interface GuardianState {
   requiredTargetAuraId?: string;
   /** Fire-and-forget guardians may dismiss when their target contract is exhausted. */
   dismissWhenUntargeted?: boolean;
+  /** Opt-in walking melee mode (combat/guardians.ts). Absent: the classic stationary
+   *  guardian that fires at range, unchanged. */
+  melee?: GuardianMelee;
+}
+
+/**
+ * A walking melee guardian (the Muster Standard's soldiers): it fights ONLY its owner's
+ * current hostile target, runs to it at `moveSpeed`, swings from `reach`, and walks back
+ * to its post (`postX`/`postZ`) while the owner has no target. It never picks a fight of
+ * its own. It is dismissed with its post: when the owner strays more than `leash` yd from
+ * it, and then the owner's aura `postAuraId` (the planted standard) is taken down too.
+ */
+export interface GuardianMelee {
+  moveSpeed: number;
+  reach: number;
+  postX: number;
+  postZ: number;
+  leash: number;
+  postAuraId?: string;
+  /**
+   * Follow the OWNER instead of holding the post (combat/guardians.ts): with nothing to
+   * fight it falls in beside its owner, the leash and the target reach are measured from
+   * the owner, and a guardian left past the leash rejoins at the owner's side rather than
+   * leaving. The Muster Standard's soldiers. Absent = the post-holding mode, unchanged.
+   */
+  followOwner?: boolean;
+  /** Which side of its owner a follower walks on: -1 left, 1 right. */
+  followSide?: number;
 }
 
 /**
@@ -5619,6 +6080,19 @@ export interface Entity extends ClientMirroredEntityFields {
   afk: boolean;
   // mob AI
   aiState: AiState;
+  /**
+   * The eye-ward clock (mob/eye_ward.ts): while `eyeWardDownUntil` is ahead of the sim
+   * clock the ward is pried open (the Blinded window); `eyeWardSealedUntil` refuses the
+   * next blind until the fight has breathed. Timestamps are the truth, the auras are
+   * presentation; only mobs whose template declares `eyeWard` ever carry them.
+   */
+  eyeWardDownUntil?: number;
+  eyeWardSealedUntil?: number;
+  /**
+   * Wire-visible: this player has the Shardpike couched (src/sim/lance_trial.ts). Other
+   * clients render the brace pose from it; the balance itself is self-only state.
+   */
+  bracing?: boolean;
   tappedById: number | null; // first player to damage this mob owns loot/xp/quest credit
   /** Classic-style hate table: attacker entity id (player or pet) -> threat.
    *  Wiped on evade/respawn/death; drives target selection with the 110%
@@ -5994,11 +6468,17 @@ export interface Entity extends ClientMirroredEntityFields {
   // list are live on THIS spawn (C=1, B=2, A=3, S=4; rift/ranks.ts). Undefined
   // (every non-rift mob, and rift trash) suppresses nothing.
   riftMechanicLimit?: number;
-  // Rift boss mechanic spacing: the minimum gap in seconds between two boss
-  // mechanic fires on THIS spawn, so mechanics never land on top of each other
-  // (mob/mechanic_spacing.ts). Stamped by rift/runs.ts on every rift boss and
-  // miniboss, including the authored citadel set-piece. Undefined (every
-  // non-rift mob) disables the shared lock entirely.
+  // Mechanic spacing: the minimum gap in seconds between two boss mechanic fires
+  // on THIS spawn, so mechanics never land on top of each other
+  // (mob/mechanic_spacing.ts), AND the switch that turns the instant AoEs into
+  // TELEGRAPHED ones (a ground ring, a windup, then the blast at the snapshot
+  // centre). Undefined disables both, which is every ordinary mob.
+  //
+  // The `rift` in the name is historical: rifts were the first and for a long
+  // time the only consumer, stamped per spawn by rift/runs.ts. It is now also set
+  // from `MobTemplate.telegraphedMechanics` for authored bosses whose design is
+  // dodge-the-circle. The name is kept because it is recorded in the parity golden
+  // entity samples, and a cosmetic rename there would force a golden regeneration.
   riftMechanicSpacing?: number;
   // Countdown on the shared mechanic lock (mob/mechanic_spacing.ts). Armed each
   // time a spacing-governed mechanic fires (plus the cast time for a hardcast,
@@ -6014,6 +6494,74 @@ export interface Entity extends ClientMirroredEntityFields {
   // samples never churn for unstamped mobs).
   stompWindupRemaining?: number;
   pulseWindupRemaining?: number;
+  // Warpath state (mob/warpath.ts). Only ever defined on a mob whose template declares
+  // `warpath`, the same defined-vs-undefined discipline as the windup fields above, so
+  // the parity golden's entity samples never churn for a mob that does not walk one.
+  warpathPhase?: 'focus' | 'travel' | 'wreck';
+  warpathTimer?: number;
+  // Slumber state (mob/slumber.ts): true while a `slumber` template sleeps through the
+  // night. Only ever defined on such a mob (the same defined-vs-undefined discipline as
+  // the warpath fields), mirrored to clients so the rig can lie down and wake with him.
+  asleep?: boolean;
+  /** Seconds left in the dawn rise (mob/slumber.ts): the AI is held while it runs. */
+  slumberRise?: number;
+  /** A /dev wake or sleep holding him against the clock until it agrees (mob/slumber.ts). */
+  slumberDevHold?: 'awake' | 'asleep';
+  /** Where the corpse lay before it began to sink (mob/boss_corpse_sink.ts). */
+  corpseSinkBaseY?: number;
+  /** Index into the template's destination list. */
+  warpathDestination?: number;
+  /** Seconds since anything reduced his health. */
+  warpathUnharried?: number;
+  /** Seconds with no living player inside his give-up range (mob/warpath.ts). */
+  warpathAlone?: number;
+  /** Health observed last tick, so any damage source counts as harassment. */
+  warpathLastHp?: number;
+  warpathSwipeTimer?: number;
+  // Aimed-slam state (mob/boss_slams.ts). Only ever defined on a mob whose template
+  // declares `slams`, the same defined-vs-undefined discipline as the windup fields
+  // above, so the parity golden's entity samples never churn for a mob without them.
+  // ONE windup slot for both, deliberately: the shared mechanic spacing lock already
+  // forbids two telegraphs at once, so a second slot could only ever hold a state the
+  // fight is not allowed to reach.
+  slamKind?: 'hammer' | 'cleave';
+  slamWindup?: number;
+  /** The hammer's snapshot aim POINT; the cleave's snapshot aim DIRECTION. */
+  slamX?: number;
+  slamZ?: number;
+  hammerTimer?: number;
+  cleaveTimer?: number;
+  // Ranged-punish state (mob/boss_ranged_mechanics.ts). Only ever defined on a mob whose
+  // template declares `rangedMechanics`, the same defined-vs-undefined discipline as the
+  // slam fields above. ONE windup slot for the three, for the same reason.
+  rangedKind?: 'boulder' | 'glare' | 'burden';
+  rangedWindup?: number;
+  /** Boulder: flat [x, z] impact points. Glare: [originX, originZ, dirX, dirZ, length]. */
+  rangedAim?: number[];
+  /** The player the burden was laid on. */
+  rangedTargetId?: number;
+  boulderTimer?: number;
+  glareTimer?: number;
+  burdenTimer?: number;
+  /** Seconds overdue of the oldest aimable due one, published each tick for the circle
+   *  smashes' oldest-due drain (mob/mechanic_spacing.ts); undefined when none is ready. */
+  rangedReadyOverdue?: number;
+  // Wake of the Fallen Star state (mob/boss_starwake.ts). Only ever defined on a mob whose
+  // template declares `starwake`, the same defined-vs-undefined discipline as above.
+  starwakeTimer?: number;
+  /** Seconds since the current cast began; undefined while none is in flight. */
+  starwakeElapsed?: number;
+  /** The laid fissures, flat [originX, originZ, dirX, dirZ, length] per fissure. */
+  starwakeFissures?: number[];
+  /** The laid geyser circles, flat [x, z, radius] per geyser. */
+  starwakeGeysers?: number[];
+  /** Live molten pools, flat [x, z, radius, remaining, tickTimer] per pool. */
+  starwakePools?: number[];
+  /** The meteor shower since the eruption; undefined while none is calling or falling
+   *  (mob/boss_starwake_meteors.ts). */
+  starwakeShower?: StarwakeShowerState;
+  /** Absolute sim time the arrival slam lands; null once it has, so it fires once. */
+  warpathBlastAt?: number | null;
   // The telegraphed ring center each windup was drawn at: the detonation is
   // measured from HERE, never from the boss's live position, so the edge
   // players dodge is the edge they were shown even if the boss chased during
@@ -6301,6 +6849,30 @@ export interface NythraxisEncounterState {
   // roster used for raid-wipe recovery, so a remote group member cannot farm
   // cooldown resets without participating.
   attemptParticipantIds?: number[];
+}
+
+/**
+ * Balgath's Star Debris shower in flight (mob/boss_starwake_meteors.ts): the waves still
+ * to call and the meteors still falling. Plain numbers only, like the other starwake state.
+ */
+export interface StarwakeShowerState {
+  /** The shower's cast key: every wave's pattern and every warning id derive from it. */
+  key: number;
+  /** Where he stood at the eruption: the shower's arena origin, wherever he walks next. */
+  originX: number;
+  originZ: number;
+  /** Seconds since the eruption. */
+  elapsed: number;
+  /** Seconds until the next wave. */
+  nextWave: number;
+  /** Waves called so far. */
+  wave: number;
+  /** Meteors called so far (each meteor's warning id index). */
+  serial: number;
+  /** The eruption's fissures, flat [originX, originZ, dirX, dirZ, length] per fissure. */
+  lines: number[];
+  /** Falling meteors, flat [x, z, secondsLeft, serial] per meteor. */
+  falling: number[];
 }
 
 export interface IgnivarEncounterState {
@@ -6804,6 +7376,11 @@ export type SimEvent = { pid?: number } & (
   // membership authority), the server persists the row and fans the entry out
   // to the account's other live sessions. `retro` marks the on-join seed pass.
   | { type: 'relicRecorded'; key: string; retro?: boolean }
+  // A Barrowglass Thrust broke the world boss's ward (src/sim/lance_trial.ts). Personal
+  // (carries pid): the wielder is the one owed the feedback, and `count` is their running
+  // tally so the client can float `+N` without holding its own counter, which would drift
+  // from the character's persisted number across a relog. Id-only, no English.
+  | { type: 'lanceBlind'; pid: number; count: number; targetId: number; effigy?: true }
   // Reliquary first fill (always personal: emitted with pid). Id-only: exactly
   // one of itemId / markId is set for a catalogued relic or authored mark.
   // pageIds list pages that list the relic; illuminatedPageId is set when a
@@ -9014,6 +9591,14 @@ export interface SimConfig {
   devCommands?: boolean; // local dev: /dev level|tp|give chat cheats
   worldPvpDisabled?: boolean; // realm kill switch for the /pvp flag (server env WORLD_PVP_DISABLED=1)
   lockoutNowMs?: () => number; // host wall-clock for persisted raid lockouts
+  // Host wall clock the day/night cycle is anchored to (src/sim/day_night.ts): the
+  // server's Date.now, the offline client's Date.now (or its /daynight override), so
+  // a boss who sleeps at night sleeps under the sky the renderer actually draws.
+  // Omitted (tests, the RL env): the sim has NO day/night clock, Sim.dayNightPhase()
+  // answers null, nocturnal behavior stays off and every schedule keeps its interval
+  // cadence, exactly the pre-cycle world. Only ever read through the SimContext seam,
+  // so the parity gate's rng draw order is untouched either way.
+  dayNightNowMs?: () => number;
   // Live server: schedule the first world-boss rise at boot instead of one
   // interval out, so a freshly (re)started realm has Thunzharr up immediately.
   // Offline worlds and parity traces keep the default (first rise after one
@@ -9029,6 +9614,11 @@ export interface SimConfig {
   // Default OFF so deterministic tests, parity traces, and the RL env never
   // teleport a fresh character mid-scenario unless they opt in.
   compulsoryTutorial?: boolean;
+  // Live worlds (server + offline client): raise the Mirefen muster (its squads, the
+  // command camp and its weapon rack; src/sim/mirefen_muster.ts) on the first tick,
+  // whether or not Balgath is up. Default OFF so deterministic tests, parity traces and
+  // the RL env allocate no muster ids unless they opt in (or see a Balgath).
+  mirefenMuster?: boolean;
   // Host-computed next raid-reset instant for a given lockout "now" (epoch ms). The
   // authoritative server uses its realm-local 3 AM daily reset; offline/headless omit
   // this and fall back to a flat 24h day. Keeps the time zone out of the sim core.
@@ -9319,6 +9909,7 @@ export type DeedStatKey =
   | 'groundObjectsLooted'
   | 'dungeonFinalBossKills'
   | 'thunzharrKills'
+  | 'balgathKills'
   | 'bloatCleanKills'
   | 'hubCraftsPerformed'
   | 'attunementsCompleted'
@@ -9359,6 +9950,7 @@ export const DEED_STAT_KEYS: readonly DeedStatKey[] = [
   'groundObjectsLooted',
   'dungeonFinalBossKills',
   'thunzharrKills',
+  'balgathKills',
   'bloatCleanKills',
   'hubCraftsPerformed',
   'attunementsCompleted',

@@ -2,9 +2,9 @@
 // known recipes, and cadence-blocked work orders. Extracted from sim.ts's
 // craftingIdentityFor (Modularity: a natural existing seam, moved verbatim).
 import type { CraftingIdentityView } from '../../world_api';
+import { repeatBlockedQuestIds } from '../quests/quest_commands';
 import type { SimContext } from '../sim_context';
 import { archetypeStateFor, requiredAmendsProgress } from './archetype';
-import { cadenceBlockedKeys } from './cadence';
 import { craftSkillsFor } from './wheel';
 
 export function craftingIdentityFor(ctx: SimContext, pid: number): CraftingIdentityView {
@@ -25,10 +25,11 @@ export function craftingIdentityFor(ctx: SimContext, pid: number): CraftingIdent
     // cprof delta diff (server/game.ts maybe()) re-emits exactly when the
     // set actually changes, never on Set iteration order.
     knownRecipes: [...(meta?.knownRecipes ?? [])].sort(),
-    // Work orders on cooldown, resolved against THIS host's tickCount.
+    // Work orders on cooldown, resolved against THIS host's tickCount, plus
+    // weekly quests locked until the weekly reset (quests/weekly_quest_lock.ts).
     // Sorted, so the cprof diff re-emits only on arm/expiry, and the
     // online client feeds it into its local computeQuestState.
-    cadenceBlockedQuests: cadenceBlockedKeys(meta?.questCadence ?? new Map(), ctx.tickCount),
+    cadenceBlockedQuests: meta ? [...(repeatBlockedQuestIds(ctx, meta) ?? [])].sort() : [],
     // Quested-hobby record (professions/hobby_memory.ts), KEY-SORTED for a
     // stable cprof signature and omitted while empty, so the delta diff
     // never fires for characters without the feature.

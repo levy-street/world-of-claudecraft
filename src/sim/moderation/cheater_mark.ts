@@ -21,7 +21,7 @@
 // outcome: the sanction is visibility, never a handicap. Nothing in this module
 // may grow a mechanical effect.
 
-import type { Aura } from '../types';
+import type { Aura, Entity, SimEvent } from '../types';
 
 /**
  * Aura id for the countdown debuff. Stable because every host keys off it by
@@ -125,4 +125,48 @@ export function cheaterMarkAura(mark: CheaterMark, entityId: number): Aura {
     school: 'physical',
     undispellable: true,
   };
+}
+
+/**
+ * Set, refresh or lift an entity's Cheater Mark (the operator verb behind
+ * `Sim.setCheaterMark`). The aura write and the event emit are injected, so this stays a
+ * pure leaf: no SimContext, no rng, no clock.
+ */
+export function setCheaterMarkOn(
+  e: Entity,
+  seconds: number,
+  applyAura: (aura: Aura) => void,
+  emit: (ev: SimEvent) => void,
+): void {
+  // Garbage in, no-op out: normalize collapses NaN and non-numbers to 0, and
+  // 0 is the LIFT arm, so without this guard a corrupt budget from any caller
+  // would silently end a live sanction. Only an explicit finite value may
+  // lift; anything else leaves the mark exactly as it stands.
+  if (typeof seconds !== 'number' || !Number.isFinite(seconds)) return;
+  const mark = normalizeCheaterMark(seconds);
+  if (mark) {
+    applyAura(cheaterMarkAura(mark, e.id));
+    // Derive the flag from the POST-CONDITION, not from the intent. No
+    // applyAura guard can refuse this aura today (they gate on npc/mob kinds,
+    // or on control kinds from a foreign source, and the mark is inert and
+    // self-sourced), but an intent-set flag would survive one of them
+    // widening, and the result is a tag with no countdown: the natural-expiry
+    // hook cannot fire without an aura, so only an operator lift would clear
+    // it. Reading back costs one scan on an operator action, never per tick.
+    e.cheaterMark = e.auras.some((a) => a.id === CHEATER_MARK_AURA_ID) || undefined;
+    return;
+  }
+  const live = e.auras.findIndex((a) => a.id === CHEATER_MARK_AURA_ID);
+  if (live >= 0) {
+    const [lifted] = e.auras.splice(live, 1);
+    emit({
+      type: 'aura',
+      targetId: e.id,
+      name: lifted.name,
+      gained: false,
+      sourceId: lifted.sourceId,
+      abilityId: lifted.id,
+    });
+  }
+  e.cheaterMark = undefined;
 }

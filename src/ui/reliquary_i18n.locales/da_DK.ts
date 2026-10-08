@@ -62,6 +62,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Thunzharr, den Vågnende Tinde',
     desc: 'Personligt episk bytte fra den Vågnende Tindes verdensboss.',
   },
+  conquerors_balgath: {
+    name: 'Balgath, den Begravede Formand',
+    desc: 'Bytte slæbt op af gravhøjene i Mirefen.',
+  },
   conquerors_collapsed_reliquary: {
     name: 'Det Sammenstyrtede Relikvarium',
     desc: 'Kendetegnende sjældenheder fra dirkekisten i Det Sammenstyrtede Relikvarium.',

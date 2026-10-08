@@ -700,7 +700,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '164b585f770570b773faa8e35c466bcd4ab2840a6572507aa9528bc52572cbc5';
+  // Re-minted at the Mirefen world-boss branch's release/v0.45.0 merge
+  // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
+  '1e3517a7b12c450078a9ced4c9ed766cf63d6e166300cb4be0c283ea7eeda1d3';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

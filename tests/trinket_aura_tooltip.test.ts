@@ -101,12 +101,18 @@ describe('trinket aura icons', () => {
       trinket_pierce: 'molten_fletching',
       trinket_lantern: 'last_flame_lantern',
       trinket_crucible_heat: 'heart_of_the_crucible',
+      // Balgath's (combat/balgath_trinkets.ts); the Grapnel applies no aura of its own.
+      trinket_foreman_shape: 'knucklebone_of_balgath',
+      trinket_muster_standard: 'muster_standard',
+      trinket_guttered_glare: 'guttered_eye',
+      trinket_barrowstone_statue: 'barrowstone_heart',
     });
     // Every trinket with a use or passive aura owns at least one of them; the
     // Medallion of Defiance applies none (it only breaks control).
     const owners = new Set(Object.values(TRINKET_AURA_ITEM));
     expect(Object.keys(TRINKET_ITEMS).filter((id) => !owners.has(id))).toEqual([
       'medallion_of_defiance',
+      'muster_grapnel',
     ]);
   });
 
@@ -314,6 +320,26 @@ describe('trinket aura tooltips (English)', () => {
       'Crucible Heat (another player)',
       foreign({ id: TRINKET_AURA.guardHeat, kind: 'internal_cd', value: 4, stacks: 4 }),
       'Heat: 4/10. Heart of the Crucible spends it all on a fire nova within 10 yd that deals more Fire damage for each stack and taunts every creature it hits.',
+    ],
+    [
+      'Shape of the Foreman',
+      own({ id: TRINKET_AURA.foremanShape, kind: 'form_foreman', value: 50 }),
+      'You are the Foreman: 50% more armor and immune to knockbacks.',
+    ],
+    [
+      'Muster Standard',
+      own({ id: TRINKET_AURA.musterStandard, kind: 'internal_cd', value: 2 }),
+      'Your Muster Standard is planted. Its soldiers march with you and fight your target.',
+    ],
+    [
+      'Guttered Glare',
+      own({ id: TRINKET_AURA.gutteredGlare, kind: 'internal_cd', value: 42, tickInterval: 0.5 }),
+      'The beam deals 42 Arcane damage every 0.5 sec to enemies in its path. Moving or casting ends it.',
+    ],
+    [
+      'Stone Statue',
+      own({ id: TRINKET_AURA.stoneStatue, kind: 'stasis', value: 0.2 }),
+      'Turned to stone: immune to damage and unable to act. You return with 20% of your maximum health.',
     ],
   ];
 

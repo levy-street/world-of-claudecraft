@@ -17,6 +17,7 @@
 //   - mortal_wound/cost_tax/critvuln/vulnerability/spellvuln/expose/buff_dodge:
 //     value is a 0..1 fraction shown as a percent.
 
+import { BURDEN_AURA_ID } from '../sim/boss_ranged_geometry';
 import {
   ECHO_CONVERT_AOE,
   ECHO_GROUP_CONVERT_AOE,
@@ -64,6 +65,7 @@ import {
   VARKHUL_MAKERS_BRAND_PER_STACK,
   VARKHUL_MAKERS_BRAND_TANK_SWAP_STACKS,
 } from '../sim/encounters/varkhul';
+import { EFFIGY_OPENED_AURA_ID, EFFIGY_WARD_AURA_ID } from '../sim/muster_effigy_core';
 import {
   NYTHRAXIS_ASCENSION_AURA_ID,
   NYTHRAXIS_ASCENSION_HASTE_AURA_ID,
@@ -204,6 +206,16 @@ export function auraEffectDescriptor(
       ? { key: `${KEY}.mendingCurrentPercent`, nums: { pct: round(a.poolPct) } }
       : { key: `${KEY}.mendingCurrent`, nums: { value: round(a.value) } };
   }
+  // Balgath's Barrow Burden: the same shared-soak split, so the same sentence, priced
+  // from the mark itself (value2 is the total fraction, stacks the players it asks for).
+  if (a.id === BURDEN_AURA_ID) {
+    const players = Math.max(1, Math.floor(a.stacks ?? 4));
+    const total = pctFromFrac(a.value2 ?? 0);
+    return {
+      key: `${KEY}.sharedPyre`,
+      nums: { total, players, perPlayer: round(total / players) },
+    };
+  }
   if (a.id === 'ignivar_shared_pyre') {
     const total = pctFromFrac(IGNIVAR_SOAK_SHARED_MAX_HP);
     return {
@@ -339,6 +351,20 @@ export function auraEffectDescriptor(
   }
   if (a.id === 'temporal_hourglass' && a.kind === 'stasis') {
     return { key: `${KEY}.temporalHourglass`, nums: {} };
+  }
+  // A slumbering world boss in bed (src/sim/mob/slumber.ts): a value-zero buff_dr whose
+  // whole job is to tell the raid he is asleep, so it must never fall through to the
+  // generic "reduces damage by 0%" line.
+  if (a.id === 'slumber' && a.kind === 'buff_dr') {
+    return { key: `${KEY}.slumber`, nums: {} };
+  }
+  // The drill yard's effigy (src/sim/muster_effigy.ts): its plank hide, and a player's own
+  // open window on it (an inert timer; the window's truth lives on the muster army).
+  if (a.id === EFFIGY_WARD_AURA_ID && a.kind === 'buff_dr') {
+    return { key: `${KEY}.effigyPlankHide`, nums: { pct: pctFromFrac(a.value) } };
+  }
+  if (a.id === EFFIGY_OPENED_AURA_ID && a.kind === 'internal_cd') {
+    return { key: `${KEY}.effigyLanternOut`, nums: {} };
   }
   if (a.id === 'heating_up' && a.kind === 'internal_cd') {
     return { key: `${KEY}.heatingUp`, nums: {} };

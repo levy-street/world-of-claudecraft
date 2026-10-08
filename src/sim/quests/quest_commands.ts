@@ -56,6 +56,7 @@ import {
 } from './profession_quest_effects';
 import { playerHoldsQuestItem } from './quest_item_presence';
 import { grantQuestRecipeReward, validateQuestRecipeReward } from './quest_recipe_rewards';
+import { weeklyLockedQuestIds, weeklyQuestLockoutId } from './weekly_quest_lock';
 
 // Pure quest-state computation, shared by the sim and the network client. Relocated
 // from sim.ts (W4) and re-exported from sim.ts so the ClientWorld import
@@ -80,6 +81,7 @@ export function computeQuestState(
   if (questsDone.has(questId) && !quest.repeatable) return 'done';
   if (quest.requiresQuest && !questsDone.has(quest.requiresQuest)) return 'unavailable';
   if (quest.minLevel && playerLevel < quest.minLevel) return 'unavailable';
+  if (quest.maxLevel && playerLevel > quest.maxLevel) return 'unavailable';
   if (quest.retired) return 'unavailable';
   // Class-locked quest (the paladin-only Divine Tome chain): invisible to any
   // other class. A missing class fails closed so a class-less caller never opens it.
@@ -131,10 +133,7 @@ export function computeQuestState(
 export function questState(ctx: SimContext, questId: string, pid?: number): QuestState {
   const r = ctx.resolve(pid);
   if (!r) return 'unavailable';
-  const withinCadence =
-    r.meta.questCadence.size > 0
-      ? new Set(cadenceBlockedKeys(r.meta.questCadence, ctx.tickCount))
-      : undefined;
+  const withinCadence = repeatBlockedQuestIds(ctx, r.meta);
   return computeQuestState(
     questId,
     r.meta.questLog,
@@ -144,6 +143,25 @@ export function questState(ctx: SimContext, questId: string, pid?: number): Ques
     withinCadence,
     r.meta.cls,
   );
+}
+
+/**
+ * The repeatable quests this player cannot take again yet: work orders inside their tick
+ * cadence, plus weekly quests locked until the weekly reset (weekly_quest_lock.ts). One
+ * set, fed to computeQuestState here and mirrored to the online client through the cprof
+ * `cadenceBlockedQuests` (professions/crafting_identity.ts), so both worlds agree.
+ * Undefined when nothing is blocked, which keeps the common case allocation-free.
+ */
+export function repeatBlockedQuestIds(
+  ctx: SimContext,
+  meta: PlayerMeta,
+): ReadonlySet<string> | undefined {
+  const cadence =
+    meta.questCadence.size > 0 ? cadenceBlockedKeys(meta.questCadence, ctx.tickCount) : [];
+  const weekly =
+    meta.raidLockouts.size > 0 ? weeklyLockedQuestIds(meta.raidLockouts, ctx.lockoutNowMs()) : [];
+  if (cadence.length === 0 && weekly.length === 0) return undefined;
+  return new Set([...cadence, ...weekly]);
 }
 
 function questNpcFor(
@@ -487,6 +505,11 @@ export function turnInQuestCore(
   // authoritative and persisted per character with zero-default omission.
   if (quest.repeatCadenceTicks && quest.repeatCadenceTicks > 0) {
     armCadence(meta.questCadence, questId, ctx.tickCount, quest.repeatCadenceTicks);
+  }
+  // A weekly quest locks until the realm's weekly reset (weekly_quest_lock.ts).
+  if (quest.weeklyReset) {
+    const now = ctx.lockoutNowMs();
+    meta.raidLockouts.set(weeklyQuestLockoutId(questId), ctx.weeklyRaidResetMs(now));
   }
   // A quest that unlocks a quest-gated ability (recall_the_fallen <-
   // q_rite_of_redemption) must surface it now: rebuild the known list (which reads

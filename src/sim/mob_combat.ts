@@ -137,6 +137,28 @@ function buildCombatProfileForMob(templateId: string, scale: number): MobCombatP
       meleeRange: scaledDefaultMobMeleeRange(2.275),
       desiredRange: 5,
     };
+  // Balgath, the Mirefen world boss at scale 4.2. One departure from the scaled default,
+  // and it is what the fight needs rather than what the body measures: the scaled default
+  // settles him at 11.7 yards and he simply STOPS there, swinging from outside his own
+  // silhouette at a target he never closes on. That is the wildheart/grubjaw lesson one
+  // size up and it is worse here, because at his reach the standoff is wide enough that
+  // the raid never sees him take a step, which reads as a statue with a health bar. 9 is
+  // contact for a body this size, so he walks all the way in.
+  //
+  // He deliberately KEEPS canLeash. He walks a warpath (mob/warpath.ts), a circuit of
+  // landmarks across the zone, and the obvious way to stop the 45-yard tether pulling him
+  // home mid-run is to turn it off. That was tried and it is wrong: an untethered open
+  // world boss can be dragged anywhere by one kiting player and never comes back, since
+  // nothing else in this fight ever returns him. Instead the warpath REFRESHES his leash
+  // anchor while he travels, so the tether follows his circuit and then re-tightens
+  // around whichever landmark he stopped at. Untethered where he is supposed to be
+  // moving, tethered everywhere else.
+  if (templateId === 'balgath_cyclops')
+    return {
+      ...DEFAULT_MOB_COMBAT_PROFILE,
+      meleeRange: scaledDefaultMobMeleeRange(4.2),
+      desiredRange: 9,
+    };
   if (templateId === 'wildheart_beastmaster')
     return {
       ...DEFAULT_MOB_COMBAT_PROFILE,

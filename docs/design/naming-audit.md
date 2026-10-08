@@ -721,6 +721,26 @@ Exact-phrase and coined-token searches against the major game wikis.
 | Cocoon / Cocooned | Vysska's cast and the wrapped player's stun | KEEP. Single common English words. |
 | Draining Silk | her feeding's damage line | KEEP. No match. |
 
+## Balgath loot addendum (2026-09-28)
+
+The Mirefen world boss's loot pass (five trinkets, a caster staff and their aura
+names) was web-checked before shipping (exact-phrase plus coined-token searches
+against the major game wikis), and the one live collision on the boss's existing
+content was renamed display-only in the same change (id `loomshard_eye` frozen,
+pinned in `tests/originality_renames.test.ts`).
+
+| Name | Verdict | Detail |
+|---|---|---|
+| Loomshard (item, thrust label, lance log, two quest texts) | RENAMED | -> Barrowglass. Loomshard is a coined material in Eternal Strands; Barrowglass returned no game hit |
+| Knucklebone of Balgath | CLEAR | built on our own boss name |
+| Muster Standard | CLEAR | generic English, our own Mirefen muster |
+| The Guttered Eye | CLEAR | generic English phrase, no game item of that name |
+| Barrowstone Heart | CLEAR | chosen over Heart of Stone (BORDERLINE: a common item name in other games) |
+| Muster Grapnel | CLEAR | generic English |
+| Craterglass Stave | CLEAR | chosen over Starwake Stave (BORDERLINE); no hit for the coined token |
+| Shape of the Foreman / Guttered Glare / Grapnel Pull (auras) | CLEAR | generic English on our own boss vocabulary |
+| Stone Statue (aura) | CLEAR | chosen over Stoneheart Statue (BORDERLINE); generic English |
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

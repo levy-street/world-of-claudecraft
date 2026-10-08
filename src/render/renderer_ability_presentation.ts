@@ -6,6 +6,7 @@ import { resumeActiveAbilityKit } from './ability_vfx/active_kit_prewarm';
 import type { AbilityVfxDeps } from './ability_vfx/painter';
 import { isLivingWarriorAttentionSource } from './ability_vfx/warrior_attention_core';
 import { preparedAbilityAudio, type SpatialAudioSink } from './audio_sink';
+import { BalgathLootRelics, composeRelicHooks } from './balgath_loot_relics';
 import { CAST_VFX_ENGINE } from './cast_vfx_family';
 import type { CastVfxReadiness } from './cast_vfx_readiness_core';
 import type { CharacterVisual } from './characters/visual';
@@ -13,6 +14,7 @@ import { createOnrushArrivalHandler } from './characters/warrior_rush_pose';
 import { impactContact } from './impact_contact';
 import type { LightPulses } from './light_pulses';
 import type { EntityView } from './renderer';
+import { ShardpikeThrowFx } from './shardpike_throw_fx';
 import { TrinketRelics } from './trinket_relics';
 import type { Vfx } from './vfx';
 import type { VfxAnchorResolver } from './vfx_anchor';
@@ -77,6 +79,15 @@ export function createRendererAbilityPresentation(h: PresentationHost) {
     },
   );
   fx.setViewportScale(h.height() * h.pixelRatio(), 60, h.height());
+  fx.shardpikeThrow = new ShardpikeThrowFx(
+    h.scene,
+    h.world,
+    visual,
+    fx,
+    // The throw draws engine-family pools (bodyGlow, impact), so it waits on that family.
+    () => h.castGate.ready(CAST_VFX_ENGINE),
+    h.camera,
+  );
   fx.setSpiritBuildScheduler(h.spiritBuild);
   fx.setSpiritCompileGate(h.compile);
   fx.setCastVfxSpawnGate((bit) => h.castGate.spawnAllowed(bit));
@@ -98,14 +109,27 @@ export function createRendererAbilityPresentation(h: PresentationHost) {
     // linked that family (the release's per-family cast admission).
     ready: () => h.castGate.ready(CAST_VFX_ENGINE),
   });
+  // Balgath's trinkets in the world (balgath_loot_relics.ts): the same pooled, prewarmed
+  // shape, offered every trinket cue right after the Crucible relics.
+  const balgathLoot = new BalgathLootRelics({
+    scene: h.scene,
+    world: () => h.world(),
+    views: h.views,
+    anchor: h.anchor,
+    ground: (x, z) => h.ground(x, z),
+    vfx: h.vfx,
+    time: () => h.time(),
+    ready: () => h.castGate.ready(CAST_VFX_ENGINE),
+  });
   const painter = new AbilityVfx(
     {
       ...h.painter,
-      trinketRelics,
+      trinketRelics: composeRelicHooks(trinketRelics, balgathLoot),
       castVfxAdmit: (mask) => h.castGate.admit(mask),
       castVfxReady: (mask) => h.castGate.ready(mask),
       vfx: h.vfx,
       fx,
+      shardpikeThrow: fx.shardpikeThrow,
       anchor: h.anchor,
       setAuraGlow: (id, color, intensity) => visual(id)?.setAuraGlow(color, intensity),
       playShoutAnim: (id) => {

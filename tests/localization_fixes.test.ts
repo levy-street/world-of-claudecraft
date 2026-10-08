@@ -1266,6 +1266,8 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // variable-routed via FATIGUE_WARNING but matched by the sim_i18n EXACT
     // map (log.seaFatigue); scanning keeps future literal emits guarded.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/fatigue.ts'), 'utf8'),
+    // The Shardpike trial (brace/thrust refusals + the set/fumble/blind notices).
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/lance_trial.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/runs.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/lockpick_controller.ts'), 'utf8'),
     // DL1: Drowned Litany boss/rite/rooms emit surfaces.
@@ -1476,6 +1478,10 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // above, resolved by the sim_i18n log.bossUnleashes RULE). Scanned so any FUTURE literal
     // emit added to this module lands under the drift guard from day one.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/dragonkin_brood.ts'), 'utf8'),
+    // The warpath's dev trace: its lines are dev-channel ("[dev] ..." to testers, only with
+    // dev commands on), English by rule and variable-routed like dev_commands.ts emitDevLog.
+    // Scanned so a literal PLAYER emit ever added here lands under the drift guard.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/warpath_dev_trace.ts'), 'utf8'),
     socialSrc,
     // Whole-directory sweep (the phase 18 whole-branch review): EVERY
     // src/sim/professions module is scanned, the same directory-glob treatment

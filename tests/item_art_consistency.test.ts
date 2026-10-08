@@ -853,7 +853,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // The Emissary's Cache chest: 1,322. The Clue Scroll items (clue_scroll,
     // treasure_casket): 1,323. The faction ladder rework's 17 new rows
     // (13 periphery pieces + 4 formulas): 1,340. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,341. the trinket slot's 18 trinkets (PR 4173): 1,359. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s 139 honor items: 1,498.
-    expect(Object.keys(ITEMS)).toHaveLength(1617);
+    // Plus the Mirefen world-boss branch (nine items: the boss spoils, both Shardpikes and the
+    // Wage rares) and Balgath's loot (five trinkets and the Craterglass Stave), at the
+    // release/v0.45.0 merge: +15.
+    expect(Object.keys(ITEMS)).toHaveLength(1632);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -1017,9 +1020,12 @@ describe('item-art consistency accepted-art provenance', () => {
     // Scroll icons (clue-scroll-icons-2026-09-17, two SVG compositions) join:
     // 1,305. The faction ladder icons (faction-ladder-icons-2026-09-23, 17 SVG
     // compositions) join: 1,322. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,323. the trinket slot's 18 trinkets (PR 4173): 1,341. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s four painted weapons: 1,345.
-    expect(new Set(currentOwnerIds).size).toBe(1464);
-    expect(shippingIds).toHaveLength(1464);
-    expect(Object.keys(ITEMS)).toHaveLength(1617);
+    // Plus the Mirefen world-boss branch (nine items: the boss spoils, both Shardpikes and the
+    // Wage rares) and Balgath's loot (five trinkets and the Craterglass Stave), at the
+    // release/v0.45.0 merge: +15.
+    expect(new Set(currentOwnerIds).size).toBe(1479);
+    expect(shippingIds).toHaveLength(1479);
+    expect(Object.keys(ITEMS)).toHaveLength(1632);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1157,7 +1163,10 @@ describe('item-art consistency accepted-art provenance', () => {
     expect(hoardLootBatchIds).toHaveLength(96);
     expect(sorted(hoardLootBatchIds)).toEqual(sorted(Object.keys(HOARD_ITEMS)));
     // The OSSBrain PR #3781 reconcile's two reins owners are additive beyond
-    // this whole historical chain too, the same way the Field Kit is.
+    // this whole historical chain too, the same way the Field Kit is, and so
+    // are the Mirefen world boss's eight spoils: their three batches
+    // (balgath-boss-icons-2026-08-18, shardpike-mechanic-icons-2026-08-20,
+    // foremans-wage-icons-2026-08-25) all postdate this dated verdict.
     expect(
       sorted([
         ...oldPassIds,
@@ -1181,6 +1190,23 @@ describe('item-art consistency accepted-art provenance', () => {
         'vanguard_oath_blade',
         'vanguard_fang_dagger',
         'vanguard_warstaff',
+        'foremans_barrowmaul',
+        'loomshard_eye',
+        'barrowhide_pauldrons',
+        'mirestone_stride',
+        'skerrits_shardpike',
+        'foremans_wage_band',
+        'mirelight_locket',
+        'fenwright_grips',
+        // The Mirefen muster rework's lent pike (muster-shardpike-icon-2026-09-26).
+        'muster_shardpike',
+        // Balgath's loot (balgath-loot-icons-2026-09-28).
+        'knucklebone_of_balgath',
+        'muster_standard',
+        'guttered_eye',
+        'barrowstone_heart',
+        'muster_grapnel',
+        'craterglass_stave',
       ]),
     ).toEqual(sorted(currentOwnerIds));
 
@@ -1349,7 +1375,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // its batch (faction-ladder-icons-2026-09-23) = 36. The trinket slot's icon batch
     // (trinket-slot-icons-2026-09-23) = 37. Warfare Season 2's weapon
     // batch (warfare-season2-weapons-2026-09-25) = 38.
-    expect(mapping.generatedBatches).toHaveLength(41);
+    // Plus the Mirefen world-boss branch's five batches (balgath-boss, shardpike-mechanic,
+    // foremans-wage, muster-shardpike, balgath-loot) at the release/v0.45.0 merge = 46.
+    expect(mapping.generatedBatches).toHaveLength(46);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1419,13 +1447,17 @@ describe('item-art consistency accepted-art provenance', () => {
     // Season 2's weapon batch adds 4: 815. The Buried Hoards branch's three
     // batches (18 faction reward paintings, 5 treasure-map family, 96 hoard boss
     // loot) add 119 at the 2026-09-28 release merge: 934.
-    expect(priorGeneratedIds).toHaveLength(934);
+    // Plus the Mirefen world-boss branch's 15 batch ids: 949.
+    expect(priorGeneratedIds).toHaveLength(949);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1464);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1464);
+    // Plus the Mirefen world-boss branch (nine items: the boss spoils, both Shardpikes and the
+    // Wage rares) and Balgath's loot (five trinkets and the Craterglass Stave), at the
+    // release/v0.45.0 merge: +15.
+    expect(allCurrentOwnerIds).toHaveLength(1479);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1479);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1439,7 +1471,8 @@ describe('item-art consistency accepted-art provenance', () => {
       // + the 18 trinkets (trinket-slot-icons-2026-09-23) = 811.
       // + the 4 Warfare Season 2 weapons = 815.
       // + the Buried Hoards branch's 119 paintings (three batches) = 934.
-      priorGenerated: 934,
+      // + the Mirefen world-boss branch's 15 = 949.
+      priorGenerated: 949,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1468,6 +1501,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // chain too (like the Field Kit): neither the dated Masterwrought verdict
     // nor the Nythraxis/Bramblehide release batches know about them, so they
     // join the same way the Field Kit does, bringing the total to 1,283.
+    // The Mirefen world-boss forward-port's eight spoils are additive beyond
+    // the whole chain in exactly the same way (their three batches postdate
+    // every record above, which is why the frozen 2026-08-09 campaign record
+    // does not carry them), bringing the total to 1,291.
     const datedMasterwroughtVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const releaseBatchIdsForCatalog = mapping.generatedBatches
       .filter(
@@ -1533,8 +1570,26 @@ describe('item-art consistency accepted-art provenance', () => {
         'vanguard_oath_blade',
         'vanguard_fang_dagger',
         'vanguard_warstaff',
+        // The Mirefen world boss's own batches (boss spoils, Shardpike, Foreman's Wage,
+        // muster pike).
+        'foremans_barrowmaul',
+        'loomshard_eye',
+        'barrowhide_pauldrons',
+        'mirestone_stride',
+        'skerrits_shardpike',
+        'foremans_wage_band',
+        'mirelight_locket',
+        'fenwright_grips',
+        'muster_shardpike',
+        // Balgath's loot (balgath-loot-icons-2026-09-28).
+        'knucklebone_of_balgath',
+        'muster_standard',
+        'guttered_eye',
+        'barrowstone_heart',
+        'muster_grapnel',
+        'craterglass_stave',
       ]),
-      'the dated catalog plus the release batches, the world-quest, faction-vendor, faction-ladder and clue-scroll batches, the Field Kit, the OSSBrain reins icons and the Emissary Cache and the trinket icons is the full current catalog',
+      'the dated catalog plus the release batches, the Field Kit, the OSSBrain reins icons, and the Mirefen world-boss spoils is the full current catalog',
     ).toEqual(sorted(allCurrentOwnerIds));
     expect(batch?.provenanceRecords).toEqual([
       `${evidenceDir}/accepted-art.json`,
@@ -1660,16 +1715,17 @@ describe('item-art consistency accepted-art provenance', () => {
     for (const id of ownerIds) ownerCountById.set(id, (ownerCountById.get(id) ?? 0) + 1);
 
     const violations: string[] = [];
-    // Matches the mapping-owner sum above: 43 entries + 755 prior-generated
+    // Matches the mapping-owner sum above: 43 entries + 763 prior-generated
     // batch ids + 274 historical-audit batch ids + 165 Masterwrought-completion
     // batch ids + 46 Crucible-professions batch ids = 1283.
     // Plus the world-quest branch's four quest-item owners at the release/v0.43.0
     // merge = 1302. Plus the weekly emissary's cache chest = 1303. Plus the two
     // Clue Scroll owners = 1305. Plus the 17 faction ladder owners
     // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464.
-    if (ownerIds.length !== 1464)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1464`);
-    if (fileIds.length !== 1464) violations.push(`shipping WebP count: ${fileIds.length} != 1464`);
+    // Plus the Mirefen world-boss branch and Balgath's loot (15 items) = 1479.
+    if (ownerIds.length !== 1479)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1479`);
+    if (fileIds.length !== 1479) violations.push(`shipping WebP count: ${fileIds.length} != 1479`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);
