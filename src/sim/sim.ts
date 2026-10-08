@@ -10455,9 +10455,7 @@ export class Sim {
     return this.postOffice.mailInfoFor(pid);
   }
 
-  // Server-only broadcast helper (never IWorld, the marketBrowseRevFor shape):
-  // the cheap change signal server/game.ts polls before paying for a
-  // mailInfoFor rebuild. Null while the player is not at a raven pillar.
+  // Server-only mailbox revision, outside IWorld; null away from a raven pillar.
   mailRevFor(pid: number): number | null {
     return this.postOffice.mailRevFor(pid);
   }
@@ -10476,6 +10474,8 @@ export class Sim {
     return this.postOffice.hasCustodyParcel(custodyRef);
   }
   canBookVaultRewardMail = (id: number): boolean => this.postOffice.canBookVaultRewardMail(id);
+  canBookReportRewardMail = (id: number, name: string): boolean =>
+    this.postOffice.canBookReportRewardMail(id, name);
   // The vault mail take / recovery seams (server/vault_mail_take_*.ts).
   takeDirtyMailPartition = (key: string) => this.postOffice.takeDirtyMailPartition(key);
   restoreVaultLetter = (...a: Parameters<PostOffice['restoreVaultLetter']>) =>

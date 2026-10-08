@@ -167,3 +167,18 @@ restart behavior. The overlay test verifies that replay also carries zero copper
 Real-browser verification opened the current letter in the actual mailbox and
 confirmed the thank-you text, no money or item attachments, and no collection
 button. `docs/screenshots/report-rewards/desktop-mail.png` shows this updated mail.
+
+## CI facade correction
+
+CI exposed a direct server read of `sim.postOffice` for report-mail admission.
+`server/main.ts` now calls `Sim.canBookReportRewardMail`; the mailbox admission
+tests exercise this facade, retaining indexed counts and the existing limit.
+
+```text
+npx vitest run tests/server_sim_facade.test.ts tests/report_reward_mail_admission.test.ts tests/monolith_budget.test.ts --maxWorkers=1
+PASS: 27 tests
+pnpm exec tsc --noEmit
+PASS
+pnpm exec biome check server/main.ts src/sim/sim.ts tests/report_reward_mail_admission.test.ts
+PASS: no errors
+```

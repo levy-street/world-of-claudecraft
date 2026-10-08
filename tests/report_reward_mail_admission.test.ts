@@ -13,10 +13,10 @@ describe('report reward mailbox admission', () => {
         `old:${i}`,
       );
     }
-    expect(sim.postOffice.canBookReportRewardMail(9, 'Reporter')).toBe(true);
+    expect(sim.canBookReportRewardMail(9, 'Reporter')).toBe(true);
     sim.mailSystemParcel({ key: '9', name: 'Reporter' }, BOT_REPORT_REWARD_LETTER, [], 'last');
-    expect(sim.postOffice.canBookReportRewardMail(9, 'Reporter')).toBe(false);
-    expect(sim.postOffice.canBookReportRewardMail(10, 'Other')).toBe(true);
+    expect(sim.canBookReportRewardMail(9, 'Reporter')).toBe(false);
+    expect(sim.canBookReportRewardMail(10, 'Other')).toBe(true);
   });
 
   it('admission reads only the indexed recipient counts against a grown book', () => {
@@ -31,7 +31,7 @@ describe('report reward mailbox admission', () => {
     }
     const index = (sim.postOffice as unknown as { index: { countFor(key: string): number } }).index;
     const count = vi.spyOn(index, 'countFor');
-    expect(sim.postOffice.canBookReportRewardMail(9, 'Reporter')).toBe(true);
+    expect(sim.canBookReportRewardMail(9, 'Reporter')).toBe(true);
     expect(count.mock.calls).toEqual([['9'], ['Reporter']]);
   });
 });

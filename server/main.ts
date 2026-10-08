@@ -3741,7 +3741,7 @@ export async function startServer(): Promise<http.Server> {
     },
     {
       book: game.sim,
-      canBook: (id, name) => game.sim.postOffice.canBookReportRewardMail(id, name),
+      canBook: (id, name) => game.sim.canBookReportRewardMail(id, name),
       onlineAccounts: () => {
         reportRewardSessions.clear();
         for (const s of game.clients.values()) {
