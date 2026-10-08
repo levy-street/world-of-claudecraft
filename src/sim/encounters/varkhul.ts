@@ -185,6 +185,7 @@ import {
   varkhulWorldfireStage,
 } from '../varkhul_worldfire';
 import { attemptLost } from './attempt_wipe';
+import { committedTankIds } from './committed_tanks';
 import { resolveEncounterWipe } from './encounter_wipe';
 import { resolveLivingTarget } from './living_target';
 import { walkEncounterActorTo } from './scripted_walk';
@@ -351,11 +352,8 @@ function recordVarkhulAttemptParticipants(
 }
 
 function tankIds(ctx: SimContext, boss: Entity): Set<number> {
-  const result = new Set<number>();
+  const result = committedTankIds(ctx);
   if (boss.aggroTargetId !== null) result.add(boss.aggroTargetId);
-  for (const meta of ctx.players.values()) {
-    if (meta.talentMods.role === 'tank') result.add(meta.entityId);
-  }
   return result;
 }
 
@@ -1550,10 +1548,7 @@ function highestThreatTankTarget(
   boss: Entity,
   players: readonly Entity[],
 ): Entity | null {
-  const authoredTankIds = new Set<number>();
-  for (const meta of ctx.players.values()) {
-    if (meta.talentMods.role === 'tank') authoredTankIds.add(meta.entityId);
-  }
+  const authoredTankIds = committedTankIds(ctx);
   const tanks = players.filter((player) => !player.dead && authoredTankIds.has(player.id));
   const pool = tanks.length > 0 ? tanks : players.filter((player) => !player.dead);
   let best: Entity | null = null;
