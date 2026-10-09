@@ -28,6 +28,7 @@ import { shadowActionsLocked } from './shadow_action_lock';
 //
 // `src/sim`-pure and rng-free.
 
+import { isMountSafeFormAuraKind } from './combat/forms';
 import { normalizeMountSkinId } from './content/mount_skins';
 import { MOUNT_KEYS, type MountKey, mountDef, TRAINING_MOUNT_KEY } from './content/mounts';
 import { ITEMS } from './data';
@@ -182,7 +183,9 @@ const CARRYING_FREIGHT_MSG = "You can't ride while carrying freight.";
 /** Strip all active form auras (FORM_AURA_KINDS), ghost_wolf, and stealth from the
  *  entity, emitting aura-removal events for each one removed. Called before a mount
  *  summon starts so the player is never simultaneously shapeshifted/stealthed and
- *  mounting. Stealth is routed through the single `ctx.breakStealth` funnel (not
+ *  mounting. The mount-safe forms (combat/forms.ts: Moonwing, Gloamveil) stay on:
+ *  they only adorn the rider, who may shift into and out of them in the saddle
+ *  anyway (the cast path's dismount skips their toggle). Stealth is routed through the single `ctx.breakStealth` funnel (not
  *  spliced inline like the forms) until no stealth aura remains, so each aura's
  *  linger/aftereffect side effects fire exactly as they do for every other way
  *  stealth ends. Without this, a stealthed rider keeps the aura's shrunk detection
@@ -193,7 +196,10 @@ function cancelFormsAndGhostWolf(ctx: SimContext, e: Entity): void {
   let stripped = false;
   for (let i = e.auras.length - 1; i >= 0; i--) {
     const aura = e.auras[i];
-    if (FORM_AURA_KINDS.has(aura.kind) || aura.id === 'ghost_wolf') {
+    if (
+      (FORM_AURA_KINDS.has(aura.kind) && !isMountSafeFormAuraKind(aura.kind)) ||
+      aura.id === 'ghost_wolf'
+    ) {
       e.auras.splice(i, 1);
       ctx.emit({
         type: 'aura',
@@ -451,7 +457,8 @@ export function updateMountTransition(ctx: SimContext, e: Entity, swimming: bool
       ) {
         // Strip any form that slipped through during the channel (e.g. instant
         // shapeshifts cast while channeling), so the player is never
-        // simultaneously mounted and shapeshifted at completion.
+        // simultaneously mounted and shapeshifted at completion. A mount-safe
+        // form toggled during the channel is the exception and rides along.
         cancelFormsAndGhostWolf(ctx, e);
         e.mountKey = target;
       }
