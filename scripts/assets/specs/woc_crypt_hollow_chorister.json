@@ -1,0 +1,11 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/crypt_hollow_chorister_woc.glb",
+      "out": "models/creatures/woc_crypt_hollow_chorister.glb",
+      "type": "character",
+      "keepClips": ["Idle", "Walk", "Run", "Attack", "Attack2", "React", "Sing", "Death", "Awaken"],
+      "maxTex": 1024
+    }
+  ]
+}

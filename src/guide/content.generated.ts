@@ -13,7 +13,7 @@ export interface GuideClassSpec { id: string; name: string; role: GuideRole; sig
 // Interactive 3D model data, mirrored from the renderer's VisualDef manifest. The Guide's
 // standalone viewer builds the model from one GLB on demand; entities reference a model by
 // visual key into GUIDE_MODELS and carry their own tint color.
-export interface GuideModelAttach { url: string; bone: string; position?: [number, number, number]; rotationY?: number; gripRef?: string; }
+export interface GuideModelAttach { url: string; bone: string; position?: [number, number, number]; rotationY?: number; gripRef?: string; size?: number; }
 export interface GuideModelWeaponFix { node: string; rotX?: number; rotY?: number; rotZ?: number; }
 export interface GuideModelSpec {
   url: string;

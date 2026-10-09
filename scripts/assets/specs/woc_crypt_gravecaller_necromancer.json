@@ -1,0 +1,11 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/crypt_gravecaller_necromancer_woc.glb",
+      "out": "models/creatures/woc_crypt_gravecaller_necromancer.glb",
+      "type": "character",
+      "keepClips": ["Idle", "Walk", "Run", "Attack", "React", "Cast", "Raise", "Death"],
+      "maxTex": 1024
+    }
+  ]
+}

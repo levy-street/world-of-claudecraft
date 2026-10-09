@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "5b8004ad2e91a0a6b761ed4242fe6a8323c9aaf6e869d42d159a3dd135838f66",
+  "rendererFingerprint": "5c486a09aa68dc419d2953c01f35909a5ab63881521da6ae2cd2fb2cebd70958",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "darwin",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6078052,
-      "sha256": "c312f7ec995b6becda2962796da44a5c6dec93da6032d69ac9894e4c1cce33ef",
+      "bytes": 6078964,
+      "sha256": "c7cf0842fb9749f17c47e9fe23d90cdbab686b3a0be623ad3fae4841add6939a",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -1548,10 +1548,10 @@
       "visualKey": "crypt_skel_brute",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_golem.glb",
-          "path": "public/models/chars/enemies/skeleton_golem.glb",
-          "bytes": 292776,
-          "sha256": "5ea6cd76ee8cfe1380ff056cd226c9403c49f17b5d280a504448efa82990c1f5"
+          "url": "models/creatures/woc_crypt_bone_brute.glb",
+          "path": "public/models/creatures/woc_crypt_bone_brute.glb",
+          "bytes": 2404736,
+          "sha256": "c851e92c8a6c41837e7aa252901f00bc98bd5066a49780255cd20659c8149405"
         },
         "idle": "Idle",
         "height": 4.6,
@@ -1559,12 +1559,7 @@
         "hover": null,
         "show": null,
         "attach": [],
-        "weaponFix": [
-          {
-            "node": "Skeleton_Golem_Axe",
-            "rotY": 3.141592653589793
-          }
-        ],
+        "weaponFix": null,
         "tintStrength": 0.25
       },
       "tint": {
@@ -1573,11 +1568,11 @@
         "resolved": "#d9d0bc",
         "strength": 0.25
       },
-      "sourceFingerprint": "6221e592846397a812a7e50ed166cbc6cf44c01edccbd41b53176a32671aa182",
+      "sourceFingerprint": "857881aec07203bb03c2dac7b504beefff60df72d2780f607a91b9177a96ca4d",
       "output": {
         "path": "public/ui/mobs/crypt_bone_brute.webp",
-        "bytes": 2914,
-        "sha256": "7277bd845018ee93219494a3e9d142180308138e2f97942cfb852a5372631689"
+        "bytes": 3068,
+        "sha256": "4068cfe394483ca55e24be4ebc4bd59e760128ef021077bd00134933fcda66a7"
       }
     },
     {
@@ -1798,12 +1793,12 @@
       "visualKey": "crypt_skel_adept",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_mage.glb",
-          "path": "public/models/chars/enemies/skeleton_mage.glb",
-          "bytes": 802628,
-          "sha256": "648ef555e8023ba2570a98c3aa38bf27b680db6d2eeb744b20ad6db06e587132"
+          "url": "models/creatures/woc_crypt_gravecaller_adept.glb",
+          "path": "public/models/creatures/woc_crypt_gravecaller_adept.glb",
+          "bytes": 1960704,
+          "sha256": "ca6d481e41b62238a952b2bb5ef2ab61cf2bc057c94a94299de06c4abc0c9483"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 3.2,
         "yaw": null,
         "hover": null,
@@ -1811,10 +1806,10 @@
         "attach": [
           {
             "asset": {
-              "url": "models/weapons/skeleton_staff.glb",
-              "path": "public/models/weapons/skeleton_staff.glb",
-              "bytes": 51660,
-              "sha256": "75147e92b25e4d88a5edaf35b55b0eb6b2e2fe538694995507ecbb651072a78e"
+              "url": "models/weapons/staff_rare_a_violet.glb",
+              "path": "public/models/weapons/staff_rare_a_violet.glb",
+              "bytes": 84264,
+              "sha256": "fd88c67c332006989fcaab1ace387ca9b74739b13c6b64d4ed067d621fbdc738"
             },
             "bone": "handslot.r",
             "position": null,
@@ -1831,11 +1826,11 @@
         "resolved": "#8f6cc4",
         "strength": 0.35
       },
-      "sourceFingerprint": "aa64a50b6ca3154eabfca3b3f13fa79fcba135b9b80f8932478e3031c349b830",
+      "sourceFingerprint": "bf31da6733dc386ab5bcee75a92eb637c5f6e713c032e05c56ff7eae93d2e9c5",
       "output": {
         "path": "public/ui/mobs/crypt_gravecaller_adept.webp",
-        "bytes": 2190,
-        "sha256": "ac4367023083217dab0234070861344dd3f704bb38653dca6dffacf398bb0e9d"
+        "bytes": 2336,
+        "sha256": "c8951519aa4109fad18fb1b05aed8ba6e62a487e6acd6563d54438e3e6931c37"
       }
     },
     {
@@ -1845,17 +1840,30 @@
       "visualKey": "crypt_skel_necromancer",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/necromancer.glb",
-          "path": "public/models/chars/enemies/necromancer.glb",
-          "bytes": 528152,
-          "sha256": "9f1e4ea763337369a1b455afd9d07888d409d1f4efe12cf2880340937c0b16fc"
+          "url": "models/creatures/woc_crypt_gravecaller_necromancer.glb",
+          "path": "public/models/creatures/woc_crypt_gravecaller_necromancer.glb",
+          "bytes": 1918796,
+          "sha256": "bc830774025fc2cf092fa8766bb228d7df3feb531e1dfbb56db6f83f23690077"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 3.3,
         "yaw": null,
         "hover": null,
         "show": null,
-        "attach": [],
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/staff_rare_b_violet.glb",
+              "path": "public/models/weapons/staff_rare_b_violet.glb",
+              "bytes": 83288,
+              "sha256": "83db85673cbcb66b0794f28d2f7621119364167c56874ede9c9cef8237a1f914"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
         "weaponFix": null,
         "tintStrength": 0.3
       },
@@ -1865,11 +1873,11 @@
         "resolved": "#6fd6a8",
         "strength": 0.3
       },
-      "sourceFingerprint": "6548b1f6fcf4210d90a8fa7692e6a56684439ab195a4c3fad049b4c5b7764ceb",
+      "sourceFingerprint": "1eff1a4c7c1de16cfdc671642f72565b46073c9f1f4ef8f41e777938d862fc4f",
       "output": {
         "path": "public/ui/mobs/crypt_gravecaller_necromancer.webp",
-        "bytes": 2670,
-        "sha256": "6d4d1df64c1eec08cf1bbf2a51b772d0b4870db6bc85185f28252c06ed3061eb"
+        "bytes": 2322,
+        "sha256": "6e72e918289f6621ccfded8ccf55afa31296c62a638195fb3e6b9a30780664f1"
       }
     },
     {
@@ -1913,17 +1921,42 @@
       "visualKey": "crypt_skel_cutthroat",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_rogue.glb",
-          "path": "public/models/chars/enemies/skeleton_rogue.glb",
-          "bytes": 505020,
-          "sha256": "e6cc7ba50e84a3c2e9c800e22197c6e6621c1747dca9eb48e867c8b4529aef65"
+          "url": "models/creatures/woc_crypt_ossuary_cutthroat.glb",
+          "path": "public/models/creatures/woc_crypt_ossuary_cutthroat.glb",
+          "bytes": 2301192,
+          "sha256": "7e1c03f3d8b58b128372efd29103d61bd86f48f337de207c29277246cccc6058"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 3.2,
         "yaw": null,
         "hover": null,
         "show": null,
-        "attach": [],
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/dagger_rare_a_bone.glb",
+              "path": "public/models/weapons/dagger_rare_a_bone.glb",
+              "bytes": 72560,
+              "sha256": "598f2421a9d756fd2df67af9c3d531bf5dce20569d6996b2931eeee11fea5d95"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/dagger_rare_a_bone.glb",
+              "path": "public/models/weapons/dagger_rare_a_bone.glb",
+              "bytes": 72560,
+              "sha256": "598f2421a9d756fd2df67af9c3d531bf5dce20569d6996b2931eeee11fea5d95"
+            },
+            "bone": "handslot.l",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
         "weaponFix": null,
         "tintStrength": 0.25
       },
@@ -1933,11 +1966,11 @@
         "resolved": "#a8b0b0",
         "strength": 0.25
       },
-      "sourceFingerprint": "c9c047fb859e2c2e5dcda70d9dd22f42890d490f96fb28265ff457a8d647695b",
+      "sourceFingerprint": "61b5e8ba2465dfc26540fe11d5004e79eff5a4b0a49b0b2534a749268bbb537e",
       "output": {
         "path": "public/ui/mobs/crypt_ossuary_cutthroat.webp",
-        "bytes": 2528,
-        "sha256": "d27b5393bc3be075cf06eeb405b464db725df8abb4320349f986d49810b1b55e"
+        "bytes": 2824,
+        "sha256": "b73ee3e993202904a587c0f09b2e5ddee184b8936317f80bb09d47aca1858552"
       }
     },
     {
@@ -1981,17 +2014,30 @@
       "visualKey": "crypt_skel_warrior",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_warrior.glb",
-          "path": "public/models/chars/enemies/skeleton_warrior.glb",
-          "bytes": 523236,
-          "sha256": "572feed3592cfd46b241d0bccc601673c1f652c0792da716f49dc83369e4c681"
+          "url": "models/creatures/woc_crypt_ossuary_warrior.glb",
+          "path": "public/models/creatures/woc_crypt_ossuary_warrior.glb",
+          "bytes": 2232132,
+          "sha256": "f4bd3cba50d8ffce0ef5fe8afee8721d484ed724474b9659c6c37d215056d9b7"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 3.3,
         "yaw": null,
         "hover": null,
         "show": null,
-        "attach": [],
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/sword_field_iron.glb",
+              "path": "public/models/weapons/sword_field_iron.glb",
+              "bytes": 68232,
+              "sha256": "0c6dcdbb7a0b04713f911ef0783ed282d01c23e8b8f8844d34c7c6a2c279a1fe"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
         "weaponFix": null,
         "tintStrength": 0.25
       },
@@ -2001,11 +2047,11 @@
         "resolved": "#d8cfb8",
         "strength": 0.25
       },
-      "sourceFingerprint": "9863ba612ee6166893b24e7490d2796d620f384e050e6c72e0c06352eb64c452",
+      "sourceFingerprint": "842f81cc20ff479ac472f4942ba30e73335ce814fcbd5851742e2d834ff78d6c",
       "output": {
         "path": "public/ui/mobs/crypt_ossuary_warrior.webp",
-        "bytes": 2328,
-        "sha256": "62343c8b8b047dc71bdd9e03294e7d6b1b6040fa45f6aac91dbf562c4f2cce36"
+        "bytes": 2166,
+        "sha256": "51d3e6f04a0170341e6810c9749958affaef5f19f6935839aabebca599348787"
       }
     },
     {
@@ -5627,12 +5673,12 @@
       "visualKey": "crypt_skel_chorister",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/necromancer.glb",
-          "path": "public/models/chars/enemies/necromancer.glb",
-          "bytes": 528152,
-          "sha256": "9f1e4ea763337369a1b455afd9d07888d409d1f4efe12cf2880340937c0b16fc"
+          "url": "models/creatures/woc_crypt_hollow_chorister.glb",
+          "path": "public/models/creatures/woc_crypt_hollow_chorister.glb",
+          "bytes": 2452740,
+          "sha256": "9e5d35cd433976780538c7d29416e02d3ca7c6d226ab90bb4dac1441b1575878"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 3.3,
         "yaw": null,
         "hover": null,
@@ -5647,11 +5693,11 @@
         "resolved": "#7b4fa0",
         "strength": 0.3
       },
-      "sourceFingerprint": "d5be20a639c275b28a3cb272b09bf548260c2b3a90ce398cde58a5dd13a18221",
+      "sourceFingerprint": "8a7de033f61d4ded64d266d66741b1497654510fff9e94d0d07b8d12a849c176",
       "output": {
         "path": "public/ui/mobs/hollow_chorister.webp",
-        "bytes": 2580,
-        "sha256": "b74c072ec954151fcd540f24b4430287428e3c7f1355b7e11fd7ea970d833f8a"
+        "bytes": 2232,
+        "sha256": "589a9bd57f52173d7d4e14dcec890f7277bfb667309129693200de695aa8ed92"
       }
     },
     {

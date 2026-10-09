@@ -103,8 +103,10 @@ describe('KayKit hit-reaction stagger (issue #2889 round 2)', () => {
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 45. The integration
     // tree itself had already drifted to 43 when the skeleton minion was remade through
     // the art guide, and that took three more off (skel_minion, delve_skel_wraith and
-    // crypt_skel_minion ride WOC_SKELETON_MINION's own clips now): 40.
-    expect(occurrences).toBe(40);
+    // crypt_skel_minion ride WOC_SKELETON_MINION's own clips now): 40. The Hollow Crypt's
+    // trash bodies were remade the same way, and five more left the donors (the ossuary
+    // warrior, cutthroat, adept, necromancer and chorister ride their own clips): 35.
+    expect(occurrences).toBe(35);
 
     // Spot-check the two entries that already had an animUrls array before
     // this task (must be APPENDED to, not overwritten).

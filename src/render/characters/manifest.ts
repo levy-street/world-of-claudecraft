@@ -485,7 +485,8 @@ export interface AttachDef {
   swapOnly?: boolean;
   /** The size the prop draws at about its hand, on top of its model's own fit: set by the
    *  swap path from the equipped ITEM (held_item_size_core.ts: a common or uncommon weapon
-   *  draws a fifth smaller). Absent is 1. */
+   *  draws a fifth smaller), or authored on a fixed attach whose rig is not the WOC bodies'
+   *  scale (WOC_CRYPT_PROP_SIZE). Absent is 1. */
   size?: number;
 }
 
@@ -2463,6 +2464,11 @@ const MORTHEN_SCYTHE_CLIPS: ClipMap = {
   castByAbility: { [MORTHEN_REAP]: 'ScytheSummon' },
 };
 
+// The held-prop size on the art guide's crypt bodies. Their rigs stand about 1.9 units
+// tall natively, where a WOC body stands 1.15 with a handslot that draws props at 0.46:
+// 0.46 x 1.9 / 1.15 is 0.76, so a sword sits in their fist at the size a WOC body holds it.
+const WOC_CRYPT_PROP_SIZE = 0.76;
+
 // The skeleton minion remade through the art guide (scripts/assets/specs/
 // woc_skeleton_minion.json): a T-pose concept, Tripo Smart Mesh P2.0, and a 31-bone
 // rig built for this mesh with every clip animated for it in Blender at 30 fps. It
@@ -2493,6 +2499,7 @@ const WOC_SKELETON_MINION: VisualDef = {
   oneShotsHoldAttacks: ['Awaken'],
   walkRef: 2.0,
   runRef: 6.0,
+  authoredAtlas: true,
   tint: 'entity',
   tintStrength: 0.25,
 };
@@ -4563,18 +4570,42 @@ export const VISUALS: Record<string, VisualDef> = {
   },
 
   // -- the Hollow Crypt trash (sim/content/hollow_crypt_trash.ts) ----------------
-  // The KayKit skeletons with the trash kit's casts on their own gestures: the
-  // Grave Cleave winds up the two-hand chop over its bar, the Raise Bones
-  // channel lifts both arms, the Grave Bolt is the shooting cast.
+  // The crypt's skeletons are the art guide's models (concept, Tripo P2, a skeleton
+  // and every clip built from scratch in Blender), each with the trash kit's casts on
+  // its own gestures.
+  //
+  // The Ossuary Warrior: an ossuary guard in rusted plate studded with skulls and
+  // bones, an iron sword in its right hand. Attack is the overhead chop, Attack2 the
+  // diagonal slice. Cleave is Grave Cleave: both hands take the hilt, the sword hangs
+  // overhead straining while the 1.6 s bar fills and falls into the ground on the
+  // bar's end (frame 49, bar-locked), then the recovery plays out. Death crumples it
+  // onto its back and the helmed skull rolls clear: that corpse is Reassemble's bone
+  // pile, and Awaken (the flourish on the dead-to-alive edge) rolls the skull back
+  // and hauls the body up to Idle. Walk and Run are authored at 1.37 and 4.2 raw
+  // units/s over the 1.819 posed idle height. The sword's size matches the WOC
+  // bodies' hold (their handslot draws props at 0.46 on a body 1.15 units tall).
   crypt_skel_warrior: {
-    url: `${ENEMIES}/skeleton_warrior.glb`,
-    animUrls: [`${ENEMIES}/skeleton_warrior_hit_variety_anims.glb`],
+    url: `${CREATURES}/woc_crypt_ossuary_warrior.glb`,
     height: 3.3,
     clips: {
-      ...skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
-      castByAbility: { [CRYPT_GRAVE_CLEAVE]: '2H_Melee_Attack_Chop' },
-      castTimeScaleByAbility: { [CRYPT_GRAVE_CLEAVE]: 0.7 },
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['React'],
+      death: 'Death',
+      flourish: 'Awaken',
+      castByAbility: { [CRYPT_GRAVE_CLEAVE]: 'Cleave' },
+      castPlayOut: ['Cleave'],
     },
+    castClipSync: [CRYPT_GRAVE_CLEAVE],
+    oneShotsHoldAttacks: ['Awaken'],
+    attach: [
+      { url: `${WEAPONS}/sword_field_iron.glb`, bone: 'handslot.r', size: WOC_CRYPT_PROP_SIZE },
+    ],
+    walkRef: 2.5,
+    runRef: 7.6,
+    authoredAtlas: true,
     tint: 'entity',
     tintStrength: 0.25,
   },
@@ -4619,65 +4650,118 @@ export const VISUALS: Record<string, VisualDef> = {
     bodyless: true,
     clickRadius: 2.2,
   },
+  // The Gravecaller Adept: a novice of the cult in a violet hooded robe split over its
+  // legs, a violet staff in its right hand. Cast is the conjuring loop (Grave Spark).
+  // Bolt is Grave Bolt: the staff levelled, the off hand drawn back to the shoulder
+  // through the 2.5 s bar and thrust out on its end (frame 76). Volley is Gravespark
+  // Volley: staff and hand climb overhead through the 3 s bar and fling forward on its
+  // end (frame 91). Both are bar-locked and play their recovery out. Walk and Run are
+  // authored at 1.21 and 4.0 raw units/s over the 1.818 posed idle height.
   crypt_skel_adept: {
-    url: `${ENEMIES}/skeleton_mage.glb`,
-    animUrls: [`${ENEMIES}/skeleton_mage_hit_variety_anims.glb`],
+    url: `${CREATURES}/woc_crypt_gravecaller_adept.glb`,
     height: 3.2,
     clips: {
-      ...skeletonClips(['2H_Melee_Attack_Chop']),
-      // Gravespark Volley (the trash pass's second wave): both hands raised
-      // for the whole 3 s bar, the sparks loosed as it lands.
-      castByAbility: {
-        [CRYPT_GRAVE_BOLT]: 'Spellcast_Shoot',
-        [CRYPT_GRAVESPARK_VOLLEY]: 'Spellcast_Raise',
-      },
-      castTimeScaleByAbility: { [CRYPT_GRAVE_BOLT]: 0.6, [CRYPT_GRAVESPARK_VOLLEY]: 0.6 },
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['React'],
+      death: 'Death',
+      cast: 'Cast',
+      castByAbility: { [CRYPT_GRAVE_BOLT]: 'Bolt', [CRYPT_GRAVESPARK_VOLLEY]: 'Volley' },
+      castPlayOut: ['Bolt', 'Volley'],
     },
-    attach: [{ url: `${WEAPONS}/skeleton_staff.glb`, bone: 'handslot.r' }],
+    castClipSync: [CRYPT_GRAVE_BOLT, CRYPT_GRAVESPARK_VOLLEY],
+    attach: [
+      { url: `${WEAPONS}/staff_rare_a_violet.glb`, bone: 'handslot.r', size: WOC_CRYPT_PROP_SIZE },
+    ],
+    walkRef: 2.13,
+    runRef: 7.0,
+    authoredAtlas: true,
     tint: 'entity',
     tintStrength: 0.35,
   },
+  // The Gravecaller Necromancer: a senior priest in black over violet robes, a mantle of
+  // finger bones and a chained ledger, a violet staff in its right hand. Cast is the
+  // conjuring loop (Grave Spark, Grave Rupture); Raise is the Raise Bones channel, both
+  // arms and the staff lifting the dead with each heave. Walk and Run are authored at
+  // 1.13 and 3.9 raw units/s over the 1.836 posed idle height.
   crypt_skel_necromancer: {
-    url: `${ENEMIES}/necromancer.glb`,
-    animUrls: [`${ENEMIES}/necromancer_hit_variety_anims.glb`],
+    url: `${CREATURES}/woc_crypt_gravecaller_necromancer.glb`,
     height: 3.3,
     clips: {
-      ...skeletonClips(['2H_Melee_Attack_Chop']),
-      castByAbility: { [CRYPT_RAISE_BONES]: 'Spellcast_Raise' },
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['React'],
+      death: 'Death',
+      cast: 'Cast',
+      castByAbility: { [CRYPT_RAISE_BONES]: 'Raise' },
     },
+    attach: [
+      { url: `${WEAPONS}/staff_rare_b_violet.glb`, bone: 'handslot.r', size: WOC_CRYPT_PROP_SIZE },
+    ],
+    walkRef: 2.03,
+    runRef: 7.0,
+    authoredAtlas: true,
     tint: 'entity',
     tintStrength: 0.3,
   },
-  // The rest of the Hollow Crypt roster on the same rigs, raised a head or more
-  // over a player (2.6) so nothing in the crypt stands at player size: the
-  // cutthroat, the Bone Minion (it grows into the Brute), the Brute itself, the
-  // Sexton, the Cantor and her choir, Morthen, and Rimeweb over her brood.
+  // The rest of the Hollow Crypt roster, raised a head or more over a player (2.6) so
+  // nothing in the crypt stands at player size: the cutthroat, the Bone Minion (it
+  // grows into the Brute), the Brute itself, the Sexton, the Cantor and her choir,
+  // Morthen, and Rimeweb over her brood.
+  //
+  // The Ossuary Cutthroat: a lean skeleton bound in burial shroud, a bone dagger in each
+  // hand, crouched low. Attack is the right-hand stab, Attack2 the double-dagger lunge
+  // (also what its Rending Leap plays: the leap's windup carries no ability id, so it
+  // swings the plain attack mid-arc). Walk and Run are authored at 1.45 and 4.6 raw
+  // units/s over the 1.734 posed (crouched) idle height.
   crypt_skel_cutthroat: {
-    url: `${ENEMIES}/skeleton_rogue.glb`,
-    animUrls: [`${ENEMIES}/skeleton_rogue_hit_variety_anims.glb`],
+    url: `${CREATURES}/woc_crypt_ossuary_cutthroat.glb`,
     height: 3.2,
-    clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['React'],
+      death: 'Death',
+    },
+    attach: [
+      { url: `${WEAPONS}/dagger_rare_a_bone.glb`, bone: 'handslot.r', size: WOC_CRYPT_PROP_SIZE },
+      { url: `${WEAPONS}/dagger_rare_a_bone.glb`, bone: 'handslot.l', size: WOC_CRYPT_PROP_SIZE },
+    ],
+    walkRef: 2.68,
+    runRef: 8.5,
+    authoredAtlas: true,
     tint: 'entity',
     tintStrength: 0.25,
   },
   crypt_skel_minion: { ...WOC_SKELETON_MINION, height: 3.5 },
-  // The Bone Brute's Marrow Crush heaves the golem's two-fist slam over its
-  // 2 s bar, locked to it: Golem_Slam's fists strike the floor 1.1 s in, so at
-  // 0.55 the strike lands on the bar's end (castClipSync), and the recovery
-  // plays out after it.
+  // The Bone Brute: a hulk of fused ribcages and bundled bone, unarmed, its skull sunk
+  // between the shoulders. Attack is a right hook, Attack2 a short two-fist hammer. Slam
+  // is Marrow Crush: both fists climb overhead through the 2 s bar and smash the floor on
+  // its end (frame 61, bar-locked), then the recovery plays out. Walk and Run are
+  // authored at 1.17 and 3.6 raw units/s over the 1.819 posed idle height.
   crypt_skel_brute: {
-    url: `${ENEMIES}/skeleton_golem.glb`,
+    url: `${CREATURES}/woc_crypt_bone_brute.glb`,
     height: 4.6,
     clips: {
-      ...skeletonLargeClips(['2H_Melee_Attack_Chop', '1H_Melee_Attack_Chop']),
-      attack: ['Golem_Slam'],
-      castByAbility: { [CRYPT_MARROW_CRUSH]: 'Golem_Slam' },
-      castTimeScaleByAbility: { [CRYPT_MARROW_CRUSH]: 0.55 },
-      castPlayOut: ['Golem_Slam'],
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['React'],
+      death: 'Death',
+      castByAbility: { [CRYPT_MARROW_CRUSH]: 'Slam' },
+      castPlayOut: ['Slam'],
     },
     castClipSync: [CRYPT_MARROW_CRUSH],
-    animUrls: [`${ENEMIES}/skeleton_golem_anims.glb`],
-    weaponFix: [{ node: 'Skeleton_Golem_Axe', rotY: Math.PI }],
+    walkRef: 2.97,
+    runRef: 9.1,
+    authoredAtlas: true,
     tint: 'entity',
     tintStrength: 0.25,
   },
@@ -4769,11 +4853,29 @@ export const VISUALS: Record<string, VisualDef> = {
     selfIllumination: 0.1,
     clickRadius: 2.2,
   },
+  // The Hollow Chorister (the art guide's model): a skeleton of the ruined choir in a lace
+  // hood and surplice over a violet cassock, its jaw open mid-hymn. It fights unarmed
+  // with two raking claw swipes; Sing is its cast loop. Death drops it in its robes, and
+  // Awaken (the flourish: heroic Encore stands a fallen Chorister back up) reverses the
+  // fall into Idle. Walk and Run are authored at 1.10 and 3.9 raw units/s over the 1.806
+  // posed idle height.
   crypt_skel_chorister: {
-    url: `${ENEMIES}/necromancer.glb`,
-    animUrls: [`${ENEMIES}/necromancer_hit_variety_anims.glb`],
+    url: `${CREATURES}/woc_crypt_hollow_chorister.glb`,
     height: 3.3,
-    clips: skeletonClips(['2H_Melee_Attack_Chop']),
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack', 'Attack2'],
+      hit: ['React'],
+      death: 'Death',
+      flourish: 'Awaken',
+      cast: 'Sing',
+    },
+    oneShotsHoldAttacks: ['Awaken'],
+    walkRef: 2.0,
+    runRef: 7.1,
+    authoredAtlas: true,
     tint: 'entity',
     tintStrength: 0.3,
   },
