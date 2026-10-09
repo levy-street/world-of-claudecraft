@@ -202,6 +202,64 @@ describe('Tripo task detail requests', () => {
   });
 });
 
+describe('Tripo multiview (Smart Mesh P2.0) generation', () => {
+  it('orders the views front, left, back, right and requires the front', () => {
+    expect(tripo.multiviewInputs({ back: 'b', front: 'f', left: 'l' })).toEqual([
+      { front: 'f' },
+      { left: 'l' },
+      { back: 'b' },
+    ]);
+    expect(() => tripo.multiviewInputs({ left: 'l' })).toThrow(/front view/);
+    expect(() => tripo.multiviewInputs({ front: 'f', top: 't' })).toThrow(
+      /unknown multiview angle/,
+    );
+  });
+
+  it('posts the views to the multiview endpoint on P2, with quad only where P2 takes it', async () => {
+    const previousKey = process.env.TRIPO_API_KEY;
+    process.env.TRIPO_API_KEY = 'test-key';
+    const posted: { url: string; body: Record<string, unknown> }[] = [];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string, init: RequestInit | undefined) => {
+        if (init?.method === 'POST') {
+          posted.push({ url, body: JSON.parse(String(init.body)) });
+          return new Response(JSON.stringify({ code: 0, data: { task_id: 'task-1' } }));
+        }
+        return new Response(
+          JSON.stringify({ code: 0, data: { task_id: 'task-1', status: 'success', output: {} } }),
+        );
+      }),
+    );
+    try {
+      const views = {
+        front: 'https://example.test/front.png',
+        left: 'https://example.test/left.png',
+        back: 'https://example.test/back.png',
+      };
+      await tripo.generateModelFromViews({ views, faceLimit: 5000, quad: true });
+      await tripo.generateModelFromViews({ views, model: tripo.MODEL_LOWPOLY, quad: true });
+      expect(posted.map((p) => p.url)).toEqual([
+        `${tripo.TRIPO_BASE}/generation/multiview-to-model`,
+        `${tripo.TRIPO_BASE}/generation/multiview-to-model`,
+      ]);
+      expect(posted[0].body).toMatchObject({
+        model: 'P2-20260801',
+        face_limit: 5000,
+        quad: true,
+        inputs: [{ front: views.front }, { left: views.left }, { back: views.back }],
+      });
+      // P1 rejects quad, so it is never sent there
+      expect(posted[1].body.model).toBe('P1-20260311');
+      expect(posted[1].body).not.toHaveProperty('quad');
+    } finally {
+      vi.unstubAllGlobals();
+      if (previousKey === undefined) delete process.env.TRIPO_API_KEY;
+      else process.env.TRIPO_API_KEY = previousKey;
+    }
+  });
+});
+
 describe('asset library paths', () => {
   it('parses skin atlas paths on Windows and POSIX', () => {
     expect(library.skinAtlasPathParts('textures\\skins\\mage\\base.png')).toEqual({
