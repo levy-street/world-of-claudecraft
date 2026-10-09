@@ -22068,8 +22068,8 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "tintStrength": 0.12
   },
   "skel_minion": {
-    "url": "models/chars/enemies/skeleton_minion.glb",
-    "idle": "Idle_Combat",
+    "url": "models/creatures/woc_skeleton_minion.glb",
+    "idle": "Idle",
     "height": 2.5,
     "tintStrength": 0.25
   },

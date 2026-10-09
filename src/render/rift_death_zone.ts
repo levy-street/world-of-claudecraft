@@ -54,6 +54,7 @@ import {
   RING_MAX_OPACITY,
   SWEEP_BASE_OPACITY,
 } from './rift_death_zone_core';
+import { SummonRiseFx } from './summon_rise_fx';
 import { BastionFx } from './sunken_bastion/bastion_fx';
 import { TrashEngineFx } from './trash_engine_fx';
 import { WildheartFx } from './wildheart_basin';
@@ -133,6 +134,8 @@ export class RiftDeathZoneVisuals {
   // The trash engine's generic pieces in any dungeon (hazard pools, combat
   // walls, walker orbs, the sight-line nova, usable bodies, freeze, brands).
   private readonly trashEngine: TrashEngineFx;
+  // A boss's summoned dead rising as they land, in any zone (summon_rise_fx.ts).
+  private readonly summonRise: SummonRiseFx;
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -268,6 +271,7 @@ export class RiftDeathZoneVisuals {
       reducedMotion,
     );
     this.trashEngine = new TrashEngineFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.summonRise = new SummonRiseFx(playGesture);
   }
 
   /** Called each frame with the current zone list from IWorld.riftBossDeathZones().
@@ -344,6 +348,7 @@ export class RiftDeathZoneVisuals {
     this.sanctumFx.update(dt);
     this.sanctumBosses.update(dt);
     this.trashEngine.update(dt);
+    this.summonRise.update(dt);
     for (const visual of this.zones.values()) {
       visual.phase = (visual.phase + dt * deathZonePulseSpeed(visual.remaining)) % (Math.PI * 2);
       const plan = deathZonePlan(visual.phase, visual.remaining, visual.total);
@@ -411,6 +416,7 @@ export class RiftDeathZoneVisuals {
     const sanctum = this.sanctumFx.handleEvent(event);
     const sanctumBoss = this.sanctumBosses.handleEvent(event);
     const engine = this.trashEngine.handleEvent(event);
+    this.summonRise.handleEvent(event);
     return (
       this.bastionFx.handleEvent(event) ||
       temple ||

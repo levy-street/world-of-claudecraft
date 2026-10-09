@@ -92,6 +92,7 @@ import {
 } from '../../sim/ignivar_raid_ids';
 import { DUNGEON_MINIBOSS_STOMP_ABILITY_ID } from '../../sim/mob/dungeon_miniboss_stomp';
 import { VARKHUL_CRUCIBLE_QUAKE_CAST_ID } from '../../sim/mob/healer_channel';
+import { SUMMON_RISE_CUE } from '../../sim/mob/summon_rise';
 import {
   BASTION_BOATHOOK,
   BASTION_BRINE_MEND,
@@ -2462,6 +2463,40 @@ const MORTHEN_SCYTHE_CLIPS: ClipMap = {
   castByAbility: { [MORTHEN_REAP]: 'ScytheSummon' },
 };
 
+// The skeleton minion remade through the art guide (scripts/assets/specs/
+// woc_skeleton_minion.json): a T-pose concept, Tripo Smart Mesh P2.0, and a 31-bone
+// rig built for this mesh with every clip animated for it in Blender at 30 fps. It
+// fights unarmed, as the KayKit minion did (handslot.l/.r are there for a weapon).
+// Walk and Run are authored at their ground speeds (1.44 and 4.31 raw units/s, scaled
+// by height over the 1.797 posed idle height), so a wander and a full chase stay
+// inside the cadence clamps. Death collapses it into a heap of bones; Awaken (the
+// flourish: a respawn, Reassemble, a summon) pulls the heap back onto its feet and
+// ends on Idle, and a boss's summoned minions rise on it too. Cast is a raised-hands
+// conjuring loop for the cast bars.
+const WOC_SKELETON_MINION: VisualDef = {
+  url: `${CREATURES}/woc_skeleton_minion.glb`,
+  height: 2.5,
+  clips: {
+    idle: 'Idle',
+    walk: 'Walk',
+    run: 'Run',
+    attack: ['Attack'],
+    hit: ['React'],
+    death: 'Death',
+    flourish: 'Awaken',
+    cast: 'Cast',
+    // a summoned minion rises the same way (sim/mob/summon_rise.ts, summon_rise_fx.ts)
+    entrance: 'Awaken',
+  },
+  entranceGesture: SUMMON_RISE_CUE,
+  // its first swing never cuts the rise short
+  oneShotsHoldAttacks: ['Awaken'],
+  walkRef: 2.0,
+  runRef: 6.0,
+  tint: 'entity',
+  tintStrength: 0.25,
+};
+
 export const VISUALS: Record<string, VisualDef> = {
   // -- player classes ------------------------------------------------------
   // The WOC warrior: the artist's modular character handoff on its own 34-joint
@@ -4364,15 +4399,8 @@ export const VISUALS: Record<string, VisualDef> = {
   },
 
   // -- delve-specific variants (same rigs, colour-differentiated via mob.color) -
-  delve_skel_wraith: {
-    // Ledger Wraith: pale skeleton, no weapon, stronger wash reads as near-transparent
-    url: `${ENEMIES}/skeleton_minion.glb`,
-    animUrls: [`${ENEMIES}/skeleton_minion_hit_variety_anims.glb`],
-    height: 2.5,
-    clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
-    tint: 'entity',
-    tintStrength: 0.55,
-  },
+  // Ledger Wraith: the minion, pale; a stronger wash reads as near-transparent
+  delve_skel_wraith: { ...WOC_SKELETON_MINION, tintStrength: 0.55 },
   delve_skel_ringer: {
     // Funeral Ringer: skeleton rogue rig, cloth-brown tint at mid strength
     url: `${ENEMIES}/skeleton_rogue.glb`,
@@ -4419,17 +4447,11 @@ export const VISUALS: Record<string, VisualDef> = {
   },
 
   // -- undead (KayKit skeletons, shared 41-joint rig) ------------------------
-  skel_minion: {
-    url: `${ENEMIES}/skeleton_minion.glb`,
-    animUrls: [`${ENEMIES}/skeleton_minion_hit_variety_anims.glb`],
-    height: 2.5,
-    clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
-    tint: 'entity',
-    tintStrength: 0.25,
-  },
+  // The minion is the art guide's own skeleton now (WOC_SKELETON_MINION above).
+  skel_minion: WOC_SKELETON_MINION,
   // The Bonebound Rickshaw's puller ONLY: a separate key on its own rebuilt
   // rig (see RICKSHAW_PULLER_CLIPS above for why it is a separate GLB from
-  // skeleton_minion.glb, which skel_minion above still uses unchanged, no
+  // skeleton_minion.glb, which skel_minion above used, no
   // regression to any of its own consumers).
   //
   // 2.166 is a DELIBERATE ART CHOICE, not a measurement, and it is the one
@@ -4638,14 +4660,7 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.25,
   },
-  crypt_skel_minion: {
-    url: `${ENEMIES}/skeleton_minion.glb`,
-    animUrls: [`${ENEMIES}/skeleton_minion_hit_variety_anims.glb`],
-    height: 3.5,
-    clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
-    tint: 'entity',
-    tintStrength: 0.25,
-  },
+  crypt_skel_minion: { ...WOC_SKELETON_MINION, height: 3.5 },
   // The Bone Brute's Marrow Crush heaves the golem's two-fist slam over its
   // 2 s bar, locked to it: Golem_Slam's fists strike the floor 1.1 s in, so at
   // 0.55 the strike lands on the bar's end (castClipSync), and the recovery

@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "9b439dd99e12900da2bc373385014c00d2ce9c63de11cdb80b2945ff69c1a96d",
+  "rendererFingerprint": "5b8004ad2e91a0a6b761ed4242fe6a8323c9aaf6e869d42d159a3dd135838f66",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "darwin",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6077940,
-      "sha256": "b0a98d9e13ef177a55dd408368b67d9fe97368604d3a79c6ab36dbb091c6ddb9",
+      "bytes": 6078052,
+      "sha256": "c312f7ec995b6becda2962796da44a5c6dec93da6032d69ac9894e4c1cce33ef",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -249,12 +249,12 @@
       "visualKey": "skel_minion",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/woc_skeleton_minion.glb",
+          "path": "public/models/creatures/woc_skeleton_minion.glb",
+          "bytes": 2124600,
+          "sha256": "5ad46a36df19ba1b6a01ec3e48a517964dda23e6994fb2850200359934c30d89"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 2.5,
         "yaw": null,
         "hover": null,
@@ -269,11 +269,11 @@
         "resolved": "#e8dcc8",
         "strength": 0.25
       },
-      "sourceFingerprint": "6312c51b16609b502839f36416fb533bb5f6dceb3395bdd6abe1485f9dc7f78c",
+      "sourceFingerprint": "c8799a0a7dc9a73b7c7191a123cd27713ab28ba68cad666d6b704711b1982daa",
       "output": {
         "path": "public/ui/mobs/ashbone_raider.webp",
-        "bytes": 2840,
-        "sha256": "a94d3b039105bdf2f88e64026ac279d6076eeac3b08499d9700f8b341bc979ca"
+        "bytes": 2266,
+        "sha256": "44a5b1a1ea9b8143b337ab55eeea5a2fb6b52f69c06c6936a6d4742c99cd8f0e"
       }
     },
     {
@@ -283,12 +283,12 @@
       "visualKey": "skel_minion",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/woc_skeleton_minion.glb",
+          "path": "public/models/creatures/woc_skeleton_minion.glb",
+          "bytes": 2124600,
+          "sha256": "5ad46a36df19ba1b6a01ec3e48a517964dda23e6994fb2850200359934c30d89"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 2.5,
         "yaw": null,
         "hover": null,
@@ -303,11 +303,11 @@
         "resolved": "#d8c8a8",
         "strength": 0.25
       },
-      "sourceFingerprint": "a24536a0635c75bbc3700ef06338a4420c1a5cfa5a96d5fc88233e3d98665089",
+      "sourceFingerprint": "1cb450935e011d20211a40cd576f9f2015ad8c32928efa8fff801607e9ee5c32",
       "output": {
         "path": "public/ui/mobs/ashbone_warcaller.webp",
-        "bytes": 2828,
-        "sha256": "d2afcaf1ac9676eb446e4890480ad51def689e662c208f83c5250b095c416c83"
+        "bytes": 2260,
+        "sha256": "86dab944bb55cb9db1dd1b2dab14df75b424f8d33536db63be3568233b65a7c2"
       }
     },
     {
@@ -453,12 +453,12 @@
       "visualKey": "skel_minion",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/woc_skeleton_minion.glb",
+          "path": "public/models/creatures/woc_skeleton_minion.glb",
+          "bytes": 2124600,
+          "sha256": "5ad46a36df19ba1b6a01ec3e48a517964dda23e6994fb2850200359934c30d89"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 2.5,
         "yaw": null,
         "hover": null,
@@ -473,11 +473,11 @@
         "resolved": "#9fb0c4",
         "strength": 0.25
       },
-      "sourceFingerprint": "06d23bcb1273c93990cdd3a3e8282e098835e02329e9202001882a06278e36f5",
+      "sourceFingerprint": "5506988cc7a08a551a3ba96622442ddbb767671a0cf062671534a5d50ce57115",
       "output": {
         "path": "public/ui/mobs/barrow_wight.webp",
-        "bytes": 2756,
-        "sha256": "464fc4c587c2b9ace7404a1d2e50d56839d7c16d1a28875fc37afb4b5d24e5e2"
+        "bytes": 2204,
+        "sha256": "8e0479fd258a906ecdce31dea8d3fa245bbd91bcd1fbab9f448e177be732240d"
       }
     },
     {
@@ -793,12 +793,12 @@
       "visualKey": "skel_minion",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/woc_skeleton_minion.glb",
+          "path": "public/models/creatures/woc_skeleton_minion.glb",
+          "bytes": 2124600,
+          "sha256": "5ad46a36df19ba1b6a01ec3e48a517964dda23e6994fb2850200359934c30d89"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 2.5,
         "yaw": null,
         "hover": null,
@@ -813,11 +813,11 @@
         "resolved": "#a8b0b8",
         "strength": 0.25
       },
-      "sourceFingerprint": "ce635733b6fee3a9a0d3f869dc2cd9709138d221650da960471d62c22e332d99",
+      "sourceFingerprint": "95e676eb1d8de41458171d25f083707f7e2d39082ca5d3f094e8f14e615ad5da",
       "output": {
         "path": "public/ui/mobs/bound_guardian.webp",
-        "bytes": 2762,
-        "sha256": "978ba0ea6706845031d0d62b20620db4309bff1f5818fd62cad607ef3e5496c0"
+        "bytes": 2212,
+        "sha256": "44f8ace4ec065e163702dc9f1c69e731c130275234ab7734624df7790d402928"
       }
     },
     {
@@ -827,12 +827,12 @@
       "visualKey": "skel_minion",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/woc_skeleton_minion.glb",
+          "path": "public/models/creatures/woc_skeleton_minion.glb",
+          "bytes": 2124600,
+          "sha256": "5ad46a36df19ba1b6a01ec3e48a517964dda23e6994fb2850200359934c30d89"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 2.5,
         "yaw": null,
         "hover": null,
@@ -847,11 +847,11 @@
         "resolved": "#6fd6a8",
         "strength": 0.25
       },
-      "sourceFingerprint": "1d93a3b986d0fd4e39d5c69b286e4a146e26b89fe5d6df84224150bab2f64fae",
+      "sourceFingerprint": "c798cc5a8e4b419e69dcb418af78effae5989450e0f9c9d17b71966f7b4dece5",
       "output": {
         "path": "public/ui/mobs/bound_soul.webp",
-        "bytes": 2722,
-        "sha256": "17c2bc8c8dcea66ef16154d5971c211a93a08ada581b925827f5d384923e2fc2"
+        "bytes": 2182,
+        "sha256": "a05fd6866144bbc5796b72b7c9c6ab3d0384b47a01439b9902266646cd092e2f"
       }
     },
     {
@@ -1167,12 +1167,12 @@
       "visualKey": "skel_minion",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/woc_skeleton_minion.glb",
+          "path": "public/models/creatures/woc_skeleton_minion.glb",
+          "bytes": 2124600,
+          "sha256": "5ad46a36df19ba1b6a01ec3e48a517964dda23e6994fb2850200359934c30d89"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 2.5,
         "yaw": null,
         "hover": null,
@@ -1187,11 +1187,11 @@
         "resolved": "#e8a64a",
         "strength": 0.25
       },
-      "sourceFingerprint": "67a457e51353192a94657a29c43a7bcbfcc29e1775d8490eb88899cd41eae398",
+      "sourceFingerprint": "8743cae8531ca1dd234ada07991008bd2a8845e791af89bb3466ce0af2661d75",
       "output": {
         "path": "public/ui/mobs/candlewright_acolyte.webp",
-        "bytes": 2850,
-        "sha256": "4c6bbbf9bc53e4d10712c8275bc966c90eafd617c8df90fa3a32349c02d1ba25"
+        "bytes": 2268,
+        "sha256": "d6dba5b1179c96bc8492b89b8cd7099fcbb6e8cda2f4851b8a00570339209e18"
       }
     },
     {
@@ -1269,12 +1269,12 @@
       "visualKey": "skel_minion",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/woc_skeleton_minion.glb",
+          "path": "public/models/creatures/woc_skeleton_minion.glb",
+          "bytes": 2124600,
+          "sha256": "5ad46a36df19ba1b6a01ec3e48a517964dda23e6994fb2850200359934c30d89"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 2.5,
         "yaw": null,
         "hover": null,
@@ -1289,11 +1289,11 @@
         "resolved": "#3b4a5a",
         "strength": 0.25
       },
-      "sourceFingerprint": "8699c2ce4df3d71f47fc5abdfea944a5776d3f1988aca44db6eff4d29e88f58a",
+      "sourceFingerprint": "d3fffc25f05161a1d3c44af2afd24928ff50a591e3eaf81c7e50821cecb02d92",
       "output": {
         "path": "public/ui/mobs/captain_verlan.webp",
-        "bytes": 2722,
-        "sha256": "f5daef3496c879055a56f2514e5f908887fa3147f91fde72367131ebf1d6371f"
+        "bytes": 2188,
+        "sha256": "9f0f6bafaccf8e97a3f4108b8445b28a96d56375b89d32896b997836e4d8a62b"
       }
     },
     {
@@ -1587,12 +1587,12 @@
       "visualKey": "crypt_skel_minion",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/woc_skeleton_minion.glb",
+          "path": "public/models/creatures/woc_skeleton_minion.glb",
+          "bytes": 2124600,
+          "sha256": "5ad46a36df19ba1b6a01ec3e48a517964dda23e6994fb2850200359934c30d89"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 3.5,
         "yaw": null,
         "hover": null,
@@ -1607,11 +1607,11 @@
         "resolved": "#e8e0c8",
         "strength": 0.25
       },
-      "sourceFingerprint": "2a2517122d0f455addb51ee6d5f4925e743db16d51902cbe2dea9bd3c750df6b",
+      "sourceFingerprint": "6c2545901b2982f80ef55ad2edcf817715a6fe1fbafdd397c7f0f8a8b38e7fee",
       "output": {
         "path": "public/ui/mobs/crypt_bone_minion.webp",
-        "bytes": 2838,
-        "sha256": "39c9ca77972d0f4e817f18e20483b3952850ddc9a9c8f4116791342c591b90dd"
+        "bytes": 2254,
+        "sha256": "f167ccebdbbe42d60ea861082fe352015f5d337abc925405660442d6072bb6e3"
       }
     },
     {
@@ -2620,12 +2620,12 @@
       "visualKey": "skel_minion",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/woc_skeleton_minion.glb",
+          "path": "public/models/creatures/woc_skeleton_minion.glb",
+          "bytes": 2124600,
+          "sha256": "5ad46a36df19ba1b6a01ec3e48a517964dda23e6994fb2850200359934c30d89"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 2.5,
         "yaw": null,
         "hover": null,
@@ -2640,11 +2640,11 @@
         "resolved": "#7fb3d5",
         "strength": 0.25
       },
-      "sourceFingerprint": "6060337f7d2493f368665655645a66b5ef77111dcb9a75ef903e9f3b91a178a2",
+      "sourceFingerprint": "acb485b6d1ed92a761f1bac0c7916a8c6691a4670231d5548c222fffc5520dbf",
       "output": {
         "path": "public/ui/mobs/drowned_dead.webp",
-        "bytes": 2772,
-        "sha256": "aca9181bb36d5f4c8c82aa05f392095678f5b4fc61c58d5d88add6a8783cad02"
+        "bytes": 2184,
+        "sha256": "5052cf4470904244fee19c96cfab8e449798ec3794a1e97d03eb2a37038cbfd9"
       }
     },
     {
@@ -2654,12 +2654,12 @@
       "visualKey": "skel_minion",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/woc_skeleton_minion.glb",
+          "path": "public/models/creatures/woc_skeleton_minion.glb",
+          "bytes": 2124600,
+          "sha256": "5ad46a36df19ba1b6a01ec3e48a517964dda23e6994fb2850200359934c30d89"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 2.5,
         "yaw": null,
         "hover": null,
@@ -2674,11 +2674,11 @@
         "resolved": "#86988e",
         "strength": 0.25
       },
-      "sourceFingerprint": "4e84901f5e2d641bb00995baa9d6f2f1fc645e5576e8ffd43ef56ac08f81d239",
+      "sourceFingerprint": "00b16e4967597db2d3a331412e99a60d6dcd4b3792dbe99aae73b62e296a82e1",
       "output": {
         "path": "public/ui/mobs/drowned_deckhand.webp",
-        "bytes": 2754,
-        "sha256": "5ba49e69aeff7b2b49abe0bd38971cfde403fde4b9c2b6b19214ffde92622270"
+        "bytes": 2198,
+        "sha256": "550ed585f2adf318ee71ae186c4c200ae448208d468882a5c56dae6032f921cd"
       }
     },
     {
@@ -2790,12 +2790,12 @@
       "visualKey": "skel_minion",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/woc_skeleton_minion.glb",
+          "path": "public/models/creatures/woc_skeleton_minion.glb",
+          "bytes": 2124600,
+          "sha256": "5ad46a36df19ba1b6a01ec3e48a517964dda23e6994fb2850200359934c30d89"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 2.5,
         "yaw": null,
         "hover": null,
@@ -2810,11 +2810,11 @@
         "resolved": "#6fae9e",
         "strength": 0.25
       },
-      "sourceFingerprint": "a703d94d5380918333fd6598b3d3de067c6c7e93c8dad03b208412303b06c5cf",
+      "sourceFingerprint": "d105edfd297f9ee65ed5ec17f6bff356649d2d81a3ca44258e724e41a5105bef",
       "output": {
         "path": "public/ui/mobs/drowned_thrall.webp",
-        "bytes": 2740,
-        "sha256": "f92ace671b3f612dd1eb29c491435062cc955dd48a8e836e996f8f97940970d2"
+        "bytes": 2198,
+        "sha256": "d7d645821c5898575ac981ede77d3ed8490b73dfd60afe11fbd84744187e2f5a"
       }
     },
     {
@@ -2824,12 +2824,12 @@
       "visualKey": "skel_minion",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/woc_skeleton_minion.glb",
+          "path": "public/models/creatures/woc_skeleton_minion.glb",
+          "bytes": 2124600,
+          "sha256": "5ad46a36df19ba1b6a01ec3e48a517964dda23e6994fb2850200359934c30d89"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 2.5,
         "yaw": null,
         "hover": null,
@@ -2844,11 +2844,11 @@
         "resolved": "#6c8f8a",
         "strength": 0.25
       },
-      "sourceFingerprint": "90d70e8d52071559e127fe1d122e9cd88c0ae077f15edf3da9e7609a203f93e9",
+      "sourceFingerprint": "b16a18fa0b1a6c55d121aea7073847f0c75cb216d6c88fcc9309bc2314595a2a",
       "output": {
         "path": "public/ui/mobs/drowned_votary.webp",
-        "bytes": 2728,
-        "sha256": "2475a47a35e355fb7b99c5c6ad7eddfdb16a43d73ba5569e27e4888bfc2ad1f7"
+        "bytes": 2194,
+        "sha256": "08b198f382434d3846f74476e46cc408715e400f38691958c40f38ecf20ea2a1"
       }
     },
     {
@@ -2858,12 +2858,12 @@
       "visualKey": "skel_minion",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/woc_skeleton_minion.glb",
+          "path": "public/models/creatures/woc_skeleton_minion.glb",
+          "bytes": 2124600,
+          "sha256": "5ad46a36df19ba1b6a01ec3e48a517964dda23e6994fb2850200359934c30d89"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 2.5,
         "yaw": null,
         "hover": null,
@@ -2878,11 +2878,11 @@
         "resolved": "#3a6ea5",
         "strength": 0.25
       },
-      "sourceFingerprint": "d6d315d94ba8c2810f3aeed5b81683778276eceae2c8cb87f5ba544e5adc49a3",
+      "sourceFingerprint": "8cf13159814ca4eb19c04e5203b9e576aba85e9b6c0e35f41c186daaf357ecbd",
       "output": {
         "path": "public/ui/mobs/drowned_warlord.webp",
-        "bytes": 2772,
-        "sha256": "457d834ea5fd5217cfe893a25408dc381b3cfcc0fefecb04ca25f79c7ad56e81"
+        "bytes": 2176,
+        "sha256": "b92440264b46d540cacd52ab0da364afe88c56c5067cf61d16295e9a84809ecf"
       }
     },
     {
@@ -3382,12 +3382,12 @@
       "visualKey": "skel_minion",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/woc_skeleton_minion.glb",
+          "path": "public/models/creatures/woc_skeleton_minion.glb",
+          "bytes": 2124600,
+          "sha256": "5ad46a36df19ba1b6a01ec3e48a517964dda23e6994fb2850200359934c30d89"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 2.5,
         "yaw": null,
         "hover": null,
@@ -3402,11 +3402,11 @@
         "resolved": "#7fb3d5",
         "strength": 0.25
       },
-      "sourceFingerprint": "6060337f7d2493f368665655645a66b5ef77111dcb9a75ef903e9f3b91a178a2",
+      "sourceFingerprint": "acb485b6d1ed92a761f1bac0c7916a8c6691a4670231d5548c222fffc5520dbf",
       "output": {
         "path": "public/ui/mobs/fenbridge_infiltrator.webp",
-        "bytes": 2772,
-        "sha256": "aca9181bb36d5f4c8c82aa05f392095678f5b4fc61c58d5d88add6a8783cad02"
+        "bytes": 2184,
+        "sha256": "5052cf4470904244fee19c96cfab8e449798ec3794a1e97d03eb2a37038cbfd9"
       }
     },
     {
@@ -5661,12 +5661,12 @@
       "visualKey": "skel_minion",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/woc_skeleton_minion.glb",
+          "path": "public/models/creatures/woc_skeleton_minion.glb",
+          "bytes": 2124600,
+          "sha256": "5ad46a36df19ba1b6a01ec3e48a517964dda23e6994fb2850200359934c30d89"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 2.5,
         "yaw": null,
         "hover": null,
@@ -5681,11 +5681,11 @@
         "resolved": "#8a7a64",
         "strength": 0.25
       },
-      "sourceFingerprint": "fcda45c3d97b73d612701453f998a091e7388ec95ebddfa8253dc141947e27fb",
+      "sourceFingerprint": "9f89c4fcef795d5336ec2d9734a74bbc82c0835aa35dd572cfb49eba0be0a7ff",
       "output": {
         "path": "public/ui/mobs/hollow_gravedigger.webp",
-        "bytes": 2754,
-        "sha256": "52375c44005188b60237df2819c760b62828f21d12175c2be0e023d1bd275d66"
+        "bytes": 2200,
+        "sha256": "1d685cf527fd82a3eaf912489375bd4d4b4ca6e8b6d6aeba3e00ae8e7ae38cf9"
       }
     },
     {
@@ -6312,12 +6312,12 @@
       "visualKey": "skel_minion",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/woc_skeleton_minion.glb",
+          "path": "public/models/creatures/woc_skeleton_minion.glb",
+          "bytes": 2124600,
+          "sha256": "5ad46a36df19ba1b6a01ec3e48a517964dda23e6994fb2850200359934c30d89"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 2.5,
         "yaw": null,
         "hover": null,
@@ -6332,11 +6332,11 @@
         "resolved": "#d5dbdb",
         "strength": 0.25
       },
-      "sourceFingerprint": "7545d7ee4dac26300ea916a4bde2f0900bcc44d16a408dd90085cfdc939e0fe3",
+      "sourceFingerprint": "060c7f252db8d9bfa5054868dd3bcb463795f477dd3ad6debf9f14f28410300f",
       "output": {
         "path": "public/ui/mobs/marrow_restless_bones.webp",
-        "bytes": 2810,
-        "sha256": "305de95e559a9193dddba8f72148a3c75d0a9cb5bba085a8c357f0c3f0fe9a6b"
+        "bytes": 2218,
+        "sha256": "6dc5d58865c242a987dff264a095baf4eabb447c2f313a134b3f6020739525ab"
       }
     },
     {
@@ -7591,12 +7591,12 @@
       "visualKey": "skel_minion",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/woc_skeleton_minion.glb",
+          "path": "public/models/creatures/woc_skeleton_minion.glb",
+          "bytes": 2124600,
+          "sha256": "5ad46a36df19ba1b6a01ec3e48a517964dda23e6994fb2850200359934c30d89"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 2.5,
         "yaw": null,
         "hover": null,
@@ -7611,11 +7611,11 @@
         "resolved": "#c7d0bd",
         "strength": 0.25
       },
-      "sourceFingerprint": "bf2198d09351b19170955448e1e8f63e12abf1449bc17dcca3c3750220e0f362",
+      "sourceFingerprint": "0ecc9a135b320541665f5bbcbc62432e285bbc155800ec5b567743c1818441c8",
       "output": {
         "path": "public/ui/mobs/necromancy_skeletal_warrior.webp",
-        "bytes": 2808,
-        "sha256": "d3be95b1b4f824cee47c764d44582bb2211092ca4fda039d7625422e8a02f99a"
+        "bytes": 2272,
+        "sha256": "1583b58cc335013b395b6aadb0432e9b3b99ba548fd32fcae0f0b7bc5a0134dc"
       }
     },
     {
@@ -8181,12 +8181,12 @@
       "visualKey": "skel_minion",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/woc_skeleton_minion.glb",
+          "path": "public/models/creatures/woc_skeleton_minion.glb",
+          "bytes": 2124600,
+          "sha256": "5ad46a36df19ba1b6a01ec3e48a517964dda23e6994fb2850200359934c30d89"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 2.5,
         "yaw": null,
         "hover": null,
@@ -8201,11 +8201,11 @@
         "resolved": "#cfc6b0",
         "strength": 0.25
       },
-      "sourceFingerprint": "fd3b1d3c56f65eee8933945bbef1d7c69ec86a5df7c1378d0ae568729c6544e6",
+      "sourceFingerprint": "689edfba97ffa9216a40f585b8023fcfcf18f9b9854e1f0a53fdfdc4ccf764b5",
       "output": {
         "path": "public/ui/mobs/ossuary_sentinel.webp",
-        "bytes": 2800,
-        "sha256": "b4f8b5cbf772957d4bd0ee292dd005e82f45dfd1172b57df05a6da34ba7fa0c9"
+        "bytes": 2236,
+        "sha256": "228f2d50651e37b83443fc4fca0117285f6492de4c87d57ceb0bea8c0bc5e78a"
       }
     },
     {
@@ -8419,12 +8419,12 @@
       "visualKey": "skel_minion",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/woc_skeleton_minion.glb",
+          "path": "public/models/creatures/woc_skeleton_minion.glb",
+          "bytes": 2124600,
+          "sha256": "5ad46a36df19ba1b6a01ec3e48a517964dda23e6994fb2850200359934c30d89"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 2.5,
         "yaw": null,
         "hover": null,
@@ -8439,11 +8439,11 @@
         "resolved": "#b9b2a4",
         "strength": 0.25
       },
-      "sourceFingerprint": "20d06d20a8ed31e84b277128dcbc551f1c9700a100c5699ce9ba895979c17b1b",
+      "sourceFingerprint": "a8f9afcb3c126da8eabe17cbbcf3a36981e7b15184c164b2a261902ae4fe98e3",
       "output": {
         "path": "public/ui/mobs/reliquary_bonewalker.webp",
-        "bytes": 2796,
-        "sha256": "dd88cb1e85ad01ad76ddecd8324aef4c86a482fe27d08627e97b8db20d50174c"
+        "bytes": 2232,
+        "sha256": "47a6a3cbb6a1da919850a14424bfc22b201a1b9b368926965baa5841f09b0d39"
       }
     },
     {
@@ -8575,12 +8575,12 @@
       "visualKey": "delve_skel_wraith",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/woc_skeleton_minion.glb",
+          "path": "public/models/creatures/woc_skeleton_minion.glb",
+          "bytes": 2124600,
+          "sha256": "5ad46a36df19ba1b6a01ec3e48a517964dda23e6994fb2850200359934c30d89"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 2.5,
         "yaw": null,
         "hover": null,
@@ -8595,11 +8595,11 @@
         "resolved": "#9ba8a0",
         "strength": 0.55
       },
-      "sourceFingerprint": "d704a1bc447e36ddcd1af412b50f89653792444aff18b586030eb4fb33e850f7",
+      "sourceFingerprint": "b3f765dfbc1f0ffe5e8a081612a68fe552973b32ccb3650b155b8223ae2de914",
       "output": {
         "path": "public/ui/mobs/reliquary_ledger_wraith.webp",
-        "bytes": 2656,
-        "sha256": "5c856306d093540fe7793f629ec8f88ca1ab1920620b0a56411baa6d76677f84"
+        "bytes": 2134,
+        "sha256": "e2c48a5488ed818606e612f00c09b39800020b769d57a4f56bd7a44eee1bdca9"
       }
     },
     {
@@ -8668,12 +8668,12 @@
       "visualKey": "skel_minion",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/woc_skeleton_minion.glb",
+          "path": "public/models/creatures/woc_skeleton_minion.glb",
+          "bytes": 2124600,
+          "sha256": "5ad46a36df19ba1b6a01ec3e48a517964dda23e6994fb2850200359934c30d89"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 2.5,
         "yaw": null,
         "hover": null,
@@ -8688,11 +8688,11 @@
         "resolved": "#d5dbdb",
         "strength": 0.25
       },
-      "sourceFingerprint": "7545d7ee4dac26300ea916a4bde2f0900bcc44d16a408dd90085cfdc939e0fe3",
+      "sourceFingerprint": "060c7f252db8d9bfa5054868dd3bcb463795f477dd3ad6debf9f14f28410300f",
       "output": {
         "path": "public/ui/mobs/restless_bones.webp",
-        "bytes": 2810,
-        "sha256": "305de95e559a9193dddba8f72148a3c75d0a9cb5bba085a8c357f0c3f0fe9a6b"
+        "bytes": 2218,
+        "sha256": "6dc5d58865c242a987dff264a095baf4eabb447c2f313a134b3f6020739525ab"
       }
     },
     {
@@ -8770,12 +8770,12 @@
       "visualKey": "skel_minion",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/woc_skeleton_minion.glb",
+          "path": "public/models/creatures/woc_skeleton_minion.glb",
+          "bytes": 2124600,
+          "sha256": "5ad46a36df19ba1b6a01ec3e48a517964dda23e6994fb2850200359934c30d89"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 2.5,
         "yaw": null,
         "hover": null,
@@ -8790,11 +8790,11 @@
         "resolved": "#c8cfc8",
         "strength": 0.25
       },
-      "sourceFingerprint": "f03c004f0931165a6f4b3b58ee466ed2264d3f816446f55016fa5eb9b2155cdd",
+      "sourceFingerprint": "f28288927cc272ae5a3142c6da26d65d4d39a3452b8157d414e774fac8707abb",
       "output": {
         "path": "public/ui/mobs/rift_bonewalker.webp",
-        "bytes": 2800,
-        "sha256": "bba40e8255adc900269d2cd991c7ac7a8f786f9c7fdfc450593aea9776e5cff2"
+        "bytes": 2230,
+        "sha256": "2ea8da60696c5caaa1121eb4adaaa95a84ddb30ef9b3214010794baeb3fd6e9a"
       }
     },
     {
@@ -8953,12 +8953,12 @@
       "visualKey": "skel_minion",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/woc_skeleton_minion.glb",
+          "path": "public/models/creatures/woc_skeleton_minion.glb",
+          "bytes": 2124600,
+          "sha256": "5ad46a36df19ba1b6a01ec3e48a517964dda23e6994fb2850200359934c30d89"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 2.5,
         "yaw": null,
         "hover": null,
@@ -8973,11 +8973,11 @@
         "resolved": "#b9c4a8",
         "strength": 0.25
       },
-      "sourceFingerprint": "fc6a0eb898a41d5e178efe0e55b0b5c21c5a076ea53f1e13a4960f72d60a3a6c",
+      "sourceFingerprint": "8370d0355671dd127df17d5359b540798d0b0c174516feaca9094c4c24a33438",
       "output": {
         "path": "public/ui/mobs/rift_boss_necro.webp",
-        "bytes": 2794,
-        "sha256": "11e52cc6d4a0e446f3de09f5268d1bef25eeedb9f087fc2d5b42fd2099635f26"
+        "bytes": 2240,
+        "sha256": "9185a72735c15923cfdd8b8b775cbecae508a1363342e009f1539a63e7123a63"
       }
     },
     {
@@ -12866,12 +12866,12 @@
       "visualKey": "skel_minion",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/woc_skeleton_minion.glb",
+          "path": "public/models/creatures/woc_skeleton_minion.glb",
+          "bytes": 2124600,
+          "sha256": "5ad46a36df19ba1b6a01ec3e48a517964dda23e6994fb2850200359934c30d89"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 2.5,
         "yaw": null,
         "hover": null,
@@ -12886,11 +12886,11 @@
         "resolved": "#c9c2b5",
         "strength": 0.25
       },
-      "sourceFingerprint": "b6c76e7ed755ae0b6548421763cac5deaf02c160a11e5bedf5a2bc85ff0d1ef4",
+      "sourceFingerprint": "96375cda5a6cff41ba8dabbd31624711abaae16a326155c116556af4028a0918",
       "output": {
         "path": "public/ui/mobs/varkas_boneguard.webp",
-        "bytes": 2812,
-        "sha256": "cba2167e8dbc5aef277d2a716ce36a752553e17a25eee9c9b4c23268b3bdd4b3"
+        "bytes": 2236,
+        "sha256": "19d36c854bfbbd23a908938b2b76a198edb62b259f76c65c3f5c754dd1d25e05"
       }
     },
     {
@@ -13953,12 +13953,12 @@
       "visualKey": "skel_minion",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/woc_skeleton_minion.glb",
+          "path": "public/models/creatures/woc_skeleton_minion.glb",
+          "bytes": 2124600,
+          "sha256": "5ad46a36df19ba1b6a01ec3e48a517964dda23e6994fb2850200359934c30d89"
         },
-        "idle": "Idle_Combat",
+        "idle": "Idle",
         "height": 2.5,
         "yaw": null,
         "hover": null,
@@ -13973,11 +13973,11 @@
         "resolved": "#6f7f8f",
         "strength": 0.25
       },
-      "sourceFingerprint": "3de4c55c6e71c1dd0d95893263b0a1ba261ef16736db495f6258d1a9fd1a2504",
+      "sourceFingerprint": "fa472b1142f05111ef07921a8952f0eb02c1e983087e6a7d4442a2d228b7df4f",
       "output": {
         "path": "public/ui/mobs/wraithbinder_maldrec.webp",
-        "bytes": 2730,
-        "sha256": "9d3e43581fcbbcde018b16d822fbc516af2efd1a5b62c40835bbc795078cc8f7"
+        "bytes": 2178,
+        "sha256": "8ae07d918042d13a0c93a7e650529d34f05c6cbaf2ea1c167d4de6bd1b4003fb"
       }
     },
     {
