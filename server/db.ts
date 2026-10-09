@@ -888,6 +888,9 @@ ALTER TABLE accounts ADD COLUMN IF NOT EXISTS chat_strikes INT NOT NULL DEFAULT 
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS cheater_mark_seconds INT NOT NULL DEFAULT 0;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS cheater_mark_reason TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS cheater_mark_set_at TIMESTAMPTZ;
+-- The operator world quest block (src/sim/world_quest_block.ts): NULL = not blocked.
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS world_quests_blocked_at TIMESTAMPTZ;
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS world_quests_block_reason TEXT;
 -- Admin-managed filter word lists. tier 'soft' = cosmetic (masked client-side
 -- when the player's filter is on); tier 'hard' = enforced (blocked + escalated).
 CREATE TABLE IF NOT EXISTS chat_filter_words (

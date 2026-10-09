@@ -7,6 +7,7 @@
 import { formatMoney } from './format_money';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
+import { worldQuestsBlocked } from './world_quest_block';
 
 /** Pure: the bonus purse for a given character level. */
 export function worldQuestBonusCopper(base: number, perLevel: number, level: number): number {
@@ -19,7 +20,9 @@ export function awardWorldQuestBonusCopper(
   meta: PlayerMeta,
   amount: number,
 ): void {
-  if (!(amount > 0)) return;
+  // Every bonus purse (hard maze, champion, ambush) is a world quest payout, so
+  // an operator-blocked account (world_quest_block.ts) is paid none of them.
+  if (!(amount > 0) || worldQuestsBlocked(meta)) return;
   meta.copper += amount;
   ctx.emit({
     type: 'loot',

@@ -1351,6 +1351,9 @@ export interface AccountDetail {
   // the account is not marked, so the dashboard can branch apply-vs-lift the way
   // it does for dailyRewardsBan.
   cheaterMark: { secondsRemaining: number; reason: string; setAt: string | null } | null;
+  // The operator world quest block (accounts.world_quests_*): the audited reason and
+  // when it was applied. Null when the account is not blocked.
+  worldQuestBlock: { reason: string; blockedAt: string } | null;
   lastLoginIp: string | null;
   playtimeSeconds: number;
   characters: {
@@ -1667,6 +1670,8 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
                 cheater_mark_seconds,
                 COALESCE(cheater_mark_reason, '') AS cheater_mark_reason,
                 cheater_mark_set_at,
+                world_quests_blocked_at,
+                COALESCE(world_quests_block_reason, '') AS world_quests_block_reason,
                 last_login_ip,
                 (COALESCE((SELECT sum(EXTRACT(EPOCH FROM (COALESCE(s.ended_at, now()) - s.started_at)))
                            FROM play_sessions s WHERE s.account_id = accounts.id), 0)
@@ -1789,6 +1794,13 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
             setAt: a.cheater_mark_set_at ?? null,
           }
         : null,
+    worldQuestBlock:
+      a.world_quests_blocked_at == null
+        ? null
+        : {
+            reason: String(a.world_quests_block_reason),
+            blockedAt: a.world_quests_blocked_at,
+          },
     lastLoginIp: a.last_login_ip ?? null,
     playtimeSeconds: Number(a.playtime_seconds),
     characters: characters.rows.map((c) => ({

@@ -41,6 +41,10 @@ export interface WorldQuestPlayerState {
   worldQuestLog: Map<string, WorldQuestProgress>;
   /** Session-only cycle override used by focused dev commands; never persisted. */
   devWorldQuestCycle?: string | null;
+  /** The operator world quest block (src/sim/world_quest_block.ts). Server-set
+   *  from the account row at join and on an admin change; never persisted in
+   *  the character blob, never true offline, never user-settable. */
+  worldQuestsBlocked?: boolean;
   /** Puzzle-area entry edges for this session. Never persisted or wired. */
   worldQuestAreas: Set<string>;
   /** Minigame unlocked by the area's physical activator for this session. */
