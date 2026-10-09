@@ -20,6 +20,7 @@
 
 import { CRAFT_RING, GATHERING_PROFESSION_IDS, TOOL_EFFECTS } from '../src/sim/content/professions';
 import { ITEMS } from '../src/sim/data';
+import { isItemGuid } from '../src/sim/item_provenance';
 import { normalizeArchetypeState } from '../src/sim/professions/archetype';
 import {
   gatherNodeById,
@@ -274,7 +275,11 @@ export const RESTORE_ITEM_MAX_COUNT = 20;
  *  Validation runs BEFORE the audit write, so a fat-fingered request never
  *  leaves an audit row for a grant that was never possible; the runtime
  *  re-checks everything defensively. */
-export function restoreItemBodyError(body: { itemId?: unknown; count?: unknown }): string | null {
+export function restoreItemBodyError(body: {
+  itemId?: unknown;
+  count?: unknown;
+  derivedFrom?: unknown;
+}): string | null {
   if (
     typeof body.itemId !== 'string' ||
     body.itemId.length === 0 ||
@@ -291,7 +296,38 @@ export function restoreItemBodyError(body: { itemId?: unknown; count?: unknown }
   ) {
     return `count must be a whole number between 1 and ${RESTORE_ITEM_MAX_COUNT}`;
   }
+  if (!isRestoreDerivedFromAbsent(body.derivedFrom) && restoreItemDerivedFrom(body) === undefined) {
+    return 'derived-from must be an item id';
+  }
   return null;
+}
+
+function isRestoreDerivedFromAbsent(raw: unknown): boolean {
+  return raw === undefined || raw === null || raw === '';
+}
+
+/** The restore's optional lineage link: the LOST copy's item guid (any case,
+ *  as an operator pastes it from the Item Tracking page), normalized to the
+ *  canonical lowercase form the sim mints, so the restored copy is minted as
+ *  a `derive` of it (src/sim/item_tracking.ts). Undefined when absent or not
+ *  an item guid; restoreItemBodyError refuses the latter before any audit. */
+export function restoreItemDerivedFrom(body: { derivedFrom?: unknown }): string | undefined {
+  const raw = body.derivedFrom;
+  if (typeof raw !== 'string') return undefined;
+  const guid = raw.toLowerCase();
+  return isItemGuid(guid) ? guid : undefined;
+}
+
+/** The restore-item audit detail both admin arms record: what was requested,
+ *  plus the lost copy's guid when the restore names one, so the audit row
+ *  ties to the ledger's `derive` row. */
+export function restoreItemAuditDetail(
+  itemId: string,
+  count: number,
+  derivedFrom?: string,
+): string {
+  const base = `${itemId} x${count}`;
+  return derivedFrom === undefined ? base : `${base} derived from ${derivedFrom}`;
 }
 
 /** Validate a restore-slot request body, same contract as

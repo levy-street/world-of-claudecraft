@@ -4066,11 +4066,92 @@ describe('R35 GM restores (restore-item / restore-slot)', () => {
       detail: 'copper_mining_pick x2',
       reason: 'lost to issue 2514',
     });
-    expect(rt.adminRestoreItem).toHaveBeenCalledWith(5, 'copper_mining_pick', 2);
+    expect(rt.adminRestoreItem).toHaveBeenCalledWith(5, 'copper_mining_pick', 2, undefined);
     // A grant may never exist unaudited: the audit row precedes the mint.
     const auditOrder = recordProfessionsRestore.mock.invocationCallOrder[0];
     const mintOrder = (rt.adminRestoreItem as ReturnType<typeof vi.fn>).mock.invocationCallOrder[0];
     expect(auditOrder).toBeLessThan(mintOrder);
+  });
+
+  it('restore-item threads a lost copy guid (any case) as derivedFrom, lowercased and audited', async () => {
+    const lost = '9B2E7C1A-5D34-4F6E-8A1B-2C3D4E5F6071';
+    const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
+    authedAdminDb({ recordProfessionsRestore });
+    const rt = installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreItem: vi.fn(() => 'ok'),
+    });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: {
+        itemId: 'duskforged_warblade',
+        count: 1,
+        derivedFrom: lost,
+        reason: 'lost to issue 4305',
+      },
+    });
+    expect(r.status).toBe(200);
+    expect(recordProfessionsRestore).toHaveBeenCalledWith({
+      characterId: 5,
+      adminAccountId: ADMIN_ACCOUNT_ID,
+      action: 'restore_item',
+      detail: `duskforged_warblade x1 derived from ${lost.toLowerCase()}`,
+      reason: 'lost to issue 4305',
+    });
+    expect(rt.adminRestoreItem).toHaveBeenCalledWith(
+      5,
+      'duskforged_warblade',
+      1,
+      lost.toLowerCase(),
+    );
+  });
+
+  it('restore-item treats an empty or null derivedFrom as a plain restore', async () => {
+    const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
+    authedAdminDb({ recordProfessionsRestore });
+    const rt = installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreItem: vi.fn(() => 'ok'),
+    });
+    for (const derivedFrom of ['', null]) {
+      const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
+        headers: { authorization: BEARER },
+        params: { id: '5' },
+        body: { itemId: 'copper_mining_pick', count: 1, derivedFrom, reason: 'lost' },
+      });
+      expect(r.status).toBe(200);
+    }
+    expect(rt.adminRestoreItem).toHaveBeenNthCalledWith(1, 5, 'copper_mining_pick', 1, undefined);
+    expect(rt.adminRestoreItem).toHaveBeenNthCalledWith(2, 5, 'copper_mining_pick', 1, undefined);
+    expect(recordProfessionsRestore).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({ detail: 'copper_mining_pick x1' }),
+    );
+  });
+
+  it('restore-item refuses a malformed derivedFrom BEFORE any audit write', async () => {
+    const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
+    authedAdminDb({ recordProfessionsRestore });
+    const rt = installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreItem: vi.fn(() => 'ok'),
+    });
+    for (const derivedFrom of ['not-a-guid', 42, '9b2e7c1a-5d34-0f6e-8a1b-2c3d4e5f6071']) {
+      const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
+        headers: { authorization: BEARER },
+        params: { id: '5' },
+        body: { itemId: 'duskforged_warblade', count: 1, derivedFrom, reason: 'lost' },
+      });
+      expect(r.status).toBe(400);
+      expect(r.body).toEqual({
+        success: false,
+        data: null,
+        error: 'derived-from must be an item id',
+      });
+    }
+    expect(recordProfessionsRestore).not.toHaveBeenCalled();
+    expect(rt.adminRestoreItem).not.toHaveBeenCalled();
   });
 
   it('restore-item refuses an offline character BEFORE any audit write', async () => {

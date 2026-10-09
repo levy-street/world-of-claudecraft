@@ -1257,5 +1257,10 @@ export const vi_VN: AdminTranslations = {
   "realmBuilders.errorMonth": "Tháng phải nằm trong khoảng từ 1 đến 12.",
   "realmBuilders.errorNameEmpty": "Nhập tên để tôn vinh.",
   "realmBuilders.errorNameLong": "Cái tên đó quá dài cho tấm bảng.",
-  "realmBuilders.errorNoteLong": "Ghi chú đó quá dài."
+  "realmBuilders.errorNoteLong": "Ghi chú đó quá dài.",
+  "profInspect.derivedFromLabel": "Lost copy item ID (optional)",
+  "profInspect.derivedFromPlaceholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "dialog.restoreDerivedFrom": "Replaces lost copy",
+  "alert.restoreDerivedFromInvalid": "Enter the full item ID of the lost copy (36 characters), or leave it blank.",
+  "error.restoreDerivedFromInvalid": "The lost copy item ID is not a valid item ID."
 };

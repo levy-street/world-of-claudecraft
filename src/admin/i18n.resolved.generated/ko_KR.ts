@@ -1257,5 +1257,10 @@ export const ko_KR: AdminTranslations = {
   "realmBuilders.errorMonth": "월은 1에서 12 사이여야 합니다.",
   "realmBuilders.errorNameEmpty": "명예를 위해 이름을 입력하세요.",
   "realmBuilders.errorNameLong": "그 이름은 명판에 비해 너무 깁니다.",
-  "realmBuilders.errorNoteLong": "메모가 너무 깁니다."
+  "realmBuilders.errorNoteLong": "메모가 너무 깁니다.",
+  "profInspect.derivedFromLabel": "Lost copy item ID (optional)",
+  "profInspect.derivedFromPlaceholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "dialog.restoreDerivedFrom": "Replaces lost copy",
+  "alert.restoreDerivedFromInvalid": "Enter the full item ID of the lost copy (36 characters), or leave it blank.",
+  "error.restoreDerivedFromInvalid": "The lost copy item ID is not a valid item ID."
 };

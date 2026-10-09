@@ -1257,5 +1257,10 @@ export const id_ID: AdminTranslations = {
   "realmBuilders.errorMonth": "Bulan harus antara 1 dan 12.",
   "realmBuilders.errorNameEmpty": "Masukkan nama untuk dihormati.",
   "realmBuilders.errorNameLong": "Nama itu terlalu panjang untuk sebuah plakat.",
-  "realmBuilders.errorNoteLong": "Catatan itu terlalu panjang."
+  "realmBuilders.errorNoteLong": "Catatan itu terlalu panjang.",
+  "profInspect.derivedFromLabel": "Lost copy item ID (optional)",
+  "profInspect.derivedFromPlaceholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "dialog.restoreDerivedFrom": "Replaces lost copy",
+  "alert.restoreDerivedFromInvalid": "Enter the full item ID of the lost copy (36 characters), or leave it blank.",
+  "error.restoreDerivedFromInvalid": "The lost copy item ID is not a valid item ID."
 };

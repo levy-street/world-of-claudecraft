@@ -1257,5 +1257,10 @@ export const sv_SE: AdminTranslations = {
   "realmBuilders.errorMonth": "Månaden måste vara mellan 1 och 12.",
   "realmBuilders.errorNameEmpty": "Ange namnet för att hedra.",
   "realmBuilders.errorNameLong": "Det namnet är för långt för plaketten.",
-  "realmBuilders.errorNoteLong": "Den anteckningen är för lång."
+  "realmBuilders.errorNoteLong": "Den anteckningen är för lång.",
+  "profInspect.derivedFromLabel": "Lost copy item ID (optional)",
+  "profInspect.derivedFromPlaceholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "dialog.restoreDerivedFrom": "Replaces lost copy",
+  "alert.restoreDerivedFromInvalid": "Enter the full item ID of the lost copy (36 characters), or leave it blank.",
+  "error.restoreDerivedFromInvalid": "The lost copy item ID is not a valid item ID."
 };

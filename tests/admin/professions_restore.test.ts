@@ -3,7 +3,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
+  restoreItemAuditDetail,
   restoreItemBodyError,
+  restoreItemDerivedFrom,
   restoreSlotBodyError,
   RESTORE_ITEM_MAX_COUNT as SERVER_RESTORE_ITEM_MAX_COUNT,
 } from '../../server/character_professions';
@@ -13,11 +15,16 @@ import { fmtNumber } from '../../src/admin/format';
 import { ADMIN_ERROR_KEYS, DICT, localizeAdminError, t } from '../../src/admin/i18n';
 import { en } from '../../src/admin/i18n.en';
 import {
+  ITEM_GUID_PATTERN,
   RESTORE_ITEM_MAX_COUNT,
+  restoreDerivedFrom,
   restoreItem,
   restoreItemSummary,
   restoreSlot,
 } from '../../src/admin/professions_restore';
+import { ITEM_GUID_PATTERN as SIM_ITEM_GUID_PATTERN } from '../../src/sim/item_provenance';
+
+const LOST_GUID = '9b2e7c1a-5d34-4f6e-8a1b-2c3d4e5f6071';
 
 // Pure validation + endpoint/body shaping for the R35 GM restores, the
 // moderation_actions.test.ts pattern: Node env, no DOM, pins the exact
@@ -162,6 +169,51 @@ describe('professions_restore builders', () => {
     );
   });
 
+  it('sends a lost copy guid (any case, trimmed) as derivedFrom and shows it in the confirm rows', () => {
+    const built = restoreItem(
+      7,
+      'Merlin',
+      'duskforged_warblade',
+      1,
+      'lost to issue 4305',
+      `  ${LOST_GUID.toUpperCase()} `,
+    );
+    if (!('pending' in built)) throw new Error('expected pending');
+    expect(built.pending.body).toEqual({
+      itemId: 'duskforged_warblade',
+      count: 1,
+      derivedFrom: LOST_GUID,
+      reason: 'lost to issue 4305',
+    });
+    expect(built.pending.rows).toContainEqual({
+      label: t('dialog.restoreDerivedFrom'),
+      value: LOST_GUID,
+    });
+    // The reason stays the last row, after the lineage row.
+    expect(built.pending.rows.at(-1)).toEqual({
+      label: t('dialog.reason'),
+      value: 'lost to issue 4305',
+    });
+  });
+
+  it('omits derivedFrom (body and row) when the lost copy field is blank', () => {
+    for (const blank of ['', '   ']) {
+      const built = restoreItem(7, 'Merlin', 'duskforged_warblade', 1, 'lost', blank);
+      if (!('pending' in built)) throw new Error('expected pending');
+      expect(built.pending.body).not.toHaveProperty('derivedFrom');
+      expect(built.pending.rows.map((r) => r.label)).not.toContain(t('dialog.restoreDerivedFrom'));
+    }
+  });
+
+  it('refuses a malformed lost copy id locally', () => {
+    for (const bad of ['not-a-guid', `${LOST_GUID}0`, '9b2e7c1a-5d34-0f6e-8a1b-2c3d4e5f6071']) {
+      expect(restoreItem(7, 'Merlin', 'duskforged_warblade', 1, 'lost', bad)).toEqual({
+        errorKey: 'alert.restoreDerivedFromInvalid',
+      });
+    }
+    expect((en as Record<string, string>)['alert.restoreDerivedFromInvalid']).toBeTruthy();
+  });
+
   it('refuses a whitespace-only note locally, matching the server cleanText refusal', () => {
     expect(restoreItem(7, 'Merlin', 'copper_mining_pick', 1, '   ')).toEqual({
       errorKey: 'alert.noteRequired',
@@ -173,6 +225,47 @@ describe('professions_restore builders', () => {
 });
 
 describe('server prose coupling (the count clamp and the error reverse map)', () => {
+  it('mirrors the sim item guid shape exactly (the admin bundle cannot import it)', () => {
+    expect(ITEM_GUID_PATTERN.source).toBe(SIM_ITEM_GUID_PATTERN.source);
+    expect(ITEM_GUID_PATTERN.flags).toBe(SIM_ITEM_GUID_PATTERN.flags);
+  });
+
+  it('agrees with the server on every lost copy id: accepted, normalized, or refused', () => {
+    const fixtures = [
+      '',
+      LOST_GUID,
+      LOST_GUID.toUpperCase(),
+      'not-a-guid',
+      `${LOST_GUID}0`,
+      '9b2e7c1a-5d34-0f6e-8a1b-2c3d4e5f6071',
+      '9b2e7c1a-5d34-4f6e-7a1b-2c3d4e5f6071',
+    ];
+    for (const raw of fixtures) {
+      const client = restoreDerivedFrom(raw);
+      const body = { itemId: 'duskforged_warblade', count: 1, derivedFrom: raw };
+      const serverError = restoreItemBodyError(body);
+      expect(serverError === null, raw).toBe(client !== null);
+      if (client) expect(restoreItemDerivedFrom(body), raw).toBe(client);
+      if (client === '') expect(restoreItemDerivedFrom(body), raw).toBeUndefined();
+      if (serverError) expect(serverError).toBe('derived-from must be an item id');
+    }
+    // A non-string never passes the server, and an absent field is a plain restore.
+    expect(restoreItemBodyError({ itemId: 'duskforged_warblade', count: 1, derivedFrom: 42 })).toBe(
+      'derived-from must be an item id',
+    );
+    expect(restoreItemBodyError({ itemId: 'duskforged_warblade', count: 1 })).toBeNull();
+    expect(
+      restoreItemBodyError({ itemId: 'duskforged_warblade', count: 1, derivedFrom: null }),
+    ).toBeNull();
+  });
+
+  it('records the lost copy guid in the audit detail only when the restore names one', () => {
+    expect(restoreItemAuditDetail('duskforged_warblade', 2)).toBe('duskforged_warblade x2');
+    expect(restoreItemAuditDetail('duskforged_warblade', 1, LOST_GUID)).toBe(
+      `duskforged_warblade x1 derived from ${LOST_GUID}`,
+    );
+  });
+
   it('mirrors the server count clamp exactly', () => {
     // Three copies of the clamp exist (server validator, client mirror, the
     // matcher key below); this pin makes a move in one drag the others.
@@ -294,10 +387,11 @@ describe('server prose coupling (the count clamp and the error reverse map)', ()
       .map((m) => m[0])
       .join(' ');
     const proses = [...new Set([...validators.matchAll(/return '([^']+)'/g)].map((m) => m[1]))];
-    // Floor just under the real count (4 distinct proses today, the phase 18
-    // pair-validity refusal included), the same doctrine as the admin scan
-    // above: a scan that silently stops resolving one prose fails HERE.
-    expect(proses.length).toBeGreaterThan(3);
+    // Floor just under the real count (5 distinct proses today, the phase 18
+    // pair-validity refusal and the lost-copy id refusal included), the same
+    // doctrine as the admin scan above: a scan that silently stops resolving
+    // one prose fails HERE.
+    expect(proses.length).toBeGreaterThan(4);
     for (const prose of proses) {
       expect(
         ADMIN_ERROR_KEYS[prose.toLowerCase()],
@@ -316,6 +410,7 @@ describe('server prose coupling (the count clamp and the error reverse map)', ()
       restoreSlotBodyError({ professionId: 'mining', effectId: 'nope' }),
       restoreItemBodyError({ itemId: 'not_a_real_item', count: 1 }),
       restoreSlotBodyError({ professionId: 'cooking', effectId: 'gatherers_cache' }),
+      restoreItemBodyError({ itemId: 'copper_mining_pick', count: 1, derivedFrom: 'nope' }),
       'character is not online on this realm',
       'the character owns no tool for that profession',
       'that profession already has a slotted effect',

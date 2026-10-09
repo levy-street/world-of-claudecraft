@@ -11,7 +11,10 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "alert.restoreDerivedFromInvalid",
+    "dialog.restoreDerivedFrom",
     "error.invalidItemGuid",
+    "error.restoreDerivedFromInvalid",
     "itemTracking.colCharacter",
     "itemTracking.colDetail",
     "itemTracking.colEvent",
@@ -48,10 +51,15 @@ export const pending: Record<string, readonly string[]> = {
     "itemTracking.recentTitle",
     "itemTracking.retry",
     "itemTracking.shown",
-    "nav.itemTracking"
+    "nav.itemTracking",
+    "profInspect.derivedFromLabel",
+    "profInspect.derivedFromPlaceholder"
   ],
   "es_ES": [
+    "alert.restoreDerivedFromInvalid",
+    "dialog.restoreDerivedFrom",
     "error.invalidItemGuid",
+    "error.restoreDerivedFromInvalid",
     "itemTracking.colCharacter",
     "itemTracking.colDetail",
     "itemTracking.colEvent",
@@ -88,10 +96,15 @@ export const pending: Record<string, readonly string[]> = {
     "itemTracking.recentTitle",
     "itemTracking.retry",
     "itemTracking.shown",
-    "nav.itemTracking"
+    "nav.itemTracking",
+    "profInspect.derivedFromLabel",
+    "profInspect.derivedFromPlaceholder"
   ],
   "fr_FR": [
+    "alert.restoreDerivedFromInvalid",
+    "dialog.restoreDerivedFrom",
     "error.invalidItemGuid",
+    "error.restoreDerivedFromInvalid",
     "itemTracking.colCharacter",
     "itemTracking.colDetail",
     "itemTracking.colEvent",
@@ -128,10 +141,15 @@ export const pending: Record<string, readonly string[]> = {
     "itemTracking.recentTitle",
     "itemTracking.retry",
     "itemTracking.shown",
-    "nav.itemTracking"
+    "nav.itemTracking",
+    "profInspect.derivedFromLabel",
+    "profInspect.derivedFromPlaceholder"
   ],
   "fr_CA": [
+    "alert.restoreDerivedFromInvalid",
+    "dialog.restoreDerivedFrom",
     "error.invalidItemGuid",
+    "error.restoreDerivedFromInvalid",
     "itemTracking.colCharacter",
     "itemTracking.colDetail",
     "itemTracking.colEvent",
@@ -168,11 +186,16 @@ export const pending: Record<string, readonly string[]> = {
     "itemTracking.recentTitle",
     "itemTracking.retry",
     "itemTracking.shown",
-    "nav.itemTracking"
+    "nav.itemTracking",
+    "profInspect.derivedFromLabel",
+    "profInspect.derivedFromPlaceholder"
   ],
   "en_CA": [],
   "it_IT": [
+    "alert.restoreDerivedFromInvalid",
+    "dialog.restoreDerivedFrom",
     "error.invalidItemGuid",
+    "error.restoreDerivedFromInvalid",
     "itemTracking.colCharacter",
     "itemTracking.colDetail",
     "itemTracking.colEvent",
@@ -209,10 +232,15 @@ export const pending: Record<string, readonly string[]> = {
     "itemTracking.recentTitle",
     "itemTracking.retry",
     "itemTracking.shown",
-    "nav.itemTracking"
+    "nav.itemTracking",
+    "profInspect.derivedFromLabel",
+    "profInspect.derivedFromPlaceholder"
   ],
   "de_DE": [
+    "alert.restoreDerivedFromInvalid",
+    "dialog.restoreDerivedFrom",
     "error.invalidItemGuid",
+    "error.restoreDerivedFromInvalid",
     "itemTracking.colCharacter",
     "itemTracking.colDetail",
     "itemTracking.colEvent",
@@ -249,10 +277,15 @@ export const pending: Record<string, readonly string[]> = {
     "itemTracking.recentTitle",
     "itemTracking.retry",
     "itemTracking.shown",
-    "nav.itemTracking"
+    "nav.itemTracking",
+    "profInspect.derivedFromLabel",
+    "profInspect.derivedFromPlaceholder"
   ],
   "zh_CN": [
+    "alert.restoreDerivedFromInvalid",
+    "dialog.restoreDerivedFrom",
     "error.invalidItemGuid",
+    "error.restoreDerivedFromInvalid",
     "itemTracking.colCharacter",
     "itemTracking.colDetail",
     "itemTracking.colEvent",
@@ -289,10 +322,15 @@ export const pending: Record<string, readonly string[]> = {
     "itemTracking.recentTitle",
     "itemTracking.retry",
     "itemTracking.shown",
-    "nav.itemTracking"
+    "nav.itemTracking",
+    "profInspect.derivedFromLabel",
+    "profInspect.derivedFromPlaceholder"
   ],
   "zh_TW": [
+    "alert.restoreDerivedFromInvalid",
+    "dialog.restoreDerivedFrom",
     "error.invalidItemGuid",
+    "error.restoreDerivedFromInvalid",
     "itemTracking.colCharacter",
     "itemTracking.colDetail",
     "itemTracking.colEvent",
@@ -329,10 +367,15 @@ export const pending: Record<string, readonly string[]> = {
     "itemTracking.recentTitle",
     "itemTracking.retry",
     "itemTracking.shown",
-    "nav.itemTracking"
+    "nav.itemTracking",
+    "profInspect.derivedFromLabel",
+    "profInspect.derivedFromPlaceholder"
   ],
   "ko_KR": [
+    "alert.restoreDerivedFromInvalid",
+    "dialog.restoreDerivedFrom",
     "error.invalidItemGuid",
+    "error.restoreDerivedFromInvalid",
     "itemTracking.colCharacter",
     "itemTracking.colDetail",
     "itemTracking.colEvent",
@@ -369,10 +412,15 @@ export const pending: Record<string, readonly string[]> = {
     "itemTracking.recentTitle",
     "itemTracking.retry",
     "itemTracking.shown",
-    "nav.itemTracking"
+    "nav.itemTracking",
+    "profInspect.derivedFromLabel",
+    "profInspect.derivedFromPlaceholder"
   ],
   "ja_JP": [
+    "alert.restoreDerivedFromInvalid",
+    "dialog.restoreDerivedFrom",
     "error.invalidItemGuid",
+    "error.restoreDerivedFromInvalid",
     "itemTracking.colCharacter",
     "itemTracking.colDetail",
     "itemTracking.colEvent",
@@ -409,10 +457,15 @@ export const pending: Record<string, readonly string[]> = {
     "itemTracking.recentTitle",
     "itemTracking.retry",
     "itemTracking.shown",
-    "nav.itemTracking"
+    "nav.itemTracking",
+    "profInspect.derivedFromLabel",
+    "profInspect.derivedFromPlaceholder"
   ],
   "pt_BR": [
+    "alert.restoreDerivedFromInvalid",
+    "dialog.restoreDerivedFrom",
     "error.invalidItemGuid",
+    "error.restoreDerivedFromInvalid",
     "itemTracking.colCharacter",
     "itemTracking.colDetail",
     "itemTracking.colEvent",
@@ -449,10 +502,15 @@ export const pending: Record<string, readonly string[]> = {
     "itemTracking.recentTitle",
     "itemTracking.retry",
     "itemTracking.shown",
-    "nav.itemTracking"
+    "nav.itemTracking",
+    "profInspect.derivedFromLabel",
+    "profInspect.derivedFromPlaceholder"
   ],
   "ru_RU": [
+    "alert.restoreDerivedFromInvalid",
+    "dialog.restoreDerivedFrom",
     "error.invalidItemGuid",
+    "error.restoreDerivedFromInvalid",
     "itemTracking.colCharacter",
     "itemTracking.colDetail",
     "itemTracking.colEvent",
@@ -489,10 +547,15 @@ export const pending: Record<string, readonly string[]> = {
     "itemTracking.recentTitle",
     "itemTracking.retry",
     "itemTracking.shown",
-    "nav.itemTracking"
+    "nav.itemTracking",
+    "profInspect.derivedFromLabel",
+    "profInspect.derivedFromPlaceholder"
   ],
   "cs_CZ": [
+    "alert.restoreDerivedFromInvalid",
+    "dialog.restoreDerivedFrom",
     "error.invalidItemGuid",
+    "error.restoreDerivedFromInvalid",
     "itemTracking.colCharacter",
     "itemTracking.colDetail",
     "itemTracking.colEvent",
@@ -529,10 +592,15 @@ export const pending: Record<string, readonly string[]> = {
     "itemTracking.recentTitle",
     "itemTracking.retry",
     "itemTracking.shown",
-    "nav.itemTracking"
+    "nav.itemTracking",
+    "profInspect.derivedFromLabel",
+    "profInspect.derivedFromPlaceholder"
   ],
   "nl_NL": [
+    "alert.restoreDerivedFromInvalid",
+    "dialog.restoreDerivedFrom",
     "error.invalidItemGuid",
+    "error.restoreDerivedFromInvalid",
     "itemTracking.colCharacter",
     "itemTracking.colDetail",
     "itemTracking.colEvent",
@@ -569,10 +637,15 @@ export const pending: Record<string, readonly string[]> = {
     "itemTracking.recentTitle",
     "itemTracking.retry",
     "itemTracking.shown",
-    "nav.itemTracking"
+    "nav.itemTracking",
+    "profInspect.derivedFromLabel",
+    "profInspect.derivedFromPlaceholder"
   ],
   "pl_PL": [
+    "alert.restoreDerivedFromInvalid",
+    "dialog.restoreDerivedFrom",
     "error.invalidItemGuid",
+    "error.restoreDerivedFromInvalid",
     "itemTracking.colCharacter",
     "itemTracking.colDetail",
     "itemTracking.colEvent",
@@ -609,10 +682,15 @@ export const pending: Record<string, readonly string[]> = {
     "itemTracking.recentTitle",
     "itemTracking.retry",
     "itemTracking.shown",
-    "nav.itemTracking"
+    "nav.itemTracking",
+    "profInspect.derivedFromLabel",
+    "profInspect.derivedFromPlaceholder"
   ],
   "id_ID": [
+    "alert.restoreDerivedFromInvalid",
+    "dialog.restoreDerivedFrom",
     "error.invalidItemGuid",
+    "error.restoreDerivedFromInvalid",
     "itemTracking.colCharacter",
     "itemTracking.colDetail",
     "itemTracking.colEvent",
@@ -649,10 +727,15 @@ export const pending: Record<string, readonly string[]> = {
     "itemTracking.recentTitle",
     "itemTracking.retry",
     "itemTracking.shown",
-    "nav.itemTracking"
+    "nav.itemTracking",
+    "profInspect.derivedFromLabel",
+    "profInspect.derivedFromPlaceholder"
   ],
   "tr_TR": [
+    "alert.restoreDerivedFromInvalid",
+    "dialog.restoreDerivedFrom",
     "error.invalidItemGuid",
+    "error.restoreDerivedFromInvalid",
     "itemTracking.colCharacter",
     "itemTracking.colDetail",
     "itemTracking.colEvent",
@@ -689,10 +772,15 @@ export const pending: Record<string, readonly string[]> = {
     "itemTracking.recentTitle",
     "itemTracking.retry",
     "itemTracking.shown",
-    "nav.itemTracking"
+    "nav.itemTracking",
+    "profInspect.derivedFromLabel",
+    "profInspect.derivedFromPlaceholder"
   ],
   "sv_SE": [
+    "alert.restoreDerivedFromInvalid",
+    "dialog.restoreDerivedFrom",
     "error.invalidItemGuid",
+    "error.restoreDerivedFromInvalid",
     "itemTracking.colCharacter",
     "itemTracking.colDetail",
     "itemTracking.colEvent",
@@ -729,10 +817,15 @@ export const pending: Record<string, readonly string[]> = {
     "itemTracking.recentTitle",
     "itemTracking.retry",
     "itemTracking.shown",
-    "nav.itemTracking"
+    "nav.itemTracking",
+    "profInspect.derivedFromLabel",
+    "profInspect.derivedFromPlaceholder"
   ],
   "vi_VN": [
+    "alert.restoreDerivedFromInvalid",
+    "dialog.restoreDerivedFrom",
     "error.invalidItemGuid",
+    "error.restoreDerivedFromInvalid",
     "itemTracking.colCharacter",
     "itemTracking.colDetail",
     "itemTracking.colEvent",
@@ -769,10 +862,15 @@ export const pending: Record<string, readonly string[]> = {
     "itemTracking.recentTitle",
     "itemTracking.retry",
     "itemTracking.shown",
-    "nav.itemTracking"
+    "nav.itemTracking",
+    "profInspect.derivedFromLabel",
+    "profInspect.derivedFromPlaceholder"
   ],
   "da_DK": [
+    "alert.restoreDerivedFromInvalid",
+    "dialog.restoreDerivedFrom",
     "error.invalidItemGuid",
+    "error.restoreDerivedFromInvalid",
     "itemTracking.colCharacter",
     "itemTracking.colDetail",
     "itemTracking.colEvent",
@@ -809,6 +907,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemTracking.recentTitle",
     "itemTracking.retry",
     "itemTracking.shown",
-    "nav.itemTracking"
+    "nav.itemTracking",
+    "profInspect.derivedFromLabel",
+    "profInspect.derivedFromPlaceholder"
   ]
 };

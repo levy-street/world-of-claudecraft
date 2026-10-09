@@ -1325,6 +1325,14 @@ export const en = {
   'realmBuilders.errorNameEmpty': 'Enter the name to honour.',
   'realmBuilders.errorNameLong': 'That name is too long for the plaque.',
   'realmBuilders.errorNoteLong': 'That note is too long.',
+  // The GM item restore's optional lineage link (the lost copy's item ID, from
+  // the Item Tracking page): the restored copy is logged as derived from it.
+  'profInspect.derivedFromLabel': 'Lost copy item ID (optional)',
+  'profInspect.derivedFromPlaceholder': 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
+  'dialog.restoreDerivedFrom': 'Replaces lost copy',
+  'alert.restoreDerivedFromInvalid':
+    'Enter the full item ID of the lost copy (36 characters), or leave it blank.',
+  'error.restoreDerivedFromInvalid': 'The lost copy item ID is not a valid item ID.',
 };
 
 export type AdminTranslations = typeof en;

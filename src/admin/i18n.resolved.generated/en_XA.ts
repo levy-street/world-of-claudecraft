@@ -1257,5 +1257,10 @@ export const en_XA: AdminTranslations = {
   "realmBuilders.errorMonth": "[Ɱóñţĥ ɱúšţ ƀé ƀéţŵééñ 1 áñð 12.]",
   "realmBuilders.errorNameEmpty": "[Éñţéŕ ţĥé ñáɱé ţó ĥóñóúŕ.]",
   "realmBuilders.errorNameLong": "[Ţĥáţ ñáɱé íš ţóó ļóñĝ ƒóŕ ţĥé þļáɋúé.]",
-  "realmBuilders.errorNoteLong": "[Ţĥáţ ñóţé íš ţóó ļóñĝ.]"
+  "realmBuilders.errorNoteLong": "[Ţĥáţ ñóţé íš ţóó ļóñĝ.]",
+  "profInspect.derivedFromLabel": "[Ļóšţ çóþý íţéɱ ÍÐ (óþţíóñáļ)]",
+  "profInspect.derivedFromPlaceholder": "[ẋẋẋẋẋẋẋẋ-ẋẋẋẋ-ẋẋẋẋ-ẋẋẋẋ-ẋẋẋẋẋẋẋẋẋẋẋẋ]",
+  "dialog.restoreDerivedFrom": "[Ŕéþļáçéš ļóšţ çóþý]",
+  "alert.restoreDerivedFromInvalid": "[Éñţéŕ ţĥé ƒúļļ íţéɱ ÍÐ óƒ ţĥé ļóšţ çóþý (36 çĥáŕáçţéŕš), óŕ ļéáʋé íţ ƀļáñķ.]",
+  "error.restoreDerivedFromInvalid": "[Ţĥé ļóšţ çóþý íţéɱ ÍÐ íš ñóţ á ʋáļíð íţéɱ ÍÐ.]"
 };

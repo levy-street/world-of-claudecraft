@@ -91,7 +91,9 @@ import {
 } from './bug_report_db';
 import {
   characterProfessionsSheetFromRow,
+  restoreItemAuditDetail,
   restoreItemBodyError,
+  restoreItemDerivedFrom,
   restoreSlotBodyError,
 } from './character_professions';
 import {
@@ -1191,6 +1193,7 @@ export async function handleAdminApi(
       if (bodyError) return fail(res, 400, bodyError);
       const itemId = String(body.itemId);
       const count = Number(body.count);
+      const derivedFrom = restoreItemDerivedFrom(body);
       try {
         if (!game.adminCharacterOnline(id)) {
           return fail(res, 400, 'character is not online on this realm');
@@ -1199,10 +1202,10 @@ export async function handleAdminApi(
           characterId: id,
           adminAccountId: accountId,
           action: 'restore_item',
-          detail: `${itemId} x${count}`,
+          detail: restoreItemAuditDetail(itemId, count, derivedFrom),
           reason: body.reason,
         });
-        const result = game.adminRestoreItem(id, itemId, count);
+        const result = game.adminRestoreItem(id, itemId, count, derivedFrom);
         // Defensive twin of the pre-audit body check; reachable only if the
         // runtime and validator ever disagree about ITEMS.
         if (result === 'invalid_item') return fail(res, 400, 'unknown item id');
@@ -3308,6 +3311,7 @@ async function restoreItemHandler(ctx: Ctx): Promise<void> {
   if (bodyError) return fail(ctx.res, 400, bodyError);
   const itemId = String(body.itemId);
   const count = Number(body.count);
+  const derivedFrom = restoreItemDerivedFrom(body);
   try {
     if (!rt.adminCharacterOnline(id)) {
       return fail(ctx.res, 400, 'character is not online on this realm');
@@ -3316,10 +3320,10 @@ async function restoreItemHandler(ctx: Ctx): Promise<void> {
       characterId: id,
       adminAccountId: ctxAccountId(ctx),
       action: 'restore_item',
-      detail: `${itemId} x${count}`,
+      detail: restoreItemAuditDetail(itemId, count, derivedFrom),
       reason: body.reason,
     });
-    const result = rt.adminRestoreItem(id, itemId, count);
+    const result = rt.adminRestoreItem(id, itemId, count, derivedFrom);
     // Defensive twin of the pre-audit body check; reachable only if the
     // runtime and validator ever disagree about ITEMS.
     if (result === 'invalid_item') return fail(ctx.res, 400, 'unknown item id');

@@ -1257,5 +1257,10 @@ export const nl_NL: AdminTranslations = {
   "realmBuilders.errorMonth": "Maand moet tussen 1 en 12 liggen.",
   "realmBuilders.errorNameEmpty": "Voer de naam in die u wilt eren.",
   "realmBuilders.errorNameLong": "Die naam is te lang voor de plaquette.",
-  "realmBuilders.errorNoteLong": "Die noot is te lang."
+  "realmBuilders.errorNoteLong": "Die noot is te lang.",
+  "profInspect.derivedFromLabel": "Lost copy item ID (optional)",
+  "profInspect.derivedFromPlaceholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "dialog.restoreDerivedFrom": "Replaces lost copy",
+  "alert.restoreDerivedFromInvalid": "Enter the full item ID of the lost copy (36 characters), or leave it blank.",
+  "error.restoreDerivedFromInvalid": "The lost copy item ID is not a valid item ID."
 };

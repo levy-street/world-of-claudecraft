@@ -1257,5 +1257,10 @@ export const ja_JP: AdminTranslations = {
   "realmBuilders.errorMonth": "月は 1 ～ 12 の間である必要があります。",
   "realmBuilders.errorNameEmpty": "称える名前を入力します。",
   "realmBuilders.errorNameLong": "その名前は銘板には長すぎます。",
-  "realmBuilders.errorNoteLong": "そのメモは長すぎます。"
+  "realmBuilders.errorNoteLong": "そのメモは長すぎます。",
+  "profInspect.derivedFromLabel": "Lost copy item ID (optional)",
+  "profInspect.derivedFromPlaceholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "dialog.restoreDerivedFrom": "Replaces lost copy",
+  "alert.restoreDerivedFromInvalid": "Enter the full item ID of the lost copy (36 characters), or leave it blank.",
+  "error.restoreDerivedFromInvalid": "The lost copy item ID is not a valid item ID."
 };

@@ -1257,5 +1257,10 @@ export const it_IT: AdminTranslations = {
   "realmBuilders.errorMonth": "Il mese deve essere compreso tra 1 e 12.",
   "realmBuilders.errorNameEmpty": "Inserisci il nome da onorare.",
   "realmBuilders.errorNameLong": "Quel nome è troppo lungo per la targa.",
-  "realmBuilders.errorNoteLong": "Quella nota è troppo lunga."
+  "realmBuilders.errorNoteLong": "Quella nota è troppo lunga.",
+  "profInspect.derivedFromLabel": "Lost copy item ID (optional)",
+  "profInspect.derivedFromPlaceholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "dialog.restoreDerivedFrom": "Replaces lost copy",
+  "alert.restoreDerivedFromInvalid": "Enter the full item ID of the lost copy (36 characters), or leave it blank.",
+  "error.restoreDerivedFromInvalid": "The lost copy item ID is not a valid item ID."
 };

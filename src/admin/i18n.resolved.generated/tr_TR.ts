@@ -1257,5 +1257,10 @@ export const tr_TR: AdminTranslations = {
   "realmBuilders.errorMonth": "Ay 1 ile 12 arasında olmalıdır.",
   "realmBuilders.errorNameEmpty": "Onurlandırılacak adı girin.",
   "realmBuilders.errorNameLong": "Bu isim plaket için çok uzun.",
-  "realmBuilders.errorNoteLong": "Bu not çok uzun."
+  "realmBuilders.errorNoteLong": "Bu not çok uzun.",
+  "profInspect.derivedFromLabel": "Lost copy item ID (optional)",
+  "profInspect.derivedFromPlaceholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "dialog.restoreDerivedFrom": "Replaces lost copy",
+  "alert.restoreDerivedFromInvalid": "Enter the full item ID of the lost copy (36 characters), or leave it blank.",
+  "error.restoreDerivedFromInvalid": "The lost copy item ID is not a valid item ID."
 };
