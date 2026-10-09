@@ -17942,6 +17942,11 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'apiError.kick.admin_target': 'Operatörskonton kan inte sparkas.',
   'apiError.kick.reason_required': 'En anledning krävs.',
   'apiError.kick.target_offline': 'Den spelaren är inte längre online i denna värld.',
+  'apiError.world_quest_block.admin_target':
+    'Operatörskonton kan inte blockeras från världsuppdrag.',
+  'apiError.world_quest_block.reason_required': 'En anledning krävs.',
+  'apiError.world_quest_block.already_blocked': 'Det kontot är redan blockerat från världsuppdrag.',
+  'apiError.world_quest_block.not_blocked': 'Det kontot är inte blockerat från världsuppdrag.',
   'entities.abilities.melting_acid.description':
     'Bestryker ditt vapen i 30 min. Vart och ett av dina närstridshugg stänker frätande syra på målet och minskar dess rustning med 5 % i 12 sekunder.',
   'entities.abilities.nightshade_coating.description':

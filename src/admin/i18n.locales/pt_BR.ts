@@ -1084,6 +1084,14 @@ export const pt_BR: Record<string, string> = {
     'Todos os personagens da conta exibem a etiqueta pública até que esse tempo jogado se esgote.',
   'detail.cheaterMarkRelengthHint':
     'Substitui totalmente o crédito restante; não soma a ele. A etiqueta pública continua visível.',
+  'detail.worldQuestBlockModeration': 'Missões mundiais',
+  'detail.worldQuestBlockActions': 'Ações de moderação de missões mundiais',
+  'detail.worldQuestBlockApply': 'Bloquear missões mundiais',
+  'detail.worldQuestBlockLift': 'Desbloquear missões mundiais',
+  'detail.worldQuestBlockReason': 'Motivo do bloqueio: {value}',
+  'detail.worldQuestBlockedAt': 'Bloqueado em: {value}',
+  'detail.worldQuestBlockHint':
+    'Para uso de bots em missões mundiais em vez de banimento: nenhum personagem da conta pode mais iniciar, avançar ou ganhar recompensas de missões mundiais. Todo o resto continua jogável.',
   'dialog.confirmCheaterMark': 'Confirmar marca de trapaceiro',
   'dialog.confirmCheaterMarkRelength': 'Confirmar a nova duração da marca',
   'dialog.confirmCheaterMarkLift': 'Confirmar remoção da marca',
@@ -1091,13 +1099,24 @@ export const pt_BR: Record<string, string> = {
     'Exibir a etiqueta pública Trapaceiro em todos os personagens desta conta',
   'dialog.actionCheaterMarkRelength': 'Substituir o crédito de tempo jogado restante desta marca',
   'dialog.actionCheaterMarkLift': 'Remover a marca de trapaceiro antes do fim',
+  'dialog.confirmWorldQuestBlock': 'Confirmar bloqueio de missões mundiais',
+  'dialog.confirmWorldQuestUnblock': 'Confirmar desbloqueio de missões mundiais',
+  'dialog.actionWorldQuestBlock':
+    'Bloquear as missões mundiais para todos os personagens desta conta',
+  'dialog.actionWorldQuestUnblock': 'Permitir novamente as missões mundiais nesta conta',
   'alert.cheaterMarkDurationInvalid': 'Insira um número inteiro de 1 a {max} horas.',
   'error.cheaterMarkDurationInvalid': 'O crédito de tempo jogado deve ficar entre 1 e 100 horas.',
   'error.cheaterMarkNotMarked': 'Esta conta não está usando a marca de trapaceiro.',
   'error.cheaterMarkAdminTarget':
     'Contas de administrador não podem receber a marca de trapaceiro.',
+  'error.worldQuestBlockAdminTarget':
+    'Contas de administrador não podem ser bloqueadas das missões mundiais.',
+  'error.worldQuestBlockAlreadyBlocked': 'Esta conta já está bloqueada das missões mundiais.',
+  'error.worldQuestBlockNotBlocked': 'Esta conta não está bloqueada das missões mundiais.',
   'moderationHistory.actionCheaterMark': 'Marca de trapaceiro aplicada',
   'moderationHistory.actionCheaterMarkLift': 'Marca de trapaceiro removida',
+  'moderationHistory.actionWorldQuestsBlock': 'Missões mundiais bloqueadas',
+  'moderationHistory.actionWorldQuestsUnblock': 'Missões mundiais desbloqueadas',
   // v0.40 release i18n fill.
   'accounts.colGold': 'Ouro',
   'error.flagInvalidStatus': 'status de sinalizador inválido',

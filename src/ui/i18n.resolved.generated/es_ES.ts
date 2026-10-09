@@ -6840,10 +6840,10 @@ export const es_ES: EnTranslations = {
       "target_offline": "Ese jugador ya no está en línea en este reino."
     },
     "world_quest_block": {
-      "admin_target": "Operator accounts cannot be blocked from world quests.",
-      "reason_required": "A reason is required.",
-      "already_blocked": "That account is already blocked from world quests.",
-      "not_blocked": "That account is not blocked from world quests."
+      "admin_target": "Las cuentas de los operadores no se pueden bloquear para misiones de mundo.",
+      "reason_required": "Se requiere una razón.",
+      "already_blocked": "Esa cuenta ya está bloqueada para misiones de mundo.",
+      "not_blocked": "Esa cuenta no está bloqueada para misiones de mundo."
     },
     "woc_market": {
       "invalid_input": "Entrada no válida.",

@@ -6840,10 +6840,10 @@ export const tr_TR: EnTranslations = {
       "target_offline": "Bu oyuncu artık bu alanda çevrimiçi değil."
     },
     "world_quest_block": {
-      "admin_target": "Operator accounts cannot be blocked from world quests.",
-      "reason_required": "A reason is required.",
-      "already_blocked": "That account is already blocked from world quests.",
-      "not_blocked": "That account is not blocked from world quests."
+      "admin_target": "Operatör hesapları dünya görevlerinden engellenemez.",
+      "reason_required": "Bir neden gereklidir.",
+      "already_blocked": "O hesap zaten dünya görevlerinden engellenmiş.",
+      "not_blocked": "O hesap dünya görevlerinden engellenmemiş."
     },
     "woc_market": {
       "invalid_input": "Geçersiz girdi.",

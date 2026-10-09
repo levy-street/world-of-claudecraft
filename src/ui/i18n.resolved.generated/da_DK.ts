@@ -6840,10 +6840,10 @@ export const da_DK: EnTranslations = {
       "target_offline": "Den spiller er ikke længere online i dette rige."
     },
     "world_quest_block": {
-      "admin_target": "Operator accounts cannot be blocked from world quests.",
-      "reason_required": "A reason is required.",
-      "already_blocked": "That account is already blocked from world quests.",
-      "not_blocked": "That account is not blocked from world quests."
+      "admin_target": "Operatørkonti kan ikke blokeres fra verdenquester.",
+      "reason_required": "En grund er påkrævet.",
+      "already_blocked": "Den konto er allerede blokeret fra verdenquester.",
+      "not_blocked": "Den konto er ikke blokeret fra verdenquester."
     },
     "woc_market": {
       "invalid_input": "Ugyldigt input.",

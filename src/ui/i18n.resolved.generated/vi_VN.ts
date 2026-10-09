@@ -6840,10 +6840,10 @@ export const vi_VN: EnTranslations = {
       "target_offline": "Người chơi đó không còn trực tuyến trên vương quốc này nữa."
     },
     "world_quest_block": {
-      "admin_target": "Operator accounts cannot be blocked from world quests.",
-      "reason_required": "A reason is required.",
-      "already_blocked": "That account is already blocked from world quests.",
-      "not_blocked": "That account is not blocked from world quests."
+      "admin_target": "Không thể chặn nhiệm vụ thế giới đối với tài khoản nhà điều hành.",
+      "reason_required": "Một lý do là cần thiết.",
+      "already_blocked": "Tài khoản đó đã bị chặn nhiệm vụ thế giới.",
+      "not_blocked": "Tài khoản đó không bị chặn nhiệm vụ thế giới."
     },
     "woc_market": {
       "invalid_input": "Dữ liệu nhập không hợp lệ.",

@@ -18023,6 +18023,11 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'apiError.kick.admin_target': 'Tài khoản nhà điều hành không thể bị đá.',
   'apiError.kick.reason_required': 'Một lý do là cần thiết.',
   'apiError.kick.target_offline': 'Người chơi đó không còn trực tuyến trên vương quốc này nữa.',
+  'apiError.world_quest_block.admin_target':
+    'Không thể chặn nhiệm vụ thế giới đối với tài khoản nhà điều hành.',
+  'apiError.world_quest_block.reason_required': 'Một lý do là cần thiết.',
+  'apiError.world_quest_block.already_blocked': 'Tài khoản đó đã bị chặn nhiệm vụ thế giới.',
+  'apiError.world_quest_block.not_blocked': 'Tài khoản đó không bị chặn nhiệm vụ thế giới.',
   'entities.abilities.melting_acid.description':
     'Bôi lên vũ khí trong 30 phút. Mỗi đòn cận chiến tạt axit ăn da lên mục tiêu và giảm 5% giáp của mục tiêu trong 12 giây.',
   'entities.abilities.nightshade_coating.description':

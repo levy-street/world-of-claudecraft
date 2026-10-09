@@ -18330,6 +18330,11 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'apiError.kick.admin_target': 'Betreiberkonten können nicht gekündigt werden.',
   'apiError.kick.reason_required': 'Es ist ein Grund erforderlich.',
   'apiError.kick.target_offline': 'Dieser Spieler ist auf diesem Realm nicht mehr online.',
+  'apiError.world_quest_block.admin_target':
+    'Betreiberkonten können nicht für Weltquests gesperrt werden.',
+  'apiError.world_quest_block.reason_required': 'Es ist ein Grund erforderlich.',
+  'apiError.world_quest_block.already_blocked': 'Dieses Konto ist bereits für Weltquests gesperrt.',
+  'apiError.world_quest_block.not_blocked': 'Dieses Konto ist nicht für Weltquests gesperrt.',
   'entities.abilities.melting_acid.description':
     'Überzieht Eure Waffe 30 Min. lang. Jeder Nahkampfschwung bespritzt das Ziel mit ätzender Säure und verringert seine Rüstung 12 Sek. lang um 5 %.',
   'entities.abilities.nightshade_coating.description':

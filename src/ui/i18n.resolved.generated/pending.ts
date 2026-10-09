@@ -9,100 +9,25 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [
-    "apiError.world_quest_block.admin_target",
-    "apiError.world_quest_block.already_blocked",
-    "apiError.world_quest_block.not_blocked",
-    "apiError.world_quest_block.reason_required"
-  ],
-  "es_ES": [
-    "apiError.world_quest_block.admin_target",
-    "apiError.world_quest_block.already_blocked",
-    "apiError.world_quest_block.not_blocked",
-    "apiError.world_quest_block.reason_required"
-  ],
-  "fr_FR": [
-    "apiError.world_quest_block.admin_target",
-    "apiError.world_quest_block.already_blocked",
-    "apiError.world_quest_block.not_blocked",
-    "apiError.world_quest_block.reason_required"
-  ],
-  "fr_CA": [
-    "apiError.world_quest_block.admin_target",
-    "apiError.world_quest_block.already_blocked",
-    "apiError.world_quest_block.not_blocked",
-    "apiError.world_quest_block.reason_required"
-  ],
+  "es": [],
+  "es_ES": [],
+  "fr_FR": [],
+  "fr_CA": [],
   "en_CA": [],
-  "it_IT": [
-    "apiError.world_quest_block.admin_target",
-    "apiError.world_quest_block.already_blocked",
-    "apiError.world_quest_block.not_blocked",
-    "apiError.world_quest_block.reason_required"
-  ],
-  "de_DE": [
-    "apiError.world_quest_block.admin_target",
-    "apiError.world_quest_block.already_blocked",
-    "apiError.world_quest_block.not_blocked",
-    "apiError.world_quest_block.reason_required"
-  ],
+  "it_IT": [],
+  "de_DE": [],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [
-    "apiError.world_quest_block.admin_target",
-    "apiError.world_quest_block.already_blocked",
-    "apiError.world_quest_block.not_blocked",
-    "apiError.world_quest_block.reason_required"
-  ],
+  "pt_BR": [],
   "ru_RU": [],
-  "cs_CZ": [
-    "apiError.world_quest_block.admin_target",
-    "apiError.world_quest_block.already_blocked",
-    "apiError.world_quest_block.not_blocked",
-    "apiError.world_quest_block.reason_required"
-  ],
-  "nl_NL": [
-    "apiError.world_quest_block.admin_target",
-    "apiError.world_quest_block.already_blocked",
-    "apiError.world_quest_block.not_blocked",
-    "apiError.world_quest_block.reason_required"
-  ],
-  "pl_PL": [
-    "apiError.world_quest_block.admin_target",
-    "apiError.world_quest_block.already_blocked",
-    "apiError.world_quest_block.not_blocked",
-    "apiError.world_quest_block.reason_required"
-  ],
-  "id_ID": [
-    "apiError.world_quest_block.admin_target",
-    "apiError.world_quest_block.already_blocked",
-    "apiError.world_quest_block.not_blocked",
-    "apiError.world_quest_block.reason_required"
-  ],
-  "tr_TR": [
-    "apiError.world_quest_block.admin_target",
-    "apiError.world_quest_block.already_blocked",
-    "apiError.world_quest_block.not_blocked",
-    "apiError.world_quest_block.reason_required"
-  ],
-  "sv_SE": [
-    "apiError.world_quest_block.admin_target",
-    "apiError.world_quest_block.already_blocked",
-    "apiError.world_quest_block.not_blocked",
-    "apiError.world_quest_block.reason_required"
-  ],
-  "vi_VN": [
-    "apiError.world_quest_block.admin_target",
-    "apiError.world_quest_block.already_blocked",
-    "apiError.world_quest_block.not_blocked",
-    "apiError.world_quest_block.reason_required"
-  ],
-  "da_DK": [
-    "apiError.world_quest_block.admin_target",
-    "apiError.world_quest_block.already_blocked",
-    "apiError.world_quest_block.not_blocked",
-    "apiError.world_quest_block.reason_required"
-  ]
+  "cs_CZ": [],
+  "nl_NL": [],
+  "pl_PL": [],
+  "id_ID": [],
+  "tr_TR": [],
+  "sv_SE": [],
+  "vi_VN": [],
+  "da_DK": []
 };

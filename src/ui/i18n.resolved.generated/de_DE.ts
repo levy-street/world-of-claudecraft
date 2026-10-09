@@ -6840,10 +6840,10 @@ export const de_DE: EnTranslations = {
       "target_offline": "Dieser Spieler ist auf diesem Realm nicht mehr online."
     },
     "world_quest_block": {
-      "admin_target": "Operator accounts cannot be blocked from world quests.",
-      "reason_required": "A reason is required.",
-      "already_blocked": "That account is already blocked from world quests.",
-      "not_blocked": "That account is not blocked from world quests."
+      "admin_target": "Betreiberkonten können nicht für Weltquests gesperrt werden.",
+      "reason_required": "Es ist ein Grund erforderlich.",
+      "already_blocked": "Dieses Konto ist bereits für Weltquests gesperrt.",
+      "not_blocked": "Dieses Konto ist nicht für Weltquests gesperrt."
     },
     "woc_market": {
       "invalid_input": "Ungültige Eingabe.",

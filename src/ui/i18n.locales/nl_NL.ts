@@ -18150,6 +18150,11 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'apiError.kick.admin_target': 'Operatoraccounts kunnen niet worden verwijderd.',
   'apiError.kick.reason_required': 'Er is een reden vereist.',
   'apiError.kick.target_offline': 'Die speler is niet langer online in dit rijk.',
+  'apiError.world_quest_block.admin_target':
+    'Operatoraccounts kunnen niet worden geblokkeerd voor wereldquests.',
+  'apiError.world_quest_block.reason_required': 'Er is een reden vereist.',
+  'apiError.world_quest_block.already_blocked': 'Dat account is al geblokkeerd voor wereldquests.',
+  'apiError.world_quest_block.not_blocked': 'Dat account is niet geblokkeerd voor wereldquests.',
   'entities.abilities.melting_acid.description':
     'Bedekt je wapen 30 min. lang. Elke melee-aanval bespat het doelwit met bijtend zuur en vermindert het pantser met 5% gedurende 12 seconden.',
   'entities.abilities.nightshade_coating.description':

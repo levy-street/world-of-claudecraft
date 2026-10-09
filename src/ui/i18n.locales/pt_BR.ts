@@ -18786,6 +18786,12 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'apiError.kick.admin_target': 'As contas dos operadores não podem ser kickadas.',
   'apiError.kick.reason_required': 'É necessário um motivo.',
   'apiError.kick.target_offline': 'Esse jogador não está mais online neste reino.',
+  'apiError.world_quest_block.admin_target':
+    'As contas dos operadores não podem ser bloqueadas das missões mundiais.',
+  'apiError.world_quest_block.reason_required': 'É necessário um motivo.',
+  'apiError.world_quest_block.already_blocked':
+    'Essa conta já está bloqueada das missões mundiais.',
+  'apiError.world_quest_block.not_blocked': 'Essa conta não está bloqueada das missões mundiais.',
   'entities.abilities.melting_acid.description':
     'Reveste sua arma por 30 min. Cada golpe corpo a corpo salpica o alvo com ácido cáustico, reduzindo sua armadura em 5% por 12 s.',
   'entities.abilities.nightshade_coating.description':

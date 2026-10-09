@@ -6840,10 +6840,10 @@ export const nl_NL: EnTranslations = {
       "target_offline": "Die speler is niet langer online in dit rijk."
     },
     "world_quest_block": {
-      "admin_target": "Operator accounts cannot be blocked from world quests.",
-      "reason_required": "A reason is required.",
-      "already_blocked": "That account is already blocked from world quests.",
-      "not_blocked": "That account is not blocked from world quests."
+      "admin_target": "Operatoraccounts kunnen niet worden geblokkeerd voor wereldquests.",
+      "reason_required": "Er is een reden vereist.",
+      "already_blocked": "Dat account is al geblokkeerd voor wereldquests.",
+      "not_blocked": "Dat account is niet geblokkeerd voor wereldquests."
     },
     "woc_market": {
       "invalid_input": "Ongeldige invoer.",

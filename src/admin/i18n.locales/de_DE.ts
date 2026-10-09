@@ -1099,6 +1099,14 @@ export const de_DE: Record<string, string> = {
     'Jeder Charakter des Kontos trägt das öffentliche Kennzeichen, bis diese Spielzeit aufgebraucht ist.',
   'detail.cheaterMarkRelengthHint':
     'Ersetzt das verbleibende Kontingent vollständig und addiert nichts hinzu. Das öffentliche Kennzeichen bleibt sichtbar.',
+  'detail.worldQuestBlockModeration': 'Weltquests',
+  'detail.worldQuestBlockActions': 'Moderationsaktionen für Weltquests',
+  'detail.worldQuestBlockApply': 'Weltquests sperren',
+  'detail.worldQuestBlockLift': 'Weltquests entsperren',
+  'detail.worldQuestBlockReason': 'Sperrgrund: {value}',
+  'detail.worldQuestBlockedAt': 'Gesperrt: {value}',
+  'detail.worldQuestBlockHint':
+    'Bei Weltquest-Botting statt eines Banns: Kein Charakter des Kontos kann Weltquests mehr beginnen, darin vorankommen oder Belohnungen daraus erhalten. Alles andere bleibt spielbar.',
   'dialog.confirmCheaterMark': 'Schummler-Markierung bestätigen',
   'dialog.confirmCheaterMarkRelength': 'Neue Dauer der Markierung bestätigen',
   'dialog.confirmCheaterMarkLift': 'Entfernen der Markierung bestätigen',
@@ -1107,13 +1115,23 @@ export const de_DE: Record<string, string> = {
   'dialog.actionCheaterMarkRelength':
     'Das verbleibende Spielzeitkontingent dieser Markierung ersetzen',
   'dialog.actionCheaterMarkLift': 'Schummler-Markierung vorzeitig entfernen',
+  'dialog.confirmWorldQuestBlock': 'Weltquest-Sperre bestätigen',
+  'dialog.confirmWorldQuestUnblock': 'Aufhebung der Weltquest-Sperre bestätigen',
+  'dialog.actionWorldQuestBlock': 'Alle Charaktere dieses Kontos für Weltquests sperren',
+  'dialog.actionWorldQuestUnblock': 'Weltquests für dieses Konto wieder erlauben',
   'alert.cheaterMarkDurationInvalid': 'Gib eine ganze Zahl von 1 bis {max} Stunden ein.',
   'error.cheaterMarkDurationInvalid':
     'Das Spielzeitkontingent muss zwischen 1 und 100 Stunden liegen.',
   'error.cheaterMarkNotMarked': 'Dieses Konto trägt keine Schummler-Markierung.',
   'error.cheaterMarkAdminTarget': 'Administratorkonten können keine Schummler-Markierung erhalten.',
+  'error.worldQuestBlockAdminTarget':
+    'Administratorkonten können nicht für Weltquests gesperrt werden.',
+  'error.worldQuestBlockAlreadyBlocked': 'Dieses Konto ist bereits für Weltquests gesperrt.',
+  'error.worldQuestBlockNotBlocked': 'Dieses Konto ist nicht für Weltquests gesperrt.',
   'moderationHistory.actionCheaterMark': 'Schummler-Markierung angewendet',
   'moderationHistory.actionCheaterMarkLift': 'Schummler-Markierung entfernt',
+  'moderationHistory.actionWorldQuestsBlock': 'Weltquests gesperrt',
+  'moderationHistory.actionWorldQuestsUnblock': 'Weltquests entsperrt',
   // v0.40 release i18n fill.
   'accounts.colGold': 'Gold',
   'error.flagInvalidStatus': 'Ungültiger Flaggenstatus',

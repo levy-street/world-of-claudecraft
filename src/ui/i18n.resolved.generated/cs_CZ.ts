@@ -6840,10 +6840,10 @@ export const cs_CZ: EnTranslations = {
       "target_offline": "Tento hráč již není v této sféře online."
     },
     "world_quest_block": {
-      "admin_target": "Operator accounts cannot be blocked from world quests.",
-      "reason_required": "A reason is required.",
-      "already_blocked": "That account is already blocked from world quests.",
-      "not_blocked": "That account is not blocked from world quests."
+      "admin_target": "Účty operátorů nelze zablokovat pro světové úkoly.",
+      "reason_required": "Je vyžadován důvod.",
+      "already_blocked": "Tento účet už má světové úkoly zablokované.",
+      "not_blocked": "Tento účet nemá světové úkoly zablokované."
     },
     "woc_market": {
       "invalid_input": "Neplatný vstup.",

@@ -1109,6 +1109,14 @@ export const fr_FR: Record<string, string> = {
     "Tous les personnages du compte portent l'étiquette publique jusqu'à épuisement de ce temps de jeu.",
   'detail.cheaterMarkRelengthHint':
     "Remplace entièrement le temps restant, sans s'y ajouter. L'étiquette publique reste affichée.",
+  'detail.worldQuestBlockModeration': 'Quêtes mondiales',
+  'detail.worldQuestBlockActions': 'Actions de modération des quêtes mondiales',
+  'detail.worldQuestBlockApply': 'Bloquer les quêtes mondiales',
+  'detail.worldQuestBlockLift': 'Débloquer les quêtes mondiales',
+  'detail.worldQuestBlockReason': 'Motif du blocage : {value}',
+  'detail.worldQuestBlockedAt': 'Bloqué : {value}',
+  'detail.worldQuestBlockHint':
+    "Contre le bot sur les quêtes mondiales, plutôt qu'un bannissement : aucun personnage du compte ne peut plus commencer, faire progresser ni obtenir de récompenses des quêtes mondiales. Le reste du jeu reste jouable.",
   'dialog.confirmCheaterMark': 'Confirmer la marque de tricheur',
   'dialog.confirmCheaterMarkRelength': 'Confirmer la nouvelle durée de la marque',
   'dialog.confirmCheaterMarkLift': 'Confirmer le retrait de la marque',
@@ -1116,14 +1124,25 @@ export const fr_FR: Record<string, string> = {
     "Afficher l'étiquette publique Tricheur sur tous les personnages de ce compte",
   'dialog.actionCheaterMarkRelength': 'Remplacer le temps de jeu restant de cette marque',
   'dialog.actionCheaterMarkLift': 'Retirer la marque de tricheur avant son terme',
+  'dialog.confirmWorldQuestBlock': 'Confirmer le blocage des quêtes mondiales',
+  'dialog.confirmWorldQuestUnblock': 'Confirmer le déblocage des quêtes mondiales',
+  'dialog.actionWorldQuestBlock':
+    'Bloquer les quêtes mondiales pour tous les personnages de ce compte',
+  'dialog.actionWorldQuestUnblock': 'Autoriser de nouveau les quêtes mondiales sur ce compte',
   'alert.cheaterMarkDurationInvalid': 'Saisissez un nombre entier entre 1 et {max} heures.',
   'error.cheaterMarkDurationInvalid':
     'Le crédit de temps de jeu doit être compris entre 1 et 100 heures.',
   'error.cheaterMarkNotMarked': 'Ce compte ne porte pas la marque de tricheur.',
   'error.cheaterMarkAdminTarget':
     'Les comptes administrateur ne peuvent pas recevoir la marque de tricheur.',
+  'error.worldQuestBlockAdminTarget':
+    'Les comptes administrateurs ne peuvent pas être bloqués des quêtes mondiales.',
+  'error.worldQuestBlockAlreadyBlocked': 'Ce compte est déjà bloqué des quêtes mondiales.',
+  'error.worldQuestBlockNotBlocked': "Ce compte n'est pas bloqué des quêtes mondiales.",
   'moderationHistory.actionCheaterMark': 'Marque de tricheur appliquée',
   'moderationHistory.actionCheaterMarkLift': 'Marque de tricheur retirée',
+  'moderationHistory.actionWorldQuestsBlock': 'Quêtes mondiales bloquées',
+  'moderationHistory.actionWorldQuestsUnblock': 'Quêtes mondiales débloquées',
   // v0.40 release i18n fill.
   'accounts.colGold': 'Or',
   'error.flagInvalidStatus': 'statut de drapeau invalide',

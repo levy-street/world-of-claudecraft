@@ -18458,6 +18458,11 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'apiError.kick.admin_target': "Les comptes d'opérateur ne peuvent pas être supprimés.",
   'apiError.kick.reason_required': 'Une raison est requise.',
   'apiError.kick.target_offline': "Ce joueur n'est plus en ligne sur ce royaume.",
+  'apiError.world_quest_block.admin_target':
+    "Les comptes d'opérateur ne peuvent pas être bloqués des quêtes mondiales.",
+  'apiError.world_quest_block.reason_required': 'Une raison est requise.',
+  'apiError.world_quest_block.already_blocked': 'Ce compte est déjà bloqué des quêtes mondiales.',
+  'apiError.world_quest_block.not_blocked': "Ce compte n'est pas bloqué des quêtes mondiales.",
   'entities.abilities.melting_acid.description':
     "Enduit votre arme pendant 30 min. Chacune de vos attaques en mêlée projette de l'acide caustique sur la cible et réduit son armure de 5% pendant 12 s.",
   'entities.abilities.nightshade_coating.description':
