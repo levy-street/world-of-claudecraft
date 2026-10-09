@@ -311,15 +311,23 @@ describe('missing painted icon accepted-art manifest', () => {
     // The Nythraxis gap-fill one-handers add three generated heroic resolvers at
     // the current head (heroic_courtiers_bonefang, heroic_gravecourt_hewer,
     // heroic_thornpeak_wardblade): 210/16/12 become 213/19/15.
+    // The five-dungeon rework's six generated Heroic weapons
+    // (heroic_falls_blessed_staff, heroic_gaolyard_cudgel,
+    // heroic_knight_commanders_longsword, heroic_rimeweb_fang,
+    // heroic_sextons_spadehaft, heroic_tideglass_shiv) add their resolvers the
+    // same way: 213/19/15 become 219/25/21. The lower dungeons' normal blues'
+    // five (heroic_gravecallers_rod, heroic_turnkeys_shank,
+    // heroic_fogbinders_rod, heroic_merecleaver, heroic_moonwrack_stave):
+    // 219/25/21 become 224/30/26.
     expect(accepted.scope).toEqual({
-      targetRows: 213,
+      targetRows: 224,
       rasterPaintings: 194,
       abilities: 90,
       items: 101,
       deeds: 3,
-      heroicWeaponResolvers: 19,
+      heroicWeaponResolvers: 30,
       originalInventoryRows: 197,
-      supplementalCurrentHeadRows: 15,
+      supplementalCurrentHeadRows: 26,
     });
     expect(accepted.assets).toHaveLength(194);
     expect(accepted.assets.filter((asset) => asset.kind === 'ability')).toHaveLength(90);
@@ -336,7 +344,7 @@ describe('missing painted icon accepted-art manifest', () => {
         accepted.assets.filter((asset) => asset.kind === kind).map((asset) => asset.id),
       ).toEqual(ids);
     }
-    expect(accepted.targetSets.heroicWeaponResolvers).toHaveLength(19);
+    expect(accepted.targetSets.heroicWeaponResolvers).toHaveLength(30);
     expect(accepted.targetSets.heroicWeaponResolvers.map(({ id }) => id)).toEqual(
       sorted(new Set(accepted.targetSets.heroicWeaponResolvers.map(({ id }) => id))),
     );
@@ -688,7 +696,12 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // the pending side on the exploration crest.
     // 319 at the 2026-09-28 release/v0.44.0 merge into Buried Hoards: the
     // Coinsack Scurrier catch (cmb_coinsack_caught) joins the pending side.
-    expect(DEED_ORDER).toHaveLength(319);
+    // 338 with the five-dungeon rework's 19 encounter deeds, all on the
+    // pending side on the deed_cat_dungeon crest. 339 with the Drowned
+    // Temple lore guide's The Last Verse and 342 with the Hollow Crypt wing
+    // bosses' three, all on the pending side on the same crest. 343 with
+    // Morthen's Every Candle Lit, pending on the same crest.
+    expect(DEED_ORDER).toHaveLength(343);
     expect(DEED_ART_PENDING.has('hid_forgebreaker')).toBe(true);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');

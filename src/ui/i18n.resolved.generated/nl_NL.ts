@@ -3132,6 +3132,12 @@ export const nl_NL: EnTranslations = {
         "kindlingOrb": "Roep een asmborb naast je op voor {duration} sec. Elke spreuk die je op een vijand cast laat hem een pijl op die vijand afvuren voor {damage} Vuur schade. Schade neemt toe met Spell Power.",
         "pierce": "Voor {duration} sec, je auto-attacks, shots en fysieke vaardigheden (geen bloeds) slaan ook de vijand dichtst bij je doelwit binnen {reach} yd voor {share}% van de toegebrachte schade.",
         "lantern": "Zet een lantaarn aan je voeten voor {duration} sec. Een directe genezing van iemand op je of een partylidmaatje binnen {radius} yd ervan geneest ook het meest gewonde andere partylidmaatje in het licht voor {share}% van de genezing.",
+        "shackle": "Chain your target within {range} yd in place for {duration} sec. A creature immune to control, such as a boss, is slowed by {slow}% instead, unless it is also immune to slows.",
+        "spiritPack": "Call a spirit jaguar to fight beside you for {duration} sec. It runs to your target and bites it for {min} to {max} Physical damage every {every} sec, switching to any other enemy you target. With no enemy targeted it attacks the enemy nearest you within {range} yd. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, fixed when it is called. Requires an enemy target within {range} yd.",
+        "seedburst": "Plant a seed on your target within {range} yd. After {delay} sec it bursts where the target stands, or where it died, dealing {damage} Nature damage to each enemy within {radius} yd, or {bonus}% more ({empowered}) if the target died first. Damage increases with Spell Power, fixed when it is planted. The seed withers if you die before it bursts.",
+        "tether": "Chain yourself to a friendly player within {range} yd for {duration} sec. {share}% of the damage that would reach their health is dealt to you instead. Ends early if you die. Requires a friendly player target other than you.",
+        "harvest": "For {duration} sec, each hostile creature that dies within {radius} yd of you restores {pct}% of your maximum health ({health}) and {pct}% of your maximum mana.",
+        "quench": "Your next {hits} melee or ranged weapon hits within {duration} sec deal {damage} extra Frost damage. The last of them also quenches the target, slowing its attacks by {slow}% for {slowDuration} sec. Unused hits are lost when it ends. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.",
         "heartNova": "Breng alle hittestapels uit op een vuurvuur die {perHeat} Vuur schade per stapel ({max} op {maxHeat} stapels) aan elke vijand binnen {radius} yd doet en elke vijand die het raakt daagt uit. Schade neemt toe met Attack Power. Vereist een hittestapel."
       }
     },
@@ -3906,6 +3912,64 @@ export const nl_NL: EnTranslations = {
       }
     },
     "auraEffect": {
+      "wildheart": {
+        "packBond": "Takes {pct}% less damage while its partner stands close. Pull the Beastmaster and his jaguar apart to break it.",
+        "packBondFury": "Deals {pct}% more damage while its partner stands close.",
+        "stalked": "The Great Jaguar hunts you and ignores taunts. Each bite deals {min} to {max} physical damage ({heroicMin} to {heroicMax} on Heroic) and opens a bleed. Kite it away from its master.",
+        "waryStuns": "A stun has landed on it. Further stuns slide off until this ends.",
+        "waryRoots": "A root has landed on it. Further roots slide off until this ends.",
+        "warySlows": "A slow has landed on it. Further slows slide off until this ends.",
+        "pollinated": "Touching a Seedpod makes it sprout a Thorn Sprout at once. Stay off the seeds and let a clean player stomp them; an untouched pod sprouts after {seconds} sec (on Heroic it burrows after {heroic} sec and rises beside the nearest player).",
+        "prey": "Zulgar hunts you. Lead him across a lit sun glyph to slow him by {slow}%. If he catches you, you are Mauled for {damage} damage ({heroic} on Heroic) and knocked down for {stun} sec.",
+        "avatar": "Moves {pct}% faster and hunts its Prey. Slows and roots take hold, and stuns last half as long.",
+        "vanished": "Hidden and immune to damage. He is about to pounce on the farthest player."
+      },
+      "bastion": {
+        "brineColumn": "Rooted in a column of sea water: you take {min} to {max} Nature damage every {tick} sec for up to {seconds} sec. Interrupt or stun the Tidebound Acolyte to break it.",
+        "halberdWall": "Takes {pct}% less damage while another Drowned Watchman stands within {radius} yd. Pull them apart.",
+        "fogShroud": "Takes {pct}% less damage while it stands in the Fog Bank. Drag it out of the fog.",
+        "carrionGlut": "Fed on the dead ({stacks} of {max}): each stack makes its Soul Release {radius} yd wider and {pct}% stronger.",
+        "snappedFetters": "Its chains are broken. It no longer fights, cannot be harmed, and soon leaves.",
+        "anchored": "Chained to the Drowned Anchor: you can move, but never farther from the winch, which reels you toward the Drowning Pit. Reach within {reach} yd of a lit mooring post at least {run} yd from where you were hooked to moor the chain (that post goes dark for {dark} sec), or have your group break it with {links} hits ({linksHeroic} on Heroic). The pit takes {pit}% of your maximum health ({pitHeroic}% on Heroic)."
+      },
+      "crypt": {
+        "carrionEye": "Every crow in the fight hunts you for {seconds} sec. Run to your tank so the flock can be cut down together.",
+        "graniteSkin": "Takes {pct}% less damage, and the stone thickens every {every} sec, up to {max} layers. A stun shatters it and leaves it taking {cracked}% more damage for {seconds} sec.",
+        "measured": "When this ends, an Open Grave caves in where you stand: {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone within {radius} yd. The grave stays for the rest of the fight, so carry the mark to the edge of the yard, away from the group.",
+        "graveDirt": "Standing in an Open Grave: movement speed reduced by {slow}% and {damage} Shadow damage every second ({heroic} on Heroic). On Heroic, lingering {linger} sec in a grave raises a Restless Bones. Step out of the grave.",
+        "dirtInEyes": "Reduces movement speed by {pct}%. Shovelful hits everyone in front of Sexton Marrow: stand behind him.",
+        "blow": "Increases damage taken by {pct}%: {per}% for each stack, {stacks} of {max} now. Each Gravedigger's Blow adds a stack and resets the duration to {seconds} sec.",
+        "graveVigor": "Attacks {pct}% faster while he stands in an Open Grave. Keep him out of the graves.",
+        "tolling": "Immune to damage while he strides to the bell rope and rings the Burial Bell. When the ringing ends, the Toll deals {min} to {max} Shadow damage ({heroicMin} to {heroicMax} on Heroic) to everyone, and every Open Grave gives up a Restless Bones.",
+        "embraced": "Held aloft in the Lady's arms: unable to act, taking {tick} Frost damage every second ({tickHeroic} on Heroic). If your group deals {share}% of her maximum health she sets you down gently; if she holds you {hold} sec at the top she drops you onto the ice for {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic).",
+        "lament": "When Bride's Lament ends, it deals {min} to {max} Frost damage ({heroicMin} to {heroicMax} on Heroic) to everyone not within {radius} yd of a lit grave lantern. A lantern shelters the {cap} players nearest it, then goes dark and misses the next Lament.",
+        "lingering": "Your next Bride's Lament deals {pct}% more damage: {per}% for each stack, up to {max} stacks. Take the next one in a lantern's light.",
+        "slippery": "On slick ice: your speed changes by at most {grip} yd/sec each second, so you are slow to get going, slide on when you stop, and swing wide when you turn. Step off the ice to get your footing back.",
+        "harmony": "Takes {pct}% less damage: {per}% for each of her living Choristers. Kill the Choristers first.",
+        "crescendo": "Sings faster: the Dirge of the Hollow takes {cast} sec instead of {castNormal} sec and comes every {every} sec instead of {everyNormal} sec, and the Bone Organ plays {waves} waves of notes instead of {wavesNormal}.",
+        "gorged": "Deals {pct}% more damage: {per}% for each Bound Soul that reached him, {stacks} of {max} now, for the rest of the fight. Each soul that reaches him also heals him for {heal}% of his maximum health. Step into a soul's path to take it instead.",
+        "unquietWard": "Immune to damage while he channels the Rite of the Unquiet at the altar: {lit} of {total} Remembrance Candles relit. Relighting one is a {channel} sec channel that drains {drain}% of the lighter's maximum health every second ({drainHeroic}% on Heroic); hits do not break it, a step or a stun does. The last candle shatters the ward. On Heroic, light them in the order the Ledger names: a wrong candle snuffs the last one lit and deals {wrongMin} to {wrongMax} Shadow damage to the lighter.",
+        "riteBroken": "Stunned: the shattered ward leaves him unable to act for {seconds} sec.",
+        "shatteredWard": "Takes {pct}% more damage for {seconds} sec: the relit candles broke his ward. Spend your strongest attacks now.",
+        "graveChill": "Takes {bite} Shadow damage every second ({biteHeroic} on Heroic) while the Rite of the Unquiet holds, rising by {step} ({stepHeroic} on Heroic) every {every} sec. Relight the Remembrance Candles to end it.",
+        "graspMark": "Hands erupt from the ring under you in {fuse} sec: everyone within {radius} yd of where it was laid is rooted for {root} sec and takes {min} to {max} Shadow damage. Step out of the ring.",
+        "graspRoot": "Held by the grave's hands: unable to move for {seconds} sec.",
+        "knellAirborne": "On the wing over the Rite Ring, out of reach. It marks half of the ring for {mark} sec, then pours ghost fire over that half: {min} to {max} Fire damage to everyone in it. It burns {breaths} halves each flight, then lands."
+      },
+      "sanctum": {
+        "lockbound": "Takes {pct}% less damage: {per}% for each of his chains that still holds. Break a Seal Shackle to drop its chain.",
+        "enrage": "Deals {pct}% more damage.",
+        "grasp": "Stands in meltwater and deals {pct}% more damage. If it dies in meltwater it sinks and rises again {seconds} sec later; kill it on cold ice to keep it down.",
+        "twiceWoken": "Rose again from the meltwater and deals {pct}% more damage.",
+        "doused": "His plate broke under him and the quench-water put out his Grave Inferno.",
+        "airborne": "In the air and cannot be attacked. He lands with Crashing Descent on the plate where the most players stand, dealing {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone within {radius} yd.",
+        "wyrmsEye": "When this ends, Korzul pours Plunging Fire over the whole plate you stand on: {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone on it, and the plate cracks, or breaks if it was already cracked. Stand on sound ice, away from the group.",
+        "quenchWater": "In open quench-water: slowed by {slow}% and burned for {damage} damage every second ({heroic} on Heroic). Swim to any plate or the shore.",
+        "shardFlare": "The heart-shard flares: Grave Breath every {breath} sec and Wing Gale every {gale} sec.",
+        "branded": "Deals {value} {school} damage every {interval} sec for {seconds} sec. Step into a meltwater pool to put it out at once.",
+        "creepingRime": "Reduces movement speed by {pct}%, {per}% for each stack. Each Rime Breath adds a stack and resets the duration to {seconds} sec. Reaching {max} stacks freezes you solid (Iced Over) for {freeze} sec and clears them.",
+        "icedOver": "Frozen solid by Creeping Rime: unable to move or act."
+      },
       "sharedPyre": "Doet {total}% van de maximale gezondheid van elke speler, verdeeld over het aantal spelers in de cirkel ({perPlayer}% elk bij {players} spelers).",
       "varkhulSharedPyre": "Doet {total}% van de maximale gezondheid van elke speler, verdeeld over de spelers in de cirkel ({perPlayer}% elk bij {players} spelers). Elke ontbrekende speler doet bovendien {missingPenalty}% van de maximale gezondheid aan de hele raid, inclusief spelers in de cirkel.",
       "makersBrand": "Gedurende {duration} sec verhoogt elke stapeling de schade die je van Varkhul oploopt met {pct}%. Stapelt tot {max} keer. Tanks moeten wisselen bij {swap} stapelingen.",
@@ -4028,6 +4092,16 @@ export const nl_NL: EnTranslations = {
         "riftGuard": "Je neemt {pct}% minder schade.",
         "sprint": "Bewegingssnelheid verhoogd met {pct}%. Stapelt niet met andere snelheidsverbeteringen.",
         "brand": "Ontvangen genezing is verminderd met {pct}%.",
+        "shackle": "Chained in place: cannot move.",
+        "shackleSlow": "Chained: movement speed reduced by {pct}%.",
+        "spiritPack": "A spirit jaguar fights beside you, biting your target for {min} to {max} Physical damage every {every} sec.",
+        "seedburst": "A Gorgebloom seed. When this expires it bursts for {damage} Nature damage to each enemy within {radius} yd, or {bonus}% more ({empowered}) if this enemy dies before then.",
+        "tether": "Chained by Foreman's Last Link: {pct}% of the damage that would reach your health is dealt to the one who chained you instead.",
+        "tetherLink": "You take {pct}% of the damage your chained ally would take.",
+        "harvest": "Each hostile creature that dies within {radius} yd of you restores {pct}% of your maximum health and mana.",
+        "quench": "Your next {stacks} weapon hits deal {damage} extra Frost damage. The last one slows the target's attacks by {slow}%.",
+        "quenchOther": "The next {stacks} weapon hits deal extra Frost damage. The last one slows the target's attacks by {slow}%.",
+        "quenched": "Attack speed slowed by {pct}%.",
         "forgeHeat": "Hitte: {stacks}/{max}. Het gebruik van Tempering van de Smederij besteedt alles, en zijn wapenvuur toebrengt {pct}% meer schade.",
         "tempered": "Je melee- en afstandswapen treffen toebrengen {damage} extra Vuurschade ({pct}% meer van de bestede hitte). Elke trefferslag voegt {killExtend} sec toe, tot {maxDuration} sec totaal.",
         "temperedOther": "Melee- en afstandswapen treffen toebrengen extra Vuurschade, {pct}% meer van de bestede hitte. Schade groeit met Aanvalssterkte of Afstandsaanvalssterkte, welke het hoogst is.",
@@ -5949,10 +6023,38 @@ export const nl_NL: EnTranslations = {
       "tagFastRun": "Snelle run",
       "mech": {
         "shadow_pulse": "Schaduwpuls (pulserende gebiedsschade)",
+        "crypt_shovelful": "Shovelful (every 11 seconds he flings grave dirt over an 8 yard cone in front of him: one and a half times his swing and 50 percent slower movement for 6 seconds, so stand behind him)",
+        "crypt_measured_for_the_grave": "Measured for the Grave (every 15 seconds he marks a player other than the tank; 4 seconds later an Open Grave caves in under them, 42 to 52 damage within 3 yards on normal, and the pit stays for the fight: 9 damage a second and 40 percent slower movement inside, so lay the graves at the edge of the yard)",
+        "crypt_burial_toll": "Burial Toll (at 66 and 33 percent health he strides to the bell rope, immune to damage, and rings for 3 seconds: 30 to 38 shadow damage to everyone on normal, and every Open Grave raises a Restless Bones)",
+        "crypt_marrow_heroic": "Heroic: Gravedigger's Blow every 9 seconds on the tank (each stack makes them take 6 percent more damage for 20 seconds, up to 6 stacks), Grave Vigor (he swings 30 percent faster while he stands in a grave) and Unquiet Earth (anyone who stays 2 seconds in a grave raises a Restless Bones there)",
+        "crypt_brides_lament": "Bride's Lament (every 22 seconds a 3 second wail: 60 to 75 frost damage on normal to everyone outside the light of a lit grave lantern, half again for every Lingering Lament stack from the Laments you already took. A lantern shelters two players at most and goes dark for 28 seconds after it shelters anyone, so split up and take turns)",
+        "crypt_frozen_embrace": "Frozen Embrace (every 30 seconds she seizes a player other than the tank and rises 5 yards into the air with them, 6 frost damage a second: deal 6 percent of her health within 8 seconds and she sets them down, otherwise she drops them for 150 to 180 damage on normal)",
+        "crypt_rime_path": "Rime Path (she leaves slippery rime where she drifts for 25 seconds: on it you gather speed slowly and slide on when you stop or turn)",
+        "crypt_bridal_freeze": "Bridal Freeze (at half health the whole ravine floor freezes over: slippery ice for the rest of the fight)",
+        "crypt_lady_heroic": "Heroic: every lit lantern also burns out on its own after 30 seconds and stays dark for 10, and the Frozen Embrace takes two players",
+        "crypt_dirge_of_the_hollow": "Dirge of the Hollow (every 16 seconds a 2.5 second song you can interrupt: if she finishes it, 105 to 125 shadow damage on normal and a 4 second silence to everyone within 45 yards who can see her, so interrupt it or hide behind a choir pillar)",
+        "crypt_harmony": "Harmony (each living Chorister makes her take 30 percent less damage: kill the Choristers first)",
+        "crypt_bone_organ": "Bone Organ (every 26 seconds she plays the Bone Organ: two waves of shadow notes burst down lanes of the loft, 100 to 115 damage on normal in a lane, the second wave filling the first one's gaps)",
+        "crypt_crescendo": "Crescendo (below 30 percent health her Dirge takes 1.8 seconds and comes every 11 seconds, and the organ plays a third wave)",
+        "crypt_ilvane_heroic": "Heroic: Encore (a Chorister that lies dead for 10 seconds while the other still stands rises again, so kill them together) and Unbroken Verse (every third Dirge cannot be interrupted: hide from it)",
+        "crypt_morthen_shadow_pulse": "Shadow Pulse (every 12 seconds a 2 second cast, then 24 to 30 shadow damage on normal to everyone within 12 yards of him, so step away; every 9 seconds in his Last Rites)",
+        "crypt_gravecall": "Gravecall (every 15 seconds a Bound Soul drifts from the next sarcophagus alcove toward him; when it reaches him he is Gorged on the Dead, 10 percent more damage for each soul up to 10 stacks, and heals 3 percent of his health. A player in its path takes it instead: 12 to 16 shadow damage on normal)",
+        "crypt_rite_of_the_unquiet": "Rite of the Unquiet (at 65 percent health he returns to the altar, immune inside the Unquiet Ward, while Grave Chill deals 3 shadow damage a second to everyone, rising by 1 every 5 seconds, and 2 Restless Bones climb out of the alcoves. Relight the 4 Remembrance Candles: each is a 4 second channel that drains 6 percent of the lighter's maximum health every second, which hits do not break but a step or a stun does. The last candle breaks the Rite: he is stunned for 8 seconds and takes 25 percent more damage)",
+        "crypt_reap_the_unquiet": "Reap the Unquiet (below 35 percent health the souls stop; every 14 seconds he sweeps his scythe after a 2 second cast: 55 to 65 shadow damage on normal to everyone in a 120 degree arc 14 yards in front of him. Shadow Pulse then comes every 9 seconds)",
+        "crypt_morthen_heroic": "Heroic: Name the Dead (the Ledger names the order of the candles: a wrong candle snuffs the last one lit and deals 252 to 288 shadow damage to the lighter, and each relight drains 8 percent a second), Grasp of the Grave (every 16 seconds 2 players get a 4 yard ring; 1.5 seconds later hands erupt in it: a 3 second root and 162 to 198 shadow damage) and the Knellwyrm's Burning Knell (it takes flight and marks half of the ring for 4.5 seconds, then pours ghost fire over that half for 1,000 to 1,120 fire damage, 3 halves each flight)",
         "reaping_arc": "Maaiboog (frontale maaislaan)",
+        "hallowed_brine": "Hallowed Brine (a 9 yard pool of dark holy water, 10 on heroic: 18 damage a second to anyone in it, 26 on heroic, and he takes 40 percent less damage while he stands in it, so drag him out)",
+        "rebounding_bulwark": "Rebounding Bulwark (his shield rebounds to the nearest player within 10 yards of the last one hit, up to 3 players, 4 on heroic: spread out)",
+        "tide_sentence": "Sentence of the Tide (5 seconds after the mark, a column of light strikes everyone within 6 yards of the marked player, 8 on heroic: take it away from the group)",
+        "unbroken_oath": "Unbroken Oath (once, at half health, he kneels immune in a bubble for up to 60 seconds: kill his soldiers to break it, then he is stunned 4 seconds and takes 20 percent more damage for 10)",
+        "fog_veil": "Fog Veil (four figures, one real: the beacon's beam makes the real Vael's lantern flare)",
         "mist_surge": "Mistgolf (pulserende gebiedsschade)",
         "summons_adds": "Roept versterkingen op",
         "lunar_tide": "Maantij (pulserende gebiedsschade)",
+        "chorus_and_solo": "Chorus and Solo (stack on one mark, spread from the other)",
+        "tideglass_reflections": "Tideglass Reflections (kill each other's mirror images)",
+        "rising_tide": "Rising Tide (half the island floods, move to the dry half)",
+        "undertow": "Undertow (pulls everyone in, run out before the crash)",
         "enrage": "Razend bij weinig gezondheid",
         "shuddering_stomp": "Huiverende Stamp (gebiedsverdoving)",
         "grave_inferno": "Grafsinferno (gekanaliseerde vuur-AoE, houd afstand)",
@@ -5978,6 +6080,9 @@ export const nl_NL: EnTranslations = {
         "deathless_court": "Het Doodloze Hof (alleen heroic, het koninklijk hof verrijst na Doodloze Razernij)",
         "bloodmane_rend": "Bloodmane Rend (bloeden, let op doelwissels)",
         "tusk_sweep": "Tusk Sweep (frontaal splijten)",
+        "grave_breath": "Grave Breath (frontal fire cone, it cracks the ice it covers)",
+        "plate_floor": "Breaking Ice (his fire cracks and sinks the lake plates, stay out of the open water)",
+        "wyrm_flights": "Flights (at 70% and 40%: walk Wyrm's Eye onto sound ice, stack where he should land)",
         "ancestral_sap": "Ancestral Sap (geneest zijn bondgenoten)",
         "call_of_the_hunt": "Call of the Hunt (versnelt nabije bondgenoten)",
         "thickhide_ward": "Thickhide Ward (schermt nabijgelegen bondgenoten)",
@@ -6001,8 +6106,172 @@ export const nl_NL: EnTranslations = {
         "forgestorm": "Forgestorm (vallende meteoorcirkels, ga weg)",
         "shared_pyre": "Gedeelde brandstapel (verzamelcirkel, de schade verdelen)",
         "anvils_decree": "Anvil's Decreet (drie hamerslagen over de hele raid, genezen door)",
-        "masters_assembly": "De Meestervergadering (blokkeer de smederijbalken, draai blokkers)"
+        "masters_assembly": "De Meestervergadering (blokkeer de smederijbalken, draai blokkers)",
+        "iron_cage": "Iron Cage (mash your interact key to break out, allies can smash the bars)",
+        "drowned_anchor": "Drowned Anchor (its victim is reeled toward the pit: run within 3 yards of a lit mooring post to moor the chain, the post then goes dark for 30 seconds, or break the chain with 12 hits, 16 on heroic)",
+        "shackle_pair": "Shackle Pair (two chained players must stay close together)",
+        "reaper_behind": "Shadow Crossing (three times in a row he rises behind a player, a different one each time while enough stand: step out of the scythe's arc)",
+        "pack_bond": "Pack Bond (together they take half damage: drag them 15 yards apart)",
+        "stalk": "Stalk (the jaguar hunts a marked player, never the tank; alone, it hunts you: kite, slow, root and stun it)",
+        "shared_health": "Shared Health (one pool: hit whichever is safest)",
+        "heel_frenzied_bond": "Heel! and Frenzied Bond (the jaguar leaps home, the bond reaches 20 yards)",
+        "seed_rain": "Seed Rain (clean players stomp the seeds before they sprout)",
+        "pollinate": "Pollinate (golden players stay off the seeds, or they sprout at once)",
+        "vine_lash": "Vine Lash (step out of the thorny lane or be rooted)",
+        "gorge": "Gorge (a heavy bite and a poison on the tank)",
+        "burrowing_seeds": "Burrowing Seeds and Pollen Cloud (seeds rise by a player at 6 seconds, gold spreads)",
+        "spirit_of_the_hunt": "Spirit of the Hunt (the Prey kites the avatar through lit sun glyphs; a Mauled player gets a head start)",
+        "twin_prey_ambush": "Twin Prey and Ambush (two Prey, then a pounce on the farthest player)",
+        "seal_shackles": "Seal Shackles (each chain you break makes him take 20 percent more damage and frees one of his attacks)",
+        "chain_strain": "Strain (step away from every pillar whose chain still holds)",
+        "korgath_stomp": "Shuddering Stomp (step out of the ring round him)",
+        "rerivet_last_link": "Re-rivet and Last Link (kick the Goadsmith re-pinning a chain; one chain left means Strain every 10 seconds)",
+        "waking_thaw": "Waking Thaw (the dead climb out of the thaw pools)",
+        "unquenched_held": "Held or Unquenched (kill the dead on cold ice, never in meltwater)",
+        "soulfire_trench": "Soulfire Trench (a line of soulfire, then a strip of meltwater)",
+        "shadow_volley": "Shadow Volley (shadow damage to everyone)",
+        "warm_hands_twice_woken": "Warm Hands and Twice-Woken (heroic only, keep the dead moving; a risen one returns stronger)"
       }
+    },
+    "bastionCage": {
+      "title": "Locked in the Iron Cage!",
+      "promptKey": "Press {key} again and again to break free",
+      "promptNoKey": "Press your interact key again and again to break free",
+      "promptClick": "Click here again and again to break free",
+      "promptTap": "Tap here again and again to break free",
+      "buttonAria": "Break free from the Iron Cage",
+      "progressAria": "Escape progress: {pct}"
+    },
+    "bastionChain": {
+      "anchoredTitle": "Chained to the Drowned Anchor!",
+      "anchoredLine": "Run to a lit mooring post to moor the chain, or have your group break it before the winch drags you into the pit",
+      "allyTitle": "Break the chain!",
+      "allyLine": "{name} is being dragged to the pit: hit the Drowned Anchor, or help them reach a lit post",
+      "shackledTitle": "Shackled to {name}",
+      "shackledLine": "Stay within {range} yards of each other ({dist} yards apart)",
+      "strainedLine": "Too far apart! The chain bites both of you: close to {range} yards",
+      "brokenAria": "Chain broken: {pct}",
+      "reachAria": "Chain reach used: {pct}",
+      "linksLeft": "Chain links left: {count} of {total}",
+      "linkRule": "Every hit on the anchor breaks one link, however hard it lands",
+      "linksTarget": "{count} of {total} links",
+      "linkBroken": "Link broken!"
+    },
+    "bastionAlert": {
+      "sentencedTitle": "The Sentence falls on you!",
+      "sentencedLine": "A column of light strikes everyone near you: move away from the group",
+      "brineTitle": "In the Hallowed Brine!",
+      "brineLine": "It burns you every second: step out of the pool",
+      "reapedTitle": "Death rises behind you!",
+      "reapedLine": "Step out of the scythe's arc: forward, or to either side",
+      "veilTitle": "The Fog Veil",
+      "veilLine": "Watch the beacon's beam: the figure whose lantern flares is the real Vael",
+      "realTitle": "The beam found him!",
+      "realLine": "This is the real Vael: strike him to break the veil",
+      "shadeTitle": "A hollow shade",
+      "shadeLine": "The light pours through it: leave it, find the one the beam lights",
+      "timeAria": "{seconds} seconds left"
+    },
+    "wildheartAlert": {
+      "preyTitle": "You are the Prey!",
+      "preyLine": "Zulgar hunts you: run him through the lit sun glyphs",
+      "preyWaitLine": "He chases the other Prey now: be ready, he switches",
+      "stalkedTitle": "Stalked!",
+      "stalkedLine": "The jaguar hunts you: kite it away from its master",
+      "pollinatedTitle": "Pollinated!",
+      "pollinatedLine": "Stay off the seeds: your touch makes them sprout",
+      "bondTitle": "Pack Bond",
+      "bondLine": "Together they take half damage: pull them apart",
+      "timeAria": "{seconds} seconds left"
+    },
+    "sanctumAlert": {
+      "quenchTitle": "In the quench-water!",
+      "quenchLine": "It burns and slows you: swim to the nearest ice or the shore",
+      "plungeTitle": "Plunging Fire!",
+      "plungeLine": "Your whole plate is about to burn: get off it now",
+      "descentTitle": "Crashing Descent!",
+      "descentLine": "He lands right here: step out of his shadow",
+      "eyeTitle": "Wyrm's Eye on you!",
+      "eyeLine": "Your plate burns when the mark ends: stay on sound ice, away from the group",
+      "eyeCrackedLine": "You stand on cracked ice: walk to a sound plate before the mark ends",
+      "flailTitle": "Chain Flail!",
+      "flailLine": "The chain whips down the painted lane: step out of it",
+      "chargeTitle": "Threshold Charge!",
+      "chargeLine": "He charges down the lane: get out of it, away from the edge",
+      "trenchTitle": "Soulfire Trench!",
+      "trenchLine": "Soulfire cuts the lane and leaves meltwater: get out of it",
+      "strainTitle": "Strain!",
+      "strainLine": "The intact pillars are about to lash out: get away from them",
+      "infernoTitle": "Grave Inferno!",
+      "infernoLine": "Each pulse burns harder: get out of his reach",
+      "stompTitle": "Shuddering Stomp!",
+      "stompLine": "Get away from him before his foot comes down",
+      "breathTitle": "Grave Breath!",
+      "breathLine": "You stand in the breath cone: get out to the side",
+      "maulTitle": "Maul Arc!",
+      "maulLine": "He swings through everything in front of him: get behind him",
+      "tailTitle": "Tail Sweep!",
+      "tailLine": "You stand behind him: get out before the tail hits",
+      "meltwaterTitle": "In the meltwater",
+      "meltwaterLine": "Your Bonewalker stands in meltwater: drag it onto the cold ice",
+      "meltwaterTargetLine": "If your target dies in meltwater it rises again: wait for cold ice",
+      "crackedTitle": "Cracked ice",
+      "crackedLine": "Fire here breaks this plate: keep his fire off it",
+      "flightTitle": "Korzul takes flight",
+      "flightLine": "Stack on sound ice to choose where he lands, then step off",
+      "lockboundTitle": "Lockbound",
+      "lockboundLine": "{chains} chains hold: he takes {pct}% less damage. Break the Seal Shackles to strip it.",
+      "timeAria": "{seconds} seconds left",
+      "brandedTitle": "Branded!",
+      "brandedLine": "The brand burns until it ends: douse it in a meltwater pool",
+      "rimeTitle": "Creeping Rime!",
+      "rimeLine": "Creeping Rime {stacks}/{max}: step out of the whelps' breath",
+      "slabTitle": "Ice Slab",
+      "slabLine": "Solid ice: it blocks line of sight. Hide behind it from the casters' spells"
+    },
+    "cryptAlert": {
+      "measuredTitle": "Measured for the Grave!",
+      "measuredLine": "A grave caves in under you when the bar runs out: carry it to the edge of the yard",
+      "embracedTitle": "Frozen Embrace!",
+      "embracedLine": "She holds you aloft: your group must hurt her to make her set you down",
+      "lamentTitle": "Bride's Lament!",
+      "lamentShelteredLine": "You stand in a lit lantern's light with room for you: hold still",
+      "lamentOpenLine": "Get into a lit lantern's light before the wail lands: two to a lantern",
+      "graveTitle": "In an Open Grave!",
+      "graveLine": "The grave dirt burns and slows you: step out of it",
+      "tollTitle": "Burial Toll!",
+      "tollLine": "He cannot be hurt while he rings the bell: brace for the Toll and the dead it raises",
+      "harmonyTitle": "Harmony",
+      "harmonyLine": "Her Choristers take {pct}% off the damage she takes: kill them first",
+      "knellTitle": "Burning Knell!",
+      "knellLine": "Ghost fire pours over this half of the ring when the bar runs out: get to the other half",
+      "graspTitle": "Grasp of the Grave!",
+      "graspLine": "Hands erupt from this ring and hold whoever stands in it: step out",
+      "reapTitle": "Reap the Unquiet!",
+      "reapLine": "His scythe sweeps the ground in front of him: get behind him",
+      "riteTitle": "Rite of the Unquiet",
+      "riteLine": "Relight the Remembrance Candles to shatter his ward: {lit} of {total} lit",
+      "riteNamedLine": "Relight only the candle the Ledger names next: {lit} of {total} lit",
+      "soulTitle": "Bound Soul",
+      "soulLine": "A soul drifts toward Morthen: step into its path to take it before it feeds him",
+      "timeAria": "{seconds} seconds left"
+    },
+    "kitUse": {
+      "toppleLine": "Kick it over onto the pack: the spill burns them",
+      "toppleKey": "Topple the {name} onto them",
+      "toppleTap": "Tap here to topple the {name} onto them",
+      "toppleClick": "Click here to topple the {name} onto them",
+      "toppleFar": "Get within {range} yd to kick it over",
+      "toppleAria": "Topple the {name}",
+      "usingLine": "Hold still: a hit, a step or a stun breaks it",
+      "relightLine": "It drains your health every second you channel: hits do not break it, a step or a stun does",
+      "relightKey": "Relight the {name}",
+      "relightTap": "Tap here to relight the {name}",
+      "relightClick": "Click here to relight the {name}",
+      "relightFar": "Get within {range} yd to relight it",
+      "relightAria": "Relight the {name}",
+      "relightUsingLine": "Hold still while it drains you: hits do not break it, a step or a stun does",
+      "timeAria": "{seconds} seconds left"
     },
     "cosmetics": {
       "title": "Uiterlijk",
@@ -6947,6 +7216,95 @@ export const nl_NL: EnTranslations = {
         "0": "Goede compost, de bedden zullen leven. De oude molenaar begroef iets voordat hij vertrok. Zijn molen draait nog steeds in de verre hoek van de tuinen. Ga daar staan.",
         "2": "Dus de molen stuurde je de kustweg af. Het baken houdt een laatste geheim: noordwestelijk ervan, net buiten het pad, was het gras gesneden en terugelegd. Graaf daar."
       }
+    }
+  },
+  "dungeonGuide": {
+    "drownedTemple": {
+      "greet": {
+        "1": "I was the youngest voice of the Pale Choir. On the night of the rite I did not drink, and I ran. Every full moon since, I hear them singing under the water. I must see her before I die. Let me walk behind you. I will not fight, and I will not slow you.",
+        "2": "Every full moon I come to this gate, and every full moon my nerve fails me. Not tonight. The Choir is singing, and I am the one who ran. Take me down to her, and I will keep out of your way."
+      },
+      "row": {
+        "join": "Come with us.",
+        "decline": "We go alone."
+      },
+      "joined": "Lead on. I am right behind you.",
+      "singing": "Let me sing. Go, and go gently.",
+      "accept": {
+        "1": "Thank you. I will walk behind you, and keep out of your way.",
+        "2": "Then I go down at last. Walk on. I will keep up."
+      },
+      "decline": "I understand. I will listen from up here, as I always have.",
+      "heroicWater": "The water stands high tonight, higher than I have ever seen it. She is close to waking.",
+      "memory": {
+        "votaries": "The drowned ones on the shore walked in after the gate closed. The moon never took them, only the water.",
+        "rubbing": "The Tidewatcher read my words on the shore-rock. 'It only sleeps.' I carved them the morning after."
+      },
+      "area": {
+        "steps": "The Pilgrim Steps. I ran up these that night, three at a time, and never looked back.",
+        "causeway": {
+          "1": "On rite nights the moon lay on this causeway like a second road.",
+          "2": "Look at the water. It still remembers how to hold the moon."
+        },
+        "colonnade": "The Colonnade of Tides. We walked it two by two, singing the rising verse.",
+        "veil": "Past that veil is the Choir Court. I have not stood there since I was a boy.",
+        "terraces": "The tidepools. The novices kept them clean and fed the small bright things living in them.",
+        "falls": "Behind the falls the water drowns every voice. I hid here when I skipped practice.",
+        "pool": "The moon pool. They knelt round it and drank from their shells. I could not lift mine.",
+        "prismStair": "The Prism Stair. We climbed it at moonrise to wake the great glass.",
+        "moonbridge": {
+          "1": "A bridge of moonlight. The elders said only the faithful could cross it.",
+          "2": "I was never faithful. Well. We shall see if it holds me."
+        },
+        "altarLanding": "This is where I stood. Right here. This is where I turned and ran."
+      },
+      "sight": {
+        "pilgrim": "The pilgrims of the shore villages. They carried their shrine on their backs every spring. Now they carry it forever.",
+        "acolyte": "The novices. I learned my letters beside them. They sing in their sleep now, and never wake.",
+        "templeguard": "The stair guard. They swore to hold the temple until the moon set. It never set.",
+        "snapper": "We drank the moon-water from shells like those. Mine I dropped on the stair.",
+        "siren": "That voice. She sang beside me in the choir. She still comes in half a beat early.",
+        "lurker": "The children netted those in the shallows. They were small as a thumb, and they glowed.",
+        "tidewisp": "That is the moon-water itself, the draught we were meant to drink. Do not let it touch you.",
+        "sentinel": "The moon rays of the gate pools. As novices we fed them pearls at moonrise. Now they keep the doors, and wear our pearls as hearts.",
+        "eel": "The lagoon eels. The novices fed them bread at dusk. They grew fat on our hymns.",
+        "reflection": "It shows you what the water would make of you. Break it!",
+        "moonspawn": "Those were never my people. They are hers, made of nothing but moonlight."
+      },
+      "selthe": {
+        "pre": {
+          "1": "Mother Selthe. She taught me to breathe from the belly. She taught us all to drown without dying.",
+          "2": "Choirmother Selthe. Every note I know, she put in me. Forgive me, Mother."
+        },
+        "post": {
+          "1": "She is quiet. In all my years in the Choir, she was never once quiet.",
+          "2": "Rest now, Mother. You were right about me. I never could hold the long notes."
+        }
+      },
+      "hydra": {
+        "pre": "The pool serpent. When I was a boy it had one head, and it ate from our hands.",
+        "post": "Listen. Under the falls they are still singing. Closer now."
+      },
+      "colossus": {
+        "pre": "The great prism. We sang into it to catch the moon. I never knew it could stand.",
+        "post": "The glass is broken. Nothing is left to catch the moon now, but her."
+      },
+      "ysolei": {
+        "pre": "There she is. All my life I have asked if she was a goddess or a monster. Show me.",
+        "preHeroic": "On a night like this the whole Choir sings with her. Hold fast, all of you."
+      },
+      "farewell": {
+        "answer": "She was neither. She was the moon in the water, and we were the ones who knelt.",
+        "verse": "The rite had a last verse, the one that lets the singers sleep. I never sang it.",
+        "stay": "They have waited long enough. I will stay, and sing it for them now.",
+        "goodbye": {
+          "1": "Go up into the night. If you hear singing at the full moon, it is only me.",
+          "2": "Thank you for bringing an old coward to the end of his song. Go now."
+        },
+        "emote": "{name} lifts his voice over the altar, and the lagoon falls still."
+      },
+      "wipe": "Get up. Please. Do not leave me down here alone again.",
+      "catchUp": "My legs are old, but I know every one of these stairs. I am here."
     }
   },
   "guide": {
@@ -11811,6 +12169,7 @@ export const nl_NL: EnTranslations = {
       "deathRecapCauterized": "Je bent gestorven. De verbranding van Cauteriseren overweldigde je.",
       "respawn": "Je voelt je uitgerust en weer heel.",
       "respawnKeeperToll": "De Bleke Bewaarder heeft je doen herleven, maar je bent er zwakker door geworden: de Tol van de Bewaarder put je eigenschappen uit totdat het vervalt.",
+      "moonbridgeBanner": "The Moonbridge Rises",
       "ignoringChat": "Chat van {name} wordt genegeerd.",
       "noLongerIgnoring": "{name} wordt niet langer genegeerd.",
       "playerNotNearby": "Die speler is niet in de buurt.",
@@ -12241,7 +12600,161 @@ export const nl_NL: EnTranslations = {
       "hoard_cast_screech": "Verdovend Krijsen",
       "hoard_cast_mimic_bite": "Gulzige Beet",
       "hoard_cast_mimic_leap": "Verpletterde Sprong",
-      "hoard_cast_coin_spit": "Vervloekte munten"
+      "hoard_cast_coin_spit": "Vervloekte munten",
+      "crypt_grave_bolt": "Grave Bolt",
+      "crypt_raise_bones": "Raise Bones",
+      "crypt_murder_call": "Murder Call",
+      "crypt_stone_shriek": "Stone Shriek",
+      "crypt_grave_cleave": "Grave Cleave",
+      "crypt_barrowflame_breath": "Barrowflame Breath",
+      "crypt_tail_lash": "Tail Lash",
+      "crypt_wing_gust": "Wing Gust",
+      "crypt_grave_rupture": "Grave Rupture",
+      "crypt_carrion_eye": "Carrion Eye",
+      "crypt_marrow_crush": "Marrow Crush",
+      "crypt_rimesilk_spit": "Rimesilk Spit",
+      "crypt_gravespark_volley": "Gravespark Volley",
+      "crypt_morthen_rite_wakes": "The Rite Wakes",
+      "crypt_morthen_rise": "Rise of the Gravecaller",
+      "crypt_morthen_proclaim": "Grave Proclamation",
+      "crypt_morthen_descend": "Descent",
+      "crypt_knellwyrm_arrive": "Descending from the Sky",
+      "crypt_knellwyrm_pyre_strafe": "Pyre Strafe",
+      "crypt_knellwyrm_strafe_run": "Strafing Run",
+      "crypt_knellwyrm_dread_bellow": "Dread Bellow",
+      "crypt_marrow_shovelful": "Shovelful",
+      "crypt_marrow_measure": "Measured for the Grave",
+      "crypt_marrow_burial_toll": "Burial Toll",
+      "crypt_marrow_gravediggers_blow": "Gravedigger's Blow",
+      "crypt_lady_brides_lament": "Bride's Lament",
+      "crypt_lady_frozen_embrace": "Frozen Embrace",
+      "crypt_lady_embrace_hold": "Frozen Embrace",
+      "crypt_lady_bridal_freeze": "Bridal Freeze",
+      "crypt_ilvane_dirge": "Dirge of the Hollow",
+      "crypt_ilvane_unbroken_dirge": "Unbroken Verse",
+      "crypt_ilvane_bone_organ": "Bone Organ",
+      "crypt_morthen_shadow_pulse": "Shadow Pulse",
+      "crypt_morthen_rite_of_the_unquiet": "Rite of the Unquiet",
+      "crypt_morthen_reap_the_unquiet": "Reap the Unquiet",
+      "kituse_crypt_relight_candle": "Relight the Candle",
+      "crypt_knellwyrm_knell_rise": "Burning Knell",
+      "crypt_knellwyrm_knell_mark": "Burning Knell",
+      "crypt_knellwyrm_knell_breath": "Burning Knell",
+      "crypt_knellwyrm_knell_land": "Burning Knell",
+      "bastion_brine_mend": "Brine Mend",
+      "bastion_fog_ward": "Fog Ward",
+      "bastion_halberd_sweep": "Halberd Sweep",
+      "bastion_piercing_bolt": "Piercing Bolt",
+      "bastion_claw_sweep": "Claw Sweep",
+      "bastion_shell_slam": "Shell Slam",
+      "ghost_captain_broadside": "Spectral Broadside",
+      "ghost_captain_anchor": "Cursed Anchor",
+      "ghost_captain_boarding": "Phantom Boarding",
+      "bastion_boathook": "Boathook Drag",
+      "bastion_fog_bank": "Fog Bank",
+      "bastion_brine_column": "Brine Column",
+      "bastion_loose_on_my_mark": "Loose on My Mark",
+      "bastion_oathbound_charge": "Oathbound Charge",
+      "bastion_gaolers_cudgel": "Gaoler's Cudgel",
+      "bastion_mist_surge": "Mist Surge",
+      "bastion_drowning_hymn": "Drowning Hymn",
+      "bastion_iron_cage": "Iron Cage",
+      "bastion_drowned_anchor_cast": "Drowned Anchor",
+      "bastion_shackle_pair": "Shackle Pair",
+      "bastion_shadowstep": "Shadow Crossing",
+      "bastion_reaping_scythe": "Reaping Scythe",
+      "bastion_veil_rise": "Fog Veil",
+      "bastion_veil_gather": "Gathering Fog",
+      "bastion_vael_rise": "Death Rises",
+      "bastion_vael_sink": "Into the Fog",
+      "bastion_hallowed_brine": "Hallowed Brine",
+      "bastion_rebounding_bulwark": "Rebounding Bulwark",
+      "bastion_tide_sentence": "Sentence of the Tide",
+      "bastion_oath_kneel": "Unbroken Oath",
+      "bastion_oath_vigil": "Unbroken Oath",
+      "temple_lullaby": "Lullaby",
+      "cantor_last_verse": "The Last Verse",
+      "temple_call_the_tide": "Call the Tide",
+      "temple_static_coil": "Static Coil",
+      "temple_snapper_snap": "Snap",
+      "temple_trident_sweep": "Trident Sweep",
+      "temple_sea_song": "Sea-Song",
+      "temple_tidal_slap": "Tidal Slap",
+      "temple_tide_breath": "Freezing Breath",
+      "temple_moonlight_lance": "Moonlight Lance",
+      "temple_prism_flare": "Prism Flare",
+      "temple_resonant_slam": "Resonant Slam",
+      "temple_moonwater_bolt": "Moonwater Bolt",
+      "temple_drowning_aria": "Drowning Aria",
+      "temple_mere_surge": "Mere Surge",
+      "temple_tideglass_fracture": "Tideglass Fracture",
+      "temple_undertow": "Undertow",
+      "temple_lunar_tide": "Lunar Tide",
+      "temple_skewering_trident": "Skewering Trident",
+      "temple_pale_mending": "Pale Mending",
+      "temple_glimmer_venom": "Glimmer Venom",
+      "temple_pearl_slam": "Tidal Wingbeat",
+      "temple_lightning_spit": "Lightning Spit",
+      "temple_crushing_torrent": "Crushing Torrent",
+      "temple_hydra_tsunami": "Tsunami",
+      "temple_ysolei_call": "Moonspawn Call",
+      "temple_ysolei_wrath": "Drowned Wrath",
+      "temple_frostlocked_torrent": "Frostlocked Torrent",
+      "temple_venom_current": "Venom Current",
+      "temple_toxic_rime": "Toxic Rime",
+      "temple_beckoning_moon": "Beckoning Moon",
+      "temple_falling_moon": "Falling Moon",
+      "temple_prism_glare": "Prism Glare",
+      "temple_arcing_spark": "Arcing Spark",
+      "temple_call_of_the_shallows": "Call of the Shallows",
+      "wildheart_ancestral_sap": "Ancestral Sap",
+      "wildheart_plant_totem": "Plant Totem",
+      "wildheart_entangling_lash": "Entangling Lash",
+      "wildheart_saurian_tail_swipe": "Tail Swipe",
+      "wildheart_saurian_stomp": "Earthshaking Stomp",
+      "wildheart_quarry_mark": "Quarry Mark",
+      "wildheart_war_roar": "War Roar",
+      "wildheart_toad_hex": "Toad Hex",
+      "wildheart_rattling_dread": "Rattling Dread",
+      "wildheart_snaring_tongue": "Snaring Tongue",
+      "wildheart_beast_pit_quake": "Beast Pit Quake",
+      "wildheart_jaguar_heel": "Heel!",
+      "wildheart_gorgebloom_seed_rain": "Seed Rain",
+      "wildheart_gorgebloom_vine_lash": "Vine Lash",
+      "wildheart_gorgebloom_gorge": "Gorge",
+      "wildheart_zulgar_pulse": "Wildheart Pulse",
+      "wildheart_zulgar_spirit_hunt": "Spirit of the Hunt",
+      "sanctum_cinder_breath": "Cinder Breath",
+      "sanctum_warming_rite": "Warming Rite",
+      "sanctum_goad": "Goad",
+      "sanctum_plant_brazier": "Plant Soul Brazier",
+      "sanctum_ice_block_toss": "Ice Block Toss",
+      "sanctum_tusker_tusk_sweep": "Tusk Sweep",
+      "sanctum_tusker_trample": "Trample",
+      "sanctum_thaw_the_held": "Thaw the Held",
+      "sanctum_counterweight_lash": "Counterweight Lash",
+      "sanctum_branding_iron": "Branding Iron",
+      "sanctum_rime_breath": "Rime Breath",
+      "kituse_sanctum_topple_brazier": "Topple Brazier",
+      "trash_demo_nova": "Test Nova",
+      "trash_demo_nova_unstoppable": "Test Nova",
+      "trash_demo_walker": "Test Orb",
+      "sanctum_korgath_maul_arc": "Maul Arc",
+      "sanctum_korgath_chain_flail": "Chain Flail",
+      "sanctum_korgath_threshold_charge": "Threshold Charge",
+      "sanctum_korgath_foremans_bellow": "Foreman's Bellow",
+      "sanctum_korgath_strain": "Strain",
+      "sanctum_korgath_stomp": "Shuddering Stomp",
+      "sanctum_goadsmith_rerivet": "Re-rivet",
+      "sanctum_velkhar_soulfire_trench": "Soulfire Trench",
+      "sanctum_velkhar_shadow_volley": "Shadow Volley",
+      "sanctum_korzul_break_free": "Break Free",
+      "sanctum_korzul_grave_breath": "Grave Breath",
+      "sanctum_korzul_tail_sweep": "Tail Sweep",
+      "sanctum_korzul_grave_inferno": "Grave Inferno",
+      "sanctum_korzul_wing_gale": "Wing Gale",
+      "sanctum_korzul_plunging_fire": "Plunging Fire",
+      "sanctum_korzul_crashing_descent": "Crashing Descent"
     }
   },
   "questUi": {
@@ -18451,6 +18964,252 @@ export const nl_NL: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Voortocht Krijgsstaf"
       },
+      "gravedirt_treads": {
+        "name": "Gravedirt Treads"
+      },
+      "bellrope_girdle": {
+        "name": "Bellrope Girdle"
+      },
+      "sextons_spadehaft": {
+        "name": "Sexton's Spadehaft"
+      },
+      "rimesilk_mantle": {
+        "name": "Rimesilk Mantle"
+      },
+      "bonechill_carapace_vest": {
+        "name": "Bonechill Hauberk"
+      },
+      "rimeweb_hunters_leggings": {
+        "name": "Rime-Laced Leggings"
+      },
+      "rimeweb_fang": {
+        "name": "Bride's Icicle"
+      },
+      "cantors_cassock": {
+        "name": "Cantor's Cassock"
+      },
+      "choirward_leggings": {
+        "name": "Choirward Leggings"
+      },
+      "choristers_gloves": {
+        "name": "Chorister's Gloves"
+      },
+      "cantors_hymnal": {
+        "name": "Cantor's Hymnal"
+      },
+      "gravecallers_vestments": {
+        "name": "Gravecaller's Vestments"
+      },
+      "unquiet_stalkers_hood": {
+        "name": "Unquiet Stalker's Hood"
+      },
+      "sextons_burial_spade": {
+        "name": "Sexton's Burial Spade"
+      },
+      "rimesilk_hood": {
+        "name": "Rimesilk Hood"
+      },
+      "knight_commanders_longsword": {
+        "name": "Knight-Commander's Longsword"
+      },
+      "gaolers_chain_girdle": {
+        "name": "Gaoler's Chain Girdle"
+      },
+      "rusted_shackle_grips": {
+        "name": "Rusted Shackle Grips"
+      },
+      "drowned_wardens_mantle": {
+        "name": "Drowned Warden's Mantle"
+      },
+      "gaolyard_cudgel": {
+        "name": "Gaolyard Cudgel"
+      },
+      "drowned_commanders_breastplate": {
+        "name": "Drowned Commander's Breastplate"
+      },
+      "gaolyard_striders": {
+        "name": "Gaolyard Striders"
+      },
+      "jailers_iron_gauntlets": {
+        "name": "Jailer's Iron Gauntlets"
+      },
+      "turnkeys_keyring_belt": {
+        "name": "Turnkey's Keyring Belt"
+      },
+      "turnkeys_lantern_cowl": {
+        "name": "Turnkey's Lantern Cowl"
+      },
+      "conchplate_girdle": {
+        "name": "Conchplate Girdle"
+      },
+      "pale_chorus_leggings": {
+        "name": "Pale Chorus Leggings"
+      },
+      "refrain_silk_gloves": {
+        "name": "Refrain Silk Gloves"
+      },
+      "chorus_conch": {
+        "name": "Chorus Conch"
+      },
+      "tideglass_pauldrons": {
+        "name": "Tideglass Pauldrons"
+      },
+      "moonburn_treads": {
+        "name": "Moonburn Treads"
+      },
+      "prism_etched_cowl": {
+        "name": "Prism-Etched Cowl"
+      },
+      "tideglass_shiv": {
+        "name": "Tideglass Shiv"
+      },
+      "pale_chorus_vestment": {
+        "name": "Pale Chorus Vestment"
+      },
+      "tideglass_warmaul": {
+        "name": "Tideglass Warmaul"
+      },
+      "beastpit_warbelt": {
+        "name": "Beastpit Warbelt"
+      },
+      "jaguar_hide_jerkin": {
+        "name": "Jaguar-Hide Jerkin"
+      },
+      "hexbone_handwraps": {
+        "name": "Hexbone Handwraps"
+      },
+      "rootbound_sabatons": {
+        "name": "Rootbound Sabatons"
+      },
+      "pollen_dusted_leggings": {
+        "name": "Pollen-Dusted Leggings"
+      },
+      "bloomsilk_cowl": {
+        "name": "Bloomsilk Cowl"
+      },
+      "falls_blessed_staff": {
+        "name": "Falls-Blessed Staff"
+      },
+      "fanglords_hide_mantle": {
+        "name": "Fanglord's Hide Mantle"
+      },
+      "thornroot_greathelm": {
+        "name": "Thorncrowned Greathelm"
+      },
+      "foremans_grips": {
+        "name": "Foreman's Grips"
+      },
+      "serac_stride_boots": {
+        "name": "Serac-Stride Boots"
+      },
+      "seal_rune_mantle": {
+        "name": "Seal-Rune Mantle"
+      },
+      "thawbound_legguards": {
+        "name": "Thawbound Legguards"
+      },
+      "pyre_tenders_hood": {
+        "name": "Pyre-Tender's Hood"
+      },
+      "meltwater_cord": {
+        "name": "Meltwater Cord"
+      },
+      "hammer_of_the_open_lock": {
+        "name": "Hammer of the Open Lock"
+      },
+      "vestments_of_the_waking_rite": {
+        "name": "Vestments of the Waking Rite"
+      },
+      "spadeworn_gauntlets": {
+        "name": "Spadeworn Gauntlets"
+      },
+      "gravedirt_grips": {
+        "name": "Gravedirt Grips"
+      },
+      "bellrope_mitts": {
+        "name": "Bellrope Mitts"
+      },
+      "rimewreath_coif": {
+        "name": "Rimewreath Coif"
+      },
+      "rime_laced_hood": {
+        "name": "Rime-Laced Hood"
+      },
+      "lamenting_veil": {
+        "name": "Lamenting Veil"
+      },
+      "choirward_pauldrons": {
+        "name": "Choirward Pauldrons"
+      },
+      "choristers_spaulders": {
+        "name": "Chorister's Spaulders"
+      },
+      "cantors_stole": {
+        "name": "Cantor's Stole"
+      },
+      "knellbound_hauberk": {
+        "name": "Knellbound Hauberk"
+      },
+      "candlewatch_jerkin": {
+        "name": "Candlewatch Jerkin"
+      },
+      "robe_of_the_unquiet_rite": {
+        "name": "Robe of the Unquiet Rite"
+      },
+      "gravecallers_rod": {
+        "name": "Gravecaller's Rod"
+      },
+      "portcullis_girdle": {
+        "name": "Portcullis Girdle"
+      },
+      "cellwatch_belt": {
+        "name": "Cellwatch Belt"
+      },
+      "lanternwick_sash": {
+        "name": "Lanternwick Sash"
+      },
+      "turnkeys_shank": {
+        "name": "Turnkey's Shank"
+      },
+      "gaolyard_jerkin": {
+        "name": "Gaolyard Jerkin"
+      },
+      "brinewarden_robe": {
+        "name": "Brinewarden Robe"
+      },
+      "fogbinders_rod": {
+        "name": "Fogbinder's Rod"
+      },
+      "conchplate_sabatons": {
+        "name": "Conchplate Sabatons"
+      },
+      "pale_chorus_slippers": {
+        "name": "Pale Chorus Slippers"
+      },
+      "tideglass_gauntlets": {
+        "name": "Tideglass Gauntlets"
+      },
+      "moonburn_grips": {
+        "name": "Moonburn Grips"
+      },
+      "prism_etched_handwraps": {
+        "name": "Prism-Etched Handwraps"
+      },
+      "mere_crested_helm": {
+        "name": "Mere-Crested Helm"
+      },
+      "mereskin_hood": {
+        "name": "Mereskin Hood"
+      },
+      "merewater_cowl": {
+        "name": "Merewater Cowl"
+      },
+      "merecleaver": {
+        "name": "Merecleaver"
+      },
+      "moonwrack_stave": {
+        "name": "Moonwrack Stave"
+      },
       "conjured_water4": {
         "name": "Getoverd bronwater"
       },
@@ -19306,6 +20065,24 @@ export const nl_NL: EnTranslations = {
       "heart_of_the_crucible": {
         "name": "Hart van de Smeltkroes"
       },
+      "gaolers_iron_key": {
+        "name": "Gaoler's Iron Key"
+      },
+      "fanglords_whistle": {
+        "name": "Fanglord's Whistle"
+      },
+      "gorgebloom_seedpod": {
+        "name": "Gorgebloom Seedpod"
+      },
+      "foremans_last_link": {
+        "name": "Foreman's Last Link"
+      },
+      "phial_of_the_tithe": {
+        "name": "Phial of the Tithe"
+      },
+      "quenchwater_flask": {
+        "name": "Quenchwater Flask"
+      },
       "rift_watchers_band": {
         "name": "Breukwachter's Armband"
       },
@@ -19440,6 +20217,9 @@ export const nl_NL: EnTranslations = {
       "restless_bones": {
         "name": "Rusteloze Beenderen"
       },
+      "marrow_restless_bones": {
+        "name": "Restless Bones"
+      },
       "gorrak": {
         "name": "Gorrak de Meedogenloze"
       },
@@ -19557,6 +20337,75 @@ export const nl_NL: EnTranslations = {
       "morthen": {
         "name": "Morthen de Grafroeper"
       },
+      "ossuary_sentinel": {
+        "name": "Ossuary Sentinel"
+      },
+      "hollow_gravedigger": {
+        "name": "Hollow Gravedigger"
+      },
+      "rime_egg_sac": {
+        "name": "Rime Egg Sac"
+      },
+      "rimeweb_hatchling": {
+        "name": "Rimeweb Hatchling"
+      },
+      "rimeweb_spinner": {
+        "name": "Rimeweb Spinner"
+      },
+      "candlewright_acolyte": {
+        "name": "Candlewright Acolyte"
+      },
+      "hollow_chorister": {
+        "name": "Hollow Chorister"
+      },
+      "bound_soul": {
+        "name": "Bound Soul"
+      },
+      "rimeweb": {
+        "name": "Lady of the Bonechill"
+      },
+      "cantor_ilvane": {
+        "name": "Cantor Ilvane"
+      },
+      "crypt_ossuary_warrior": {
+        "name": "Ossuary Warrior"
+      },
+      "crypt_gravecaller_adept": {
+        "name": "Gravecaller Adept"
+      },
+      "crypt_ossuary_cutthroat": {
+        "name": "Ossuary Cutthroat"
+      },
+      "crypt_gravecaller_necromancer": {
+        "name": "Gravecaller Necromancer"
+      },
+      "crypt_bone_minion": {
+        "name": "Bone Minion"
+      },
+      "crypt_bone_brute": {
+        "name": "Bone Brute"
+      },
+      "crypt_bone_pile": {
+        "name": "Stirring Bones"
+      },
+      "crypt_chapel_gargoyle": {
+        "name": "Chapel Gargoyle"
+      },
+      "crypt_crow_caller": {
+        "name": "Crow Caller"
+      },
+      "crypt_carrion_crow": {
+        "name": "Carrion Crow"
+      },
+      "crypt_ossuary_drake": {
+        "name": "Ossuary Drake"
+      },
+      "crypt_knellwyrm": {
+        "name": "Knellwyrm"
+      },
+      "crypt_remembrance_candle": {
+        "name": "Remembrance Candle"
+      },
       "bastion_revenant": {
         "name": "Bastion-Geestwraak"
       },
@@ -19571,6 +20420,102 @@ export const nl_NL: EnTranslations = {
       },
       "vael_the_mistcaller": {
         "name": "Vael de Fogbinder"
+      },
+      "drowned_watchman": {
+        "name": "Drowned Watchman"
+      },
+      "fogbound_arbalest": {
+        "name": "Fogbound Arbalest"
+      },
+      "barnacle_crawler": {
+        "name": "Wreckbound Sailor"
+      },
+      "bastion_warhound": {
+        "name": "Bastion Warhound"
+      },
+      "mistweaver": {
+        "name": "Mist Chanter"
+      },
+      "drowned_sergeant": {
+        "name": "Drowned Sergeant"
+      },
+      "shackled_prisoner": {
+        "name": "Shackled Prisoner"
+      },
+      "gaol_turnkey": {
+        "name": "Gaol Turnkey"
+      },
+      "turretback_hermit": {
+        "name": "Shipwreck Captain"
+      },
+      "vael_fog_shade": {
+        "name": "Vael the Fogbinder"
+      },
+      "gaoler_ossick": {
+        "name": "Gaoler Ossick"
+      },
+      "bastion_gaol_cage": {
+        "name": "Iron Cage"
+      },
+      "bastion_drowned_anchor": {
+        "name": "Drowned Anchor"
+      },
+      "lagoon_snapper": {
+        "name": "Lagoon Snapper"
+      },
+      "ice_wraith": {
+        "name": "Ice Wraith"
+      },
+      "moonlit_siren": {
+        "name": "Moonlit Siren"
+      },
+      "tidewisp": {
+        "name": "Tidewisp"
+      },
+      "drowned_pilgrim": {
+        "name": "Drowned Pilgrim"
+      },
+      "mere_hydra_head_left": {
+        "name": "Mere Hydra"
+      },
+      "mere_hydra_head_center": {
+        "name": "Mere Hydra"
+      },
+      "mere_hydra_head_right": {
+        "name": "Mere Hydra"
+      },
+      "tideglass_colossus": {
+        "name": "Tideglass Colossus"
+      },
+      "tideglass_reflection": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_warrior": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_paladin": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_hunter": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_rogue": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_priest": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_shaman": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_mage": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_warlock": {
+        "name": "Tideglass Reflection"
+      },
+      "tideglass_reflection_druid": {
+        "name": "Tideglass Reflection"
       },
       "sanctum_boneguard": {
         "name": "Heiligdom-Botwacht"
@@ -20100,8 +21045,77 @@ export const nl_NL: EnTranslations = {
       "wildheart_beastmaster": {
         "name": "Slagtandheer Beestenmeester"
       },
+      "sunbone_totem_binder": {
+        "name": "Sunbone Totem-Binder"
+      },
+      "sunbone_totem": {
+        "name": "Sunbone Totem"
+      },
+      "sunbone_dread_totem": {
+        "name": "Sunbone Dread Totem"
+      },
+      "basin_raptor": {
+        "name": "Basin Raptor"
+      },
+      "spore_toad": {
+        "name": "Spore Toad"
+      },
+      "vine_lasher": {
+        "name": "Snarlvine Lasher"
+      },
+      "great_saurian": {
+        "name": "Great Saurian"
+      },
+      "howdah_hexcaller": {
+        "name": "Howdah Hexcaller"
+      },
+      "fanglord_jaguar": {
+        "name": "Fanglord's Great Jaguar"
+      },
+      "the_gorgebloom": {
+        "name": "The Gorgebloom"
+      },
       "wildheart_high_priest": {
         "name": "Zulgar, Stem van het Bekken"
+      },
+      "broodsworn_thawcaller": {
+        "name": "Broodsworn Thawcaller"
+      },
+      "broodsworn_goadsmith": {
+        "name": "Broodsworn Goadsmith"
+      },
+      "broodsworn_pyre_tender": {
+        "name": "Broodsworn Pyre-Tender"
+      },
+      "soul_brazier": {
+        "name": "Soul Brazier"
+      },
+      "rime_whelp": {
+        "name": "Rime Whelp"
+      },
+      "ogre_sledge_hauler": {
+        "name": "Ogre Sledge-Hauler"
+      },
+      "glacier_splinter": {
+        "name": "Glacier Splinter"
+      },
+      "sledge_tusker": {
+        "name": "Sledge Tusker"
+      },
+      "sanctum_shackle_hammer": {
+        "name": "Hammer Shackle"
+      },
+      "sanctum_shackle_tongs": {
+        "name": "Tongs Shackle"
+      },
+      "sanctum_shackle_anvil": {
+        "name": "Anvil Shackle"
+      },
+      "sanctum_shackle_bellows": {
+        "name": "Bellows Shackle"
+      },
+      "thorn_sprout": {
+        "name": "Thorn Sprout"
       },
       "ironvein_foreman": {
         "name": "IJzerader-Voorman"
@@ -20890,6 +21904,11 @@ export const nl_NL: EnTranslations = {
         "name": "Oefenmeester Hale",
         "title": "Meester van het Muurduel",
         "greeting": "Die pop achter me slaat nooit terug en gaat nooit neer, {className}. Wat telt is de telling: je schademeters tellen elke klap die je erop uitdeelt. Richt hem aan en open de meters, dan leg ik de rest uit."
+      },
+      "cantor_laverock": {
+        "name": "Laverock",
+        "title": "Last Cantor of the Pale Choir",
+        "greeting": "I was the youngest voice of the Pale Choir. On the night of the rite I did not drink, and I ran. Every full moon since, I hear them singing under the water. I must see her before I die. Let me walk behind you. I will not fight, and I will not slow you."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",

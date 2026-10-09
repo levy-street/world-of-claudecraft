@@ -293,3 +293,58 @@ describe('resolveNearbyInteractionCandidate', () => {
     });
   });
 });
+
+// The trash engine's G3 use (a Soul Brazier): the press resolves the nearest
+// living usable body within its use reach FIRST, since it only ever stands in
+// a dungeon fight (src/ui/hud/dungeon/kit_use_prompt_view.ts offers the press
+// on the same boundary; tests/sanctum_trash_ui.test.ts pins the two together).
+describe('resolveNearbyInteractionCandidate: the usable encounter body', () => {
+  const brazier = (overrides: Partial<Entity> = {}) =>
+    entity({
+      id: 70,
+      kind: 'mob',
+      templateId: 'soul_brazier',
+      name: 'Soul Brazier',
+      hp: 120,
+      pos: { x: 3, y: 0, z: 0 },
+      ...overrides,
+    });
+
+  it('resolves a living brazier in its 4 yd reach, above a lootable corpse and an npc', () => {
+    const corpse = entity({
+      id: 71,
+      kind: 'mob',
+      dead: true,
+      lootable: true,
+      loot: { copper: 1, items: [] },
+      pos: { x: 1, y: 0, z: 0 },
+    });
+    const npc = entity({ id: 72, kind: 'npc', templateId: 'elder_maren', name: 'Elder Maren' });
+    expect(resolveNearbyInteractionCandidate(scan([corpse, npc, brazier()]).world)).toMatchObject({
+      kind: 'use',
+      id: 70,
+    });
+  });
+
+  it('is no candidate out of reach, fallen, at no health, or for a dead viewer', () => {
+    expect(
+      resolveNearbyInteractionCandidate(scan([brazier({ pos: { x: 4.05, y: 0, z: 0 } })]).world),
+    ).toBeNull();
+    expect(resolveNearbyInteractionCandidate(scan([brazier({ dead: true })]).world)).toBeNull();
+    expect(resolveNearbyInteractionCandidate(scan([brazier({ hp: 0 })]).world)).toBeNull();
+    const dead = scan([brazier()]);
+    dead.world.player.dead = true;
+    expect(resolveNearbyInteractionCandidate(dead.world)).toBeNull();
+  });
+
+  it('a mob with no usable kit is never a use', () => {
+    expect(
+      resolveNearbyInteractionCandidate(scan([brazier({ templateId: 'rime_whelp' })]).world),
+    ).toBeNull();
+  });
+
+  it('picks the nearest of two braziers', () => {
+    const near = brazier({ id: 73, pos: { x: 0, y: 0, z: 1.5 } });
+    expect(resolveNearbyInteractionCandidate(scan([brazier(), near]).world)?.id).toBe(73);
+  });
+});

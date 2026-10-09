@@ -69,16 +69,27 @@ describe('held weapon models', () => {
       'heroic_deathless_heartwood',
       'heroic_direfang_greatblade',
       'heroic_duskwhisper',
+      'heroic_falls_blessed_staff',
       'heroic_fang_of_korzul',
       'heroic_fanglords_beastspear',
+      'heroic_fogbinders_rod',
+      'heroic_gaolyard_cudgel',
+      'heroic_gravecallers_rod',
       'heroic_gravecourt_hewer',
       'heroic_gravewyrm_thornmaul',
       'heroic_kingsbane_last_oath',
+      'heroic_knight_commanders_longsword',
       'heroic_maul_of_the_scourged_wilds',
+      'heroic_merecleaver',
+      'heroic_moonwrack_stave',
       'heroic_nightfangs_greatstaff',
+      'heroic_rimeweb_fang',
+      'heroic_sextons_spadehaft',
       'heroic_staff_of_the_gravewyrm',
       'heroic_staff_of_velkhar',
       'heroic_thornpeak_wardblade',
+      'heroic_tideglass_shiv',
+      'heroic_turnkeys_shank',
       'heroic_wildheart_fangknife',
       'heroic_wildheart_hexwood_staff',
       'heroic_wildheart_tuskblade',
@@ -223,10 +234,15 @@ describe('held weapon models', () => {
       .map((item) => item.id)
       .sort();
     expect(unmapped).toEqual([
+      // The dungeon reworks' held offhands: the Hollow Crypt's Cantor's Hymnal
+      // and the Drowned Temple's Chorus Conch (each with its Heroic clone). A
+      // hymnal and a conch have no shared held model yet.
+      'cantors_hymnal',
       // The Buried Hoard held offhands (a chalice and a void orb, each in its three
       // map-rarity tiers) are the orb class of gap: the shared art set has no
       // chalice or orb model, so they need new art, not a table row.
       'chalice_of_living_tides',
+      'chorus_conch',
       // The two Crucible held offhands follow the wraithfire_orb precedent
       // (a held orb/censer with no dedicated GLB yet).
       'cinder_of_the_first_design',
@@ -251,6 +267,8 @@ describe('held weapon models', () => {
       // cosmetic only. Commissioning is the maintainer's art wave.
       'gravewyrm_bone_quiver',
       'gyrelens_array',
+      'heroic_cantors_hymnal',
+      'heroic_chorus_conch',
       'heroic_direfang_quiver',
       'heroic_gravewyrm_bone_quiver',
       'heroic_wraithfire_orb',

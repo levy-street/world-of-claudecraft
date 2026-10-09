@@ -197,7 +197,14 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // 434 with the trinket slot's seventeen character-scoped relics (PR 4173).
     // 466 at the release/v0.44.0 merge into feature/buried-hoards (2026-09-28): the 32 Buried Hoard pieces
     // (character-scoped items), the same +32 as reliquary_content.test.ts's pair.
-    expect(catalogTotal).toBe(466);
+    // 485 with the dungeon rework's 19 new relics (Sunken Bastion 5, Drowned
+    // Temple 4, Wildheart Basin 5, Gravewyrm Sanctum 5), the same +19 as
+    // reliquary_content.test.ts's pair.
+    // 486 with the Witness of the Choir title's slot on the Horizons titles
+    // page (the Drowned Temple lore guide's deed, The Last Verse).
+    // 516 with the lower dungeons' thirty blue-roll relics (2026-10-08), the same
+    // +30 as reliquary_content.test.ts's pair.
+    expect(catalogTotal).toBe(516);
     // The Warfare Season 2 Vanguard Gallery is class-personal and sits outside
     // completion, so it moves nothing here.
   });

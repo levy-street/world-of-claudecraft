@@ -126,7 +126,12 @@ describe('dungeon finder view core', () => {
     const boss = view.detail?.encounters.find((e) => e.final);
     expect(boss?.mobId).toBe('morthen');
     expect(boss?.portraitUrl).toBe('/ui/dungeons/morthen.webp');
-    expect(boss?.mechanics).toEqual(['shadow_pulse']);
+    expect(boss?.mechanics).toEqual([
+      'crypt_morthen_shadow_pulse',
+      'crypt_gravecall',
+      'crypt_rite_of_the_unquiet',
+      'crypt_reap_the_unquiet',
+    ]);
     expect(boss?.groups.length).toBeGreaterThan(0);
     // morthen_guaranteed_uncommon partitions a full draw; morthen_bonus sums
     // below 1 and must NOT claim a guaranteed drop.
@@ -176,7 +181,8 @@ describe('dungeon finder view core', () => {
     // kill actually pays; a non-finale encounter keeps its normal copper.
     expect(boss?.copper).toBe(100000);
     const sexton = view.detail?.encounters.find((e) => e.mobId === 'sexton_marrow');
-    expect(sexton?.copper).toBe(400);
+    // The rework raised Marrow's purse with his level (hollow_crypt.md 8.1).
+    expect(sexton?.copper).toBe(800);
     expect(sexton?.heroicGroups).toHaveLength(1);
     expect(sexton?.heroicGroups[0].guaranteed).toBe(true);
 
@@ -193,7 +199,11 @@ describe('dungeon finder view core', () => {
       (e) => e.mobId === 'wildheart_beastmaster',
     );
     expect(beastmaster?.final).toBe(false);
-    expect(beastmaster?.heroicSingles.map((i) => i.itemId)).toContain('heroic_duskwhisper');
+    // The promoted Beastmaster pays one equipment item per heroic kill: Heroic
+    // Duskwhisper rides his weighted heroic partition (design section 8.2).
+    expect(beastmaster?.heroicGroups.flatMap((g) => g.items.map((i) => i.itemId))).toContain(
+      'heroic_duskwhisper',
+    );
   });
 
   it('previews the live non-finale equipment budget on Heroic only', () => {
@@ -212,9 +222,18 @@ describe('dungeon finder view core', () => {
     expect(heroic?.heroicGroups).toMatchObject([
       {
         guaranteed: true,
+        // The relocated Nythraxis piece (0.1) and the blue roll's three rare
+        // copies (0.04 each, 2026-10-08) come first; the shipped rows keep their
+        // ratios in the remaining 0.78. The two uncommon rows left on 2026-10-09
+        // (Heroic pays no uncommon gear), so 0.7 of weight shares the 0.78.
         items: [
-          { itemId: 'quilted_trousers', chance: 0.5 },
-          { itemId: 'oiled_boots', chance: 0.5 },
+          { itemId: 'heroic_bonewrought_greatsword', chance: expect.closeTo(0.1, 9) },
+          { itemId: 'heroic_spadeworn_gauntlets', chance: expect.closeTo(0.04, 9) },
+          { itemId: 'heroic_gravedirt_grips', chance: expect.closeTo(0.04, 9) },
+          { itemId: 'heroic_bellrope_mitts', chance: expect.closeTo(0.04, 9) },
+          { itemId: 'sextons_burial_spade', chance: expect.closeTo((0.3 / 0.7) * 0.78, 9) },
+          { itemId: 'cryptplate_helm', chance: expect.closeTo((0.3 / 0.7) * 0.78, 9) },
+          { itemId: 'heroic_sextons_spadehaft', chance: expect.closeTo((0.1 / 0.7) * 0.78, 9) },
         ],
       },
     ]);

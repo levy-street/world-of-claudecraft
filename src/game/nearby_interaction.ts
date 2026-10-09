@@ -1,6 +1,7 @@
 import { isInvestigationNpc } from '../sim/content/world_quest_investigation';
 import { isShadowNpc, SHADOW_NPC_ID } from '../sim/content/world_quest_shadow';
 import { ESCORTS } from '../sim/data';
+import { TURNKEY_CAGED } from '../sim/encounters/sunken_bastion/ids';
 import type { FarmPlotView } from '../world_api/farming';
 import { handleEscortPress } from './escort_interact';
 import {
@@ -112,12 +113,27 @@ export function tryNearbyInteraction(
   // The gather-node arm's inputs; absent means the press knows no nodes.
   gather?: NearbyGatherOptions,
 ): InteractionOutcome {
+  // Locked in the Gaol Turnkey's Iron Cage: every interact press is an escape
+  // press (the sim counts and rate-limits it), never a scan of the room.
+  if (world.player.auras?.some((a) => a.id === TURNKEY_CAGED)) {
+    world.interact();
+    return true;
+  }
   const candidate = resolveNearbyInteractionCandidate(
     world,
     harvestStateReliable,
     preferNpcId,
     gather?.nodes,
   );
+  if (candidate?.kind === 'use') {
+    // A usable encounter body (a Soul Brazier): target it and send the
+    // ordinary interact, exactly as the investigation suspects answer. The
+    // authoritative sim validates and starts the use (interaction.ts
+    // tryStartKitUse); online it is the same two commands, nothing new.
+    world.targetEntity(candidate.id);
+    world.interact();
+    return true;
+  }
   if (candidate?.kind === 'corpse') {
     // Ordinary loot only. Harvesting a corpse is an explicit action with its
     // own entry point (the corpse picker), never a side effect of this press.

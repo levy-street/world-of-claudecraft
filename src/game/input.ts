@@ -8,6 +8,7 @@ import { sanitizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import type { MoveInput } from '../sim/types';
 import { focusTargetAction } from '../ui/focus_targets_core';
 import { detectBrowserEngine } from './browser_env';
+import { BASE_ZOOM_MAX } from './camera_zoom_ceiling';
 import { clickClaimedModalFocus } from './click_claimed_focus';
 import { cursorForHover, type HoverCursorKind } from './cursors';
 import { clampGliderCameraPitch, gliderPitchFromCamera } from './glider_pitch_input';
@@ -210,6 +211,9 @@ export class Input {
   camYaw = Math.PI;
   camPitch = 0.32;
   camDist = 12;
+  // The zoom-out ceiling (yards): 22, raised in a PvE boss context by
+  // camera_zoom_wiring.ts so a towering boss fits the frame.
+  zoomMax = BASE_ZOOM_MAX;
   // Fired whenever the player changes the zoom distance (wheel / pinch), so main.ts can
   // persist it to settings (issue 1657). Not fired on a direct camDist assignment (the
   // startup restore / Reset path sets the field itself), so restoring never re-persists.
@@ -486,7 +490,7 @@ export class Input {
   /** Move the camera in/out, clamped to the zoom limits. */
   zoomBy(delta: number): void {
     if (this.cb.isCameraMotionLocked?.()) return;
-    const next = Math.min(22, Math.max(3, this.camDist + delta));
+    const next = Math.min(this.zoomMax, Math.max(3, this.camDist + delta));
     if (next === this.camDist) return;
     this.camDist = next;
     this.onCameraDistChange?.(next);

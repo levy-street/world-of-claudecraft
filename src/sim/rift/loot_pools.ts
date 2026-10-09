@@ -23,6 +23,10 @@
 // file is reordered.
 
 import { HEROIC_BOSS_LOOT, NYTHRAXIS_RAID_BOSS_ID } from '../content/heroic_loot';
+import {
+  NYTHRAXIS_RELOCATED_ITEM_IDS,
+  NYTHRAXIS_RELOCATED_TRINKET_IDS,
+} from '../content/nythraxis_loot';
 import { RIFT_EPIC_ITEM_IDS } from '../content/rift/items';
 import { DUNGEONS, ITEMS, MOBS } from '../data';
 import { VARKHUL_BOSS_ID } from '../ignivar_raid_ids';
@@ -42,6 +46,8 @@ const C_POOL_QUALITIES: ReadonlySet<ItemDef['quality']> = new Set(['rare', 'epic
 let normalPool: readonly string[] | null = null;
 let heroicPool: readonly string[] | null = null;
 
+const RELOCATED_RAID_BASES: ReadonlySet<string> = new Set(NYTHRAXIS_RELOCATED_ITEM_IDS);
+
 /** Every equippable rare/epic that the level-20 NORMAL five-man dungeons drop.
  *  This is the C-rank clear payout: "whatever a normal dungeon could drop". */
 export function riftNormalClearPool(): readonly string[] {
@@ -54,7 +60,9 @@ export function riftNormalClearPool(): readonly string[] {
       if (!mob?.loot) continue;
       for (const entry of mob.loot) {
         const itemId = entry.itemId;
-        if (!itemId) continue;
+        // A raid piece relocated off Nythraxis onto a level-20 five-man boss keeps
+        // its raid tier (content/nythraxis_loot.ts) and never pays a rift clear.
+        if (!itemId || RELOCATED_RAID_BASES.has(itemId)) continue;
         const item = ITEMS[itemId];
         // No slot means no gear (tools, reagents, quest items): never a payout.
         if (!item?.slot) continue;
@@ -82,6 +90,13 @@ export function riftHeroicClearPool(): readonly string[] {
   // Crucible ilvl-35 appends leaking here was caught by
   // tests/rift_loot_pools.test.ts when the Ignivar tables landed).
   const RAID_BOSS_IDS = new Set([NYTHRAXIS_RAID_BOSS_ID, IGNIVAR_BOSS_ID, VARKHUL_BOSS_ID]);
+  // The raid pieces and trinkets relocated off Nythraxis onto five-man heroic
+  // bosses (content/nythraxis_loot.ts) keep their raid identity: the same rule,
+  // they never pay out of a rift clear.
+  const RELOCATED_RAID_TIER = new Set<string>([
+    ...NYTHRAXIS_RELOCATED_TRINKET_IDS,
+    ...NYTHRAXIS_RELOCATED_ITEM_IDS.map((id) => `heroic_${id}`),
+  ]);
   for (const [bossId, entries] of Object.entries(HEROIC_BOSS_LOOT)) {
     if (RAID_BOSS_IDS.has(bossId)) continue;
     for (const entry of entries) {
@@ -89,7 +104,7 @@ export function riftHeroicClearPool(): readonly string[] {
       // tier or make it a new B/A/S rift reward.
       if (entry.preserveSourceTier) continue;
       const itemId = entry.itemId;
-      if (!itemId) continue;
+      if (!itemId || RELOCATED_RAID_TIER.has(itemId)) continue;
       const item = ITEMS[itemId];
       if (!item?.slot) continue; // skips the mount reins, which have no slot
       if (item.quality !== 'epic') continue;

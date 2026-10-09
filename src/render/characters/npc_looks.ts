@@ -2527,6 +2527,16 @@ export function aldricKeepsHisRig(templateId: string): boolean {
   return templateId.startsWith('brother_aldric');
 }
 
+/**
+ * NPCs that wear their own authored Blender body (a `VISUALS` def reached
+ * through the manifest's NPC key map) instead of a composed look: the Drowned
+ * Temple's lore guide Laverock (`npc_laverock`), whose clips (Talk, Startle,
+ * Kneel, Sing) the guide system drives. `npcLookFor` returns null for them, the
+ * same "keep the fixed rig" answer Aldric gets, so a later roster entry can
+ * never silently swap the body out. Pinned by tests/npc_looks.test.ts.
+ */
+export const NPC_OWN_BODY_IDS: ReadonlySet<string> = new Set(['cantor_laverock']);
+
 /** normalizeAppearance for an authored NPC look: the same clamps, except that an
  *  NPC-only outfit colorway (modular.ts NPC_MATERIAL_COLORWAY_IDS) survives where
  *  the player normalizer would clamp it back to the default. */
@@ -2558,6 +2568,7 @@ export function npcLookFor(templateId: string, kind: EntityKind = 'npc'): Modula
   if (kind !== 'npc') return null;
   if (aldricKeepsHisRig(templateId)) return null;
   const id = baseId(templateId);
+  if (NPC_OWN_BODY_IDS.has(id)) return null;
   let look = resolved.get(id);
   if (look === undefined) {
     const def = NPC_LOOKS[id];

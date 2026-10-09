@@ -1134,6 +1134,10 @@ export const VOICE_ALIAS = {
   // harbour road: the Gilded Strongbox bursar's discreet baritone is the
   // register, until a voice of his own is cast.
   eastbrook_vault_keeper: 'bursar_fernando',
+  // Laverock, the Drowned Temple's lore guide (src/sim/dungeon_guide), is the
+  // old last cantor of the Pale Choir: Brother Halven's hushed, unhurried
+  // monkish register is the closest cast, until a voice of his own is designed.
+  cantor_laverock: 'brother_halven',
   brother_aldric_fen: 'brother_aldric',
   brother_aldric_highwatch: 'brother_aldric',
   brother_aldric_raid: 'brother_aldric',

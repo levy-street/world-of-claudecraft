@@ -25,6 +25,8 @@
 
 import { ABILITIES, DELVES, GROUP_XP_BONUS, ITEMS, MOBS } from '../data';
 import * as deedsMod from '../deeds';
+import { reflectionIgnoresHit } from '../encounters/drowned_temple/reflection_guard';
+import { bastionWardHitPoints } from '../encounters/sunken_bastion/ward_hits';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
@@ -39,6 +41,8 @@ import { isKillParticipant, killParticipationPos } from '../loot/kill_participat
 import { applyBossCorpseHold } from '../mob/boss_corpse_hold';
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
 import { isEvadingWildMob } from '../mob/evade_immunity';
+import { kitUseHoldsThroughHits } from '../mob/trash_kit/encounter_use';
+import { oathShare } from '../mob/trash_kit/temple_choir';
 import {
   NYTHRAXIS_BONE_SPIKE_HIT_DAMAGE,
   nythraxisBoneSpikeWardHit,
@@ -150,6 +154,7 @@ import {
 import { duskhymnChannelStopped, vespersEchoDamage, vespersOnEntityDeath } from './priest/vespers';
 import { questGateBlocksDamage } from './quest_damage_gate';
 import { foulPlayGuardsBreak } from './rogue_talents';
+import { onHarvestDeath, tetherRedirect } from './sanctum_trinkets';
 import { applySetProcs } from './set_procs';
 import { clearSpiritmendCurrents, UNLEASH_WEAPON_GUARD_ID } from './shaman_spiritmend';
 import { clearShamanTalentState, onShamanDamageTaken } from './shaman_talents';
@@ -234,6 +239,8 @@ export function dealDamage(
   const copiedResolvedHit = resolvedHpLoss;
   if (target.dead) return 0;
   if (target.damageImmune) return 0;
+  // A Tideglass Reflection never takes damage from the player it mirrors.
+  if (reflectionIgnoresHit(source, target)) return 0;
   // A Nythraxis Bone Spike is a ward (nythraxis_bone_spike.ts): any player or
   // pet hit lands exactly one point, whatever it would have dealt, and the
   // spike's pool is its hit count. Resolved like an exact copy so no source
@@ -243,6 +250,14 @@ export function dealDamage(
   // player's own hit.
   if (nythraxisBoneSpikeWardHit(source, target)) {
     amount = NYTHRAXIS_BONE_SPIKE_HIT_DAMAGE;
+    resolvedHpLoss = true;
+    alreadyFinal = true;
+  }
+  // The Sunken Bastion's Iron Cage and Drowned Anchor are wards the same way
+  // (encounters/sunken_bastion/ward_hits.ts): a fixed number of points a hit.
+  const bastionWard = bastionWardHitPoints(source, target);
+  if (bastionWard !== null) {
+    amount = bastionWard;
     resolvedHpLoss = true;
     alreadyFinal = true;
   }
@@ -718,6 +733,12 @@ export function dealDamage(
   // sharing, so only damage that would reach health can be reduced/transferred.
   if (!resolvedHpLoss) {
     amount = mitigateVicariousSuffering(ctx, source, target, amount, abilityId);
+    // Foreman's Last Link moves its share of what is left to the tether's
+    // wearer (combat/sanctum_trinkets.ts).
+    amount = tetherRedirect(ctx, source, target, amount, school, abilityId);
+    // A heroic Drowned Temple singer under a guard's Moonset Oath passes a
+    // share of the hit onto the guard (mob/trash_kit/temple_choir.ts).
+    amount = oathShare(ctx, source, target, amount, school, ability, abilityId);
   }
 
   if (target.damageFloorHp !== undefined) {
@@ -1264,9 +1285,12 @@ export function dealDamage(
       // arm at all). Spell pushback keeps the classic kind gate below: only
       // an unblocked, unabsorbed hit pushes a cast back, exactly as before
       // this arm widened. The Demon Heal channel is deliberately NOT folded
-      // in: it takes the normal channel pushback below, as today.
-      if (isNonSpellCast(target.castingAbility)) ctx.cancelCast(target);
-      else if (
+      // in: it takes the normal channel pushback below, as today. A G3 use
+      // that holds through hits (the Remembrance Candle's draining relight,
+      // mob/trash_kit/encounter_use.ts) is the one non-spell cast a hit spares.
+      if (isNonSpellCast(target.castingAbility)) {
+        if (!kitUseHoldsThroughHits(ctx, target)) ctx.cancelCast(target);
+      } else if (
         amount > 0 &&
         kind === 'hit' &&
         !ignoresDamagePushback(ctx, target, target.castingAbility)
@@ -1499,6 +1523,9 @@ export function handleDeath(
   if (killer && killer.id !== e.id && !killer.dead) {
     applySetProcs(ctx, killer, e, 'kill');
   }
+  // The Phial of the Tithe pays every nearby wearer for an enemy's death
+  // (combat/sanctum_trinkets.ts). No rng.
+  if (e.kind === 'mob') onHarvestDeath(ctx, e);
 
   // a dead mob keeps no raid marker — respawnMob reuses the same entity id,
   // so a stale mark would otherwise reappear on the respawn
@@ -1728,7 +1755,8 @@ export function handleDeath(
     // awarders below; the slot remains stable throughout this death path.
     const claimedInst = claimedInstanceForMob(ctx, e.id);
     let heroicRewardRecipients: PlayerMeta[] = [];
-    if (meta && creditEntity && !meta.leaving) {
+    // A regrown encounter part (the Mere Hydra's head) paid on its first death.
+    if (meta && creditEntity && !meta.leaving && !e.regrown) {
       const tmpl = MOBS[e.templateId];
       // xpMult 0 marks a puzzle-object mob (the 1 HP spider egg-sac): killable
       // in one hit by design, so it must not pay full kill XP.
@@ -1878,7 +1906,8 @@ export function handleDeath(
     // future corpse-harvest cast, taken from the exact same eligible list the
     // heroic-reward award above uses (empty means the corpse is public at
     // once). Owned pets return earlier in this function and never reach here.
-    recordCorpseHarvestDeath(ctx, e, heroicRewardRecipients);
+    // A regrown encounter part (the Mere Hydra's head) was harvestable once.
+    if (!e.regrown) recordCorpseHarvestDeath(ctx, e, heroicRewardRecipients);
     // A bossExitPortal dungeon opens its far-end exit the moment the final
     // boss falls (both difficulties; no-op everywhere else).
     spawnBossExitPortal(ctx, e);

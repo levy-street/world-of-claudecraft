@@ -50,11 +50,9 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: '荒野之心盆地',
-    desc: '來自祖爾加與獠牙領主馴獸師的標誌性武器。',
   },
   conquerors_wildheart_basin_heroic: {
     name: '英雄：荒野之心盆地',
-    desc: '盆地之聲祖爾加身上僅限英雄難度掉落的史詩物品。',
   },
   // The arena entity reads 尼思拉克西斯團隊競技場; the page collects the raid's
   // spoils rather than naming the room, so the arena noun gives way to the

@@ -256,15 +256,21 @@ describe('finder catalogue metadata', () => {
       expect(a?.kind).toBe('dungeon');
       expect(a?.dungeonId).toBe('wildheart_basin');
       expect(a?.entranceDungeonId).toBe('wildheart_basin');
+      // The rework: the three boss cores (design section 5), no trash rows.
       expect(a?.encounters.map((e) => e.mobId)).toEqual([
-        'wildheart_stalker',
-        'wildheart_ravager',
-        'wildheart_hexcaller',
         'wildheart_beastmaster',
+        'the_gorgebloom',
         'wildheart_high_priest',
       ]);
       expect(a?.encounters.at(-1)?.final).toBe(true);
     }
+    // Heroic adds each boss's twists; the normal preview never carries them.
+    const twists = ['heel_frenzied_bond', 'burrowing_seeds', 'twin_prey_ambush'];
+    const normalMechs = normal?.encounters.flatMap((e) => e.mechanics) ?? [];
+    for (const t of twists) expect(normalMechs).not.toContain(t);
+    heroic?.encounters.forEach((e, i) => {
+      expect(e.mechanics).toContain(twists[i]);
+    });
     expect(normal?.lockout).toBe('none');
     expect(heroic?.lockout).toBe('daily');
   });

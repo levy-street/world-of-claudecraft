@@ -473,6 +473,7 @@ export const IWORLD_MEMBERS = [
   { name: 'perfectingSwapInfo', kind: 'method' },
   { name: 'raidLockouts', kind: 'method' }, // read-returning (5/6)
   { name: 'worldBossActive', kind: 'method' }, // realm liveness, separate from loot lockout
+  { name: 'answerDungeonGuide', kind: 'method' }, // a dungeon guide's offer answer (send-only)
   { name: 'riftFloor', kind: 'data' }, // active procedural rift floor (null outside)
   { name: 'riftCollisionToken', kind: 'data' }, // per-Sim rift collision registry key
   { name: 'riftBossDeathZones', kind: 'method' }, // live lethal zones on the boss floor
@@ -937,9 +938,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // merge: 420/124/296.
     // Plus the release's transport facet (the Eastbrook ferry's ferryView
     // method) at the fourth release/v0.44.0 base merge: 421/124/297.
-    expect(IWORLD_MEMBERS.length).toBe(424);
+    // +1 answerDungeonGuide (IWorldDungeons, the dungeon guide's offer answer).
+    expect(IWORLD_MEMBERS.length).toBe(425);
     expect(DATA_MEMBERS.length).toBe(126);
-    expect(METHOD_MEMBERS.length).toBe(298);
+    expect(METHOD_MEMBERS.length).toBe(299);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -981,6 +983,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'activeVarkhulCinderFires',
       'activeVarkhulCinderOrbProjectiles',
       'activeVarkhulForgestormWarnings',
+      'answerDungeonGuide',
       'applyEnchant',
       'applyTalents',
       'archetypeTitle',
@@ -1520,6 +1523,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'accuseWorldQuestSuspect',
       'activeLootRolls',
       'activeMasterLootRolls',
+      'answerDungeonGuide',
       'applyEnchant',
       'applyTalents',
       'arenaAugmentPick',
@@ -2289,6 +2293,7 @@ const FACET_DUNGEONS = [
   'leaveDungeon',
   'raidLockouts',
   'worldBossActive',
+  'answerDungeonGuide',
   'riftFloor',
   'riftCollisionToken',
   'riftBossDeathZones',
@@ -2621,8 +2626,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
     // Mirrors the IWORLD_MEMBERS.length pin above (411); this pin and the one above
     // must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(424);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(424);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(425);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(425);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

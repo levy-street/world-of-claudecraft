@@ -3,8 +3,16 @@
 // cooldown, and every use and passive against a real Sim.
 import { describe, expect, it } from 'vitest';
 import { applyHeal } from '../src/sim/combat/heal';
+import { quenchDamage } from '../src/sim/combat/sanctum_trinkets';
 import { restorableCooldown } from '../src/sim/combat/trinket_seams';
 import { runTrinketTrigger, TRINKET_EQUIP_LOCKOUT } from '../src/sim/combat/trinkets';
+import {
+  SPIRIT_JAGUAR_GUARDIAN_KEY,
+  SPIRIT_JAGUAR_REACH,
+  seedburstDamage,
+  spiritJaguarBite,
+  spiritJaguarOf,
+} from '../src/sim/combat/wildheart_trinkets';
 import {
   GAMBLE,
   TRINKET_AURA,
@@ -51,9 +59,14 @@ const damageBy = (events: SimEvent[], ability: string) =>
   events.filter((ev) => ev.type === 'damage' && ev.ability === ability);
 
 describe('the trinket catalog', () => {
-  it('ships eighteen trinkets, each with one attribute and a use', () => {
+  it('ships twenty-four trinkets, each with one attribute and a use', () => {
     const ids = Object.keys(TRINKET_ITEMS);
-    expect(ids).toHaveLength(18);
+    // The Sunken Bastion rework's Gaoler's Iron Key is the nineteenth; the
+    // Wildheart Basin's Fanglord's Whistle and Gorgebloom Seedpod are the
+    // twentieth and twenty-first; the Gravewyrm Sanctum's Foreman's Last Link,
+    // Phial of the Tithe and Quenchwater Flask the twenty-second to
+    // twenty-fourth.
+    expect(ids).toHaveLength(24);
     for (const id of ids) {
       const item = TRINKET_ITEMS[id];
       expect(item.slot).toBe('trinket');
@@ -186,6 +199,327 @@ describe('the tank trinkets', () => {
     expect(p.auras.some((a) => a.kind === 'stun' || a.kind === 'root')).toBe(false);
     expect(sim.ctx.applyKnockback(mob, p, 10)).toBe(0);
     expect(aura(p, TRINKET_AURA.anchorGuard)?.kind).toBe('shield_wall');
+  });
+
+  it("Gaoler's Iron Key: roots the target, slows a control-immune one, needs a target in range", () => {
+    const sim = wearing('gaolers_iron_key');
+    const mob = foe(sim, 10);
+    sim.useItem('gaolers_iron_key');
+    const root = aura(mob, TRINKET_AURA.shackle);
+    expect(root?.kind).toBe('root');
+    expect(root?.remaining).toBe(6);
+    expect(sim.player.cooldowns.get(trinketCooldownKey('gaolers_iron_key'))).toBe(
+      TRINKET_SPECS.gaolers_iron_key.cooldown,
+    );
+
+    // A creature immune to control is slowed instead of rooted.
+    const sim2 = wearing('gaolers_iron_key');
+    const boss = foe(sim2, 10);
+    boss.ccImmune = true;
+    sim2.useItem('gaolers_iron_key');
+    const slow = aura(boss, TRINKET_AURA.shackle);
+    expect(slow?.kind).toBe('slow');
+    expect(slow?.value).toBe(0.7);
+
+    // Out of range: nothing lands and the cooldown is not spent.
+    const sim3 = wearing('gaolers_iron_key');
+    const far = foe(sim3, 40);
+    sim3.useItem('gaolers_iron_key');
+    expect(aura(far, TRINKET_AURA.shackle)).toBeUndefined();
+    expect(sim3.player.cooldowns.get(trinketCooldownKey('gaolers_iron_key')) ?? 0).toBe(0);
+  });
+});
+
+describe('the Gravewyrm Sanctum trinkets', () => {
+  const QUENCH = TRINKET_SPECS.quenchwater_flask.use as Extract<
+    (typeof TRINKET_SPECS)[string]['use'],
+    { kind: 'quench' }
+  >;
+  const tickFor = (sim: Sim, seconds: number): void => {
+    for (let t = 0; t < seconds - 1e-9; t += DT) sim.tick();
+  };
+
+  it("Foreman's Last Link: 30 percent of the ally's damage moves to the wearer for 10 sec", () => {
+    const sim = wearing('foremans_last_link', 'priest');
+    const wolf = foe(sim, 6);
+    const allyId = sim.addPlayer('warrior', 'Linked');
+    const ally = sim.ctx.entities.get(allyId) as Entity;
+    ally.pos = { ...sim.player.pos, x: sim.player.pos.x + 4 };
+    const me = sim.player;
+    // Deep pools set after every aura lands (an aura re-derives the stats).
+    const pools = () => {
+      for (const e of [ally, me]) {
+        e.maxHp = 50000;
+        e.hp = 50000;
+      }
+    };
+    // A hostile target is refused (and costs no cooldown).
+    sim.useItem('foremans_last_link');
+    expect(me.cooldowns.get(trinketCooldownKey('foremans_last_link')) ?? 0).toBe(0);
+    expect(aura(me, TRINKET_AURA.tetherLink)).toBeUndefined();
+    sim.targetEntity(ally.id, me.id);
+    sim.useItem('foremans_last_link');
+    expect(aura(ally, TRINKET_AURA.tether)?.sourceId).toBe(me.id);
+    expect(aura(me, TRINKET_AURA.tetherLink)?.remaining).toBe(10);
+    expect(me.cooldowns.get(trinketCooldownKey('foremans_last_link'))).toBe(120);
+    pools();
+    const allyBefore = ally.hp;
+    const meBefore = me.hp;
+    sim.ctx.dealDamage(
+      wolf,
+      ally,
+      1000,
+      false,
+      'physical',
+      'Bite',
+      'hit',
+      true,
+      undefined,
+      true,
+      false,
+      true,
+    );
+    expect(allyBefore - ally.hp).toBe(700);
+    expect(meBefore - me.hp).toBe(300);
+    // Once the chain falls off, the ally takes it all again.
+    tickFor(sim, 10.1);
+    expect(aura(ally, TRINKET_AURA.tether)).toBeUndefined();
+    pools();
+    const after = ally.hp;
+    sim.ctx.dealDamage(
+      wolf,
+      ally,
+      1000,
+      false,
+      'physical',
+      'Bite',
+      'hit',
+      true,
+      undefined,
+      true,
+      false,
+      true,
+    );
+    expect(after - ally.hp).toBe(1000);
+  });
+
+  it('Phial of the Tithe: each enemy dying within 20 yd for 15 sec restores 5 percent health and mana', () => {
+    const sim = wearing('phial_of_the_tithe', 'mage');
+    const me = sim.player;
+    sim.useItem('phial_of_the_tithe');
+    expect(aura(me, TRINKET_AURA.harvest)?.remaining).toBe(15);
+    me.hp = Math.round(me.maxHp / 2);
+    me.resource = 0;
+    const near = foe(sim, 8, 100);
+    const far = foe(sim, 30, 100);
+    sim.ctx.dealDamage(me, far, 1000, false, 'fire', 'Test', 'hit');
+    expect(far.dead).toBe(true);
+    expect(me.resource).toBe(0);
+    const hp0 = me.hp;
+    sim.ctx.dealDamage(me, near, 1000, false, 'fire', 'Test', 'hit');
+    expect(near.dead).toBe(true);
+    expect(me.hp - hp0).toBe(Math.round(me.maxHp * 0.05));
+    expect(me.resource).toBe(Math.round(me.maxResource * 0.05));
+    // Spent window: nothing more.
+    tickFor(sim, 15.1);
+    const late = foe(sim, 5, 100);
+    const hp1 = me.hp;
+    const mana1 = me.resource;
+    sim.ctx.dealDamage(me, late, 1000, false, 'fire', 'Test', 'hit');
+    expect(me.hp).toBe(hp1);
+    expect(me.resource).toBe(mana1);
+  });
+
+  it('Quenchwater Flask: three weapon hits of frost, the third quenches the target', () => {
+    const sim = wearing('quenchwater_flask', 'warrior');
+    const wolf = foe(sim, 3);
+    const me = sim.player;
+    sim.useItem('quenchwater_flask');
+    expect(aura(me, TRINKET_AURA.quench)?.stacks).toBe(3);
+    sim.drainEvents();
+    for (let i = 0; i < 4; i++) runTrinketTrigger(sim.ctx, me, wolf, 'weaponHit');
+    const hits = damageBy(sim.drainEvents(), 'Quenchwater Flask');
+    expect(hits).toHaveLength(3);
+    const power = Math.max(me.attackPower, me.rangedPower);
+    expect(quenchDamage(QUENCH, power)).toBe(Math.round(40 + 0.2 * power));
+    expect(aura(me, TRINKET_AURA.quench)).toBeUndefined();
+    const quenched = wolf.auras.find((a) => a.id === TRINKET_AURA.quenched);
+    expect(quenched?.kind).toBe('attackspeed');
+    expect(quenched?.value).toBeCloseTo(1 / 0.85, 9);
+    expect(quenched?.remaining).toBe(8);
+  });
+});
+
+describe('the Wildheart Basin trinkets', () => {
+  const WHISTLE = TRINKET_SPECS.fanglords_whistle.use as Extract<
+    (typeof TRINKET_SPECS)[string]['use'],
+    { kind: 'spiritPack' }
+  >;
+  const SEEDPOD = TRINKET_SPECS.gorgebloom_seedpod.use as Extract<
+    (typeof TRINKET_SPECS)[string]['use'],
+    { kind: 'seedburst' }
+  >;
+  const tickFor = (sim: Sim, seconds: number): SimEvent[] => {
+    const out: SimEvent[] = [];
+    for (let t = 0; t < seconds - 1e-9; t += DT) out.push(...sim.tick());
+    return out;
+  };
+  /** A hostile wolf at an offset from the player (not targeted). */
+  const wolfAt = (sim: Sim, dx: number, dz: number, hp = 20000): Entity => {
+    const p = sim.player;
+    const mob = createMob(sim.nextId++, MOBS.forest_wolf, 20, {
+      x: p.pos.x + dx,
+      y: p.pos.y,
+      z: p.pos.z + dz,
+    });
+    mob.maxHp = hp;
+    mob.hp = hp;
+    mob.hostile = true;
+    mob.aiState = 'idle';
+    sim.addEntity(mob);
+    return mob;
+  };
+  const hitsOn = (events: SimEvent[], ability: string, targetId: number) =>
+    damageBy(events, ability).filter((ev) => ev.type === 'damage' && ev.targetId === targetId);
+  const amountOf = (ev: SimEvent): number => (ev.type === 'damage' ? ev.amount : -1);
+  const gap = (a: Entity, b: Entity) => Math.hypot(a.pos.x - b.pos.x, a.pos.z - b.pos.z);
+
+  it("Fanglord's Whistle: needs a target, then a spirit jaguar runs to it and bites", () => {
+    const sim = wearing('fanglords_whistle', 'rogue');
+    // No target: refused, no cooldown spent, no jaguar.
+    sim.player.targetId = null;
+    expect(sim.useItem('fanglords_whistle')).toBeFalsy();
+    expect(sim.player.cooldowns.get(trinketCooldownKey('fanglords_whistle')) ?? 0).toBe(0);
+    expect(spiritJaguarOf(sim.ctx, sim.player.id)).toBeNull();
+
+    const prey = foe(sim, 15);
+    sim.useItem('fanglords_whistle');
+    expect(sim.player.cooldowns.get(trinketCooldownKey('fanglords_whistle'))).toBe(120);
+    expect(aura(sim.player, TRINKET_AURA.spiritPack)?.remaining).toBe(12);
+    const jaguar = spiritJaguarOf(sim.ctx, sim.player.id);
+    if (!jaguar) throw new Error('no jaguar');
+    expect(jaguar.templateId).toBe(`guardian_${SPIRIT_JAGUAR_GUARDIAN_KEY}`);
+    expect(jaguar.guardianState?.melee).toEqual({ moveSpeed: 8, reach: SPIRIT_JAGUAR_REACH });
+    expect(jaguar.guardianState?.preferredTargetId).toBe(prey.id);
+    const start = gap(jaguar, prey);
+    expect(start).toBeGreaterThan(SPIRIT_JAGUAR_REACH);
+
+    // It runs (it does not stand and fire from range): no bite until it closes.
+    const firstTick = sim.tick();
+    expect(hitsOn(firstTick, "Fanglord's Whistle", prey.id)).toHaveLength(0);
+    expect(gap(jaguar, prey)).toBeLessThan(start);
+    const bites = hitsOn(tickFor(sim, 4), "Fanglord's Whistle", prey.id);
+    expect(bites.length).toBeGreaterThan(0);
+    for (const bite of bites) expect(bite.type === 'damage' && bite.sourceId).toBe(jaguar.id);
+    expect(gap(jaguar, prey)).toBeLessThanOrEqual(SPIRIT_JAGUAR_REACH + 0.5);
+  });
+
+  it("Fanglord's Whistle: the bite snapshots Attack Power, and the jaguar leaves at 12 sec", () => {
+    const biteAt = (power: number) => {
+      const sim = wearing('fanglords_whistle', 'rogue');
+      foe(sim, 3);
+      sim.player.attackPower = power;
+      sim.player.rangedPower = 0;
+      sim.useItem('fanglords_whistle');
+      const state = spiritJaguarOf(sim.ctx, sim.player.id)?.guardianState;
+      return { sim, min: state?.minDamage ?? 0, max: state?.maxDamage ?? 0 };
+    };
+    const low = biteAt(100);
+    const high = biteAt(400);
+    // 18 to 24 plus 8 percent of Attack Power: +24 per bite for +300 power.
+    expect(spiritJaguarBite(WHISTLE, 100)).toEqual({ min: low.min, max: low.max });
+    expect([low.min, low.max]).toEqual([26, 32]);
+    expect([high.min, high.max]).toEqual([50, 56]);
+    // Snapshotted: a later power change does not move the bite.
+    high.sim.player.attackPower = 0;
+    tickFor(high.sim, 1);
+    expect(spiritJaguarOf(high.sim.ctx, high.sim.player.id)?.guardianState?.minDamage).toBe(50);
+    // Still out at 11.9 sec, gone at 12 with its buff.
+    tickFor(high.sim, 10.85);
+    expect(spiritJaguarOf(high.sim.ctx, high.sim.player.id)).not.toBeNull();
+    tickFor(high.sim, 0.2);
+    expect(spiritJaguarOf(high.sim.ctx, high.sim.player.id)).toBeNull();
+    expect(aura(high.sim.player, TRINKET_AURA.spiritPack)).toBeUndefined();
+  });
+
+  it("Fanglord's Whistle: the jaguar follows its owner's new target", () => {
+    const sim = wearing('fanglords_whistle', 'rogue');
+    foe(sim, 3);
+    const other = wolfAt(sim, 4, 3);
+    sim.useItem('fanglords_whistle');
+    sim.targetEntity(other.id, sim.player.id);
+    const events = tickFor(sim, 4);
+    expect(spiritJaguarOf(sim.ctx, sim.player.id)?.guardianState?.preferredTargetId).toBe(other.id);
+    expect(hitsOn(events, "Fanglord's Whistle", other.id).length).toBeGreaterThan(0);
+  });
+
+  it('Gorgebloom Seedpod: bursts at 6 sec on every enemy within 8 yd of the target', () => {
+    const sim = wearing('gorgebloom_seedpod', 'mage');
+    const host = foe(sim, 10);
+    const near = wolfAt(sim, 0, 16); // 6 yd from the host
+    const far = wolfAt(sim, 0, 20); // 10 yd from the host
+    // The wolves hold still (no aggro chase) so the yards stay as placed.
+    sim.devMobsFrozen = true;
+    sim.useItem('gorgebloom_seedpod');
+    expect(sim.player.cooldowns.get(trinketCooldownKey('gorgebloom_seedpod'))).toBe(120);
+    const seed = host.auras.find((a) => a.id === TRINKET_AURA.seedburst);
+    expect(seed?.sourceId).toBe(sim.player.id);
+    expect(seed?.remaining).toBe(6);
+    const expected = seedburstDamage(SEEDPOD, sim.player.spellPower, false);
+    expect(Math.round(seed?.value ?? 0)).toBe(expected);
+
+    const before = tickFor(sim, 5.9);
+    expect(damageBy(before, 'Gorgebloom Seedpod')).toHaveLength(0);
+    const burst = damageBy(tickFor(sim, 0.3), 'Gorgebloom Seedpod');
+    expect(hitsOn(burst, 'Gorgebloom Seedpod', host.id)).toHaveLength(1);
+    expect(hitsOn(burst, 'Gorgebloom Seedpod', near.id)).toHaveLength(1);
+    expect(hitsOn(burst, 'Gorgebloom Seedpod', far.id)).toHaveLength(0);
+    for (const hit of burst) expect(amountOf(hit)).toBe(expected);
+    // It bursts once.
+    expect(damageBy(tickFor(sim, 2), 'Gorgebloom Seedpod')).toHaveLength(0);
+  });
+
+  it('Gorgebloom Seedpod: 50 percent more where the target died first', () => {
+    const sim = wearing('gorgebloom_seedpod', 'mage');
+    const host = foe(sim, 10, 50);
+    sim.devMobsFrozen = true;
+    sim.useItem('gorgebloom_seedpod');
+    // The host moves 12 yd off and dies there: the seed follows it to its
+    // corpse, so a wolf beside the corpse is hit and one at the plant spot is not.
+    const atPlantSpot = wolfAt(sim, 0, 10);
+    tickFor(sim, 1);
+    host.pos.x += 12;
+    const besideCorpse = wolfAt(sim, 15, 10);
+    tickFor(sim, 1);
+    sim.ctx.dealDamage(sim.player, host, 500, false, 'physical', 'Test Strike', 'hit');
+    expect(host.dead).toBe(true);
+    // Death cleared the seed's aura; the seed itself lives on.
+    expect(host.auras.some((a) => a.id === TRINKET_AURA.seedburst)).toBe(false);
+    const burst = damageBy(tickFor(sim, 4.2), 'Gorgebloom Seedpod');
+    const plain = seedburstDamage(SEEDPOD, sim.player.spellPower, false);
+    const empowered = seedburstDamage(SEEDPOD, sim.player.spellPower, true);
+    expect(empowered).toBe(Math.round((SEEDPOD.flat + SEEDPOD.coef * sim.player.spellPower) * 1.5));
+    expect(empowered).toBeGreaterThan(plain);
+    expect(hitsOn(burst, 'Gorgebloom Seedpod', besideCorpse.id)).toHaveLength(1);
+    expect(hitsOn(burst, 'Gorgebloom Seedpod', atPlantSpot.id)).toHaveLength(0);
+    for (const hit of burst) expect(amountOf(hit)).toBe(empowered);
+  });
+
+  it('Gorgebloom Seedpod: snapshots Spell Power at the plant; a dead planter withers it', () => {
+    const plain = wearing('gorgebloom_seedpod', 'mage');
+    const host = foe(plain, 5);
+    plain.player.spellPower = 100;
+    plain.useItem('gorgebloom_seedpod');
+    plain.player.spellPower = 0;
+    const burst = hitsOn(tickFor(plain, 6.2), 'Gorgebloom Seedpod', host.id);
+    expect(burst.map(amountOf)).toEqual([Math.round(SEEDPOD.flat + SEEDPOD.coef * 100)]);
+
+    const withered = wearing('gorgebloom_seedpod', 'mage');
+    foe(withered, 5);
+    withered.useItem('gorgebloom_seedpod');
+    withered.player.hp = 0;
+    withered.player.dead = true;
+    expect(damageBy(tickFor(withered, 6.2), 'Gorgebloom Seedpod')).toHaveLength(0);
   });
 });
 

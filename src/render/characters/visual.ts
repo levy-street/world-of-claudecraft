@@ -37,7 +37,10 @@ import {
   advanceSwimBlend,
   advanceTreadBlend,
   type BaseState,
+  castClipSyncs,
+  castClipSyncTime,
   castHoldStep,
+  clipSnapsIn,
   desiredBaseState,
   drivesPose,
   gaitWindDownTimeScale,
@@ -71,7 +74,8 @@ import {
   takeFarBakeBudget,
   tintedFarMaterials,
 } from './assets';
-import { deathGroundingOffset } from './death_grounding_core';
+import { BoneDials } from './bone_dials';
+import { deathGroundingOffset, deathLiftOffset } from './death_grounding_core';
 import {
   createGhostEffectMaterial,
   createMoonkinEffectMaterial,
@@ -81,12 +85,14 @@ import {
 } from './effect_materials';
 import { farMeshShown, shadowProxyShown } from './far_lod_reveal_core';
 import { FormAdornments } from './form_adornments';
+import { GestureMeshToggles } from './gesture_mesh_toggles';
+import { GlowPulse } from './glow_pulse';
 import { HairSwayDriver } from './hair_sway';
 import { buildHalo } from './halo';
 import { HarvestRecoil } from './harvest_recoil';
 import { disposeHeldPropIdles, updateHeldPropIdles } from './held_prop_idle';
 import { noteLookAttached } from './look_pieces';
-import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
+import type { ClipMap, EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
 import { createMetamorphWingPose, metamorphWingPoseInto } from './metamorph_wing_motion_core';
 import type { ModularAppearance, ModularLook } from './modular';
 import {
@@ -117,7 +123,9 @@ import { applySoulRendOverlay } from './soul_rend_overlay';
 import { soulRendPrewarmTargets } from './soul_rend_prewarm_core';
 import { stoneboundShellStyle } from './stonebound_shell_core';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
+import { auraHeldClip, stunIdleClip } from './stun_idle_core';
 import { CharacterSurfaceResponse, SURFACE_RESPONSE_PROGRAM } from './surface_response';
+import { createTurnInPlaceState, stepTurnInPlace } from './turn_in_place_core';
 import { warriorActionBlend } from './warrior_action_blend';
 import { WarriorActionProps } from './warrior_action_props';
 import { WarriorBodyEffects } from './warrior_body_effects';
@@ -483,6 +491,11 @@ export class CharacterVisual {
     return this.look;
   }
 
+  /** The VISUALS key this rig was built from (a shared form slot's look). */
+  get assetKey(): string {
+    return this.key;
+  }
+
   /** Move the face/body sliders on the LIVE body: morph influences are
    *  per-instance over shared geometry, so a slider drag repaints without the
    *  dispose-and-recompose a geometry change needs (which is why the sliders
@@ -723,6 +736,8 @@ export class CharacterVisual {
   /** which ability's cast clip the current cast-state base action was chosen
    *  for; lets chained casts refresh their per-ability override */
   private castClipAbility: string | null = null;
+  /** The dazed loop in force (ClipMap.stunned), or null for the rig's own idle. */
+  private stunIdle: string | null = null;
   private deadLock = false;
   /** consecutive frames with no action driving the pose (the T-pose watchdog) */
   private starvedFrames = 0;
@@ -795,6 +810,17 @@ export class CharacterVisual {
   private presentationScale = 1;
   private ascended = false;
   private metamorphLeftWing: THREE.Object3D | null = null;
+  /** VisualDef.dials: bones turned on top of the clips by gestures (bone_dials.ts). */
+  private dials: BoneDials | null = null;
+  /** VisualDef.meshToggles: mesh nodes hidden or shown by gestures (gesture_mesh_toggles.ts). */
+  private meshToggles: GestureMeshToggles | null = null;
+  /** VisualDef.glowPulses: the emissive map flared by gestures (glow_pulse.ts). */
+  private glowPulse: GlowPulse | null = null;
+  /** VisualDef.turnRate / ClipMap.turn: the rooted body's drawn heading
+   *  (turn_in_place_core.ts). */
+  private readonly turnState = createTurnInPlaceState();
+  /** The entity whose entrance (ClipMap.entrance) this rig already played. */
+  private entranceFor: unknown = undefined;
   private metamorphRightWing: THREE.Object3D | null = null;
   private metamorphLeftWingRest = new THREE.Euler();
   private metamorphRightWingRest = new THREE.Euler();
@@ -871,6 +897,10 @@ export class CharacterVisual {
           this.tintedRigClaims,
         ),
       );
+      if (this.def.dials?.length) this.dials = new BoneDials(this.model, this.def.dials);
+      if (this.def.meshToggles?.length)
+        this.meshToggles = new GestureMeshToggles(this.model, this.def.meshToggles);
+      if (this.def.glowPulses?.pulses.length) this.glowPulse = new GlowPulse(this.def.glowPulses);
       if (key === 'form_metamorph') {
         this.metamorphLeftWing = this.model.getObjectByName('metamorph_wing_left_hinge') ?? null;
         this.metamorphRightWing = this.model.getObjectByName('metamorph_wing_right_hinge') ?? null;
@@ -945,7 +975,7 @@ export class CharacterVisual {
       // lazily (buildComposedFar), because most of a crowd stands close enough
       // that the mesh would never be drawn.
       const idleGeo = prep.idleGeo;
-      if (idleGeo && !this.look) {
+      if (idleGeo && !this.look && !prep.def.bodyless) {
         timeBuildSpan('view-part:far-bake', () =>
           this.buildFarMeshes(
             idleGeo,
@@ -971,6 +1001,9 @@ export class CharacterVisual {
       this.clickProxy.scale.set(r * 2, this.height, r * 2);
       this.clickProxy.visible = false;
       this.root.add(this.clickProxy);
+      // A bodyless part (the Mere Hydra's heads): the dungeon's own visuals
+      // draw the creature; this view keeps only its capsule, bars and plate.
+      if (prep.def.bodyless) this.model.visible = false;
 
       const mixerStarted = performance.now();
       this.mixer = new THREE.AnimationMixer(this.model);
@@ -1033,6 +1066,10 @@ export class CharacterVisual {
    *  edges still latch so the pose catches up when the entity nears. */
   update(dt: number, s: AnimState, animate: boolean, reducedMotion = false): void {
     if (this.surfaceResponse.update(dt, this.root, this.height)) this.applyVisualMaterials();
+    // A glow edge re-mounts only when nothing outranks it (a surface response
+    // owns the materials until it ends, and re-applies them itself then).
+    if (this.glowPulse?.step(dt, s.dead) && !this.surfaceResponse.active)
+      this.applyVisualMaterials();
     // A transparent effect whose clones finished linking: swap them in HERE,
     // on the per-frame path, never in the gate callback (see effectSwapSettled).
     if (this.effectSwapSettled) this.commitPendingEffectSwap();
@@ -1086,6 +1123,19 @@ export class CharacterVisual {
 
     this.castingAbility = s.casting ? (s.castingAbility ?? null) : null;
     const rushChanged = this.warriorBody.updateRush(dt, s);
+    // A stun swapping the idle loop (the Great Jaguar dazed) is a base change for a
+    // standing body, so it rides the same fade arm below.
+    // A rooted body turning in place to face its target (the Gorgebloom) holds
+    // its turn loop the same way.
+    const turnIdle = this.turnIdle(dt, s);
+    // An aura-held pose (the freed prisoner's kneel, ClipMap.heldByAura) rides it too.
+    const stunIdle =
+      auraHeldClip(this.def.clips.heldByAura, s.auras) ??
+      stunIdleClip(this.def.clips.stunned, s.auras) ??
+      turnIdle;
+    const stunIdleChanged =
+      stunIdle !== this.stunIdle && (this.baseState === 'idle' || this.baseState === 'combatIdle');
+    this.stunIdle = stunIdle;
     if (!this.deadLock) {
       const desired = this.desiredBase(s);
       const baseChanged = desired !== this.baseState;
@@ -1135,7 +1185,19 @@ export class CharacterVisual {
         this.currentIsOneShot = false;
         this.currentOneShotIsCastExit = false;
         this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);
-      } else if ((baseChanged || rushChanged) && !this.currentIsOneShot) {
+      } else if (
+        baseChanged &&
+        desired === 'cast' &&
+        this.currentIsOneShot &&
+        castClipSyncs(this.def.castClipSync, this.castingAbility) &&
+        !this.oneShotHoldsAttacks()
+      ) {
+        // A bar-locked strike (VisualDef.castClipSync) takes the body from a
+        // plain swing or flinch at once: its contact frame is on the bar's end.
+        this.currentIsOneShot = false;
+        this.currentOneShotIsEmote = false;
+        this.fadeTo(this.baseAction(), 0.12, false);
+      } else if ((baseChanged || rushChanged || stunIdleChanged) && !this.currentIsOneShot) {
         // a cast clip frozen at its hold point must never stay paused through
         // the exit, whichever exit path runs below
         if (previousBase === 'cast' && this.current?.paused) this.current.paused = false;
@@ -1186,6 +1248,20 @@ export class CharacterVisual {
               ? this.def.clips.castTimeScaleByAbility?.[this.castingAbility]
               : undefined) ?? 1;
           this.current.timeScale = castScale;
+          // A bar-locked strike follows the bar (it may have entered late).
+          if (
+            castClipSyncs(this.def.castClipSync, this.castingAbility) &&
+            this.castingAbility &&
+            this.current === this.action(this.def.clips.castByAbility?.[this.castingAbility])
+          ) {
+            const t = castClipSyncTime(
+              this.current.time,
+              s.castElapsed,
+              castScale,
+              this.current.getClip().duration,
+            );
+            if (t !== null) this.current.time = t;
+          }
           const holdPoint = this.def.clips.castHoldPointSeconds;
           const genericCast = this.action(this.def.clips.cast);
           // The freeze covers ONLY the generic cast clip: a per-ability
@@ -1247,7 +1323,7 @@ export class CharacterVisual {
     } else {
       this.spinAngle = 0;
     }
-    this.poseWrap.rotation.y = this.spinAngle;
+    this.poseWrap.rotation.y = this.spinAngle + this.turnState.lag;
 
     // swim pose: the clip's own posture + whatever pitch and lift it still needs
     const authoredSwim = !!this.action(this.def.clips.swimSurface);
@@ -1315,7 +1391,9 @@ export class CharacterVisual {
     this.harvestRecoil.apply(this.poseWrap, dt, reducedMotion || s.dead);
     this.warriorBody.applyContactRecoil(this.poseWrap, dt, reducedMotion || s.dead);
 
-    // distant corpses show the static idle far mesh, tip it over
+    // distant corpses show the static idle far mesh, tip it over (laid on its
+    // side from the pivot, so a body sunk in life by a negative hover needs no
+    // deathLift here: the rig's lift above is what rests the near corpse)
     if (this.farMesh?.visible) {
       if (s.dead) {
         this.farMesh.rotation.z = Math.PI / 2;
@@ -1379,11 +1457,15 @@ export class CharacterVisual {
 
   private syncDeathGrounding(dead: boolean): void {
     const finalOffset = this.def.deathGroundOffset ?? 0;
-    if (finalOffset <= 0) return;
+    const lift = this.def.deathLift;
+    if (finalOffset <= 0 && !lift) return;
     const death = this.action(this.def.clips.death);
+    const time = death?.time ?? 0;
+    const duration = death?.getClip().duration ?? 0;
     this.modelWrap.position.y =
       this.modelWrapGroundY -
-      deathGroundingOffset(dead, death?.time ?? 0, death?.getClip().duration ?? 0, finalOffset);
+      deathGroundingOffset(dead, time, duration, finalOffset) +
+      (lift ? deathLiftOffset(dead, time, duration, lift.yards, lift.from, lift.to) : 0);
   }
 
   private updateMetamorphWings(dt: number, s: AnimState, reducedMotion: boolean): void {
@@ -1772,7 +1854,31 @@ export class CharacterVisual {
   }
 
   playAttack(abilityId?: string): void {
+    if (abilityId && this.meshToggles?.handle(abilityId)) {
+      this.syncFarVisibility();
+      return;
+    }
+    if (abilityId && this.dials?.handle(abilityId)) return;
+    // A glow-only gesture (no clip of its own) flares the emissive map and stops
+    // here; a gesture that also names a clip (Pollinate) plays it below too.
+    if (
+      abilityId &&
+      this.glowPulse?.handle(abilityId) &&
+      !this.def.clips.attackByAbility?.[abilityId]
+    )
+      return;
     if (this.deadLock) return;
+    if (abilityId && abilityId === this.def.entranceGesture) {
+      this.playEntrance();
+      return;
+    }
+    if (!abilityId && this.oneShotHoldsAttacks()) return;
+    const phase = abilityId ? this.def.phaseClips?.[abilityId] : undefined;
+    if (phase) {
+      this.enterClipPhase(phase);
+      return;
+    }
+    if (!abilityId && this.def.castPlayOutHoldsAttacks && this.castPlayOutRunning()) return;
     if ((abilityId === 'charge' || abilityId === 'intervene') && this.action(this.def.clips.rush)) {
       this.warriorBody.beginRush(abilityId);
       return;
@@ -1833,6 +1939,20 @@ export class CharacterVisual {
     const name = clips[this.attackIdx++ % clips.length];
     this.playOneShot(name, skinAttack?.timeScale ?? this.def.attackTimeScale ?? 1.3);
     this.currentOneShotIsAttack = true;
+  }
+
+  /** A boss stance gesture (VisualDef.phaseClips): the rig's whole ClipMap
+   *  swaps in place, and the stance's `enter` one-shot plays when it names
+   *  one; every later base fade reads the new vocabulary. Idempotent. */
+  private enterClipPhase(phase: { clips: ClipMap; enter?: string }): void {
+    if (this.def.clips === phase.clips) return;
+    this.def = { ...this.def, clips: phase.clips };
+    if (phase.enter && this.action(phase.enter)) {
+      this.playOneShot(phase.enter, 1);
+      this.currentOneShotIsAttack = true;
+    } else if (!this.currentIsOneShot) {
+      this.fadeTo(this.baseAction(), FADE, false);
+    }
   }
 
   /** Bladed Gyre is instant, so it uses one short body spin instead of the
@@ -2056,7 +2176,12 @@ export class CharacterVisual {
    *  a far mesh whose materials are still linking never draws early and the
    *  articulated rig never hides without a ready stand-in. */
   private syncFarVisibility(): void {
-    const showFar = farMeshShown(this.far, this.farMesh !== null, this.farCompilePending);
+    // A gesture hiding part of the model (the Saurian's broken howdah) keeps the
+    // articulated rig: the far bake still carries the part. A whole-model hide
+    // (Zulgar vanished) takes the far mesh with it.
+    const hidden = this.meshToggles?.hidden() ?? 'none';
+    const showFar =
+      hidden === 'none' && farMeshShown(this.far, this.farMesh !== null, this.farCompilePending);
     const showRig = !showFar;
     if (this.modelWrap.visible !== showRig) this.modelWrap.visible = showRig;
     if (this.farMesh && this.farMesh.visible !== showFar) this.farMesh.visible = showFar;
@@ -2065,11 +2190,10 @@ export class CharacterVisual {
 
   private syncShadowProxyVisibility(): void {
     if (!this.shadowProxy) return;
-    const show = shadowProxyShown(
-      this.proxyShadowWanted,
-      this.farMesh !== null,
-      this.farCompilePending,
-    );
+    // The proxy is the whole idle pose too: never while the toggles hide any of it.
+    const show =
+      (this.meshToggles?.hidden() ?? 'none') === 'none' &&
+      shadowProxyShown(this.proxyShadowWanted, this.farMesh !== null, this.farCompilePending);
     if (this.shadowProxy.visible !== show) this.shadowProxy.visible = show;
   }
 
@@ -2228,6 +2352,14 @@ export class CharacterVisual {
     if (this.disposed || this.deadLock) return;
     if (this.surfaceResponse.trigger(school, strength, contact)) this.applyVisualMaterials();
   }
+  /** The pool hands this rig to a new entity (pooled_visual_lifecycle.ts):
+   *  no glow pulse, turn or entrance carries over from the last one. */
+  resetForReuse(): void {
+    this.turnState.seeded = false;
+    this.entranceFor = undefined;
+    if (this.glowPulse?.reset() && !this.disposed) this.applyVisualMaterials();
+  }
+
   clearElementResponse(): void {
     this.harvestRecoil.clear();
     this.warriorBody.clearContactRecoil();
@@ -3246,6 +3378,7 @@ export class CharacterVisual {
       this.runeTintMaterials,
       this.auraGlowMaterials,
       this.surfaceResponse.materials,
+      ...(this.glowPulse ? [this.glowPulse.materials] : []),
     ]);
   }
 
@@ -3263,6 +3396,7 @@ export class CharacterVisual {
       ...this.runeTintMaterials.values(),
       ...this.auraGlowMaterials.values(),
       ...this.surfaceResponse.materials.values(),
+      ...(this.glowPulse?.materials.values() ?? []),
     ]);
     for (const material of materials) material.dispose();
     this.ghostMaterials.clear();
@@ -3274,6 +3408,7 @@ export class CharacterVisual {
     this.runeTintMaterials.clear();
     this.auraGlowMaterials.clear();
     this.surfaceResponse.materials.clear();
+    this.glowPulse?.forget();
   }
 
   /** Move every held prop between the hands and the sheathed on-back pose (the
@@ -3427,6 +3562,28 @@ export class CharacterVisual {
   // State machine internals
   // -------------------------------------------------------------------------
 
+  /** ClipMap.entrance, once per entity this rig draws (a pooled rig reused
+   *  for a new entity plays it again). */
+  private playEntrance(): void {
+    const id = this.clickProxy.userData.entityId;
+    const clip = this.def.clips.entrance;
+    if (!clip || this.entranceFor === id || !this.action(clip)) return;
+    this.entranceFor = id;
+    this.playOneShot(clip, 1);
+    this.currentOneShotIsAttack = true;
+  }
+
+  /** The turn loop while a rooted body swings to a new heading (ClipMap.turn,
+   *  VisualDef.turnRate), else null. Steps the drawn heading every frame (the
+   *  lag lands on poseWrap's yaw); a body on the move never plays it. */
+  private turnIdle(dt: number, s: AnimState): string | null {
+    const { turnRate, clips } = this.def;
+    if (turnRate === undefined && !clips.turn) return null;
+    const now = performance.now() / 1000;
+    stepTurnInPlace(this.turnState, this.root.parent?.rotation.y ?? 0, dt, turnRate ?? 0, now);
+    return this.turnState.turning && !s.moving && !s.dead ? (clips.turn ?? null) : null;
+  }
+
   private desiredBase(s: AnimState): BaseState {
     // Whether the LOADED rig has the clip, not whether the ClipMap names one:
     // every player ClipMap names walkBack, but baseAction() silently falls back
@@ -3482,6 +3639,9 @@ export class CharacterVisual {
 
   private updateMixer(dt: number): void {
     this.mixer.update(dt);
+    this.dials?.apply(dt);
+    if (this.meshToggles?.update(dt, this.current?.getClip().name ?? null))
+      this.syncFarVisibility();
     this.skeletonUpdates.markPoseChanged();
   }
 
@@ -3547,6 +3707,8 @@ export class CharacterVisual {
     if (this.ascended) return this.ascensionMaterial(material);
     if (this.runeTint !== null) return this.runeTintMaterial(material, this.runeTint);
     if (this.surfaceResponse.active) return this.surfaceResponse.material(material);
+    // the body's own glow map flared by a gesture (VisualDef.glowPulses)
+    if (this.glowPulse?.active) return this.glowPulse.material(material);
     // lowest priority: the ability VFX buff/cast body glow
     if (this.auraGlowIntensity > 0.01) return this.auraGlowMaterial(material);
     return material;
@@ -3677,7 +3839,11 @@ export class CharacterVisual {
         // desiredBaseState only picks this for a rig that HAS the loop, so the
         // fallback is unreachable belt-and-braces (a def whose clip name misses
         // in the GLB resolves to null in both places and lands on idle).
-        return this.action(c.combatIdle) ?? this.action(c.idle);
+        return (
+          this.action(this.stunIdle ?? undefined) ??
+          this.action(c.combatIdle) ??
+          this.action(c.idle)
+        );
       case 'walk':
         return this.action(c.walk) ?? this.action(c.idle);
       case 'walkBack':
@@ -3732,7 +3898,8 @@ export class CharacterVisual {
         // pose for the whole fall, which is what every rig did before it.
         return this.action(c.fall) ?? this.action(c.jump) ?? this.action(c.idle);
       default:
-        return this.action(c.idle);
+        // 'idle' lands here: a dazed loop (ClipMap.stunned) replaces it while a stun rides.
+        return this.action(this.stunIdle ?? undefined) ?? this.action(c.idle);
     }
   }
 
@@ -3800,7 +3967,9 @@ export class CharacterVisual {
     next.setLoop(oneShot || this.isOnce(next) ? THREE.LoopOnce : THREE.LoopRepeat, Infinity);
     next.clampWhenFinished = true;
     next.timeScale = 1;
-    this.beginAction(next, prev, fade);
+    // A clip that starts out of sight (ClipMap.castSnapIn) takes the rig at once.
+    const snap = clipSnapsIn(this.def.clips.castSnapIn, next.getClip().name);
+    this.beginAction(next, prev, snap ? 0 : fade);
     this.current = next;
     this.currentIsOneShot = oneShot;
     this.currentOneShotIsEmote = false;
@@ -3845,7 +4014,7 @@ export class CharacterVisual {
       if (a === next || a === prev || a.paused || !a.isRunning()) continue;
       a.stop();
     }
-    if (prev && prev !== next && drivesPose(readActionWeight(prev))) {
+    if (fade > 0 && prev && prev !== next && drivesPose(readActionWeight(prev))) {
       prev.fadeOut(fade);
       // Arm the cadence wind-down on the SAME action the mixer is fading, and
       // only for a gait that was actually running forward: a reversed
@@ -3869,18 +4038,46 @@ export class CharacterVisual {
     // exists to SNAP, and fading a near-dead prev out from weight 1 would blend
     // it ~50/50 against the snapped `next` for the whole fade, the opposite of
     // what the docblock above promises.
-    if (prev && prev !== next && !prev.paused && prev.isRunning()) prev.stop();
+    // A snap-in (fade 0, ClipMap.castSnapIn) stops even a paused prev (a clamped
+    // clip still holds its pose): nothing standing may blend into the rise.
+    if (prev && prev !== next && (fade <= 0 || (!prev.paused && prev.isRunning()))) prev.stop();
     next.setEffectiveWeight(1);
     next.play();
+  }
+
+  /** Is a `castPlayOut` clip on the rig right now (its cast loop or its play-out)? */
+  /** VisualDef.oneShotsHoldAttacks: a plain swing never cuts these one-shots. */
+  private oneShotHoldsAttacks(): boolean {
+    const held = this.def.oneShotsHoldAttacks;
+    if (!held || !this.currentIsOneShot) return false;
+    const name = this.current?.getClip().name;
+    return name !== undefined && held.includes(name);
+  }
+
+  private castPlayOutRunning(): boolean {
+    const name = this.current?.getClip().name;
+    if (!name || !this.def.clips.castPlayOut?.includes(name)) return false;
+    return this.currentOneShotIsCastExit || this.baseState === 'cast';
+  }
+
+  /** A flying or perching creature (VisualDef.flight): the renderer reads its
+   *  airborne state from its drawn height, as it does a player's. */
+  get flies(): boolean {
+    return this.def.flight === true;
   }
 
   /** Base clips that play once and CLAMP instead of looping: a sit-down
    *  transition (which then hands off to the sit-idle loop), and the jump clip
    *  of a rig that ships a landing one-shot, which holds its airborne pose for
    *  as long as the body is off the ground. Rigs without a `land` clip keep
-   *  looping `jump` unchanged. */
+   *  looping `jump` unchanged, and a flier (VisualDef.flight) never clamps. */
   private isOnce(a: THREE.AnimationAction): boolean {
+    // A rise into sight (ClipMap.castSnapIn) plays once and holds its last
+    // pose: a loop would drop the body back out of sight for a frame.
+    if (clipSnapsIn(this.def.clips.castSnapIn, a.getClip().name)) return true;
     if (this.baseState === 'sit') return a === this.action(this.def.clips.sitDown);
+    // A flier's `jump` is its flight loop (or its perch): it never clamps.
+    if (this.def.flight) return false;
     // 'fall' counts as well as 'jump'. A rig with no authored flail resolves
     // `fall` back to its jump clip (baseAction), so keying this on 'jump' alone
     // meant a long fall silently LOOPED the pose a short hop clamps. The check
@@ -4102,6 +4299,7 @@ export class CharacterVisual {
     this.baseState = 'idle';
     this.modelWrap.position.y = this.modelWrapGroundY;
     this.applyCorpseMeshSwap(false);
+    this.meshToggles?.reset();
     // Release the one-shot latch: a `finished` that never arrived (the rig was
     // throttled, or the clip was cut) would otherwise leave every later base
     // change committing its state while silently skipping its fade.
@@ -4125,10 +4323,23 @@ export class CharacterVisual {
 }
 
 function clipNamesOf(def: VisualDef): string[] {
-  const c = def.clips;
+  // A stance's vocabulary (phaseClips) must be bound too, or its clips never
+  // get an action and the swap plays nothing.
+  const phases = Object.values(def.phaseClips ?? {}).flatMap((p) => [
+    ...clipMapNames(p.clips),
+    ...(p.enter ? [p.enter] : []),
+  ]);
+  return [...clipMapNames(def.clips), ...phases];
+}
+
+function clipMapNames(c: ClipMap): string[] {
   return [
     c.idle,
     c.combatIdle,
+    c.stunned,
+    ...Object.values(c.heldByAura ?? {}),
+    c.turn,
+    c.entrance,
     c.prowlIdle,
     c.prowlWalk,
     c.walk,

@@ -319,6 +319,22 @@ describe('v0.36 placeholder-art completion evidence', () => {
       'vanguard_oath_blade',
       'vanguard_fang_dagger',
       'vanguard_warstaff',
+      // The Sunken Bastion rework's boss weapons (their art ships with the
+      // dungeon: scripts/generate_sunken_bastion_item_icons.mjs).
+      'knight_commanders_longsword',
+      'gaolyard_cudgel',
+      // The Drowned Temple, Wildheart Basin and Gravewyrm Sanctum reworks' boss
+      // weapons, likewise painted with their dungeons
+      // (scripts/generate_<dungeon>_item_icons.mjs).
+      'tideglass_shiv',
+      'tideglass_warmaul',
+      'falls_blessed_staff',
+      'hammer_of_the_open_lock',
+      // The Hollow Crypt rework's three
+      // (scripts/generate_hollow_crypt_item_icons.mjs).
+      'sextons_spadehaft',
+      'sextons_burial_spade',
+      'rimeweb_fang',
     ];
     expect(targets.weaponItems).toEqual(
       sorted(

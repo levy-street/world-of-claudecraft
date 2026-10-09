@@ -102,8 +102,28 @@ describe('mob portrait source manifest', () => {
     // goblin that sometimes runs through a hoard with a sack of gold. 266: the
     // Mother of Mushrooms, the first cave boss, with her sporeling and her
     // Bloated Cap. 270: the other three cave bosses (Deeprake, the Colossal Bat,
-    // the Voracious Chest) and the bat's swarm.
-    expect(liveIds).toHaveLength(270);
+    // the Voracious Chest) and the bat's swarm. 280: the Hollow Crypt rework's
+    // two new bosses (Rimeweb, Cantor Ilvane) and its eight new trash bodies.
+    // 290: the Hollow Crypt trash kit's ten bodies (warrior, adept, cutthroat,
+    // necromancer, bone minion and brute, gargoyle, crow caller, crow, drake).
+    // 301: the Sunken Bastion rework's eleven new bodies (nine trash, the fog
+    // shade and Gaoler Ossick). 320: the Drowned Temple rework's nineteen (five
+    // trash, the three Mere Hydra heads, the Tideglass Colossus and its ten
+    // Reflections, the plain one plus one per class). 321: the Hollow Crypt
+    // finale's Knellwyrm. 323: the Sunken Bastion fifth pass's two encounter
+    // bodies (the Turnkey's Iron Cage and Ossick's Drowned Anchor). 333: the
+    // Wildheart Basin rework's ten (the Great Saurian and its Howdah
+    // Hexcaller, the Fanglord's Great Jaguar, the Gorgebloom and its Thorn
+    // Sprout, and five trash bodies: raptor, toad, Snarlvine Lasher,
+    // Totem-Binder and its totem). 341: the Gravewyrm Sanctum rework's eight
+    // trash bodies (Thawcaller, Goadsmith, Pyre-Tender, Soul Brazier, Rime
+    // Whelp, Ogre Sledge-Hauler, Glacier Splinter and the Sledge Tusker). 345:
+    // Korgath's four Seal Shackles (hammer, tongs, anvil, bellows). The
+    // Stormbrass Foundry's seventeen bodies left with the parked dungeon.
+    // 347: the dungeon trash pass's two new bodies (the Hollow Crypt's
+    // Stirring Bones and the Sunbone Dread Totem). 348: Sexton Marrow's
+    // Restless Bones (marrow_restless_bones), raised from his Open Graves.
+    expect(liveIds).toHaveLength(348);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

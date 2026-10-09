@@ -13,6 +13,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'abilityUi.cast.ghost_captain_boarding': 'Призрачный абордаж',
+  'abilityUi.cast.ghost_captain_anchor': 'Проклятый якорь',
+  'abilityUi.cast.ghost_captain_broadside': 'Призрачный бортовой залп',
   'abilityUi.actionBar.cooldownMinutes': '{minutes} мин',
   'abilityUi.cast.hoard_cast_rime_beam': 'Луч инея',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount} {currency}',
@@ -4142,6 +4145,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.system.respawn': 'Вы снова чувствуете себя отдохнувшим и целым.',
   'hud.system.respawnKeeperToll':
     'Целитель душ воскресил вас, но вы ослабли: болезнь воскрешения снижает все ваши характеристики, пока не пройдёт.',
+  'hud.system.moonbridgeBanner': 'Лунный мост возведён',
   'hud.system.ignoringChat': 'Чат от {name} игнорируется.',
   'hud.system.noLongerIgnoring': '{name} больше не игнорируется.',
   'hud.system.playerNotNearby': 'Этого игрока нет рядом.',
@@ -5758,6 +5762,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.willowfen_remedy_caravan.name': 'Караван лекарств Ивовой Топи',
   'entities.mobs.frostveil_supply_caravan.name': 'Караван припасов Морозного Предела',
   'entities.mobs.restless_bones.name': 'Беспокойные кости',
+  'entities.mobs.marrow_restless_bones.name': 'Беспокойные кости',
   'entities.mobs.gorrak.name': 'Горрак Безжалостный',
   'entities.mobs.mire_prowler.name': 'Болотный хищник',
   'entities.mobs.deepfen_murloc.name': 'Глубинный щелкун',
@@ -5809,6 +5814,36 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.drowned_thrall.name': 'Утопший раб',
   'entities.mobs.knight_commander_olen.name': 'Рыцарь-командор Олен',
   'entities.mobs.vael_the_mistcaller.name': 'Ваэль Вязатель Тумана',
+  'entities.mobs.drowned_watchman.name': 'Утонувший дозорный',
+  'entities.mobs.fogbound_arbalest.name': 'Скованный туманом арбалетчик',
+  'entities.mobs.barnacle_crawler.name': 'Матрос, связанный с остовом',
+  'entities.mobs.bastion_warhound.name': 'Боевой пёс бастиона',
+  'entities.mobs.mistweaver.name': 'Певчий тумана',
+  'entities.mobs.drowned_sergeant.name': 'Утонувший сержант',
+  'entities.mobs.shackled_prisoner.name': 'Закованный узник',
+  'entities.mobs.gaol_turnkey.name': 'Тюремный ключник',
+  'entities.mobs.turretback_hermit.name': 'Капитан затонувшего корабля',
+  'entities.mobs.vael_fog_shade.name': 'Ваэль Вязатель Тумана',
+  'entities.mobs.gaoler_ossick.name': 'Тюремщик Оссик',
+  'entities.mobs.lagoon_snapper.name': 'Лагунная кусачая черепаха',
+  'entities.mobs.ice_wraith.name': 'Ледяной призрак',
+  'entities.mobs.moonlit_siren.name': 'Лунная сирена',
+  'entities.mobs.tidewisp.name': 'Приливный огонёк',
+  'entities.mobs.drowned_pilgrim.name': 'Утонувший паломник',
+  'entities.mobs.mere_hydra_head_left.name': 'Озёрная гидра',
+  'entities.mobs.mere_hydra_head_center.name': 'Озёрная гидра',
+  'entities.mobs.mere_hydra_head_right.name': 'Озёрная гидра',
+  'entities.mobs.tideglass_colossus.name': 'Колосс Приливного стекла',
+  'entities.mobs.tideglass_reflection.name': 'Отражение Приливного стекла',
+  'entities.mobs.tideglass_reflection_warrior.name': 'Отражение Приливного стекла',
+  'entities.mobs.tideglass_reflection_paladin.name': 'Отражение Приливного стекла',
+  'entities.mobs.tideglass_reflection_hunter.name': 'Отражение Приливного стекла',
+  'entities.mobs.tideglass_reflection_rogue.name': 'Отражение Приливного стекла',
+  'entities.mobs.tideglass_reflection_priest.name': 'Отражение Приливного стекла',
+  'entities.mobs.tideglass_reflection_shaman.name': 'Отражение Приливного стекла',
+  'entities.mobs.tideglass_reflection_mage.name': 'Отражение Приливного стекла',
+  'entities.mobs.tideglass_reflection_warlock.name': 'Отражение Приливного стекла',
+  'entities.mobs.tideglass_reflection_druid.name': 'Отражение Приливного стекла',
   'entities.mobs.sanctum_boneguard.name': 'Костяной страж святилища',
   'entities.mobs.sanctum_drakonid.name': 'Чешуйчатый страж святилища',
   'entities.mobs.raised_bonewalker.name': 'Поднятый костеход',
@@ -5836,7 +5871,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.glimmerscale_lurker.name': 'Затаившийся Мерцающечешуйный',
   'entities.mobs.moonspawn.name': 'Лунное отродье',
   'entities.mobs.pale_choir_acolyte.name': 'Послушник Бледного хора',
-  'entities.mobs.pearlguard_sentinel.name': 'Часовой Жемчужной стражи',
+  'entities.mobs.pearlguard_sentinel.name': 'Скат лунной мантии',
   'entities.mobs.sethrael_palecoil.name': 'Сетраэль Бледное Кольцо',
   'entities.mobs.warlock_imp.name': 'Огненный демон',
   'entities.mobs.warlock_voidwalker.name': 'Демон Пустоты',
@@ -8855,9 +8890,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Смените сложность, пока ваша группа всё ещё держит занятые проходы, и старые притязания задержатся ненадолго, прежде чем отпустятся сами. Лидер группы может отпустить их разом: выберите «Сбросить все копии» в меню собственного портрета либо наберите /dungeon reset. Сброс работает только после того, как сложность действительно сменили, только пока внутри не осталось никого, живого или павшего, только когда каждое тело там обобрано начисто, и один сброс от следующего отделяет короткое время восстановления. Придёте к двери с неверной сложностью — игра скажет об этом прежде, чем проход начнётся. Рейд так не сбрасывается никогда; действуют его собственные правила привязки.',
   'guide.dungeonsPage.resetTitle': 'Сброс инстансов',
   'guide.dungeonsPage.sanctumBody':
-    'Темное сердце Терновых высот, где долгий труд культа достигает своего ужасающего пика.',
+    'Скрытый ледник высоко на Терновых высотах, где в толще льда замёрз дракон, а культ сжигает украденные души, чтобы растопить его. Спуститесь с высокого перевала мимо ледяных башен, разорванных цепей Кузнеца и костров культа к замёрзшему озеру у подножия ледника.',
   'guide.dungeonsPage.wildheartBody':
-    'Залитая тёплым дождём лесная кальдера, где две высокие охотничьи тропы огибают нефритовый сенот. Пройдите через звериные логова и руины предков, затем поднимитесь на ритуальную пирамиду, чтобы увидеть, кто ждёт на вершине.',
+    'Скрытая за Затонувшим идолом кальдера в джунглях, окружённая скалами и полная грохота водопадов. Перейдите речной брод, пройдите охотничьи террасы и водопады, минуйте руины колонии и поднимитесь к ступенчатому святилищу под исполинской каменной головой ягуара.',
   'guide.dungeonsPage.raidName': 'Финальный рейд',
   'guide.dungeonsPage.raidBody':
     'За запечатанной королевской дверью ждёт испытание для десяти игроков: многофазная битва и не знающая смерти сила, которую весь рейд должен пресечь сообща. Заслужите право войти, а затем приведите девятерых друзей.',
@@ -13058,10 +13093,45 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.tagLearning': 'Новичкам рады',
   'hudChrome.finder.tagFastRun': 'Быстрый заход',
   'hudChrome.finder.mech.shadow_pulse': 'Пульс тьмы (периодический урон по области)',
+  'hudChrome.finder.mech.crypt_shovelful':
+    'Полная лопата (каждые 11 секунд он швыряет могильную землю конусом на 8 ярдов перед собой: полтора его удара и замедление на 50% на 6 секунд, так что стойте у него за спиной)',
+  'hudChrome.finder.mech.crypt_measured_for_the_grave':
+    'Мерка для могилы (каждые 15 секунд он метит игрока, не танка; через 4 секунды под ним обрушивается Открытая могила, 42–52 урона в радиусе 3 ярдов на обычной сложности, и яма остаётся до конца боя: 9 урона в секунду и замедление на 40% внутри, так что оставляйте могилы у края двора)',
+  'hudChrome.finder.mech.crypt_burial_toll':
+    'Погребальный звон (на 66 и 33 процентах здоровья он шагает к колокольной верёвке, неуязвимый, и звонит 3 секунды: 30–38 урона от тьмы всем на обычной сложности, и из каждой Открытой могилы встают Беспокойные кости)',
+  'hudChrome.finder.mech.crypt_marrow_heroic':
+    'Героический: Удар могильщика каждые 9 секунд по танку (каждый заряд увеличивает получаемый урон на 6% на 20 секунд, до 6 зарядов), Могильная сила (стоя в могиле, он бьёт на 30% быстрее) и Неспокойная земля (кто пробудет в могиле 2 секунды, поднимает там Беспокойные кости)',
+  'hudChrome.finder.mech.crypt_brides_lament':
+    'Плач невесты (каждые 22 секунды 3-секундный вопль: 60–75 урона от холода на обычной сложности всем вне света горящего могильного фонаря, и ещё половина за каждый заряд Затяжного плача от уже пережитых Плачей. Фонарь укрывает не больше двух игроков и гаснет на 28 секунд, укрыв кого-то, так что разделяйтесь и чередуйтесь)',
+  'hudChrome.finder.mech.crypt_frozen_embrace':
+    'Ледяные объятия (каждые 30 секунд она хватает игрока, не танка, и поднимается с ним на 5 ярдов в воздух, 6 урона от холода в секунду: снимите 6% её здоровья за 8 секунд, и она опустит его, иначе она его уронит, 150–180 урона на обычной сложности)',
+  'hudChrome.finder.mech.crypt_rime_path':
+    'Инеистая тропа (там, где она проплывает, на 25 секунд остаётся скользкий иней: на нём разгоняешься медленно и продолжаешь скользить, когда останавливаешься или поворачиваешь)',
+  'hudChrome.finder.mech.crypt_bridal_freeze':
+    'Свадебная стужа (на половине здоровья весь пол ущелья замерзает: скользкий лёд до конца боя)',
+  'hudChrome.finder.mech.crypt_lady_heroic':
+    'Героический: каждый горящий фонарь ещё и сам гаснет через 30 секунд на 10 секунд, а Ледяные объятия хватают двух игроков',
+  'hudChrome.finder.mech.crypt_dirge_of_the_hollow':
+    'Погребальная песнь Пустоты (каждые 16 секунд 2,5-секундная песнь, которую можно прервать: если она её допоёт, 105–125 урона от тьмы на обычной сложности и немота на 4 секунды всем в пределах 45 ярдов, кто её видит, так что прерывайте или прячьтесь за колоннами хора)',
+  'hudChrome.finder.mech.crypt_harmony':
+    'Гармония (каждый живой Хорист уменьшает получаемый ею урон на 30%: сначала убейте Хористов)',
+  'hudChrome.finder.mech.crypt_bone_organ':
+    'Костяной орган (каждые 26 секунд она играет на Костяном органе: две волны теневых нот взрываются полосами по полу хоров, 100–115 урона в полосе на обычной сложности, вторая волна заполняет промежутки первой)',
+  'hudChrome.finder.mech.crypt_crescendo':
+    'Крещендо (ниже 30 процентов здоровья её Песнь длится 1,8 секунды и звучит каждые 11 секунд, а орган играет третью волну)',
+  'hudChrome.finder.mech.crypt_ilvane_heroic':
+    'Героический: Бис (Хорист, пролежавший мёртвым 10 секунд, пока второй ещё стоит, поднимается снова, так что убивайте их вместе) и Непрерывный стих (каждую третью Песнь нельзя прервать: прячьтесь)',
   'hudChrome.finder.mech.reaping_arc': 'Жатвенная дуга (рассекающий удар спереди)',
   'hudChrome.finder.mech.mist_surge': 'Волна тумана (периодический урон по области)',
   'hudChrome.finder.mech.summons_adds': 'Призывает подкрепления',
   'hudChrome.finder.mech.lunar_tide': 'Лунный прилив (периодический урон по области)',
+  'hudChrome.finder.mech.chorus_and_solo':
+    'Хор и соло (соберитесь у одной метки, разойдитесь от другой)',
+  'hudChrome.finder.mech.tideglass_reflections':
+    'Отражения Приливного стекла (убивайте отражения друг друга)',
+  'hudChrome.finder.mech.rising_tide':
+    'Прилив (затапливает половину острова, переходите на сухую сторону)',
+  'hudChrome.finder.mech.undertow': 'Отбойное течение (притягивает всех, убегайте до удара)',
   'hudChrome.finder.mech.enrage': 'Приходит в ярость при низком здоровье',
   'hudChrome.finder.mech.shuddering_stomp': 'Сотрясающий топот (оглушение по области)',
   'hudChrome.finder.mech.grave_inferno':
@@ -13096,6 +13166,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Бессмертный двор (только на героическом, королевский двор восстаёт после Бессмертной ярости)',
   'hudChrome.finder.mech.bloodmane_rend': 'Кровавый разрыв (кровотечение, следите за сменой цели)',
   'hudChrome.finder.mech.tusk_sweep': 'Удар бивнями (рассекающий удар спереди)',
+  'hudChrome.finder.mech.grave_breath':
+    'Могильное дыхание (конус огня спереди, раскалывает лёд под собой)',
+  'hudChrome.finder.mech.plate_floor':
+    'Ломкий лёд (его огонь раскалывает и топит плиты озера, не заходите в открытую воду)',
+  'hudChrome.finder.mech.wyrm_flights':
+    'Полёты (на 70% и 40%: несите Око змея на целый лёд, соберитесь там, где он должен приземлиться)',
   'hudChrome.finder.mech.ancestral_sap': 'Соки предков (лечит союзников)',
   'hudChrome.finder.mech.call_of_the_hunt': 'Зов охоты (ускоряет союзников поблизости)',
   'hudChrome.finder.mech.thickhide_ward': 'Толстокожая защита (щит для союзников поблизости)',
@@ -14262,7 +14338,29 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.wildheart_ravager.name': 'Разоритель Кровавой Гривы',
   'entities.mobs.wildheart_hexcaller.name': 'Заклинатель Солнечной Кости',
   'entities.mobs.wildheart_beastmaster.name': 'Повелитель клыков',
+  'entities.mobs.the_gorgebloom.name': 'Цветожор',
+  'entities.mobs.fanglord_jaguar.name': 'Великий ягуар Повелителя клыков',
+  'entities.mobs.howdah_hexcaller.name': 'Заклинатель с паланкина',
+  'entities.mobs.great_saurian.name': 'Великий завр',
+  'entities.mobs.vine_lasher.name': 'Хлестун спутанной лозы',
+  'entities.mobs.spore_toad.name': 'Спороносная жаба',
+  'entities.mobs.basin_raptor.name': 'Котловинный раптор',
+  'entities.mobs.sunbone_totem.name': 'Тотем Солнечной Кости',
+  'entities.mobs.sunbone_totem_binder.name': 'Связыватель тотемов Солнечной Кости',
+  'entities.mobs.sunbone_dread_totem.name': 'Тотем ужаса Солнечной Кости',
   'entities.mobs.wildheart_high_priest.name': 'Зулгар, Голос Котловины',
+  'entities.mobs.broodsworn_thawcaller.name': 'Талоклич Клятвы Выводка',
+  'entities.mobs.broodsworn_goadsmith.name': 'Кузнец-погонщик Клятвы Выводка',
+  'entities.mobs.broodsworn_pyre_tender.name': 'Хранитель костров Клятвы Выводка',
+  'entities.mobs.soul_brazier.name': 'Жаровня душ',
+  'entities.mobs.rime_whelp.name': 'Изморозный дракончик',
+  'entities.mobs.ogre_sledge_hauler.name': 'Огр-тягач саней',
+  'entities.mobs.glacier_splinter.name': 'Осколок ледника',
+  'entities.mobs.sledge_tusker.name': 'Санный бивнерог',
+  'entities.mobs.sanctum_shackle_hammer.name': 'Оковы Молота',
+  'entities.mobs.sanctum_shackle_tongs.name': 'Оковы Клещей',
+  'entities.mobs.sanctum_shackle_anvil.name': 'Оковы Наковальни',
+  'entities.mobs.sanctum_shackle_bellows.name': 'Оковы Мехов',
   'entities.mobs.apprentice_wren.name': 'Ученица Рен',
   'entities.mobs.barrow_wight.name': 'Курганное умертвие',
   'entities.mobs.castaway_navigator.name': 'Штурман Сули',
@@ -14278,7 +14376,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.the_meredark.name': 'Озёрный Мрак',
   'entities.dungeons.wildheart_basin.name': 'Котловина Дикого Сердца',
   'entities.dungeons.wildheart_basin.enterText':
-    'Тёплый дождь шипит на древнем камне. Перед вами открывается Котловина Дикого Сердца.',
+    'Вы проходите сквозь пасть идола на уступ высоко над котловиной. С края скал грохочут водопады, а далеко внизу что-то огромное бредёт через брод.',
   'entities.dungeons.wildheart_basin.leaveText':
     'Вы проходите под каменными клыками и возвращаетесь к солнцу Палмрича.',
   'entities.dungeons.the_last_keep.name': 'Последний оплот',
@@ -19978,4 +20076,728 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Время применения Хватких корней сокращается на 0,5 сек.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'После применения Хватких корней вы можете произносить заклинания на ходу, а ваша скорость передвижения повышается на 20% на 4 сек. Срабатывает не чаще одного раза в 20 сек.',
+  // The Hollow Crypt rework (M16 non-Latin fills for its new names).
+  'entities.items.gravedirt_treads.name': 'Сапоги могильной земли',
+  'entities.items.bellrope_girdle.name': 'Пояс из колокольной верёвки',
+  'entities.items.sextons_spadehaft.name': 'Черенок лопаты пономаря',
+  'entities.items.rimesilk_mantle.name': 'Наплечье из инейного шёлка',
+  'entities.items.bonechill_carapace_vest.name': 'Кольчуга костяного холода',
+  'entities.items.rimeweb_hunters_leggings.name': 'Поножи с инеистой шнуровкой',
+  'entities.items.rimeweb_fang.name': 'Сосулька невесты',
+  'entities.items.cantors_cassock.name': 'Ряса кантора',
+  'entities.items.choirward_leggings.name': 'Поножи хорового стража',
+  'entities.items.choristers_gloves.name': 'Перчатки хориста',
+  'entities.items.cantors_hymnal.name': 'Псалтырь кантора',
+  'entities.items.gravecallers_vestments.name': 'Облачение Могильного Зова',
+  'entities.items.unquiet_stalkers_hood.name': 'Капюшон неупокоенного следопыта',
+  'entities.items.sextons_burial_spade.name': 'Погребальная лопата пономаря',
+  'entities.items.rimesilk_hood.name': 'Капюшон из инейного шёлка',
+  'entities.items.knight_commanders_longsword.name': 'Длинный меч рыцаря-командора',
+  'entities.items.gaolers_chain_girdle.name': 'Цепной пояс тюремщика',
+  'entities.items.rusted_shackle_grips.name': 'Перчатки с ржавыми кандалами',
+  'entities.items.drowned_wardens_mantle.name': 'Мантия утонувшего стража',
+  'entities.items.gaolyard_cudgel.name': 'Дубинка тюремного двора',
+  'entities.items.drowned_commanders_breastplate.name': 'Нагрудник утонувшего командира',
+  'entities.items.gaolyard_striders.name': 'Сапоги тюремного двора',
+  'entities.items.gaolers_iron_key.name': 'Железный ключ тюремщика',
+  'entities.items.conchplate_girdle.name': 'Пояс из раковинных пластин',
+  'entities.items.pale_chorus_leggings.name': 'Поножи Бледного хора',
+  'entities.items.refrain_silk_gloves.name': 'Шёлковые перчатки припева',
+  'entities.items.chorus_conch.name': 'Раковина хора',
+  'entities.items.tideglass_pauldrons.name': 'Наплечники Приливного стекла',
+  'entities.items.moonburn_treads.name': 'Ступни лунного ожога',
+  'entities.items.prism_etched_cowl.name': 'Капюшон с призменной гравировкой',
+  'entities.items.tideglass_shiv.name': 'Заточка Приливного стекла',
+  'entities.items.pale_chorus_vestment.name': 'Облачение Бледного хора',
+  'entities.items.tideglass_warmaul.name': 'Боевой молот Приливного стекла',
+  'hudChrome.trinkets.use.shackle':
+    'Сковывает цель в пределах {range} м на месте на {duration} сек. Существо, невосприимчивое к контролю (например, босс), вместо этого замедляется на {slow}%, если оно не невосприимчиво и к замедлению.',
+  'hudChrome.auraEffect.trinket.shackle': 'Скован цепью: не может двигаться.',
+  'hudChrome.auraEffect.trinket.shackleSlow':
+    'Скован цепью: скорость передвижения снижена на {pct}%.',
+  'entities.mobs.ossuary_sentinel.name': 'Страж оссуария',
+  'entities.mobs.hollow_gravedigger.name': 'Могильщик Пустоты',
+  'entities.mobs.rimeweb_hatchling.name': 'Паучок Инеистой Паутины',
+  'entities.mobs.rimeweb_spinner.name': 'Прядильщица Инеистой Паутины',
+  'entities.mobs.candlewright_acolyte.name': 'Послушник-свечник',
+  'entities.mobs.hollow_chorister.name': 'Хорист Пустоты',
+  'entities.mobs.bound_soul.name': 'Связанная душа',
+  'entities.mobs.rimeweb.name': 'Госпожа Костяного Холода',
+  'entities.mobs.cantor_ilvane.name': 'Кантор Ильвейн',
+  'entities.mobs.rime_egg_sac.name': 'Инеистый кокон с яйцами',
+  // The Hollow Crypt trash (M16 non-Latin fills for its new names).
+  'abilityUi.cast.crypt_grave_bolt': 'Могильная стрела',
+  'abilityUi.cast.crypt_raise_bones': 'Подъём костей',
+  'abilityUi.cast.crypt_murder_call': 'Зов стаи',
+  'abilityUi.cast.crypt_stone_shriek': 'Каменный вопль',
+  'abilityUi.cast.crypt_grave_cleave': 'Могильный размах',
+  'abilityUi.cast.crypt_barrowflame_breath': 'Дыхание курганного пламени',
+  'abilityUi.cast.crypt_tail_lash': 'Удар хвостом',
+  'abilityUi.cast.crypt_wing_gust': 'Порыв крыльев',
+  'abilityUi.cast.crypt_grave_rupture': 'Разрыв могилы',
+  'abilityUi.cast.crypt_carrion_eye': 'Око падальщика',
+  'abilityUi.cast.crypt_marrow_crush': 'Костодробящий удар',
+  'abilityUi.cast.crypt_rimesilk_spit': 'Плевок инейным шёлком',
+  'abilityUi.cast.bastion_brine_mend': 'Целительный рассол',
+  'abilityUi.cast.bastion_fog_ward': 'Туманный оберег',
+  'abilityUi.cast.bastion_halberd_sweep': 'Размах алебарды',
+  'abilityUi.cast.bastion_piercing_bolt': 'Пронзающий болт',
+  'abilityUi.cast.bastion_claw_sweep': 'Взмах клешни',
+  'abilityUi.cast.bastion_shell_slam': 'Удар панцирем',
+  'abilityUi.cast.bastion_boathook': 'Рывок багром',
+  'abilityUi.cast.bastion_fog_bank': 'Полоса тумана',
+  'abilityUi.cast.bastion_brine_column': 'Столб рассола',
+  'abilityUi.cast.bastion_oathbound_charge': 'Клятвенный натиск',
+  'abilityUi.cast.bastion_gaolers_cudgel': 'Дубинка тюремщика',
+  'abilityUi.cast.bastion_mist_surge': 'Туманный прилив',
+  'abilityUi.cast.bastion_drowning_hymn': 'Гимн утопленников',
+  'abilityUi.cast.temple_lullaby': 'Колыбельная',
+  'abilityUi.cast.temple_call_the_tide': 'Зов прилива',
+  'abilityUi.cast.temple_static_coil': 'Статический виток',
+  'abilityUi.cast.temple_snapper_snap': 'Укус',
+  'abilityUi.cast.temple_trident_sweep': 'Взмах трезубца',
+  'abilityUi.cast.temple_sea_song': 'Песнь моря',
+  'abilityUi.cast.temple_tidal_slap': 'Приливная пощёчина',
+  'abilityUi.cast.temple_tide_breath': 'Леденящее дыхание',
+  'abilityUi.cast.temple_moonlight_lance': 'Копьё лунного света',
+  'abilityUi.cast.temple_prism_flare': 'Вспышка призмы',
+  'abilityUi.cast.temple_resonant_slam': 'Резонирующий удар',
+  'abilityUi.cast.temple_moonwater_bolt': 'Стрела лунной воды',
+  'abilityUi.cast.temple_drowning_aria': 'Ария утопления',
+  'abilityUi.cast.temple_mere_surge': 'Вал из озера',
+  'abilityUi.cast.temple_tideglass_fracture': 'Трещина Приливного стекла',
+  'abilityUi.cast.temple_undertow': 'Отбойное течение',
+  'abilityUi.cast.temple_lunar_tide': 'Лунный прилив',
+  'abilityUi.cast.temple_skewering_trident': 'Пронзающий трезубец',
+  'abilityUi.cast.temple_pale_mending': 'Бледное исцеление',
+  'abilityUi.cast.temple_glimmer_venom': 'Мерцающий яд',
+  'abilityUi.cast.temple_pearl_slam': 'Приливный взмах крыльев',
+  'abilityUi.cast.temple_frostlocked_torrent': 'Скованный льдом поток',
+  'abilityUi.cast.temple_venom_current': 'Ядовитое течение',
+  'abilityUi.cast.temple_toxic_rime': 'Ядовитая изморозь',
+  'abilityUi.cast.temple_beckoning_moon': 'Зов луны',
+  'abilityUi.cast.temple_falling_moon': 'Падающая луна',
+  'abilityUi.cast.temple_lightning_spit': 'Молниевый плевок',
+  'abilityUi.cast.temple_crushing_torrent': 'Сокрушительный поток',
+  'abilityUi.cast.temple_hydra_tsunami': 'Цунами',
+  'abilityUi.cast.temple_ysolei_call': 'Зов лунного отродья',
+  'abilityUi.cast.temple_ysolei_wrath': 'Утопленный гнев',
+  'abilityUi.cast.temple_prism_glare': 'Взор призмы',
+  'abilityUi.cast.temple_arcing_spark': 'Дуговая искра',
+  'abilityUi.cast.crypt_gravespark_volley': 'Залп могильных искр',
+  'abilityUi.cast.bastion_loose_on_my_mark': 'Огонь по моей метке',
+  'abilityUi.cast.temple_call_of_the_shallows': 'Зов отмелей',
+  'entities.mobs.crypt_ossuary_warrior.name': 'Воин оссуария',
+  'entities.mobs.crypt_gravecaller_adept.name': 'Адепт Могильного Зова',
+  'entities.mobs.crypt_ossuary_cutthroat.name': 'Головорез оссуария',
+  'entities.mobs.crypt_gravecaller_necromancer.name': 'Некромант Могильного Зова',
+  'entities.mobs.crypt_bone_minion.name': 'Костяной прислужник',
+  'entities.mobs.crypt_bone_brute.name': 'Костяной громила',
+  'entities.mobs.crypt_bone_pile.name': 'Шевелящиеся кости',
+  'entities.mobs.crypt_chapel_gargoyle.name': 'Часовенная горгулья',
+  'entities.mobs.crypt_crow_caller.name': 'Зовущий воронов',
+  'entities.mobs.crypt_carrion_crow.name': 'Ворон-падальщик',
+  'entities.mobs.crypt_ossuary_drake.name': 'Костяной дракон оссуария',
+  // The Hollow Crypt finale (M16 non-Latin fills for its new names).
+  'abilityUi.cast.crypt_morthen_rite_wakes': 'Пробуждение обряда',
+  'abilityUi.cast.crypt_morthen_rise': 'Восход Могильного Зова',
+  'abilityUi.cast.crypt_morthen_proclaim': 'Могильное воззвание',
+  'abilityUi.cast.crypt_morthen_descend': 'Нисхождение',
+  'abilityUi.cast.crypt_knellwyrm_arrive': 'Спуск с небес',
+  'abilityUi.cast.crypt_knellwyrm_pyre_strafe': 'Погребальный налёт',
+  'abilityUi.cast.crypt_knellwyrm_strafe_run': 'Огненный заход',
+  'abilityUi.cast.crypt_knellwyrm_dread_bellow': 'Жуткий рёв',
+  'abilityUi.cast.crypt_marrow_shovelful': 'Полная лопата',
+  'abilityUi.cast.crypt_marrow_measure': 'Мерка для могилы',
+  'abilityUi.cast.crypt_marrow_burial_toll': 'Погребальный звон',
+  'abilityUi.cast.crypt_marrow_gravediggers_blow': 'Удар могильщика',
+  'abilityUi.cast.crypt_lady_brides_lament': 'Плач невесты',
+  'abilityUi.cast.crypt_lady_frozen_embrace': 'Ледяные объятия',
+  'abilityUi.cast.crypt_lady_embrace_hold': 'Ледяные объятия',
+  'abilityUi.cast.crypt_lady_bridal_freeze': 'Свадебная стужа',
+  'abilityUi.cast.crypt_ilvane_dirge': 'Погребальная песнь Пустоты',
+  'abilityUi.cast.crypt_ilvane_unbroken_dirge': 'Непрерывный стих',
+  'abilityUi.cast.crypt_ilvane_bone_organ': 'Костяной орган',
+  'entities.mobs.crypt_knellwyrm.name': 'Погребальный змий',
+  // The Sunken Bastion fifth pass (M16 non-Latin fills for its new names).
+  'abilityUi.cast.bastion_iron_cage': 'Железная клетка',
+  'abilityUi.cast.bastion_drowned_anchor_cast': 'Утопленный якорь',
+  'abilityUi.cast.bastion_shackle_pair': 'Парные кандалы',
+  'abilityUi.cast.bastion_shadowstep': 'Переход сквозь тень',
+  'abilityUi.cast.bastion_reaping_scythe': 'Жнущая коса',
+  'abilityUi.cast.bastion_veil_rise': 'Туманная завеса',
+  'abilityUi.cast.bastion_veil_gather': 'Сгущение тумана',
+  'abilityUi.cast.bastion_vael_rise': 'Смерть восстаёт',
+  'abilityUi.cast.bastion_vael_sink': 'В туман',
+  'abilityUi.cast.bastion_hallowed_brine': 'Освящённый рассол',
+  'abilityUi.cast.bastion_rebounding_bulwark': 'Отскакивающий щит',
+  'abilityUi.cast.bastion_tide_sentence': 'Приговор прилива',
+  'abilityUi.cast.bastion_oath_kneel': 'Нерушимая клятва',
+  'abilityUi.cast.bastion_oath_vigil': 'Нерушимая клятва',
+  'entities.mobs.bastion_gaol_cage.name': 'Железная клетка',
+  'entities.mobs.bastion_drowned_anchor.name': 'Утопленный якорь',
+  'entities.items.jailers_iron_gauntlets.name': 'Железные рукавицы тюремщика',
+  'entities.items.turnkeys_keyring_belt.name': 'Пояс со связкой ключей надзирателя',
+  'entities.items.turnkeys_lantern_cowl.name': 'Капюшон надзирателя с фонарём',
+  'hudChrome.finder.mech.iron_cage':
+    'Железная клетка (жмите клавишу взаимодействия, чтобы вырваться; союзники могут ломать прутья)',
+  'hudChrome.finder.mech.drowned_anchor':
+    'Утопленный якорь (жертву подтягивает к яме: добегите на 3 ярда к горящему швартовому столбу, чтобы пришвартовать цепь, столб гаснет на 30 секунд, или разбейте цепь 12 ударами, 16 в героическом режиме)',
+  'hudChrome.finder.mech.shackle_pair':
+    'Парные кандалы (двое скованных игроков должны держаться вместе)',
+  'hudChrome.finder.mech.hallowed_brine':
+    'Освящённый рассол (лужа тёмной святой воды радиусом 9 ярдов, 10 в героическом режиме: 18 урона в секунду всем внутри, 26 в героическом, а он получает на 40 процентов меньше урона, пока стоит в ней: вытащите его)',
+  'hudChrome.finder.mech.rebounding_bulwark':
+    'Отскакивающий щит (щит отскакивает к ближайшему игроку в 10 метрах от последнего поражённого, до 3 игроков, 4 в героике: рассредоточьтесь)',
+  'hudChrome.finder.mech.tide_sentence':
+    'Приговор прилива (через 5 секунд после метки столп света бьёт всех в 6 метрах от отмеченного, 8 в героике: примите его вдали от группы)',
+  'hudChrome.finder.mech.unbroken_oath':
+    'Нерушимая клятва (один раз, на половине здоровья, он до 60 секунд неуязвим в пузыре: убейте его солдат, затем он оглушён на 4 секунды и 10 секунд получает на 20 процентов больше урона)',
+  'hudChrome.finder.mech.fog_veil':
+    'Туманная завеса (четыре фигуры, одна настоящая: в луче маяка фонарь настоящего Ваэля вспыхивает)',
+  'hudChrome.finder.mech.reaper_behind':
+    'Переход сквозь тень (трижды подряд встаёт за спиной игрока, каждый раз другого, пока хватает игроков: выйдите из дуги косы)',
+  'hudChrome.bastionCage.title': 'Вы заперты в железной клетке!',
+  'hudChrome.bastionCage.promptKey': 'Жмите {key} снова и снова, чтобы вырваться',
+  'hudChrome.bastionCage.promptNoKey':
+    'Жмите клавишу взаимодействия снова и снова, чтобы вырваться',
+  'hudChrome.bastionCage.promptClick': 'Щёлкайте здесь снова и снова, чтобы вырваться',
+  'hudChrome.bastionCage.promptTap': 'Нажимайте сюда снова и снова, чтобы вырваться',
+  'hudChrome.bastionCage.buttonAria': 'Вырваться из железной клетки',
+  'hudChrome.bastionCage.progressAria': 'Прогресс побега: {pct}',
+  'hudChrome.bastionChain.anchoredTitle': 'Прикован к Утопленному якорю!',
+  'hudChrome.bastionChain.anchoredLine':
+    'Бегите к горящему швартовому столбу, чтобы пришвартовать цепь, или пусть группа разобьёт её, пока лебёдка не утащила вас в яму',
+  'hudChrome.bastionChain.allyTitle': 'Разбейте цепь!',
+  'hudChrome.bastionChain.allyLine':
+    '{name} тащат к яме: бейте Утопленный якорь или помогите добежать до горящего столба',
+  'hudChrome.auraEffect.bastion.anchored':
+    'Прикованы к Утопленному якорю: двигаться можно, но не дальше от лебёдки, которая подтягивает вас к яме. Подойдите на {reach} ярда к горящему швартовому столбу не ближе {run} ярдов от места, где вас зацепило, чтобы пришвартовать цепь (этот столб гаснет на {dark} сек.), или пусть группа разобьёт её за {links} ударов ({linksHeroic} в героическом режиме). Яма отнимает {pit}% максимального здоровья ({pitHeroic}% в героическом режиме).',
+  'hudChrome.auraEffect.bastion.brineColumn':
+    'Вас сковал столб морской воды: вы получаете {min}-{max} ед. урона от сил природы каждые {tick} сек. в течение {seconds} сек. Прервите или оглушите Приливного послушника, чтобы освободиться.',
+  'hudChrome.auraEffect.bastion.halberdWall':
+    'Получает на {pct}% меньше урона, пока в пределах {radius} ярд. стоит другой Утонувший дозорный. Разведите их.',
+  'hudChrome.auraEffect.bastion.fogShroud':
+    'Получает на {pct}% меньше урона, пока стоит в полосе тумана. Вытащите его из тумана.',
+  'hudChrome.auraEffect.bastion.carrionGlut':
+    'Поглотил мертвецов ({stacks} из {max}): каждый заряд увеличивает радиус высвобождения душ на {radius} ярд. и урон на {pct}%.',
+  'hudChrome.auraEffect.bastion.snappedFetters':
+    'Его цепи разорваны. Он больше не сражается, неуязвим и скоро уйдёт.',
+  'hudChrome.auraEffect.crypt.carrionEye':
+    'Все вороны в бою охотятся на вас {seconds} сек. Бегите к танку, чтобы стаю можно было убить разом.',
+  'hudChrome.auraEffect.crypt.graniteSkin':
+    'Получает на {pct}% меньше урона, и камень утолщается каждые {every} сек., до {max} слоёв. Оглушение раскалывает его, и цель {seconds} сек. получает на {cracked}% больше урона.',
+  'hudChrome.bastionChain.shackledTitle': 'Скован с {name}',
+  'hudChrome.bastionChain.shackledLine':
+    'Держитесь в пределах {range} ярдов друг от друга (сейчас {dist} ярдов)',
+  'hudChrome.bastionChain.strainedLine':
+    'Слишком далеко! Цепь ранит обоих: сойдитесь ближе {range} ярдов',
+  'hudChrome.bastionChain.brokenAria': 'Цепь разбита: {pct}',
+  'hudChrome.bastionChain.reachAria': 'Натяжение цепи: {pct}',
+  'hudChrome.bastionChain.linksLeft': 'Осталось звеньев цепи: {count} из {total}',
+  'hudChrome.bastionChain.linkRule':
+    'Каждый удар по якорю разбивает одно звено, как бы силён он ни был',
+  'hudChrome.bastionChain.linksTarget': 'Звеньев: {count} из {total}',
+  'hudChrome.bastionChain.linkBroken': 'Звено разбито!',
+  'entities.items.beastpit_warbelt.name': 'Боевой пояс звериных ям',
+  'entities.items.jaguar_hide_jerkin.name': 'Куртка из шкуры ягуара',
+  'entities.items.hexbone_handwraps.name': 'Обмотки из заклятой кости',
+  'entities.items.rootbound_sabatons.name': 'Сабатоны, оплетённые корнями',
+  'entities.items.pollen_dusted_leggings.name': 'Поножи в пыльце',
+  'entities.items.bloomsilk_cowl.name': 'Капюшон из цветочного шёлка',
+  'entities.items.falls_blessed_staff.name': 'Посох, благословлённый водопадами',
+  'entities.items.fanglords_hide_mantle.name': 'Кожаная мантия Повелителя клыков',
+  'entities.items.thornroot_greathelm.name': 'Великий шлем в терновом венце',
+  'entities.items.fanglords_whistle.name': 'Свисток Повелителя клыков',
+  'entities.items.gorgebloom_seedpod.name': 'Семенная коробочка Цветожора',
+  'hudChrome.trinkets.use.spiritPack':
+    'Призывает духа-ягуара, который сражается рядом с вами {duration} сек. Он бежит к вашей цели и кусает её каждые {every} сек., нанося от {min} до {max} ед. физического урона, и переключается на любого другого врага, которого вы выберете целью. Если враг не выбран, он атакует ближайшего к вам врага в радиусе {range} м. Урон растёт с силой атаки или силой дальнего боя (большей из них) и фиксируется при призыве. Требуется враждебная цель в пределах {range} м.',
+  'hudChrome.trinkets.use.seedburst':
+    'Сажает семя на вашу цель в пределах {range} м. Через {delay} сек. оно лопается там, где стоит цель (или где она погибла), нанося {damage} ед. урона от сил природы каждому врагу в радиусе {radius} м, или на {bonus}% больше ({empowered}), если цель погибла раньше. Урон растёт с силой заклинаний и фиксируется при посадке. Если вы погибнете до того, как семя лопнет, оно засохнет.',
+  'hudChrome.auraEffect.trinket.spiritPack':
+    'Дух-ягуар сражается рядом с вами, кусая вашу цель каждые {every} сек. и нанося от {min} до {max} ед. физического урона.',
+  'hudChrome.auraEffect.trinket.seedburst':
+    'Семя Цветожора. Когда эффект закончится, оно лопнет, нанося {damage} ед. урона от сил природы каждому врагу в радиусе {radius} м, или на {bonus}% больше ({empowered}), если этот враг погибнет раньше.',
+  'entities.items.foremans_grips.name': 'Рукавицы бригадира',
+  'entities.items.serac_stride_boots.name': 'Сапоги ледяных зубцов',
+  'entities.items.seal_rune_mantle.name': 'Мантия печатных рун',
+  'entities.items.thawbound_legguards.name': 'Поножи талых оков',
+  'entities.items.pyre_tenders_hood.name': 'Капюшон хранителя костра',
+  'entities.items.meltwater_cord.name': 'Шнур талой воды',
+  'entities.items.hammer_of_the_open_lock.name': 'Молот отпертого замка',
+  'entities.items.vestments_of_the_waking_rite.name': 'Облачение обряда пробуждения',
+  'entities.items.foremans_last_link.name': 'Последнее звено бригадира',
+  'entities.items.phial_of_the_tithe.name': 'Фиал десятины',
+  'entities.items.quenchwater_flask.name': 'Фляга закалочной воды',
+  'hudChrome.trinkets.use.tether':
+    'Приковывает вас цепью к дружественному игроку в пределах {range} м на {duration} сек. {share}% урона, который дошёл бы до его здоровья, вместо этого получаете вы. Действие прекращается досрочно, если вы погибнете. Требуется целью дружественный игрок, отличный от вас.',
+  'hudChrome.trinkets.use.harvest':
+    'В течение {duration} сек. каждое враждебное существо, погибшее в радиусе {radius} м от вас, восполняет {pct}% вашего максимального здоровья ({health}) и {pct}% вашей максимальной маны.',
+  'hudChrome.trinkets.use.quench':
+    'Ваши следующие {hits} попаданий оружием ближнего или дальнего боя в течение {duration} сек. наносят дополнительно {damage} ед. урона от магии льда. Последнее из них также закаляет цель, замедляя её атаки на {slow}% на {slowDuration} сек. Неиспользованные попадания пропадают по окончании эффекта. Урон растёт с силой атаки или силой дальнего боя (большей из них).',
+  'hudChrome.auraEffect.trinket.tether':
+    'Скован Последним звеном бригадира: {pct}% урона, который дошёл бы до вашего здоровья, вместо этого получает тот, кто вас приковал.',
+  'hudChrome.auraEffect.trinket.tetherLink':
+    'Вы получаете {pct}% урона, который получил бы прикованный к вам союзник.',
+  'hudChrome.auraEffect.trinket.harvest':
+    'Каждое враждебное существо, погибшее в радиусе {radius} м от вас, восполняет {pct}% вашего максимального здоровья и маны.',
+  'hudChrome.auraEffect.trinket.quench':
+    'Ваши следующие {stacks} попаданий оружием наносят дополнительно {damage} ед. урона от магии льда. Последнее замедляет атаки цели на {slow}%.',
+  'hudChrome.auraEffect.trinket.quenchOther':
+    'Следующие {stacks} попаданий оружием наносят дополнительный урон от магии льда. Последнее замедляет атаки цели на {slow}%.',
+  'hudChrome.auraEffect.trinket.quenched': 'Скорость атаки снижена на {pct}%.',
+  'abilityUi.cast.wildheart_ancestral_sap': 'Сок предков',
+  'abilityUi.cast.wildheart_plant_totem': 'Установка тотема',
+  'abilityUi.cast.wildheart_entangling_lash': 'Опутывающий хлыст',
+  'abilityUi.cast.wildheart_saurian_tail_swipe': 'Удар хвостом',
+  'abilityUi.cast.wildheart_saurian_stomp': 'Сотрясающий топот',
+  'abilityUi.cast.wildheart_beast_pit_quake': 'Сотрясение звериных ям',
+  'abilityUi.cast.wildheart_jaguar_heel': 'К ноге!',
+  'abilityUi.cast.wildheart_gorgebloom_seed_rain': 'Семенной дождь',
+  'abilityUi.cast.wildheart_gorgebloom_vine_lash': 'Удар лозы',
+  'abilityUi.cast.wildheart_gorgebloom_gorge': 'Пожирание',
+  'abilityUi.cast.wildheart_zulgar_pulse': 'Импульс Дикого Сердца',
+  'abilityUi.cast.wildheart_zulgar_spirit_hunt': 'Дух охоты',
+  'abilityUi.cast.wildheart_quarry_mark': 'Метка добычи',
+  'abilityUi.cast.wildheart_war_roar': 'Боевой рёв',
+  'abilityUi.cast.wildheart_toad_hex': 'Жабья порча',
+  'abilityUi.cast.wildheart_rattling_dread': 'Гремящий ужас',
+  'abilityUi.cast.wildheart_snaring_tongue': 'Ловчий язык',
+  'abilityUi.cast.sanctum_cinder_breath': 'Пепельное дыхание',
+  'abilityUi.cast.sanctum_warming_rite': 'Обряд согревания',
+  'abilityUi.cast.sanctum_goad': 'Подстрекательство',
+  'abilityUi.cast.sanctum_plant_brazier': 'Установить жаровню душ',
+  'abilityUi.cast.sanctum_ice_block_toss': 'Бросок ледяной глыбы',
+  'abilityUi.cast.sanctum_tusker_tusk_sweep': 'Взмах бивнями',
+  'abilityUi.cast.sanctum_korzul_break_free': 'Вырваться на волю',
+  'abilityUi.cast.sanctum_korzul_grave_breath': 'Могильное дыхание',
+  'abilityUi.cast.sanctum_korzul_tail_sweep': 'Взмах хвостом',
+  'abilityUi.cast.sanctum_korzul_grave_inferno': 'Могильное пекло',
+  'abilityUi.cast.sanctum_korzul_wing_gale': 'Порыв крыльев',
+  'abilityUi.cast.sanctum_korzul_plunging_fire': 'Низвергающийся огонь',
+  'abilityUi.cast.sanctum_korzul_crashing_descent': 'Сокрушительное падение',
+  'abilityUi.cast.sanctum_tusker_trample': 'Растаптывание',
+  'abilityUi.cast.sanctum_counterweight_lash': 'Удар хвостом-противовесом',
+  'abilityUi.cast.sanctum_branding_iron': 'Клеймо',
+  'abilityUi.cast.sanctum_rime_breath': 'Изморозное дыхание',
+  'abilityUi.cast.kituse_sanctum_topple_brazier': 'Опрокинуть жаровню',
+  'abilityUi.cast.sanctum_korgath_maul_arc': 'Дуга кувалды',
+  'abilityUi.cast.sanctum_korgath_chain_flail': 'Цепной хлыст',
+  'abilityUi.cast.sanctum_korgath_threshold_charge': 'Рывок через порог',
+  'abilityUi.cast.sanctum_korgath_foremans_bellow': 'Рёв бригадира',
+  'abilityUi.cast.sanctum_korgath_strain': 'Натяжение',
+  'abilityUi.cast.sanctum_korgath_stomp': 'Сотрясающий топот',
+  'abilityUi.cast.sanctum_goadsmith_rerivet': 'Переклёпка',
+  'abilityUi.cast.sanctum_velkhar_soulfire_trench': 'Траншея душевного огня',
+  'abilityUi.cast.sanctum_velkhar_shadow_volley': 'Залп тьмы',
+  'hudChrome.finder.mech.waking_thaw':
+    'Пробуждающая оттепель (мертвецы выбираются из талых прудов)',
+  'hudChrome.finder.mech.unquenched_held':
+    'Скованные или Неугасшие (убивайте мертвецов на холодном льду, никогда в талой воде)',
+  'hudChrome.finder.mech.soulfire_trench':
+    'Траншея душевного огня (линия душевного огня, затем полоса талой воды)',
+  'hudChrome.finder.mech.shadow_volley': 'Залп тьмы (урон тьмой по всем)',
+  'hudChrome.finder.mech.warm_hands_twice_woken':
+    'Тёплые руки и Дважды пробуждённые (только героический режим: не давайте мертвецам стоять; восставший возвращается сильнее)',
+  'entities.mobs.thorn_sprout.name': 'Терновый росток',
+  'hudChrome.finder.mech.pack_bond':
+    'Узы стаи (вместе получают вдвое меньше урона: разведите их на 15 ярдов)',
+  'hudChrome.finder.mech.stalk':
+    'Выслеживание (ягуар охотится на отмеченного, но не на танка; в одиночку он охотится на вас: уводите его, замедляйте, обездвиживайте, оглушайте)',
+  'hudChrome.finder.mech.shared_health': 'Общее здоровье (один запас: бейте того, кого безопаснее)',
+  'hudChrome.finder.mech.heel_frenzied_bond':
+    'К ноге! и Неистовые узы (ягуар прыгает к хозяину, узы действуют на 20 ярдов)',
+  'hudChrome.finder.mech.seed_rain':
+    'Семенной дождь (чистые игроки давят семена, пока те не проросли)',
+  'hudChrome.finder.mech.pollinate':
+    'Опыление (золотые игроки держатся подальше от семян, иначе те тут же прорастут)',
+  'hudChrome.finder.mech.vine_lash': 'Удар лозы (выйдите из колючей полосы, иначе вас обездвижит)',
+  'hudChrome.finder.mech.gorge': 'Пожирание (тяжёлый укус и яд на танке)',
+  'hudChrome.finder.mech.burrowing_seeds':
+    'Зарывающиеся семена и Пыльцевое облако (через 6 секунд росток встаёт рядом с игроком, золото передаётся)',
+  'hudChrome.finder.mech.spirit_of_the_hunt':
+    'Дух охоты (Добыча уводит аватара через горящие солнечные глифы; растерзанный игрок получает фору)',
+  'hudChrome.finder.mech.twin_prey_ambush':
+    'Двойная добыча и Засада (две Добычи, затем прыжок на самого дальнего игрока)',
+  'hudChrome.finder.mech.seal_shackles':
+    'Печатные оковы (каждая разбитая цепь увеличивает получаемый им урон на 20% и освобождает одну из его атак)',
+  'hudChrome.finder.mech.chain_strain': 'Натяжение (отойдите от каждого столпа, чья цепь ещё цела)',
+  'hudChrome.finder.mech.korgath_stomp': 'Сотрясающий топот (выйдите из кольца вокруг него)',
+  'hudChrome.finder.mech.rerivet_last_link':
+    'Переклёпка и Последнее звено (прервите кузнеца-погонщика, заново склёпывающего цепь; когда остаётся одна цепь, Натяжение каждые 10 секунд)',
+  'hudChrome.bastionAlert.sentencedTitle': 'Приговор падёт на тебя!',
+  'hudChrome.bastionAlert.sentencedLine': 'Столп света ударит всех рядом с тобой: отойди от группы',
+  'hudChrome.bastionAlert.brineTitle': 'Ты в освящённом рассоле!',
+  'hudChrome.bastionAlert.brineLine': 'Он жжёт каждую секунду: выйди из лужи',
+  'hudChrome.bastionAlert.reapedTitle': 'Смерть встаёт за твоей спиной!',
+  'hudChrome.bastionAlert.reapedLine': 'Выйди из дуги косы: вперёд или в сторону',
+  'hudChrome.bastionAlert.veilTitle': 'Туманная завеса',
+  'hudChrome.bastionAlert.veilLine':
+    'Следи за лучом маяка: настоящий Ваэль тот, чей фонарь вспыхивает',
+  'hudChrome.bastionAlert.realTitle': 'Луч нашёл его!',
+  'hudChrome.bastionAlert.realLine': 'Это настоящий Ваэль: бей его, чтобы разорвать завесу',
+  'hudChrome.bastionAlert.shadeTitle': 'Пустая тень',
+  'hudChrome.bastionAlert.shadeLine':
+    'Свет проходит сквозь неё: оставь её, найди того, кого освещает луч',
+  'hudChrome.bastionAlert.timeAria': 'Осталось секунд: {seconds}',
+  'hudChrome.wildheartAlert.preyTitle': 'Вы добыча!',
+  'hudChrome.wildheartAlert.preyLine':
+    'Зулгар охотится на вас: ведите его через горящие солнечные глифы',
+  'hudChrome.wildheartAlert.preyWaitLine':
+    'Сейчас он гонится за другой Добычей: будьте готовы, он сменит цель',
+  'hudChrome.wildheartAlert.stalkedTitle': 'Вас выслеживают!',
+  'hudChrome.wildheartAlert.stalkedLine': 'Ягуар охотится на вас: уведите его подальше от хозяина',
+  'hudChrome.wildheartAlert.pollinatedTitle': 'Опылены!',
+  'hudChrome.wildheartAlert.pollinatedLine':
+    'Держитесь подальше от семян: от вашего касания они прорастают',
+  'hudChrome.wildheartAlert.bondTitle': 'Узы стаи',
+  'hudChrome.wildheartAlert.bondLine': 'Вместе они получают вдвое меньше урона: разведите их',
+  'hudChrome.wildheartAlert.timeAria': 'Осталось секунд: {seconds}',
+  'hudChrome.sanctumAlert.quenchTitle': 'В закалочной воде!',
+  'hudChrome.sanctumAlert.quenchLine':
+    'Она жжёт и замедляет: плывите к ближайшему льду или на берег',
+  'hudChrome.sanctumAlert.plungeTitle': 'Низвергающийся огонь!',
+  'hudChrome.sanctumAlert.plungeLine': 'Вся ваша плита сейчас загорится: немедленно уходите с неё',
+  'hudChrome.sanctumAlert.descentTitle': 'Сокрушительное снижение!',
+  'hudChrome.sanctumAlert.descentLine': 'Он приземлится прямо здесь: выйдите из его тени',
+  'hudChrome.sanctumAlert.eyeTitle': 'Око вирма на вас!',
+  'hudChrome.sanctumAlert.eyeLine':
+    'Когда метка спадёт, ваша плита загорится: стойте на целом льду, подальше от группы',
+  'hudChrome.sanctumAlert.eyeCrackedLine':
+    'Вы стоите на треснувшем льду: перейдите на целую плиту, пока метка не спала',
+  'hudChrome.sanctumAlert.flailTitle': 'Цепной цеп!',
+  'hudChrome.sanctumAlert.flailLine': 'Цепь хлестнёт вдоль отмеченной полосы: уйдите с неё',
+  'hudChrome.sanctumAlert.chargeTitle': 'Рывок с порога!',
+  'hudChrome.sanctumAlert.chargeLine': 'Он бросится вдоль полосы: уйдите с неё и подальше от края',
+  'hudChrome.sanctumAlert.trenchTitle': 'Траншея душевного огня!',
+  'hudChrome.sanctumAlert.trenchLine':
+    'Душевный огонь прорежет полосу и оставит талую воду: уйдите с неё',
+  'hudChrome.sanctumAlert.strainTitle': 'Натяжение цепей!',
+  'hudChrome.sanctumAlert.strainLine': 'Целые столпы вот-вот ударят: отойдите от них',
+  'hudChrome.sanctumAlert.infernoTitle': 'Могильное пекло!',
+  'hudChrome.sanctumAlert.infernoLine':
+    'Каждый импульс сильнее прежнего: выйдите из его досягаемости',
+  'hudChrome.sanctumAlert.stompTitle': 'Сотрясающий топот!',
+  'hudChrome.sanctumAlert.stompLine': 'Отойдите от него, пока нога не опустилась',
+  'hudChrome.sanctumAlert.breathTitle': 'Могильное дыхание!',
+  'hudChrome.sanctumAlert.breathLine': 'Вы в конусе дыхания: уйдите в сторону',
+  'hudChrome.sanctumAlert.maulTitle': 'Дуга кувалды!',
+  'hudChrome.sanctumAlert.maulLine': 'Он сметает всё перед собой: зайдите ему за спину',
+  'hudChrome.sanctumAlert.tailTitle': 'Удар хвостом!',
+  'hudChrome.sanctumAlert.tailLine': 'Вы стоите позади него: уйдите, пока не ударил хвост',
+  'hudChrome.sanctumAlert.meltwaterTitle': 'В талой воде',
+  'hudChrome.sanctumAlert.meltwaterLine':
+    'Ваш костеход стоит в талой воде: вытащите его на холодный лёд',
+  'hudChrome.sanctumAlert.meltwaterTargetLine':
+    'Если цель умрёт в талой воде, она поднимется снова: дождитесь холодного льда',
+  'hudChrome.sanctumAlert.crackedTitle': 'Треснувший лёд',
+  'hudChrome.sanctumAlert.crackedLine': 'Огонь здесь разобьёт эту плиту: уводите его пламя отсюда',
+  'hudChrome.sanctumAlert.flightTitle': 'Корзул взлетает',
+  'hudChrome.sanctumAlert.flightLine':
+    'Соберитесь на целом льду, чтобы выбрать место его посадки, затем разойдитесь',
+  'hudChrome.sanctumAlert.lockboundTitle': 'Скованный замком',
+  'hudChrome.sanctumAlert.lockboundLine':
+    'Держится цепей: {chains}. Он получает на {pct}% меньше урона. Разбейте печатные кандалы, чтобы снять защиту.',
+  'hudChrome.sanctumAlert.timeAria': 'Осталось секунд: {seconds}',
+  'hudChrome.sanctumAlert.brandedTitle': 'Заклеймён!',
+  'hudChrome.sanctumAlert.brandedLine':
+    'Клеймо жжёт до конца действия: потушите его в луже талой воды',
+  'hudChrome.sanctumAlert.rimeTitle': 'Ползучая изморозь!',
+  'hudChrome.sanctumAlert.rimeLine':
+    'Ползучая изморозь {stacks}/{max}: выйдите из дыхания дракончиков',
+  'hudChrome.sanctumAlert.slabTitle': 'Ледяная глыба',
+  'hudChrome.sanctumAlert.slabLine':
+    'Сплошной лёд: он закрывает обзор. Укройтесь за ним от заклинаний',
+  'hudChrome.kitUse.toppleLine': 'Опрокиньте на стаю: пролитое пламя обжигает врагов',
+  'hudChrome.kitUse.toppleKey': 'Опрокинуть на врагов: {name}',
+  'hudChrome.kitUse.toppleTap': 'Нажмите здесь, чтобы опрокинуть на врагов: {name}',
+  'hudChrome.kitUse.toppleClick': 'Щёлкните здесь, чтобы опрокинуть на врагов: {name}',
+  'hudChrome.kitUse.toppleFar': 'Подойдите ближе чем на {range} м, чтобы опрокинуть',
+  'hudChrome.kitUse.toppleAria': 'Опрокинуть: {name}',
+  'hudChrome.kitUse.usingLine': 'Не двигайтесь: удар, шаг или оглушение прервут действие',
+  'hudChrome.kitUse.timeAria': 'Осталось секунд: {seconds}',
+  'hudChrome.auraEffect.sanctum.branded':
+    'Наносит {value} ед. урона ({school}) каждые {interval} сек. в течение {seconds} сек. Встаньте в лужу талой воды, чтобы сразу потушить клеймо.',
+  'hudChrome.auraEffect.sanctum.creepingRime':
+    'Снижает скорость передвижения на {pct}%, по {per}% за каждый эффект. Каждое Изморозное дыхание добавляет эффект и сбрасывает длительность до {seconds} сек. При {max} эффектах вы замерзаете (Обледенение) на {freeze} сек., и эффекты снимаются.',
+  'hudChrome.auraEffect.sanctum.icedOver':
+    'Скован Ползучей изморозью: невозможно двигаться и действовать.',
+  'hudChrome.auraEffect.sanctum.lockbound':
+    'Получает на {pct}% меньше урона: по {per}% за каждую ещё целую цепь. Разбейте печатные кандалы, чтобы сбросить их цепь.',
+  'hudChrome.auraEffect.sanctum.enrage': 'Наносит на {pct}% больше урона.',
+  'hudChrome.auraEffect.sanctum.grasp':
+    'Стоит в талой воде и наносит на {pct}% больше урона. Если умрёт в талой воде, утонет и поднимется снова через {seconds} сек.; убейте его на холодном льду, чтобы он не встал.',
+  'hudChrome.auraEffect.sanctum.twiceWoken':
+    'Поднялся из талой воды снова и наносит на {pct}% больше урона.',
+  'hudChrome.auraEffect.sanctum.doused':
+    'Плита под ним треснула, и закалочная вода погасила его Могильное пекло.',
+  'hudChrome.auraEffect.sanctum.airborne':
+    'В воздухе, атаковать нельзя. Он приземлится Сокрушительным снижением на плиту, где стоит больше всего игроков, нанося {min}-{max} ед. урона ({heroicMin}-{heroicMax} в героическом режиме) всем в радиусе {radius} м.',
+  'hudChrome.auraEffect.sanctum.wyrmsEye':
+    'Когда эффект закончится, Корзул обрушит Низвергающийся огонь на всю плиту, где вы стоите: {min}-{max} ед. урона ({heroicMin}-{heroicMax} в героическом режиме) всем на ней, а плита треснет или разобьётся, если уже была треснувшей. Стойте на целом льду, подальше от группы.',
+  'hudChrome.auraEffect.sanctum.quenchWater':
+    'В открытой закалочной воде: скорость снижена на {slow}%, каждую секунду {damage} ед. урона ({heroic} в героическом режиме). Плывите к любой плите или на берег.',
+  'hudChrome.auraEffect.sanctum.shardFlare':
+    'Осколок сердца вспыхивает: Могильное дыхание каждые {breath} сек., Порыв крыльев каждые {gale} сек.',
+  'hudChrome.auraEffect.wildheart.packBond':
+    'Получает на {pct}% меньше урона, пока напарник рядом. Разведите Повелителя клыков и его ягуара, чтобы разорвать узы.',
+  'hudChrome.auraEffect.wildheart.packBondFury':
+    'Наносит на {pct}% больше урона, пока напарник рядом.',
+  'hudChrome.auraEffect.wildheart.stalked':
+    'Великий ягуар охотится на вас и не поддаётся провокации. Каждый укус наносит {min}–{max} физического урона ({heroicMin}–{heroicMax} в героическом режиме) и вызывает кровотечение. Уведите его от хозяина.',
+  'hudChrome.auraEffect.wildheart.waryStuns':
+    'Оглушение уже сработало. Пока эффект действует, новые оглушения не срабатывают.',
+  'hudChrome.auraEffect.wildheart.waryRoots':
+    'Обездвиживание уже сработало. Пока эффект действует, новые обездвиживания не срабатывают.',
+  'hudChrome.auraEffect.wildheart.warySlows':
+    'Замедление уже сработало. Пока эффект действует, новые замедления не срабатывают.',
+  'hudChrome.auraEffect.wildheart.pollinated':
+    'От вашего касания семенной стручок сразу прорастает Терновым ростком. Держитесь подальше от семян, пусть их давят чистые игроки; нетронутый стручок прорастает через {seconds} сек. (в героическом режиме через {heroic} сек. он зарывается и вылезает рядом с ближайшим игроком).',
+  'hudChrome.auraEffect.wildheart.prey':
+    'Зулгар охотится на вас. Проведите его через горящий солнечный глиф, чтобы замедлить на {slow}%. Если он вас догонит, вас растерзают: {damage} урона ({heroic} в героическом режиме) и падение на {stun} сек.',
+  'hudChrome.auraEffect.wildheart.avatar':
+    'Движется на {pct}% быстрее и охотится на свою Добычу. Замедления и обездвиживания действуют, оглушения длятся вдвое меньше.',
+  'hudChrome.auraEffect.wildheart.vanished':
+    'Скрыт и неуязвим. Вот-вот бросится на самого дальнего игрока.',
+  // The Drowned Temple lore guide, Laverock (src/sim/content/drowned_temple_cantor.ts).
+  'dungeonGuide.drownedTemple.greet.1':
+    'Я был самым юным голосом Бледного хора. В ночь обряда я не выпил и сбежал. С тех пор каждое полнолуние я слышу, как они поют под водой. Я должен увидеть её, прежде чем умру. Позвольте мне идти позади вас. Я не стану сражаться и не задержу вас.',
+  'dungeonGuide.drownedTemple.greet.2':
+    'Каждое полнолуние я прихожу к этим вратам, и каждое полнолуние мне изменяет мужество. Но не сегодня. Хор поёт, а сбежал от него я. Отведите меня к ней, и я не буду вам мешать.',
+  'dungeonGuide.drownedTemple.row.join': 'Идём с нами.',
+  'dungeonGuide.drownedTemple.row.decline': 'Мы пойдём одни.',
+  'dungeonGuide.drownedTemple.joined': 'Ведите. Я прямо за вами.',
+  'dungeonGuide.drownedTemple.singing': 'Дайте мне петь. Ступайте, и ступайте с миром.',
+  'dungeonGuide.drownedTemple.accept.1': 'Спасибо. Я пойду позади вас и не стану мешать.',
+  'dungeonGuide.drownedTemple.accept.2':
+    'Значит, наконец-то я спускаюсь. Идите вперёд. Я не отстану.',
+  'dungeonGuide.drownedTemple.decline': 'Я понимаю. Я буду слушать отсюда, сверху, как всегда.',
+  'dungeonGuide.drownedTemple.heroicWater':
+    'Вода сегодня стоит высоко, выше, чем я когда-либо видел. Она вот-вот проснётся.',
+  'dungeonGuide.drownedTemple.memory.votaries':
+    'Утопленники на берегу вошли в воду уже после того, как врата закрылись. Их забрала не луна, а только вода.',
+  'dungeonGuide.drownedTemple.memory.rubbing':
+    'Страж приливов прочёл мои слова на прибрежном камне. «Оно лишь спит». Я вырезал их наутро.',
+  'dungeonGuide.drownedTemple.area.steps':
+    'Ступени паломников. В ту ночь я взбежал по ним через три ступени и ни разу не оглянулся.',
+  'dungeonGuide.drownedTemple.sight.pilgrim':
+    'Паломники из прибрежных деревень. Каждую весну они несли свою святыню на спине. Теперь несут её вечно.',
+  'dungeonGuide.drownedTemple.sight.acolyte':
+    'Послушницы. Я учился грамоте рядом с ними. Теперь они поют во сне и никогда не просыпаются.',
+  'dungeonGuide.drownedTemple.area.causeway.1':
+    'В ночи обряда луна ложилась на эту дамбу, словно вторая дорога.',
+  'dungeonGuide.drownedTemple.area.causeway.2':
+    'Посмотрите на воду. Она всё ещё помнит, как держать луну.',
+  'dungeonGuide.drownedTemple.sight.templeguard':
+    'Стража лестницы. Они поклялись держать храм, пока не зайдёт луна. Луна так и не зашла.',
+  'dungeonGuide.drownedTemple.sight.snapper':
+    'Мы пили лунную воду из таких раковин. Свою я уронил на лестнице.',
+  'dungeonGuide.drownedTemple.sight.siren':
+    'Этот голос. Она пела рядом со мной в хоре. До сих пор вступает на полдоли раньше.',
+  'dungeonGuide.drownedTemple.sight.lurker':
+    'Дети ловили таких сетями на мелководье. Они были с большой палец и светились.',
+  'dungeonGuide.drownedTemple.sight.tidewisp':
+    'Это сама лунная вода, тот глоток, что мы должны были выпить. Не дайте ей вас коснуться.',
+  'dungeonGuide.drownedTemple.area.colonnade':
+    'Колоннада приливов. Мы шли по ней по двое, распевая восходящий стих.',
+  'dungeonGuide.drownedTemple.sight.sentinel':
+    'Лунные скаты из прудов у ворот. Послушниками мы кормили их жемчугом на восходе луны. Теперь они стерегут двери, а наш жемчуг стал их сердцами.',
+  'dungeonGuide.drownedTemple.sight.eel':
+    'Угри лагуны. Послушницы кормили их хлебом в сумерках. Они разжирели на наших гимнах.',
+  'dungeonGuide.drownedTemple.area.veil':
+    'За этой завесой Двор хора. Я не стоял там с тех пор, как был мальчишкой.',
+  'dungeonGuide.drownedTemple.selthe.pre.1':
+    'Матушка Селте. Она учила меня дышать животом. Она научила нас всех тонуть, не умирая.',
+  'dungeonGuide.drownedTemple.selthe.pre.2':
+    'Матерь хора Селте. Каждую ноту, что я знаю, вложила в меня она. Прости меня, матушка.',
+  'dungeonGuide.drownedTemple.selthe.post.1':
+    'Она молчит. За все мои годы в хоре она ни разу не молчала.',
+  'dungeonGuide.drownedTemple.selthe.post.2':
+    'Покойся, матушка. Ты была права насчёт меня. Я так и не научился держать долгие ноты.',
+  'dungeonGuide.drownedTemple.area.terraces':
+    'Приливные заводи. Послушницы чистили их и кормили маленьких светящихся созданий, что жили в них.',
+  'dungeonGuide.drownedTemple.area.falls':
+    'За водопадом вода заглушает любой голос. Я прятался здесь, когда прогуливал спевки.',
+  'dungeonGuide.drownedTemple.area.pool':
+    'Лунный пруд. Они стояли вокруг него на коленях и пили из своих раковин. Я не смог поднять свою.',
+  'dungeonGuide.drownedTemple.hydra.pre':
+    'Змей пруда. Когда я был мальчишкой, у него была одна голова, и он ел у нас с рук.',
+  'dungeonGuide.drownedTemple.hydra.post':
+    'Слушайте. Под водопадом они всё ещё поют. Теперь ближе.',
+  'dungeonGuide.drownedTemple.area.prismStair':
+    'Лестница призмы. Мы поднимались по ней на восходе луны, чтобы пробудить великое стекло.',
+  'dungeonGuide.drownedTemple.colossus.pre':
+    'Великая призма. Мы пели в неё, чтобы поймать луну. Я и не знал, что она может встать.',
+  'dungeonGuide.drownedTemple.sight.reflection':
+    'Оно показывает, во что вас превратила бы вода. Разбейте его!',
+  'dungeonGuide.drownedTemple.colossus.post':
+    'Стекло разбито. Теперь не осталось ничего, что поймает луну, кроме неё.',
+  'dungeonGuide.drownedTemple.area.moonbridge.1':
+    'Мост из лунного света. Старейшины говорили, что пройти по нему могут лишь верные.',
+  'dungeonGuide.drownedTemple.area.moonbridge.2':
+    'Я никогда не был верным. Что ж. Посмотрим, выдержит ли он меня.',
+  'dungeonGuide.drownedTemple.area.altarLanding':
+    'Вот где я стоял. Прямо здесь. Здесь я повернулся и побежал.',
+  'dungeonGuide.drownedTemple.ysolei.pre':
+    'Вот она. Всю жизнь я спрашивал себя, богиня она или чудовище. Покажите мне.',
+  'dungeonGuide.drownedTemple.ysolei.preHeroic':
+    'В такую ночь с ней поёт весь хор. Держитесь, все вы.',
+  'dungeonGuide.drownedTemple.sight.moonspawn':
+    'Это никогда не были мои люди. Они её, сотканные из одного лунного света.',
+  'dungeonGuide.drownedTemple.farewell.answer':
+    'Она не была ни тем, ни другим. Она была луной в воде, а на колени вставали мы сами.',
+  'dungeonGuide.drownedTemple.farewell.verse':
+    'У обряда был последний стих, тот, что даёт певцам уснуть. Я так его и не спел.',
+  'dungeonGuide.drownedTemple.farewell.stay':
+    'Они ждали достаточно. Я останусь и спою его для них сейчас.',
+  'dungeonGuide.drownedTemple.farewell.goodbye.1':
+    'Поднимайтесь в ночь. Если услышите пение в полнолуние, это всего лишь я.',
+  'dungeonGuide.drownedTemple.farewell.goodbye.2':
+    'Спасибо, что довели старого труса до конца его песни. Теперь ступайте.',
+  'dungeonGuide.drownedTemple.farewell.emote':
+    '{name} возвышает голос над алтарём, и лагуна затихает.',
+  'dungeonGuide.drownedTemple.wipe':
+    'Вставайте. Прошу вас. Не оставляйте меня здесь внизу одного снова.',
+  'dungeonGuide.drownedTemple.catchUp': 'Ноги мои стары, но я знаю здесь каждую ступень. Я здесь.',
+  'abilityUi.cast.cantor_last_verse': 'Последний стих',
+  'entities.npcs.cantor_laverock.name': 'Лаверок',
+  'entities.npcs.cantor_laverock.title': 'Последний кантор Бледного хора',
+  'entities.npcs.cantor_laverock.greeting':
+    'Я был самым юным голосом Бледного хора. В ночь обряда я не выпил и сбежал. С тех пор каждое полнолуние я слышу, как они поют под водой. Я должен увидеть её, прежде чем умру. Позвольте мне идти позади вас. Я не стану сражаться и не задержу вас.',
+  'hudChrome.cryptAlert.measuredTitle': 'Мерка для могилы!',
+  'hudChrome.cryptAlert.measuredLine':
+    'Когда полоса истечёт, под вами обрушится могила: отнесите её к краю двора',
+  'hudChrome.cryptAlert.embracedTitle': 'Ледяные объятия!',
+  'hudChrome.cryptAlert.embracedLine':
+    'Она держит вас в воздухе: группа должна ранить её, чтобы она вас опустила',
+  'hudChrome.cryptAlert.lamentTitle': 'Плач невесты!',
+  'hudChrome.cryptAlert.lamentShelteredLine':
+    'Вы в свете горящего фонаря, и для вас есть место: стойте на месте',
+  'hudChrome.cryptAlert.lamentOpenLine':
+    'Встаньте в свет горящего фонаря, пока не прозвучал вопль: по двое на фонарь',
+  'hudChrome.cryptAlert.graveTitle': 'Вы в Открытой могиле!',
+  'hudChrome.cryptAlert.graveLine': 'Могильная земля жжёт и замедляет вас: выйдите из неё',
+  'hudChrome.cryptAlert.tollTitle': 'Погребальный звон!',
+  'hudChrome.cryptAlert.tollLine':
+    'Пока он звонит в колокол, его нельзя ранить: готовьтесь к Звону и к мертвецам, которых он поднимет',
+  'hudChrome.cryptAlert.harmonyTitle': 'Гармония',
+  'hudChrome.cryptAlert.harmonyLine':
+    'Её Хористы снимают {pct}% получаемого ею урона: сначала убейте их',
+  'hudChrome.cryptAlert.timeAria': 'Осталось секунд: {seconds}',
+  'hudChrome.auraEffect.crypt.measured':
+    'Когда эффект закончится, там, где вы стоите, обрушится Открытая могила: от {min} до {max} урона (от {heroicMin} до {heroicMax} на героической сложности) всем в радиусе {radius} ярдов. Могила остаётся до конца боя, так что отнесите метку к краю двора, подальше от группы.',
+  'hudChrome.auraEffect.crypt.graveDirt':
+    'Вы стоите в Открытой могиле: скорость передвижения снижена на {slow}%, и каждую секунду вы получаете {damage} урона от тьмы ({heroic} на героической сложности). На героической сложности, если пробыть в могиле {linger} сек., из неё встают Беспокойные кости. Выйдите из могилы.',
+  'hudChrome.auraEffect.crypt.dirtInEyes':
+    'Скорость передвижения снижена на {pct}%. Полная лопата бьёт всех перед Пономарём Марроу: стойте у него за спиной.',
+  'hudChrome.auraEffect.crypt.blow':
+    'Получаемый урон увеличен на {pct}%: {per}% за каждый заряд, сейчас {stacks} из {max}. Каждый Удар могильщика добавляет заряд и обновляет длительность до {seconds} сек.',
+  'hudChrome.auraEffect.crypt.graveVigor':
+    'Атакует на {pct}% быстрее, пока стоит в Открытой могиле. Не давайте ему стоять в могилах.',
+  'hudChrome.auraEffect.crypt.tolling':
+    'Неуязвим, пока идёт к колокольной верёвке и звонит в Погребальный колокол. Когда звон стихнет, Погребальный звон наносит от {min} до {max} урона от тьмы (от {heroicMin} до {heroicMax} на героической сложности) всем, и из каждой Открытой могилы встают Беспокойные кости.',
+  'hudChrome.auraEffect.crypt.embraced':
+    'Госпожа держит вас в воздухе: вы не можете действовать и каждую секунду получаете {tick} урона от холода ({tickHeroic} на героической сложности). Если группа снимет {share}% её максимального здоровья, она бережно опустит вас; если она продержит вас наверху {hold} сек., то уронит на лёд: от {min} до {max} урона (от {heroicMin} до {heroicMax} на героической сложности).',
+  'hudChrome.auraEffect.crypt.lament':
+    'Когда Плач невесты закончится, он наносит от {min} до {max} урона от холода (от {heroicMin} до {heroicMax} на героической сложности) всем, кто не находится в пределах {radius} ярдов от горящего могильного фонаря. Фонарь укрывает {cap} ближайших к нему игроков, затем гаснет и пропускает следующий Плач.',
+  'hudChrome.auraEffect.crypt.lingering':
+    'Следующий Плач невесты нанесёт вам на {pct}% больше урона: {per}% за каждый заряд, не больше {max} зарядов. Встретьте следующий в свете фонаря.',
+  'hudChrome.auraEffect.crypt.slippery':
+    'Вы на скользком льду: ваша скорость меняется не больше чем на {grip} ярд/сек. за секунду, поэтому вы медленно разгоняетесь, скользите дальше, когда останавливаетесь, и вас заносит на поворотах. Сойдите со льда, чтобы снова твёрдо стоять на ногах.',
+  'hudChrome.auraEffect.crypt.harmony':
+    'Получает на {pct}% меньше урона: {per}% за каждого живого Хориста. Сначала убейте Хористов.',
+  'hudChrome.auraEffect.crypt.crescendo':
+    'Поёт быстрее: Погребальная песнь Пустоты длится {cast} сек. вместо {castNormal} сек. и звучит каждые {every} сек. вместо {everyNormal} сек., а Костяной орган играет {waves} волны нот вместо {wavesNormal}.',
+  // Morthen the Gravecaller's Rite and the Knellwyrm's heroic Burning Knell
+  // (M16 non-Latin fills for their new strings).
+  'abilityUi.cast.crypt_morthen_shadow_pulse': 'Пульс тьмы',
+  'abilityUi.cast.crypt_morthen_rite_of_the_unquiet': 'Обряд неупокоенных',
+  'abilityUi.cast.crypt_morthen_reap_the_unquiet': 'Жатва неупокоенных',
+  'abilityUi.cast.kituse_crypt_relight_candle': 'Зажечь свечу',
+  'abilityUi.cast.crypt_knellwyrm_knell_rise': 'Пылающий звон',
+  'abilityUi.cast.crypt_knellwyrm_knell_mark': 'Пылающий звон',
+  'abilityUi.cast.crypt_knellwyrm_knell_breath': 'Пылающий звон',
+  'abilityUi.cast.crypt_knellwyrm_knell_land': 'Пылающий звон',
+  'entities.mobs.crypt_remembrance_candle.name': 'Поминальная свеча',
+  'hudChrome.auraEffect.crypt.gorged':
+    'Наносит на {pct}% больше урона: {per}% за каждую Связанную душу, достигшую его, сейчас {stacks} из {max}, до конца боя. Каждая дошедшая душа также исцеляет его на {heal}% максимального здоровья. Встаньте на пути души, чтобы принять её на себя.',
+  'hudChrome.auraEffect.crypt.unquietWard':
+    'Неуязвим, пока творит Обряд неупокоенных у алтаря: зажжено поминальных свечей: {lit} из {total}. Зажечь свечу заново: поддерживаемое действие на {channel} сек., которое каждую секунду отнимает {drain}% максимального здоровья зажигающего ({drainHeroic}% на героической сложности); удары его не прерывают, а шаг или оглушение прерывают. Последняя свеча разбивает оберег. На героической сложности зажигайте их в порядке, который называет Реестр: неверная свеча гасит последнюю зажжённую и наносит зажигающему от {wrongMin} до {wrongMax} урона от тьмы.',
+  'hudChrome.auraEffect.crypt.riteBroken':
+    'Оглушён: разбитый оберег лишает его возможности действовать на {seconds} сек.',
+  'hudChrome.auraEffect.crypt.shatteredWard':
+    'Получает на {pct}% больше урона в течение {seconds} сек.: зажжённые свечи разбили его оберег. Бейте сильнейшими атаками сейчас.',
+  'hudChrome.auraEffect.crypt.graveChill':
+    'Каждую секунду вы получаете {bite} урона от тьмы ({biteHeroic} на героической сложности), пока длится Обряд неупокоенных, и урон растёт на {step} ({stepHeroic} на героической сложности) каждые {every} сек. Зажгите поминальные свечи, чтобы прекратить его.',
+  'hudChrome.auraEffect.crypt.graspMark':
+    'Через {fuse} сек. из круга под вами вырвутся руки: все в пределах {radius} м от места, где он появился, будут обездвижены на {root} сек. и получат от {min} до {max} урона от тьмы. Выйдите из круга.',
+  'hudChrome.auraEffect.crypt.graspRoot':
+    'Вас держат руки могилы: вы не можете двигаться {seconds} сек.',
+  'hudChrome.auraEffect.crypt.knellAirborne':
+    'Парит над Кругом обряда, вне досягаемости. Отмечает половину круга на {mark} сек., затем заливает её призрачным огнём: от {min} до {max} урона от огня всем внутри. За один полёт выжигает половину круга столько раз: {breaths}, затем приземляется.',
+  'hudChrome.finder.mech.crypt_morthen_shadow_pulse':
+    'Пульс тьмы (каждые 12 секунд заклинание на 2 секунды, затем от 24 до 30 урона от тьмы на обычной сложности всем в пределах 12 м от него, так что отойдите; в его Последнем обряде каждые 9 секунд)',
+  'hudChrome.finder.mech.crypt_gravecall':
+    'Могильный зов (каждые 15 секунд Связанная душа плывёт к нему из следующей ниши с саркофагом; дойдя до него, она даёт ему Пресыщение мёртвыми: на 10 процентов больше урона за каждую душу, до 10 стопок, и исцеление на 3 процента здоровья. Игрок на её пути принимает её на себя: от 12 до 16 урона от тьмы на обычной сложности)',
+  'hudChrome.finder.mech.crypt_rite_of_the_unquiet':
+    'Обряд неупокоенных (на 65 процентах здоровья он возвращается к алтарю, неуязвимый внутри Оберега неупокоенных, а Могильный холод наносит всем 3 урона от тьмы в секунду, растущие на 1 каждые 5 секунд, и из ниш выбираются 2 Беспокойные кости. Зажгите заново 4 Поминальные свечи: каждая требует 4 секунды поддержания и каждую секунду отнимает 6 процентов максимального здоровья зажигающего; удары не прерывают, а шаг или оглушение прерывают. Последняя свеча ломает Обряд: он оглушён на 8 секунд и получает на 25 процентов больше урона)',
+  'hudChrome.finder.mech.crypt_reap_the_unquiet':
+    'Жатва неупокоенных (ниже 35 процентов здоровья души перестают идти; каждые 14 секунд после заклинания на 2 секунды он взмахивает косой: от 55 до 65 урона от тьмы на обычной сложности всем в дуге 120 градусов на 14 м перед ним. Пульс тьмы тогда приходит каждые 9 секунд)',
+  'hudChrome.finder.mech.crypt_morthen_heroic':
+    'Героическая сложность: Назови мёртвых (Реестр называет порядок свечей: неверная свеча гасит последнюю зажжённую и наносит зажигающему от 252 до 288 урона от тьмы, а каждое зажигание отнимает 8 процентов здоровья в секунду), Хватка могилы (каждые 16 секунд у 2 игроков появляется круг радиусом 4 м; через 1,5 секунды из него вырываются руки: обездвиживание на 3 секунды и от 162 до 198 урона от тьмы) и Пылающий звон Погребального змия (он взлетает, отмечает половину круга на 4,5 секунды и заливает её призрачным огнём: от 1000 до 1120 урона от огня, 3 половины за полёт)',
+  'hudChrome.cryptAlert.knellTitle': 'Пылающий звон!',
+  'hudChrome.cryptAlert.knellLine':
+    'Когда полоса иссякнет, на эту половину круга обрушится призрачный огонь: перейдите на другую половину',
+  'hudChrome.cryptAlert.graspTitle': 'Хватка могилы!',
+  'hudChrome.cryptAlert.graspLine': 'Из этого круга вырвутся руки и схватят всех внутри: выйдите',
+  'hudChrome.cryptAlert.reapTitle': 'Жатва неупокоенных!',
+  'hudChrome.cryptAlert.reapLine': 'Его коса сметает всё перед ним: зайдите ему за спину',
+  'hudChrome.cryptAlert.riteTitle': 'Обряд неупокоенных',
+  'hudChrome.cryptAlert.riteLine':
+    'Зажгите заново Поминальные свечи, чтобы разбить его оберег: зажжено {lit} из {total}',
+  'hudChrome.cryptAlert.riteNamedLine':
+    'Зажигайте только свечу, которую Реестр называет следующей: зажжено {lit} из {total}',
+  'hudChrome.cryptAlert.soulTitle': 'Связанная душа',
+  'hudChrome.cryptAlert.soulLine':
+    'Душа плывёт к Мортену: встаньте на её пути и примите её, пока она его не напитала',
+  'hudChrome.kitUse.relightLine':
+    'Пока вы поддерживаете действие, оно каждую секунду отнимает здоровье: удары не прерывают его, а шаг или оглушение прерывают',
+  'hudChrome.kitUse.relightKey': 'Зажечь заново: {name}',
+  'hudChrome.kitUse.relightTap': 'Нажмите здесь, чтобы зажечь заново: {name}',
+  'hudChrome.kitUse.relightClick': 'Щёлкните здесь, чтобы зажечь заново: {name}',
+  'hudChrome.kitUse.relightFar': 'Подойдите ближе чем на {range} м, чтобы зажечь её',
+  'hudChrome.kitUse.relightAria': 'Зажечь заново: {name}',
+  'hudChrome.kitUse.relightUsingLine':
+    'Не двигайтесь, пока оно вытягивает здоровье: удары не прерывают, а шаг или оглушение прерывают',
+  // The lower dungeons' normal blues (M16 non-Latin fills for their new names).
+  'entities.items.spadeworn_gauntlets.name': 'Рукавицы, стёртые лопатой',
+  'entities.items.gravedirt_grips.name': 'Перчатки могильной земли',
+  'entities.items.bellrope_mitts.name': 'Митенки колокольной верёвки',
+  'entities.items.rimewreath_coif.name': 'Кольчужный капюшон инейного венца',
+  'entities.items.rime_laced_hood.name': 'Капюшон с инеистой шнуровкой',
+  'entities.items.lamenting_veil.name': 'Скорбная вуаль',
+  'entities.items.choirward_pauldrons.name': 'Наплечники хорового стража',
+  'entities.items.choristers_spaulders.name': 'Наплечники хориста',
+  'entities.items.cantors_stole.name': 'Стола кантора',
+  'entities.items.knellbound_hauberk.name': 'Кольчуга погребального звона',
+  'entities.items.candlewatch_jerkin.name': 'Куртка свечного дозора',
+  'entities.items.robe_of_the_unquiet_rite.name': 'Одеяние Неупокоенного обряда',
+  'entities.items.gravecallers_rod.name': 'Жезл Могильного Зова',
+  'entities.items.portcullis_girdle.name': 'Пояс опускной решётки',
+  'entities.items.cellwatch_belt.name': 'Пояс тюремного дозора',
+  'entities.items.lanternwick_sash.name': 'Кушак фонарного фитиля',
+  'entities.items.turnkeys_shank.name': 'Тюремный нож надзирателя',
+  'entities.items.gaolyard_jerkin.name': 'Куртка тюремного двора',
+  'entities.items.brinewarden_robe.name': 'Одеяние стража солёных вод',
+  'entities.items.fogbinders_rod.name': 'Жезл Вязателя Тумана',
+  'entities.items.conchplate_sabatons.name': 'Сабатоны из раковинных пластин',
+  'entities.items.pale_chorus_slippers.name': 'Туфли Бледного хора',
+  'entities.items.tideglass_gauntlets.name': 'Рукавицы Приливного стекла',
+  'entities.items.moonburn_grips.name': 'Перчатки лунного ожога',
+  'entities.items.prism_etched_handwraps.name': 'Обмотки с призменной гравировкой',
+  'entities.items.mere_crested_helm.name': 'Шлем с озёрным гребнем',
+  'entities.items.mereskin_hood.name': 'Капюшон из озёрной шкуры',
+  'entities.items.merewater_cowl.name': 'Капюшон озёрной воды',
+  'entities.items.merecleaver.name': 'Озёрный секач',
+  'entities.items.moonwrack_stave.name': 'Посох Лунной погибели',
 };

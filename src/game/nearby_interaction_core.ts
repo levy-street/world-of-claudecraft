@@ -1,4 +1,5 @@
 import { WORLD_QUESTS_BY_ID } from '../sim/data';
+import { kitUsableNow, kitUseOf } from '../sim/mob/trash_kit/encounter_use';
 import { isQuestGatedGroundObjectHidden } from '../sim/quest_gated_entity';
 import { isObjectOpenedByViewer } from '../sim/quests/opened_object_view';
 import {
@@ -48,6 +49,10 @@ export interface NearbyInteractionScanWorld {
 export type NearbyGatherNode = Pick<GatherNodeDef, 'id' | 'pos' | 'type' | 'tier'>;
 
 export type NearbyInteractionCandidate =
+  /** A usable encounter body in its use reach (the trash engine's G3: a Soul
+   *  Brazier): the press TARGETS it and sends the ordinary interact, which the
+   *  authoritative sim turns into the use (interaction.ts tryStartKitUse). */
+  | { kind: 'use'; id: number; entity: Entity }
   | { kind: 'corpse'; id: number; entity: Entity }
   /** A harvest-only body the press OPENS the corpse choice for (never harvests):
    *  the keyboard, pad and touch route to the popup's own Harvest control. */
@@ -66,9 +71,12 @@ export type NearbyInteractionCandidate =
 /** Resolve the one eligible nearby interaction dispatch will run, without
  *  running it. This is dispatch's shared candidate resolution: the ladder IS
  *  the press ladder in nearby_interaction.ts, arm for arm, so the two can never
- *  read a different world: corpse (ordinary loot only), delve, ground object,
- *  npc, escort start, the offered gather node, placed feast, garden bed, the
- *  corpse harvest CHOICE, then the escort-away last resort. Intentional
+ *  read a different world: the usable encounter body (the trash engine's G3
+ *  use, a Soul Brazier mid-pull: first, since it only ever stands in a dungeon
+ *  fight and the moment to kick it is now), corpse (ordinary loot only),
+ *  delve, ground object, npc, escort start, the offered gather node, placed
+ *  feast, garden bed, the corpse harvest CHOICE, then the escort-away last
+ *  resort. Intentional
  *  gathering made the generic press ORDINARY INTERACTION for bodies and crops,
  *  so there is deliberately no corpse-harvest or crop arm here: those are
  *  explicit actions with their own entry points (the corpse picker, the bed
@@ -106,6 +114,8 @@ export function resolveNearbyInteractionCandidate(
   const salvageQuest = WORLD_QUESTS_BY_ID.wq_farshore_salvage;
   let bestNode: NearbyGatherNode | null = null;
   let bestNodeDistance = INTERACT_RANGE;
+  let bestUse: Entity | null = null;
+  let bestUseDistance = Number.POSITIVE_INFINITY;
 
   // Nodes stand on the ground plane, so reach is the flat distance (the same
   // measure the node click's core takes in decideGatherNodeAction).
@@ -124,6 +134,17 @@ export function resolveNearbyInteractionCandidate(
     // no candidate, exactly as the renderer hides it.
     if (investigationDisguiseHidden(entity, world) || shadowGuardHidden(entity, world)) continue;
     const distance = dist2d(player.pos, entity.pos);
+    // A usable encounter body within its own use reach (KitUseDef.range, the
+    // same flat distance the sim's kitUseRefusal measures): the HUD's use
+    // prompt (src/ui/hud/dungeon/kit_use_prompt_view.ts) offers the press on
+    // exactly this boundary.
+    if (!player.dead && entity.kind === 'mob' && distance < bestUseDistance) {
+      const use = kitUseOf(entity);
+      if (use && kitUsableNow(entity) && distance <= use.range) {
+        bestUse = entity;
+        bestUseDistance = distance;
+      }
+    }
     // A corpse is a candidate only for the ordinary loot this viewer may take
     // (hasLoot, never canOpen): a harvest-only corpse is no candidate here, so
     // it cannot swallow an eligible interaction standing behind it.
@@ -177,6 +198,13 @@ export function resolveNearbyInteractionCandidate(
     }
   }
 
+  if (bestUse) {
+    return {
+      kind: 'use',
+      id: bestUse.id,
+      entity: bestUse,
+    };
+  }
   if (bestCorpse) {
     return {
       kind: 'corpse',

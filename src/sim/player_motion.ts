@@ -40,6 +40,7 @@ import {
   shoreStepOut,
   stepWaterLevel,
 } from './ride_height';
+import { slideVelocity, slipperyGrip } from './slippery_ground';
 import { GHOST_RUN_MULT } from './spirit';
 import {
   CAT_FORM_MOVE_MULT,
@@ -89,6 +90,8 @@ const moveParams: CharacterMoveParams = {
   swimming: false,
   ignoreFences: false,
 };
+/** Scratch for the ice slide's velocity (no allocation on the 20 Hz path). */
+const slideOut = { x: 0, z: 0 };
 const moveOut: CharacterMoveResult = {
   x: 0,
   y: 0,
@@ -464,12 +467,41 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
   }
 
   const movingOnGround = moving && (p.onGround || swimming);
+  // Ice (slippery_ground.ts): on slick ground the ground velocity keeps its
+  // momentum, steered toward the wish (or toward rest) at the ice's grip, so
+  // the body slides on after the keys let go and swings wide on a turn. Off
+  // the ice the ground velocity is never read, so it is simply cleared.
+  const grip = p.onGround && !swimming && !steepGround ? slipperyGrip(p) : 0;
+  if (grip > 0) {
+    slideVelocity(
+      p.vx,
+      p.vz,
+      moving ? wishX * wishSpeed : 0,
+      moving ? wishZ * wishSpeed : 0,
+      grip,
+      RUN_SPEED * deps.moveSpeedMult(p),
+      DT,
+      slideOut,
+    );
+    p.vx = slideOut.x;
+    p.vz = slideOut.z;
+  } else if (p.onGround && !swimming && (p.vx !== 0 || p.vz !== 0)) {
+    p.vx = 0;
+    p.vz = 0;
+  }
+  const iceSliding = grip > 0 && (p.vx !== 0 || p.vz !== 0);
   // Air control: held keys steer the airborne velocity toward the wish vector.
   // Also what lets a jump STARTED in place drift forward, and a fall off a
   // ledge stay steerable, instead of the old frozen-at-takeoff trajectory.
   const airSteering = moving && !p.onGround && !swimming;
   const slide = steepSlide;
-  if (slide || movingOnGround || airSteering || (!p.onGround && (p.vx !== 0 || p.vz !== 0))) {
+  if (
+    slide ||
+    movingOnGround ||
+    airSteering ||
+    iceSliding ||
+    (!p.onGround && (p.vx !== 0 || p.vz !== 0))
+  ) {
     if (slide && p.castingAbility) deps.cancelCast(p);
     if (airSteering) {
       // Steer the air velocity toward the wish vector, limited as a VECTOR
@@ -502,8 +534,20 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
         p.vz *= k;
       }
     }
-    const stepX = slide ? slide.x * STEEP_SLIDE_SPEED : movingOnGround ? wishX * wishSpeed : p.vx;
-    const stepZ = slide ? slide.z * STEEP_SLIDE_SPEED : movingOnGround ? wishZ * wishSpeed : p.vz;
+    const stepX = slide
+      ? slide.x * STEEP_SLIDE_SPEED
+      : grip > 0
+        ? p.vx
+        : movingOnGround
+          ? wishX * wishSpeed
+          : p.vx;
+    const stepZ = slide
+      ? slide.z * STEEP_SLIDE_SPEED
+      : grip > 0
+        ? p.vz
+        : movingOnGround
+          ? wishZ * wishSpeed
+          : p.vz;
     // Slide along buildings, trees, crypt walls; but while airborne from a
     // jump, pass through fences for the whole arc. Keying off the jump itself
     // (not a height threshold) makes this independent of slope: an uphill
@@ -722,8 +766,11 @@ function verticalPass(
     terrainSteepnessAt(p.pos.x, p.pos.z, deps.seed) <= MAX_CLIMB_SLOPE;
   if (inp.jump && (p.onGround || coyote) && !isRooted(p) && !steepGround && !mountLocked) {
     p.vy = JUMP_VELOCITY * jumpMult(p);
-    p.vx = wishX * wishSpeed;
-    p.vz = wishZ * wishSpeed;
+    // On ice the slide carries into the jump (a hop never stops a slide dead).
+    if (!(p.onGround && slipperyGrip(p) > 0)) {
+      p.vx = wishX * wishSpeed;
+      p.vz = wishZ * wishSpeed;
+    }
     p.onGround = false;
     p.jumping = true;
     p.fallStartY = p.pos.y;
@@ -770,8 +817,11 @@ function verticalPass(
       // onto the crate/rock rim it jumped at.
       p.pos.y = support;
       p.vy = 0;
-      p.vx = 0;
-      p.vz = 0;
+      // Landing on ice keeps the slide (the ice step caps it to a run).
+      if (slipperyGrip(p) <= 0) {
+        p.vx = 0;
+        p.vz = 0;
+      }
       p.onGround = true;
       p.jumping = false;
       const gLandIdx = p.auras.findIndex((a) => a.id === 'rift_feather_glider');

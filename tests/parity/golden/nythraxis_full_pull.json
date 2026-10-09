@@ -17546,7 +17546,7 @@
       "tick": 1248,
       "time": 62.4,
       "nextId": 1023,
-      "state": "eaee410a",
+      "state": "c5d9a55d",
       "events": "37f2b712",
       "rng": {
         "draws": 10844,
@@ -18829,7 +18829,7 @@
             "items": [
               {
                 "count": 1,
-                "itemId": "stormcallers_spaulders"
+                "itemId": "nighttalon_shoulderguards"
               },
               {
                 "count": 1,
@@ -18846,7 +18846,7 @@
                     ]
                   }
                 },
-                "itemId": "gravecourt_hewer"
+                "itemId": "stormcallers_spaulders"
               }
             ]
           },
@@ -19129,7 +19129,7 @@
       "tick": 1250,
       "time": 62.5,
       "nextId": 1023,
-      "state": "054901f8",
+      "state": "cfb3de3f",
       "events": "741638a5",
       "rng": {
         "draws": 10863,
@@ -19140,7 +19140,7 @@
       "tick": 1260,
       "time": 63,
       "nextId": 1023,
-      "state": "60afc782",
+      "state": "551d59dd",
       "events": "741638a5",
       "rng": {
         "draws": 10975,
@@ -19151,7 +19151,7 @@
       "tick": 1270,
       "time": 63.5,
       "nextId": 1023,
-      "state": "c00f6d6d",
+      "state": "47d6ee90",
       "events": "741638a5",
       "rng": {
         "draws": 11056,
@@ -19162,7 +19162,7 @@
       "tick": 1280,
       "time": 64,
       "nextId": 1023,
-      "state": "dc59e089",
+      "state": "89790c74",
       "events": "741638a5",
       "rng": {
         "draws": 11149,
@@ -19173,7 +19173,7 @@
       "tick": 1290,
       "time": 64.5,
       "nextId": 1023,
-      "state": "dad53478",
+      "state": "bbb7a13f",
       "events": "741638a5",
       "rng": {
         "draws": 11242,
@@ -19184,7 +19184,7 @@
       "tick": 1300,
       "time": 65,
       "nextId": 1023,
-      "state": "82034874",
+      "state": "358012eb",
       "events": "741638a5",
       "rng": {
         "draws": 11335,
@@ -19195,7 +19195,7 @@
       "tick": 1308,
       "time": 65.4,
       "nextId": 1023,
-      "state": "001fff46",
+      "state": "861f1155",
       "events": "73c8d5ba",
       "rng": {
         "draws": 11388,
@@ -20477,7 +20477,7 @@
             "items": [
               {
                 "count": 1,
-                "itemId": "stormcallers_spaulders"
+                "itemId": "nighttalon_shoulderguards"
               },
               {
                 "count": 1,
@@ -20494,7 +20494,7 @@
                     ]
                   }
                 },
-                "itemId": "gravecourt_hewer"
+                "itemId": "stormcallers_spaulders"
               }
             ]
           },

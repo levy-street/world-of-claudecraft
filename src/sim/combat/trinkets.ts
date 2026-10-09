@@ -28,7 +28,7 @@ import {
   trinketCooldownKey,
   trinketSpec,
 } from '../content/trinkets';
-import { ITEMS } from '../data';
+import { ITEMS, MOBS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { duelJustEndedBetween } from '../social/duel';
@@ -37,6 +37,14 @@ import { meleeSwing } from './auto_attack';
 import { isUnbreakableControlAura } from './cc';
 import { applyHeal } from './heal';
 import { relocateSwept } from './heroic_leap';
+import {
+  applyHarvest,
+  applyQuench,
+  applyTether,
+  quenchStrike,
+  tetherTarget,
+} from './sanctum_trinkets';
+import { plantSeedpod, summonSpiritJaguar } from './wildheart_trinkets';
 
 /** The control kinds the Mooring Stone shrugs off and the Medallion breaks. */
 const CONTROL_KINDS: ReadonlySet<string> = new Set([
@@ -477,6 +485,59 @@ export function useWornTrinket(
       placeLantern(ctx, p, use);
       break;
     }
+    case 'shackle': {
+      const target = hostileTarget(ctx, p, use.range);
+      if (!target) {
+        ctx.error(meta.entityId, 'You have no target.');
+        return false;
+      }
+      // A creature immune to control (every boss) is slowed instead of rooted.
+      const immune =
+        target.kind === 'mob' && (MOBS[target.templateId]?.ccImmune || target.ccImmune);
+      ctx.applyAura(target, {
+        id: TRINKET_AURA.shackle,
+        name: "Gaoler's Iron Key",
+        kind: immune ? 'slow' : 'root',
+        remaining: use.duration,
+        duration: use.duration,
+        value: immune ? use.slow : 0,
+        sourceId: p.id,
+        school: 'physical',
+      });
+      fxOn(ctx, p, target, 'physical', 'trinket_gaolers_iron_key');
+      break;
+    }
+    case 'spiritPack':
+    case 'seedburst': {
+      // The Wildheart Basin's two (combat/wildheart_trinkets.ts): both need a
+      // hostile target in range.
+      const target = hostileTarget(ctx, p, use.range);
+      if (!target) {
+        ctx.error(meta.entityId, 'You have no target.');
+        return false;
+      }
+      if (use.kind === 'spiritPack') summonSpiritJaguar(ctx, p, target, use);
+      else plantSeedpod(ctx, p, target, use);
+      break;
+    }
+    case 'tether': {
+      // The Gravewyrm Sanctum's three (combat/sanctum_trinkets.ts).
+      const ally = tetherTarget(ctx, p, use.range);
+      if (!ally) {
+        ctx.error(meta.entityId, 'You need an ally as your target.');
+        return false;
+      }
+      applyTether(ctx, p, ally, use);
+      break;
+    }
+    case 'harvest': {
+      applyHarvest(ctx, p, use);
+      break;
+    }
+    case 'quench': {
+      applyQuench(ctx, p, use);
+      break;
+    }
     case 'heartNova': {
       const stacks = findAura(p, TRINKET_AURA.guardHeat)?.stacks ?? 0;
       if (stacks <= 0) {
@@ -574,6 +635,7 @@ export function runTrinketTrigger(
     if (passive?.kind === 'twinStrike') twinStrike(ctx, source, target, passive);
     // Last, so an earlier rider never lands on a target the fire just killed.
     if (worn.spec.use.kind === 'temper') temperStrike(ctx, source, target, worn.spec.use);
+    else if (worn.spec.use.kind === 'quench') quenchStrike(ctx, source, target, worn.spec.use);
   }
   if (trigger === 'weaponHit' && passive?.kind === 'heat') {
     addStack(ctx, source, TRINKET_AURA.heat, 'Forge Heat', passive.max, passive.duration);

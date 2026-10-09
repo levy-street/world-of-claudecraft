@@ -323,8 +323,16 @@ describe('item webp icons', () => {
     // (nythraxis-gap-weapon-renders-2026-09-04) to 136. This merge unions both waves
     // plus the three faction vendor weapons (riftwarden_voidblade,
     // dawnkeeper_consecrated_mace, forgemaster_crag_cleaver): 138 -> 141, plus the four Warfare Season 2 honor weapons
-    // (warfare-season2-weapons-2026-09-25): 145.
-    expect(WEAPON_IMAGE_IDS.size).toBe(145);
+    // (warfare-season2-weapons-2026-09-25): 145, plus the Sunken Bastion rework's
+    // two (knight_commanders_longsword, gaolyard_cudgel): 147, plus the Drowned
+    // Temple rework's two (tideglass_shiv, tideglass_warmaul): 149, plus the
+    // Wildheart Basin rework's Falls-Blessed Staff: 150, plus the Gravewyrm
+    // Sanctum rework's Hammer of the Open Lock: 151, plus the Hollow Crypt
+    // rework's three (sextons_spadehaft, sextons_burial_spade, rimeweb_fang;
+    // hollow-crypt-icons-2026-10-03): 154, plus the lower dungeons' normal
+    // blues' five (gravecallers_rod, turnkeys_shank, fogbinders_rod,
+    // merecleaver, moonwrack_stave; lower-dungeon-blues-icons-2026-10-08): 159.
+    expect(WEAPON_IMAGE_IDS.size).toBe(159);
   });
 
   it('A) every image-backed item and weapon resolves to a committed, decodable .webp', async () => {
@@ -384,6 +392,10 @@ describe('item webp icons', () => {
     // follow-up art pass.
     const season2Armor = SEASON2_SETS.flatMap((set) => set.itemIds);
     expect(season2Armor).toHaveLength(135);
+    // The Hollow Crypt rework's per-boss loot left the ledger when its wave
+    // (hollow-crypt-icons-2026-10-03) painted every non-weapon piece and the
+    // generated Heroic Hymnal: HOLLOW_CRYPT_ART_PENDING_ITEM_IDS is declared
+    // empty in content/hollow_crypt_items.ts.
     expect(
       [...ITEM_ART_PENDING].sort(),
       'art debt is enumerated and re-pinned deliberately, never grown quietly',

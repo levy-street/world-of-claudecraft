@@ -25,7 +25,7 @@
 
 import { bagPools, bagsFullError, consumeOneScratch, countFit, countStacked } from '../bags';
 import { WISP_MAZE_QUEST_ID } from '../content/world_quest_wisp_maze';
-import { ITEMS, QUESTS, questRewardItemId } from '../data';
+import { DUNGEONS, ITEMS, QUESTS, questRewardItemId } from '../data';
 import { formatMoney } from '../format_money';
 import { removePreferFungible } from '../items';
 import type { ArchetypeState } from '../professions/archetype';
@@ -81,6 +81,9 @@ export function computeQuestState(
   if (quest.requiresQuest && !questsDone.has(quest.requiresQuest)) return 'unavailable';
   if (quest.minLevel && playerLevel < quest.minLevel) return 'unavailable';
   if (quest.retired) return 'unavailable';
+  // A quest pointing into a development-only room waits until that room ships.
+  if (quest.gatedWithDungeon && DUNGEONS[quest.gatedWithDungeon]?.guideVisible === false)
+    return 'unavailable';
   // Class-locked quest (the paladin-only Divine Tome chain): invisible to any
   // other class. A missing class fails closed so a class-less caller never opens it.
   if (quest.requiredClass && (!playerClass || !quest.requiredClass.includes(playerClass)))

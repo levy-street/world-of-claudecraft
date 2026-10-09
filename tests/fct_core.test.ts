@@ -24,6 +24,8 @@ import {
   type FctKind,
   isDamageFctKind,
 } from '../src/ui/fct_core';
+import { fctAvoidanceText } from '../src/ui/hud/dungeon/fct_avoidance_core';
+import { t } from '../src/ui/i18n';
 
 const CORE_SRC = fileURLToPath(new URL('../src/ui/fct_core.ts', import.meta.url));
 
@@ -257,5 +259,16 @@ describe('blockFctAmountText: the shield-block floater keeps the incoming/outgoi
   it('leaves an outgoing block unsigned, matching the damage-done floater convention', () => {
     expect(blockFctAmountText(12, false, false)).toBe('12');
     expect(blockFctAmountText(12, true, false)).toBe('12!');
+  });
+});
+
+describe('fctAvoidanceText (hud/dungeon/fct_avoidance_core.ts)', () => {
+  it('floats the classic avoidance words, and Resist for everything else', () => {
+    expect(fctAvoidanceText('miss')).toBe(t('hud.combat.floatingMiss'));
+    expect(fctAvoidanceText('dodge')).toBe(t('hud.combat.floatingDodge'));
+    expect(fctAvoidanceText('parry')).toBe(t('hud.combat.floatingParry'));
+    expect(fctAvoidanceText('evade')).toBe(t('hud.combat.floatingEvade'));
+    expect(fctAvoidanceText('resist')).toBe(t('hud.combat.floatingResist'));
+    expect(fctAvoidanceText('immune')).toBe(t('hud.combat.floatingResist'));
   });
 });

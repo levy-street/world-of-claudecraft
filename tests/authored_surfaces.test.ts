@@ -86,7 +86,6 @@ const LEGACY_UNFLAGGED_DEFS = new Set([
   'mob_spider_egg_sac',
   'mob_tolling_bell',
   'mob_training_dummy',
-  'mob_wildheart_beastmaster',
   'mob_wildheart_hexcaller',
   'mob_wildheart_high_priest',
   'mob_wildheart_ravager',
@@ -103,6 +102,11 @@ const LEGACY_UNFLAGGED_DEFS = new Set([
   'mount_stormfeather_griffin',
   'mount_terrorspark_groundshaker',
   'mount_thunderstrut_gobbler',
+  // The five-dungeon rework's re-tints of a legacy body above: they spread the
+  // base def (the Wildheart Basin's Howdah Hexcaller over
+  // mob_wildheart_hexcaller), so it keeps the floor its shared GLB was
+  // tuned under.
+  'wildheart_howdah_hexcaller',
 ]);
 
 /** Held ITEM models with authored materials that still take the kit polish
@@ -170,6 +174,98 @@ const AUTHORED_ATLAS_DEFS = [
   'mount_goblin_rocket_sled',
   'mount_rallycart_rxt',
   'mount_avian_strider',
+  // the Blender-built dungeon bosses and bodies: the Sunken Bastion's Vael,
+  // Iron Cage, Drowned Anchor and Gaol Turnkey, and the Hollow Crypt's Lich
+  // Bishop (Morthen); and the Bastion's sculpted drowned (the Revenant first)
+  'bastion_vael',
+  'bastion_drowned_revenant',
+  'bastion_warhound',
+  'bastion_skel_watchman',
+  'bastion_skel_arbalest',
+  'bastion_skel_sergeant',
+  'bastion_mistweaver',
+  'bastion_acolyte',
+  'bastion_prisoner',
+  'bastion_gaol_cage',
+  // the Sunken Bastion's Blender bosses Olen and Ossick, and Laverock, the
+  // Drowned Temple's lore guide (flagged in manifest.ts, listed here late)
+  'bastion_olen',
+  'bastion_ossick',
+  'npc_laverock',
+  'bastion_drowned_anchor',
+  'bastion_turnkey',
+  'crypt_morthen_lich',
+  // the Hollow Crypt's Blender Sexton Marrow (the skeletal gravedigger)
+  'crypt_skel_sexton',
+  // the Hollow Crypt's Lady of the Bonechill (the frozen bride's ghost)
+  'crypt_lady_bonechill',
+  // the Hollow Crypt's Blender Cantor Ilvane (the skeletal choir mistress)
+  'crypt_skel_cantor',
+  // the Gravewyrm Sanctum's three Blender bosses (characters/sanctum_boss_looks.ts)
+  'sanctum_korgath',
+  'sanctum_velkhar',
+  'sanctum_korzul',
+  'sanctum_seal_shackle',
+  // the Hollow Crypt's Blender gargoyle, drake and Knellwyrm, the Drowned
+  // Temple's Ysolei, the Gravewyrm Sanctum's Sledge Tusker and Soul Brazier
+  // prop, and the Wildheart Basin's Blender bodies and mask-totem prop
+  'mob_crypt_gargoyle',
+  'mob_crypt_drake',
+  'mob_crypt_knellwyrm',
+  'temple_ysolei',
+  // the Drowned Temple's Blender Tide Pilgrim (the sacred sea snail)
+  'temple_pilgrim',
+  // the Drowned Temple's Blender Nacre Templeguard (the seahorse temple knight)
+  'temple_templeguard',
+  // the Drowned Temple's Blender Pale Choir Acolyte (the moon-jelly priestess)
+  'temple_acolyte',
+  // the Drowned Temple's Blender Moonlit Siren (the priestess on her waterspout)
+  'temple_siren',
+  // the Drowned Temple's Blender Tidewisp (the drop of moon-water)
+  'temple_tidewisp',
+  // the Drowned Temple's Blender Glimmerscale Lurker (the sacred mantis shrimp)
+  'temple_lurker',
+  // the Drowned Temple's Blender Pearlguard Sentinel (the Moonmantle Ray)
+  'temple_sentinel',
+  // the Drowned Temple's Blender Choirmother Selthe (the siren matriarch)
+  'temple_selthe',
+  // the Drowned Temple's Blender Lagoon Snapper (the sacred nautilus)
+  'temple_snapper',
+  // the Drowned Temple's Blender Tideglass Colossus (the sea-glass giant)
+  'temple_colossus',
+  // the Drowned Temple's Blender Moonspawn (the moon spirit of water)
+  'temple_moonspawn',
+  // the Drowned Temple's Ice Wraith (a Tripo sculpt)
+  'temple_ice_wraith',
+  'sanctum_sledge_tusker',
+  'sanctum_soul_brazier',
+  // the Gravewyrm Sanctum trash's Blender bodies (sanctum_trash_looks.ts)
+  'sanctum_boneguard',
+  'sanctum_raised_bonewalker',
+  'sanctum_scaleguard',
+  'sanctum_thawcaller',
+  'sanctum_goadsmith',
+  'sanctum_pyre_tender',
+  'sanctum_rime_whelp',
+  'sanctum_sledge_hauler',
+  'sanctum_glacier_splinter',
+  'wildheart_great_saurian',
+  'wildheart_gorgebloom',
+  'wildheart_vine_lasher',
+  'wildheart_thorn_sprout',
+  'wildheart_fanglord_jaguar',
+  // the Blender Basin Raptor (scripts/assets/wildheart_basin_raptor)
+  'wildheart_basin_raptor',
+  // the Blender Spore Toad (scripts/assets/wildheart_spore_toad) and the Toad Hex's toad on it
+  'wildheart_spore_toad',
+  'form_toad',
+  // the Blender Sunbone Totem-Binder (scripts/assets/wildheart_totem_binder)
+  'wildheart_totem_binder',
+  // the Fanglord Beastmaster's Blender body (scripts/assets/wildheart_beastmaster)
+  'mob_wildheart_beastmaster',
+  'wildheart_sunbone_totem',
+  // its Dread Totem (scripts/assets/wildheart_sunbone_totem, both Blender bodies)
+  'wildheart_sunbone_dread_totem',
 ];
 
 describe('authored surfaces', () => {

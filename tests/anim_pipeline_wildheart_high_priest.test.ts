@@ -7,6 +7,8 @@
 // (tests/anim_pipeline_batch1.test.ts's elemental family describe block).
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { NodeIO } from '@gltf-transform/core';
+import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { describe, expect, it } from 'vitest';
 
 const ROOT = join(__dirname, '..');
@@ -38,7 +40,10 @@ function manifestBlock(startAnchor: string, endAnchor: string): string {
 describe('Zulgar, Voice of the Basin bespoke attack/cast (issue #2889 round 2)', () => {
   it('ships Wildheart_High_Priest_Attack in a mesh-free donor GLB', () => {
     const glbPath = 'public/models/creatures/wildheart_high_priest_ability_anims.glb';
-    expect(clipNamesOf(glbPath)).toEqual(['Wildheart_High_Priest_Attack']);
+    expect(clipNamesOf(glbPath)).toEqual([
+      'Wildheart_High_Priest_Attack',
+      'Wildheart_High_Priest_Swing',
+    ]);
     expect(meshCountOf(glbPath)).toBe(0);
   });
 
@@ -49,7 +54,8 @@ describe('Zulgar, Voice of the Basin bespoke attack/cast (issue #2889 round 2)',
     expect(highPriestBlock).not.toContain('clips: TRIPO_BIPED_FULL_RIG,');
 
     const highPriestConstBlock = manifestBlock('const WILDHEART_HIGH_PRIEST: ClipMap = {', '};');
-    expect(highPriestConstBlock).toContain("attack: ['Wildheart_High_Priest_Attack']");
+    // The melee swing is its own planted clip; the slam stays his cast.
+    expect(highPriestConstBlock).toContain("attack: ['Wildheart_High_Priest_Swing']");
     expect(highPriestConstBlock).toContain("cast: 'Wildheart_High_Priest_Attack'");
 
     // TRIPO_BIPED_FULL_RIG itself (the constant definition, not a VisualDef using it) must
@@ -65,5 +71,46 @@ describe('Zulgar, Voice of the Basin bespoke attack/cast (issue #2889 round 2)',
     // WILDHEART_HEXCALLER, and WILDHEART_HIGH_PRIEST above).
     const remaining = [...MANIFEST_SRC.matchAll(/clips: TRIPO_BIPED_FULL_RIG,/g)].length;
     expect(remaining).toBe(1);
+  });
+});
+
+/** The widest turn (degrees) a bone's rotation channel makes away from its first key. */
+async function boneSwing(glbPath: string, clip: string): Promise<Map<string, number>> {
+  const io = new NodeIO().registerExtensions(ALL_EXTENSIONS);
+  const doc = await io.read(join(ROOT, glbPath));
+  const anim = doc
+    .getRoot()
+    .listAnimations()
+    .find((a) => a.getName() === clip);
+  if (!anim) throw new Error(`no ${clip}`);
+  const out = new Map<string, number>();
+  for (const ch of anim.listChannels()) {
+    if (ch.getTargetPath() !== 'rotation') continue;
+    const v = ch.getSampler()?.getOutput()?.getArray();
+    if (!v) continue;
+    let widest = 0;
+    for (let i = 0; i < v.length; i += 4) {
+      const dot = Math.abs(v[0] * v[i] + v[1] * v[i + 1] + v[2] * v[i + 2] + v[3] * v[i + 3]);
+      widest = Math.max(widest, (2 * Math.acos(Math.min(1, dot)) * 180) / Math.PI);
+    }
+    out.set(ch.getTargetNode()?.getName() ?? '', widest);
+  }
+  return out;
+}
+
+describe('Zulgar swings with his arms, not his whole body (playtest 03/10)', () => {
+  const glbPath = 'public/models/creatures/wildheart_high_priest_ability_anims.glb';
+
+  it('the swing keeps the pelvis and legs on the stance while the arms carry the blow', async () => {
+    const swing = await boneSwing(glbPath, 'Wildheart_High_Priest_Swing');
+    for (const bone of ['Root', 'Pelvis', 'L_Thigh', 'R_Thigh', 'L_Calf', 'R_Calf'])
+      expect(swing.get(bone), bone).toBeLessThan(15);
+    expect(swing.get('R_Upperarm')).toBeGreaterThan(60);
+    expect(swing.get('Waist')).toBeLessThan(45);
+  });
+
+  it('the slam it replaced as the swing heaves the whole body (it stays his cast)', async () => {
+    const slam = await boneSwing(glbPath, 'Wildheart_High_Priest_Attack');
+    expect(slam.get('Pelvis')).toBeGreaterThan(100);
   });
 });

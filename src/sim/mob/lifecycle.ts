@@ -45,6 +45,7 @@ import { resetMobCharge } from './charge';
 import { idleRng, wanderPause } from './idle_rng';
 import { resetMechanicSpacing } from './mechanic_spacing';
 import { resetRiftMechanicWindups } from './rift_escape_window';
+import { boneShrapnel } from './trash_kit/crypt_hooks';
 
 const PACK_FRENZY_AURA_ID = 'pack_frenzy'; // attack-speed buff granted to surviving packmates
 
@@ -59,6 +60,13 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   // when nobody was harvesting; draws no rng.
   cancelCorpseHarvestForCorpse(ctx, mob);
   mob.corpseHarvestState = undefined;
+  // A fresh life pays again (an encounter's regrown part: Entity.regrown).
+  mob.regrown = undefined;
+  // A death burst belongs to one life (mob/trash_kit/death_burst.ts).
+  mob.deathBurst = undefined;
+  // The trash kit's long-lived state (Reassemble, Carrion Glut, Snapped
+  // Fetters) belongs to the life that ended.
+  mob.trashLife = undefined;
   mob.dead = false;
   mob.lootable = false;
   mob.loot = null;
@@ -280,4 +288,6 @@ export function detonateCorpse(ctx: SimContext, dead: Entity): void {
   }
   // A clean bloat kill means the blast caught nobody it credits.
   deedsMod.onBloatDetonatedForDeeds(ctx, dead, damagedPids);
+  // The Bone Minion's shrapnel also cuts the skeletons round it.
+  boneShrapnel(ctx, dead);
 }

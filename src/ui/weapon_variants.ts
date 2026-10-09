@@ -163,6 +163,40 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   ironbark_boar_spear: 'spear_a', // crafted 2H spear
   fanglords_beastspear: 'spear_a', // RARE: the basin Beastmaster's boar spear
 
+  // ---- The Sunken Bastion rework (sunken_bastion_items.ts) ------------------
+  knight_commanders_longsword: 'sword_d',
+  gaolyard_cudgel: 'hammer_b', // an iron-banded club reads as the plain mace
+
+  // ---- The Drowned Temple rework (drowned_temple_items.ts) -------------------
+  tideglass_shiv: 'dagger_c', // slim shiv; the Tideglass Dirk already rides dagger_b
+  tideglass_warmaul: 'hammer_c', // heroic epic maul (heroic clones ride heroicOf)
+
+  // ---- The Wildheart Basin rework (wildheart_items.ts) -----------------------
+  // Held model reuses a shipped GLB (the heroic clone rides heroicOf).
+  falls_blessed_staff: 'staff_c', // a gnarled, vine-wound staff of the falls
+
+  // ---- The Hollow Crypt rework (hollow_crypt_items.ts) -------------------------
+  // Held models reuse shipped GLBs (the heroic clones ride heroicOf). The two
+  // spades classify as axes (weapon_skin_rules.ts) and hold the two-handed axe
+  // model like the Tunnelking's Spade; the fang rides dagger_c with the other
+  // fangs (fang_of_korzul, drowned_choir_fang).
+  sextons_spadehaft: 'adv_axe_2handed',
+  sextons_burial_spade: 'adv_axe_2handed', // heroic epic: the Gravecaller's burial spade
+  rimeweb_fang: 'dagger_c',
+
+  // ---- The Gravewyrm Sanctum rework (gravewyrm_sanctum_items.ts) --------------
+  // Held model reuses a shipped GLB.
+  hammer_of_the_open_lock: 'hammer_c', // heroic epic: the Smith's forge hammer
+
+  // ---- The lower dungeons' normal blues (hollow_crypt_items.ts,
+  // sunken_bastion_items.ts, drowned_temple_items.ts) ---------------------------
+  // Held models reuse shipped GLBs (the heroic clones ride heroicOf).
+  gravecallers_rod: 'wand_a', // Morthen's rite rod, the Corpse Candle Focus's wand
+  turnkeys_shank: 'dagger_c', // a gaol shank rides the shiv model
+  fogbinders_rod: 'wand_b', // Vael's fog rod
+  merecleaver: 'adv_axe_2handed', // the Mere Hydra's two-hand axe
+  moonwrack_stave: 'adv_staff', // Ysolei's stave, the Lunar Tide Greatstaff's model
+
   // ---- Crucible of the Last Spring raid weapons (ignivar_loot.ts) -------------
   // Held models reuse shipped GLBs.
   forgefathers_warhammer: 'hammer_c',

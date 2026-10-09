@@ -22,6 +22,7 @@ describe('gossipMenuIsEmpty', () => {
         hasFarmer: false,
         hasWorldQuestBoard: false,
         hasClueStep: false,
+        hasDungeonGuide: false,
       }),
     ).toBe(true);
   });
@@ -46,6 +47,7 @@ describe('gossipMenuIsEmpty', () => {
         hasFarmer: false,
         hasWorldQuestBoard: false,
         hasClueStep: false,
+        hasDungeonGuide: false,
       }),
     ).toBe(true);
   });
@@ -66,6 +68,7 @@ describe('gossipMenuIsEmpty', () => {
         hasFarmer: false,
         hasWorldQuestBoard: false,
         hasClueStep: false,
+        hasDungeonGuide: false,
       }),
     ).toBe(false);
   });
@@ -86,6 +89,7 @@ describe('gossipMenuIsEmpty', () => {
         hasFarmer: false,
         hasWorldQuestBoard: false,
         hasClueStep: false,
+        hasDungeonGuide: false,
       }),
     ).toBe(false);
   });
@@ -106,6 +110,7 @@ describe('gossipMenuIsEmpty', () => {
         hasFarmer: false,
         hasWorldQuestBoard: false,
         hasClueStep: false,
+        hasDungeonGuide: false,
       }),
     ).toBe(false);
     expect(
@@ -123,6 +128,7 @@ describe('gossipMenuIsEmpty', () => {
         hasFarmer: false,
         hasWorldQuestBoard: false,
         hasClueStep: false,
+        hasDungeonGuide: false,
       }),
     ).toBe(false);
     expect(
@@ -140,6 +146,7 @@ describe('gossipMenuIsEmpty', () => {
         hasFarmer: false,
         hasWorldQuestBoard: false,
         hasClueStep: false,
+        hasDungeonGuide: false,
       }),
     ).toBe(false);
     // The WARFARE quartermaster alone. Its own dimension, because the shop row
@@ -160,6 +167,7 @@ describe('gossipMenuIsEmpty', () => {
         hasFarmer: false,
         hasWorldQuestBoard: false,
         hasClueStep: false,
+        hasDungeonGuide: false,
       }),
     ).toBe(false);
     expect(
@@ -177,6 +185,7 @@ describe('gossipMenuIsEmpty', () => {
         hasFarmer: false,
         hasWorldQuestBoard: false,
         hasClueStep: false,
+        hasDungeonGuide: false,
       }),
     ).toBe(false);
     expect(
@@ -194,6 +203,7 @@ describe('gossipMenuIsEmpty', () => {
         hasFarmer: false,
         hasWorldQuestBoard: false,
         hasClueStep: false,
+        hasDungeonGuide: false,
       }),
     ).toBe(false);
     // A station master's Train option alone keeps the menu open.
@@ -212,6 +222,7 @@ describe('gossipMenuIsEmpty', () => {
         hasFarmer: false,
         hasWorldQuestBoard: false,
         hasClueStep: false,
+        hasDungeonGuide: false,
       }),
     ).toBe(false);
     // A farmer's husk-trade row alone keeps the menu open (the farming
@@ -233,6 +244,7 @@ describe('gossipMenuIsEmpty', () => {
         hasFarmer: true,
         hasWorldQuestBoard: false,
         hasClueStep: false,
+        hasDungeonGuide: false,
       }),
     ).toBe(false);
   });
@@ -258,6 +270,7 @@ describe('gossipMenuIsEmpty', () => {
         hasFarmer: false,
         hasWorldQuestBoard: false,
         hasClueStep: false,
+        hasDungeonGuide: false,
       }),
     ).toBe(false);
     // The goods row alone (an unflagged NPC with stock) still keeps it open.
@@ -276,6 +289,7 @@ describe('gossipMenuIsEmpty', () => {
         hasFarmer: false,
         hasWorldQuestBoard: false,
         hasClueStep: false,
+        hasDungeonGuide: false,
       }),
     ).toBe(false);
   });
@@ -296,6 +310,28 @@ describe('gossipMenuIsEmpty', () => {
         hasFarmer: false,
         hasWorldQuestBoard: true,
         hasClueStep: false,
+        hasDungeonGuide: false,
+      }),
+    ).toBe(false);
+  });
+
+  it('keeps a dungeon guide dialog open on his own row (he has no quest or stock)', () => {
+    expect(
+      gossipMenuIsEmpty({
+        questCount: 0,
+        discussionCount: 0,
+        hasVendor: false,
+        hasMarket: false,
+        hasHeroicVendor: false,
+        hasWarfareVendor: false,
+        hasCrucibleVendor: false,
+        hasDelveBoard: false,
+        hasCardMaster: false,
+        hasTraining: false,
+        hasFarmer: false,
+        hasWorldQuestBoard: false,
+        hasClueStep: false,
+        hasDungeonGuide: true,
       }),
     ).toBe(false);
   });

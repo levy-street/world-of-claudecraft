@@ -824,7 +824,11 @@ describe('Masterwrought art completion evidence', () => {
     // 17 (faction-ladder-icons-2026-09-23): 1,322. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,323.
     // + the trinket slot's 18 (trinket-slot-icons-2026-09-23, PR 4173): 1,341. Warfare Season 2's four painted
     // weapons (warfare-season2-weapons-2026-09-25): 1,345, likewise outside it.
-    expect(currentOwnerIds).toHaveLength(1464);
+    // + the five-dungeon rework's four loot batches (Sunken Bastion, Drowned
+    // Temple, Wildheart Basin, Gravewyrm Sanctum; 11 each): 1,508.
+    // + the Hollow Crypt's 16 (hollow-crypt-icons-2026-10-03): 1,524.
+    // + the lower dungeons' normal blues' 55 (lower-dungeon-blues-icons-2026-10-08): 1,579.
+    expect(currentOwnerIds).toHaveLength(1579);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -959,6 +963,27 @@ describe('Masterwrought art completion evidence', () => {
     expect(datedIds.filter((id) => hoardBranchIds.has(id))).toEqual([]);
     expect(currentOwnerIds.filter((id) => hoardBranchIds.has(id))).toHaveLength(119);
 
+    // The five-dungeon rework's five loot batches: 11 + 11 + 11 + 11 + 16
+    // (the Hollow Crypt's, its Heroic Hymnal included) = 60 ids, additive the
+    // same way.
+    const dungeonReworkBatchIds: readonly (string | undefined)[] = [
+      'sunken-bastion-icons-2026-09-29',
+      'drowned-temple-icons-2026-09-30',
+      'wildheart-basin-icons-2026-10-02',
+      'gravewyrm-sanctum-icons-2026-10-03',
+      'hollow-crypt-icons-2026-10-03',
+      // The lower dungeons' normal blues: 55 more ids, 115 in all.
+      'lower-dungeon-blues-icons-2026-10-08',
+    ];
+    const dungeonReworkIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => dungeonReworkBatchIds.includes(batchId))
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect(dungeonReworkIds.size).toBe(115);
+    expect(datedIds.filter((id) => dungeonReworkIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => dungeonReworkIds.has(id))).toHaveLength(115);
+
     // Strip all six later additive waves (Crucible professions, the Field Kit, the
     // Nythraxis gap-fill weapon renders, Roots' Bramblehide/gap-fill paintings,
     // the OSSBrain mount reins, the Valestrider's reins, the world-quest,
@@ -985,7 +1010,8 @@ describe('Masterwrought art completion evidence', () => {
         id !== 'emissary_cache' &&
         id !== 'reins_avian_strider' &&
         !season2WeaponIds.has(id) &&
-        !hoardBranchIds.has(id),
+        !hoardBranchIds.has(id) &&
+        !dungeonReworkIds.has(id),
     );
     expect(completionOwnerIds).toHaveLength(1209);
     expect(sorted(completionOwnerIds)).toEqual(completionDatedIds);

@@ -2442,7 +2442,18 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // itemsDiscovered (+2,889), the hoardGoblinKills counter (+26), and the 32
         // hoard gear reliquary.firstFind rows plus the conquerors_buried_hoards page
         // (+1,761), Blaine's itemization; MEASURED on the 2026-09-28 merged tree.
-        4711,
+        4711 +
+        // Plus 3,089 at the five-dungeon rework (feature/drowned-temple-rework):
+        // the 19 encounter deed ids in the deeds row (+648, each
+        // `"<id>":"2026-08-08",`), the 66 new item ids (rework loot, trinkets
+        // and their generated Heroic variants) in deedStats.itemsDiscovered
+        // (+1,448, each `"<id>",`), and the 19 new relics' reliquary rows
+        // (+993). MEASURED on the rework tree.
+        3089 +
+        // Plus 41 at the Drowned Temple lore guide: its deed id in the deeds row
+        // (`"dgn_drowned_temple_cantor":"2026-08-08",`, 25 characters of id
+        // plus 16). Predicted from the literal before the run.
+        41,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2485,11 +2496,15 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // deeds 672 -> 708 and deedStats 5,861 -> 5,979 at the fourth
       // release/v0.44.0 base merge: the ferry deed and its four visit marks
       // (the +154 above).
-      deeds: 743,
+      // deeds 743 -> 1,391, deedStats 9,427 -> 10,875 and reliquary
+      // 11,501 -> 12,494 at the five-dungeon rework (the +648, +1,448 and
+      // +993 of the 3,089 attributed above).
+      // deeds 1,391 -> 1,432 with the lore guide's deed (the +41 above).
+      deeds: 1432,
       // deedStats +4,648 and reliquary +8,848 at the second release/v0.44.0 base
       // merge: Warfare Season 2's 139 item ids (the 13,496 attributed above).
-      deedStats: 9427,
-      reliquary: 11501,
+      deedStats: 10875,
+      reliquary: 12494,
     });
     // Removing field_kit AND the Bramblehide release content reproduces the
     // pre-field-kit, pre-Bramblehide baseline WITH the hammer content still
@@ -2526,7 +2541,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // ferry deed and its visit marks, which this counterfactual keeps).
       // 226,238 -> 231,729 at the 2026-09-28 Buried Hoards merge (+5,491: the
       // +247 knownRecipes, +533 and +4,711 attributed above, all kept here).
-    ).toBe(231729);
+      // 231,729 -> 234,818 at the five-dungeon rework (+3,089, kept).
+      // 234,818 -> 234,859 with the lore guide's deed (+41, kept).
+    ).toBe(234859);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2554,7 +2571,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 214,207 -> 227,703 at the second release/v0.44.0 base merge (+13,496).
       // 227,703 -> 227,857 at the fourth release/v0.44.0 base merge (+154).
       // 227,857 -> 233,348 at the 2026-09-28 Buried Hoards merge (+5,491, kept).
-    ).toBe(233348);
+      // 233,348 -> 236,437 at the five-dungeon rework (+3,089, kept).
+      // 236,437 -> 236,478 with the lore guide's deed (+41, kept).
+    ).toBe(236478);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2645,8 +2664,18 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // attributed in the growth equation above; no container or ceiling changed
     // shape. Floor at measurement minus 380, edge at measurement plus one:
     // 232980..233361.
-    expect(bytes, reMint).toBeGreaterThan(232980);
-    expect(bytes, reMint).toBeLessThan(233361);
+    // RE-BASED at the five-dungeon rework (feature/drowned-temple-rework):
+    // 236,449 bytes, up 3,089 from 233,360: the 19 encounter deed ids in the
+    // deeds row (+648), the 66 new item ids in deedStats.itemsDiscovered
+    // (+1,448) and the 19 new relics' reliquary rows (+993), all attributed in
+    // the growth equation above; no container or ceiling changed shape. Floor
+    // at measurement minus 380, edge at measurement plus one: 236069..236450.
+    // RE-BASED with the Drowned Temple lore guide's deed: 236,490 bytes, up 41
+    // (its id in the deeds row, attributed in the growth equation above).
+    // Floor at measurement minus 380, edge at measurement plus one:
+    // 236110..236491.
+    expect(bytes, reMint).toBeGreaterThan(236110);
+    expect(bytes, reMint).toBeLessThan(236491);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

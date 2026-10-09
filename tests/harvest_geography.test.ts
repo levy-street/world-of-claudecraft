@@ -485,11 +485,23 @@ describe('the reachability predicate', () => {
       .map((mob) => mob.id)
       .sort();
     expect(zeroCamp).toEqual([
+      // The Wildheart Basin open-field DungeonDef roster (content/wildheart.ts
+      // WILDHEART_BASIN_SPAWNS): raptors in packs and patrols.
+      'basin_raptor',
       // Hatched from a dragonkin_brood_egg (content/drakelands.ts broodEgg.hatchMobId).
       'dragonkin_whelp',
+      // The Beastmaster's Great Jaguar, spawned beside him (WILDHEART_BASIN_SPAWNS).
+      'fanglord_jaguar',
+      // The Wildheart showpiece patrol (WILDHEART_BASIN_SPAWNS, Patrol A).
+      'great_saurian',
+      // A Great Saurian kit add, the rider that jumps down at half health
+      // (encounters/wildheart_basin/great_saurian.ts spawnKitAdd).
+      'howdah_hexcaller',
       // Summon-only Proving Shore miniboss (interactions/crab_summon.ts).
       'mister_crabs',
-      // The Wildheart Basin open-field DungeonDef roster (content/wildheart.ts WILDHEART_SPAWN_LIST).
+      // The rest of the Wildheart Basin roster (WILDHEART_BASIN_SPAWNS).
+      'spore_toad',
+      'sunbone_totem_binder',
       'wildheart_beastmaster',
       'wildheart_hexcaller',
       'wildheart_ravager',

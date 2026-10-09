@@ -16344,6 +16344,682 @@
     line-height: 1.35;
   }
 
+  /* ---------- Dungeon prompts' shared slot (the Iron Cage, the chains, the encounter alerts) ---------- */
+  /* The three encounter prompts share one slot, clear of the WHOLE bottom
+     stack: it sits a gap above the cast bar (which already rides above the
+     action rows, the player frame and the swing timers) and lifts with it
+     when a third action row shows. They used to sit at 190px, over the player
+     frame and the stacked action rows. On touch they float above the action
+     ring's arc instead. */
+  #bastion-cage-escape,
+  #bastion-chain-alert,
+  #bastion-alert,
+  #wildheart-alert,
+  #sanctum-alert,
+  #crypt-alert,
+  #kit-use-prompt {
+    bottom: calc(260px + var(--castbar-h) + 14px);
+  }
+  body.show-actionbar3 #bastion-cage-escape,
+  body.show-actionbar3 #bastion-chain-alert,
+  body.show-actionbar3 #bastion-alert,
+  body.show-actionbar3 #wildheart-alert,
+  body.show-actionbar3 #sanctum-alert,
+  body.show-actionbar3 #crypt-alert,
+  body.show-actionbar3 #kit-use-prompt {
+    bottom: calc(312px + var(--castbar-h) + 14px);
+  }
+  body.mobile-touch #bastion-cage-escape,
+  body.mobile-touch #bastion-chain-alert,
+  body.mobile-touch #bastion-alert,
+  body.mobile-touch #wildheart-alert,
+  body.mobile-touch #sanctum-alert,
+  body.mobile-touch #crypt-alert,
+  body.mobile-touch #kit-use-prompt {
+    bottom: 56%;
+  }
+
+  /* ---------- Iron Cage escape (the Gaol Turnkey's button-mash prompt) ---------- */
+  /* Self-mounted by src/ui/hud/dungeon/cage_escape_painter.ts while the local
+     player is locked in the Iron Cage, centred low over the action bar. The
+     whole panel is a button (a tap or a click is an escape press, the same
+     command the interact key sends), composed from the library panel, keycap
+     and bar. The state is carried by text as well as the fill. */
+  #bastion-cage-escape {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 320px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    cursor: pointer;
+    pointer-events: auto;
+    touch-action: manipulation;
+    user-select: none;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #bastion-cage-escape .bce-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-hostile);
+  }
+  #bastion-cage-escape .bce-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+  }
+  #bastion-cage-escape .bce-key {
+    font-size: 16px;
+    font-weight: 700;
+    animation: bce-press 0.3s ease-in-out infinite alternate;
+  }
+  #bastion-cage-escape .bce-bar {
+    --bar-h: 16px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #bastion-cage-escape .bce-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #bastion-cage-escape.is-near .bce-fill {
+    --bar-color: var(--color-friendly);
+  }
+  @keyframes bce-throb {
+    from {
+      box-shadow: 0 0 6px color-mix(in srgb, var(--color-hostile) 40%, transparent);
+    }
+    to {
+      box-shadow: 0 0 22px color-mix(in srgb, var(--color-hostile) 80%, transparent);
+    }
+  }
+  @keyframes bce-press {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(2px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #bastion-cage-escape,
+    #bastion-cage-escape .bce-key {
+      animation: none;
+    }
+  }
+  body.mobile-touch #bastion-cage-escape {
+    min-width: min(420px, calc(100vw - 32px));
+    padding: 16px 20px 18px;
+  }
+  body.mobile-touch #bastion-cage-escape .bce-title {
+    font-size: 22px;
+  }
+  body.mobile-touch #bastion-cage-escape .bce-bar {
+    --bar-h: 22px;
+  }
+
+  /* ---------- Gaoler Ossick's chain alert (the Drowned Anchor, the Shackle Pair) ---------- */
+  /* Self-mounted by src/ui/hud/dungeon/gaol_chain_painter.ts in the Iron Cage
+     prompt's slot (the two never share a fight), shown while a chain asks
+     something of the local player. The kind classes come from the pure view;
+     the state is carried by the text too, so colour is never the only cue. */
+  #bastion-chain-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 6px 16px 8px;
+    pointer-events: none;
+    text-align: center;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-gold);
+  }
+  #bastion-chain-alert .bca-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #bastion-chain-alert .bca-line {
+    font-size: 13px;
+  }
+  /* The Drowned Anchor's links left: the number the whole group plays to. */
+  #bastion-chain-alert .bca-count {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-text-light);
+  }
+  #bastion-chain-alert .bca-hint {
+    font-size: 11px;
+    opacity: 0.85;
+  }
+  #bastion-chain-alert .bca-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #bastion-chain-alert .bca-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #bastion-chain-alert.is-anchored,
+  #bastion-chain-alert.is-strained {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #bastion-chain-alert.is-anchored .bca-title,
+  #bastion-chain-alert.is-strained .bca-title {
+    color: var(--color-hostile);
+  }
+  #bastion-chain-alert.is-strained .bca-fill {
+    --bar-color: var(--color-hostile);
+  }
+  #bastion-chain-alert.is-anchored .bca-fill,
+  #bastion-chain-alert.is-ally .bca-fill {
+    --bar-color: var(--color-friendly);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #bastion-chain-alert {
+      animation: none;
+    }
+  }
+  body.mobile-touch #bastion-chain-alert {
+    min-width: min(420px, calc(100vw - 32px));
+  }
+
+  /* ---------- The Sunken Bastion's crown alert (Vael's scythe, the Fog Veil) ---------- */
+  /* Self-mounted by the shared encounter alert painter
+     (encounter_alert_painter.ts) under its own id, from src/ui/hud/dungeon/bastion_alert_view.ts.
+     It never takes the pointer. The state is carried by the text too: the
+     scythe behind you throbs in the hostile tone, the veil's rule sits in the
+     beacon's warm gold, a hollow shade in its fog green. Never tier-gated
+     (graphics fairness). */
+  #bastion-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-gold);
+  }
+  #bastion-alert .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #bastion-alert .fa-line {
+    font-size: 14px;
+  }
+  #bastion-alert .fa-hint {
+    display: none;
+  }
+  #bastion-alert .fa-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #bastion-alert .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #bastion-alert.is-reaped,
+  #bastion-alert.is-sentenced,
+  #bastion-alert.is-brine {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #bastion-alert.is-reaped .fa-title,
+  #bastion-alert.is-reaped .fa-fill,
+  #bastion-alert.is-sentenced .fa-title,
+  #bastion-alert.is-sentenced .fa-fill,
+  #bastion-alert.is-brine .fa-title {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
+  #bastion-alert.is-veil-real {
+    animation: bce-throb 0.6s ease-in-out infinite alternate;
+  }
+  #bastion-alert.is-veil-shade {
+    border-color: var(--color-debuff-nature);
+  }
+  #bastion-alert.is-veil-shade .fa-title {
+    color: var(--color-debuff-nature);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #bastion-alert {
+      animation: none;
+    }
+  }
+  body.mobile-touch #bastion-alert {
+    min-width: min(420px, calc(100vw - 32px));
+  }
+
+  /* ---------- The Wildheart Basin's alert (the Prey, the Stalk, the pollen, the bond) ---------- */
+  /* Self-mounted by the shared encounter alert painter
+     (encounter_alert_painter.ts) under its own id, from src/ui/hud/dungeon/wildheart_alert_view.ts.
+     It never takes the pointer. The state is carried by the text too. */
+  #wildheart-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-gold);
+  }
+  #wildheart-alert .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #wildheart-alert .fa-line {
+    font-size: 14px;
+  }
+  #wildheart-alert .fa-hint {
+    display: none;
+  }
+  #wildheart-alert .fa-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #wildheart-alert .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #wildheart-alert.is-prey,
+  #wildheart-alert.is-stalked {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #wildheart-alert.is-prey .fa-title,
+  #wildheart-alert.is-stalked .fa-title,
+  #wildheart-alert.is-prey .fa-fill,
+  #wildheart-alert.is-stalked .fa-fill {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
+  #wildheart-alert.is-pollinated {
+    border-color: var(--color-energy);
+  }
+  #wildheart-alert.is-pollinated .fa-title,
+  #wildheart-alert.is-pollinated .fa-fill {
+    color: var(--color-energy);
+    --bar-color: var(--color-energy);
+  }
+  #wildheart-alert.is-bonded {
+    border-color: var(--color-debuff-nature);
+  }
+  #wildheart-alert.is-bonded .fa-title {
+    color: var(--color-debuff-nature);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #wildheart-alert {
+      animation: none;
+    }
+  }
+  body.mobile-touch #wildheart-alert {
+    min-width: min(420px, calc(100vw - 32px));
+  }
+
+  /* ---------- The Gravewyrm Sanctum's alert (the chains, the meltwater, the lake) ---------- */
+  /* Self-mounted by the shared encounter alert painter
+     (encounter_alert_painter.ts) under its own id, from src/ui/hud/dungeon/sanctum_alert_view.ts.
+     It never takes the pointer. The state is carried by the text too: a strike
+     to dodge throbs in the hostile tone, a floor to read sits in frost, the
+     Lockbound readout in gold. Never tier-gated (graphics fairness). */
+  #sanctum-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-gold);
+  }
+  #sanctum-alert .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #sanctum-alert .fa-line {
+    font-size: 14px;
+  }
+  #sanctum-alert .fa-hint {
+    display: none;
+  }
+  #sanctum-alert .fa-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #sanctum-alert .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #sanctum-alert.is-quench,
+  #sanctum-alert.is-plunge,
+  #sanctum-alert.is-descent,
+  #sanctum-alert.is-eye,
+  #sanctum-alert.is-eye-cracked,
+  #sanctum-alert.is-flail,
+  #sanctum-alert.is-charge,
+  #sanctum-alert.is-trench,
+  #sanctum-alert.is-strain,
+  #sanctum-alert.is-inferno,
+  #sanctum-alert.is-stomp,
+  #sanctum-alert.is-breath,
+  #sanctum-alert.is-maul,
+  #sanctum-alert.is-tail,
+  #sanctum-alert.is-branded {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #sanctum-alert.is-quench .fa-title,
+  #sanctum-alert.is-plunge .fa-title,
+  #sanctum-alert.is-descent .fa-title,
+  #sanctum-alert.is-eye .fa-title,
+  #sanctum-alert.is-eye-cracked .fa-title,
+  #sanctum-alert.is-flail .fa-title,
+  #sanctum-alert.is-charge .fa-title,
+  #sanctum-alert.is-trench .fa-title,
+  #sanctum-alert.is-strain .fa-title,
+  #sanctum-alert.is-inferno .fa-title,
+  #sanctum-alert.is-stomp .fa-title,
+  #sanctum-alert.is-breath .fa-title,
+  #sanctum-alert.is-maul .fa-title,
+  #sanctum-alert.is-tail .fa-title,
+  #sanctum-alert.is-branded .fa-title,
+  #sanctum-alert.is-quench .fa-fill,
+  #sanctum-alert.is-plunge .fa-fill,
+  #sanctum-alert.is-descent .fa-fill,
+  #sanctum-alert.is-eye .fa-fill,
+  #sanctum-alert.is-eye-cracked .fa-fill,
+  #sanctum-alert.is-flail .fa-fill,
+  #sanctum-alert.is-charge .fa-fill,
+  #sanctum-alert.is-trench .fa-fill,
+  #sanctum-alert.is-strain .fa-fill,
+  #sanctum-alert.is-inferno .fa-fill,
+  #sanctum-alert.is-stomp .fa-fill,
+  #sanctum-alert.is-breath .fa-fill,
+  #sanctum-alert.is-maul .fa-fill,
+  #sanctum-alert.is-tail .fa-fill,
+  #sanctum-alert.is-branded .fa-fill {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
+  #sanctum-alert.is-meltwater,
+  #sanctum-alert.is-meltwater-target,
+  #sanctum-alert.is-cracked,
+  #sanctum-alert.is-flight,
+  #sanctum-alert.is-rime {
+    border-color: var(--color-debuff-frost);
+  }
+  #sanctum-alert.is-meltwater .fa-title,
+  #sanctum-alert.is-meltwater-target .fa-title,
+  #sanctum-alert.is-cracked .fa-title,
+  #sanctum-alert.is-flight .fa-title,
+  #sanctum-alert.is-rime .fa-title,
+  #sanctum-alert.is-meltwater .fa-fill,
+  #sanctum-alert.is-meltwater-target .fa-fill,
+  #sanctum-alert.is-cracked .fa-fill,
+  #sanctum-alert.is-flight .fa-fill,
+  #sanctum-alert.is-rime .fa-fill {
+    color: var(--color-debuff-frost);
+    --bar-color: var(--color-debuff-frost);
+  }
+  /* The Ice Slab's cover hint: calm, never a warning (it is shelter). */
+  #sanctum-alert.is-slab {
+    border-color: var(--color-friendly);
+  }
+  #sanctum-alert.is-slab .fa-title,
+  #sanctum-alert.is-slab .fa-fill {
+    color: var(--color-friendly);
+    --bar-color: var(--color-friendly);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #sanctum-alert {
+      animation: none;
+    }
+  }
+  body.mobile-touch #sanctum-alert {
+    min-width: min(420px, calc(100vw - 32px));
+  }
+
+  /* ---------- The Hollow Crypt's alert (the grave mark, the Embrace, the Lament, the Open Grave, Morthen's Rite Ring) ---------- */
+  /* Self-mounted by the shared encounter alert painter
+     (encounter_alert_painter.ts) under its own id, from src/ui/hud/dungeon/crypt_alert_view.ts.
+     It never takes the pointer. The state is carried by the text too: a mark
+     or a grave to leave throbs in the hostile tone, being held and the
+     Lament's call to the light sit in frost, a sheltered player stays calm in
+     the friendly tone, the target readouts in gold. Never tier-gated
+     (graphics fairness). */
+  #crypt-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-gold);
+  }
+  #crypt-alert .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #crypt-alert .fa-line {
+    font-size: 14px;
+  }
+  #crypt-alert .fa-hint {
+    display: none;
+  }
+  #crypt-alert .fa-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #crypt-alert .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  /* Morthen's Rite Ring and the Burning Knell: the strikes to leave (the
+     marked half, a Grasp ring, the Reap's arc) throb in the hostile tone too;
+     the Rite's candle count and a Bound Soul on its way stay in gold. */
+  #crypt-alert.is-measured,
+  #crypt-alert.is-grave,
+  #crypt-alert.is-knell,
+  #crypt-alert.is-grasp,
+  #crypt-alert.is-reap {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #crypt-alert.is-measured .fa-title,
+  #crypt-alert.is-measured .fa-fill,
+  #crypt-alert.is-knell .fa-title,
+  #crypt-alert.is-knell .fa-fill,
+  #crypt-alert.is-grasp .fa-title,
+  #crypt-alert.is-grasp .fa-fill,
+  #crypt-alert.is-reap .fa-title,
+  #crypt-alert.is-reap .fa-fill,
+  #crypt-alert.is-grave .fa-title {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
+  #crypt-alert.is-embraced,
+  #crypt-alert.is-lament-open {
+    border-color: var(--color-debuff-frost);
+  }
+  #crypt-alert.is-lament-open {
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #crypt-alert.is-embraced .fa-title,
+  #crypt-alert.is-embraced .fa-fill,
+  #crypt-alert.is-lament-open .fa-title,
+  #crypt-alert.is-lament-open .fa-fill {
+    color: var(--color-debuff-frost);
+    --bar-color: var(--color-debuff-frost);
+  }
+  #crypt-alert.is-lament-sheltered {
+    border-color: var(--color-friendly);
+  }
+  #crypt-alert.is-lament-sheltered .fa-title,
+  #crypt-alert.is-lament-sheltered .fa-fill {
+    color: var(--color-friendly);
+    --bar-color: var(--color-friendly);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #crypt-alert {
+      animation: none;
+    }
+    #crypt-alert .fa-fill {
+      transition: none;
+    }
+  }
+  body.mobile-touch #crypt-alert {
+    min-width: min(420px, calc(100vw - 32px));
+  }
+
+  /* ---------- The trash engine's use prompt (a Soul Brazier to topple) ---------- */
+  /* Self-mounted by the shared encounter alert painter
+     (encounter_alert_painter.ts) under its own id, from
+     src/ui/hud/dungeon/kit_use_prompt_view.ts, in the dungeon prompts' shared
+     slot (it yields the slot to every other prompt). In the use's reach the
+     whole panel is a button (a tap or a click targets the body and interacts,
+     like the interact key); a little farther out, or while the player's own
+     use runs, it ignores the pointer. The state is carried by the text too:
+     the keycap and the press line, the step-closer line, the use's own bar.
+     Never tier-gated (graphics fairness). */
+  #kit-use-prompt {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 320px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-gold);
+  }
+  #kit-use-prompt.is-pressable {
+    cursor: pointer;
+    pointer-events: auto;
+    touch-action: manipulation;
+  }
+  #kit-use-prompt .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #kit-use-prompt .fa-line {
+    font-size: 14px;
+  }
+  #kit-use-prompt .fa-hint {
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 700;
+  }
+  #kit-use-prompt .fa-key {
+    font-size: 16px;
+    font-weight: 700;
+  }
+  #kit-use-prompt .fa-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #kit-use-prompt .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #kit-use-prompt.is-use {
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #kit-use-prompt.is-use-far {
+    border-color: var(--color-border-default);
+  }
+  #kit-use-prompt.is-using .fa-fill {
+    --bar-color: var(--color-friendly);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #kit-use-prompt {
+      animation: none;
+    }
+    #kit-use-prompt .fa-fill {
+      transition: none;
+    }
+  }
+  body.mobile-touch #kit-use-prompt {
+    min-width: min(420px, calc(100vw - 32px));
+    padding: 16px 20px 18px;
+  }
+  body.mobile-touch #kit-use-prompt .fa-hint {
+    font-size: 17px;
+  }
+
   /* ---------- King of the Hill (the in-zone bar over the standing hill) ---------- */
   /* Self-mounted by src/ui/hud/hill/hill_bar_painter.ts, top centre below the
      Thornhollow Fields scoreboard's slot; shown only while the player stands in

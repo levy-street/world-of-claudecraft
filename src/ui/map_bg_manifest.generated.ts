@@ -20,7 +20,7 @@ export const BAKED_MAP_BG = {
   "thornpeak_heights": {
     "w": 480,
     "h": 480,
-    "rowHash": "64f3ed37"
+    "rowHash": "b8636306"
   },
   "veiled_hollow": {
     "w": 720,

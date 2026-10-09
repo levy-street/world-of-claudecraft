@@ -6908,12 +6908,12 @@ export const TARGETS = [
   // The Wildheart Basin's light grade: the caldera used to add its own fill
   // pair to the world scene (a light census change that relinked every
   // material for the rest of the session); the grade now lives in
-  // interior_light_rig.ts's wildheartField state. A lighting comparison, so
+  // interior_light_rig.ts's wildheartBasin state. A lighting comparison, so
   // the shot keeps the app's default preset rather than the standing lowest.
   {
     key: 'wildheart-basin-light-rig',
     label: 'Wildheart Basin: the caldera grade through the one sun/hemi pair',
-    when: ['render/wildheart_props', 'render/interior_light_rig'],
+    when: ['render/wildheart_basin/', 'render/interior_light_rig'],
     variants: [{ key: 'desktop' }],
     async capture(page) {
       const entered = await page.evaluate(() => {

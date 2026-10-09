@@ -22,6 +22,7 @@ import { classDisplayName, dungeonDisplayName, itemDisplayName, tEntity } from '
 import { feastTitleFor } from './hud/professions/feast_title';
 import { mobileStationTitleFor } from './hud/professions/mobile_station_title';
 import { formatNumber, t } from './i18n';
+import { kitObjectDisplayName } from './kit_object_name';
 import { professionTrainerLabel } from './profession_trainer_label_core';
 import { localizeSimAuraName } from './sim_i18n';
 import { forgeObjectLabel } from './world_quest_forge_view';
@@ -180,6 +181,10 @@ export function entityDisplayName(entity: Entity): string {
     // A placed mobile crafting station, the same leaf rule (mobile_station_title.ts).
     const stationTitle = mobileStationTitleFor(entity.templateId, entity.name);
     if (stationTitle !== null) return stationTitle;
+    // A trash engine object (an Ice Slab, a soulfire pool): the sim's English
+    // mechanic name, re-localized (kit_object_name.ts).
+    const kitName = kitObjectDisplayName(entity.templateId, entity.name);
+    if (kitName !== null) return kitName;
   }
   return entity.name;
 }

@@ -44,11 +44,9 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Yaban Yürek Çukuru',
-    desc: "Zulgar'dan ve Diş Lordu Canavar Efendisi'nden çıkan simge silahlar.",
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Kahramanca: Yaban Yürek Çukuru',
-    desc: "Zulgar, Çukurun Sesi'nden yalnızca kahramanca modda düşen epikler.",
   },
   conquerors_nythraxis: {
     name: 'Nythraxis Baskını',

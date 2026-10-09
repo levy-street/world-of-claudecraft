@@ -44,11 +44,9 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Le Bassin du Cœur Sauvage',
-    desc: 'Armes emblématiques de Zulgar et du Maître des bêtes, Seigneur des crocs.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Héroïque : le Bassin du Cœur Sauvage',
-    desc: 'Épiques exclusifs au mode héroïque de Zulgar, Voix du Bassin.',
   },
   conquerors_nythraxis: {
     name: 'Raid de Nythraxis',

@@ -350,6 +350,8 @@ const UI_PURE_CORES = [
   'src/ui/hud/quest/quest_strip_core.ts',
   'src/ui/hud/action_bar/item_bags_line_core.ts',
   'src/ui/hud/quest/clue_talk_row_core.ts',
+  'src/ui/hud/quest/dungeon_guide_dialog_core.ts',
+  'src/ui/hud/dungeon/dungeon_guide_speech_view.ts',
   'src/ui/hud/action_bar/trinket_slot_core.ts',
   'src/ui/hud/quest/prof_intro_hint_core.ts',
   'src/ui/hud/quest/clue_step_row_view.ts',
@@ -609,6 +611,7 @@ const UI_PURE_CORES = [
   'src/ui/inspect_view.ts',
   'src/ui/quality_glow.ts',
   'src/ui/dungeon_map_view.ts',
+  'src/ui/field_map_view.ts',
   'src/ui/lastkeep_map_view.ts',
   'src/ui/map_pinch_zoom_core.ts',
   'src/ui/bg_field_relief_core.ts',
@@ -633,6 +636,29 @@ const UI_PURE_CORES = [
   'src/ui/hud/battleground/battleground_window_view.ts',
   'src/ui/hud/world_pvp/world_pvp_window_view.ts',
   'src/ui/hud/hill/hill_bar_view.ts',
+  // The Iron Cage escape prompt (the Gaol Turnkey's button-mash).
+  'src/ui/hud/dungeon/cage_escape_view.ts',
+  // Gaoler Ossick's chain alert (the Drowned Anchor, the Shackle Pair).
+  'src/ui/hud/dungeon/gaol_chain_view.ts',
+  // The shared encounter alert family's view contract, and the floating
+  // combat text's avoidance word.
+  'src/ui/hud/dungeon/encounter_alert_view.ts',
+  'src/ui/hud/dungeon/fct_avoidance_core.ts',
+  // The Wildheart Basin's alert (the Prey, the Stalk, the pollen, the bond).
+  'src/ui/hud/dungeon/wildheart_alert_view.ts',
+  // The Sunken Bastion's alert on the Beacon Crown (the scythe, the Fog Veil).
+  'src/ui/hud/dungeon/bastion_alert_view.ts',
+  // The Gravewyrm Sanctum's alert (the chains, the meltwater, the lake) and its
+  // scene scan.
+  'src/ui/hud/dungeon/sanctum_alert_view.ts',
+  'src/ui/hud/dungeon/sanctum_alert_scene_core.ts',
+  // The Hollow Crypt's alert (the grave mark, the Embrace, the Lament, the
+  // Open Grave, Morthen's Rite Ring, the Knell's half, the Toll and Harmony
+  // readouts) and its scene scan.
+  'src/ui/hud/dungeon/crypt_alert_view.ts',
+  'src/ui/hud/dungeon/crypt_alert_scene_core.ts',
+  // The trash engine's use prompt (a Soul Brazier to topple) and its scene scan.
+  'src/ui/hud/dungeon/kit_use_prompt_view.ts',
   'src/ui/hud/battleground/bg_end_banner_view.ts',
   'src/ui/hud/battleground/battleground_scoreboard_view.ts',
   'src/ui/leaderboard_view.ts',
@@ -793,6 +819,150 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
   'src/render/action_cam_core.ts',
+  // Which body plays an overhead emote (a player's, or a talking NPC's gesture).
+  'src/render/body_emote_core.ts',
+  // The rig / frozen-far-mesh handoff with hysteresis (the far-LOD flicker fix).
+  'src/render/far_lod_latch_core.ts',
+  // The Hollow Crypt finale's effect plan (Morthen's entrance, the Knellwyrm).
+  'src/render/hollow_crypt/crypt_boss_fx_core.ts',
+  // Cantor Ilvane's Dirge plan (swell, voices, the shock of sound, the marks).
+  'src/render/hollow_crypt/ilvane_dirge_fx_core.ts',
+  'src/render/hollow_crypt/crypt_finale_fx_core.ts',
+  // Morthen the Lich Bishop's stance latch, body anchors and effect timings.
+  'src/render/hollow_crypt/morthen_fx_core.ts',
+  // Morthen's Rite and the Knellwyrm's Burning Knell: telegraph shapes, candle
+  // looks, the ward's cracks, the Grasp's hands.
+  'src/render/hollow_crypt/morthen_rite_fx_core.ts',
+  // The Gravewyrm Sanctum bosses' Blender bodies, measured, and their gestures.
+  'src/render/gravewyrm_sanctum_bosses/boss_model_core.ts',
+  'src/render/gravewyrm_sanctum_bosses/boss_fx_core.ts',
+  // The authored open-air field's terrain plan and the Hollow Crypt's dressing,
+  // set-dressing and gate-memory cores (docs/design/dungeon-rework).
+  'src/render/authored_field/field_mesh_core.ts',
+  'src/render/authored_field/field_clip_core.ts',
+  'src/render/authored_field/field_skirt_core.ts',
+  'src/render/hollow_crypt/crypt_plan_core.ts',
+  'src/render/hollow_crypt/crypt_kit_plan_core.ts',
+  'src/render/hollow_crypt/crypt_trash_fx_core.ts',
+  // The crypt trash mechanics pass's hero effects (bone pile, rupture, granite, marks).
+  'src/render/hollow_crypt/crypt_trash_kit_fx_core.ts',
+  'src/render/hollow_crypt/crypt_creature_fx_core.ts',
+  'src/render/hollow_crypt/crypt_set_dressing_core.ts',
+  'src/render/hollow_crypt/crypt_gate_state_core.ts',
+  // The Sunken Bastion's dressing, kit placement and headland rock cores.
+  'src/render/sunken_bastion/bastion_plan_core.ts',
+  'src/render/sunken_bastion/bastion_kit_plan_core.ts',
+  'src/render/sunken_bastion/bastion_headland_core.ts',
+  'src/render/sunken_bastion/bastion_fx_core.ts',
+  'src/render/sunken_bastion/bastion_boss_fx_core.ts',
+  'src/render/sunken_bastion/bastion_rain_core.ts',
+  'src/render/sunken_bastion/bastion_creature_fx_core.ts',
+  // The drowned garrison's drips, sprays and death gush.
+  'src/render/sunken_bastion/bastion_drowned_fx_core.ts',
+  // The fifth pass's cage, anchor, shackle and reaper visual plan.
+  'src/render/sunken_bastion/bastion_gaol_reaper_core.ts',
+  // Vael's staging (entrance eruptions, the gathering fog, the scythe flash)
+  // and the hollow shade's ghost predicate renderer.ts asks.
+  'src/render/sunken_bastion/bastion_vael_stage_core.ts',
+  'src/render/sunken_bastion/bastion_shade_ghost_core.ts',
+  'src/render/sunken_bastion/bastion_trash_fx_core.ts',
+  'src/render/sunken_bastion/bastion_order_fx_core.ts',
+  // Olen the fallen paladin's visuals: the brine, the shield, the Sentence, the Oath.
+  'src/render/sunken_bastion/bastion_olen_fx_core.ts',
+  'src/render/sunken_bastion/bastion_ghost_fx_core.ts',
+  // The Drowning Yard's Mooring Post lamps: lit, dark, kindling, the flare, the ring.
+  'src/render/sunken_bastion/bastion_mooring_core.ts',
+  'src/render/authored_field/field_edge_plan_core.ts',
+  'src/render/drowned_temple/temple_plan_core.ts',
+  'src/render/drowned_temple/temple_kit_plan_core.ts',
+  // The Wildheart Basin kit's placement plan (props, lips, caldera, gorge, pyramid).
+  'src/render/wildheart_basin/basin_kit_plan_core.ts',
+  // The Wildheart Basin's plan (sun, falls, rainbows, river, lights, life, gate curves)
+  // and its telegraph and creature-effect specs.
+  'src/render/wildheart_basin/basin_plan_core.ts',
+  'src/render/wildheart_basin/basin_fx_core.ts',
+  // The basin's three boss encounters: cast specs from the sim tuning, aura
+  // dressing, the spirit cord, the pods' swell and the seeds' arc.
+  'src/render/wildheart_basin/basin_boss_fx_core.ts',
+  // The Great Saurian's Blender body (its measured model facts and clip beats)
+  // and its body effects' plan (the beats, the tail sweep, the splash curves).
+  'src/render/wildheart_basin/saurian_model_core.ts',
+  'src/render/wildheart_basin/saurian_fx_core.ts',
+  // The Fanglord's Great Jaguar's Blender body (its measured facts and beats), and
+  // the dazed loop a stunned body holds (ClipMap.stunned).
+  'src/render/wildheart_basin/jaguar_model_core.ts',
+  'src/render/wildheart_basin/zulgar_avatar_core.ts',
+  'src/render/wildheart_basin/bond_cord_core.ts',
+  'src/render/wildheart_basin/basin_fire_core.ts',
+  'src/render/characters/stun_idle_core.ts',
+  // The Gorgebloom's Blender body (its measured anchors and beats) and its body
+  // effects' plan (beats, clip rates, the lash's thorn wave, the glow pulses),
+  // the rooted turn in place (ClipMap.turn) and the gesture-flared glow map.
+  'src/render/wildheart_basin/gorgebloom_model_core.ts',
+  'src/render/wildheart_basin/gorgebloom_fx_core.ts',
+  // The Snarlvine Lasher's and the Thorn Sprout's bodies and the Lasher's lash
+  // lane, and the thorn waves both lashes tear down their lanes.
+  'src/render/wildheart_basin/lasher_model_core.ts',
+  'src/render/wildheart_basin/lasher_fx_core.ts',
+  'src/render/wildheart_basin/basin_thorns_core.ts',
+  // The trash hunt (the trash mechanics pass): its telegraphs, shocks, marks,
+  // tongue and clip rates, all read off the sim's templates.
+  'src/render/wildheart_basin/basin_trash_fx_core.ts',
+  'src/render/wildheart_basin/basin_trash_model_core.ts',
+  'src/render/wildheart_basin/maw_glow_core.ts',
+  // The Gravewyrm Sanctum's Sledge Tusker body and sledge (measured facts,
+  // clip beats, the sledge's trailer drag and the bowls onto their patches)
+  // and its creature effects' plan (telegraph specs, the Trample lane's
+  // length, the object looks, the palette and the timelines).
+  'src/render/gravewyrm_sanctum_fx/tusker_model_core.ts',
+  'src/render/gravewyrm_sanctum_fx/sanctum_fx_core.ts',
+  // The trash engine's visuals: the catalog swept from the kits, the hazard
+  // looks, the wall box, the nova's sight reach and wave, the use hint, the
+  // freeze and encase timelines, the quench pools' placement.
+  'src/render/trash_engine_fx/trash_engine_fx_core.ts',
+  // The line-of-sight field's dense draped layout (shared by the nova and the Dirge).
+  'src/render/trash_engine_fx/sight_field_core.ts',
+  'src/render/characters/turn_in_place_core.ts',
+  'src/render/characters/glow_pulse_core.ts',
+  // Creased smooth normals for a faceted rig (VisualDef.smoothNormals).
+  'src/render/characters/smooth_normals_core.ts',
+  'src/render/drowned_temple/temple_shore_core.ts',
+  'src/render/drowned_temple/temple_fx_core.ts',
+  // Laverock's finale on the Moon Altar (the fallen rising as moonlight).
+  'src/render/drowned_temple/temple_cantor_finale_core.ts',
+  // The trash kit's death-burst rings: their look and their fuse.
+  'src/render/death_burst_fx_core.ts',
+  // The Gravewyrm Sanctum (render/gravewyrm_sanctum): the palette, fires and
+  // air spots; the Calving Face's frame, swap seam and stage curves; the
+  // story-step memory; the Smith's chains; the kit placement plan; the gates'
+  // motion; the lake's plate cells; the fires' counts; the Thaw Works' marks.
+  'src/render/gravewyrm_sanctum/sanctum_plan_core.ts',
+  'src/render/gravewyrm_sanctum/sanctum_face_core.ts',
+  'src/render/gravewyrm_sanctum/sanctum_story_core.ts',
+  'src/render/gravewyrm_sanctum/sanctum_chains_core.ts',
+  'src/render/gravewyrm_sanctum/sanctum_kit_plan_core.ts',
+  'src/render/gravewyrm_sanctum/sanctum_gates_core.ts',
+  'src/render/gravewyrm_sanctum/sanctum_lake_core.ts',
+  'src/render/gravewyrm_sanctum/sanctum_fire_core.ts',
+  'src/render/gravewyrm_sanctum/sanctum_works_core.ts',
+  'src/render/drowned_temple/temple_rising_stair_core.ts',
+  // The Mere Hydra's Tsunami: the breaking wave's profile, timeline, spray and foam.
+  'src/render/drowned_temple/temple_tsunami_core.ts',
+  // The Mere Hydra's neck fold, regrowth rise and orphaned breath pours.
+  'src/render/drowned_temple/temple_hydra_neck_core.ts',
+  // The Temple encounter pass: the Combined Breath's floor marks, wall and
+  // crystals, Ysolei's moon (its swell, eclipse and ward cracks), the
+  // Moonmantle Ray's glide and wingbeat, and the Moonbridge's beam timeline.
+  'src/render/drowned_temple/temple_hydra_combo_core.ts',
+  'src/render/drowned_temple/temple_moon_core.ts',
+  'src/render/drowned_temple/temple_manta_core.ts',
+  'src/render/drowned_temple/temple_moonbridge_core.ts',
+  // The Temple trash mechanics pass: the vigil bubble, the oath, the echo,
+  // the gaze eye and veil, the whirlpool, the spark's arcs and the swell.
+  'src/render/drowned_temple/temple_trash_fx_core.ts',
+  'src/render/drowned_temple/temple_lure_fx_core.ts',
+  // The shared dungeon floor telegraph look (cones, rings, lanes, kick glyphs).
+  'src/render/floor_telegraph/telegraph_look_core.ts',
   'src/render/ambience_state_core.ts',
   'src/render/ability_vfx/cast_admission_core.ts',
   'src/render/ability_vfx/physical_choreography_core.ts',
@@ -826,6 +996,8 @@ const RENDER_PURE_CORES = [
   'src/render/hoard_room_themes_core.ts',
   'src/render/hoard_tide_wave_fx_core.ts',
   'src/render/hoard_entrance_core.ts',
+  // The Gravewyrm Sanctum Seal Gate's cosmetic plan (mist flow, rime fan).
+  'src/render/sanctum_seal_gate_core.ts',
   'src/render/hoard_valley_core.ts',
   'src/render/hoard_cavern_core.ts',
   'src/render/hoard_cavern_ground_core.ts',
@@ -854,6 +1026,7 @@ const RENDER_PURE_CORES = [
   'src/render/dais_blocks_core.ts',
   'src/render/dungeon_banner_core.ts',
   'src/render/dungeon_tile_kind_core.ts',
+  'src/render/open_air_field_visibility_core.ts',
   'src/render/rift_platform_core.ts',
   'src/render/ignivar_dressing_plan_core.ts',
   'src/render/nythraxis_bound_cage_core.ts',
@@ -2714,6 +2887,10 @@ const UI_DOM_MODULES = [
   'src/ui/host_diag_section_controller.ts',
   'src/ui/options_main_menu_controller.ts',
   'src/ui/hud/talking_head/talking_head_controller.ts',
+  // Composes the dungeon prompt painters (they mount the DOM) and reads the UI
+  // clock once a frame for the Sanctum's Ice Slab cover hint; the decisions
+  // stay in the registered pure cores (sanctum_alert_view, its scene scan).
+  'src/ui/hud/dungeon/dungeon_prompts.ts',
   'src/ui/char_skin_window.ts',
   'src/ui/char_window.ts',
   'src/ui/charselect_news.ts',

@@ -1,3 +1,5 @@
+import { WILDHEART_TOADED } from '../../sim/mob/trash_kit/wildheart_cast_ids';
+
 export const CHARACTER_FORM_FLAG = {
   sheep: 1 << 0,
   bear: 1 << 1,
@@ -58,15 +60,36 @@ export type CharacterFormKey =
   | 'form_travel'
   | 'form_metamorph';
 
+/** The polymorphs that wear a toad, not the sheep (the Sunbone Hexcaller's
+ *  Toad Hex): still kind 'polymorph', so the one polymorph slot and its gate
+ *  serve both; only the asset differs. */
+export const TOAD_POLYMORPH_AURAS: ReadonlySet<string> = new Set([WILDHEART_TOADED]);
+
+export type CharacterFormAssetKey = CharacterFormKey | 'form_ghost_wolf' | 'form_toad';
+
 /** The renderer shares one cat/wolf slot, but the two classes keep distinct
- *  assets. Resolve at construction so both stay behind the existing form gate. */
+ *  assets; it shares one polymorph slot too, and a toad hex keeps its toad.
+ *  Resolve at construction so every look stays behind the existing form gate. */
 export function characterFormAssetKey(
   formKey: CharacterFormKey,
   auras: readonly AuraIdentity[],
-): CharacterFormKey | 'form_ghost_wolf' {
-  return formKey === 'form_cat' && auras.some((aura) => aura.id === 'ghost_wolf')
-    ? 'form_ghost_wolf'
-    : formKey;
+): CharacterFormAssetKey {
+  if (formKey === 'form_cat' && auras.some((aura) => aura.id === 'ghost_wolf')) {
+    return 'form_ghost_wolf';
+  }
+  if (formKey === 'form_sheep' && auras.some(isToadPolymorph)) return 'form_toad';
+  return formKey;
+}
+
+function isToadPolymorph(aura: AuraIdentity): boolean {
+  return aura.kind === 'polymorph' && aura.id !== undefined && TOAD_POLYMORPH_AURAS.has(aura.id);
+}
+
+/** Is the built polymorph rig (built from `builtKey`) the wrong animal for the
+ *  polymorph the entity wears now (a sheep left from an earlier Polymorph
+ *  under a Toad Hex, or the other way round)? Then the slot is rebuilt. */
+export function polymorphRigStale(builtKey: string, auras: readonly AuraIdentity[]): boolean {
+  return builtKey !== characterFormAssetKey('form_sheep', auras);
 }
 
 export function characterFormMaskForAura(aura: AuraIdentity): number {

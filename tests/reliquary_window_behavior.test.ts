@@ -75,9 +75,9 @@ vi.mock('../src/ui/icons', async (importOriginal) => ({
   weaponIconUrl: () => null,
 }));
 
-// The page every grid test drives: five item relics, a dungeon clear source, and
-// a page-level sourceDefault, so its missing cells exercise the two-part
-// "bossDungeon" source arm rather than the degenerate one.
+// The page every grid test drives: item relics, a dungeon clear source, and a boss
+// hint on every relic, so its missing cells exercise the two-part "bossDungeon"
+// source arm rather than the degenerate one. Sizes are read off the live page.
 const PAGE_ID = 'conquerors_hollow_crypt';
 // The Horizons mounts page: seven mounts name every door that awards their
 // reins and two remain content gaps, so it is the page that exercises BOTH the
@@ -626,14 +626,14 @@ describe('ReliquaryWindow: focus survives a rebuild', () => {
   it('falls back to Close when the focused control is gone after the rebuild', () => {
     const state = baseState();
     const ids = relicIds(PAGE_ID);
-    // Four of five owned puts the page on the nearly-complete strip; owning the
-    // fifth completes it, so the row the player is standing on is destroyed by
+    // All but one owned puts the page on the nearly-complete strip; owning the
+    // last completes it, so the row the player is standing on is destroyed by
     // a rebuild they did not initiate.
-    for (const id of ids.slice(0, 4)) state.itemsDiscovered.add(id);
+    for (const id of ids.slice(0, -1)) state.itemsDiscovered.add(id);
     const rig = makeWindow(state, { nav: 'overview' });
     const before = must(rig.el, `[data-focus-key="nearly:${PAGE_ID}"]`);
     before.focus();
-    state.itemsDiscovered.add(ids[4] ?? '');
+    state.itemsDiscovered.add(ids[ids.length - 1] ?? '');
     rig.w.refreshIfChanged();
     expect(rig.el.querySelector(`[data-focus-key="nearly:${PAGE_ID}"]`)).toBeNull();
     const after = document.activeElement as HTMLElement | null;
@@ -865,7 +865,7 @@ describe('ReliquaryWindow: nav, page, and back navigation', () => {
 
   it('follows an Overview nearly-complete row onto that page and its shelf', () => {
     const state = baseState();
-    for (const id of relicIds(PAGE_ID).slice(0, 4)) state.itemsDiscovered.add(id);
+    for (const id of relicIds(PAGE_ID).slice(0, -1)) state.itemsDiscovered.add(id);
     const rig = makeWindow(state, { nav: 'overview' });
     click(rig.el, `[data-focus-key="nearly:${PAGE_ID}"]`);
     // The jump crosses shelves: the rail must follow the page, not stay on the
@@ -1950,9 +1950,9 @@ describe('ReliquaryWindow: owned and missing filter chips', () => {
     });
     expect(must(rig.el, '.reliquary-page-progress').textContent).toBe(trueProgress);
     click(rig.el, '[data-filter="missing"]');
-    // Three cells are on screen, but the player has still found two of five:
-    // a meter that read 0/3 here would be lying about their collection.
-    expect(cells(rig.el)).toHaveLength(3);
+    // The missing cells are on screen, but the player has still found two of
+    // the whole page: a meter that read 0 of the missing count would be lying.
+    expect(cells(rig.el)).toHaveLength(ids.length - 2);
     expect(must(rig.el, '.reliquary-page-progress').textContent).toBe(trueProgress);
   });
 

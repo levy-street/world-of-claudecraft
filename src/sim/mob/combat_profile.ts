@@ -95,7 +95,8 @@ export function tryMobMeleeSwingInRange(ctx: SimContext, mob: Entity, target: En
 // in melee still evades past the leash. Boss attack mechanics stay melee-gated
 // via the return value: 'runAttackMechanics' on any engaged tick that ENDS in
 // melee contact (the caller runs the aoePulse/stomp/bigCast/stoneskin/terrify
-// tail then).
+// tail then). A cast bar already started keeps counting down on the other
+// engaged ticks too (mob/mob_cast_bars.ts); only STARTING one is melee-gated.
 export function updateMobCombatProfile(
   ctx: SimContext,
   mob: Entity,

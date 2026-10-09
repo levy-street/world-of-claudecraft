@@ -44,11 +44,9 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Cekungan Hati Liar',
-    desc: 'Senjata khas dari Zulgar dan Fanglord, Penakluk Binatang.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Heroik: Cekungan Hati Liar',
-    desc: 'Barang epik khusus mode heroik dari Zulgar, Suara Cekungan.',
   },
   conquerors_nythraxis: {
     name: 'Raid Nythraxis',

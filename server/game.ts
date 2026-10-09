@@ -14,7 +14,6 @@ import { damageTakenWithin } from '../src/sim/combat/damage_history';
 import { wireParkedMana } from '../src/sim/combat/form_auto_unshift';
 import { rewindHealAmount } from '../src/sim/combat/rewind';
 import { DEEDS } from '../src/sim/content/deeds';
-import { isFinderListingTag, isFinderRole } from '../src/sim/content/dungeon_finder';
 import { RELIQUARY_PAGES_BY_ID } from '../src/sim/content/reliquary';
 import { MECH_CHROMAS } from '../src/sim/content/skins';
 import {
@@ -243,6 +242,7 @@ import { observeQueuePops, queuedPidsOf, queuePopDepsFor } from './discord_queue
 import { enqueueRelay } from './discord_relay';
 import { findDungeonDoorNear } from './dungeon_door';
 import * as entryFacing from './dungeon_entry_facing';
+import { dispatchDungeonFinderCommand } from './dungeon_finder_commands';
 import { formatDuration } from './duration';
 import {
   copperFlowSourceForCommand,
@@ -1349,6 +1349,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.streamerLinks && hasStreamerLink(e.streamerLinks)) out.slk = e.streamerLinks;
   writePlayerIdentityWire(e, out); // guild, pledge, guild tier, deed title/border, spec
   if (e.dungeonId) out.dgn = e.dungeonId;
+  if (e.guideState) out.gds = e.guideState; // a dungeon guide's offer (src/sim/dungeon_guide)
   if (e.riftTier) out.rt = e.riftTier; // ranked rift portal badge (render-only)
   if (e.vaultRarity) out.vr = e.vaultRarity; // buried-hoard rarity (render-only)
   if (e.objectItemId) out.obj = e.objectItemId;
@@ -7351,6 +7352,10 @@ export class GameServer {
         if (typeof msg.on === 'boolean') sim.setWorldPvpFlag(msg.on, pid);
         session.lastWpvpWireTick = -WPVP_WIRE_INTERVAL_TICKS;
         break;
+      case 'dungeon_guide_answer': // src/sim/dungeon_guide validates the rest
+        if (typeof msg.npcId === 'number' && typeof msg.accept === 'boolean')
+          sim.answerDungeonGuide(msg.npcId, msg.accept, pid);
+        break;
       case 'dev_bg_start': {
         if (process.env.ALLOW_DEV_COMMANDS === '1') sim.devStartBg();
         break;
@@ -7371,60 +7376,18 @@ export class GameServer {
         sim.forfeitCardDuel(pid);
         break;
 
-      // Dungeon Finder (docs/prd/dungeon-finder.md). Deliberately NOT in
-      // HEAVY_SELF_CMDS: finder state rides its own `df`/`dfb` delta keys, and
-      // group formation bumps the party key through the normal snapshot path.
-      // Every field is validated here; the Sim re-validates eligibility, roles,
-      // capacity, and party state authoritatively.
-      case 'df_roles': {
-        if (Array.isArray(msg.roles) && msg.roles.length <= 3) {
-          const roles = msg.roles.filter(isFinderRole);
-          if (roles.length === msg.roles.length) sim.dungeonFinderSetRoles(roles, pid);
-        }
-        break;
-      }
-      case 'df_queue': {
-        if (Array.isArray(msg.activities) && msg.activities.length <= 16) {
-          const activities = msg.activities.filter(
-            (a): a is string => typeof a === 'string' && a.length <= 64,
-          );
-          if (activities.length === msg.activities.length)
-            sim.dungeonFinderQueueJoin(activities, pid);
-        }
-        break;
-      }
+      // Dungeon Finder (docs/prd/dungeon-finder.md): the bodies and their
+      // frame guards live in server/dungeon_finder_commands.ts.
+      case 'df_roles':
+      case 'df_queue':
       case 'df_queue_leave':
-        sim.dungeonFinderQueueLeave(pid);
-        break;
       case 'df_proposal':
-        sim.dungeonFinderRespond(msg.accept === true, pid);
-        break;
-      case 'df_list_create': {
-        if (
-          typeof msg.activity === 'string' &&
-          msg.activity.length <= 64 &&
-          Array.isArray(msg.tags) &&
-          msg.tags.length <= 8
-        ) {
-          const tags = msg.tags.filter(isFinderListingTag);
-          if (tags.length === msg.tags.length)
-            sim.dungeonFinderListingCreate(msg.activity, tags, pid);
-        }
-        break;
-      }
+      case 'df_list_create':
       case 'df_list_close':
-        sim.dungeonFinderListingClose(pid);
-        break;
       case 'df_apply':
-        if (typeof msg.listing === 'number' && Number.isFinite(msg.listing))
-          sim.dungeonFinderApply(msg.listing, pid);
-        break;
       case 'df_apply_cancel':
-        sim.dungeonFinderApplyCancel(pid);
-        break;
       case 'df_app_respond':
-        if (typeof msg.applicant === 'number' && Number.isFinite(msg.applicant))
-          sim.dungeonFinderApplicationRespond(msg.applicant, msg.accept === true, pid);
+        dispatchDungeonFinderCommand(sim, msg, pid);
         break;
 
       // post-cap cosmetic prestige (Max-Level XP Overflow)

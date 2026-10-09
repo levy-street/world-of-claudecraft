@@ -35,6 +35,7 @@ import { isStationMasterNpc } from '../vendor/train_view';
 import { isWarfareVendorNpc } from '../vendor/warfare_vendor_view';
 import { clueStepRowFor, clueStepRowSig } from './clue_step_row_view';
 import { clueReplyKey, clueTalkFor } from './clue_talk_row_core';
+import { guideDialogView } from './dungeon_guide_dialog_core';
 import { gossipMenuIsEmpty } from './gossip_menu';
 import { masterCraftTarget } from './master_craft_core';
 import { PROF_INTRO_QUEST_ID, professionIntroHintVisible } from './prof_intro_hint_core';
@@ -128,6 +129,9 @@ export class QuestDialogController {
   // LIVE hunt state, so it joins the refreshIfChanged watch (a step can advance
   // or the hunt end while the dialog is open).
   private lastClueRowSig = '';
+  // A dungeon guide's offer state as of the last gossip render (null = not a
+  // guide): another member's answer flips it while this dialog is open.
+  private lastGuideState: string | null = null;
   private trap: FocusTrapHandle | null = null;
   private openedAt = 0;
   private voiceNpcId: number | null = null;
@@ -236,6 +240,7 @@ export class QuestDialogController {
     this.lastIntroHintVisible = null;
     this.lastGossipRowSig = null;
     this.lastClueRowSig = '';
+    this.lastGuideState = null;
     this.deps.hideTooltip();
     this.trap?.release(restoreFocus);
     this.trap = null;
@@ -279,7 +284,8 @@ export class QuestDialogController {
       this.introHintVisibleFor(npc) !== this.lastIntroHintVisible ||
       gossipRowSig(this.offerableRows(npc)) !== this.lastGossipRowSig ||
       clueStepRowSig(clueStepRowFor(this.deps.world().clueHunt, npc.templateId)) !==
-        this.lastClueRowSig
+        this.lastClueRowSig ||
+      (guideDialogView(npc)?.state ?? null) !== this.lastGuideState
     ) {
       this.refresh();
     }
@@ -452,6 +458,9 @@ export class QuestDialogController {
     // content flag. Gate it on live state (a husk count, the farmer range)
     // and it must join the signature or the row goes stale between refreshes.
     const hasFarmer = definition?.farmer === true;
+    // A dungeon lore guide: his greeting and his offer's answer rows.
+    const guideView = guideDialogView(npc);
+    this.lastGuideState = guideView?.state ?? null;
     if (
       closeIfEmpty &&
       gossipMenuIsEmpty({
@@ -468,6 +477,7 @@ export class QuestDialogController {
         hasFarmer,
         hasWorldQuestBoard,
         hasClueStep: clueRow !== null,
+        hasDungeonGuide: guideView !== null,
       })
     ) {
       this.close();
@@ -481,7 +491,21 @@ export class QuestDialogController {
       : this.deps.text.mobName(npc.templateId);
     const npcTitle = definition ? this.deps.text.npcTitle(definition.id) : '';
     let html = `<div class="panel-title ui-win-head"><span class="ui-win-title" id="quest-dialog-title">${esc(npcName)}<span class="quest-muted ui-win-sub"> &lt;${esc(npcTitle)}&gt;</span></span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
-    html += `<div class="qd-text">"${esc(definition ? this.deps.text.npcGreeting(definition.id, world.cfg.playerClass, world.player.name) : t('questUi.dialog.greetingFallback'))}"</div>`;
+    const greeting = guideView
+      ? t(guideView.textKey as TranslationKey)
+      : definition
+        ? this.deps.text.npcGreeting(definition.id, world.cfg.playerClass, world.player.name)
+        : t('questUi.dialog.greetingFallback');
+    html += `<div class="qd-text">"${esc(greeting)}"</div>`;
+    if (guideView?.rows) {
+      for (const [answer, key] of [
+        ['join', guideView.rows.joinKey],
+        ['decline', guideView.rows.declineKey],
+      ] as const) {
+        const label = t(key as TranslationKey);
+        html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-guide-answer="${answer}" aria-label="${esc(label)}"><span class="gold">${svgIcon('questlog')}</span> ${esc(label)}</button>`;
+      }
+    }
     // Locked-quest hint row: a profession master's
     // dialog points a pre-q_prof_intro viewer at the intro quest's giver, so
     // the Guild trend letter never lands on a greeting-plus-vendor dead end.
@@ -628,6 +652,15 @@ export class QuestDialogController {
     this.bindRoute('[data-market]', this.deps.openMarket);
     this.bindRoute('[data-world-quest-board]', this.deps.openWorldQuestBoard);
     this.bindRoute('[data-delve-board]', () => this.deps.openDelveBoard(npc.id));
+    // A dungeon guide's answer goes straight to the world (the sim validates
+    // it; his reply arrives as his own line), then the dialog closes with the
+    // trap's own focus restore, like the husk trade.
+    this.deps.element.querySelectorAll<HTMLElement>('[data-guide-answer]').forEach((row) => {
+      row.addEventListener('click', () => {
+        this.deps.world().answerDungeonGuide(npc.id, row.dataset.guideAnswer === 'join');
+        this.close(true);
+      });
+    });
     this.bindRoute('[data-card-duel]', this.deps.openCardDuel);
     // The husk trade goes straight to the world (IWorldFarming.convertHusks,
     // both worlds; online it is the convert_husks command): no new dep, no

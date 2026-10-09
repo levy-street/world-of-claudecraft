@@ -15,10 +15,11 @@ import {
   zoneWelcomeText,
 } from '../src/sim/data';
 import { EASTBROOK_BUILDINGS_BY_ID, localToWorld } from '../src/sim/eastbrook_layout';
+import { finishVaelIntro } from '../src/sim/encounters/sunken_bastion/vael_intro';
 import { createMob } from '../src/sim/entity';
 import { IGNIVAR_LIFT_RIDE_SECONDS } from '../src/sim/ignivar_forge_lift';
 import { IGNIVAR_LIFT_ROOM_ID, isIgnivarRaidRoom } from '../src/sim/ignivar_raid_ids';
-import { enterDungeon } from '../src/sim/instances/dungeons';
+import { claimedInstanceAt, enterDungeon } from '../src/sim/instances/dungeons';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
 import { dist2d, type Entity, type LootEntry, type SimEvent } from '../src/sim/types';
@@ -784,10 +785,14 @@ describe('boss loot and encounter resets', () => {
     for (const [bossId, groupId, exactlyOne] of [
       ['morthen', 'morthen_guaranteed_uncommon', true],
       ['morthen', 'morthen_bonus', false],
+      // The lower dungeons' normal blues (tests/lower_dungeon_blues.test.ts):
+      // one rare group per boss, guaranteed on the final bosses.
+      ['morthen', 'morthen_blue', true],
       ['knight_commander_olen', 'olen_guaranteed_uncommon', true],
-      ['knight_commander_olen', 'olen_bonus', false],
+      ['knight_commander_olen', 'olen_blue', false],
       ['vael_the_mistcaller', 'vael_guaranteed_uncommon', true],
       ['vael_the_mistcaller', 'vael_bonus', false],
+      ['vael_the_mistcaller', 'vael_blue', true],
       ['korgath_the_bound', 'korgath_guaranteed_uncommon', true],
       ['korgath_the_bound', 'korgath_bonus', false],
       ['grand_necromancer_velkhar', 'velkhar_guaranteed_uncommon', true],
@@ -831,15 +836,27 @@ describe('boss loot and encounter resets', () => {
       'korzul_the_gravewyrm',
     ]) {
       const template = MOBS[bossId];
+      // A boss's normal blue group (`<boss>_blue`, the lower dungeons' ruling
+      // of 2026-10-08) is its own slot, capped at one piece a kill and
+      // guaranteed where the group sums to 1; the bonus caps below cover the
+      // rest of the table.
+      const blueRows = template.loot.filter((l) => l.rollGroup?.endsWith('_blue'));
+      const blueIds = new Set(blueRows.map((l) => l.itemId));
+      const blueGuaranteed =
+        blueRows.length > 0 && Math.abs(blueRows.reduce((s, l) => s + l.chance, 0) - 1) < 1e-9;
       const mob = createMob(900010, template, template.maxLevel, { x: 0, y: 0, z: 0 });
       for (let i = 0; i < 300; i++) {
         mob.loot = null;
         asHarness(sim).rollLoot(mob, meta);
+        const blues = (lootOf(mob)?.items ?? []).filter((s) => blueIds.has(s.itemId));
+        expect(blues.length, `${bossId} blue`).toBeLessThanOrEqual(1);
+        if (blueGuaranteed) expect(blues.length, `${bossId} blue`).toBe(1);
         // Gear only: a collectible mount reins (kind 'mount') rides its own
         // independent drop and is exempt from the bonus-gear caps.
         const gear = (lootOf(mob)?.items ?? []).filter((s) => {
           const def = ITEMS[s.itemId];
           if (def?.kind === 'mount') return false;
+          if (blueIds.has(s.itemId)) return false;
           const q = def?.quality;
           return q === 'uncommon' || q === 'rare' || q === 'epic';
         });
@@ -1295,6 +1312,8 @@ describe('boss loot and encounter resets', () => {
     );
     const thralls = () =>
       [...sim.entities.values()].filter((e) => e.templateId === 'drowned_thrall').length;
+    // He waits buried for his entrance on the crown: skip it, he stands ready.
+    finishVaelIntro(sim.ctx, expectDefined(claimedInstanceAt(sim.ctx, p.pos)), vael);
     // pull to 50%: the 60% summon threshold fires one wave of 2 thralls
     vael.inCombat = true;
     vael.hp = Math.floor(vael.maxHp * 0.5);

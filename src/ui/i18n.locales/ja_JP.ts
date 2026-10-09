@@ -13,6 +13,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'abilityUi.cast.ghost_captain_boarding': '幻影の斬り込み',
+  'abilityUi.cast.ghost_captain_anchor': '呪いの錨',
+  'abilityUi.cast.ghost_captain_broadside': '幽霊船の一斉砲撃',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}分',
   'abilityUi.cast.hoard_cast_rime_beam': '霜光線',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount}{currency}',
@@ -4094,6 +4097,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.system.respawn': '再び休まり、完全な状態になりました。',
   'hud.system.respawnKeeperToll':
     '霊魂の癒し手があなたを復活させたが、その代償として弱っている。復活の後遺症が消えるまで、すべての能力値が下がる。',
+  'hud.system.moonbridgeBanner': '月の橋が架かる',
   'hud.system.ignoringChat': '{name}のチャットを無視します。',
   'hud.system.noLongerIgnoring': '{name}の無視を解除しました。',
   'hud.system.playerNotNearby': 'そのプレイヤーは近くにいません。',
@@ -5704,6 +5708,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.willowfen_remedy_caravan.name': 'ウィローフェン薬品隊商',
   'entities.mobs.frostveil_supply_caravan.name': 'フロストヴェイル補給隊商',
   'entities.mobs.restless_bones.name': '安らがぬ骨',
+  'entities.mobs.marrow_restless_bones.name': '安らがぬ骨',
   'entities.mobs.gorrak.name': '無慈悲なるゴラック',
   'entities.mobs.mire_prowler.name': '沼の徘徊者',
   'entities.mobs.deepfen_murloc.name': 'ディープフェンのスナッパー',
@@ -5755,6 +5760,36 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.drowned_thrall.name': '溺れた下僕',
   'entities.mobs.knight_commander_olen.name': '騎士司令官オレン',
   'entities.mobs.vael_the_mistcaller.name': 'フォグバインダーのヴァエル',
+  'entities.mobs.drowned_watchman.name': '溺れた見張り番',
+  'entities.mobs.fogbound_arbalest.name': '霧縛りの弩兵',
+  'entities.mobs.barnacle_crawler.name': '難破船に縛られた船員',
+  'entities.mobs.bastion_warhound.name': '砦の軍用犬',
+  'entities.mobs.mistweaver.name': '霧の詠唱者',
+  'entities.mobs.drowned_sergeant.name': '溺れた軍曹',
+  'entities.mobs.shackled_prisoner.name': '枷の囚人',
+  'entities.mobs.gaol_turnkey.name': '牢の鍵番',
+  'entities.mobs.turretback_hermit.name': '難破船の船長',
+  'entities.mobs.vael_fog_shade.name': 'フォグバインダーのヴァエル',
+  'entities.mobs.gaoler_ossick.name': '牢番オシック',
+  'entities.mobs.lagoon_snapper.name': '潟湖のスナッパー',
+  'entities.mobs.ice_wraith.name': '氷のレイス',
+  'entities.mobs.moonlit_siren.name': '月照らしのセイレーン',
+  'entities.mobs.tidewisp.name': '潮の精',
+  'entities.mobs.drowned_pilgrim.name': '溺れた巡礼者',
+  'entities.mobs.mere_hydra_head_left.name': '湖のヒュドラ',
+  'entities.mobs.mere_hydra_head_center.name': '湖のヒュドラ',
+  'entities.mobs.mere_hydra_head_right.name': '湖のヒュドラ',
+  'entities.mobs.tideglass_colossus.name': '潮硝子の巨像',
+  'entities.mobs.tideglass_reflection.name': '潮硝子の映し身',
+  'entities.mobs.tideglass_reflection_warrior.name': '潮硝子の映し身',
+  'entities.mobs.tideglass_reflection_paladin.name': '潮硝子の映し身',
+  'entities.mobs.tideglass_reflection_hunter.name': '潮硝子の映し身',
+  'entities.mobs.tideglass_reflection_rogue.name': '潮硝子の映し身',
+  'entities.mobs.tideglass_reflection_priest.name': '潮硝子の映し身',
+  'entities.mobs.tideglass_reflection_shaman.name': '潮硝子の映し身',
+  'entities.mobs.tideglass_reflection_mage.name': '潮硝子の映し身',
+  'entities.mobs.tideglass_reflection_warlock.name': '潮硝子の映し身',
+  'entities.mobs.tideglass_reflection_druid.name': '潮硝子の映し身',
   'entities.mobs.sanctum_boneguard.name': '聖所の骨衛兵',
   'entities.mobs.sanctum_drakonid.name': 'サンクタム・スケイルガード',
   'entities.mobs.raised_bonewalker.name': '甦った骨歩き',
@@ -5782,7 +5817,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.glimmerscale_lurker.name': '煌鱗の潜み者',
   'entities.mobs.moonspawn.name': '月の落とし子',
   'entities.mobs.pale_choir_acolyte.name': '蒼白聖歌隊の侍祭',
-  'entities.mobs.pearlguard_sentinel.name': '真珠衛の歩哨',
+  'entities.mobs.pearlguard_sentinel.name': '月套のエイ',
   'entities.mobs.sethrael_palecoil.name': '蒼渦のセスラエル',
   'entities.mobs.warlock_imp.name': '炎の魔物',
   'entities.mobs.warlock_voidwalker.name': '虚無の魔物',
@@ -8703,9 +8738,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'パーティがまだ確保した周回を抱えたまま難易度を切り替えると、古い確保はしばらく居座ってから自然に解けます。パーティリーダーは代わりに一度に手放せます。自分の肖像メニューから「すべてのインスタンスをリセット」を選ぶか、/dungeon reset と入力してください。リセットが働くのは、難易度が実際に変更された後だけ、中に誰も、生者も倒れた者も残っていない間だけ、そして中の亡骸がすべて拾い尽くされた後だけで、リセットの間には短いクールダウンが挟まります。誤った難易度で扉に着けば、周回が始まる前にゲームが知らせます。レイドはこのやり方では決してリセットされません。レイド自身のロックアウト規則が働きます。',
   'guide.dungeonsPage.resetTitle': 'インスタンスのリセット',
   'guide.dungeonsPage.sanctumBody':
-    'ソーンピークの暗き中心。カルトの長きにわたる企てが、おぞましい頂点に達する場所です。',
+    'ソーンピークの高みに隠された氷河。一頭の竜が氷の中に囚われ、カルトは盗んだ魂を燃やしてその氷を解かそうとしている。高い峠から氷の塔、鍛冶神の砕けた鎖、カルトの炎を越えて、氷河の麓の凍った湖へと下っていきます。',
   'guide.dungeonsPage.wildheartBody':
-    '温かな雨に濡れた密林のカルデラ。翡翠色の泉を囲む二本の高い狩猟路を進み、獣の巣と祖霊の遺跡を越えて、儀式のピラミッドの頂で誰が待っているか確かめよ。',
+    '沈んだ偶像の奥に隠されたジャングルのカルデラ。断崖に囲まれ、滝の轟きが響く。川の浅瀬を渡り、狩りの段丘と滝を抜け、植民地の廃墟を越えて、巨大な石のジャガーの頭の下にそびえる階段状の神殿へ登れ。',
   'guide.dungeonsPage.raidName': 'エンドコンテンツのレイド',
   'guide.dungeonsPage.raidBody':
     '封じられた王家の扉の奥で、10人用の試練が待ち受けます。複数段階の戦いと、レイド全員で力を合わせて封じねばならない不死の力です。挑む資格を勝ち取り、9人の仲間を連れて挑みましょう。',
@@ -12871,10 +12906,42 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.tagLearning': '初心者歓迎',
   'hudChrome.finder.tagFastRun': '高速周回',
   'hudChrome.finder.mech.shadow_pulse': 'シャドウパルス（周期的な範囲ダメージ）',
+  'hudChrome.finder.mech.crypt_shovelful':
+    'ひとすくいの墓土（11秒ごとに前方8ヤードの扇形に墓土を浴びせる：通常攻撃の1.5倍のダメージと6秒間の移動速度50%低下。背後に立つこと）',
+  'hudChrome.finder.mech.crypt_measured_for_the_grave':
+    '墓の採寸（15秒ごとにタンク以外のプレイヤーに印を付ける。4秒後その足元に開いた墓が崩れ落ち、ノーマルでは3ヤード以内に42～52のダメージ。穴は戦闘中ずっと残り、中にいると毎秒9ダメージと移動速度40%低下。墓は墓地の端に作ること）',
+  'hudChrome.finder.mech.crypt_burial_toll':
+    '埋葬の鐘（体力66%と33%で鐘の綱へ歩み寄り、ダメージ無効のまま3秒間鐘を鳴らす：ノーマルでは全員に30～38の闇ダメージ、さらに開いた墓すべてから安らがぬ骨が這い出る）',
+  'hudChrome.finder.mech.crypt_marrow_heroic':
+    'ヒロイック：墓掘りの一撃が9秒ごとにタンクを襲う（1スタックごとに受けるダメージ6%上昇、20秒、最大6スタック）、墓の活力（墓の中に立つと攻撃速度30%上昇）、安らがぬ大地（墓の中に2秒留まるとそこから安らがぬ骨が這い出る）',
+  'hudChrome.finder.mech.crypt_brides_lament':
+    '花嫁の哀歌（22秒ごとに3秒の慟哭：ノーマルでは灯った墓のランタンの光の外にいる全員に60～75の冷気ダメージ、すでに受けた哀歌の名残1スタックごとに半分ずつ増加。ランタン1つが守れるのは2人まで、誰かを守ると28秒間消える。分かれて交代で使うこと）',
+  'hudChrome.finder.mech.crypt_frozen_embrace':
+    '凍てつく抱擁（30秒ごとにタンク以外のプレイヤーを捕らえ、5ヤードの高さまで共に浮かび上がる。毎秒6の冷気ダメージ。8秒以内に彼女の体力の6%を削れば静かに降ろすが、さもなくば落とし、ノーマルで150～180のダメージ）',
+  'hudChrome.finder.mech.crypt_rime_path':
+    '霜の道（彼女が漂った跡に25秒間すべりやすい霜が残る。その上では加速が遅く、止まったり曲がったりしても滑り続ける）',
+  'hudChrome.finder.mech.crypt_bridal_freeze':
+    '花嫁の凍結（体力が半分になると峡谷の床全体が凍りつき、戦闘の残りはずっとすべる氷になる）',
+  'hudChrome.finder.mech.crypt_lady_heroic':
+    'ヒロイック：灯ったランタンは30秒経つと自然に消えて10秒間暗くなり、凍てつく抱擁は2人を捕らえる',
+  'hudChrome.finder.mech.crypt_dirge_of_the_hollow':
+    '虚ろの挽歌（16秒ごとに中断できる2.5秒の歌：歌い切ると、ノーマルでは45ヤード以内で彼女が見える全員に105～125の闇ダメージと4秒の沈黙。中断するか聖歌隊の柱の陰に隠れること）',
+  'hudChrome.finder.mech.crypt_harmony':
+    '調和（生きている聖歌隊員1人ごとに彼女の受けるダメージが30%減る：聖歌隊員を先に倒すこと）',
+  'hudChrome.finder.mech.crypt_bone_organ':
+    '骨のオルガン（26秒ごとに骨のオルガンを奏でる：闇の音符が2波、聖歌隊席の床を筋状に炸裂し、ノーマルでは筋の中で100～115のダメージ。2波目は1波目の隙間を埋める）',
+  'hudChrome.finder.mech.crypt_crescendo':
+    'クレッシェンド（体力30%未満で挽歌は1.8秒になり11秒ごとに来る。オルガンは3波目を奏でる）',
+  'hudChrome.finder.mech.crypt_ilvane_heroic':
+    'ヒロイック：アンコール（もう一方が立っているまま10秒倒れていた聖歌隊員は再び起き上がる。同時に倒すこと）と途切れぬ詩節（3回目ごとの挽歌は中断できない。隠れること）',
   'hudChrome.finder.mech.reaping_arc': 'リーピングアーク（前方クリーブ）',
   'hudChrome.finder.mech.mist_surge': 'ミストサージ（周期的な範囲ダメージ）',
   'hudChrome.finder.mech.summons_adds': '増援を召喚',
   'hudChrome.finder.mech.lunar_tide': 'ルナタイド（周期的な範囲ダメージ）',
+  'hudChrome.finder.mech.chorus_and_solo': '合唱と独唱（片方の印には集まり、もう片方からは離れる）',
+  'hudChrome.finder.mech.tideglass_reflections': '潮硝子の映し身（互いの映し身を倒す）',
+  'hudChrome.finder.mech.rising_tide': '満ち潮（島の半分が浸水、乾いた側へ移動）',
+  'hudChrome.finder.mech.undertow': '引き潮（全員を引き寄せる、衝撃の前に逃げる）',
   'hudChrome.finder.mech.enrage': '低体力で激怒',
   'hudChrome.finder.mech.shuddering_stomp': '身震いの踏みつけ（範囲スタン）',
   'hudChrome.finder.mech.grave_inferno': '墓場のインフェルノ（詠唱火炎AoE、散開を維持）',
@@ -12904,6 +12971,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '不死の宮廷（英雄限定、不死の憤怒の後に王家の廷臣が蘇る）',
   'hudChrome.finder.mech.bloodmane_rend': 'ブラッドメインレンド（出血、対象交代に注意）',
   'hudChrome.finder.mech.tusk_sweep': 'タスクスイープ（前方クリーブ）',
+  'hudChrome.finder.mech.grave_breath': '墓所のブレス（前方の炎の扇形、範囲内の氷にひびが入る）',
+  'hudChrome.finder.mech.plate_floor': '砕ける氷（炎で湖の氷板が割れて沈む、開いた水面に入らない）',
+  'hudChrome.finder.mech.wyrm_flights':
+    '飛行フェーズ（70%と40%：ワームの目は無傷の氷の上へ、着地させたい場所に集合）',
   'hudChrome.finder.mech.ancestral_sap': 'アンセストラルサップ（味方を回復）',
   'hudChrome.finder.mech.call_of_the_hunt': 'コール・オブ・ザ・ハント（周囲の味方を加速）',
   'hudChrome.finder.mech.thickhide_ward': 'シックハイドウォード（周囲の味方を守護）',
@@ -14035,7 +14106,29 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.wildheart_ravager.name': '血鬣の略奪者',
   'entities.mobs.wildheart_hexcaller.name': '陽骨の呪術師',
   'entities.mobs.wildheart_beastmaster.name': '牙王の獣使い',
+  'entities.mobs.the_gorgebloom.name': 'ゴージブルーム',
+  'entities.mobs.fanglord_jaguar.name': '牙王の大ジャガー',
+  'entities.mobs.howdah_hexcaller.name': '輿の呪術師',
+  'entities.mobs.great_saurian.name': 'グレート・サウリアン',
+  'entities.mobs.vine_lasher.name': '絡み蔓の鞭打ち',
+  'entities.mobs.spore_toad.name': '胞子ガエル',
+  'entities.mobs.basin_raptor.name': '盆地のラプトル',
+  'entities.mobs.sunbone_totem.name': '陽骨のトーテム',
+  'entities.mobs.sunbone_totem_binder.name': '陽骨のトーテム使い',
+  'entities.mobs.sunbone_dread_totem.name': '陽骨の恐怖トーテム',
   'entities.mobs.wildheart_high_priest.name': '盆地の声ズルガー',
+  'entities.mobs.broodsworn_thawcaller.name': '竜誓団の解氷術師',
+  'entities.mobs.broodsworn_goadsmith.name': '竜誓団の突き棒鍛冶',
+  'entities.mobs.broodsworn_pyre_tender.name': '竜誓団の薪守り',
+  'entities.mobs.soul_brazier.name': '魂の火鉢',
+  'entities.mobs.rime_whelp.name': '霧氷の幼竜',
+  'entities.mobs.ogre_sledge_hauler.name': 'オーガのそり引き',
+  'entities.mobs.glacier_splinter.name': '氷河の破片',
+  'entities.mobs.sledge_tusker.name': 'そり引きの巨牙獣',
+  'entities.mobs.sanctum_shackle_hammer.name': '大槌の枷',
+  'entities.mobs.sanctum_shackle_tongs.name': '火ばさみの枷',
+  'entities.mobs.sanctum_shackle_anvil.name': '金床の枷',
+  'entities.mobs.sanctum_shackle_bellows.name': 'ふいごの枷',
   'entities.mobs.apprentice_wren.name': '見習いレン',
   'entities.mobs.barrow_wight.name': '塚のワイト',
   'entities.mobs.castaway_navigator.name': '航海士スリ',
@@ -14051,7 +14144,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.the_meredark.name': 'ミアダーク',
   'entities.dungeons.wildheart_basin.name': 'ワイルドハート盆地',
   'entities.dungeons.wildheart_basin.enterText':
-    '温かな雨が古い石の上で音を立てる。ワイルドハート盆地が目の前に開けた。',
+    '偶像の口をくぐると、盆地を見下ろす高い岩棚に出た。崖の縁から滝が轟き落ち、はるか下では何か巨大なものが浅瀬を渡っている。',
   'entities.dungeons.wildheart_basin.leaveText': '石の牙の下をくぐり、パームリーチの陽光へ戻った。',
   'entities.dungeons.the_last_keep.name': '最後の砦',
   'entities.items.last_keep_signet.name': '最後の砦の印章',
@@ -19617,4 +19710,697 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_balance.bonus2': '絡み根の詠唱時間が0.5秒短縮される。',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '絡み根を詠唱すると、移動しながら詠唱でき、移動速度が4秒間20%上昇する。20秒に1回しか発生しない。',
+  // The Hollow Crypt rework (M16 non-Latin fills for its new names).
+  'entities.items.gravedirt_treads.name': '墓土のトレッド',
+  'entities.items.bellrope_girdle.name': '鐘縄の帯',
+  'entities.items.sextons_spadehaft.name': '墓守の鋤柄',
+  'entities.items.rimesilk_mantle.name': '霜絹のマントル',
+  'entities.items.bonechill_carapace_vest.name': 'ボーンチルのホーバーク',
+  'entities.items.rimeweb_hunters_leggings.name': '霜綴りのレギンス',
+  'entities.items.rimeweb_fang.name': '花嫁の氷柱',
+  'entities.items.cantors_cassock.name': '聖歌隊長の法衣',
+  'entities.items.choirward_leggings.name': '聖歌守りのレギンス',
+  'entities.items.choristers_gloves.name': '聖歌隊員の手袋',
+  'entities.items.cantors_hymnal.name': '聖歌隊長の賛美歌集',
+  'entities.items.gravecallers_vestments.name': '墓呼びの祭服',
+  'entities.items.unquiet_stalkers_hood.name': '安らがぬ追跡者のフード',
+  'entities.items.sextons_burial_spade.name': '墓守の埋葬鋤',
+  'entities.items.rimesilk_hood.name': '霜絹のフード',
+  'entities.items.knight_commanders_longsword.name': '騎士団長の長剣',
+  'entities.items.gaolers_chain_girdle.name': '牢番の鎖帯',
+  'entities.items.rusted_shackle_grips.name': '錆びた枷の手袋',
+  'entities.items.drowned_wardens_mantle.name': '溺れた看守の肩衣',
+  'entities.items.gaolyard_cudgel.name': '牢獄庭の棍棒',
+  'entities.items.drowned_commanders_breastplate.name': '溺れた指揮官の胸当て',
+  'entities.items.gaolyard_striders.name': '牢獄庭の長靴',
+  'entities.items.gaolers_iron_key.name': '牢番の鉄鍵',
+  'entities.items.conchplate_girdle.name': '巻貝板の腰帯',
+  'entities.items.pale_chorus_leggings.name': '蒼白聖歌のレギンス',
+  'entities.items.refrain_silk_gloves.name': 'リフレインの絹手袋',
+  'entities.items.chorus_conch.name': '聖歌の巻貝',
+  'entities.items.tideglass_pauldrons.name': '潮硝子の肩当て',
+  'entities.items.moonburn_treads.name': '月焼けの靴',
+  'entities.items.prism_etched_cowl.name': 'プリズム刻みの頭巾',
+  'entities.items.tideglass_shiv.name': '潮硝子の小刀',
+  'entities.items.pale_chorus_vestment.name': '蒼白聖歌の祭服',
+  'entities.items.tideglass_warmaul.name': '潮硝子の戦槌',
+  'hudChrome.trinkets.use.shackle':
+    '{range}ヤード以内の対象を{duration}秒間その場に鎖で縛る。ボスなど行動阻害に耐性のあるクリーチャーは、代わりに移動速度が{slow}%低下する（減速にも耐性がある場合は無効）。',
+  'hudChrome.auraEffect.trinket.shackle': '鎖で縛られている：移動できない。',
+  'hudChrome.auraEffect.trinket.shackleSlow': '鎖につながれている：移動速度が{pct}%低下。',
+  'entities.mobs.ossuary_sentinel.name': '納骨堂の番兵',
+  'entities.mobs.hollow_gravedigger.name': '虚ろの墓掘り',
+  'entities.mobs.rimeweb_hatchling.name': '霜網の子蜘蛛',
+  'entities.mobs.rimeweb_spinner.name': '霜網の紡ぎ手',
+  'entities.mobs.candlewright_acolyte.name': '蝋燭職人の侍祭',
+  'entities.mobs.hollow_chorister.name': '虚ろの聖歌隊員',
+  'entities.mobs.bound_soul.name': '縛られし魂',
+  'entities.mobs.rimeweb.name': '骨冷えの貴婦人',
+  'entities.mobs.cantor_ilvane.name': '聖歌隊長イルヴェイン',
+  'entities.mobs.rime_egg_sac.name': '霜の卵嚢',
+  // The Hollow Crypt trash (M16 non-Latin fills for its new names).
+  'abilityUi.cast.crypt_grave_bolt': '墓所の矢',
+  'abilityUi.cast.crypt_raise_bones': '骨の蘇生',
+  'abilityUi.cast.crypt_murder_call': '鴉群の呼び声',
+  'abilityUi.cast.crypt_stone_shriek': '石の絶叫',
+  'abilityUi.cast.crypt_grave_cleave': '墓所の薙ぎ払い',
+  'abilityUi.cast.crypt_barrowflame_breath': '塚炎の吐息',
+  'abilityUi.cast.crypt_tail_lash': '尾の一撃',
+  'abilityUi.cast.crypt_wing_gust': '翼の突風',
+  'abilityUi.cast.crypt_grave_rupture': '墓所の破裂',
+  'abilityUi.cast.crypt_carrion_eye': '屍肉喰らいの眼',
+  'abilityUi.cast.crypt_marrow_crush': '髄砕き',
+  'abilityUi.cast.crypt_rimesilk_spit': '霜糸吐き',
+  'abilityUi.cast.bastion_brine_mend': '塩水の癒し',
+  'abilityUi.cast.bastion_fog_ward': '霧の守り',
+  'abilityUi.cast.bastion_halberd_sweep': 'ハルバード薙ぎ',
+  'abilityUi.cast.bastion_piercing_bolt': '貫通の矢',
+  'abilityUi.cast.bastion_claw_sweep': '爪の薙ぎ払い',
+  'abilityUi.cast.bastion_shell_slam': '甲羅叩きつけ',
+  'abilityUi.cast.bastion_boathook': '鉤竿引き',
+  'abilityUi.cast.bastion_fog_bank': '霧の帳',
+  'abilityUi.cast.bastion_brine_column': '塩水の柱',
+  'abilityUi.cast.bastion_oathbound_charge': '誓約の突進',
+  'abilityUi.cast.bastion_gaolers_cudgel': '牢番の棍棒',
+  'abilityUi.cast.bastion_mist_surge': '霧の奔流',
+  'abilityUi.cast.bastion_drowning_hymn': '溺れの聖歌',
+  'abilityUi.cast.temple_lullaby': '子守歌',
+  'abilityUi.cast.temple_call_the_tide': '潮の呼び声',
+  'abilityUi.cast.temple_static_coil': '静電のとぐろ',
+  'abilityUi.cast.temple_snapper_snap': '噛みつき',
+  'abilityUi.cast.temple_trident_sweep': '三叉槍の薙ぎ払い',
+  'abilityUi.cast.temple_sea_song': '海の歌',
+  'abilityUi.cast.temple_tidal_slap': '潮の平手打ち',
+  'abilityUi.cast.temple_tide_breath': '凍てつく吐息',
+  'abilityUi.cast.temple_moonlight_lance': '月光の槍',
+  'abilityUi.cast.temple_prism_flare': 'プリズムの閃光',
+  'abilityUi.cast.temple_resonant_slam': '共鳴の叩きつけ',
+  'abilityUi.cast.temple_moonwater_bolt': '月水の矢',
+  'abilityUi.cast.temple_drowning_aria': '溺れのアリア',
+  'abilityUi.cast.temple_mere_surge': '湖の大波',
+  'abilityUi.cast.temple_tideglass_fracture': '潮硝子の亀裂',
+  'abilityUi.cast.temple_undertow': '引き潮',
+  'abilityUi.cast.temple_lunar_tide': '月の潮',
+  'abilityUi.cast.temple_skewering_trident': '串刺しの三叉槍',
+  'abilityUi.cast.temple_pale_mending': '蒼白の癒し',
+  'abilityUi.cast.temple_glimmer_venom': '煌めく毒',
+  'abilityUi.cast.temple_pearl_slam': '潮の羽ばたき',
+  'abilityUi.cast.temple_frostlocked_torrent': '凍てつく激流',
+  'abilityUi.cast.temple_venom_current': '毒の潮流',
+  'abilityUi.cast.temple_toxic_rime': '毒の霧氷',
+  'abilityUi.cast.temple_beckoning_moon': '月招き',
+  'abilityUi.cast.temple_falling_moon': '落ちる月',
+  'abilityUi.cast.temple_lightning_spit': '稲妻の吐きかけ',
+  'abilityUi.cast.temple_crushing_torrent': '押し潰す奔流',
+  'abilityUi.cast.temple_hydra_tsunami': '津波',
+  'abilityUi.cast.temple_ysolei_call': '月の落とし子の呼び声',
+  'abilityUi.cast.temple_ysolei_wrath': '溺れし憤怒',
+  'abilityUi.cast.temple_prism_glare': 'プリズムの眼光',
+  'abilityUi.cast.temple_arcing_spark': '弧光の火花',
+  'abilityUi.cast.crypt_gravespark_volley': '墓火花の一斉射',
+  'abilityUi.cast.bastion_loose_on_my_mark': '我が合図で放て',
+  'abilityUi.cast.temple_call_of_the_shallows': '浅瀬の呼び声',
+  'entities.mobs.crypt_ossuary_warrior.name': '納骨堂の戦士',
+  'entities.mobs.crypt_gravecaller_adept.name': '墓呼びの徒弟',
+  'entities.mobs.crypt_ossuary_cutthroat.name': '納骨堂の喉裂き',
+  'entities.mobs.crypt_gravecaller_necromancer.name': '墓呼びの死霊術師',
+  'entities.mobs.crypt_bone_minion.name': '骨の下僕',
+  'entities.mobs.crypt_bone_brute.name': '骨の巨兵',
+  'entities.mobs.crypt_bone_pile.name': '蠢く骨',
+  'entities.mobs.crypt_chapel_gargoyle.name': '礼拝堂のガーゴイル',
+  'entities.mobs.crypt_crow_caller.name': '鴉呼び',
+  'entities.mobs.crypt_carrion_crow.name': '腐肉喰らいの鴉',
+  'entities.mobs.crypt_ossuary_drake.name': '納骨堂の骨竜',
+  // The Hollow Crypt finale (M16 non-Latin fills for its new names).
+  'abilityUi.cast.crypt_morthen_rite_wakes': '儀式の目覚め',
+  'abilityUi.cast.crypt_morthen_rise': '墓呼びの昇天',
+  'abilityUi.cast.crypt_morthen_proclaim': '墓所の宣告',
+  'abilityUi.cast.crypt_morthen_descend': '降臨',
+  'abilityUi.cast.crypt_knellwyrm_arrive': '天より降下',
+  'abilityUi.cast.crypt_knellwyrm_pyre_strafe': '火葬の掃射',
+  'abilityUi.cast.crypt_knellwyrm_strafe_run': '掃射飛行',
+  'abilityUi.cast.crypt_knellwyrm_dread_bellow': '恐怖の咆哮',
+  'abilityUi.cast.crypt_marrow_shovelful': 'ひとすくいの墓土',
+  'abilityUi.cast.crypt_marrow_measure': '墓の採寸',
+  'abilityUi.cast.crypt_marrow_burial_toll': '埋葬の鐘',
+  'abilityUi.cast.crypt_marrow_gravediggers_blow': '墓掘りの一撃',
+  'abilityUi.cast.crypt_lady_brides_lament': '花嫁の哀歌',
+  'abilityUi.cast.crypt_lady_frozen_embrace': '凍てつく抱擁',
+  'abilityUi.cast.crypt_lady_embrace_hold': '凍てつく抱擁',
+  'abilityUi.cast.crypt_lady_bridal_freeze': '花嫁の凍結',
+  'abilityUi.cast.crypt_ilvane_dirge': '虚ろの挽歌',
+  'abilityUi.cast.crypt_ilvane_unbroken_dirge': '途切れぬ詩節',
+  'abilityUi.cast.crypt_ilvane_bone_organ': '骨のオルガン',
+  'entities.mobs.crypt_knellwyrm.name': '弔鐘竜',
+  // The Sunken Bastion fifth pass (M16 non-Latin fills for its new names).
+  'abilityUi.cast.bastion_iron_cage': '鉄の檻',
+  'abilityUi.cast.bastion_drowned_anchor_cast': '溺死の錨',
+  'abilityUi.cast.bastion_shackle_pair': '連鎖の枷',
+  'abilityUi.cast.bastion_shadowstep': '影渡り',
+  'abilityUi.cast.bastion_reaping_scythe': '刈り取りの大鎌',
+  'abilityUi.cast.bastion_veil_rise': '霧のヴェール',
+  'abilityUi.cast.bastion_veil_gather': '集う霧',
+  'abilityUi.cast.bastion_vael_rise': '死が昇る',
+  'abilityUi.cast.bastion_vael_sink': '霧の中へ',
+  'abilityUi.cast.bastion_hallowed_brine': '聖なる潮水',
+  'abilityUi.cast.bastion_rebounding_bulwark': '跳ね返る大盾',
+  'abilityUi.cast.bastion_tide_sentence': '潮の宣告',
+  'abilityUi.cast.bastion_oath_kneel': '不壊の誓い',
+  'abilityUi.cast.bastion_oath_vigil': '不壊の誓い',
+  'entities.mobs.bastion_gaol_cage.name': '鉄の檻',
+  'entities.mobs.bastion_drowned_anchor.name': '溺死の錨',
+  'entities.items.jailers_iron_gauntlets.name': '看守の鉄篭手',
+  'entities.items.turnkeys_keyring_belt.name': '牢番の鍵束ベルト',
+  'entities.items.turnkeys_lantern_cowl.name': '牢番のランタン頭巾',
+  'hudChrome.finder.mech.iron_cage':
+    '鉄の檻（インタラクトキーを連打して脱出、味方は格子を叩き壊せる）',
+  'hudChrome.finder.mech.drowned_anchor':
+    '溺死の錨（犠牲者は穴へ巻き寄せられる：灯った係留柱から3ヤード以内まで走れば鎖を係留でき、その柱は30秒間消える、または12回の攻撃で鎖を断つ、ヒロイックは16回）',
+  'hudChrome.finder.mech.shackle_pair': '連鎖の枷（鎖でつながれた二人は離れずに動く）',
+  'hudChrome.finder.mech.hallowed_brine':
+    '聖なる潮水（半径9ヤードの暗い聖水の溜まり、ヒロイックは10ヤード：中にいる者は毎秒18ダメージ、ヒロイックは26、彼は中に立つ間ダメージを40パーセント軽減する、外へ引きずり出せ）',
+  'hudChrome.finder.mech.rebounding_bulwark':
+    '跳ね返る大盾（盾は最後に当たった者から10ヤード以内の最も近いプレイヤーへ跳ね返る、最大3人、ヒロイックは4人：散開せよ）',
+  'hudChrome.finder.mech.tide_sentence':
+    '潮の宣告（印から5秒後、光の柱が印の者から6ヤード以内の全員を打つ、ヒロイックは8ヤード：集団から離れて受けよ）',
+  'hudChrome.finder.mech.unbroken_oath':
+    '不壊の誓い（一度だけ、体力が半分になると最大60秒、泡の中で無敵のまま跪く：兵士を倒して破れ、その後4秒気絶し10秒間ダメージが20パーセント増える）',
+  'hudChrome.finder.mech.fog_veil':
+    '霧のヴェール（四つの姿、本物は一つ：灯台の光線で本物のヴァエルのランタンが燃え上がる）',
+  'hudChrome.finder.mech.reaper_behind':
+    '影渡り（三度続けてプレイヤーの背後に現れる、人数が足りる限り毎回別の者：大鎌の弧から出る）',
+  'hudChrome.bastionCage.title': '鉄の檻に閉じ込められた！',
+  'hudChrome.bastionCage.promptKey': '{key} を連打して脱出',
+  'hudChrome.bastionCage.promptNoKey': 'インタラクトキーを連打して脱出',
+  'hudChrome.bastionCage.promptClick': 'ここをクリック連打して脱出',
+  'hudChrome.bastionCage.promptTap': 'ここを連打して脱出',
+  'hudChrome.bastionCage.buttonAria': '鉄の檻から脱出する',
+  'hudChrome.bastionCage.progressAria': '脱出の進行度：{pct}',
+  'hudChrome.bastionChain.anchoredTitle': '溺死の錨に繋がれた！',
+  'hudChrome.bastionChain.anchoredLine':
+    '灯った係留柱まで走って鎖を係留せよ、さもなくば巻き上げ機に穴へ引きずり込まれる前に仲間が鎖を断て',
+  'hudChrome.bastionChain.allyTitle': '鎖を断て！',
+  'hudChrome.bastionChain.allyLine':
+    '{name} が穴へ引きずられている：溺死の錨を攻撃するか、灯った柱へ導け',
+  'hudChrome.auraEffect.bastion.anchored':
+    '溺死の錨に繋がれている：動くことはできるが巻き上げ機から離れることはできず、溺死の穴へと巻き寄せられる。引っ掛けられた場所から{run}ヤード以上離れた灯った係留柱の{reach}ヤード以内に入れば鎖を係留できる（その柱は{dark}秒間消える）、または仲間が{links}回の攻撃で鎖を断つ（ヒロイックは{linksHeroic}回）。穴に落ちると最大体力の{pit}%を失う（ヒロイックは{pitHeroic}%）。',
+  'hudChrome.auraEffect.bastion.brineColumn':
+    '海水の柱に捕らわれ、{tick}秒ごとに{min}～{max}の自然ダメージを最大{seconds}秒間受ける。潮縛りの侍祭を妨害するかスタンさせれば抜け出せる。',
+  'hudChrome.auraEffect.bastion.halberdWall':
+    '{radius}ヤード以内に別の溺れた見張り番がいる間、受けるダメージが{pct}%減少する。引き離せ。',
+  'hudChrome.auraEffect.bastion.fogShroud':
+    '霧の帳の中にいる間、受けるダメージが{pct}%減少する。霧の外へ引きずり出せ。',
+  'hudChrome.auraEffect.bastion.carrionGlut':
+    '死者を貪った（{stacks}/{max}）：スタックごとに魂の解放の範囲が{radius}ヤード広がり、ダメージが{pct}%増加する。',
+  'hudChrome.auraEffect.bastion.snappedFetters':
+    '鎖が断ち切られた。もう戦わず、傷つけられず、まもなく去っていく。',
+  'hudChrome.auraEffect.crypt.carrionEye':
+    '戦闘中のすべてのカラスが{seconds}秒間あなたを狙う。タンクのもとへ走り、群れをまとめて倒そう。',
+  'hudChrome.auraEffect.crypt.graniteSkin':
+    '受けるダメージが{pct}%減少し、石は{every}秒ごとに厚くなる（最大{max}層）。スタンで砕け散り、{seconds}秒間受けるダメージが{cracked}%増加する。',
+  'hudChrome.bastionChain.shackledTitle': '{name} と枷で繋がれている',
+  'hudChrome.bastionChain.shackledLine':
+    '互いに {range} ヤード以内にいること（現在 {dist} ヤード）',
+  'hudChrome.bastionChain.strainedLine': '離れすぎ！鎖が二人を締め付ける：{range} ヤード以内に戻れ',
+  'hudChrome.bastionChain.brokenAria': '鎖の破損：{pct}',
+  'hudChrome.bastionChain.reachAria': '鎖の張り具合：{pct}',
+  'hudChrome.bastionChain.linksLeft': '残りの鎖の環：{count}/{total}',
+  'hudChrome.bastionChain.linkRule': '錨への一撃ごとに、威力に関係なく環が一つ外れる',
+  'hudChrome.bastionChain.linksTarget': '鎖の環 {count}/{total}',
+  'hudChrome.bastionChain.linkBroken': '環を断った！',
+  'entities.items.beastpit_warbelt.name': '獣の穴の戦帯',
+  'entities.items.jaguar_hide_jerkin.name': 'ジャガー革のジャーキン',
+  'entities.items.hexbone_handwraps.name': '呪骨のハンドラップ',
+  'entities.items.rootbound_sabatons.name': '根縛りのサバトン',
+  'entities.items.pollen_dusted_leggings.name': '花粉まみれのレギンス',
+  'entities.items.bloomsilk_cowl.name': '花絹のカウル',
+  'entities.items.falls_blessed_staff.name': '滝に祝福された杖',
+  'entities.items.fanglords_hide_mantle.name': '牙王の獣皮マントル',
+  'entities.items.thornroot_greathelm.name': '茨冠のグレートヘルム',
+  'entities.items.fanglords_whistle.name': '牙王の呼び笛',
+  'entities.items.gorgebloom_seedpod.name': 'ゴージブルームの種莢',
+  'hudChrome.trinkets.use.spiritPack':
+    '{duration}秒間、霊のジャガーを呼び出して共に戦わせる。ジャガーは対象へ駆け寄り、{every}秒ごとに噛みついて{min}～{max}の物理ダメージを与え、あなたが別の敵を対象にするとそちらへ移る。敵を対象にしていない場合は、{range}ヤード以内であなたに最も近い敵を攻撃する。ダメージは攻撃力または遠隔攻撃力の高い方に応じて増加し、呼び出した時点で確定する。{range}ヤード以内の敵対的な対象が必要。',
+  'hudChrome.trinkets.use.seedburst':
+    '{range}ヤード以内の対象に種を植える。{delay}秒後、種は対象のいる場所（または死んだ場所）で弾け、{radius}ヤード以内の各敵に{damage}の自然ダメージを与える。対象が先に死んでいた場合は{bonus}%増加（{empowered}）。ダメージは呪文力に応じて増加し、植えた時点で確定する。種が弾ける前にあなたが死ぬと、種は枯れる。',
+  'hudChrome.auraEffect.trinket.spiritPack':
+    '霊のジャガーが共に戦い、{every}秒ごとに対象へ噛みついて{min}～{max}の物理ダメージを与える。',
+  'hudChrome.auraEffect.trinket.seedburst':
+    'ゴージブルームの種。この効果が切れると弾け、{radius}ヤード以内の各敵に{damage}の自然ダメージを与える。それまでにこの敵が死んだ場合は{bonus}%増加（{empowered}）。',
+  'entities.items.foremans_grips.name': '親方の籠手',
+  'entities.items.serac_stride_boots.name': '氷塔渡りのブーツ',
+  'entities.items.seal_rune_mantle.name': '封印ルーンのマントル',
+  'entities.items.thawbound_legguards.name': '融けた枷のレッグガード',
+  'entities.items.pyre_tenders_hood.name': '火葬番の頭巾',
+  'entities.items.meltwater_cord.name': '雪解け水の飾り紐',
+  'entities.items.hammer_of_the_open_lock.name': '開かれた錠の大槌',
+  'entities.items.vestments_of_the_waking_rite.name': '目覚めの儀の祭服',
+  'entities.items.foremans_last_link.name': '親方の最後の鎖環',
+  'entities.items.phial_of_the_tithe.name': '十分の一税の小瓶',
+  'entities.items.quenchwater_flask.name': '焼き入れ水のフラスコ',
+  'hudChrome.trinkets.use.tether':
+    '{range}ヤード以内の味方プレイヤー1人と{duration}秒間鎖でつながる。その味方の体力に届くはずのダメージの{share}%を代わりにあなたが受ける。あなたが死亡すると早期に終了する。自分以外の味方プレイヤーを対象にする必要がある。',
+  'hudChrome.trinkets.use.harvest':
+    '{duration}秒間、あなたから{radius}ヤード以内で敵対的なクリーチャーが死亡するたびに、最大体力の{pct}%（{health}）と最大マナの{pct}%を回復する。',
+  'hudChrome.trinkets.use.quench':
+    '{duration}秒以内の次の{hits}回の近接または遠隔武器の命中が、追加で{damage}の冷気ダメージを与える。最後の命中は対象を焼き入れし、{slowDuration}秒間その攻撃速度を{slow}%低下させる。効果が終わると未使用の命中は失われる。ダメージは攻撃力または遠隔攻撃力の高い方に応じて増加する。',
+  'hudChrome.auraEffect.trinket.tether':
+    '親方の最後の鎖環でつながれている：あなたの体力に届くはずのダメージの{pct}%を、代わりにあなたをつないだ者が受ける。',
+  'hudChrome.auraEffect.trinket.tetherLink':
+    'つないだ味方が受けるはずのダメージの{pct}%をあなたが受ける。',
+  'hudChrome.auraEffect.trinket.harvest':
+    'あなたから{radius}ヤード以内で敵対的なクリーチャーが死亡するたびに、最大体力と最大マナの{pct}%を回復する。',
+  'hudChrome.auraEffect.trinket.quench':
+    '次の{stacks}回の武器の命中が追加で{damage}の冷気ダメージを与える。最後の命中は対象の攻撃速度を{slow}%低下させる。',
+  'hudChrome.auraEffect.trinket.quenchOther':
+    '次の{stacks}回の武器の命中が追加の冷気ダメージを与える。最後の命中は対象の攻撃速度を{slow}%低下させる。',
+  'hudChrome.auraEffect.trinket.quenched': '攻撃速度が{pct}%低下。',
+  'abilityUi.cast.wildheart_ancestral_sap': '祖霊の樹液',
+  'abilityUi.cast.wildheart_plant_totem': 'トーテム設置',
+  'abilityUi.cast.wildheart_entangling_lash': '絡みつく鞭',
+  'abilityUi.cast.wildheart_saurian_tail_swipe': '尾の薙ぎ払い',
+  'abilityUi.cast.wildheart_saurian_stomp': '大地を揺るがす踏みつけ',
+  'abilityUi.cast.wildheart_beast_pit_quake': '獣穴の地震',
+  'abilityUi.cast.wildheart_jaguar_heel': '戻れ！',
+  'abilityUi.cast.wildheart_gorgebloom_seed_rain': '種の雨',
+  'abilityUi.cast.wildheart_gorgebloom_vine_lash': '蔓の鞭',
+  'abilityUi.cast.wildheart_gorgebloom_gorge': '貪り食い',
+  'abilityUi.cast.wildheart_zulgar_pulse': 'ワイルドハートの脈動',
+  'abilityUi.cast.wildheart_zulgar_spirit_hunt': '狩りの魂',
+  'abilityUi.cast.wildheart_quarry_mark': '獲物の印',
+  'abilityUi.cast.wildheart_war_roar': '戦の咆哮',
+  'abilityUi.cast.wildheart_toad_hex': 'ヒキガエルの呪い',
+  'abilityUi.cast.wildheart_rattling_dread': '骨鳴りの恐怖',
+  'abilityUi.cast.wildheart_snaring_tongue': '絡め取る舌',
+  'abilityUi.cast.sanctum_cinder_breath': '残り火のブレス',
+  'abilityUi.cast.sanctum_warming_rite': '温めの儀式',
+  'abilityUi.cast.sanctum_goad': '駆り立て',
+  'abilityUi.cast.sanctum_plant_brazier': '魂の火鉢を置く',
+  'abilityUi.cast.sanctum_ice_block_toss': '氷塊投げ',
+  'abilityUi.cast.sanctum_tusker_tusk_sweep': '牙薙ぎ',
+  'abilityUi.cast.sanctum_korzul_break_free': '氷の封印を破る',
+  'abilityUi.cast.sanctum_korzul_grave_breath': '墓所のブレス',
+  'abilityUi.cast.sanctum_korzul_tail_sweep': '尾の薙ぎ払い',
+  'abilityUi.cast.sanctum_korzul_grave_inferno': '墓場のインフェルノ',
+  'abilityUi.cast.sanctum_korzul_wing_gale': '翼の烈風',
+  'abilityUi.cast.sanctum_korzul_plunging_fire': '降り注ぐ炎',
+  'abilityUi.cast.sanctum_korzul_crashing_descent': '墜落着地',
+  'abilityUi.cast.sanctum_tusker_trample': '踏みつぶし',
+  'abilityUi.cast.sanctum_counterweight_lash': '重り尾の鞭打ち',
+  'abilityUi.cast.sanctum_branding_iron': '焼き印',
+  'abilityUi.cast.sanctum_rime_breath': '霧氷のブレス',
+  'abilityUi.cast.kituse_sanctum_topple_brazier': '火鉢倒し',
+  'abilityUi.cast.sanctum_korgath_maul_arc': '大槌の弧撃',
+  'abilityUi.cast.sanctum_korgath_chain_flail': '鎖の鞭打ち',
+  'abilityUi.cast.sanctum_korgath_threshold_charge': '境界の突進',
+  'abilityUi.cast.sanctum_korgath_foremans_bellow': '親方の咆哮',
+  'abilityUi.cast.sanctum_korgath_strain': '鎖の引き締め',
+  'abilityUi.cast.sanctum_korgath_stomp': '震える踏みつけ',
+  'abilityUi.cast.sanctum_goadsmith_rerivet': '再鋲打ち',
+  'abilityUi.cast.sanctum_velkhar_soulfire_trench': '魂火の溝',
+  'abilityUi.cast.sanctum_velkhar_shadow_volley': '影の斉射',
+  'hudChrome.finder.mech.waking_thaw': '目覚めの雪解け（死者が融氷の池から這い上がる）',
+  'hudChrome.finder.mech.unquenched_held':
+    '封じか不滅か（死者は冷たい氷の上で倒せ、融水の中では倒すな）',
+  'hudChrome.finder.mech.soulfire_trench': '魂火の溝（魂火の線、その後に融水の帯が残る）',
+  'hudChrome.finder.mech.shadow_volley': '影の斉射（全員に闇ダメージ）',
+  'hudChrome.finder.mech.warm_hands_twice_woken':
+    '温かな手と二度目の目覚め（英雄のみ、死者を動かし続けよ。再び起きた者は強くなる）',
+  'entities.mobs.thorn_sprout.name': '茨の芽',
+  'hudChrome.finder.mech.pack_bond': '群れの絆（並ぶと被ダメージ半減：15ヤード引き離せ）',
+  'hudChrome.finder.mech.stalk':
+    '忍び狩り（ジャガーが印の者を狙う。タンクは狙わず、ソロではあなたを狙う：引き回し、鈍足・拘束・スタンを）',
+  'hudChrome.finder.mech.shared_health': '体力共有（共通の体力：最も安全な方を攻撃）',
+  'hudChrome.finder.mech.heel_frenzied_bond':
+    '戻れ！と狂乱の絆（ジャガーが主の元へ跳び、絆が20ヤードに広がる）',
+  'hudChrome.finder.mech.seed_rain': '種の雨（花粉のない者が芽吹く前に種を踏み潰す）',
+  'hudChrome.finder.mech.pollinate': '受粉（金色の者は種に触れるな、すぐに芽吹く）',
+  'hudChrome.finder.mech.vine_lash': '蔓の鞭（茨の帯から出ろ、さもなくば拘束される）',
+  'hudChrome.finder.mech.gorge': '貪り食い（タンクへの強烈な噛みつきと毒）',
+  'hudChrome.finder.mech.burrowing_seeds':
+    '潜る種と花粉の雲（種は6秒で誰かの傍から芽吹き、金色は広がる）',
+  'hudChrome.finder.mech.spirit_of_the_hunt':
+    '狩りの魂（獲物は化身を光る太陽紋へ導く。噛み倒された者には逃げる猶予がある）',
+  'hudChrome.finder.mech.twin_prey_ambush':
+    '双つの獲物と待ち伏せ（獲物が二人、その後最も遠い者へ飛びかかる）',
+  'hudChrome.finder.mech.seal_shackles':
+    '封印の枷（鎖を1本断つごとに彼の被ダメージが20%増え、攻撃が1つ解き放たれる）',
+  'hudChrome.finder.mech.chain_strain': '鎖の引き締め（鎖がまだ残る柱から離れる）',
+  'hudChrome.finder.mech.korgath_stomp': '震える踏みつけ（彼の周りの輪から出る）',
+  'hudChrome.finder.mech.rerivet_last_link':
+    '再鋲打ちと最後の環（鎖を打ち直す突き棒鍛冶を阻止する。鎖が残り1本になると10秒ごとに鎖の引き締め）',
+  'hudChrome.bastionAlert.sentencedTitle': '宣告があなたに下る！',
+  'hudChrome.bastionAlert.sentencedLine': '光の柱があなたの近くの全員を打つ：集団から離れろ',
+  'hudChrome.bastionAlert.brineTitle': '聖なる潮水の中にいる！',
+  'hudChrome.bastionAlert.brineLine': '毎秒あなたを焼く：溜まりから出ろ',
+  'hudChrome.bastionAlert.reapedTitle': '死が背後から現れる！',
+  'hudChrome.bastionAlert.reapedLine': '大鎌の弧から出ろ：前へ、あるいは左右へ',
+  'hudChrome.bastionAlert.veilTitle': '霧のヴェール',
+  'hudChrome.bastionAlert.veilLine': '灯台の光線を見よ：ランタンが燃え上がる者が本物のヴァエルだ',
+  'hudChrome.bastionAlert.realTitle': '光が彼を捉えた！',
+  'hudChrome.bastionAlert.realLine': 'これが本物のヴァエルだ：攻撃してヴェールを破れ',
+  'hudChrome.bastionAlert.shadeTitle': '虚ろな影',
+  'hudChrome.bastionAlert.shadeLine': '光が素通りしている：放っておき、光線が照らす者を探せ',
+  'hudChrome.bastionAlert.timeAria': '残り{seconds}秒',
+  'hudChrome.wildheartAlert.preyTitle': 'お前が獲物だ！',
+  'hudChrome.wildheartAlert.preyLine': 'ズルガーが狙っている：光る太陽紋を通らせろ',
+  'hudChrome.wildheartAlert.preyWaitLine': '今はもう一人の獲物を追っている：備えろ、標的が変わる',
+  'hudChrome.wildheartAlert.stalkedTitle': '狙われている！',
+  'hudChrome.wildheartAlert.stalkedLine': 'ジャガーが狙っている：主から引き離せ',
+  'hudChrome.wildheartAlert.pollinatedTitle': '受粉した！',
+  'hudChrome.wildheartAlert.pollinatedLine': '種に近づくな：触れると芽吹く',
+  'hudChrome.wildheartAlert.bondTitle': '群れの絆',
+  'hudChrome.wildheartAlert.bondLine': '並んでいると被ダメージ半減：引き離せ',
+  'hudChrome.wildheartAlert.timeAria': '残り{seconds}秒',
+  'hudChrome.sanctumAlert.quenchTitle': '焼き入れの水の中だ！',
+  'hudChrome.sanctumAlert.quenchLine': '焼かれて鈍る：一番近い氷か岸まで泳げ',
+  'hudChrome.sanctumAlert.plungeTitle': '降り注ぐ炎！',
+  'hudChrome.sanctumAlert.plungeLine': '足元の氷板全体が燃え上がる：今すぐ降りろ',
+  'hudChrome.sanctumAlert.descentTitle': '墜落の降下！',
+  'hudChrome.sanctumAlert.descentLine': 'ここに降りてくる：影から出ろ',
+  'hudChrome.sanctumAlert.eyeTitle': 'ワームの眼に狙われた！',
+  'hudChrome.sanctumAlert.eyeLine':
+    '印が消えると立っている氷板が燃える：無傷の氷の上で仲間から離れろ',
+  'hudChrome.sanctumAlert.eyeCrackedLine': 'ひびの入った氷の上だ：印が消える前に無傷の氷板へ移れ',
+  'hudChrome.sanctumAlert.flailTitle': '鎖の殻竿！',
+  'hudChrome.sanctumAlert.flailLine': '鎖が描かれた線に沿って振り下ろされる：線から出ろ',
+  'hudChrome.sanctumAlert.chargeTitle': '敷居の突進！',
+  'hudChrome.sanctumAlert.chargeLine': '線に沿って突進してくる：線から出て、端から離れろ',
+  'hudChrome.sanctumAlert.trenchTitle': '魂火の溝！',
+  'hudChrome.sanctumAlert.trenchLine': '魂火が線を裂き、融け水を残す：そこから出ろ',
+  'hudChrome.sanctumAlert.strainTitle': '鎖の引き絞り！',
+  'hudChrome.sanctumAlert.strainLine': '無傷の柱が今にも弾ける：柱から離れろ',
+  'hudChrome.sanctumAlert.infernoTitle': '墓場のインフェルノ！',
+  'hudChrome.sanctumAlert.infernoLine': '脈動のたびに激しくなる：彼の届く範囲から出ろ',
+  'hudChrome.sanctumAlert.stompTitle': '身震いの踏みつけ！',
+  'hudChrome.sanctumAlert.stompLine': '足が下りる前に彼から離れろ',
+  'hudChrome.sanctumAlert.breathTitle': '墓のブレス！',
+  'hudChrome.sanctumAlert.breathLine': 'ブレスの扇の中にいる：横へ抜けろ',
+  'hudChrome.sanctumAlert.maulTitle': '大槌の弧！',
+  'hudChrome.sanctumAlert.maulLine': '前方すべてをなぎ払う：背後へ回れ',
+  'hudChrome.sanctumAlert.tailTitle': '尾のなぎ払い！',
+  'hudChrome.sanctumAlert.tailLine': '背後に立っている：尾が来る前に離れろ',
+  'hudChrome.sanctumAlert.meltwaterTitle': '融け水の中',
+  'hudChrome.sanctumAlert.meltwaterLine':
+    'お前のボーンウォーカーが融け水の中にいる：冷たい氷の上へ引きずり出せ',
+  'hudChrome.sanctumAlert.meltwaterTargetLine':
+    'ターゲットは融け水の中で死ぬと再び起き上がる：冷たい氷の上まで待て',
+  'hudChrome.sanctumAlert.crackedTitle': 'ひびの入った氷',
+  'hudChrome.sanctumAlert.crackedLine':
+    'ここに炎が当たるとこの氷板は砕ける：彼の炎をここに向けさせるな',
+  'hudChrome.sanctumAlert.flightTitle': 'コルズルが飛び立つ',
+  'hudChrome.sanctumAlert.flightLine': '無傷の氷の上に集まって降下地点を選び、その後に離れろ',
+  'hudChrome.sanctumAlert.lockboundTitle': '錠縛',
+  'hudChrome.sanctumAlert.lockboundLine':
+    '鎖が{chains}本残っている：被ダメージが{pct}%減少。封印の枷を壊して剥がせ。',
+  'hudChrome.sanctumAlert.timeAria': '残り{seconds}秒',
+  'hudChrome.sanctumAlert.brandedTitle': '焼き印！',
+  'hudChrome.sanctumAlert.brandedLine': '焼き印は切れるまで燃え続ける：融け水の池で消せ',
+  'hudChrome.sanctumAlert.rimeTitle': '忍び寄る霧氷！',
+  'hudChrome.sanctumAlert.rimeLine': '忍び寄る霧氷 {stacks}/{max}：幼竜のブレスから出ろ',
+  'hudChrome.sanctumAlert.slabTitle': '氷塊',
+  'hudChrome.sanctumAlert.slabLine': '堅い氷：視線を遮る。その陰に隠れて術者の呪文を避けろ',
+  'hudChrome.kitUse.toppleLine': '敵の群れの上に蹴り倒せ：こぼれた炎が奴らを焼く',
+  'hudChrome.kitUse.toppleKey': '{name}を奴らの上に倒す',
+  'hudChrome.kitUse.toppleTap': 'ここをタップして{name}を奴らの上に倒す',
+  'hudChrome.kitUse.toppleClick': 'ここをクリックして{name}を奴らの上に倒す',
+  'hudChrome.kitUse.toppleFar': '{range}ヤード以内に近づいて蹴り倒せ',
+  'hudChrome.kitUse.toppleAria': '{name}を倒す',
+  'hudChrome.kitUse.usingLine': '動くな：攻撃を受ける、動く、スタンのいずれかで中断される',
+  'hudChrome.kitUse.timeAria': '残り{seconds}秒',
+  'hudChrome.auraEffect.sanctum.branded':
+    '{seconds}秒間、{interval}秒ごとに{value}の{school}ダメージを与える。融け水の池に入るとすぐに消える。',
+  'hudChrome.auraEffect.sanctum.creepingRime':
+    '移動速度が{pct}%低下する（スタック1つにつき{per}%）。霧氷のブレスを受けるたびにスタックが1つ増え、効果時間が{seconds}秒にリセットされる。{max}スタックに達すると{freeze}秒間凍りつき（凍結）、スタックは消える。',
+  'hudChrome.auraEffect.sanctum.icedOver': '忍び寄る霧氷で凍りついた：移動も行動もできない。',
+  'hudChrome.auraEffect.sanctum.lockbound':
+    '受けるダメージが{pct}%減少：まだ残っている鎖1本につき{per}%。封印の枷を壊すとその鎖が外れる。',
+  'hudChrome.auraEffect.sanctum.enrage': '与えるダメージが{pct}%増加。',
+  'hudChrome.auraEffect.sanctum.grasp':
+    '融け水の中に立ち、与えるダメージが{pct}%増加。融け水の中で死ぬと沈み、{seconds}秒後に再び起き上がる。冷たい氷の上で倒せば二度と起きない。',
+  'hudChrome.auraEffect.sanctum.twiceWoken':
+    '融け水から再び起き上がり、与えるダメージが{pct}%増加。',
+  'hudChrome.auraEffect.sanctum.doused':
+    '足元の氷板が割れ、焼き入れの水が墓場のインフェルノを消した。',
+  'hudChrome.auraEffect.sanctum.airborne':
+    '空中にいて攻撃できない。最も多くのプレイヤーが立つ氷板へ墜落の降下で着地し、{radius}ヤード以内の全員に{min}から{max}のダメージ（ヒロイックでは{heroicMin}から{heroicMax}）を与える。',
+  'hudChrome.auraEffect.sanctum.wyrmsEye':
+    'この効果が切れると、コルズルが立っている氷板全体に降り注ぐ炎を浴びせる：上にいる全員に{min}から{max}のダメージ（ヒロイックでは{heroicMin}から{heroicMax}）、氷板にひびが入り、すでにひびがあれば砕ける。無傷の氷の上で仲間から離れて立て。',
+  'hudChrome.auraEffect.sanctum.quenchWater':
+    '開いた焼き入れの水の中：移動速度が{slow}%低下し、毎秒{damage}のダメージ（ヒロイックでは{heroic}）で焼かれる。どれかの氷板か岸まで泳げ。',
+  'hudChrome.auraEffect.sanctum.shardFlare':
+    '心臓の欠片が燃え上がる：墓のブレスが{breath}秒ごと、翼の突風が{gale}秒ごとになる。',
+  'hudChrome.auraEffect.wildheart.packBond':
+    '相棒が近くにいる間、受けるダメージが{pct}%減少する。獣使いとジャガーを引き離せば絆は切れる。',
+  'hudChrome.auraEffect.wildheart.packBondFury':
+    '相棒が近くにいる間、与えるダメージが{pct}%増加する。',
+  'hudChrome.auraEffect.wildheart.stalked':
+    '大ジャガーがあなたを狙い、挑発を受け付けない。噛みつきは{min}～{max}の物理ダメージ（ヒロイックでは{heroicMin}～{heroicMax}）を与え、出血させる。主から引き離せ。',
+  'hudChrome.auraEffect.wildheart.waryStuns':
+    '一度スタンを受けた。この効果が切れるまで、以降のスタンは効かない。',
+  'hudChrome.auraEffect.wildheart.waryRoots':
+    '一度拘束を受けた。この効果が切れるまで、以降の拘束は効かない。',
+  'hudChrome.auraEffect.wildheart.warySlows':
+    '一度鈍足を受けた。この効果が切れるまで、以降の鈍足は効かない。',
+  'hudChrome.auraEffect.wildheart.pollinated':
+    '種莢に触れると、すぐに茨の芽が生える。種には近づかず、花粉のない者に踏み潰させよう。放置された種莢は{seconds}秒で芽吹く（ヒロイックでは{heroic}秒で地中に潜り、最も近い者の傍から現れる）。',
+  'hudChrome.auraEffect.wildheart.prey':
+    'ズルガーがあなたを狙っている。光る太陽紋を踏ませると{slow}%鈍足になる。捕まると引き裂かれ、{damage}のダメージ（ヒロイックでは{heroic}）を受けて{stun}秒間倒される。',
+  'hudChrome.auraEffect.wildheart.avatar':
+    '移動速度が{pct}%上昇し、獲物を狩る。鈍足と拘束は効き、スタンの持続時間は半分になる。',
+  'hudChrome.auraEffect.wildheart.vanished':
+    '姿を消し、ダメージを受けない。最も遠い者へ飛びかかろうとしている。',
+  // The Drowned Temple lore guide, Laverock (src/sim/content/drowned_temple_cantor.ts).
+  'dungeonGuide.drownedTemple.greet.1':
+    'わしは蒼白聖歌隊でいちばん若い声だった。儀式の夜、わしは飲まずに逃げた。それ以来、満月のたびに水の下で皆が歌うのが聞こえる。死ぬ前に、あの方をこの目で見なければならん。後ろを歩かせてくれ。戦いはせんし、足手まといにもならん。',
+  'dungeonGuide.drownedTemple.greet.2':
+    '満月のたびにこの門まで来ては、そのたびに勇気がくじける。だが今夜は違う。聖歌隊が歌っている。逃げたのはこのわしだ。あの方のもとまで連れて行ってくれ。邪魔はせん。',
+  'dungeonGuide.drownedTemple.row.join': '一緒に来てくれ。',
+  'dungeonGuide.drownedTemple.row.decline': '我々だけで行く。',
+  'dungeonGuide.drownedTemple.joined': '先に行ってくれ。すぐ後ろにいる。',
+  'dungeonGuide.drownedTemple.singing': '歌わせてくれ。行きなさい、穏やかにな。',
+  'dungeonGuide.drownedTemple.accept.1': 'ありがとう。後ろを歩こう。邪魔はせん。',
+  'dungeonGuide.drownedTemple.accept.2': 'ならば、ようやく下りるとしよう。進んでくれ。ついて行く。',
+  'dungeonGuide.drownedTemple.decline': 'わかった。これまでどおり、ここから聴いていよう。',
+  'dungeonGuide.drownedTemple.heroicWater':
+    '今夜は水が高い。わしが見たこともないほどにな。あの方は目覚めかけておる。',
+  'dungeonGuide.drownedTemple.memory.votaries':
+    '岸の溺れ人たちは、門が閉じたあとに入っていった者たちだ。月は彼らを奪わなかった。奪ったのは水だけだ。',
+  'dungeonGuide.drownedTemple.memory.rubbing':
+    '潮見の番人が岸の岩に刻んだわしの言葉を読んだ。「眠っているだけ」。翌朝、わしが刻んだのだ。',
+  'dungeonGuide.drownedTemple.area.steps':
+    '巡礼の階段だ。あの夜、わしは三段飛ばしで駆け上がり、一度も振り返らなかった。',
+  'dungeonGuide.drownedTemple.sight.pilgrim':
+    '岸の村々の巡礼者たちだ。毎年春になると祠を背負って歩いた。今は永遠に背負っておる。',
+  'dungeonGuide.drownedTemple.sight.acolyte':
+    '見習いの娘たちだ。わしは彼女らの隣で文字を覚えた。今は眠りながら歌い、決して目覚めん。',
+  'dungeonGuide.drownedTemple.area.causeway.1':
+    '儀式の夜には、月がこの土手道に二本目の道のように横たわっていた。',
+  'dungeonGuide.drownedTemple.area.causeway.2': '水を見てごらん。月の抱き方を、今も覚えておる。',
+  'dungeonGuide.drownedTemple.sight.templeguard':
+    '階段の衛兵だ。月が沈むまで神殿を守ると誓った。月は沈まなかった。',
+  'dungeonGuide.drownedTemple.sight.snapper':
+    'わしらはあのような貝殻で月の水を飲んだ。わしのは階段に落としてしまった。',
+  'dungeonGuide.drownedTemple.sight.siren':
+    'あの声だ。聖歌隊でわしの隣で歌っていた。今も半拍早く入ってくる。',
+  'dungeonGuide.drownedTemple.sight.lurker':
+    '子どもたちが浅瀬で網ですくっていたものだ。親指ほどの大きさで、光っておった。',
+  'dungeonGuide.drownedTemple.sight.tidewisp':
+    'あれこそ月の水そのもの、わしらが飲むはずだった一杯だ。触れさせてはならん。',
+  'dungeonGuide.drownedTemple.area.colonnade':
+    '潮の列柱回廊だ。二人ずつ並んで、昇りの節を歌いながら歩いたものだ。',
+  'dungeonGuide.drownedTemple.sight.sentinel':
+    '門の池の月エイだ。見習いの頃、月の出に真珠を与えたものだ。今は彼らが扉を守り、我らの真珠を心臓として身につけておる。',
+  'dungeonGuide.drownedTemple.sight.eel':
+    '潟のウナギだ。見習いたちが夕暮れにパンをやっていた。わしらの賛歌で太ったのさ。',
+  'dungeonGuide.drownedTemple.area.veil':
+    'あの幕の向こうが聖歌の中庭だ。子どもの頃から一度も立っておらん。',
+  'dungeonGuide.drownedTemple.selthe.pre.1':
+    'セルセ母さまだ。腹から息をすることを教えてくれた。死なずに溺れることを、皆に教えたのだ。',
+  'dungeonGuide.drownedTemple.selthe.pre.2':
+    '聖歌母セルセ。わしが知る音はすべて、あの方が授けてくれた。お許しください、母さま。',
+  'dungeonGuide.drownedTemple.selthe.post.1':
+    '静かになった。聖歌隊にいたあいだ、あの方が静かだったことなど一度もなかった。',
+  'dungeonGuide.drownedTemple.selthe.post.2':
+    'もうお休みください、母さま。あなたの言うとおりでした。わしは長い音を保てなかった。',
+  'dungeonGuide.drownedTemple.area.terraces':
+    '潮だまりだ。見習いたちが掃除をして、中に住む小さな光るものたちに餌をやっていた。',
+  'dungeonGuide.drownedTemple.area.falls':
+    '滝の裏では、水がどんな声もかき消す。稽古をさぼるとき、わしはここに隠れた。',
+  'dungeonGuide.drownedTemple.area.pool':
+    '月の池だ。皆はそのまわりにひざまずき、貝殻から飲んだ。わしは自分のを持ち上げられなかった。',
+  'dungeonGuide.drownedTemple.hydra.pre':
+    '池の大蛇だ。わしが子どもの頃は頭が一つで、わしらの手から餌を食べたものだ。',
+  'dungeonGuide.drownedTemple.hydra.post':
+    '聴いてごらん。滝の下で、まだ皆が歌っておる。さっきより近い。',
+  'dungeonGuide.drownedTemple.area.prismStair':
+    'プリズムの階段だ。月の出に登って、大いなる硝子を目覚めさせたものだ。',
+  'dungeonGuide.drownedTemple.colossus.pre':
+    '大いなるプリズムだ。月を捕らえようと、その中に向かって歌った。立ち上がれるとは知らなんだ。',
+  'dungeonGuide.drownedTemple.sight.reflection':
+    '水がお前たちを何に変えるか、それを見せておるのだ。壊せ!',
+  'dungeonGuide.drownedTemple.colossus.post':
+    '硝子は砕けた。もう月を捕らえるものは何も残っておらん。あの方を除いてはな。',
+  'dungeonGuide.drownedTemple.area.moonbridge.1':
+    '月光の橋だ。信心深い者だけが渡れると、長老たちは言っていた。',
+  'dungeonGuide.drownedTemple.area.moonbridge.2':
+    'わしは信心深くなどなかった。さて、わしを支えてくれるかどうか。',
+  'dungeonGuide.drownedTemple.area.altarLanding':
+    'ここにわしは立っていた。まさにここだ。ここで背を向けて逃げたのだ。',
+  'dungeonGuide.drownedTemple.ysolei.pre':
+    'あそこにおられる。生涯ずっと、あの方が女神か怪物かと問い続けてきた。見せてくれ。',
+  'dungeonGuide.drownedTemple.ysolei.preHeroic':
+    'こんな夜には、聖歌隊の皆があの方とともに歌う。皆、踏みとどまれ。',
+  'dungeonGuide.drownedTemple.sight.moonspawn':
+    'あれはわしの仲間などではない。あの方のものだ。月光だけでできておる。',
+  'dungeonGuide.drownedTemple.farewell.answer':
+    'どちらでもなかった。あれは水に映る月で、ひざまずいたのはわしらのほうだった。',
+  'dungeonGuide.drownedTemple.farewell.verse':
+    '儀式には最後の一節があった。歌い手たちを眠らせる節だ。わしはそれを歌わなかった。',
+  'dungeonGuide.drownedTemple.farewell.stay':
+    '皆、もう十分に待った。わしはここに残り、今それを歌ってやろう。',
+  'dungeonGuide.drownedTemple.farewell.goodbye.1':
+    '夜空のもとへ上っていきなさい。満月に歌が聞こえたら、それはわしだ。',
+  'dungeonGuide.drownedTemple.farewell.goodbye.2':
+    '年老いた臆病者を歌の終わりまで連れてきてくれて、ありがとう。さあ、行きなさい。',
+  'dungeonGuide.drownedTemple.farewell.emote': '{name}が祭壇の上で声を上げると、潟は静まり返った。',
+  'dungeonGuide.drownedTemple.wipe': '起きてくれ。頼む。またこの底にわしを独り残さんでくれ。',
+  'dungeonGuide.drownedTemple.catchUp':
+    '脚は老いたが、この階段は一段残らず知っておる。ここにいるぞ。',
+  'abilityUi.cast.cantor_last_verse': '最後の一節',
+  'entities.npcs.cantor_laverock.name': 'ラヴェロック',
+  'entities.npcs.cantor_laverock.title': '蒼白聖歌隊最後の詠唱者',
+  'entities.npcs.cantor_laverock.greeting':
+    'わしは蒼白聖歌隊でいちばん若い声だった。儀式の夜、わしは飲まずに逃げた。それ以来、満月のたびに水の下で皆が歌うのが聞こえる。死ぬ前に、あの方をこの目で見なければならん。後ろを歩かせてくれ。戦いはせんし、足手まといにもならん。',
+  'hudChrome.cryptAlert.measuredTitle': '墓の採寸！',
+  'hudChrome.cryptAlert.measuredLine': 'バーが尽きると足元に墓が崩れ落ちる：墓地の端まで運べ',
+  'hudChrome.cryptAlert.embracedTitle': '凍てつく抱擁！',
+  'hudChrome.cryptAlert.embracedLine':
+    '宙に抱え上げられている：仲間が彼女を攻撃すれば降ろしてもらえる',
+  'hudChrome.cryptAlert.lamentTitle': '花嫁の哀歌！',
+  'hudChrome.cryptAlert.lamentShelteredLine': '灯ったランタンの光の中に君の居場所がある：動くな',
+  'hudChrome.cryptAlert.lamentOpenLine':
+    '慟哭が届く前に灯ったランタンの光に入れ：1つのランタンに2人まで',
+  'hudChrome.cryptAlert.graveTitle': '開いた墓の中にいる！',
+  'hudChrome.cryptAlert.graveLine': '墓土が君を焼き、足を鈍らせる：墓から出ろ',
+  'hudChrome.cryptAlert.tollTitle': '埋葬の鐘！',
+  'hudChrome.cryptAlert.tollLine':
+    '鐘を鳴らす間はダメージを受けない：鐘の一撃と、それが呼び起こす死者に備えろ',
+  'hudChrome.cryptAlert.harmonyTitle': '調和',
+  'hudChrome.cryptAlert.harmonyLine':
+    '聖歌隊員が彼女の受けるダメージを{pct}%減らしている：先に聖歌隊員を倒せ',
+  'hudChrome.cryptAlert.timeAria': '残り{seconds}秒',
+  'hudChrome.auraEffect.crypt.measured':
+    'これが切れると、立っている場所に開いた墓が崩れ落ち、{radius}ヤード以内の全員に{min}～{max}のダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。墓は戦闘中ずっと残るので、印は仲間から離れた墓地の端まで運ぶこと。',
+  'hudChrome.auraEffect.crypt.graveDirt':
+    '開いた墓の中に立っている：移動速度が{slow}%低下し、毎秒{damage}の闇ダメージ（ヒロイックでは{heroic}）。ヒロイックでは墓の中に{linger}秒留まると安らがぬ骨が這い出る。墓から出ること。',
+  'hudChrome.auraEffect.crypt.dirtInEyes':
+    '移動速度が{pct}%低下。ひとすくいの墓土は墓守マロウの前方にいる全員に当たる：背後に立つこと。',
+  'hudChrome.auraEffect.crypt.blow':
+    '受けるダメージが{pct}%上昇：1スタックごとに{per}%、現在{stacks}/{max}スタック。墓掘りの一撃のたびにスタックが増え、効果時間が{seconds}秒に戻る。',
+  'hudChrome.auraEffect.crypt.graveVigor':
+    '開いた墓の中に立っている間、攻撃速度が{pct}%上昇。墓から引き離すこと。',
+  'hudChrome.auraEffect.crypt.tolling':
+    '鐘の綱へ歩み寄り埋葬の鐘を鳴らしている間、ダメージを受けない。鳴らし終えると全員に{min}～{max}の闇ダメージ（ヒロイックでは{heroicMin}～{heroicMax}）を与え、開いた墓すべてから安らがぬ骨が這い出る。',
+  'hudChrome.auraEffect.crypt.embraced':
+    '貴婦人の腕に抱え上げられている：行動できず、毎秒{tick}の冷気ダメージ（ヒロイックでは{tickHeroic}）。仲間が彼女の最大体力の{share}%を削れば静かに降ろされるが、高所で{hold}秒抱えられると氷の上に落とされ、{min}～{max}のダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。',
+  'hudChrome.auraEffect.crypt.lament':
+    '花嫁の哀歌が終わると、灯った墓のランタンから{radius}ヤード以内にいない全員に{min}～{max}の冷気ダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。ランタンが守るのは最も近い{cap}人だけで、その後は消えて次の哀歌を守れない。',
+  'hudChrome.auraEffect.crypt.lingering':
+    '次の花嫁の哀歌で受けるダメージが{pct}%増加：1スタックごとに{per}%、最大{max}スタック。次はランタンの光の中で受けること。',
+  'hudChrome.auraEffect.crypt.slippery':
+    'すべりやすい氷の上：速度は毎秒最大{grip}ヤード/秒しか変わらないため、走り出しが遅く、止まっても滑り続け、曲がると大きく膨らむ。氷から降りれば足場が戻る。',
+  'hudChrome.auraEffect.crypt.harmony':
+    '受けるダメージが{pct}%減少：生きている聖歌隊員1人ごとに{per}%。聖歌隊員を先に倒すこと。',
+  'hudChrome.auraEffect.crypt.crescendo':
+    '歌が速くなる：虚ろの挽歌は{castNormal}秒ではなく{cast}秒になり、{everyNormal}秒ではなく{every}秒ごとに来る。骨のオルガンは{wavesNormal}波ではなく{waves}波の音符を奏でる。',
+  // Morthen the Gravecaller's Rite and the Knellwyrm's heroic Burning Knell
+  // (M16 non-Latin fills for their new strings).
+  'abilityUi.cast.crypt_morthen_shadow_pulse': 'シャドウパルス',
+  'abilityUi.cast.crypt_morthen_rite_of_the_unquiet': '安らがぬ者の儀式',
+  'abilityUi.cast.crypt_morthen_reap_the_unquiet': '安らがぬ者の刈り取り',
+  'abilityUi.cast.kituse_crypt_relight_candle': 'ろうそくを灯し直す',
+  'abilityUi.cast.crypt_knellwyrm_knell_rise': '燃える弔鐘',
+  'abilityUi.cast.crypt_knellwyrm_knell_mark': '燃える弔鐘',
+  'abilityUi.cast.crypt_knellwyrm_knell_breath': '燃える弔鐘',
+  'abilityUi.cast.crypt_knellwyrm_knell_land': '燃える弔鐘',
+  'entities.mobs.crypt_remembrance_candle.name': '追憶のろうそく',
+  'hudChrome.auraEffect.crypt.gorged':
+    '与えるダメージが{pct}%上昇：彼のもとに届いた縛られし魂1つごとに{per}%、現在{stacks}/{max}スタック、戦闘終了まで持続。魂が届くたびに最大体力の{heal}%も回復する。魂の進路に立てば代わりに受け止められる。',
+  'hudChrome.auraEffect.crypt.unquietWard':
+    '祭壇で安らがぬ者の儀式を詠唱している間、ダメージを受けない：追憶のろうそく{total}本のうち{lit}本が再点火済み。1本を灯し直すには{channel}秒の詠唱が必要で、その間、灯す者の最大体力の{drain}%（ヒロイックでは{drainHeroic}%）が毎秒吸い取られる。攻撃を受けても中断されないが、動くかスタンで中断される。最後のろうそくで結界が砕ける。ヒロイックでは台帳が告げる順に灯すこと：違うろうそくを灯すと最後に灯したろうそくが消え、灯した者に{wrongMin}～{wrongMax}の闇ダメージ。',
+  'hudChrome.auraEffect.crypt.riteBroken': 'スタン：砕けた結界のせいで{seconds}秒間行動できない。',
+  'hudChrome.auraEffect.crypt.shatteredWard':
+    '{seconds}秒間、受けるダメージが{pct}%上昇：灯し直したろうそくが結界を砕いた。今こそ最大の攻撃を叩き込め。',
+  'hudChrome.auraEffect.crypt.graveChill':
+    '安らがぬ者の儀式が続く間、毎秒{bite}の闇ダメージ（ヒロイックでは{biteHeroic}）を受け、{every}秒ごとに{step}（ヒロイックでは{stepHeroic}）ずつ増える。追憶のろうそくを灯し直して終わらせること。',
+  'hudChrome.auraEffect.crypt.graspMark':
+    '{fuse}秒後、足元の輪から手が噴き出す：輪が置かれた場所から{radius}ヤード以内の全員が{root}秒間その場に縛られ、{min}～{max}の闇ダメージを受ける。輪から出ること。',
+  'hudChrome.auraEffect.crypt.graspRoot': '墓の手に掴まれている：{seconds}秒間移動できない。',
+  'hudChrome.auraEffect.crypt.knellAirborne':
+    '儀式の環の上空を飛んでおり、攻撃が届かない。環の半分に{mark}秒間印を付け、その半分に亡霊の炎を浴びせる：中にいる全員に{min}～{max}の火炎ダメージ。1回の飛行で{breaths}回半分を焼き、その後着地する。',
+  'hudChrome.finder.mech.crypt_morthen_shadow_pulse':
+    'シャドウパルス（12秒ごとに2秒の詠唱の後、ノーマルでは周囲12ヤード以内の全員に24～30の闇ダメージ。離れること。終の儀式中は9秒ごと）',
+  'hudChrome.finder.mech.crypt_gravecall':
+    '墓呼び（15秒ごとに縛られし魂が次の石棺の壁龕から彼のもとへ漂う。届くと死者の飽食となり、魂1つごとに与えるダメージが10%上昇（最大10スタック）、体力の3%を回復する。進路に立つプレイヤーが代わりに受け止める：ノーマルでは12～16の闇ダメージ）',
+  'hudChrome.finder.mech.crypt_rite_of_the_unquiet':
+    '安らがぬ者の儀式（体力65%で祭壇に戻り、安らがぬ者の結界の中でダメージを受けなくなる。その間、墓の冷気が全員に毎秒3の闇ダメージを与えて5秒ごとに1ずつ増え、壁龕から安らがぬ骨が2体這い出る。追憶のろうそく4本を灯し直すこと：1本ごとに4秒の詠唱で、灯す者の最大体力の6%を毎秒吸い取る。攻撃では中断されないが、動くかスタンで中断される。最後のろうそくで儀式が破れ、8秒間スタンし、受けるダメージが25%上昇する）',
+  'hudChrome.finder.mech.crypt_reap_the_unquiet':
+    '安らがぬ者の刈り取り（体力35%未満で魂は止まり、14秒ごとに2秒の詠唱の後、大鎌を振るう：ノーマルでは前方14ヤード、120度の扇形にいる全員に55～65の闇ダメージ。以後シャドウパルスは9秒ごと）',
+  'hudChrome.finder.mech.crypt_morthen_heroic':
+    'ヒロイック：死者の名を呼べ（台帳がろうそくの順番を告げる。違うろうそくを灯すと最後に灯したろうそくが消え、灯した者に252～288の闇ダメージ。再点火は毎秒8%を吸い取る）、墓の掌握（16秒ごとにプレイヤー2人の足元に4ヤードの輪が現れ、1.5秒後に手が噴き出す：3秒の移動不能と162～198の闇ダメージ）、弔鐘竜の燃える弔鐘（飛び立って環の半分に4.5秒間印を付け、その半分に亡霊の炎を浴びせて1,000～1,120の火炎ダメージ。1回の飛行で3回）',
+  'hudChrome.cryptAlert.knellTitle': '燃える弔鐘！',
+  'hudChrome.cryptAlert.knellLine':
+    'バーが尽きると環のこちら側の半分に亡霊の炎が降り注ぐ：反対側の半分へ移動しろ',
+  'hudChrome.cryptAlert.graspTitle': '墓の掌握！',
+  'hudChrome.cryptAlert.graspLine': 'この輪から手が噴き出し、中にいる者を掴む：輪から出ろ',
+  'hudChrome.cryptAlert.reapTitle': '安らがぬ者の刈り取り！',
+  'hudChrome.cryptAlert.reapLine': '大鎌が彼の前方の地面を薙ぎ払う：背後に回れ',
+  'hudChrome.cryptAlert.riteTitle': '安らがぬ者の儀式',
+  'hudChrome.cryptAlert.riteLine': '追憶のろうそくを灯し直して結界を砕け：{total}本中{lit}本点灯',
+  'hudChrome.cryptAlert.riteNamedLine':
+    '台帳が次に告げるろうそくだけを灯し直せ：{total}本中{lit}本点灯',
+  'hudChrome.cryptAlert.soulTitle': '縛られし魂',
+  'hudChrome.cryptAlert.soulLine':
+    '魂がモーセンのもとへ漂っている：進路に立ち、彼を肥えさせる前に受け止めろ',
+  'hudChrome.kitUse.relightLine':
+    '詠唱中は毎秒体力を吸い取られる：攻撃では中断されないが、動くかスタンで中断される',
+  'hudChrome.kitUse.relightKey': '{name}を灯し直す',
+  'hudChrome.kitUse.relightTap': 'ここをタップして{name}を灯し直す',
+  'hudChrome.kitUse.relightClick': 'ここをクリックして{name}を灯し直す',
+  'hudChrome.kitUse.relightFar': '{range}ヤード以内に近づいて灯し直せ',
+  'hudChrome.kitUse.relightAria': '{name}を灯し直す',
+  'hudChrome.kitUse.relightUsingLine':
+    '吸い取られる間も動くな：攻撃では中断されないが、動くかスタンで中断される',
+  // The lower dungeons' normal blues (M16 non-Latin fills for their new names).
+  'entities.items.spadeworn_gauntlets.name': '鋤擦れの籠手',
+  'entities.items.gravedirt_grips.name': '墓土のグリップ',
+  'entities.items.bellrope_mitts.name': '鐘縄のミトン',
+  'entities.items.rimewreath_coif.name': '霜花冠の鎖頭巾',
+  'entities.items.rime_laced_hood.name': '霜綴りのフード',
+  'entities.items.lamenting_veil.name': '嘆きのヴェール',
+  'entities.items.choirward_pauldrons.name': '聖歌守りの肩鎧',
+  'entities.items.choristers_spaulders.name': '聖歌隊員の肩当て',
+  'entities.items.cantors_stole.name': '聖歌隊長のストール',
+  'entities.items.knellbound_hauberk.name': '弔鐘縛りのホーバーク',
+  'entities.items.candlewatch_jerkin.name': '灯守りの胴着',
+  'entities.items.robe_of_the_unquiet_rite.name': '安らがぬ儀式のローブ',
+  'entities.items.gravecallers_rod.name': '墓呼びのロッド',
+  'entities.items.portcullis_girdle.name': '落とし格子の腰帯',
+  'entities.items.cellwatch_belt.name': '牢見張りのベルト',
+  'entities.items.lanternwick_sash.name': 'ランタン芯の飾り帯',
+  'entities.items.turnkeys_shank.name': '牢番の隠し刃',
+  'entities.items.gaolyard_jerkin.name': '牢獄庭の胴着',
+  'entities.items.brinewarden_robe.name': '潮看守のローブ',
+  'entities.items.fogbinders_rod.name': 'フォグバインダーのロッド',
+  'entities.items.conchplate_sabatons.name': '巻貝板のサバトン',
+  'entities.items.pale_chorus_slippers.name': '蒼白聖歌のスリッパ',
+  'entities.items.tideglass_gauntlets.name': '潮硝子の籠手',
+  'entities.items.moonburn_grips.name': '月焼けのグリップ',
+  'entities.items.prism_etched_handwraps.name': 'プリズム刻みのハンドラップ',
+  'entities.items.mere_crested_helm.name': '湖冠の兜',
+  'entities.items.mereskin_hood.name': '湖竜皮のフード',
+  'entities.items.merewater_cowl.name': '湖水の頭巾',
+  'entities.items.merecleaver.name': '湖断ちの大斧',
+  'entities.items.moonwrack_stave.name': 'ムーンラックの杖',
 };
