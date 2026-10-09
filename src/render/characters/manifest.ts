@@ -4572,7 +4572,9 @@ export const VISUALS: Record<string, VisualDef> = {
   // -- the Hollow Crypt trash (sim/content/hollow_crypt_trash.ts) ----------------
   // The crypt's skeletons are the art guide's models (concept, Tripo P2, a skeleton
   // and every clip built from scratch in Blender), each with the trash kit's casts on
-  // its own gestures.
+  // its own gestures. Their painted atlas carries its own colour, so they draw it
+  // untinted; the yellow cast Tripo baked into the bone is pulled to neutral before
+  // compression (scripts/assets/neutralize_warm_albedo.mjs).
   //
   // The Ossuary Warrior: an ossuary guard in rusted plate studded with skulls and
   // bones, an iron sword in its right hand. Attack is the overhead chop, Attack2 the
@@ -4606,8 +4608,6 @@ export const VISUALS: Record<string, VisualDef> = {
     walkRef: 2.5,
     runRef: 7.6,
     authoredAtlas: true,
-    tint: 'entity',
-    tintStrength: 0.25,
   },
   // Reassemble's Stirring Bones (crypt_bone_pile): the pile IS the fallen
   // warrior's own corpse, so this draws no body; its click capsule, widened so
@@ -4678,8 +4678,6 @@ export const VISUALS: Record<string, VisualDef> = {
     walkRef: 2.13,
     runRef: 7.0,
     authoredAtlas: true,
-    tint: 'entity',
-    tintStrength: 0.35,
   },
   // The Gravecaller Necromancer: a senior priest in black over violet robes, a mantle of
   // finger bones and a chained ledger, a violet staff in its right hand. Cast is the
@@ -4705,8 +4703,6 @@ export const VISUALS: Record<string, VisualDef> = {
     walkRef: 2.03,
     runRef: 7.0,
     authoredAtlas: true,
-    tint: 'entity',
-    tintStrength: 0.3,
   },
   // The rest of the Hollow Crypt roster, raised a head or more over a player (2.6) so
   // nothing in the crypt stands at player size: the cutthroat, the Bone Minion (it
@@ -4736,10 +4732,9 @@ export const VISUALS: Record<string, VisualDef> = {
     walkRef: 2.68,
     runRef: 8.5,
     authoredAtlas: true,
-    tint: 'entity',
-    tintStrength: 0.25,
   },
-  crypt_skel_minion: { ...WOC_SKELETON_MINION, height: 3.5 },
+  // the crypt's own bone minion draws its texture untinted, like the rest of its roster
+  crypt_skel_minion: { ...WOC_SKELETON_MINION, height: 3.5, tint: undefined },
   // The Bone Brute: a hulk of fused ribcages and bundled bone, unarmed, its skull sunk
   // between the shoulders. Attack is a right hook, Attack2 a short two-fist hammer. Slam
   // is Marrow Crush: both fists climb overhead through the 2 s bar and smash the floor on
@@ -4762,8 +4757,6 @@ export const VISUALS: Record<string, VisualDef> = {
     walkRef: 2.97,
     runRef: 9.1,
     authoredAtlas: true,
-    tint: 'entity',
-    tintStrength: 0.25,
   },
   // Sexton Marrow (scripts/assets/hollow_crypt_creatures/build_marrow.py): the
   // parish gravedigger raised and still digging, sculpted on the Bastion kit at
@@ -4876,8 +4869,6 @@ export const VISUALS: Record<string, VisualDef> = {
     walkRef: 2.0,
     runRef: 7.1,
     authoredAtlas: true,
-    tint: 'entity',
-    tintStrength: 0.3,
   },
   // Morthen, the Lich Bishop (the clip sets above): about three players tall
   // at his template's 1.35, floating on his soul smoke, the smoke funnel sunk
