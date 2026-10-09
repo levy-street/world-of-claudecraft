@@ -6839,6 +6839,12 @@ export const vi_VN: EnTranslations = {
       "admin_target": "Tài khoản nhà điều hành không thể bị đá.",
       "target_offline": "Người chơi đó không còn trực tuyến trên vương quốc này nữa."
     },
+    "world_quest_block": {
+      "admin_target": "Operator accounts cannot be blocked from world quests.",
+      "reason_required": "A reason is required.",
+      "already_blocked": "That account is already blocked from world quests.",
+      "not_blocked": "That account is not blocked from world quests."
+    },
     "woc_market": {
       "invalid_input": "Dữ liệu nhập không hợp lệ.",
       "disabled": "Sàn Giao Dịch $WOC không khả dụng trên thế giới này.",

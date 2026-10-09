@@ -6839,6 +6839,12 @@ export const ja_JP: EnTranslations = {
       "admin_target": "管理者アカウントはキックできません。",
       "target_offline": "そのプレイヤーはもうこのレルムにオンラインではありません。"
     },
+    "world_quest_block": {
+      "admin_target": "管理者アカウントはワールドクエストから除外できません。",
+      "reason_required": "理由の入力が必要です。",
+      "already_blocked": "そのアカウントはすでにワールドクエストから除外されています。",
+      "not_blocked": "そのアカウントはワールドクエストから除外されていません。"
+    },
     "woc_market": {
       "invalid_input": "入力が無効です。",
       "disabled": "このレルムでは $WOC 取引所を利用できません。",

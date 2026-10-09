@@ -6839,6 +6839,12 @@ export const es: EnTranslations = {
       "admin_target": "Las cuentas de los operadores no se pueden expulsar.",
       "target_offline": "Ese jugador ya no está en línea en este reino."
     },
+    "world_quest_block": {
+      "admin_target": "Operator accounts cannot be blocked from world quests.",
+      "reason_required": "A reason is required.",
+      "already_blocked": "That account is already blocked from world quests.",
+      "not_blocked": "That account is not blocked from world quests."
+    },
     "woc_market": {
       "invalid_input": "Entrada no válida.",
       "disabled": "La Bolsa de $WOC no está disponible en este mundo.",

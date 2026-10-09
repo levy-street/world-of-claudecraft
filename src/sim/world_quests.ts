@@ -45,6 +45,7 @@ import {
   updateWorldQuestAmbush,
 } from './world_quest_ambush';
 import { positionInWorldQuestArea } from './world_quest_area';
+import { suspendBlockedWorldQuests, worldQuestsBlocked } from './world_quest_block';
 import {
   awardWorldQuestBonusCopper,
   WISP_MAZE_HARD_BONUS,
@@ -306,6 +307,12 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
   // first, inside or outside the site, so an abandoned rift still tears down.
   updateWorldQuestAmbush(ctx, FARSHORE_SALVAGE_AMBUSH);
   updateWorldQuestChampions(ctx);
+  // An operator-blocked account (world_quest_block.ts) still advances the shared
+  // sites above, then tears its own state down instead of starting anything.
+  if (worldQuestsBlocked(meta)) {
+    suspendBlockedWorldQuests(ctx, meta, player);
+    return;
+  }
   const shadowProgress = meta.worldQuestLog.get(SHADOW_QUEST_ID);
   if (updateShadowEncounter(ctx, meta, player) && shadowProgress)
     creditWorldQuest(ctx, meta, WORLD_QUESTS_BY_ID[SHADOW_QUEST_ID], shadowProgress);
@@ -493,6 +500,9 @@ export function talkToWorldQuestInstructor(
   meta: PlayerMeta,
   player: Entity,
 ): boolean {
+  // A blocked account's instructor talk opens nothing; false lets the NPC fall
+  // through to the ordinary talk path exactly as for any non-instructor.
+  if (worldQuestsBlocked(meta)) return false;
   resetCycleIfNeeded(ctx, meta);
   if (talkToInvestigation(ctx, npc, meta, player)) return true;
   if (npc.templateId === GLIDER_APPRENTICE_NPC_DEF.id) {
@@ -644,6 +654,9 @@ function creditWorldQuest(
   progress: WorldQuestProgress,
   amount = 1,
 ): void {
+  // The reward choke point: a blocked account earns no progress, completion,
+  // or payout, whatever path reached here.
+  if (worldQuestsBlocked(meta)) return;
   progress.count = Math.min(quest.count, progress.count + amount);
   const practice =
     progress.practiceOnly ||
@@ -876,7 +889,7 @@ export function onObjectInteractedForWorldQuests(
     if (!quest || !inWorldQuestArea(player, quest) || !inWorldQuestArea(obj, quest)) continue;
     if (quest.objective.type === 'puzzle' || quest.objective.type === 'match3') {
       if (quest.objective.activationObjectItemId !== obj.objectItemId) continue;
-      if (player.level < quest.minLevel) continue;
+      if (player.level < quest.minLevel || worldQuestsBlocked(meta)) continue;
       const pendingBonus: boolean = leyBonusPending(progress);
       if (progress.state === 'completed' && !pendingBonus) {
         if (quest.objective.type === 'puzzle') unlockLeyBonus(progress, progress.puzzleDay);

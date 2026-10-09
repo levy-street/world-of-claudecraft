@@ -6839,6 +6839,12 @@ export const it_IT: EnTranslations = {
       "admin_target": "Gli account operatore non possono essere kickati.",
       "target_offline": "Quel giocatore non è più online su questo reame."
     },
+    "world_quest_block": {
+      "admin_target": "Operator accounts cannot be blocked from world quests.",
+      "reason_required": "A reason is required.",
+      "already_blocked": "That account is already blocked from world quests.",
+      "not_blocked": "That account is not blocked from world quests."
+    },
     "woc_market": {
       "invalid_input": "Input non valido.",
       "disabled": "La Borsa $WOC non è disponibile su questo reame.",

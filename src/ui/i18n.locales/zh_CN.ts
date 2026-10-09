@@ -17545,6 +17545,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'apiError.kick.admin_target': '管理员账号无法被踢出。',
   'apiError.kick.reason_required': '必须填写原因。',
   'apiError.kick.target_offline': '该玩家已不在此服务器在线。',
+  'apiError.world_quest_block.admin_target': '管理员账号无法被禁止参与世界任务。',
+  'apiError.world_quest_block.reason_required': '必须填写原因。',
+  'apiError.world_quest_block.already_blocked': '该账号已被禁止参与世界任务。',
+  'apiError.world_quest_block.not_blocked': '该账号未被禁止参与世界任务。',
   'entities.items.reins_goblin_rocket_sled.name': '哥布林火箭雪橇点火钥匙',
   'entities.items.reins_rallycart_rxt.name': '拉力卡丁车 RXT 点火钥匙',
   'guide.settingsPage.ifAuraBarBelowFrame':

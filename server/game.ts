@@ -112,6 +112,7 @@ import { ownedWeaponSkinLoadout } from './account_cosmetics_live';
 import { AccountCosmeticsService } from './account_cosmetics_service';
 import { reconcileAccountRelics, recordRelicFinds } from './account_ledger_records';
 import { AccountLedgerService } from './account_ledger_service';
+import { restoreAccountSanctions } from './account_sanctions_runtime';
 import { type ActivityDetectDeps, detectActivityEvent } from './activity_detect';
 import { recordOnlineSample } from './admin_db';
 import { type AdminGuildBankView, adminGuildBankView } from './admin_guild_bank_view';
@@ -185,7 +186,6 @@ import { chatSenderFlair } from './chat_sender_flair';
 import {
   applyCheaterMarkLive as applyCheaterMarkLiveRuntime,
   persistCheaterMark,
-  refreshCheaterMark,
 } from './cheater_mark_runtime';
 import {
   cancelCorpseHarvestCastOnDisconnect,
@@ -495,6 +495,7 @@ import {
 import { holderInfoForPubkey } from './woc_balance';
 import type { CharacterSaveArgs } from './woc_market';
 import { activeWorldBossIdsWireJson } from './world_boss_wire';
+import { applyWorldQuestBlockLive as applyWorldQuestBlockLiveRuntime } from './world_quest_block_runtime';
 import { recordWorldQuestScoreEvent } from './world_quest_leaderboard';
 import { isBackpressureExceeded } from './ws_backpressure';
 
@@ -2916,6 +2917,12 @@ export class GameServer {
     applyCheaterMarkLiveRuntime(this.clients.values(), this.sim, accountId, seconds);
   }
 
+  /** Push a world quest block change onto every live session of that account
+   *  (server/world_quest_block_runtime.ts owns the behavior). */
+  applyWorldQuestBlockLive(accountId: number, blocked: boolean): void {
+    applyWorldQuestBlockLiveRuntime(this.clients.values(), this.sim, accountId, blocked);
+  }
+
   /** Apply a committed cross-process policy notification to live sessions. */
   applyGeneralChatRateLimitLive(accountId: number, rateLimit: GeneralChatRateLimit | null): void {
     this.generalChatRateLimitLiveState.policyChanged(accountId, rateLimit);
@@ -3574,17 +3581,9 @@ export class GameServer {
     void this.refreshAccountFlair(session).catch((err) =>
       console.error('account flair refresh failed:', err),
     );
-    // Restore any live Cheater mark, same best-effort contract: a failed read
-    // must never block joining the world. Failing OPEN (joining untagged) is the
-    // deliberate choice over failing closed, because the alternative is locking a
-    // player out of a game they paid for over a cosmetic sanction; the budget is
-    // not burned while the tag is absent, so a missed restore delays the sanction
-    // rather than cancelling it.
-    void refreshCheaterMark(
-      session,
-      this.sim,
-      () => this.clients.get(session.pid) === session,
-    ).catch((err) => console.error('cheater mark refresh failed:', err));
+    // Restore the account's operator sanctions (Cheater mark, world quest block),
+    // best-effort and fail-open (server/account_sanctions_runtime.ts says why).
+    restoreAccountSanctions(session, this.sim, () => this.clients.get(session.pid) === session);
     // Stamp the Curator standing off the just-loaded meta so an inspect landing
     // before the first 60s cycle already reads the true rank. Synchronous (pure
     // CPU), so the try/catch is what keeps the same "a flair stamp must never
