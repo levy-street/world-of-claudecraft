@@ -3,15 +3,21 @@
 // quests, while a lifted block resumes them without replaying a claimed reward.
 // Driven through the real Sim tick and the real kill-credit arm.
 import { describe, expect, it } from 'vitest';
-import { GLIDER_APPRENTICE_NPC_DEF } from '../src/sim/content/world_quest_glider';
+import { NORTH_WATCH_CANNON } from '../src/sim/content/vehicle_stations';
+import { GLIDER_APPRENTICE_NPC_DEF, GLIDER_QUEST_ID } from '../src/sim/content/world_quest_glider';
+import { GLIDER_COURSES } from '../src/sim/content/world_quest_glider_levels';
+import { WISP_MAZE_NPC_ID, WISP_MAZE_QUEST_ID } from '../src/sim/content/world_quest_wisp_maze';
 import { WORLD_QUESTS_BY_ID } from '../src/sim/content/world_quests';
+import { BUILTIN_WORLD } from '../src/sim/data';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { setWorldQuestsBlocked, worldQuestsBlocked } from '../src/sim/world_quest_block';
 import { awardWorldQuestBonusCopper } from '../src/sim/world_quest_bonus';
+import { worldQuestCycleOfferingQuest } from '../src/sim/world_quest_rotation';
 import { onMobKilledForWorldQuests, talkToWorldQuestInstructor } from '../src/sim/world_quests';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
 const THORNPEAK = 'wq_thornpeak_stormcrag';
 
@@ -208,5 +214,91 @@ describe('a lifted block', () => {
     expect(meta.worldQuestLog.get(THORNPEAK)?.state).toBe('completed');
     expect(meta.copper).toBeGreaterThan(copper);
     expect(worldQuestDoneEvents(sim)).toBe(1);
+  });
+});
+
+describe('the other doors into a world quest activity', () => {
+  /** A capped mage beside the North Watch cannon on a cycle offering its quest. */
+  function cannonRig(): { sim: Sim; meta: PlayerMeta } {
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'mage' });
+    const meta = metaOf(sim);
+    sim.setPlayerLevel(WORLD_QUESTS_BY_ID[NORTH_WATCH_CANNON.questId].minLevel);
+    meta.devWorldQuestCycle = worldQuestCycleOfferingQuest('wq3_0', NORTH_WATCH_CANNON.questId);
+    placeAt(sim, NORTH_WATCH_CANNON.x, NORTH_WATCH_CANNON.z + 2);
+    sim.tick();
+    const row = meta.worldQuestLog.get(NORTH_WATCH_CANNON.questId);
+    if (!row) throw new Error('Missing cannon row');
+    // Today's clear already landed: endless play (and its ladder scores) is what
+    // a completed row still opens.
+    row.state = 'completed';
+    return { sim, meta };
+  }
+
+  it('refuses a blocked account at a cannon station, and ejects a live session', () => {
+    const { sim, meta } = cannonRig();
+    setWorldQuestsBlocked(meta, true);
+    expect(sim.enterVehicle(NORTH_WATCH_CANNON.id)).toBe(false);
+
+    setWorldQuestsBlocked(meta, false);
+    expect(sim.enterVehicle(NORTH_WATCH_CANNON.id)).toBe(true);
+    setWorldQuestsBlocked(meta, true);
+    sim.tick();
+    expect(sim.vehicleSession).toBeNull();
+    expect(meta.worldQuestLog.get(NORTH_WATCH_CANNON.questId)?.state).toBe('completed');
+  });
+
+  it('opens no maze from the difficulty pick on a completed row', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', devCommands: true });
+    sim.resetDay = '2026-09-06';
+    sim.chat('/dev wisps normal');
+    sim.tick();
+    const meta = metaOf(sim);
+    const row = meta.worldQuestLog.get(WISP_MAZE_QUEST_ID);
+    if (!row) throw new Error('Missing maze row');
+    delete row.wispMaze;
+    row.state = 'completed';
+    meta.devWorldQuestCycle = worldQuestCycleOfferingQuest(
+      sim.ctx.currentWorldQuestRotation().cycle,
+      WISP_MAZE_QUEST_ID,
+    );
+    const keeper = sim.entities.get(WISP_MAZE_NPC_ID);
+    if (!keeper) throw new Error('Missing maze keeper');
+    sim.player.pos = sim.groundPos(keeper.pos.x + 1, keeper.pos.z);
+    sim.player.prevPos = { ...sim.player.pos };
+    const before = { ...sim.player.pos };
+
+    setWorldQuestsBlocked(meta, true);
+    sim.startWorldQuestActivity(WISP_MAZE_QUEST_ID, 'hard');
+    expect(row.wispMaze).toBeUndefined();
+    expect(sim.player.pos).toEqual(before);
+
+    // Control: the same pick opens the practice maze once the block lifts.
+    setWorldQuestsBlocked(meta, false);
+    sim.startWorldQuestActivity(WISP_MAZE_QUEST_ID, 'hard');
+    expect(meta.worldQuestLog.get(WISP_MAZE_QUEST_ID)?.wispMaze?.difficulty).toBe('hard');
+  });
+
+  it('launches no glider from the course pick, and the completed row stays completed', () => {
+    const sim = new Sim({
+      seed: WORLD_SEED,
+      playerClass: 'warrior',
+      devCommands: true,
+      world: { ...BUILTIN_WORLD, camps: [], groundObjects: [] },
+    });
+    sim.resetDay = '2026-09-28';
+    sim.chat('/dev glider');
+    const meta = metaOf(sim);
+    const row = meta.worldQuestLog.get(GLIDER_QUEST_ID);
+    if (!row) throw new Error('Missing glider row');
+    row.state = 'completed';
+
+    setWorldQuestsBlocked(meta, true);
+    sim.startWorldQuestActivity(GLIDER_QUEST_ID, { courseId: GLIDER_COURSES[1].id });
+    expect(row.glider).toBeUndefined();
+    expect(row.state).toBe('completed');
+
+    setWorldQuestsBlocked(meta, false);
+    sim.startWorldQuestActivity(GLIDER_QUEST_ID, { courseId: GLIDER_COURSES[1].id });
+    expect(row.glider?.phase).toBe('countdown');
   });
 });

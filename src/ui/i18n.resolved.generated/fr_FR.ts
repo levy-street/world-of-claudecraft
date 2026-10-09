@@ -6839,6 +6839,12 @@ export const fr_FR: EnTranslations = {
       "admin_target": "Les comptes d'opérateur ne peuvent pas être supprimés.",
       "target_offline": "Ce joueur n'est plus en ligne sur ce royaume."
     },
+    "world_quest_block": {
+      "admin_target": "Operator accounts cannot be blocked from world quests.",
+      "reason_required": "A reason is required.",
+      "already_blocked": "That account is already blocked from world quests.",
+      "not_blocked": "That account is not blocked from world quests."
+    },
     "woc_market": {
       "invalid_input": "Entrée invalide.",
       "disabled": "La Bourse $WOC n'est pas disponible sur ce royaume.",

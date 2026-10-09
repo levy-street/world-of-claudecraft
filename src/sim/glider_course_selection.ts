@@ -2,6 +2,7 @@ import { GLIDER_NPC_ID, GLIDER_QUEST_ID, WORLD_QUEST_GLIDER } from './content/wo
 import { GLIDER_COURSES } from './content/world_quest_glider_levels';
 import type { SimContext } from './sim_context';
 import { INTERACT_RANGE } from './types';
+import { worldQuestsBlocked } from './world_quest_block';
 import { startGliderFlight } from './world_quest_glider';
 import { dismountForWorldQuestInstructor } from './world_quest_mount_gate';
 import { hasActiveWorldQuest, updateWorldQuests } from './world_quests';
@@ -12,6 +13,9 @@ export function startSelectedGliderCourse(ctx: SimContext, courseId: string, pid
   const resolved = ctx.resolve(pid);
   if (!resolved) return;
   const { meta, e: player } = resolved;
+  // The course pick is the instructor talk by another door: an operator-blocked
+  // account (world_quest_block.ts) launches nothing here either.
+  if (worldQuestsBlocked(meta)) return;
   const npc = ctx.entities.get(GLIDER_NPC_ID);
   if (
     !npc ||

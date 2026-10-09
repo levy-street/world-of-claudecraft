@@ -6839,6 +6839,12 @@ export const sv_SE: EnTranslations = {
       "admin_target": "Operatörskonton kan inte sparkas.",
       "target_offline": "Den spelaren är inte längre online i denna värld."
     },
+    "world_quest_block": {
+      "admin_target": "Operator accounts cannot be blocked from world quests.",
+      "reason_required": "A reason is required.",
+      "already_blocked": "That account is already blocked from world quests.",
+      "not_blocked": "That account is not blocked from world quests."
+    },
     "woc_market": {
       "invalid_input": "Ogiltig inmatning.",
       "disabled": "$WOC-börsen är inte tillgänglig på det här riket.",

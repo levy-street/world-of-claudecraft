@@ -6839,6 +6839,12 @@ export const zh_TW: EnTranslations = {
       "admin_target": "管理員帳號無法被踢出。",
       "target_offline": "該玩家已不在此伺服器上線。"
     },
+    "world_quest_block": {
+      "admin_target": "管理員帳號無法被禁止參與世界任務。",
+      "reason_required": "必須填寫原因。",
+      "already_blocked": "該帳號已被禁止參與世界任務。",
+      "not_blocked": "該帳號未被禁止參與世界任務。"
+    },
     "woc_market": {
       "invalid_input": "輸入無效。",
       "disabled": "本伺服器未開放 $WOC 交易所。",

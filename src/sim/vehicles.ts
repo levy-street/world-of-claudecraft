@@ -22,6 +22,7 @@ import {
   type VehicleStationDef,
 } from './types';
 import { vehicleStationById } from './vehicle_stations';
+import { worldQuestsBlocked } from './world_quest_block';
 import { activeWorldQuestsForCycle } from './world_quest_rotation';
 import { emitWorldQuestScore } from './world_quest_score_events';
 import { completeWorldQuestVehicle } from './world_quests';
@@ -57,6 +58,9 @@ function eligible(
   return (
     !ctx.cfg.world &&
     !meta.leaving &&
+    // An operator-blocked account (world_quest_block.ts) cannot man a station:
+    // checked on entry, on every shot, and on every tick, so a live session ejects.
+    !worldQuestsBlocked(meta) &&
     !player.dead &&
     !player.inCombat &&
     meta.worldQuestCycle === cycle &&

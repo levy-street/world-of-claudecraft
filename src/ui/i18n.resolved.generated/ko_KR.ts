@@ -6839,6 +6839,12 @@ export const ko_KR: EnTranslations = {
       "admin_target": "운영자 계정은 추방할 수 없습니다.",
       "target_offline": "해당 플레이어는 더 이상 이 서버에 접속해 있지 않습니다."
     },
+    "world_quest_block": {
+      "admin_target": "운영자 계정은 전역 퀘스트에서 차단할 수 없습니다.",
+      "reason_required": "사유를 입력해야 합니다.",
+      "already_blocked": "해당 계정은 이미 전역 퀘스트에서 차단되었습니다.",
+      "not_blocked": "해당 계정은 전역 퀘스트에서 차단되지 않았습니다."
+    },
     "woc_market": {
       "invalid_input": "입력이 잘못되었습니다.",
       "disabled": "이 서버에서는 $WOC 거래소를 이용할 수 없습니다.",

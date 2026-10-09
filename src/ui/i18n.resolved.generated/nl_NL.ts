@@ -6839,6 +6839,12 @@ export const nl_NL: EnTranslations = {
       "admin_target": "Operatoraccounts kunnen niet worden verwijderd.",
       "target_offline": "Die speler is niet langer online in dit rijk."
     },
+    "world_quest_block": {
+      "admin_target": "Operator accounts cannot be blocked from world quests.",
+      "reason_required": "A reason is required.",
+      "already_blocked": "That account is already blocked from world quests.",
+      "not_blocked": "That account is not blocked from world quests."
+    },
     "woc_market": {
       "invalid_input": "Ongeldige invoer.",
       "disabled": "De $WOC-beurs is niet beschikbaar op deze wereld.",
