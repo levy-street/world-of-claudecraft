@@ -18159,6 +18159,12 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'apiError.kick.admin_target': 'Las cuentas de los operadores no se pueden expulsar.',
   'apiError.kick.reason_required': 'Se requiere una razón.',
   'apiError.kick.target_offline': 'Ese jugador ya no está en línea en este reino.',
+  'apiError.world_quest_block.admin_target':
+    'Las cuentas de los operadores no se pueden bloquear para misiones de mundo.',
+  'apiError.world_quest_block.reason_required': 'Se requiere una razón.',
+  'apiError.world_quest_block.already_blocked':
+    'Esa cuenta ya está bloqueada para misiones de mundo.',
+  'apiError.world_quest_block.not_blocked': 'Esa cuenta no está bloqueada para misiones de mundo.',
   'entities.abilities.melting_acid.description':
     'Recubre tu arma durante 30 min. Cada uno de tus golpes cuerpo a cuerpo salpica al objetivo con ácido cáustico y reduce su armadura en un 5 % durante 12 s.',
   'entities.abilities.nightshade_coating.description':

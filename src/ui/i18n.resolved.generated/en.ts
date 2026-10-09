@@ -6839,6 +6839,12 @@ export const en: EnTranslations = {
       "admin_target": "Operator accounts cannot be kicked.",
       "target_offline": "That player is no longer online on this realm."
     },
+    "world_quest_block": {
+      "admin_target": "Operator accounts cannot be blocked from world quests.",
+      "reason_required": "A reason is required.",
+      "already_blocked": "That account is already blocked from world quests.",
+      "not_blocked": "That account is not blocked from world quests."
+    },
     "woc_market": {
       "invalid_input": "Invalid input.",
       "disabled": "The $WOC Exchange is not available on this realm.",

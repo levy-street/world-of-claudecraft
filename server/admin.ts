@@ -209,6 +209,12 @@ import {
   UNSTUCK_REPORT_MAX_LIMIT,
 } from './unstuck_db';
 import { PgUserAssetsDb } from './user_assets_db';
+import {
+  rethrowWorldQuestBlockRefusal,
+  WORLD_QUEST_BLOCK_ADMIN_TARGET_CODE,
+  worldQuestBlockBodySchema,
+} from './world_quest_block_api';
+import { liftAccountWorldQuestBlock, setAccountWorldQuestBlock } from './world_quest_block_db';
 
 // Admin API: everything under /admin/api/*. Auth is an exact full-scope bearer
 // token whose account has at least one staff role (accounts.admin_roles;
@@ -2024,6 +2030,9 @@ export type AdminRuntime = Pick<
   // sanction applied to a logged-in player does nothing until their next login,
   // which is the session it is most needed in.
   | 'applyCheaterMarkLive'
+  // Push a world quest block change onto the account's live session, so a
+  // bot caught mid-circuit stops earning in that session, not at its next login.
+  | 'applyWorldQuestBlockLive'
   | 'reloadChatFilter'
   | 'reloadBlockedIps'
   | 'disconnectByIp'
@@ -2188,6 +2197,9 @@ function makeRealAdminDb() {
     // a stale budget onto the live session.
     setAccountCheaterMark,
     liftAccountCheaterMark,
+    // The world quest block: the two audited writes (server/world_quest_block_db.ts).
+    setAccountWorldQuestBlock,
+    liftAccountWorldQuestBlock,
     accountAndScopeForToken,
     accountMailTarget,
     findAccount,
@@ -3132,6 +3144,47 @@ async function liftCheaterMarkHandler(ctx: Ctx): Promise<void> {
     rethrowCheaterMarkRefusal(err);
   }
   rt.applyCheaterMarkLive(targetAccountId, 0);
+  ok(ctx.res, { ok: true });
+}
+
+/**
+ * The operator-target guard for the world quest block pair, the Cheater mark's
+ * rule on both arms: an operator cannot block another operator's account.
+ */
+async function refuseAdminWorldQuestBlockTarget(targetAccountId: number): Promise<void> {
+  if (await adminDb().isAdminAccount(targetAccountId)) {
+    throw new HttpError(400, WORLD_QUEST_BLOCK_ADMIN_TARGET_CODE);
+  }
+}
+
+/**
+ * POST /admin/api/moderation/accounts/:id/world-quests-block and
+ * .../world-quests-unblock: block every character on an account from world
+ * quests (the sanction for world quest botting, short of a ban), or lift it, then
+ * push the change onto the live session. Registry-only like the Cheater mark
+ * pair: a typed body (a shape failure is the pipeline's 422) and stable
+ * `world_quest_block.*` codes. The audited write commits before the live push,
+ * so a session is never blocked without its history row.
+ */
+async function worldQuestBlockHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const targetAccountId = adminTargetId(ctx);
+  const blocked = ctx.path.endsWith('/world-quests-block');
+  const decoded = worldQuestBlockBodySchema.decode(ctx.body ?? {});
+  if (!decoded.ok) throw decoded;
+  await refuseAdminWorldQuestBlockTarget(targetAccountId);
+  const input = {
+    accountId: targetAccountId,
+    adminAccountId: ctxAccountId(ctx),
+    reason: decoded.value.reason,
+  };
+  try {
+    if (blocked) await adminDb().setAccountWorldQuestBlock(input);
+    else await adminDb().liftAccountWorldQuestBlock(input);
+  } catch (err) {
+    rethrowWorldQuestBlockRefusal(err);
+  }
+  rt.applyWorldQuestBlockLive(targetAccountId, blocked);
   ok(ctx.res, { ok: true });
 }
 
@@ -4108,6 +4161,25 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin, requireAdminTarget('account'), withBody()],
     meta: adminTargetMeta('account'),
     handler: liftCheaterMarkHandler,
+  },
+  // The world quest block pair (server/world_quest_block_api.ts): registry-only
+  // like the Cheater mark pair, so the same withBody mount, operator gate pair,
+  // and envelope; the legacy rollback answers 404 for both by design.
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/world-quests-block',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account'), withBody()],
+    meta: adminTargetMeta('account'),
+    handler: worldQuestBlockHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/world-quests-unblock',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account'), withBody()],
+    meta: adminTargetMeta('account'),
+    handler: worldQuestBlockHandler,
   },
   // The admin-panel kick (server/admin_kick_api.ts): registry-only like the
   // Cheater mark pair, so the same withBody mount, operator gate pair, and

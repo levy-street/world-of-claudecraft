@@ -253,6 +253,14 @@ export const apiErrorStrings = {
     admin_target: 'Operator accounts cannot be kicked.',
     target_offline: 'That player is no longer online on this realm.',
   },
+  // world_quest_block: the operator world quest block (server/world_quest_block_api.ts).
+  // Operator-facing copy: only the admin dashboard ever receives these codes.
+  world_quest_block: {
+    admin_target: 'Operator accounts cannot be blocked from world quests.',
+    reason_required: 'A reason is required.',
+    already_blocked: 'That account is already blocked from world quests.',
+    not_blocked: 'That account is not blocked from world quests.',
+  },
   // woc_market: the config-gated $WOC Exchange family
   // (server/woc_market_routes.ts). USD-denominated auctions settled in $WOC;
   // every code here is a player-actionable refusal.

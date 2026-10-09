@@ -174,6 +174,10 @@ const REGISTRY_ONLY_PARAM_PATHS = new Set([
   '/admin/api/moderation/characters/:id/clear-item-name',
   // The admin-panel kick: the same registry-only shape (server/admin_kick_api.ts).
   '/admin/api/moderation/accounts/:id/kick',
+  // The world quest block pair: the same registry-only shape
+  // (server/world_quest_block_api.ts).
+  '/admin/api/moderation/accounts/:id/world-quests-block',
+  '/admin/api/moderation/accounts/:id/world-quests-unblock',
 ]);
 const registryExactPaths = new Set(
   apiRoutes

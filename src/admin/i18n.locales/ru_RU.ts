@@ -1100,6 +1100,14 @@ export const ru_RU: Record<string, string> = {
     'Все персонажи учетной записи носят публичную метку, пока это игровое время не будет исчерпано.',
   'detail.cheaterMarkRelengthHint':
     'Полностью заменяет оставшийся лимит, а не прибавляет время к нему. Публичная метка сохраняется.',
+  'detail.worldQuestBlockModeration': 'Локальные задания',
+  'detail.worldQuestBlockActions': 'Действия модерации локальных заданий',
+  'detail.worldQuestBlockApply': 'Заблокировать локальные задания',
+  'detail.worldQuestBlockLift': 'Разблокировать локальные задания',
+  'detail.worldQuestBlockReason': 'Причина блокировки: {value}',
+  'detail.worldQuestBlockedAt': 'Заблокировано: {value}',
+  'detail.worldQuestBlockHint':
+    'Для ботоводства в локальных заданиях вместо бана: ни один персонаж учетной записи больше не может начинать локальные задания, продвигаться в них или получать за них награды. Все остальное остается доступным.',
   'dialog.confirmCheaterMark': 'Подтвердить метку читера',
   'dialog.confirmCheaterMarkRelength': 'Подтвердить новый срок метки',
   'dialog.confirmCheaterMarkLift': 'Подтвердить снятие метки',
@@ -1107,12 +1115,24 @@ export const ru_RU: Record<string, string> = {
     'Пометить всех персонажей этой учетной записи публичной меткой «Читер»',
   'dialog.actionCheaterMarkRelength': 'Заменить оставшийся лимит игрового времени этой метки',
   'dialog.actionCheaterMarkLift': 'Снять метку читера досрочно',
+  'dialog.confirmWorldQuestBlock': 'Подтвердить блокировку локальных заданий',
+  'dialog.confirmWorldQuestUnblock': 'Подтвердить разблокировку локальных заданий',
+  'dialog.actionWorldQuestBlock':
+    'Заблокировать локальные задания для всех персонажей этой учетной записи',
+  'dialog.actionWorldQuestUnblock': 'Снова разрешить локальные задания для этой учетной записи',
   'alert.cheaterMarkDurationInvalid': 'Введите целое число часов от 1 до {max}.',
   'error.cheaterMarkDurationInvalid': 'Лимит игрового времени должен составлять от 1 до 100 часов.',
   'error.cheaterMarkNotMarked': 'На этой учетной записи нет метки читера.',
   'error.cheaterMarkAdminTarget': 'Учетным записям администраторов нельзя назначать метку читера.',
+  'error.worldQuestBlockAdminTarget':
+    'Учетные записи администраторов нельзя лишить доступа к локальным заданиям.',
+  'error.worldQuestBlockAlreadyBlocked':
+    'Эта учетная запись уже лишена доступа к локальным заданиям.',
+  'error.worldQuestBlockNotBlocked': 'Эта учетная запись не лишена доступа к локальным заданиям.',
   'moderationHistory.actionCheaterMark': 'Метка читера установлена',
   'moderationHistory.actionCheaterMarkLift': 'Метка читера снята',
+  'moderationHistory.actionWorldQuestsBlock': 'Локальные задания заблокированы',
+  'moderationHistory.actionWorldQuestsUnblock': 'Локальные задания разблокированы',
   // v0.40 release i18n fill.
   'accounts.colGold': 'Золото',
   'error.flagInvalidStatus': 'неверный статус флага',

@@ -17950,6 +17950,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'apiError.kick.admin_target': 'Operatör hesapları atılamaz.',
   'apiError.kick.reason_required': 'Bir neden gereklidir.',
   'apiError.kick.target_offline': 'Bu oyuncu artık bu alanda çevrimiçi değil.',
+  'apiError.world_quest_block.admin_target': 'Operatör hesapları dünya görevlerinden engellenemez.',
+  'apiError.world_quest_block.reason_required': 'Bir neden gereklidir.',
+  'apiError.world_quest_block.already_blocked': 'O hesap zaten dünya görevlerinden engellenmiş.',
+  'apiError.world_quest_block.not_blocked': 'O hesap dünya görevlerinden engellenmemiş.',
   'entities.abilities.melting_acid.description':
     'Silahını 30 dakika boyunca kaplar. Her yakın dövüş savuruşun hedefe yakıcı asit sıçratır ve 12 saniye boyunca zırhını %5 azaltır.',
   'entities.abilities.nightshade_coating.description':

@@ -6839,6 +6839,12 @@ export const id_ID: EnTranslations = {
       "admin_target": "Akun operator tidak dapat ditendang.",
       "target_offline": "Pemain itu tidak lagi online di ranah ini."
     },
+    "world_quest_block": {
+      "admin_target": "Akun operator tidak dapat diblokir dari misi dunia.",
+      "reason_required": "Diperlukan suatu alasan.",
+      "already_blocked": "Akun itu sudah diblokir dari misi dunia.",
+      "not_blocked": "Akun itu tidak diblokir dari misi dunia."
+    },
     "woc_market": {
       "invalid_input": "Masukan tidak valid.",
       "disabled": "Bursa $WOC tidak tersedia di realm ini.",

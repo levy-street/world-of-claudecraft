@@ -6839,6 +6839,12 @@ export const cs_CZ: EnTranslations = {
       "admin_target": "Účty operátorů nelze vykopnout.",
       "target_offline": "Tento hráč již není v této sféře online."
     },
+    "world_quest_block": {
+      "admin_target": "Účty operátorů nelze zablokovat pro světové úkoly.",
+      "reason_required": "Je vyžadován důvod.",
+      "already_blocked": "Tento účet už má světové úkoly zablokované.",
+      "not_blocked": "Tento účet nemá světové úkoly zablokované."
+    },
     "woc_market": {
       "invalid_input": "Neplatný vstup.",
       "disabled": "Burza $WOC není na tomto světě dostupná.",

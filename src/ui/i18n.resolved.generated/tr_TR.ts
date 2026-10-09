@@ -6839,6 +6839,12 @@ export const tr_TR: EnTranslations = {
       "admin_target": "Operatör hesapları atılamaz.",
       "target_offline": "Bu oyuncu artık bu alanda çevrimiçi değil."
     },
+    "world_quest_block": {
+      "admin_target": "Operatör hesapları dünya görevlerinden engellenemez.",
+      "reason_required": "Bir neden gereklidir.",
+      "already_blocked": "O hesap zaten dünya görevlerinden engellenmiş.",
+      "not_blocked": "O hesap dünya görevlerinden engellenmemiş."
+    },
     "woc_market": {
       "invalid_input": "Geçersiz girdi.",
       "disabled": "$WOC Borsası bu dünyada kullanılamıyor.",

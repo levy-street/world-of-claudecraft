@@ -1098,6 +1098,14 @@ export const es: Record<string, string> = {
     'Todos los personajes de la cuenta muestran la etiqueta pública hasta que se agote este tiempo de juego.',
   'detail.cheaterMarkRelengthHint':
     'Sustituye por completo el tiempo restante; no se suma. La etiqueta pública permanece visible.',
+  'detail.worldQuestBlockModeration': 'Misiones de mundo',
+  'detail.worldQuestBlockActions': 'Acciones de moderación de misiones de mundo',
+  'detail.worldQuestBlockApply': 'Bloquear misiones de mundo',
+  'detail.worldQuestBlockLift': 'Desbloquear misiones de mundo',
+  'detail.worldQuestBlockReason': 'Motivo del bloqueo: {value}',
+  'detail.worldQuestBlockedAt': 'Bloqueado: {value}',
+  'detail.worldQuestBlockHint':
+    'Para el uso de bots en misiones de mundo en lugar de una expulsión: ningún personaje de la cuenta podrá iniciar, avanzar ni obtener recompensas de misiones de mundo. Todo lo demás sigue siendo jugable.',
   'dialog.confirmCheaterMark': 'Confirmar marca de tramposo',
   'dialog.confirmCheaterMarkRelength': 'Confirmar la nueva duración de la marca',
   'dialog.confirmCheaterMarkLift': 'Confirmar que se quite la marca',
@@ -1105,13 +1113,24 @@ export const es: Record<string, string> = {
     'Mostrar la etiqueta pública Tramposo en todos los personajes de esta cuenta',
   'dialog.actionCheaterMarkRelength': 'Sustituir el tiempo jugado restante de esta marca',
   'dialog.actionCheaterMarkLift': 'Quitar la marca de tramposo antes de tiempo',
+  'dialog.confirmWorldQuestBlock': 'Confirmar bloqueo de misiones de mundo',
+  'dialog.confirmWorldQuestUnblock': 'Confirmar desbloqueo de misiones de mundo',
+  'dialog.actionWorldQuestBlock':
+    'Bloquear las misiones de mundo para todos los personajes de esta cuenta',
+  'dialog.actionWorldQuestUnblock': 'Volver a permitir las misiones de mundo en esta cuenta',
   'alert.cheaterMarkDurationInvalid': 'Introduce un número entero de 1 a {max} horas.',
   'error.cheaterMarkDurationInvalid': 'El crédito de tiempo jugado debe ser de 1 a 100 horas.',
   'error.cheaterMarkNotMarked': 'Esta cuenta no lleva la marca de tramposo.',
   'error.cheaterMarkAdminTarget':
     'Las cuentas de administrador no pueden recibir la marca de tramposo.',
+  'error.worldQuestBlockAdminTarget':
+    'Las cuentas de administrador no se pueden bloquear para misiones de mundo.',
+  'error.worldQuestBlockAlreadyBlocked': 'Esta cuenta ya está bloqueada para misiones de mundo.',
+  'error.worldQuestBlockNotBlocked': 'Esta cuenta no está bloqueada para misiones de mundo.',
   'moderationHistory.actionCheaterMark': 'Marca de tramposo aplicada',
   'moderationHistory.actionCheaterMarkLift': 'Marca de tramposo retirada',
+  'moderationHistory.actionWorldQuestsBlock': 'Misiones de mundo bloqueadas',
+  'moderationHistory.actionWorldQuestsUnblock': 'Misiones de mundo desbloqueadas',
   // v0.40 release i18n fill.
   'accounts.colGold': 'Oro',
   'error.flagInvalidStatus': 'estado de bandera no válido',

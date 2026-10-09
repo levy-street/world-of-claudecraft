@@ -6839,6 +6839,12 @@ export const de_DE: EnTranslations = {
       "admin_target": "Betreiberkonten können nicht gekündigt werden.",
       "target_offline": "Dieser Spieler ist auf diesem Realm nicht mehr online."
     },
+    "world_quest_block": {
+      "admin_target": "Betreiberkonten können nicht für Weltquests gesperrt werden.",
+      "reason_required": "Es ist ein Grund erforderlich.",
+      "already_blocked": "Dieses Konto ist bereits für Weltquests gesperrt.",
+      "not_blocked": "Dieses Konto ist nicht für Weltquests gesperrt."
+    },
     "woc_market": {
       "invalid_input": "Ungültige Eingabe.",
       "disabled": "Die $WOC-Börse ist auf diesem Realm nicht verfügbar.",

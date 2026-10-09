@@ -18168,6 +18168,10 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'apiError.kick.admin_target': 'Akun operator tidak dapat ditendang.',
   'apiError.kick.reason_required': 'Diperlukan suatu alasan.',
   'apiError.kick.target_offline': 'Pemain itu tidak lagi online di ranah ini.',
+  'apiError.world_quest_block.admin_target': 'Akun operator tidak dapat diblokir dari misi dunia.',
+  'apiError.world_quest_block.reason_required': 'Diperlukan suatu alasan.',
+  'apiError.world_quest_block.already_blocked': 'Akun itu sudah diblokir dari misi dunia.',
+  'apiError.world_quest_block.not_blocked': 'Akun itu tidak diblokir dari misi dunia.',
   'entities.abilities.melting_acid.description':
     'Melapisi senjatamu selama 30 menit. Setiap ayunan jarak dekat memercikkan asam kaustik ke target dan mengurangi armornya sebesar 5% selama 12 detik.',
   'entities.abilities.nightshade_coating.description':

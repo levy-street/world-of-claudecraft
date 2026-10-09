@@ -18906,6 +18906,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'apiError.kick.admin_target': 'Gli account operatore non possono essere kickati.',
   'apiError.kick.reason_required': 'È necessario un motivo.',
   'apiError.kick.target_offline': 'Quel giocatore non è più online su questo reame.',
+  'apiError.world_quest_block.admin_target':
+    'Gli account operatore non possono essere bloccati dalle missioni mondiali.',
+  'apiError.world_quest_block.reason_required': 'È necessario un motivo.',
+  'apiError.world_quest_block.already_blocked':
+    "Quell'account è già bloccato dalle missioni mondiali.",
+  'apiError.world_quest_block.not_blocked': "Quell'account non è bloccato dalle missioni mondiali.",
   'entities.abilities.melting_acid.description':
     "Ricopre la tua arma per 30 min. Ognuno dei tuoi attacchi in mischia spruzza il bersaglio con acido caustico e ne riduce l'armatura del 5% per 12 sec.",
   'entities.abilities.nightshade_coating.description':

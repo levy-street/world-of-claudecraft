@@ -18410,6 +18410,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.kick.admin_target': '운영자 계정은 추방할 수 없습니다.',
   'apiError.kick.reason_required': '사유를 입력해야 합니다.',
   'apiError.kick.target_offline': '해당 플레이어는 더 이상 이 서버에 접속해 있지 않습니다.',
+  'apiError.world_quest_block.admin_target': '운영자 계정은 전역 퀘스트에서 차단할 수 없습니다.',
+  'apiError.world_quest_block.reason_required': '사유를 입력해야 합니다.',
+  'apiError.world_quest_block.already_blocked': '해당 계정은 이미 전역 퀘스트에서 차단되었습니다.',
+  'apiError.world_quest_block.not_blocked': '해당 계정은 전역 퀘스트에서 차단되지 않았습니다.',
   'entities.items.reins_goblin_rocket_sled.name': '고블린 로켓 썰매 시동 열쇠',
   'entities.items.reins_rallycart_rxt.name': '랠리카트 RXT 시동 열쇠',
   'guide.settingsPage.ifAuraBarBelowFrame':

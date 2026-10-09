@@ -6839,6 +6839,12 @@ export const pt_BR: EnTranslations = {
       "admin_target": "As contas dos operadores não podem ser kickadas.",
       "target_offline": "Esse jogador não está mais online neste reino."
     },
+    "world_quest_block": {
+      "admin_target": "As contas dos operadores não podem ser bloqueadas das missões mundiais.",
+      "reason_required": "É necessário um motivo.",
+      "already_blocked": "Essa conta já está bloqueada das missões mundiais.",
+      "not_blocked": "Essa conta não está bloqueada das missões mundiais."
+    },
     "woc_market": {
       "invalid_input": "Entrada inválida.",
       "disabled": "A Bolsa $WOC não está disponível neste reino.",

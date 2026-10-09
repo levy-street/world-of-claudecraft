@@ -17835,6 +17835,10 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'apiError.kick.admin_target': 'Účty operátorů nelze vykopnout.',
   'apiError.kick.reason_required': 'Je vyžadován důvod.',
   'apiError.kick.target_offline': 'Tento hráč již není v této sféře online.',
+  'apiError.world_quest_block.admin_target': 'Účty operátorů nelze zablokovat pro světové úkoly.',
+  'apiError.world_quest_block.reason_required': 'Je vyžadován důvod.',
+  'apiError.world_quest_block.already_blocked': 'Tento účet už má světové úkoly zablokované.',
+  'apiError.world_quest_block.not_blocked': 'Tento účet nemá světové úkoly zablokované.',
   'entities.abilities.melting_acid.description':
     'Na 30 minut potáhne vaši zbraň. Každý útok zblízka potřísní cíl žíravou kyselinou a sníží jeho brnění o 5 % na 12 sekund.',
   'entities.abilities.nightshade_coating.description':

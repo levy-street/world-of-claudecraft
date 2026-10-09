@@ -6839,6 +6839,12 @@ export const pl_PL: EnTranslations = {
       "admin_target": "Konta operatorów nie mogą zostać wyrzucone.",
       "target_offline": "Ten gracz nie jest już online na tym serwerze."
     },
+    "world_quest_block": {
+      "admin_target": "Kont operatorów nie można zablokować w zadaniach światowych.",
+      "reason_required": "Wymagany jest powód.",
+      "already_blocked": "To konto ma już zablokowane zadania światowe.",
+      "not_blocked": "To konto nie ma zablokowanych zadań światowych."
+    },
     "woc_market": {
       "invalid_input": "Nieprawidłowe dane wejściowe.",
       "disabled": "Giełda $WOC nie jest dostępna na tym realmie.",

@@ -18448,6 +18448,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.kick.admin_target': '管理者アカウントはキックできません。',
   'apiError.kick.reason_required': '理由の入力が必要です。',
   'apiError.kick.target_offline': 'そのプレイヤーはもうこのレルムにオンラインではありません。',
+  'apiError.world_quest_block.admin_target': '管理者アカウントはワールドクエストから除外できません。',
+  'apiError.world_quest_block.reason_required': '理由の入力が必要です。',
+  'apiError.world_quest_block.already_blocked': 'そのアカウントはすでにワールドクエストから除外されています。',
+  'apiError.world_quest_block.not_blocked': 'そのアカウントはワールドクエストから除外されていません。',
   'entities.items.reins_goblin_rocket_sled.name': 'ゴブリンロケットそりの始動キー',
   'entities.items.reins_rallycart_rxt.name': 'ラリーカートRXTの始動キー',
   'guide.settingsPage.ifAuraBarBelowFrame':

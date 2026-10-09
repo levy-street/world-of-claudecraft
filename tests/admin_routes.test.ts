@@ -111,6 +111,16 @@ describe('admin route permission map', () => {
     expect(
       permissionForAdminRoute('GET', '/admin/api/moderation/accounts/42/cheater-mark'),
     ).toBeNull();
+    // The world quest block pair: registry-only too, so spot-checked for the same reason.
+    expect(
+      permissionForAdminRoute('POST', '/admin/api/moderation/accounts/42/world-quests-block'),
+    ).toBe('moderation.act');
+    expect(
+      permissionForAdminRoute('POST', '/admin/api/moderation/accounts/42/world-quests-unblock'),
+    ).toBe('moderation.act');
+    expect(
+      permissionForAdminRoute('GET', '/admin/api/moderation/accounts/42/world-quests-block'),
+    ).toBeNull();
     expect(permissionForAdminRoute('POST', '/admin/api/chat-filter/config')).toBe(
       'chatfilter.manage',
     );

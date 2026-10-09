@@ -17901,6 +17901,10 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'apiError.kick.admin_target': 'Operatørkonti kan ikke sparkes.',
   'apiError.kick.reason_required': 'En grund er påkrævet.',
   'apiError.kick.target_offline': 'Den spiller er ikke længere online i dette rige.',
+  'apiError.world_quest_block.admin_target': 'Operatørkonti kan ikke blokeres fra verdenquester.',
+  'apiError.world_quest_block.reason_required': 'En grund er påkrævet.',
+  'apiError.world_quest_block.already_blocked': 'Den konto er allerede blokeret fra verdenquester.',
+  'apiError.world_quest_block.not_blocked': 'Den konto er ikke blokeret fra verdenquester.',
   'entities.abilities.melting_acid.description':
     'Smører dit våben i 30 min. Hvert af dine nærkampshug sprøjter målet med ætsende syre og reducerer dets rustning med 5 % i 12 sek.',
   'entities.abilities.nightshade_coating.description':

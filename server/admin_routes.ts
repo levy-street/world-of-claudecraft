@@ -232,6 +232,14 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
     pattern: /^\/admin\/api\/moderation\/accounts\/(\d+)\/lift-cheater-mark$/,
     permission: 'moderation.act',
   },
+  // The world quest block (src/sim/world_quest_block.ts): the sanction for world
+  // quest botting, short of a ban, so it sits with the other moderation actions.
+  // Registry-only like the Cheater mark pair, hence listed here by hand.
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/moderation\/accounts\/(\d+)\/world-quests-(block|unblock)$/,
+    permission: 'moderation.act',
+  },
   // The admin-panel kick (server/admin_kick_api.ts): the dashboard twin of the
   // in-game /kick, which the moderation service already gates on moderation.act
   // (requiredCommandPermission), so the row states the same rule. Registry-only

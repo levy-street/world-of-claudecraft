@@ -18088,6 +18088,11 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'apiError.kick.admin_target': 'Konta operatorów nie mogą zostać wyrzucone.',
   'apiError.kick.reason_required': 'Wymagany jest powód.',
   'apiError.kick.target_offline': 'Ten gracz nie jest już online na tym serwerze.',
+  'apiError.world_quest_block.admin_target':
+    'Kont operatorów nie można zablokować w zadaniach światowych.',
+  'apiError.world_quest_block.reason_required': 'Wymagany jest powód.',
+  'apiError.world_quest_block.already_blocked': 'To konto ma już zablokowane zadania światowe.',
+  'apiError.world_quest_block.not_blocked': 'To konto nie ma zablokowanych zadań światowych.',
   'entities.abilities.melting_acid.description':
     'Pokrywa twoją broń na 30 min. Każdy atak wręcz opryskuje cel żrącym kwasem i zmniejsza jego pancerz o 5% na 12 sek.',
   'entities.abilities.nightshade_coating.description':
