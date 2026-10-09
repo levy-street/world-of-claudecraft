@@ -300,7 +300,8 @@ export function multiviewInputs(resolved) {
 /** Generate a 3D model from separate fixed-angle views of one subject (a T-pose concept
  *  drawn front, left and back), the art team's model step: Smart Mesh P2.0 by default.
  *  `views` maps an angle to a local image path, URL or Tripo file ref. `quad` asks P2
- *  for a quad mesh (P1 rejects it). Returns {taskId, task} like generateModel. */
+ *  for a quad mesh (P1 rejects it). `textureSize` is the texture map's edge in pixels
+ *  (the art guide asks for 1024). Returns {taskId, task} like generateModel. */
 export async function generateModelFromViews({
   views,
   model = MODEL_P2,
@@ -309,6 +310,7 @@ export async function generateModelFromViews({
   pbr = true,
   quad = false,
   textureQuality,
+  textureSize,
   onProgress,
   onTaskCreated,
 }) {
@@ -324,6 +326,7 @@ export async function generateModelFromViews({
     ...(faceLimit ? { face_limit: faceLimit } : {}),
     ...(quad && model.startsWith('P2') ? { quad: true } : {}),
     ...(textureQuality ? { texture_quality: textureQuality } : {}),
+    ...(textureSize ? { texture_size: textureSize } : {}),
   };
   const taskId = await createTask('/generation/multiview-to-model', body);
   onTaskCreated?.(taskId);

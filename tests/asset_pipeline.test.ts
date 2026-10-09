@@ -237,7 +237,7 @@ describe('Tripo multiview (Smart Mesh P2.0) generation', () => {
         left: 'https://example.test/left.png',
         back: 'https://example.test/back.png',
       };
-      await tripo.generateModelFromViews({ views, faceLimit: 5000, quad: true });
+      await tripo.generateModelFromViews({ views, faceLimit: 5000, quad: true, textureSize: 1024 });
       await tripo.generateModelFromViews({ views, model: tripo.MODEL_LOWPOLY, quad: true });
       expect(posted.map((p) => p.url)).toEqual([
         `${tripo.TRIPO_BASE}/generation/multiview-to-model`,
@@ -247,11 +247,15 @@ describe('Tripo multiview (Smart Mesh P2.0) generation', () => {
         model: 'P2-20260801',
         face_limit: 5000,
         quad: true,
+        // the art guide's 1024 px texture map
+        texture_size: 1024,
         inputs: [{ front: views.front }, { left: views.left }, { back: views.back }],
       });
       // P1 rejects quad, so it is never sent there
       expect(posted[1].body.model).toBe('P1-20260311');
       expect(posted[1].body).not.toHaveProperty('quad');
+      // no size asked, none sent: Tripo's own default
+      expect(posted[1].body).not.toHaveProperty('texture_size');
     } finally {
       vi.unstubAllGlobals();
       if (previousKey === undefined) delete process.env.TRIPO_API_KEY;
