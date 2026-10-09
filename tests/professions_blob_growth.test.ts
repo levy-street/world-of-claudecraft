@@ -2168,7 +2168,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // 241,763 on the membership integration: the release's 233,515 plus the
     // quest gear (+5,019), quest blues (+1,688) and role fill (+1,541) underneath.
     // 242,954 on the v0.45.0 integration: plus the Mirefen world-boss branch (+1,191).
-    expect(beforeReferralBytes).toBe(242954);
+    // 246,084 with the five-dungeon rework's attributed +3,130 (PR 4352).
+    expect(beforeReferralBytes).toBe(246084);
     expect(bytes - beforeReferralBytes).toBe(122);
     expect(fieldBytes(s2, 'deedStats') - fieldBytes(withoutReferral, 'deedStats')).toBe(122);
     // Membership adds eight discoverable item ids and no character entitlement
@@ -2189,7 +2190,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     };
     expect(membershipIds.size).toBe(8);
     const beforeMembershipBytes = Buffer.byteLength(JSON.stringify(withoutMembership), 'utf8');
-    expect(beforeMembershipBytes).toBe(242799);
+    expect(beforeMembershipBytes).toBe(245929);
     expect(beforeReferralBytes - beforeMembershipBytes).toBe(155);
     expect(
       fieldBytes(withoutReferral, 'deedStats') - fieldBytes(withoutMembership, 'deedStats'),
@@ -2615,7 +2616,12 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // MEASURED equal (83,911 to 85,452).
         1541 +
         // Membership's eight discoverable item ids, isolated from withoutReferral above.
-        155,
+        155 +
+        // Plus 3,089 at the five-dungeon rework (PR 4352) and 41 at its lore guide's
+        // deed, on the v0.45.0 integration (the rework's own attribution: its 19
+        // encounter deed ids, 66 item ids and 19 relics' reliquary rows).
+        3089 +
+        41,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2658,7 +2664,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // deeds 672 -> 708 and deedStats 5,861 -> 5,979 at the fourth
       // release/v0.44.0 base merge: the ferry deed and its four visit marks
       // (the +154 above).
-      deeds: 743,
+      // deeds 743 -> 1,391, deedStats 9,427 -> 10,875 and reliquary
+      // 11,501 -> 12,494 at the five-dungeon rework (the +648, +1,448 and
+      // +993 of the 3,089 attributed above).
+      // deeds 1,391 -> 1,432 with the lore guide's deed (the +41 above).
+      deeds: 1432,
       // deedStats +4,648 and reliquary +8,848 at the second release/v0.44.0 base
       // merge: Warfare Season 2's 139 item ids (the 13,496 attributed above).
       // deedStats 9,427 -> 14,446 at the choose-one leveling quest gear: its
@@ -2666,8 +2676,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // rewards' 76 rare ids (the +1,688 above), then -> 17,675 at the quest
       // role fill's 75 ids (the +1,541 above).
       // Then -> 17,830 with membership item discovery (+155, measured above).
-      deedStats: 17830,
-      reliquary: 11501,
+      // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: deedStats +1,448 and reliquary +993.
+      deedStats: 19278,
+      reliquary: 12494,
     });
     // Removing field_kit AND the Bramblehide release content reproduces the
     // pre-field-kit, pre-Bramblehide baseline WITH the hammer content still
@@ -2709,7 +2720,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 236,748 -> 238,436 at the quest blue rewards (+1,688, the 76 rare ids).
       // 238,436 -> 239,977 at the quest role fill (+1,541, the 75 ids).
       // Membership's eight discovered item ids remain here: +155 bytes (240,132).
-    ).toBe(240132);
+      // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: +3,130 (240,132 -> 243,262).
+    ).toBe(243262);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2744,7 +2756,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 241,751 -> 242,942 with the Mirefen world-boss branch on the v0.45.0
       // integration (+1,191, the balgathDelta above: the boss content, Balgath's
       // loot, and the muster weekly as a kill credit with no item of its own).
-    ).toBe(242942);
+      // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: +3,130 (242,942 -> 246,072).
+    ).toBe(246072);
     const priorContent = withoutCrucibleContent(withoutReferral);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2868,8 +2881,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // balgathDelta attributed above); no container or ceiling changed shape.
     // Floor at measurement minus 380, edge at measurement plus one:
     // 242696..243077.
-    expect(bytes, reMint).toBeGreaterThan(242696);
-    expect(bytes, reMint).toBeLessThan(243077);
+    // RE-BASED with the five-dungeon rework (PR 4352) on the v0.45.0 integration:
+    // 246,206 bytes = 243,076 + 3,089 + 41, attributed above. Floor at measurement
+    // minus 380, edge at measurement plus one: 245826..246207.
+    expect(bytes, reMint).toBeGreaterThan(245826);
+    expect(bytes, reMint).toBeLessThan(246207);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

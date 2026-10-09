@@ -199,7 +199,8 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // (character-scoped items), the same +32 as reliquary_content.test.ts's pair.
     // 479 with the Mirefen world boss page's seven character-scoped item relics, his
     // Craterglass Stave and five trinkets (+13).
-    expect(catalogTotal).toBe(479);
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 529.
+    expect(catalogTotal).toBe(529);
     // The Warfare Season 2 Vanguard Gallery is class-personal and sits outside
     // completion, so it moves nothing here.
   });

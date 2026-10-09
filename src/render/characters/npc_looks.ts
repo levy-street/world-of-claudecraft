@@ -2632,6 +2632,16 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
   },
 };
 
+/**
+ * NPCs that wear their own authored Blender body (a `VISUALS` def reached
+ * through the manifest's NPC key map) instead of a composed look: the Drowned
+ * Temple's lore guide Laverock (`npc_laverock`), whose clips (Talk, Startle,
+ * Kneel, Sing) the guide system drives. `npcLookFor` returns null for them, the
+ * same "keep the fixed rig" answer Aldric gets, so a later roster entry can
+ * never silently swap the body out. Pinned by tests/npc_looks.test.ts.
+ */
+export const NPC_OWN_BODY_IDS: ReadonlySet<string> = new Set(['cantor_laverock']);
+
 /** Suffixed hub ids that share one person's look (the same character recurs
  *  across zones under new templateIds). */
 function baseId(templateId: string): string {
@@ -2680,6 +2690,7 @@ export function npcLookFor(templateId: string, kind: EntityKind = 'npc'): NpcLoo
   const hit = resolved.get(templateId);
   if (hit !== undefined) return hit;
   const id = baseId(templateId);
+  if (NPC_OWN_BODY_IDS.has(id)) return null;
   let look = id === templateId ? undefined : resolved.get(id);
   if (look === undefined) {
     const def = NPC_LOOKS[id];

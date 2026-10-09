@@ -244,7 +244,7 @@ describe('the src/render light census', () => {
       'mount_preview.ts',
     ])
       expect(ALLOWED[context].reason).toContain('secondary GL context');
-    expect(ALLOWED['wildheart_props.ts']).toBeUndefined();
+    expect(ALLOWED['wildheart_basin/basin_lights.ts']).toBeUndefined();
   });
 
   it('constructs a census-keyed light outside src/render only where allowlisted', () => {

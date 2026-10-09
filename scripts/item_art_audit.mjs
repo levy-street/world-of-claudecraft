@@ -159,13 +159,16 @@ const build = await buildItemArtAudit({
     // + the Mirefen world-boss branch's fifteen items (balgath-boss, shardpike-mechanic,
     // foremans-wage, muster-shardpike and balgath-loot batches) on the v0.45.0
     // integration: 1890 / 1908.
-    catalogCount: 1890,
-    liveItemCount: 1908,
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005 / 2034 on 42
+    // sheet pages, re-measured with `--verify-only` (116 generated Heroic definitions,
+    // 86 with their own WebP, 30 weapon art aliases).
+    catalogCount: 2005,
+    liveItemCount: 2034,
     pendingArtCount: 135,
-    generatedHeroicDefinitions: 78,
-    heroicDefinitionsWithOwnWebp: 59,
-    heroicWeaponArtAliases: 19,
-    sheetPageCount: 40,
+    generatedHeroicDefinitions: 116,
+    heroicDefinitionsWithOwnWebp: 86,
+    heroicWeaponArtAliases: 30,
+    sheetPageCount: 42,
     groupCount: 26,
   },
 });

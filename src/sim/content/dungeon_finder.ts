@@ -110,24 +110,132 @@ const FIVE_MAN: FinderComposition = { tank: 1, healer: 1, dps: 3 };
 const TEN_RAID: FinderComposition = { tank: 2, healer: 2, dps: 6 };
 
 const HOLLOW_CRYPT_ENCOUNTERS: readonly FinderEncounter[] = [
-  { mobId: 'sexton_marrow', mechanics: [] },
-  { mobId: 'morthen', final: true, mechanics: ['shadow_pulse'] },
+  // The rework's route (hollow_crypt.md): two wing bosses, the choir, the ring.
+  // The wing bosses' cores are their encounter modules (encounters/hollow_crypt).
+  {
+    mobId: 'sexton_marrow',
+    mechanics: ['crypt_shovelful', 'crypt_measured_for_the_grave', 'crypt_burial_toll'],
+  },
+  {
+    mobId: 'rimeweb',
+    mechanics: [
+      'crypt_brides_lament',
+      'crypt_frozen_embrace',
+      'crypt_rime_path',
+      'crypt_bridal_freeze',
+    ],
+  },
+  {
+    mobId: 'cantor_ilvane',
+    mechanics: [
+      'crypt_dirge_of_the_hollow',
+      'crypt_harmony',
+      'crypt_bone_organ',
+      'crypt_crescendo',
+    ],
+  },
+  // Morthen's three-act rite (encounters/hollow_crypt/morthen*.ts).
+  {
+    mobId: 'morthen',
+    final: true,
+    mechanics: [
+      'crypt_morthen_shadow_pulse',
+      'crypt_gravecall',
+      'crypt_rite_of_the_unquiet',
+      'crypt_reap_the_unquiet',
+    ],
+  },
+];
+
+// The heroic tier adds each boss's heroic twists (its own array, so the
+// normal preview never carries them); Morthen's line also carries the
+// Knellwyrm's heroic Burning Knell (the wyrm has no finder row of its own).
+const HOLLOW_CRYPT_ENCOUNTERS_HEROIC: readonly FinderEncounter[] = [
+  {
+    mobId: 'sexton_marrow',
+    mechanics: [...HOLLOW_CRYPT_ENCOUNTERS[0].mechanics, 'crypt_marrow_heroic'],
+  },
+  {
+    mobId: 'rimeweb',
+    mechanics: [...HOLLOW_CRYPT_ENCOUNTERS[1].mechanics, 'crypt_lady_heroic'],
+  },
+  {
+    mobId: 'cantor_ilvane',
+    mechanics: [...HOLLOW_CRYPT_ENCOUNTERS[2].mechanics, 'crypt_ilvane_heroic'],
+  },
+  {
+    ...HOLLOW_CRYPT_ENCOUNTERS[3],
+    mechanics: [...HOLLOW_CRYPT_ENCOUNTERS[3].mechanics, 'crypt_morthen_heroic'],
+  },
 ];
 
 const SUNKEN_BASTION_ENCOUNTERS: readonly FinderEncounter[] = [
-  { mobId: 'knight_commander_olen', mechanics: ['reaping_arc'] },
-  { mobId: 'vael_the_mistcaller', final: true, mechanics: ['mist_surge', 'summons_adds'] },
+  // The rework's route (sunken_bastion.md): the bastion, the gaol (its
+  // Turnkey miniboss, then Ossick), the crown.
+  {
+    mobId: 'knight_commander_olen',
+    mechanics: [
+      'hallowed_brine',
+      'rebounding_bulwark',
+      'tide_sentence',
+      'unbroken_oath',
+      'reaping_arc',
+    ],
+  },
+  { mobId: 'gaol_turnkey', mechanics: ['iron_cage', 'summons_adds'] },
+  { mobId: 'gaoler_ossick', mechanics: ['drowned_anchor', 'shackle_pair', 'summons_adds'] },
+  {
+    mobId: 'vael_the_mistcaller',
+    final: true,
+    mechanics: ['fog_veil', 'reaper_behind', 'mist_surge', 'summons_adds'],
+  },
 ];
 
 const DROWNED_TEMPLE_ENCOUNTERS: readonly FinderEncounter[] = [
-  { mobId: 'choirmother_selthe', mechanics: [] },
-  { mobId: 'ysolei', final: true, mechanics: ['lunar_tide', 'summons_adds', 'enrage'] },
+  // The rework's route (drowned_temple.md): the choir, the prism, the altar.
+  { mobId: 'choirmother_selthe', mechanics: ['chorus_and_solo'] },
+  { mobId: 'tideglass_colossus', mechanics: ['tideglass_reflections'] },
+  {
+    mobId: 'ysolei',
+    final: true,
+    mechanics: ['rising_tide', 'undertow', 'lunar_tide', 'summons_adds', 'enrage'],
+  },
 ];
 
 const GRAVEWYRM_SANCTUM_ENCOUNTERS: readonly FinderEncounter[] = [
-  { mobId: 'korgath_the_bound', mechanics: ['shuddering_stomp', 'enrage'] },
-  { mobId: 'grand_necromancer_velkhar', mechanics: ['summons_adds'] },
-  { mobId: 'korzul_the_gravewyrm', final: true, mechanics: ['grave_inferno', 'enrage'] },
+  {
+    mobId: 'korgath_the_bound',
+    mechanics: ['seal_shackles', 'chain_strain', 'korgath_stomp', 'enrage'],
+  },
+  {
+    mobId: 'grand_necromancer_velkhar',
+    mechanics: [
+      'waking_thaw',
+      'summons_adds',
+      'unquenched_held',
+      'soulfire_trench',
+      'shadow_volley',
+    ],
+  },
+  {
+    mobId: 'korzul_the_gravewyrm',
+    final: true,
+    mechanics: ['grave_inferno', 'enrage', 'grave_breath', 'plate_floor', 'wyrm_flights'],
+  },
+];
+
+// The heroic tier adds each boss's heroic twists (its own array, so the normal
+// preview never carries them).
+const GRAVEWYRM_SANCTUM_ENCOUNTERS_HEROIC: readonly FinderEncounter[] = [
+  {
+    mobId: 'korgath_the_bound',
+    mechanics: [...GRAVEWYRM_SANCTUM_ENCOUNTERS[0].mechanics, 'rerivet_last_link'],
+  },
+  {
+    mobId: 'grand_necromancer_velkhar',
+    mechanics: [...GRAVEWYRM_SANCTUM_ENCOUNTERS[1].mechanics, 'warm_hands_twice_woken'],
+  },
+  GRAVEWYRM_SANCTUM_ENCOUNTERS[2],
 ];
 
 const NYTHRAXIS_CRYPT_ENCOUNTERS: readonly FinderEncounter[] = [
@@ -191,18 +299,38 @@ const NYTHRAXIS_RAID_ENCOUNTERS_HEROIC: readonly FinderEncounter[] = [
   },
 ];
 
+// The Wildheart Basin rework (docs/design/dungeon-rework/wildheart_basin.md
+// section 5): the three boss cores replace the old trash rows; heroic adds each
+// boss's twists (its own array, so the normal preview never carries them).
 const WILDHEART_BASIN_ENCOUNTERS: readonly FinderEncounter[] = [
-  { mobId: 'wildheart_stalker', mechanics: [] },
-  { mobId: 'wildheart_ravager', mechanics: ['bloodmane_rend', 'tusk_sweep'] },
-  { mobId: 'wildheart_hexcaller', mechanics: ['ancestral_sap'] },
   {
     mobId: 'wildheart_beastmaster',
-    mechanics: ['call_of_the_hunt', 'thickhide_ward', 'beast_pit_quake'],
+    mechanics: ['pack_bond', 'stalk', 'shared_health', 'beast_pit_quake'],
+  },
+  {
+    mobId: 'the_gorgebloom',
+    mechanics: ['seed_rain', 'pollinate', 'vine_lash', 'gorge'],
   },
   {
     mobId: 'wildheart_high_priest',
     final: true,
-    mechanics: ['wildheart_pulse', 'jaguar_roar', 'enrage'],
+    mechanics: ['spirit_of_the_hunt', 'wildheart_pulse', 'jaguar_roar', 'enrage'],
+  },
+];
+
+const WILDHEART_BASIN_ENCOUNTERS_HEROIC: readonly FinderEncounter[] = [
+  {
+    mobId: 'wildheart_beastmaster',
+    mechanics: [...WILDHEART_BASIN_ENCOUNTERS[0].mechanics, 'heel_frenzied_bond'],
+  },
+  {
+    mobId: 'the_gorgebloom',
+    mechanics: [...WILDHEART_BASIN_ENCOUNTERS[1].mechanics, 'burrowing_seeds'],
+  },
+  {
+    mobId: 'wildheart_high_priest',
+    final: true,
+    mechanics: [...WILDHEART_BASIN_ENCOUNTERS[2].mechanics, 'twin_prey_ambush'],
   },
 ];
 
@@ -320,7 +448,7 @@ export const FINDER_ACTIVITIES: readonly FinderActivity[] = [
     composition: FIVE_MAN,
     autoQueue: true,
     entranceDungeonId: 'hollow_crypt',
-    encounters: HOLLOW_CRYPT_ENCOUNTERS,
+    encounters: HOLLOW_CRYPT_ENCOUNTERS_HEROIC,
     lockout: 'daily',
   },
   {
@@ -362,7 +490,7 @@ export const FINDER_ACTIVITIES: readonly FinderActivity[] = [
     composition: FIVE_MAN,
     autoQueue: true,
     entranceDungeonId: 'gravewyrm_sanctum',
-    encounters: GRAVEWYRM_SANCTUM_ENCOUNTERS,
+    encounters: GRAVEWYRM_SANCTUM_ENCOUNTERS_HEROIC,
     lockout: 'daily',
   },
   {
@@ -390,7 +518,7 @@ export const FINDER_ACTIVITIES: readonly FinderActivity[] = [
     composition: FIVE_MAN,
     autoQueue: true,
     entranceDungeonId: 'wildheart_basin',
-    encounters: WILDHEART_BASIN_ENCOUNTERS,
+    encounters: WILDHEART_BASIN_ENCOUNTERS_HEROIC,
     lockout: 'daily',
   },
   {

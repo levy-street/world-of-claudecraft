@@ -955,6 +955,9 @@ export const COMMAND_NAMES = [
   'account_bank_transfer',
   'membership_claim_armour',
   'courier_dispatch',
+  // A dungeon guide's offer answered for the whole group
+  // (IWorldDungeons.answerDungeonGuide; src/sim/dungeon_guide owns every rule).
+  'dungeon_guide_answer',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -1345,4 +1348,7 @@ export const COMMAND_FACETS = {
   // IWorldWorldPvp: the /pvp flag raise/lower. worldPvpInfo (the `wpvp`
   // self-delta mirror) carries no wire command and stays untagged.
   pvp_flag: 'IWorldWorldPvp',
+  // IWorldDungeons: the dungeon guide's offer answer (the guide's state is a
+  // snapshot read off his entity, `gds`).
+  dungeon_guide_answer: 'IWorldDungeons',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;

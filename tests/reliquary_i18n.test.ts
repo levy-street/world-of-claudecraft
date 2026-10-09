@@ -507,15 +507,13 @@ describe('the window paints the RESOLVED page name, never the model English', ()
 
   it('renders the ja_JP fill for the Overview nearly-complete row', async () => {
     // Nearly-complete needs at least one owned relic and an incomplete page: own
-    // four of the five Hollow Crypt items.
+    // every Hollow Crypt item but one.
+    const cryptItems = RELIQUARY_PAGES_BY_ID.conquerors_hollow_crypt.relics.flatMap((relic) =>
+      relic.kind === 'item' ? [relic.itemId] : [],
+    );
     const html = await renderSentinel({
       nav: 'overview',
-      itemsDiscovered: new Set([
-        'cryptbone_greaves',
-        'cryptbone_helm',
-        'cryptbone_pauldrons',
-        'greyjaw_hide_boots',
-      ]),
+      itemsDiscovered: new Set(cryptItems.slice(0, -1)),
     });
     expect(html).toContain('reliquary-nearly-row');
     expect(html).toContain(JA_FILL);

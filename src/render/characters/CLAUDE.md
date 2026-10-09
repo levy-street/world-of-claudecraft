@@ -672,7 +672,10 @@ an NPC with no authored look to its stock rig in `NPC_KEYS`. Forms
 (`form_sheep`/`form_bear`/`form_cat`/`form_travel`) are passed explicitly by the renderer;
 `characterFormAssetKey` (`form_visual_selection_core.ts`) then splits the shared cat slot at
 construction, so a shaman's `ghost_wolf` aura resolves to `form_ghost_wolf` (the tinted
-`wolf_basic.glb`) while the druid's `form_cat` loads its own `druid_cat_form.glb`.
+`wolf_basic.glb`) while the druid's `form_cat` loads its own `druid_cat_form.glb`. It
+splits the polymorph slot the same way: a polymorph whose aura id is in
+`TOAD_POLYMORPH_AURAS` (the Wildheart Toad Hex) resolves to `form_toad`, and
+`form_rig_sync.ts` disposes and rebuilds a polymorph rig left holding the other animal.
 
 **Every world NPC is a WOC body** (`npc_looks.ts`, pure data): the body, kit and
 clips of one player class, wearing a look the creator's face builder could have

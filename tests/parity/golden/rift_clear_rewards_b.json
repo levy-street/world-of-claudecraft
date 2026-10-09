@@ -721,7 +721,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1055,
-      "state": "2ae3b28d",
+      "state": "74489ccd",
       "events": "592b020d",
       "rng": {
         "draws": 322,
@@ -732,7 +732,7 @@
       "tick": 67,
       "time": 3.35,
       "nextId": 1055,
-      "state": "451fba5c",
+      "state": "77c7419c",
       "events": "741638a5",
       "rng": {
         "draws": 363,
@@ -940,7 +940,7 @@
             "items": [
               {
                 "count": 1,
-                "itemId": "shroud_of_the_gravewyrm"
+                "itemId": "shadowpulse_handwraps"
               },
               {
                 "count": 1,
@@ -993,7 +993,7 @@
       "tick": 67,
       "time": 3.35,
       "nextId": 1055,
-      "state": "451fba5c",
+      "state": "77c7419c",
       "events": "741638a5",
       "rng": {
         "draws": 363,
@@ -1201,7 +1201,7 @@
             "items": [
               {
                 "count": 1,
-                "itemId": "shroud_of_the_gravewyrm"
+                "itemId": "shadowpulse_handwraps"
               },
               {
                 "count": 1,

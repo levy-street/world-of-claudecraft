@@ -179,6 +179,43 @@ describe('authored ground pickups stand on reachable natural ground', () => {
   });
 });
 
+// The Gravewyrm Sanctum's Seal Gate (src/sim/sanctum_seal_gate.ts) was built
+// over the old spots of four key shards and three sigils (under its east
+// pylon, in its gate tunnel and in its rock wall), so they moved into the gate plaza in front of it, which
+// the quest text already named ("scattered in the gate plaza"). Each one must
+// lie in that plaza on open ground a body can stand on beside it.
+describe('the Sanctum key shards and sigils lie in the gate plaza', () => {
+  const door = { x: 0, z: 858 };
+  const items = ['sanctum_key_shard', 'gravewyrm_sigil'];
+
+  it('none is left in the gate tunnel or its walls, every one is in the plaza', () => {
+    for (const def of GROUND_OBJECTS.filter((g) => items.includes(g.itemId))) {
+      expect(def.positions.length).toBe(4);
+      for (const p of def.positions) {
+        // the plaza runs z 842 to 856, in front of the gate line at z 858
+        expect(p.z, `${def.itemId} at ${p.x},${p.z}`).toBeGreaterThanOrEqual(door.z - 16);
+        expect(p.z, `${def.itemId} at ${p.x},${p.z}`).toBeLessThanOrEqual(door.z - 2);
+        expect(Math.abs(p.x - door.x), `${def.itemId} at ${p.x},${p.z}`).toBeLessThanOrEqual(10);
+      }
+    }
+  });
+
+  it('every one stands clear of the Seal Gate and its props, on natural ground', () => {
+    const sim = makeSim();
+    const seed = sim.cfg.seed;
+    for (const def of GROUND_OBJECTS.filter((g) => items.includes(g.itemId))) {
+      for (const p of def.positions) {
+        const at = `${def.itemId} at ${p.x},${p.z}`;
+        expect(isBlocked(seed, p.x, p.z, PLAYER_BODY_RADIUS), at).toBe(false);
+        expect(
+          groundHeight(p.x, p.z, seed) - terrainHeight(p.x, p.z, seed),
+          at,
+        ).toBeLessThanOrEqual(LIFT_EPSILON);
+      }
+    }
+  });
+});
+
 // The other way verbatim placement strands a pickup: DOWN, under a declared
 // water body. The Bridgemere moat is authored as a ring of lake pools, and the
 // first Sunken Toll-Chest of Toll and Tangle sat at the exact centre of one

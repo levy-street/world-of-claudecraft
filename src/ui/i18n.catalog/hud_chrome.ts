@@ -4031,6 +4031,18 @@ export const hudChromeStrings = {
         'For {duration} sec, your auto-attacks, shots and physical abilities (not bleeds) also strike the enemy nearest your target within {reach} yd for {share}% of the damage dealt.',
       lantern:
         'Set a lantern at your feet for {duration} sec. A direct heal from anyone on you or a party member within {radius} yd of it also heals the most wounded other party member in its light for {share}% of the heal.',
+      shackle:
+        'Chain your target within {range} yd in place for {duration} sec. A creature immune to control, such as a boss, is slowed by {slow}% instead, unless it is also immune to slows.',
+      spiritPack:
+        'Call a spirit jaguar to fight beside you for {duration} sec. It runs to your target and bites it for {min} to {max} Physical damage every {every} sec, switching to any other enemy you target. With no enemy targeted it attacks the enemy nearest you within {range} yd. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, fixed when it is called. Requires an enemy target within {range} yd.',
+      seedburst:
+        'Plant a seed on your target within {range} yd. After {delay} sec it bursts where the target stands, or where it died, dealing {damage} Nature damage to each enemy within {radius} yd, or {bonus}% more ({empowered}) if the target died first. Damage increases with Spell Power, fixed when it is planted. The seed withers if you die before it bursts.',
+      tether:
+        'Chain yourself to a friendly player within {range} yd for {duration} sec. {share}% of the damage that would reach their health is dealt to you instead. Ends early if you die. Requires a friendly player target other than you.',
+      harvest:
+        'For {duration} sec, each hostile creature that dies within {radius} yd of you restores {pct}% of your maximum health ({health}) and {pct}% of your maximum mana.',
+      quench:
+        'Your next {hits} melee or ranged weapon hits within {duration} sec deal {damage} extra Frost damage. The last of them also quenches the target, slowing its attacks by {slow}% for {slowDuration} sec. Unused hits are lost when it ends. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.',
       heartNova:
         'Spend all heat stacks on a fire nova that deals {perHeat} Fire damage per stack ({max} at {maxHeat} stacks) to each enemy within {radius} yd and taunts every creature it hits. Damage increases with Attack Power. Requires a heat stack.',
       // Balgath's trinkets (combat/balgath_trinkets.ts).
@@ -5267,6 +5279,111 @@ export const hudChromeStrings = {
     },
   },
   auraEffect: {
+    // The Wildheart Basin's marks and boss auras (src/ui/wildheart_aura_effect.ts).
+    wildheart: {
+      packBond:
+        'Takes {pct}% less damage while its partner stands close. Pull the Beastmaster and his jaguar apart to break it.',
+      packBondFury: 'Deals {pct}% more damage while its partner stands close.',
+      stalked:
+        'The Great Jaguar hunts you and ignores taunts. Each bite deals {min} to {max} physical damage ({heroicMin} to {heroicMax} on Heroic) and opens a bleed. Kite it away from its master.',
+      waryStuns: 'A stun has landed on it. Further stuns slide off until this ends.',
+      waryRoots: 'A root has landed on it. Further roots slide off until this ends.',
+      warySlows: 'A slow has landed on it. Further slows slide off until this ends.',
+      pollinated:
+        'Touching a Seedpod makes it sprout a Thorn Sprout at once. Stay off the seeds and let a clean player stomp them; an untouched pod sprouts after {seconds} sec (on Heroic it burrows after {heroic} sec and rises beside the nearest player).',
+      prey: 'Zulgar hunts you. Lead him across a lit sun glyph to slow him by {slow}%. If he catches you, you are Mauled for {damage} damage ({heroic} on Heroic) and knocked down for {stun} sec.',
+      avatar:
+        'Moves {pct}% faster and hunts its Prey. Slows and roots take hold, and stuns last half as long.',
+      vanished: 'Hidden and immune to damage. He is about to pounce on the farthest player.',
+    },
+    // The Sunken Bastion's boss marks (src/ui/bastion_aura_effect.ts).
+    // Wordy (M16): non-Latin fills in the overlays.
+    bastion: {
+      // The trash mechanics pass (src/ui/bastion_aura_effect.ts).
+      brineColumn:
+        'Rooted in a column of sea water: you take {min} to {max} Nature damage every {tick} sec for up to {seconds} sec. Interrupt or stun the Tidebound Acolyte to break it.',
+      halberdWall:
+        'Takes {pct}% less damage while another Drowned Watchman stands within {radius} yd. Pull them apart.',
+      fogShroud:
+        'Takes {pct}% less damage while it stands in the Fog Bank. Drag it out of the fog.',
+      carrionGlut:
+        'Fed on the dead ({stacks} of {max}): each stack makes its Soul Release {radius} yd wider and {pct}% stronger.',
+      snappedFetters:
+        'Its chains are broken. It no longer fights, cannot be harmed, and soon leaves.',
+      anchored:
+        'Chained to the Drowned Anchor: you can move, but never farther from the winch, which reels you toward the Drowning Pit. Reach within {reach} yd of a lit mooring post at least {run} yd from where you were hooked to moor the chain (that post goes dark for {dark} sec), or have your group break it with {links} hits ({linksHeroic} on Heroic). The pit takes {pit}% of your maximum health ({pitHeroic}% on Heroic).',
+    },
+    // The Hollow Crypt trash marks and wing-boss auras (src/ui/crypt_aura_effect.ts).
+    // Wordy (M16): non-Latin fills in the overlays.
+    crypt: {
+      carrionEye:
+        'Every crow in the fight hunts you for {seconds} sec. Run to your tank so the flock can be cut down together.',
+      graniteSkin:
+        'Takes {pct}% less damage, and the stone thickens every {every} sec, up to {max} layers. A stun shatters it and leaves it taking {cracked}% more damage for {seconds} sec.',
+      measured:
+        'When this ends, an Open Grave caves in where you stand: {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone within {radius} yd. The grave stays for the rest of the fight, so carry the mark to the edge of the yard, away from the group.',
+      graveDirt:
+        'Standing in an Open Grave: movement speed reduced by {slow}% and {damage} Shadow damage every second ({heroic} on Heroic). On Heroic, lingering {linger} sec in a grave raises a Restless Bones. Step out of the grave.',
+      dirtInEyes:
+        'Reduces movement speed by {pct}%. Shovelful hits everyone in front of Sexton Marrow: stand behind him.',
+      blow: "Increases damage taken by {pct}%: {per}% for each stack, {stacks} of {max} now. Each Gravedigger's Blow adds a stack and resets the duration to {seconds} sec.",
+      graveVigor:
+        'Attacks {pct}% faster while he stands in an Open Grave. Keep him out of the graves.',
+      tolling:
+        'Immune to damage while he strides to the bell rope and rings the Burial Bell. When the ringing ends, the Toll deals {min} to {max} Shadow damage ({heroicMin} to {heroicMax} on Heroic) to everyone, and every Open Grave gives up a Restless Bones.',
+      embraced:
+        "Held aloft in the Lady's arms: unable to act, taking {tick} Frost damage every second ({tickHeroic} on Heroic). If your group deals {share}% of her maximum health she sets you down gently; if she holds you {hold} sec at the top she drops you onto the ice for {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic).",
+      lament:
+        "When Bride's Lament ends, it deals {min} to {max} Frost damage ({heroicMin} to {heroicMax} on Heroic) to everyone not within {radius} yd of a lit grave lantern. A lantern shelters the {cap} players nearest it, then goes dark and misses the next Lament.",
+      lingering:
+        "Your next Bride's Lament deals {pct}% more damage: {per}% for each stack, up to {max} stacks. Take the next one in a lantern's light.",
+      slippery:
+        'On slick ice: your speed changes by at most {grip} yd/sec each second, so you are slow to get going, slide on when you stop, and swing wide when you turn. Step off the ice to get your footing back.',
+      harmony:
+        'Takes {pct}% less damage: {per}% for each of her living Choristers. Kill the Choristers first.',
+      crescendo:
+        'Sings faster: the Dirge of the Hollow takes {cast} sec instead of {castNormal} sec and comes every {every} sec instead of {everyNormal} sec, and the Bone Organ plays {waves} waves of notes instead of {wavesNormal}.',
+      // Morthen the Gravecaller and the Knellwyrm (morthen_ids.ts, ids.ts).
+      gorged:
+        "Deals {pct}% more damage: {per}% for each Bound Soul that reached him, {stacks} of {max} now, for the rest of the fight. Each soul that reaches him also heals him for {heal}% of his maximum health. Step into a soul's path to take it instead.",
+      unquietWard:
+        "Immune to damage while he channels the Rite of the Unquiet at the altar: {lit} of {total} Remembrance Candles relit. Relighting one is a {channel} sec channel that drains {drain}% of the lighter's maximum health every second ({drainHeroic}% on Heroic); hits do not break it, a step or a stun does. The last candle shatters the ward. On Heroic, light them in the order the Ledger names: a wrong candle snuffs the last one lit and deals {wrongMin} to {wrongMax} Shadow damage to the lighter.",
+      riteBroken: 'Stunned: the shattered ward leaves him unable to act for {seconds} sec.',
+      shatteredWard:
+        'Takes {pct}% more damage for {seconds} sec: the relit candles broke his ward. Spend your strongest attacks now.',
+      graveChill:
+        'Takes {bite} Shadow damage every second ({biteHeroic} on Heroic) while the Rite of the Unquiet holds, rising by {step} ({stepHeroic} on Heroic) every {every} sec. Relight the Remembrance Candles to end it.',
+      graspMark:
+        'Hands erupt from the ring under you in {fuse} sec: everyone within {radius} yd of where it was laid is rooted for {root} sec and takes {min} to {max} Shadow damage. Step out of the ring.',
+      graspRoot: "Held by the grave's hands: unable to move for {seconds} sec.",
+      knellAirborne:
+        'On the wing over the Rite Ring, out of reach. It marks half of the ring for {mark} sec, then pours ghost fire over that half: {min} to {max} Fire damage to everyone in it. It burns {breaths} halves each flight, then lands.',
+    },
+    // The Gravewyrm Sanctum's boss auras (src/ui/sanctum_aura_effect.ts).
+    sanctum: {
+      lockbound:
+        'Takes {pct}% less damage: {per}% for each of his chains that still holds. Break a Seal Shackle to drop its chain.',
+      enrage: 'Deals {pct}% more damage.',
+      grasp:
+        'Stands in meltwater and deals {pct}% more damage. If it dies in meltwater it sinks and rises again {seconds} sec later; kill it on cold ice to keep it down.',
+      twiceWoken: 'Rose again from the meltwater and deals {pct}% more damage.',
+      doused: 'His plate broke under him and the quench-water put out his Grave Inferno.',
+      airborne:
+        'In the air and cannot be attacked. He lands with Crashing Descent on the plate where the most players stand, dealing {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone within {radius} yd.',
+      wyrmsEye:
+        'When this ends, Korzul pours Plunging Fire over the whole plate you stand on: {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone on it, and the plate cracks, or breaks if it was already cracked. Stand on sound ice, away from the group.',
+      quenchWater:
+        'In open quench-water: slowed by {slow}% and burned for {damage} damage every second ({heroic} on Heroic). Swim to any plate or the shore.',
+      shardFlare:
+        'The heart-shard flares: Grave Breath every {breath} sec and Wing Gale every {gale} sec.',
+      // The Sanctum trash debuffs (the Goadsmith's Branding Iron, the Rime
+      // Whelps' Rime Breath).
+      branded:
+        'Deals {value} {school} damage every {interval} sec for {seconds} sec. Step into a meltwater pool to put it out at once.',
+      creepingRime:
+        'Reduces movement speed by {pct}%, {per}% for each stack. Each Rime Breath adds a stack and resets the duration to {seconds} sec. Reaching {max} stacks freezes you solid (Iced Over) for {freeze} sec and clears them.',
+      icedOver: 'Frozen solid by Creeping Rime: unable to move or act.',
+    },
     sharedPyre:
       "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
     varkhulSharedPyre:
@@ -5461,6 +5578,22 @@ export const hudChromeStrings = {
       riftGuard: 'You take {pct}% less damage.',
       sprint: 'Movement speed increased by {pct}%. Does not stack with other speed increases.',
       brand: 'Healing received is reduced by {pct}%.',
+      shackle: 'Chained in place: cannot move.',
+      shackleSlow: 'Chained: movement speed reduced by {pct}%.',
+      spiritPack:
+        'A spirit jaguar fights beside you, biting your target for {min} to {max} Physical damage every {every} sec.',
+      seedburst:
+        'A Gorgebloom seed. When this expires it bursts for {damage} Nature damage to each enemy within {radius} yd, or {bonus}% more ({empowered}) if this enemy dies before then.',
+      tether:
+        "Chained by Foreman's Last Link: {pct}% of the damage that would reach your health is dealt to the one who chained you instead.",
+      tetherLink: 'You take {pct}% of the damage your chained ally would take.',
+      harvest:
+        'Each hostile creature that dies within {radius} yd of you restores {pct}% of your maximum health and mana.',
+      quench:
+        "Your next {stacks} weapon hits deal {damage} extra Frost damage. The last one slows the target's attacks by {slow}%.",
+      quenchOther:
+        "The next {stacks} weapon hits deal extra Frost damage. The last one slows the target's attacks by {slow}%.",
+      quenched: 'Attack speed slowed by {pct}%.',
       forgeHeat:
         "Heat: {stacks}/{max}. Using Forgefather's Temper spends it all, and its weapon fire deals {pct}% more damage.",
       tempered:
@@ -8880,10 +9013,67 @@ export const hudChromeStrings = {
     // src/sim/content/dungeon_finder.ts encounter records).
     mech: {
       shadow_pulse: 'Shadow Pulse (pulsing area damage)',
+      // Sexton Marrow (encounters/hollow_crypt/marrow.ts).
+      crypt_shovelful:
+        'Shovelful (every 11 seconds he flings grave dirt over an 8 yard cone in front of him: one and a half times his swing and 50 percent slower movement for 6 seconds, so stand behind him)',
+      crypt_measured_for_the_grave:
+        'Measured for the Grave (every 15 seconds he marks a player other than the tank; 4 seconds later an Open Grave caves in under them, 42 to 52 damage within 3 yards on normal, and the pit stays for the fight: 9 damage a second and 40 percent slower movement inside, so lay the graves at the edge of the yard)',
+      crypt_burial_toll:
+        'Burial Toll (at 66 and 33 percent health he strides to the bell rope, immune to damage, and rings for 3 seconds: 30 to 38 shadow damage to everyone on normal, and every Open Grave raises a Restless Bones)',
+      crypt_marrow_heroic:
+        "Heroic: Gravedigger's Blow every 9 seconds on the tank (each stack makes them take 6 percent more damage for 20 seconds, up to 6 stacks), Grave Vigor (he swings 30 percent faster while he stands in a grave) and Unquiet Earth (anyone who stays 2 seconds in a grave raises a Restless Bones there)",
+      // The Lady of the Bonechill (encounters/hollow_crypt/lady.ts).
+      crypt_brides_lament:
+        "Bride's Lament (every 22 seconds a 3 second wail: 60 to 75 frost damage on normal to everyone outside the light of a lit grave lantern, half again for every Lingering Lament stack from the Laments you already took. A lantern shelters two players at most and goes dark for 28 seconds after it shelters anyone, so split up and take turns)",
+      crypt_frozen_embrace:
+        'Frozen Embrace (every 30 seconds she seizes a player other than the tank and rises 5 yards into the air with them, 6 frost damage a second: deal 6 percent of her health within 8 seconds and she sets them down, otherwise she drops them for 150 to 180 damage on normal)',
+      crypt_rime_path:
+        'Rime Path (she leaves slippery rime where she drifts for 25 seconds: on it you gather speed slowly and slide on when you stop or turn)',
+      crypt_bridal_freeze:
+        'Bridal Freeze (at half health the whole ravine floor freezes over: slippery ice for the rest of the fight)',
+      crypt_lady_heroic:
+        'Heroic: every lit lantern also burns out on its own after 30 seconds and stays dark for 10, and the Frozen Embrace takes two players',
+      // Cantor Ilvane (encounters/hollow_crypt/ilvane.ts).
+      crypt_dirge_of_the_hollow:
+        'Dirge of the Hollow (every 16 seconds a 2.5 second song you can interrupt: if she finishes it, 105 to 125 shadow damage on normal and a 4 second silence to everyone within 45 yards who can see her, so interrupt it or hide behind a choir pillar)',
+      crypt_harmony:
+        'Harmony (each living Chorister makes her take 30 percent less damage: kill the Choristers first)',
+      crypt_bone_organ:
+        "Bone Organ (every 26 seconds she plays the Bone Organ: two waves of shadow notes burst down lanes of the loft, 100 to 115 damage on normal in a lane, the second wave filling the first one's gaps)",
+      crypt_crescendo:
+        'Crescendo (below 30 percent health her Dirge takes 1.8 seconds and comes every 11 seconds, and the organ plays a third wave)',
+      crypt_ilvane_heroic:
+        'Heroic: Encore (a Chorister that lies dead for 10 seconds while the other still stands rises again, so kill them together) and Unbroken Verse (every third Dirge cannot be interrupted: hide from it)',
+      // Morthen the Gravecaller (encounters/hollow_crypt/morthen*.ts) and, on
+      // heroic, the Knellwyrm's Burning Knell (knellwyrm_knell.ts).
+      crypt_morthen_shadow_pulse:
+        'Shadow Pulse (every 12 seconds a 2 second cast, then 24 to 30 shadow damage on normal to everyone within 12 yards of him, so step away; every 9 seconds in his Last Rites)',
+      crypt_gravecall:
+        'Gravecall (every 15 seconds a Bound Soul drifts from the next sarcophagus alcove toward him; when it reaches him he is Gorged on the Dead, 10 percent more damage for each soul up to 10 stacks, and heals 3 percent of his health. A player in its path takes it instead: 12 to 16 shadow damage on normal)',
+      crypt_rite_of_the_unquiet:
+        "Rite of the Unquiet (at 65 percent health he returns to the altar, immune inside the Unquiet Ward, while Grave Chill deals 3 shadow damage a second to everyone, rising by 1 every 5 seconds, and 2 Restless Bones climb out of the alcoves. Relight the 4 Remembrance Candles: each is a 4 second channel that drains 6 percent of the lighter's maximum health every second, which hits do not break but a step or a stun does. The last candle breaks the Rite: he is stunned for 8 seconds and takes 25 percent more damage)",
+      crypt_reap_the_unquiet:
+        'Reap the Unquiet (below 35 percent health the souls stop; every 14 seconds he sweeps his scythe after a 2 second cast: 55 to 65 shadow damage on normal to everyone in a 120 degree arc 14 yards in front of him. Shadow Pulse then comes every 9 seconds)',
+      crypt_morthen_heroic:
+        "Heroic: Name the Dead (the Ledger names the order of the candles: a wrong candle snuffs the last one lit and deals 252 to 288 shadow damage to the lighter, and each relight drains 8 percent a second), Grasp of the Grave (every 16 seconds 2 players get a 4 yard ring; 1.5 seconds later hands erupt in it: a 3 second root and 162 to 198 shadow damage) and the Knellwyrm's Burning Knell (it takes flight and marks half of the ring for 4.5 seconds, then pours ghost fire over that half for 1,000 to 1,120 fire damage, 3 halves each flight)",
       reaping_arc: 'Reaping Arc (frontal cleave)',
+      hallowed_brine:
+        'Hallowed Brine (a 9 yard pool of dark holy water, 10 on heroic: 18 damage a second to anyone in it, 26 on heroic, and he takes 40 percent less damage while he stands in it, so drag him out)',
+      rebounding_bulwark:
+        'Rebounding Bulwark (his shield rebounds to the nearest player within 10 yards of the last one hit, up to 3 players, 4 on heroic: spread out)',
+      tide_sentence:
+        'Sentence of the Tide (5 seconds after the mark, a column of light strikes everyone within 6 yards of the marked player, 8 on heroic: take it away from the group)',
+      unbroken_oath:
+        'Unbroken Oath (once, at half health, he kneels immune in a bubble for up to 60 seconds: kill his soldiers to break it, then he is stunned 4 seconds and takes 20 percent more damage for 10)',
+      fog_veil:
+        "Fog Veil (four figures, one real: the beacon's beam makes the real Vael's lantern flare)",
       mist_surge: 'Mist Surge (pulsing area damage)',
       summons_adds: 'Summons reinforcements',
       lunar_tide: 'Lunar Tide (pulsing area damage)',
+      chorus_and_solo: 'Chorus and Solo (stack on one mark, spread from the other)',
+      tideglass_reflections: "Tideglass Reflections (kill each other's mirror images)",
+      rising_tide: 'Rising Tide (half the island floods, move to the dry half)',
+      undertow: 'Undertow (pulls everyone in, run out before the crash)',
       enrage: 'Enrages at low health',
       shuddering_stomp: 'Shuddering Stomp (area stun)',
       grave_inferno: 'Grave Inferno (channeled fire AoE, stay spread)',
@@ -8913,6 +9103,11 @@ export const hudChromeStrings = {
         'The Deathless Court (heroic only, the royal court rises after Deathless Rage)',
       bloodmane_rend: 'Bloodmane Rend (bleed, watch for target swaps)',
       tusk_sweep: 'Tusk Sweep (frontal cleave)',
+      grave_breath: 'Grave Breath (frontal fire cone, it cracks the ice it covers)',
+      plate_floor:
+        'Breaking Ice (his fire cracks and sinks the lake plates, stay out of the open water)',
+      wyrm_flights:
+        "Flights (at 70% and 40%: walk Wyrm's Eye onto sound ice, stack where he should land)",
       ancestral_sap: 'Ancestral Sap (heals its allies)',
       call_of_the_hunt: 'Call of the Hunt (hastens nearby allies)',
       thickhide_ward: 'Thickhide Ward (shields nearby allies)',
@@ -8939,7 +9134,217 @@ export const hudChromeStrings = {
       shared_pyre: 'Shared Pyre (gathering circle, split the damage)',
       anvils_decree: "Anvil's Decree (three raid-wide hammer strikes, heal through)",
       masters_assembly: "The Master's Assembly (block the forge beams, rotate blockers)",
+      // The Sunken Bastion's fifth pass (encounters/sunken_bastion).
+      iron_cage: 'Iron Cage (mash your interact key to break out, allies can smash the bars)',
+      drowned_anchor:
+        'Drowned Anchor (its victim is reeled toward the pit: run within 3 yards of a lit mooring post to moor the chain, the post then goes dark for 30 seconds, or break the chain with 12 hits, 16 on heroic)',
+      shackle_pair: 'Shackle Pair (two chained players must stay close together)',
+      reaper_behind:
+        "Shadow Crossing (three times in a row he rises behind a player, a different one each time while enough stand: step out of the scythe's arc)",
+      // The Wildheart Basin rework (encounters/wildheart_basin).
+      pack_bond: 'Pack Bond (together they take half damage: drag them 15 yards apart)',
+      stalk:
+        'Stalk (the jaguar hunts a marked player, never the tank; alone, it hunts you: kite, slow, root and stun it)',
+      shared_health: 'Shared Health (one pool: hit whichever is safest)',
+      heel_frenzied_bond:
+        'Heel! and Frenzied Bond (the jaguar leaps home, the bond reaches 20 yards)',
+      seed_rain: 'Seed Rain (clean players stomp the seeds before they sprout)',
+      pollinate: 'Pollinate (golden players stay off the seeds, or they sprout at once)',
+      vine_lash: 'Vine Lash (step out of the thorny lane or be rooted)',
+      gorge: 'Gorge (a heavy bite and a poison on the tank)',
+      burrowing_seeds:
+        'Burrowing Seeds and Pollen Cloud (seeds rise by a player at 6 seconds, gold spreads)',
+      spirit_of_the_hunt:
+        'Spirit of the Hunt (the Prey kites the avatar through lit sun glyphs; a Mauled player gets a head start)',
+      twin_prey_ambush: 'Twin Prey and Ambush (two Prey, then a pounce on the farthest player)',
+      // Korgath the Bound (encounters/gravewyrm_sanctum/korgath.ts).
+      seal_shackles:
+        'Seal Shackles (each chain you break makes him take 20 percent more damage and frees one of his attacks)',
+      chain_strain: 'Strain (step away from every pillar whose chain still holds)',
+      korgath_stomp: 'Shuddering Stomp (step out of the ring round him)',
+      rerivet_last_link:
+        'Re-rivet and Last Link (kick the Goadsmith re-pinning a chain; one chain left means Strain every 10 seconds)',
+      // Grand Necromancer Velkhar (encounters/gravewyrm_sanctum/velkhar.ts).
+      waking_thaw: 'Waking Thaw (the dead climb out of the thaw pools)',
+      unquenched_held: 'Held or Unquenched (kill the dead on cold ice, never in meltwater)',
+      soulfire_trench: 'Soulfire Trench (a line of soulfire, then a strip of meltwater)',
+      shadow_volley: 'Shadow Volley (shadow damage to everyone)',
+      warm_hands_twice_woken:
+        'Warm Hands and Twice-Woken (heroic only, keep the dead moving; a risen one returns stronger)',
     },
+  },
+  // The Gaol Turnkey's Iron Cage escape prompt (src/ui/hud/dungeon/cage_escape).
+  bastionCage: {
+    title: 'Locked in the Iron Cage!',
+    promptKey: 'Press {key} again and again to break free',
+    // Retired: the unbound desktop case names the click (promptClick) now, since a
+    // player with no interact key has nothing to press but the panel itself.
+    promptNoKey: 'Press your interact key again and again to break free',
+    promptClick: 'Click here again and again to break free',
+    promptTap: 'Tap here again and again to break free',
+    buttonAria: 'Break free from the Iron Cage',
+    progressAria: 'Escape progress: {pct}',
+  },
+  // Gaoler Ossick's chain alert (src/ui/hud/dungeon/gaol_chain_view.ts).
+  bastionChain: {
+    anchoredTitle: 'Chained to the Drowned Anchor!',
+    anchoredLine:
+      'Run to a lit mooring post to moor the chain, or have your group break it before the winch drags you into the pit',
+    allyTitle: 'Break the chain!',
+    allyLine:
+      '{name} is being dragged to the pit: hit the Drowned Anchor, or help them reach a lit post',
+    shackledTitle: 'Shackled to {name}',
+    shackledLine: 'Stay within {range} yards of each other ({dist} yards apart)',
+    strainedLine: 'Too far apart! The chain bites both of you: close to {range} yards',
+    brokenAria: 'Chain broken: {pct}',
+    reachAria: 'Chain reach used: {pct}',
+    // The Drowned Anchor's health is its chain's links (one per hit, however
+    // hard): the alert's count, its rule, the target frame's health text and
+    // the floating text a hit on it shows. Wordy (M16): non-Latin fills here.
+    linksLeft: 'Chain links left: {count} of {total}',
+    linkRule: 'Every hit on the anchor breaks one link, however hard it lands',
+    linksTarget: '{count} of {total} links',
+    linkBroken: 'Link broken!',
+  },
+  // The Sunken Bastion's boss alert (src/ui/hud/dungeon/bastion_alert_view.ts):
+  // Olen's Sentence and brine, Vael's scythe behind a player and the Fog
+  // Veil's beam. Wordy (M16): non-Latin fills in the overlays.
+  bastionAlert: {
+    sentencedTitle: 'The Sentence falls on you!',
+    sentencedLine: 'A column of light strikes everyone near you: move away from the group',
+    brineTitle: 'In the Hallowed Brine!',
+    brineLine: 'It burns you every second: step out of the pool',
+    reapedTitle: 'Death rises behind you!',
+    reapedLine: "Step out of the scythe's arc: forward, or to either side",
+    veilTitle: 'The Fog Veil',
+    veilLine: "Watch the beacon's beam: the figure whose lantern flares is the real Vael",
+    realTitle: 'The beam found him!',
+    realLine: 'This is the real Vael: strike him to break the veil',
+    shadeTitle: 'A hollow shade',
+    shadeLine: 'The light pours through it: leave it, find the one the beam lights',
+    timeAria: '{seconds} seconds left',
+  },
+  // The Wildheart Basin's encounter alert (src/ui/hud/dungeon/wildheart_alert_view.ts).
+  wildheartAlert: {
+    preyTitle: 'You are the Prey!',
+    preyLine: 'Zulgar hunts you: run him through the lit sun glyphs',
+    preyWaitLine: 'He chases the other Prey now: be ready, he switches',
+    stalkedTitle: 'Stalked!',
+    stalkedLine: 'The jaguar hunts you: kite it away from its master',
+    pollinatedTitle: 'Pollinated!',
+    pollinatedLine: 'Stay off the seeds: your touch makes them sprout',
+    bondTitle: 'Pack Bond',
+    bondLine: 'Together they take half damage: pull them apart',
+    timeAria: '{seconds} seconds left',
+  },
+  // The Gravewyrm Sanctum's encounter alert (src/ui/hud/dungeon/sanctum_alert_view.ts).
+  // Wordy (M16): non-Latin fills in the overlays.
+  sanctumAlert: {
+    quenchTitle: 'In the quench-water!',
+    quenchLine: 'It burns and slows you: swim to the nearest ice or the shore',
+    plungeTitle: 'Plunging Fire!',
+    plungeLine: 'Your whole plate is about to burn: get off it now',
+    descentTitle: 'Crashing Descent!',
+    descentLine: 'He lands right here: step out of his shadow',
+    eyeTitle: "Wyrm's Eye on you!",
+    eyeLine: 'Your plate burns when the mark ends: stay on sound ice, away from the group',
+    eyeCrackedLine: 'You stand on cracked ice: walk to a sound plate before the mark ends',
+    flailTitle: 'Chain Flail!',
+    flailLine: 'The chain whips down the painted lane: step out of it',
+    chargeTitle: 'Threshold Charge!',
+    chargeLine: 'He charges down the lane: get out of it, away from the edge',
+    trenchTitle: 'Soulfire Trench!',
+    trenchLine: 'Soulfire cuts the lane and leaves meltwater: get out of it',
+    strainTitle: 'Strain!',
+    strainLine: 'The intact pillars are about to lash out: get away from them',
+    infernoTitle: 'Grave Inferno!',
+    infernoLine: 'Each pulse burns harder: get out of his reach',
+    stompTitle: 'Shuddering Stomp!',
+    stompLine: 'Get away from him before his foot comes down',
+    breathTitle: 'Grave Breath!',
+    breathLine: 'You stand in the breath cone: get out to the side',
+    maulTitle: 'Maul Arc!',
+    maulLine: 'He swings through everything in front of him: get behind him',
+    tailTitle: 'Tail Sweep!',
+    tailLine: 'You stand behind him: get out before the tail hits',
+    meltwaterTitle: 'In the meltwater',
+    meltwaterLine: 'Your Bonewalker stands in meltwater: drag it onto the cold ice',
+    meltwaterTargetLine: 'If your target dies in meltwater it rises again: wait for cold ice',
+    crackedTitle: 'Cracked ice',
+    crackedLine: 'Fire here breaks this plate: keep his fire off it',
+    flightTitle: 'Korzul takes flight',
+    flightLine: 'Stack on sound ice to choose where he lands, then step off',
+    lockboundTitle: 'Lockbound',
+    lockboundLine:
+      '{chains} chains hold: he takes {pct}% less damage. Break the Seal Shackles to strip it.',
+    timeAria: '{seconds} seconds left',
+    // The trash debuffs, below every boss alert (the trash mechanics pass).
+    brandedTitle: 'Branded!',
+    brandedLine: 'The brand burns until it ends: douse it in a meltwater pool',
+    rimeTitle: 'Creeping Rime!',
+    rimeLine: "Creeping Rime {stacks}/{max}: step out of the whelps' breath",
+    // A fresh Ice Slab near you (the Ogre Sledge-Hauler's thrown block): what
+    // it is for, for its first seconds.
+    slabTitle: 'Ice Slab',
+    slabLine: "Solid ice: it blocks line of sight. Hide behind it from the casters' spells",
+  },
+  // The Hollow Crypt's wing-boss alert (src/ui/hud/dungeon/crypt_alert_view.ts):
+  // Sexton Marrow's grave mark and Open Graves, the Lady of the Bonechill's
+  // Frozen Embrace and Bride's Lament, and the target readouts (Marrow at the
+  // bell, Cantor Ilvane in Harmony). Wordy (M16): non-Latin fills in the overlays.
+  cryptAlert: {
+    measuredTitle: 'Measured for the Grave!',
+    measuredLine:
+      'A grave caves in under you when the bar runs out: carry it to the edge of the yard',
+    embracedTitle: 'Frozen Embrace!',
+    embracedLine: 'She holds you aloft: your group must hurt her to make her set you down',
+    lamentTitle: "Bride's Lament!",
+    lamentShelteredLine: "You stand in a lit lantern's light with room for you: hold still",
+    lamentOpenLine: "Get into a lit lantern's light before the wail lands: two to a lantern",
+    graveTitle: 'In an Open Grave!',
+    graveLine: 'The grave dirt burns and slows you: step out of it',
+    tollTitle: 'Burial Toll!',
+    tollLine:
+      'He cannot be hurt while he rings the bell: brace for the Toll and the dead it raises',
+    harmonyTitle: 'Harmony',
+    harmonyLine: 'Her Choristers take {pct}% off the damage she takes: kill them first',
+    // Morthen's Rite Ring and the Knellwyrm's heroic Burning Knell.
+    knellTitle: 'Burning Knell!',
+    knellLine:
+      'Ghost fire pours over this half of the ring when the bar runs out: get to the other half',
+    graspTitle: 'Grasp of the Grave!',
+    graspLine: 'Hands erupt from this ring and hold whoever stands in it: step out',
+    reapTitle: 'Reap the Unquiet!',
+    reapLine: 'His scythe sweeps the ground in front of him: get behind him',
+    riteTitle: 'Rite of the Unquiet',
+    riteLine: 'Relight the Remembrance Candles to shatter his ward: {lit} of {total} lit',
+    riteNamedLine: 'Relight only the candle the Ledger names next: {lit} of {total} lit',
+    soulTitle: 'Bound Soul',
+    soulLine: 'A soul drifts toward Morthen: step into its path to take it before it feeds him',
+    timeAria: '{seconds} seconds left',
+  },
+  // The trash engine's use prompt (src/ui/hud/dungeon/kit_use_prompt_view.ts):
+  // a usable encounter body near the local player (a Soul Brazier), kicked
+  // over with the interact press. {name} is the body's localized name.
+  kitUse: {
+    toppleLine: 'Kick it over onto the pack: the spill burns them',
+    toppleKey: 'Topple the {name} onto them',
+    toppleTap: 'Tap here to topple the {name} onto them',
+    toppleClick: 'Click here to topple the {name} onto them',
+    toppleFar: 'Get within {range} yd to kick it over',
+    toppleAria: 'Topple the {name}',
+    usingLine: 'Hold still: a hit, a step or a stun breaks it',
+    // The 'relight' use (a Remembrance Candle in Morthen's Rite): a channel
+    // that drains the lighter, kept through hits.
+    relightLine:
+      'It drains your health every second you channel: hits do not break it, a step or a stun does',
+    relightKey: 'Relight the {name}',
+    relightTap: 'Tap here to relight the {name}',
+    relightClick: 'Click here to relight the {name}',
+    relightFar: 'Get within {range} yd to relight it',
+    relightAria: 'Relight the {name}',
+    relightUsingLine: 'Hold still while it drains you: hits do not break it, a step or a stun does',
+    timeAria: '{seconds} seconds left',
   },
   // The Book of Deeds window: the deed catalog browser (summary strip,
   // category rail, entry cards, title picker), the watchlist HUD tracker, and

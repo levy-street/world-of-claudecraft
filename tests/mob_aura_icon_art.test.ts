@@ -170,8 +170,9 @@ describe('mob aura icon art', () => {
     // whose shared blood_frenzy runtime id already resolves to painted art, so
     // the identity count holds. 111 carriers and 91 identities with Balgath's
     // Barrowhide (the Mirefen world-boss branch, release/v0.45.0 merge).
-    expect(census.carrierCount).toBe(111);
-    expect(census.identities.size).toBe(91);
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 114, 93.
+    expect(census.carrierCount).toBe(114);
+    expect(census.identities.size).toBe(93);
     expect([...MOB_AURA_IMAGE_IDS].sort()).toEqual([...new Set(census.identities.values())].sort());
     expect(MOB_AURA_IMAGE_IDS.size).toBe(44);
     for (const [runtimeId, artIdentity] of census.identities) {

@@ -326,7 +326,8 @@ describe('item webp icons', () => {
     // (warfare-season2-weapons-2026-09-25): 145.
     // 148 with the Mirefen world-boss branch's three held weapons, 149 with Balgath's
     // Craterglass Stave.
-    expect(WEAPON_IMAGE_IDS.size).toBe(149);
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 163.
+    expect(WEAPON_IMAGE_IDS.size).toBe(163);
   });
 
   it('A) every image-backed item and weapon resolves to a committed, decodable .webp', async () => {
@@ -386,6 +387,10 @@ describe('item webp icons', () => {
     // follow-up art pass.
     const season2Armor = SEASON2_SETS.flatMap((set) => set.itemIds);
     expect(season2Armor).toHaveLength(135);
+    // The Hollow Crypt rework's per-boss loot left the ledger when its wave
+    // (hollow-crypt-icons-2026-10-03) painted every non-weapon piece and the
+    // generated Heroic Hymnal: HOLLOW_CRYPT_ART_PENDING_ITEM_IDS is declared
+    // empty in content/hollow_crypt_items.ts.
     expect(
       [...ITEM_ART_PENDING].sort(),
       'art debt is enumerated and re-pinned deliberately, never grown quietly',

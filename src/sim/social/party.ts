@@ -25,7 +25,9 @@ import { type Aura, DEFAULT_PARTY_LOOT_STRATEGIES } from '../types';
 
 // Group caps (classic 5-player party, 10-player raid as 2 subgroups of 5). Moved
 // from sim.ts with the code that reads them; do NOT inline new numbers.
-const PARTY_MAX = 5;
+// PARTY_MAX is also read by the render side to size the pools of telegraphs a
+// whole party can wear at once (wildheart_basin/basin_trash_fx_core.ts).
+export const PARTY_MAX = 5;
 const RAID_MIN = 5;
 // The largest roster any group can hold, enforced at every join site below
 // (partyInvite, partyAccept, and the Dungeon Finder formation seam). The one cap

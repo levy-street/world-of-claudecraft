@@ -77,8 +77,16 @@ describe('Ignivar raid gate', () => {
       new URL('../src/render/renderer.ts', import.meta.url),
       'utf8',
     );
-    expect(rendererSource).toContain('ignivarRaidGatePlan(e.templateId, e.dungeonId)');
-    expect(rendererSource).toContain('buildIgnivarRaidGate(raidGatePlan)');
+    // The renderer dispatches every gate object through one seam
+    // (gate_objects.ts): the Ignivar plan first, then the dungeon gates.
+    const gateSource = readFileSync(
+      new URL('../src/render/gate_objects.ts', import.meta.url),
+      'utf8',
+    );
+    expect(gateSource).toContain('ignivarRaidGatePlan(e.templateId, e.dungeonId)');
+    expect(gateSource).toContain('return buildIgnivarRaidGate(plan)');
+    expect(rendererSource).toContain('gateObjectPlan(e)');
+    expect(rendererSource).toContain('body = buildGateObject(raidGatePlan)');
     expect(rendererSource).toContain('height = raidGatePlan.height');
     const dungeonSource = readFileSync(
       new URL('../src/render/dungeon.ts', import.meta.url),

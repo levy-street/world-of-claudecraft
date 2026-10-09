@@ -457,6 +457,52 @@
     --color-delve-label: #ffe9a0;
     --color-delve-outline: #000;
 
+    /* painted map of an authored open-air dungeon field (the Sunken Bastion, the
+       Hollow Crypt; resolved by field_map_painter.ts via getComputedStyle): the
+       sea or the chasm mist, the terraces by ground, the cliffs, walls and
+       landmarks. */
+    --color-field-map-sea: #2f6488;
+    --color-field-map-sea-deep: #12283f;
+    --color-field-map-shoal: #3f7f96;
+    --color-field-map-foam: #e2f1f2;
+    --color-field-map-mist: #16181d;
+    --color-field-map-mist-swirl: #3a3f4a;
+    /* the jungle canopy over a gorge floor (the Wildheart Basin) */
+    --color-field-map-canopy: #2f5a36;
+    --color-field-map-canopy-dark: #1b3322;
+    --color-field-map-canopy-light: #5a8a48;
+    --color-field-map-ink: #140f0a;
+    --color-field-map-shadow: rgba(4, 6, 10, 0.5);
+    --color-field-map-highlight: #fff4d6;
+    --color-field-map-flagstone: #8f8674;
+    --color-field-map-earth: #6d5b42;
+    --color-field-map-grave: #4f4433;
+    --color-field-map-frost: #a9bac9;
+    --color-field-map-bone: #bcae92;
+    --color-field-map-ritual: #625d76;
+    --color-field-map-mud: #6a5d45;
+    --color-field-map-wetstone: #74827c;
+    --color-field-map-quay: #947f5f;
+    --color-field-map-shallows: #3f8392;
+    --color-field-map-moss: #5d7a3c;
+    --color-field-map-basalt: #4f544e;
+    --color-field-map-plate: #6c7178;
+    --color-field-map-grating: #4a4d52;
+    --color-field-map-soot: #5c5752;
+    --color-field-map-snow: #dfe9f1;
+    --color-field-map-ice: #7fb3cf;
+    --color-field-map-slate: #4a5058;
+    --color-field-map-crevasse: #2e6f9e;
+    --color-field-map-crevasse-deep: #0d1f33;
+    --color-field-map-wall: #4b433a;
+    --color-field-map-wall-top: #a79b87;
+    --color-field-map-prop: #3c352c;
+    --color-field-map-gate: #d4a94c;
+    --color-field-map-seal: #7fe0d0;
+    --color-field-map-beacon: #ffe39a;
+    --color-field-map-vignette: rgba(0, 0, 0, 0.55);
+    --color-field-map-vignette-clear: rgba(0, 0, 0, 0);
+
     /* overworld world-map window (resolved by map_window_painter.ts via
        getComputedStyle: a 2D canvas context cannot read a CSS var directly).
        Exact pre-existing values from the inline updateMapWindow/drawMapDetail. */

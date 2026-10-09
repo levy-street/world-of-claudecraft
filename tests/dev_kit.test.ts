@@ -365,24 +365,39 @@ describe('kit construction', () => {
     // it) or the tome ladder changed. Scope: CASTER_ALL classes only; a
     // hunter's held offhand is its quiver (tomes are class-locked away), and
     // dual-wield specs fill the slot with a second weapon first.
-    const CASTER_TOME = 'sunpetal_grimoire';
+    // Re-pinned sunpetal_grimoire -> chorus_conch by the Drowned Temple
+    // rework: Choirmother Selthe's Chorus Conch is a rare held offhand on the
+    // exact same line as the tome (int 5, spi 3, sta 3), so every caster sees
+    // an identity-and-quality tie that the picker resolves on id.
+    const CASTER_TOME = 'chorus_conch';
     const casterClasses = new Set(['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid']);
     let pinned = 0;
+    let staffCasters = 0;
     for (const { cls, spec } of everySpec()) {
       const kit = buildDevKit(cls, spec);
       const off = kit?.equip.offhand;
-      if (!off) continue;
+      if (!off) {
+        const main = ITEMS[kit?.equip.mainhand ?? ''];
+        if (casterClasses.has(cls) && main?.kind === 'weapon' && main.hand === 'twohand')
+          staffCasters += 1;
+        continue;
+      }
       if (ITEMS[off]?.kind !== 'held_offhand') continue;
       if (!casterClasses.has(cls)) continue;
       expect(off, `${cls}/${spec} held offhand`).toBe(CASTER_TOME);
       pinned += 1;
     }
-    // Liveness at the REAL count (the vacuity-floor rule): thirteen specs
-    // carry the pick today (mage x3, priest x3, warlock x3, druid x3,
-    // shaman/elemental; paladin contributes zero, holy and protection take
-    // shields and retribution takes nothing). A pool or picker change that
-    // moves ANY of them must be admitted here.
-    expect(pinned).toBe(13);
+    // Liveness at the REAL count (the vacuity-floor rule). Thirteen specs
+    // carried the pick until the Wildheart Basin rework (mage x3, priest x3,
+    // warlock x3, druid x3, shaman/elemental). Its Falls-Blessed Staff, a
+    // level-20 boss rare, now outscores a one-hander plus the tome for every
+    // caster spec but feral (which keeps a one-hander and the held offhand),
+    // so twelve specs move to the two-hander and one keeps the pick; paladin
+    // contributes zero tomes (holy and protection take shields, retribution a
+    // two-hander, the thirteenth two-hander counted below). A pool or picker
+    // change that moves ANY of them must be admitted here.
+    expect(pinned).toBe(1);
+    expect(staffCasters).toBe(13);
   });
 
   it('never puts the same ring in both ring slots', () => {
@@ -408,12 +423,17 @@ describe('kit construction', () => {
     // (sta 2 each) inside the epsilon band, and before the quality term the
     // alphabet handed the kit the strictly weaker uncommon the day its lower
     // id shipped. The tome must win on quality.
-    expect(buildDevKit('druid', 'feral')?.equip.offhand).toBe('sunpetal_grimoire');
+    // Since the Drowned Temple rework the Chorus Conch (rare, the tome's exact
+    // line) ties the tome on identity AND quality and wins on id; the pick is
+    // still a rare, never the weaker uncommon.
+    expect(buildDevKit('druid', 'feral')?.equip.offhand).toBe('chorus_conch');
+    expect(ITEMS.chorus_conch.quality).toBe('rare');
     // The dominance order's other half: quality never outranks identity (a
     // caster spec whose weights the tome's int/spi DO count keeps it too,
     // trivially, and a role-stat edge beats any quality edge by construction;
     // the integer-stat premise that construction rests on is pinned below).
-    expect(buildDevKit('mage', 'frost')?.equip.offhand).toBe('sunpetal_grimoire');
+    // A caster spec whose weights the tome's int/spi count now takes the
+    // Falls-Blessed Staff two-hander instead, so feral is the live probe.
   });
 
   it('the tiebreak scale strictly exceeds the quality ladder top rank (dominance property)', () => {

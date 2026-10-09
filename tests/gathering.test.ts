@@ -335,8 +335,12 @@ describe('isHarvestableCorpse', () => {
     // every carrier of either already carried a mapped family beside it. The
     // release's seven Ignivar raid templates (the v0.41.0 sync merge) are all
     // untagged forge constructs, so they move the `untagged` count below and
-    // this one not at all.
-    expect(included).toHaveLength(54);
+    // this one not at all. Then 60 with the five-dungeon rework's six tagged
+    // Wildheart Basin templates (basin_raptor, fanglord_jaguar, great_saurian,
+    // howdah_hexcaller, spore_toad and sunbone_totem_binder), every one on a
+    // mapped family; its two plant templates (vine_lasher, thorn_sprout) ship
+    // untagged like the shipped treants.
+    expect(included).toHaveLength(60);
     // ...and the untagged templates are counted rather than assumed: 189 of
     // them ship, every one excluded, and none of them ever passed through
     // `excluded` (fen_troll was already tagged with claw and tusk when #2905
@@ -378,7 +382,8 @@ describe('isHarvestableCorpse', () => {
     // the release already carries: 216.
     // The Mirefen world-boss branch adds six untagged templates (the boss, three muster
     // soldiers, the drillmaster and the Straw Foreman effigy): 222.
-    expect(untagged).toHaveLength(222);
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 293.
+    expect(untagged).toHaveLength(293);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read
@@ -604,7 +609,7 @@ describe('yieldingFocusComponents and harvestConcentrationBonus (#2514)', () => 
     // the templates the later passes tagged, leaving only the gills/horn-mixed
     // templates raising a pick. Masterwrought Phase 11m mapped gills and horn,
     // so no shipped template mixes mapped and unmapped families (mixed 0 over
-    // 54 tagged templates) and the raising arm is never entered on shipped
+    // 54 tagged templates then, 60 since the dungeon rework) and the raising arm is never entered on shipped
     // content: ZERO is the shipped reality, pinned as such.
     expect(sweep()).toBe(0);
     // The raising arm still has to be exercised, or a formula that changed

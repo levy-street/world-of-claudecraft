@@ -305,7 +305,8 @@ describe('which items draw the rare set', () => {
       .filter(isRareKey);
     for (const key of NPC_ONLY) expect(npc, key).toContain(key);
     for (const key of npc) expect(ALL_KEYS, key).toContain(key);
-    expect(rareItems.length).toBe(45);
+    // + the five-dungeon rework's three epics on the v0.45.0 integration: 48.
+    expect(rareItems.length).toBe(48);
     // exactly the finishes in use are shipped: no stray file, none missing
     const onDisk = (dir: string, ext: string): string[] =>
       readdirSync(dir)

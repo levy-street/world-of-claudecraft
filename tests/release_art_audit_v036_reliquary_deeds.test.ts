@@ -257,6 +257,35 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       'cmb_balgath_ten',
       // The muster's pike drill deed, on the same combat crest.
       'cmb_point_taken',
+      // The five-dungeon rework's encounter deeds ride the deed_cat_dungeon
+      // crest the same way until their paintings are commissioned.
+      'dgn_olen_buttress',
+      'dgn_ossick_moored',
+      'dgn_vael_beacon',
+      'dgn_turretback',
+      'dgn_selthe_pitch',
+      'dgn_colossus_mirror',
+      'dgn_ysolei_high_and_dry',
+      'dgn_mere_hydra',
+      'dgn_crypt_knellwyrm',
+      'dgn_turnkey_cage',
+      'dgn_beastmaster_apart',
+      'dgn_gorgebloom_clean',
+      'dgn_zulgar_uncaught',
+      'dgn_great_saurian',
+      'dgn_korgath_all_chains',
+      'dgn_korgath_still_bound',
+      'dgn_velkhar_cold',
+      'dgn_korzul_thin_ice',
+      'dgn_sledge_tusker',
+      // The Drowned Temple lore guide's deed rides the dungeon crest too.
+      'dgn_drowned_temple_cantor',
+      // The Hollow Crypt wing bosses' encounter deeds.
+      'dgn_marrow_tidy',
+      'dgn_lady_nobody_hanging',
+      'dgn_ilvane_hush',
+      // Morthen the Gravecaller's Rite.
+      'dgn_morthen_candlelight',
     ]);
     // RE-PINNED at the Mirefen world-boss forward-port onto release/v0.44.0:
     // 302 live (counted directly off the resolved src/sim/content/deeds.ts
@@ -270,7 +299,8 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     // so the painted count still holds at 289. 319 with the Buried Hoards Coinsack
     // catch (2026-09-28 merge), also pending: still 289 painted. 322 with the
     // Mirefen world-boss branch's three combat deeds, all pending.
-    expect(DEED_ORDER).toHaveLength(322);
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346.
+    expect(DEED_ORDER).toHaveLength(346);
     expect(DEED_IMAGE_IDS.size).toBe(289);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(

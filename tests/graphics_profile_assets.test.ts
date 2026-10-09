@@ -137,9 +137,6 @@ vi.mock('../src/render/temporal_hourglass_visual', () => ({
 vi.mock('../src/render/paladin_ascension_visual', () => ({
   resetPaladinAscensionProfileCaches: mocks.reset,
 }));
-vi.mock('../src/render/wildheart_terrain', () => ({
-  resetWildheartTerrainProfileCaches: mocks.reset,
-}));
 vi.mock('../src/render/goblin_rocket_sled_fx', () => ({
   resetGoblinRocketSledProfileCaches: mocks.sledReset,
 }));
@@ -254,7 +251,6 @@ describe('graphics profile derived-cache reset', () => {
       'jail_scene',
       'cliff_scree',
       'door_portal',
-      'wildheart_terrain',
       'fireball_travel_visual',
       'frost_nova_root_visual',
       'ice_block_visual',

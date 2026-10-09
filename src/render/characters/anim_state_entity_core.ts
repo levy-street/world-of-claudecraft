@@ -36,9 +36,13 @@ export interface AnimOverrideFacts {
   /** Rift ice-slide in progress (the sim glides the body at speed). Optional to
    *  match `Entity`, where it is only set on a sliding player. */
   riftSliding?: boolean;
-  /** The live aura list (ids only are read), handed to the rig by reference for
-   *  its `idleByAura` poses. */
-  auras?: readonly { id: string }[];
+  /** The live aura list, handed to the rig by reference: ids for its `idleByAura`
+   *  poses, kinds for its `stunned` loop. */
+  auras?: readonly { id: string; kind?: string; remaining?: number }[];
+  /** The cast bar (for a bar-locked cast clip, VisualDef.castClipSync). */
+  castingAbility?: string | null;
+  castRemaining?: number;
+  castTotal?: number;
 }
 
 /** Mutates `st` in place. Called once per entity per frame, so it allocates
@@ -59,8 +63,14 @@ export function applyEntityAnimOverrides(
   // same way. Players have no stance clip today, and they carry their selection
   // in targetId rather than aggroTargetId, so they are unaffected either way.
   st.combat = e.aggroTargetId !== null && !visuallyDead;
-  // A held aura pose (Balgath blinded) reads the list by reference: no copy per frame.
+  // A held aura pose (Balgath blinded) or a dazed loop (the Great Jaguar stunned) reads
+  // the list by reference: no copy per frame.
   st.auras = e.auras;
+  // How far its bar has run: a bar-locked cast clip follows it.
+  st.castElapsed =
+    e.castingAbility && (e.castTotal ?? 0) > 0
+      ? (e.castTotal ?? 0) - (e.castRemaining ?? 0)
+      : undefined;
   st.stealthed = stealthed && !visuallyDead;
   // Ice slide: the sim glides the player at speed but they should read as FROZEN
   // (gliding stiff on the ice), not sprinting. Suppress locomotion + airborne so

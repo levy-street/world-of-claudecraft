@@ -44,6 +44,7 @@ import {
   wrapAngle,
 } from './game/camera_follow';
 import { applyCameraViewSetting, applyCameraViewSettings } from './game/camera_view_settings';
+import { tickCameraZoomCeiling } from './game/camera_zoom_wiring';
 import { initCharselectWocMarket } from './game/charselect_woc_market_wiring';
 import { shouldRecoverOnComposerBlur } from './game/chat_keyboard_dismiss';
 import {
@@ -3846,6 +3847,7 @@ async function startGame(
     riftFloor: null,
   };
   function updateCamera(frameDt: number, interpFacing: number): void {
+    tickCameraZoomCeiling(input, world, frameDt);
     const mi = input.readMoveInput();
     const clickMoving = !!input.clickMoveTarget && !input.suspendMovement && !movementFrozen();
     // When click-to-move ends, the player's facing snaps from the (camera-lagging)

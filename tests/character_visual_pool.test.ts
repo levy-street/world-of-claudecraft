@@ -295,6 +295,19 @@ describe('PooledVisualLifecycle (the renderer take/store halves)', () => {
     expect(visual.setFarBakeGate).toHaveBeenCalledWith(gate);
   });
 
+  it('take and store both forget the last entity presentation state', () => {
+    const pool = new CharacterVisualPool<ReturnType<typeof stubVisual>>();
+    const lifecycle = new PooledVisualLifecycle(pool, {
+      farBakeGate: () => null,
+      maxPooled: () => 8,
+    });
+    const visual = { ...stubVisual(), resetForReuse: vi.fn() };
+    lifecycle.store('mob:bloom', visual);
+    expect(visual.resetForReuse).toHaveBeenCalledTimes(1);
+    expect(lifecycle.take('mob:bloom', 0)).toBe(visual);
+    expect(visual.resetForReuse).toHaveBeenCalledTimes(2);
+  });
+
   it('store parks the visual detached and hidden under the live cap', () => {
     const pool = new CharacterVisualPool<ReturnType<typeof stubVisual>>();
     let cap = 1;

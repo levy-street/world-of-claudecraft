@@ -521,11 +521,12 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     // elixir_of_mana_regeneration) ship committed painted art: 122.
     // Balgath's five trinkets join the same way (the Barrowstone Heart too: its slot
     // shows the statue's internal cooldown), painted in balgath-loot-icons-2026-09-28: 127.
-    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(127);
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 133.
+    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(133);
     expect(
       artSubjectHotbarItemIds,
       'production isHotbarItemId art-subject inventory (live minus ITEM_ART_PENDING)',
-    ).toHaveLength(127);
+    ).toHaveLength(133);
     expect(pendingHotbarItemIds, 'ITEM_ART_PENDING hotbar items').toHaveLength(0);
     expect(
       pendingHotbarItemIds.filter((id) => shippingImageExists(`/ui/items/${id}.webp`)),

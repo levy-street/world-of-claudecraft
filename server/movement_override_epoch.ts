@@ -1,4 +1,5 @@
 import type { PlayerMeta, Sim } from '../src/sim/sim';
+import { slipperyGrip } from '../src/sim/slippery_ground';
 import { DT, type Entity, RUN_SPEED, type Vec3 } from '../src/sim/types';
 import { ferryMovementFrame } from './transport_head';
 
@@ -16,6 +17,11 @@ export interface MovementOverrideSignature {
   climbing: boolean;
   braced: boolean;
   moveSpeedMult: number;
+  /** On slippery ground (src/sim/slippery_ground.ts): an override, like a
+   *  rift ice slide. The slide's ground velocity is state the reconcile wire
+   *  does not carry, so the client stands its prediction down on the ice and
+   *  draws the authoritative slide; the edge bumps the epoch both ways. */
+  slippery?: boolean;
 }
 
 export interface MovementOverrideSessionState {
@@ -92,6 +98,7 @@ export function fillOverrideSignature(
   // (src/sim/lance_trial.ts), so the client must not predict that strafe as a step.
   target.braced = entity.bracing === true;
   target.moveSpeedMult = moveSpeedMult;
+  target.slippery = slipperyGrip(entity) > 0;
   return target;
 }
 
@@ -105,7 +112,8 @@ function overrideBits(signature: MovementOverrideSignature): number {
     (signature.mountRaceLocked ? 32 : 0) |
     (signature.climbing ? 64 : 0) |
     (signature.vehicleLocked ? 128 : 0) |
-    (signature.braced ? 256 : 0)
+    (signature.braced ? 256 : 0) |
+    (signature.slippery ? 512 : 0)
   );
 }
 

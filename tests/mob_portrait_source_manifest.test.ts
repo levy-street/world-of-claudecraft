@@ -105,7 +105,8 @@ describe('mob portrait source manifest', () => {
     // the Voracious Chest) and the bat's swarm.
     // 276: plus the Mirefen world-boss branch's six (balgath_cyclops, muster_footman,
     // muster_chaplain, muster_sergeant, muster_drillmaster, muster_effigy).
-    expect(liveIds).toHaveLength(276);
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 354.
+    expect(liveIds).toHaveLength(354);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

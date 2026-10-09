@@ -237,30 +237,31 @@ describe('which items draw the field weapons', () => {
     for (const [, key] of fieldItems) counts[key] = (counts[key] ?? 0) + 1;
     expect(counts).toEqual({
       sword_field_iron: 5,
-      sword_field_steel: 8,
+      sword_field_steel: 9,
       sword_field_bronze: 3,
       sword_field_2h_iron: 1,
       sword_field_2h_steel: 1,
-      dagger_field_iron: 9,
-      dagger_field_steel: 8,
-      dagger_field_bronze: 7,
+      dagger_field_iron: 10,
+      dagger_field_steel: 9,
+      dagger_field_bronze: 8,
       hammer_field_iron: 1,
-      hammer_field_steel: 4,
+      hammer_field_steel: 5,
       hammer_field_bronze: 5,
       hammer_field_2h_iron: 2,
       hammer_field_2h_steel: 1,
-      axe_field_iron: 3,
-      axe_field_steel: 2,
+      axe_field_iron: 4,
+      axe_field_steel: 3,
       axe_field_bronze: 4,
-      staff_field_iron: 7,
-      staff_field_steel: 6,
+      staff_field_iron: 8,
+      staff_field_steel: 7,
       staff_field_bronze: 5,
       spear_field_iron: 4,
-      wand_field_iron: 3,
-      wand_field_steel: 2,
+      wand_field_iron: 4,
+      wand_field_steel: 3,
     });
-    // 49 common and uncommon weapons, and the 42 rare ones
-    expect(fieldItems.length).toBe(91);
+    // 49 common and uncommon weapons, and the 42 rare ones; 53 rare on the v0.45.0
+    // integration with the five-dungeon rework's eleven (placeholder finishes).
+    expect(fieldItems.length).toBe(102);
   });
 
   it('only common, uncommon and rare weapons of the matching type draw one', () => {

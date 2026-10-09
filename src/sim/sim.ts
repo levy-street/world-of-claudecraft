@@ -153,7 +153,7 @@ import { spellCritChance, spellDamageMultFromAuras } from './combat/spell_combat
 import { isMobSpellResisted } from './combat/spell_resist';
 import { isCritImmuneTank } from './combat/tank_crit_immunity';
 import { threatMod as threatModImpl } from './combat/threat_modifiers';
-import { onTrinketAvoidance, playerAuraGuarded, restorableCooldown } from './combat/trinket_seams';
+import { auraGuarded, onTrinketAvoidance, restorableCooldown } from './combat/trinket_seams';
 import { warriorMeleeDefense } from './combat/warrior_hit_table';
 import { ensureWarriorStance } from './combat/warrior_stances';
 // A3: the augment/power-up content helpers used by the Fiesta match logic
@@ -248,6 +248,7 @@ import { CASCADE_SCENARIO } from './dev/cascade_playtest';
 import { DEV_SANDBOX_CFG, DEV_SANDBOX_CLASSES } from './dev/dev_sandbox_config';
 import { despawnMobsForDev } from './dev_commands';
 import { projectOutsideDungeonDoors } from './dungeon_door_clearance';
+import { answerDungeonGuide as answerDungeonGuideImpl } from './dungeon_guide';
 import { arenaMapForSlot } from './dungeon_layout';
 import { effectiveArmorOf, effectiveAttackPowerOf } from './effective_stats';
 import * as nythraxis from './encounters/nythraxis';
@@ -5915,7 +5916,7 @@ export class Sim {
         worldQuestMod.updateWorldQuests(this.ctx, meta, p);
         vehicleMod.ensureActiveVehicleStations(this.ctx, meta);
         lap?.('p.move');
-        this.updateDoorTriggers(p);
+        updateDoorTriggersImpl(this.ctx, p);
         this.updateRiftTriggers(p);
         updatePortalTriggers(this.ctx, p);
         updateSwimFatigue(this.ctx, p);
@@ -6837,7 +6838,7 @@ export class Sim {
 
   private applyAura(target: Entity, aura: Aura): void {
     if (target.kind === 'npc' && isRejectedFriendlyNpcAura(aura)) return;
-    if (playerAuraGuarded(target, aura)) return;
+    if (auraGuarded(target, aura)) return;
     if (aura.kind === 'slow' && target.auras.some((active) => active.kind === 'slow_immunity')) {
       return;
     }
@@ -10466,10 +10467,6 @@ export class Sim {
   // (entity_roster.addEntityToRoster). Stays Sim-owned; reached via ctx.dungeonDoorIds.
   private dungeonDoorIds: number[] | null = null;
 
-  private updateDoorTriggers(p: Entity): void {
-    updateDoorTriggersImpl(this.ctx, p);
-  }
-
   enterDungeon(dungeonId: string, pid?: number): boolean {
     return enterDungeonImpl(this.ctx, dungeonId, pid);
   }
@@ -10480,6 +10477,9 @@ export class Sim {
 
   resetDungeonInstances(pid?: number): void {
     resetDungeonInstancesImpl(this.ctx, pid);
+  }
+  answerDungeonGuide(npcId: number, accept: boolean, pid?: number): void {
+    answerDungeonGuideImpl(this.ctx, npcId, accept, pid);
   }
 
   inheritDungeonResetLocks(pid: number): void {

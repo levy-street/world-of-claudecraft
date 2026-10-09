@@ -741,6 +741,267 @@ pinned in `tests/originality_renames.test.ts`).
 | Shape of the Foreman / Guttered Glare / Grapnel Pull (auras) | CLEAR | generic English on our own boss vocabulary |
 | Stone Statue (aura) | CLEAR | chosen over Stoneheart Statue (BORDERLINE); generic English |
 
+### The Sunken Bastion rework (web-verified 2026-09-29)
+
+Exact-phrase and coined-token searches against the major game wikis, at authoring. The
+design-time verdicts live in `docs/design/dungeon-rework/sunken_bastion.md` section 10.
+
+| Name | Where | Verdict |
+|---|---|---|
+| Mistweaver | REJECTED before shipping | The Mistweaver is a World of Warcraft Monk specialization. The trash mob keeps its id (`mistweaver`, never shown); its display name is Mist Chanter. |
+| Mist Chanter | the fog-warding trash caster | KEEP. No match; plain English. |
+| Oathwarden | REJECTED before shipping | Kyril Oathwarden is a Guild Wars boss: a coined surname. Olen's rare is the Knight-Commander's Longsword and his heroic epic the Drowned Commander's Breastplate. |
+| Keelhauler | REJECTED before shipping | Keelhauler Legplates (World of Warcraft item) and the Keelhauler pistol (Starfield). Ossick's weapon and striders take Gaolyard instead. |
+| Shacklebreaker | REJECTED before shipping | A crafted armor set in The Elder Scrolls Online. The gloves are Rusted Shackle Grips. |
+| Knight-Commander's Longsword, Drowned Commander's Breastplate, Gaoler's Chain Girdle, Rusted Shackle Grips, Drowned Warden's Mantle, Gaolyard Cudgel, Gaolyard Striders, Gaoler's Iron Key | the new loot | KEEP. No match for any full name; generic English compounds. |
+| Fogweaver | considered, not used | A World of Warcraft item prefix (Fogweaver Gauntlets). |
+
+### The Drowned Temple encounter pass (web-verified 2026-10-04)
+
+Exact-phrase searches against the major game wikis at authoring, for Choirmother Selthe's
+caster kit and the Tideglass Colossus's floor mechanic (`src/sim/encounters/drowned_temple/ids.ts`).
+
+| Name | Where | Verdict |
+|---|---|---|
+| Cresting Wave | REJECTED before shipping | A World of Warcraft spell and Water Elemental look (Cresting Wave Water Elemental Transform). Selthe's wave is the Mere Surge. |
+| Moonwater Bolt | Selthe's kickable filler bolt | KEEP. No match; "moonwater" is common English. |
+| Drowning Aria | Selthe's sung beam | KEEP. No match (Castlevania's Aria of Sorrow is unrelated); generic English. |
+| Mere Surge | Selthe's wedge of water | KEEP. No match; plain English, "Mere" is the game's own Mere Hydra word. |
+| Tideglass Fracture | the Colossus's prism slices | KEEP. No match; "Tideglass" is this game's own coined token (Tideglass Colossus, Tideglass Dirk). |
+
+The second round of the same pass (web-verified 2026-10-04): the Mere Hydra's Combined Breath
+(`hydra_combo.ts`), Ysolei calling the moon (`ysolei_moon.ts`) and the Pearlguard Sentinel's new
+manta body (display only; the id `pearlguard_sentinel` is frozen).
+
+| Name | Where | Verdict |
+|---|---|---|
+| Frozen Torrent | REJECTED before shipping | A World of Warcraft spell (Frozen Torrent, Cataclysm). The ice and water combo is the Frostlocked Torrent. |
+| Frostlocked Torrent | the Hydra's ice and water combo | KEEP. No match for the full name; generic English compound. |
+| Venom Tide | REJECTED before shipping | Too close to the World of Warcraft achievement "Turning the Venom Tide". The venom and water combo is the Venom Current. |
+| Venom Current, Toxic Rime, Ice Wall, Ice Shards | the Hydra's combos and their hazards | KEEP. No match for the full names; plain English. |
+| Tears of the Moon | REJECTED before shipping | A World of Warcraft quest (Tears of the Moon, Teldrassil); "Moon Tears" is a WoW battle pet ability. The tears are Moonlight Tears. |
+| Moonfall | REJECTED before shipping | A World of Warcraft spell (Moonfall, Dragonflight) and zone name. Ysolei's bar is the Falling Moon. |
+| Descending Moon | REJECTED before shipping | A Genshin Impact Archon Quest title. |
+| Moonscorch | REJECTED before shipping | A coined term of Fear and Hunger 2 (the Moonscorched). The tear burn is Moonsear. |
+| Full Moon | not used as a name | A World of Warcraft Balance druid ability (New Moon, Half Moon, Full Moon); the stacks are Moonswell. |
+| Moonglow | not used | A classic World of Warcraft druid talent. The heroic pool is Spilled Moonlight. |
+| Beckoning Moon, Moonlight Tear, Moonsear, Moonswell, Falling Moon, Eclipsed, Moonborne Might, Spilled Moonlight | Ysolei's moon | KEEP. No match for the full names; generic English. |
+| Plenilune Ward | Ysolei's full-moon dome | KEEP. "Plenilune" is an English word for the full moon; only longer compounds exist elsewhere (Final Fantasy XI's Plenilune Embrace, Honkai Star Rail's Sixfold Plenilune). |
+| Moonmantle Ray | the manta that replaces the clam golem (display name of `pearlguard_sentinel`) | KEEP. No match for "Moonmantle" on Wowhead or the game wikis. |
+| Moon Glide, Moonglide | REJECTED before shipping | A Tekken stance and a Fortnite glider. The manta's charge is the Lunar Glide. |
+| Wing Buffet | REJECTED before shipping | A World of Warcraft dragon attack. The manta's slam is the Tidal Wingbeat. |
+| Lunar Glide, Tidal Wingbeat, Nacre Cocoon | the manta's three moves | KEEP. No match for the full names ("Wingbeat" alone is a plain English word). |
+| The Moonbridge Rises | the banner as the Moonbridge forms | KEEP. Plain English over the dungeon's own place name. |
+| Combined Breath | the Mere Hydra's umbrella mechanic, the bar every head pours into (re-checked 2026-10-05 with the sources listed under the Sunken Bastion encounter pass below) | KEEP. No match as a name on any wiki searched or on Wowhead. The one warcraft.wiki.gg hit is quest prose (Wrathion and Sabellian "using their combined breath attacks"). |
+| Moonlight Tears | the plural of the Moonlight Tear row above (re-checked 2026-10-05) | KEEP. No match as a name on Wowhead or the wikis. The UESP hits are Elder Scrolls lore prose (Azurah's realm "formed of the moonlight tears she shed"), a description, not a named thing. |
+
+### The Sunken Bastion encounter pass (web-verified 2026-10-05)
+
+Knight-Commander Olen's new kit (`src/sim/encounters/sunken_bastion/olen.ts`), Vael the
+Fogbinder's new beats (`vael.ts`, `vael_intro.ts`, `vael_veil_gather.ts`) and the Drowning
+Yard's posts in Gaoler Ossick's fight (`src/sim/content/sunken_bastion.ts`).
+
+Sources, for this table and the Laverock table below: quoted exact-phrase searches through
+the search APIs of warcraft.wiki.gg, Wowpedia, the Guild Wars and Guild Wars 2 wikis, the
+EverQuest II wiki, the Project 1999 EverQuest wiki (plus a page-title lookup on the EverQuest
+fandom wiki, whose full-text search returns nothing for any query), the RuneScape and Old
+School RuneScape wikis, the LOTRO fandom wiki, UESP (every namespace), both FFXIV wikis
+(Console Games Wiki and Gamer Escape), the Diablo and Path of Exile fandom wikis, the
+Hearthstone wiki and the MTG wiki; Wowhead's own search index (it lists NPC spells no wiki
+has a page for); Scryfall for Magic card names. Not reachable this pass: lotro-wiki.com and
+poewiki.net (both behind a bot-verification wall); a general web search was not available, so
+this pass is wiki and database only.
+
+| Name | Where | Verdict |
+|---|---|---|
+| Hallowed Brine | Olen's pool cast and the pool | KEEP. No match on any source; plain English pair. |
+| Brine-Hallowed | Olen's shield aura while he stands in his own pool | KEEP. No match, hyphenated or spaced. |
+| Rebounding Bulwark | Olen's shield throw that bounces between players | KEEP. No match. Nearest is this game's own shaman option Rebounding Current, a different noun. |
+| Sentence of the Tide | Olen's strike on a marked player | KEEP. No match. |
+| Unbroken Oath | Olen's once-a-fight kneel and bubble vigil | KEEP. No external match on any source, Wowhead and Scryfall included; the nearest is WoW dialogue ("By my unbroken oaths", The Tabiqa), not a name. INTERNAL REUSE: the same English is already this game's Warfare PvP set proc and its aura (`set_warfare_unbroken_oath` in `src/sim/content/item_sets.ts`, `aura.unbrokenOath` in `src/ui/sim_i18n.ts`). Olen's aura has its own key (`aura.bastionUnbrokenOath`), but the two now show one English name, and the matcher's reverse map sends that literal to the PvP key. Not an IP issue; recorded so the maintainer can decide whether two different things should share a name. |
+| Breached | Olen's stun once the bubble breaks | KEEP. A single common English word (the precedent of Crushed and Staggered). Other games use it only inside longer names: WoW's The Breached Ossuary, Bracers of Breached Integrity and Time-Breached Waistband, Guild Wars 2's The Breached Wall, Diablo's The Breached Keep. |
+| Gathering Fog | Vael's bar while he draws the fog into the crown | KEEP. No match as a name. The MTG wiki hits are prose on its Fog card pages. |
+| Death Rises | Vael's rise out of the fog | KEEP. No match as a name. The warcraft.wiki.gg hits are boss yells that contain the plain sentence (Lord Magmathar, Mistress Sassz'ine). |
+| Into the Fog | Vael's sink into the fog | KEEP, borderline, recorded for the reviewer. A stock English phrase (books, films, songs), not a coined term, and no wiki has a page by that name. But Wowhead lists "Into the Fog" as a World of Warcraft quest storyline in The Ringing Deeps (The War Within, also a criterion of the Sojourner of The Ringing Deeps achievement). Different role (a quest storyline, ours a boss cast bar), so it clears the bar; it is closer than most keeps here (compare Tears of the Moon above, a WoW quest title swapped while it was still free to change). The nearest WoW mechanic, Admiral Ripsnarl retreating into the fog in the Deadmines, is named The Fog. |
+| Shrouded | Vael's untouchable aura in his intro and over the Gathering Fog | KEEP. A single common English word. Wowhead lists bare "Shrouded" as several WoW NPC spells and a Shadowlands Mythic+ affix; under the same precedent as Constricted and Cocooned a lone common word is shared vocabulary, never a collision. |
+| Beacon-Lit | the tell on the real Vael when the Fogbeacon's beam finds him | KEEP. No match as a name; the wiki hits are prose ("keep the beacon lit"). |
+| Hollow Shade | the tell on a fog shade the beam passes through | KEEP. No match for the two-word name. Nearest is Hollowshade Moor, an EverQuest zone: one coined compound word, a place, so a different form and role. |
+| Mooring Post | the Drowning Yard's lit safe points in Gaoler Ossick's fight | KEEP. Plain English for the real object. Nearest is Broken Mooring Post, a grey World of Warcraft mace. |
+
+### The Drowned Temple lore guide, Laverock (web-verified 2026-10-05)
+
+Laverock and his deed (`src/sim/content/drowned_temple_cantor.ts`, `src/sim/content/deeds.ts`),
+checked against the sources listed for the Sunken Bastion encounter pass above.
+
+| Name | Where | Verdict |
+|---|---|---|
+| Laverock | the Temple's optional lore guide NPC | KEEP. No hit on any wiki searched, on Wowhead or on Scryfall. "Laverock" is a real Scots and northern English dialect word for the skylark (and a British surname), so it is shared English, not a coined token. The LOTRO check is PARTIAL: lotro-wiki.com was NOT reachable (a bot-verification wall on its search page, its article URL and its API, retried this pass); the LOTRO fandom wiki was reachable and has no hit. LOTRO leans on English dialect words, so lotro-wiki.com is the one source still worth a manual look. |
+| Last Cantor of the Pale Choir | his NPC title | KEEP. No match for the full title, for "Last Cantor" or for "Pale Choir". "Cantor" is a real word; the one near hit is ESO dialogue on UESP ("Sing, Cantor"), not a name. |
+| The Last Verse | his deed, and his finale song cast | KEEP. No match as a name on any wiki, on Wowhead or on Scryfall. Every hit is prose about the final verse of an in-game poem or song (WoW quest text, Skyrim and ESO lore and dialogue, a RuneScape song page). |
+| Witness of the Choir | the title the deed grants | KEEP. No match. |
+
+### The Gravewyrm Sanctum trash mechanics pass (web-verified 2026-10-04)
+
+Exact-phrase and coined-token searches at authoring (warcraft.wiki.gg full text, the Wowhead
+spell database, the Guild Wars 2 and FFXIV wikis, Arknights; the PoE and UESP wikis refused the
+fetch, so they are covered by the broad web search only), for the trash pass on the trash
+engine's generic keys (`src/sim/mob/trash_kit/sanctum_cast_ids.ts`, `src/sim/content/
+gravewyrm_sanctum.ts`).
+
+| Name | Where | Verdict |
+|---|---|---|
+| Thaw the Held | the Thawcaller's raise rite | KEEP. No match; plain English over the dungeon's own "the held". |
+| Counterweight Lash | the Scaleguard's tail | KEEP. No match (WoW only has items called "... Counterweight"). |
+| Boiling Meltwater | the Scaleguard's heroic pool | KEEP. No match. |
+| Branding Iron, Branded | the Goadsmith's brand and its burn | KEEP, borderline, recorded: plain English object and adjective; WoW has a minor Torghast anima power "Branding Iron" and GW2's Branded is a creature faction, neither a distinctive shared ability. |
+| Topple Brazier, Spilled Soulfire | the brazier players kick over and its pool | KEEP. No match for the full names; "Soulfire" already ships in this game. |
+| Rime Breath | the Rime Whelp's breath | KEEP. No match (PoE's "Breath of Rime" is a different phrase). |
+| Rimechill | REJECTED before shipping | An Arknights enemy ability (Kjeragandr). The stacking chill is Creeping Rime. |
+| Frozen Solid | REJECTED before shipping | A World of Warcraft debuff that ends stacking chill exactly like ours (Melidrussa Chillworn). The freeze is Iced Over. |
+| Creeping Rime, Iced Over | the chill and the freeze | KEEP. Plain English. |
+| Ice Slab, Fracture, Meltwater | the Ogre's wall, the Splinter's split, the quench pools | KEEP. Plain English (WoW's Fracture is an unrelated demon hunter builder; "Tideglass Fracture" already ships). |
+| Test Nova, Test Orb | the dev-only engine demonstration kit | KEEP. Plain labels, never on a template. |
+### The Hollow Crypt and Sunken Bastion trash mechanics pass (web-verified 2026-10-04)
+
+Exact-phrase searches through the MediaWiki search of 25 game wikis (warcraft.wiki.gg,
+wowpedia, the Hearthstone, Diablo, StarCraft, RuneScape, Old School RuneScape, FFXIV,
+Final Fantasy, Guild Wars 1 and 2, UESP, Path of Exile, Diablo IV, Elden Ring, Dark Souls,
+Darkest Dungeon, Baldur's Gate 3, Forgotten Realms, Dota 2, League of Legends, Dragon Age,
+Magic: The Gathering, EverQuest and LOTRO wikis) plus Wowhead's spell database, at
+authoring, for the trash kit's new names (`src/sim/mob/trash_kit/crypt_kit.ts`,
+`bastion_kit.ts`).
+
+| Name | Where | Verdict |
+|---|---|---|
+| Bone Shrapnel | REJECTED before shipping | A World of Warcraft death burst in the same role (Restless Bones, Return to Karazhan; a Torghast creation). The Bone Minion's burst on its own skeletons is the Splinter Burst. |
+| Bone Splinters | REJECTED before shipping | A Diablo IV Necromancer skill. |
+| Eye Peck | REJECTED before shipping | A World of Warcraft carrion-bird ability since vanilla, same role. The Carrion Crow's peck is the Gouging Beak. |
+| Blinding Peck, Beak Gouge | REJECTED before shipping | World of Warcraft spells (seagulls and vultures; a beak gouge). |
+| Hobbled | REJECTED before shipping (borderline) | A plain word, but also a World of Warcraft NPC slow in the same role. The Cutthroat's slow is Torn Tendon. |
+| Gorged | REJECTED before shipping (borderline) | A World of Warcraft scarab mechanic too close in role (gorge, grow, burst). The crawler's stacks are the Carrion Glut; "Glutted" is also a WoW spell. |
+| Unshackled | REJECTED before shipping (borderline) | The freed-captive faction of World of Warcraft (The Unshackled, Nazjatar). The prisoner's release is the Snapped Fetters; "Broken Chains" is a WoW object and a Dragon Age item. |
+| Reassemble | the Ossuary Warrior's rise | KEEP. Plain English verb; WoW's "Reassemble Armor" and FFXIV's Machinist "Reassemble" are different roles. |
+| Stirring Bones | the bone pile mob | KEEP. No match. |
+| Grave Rupture, Marrow Crush, Granite Skin, Carrion Eye, Barrow Embers, Rimesilk Spit, Boathook Drag, Halberd Wall, Brine Column | the new casts and auras | KEEP. No match for the full names ("Rimesilk" has no hits on its own). |
+| Cracked Stone | the gargoyle's broken ward | KEEP. Plain English; WoW's "Cracked Stone" is a thrown rock, a different role. |
+| Fall Back | the Arbalest's leap back | KEEP. A generic military order across many properties; none is a backward self leap. |
+| Fog Bank | the Mist Chanter's patch | KEEP. A weather term; the Magic: The Gathering card is shared dictionary English in another medium. |
+| Splinter Burst, Torn Tendon, Carrion Glut, Snapped Fetters, Gouging Beak | the replacements | KEEP. No match on any of the wikis or on Wowhead. |
+### The Temple and Wildheart trash mechanics (wiki-verified 2026-10-04)
+
+The general web search budget was exhausted, so this check ran against the wikis' own search: the Wowhead database search and a warcraft.wiki.gg full-text exact-phrase search for every name, plus RuneScape, Guild Wars 2, FFXIV, Hearthstone, League of Legends and Liquipedia Dota 2 for the coined tokens and the flagged names (UESP, poewiki, the Diablo fandom and Scryfall refused the fetch, so ESO, Path of Exile, Diablo and Magic: The Gathering are not covered).
+
+| Name | Where | Verdict |
+|---|---|---|
+| Leaping Spark | REJECTED before shipping | A World of Warcraft boss ability (Geezle's Leaping Sparks). The lagoon eel's chain lightning is the Arcing Spark. |
+| Bloodmane Roar | REJECTED before shipping | "Bloodmane" is a World of Warcraft tribe name (the Bloodmane saberon of the Spires of Arak). The shipped Bloodmane names stay as the maintainer kept them, but the token is not extended: the ravager's pack enrage is the War Roar. |
+| Tongue Lash | considered, not used | A World of Warcraft battle pet ability and NPC spell. The giant toad's pull is the Snaring Tongue. |
+| Shrine Vigil, Moonset Oath, Lullaby Echo, Prism Glare, Spiral Whirlpool, Arcing Spark, Swollen Tide | the Drowned Temple trash (pilgrim-warded singer, heroic guard link, heroic sleep spread, mantis shrimp gaze, nautilus pull, eel chain lightning, heroic wisp merge) | KEEP. No match for the full names; plain English ("moonset" is an English word). |
+| Quarry Mark, War Roar, Toad Hex, Rattling Dread, Snaring Tongue | the Wildheart Basin trash (raptor prey mark, ravager pack enrage, hexer polymorph, totem fear pulse, toad pull) | KEEP. No match for the full names; plain English ("Hex" alone is shared vocabulary). |
+| Sunbone Dread Totem | the Sunbone fear totem | KEEP. No match; "Sunbone" is this game's own coined token (Sunbone Hexcaller). |
+| Snarlbark | the vine creature's thorns | KEEP. No match; pairs with this game's own Snarlvine. |
+
+Completed 2026-10-05 for the four properties the first check could not reach: Scryfall
+exact-name search over every Magic: The Gathering printing and the MTG fandom wiki; the
+elderscrolls fandom wiki full text and UESP page titles (Online, Lore, Skyrim, Oblivion,
+Morrowind; UESP's own full-text search sits behind a bot challenge); the Path of Exile fandom
+wiki plus the PoE1 and PoE2 game data (skill gems, base items, uniques, mods; poewiki.net and
+poe2wiki.net refused the fetch); the Diablo fandom wiki (Diablo I to IV). Every name above is
+KEEP there too. Nearest neighbours, none a collision: FFXIV's "Moonset" action (a different
+full name, already cleared), MTG's "Whirlpool" cards (Quicksand Whirlpool, Whirlpool Drake),
+Path of Exile's and Diablo IV's single-word "Spark" and "Arc", Diablo III's "Hex" and "Plague
+of Toads", MTG's "Snarl" cards (Snarl Song, Snarlfang Vermin).
+
+### The dungeon trash pass, second wave (web-verified 2026-10-05)
+
+The five mechanics on the trash engine's sight rule and walker
+(`src/sim/mob/trash_kit/kit_nova.ts`, `kit_walker.ts`, `bastion_order.ts`, `temple_lure.ts`,
+`temple_pearl.ts`). Checked against warcraft.wiki.gg, wowpedia and Wowhead's suggestions, the
+GW2 wiki, FFXIV (consolegameswiki and the XIVAPI actions, statuses, items, enemies and places),
+the RS3 and OSRS wikis, ESO and Path of Exile as above, the Diablo fandom wiki, Scryfall and
+the MTG wiki, the Hearthstone wiki and the HearthstoneJSON card list, League of Legends (fandom
+and Riot's game data), Dota 2 (fandom and dotaconstants), the Elden Ring and Dark Souls wikis,
+bg3.wiki and the Forgotten Realms wiki, plus exact-phrase web searches for the coined tokens.
+
+| Name | Where | Verdict |
+|---|---|---|
+| Gravespark Volley, Gravespark | the Gravecaller Adept's line-of-sight volley | KEEP. No match in any game; "Gravespark" only turns up a place name and an unused domain. |
+| Throatlight | the Bastion Revenant's death orb | KEEP, borderline, recorded: no game uses it; TV Tropes files light shining from a mouth under a generic "Throat Light" label, a trope name, not a proprietary term. |
+| Drowned Surge | the orb's heroic damage surge | KEEP. No match. |
+| Loose on My Mark | the Drowned Sergeant's order | KEEP. A plain command phrase; no match. |
+| Call of the Shallows | the Moonlit Siren's luring song | KEEP, borderline, recorded: no game uses it; the nearest are a poetry book ("A Call from the Shallows") and the unrelated "Call of the Deep". |
+| Song-Struck | the song's stun | KEEP. A generic compound like "star-struck". |
+| Heartpearl, Heartpearl Ward | the Moonmantle Ray's pearl and the ward it lays | KEEP, borderline, recorded: no game uses it; outside games "HeartPearl" is a short-drama video app's brand, a different industry. |
+| Nacre Mantle | the group shield for taking the pearl | KEEP. Only biology papers (nacre is laid by the mollusc mantle). |
+| Rusted Bolt | the arbalests' bolt on the mark | KEEP. The arbalest's shipped petSpell name, reused. |
+
+### The Hollow Crypt wing-boss rework (web-verified 2026-10-05)
+
+Exact-phrase and coined-token searches at authoring (warcraft.wiki.gg full text, the Guild Wars
+wiki, and for the encounter names also the FFXIV wiki), for the three reworked wing bosses
+(`src/sim/encounters/hollow_crypt/marrow_ids.ts`, `lady_ids.ts`, `ilvane_ids.ts`) and the
+Lady's renamed loot (`src/sim/content/hollow_crypt_items.ts`; display only, the ids are frozen
+since the spider placeholder and pinned by `tests/hollow_crypt_alert.test.ts`).
+
+| Name | Where | Verdict |
+|---|---|---|
+| Lady of the Bonechill | the second boss (display name of `rimeweb`) | KEEP. No match for the full name; "Bonechill" is already a GENERIC token in this game (Bonechill Cord, Striders, Widow). |
+| Bride's Lament, Frozen Embrace, Rime Path, Bridal Freeze, Lingering Lament, Shattering Fall, Rime-Slick | her kit and the ice | KEEP. No match for any full name; generic English. |
+| Earthbound | REJECTED before shipping | A game title (Nintendo's EarthBound). Marrow's heroic haste in a grave is Grave Vigor. |
+| Grave Vigor, Shovelful, Gravedigger's Blow, Unquiet Earth, Measured for the Grave | Sexton Marrow's kit | KEEP. No match for any full name; generic English. |
+| Bone Organ, Unbroken Verse | Cantor Ilvane's organ and her heroic uninterruptible Dirge | KEEP. No match. |
+| Open Grave, Grave Dirt, Dirt in the Eyes, Harmony, Crescendo, Encore, Grave Lantern, Frozen Ravine | mechanics, auras and places | GENERIC. Plain English. |
+| Bonechill Carapace Vest | RENAMED before the rework shipped (theme, not a collision) | The spider word. Now Bonechill Hauberk (`bonechill_carapace_vest`): a mail chest, which is what the committed icon paints. No match for the full name on either wiki; "Bonechill" is GENERIC here (WoW's Bonechill Hammer and Magus Bonechill share only the common compound). |
+| Rimeweb Hunter's Leggings | RENAMED before the rework shipped (theme) | The spider's web and its hunter. Now Rime-Laced Leggings (`rimeweb_hunters_leggings`), after the frosted lacing on the committed icon. No match for the full name or for "Rime-laced" on either wiki. |
+| Rimeweb Fang | RENAMED before the rework shipped (theme) | The committed icon is a pale curved ice blade, not a fang. Now Bride's Icicle (`rimeweb_fang`, and its generated heroic twin, which reads the base name). No match on either wiki. |
+| Rimesilk | kept | A bride's silk: Rimesilk Mantle and Rimesilk Hood keep their names. |
+
+### Morthen's Rite and the Knellwyrm's Burning Knell (web-checked 2026-10-05)
+
+The new player-visible names of Morthen the Gravecaller's three-act rite
+(`src/sim/encounters/hollow_crypt/morthen_ids.ts` and its siblings), the Knellwyrm's heroic
+flight (`knellwyrm_knell.ts`) and the rite's deed (`dgn_morthen_candlelight` in
+`src/sim/content/deeds.ts`). The authoring session had no web search, so the exact-phrase
+and coined-token searches ran in a follow-up session on the same day, before the change
+shipped. One collision was found and renamed before shipping (the id stays frozen).
+
+| Name | Where | Verdict |
+|---|---|---|
+| Gravecall | the Bound Soul launch (finder copy) | KEEP. Builds on this game's own shipped "Gravecall" token (Gravecall Acolyte, Morthen the Gravecaller). Elsewhere only as a minor compound (an EverQuest II sword "Gravecall, Sword of Culling", an Age of Wonders 4 staff); not distinctive to one game. |
+| Gorged on the Dead | Morthen's stacking damage buff from the souls | Chosen in the crypt rework's 2026-09-29 naming pass to replace the rejected "Soul Tithe" (`docs/design/dungeon-rework/hollow_crypt.md` section 10); re-confirm with the rest of this table. |
+| Rite of the Unquiet | his act-two channel at the altar | Chosen in the same 2026-09-29 pass to replace the rejected "Rite of Unmaking" (section 10); re-confirm with the rest of this table. |
+| Unquiet Ward | his immunity through the Rite | CLEAR. No match for the full name (only The Elder Scrolls Online quest "The Unquiet Dead" shares the common word). |
+| Reap the Unquiet | his Last Rites frontal sweep | CLEAR. No match. |
+| Name the Dead | the heroic candle order (the Ledger) | CLEAR. No match on the WoW, Guild Wars or FFXIV wikis. |
+| Grasp of the Grave | the heroic rings and their hands | GENERIC. No match on the WoW, Guild Wars, FFXIV or PoE wikis; the phrase is a stock tabletop necromancy spell name (D&D 4e, several d20 publishers, GemStone IV), shared generic fantasy English. |
+| Burning Knell | the Knellwyrm's heroic flight | CLEAR. No match. |
+| By Candlelight | RENAMED before shipping | COLLISION: the exact title of a World of Warcraft storyline (The War Within). The deed ships as Every Candle Lit (`dgn_morthen_candlelight`); no match for that name. |
+| Bound Soul | the soul itself | GENERIC. Reuses this game's own mob name (`bound_soul`). |
+| Grave Chill | the Rite's rising shadow damage | GENERIC, as already recorded for Wraithbinder Maldrec's pulse (this audit's mechanic table). An exact World of Warcraft spell name exists (a Shadowlands zone hazard), but the two words are plain English and the name already shipped here. |
+| Remembrance Candle | the four candles and their usable bodies | GENERIC. A real-world memorial candle; no game match. |
+| Candle's Price | the relight's health drain (a damage name) | CLEAR. No match. |
+| Rite Broken, Shattered Ward | the stun and the vulnerability when the fourth candle catches | GENERIC. Plain English. |
+| Shadow Pulse, Relight the Candle, the Ledger | the pulse (already shipped on him as GENERIC), the relight bar, the book that names the order | GENERIC. Plain English. |
+
+### The lower dungeons' normal blues (web-checked 2026-10-08)
+
+The thirty new rare names of the Hollow Crypt, Sunken Bastion and Drowned Temple normal
+blue groups (`src/sim/content/hollow_crypt_items.ts`, `sunken_bastion_items.ts`,
+`drowned_temple_items.ts`). Method: quoted exact-phrase web searches for every full name
+and the coined tokens alone (Spadeworn, Rimewreath, Knellbound, Candlewatch, Lanternwick,
+Cellwatch, Brinewarden, Merecleaver, Mereskin, Merecrest, Hydracrest, Moonwrack), in
+batched OR queries through a general web search engine; no per-wiki search (the WoW,
+Guild Wars, FFXIV and PoE wikis were not queried one by one this session). Three
+candidates collided and were replaced before shipping; the ids never shipped under them.
+
+| Name | Where | Verdict |
+|---|---|---|
+| Bonechill Veil | REJECTED before shipping | An armor piece in Klei's Rotwood (its ArmorList, found at a "Bonechill Quarry"). The Lady's cloth helm ships as the Lamenting Veil (`lamenting_veil`); no match for that name. |
+| Gravecall Scepter | REJECTED before shipping | "Gravecall" is the title of a trading card game (gravecall.com), the Earthbound rule. Morthen's rod ships as the Gravecaller's Rod (`gravecallers_rod`), built on this game's shipped Gravecaller's Vestments; D&D 5e's "Staff of the Gravecaller" is a different full name. |
+| Venomtide Cowl | REJECTED before shipping | "Venomtide" surfaced as a World of Warcraft mount token. The Hydra's cloth helm ships as the Merewater Cowl (`merewater_cowl`). |
+| Spadeworn Gauntlets, Rimewreath Coif, Knellbound Hauberk, Candlewatch Jerkin, Lanternwick Sash, Cellwatch Belt, Portcullis Girdle, Brinewarden Robe, Merecleaver, Mereskin Hood, Mere-Crested Helm, Merewater Cowl, Lamenting Veil, Robe of the Unquiet Rite, Turnkey's Shank | the new names with a coined or distinctive token | CLEAR. No match for any full name or coined token. |
+| Bellrope Mitts, Gravedirt Grips, Rime-Laced Hood, Cantor's Stole, Chorister's Spaulders, Choirward Pauldrons, Gaolyard Jerkin, Fogbinder's Rod, Pale Chorus Slippers, Conchplate Sabatons, Prism-Etched Handwraps, Moonburn Grips, Tideglass Gauntlets, Moonwrack Stave, Gravecaller's Rod | built on this game's own shipped tokens (Bellrope, Gravedirt, Rime-Laced, Cantor, Chorister, Choirward, Gaolyard, Fogbinder, Pale Chorus, Conchplate, Prism-Etched, Moonburn, Tideglass, Moonwrack, Gravecaller) | CLEAR. No match for any full name; the tokens are already recorded GENERIC or CLEAR in this audit's rework tables. |
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.
@@ -2530,6 +2791,7 @@ frozen).
 | Moonfleece Mitts | GENERIC |  | item:moonfleece_mitts |
 | Moonfleece Tuft | GENERIC |  | item:moonfleece_tuft |
 | Moonlit Bloom | GENERIC |  | deed:col_moonlit_bloom |
+| Moonmantle Ray | GENERIC |  | mob:pearlguard_sentinel |
 | Moonpale Scale | GENERIC |  | item:moonpale_scale |
 | Moonscale Saber | GENERIC |  | item:moonscale_saber |
 | Moonspawn | GENERIC |  | mob:moonspawn |
@@ -2653,7 +2915,6 @@ frozen).
 | Peaksong Helm | GENERIC |  | item:peaksong_helm |
 | Peakwool Robe | GENERIC |  | item:peakwool_robe |
 | Pearl-Mother Isha | GENERIC |  | npc:pearlmother_isha |
-| Pearlguard Sentinel | GENERIC |  | mob:pearlguard_sentinel |
 | Pearlwake Cargo Crate | GENERIC |  | item:pearlwake_cargo_crate |
 | Pearlward Aegis | GENERIC |  | item:pearlward_aegis |
 | Pelts for the Causeway | GENERIC |  | quest:q_prowler_pelts |

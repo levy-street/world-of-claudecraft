@@ -95,6 +95,7 @@ export function identityFields(e: Entity): Record<string, unknown> {
   if (e.streamerLinks && hasStreamerLink(e.streamerLinks)) out.slk = e.streamerLinks;
   writePlayerIdentityWire(e, out); // guild, pledge, guild tier, deed title/border, spec
   if (e.dungeonId) out.dgn = e.dungeonId;
+  if (e.guideState) out.gds = e.guideState; // a dungeon guide's offer (src/sim/dungeon_guide)
   if (e.riftTier) out.rt = e.riftTier; // ranked rift portal badge (render-only)
   if (e.vaultRarity) out.vr = e.vaultRarity; // buried-hoard rarity (render-only)
   if (e.objectItemId) out.obj = e.objectItemId;

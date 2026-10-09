@@ -956,17 +956,19 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
       .filter((m) => (m.componentTags ?? []).includes('horn'))
       .map((m) => m.id);
     // OPEN-WORLD carriers, meaning those with a CAMPS row. NOT "reachable":
-    // the seventh tagged template is a Wildheart DUNGEON mob, reached through
-    // an instance, which structurally cannot carry a camp row at all. The six
-    // open-world carriers are the farm route the ratification leans on.
+    // the other three tagged templates are Wildheart DUNGEON mobs (the
+    // Hexcaller, and the rework's Sunbone Totem-Binder and Howdah Hexcaller),
+    // reached through an instance, which structurally cannot carry a camp row
+    // at all. The six open-world carriers are the farm route the ratification
+    // leans on.
     const openWorldHorn = hornCarriers.filter((id) => campedMobIds.has(id)).sort();
     expect(openWorldHorn.length, `horn carriers with a camp row: ${openWorldHorn.join(', ')}`).toBe(
       6,
     );
     // Non-vacuity, on the honest ground: the tag set is strictly larger than
-    // the camped set, so the filter is doing real work. The reason is that one
-    // tagged template is instanced content, not a spread decision.
-    expect(hornCarriers.length, 'horn-tagged templates, camped or not').toBe(7);
+    // the camped set, so the filter is doing real work. The reason is that
+    // three tagged templates are instanced content, not a spread decision.
+    expect(hornCarriers.length, 'horn-tagged templates, camped or not').toBe(9);
   });
 
   it('the filed crossing case: zero free slots + a partial plain stack tops up, never overflows', () => {
@@ -2525,7 +2527,11 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
       ).toEqual([]);
     }
     const tagged = Object.values(MOBS).filter((m) => (m.componentTags?.length ?? 0) > 0);
-    expect(tagged).toHaveLength(54);
+    // 60, not 54: the dungeon rework's six tagged Wildheart Basin templates
+    // (basin_raptor, fanglord_jaguar, great_saurian, howdah_hexcaller,
+    // spore_toad, sunbone_totem_binder), every family mapped. Full chain:
+    // tests/gathering.test.ts.
+    expect(tagged).toHaveLength(60);
     // 189, not 188: the Nythraxis Bone Spike (src/sim/content/dungeons.ts) the mechanics
     // redo added ships untagged (a stationary pillar, not a butcherable corpse), so it
     // grows MOBS without touching `tagged`. Full documented chain: tests/gathering.test.ts,
@@ -2546,7 +2552,8 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     // `tagged`.
     // 222 with the Mirefen world-boss branch at the release/v0.45.0 merge: balgath_cyclops,
     // three muster soldiers, the drillmaster and the Straw Foreman effigy, all untagged.
-    expect(Object.keys(MOBS).length - tagged.length).toBe(222);
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 291.
+    expect(Object.keys(MOBS).length - tagged.length).toBe(291);
     withMixedTemplates(() => {
       const mixed = mixedTemplates();
       expect(mixed.map(([id]) => id).sort()).toEqual(
@@ -2854,8 +2861,12 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     };
     // The shipped corpus: every subset of every tagged template. Exact totals
     // are pinned against the shipped catalog, not derived, so a template that
-    // gains or loses a mapped tag moves one of them.
-    expect(sweep(Object.keys(MOBS))).toEqual({ spent: 266, refused: 0 });
+    // gains or loses a mapped tag moves one of them. 286, not 266: the
+    // dungeon rework's six tagged Wildheart Basin templates add 2^n subsets
+    // each (basin_raptor, fanglord_jaguar, howdah_hexcaller and
+    // sunbone_totem_binder carry two families, 4 each; great_saurian and
+    // spore_toad one, 2 each).
+    expect(sweep(Object.keys(MOBS))).toEqual({ spent: 286, refused: 0 });
     // Both arms still have to be visited, so neither half of the property is
     // vacuous: the refused arm is driven through the three retagged fixtures.
     const fixtures = withFixtureTemplates(() =>
@@ -2920,7 +2931,10 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
       }
       return { extracted, unmappedOffered };
     };
-    expect(sweep(Object.keys(MOBS))).toEqual({ extracted: 447, unmappedOffered: 0 });
+    // 475, not 447: the six tagged Wildheart Basin rework templates (see the
+    // spend sweep above) extract 6 per two-family template over its four
+    // subsets (2 + 1 + 1 + 2) and 2 per one-family template: 4 * 6 + 2 * 2.
+    expect(sweep(Object.keys(MOBS))).toEqual({ extracted: 475, unmappedOffered: 0 });
     const fixtures = withFixtureTemplates(() =>
       sweep([UNMAPPED_TEMPLATE_ID, MIXED_TEMPLATE_ID, MIXED2_TEMPLATE_ID]),
     );

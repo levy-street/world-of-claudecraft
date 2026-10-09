@@ -50,6 +50,26 @@ describe('makeQuestObjectGate', () => {
     expect(gate(crate(), onQuest())).toBe(false);
   });
 
+  it('withholds an encounter-entombed mob from every viewer, the editor included', () => {
+    // Morthen under the Rite Ring, the Knellwyrm before it flies in
+    // (src/sim/encounters/hollow_crypt): no body, plate or click until revealed.
+    const mob = (entombed: boolean): Entity =>
+      ({
+        kind: 'mob',
+        templateId: 'morthen',
+        pos: { x: 0, y: 0, z: 0 },
+        auras: entombed ? [{ id: 'crypt_entombed' }] : [],
+      }) as unknown as Entity;
+    for (const gate of [
+      makeQuestObjectGate({}),
+      makeQuestObjectGate({ showAllQuestObjects: true }),
+      makeQuestObjectGate({}, { worldQuestCycle: '', worldQuestLog: new Map() }),
+    ]) {
+      expect(gate(mob(true), new Map())).toBe(true);
+      expect(gate(mob(false), new Map())).toBe(false);
+    }
+  });
+
   it('treats an absent flag as the game default, never as opt-out', () => {
     const gate = makeQuestObjectGate({ showAllQuestObjects: undefined });
     expect(gate(crate(), new Map())).toBe(true);

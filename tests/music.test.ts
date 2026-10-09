@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { BossLoopTrack } from '../src/game/boss_music_loop';
 import {
   buildMusicThemes,
   dungeonMusicZoneForDungeon,
@@ -343,6 +344,22 @@ describe('MusicDirector stream keeper', () => {
     expect(el.play).toHaveBeenCalledTimes(1);
   });
 
+  it('stops the default combat track immediately when a boss cue takes over', () => {
+    director.update('dungeon_hollow_crypt', true);
+    const inner = internals(director);
+    const combat = inner.combatStreams.find((stream) => stream.target === 1);
+    if (!combat?.el) throw new Error('combat stream element missing');
+    expect(combat.el.paused).toBe(false);
+
+    director.setBossCombat(true, '/audio/music/boss_sexton_marrow.mp3');
+
+    expect(combat.el.paused).toBe(true);
+    expect(FakeAudio.instances.at(-1)?.src).toBe('/audio/music/boss_sexton_marrow.mp3');
+    expect(FakeAudio.instances.at(-1)?.paused).toBe(false);
+    inner.streamKeeper();
+    expect(combat.el.paused).toBe(true);
+  });
+
   it('pauses streams at volume zero and revives when the slider comes back', () => {
     director.update('vale', false);
     const inner = internals(director);
@@ -433,8 +450,10 @@ describe('dungeon music entry reset', () => {
     const el = internals(director).zoneStreams.dungeon_hollow_crypt?.el;
     if (!el) throw new Error('dungeon stream element missing');
     el.currentTime = 19;
-    const bossElement = { currentTime: 19 };
-    (director as unknown as { bossElement: typeof bossElement }).bossElement = bossElement;
+    const bossLoop = (director as unknown as { bossLoop: BossLoopTrack }).bossLoop;
+    const bossElement = bossLoop.element();
+    if (!bossElement) throw new Error('boss loop element missing');
+    bossElement.currentTime = 19;
 
     director.resetForDungeonEntry('nythraxis_boss_arena');
 

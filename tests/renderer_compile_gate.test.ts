@@ -453,7 +453,9 @@ describe('Renderer live shader compile rejection recovery', () => {
     expect(returns).toBeGreaterThanOrEqual(3);
     expect(bareAdds).toBe(0);
     expect(gated).toBe(returns);
-    const wildheart = body.indexOf("if (interior === 'wildheart')");
+    // The open-air fields (Wildheart, the Hollow Crypt, the Sunken Bastion, the
+    // Drowned Temple) share one arm, keyed by OPEN_AIR_FIELDS.
+    const wildheart = body.indexOf('if (field) {');
     expect(wildheart).toBeGreaterThan(-1);
     const wildheartArm = body.slice(wildheart, body.indexOf('return group;', wildheart));
     expect(wildheartArm).toContain(

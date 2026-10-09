@@ -44,11 +44,9 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Das Wildherzbecken',
-    desc: 'Bezeichnende Waffen von Zulgar und dem Fangfürst, Bestienmeister.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Heroisch: Das Wildherzbecken',
-    desc: 'Nur heroisch erhältliche Epics von Zulgar, Stimme des Beckens.',
   },
   conquerors_nythraxis: {
     name: 'Nythraxis-Schlachtzug',

@@ -93,6 +93,7 @@ import {
   createBlobShadowSlot,
 } from './blob_shadow_core';
 import { BlobShadows } from './blob_shadows';
+import { bodyEmoteId } from './body_emote_core';
 import { createBuildLedger } from './build_ledger_core';
 import { BuildRetryGate } from './build_retry_gate';
 import { setBuildSpanSink } from './build_spans';
@@ -197,6 +198,7 @@ import {
   damageCarriesCastRelease,
   damageEventStartsAttackAnimation,
 } from './characters/damage_attack_animation';
+import { type FormRigBuild, syncFormRig } from './characters/form_rig_sync';
 import {
   activeCharacterFormVisual,
   characterFormMaskForAura,
@@ -245,8 +247,6 @@ import {
   CHARACTER_LOD_RANGE_SQ,
   type CharacterLodBands,
   characterLodBandsInto,
-  movingHoldoutActive,
-  showsStaticFarMesh,
 } from './crowd_lod';
 import { groundCueY } from './dais_lift';
 import { buildDawnholdFeatures, type DawnholdFeaturesView } from './dawnhold_features';
@@ -324,6 +324,7 @@ import {
 import { EvilEyeMarkers } from './evil_eye_markers';
 import { enableAndWatchRendererExtensions } from './extension_drift_sentinel';
 import { advanceSelfFacing, releaseSelfFacing, wrapAngle } from './facing_smooth';
+import { latchFarLod } from './far_lod_latch';
 import {
   buildFarTerrain,
   FAR_VISTA_ENTRY_MAX_WAIT_MS,
@@ -338,7 +339,6 @@ import {
   horizonHazePlan,
 } from './far_terrain_core';
 import { buildFarmPatchProps, type FarmBedSeat, FarmPatchVisuals } from './farm_patches';
-import { buildFarshoreFeatures } from './farshore_features';
 import { groundQuestObjectYaw } from './farshore_salvage_assets';
 import { buildFenFeatures, type FenFeaturesView } from './fen_features';
 import { buildFenbridgeTownView, type FenbridgeTownView } from './fenbridge_town';
@@ -382,6 +382,7 @@ import { FrozenOrbFx, handleFrozenOrbSpellfxEvent } from './frozen_orb_fx';
 import { buildGaleFeatures, type GaleFeaturesView } from './gale_features';
 import { buildGardenFeatures, type GardenFeaturesView } from './garden_features';
 import { gardenMazeCameraLift } from './garden_maze_core';
+import { buildGateObject, gateObjectPlan, isStableObjectTransition } from './gate_objects';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { buildGatherNodes, type GatherNodesView, resolveGatherNodePick } from './gather_nodes';
 import {
@@ -418,18 +419,17 @@ import { HillRingVisuals } from './hill_ring';
 import { createHitchFrameAligner } from './hitch_frame_align_core';
 import { HOARD_BODY_IDS, hoardEntrance } from './hoard_entrance';
 import * as hoardValley from './hoard_valley_frame';
+import { paintsOwnBreath } from './hollow_crypt/crypt_creature_fx_core';
 import { buildHollowGates, type HollowGatesView } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
 import {
   buildIgnivarWaterConduit,
   isIgnivarWaterConduitTemplate,
-  isStableIgnivarWaterConduitTransition,
   syncIgnivarWaterConduitVisibility,
 } from './ignivar_conduit';
 import { ignivarBossFacingLocked } from './ignivar_encounter_core';
 import { attachIgnivarModelVfx } from './ignivar_model_vfx';
-import { buildIgnivarRaidGate, ignivarRaidGatePlan } from './ignivar_raid_gate';
 import { buildImpactSite, buildImpactSitePrewarmGroup, type ImpactSiteView } from './impact_site';
 import { deferredPassArms, initialFrameDeferral, type LinkDebt } from './initial_frame_core';
 import { buildInitialSceneCompileUnits, entryCompileTail } from './initial_scene_compile_units';
@@ -509,7 +509,7 @@ import { NecromancyArmyPortalFx, spawnArmyPortalBurstEvent } from './necromancy_
 import { NecromancyGroundFx } from './necromancy_ground_fx';
 import { NeedleOfFateVfx } from './needle_of_fate_vfx';
 import { isNeedleOfFateProjectile } from './needle_of_fate_vfx_core';
-import { POS_EXTRAPOLATION_CAP, remoteEntityAlpha } from './net_interp_core';
+import { remoteEntityAlpha } from './net_interp_core';
 import { buildNightAccents, type NightAccentsView } from './night_accents';
 import { buildNightFeatures, type NightFeaturesView } from './night_features';
 import {
@@ -730,7 +730,7 @@ import {
 import { sceneKeyLightUniform } from './scene_sampling';
 import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
 import { captureRendererScreenshot } from './screenshot_capture';
-import { drapeRingLocalY } from './selection_ring';
+import { drapeRingLocalY, reticleShownUnder } from './selection_ring';
 import {
   createSelfRenderPositionState,
   noteSelfIdentity,
@@ -782,11 +782,13 @@ import {
   lookAtFrozen,
   refreshFrozenWorldMatrix,
 } from './static_matrix';
+import { buildStaticWorldFeatures } from './static_world_features';
 import { buildStationProps } from './stations';
 import { shouldRenderStealthGhost } from './stealth';
 import { createStepSmooth, type StepSmoothState, stepSmoothHeight } from './step_smooth_core';
 import { buildStreetlamps, type StreetlampsView } from './streetlamps';
 import { strideHit } from './stride_audio_core';
+import { bastionShadeGhosted } from './sunken_bastion/bastion_shade_ghost_core';
 import { drapeConeWorld } from './target_cone_debug';
 import { buildTargetConeMesh, type TargetConeMesh } from './target_cone_debug_mesh';
 import {
@@ -845,7 +847,6 @@ import {
 } from './warrior_cast_fx_core';
 import { RecklessSkullPainter } from './warrior_cast_fx_painter';
 import { buildWater, setWaterDayNight, setWaterSunDirection, type WaterView } from './water';
-import { buildWaterFlora } from './water_flora';
 import {
   buildWeaponVfxPrewarmGroup,
   disposeWeaponEmissiveCache,
@@ -2544,16 +2545,15 @@ export class Renderer {
     // The light budget must exist BEFORE any attachZoneFeature call: a static
     // feature that ships glowLights pushes into it during the loop below.
     this.fireLights = props.fireLights;
-    // World-spanning modeled dressing, all static: the Duskfall cave mouths,
-    // lily-and-reed water flora on every temperate lake, and the Farshore's
-    // palm strand. Attached like the per-zone features so the distance cull
-    // applies: the gates and the palm strand have compact footprints of their
-    // own, and water flora registers one cull child per zone.
+    // World-spanning modeled dressing, all static: the Duskfall cave mouths
+    // plus static_world_features.ts (lake flora, the Farshore's palm strand,
+    // the Sanctum's Seal Gate). Attached like the per-zone features so the
+    // distance cull applies: the gates and the palm strand have compact
+    // footprints, and water flora registers one cull child per zone.
     this.hollowGates = buildHollowGates(this.sim.cfg.seed);
     for (const staticFeature of [
       this.hollowGates,
-      buildWaterFlora(this.sim.cfg.seed),
-      buildFarshoreFeatures(this.sim.cfg.seed),
+      ...buildStaticWorldFeatures(this.sim.cfg.seed),
     ]) {
       this.attachZoneFeature(staticFeature);
     }
@@ -4811,6 +4811,10 @@ export class Renderer {
       () => onSettled(compileProof(this.asyncCompileSupported, this.webgl.properties, target)),
     );
 
+  /** buildFormVisual as one stable callback (no per-frame closure). */
+  private readonly buildFormRig: FormRigBuild<Entity, EntityView> = (e, v, key, slot, gate) =>
+    this.buildFormVisual(e, v, key, slot, gate);
+
   /** Build one lazy FORM rig into its view slot. A null build leaves the slot
    *  unset; the shared gate retries after its cooldown. A freshly built form
    *  root is exactly a brand-new rig's materials linking for the first time
@@ -7066,7 +7070,7 @@ export class Renderer {
   }
 
   handleEvent(ev: SimEvent): void {
-    this.riftDeathZoneVisuals?.handleEvent(ev);
+    if (this.riftDeathZoneVisuals?.handleEvent(ev)) return;
     switch (ev.type) {
       case 'castStart': {
         if (ev.ability === 'needle_of_fate') {
@@ -7780,10 +7784,9 @@ export class Renderer {
     // (rift_portal) and the in-rift descent are "entering" portals; the egress is a
     // "leaving" portal. Pylons and the other puzzle props are bespoke procedural
     // bodies (handled in the next branch).
-    const raidGatePlan =
-      e.kind === 'object' ? ignivarRaidGatePlan(e.templateId, e.dungeonId) : null;
+    const raidGatePlan = e.kind === 'object' ? gateObjectPlan(e) : null;
     if (raidGatePlan) {
-      body = buildIgnivarRaidGate(raidGatePlan);
+      body = buildGateObject(raidGatePlan);
       height = raidGatePlan.height;
       objectMesh = body;
     } else if (
@@ -9895,7 +9898,7 @@ export class Renderer {
       const _stealthed = hasStealth;
       const hasSoulRend = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_SOUL_REND);
       const hasRecklessness = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_RECKLESSNESS);
-      const displayScale = e.scale;
+      const displayScale = e.scale * (this.riftDeathZoneVisuals?.bodySwell(e.id) ?? 1);
       if (displayScale !== v.liveScale) {
         v.liveScale = displayScale;
         v.group.scale.setScalar(displayScale);
@@ -9931,15 +9934,6 @@ export class Renderer {
       const ea = isSelf
         ? Math.min(1, alpha)
         : remoteEntityAlpha(now, e.netUpdatedAt, e.netInterval, alpha);
-      const movingFarHoldout = movingHoldoutActive(
-        e.pos,
-        e.prevPos,
-        ea,
-        !isSelf && e.netUpdatedAt !== undefined && e.netInterval !== undefined
-          ? POS_EXTRAPOLATION_CAP
-          : 1,
-        e.vx !== 0 || e.vz !== 0,
-      );
       let wantShadow = true;
       let inProxyBand = false;
       if (isSelf) {
@@ -10000,7 +9994,8 @@ export class Renderer {
             for (const caster of v.objectCasters) (caster as THREE.Mesh).castShadow = wantShadow;
           }
         }
-        if (v.visual) v.isFar = showsStaticFarMesh(d2, lodBands, actionablePose, movingFarHoldout);
+        if (v.visual)
+          v.isFar = latchFarLod(v, e, ea, isSelf, d2, lodBands, actionablePose, this.time);
       }
       // online, entities beyond nameplate range stream below snapshot rate;
       // each interpolates on its own clock so they move smoothly instead of
@@ -10050,7 +10045,7 @@ export class Renderer {
         // strand the object invisible through the whole 80-96yd hysteresis band
         // if the viewer retreats before the rebuild lands.
         if (v.builtTemplateId !== undefined && v.builtTemplateId !== e.templateId) {
-          if (isStableIgnivarWaterConduitTransition(v.builtTemplateId, e.templateId)) {
+          if (isStableObjectTransition(v.builtTemplateId, e.templateId)) {
             v.builtTemplateId = e.templateId;
           } else {
             this.removeView(id);
@@ -10384,16 +10379,9 @@ export class Renderer {
       // the body froze in the chop's windup.
 
       // lazy form visuals, swapped by visibility like the old sheep/bear rigs
-      // (build, compile gate and encounter prewarm all live in buildFormVisual)
-      if (polyed && !v.sheepVisual) this.buildFormVisual(e, v, 'form_sheep', 'sheepVisual', true);
-      if (bear && !v.bearVisual) this.buildFormVisual(e, v, 'form_bear', 'bearVisual', true);
-      if (cat && !v.catVisual) this.buildFormVisual(e, v, 'form_cat', 'catVisual', true);
-      if (travel && !v.travelVisual) {
-        this.buildFormVisual(e, v, 'form_travel', 'travelVisual', true);
-      }
-      if (metamorphForm && !v.metamorphVisual) {
-        this.buildFormVisual(e, v, 'form_metamorph', 'metamorphVisual', false);
-      }
+      // (build, compile gate and encounter prewarm all live in buildFormVisual;
+      // a polymorph slot holding the other animal rebuilds: form_rig_sync.ts)
+      syncFormRig(e, v, requestedForm, this.buildFormRig);
       // A form rig that is still linking is NOT ready: the mask holds the
       // resolved form at 'base', so the BODY stands in and a polymorphed target
       // turns into a sheep a few frames late instead of vanishing for the whole
@@ -10460,10 +10448,9 @@ export class Renderer {
         stealthGhost ||
         e.templateId.startsWith('vision_') ||
         e.ghost || // a released player spirit renders translucent (the ghost run)
-        e.templateId === 'spirit_healer'; // the graveyard angel is an ethereal figure
-      // Duskveil/Smokefade wear the denser stealth fade; every spirit read
-      // (ghost run, ghost wolf, visions, the graveyard angel) keeps the thin
-      // ethereal one. A dead stealther is a spirit first.
+        e.templateId === 'spirit_healer' || // the graveyard angel is an ethereal figure
+        bastionShadeGhosted(e); // a Fog Shade the Fogbeacon's beam pours through
+      // Stealth wears the denser fade; every spirit read keeps the thin one.
       const ghostStyle =
         stealthGhost && !ghostWolf && !e.ghost ? ('stealth' as const) : ('spirit' as const);
       active.setGhost(ghost || veilboundState === 'march', ghostStyle);
@@ -10620,7 +10607,7 @@ export class Renderer {
       // predictor's onGround inside a rift (the predictor samples the same flat
       // ground, so it would still report airborne on the platform).
       const inRift = isRiftPos(ax) && this.sim.riftFloor !== null;
-      if (e.kind === 'player' && e.onGround && !swimming) {
+      if ((e.kind === 'player' || active.flies) && e.onGround && !swimming) {
         // Cached per remote body and resampled on entity_ground_sample_core's
         // cadence; the local player samples every frame as before.
         const standY = sampleStandingSurface(v.groundSample, this.sim, ax, ay, az, dt, isSelf);
@@ -11097,7 +11084,7 @@ export class Renderer {
         mountShown && !v.mountCompilePending && runCharacterPresentation ? this.vfx : null,
       );
 
-      const emoteId = e.kind !== 'npc' && e.overheadEmoteId && !e.dead ? e.overheadEmoteId : null;
+      const emoteId = bodyEmoteId(e);
       const emoteKey = emoteId ? `${emoteId}:${e.overheadEmoteSeq}` : null;
       if (emoteKey !== v.lastOverheadEmoteKey) {
         const canPlayEmote =
@@ -11290,7 +11277,7 @@ export class Renderer {
         ringMat.color.setHex(this.isHostileSelectionTarget(target) ? 0xcc2222 : 0xd4af37);
         if (!this.lowGfx) ringMat.color.multiplyScalar(SELECTION_RING_BOOST); // subtle bloom edge
         ringMat.opacity = 0.78 + 0.2 * Math.sin(this.time * 4.5); // gentle pulse
-        this.selectionRing.visible = true;
+        this.selectionRing.visible = reticleShownUnder(tv.group, this.selectionRing);
       } else {
         this.selectionRing.visible = false;
       }
@@ -11894,8 +11881,8 @@ export class Renderer {
   // props are built), and one that captured them instead would rank a dead
   // array while numPointLights moves, which is the stall this prevents.
   private budgetFireLights(px: number, pz: number, flicker = false): void {
-    // The pass itself lives in fire_light_registry.ts; the renderer only owns
-    // the registries and the clock it reads from.
+    // Open-air fields settle first: the pass (fire_light_registry.ts) ranks the ancestry it sees.
+    this.dungeons?.openAirFields.sync(px, pz);
     runFireLightBudgetPass({
       rank: this.lightRank,
       rankDirty: this.lightRankDirty,

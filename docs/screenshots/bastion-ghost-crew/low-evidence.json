@@ -1,0 +1,151 @@
+{
+  "graphics": "low",
+  "evidence": [
+    {
+      "move": "broadside",
+      "cues": [
+        {
+          "template": "ghost_broadside_lane",
+          "x": 100950,
+          "y": 2,
+          "z": -1342,
+          "yaw": 3.141592653589793,
+          "remaining": 1.1999999999999995,
+          "total": 2.4
+        },
+        {
+          "template": "ghost_broadside_lane",
+          "x": 100945,
+          "y": 2,
+          "z": -1342,
+          "yaw": 3.141592653589793,
+          "remaining": 1.1999999999999995,
+          "total": 2.4
+        },
+        {
+          "template": "ghost_broadside_lane",
+          "x": 100940,
+          "y": 2,
+          "z": -1342,
+          "yaw": 3.141592653589793,
+          "remaining": 1.1999999999999995,
+          "total": 2.4
+        },
+        {
+          "template": "ghost_broadside_lane",
+          "x": 100935,
+          "y": 2,
+          "z": -1342,
+          "yaw": 3.141592653589793,
+          "remaining": 1.1999999999999995,
+          "total": 2.4
+        },
+        {
+          "template": "ghost_broadside_lane",
+          "x": 100930,
+          "y": 2,
+          "z": -1342,
+          "yaw": 3.141592653589793,
+          "remaining": 1.1999999999999995,
+          "total": 2.4
+        },
+        {
+          "template": "ghost_broadside_ship",
+          "x": 100940,
+          "y": 2,
+          "z": -1342,
+          "yaw": 3.141592653589793,
+          "remaining": 1.7999999999999994,
+          "total": 3
+        }
+      ]
+    },
+    {
+      "move": "broadside",
+      "phase": "impact",
+      "cues": [
+        {
+          "template": "ghost_broadside_fire",
+          "remaining": 0.44999999999999996,
+          "total": 0.6
+        },
+        {
+          "template": "ghost_broadside_fire",
+          "remaining": 0.44999999999999996,
+          "total": 0.6
+        },
+        {
+          "template": "ghost_broadside_fire",
+          "remaining": 0.44999999999999996,
+          "total": 0.6
+        },
+        {
+          "template": "ghost_broadside_fire",
+          "remaining": 0.44999999999999996,
+          "total": 0.6
+        },
+        {
+          "template": "ghost_broadside_fire",
+          "remaining": 0.44999999999999996,
+          "total": 0.6
+        },
+        {
+          "template": "ghost_broadside_ship",
+          "remaining": 0.44999999999999996,
+          "total": 3
+        }
+      ]
+    },
+    {
+      "move": "anchor",
+      "cues": [
+        {
+          "template": "ghost_anchor_lane",
+          "x": 100940,
+          "y": 2,
+          "z": -1350,
+          "yaw": 3.141592653589793,
+          "remaining": 0.7999999999999996,
+          "total": 2
+        }
+      ]
+    },
+    {
+      "move": "anchor",
+      "phase": "impact",
+      "cues": [
+        {
+          "template": "ghost_anchor_drag",
+          "remaining": 1.85,
+          "total": 2
+        }
+      ]
+    },
+    {
+      "move": "boarding",
+      "cues": [
+        {
+          "template": "ghost_boarding_lane",
+          "x": 100940,
+          "y": 2,
+          "z": -1350,
+          "yaw": 3.141592653589793,
+          "remaining": 0.7999999999999996,
+          "total": 2
+        }
+      ]
+    },
+    {
+      "move": "boarding",
+      "phase": "impact",
+      "cues": [
+        {
+          "template": "ghost_boarding_slash",
+          "remaining": 0.44999999999999996,
+          "total": 0.6
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

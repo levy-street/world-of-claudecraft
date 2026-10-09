@@ -12,6 +12,7 @@
 // maximum-health amount uses the viewer's live maximum health.
 
 import { TRINKET_EQUIP_LOCKOUT } from '../sim/combat/trinkets';
+import { seedburstDamage, spiritJaguarBite } from '../sim/combat/wildheart_trinkets';
 import {
   GAMBLE,
   type GambleFortune,
@@ -360,6 +361,56 @@ function useEffect(spec: TrinketSpec, u: TrinketUse, viewer: TrinketTooltipViewe
       });
     case 'passiveOnly':
       return '';
+    case 'spiritPack': {
+      // The bite the jaguar would snapshot if called now (combat/
+      // wildheart_trinkets.ts summonSpiritJaguar).
+      const bite = spiritJaguarBite(u, trinketWeaponPower(viewer));
+      return t('hudChrome.trinkets.use.spiritPack', {
+        duration: n(u.duration),
+        min: n(bite.min),
+        max: n(bite.max),
+        every: n(u.attackInterval),
+        range: n(u.range),
+      });
+    }
+    case 'seedburst':
+      return t('hudChrome.trinkets.use.seedburst', {
+        range: n(u.range),
+        delay: n(u.delay),
+        damage: n(seedburstDamage(u, viewer.spellPower, false)),
+        radius: n(u.radius),
+        bonus: pct(u.deathBonus),
+        empowered: n(seedburstDamage(u, viewer.spellPower, true)),
+      });
+    case 'tether':
+      return t('hudChrome.trinkets.use.tether', {
+        range: n(u.range),
+        duration: n(u.duration),
+        share: pct(u.share),
+      });
+    case 'harvest':
+      return t('hudChrome.trinkets.use.harvest', {
+        duration: n(u.duration),
+        radius: n(u.radius),
+        pct: pct(u.restore),
+        health: n(Math.round(viewer.maxHp * u.restore)),
+      });
+    case 'quench':
+      // The bonus frost each charged hit deals (combat/sanctum_trinkets.ts
+      // quenchDamage), against the viewer's live weapon power.
+      return t('hudChrome.trinkets.use.quench', {
+        hits: n(u.hits),
+        duration: n(u.duration),
+        damage: scaled(u.flat, u.coef * trinketWeaponPower(viewer)),
+        slow: pct(u.slow),
+        slowDuration: n(u.slowDuration),
+      });
+    case 'shackle':
+      return t('hudChrome.trinkets.use.shackle', {
+        range: n(u.range),
+        duration: n(u.duration),
+        slow: pct(1 - u.slow),
+      });
     case 'heartNova': {
       const perHeat = u.flat + u.coef * viewer.attackPower;
       const maxHeat = passiveMax(spec);

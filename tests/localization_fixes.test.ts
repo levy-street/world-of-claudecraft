@@ -1332,6 +1332,10 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // at zone expiry (type:'log', telegraph:true). These are the only player-facing
     // emits in this file; re-localized via the sim.rift.detonate* rules.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/locomotion.ts'), 'utf8'),
+    // The landing halves of those bars (the bigCast and breathCone unleashes
+    // lines, the death-zone detonateText) moved to mob_cast_bars.ts: the same
+    // literals, re-localized by the same rules.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/mob_cast_bars.ts'), 'utf8'),
     // Professions 2.0: the fishing command bodies moved out of sim.ts.
     // Three literals have their ONLY emitter occurrences here ("No fish are
     // biting.", "Something golden flashes beneath the surface!", "You need to
@@ -1517,6 +1521,11 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // refusals sit under the drift guard from day one.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/clue_scrolls.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/clue_casket.ts'), 'utf8'),
+    // The trash engine's G3 use (a Soul Brazier toppled with the interact
+    // press): its refusals ("Too far away.", "Line of sight.", "You are
+    // busy.", the dead line) are RETURNED by kitUseRefusal and emitted
+    // through a variable, so only the return-literal scan sees them here.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/trash_kit/encounter_use.ts'), 'utf8'),
   ].join('\n');
   // Hardened S3: also scan the authoritative server's player-facing emits. The
   // server (server/game.ts) is language-agnostic like the sim and re-localized

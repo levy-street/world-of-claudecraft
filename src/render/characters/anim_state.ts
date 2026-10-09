@@ -1,5 +1,6 @@
 import type { LocoState, LocoStrafe } from '../locomotion';
 import type { AuraIdFact } from './aura_idle_core';
+import type { StunAuraFact } from './stun_idle_core';
 
 /** Renderer-derived animation inputs (same facts the old pose machine used). */
 export interface AnimState {
@@ -61,9 +62,59 @@ export interface AnimState {
    *  loop outranks every locomotion and posture state below it. */
   asleep?: boolean;
   /** The body's live aura list, by reference (never copied): a rig whose ClipMap
-   *  names `idleByAura` holds that loop in place of its idle while one rides
-   *  (aura_idle_core.ts). */
-  auras?: readonly AuraIdFact[];
+   *  names `idleByAura` (aura_idle_core.ts) or `stunned` (stun_idle_core.ts) holds
+   *  that loop in place of its idle while one rides. */
+  auras?: readonly (AuraIdFact & StunAuraFact)[];
+  /** Seconds the body's cast bar has run (castTotal - castRemaining), or
+   *  undefined with no bar: a rig with VisualDef.castClipSync locks its
+   *  per-ability cast clip to it (castClipSyncTime). */
+  castElapsed?: number;
+}
+
+/** A cast clip may drift this far (clip seconds) from the bar before it is
+ *  pulled back onto it. */
+export const CAST_CLIP_SYNC_SLACK = 0.12;
+
+/**
+ * Where a bar-locked cast clip should be (VisualDef.castClipSync): the bar's
+ * elapsed time at the clip's rate, when the clip has drifted more than the
+ * slack from it (it entered late behind a swing or a flinch), else null (leave
+ * it). Clamped inside the clip so it never wraps.
+ */
+/**
+ * Whether the cast clip for `ability` is bar-locked (VisualDef.castClipSync):
+ * `true` locks every per-ability cast clip of the rig; a list locks only those
+ * abilities, so a rig can lock a one-off rise to its bar while its channel
+ * loops (Vael's Emerge off the floor beside his looping Hymn).
+ */
+export function castClipSyncs(
+  sync: boolean | readonly string[] | undefined,
+  ability: string | null | undefined,
+): boolean {
+  if (sync === true) return true;
+  if (!sync || !ability) return false;
+  return sync.includes(ability);
+}
+
+/**
+ * Whether a clip takes the rig at full weight at once instead of crossfading
+ * out of the pose before it (ClipMap.castSnapIn): a body whose clip starts out
+ * of sight (under the floor) must never blend its standing pose into the first
+ * frames, or it reads as popping in standing and then dropping.
+ */
+export function clipSnapsIn(snapIn: readonly string[] | undefined, clip: string): boolean {
+  return snapIn?.includes(clip) === true;
+}
+
+export function castClipSyncTime(
+  clipTime: number,
+  castElapsed: number | undefined,
+  rate: number,
+  duration: number,
+): number | null {
+  if (castElapsed === undefined || !Number.isFinite(castElapsed) || duration <= 0) return null;
+  const want = Math.min(duration - 1e-3, Math.max(0, castElapsed * rate));
+  return Math.abs(clipTime - want) > CAST_CLIP_SYNC_SLACK ? want : null;
 }
 
 export type BaseState =

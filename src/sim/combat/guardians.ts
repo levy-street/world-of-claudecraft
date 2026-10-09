@@ -4,9 +4,11 @@ import {
   DT,
   dist2d,
   type Entity,
+  type GuardianAssistMelee,
   type GuardianMelee,
   type GuardianState,
   type MobTemplate,
+  steadyAngleTo,
 } from '../types';
 
 export interface GuardianConfig extends Omit<GuardianState, 'attackTimer'> {
@@ -255,7 +257,7 @@ function dismissFromPost(ctx: SimContext, guardian: Entity, owner: Entity, melee
  * target it walks back to its post. It never scans for enemies of its own. Draws rng
  * only for the damage roll of a landed swing, exactly like the stationary guardians.
  */
-function updateMeleeGuardian(
+function updatePostedMeleeGuardian(
   ctx: SimContext,
   guardian: Entity,
   owner: Entity,
@@ -332,4 +334,78 @@ function updateMeleeGuardian(
     false,
   );
   return ctx.entities.has(guardian.id);
+}
+
+/** How close a melee guardian with no target keeps to its owner. */
+const MELEE_GUARDIAN_HEEL = 3;
+
+/** A melee guardian (GuardianState.melee): it assists its owner's current
+ *  hostile target (else its preferred one, else the nearest enemy), runs to it
+ *  and bites in melee reach on its attack interval. With no target it runs back
+ *  to its owner's side. No rng beyond the bite's own damage roll. */
+function updateAssistMeleeGuardian(
+  ctx: SimContext,
+  guardian: Entity,
+  owner: Entity,
+  state: GuardianState,
+  melee: GuardianAssistMelee,
+): boolean {
+  const assist = owner.targetId === null ? null : (ctx.entities.get(owner.targetId) ?? null);
+  if (assist && !assist.dead && ctx.isHostileTo(owner, assist)) state.preferredTargetId = assist.id;
+  // The swing timer winds down while it runs, so it bites on arrival.
+  state.attackTimer = Math.max(0, state.attackTimer - DT);
+  const target = guardianTarget(ctx, guardian, owner);
+  if (!target) {
+    if (state.dismissWhenUntargeted) {
+      dismissGuardian(ctx, guardian);
+      return false;
+    }
+    if (dist2d(guardian.pos, owner.pos) > MELEE_GUARDIAN_HEEL)
+      ctx.moveToward(guardian, owner.pos, melee.moveSpeed, true);
+    return true;
+  }
+  if (dist2d(guardian.pos, target.pos) > melee.reach) {
+    // A spirit runs straight through brush and shallows to its prey.
+    ctx.moveToward(guardian, target.pos, melee.moveSpeed, true);
+    return true;
+  }
+  guardian.facing = steadyAngleTo(guardian.pos, target.pos, guardian.facing);
+  if (state.attackTimer > 0) return true;
+  state.attackTimer = state.attackInterval;
+  ctx.dealDamage(
+    guardian,
+    target,
+    ctx.rng.range(state.minDamage, state.maxDamage),
+    false,
+    state.school,
+    state.abilityName,
+    'hit',
+    true,
+    undefined,
+    true,
+    false,
+    false,
+    state.abilityId,
+    false,
+  );
+  return ctx.entities.has(guardian.id);
+}
+
+/**
+ * One tick of a walking melee guardian, by shape: a POSTED one (GuardianMelee, with a
+ * leash: the Muster Standard's soldiers) holds or follows its post and fights only its
+ * owner's target; an ASSIST one (GuardianAssistMelee: the Wildheart spirit jaguar)
+ * assists its owner's target, else its preferred one, else the nearest enemy, and
+ * heels to its owner. Each arm is its branch's own code, unchanged.
+ */
+function updateMeleeGuardian(
+  ctx: SimContext,
+  guardian: Entity,
+  owner: Entity,
+  state: GuardianState,
+  melee: NonNullable<GuardianState['melee']>,
+): boolean {
+  return 'leash' in melee
+    ? updatePostedMeleeGuardian(ctx, guardian, owner, state, melee)
+    : updateAssistMeleeGuardian(ctx, guardian, owner, state, melee);
 }

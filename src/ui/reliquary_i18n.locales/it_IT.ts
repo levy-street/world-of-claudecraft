@@ -44,11 +44,9 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Il Bacino di Wildheart',
-    desc: 'Armi distintive di Zulgar e del Domabestie Signore delle Zanne.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Eroico: Il Bacino di Wildheart',
-    desc: 'Epici esclusivi della modalità eroica di Zulgar, Voce del Bacino.',
   },
   conquerors_nythraxis: {
     name: 'Raid di Nythraxis',

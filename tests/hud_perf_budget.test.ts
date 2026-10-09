@@ -813,6 +813,37 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.innerHTML': 1, '.setAttribute': 2 },
     reflowAllow: {},
   },
+  // The Iron Cage escape prompt (hud/dungeon/) builds its self-mounted button
+  // skeleton ONCE (seven construction-only class assignments and the progress
+  // bar's three build-time role/range attributes); every per-frame value
+  // (texts, the fill width, the live aria values) rides the elided writers.
+  {
+    file: 'hud/dungeon/cage_escape_painter.ts',
+    allow: { '.className': 7, '.setAttribute': 3 },
+    reflowAllow: {},
+  },
+  // Gaoler Ossick's chain alert (hud/dungeon/) builds its self-mounted panel
+  // skeleton ONCE in ensureRoot (seven construction-only class assignments: the
+  // root, title, links-left count, line, hint, bar and fill; plus the progress
+  // bar's three build-time role/range attributes); every per-frame value (the
+  // kind classes, texts, the count and hint visibility, the fill width, the
+  // live aria values) rides the elided writers.
+  {
+    file: 'hud/dungeon/gaol_chain_painter.ts',
+    allow: { '.className': 7, '.setAttribute': 3 },
+    reflowAllow: {},
+  },
+  // The shared encounter alert (hud/dungeon/, the Wildheart Basin's and the
+  // Gravewyrm Sanctum's) builds its self-mounted button skeleton ONCE (eight
+  // construction-only class assignments and the progress bar's three
+  // build-time role/range attributes); every per-frame value (the kind
+  // classes, texts, the hint, the fill width, the live aria values) rides the
+  // elided writers.
+  {
+    file: 'hud/dungeon/encounter_alert_painter.ts',
+    allow: { '.className': 8, '.setAttribute': 3 },
+    reflowAllow: {},
+  },
   // The bg kill feed rebuilds its tiny stack in ONE innerHTML write, on a
   // death or an expiry only (the per-frame update elides on the pure core's
   // reference equality); the setAttribute runs once at mount.
@@ -895,6 +926,9 @@ const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
   // caller's clock; like minimap it caches its one --color-daynight-* resolve
   { file: 'day_night_dial_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'dungeon_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
+  // the painted plate of an authored open-air field (the Sunken Bastion, the Hollow
+  // Crypt): rasterised once per field, caching its one --color-field-map-* resolve
+  { file: 'field_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'lastkeep_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'map_window_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'minimap_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },

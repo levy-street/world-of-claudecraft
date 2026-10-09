@@ -20,6 +20,9 @@ export interface PooledCharacterVisual extends PoolableVisual {
   /** The visual is parked: it lets go of what it was still waiting on for a body nobody
    *  sees any more (a queued far bake). */
   parked?(): void;
+  /** Forget per-entity presentation state (a glow pulse, a turn in progress,
+   *  an entrance already played) so the next entity starts clean. */
+  resetForReuse?(): void;
 }
 
 /** What the renderer supplies, read at call time (the gate is a renderer
@@ -57,6 +60,7 @@ export class PooledVisualLifecycle<V extends PooledCharacterVisual> {
     if (!visual) return null;
     resetPooledRoot(visual.root, true);
     visual.clearElementResponse?.();
+    visual.resetForReuse?.();
     visual.setFar(false);
     visual.setGhost(false);
     // Re-tint BEFORE the gate goes in: a tint is a uniform on programs the
@@ -78,6 +82,7 @@ export class PooledVisualLifecycle<V extends PooledCharacterVisual> {
     resetPooledRoot(visual.root, false);
     visual.clearElementResponse?.();
     visual.parked?.();
+    visual.resetForReuse?.();
     this.pool.store(key, visual, this.host.maxPooled());
   }
 }

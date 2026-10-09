@@ -30,6 +30,7 @@ import { renderLayerDisabled } from '../render_dev_flags';
 import { applyRiggedWornDetail, applySurfaceDetail } from '../worn_stone';
 import { type ArmorDyeSpec, attachArmorDye } from './armor_dye';
 import { backGripFor, slotToChestScale } from './back_grips';
+import { applyClipPositionDrops, applyClipTrackDrops } from './clip_track_drops';
 import { applyEnvSheen } from './env_sheen';
 import {
   type HandGrip,
@@ -106,7 +107,9 @@ import { characterMeshCastsShadow } from './shadow_policy';
 import { prepareShardpikeThrowClip } from './shardpike_throw_clip';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
 import { optimizeSkinGpuLayout } from './skin_gpu_layout';
+import { notePosedCullCentre } from './skinned_cull_bounds';
 import { primeSkinnedSortSpheres } from './skinned_sort_spheres';
+import { applySmoothNormals } from './smooth_normals';
 import { bakeStaticPose, farBakeGroupKey } from './static_pose_bake';
 import { buildStubbleDecal, headNodeName } from './stubble';
 import { TINTED_MATERIAL_IDLE_CACHE_MAX, TintedMaterialCache } from './tinted_material_cache_core';
@@ -2091,6 +2094,9 @@ export function assembleModel(
       wocVisibleParts(manifest, wocDefaultAppearance(manifest), wocDefaultWorn(manifest)),
     );
   }
+  // A faceted rig shaded smooth (VisualDef.smoothNormals), before anything
+  // measures or bakes it.
+  if (def.smoothNormals !== undefined) applySmoothNormals(root, def.smoothNormals);
   // Two-state prop mobs (the dragonkin egg) ship BOTH state meshes at the
   // origin: seed the ALIVE state (hide the corpse shell); CharacterVisual's
   // enterDeath/revive flip it (created-already-dead corpses flip on their
@@ -2894,6 +2900,17 @@ export const PALADIN_SYNTHESIZED_CLIP_SOURCES: Readonly<Record<string, string>> 
   [PALADIN_BASTION_SWEEP_CLIP]: '1H_Melee_Attack_Slice_Diagonal',
 };
 
+/** Every visual key whose clip map names the synthesized paladin clips: the
+ *  classic and modular paladin, plus the Drowned Temple's paladin Reflection
+ *  (manifest.ts copies the class def, attackByAbility included). */
+export function synthesizesPaladinClips(key: string): boolean {
+  return (
+    key === 'player_paladin' ||
+    key === modularVisualKey('paladin') ||
+    key === 'temple_reflection_paladin'
+  );
+}
+
 /** Test-only observation window into the shared tinted-material cache. */
 export const tintedMaterialInternalsForTest = {
   cacheSize: (): number => matCache.size,
@@ -2912,12 +2929,13 @@ export function prepareVisual(key: string): PreparedVisual {
   for (const url of def.animUrls ?? []) {
     for (const clip of resolvedGltf(url).animations) clips.set(clip.name, clip);
   }
-  // The modular paladin mirrors the classic clip map (attackByAbility includes
-  // the synthesized Verdict and Sweep names), so it needs the same synthesis:
-  // its animUrls lead with the class GLB, which supplies both source clips.
+  // The modular paladin and the paladin Reflection mirror the classic clip map
+  // (attackByAbility includes the synthesized Verdict and Sweep names), so they
+  // need the same synthesis: the modular animUrls lead with the class GLB, and
+  // the Reflection draws the class GLB itself, which supplies both sources.
   // The WOC paladin body ships its own vocabulary and no KayKit source clips:
-  // the synthesis is the KayKit paladin's (and its modular derivative's).
-  if ((key === 'player_paladin' || key === modularVisualKey('paladin')) && !def.wocCharacter) {
+  // the synthesis is the KayKit paladin's (and its derivatives').
+  if (synthesizesPaladinClips(key) && !def.wocCharacter) {
     const verdictBase = clips.get(PALADIN_SYNTHESIZED_CLIP_SOURCES[PALADIN_TEMPLARS_VERDICT_CLIP]);
     if (!verdictBase) throw new Error('Paladin Templar Verdict requires 2H_Melee_Attack_Chop');
     clips.set(PALADIN_TEMPLARS_VERDICT_CLIP, createPaladinTemplarsVerdictClip(verdictBase));
@@ -2928,6 +2946,8 @@ export function prepareVisual(key: string): PreparedVisual {
     clips.set(PALADIN_BASTION_SWEEP_CLIP, createPaladinBastionSweepClip(sweepBase));
   }
 
+  applyClipTrackDrops(clips, def.clipTrackDrops);
+  applyClipPositionDrops(clips, def.clipPositionDrops);
   // These prepared gestures use KayKit axes and cannot bind to the WOC rig.
   if (!def.wocCharacter) {
     prepareWarriorAbilityClips(key, clips, def.clips.attackByAbility);
@@ -2982,6 +3002,7 @@ export function prepareVisual(key: string): PreparedVisual {
   // body bounds from the skinned meshes only (weapons would skew the height);
   // a WOC body also counts its rigid anatomy parts, never a held prop
   const bounds = new THREE.Box3();
+  const local = new THREE.Box3();
   const v = new THREE.Vector3();
   temp.traverse((o) => {
     const mesh = o as THREE.Mesh;
@@ -2990,12 +3011,17 @@ export function prepareVisual(key: string): PreparedVisual {
     if (!sm.isSkinnedMesh && !(def.wocCharacter && !mesh.userData.weaponMesh)) return;
     const pos = mesh.geometry.getAttribute('position') as THREE.BufferAttribute | undefined;
     if (!pos) return;
+    // The posed centre in the mesh's own space too: the cull sphere's centre
+    // (skinned_cull_bounds.ts; a quantized rig's geometry centre is not it).
+    local.makeEmpty();
     for (let i = 0; i < pos.count; i++) {
       v.fromBufferAttribute(pos, i);
       if (sm.isSkinnedMesh) sm.applyBoneTransform(i, v);
+      local.expandByPoint(v);
       v.applyMatrix4(mesh.matrixWorld);
       bounds.expandByPoint(v);
     }
+    if (!local.isEmpty()) notePosedCullCentre(sm.geometry, local.getCenter(v));
   });
   // where the bare body ends: the stand-in's head starts there (woc_shadow_stand_in.ts)
   const wocNeckTop = bounds.max.y;
@@ -3249,6 +3275,10 @@ function farBakeMeshes(root: THREE.Object3D): THREE.Mesh[] {
   root.traverse((o) => {
     const mesh = o as THREE.Mesh;
     if (!mesh.isMesh || mesh.userData.faceDecal) return;
+    // An authored opt-out (glTF node extras `farBake: false`): a translucent,
+    // vertex-alpha part (Morthen's soul smoke) has no faithful frozen form, since the
+    // bake keeps no vertex colour; far away it is dropped, not drawn as a dark shell.
+    if (mesh.userData.farBake === false) return;
     if (!meshChainVisible(mesh, root)) return;
     if (!mesh.geometry?.getAttribute('position')) return;
     out.push(mesh);

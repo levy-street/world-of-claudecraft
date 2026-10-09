@@ -1,14 +1,19 @@
 // The premature-boss-pull punish (src/sim/instances/boss_chain_pull.ts), opted
 // into by DungeonDef.bossChainPull and live only in the Wildheart Basin.
 //
-// The basin is an open field with two routes to the shrine, so running past
-// every pack to pull Zulgar alone is trivial there in a way it is not in a
-// corridor dungeon. With the flag on, pulling him while ANY of the route is
-// still alive sends the whole instance at the puller at once.
+// The basin is an open field with two wings, so running past every pack to
+// pull Zulgar alone was trivial there in a way it is not in a corridor
+// dungeon. The rework (docs/design/dungeon-rework/wildheart_basin.md) gates
+// every pack (instances/dungeon_gates.ts), and keeps this as the belt and
+// braces: pulling him while ANY of the route is still alive sends the whole
+// instance at the puller at once. The arrival cases below open the gates the
+// way a dev walk does, since a closed gate is exactly what keeps a far pack
+// from crossing the basin in play.
 
 import { describe, expect, it } from 'vitest';
 import { BUILTIN_WORLD, DUNGEONS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { setDungeonGatesDevOpen } from '../src/sim/instances/dungeon_gates';
 import { enterDungeon } from '../src/sim/instances/dungeons';
 import {
   CHAIN_PULL_ARRIVAL_MARGIN,
@@ -57,6 +62,21 @@ function claim(dungeonId: string, finalBossId: string): Claimed {
 // Stand the puller at the shrine, where a group that ran the route past every
 // pack actually pulls Zulgar from. claim() leaves the player at the entrance
 // ~210 yards away, which is not where this mechanic is exercised in play.
+/** The packs on the Upper Convergence and the Shrine Stair: the ones a premature
+ *  Zulgar pull meets on the pyramid, with an open stair between them and him. */
+const NORTH_PACKS = new Set(['g10', 'g11', 'g12', 'g13', 'pd']);
+
+/** The pack id a claimed mob was placed with (the claim's roster runs in
+ *  spawn order, one mob per DungeonSpawn). */
+function packOf(instance: InstanceSlot, mob: Entity): string | undefined {
+  const i = instance.mobIds.indexOf(mob.id);
+  return i < 0 ? undefined : DUNGEONS.wildheart_basin.spawns[i]?.packId;
+}
+
+function northOf(instance: InstanceSlot, others: Entity[]): Entity[] {
+  return others.filter((m) => NORTH_PACKS.has(packOf(instance, m) ?? ''));
+}
+
 function standAtShrine(sim: Sim, player: Entity, boss: Entity): void {
   player.pos = sim.ctx.groundPos(boss.pos.x, boss.pos.z - 8);
   player.prevPos = { ...player.pos };
@@ -75,18 +95,27 @@ function tickWithImmortalPuller(sim: Sim, player: Entity, ticks: number): void {
 
 describe('Wildheart Basin premature boss pull', () => {
   it('opts in through content, not through a hardcoded dungeon id in sim logic', () => {
-    expect(DUNGEONS.wildheart_basin.bossChainPull).toBe(true);
+    // Wildheart and the open-air five-player reworks opt in (README section 2,
+    // docs/design/dungeon-rework: bossChainPull stays on everywhere).
+    const OPTED_IN = new Set([
+      'wildheart_basin',
+      'hollow_crypt',
+      'sunken_bastion',
+      'drowned_temple',
+      'gravewyrm_sanctum',
+    ]);
+    for (const id of OPTED_IN) expect(DUNGEONS[id].bossChainPull, id).toBe(true);
     // Every other dungeon keeps classic pull behavior.
     for (const dungeon of Object.values(DUNGEONS)) {
-      if (dungeon.id === 'wildheart_basin') continue;
+      if (OPTED_IN.has(dungeon.id)) continue;
       expect(dungeon.bossChainPull, dungeon.id).toBeUndefined();
     }
   });
 
   it('sends every living mob in the instance at the puller when Zulgar is pulled early', () => {
     const { sim, player, boss, others } = claim('wildheart_basin', 'wildheart_high_priest');
-    // The whole authored route is standing: 20 spawns, so 19 besides Zulgar.
-    expect(others.length).toBe(19);
+    // The whole authored route is standing: every spawn besides Zulgar.
+    expect(others.length).toBe(DUNGEONS.wildheart_basin.spawns.length - 1);
     for (const mob of others) expect(mob.aiState).toBe('idle');
 
     sim.aggroMob(boss, player, false);
@@ -132,22 +161,40 @@ describe('Wildheart Basin premature boss pull', () => {
     }
   });
 
-  it('lands every pulled mob on the puller, from the entrance packs to the shrine', () => {
-    const { sim, player, boss, others } = claim('wildheart_basin', 'wildheart_high_priest');
+  it('lands every pulled mob of the pyramid on the puller, down the open stair', () => {
+    const { sim, instance, player, boss, others } = claim(
+      'wildheart_basin',
+      'wildheart_high_priest',
+    );
+    setDungeonGatesDevOpen(instance, true);
     standAtShrine(sim, player, boss);
 
     sim.aggroMob(boss, player, false);
-    // 170 yards at chase speed is about 23 seconds; 60 leaves real headroom.
+    // 100 yards at chase speed is about 14 seconds; 60 leaves real headroom.
     tickWithImmortalPuller(sim, player, 20 * 60);
+    // The Basin trash moves its quarry (a Spore Toad's Snaring Tongue reels
+    // the puller up to about 1.8 s, a Dread Totem's fear runs them 2 s), so
+    // the pack can be mid-step on any one tick: give it up to 5 s to settle
+    // back onto the puller before reading the snapshot.
+    for (let i = 0; i < 20 * 5; i++) {
+      if (northOf(instance, others).every((m) => m.aiState === 'attack')) break;
+      tickWithImmortalPuller(sim, player, 1);
+    }
 
-    for (const mob of others) {
+    const north = northOf(instance, others);
+    expect(north.length).toBeGreaterThanOrEqual(15);
+    for (const mob of north) {
       expect(mob.aiState, `${mob.templateId} ${mob.id}`).toBe('attack');
       expect(mob.aggroTargetId, `${mob.templateId} ${mob.id}`).toBe(player.id);
     }
   });
 
   it('spends the transit grace on arrival and keeps the pull anchored at the pull point', () => {
-    const { sim, player, boss, others } = claim('wildheart_basin', 'wildheart_high_priest');
+    const { sim, instance, player, boss, others } = claim(
+      'wildheart_basin',
+      'wildheart_high_priest',
+    );
+    setDungeonGatesDevOpen(instance, true);
     standAtShrine(sim, player, boss);
     const pullPoint = { ...player.pos };
 
@@ -156,7 +203,7 @@ describe('Wildheart Basin premature boss pull', () => {
 
     // Arrived means anchored again: the transit grace is spent and the anchor
     // still reads the pull point (the hold below is what keeps the pull now).
-    for (const mob of others) {
+    for (const mob of northOf(instance, others)) {
       expect(mob.chainPullInbound, `${mob.templateId} ${mob.id}`).toBe(false);
       expect(mob.leashAnchor, `${mob.templateId} ${mob.id}`).toEqual(pullPoint);
       expect(dist2d(mob.pos, pullPoint), `${mob.templateId} ${mob.id}`).toBeLessThanOrEqual(
@@ -215,7 +262,10 @@ describe('Wildheart Basin premature boss pull', () => {
   });
 
   it('never fires for a mob that is not the boss', () => {
-    const { sim, player, boss, others } = claim('wildheart_basin', 'wildheart_high_priest');
+    const { sim, instance, player, boss, others } = claim(
+      'wildheart_basin',
+      'wildheart_high_priest',
+    );
     const trash = others.find((m) => m.templateId === 'wildheart_ravager');
     if (!trash) throw new Error('no ravager spawned');
 
@@ -223,18 +273,23 @@ describe('Wildheart Basin premature boss pull', () => {
 
     expect(trash.aiState).toBe('chase');
     expect(boss.aiState).toBe('idle');
-    // Everything else stays asleep: a trash pull is still a local pull.
+    // Everything else stays asleep: a trash pull is still a local pull (its
+    // own pack comes with it, nothing more).
+    const pack = others.filter((m) => packOf(instance, m) === packOf(instance, trash));
     const stillIdle = others.filter((m) => m.id !== trash.id && m.aiState === 'idle');
-    expect(stillIdle.length).toBe(others.length - 1);
+    expect(stillIdle.length).toBe(others.length - pack.length);
   });
 
-  it('leaves a dungeon that did not opt in on classic boss-pull behavior', () => {
+  it('wakes the whole Gravewyrm Sanctum too now that its Ice Tomb rework opts in', () => {
     const { sim, player, boss, others } = claim('gravewyrm_sanctum', 'korzul_the_gravewyrm');
 
     sim.aggroMob(boss, player, false);
 
     expect(boss.aiState).toBe('chase');
-    for (const mob of others) expect(mob.aiState, mob.templateId).toBe('idle');
+    for (const mob of others) {
+      expect(mob.aiState, mob.templateId).toBe('chase');
+      expect(mob.aggroTargetId, mob.templateId).toBe(player.id);
+    }
   });
 
   it('draws no rng, so the shared draw order and the parity goldens are unaffected', () => {

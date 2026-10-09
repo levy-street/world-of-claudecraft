@@ -14,10 +14,10 @@ import {
 } from '../sim/ignivar_arena';
 import { loadTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { CAMERA_RELATIVE_GLSL } from './camera_relative_glsl';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { sharedUniforms } from './gfx';
 import { markSharedGeometry, markSharedMaterial, markSharedTexture } from './shared_resource';
-
 export const IGNIVAR_LAVA_MOAT_NAME = 'ignivarLavaMoat';
 export const IGNIVAR_LAVA_COLOR_URL = '/textures/encounters/ignivar/ignivar_lava_original.webp';
 
@@ -84,7 +84,7 @@ function lavaMaterial(textures: IgnivarLavaMoatTextures, lowGfx: boolean): THREE
         uIntensity: { value: lowGfx ? 1.04 : 1.24 },
         uFlowStrength: { value: lowGfx ? 0.055 : 0.095 },
       },
-      vertexShader: /* glsl */ `
+      vertexShader: /* glsl */ `${CAMERA_RELATIVE_GLSL}
         uniform float uTime;
         varying vec2 vLavaUv;
         varying vec3 vWorldPosition;
@@ -100,7 +100,7 @@ function lavaMaterial(textures: IgnivarLavaMoatTextures, lowGfx: boolean): THREE
           vLavaUv = position.xz * 0.065;
           vec4 worldPosition = modelMatrix * vec4(pos, 1.0);
           vWorldPosition = worldPosition.xyz;
-          vec4 mvPosition = viewMatrix * worldPosition;
+          vec4 mvPosition = wocCamRelView(worldPosition.xyz);
           gl_Position = projectionMatrix * mvPosition;
           #include <fog_vertex>
         }

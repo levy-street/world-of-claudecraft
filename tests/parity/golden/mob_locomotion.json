@@ -5,7 +5,7 @@
   "ticks": 0,
   "coverage": [
     "attack arm aoePulse rng.range(pulse.min,pulse.max) + spellfx (mogger Ground Pound)",
-    "attack arm War Stomp rng.range(stomp.min,stomp.max) + stomp_stun aura (korgath)",
+    "attack arm War Stomp rng.range(stomp.min,stomp.max) + stomp_stun aura (ossuary_sentinel: the Korgath Stomp moved into his encounter)",
     "attack arm Banshee terrify rng.range(-PI,PI) fear facing + fear_incap aura on the non-tank bystander; the aggro target is exempt (sister_nhalia)",
     "idle arm wander draws (range(0,2PI) heading + range(2,9) radius -> groundPos wanderTarget)",
     "evade arm arrival -> resetEvadingMob (rng.range(2,8), full-heal, clearThreat, telegraph re-arm)",
@@ -369,8 +369,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 1015,
-      "state": "9bdaad92",
-      "events": "c80e1c6e",
+      "state": "05e08cdc",
+      "events": "a55a00d1",
       "rng": {
         "draws": 10,
         "digest": "c8a57c95"
@@ -400,7 +400,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 183
+            "damageTaken": 100
           },
           "craftDaily": {},
           "craftSkills": {},
@@ -478,7 +478,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 44
+            "damageTaken": 26
           },
           "craftDaily": {},
           "craftSkills": {},
@@ -555,7 +555,7 @@
               "duration": 1.5,
               "id": "stomp_stun",
               "kind": "stun",
-              "name": "Shuddering Stomp",
+              "name": "Bone Rattle",
               "remaining": 1.5,
               "school": "physical",
               "sourceId": 1014
@@ -570,7 +570,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "healPower": 5,
-          "hp": 999870,
+          "hp": 999953,
           "id": 1011,
           "inCombat": true,
           "kind": "player",
@@ -589,7 +589,7 @@
             "z": -58
           },
           "potionCooldownUntil": -1,
-          "resource": 16.866667,
+          "resource": 16.179167,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
@@ -620,7 +620,7 @@
               "duration": 1.5,
               "id": "stomp_stun",
               "kind": "stun",
-              "name": "Shuddering Stomp",
+              "name": "Bone Rattle",
               "remaining": 1.5,
               "school": "physical",
               "sourceId": 1014
@@ -633,7 +633,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "healPower": 13,
-          "hp": 999970,
+          "hp": 999988,
           "id": 1012,
           "inCombat": true,
           "kind": "player",
@@ -731,14 +731,14 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 2171,
+          "hp": 570,
           "id": 1014,
           "inCombat": true,
           "kind": "mob",
-          "level": 20,
+          "level": 8,
           "lootFfaTimer": "Infinity",
-          "maxHp": 2171,
-          "moveSpeed": 7,
+          "maxHp": 570,
+          "moveSpeed": 6,
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -754,15 +754,15 @@
             "z": -58
           },
           "stats": {
-            "armor": 570
+            "armor": 154
           },
           "stompTimer": 12,
-          "swingTimer": 2.8,
-          "templateId": "korgath_the_bound",
+          "swingTimer": 2.6,
+          "templateId": "ossuary_sentinel",
           "weapon": {
-            "max": 130,
-            "min": 83,
-            "speed": 2.8
+            "max": 48,
+            "min": 31,
+            "speed": 2.6
           }
         }
       ]
@@ -771,7 +771,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1016,
-      "state": "ac5e1820",
+      "state": "bd320af5",
       "events": "a9db2371",
       "rng": {
         "draws": 13,
@@ -802,7 +802,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 183
+            "damageTaken": 100
           },
           "craftDaily": {},
           "craftSkills": {},
@@ -880,7 +880,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 44
+            "damageTaken": 26
           },
           "craftDaily": {},
           "craftSkills": {},
@@ -957,7 +957,7 @@
               "duration": 1.5,
               "id": "stomp_stun",
               "kind": "stun",
-              "name": "Shuddering Stomp",
+              "name": "Bone Rattle",
               "remaining": 1.5,
               "school": "physical",
               "sourceId": 1014
@@ -991,7 +991,7 @@
             "z": -58
           },
           "potionCooldownUntil": -1,
-          "resource": 16.866667,
+          "resource": 16.179167,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
@@ -1022,7 +1022,7 @@
               "duration": 1.5,
               "id": "stomp_stun",
               "kind": "stun",
-              "name": "Shuddering Stomp",
+              "name": "Bone Rattle",
               "remaining": 1.5,
               "school": "physical",
               "sourceId": 1014
@@ -1144,14 +1144,14 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 2171,
+          "hp": 570,
           "id": 1014,
           "inCombat": true,
           "kind": "mob",
-          "level": 20,
+          "level": 8,
           "lootFfaTimer": "Infinity",
-          "maxHp": 2171,
-          "moveSpeed": 7,
+          "maxHp": 570,
+          "moveSpeed": 6,
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -1167,15 +1167,15 @@
             "z": -58
           },
           "stats": {
-            "armor": 570
+            "armor": 154
           },
           "stompTimer": 12,
-          "swingTimer": 2.8,
-          "templateId": "korgath_the_bound",
+          "swingTimer": 2.6,
+          "templateId": "ossuary_sentinel",
           "weapon": {
-            "max": 130,
-            "min": 83,
-            "speed": 2.8
+            "max": 48,
+            "min": 31,
+            "speed": 2.6
           }
         },
         {
@@ -1231,7 +1231,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1017,
-      "state": "88feb0a3",
+      "state": "e345de6e",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -1262,7 +1262,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 183
+            "damageTaken": 100
           },
           "craftDaily": {},
           "craftSkills": {},
@@ -1340,7 +1340,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 44
+            "damageTaken": 26
           },
           "craftDaily": {},
           "craftSkills": {},
@@ -1417,7 +1417,7 @@
               "duration": 1.5,
               "id": "stomp_stun",
               "kind": "stun",
-              "name": "Shuddering Stomp",
+              "name": "Bone Rattle",
               "remaining": 1.5,
               "school": "physical",
               "sourceId": 1014
@@ -1451,7 +1451,7 @@
             "z": -58
           },
           "potionCooldownUntil": -1,
-          "resource": 16.866667,
+          "resource": 16.179167,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
@@ -1482,7 +1482,7 @@
               "duration": 1.5,
               "id": "stomp_stun",
               "kind": "stun",
-              "name": "Shuddering Stomp",
+              "name": "Bone Rattle",
               "remaining": 1.5,
               "school": "physical",
               "sourceId": 1014
@@ -1604,14 +1604,14 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 2171,
+          "hp": 570,
           "id": 1014,
           "inCombat": true,
           "kind": "mob",
-          "level": 20,
+          "level": 8,
           "lootFfaTimer": "Infinity",
-          "maxHp": 2171,
-          "moveSpeed": 7,
+          "maxHp": 570,
+          "moveSpeed": 6,
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -1627,15 +1627,15 @@
             "z": -58
           },
           "stats": {
-            "armor": 570
+            "armor": 154
           },
           "stompTimer": 12,
-          "swingTimer": 2.8,
-          "templateId": "korgath_the_bound",
+          "swingTimer": 2.6,
+          "templateId": "ossuary_sentinel",
           "weapon": {
-            "max": 130,
-            "min": 83,
-            "speed": 2.8
+            "max": 48,
+            "min": 31,
+            "speed": 2.6
           }
         },
         {
@@ -1739,7 +1739,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1018,
-      "state": "2a1cad7f",
+      "state": "6e55114e",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -1770,7 +1770,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 183
+            "damageTaken": 100
           },
           "craftDaily": {},
           "craftSkills": {},
@@ -1848,7 +1848,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 44
+            "damageTaken": 26
           },
           "craftDaily": {},
           "craftSkills": {},
@@ -1925,7 +1925,7 @@
               "duration": 1.5,
               "id": "stomp_stun",
               "kind": "stun",
-              "name": "Shuddering Stomp",
+              "name": "Bone Rattle",
               "remaining": 1.5,
               "school": "physical",
               "sourceId": 1014
@@ -1959,7 +1959,7 @@
             "z": -58
           },
           "potionCooldownUntil": -1,
-          "resource": 16.866667,
+          "resource": 16.179167,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
@@ -1990,7 +1990,7 @@
               "duration": 1.5,
               "id": "stomp_stun",
               "kind": "stun",
-              "name": "Shuddering Stomp",
+              "name": "Bone Rattle",
               "remaining": 1.5,
               "school": "physical",
               "sourceId": 1014
@@ -2112,14 +2112,14 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 2171,
+          "hp": 570,
           "id": 1014,
           "inCombat": true,
           "kind": "mob",
-          "level": 20,
+          "level": 8,
           "lootFfaTimer": "Infinity",
-          "maxHp": 2171,
-          "moveSpeed": 7,
+          "maxHp": 570,
+          "moveSpeed": 6,
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -2135,15 +2135,15 @@
             "z": -58
           },
           "stats": {
-            "armor": 570
+            "armor": 154
           },
           "stompTimer": 12,
-          "swingTimer": 2.8,
-          "templateId": "korgath_the_bound",
+          "swingTimer": 2.6,
+          "templateId": "ossuary_sentinel",
           "weapon": {
-            "max": 130,
-            "min": 83,
-            "speed": 2.8
+            "max": 48,
+            "min": 31,
+            "speed": 2.6
           }
         },
         {
@@ -2290,7 +2290,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1019,
-      "state": "892b6852",
+      "state": "a6b4429b",
       "events": "d6509a1f",
       "rng": {
         "draws": 16,
@@ -2321,7 +2321,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 183
+            "damageTaken": 100
           },
           "craftDaily": {},
           "craftSkills": {},
@@ -2399,7 +2399,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 44
+            "damageTaken": 26
           },
           "craftDaily": {},
           "craftSkills": {},
@@ -2476,7 +2476,7 @@
               "duration": 1.5,
               "id": "stomp_stun",
               "kind": "stun",
-              "name": "Shuddering Stomp",
+              "name": "Bone Rattle",
               "remaining": 1.5,
               "school": "physical",
               "sourceId": 1014
@@ -2510,7 +2510,7 @@
             "z": -58
           },
           "potionCooldownUntil": -1,
-          "resource": 16.866667,
+          "resource": 16.179167,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
@@ -2541,7 +2541,7 @@
               "duration": 1.5,
               "id": "stomp_stun",
               "kind": "stun",
-              "name": "Shuddering Stomp",
+              "name": "Bone Rattle",
               "remaining": 1.5,
               "school": "physical",
               "sourceId": 1014
@@ -2663,14 +2663,14 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 2171,
+          "hp": 570,
           "id": 1014,
           "inCombat": true,
           "kind": "mob",
-          "level": 20,
+          "level": 8,
           "lootFfaTimer": "Infinity",
-          "maxHp": 2171,
-          "moveSpeed": 7,
+          "maxHp": 570,
+          "moveSpeed": 6,
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -2686,15 +2686,15 @@
             "z": -58
           },
           "stats": {
-            "armor": 570
+            "armor": 154
           },
           "stompTimer": 12,
-          "swingTimer": 2.8,
-          "templateId": "korgath_the_bound",
+          "swingTimer": 2.6,
+          "templateId": "ossuary_sentinel",
           "weapon": {
-            "max": 130,
-            "min": 83,
-            "speed": 2.8
+            "max": 48,
+            "min": 31,
+            "speed": 2.6
           }
         },
         {
@@ -2886,7 +2886,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1019,
-      "state": "baa950f9",
+      "state": "23fc3c1c",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -2917,7 +2917,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 183
+            "damageTaken": 100
           },
           "craftDaily": {},
           "craftSkills": {},
@@ -2995,7 +2995,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 44
+            "damageTaken": 26
           },
           "craftDaily": {},
           "craftSkills": {},
@@ -3072,7 +3072,7 @@
               "duration": 1.5,
               "id": "stomp_stun",
               "kind": "stun",
-              "name": "Shuddering Stomp",
+              "name": "Bone Rattle",
               "remaining": 1.5,
               "school": "physical",
               "sourceId": 1014
@@ -3106,7 +3106,7 @@
             "z": -58
           },
           "potionCooldownUntil": -1,
-          "resource": 16.866667,
+          "resource": 16.179167,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
@@ -3137,7 +3137,7 @@
               "duration": 1.5,
               "id": "stomp_stun",
               "kind": "stun",
-              "name": "Shuddering Stomp",
+              "name": "Bone Rattle",
               "remaining": 1.5,
               "school": "physical",
               "sourceId": 1014
@@ -3259,14 +3259,14 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 2171,
+          "hp": 570,
           "id": 1014,
           "inCombat": true,
           "kind": "mob",
-          "level": 20,
+          "level": 8,
           "lootFfaTimer": "Infinity",
-          "maxHp": 2171,
-          "moveSpeed": 7,
+          "maxHp": 570,
+          "moveSpeed": 6,
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -3282,15 +3282,15 @@
             "z": -58
           },
           "stats": {
-            "armor": 570
+            "armor": 154
           },
           "stompTimer": 12,
-          "swingTimer": 2.8,
-          "templateId": "korgath_the_bound",
+          "swingTimer": 2.6,
+          "templateId": "ossuary_sentinel",
           "weapon": {
-            "max": 130,
-            "min": 83,
-            "speed": 2.8
+            "max": 48,
+            "min": 31,
+            "speed": 2.6
           }
         },
         {
@@ -3483,7 +3483,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1019,
-      "state": "baa950f9",
+      "state": "23fc3c1c",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -3514,7 +3514,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 183
+            "damageTaken": 100
           },
           "craftDaily": {},
           "craftSkills": {},
@@ -3592,7 +3592,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 44
+            "damageTaken": 26
           },
           "craftDaily": {},
           "craftSkills": {},
@@ -3669,7 +3669,7 @@
               "duration": 1.5,
               "id": "stomp_stun",
               "kind": "stun",
-              "name": "Shuddering Stomp",
+              "name": "Bone Rattle",
               "remaining": 1.5,
               "school": "physical",
               "sourceId": 1014
@@ -3703,7 +3703,7 @@
             "z": -58
           },
           "potionCooldownUntil": -1,
-          "resource": 16.866667,
+          "resource": 16.179167,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
@@ -3734,7 +3734,7 @@
               "duration": 1.5,
               "id": "stomp_stun",
               "kind": "stun",
-              "name": "Shuddering Stomp",
+              "name": "Bone Rattle",
               "remaining": 1.5,
               "school": "physical",
               "sourceId": 1014
@@ -3856,14 +3856,14 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 2171,
+          "hp": 570,
           "id": 1014,
           "inCombat": true,
           "kind": "mob",
-          "level": 20,
+          "level": 8,
           "lootFfaTimer": "Infinity",
-          "maxHp": 2171,
-          "moveSpeed": 7,
+          "maxHp": 570,
+          "moveSpeed": 6,
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -3879,15 +3879,15 @@
             "z": -58
           },
           "stats": {
-            "armor": 570
+            "armor": 154
           },
           "stompTimer": 12,
-          "swingTimer": 2.8,
-          "templateId": "korgath_the_bound",
+          "swingTimer": 2.6,
+          "templateId": "ossuary_sentinel",
           "weapon": {
-            "max": 130,
-            "min": 83,
-            "speed": 2.8
+            "max": 48,
+            "min": 31,
+            "speed": 2.6
           }
         },
         {

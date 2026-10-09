@@ -44,11 +44,9 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Vildhjärtats bassäng',
-    desc: 'Utmärkande vapen från Zulgar och Huggtandsherren, djurens mästare.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Heroisk: Vildhjärtats bassäng',
-    desc: 'Episka föremål enbart från heroiskt läge, från Zulgar, Bassängens röst.',
   },
   conquerors_nythraxis: {
     name: 'Nythraxis-raid',

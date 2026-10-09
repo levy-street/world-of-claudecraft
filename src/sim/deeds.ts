@@ -543,6 +543,10 @@ export interface DeedEncounterState {
   bellTainted: boolean;
   // Live entity ids of every add this boss summoned this attempt.
   addIds: number[];
+  // Adds whose body lies dead but that are not destroyed yet (Velkhar's
+  // Unquenched Bonewalkers, sunk and waiting to rise): the kill-order task
+  // fails while any is pending.
+  pendingAddIds?: Set<number>;
   // World boss only: character keys (deedCharKey) of contributors who died
   // between joining the roster and the kill (cmb_thunzharr_unbroken is personal,
   // not raid-wide). Keyed by character so a relog cannot launder the death.
@@ -1675,6 +1679,24 @@ export function onBossAddsSummonedForDeeds(ctx: SimContext, boss: Entity, addIds
   ensureEncounter(ctx, boss.id).addIds.push(...addIds);
 }
 
+/** A tracked boss's dead add is pending (its body lies dead but it will rise
+ *  again: Velkhar's Unquenched Bonewalkers) or no longer pending. */
+export function setBossAddPendingForDeeds(
+  ctx: SimContext,
+  boss: Entity,
+  addId: number,
+  pending: boolean,
+): void {
+  if (!ADD_TASKS[boss.templateId]) return;
+  const st = ensureEncounter(ctx, boss.id);
+  if (!pending) {
+    st.pendingAddIds?.delete(addId);
+    return;
+  }
+  st.pendingAddIds ??= new Set();
+  st.pendingAddIds.add(addId);
+}
+
 /** The boss's tracked splash (Reaping Arc cleave / Gravebreaker arc) struck a
  *  player other than its current target: taint the positioning task. */
 export function onBossSplashHitForDeeds(ctx: SimContext, boss: Entity): void {
@@ -1900,10 +1922,12 @@ export function onMobKillCreditForDeeds(
   }
   const addDeed = ADD_TASKS[mob.templateId];
   if (addDeed) {
-    const allDead = (st?.addIds ?? []).every((id) => {
-      const add = ctx.entities.get(id);
-      return !add || add.dead;
-    });
+    const allDead =
+      (st?.pendingAddIds?.size ?? 0) === 0 &&
+      (st?.addIds ?? []).every((id) => {
+        const add = ctx.entities.get(id);
+        return !add || add.dead;
+      });
     if (allDead) for (const meta of taskRecipients) grantDeed(ctx, meta, addDeed);
   }
   const splashDeed = SPLASH_TASKS[mob.templateId];

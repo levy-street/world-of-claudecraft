@@ -316,15 +316,23 @@ describe('missing painted icon accepted-art manifest', () => {
     // The Nythraxis gap-fill one-handers add three generated heroic resolvers at
     // the current head (heroic_courtiers_bonefang, heroic_gravecourt_hewer,
     // heroic_thornpeak_wardblade): 210/16/12 become 213/19/15.
+    // The five-dungeon rework's six generated Heroic weapons
+    // (heroic_falls_blessed_staff, heroic_gaolyard_cudgel,
+    // heroic_knight_commanders_longsword, heroic_rimeweb_fang,
+    // heroic_sextons_spadehaft, heroic_tideglass_shiv) add their resolvers the
+    // same way: 213/19/15 become 219/25/21. The lower dungeons' normal blues'
+    // five (heroic_gravecallers_rod, heroic_turnkeys_shank,
+    // heroic_fogbinders_rod, heroic_merecleaver, heroic_moonwrack_stave):
+    // 219/25/21 become 224/30/26.
     expect(accepted.scope).toEqual({
-      targetRows: 213,
+      targetRows: 224,
       rasterPaintings: 194,
       abilities: 90,
       items: 101,
       deeds: 3,
-      heroicWeaponResolvers: 19,
+      heroicWeaponResolvers: 30,
       originalInventoryRows: 197,
-      supplementalCurrentHeadRows: 15,
+      supplementalCurrentHeadRows: 26,
     });
     expect(accepted.assets).toHaveLength(194);
     expect(accepted.assets.filter((asset) => asset.kind === 'ability')).toHaveLength(90);
@@ -341,7 +349,7 @@ describe('missing painted icon accepted-art manifest', () => {
         accepted.assets.filter((asset) => asset.kind === kind).map((asset) => asset.id),
       ).toEqual(ids);
     }
-    expect(accepted.targetSets.heroicWeaponResolvers).toHaveLength(19);
+    expect(accepted.targetSets.heroicWeaponResolvers).toHaveLength(30);
     expect(accepted.targetSets.heroicWeaponResolvers.map(({ id }) => id)).toEqual(
       sorted(new Set(accepted.targetSets.heroicWeaponResolvers.map(({ id }) => id))),
     );
@@ -694,7 +702,8 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // 319 at the 2026-09-28 release/v0.44.0 merge into Buried Hoards: the
     // Coinsack Scurrier catch (cmb_coinsack_caught) joins the pending side.
     // 322 with the Mirefen world-boss branch's three combat deeds, all pending.
-    expect(DEED_ORDER).toHaveLength(322);
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346, its 24 pending on the dungeon crest.
+    expect(DEED_ORDER).toHaveLength(346);
     expect(DEED_ART_PENDING.has('cmb_point_taken')).toBe(true);
     expect(DEED_ART_PENDING.has('hid_forgebreaker')).toBe(true);
     expect(DEED_ART_PENDING.has('cmb_balgath')).toBe(true);
@@ -772,6 +781,19 @@ describe('missing painted deed and Heroic weapon integration', () => {
     duskwhisper: 'dagger_rare_a_violet',
     maul_of_the_scourged_wilds: 'hammer_rare_b_violet',
     gravecourt_hewer: 'axe_rare_a_violet',
+    // The five-dungeon rework's bases on the v0.45.0 integration (the placeholder pack
+    // finishes in src/ui/weapon_variants.ts).
+    falls_blessed_staff: 'staff_field_iron',
+    gaolyard_cudgel: 'hammer_field_steel',
+    knight_commanders_longsword: 'sword_field_steel',
+    rimeweb_fang: 'dagger_field_steel',
+    sextons_spadehaft: 'axe_field_iron',
+    tideglass_shiv: 'dagger_field_bronze',
+    gravecallers_rod: 'wand_field_steel',
+    turnkeys_shank: 'dagger_field_iron',
+    fogbinders_rod: 'wand_field_iron',
+    merecleaver: 'axe_field_steel',
+    moonwrack_stave: 'staff_field_steel',
     staff_of_the_gravewyrm: 'staff_rare_a_teal',
     nightfangs_greatstaff: 'staff_rare_b_violet',
     wildheart_hexwood_staff: 'staff_rare_b_ember',

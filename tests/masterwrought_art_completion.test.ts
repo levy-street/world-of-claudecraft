@@ -834,7 +834,8 @@ describe('Masterwrought art completion evidence', () => {
     // it.
     // + the Mirefen world-boss branch (nine items: the boss spoils, both Shardpikes and the
     // Wage rares) and Balgath's loot (six items) on the v0.45.0 integration: 1,890.
-    expect(currentOwnerIds).toHaveLength(1890);
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005.
+    expect(currentOwnerIds).toHaveLength(2005);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -1057,6 +1058,27 @@ describe('Masterwrought art completion evidence', () => {
     expect(datedIds.filter((id) => referralIds.has(id))).toEqual([]);
     expect(currentOwnerIds.filter((id) => referralIds.has(id))).toHaveLength(7);
 
+    // The five-dungeon rework's five loot batches: 11 + 11 + 11 + 11 + 16
+    // (the Hollow Crypt's, its Heroic Hymnal included) = 60 ids, additive the
+    // same way.
+    const dungeonReworkBatchIds: readonly (string | undefined)[] = [
+      'sunken-bastion-icons-2026-09-29',
+      'drowned-temple-icons-2026-09-30',
+      'wildheart-basin-icons-2026-10-02',
+      'gravewyrm-sanctum-icons-2026-10-03',
+      'hollow-crypt-icons-2026-10-03',
+      // The lower dungeons' normal blues: 55 more ids, 115 in all.
+      'lower-dungeon-blues-icons-2026-10-08',
+    ];
+    const dungeonReworkIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => dungeonReworkBatchIds.includes(batchId))
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect(dungeonReworkIds.size).toBe(115);
+    expect(datedIds.filter((id) => dungeonReworkIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => dungeonReworkIds.has(id))).toHaveLength(115);
+
     // Strip all six later additive waves (Crucible professions, the Field Kit, the
     // Nythraxis gap-fill weapon renders, Roots' Bramblehide/gap-fill paintings,
     // the OSSBrain mount reins, the Valestrider's reins, the world-quest,
@@ -1088,7 +1110,8 @@ describe('Masterwrought art completion evidence', () => {
         !membershipIds.has(id) &&
         !referralIds.has(id) &&
         !balgathIds.has(id) &&
-        !musterIds.has(id),
+        !musterIds.has(id) &&
+        !dungeonReworkIds.has(id),
     );
     expect(completionOwnerIds).toHaveLength(1209);
     expect(sorted(completionOwnerIds)).toEqual(completionDatedIds);

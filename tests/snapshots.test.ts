@@ -1,6 +1,23 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { startGhostCaptainMove } from '../src/sim/encounters/sunken_bastion/ghost_captain';
+import {
+  GHOST_BROADSIDE_FIRE,
+  GHOST_BROADSIDE_LANE,
+  GHOST_BROADSIDE_SHIP,
+  GHOST_CAPTAIN_BROADSIDE,
+  GHOST_CAPTAIN_ID,
+} from '../src/sim/encounters/sunken_bastion/ghost_captain_ids';
+import {
+  boss as bastionBoss,
+  fight as bastionFight,
+  engage as engageBastion,
+  live as liveBastion,
+  put as putBastion,
+  run as runBastion,
+  tick as tickBastion,
+} from './helpers/bastion_fight';
 import { completeCraftCast } from './helpers/enchant_family_cast';
 import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
 import { tsFilesUnder } from './helpers/ts_files_under';
@@ -8557,6 +8574,50 @@ describe('Consecration snapshot parity', () => {
         rem: 6.5,
       }),
     ]);
+  });
+});
+
+describe('Shipwreck Captain actionable object snapshots', () => {
+  it('round-trips real warning and impact stages with continuous ship clocks', () => {
+    const f = bastionFight('normal', 0, new Set([GHOST_CAPTAIN_ID]));
+    const captain = bastionBoss(f, GHOST_CAPTAIN_ID);
+    putBastion(f, captain, 57, 130);
+    putBastion(f, f.tank, 57, 127);
+    engageBastion(f, captain);
+    tickBastion(f);
+    expect(startGhostCaptainMove(f.sim.ctx, f.inst, captain, 'broadside')).toBe(true);
+    const lanes = liveBastion(f, GHOST_BROADSIDE_LANE);
+    const ship = liveBastion(f, GHOST_BROADSIDE_SHIP)[0];
+    expect(lanes).toHaveLength(5);
+    const client = bareClient(f.tank.id);
+    const apply = () =>
+      (client as unknown as SnapshotApplier).applySnapshot({
+        t: 'snap',
+        ents: JSON.parse(JSON.stringify([...lanes, ship].map((e) => wireEntity(e)))),
+      });
+    apply();
+    expect(client.entities.get(lanes[0].id)).toMatchObject({
+      templateId: GHOST_BROADSIDE_LANE,
+      castingAbility: GHOST_CAPTAIN_BROADSIDE,
+      castTotal: 2.4,
+      castRemaining: 2.4,
+      scale: 28,
+    });
+    expect(client.entities.get(ship.id)).toMatchObject({ castTotal: 3, castRemaining: 3 });
+    runBastion(f, 2.5);
+    expect(lanes[0].templateId).toBe(GHOST_BROADSIDE_FIRE);
+    apply();
+    expect(client.entities.get(lanes[0].id)).toMatchObject({
+      templateId: GHOST_BROADSIDE_FIRE,
+      castingAbility: GHOST_CAPTAIN_BROADSIDE,
+      castTotal: 0.6,
+      castRemaining: 0.5,
+    });
+    expect(client.entities.get(ship.id)).toMatchObject({
+      templateId: GHOST_BROADSIDE_SHIP,
+      castTotal: 3,
+      castRemaining: 0.5,
+    });
   });
 });
 

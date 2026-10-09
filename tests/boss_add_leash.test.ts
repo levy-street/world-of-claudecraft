@@ -1,6 +1,6 @@
 // Boss-summoned add spawning (Sim.spawnBossAdds): adds anchor where they
 // ERUPT, aggro the boss's victim with a seeded leash anchor, and (on heroic)
-// swing at the tuning table's softer addDamageMultiplier instead of the
+// swing at the tuning table's addDamageMultiplier instead of the
 // dungeon-wide damageMultiplier.
 //
 // Regression: adds used to inherit the BOSS's original spawnPos as their leash
@@ -136,14 +136,20 @@ describe('heroic boss adds swing at addDamageMultiplier', () => {
       // Fire-time mechanic scaling rides the add multiplier too.
       expect(add.mechanicDamageMult).toBe(tuning.addDamageMultiplier);
     }
-    // The summoner himself carries the Sanctum boss override (see
-    // damageMultiplierByMob), not the trash-wide multiplier.
-    expect(boss.mechanicDamageMult).toBe(tuning.damageMultiplierByMob?.grand_necromancer_velkhar);
+    // The summoner himself carries the Sanctum boss's own mechanic factor (his
+    // telegraphed Soulfire Trench and Shadow Volley), not the trash-wide one.
+    expect(boss.mechanicDamageMult).toBe(
+      tuning.mechanicDamageMultiplierByMob?.grand_necromancer_velkhar,
+    );
+    expect(boss.mechanicDamageMult).toBe(2.5);
     // Summoned adds are wave pressure, not extra bosses: halved to the 250
     // floor in 2026-07, then 40% softer again in v0.30 (the 150 floor), so
-    // their multiplier sits well BELOW the trash-wide one despite the
-    // missing 1.5x elite swing multiplier.
-    expect(tuning.addDamageMultiplier).toBeLessThan(tuning.damageMultiplier);
+    // their multiplier sits well BELOW the summoner's own. (The heroic pack
+    // budget lowered the trash-wide factor under it: trash is now priced per
+    // pull, and an elite trash swing carries the 1.5x the non-elite adds lack.)
+    expect(tuning.addDamageMultiplier).toBeLessThan(
+      tuning.damageMultiplierByMob?.grand_necromancer_velkhar ?? 0,
+    );
   });
 
   it('normal-difficulty adds use the normal per-mob retune, not the heroic add multiplier', () => {

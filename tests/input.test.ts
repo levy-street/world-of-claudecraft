@@ -1984,6 +1984,19 @@ describe('Input camera zoom (issue 1657)', () => {
     expect(changes).toEqual([16, 3, 22]);
   });
 
+  it('zooms past 22 only while a boss context raises the ceiling (camera_zoom_wiring)', () => {
+    const { input } = makeInput();
+    input.camDist = 21;
+    input.zoomBy(5);
+    expect(input.camDist).toBe(22);
+    input.zoomMax = 36;
+    input.zoomBy(5);
+    input.zoomBy(5);
+    expect(input.camDist).toBe(32);
+    input.zoomBy(10);
+    expect(input.camDist).toBe(36);
+  });
+
   it('does not fire onCameraDistChange when the clamp leaves camDist unchanged (no spurious persist)', () => {
     const { input } = makeInput();
     input.zoomBy(-100); // camDist -> 3 (min)

@@ -100,7 +100,8 @@ describe('KayKit hit-reaction stagger (issue #2889 round 2)', () => {
     // 36 again since the composed-NPC defs left (every NPC rides a WOC class
     // body now, npc_looks.ts): their `npc_modular_<propSet>` loop was one more
     // kaykit() consumer and wired the rogue donor with one literal.
-    expect(occurrences).toBe(36);
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 45.
+    expect(occurrences).toBe(45);
 
     // Spot-check the two entries that already had an animUrls array before
     // this task (must be APPENDED to, not overwritten).

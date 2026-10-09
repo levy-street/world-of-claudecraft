@@ -157,6 +157,78 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/water.ts': 1,
   'src/render/weapon_vfx.ts': 4,
   'src/render/worn_stone.ts': 1,
+  // the five-dungeon rework's interiors, skies, water and boss fx, plus the
+  // shared floor-telegraph material and the Sanctum seal gate (the bases that
+  // were not already a recognized clamp now take max(x, 0.0), or abs() for the
+  // symmetric Gaussian of the Sanctum lake's ripple ring)
+  // Laverock's finale: the column's axis glow, the pool's glow, the moon's road
+  // on the lagoon and the stream ribbon's core (bases abs(), max(x, 0)).
+  'src/render/drowned_temple/temple_cantor_finale_fx.ts': 4,
+  'src/render/drowned_temple/temple_fracture_fx.ts': 1,
+  'src/render/drowned_temple/temple_hydra_combo_fx.ts': 8,
+  'src/render/drowned_temple/temple_landmarks.ts': 2,
+  'src/render/drowned_temple/temple_manta_fx.ts': 2,
+  'src/render/drowned_temple/temple_moon_fx.ts': 5,
+  'src/render/drowned_temple/temple_moonbridge_fx.ts': 1,
+  'src/render/drowned_temple/temple_selthe_fx.ts': 4,
+  'src/render/drowned_temple/temple_sky_lagoon.ts': 7,
+  'src/render/drowned_temple/temple_tsunami_core.ts': 1,
+  'src/render/drowned_temple/temple_tsunami_fx.ts': 3,
+  'src/render/floor_telegraph/telegraph_material.ts': 1,
+  'src/render/gravewyrm_sanctum/sanctum_air.ts': 2,
+  'src/render/gravewyrm_sanctum/sanctum_face.ts': 2,
+  'src/render/gravewyrm_sanctum/sanctum_fire.ts': 2,
+  'src/render/gravewyrm_sanctum/sanctum_lake.ts': 3,
+  'src/render/gravewyrm_sanctum/sanctum_sky.ts': 3,
+  'src/render/gravewyrm_sanctum/sanctum_steam.ts': 2,
+  'src/render/gravewyrm_sanctum/sanctum_vault.ts': 1,
+  'src/render/gravewyrm_sanctum/sanctum_works.ts': 2,
+  'src/render/gravewyrm_sanctum_bosses/sanctum_boss_art.ts': 2,
+  'src/render/hollow_crypt/crypt_atmosphere.ts': 6,
+  'src/render/hollow_crypt/crypt_creature_fx.ts': 2,
+  'src/render/hollow_crypt/crypt_finale_fx.ts': 2,
+  'src/render/hollow_crypt/crypt_fx_particles.ts': 1,
+  'src/render/hollow_crypt/crypt_gates.ts': 1,
+  'src/render/hollow_crypt/crypt_lights.ts': 1,
+  'src/render/hollow_crypt/ilvane_dirge_fx.ts': 4,
+  'src/render/hollow_crypt/lady_fx.ts': 2,
+  'src/render/hollow_crypt/marrow_fx.ts': 1,
+  'src/render/hollow_crypt/crypt_particles.ts': 1,
+  'src/render/hollow_crypt/morthen_fx.ts': 1,
+  'src/render/hollow_crypt/morthen_rite_fx.ts': 3,
+  'src/render/hollow_crypt/morthen_ward_fx.ts': 1,
+  'src/render/sanctum_seal_gate_surface.ts': 1,
+  'src/render/sunken_bastion/bastion_beacon.ts': 4,
+  'src/render/sunken_bastion/bastion_boss_fx.ts': 1,
+  'src/render/sunken_bastion/bastion_creature_fx.ts': 1,
+  'src/render/sunken_bastion/bastion_flood.ts': 2,
+  'src/render/sunken_bastion/bastion_olen_fx.ts': 1,
+  'src/render/sunken_bastion/bastion_rain.ts': 1,
+  'src/render/sunken_bastion/bastion_shore.ts': 1,
+  'src/render/sunken_bastion/bastion_sky_sea.ts': 5,
+  // The trash mechanics' shell program: the fresnel, the ward's sweep and the
+  // band's core, each clamped to [0, 1].
+  'src/render/sunken_bastion/bastion_trash_fx_kit.ts': 3,
+  'src/render/sunken_bastion/bastion_water.ts': 2,
+  'src/render/wildheart_basin/basin_air.ts': 1,
+  'src/render/wildheart_basin/basin_boss_fx.ts': 5,
+  'src/render/wildheart_basin/basin_falls.ts': 3,
+  'src/render/wildheart_basin/basin_fire.ts': 1,
+  'src/render/wildheart_basin/basin_seedpod.ts': 1,
+  'src/render/wildheart_basin/basin_sky.ts': 3,
+  'src/render/wildheart_basin/basin_thorns.ts': 1,
+  'src/render/wildheart_basin/basin_water.ts': 4,
+  'src/render/wildheart_basin/bond_cord.ts': 2,
+  // The dungeon trash pass: the Temple kit's shells, the Sanctum kit's brazier
+  // and the trash engine's pools, orbs, walls, novas and body marks, every
+  // base wrapped in max(x, 0.0).
+  'src/render/drowned_temple/temple_trash_fx.ts': 14,
+  'src/render/gravewyrm_sanctum_fx/sanctum_kit_fx.ts': 2,
+  'src/render/trash_engine_fx/engine_body_fx.ts': 1,
+  'src/render/trash_engine_fx/engine_hazards.ts': 3,
+  'src/render/trash_engine_fx/engine_nova.ts': 1,
+  'src/render/trash_engine_fx/engine_walkers.ts': 2,
+  'src/render/trash_engine_fx/engine_walls.ts': 1,
 };
 
 // Generated locale bundles are megabytes of prose with no shader in them; a

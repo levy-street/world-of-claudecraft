@@ -47,8 +47,24 @@ export function applyKnockback(
     dz = Math.cos(source.facing);
     len = 1;
   }
-  const ux = dx / len,
-    uz = dz / len;
+  return displaceAlong(ctx, target, dx / len, dz / len, distance);
+}
+
+/**
+ * Move `target` up to `distance` yards along the unit direction (ux, uz), with
+ * the knockback's terrain clamp and collider sweep (the shared walker of every
+ * forced displacement: a shove away, or a drag toward a point such as an
+ * undertow). The caller has already applied its own immunity rules. Returns
+ * the yards actually moved.
+ */
+export function displaceAlong(
+  ctx: SimContext,
+  target: Entity,
+  ux: number,
+  uz: number,
+  distance: number,
+): number {
+  if (distance <= 0) return 0;
   const STEP = 0.5;
   let moved = 0;
   let cx = target.pos.x,

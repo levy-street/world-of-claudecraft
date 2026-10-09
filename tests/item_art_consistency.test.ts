@@ -855,7 +855,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // treasure_casket): 1,323. The faction ladder rework's 17 new rows
     // (13 periphery pieces + 4 formulas): 1,340. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,341. the trinket slot's 18 trinkets (PR 4173): 1,359. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s 139 honor items: 1,498.
     // Plus the Mirefen world-boss branch (15 items) on the v0.45.0 integration: 2043.
-    expect(Object.keys(ITEMS)).toHaveLength(2043);
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2169.
+    expect(Object.keys(ITEMS)).toHaveLength(2169);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -871,19 +872,32 @@ describe('item-art consistency accepted-art provenance', () => {
       expect(currentOwnerIds.has(id), `${id} still has a current mapping owner`).toBe(true);
     }
 
+    // The art-pending ledger (ITEM_ART_PENDING) stages a wave's generated
+    // heroic variants outside the audited catalog until their paintings land,
+    // exactly as the sealed-audit test above and the audit CLI account them
+    // (none is staged today: the Hollow Crypt's Heroic Cantor's Hymnal, the
+    // last staged one, now ships its own painting).
     const generatedHeroics = Object.entries(ITEMS).filter(
-      ([, item]) => 'heroicOf' in item && typeof item.heroicOf === 'string',
+      ([id, item]) =>
+        'heroicOf' in item && typeof item.heroicOf === 'string' && !ITEM_ART_PENDING.has(id),
     );
-    const datedIdSet = new Set(datedIds);
     // Membership against the CURRENT mapping owners, not the dated snapshot: the
     // release's Bramblehide wave ships its own heroic art (own mapping owner),
     // while its three Nythraxis gap-fill weapons alias their base weapon's art
     // like every other heroic weapon variant.
     const heroicWithOwnWebp = generatedHeroics.filter(([id]) => currentOwnerIds.has(id));
     const heroicArtAliases = generatedHeroics.filter(([id]) => !currentOwnerIds.has(id));
-    expect(generatedHeroics).toHaveLength(78);
-    expect(heroicWithOwnWebp).toHaveLength(59);
-    expect(heroicArtAliases).toHaveLength(19);
+    // 85 / 60 / 25 with the five-dungeon rework's seven unstaged Heroic
+    // variants (named below): the Heroic Chorus Conch ships its own painting,
+    // the six Heroic weapons alias their base weapon's art. 86 / 61 / 25 once
+    // the Heroic Cantor's Hymnal leaves the art-pending ledger with its own
+    // painting (hollow-crypt-icons-2026-10-03).
+    // 116 / 86 / 30 with the lower dungeons' normal blues: 25 Heroic armour
+    // clones with their own painting (lower-dungeon-blues-icons-2026-10-08) and five
+    // Heroic weapons aliasing their base painting.
+    expect(generatedHeroics).toHaveLength(116);
+    expect(heroicWithOwnWebp).toHaveLength(86);
+    expect(heroicArtAliases).toHaveLength(30);
     expect(heroicArtAliases.every(([, item]) => item.kind === 'weapon')).toBe(true);
     // The 14 new heroic defs the release's gap-fill and Bramblehide waves add
     // are named additions, never a silent side effect of widening the
@@ -905,14 +919,49 @@ describe('item-art consistency accepted-art provenance', () => {
       ...(releaseGapWeaponBatch?.itemIds.map((id) => heroicVariantId(id)) ?? []),
     ]);
     expect(expectedNewHeroicIds).toHaveLength(14);
+    // The five-dungeon rework's eight Heroic variants, named the same way: two
+    // own-art offhands from their dungeon batches (the conch and the hymnal),
+    // six weapon aliases.
+    const reworkHeroicIds = [
+      'heroic_cantors_hymnal',
+      'heroic_chorus_conch',
+      'heroic_falls_blessed_staff',
+      'heroic_gaolyard_cudgel',
+      'heroic_knight_commanders_longsword',
+      'heroic_rimeweb_fang',
+      'heroic_sextons_spadehaft',
+      'heroic_tideglass_shiv',
+    ];
+    expect(heroicWithOwnWebp.map(([id]) => id)).toContain('heroic_chorus_conch');
+    expect(heroicWithOwnWebp.map(([id]) => id)).toContain('heroic_cantors_hymnal');
     const heroicIdSet = new Set(generatedHeroics.map(([id]) => id));
-    for (const id of expectedNewHeroicIds) {
+    for (const id of [...expectedNewHeroicIds, ...reworkHeroicIds]) {
+      expect(heroicIdSet.has(id), `${id} is a live heroic def`).toBe(true);
+    }
+    // The lower dungeons' normal blues add 30 more, named by their batch the
+    // same way: its 25 own-art Heroic armour clones plus the generated Heroic
+    // copies of its five weapons, which alias their base painting.
+    const bluesBatch = mapping.generatedBatches.find(
+      ({ batchId }) => batchId === 'lower-dungeon-blues-icons-2026-10-08',
+    );
+    const blueHeroicIds = [
+      ...(bluesBatch?.itemIds.filter((id) => id.startsWith('heroic_')) ?? []),
+      ...(bluesBatch?.itemIds
+        .filter((id) => ITEMS[id]?.kind === 'weapon')
+        .map((id) => heroicVariantId(id)) ?? []),
+    ];
+    expect(blueHeroicIds).toHaveLength(30);
+    for (const id of blueHeroicIds) {
       expect(heroicIdSet.has(id), `${id} is a live heroic def`).toBe(true);
     }
     // Everything else in the current heroic set is the dated 64: this proves
-    // the release's 14 heroic defs are exactly the additive ones, not a
-    // silent expansion of what was already there.
-    const expectedNewHeroicIdSet = new Set(expectedNewHeroicIds);
+    // the release's 14 heroic defs and the rework's eight are exactly the
+    // additive ones, not a silent expansion of what was already there.
+    const expectedNewHeroicIdSet = new Set([
+      ...expectedNewHeroicIds,
+      ...reworkHeroicIds,
+      ...blueHeroicIds,
+    ]);
     const preReleaseHeroics = generatedHeroics.filter(([id]) => !expectedNewHeroicIdSet.has(id));
     expect(preReleaseHeroics).toHaveLength(64);
 
@@ -1031,9 +1080,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // Plus the Mirefen world-boss branch (nine items: the boss spoils, both Shardpikes and the
     // Wage rares) and Balgath's loot (five trinkets and the Craterglass Stave) on the v0.45.0
     // integration: 1,890 owners over 2,043 items.
-    expect(new Set(currentOwnerIds).size).toBe(1890);
-    expect(shippingIds).toHaveLength(1890);
-    expect(Object.keys(ITEMS)).toHaveLength(2043);
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005, 2169.
+    expect(new Set(currentOwnerIds).size).toBe(2005);
+    expect(shippingIds).toHaveLength(2005);
+    expect(Object.keys(ITEMS)).toHaveLength(2169);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1275,6 +1325,20 @@ describe('item-art consistency accepted-art provenance', () => {
         'barrowstone_heart',
         'muster_grapnel',
         'craterglass_stave',
+        // The dungeon reworks' loot batches (Sunken Bastion, Drowned Temple,
+        // Wildheart Basin, Gravewyrm Sanctum, Hollow Crypt).
+        ...mapping.generatedBatches
+          .filter(({ batchId }) =>
+            [
+              'sunken-bastion-icons-2026-09-29',
+              'drowned-temple-icons-2026-09-30',
+              'wildheart-basin-icons-2026-10-02',
+              'gravewyrm-sanctum-icons-2026-10-03',
+              'hollow-crypt-icons-2026-10-03',
+              'lower-dungeon-blues-icons-2026-10-08',
+            ].includes(batchId ?? ''),
+          )
+          .flatMap(({ itemIds }) => itemIds),
       ]),
     ).toEqual(sorted(currentOwnerIds));
 
@@ -1449,7 +1513,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // batches (PR 4281) bring it to 46. The Mirefen world-boss branch's five batches
     // (balgath-boss, shardpike-mechanic, foremans-wage, muster-shardpike, balgath-loot)
     // bring it to 51 on the v0.45.0 integration.
-    expect(mapping.generatedBatches).toHaveLength(51);
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 57.
+    expect(mapping.generatedBatches).toHaveLength(57);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1523,14 +1588,16 @@ describe('item-art consistency accepted-art provenance', () => {
     // 1179. Its rares (quest-blue-rewards-icons-2026-10-07) add 76: 1255. The
     // role fill (quest-role-fill-icons-2026-10-07) adds 75: 1330. Membership adds 8
     // and referral armour 7: 1345. The Mirefen world-boss branch's 15 batch ids: 1360.
-    expect(priorGeneratedIds).toHaveLength(1360);
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 1475.
+    expect(priorGeneratedIds).toHaveLength(1475);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
     // Plus the Mirefen world-boss branch (15 items) on the v0.45.0 integration: 1890.
-    expect(allCurrentOwnerIds).toHaveLength(1890);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1890);
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005.
+    expect(allCurrentOwnerIds).toHaveLength(2005);
+    expect(new Set(allCurrentOwnerIds).size).toBe(2005);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1549,7 +1616,8 @@ describe('item-art consistency accepted-art provenance', () => {
       // + the 75 quest role-fill paintings = 1330.
       // + 8 membership paintings + 7 referral paintings = 1345.
       // + the Mirefen world-boss branch's 15 = 1360.
-      priorGenerated: 1360,
+      // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 1475.
+      priorGenerated: 1475,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1636,6 +1704,18 @@ describe('item-art consistency accepted-art provenance', () => {
                 'membership-items-2026-10-05',
                 'referral-items-2026-10-07',
                 'quest-role-fill-icons-2026-10-07',
+                // The Sunken Bastion rework's loot.
+                'sunken-bastion-icons-2026-09-29',
+                // The Drowned Temple rework's loot.
+                'drowned-temple-icons-2026-09-30',
+                // The Wildheart Basin rework's loot.
+                'wildheart-basin-icons-2026-10-02',
+                // The Gravewyrm Sanctum rework's loot.
+                'gravewyrm-sanctum-icons-2026-10-03',
+                // The Hollow Crypt rework's loot.
+                'hollow-crypt-icons-2026-10-03',
+                // The lower dungeons' normal blues.
+                'lower-dungeon-blues-icons-2026-10-08',
               ].includes(batchId),
           )
           .flatMap(({ itemIds }) => itemIds),
@@ -1805,9 +1885,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // Clue Scroll owners = 1305. Plus the 17 faction ladder owners
     // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464. Plus the 245 choose-one leveling quest armor paintings (quest-leveling-gear-icons-2026-10-06) = 1709. Plus the 76 quest blue reward rares (quest-blue-rewards-icons-2026-10-07) = 1785. Plus the 75 quest role-fill paintings (quest-role-fill-icons-2026-10-07) = 1860. Plus the 8 membership paintings and the 7 referral paintings = 1875.
     // Plus the Mirefen world-boss branch and Balgath's loot (15 items) = 1890.
-    if (ownerIds.length !== 1890)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1890`);
-    if (fileIds.length !== 1890) violations.push(`shipping WebP count: ${fileIds.length} != 1890`);
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005.
+    if (ownerIds.length !== 2005)
+      violations.push(`mapping owner count: ${ownerIds.length} != 2005`);
+    if (fileIds.length !== 2005) violations.push(`shipping WebP count: ${fileIds.length} != 2005`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

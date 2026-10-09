@@ -30,6 +30,18 @@ export const NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL = 27;
 // archetype; healer-facing pieces never take Hit (heals are not resisted by level).
 // The ilvl 33/37 raid variants scale these up + add a secondary rating (see
 // heroic_variants.ts). See docs/prd/combat-ratings-and-jewelry.md.
+/** A shipped heroic partition squeezed into `share` of a reworked boss's one
+ *  guaranteed equipment roll, its rows keeping their ratios (the Gravewyrm
+ *  Sanctum rework, gravewyrm_sanctum.md 9.2: the new epics and trinkets take
+ *  the rest). */
+function sharedPartition(
+  share: number,
+  rows: readonly (readonly [string, number])[],
+): [string, number][] {
+  const total = rows.reduce((sum, [, weight]) => sum + weight, 0);
+  return rows.map(([itemId, weight]) => [itemId, (weight * share) / total]);
+}
+
 export const ARMOR_RATING = 40; // 40 rating = 4.0%
 export const FIVE_MAN_WEAPON_RATING = 50; // 50 rating = 5.0%
 const RAID_WEAPON_PRIMARY_RATING = 65; // 65 rating = 6.5%
@@ -694,17 +706,47 @@ const heroicFarmPatternRows = (): LootEntry[] => [
 // These former base-table sources must not acquire the bespoke heroic tier
 // merely because their acquisition rows now share the heroic equipment slot.
 const PRESERVED_BASE_LOOT_SOURCES = new Set([
-  'bloodmane_warleggings',
-  'boneplate_vest',
-  'cryptbone_greaves',
-  'cryptbone_helm',
-  'cryptbone_pauldrons',
-  'cultist_flayer',
-  'eelskin_tunic',
-  'emberwood_staff',
-  'fenmist_robe',
-  'greyjaw_hide_boots',
+  // The Heroic copies of the lower dungeons' blue rolls (BLUE_COPY_SHARE).
+  'heroic_bellrope_mitts',
+  'heroic_brinewarden_robe',
+  'heroic_candlewatch_jerkin',
+  'heroic_cantors_stole',
+  'heroic_cellwatch_belt',
+  'heroic_choirward_pauldrons',
+  'heroic_choristers_spaulders',
+  'heroic_conchplate_sabatons',
+  'heroic_fogbinders_rod',
+  'heroic_gaolyard_jerkin',
+  'heroic_gravecallers_rod',
+  'heroic_gravedirt_grips',
+  'heroic_knellbound_hauberk',
+  'heroic_lamenting_veil',
+  'heroic_lanternwick_sash',
+  'heroic_mere_crested_helm',
+  'heroic_merecleaver',
+  'heroic_mereskin_hood',
+  'heroic_merewater_cowl',
+  'heroic_moonburn_grips',
+  'heroic_moonwrack_stave',
+  'heroic_pale_chorus_slippers',
+  'heroic_portcullis_girdle',
+  'heroic_prism_etched_handwraps',
+  'heroic_rime_laced_hood',
+  'heroic_rimewreath_coif',
+  'heroic_robe_of_the_unquiet_rite',
+  'heroic_spadeworn_gauntlets',
+  'heroic_tideglass_gauntlets',
+  'heroic_turnkeys_shank',
   'heroic_boneguard_breastplate',
+  'heroic_cantors_hymnal',
+  'heroic_rimeweb_fang',
+  'heroic_sextons_spadehaft',
+  'heroic_knight_commanders_longsword',
+  'heroic_gaolyard_cudgel',
+  'heroic_chorus_conch',
+  'heroic_tideglass_shiv',
+  'heroic_falls_blessed_staff',
+  'heroic_fanglords_beastspear',
   'heroic_boundstone_girdle',
   'heroic_boundstone_helm',
   'heroic_deathlord_legguards',
@@ -749,17 +791,6 @@ const PRESERVED_BASE_LOOT_SOURCES = new Set([
   'heroic_wyrmshadow_talongrips',
   'heroic_wyrmshadow_treads',
   'heroic_ysols_pearl_greaves',
-  'marshstrider_boots',
-  'mistveil_cord',
-  'mistveil_grips',
-  'nightwalk_jerkin',
-  'oiled_boots',
-  'quilted_trousers',
-  'revenant_silk_robe',
-  'sunbone_ritual_sarong',
-  'trollhide_leggings',
-  'vineclaw_stalking_breeches',
-  'zealotsbane_blade',
 ]);
 
 const preserveBaseLootSource = (entry: LootEntry): LootEntry =>
@@ -767,79 +798,240 @@ const preserveBaseLootSource = (entry: LootEntry): LootEntry =>
     ? { ...entry, preserveSourceTier: true }
     : entry;
 
+// The heroic share of a relocated Nythraxis raid piece or trinket
+// (content/nythraxis_loot.ts) on its five-man boss: a tenth of the boss's one
+// guaranteed equipment roll, the boss's own rows keeping their ratios in the
+// rest, so a kill still pays exactly one item. The pieces keep their raid tier
+// (item level 33) through the anchors in item_level.ts and heroic_variants.ts.
+const THORNPEAK_SHARE = 0.1;
+// A relocated piece also drops as its Heroic copy from its HOME boss (the
+// Gravewyrm Sanctum or Wildheart Basin boss whose Normal table carries it), so
+// every relic on those dungeons' Reliquary pages is paid on both difficulties.
+// A piece with no second heroic boss takes THORNPEAK_SHARE at home; one that
+// also drops from a Crypt, Bastion or Temple boss takes this smaller share.
+const THORNPEAK_HOME_SHARE = 0.04;
+// The Heroic copy of each blue on a lower dungeon boss's Normal blue roll
+// (2026-10-08). Those base rows are normalOnly, so the copy is what keeps the
+// boss's Reliquary page paid on Heroic; it keeps its generated rare tier (item
+// level 25, PRESERVED_BASE_LOOT_SOURCES), a small slice beside the epics.
+const BLUE_COPY_SHARE = 0.04;
+
+// A Heroic table pays heroic-tier gear only (2026-10-09): every dungeon's
+// uncommon pieces drop on Normal, never on a Heroic kill, so each boss's one
+// Heroic item is an epic, a raid piece or a Heroic copy.
 export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
+  // The Hollow Crypt rework (hollow_crypt.md 8.2): one equipment item per boss
+  // kill; four shipped epics moved off Morthen onto the new wing and choir bosses.
   sexton_marrow: [
     ...weightedLootGroup('sexton_marrow_heroic', [
-      ['quilted_trousers', 0.4],
-      ['oiled_boots', 0.4],
+      ['heroic_bonewrought_greatsword', THORNPEAK_SHARE],
+      ['heroic_spadeworn_gauntlets', BLUE_COPY_SHARE],
+      ['heroic_gravedirt_grips', BLUE_COPY_SHARE],
+      ['heroic_bellrope_mitts', BLUE_COPY_SHARE],
+      ...sharedPartition(1 - THORNPEAK_SHARE - 3 * BLUE_COPY_SHARE, [
+        ['sextons_burial_spade', 0.3],
+        ['cryptplate_helm', 0.3],
+        ['heroic_sextons_spadehaft', 0.1],
+      ]),
     ]).map(preserveBaseLootSource),
   ],
+  rimeweb: [
+    ...weightedLootGroup('rimeweb_heroic', [
+      ['heroic_courtiers_bonefang', THORNPEAK_SHARE],
+      ['heroic_rimewreath_coif', BLUE_COPY_SHARE],
+      ['heroic_rime_laced_hood', BLUE_COPY_SHARE],
+      ['heroic_lamenting_veil', BLUE_COPY_SHARE],
+      ...sharedPartition(1 - THORNPEAK_SHARE - 3 * BLUE_COPY_SHARE, [
+        ['rimesilk_hood', 0.35],
+        ['bonechill_striders', 0.25],
+        ['bonechill_cord', 0.25],
+        ['heroic_rimeweb_fang', 0.15],
+      ]),
+    ]).map(preserveBaseLootSource),
+  ],
+  // The design's Vigil Taper trinket (a new trinket effect) is deferred to the
+  // encounter pass; its share is spread over the other pieces meanwhile. The
+  // base rare chase rows are normalOnly, so each boss's Heroic partition carries
+  // the rare's Heroic variant (Spadehaft, Fang, Hymnal) inside its one slot.
+  // The Shadowpulse Slippers moved here off Morthen to join their Handwraps, so
+  // the choir boss carries two heroic epics like his neighbours.
+  cantor_ilvane: [
+    ...weightedLootGroup('cantor_ilvane_heroic', [
+      ['heroic_votive_ward_of_the_deathless_court', THORNPEAK_SHARE],
+      ['heroic_choirward_pauldrons', BLUE_COPY_SHARE],
+      ['heroic_choristers_spaulders', BLUE_COPY_SHARE],
+      ['heroic_cantors_stole', BLUE_COPY_SHARE],
+      ...sharedPartition(1 - THORNPEAK_SHARE - 3 * BLUE_COPY_SHARE, [
+        ['shadowpulse_handwraps', 0.35],
+        ['shadowpulse_slippers', 0.3],
+        ['heroic_cantors_hymnal', 0.15],
+      ]),
+    ]).map(preserveBaseLootSource),
+  ],
+  // The Sunken Bastion rework (sunken_bastion.md 8.2): one equipment item per
+  // boss kill; three shipped epics moved off Vael onto Olen and Ossick.
   knight_commander_olen: [
     ...weightedLootGroup('knight_commander_olen_heroic', [
-      ['trollhide_leggings', 0.5],
-      ['marshstrider_boots', 0.5],
-      ['fenmist_robe', 0.25],
-      ['heroic_tideguard_greaves', 0.1],
-      ['heroic_tideguard_sabatons', 0.1],
-      ['heroic_eelscale_leggings', 0.1],
+      ['heroic_stormhymn_chain_grips', THORNPEAK_SHARE],
+      ...sharedPartition(1 - THORNPEAK_SHARE, [
+        ['drowned_commanders_breastplate', 0.3],
+        ['tideguard_faceguard', 0.2],
+        ['mistforged_pauldrons', 0.2],
+        ['heroic_knight_commanders_longsword', 0.15],
+        ['heroic_tideguard_greaves', 0.05],
+        // Each Bastion blue's Heroic copy follows its Normal boss (2026-10-08):
+        // the Prayer Leggings came here from Vael, the Sabatons went to him.
+        ['heroic_drowned_prayer_leggings', 0.05],
+        ['heroic_eelscale_leggings', 0.05],
+      ]),
     ]).map(preserveBaseLootSource),
   ],
-  choirmother_selthe: [
-    ...weightedLootGroup('choirmother_selthe_heroic', [['heroic_selthes_seastriders', 0.4]]).map(
-      preserveBaseLootSource,
-    ),
+  gaoler_ossick: [
+    ...weightedLootGroup('gaoler_ossick_heroic', [
+      ['heroic_bramblehide_grips', THORNPEAK_SHARE],
+      ['mooring_stone', THORNPEAK_SHARE],
+      ['heroic_gaolyard_jerkin', BLUE_COPY_SHARE],
+      ['heroic_brinewarden_robe', BLUE_COPY_SHARE],
+      ...sharedPartition(1 - 2 * THORNPEAK_SHARE - 2 * BLUE_COPY_SHARE, [
+        ['gaolyard_striders', 0.3],
+        ['gaolers_iron_key', 0.25],
+        ['sash_of_the_sunken_court', 0.25],
+        ['heroic_gaolyard_cudgel', 0.2],
+        // The Tidescale Vest's Heroic copy follows its Normal drop off Vael.
+        ['heroic_tidescale_vest', 0.1],
+      ]),
+    ]).map(preserveBaseLootSource),
   ],
+  // The Gaol Turnkey, the Bastion's miniboss, had no heroic loot at all. It
+  // takes two of Vael's five heroic epics, so the final boss no longer carries
+  // the dungeon on its own, plus its relocated Nythraxis piece.
+  gaol_turnkey: [
+    ...weightedLootGroup('gaol_turnkey_heroic', [
+      ['heroic_bramblehide_cinch', THORNPEAK_SHARE],
+      ['sunken_court_mantle', (1 - THORNPEAK_SHARE - 4 * BLUE_COPY_SHARE) / 2],
+      ['dreamroot_boots', (1 - THORNPEAK_SHARE - 4 * BLUE_COPY_SHARE) / 2],
+      ['heroic_portcullis_girdle', BLUE_COPY_SHARE],
+      ['heroic_cellwatch_belt', BLUE_COPY_SHARE],
+      ['heroic_lanternwick_sash', BLUE_COPY_SHARE],
+      ['heroic_turnkeys_shank', BLUE_COPY_SHARE],
+    ]).map(preserveBaseLootSource),
+  ],
+  // The Drowned Temple rework (drowned_temple.md 8.2): one equipment item per
+  // boss kill; three shipped epics moved off Ysolei onto Selthe and the new
+  // Tideglass Colossus.
+  choirmother_selthe: [
+    ...weightedLootGroup('choirmother_selthe_heroic', [
+      ['heroic_stormhymn_chain_treads', THORNPEAK_SHARE],
+      ['heroic_conchplate_sabatons', BLUE_COPY_SHARE],
+      ['heroic_pale_chorus_slippers', BLUE_COPY_SHARE],
+      ...sharedPartition(1 - THORNPEAK_SHARE - 2 * BLUE_COPY_SHARE, [
+        ['pale_chorus_vestment', 0.3],
+        ['choirmothers_casque', 0.25],
+        ['heroic_selthes_seastriders', 0.2],
+        ['heroic_chorus_conch', 0.25],
+      ]),
+    ]).map(preserveBaseLootSource),
+  ],
+  tideglass_colossus: [
+    ...weightedLootGroup('tideglass_colossus_heroic', [
+      ['heroic_bramblehide_legguards', THORNPEAK_SHARE],
+      ['echoing_lens', THORNPEAK_SHARE],
+      ['heroic_tideglass_gauntlets', BLUE_COPY_SHARE],
+      ['heroic_moonburn_grips', BLUE_COPY_SHARE],
+      ['heroic_prism_etched_handwraps', BLUE_COPY_SHARE],
+      ...sharedPartition(1 - 2 * THORNPEAK_SHARE - 3 * BLUE_COPY_SHARE, [
+        ['tideglass_warmaul', 0.3],
+        ['lunar_choir_leggings', 0.2],
+        ['tidewoven_trousers', 0.2],
+        ['tideworn_warboots', 0.15],
+        ['heroic_tideglass_shiv', 0.15],
+      ]),
+    ]).map(preserveBaseLootSource),
+  ],
+  // The Mere Hydra had no heroic loot at all. Its center head carries the
+  // fight's one roll (each head pays once, on its first death, and all three
+  // must fall: encounters/drowned_temple/hydra_regrowth.ts): two of Ysolei's
+  // heroic epics plus its relocated Nythraxis piece.
+  mere_hydra_head_center: [
+    ...weightedLootGroup('mere_hydra_heroic', [
+      ['heroic_bramblehide_mantle', THORNPEAK_SHARE],
+      ['stormbark_mantle', (1 - THORNPEAK_SHARE - 4 * BLUE_COPY_SHARE) / 2],
+      ['choir_blessed_spaulders', (1 - THORNPEAK_SHARE - 4 * BLUE_COPY_SHARE) / 2],
+      ['heroic_mere_crested_helm', BLUE_COPY_SHARE],
+      ['heroic_mereskin_hood', BLUE_COPY_SHARE],
+      ['heroic_merewater_cowl', BLUE_COPY_SHARE],
+      ['heroic_merecleaver', BLUE_COPY_SHARE],
+    ]).map(preserveBaseLootSource),
+  ],
+  // The Sanctum's heroic epics are spread over its three bosses (2026-10-08): each
+  // boss pays four dungeon epics or trinkets and one relocated Nythraxis piece,
+  // and the shipped heroic copies split across all three instead of piling on
+  // Korzul.
   korgath_the_bound: [
     ...weightedLootGroup('korgath_the_bound_heroic', [
-      ['boneplate_vest', 0.34],
-      ['revenant_silk_robe', 0.33],
-      ['nightwalk_jerkin', 0.33],
-      ['zealotsbane_blade', 0.19],
-      ['heroic_korgaths_chainwraps', 0.1],
-      ['heroic_staff_of_velkhar', 0.1],
-      ['heroic_shadowmeld_tunic', 0.1],
-      ['heroic_wyrmcult_grand_robe', 0.1],
-      ['heroic_gravewyrm_sabatons', 0.1],
-      ['heroic_wyrmcult_soulsteps', 0.1],
-      ['heroic_wyrmshadow_treads', 0.05],
-      ['heroic_boundstone_helm', 0.08],
-      ['heroic_gravewyrm_mantle', 0.08],
+      ['foremans_last_link', 0.18],
+      ['hammer_of_the_open_lock', 0.18],
+      ['gravewyrm_claws', 0.14],
+      ['gravescale_girdle', 0.14],
+      ['heroic_bonewrought_bulwark', THORNPEAK_SHARE],
+      ['heroic_bonewrought_greatsword', THORNPEAK_HOME_SHARE],
+      ['heroic_thornpeak_wardblade', THORNPEAK_HOME_SHARE],
+      ...sharedPartition(0.26 - 2 * THORNPEAK_HOME_SHARE, [
+        ['heroic_korgaths_chainwraps', 0.1],
+        ['heroic_staff_of_velkhar', 0.1],
+        ['heroic_shadowmeld_tunic', 0.1],
+        ['heroic_wyrmcult_grand_robe', 0.1],
+        ['heroic_gravewyrm_sabatons', 0.1],
+        ['heroic_wyrmcult_soulsteps', 0.1],
+        ['heroic_wyrmshadow_treads', 0.05],
+        ['heroic_boundstone_helm', 0.08],
+        ['heroic_gravewyrm_mantle', 0.08],
+        ['heroic_deathlord_warplate', 0.05],
+        ['heroic_boundstone_girdle', 0.05],
+        ['heroic_gravewyrm_gauntlets', 0.05],
+        ['heroic_deathlords_dread_visage', 0.04],
+        ['heroic_wyrmfang_greatblade', 0.05],
+      ]),
     ]).map(preserveBaseLootSource),
   ],
   grand_necromancer_velkhar: [
     ...weightedLootGroup('grand_necromancer_velkhar_heroic', [
-      ['boneplate_vest', 0.34],
-      ['revenant_silk_robe', 0.33],
-      ['nightwalk_jerkin', 0.33],
-      ['emberwood_staff', 0.2],
-      ['heroic_boneguard_breastplate', 0.1],
-      ['heroic_shadowmeld_tunic', 0.1],
-      ['heroic_staff_of_velkhar', 0.1],
-      ['heroic_gravewyrm_stalkers_treads', 0.1],
-      ['heroic_deathlord_legguards', 0.05],
-      ['heroic_necromancers_soulsteps', 0.05],
-      ['heroic_wyrmshadow_legguards', 0.05],
+      ['phial_of_the_tithe', 0.18],
+      ['vestments_of_the_waking_rite', 0.18],
+      ['sanctum_prowlers_grips', 0.14],
+      ['wyrmchoir_handwraps', 0.14],
+      ['heroic_wraithfire_orb', THORNPEAK_SHARE],
+      ['heroic_votive_ward_of_the_deathless_court', THORNPEAK_HOME_SHARE],
+      ['heroic_courtiers_bonefang', THORNPEAK_HOME_SHARE],
+      ...sharedPartition(0.26 - 2 * THORNPEAK_HOME_SHARE, [
+        ['heroic_boneguard_breastplate', 0.1],
+        ['heroic_shadowmeld_tunic', 0.1],
+        ['heroic_staff_of_velkhar', 0.1],
+        ['heroic_gravewyrm_stalkers_treads', 0.1],
+        ['heroic_deathlord_legguards', 0.05],
+        ['heroic_necromancers_soulsteps', 0.05],
+        ['heroic_wyrmshadow_legguards', 0.05],
+        ['heroic_necromancers_starshroud', 0.05],
+        ['heroic_necromancers_soulspire_mantle', 0.04],
+        ['heroic_staff_of_the_gravewyrm', 0.05],
+        ['heroic_wildgrowth_leggings', 0.05],
+        ['heroic_grovewardens_grips', 0.05],
+      ]),
     ]).map(preserveBaseLootSource),
     { itemId: 'necromancers_reagent_satchel', chance: 0.2, preserveSourceTier: true },
   ],
   morthen: [
     ...weightedLootGroup('morthen_heroic', [
-      ['cryptbone_greaves', 0.34],
-      ['quilted_trousers', 0.33],
-      ['oiled_boots', 0.33],
-      ['greyjaw_hide_boots', 0.25],
-      ['cryptbone_helm', 0.18],
-      ['cryptbone_pauldrons', 0.18],
-      ['morthens_cryptforged_hauberk', 0.25],
-      ['shadowpulse_handwraps', 0.25],
-      ['bonechill_striders', 0.25],
-      ['lunarward_cinch', 0.25],
-      ['cryptplate_helm', 0.34],
-      ['shadowpulse_slippers', 0.33],
-      ['bonechill_cord', 0.33],
-      // Trinkets (content/trinkets.ts): one per heroic final boss, each in a
-      // different dungeon, inside the one guaranteed equipment slot.
-      ['bastion_sigil', 0.25],
+      ['heroic_thornpeak_wardblade', THORNPEAK_SHARE],
+      ['heroic_knellbound_hauberk', BLUE_COPY_SHARE],
+      ['heroic_candlewatch_jerkin', BLUE_COPY_SHARE],
+      ['heroic_robe_of_the_unquiet_rite', BLUE_COPY_SHARE],
+      ['heroic_gravecallers_rod', BLUE_COPY_SHARE],
+      ...sharedPartition(1 - THORNPEAK_SHARE - 4 * BLUE_COPY_SHARE, [
+        ['morthens_cryptforged_hauberk', 0.18],
+        ['lunarward_cinch', 0.18],
+        ['bastion_sigil', 0.18],
+      ]),
     ]).map(preserveBaseLootSource),
     { itemId: 'gravewoven_bag', chance: 0.2, preserveSourceTier: true },
     { itemId: 'reins_stormfeather_griffin', chance: HEROIC_GREEN_MOUNT_CHANCE },
@@ -847,24 +1039,18 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
   ],
   vael_the_mistcaller: [
     ...weightedLootGroup('vael_heroic', [
-      ['trollhide_leggings', 0.34],
-      ['marshstrider_boots', 0.33],
-      ['fenmist_robe', 0.33],
-      ['eelskin_tunic', 0.2],
-      ['heroic_tidescale_vest', 0.1],
-      ['heroic_drowned_prayer_leggings', 0.1],
-      ['heroic_drowned_prayer_sandals', 0.1],
-      ['heroic_eelscale_treads', 0.1],
-      ['mistveil_cord', 0.12],
-      ['mistveil_grips', 0.12],
-      ['mistcallers_fang', 0.34],
-      ['tidebound_spaulders', 0.33],
-      ['sash_of_the_sunken_court', 0.33],
-      ['mistforged_pauldrons', 0.25],
-      ['tideguard_faceguard', 0.25],
-      ['sunken_court_mantle', 0.25],
-      ['dreamroot_boots', 0.25],
-      ['stormjar', 0.25],
+      ['heroic_direfang_quiver', THORNPEAK_SHARE],
+      ['heroic_bramblehide_treads', THORNPEAK_SHARE],
+      ['heroic_fogbinders_rod', BLUE_COPY_SHARE],
+      ...sharedPartition(1 - 2 * THORNPEAK_SHARE - 1 * BLUE_COPY_SHARE, [
+        // The Tideguard Sabatons' Heroic copy came with its Normal drop off Olen.
+        ['heroic_tideguard_sabatons', 0.1],
+        ['heroic_drowned_prayer_sandals', 0.1],
+        ['heroic_eelscale_treads', 0.1],
+        ['mistcallers_fang', 0.34],
+        ['tidebound_spaulders', 0.33],
+        ['stormjar', 0.25],
+      ]),
     ]).map(preserveBaseLootSource),
     { itemId: 'mistcallers_duffel', chance: 0.1, preserveSourceTier: true },
     { itemId: 'reins_shadowjump_toad', chance: HEROIC_GREEN_MOUNT_CHANCE },
@@ -872,73 +1058,103 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
   ],
   ysolei: [
     ...weightedLootGroup('ysolei_heroic', [
-      ['heroic_ysols_pearl_greaves', 0.5],
-      ['heroic_moonshroud_breastplate', 0.34],
-      ['heroic_moonshroud_robe', 0.33],
-      ['heroic_moonshroud_tunic', 0.33],
-      ['lunar_tide_greatstaff', 0.25],
-      ['tidewoven_trousers', 0.25],
-      ['choirmothers_casque', 0.25],
-      ['stormbark_mantle', 0.25],
-      ['lunar_choir_leggings', 0.34],
-      ['choir_blessed_spaulders', 0.33],
-      ['tideworn_warboots', 0.33],
-      ['menders_hourglass', 0.25],
+      ['heroic_thornpeak_moonhide_cowl', THORNPEAK_SHARE],
+      ['heroic_moonwrack_stave', BLUE_COPY_SHARE],
+      ...sharedPartition(1 - THORNPEAK_SHARE - 1 * BLUE_COPY_SHARE, [
+        ['heroic_ysols_pearl_greaves', 0.5],
+        ['heroic_moonshroud_breastplate', 0.34],
+        ['heroic_moonshroud_robe', 0.33],
+        ['heroic_moonshroud_tunic', 0.33],
+        ['lunar_tide_greatstaff', 0.25],
+        ['menders_hourglass', 0.25],
+      ]),
     ]).map(preserveBaseLootSource),
     { itemId: 'reins_grag_bear', chance: HEROIC_BLUE_MOUNT_CHANCE },
     ...heroicFarmPatternRows(),
   ],
   korzul_the_gravewyrm: [
     ...weightedLootGroup('korzul_heroic', [
-      ['boneplate_vest', 0.34],
-      ['revenant_silk_robe', 0.33],
-      ['nightwalk_jerkin', 0.33],
-      ['cultist_flayer', 0.1],
-      ['heroic_wyrmfang_greatblade', 0.05],
-      ['heroic_staff_of_the_gravewyrm', 0.05],
-      ['heroic_fang_of_korzul', 0.05],
-      ['heroic_deathlord_warplate', 0.05],
-      ['heroic_necromancers_starshroud', 0.05],
-      ['heroic_wyrmshadow_harness', 0.05],
-      ['heroic_boundstone_girdle', 0.05],
-      ['heroic_gravewyrm_gauntlets', 0.05],
-      ['heroic_deathlords_dread_visage', 0.04],
-      ['heroic_necromancers_soulspire_mantle', 0.04],
-      ['heroic_wyrmshadow_talongrips', 0.04],
-      ['heroic_nightfangs_greatstaff', 0.05],
-      ['heroic_wildgrowth_leggings', 0.05],
-      ['heroic_grovewardens_grips', 0.05],
-      ['heroic_verdant_walkers', 0.05],
-      ['heroic_gravewyrm_bone_quiver', 0.05],
-      ['gravewyrm_cleaver', 0.34],
-      ['shroud_of_the_gravewyrm', 0.33],
-      ['sanctum_prowlers_grips', 0.33],
-      ['gravewyrm_claws', 0.25],
-      ['gravescale_girdle', 0.25],
-      ['wyrmchoir_handwraps', 0.25],
-      ['wildsoul_maul', 0.25],
+      ['quenchwater_flask', 0.15],
+      ['gravewyrm_cleaver', 0.17],
+      ['shroud_of_the_gravewyrm', 0.17],
+      ['wildsoul_maul', 0.17],
+      ['heroic_gravecourt_hewer', THORNPEAK_SHARE],
+      ['heroic_stormhymn_chain_grips', THORNPEAK_HOME_SHARE],
+      ['heroic_stormhymn_chain_treads', THORNPEAK_HOME_SHARE],
+      ...sharedPartition(0.24 - 2 * THORNPEAK_HOME_SHARE, [
+        ['heroic_fang_of_korzul', 0.05],
+        ['heroic_wyrmshadow_harness', 0.05],
+        ['heroic_wyrmshadow_talongrips', 0.04],
+        ['heroic_nightfangs_greatstaff', 0.05],
+        ['heroic_verdant_walkers', 0.05],
+        ['heroic_gravewyrm_bone_quiver', 0.05],
+      ]),
     ]).map(preserveBaseLootSource),
     { itemId: 'reins_stalkglider_snail', chance: HEROIC_BLUE_MOUNT_CHANCE },
     ...heroicFarmPatternRows(),
   ],
-  // Heroic mid-boss table: the Fanglord Beastmaster drops the heroic twin of
-  // Duskwhisper (the normal drops from his normal-mode kill in WILDHEART_ITEMS).
-  wildheart_beastmaster: [{ itemId: 'heroic_duskwhisper', chance: 0.18 }],
+  // The Wildheart Basin rework (wildheart_basin.md 8.2): one equipment item per
+  // boss kill. The Fanglord Beastmaster, promoted to a real boss, pays the
+  // Fanglord's Whistle, the new Hide Mantle, his two shipped chase weapons'
+  // Heroic twins and the Bloodmane War-Legguards moved off Zulgar. The design
+  // table gives the Heroic Duskwhisper 0.20; the Heroic Fanglord's Beastspear
+  // shares that weight (0.10 each) because its base row is normalOnly now and
+  // this partition is its only heroic path (the shipped Reliquary page counts
+  // both difficulties, so a heroic kill must still pay every one of its
+  // relics). Duskwhisper keeps its five-man boss tier; the Beastspear keeps
+  // its shipped generated tier (PRESERVED_BASE_LOOT_SOURCES).
+  wildheart_beastmaster: [
+    ...weightedLootGroup('wildheart_beastmaster_heroic', [
+      ['heroic_direfang_greatblade', THORNPEAK_SHARE],
+      ['hunters_tally', THORNPEAK_SHARE],
+      ['heroic_direfang_quiver', THORNPEAK_HOME_SHARE],
+      ['heroic_bramblehide_grips', THORNPEAK_HOME_SHARE],
+      ['heroic_bramblehide_treads', THORNPEAK_HOME_SHARE],
+      ...sharedPartition(1 - 2 * THORNPEAK_SHARE - 3 * THORNPEAK_HOME_SHARE, [
+        ['fanglords_whistle', 0.25],
+        ['fanglords_hide_mantle', 0.3],
+        ['heroic_duskwhisper', 0.1],
+        ['heroic_fanglords_beastspear', 0.1],
+        ['bloodmane_war_legguards', 0.25],
+      ]),
+    ]).map(preserveBaseLootSource),
+  ],
+  // The Gorgebloom: the Gorgebloom Seedpod, the new Thorncrowned Greathelm, the
+  // Sunbone Oracle's Crown moved off Zulgar, and the generated Heroic
+  // Falls-Blessed Staff (its base tier preserved).
+  the_gorgebloom: [
+    ...weightedLootGroup('the_gorgebloom_heroic', [
+      ['heroic_bramblehide_crown', THORNPEAK_SHARE],
+      ['wellspring_seed', THORNPEAK_SHARE],
+      ['heroic_bramblehide_mantle', THORNPEAK_HOME_SHARE],
+      ['heroic_bramblehide_cinch', THORNPEAK_HOME_SHARE],
+      ...sharedPartition(1 - 2 * THORNPEAK_SHARE - 2 * THORNPEAK_HOME_SHARE, [
+        ['gorgebloom_seedpod', 0.25],
+        ['thornroot_greathelm', 0.3],
+        ['sunbone_oracles_crown', 0.25],
+        ['heroic_falls_blessed_staff', 0.2],
+      ]),
+    ]).map(preserveBaseLootSource),
+  ],
+  // Zulgar keeps his shipped partition minus the two epics the rework moved to
+  // the Beastmaster and the Gorgebloom and minus his uncommon trio (Normal
+  // only); weightedLootGroup renormalizes the remaining weights. Mount reins
+  // and the farm pattern rows are unchanged.
   wildheart_high_priest: [
     ...weightedLootGroup('wildheart_heroic', [
-      ['bloodmane_warleggings', 0.34],
-      ['vineclaw_stalking_breeches', 0.33],
-      ['sunbone_ritual_sarong', 0.33],
-      ['heroic_wildheart_tuskblade', 0.06],
-      ['heroic_wildheart_hexwood_staff', 0.06],
-      ['heroic_wildheart_fangknife', 0.06],
-      ['basin_stalkers_tunic', 0.34],
-      ['verdant_heart_vestment', 0.33],
-      ['sunbone_ritual_hauberk', 0.33],
-      ['greatfang_of_the_basin', 0.34],
-      ['sunbone_oracles_crown', 0.33],
-      ['bloodmane_war_legguards', 0.33],
-      ['paired_talons', 0.25],
+      ['heroic_bramblehide_harness', THORNPEAK_SHARE],
+      ['heroic_bramblehide_legguards', THORNPEAK_HOME_SHARE],
+      ['heroic_thornpeak_moonhide_cowl', THORNPEAK_HOME_SHARE],
+      ...sharedPartition(1 - THORNPEAK_SHARE - 2 * THORNPEAK_HOME_SHARE, [
+        ['heroic_wildheart_tuskblade', 0.06],
+        ['heroic_wildheart_hexwood_staff', 0.06],
+        ['heroic_wildheart_fangknife', 0.06],
+        ['basin_stalkers_tunic', 0.34],
+        ['verdant_heart_vestment', 0.33],
+        ['sunbone_ritual_hauberk', 0.33],
+        ['greatfang_of_the_basin', 0.34],
+        ['paired_talons', 0.25],
+      ]),
     ]).map(preserveBaseLootSource),
     { itemId: 'reins_grag_bear', chance: HEROIC_BLUE_MOUNT_CHANCE },
     { itemId: 'reins_stalkglider_snail', chance: HEROIC_BLUE_MOUNT_CHANCE },
@@ -950,22 +1166,21 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     // raid-tier (item level 33/37) heroic variants in a heroic claim
     // (loot/loot_roll.ts + heroic_variants.ts). This table adds only the
     // heroic-ONLY extras the normal table never carries: the three bespoke raid
-    // weapons and the four raid trinkets (content/trinkets.ts), one of which
-    // drops per heroic kill (chances sum to 1.0; weapons half, trinkets half,
-    // so the kill still pays exactly two equipment items), plus the
-    // blue and green mount secondary paths (same per-mount rate as their five-man
-    // sources; the raid offers both of each so every heroic raider has a path).
-    { itemId: 'deathless_greatblade', chance: 0.17, rollGroup: 'nythraxis_heroic_weapon' },
+    // weapons, one of which drops per heroic kill (chances sum to 1.0, so the
+    // kill still pays exactly two equipment items), plus the blue and green
+    // mount secondary paths (same per-mount rate as their five-man sources; the
+    // raid offers both of each so every heroic raider has a path). The four raid
+    // trinkets (content/trinkets.ts) moved to the heroic five-man bosses whose
+    // fights they echo: the Mooring Stone to Gaoler Ossick, the Echoing Lens to
+    // the Tideglass Colossus, the Hunter's Tally to the Wildheart Beastmaster and
+    // the Wellspring Seed to the Gorgebloom.
+    { itemId: 'deathless_greatblade', chance: 0.34, rollGroup: 'nythraxis_heroic_weapon' },
     {
       itemId: 'scepter_of_the_deathless_court',
-      chance: 0.17,
+      chance: 0.34,
       rollGroup: 'nythraxis_heroic_weapon',
     },
-    { itemId: 'stormcallers_focus', chance: 0.16, rollGroup: 'nythraxis_heroic_weapon' },
-    { itemId: 'mooring_stone', chance: 0.125, rollGroup: 'nythraxis_heroic_weapon' },
-    { itemId: 'wellspring_seed', chance: 0.125, rollGroup: 'nythraxis_heroic_weapon' },
-    { itemId: 'hunters_tally', chance: 0.125, rollGroup: 'nythraxis_heroic_weapon' },
-    { itemId: 'echoing_lens', chance: 0.125, rollGroup: 'nythraxis_heroic_weapon' },
+    { itemId: 'stormcallers_focus', chance: 0.32, rollGroup: 'nythraxis_heroic_weapon' },
     // Blue mount secondary paths on the heroic raid (0.1% each, equal per-mount
     // to the five-man rate; both blues available so aggregate ~0.2%); the primary
     // path for each is its five-man heroic boss. Epic mounts are rift S-only.

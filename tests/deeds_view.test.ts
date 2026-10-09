@@ -876,13 +876,15 @@ describe('real catalog integration', () => {
     // 286 with the release's ferry round trip (exp_harbor_to_harbor).
     // 287 with the Buried Hoards Coinsack catch (cmb_coinsack_caught, visible),
     // 290 with the Mirefen world-boss branch's three combat deeds (none feat or hidden).
-    expect(view.summary.visibleTotal).toBe(290);
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 314.
+    expect(view.summary.visibleTotal).toBe(314);
     // The bucket sum adds the feat-flagged rows back on top (hidden-unearned
     // deeds never enter a bucket at all, so only the 22 feats separate this
     // from visibleTotal): 268 + 22 = 290, then 298, 305, 307 and 308 by the same
     // four appends, then 309 with the Buried Hoards Coinsack catch, and 312 with
     // the world-boss branch's three.
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(312);
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 336.
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(336);
   });
 
   it('offers exactly the live catalog border deeds once they are earned', () => {

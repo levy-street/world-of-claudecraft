@@ -30,6 +30,7 @@ const MOB_IDS = [
   'willowfen_remedy_caravan',
   'frostveil_supply_caravan',
   'restless_bones',
+  'marrow_restless_bones',
   'gorrak',
   'mire_prowler',
   'deepfen_murloc',
@@ -72,11 +73,75 @@ const MOB_IDS = [
   'bonechill_widow',
   'sexton_marrow',
   'morthen',
+  // The Hollow Crypt rework (sim/content/hollow_crypt.ts).
+  'ossuary_sentinel',
+  'hollow_gravedigger',
+  'rime_egg_sac',
+  'rimeweb_hatchling',
+  'rimeweb_spinner',
+  'candlewright_acolyte',
+  'hollow_chorister',
+  'bound_soul',
+  'rimeweb',
+  'cantor_ilvane',
+  // The Hollow Crypt trash (sim/content/hollow_crypt_trash.ts).
+  'crypt_ossuary_warrior',
+  'crypt_gravecaller_adept',
+  'crypt_ossuary_cutthroat',
+  'crypt_gravecaller_necromancer',
+  'crypt_bone_minion',
+  'crypt_bone_brute',
+  // Reassemble's bones (the crypt trash mechanics pass, trash_kit/crypt_kit.ts).
+  'crypt_bone_pile',
+  'crypt_chapel_gargoyle',
+  'crypt_crow_caller',
+  'crypt_carrion_crow',
+  'crypt_ossuary_drake',
+  // The Hollow Crypt finale (sim/content/hollow_crypt.ts).
+  'crypt_knellwyrm',
+  // Morthen's Rite: the usable body at each candle's foot (the relight).
+  'crypt_remembrance_candle',
   'bastion_revenant',
   'tidebound_acolyte',
   'drowned_thrall',
   'knight_commander_olen',
   'vael_the_mistcaller',
+  // The Sunken Bastion rework (sim/content/sunken_bastion.ts).
+  'drowned_watchman',
+  'fogbound_arbalest',
+  'barnacle_crawler',
+  'bastion_warhound',
+  'mistweaver',
+  'drowned_sergeant',
+  'shackled_prisoner',
+  'gaol_turnkey',
+  'turretback_hermit',
+  'vael_fog_shade',
+  'gaoler_ossick',
+  // The Bastion's fifth pass: the Turnkey's Iron Cage and Ossick's anchor.
+  'bastion_gaol_cage',
+  'bastion_drowned_anchor',
+  // The Drowned Temple rework (sim/content/drowned_temple.ts); the per-class
+  // Reflections all wear the one name.
+  'lagoon_snapper',
+  'ice_wraith',
+  'moonlit_siren',
+  'tidewisp',
+  'drowned_pilgrim',
+  'mere_hydra_head_left',
+  'mere_hydra_head_center',
+  'mere_hydra_head_right',
+  'tideglass_colossus',
+  'tideglass_reflection',
+  'tideglass_reflection_warrior',
+  'tideglass_reflection_paladin',
+  'tideglass_reflection_hunter',
+  'tideglass_reflection_rogue',
+  'tideglass_reflection_priest',
+  'tideglass_reflection_shaman',
+  'tideglass_reflection_mage',
+  'tideglass_reflection_warlock',
+  'tideglass_reflection_druid',
   'sanctum_boneguard',
   'sanctum_drakonid',
   'raised_bonewalker',
@@ -273,7 +338,35 @@ const MOB_IDS = [
   'wildheart_ravager',
   'wildheart_hexcaller',
   'wildheart_beastmaster',
+  // The Wildheart Basin rework (docs/design/dungeon-rework/wildheart_basin.md).
+  'sunbone_totem_binder',
+  'sunbone_totem',
+  // The Wildheart trash mechanics pass: the Totem-Binder's fear totem.
+  'sunbone_dread_totem',
+  'basin_raptor',
+  'spore_toad',
+  'vine_lasher',
+  'great_saurian',
+  'howdah_hexcaller',
+  'fanglord_jaguar',
+  'the_gorgebloom',
   'wildheart_high_priest',
+  // The Gravewyrm Sanctum rework (docs/design/dungeon-rework/gravewyrm_sanctum.md).
+  'broodsworn_thawcaller',
+  'broodsworn_goadsmith',
+  'broodsworn_pyre_tender',
+  'soul_brazier',
+  'rime_whelp',
+  'ogre_sledge_hauler',
+  'glacier_splinter',
+  'sledge_tusker',
+  // Korgath's Seal Shackles (encounters/gravewyrm_sanctum/korgath.ts).
+  'sanctum_shackle_hammer',
+  'sanctum_shackle_tongs',
+  'sanctum_shackle_anvil',
+  'sanctum_shackle_bellows',
+  // The Gorgebloom's sprouts (encounters/wildheart_basin/gorgebloom.ts).
+  'thorn_sprout',
 ] as const;
 
 const NPC_IDS = [
@@ -433,6 +526,8 @@ const NPC_IDS = [
   'tidewarden_nel',
   // the Eastbrook quay's sparring master (content/practice_dummies.ts)
   'drillmaster_hale',
+  // the Drowned Temple's lore guide (content/drowned_temple_cantor.ts)
+  'cantor_laverock',
 ] as const;
 
 const QUEST_IDS = [

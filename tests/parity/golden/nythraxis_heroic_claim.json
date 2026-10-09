@@ -760,7 +760,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1021,
-      "state": "88e5b360",
+      "state": "ceafa9e3",
       "events": "55560e1b",
       "rng": {
         "draws": 14,
@@ -2063,20 +2063,11 @@
               },
               {
                 "count": 1,
-                "itemId": "hunters_tally"
+                "itemId": "stormcallers_focus"
               }
             ]
           },
           "lootFfaTimer": 59.95,
-          "lootPartyTradeEligibility": {
-            "names": [
-              "HeroicTank",
-              "HeroicDps0",
-              "HeroicDps1",
-              "HeroicDps2",
-              "HeroicDps3"
-            ]
-          },
           "lootRecipientIds": [
             1011,
             1012,
@@ -2120,7 +2111,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1021,
-      "state": "88e5b360",
+      "state": "ceafa9e3",
       "events": "741638a5",
       "rng": {
         "draws": 14,
@@ -3423,20 +3414,11 @@
               },
               {
                 "count": 1,
-                "itemId": "hunters_tally"
+                "itemId": "stormcallers_focus"
               }
             ]
           },
           "lootFfaTimer": 59.95,
-          "lootPartyTradeEligibility": {
-            "names": [
-              "HeroicTank",
-              "HeroicDps0",
-              "HeroicDps1",
-              "HeroicDps2",
-              "HeroicDps3"
-            ]
-          },
           "lootRecipientIds": [
             1011,
             1012,

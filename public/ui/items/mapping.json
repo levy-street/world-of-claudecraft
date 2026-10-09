@@ -7714,6 +7714,211 @@
         "muster_grapnel",
         "craterglass_stave"
       ]
+    },
+    {
+      "batchId": "sunken-bastion-icons-2026-09-29",
+      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_sunken_bastion_item_icons.mjs); no image model",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
+      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (per-item vector art over a three-stop radial ground, a paper-grain overlay) rasterized at the 512 master to an opaque 128x128 sRGB WebP. The exact vector source of every item is the ITEMS_TO_GENERATE table in scripts/generate_sunken_bastion_item_icons.mjs.",
+      "provenanceRecord": "docs/achievements/sunken-bastion-icons-2026-09-29/",
+      "itemIds": [
+        "knight_commanders_longsword",
+        "gaolers_chain_girdle",
+        "rusted_shackle_grips",
+        "drowned_wardens_mantle",
+        "gaolyard_cudgel",
+        "drowned_commanders_breastplate",
+        "gaolyard_striders",
+        "gaolers_iron_key",
+        "jailers_iron_gauntlets",
+        "turnkeys_keyring_belt",
+        "turnkeys_lantern_cowl"
+      ]
+    },
+    {
+      "batchId": "drowned-temple-icons-2026-09-30",
+      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_drowned_temple_item_icons.mjs); no image model",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
+      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (per-item vector art over a three-stop radial ground, a paper-grain overlay) rasterized at the 512 master to an opaque 128x128 sRGB WebP. The exact vector source of every item is the ITEMS_TO_GENERATE table in scripts/generate_drowned_temple_item_icons.mjs.",
+      "provenanceRecord": "docs/achievements/drowned-temple-icons-2026-09-30/",
+      "itemIds": [
+        "conchplate_girdle",
+        "pale_chorus_leggings",
+        "refrain_silk_gloves",
+        "chorus_conch",
+        "heroic_chorus_conch",
+        "tideglass_pauldrons",
+        "moonburn_treads",
+        "prism_etched_cowl",
+        "tideglass_shiv",
+        "pale_chorus_vestment",
+        "tideglass_warmaul"
+      ]
+    },
+    {
+      "batchId": "wildheart-basin-icons-2026-10-02",
+      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_wildheart_basin_item_icons.mjs); no image model",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
+      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (per-item vector art over a three-stop radial ground, a paper-grain overlay) rasterized at the 512 master to an opaque 128x128 sRGB WebP. The exact vector source of every item is the ITEMS_TO_GENERATE table in scripts/generate_wildheart_basin_item_icons.mjs.",
+      "provenanceRecord": "docs/achievements/wildheart-basin-icons-2026-10-02/",
+      "itemIds": [
+        "beastpit_warbelt",
+        "jaguar_hide_jerkin",
+        "hexbone_handwraps",
+        "rootbound_sabatons",
+        "pollen_dusted_leggings",
+        "bloomsilk_cowl",
+        "falls_blessed_staff",
+        "fanglords_hide_mantle",
+        "thornroot_greathelm",
+        "fanglords_whistle",
+        "gorgebloom_seedpod"
+      ]
+    },
+    {
+      "batchId": "gravewyrm-sanctum-icons-2026-10-03",
+      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_gravewyrm_sanctum_item_icons.mjs); no image model",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
+      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (per-item vector art over a three-stop radial ground, a paper-grain overlay) rasterized at the 512 master to an opaque 128x128 sRGB WebP. The exact vector source of every item is the ITEMS_TO_GENERATE table in scripts/generate_gravewyrm_sanctum_item_icons.mjs.",
+      "provenanceRecord": "docs/achievements/gravewyrm-sanctum-icons-2026-10-03/",
+      "itemIds": [
+        "foremans_grips",
+        "serac_stride_boots",
+        "seal_rune_mantle",
+        "thawbound_legguards",
+        "pyre_tenders_hood",
+        "meltwater_cord",
+        "hammer_of_the_open_lock",
+        "vestments_of_the_waking_rite",
+        "foremans_last_link",
+        "phial_of_the_tithe",
+        "quenchwater_flask"
+      ]
+    },
+    {
+      "batchId": "hollow-crypt-icons-2026-10-03",
+      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_hollow_crypt_item_icons.mjs); no image model",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
+      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (per-item vector art with a per-plate volume sheen and a soft paint-grain filter, over a three-stop radial ground, a paper-grain overlay) rasterized at the 512 master to an opaque 128x128 sRGB WebP. The exact vector source of every item is the ITEMS_TO_GENERATE table in scripts/generate_hollow_crypt_item_icons.mjs.",
+      "provenanceRecord": "docs/achievements/hollow-crypt-icons-2026-10-03/",
+      "itemIds": [
+        "gravedirt_treads",
+        "bellrope_girdle",
+        "sextons_spadehaft",
+        "rimesilk_mantle",
+        "bonechill_carapace_vest",
+        "rimeweb_hunters_leggings",
+        "rimeweb_fang",
+        "cantors_cassock",
+        "choirward_leggings",
+        "choristers_gloves",
+        "cantors_hymnal",
+        "heroic_cantors_hymnal",
+        "gravecallers_vestments",
+        "unquiet_stalkers_hood",
+        "sextons_burial_spade",
+        "rimesilk_hood"
+      ]
+    },
+    {
+      "batchId": "lower-dungeon-blues-icons-2026-10-08",
+      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_hollow_crypt_item_icons.mjs CRYPT_BLUES, scripts/generate_sunken_bastion_item_icons.mjs BASTION_BLUES, scripts/generate_drowned_temple_item_icons.mjs TEMPLE_BLUES); no image model",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
+      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (per-item vector art over a three-stop radial ground, a paper-grain overlay; the Crypt's with its per-plate volume sheen and soft paint-grain filter) rasterized at the 512 master to an opaque 128x128 sRGB WebP. Each generated Heroic armour clone is its base composition under a deeper ground with a halo and extra glints (the heroic_chorus_conch recipe). The exact vector source of every item is the CRYPT_BLUES, BASTION_BLUES and TEMPLE_BLUES tables in the three dungeon generators.",
+      "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
+      "itemIds": [
+        "spadeworn_gauntlets",
+        "gravedirt_grips",
+        "bellrope_mitts",
+        "rimewreath_coif",
+        "rime_laced_hood",
+        "lamenting_veil",
+        "choirward_pauldrons",
+        "choristers_spaulders",
+        "cantors_stole",
+        "knellbound_hauberk",
+        "candlewatch_jerkin",
+        "robe_of_the_unquiet_rite",
+        "gravecallers_rod",
+        "heroic_spadeworn_gauntlets",
+        "heroic_gravedirt_grips",
+        "heroic_bellrope_mitts",
+        "heroic_rimewreath_coif",
+        "heroic_rime_laced_hood",
+        "heroic_lamenting_veil",
+        "heroic_choirward_pauldrons",
+        "heroic_choristers_spaulders",
+        "heroic_cantors_stole",
+        "heroic_knellbound_hauberk",
+        "heroic_candlewatch_jerkin",
+        "heroic_robe_of_the_unquiet_rite",
+        "portcullis_girdle",
+        "cellwatch_belt",
+        "lanternwick_sash",
+        "turnkeys_shank",
+        "gaolyard_jerkin",
+        "brinewarden_robe",
+        "fogbinders_rod",
+        "heroic_portcullis_girdle",
+        "heroic_cellwatch_belt",
+        "heroic_lanternwick_sash",
+        "heroic_gaolyard_jerkin",
+        "heroic_brinewarden_robe",
+        "conchplate_sabatons",
+        "pale_chorus_slippers",
+        "tideglass_gauntlets",
+        "moonburn_grips",
+        "prism_etched_handwraps",
+        "mere_crested_helm",
+        "mereskin_hood",
+        "merewater_cowl",
+        "merecleaver",
+        "moonwrack_stave",
+        "heroic_conchplate_sabatons",
+        "heroic_pale_chorus_slippers",
+        "heroic_tideglass_gauntlets",
+        "heroic_moonburn_grips",
+        "heroic_prism_etched_handwraps",
+        "heroic_mere_crested_helm",
+        "heroic_mereskin_hood",
+        "heroic_merewater_cowl"
+      ]
     }
   ]
 }

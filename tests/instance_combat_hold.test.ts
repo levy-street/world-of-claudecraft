@@ -7,6 +7,7 @@
 // unreachable stall, and the pull was being farmed.
 import { describe, expect, it } from 'vitest';
 import { collectEngagedPids } from '../src/sim/combat/engaged_combat';
+import { RIVER_FORD, WILDHEART_BASIN_ANCHORS } from '../src/sim/content/wildheart_basin_layout';
 import {
   BUILTIN_WORLD,
   DUNGEON_LIST,
@@ -17,6 +18,7 @@ import {
   instanceSlotForZ,
   MOBS,
 } from '../src/sim/data';
+import { finishRite } from '../src/sim/encounters/hollow_crypt/morthen_rise';
 import {
   IGNIVAR_APPROACH_GUARDIAN_IDS,
   IGNIVAR_CRUCIBLE_WARDEN_ID,
@@ -144,7 +146,25 @@ describe('instance combat hold: hate tables are slot-scoped, never distance-scop
     const { sim, instance, player, mobs } = claim('wildheart_basin');
     const mob = expectDefined(mobs.find((m) => !MOBS[m.templateId]?.boss));
     engage(sim, player, mob);
-    const far = insideSlotAwayFrom(instance, mob, THREAT_DROP_RANGE + 40);
+    // The far spot has to be ground the mob can walk to. The authored Basin
+    // field is terraces over a void gorge, and a mob whose target stands in
+    // the gorge holds pinned in place (the unreachable arm, below) instead of
+    // chasing. The ford's east shallows sit open below the fern landing the
+    // first pack holds, past the threat drop range.
+    const origin = instanceOriginOf(instance);
+    const far = {
+      x: origin.x + RIVER_FORD.x1 - 12,
+      y: 0,
+      z: origin.z + (RIVER_FORD.z0 + RIVER_FORD.z1) / 2,
+    };
+    expect(
+      dist2d(mob.pos, {
+        x: origin.x + WILDHEART_BASIN_ANCHORS.fernLanding.x,
+        y: 0,
+        z: origin.z + WILDHEART_BASIN_ANCHORS.fernLanding.z,
+      }),
+    ).toBeLessThan(10);
+    expect(dist2d(mob.pos, far)).toBeGreaterThan(THREAT_DROP_RANGE);
     place(sim, player, far.x, far.z);
     expect(claimedSlotOf(sim.ctx, player)).toBe(claimedSlotOf(sim.ctx, mob));
 
@@ -177,6 +197,9 @@ describe('instance combat hold: hate tables are slot-scoped, never distance-scop
   it('holds a party member anywhere in the room for an instance boss, and nobody outside it', () => {
     const { sim, instance, pid, player, mobs } = claim('hollow_crypt');
     const boss = expectDefined(mobs.find((m) => MOBS[m.templateId]?.boss));
+    // Morthen waits entombed for his entrance at the Rite Ring
+    // (encounters/hollow_crypt/morthen_rise.ts); skip it so he fights.
+    finishRite(sim.ctx, instance, boss);
     const passivePid = sim.addPlayer('priest', 'Passive');
     sim.setPlayerLevel(30, passivePid);
     sim.partyInvite(passivePid, pid);

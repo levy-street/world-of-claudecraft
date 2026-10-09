@@ -1,7 +1,11 @@
 // Boss-table eligibility is content-bounded. No character cache or random draws here.
 import { HEROIC_DUNGEON_TUNING } from './content/dungeon_difficulty';
 import { FINDER_ACTIVITIES } from './content/dungeon_finder';
-import { HEROIC_BOSS_LOOT } from './content/heroic_loot';
+import { HEROIC_BOSS_LOOT, NYTHRAXIS_RAID_BOSS_ID } from './content/heroic_loot';
+import {
+  NYTHRAXIS_RELOCATED_ITEM_IDS,
+  NYTHRAXIS_RELOCATED_TRINKET_IDS,
+} from './content/nythraxis_loot';
 import { DUNGEONS, ITEMS, MOBS } from './data';
 import { RAID_MIN_PLAYERS } from './item_level';
 import { heroicLootItemId } from './loot/heroic_item';
@@ -78,6 +82,36 @@ export function needsWeeklyBossTable(pool: WeeklyPoolId): boolean {
   );
 }
 
+/**
+ * The raid pieces and trinkets relocated off Nythraxis onto the five-man bosses
+ * (content/nythraxis_loot.ts) keep their raid identity, so every weekly shelf
+ * built from the raid still offers them: Normal copies on Normal, Heroic copies
+ * and the trinkets on Heroic, exactly as before the relocation. Shared by the
+ * boss-table shelf here and the instance shelves in weekly_rewards.ts.
+ */
+export function addRelocatedRaidShelf(ids: Set<string>, heroic: boolean): void {
+  for (const id of NYTHRAXIS_RELOCATED_ITEM_IDS) ids.add(heroicLootItemId(id, heroic));
+  if (heroic) for (const id of NYTHRAXIS_RELOCATED_TRINKET_IDS) ids.add(id);
+}
+
+let relocatedRaidIds: ReadonlySet<string> | null = null;
+
+/**
+ * Whether an id is one of those relocated raid pieces (either copy) or trinkets.
+ * They stay off the five-man weekly shelves even though five-man bosses drop them
+ * now: the relocation changed where they drop, not which weekly shelf offers them
+ * (the rift clear pools keep them out the same way, rift/loot_pools.ts).
+ */
+export function isRelocatedRaidPiece(id: string): boolean {
+  if (!relocatedRaidIds) {
+    const ids = new Set<string>();
+    addRelocatedRaidShelf(ids, false);
+    addRelocatedRaidShelf(ids, true);
+    relocatedRaidIds = ids;
+  }
+  return relocatedRaidIds.has(id);
+}
+
 export function weeklyBossLootPool(bossId: string, pool: WeeklyPoolId, cls: PlayerClass): string[] {
   const table = weeklyBossTable(bossId);
   if (!table || !needsWeeklyBossTable(pool) || !pool.startsWith(table.category)) return [];
@@ -91,6 +125,9 @@ export function weeklyBossLootPool(bossId: string, pool: WeeklyPoolId, cls: Play
     for (const entry of HEROIC_BOSS_LOOT[bossId] ?? [])
       if (entry.itemId && !entry.questId && entry.chance > 0) ids.add(entry.itemId);
   }
+  if (bossId === NYTHRAXIS_RAID_BOSS_ID) addRelocatedRaidShelf(ids, heroic);
+  else if (table.category === 'dungeon')
+    for (const id of ids) if (isRelocatedRaidPiece(id)) ids.delete(id);
   return [...ids]
     .filter((id) => {
       const item = ITEMS[id];

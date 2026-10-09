@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "e898677ed03d607ba1ab47f4da305fdedc6dc958b6efc0dd8b6e4eb0ddf93483",
+  "rendererFingerprint": "bf9f43cc1dabf67977a96512498c2a90d164dc0656a53c8dc2847b516a185a17",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "darwin",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 5714353,
-      "sha256": "1184dbfd044e181b90cd729a4a657ed2b105d0d6f1e782e09941a2e770c7bf84",
+      "bytes": 6063673,
+      "sha256": "2675e6f7ee87d1986d73399c66b24f8dc16a6518acec848001d6f845e8493433",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 276,
+  "portraitCount": 355,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -363,6 +363,40 @@
       }
     },
     {
+      "id": "barnacle_crawler",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "bastion_crawler",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/bastion_ghost_sailor.glb",
+          "path": "public/models/creatures/bastion_ghost_sailor.glb",
+          "bytes": 2176272,
+          "sha256": "007aaa1e67bf2b952befeb58e9c34d86c1731129bdded2b461732244c960b2f3"
+        },
+        "idle": "Idle",
+        "height": 2.8,
+        "yaw": null,
+        "hover": 0.2,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "7c51c54d6e75c8091edb6d6f0895bde75ef54e042fe25a088d7003935537225e",
+      "output": {
+        "path": "public/ui/mobs/barnacle_crawler.webp",
+        "bytes": 2292,
+        "sha256": "ea1c3117d25b6b5dd61f7f3bdf096f101a67a230e280330ffbd60876a24c381b"
+      }
+    },
+    {
       "id": "barrow_king",
       "family": "undead",
       "finderEncounter": false,
@@ -431,37 +465,173 @@
       }
     },
     {
+      "id": "basin_raptor",
+      "family": "beast",
+      "finderEncounter": false,
+      "visualKey": "wildheart_basin_raptor",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/wildheart_basin_raptor.glb",
+          "path": "public/models/creatures/wildheart_basin_raptor.glb",
+          "bytes": 2184872,
+          "sha256": "7a0bdf97e10517eff08df4a5b82a733f8742c40a35404bf1345878550200a9d9"
+        },
+        "idle": "Idle",
+        "height": 3.0405882352941176,
+        "yaw": null,
+        "hover": -0.0011764705882352942,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "dd1f316d9e37ea35da7ff74dc19fb712ad8063d2d616c8f78d0b8bd9bc178e29",
+      "output": {
+        "path": "public/ui/mobs/basin_raptor.webp",
+        "bytes": 2302,
+        "sha256": "a144cc9bc5cca195c22d1987645a89ddfcc8f6670cc09bacf38e69f06e2cd81a"
+      }
+    },
+    {
+      "id": "bastion_drowned_anchor",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "bastion_drowned_anchor",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/drowned_anchor.glb",
+          "path": "public/models/creatures/drowned_anchor.glb",
+          "bytes": 513480,
+          "sha256": "d9d2bf8eda6826102cd8c48220f7ce2adc509f7eb05d8c0606fe50949c8b57ab"
+        },
+        "idle": "Idle",
+        "height": 6.64,
+        "yaw": null,
+        "hover": -0.07,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "9215049ef76eae054624e09795d3efb697431ffb835bc44e0993ef4c5e9bf2b8",
+      "output": {
+        "path": "public/ui/mobs/bastion_drowned_anchor.webp",
+        "bytes": 1672,
+        "sha256": "1421b8c9326690df3a5dae888bc839eb520d3a35cb706080b2efc7c3cc578258"
+      }
+    },
+    {
+      "id": "bastion_gaol_cage",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "bastion_gaol_cage",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/gaol_cage.glb",
+          "path": "public/models/creatures/gaol_cage.glb",
+          "bytes": 565080,
+          "sha256": "d2da328d9b5595f414a1d820fb8a256f1ca39cfafa590f6785c2eedd6e842c77"
+        },
+        "idle": "Idle",
+        "height": 8.27,
+        "yaw": null,
+        "hover": -0.33,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "e1643febcf389257223f754ef6902fcb52d222fbccbffdf4590f5b5fae0f157a",
+      "output": {
+        "path": "public/ui/mobs/bastion_gaol_cage.webp",
+        "bytes": 2302,
+        "sha256": "7297bf4499080b4abe4c2dc1b0591ee9f3c44e7b79c3ad96fb6c7e371fb41bee"
+      }
+    },
+    {
       "id": "bastion_revenant",
       "family": "undead",
       "finderEncounter": false,
-      "visualKey": "skel_warrior",
+      "visualKey": "bastion_drowned_revenant",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_warrior.glb",
-          "path": "public/models/chars/enemies/skeleton_warrior.glb",
-          "bytes": 523236,
-          "sha256": "572feed3592cfd46b241d0bccc601673c1f652c0792da716f49dc83369e4c681"
+          "url": "models/creatures/drowned_revenant.glb",
+          "path": "public/models/creatures/drowned_revenant.glb",
+          "bytes": 2852992,
+          "sha256": "6dfc0be7e5905fe5136dadd311535ae7086b23cb0d2ed2a750172f62bfa65323"
         },
-        "idle": "Idle_Combat",
-        "height": 2.5,
+        "idle": "Idle",
+        "height": 4.95,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.25
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#7fa8a0",
-        "strength": 0.25
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "ca1c5b72eceff5cfb63731012d755711fd5a0ecbc793e4b6193b10ab10016421",
+      "sourceFingerprint": "cca6a5ec1203ea0181ae3d614b1555eaf1b50f457081f6e96f5836024dfb7c98",
       "output": {
         "path": "public/ui/mobs/bastion_revenant.webp",
-        "bytes": 2284,
-        "sha256": "05c3fdef7b904cb544ee03ee65dba16298e664f3f4ca7d57a0c4d89e77049def"
+        "bytes": 2312,
+        "sha256": "2d913117d5586314e0c77b30d2a31383b3d076b1f0235e7ba6397fcf866e0dee"
+      }
+    },
+    {
+      "id": "bastion_warhound",
+      "family": "beast",
+      "finderEncounter": false,
+      "visualKey": "bastion_warhound",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/bastion_warhound.glb",
+          "path": "public/models/creatures/bastion_warhound.glb",
+          "bytes": 2782908,
+          "sha256": "45912d864c47383b6794313ac32227794cbd185b9f0733989194ab19de088a95"
+        },
+        "idle": "Idle",
+        "height": 3.55,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "f6e6ca2df0116c4d6769c23cc44cfeec595657376da37e74868157744cab647b",
+      "output": {
+        "path": "public/ui/mobs/bastion_warhound.webp",
+        "bytes": 1970,
+        "sha256": "d4a70fba2cb18d84f9654fe8e09994f2265969b51869abd2f4a4bb2192e7195f"
       }
     },
     {
@@ -635,6 +805,40 @@
       }
     },
     {
+      "id": "bound_soul",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "skel_minion",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_minion.glb",
+          "path": "public/models/chars/enemies/skeleton_minion.glb",
+          "bytes": 815932,
+          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+        },
+        "idle": "Idle_Combat",
+        "height": 2.5,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.25
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#6fd6a8",
+        "strength": 0.25
+      },
+      "sourceFingerprint": "1d93a3b986d0fd4e39d5c69b286e4a146e26b89fe5d6df84224150bab2f64fae",
+      "output": {
+        "path": "public/ui/mobs/bound_soul.webp",
+        "bytes": 2722,
+        "sha256": "17c2bc8c8dcea66ef16154d5971c211a93a08ada581b925827f5d384923e2fc2"
+      }
+    },
+    {
       "id": "brakka_wallbreaker",
       "family": "ogre",
       "finderEncounter": false,
@@ -703,6 +907,108 @@
       }
     },
     {
+      "id": "broodsworn_goadsmith",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "sanctum_goadsmith",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/sanctum_goadsmith.glb",
+          "path": "public/models/creatures/sanctum_goadsmith.glb",
+          "bytes": 653576,
+          "sha256": "4643ea429aedab697ff118ab6faf853f5b1e0649fbf593b63ec12bc9b1bcff1a"
+        },
+        "idle": "Idle",
+        "height": 2.6285714285714286,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "7232d279b204b7d3ee58f757de61326723056e7b9d7f7d6fa6dc7c24cf474157",
+      "output": {
+        "path": "public/ui/mobs/broodsworn_goadsmith.webp",
+        "bytes": 1810,
+        "sha256": "62d66902cf27e22bc510d93e4266298c1965ef65e640a2dff878f80c97e4d25a"
+      }
+    },
+    {
+      "id": "broodsworn_pyre_tender",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "sanctum_pyre_tender",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/sanctum_pyre_tender.glb",
+          "path": "public/models/creatures/sanctum_pyre_tender.glb",
+          "bytes": 704688,
+          "sha256": "178e9fb3e342bc5e323f4622668ed2bca40c8efcc15ac1f70da160b3342a51c2"
+        },
+        "idle": "Idle",
+        "height": 2.666666666666667,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "18a86f9fe5613b0ddc2d8f76af2a0abcd434ea58f38bb06348cf8ee333e8bb14",
+      "output": {
+        "path": "public/ui/mobs/broodsworn_pyre_tender.webp",
+        "bytes": 2246,
+        "sha256": "a39a9d9d242a9f60acc727bf56dfb4ea0f39b16191f034779efd5a05e8f86a5d"
+      }
+    },
+    {
+      "id": "broodsworn_thawcaller",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "sanctum_thawcaller",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/sanctum_thawcaller.glb",
+          "path": "public/models/creatures/sanctum_thawcaller.glb",
+          "bytes": 870900,
+          "sha256": "4a0b35c1aeac03b5ccb1165dc85be8c1743132d6ac169c5d304ad9bbca01a2b0"
+        },
+        "idle": "Idle",
+        "height": 2.75,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "461379c6b03d30639e523107c17ded0b3f1331bdba1baa7b0930b3eacee0c757",
+      "output": {
+        "path": "public/ui/mobs/broodsworn_thawcaller.webp",
+        "bytes": 2336,
+        "sha256": "ccb9e18cacb23289a230b8e74db4d8dce0a547ea01f4a61fba5859df23441084"
+      }
+    },
+    {
       "id": "brutok_skullsmasher",
       "family": "ogre",
       "finderEncounter": false,
@@ -737,6 +1043,40 @@
       }
     },
     {
+      "id": "candlewright_acolyte",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "skel_minion",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_minion.glb",
+          "path": "public/models/chars/enemies/skeleton_minion.glb",
+          "bytes": 815932,
+          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+        },
+        "idle": "Idle_Combat",
+        "height": 2.5,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.25
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#e8a64a",
+        "strength": 0.25
+      },
+      "sourceFingerprint": "67a457e51353192a94657a29c43a7bcbfcc29e1775d8490eb88899cd41eae398",
+      "output": {
+        "path": "public/ui/mobs/candlewright_acolyte.webp",
+        "bytes": 2850,
+        "sha256": "4c6bbbf9bc53e4d10712c8275bc966c90eafd617c8df90fa3a32349c02d1ba25"
+      }
+    },
+    {
       "id": "canopy_weaver",
       "family": "spider",
       "finderEncounter": false,
@@ -768,6 +1108,40 @@
         "path": "public/ui/mobs/canopy_weaver.webp",
         "bytes": 1712,
         "sha256": "12a7d0db9336a50b576f8e77b27a1f0d2a1fc0b5847f6219375ed62b2e8ac0f2"
+      }
+    },
+    {
+      "id": "cantor_ilvane",
+      "family": "undead",
+      "finderEncounter": true,
+      "visualKey": "crypt_skel_cantor",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/crypt_cantor_ilvane.glb",
+          "path": "public/models/creatures/crypt_cantor_ilvane.glb",
+          "bytes": 3040532,
+          "sha256": "6965eaae050feb4a39082a39b5142df7aa25b5e13bcc4f994aeceb011a7cc04a"
+        },
+        "idle": "Idle",
+        "height": 5.964,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "0d18a35c34ebb6ae7c0a9db8d3ba73eaa3f74ccbd3c2925942ac4641ad372d88",
+      "output": {
+        "path": "public/ui/mobs/cantor_ilvane.webp",
+        "bytes": 2778,
+        "sha256": "c14cf720973cffbbf1f562f58f1a77fbecf50dad6a9c2103f52571cbdfdbf03b"
       }
     },
     {
@@ -917,59 +1291,34 @@
       "id": "choirmother_selthe",
       "family": "humanoid",
       "finderEncounter": true,
-      "visualKey": "mob_bandit",
+      "visualKey": "temple_selthe",
       "renderSpec": {
         "model": {
-          "url": "models/chars/players/rogue_hooded.glb",
-          "path": "public/models/chars/players/rogue_hooded.glb",
-          "bytes": 448736,
-          "sha256": "876d60366dc2105a801b2fb65da49a9cdee061f267cddb97ff8a27c95395c40a"
+          "url": "models/creatures/temple_selthe.glb",
+          "path": "public/models/creatures/temple_selthe.glb",
+          "bytes": 3651184,
+          "sha256": "d3fb538d4b73a7963013d0aa356352c20e63867957512e21281e0e0876127ecb"
         },
         "idle": "Idle",
-        "height": 2.6,
+        "height": 7.83,
         "yaw": null,
         "hover": null,
         "show": null,
-        "attach": [
-          {
-            "asset": {
-              "url": "models/weapons/dagger.glb",
-              "path": "public/models/weapons/dagger.glb",
-              "bytes": 35340,
-              "sha256": "b3c3c662c3d9505f727480d0bb1a9dcb26f88550985516f5159ea22b16a86e56"
-            },
-            "bone": "handslot.r",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          },
-          {
-            "asset": {
-              "url": "models/weapons/dagger.glb",
-              "path": "public/models/weapons/dagger.glb",
-              "bytes": 35340,
-              "sha256": "b3c3c662c3d9505f727480d0bb1a9dcb26f88550985516f5159ea22b16a86e56"
-            },
-            "bone": "handslot.l",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          }
-        ],
+        "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.3
+        "tintStrength": null
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#6b3a32",
-        "resolved": "#6b3a32",
-        "strength": 0.3
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "sourceFingerprint": "01c787c5ef48a45d1673b315a0d3db62b92f2defd0a5d6c38ebae6813734f6f8",
       "output": {
         "path": "public/ui/mobs/choirmother_selthe.webp",
-        "bytes": 2208,
-        "sha256": "6d2ea0022793890c53ba3178e219616ee0387c7cbc67250a25c8f0ff48ccf1f9"
+        "bytes": 3580,
+        "sha256": "73e287aa6ed923415b45a6539d66115e3e15f27d18b667e8e102f37ac8d3895b"
       }
     },
     {
@@ -1072,6 +1421,479 @@
         "path": "public/ui/mobs/corrupted_sporeling.webp",
         "bytes": 1500,
         "sha256": "ecd06eedf4439331bcb4f3e4499af9ba6df02bfa316fec3e31fd11c7a6ae0af5"
+      }
+    },
+    {
+      "id": "crypt_bone_brute",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "crypt_skel_brute",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_golem.glb",
+          "path": "public/models/chars/enemies/skeleton_golem.glb",
+          "bytes": 292776,
+          "sha256": "5ea6cd76ee8cfe1380ff056cd226c9403c49f17b5d280a504448efa82990c1f5"
+        },
+        "idle": "Idle",
+        "height": 4.6,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": [
+          {
+            "node": "Skeleton_Golem_Axe",
+            "rotY": 3.141592653589793
+          }
+        ],
+        "tintStrength": 0.25
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#d9d0bc",
+        "strength": 0.25
+      },
+      "sourceFingerprint": "6221e592846397a812a7e50ed166cbc6cf44c01edccbd41b53176a32671aa182",
+      "output": {
+        "path": "public/ui/mobs/crypt_bone_brute.webp",
+        "bytes": 2914,
+        "sha256": "7277bd845018ee93219494a3e9d142180308138e2f97942cfb852a5372631689"
+      }
+    },
+    {
+      "id": "crypt_bone_minion",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "crypt_skel_minion",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_minion.glb",
+          "path": "public/models/chars/enemies/skeleton_minion.glb",
+          "bytes": 815932,
+          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+        },
+        "idle": "Idle_Combat",
+        "height": 3.5,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.25
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#e8e0c8",
+        "strength": 0.25
+      },
+      "sourceFingerprint": "2a2517122d0f455addb51ee6d5f4925e743db16d51902cbe2dea9bd3c750df6b",
+      "output": {
+        "path": "public/ui/mobs/crypt_bone_minion.webp",
+        "bytes": 2838,
+        "sha256": "39c9ca77972d0f4e817f18e20483b3952850ddc9a9c8f4116791342c591b90dd"
+      }
+    },
+    {
+      "id": "crypt_bone_pile",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "crypt_skel_bone_pile",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_warrior.glb",
+          "path": "public/models/chars/enemies/skeleton_warrior.glb",
+          "bytes": 523236,
+          "sha256": "572feed3592cfd46b241d0bccc601673c1f652c0792da716f49dc83369e4c681"
+        },
+        "idle": "Lie_Idle",
+        "height": 1.4,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "aa4c2693edd7a2c0455f3957867b0017b06578fb663d9f06acb1aa51eee47a63",
+      "output": {
+        "path": "public/ui/mobs/crypt_bone_pile.webp",
+        "bytes": 2788,
+        "sha256": "7e858295ad4b1100fbe3b31ecb722928f62abfeed58fca9fb29a679ff4b4bc1e"
+      }
+    },
+    {
+      "id": "crypt_carrion_crow",
+      "family": "beast",
+      "finderEncounter": false,
+      "visualKey": "mob_crypt_crow",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/crypt_crow.glb",
+          "path": "public/models/creatures/crypt_crow.glb",
+          "bytes": 87216,
+          "sha256": "448da36c47023500383b02fc77815211fe1681da10b6a0796960f540a7e460eb"
+        },
+        "idle": "Idle",
+        "height": 1.7,
+        "yaw": null,
+        "hover": 2.2,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "a730dd51566f4961fdf2175ba5bf99e814b58cdce6f348b17a044a70ef68c39f",
+      "output": {
+        "path": "public/ui/mobs/crypt_carrion_crow.webp",
+        "bytes": 1544,
+        "sha256": "a20ec45f7a9f71e65553edd7abb037e0b024f1eeac25ce4da802c350bba8ae12"
+      }
+    },
+    {
+      "id": "crypt_chapel_gargoyle",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_crypt_gargoyle",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/crypt_gargoyle.glb",
+          "path": "public/models/creatures/crypt_gargoyle.glb",
+          "bytes": 1982324,
+          "sha256": "6ce1811d4c3a86180074ce40ebf61734318077a732d5b7f440510820ad76387a"
+        },
+        "idle": "Perch",
+        "height": 5.81,
+        "yaw": null,
+        "hover": -0.22,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "7d01f5eeca2cf6b4c9e5d2725d2337f6b642df6f9a3a586f925678b11730f5f4",
+      "output": {
+        "path": "public/ui/mobs/crypt_chapel_gargoyle.webp",
+        "bytes": 2136,
+        "sha256": "6c8d406b24dc11c6e24de64ddc9025051d8f4b158403b0b12c29b93a93fd756b"
+      }
+    },
+    {
+      "id": "crypt_crow_caller",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "mob_crypt_crow_caller",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/rogue_hooded.glb",
+          "path": "public/models/chars/players/rogue_hooded.glb",
+          "bytes": 448736,
+          "sha256": "876d60366dc2105a801b2fb65da49a9cdee061f267cddb97ff8a27c95395c40a"
+        },
+        "idle": "Idle",
+        "height": 3.3,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/staff.glb",
+              "path": "public/models/weapons/staff.glb",
+              "bytes": 36168,
+              "sha256": "0958a09b353f4e1228c67e318b130625db647f67b6a8c6a1dcd9d3f3aeff523a"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.6
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#3a3440",
+        "strength": 0.6
+      },
+      "sourceFingerprint": "6febc35336c7e1c4ba1bdb13b33150b7c2123189003cf59509dae7b67843e10f",
+      "output": {
+        "path": "public/ui/mobs/crypt_crow_caller.webp",
+        "bytes": 1868,
+        "sha256": "ec2c7d444d2ebf0d38e1df0eedd89770af5733309b0c7fc9d0d9e8294ff5b348"
+      }
+    },
+    {
+      "id": "crypt_gravecaller_adept",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "crypt_skel_adept",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_mage.glb",
+          "path": "public/models/chars/enemies/skeleton_mage.glb",
+          "bytes": 802628,
+          "sha256": "648ef555e8023ba2570a98c3aa38bf27b680db6d2eeb744b20ad6db06e587132"
+        },
+        "idle": "Idle_Combat",
+        "height": 3.2,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/skeleton_staff.glb",
+              "path": "public/models/weapons/skeleton_staff.glb",
+              "bytes": 51660,
+              "sha256": "75147e92b25e4d88a5edaf35b55b0eb6b2e2fe538694995507ecbb651072a78e"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#8f6cc4",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "aa64a50b6ca3154eabfca3b3f13fa79fcba135b9b80f8932478e3031c349b830",
+      "output": {
+        "path": "public/ui/mobs/crypt_gravecaller_adept.webp",
+        "bytes": 2190,
+        "sha256": "ac4367023083217dab0234070861344dd3f704bb38653dca6dffacf398bb0e9d"
+      }
+    },
+    {
+      "id": "crypt_gravecaller_necromancer",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "crypt_skel_necromancer",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/necromancer.glb",
+          "path": "public/models/chars/enemies/necromancer.glb",
+          "bytes": 528152,
+          "sha256": "9f1e4ea763337369a1b455afd9d07888d409d1f4efe12cf2880340937c0b16fc"
+        },
+        "idle": "Idle_Combat",
+        "height": 3.3,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.3
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#6fd6a8",
+        "strength": 0.3
+      },
+      "sourceFingerprint": "6548b1f6fcf4210d90a8fa7692e6a56684439ab195a4c3fad049b4c5b7764ceb",
+      "output": {
+        "path": "public/ui/mobs/crypt_gravecaller_necromancer.webp",
+        "bytes": 2670,
+        "sha256": "6d4d1df64c1eec08cf1bbf2a51b772d0b4870db6bc85185f28252c06ed3061eb"
+      }
+    },
+    {
+      "id": "crypt_knellwyrm",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "mob_crypt_knellwyrm",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/crypt_knellwyrm.glb",
+          "path": "public/models/creatures/crypt_knellwyrm.glb",
+          "bytes": 2513888,
+          "sha256": "82514cd4fc812833e767011bf7cb9ddc2fab17cd0d1802558a9d96491340ae8e"
+        },
+        "idle": "Idle",
+        "height": 15.07,
+        "yaw": null,
+        "hover": -0.19,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "4e69ad0929fdf136a39722950b6fb85b81741db3e9b6428bcf3f85de1ef74134",
+      "output": {
+        "path": "public/ui/mobs/crypt_knellwyrm.webp",
+        "bytes": 2394,
+        "sha256": "303fca978a0494e9e3f8bedc756efca8e7f50e2449cd801bf15b4b0608c6574a"
+      }
+    },
+    {
+      "id": "crypt_ossuary_cutthroat",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "crypt_skel_cutthroat",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_rogue.glb",
+          "path": "public/models/chars/enemies/skeleton_rogue.glb",
+          "bytes": 505020,
+          "sha256": "e6cc7ba50e84a3c2e9c800e22197c6e6621c1747dca9eb48e867c8b4529aef65"
+        },
+        "idle": "Idle_Combat",
+        "height": 3.2,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.25
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#a8b0b0",
+        "strength": 0.25
+      },
+      "sourceFingerprint": "c9c047fb859e2c2e5dcda70d9dd22f42890d490f96fb28265ff457a8d647695b",
+      "output": {
+        "path": "public/ui/mobs/crypt_ossuary_cutthroat.webp",
+        "bytes": 2528,
+        "sha256": "d27b5393bc3be075cf06eeb405b464db725df8abb4320349f986d49810b1b55e"
+      }
+    },
+    {
+      "id": "crypt_ossuary_drake",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "mob_crypt_drake",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/crypt_drake.glb",
+          "path": "public/models/creatures/crypt_drake.glb",
+          "bytes": 2424492,
+          "sha256": "9521ffb529f0262d40aedb2c30a2dad3fdaa2767ba9c534861705c60f68e0607"
+        },
+        "idle": "Idle",
+        "height": 13.63,
+        "yaw": null,
+        "hover": -0.19,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "8fa4864c8760f8e11b5ecaa98a1ba0d491581f1734dde3d5861a0ac448c3d381",
+      "output": {
+        "path": "public/ui/mobs/crypt_ossuary_drake.webp",
+        "bytes": 2578,
+        "sha256": "7aada61df46bdc235fa9c8c4f185b053782e88676ce2525c204277395c36b094"
+      }
+    },
+    {
+      "id": "crypt_ossuary_warrior",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "crypt_skel_warrior",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_warrior.glb",
+          "path": "public/models/chars/enemies/skeleton_warrior.glb",
+          "bytes": 523236,
+          "sha256": "572feed3592cfd46b241d0bccc601673c1f652c0792da716f49dc83369e4c681"
+        },
+        "idle": "Idle_Combat",
+        "height": 3.3,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.25
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#d8cfb8",
+        "strength": 0.25
+      },
+      "sourceFingerprint": "9863ba612ee6166893b24e7490d2796d620f384e050e6c72e0c06352eb64c452",
+      "output": {
+        "path": "public/ui/mobs/crypt_ossuary_warrior.webp",
+        "bytes": 2328,
+        "sha256": "62343c8b8b047dc71bdd9e03294e7d6b1b6040fa45f6aac91dbf562c4f2cce36"
+      }
+    },
+    {
+      "id": "crypt_remembrance_candle",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "crypt_rite_candle_body",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_warrior.glb",
+          "path": "public/models/chars/enemies/skeleton_warrior.glb",
+          "bytes": 523236,
+          "sha256": "572feed3592cfd46b241d0bccc601673c1f652c0792da716f49dc83369e4c681"
+        },
+        "idle": "Lie_Idle",
+        "height": 3.6,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "cbc4f323da1b1e02e73385cda5de94f49b2488348d0ae9d30e7c86c6268ca1d9",
+      "output": {
+        "path": "public/ui/mobs/crypt_remembrance_candle.webp",
+        "bytes": 2772,
+        "sha256": "ec96a773abae72936b90eb6f83132a1c01286f07bd9976053256d51b4851619b"
       }
     },
     {
@@ -1662,37 +2484,105 @@
       }
     },
     {
-      "id": "drowned_templeguard",
+      "id": "drowned_pilgrim",
       "family": "undead",
       "finderEncounter": false,
-      "visualKey": "skel_minion",
+      "visualKey": "temple_pilgrim",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/temple_pilgrim.glb",
+          "path": "public/models/creatures/temple_pilgrim.glb",
+          "bytes": 2525480,
+          "sha256": "68a106bd0ca1cdef8eb5793d58f7fc8974b2794bd207d3bfe6026d7e291bbc8c"
         },
-        "idle": "Idle_Combat",
-        "height": 2.5,
+        "idle": "Idle",
+        "height": 4.9,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.25
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#88a7a0",
-        "strength": 0.25
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "02109bcdd7518c08bdaa953f3321a2edd8b33ad4b56ca8d35b843a2fa70fc9eb",
+      "sourceFingerprint": "02208d22975a0fd0fc4ec98e67d1616a5bc0531ca5d2e16e01b7cb9760314a33",
+      "output": {
+        "path": "public/ui/mobs/drowned_pilgrim.webp",
+        "bytes": 2776,
+        "sha256": "a5d75aa1b491e5f4946a23cd7a2a6a86b0f394757f2ae03208a80d65d4598c79"
+      }
+    },
+    {
+      "id": "drowned_sergeant",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "bastion_skel_sergeant",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/drowned_sergeant.glb",
+          "path": "public/models/creatures/drowned_sergeant.glb",
+          "bytes": 2849592,
+          "sha256": "6f2817dea8ea2b053257064077c9b10fe6e73e466a77e5f4be225effd4bb2fa0"
+        },
+        "idle": "Idle",
+        "height": 5.15,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "df45c124569b75638a7c3358c217ba0e5eb707e4fcc5b0ef4c12a22652603c20",
+      "output": {
+        "path": "public/ui/mobs/drowned_sergeant.webp",
+        "bytes": 2290,
+        "sha256": "8abdea1ab44f53ab1f249836bf7ee30c37dbf6972217de970dd32f9894e1f0fd"
+      }
+    },
+    {
+      "id": "drowned_templeguard",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "temple_templeguard",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/temple_templeguard.glb",
+          "path": "public/models/creatures/temple_templeguard.glb",
+          "bytes": 3071440,
+          "sha256": "071169445ad70bccb83565cb91b9fd7b0aae23e61a094819a8f769979bef0a96"
+        },
+        "idle": "Idle",
+        "height": 5,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "65bb71470a8ee56357ef9e955d4dd95e114f1538feffe663ccfa6d462a833acd",
       "output": {
         "path": "public/ui/mobs/drowned_templeguard.webp",
-        "bytes": 2750,
-        "sha256": "95745e47abda4abe2202b40f57981ef2f3dbe5c8880f2e768eac86d167639049"
+        "bytes": 3532,
+        "sha256": "b6ca0bab8ec358fe9828eb2c3e798ec704561f5f21e33f1d072914b737317098"
       }
     },
     {
@@ -1795,6 +2685,40 @@
         "path": "public/ui/mobs/drowned_warlord.webp",
         "bytes": 2772,
         "sha256": "457d834ea5fd5217cfe893a25408dc381b3cfcc0fefecb04ca25f79c7ad56e81"
+      }
+    },
+    {
+      "id": "drowned_watchman",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "bastion_skel_watchman",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/drowned_watchman.glb",
+          "path": "public/models/creatures/drowned_watchman.glb",
+          "bytes": 2798912,
+          "sha256": "b1ee9ac1c6cdb42ff712a5b0f8b17ac95488d8a7708bc46103e70e4b59607007"
+        },
+        "idle": "Idle",
+        "height": 4.9,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "07b566e5e14f6040e4a5ec301c912328cb733240a2d2e62fab2dabd33766b4c6",
+      "output": {
+        "path": "public/ui/mobs/drowned_watchman.webp",
+        "bytes": 2044,
+        "sha256": "86da78742ed7cd0e1d749e0c04bb2b89679cfa8807314573ca853c9961a1a7d6"
       }
     },
     {
@@ -2108,6 +3032,40 @@
       }
     },
     {
+      "id": "fanglord_jaguar",
+      "family": "beast",
+      "finderEncounter": false,
+      "visualKey": "wildheart_fanglord_jaguar",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/wildheart_great_jaguar.glb",
+          "path": "public/models/creatures/wildheart_great_jaguar.glb",
+          "bytes": 2434800,
+          "sha256": "d5b816ebc91819c8a71a680fd6e793d54c45753d783aa11a4015fc25f48e5691"
+        },
+        "idle": "Idle",
+        "height": 1.9666666666666666,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "a93140612bf9138034df30c960c5b0457b717eba06bc8eb0165224b810e76fd4",
+      "output": {
+        "path": "public/ui/mobs/fanglord_jaguar.webp",
+        "bytes": 2714,
+        "sha256": "ee046b938511ad305f580a221b4841ee63e3f0253abf604a56214c114e469bcb"
+      }
+    },
+    {
       "id": "fen_sprite",
       "family": "burrower",
       "finderEncounter": false,
@@ -2282,6 +3240,40 @@
         "path": "public/ui/mobs/fisher_bram.webp",
         "bytes": 2192,
         "sha256": "1650811331dd1609e155a17da9151423b38c1892289c165c408cb456bf0764e1"
+      }
+    },
+    {
+      "id": "fogbound_arbalest",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "bastion_skel_arbalest",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/drowned_arbalest.glb",
+          "path": "public/models/creatures/drowned_arbalest.glb",
+          "bytes": 2701772,
+          "sha256": "c886085b52e4cdf5411647beb87a99c8bfe128541ffb7ce171d08f3301068893"
+        },
+        "idle": "Idle",
+        "height": 5.1,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "bae6d1c462c6bfe02fa590eb1842298dd0ab0875656747f99fe9e60c2a11a272",
+      "output": {
+        "path": "public/ui/mobs/fogbound_arbalest.webp",
+        "bytes": 2092,
+        "sha256": "49744945bfc6806362b3845d0728f419b9f505f05790cf70b652a8a13ffec45d"
       }
     },
     {
@@ -2480,6 +3472,74 @@
       }
     },
     {
+      "id": "gaol_turnkey",
+      "family": "humanoid",
+      "finderEncounter": true,
+      "visualKey": "bastion_turnkey",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/gaol_turnkey.glb",
+          "path": "public/models/creatures/gaol_turnkey.glb",
+          "bytes": 2684540,
+          "sha256": "0499f2be5653b49c35749684ac1cb7bbeadd56fff3ad08c17fc722edaa4d91a9"
+        },
+        "idle": "Idle",
+        "height": 6.4,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "25ad873fab2368b02a5a9bcc25d1a91a57e89e68f612cfb12588d0f7f7648014",
+      "output": {
+        "path": "public/ui/mobs/gaol_turnkey.webp",
+        "bytes": 1624,
+        "sha256": "c170c9dc7fbccaca4d84ce8e124583f60808db79208ea3a481fa75e0d73bb467"
+      }
+    },
+    {
+      "id": "gaoler_ossick",
+      "family": "undead",
+      "finderEncounter": true,
+      "visualKey": "bastion_ossick",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/gaoler_ossick.glb",
+          "path": "public/models/creatures/gaoler_ossick.glb",
+          "bytes": 3007028,
+          "sha256": "cc565b647613cabb093b2e344ce3fe98fbc123b9c50955e40a5f63de0cfef689"
+        },
+        "idle": "Idle",
+        "height": 7,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "c4a48914b7d4099141403a59b769412ecfe166b6f204e6dcb8ed30283d90f15a",
+      "output": {
+        "path": "public/ui/mobs/gaoler_ossick.webp",
+        "bytes": 2360,
+        "sha256": "d951e15145fbc0d388b82506cc6690ca6bbb04d69255cb333df560182d5cf1a8"
+      }
+    },
+    {
       "id": "gilded_stag",
       "family": "beast",
       "finderEncounter": false,
@@ -2511,6 +3571,40 @@
         "path": "public/ui/mobs/gilded_stag.webp",
         "bytes": 2190,
         "sha256": "72e9707199f5fdf5c39173076ec2da933a5535c2c9f2729c9c111b98d3278dec"
+      }
+    },
+    {
+      "id": "glacier_splinter",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "sanctum_glacier_splinter",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/sanctum_glacier_splinter.glb",
+          "path": "public/models/creatures/sanctum_glacier_splinter.glb",
+          "bytes": 1947596,
+          "sha256": "6527188b56ed28712856763d2a3db41b1153f2bc289a333cddb20d19f0333ff3"
+        },
+        "idle": "Idle",
+        "height": 2.842105263157895,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.45
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#6aaee6",
+        "resolved": "#6aaee6",
+        "strength": 0.45
+      },
+      "sourceFingerprint": "2786d995e215b95fb45be48aff4e188109638dad9bfd552a453570bfe97d756b",
+      "output": {
+        "path": "public/ui/mobs/glacier_splinter.webp",
+        "bytes": 3514,
+        "sha256": "95c58872dc407c1424033c3952ca6685dbcf66ac0c8c6a93bf8a4974d7ed11d8"
       }
     },
     {
@@ -2585,34 +3679,34 @@
       "id": "glimmerscale_lurker",
       "family": "spider",
       "finderEncounter": false,
-      "visualKey": "mob_spider",
+      "visualKey": "temple_lurker",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/spider.glb",
-          "path": "public/models/creatures/spider.glb",
-          "bytes": 130436,
-          "sha256": "5becf8b6510f0620ff473becc29c6567f7ae32fc1bd9f42e0b647599aa6ed6de"
+          "url": "models/creatures/temple_lurker.glb",
+          "path": "public/models/creatures/temple_lurker.glb",
+          "bytes": 2380548,
+          "sha256": "094faf63a37b8f5b27d4ad0a437b0d145e2be7be496672c5397d3bf8d213b872"
         },
-        "idle": "Spider_Idle",
-        "height": 1.4,
+        "idle": "Idle",
+        "height": 3.65,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.35
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#bfe1ec",
-        "strength": 0.35
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "b7c2ba68bb166ffcc6b2896b3176973f67b400fd46e1af8cdcd7c0baaa0064a3",
+      "sourceFingerprint": "af2fd351526b7817b618ce14cbfecc85819ef5a1832568c7861cb7a2a54e6e81",
       "output": {
         "path": "public/ui/mobs/glimmerscale_lurker.webp",
-        "bytes": 1816,
-        "sha256": "293b1f651affe0c534108b395152b17f4eca690c3fd0732970b7d330abcde90f"
+        "bytes": 1822,
+        "sha256": "9b02daad8be4407e160e41cbd62791faaa92b590c16047fd7f3bee1c3094121c"
       }
     },
     {
@@ -2804,49 +3898,34 @@
       "id": "grand_necromancer_velkhar",
       "family": "humanoid",
       "finderEncounter": true,
-      "visualKey": "mob_dark_caster",
+      "visualKey": "sanctum_velkhar",
       "renderSpec": {
         "model": {
-          "url": "models/chars/players/mage.glb",
-          "path": "public/models/chars/players/mage.glb",
-          "bytes": 441576,
-          "sha256": "28bbbc7a04fa114badde2979eb979d37646bae354d4cd3abae33427ed2d557ca"
+          "url": "models/creatures/sanctum_velkhar.glb",
+          "path": "public/models/creatures/sanctum_velkhar.glb",
+          "bytes": 2754456,
+          "sha256": "7bf7e4751af3318a78fcc33cf3ccf3ee21a45210a93fb90f61800a46a0b2ccb9"
         },
         "idle": "Idle",
-        "height": 2.6,
+        "height": 4.048,
         "yaw": null,
         "hover": null,
-        "show": [
-          "Mage_Hat"
-        ],
-        "attach": [
-          {
-            "asset": {
-              "url": "models/weapons/staff.glb",
-              "path": "public/models/weapons/staff.glb",
-              "bytes": 36168,
-              "sha256": "0958a09b353f4e1228c67e318b130625db647f67b6a8c6a1dcd9d3f3aeff523a"
-            },
-            "bone": "handslot.r",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          }
-        ],
+        "show": null,
+        "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.5
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#512e5f",
-        "strength": 0.5
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "c5152e9c6abf5ced4589b1e2ee72050df1fa91febba28d98ced80ff4ff3f06e4",
+      "sourceFingerprint": "9cc917fb26af40dc344725f963805b09f81ba1fd716f879a5d961d49d182da3b",
       "output": {
         "path": "public/ui/mobs/grand_necromancer_velkhar.webp",
-        "bytes": 2128,
-        "sha256": "f6f89ebf2b9521c966e915128e43d798e5407a3380f95712ae99f852f781d450"
+        "bytes": 2162,
+        "sha256": "6e2e024e93224fb18e69f9c0a87d2cdc16dc33d92146b1289d738a8af45cd2b3"
       }
     },
     {
@@ -3181,6 +4260,40 @@
         "path": "public/ui/mobs/gravenbark_shambler.webp",
         "bytes": 1634,
         "sha256": "e56c11671f52da22d76e53b7237efebe1180368574af9ffe61e5b4618b47b852"
+      }
+    },
+    {
+      "id": "great_saurian",
+      "family": "beast",
+      "finderEncounter": false,
+      "visualKey": "wildheart_great_saurian",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/wildheart_great_saurian.glb",
+          "path": "public/models/creatures/wildheart_great_saurian.glb",
+          "bytes": 3512244,
+          "sha256": "0d326ddeafed68b63e848903be3c92b4d910bc25be998c82c977a14d329bfb8d"
+        },
+        "idle": "Idle",
+        "height": 4.375249999999999,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "f879d9f89d411a2ab333304e5686020f6e623fdd005abef09849e1e910192fab",
+      "output": {
+        "path": "public/ui/mobs/great_saurian.webp",
+        "bytes": 2478,
+        "sha256": "c3d42f5fdac76bd38afae4b344ef276d4cdee614950961ff563ea6834a8c05d2"
       }
     },
     {
@@ -4131,6 +5244,108 @@
       }
     },
     {
+      "id": "hollow_chorister",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "crypt_skel_chorister",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/necromancer.glb",
+          "path": "public/models/chars/enemies/necromancer.glb",
+          "bytes": 528152,
+          "sha256": "9f1e4ea763337369a1b455afd9d07888d409d1f4efe12cf2880340937c0b16fc"
+        },
+        "idle": "Idle_Combat",
+        "height": 3.3,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.3
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#7b4fa0",
+        "strength": 0.3
+      },
+      "sourceFingerprint": "d5be20a639c275b28a3cb272b09bf548260c2b3a90ce398cde58a5dd13a18221",
+      "output": {
+        "path": "public/ui/mobs/hollow_chorister.webp",
+        "bytes": 2580,
+        "sha256": "b74c072ec954151fcd540f24b4430287428e3c7f1355b7e11fd7ea970d833f8a"
+      }
+    },
+    {
+      "id": "hollow_gravedigger",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "skel_minion",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_minion.glb",
+          "path": "public/models/chars/enemies/skeleton_minion.glb",
+          "bytes": 815932,
+          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+        },
+        "idle": "Idle_Combat",
+        "height": 2.5,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.25
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#8a7a64",
+        "strength": 0.25
+      },
+      "sourceFingerprint": "fcda45c3d97b73d612701453f998a091e7388ec95ebddfa8253dc141947e27fb",
+      "output": {
+        "path": "public/ui/mobs/hollow_gravedigger.webp",
+        "bytes": 2754,
+        "sha256": "52375c44005188b60237df2819c760b62828f21d12175c2be0e023d1bd275d66"
+      }
+    },
+    {
+      "id": "howdah_hexcaller",
+      "family": "troll",
+      "finderEncounter": false,
+      "visualKey": "wildheart_howdah_hexcaller",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/wildheart_hexcaller.glb",
+          "path": "public/models/creatures/wildheart_hexcaller.glb",
+          "bytes": 1056052,
+          "sha256": "f25e9ea2acad458b9761183277258e5c650137de93a512de2aa59cb8c9a9036e"
+        },
+        "idle": "Idle",
+        "height": 2.5,
+        "yaw": -1.5707963267948966,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.22
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#a3322a",
+        "resolved": "#a3322a",
+        "strength": 0.22
+      },
+      "sourceFingerprint": "288049247f3d0c62d24d8d0a72653c67e8e0d4704e0b5f04799d4319423e0a95",
+      "output": {
+        "path": "public/ui/mobs/howdah_hexcaller.webp",
+        "bytes": 3172,
+        "sha256": "b4fa6aa66ac2e217418989d5a18bf4e4f72b3e96406266ce0af3a2ae79de05a6"
+      }
+    },
+    {
       "id": "hub_healing_dummy",
       "family": "humanoid",
       "finderEncounter": false,
@@ -4230,6 +5445,40 @@
         "path": "public/ui/mobs/ice_wisp.webp",
         "bytes": 1644,
         "sha256": "0b8f5623f554146cc6fa45acfa0097e22ca84fd2252047d607a8b9137d7a0121"
+      }
+    },
+    {
+      "id": "ice_wraith",
+      "family": "beast",
+      "finderEncounter": false,
+      "visualKey": "temple_ice_wraith",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/temple_ice_wraith.glb",
+          "path": "public/models/creatures/temple_ice_wraith.glb",
+          "bytes": 742112,
+          "sha256": "552fc10f49cb63431718299f08af93ccae096bc7fbfbf5e929f4f0aedd9784a1"
+        },
+        "idle": "Idle",
+        "height": 4,
+        "yaw": null,
+        "hover": 0.3,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "1c331896b8d6e4e22ae3129c5392957121823dc069ba809bccf79dc37eddb7f0",
+      "output": {
+        "path": "public/ui/mobs/ice_wraith.webp",
+        "bytes": 2980,
+        "sha256": "3957ba6a1675fade51acb5d4d00fc77886628019971e6140f170c73f6edffc7e"
       }
     },
     {
@@ -4513,102 +5762,136 @@
       "id": "knight_commander_olen",
       "family": "undead",
       "finderEncounter": true,
-      "visualKey": "skel_warrior",
+      "visualKey": "bastion_olen",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_warrior.glb",
-          "path": "public/models/chars/enemies/skeleton_warrior.glb",
-          "bytes": 523236,
-          "sha256": "572feed3592cfd46b241d0bccc601673c1f652c0792da716f49dc83369e4c681"
+          "url": "models/creatures/knight_commander_olen.glb",
+          "path": "public/models/creatures/knight_commander_olen.glb",
+          "bytes": 3375088,
+          "sha256": "197e7e234cc275964473dbfd1aa9d78f8e94e22197eae2592fd3afe072ce4602"
         },
-        "idle": "Idle_Combat",
-        "height": 2.5,
+        "idle": "Idle",
+        "height": 7.4,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.25
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#95a5a6",
-        "strength": 0.25
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "f5df3b7c1a4b21edb7b1e5088cfbafaef69d3b507b78abe7a17cdc37b23aa23f",
+      "sourceFingerprint": "541b9e0f7c6cb5f816994a114dcae9eb9ccc6d8cc8ed20ff76deb15e4c672f42",
       "output": {
         "path": "public/ui/mobs/knight_commander_olen.webp",
-        "bytes": 2280,
-        "sha256": "7b0f6b32a67abc7d6ae434a7802a8569ad7c13c861d1950781c6ff1e0c1364e2"
+        "bytes": 2362,
+        "sha256": "92813c3a1559c50aca0bbd01f1974076b4ccb230facfc5ac7b4ed8c33ef83ab1"
       }
     },
     {
       "id": "korgath_the_bound",
       "family": "ogre",
       "finderEncounter": true,
-      "visualKey": "mob_ogre",
+      "visualKey": "sanctum_korgath",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/ogre.glb",
-          "path": "public/models/creatures/ogre.glb",
-          "bytes": 494060,
-          "sha256": "8a65d06c205289e546ba98580c62bc1f90dbc48740dfb2625338c8b1584825fc"
+          "url": "models/creatures/sanctum_korgath.glb",
+          "path": "public/models/creatures/sanctum_korgath.glb",
+          "bytes": 3587280,
+          "sha256": "a4cba148d1d52bd3c46df67f1761d743bbcea3d95d9827d55b17beaafc480255"
         },
         "idle": "Idle",
-        "height": 2.8,
+        "height": 6.846666666666667,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.12
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#8f6f46",
-        "strength": 0.12
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "a0302554a6d323032808701d6cdbc14bd464ecefaf491ee50c9bf5ff5c207022",
+      "sourceFingerprint": "8851b569e25f335a030cf24d92bf540e9cd5a6dc93fcd6dc8d44351536e8d297",
       "output": {
         "path": "public/ui/mobs/korgath_the_bound.webp",
-        "bytes": 2424,
-        "sha256": "4f1bfcbdd19b0d071075f6b1e047ed54a4485a807b3d6a823d84d8d5de5a1289"
+        "bytes": 2942,
+        "sha256": "908b941a579f94859f0725c9794707b624c7514b5c7a661d210b98ef02eeb853"
       }
     },
     {
       "id": "korzul_the_gravewyrm",
       "family": "dragonkin",
       "finderEncounter": true,
-      "visualKey": "mob_dragonkin",
+      "visualKey": "sanctum_korzul",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/dragonevolved.glb",
-          "path": "public/models/creatures/dragonevolved.glb",
-          "bytes": 138560,
-          "sha256": "ade414f75155e43ac9de2ed3a3fd5685455d010d7161473acf016bcd18056066"
+          "url": "models/creatures/sanctum_korzul.glb",
+          "path": "public/models/creatures/sanctum_korzul.glb",
+          "bytes": 4516928,
+          "sha256": "abfb84bffa168999760e568dd95d1059d18d56fe42ab382cb6e302a277e4acb8"
         },
-        "idle": "Flying_Idle",
-        "height": 2.4,
+        "idle": "Idle",
+        "height": 12.13888888888889,
         "yaw": null,
-        "hover": 0.25,
+        "hover": -0.1388888888888889,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.2
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#3d5c45",
-        "strength": 0.2
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "fcb7f89c02987b23574ea2a1e137371ea7ca8b37696c28167b04cb7d3cdd3cd0",
+      "sourceFingerprint": "c0ee19f51cb70bd5a62a3475993d74c7573cc9793910db0efc456c4ef0de7c9f",
       "output": {
         "path": "public/ui/mobs/korzul_the_gravewyrm.webp",
-        "bytes": 2172,
-        "sha256": "b5feea4f14f3f7739f4cba0cd2f6594d86fd0c0fd9784dc4981b7c7c8633f5df"
+        "bytes": 2350,
+        "sha256": "78bcd67ad380d273920a5da564f27392c19c917418a63fe3bcb7b1cf838a93f7"
+      }
+    },
+    {
+      "id": "lagoon_snapper",
+      "family": "beast",
+      "finderEncounter": false,
+      "visualKey": "temple_snapper",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/temple_snapper.glb",
+          "path": "public/models/creatures/temple_snapper.glb",
+          "bytes": 2279000,
+          "sha256": "74bf9d0fee61d06704a82ecc97a18fd68ad729172295904918762fb08aaa794d"
+        },
+        "idle": "Idle",
+        "height": 3.83,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "21c4e6a54c4f7c5b3066fd98d340bea4e35331229fd2523848939ef0150c0157",
+      "output": {
+        "path": "public/ui/mobs/lagoon_snapper.webp",
+        "bytes": 2432,
+        "sha256": "1035fd9df1540368a7b3f25ae033bb3003b037a8ede03b2bd52843262c8b5b1b"
       }
     },
     {
@@ -4646,6 +5929,40 @@
       }
     },
     {
+      "id": "marrow_restless_bones",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "skel_minion",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/enemies/skeleton_minion.glb",
+          "path": "public/models/chars/enemies/skeleton_minion.glb",
+          "bytes": 815932,
+          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+        },
+        "idle": "Idle_Combat",
+        "height": 2.5,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.25
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#d5dbdb",
+        "strength": 0.25
+      },
+      "sourceFingerprint": "7545d7ee4dac26300ea916a4bde2f0900bcc44d16a408dd90085cfdc939e0fe3",
+      "output": {
+        "path": "public/ui/mobs/marrow_restless_bones.webp",
+        "bytes": 2810,
+        "sha256": "305de95e559a9193dddba8f72148a3c75d0a9cb5bba085a8c357f0c3f0fe9a6b"
+      }
+    },
+    {
       "id": "marrowlord_varkas",
       "family": "undead",
       "finderEncounter": false,
@@ -4677,6 +5994,108 @@
         "path": "public/ui/mobs/marrowlord_varkas.webp",
         "bytes": 2344,
         "sha256": "d826a49e75f7535da13a8f74ec57050b68f1dd2d28cf5af6ff43e48837df5a2b"
+      }
+    },
+    {
+      "id": "mere_hydra_head_center",
+      "family": "dragonkin",
+      "finderEncounter": false,
+      "visualKey": "temple_hydra_head",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/mere_hydra.glb",
+          "path": "public/models/creatures/mere_hydra.glb",
+          "bytes": 611092,
+          "sha256": "58bf0716d4d1de5ce8d7f6f97720acaa680f03276bfbbc46b9adcfa607bd1391"
+        },
+        "idle": "Idle",
+        "height": 14,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "79ba325a08f1fd4f4562ad13c9a1b4e56ccc5df51349ae827edf0bf0fa9773be",
+      "output": {
+        "path": "public/ui/mobs/mere_hydra_head_center.webp",
+        "bytes": 3496,
+        "sha256": "b3ff98f15cd0e6aac934e067a6490b6558422c3b92409e710c5966f83b1e4a37"
+      }
+    },
+    {
+      "id": "mere_hydra_head_left",
+      "family": "dragonkin",
+      "finderEncounter": false,
+      "visualKey": "temple_hydra_head",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/mere_hydra.glb",
+          "path": "public/models/creatures/mere_hydra.glb",
+          "bytes": 611092,
+          "sha256": "58bf0716d4d1de5ce8d7f6f97720acaa680f03276bfbbc46b9adcfa607bd1391"
+        },
+        "idle": "Idle",
+        "height": 14,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "79ba325a08f1fd4f4562ad13c9a1b4e56ccc5df51349ae827edf0bf0fa9773be",
+      "output": {
+        "path": "public/ui/mobs/mere_hydra_head_left.webp",
+        "bytes": 3496,
+        "sha256": "b3ff98f15cd0e6aac934e067a6490b6558422c3b92409e710c5966f83b1e4a37"
+      }
+    },
+    {
+      "id": "mere_hydra_head_right",
+      "family": "dragonkin",
+      "finderEncounter": false,
+      "visualKey": "temple_hydra_head",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/mere_hydra.glb",
+          "path": "public/models/creatures/mere_hydra.glb",
+          "bytes": 611092,
+          "sha256": "58bf0716d4d1de5ce8d7f6f97720acaa680f03276bfbbc46b9adcfa607bd1391"
+        },
+        "idle": "Idle",
+        "height": 14,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "79ba325a08f1fd4f4562ad13c9a1b4e56ccc5df51349ae827edf0bf0fa9773be",
+      "output": {
+        "path": "public/ui/mobs/mere_hydra_head_right.webp",
+        "bytes": 3496,
+        "sha256": "b3ff98f15cd0e6aac934e067a6490b6558422c3b92409e710c5966f83b1e4a37"
       }
     },
     {
@@ -4952,6 +6371,40 @@
       }
     },
     {
+      "id": "mistweaver",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "bastion_mistweaver",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/mist_chanter.glb",
+          "path": "public/models/creatures/mist_chanter.glb",
+          "bytes": 2589576,
+          "sha256": "3491588535504b87e18cbdbcffdef282393af1bfdf576b330688a9a2a59c6ebc"
+        },
+        "idle": "Idle",
+        "height": 4.4,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "62d1f4d52e6e32e93db4061e6fcece8d54062c0372828dc791ebf7ce9713c6d5",
+      "output": {
+        "path": "public/ui/mobs/mistweaver.webp",
+        "bytes": 2396,
+        "sha256": "47b0f4c1c1ab4ed610ea1973d8849d8078e29357409f36fa57769d39b0a31a85"
+      }
+    },
+    {
       "id": "mogger",
       "family": "humanoid",
       "finderEncounter": false,
@@ -5094,37 +6547,71 @@
       }
     },
     {
-      "id": "moonspawn",
-      "family": "mudfin",
+      "id": "moonlit_siren",
+      "family": "humanoid",
       "finderEncounter": false,
-      "visualKey": "mob_murloc",
+      "visualKey": "temple_siren",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/frog.glb",
-          "path": "public/models/creatures/frog.glb",
-          "bytes": 140836,
-          "sha256": "0d77a9e6b9a741bca8fb231a85eab7c7f894ea38099048a4696bd6f2edf3afef"
+          "url": "models/creatures/temple_siren.glb",
+          "path": "public/models/creatures/temple_siren.glb",
+          "bytes": 3191276,
+          "sha256": "f9c52d38262eb420f4eb7b31769a763ca6d1cc3df3ffe7b06dfdf0946c09dc31"
         },
         "idle": "Idle",
-        "height": 1.7,
+        "height": 6,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.45
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#cfe0ff",
-        "strength": 0.45
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "29eb0a06d999a18a5bfc6f401065454949cd6aa2cbc0a71c45ad9857d76cd611",
+      "sourceFingerprint": "dda01e26d762733b440456acd9df698a6a05229708390233b5e27073ad24584d",
+      "output": {
+        "path": "public/ui/mobs/moonlit_siren.webp",
+        "bytes": 3350,
+        "sha256": "90994ee61f3bb2f57321c3c0599f383461f21cc0c1e14e76a77eedd76baf1845"
+      }
+    },
+    {
+      "id": "moonspawn",
+      "family": "mudfin",
+      "finderEncounter": false,
+      "visualKey": "temple_moonspawn",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/temple_moonspawn.glb",
+          "path": "public/models/creatures/temple_moonspawn.glb",
+          "bytes": 1855672,
+          "sha256": "228c2574b76c5a9e9df49f8cb9bc9920193b7bca23a9f3f8335cfaedef43dc3a"
+        },
+        "idle": "Idle",
+        "height": 3.89,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "1aa23a5931bee1aed11569fe3be99be368f4ffe87e29f9ec2bf909e3ffe11f37",
       "output": {
         "path": "public/ui/mobs/moonspawn.webp",
-        "bytes": 1788,
-        "sha256": "537c4b57c99273081c24d91e8185e3f152d922a7c3de3f42c53928e96c279bcf"
+        "bytes": 3546,
+        "sha256": "ece12337941781e0189a70d455dc7ba081d71015e62bad3726ff0f5d61261b0c"
       }
     },
     {
@@ -5165,47 +6652,34 @@
       "id": "morthen",
       "family": "undead",
       "finderEncounter": true,
-      "visualKey": "skel_boss",
+      "visualKey": "crypt_morthen_lich",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_mage.glb",
-          "path": "public/models/chars/enemies/skeleton_mage.glb",
-          "bytes": 802628,
-          "sha256": "648ef555e8023ba2570a98c3aa38bf27b680db6d2eeb744b20ad6db06e587132"
+          "url": "models/creatures/crypt_morthen_lich.glb",
+          "path": "public/models/creatures/crypt_morthen_lich.glb",
+          "bytes": 3366996,
+          "sha256": "71088e679c39b0a9b079ea3a2744fc54c26bf2af8eac2ac5d30a3e8c39532e07"
         },
-        "idle": "Idle_Combat",
-        "height": 2.5,
+        "idle": "Idle",
+        "height": 6.994,
         "yaw": null,
-        "hover": null,
+        "hover": -1.178,
         "show": null,
-        "attach": [
-          {
-            "asset": {
-              "url": "models/weapons/skeleton_staff.glb",
-              "path": "public/models/weapons/skeleton_staff.glb",
-              "bytes": 51660,
-              "sha256": "75147e92b25e4d88a5edaf35b55b0eb6b2e2fe538694995507ecbb651072a78e"
-            },
-            "bone": "handslot.r",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          }
-        ],
+        "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.25
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#4a235a",
-        "strength": 0.25
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "cf20a028c0fcd49d6c62f6704fcbb9b933c6c3cb58ebcc6e54e8dcf3edd0848f",
+      "sourceFingerprint": "b3ea439a1061f5eb3de36cb041b4f9f68c8945cc4234af5ba3d115fe8b3cbf26",
       "output": {
         "path": "public/ui/mobs/morthen.webp",
-        "bytes": 2206,
-        "sha256": "0f1f31a372ec21e5b0d74364bd6400aed4e44b9ed3ed40fdf7bc72e6aaa59725"
+        "bytes": 2334,
+        "sha256": "29fdc46094ed0227a9065234dc014b9e7e5fcb277d3edcc4db64cc99bd54bf1c"
       }
     },
     {
@@ -6030,6 +7504,40 @@
       }
     },
     {
+      "id": "ogre_sledge_hauler",
+      "family": "ogre",
+      "finderEncounter": false,
+      "visualKey": "sanctum_sledge_hauler",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/sanctum_sledge_hauler.glb",
+          "path": "public/models/creatures/sanctum_sledge_hauler.glb",
+          "bytes": 2748068,
+          "sha256": "c82d225ff3ddd3149dc531bb428786a30f4f8cfaf473604a92a74cb527d88946"
+        },
+        "idle": "Idle",
+        "height": 2.761904761904762,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "386acd868da6ead8571262ce8e102e672b8c61f873b480d3a26a19dded1b79e2",
+      "output": {
+        "path": "public/ui/mobs/ogre_sledge_hauler.webp",
+        "bytes": 3274,
+        "sha256": "d90ff6786251b5f33566c10fb66cef3db425fbfa0053b83dc340335e71f2e669"
+      }
+    },
+    {
       "id": "old_cragmaw",
       "family": "beast",
       "finderEncounter": false,
@@ -6166,62 +7674,71 @@
       }
     },
     {
-      "id": "pale_choir_acolyte",
-      "family": "humanoid",
+      "id": "ossuary_sentinel",
+      "family": "undead",
       "finderEncounter": false,
-      "visualKey": "mob_bandit",
+      "visualKey": "skel_minion",
       "renderSpec": {
         "model": {
-          "url": "models/chars/players/rogue_hooded.glb",
-          "path": "public/models/chars/players/rogue_hooded.glb",
-          "bytes": 448736,
-          "sha256": "876d60366dc2105a801b2fb65da49a9cdee061f267cddb97ff8a27c95395c40a"
+          "url": "models/chars/enemies/skeleton_minion.glb",
+          "path": "public/models/chars/enemies/skeleton_minion.glb",
+          "bytes": 815932,
+          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
         },
-        "idle": "Idle",
-        "height": 2.6,
+        "idle": "Idle_Combat",
+        "height": 2.5,
         "yaw": null,
         "hover": null,
         "show": null,
-        "attach": [
-          {
-            "asset": {
-              "url": "models/weapons/dagger.glb",
-              "path": "public/models/weapons/dagger.glb",
-              "bytes": 35340,
-              "sha256": "b3c3c662c3d9505f727480d0bb1a9dcb26f88550985516f5159ea22b16a86e56"
-            },
-            "bone": "handslot.r",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          },
-          {
-            "asset": {
-              "url": "models/weapons/dagger.glb",
-              "path": "public/models/weapons/dagger.glb",
-              "bytes": 35340,
-              "sha256": "b3c3c662c3d9505f727480d0bb1a9dcb26f88550985516f5159ea22b16a86e56"
-            },
-            "bone": "handslot.l",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          }
-        ],
+        "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.3
+        "tintStrength": 0.25
       },
       "tint": {
-        "source": "fixed",
-        "authored": "#6b3a32",
-        "resolved": "#6b3a32",
-        "strength": 0.3
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#cfc6b0",
+        "strength": 0.25
       },
-      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "sourceFingerprint": "fd3b1d3c56f65eee8933945bbef1d7c69ec86a5df7c1378d0ae568729c6544e6",
+      "output": {
+        "path": "public/ui/mobs/ossuary_sentinel.webp",
+        "bytes": 2800,
+        "sha256": "b4f8b5cbf772957d4bd0ee292dd005e82f45dfd1172b57df05a6da34ba7fa0c9"
+      }
+    },
+    {
+      "id": "pale_choir_acolyte",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "temple_acolyte",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/temple_acolyte.glb",
+          "path": "public/models/creatures/temple_acolyte.glb",
+          "bytes": 3129744,
+          "sha256": "8b8ca9cee5ce60b377d1241f343be04ca632cbcdc45ddbafbd884017e02658ec"
+        },
+        "idle": "Idle",
+        "height": 5.2,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "9cd85c3dceec9b5b1ef9829d98b991601599f93ff90dbcce9067d44e7657fd1f",
       "output": {
         "path": "public/ui/mobs/pale_choir_acolyte.webp",
-        "bytes": 2208,
-        "sha256": "6d2ea0022793890c53ba3178e219616ee0387c7cbc67250a25c8f0ff48ccf1f9"
+        "bytes": 3308,
+        "sha256": "a927c5fcb750ad595e8b410fa12a86f4832ccf67551ce944f6911aa24627a801"
       }
     },
     {
@@ -6262,34 +7779,34 @@
       "id": "pearlguard_sentinel",
       "family": "elemental",
       "finderEncounter": false,
-      "visualKey": "mob_elemental",
+      "visualKey": "temple_sentinel",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/golelingevolved.glb",
-          "path": "public/models/creatures/golelingevolved.glb",
-          "bytes": 85588,
-          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+          "url": "models/creatures/temple_sentinel.glb",
+          "path": "public/models/creatures/temple_sentinel.glb",
+          "bytes": 2104228,
+          "sha256": "7c2a067ceb1e3df9cc8e77f97dbc1ab7776eecf0fd8e8fb9714ddc14ff251c62"
         },
-        "idle": "Flying_Idle",
-        "height": 2.2,
+        "idle": "Idle",
+        "height": 1.3236,
         "yaw": null,
-        "hover": 0.3,
+        "hover": 0.673,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.4
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#9fc6e0",
-        "strength": 0.4
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "58c764cae0ffca67adf03aaa21454e6538d4847dea0bb74c846f3099b3e68529",
+      "sourceFingerprint": "35f4fd65f6ca63a3dc1bf9831db4f7a796dad8f5e95b30fc31090471b8c242e3",
       "output": {
         "path": "public/ui/mobs/pearlguard_sentinel.webp",
-        "bytes": 2018,
-        "sha256": "c24bc32d98d32d563df0a32861640067de9dea7ae084eb6abda81101792c7875"
+        "bytes": 2154,
+        "sha256": "e0686fbbbcd104914e1271fa8237ebadc9925e5d687ad1fc9a54e933e92f0d63"
       }
     },
     {
@@ -6330,34 +7847,34 @@
       "id": "raised_bonewalker",
       "family": "undead",
       "finderEncounter": false,
-      "visualKey": "skel_minion",
+      "visualKey": "sanctum_raised_bonewalker",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_minion.glb",
-          "path": "public/models/chars/enemies/skeleton_minion.glb",
-          "bytes": 815932,
-          "sha256": "d2e2c517b876697997eb0699089ba0446e3765d3be604f193d59fe5466bdc76b"
+          "url": "models/creatures/sanctum_raised_bonewalker.glb",
+          "path": "public/models/creatures/sanctum_raised_bonewalker.glb",
+          "bytes": 2673492,
+          "sha256": "4a83c58b9507c68e91f431eeb5bfd24835462809249d1899f90a2592e740a760"
         },
-        "idle": "Idle_Combat",
-        "height": 2.5,
+        "idle": "Idle",
+        "height": 3.7,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.25
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#c8cfc8",
-        "strength": 0.25
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "f03c004f0931165a6f4b3b58ee466ed2264d3f816446f55016fa5eb9b2155cdd",
+      "sourceFingerprint": "cb77a564fa1dc66b589659ec5bc17e661cc51586b715abb39fa3608a1785912a",
       "output": {
         "path": "public/ui/mobs/raised_bonewalker.webp",
-        "bytes": 2800,
-        "sha256": "bba40e8255adc900269d2cd991c7ac7a8f786f9c7fdfc450593aea9776e5cff2"
+        "bytes": 2654,
+        "sha256": "b451de29859b10feae82253ab0421a69ae43abab907b7f3ad5a147491d8e2372"
       }
     },
     {
@@ -7773,6 +9290,40 @@
       }
     },
     {
+      "id": "rime_egg_sac",
+      "family": "spider",
+      "finderEncounter": false,
+      "visualKey": "mob_spider",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/spider.glb",
+          "path": "public/models/creatures/spider.glb",
+          "bytes": 130436,
+          "sha256": "5becf8b6510f0620ff473becc29c6567f7ae32fc1bd9f42e0b647599aa6ed6de"
+        },
+        "idle": "Spider_Idle",
+        "height": 1.4,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#cfe3f0",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "707a31fb8e4fba4ba73865807c324f791b9271ede1a1a0a01fcd4306dea1ab5b",
+      "output": {
+        "path": "public/ui/mobs/rime_egg_sac.webp",
+        "bytes": 1742,
+        "sha256": "1dc21e23d28d14de6a42c1bda3f197b80e1ea5d96789d3f3cbcddc5ead2e0bbc"
+      }
+    },
+    {
       "id": "rime_elemental",
       "family": "elemental",
       "finderEncounter": false,
@@ -7807,71 +9358,343 @@
       }
     },
     {
-      "id": "sanctum_boneguard",
-      "family": "undead",
+      "id": "rime_whelp",
+      "family": "dragonkin",
       "finderEncounter": false,
-      "visualKey": "skel_warrior",
+      "visualKey": "sanctum_rime_whelp",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_warrior.glb",
-          "path": "public/models/chars/enemies/skeleton_warrior.glb",
-          "bytes": 523236,
-          "sha256": "572feed3592cfd46b241d0bccc601673c1f652c0792da716f49dc83369e4c681"
+          "url": "models/creatures/sanctum_rime_whelp.glb",
+          "path": "public/models/creatures/sanctum_rime_whelp.glb",
+          "bytes": 2774136,
+          "sha256": "bc18a63bc995f78dd70cd98dc32849829dc9e997b8b36216654cb66434c4f81f"
         },
-        "idle": "Idle_Combat",
-        "height": 2.5,
+        "idle": "Idle",
+        "height": 2.25,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.25
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "1648f0ec6ba9db4bc60307bca3f2519c35781b39bd17d18474dbe516c63fab63",
+      "output": {
+        "path": "public/ui/mobs/rime_whelp.webp",
+        "bytes": 2460,
+        "sha256": "e94cbf11f282d49a5757b1e2da1811f451050c65a46efa5d89826dfd6f91f4ee"
+      }
+    },
+    {
+      "id": "rimeweb",
+      "family": "undead",
+      "finderEncounter": true,
+      "visualKey": "crypt_lady_bonechill",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/crypt_lady_bonechill.glb",
+          "path": "public/models/creatures/crypt_lady_bonechill.glb",
+          "bytes": 2790900,
+          "sha256": "ded31e9ecd95dcf092ed07464e7f787e8fd82bec0629e5454bf31518e1bb71cf"
+        },
+        "idle": "Idle",
+        "height": 6.749,
+        "yaw": null,
+        "hover": 0.544,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "47d8bfcfeaf1babf8b8777f4b411aeb3280d8a5d4fdb84fe5dc1fbadfa7fe25f",
+      "output": {
+        "path": "public/ui/mobs/rimeweb.webp",
+        "bytes": 2088,
+        "sha256": "081953c34264317a160bb563a41a785e7d0765d26e4cfaa21d1b3dd488d8110f"
+      }
+    },
+    {
+      "id": "rimeweb_hatchling",
+      "family": "spider",
+      "finderEncounter": false,
+      "visualKey": "mob_spider",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/spider.glb",
+          "path": "public/models/creatures/spider.glb",
+          "bytes": 130436,
+          "sha256": "5becf8b6510f0620ff473becc29c6567f7ae32fc1bd9f42e0b647599aa6ed6de"
+        },
+        "idle": "Spider_Idle",
+        "height": 1.4,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.35
       },
       "tint": {
         "source": "entity",
         "authored": "entity",
-        "resolved": "#cfc8b0",
-        "strength": 0.25
+        "resolved": "#d6eaf8",
+        "strength": 0.35
       },
-      "sourceFingerprint": "00255d675d7766e83b6ea9863ad405840a8f21193e1f1bf337c21f22e6434661",
+      "sourceFingerprint": "5157d4a1cf7d753e8a11c086625daa40acc5311928ed30db0480a1c6e0970a44",
+      "output": {
+        "path": "public/ui/mobs/rimeweb_hatchling.webp",
+        "bytes": 1752,
+        "sha256": "3527d39bb4c9a96a13726c7c54d832190bec1d0f4c3ede6150e7f4f746442ffa"
+      }
+    },
+    {
+      "id": "rimeweb_spinner",
+      "family": "spider",
+      "finderEncounter": false,
+      "visualKey": "mob_spider",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/spider.glb",
+          "path": "public/models/creatures/spider.glb",
+          "bytes": 130436,
+          "sha256": "5becf8b6510f0620ff473becc29c6567f7ae32fc1bd9f42e0b647599aa6ed6de"
+        },
+        "idle": "Spider_Idle",
+        "height": 1.4,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#e4f0fa",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "a8713eb6046a805c178d1c1ef35f8e347795943d349ccd4bbedf727fe92f172e",
+      "output": {
+        "path": "public/ui/mobs/rimeweb_spinner.webp",
+        "bytes": 1778,
+        "sha256": "be256d7133b590a20c6eb270a2dad89bf90b310c098d848e904708e613bb544c"
+      }
+    },
+    {
+      "id": "sanctum_boneguard",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "sanctum_boneguard",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/sanctum_boneguard.glb",
+          "path": "public/models/creatures/sanctum_boneguard.glb",
+          "bytes": 2802012,
+          "sha256": "f5b2f800686188740ffa9eda94e7efcadf5f918b0929d2c291485c3176bdf10f"
+        },
+        "idle": "Idle",
+        "height": 4,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "10406e38e1d0ec058b9f77b0123653e7deccd38b4dbd31085263eae59464f611",
       "output": {
         "path": "public/ui/mobs/sanctum_boneguard.webp",
-        "bytes": 2380,
-        "sha256": "a24a15b8f0f666ba40d6d0099bbf3c6d0af8b16226557e2e9f59325447e2eb49"
+        "bytes": 2612,
+        "sha256": "ea225728d7b1747b758a71b8c1df62bcaff5f6aa4db04b839478f3723ac4d76c"
       }
     },
     {
       "id": "sanctum_drakonid",
       "family": "dragonkin",
       "finderEncounter": false,
-      "visualKey": "mob_dragonkin",
+      "visualKey": "sanctum_scaleguard",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/dragonevolved.glb",
-          "path": "public/models/creatures/dragonevolved.glb",
-          "bytes": 138560,
-          "sha256": "ade414f75155e43ac9de2ed3a3fd5685455d010d7161473acf016bcd18056066"
+          "url": "models/creatures/sanctum_scaleguard.glb",
+          "path": "public/models/creatures/sanctum_scaleguard.glb",
+          "bytes": 2516288,
+          "sha256": "14fb543b2f5886811006ac332810f9422c5cd1b8ebdd81a5735d0a23dafc18bb"
         },
-        "idle": "Flying_Idle",
-        "height": 2.4,
+        "idle": "Idle",
+        "height": 3.241379310344828,
         "yaw": null,
-        "hover": 0.25,
+        "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.2
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#567d46",
-        "strength": 0.2
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "d203457fa8530e4fabc4c846abe4b14fe1dd1bdd59171b2b3051ef1c8a2ec9ea",
+      "sourceFingerprint": "4ec890e505c7effb1ec09bfd15c0d8c536284a56021993a56df07324b3f0fd16",
       "output": {
         "path": "public/ui/mobs/sanctum_drakonid.webp",
-        "bytes": 2182,
-        "sha256": "1f294d58c7ff944f5a9aaf2aaf8a2c4078d34ee26d62016811cf09f324a91f8f"
+        "bytes": 2290,
+        "sha256": "4c75762538d243c7915a560a38f14f6de01d76741782c71ce6cbf5a42661faf3"
+      }
+    },
+    {
+      "id": "sanctum_shackle_anvil",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "sanctum_seal_shackle",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/sanctum_korgath.glb",
+          "path": "public/models/creatures/sanctum_korgath.glb",
+          "bytes": 3587280,
+          "sha256": "a4cba148d1d52bd3c46df67f1761d743bbcea3d95d9827d55b17beaafc480255"
+        },
+        "idle": "Idle",
+        "height": 2,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "f1c5d4752cb7960d5f8c5741c29611a3f1d360c559769a6fdad13b03a19ce545",
+      "output": {
+        "path": "public/ui/mobs/sanctum_shackle_anvil.webp",
+        "bytes": 2998,
+        "sha256": "82e81a4591eafaf21791d432a8314038f152fefed0978e5ab7293c89847a43af"
+      }
+    },
+    {
+      "id": "sanctum_shackle_bellows",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "sanctum_seal_shackle",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/sanctum_korgath.glb",
+          "path": "public/models/creatures/sanctum_korgath.glb",
+          "bytes": 3587280,
+          "sha256": "a4cba148d1d52bd3c46df67f1761d743bbcea3d95d9827d55b17beaafc480255"
+        },
+        "idle": "Idle",
+        "height": 2,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "f1c5d4752cb7960d5f8c5741c29611a3f1d360c559769a6fdad13b03a19ce545",
+      "output": {
+        "path": "public/ui/mobs/sanctum_shackle_bellows.webp",
+        "bytes": 2998,
+        "sha256": "82e81a4591eafaf21791d432a8314038f152fefed0978e5ab7293c89847a43af"
+      }
+    },
+    {
+      "id": "sanctum_shackle_hammer",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "sanctum_seal_shackle",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/sanctum_korgath.glb",
+          "path": "public/models/creatures/sanctum_korgath.glb",
+          "bytes": 3587280,
+          "sha256": "a4cba148d1d52bd3c46df67f1761d743bbcea3d95d9827d55b17beaafc480255"
+        },
+        "idle": "Idle",
+        "height": 2,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "f1c5d4752cb7960d5f8c5741c29611a3f1d360c559769a6fdad13b03a19ce545",
+      "output": {
+        "path": "public/ui/mobs/sanctum_shackle_hammer.webp",
+        "bytes": 2998,
+        "sha256": "82e81a4591eafaf21791d432a8314038f152fefed0978e5ab7293c89847a43af"
+      }
+    },
+    {
+      "id": "sanctum_shackle_tongs",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "sanctum_seal_shackle",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/sanctum_korgath.glb",
+          "path": "public/models/creatures/sanctum_korgath.glb",
+          "bytes": 3587280,
+          "sha256": "a4cba148d1d52bd3c46df67f1761d743bbcea3d95d9827d55b17beaafc480255"
+        },
+        "idle": "Idle",
+        "height": 2,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "f1c5d4752cb7960d5f8c5741c29611a3f1d360c559769a6fdad13b03a19ce545",
+      "output": {
+        "path": "public/ui/mobs/sanctum_shackle_tongs.webp",
+        "bytes": 2998,
+        "sha256": "82e81a4591eafaf21791d432a8314038f152fefed0978e5ab7293c89847a43af"
       }
     },
     {
@@ -7912,47 +9735,68 @@
       "id": "sexton_marrow",
       "family": "undead",
       "finderEncounter": true,
-      "visualKey": "skel_mage",
+      "visualKey": "crypt_skel_sexton",
       "renderSpec": {
         "model": {
-          "url": "models/chars/enemies/skeleton_mage.glb",
-          "path": "public/models/chars/enemies/skeleton_mage.glb",
-          "bytes": 802628,
-          "sha256": "648ef555e8023ba2570a98c3aa38bf27b680db6d2eeb744b20ad6db06e587132"
+          "url": "models/creatures/crypt_sexton_marrow.glb",
+          "path": "public/models/creatures/crypt_sexton_marrow.glb",
+          "bytes": 2998000,
+          "sha256": "0267ad5663dae8b2afbed02321e5cd2572a82de664b183086cd21799771b3870"
         },
-        "idle": "Idle_Combat",
-        "height": 2.5,
+        "idle": "Idle",
+        "height": 5.783,
+        "yaw": null,
+        "hover": -0.038,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "246ce277297008e314821b4dee303f3fdca1f540ea3cdee0e1dfee86146ecadd",
+      "output": {
+        "path": "public/ui/mobs/sexton_marrow.webp",
+        "bytes": 2380,
+        "sha256": "a1064e5a0b6ea955fbc3e0b2af195b8c0c5e3b3b2607e889f4df97deee8e0914"
+      }
+    },
+    {
+      "id": "shackled_prisoner",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "bastion_prisoner",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/drowned_prisoner.glb",
+          "path": "public/models/creatures/drowned_prisoner.glb",
+          "bytes": 2507028,
+          "sha256": "b59ed852323830ce141e572758ec97200b74e4b7564738bac0defb0bc0e633df"
+        },
+        "idle": "Idle",
+        "height": 4.6,
         "yaw": null,
         "hover": null,
         "show": null,
-        "attach": [
-          {
-            "asset": {
-              "url": "models/weapons/skeleton_staff.glb",
-              "path": "public/models/weapons/skeleton_staff.glb",
-              "bytes": 51660,
-              "sha256": "75147e92b25e4d88a5edaf35b55b0eb6b2e2fe538694995507ecbb651072a78e"
-            },
-            "bone": "handslot.r",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          }
-        ],
+        "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.25
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#839192",
-        "strength": 0.25
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "0c306427584ad5b6626decd29a01d9dd6673b0c4cd5d9c45e08e563f8fb31d72",
+      "sourceFingerprint": "ce2d5b06c70f06558248f74027a98359053f8737760f629d0a84178c7202bfa9",
       "output": {
-        "path": "public/ui/mobs/sexton_marrow.webp",
-        "bytes": 2218,
-        "sha256": "2f4a59251df97b2d7248c65549c87e4c0efb09c62c28edf8dd1f08350449263d"
+        "path": "public/ui/mobs/shackled_prisoner.webp",
+        "bytes": 2266,
+        "sha256": "b883656aa802754b882ae0cacfdd82e981f3d281ce965885fa8dfe6a245cfa97"
       }
     },
     {
@@ -8156,6 +10000,40 @@
       }
     },
     {
+      "id": "sledge_tusker",
+      "family": "beast",
+      "finderEncounter": false,
+      "visualKey": "sanctum_sledge_tusker",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/sledge_tusker.glb",
+          "path": "public/models/creatures/sledge_tusker.glb",
+          "bytes": 3163112,
+          "sha256": "67afc2947f55121e26305d741a23a028a5cf139b3ae6e3f0df9dbaaac6d6255d"
+        },
+        "idle": "Idle",
+        "height": 2.778571428571429,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "abb3333470ee0203fe0d5cec9bef43bc123fa05c77a495a0a78e40618ef2bca4",
+      "output": {
+        "path": "public/ui/mobs/sledge_tusker.webp",
+        "bytes": 2480,
+        "sha256": "e6bb442ca96c48d250563e3bfdefcf8893b6a7e84861f2b61a62b9a3818b9e3b"
+      }
+    },
+    {
       "id": "sloomtooth_the_drowned",
       "family": "mudfin",
       "finderEncounter": false,
@@ -8224,6 +10102,40 @@
       }
     },
     {
+      "id": "soul_brazier",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "sanctum_soul_brazier",
+      "renderSpec": {
+        "model": {
+          "url": "models/props/infernal_brazier.glb",
+          "path": "public/models/props/infernal_brazier.glb",
+          "bytes": 150536,
+          "sha256": "94436661fb9b4d789dc9f0fa415700cf04d6d1509b838b3e923d715945e5451f"
+        },
+        "idle": "Idle",
+        "height": 1.4999999999999998,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.45
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#6f5a9e",
+        "resolved": "#6f5a9e",
+        "strength": 0.45
+      },
+      "sourceFingerprint": "739d68ca367f5ea5d761d0d7854a498eb9d7444185b22572722fdb4f3b3ddc06",
+      "output": {
+        "path": "public/ui/mobs/soul_brazier.webp",
+        "bytes": 1540,
+        "sha256": "b23ee135c078af42534c285dae0fd7e5eb5b3be0f063fdb85373a6714d10825d"
+      }
+    },
+    {
       "id": "spider_egg",
       "family": "spider",
       "finderEncounter": false,
@@ -8289,6 +10201,40 @@
         "path": "public/ui/mobs/spider_egg_sac.webp",
         "bytes": 2244,
         "sha256": "6bb484d65298ac640bed71958449a2d7ef89e94bc832816b0a091d984e269dee"
+      }
+    },
+    {
+      "id": "spore_toad",
+      "family": "beast",
+      "finderEncounter": false,
+      "visualKey": "wildheart_spore_toad",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/wildheart_spore_toad.glb",
+          "path": "public/models/creatures/wildheart_spore_toad.glb",
+          "bytes": 2230208,
+          "sha256": "5ca3ab3b4d041118c89ac68ce4171965f720bdfaf207aea4151b392e0512db5e"
+        },
+        "idle": "Idle",
+        "height": 1.6208333333333333,
+        "yaw": null,
+        "hover": -0.044583333333333336,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "2f08ec1085d43ea371897f413c65946d2f06ce3bc0873be4459d7a0def116cbc",
+      "output": {
+        "path": "public/ui/mobs/spore_toad.webp",
+        "bytes": 2576,
+        "sha256": "a4f934bf19ca7c95106dbe742aae1172098195ef6bbf3fa51e4b319df4f31fd5"
       }
     },
     {
@@ -8428,6 +10374,108 @@
       }
     },
     {
+      "id": "sunbone_dread_totem",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "wildheart_sunbone_dread_totem",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/wildheart_sunbone_dread_totem.glb",
+          "path": "public/models/creatures/wildheart_sunbone_dread_totem.glb",
+          "bytes": 1852908,
+          "sha256": "5bc1133fc0d5f82c8754ede5b6c92f5beadd65c7846b25df81a3d7fa8b27ac66"
+        },
+        "idle": "Idle",
+        "height": 3.9856249999999998,
+        "yaw": null,
+        "hover": -0.008124999999999999,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "f3150988e12fab02760205fe96ce05dee8da108247426d2d6c4542587cbb781f",
+      "output": {
+        "path": "public/ui/mobs/sunbone_dread_totem.webp",
+        "bytes": 2538,
+        "sha256": "a51455cbaaf405340d272d39a76de76ab71f60255a1a5a2995b00908f66d1f36"
+      }
+    },
+    {
+      "id": "sunbone_totem",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "wildheart_sunbone_totem",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/wildheart_sunbone_totem.glb",
+          "path": "public/models/creatures/wildheart_sunbone_totem.glb",
+          "bytes": 1887784,
+          "sha256": "e04fce1afdacf36669ad30bad95c6b33ae08bb502c5c8fe8318db1069418ba61"
+        },
+        "idle": "Idle",
+        "height": 4.138125,
+        "yaw": null,
+        "hover": -0.008124999999999999,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "37b443acdafa6383c3dab3a4c1eb20f7976fe03db915502f55c6813f3ce68ef4",
+      "output": {
+        "path": "public/ui/mobs/sunbone_totem.webp",
+        "bytes": 2610,
+        "sha256": "72bd79a9237c37abded39e488c6a825d13fb60907ae65898a1282610dd3a2f87"
+      }
+    },
+    {
+      "id": "sunbone_totem_binder",
+      "family": "troll",
+      "finderEncounter": false,
+      "visualKey": "wildheart_totem_binder",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/wildheart_totem_binder.glb",
+          "path": "public/models/creatures/wildheart_totem_binder.glb",
+          "bytes": 2496928,
+          "sha256": "3e618443b27be0db3c1886e363d4f80a42647419386235962951a038dda9fd4b"
+        },
+        "idle": "Idle",
+        "height": 3.101538461538462,
+        "yaw": null,
+        "hover": 0,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "187f41af9a1c1ee9fde09f8b8485b841708342fd1e3b62cbf1671865287df643",
+      "output": {
+        "path": "public/ui/mobs/sunbone_totem_binder.webp",
+        "bytes": 2986,
+        "sha256": "2449d16a25013af1a2e847123d921db665f5b498ad11f36d4f5f09d4168d1cff"
+      }
+    },
+    {
       "id": "sundered_horror",
       "family": "ogre",
       "finderEncounter": false,
@@ -8493,6 +10541,40 @@
         "path": "public/ui/mobs/terrace_howler.webp",
         "bytes": 1940,
         "sha256": "3a53583fd76a609fa07a3f03742080cc0e2e9d699393c4fc32b5aab2da4b627b"
+      }
+    },
+    {
+      "id": "the_gorgebloom",
+      "family": "elemental",
+      "finderEncounter": true,
+      "visualKey": "wildheart_gorgebloom",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/wildheart_gorgebloom.glb",
+          "path": "public/models/creatures/wildheart_gorgebloom.glb",
+          "bytes": 2958724,
+          "sha256": "855fb2dbd103ffe0b36028dc250850d9eb9d4f875966057016947ba1ea167129"
+        },
+        "idle": "Idle",
+        "height": 5.213571428571429,
+        "yaw": null,
+        "hover": -0.30178571428571427,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "b53fdb29f7b13526ed5df71cce5d3d11599162b615817ffe217f80eea97cef53",
+      "output": {
+        "path": "public/ui/mobs/the_gorgebloom.webp",
+        "bytes": 2150,
+        "sha256": "0eeee974114327ee30ba3d6acc18c0dcd5048ab624c9c97f3ad40e9b1ed69f44"
       }
     },
     {
@@ -8644,6 +10726,40 @@
         "path": "public/ui/mobs/thicket_boar.webp",
         "bytes": 2788,
         "sha256": "1e7eb8929b764136d988a6fc3393aff24e7095f6a0120a373629a70ff2b06acd"
+      }
+    },
+    {
+      "id": "thorn_sprout",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "wildheart_thorn_sprout",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/wildheart_thorn_sprout.glb",
+          "path": "public/models/creatures/wildheart_thorn_sprout.glb",
+          "bytes": 2780404,
+          "sha256": "90036bcb5169ce6957d8cf98cfb3c32441d814b12a50e1bea62b42e9a1a883aa"
+        },
+        "idle": "Idle",
+        "height": 2.0206666666666666,
+        "yaw": null,
+        "hover": -0.016666666666666666,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "edbb0eab3cba403032f01db1784b02214c278a4d458eb85ac9187e71ff232b9b",
+      "output": {
+        "path": "public/ui/mobs/thorn_sprout.webp",
+        "bytes": 3208,
+        "sha256": "d00c040db997fe643823674b2eab56e53d28af3adf4ca45f0d8c60739f1e7707"
       }
     },
     {
@@ -8845,19 +10961,436 @@
       "id": "tidebound_acolyte",
       "family": "humanoid",
       "finderEncounter": false,
-      "visualKey": "mob_bandit",
+      "visualKey": "bastion_acolyte",
       "renderSpec": {
         "model": {
-          "url": "models/chars/players/rogue_hooded.glb",
-          "path": "public/models/chars/players/rogue_hooded.glb",
-          "bytes": 448736,
-          "sha256": "876d60366dc2105a801b2fb65da49a9cdee061f267cddb97ff8a27c95395c40a"
+          "url": "models/creatures/tidebound_acolyte.glb",
+          "path": "public/models/creatures/tidebound_acolyte.glb",
+          "bytes": 2555740,
+          "sha256": "9b275ebb5fdbb7395d560434a03c563bac10e1de988760b0d2f45b68dd163eb9"
         },
         "idle": "Idle",
-        "height": 2.6,
+        "height": 5,
         "yaw": null,
         "hover": null,
         "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "bb37e47536191d48cdc4a31a01d3e3cbf7ecb41d15fd4f102da5e78c66ec50a8",
+      "output": {
+        "path": "public/ui/mobs/tidebound_acolyte.webp",
+        "bytes": 2062,
+        "sha256": "4a7f3204314f1fcefe7ec1edf8f1fbb58ef119a25c99988e50bddf3225a06a90"
+      }
+    },
+    {
+      "id": "tideglass_colossus",
+      "family": "elemental",
+      "finderEncounter": true,
+      "visualKey": "temple_colossus",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/temple_colossus.glb",
+          "path": "public/models/creatures/temple_colossus.glb",
+          "bytes": 2853232,
+          "sha256": "513ebec51de376ea81c05faba0e35ce7fcac75d15e0e163a6011581e608db9ec"
+        },
+        "idle": "Idle",
+        "height": 7.59090909090909,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "80bb3a30af1023bc99b5db42c2236b0e4eb418f9291dc1fe7499e5f9ecd07664",
+      "output": {
+        "path": "public/ui/mobs/tideglass_colossus.webp",
+        "bytes": 4264,
+        "sha256": "b894ba810dde570fece52e03913a94fe33b94443cf262593b589ce10d2bb8c71"
+      }
+    },
+    {
+      "id": "tideglass_reflection",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "temple_reflection_warrior",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/knight.glb",
+          "path": "public/models/chars/players/knight.glb",
+          "bytes": 462916,
+          "sha256": "063f81b53c354eeb60bb7550067bf95229278576950766228e933ed703d14c72"
+        },
+        "idle": "Idle",
+        "height": 2.9899999999999998,
+        "yaw": null,
+        "hover": null,
+        "show": [
+          "Knight_Helmet",
+          "Knight_Cape"
+        ],
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/sword_1handed.glb",
+              "path": "public/models/weapons/sword_1handed.glb",
+              "bytes": 30608,
+              "sha256": "3105728b5d9d5636b45c28570a2a8dc7aee916899c47d141879c0e66c87edf4f"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/shield_round.glb",
+              "path": "public/models/weapons/shield_round.glb",
+              "bytes": 30432,
+              "sha256": "1f184eb71cf5f9bbbc8df984d9d049710c523daffb30d0f2955eb3a648dc86bb"
+            },
+            "bone": "handslot.l",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.88
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#7fb2ff",
+        "resolved": "#7fb2ff",
+        "strength": 0.88
+      },
+      "sourceFingerprint": "33d9757449bcec9031002b2585b8238e0cbbea2df47b48e17a9eac4f31e6beff",
+      "output": {
+        "path": "public/ui/mobs/tideglass_reflection.webp",
+        "bytes": 2036,
+        "sha256": "f1f5ea326823bdf83079fe13819a8c3940f007a29a44ae871b34e177a336dc7f"
+      }
+    },
+    {
+      "id": "tideglass_reflection_druid",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "temple_reflection_druid",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/druid.glb",
+          "path": "public/models/chars/players/druid.glb",
+          "bytes": 463692,
+          "sha256": "b1156d55834d003001da5e874fbfa0eef7079442ee2125afe16f4598aeba833d"
+        },
+        "idle": "Idle",
+        "height": 2.9899999999999998,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/staff.glb",
+              "path": "public/models/weapons/staff.glb",
+              "bytes": 36168,
+              "sha256": "0958a09b353f4e1228c67e318b130625db647f67b6a8c6a1dcd9d3f3aeff523a"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/spellbook_open.glb",
+              "path": "public/models/weapons/spellbook_open.glb",
+              "bytes": 35136,
+              "sha256": "e564abd17649ec4fa471dfbfdfd1d0668987f1844ee925d8bde17b9f2ec1d6e0"
+            },
+            "bone": "handslot.l",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.88
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#7fb2ff",
+        "resolved": "#7fb2ff",
+        "strength": 0.88
+      },
+      "sourceFingerprint": "2d982ea1b651e6a15f7f113c2a17e060e9509cc9b33c9965abb61bff4ff158eb",
+      "output": {
+        "path": "public/ui/mobs/tideglass_reflection_druid.webp",
+        "bytes": 2114,
+        "sha256": "c30208f3880e902e9becb0a36eff3dd584920f8b2f3abe83c43a0b661fbcbce4"
+      }
+    },
+    {
+      "id": "tideglass_reflection_hunter",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "temple_reflection_hunter",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/ranger.glb",
+          "path": "public/models/chars/players/ranger.glb",
+          "bytes": 465964,
+          "sha256": "6a9aeb0d717d66f4ddd66335afedac964a66b31c382f96b1324c84373cd851d0"
+        },
+        "idle": "Idle",
+        "height": 2.9899999999999998,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/crossbow_1handed.glb",
+              "path": "public/models/weapons/crossbow_1handed.glb",
+              "bytes": 40584,
+              "sha256": "1d1eb744880ed7b4c8222cde587c94c203ea7d56ee87c7a058be1eb85094066f"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.88
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#7fb2ff",
+        "resolved": "#7fb2ff",
+        "strength": 0.88
+      },
+      "sourceFingerprint": "66f49deac73891136aa2645506326de26e84b25791280c9c70475cdcab0d8042",
+      "output": {
+        "path": "public/ui/mobs/tideglass_reflection_hunter.webp",
+        "bytes": 2590,
+        "sha256": "ae4666375fb1439908daa75c0ee2286dd64493ddec45520fa17a6e21024702e8"
+      }
+    },
+    {
+      "id": "tideglass_reflection_mage",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "temple_reflection_mage",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/mage.glb",
+          "path": "public/models/chars/players/mage.glb",
+          "bytes": 441576,
+          "sha256": "28bbbc7a04fa114badde2979eb979d37646bae354d4cd3abae33427ed2d557ca"
+        },
+        "idle": "Idle",
+        "height": 2.9899999999999998,
+        "yaw": null,
+        "hover": null,
+        "show": [
+          "Mage_Cape"
+        ],
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/staff.glb",
+              "path": "public/models/weapons/staff.glb",
+              "bytes": 36168,
+              "sha256": "0958a09b353f4e1228c67e318b130625db647f67b6a8c6a1dcd9d3f3aeff523a"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/spellbook_open.glb",
+              "path": "public/models/weapons/spellbook_open.glb",
+              "bytes": 35136,
+              "sha256": "e564abd17649ec4fa471dfbfdfd1d0668987f1844ee925d8bde17b9f2ec1d6e0"
+            },
+            "bone": "handslot.l",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.88
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#7fb2ff",
+        "resolved": "#7fb2ff",
+        "strength": 0.88
+      },
+      "sourceFingerprint": "f6b5d062325143ce6be687bb8ed3941fbdd65a970f649e54c15873c6d07eb3c9",
+      "output": {
+        "path": "public/ui/mobs/tideglass_reflection_mage.webp",
+        "bytes": 2104,
+        "sha256": "4fa6e54187ed522d1788f1ef236cbc28255199f0e8a5a346a9b3505d6295edb4"
+      }
+    },
+    {
+      "id": "tideglass_reflection_paladin",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "temple_reflection_paladin",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/paladin.glb",
+          "path": "public/models/chars/players/paladin.glb",
+          "bytes": 448820,
+          "sha256": "6481234c2f3c95087a6fbcd81b4308986142ded6e02cf42036801355f0bdfa4c"
+        },
+        "idle": "Idle",
+        "height": 2.9899999999999998,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/axe_1handed.glb",
+              "path": "public/models/weapons/axe_1handed.glb",
+              "bytes": 32372,
+              "sha256": "4dc41dbbdcc1b0fe604f9095fdc8fd61a61ec22dd2bcad346f496e3dc50d1852"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/shield_square.glb",
+              "path": "public/models/weapons/shield_square.glb",
+              "bytes": 29960,
+              "sha256": "72b44c7882482f161b6aee28605ad2714d49b6b8f2e40763feae9e42eaa4c15b"
+            },
+            "bone": "handslot.l",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.88
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#7fb2ff",
+        "resolved": "#7fb2ff",
+        "strength": 0.88
+      },
+      "sourceFingerprint": "47aeae666306560184feb76340ebe89b602e8881754645bc10da8473dcdf4c5d",
+      "output": {
+        "path": "public/ui/mobs/tideglass_reflection_paladin.webp",
+        "bytes": 2492,
+        "sha256": "28d8e06dc17cb984492b2be553092d368814176e96ad75b8c305e0b8cfa27ca7"
+      }
+    },
+    {
+      "id": "tideglass_reflection_priest",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "temple_reflection_priest",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/mage.glb",
+          "path": "public/models/chars/players/mage.glb",
+          "bytes": 441576,
+          "sha256": "28bbbc7a04fa114badde2979eb979d37646bae354d4cd3abae33427ed2d557ca"
+        },
+        "idle": "Idle",
+        "height": 2.9899999999999998,
+        "yaw": null,
+        "hover": null,
+        "show": [],
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/staff.glb",
+              "path": "public/models/weapons/staff.glb",
+              "bytes": 36168,
+              "sha256": "0958a09b353f4e1228c67e318b130625db647f67b6a8c6a1dcd9d3f3aeff523a"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/spellbook_open.glb",
+              "path": "public/models/weapons/spellbook_open.glb",
+              "bytes": 35136,
+              "sha256": "e564abd17649ec4fa471dfbfdfd1d0668987f1844ee925d8bde17b9f2ec1d6e0"
+            },
+            "bone": "handslot.l",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.88
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#7fb2ff",
+        "resolved": "#7fb2ff",
+        "strength": 0.88
+      },
+      "sourceFingerprint": "55bd9cae3cf08874bb70aed9ff82cbf621679db491324d2d15e74bc2df043df5",
+      "output": {
+        "path": "public/ui/mobs/tideglass_reflection_priest.webp",
+        "bytes": 2104,
+        "sha256": "4fa6e54187ed522d1788f1ef236cbc28255199f0e8a5a346a9b3505d6295edb4"
+      }
+    },
+    {
+      "id": "tideglass_reflection_rogue",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "temple_reflection_rogue",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/rogue.glb",
+          "path": "public/models/chars/players/rogue.glb",
+          "bytes": 477976,
+          "sha256": "821bf642863cb49cb9c87514cef48852271f2b518fc52807a1df86cb283a044d"
+        },
+        "idle": "Idle",
+        "height": 2.9899999999999998,
+        "yaw": null,
+        "hover": null,
+        "show": [
+          "Rogue_Cape"
+        ],
         "attach": [
           {
             "asset": {
@@ -8885,19 +11418,235 @@
           }
         ],
         "weaponFix": null,
-        "tintStrength": 0.3
+        "tintStrength": 0.88
       },
       "tint": {
         "source": "fixed",
-        "authored": "#6b3a32",
-        "resolved": "#6b3a32",
-        "strength": 0.3
+        "authored": "#7fb2ff",
+        "resolved": "#7fb2ff",
+        "strength": 0.88
       },
-      "sourceFingerprint": "7fe1561ccdfadfaed35de3b431bbe128c599f5994dcc1f27c32470d921cdf0a9",
+      "sourceFingerprint": "ef35cbc5ee38034478406173ed1d12785249d6c043550e475dfd1bf66f0b2af0",
       "output": {
-        "path": "public/ui/mobs/tidebound_acolyte.webp",
-        "bytes": 2208,
-        "sha256": "6d2ea0022793890c53ba3178e219616ee0387c7cbc67250a25c8f0ff48ccf1f9"
+        "path": "public/ui/mobs/tideglass_reflection_rogue.webp",
+        "bytes": 2046,
+        "sha256": "ca578a969e9ea5472f1c342e89810873ea9313799262249610b6c98747039951"
+      }
+    },
+    {
+      "id": "tideglass_reflection_shaman",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "temple_reflection_shaman",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/barbarian.glb",
+          "path": "public/models/chars/players/barbarian.glb",
+          "bytes": 444244,
+          "sha256": "2fb8d32c29d2b5c4b9b4b54ec502c3778f3d4d0da0e55cd1d4ed2b7c1e8d0abb"
+        },
+        "idle": "Idle",
+        "height": 2.9899999999999998,
+        "yaw": null,
+        "hover": null,
+        "show": [
+          "Barbarian_BearHat"
+        ],
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/axe_1handed.glb",
+              "path": "public/models/weapons/axe_1handed.glb",
+              "bytes": 32372,
+              "sha256": "4dc41dbbdcc1b0fe604f9095fdc8fd61a61ec22dd2bcad346f496e3dc50d1852"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/shield_round.glb",
+              "path": "public/models/weapons/shield_round.glb",
+              "bytes": 30432,
+              "sha256": "1f184eb71cf5f9bbbc8df984d9d049710c523daffb30d0f2955eb3a648dc86bb"
+            },
+            "bone": "handslot.l",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.88
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#7fb2ff",
+        "resolved": "#7fb2ff",
+        "strength": 0.88
+      },
+      "sourceFingerprint": "323414ccfbb6a0ea7867fa966df5ad90448fd6ca0e8649c194de4284a67fa86b",
+      "output": {
+        "path": "public/ui/mobs/tideglass_reflection_shaman.webp",
+        "bytes": 2544,
+        "sha256": "ee389a37b1232b023e9a0d3b4d55753ab848b4a9825eeba54121de0cd29b2ddd"
+      }
+    },
+    {
+      "id": "tideglass_reflection_warlock",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "temple_reflection_warlock",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/mage.glb",
+          "path": "public/models/chars/players/mage.glb",
+          "bytes": 441576,
+          "sha256": "28bbbc7a04fa114badde2979eb979d37646bae354d4cd3abae33427ed2d557ca"
+        },
+        "idle": "Idle",
+        "height": 2.9899999999999998,
+        "yaw": null,
+        "hover": null,
+        "show": [],
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/wand.glb",
+              "path": "public/models/weapons/wand.glb",
+              "bytes": 32520,
+              "sha256": "aecd32413de89cdd1375e9c83124af6b446fb28d58d7326b62ee342157610239"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/spellbook_open.glb",
+              "path": "public/models/weapons/spellbook_open.glb",
+              "bytes": 35136,
+              "sha256": "e564abd17649ec4fa471dfbfdfd1d0668987f1844ee925d8bde17b9f2ec1d6e0"
+            },
+            "bone": "handslot.l",
+            "position": null,
+            "rotationY": null,
+            "gripRef": "Spellbook_open"
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.88
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#7fb2ff",
+        "resolved": "#7fb2ff",
+        "strength": 0.88
+      },
+      "sourceFingerprint": "951882d99aef4817af8db2d37a704ab8ab676119a453d4564626d7a14001d9a9",
+      "output": {
+        "path": "public/ui/mobs/tideglass_reflection_warlock.webp",
+        "bytes": 2374,
+        "sha256": "205e7a82abb385ffc8c4697332db4003a99b2599c721af3b4b377bd15082b36f"
+      }
+    },
+    {
+      "id": "tideglass_reflection_warrior",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "temple_reflection_warrior",
+      "renderSpec": {
+        "model": {
+          "url": "models/chars/players/knight.glb",
+          "path": "public/models/chars/players/knight.glb",
+          "bytes": 462916,
+          "sha256": "063f81b53c354eeb60bb7550067bf95229278576950766228e933ed703d14c72"
+        },
+        "idle": "Idle",
+        "height": 2.9899999999999998,
+        "yaw": null,
+        "hover": null,
+        "show": [
+          "Knight_Helmet",
+          "Knight_Cape"
+        ],
+        "attach": [
+          {
+            "asset": {
+              "url": "models/weapons/sword_1handed.glb",
+              "path": "public/models/weapons/sword_1handed.glb",
+              "bytes": 30608,
+              "sha256": "3105728b5d9d5636b45c28570a2a8dc7aee916899c47d141879c0e66c87edf4f"
+            },
+            "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/shield_round.glb",
+              "path": "public/models/weapons/shield_round.glb",
+              "bytes": 30432,
+              "sha256": "1f184eb71cf5f9bbbc8df984d9d049710c523daffb30d0f2955eb3a648dc86bb"
+            },
+            "bone": "handslot.l",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          }
+        ],
+        "weaponFix": null,
+        "tintStrength": 0.88
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#7fb2ff",
+        "resolved": "#7fb2ff",
+        "strength": 0.88
+      },
+      "sourceFingerprint": "33d9757449bcec9031002b2585b8238e0cbbea2df47b48e17a9eac4f31e6beff",
+      "output": {
+        "path": "public/ui/mobs/tideglass_reflection_warrior.webp",
+        "bytes": 2036,
+        "sha256": "f1f5ea326823bdf83079fe13819a8c3940f007a29a44ae871b34e177a336dc7f"
+      }
+    },
+    {
+      "id": "tidewisp",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "temple_tidewisp",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/temple_tidewisp.glb",
+          "path": "public/models/creatures/temple_tidewisp.glb",
+          "bytes": 721336,
+          "sha256": "31e12fa7d459270ef4565a7f69790d08e4e30cb0c674ecf868d5d75736f60227"
+        },
+        "idle": "Idle",
+        "height": 2.75,
+        "yaw": null,
+        "hover": 0.45,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "4d169866151e956839c68f3fdd22bc2a2379eb487c5144a4a9c8e0e0cd986fdb",
+      "output": {
+        "path": "public/ui/mobs/tidewisp.webp",
+        "bytes": 2186,
+        "sha256": "2d305bb86e6721cedff82ab726d0667a0ef81adcfcb003519e393ad6ccdb1d8e"
       }
     },
     {
@@ -9139,52 +11888,105 @@
       }
     },
     {
+      "id": "turretback_hermit",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "mob_turretback",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/bastion_ghost_captain.glb",
+          "path": "public/models/creatures/bastion_ghost_captain.glb",
+          "bytes": 2212432,
+          "sha256": "3965105de5c534565cef2f738b28e7706170182c3e527ba3af6241cdd800cb2f"
+        },
+        "idle": "Idle",
+        "height": 7.5,
+        "yaw": null,
+        "hover": 0.3,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "37350f0b78476aeea63b923dd96d4ad9d5674e96fdc3e6d78796bbfb3a6d5050",
+      "output": {
+        "path": "public/ui/mobs/turretback_hermit.webp",
+        "bytes": 2224,
+        "sha256": "217a809d01f71e6d3e565e32055ff62df44b01761ccad44fc10d05fd0417a552"
+      }
+    },
+    {
+      "id": "vael_fog_shade",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "bastion_vael",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/vael_reaper.glb",
+          "path": "public/models/creatures/vael_reaper.glb",
+          "bytes": 2112176,
+          "sha256": "1418e5200072668d6cb324edc35a6230cc753447e3a5e983974485ebd1e92d3f"
+        },
+        "idle": "Idle",
+        "height": 9.21,
+        "yaw": null,
+        "hover": 0.406,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "bc28feec43652168c035bd2cb0a3eab5d1459f0a5f0c18891e76ca4070df5ae8",
+      "output": {
+        "path": "public/ui/mobs/vael_fog_shade.webp",
+        "bytes": 1688,
+        "sha256": "78752010e3e92565421f5f153c02c5ba62332e40c67d08997fe020097c532d20"
+      }
+    },
+    {
       "id": "vael_the_mistcaller",
       "family": "humanoid",
       "finderEncounter": true,
-      "visualKey": "mob_dark_caster",
+      "visualKey": "bastion_vael",
       "renderSpec": {
         "model": {
-          "url": "models/chars/players/mage.glb",
-          "path": "public/models/chars/players/mage.glb",
-          "bytes": 441576,
-          "sha256": "28bbbc7a04fa114badde2979eb979d37646bae354d4cd3abae33427ed2d557ca"
+          "url": "models/creatures/vael_reaper.glb",
+          "path": "public/models/creatures/vael_reaper.glb",
+          "bytes": 2112176,
+          "sha256": "1418e5200072668d6cb324edc35a6230cc753447e3a5e983974485ebd1e92d3f"
         },
         "idle": "Idle",
-        "height": 2.6,
+        "height": 9.21,
         "yaw": null,
-        "hover": null,
-        "show": [
-          "Mage_Hat"
-        ],
-        "attach": [
-          {
-            "asset": {
-              "url": "models/weapons/staff.glb",
-              "path": "public/models/weapons/staff.glb",
-              "bytes": 36168,
-              "sha256": "0958a09b353f4e1228c67e318b130625db647f67b6a8c6a1dcd9d3f3aeff523a"
-            },
-            "bone": "handslot.r",
-            "position": null,
-            "rotationY": null,
-            "gripRef": null
-          }
-        ],
+        "hover": 0.406,
+        "show": null,
+        "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.5
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#48c9b0",
-        "strength": 0.5
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "028ead47c9935a5f769ac47203123bc1b6aa2098a0f2da755b8f0c6f435a9fc7",
+      "sourceFingerprint": "bc28feec43652168c035bd2cb0a3eab5d1459f0a5f0c18891e76ca4070df5ae8",
       "output": {
         "path": "public/ui/mobs/vael_the_mistcaller.webp",
-        "bytes": 2184,
-        "sha256": "de9529ce9d9aafd6a0688e147f67dc6d066fd46712e02cfdf3843c2e3de06c56"
+        "bytes": 1688,
+        "sha256": "78752010e3e92565421f5f153c02c5ba62332e40c67d08997fe020097c532d20"
       }
     },
     {
@@ -9380,6 +12182,40 @@
         "path": "public/ui/mobs/veiled_stag.webp",
         "bytes": 2524,
         "sha256": "67204e92ab529f16a4507a9fdd865a6ee37fc36dea6cee3ed4f1c3534b869ec1"
+      }
+    },
+    {
+      "id": "vine_lasher",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "wildheart_vine_lasher",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/wildheart_vine_lasher.glb",
+          "path": "public/models/creatures/wildheart_vine_lasher.glb",
+          "bytes": 3076864,
+          "sha256": "7ab19f5078fc3b684ec650d435ce6568a10f26f3e9b02d94077c8772f045fcd7"
+        },
+        "idle": "Idle",
+        "height": 2.9886363636363633,
+        "yaw": null,
+        "hover": -0.02409090909090909,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "41061d02eb706721628aab3ebc3f38ecdab8fc7752dfb2cde2e9121f31887e2d",
+      "output": {
+        "path": "public/ui/mobs/vine_lasher.webp",
+        "bytes": 2254,
+        "sha256": "f43751125f5742cdefff44c066ed10d789933d4c784cddc1ddf6b1814db055e5"
       }
     },
     {
@@ -9980,37 +12816,37 @@
       "visualKey": "mob_wildheart_beastmaster",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/wildheart_beastmaster.glb",
-          "path": "public/models/creatures/wildheart_beastmaster.glb",
-          "bytes": 1342220,
-          "sha256": "399c39ab6c959dfe8c553fca418e5f26fbd612495797ffacfa9c11cf891eb6a1"
+          "url": "models/creatures/wildheart_beastmaster_blender.glb",
+          "path": "public/models/creatures/wildheart_beastmaster_blender.glb",
+          "bytes": 2569776,
+          "sha256": "8eba2421ee8b34c8c396243bcfb3cf8d9f432d42a125a93ddc2a2337beb2d25f"
         },
         "idle": "Idle",
-        "height": 3,
-        "yaw": -1.5707963267948966,
-        "hover": null,
+        "height": 2.678723404255319,
+        "yaw": null,
+        "hover": 0,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.03
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#485b3d",
-        "strength": 0.03
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "3c3b9c0c15aa5b1061dd6ebccde693527bd9c86c45be51cd26da658de0e0ff7e",
+      "sourceFingerprint": "03eb6f68b1fea7b4e263fde7cb5965a3f16f2bc6d309b22c8171f47001423659",
       "output": {
         "path": "public/ui/mobs/wildheart_beastmaster.webp",
-        "bytes": 3228,
-        "sha256": "bc40fa803ab1690d649e8bf3470a6a90003f0aeccecf94720fd5d533d55a63df"
+        "bytes": 3252,
+        "sha256": "2e5713d91da9817231d943a4230d6985ac17c5e47494f4d274fed94a1531bad9"
       }
     },
     {
       "id": "wildheart_hexcaller",
       "family": "troll",
-      "finderEncounter": true,
+      "finderEncounter": false,
       "visualKey": "mob_wildheart_hexcaller",
       "renderSpec": {
         "model": {
@@ -10078,7 +12914,7 @@
     {
       "id": "wildheart_ravager",
       "family": "troll",
-      "finderEncounter": true,
+      "finderEncounter": false,
       "visualKey": "mob_wildheart_ravager",
       "renderSpec": {
         "model": {
@@ -10112,7 +12948,7 @@
     {
       "id": "wildheart_stalker",
       "family": "troll",
-      "finderEncounter": true,
+      "finderEncounter": false,
       "visualKey": "mob_wildheart_stalker",
       "renderSpec": {
         "model": {
@@ -10450,34 +13286,34 @@
       "id": "ysolei",
       "family": "dragonkin",
       "finderEncounter": true,
-      "visualKey": "mob_dragonkin",
+      "visualKey": "temple_ysolei",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/dragonevolved.glb",
-          "path": "public/models/creatures/dragonevolved.glb",
-          "bytes": 138560,
-          "sha256": "ade414f75155e43ac9de2ed3a3fd5685455d010d7161473acf016bcd18056066"
+          "url": "models/creatures/temple_ysolei.glb",
+          "path": "public/models/creatures/temple_ysolei.glb",
+          "bytes": 1281756,
+          "sha256": "904fe12f2feb02cef59f82abf0d8519ab7f93e6206e7f4a740877e1d241e64d8"
         },
-        "idle": "Flying_Idle",
-        "height": 2.4,
+        "idle": "Idle",
+        "height": 9.588,
         "yaw": null,
-        "hover": 0.25,
+        "hover": -0.1356,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.2
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#bcd2ec",
-        "strength": 0.2
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "99b644f9469b359d52af3c5dd112aeae0ea378b00c0d019776e203bd62ce9e25",
+      "sourceFingerprint": "9195d03436ee50cc7728522e57e7c1ae052fad3f630e287ed2acefbb28d3e8d4",
       "output": {
         "path": "public/ui/mobs/ysolei.webp",
-        "bytes": 2124,
-        "sha256": "04b0c598c74fe93dc06325d51c74e4a9459d6a6fbe95b65372b2a6e42c21493e"
+        "bytes": 3464,
+        "sha256": "dcd2d129d22db33c8cbcef4e9da17580cb0291d0c13b9dbc3dbe9616135d7f26"
       }
     },
     {

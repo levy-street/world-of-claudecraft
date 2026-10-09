@@ -189,8 +189,9 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // lance_thrust, lance_release), each a send plus a dispatch: 250/264/14 on its own.
 // On the v0.45.0 integration: the membership integration's 252/266 plus those three
 // commands = 255/269.
-const EXPECTED_SEND_COUNT = 255;
-const EXPECTED_DISPATCH_COUNT = 269;
+// + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 256, 270.
+const EXPECTED_SEND_COUNT = 256;
+const EXPECTED_DISPATCH_COUNT = 270;
 const EXPECTED_DISPATCH_ONLY_COUNT = 14;
 
 // The chat sub-channel routing switch (server/game.ts `switch
@@ -326,7 +327,8 @@ describe('command schema parity (W0b)', () => {
     expect(dispatchSet.has('unstuck')).toBe(true);
   });
   it('appends courier dispatch as a complete client/server command pair', () => {
-    expect(COMMAND_NAMES.at(-1)).toBe('courier_dispatch');
+    // On the v0.45.0 integration the dungeon guide's answer (PR 4352) appends after it.
+    expect(COMMAND_NAMES.slice(-2)).toEqual(['courier_dispatch', 'dungeon_guide_answer']);
     expect(sendSet.has('courier_dispatch')).toBe(true);
     expect(dispatchSet.has('courier_dispatch')).toBe(true);
     expect(allowlistSet.has('courier_dispatch' as CommandName)).toBe(false);

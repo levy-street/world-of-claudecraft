@@ -44,11 +44,9 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Lòng Chảo Trái Tim Hoang Dã',
-    desc: 'Vũ khí tiêu biểu từ Zulgar và Thuần Thú Sư Lãnh Chúa Nanh.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Anh Hùng: Lòng Chảo Trái Tim Hoang Dã',
-    desc: 'Đồ sử thi chỉ rơi ở chế độ anh hùng từ Zulgar, Tiếng Nói Của Vùng Trũng.',
   },
   conquerors_nythraxis: {
     name: 'Raid Nythraxis',

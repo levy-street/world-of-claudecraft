@@ -125,3 +125,45 @@ describe('handleEvent spellfx: the mob engage cue never swallows a warrior castF
     expect(ABILITIES.battle_shout.castFx).toBe('shout');
   });
 });
+
+describe('handleEvent spellfx: a dungeon effect that claims the event skips the generic draw', () => {
+  function projectileHarness(claimed: boolean) {
+    const projectile = vi.fn();
+    const renderer = Object.create(Renderer.prototype) as EventHarness & Record<string, unknown>;
+    renderer.abilityVfx = { handleSpellfx: vi.fn().mockReturnValue(false) };
+    renderer.vfx = { projectile };
+    renderer.views = new Map();
+    renderer.sim = {
+      player: { id: 1 },
+      entities: new Map([[SOURCE_ID, { id: SOURCE_ID, kind: 'mob' }]]),
+    };
+    const riftEvents: SimEvent[] = [];
+    renderer.riftDeathZoneVisuals = {
+      handleEvent: (ev: SimEvent) => {
+        riftEvents.push(ev);
+        return claimed;
+      },
+    };
+    return { harness: renderer as EventHarness, projectile, riftEvents };
+  }
+  const shot = {
+    type: 'spellfx',
+    sourceId: SOURCE_ID,
+    targetId: 1,
+    school: 'physical',
+    fx: 'projectile',
+  } as SimEvent;
+
+  it('draws no generic projectile when the Bastion bolt claimed it', () => {
+    const { harness, projectile, riftEvents } = projectileHarness(true);
+    harness.handleEvent(shot);
+    expect(riftEvents).toEqual([shot]);
+    expect(projectile).not.toHaveBeenCalled();
+  });
+
+  it('still draws the generic projectile when nothing claimed it', () => {
+    const { harness, projectile } = projectileHarness(false);
+    harness.handleEvent(shot);
+    expect(projectile).toHaveBeenCalledOnce();
+  });
+});

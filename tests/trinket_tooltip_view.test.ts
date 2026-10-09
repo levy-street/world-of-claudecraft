@@ -1,5 +1,5 @@
 // The trinkets' item-tooltip lines (src/ui/trinket_tooltip_view.ts): every one
-// of the eighteen trinkets renders a Use line with its exact resolved numbers
+// of the nineteen trinkets renders a Use line with its exact resolved numbers
 // and cooldown, the ones with a passive render an Equip line first, the
 // power-scaled numbers move with the viewer's power exactly as combat does, and
 // the fortune notice names each Gambler's Die roll. The combat proofs drive a
@@ -127,6 +127,28 @@ const EXPECTED: Record<string, { equip?: string; use?: string }> = {
   muster_grapnel: {
     use: 'Use: Hook a party or raid member within 30 yd that you can see and haul them through the air to your side, healing them for 120 (+160) when they land. It cannot pull enemies, or allies in a vehicle, on a ship, turned to stone or held by an effect that cannot be broken. Healing increases with Healing Power. (90 sec cooldown)',
   },
+  foremans_last_link: {
+    use: 'Use: Chain yourself to a friendly player within 20 yd for 10 sec. 30% of the damage that would reach their health is dealt to you instead. Ends early if you die. Requires a friendly player target other than you. (2 min cooldown)',
+  },
+  // 5% of the viewer's 5000 maximum health: 250.
+  phial_of_the_tithe: {
+    use: 'Use: For 15 sec, each hostile creature that dies within 20 yd of you restores 5% of your maximum health (250) and 5% of your maximum mana. (2 min cooldown)',
+  },
+  // 40 plus 20% of 500 Attack Power: 40 (+100).
+  quenchwater_flask: {
+    use: 'Use: Your next 3 melee or ranged weapon hits within 12 sec deal 40 (+100) extra Frost damage. The last of them also quenches the target, slowing its attacks by 15% for 8 sec. Unused hits are lost when it ends. Damage increases with Attack Power or Ranged Attack Power, whichever is higher. (2 min cooldown)',
+  },
+  // 18 to 24 plus 8% of 500 Attack Power: 58 to 64.
+  fanglords_whistle: {
+    use: 'Use: Call a spirit jaguar to fight beside you for 12 sec. It runs to your target and bites it for 58 to 64 Physical damage every 2 sec, switching to any other enemy you target. With no enemy targeted it attacks the enemy nearest you within 30 yd. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, fixed when it is called. Requires an enemy target within 30 yd. (2 min cooldown)',
+  },
+  // 75 plus 60% of 300 Spell Power: 255, or 383 (x 1.5) on a fallen target.
+  gorgebloom_seedpod: {
+    use: 'Use: Plant a seed on your target within 30 yd. After 6 sec it bursts where the target stands, or where it died, dealing 255 Nature damage to each enemy within 8 yd, or 50% more (383) if the target died first. Damage increases with Spell Power, fixed when it is planted. The seed withers if you die before it bursts. (2 min cooldown)',
+  },
+  gaolers_iron_key: {
+    use: 'Use: Chain your target within 30 yd in place for 6 sec. A creature immune to control, such as a boss, is slowed by 30% instead, unless it is also immune to slows. (2 min cooldown)',
+  },
 };
 
 function wearing(itemId: string, seed = 11): Sim {
@@ -157,7 +179,8 @@ function shownTotal(text: string, before: string, after: string): number {
 }
 
 describe('trinket tooltip lines', () => {
-  it("covers exactly the twenty-three trinkets (the eighteen plus Balgath's five)", () => {
+  // The eighteen, Balgath's five and the dungeon rework's eight (v0.45.0 integration).
+  it('covers exactly the thirty-one trinkets', () => {
     expect(Object.keys(EXPECTED).sort()).toEqual(Object.keys(TRINKET_ITEMS).sort());
     expect(Object.keys(TRINKET_SPECS).sort()).toEqual(Object.keys(TRINKET_ITEMS).sort());
   });
@@ -186,6 +209,41 @@ describe('trinket tooltip lines', () => {
     expect(plain).toBeDefined();
     if (plain) expect(trinketTooltipLines(plain, VIEWER)).toBe('');
     expect(trinketTooltipLineTexts('not_an_item', VIEWER)).toEqual([]);
+  });
+
+  it('resolves the Wildheart trinkets against the power combat snapshots', () => {
+    const use = (id: string, v: TrinketTooltipViewer) =>
+      trinketTooltipLineTexts(id, v).at(-1)?.text;
+    // The jaguar's bite reads the higher of melee and ranged Attack Power.
+    const hunter = { ...VIEWER, attackPower: 100, rangedPower: 400 };
+    expect(use('fanglords_whistle', hunter)).toContain('bites it for 50 to 56 Physical damage');
+    expect(use('fanglords_whistle', { ...VIEWER, attackPower: 100 })).toContain(
+      'bites it for 26 to 32 Physical damage',
+    );
+    // The seed's burst moves with Spell Power: +60 for +100.
+    expect(use('gorgebloom_seedpod', { ...VIEWER, spellPower: 100 })).toContain(
+      'dealing 135 Nature damage to each enemy within 8 yd, or 50% more (203)',
+    );
+    expect(use('gorgebloom_seedpod', { ...VIEWER, spellPower: 200 })).toContain(
+      'dealing 195 Nature damage to each enemy within 8 yd, or 50% more (293)',
+    );
+    // A real Sim at that power snapshots exactly the printed bite.
+    const sim = wearing('fanglords_whistle');
+    const mob = createMob(sim.nextId++, MOBS.forest_wolf, 20, {
+      x: sim.player.pos.x,
+      y: sim.player.pos.y,
+      z: sim.player.pos.z + 3,
+    });
+    mob.hostile = true;
+    sim.addEntity(mob);
+    sim.targetEntity(mob.id, sim.player.id);
+    sim.player.attackPower = 100;
+    sim.player.rangedPower = 0;
+    sim.useItem('fanglords_whistle');
+    const jaguar = [...sim.entities.values()].find(
+      (e) => e.ownerId === sim.player.id && e.guardianState,
+    );
+    expect([jaguar?.guardianState?.minDamage, jaguar?.guardianState?.maxDamage]).toEqual([26, 32]);
   });
 
   it('moves every power-scaled number with the viewer power, as combat resolves it', () => {

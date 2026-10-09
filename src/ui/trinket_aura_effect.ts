@@ -205,6 +205,66 @@ export function trinketAuraEffectDescriptor(
       return { key: `${KEY}.sprint`, nums: { pct: pct(a.value - 1) } };
     case TRINKET_AURA.brand:
       return { key: `${KEY}.brand`, nums: { pct: pct(a.value) } };
+    case TRINKET_AURA.spiritPack:
+      // value/value2 are the bite range the jaguar snapshotted at its call.
+      return {
+        key: `${KEY}.spiritPack`,
+        nums: {
+          min: round(a.value),
+          max: round(a.value2 ?? a.value),
+          every: useOf('fanglords_whistle', 'spiritPack')?.attackInterval ?? 0,
+        },
+      };
+    case TRINKET_AURA.seedburst: {
+      // value is the unrounded planted base the burst rounds (combat/
+      // wildheart_trinkets.ts seedDamageFromBase).
+      const use = useOf('gorgebloom_seedpod', 'seedburst');
+      const bonus = use?.deathBonus ?? 0;
+      return {
+        key: `${KEY}.seedburst`,
+        nums: {
+          damage: Math.max(1, round(a.value)),
+          empowered: Math.max(1, round(a.value * (1 + bonus))),
+          bonus: pct(bonus),
+          radius: use?.radius ?? 0,
+        },
+      };
+    }
+    case TRINKET_AURA.tether:
+      // On the chained ally: value is the share moved to the wearer.
+      return { key: `${KEY}.tether`, nums: { pct: pct(a.value) } };
+    case TRINKET_AURA.tetherLink:
+      return {
+        key: `${KEY}.tetherLink`,
+        nums: { pct: pct(useOf('foremans_last_link', 'tether')?.share ?? 0) },
+      };
+    case TRINKET_AURA.harvest: {
+      const use = useOf('phial_of_the_tithe', 'harvest');
+      return {
+        key: `${KEY}.harvest`,
+        nums: { pct: pct(a.value), radius: use?.radius ?? 0 },
+      };
+    }
+    case TRINKET_AURA.quench: {
+      const use = useOf('quenchwater_flask', 'quench');
+      const slow = pct(use?.slow ?? 0);
+      if (!own || !use) return { key: `${KEY}.quenchOther`, nums: { stacks, slow } };
+      return {
+        key: `${KEY}.quench`,
+        nums: {
+          stacks,
+          slow,
+          damage: Math.max(1, round(use.flat + use.coef * weaponPower(own))),
+        },
+      };
+    }
+    case TRINKET_AURA.quenched:
+      // value is the swing-interval stretch: 1 / (1 - slow).
+      return { key: `${KEY}.quenched`, nums: { pct: pct(1 - 1 / a.value) } };
+    case TRINKET_AURA.shackle:
+      // Rooted, or (on a creature immune to control) slowed.
+      if (a.kind === 'slow') return { key: `${KEY}.shackleSlow`, nums: { pct: pct(1 - a.value) } };
+      return { key: `${KEY}.shackle`, nums: {} };
     case TRINKET_AURA.heat: {
       const use = useOf('forgefathers_temper', 'temper');
       const max = passiveOf('forgefathers_temper', 'heat')?.max ?? 0;

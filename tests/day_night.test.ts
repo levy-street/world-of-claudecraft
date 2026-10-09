@@ -72,7 +72,7 @@ describe('open-air instances follow the live cycle (source pins)', () => {
     expect(usesLiveDayNightLighting('hoardValley')).toBe(true);
     expect(usesLiveDayNightLighting('battleground')).toBe(true);
     expect(usesLiveDayNightLighting('dungeon')).toBe(false);
-    expect(usesLiveDayNightLighting('wildheartField')).toBe(false);
+    expect(usesLiveDayNightLighting('wildheartBasin')).toBe(false);
   });
 
   it('keeps Thornhollow fog, lights, and IBL on the same live grade as its sky', () => {

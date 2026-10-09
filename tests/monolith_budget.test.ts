@@ -206,7 +206,6 @@ const MONOLITHS: MonolithRow[] = [
     // signature latch) moved behind a new hud/stance seam, and Hud kept the
     // one-line frame call plus the callback bag the module is built with. The
     // ratchet's own rule: an extraction lowers the ceiling in the same change.
-    // Exact count, zero slack.
     // Upstream lowered the SAME pin twice on its own arm: the Reliquary-tracker
     // input construction moved into makeReliquaryTrackerInput
     // (reliquary_tracker_view.ts), and the stale-focus Space fix (PR #3506)
@@ -222,7 +221,6 @@ const MONOLITHS: MonolithRow[] = [
     // share placeAbility's spellbook-refresh through one commitHotbarActions
     // helper, fixing a stale assign toggle when a bound spell is cleared or
     // swapped with the spellbook open behind the editor. Exact count, zero slack.
-    //
     // RE-PINNED 19235 -> 18792 at the Phase 11i QA release sync (release tip
     // 14ab2e8630, prior synced release parent 50462dda83). BOTH parent pins for
     // the record: ours 19235 against a 19235 file, the release 19031 against a
@@ -242,14 +240,12 @@ const MONOLITHS: MonolithRow[] = [
     // UNDER both parent pins (ours 18792, the release's 18694) because both
     // parents' extractions land together and the two deleted the same ability
     // tooltip helpers, so the ratchet follows it down. Exact merged count, zero
-    // slack: any further growth reds again.
     // MEASURED AGAIN AT THE 11k QA FIX ROUND and lowered by three: the number
     // above was taken mid-resolution, and the conflict work then removed the
     // twin display-name import block and the merge's own unused
     // window_stack_state_core import. A row whose comment says zero slack and
     // whose pin sits above the file is the defect this packet's sim.ts row
     // already named, so it is re-measured rather than left green.
-    //
     // UPSTREAM'S OWN HALF over the release/v0.41.0 span, kept so the merge drops
     // neither parent's record:
     // Lowered after extracting the ability description prose (the placeholder
@@ -314,7 +310,6 @@ const MONOLITHS: MonolithRow[] = [
     // threading is unit-testable, and Hud keeps a thin consumer; the round's
     // own additions (the log plainText opt-out, the celebration playCue
     // consumption, the compare-card wiring) land inside that extraction.
-    // Exact count, zero slack.
     // LOWERED 18245 -> 18242 at the Masterwrought Phase 13 QA (2026-08-27):
     // the masterwork and tier-up toast lines' color moved into the
     // craft_celebration_text_view bundle (craftToastLogLines: the pure core
@@ -328,14 +323,12 @@ const MONOLITHS: MonolithRow[] = [
     // relocalize arm, error-toast forward, open/togglePerfecting, and the
     // crafting deps' onOpenPerfecting line) plus the 7 lines the
     // hud/professions migration commit had landed over the pin. Exact count,
-    // zero slack.
     // LOWERED 18230 -> 18220 in the same phase: the sunder completion cue's
     // log arm landed as predicates in the registered pure cores instead of
     // inline dispatch code (isSunderCompletionLog in
     // profession_event_lines_core.ts; the chat-bubble decision and the
     // Nythraxis vision line set moved verbatim to log_event_route.ts
     // chatBubbleKind), so the case 'log' body shrank while gaining the cue.
-    // Exact count, zero slack.
     // LOWERED 18220 -> 18217 wiring the same phase's cap-visibility and
     // catalyst-readout arms: the masterwrought tooltip block collapsed onto
     // masterwrought_cap_view.ts masterwroughtTooltipLines (which also brings
@@ -354,7 +347,6 @@ const MONOLITHS: MonolithRow[] = [
     // measured on the merged working tree (wc -l < src/ui/hud.ts), neither
     // parent's literal. Exact merged count, zero slack: any further growth
     // reds again.
-    //
     // UPSTREAM'S OWN HALF over the remainder of the v0.41.0 span, kept so the
     // merge drops neither parent's record (the release row rode the
     // bank-storage branch; its full ledger lives in git on that arm):
@@ -367,13 +359,11 @@ const MONOLITHS: MonolithRow[] = [
     // ground-aim branch had down-ratcheted its own row via the quickAimPoint
     // and reticle-sync-closure extractions (one under the empower-hold base),
     // and the release arm carries the bank-storage +3 above. Exact count,
-    // zero slack.
     // RE-PINNED at the merge of release/v0.41.0 (tip e19d832b47) into
     // feature/masterwrought (base d3f8bae369). BOTH parent pins for the
     // record: ours 18731, the release 19002. The release arm nets zero lines
     // on this file over the span (its adds land against equal sheds), so the
     // merged file measures exactly ours' pin (wc -l < src/ui/hud.ts). Exact
-    // merged count, zero slack: any further growth reds again.
     // THE RELEASE PARENT'S OWN HALF over the v0.41.0 span (tip 3e801dc925),
     // kept so the merge drops neither parent's record:
     // and the release arm carries the bank-storage +3 above. Measured on the
@@ -425,7 +415,6 @@ const MONOLITHS: MonolithRow[] = [
     // argument, which wrapped one call onto five lines. Recorded rather than
     // folded in, so the next measure knows which half moved. Measured on the
     // working tree (wc -l < src/ui/hud.ts), never reconciled by arithmetic.
-    // Exact count, zero slack.
     // LOWERED 18711 -> 18686 at Phase 18 (U-FE-HUD, 2026-08-31), and it had to
     // be: the row carried ZERO slack while the phase added two arms here, the
     // farming press affordance (+13) and the flair line's language key. The
@@ -453,7 +442,6 @@ const MONOLITHS: MonolithRow[] = [
     // Nythraxis-redo sync trim. Neither parent pin fits the resolved tree:
     // `wc -l < src/ui/hud.ts` on the reconciled file measures 18577, below
     // both arms, so the ceiling follows it down. Exact merged count, zero
-    // slack: any further growth reds again.
     // The aura-tracks release sync (186dd8fe7f) composes its system-text
     // extraction with the OSSBrain long-press and tooltip modules. The
     // measured combined count is below both parent pins (18574 / 18489).
@@ -494,7 +482,6 @@ const MONOLITHS: MonolithRow[] = [
     // revive change: the Keeper dialog copy moved out to
     // src/ui/keeper_revive_dialog_core.ts and the ghost prompt lost its
     // per-frame healer-range scan (the Keeper is talked to). wc -l on the
-    // merged tree. Exact count, zero slack.
     // LOWERED 18276 -> 18263 with the character-select raid lockouts: the
     // lockout-id -> raid-name rule moved out of raidLockoutPanelView into
     // src/ui/raid_lockout_format.ts (raidLockoutDisplayName) so the roster
@@ -510,7 +497,6 @@ const MONOLITHS: MonolithRow[] = [
     // the heal audio policy (potion cue, HoT silence, the Frenzied
     // Regeneration exemption) moved out of the heal2 arm into
     // combat_sfx.healAudioPlan (18253 - 18). wc -l on the merged tree. Exact
-    // count, zero slack.
     // RE-MEASURED at the release/v0.44.0 base merge into
     // integration/world-quests-v0440: the branch's own extractions (map zone
     // focus, faction tier celebration, noticeboard dispatch; ours 18286
@@ -540,12 +526,20 @@ const MONOLITHS: MonolithRow[] = [
     // RE-PINNED at the release/v0.45.0 sync into the character branch (2026-10-02): both
     // parent pins for the record, the release 18093 and the branch 18201 (shared
     // turntable subject orchestration moved to preview_subject.ts); wc -l on the merged
-    // tree. Exact count, zero slack.
     // LOWERED 18059 -> 18054 with the NPC face portraits: the "what does a
     // non-player frame show" rule (authored face, committed mob art or crest)
     // moved out of drawNonPlayerPortrait into src/ui/nonplayer_portrait_core.ts,
     // paying for the listener arm that repaints a landed face. Exact count,
-    // zero slack.
+    // LOWERED to 18083 by the Sunken Bastion fifth pass: the chat line templates
+    // (chat_template_keys.ts) and the emote wheel defaults (emote_wheel_defaults.ts)
+    // moved out, buying the Iron Cage escape prompt's composition (hud/dungeon).
+    // LOWERED to 18082 when Ossick's chain alert joined it: both prompts now
+    // compose behind one DungeonPrompts member and one frame call (hud/dungeon).
+    // LOWERED 18073 -> 18069 by the Drowned Temple encounter pass: the log
+    // line's raw-English cues (the Cheat Death and Sundering sounds, now with
+    // the Moonbridge banner) moved into log_event_route.ts logEventCue.
+    // v0.45.0 integration: 18025 on the merged tree (wc -l); the lower of the two
+    // parent pins (18054 and PR 4352's 18069) stands.
     ceiling: 18054,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
@@ -756,7 +750,6 @@ const MONOLITHS: MonolithRow[] = [
     // 41 lines of load-bearing comments, 11 blank lines and folding three `let`
     // declarations into one comma statement. Every comment was restored before
     // it landed, so upstream's +2 is what its extractions alone earn.
-    //
     // RE-PINNED 13576 -> 13578 at the Phase 11e QA release sync (release tip
     // fd705304ee, PR #3531's shader-memory probes; prior synced release parent
     // 2df374a074), under the MONOLITHS header rule for a release sync that
@@ -769,7 +762,6 @@ const MONOLITHS: MonolithRow[] = [
     // branch added nothing to renderer.ts in this sync. Per that rule upstream's
     // code is NOT extracted to buy the two lines back and the ceiling is NOT
     // raised for headroom.
-    //
     // UPSTREAM'S OWN HISTORY over the same span, kept because this row's value
     // is the record of who grew it and why, and the merge must not drop either
     // parent's half. The release re-pinned 13548 -> 13563 (+15) when the
@@ -786,7 +778,6 @@ const MONOLITHS: MonolithRow[] = [
     // nearbyPrewarmViewBudget; the renderer carries the two call sites and the
     // rationale comment) and the weapon-skin early-out in onCharacterAssetReady
     // (the predicate lives in src/render/characters/assets.ts).
-    //
     // RE-PINNED AGAIN 13578 -> 13603 at the Phase 11f release sync (release tip
     // 098372138a, PR #3232's fast loading screens; prior synced release parent
     // fd705304ee), the FIFTH sync and the fourth consecutive one to touch this
@@ -799,7 +790,6 @@ const MONOLITHS: MonolithRow[] = [
     // renderer.ts in this sync either. Upstream's code is NOT extracted to buy
     // the lines back and the ceiling is NOT raised for headroom. Exact merged
     // count, zero slack: any further growth reds again.
-    //
     // RE-PINNED AGAIN 13603 -> 13614 at the Phase 11g QA release sync (release
     // tip 3e49dc11b3, PR #3566's rift long-session perf work; prior synced
     // release parent 098372138a), the SIXTH sync and the fifth consecutive one
@@ -812,7 +802,6 @@ const MONOLITHS: MonolithRow[] = [
     // code is NOT extracted to buy the lines back and the ceiling is NOT raised
     // for headroom. Exact merged count, zero slack: any further growth reds
     // again.
-    //
     // UPSTREAM'S OWN HISTORY over this span, kept so the merge drops neither
     // parent's half. The release re-pinned 13548 -> 13551 when its rift
     // long-session perf branch merged this base (both parents grew the file
@@ -825,7 +814,6 @@ const MONOLITHS: MonolithRow[] = [
     // src/render/build_retry_gate.ts and the renderer keeping only the
     // coordinator's thin wiring. It then re-pinned to the exact count of its
     // own merged file at 13584.
-    //
     // RE-PINNED AGAIN 13614 -> 13571 at the Phase 11h release sync (release tip
     // 50462dda83, PR #3582's entry-admission perf work; prior synced release
     // parent 3e49dc11b3), the SEVENTH sync and the sixth consecutive one to
@@ -838,8 +826,6 @@ const MONOLITHS: MonolithRow[] = [
     // 13571. PREDICTED at 13571 before the merge ran and observed at 13571.
     // Phase 11h is a content-table phase and added nothing to renderer.ts.
     // Exact merged count, zero slack: any further growth reds again.
-    //
-    // UPSTREAM'S OWN HISTORY over this span, kept so the merge drops neither
     // parent's half, and it is why the number fell: entry-detail admission
     // moved the settle step ahead of compile and texture collection while
     // deleting the old reveal-time arm; the initial-scene texture collection
@@ -861,8 +847,6 @@ const MONOLITHS: MonolithRow[] = [
     // but not this one, so the branch parent carried two lines of unbanked
     // slack under a zero-slack comment; the merge audit measured the merged
     // file at 13569 (base 13539 + 30 ours). Exact merged count, zero slack:
-    // any further growth reds again.
-    //
     // UPSTREAM'S OWN HALF over the release/v0.41.0 span, kept so the merge drops
     // neither parent's record:
     // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
@@ -893,7 +877,6 @@ const MONOLITHS: MonolithRow[] = [
     // base and the union composes (ours +30, the release +6), so the merged
     // file measures 13363 (wc -l < src/render/renderer.ts). INHERITED growth
     // on the release arm (the entry-horizon cull and the compile gate). Exact
-    // merged count, zero slack: any further growth reds again.
     // LOWERED at Phase 16 (2026-08-29): the farming absorb's recorded +30
     // raise is PAID (rulings 11d-D-4 and 11d-U6-FIFTH; target 13333 by the
     // moved-baseline arithmetic) by extracting the zone/archetype
@@ -921,7 +904,6 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the 2026-08-31 v0.41.0 sync: the release arm's raid
     // consolidation and set-proc extraction (set_proc_fx.ts) land alongside
     // this branch's extractions; neither parent pin fits the combined file.
-    // Measured on the merged tree. Exact merged count, zero headroom.
     // Lowered again after the battleground view drive (the per-frame ward-state
     // push, and the release of a copy the session is done with) moved into
     // src/render/battleground_views.ts beside the build it belongs to.
@@ -960,7 +942,6 @@ const MONOLITHS: MonolithRow[] = [
     // Keep castle assembly build/attach). Neither parent pin fits the
     // resolved tree: `wc -l < src/render/renderer.ts` on the reconciled file
     // measures 12903, below both arms, so the ceiling follows it down. Exact
-    // merged count, zero slack: any further growth reds again.
     // OSSBrain integration: Fiesta effects moved to render/fiesta_effects.ts.
     // Measured after formatting; lower the ratchet with the extraction.
     // Mount skins: bank the coordinator extraction at its measured size.
@@ -1014,6 +995,21 @@ const MONOLITHS: MonolithRow[] = [
     // player, its target) moved into required_views_core.ts, which counts a view only when
     // its build made one; the world-entry head start of the player bodies
     // (characters/woc_entry_prepare.ts) came in as one awaited, announced call. Exact count.
+    // LOWERED 12688 -> 12687 with the Hollow Crypt rework: the gate object
+    // views (the Ignivar gates plus the in-dungeon gates) route through one
+    // plan and builder in src/render/gate_objects.ts. wc -l. Exact count.
+    // Lowered to 12673 when the frost- and fire-cone spellfx branches were
+    // folded into one (the Hollow Crypt drake paints its own breath).
+    // Lowered after extracting the per-view far-mesh decision (the moving
+    // holdout and the hysteresis latch) into src/render/far_lod_latch.ts.
+    // LOWERED 12663 -> 12661: the boot-attached static dressing list (lake
+    // flora, the Farshore strand, now the Sanctum's Seal Gate) moved into
+    // src/render/static_world_features.ts. wc -l. Exact count.
+    // LOWERED 12661 -> 12659: the five lazy form-rig builds became one call
+    // into src/render/characters/form_rig_sync.ts (which also keeps the shared
+    // polymorph slot on the right animal: the Toad Hex's toad). wc -l.
+    // v0.45.0 integration: 12583 on the merged tree (wc -l); the lower of the two
+    // parent pins (12598 and PR 4352's 12659) stands.
     ceiling: 12598,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
@@ -1089,7 +1085,6 @@ const MONOLITHS: MonolithRow[] = [
     // 12370 + 18 (theirs) = 12388, and the merged file measures 12388. INHERITED
     // growth: Phase 11k authored nothing in sim.ts. Exact merged count, zero
     // slack.
-    //
     // UPSTREAM'S OWN HALF over the release/v0.41.0 span, kept so the merge drops
     // neither parent's record:
     // Re-pinned to the eastbrook-plus-tutorial integration merge output:
@@ -1115,7 +1110,6 @@ const MONOLITHS: MonolithRow[] = [
     // the merged file lands below both parent pins (the release retired the
     // Vale Cup arms this branch had kept), so the ratchet follows it down.
     // Exact merged count, zero slack.
-    //
     // RE-PINNED 12361 -> 12326 at Masterwrought Phase 12 (the Perfecting
     // stage): the commission-order command emit bodies (the four verbs plus
     // their two private board lookups) moved to
@@ -1129,7 +1123,6 @@ const MONOLITHS: MonolithRow[] = [
     // professions/crafting.ts emitCraftResult (the fourth copy of that emit;
     // rule of three), paying for the host-fed dailyResetRemainingSec field,
     // its buildSimContext getter, and the import. Exact count, zero slack.
-    //
     // UPSTREAM'S OWN HALF over the remainder of the v0.41.0 span, kept so the
     // merge drops neither parent's record:
     // Lowered after CharacterState and PetState moved to the type-only
@@ -1193,7 +1186,6 @@ const MONOLITHS: MonolithRow[] = [
     // the account-wide Book of Deeds / Reliquary change moved the deeds restore
     // and join-retro passes into src/sim/deeds_restore.ts and the ownership
     // union into accountReliquaryOwnershipOpts (src/sim/reliquary.ts). Exact
-    // count, zero slack.
     // Down 11843 -> 11822 at the v0.42.2 hotfix line forward merge: the
     // Crucible binding restore moved the per-slot payload-bound blocks to
     // item_instance_load.ts's sanitizeSlotInstanceOnLoad and the party-trade
@@ -1204,7 +1196,6 @@ const MONOLITHS: MonolithRow[] = [
     // ResolvedAbility interface moved to src/sim/resolved_ability.ts (a new
     // cast-scoped marker, naturesBoonPower, would otherwise have grown this
     // file); sim.ts keeps the type import and the barrel re-export. Exact
-    // count, zero slack.
     // Permanent loot quality (PR 4054) base merge: the loot identity receipt
     // and projection helpers moved to dedicated siblings, composed with the
     // release extractions above. Exact merged count, zero slack.
@@ -1232,7 +1223,11 @@ const MONOLITHS: MonolithRow[] = [
     // count; the open-world mob curve (PR 4382) adds its spawn import and the
     // respawn selector line, 11639 merged. Not a release re-pin: whichever of
     // 4281 and 4382 lands second needs a two-line extraction or a maintainer raise.
-    ceiling: 11639,
+    // Lowered when the Stormbrass Foundry was parked: the Lift Warden's spawn
+    // call and its import left the coordinator (11636, measured).
+    // v0.45.0 integration: 11611 on the merged tree (wc -l); the lower of the two
+    // parent pins (11639 and PR 4352's 11636) stands.
+    ceiling: 11636,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1463,7 +1458,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 10961 -> 10958: the modular look provider answers for players only now
     // (every world NPC rides a WOC class body, characters/npc_looks.ts), which took
     // the NPC arm and its import out of the coordinator. Exact count, zero slack.
-    ceiling: 10958,
+    // v0.45.0 integration: the five-dungeon rework's two lines of main.ts wiring on top of
+    // the character pack's 10958 make 10960 (wc -l), still under the release's 11140.
+    // INTEGRATION-ONLY pin; neither parent PR carries it.
+    ceiling: 10960,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1607,7 +1605,6 @@ const MONOLITHS: MonolithRow[] = [
     // together those paid for the arm-marked heavy-self lines in the perfect_item
     // and farming cases and the blobP99 heartbeat input. Extraction first, then
     // the phase's lines, netting 4 under (wc -l < server/game.ts after biome);
-    // the ceiling follows the file down. Exact count, zero slack.
     // LOWERED 10294 -> 10282 at Phase 18 (U-NET-WIRE addendum C, 2026-08-31):
     // routeEvents' once-per-batch chat-flair prologue moved whole to
     // server/chat_flair_stamp.ts (a pure function behind a two-call deps bag,
@@ -1656,7 +1653,6 @@ const MONOLITHS: MonolithRow[] = [
     // both this extraction and the Intentional Gathering dispatch trimming
     // (whose own arm read 10333) land together and their savings compose.
     // Measured with wc -l < server/game.ts after biome. Exact count, zero slack.
-    //
     // THE RELEASE PARENT'S OWN HALF over this same release/v0.42.0 span, kept
     // so the merge drops neither parent's record: chatChannelHint and
     // chatSenderFlair moved to their own server/ modules; the guild roster
@@ -1667,7 +1663,6 @@ const MONOLITHS: MonolithRow[] = [
     // the per-surface action-bar profiles moved the join read, per-profile
     // merge and FIFO write to server/hotbar_layout.ts (HotbarLayoutStore),
     // ratcheting theirs down to 10587.
-    //
     // RE-PINNED at this merge of release/v0.42.0 into feature/masterwrought.
     // BOTH parent pins for the record: ours 10327, the release 10587 (base
     // 10641). server/game.ts's own conflicts (owned by a different
@@ -1722,6 +1717,12 @@ const MONOLITHS: MonolithRow[] = [
     // branch 9965; the two sides' additions compose to 9840 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
     // Referral admission extracts account-bound addPlayer into account_player_join.ts.
+    // LOWERED to 9803 by the Drowned Temple lore guide: the nine Dungeon
+    // Finder command bodies moved whole to server/dungeon_finder_commands.ts
+    // (the farming_commands.ts precedent), buying the guide's answer case and
+    // its `gds` wire field (measured).
+    // v0.45.0 integration: 9676 on the merged tree (wc -l); the lower of the two
+    // parent pins (9769 and PR 4352's 9803) stands.
     ceiling: 9769,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
@@ -1782,7 +1783,6 @@ const MONOLITHS: MonolithRow[] = [
     // top of ours (5926 - 38), so the merged file measures 5888
     // (wc -l < src/net/online.ts), neither parent's literal; the ratchet follows
     // it down. Exact merged count, zero slack.
-    //
     // UPSTREAM'S OWN HALF over the remainder of the v0.41.0 span, kept so the
     // merge drops neither parent's record:
     // Re-derived at the PR #3670 review-fix round. Against the release/v0.41.0
@@ -1837,7 +1837,6 @@ const MONOLITHS: MonolithRow[] = [
     // raid span, 294 commits) into feature/masterwrought (base e19d832b47).
     // BOTH parent pins for the record: ours 5922, the release 5856. Measured on
     // the merged tree, never reconciled by arithmetic. Exact merged count,
-    // zero slack: any further growth reds again.
     // LOWERED 5890 -> 5823 at Phase 18 (U-NET-WIRE, 2026-08-31): the whole aura
     // half of applySnapshot moved to src/net/aura_wire_decode.ts, the
     // directory's own "a new decode block is a new sibling" shape (the deadline
@@ -1861,7 +1860,6 @@ const MONOLITHS: MonolithRow[] = [
     // telegraph extractions. Neither parent pin fits the resolved tree:
     // `wc -l < src/net/online.ts` on the reconciled file measures 5788,
     // below both arms, so the ceiling follows it down. Exact merged count,
-    // zero slack: any further growth reds again.
     // OSSBrain integration: entity flair decoding moved to net/entity_flair_wire.ts.
     // Measured after formatting; lower the ratchet with the extraction.
     // Main hotfix integration: combined extractions, exact merged count.
@@ -1901,6 +1899,15 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 5354 and the
     // branch 5426; the two sides' additions compose to 5356 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
+    // LOWERED 5356 -> 5355 with the Hollow Crypt rework: the snapshot-head
+    // syncs (telegraphs, ferry gates, and the new dungeon gate mirror) moved
+    // into src/net/snapshot_head_syncs.ts. wc -l. Exact count.
+    // LOWERED to 5347 by the Drowned Temple lore guide: the show-jumping
+    // race's countdown projection moved whole to mount_race_wire.ts
+    // (mountRaceViewAt), buying the guide's answer send and its `gds` decode
+    // (measured).
+    // v0.45.0 integration: 5336 on the merged tree (wc -l); the lower of the two
+    // parent pins (5347 and PR 4352's 5347) stands.
     ceiling: 5347,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
@@ -1916,7 +1923,9 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned 4850 -> 4720: the world quest minigame layer's three director
     // hooks were paid for by moving the note-event primitives (the Inst union,
     // NoteEvent/Theme, and the push* composition helpers) to music_notes.ts.
-    ceiling: 4720,
+    // Lowered 4720 -> 4672: the boss-fight loop's asset handling moved to
+    // src/game/boss_music_loop.ts with the per-boss fight tracks.
+    ceiling: 4672,
     seam: 'a src/game sibling module (the refactor/game-music split is the template)',
   },
   {
@@ -2215,7 +2224,14 @@ const MONOLITHS: MonolithRow[] = [
     // 2486 to 2513 into the row's slack: the berth gate bookkeeping (setColliderGateOpen,
     // gridIndex-ordered reopen, lazy wishes) needs the grid's private state, net of the
     // decoration collider builder moving out to decoration_collider.ts. wc -l. Exact count.
-    ceiling: 2513,
+    // LOWERED 2513 -> 2486 with the Hollow Crypt rework: the static interior
+    // collider table and interiorCollidersFor moved into interior_collider_sets.ts
+    // (which now also applies the per-slot dungeon gate view). wc -l. Exact count.
+    // LOWERED 2486 -> 2392 with the interior collider cell index: the push-out
+    // kernel (pushOut, resolveAgainst, passesOver, rotY, colliderTopAt) moved
+    // verbatim to collider_pushout.ts, the index itself is
+    // interior_collider_cells.ts. wc -l. Exact count.
+    ceiling: 2392,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {
@@ -2256,7 +2272,14 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again after the dais foundation-block stacking (and its
     // per-position hash) moved to src/render/dais_blocks_core.ts for the
     // Nythraxis flanking platforms (v0.42.2). Exact count, zero slack.
-    ceiling: 2420,
+    // Lowered 2420 -> 2411: the open-air field builders moved to
+    // src/render/open_air_fields.ts (the Drowned Temple joined that table).
+    // Lowered 2411 -> 2364: the Drowned Temple water sheet's shaders moved to
+    // src/render/temple_water_shader.ts with the camera-relative floor fix.
+    // Lowered 2364 -> 2362: the open-air arm's placement moved into the
+    // roster that draws only the field the player stands in
+    // (src/render/open_air_field_visibility_core.ts). Exact count, zero slack.
+    ceiling: 2362,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

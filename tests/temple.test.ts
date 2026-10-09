@@ -49,7 +49,8 @@ describe('The Drowned Temple', () => {
     const t = DUNGEONS.drowned_temple;
     expect(t).toBeTruthy();
     expect(t.index).toBe(3);
-    expect(t.interior).toBe('temple');
+    // The open-air lagoon rework (drowned_temple.md): its own authored field.
+    expect(t.interior).toBe('drowned_temple');
     expect(t.suggestedPlayers).toBe(5);
     // it joins the map-derived dungeon list (the moongate draws itself there)
     expect(DUNGEON_LIST.some((d) => d.id === 'drowned_temple')).toBe(true);
@@ -111,33 +112,39 @@ describe('The Drowned Temple', () => {
     expect(ysolei.enraged).toBe(true); // and the enrage flips below 30%
   });
 
-  it('the new temple interior has solid walls and pillars but a walkable altar', () => {
+  it('the lagoon temple has solid cliffs and columns but open walkways', () => {
     const sim = makeWorld();
     const o = instanceOrigin(3, 0);
     const seed = sim.cfg.seed;
-    // open entry aisle is clear; the side wall and a colonnade pillar block
-    expect(isBlocked(seed, o.x + 0, o.z + 8)).toBe(false);
-    expect(isBlocked(seed, o.x + 23, o.z + 8)).toBe(true); // side wall at |x|=23
-    expect(isBlocked(seed, o.x + 14, o.z + 10)).toBe(true); // colonnade pillar
-    // Ysolei's altar dais (z 116) is deliberately walkable — no collider
-    expect(isBlocked(seed, o.x + 0, o.z + 116)).toBe(false);
+    // The Choir Court's stage is open; the lagoon off its rim is walled by
+    // the generated cliffs, and a colonnade column is solid.
+    expect(isBlocked(seed, o.x + 0, o.z + 0)).toBe(false);
+    expect(isBlocked(seed, o.x + 0, o.z + 26)).toBe(true);
+    expect(isBlocked(seed, o.x - 15.5, o.z - 64)).toBe(true);
+    // The Moon Altar island round the altar stone is open ground.
+    expect(isBlocked(seed, o.x - 18, o.z + 206)).toBe(false);
   });
 
-  it("Ysolei's blue drop table is an exclusive one-of-three and resolves to real items", () => {
+  it("Ysolei's blue drop table is an exclusive one-of-four and resolves to real items", () => {
     const ysolei = MOBS.ysolei;
     const group = ysolei.loot.filter((l) => l.rollGroup === 'ysolei_blue');
-    expect(group.length).toBe(3);
+    // The lower dungeons' normal blues (tests/lower_dungeon_blues.test.ts):
+    // her three Moonwrack chests and the Moonwrack Stave, guaranteed.
+    expect(group.length).toBe(4);
     const sum = group.reduce((s, l) => s + l.chance, 0);
     expect(sum).toBeCloseTo(1.0, 5);
     for (const l of ysolei.loot) {
       if (l.itemId) expect(ITEMS[l.itemId], `loot item ${l.itemId}`).toBeTruthy();
     }
-    // each rollGroup blue is a rare chest, one per archetype
-    for (const l of group) {
-      const item = ITEMS[l.itemId!];
-      expect(item.quality).toBe('rare');
-      expect(item.slot).toBe('chest');
-    }
+    // every rollGroup blue is rare: a chest per archetype plus the stave
+    for (const l of group) expect(ITEMS[l.itemId!].quality).toBe('rare');
+    const chests = group.filter((l) => ITEMS[l.itemId!].slot === 'chest');
+    expect(new Set(chests.map((l) => ITEMS[l.itemId!].armorType))).toEqual(
+      new Set(['mail', 'leather', 'cloth']),
+    );
+    expect(group.map((l) => l.itemId).filter((id) => ITEMS[id!].kind === 'weapon')).toEqual([
+      'moonwrack_stave',
+    ]);
   });
 
   it('the Tidewatcher offers a self-contained chain ending at the 5-player finale', () => {
