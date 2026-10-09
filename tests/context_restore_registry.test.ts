@@ -79,6 +79,10 @@ const INVENTORY: Record<string, Answer> = {
     exempt:
       'a gated attach already revealed: drawn content, linked by the hold or the resident debt',
   },
+  'src/render/reward_glider_visual.ts:ready': {
+    exempt:
+      'a gated attach already revealed: drawn content, linked by the hold or the resident debt',
+  },
   'src/render/wisp_maze_visual.ts:ready': {
     exempt:
       'a gated attach already revealed: drawn content, linked by the hold or the resident debt',

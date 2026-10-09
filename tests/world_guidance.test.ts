@@ -58,6 +58,7 @@ vi.mock('../src/render/world_quest_trace_visual', () => ({
 }));
 
 import { WorldGuidance } from '../src/render/world_guidance';
+import { GLIDER_QUEST_ID } from '../src/sim/content/world_quest_glider';
 
 vi.mock('../src/render/cannon_encounter_visual', () => ({
   CannonEncounterVisual: class {
@@ -89,6 +90,108 @@ vi.mock('../src/render/wisp_maze_visual', () => ({
 }));
 
 describe('personal world guidance coordinator', () => {
+  it('renders the reputation glider apparatus outside a world-quest flight', async () => {
+    const scene = new THREE.Scene();
+    const guidance = new WorldGuidance(scene, () => 0);
+    await guidance.readyForEntry;
+    const player = {
+      id: 1,
+      kind: 'player',
+      dead: false,
+      onGround: false,
+      pos: { x: 10, y: 20, z: 30 },
+      facing: 0,
+      vx: 4,
+      vy: -2,
+      vz: 0,
+      auras: [{ id: 'rift_feather_glider', remaining: 30, value: 1 }],
+    };
+    guidance.update(
+      {
+        mountRaceView: () => null,
+        questState: () => 'available',
+        worldQuestLog: new Map(),
+        player,
+        entities: new Map([[player.id, player]]),
+      } as unknown as IWorld,
+      10,
+      0.05,
+    );
+    const reward = scene.getObjectByName('reward-glider-visual');
+    expect(reward).toBeDefined();
+    expect(reward?.getObjectByName('glider-apparatus')?.visible).toBe(true);
+    guidance.dispose();
+  });
+  it('forwards rendered remote poses while a live course owns the self apparatus', async () => {
+    const scene = new THREE.Scene();
+    const guidance = new WorldGuidance(scene, () => 0);
+    await guidance.readyForEntry;
+    const player = {
+      id: 1,
+      kind: 'player',
+      dead: false,
+      onGround: false,
+      pos: { x: 10, y: 20, z: 30 },
+      facing: 0,
+      vx: 4,
+      vy: -2,
+      vz: 0,
+      auras: [{ id: 'rift_feather_glider', remaining: 30, value: 1 }],
+    };
+    const remote = { ...player, id: 2 };
+    const body = new THREE.Group();
+    body.position.set(18, 25, 34);
+    body.rotation.y = 0.7;
+    const selfBody = new THREE.Group();
+    selfBody.position.set(11, 21, 31);
+    selfBody.rotation.y = -0.3;
+    const state = {
+      mountRaceView: () => null,
+      questState: () => 'available',
+      player,
+      entities: new Map([
+        [1, player],
+        [2, remote],
+      ]),
+      worldQuestLog: new Map([
+        [
+          GLIDER_QUEST_ID,
+          {
+            state: 'active',
+            glider: { phase: 'flying', vy: -2, speed: 4, passedRings: [] },
+          },
+        ],
+      ]),
+    } as unknown as IWorld;
+    guidance.update(
+      state,
+      10,
+      0.05,
+      false,
+      new Map([
+        [1, { group: selfBody }],
+        [2, { group: body }],
+      ]),
+    );
+    const apparatus: THREE.Object3D[] = [];
+    scene.traverseVisible((node) => {
+      if (node.name === 'glider-apparatus') apparatus.push(node);
+    });
+    expect(apparatus).toHaveLength(2);
+    expect(apparatus.filter((node) => node.parent?.name === 'glider-course-visual')).toHaveLength(
+      1,
+    );
+    const course = apparatus.find(
+      (node) => node.parent?.name === 'glider-course-visual',
+    ) as THREE.Group;
+    expect(course.position.toArray()).toEqual([11, 22.22, 31]);
+    expect(course.rotation.y).toBe(-0.3);
+    const reward = scene.getObjectByName('reward-glider-visual') as THREE.Group;
+    expect(reward.children[0].visible).toBe(false);
+    expect(reward.children[1].position.toArray()).toEqual([18, 27.8, 34]);
+    expect(reward.children[1].rotation.y).toBe(0.7);
+    guidance.dispose();
+  });
   it('does not finish entry while the private maze actors are still linking', async () => {
     let release = () => {};
     calls.wispReady = new Promise<void>((resolve) => {

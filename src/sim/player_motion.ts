@@ -710,6 +710,8 @@ function verticalPass(
   const waterHere = waterLevelAt(p.pos.x, p.pos.z, deps.seed);
   const deepWater = ground < waterHere - SWIM_DEPTH;
   if (deepWater && p.pos.y <= waterHere - 0.75 + 0.05) {
+    const gliderIdx = p.auras.findIndex((a) => a.id === 'rift_feather_glider');
+    if (gliderIdx >= 0) p.auras.splice(gliderIdx, 1);
     swimVerticalPass(p, inp, wishX, wishZ, wishSpeed, mountLocked, ground, waterHere);
     return;
   }
@@ -795,7 +797,7 @@ function verticalPass(
     }
   } else {
     const gGroundIdx = p.auras.findIndex((a) => a.id === 'rift_feather_glider');
-    if (gGroundIdx >= 0) p.auras.splice(gGroundIdx, 1);
+    if (gGroundIdx >= 0 && p.auras[gGroundIdx].value > 0) p.auras.splice(gGroundIdx, 1);
     // Distinguish a walkable downhill slope from a genuine cliff/ledge. The
     // drop the surface can take in one tick scales with how far we moved: a
     // slope no steeper than MAX_CLIMB_SLOPE (the same gate that blocks uphill

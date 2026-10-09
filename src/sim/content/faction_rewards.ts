@@ -140,7 +140,8 @@ export function useRiftFeatherGlider(ctx: SimContext, p: Entity, meta: PlayerMet
     kind: 'slow_fall',
     duration: 30,
     remaining: 30,
-    value: 1,
+    // Zero arms the glider on a ledge; aura upkeep latches one after takeoff.
+    value: p.onGround ? 0 : 1,
     sourceId: p.id,
     school: 'physical',
   });

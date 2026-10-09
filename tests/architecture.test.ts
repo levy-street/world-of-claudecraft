@@ -867,6 +867,7 @@ const RENDER_PURE_CORES = [
   'src/render/wisp_maze_kit_core.ts',
   'src/render/glider_course_core.ts',
   'src/render/glider_flight_pose_core.ts',
+  'src/render/reward_glider_core.ts',
   'src/render/shadow_detection_core.ts',
   'src/render/world_quest_public_trace_core.ts',
   'src/render/world_quest_trace_core.ts',

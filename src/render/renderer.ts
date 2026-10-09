@@ -11435,7 +11435,7 @@ export class Renderer {
     this.bgFx.update(this.time);
     updateBattlegroundViews(this.bgViews, this.bgViewState, this.sim.bgInfo, this.sim.playerId);
     this.vfx.update(dt);
-    this.worldGuidance.update(this.sim, this.time, dt, this.reducedMotion(), this.views.get(p.id));
+    this.worldGuidance.update(this.sim, this.time, dt, this.reducedMotion(), this.views);
     this.abilityVfx.update(dt, this.reducedMotion());
     this.needleOfFateVfx.update(dt, this.reducedMotion());
     this.sentenceVfx.update(dt, this.reducedMotion());

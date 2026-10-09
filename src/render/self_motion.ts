@@ -481,9 +481,9 @@ export class SelfMotionPredictor {
       this.leadMs = 0;
       return this.out;
     }
-    // Borrow the mirrored per-frame state the kernel reads; the pose fields
-    // above stay owned by the scratch actor.
-    actor.auras = self.auras;
+    // The kernel can remove landing/swimming auras. Own the scratch array so
+    // prediction cannot erase an authoritative, delta-gated mirrored buff.
+    actor.auras = self.auras.slice();
     actor.ghost = self.ghost;
     actor.sitting = self.sitting;
     actor.castingAbility = self.castingAbility;

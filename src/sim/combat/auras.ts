@@ -289,9 +289,12 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
     e.stealthed = e.auras.some((a) => a.kind === 'stealth');
     return;
   }
-  if (e.inCombat || e.onGround) {
-    const gIdx = e.auras.findIndex((a) => a.id === 'rift_feather_glider');
-    if (gIdx >= 0) {
+  const gIdx = e.auras.findIndex((a) => a.id === 'rift_feather_glider');
+  if (gIdx >= 0) {
+    // Latch takeoff on the authority, after movement. Display predictors borrow
+    // aura objects, so the shared movement kernel must not write this value.
+    if (!e.inCombat && !e.onGround) e.auras[gIdx].value = 1;
+    else if (e.inCombat || e.auras[gIdx].value > 0) {
       const removed = e.auras.splice(gIdx, 1)[0];
       ctx.emit({
         type: 'aura',
