@@ -17,6 +17,7 @@
 
 import { recipeById } from '../content/recipes';
 import { consumeSelectedInventorySlot, selectedInventorySlot } from '../item_copy_ref';
+import { recordTrackedConsumed } from '../item_tracking';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { RecipeItemDef } from '../types';
@@ -171,10 +172,14 @@ export function useRecipePatternItem(
   // for callers with no selection, per item_copy_ref.ts's frozen-fallback
   // doctrine.
   const taken = consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex);
+  // A tracked (epic or legendary) pattern ends when it is learned: its final
+  // ledger row names the recipe(s) it taught. Emits only, draws no rng.
+  const learnedIds = missing.map((recipe) => recipe.id).join(',');
   if (taken === undefined) {
     // No selection named: the legacy id-only walk, byte-identical to the
     // pre-selection behavior (the hook fires inside ctx.removeItem).
-    ctx.removeItem(itemId, 1, meta.entityId);
+    const spent = ctx.removeItem(itemId, 1, meta.entityId);
+    recordTrackedConsumed(ctx, meta, itemId, spent, 'pattern', learnedIds);
   } else if (taken === null) {
     // Unreachable: the gate at the top of this function pinned the selection
     // and nothing between it and this consume touches the bags (the resolver
@@ -188,6 +193,7 @@ export function useRecipePatternItem(
     // online host's heavy self block that the bags changed (pinned in
     // tests/recipe_pattern_items.test.ts).
     ctx.onInventoryChangedForQuests?.(meta);
+    recordTrackedConsumed(ctx, meta, itemId, [taken.instance], 'pattern', learnedIds);
   }
   // Success feedback, the Sim.trainRecipe shape: the same text-free personal
   // trainResult the trainer path emits, so the hud's existing handler logs

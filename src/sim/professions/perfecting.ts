@@ -50,7 +50,7 @@ import { recalcPlayerStats } from '../entity';
 import { masterwroughtConflictSlot, uniqueEquipConflictSlot } from '../equipment_rules';
 import { selectedInventorySlot } from '../item_copy_ref';
 import { countRawInSlots, countUnlockedInSlots, removeUnlockedFromSlots } from '../item_lock';
-import { ensureTrackedInPlace } from '../item_tracking';
+import { ensureTrackedInPlace, recordTrackedChange } from '../item_tracking';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity, EquipSlot, InvSlot, ItemDef, ItemInstancePayload } from '../types';
@@ -456,7 +456,8 @@ export function resolvePerfectingAttempt(
   // New collections keep their binding independent of rank. Existing item
   // semantics are unchanged, including legacy rank-zero payloads.
   if (payload.perfectingBonus !== undefined) payload.perfectingBound = true;
-  if (payload.boundTo === undefined) {
+  const bindsNow = payload.boundTo === undefined;
+  if (bindsNow) {
     payload.boundTo = meta.entityId;
     ctx.notice(meta.entityId, `Perfecting begins: ${def.name} is now bound to you.`);
   }
@@ -523,6 +524,15 @@ export function resolvePerfectingAttempt(
     }
   } else {
     ctx.notice(meta.entityId, 'The perfecting attempt fails; the materials are spent.');
+  }
+  // The item ledger's lineage row (item_tracking.ts): an attempt that changed
+  // the copy in place (a rank gained, or the first attempt's bind) keeps its
+  // guid and records a `modify` naming the rank the copy now holds. A later
+  // failed attempt left the copy as it was, so it records nothing. Draw-free,
+  // and a no-op on an untracked copy.
+  if (success || bindsNow) {
+    const rankNow = success ? rankBefore + 1 : rankBefore;
+    recordTrackedChange(ctx, meta, itemId, payload, 'modify', 'perfecting', `rank ${rankNow}`);
   }
   // The rift forge ops' wire bump on an in-place payload mutation: the owner's
   // heavy self mirrors (inv, einst) re-diff on the next snapshot. Every
@@ -677,8 +687,9 @@ function promotePerfectedCopy(
   payload.name = normalized;
   // The copy just became tracked in place (item_tracking.ts): a legendary
   // that never passed through the hub as one gets its guid and provenance
-  // now, source 'promotion'. Draw-free; an already-tracked copy keeps its id.
-  ensureTrackedInPlace(ctx, meta, itemId, payload, 'promotion');
+  // now, source 'promotion'. Draw-free; an already-tracked copy keeps its id
+  // and records a `modify` row naming the change instead.
+  ensureTrackedInPlace(ctx, meta, itemId, payload, 'promotion', 'legendary');
   // The discovery ledger at the stamp site (the addItemInstance hub's
   // recipe): the quality:legendary mark (a real deed trigger) lands the
   // moment the promotion mints it, never at the next login's retro pass.

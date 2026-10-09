@@ -3,6 +3,11 @@ import {
   type BackgroundDbPermit,
   createBackgroundDbGate,
 } from './background_db_gate';
+import {
+  DELETED_CHARACTER_HOLDINGS_RETURNING,
+  type DeletedCharacterHoldingsRow,
+  recordDeletedCharacterCopies,
+} from './character_delete_item_ledger';
 import { CHARACTER_SAVE_STATEMENT_TIMEOUT_MS } from './character_save_transaction';
 import {
   backendCancelViaPool,
@@ -281,13 +286,20 @@ export async function deleteOwnedCharacterRow(
     // character-save allowance) and restore the tighter bound afterward so
     // COMMIT keeps the transaction's own ceiling.
     await transaction.query(`SET LOCAL statement_timeout = ${CHARACTER_SAVE_STATEMENT_TIMEOUT_MS}`);
-    const deleted = await transaction.query(
-      'DELETE FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3',
+    // RETURNING the item containers of the stored state: the delete is hard,
+    // so every tracked (epic or legendary) copy in them ends here and writes
+    // its final ledger row below (character_delete_item_ledger.ts).
+    const deleted = await transaction.query<DeletedCharacterHoldingsRow>(
+      `DELETE FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3
+        RETURNING ${DELETED_CHARACTER_HOLDINGS_RETURNING}`,
       [characterId, accountId, realm],
     );
     // Deliberately skipped when the DELETE throws: the catch below rolls the
     // whole transaction back, which clears every SET LOCAL with it.
     await transaction.query(`SET LOCAL statement_timeout = ${DELETE_RESTORE_STATEMENT_TIMEOUT_MS}`);
+    // Same transaction, so the consume rows commit iff the delete does. No
+    // statement at all when the character held no tracked copy.
+    await recordDeletedCharacterCopies(transaction, realm, accountId, deleted.rows?.[0]);
     await transaction.commit();
     return (deleted.rowCount ?? 0) > 0;
   } catch (error) {

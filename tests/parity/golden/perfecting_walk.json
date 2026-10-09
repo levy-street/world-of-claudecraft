@@ -602,7 +602,7 @@
       "time": 0,
       "nextId": 1011,
       "state": "65133546",
-      "events": "f2f99f5d",
+      "events": "272be1bb",
       "rng": {
         "draws": 6,
         "digest": "1272a77a"
@@ -1038,7 +1038,7 @@
       "time": 0,
       "nextId": 1011,
       "state": "a4b2fd8a",
-      "events": "0f2975c3",
+      "events": "b724d416",
       "rng": {
         "draws": 8,
         "digest": "3c3c49a7"

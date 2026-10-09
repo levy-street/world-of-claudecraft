@@ -14,6 +14,7 @@ import { ITEMS } from '../data';
 import { refusedWhileDead } from '../dead_gate';
 import { selectedInventorySlot } from '../item_copy_ref';
 import { cloneItemProvenance, isItemGuid, isLoadableItemProvenance } from '../item_provenance';
+import { recordTrackedChange } from '../item_tracking';
 import { isEligibleEnemyQualitySource, rollEnemyLootQuality } from '../loot/enemy_quality';
 import { createLootQuality, isEligibleLootQualityItem } from '../loot_quality/core';
 import { cloneLootQuality } from '../loot_quality/types';
@@ -618,6 +619,18 @@ export function upgradeRiftItem(
   ctx.removeItem(RIFT_ESSENCE_ITEM_ID, cost, r.meta.entityId);
   gear.upgradeLevel += 1;
   rebuildRolledStats(slot.itemId, slot.instance);
+  // The item ledger's lineage row (item_tracking.ts): the band changed in
+  // place and keeps its guid, so it records a `modify` naming the new upgrade
+  // level. Draw-free.
+  recordTrackedChange(
+    ctx,
+    r.meta,
+    slot.itemId,
+    slot.instance,
+    'modify',
+    'riftForge',
+    `upgrade ${gear.upgradeLevel}`,
+  );
   r.meta.wireRev++;
   return emitResult(ctx, r.meta.entityId, {
     ok: true,
@@ -671,6 +684,17 @@ export function socketRiftGem(
   const replacedGem = gear.gems.length >= gear.gemSlots ? gear.gems.shift() : undefined;
   gear.gems.push(gemId as RiftGemId);
   rebuildRolledStats(slot.itemId, slot.instance);
+  // The lineage row, as the upgrade above: a `modify` naming the gem set and
+  // the one it destroyed, if any. Draw-free.
+  recordTrackedChange(
+    ctx,
+    r.meta,
+    slot.itemId,
+    slot.instance,
+    'modify',
+    'riftSocket',
+    replacedGem === undefined ? gemId : `${gemId} replacing ${replacedGem}`,
+  );
   r.meta.wireRev++;
   return emitResult(ctx, r.meta.entityId, {
     ok: true,

@@ -85,6 +85,7 @@ import {
 import { canStackInstancePayloads, itemInstancePayloadsEqual } from './item_instance_merge';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
 import { isItemLocked } from './item_lock';
+import { recordTrackedChange, recordTrackedConsumed } from './item_tracking';
 import { withoutPartyTradeMarker } from './loot/bop_trade_window';
 import { isMaterialItemId } from './material_ids';
 import {
@@ -491,11 +492,13 @@ export function discardItem(
       return;
     }
     ctx.onInventoryChangedForQuests?.(meta);
+    // Destroying a tracked copy ends it: its final ledger row.
+    recordTrackedChange(ctx, meta, itemId, taken?.instance, 'consume', 'discard');
   } else {
     // The copy-choice rule on the discard arm (the phase 18 whole-branch
     // review): with a plain and a self-signed charm copy in the bags, the
     // discard consumes the plain one and the recharge discount survives.
-    removePreferFungible(
+    const destroyed = removePreferFungible(
       ctx,
       itemId,
       discardCount,
@@ -503,6 +506,7 @@ export function discardItem(
       undefined,
       sellerSignedCharmDeprioritize(meta.name, itemId),
     );
+    recordTrackedConsumed(ctx, meta, itemId, destroyed, 'discard');
   }
   ctx.emit({
     type: 'log',
@@ -1546,7 +1550,13 @@ function vendorInRange(ctx: SimContext, p: Entity): boolean {
 // descriptors gains one unit rather than being rewritten, and the recency and
 // limit rules are untouched: the merged row still moves to the front and the
 // list still pops past VENDOR_BUYBACK_LIMIT.
+//
+// A sold copy is still the seller's while it sits on the list (buying it back
+// is the same holder), so the sale writes no ledger row. A row that falls off
+// the end is destroyed, and THAT is where a tracked copy's final `consume`
+// row is written (source 'vendor', detail 'buybackExpired').
 function recordVendorBuyback(
+  ctx: SimContext,
   meta: PlayerMeta,
   itemId: string,
   count: number,
@@ -1578,7 +1588,20 @@ function recordVendorBuyback(
         : { materialSources: buybackCompositionAfter(undefined, materialSources) }),
     });
   }
-  while (meta.vendorBuyback.length > VENDOR_BUYBACK_LIMIT) meta.vendorBuyback.pop();
+  while (meta.vendorBuyback.length > VENDOR_BUYBACK_LIMIT) {
+    const expired = meta.vendorBuyback.pop();
+    if (expired) {
+      recordTrackedChange(
+        ctx,
+        meta,
+        expired.itemId,
+        expired.instance,
+        'consume',
+        'vendor',
+        'buybackExpired',
+      );
+    }
+  }
 }
 
 export function sellItem(
@@ -1708,7 +1731,15 @@ export function sellItem(
     );
   }
   for (const unit of consumedUnits) {
-    recordVendorBuyback(meta, itemId, 1, unit.instance, unit.craftedRecipeId, unit.materialSources);
+    recordVendorBuyback(
+      ctx,
+      meta,
+      itemId,
+      1,
+      unit.instance,
+      unit.craftedRecipeId,
+      unit.materialSources,
+    );
   }
   const payout = def.sellValue * sellableCount;
   meta.copper += payout;
@@ -1821,6 +1852,7 @@ export function sellAllJunk(ctx: SimContext, pid?: number): void {
     );
     for (const unit of consumedUnits) {
       recordVendorBuyback(
+        ctx,
         meta,
         itemId,
         1,
