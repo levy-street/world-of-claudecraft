@@ -3151,6 +3151,12 @@ export const pl_PL: EnTranslations = {
       "linkHint": "Kliknij z Shift, aby wstawić link do tego przedmiotu na czacie."
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "{count} earlier transfer is not shown.",
+        "few": "{count} earlier transfers are not shown.",
+        "many": "{count} earlier transfers are not shown.",
+        "other": "{count} earlier transfers are not shown."
+      },
       "guildBoardShown": {
         "one": "{count} gildia",
         "few": "{count} gildie",
@@ -4435,6 +4441,9 @@ export const pl_PL: EnTranslations = {
       "partyTradeWindow": "Możesz wymienić ten przedmiot z graczami, z którymi wypadł, jeszcze przez {time}. Założenie go kończy okno wymiany.",
       "perfectedBadge": "Udoskonalone",
       "perfectingRank": "Doskonalenie: ranga {rank} z {ranks}",
+      "lootedBy": "Looted by {name} on {date}",
+      "questRewardTo": "Quest reward to {name} on {date}",
+      "obtainedBy": "Obtained by {name} on {date}",
       "materialSourceGatherer": "{count} × zebrane przez {name}",
       "materialSourceGathererSigned": "{count} × zebrane przez {name}, podpisane przez {signer}",
       "materialSourceUnrecorded": "{count} × bez zapisanego zbierającego",
@@ -5621,7 +5630,14 @@ export const pl_PL: EnTranslations = {
       "viewSources": "Pokaż źródła",
       "separateByGatherer": "Rozdziel według zbierającego",
       "takeChosenQuantity": "Wyjmij wybraną liczbę",
-      "combine": "Połącz stosy materiałów"
+      "combine": "Połącz stosy materiałów",
+      "itemHistory": "Item history"
+    },
+    "itemHistory": {
+      "title": "{item}: history",
+      "passedTo": "Passed to {name} on {date}",
+      "noTransfers": "This item has never changed hands.",
+      "close": "Close"
     },
     "enchanting": {
       "recipeNotLearned": "Naucz się formuły przed zastosowaniem tego zaklęcia.",
@@ -13031,7 +13047,8 @@ export const pl_PL: EnTranslations = {
       "tooManyOrders": "Możesz mieć jednocześnie otwarte co najwyżej {count} zamówień.",
       "orderClosed": "To wystawienie nie jest już otwarte.",
       "orderOwn": "To jest twoje własne wystawienie. Anuluj je, aby je wycofać.",
-      "orderNotYours": "To nie jest twoje wystawienie."
+      "orderNotYours": "To nie jest twoje wystawienie.",
+      "orderTrackedItem": "The Merchant takes no orders for one-of-a-kind gear."
     },
     "loot": {
       "takeAll": "Weź wszystko",

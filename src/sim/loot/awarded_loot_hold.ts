@@ -60,6 +60,11 @@ function awardInstanceFor(
   return window ? { ...instance, ...window } : instance;
 }
 
+/** The provenance source label for a copy awarded off `mob`'s corpse. */
+export function mobLootSource(mob: { templateId: string } | undefined): string | undefined {
+  return mob ? `mob:${mob.templateId}` : undefined;
+}
+
 // The one shared grant for a loot award (a roll win, a master-loot assignment,
 // a round-robin turn, an everyone-passed pickup off the corpse). Never
 // capacity-capped: the caller owns the fit decision (grantOrHoldAwardedLoot
@@ -70,10 +75,14 @@ export function grantAwardedLootItem(
   pid: number,
   eligibility: AwardEligibility,
   sourceInstance?: ItemInstancePayload,
+  source?: string,
 ): void {
   const instance = awardInstanceFor(ctx, itemId, eligibility, sourceInstance);
-  if (instance) ctx.addItemInstance(itemId, instance, pid, 1);
-  else ctx.addItem(itemId, 1, pid);
+  // `source` labels a tracked copy's provenance (item_tracking.ts): the
+  // corpse's mob template for every award off a kill.
+  const opts = source === undefined ? undefined : { source };
+  if (instance) ctx.addItemInstance(itemId, instance, pid, 1, opts);
+  else ctx.addItem(itemId, 1, pid, opts);
 }
 
 // Grant `itemId` to `pid` exactly as grantAwardedLootItem would, unless the
@@ -98,7 +107,7 @@ export function grantOrHoldAwardedLoot(
     !meta ||
     countFit(meta.inventory, bagPools(meta.bags), itemId, 1, instance) >= 1
   ) {
-    grantAwardedLootItem(ctx, itemId, pid, eligibility, instance);
+    grantAwardedLootItem(ctx, itemId, pid, eligibility, instance, mobLootSource(mob));
     return;
   }
   const slot: LootSlot = {

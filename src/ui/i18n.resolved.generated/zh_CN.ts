@@ -3151,6 +3151,12 @@ export const zh_CN: EnTranslations = {
       "linkHint": "Shift + 点击可在聊天中链接该物品。"
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "更早的 {count} 次转手未显示。",
+        "few": "更早的 {count} 次转手未显示。",
+        "many": "更早的 {count} 次转手未显示。",
+        "other": "更早的 {count} 次转手未显示。"
+      },
       "guildBoardShown": {
         "one": "显示 {count} 个公会",
         "few": "显示 {count} 个公会",
@@ -4435,6 +4441,9 @@ export const zh_CN: EnTranslations = {
       "partyTradeWindow": "在接下来的{time}内，你可以将此物品交易给共同获得该掉落的玩家。装备后交易期限即告结束。",
       "perfectedBadge": "臻至完美",
       "perfectingRank": "完美化：第{rank}阶，共{ranks}阶",
+      "lootedBy": "{name} 于 {date} 拾取",
+      "questRewardTo": "{date} 任务奖励予 {name}",
+      "obtainedBy": "{name} 于 {date} 获得",
       "materialSourceGatherer": "{count} × 由{name}采集",
       "materialSourceGathererSigned": "{count} × 由{name}采集，由{signer}签名",
       "materialSourceUnrecorded": "{count} × 未记录采集者",
@@ -5621,7 +5630,14 @@ export const zh_CN: EnTranslations = {
       "viewSources": "查看来源",
       "separateByGatherer": "按采集者拆分",
       "takeChosenQuantity": "取出指定数量",
-      "combine": "合并素材堆叠"
+      "combine": "合并素材堆叠",
+      "itemHistory": "物品历史"
+    },
+    "itemHistory": {
+      "title": "{item}：历史",
+      "passedTo": "{date} 转交给 {name}",
+      "noTransfers": "此物品从未易手。",
+      "close": "关闭"
     },
     "enchanting": {
       "recipeNotLearned": "施加此附魔前，请先学习配方。",
@@ -13031,7 +13047,8 @@ export const zh_CN: EnTranslations = {
       "tooManyOrders": "你最多只能同时保留 {count} 个待处理订单。",
       "orderClosed": "该订单已不再开放。",
       "orderOwn": "那是你自己的订单。取消它即可撤回。",
-      "orderNotYours": "那不是你的订单。"
+      "orderNotYours": "那不是你的订单。",
+      "orderTrackedItem": "商人不接受独一无二装备的订单。"
     },
     "loot": {
       "takeAll": "全部拾取",

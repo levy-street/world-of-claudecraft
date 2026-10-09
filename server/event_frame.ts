@@ -26,6 +26,7 @@ const SERVER_ONLY_EVENT_TYPES: ReadonlySet<SimEvent['type']> = new Set([
   'vaultCraftConsume',
   'lootRollAwarded',
   'craftRoll',
+  'itemTracked',
   'treasureVaultOutcomePending',
   'treasureVaultClaimRequested',
 ]);

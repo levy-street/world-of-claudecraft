@@ -3151,6 +3151,12 @@ export const cs_CZ: EnTranslations = {
       "linkHint": "Shift + kliknutí vloží odkaz na tento předmět do chatu."
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "{count} earlier transfer is not shown.",
+        "few": "{count} earlier transfers are not shown.",
+        "many": "{count} earlier transfers are not shown.",
+        "other": "{count} earlier transfers are not shown."
+      },
       "guildBoardShown": {
         "one": "Zobrazena {count} gilda",
         "few": "Zobrazeny {count} gildy",
@@ -4435,6 +4441,9 @@ export const cs_CZ: EnTranslations = {
       "partyTradeWindow": "Tento předmět můžeš dalších {time} směňovat s hráči, kteří sdíleli jeho kořist. Nasazení předmětu okno pro směnu ukončí.",
       "perfectedBadge": "Zdokonalené",
       "perfectingRank": "Zdokonalování: hodnost {rank} z {ranks}",
+      "lootedBy": "Looted by {name} on {date}",
+      "questRewardTo": "Quest reward to {name} on {date}",
+      "obtainedBy": "Obtained by {name} on {date}",
       "materialSourceGatherer": "{count} × sebral(a) {name}",
       "materialSourceGathererSigned": "{count} × sebral(a) {name}, podepsal(a) {signer}",
       "materialSourceUnrecorded": "{count} × bez zaznamenaného sběrače",
@@ -5621,7 +5630,14 @@ export const cs_CZ: EnTranslations = {
       "viewSources": "Zobrazit zdroje",
       "separateByGatherer": "Oddělit podle sběrače",
       "takeChosenQuantity": "Vyjmout zvolené množství",
-      "combine": "Sloučit hromádky materiálu"
+      "combine": "Sloučit hromádky materiálu",
+      "itemHistory": "Item history"
+    },
+    "itemHistory": {
+      "title": "{item}: history",
+      "passedTo": "Passed to {name} on {date}",
+      "noTransfers": "This item has never changed hands.",
+      "close": "Close"
     },
     "enchanting": {
       "recipeNotLearned": "Než toto očarování použiješ, nauč se vzorec.",
@@ -13031,7 +13047,8 @@ export const cs_CZ: EnTranslations = {
       "tooManyOrders": "Najednou můžeš mít otevřených nejvýše {count} objednávek.",
       "orderClosed": "Tato objednávka už není otevřená.",
       "orderOwn": "To je tvoje vlastní objednávka. Zrušením ji stáhneš.",
-      "orderNotYours": "To není tvoje objednávka."
+      "orderNotYours": "To není tvoje objednávka.",
+      "orderTrackedItem": "The Merchant takes no orders for one-of-a-kind gear."
     },
     "loot": {
       "takeAll": "Vzít vše",

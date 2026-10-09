@@ -91,7 +91,9 @@ import {
 } from './bug_report_db';
 import {
   characterProfessionsSheetFromRow,
+  restoreItemAuditDetail,
   restoreItemBodyError,
+  restoreItemDerivedFrom,
   restoreSlotBodyError,
 } from './character_professions';
 import {
@@ -138,15 +140,24 @@ import {
   ADMIN_META,
   type AdminAuthDb,
   adminIdentityOf,
+  adminTargetGuid,
   adminTargetId,
   adminTargetMeta,
   createRequireAdmin,
+  requireAdminGuidTarget,
   requireAdminTarget,
 } from './http/middleware/require_admin';
 import { enum_ } from './http/schema';
 import type { Ctx, RouteDef } from './http/types';
 import { json, readBody } from './http_util';
 import { addBlockedIp, cleanIp, listBlockedIps, removeBlockedIp } from './ip_block_db';
+import {
+  ITEM_LEDGER_DEFAULT_LIMIT,
+  ITEM_LEDGER_MAX_LIMIT,
+  isItemLedgerGuid,
+  itemLedgerHistory as itemLedgerHistoryDb,
+  listItemLedger as listItemLedgerDb,
+} from './item_ledger_db';
 import { PgMapsDb } from './maps_db';
 import {
   addAccountNote,
@@ -1182,6 +1193,7 @@ export async function handleAdminApi(
       if (bodyError) return fail(res, 400, bodyError);
       const itemId = String(body.itemId);
       const count = Number(body.count);
+      const derivedFrom = restoreItemDerivedFrom(body);
       try {
         if (!game.adminCharacterOnline(id)) {
           return fail(res, 400, 'character is not online on this realm');
@@ -1190,10 +1202,10 @@ export async function handleAdminApi(
           characterId: id,
           adminAccountId: accountId,
           action: 'restore_item',
-          detail: `${itemId} x${count}`,
+          detail: restoreItemAuditDetail(itemId, count, derivedFrom),
           reason: body.reason,
         });
-        const result = game.adminRestoreItem(id, itemId, count);
+        const result = game.adminRestoreItem(id, itemId, count, derivedFrom);
         // Defensive twin of the pre-audit body check; reachable only if the
         // runtime and validator ever disagree about ITEMS.
         if (result === 'invalid_item') return fail(res, 400, 'unknown item id');
@@ -1839,6 +1851,40 @@ export async function handleAdminApi(
       ]);
       return ok(res, adminUnstuckPayload(page, hotspots, query));
     }
+    if (path === '/admin/api/item-ledger') {
+      const limit = boundedPositiveParam(
+        url.searchParams.get('limit'),
+        ITEM_LEDGER_DEFAULT_LIMIT,
+        ITEM_LEDGER_MAX_LIMIT,
+      );
+      const rawBeforeId = Number(url.searchParams.get('beforeId'));
+      const rawCharacterId = Number(url.searchParams.get('characterId'));
+      const rawItemId = url.searchParams.get('itemId') ?? '';
+      const page = await listItemLedgerDb(pool, {
+        realm: REALM,
+        limit,
+        ...(Number.isSafeInteger(rawBeforeId) && rawBeforeId > 0 ? { beforeId: rawBeforeId } : {}),
+        ...(Number.isSafeInteger(rawCharacterId) && rawCharacterId > 0
+          ? { characterId: rawCharacterId }
+          : {}),
+        ...(rawItemId.length > 0 && rawItemId.length <= 128 ? { itemId: rawItemId } : {}),
+      });
+      return ok(res, {
+        events: page.rows,
+        limit,
+        hasMore: page.hasMore,
+        nextBeforeId: page.nextBeforeId,
+      });
+    }
+    // A startsWith arm rather than a ladder regex: the permission scan
+    // (tests/admin_routes.test.ts) samples only digit captures, so this row
+    // is pinned there by hand, like the registry-only kick.
+    const ITEM_GUID_PREFIX = '/admin/api/items/';
+    if (path.startsWith(ITEM_GUID_PREFIX) && !path.slice(ITEM_GUID_PREFIX.length).includes('/')) {
+      const guid = path.slice(ITEM_GUID_PREFIX.length).toLowerCase();
+      if (!isItemLedgerGuid(guid)) return fail(res, 400, 'invalid item guid');
+      return ok(res, { guid, events: await itemLedgerHistoryDb(pool, REALM, guid) });
+    }
     const bugScreenshotMatch = /^\/admin\/api\/bug-reports\/(\d+)\/screenshot$/.exec(path);
     if (bugScreenshotMatch) {
       // The list query omits the (potentially large) screenshot; fetch it per report.
@@ -2159,6 +2205,9 @@ function makeRealAdminDb() {
       listUnstuckReportsDb(pool, options),
     listUnstuckHotspots: (options: Parameters<typeof listUnstuckHotspotsDb>[1]) =>
       listUnstuckHotspotsDb(pool, options),
+    listItemLedger: (options: Parameters<typeof listItemLedgerDb>[1]) =>
+      listItemLedgerDb(pool, options),
+    itemLedgerHistory: (realm: string, guid: string) => itemLedgerHistoryDb(pool, realm, guid),
     listFilterWords,
     addFilterWord,
     removeFilterWord,
@@ -3262,6 +3311,7 @@ async function restoreItemHandler(ctx: Ctx): Promise<void> {
   if (bodyError) return fail(ctx.res, 400, bodyError);
   const itemId = String(body.itemId);
   const count = Number(body.count);
+  const derivedFrom = restoreItemDerivedFrom(body);
   try {
     if (!rt.adminCharacterOnline(id)) {
       return fail(ctx.res, 400, 'character is not online on this realm');
@@ -3270,10 +3320,10 @@ async function restoreItemHandler(ctx: Ctx): Promise<void> {
       characterId: id,
       adminAccountId: ctxAccountId(ctx),
       action: 'restore_item',
-      detail: `${itemId} x${count}`,
+      detail: restoreItemAuditDetail(itemId, count, derivedFrom),
       reason: body.reason,
     });
-    const result = rt.adminRestoreItem(id, itemId, count);
+    const result = rt.adminRestoreItem(id, itemId, count, derivedFrom);
     // Defensive twin of the pre-audit body check; reachable only if the
     // runtime and validator ever disagree about ITEMS.
     if (result === 'invalid_item') return fail(ctx.res, 400, 'unknown item id');
@@ -3573,6 +3623,41 @@ async function bugReportsHandler(ctx: Ctx): Promise<void> {
   const { page, limit } = parsePageParams(ctx.url.searchParams);
   const { rows, total } = await adminDb().listBugReports(limit, (page - 1) * limit);
   ok(ctx.res, { rows, total, page, limit });
+}
+
+/** GET /admin/api/item-ledger: recent tracked-item ledger rows, newest first,
+ *  cursor-paged, optionally narrowed to one character id or one item id. */
+async function itemLedgerHandler(ctx: Ctx): Promise<void> {
+  const params = ctx.url.searchParams;
+  const limit = boundedPositiveParam(
+    params.get('limit'),
+    ITEM_LEDGER_DEFAULT_LIMIT,
+    ITEM_LEDGER_MAX_LIMIT,
+  );
+  const rawBeforeId = Number(params.get('beforeId'));
+  const rawCharacterId = Number(params.get('characterId'));
+  const rawItemId = params.get('itemId') ?? '';
+  const page = await adminDb().listItemLedger({
+    realm: REALM,
+    limit,
+    ...(Number.isSafeInteger(rawBeforeId) && rawBeforeId > 0 ? { beforeId: rawBeforeId } : {}),
+    ...(Number.isSafeInteger(rawCharacterId) && rawCharacterId > 0
+      ? { characterId: rawCharacterId }
+      : {}),
+    ...(rawItemId.length > 0 && rawItemId.length <= 128 ? { itemId: rawItemId } : {}),
+  });
+  ok(ctx.res, { events: page.rows, limit, hasMore: page.hasMore, nextBeforeId: page.nextBeforeId });
+}
+
+/** GET /admin/api/items/:guid: one tracked copy's whole ledger, oldest first
+ *  (the mint, then every recorded change of hands). An unknown guid is an
+ *  empty history, never a 404: guids are unguessable and the answer "never
+ *  seen on this realm" is itself what a support lookup needs. */
+async function itemLedgerHistoryHandler(ctx: Ctx): Promise<void> {
+  // requireAdminGuidTarget already 422d a malformed :guid before any DB call.
+  const guid = adminTargetGuid(ctx);
+  const events = await adminDb().itemLedgerHistory(REALM, guid);
+  ok(ctx.res, { guid, events });
 }
 
 /** GET /admin/api/unstuck-reports: bounded reports plus content-local hotspots. */
@@ -4275,6 +4360,22 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin],
     meta: ADMIN_META,
     handler: unstuckReportsHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/item-ledger',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: itemLedgerHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/items/:guid',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminGuidTarget('itemGuid')],
+    meta: adminTargetMeta('itemGuid'),
+    handler: itemLedgerHistoryHandler,
   },
   {
     method: 'GET',

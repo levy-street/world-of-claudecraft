@@ -958,24 +958,37 @@ describe('masterwrought sub-cap reads the copy being worn', () => {
     sim.tick();
     expect(sim.equipment.ring1).toBe(EMBER_ID);
 
-    // The plain copy first (lower index), the promoted copy on top.
+    // The ordinary copy first (lower index), the promoted copy on top. The
+    // amulet is epic, so the ordinary copy is never payload-free any more: it
+    // carries only its tracked identity (item_tracking.ts), and the two
+    // copies are told apart by guid.
     grant(sim, AMULET_ID);
     const plainIdx = meta.inventory.findIndex(
-      (s) => s.itemId === AMULET_ID && s.instance === undefined,
+      (s) => s.itemId === AMULET_ID && s.instance?.rolled?.quality === undefined,
     );
     expect(plainIdx).toBeGreaterThanOrEqual(0);
+    const plainGuid = meta.inventory[plainIdx].instance?.guid;
+    expect(plainGuid).toBeDefined();
     sim.addItemInstance(AMULET_ID, { perfected: true, rolled: { quality: 'legendary' } });
+    const promotedIdx = meta.inventory.findIndex(
+      (s) => s.itemId === AMULET_ID && s.instance?.rolled?.quality === 'legendary',
+    );
+    expect(promotedIdx, 'the promoted copy sits highest').toBeGreaterThan(plainIdx);
+    const promotedGuid = meta.inventory[promotedIdx].instance?.guid;
+    expect(promotedGuid).toBeDefined();
+    expect(promotedGuid).not.toBe(plainGuid);
     sim.tick();
 
     sim.equipItem(AMULET_ID, { slotIndex: plainIdx });
     expect(tickErrors(sim)).toHaveLength(0);
     expect(sim.equipment.neck).toBe(AMULET_ID);
     expect(sim.equipmentInstances.neck?.rolled?.quality).toBeUndefined();
+    expect(sim.equipmentInstances.neck?.guid, 'the NAMED copy is the one worn').toBe(plainGuid);
     // The promoted copy stays in the bags, untouched.
     const promoted = meta.inventory.find(
       (s) => s.itemId === AMULET_ID && s.instance?.rolled?.quality === 'legendary',
     );
-    expect(promoted).toBeDefined();
+    expect(promoted?.instance?.guid).toBe(promotedGuid);
   });
 });
 

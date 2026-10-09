@@ -169,6 +169,14 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
 
   { method: 'GET', pattern: '/admin/api/bug-reports', permission: 'support.read' },
   { method: 'GET', pattern: '/admin/api/unstuck-reports', permission: 'support.read' },
+  // The tracked-item provenance ledger (server/item_ledger_db.ts): a
+  // support read, beside the reports it answers.
+  { method: 'GET', pattern: '/admin/api/item-ledger', permission: 'support.read' },
+  {
+    method: 'GET',
+    pattern: /^\/admin\/api\/items\/[0-9a-fA-F-]{36}$/,
+    permission: 'support.read',
+  },
   {
     method: 'GET',
     pattern: /^\/admin\/api\/bug-reports\/(\d+)\/screenshot$/,

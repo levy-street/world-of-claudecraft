@@ -36,6 +36,7 @@
   import BlockedIps from './pages/BlockedIps.svelte';
   import BugReports from './pages/BugReports.svelte';
   import UnstuckReports from './pages/UnstuckReports.svelte';
+  import ItemTracking from './pages/ItemTracking.svelte';
   import IpAssociations from './pages/IpAssociations.svelte';
   import Staff from './pages/Staff.svelte';
   import TopHolders from './pages/TopHolders.svelte';
@@ -69,6 +70,7 @@
     'blocked-ips': BlockedIps,
     'bug-reports': BugReports,
     'unstuck-reports': UnstuckReports,
+    'item-tracking': ItemTracking,
     staff: Staff,
   } satisfies Record<Exclude<AdminPage, 'guilds'>, Component>;
   // Permission route guard (presentation only; the server re-checks every

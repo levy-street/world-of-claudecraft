@@ -3151,6 +3151,12 @@ export const zh_TW: EnTranslations = {
       "linkHint": "Shift + 點擊可在聊天中連結該物品。"
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "更早的 {count} 次轉手未顯示。",
+        "few": "更早的 {count} 次轉手未顯示。",
+        "many": "更早的 {count} 次轉手未顯示。",
+        "other": "更早的 {count} 次轉手未顯示。"
+      },
       "guildBoardShown": {
         "one": "顯示 {count} 個公會",
         "few": "顯示 {count} 個公會",
@@ -4435,6 +4441,9 @@ export const zh_TW: EnTranslations = {
       "partyTradeWindow": "在接下來的{time}內，你可以將此物品交易給共同獲得該掉落的玩家。裝備後交易期限即告結束。",
       "perfectedBadge": "臻至完美",
       "perfectingRank": "完美化：第{rank}階，共{ranks}階",
+      "lootedBy": "{name} 於 {date} 拾取",
+      "questRewardTo": "{date} 任務獎勵予 {name}",
+      "obtainedBy": "{name} 於 {date} 獲得",
       "materialSourceGatherer": "{count} × 由{name}採集",
       "materialSourceGathererSigned": "{count} × 由{name}採集，由{signer}簽名",
       "materialSourceUnrecorded": "{count} × 未記錄採集者",
@@ -5621,7 +5630,14 @@ export const zh_TW: EnTranslations = {
       "viewSources": "查看來源",
       "separateByGatherer": "依採集者拆分",
       "takeChosenQuantity": "取出指定數量",
-      "combine": "合併素材堆疊"
+      "combine": "合併素材堆疊",
+      "itemHistory": "物品歷史"
+    },
+    "itemHistory": {
+      "title": "{item}：歷史",
+      "passedTo": "{date} 轉交給 {name}",
+      "noTransfers": "此物品從未易手。",
+      "close": "關閉"
     },
     "enchanting": {
       "recipeNotLearned": "施加此附魔前，請先學習配方。",
@@ -13031,7 +13047,8 @@ export const zh_TW: EnTranslations = {
       "tooManyOrders": "你同時最多只能保留 {count} 筆待處理的訂單。",
       "orderClosed": "該訂單已不再開放。",
       "orderOwn": "這是你自己的訂單。撤回即可取消它。",
-      "orderNotYours": "這不是你的訂單。"
+      "orderNotYours": "這不是你的訂單。",
+      "orderTrackedItem": "商人不接受獨一無二裝備的訂單。"
     },
     "loot": {
       "takeAll": "全部拾取",

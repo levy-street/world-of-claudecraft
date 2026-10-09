@@ -212,6 +212,9 @@ const UI_PURE_CORES = [
   'src/ui/frame_presets_core.ts',
   'src/ui/frame_menu_core.ts',
   'src/ui/loot_quality_view.ts',
+  // The tracked epic/legendary copy's history lines (origin, every later
+  // hand); the right-click Item history dialog renders them.
+  'src/ui/item_history_view.ts',
   'src/ui/item_combat_tooltip_view.ts',
   'src/ui/trinket_tooltip_view.ts',
   // The trinket auras' tooltip descriptor and their item-icon art map.
@@ -2816,6 +2819,8 @@ const UI_DOM_MODULES = [
   'src/ui/market_window.ts',
   'src/ui/woc_market_window.ts',
   'src/ui/material_sources_dialog.ts',
+  // The Item history prompt (the sources dialog's #prompt-stack recipe).
+  'src/ui/item_history_dialog.ts',
   'src/ui/personal_bank_item_cell.ts',
   'src/ui/meters.ts',
   'src/ui/meters_frame.ts',

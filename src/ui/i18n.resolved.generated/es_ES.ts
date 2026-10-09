@@ -3151,6 +3151,12 @@ export const es_ES: EnTranslations = {
       "linkHint": "Mayús+clic para enlazar este objeto en el chat."
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "{count} earlier transfer is not shown.",
+        "few": "{count} earlier transfers are not shown.",
+        "many": "{count} earlier transfers are not shown.",
+        "other": "{count} earlier transfers are not shown."
+      },
       "guildBoardShown": {
         "one": "{count} hermandad mostrada",
         "few": "{count} hermandades mostradas",
@@ -4435,6 +4441,9 @@ export const es_ES: EnTranslations = {
       "partyTradeWindow": "Puedes intercambiar este objeto con jugadores que compartieron su botín durante los próximos {time}. Equiparlo termina la ventana de intercambio.",
       "perfectedBadge": "Perfeccionado",
       "perfectingRank": "Perfeccionamiento: rango {rank} de {ranks}",
+      "lootedBy": "Looted by {name} on {date}",
+      "questRewardTo": "Quest reward to {name} on {date}",
+      "obtainedBy": "Obtained by {name} on {date}",
       "materialSourceGatherer": "{count} × Recolectado por {name}",
       "materialSourceGathererSigned": "{count} × Recolectado por {name}, firmado por {signer}",
       "materialSourceUnrecorded": "{count} × Sin recolector registrado",
@@ -5621,7 +5630,14 @@ export const es_ES: EnTranslations = {
       "viewSources": "Ver fuentes",
       "separateByGatherer": "Separar por recolector",
       "takeChosenQuantity": "Retirar la cantidad elegida",
-      "combine": "Combinar pilas de materiales"
+      "combine": "Combinar pilas de materiales",
+      "itemHistory": "Item history"
+    },
+    "itemHistory": {
+      "title": "{item}: history",
+      "passedTo": "Passed to {name} on {date}",
+      "noTransfers": "This item has never changed hands.",
+      "close": "Close"
     },
     "enchanting": {
       "recipeNotLearned": "Aprende la fórmula antes de aplicar este encantamiento.",
@@ -13031,7 +13047,8 @@ export const es_ES: EnTranslations = {
       "tooManyOrders": "Puedes mantener como máximo {count} pedidos abiertos a la vez.",
       "orderClosed": "Ese pedido ya no está abierto.",
       "orderOwn": "Ese es tu propio pedido. Cancélalo para retirarlo.",
-      "orderNotYours": "Ese pedido no es tuyo."
+      "orderNotYours": "Ese pedido no es tuyo.",
+      "orderTrackedItem": "The Merchant takes no orders for one-of-a-kind gear."
     },
     "loot": {
       "takeAll": "Recoger botín",

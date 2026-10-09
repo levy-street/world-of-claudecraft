@@ -197,6 +197,7 @@ export const ADMIN_ERROR_KEYS: Record<string, string> = {
   'admin accounts cannot be suspended or banned': 'error.cannotModerateAdmin',
   'open report not found': 'error.reportNotFound',
   'open bug report not found': 'error.bugReportNotFound',
+  'invalid item guid': 'error.invalidItemGuid',
   'account not found': 'error.accountNotFound',
   'account is not suspended': 'error.accountNotSuspended',
   'moderation action failed': 'error.moderationFailed',
@@ -323,6 +324,8 @@ export const ADMIN_ERROR_KEYS: Record<string, string> = {
   'that status change is not allowed': 'error.flagInvalidTransition',
   'this account already has an open flag of that kind': 'error.flagActiveExists',
   'a note is required': 'error.flagNoteRequired',
+  // The GM item restore's optional lost-copy link (restoreItemBodyError).
+  'derived-from must be an item id': 'error.restoreDerivedFromInvalid',
 };
 export function localizeAdminError(message: string): string {
   const normalized = message.trim().toLowerCase();

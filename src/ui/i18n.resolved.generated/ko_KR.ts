@@ -3151,6 +3151,12 @@ export const ko_KR: EnTranslations = {
       "linkHint": "Shift + 클릭하면 이 아이템을 채팅에 연결합니다."
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "이전 {count}건의 양도는 표시되지 않습니다.",
+        "few": "이전 {count}건의 양도는 표시되지 않습니다.",
+        "many": "이전 {count}건의 양도는 표시되지 않습니다.",
+        "other": "이전 {count}건의 양도는 표시되지 않습니다."
+      },
       "guildBoardShown": {
         "one": "길드 {count}개 표시 중",
         "few": "길드 {count}개 표시 중",
@@ -4435,6 +4441,9 @@ export const ko_KR: EnTranslations = {
       "partyTradeWindow": "앞으로 {time} 동안 이 아이템을 같은 전리품을 함께 획득한 플레이어와 거래할 수 있습니다. 착용하면 거래 기간이 끝납니다.",
       "perfectedBadge": "완전해짐",
       "perfectingRank": "완전화: {ranks}단계 중 {rank}단계",
+      "lootedBy": "{date}에 {name}이(가) 획득",
+      "questRewardTo": "{date}에 {name}이(가) 퀘스트 보상으로 획득",
+      "obtainedBy": "{date}에 {name}이(가) 입수",
       "materialSourceGatherer": "{count} × {name} 채집",
       "materialSourceGathererSigned": "{count} × {name} 채집, {signer} 서명",
       "materialSourceUnrecorded": "{count} × 채집자 기록 없음",
@@ -5621,7 +5630,14 @@ export const ko_KR: EnTranslations = {
       "viewSources": "출처 보기",
       "separateByGatherer": "채집자별 분리",
       "takeChosenQuantity": "지정 수량 꺼내기",
-      "combine": "재료 묶음 합치기"
+      "combine": "재료 묶음 합치기",
+      "itemHistory": "아이템 이력"
+    },
+    "itemHistory": {
+      "title": "{item}: 이력",
+      "passedTo": "{date}에 {name}에게 넘어감",
+      "noTransfers": "이 아이템은 주인이 바뀐 적이 없습니다.",
+      "close": "닫기"
     },
     "enchanting": {
       "recipeNotLearned": "이 마법부여를 적용하려면 먼저 공식을 배워야 합니다.",
@@ -13031,7 +13047,8 @@ export const ko_KR: EnTranslations = {
       "tooManyOrders": "한 번에 최대 {count}개의 주문만 열어 둘 수 있습니다.",
       "orderClosed": "그 주문은 더 이상 열려 있지 않습니다.",
       "orderOwn": "그것은 당신 자신의 주문입니다. 철회하려면 주문을 취소하세요.",
-      "orderNotYours": "그것은 당신의 주문이 아닙니다."
+      "orderNotYours": "그것은 당신의 주문이 아닙니다.",
+      "orderTrackedItem": "상인은 하나뿐인 장비에 대한 주문을 받지 않습니다."
     },
     "loot": {
       "takeAll": "모두 가져가기",

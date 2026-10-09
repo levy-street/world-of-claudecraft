@@ -4,6 +4,7 @@
 // touches again. The one parameter is the perfLap hook, which must stay a
 // game.ts closure because it reads the GameServer's live tick-profiler state.
 
+import { randomUUID } from 'node:crypto';
 import {
   PLAYER_INTEREST_DROP_RADIUS,
   type SimConfig,
@@ -57,6 +58,9 @@ export function buildRealmSimConfig(
     // pulled someone.
     idleMobTickRadius: PLAYER_INTEREST_DROP_RADIUS,
     lockoutNowMs: () => Date.now(),
+    // Tracked (epic/legendary) copies get a real UUID from the host
+    // (src/sim/item_tracking.ts); never the deterministic fallback online.
+    mintItemGuid: randomUUID,
     // Raid lockouts end at the next 3 AM (the classic daily reset) in this realm's civil
     // time zone, so the whole realm shares one predictable reset (via REALM_RESET_TZ).
     raidResetMs: (nowMs) => nextRaidResetMs(nowMs, REALM_RESET_TIME_ZONE),

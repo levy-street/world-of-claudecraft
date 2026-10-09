@@ -248,7 +248,15 @@ describe('taking an instanced parcel', () => {
     sim.postOffice.mailTake(letter.id, pid);
     expect(letter.items).toHaveLength(0);
     const granted = meta.inventory.find((s) => s.itemId === 'rusty_hatchet' && s.instance);
-    expect(granted?.instance).toEqual(PAYLOAD);
+    // The parcel's copy rolled epic, so it is tracked: a pre-tracking copy
+    // first seen while changing hands is minted on arrival with source
+    // `legacy`. Everything the parcel carried (rolls, enchant, signer) must
+    // survive the take exactly; the tracked identity is the only addition.
+    const { guid, provenance, ...rest } = granted?.instance ?? {};
+    expect(rest).toEqual(PAYLOAD);
+    expect(PAYLOAD.guid).toBeUndefined();
+    expect(guid).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+    expect(provenance).toMatchObject({ by: 'Buyer', source: 'legacy' });
   });
 
   it('keeps the attachment (payload intact) when the bags are full', () => {

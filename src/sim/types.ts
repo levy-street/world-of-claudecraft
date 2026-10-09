@@ -1,3 +1,4 @@
+import { cloneItemProvenance, type ItemTrackedKind } from './item_provenance';
 import { cloneLootQuality, type LootQualityDescriptor } from './loot_quality/types';
 import type { LocalGathererIdentity } from './material_gatherer';
 import { cloneMaterialData, cloneMaterialPayload } from './material_payload_identity';
@@ -1609,6 +1610,36 @@ export type ItemDef =
   | FlaskItemDef
   | FoodItemDef;
 
+/** One hand a tracked copy passed through: the character (display name plus
+ *  the stable character id where the host knows one) and the host epoch ms.
+ *  The origin record and every entry of the owner chain share this shape. */
+export interface ItemOwnerRecord {
+  at: number;
+  by: string;
+  byId?: number;
+}
+
+/** The provenance record on a tracked copy (item_provenance.ts owns the
+ *  bounds and the transfer rule). `source` is a sim-composed id
+ *  ("mob:<templateId>", "quest:<questId>", "craft:<recipeId>", "vendor",
+ *  "dev", "world", "legacy", "promotion", "restore", "boost"), never
+ *  player text; `zone` is the zone or dungeon id where the origin grant
+ *  landed. `owners` is the most
+ *  recent MAX_ITEM_OWNER_HISTORY holders after the origin, oldest first;
+ *  `transfers` is the true count of hands it changed, which keeps counting
+ *  after the chain rolls. */
+export interface ItemProvenance extends ItemOwnerRecord {
+  source: string;
+  zone?: string;
+  /** The guid of the copy this one was made from, when it was derived from
+   *  another tracked copy (an upgrade recipe that consumes one, an admin
+   *  restore of a lost copy, a duplicate-guid split): the parent's ledger
+   *  carries the matching consume row. */
+  derivedFrom?: string;
+  owners?: ItemOwnerRecord[];
+  transfers?: number;
+}
+
 // Per-instance item payload (#1165). Additive and OPTIONAL: most items stay plain
 // {itemId, count} with no instance payload (fungible, market-listable). A slot
 // carrying `instance` is non-fungible (signed, has rolled stats, or is
@@ -1617,6 +1648,21 @@ export type ItemDef =
 // time, see market.ts marketList); #1146 wires real market handling for
 // instanced items later.
 export interface ItemInstancePayload {
+  /** Per-copy identity for a TRACKED copy (an epic or legendary item,
+   *  item_provenance.ts TRACKED_ITEM_QUALITIES): one canonical UUID, minted
+   *  once at the inventory hub (item_tracking.ts) from the host's randomness
+   *  (SimConfig.mintItemGuid, the server's crypto.randomUUID) or the
+   *  deterministic fallback, and never rewritten afterwards. Two copies never
+   *  share one, so a tracked copy is one-per-slot by construction (the merge
+   *  predicate compares every key). Owner-only on the wire: the eqi peer
+   *  allowlist and publicInstanceView leave it out. */
+  guid?: string;
+  /** The tracked copy's provenance record (item_provenance.ts): who first
+   *  obtained it, when (host epoch ms), from what source and where, plus the
+   *  bounded chain of later holders the hub appends on every grant that
+   *  changes hands (`movement` grants to a different character). Stamped
+   *  beside `guid` and judged atomically on load. Owner-only, like `guid`. */
+  provenance?: ItemProvenance;
   /** Permanent enemy-drop quality, independent of rarity, enchants and upgrades. */
   lootQuality?: LootQualityDescriptor;
   /** Player name that signed/crafted this specific copy, if any. */
@@ -1751,6 +1797,9 @@ export function cloneItemInstancePayload(src: ItemInstancePayload): ItemInstance
   const lootQuality = cloneLootQuality(src.lootQuality);
   if (lootQuality) instance.lootQuality = lootQuality;
   if (src.charges) instance.charges = { ...src.charges };
+  // The owner chain is a mutable array on the provenance record (item_provenance.ts).
+  if (src.provenance && typeof src.provenance === 'object')
+    instance.provenance = cloneItemProvenance(src.provenance);
   if (
     src.perfectingBonus &&
     typeof src.perfectingBonus === 'object' &&
@@ -8050,6 +8099,31 @@ export type SimEvent = { pid?: number } & (
       rankBefore?: number;
       rankAfter?: number;
     }
+  // Tracked-item ledger event (item_tracking.ts): one per lifecycle step of
+  // an epic or legendary copy (ITEM_TRACKED_KINDS, item_provenance.ts): the
+  // guid mint, each recorded change of hands, each in-place modification,
+  // the end of its life, and the mint of a copy derived from another. Server-
+  // only (server/event_frame.ts SERVER_ONLY_EVENT_TYPES): the authoritative
+  // server mirrors it into item_ledger (server/item_ledger.ts), no client ever
+  // receives it. The pid is the character the step happened to; by/byId name
+  // that character (display name plus the stable character id online). The
+  // at field is host epoch ms. `detail` is a short sim-composed note (a rank,
+  // an enchant id, what the copy became) and `relatedGuid` the other copy a
+  // swap or derivation names. Draw-free by construction.
+  | {
+      type: 'itemTracked';
+      kind: ItemTrackedKind;
+      guid: string;
+      itemId: string;
+      quality: string;
+      by: string;
+      byId?: number;
+      source: string;
+      zone?: string;
+      detail?: string;
+      relatedGuid?: string;
+      at: number;
+    }
   // Masterwork zone broadcast (Professions 2.0): the soft zone-wide
   // copy of a masterwork proc, one per overworld player currently in the
   // crafter's zone INCLUDING the crafter, `pid` being the RECIPIENT (the
@@ -9014,6 +9088,11 @@ export interface SimConfig {
   devCommands?: boolean; // local dev: /dev level|tp|give chat cheats
   worldPvpDisabled?: boolean; // realm kill switch for the /pvp flag (server env WORLD_PVP_DISABLED=1)
   lockoutNowMs?: () => number; // host wall-clock for persisted raid lockouts
+  // Host randomness for the per-copy guid of a tracked (epic or legendary)
+  // item (item_tracking.ts): the server binds crypto.randomUUID, the offline
+  // client its own crypto. Unset (tests, headless) falls back to the
+  // deterministic mint in item_provenance.ts, which never touches the rng.
+  mintItemGuid?: () => string;
   // Live server: schedule the first world-boss rise at boot instead of one
   // interval out, so a freshly (re)started realm has Thunzharr up immediately.
   // Offline worlds and parity traces keep the default (first rise after one

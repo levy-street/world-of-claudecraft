@@ -1,12 +1,15 @@
 // Atomic, draw-free rank exchange between two owned collection copies. Both
-// selections are pinned and validated before either copy changes. No ledger,
-// currency, cooldown, timer, or additional host call is needed.
+// selections are pinned and validated before either copy changes. No
+// currency, cooldown, timer, or additional host call is needed. Both copies
+// keep their tracked guids (item_tracking.ts): the exchange changes each IN
+// PLACE, so each writes one `modify` item-ledger row naming the other copy.
 import { crucibleCollectionForItem } from '../content/crucible_collections';
 import { STATIONS } from '../content/professions';
 import { recipeForResultItem } from '../content/recipes';
 import { ITEMS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { isItemLocked } from '../item_lock_flag';
+import { recordTrackedChange } from '../item_tracking';
 import type { SimContext } from '../sim_context';
 import { cloneItemInstancePayload, type ItemInstancePayload, type StationDef } from '../types';
 import { PERFECTING_RANKS, PERFECTING_SKILL_REQ } from './perfecting';
@@ -239,6 +242,25 @@ export function swapPerfectingRanks(
     }
     meta.equipmentInstance = equipmentInstance;
     recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
+    // The lineage rows: each copy kept its guid (the clone carries it) and
+    // now holds the other's rank, so each `modify` names the copy it traded
+    // with. Draw-free; an untracked side records nothing.
+    const swapped = [
+      { itemId: source.itemId, payload: sourcePayload, rank: target.rank, other: targetPayload },
+      { itemId: target.itemId, payload: targetPayload, rank: source.rank, other: sourcePayload },
+    ];
+    for (const { itemId, payload, rank, other } of swapped) {
+      recordTrackedChange(
+        ctx,
+        meta,
+        itemId,
+        payload,
+        'modify',
+        'perfectingSwap',
+        `rank ${rank}`,
+        other.guid,
+      );
+    }
     meta.wireRev++;
   }
   ctx.emit({ type: 'perfectingSwapResult', pid: meta.entityId, ...result });

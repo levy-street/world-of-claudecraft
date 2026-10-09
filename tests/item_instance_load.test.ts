@@ -41,6 +41,11 @@ const legalPayload = () => ({
   perfected: true,
   name: 'Sunrise Vow',
   locked: true,
+  // The tracked-copy pair (item_provenance.ts): a canonical guid and an
+  // atomic provenance record, both legal here so the identity claim covers
+  // them; their drop arms are pinned in tests/item_tracking.test.ts.
+  guid: '3f2504e0-4f89-41d3-9a0c-0305e82c3301',
+  provenance: { at: 1, by: 'Loggerholm', source: 'mob:forest_wolf' },
 });
 
 const atLimit = 'e'.repeat(MAX_INSTANCE_STRING_LENGTH);
@@ -68,6 +73,8 @@ describe('sanitizeItemInstancePayloadOnLoad: identity on legal data', () => {
       'perfected',
       'name',
       'locked',
+      'guid',
+      'provenance',
     ]);
     expect(out.payload).toEqual(legalPayload());
   });

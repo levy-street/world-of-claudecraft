@@ -183,6 +183,7 @@ export function localizeErrorText(text: string, deps: ErrorTextLockoutDeps): str
     'That order is no longer open.': 'itemUi.errors.orderClosed',
     'That is your own order - cancel it to withdraw it.': 'itemUi.errors.orderOwn',
     'That is not your order.': 'itemUi.errors.orderNotYours',
+    'The Merchant takes no orders for one-of-a-kind gear.': 'itemUi.errors.orderTrackedItem',
     "You can't assist yourself.": 'hud.errors.assistSelf',
     'Assist whom? Target a player or use /assist <name>.': 'hud.errors.assistWhom',
     'Invite whom? Usage: /invite <name>.': 'hudChrome.party.inviteUsage',

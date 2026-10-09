@@ -3151,6 +3151,12 @@ export const tr_TR: EnTranslations = {
       "linkHint": "Bu eşyayı sohbete bağlamak için Shift+tıkla."
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "{count} earlier transfer is not shown.",
+        "few": "{count} earlier transfers are not shown.",
+        "many": "{count} earlier transfers are not shown.",
+        "other": "{count} earlier transfers are not shown."
+      },
       "guildBoardShown": {
         "one": "{count} lonca gösteriliyor",
         "few": "{count} lonca gösteriliyor",
@@ -4435,6 +4441,9 @@ export const tr_TR: EnTranslations = {
       "partyTradeWindow": "Bu eşyayı, düşüşünü paylaşan oyunculara önümüzdeki {time} boyunca takas edebilirsin. Kuşanmak takas penceresini sona erdirir.",
       "perfectedBadge": "Kusursuzlaştırılmış",
       "perfectingRank": "Kusursuzlaştırma: {ranks} içinden {rank}. kademe",
+      "lootedBy": "Looted by {name} on {date}",
+      "questRewardTo": "Quest reward to {name} on {date}",
+      "obtainedBy": "Obtained by {name} on {date}",
       "materialSourceGatherer": "{count} × {name} tarafından toplandı",
       "materialSourceGathererSigned": "{count} × {name} tarafından toplandı, {signer} imzalı",
       "materialSourceUnrecorded": "{count} × Toplayıcı kaydedilmedi",
@@ -5621,7 +5630,14 @@ export const tr_TR: EnTranslations = {
       "viewSources": "Kaynakları görüntüle",
       "separateByGatherer": "Toplayıcıya göre ayır",
       "takeChosenQuantity": "Seçilen miktarı çıkar",
-      "combine": "Malzeme yığınlarını birleştir"
+      "combine": "Malzeme yığınlarını birleştir",
+      "itemHistory": "Item history"
+    },
+    "itemHistory": {
+      "title": "{item}: history",
+      "passedTo": "Passed to {name} on {date}",
+      "noTransfers": "This item has never changed hands.",
+      "close": "Close"
     },
     "enchanting": {
       "recipeNotLearned": "Bu büyüyü uygulamadan önce formülü öğren.",
@@ -13031,7 +13047,8 @@ export const tr_TR: EnTranslations = {
       "tooManyOrders": "Aynı anda en fazla {count} sipariş açık tutabilirsin.",
       "orderClosed": "Bu sipariş artık açık değil.",
       "orderOwn": "Bu senin kendi siparişin. Geri çekmek için iptal et.",
-      "orderNotYours": "Bu senin siparişin değil."
+      "orderNotYours": "Bu senin siparişin değil.",
+      "orderTrackedItem": "The Merchant takes no orders for one-of-a-kind gear."
     },
     "loot": {
       "takeAll": "Hepsini Al",

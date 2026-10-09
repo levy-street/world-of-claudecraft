@@ -3151,6 +3151,12 @@ export const da_DK: EnTranslations = {
       "linkHint": "Shift-klik for at linke denne genstand i chatten."
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "{count} earlier transfer is not shown.",
+        "few": "{count} earlier transfers are not shown.",
+        "many": "{count} earlier transfers are not shown.",
+        "other": "{count} earlier transfers are not shown."
+      },
       "guildBoardShown": {
         "one": "{count} laug vist",
         "few": "{count} laug vist",
@@ -4435,6 +4441,9 @@ export const da_DK: EnTranslations = {
       "partyTradeWindow": "Du kan handle denne genstand til spillere, der delte dens bytte, i de næste {time}. Udstyrer du den, afsluttes handelsvinduet.",
       "perfectedBadge": "Forædlet",
       "perfectingRank": "Forædling: rang {rank} af {ranks}",
+      "lootedBy": "Looted by {name} on {date}",
+      "questRewardTo": "Quest reward to {name} on {date}",
+      "obtainedBy": "Obtained by {name} on {date}",
       "materialSourceGatherer": "{count} × samlet af {name}",
       "materialSourceGathererSigned": "{count} × samlet af {name}, signeret af {signer}",
       "materialSourceUnrecorded": "{count} × ingen samler registreret",
@@ -5621,7 +5630,14 @@ export const da_DK: EnTranslations = {
       "viewSources": "Vis kilder",
       "separateByGatherer": "Adskil efter samler",
       "takeChosenQuantity": "Tag valgt antal ud",
-      "combine": "Saml materialebunker"
+      "combine": "Saml materialebunker",
+      "itemHistory": "Item history"
+    },
+    "itemHistory": {
+      "title": "{item}: history",
+      "passedTo": "Passed to {name} on {date}",
+      "noTransfers": "This item has never changed hands.",
+      "close": "Close"
     },
     "enchanting": {
       "recipeNotLearned": "Lær formlen, før du anvender denne fortryllelse.",
@@ -13031,7 +13047,8 @@ export const da_DK: EnTranslations = {
       "tooManyOrders": "Du kan holde højst {count} ordrer åbne på én gang.",
       "orderClosed": "Den ordre er ikke længere åben.",
       "orderOwn": "Det er din egen ordre. Annuller den for at trække den tilbage.",
-      "orderNotYours": "Det er ikke din ordre."
+      "orderNotYours": "Det er ikke din ordre.",
+      "orderTrackedItem": "The Merchant takes no orders for one-of-a-kind gear."
     },
     "loot": {
       "takeAll": "Tag alt",

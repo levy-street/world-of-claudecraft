@@ -102,13 +102,22 @@ describe('Rift reward source quality', () => {
     const generated = structuredClone(rings);
     int.mockClear();
     for (const pid of [owner, mage, rogue]) sim.lootCorpse(boss.id, pid);
+    const guids: unknown[] = [];
     for (const ring of generated) {
       const recipient = expectDefined(ring.personalFor)[0];
-      const received = expectDefined(sim.players.get(recipient)).inventory.find(
-        (s) => s.itemId === ring.itemId,
-      );
-      expect(received?.instance).toEqual(ring.instance);
+      const meta = expectDefined(sim.players.get(recipient));
+      const received = meta.inventory.find((s) => s.itemId === ring.itemId);
+      // Every Rift band is an epic one-per-slot copy, so pickup adds the
+      // tracked identity on top; the rest of the minted band (rift block,
+      // quality, binding) must arrive exactly as generated.
+      const { guid, provenance, ...rest } = expectDefined(received?.instance);
+      expect(ring.instance?.guid).toBeUndefined();
+      expect(rest).toEqual(ring.instance);
+      expect(guid).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+      expect(provenance).toMatchObject({ by: meta.name, source: `mob:${boss.templateId}` });
+      guids.push(guid);
     }
+    expect(new Set(guids).size).toBe(generated.length);
     expect(int).not.toHaveBeenCalled();
   });
 

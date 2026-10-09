@@ -709,6 +709,38 @@ export interface UnstuckHotspot {
   lastUsedAt: string;
 }
 
+/** One item_ledger row (server/item_ledger_db.ts). */
+export interface ItemLedgerEvent {
+  id: number;
+  guid: string;
+  itemId: string;
+  quality: string;
+  kind: 'mint' | 'transfer' | 'modify' | 'consume' | 'derive';
+  characterId: number | null;
+  accountId: number | null;
+  characterName: string;
+  source: string;
+  zone: string | null;
+  /** The step's short note (a rank, an enchant id, what the copy became). */
+  detail: string | null;
+  /** The other copy a swap or derivation names. */
+  relatedGuid: string | null;
+  occurredAt: string;
+  createdAt: string;
+}
+
+export interface ItemLedgerPage {
+  events: ItemLedgerEvent[];
+  limit: number;
+  hasMore: boolean;
+  nextBeforeId: number | null;
+}
+
+export interface ItemLedgerHistory {
+  guid: string;
+  events: ItemLedgerEvent[];
+}
+
 export interface UnstuckReportsData {
   reports: UnstuckReportRow[];
   hotspots: UnstuckHotspot[];

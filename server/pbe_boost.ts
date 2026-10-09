@@ -30,7 +30,7 @@
 // derived field (xp, talents unlocked, known abilities, stats) stays exactly
 // consistent with what the game itself would produce.
 
-import { randomInt } from 'node:crypto';
+import { randomInt, randomUUID } from 'node:crypto';
 import { bagSlotsOf, isMaterialsOnlyBag } from '../src/sim/bag_pools';
 import { BAG_SOCKETS } from '../src/sim/bags';
 import { IGNIVAR_DROP_PLACEHOLDER_IDS } from '../src/sim/content/ignivar_drops';
@@ -72,8 +72,10 @@ const CHARACTER_LIMIT = 10;
  *  The server `dev_give` command (server/game.ts) is the same family: also
  *  ALLOW_DEV_COMMANDS-gated, also counts, so the two dev arms agree with
  *  each other. The seed policy recorded here is server-boost-only, on
- *  purpose. */
-const MOVEMENT = { movement: true } as const;
+ *  purpose. The `boost` source labels every tracked (epic or legendary)
+ *  kit copy's provenance and ledger mint (src/sim/item_tracking.ts), so an
+ *  operator never mistakes PBE kit gear for a pre-tracking `legacy` copy. */
+const MOVEMENT = { movement: true, source: 'boost' } as const;
 const BOOST_MAX_SKIN = 7;
 // Same fixed world seed the normal creation path uses (initialCharacterState
 // in server/main.ts): the builder Sim is a throwaway, never ticked.
@@ -814,6 +816,7 @@ export function buildBoostedCharacterState(
     playerClass: cls,
     playerName: name,
     lockoutNowMs: () => Date.now(),
+    mintItemGuid: randomUUID,
   });
   const pid = sim.playerId;
   sim.setPlayerSkin(pid, skin);

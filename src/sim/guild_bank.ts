@@ -40,6 +40,7 @@ import {
   warnDroppedInstanceKeys,
 } from './item_instance_load';
 import { isTransferLockedInstance, publicInstanceView } from './item_instance_transfer';
+import { recordTrackedWithdrawal } from './item_tracking';
 import { materialItemIds } from './material_ids';
 import type { MaterialPayloadIdentity } from './material_payload_identity';
 import {
@@ -1244,6 +1245,7 @@ export function guildBankWithdraw(
   // Captured before the move: a whole-stack success splices the source slot out.
   const itemName =
     ITEMS[book.inventory[slotIndex].itemId]?.name ?? book.inventory[slotIndex].itemId;
+  const withdrawnGuid = book.inventory[slotIndex].instance?.guid;
   const result = moveBetweenContainers(
     book.inventory,
     slotIndex,
@@ -1265,6 +1267,10 @@ export function guildBankWithdraw(
   }
   if (result.refusal) return; // 'invalid': malformed input (cheat/desync), no player line
   ctx.onInventoryChangedForQuests(meta);
+  // A tracked copy leaving the guild's custody changes hands: record the
+  // withdrawing character on its owner chain (item_tracking.ts). The move
+  // bypasses the inventory hub, so the stamp lands here.
+  if (withdrawnGuid !== undefined) recordTrackedWithdrawal(ctx, meta, withdrawnGuid, 'guildBank');
   ctx.notice(meta.entityId, `You withdraw ${itemName} from the guild bank.`);
 }
 

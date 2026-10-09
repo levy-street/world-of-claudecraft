@@ -157,7 +157,9 @@ describe('BoP party trade window: the trade path', () => {
 
     expect(sim.countItem(HELM, alice)).toBe(1);
     const kept = meta(sim, alice).inventory.find((s) => s.itemId === HELM);
-    expect(kept?.instance).toBeUndefined(); // the plain copy stayed home
+    // The windowless copy stayed home (it is an epic, so it carries the
+    // tracking payload of src/sim/item_tracking.ts, never a trade window).
+    expect(kept?.instance?.partyTrade).toBeUndefined();
     const received = meta(sim, bob).inventory.find((s) => s.itemId === HELM);
     expect(received?.instance?.partyTrade).toEqual(instance.partyTrade);
   });

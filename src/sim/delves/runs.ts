@@ -1843,7 +1843,7 @@ export function delveBuyShopItem(
     return;
   }
   meta.delveMarks -= entry.marks;
-  ctx.addItem(itemId, 1, meta.entityId);
+  ctx.addItem(itemId, 1, meta.entityId, { source: 'vendor' });
   // Feedback rides the 'vendor' event (the shop panel re-renders), matching the
   // regular buyItem path, no raw English log string emitted from the sim.
   ctx.emit({ type: 'vendor', action: 'buy', itemId, pid: meta.entityId });

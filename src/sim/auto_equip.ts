@@ -7,11 +7,34 @@ import { itemInstancePayloadsEqual } from './item_instance_merge';
 import { activeItemInstanceStats } from './item_instance_stats';
 import { itemInstanceLevel } from './item_level';
 import { meetsLevelRequirement } from './item_level_req';
+import { isTrackedItemGrant } from './item_tracking';
 import { desiredEquipSlot, equipItem } from './items';
 import { lootQualityWeapon } from './loot_quality';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { ItemDef, ItemInstancePayload } from './types';
+
+/** The gear kinds a plain hub grant auto-equips (Sim.addItem's arm). */
+export function isAutoEquipGearKind(def: ItemDef | undefined): boolean {
+  return def?.kind === 'weapon' || def?.kind === 'armor' || def?.kind === 'held_offhand';
+}
+
+/**
+ * Whether an instanced hub grant (Sim.addItemInstance) auto-equips: an
+ * enemy-quality copy always has; and a payload-free grant of a TRACKED def
+ * is the plain arm in disguise (Sim.addItem redirects every epic or legendary
+ * def through the instanced arm so its copy is minted, item_tracking.ts), so
+ * it keeps the plain arm's gear-kind auto-equip. Other instanced grants
+ * (profession outputs, signed copies) keep their explicit-equip behavior.
+ */
+export function autoEquipsInstanceGrant(
+  def: ItemDef | undefined,
+  given: ItemInstancePayload,
+  granted: ItemInstancePayload,
+): boolean {
+  if (granted.lootQuality) return true;
+  return isTrackedItemGrant(def) && Object.keys(given).length === 0 && isAutoEquipGearKind(def);
+}
 
 function resolvedArmor(item: ItemDef, instance?: ItemInstancePayload): number {
   return (item.stats?.armor ?? 0) + (activeItemInstanceStats(instance, item)?.armor ?? 0);

@@ -3151,6 +3151,12 @@ export const sv_SE: EnTranslations = {
       "linkHint": "Skift-klicka för att länka det här föremålet i chatten."
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "{count} earlier transfer is not shown.",
+        "few": "{count} earlier transfers are not shown.",
+        "many": "{count} earlier transfers are not shown.",
+        "other": "{count} earlier transfers are not shown."
+      },
       "guildBoardShown": {
         "one": "{count} gille visas",
         "few": "{count} gillen visas",
@@ -4435,6 +4441,9 @@ export const sv_SE: EnTranslations = {
       "partyTradeWindow": "Du kan överlåta det här föremålet till spelare som delade bytet i {time} till. Att ta på det avslutar handelsfönstret.",
       "perfectedBadge": "Förfinad",
       "perfectingRank": "Förfining: rang {rank} av {ranks}",
+      "lootedBy": "Looted by {name} on {date}",
+      "questRewardTo": "Quest reward to {name} on {date}",
+      "obtainedBy": "Obtained by {name} on {date}",
       "materialSourceGatherer": "{count} × samlad av {name}",
       "materialSourceGathererSigned": "{count} × samlad av {name}, signerad av {signer}",
       "materialSourceUnrecorded": "{count} × ingen samlare registrerad",
@@ -5621,7 +5630,14 @@ export const sv_SE: EnTranslations = {
       "viewSources": "Visa källor",
       "separateByGatherer": "Dela upp efter samlare",
       "takeChosenQuantity": "Ta ut valt antal",
-      "combine": "Slå ihop materialbuntar"
+      "combine": "Slå ihop materialbuntar",
+      "itemHistory": "Item history"
+    },
+    "itemHistory": {
+      "title": "{item}: history",
+      "passedTo": "Passed to {name} on {date}",
+      "noTransfers": "This item has never changed hands.",
+      "close": "Close"
     },
     "enchanting": {
       "recipeNotLearned": "Lär dig formeln innan du använder förtrollningen.",
@@ -13031,7 +13047,8 @@ export const sv_SE: EnTranslations = {
       "tooManyOrders": "Du kan ha högst {count} ordrar öppna på samma gång.",
       "orderClosed": "Den ordningen är inte längre öppen.",
       "orderOwn": "Det är din egen order. Avbryt den för att dra tillbaka den.",
-      "orderNotYours": "Det är inte din order."
+      "orderNotYours": "Det är inte din order.",
+      "orderTrackedItem": "The Merchant takes no orders for one-of-a-kind gear."
     },
     "loot": {
       "takeAll": "Ta allt",

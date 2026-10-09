@@ -3151,6 +3151,12 @@ export const id_ID: EnTranslations = {
       "linkHint": "Shift-klik untuk menautkan item ini di obrolan."
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "{count} earlier transfer is not shown.",
+        "few": "{count} earlier transfers are not shown.",
+        "many": "{count} earlier transfers are not shown.",
+        "other": "{count} earlier transfers are not shown."
+      },
       "guildBoardShown": {
         "one": "{count} guild ditampilkan",
         "few": "{count} guild ditampilkan",
@@ -4435,6 +4441,9 @@ export const id_ID: EnTranslations = {
       "partyTradeWindow": "Kamu dapat memperdagangkan barang ini kepada pemain yang berbagi jarahannya selama {time} berikutnya. Memakainya mengakhiri jendela perdagangan.",
       "perfectedBadge": "Disempurnakan",
       "perfectingRank": "Penyempurnaan: peringkat {rank} dari {ranks}",
+      "lootedBy": "Looted by {name} on {date}",
+      "questRewardTo": "Quest reward to {name} on {date}",
+      "obtainedBy": "Obtained by {name} on {date}",
       "materialSourceGatherer": "{count} × Dikumpulkan oleh {name}",
       "materialSourceGathererSigned": "{count} × Dikumpulkan oleh {name}, ditandatangani oleh {signer}",
       "materialSourceUnrecorded": "{count} × Tidak ada pengumpul yang tercatat",
@@ -5621,7 +5630,14 @@ export const id_ID: EnTranslations = {
       "viewSources": "Lihat sumber",
       "separateByGatherer": "Pisahkan berdasarkan pengumpul",
       "takeChosenQuantity": "Keluarkan jumlah yang dipilih",
-      "combine": "Gabungkan tumpukan material"
+      "combine": "Gabungkan tumpukan material",
+      "itemHistory": "Item history"
+    },
+    "itemHistory": {
+      "title": "{item}: history",
+      "passedTo": "Passed to {name} on {date}",
+      "noTransfers": "This item has never changed hands.",
+      "close": "Close"
     },
     "enchanting": {
       "recipeNotLearned": "Pelajari formulanya sebelum menerapkan enchant ini.",
@@ -13031,7 +13047,8 @@ export const id_ID: EnTranslations = {
       "tooManyOrders": "Kamu bisa menyimpan paling banyak {count} pesanan terbuka sekaligus.",
       "orderClosed": "Pesanan itu tidak lagi terbuka.",
       "orderOwn": "Itu pesanan mu sendiri. Batalkan untuk menariknya.",
-      "orderNotYours": "Itu bukan pesanan mu."
+      "orderNotYours": "Itu bukan pesanan mu.",
+      "orderTrackedItem": "The Merchant takes no orders for one-of-a-kind gear."
     },
     "loot": {
       "takeAll": "Ambil Semua",

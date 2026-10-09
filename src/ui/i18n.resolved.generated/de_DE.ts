@@ -3151,6 +3151,12 @@ export const de_DE: EnTranslations = {
       "linkHint": "Umschalt-Klick, um diesen Gegenstand im Chat zu verlinken."
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "{count} earlier transfer is not shown.",
+        "few": "{count} earlier transfers are not shown.",
+        "many": "{count} earlier transfers are not shown.",
+        "other": "{count} earlier transfers are not shown."
+      },
       "guildBoardShown": {
         "one": "{count} Gilde angezeigt",
         "few": "{count} Gilden angezeigt",
@@ -4435,6 +4441,9 @@ export const de_DE: EnTranslations = {
       "partyTradeWindow": "Du kannst diesen Gegenstand noch {time} lang an Spieler weitergeben, die denselben Beutefund erhalten haben. Das Anlegen beendet dieses Handelsfenster.",
       "perfectedBadge": "Perfektioniert",
       "perfectingRank": "Perfektionierung: Rang {rank} von {ranks}",
+      "lootedBy": "Looted by {name} on {date}",
+      "questRewardTo": "Quest reward to {name} on {date}",
+      "obtainedBy": "Obtained by {name} on {date}",
       "materialSourceGatherer": "{count} × Gesammelt von {name}",
       "materialSourceGathererSigned": "{count} × Gesammelt von {name}, signiert von {signer}",
       "materialSourceUnrecorded": "{count} × Kein Sammler verzeichnet",
@@ -5621,7 +5630,14 @@ export const de_DE: EnTranslations = {
       "viewSources": "Quellen anzeigen",
       "separateByGatherer": "Nach Sammler trennen",
       "takeChosenQuantity": "Gewählte Menge herausnehmen",
-      "combine": "Materialstapel zusammenlegen"
+      "combine": "Materialstapel zusammenlegen",
+      "itemHistory": "Item history"
+    },
+    "itemHistory": {
+      "title": "{item}: history",
+      "passedTo": "Passed to {name} on {date}",
+      "noTransfers": "This item has never changed hands.",
+      "close": "Close"
     },
     "enchanting": {
       "recipeNotLearned": "Lerne die Formel, bevor du diese Verzauberung anwendest.",
@@ -13031,7 +13047,8 @@ export const de_DE: EnTranslations = {
       "tooManyOrders": "Ihr könnt höchstens {count} Aufträge gleichzeitig offen halten.",
       "orderClosed": "Dieser Auftrag ist nicht mehr offen.",
       "orderOwn": "Das ist Euer eigener Auftrag. Storniert ihn, um ihn zurückzuziehen.",
-      "orderNotYours": "Das ist nicht Euer Auftrag."
+      "orderNotYours": "Das ist nicht Euer Auftrag.",
+      "orderTrackedItem": "The Merchant takes no orders for one-of-a-kind gear."
     },
     "loot": {
       "takeAll": "Alles nehmen",
