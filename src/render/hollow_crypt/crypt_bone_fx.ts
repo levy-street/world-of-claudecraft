@@ -7,7 +7,7 @@
 //    template's 8 s; bone chips rattle and soul wisps rise off it; a soul
 //    tether runs from the nearest living Gravecaller Necromancer to the pile,
 //    its light flowing down into the bones (kill the necromancer). When the
-//    warrior stands (the rig's flourish, Skeletons_Awaken_Standing, plays on
+//    warrior stands (the rig's flourish, its Awaken, plays on
 //    the revive edge), bone shards are drawn in from all round and it rises
 //    out of a column of soul fire; when the pile is broken or its master
 //    falls, the glow dies, the bones scatter and a dust puff settles.

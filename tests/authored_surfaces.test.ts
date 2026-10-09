@@ -233,6 +233,32 @@ const AUTHORED_ATLAS_DEFS = [
   'crypt_lady_bonechill',
   // the Hollow Crypt's Blender Cantor Ilvane (the skeletal choir mistress)
   'crypt_skel_cantor',
+  // the art guide's skeleton minion (Tripo P2, rigged in Blender) on its three keys
+  'skel_minion',
+  'delve_skel_wraith',
+  'crypt_skel_minion',
+  // the Sunken Bastion's Blender crawler and the Stormbrass Foundry's turretback, flagged in
+  // manifest.ts on the v0.45.0 integration and listed here late
+  'bastion_crawler',
+  'mob_turretback',
+  // the Drowned Temple's Reflections: copies of the WOC class bodies (their flag
+  // comes with the body they spread)
+  'temple_reflection_druid',
+  'temple_reflection_hunter',
+  'temple_reflection_mage',
+  'temple_reflection_paladin',
+  'temple_reflection_priest',
+  'temple_reflection_rogue',
+  'temple_reflection_shaman',
+  'temple_reflection_warlock',
+  'temple_reflection_warrior',
+  // the art guide's Hollow Crypt trash bodies (Tripo P2, rigged in Blender)
+  'crypt_skel_warrior',
+  'crypt_skel_adept',
+  'crypt_skel_necromancer',
+  'crypt_skel_cutthroat',
+  'crypt_skel_brute',
+  'crypt_skel_chorister',
   // the Gravewyrm Sanctum's three Blender bosses (characters/sanctum_boss_looks.ts)
   'sanctum_korgath',
   'sanctum_velkhar',

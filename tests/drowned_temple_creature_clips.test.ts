@@ -713,8 +713,9 @@ describe('the pilgrim frenzy cue rides the real enrage', () => {
 describe('the trash pass second wave plays on the casters own clips', () => {
   it('the volley, the shout and the song each have their clip', () => {
     const adept = VISUALS.crypt_skel_adept.clips;
-    expect(adept.castByAbility?.[CRYPT_GRAVESPARK_VOLLEY]).toBe('Spellcast_Raise');
-    expect(adept.castTimeScaleByAbility?.[CRYPT_GRAVESPARK_VOLLEY]).toBe(0.6);
+    // the adept's own art-guide body: Volley is authored at the 3 s bar, played at rate 1
+    expect(adept.castByAbility?.[CRYPT_GRAVESPARK_VOLLEY]).toBe('Volley');
+    expect(adept.castTimeScaleByAbility?.[CRYPT_GRAVESPARK_VOLLEY] ?? 1).toBe(1);
     expect(VISUALS.bastion_skel_sergeant.clips.castByAbility?.[BASTION_LOOSE_ON_MY_MARK]).toBe(
       'Rally',
     );

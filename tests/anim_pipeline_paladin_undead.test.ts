@@ -150,10 +150,11 @@ describe('skeleton golem bespoke attack (issue #2889 follow-up batch)', () => {
     // until he got his own sculpted body), and each keeps the bespoke
     // Golem_Slam override rather than the generic swing. The other skeleton
     // VisualDefs share the smaller 41-joint rig via skeletonClips() instead
-    // and are untouched by this change.
+    // and are untouched by this change. The Bone Brute has since moved to its
+    // own art-guide body (woc_crypt_bone_brute.glb), so skel_golem is alone again.
     const largeClipsCallers = [...MANIFEST_SRC.matchAll(/clips: \{\s*\.\.\.skeletonLargeClips\(/g)]
       .length;
-    expect(largeClipsCallers).toBe(2);
+    expect(largeClipsCallers).toBe(1);
     const slamOverrides = [
       ...MANIFEST_SRC.matchAll(
         /clips: \{\s*\.\.\.skeletonLargeClips\([^)]*\),\s*attack: \['Golem_Slam'\]/g,
@@ -161,7 +162,8 @@ describe('skeleton golem bespoke attack (issue #2889 follow-up batch)', () => {
     ].length;
     expect(slamOverrides).toBe(largeClipsCallers);
     const skeletonClipsCallers = [...MANIFEST_SRC.matchAll(/clips: skeletonClips\(/g)].length;
-    expect(skeletonClipsCallers).toBeGreaterThanOrEqual(10);
+    // 8 since the Hollow Crypt's cutthroat and chorister left for their own art-guide bodies
+    expect(skeletonClipsCallers).toBeGreaterThanOrEqual(8);
   });
 
   it('is wired to a real boss/rare mob (a dungeon final boss among them)', () => {
