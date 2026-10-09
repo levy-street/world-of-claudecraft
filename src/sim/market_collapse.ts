@@ -1,3 +1,4 @@
+import { isPlainCopy } from './item_plain_copy';
 import type { MaterialComposition } from './material_sources';
 import type { ItemInstancePayload } from './types';
 
@@ -33,8 +34,10 @@ export function collapseToLowestPerItem<T extends CollapsibleListing>(listings: 
   for (const listing of listings) {
     // Listing ids are unique within the market book. Giving each instanced row its id as
     // the key preserves every non-fungible copy without serializing or comparing payloads.
+    // A copy whose payload is only its tracked identity (an epic guid, item_plain_copy.ts)
+    // is interchangeable with its twins, so it collapses by item id like a plain row.
     const hasSignature = listing.materialSources?.some(({ source }) => source.signer !== undefined);
-    const identity = listing.instance || hasSignature ? listing.id : listing.itemId;
+    const identity = !isPlainCopy(listing.instance) || hasSignature ? listing.id : listing.itemId;
     const current = bestByIdentity.get(identity);
     if (
       !current ||

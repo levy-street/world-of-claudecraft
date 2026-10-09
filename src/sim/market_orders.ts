@@ -516,12 +516,15 @@ export class MarketOrderBook {
 
   /** Once a second (the listing sweep's cadence): refund every expired order's
    *  escrow into the buyer's collection and drop the row. Returns whether the
-   *  board changed (the caller bumps). */
+   *  board changed (the caller bumps). An order for a TRACKED def (one placed
+   *  before item tracking, or restored from such a save) expires at once:
+   *  every new copy is instanced, so nothing could ever fill it, and holding
+   *  the buyer's escrow for the rest of its week helps no one. */
   expire(now: number): boolean {
     let changed = false;
     for (let i = this.orders.length - 1; i >= 0; i--) {
       const o = this.orders[i];
-      if (now < o.expiresAt) continue;
+      if (now < o.expiresAt && !isTrackedItemGrant(ITEMS[o.itemId])) continue;
       this.orders.splice(i, 1);
       changed = true;
       const refund = orderEscrow(o);
