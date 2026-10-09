@@ -3615,6 +3615,7 @@ export const cs_CZ: EnTranslations = {
       "dragEquipHint": "Přetáhni na svou postavu a předmět bude vybaven",
       "dragDestroyHint": "Přetáhni do světa a předmět bude zničen",
       "reorderNeedsRecent": "Zruš filtr a seřaď podle Nedávných, chceš-li přeuspořádat batohy",
+      "reorderLocked": "Locked items stay in their bag slot. Unlock it to move it.",
       "itemAriaInstanced": "{item}, množství {count}, kopie s výrobcovou značkou",
       "itemAriaEnchanted": "{item}, množství {count}, okouzlená kopie",
       "itemAriaBound": "{item}, množství {count}, vázaná kopie",

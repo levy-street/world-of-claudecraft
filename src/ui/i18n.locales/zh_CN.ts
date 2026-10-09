@@ -7812,6 +7812,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.dragEquipHint': '拖到角色身上以装备',
   'hudChrome.bags.dragDestroyHint': '拖出到世界中以销毁',
   'hudChrome.bags.reorderNeedsRecent': '清除筛选并按“最近”排序即可整理背包',
+  'hudChrome.bags.reorderLocked': '已锁定的物品会固定在其背包格中。请先解锁再移动。',
   'hudChrome.bags.filterGroupAria': '按类别筛选背包',
   'hudChrome.bags.filterAll': '全部',
   'hudChrome.bags.filterWeapon': '武器',

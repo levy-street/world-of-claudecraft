@@ -17,6 +17,8 @@
 // `src/sim`-pure: no DOM/render/ui/game/net imports, no rng, no clock
 // (enforced by tests/architecture.test.ts). Draws no rng.
 
+import { bagCapacity } from './bags';
+import { pinStackToCurrentCell } from './inventory_order';
 import type { ItemCopyAnchor } from './item_copy_anchor';
 import { selectedInventorySlot } from './item_copy_ref';
 import { isItemLocked } from './item_lock_flag';
@@ -159,6 +161,8 @@ export function setItemLocked(
     selected.instance = Object.keys(rest).length > 0 ? rest : undefined;
   } else {
     selected.instance = { ...selected.instance, locked };
+    // Locking also pins the stack to the cell it sits in (inventory_order.ts).
+    pinStackToCurrentCell(meta.inventory, bagCapacity(meta.bags), selected);
   }
   ctx.onInventoryChangedForQuests?.(meta);
   return { ok: true, itemId, locked };

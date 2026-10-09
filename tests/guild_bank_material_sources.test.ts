@@ -414,9 +414,11 @@ describe('the legacy SIGNATURE constraint on a removal', () => {
   });
 });
 
-// The guild pipe does not consult the player item lock (transfer_lock.ts scopes
-// that to the $WOC rail), so a locked copy really moves through a guild bank and
-// the replay has to land the same units the live move did.
+// The guild pipe's transfer lock does not consult the player item lock
+// (transfer_lock.ts scopes that to the $WOC rail). A locked copy can no longer be
+// deposited (guildBankDeposit refuses it), but a book written before that
+// refusal can still hold one, so the replay has to land the same units the live
+// withdraw did.
 describe('a LOCKED material copy', () => {
   const lockedBook = (): GuildBankState =>
     bookWith([

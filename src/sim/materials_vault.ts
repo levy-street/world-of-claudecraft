@@ -90,6 +90,7 @@ import { addStacked, bagPools, bagsFullError, countFit } from './bags';
 import { nearBanker } from './bank';
 import { warnDroppedInstanceKeys } from './item_instance_load';
 import { itemInstancePayloadsEqual } from './item_instance_merge';
+import { isItemLocked } from './item_lock_flag';
 import { normalizePartyTradeSlots } from './loot/bop_trade_cleanup';
 import { materialItemIds } from './material_ids';
 import { applyMaterialInventoryTake } from './material_inventory_take';
@@ -445,6 +446,13 @@ export function vaultDeposit(
     return;
   const want = count === undefined ? slot.count : Math.floor(count);
   if (!(want > 0) || want > slot.count) return;
+  // A player-locked copy stays pinned in its bag cell (inventory_order.ts), the
+  // personal and guild banks' rule. Aloud here; the sweep's shared predicate
+  // (isVaultDepositableSlot) skips it silently.
+  if (isItemLocked(slot.instance)) {
+    ctx.error(meta.entityId, 'That item is locked and cannot be stored in the vault.');
+    return;
+  }
   // A charge-bearing or locked payload is one identity per unit, so only the
   // exact whole-stack request is valid for it. Every other payload already
   // rides counted stacks in the bags (a split clones it onto both halves), and
@@ -511,6 +519,7 @@ export function isVaultDepositableSlot(
 ): boolean {
   return (
     materialIds.has(slot.itemId) &&
+    !isItemLocked(slot.instance) &&
     Number.isInteger(slot.count) &&
     slot.count > 0 &&
     slot.count <= Number.MAX_SAFE_INTEGER

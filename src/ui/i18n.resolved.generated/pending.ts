@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.bags.reorderLocked"
+  ],
+  "es_ES": [
+    "hudChrome.bags.reorderLocked"
+  ],
+  "fr_FR": [
+    "hudChrome.bags.reorderLocked"
+  ],
+  "fr_CA": [
+    "hudChrome.bags.reorderLocked"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.bags.reorderLocked"
+  ],
+  "de_DE": [
+    "hudChrome.bags.reorderLocked"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.bags.reorderLocked"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.bags.reorderLocked"
+  ],
+  "nl_NL": [
+    "hudChrome.bags.reorderLocked"
+  ],
+  "pl_PL": [
+    "hudChrome.bags.reorderLocked"
+  ],
+  "id_ID": [
+    "hudChrome.bags.reorderLocked"
+  ],
+  "tr_TR": [
+    "hudChrome.bags.reorderLocked"
+  ],
+  "sv_SE": [
+    "hudChrome.bags.reorderLocked"
+  ],
+  "vi_VN": [
+    "hudChrome.bags.reorderLocked"
+  ],
+  "da_DK": [
+    "hudChrome.bags.reorderLocked"
+  ]
 };

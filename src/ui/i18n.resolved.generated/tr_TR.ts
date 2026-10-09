@@ -3615,6 +3615,7 @@ export const tr_TR: EnTranslations = {
       "dragEquipHint": "Kuşanmak için karakterinin üzerine sürükle",
       "dragDestroyHint": "Yok etmek için dünyaya sürükle",
       "reorderNeedsRecent": "Çantalarını yeniden düzenlemek için filtreyi temizle ve Son Eklenen sıralama seçeneğini kullan",
+      "reorderLocked": "Locked items stay in their bag slot. Unlock it to move it.",
       "itemAriaInstanced": "{item}, adet {count}, ustaişareti kopyası",
       "itemAriaEnchanted": "{item}, adet {count}, büyülü kopya",
       "itemAriaBound": "{item}, adet {count}, bağlı kopya",

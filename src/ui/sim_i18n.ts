@@ -66,6 +66,11 @@ const baseEnTable = {
   // refusal toasts; log.bankSlotsPurchased is the purchase notice.
   'error.bankQuestItem': 'You cannot store quest items in the bank.',
   'error.bankFull': 'Your bank is full.',
+  // Player item lock (src/sim/bank.ts bankDeposit, guild_bank.ts guildBankDeposit):
+  // a locked copy is pinned to its bag cell and never leaves for storage.
+  'error.bankLocked': 'That item is locked and cannot be stored in the bank.',
+  'error.guildBankLocked': 'That item is locked and cannot be stored in the guild bank.',
+  'error.vaultItemLocked': 'That item is locked and cannot be stored in the vault.',
   // The pool-honest no_fit refusal (src/sim/bank.ts bankDeposit): a
   // non-material deposit refused while only materials-only satchel capacity
   // remains, so "full" would contradict the two-pool meter on screen.
@@ -1389,6 +1394,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noSellQuest': 'You cannot sell quest items.',
     'error.sellBound': 'That item is bound and cannot be sold.',
     'error.sellLocked': 'That item is locked and cannot be sold.',
+    'error.bankLocked': 'That item is locked and cannot be stored in the bank.',
+    'error.guildBankLocked': 'That item is locked and cannot be stored in the guild bank.',
+    'error.vaultItemLocked': 'That item is locked and cannot be stored in the vault.',
     'error.noBuyback': 'That item is not available for buyback.',
     'error.nailedShut': 'It is nailed shut.',
     'error.enoughOfThose': 'You have enough of those.',
@@ -5623,6 +5631,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noSellQuest': 'You cannot sell quest items.',
     'error.sellBound': 'That item is bound and cannot be sold.',
     'error.sellLocked': 'That item is locked and cannot be sold.',
+    'error.bankLocked': 'That item is locked and cannot be stored in the bank.',
+    'error.guildBankLocked': 'That item is locked and cannot be stored in the guild bank.',
+    'error.vaultItemLocked': 'That item is locked and cannot be stored in the vault.',
     'error.noBuyback': 'That item is not available for buyback.',
     'error.nailedShut': 'It is nailed shut.',
     'error.enoughOfThose': 'You have enough of those.',

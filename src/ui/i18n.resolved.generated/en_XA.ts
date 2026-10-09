@@ -3615,6 +3615,7 @@ export const en_XA: EnTranslations = {
       "dragEquipHint": "[Ðŕáĝ óñţó ýóúŕ çĥáŕáçţéŕ ţó éɋúíþ]",
       "dragDestroyHint": "[Ðŕáĝ óúţ íñţó ţĥé ŵóŕļð ţó ðéšţŕóý]",
       "reorderNeedsRecent": "[Çļéáŕ ţĥé ƒíļţéŕ áñð šóŕţ ƀý Ŕéçéñţ ţó ŕéáŕŕáñĝé ýóúŕ ƀáĝš]",
+      "reorderLocked": "[Ļóçķéð íţéɱš šţáý íñ ţĥéíŕ ƀáĝ šļóţ. Úñļóçķ íţ ţó ɱóʋé íţ.]",
       "itemAriaInstanced": "[{item}, ɋúáñţíţý {count}, ɱáķéŕ-ɱáŕķéð çóþý]",
       "itemAriaEnchanted": "[{item}, ɋúáñţíţý {count}, éñçĥáñţéð çóþý]",
       "itemAriaBound": "[{item}, ɋúáñţíţý {count}, ƀóúñð çóþý]",

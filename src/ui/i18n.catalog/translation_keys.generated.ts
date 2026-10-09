@@ -9454,6 +9454,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.bags.noQuestItems'
   | 'hudChrome.bags.poolGeneral'
   | 'hudChrome.bags.poolMaterials'
+  | 'hudChrome.bags.reorderLocked'
   | 'hudChrome.bags.reorderNeedsRecent'
   | 'hudChrome.bags.rightClickDestroy'
   | 'hudChrome.bags.searchAria'

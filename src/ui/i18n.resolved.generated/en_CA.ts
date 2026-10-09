@@ -3615,6 +3615,7 @@ export const en_CA: EnTranslations = {
       "dragEquipHint": "Drag onto your character to equip",
       "dragDestroyHint": "Drag out into the world to destroy",
       "reorderNeedsRecent": "Clear the filter and sort by Recent to rearrange your bags",
+      "reorderLocked": "Locked items stay in their bag slot. Unlock it to move it.",
       "itemAriaInstanced": "{item}, quantity {count}, maker-marked copy",
       "itemAriaEnchanted": "{item}, quantity {count}, enchanted copy",
       "itemAriaBound": "{item}, quantity {count}, bound copy",

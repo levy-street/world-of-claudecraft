@@ -27,6 +27,7 @@ import {
   warnDroppedInstanceKeys,
 } from './item_instance_load';
 import { isMergeableInstancePayload } from './item_instance_merge';
+import { isItemLocked } from './item_lock_flag';
 import { moveMaterialBetweenContainers } from './material_container_move';
 import { isMaterialItemId } from './material_ids';
 import {
@@ -461,6 +462,12 @@ export function bankDeposit(
   const slot = meta.inventory[slotIndex];
   if (ITEMS[slot.itemId]?.kind === 'quest') {
     ctx.error(meta.entityId, 'You cannot store quest items in the bank.');
+    return;
+  }
+  // A player-locked copy stays in the bag cell it is pinned to
+  // (inventory_order.ts): the lock is the owner's "keep this right here".
+  if (isItemLocked(slot.instance)) {
+    ctx.error(meta.entityId, 'That item is locked and cannot be stored in the bank.');
     return;
   }
   let selectedSources: MaterialComposition | undefined;

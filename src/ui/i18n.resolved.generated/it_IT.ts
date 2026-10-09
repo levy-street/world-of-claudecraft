@@ -3615,6 +3615,7 @@ export const it_IT: EnTranslations = {
       "dragEquipHint": "Trascina sul personaggio per equipaggiare",
       "dragDestroyHint": "Trascina nel mondo per distruggere",
       "reorderNeedsRecent": "Rimuovi il filtro e ordina per Recenti per riorganizzare le borse",
+      "reorderLocked": "Locked items stay in their bag slot. Unlock it to move it.",
       "itemAriaInstanced": "{item}, quantita {count}, copia con marchio del creatore",
       "itemAriaEnchanted": "{item}, quantita {count}, copia incantata",
       "itemAriaBound": "{item}, quantita {count}, copia vincolata",
