@@ -50,7 +50,10 @@ describe('the Hollow Crypt trash bodies', () => {
       expect(def.url, mob).toBe(url);
       expect(def.animUrls ?? [], mob).toEqual([]);
       expect(def.authoredAtlas, mob).toBe(true);
+      // the painted atlas carries its own colour: no entity tint washing it toward the template's
+      expect(def.tint, mob).toBeUndefined();
     }
+    expect(defOf('crypt_bone_minion').tint).toBeUndefined();
   });
 
   it('ships every clip each ClipMap names', () => {
