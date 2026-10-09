@@ -3151,6 +3151,12 @@ export const es: EnTranslations = {
       "linkHint": "Mayús+clic para enlazar este objeto en el chat."
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "{count} earlier transfer is not shown.",
+        "few": "{count} earlier transfers are not shown.",
+        "many": "{count} earlier transfers are not shown.",
+        "other": "{count} earlier transfers are not shown."
+      },
       "guildBoardShown": {
         "one": "{count} hermandad mostrada",
         "few": "{count} hermandades mostradas",
@@ -5631,7 +5637,6 @@ export const es: EnTranslations = {
       "title": "{item}: history",
       "passedTo": "Passed to {name} on {date}",
       "noTransfers": "This item has never changed hands.",
-      "earlierHidden": "{count} earlier transfers are not shown.",
       "close": "Close"
     },
     "enchanting": {
@@ -13042,7 +13047,8 @@ export const es: EnTranslations = {
       "tooManyOrders": "Puedes mantener como máximo {count} pedidos abiertos a la vez.",
       "orderClosed": "Ese pedido ya no está abierto.",
       "orderOwn": "Ese es tu propio pedido. Cancélalo para retirarlo.",
-      "orderNotYours": "Ese pedido no es tuyo."
+      "orderNotYours": "Ese pedido no es tuyo.",
+      "orderTrackedItem": "The Merchant takes no orders for one-of-a-kind gear."
     },
     "loot": {
       "takeAll": "Recoger botín",

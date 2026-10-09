@@ -24,7 +24,7 @@ import type {
 import type { GroundAimPointXZ } from '../world_api/combat';
 import { abilityNeedsLineOfSight } from './ability_line_of_sight';
 import { offlineActionBarRestore } from './action_bar_restore';
-import { maybeAutoEquip } from './auto_equip';
+import { autoEquipsInstanceGrant, isAutoEquipGearKind, maybeAutoEquip } from './auto_equip';
 import * as bagsMod from './bags';
 import {
   addStacked,
@@ -8087,12 +8087,7 @@ export class Sim {
     if (!opts?.movement) noteRelicObtain(meta, itemId, count);
     emitInventoryReceipt(this.ctx, meta.entityId, itemId, def?.name ?? itemId, count, opts);
     this.ctx.onInventoryChangedForQuests(meta);
-    if (
-      meta.autoEquip &&
-      (def?.kind === 'weapon' || def?.kind === 'armor' || def?.kind === 'held_offhand')
-    ) {
-      maybeAutoEquip(this.ctx, itemId, meta);
-    }
+    if (meta.autoEquip && isAutoEquipGearKind(def)) maybeAutoEquip(this.ctx, itemId, meta);
   }
 
   // Grant payload-bearing copies. Materials coalesce exact source buckets;
@@ -8137,7 +8132,8 @@ export class Sim {
       instance,
     );
     this.ctx.onInventoryChangedForQuests(meta);
-    if (meta.autoEquip && instance.lootQuality) maybeAutoEquip(this.ctx, itemId, meta, instance);
+    if (meta.autoEquip && autoEquipsInstanceGrant(def, given, instance))
+      maybeAutoEquip(this.ctx, itemId, meta, instance);
   }
 
   // Returns the `instance` payload of every instanced UNIT actually consumed

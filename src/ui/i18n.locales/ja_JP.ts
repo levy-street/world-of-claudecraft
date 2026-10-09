@@ -828,6 +828,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.errors.orderClosed': 'その注文はもう受け付けていません。',
   'itemUi.errors.orderCountNeeded': '欲しい数量を指定してください。',
   'itemUi.errors.orderNotYours': 'それはあなたの注文ではありません。',
+  'itemUi.errors.orderTrackedItem': '商人は一点物の装備の注文を受け付けません。',
   'itemUi.errors.orderOwn': 'それは自分の注文です。キャンセルすると回収できます。',
   'itemUi.errors.tooManyOrders': '同時に出せる注文は最大{count}件です。',
   'itemUi.logs.orderDelivered':
@@ -15292,7 +15293,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemHistory.title': '{item}：履歴',
   'hudChrome.itemHistory.passedTo': '{date} に {name} へ譲渡',
   'hudChrome.itemHistory.noTransfers': 'このアイテムは一度も持ち主が変わっていません。',
-  'hudChrome.itemHistory.earlierHidden': 'それ以前の {count} 件の譲渡は表示されません。',
+  'hudChrome.plurals.itemHistoryEarlierHidden.one': 'それ以前の {count} 件の譲渡は表示されません。',
+  'hudChrome.plurals.itemHistoryEarlierHidden.few': 'それ以前の {count} 件の譲渡は表示されません。',
+  'hudChrome.plurals.itemHistoryEarlierHidden.many': 'それ以前の {count} 件の譲渡は表示されません。',
+  'hudChrome.plurals.itemHistoryEarlierHidden.other': 'それ以前の {count} 件の譲渡は表示されません。',
   'hudChrome.itemHistory.close': '閉じる',
   'devCommand.actions.kit.description':
     '指定したスペック向けのSanctum以前レベル20プリセットを装備します (バッグを先に)。装備品のみです。',

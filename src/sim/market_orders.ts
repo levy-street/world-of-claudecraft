@@ -19,7 +19,9 @@
 //     instanced or crafted-recipe row never fills an order (its units do not
 //     merge into the buyer's plain stack), and a deliverer's escrow keeps every
 //     provenance bucket exact through the buyer's collection (the marketList
-//     doctrine, reused rather than reimplemented).
+//     doctrine, reused rather than reimplemented). So a TRACKED def (epic or
+//     legendary gear, every copy instanced with its own guid) refuses a new
+//     order outright: nothing could ever fill it.
 //   - Delivered goods land in the buyer's COLLECTION, never straight into bags:
 //     the buyer is usually offline or away, and the collection already has the
 //     capacity-gated pickup path. The deliverer's proceeds (less the Merchant's
@@ -37,6 +39,7 @@
 import { bagPools, canGrantCopies } from './bags';
 import { ITEMS } from './data';
 import { formatMoney } from './format_money';
+import { isTrackedItemGrant } from './item_tracking';
 import type { MarketCollection, MarketListing } from './market';
 import { recordSale } from './market_sale_log';
 import { MARKET_SWEEP_MAX_UNITS, type SweepableListing } from './market_sweep';
@@ -252,6 +255,14 @@ export class MarketOrderBook {
     }
     if (def.noMarketList || def.soulbound) {
       ctx.error(meta.entityId, 'That item cannot be listed on the World Market.');
+      return [];
+    }
+    // A tracked (epic or legendary) def is one of a kind: every copy carries
+    // its own guid (item_tracking.ts), so it trades only as its own instanced
+    // listing, never as the plain fungible stock an order fills from. An order
+    // for one could never be filled, so the board never shows one.
+    if (isTrackedItemGrant(def)) {
+      ctx.error(meta.entityId, 'The Merchant takes no orders for one-of-a-kind gear.');
       return [];
     }
     const want = sanitizeOrderCount(count);

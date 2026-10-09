@@ -3151,6 +3151,12 @@ export const sv_SE: EnTranslations = {
       "linkHint": "Skift-klicka för att länka det här föremålet i chatten."
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "{count} earlier transfer is not shown.",
+        "few": "{count} earlier transfers are not shown.",
+        "many": "{count} earlier transfers are not shown.",
+        "other": "{count} earlier transfers are not shown."
+      },
       "guildBoardShown": {
         "one": "{count} gille visas",
         "few": "{count} gillen visas",
@@ -5631,7 +5637,6 @@ export const sv_SE: EnTranslations = {
       "title": "{item}: history",
       "passedTo": "Passed to {name} on {date}",
       "noTransfers": "This item has never changed hands.",
-      "earlierHidden": "{count} earlier transfers are not shown.",
       "close": "Close"
     },
     "enchanting": {
@@ -13042,7 +13047,8 @@ export const sv_SE: EnTranslations = {
       "tooManyOrders": "Du kan ha högst {count} ordrar öppna på samma gång.",
       "orderClosed": "Den ordningen är inte längre öppen.",
       "orderOwn": "Det är din egen order. Avbryt den för att dra tillbaka den.",
-      "orderNotYours": "Det är inte din order."
+      "orderNotYours": "Det är inte din order.",
+      "orderTrackedItem": "The Merchant takes no orders for one-of-a-kind gear."
     },
     "loot": {
       "takeAll": "Ta allt",

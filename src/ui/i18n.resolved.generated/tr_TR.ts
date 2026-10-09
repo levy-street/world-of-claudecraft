@@ -3151,6 +3151,12 @@ export const tr_TR: EnTranslations = {
       "linkHint": "Bu eşyayı sohbete bağlamak için Shift+tıkla."
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "{count} earlier transfer is not shown.",
+        "few": "{count} earlier transfers are not shown.",
+        "many": "{count} earlier transfers are not shown.",
+        "other": "{count} earlier transfers are not shown."
+      },
       "guildBoardShown": {
         "one": "{count} lonca gösteriliyor",
         "few": "{count} lonca gösteriliyor",
@@ -5631,7 +5637,6 @@ export const tr_TR: EnTranslations = {
       "title": "{item}: history",
       "passedTo": "Passed to {name} on {date}",
       "noTransfers": "This item has never changed hands.",
-      "earlierHidden": "{count} earlier transfers are not shown.",
       "close": "Close"
     },
     "enchanting": {
@@ -13042,7 +13047,8 @@ export const tr_TR: EnTranslations = {
       "tooManyOrders": "Aynı anda en fazla {count} sipariş açık tutabilirsin.",
       "orderClosed": "Bu sipariş artık açık değil.",
       "orderOwn": "Bu senin kendi siparişin. Geri çekmek için iptal et.",
-      "orderNotYours": "Bu senin siparişin değil."
+      "orderNotYours": "Bu senin siparişin değil.",
+      "orderTrackedItem": "The Merchant takes no orders for one-of-a-kind gear."
     },
     "loot": {
       "takeAll": "Hepsini Al",

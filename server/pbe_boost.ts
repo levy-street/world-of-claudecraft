@@ -72,8 +72,10 @@ const CHARACTER_LIMIT = 10;
  *  The server `dev_give` command (server/game.ts) is the same family: also
  *  ALLOW_DEV_COMMANDS-gated, also counts, so the two dev arms agree with
  *  each other. The seed policy recorded here is server-boost-only, on
- *  purpose. */
-const MOVEMENT = { movement: true } as const;
+ *  purpose. The `boost` source labels every tracked (epic or legendary)
+ *  kit copy's provenance and ledger mint (src/sim/item_tracking.ts), so an
+ *  operator never mistakes PBE kit gear for a pre-tracking `legacy` copy. */
+const MOVEMENT = { movement: true, source: 'boost' } as const;
 const BOOST_MAX_SKIN = 7;
 // Same fixed world seed the normal creation path uses (initialCharacterState
 // in server/main.ts): the builder Sim is a throwaway, never ticked.

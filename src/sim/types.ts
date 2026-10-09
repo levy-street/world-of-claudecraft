@@ -1,4 +1,4 @@
-import { cloneItemProvenance } from './item_provenance';
+import { cloneItemProvenance, type ItemTrackedKind } from './item_provenance';
 import { cloneLootQuality, type LootQualityDescriptor } from './loot_quality/types';
 import type { LocalGathererIdentity } from './material_gatherer';
 import { cloneMaterialData, cloneMaterialPayload } from './material_payload_identity';
@@ -1622,14 +1622,20 @@ export interface ItemOwnerRecord {
 /** The provenance record on a tracked copy (item_provenance.ts owns the
  *  bounds and the transfer rule). `source` is a sim-composed id
  *  ("mob:<templateId>", "quest:<questId>", "craft:<recipeId>", "vendor",
- *  "dev", "world", "legacy", "promotion"), never player text; `zone` is the
- *  zone or dungeon id where the origin grant landed. `owners` is the most
+ *  "dev", "world", "legacy", "promotion", "restore", "boost"), never
+ *  player text; `zone` is the zone or dungeon id where the origin grant
+ *  landed. `owners` is the most
  *  recent MAX_ITEM_OWNER_HISTORY holders after the origin, oldest first;
  *  `transfers` is the true count of hands it changed, which keeps counting
  *  after the chain rolls. */
 export interface ItemProvenance extends ItemOwnerRecord {
   source: string;
   zone?: string;
+  /** The guid of the copy this one was made from, when it was derived from
+   *  another tracked copy (an upgrade recipe that consumes one, an admin
+   *  restore of a lost copy, a duplicate-guid split): the parent's ledger
+   *  carries the matching consume row. */
+  derivedFrom?: string;
   owners?: ItemOwnerRecord[];
   transfers?: number;
 }
@@ -8093,16 +8099,20 @@ export type SimEvent = { pid?: number } & (
       rankBefore?: number;
       rankAfter?: number;
     }
-  // Tracked-item ledger event (item_tracking.ts): one per guid mint and one
-  // per recorded change of hands of an epic or legendary copy. Server-only
-  // (server/event_frame.ts SERVER_ONLY_EVENT_TYPES): the authoritative server
-  // mirrors it into item_ledger (server/item_ledger.ts), no client ever
-  // receives it. The pid is the recipient; by/byId name that character
-  // (display name plus the stable character id online). The at field is the
-  // host epoch ms the payload's own record carries. Draw-free by construction.
+  // Tracked-item ledger event (item_tracking.ts): one per lifecycle step of
+  // an epic or legendary copy (ITEM_TRACKED_KINDS, item_provenance.ts): the
+  // guid mint, each recorded change of hands, each in-place modification,
+  // the end of its life, and the mint of a copy derived from another. Server-
+  // only (server/event_frame.ts SERVER_ONLY_EVENT_TYPES): the authoritative
+  // server mirrors it into item_ledger (server/item_ledger.ts), no client ever
+  // receives it. The pid is the character the step happened to; by/byId name
+  // that character (display name plus the stable character id online). The
+  // at field is host epoch ms. `detail` is a short sim-composed note (a rank,
+  // an enchant id, what the copy became) and `relatedGuid` the other copy a
+  // swap or derivation names. Draw-free by construction.
   | {
       type: 'itemTracked';
-      kind: 'mint' | 'transfer';
+      kind: ItemTrackedKind;
       guid: string;
       itemId: string;
       quality: string;
@@ -8110,6 +8120,8 @@ export type SimEvent = { pid?: number } & (
       byId?: number;
       source: string;
       zone?: string;
+      detail?: string;
+      relatedGuid?: string;
       at: number;
     }
   // Masterwork zone broadcast (Professions 2.0): the soft zone-wide

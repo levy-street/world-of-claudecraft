@@ -824,6 +824,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.errors.orderClosed': '그 주문은 더 이상 열려 있지 않습니다.',
   'itemUi.errors.orderCountNeeded': '원하는 수량을 입력하세요.',
   'itemUi.errors.orderNotYours': '그것은 당신의 주문이 아닙니다.',
+  'itemUi.errors.orderTrackedItem': '상인은 하나뿐인 장비에 대한 주문을 받지 않습니다.',
   'itemUi.errors.orderOwn': '그것은 당신 자신의 주문입니다. 철회하려면 주문을 취소하세요.',
   'itemUi.errors.tooManyOrders': '한 번에 최대 {count}개의 주문만 열어 둘 수 있습니다.',
   'itemUi.logs.orderDelivered':
@@ -15253,7 +15254,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemHistory.title': '{item}: 이력',
   'hudChrome.itemHistory.passedTo': '{date}에 {name}에게 넘어감',
   'hudChrome.itemHistory.noTransfers': '이 아이템은 주인이 바뀐 적이 없습니다.',
-  'hudChrome.itemHistory.earlierHidden': '이전 {count}건의 양도는 표시되지 않습니다.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.one': '이전 {count}건의 양도는 표시되지 않습니다.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.few': '이전 {count}건의 양도는 표시되지 않습니다.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.many': '이전 {count}건의 양도는 표시되지 않습니다.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.other': '이전 {count}건의 양도는 표시되지 않습니다.',
   'hudChrome.itemHistory.close': '닫기',
   'devCommand.actions.kit.description':
     '특성에 맞는 성소 입장 전 20레벨 사전 설정 장비를 가방부터 착용합니다. 장비만 해당됩니다.',

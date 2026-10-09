@@ -3151,6 +3151,12 @@ export const id_ID: EnTranslations = {
       "linkHint": "Shift-klik untuk menautkan item ini di obrolan."
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "{count} earlier transfer is not shown.",
+        "few": "{count} earlier transfers are not shown.",
+        "many": "{count} earlier transfers are not shown.",
+        "other": "{count} earlier transfers are not shown."
+      },
       "guildBoardShown": {
         "one": "{count} guild ditampilkan",
         "few": "{count} guild ditampilkan",
@@ -5631,7 +5637,6 @@ export const id_ID: EnTranslations = {
       "title": "{item}: history",
       "passedTo": "Passed to {name} on {date}",
       "noTransfers": "This item has never changed hands.",
-      "earlierHidden": "{count} earlier transfers are not shown.",
       "close": "Close"
     },
     "enchanting": {
@@ -13042,7 +13047,8 @@ export const id_ID: EnTranslations = {
       "tooManyOrders": "Kamu bisa menyimpan paling banyak {count} pesanan terbuka sekaligus.",
       "orderClosed": "Pesanan itu tidak lagi terbuka.",
       "orderOwn": "Itu pesanan mu sendiri. Batalkan untuk menariknya.",
-      "orderNotYours": "Itu bukan pesanan mu."
+      "orderNotYours": "Itu bukan pesanan mu.",
+      "orderTrackedItem": "The Merchant takes no orders for one-of-a-kind gear."
     },
     "loot": {
       "takeAll": "Ambil Semua",

@@ -3151,6 +3151,12 @@ export const cs_CZ: EnTranslations = {
       "linkHint": "Shift + kliknutí vloží odkaz na tento předmět do chatu."
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "{count} earlier transfer is not shown.",
+        "few": "{count} earlier transfers are not shown.",
+        "many": "{count} earlier transfers are not shown.",
+        "other": "{count} earlier transfers are not shown."
+      },
       "guildBoardShown": {
         "one": "Zobrazena {count} gilda",
         "few": "Zobrazeny {count} gildy",
@@ -5631,7 +5637,6 @@ export const cs_CZ: EnTranslations = {
       "title": "{item}: history",
       "passedTo": "Passed to {name} on {date}",
       "noTransfers": "This item has never changed hands.",
-      "earlierHidden": "{count} earlier transfers are not shown.",
       "close": "Close"
     },
     "enchanting": {
@@ -13042,7 +13047,8 @@ export const cs_CZ: EnTranslations = {
       "tooManyOrders": "Najednou můžeš mít otevřených nejvýše {count} objednávek.",
       "orderClosed": "Tato objednávka už není otevřená.",
       "orderOwn": "To je tvoje vlastní objednávka. Zrušením ji stáhneš.",
-      "orderNotYours": "To není tvoje objednávka."
+      "orderNotYours": "To není tvoje objednávka.",
+      "orderTrackedItem": "The Merchant takes no orders for one-of-a-kind gear."
     },
     "loot": {
       "takeAll": "Vzít vše",

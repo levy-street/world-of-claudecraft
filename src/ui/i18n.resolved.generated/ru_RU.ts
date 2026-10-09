@@ -3151,6 +3151,12 @@ export const ru_RU: EnTranslations = {
       "linkHint": "Shift + клик, чтобы вставить ссылку на этот предмет в чат."
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "Ещё {count} ранняя передача не показана.",
+        "few": "Ещё {count} ранние передачи не показаны.",
+        "many": "Ещё {count} ранних передач не показаны.",
+        "other": "Ещё {count} ранней передачи не показаны."
+      },
       "guildBoardShown": {
         "one": "Показана {count} гильдия",
         "few": "Показано {count} гильдии",
@@ -5631,7 +5637,6 @@ export const ru_RU: EnTranslations = {
       "title": "{item}: история",
       "passedTo": "Передано: {name}, {date}",
       "noTransfers": "Этот предмет никогда не менял владельца.",
-      "earlierHidden": "Ещё {count} ранних передач не показаны.",
       "close": "Закрыть"
     },
     "enchanting": {
@@ -13042,7 +13047,8 @@ export const ru_RU: EnTranslations = {
       "tooManyOrders": "Одновременно можно держать открытыми не более {count} заказов.",
       "orderClosed": "Этот заказ больше не открыт.",
       "orderOwn": "Это ваш собственный заказ. Отмените его, чтобы вернуть средства.",
-      "orderNotYours": "Это не ваш заказ."
+      "orderNotYours": "Это не ваш заказ.",
+      "orderTrackedItem": "Торговец не принимает заказы на уникальное снаряжение."
     },
     "loot": {
       "takeAll": "Взять все",

@@ -3151,6 +3151,12 @@ export const nl_NL: EnTranslations = {
       "linkHint": "Shift-klik om dit voorwerp in de chat te delen."
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "{count} earlier transfer is not shown.",
+        "few": "{count} earlier transfers are not shown.",
+        "many": "{count} earlier transfers are not shown.",
+        "other": "{count} earlier transfers are not shown."
+      },
       "guildBoardShown": {
         "one": "{count} gilde getoond",
         "few": "{count} gilden getoond",
@@ -5631,7 +5637,6 @@ export const nl_NL: EnTranslations = {
       "title": "{item}: history",
       "passedTo": "Passed to {name} on {date}",
       "noTransfers": "This item has never changed hands.",
-      "earlierHidden": "{count} earlier transfers are not shown.",
       "close": "Close"
     },
     "enchanting": {
@@ -13042,7 +13047,8 @@ export const nl_NL: EnTranslations = {
       "tooManyOrders": "Je kunt tegelijk maximaal {count} bestellingen open houden.",
       "orderClosed": "Die bestelling is niet langer open.",
       "orderOwn": "Dat is je eigen bestelling. Annuleer deze om hem in te trekken.",
-      "orderNotYours": "Dat is niet jouw bestelling."
+      "orderNotYours": "Dat is niet jouw bestelling.",
+      "orderTrackedItem": "The Merchant takes no orders for one-of-a-kind gear."
     },
     "loot": {
       "takeAll": "Alles nemen",

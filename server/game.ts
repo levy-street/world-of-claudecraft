@@ -5740,9 +5740,9 @@ export class GameServer {
       : 1;
     // movement: a support restore re-mints a copy the player already obtained
     // once (and already had counted), so crediting it again would inflate a
-    // player-visible number from a support ticket. The safer default for a
-    // verb named restore.
-    this.sim.addItem(itemId, clamped, session.pid, { movement: true });
+    // player-visible number from a support ticket. A tracked copy gets a NEW
+    // guid labelled `restore` (item_tracking.ts): the lost one may still exist.
+    this.sim.addItem(itemId, clamped, session.pid, { movement: true, source: 'restore' });
     // Close the audit-durability window: the audit row is already committed,
     // so the grant must not wait up to AUTOSAVE_SECONDS to become durable (a
     // crash inside that window would leave a row for a grant that vanished).

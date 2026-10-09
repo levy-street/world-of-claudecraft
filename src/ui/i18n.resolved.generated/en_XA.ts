@@ -3151,6 +3151,12 @@ export const en_XA: EnTranslations = {
       "linkHint": "[Šĥíƒţ-çļíçķ ţó ļíñķ ţĥíš íţéɱ íñ çĥáţ.]"
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "[{count} éáŕļíéŕ ţŕáñšƒéŕ íš ñóţ šĥóŵñ.]",
+        "few": "[{count} éáŕļíéŕ ţŕáñšƒéŕš áŕé ñóţ šĥóŵñ.]",
+        "many": "[{count} éáŕļíéŕ ţŕáñšƒéŕš áŕé ñóţ šĥóŵñ.]",
+        "other": "[{count} éáŕļíéŕ ţŕáñšƒéŕš áŕé ñóţ šĥóŵñ.]"
+      },
       "guildBoardShown": {
         "one": "[{count} ĝúíļð šĥóŵñ]",
         "few": "[{count} ĝúíļðš šĥóŵñ]",
@@ -5631,7 +5637,6 @@ export const en_XA: EnTranslations = {
       "title": "[{item}: ĥíšţóŕý]",
       "passedTo": "[Þáššéð ţó {name} óñ {date}]",
       "noTransfers": "[Ţĥíš íţéɱ ĥáš ñéʋéŕ çĥáñĝéð ĥáñðš.]",
-      "earlierHidden": "[{count} éáŕļíéŕ ţŕáñšƒéŕš áŕé ñóţ šĥóŵñ.]",
       "close": "[Çļóšé]"
     },
     "enchanting": {
@@ -13042,7 +13047,8 @@ export const en_XA: EnTranslations = {
       "tooManyOrders": "[Ýóú ɱáý ķééþ áţ ɱóšţ {count} óŕðéŕš óþéñ áţ óñçé.]",
       "orderClosed": "[Ţĥáţ óŕðéŕ íš ñó ļóñĝéŕ óþéñ.]",
       "orderOwn": "[Ţĥáţ íš ýóúŕ óŵñ óŕðéŕ. Çáñçéļ íţ ţó ŵíţĥðŕáŵ íţ.]",
-      "orderNotYours": "[Ţĥáţ íš ñóţ ýóúŕ óŕðéŕ.]"
+      "orderNotYours": "[Ţĥáţ íš ñóţ ýóúŕ óŕðéŕ.]",
+      "orderTrackedItem": "[Ţĥé Ɱéŕçĥáñţ ţáķéš ñó óŕðéŕš ƒóŕ óñé-óƒ-á-ķíñð ĝéáŕ.]"
     },
     "loot": {
       "takeAll": "[Ţáķé Áļļ]",

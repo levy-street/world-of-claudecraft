@@ -3151,6 +3151,12 @@ export const zh_CN: EnTranslations = {
       "linkHint": "Shift + 点击可在聊天中链接该物品。"
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "更早的 {count} 次转手未显示。",
+        "few": "更早的 {count} 次转手未显示。",
+        "many": "更早的 {count} 次转手未显示。",
+        "other": "更早的 {count} 次转手未显示。"
+      },
       "guildBoardShown": {
         "one": "显示 {count} 个公会",
         "few": "显示 {count} 个公会",
@@ -5631,7 +5637,6 @@ export const zh_CN: EnTranslations = {
       "title": "{item}：历史",
       "passedTo": "{date} 转交给 {name}",
       "noTransfers": "此物品从未易手。",
-      "earlierHidden": "更早的 {count} 次转手未显示。",
       "close": "关闭"
     },
     "enchanting": {
@@ -13042,7 +13047,8 @@ export const zh_CN: EnTranslations = {
       "tooManyOrders": "你最多只能同时保留 {count} 个待处理订单。",
       "orderClosed": "该订单已不再开放。",
       "orderOwn": "那是你自己的订单。取消它即可撤回。",
-      "orderNotYours": "那不是你的订单。"
+      "orderNotYours": "那不是你的订单。",
+      "orderTrackedItem": "商人不接受独一无二装备的订单。"
     },
     "loot": {
       "takeAll": "全部拾取",

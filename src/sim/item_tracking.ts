@@ -8,8 +8,18 @@
 // server mirrors into its item ledger (server/item_ledger.ts); offline and
 // headless hosts simply drain it.
 //
+// The guid belongs to the physical copy for its whole life
+// (docs/design/item-tracking.md "Lineage"): a change IN PLACE keeps it and
+// writes a `modify` row (recordTrackedChange), the end of the copy writes a
+// `consume` row, and only a copy that turns into a DIFFERENT item gets a new
+// guid, minted as a `derive` row that names its parent (opts.derivedFrom).
+// So "one guid, one live copy" holds, and a guid seen after its consume row
+// is a duplicate.
+//
 // What is NOT tracked, deliberately: stackable defs (a tracked copy is one
-// per slot, and a stackable epic consumable would fragment its stack), and
+// per slot, and a stackable epic consumable would fragment its stack), bags
+// (declared payload-free, bags.ts equipBag #2837: a worn bag socket carries
+// no payload, so a minted bag could never be equipped), and
 // the payload-free `movement` regrants a same-character path makes (a trade
 // rollback, an enchant re-mint, a buyback), which the transfer rule in
 // item_provenance.ts recognises as the same holder and leaves alone.
@@ -32,6 +42,7 @@ import {
   deterministicItemGuid,
   isItemGuid,
   LEGACY_ITEM_SOURCE,
+  MAX_ITEM_LEDGER_DETAIL_LENGTH,
   MAX_ITEM_PROVENANCE_NAME_LENGTH,
   MAX_ITEM_PROVENANCE_SOURCE_LENGTH,
   recordItemTransfer,
@@ -46,7 +57,7 @@ import type { ItemDef, ItemInstancePayload, ItemOwnerRecord, ItemProvenance } fr
  *  epic or legendary quality (the copy's own rolled quality wins over the
  *  def's, the equipment_rules.ts precedence) on a one-per-slot def. */
 export function isTrackedItem(def: ItemDef | undefined, instance?: ItemInstancePayload): boolean {
-  if (!def) return false;
+  if (!def || def.kind === 'bag') return false;
   const quality = effectiveQuality(def, instance);
   return quality !== undefined && TRACKED_ITEM_QUALITIES.has(quality) && stackSizeOf(def) === 1;
 }
@@ -129,16 +140,20 @@ export function stampTrackedCopy(
     if (!isTrackedItem(def, instance)) return instance;
     const holder = holderFor(ctx, meta);
     const zone = zoneFor(ctx, meta);
+    // A copy made FROM another tracked copy names its parent: the mint is a
+    // `derive` row, and the parent's own consume row points back here.
+    const derivedFrom = isItemGuid(opts?.derivedFrom) ? opts.derivedFrom : undefined;
     const provenance: ItemProvenance = {
       ...holder,
       source: sourceFor(opts),
       ...(zone !== undefined && { zone }),
+      ...(derivedFrom !== undefined && { derivedFrom }),
     };
     const guid = mintGuid(ctx, itemId, meta.entityId);
     ctx.emit({
       type: 'itemTracked',
       pid: meta.entityId,
-      kind: 'mint',
+      kind: derivedFrom === undefined ? 'mint' : 'derive',
       guid,
       itemId,
       quality: quality ?? '',
@@ -146,6 +161,7 @@ export function stampTrackedCopy(
       ...(holder.byId !== undefined && { byId: holder.byId }),
       source: provenance.source,
       ...(zone !== undefined && { zone }),
+      ...(derivedFrom !== undefined && { relatedGuid: derivedFrom }),
       at: holder.at,
     });
     return { guid, provenance, ...instance };
@@ -177,12 +193,23 @@ export function stampTrackedCopy(
   return stamped;
 }
 
+/** A payload with its tracked identity stripped, so the hub mints it fresh. */
+function withoutIdentity(instance: ItemInstancePayload): ItemInstancePayload {
+  const { guid: _guid, provenance: _provenance, ...rest } = instance;
+  return rest;
+}
+
 /**
  * The instanced hub arm's grant: `count` copies of `instance` into `meta`'s
  * bags, each tracked copy stamped on its own (a fresh mint per copy, since
  * two copies never share a guid). Untracked payloads take the shared packer
  * once, exactly as before tracking existed. Returns the payload the first
  * copy was granted with, for the receipt event.
+ *
+ * The duplicate guard: a payload that already carries a guid is ONE copy, so
+ * only the first of `count` keeps it. Every further copy is minted fresh as a
+ * `derive` of that guid rather than landing as a second live copy sharing it
+ * (tracked defs are one per slot, so no caller does this today).
  */
 export function grantTrackedInstances(
   ctx: SimContext,
@@ -205,7 +232,13 @@ export function grantTrackedInstances(
   }
   let first: ItemInstancePayload | undefined;
   for (let i = 0; i < count; i++) {
-    const stamped = stampTrackedCopy(ctx, meta, itemId, instance, opts);
+    const stamped =
+      i > 0 && isItemGuid(instance.guid)
+        ? stampTrackedCopy(ctx, meta, itemId, withoutIdentity(instance), {
+            ...opts,
+            derivedFrom: instance.guid,
+          })
+        : stampTrackedCopy(ctx, meta, itemId, instance, opts);
     grantInventoryInstances(
       meta.inventory,
       itemId,
@@ -242,7 +275,9 @@ export function recordTrackedWithdrawal(
  * Stamp a guid onto a copy that became tracked IN PLACE (the legendary
  * promotion, professions/perfecting.ts: a Perfected copy's rolled quality
  * turns legendary without passing through the hub). Mutates the live payload
- * and emits the mint; a copy that already carries a guid is left alone.
+ * and emits the mint. A copy that already carries a guid keeps it and gets a
+ * `modify` row instead (source and `detail` name the change), since the
+ * guid belongs to the copy for its whole life.
  */
 export function ensureTrackedInPlace(
   ctx: SimContext,
@@ -250,10 +285,72 @@ export function ensureTrackedInPlace(
   itemId: string,
   payload: ItemInstancePayload,
   source: string,
+  detail?: string,
 ): void {
-  if (payload.guid !== undefined) return;
+  if (payload.guid !== undefined) {
+    recordTrackedChange(ctx, meta, itemId, payload, 'modify', source, detail);
+    return;
+  }
   const stamped = stampTrackedCopy(ctx, meta, itemId, payload, { source });
   if (stamped.guid === undefined) return;
   payload.guid = stamped.guid;
   payload.provenance = stamped.provenance;
+}
+
+/**
+ * Record a lifecycle step of a tracked copy that is NOT a grant: a change in
+ * place (`modify`: Perfecting, an enchant, a Rift Forge upgrade, an unbind)
+ * or the end of the copy (`consume`: sundered, salvaged, disenchanted,
+ * destroyed, learned, spent). `source` names the action (a sim-composed id),
+ * `detail` the specifics (a rank, an enchant id, what it became) and
+ * `relatedGuid` the other copy a swap or derivation names. A payload with no
+ * guid (an untracked or pre-tracking copy) records nothing. Emits only: the
+ * copy itself is never touched, so a call can sit beside any mutation.
+ */
+export function recordTrackedChange(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  itemId: string,
+  payload: ItemInstancePayload | undefined,
+  kind: 'modify' | 'consume',
+  source: string,
+  detail?: string,
+  relatedGuid?: string,
+): void {
+  const guid = payload?.guid;
+  if (!isItemGuid(guid)) return;
+  const def = ITEMS[itemId];
+  const holder = holderFor(ctx, meta);
+  ctx.emit({
+    type: 'itemTracked',
+    pid: meta.entityId,
+    kind,
+    guid,
+    itemId,
+    quality: (def ? effectiveQuality(def, payload) : undefined) ?? '',
+    by: holder.by,
+    ...(holder.byId !== undefined && { byId: holder.byId }),
+    source: source.slice(0, MAX_ITEM_PROVENANCE_SOURCE_LENGTH),
+    ...(detail !== undefined &&
+      detail.length > 0 && { detail: detail.slice(0, MAX_ITEM_LEDGER_DETAIL_LENGTH) }),
+    ...(isItemGuid(relatedGuid) && relatedGuid !== guid && { relatedGuid }),
+    at: holder.at,
+  });
+}
+
+/** `consume` rows for every tracked copy among `payloads` (a remover's
+ *  consumed-instance list, e.g. removeItem's): one per copy, all with the
+ *  same action, detail and related guid. */
+export function recordTrackedConsumed(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  itemId: string,
+  payloads: readonly (ItemInstancePayload | undefined)[],
+  source: string,
+  detail?: string,
+  relatedGuid?: string,
+): void {
+  for (const payload of payloads) {
+    recordTrackedChange(ctx, meta, itemId, payload, 'consume', source, detail, relatedGuid);
+  }
 }

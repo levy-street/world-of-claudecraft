@@ -54,6 +54,11 @@ describe('itemHistoryModel', () => {
     expect(model.earlierHidden).toBe('12 earlier transfers are not shown.');
   });
 
+  it('uses the singular form for exactly one rolled-off hand', () => {
+    const model = itemHistoryModel(origin({ owners: [{ at: LATER, by: 'Zed' }], transfers: 2 }));
+    expect(model.earlierHidden).toBe('1 earlier transfer is not shown.');
+  });
+
   it('wording for a quest reward', () => {
     const model = itemHistoryModel(origin({ source: 'quest:q_wolves' }));
     expect(model.origin.startsWith('Quest reward to Alice on ')).toBe(true);

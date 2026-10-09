@@ -42,6 +42,24 @@ export const MAX_ITEM_OWNER_HISTORY = 10;
 export const MAX_ITEM_PROVENANCE_NAME_LENGTH = 32;
 export const MAX_ITEM_PROVENANCE_SOURCE_LENGTH = 64;
 export const MAX_ITEM_PROVENANCE_ZONE_LENGTH = 64;
+/** Ceiling for the short note a ledger row carries (a rank, an enchant id,
+ *  the item id a copy became): sim-composed, never player text. */
+export const MAX_ITEM_LEDGER_DETAIL_LENGTH = 64;
+
+/** The closed lifecycle vocabulary of a tracked copy (the `itemTracked`
+ *  event kind, mirrored by the server ledger's ITEM_LEDGER_KINDS):
+ *  - mint: the copy first reaches a player (its guid is born here);
+ *  - transfer: the copy changes hands;
+ *  - modify: the copy changes IN PLACE and keeps its guid (Perfecting, a
+ *    legendary promotion, an enchant, a Rift Forge upgrade or socket, an
+ *    unbind, a Perfecting swap);
+ *  - consume: the copy ends (sundered, salvaged, disenchanted, destroyed,
+ *    sold off the buyback list, learned as a pattern, spent as a reagent,
+ *    deleted with its character); its guid must never be seen again;
+ *  - derive: a NEW copy minted from an old one (an upgrade recipe, an admin
+ *    restore, a duplicate-guid split), naming its parent. */
+export const ITEM_TRACKED_KINDS = ['mint', 'transfer', 'modify', 'consume', 'derive'] as const;
+export type ItemTrackedKind = (typeof ITEM_TRACKED_KINDS)[number];
 
 /** The item quality tiers whose copies are tracked. Every copy of a def (or a
  *  promoted copy, via its rolled quality) in one of these tiers gets a guid
@@ -110,6 +128,7 @@ export function isLoadableItemProvenance(value: unknown): value is ItemProvenanc
       key !== 'byId' &&
       key !== 'source' &&
       key !== 'zone' &&
+      key !== 'derivedFrom' &&
       key !== 'owners' &&
       key !== 'transfers'
     )
@@ -121,6 +140,7 @@ export function isLoadableItemProvenance(value: unknown): value is ItemProvenanc
   if (!isBoundedPrintableAscii(r.source, MAX_ITEM_PROVENANCE_SOURCE_LENGTH)) return false;
   if (r.zone !== undefined && !isBoundedPrintableAscii(r.zone, MAX_ITEM_PROVENANCE_ZONE_LENGTH))
     return false;
+  if (r.derivedFrom !== undefined && !isItemGuid(r.derivedFrom)) return false;
   if (r.owners !== undefined) {
     if (!Array.isArray(r.owners) || r.owners.length > MAX_ITEM_OWNER_HISTORY) return false;
     for (const o of r.owners) if (!isLoadableItemOwnerRecord(o)) return false;

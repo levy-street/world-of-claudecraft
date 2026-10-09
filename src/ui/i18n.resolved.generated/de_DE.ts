@@ -3151,6 +3151,12 @@ export const de_DE: EnTranslations = {
       "linkHint": "Umschalt-Klick, um diesen Gegenstand im Chat zu verlinken."
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "{count} earlier transfer is not shown.",
+        "few": "{count} earlier transfers are not shown.",
+        "many": "{count} earlier transfers are not shown.",
+        "other": "{count} earlier transfers are not shown."
+      },
       "guildBoardShown": {
         "one": "{count} Gilde angezeigt",
         "few": "{count} Gilden angezeigt",
@@ -5631,7 +5637,6 @@ export const de_DE: EnTranslations = {
       "title": "{item}: history",
       "passedTo": "Passed to {name} on {date}",
       "noTransfers": "This item has never changed hands.",
-      "earlierHidden": "{count} earlier transfers are not shown.",
       "close": "Close"
     },
     "enchanting": {
@@ -13042,7 +13047,8 @@ export const de_DE: EnTranslations = {
       "tooManyOrders": "Ihr könnt höchstens {count} Aufträge gleichzeitig offen halten.",
       "orderClosed": "Dieser Auftrag ist nicht mehr offen.",
       "orderOwn": "Das ist Euer eigener Auftrag. Storniert ihn, um ihn zurückzuziehen.",
-      "orderNotYours": "Das ist nicht Euer Auftrag."
+      "orderNotYours": "Das ist nicht Euer Auftrag.",
+      "orderTrackedItem": "The Merchant takes no orders for one-of-a-kind gear."
     },
     "loot": {
       "takeAll": "Alles nehmen",

@@ -20,6 +20,12 @@ export interface InventoryGrantOptions {
    *  ("craft:<recipeId>" when craftedRecipeId is set, else "world", or
    *  "legacy" for a payload-free copy first seen while changing hands). */
   readonly source?: string;
+  /** The guid of the tracked copy this grant was made FROM (an upgrade
+   *  recipe that consumed it, an admin restore of a lost copy): a minted copy
+   *  records it as provenance.derivedFrom and its ledger row is a `derive`
+   *  naming the parent (item_tracking.ts). Ignored for a copy that already
+   *  carries a guid. */
+  readonly derivedFrom?: string;
 }
 
 export function grantInventoryInstances(

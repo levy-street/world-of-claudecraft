@@ -3151,6 +3151,12 @@ export const ja_JP: EnTranslations = {
       "linkHint": "Shift + クリックでこのアイテムをチャットにリンクします。"
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "それ以前の {count} 件の譲渡は表示されません。",
+        "few": "それ以前の {count} 件の譲渡は表示されません。",
+        "many": "それ以前の {count} 件の譲渡は表示されません。",
+        "other": "それ以前の {count} 件の譲渡は表示されません。"
+      },
       "guildBoardShown": {
         "one": "{count} 件のギルドを表示中",
         "few": "{count} 件のギルドを表示中",
@@ -5631,7 +5637,6 @@ export const ja_JP: EnTranslations = {
       "title": "{item}：履歴",
       "passedTo": "{date} に {name} へ譲渡",
       "noTransfers": "このアイテムは一度も持ち主が変わっていません。",
-      "earlierHidden": "それ以前の {count} 件の譲渡は表示されません。",
       "close": "閉じる"
     },
     "enchanting": {
@@ -13042,7 +13047,8 @@ export const ja_JP: EnTranslations = {
       "tooManyOrders": "同時に出せる注文は最大{count}件です。",
       "orderClosed": "その注文はもう受け付けていません。",
       "orderOwn": "それは自分の注文です。キャンセルすると回収できます。",
-      "orderNotYours": "それはあなたの注文ではありません。"
+      "orderNotYours": "それはあなたの注文ではありません。",
+      "orderTrackedItem": "商人は一点物の装備の注文を受け付けません。"
     },
     "loot": {
       "takeAll": "すべて取る",

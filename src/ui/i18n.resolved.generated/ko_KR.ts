@@ -3151,6 +3151,12 @@ export const ko_KR: EnTranslations = {
       "linkHint": "Shift + 클릭하면 이 아이템을 채팅에 연결합니다."
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "이전 {count}건의 양도는 표시되지 않습니다.",
+        "few": "이전 {count}건의 양도는 표시되지 않습니다.",
+        "many": "이전 {count}건의 양도는 표시되지 않습니다.",
+        "other": "이전 {count}건의 양도는 표시되지 않습니다."
+      },
       "guildBoardShown": {
         "one": "길드 {count}개 표시 중",
         "few": "길드 {count}개 표시 중",
@@ -5631,7 +5637,6 @@ export const ko_KR: EnTranslations = {
       "title": "{item}: 이력",
       "passedTo": "{date}에 {name}에게 넘어감",
       "noTransfers": "이 아이템은 주인이 바뀐 적이 없습니다.",
-      "earlierHidden": "이전 {count}건의 양도는 표시되지 않습니다.",
       "close": "닫기"
     },
     "enchanting": {
@@ -13042,7 +13047,8 @@ export const ko_KR: EnTranslations = {
       "tooManyOrders": "한 번에 최대 {count}개의 주문만 열어 둘 수 있습니다.",
       "orderClosed": "그 주문은 더 이상 열려 있지 않습니다.",
       "orderOwn": "그것은 당신 자신의 주문입니다. 철회하려면 주문을 취소하세요.",
-      "orderNotYours": "그것은 당신의 주문이 아닙니다."
+      "orderNotYours": "그것은 당신의 주문이 아닙니다.",
+      "orderTrackedItem": "상인은 하나뿐인 장비에 대한 주문을 받지 않습니다."
     },
     "loot": {
       "takeAll": "모두 가져가기",

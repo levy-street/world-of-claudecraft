@@ -843,6 +843,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.errors.orderClosed': 'Этот заказ больше не открыт.',
   'itemUi.errors.orderCountNeeded': 'Укажите, сколько вам нужно.',
   'itemUi.errors.orderNotYours': 'Это не ваш заказ.',
+  'itemUi.errors.orderTrackedItem': 'Торговец не принимает заказы на уникальное снаряжение.',
   'itemUi.errors.orderOwn': 'Это ваш собственный заказ. Отмените его, чтобы вернуть средства.',
   'itemUi.errors.tooManyOrders': 'Одновременно можно держать открытыми не более {count} заказов.',
   'itemUi.logs.orderDelivered':
@@ -15555,7 +15556,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemHistory.title': '{item}: история',
   'hudChrome.itemHistory.passedTo': 'Передано: {name}, {date}',
   'hudChrome.itemHistory.noTransfers': 'Этот предмет никогда не менял владельца.',
-  'hudChrome.itemHistory.earlierHidden': 'Ещё {count} ранних передач не показаны.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.one': 'Ещё {count} ранняя передача не показана.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.few': 'Ещё {count} ранние передачи не показаны.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.many': 'Ещё {count} ранних передач не показаны.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.other': 'Ещё {count} ранней передачи не показаны.',
   'hudChrome.itemHistory.close': 'Закрыть',
   'devCommand.actions.kit.description':
     'Надеть комплект уровня 20 (до Sanctum) для выбранной специализации, сначала сумки. Только снаряжение.',

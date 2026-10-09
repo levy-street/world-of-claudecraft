@@ -3920,6 +3920,14 @@ export const hudChromeStrings = {
   // carry the real distinct forms only in the locales that need them (ru_RU). The
   // count is auto-supplied as {count}. Keep all four categories present per base.
   plurals: {
+    // The Item history prompt's rolled-off line (item_history_view.ts): how
+    // many earlier hands fell off the bounded owner chain.
+    itemHistoryEarlierHidden: {
+      one: '{count} earlier transfer is not shown.',
+      few: '{count} earlier transfers are not shown.',
+      many: '{count} earlier transfers are not shown.',
+      other: '{count} earlier transfers are not shown.',
+    },
     // The signpost guild board's live count line ({count} pre-formatted): a
     // screen reader hears how many guilds a read (or a filter flip) produced.
     guildBoardShown: {
@@ -8185,7 +8193,6 @@ export const hudChromeStrings = {
     title: '{item}: history',
     passedTo: 'Passed to {name} on {date}',
     noTransfers: 'This item has never changed hands.',
-    earlierHidden: '{count} earlier transfers are not shown.',
     close: 'Close',
   },
   // Enchanting actions (Professions 2.0): the result toasts for the

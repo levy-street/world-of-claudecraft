@@ -138,9 +138,11 @@ import {
   ADMIN_META,
   type AdminAuthDb,
   adminIdentityOf,
+  adminTargetGuid,
   adminTargetId,
   adminTargetMeta,
   createRequireAdmin,
+  requireAdminGuidTarget,
   requireAdminTarget,
 } from './http/middleware/require_admin';
 import { enum_ } from './http/schema';
@@ -3648,8 +3650,8 @@ async function itemLedgerHandler(ctx: Ctx): Promise<void> {
  *  empty history, never a 404: guids are unguessable and the answer "never
  *  seen on this realm" is itself what a support lookup needs. */
 async function itemLedgerHistoryHandler(ctx: Ctx): Promise<void> {
-  const guid = (ctx.params.guid ?? '').toLowerCase();
-  if (!isItemLedgerGuid(guid)) return fail(ctx.res, 400, 'invalid item guid');
+  // requireAdminGuidTarget already 422d a malformed :guid before any DB call.
+  const guid = adminTargetGuid(ctx);
   const events = await adminDb().itemLedgerHistory(REALM, guid);
   ok(ctx.res, { guid, events });
 }
@@ -4367,8 +4369,8 @@ export const routes: RouteDef[] = [
     method: 'GET',
     path: '/admin/api/items/:guid',
     surface: 'admin',
-    middleware: [requireAdmin],
-    meta: ADMIN_META,
+    middleware: [requireAdmin, requireAdminGuidTarget('itemGuid')],
+    meta: adminTargetMeta('itemGuid'),
     handler: itemLedgerHistoryHandler,
   },
   {

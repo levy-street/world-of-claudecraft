@@ -9,7 +9,7 @@
 // from the record's own host epoch ms through the i18n formatter.
 
 import type { ItemOwnerRecord, ItemProvenance } from '../sim/types';
-import { formatDateTime, formatNumber, t } from './i18n';
+import { formatDateTime, formatNumber, t, tPlural } from './i18n';
 
 const MOB_SOURCE_PREFIX = 'mob:';
 const QUEST_SOURCE_PREFIX = 'quest:';
@@ -58,6 +58,10 @@ export function itemHistoryModel(provenance: ItemProvenance): ItemHistoryModel {
     hands,
     noTransfers: hands.length === 0 ? t('hudChrome.itemHistory.noTransfers') : null,
     earlierHidden:
-      hidden > 0 ? t('hudChrome.itemHistory.earlierHidden', { count: formatNumber(hidden) }) : null,
+      hidden > 0
+        ? tPlural('hudChrome.plurals.itemHistoryEarlierHidden', hidden, {
+            count: formatNumber(hidden),
+          })
+        : null,
   };
 }

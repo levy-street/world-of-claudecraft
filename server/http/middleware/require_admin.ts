@@ -72,6 +72,9 @@ export const ADMIN_AUTH_REQUIRED = {
 /** The ctx.state key the decoded operator :id is stashed under for the handler. */
 const ADMIN_TARGET_ID = 'adminTargetId';
 
+/** The ctx.state key the decoded operator :guid is stashed under for the handler. */
+const ADMIN_TARGET_GUID = 'adminTargetGuid';
+
 /** The ctx.state key the resolved staff identity is stashed under for the handler. */
 const ADMIN_IDENTITY = 'adminIdentity';
 
@@ -204,6 +207,35 @@ export function requireAdminTarget(_kind: string): Middleware {
  */
 export function adminTargetId(ctx: Ctx): number {
   return ctx.state.get(ADMIN_TARGET_ID) as number;
+}
+
+// The canonical UUID shape an operator :guid must match (any case; the
+// loader folds it to lowercase, the shape the item ledger stores).
+const GUID_PARAM_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * The :guid twin of requireAdminTarget, for an operator resource keyed by a
+ * canonical UUID rather than a bigserial id (the tracked-item ledger,
+ * server/item_ledger_db.ts). It decodes the :guid param (422 on a malformed
+ * one, thrown before any DB call, exactly like the :id decode) and stashes the
+ * lowercased guid on ctx.state for the handler. Same operator scope, same
+ * adminTargetMeta marker.
+ */
+export function requireAdminGuidTarget(_kind: string): Middleware {
+  return async (ctx: Ctx, next: Next) => {
+    const raw = ctx.params.guid;
+    if (typeof raw !== 'string' || !GUID_PARAM_RE.test(raw)) {
+      // A raw { ok: false, issues } is what toAppError maps to 422 validation.failed.
+      throw { ok: false, issues: [{ pointer: '/guid', code: 'pattern' }] };
+    }
+    ctx.state.set(ADMIN_TARGET_GUID, raw.toLowerCase());
+    await next();
+  };
+}
+
+/** The decoded, lowercased operator :guid the requireAdminGuidTarget loader stashed. */
+export function adminTargetGuid(ctx: Ctx): string {
+  return ctx.state.get(ADMIN_TARGET_GUID) as string;
 }
 
 /** RouteMeta for a plain admin route: select the { success, data, error } envelope. */

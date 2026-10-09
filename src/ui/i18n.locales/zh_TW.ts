@@ -795,6 +795,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.errors.orderClosed': '該訂單已不再開放。',
   'itemUi.errors.orderCountNeeded': '請指定你想要的數量。',
   'itemUi.errors.orderNotYours': '這不是你的訂單。',
+  'itemUi.errors.orderTrackedItem': '商人不接受獨一無二裝備的訂單。',
   'itemUi.errors.orderOwn': '這是你自己的訂單。撤回即可取消它。',
   'itemUi.errors.tooManyOrders': '你同時最多只能保留 {count} 筆待處理的訂單。',
   'itemUi.logs.orderDelivered':
@@ -14572,7 +14573,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemHistory.title': '{item}：歷史',
   'hudChrome.itemHistory.passedTo': '{date} 轉交給 {name}',
   'hudChrome.itemHistory.noTransfers': '此物品從未易手。',
-  'hudChrome.itemHistory.earlierHidden': '更早的 {count} 次轉手未顯示。',
+  'hudChrome.plurals.itemHistoryEarlierHidden.one': '更早的 {count} 次轉手未顯示。',
+  'hudChrome.plurals.itemHistoryEarlierHidden.few': '更早的 {count} 次轉手未顯示。',
+  'hudChrome.plurals.itemHistoryEarlierHidden.many': '更早的 {count} 次轉手未顯示。',
+  'hudChrome.plurals.itemHistoryEarlierHidden.other': '更早的 {count} 次轉手未顯示。',
   'hudChrome.itemHistory.close': '關閉',
   'devCommand.actions.kit.description':
     '為指定專精穿上聖所前的20級預設裝備，優先裝備背包。僅限裝備。',

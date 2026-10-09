@@ -3151,6 +3151,12 @@ export const da_DK: EnTranslations = {
       "linkHint": "Shift-klik for at linke denne genstand i chatten."
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "{count} earlier transfer is not shown.",
+        "few": "{count} earlier transfers are not shown.",
+        "many": "{count} earlier transfers are not shown.",
+        "other": "{count} earlier transfers are not shown."
+      },
       "guildBoardShown": {
         "one": "{count} laug vist",
         "few": "{count} laug vist",
@@ -5631,7 +5637,6 @@ export const da_DK: EnTranslations = {
       "title": "{item}: history",
       "passedTo": "Passed to {name} on {date}",
       "noTransfers": "This item has never changed hands.",
-      "earlierHidden": "{count} earlier transfers are not shown.",
       "close": "Close"
     },
     "enchanting": {
@@ -13042,7 +13047,8 @@ export const da_DK: EnTranslations = {
       "tooManyOrders": "Du kan holde højst {count} ordrer åbne på én gang.",
       "orderClosed": "Den ordre er ikke længere åben.",
       "orderOwn": "Det er din egen ordre. Annuller den for at trække den tilbage.",
-      "orderNotYours": "Det er ikke din ordre."
+      "orderNotYours": "Det er ikke din ordre.",
+      "orderTrackedItem": "The Merchant takes no orders for one-of-a-kind gear."
     },
     "loot": {
       "takeAll": "Tag alt",

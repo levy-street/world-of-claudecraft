@@ -3151,6 +3151,12 @@ export const pt_BR: EnTranslations = {
       "linkHint": "Shift-clique para vincular este item no chat."
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "{count} earlier transfer is not shown.",
+        "few": "{count} earlier transfers are not shown.",
+        "many": "{count} earlier transfers are not shown.",
+        "other": "{count} earlier transfers are not shown."
+      },
       "guildBoardShown": {
         "one": "{count} guilda mostrada",
         "few": "{count} guildas mostradas",
@@ -5631,7 +5637,6 @@ export const pt_BR: EnTranslations = {
       "title": "{item}: history",
       "passedTo": "Passed to {name} on {date}",
       "noTransfers": "This item has never changed hands.",
-      "earlierHidden": "{count} earlier transfers are not shown.",
       "close": "Close"
     },
     "enchanting": {
@@ -13042,7 +13047,8 @@ export const pt_BR: EnTranslations = {
       "tooManyOrders": "Você pode manter no máximo {count} pedidos abertos de uma vez.",
       "orderClosed": "Esse pedido não está mais aberto.",
       "orderOwn": "Esse é seu próprio pedido. Cancele-o para retirá-lo.",
-      "orderNotYours": "Esse pedido não é seu."
+      "orderNotYours": "Esse pedido não é seu.",
+      "orderTrackedItem": "The Merchant takes no orders for one-of-a-kind gear."
     },
     "loot": {
       "takeAll": "Pegar tudo",

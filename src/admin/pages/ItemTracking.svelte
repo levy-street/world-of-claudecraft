@@ -29,11 +29,25 @@
   let historyRequest = 0;
 
   function kindLabel(kind: ItemLedgerEvent['kind']): string {
-    return kind === 'mint' ? t('itemTracking.kind.mint') : t('itemTracking.kind.transfer');
+    switch (kind) {
+      case 'mint':
+        return t('itemTracking.kind.mint');
+      case 'transfer':
+        return t('itemTracking.kind.transfer');
+      case 'modify':
+        return t('itemTracking.kind.modify');
+      case 'consume':
+        return t('itemTracking.kind.consume');
+      case 'derive':
+        return t('itemTracking.kind.derive');
+    }
   }
 
-  function kindVariant(kind: ItemLedgerEvent['kind']): 'success' | 'neutral' {
-    return kind === 'mint' ? 'success' : 'neutral';
+  // A copy's birth reads green, its end amber: a guid seen in any row AFTER
+  // its consume row is a duplicate, so the end has to stand out.
+  function kindVariant(kind: ItemLedgerEvent['kind']): 'success' | 'neutral' | 'warn' {
+    if (kind === 'mint' || kind === 'derive') return 'success';
+    return kind === 'consume' ? 'warn' : 'neutral';
   }
 
   async function loadFeed(beforeId: number | null): Promise<void> {
@@ -107,10 +121,22 @@
       <td>{ev.characterName}</td>
       <td class="mono">{ev.source}</td>
       <td class="mono">{ev.zone ?? ''}</td>
+      <td class="mono">{ev.detail ?? ''}</td>
       <td>
         <button type="button" class="link-button mono" onclick={() => pick(ev.guid)}>
           {ev.guid}
         </button>
+      </td>
+      <td>
+        {#if ev.relatedGuid}
+          <button
+            type="button"
+            class="link-button mono"
+            onclick={() => ev.relatedGuid && pick(ev.relatedGuid)}
+          >
+            {ev.relatedGuid}
+          </button>
+        {/if}
       </td>
     </tr>
   {/each}
@@ -169,7 +195,9 @@
                 <th>{t('itemTracking.colCharacter')}</th>
                 <th>{t('itemTracking.colSource')}</th>
                 <th>{t('itemTracking.colZone')}</th>
+                <th>{t('itemTracking.colDetail')}</th>
                 <th>{t('itemTracking.colGuid')}</th>
+                <th>{t('itemTracking.colRelated')}</th>
               </tr>
             </thead>
             <tbody>{@render EventRows(history.events)}</tbody>
@@ -217,7 +245,9 @@
                 <th>{t('itemTracking.colCharacter')}</th>
                 <th>{t('itemTracking.colSource')}</th>
                 <th>{t('itemTracking.colZone')}</th>
+                <th>{t('itemTracking.colDetail')}</th>
                 <th>{t('itemTracking.colGuid')}</th>
+                <th>{t('itemTracking.colRelated')}</th>
               </tr>
             </thead>
             <tbody>{@render EventRows(feed.events)}</tbody>

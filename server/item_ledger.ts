@@ -71,6 +71,8 @@ export function recordItemTracked(who: ItemLedgerWho, ev: ItemTrackedEvent): voi
       characterName: ev.by,
       source: ev.source,
       zone: ev.zone ?? null,
+      detail: ev.detail ?? null,
+      relatedGuid: ev.relatedGuid ?? null,
       occurredAtMs: ev.at,
     };
     pending += 1;

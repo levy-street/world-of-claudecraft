@@ -1,10 +1,13 @@
 // item_ledger: the append-only provenance ledger of tracked (epic and
 // legendary) item copies, mirrored from the sim's server-only `itemTracked`
 // event (src/sim/types.ts; minted in src/sim/item_tracking.ts). One row per
-// guid mint and one per recorded change of hands, so "who looted this
-// legendary, when, and every hand it passed through since" is one indexed
-// lookup by guid, and a character's tracked acquisitions one lookup by
-// character. The payload on the copy itself carries the same record
+// lifecycle step of a copy (the guid mint, each change of hands, each change
+// in place, its end, a copy derived from it), so "who looted this
+// legendary, when, what happened to it, and every hand it passed through
+// since" is one indexed lookup by guid, and a character's tracked
+// acquisitions one lookup by character. `detail` carries the step's short
+// specifics (a rank, an enchant id, what the copy became) and `related_guid`
+// the other copy a swap or derivation names. The payload on the copy itself carries the same record
 // (ItemInstancePayload.provenance), bounded to the most recent holders; this
 // table is the unbounded audit twin an operator reads.
 //
@@ -18,13 +21,15 @@
 // and legendary drop rates, far below any per-character event burst.
 
 import type { Pool } from 'pg';
+import { ITEM_TRACKED_KINDS, type ItemTrackedKind } from '../src/sim/item_provenance';
 
 /** The closed event vocabulary, enforced by insertItemLedgerEvent below and
  *  deliberately NOT a DB CHECK constraint (CREATE TABLE IF NOT EXISTS never
- *  revises a constraint on a deployed database). Mirrors the sim's
- *  itemTracked `kind`. */
-export const ITEM_LEDGER_KINDS = ['mint', 'transfer'] as const;
-export type ItemLedgerKind = (typeof ITEM_LEDGER_KINDS)[number];
+ *  revises a constraint on a deployed database). It IS the sim's itemTracked
+ *  `kind` list (src/sim/item_provenance.ts ITEM_TRACKED_KINDS), so the two
+ *  can never drift. */
+export const ITEM_LEDGER_KINDS: readonly ItemTrackedKind[] = ITEM_TRACKED_KINDS;
+export type ItemLedgerKind = ItemTrackedKind;
 
 export const ITEM_LEDGER_SCHEMA = `
 CREATE TABLE IF NOT EXISTS item_ledger (
@@ -39,6 +44,8 @@ CREATE TABLE IF NOT EXISTS item_ledger (
   character_name TEXT NOT NULL,
   source TEXT NOT NULL,
   zone TEXT,
+  detail TEXT,
+  related_guid TEXT,
   occurred_at TIMESTAMPTZ NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -73,7 +80,11 @@ export interface ItemLedgerEventRow {
   characterName: string;
   source: string;
   zone: string | null;
-  /** Host epoch ms the sim stamped on the copy's own record. */
+  /** The step's short sim-composed note (a rank, an enchant id, what the copy became). */
+  detail: string | null;
+  /** The other copy a swap or derivation names (a canonical UUID). */
+  relatedGuid: string | null;
+  /** Host epoch ms the sim stamped on the step. */
   occurredAtMs: number;
 }
 
@@ -88,6 +99,8 @@ export interface ItemLedgerRow {
   characterName: string;
   source: string;
   zone: string | null;
+  detail: string | null;
+  relatedGuid: string | null;
   occurredAt: string;
   createdAt: string;
 }
@@ -119,6 +132,8 @@ interface RawRow {
   character_name: string;
   source: string;
   zone: string | null;
+  detail: string | null;
+  related_guid: string | null;
   occurred_at: Date | string;
   created_at: Date | string;
 }
@@ -150,18 +165,28 @@ function isoOf(value: Date | string): string {
   return value instanceof Date ? value.toISOString() : new Date(value).toISOString();
 }
 
+/** A stored kind read back through the closed list; an unknown value (a row
+ *  written by a later build) reads as a modification rather than throwing. */
+function ledgerKindOf(raw: string): ItemLedgerKind {
+  return (ITEM_LEDGER_KINDS as readonly string[]).includes(raw)
+    ? (raw as ItemLedgerKind)
+    : 'modify';
+}
+
 function rowOf(raw: RawRow): ItemLedgerRow {
   return {
     id: Number(raw.id),
     guid: raw.guid,
     itemId: raw.item_id,
     quality: raw.quality,
-    kind: raw.kind === 'transfer' ? 'transfer' : 'mint',
+    kind: ledgerKindOf(raw.kind),
     characterId: raw.character_id,
     accountId: raw.account_id,
     characterName: raw.character_name,
     source: raw.source,
     zone: raw.zone,
+    detail: raw.detail,
+    relatedGuid: raw.related_guid,
     occurredAt: isoOf(raw.occurred_at),
     createdAt: isoOf(raw.created_at),
   };
@@ -174,14 +199,18 @@ export async function insertItemLedgerEvent(db: Pool, row: ItemLedgerEventRow): 
     throw new TypeError(`unknown item ledger kind: ${String(row.kind)}`);
   }
   if (!isItemLedgerGuid(row.guid)) throw new TypeError('guid must be a canonical UUID');
+  if (row.relatedGuid !== null && !isItemLedgerGuid(row.relatedGuid)) {
+    throw new TypeError('relatedGuid must be a canonical UUID or null');
+  }
   if (!Number.isFinite(row.occurredAtMs) || row.occurredAtMs < 0) {
     throw new TypeError('occurredAtMs must be a non-negative finite number');
   }
   await db.query(
     `INSERT INTO item_ledger
        (realm, guid, item_id, quality, kind, character_id, account_id,
-        character_name, source, zone, occurred_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, to_timestamp($11::double precision / 1000))`,
+        character_name, source, zone, detail, related_guid, occurred_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12,
+             to_timestamp($13::double precision / 1000))`,
     [
       requiredText(row.realm, 'realm', NAME_MAX_LENGTH),
       row.guid,
@@ -193,12 +222,14 @@ export async function insertItemLedgerEvent(db: Pool, row: ItemLedgerEventRow): 
       requiredText(row.characterName, 'characterName', NAME_MAX_LENGTH),
       requiredText(row.source, 'source', ID_MAX_LENGTH),
       nullableText(row.zone, ID_MAX_LENGTH),
+      nullableText(row.detail, ID_MAX_LENGTH),
+      row.relatedGuid,
       row.occurredAtMs,
     ],
   );
 }
 
-/** Every ledger row for one copy, oldest first (the mint, then each hand),
+/** Every ledger row for one copy, oldest first (the mint, then each step),
  *  bounded by ITEM_LEDGER_HISTORY_LIMIT. An unknown guid reads as an empty
  *  history, never an error (anti-enumeration is not a concern here: guids
  *  are unguessable and the surface is admin-gated). */
@@ -210,7 +241,7 @@ export async function itemLedgerHistory(
   if (!isItemLedgerGuid(guid)) return [];
   const res = await db.query<RawRow>(
     `SELECT id, guid, item_id, quality, kind, character_id, account_id,
-            character_name, source, zone, occurred_at, created_at
+            character_name, source, zone, detail, related_guid, occurred_at, created_at
        FROM item_ledger
       WHERE realm = $1 AND guid = $2
       ORDER BY id ASC
@@ -247,7 +278,7 @@ export async function listItemLedger(
   const itemId = nullableText(options.itemId, ID_MAX_LENGTH);
   const res = await db.query<RawRow>(
     `SELECT id, guid, item_id, quality, kind, character_id, account_id,
-            character_name, source, zone, occurred_at, created_at
+            character_name, source, zone, detail, related_guid, occurred_at, created_at
        FROM item_ledger
       WHERE realm = $1
         AND ($2::bigint IS NULL OR id < $2)

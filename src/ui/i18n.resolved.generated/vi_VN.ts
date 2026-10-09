@@ -3151,6 +3151,12 @@ export const vi_VN: EnTranslations = {
       "linkHint": "Shift-click để chia sẻ vật phẩm này trong khung chat."
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "{count} earlier transfer is not shown.",
+        "few": "{count} earlier transfers are not shown.",
+        "many": "{count} earlier transfers are not shown.",
+        "other": "{count} earlier transfers are not shown."
+      },
       "guildBoardShown": {
         "one": "Đang hiển thị {count} bang hội",
         "few": "Đang hiển thị {count} bang hội",
@@ -5631,7 +5637,6 @@ export const vi_VN: EnTranslations = {
       "title": "{item}: history",
       "passedTo": "Passed to {name} on {date}",
       "noTransfers": "This item has never changed hands.",
-      "earlierHidden": "{count} earlier transfers are not shown.",
       "close": "Close"
     },
     "enchanting": {
@@ -13042,7 +13047,8 @@ export const vi_VN: EnTranslations = {
       "tooManyOrders": "Bạn có thể giữ tối đa {count} đơn hàng mở cùng lúc.",
       "orderClosed": "Đơn hàng đó không còn mở nữa.",
       "orderOwn": "Đó là đơn hàng của bạn. Hủy nó để rút lại.",
-      "orderNotYours": "Đó không phải là đơn hàng của bạn."
+      "orderNotYours": "Đó không phải là đơn hàng của bạn.",
+      "orderTrackedItem": "The Merchant takes no orders for one-of-a-kind gear."
     },
     "loot": {
       "takeAll": "Lấy Tất Cả",
