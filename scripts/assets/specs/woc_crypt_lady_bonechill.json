@@ -1,0 +1,24 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/crypt_lady_bonechill_woc.glb",
+      "out": "models/creatures/woc_crypt_lady_bonechill.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "CombatIdle",
+        "Walk",
+        "Run",
+        "Attack",
+        "Attack2",
+        "Hit",
+        "Death",
+        "Wail",
+        "EmbraceReach",
+        "EmbraceHold",
+        "Release"
+      ],
+      "maxTex": 1024
+    }
+  ]
+}

@@ -4758,21 +4758,23 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 9.1,
     authoredAtlas: true,
   },
-  // Sexton Marrow (scripts/assets/hollow_crypt_creatures/build_marrow.py): the
-  // parish gravedigger raised and still digging, sculpted on the Bastion kit at
-  // full size (template scale 1): a stooped skeleton about twice a player's
-  // height under a peaked cowl of grave cloth, a leather apron, a hooded tin
-  // lantern at his hip and the long spade. At rest he digs (Idle); every bar
-  // clip is locked to its bar and plays its recovery out: Shovelful flings the
-  // earth at 1.0 of its 1.2 s bar, Measure levels the spade at the mark from 0.5,
-  // GravediggersBlow lands at 0.7 of 0.8. BellRing is a 1.0 s loop (the haul
-  // bottoming at 0.9, in step with ropePull) with his fists on his own axis,
-  // the spade stood in the earth beside him.
+  // Sexton Marrow (the art guide's model): the parish gravedigger raised and
+  // still digging, a stooped skeleton about twice a player's height in a hooded
+  // grave coat and a leather apron, a tin lantern at his hip and the long spade
+  // in his fists. At rest he digs (Idle: drive, lever, lift, toss); in a fight he
+  // holds the spade low like a spear (CombatIdle), chops (Attack) and swats
+  // (Attack2), and Walk drags the blade behind him. Every bar clip is authored
+  // at bar time and plays its recovery out: Shovelful flings the earth at 1.0 of
+  // its 1.2 s bar, Measure levels the spade at the mark from 0.5, GravediggersBlow
+  // lands at 0.7 of 0.8. BellRing is a 1.0 s loop (the haul bottoming at 0.9, in
+  // step with ropePull) with his fists on his own axis, the spade stood in the
+  // earth beside him.
   crypt_skel_sexton: {
-    url: `${CREATURES}/crypt_sexton_marrow.glb`,
-    // The build's IDLE_HEIGHT and MINZ, half a second into Idle (as the game measures).
-    height: 5.783,
-    hover: -0.038,
+    url: `${CREATURES}/woc_crypt_sexton_marrow.glb`,
+    // The idle's posed height and lowest point half a second in (the spade's blade
+    // is in the earth), at 3.5 yd a unit.
+    height: 5.975,
+    hover: -0.56,
     clips: {
       idle: 'Idle',
       combatIdle: 'CombatIdle',
@@ -4799,25 +4801,25 @@ export const VISUALS: Record<string, VisualDef> = {
     // The one-shot bars follow the bar; the bell loops for as long as it rings.
     castClipSync: [MARROW_SHOVELFUL, MARROW_MEASURE, MARROW_GRAVEDIGGERS_BLOW],
     castPlayOutHoldsAttacks: true,
-    walkRef: 1.671,
-    runRef: 6.109,
+    walkRef: 3.29,
+    runRef: 9.1,
     authoredAtlas: true,
     selfIllumination: 0.1,
     clickRadius: 2.2,
   },
-  // Cantor Ilvane (scripts/assets/hollow_crypt_creatures/build_cantor.py): a tall
-  // skeletal choir mistress in a faded violet cassock and a torn surplice, a great
-  // pleated ruff, a black lace veil under a crown of silver organ pipes, the hymnal
-  // open in her left hand and a finger-bone baton with a violet light in her right.
-  // Her song glows violet (the eyes, the voice in her open jaw, the baton, the notes).
+  // Cantor Ilvane (the art guide's model): a tall skeletal choir mistress in a
+  // violet cassock under a black cloak, a crown of silver organ pipes caging her
+  // face, the hymnal hung open at her belt and a finger-bone baton in her right
+  // hand. Idle conducts softly in three; CombatIdle points the baton at her foe.
   // Sing is the Dirge: bar-locked, its peak reached by 1.75 s (the Crescendo's 1.8 s
   // bar) and held, climbing, to the 2.5 s bar's end. PlayOrgan loops at the Bone
-  // Organ's keys (the hymnal hangs open over them); Conduct is her flourish.
+  // Organ's keys, leaning in; Conduct is her flourish.
   crypt_skel_cantor: {
-    url: `${CREATURES}/crypt_cantor_ilvane.glb`,
-    // The build's IDLE_HEIGHT (feet to the crown's tallest pipe, half a second into
-    // Idle); her template's 1.1 draws her about 6.5 yd, two and a half players.
+    url: `${CREATURES}/woc_crypt_cantor_ilvane.glb`,
+    // The idle's posed height (hem to the crown's tallest pipe, half a second in);
+    // her template's 1.1 draws her about 6.5 yd, two and a half players.
     height: 5.964,
+    hover: -0.206,
     clips: {
       idle: 'Idle',
       combatIdle: 'CombatIdle',
@@ -4840,8 +4842,8 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     // The Dirge follows its bar (normal or Crescendo); the organ loops while she plays.
     castClipSync: [ILVANE_DIRGE, ILVANE_UNBROKEN_DIRGE],
-    walkRef: 2.2,
-    runRef: 6.34,
+    walkRef: 1.97,
+    runRef: 6.82,
     authoredAtlas: true,
     selfIllumination: 0.1,
     clickRadius: 2.2,
@@ -4890,17 +4892,17 @@ export const VISUALS: Record<string, VisualDef> = {
     selfIllumination: 0.08,
     clickRadius: 2.2,
   },
-  // The Lady of the Bonechill (scripts/assets/hollow_crypt_creatures/build_lady.py),
-  // the ghost of a bride buried in the ravine's ice: authored at size (`height`
-  // and `hover` are the build's IDLE_HEIGHT and MINZ half a second into Idle,
-  // the ice crown on top), floating half a yard over the ice. Her gown, veil and
-  // sleeves are one alpha-blended material whose translucency lives in the baked
-  // atlas (it survives the far-LOD bake); the face and hands stay solid. The
-  // Lament and the Bridal Freeze play the Wail on their bars (the Freeze's 2.5 s
-  // bar at 1.2, so the scream peaks as either lands); the Embrace's reach closes
-  // on its bar's end, and the hold loops while the sim lifts her aloft.
+  // The Lady of the Bonechill (the art guide's model), the ghost of a bride buried
+  // in the ravine's ice: a crown of ice, long hair, a bouquet of frozen roses at her
+  // waist, a gown and veil hung with icicles, floating half a yard over the ice
+  // (`hover`; `height` is the idle's posed height half a second in). Her gown, veil
+  // and sleeves are the alpha-blended CreatureGhostVeil; her face, hands, crown and
+  // bouquet the solid CreatureBody. The Lament and the Bridal Freeze play the Wail
+  // on their bars (the Freeze's 2.5 s bar at 1.2, so the scream peaks as either
+  // lands); the Embrace's reach closes on its bar's end, and the hold loops while
+  // the sim lifts her aloft. Her Death sinks her onto the ice below her hover.
   crypt_lady_bonechill: {
-    url: `${CREATURES}/crypt_lady_bonechill.glb`,
+    url: `${CREATURES}/woc_crypt_lady_bonechill.glb`,
     height: 6.749,
     hover: 0.544,
     clips: {
@@ -4932,6 +4934,26 @@ export const VISUALS: Record<string, VisualDef> = {
     selfIllumination: 0.3,
     clickRadius: 2.2,
   },
+  // The Rime Egg Sac (the art guide's model): a frost-crusted clutch of spider eggs
+  // in a mound of rime-webbing, nearly a player's height. Idle breathes (the shells
+  // swell in turn, something twitching inside); Hit wobbles it; Death swells the
+  // shells, splits them open and lets them fall away, the mound slumping into a torn
+  // husk, as the hatchling breaks free (the sim's frost burst, broodEgg.burstSchool).
+  // `height` is the idle's posed height half a second in.
+  crypt_rime_egg_sac: {
+    url: `${CREATURES}/woc_crypt_rime_egg_sac.glb`,
+    height: 2.2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Idle',
+      run: 'Idle',
+      attack: ['Idle'],
+      hit: ['Hit'],
+      death: 'Death',
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.12,
+  },
   mob_crypt_rimeweb: {
     url: `${CREATURES}/spider.glb`,
     height: 2.7,
@@ -4952,19 +4974,19 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.6,
   },
-  // The Chapel Gargoyle (scripts/assets/hollow_crypt_creatures/build_stone_gargoyle.py):
-  // a great, heavy stone brute with baked cracked-stone surfaces, authored about
-  // 4.5 yd tall crouched and raised to scale 1.5 by its template, so it looms
-  // well over three players high on its arch (a player stands 2.6). It is a statue while it
-  // perches (`Perch`, read as airborne up on the cap), cracks free on the pull
-  // (`Awaken`, keyed on the dive cue), plunges (`Dive`), slams down (`DiveLand`),
-  // fights from a braced crouch (`Ready`), rakes with its talons and rears to
-  // shriek. Its talons curl just under its feet: the negative hover plants them.
+  // The Chapel Gargoyle (the art guide's model): a great, heavy horned stone brute
+  // with bat wings and digitigrade legs, raised to scale 1.5 by its template, so it
+  // looms well over three players high on its arch (a player stands 2.6). It is a
+  // statue while it perches (`Perch`, read as airborne up on the cap), cracks free
+  // on the pull (`Awaken`, keyed on the dive cue), plunges (`Dive`), slams down
+  // (`DiveLand`), fights from a braced crouch (`Ready`), rakes with its talons and
+  // rears to shriek (`Screech`). `height` and `hover` are the perch's posed height
+  // and lowest point, at 3.94 yd a unit.
   mob_crypt_gargoyle: {
-    url: `${CREATURES}/crypt_gargoyle.glb`,
+    url: `${CREATURES}/woc_crypt_gargoyle.glb`,
     authoredAtlas: true,
     height: 5.81,
-    hover: -0.22,
+    hover: 0.043,
     flight: true,
     clips: {
       idle: 'Perch',
@@ -5001,20 +5023,21 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     selfIllumination: 0.15,
   },
-  // The Ossuary Drake (scripts/assets/hollow_crypt_creatures/build_bone_drake.py):
-  // a colossal skeletal wyvern, its head about 10 yd up and its wings about 34
-  // across, centred on its SHOULDERS so the jaws that pour the Barrowflame hang
-  // over the breath cone's apex. It flies its patrol (`Fly`: two downbeats and a
-  // long glide), cries as it breaks off (`SkyRoar`, the landing cue), glides
-  // down (`Glide`), lands (`Land`), walks and runs on its wing knuckles, bites
-  // (never claws), and plays each strike to its bar: the breath inhales over the
-  // 2 s bar and its exhale plays OUT after it; the tail sweeps and the wings
-  // buffet exactly at their bars' ends. Plain swings never cut those short.
+  // The Ossuary Drake (the art guide's model): a colossal skeletal wyvern standing
+  // on two digitigrade legs, its body pitched forward over them, the tail behind as
+  // its counterweight and its bat wings raised over its back. It flies its patrol
+  // (`Fly`: two downbeats and a long glide), cries as it breaks off (`SkyRoar`, the
+  // landing cue), glides down (`Glide`), lands (`Land`), stalks and runs on its
+  // hind legs, bites (never claws), and plays each strike to its bar: the breath
+  // inhales over the 2 s bar with the head reared and its exhale plays OUT after
+  // it, the jaws thrust low (crypt_creature_fx_core.ts DRAKE_JAWS_*); the tail
+  // sweeps and the wings buffet exactly at their bars' ends. Plain swings never cut
+  // those short. `height` is the idle's posed height half a second in.
   mob_crypt_drake: {
-    url: `${CREATURES}/crypt_drake.glb`,
+    url: `${CREATURES}/woc_crypt_ossuary_drake.glb`,
     authoredAtlas: true,
     height: 13.63,
-    hover: -0.19,
+    hover: -0.03,
     flight: true,
     clips: {
       idle: 'Idle',
@@ -5044,21 +5067,24 @@ export const VISUALS: Record<string, VisualDef> = {
       flourish: 'Roar',
     },
     castPlayOutHoldsAttacks: true,
+    walkRef: 4.02,
+    runRef: 12.97,
     selfIllumination: 0.12,
   },
 
-  // The Knellwyrm (scripts/assets/hollow_crypt_creatures/build_knellwyrm.py):
-  // the Ossuary Drake's charred kin, built on its skeleton and rig, with ghost
-  // fire burning through its skull, ribs, spine and tail and a crown of horns.
-  // Authored at the drake's size; its template raises it a quarter again. It
-  // glides in from the sky (the arrival bar), takes wing for its Pyre Strafe,
-  // flies the lane with its neck plunged and jaws wide, and rears up with its
-  // wings flung wide for Dread Bellow; the drake's strikes play to their bars.
+  // The Knellwyrm (the art guide's model): the Ossuary Drake's charred kin, a
+  // horned bone wyvern with violet ghost fire through its ribs and spine, a funeral
+  // bell hung in its chest and a long spined tail, posed by the drake's clip set on
+  // its own skeleton. Its template raises it a quarter again. It glides in from the
+  // sky (the arrival bar), takes wing for its Pyre Strafe, flies the lane with its
+  // neck plunged and jaws wide, and rears up with its wings flung wide for Dread
+  // Bellow; the drake's strikes play to their bars (its own jaws:
+  // KNELLWYRM_JAWS_EXHALE). `height` is the idle's posed height half a second in.
   mob_crypt_knellwyrm: {
-    url: `${CREATURES}/crypt_knellwyrm.glb`,
+    url: `${CREATURES}/woc_crypt_knellwyrm.glb`,
     authoredAtlas: true,
     height: 15.07,
-    hover: -0.19,
+    hover: 0,
     flight: true,
     clips: {
       idle: 'Idle',
@@ -5094,11 +5120,11 @@ export const VISUALS: Record<string, VisualDef> = {
         [CRYPT_WING_GUST]: 1,
         [KNELLWYRM_PYRE_STRAFE]: 1,
         [KNELLWYRM_DREAD_BELLOW]: 1,
-        // TakeWing is authored on the 2.5 s rise (60 frames at 24 fps).
+        // TakeWing is authored on the 2.5 s rise (76 frames at 30 fps).
         [KNELLWYRM_KNELL_RISE]: 1,
       },
       // The Knell's beats aloft (morthen_rite_fx_core.ts): it roars the fire
-      // down over the marked half, then dives into the pour (Strafe's 33
+      // down over the marked half, then dives into the pour (Strafe's 43
       // frames are the 1.4 s breath at rate 1).
       attackByAbility: { [KNELL_GESTURE_SKY_ROAR]: 'SkyRoar', [KNELL_GESTURE_POUR]: 'Strafe' },
       attackTimeScaleByAbility: { [KNELL_GESTURE_SKY_ROAR]: 1, [KNELL_GESTURE_POUR]: 1 },
@@ -5106,6 +5132,8 @@ export const VISUALS: Record<string, VisualDef> = {
       flourish: 'Roar',
     },
     castPlayOutHoldsAttacks: true,
+    walkRef: 6.03,
+    runRef: 19.4,
     selfIllumination: 0.2,
   },
 
@@ -7916,6 +7944,7 @@ const MOB_KEYS: Record<string, string> = {
   cantor_ilvane: 'crypt_skel_cantor',
   hollow_chorister: 'crypt_skel_chorister',
   rimeweb: 'crypt_lady_bonechill',
+  rime_egg_sac: 'crypt_rime_egg_sac',
   crypt_shambler: 'skel_rogue',
   // The Hollow Crypt trash (sim/content/hollow_crypt_trash.ts).
   crypt_ossuary_warrior: 'crypt_skel_warrior',

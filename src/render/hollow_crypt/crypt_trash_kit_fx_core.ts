@@ -263,15 +263,15 @@ export function graniteSpec(): { maxStacks: number; crackedSeconds: number } {
   return { maxStacks: g?.maxStacks ?? 0, crackedSeconds: g?.cracked.seconds ?? 0 };
 }
 
-/** The gargoyle's body volume at its authored size (the Ready crouch of
- *  build_stone_gargoyle.py): its centre over the floor and its half extents,
- *  in yards at scale 1. Scaled by the entity's own scale. */
+/** The gargoyle's body volume at its authored size (its Ready crouch): its
+ *  centre over the floor and its half extents, in yards at scale 1. Scaled by
+ *  the entity's own scale. */
 export const GARGOYLE_BODY: CreatureAnchor & { rx: number; ry: number; rz: number } = {
-  forward: 0.25,
-  up: 2.55,
-  rx: 1.35,
-  ry: 1.95,
-  rz: 1.45,
+  forward: 0.53,
+  up: 3.51,
+  rx: 1.66,
+  ry: 1.63,
+  rz: 2.11,
 };
 
 /** Stone plates each layer of Granite Skin lays on the body. */

@@ -1,8 +1,8 @@
-// The Lady of the Bonechill (scripts/assets/hollow_crypt_creatures/build_lady.py):
-// the Hollow Crypt's second boss drawn as her own Blender ghost, not the spider
-// placeholder. Pins the look's contract: the size she looms at, the clips the
-// sim's casts and bars play (timed to the bars), the alpha-blended ghost cloth
-// (never transmission), and the asset budget.
+// The Lady of the Bonechill (the art guide's model: concept, Tripo, a skeleton and
+// every clip built in Blender): the Hollow Crypt's second boss drawn as her own
+// ghost bride, not the spider placeholder. Pins the look's contract: the size she
+// looms at, the clips the sim's casts and bars play (timed to the bars), the
+// alpha-blended ghost cloth (never transmission), and the asset budget.
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
@@ -19,7 +19,7 @@ import {
 import type { Entity } from '../src/sim/types';
 
 const PLAYER_HEIGHT = 2.6;
-const GLB = 'public/models/creatures/crypt_lady_bonechill.glb';
+const GLB = 'public/models/creatures/woc_crypt_lady_bonechill.glb';
 
 interface GlbJson {
   animations?: { name: string; samplers: { input: number }[] }[];
@@ -53,9 +53,9 @@ const key = visualKeyFor({ kind: 'mob', templateId: LADY_ID } as Entity);
 const def = VISUALS[key];
 
 describe('the Lady of the Bonechill: her own body', () => {
-  it('draws the Blender ghost bride, not the spider placeholder', () => {
+  it('draws the ghost bride, not the spider placeholder', () => {
     expect(key).toBe('crypt_lady_bonechill');
-    expect(def.url).toBe('models/creatures/crypt_lady_bonechill.glb');
+    expect(def.url).toBe('models/creatures/woc_crypt_lady_bonechill.glb');
     expect(def.authoredAtlas).toBe(true);
   });
 
@@ -93,8 +93,10 @@ describe('the Lady of the Bonechill: her own body', () => {
     let tris = 0;
     for (const m of j.meshes)
       for (const p of m.primitives) tris += j.accessors[p.indices].count / 3;
-    expect(tris).toBeGreaterThan(25_000);
-    expect(tris).toBeLessThan(55_000);
+    // A Tripo smart mesh: a few thousand triangles, the budget's lower floor a
+    // guard against a placeholder or a stripped mesh shipping in her place.
+    expect(tris).toBeGreaterThan(4_000);
+    expect(tris).toBeLessThan(20_000);
     expect(readFileSync(GLB).length).toBeLessThan(3_500_000);
   });
 
