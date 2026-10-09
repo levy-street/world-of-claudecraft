@@ -216,7 +216,7 @@ export function rollWorldBossLoot(ctx: SimContext, mob: Entity, contributors: Pl
     // Ungrouped entries (the guaranteed storm trophy) are unaffected and always drop.
     let gearWon = false;
     // Personal loot: the class-lock gate (loot/class_locked_drop.ts) reads this
-    // contributor's own class. It draws NO rng, so the draw order is unchanged.
+    // contributor's own class. It draws NO rng, so the table draws are unchanged.
     const classes = new Set([meta.cls]);
     const usable = (id: string): boolean => lootItemUsableByClasses(id, classes);
     for (const entry of template.loot) {

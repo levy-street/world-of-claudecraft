@@ -26,7 +26,9 @@
 //    ctx.rng.next() per rollGroup (partitioned across the group), then for non-group
 //    entries ctx.rng.chance(entry.chance) and, if entry.copper, ctx.rng.int(...).
 //    The class-lock gate (class_locked_drop.ts) reweights a group or drops a won row
-//    AFTER its draw, so the eligible classes never change the draw count.
+//    AFTER its draw, so the eligible classes never change THIS phase's draws. A
+//    withheld gear copy does skip its later quality draws (none today: the only
+//    locked drops are the non-equipment Crucible sigils).
 //    A `normalOnly` entry draws NOTHING on a heroic claim (loot_difficulty_gate.ts):
 //    the normal trace is unchanged, the heroic trace simply omits those draws.
 //  - quality: one tier draw per eligible copy, then enhanced allocation draws.
@@ -277,8 +279,10 @@ export function rollLoot(
   const heroicItem = (id: string): string => heroicLootItemId(id, heroicClaim);
   // Class-lock gate (loot/class_locked_drop.ts): a soulbound, class-restricted
   // drop only rolls when some loot-eligible class can use it. Draws NO rng, so
-  // the party's class mix never changes the draw count below.
-  const eligibleClasses = new Set([meta.cls, ...eligible.map((m) => m.cls)]);
+  // the party's class mix never changes the table draws below. Read from
+  // `eligible` alone: it is the need/greed candidate list, and the tapper can
+  // sit outside it (out of range), so their class must not unlock a drop.
+  const eligibleClasses = new Set((eligible.length > 0 ? eligible : [meta]).map((m) => m.cls));
   const usable = (id: string): boolean => lootItemUsableByClasses(id, eligibleClasses);
   for (const entry of template.loot) {
     // A Normal-only row is not part of a heroic kill at all: skipped BEFORE the

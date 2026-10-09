@@ -33,6 +33,25 @@ function raid(classes: readonly PlayerClass[]): { sim: Sim; metas: PlayerMeta[] 
   return { sim, metas };
 }
 
+// One kill of `bossId` through the live roller, with or without a heroic
+// claim; returns every item id the corpse got.
+function killOnce(sim: Sim, metas: PlayerMeta[], bossId: string, heroic: boolean): string[] {
+  const template = MOBS[bossId];
+  const mob = createMob(-1, template, template.minLevel, { x: 0, y: 0, z: 0 });
+  sim.ctx.instances.length = 0;
+  if (heroic) {
+    sim.ctx.instances.push({
+      id: -1,
+      dungeonId: 'crucible',
+      difficulty: 'heroic',
+      partyKey: 'raid',
+      mobIds: [mob.id],
+    } as unknown as (typeof sim.ctx.instances)[number]);
+  }
+  rollLoot(sim.ctx, mob, metas[0], metas);
+  return (mob.loot?.items ?? []).map((s) => s.itemId);
+}
+
 // Rolls a boss's live table once per seed and returns every sigil it paid.
 function sigilsFromKills(
   bossId: string,
@@ -41,28 +60,22 @@ function sigilsFromKills(
   kills = 200,
 ): string[] {
   const { sim, metas } = raid(classes);
-  const template = MOBS[bossId];
   const sigils: string[] = [];
   for (let seed = 0; seed < kills; seed++) {
     sim.rng = new Rng(seed);
-    const mob = createMob(-1, template, template.minLevel, { x: 0, y: 0, z: 0 });
-    sim.ctx.instances.length = 0;
-    if (heroic) {
-      sim.ctx.instances.push({
-        id: -1,
-        dungeonId: 'crucible',
-        difficulty: 'heroic',
-        partyKey: 'raid',
-        mobIds: [mob.id],
-      } as unknown as (typeof sim.ctx.instances)[number]);
-    }
-    rollLoot(sim.ctx, mob, metas[0], metas);
-    sigils.push(
-      ...(mob.loot?.items ?? []).map((s) => s.itemId).filter((id) => id.startsWith('sigil_')),
-    );
+    sigils.push(...killOnce(sim, metas, bossId, heroic).filter((id) => id.startsWith('sigil_')));
   }
   return sigils;
 }
+
+// A mocked table that exercises every gate arm at once: an all-locked group,
+// a locked plain row, and an unlocked plain row after them (anvil sigils are
+// warrior, druid, and mage only; the core is unrestricted).
+const LOCKED_TABLE: LootEntry[] = [
+  { itemId: 'sigil_anvil_legs', chance: 1, rollGroup: 'locked_group' },
+  { itemId: 'sigil_anvil_helmet', chance: 1 },
+  { itemId: 'lastflame_core', chance: 0.5 },
+];
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -100,12 +113,19 @@ describe('class-locked soulbound drops: usableRollGroup', () => {
     expect(usableRollGroup(group, () => true)).toBe(group);
   });
 
-  it('redistributes a removed row across the kept rows, keeping the group total', () => {
-    const kept = usableRollGroup(group, (id) => id !== 'c');
+  it('redistributes a removed row across the kept rows in proportion, keeping the total', () => {
+    const uneven: LootEntry[] = [
+      { itemId: 'a', chance: 0.1, rollGroup: 'g' },
+      { itemId: 'b', chance: 0.3, rollGroup: 'g' },
+      { itemId: 'c', chance: 0.6, rollGroup: 'g' },
+    ];
+    const kept = usableRollGroup(uneven, (id) => id !== 'c');
     expect(kept.map((e) => e.itemId)).toEqual(['a', 'b']);
-    expect(kept.map((e) => e.chance)).toEqual([0.5, 0.5]);
+    // 1:3 stays 1:3 (an even split would read 0.5 / 0.5).
+    expect(kept[0].chance).toBeCloseTo(0.25, 12);
+    expect(kept[1].chance).toBeCloseTo(0.75, 12);
     // The guaranteed slot stays guaranteed: the top of the roll range still pays.
-    expect(pickRollGroupWinner(0.999999, kept, new Set())?.itemId).toBe('b');
+    expect(pickRollGroupWinner(1 - Number.EPSILON, kept, new Set())?.itemId).toBe('b');
   });
 
   it('keeps a partial group partial (the nothing share is preserved)', () => {
@@ -161,22 +181,78 @@ describe('class-locked soulbound drops: the live Crucible tables', () => {
     expect(sigils.filter((id) => id.endsWith('_chest'))).toHaveLength(60);
   });
 
-  it('a full-coverage raid rolls on the authored weights, unchanged', () => {
-    const everyone: PlayerClass[] = ['warrior', 'paladin', 'shaman'];
-    const sigils = sigilsFromKills(VARKHUL, everyone, false, 300);
-    expect(new Set(sigils.map(sigilFamily))).toEqual(new Set(['anvil', 'ember', 'tempest']));
+  it('a raid covering every sigil family rolls exactly like a full nine-class raid', () => {
+    // Nothing is removed, so the group keeps its authored weights: every kill
+    // pays the same items, seed for seed.
+    const allNine: PlayerClass[] = [
+      'warrior',
+      'paladin',
+      'hunter',
+      'rogue',
+      'priest',
+      'shaman',
+      'mage',
+      'warlock',
+      'druid',
+    ];
+    for (const heroic of [false, true]) {
+      const covering = sigilsFromKills(VARKHUL, ['warrior', 'paladin', 'shaman'], heroic, 150);
+      expect(covering).toHaveLength(heroic ? 300 : 150);
+      expect(covering).toEqual(sigilsFromKills(VARKHUL, allNine, heroic, 150));
+      expect(new Set(covering.map(sigilFamily))).toEqual(new Set(['anvil', 'ember', 'tempest']));
+    }
+  });
+});
+
+describe('class-locked soulbound drops: mocked tables (every arm)', () => {
+  function rollMocked(classes: PlayerClass[], heroic: boolean) {
+    const { sim, metas } = raid(classes);
+    sim.rng = new Rng(77);
+    const draws = vi.spyOn(sim.ctx.rng, 'next');
+    const items = killOnce(sim, metas, VARKHUL, heroic);
+    const count = draws.mock.calls.length;
+    draws.mockRestore();
+    return { items, draws: count, nextDraw: sim.rng.next() };
+  }
+  const sigilsOf = (items: string[]) => items.filter((id) => id.startsWith('sigil_')).sort();
+
+  it('withholds a locked plain row and an all-locked group from the base table', () => {
+    vi.spyOn(MOBS[VARKHUL], 'loot', 'get').mockReturnValue(LOCKED_TABLE);
+    const priest = rollMocked(['priest'], false);
+    expect(sigilsOf(priest.items)).toEqual([]);
+    const warrior = rollMocked(['warrior'], false);
+    expect(sigilsOf(warrior.items)).toEqual(['sigil_anvil_helmet', 'sigil_anvil_legs']);
+    // Same draws in the selection pass whatever the class mix: the emptied
+    // group still draws its one next(), the locked row still draws its chance.
+    expect(priest.draws).toBe(warrior.draws);
+    expect(priest.nextDraw).toBe(warrior.nextDraw);
+    // The trailing unlocked row is decided on the same draw for both.
+    expect(priest.items.includes('lastflame_core')).toBe(warrior.items.includes('lastflame_core'));
   });
 
-  it('never changes the rng draw count: the class mix cannot shift later rolls', () => {
-    const nextDrawAfterKill = (classes: PlayerClass[]): number => {
-      const { sim, metas } = raid(classes);
-      sim.rng = new Rng(77);
-      const mob = createMob(-1, MOBS[VARKHUL], 20, { x: 0, y: 0, z: 0 });
-      rollLoot(sim.ctx, mob, metas[0], metas);
-      return sim.rng.next();
-    };
-    expect(nextDrawAfterKill(['priest'])).toBe(nextDrawAfterKill(['warrior']));
-    expect(nextDrawAfterKill(['warlock', 'hunter'])).toBe(nextDrawAfterKill(['druid']));
+  it('withholds the same arms from the heroic append', () => {
+    vi.spyOn(MOBS[VARKHUL], 'loot', 'get').mockReturnValue([]);
+    vi.spyOn(HEROIC_BOSS_LOOT, VARKHUL, 'get').mockReturnValue(
+      LOCKED_TABLE.map((entry) =>
+        entry.rollGroup ? { ...entry, rollGroup: 'locked_h_group' } : entry,
+      ),
+    );
+    const priest = rollMocked(['priest'], true);
+    expect(sigilsOf(priest.items)).toEqual([]);
+    const warrior = rollMocked(['warrior'], true);
+    expect(sigilsOf(warrior.items)).toEqual(['sigil_anvil_helmet', 'sigil_anvil_legs']);
+    expect(priest.draws).toBe(warrior.draws);
+    expect(priest.nextDraw).toBe(warrior.nextDraw);
+  });
+
+  it('reads the whole eligible set, not just the killer', () => {
+    vi.spyOn(MOBS[VARKHUL], 'loot', 'get').mockReturnValue(LOCKED_TABLE);
+    const { sim, metas } = raid(['priest', 'mage']);
+    sim.rng = new Rng(77);
+    expect(sigilsOf(killOnce(sim, metas, VARKHUL, false))).toEqual([
+      'sigil_anvil_helmet',
+      'sigil_anvil_legs',
+    ]);
   });
 });
 
@@ -191,14 +267,24 @@ describe('class-locked soulbound drops: world boss personal loot', () => {
       return meta;
     });
     const mob = createMob(sim.nextId++, MOBS.thunzharr_waking_peak, 20, { x: 0, y: 0, z: 0 });
+    // A locked plain row, then a half-and-half group whose first row is
+    // warrior-only (anvil) and second priest-usable (ember). Tools only, so
+    // no quality draws follow the selection.
     vi.spyOn(MOBS[mob.templateId], 'loot', 'get').mockReturnValue([
       { itemId: 'sigil_anvil_helmet', chance: 1 },
-      { itemId: 'sigil_anvil_legs', chance: 1, rollGroup: 'wb_gear' },
+      { itemId: 'sigil_anvil_legs', chance: 0.5, rollGroup: 'wb_gear' },
+      { itemId: 'sigil_ember_legs', chance: 0.5, rollGroup: 'wb_gear' },
     ]);
+    // Every draw lands at 0.25: inside the anvil half of the authored group.
+    const draws = vi.spyOn(sim.ctx.rng, 'next').mockReturnValue(0.25);
     rollWorldBossLoot(sim.ctx, mob, metas);
     const byOwner = (pid: number) =>
       (mob.loot?.items ?? []).filter((s) => s.personalFor?.includes(pid)).map((s) => s.itemId);
     expect(byOwner(a).sort()).toEqual(['sigil_anvil_helmet', 'sigil_anvil_legs']);
-    expect(byOwner(b)).toEqual([]);
+    // The priest rolled too (positive control): the group reweights onto the
+    // one row a priest can use, so the same 0.25 pays Ember instead of nothing.
+    expect(byOwner(b)).toEqual(['sigil_ember_legs']);
+    // One chance plus one group draw per contributor, gated or not.
+    expect(draws).toHaveBeenCalledTimes(4);
   });
 });

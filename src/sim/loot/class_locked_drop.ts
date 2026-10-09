@@ -13,8 +13,16 @@
 // Items that are only one of soulbound or class-restricted are untouched.
 //
 // Shared by rollLoot and rollWorldBossLoot. Pure and draws NO rng: callers
-// keep their own draw counts, so a group still draws exactly one rng.next()
+// keep their own table draws, so a group still draws exactly one rng.next()
 // and a plain row still draws its chance, whatever the party's classes are.
+// A withheld GEAR copy never reaches the later quality roll, so it skips that
+// copy's tier draw; the live locked drops (sigils) are not gear.
+//
+// Authoring notes for the reweight: a row with no itemId (an explicit
+// "nothing" row) is kept and scaled like any other, unlike the implicit
+// nothing share of a group summing below 1, which is preserved; and a group
+// mixing locked and unlocked rows raises the unlocked rows too. Live groups
+// are all-locked (the sigil partitions) or all-unlocked.
 
 import { ITEMS } from '../data';
 import type { LootEntry, PlayerClass } from '../types';
