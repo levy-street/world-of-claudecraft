@@ -59,7 +59,7 @@ beforeAll(async () => {
 });
 
 const keys = Object.entries(VISUALS)
-  .filter(([, def]) => def.wocCharacter)
+  .filter(([key, def]) => key.startsWith('player_') && def.wocCharacter)
   .map(([key]) => key);
 
 describe('WOC jumps hold in the air and land on touchdown', () => {

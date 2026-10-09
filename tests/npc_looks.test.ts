@@ -13,6 +13,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { glbJsonChunk } from '../scripts/assets/lib/glb_texture_compression_core.mjs';
 import {
   characterPreloadUrls,
+  mobVisualKey,
   NPC_PROP_ATTACH,
   npcHeldProps,
   VISUALS,
@@ -44,7 +45,8 @@ import {
 } from '../src/render/characters/woc_head_catalog';
 import { wocWornHidesHair } from '../src/render/characters/woc_head_look_core';
 import { WOC_BODY_CLASSES, wocDefaultWorn } from '../src/render/characters/woc_parts_core';
-import { ESCORTS, NPCS } from '../src/sim/data';
+import { caravanDriverLookId } from '../src/render/world_quest_caravan_driver';
+import { ESCORTS, MOBS, NPCS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 
@@ -58,6 +60,32 @@ const MUSTER_MOB_LOOKS = [
   'guardian_muster_standard_spear',
   'guardian_muster_standard_sword',
 ] as const;
+/** The humanoid enemies (and the two delve companions) that left the KayKit chibi
+ *  bodies, each on the class body its roster row names (npc_looks.ts MOB_LOOK_IDS). */
+const ENEMY_BODIES: Record<string, string> = {
+  vale_bandit: 'player_rogue',
+  mogger_lackey: 'player_warrior',
+  mogger: 'player_warrior',
+  gorrak: 'player_warrior',
+  gravecaller_cultist: 'player_warlock',
+  gravecaller_summoner: 'player_warlock_female',
+  gravecaller_mender: 'player_priest',
+  sister_nhalia: 'player_priest_female',
+  nhalia_mourner: 'player_priest_female',
+  deacon_voss: 'player_priest',
+  wyrmcult_zealot: 'player_rogue',
+  wyrmcult_necromancer: 'player_warlock',
+  threnos_first_voice: 'player_warlock',
+  reliquary_gravecall_acolyte: 'player_warlock',
+  drowned_cantor: 'player_priest',
+  sister_nhalia_drowned_canticle: 'player_priest_female',
+  edda_reedhand: 'player_druid_female',
+  acolyte_tessa: 'player_priest_female',
+  rift_pact_acolyte: 'player_warlock_female',
+  crypt_crow_caller: 'player_rogue',
+  hedge_knight: 'player_paladin',
+  the_wreck_warden: 'player_warrior',
+};
 const roster = Object.entries(NPC_LOOKS) as [string, NpcLookDef][];
 
 const SLOT_FIELD: Record<WocHeadSlot, keyof NpcLookDef['app']> = {
@@ -152,9 +180,12 @@ describe('npc looks roster', () => {
       'fisher_bram',
       'gravedigger_mosley',
     ]);
-    // the mob ids that wear a look are exactly those and the Mirefen muster's soldiers
-    // (pinned in the next case): none missed, none extra
-    expect([...MOB_LOOK_IDS].sort()).toEqual([...escortees, ...MUSTER_MOB_LOOKS].sort());
+    // the mob ids that wear a look are exactly those, the Mirefen muster's soldiers
+    // (pinned in the case above) and the humanoid enemies (the next case): none
+    // missed, none extra
+    expect([...MOB_LOOK_IDS].sort()).toEqual(
+      [...escortees, ...MUSTER_MOB_LOOKS, ...Object.keys(ENEMY_BODIES)].sort(),
+    );
     const bodies: Record<string, string> = {
       apprentice_wren: 'player_mage_female',
       castaway_navigator: 'player_rogue',
@@ -177,6 +208,69 @@ describe('npc looks roster', () => {
     ]);
     for (const id of ['apprentice_wren', 'castaway_navigator', 'fisher_bram']) {
       expect(npcLookFor(id, 'mob')?.props, id).toBe('none');
+    }
+  });
+
+  it('draws every humanoid enemy on the class body its roster row names, armed', () => {
+    for (const [id, body] of Object.entries(ENEMY_BODIES)) {
+      // a real template the world spawns, a person (living or risen)
+      expect(MOBS[id], id).toBeDefined();
+      expect(['humanoid', 'undead'], id).toContain(MOBS[id].family);
+      const look = npcLookFor(id, 'mob');
+      expect(look, id).not.toBeNull();
+      const key = visualKeyFor({ kind: 'mob', templateId: id, family: MOBS[id].family } as never);
+      expect(key, id).toBe(body);
+      // the previews and the bestiary resolve the very body the world draws
+      expect(mobVisualKey(id), id).toBe(body);
+      expect(VISUALS[key].wocCharacter?.fit, id).toBe(look?.app.gender);
+      // an enemy fights with something in its hands
+      expect(look?.props, id).not.toBe('none');
+    }
+    // Sister Nhalia drowned is Sister Nhalia: one face, a drowned colour
+    const living = NPC_LOOKS.sister_nhalia.app;
+    const drowned = NPC_LOOKS.sister_nhalia_drowned_canticle.app;
+    for (const k of ['headHair', 'headBrows', 'headEyes', 'headNose', 'headMouth'] as const) {
+      expect(drowned[k], k).toBe(living[k]);
+    }
+    expect(drowned.headShape).toEqual(living.headShape);
+    expect(drowned.skinHue).not.toBe(living.skinHue);
+  });
+
+  // The guard for the whole move: a mob template the world spawns draws a WOC body, a
+  // creature rig, or a skeleton, never one of the retired KayKit player rigs
+  // (`chars/players/<rig>.glb`: the hooded outlaw, the robed caster, the barbarian, the
+  // knight, the druid) a person used to be drawn on.
+  it('draws no mob on a retired KayKit player rig', () => {
+    const kaykit = Object.keys(MOBS).filter((id) =>
+      /chars\/players\/[^/]+\.glb$/.test(VISUALS[mobVisualKey(id)]?.url ?? ''),
+    );
+    expect(kaykit).toEqual([]);
+  });
+
+  // The world-quest caravans' drivers ride the wagon (world_quest_caravan_driver.ts) and
+  // are no entity, so they are asked for by row id, as the NPC each row describes.
+  it('seats a person with a face of their own on every caravan', () => {
+    const caravans = Object.values(ESCORTS)
+      .filter((def) => def.worldQuestId !== undefined)
+      .map((def) => def.npcMobId)
+      .sort();
+    expect(caravans).toEqual([
+      'eastbrook_freight_caravan',
+      'frostveil_supply_caravan',
+      'willowfen_remedy_caravan',
+    ]);
+    const bodies: Record<string, string> = {
+      eastbrook_freight_caravan: 'player_rogue',
+      frostveil_supply_caravan: 'player_hunter',
+      willowfen_remedy_caravan: 'player_mage_female',
+    };
+    for (const id of caravans) {
+      const look = npcLookFor(caravanDriverLookId(id));
+      expect(look, id).not.toBeNull();
+      expect(look?.props, id).toBe('none');
+      expect(visualKeyFor(npc(caravanDriverLookId(id))), id).toBe(bodies[id]);
+      // the wagon is the mob: the driver's row never reaches a mob view
+      expect(npcLookFor(id, 'mob'), id).toBeNull();
     }
   });
 
@@ -412,6 +506,13 @@ describe('npc held props', () => {
         { url: `${W}/shield_rare_b_ember.glb`, bone: 'handslot.l' },
       ],
       mallet: [{ url: `${W}/muster_mallet.glb`, bone: 'handslot.r' }],
+      daggers: [
+        { url: `${W}/dagger_starter.glb`, bone: 'handslot.r' },
+        { url: `${W}/dagger_starter.glb`, bone: 'handslot.l' },
+      ],
+      axe: [{ url: `${W}/axe_rare_a_ember.glb`, bone: 'handslot.r' }],
+      dark_staff: [{ url: `${W}/staff_rare_a_violet.glb`, bone: 'handslot.r' }],
+      wand: [{ url: `${W}/wand_rare_b_violet.glb`, bone: 'handslot.r' }],
     });
   });
 

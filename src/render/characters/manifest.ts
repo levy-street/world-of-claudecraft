@@ -6914,16 +6914,14 @@ export const VISUALS: Record<string, VisualDef> = {
 //    colour belongs to the player's skin/hair wheels, and a tint over the
 //    picked skin tone repaints exactly what the player chose.
 // ---------------------------------------------------------------------------
-// The retired fixed KayKit warrior rig (knight.glb), kept for two NON-player
+// The retired fixed KayKit warrior rig (knight.glb), kept for NON-player
 // consumers now that the playable warrior rides the WOC body:
 //  - the modular library's own `player_warrior_modular` def below: a class on
 //    a WOC body (WOC_BODY_CLASSES) never composes, so that def is unreachable
 //    for its own players, but the library's fallback key (MODULAR_WARRIOR_KEY)
 //    and the composed-body test bed still name it, and it must keep deriving
 //    from a Rig_Medium rig (the WOC clips would bind onto the library's bones
-//    by name against the wrong bind pose, and drag the WOC part manifest along);
-//  - the Nythraxis phase-2 court's vision of Captain Aldren (mob_vision_aldren),
-//    which borrowed the warrior's key and keeps the knight look it shipped with.
+//    by name against the wrong bind pose, and drag the WOC part manifest along).
 export const KAYKIT_KNIGHT_WARRIOR: VisualDef = swims({
   url: `${PLAYERS}/knight.glb`,
   // Every clip knight.glb ships is already wired somewhere in this block
@@ -7072,8 +7070,6 @@ export const KAYKIT_PALADIN: VisualDef = swims({
   weaponSlots: [0],
   offhandSlot: 1,
 });
-
-VISUALS.mob_vision_aldren = { ...KAYKIT_KNIGHT_WARRIOR, show: ['Knight_Helmet', 'Knight_Cape'] };
 
 // The KayKit class rigs as they shipped before the WOC bodies took the seven
 // remaining classes (2026-09-18 equipment sets): their donor clip GLBs and
@@ -7555,15 +7551,12 @@ for (const cls of ALL_CLASSES) {
 // glass copy of each class's own body, silvered and lit from within, a head
 // taller than the player it mirrors (the owner's look rides the template id,
 // `tideglass_reflection_<class>`, so no wire field is needed).
-// On the WOC character pack the class def is a WOC body; the Reflection keeps the class's
-// KayKit body it was authored and clip-mapped on (the `_modular` fallback's rule above),
-// fetched on demand like that fallback.
+// The copy is of the class's WOC body, the one its player wears, with that body's own
+// clip map and default kit; a mob hands it no look, so it wears the type's default face.
 for (const cls of ALL_CLASSES) {
-  const classDef = VISUALS[`player_${cls}`];
-  const base = classDef.wocCharacter ? (KAYKIT_BASELINES[cls] ?? KAYKIT_KNIGHT_WARRIOR) : classDef;
+  const base = VISUALS[`player_${cls}`];
   VISUALS[`temple_reflection_${cls}`] = {
     ...base,
-    ...(classDef.wocCharacter ? { lazyPreload: true } : {}),
     height: base.height * 1.15,
     // A tint multiplies, so near-white read as the plain class look: a cold
     // tideglass blue with a strong inner light makes the copy read as glass.
@@ -7634,6 +7627,15 @@ export const NPC_PROP_ATTACH: Readonly<Record<NpcPropSet, readonly AttachDef[]>>
     { url: `${WEAPONS}/shield_rare_b_ember.glb`, bone: 'handslot.l' },
   ],
   mallet: [{ url: `${WEAPONS}/muster_mallet.glb`, bone: 'handslot.r' }],
+  // The humanoid enemies' arms (npc_looks.ts, the enemy rows): the outlaws' paired
+  // starter daggers, the brutes' axe, and the shadow cults' violet staff and wand.
+  daggers: [
+    { url: `${WEAPONS}/dagger_starter.glb`, bone: 'handslot.r' },
+    { url: `${WEAPONS}/dagger_starter.glb`, bone: 'handslot.l' },
+  ],
+  axe: [{ url: `${WEAPONS}/axe_rare_a_ember.glb`, bone: 'handslot.r' }],
+  dark_staff: [{ url: `${WEAPONS}/staff_rare_a_violet.glb`, bone: 'handslot.r' }],
+  wand: [{ url: `${WEAPONS}/wand_rare_b_violet.glb`, bone: 'handslot.r' }],
 };
 
 // One layout object per prop set, minted once: a stable identity for every
@@ -7698,9 +7700,6 @@ const MOB_KEYS: Record<string, string> = {
   // Ambient Highwatch stable horse: the Valorsteed mount model (mob_stable_horse
   // above) so it renders as an animated horse, not a humanoid.
   stable_horse: 'mob_stable_horse',
-  // Dawnhold's garrison: the armored knight body (helmet, cape, sword), not
-  // the humanoid family's hooded outlaw fallback.
-  hedge_knight: 'npc_knight',
   // Protect Yumi objective cat: the dedicated Meshy familiar
   // (docs/prd/protect-yumi-assets.md item 1, delivered).
   yumi_cat: 'mob_yumi_cat',
@@ -7780,26 +7779,13 @@ const MOB_KEYS: Record<string, string> = {
   // The ogre family's quest boss gets his own body instead of the family's
   // mob_ogre fallback (visualKeyFor checks MOB_KEYS first).
   warlord_drogmar: 'mob_drogmar',
-  drowned_cantor: 'delve_mob_acolyte',
   deepfen_spearjaw: 'mob_spearjaw',
   choir_thrall: 'mob_choir_thrall',
   tolling_bell: 'mob_tolling_bell',
   reedbound_acolyte: 'mob_reedbound_acolyte',
-  edda_reedhand: 'npc_edda_reedhand',
-  // gravecaller cult + necromancers: dark-robed casters
-  gravecaller_cultist: 'mob_dark_caster',
-  gravecaller_summoner: 'mob_dark_caster',
-  // BOTH Nhalias: the zone 2 overworld rare elite keeps her original template
-  // id; the Drowned Litany boss is a separate renamed template.
-  sister_nhalia: 'mob_dark_caster',
-  sister_nhalia_drowned_canticle: 'mob_dark_caster',
-  deacon_voss: 'mob_dark_caster',
-  wyrmcult_necromancer: 'mob_dark_caster',
   vael_the_mistcaller: 'bastion_vael',
   vael_fog_shade: 'bastion_vael',
   grand_necromancer_velkhar: 'mob_dark_caster',
-  gorrak: 'mob_bruiser',
-  mogger: 'mob_bruiser',
   // undead variants by role
   boneclad_revenant: 'skel_warrior',
   marrowlord_varkas: 'skel_warrior',
@@ -7833,7 +7819,6 @@ const MOB_KEYS: Record<string, string> = {
   crypt_bone_minion: 'crypt_skel_minion',
   crypt_bone_brute: 'crypt_skel_brute',
   crypt_chapel_gargoyle: 'mob_crypt_gargoyle',
-  crypt_crow_caller: 'mob_crypt_crow_caller',
   crypt_carrion_crow: 'mob_crypt_crow',
   crypt_ossuary_drake: 'mob_crypt_drake',
   crypt_knellwyrm: 'mob_crypt_knellwyrm',
@@ -7877,7 +7862,6 @@ const MOB_KEYS: Record<string, string> = {
   // delve enemies
   reliquary_ledger_wraith: 'delve_skel_wraith',
   reliquary_funeral_ringer: 'delve_skel_ringer',
-  reliquary_gravecall_acolyte: 'delve_mob_acolyte',
   reliquary_saintless_effigy: 'delve_skel_effigy',
   deacon_varric: 'delve_skel_varric',
   fallen_captain_aldren: 'skel_warrior',
@@ -7890,8 +7874,8 @@ const MOB_KEYS: Record<string, string> = {
   // The Mirefen muster's Straw Foreman. Its soldiers wear WOC class bodies
   // (npc_looks.ts MOB_LOOK_IDS), so only the effigy keeps a mob visual here.
   muster_effigy: 'mob_muster_effigy',
-  // The playable warrior moved to the WOC body; the vision keeps its knight look.
-  vision_aldren_warrior: 'mob_vision_aldren',
+  // The court's three visions ride the WOC class bodies of the classes they were.
+  vision_aldren_warrior: 'player_warrior',
   vision_malric_mage: 'player_mage',
   vision_deathstalker_voss: 'player_rogue',
   // the Veiled Hollow: stags use the real stag rig instead of the beast-family
@@ -7944,12 +7928,9 @@ const MOB_KEYS: Record<string, string> = {
   the_topiary_bull: 'mob_bull',
   moor_ram: 'mob_alpaca',
   shoal_scuttler: 'mob_crab',
-  // The Wreck Warden walks as Mogger's hulking bruiser body, not a skeleton.
-  the_wreck_warden: 'mob_bruiser',
-  // The Infernal Citadel: the pact cult reads as robed casters, not the `undead`
-  // family's default skeleton minion. Its demons keep the family fallback
-  // (mob_demonalt), re-tinted deep red by the templates.
-  rift_pact_acolyte: 'mob_dark_caster',
+  // The Infernal Citadel: the pact cult's acolytes wear WOC looks (npc_looks.ts
+  // MOB_LOOK_IDS); its demons keep the family fallback (mob_demonalt), re-tinted
+  // deep red by the templates.
   rift_boss_ritualist: 'rift_ritualist',
   rift_boss_tide: 'mob_hoard_abyssal_maw',
   rift_boss_frost: 'mob_hoard_hoarfrost_warden',
@@ -7974,7 +7955,9 @@ const MOB_KEYS: Record<string, string> = {
 
 const FAMILY_KEYS: Record<string, string> = {
   beast: 'mob_wolf',
-  humanoid: 'mob_bandit',
+  // a humanoid with no look of its own (npc_looks.ts MOB_LOOK_IDS) draws as a
+  // person too: the rogue's WOC body, never the KayKit outlaw
+  humanoid: 'player_rogue',
   mudfin: 'mob_murloc',
   spider: 'mob_spider',
   burrower: 'mob_kobold',

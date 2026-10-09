@@ -5,6 +5,7 @@
 // face, haircut and kit can be reviewed against the NPC's role.
 //
 //   node scripts/npc_looks_shot.mjs [--only id1,id2] [--url http://localhost:5173]
+//   node scripts/npc_looks_shot.mjs --mob --only vale_bandit,mogger
 //
 // Needs `npm run dev` (pass --url when the worktree's Vite picked another
 // port). Writes PNGs to tmp/npc_looks/.
@@ -28,6 +29,12 @@ const ONLY = argOf('--only')?.split(',').filter(Boolean) ?? null;
 // --town id1,id2: instead of the stage catalog, visit each named NPC at its
 // real post and take one wide ensemble shot there (hub context check).
 const TOWN = argOf('--town')?.split(',').filter(Boolean) ?? null;
+// --mob (with --only <mob template ids>): stage a placed MOB instead of the NPC
+// mannequin, held on the stage and retagged per target, so each shot is the body the
+// world draws for that mob template on this checkout (the base checkout of a PR
+// comparison draws whatever rig it gave the mob).
+const MOB = args.includes('--mob');
+if (MOB && !ONLY) throw new Error('--mob needs --only <mob template ids>');
 
 fs.mkdirSync('tmp/npc_looks', { recursive: true });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -44,8 +51,15 @@ const tsxJson = (source) =>
 // list falls back to the sim's NPC names alone and shoots the same subjects
 // wearing whatever rig that checkout gives them.
 let roster;
-try {
+if (MOB) {
   roster = tsxJson(`
+import { MOBS } from './src/sim/data';
+const ids = ${JSON.stringify(ONLY)};
+console.log(JSON.stringify(ids.map((id) => ({ id, name: MOBS[id]?.name ?? id, title: '' }))));
+`);
+} else {
+  try {
+    roster = tsxJson(`
 import { NPC_LOOKS } from './src/render/characters/npc_looks';
 import { NPCS } from './src/sim/data';
 const rows = Object.keys(NPC_LOOKS).map((id) => ({
@@ -55,10 +69,10 @@ const rows = Object.keys(NPC_LOOKS).map((id) => ({
 }));
 console.log(JSON.stringify(rows));
 `);
-} catch (err) {
-  if (!ONLY) throw err;
-  console.log('[npc-looks] no roster module here (base checkout?); using --only ids');
-  roster = tsxJson(`
+  } catch (err) {
+    if (!ONLY) throw err;
+    console.log('[npc-looks] no roster module here (base checkout?); using --only ids');
+    roster = tsxJson(`
 import { NPCS } from './src/sim/data';
 const ids = ${JSON.stringify(ONLY)};
 console.log(JSON.stringify(ids.map((id) => ({
@@ -67,6 +81,7 @@ console.log(JSON.stringify(ids.map((id) => ({
   title: NPCS[id]?.title ?? '',
 }))));
 `);
+  }
 }
 
 // --town visits placed NPCs by templateId and never reads the roster, so it
@@ -118,12 +133,14 @@ await sleep(300);
 // on quiet flat grass away from towns and the Sowfield (the Vale Cup runs
 // there on a schedule and floods the frame with actors and a betting banner).
 // The spot is probed for flatness so the subject and dolly stand level.
-const stage = await page.evaluate(() => {
+const stage = await page.evaluate((mob) => {
   const g = window.__game;
   const sim = g.world;
-  const mannequin = [...sim.entities.values()].find(
-    (e) => e.kind === 'npc' && e.templateId === 'fisherman_brandt',
-  );
+  const mannequin = mob
+    ? [...sim.entities.values()].find((e) => e.kind === 'mob' && e.hp > 0)
+    : [...sim.entities.values()].find(
+        (e) => e.kind === 'npc' && e.templateId === 'fisherman_brandt',
+      );
   if (!mannequin) return null;
   // Solved offline against the fixed offline seed (20061): dead flat, dry,
   // 35yd+ from every zone-1 camp, NPC post, the town and the Sowfield.
@@ -145,8 +162,26 @@ const stage = await page.evaluate(() => {
   g.input.camPitch = 0.12;
   g.input.camDist = 6;
   g.input.clickMoveTarget = null;
+  if (mob) {
+    // A mob walks, turns and fights on its own: hold it on its mark, facing the
+    // camera at full health, every frame the page draws.
+    const mark = { ...mannequin.pos };
+    const facing = mannequin.facing;
+    const hold = () => {
+      const e = sim.entities.get(mannequin.id);
+      if (e) {
+        e.pos = { ...mark };
+        e.prevPos = { ...mark };
+        e.facing = facing;
+        e.prevFacing = facing;
+        if (e.maxHp) e.hp = e.maxHp;
+      }
+      requestAnimationFrame(hold);
+    };
+    hold();
+  }
   return { stageId: mannequin.id };
-}, undefined);
+}, MOB);
 if (!stage) throw new Error('stage NPCs not found');
 
 // Force frames so the teleport, camera and any rebuilds settle.
@@ -223,11 +258,16 @@ if (TOWN) {
 let failures = 0;
 for (const t of targets) {
   await page.evaluate(
-    (stageId, id, name) => {
+    (stageId, id, name, mob) => {
       const g = window.__game;
       const e = g.world.entities.get(stageId);
       e.templateId = id;
       e.name = name;
+      if (mob) {
+        // the template's own size, and no aggro: the stage mob stands for its portrait
+        e.scale = g.MOBS[id]?.scale ?? 1;
+        if (g.MOBS[id]) g.MOBS[id].aggroRadius = 0;
+      }
       // The graveyard angel's view is hidden from the living: only a ghost
       // sees her, so her portrait is taken through a spirit's eyes.
       g.world.entities.get(g.world.playerId).ghost = id === 'spirit_healer';
@@ -236,7 +276,7 @@ for (const t of targets) {
       // respawn logic may drift some back over a long run).
       const s = e.pos;
       for (const other of g.world.entities.values()) {
-        if (other.kind !== 'mob') continue;
+        if (other.kind !== 'mob' || other.id === stageId) continue;
         if (Math.hypot(other.pos.x - s.x, other.pos.z - s.z) > 60) continue;
         other.pos = { x: other.pos.x + 600, y: other.pos.y, z: other.pos.z + 600 };
         other.prevPos = { ...other.pos };
@@ -250,6 +290,7 @@ for (const t of targets) {
     stage.stageId,
     t.id,
     t.name,
+    MOB,
   );
   await settle(3);
   // Full body. The renderer re-asserts the self rig every frame via

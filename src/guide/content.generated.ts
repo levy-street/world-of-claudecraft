@@ -3077,10 +3077,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 5,
         "rare": false,
         "templateId": "vale_bandit",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "tintStrength": 0.3,
-        "still": "/guide-stills/mob_bandit__6b3a32__s30.webp"
+        "model": "player_rogue",
+        "still": "/guide-stills/player_rogue.webp"
       },
       {
         "name": "Gravecaller Cultist",
@@ -3088,10 +3086,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 12,
         "rare": false,
         "templateId": "gravecaller_cultist",
-        "model": "mob_dark_caster",
-        "tint": "#6c3483",
-        "tintStrength": 0.5,
-        "still": "/guide-stills/mob_dark_caster__6c3483__s50.webp"
+        "model": "player_warlock",
+        "still": "/guide-stills/player_warlock.webp"
       },
       {
         "name": "Gravecaller Mender",
@@ -3099,10 +3095,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 12,
         "rare": false,
         "templateId": "gravecaller_mender",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "tintStrength": 0.3,
-        "still": "/guide-stills/mob_bandit__6b3a32__s30.webp"
+        "model": "player_priest",
+        "still": "/guide-stills/player_priest.webp"
       },
       {
         "name": "Gravecaller Summoner",
@@ -3110,10 +3104,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 12,
         "rare": false,
         "templateId": "gravecaller_summoner",
-        "model": "mob_dark_caster",
-        "tint": "#884ea0",
-        "tintStrength": 0.5,
-        "still": "/guide-stills/mob_dark_caster__884ea0__s50.webp"
+        "model": "player_warlock_female",
+        "still": "/guide-stills/player_warlock_female.webp"
       },
       {
         "name": "Broodsworn Zealot",
@@ -3121,10 +3113,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 19,
         "rare": false,
         "templateId": "wyrmcult_zealot",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "tintStrength": 0.3,
-        "still": "/guide-stills/mob_bandit__6b3a32__s30.webp"
+        "model": "player_rogue",
+        "still": "/guide-stills/player_rogue.webp"
       },
       {
         "name": "Broodsworn Necromancer",
@@ -3132,10 +3122,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 19,
         "rare": false,
         "templateId": "wyrmcult_necromancer",
-        "model": "mob_dark_caster",
-        "tint": "#533566",
-        "tintStrength": 0.5,
-        "still": "/guide-stills/mob_dark_caster__533566__s50.webp"
+        "model": "player_warlock",
+        "still": "/guide-stills/player_warlock.webp"
       },
       {
         "name": "Dawnhold Knight",
@@ -3143,8 +3131,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 20,
         "rare": false,
         "templateId": "hedge_knight",
-        "model": "npc_knight",
-        "still": "/guide-stills/npc_knight.webp"
+        "model": "player_paladin",
+        "still": "/guide-stills/player_paladin.webp"
       }
     ]
   },
@@ -22079,22 +22067,6 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "hover": -0.2,
     "tintStrength": 0.12
   },
-  "mob_bandit": {
-    "url": "models/chars/players/rogue_hooded.glb",
-    "idle": "Idle",
-    "height": 2.6,
-    "attach": [
-      {
-        "url": "models/weapons/dagger.glb",
-        "bone": "handslot.r"
-      },
-      {
-        "url": "models/weapons/dagger.glb",
-        "bone": "handslot.l"
-      }
-    ],
-    "tintStrength": 0.3
-  },
   "skel_minion": {
     "url": "models/chars/enemies/skeleton_minion.glb",
     "idle": "Idle_Combat",
@@ -22118,20 +22090,27 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "height": 2.9,
     "tintStrength": 0.04
   },
-  "mob_dark_caster": {
-    "url": "models/chars/players/mage.glb",
+  "player_warlock_female": {
+    "url": "models/chars/players/woc/base_female.glb",
     "idle": "Idle",
-    "height": 2.6,
-    "show": [
-      "Mage_Hat"
-    ],
+    "height": 2.8600000000000003,
     "attach": [
       {
-        "url": "models/weapons/staff.glb",
+        "url": "models/weapons/wand.glb",
         "bone": "handslot.r"
+      },
+      {
+        "url": "models/weapons/spellbook_starter.glb",
+        "bone": "handslot.l",
+        "rotationY": 3.141592653589793
       }
     ],
-    "tintStrength": 0.5
+    "animUrls": [
+      "models/chars/players/woc/anims_female.glb"
+    ],
+    "armor": [
+      "models/chars/players/woc/armor/female_warlock_medium.glb"
+    ]
   },
   "mob_kobold": {
     "url": "models/creatures/goblin.glb",
@@ -22264,21 +22243,6 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "idle": "Idle",
     "height": 1.7,
     "tintStrength": 0.35
-  },
-  "npc_knight": {
-    "url": "models/chars/players/knight.glb",
-    "idle": "Idle",
-    "height": 2.6,
-    "show": [
-      "Knight_Helmet",
-      "Knight_Cape"
-    ],
-    "attach": [
-      {
-        "url": "models/weapons/sword_1handed.glb",
-        "bone": "handslot.r"
-      }
-    ]
   },
   "mob_demonalt": {
     "url": "models/creatures/demonalt.glb",

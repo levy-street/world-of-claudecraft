@@ -664,9 +664,11 @@ Every drawable is a `VisualDef` in `VISUALS` (player classes, creature families,
 humanoid mobs, NPCs, forms). Dispatch precedence in `visualKeyFor`: players to
 `player_<class>` (or `player_mech` for the mech skin catalog); mobs to
 `MOB_KEYS[templateId]`, then `FAMILY_KEYS[MOBS[id].family]` (the family ids
-live in `manifest.ts`), falling back to `mob_bandit`, except the quest
-escortees, which the sim makes mobs and which take their authored look first
-(`MOB_LOOK_IDS`, the next paragraph); NPCs to the WOC def of
+live in `manifest.ts`; a humanoid falls to the rogue's WOC body), except the
+mobs that take their authored look first: the quest escortees, the Mirefen
+muster's soldiers and every humanoid enemy (`MOB_LOOK_IDS`, the next
+paragraph). No mob draws on a retired KayKit player rig (pinned in
+`tests/npc_looks.test.ts`); NPCs to the WOC def of
 their authored class and body type (`npcLookFor`, the next paragraph), and only
 an NPC with no authored look to its stock rig in `NPC_KEYS`. Forms
 (`form_sheep`/`form_bear`/`form_cat`/`form_travel`) are passed explicitly by the renderer;
@@ -707,10 +709,13 @@ and a pooled body finds the renderer's work queue by its gate. Authoring rules
 face, the eye controls carry character) are the header of `npc_looks.ts`;
 `tests/npc_looks.test.ts` pins the roster and `tests/npc_woc_body.test.ts` the
 body through the real factory.
-The four quest escortees wear a roster row too, although the sim makes them
-mobs so the escort driver can walk them: `MOB_LOOK_IDS` names them one by one,
-because one templateId can be an NPC and a mob at once (Sexton Marrow), and
-that mob keeps its mob body. A unit frame draws the same face the world does:
+The quest escortees wear a roster row too, although the sim makes them mobs so
+the escort driver can walk them, and so do the Mirefen muster's soldiers and
+the humanoid enemies (the outlaws, the cults, the knights, the drowned):
+`MOB_LOOK_IDS` names them one by one, because one templateId can be an NPC and
+a mob at once (Sexton Marrow), and that mob keeps its mob body. A body that is
+no entity at all (a caravan's seated driver) asks for its row by id through
+`createRosterLookVisual` (`index.ts`). A unit frame draws the same face the world does:
 `npcPortraitSourceFor` (`manifest.ts`) hands `src/ui/nonplayer_portrait_core.ts`
 the body key and the look's head, and the painter asks the live headshot lane
 for it (`portrait.ts` `visualPortraitDataUrl`, the capture a player's frame
