@@ -745,7 +745,9 @@ const allPreloadUrls = characterPreloadUrls(false);
 // woc_entry_preload.ts): the char-select preview builds CharacterVisual
 // DIRECTLY (not through the fail-soft factory), so a missing held-weapon GLB
 // there would throw.
-const STREAMED_URL_PREFIXES = ['models/creatures/', 'models/chars/enemies/'];
+// Buddy follower rigs use the same fail-soft creature view path and stream
+// after entry on the constrained iOS profile.
+const STREAMED_URL_PREFIXES = ['models/creatures/', 'models/chars/enemies/', 'models/buddies/'];
 // Armory weapon-SKIN models stay out of the gate too (64 of the 78 weapon
 // files), but remain on demand instead of joining the bulk post-entry stream.
 // They are cosmetic replacements for base weapons that always stay in the

@@ -1395,10 +1395,12 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Courier integration reseals only renderer provenance, preserving captured measurements.
+  // Re-minted after composing buddy rendering into the v0.45.0 integration.
+  // Existing captures and measurements remain unchanged.
   // Re-minted at the v0.45.0 integration (membership integration + the Mirefen world-boss
   // branch + the character pack + the five-dungeon rework; remint_polish_provenance.mjs
   // on the merged tree, no capture was retaken).
-  '32617ec290b8122f66e0b3f837edf93d4ba0f364aa2f747497e39b70938ded6b';
+  '40dd2a98a0991696e90cb6f102cbc073a5a0cc38cf37bb5ab1519526b49f9bf7';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1424,7 +1426,7 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted at the v0.45.0 integration (membership integration + the Mirefen world-boss
   // branch + the character pack + the five-dungeon rework; remint_polish_provenance.mjs
   // on the merged tree, no capture was retaken).
-  'e16c737bde31a5176946e7abd841603d31cc505498083d644e4db273fc579167';
+  '16d24d35e308ac6bc78c0b6ac73fe1e3e8bc725ca098f1b910af1847a67e8b7a';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2811,7 +2813,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // + the character pack + the five-dungeon rework): recomputed LAST again over the
       // re-swept evidence. No
       // capture was retaken.
-    ).toBe('42b69dc27f3a9f07a4799f15e46b6628fec3f11d3ac3f641c70793f8f3964d25');
+    ).toBe('06c9651b39dba0df948f0155f39d1b47ed8a7d4c20f5c4d8ef8b65424278714a');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

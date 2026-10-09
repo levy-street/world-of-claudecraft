@@ -18,6 +18,7 @@ import {
   FURY_NPC_ID,
   FURY_STOCK,
   HONOR_QUARTERMASTER_STOCK,
+  HONOR_VENDOR_STOCK,
   WARFARE_TRINKET_STOCK,
 } from '../src/sim/content/pvp_honor';
 import { ZONE3_NPCS, ZONE3_ZONE } from '../src/sim/content/zone3';
@@ -36,6 +37,14 @@ import { worldEntityText } from '../src/ui/world_entity_i18n';
 
 const SEED = 42;
 const KOLE = ZONE3_NPCS[WARFARE_QUARTERMASTER_NPC_ID];
+/** Both honor vendors carry Horse alongside their mirrored WARFARE gear. */
+const HONOR_COMPANION_ITEM_ID = 'whistle_horse';
+
+/** A vendor list with the cosmetic rows dropped, so the two placements' GEAR
+ *  can be compared for drift without the companion masking a real fork. */
+function gearRows(items: readonly string[] | undefined): string[] {
+  return [...(items ?? [])].filter((id) => ITEMS[id]?.kind !== 'buddy');
+}
 
 describe('Warmarshal Draven Kole: the definition', () => {
   it('is a Highwatch NPC with the authored name, title and rank', () => {
@@ -60,8 +69,8 @@ describe('Warmarshal Draven Kole: the definition', () => {
     // One list, two placements. FURY keeps the identical stock in Eastbrook, so
     // a divergence here means someone forked the item table.
     // Both sell the one canonical honor stock: the entry tier then Warfare Season 2.
-    expect(KOLE.vendorItems).toEqual([...HONOR_QUARTERMASTER_STOCK]);
-    expect(NPCS[FURY_NPC_ID].vendorItems).toEqual([...HONOR_QUARTERMASTER_STOCK]);
+    expect(KOLE.vendorItems).toEqual([...HONOR_VENDOR_STOCK]);
+    expect(NPCS[FURY_NPC_ID].vendorItems).toEqual([...HONOR_VENDOR_STOCK]);
     expect(HONOR_QUARTERMASTER_STOCK.slice(0, FURY_STOCK.length)).toEqual([...FURY_STOCK]);
     expect(
       HONOR_QUARTERMASTER_STOCK.slice(
@@ -69,7 +78,12 @@ describe('Warmarshal Draven Kole: the definition', () => {
         FURY_STOCK.length + WARFARE_TRINKET_STOCK.length,
       ),
     ).toEqual([...WARFARE_TRINKET_STOCK]);
+    expect(HONOR_VENDOR_STOCK).toEqual([...HONOR_QUARTERMASTER_STOCK, HONOR_COMPANION_ITEM_ID]);
+    expect(gearRows(KOLE.vendorItems)).toEqual([...HONOR_QUARTERMASTER_STOCK]);
     expect(FURY_STOCK.length).toBeGreaterThan(0);
+    // The companion is not gear.
+    expect(ITEMS[HONOR_COMPANION_ITEM_ID].kind).toBe('buddy');
+    expect(FURY_STOCK).not.toContain(HONOR_COMPANION_ITEM_ID);
   });
 
   it('carries the warfareVendor flag on BOTH placements, so the shop is not Highwatch-only', () => {
@@ -82,7 +96,7 @@ describe('Warmarshal Draven Kole: the definition', () => {
     expect(FURY_NPC.warfareVendor, 'FURY, the Eastbrook mirror').toBe(true);
     // And the two really do sell the same list, not a copy that can drift.
     expect(KOLE.vendorItems).toEqual(FURY_NPC.vendorItems);
-    expect(KOLE.vendorItems).toEqual([...HONOR_QUARTERMASTER_STOCK]);
+    expect(KOLE.vendorItems).toEqual([...HONOR_VENDOR_STOCK]);
   });
 
   it('is an honor vendor purely by virtue of its priced stock, not by a flag', () => {
@@ -158,7 +172,7 @@ describe('Warmarshal Draven Kole: the world build is untouched', () => {
     expect(kole.spawnPos.x).toBe(KOLE.pos.x);
     expect(kole.spawnPos.z).toBe(KOLE.pos.z);
     expect(kole.facing).toBe(KOLE.facing);
-    expect(kole.vendorItems).toEqual([...HONOR_QUARTERMASTER_STOCK]);
+    expect(kole.vendorItems).toEqual([...HONOR_VENDOR_STOCK]);
   });
 
   it('is idempotent, so a second spawn call cannot mint a duplicate', () => {

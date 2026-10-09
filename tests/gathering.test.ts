@@ -383,7 +383,8 @@ describe('isHarvestableCorpse', () => {
     // The Mirefen world-boss branch adds six untagged templates (the boss, three muster
     // soldiers, the drillmaster and the Straw Foreman effigy): 222.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 293.
-    expect(untagged).toHaveLength(293);
+    // The three retained cosmetic companions add untagged templates.
+    expect(untagged).toHaveLength(296);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

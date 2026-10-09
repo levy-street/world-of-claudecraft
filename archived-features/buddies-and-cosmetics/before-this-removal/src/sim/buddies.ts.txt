@@ -1,0 +1,375 @@
+// Cosmetic buddies: the per-character COLLECTION plus summon/dismiss and the
+// cosmetic wardrobe. A sibling sim system behind the SimContext seam
+// (module-first; sim.ts keeps thin delegates).
+//
+// Ownership model (owner plan, 2026-09-09): a buddy ATTACHES TO THE CHARACTER.
+// It is a flag in PlayerMeta.buddies.owned, persisted with the character
+// (character_state.ts `buddies`), never an item in a bag. Nothing about a
+// companion trades, mails, lists or sells; the whistle items that remain
+// (ItemDef kind 'buddy') are soulbound grant TOKENS consumed on use, the
+// channel a vendor, a letter or an admin grant uses to hand one over.
+//
+// Two ways in (src/sim/content/buddy_sources.ts): a per-player boss roll
+// that lands as a PENDING companion and reveals itself on the zone-out
+// (src/sim/buddy_drops.ts), or a Book of Deeds grant. Cosmetics are a second
+// per-character set (`cosmetics`), one of which can be worn per buddy
+// (`equipped`); the worn look is a tint the follower entity carries as its
+// color (content/buddy_cosmetics.ts).
+//
+// A buddy IS a real server-simulated owned mob entity (content/buddy_mobs.ts's
+// MobTemplate, heeled by pet/buddy_ai.ts's updateBuddyMob using the same
+// A*-pathed locomotion as a hunter pet); every summon/dismiss below spawns or
+// despawns that entity alongside the Entity.buddyKey flip. buddyKey ('' =
+// none) stays the source of truth for "which buddy is out" (the wire mirrors
+// it like `skin`/`mountKey`); the entity is its positioned, replicated body.
+//
+// `src/sim`-pure and rng-free.
+
+import { BUDDY_KEYS, type BuddyKey, buddyDef, normalizeBuddyKey } from './content/buddies';
+import { buddyCosmeticDef } from './content/buddy_cosmetics';
+import { ITEMS } from './data';
+import { despawnBuddyEntity, spawnBuddyEntity } from './pet/buddy_ai';
+import type { PlayerMeta } from './sim';
+import type { SimContext } from './sim_context';
+
+/** A companion won off a boss that has not shown itself yet: the player read
+ *  the presence line, the buddy reveals on the zone-out (instance) or once
+ *  the player walks BUDDY_WORLD_REVEAL_DISTANCE from the kill (world). */
+export interface PendingBuddy {
+  key: BuddyKey;
+  source: 'instance' | 'world';
+  /** Kill position, the anchor for the world-source distance test. */
+  x: number;
+  z: number;
+}
+
+export interface BuddyCollection {
+  owned: Set<BuddyKey>;
+  /** Unlocked cosmetic ids (content/buddy_cosmetics.ts). */
+  cosmetics: Set<string>;
+  /** The worn cosmetic per buddy; absent = the buddy's own look. */
+  equipped: Map<BuddyKey, string>;
+  pending: PendingBuddy[];
+  /** The companion the bare toggle keybind brings back out: the last one
+   *  summoned. '' until the first summon. */
+  last: BuddyKey | '';
+}
+
+/** The persisted shape (character_state.ts). Absent while the collection is
+ *  empty, so pre-buddy saves stay byte-equal. */
+export interface SavedBuddyCollection {
+  owned?: string[];
+  cosmetics?: string[];
+  equipped?: Record<string, string>;
+  pending?: { key: string; source: string; x?: number; z?: number }[];
+  last?: string;
+}
+
+export function freshBuddyCollection(): BuddyCollection {
+  return { owned: new Set(), cosmetics: new Set(), equipped: new Map(), pending: [], last: '' };
+}
+
+/** Restore a saved collection through the catalog: a key or cosmetic a
+ *  content change removed loads as absent rather than as a dangling id. */
+export function restoreBuddyCollection(saved: SavedBuddyCollection | undefined): BuddyCollection {
+  const out = freshBuddyCollection();
+  if (!saved) return out;
+  for (const key of saved.owned ?? []) {
+    const norm = normalizeBuddyKey(typeof key === 'string' ? key : '');
+    if (norm) out.owned.add(norm);
+  }
+  for (const id of saved.cosmetics ?? []) {
+    if (typeof id === 'string' && buddyCosmeticDef(id)) out.cosmetics.add(id);
+  }
+  for (const [key, id] of Object.entries(saved.equipped ?? {})) {
+    const norm = normalizeBuddyKey(key);
+    const def = typeof id === 'string' ? buddyCosmeticDef(id) : null;
+    // A worn look must be owned and must fit the buddy it is worn on.
+    if (norm && def && def.buddy === norm && out.cosmetics.has(def.id) && out.owned.has(norm))
+      out.equipped.set(norm, def.id);
+  }
+  for (const p of saved.pending ?? []) {
+    const norm = normalizeBuddyKey(typeof p?.key === 'string' ? p.key : '');
+    if (!norm || out.owned.has(norm)) continue;
+    if (out.pending.some((q) => q.key === norm)) continue;
+    out.pending.push({
+      key: norm,
+      source: p.source === 'world' ? 'world' : 'instance',
+      x: typeof p.x === 'number' && Number.isFinite(p.x) ? p.x : 0,
+      z: typeof p.z === 'number' && Number.isFinite(p.z) ? p.z : 0,
+    });
+  }
+  const last = normalizeBuddyKey(saved.last);
+  out.last = last && out.owned.has(last) ? last : '';
+  return out;
+}
+
+/** The save-side shape, or null while nothing is collected (zero-default
+ *  omission: the caller leaves the key out). */
+export function serializeBuddyCollection(c: BuddyCollection): SavedBuddyCollection | null {
+  if (
+    c.owned.size === 0 &&
+    c.cosmetics.size === 0 &&
+    c.equipped.size === 0 &&
+    c.pending.length === 0 &&
+    c.last === ''
+  )
+    return null;
+  return {
+    ...(c.owned.size > 0 ? { owned: BUDDY_KEYS.filter((k) => c.owned.has(k)) } : {}),
+    ...(c.cosmetics.size > 0 ? { cosmetics: [...c.cosmetics].sort() } : {}),
+    ...(c.equipped.size > 0 ? { equipped: Object.fromEntries(c.equipped) } : {}),
+    ...(c.pending.length > 0 ? { pending: c.pending.map((p) => ({ ...p })) } : {}),
+    ...(c.last !== '' ? { last: c.last } : {}),
+  };
+}
+
+// The whistle itemId per catalog buddy, derived once from the merged ITEMS
+// table (single source: the item record declares `buddy`, nothing re-lists
+// the map). Static content, so the lazy module-level cache is multi-Sim safe.
+let buddyItemIds: Map<string, string> | null = null;
+
+/** The grant-token item for `key` (null for an unknown key, or a catalog
+ *  buddy with no whistle). Used by the admin/mail/vendor channels and the
+ *  Hunting pane's vendor line, never by ownership. */
+export function buddyItemId(key: string): string | null {
+  if (!buddyDef(key)) return null;
+  if (!buddyItemIds) {
+    buddyItemIds = new Map();
+    for (const def of Object.values(ITEMS)) {
+      if (def.kind === 'buddy') buddyItemIds.set(def.buddy, def.id);
+    }
+  }
+  return buddyItemIds.get(key) ?? null;
+}
+
+/** Whether the player has collected the buddy. Unknown keys are never owned.
+ *  A fresh player owns nothing. */
+export function buddyOwned(meta: PlayerMeta, key: string): boolean {
+  if (!buddyDef(key)) return false;
+  return meta.buddies.owned.has(key as BuddyKey);
+}
+
+/** The owned subset of the catalog, in catalog order. */
+export function ownedBuddies(meta: PlayerMeta): BuddyKey[] {
+  return BUDDY_KEYS.filter((key) => meta.buddies.owned.has(key));
+}
+
+/** The unlocked cosmetic ids, in catalog-stable (sorted) order. */
+export function ownedBuddyCosmetics(meta: PlayerMeta): string[] {
+  return [...meta.buddies.cosmetics].sort();
+}
+
+/** The worn cosmetic per buddy as a plain record for the wire. */
+export function equippedBuddyCosmetics(meta: PlayerMeta): Record<string, string> {
+  return Object.fromEntries(meta.buddies.equipped);
+}
+
+/** The pending (won, unrevealed) companions, catalog order. */
+export function pendingBuddies(meta: PlayerMeta): BuddyKey[] {
+  return meta.buddies.pending.map((p) => p.key);
+}
+
+/** The color the follower entity wears: the equipped cosmetic's tint, else
+ *  null for the template's own color. */
+export function buddyWornTint(meta: PlayerMeta, key: BuddyKey): number | null {
+  const id = meta.buddies.equipped.get(key);
+  const def = id ? buddyCosmeticDef(id) : null;
+  return def ? def.tint : null;
+}
+
+function spawnFor(ctx: SimContext, meta: PlayerMeta, e: { id: number }, key: BuddyKey): void {
+  const owner = ctx.entities.get(e.id);
+  if (!owner) return;
+  owner.buddyKey = key;
+  meta.buddies.last = key;
+  spawnBuddyEntity(ctx, owner, key, buddyWornTint(meta, key));
+}
+
+/** Attach `key` to the character outright: owned, announced (buddyRevealed)
+ *  and summoned. Idempotent: an owned buddy is a no-op that returns false, so
+ *  a deed retro-grant on login or a duplicate token cannot re-announce. Any
+ *  pending entry for the same buddy is consumed by the grant. */
+export function grantBuddy(ctx: SimContext, pid: number, key: string): boolean {
+  const meta = ctx.players.get(pid);
+  const def = buddyDef(key);
+  if (!meta || !def) return false;
+  if (meta.buddies.owned.has(def.key)) return false;
+  meta.buddies.owned.add(def.key);
+  meta.buddies.pending = meta.buddies.pending.filter((p) => p.key !== def.key);
+  meta.wireRev++;
+  ctx.emit({ type: 'buddyRevealed', pid, key: def.key });
+  const e = ctx.entities.get(pid);
+  if (e && !e.dead) spawnFor(ctx, meta, e, def.key);
+  return true;
+}
+
+/** Record a boss-roll win as a pending companion and tell the player something
+ *  is watching them (buddyPresence). Owned or already-pending keys return
+ *  false: the presence line never repeats for a companion the player has. */
+export function attachPendingBuddy(
+  ctx: SimContext,
+  pid: number,
+  key: string,
+  source: PendingBuddy['source'],
+  at: { x: number; z: number },
+): boolean {
+  const meta = ctx.players.get(pid);
+  const def = buddyDef(key);
+  if (!meta || !def) return false;
+  if (meta.buddies.owned.has(def.key)) return false;
+  if (meta.buddies.pending.some((p) => p.key === def.key)) return false;
+  meta.buddies.pending.push({ key: def.key, source, x: at.x, z: at.z });
+  meta.wireRev++;
+  ctx.emit({ type: 'buddyPresence', pid, key: def.key });
+  return true;
+}
+
+/** Reveal every pending companion whose condition `ready` accepts: each one
+ *  becomes owned and announced; the LAST revealed is the one summoned (a
+ *  player who won two at once still has one follower out). */
+export function revealPendingBuddies(
+  ctx: SimContext,
+  pid: number,
+  ready: (p: PendingBuddy) => boolean = () => true,
+): BuddyKey[] {
+  const meta = ctx.players.get(pid);
+  if (!meta || meta.buddies.pending.length === 0) return [];
+  const revealed: BuddyKey[] = [];
+  const keep: PendingBuddy[] = [];
+  for (const p of meta.buddies.pending) {
+    if (!ready(p)) {
+      keep.push(p);
+      continue;
+    }
+    revealed.push(p.key);
+  }
+  if (revealed.length === 0) return [];
+  meta.buddies.pending = keep;
+  for (const key of revealed) grantBuddy(ctx, pid, key);
+  return revealed;
+}
+
+/** Summon a SPECIFIC owned buddy, or put it away when it is the one out.
+ *  Instant: no channel, no gate beyond ownership (re-checked server-side even
+ *  when a click proves it). Routed here from the Hunting pane command and
+ *  from the grant token's use. */
+export function summonBuddy(ctx: SimContext, pid: number, key: string): boolean {
+  const meta = ctx.players.get(pid);
+  const e = ctx.entities.get(pid);
+  if (!meta || !e) return false;
+  const def = buddyDef(key);
+  if (!def) return false;
+  if (e.buddyKey === def.key) {
+    e.buddyKey = '';
+    despawnBuddyEntity(ctx, pid);
+    return true;
+  }
+  if (!buddyOwned(meta, def.key)) {
+    ctx.error(pid, "You haven't collected that companion.");
+    return false;
+  }
+  spawnFor(ctx, meta, e, def.key);
+  return true;
+}
+
+/** Use a grant token (a whistle item): attach the companion and consume the
+ *  token. A token for a companion the player already has is REFUSED without
+ *  being consumed, so a duplicate stays a duplicate rather than vanishing. */
+export function useBuddyToken(ctx: SimContext, pid: number, itemId: string): boolean {
+  const meta = ctx.players.get(pid);
+  const item = ITEMS[itemId];
+  if (!meta || !item || item.kind !== 'buddy') return false;
+  const def = buddyDef(item.buddy);
+  if (!def) return false;
+  if (meta.buddies.owned.has(def.key)) {
+    ctx.error(pid, 'You already have that companion.');
+    return false;
+  }
+  ctx.removeItem(itemId, 1, pid);
+  return grantBuddy(ctx, pid, item.buddy);
+}
+
+/** The bare keybind/button toggle: dismiss the active buddy, or bring the last
+ *  summoned one back out when none is. */
+export function toggleBuddy(ctx: SimContext, pid: number): boolean {
+  const meta = ctx.players.get(pid);
+  const e = ctx.entities.get(pid);
+  if (!meta || !e) return false;
+  if (e.buddyKey) {
+    e.buddyKey = '';
+    despawnBuddyEntity(ctx, pid);
+    return true;
+  }
+  const last = meta.buddies.last;
+  if (!last || !meta.buddies.owned.has(last)) return false;
+  spawnFor(ctx, meta, e, last);
+  return true;
+}
+
+/** Unlock a cosmetic for the character (challenge, deed, token, or grant).
+ *  Idempotent: returns false when already owned so nothing re-announces. */
+export function grantBuddyCosmetic(ctx: SimContext, pid: number, cosmeticId: string): boolean {
+  const meta = ctx.players.get(pid);
+  const def = buddyCosmeticDef(cosmeticId);
+  if (!meta || !def) return false;
+  if (meta.buddies.cosmetics.has(def.id)) return false;
+  meta.buddies.cosmetics.add(def.id);
+  meta.wireRev++;
+  ctx.emit({ type: 'buddyCosmeticUnlocked', pid, cosmeticId: def.id });
+  return true;
+}
+
+/** Use a cosmetic token item: unlock and consume. Refused unconsumed when the
+ *  look is already unlocked, same rule as the buddy token. */
+export function useBuddyCosmeticToken(ctx: SimContext, pid: number, itemId: string): boolean {
+  const meta = ctx.players.get(pid);
+  const item = ITEMS[itemId];
+  if (!meta || !item || item.kind !== 'buddy_cosmetic' || !buddyCosmeticDef(item.cosmetic))
+    return false;
+  if (meta.buddies.cosmetics.has(item.cosmetic)) {
+    ctx.error(pid, 'You already have that look.');
+    return false;
+  }
+  ctx.removeItem(itemId, 1, pid);
+  return grantBuddyCosmetic(ctx, pid, item.cosmetic);
+}
+
+/** Wear `cosmeticId` on `key` (null = the buddy's own look). Silent no-op on
+ *  anything invalid: an unowned buddy, an unowned look, or a look authored
+ *  for another companion. A buddy that is out is re-spawned so its body picks
+ *  up the new dye (a fresh entity identity is how the wire re-sends color). */
+export function equipBuddyCosmetic(
+  ctx: SimContext,
+  pid: number,
+  key: string,
+  cosmeticId: string | null,
+): boolean {
+  const meta = ctx.players.get(pid);
+  const def = buddyDef(key);
+  if (!meta || !def || !meta.buddies.owned.has(def.key)) return false;
+  if (cosmeticId === null) {
+    if (!meta.buddies.equipped.has(def.key)) return false;
+    meta.buddies.equipped.delete(def.key);
+  } else {
+    const cos = buddyCosmeticDef(cosmeticId);
+    if (!cos || cos.buddy !== def.key || !meta.buddies.cosmetics.has(cos.id)) return false;
+    if (meta.buddies.equipped.get(def.key) === cos.id) return false;
+    meta.buddies.equipped.set(def.key, cos.id);
+  }
+  meta.wireRev++;
+  const e = ctx.entities.get(pid);
+  if (e && e.buddyKey === def.key) spawnFor(ctx, meta, e, def.key);
+  return true;
+}
+
+/** Enable/disable the autoloot errand for whatever buddy this player has out
+ *  (src/sim/pet/buddy_autoloot.ts does the work each tick). A PREFERENCE, not
+ *  a buddy command: it is settable with no buddy out and survives a
+ *  dismiss/re-summon. Session state, like buddyKey itself. */
+export function setBuddyAutoloot(ctx: SimContext, pid: number, enabled: boolean): boolean {
+  const e = ctx.entities.get(pid);
+  if (!e) return false;
+  e.buddyAutoloot = enabled;
+  return true;
+}

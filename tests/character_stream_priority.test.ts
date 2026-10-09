@@ -37,7 +37,9 @@ async function iosWorld() {
 }
 
 const isCreature = (url: string): boolean =>
-  url.includes('models/creatures/') || url.includes('models/chars/enemies/');
+  url.includes('models/creatures/') ||
+  url.includes('models/chars/enemies/') ||
+  url.includes('models/buddies/');
 
 let restore: (() => void) | null = null;
 
@@ -60,6 +62,7 @@ describe('the post-entry creature stream', () => {
     // a profile that streamed nothing would prove nothing
     expect(started).toBeGreaterThan(50);
     expect(stream).toHaveLength(started);
+    expect(stream.some((call) => call.url.includes('models/buddies/'))).toBe(true);
     for (const call of stream) {
       expect(isCreature(call.url), call.url).toBe(true);
       expect(call.priority, call.url).toBe('background');

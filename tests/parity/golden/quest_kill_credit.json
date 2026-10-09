@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "793701e3",
+      "state": "caf53a89",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -45,6 +45,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -173,7 +176,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "a9ddf68d",
+      "state": "1358aba7",
       "events": "340ae109",
       "rng": {
         "draws": 0,
@@ -202,6 +205,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -346,7 +352,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 1020,
-      "state": "1d54c20d",
+      "state": "40402f59",
       "events": "0afecc5f",
       "rng": {
         "draws": 40,
@@ -375,6 +381,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -550,7 +559,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 1020,
-      "state": "dc3a8391",
+      "state": "e722d0d3",
       "events": "ee143ce2",
       "rng": {
         "draws": 40,
@@ -579,6 +588,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 75,
@@ -751,7 +763,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1020,
-      "state": "99e17432",
+      "state": "1521f756",
       "events": "741638a5",
       "rng": {
         "draws": 40,
@@ -780,6 +792,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 75,

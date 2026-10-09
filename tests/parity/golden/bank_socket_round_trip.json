@@ -31,7 +31,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "4eac0381",
+      "state": "8aff373b",
       "events": "26d30607",
       "rng": {
         "draws": 0,
@@ -60,6 +60,9 @@
             "unlockedSockets": 2
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 500000,
@@ -202,7 +205,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "a2564f14",
+      "state": "64b61ac4",
       "events": "e606ba12",
       "rng": {
         "draws": 0,
@@ -231,6 +234,9 @@
             "unlockedSockets": 2
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 500000,
@@ -369,7 +375,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "8dbc0112",
+      "state": "19453a48",
       "events": "950c936a",
       "rng": {
         "draws": 0,
@@ -398,6 +404,9 @@
             "unlockedSockets": 2
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 500000,
@@ -536,7 +545,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "4eac0381",
+      "state": "8aff373b",
       "events": "84fcc959",
       "rng": {
         "draws": 0,
@@ -565,6 +574,9 @@
             "unlockedSockets": 2
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 500000,
@@ -707,7 +719,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "4eac0381",
+      "state": "8aff373b",
       "events": "6aabe59a",
       "rng": {
         "draws": 0,
@@ -736,6 +748,9 @@
             "unlockedSockets": 2
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 500000,
@@ -878,7 +893,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 1012,
-      "state": "ba23505f",
+      "state": "94b5c07d",
       "events": "532adf21",
       "rng": {
         "draws": 0,
@@ -907,6 +922,9 @@
             "unlockedSockets": 2
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 500000,

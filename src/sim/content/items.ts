@@ -442,6 +442,363 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     buyValue: 1_000_000, // 100 gold in copper
   },
+  // Active buddy whistles are soulbound grant tokens consumed on use.
+  // Retired whistles and charms retain their original definitions so existing
+  // bag/bank saves keep their identities and inventory rules. Token use checks
+  // the active buddy/cosmetic catalog first and leaves retired tokens untouched.
+  // Retired tokens have no vendor, recipe, loot or collection source.
+  whistle_ember_fox: {
+    id: 'whistle_ember_fox',
+    name: 'Ember Fox Whistle',
+    kind: 'buddy',
+    buddy: 'ember_fox',
+    soulbound: true,
+    quality: 'common',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  whistle_moss_hare: {
+    id: 'whistle_moss_hare',
+    name: 'Moss Hare Whistle',
+    kind: 'buddy',
+    buddy: 'moss_hare',
+    soulbound: true,
+    quality: 'common',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  // Rarity-tiered buddy whistle set. Quality mirrors the source GLB's
+  // common_/rare_/epic_ filename prefix (public/models/buddies/). Common
+  // stays vendor-buyable like the whistles above; rare/epic carry no
+  // buyValue (mirroring how reins_grag_bear, a rare mount, has none either)
+  // and instead come from the global buddy-whistle drop on every regular mob
+  // kill (src/sim/loot/global_drops.ts) plus /dev give.
+  whistle_frog: {
+    id: 'whistle_frog',
+    name: 'Frog Whistle',
+    kind: 'buddy',
+    buddy: 'frog',
+    soulbound: true,
+    quality: 'common',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  whistle_crimson_claw_crab: {
+    id: 'whistle_crimson_claw_crab',
+    name: 'Crimson Claw Crab Whistle',
+    kind: 'buddy',
+    buddy: 'crimson_claw_crab',
+    soulbound: true,
+    quality: 'common',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  whistle_golden_sentinel: {
+    id: 'whistle_golden_sentinel',
+    name: 'Golden Sentinel Whistle',
+    kind: 'buddy',
+    buddy: 'golden_sentinel',
+    soulbound: true,
+    quality: 'common',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  whistle_nightfang: {
+    id: 'whistle_nightfang',
+    name: 'Nightfang Whistle',
+    kind: 'buddy',
+    buddy: 'nightfang',
+    soulbound: true,
+    quality: 'common',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  whistle_tuskhorn_boar: {
+    id: 'whistle_tuskhorn_boar',
+    name: 'Tuskhorn Boar Whistle',
+    kind: 'buddy',
+    buddy: 'tuskhorn_boar',
+    soulbound: true,
+    quality: 'common',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  whistle_emerald_wolf: {
+    id: 'whistle_emerald_wolf',
+    name: 'Emerald Wolf Whistle',
+    kind: 'buddy',
+    buddy: 'emerald_wolf',
+    soulbound: true,
+    quality: 'common',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  whistle_tiger: {
+    id: 'whistle_tiger',
+    name: 'Tiger Whistle',
+    kind: 'buddy',
+    buddy: 'tiger',
+    soulbound: true,
+    quality: 'common',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  whistle_cate_coin: {
+    id: 'whistle_cate_coin',
+    name: 'Cate Coin Whistle',
+    kind: 'buddy',
+    buddy: 'cate_coin',
+    soulbound: true,
+    quality: 'rare',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  whistle_alon: {
+    id: 'whistle_alon',
+    name: 'Alon Whistle',
+    kind: 'buddy',
+    buddy: 'alon',
+    soulbound: true,
+    quality: 'rare',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  whistle_trollface: {
+    id: 'whistle_trollface',
+    name: 'Trollface Whistle',
+    kind: 'buddy',
+    buddy: 'trollface',
+    soulbound: true,
+    quality: 'rare',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  whistle_ansem: {
+    id: 'whistle_ansem',
+    name: 'Ansem Whistle',
+    kind: 'buddy',
+    buddy: 'ansem',
+    soulbound: true,
+    quality: 'epic',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  whistle_triple_t: {
+    id: 'whistle_triple_t',
+    name: 'Triple T Whistle',
+    kind: 'buddy',
+    buddy: 'triple_t',
+    soulbound: true,
+    quality: 'epic',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  whistle_kekius: {
+    id: 'whistle_kekius',
+    name: 'Kekius Whistle',
+    kind: 'buddy',
+    buddy: 'kekius',
+    soulbound: true,
+    quality: 'rare',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  whistle_solbot: {
+    id: 'whistle_solbot',
+    name: 'Solbot Whistle',
+    kind: 'buddy',
+    buddy: 'solbot',
+    soulbound: true,
+    quality: 'rare',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  whistle_frostfire: {
+    id: 'whistle_frostfire',
+    name: 'Frostfire Whistle',
+    kind: 'buddy',
+    buddy: 'frostfire',
+    soulbound: true,
+    quality: 'uncommon',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  whistle_rocky: {
+    id: 'whistle_rocky',
+    name: 'Rocky Whistle',
+    kind: 'buddy',
+    buddy: 'rocky',
+    soulbound: true,
+    quality: 'uncommon',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  // Historical prestige-currency tokens, no longer stocked by vendors.
+  whistle_proud_grunt: {
+    id: 'whistle_proud_grunt',
+    name: 'Proud Grunt Whistle',
+    kind: 'buddy',
+    buddy: 'proud_grunt',
+    soulbound: true,
+    quality: 'rare',
+    // Honor purchases are final (the Warfare doctrine the arena guide states):
+    // the one honor-priced whistle sells back for nothing, unlike the flat 5g
+    // every other whistle takes.
+    sellValue: 0,
+    noVendorSell: true,
+    priceHonor: 20_000,
+  },
+  whistle_loot_goblin: {
+    id: 'whistle_loot_goblin',
+    name: 'Loot Goblin Whistle',
+    kind: 'buddy',
+    buddy: 'loot_goblin',
+    soulbound: true,
+    quality: 'rare',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  whistle_penny_goldspark: {
+    id: 'whistle_penny_goldspark',
+    name: 'Penny Goldspark Whistle',
+    kind: 'buddy',
+    buddy: 'penny_goldspark',
+    soulbound: true,
+    quality: 'rare',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  // The common beast tier plus the one common undead. Their sources (a deed,
+  // a boss, or none yet) live in content/buddy_sources.ts.
+  whistle_stag: {
+    id: 'whistle_stag',
+    name: 'Stag Whistle',
+    kind: 'buddy',
+    buddy: 'stag',
+    soulbound: true,
+    quality: 'common',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  whistle_alpaca: {
+    id: 'whistle_alpaca',
+    name: 'Alpaca Whistle',
+    kind: 'buddy',
+    buddy: 'alpaca',
+    soulbound: true,
+    quality: 'common',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  whistle_horse: {
+    id: 'whistle_horse',
+    name: 'Horse Whistle',
+    kind: 'buddy',
+    buddy: 'horse',
+    soulbound: true,
+    quality: 'common',
+    priceHonor: 100_000, // CALIBRATE: placeholder Horse companion price.
+    sellValue: 0,
+    noVendorSell: true,
+  },
+  whistle_sapling: {
+    id: 'whistle_sapling',
+    name: 'Sapling Whistle',
+    kind: 'buddy',
+    buddy: 'sapling',
+    soulbound: true,
+    quality: 'common',
+    sellValue: 50_000,
+  },
+  whistle_bull: {
+    id: 'whistle_bull',
+    name: 'Bull Whistle',
+    kind: 'buddy',
+    buddy: 'bull',
+    soulbound: true,
+    quality: 'common',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  whistle_spider: {
+    id: 'whistle_spider',
+    name: 'Spider Whistle',
+    kind: 'buddy',
+    buddy: 'spider',
+    soulbound: true,
+    quality: 'common',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  whistle_raptor: {
+    id: 'whistle_raptor',
+    name: 'Raptor Whistle',
+    kind: 'buddy',
+    buddy: 'raptor',
+    soulbound: true,
+    quality: 'common',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  whistle_skeleton: {
+    id: 'whistle_skeleton',
+    name: 'Skeleton Whistle',
+    kind: 'buddy',
+    buddy: 'skeleton',
+    soulbound: true,
+    quality: 'common',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  // The one epic whistle with a live source: Nythraxis drops it on normal
+  // (0.5%) and heroic (1%). The epic global tier stays at chance 0, so this is
+  // a raid chase and nothing else.
+  whistle_crystal_lich: {
+    id: 'whistle_crystal_lich',
+    name: 'Crystal Lich Whistle',
+    kind: 'buddy',
+    buddy: 'crystal_lich',
+    soulbound: true,
+    quality: 'epic',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  // The one HEROIC-only companion: both Crucible bosses carry it at 1% on
+  // their heroic tables (content/heroic_loot.ts) and neither Normal table
+  // lists it at all, so the difficulty IS the gate.
+  whistle_forgemaw: {
+    id: 'whistle_forgemaw',
+    name: 'Forgemaw The Molten Whistle',
+    kind: 'buddy',
+    buddy: 'forgemaw',
+    soulbound: true,
+    quality: 'epic',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  // The angler's companion: fished up anywhere at 0.5% a catch
+  // (professions/fishing.ts). Rare, so it also rides the global rare tier's
+  // 0.05% off a kill like the three vendor rares do.
+  whistle_crystal_tide: {
+    id: 'whistle_crystal_tide',
+    name: 'Crystal Tide Whistle',
+    kind: 'buddy',
+    buddy: 'crystal_tide',
+    soulbound: true,
+    quality: 'rare',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  whistle_phantom: {
+    id: 'whistle_phantom',
+    name: 'Phantom Whistle',
+    kind: 'buddy',
+    buddy: 'phantom',
+    soulbound: true,
+    quality: 'uncommon',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  // Epic, the world-boss companion (content/buddy_sources.ts: Thunzharr).
+  whistle_emberfall_phoenix: {
+    id: 'whistle_emberfall_phoenix',
+    name: 'Emberfall Phoenix Whistle',
+    kind: 'buddy',
+    buddy: 'emberfall_phoenix',
+    soulbound: true,
+    quality: 'epic',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  // Historical cosmetic tokens, retained for existing inventories only.
+  charm_stag_acorn: {
+    id: 'charm_stag_acorn',
+    name: 'Acorn Crown Charm',
+    kind: 'buddy_cosmetic',
+    cosmetic: 'stag_acorn',
+    soulbound: true,
+    quality: 'rare',
+    sellValue: 200, // 2s: a crafted charm vendors below its fifteen logs (recipe_economy)
+  },
+  charm_stag_gilded: {
+    id: 'charm_stag_gilded',
+    name: 'Gilded Charm',
+    kind: 'buddy_cosmetic',
+    cosmetic: 'stag_gilded',
+    soulbound: true,
+    quality: 'rare',
+    sellValue: 50_000, // 5g, same flat price as a whistle
+    buyValue: 5_000_000, // 500g
+  },
   // Legacy cosmetic reins; same inert, discardable treatment as mech_bird.
   reins_rallycart_rxt: {
     id: 'reins_rallycart_rxt',

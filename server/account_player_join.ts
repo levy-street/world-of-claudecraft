@@ -11,13 +11,14 @@ export function addAccountPlayer(
   state: NonNullable<Parameters<Sim['addPlayer']>[2]>['state'] | null,
   meta: Pick<
     NonNullable<Parameters<Sim['addPlayer']>[2]>,
-    'accountLedger' | 'bankBonus' | 'appearance'
+    'accountLedger' | 'accountBuddyOwned' | 'bankBonus' | 'appearance'
   >,
 ): number {
   const pid = sim.addPlayer(cls, name, {
     state: state ?? undefined,
     characterId,
     accountLedger: meta.accountLedger,
+    accountBuddyOwned: meta.accountBuddyOwned,
     bankBonus: meta.bankBonus,
     appearance: meta.appearance ?? null,
     tutorialGreetingSent: state === null,

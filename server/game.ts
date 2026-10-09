@@ -50,7 +50,6 @@ import {
   partyFrameIncomingHeals,
   partyFrameRole,
 } from '../src/sim/party_frame_info';
-import { cleanPetName } from '../src/sim/pet/pet_commands';
 import { livePlaytimeSeconds } from '../src/sim/playtime';
 import { effectiveFishingBand } from '../src/sim/professions/fishing';
 import { cancelProfessionSessionOnDisplacement } from '../src/sim/professions/session_teardown';
@@ -106,6 +105,7 @@ import {
   type StableTimerWireVersion,
 } from '../src/world_api';
 import { sameAppearance } from '../src/world_api/appearance';
+import { AccountBuddiesService } from './account_buddies_service';
 import { ownedWeaponSkinLoadout } from './account_cosmetics_live';
 import { AccountCosmeticsService } from './account_cosmetics_service';
 import { reconcileAccountRelics, recordRelicFinds } from './account_ledger_records';
@@ -187,6 +187,7 @@ import {
   persistCheaterMark,
   refreshCheaterMark,
 } from './cheater_mark_runtime';
+import { dispatchPetRename } from './companion_rename';
 import {
   cancelCorpseHarvestCastOnDisconnect,
   harvestCorpseCommandOutcome,
@@ -415,6 +416,14 @@ import { dispatchWeeklyRewardCommand } from './weekly_reward_open';
 
 export type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types';
 
+import {
+  applyBuddyGrantToSim,
+  type BuddyGrant,
+  dispatchBuddyCommand,
+  dispatchBuddyRename,
+  drainPendingBuddyGrants,
+  emitBuddySelfKeys,
+} from './buddy_wire';
 import {
   type EntityWireCache,
   type EntityWireVariantCache,
@@ -1503,6 +1512,15 @@ export class GameServer {
   // One FIFO per character id: every durable LIVE-SESSION character write
   // rides it, so commit order is enqueue order (exceptions: server/CLAUDE.md).
   readonly characterSaveQueues = createKeyedSerialWriter<number>();
+  private readonly accountBuddies = new AccountBuddiesService({
+    sim: () => this.sim,
+    save: (session) => this.saveCharacter(session),
+    serialize: (id) => this.serializeCharacterForPersist(id)?.state ?? null,
+    queue: this.characterSaveQueues,
+    quarantine: (session) =>
+      this.escrowSessionLost(session.pid, session.characterId, 'ambiguous', 'buddy purchase'),
+    observe: (ms) => this.tickProfiler.add('accountBuddies', ms),
+  });
   // The per-guild holder index behind the unsettled gate
   // (server/guild_book_holders.ts owns the maintenance contract).
   private readonly guildBookHolders = new GuildBookHolderIndex<ClientSession>();
@@ -1574,6 +1592,7 @@ export class GameServer {
     'social',
     'saves',
     'membership',
+    'accountBuddies',
     'lateness',
     ...SIM_LAP_PHASES,
     ...SIM_MOB_ZONE_PHASES,
@@ -1711,6 +1730,7 @@ export class GameServer {
       database: (job, signal) => this.withBackgroundDbPermit(job, signal),
       mailWrite: (job, signal) => this.enqueueMarketWriteForSave(signal, job),
     });
+    this.sim.onBuddyGranted = (pid) => this.accountBuddies.granted(pid);
     this.riftUpgrader = new RiftUpgradeCoordinator(riftUpgraderConfigFromEnv());
     this.riftAssets = new RiftAssetCoordinator(riftAssetConfigFromEnv());
     this.social = new SocialService(
@@ -2605,6 +2625,7 @@ export class GameServer {
     if (this.saveTimer < AUTOSAVE_SECONDS) return;
     this.saveTimer = 0;
     const sample = this.tickProfiler.currentSample();
+    void this.accountBuddies.refresh();
     runPeriodicSaveFlush({
       saveCharacters: () => this.saveAll('autosave'),
       saveMarket: () => this.saveMarket(sample),
@@ -3106,10 +3127,6 @@ export class GameServer {
 
   // -------------------------------------------------------------------------
 
-  // Account-wide cosmetics (quest lockouts, mech chromas, weapon + mount skins)
-  // live in AccountCosmeticsService (server/account_cosmetics_service.ts); these
-  // three stay on GameServer as the hook surface server/main.ts injects into the
-  // Discord and Claudium routes.
   grantMechChromaToAccount(accountId: number, chromaId: string): void {
     this.cosmetics.grantMechChroma(accountId, chromaId);
   }
@@ -3133,8 +3150,8 @@ export class GameServer {
     meta: RequestMetadata &
       Partial<AccountChatMuteStatus> & {
         accountCosmetics?: AccountCosmetics;
-        // The account ledger loaded for this account (server/account_ledger_db.ts);
-        // absent on the bare test join, which then fills a fresh ledger alone.
+        accountBuddyOwned?: readonly string[];
+        // Account ledger absent on bare test joins; the sim supplies a fresh one.
         accountLedger?: AccountLedger;
         chatStrikes?: number;
         isAdmin?: boolean;
@@ -3389,6 +3406,7 @@ export class GameServer {
     this.sessionsByCharacterId.set(characterId, session);
     this.membership.onJoin(session);
     this.vault.onJoin(pid, characterId);
+    this.accountBuddies.attach(session, meta.accountBuddyOwned ?? []);
     this.peakOnline = Math.max(this.peakOnline, this.clients.size);
     void this.recordOnlineSnapshot();
     // Stamp this character's last world-entry time for the guild-roster "last
@@ -3762,6 +3780,7 @@ export class GameServer {
     session.bankVaultLedgerGuard.release();
     this.clients.delete(session.pid);
     this.membership.onLeave(session);
+    this.accountBuddies.detach(session);
     if (![...this.clients.values()].some((live) => live.accountId === session.accountId)) {
       this.generalChatQuota.forgetAccount(session.accountId);
     }
@@ -5605,6 +5624,20 @@ export class GameServer {
     return 'ok';
   }
 
+  // Admin grants use the normal sim grant hook and durable account ownership.
+  adminGrantBuddy(characterId: number, grant: BuddyGrant): 'ok' | 'offline' | 'already_owned' {
+    const session = this.sessionByCharacterId(characterId);
+    if (!session) return 'offline';
+    return applyBuddyGrantToSim(this.sim, session.pid, grant) ? 'ok' : 'already_owned';
+  }
+
+  /** Join-time drain of the grants queued while this character was offline. */
+  drainBuddyGrants(session: ClientSession): Promise<void> {
+    return drainPendingBuddyGrants(this.sim, session.pid, session.characterId, session.name, () =>
+      this.saveCharacter(session),
+    );
+  }
+
   // R35 GM restore: re-mint a lost tool-effect slot row on a LIVE character.
   // The sim action owns validation, tool-rarity charge sizing, and the
   // success event the player sees; it is server-admin-only by design (the
@@ -6059,6 +6092,7 @@ export class GameServer {
     ) {
       return;
     }
+    if (this.accountBuddies.commandBlocked(pid)) return;
     // W0b command-schema lockstep: cast the untyped wire token to the shared
     // CommandName union so tsc proves every `case` label below is a member of
     // COMMAND_NAMES (a typo or out-of-table token is a compile error) and that
@@ -6337,19 +6371,14 @@ export class GameServer {
         }
         break;
       case 'buy':
-        // The options bag third, pid fourth (the one explicit shape; see
-        // Sim.buyItem). A non-number count is dropped like sell's, a hostile
-        // number reaches the sim's sanitize and denies there.
-        if (typeof msg.npc === 'number' && typeof msg.item === 'string')
-          sim.buyItem(
-            msg.npc,
-            msg.item,
-            {
-              count: typeof msg.count === 'number' ? msg.count : undefined,
-              bulk: msg.bulk === true,
-            },
-            pid,
-          );
+        if (typeof msg.npc === 'number' && typeof msg.item === 'string') {
+          const options = {
+            count: typeof msg.count === 'number' ? msg.count : undefined,
+            bulk: msg.bulk === true,
+          };
+          if (!this.accountBuddies.buy(session, msg.npc, msg.item, options))
+            sim.buyItem(msg.npc, msg.item, options, pid);
+        }
         break;
       case 'sell':
         if (typeof msg.item === 'string') {
@@ -6632,6 +6661,19 @@ export class GameServer {
       // gate, combat gate); the entity mirror + self `mnt` field carry the result.
       case 'mount_toggle':
         sim.toggleMountFor(pid);
+        break;
+      case 'buddy_rename':
+        dispatchBuddyRename(sim, pid, msg, offensiveName, () =>
+          this.sendChatNotice(session, 'Pet name is not allowed.'),
+        );
+        break;
+      // Cosmetic buddies (server/buddy_wire.ts): the Sim re-validates every
+      // key and ownership; the entity mirror and the self keys carry results.
+      case 'buddy_toggle':
+      case 'buddy_summon':
+      case 'buddy_cosmetic':
+      case 'buddy_autoloot':
+        dispatchBuddyCommand(sim, pid, command, msg);
         break;
       // Riding lesson: the Sim re-validates everything (level, range, quest
       // state, fee, session state).
@@ -6934,15 +6976,9 @@ export class GameServer {
         sim.abandonPet(pid);
         break;
       case 'pet_rename':
-        if (typeof msg.name === 'string') {
-          // Shape-first like perfect_item: a name the sim's 16-character shape
-          // (cleanPetName) refuses skips the matcher and rides raw for the sim's
-          // own refusal; a valid one is screened and stored as that one value.
-          const clean = cleanPetName(msg.name);
-          if (clean !== null && offensiveName(clean))
-            this.sendChatNotice(session, 'Pet name is not allowed.');
-          else sim.renamePet(clean ?? msg.name, pid);
-        }
+        dispatchPetRename(sim, pid, msg, offensiveName, () =>
+          this.sendChatNotice(session, 'Pet name is not allowed.'),
+        );
         break;
       case 'pet_revive':
         sim.revivePet(pid);
@@ -8635,6 +8671,8 @@ export class GameServer {
       // flag, not the modulo, is what carries correctness here. Wire key
       // `mntOwn`.
       maybe('mntOwn', this.sim.ownedMountsFor(anchorSession.pid));
+      // The buddy collection (IWorldBuddies), four keys (server/buddy_wire.ts).
+      emitBuddySelfKeys(this.sim, anchorSession.pid, maybe);
       // The viewer's own farm plots (wire key `fplot`): heavy-gated, built by
       // appendFarmPlotsWire in server/farming_commands.ts since the v0.38.0
       // sync monolith heal; the gating and projection doctrine lives there.

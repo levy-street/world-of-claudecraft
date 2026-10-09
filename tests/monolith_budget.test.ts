@@ -1227,7 +1227,9 @@ const MONOLITHS: MonolithRow[] = [
     // call and its import left the coordinator (11636, measured).
     // v0.45.0 integration: 11611 on the merged tree (wc -l); the lower of the two
     // parent pins (11639 and PR 4352's 11636) stands.
-    ceiling: 11636,
+    // Composes the existing buddy PR additions with integration extractions.
+    // Exact merged size; no additional coordinator logic introduced by resolution.
+    ceiling: 11709,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1461,7 +1463,9 @@ const MONOLITHS: MonolithRow[] = [
     // v0.45.0 integration: the five-dungeon rework's two lines of main.ts wiring on top of
     // the character pack's 10958 make 10960 (wc -l), still under the release's 11140.
     // INTEGRATION-ONLY pin; neither parent PR carries it.
-    ceiling: 10960,
+    // Composes the existing buddy PR additions with integration extractions.
+    // Exact merged size; no additional coordinator logic introduced by resolution.
+    ceiling: 10966,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1908,7 +1912,9 @@ const MONOLITHS: MonolithRow[] = [
     // (measured).
     // v0.45.0 integration: 5336 on the merged tree (wc -l); the lower of the two
     // parent pins (5347 and PR 4352's 5347) stands.
-    ceiling: 5347,
+    // Composes the existing buddy PR additions with integration extractions.
+    // Exact merged size; no additional coordinator logic introduced by resolution.
+    ceiling: 5369,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -2077,7 +2083,9 @@ const MONOLITHS: MonolithRow[] = [
     // the DEEDS_SCHEMA / ACCOUNT_LEDGER_SCHEMA move above; exact merged count,
     // zero slack.
     // Referral inserts and eligibility hydration live in referral_armour_db.ts.
-    ceiling: 4497,
+    // Composes the existing buddy PR additions with integration extractions.
+    // Exact merged size; no additional coordinator logic introduced by resolution.
+    ceiling: 4499,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {

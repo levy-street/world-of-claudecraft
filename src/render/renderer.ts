@@ -730,7 +730,7 @@ import {
 import { sceneKeyLightUniform } from './scene_sampling';
 import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
 import { captureRendererScreenshot } from './screenshot_capture';
-import { drapeRingLocalY, reticleShownUnder } from './selection_ring';
+import { drapeRingLocalY, reticleShownUnder, selectionRingScale } from './selection_ring';
 import {
   createSelfRenderPositionState,
   noteSelfIdentity,
@@ -1440,6 +1440,13 @@ export class Renderer {
   // readable, especially on short mobile viewports. Initialized from Settings
   // and kept live by main.ts's applySetting dispatcher (mirrors showOwnNameplate).
   showPlayerNameplates = true;
+  // settings-backed cosmetic-buddy nameplate toggle (off by default): a buddy
+  // (src/sim/content/buddy_mobs.ts) has no health worth a bar and cannot be
+  // attacked, so its plate stays hidden regardless of showNameplates above
+  // unless this is on, in which case it shows name-only. Initialized from
+  // Settings and kept live by main.ts's applySetting dispatcher (mirrors
+  // showOwnNameplate).
+  showPetNames = false;
   // settings-menu graphics knobs (applied live)
   private renderScale = 1; // user-requested resolution ceiling on top of the device pixel ratio
   private effectiveRenderScale = 1; // runtime value after adaptive backoff
@@ -2255,6 +2262,7 @@ export class Renderer {
       showDevBadges: () => this.showDevBadges,
       showOwnNameplate: () => this.showOwnNameplate,
       showPlayerNameplates: () => this.showPlayerNameplates,
+      showPetNames: () => this.showPetNames,
       isHostilePlayer: (e) => this.isHostilePlayer(e),
     });
 
@@ -11243,10 +11251,11 @@ export class Renderer {
         // The drape is a pure function of (cx, cz, scale) and nothing else writes
         // the ring's position attribute, so a stationary target reuses last
         // frame's per-vertex groundHeight samples untouched.
-        if (cx !== this.selRingX || cz !== this.selRingZ || target.scale !== this.selRingScale) {
+        const ringScale = selectionRingScale(target.scale, tv.height);
+        if (cx !== this.selRingX || cz !== this.selRingZ || ringScale !== this.selRingScale) {
           this.selRingX = cx;
           this.selRingZ = cz;
-          this.selRingScale = target.scale;
+          this.selRingScale = ringScale;
           const seed = this.sim.cfg.seed;
           // A target standing on a prop top (crate/rock) gets the ring on that
           // surface, not buried at terrain height under it.
@@ -11254,13 +11263,13 @@ export class Renderer {
           const gy = Math.max(groundHeight(cx, cz, seed), supportY);
           this.selectionDrapeSupportY = supportY;
           this.selectionRing.position.set(cx, gy, cz);
-          this.selectionRing.scale.setScalar(target.scale);
+          this.selectionRing.scale.setScalar(ringScale);
           const drape = drapeRingLocalY(
             this.selectionRingLocalXZ,
             cx,
             cz,
             gy,
-            target.scale,
+            ringScale,
             0.08,
             this.selectionGroundSample,
             this.selectionRingDrapeY,

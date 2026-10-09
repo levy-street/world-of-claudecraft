@@ -678,6 +678,25 @@ describe('the creator on a High desktop', () => {
     expect(w.hung(preview)).toEqual({ [w.url('mage', 'female', drawn)]: true });
   });
 
+  it('keeps an entity tint when a streamed preview body lands', async () => {
+    const w = await world('high', { holdFemaleBodies: true });
+    const { VISUALS } = await import('../src/render/characters/manifest');
+    const key = w.keyOf('mage', 'female');
+    // Give the held body the entity-tint contract used by creature previews.
+    VISUALS[key].tint = 'entity';
+    VISUALS[key].tintStrength = 1;
+    const preview = w.stage();
+    preview.setVisualKey(key, null, null, null, 0x336699);
+    expect(w.bodyOf(preview)).toBeNull();
+    await w.landBodies(preview);
+    const mesh = w.bodyOf(preview)?.root.getObjectByName('Character_Body') as THREE.Mesh;
+    expect(mesh).toBeDefined();
+    const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+    expect(
+      materials.map((material) => (material as THREE.MeshStandardMaterial).color.getHex()),
+    ).toEqual([0x336699]);
+  });
+
   it('holds one choice: choosing another class forgets the first', async () => {
     const w = await world('high');
     const preview = w.stage();

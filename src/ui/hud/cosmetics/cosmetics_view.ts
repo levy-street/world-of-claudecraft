@@ -22,11 +22,12 @@ import {
 } from '../../../sim/content/weapon_skins';
 import type { SkinCatalog, SkinRank, WeaponSkinType } from '../../../sim/types';
 import { type TabStripModel, tabStripModel } from '../../tab_strip_view';
+import type { BuddyCosmeticsSnapshot } from './buddy_cosmetics_view';
 
-/** Closed on purpose: a future tab (buddies) is a deliberate addition here. */
-export type CosmeticsTab = 'mounts' | 'skins' | 'mech';
+/** Closed set shared by the tab strip and panel painter. */
+export type CosmeticsTab = 'mounts' | 'skins' | 'mech' | 'buddies';
 
-export const COSMETICS_TABS: readonly CosmeticsTab[] = ['mounts', 'skins', 'mech'];
+export const COSMETICS_TABS: readonly CosmeticsTab[] = ['mounts', 'skins', 'mech', 'buddies'];
 
 export function isCosmeticsTab(value: string): value is CosmeticsTab {
   return (COSMETICS_TABS as readonly string[]).includes(value);
@@ -51,6 +52,7 @@ export type CosmeticsScope = 'account' | 'character';
 /** One plain read of everything the window paints from. */
 export interface CosmeticsSnapshot {
   tab: CosmeticsTab;
+  buddies: BuddyCosmeticsSnapshot;
   ownedMountSkins: readonly string[];
   wornMountSkin: string | null;
   /** The character owns at least one rideable mount (a skin needs a ride). */
@@ -197,6 +199,7 @@ export function cosmeticsTabStrip(
 export function cosmeticsSig(s: CosmeticsSnapshot): string {
   return JSON.stringify([
     s.tab,
+    s.buddies,
     s.ownedMountSkins,
     s.wornMountSkin,
     s.ownsAnyMount,

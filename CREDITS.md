@@ -415,6 +415,8 @@ non-commercial. For commercial use, arrange your own licence with the author.
 | Shardpike world-boss item and mechanic icons (`skerrits_shardpike`, `lance_brace`, `lance_thrust`, `lance_release`) | World of ClaudeCraft | Project-generated via gpt-image-2 through `scripts/asset_pipeline/lib/openai_image.mjs`, then normalized locally to 128px WebP; exact prompts and per-icon provenance are recorded in the corresponding item and skill `mapping.json` files | Project asset, rights reserved | **No, permission required** |
 | Balgath eye-ward world-boss status badges (`eye_ward_sealed`, `eye_ward_open`, `eye_ward_blinded`) | World of ClaudeCraft | Project-generated via gpt-image-2 through `scripts/asset_pipeline/lib/openai_image.mjs`, then normalized locally to 128px WebP; exact prompts and per-icon provenance are recorded in `public/ui/status/mapping.json` | Project asset, rights reserved | **No, permission required** |
 | Foreman's Wage world-boss item icons (`foremans_wage_band`, `mirelight_locket`, `fenwright_grips`) | World of ClaudeCraft | Project-generated via gpt-image-2 through `scripts/asset_pipeline/lib/openai_image.mjs`, then normalized locally to 128px WebP; exact prompts and per-icon provenance are recorded in `public/ui/items/mapping.json` and `docs/achievements/foremans-wage-icons-2026-08-25/` | Project asset, rights reserved | **No, permission required** |
+| Generated buddy model + animations (horse, the low-poly pony companion, `public/models/buddies/horse.glb`) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline creature lane (Tripo AI 3D sculpt + quadruped auto-rig), owned under the Tripo paid-plan license; Idle/Walk gait clips authored locally by scripts/bake_buddy_horse_gaits.mjs | Project asset | With the project only |
+| Generated buddy model, animations and whistle icon (sapling, `public/models/buddies/sapling.glb`) | World of ClaudeCraft | User-approved lavender-eye concept, Tripo sculpt and biped rig; locally authored Idle/Walk/Run waddle clips; prepared by scripts/prepare_buddy_sapling.mjs and rendered by scripts/assets/render_buddy_item_icons.mjs. Generation task 210d80e7-3360-4f16-8682-3eac128249e7; rig task b0e39abb-708f-4e53-987e-a0970ffda400. | Project asset | With the project only |
 
 Crucible profession collection equipment, manuals, and enchant formula paintings are project-generated art, made with OpenAI's built-in image generation for World of ClaudeCraft. Provenance: `docs/achievements/crucible-professions-2026-09-05/`. Project asset, with the project only.
 
@@ -422,6 +424,13 @@ The Forgefather's Ember quest item painting is project-generated art, made with 
 Assets were optimized for shipping (animation clip pruning, meshopt compression,
 texture resizing) via `scripts/assets/build_assets.mjs`; raw packs are not
 committed.
+
+Buddy portraits (`public/ui/portraits/buddy_{horse,crystal_lich,forgemaw}.webp`)
+are local renders of the existing shipped buddy models, using their canonical
+visual definitions and idle poses through `scripts/render_buddy_portraits.mjs`.
+The shared backdrop comes from `scripts/lib/mob_portrait_background.mjs`.
+Underlying model ownership and licenses are unchanged; no external image source
+or generated replacement model was used.
 
 License texts: https://creativecommons.org/publicdomain/zero/1.0/ (CC0 1.0) ,
 https://creativecommons.org/licenses/by/4.0/ (CC BY 4.0) ,

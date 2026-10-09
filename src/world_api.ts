@@ -48,6 +48,7 @@
 //   mounts.ts           IWorldMounts         rideable ground mounts: pick + mount/dismount
 //   lance_trial.ts      IWorldLanceTrial     the Shardpike balance trial: self view + verbs
 //   vehicles.ts         IWorldVehicles       personal vehicle session + enter/action/leave
+//   buddies.ts          IWorldBuddies        cosmetic followers: pick + summon/dismiss
 //   dungeon_finder.ts   IWorldDungeonFinder  Dungeon Finder queue/proposals/premade board
 //   deeds.ts            IWorldDeeds          earned deeds, lifetime stats, renown, active title,
 //                                            rarity + the account-Renown leaderboard reads
@@ -71,6 +72,7 @@
 import type { IWorldActionBar } from './world_api/action_bar';
 import type { IWorldBank } from './world_api/bank';
 import type { IWorldBattleground } from './world_api/battleground';
+import type { IWorldBuddies } from './world_api/buddies';
 import type { IWorldCardMinigame } from './world_api/card_minigame';
 import type { IWorldChat } from './world_api/chat';
 import type { IWorldCombat } from './world_api/combat';
@@ -508,7 +510,8 @@ export interface IWorld
     IWorldLanceTrial,
     IWorldVehicles,
     IWorldTransport,
-    IWorldWorldPvp {}
+    IWorldWorldPvp,
+    IWorldBuddies {}
 
 // ---------------------------------------------------------------------------
 // Command schema (W0b): the shared wire-token vocabulary.
@@ -695,6 +698,10 @@ export const COMMAND_NAMES = [
   'heroic_buy',
   'crucible_buy',
   'mount_toggle',
+  'buddy_toggle',
+  'buddy_autoloot',
+  'buddy_summon',
+  'buddy_cosmetic',
   'mount_train_begin',
   'mount_train_answer',
   'mount_train_abort',
@@ -958,6 +965,8 @@ export const COMMAND_NAMES = [
   // A dungeon guide's offer answered for the whole group
   // (IWorldDungeons.answerDungeonGuide; src/sim/dungeon_guide owns every rule).
   'dungeon_guide_answer',
+  // Rename a specific summoned buddy; the sim verifies its current owner.
+  'buddy_rename',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -971,6 +980,8 @@ export type CommandName = (typeof COMMAND_NAMES)[number];
 // is called directly on the Sim by the headless RL action layer, never over the
 // wire. Each must be a member of COMMAND_NAMES (the `satisfies` enforces it).
 export const DISPATCH_ONLY_COMMANDS = [
+  // Retired buddy-look command, retained as an inert append-only protocol token.
+  'buddy_cosmetic',
   'dev_level',
   'dev_teleport',
   'dev_give',
@@ -1049,7 +1060,8 @@ export type WorldFacet =
   | 'IWorldFarming'
   | 'IWorldLanceTrial'
   | 'IWorldVehicles'
-  | 'IWorldWorldPvp';
+  | 'IWorldWorldPvp'
+  | 'IWorldBuddies';
 
 export const COMMAND_FACETS = {
   weekly_reward_claim: 'IWorldBank',
@@ -1313,6 +1325,19 @@ export const COMMAND_FACETS = {
   // learn_riding: purchase the riding skill from Marla (80g, once). No snapshot
   // field; the result rides the ridingTrained snapshot delta (mntRtd).
   learn_riding: 'IWorldMounts',
+  // IWorldBuddies: cosmetic followers (snake_case wire strings, by design,
+  // mirroring mount_toggle). The active buddy is a self-snapshot read (terse
+  // `bud`, no send, untagged); the collection reads (ownedBuddies,
+  // pendingBuddies) ride the self snapshot too (budOwn/budPend, untagged).
+  buddy_toggle: 'IWorldBuddies',
+  // buddy_summon: summon/dismiss a specific collected buddy (the Cosmetics
+  // window's button); the entity mirror `bud` carries the result.
+  buddy_summon: 'IWorldBuddies',
+  buddy_rename: 'IWorldBuddies',
+  // buddy_autoloot: enable/disable the buddy's loot errand (snake_case wire
+  // string, same family as buddy_toggle). The result rides the same self
+  // snapshot the toggle does (terse `budal`, no send, untagged).
+  buddy_autoloot: 'IWorldBuddies',
   // IWorldDungeonFinder: the group finder (snake_case wire strings, by design).
   // dungeonFinderInfo / dungeonFinderBoard are snapshot reads (no send, untagged).
   df_roles: 'IWorldDungeonFinder',

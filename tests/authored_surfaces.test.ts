@@ -65,6 +65,10 @@ function authoredMaterialsOf(file: string): string[] {
  *  authored rig here instead of flagging it is a conscious choice, not the
  *  default: a new Tripo or Blender creature sets `authoredAtlas: true`. */
 const LEGACY_UNFLAGGED_DEFS = new Set([
+  // Retained buddies keep their existing low-tier material response.
+  'buddy_horse',
+  'buddy_crystal_lich',
+  'buddy_forgemaw',
   'delve_mob_acolyte',
   'form_bear',
   'form_ghost_wolf',

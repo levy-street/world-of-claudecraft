@@ -582,7 +582,7 @@ export interface VisualDef {
    *  stay): a part of a larger creature drawn once by its dungeon's own
    *  visuals (the Mere Hydra's heads). */
   bodyless?: boolean;
-  /** material tint: explicit color, 'entity' (use e.color), or none */
+  /** Material tint: explicit color, 'entity' (use e.color), or none */
   tint?: number | 'entity';
   /** lerp amount toward the tint (default 0.4) */
   tintStrength?: number;
@@ -992,6 +992,11 @@ const animal = (attack: string[]): ClipMap => ({
   hit: ['Idle_HitReact_Left', 'Idle_HitReact_Right'],
   death: 'Death',
 });
+
+// Every buddy rig (public/models/buddies/) ships exactly Idle + Walk, renamed
+// in-place to this convention (see the buddy_* VISUALS entries below); run
+// and death alias Walk/Idle since a buddy never plays either.
+const BUDDY_CLIPS: ClipMap = { idle: 'Idle', walk: 'Walk', run: 'Walk', attack: [], death: 'Idle' };
 
 // Rideable mounts. The Tripo-lane rigs (bear, toad, griffin) ship clips baked
 // locally by scripts/bake_mount_gaits.mjs (the Tripo quadruped retarget was
@@ -1953,6 +1958,7 @@ const CREATURES = 'models/creatures';
 const PROPS = 'models/props';
 const WEAPONS = 'models/weapons';
 const MOUNTS_DIR = 'models/mounts';
+const BUDDIES_DIR = 'models/buddies';
 
 /** Exported for the authored-surface guard (tests/authored_surfaces.test.ts),
  *  which sweeps every shipped held model; render code resolves through
@@ -3472,6 +3478,25 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: animal(['Attack']),
     tint: 'entity',
     tintStrength: 0.35,
+  },
+  // Cosmetic followers: each active buddy keeps its authored rig and colors.
+  buddy_horse: {
+    url: `${BUDDIES_DIR}/horse.glb`,
+    height: 0.75,
+    clips: BUDDY_CLIPS,
+  },
+  buddy_crystal_lich: {
+    url: `${BUDDIES_DIR}/crystal_lich.glb`,
+    height: 0.9,
+    clips: BUDDY_CLIPS,
+  },
+  buddy_forgemaw: {
+    url: `${BUDDIES_DIR}/forgemaw.glb`,
+    height: 0.85,
+    clips: BUDDY_CLIPS,
+    // The rig is authored facing -Z, so without this it heels the owner
+    // back-to-front: chest toward the camera while its owner walks away.
+    yaw: Math.PI,
   },
   // Yumi, the Protect Yumi objective cat familiar (Meshy rig, scale baked by
   // scripts/_bake_meshy_scale.mjs, meshopt + 1024 webp). The GLB ships ONE
@@ -7776,6 +7801,10 @@ const MOB_KEYS: Record<string, string> = {
   warlock_imp: 'mob_demon_flying',
   warlock_voidwalker: 'mob_demonalt',
   guardian_tithefiend: 'mob_demonalt',
+  // Active cosmetic buddy followers.
+  buddy_horse: 'buddy_horse',
+  buddy_crystal_lich: 'buddy_crystal_lich',
+  buddy_forgemaw: 'buddy_forgemaw',
   // Packlord Stampede guardians are transient local templates, not MOBS rows.
   // Give the three summoned beasts distinct existing bodies instead of the
   // generic humanoid bandit fallback.
@@ -8161,25 +8190,27 @@ export function npcPortraitSourceFor(
   return source;
 }
 
+/** The rig a mob TEMPLATE renders through: its per-template override, else its
+ *  family's shared body, else the humanoid fallback. Split out of visualKeyFor
+ *  so a caller holding a template id but no live entity (the Collections
+ *  window's idle preview) resolves the same key the world draws, instead of
+ *  guessing at VISUALS directly and missing every family-keyed mob. */
+export function mobVisualKey(templateId: string): string {
+  // Quest escortees retain the same authored WOC body in previews and in-world.
+  const look = npcLookFor(templateId, 'mob');
+  if (look) return npcBodyKey(look);
+  const override = MOB_KEYS[templateId];
+  if (override) return override;
+  const family = MOBS[templateId]?.family;
+  return (family && FAMILY_KEYS[family]) || 'mob_bandit';
+}
+
 export function visualKeyFor(e: Entity): string {
   if (e.kind === 'player') {
     if (isMechWearer(e)) return 'player_mech';
     return playerVisualKey(e.templateId, e.modularAppearance);
   }
-  if (e.kind === 'mob') {
-    // A quest escortee is a mob only so the escort driver can walk it. It draws as
-    // the townsperson it is: its roster look on the WOC body of its class, exactly
-    // as an NPC does (npc_looks.ts MOB_LOOK_IDS). It must never reach the tables
-    // below: the humanoid family default is the hooded outlaw, so the townsfolk you
-    // walk home would read as the bandits you protect them from. For every other
-    // mob this is one set read (npcLookFor), then the tables as before.
-    const look = npcLookFor(e.templateId, e.kind);
-    if (look) return npcBodyKey(look);
-    const override = MOB_KEYS[e.templateId];
-    if (override) return override;
-    const family = MOBS[e.templateId]?.family;
-    return (family && FAMILY_KEYS[family]) || 'mob_bandit';
-  }
+  if (e.kind === 'mob') return mobVisualKey(e.templateId);
   // An NPC wears an authored look on the WOC body of its class and body type
   // (npc_looks.ts), the very def a player of that class draws. One with no
   // authored look (none ships: tests/npc_looks.test.ts) falls back to a stock rig.

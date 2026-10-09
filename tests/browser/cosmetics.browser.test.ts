@@ -19,8 +19,14 @@ function mountWindow() {
       skinCatalog: 'class',
       skin: 0,
       mountSkinId: null as string | null,
+      buddyKey: '',
     },
     ownedMounts: () => ['valorsteed'],
+    ownedBuddies: () => ['horse'],
+    pendingBuddies: () => [],
+    summonBuddy: vi.fn((key: string) => {
+      world.player.buddyKey = world.player.buddyKey === key ? '' : key;
+    }),
     accountCosmetics: {
       completedQuestIds: [],
       mountSkinIds: [...MOUNT_SKIN_IDS],
@@ -78,7 +84,36 @@ describe('cosmetics accessibility and interaction', () => {
       }
     }
   });
-  it.each(['mounts', 'skins', 'mech'] as const)(
+  it('keeps all four tabs and buddy summon controls reachable without dragging on narrow portrait', async () => {
+    await page.viewport(320, 640);
+    document.body.classList.add('mobile-touch');
+    const { root, world, win } = mountWindow();
+    win.open('buddies');
+    const tabs = root.querySelectorAll<HTMLElement>('.cos-tab');
+    expect(tabs).toHaveLength(4);
+    for (const tab of tabs) {
+      const bounds = tab.getBoundingClientRect();
+      expect(bounds.left).toBeGreaterThanOrEqual(0);
+      expect(bounds.right).toBeLessThanOrEqual(320);
+      expect(bounds.height).toBeGreaterThanOrEqual(40);
+    }
+    expect(root.scrollWidth).toBeLessThanOrEqual(root.clientWidth);
+    expect(root.querySelector('[data-buddy-drag], [draggable="true"]')).toBeNull();
+    expect(root.querySelectorAll('.cos-scope-account')).toHaveLength(3);
+    expect(root.querySelector('.cos-scope-character')).toBeNull();
+    expect(root.textContent).not.toContain('Drag to action bar');
+    const control = () =>
+      root.querySelector<HTMLButtonElement>('[data-act="summon-buddy"][data-id="horse"]')!;
+    expect(control().getBoundingClientRect().height).toBeGreaterThanOrEqual(40);
+    expect(control().getBoundingClientRect().width).toBeGreaterThanOrEqual(40);
+    control().click();
+    expect(world.player.buddyKey).toBe('horse');
+    expect(control().textContent).toBe('Dismiss');
+    control().click();
+    expect(world.player.buddyKey).toBe('');
+    expect(control().textContent).toBe('Summon');
+  });
+  it.each(['mounts', 'skins', 'mech', 'buddies'] as const)(
     '%s has a named dialog and no serious WCAG violations',
     async (tab) => {
       await page.viewport(1280, 900);

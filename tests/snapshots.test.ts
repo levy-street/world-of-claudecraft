@@ -5713,6 +5713,8 @@ const ALL_DELTA_KEYS = [
   'bg',
   'blk',
   'bpsl',
+  'budOwn',
+  'budPend',
   'buyback',
   'bval',
   'cardDuel',
@@ -5862,6 +5864,8 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   bags: 'bags',
   bank: 'bankInfo',
   blk: 'blockChance',
+  budOwn: 'ownedBuddies',
+  budPend: 'pendingBuddies',
   buyback: 'vendorBuyback',
   bval: 'blockValue',
   cbt: 'inCombat',
@@ -6974,6 +6978,23 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.player.mountKey).toBe('valorsteed');
   });
 
+  it('round-trips the active buddy identity mirror (bud) like mnt', () => {
+    // Entity.buddyKey (wire `bud`, identityFields in server/entity_identity_wire.ts) is the
+    // "which buddy is out" mirror every client reads for HUD/UI identity; the
+    // buddy's own body renders through its real owned mob entity, never off
+    // this field, but the field itself must still round-trip like every
+    // other identity mirror (skin, mountKey).
+    const { server, fc, leader } = dirtyEveryDeltaField();
+    server.sim.entities.get(leader.pid)!.buddyKey = 'horse';
+    broadcast(server);
+    const snapshot = lastSnap(fc.sent);
+    expect(snapshot.self.bud).toBe('horse');
+
+    const client = bareClient(leader.pid);
+    (client as any).applySnapshot(snapshot);
+    expect(client.player.buddyKey).toBe('horse');
+  });
+
   it('flips mst to null when the mobile station expires (server-side tick-domain check)', () => {
     // The expiry arm of the mst self-delta: activeMobileStationCraftsFor
     // resolves active-vs-expired against the SERVER sim's own tickCount, so
@@ -7270,7 +7291,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 119 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 121 unique keys in sorted order', () => {
     // 109 plus the release batch's pending Town Focus and Spell Crit core keys (113),
     // plus the courier's three keys and the Shardpike trial's lance, lrest and lguide (119).
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
@@ -7332,8 +7353,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // release/v0.44.0 base merge, for 111.
     // Courier adds its small pose and separately revision-gated custody data.
     // The Mirefen world-boss branch's Shardpike self keys (lance, lrest, lguide): 119.
-    expect(ALL_DELTA_KEYS).toHaveLength(119);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(119);
+    // The buddy collection adds budOwn and budPend to the integration keys.
+    expect(ALL_DELTA_KEYS).toHaveLength(121);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(121);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7506,7 +7528,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The World PvP readout wpvp and the King of the Hill readout hill make 109.
     // The release batch's pending Town Focus and Spell Crit core keys make 111.
     // The courier's keys and the Shardpike trial's lance, lrest and lguide self emits make 119.
-    expect(scraped.size).toBe(119);
+    // The buddy collection adds budOwn and budPend.
+    expect(scraped.size).toBe(121);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

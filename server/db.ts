@@ -9,6 +9,7 @@ import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
 import type { ActionBarLayoutProfiles, StoredActionBarLayout } from '../src/world_api/action_bar';
+import { ACCOUNT_BUDDIES_SCHEMA } from './account_buddies_db';
 import { projectAccountExportState } from './account_export_state';
 import { ACCOUNT_LEDGER_SCHEMA } from './account_ledger_db';
 import { ACCOUNT_WEALTH_SCHEMA } from './account_wealth_db';
@@ -43,6 +44,7 @@ import {
   lockCharacterSaveEffectAccountsOnClient as lockSaveEffectAccounts,
   writeBankLedgerSaveEffectsOnClient,
 } from './bank_ledger_save_effects_db';
+import { BUDDY_GRANTS_SCHEMA } from './buddy_grants_db';
 import { deleteOwnedCharacterRow } from './character_delete_db';
 import { PROCESS_LEASE_HOLDER } from './character_lease_db';
 import { journalCharacterSaveSources } from './character_material_sources_db';
@@ -1366,6 +1368,8 @@ export async function ensureSchema(): Promise<void> {
     // Both FK-reference accounts(id), so they run after SCHEMA. Applied
     // unconditionally (idempotent), like the other schema modules.
     await client.query(MAPS_SCHEMA);
+    await client.query(BUDDY_GRANTS_SCHEMA); // offline buddy grants, after SCHEMA
+    await client.query(ACCOUNT_BUDDIES_SCHEMA);
     await client.query(USER_ASSETS_SCHEMA);
     // Audit trail for the map/asset moderation actions above (unpublish,
     // block, unblock). FK-references accounts(id), so it runs after SCHEMA.
@@ -1581,9 +1585,7 @@ export interface RequestMetadata {
 }
 
 export type { AccountCosmetics } from './account_cosmetics_db';
-// Account cosmetics (quest lockouts, mech chromas, weapon skins, mount skins)
-// live in server/account_cosmetics_db.ts; re-exported so every caller and test
-// double keeps importing them from here.
+// Shared import seam for account cosmetics and test doubles.
 export {
   grantAccountMechChroma,
   grantAccountMountSkins,

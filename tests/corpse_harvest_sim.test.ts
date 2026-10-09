@@ -2553,7 +2553,8 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     // 222 with the Mirefen world-boss branch at the release/v0.45.0 merge: balgath_cyclops,
     // three muster soldiers, the drillmaster and the Straw Foreman effigy, all untagged.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 291.
-    expect(Object.keys(MOBS).length - tagged.length).toBe(291);
+    // The three retained cosmetic companions add untagged templates.
+    expect(Object.keys(MOBS).length - tagged.length).toBe(294);
     withMixedTemplates(() => {
       const mixed = mixedTemplates();
       expect(mixed.map(([id]) => id).sort()).toEqual(

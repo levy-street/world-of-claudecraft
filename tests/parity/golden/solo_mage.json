@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "02b36e7f",
+      "state": "1d9ae481",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -44,6 +44,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -162,7 +165,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1013,
-      "state": "01bd2460",
+      "state": "b312e350",
       "events": "4be5eb25",
       "rng": {
         "draws": 2,
@@ -173,7 +176,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1013,
-      "state": "944b91d4",
+      "state": "b56f8a9c",
       "events": "34fe5d0d",
       "rng": {
         "draws": 2,
@@ -184,7 +187,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1013,
-      "state": "f59a13e1",
+      "state": "083a7623",
       "events": "046746cd",
       "rng": {
         "draws": 136,
@@ -195,7 +198,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1013,
-      "state": "a4808008",
+      "state": "d3a73f7c",
       "events": "bf621830",
       "rng": {
         "draws": 304,
@@ -206,7 +209,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1013,
-      "state": "fa7ca03a",
+      "state": "ad74e632",
       "events": "786d84d5",
       "rng": {
         "draws": 507,
@@ -217,7 +220,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1013,
-      "state": "48ac0541",
+      "state": "d46b638d",
       "events": "be8d1df4",
       "rng": {
         "draws": 714,
@@ -228,7 +231,7 @@
       "tick": 128,
       "time": 6.4,
       "nextId": 1013,
-      "state": "fb54f8e0",
+      "state": "eb0f7c42",
       "events": "741638a5",
       "rng": {
         "draws": 797,
@@ -257,6 +260,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {

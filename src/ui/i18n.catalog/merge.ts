@@ -805,6 +805,8 @@ const mergeStringsEn = {
       scroll: 'Scroll',
       bag: 'Bag',
       mount: 'Mount',
+      buddy: 'Buddy',
+      buddyCosmetic: 'Buddy cosmetic',
     },
     tooltip: {
       ...itemNames.en.itemUi.tooltip,

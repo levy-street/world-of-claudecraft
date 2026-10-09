@@ -13,6 +13,8 @@ export function identityFields(e: Entity): Record<string, unknown> {
   // distinct from the self-only persisted pick (`mntSel`): using `mnt` for both
   // made the appended self delta overwrite the live riding state in JSON.
   if (e.mountKey) out.mnt = e.mountKey;
+  if (e.buddyKey) out.bud = e.buddyKey;
+  if (e.buddyAutoloot) out.budal = true;
   if (e.mainhandItemId) out.mh = e.mainhandItemId; // equipped mainhand → held weapon model (render-only)
   if (e.offhandItemId) out.oh = e.offhandItemId; // equipped offhand → held weapon model (render-only)
   if (e.weaponSkinId) out.wsk = e.weaponSkinId; // active weapon-skin cosmetic (render-only, like mh)

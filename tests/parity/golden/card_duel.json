@@ -29,7 +29,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1013,
-      "state": "74548df1",
+      "state": "1cc24567",
       "events": "8650d7d6",
       "rng": {
         "draws": 0,
@@ -40,7 +40,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1013,
-      "state": "db00ccca",
+      "state": "28effcb0",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -51,7 +51,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 1013,
-      "state": "ba45d7c8",
+      "state": "94a47546",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -62,7 +62,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1013,
-      "state": "8b781a91",
+      "state": "6eba19b9",
       "events": "3f5a7a0c",
       "rng": {
         "draws": 0,
@@ -73,7 +73,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 1013,
-      "state": "7c1a7192",
+      "state": "abb05baa",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -84,7 +84,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 1013,
-      "state": "e0560bab",
+      "state": "c325abf3",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -95,7 +95,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 1013,
-      "state": "225bbdc3",
+      "state": "3986a78b",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -106,7 +106,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1013,
-      "state": "0f5ff3b6",
+      "state": "d1eb4a2e",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -117,7 +117,7 @@
       "tick": 41,
       "time": 2.05,
       "nextId": 1013,
-      "state": "a8e9669f",
+      "state": "9ba97017",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -145,6 +145,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
@@ -224,6 +227,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},

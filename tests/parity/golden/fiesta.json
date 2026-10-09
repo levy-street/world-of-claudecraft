@@ -30,7 +30,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 1015,
-      "state": "e4a446dc",
+      "state": "923570ee",
       "events": "08be3e77",
       "rng": {
         "draws": 0,
@@ -41,7 +41,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1015,
-      "state": "9411a1e5",
+      "state": "234ef837",
       "events": "14dc52c1",
       "rng": {
         "draws": 66,
@@ -52,7 +52,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 1015,
-      "state": "dd78ad77",
+      "state": "f819eae9",
       "events": "f3c46c01",
       "rng": {
         "draws": 247,
@@ -63,7 +63,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1015,
-      "state": "d8b73ecc",
+      "state": "63c4f11e",
       "events": "1b9b3d0d",
       "rng": {
         "draws": 485,
@@ -74,7 +74,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 1015,
-      "state": "cc715823",
+      "state": "4282aa9f",
       "events": "f71b8be8",
       "rng": {
         "draws": 756,
@@ -85,7 +85,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 1015,
-      "state": "ada916f8",
+      "state": "8a2b1658",
       "events": "741638a5",
       "rng": {
         "draws": 1041,
@@ -96,7 +96,7 @@
       "tick": 163,
       "time": 8.15,
       "nextId": 1015,
-      "state": "202b7e7c",
+      "state": "21eb3c6c",
       "events": "f5e07b12",
       "rng": {
         "draws": 1178,
@@ -124,6 +124,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -220,6 +223,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -313,6 +319,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {
@@ -407,6 +416,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {},

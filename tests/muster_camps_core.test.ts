@@ -489,6 +489,7 @@ describe('muster camps: the weapon rack entity', () => {
         false,
         true,
         false,
+        false,
       );
     expect(rackAt(INTERACT_RANGE).hidden).toBe(false);
     expect(rackAt(INTERACT_RANGE + 4).hidden).toBe(true);

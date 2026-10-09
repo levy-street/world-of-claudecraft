@@ -1,3 +1,4 @@
+import type { BuddyKey } from './content/buddies';
 // SimContext: the shared seam every extracted game-system module talks to instead
 // of reaching into the 17.5k-line `Sim` monolith.
 //
@@ -441,6 +442,7 @@ export interface SimContextPrimitives {
 // a faithful move-not-rewrite. Grouped by the slice that will eventually own them.
 export interface SimContextCallbacks {
   // Event sink (core). Routes to `Sim.emit`.
+  onBuddyGranted?: (pid: number, key: BuddyKey) => void;
   emit(ev: SimEvent): void;
   // Personal error toast/event to a player (core). Routes to `Sim.error`, which
   // emits `{ type: 'error', text, pid, reason? }`.
@@ -1608,6 +1610,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     set nextCommissionOrderId(v) {
       host.nextCommissionOrderId = v;
     },
+    onBuddyGranted: host.onBuddyGranted,
     emit: host.emit,
     error: host.error,
     reserveVaultConsumption: host.reserveVaultConsumption,

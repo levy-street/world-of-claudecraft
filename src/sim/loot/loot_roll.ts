@@ -324,7 +324,13 @@ export function rollLoot(
       questSlots.add(slot);
       continue;
     }
-    if (!ctx.rng.chance(entry.chance)) continue;
+    // A heroic claim can retune THIS row's odds (LootEntry.heroicChance), the
+    // same value swap on the same single draw that heroicCopper performs for
+    // the money arm below: no extra draw, so the trace and the parity goldens
+    // are untouched on both difficulties.
+    const rowChance =
+      heroicClaim && entry.heroicChance !== undefined ? entry.heroicChance : entry.chance;
+    if (!ctx.rng.chance(rowChance)) continue;
     if (entry.copper) {
       // A heroic claim substitutes the raised finale money base (see
       // LootEntry.heroicCopper): a VALUE swap on the same single int draw at
@@ -365,6 +371,9 @@ export function rollLoot(
       }
     }
   }
+  // Buddies are deliberately NOT corpse loot: the per-player companion roll
+  // rides the boss death site instead (src/sim/buddy_drops.ts, content/
+  // buddy_sources.ts), so no kill anywhere draws for one here.
   if (copper > 0 || items.length > 0) {
     // A soulbound drop pins its bind-on-pickup trade group NOW, from the
     // kill-time `eligible` set, so a member who disconnects before the roll

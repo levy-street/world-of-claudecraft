@@ -162,14 +162,15 @@ const build = await buildItemArtAudit({
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005 / 2034 on 42
     // sheet pages, re-measured with `--verify-only` (116 generated Heroic definitions,
     // 86 with their own WebP, 30 weapon art aliases).
-    catalogCount: 2005,
-    liveItemCount: 2034,
-    pendingArtCount: 135,
+    // Buddy restoration adds 34 painted owners and two enumerated pending whistles.
+    catalogCount: 2039,
+    liveItemCount: 2068,
+    pendingArtCount: 137,
     generatedHeroicDefinitions: 116,
     heroicDefinitionsWithOwnWebp: 86,
     heroicWeaponArtAliases: 30,
-    sheetPageCount: 42,
-    groupCount: 26,
+    sheetPageCount: 44,
+    groupCount: 28,
   },
 });
 assertItemArtAuditPass(build);

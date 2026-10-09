@@ -856,7 +856,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // (13 periphery pieces + 4 formulas): 1,340. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,341. the trinket slot's 18 trinkets (PR 4173): 1,359. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s 139 honor items: 1,498.
     // Plus the Mirefen world-boss branch (15 items) on the v0.45.0 integration: 2043.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2169.
-    expect(Object.keys(ITEMS)).toHaveLength(2169);
+    // The restored legacy whistle and charm definitions add 36 item ids.
+    expect(Object.keys(ITEMS)).toHaveLength(2205);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -1081,9 +1082,11 @@ describe('item-art consistency accepted-art provenance', () => {
     // Wage rares) and Balgath's loot (five trinkets and the Craterglass Stave) on the v0.45.0
     // integration: 1,890 owners over 2,043 items.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005, 2169.
-    expect(new Set(currentOwnerIds).size).toBe(2005);
-    expect(shippingIds).toHaveLength(2005);
-    expect(Object.keys(ITEMS)).toHaveLength(2169);
+    // Buddy provenance contributes 34 additional owners.
+    expect(new Set(currentOwnerIds).size).toBe(2039);
+    expect(shippingIds).toHaveLength(2039);
+    // The restored legacy whistle and charm definitions add 36 item ids.
+    expect(Object.keys(ITEMS)).toHaveLength(2205);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1102,10 +1105,13 @@ describe('item-art consistency accepted-art provenance', () => {
           [
             'nythraxis-gap-weapon-renders-2026-09-04',
             'roots-bramblehide-icons-2026-09-07',
+            // The buddy companion merge: rendered whistles + the two charm dyes.
+            'buddy-whistle-icons-2026-08-28',
+            'buddy-charm-icons-2026-09-09',
           ].includes(batchId),
       )
       .flatMap(({ itemIds }) => itemIds);
-    expect(releaseBatchIds).toHaveLength(25);
+    expect(releaseBatchIds).toHaveLength(59);
     // The world-quest branch's two batches are additive beyond the dated chain
     // as well (release/v0.43.0 merge into feature/world-quests).
     const worldQuestBatchIds = mapping.generatedBatches
@@ -1514,7 +1520,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // (balgath-boss, shardpike-mechanic, foremans-wage, muster-shardpike, balgath-loot)
     // bring it to 51 on the v0.45.0 integration.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 57.
-    expect(mapping.generatedBatches).toHaveLength(57);
+    // Buddy whistle and charm provenance add two batches.
+    expect(mapping.generatedBatches).toHaveLength(59);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1589,15 +1596,16 @@ describe('item-art consistency accepted-art provenance', () => {
     // role fill (quest-role-fill-icons-2026-10-07) adds 75: 1330. Membership adds 8
     // and referral armour 7: 1345. The Mirefen world-boss branch's 15 batch ids: 1360.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 1475.
-    expect(priorGeneratedIds).toHaveLength(1475);
+    // Buddy batches add 34 owner ids to the integration inventory.
+    expect(priorGeneratedIds).toHaveLength(1509);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
     // Plus the Mirefen world-boss branch (15 items) on the v0.45.0 integration: 1890.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005.
-    expect(allCurrentOwnerIds).toHaveLength(2005);
-    expect(new Set(allCurrentOwnerIds).size).toBe(2005);
+    expect(allCurrentOwnerIds).toHaveLength(2039);
+    expect(new Set(allCurrentOwnerIds).size).toBe(2039);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1617,7 +1625,8 @@ describe('item-art consistency accepted-art provenance', () => {
       // + 8 membership paintings + 7 referral paintings = 1345.
       // + the Mirefen world-boss branch's 15 = 1360.
       // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 1475.
-      priorGenerated: 1475,
+      // Plus 34 restored buddy provenance owners.
+      priorGenerated: 1509,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1662,6 +1671,16 @@ describe('item-art consistency accepted-art provenance', () => {
       )
       .flatMap(({ itemIds }) => itemIds);
     expect(releaseBatchIdsForCatalog).toHaveLength(25);
+    // The buddy companion merge's two batches (rendered whistles, charm dyes)
+    // are additive beyond the whole historical chain, the way the Field Kit is.
+    const buddyBatchIdsForCatalog = mapping.generatedBatches
+      .filter(
+        ({ batchId }) =>
+          typeof batchId === 'string' &&
+          ['buddy-whistle-icons-2026-08-28', 'buddy-charm-icons-2026-09-09'].includes(batchId),
+      )
+      .flatMap(({ itemIds }) => itemIds);
+    expect(buddyBatchIdsForCatalog).toHaveLength(34);
     expect(
       sorted([
         ...historicalVerdict.visualVerdict.passIds.filter(
@@ -1719,6 +1738,7 @@ describe('item-art consistency accepted-art provenance', () => {
               ].includes(batchId),
           )
           .flatMap(({ itemIds }) => itemIds),
+        ...buddyBatchIdsForCatalog,
         'field_kit',
         'reins_goblin_rocket_sled',
         'reins_rallycart_rxt',
@@ -1886,9 +1906,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464. Plus the 245 choose-one leveling quest armor paintings (quest-leveling-gear-icons-2026-10-06) = 1709. Plus the 76 quest blue reward rares (quest-blue-rewards-icons-2026-10-07) = 1785. Plus the 75 quest role-fill paintings (quest-role-fill-icons-2026-10-07) = 1860. Plus the 8 membership paintings and the 7 referral paintings = 1875.
     // Plus the Mirefen world-boss branch and Balgath's loot (15 items) = 1890.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005.
-    if (ownerIds.length !== 2005)
-      violations.push(`mapping owner count: ${ownerIds.length} != 2005`);
-    if (fileIds.length !== 2005) violations.push(`shipping WebP count: ${fileIds.length} != 2005`);
+    if (ownerIds.length !== 2039)
+      violations.push(`mapping owner count: ${ownerIds.length} != 2039`);
+    if (fileIds.length !== 2039) violations.push(`shipping WebP count: ${fileIds.length} != 2039`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

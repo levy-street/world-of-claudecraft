@@ -41,6 +41,9 @@ import * as bankMod from './bank';
 import { applyBankBonusStamp, type BankState, emptyBankState } from './bank';
 import * as bankSocketsMod from './bank_sockets';
 import { extractTradableCopyImpl, grantTradableCopyImpl } from './broker_custody';
+import * as buddiesMod from './buddies';
+import { revealBuddiesOnJoin, updateBuddyReveals } from './buddy_drops';
+import { renameBuddy } from './buddy_names';
 import { campSpawnOffset } from './camp_scatter';
 import type { CharacterState, PetState } from './character_state';
 import { restoreCharacterStorage, savedCharacterStorage } from './character_storage';
@@ -161,6 +164,7 @@ import { ensureWarriorStance } from './combat/warrior_stances';
 // moved to social/fiesta.ts with that logic; sim.ts keeps only the type used by
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
+import type { BuddyKey } from './content/buddies';
 import { farmCropTier } from './content/farm_crops';
 import {
   FARM_BED_IDS,
@@ -433,6 +437,7 @@ import {
   PLAYER_MAX_CLIMB_SLOPE,
   PLAYER_SWIM_DEPTH,
 } from './pathfind';
+import { isBuddyMob } from './pet/buddy_ai';
 import * as petAi from './pet/pet_ai';
 import * as petCommands from './pet/pet_commands';
 import type { MatchPetSnapshot } from './pet/pet_match_return';
@@ -920,6 +925,7 @@ import {
   type SkinRank,
   steadyAngleTo,
   swingMissChance,
+  TICK_RATE,
   type Vec3,
   virtualLevel,
   type WeaponSkinLoadout,
@@ -1830,6 +1836,11 @@ export interface PlayerMeta
   // account earned each deed and found each relic. Host-loaded INPUT per join,
   // appended by the grant paths; never serialized into CharacterState.
   accountLedger: AccountLedger;
+  // The buddy collection (src/sim/buddies.ts): owned companions and
+  // the boss-roll wins still pending
+  // their reveal. Persisted (character_state.ts `buddies`); the ACTIVE buddy
+  // stays a session-only entity field (Entity.buddyKey), like the mount.
+  buddies: buddiesMod.BuddyCollection;
 }
 
 // Away-from-keyboard / do-not-disturb presence. `afk` still delivers whispers
@@ -1922,6 +1933,7 @@ export class Sim {
   // through instead of reaching into Sim. Built once in the ctor (buildSimContext);
   // it moves no behavior. See src/sim/sim_context.ts.
   readonly ctx: SimContext;
+  onBuddyGranted?: (pid: number, key: BuddyKey) => void;
   // Movement-kernel callbacks (MV1): binds stepPlayerMotion's deps to the live Sim
   // (fiesta-aware moveSpeedMult, delve-aware resolveMove, cancelCast/standUp/
   // dealDamage). Built once in the ctor; draws no rng and mutates nothing.
@@ -2659,6 +2671,7 @@ export class Sim {
       // title/border validators already see an alt's deeds. Absent (offline, a
       // bare test join) means a fresh ledger this character alone fills.
       accountLedger?: AccountLedger;
+      accountBuddyOwned?: readonly string[];
       // The FRESH host-allocated material-gatherer identity for an
       // offline/headless character that has none persisted yet
       // (src/sim/material_gatherer.ts). Allocated by the host OUTSIDE the sim
@@ -2904,6 +2917,7 @@ export class Sim {
       renown: 0,
       reliquary: freshReliquaryState(),
       accountLedger: opts?.accountLedger ?? freshAccountLedger(),
+      buddies: buddiesMod.freshBuddyCollection(),
     };
     // A fresh character sets out provisioned (class-defined starter rations);
     // a saved character loads its own bags from savedState below.
@@ -3352,6 +3366,9 @@ export class Sim {
       // stat block, sparse Reliquary state, milestone unification, the renown
       // recompute, and the validated title/border re-apply.
       restoreBookOfDeeds(meta, player, s);
+      // The buddy collection restores beside the Book (buddies.ts): owned
+      // companions and pending boss reveals.
+      meta.buddies = buddiesMod.restoreBuddyCollection(s.buddies);
       // Resume with the weapon sheathed exactly as saved (absent = drawn).
       if (s.weaponStowed) player.weaponStowed = true;
       if (s.helmHidden) player.helmHidden = true;
@@ -3477,6 +3494,11 @@ export class Sim {
     // (deeds_restore.ts): the discovery seed, the retro fallbacks, the full
     // evaluator pass (retro: true events), and the account ledger self seed.
     runBookOfDeedsJoinRetro(this.ctx, meta, player);
+    // A boss pet left pending by a logout reveals now when the player stands
+    // outside; inside, the 1 Hz sweep reveals it on the way out.
+    if (opts?.accountBuddyOwned)
+      buddiesMod.syncBuddyOwnership(this.ctx, player.id, opts.accountBuddyOwned);
+    revealBuddiesOnJoin(this.ctx, player.id);
     notifyFarmReady(this.ctx, meta);
     return player.id;
   }
@@ -4064,6 +4086,11 @@ export class Sim {
       // must never carry an identity claim back in), so its blob and every
       // pre-feature save stay byte-equal.
       ...materialGathererIdentitySaveFragment(meta.gathererIdentity),
+      // Buddy collection: absent while empty, same zero-default omission.
+      ...(() => {
+        const buddies = buddiesMod.serializeBuddyCollection(meta.buddies);
+        return buddies ? { buddies } : {};
+      })(),
     };
     // Expired party-trade markers retire at this persistence boundary, never by tick sweep.
     return sanitizeRemovedZone1Content(retirePartyTradeOnSave(state, this.lockoutNowMs())).state;
@@ -4122,6 +4149,66 @@ export class Sim {
   }
   toggleMounted(): void {
     this.toggleMountFor(this.primaryId);
+  }
+
+  /** Per-pid buddy dismiss (the server command path); the IWorld member below
+   *  rides primaryId. Rules live in src/sim/buddies.ts. Summoning a specific
+   *  buddy is not here: it is an item use (useItem -> summonBuddyItem). */
+  toggleBuddyFor(pid: number): boolean {
+    return buddiesMod.toggleBuddy(this.ctx, pid);
+  }
+
+  /** The owned subset of the buddy catalog for a player (the server wire path). */
+  ownedBuddiesFor(pid: number): BuddyKey[] {
+    const meta = this.players.get(pid);
+    return meta ? buddiesMod.ownedBuddies(meta) : [];
+  }
+
+  /** Per-pid buddy autoloot toggle (the server command path); the IWorld member
+   *  below rides primaryId. Rules live in src/sim/buddies.ts, the per-tick
+   *  errand it arms in src/sim/pet/buddy_autoloot.ts. */
+  setBuddyAutolootFor(pid: number, enabled: boolean): boolean {
+    return buddiesMod.setBuddyAutoloot(this.ctx, pid, enabled);
+  }
+
+  // The rest of the per-pid buddy surface (server wire + commands + grants);
+  // every rule lives in src/sim/buddies.ts, these are the thin delegates.
+  renameBuddyFor(pid: number, buddyId: number, name: string): boolean {
+    return renameBuddy(this.ctx, pid, buddyId, name);
+  }
+  summonBuddyFor(pid: number, key: string): boolean {
+    return buddiesMod.summonBuddy(this.ctx, pid, key);
+  }
+  grantBuddyFor(pid: number, key: string): boolean {
+    return buddiesMod.grantBuddy(this.ctx, pid, key);
+  }
+  pendingBuddiesFor(pid: number): BuddyKey[] {
+    const meta = this.players.get(pid);
+    return meta ? buddiesMod.pendingBuddies(meta) : [];
+  }
+
+  syncBuddyOwnershipFor(pid: number, keys: readonly string[]): boolean {
+    return buddiesMod.syncBuddyOwnership(this.ctx, pid, keys);
+  }
+
+  // --- IWorldBuddies ---
+  ownedBuddies(): readonly BuddyKey[] {
+    return this.ownedBuddiesFor(this.primaryId);
+  }
+  pendingBuddies(): readonly BuddyKey[] {
+    return this.pendingBuddiesFor(this.primaryId);
+  }
+  renameBuddy(buddyId: number, name: string): void {
+    this.renameBuddyFor(this.primaryId, buddyId, name);
+  }
+  summonBuddy(key: BuddyKey): void {
+    this.summonBuddyFor(this.primaryId, key);
+  }
+  toggleBuddy(): void {
+    this.toggleBuddyFor(this.primaryId);
+  }
+  setBuddyAutoloot(enabled: boolean): void {
+    this.setBuddyAutolootFor(this.primaryId, enabled);
   }
 
   /** Purchase the riding skill from Marla (80g). Server path; IWorld member rides
@@ -5246,6 +5333,7 @@ export class Sim {
       // observe events (mob_blind/mob_cleave). An early .bind(sim) would capture the
       // original method and bypass that swap, breaking the dynamic-dispatch semantics
       // the pre-move this.emit had. (Mirrors the late-bound ctx.error C4a installed.)
+      onBuddyGranted: (pid, key) => sim.onBuddyGranted?.(pid, key),
       emit: (ev) => sim.emit(ev),
       dealDamage: sim.dealDamage.bind(sim),
       handleDeath: sim.handleDeath.bind(sim),
@@ -6139,6 +6227,9 @@ export class Sim {
     // same-tick delayed-event results, and because it draws ZERO rng (pure
     // predicate checks over dirty players plus a 1 Hz proximity sweep) its
     // position cannot fork the draw order (the Vale Cup tail precedent).
+    // Pending boss-pet reveals (src/sim/buddy_drops.ts): a 1 Hz position
+    // sweep that draws no rng, so it sits beside the deeds evaluator.
+    if (this.tickCount % TICK_RATE === 0) updateBuddyReveals(this.ctx);
     deedsMod.updateDeeds(this.ctx);
     lap?.('deeds');
 
@@ -9029,6 +9120,13 @@ export class Sim {
   isHostileTo(attacker: Entity, target: Entity): boolean {
     if (target.kind === 'mob') {
       if (target.templateId.startsWith('vision_')) return false;
+      // A cosmetic buddy (src/sim/pet/buddy_ai.ts) is never a valid hostile
+      // target, in a duel/arena/battleground or anywhere else: it carries no
+      // combat at all, so recursing to its owner below would make an
+      // opponent's follower Tab-targetable and AoE-eligible purely because
+      // the owner is hostile. Checked before the owner-recursion arm so it
+      // wins regardless of who the owner is.
+      if (isBuddyMob(target)) return false;
       // A Protect Yumi cat is attackable only by the opposing team of its
       // live match (social/yumi.ts owns the rule).
       if (yumiMod.isYumiCat(target)) return yumiMod.yumiCatHostileTo(this.ctx, attacker, target);

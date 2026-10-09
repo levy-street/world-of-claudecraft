@@ -5,6 +5,15 @@
 // Short-lived guardians are not MOBS rows, so they deliberately borrow the
 // portrait of the exact existing creature body used in-world.
 
+import type { BuddyKey } from '../sim/content/buddies';
+
+/** Shared model headshots for Cosmetics cards and every targeted buddy frame. */
+export const BUDDY_PORTRAIT_URLS: Readonly<Record<BuddyKey, string>> = Object.freeze({
+  horse: '/ui/portraits/buddy_horse.webp',
+  crystal_lich: '/ui/portraits/buddy_crystal_lich.webp',
+  forgemaw: '/ui/portraits/buddy_forgemaw.webp',
+});
+
 export const TRANSIENT_MOB_PORTRAIT_SOURCE_IDS: Readonly<Record<string, string>> = Object.freeze({
   guardian_tithefiend: 'rift_dread_stalker',
   guardian_stampede_0: 'old_greyjaw',
@@ -27,6 +36,10 @@ export function targetPortraitSourceId(templateId: string, isMobEntity: boolean)
 }
 
 export function targetPortraitUrl(templateId: string, isMobEntity: boolean): string | null {
+  if (isMobEntity && templateId.startsWith('buddy_')) {
+    const key = templateId.slice('buddy_'.length);
+    if (Object.hasOwn(BUDDY_PORTRAIT_URLS, key)) return BUDDY_PORTRAIT_URLS[key as BuddyKey];
+  }
   if (isMobEntity && STATIC_MOB_PORTRAIT_URLS[templateId]) {
     return STATIC_MOB_PORTRAIT_URLS[templateId];
   }

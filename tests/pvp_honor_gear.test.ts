@@ -4,6 +4,7 @@ import {
   FURY_NPC,
   FURY_STOCK,
   HONOR_QUARTERMASTER_STOCK,
+  HONOR_VENDOR_STOCK,
   WARFARE_ITEMS,
   WARFARE_JEWELRY_STAT_FRACTION,
   WARFARE_RATING_FRACTION,
@@ -207,8 +208,9 @@ describe('FURY WARFARE stock', () => {
     expect(NPCS.fury.facing).toBe(-2.2455372690184494);
     expect(NPCS.fury.dynamic).toBe(true);
     // The entry tier first, then the two honor trinkets, then Warfare Season 2
-    // (pinned as the tail in warfare_season2.test.ts).
-    expect(NPCS.fury.vendorItems).toEqual(HONOR_QUARTERMASTER_STOCK);
+    // (pinned as the gear tail in warfare_season2.test.ts), then the buddy.
+    expect(NPCS.fury.vendorItems).toEqual(HONOR_VENDOR_STOCK);
+    expect(HONOR_VENDOR_STOCK).toEqual([...HONOR_QUARTERMASTER_STOCK, 'whistle_horse']);
     expect(HONOR_QUARTERMASTER_STOCK.slice(0, FURY_STOCK.length)).toEqual(FURY_STOCK);
     expect(
       HONOR_QUARTERMASTER_STOCK.slice(

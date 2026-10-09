@@ -190,9 +190,11 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // On the v0.45.0 integration: the membership integration's 252/266 plus those three
 // commands = 255/269.
 // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 256, 270.
-const EXPECTED_SEND_COUNT = 256;
-const EXPECTED_DISPATCH_COUNT = 270;
-const EXPECTED_DISPATCH_ONLY_COUNT = 14;
+// Buddy collection integration adds four sends and five dispatches: the retired
+// buddy_cosmetic token is dispatch-only; buddy_rename is sent and dispatched.
+const EXPECTED_SEND_COUNT = 260;
+const EXPECTED_DISPATCH_COUNT = 275;
+const EXPECTED_DISPATCH_ONLY_COUNT = 15;
 
 // The chat sub-channel routing switch (server/game.ts `switch
 // (session.rememberedChat.channel)`) is NOT a msg.cmd dispatch; its labels must
@@ -327,8 +329,12 @@ describe('command schema parity (W0b)', () => {
     expect(dispatchSet.has('unstuck')).toBe(true);
   });
   it('appends courier dispatch as a complete client/server command pair', () => {
-    // On the v0.45.0 integration the dungeon guide's answer (PR 4352) appends after it.
-    expect(COMMAND_NAMES.slice(-2)).toEqual(['courier_dispatch', 'dungeon_guide_answer']);
+    // The integration adds the dungeon guide answer, then the buddy rename command.
+    expect(COMMAND_NAMES.slice(-3)).toEqual([
+      'courier_dispatch',
+      'dungeon_guide_answer',
+      'buddy_rename',
+    ]);
     expect(sendSet.has('courier_dispatch')).toBe(true);
     expect(dispatchSet.has('courier_dispatch')).toBe(true);
     expect(allowlistSet.has('courier_dispatch' as CommandName)).toBe(false);

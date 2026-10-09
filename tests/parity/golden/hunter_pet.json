@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "77b25040",
+      "state": "a26c1380",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -44,6 +44,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {},
@@ -158,7 +161,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1015,
-      "state": "ab5ac9b3",
+      "state": "b29d7501",
       "events": "3534744f",
       "rng": {
         "draws": 10,
@@ -169,7 +172,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1015,
-      "state": "5635772e",
+      "state": "cb0e54c6",
       "events": "741638a5",
       "rng": {
         "draws": 10,
@@ -180,7 +183,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1015,
-      "state": "81f07008",
+      "state": "d1377474",
       "events": "9084e4bd",
       "rng": {
         "draws": 174,
@@ -191,7 +194,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1015,
-      "state": "ebda44ed",
+      "state": "115e5ba7",
       "events": "741638a5",
       "rng": {
         "draws": 339,
@@ -202,7 +205,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1015,
-      "state": "f2dfa04c",
+      "state": "644cac42",
       "events": "2ecdf293",
       "rng": {
         "draws": 533,
@@ -213,7 +216,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1015,
-      "state": "cb120575",
+      "state": "585ecb21",
       "events": "741638a5",
       "rng": {
         "draws": 736,
@@ -224,7 +227,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1015,
-      "state": "cb120575",
+      "state": "585ecb21",
       "events": "741638a5",
       "rng": {
         "draws": 736,
@@ -253,6 +256,9 @@
             ]
           },
           "bgRating": 1500,
+          "buddies": {
+            "names": {}
+          },
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {

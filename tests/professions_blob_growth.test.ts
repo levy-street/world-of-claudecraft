@@ -165,6 +165,8 @@ const PROFESSIONS_BLOB_FIELDS = [
 // included, since a key absent from the fixture is harmless here while a
 // missing one is not.
 const NON_PROFESSIONS_BLOB_FIELDS = [
+  // The buddy collection (src/sim/buddies.ts): owned, last and custom names.
+  'buddies',
   // Written by the SERVER, not by serializeCharacter: server/game.ts stamps
   // state.jail onto the serialized blob before persisting, so no sim fixture
   // can arm it and the source scrape below cannot see it either. Classified
@@ -1668,6 +1670,16 @@ function maximalCharacterSim(): Sim {
   const longName = 'A'.repeat(MAX_CRAFTED_BY_LENGTH);
   const instanceItemId = STORED_COLLECTION_ITEM_ID;
 
+  // Deeds no longer grant companions. Arm the complete retained collection
+  // explicitly so removing those rewards does not shrink this field to absent.
+  meta.buddies.owned = new Set(['horse', 'crystal_lich', 'forgemaw']);
+  meta.buddies.last = 'crystal_lich';
+  meta.buddies.names = {
+    horse: 'ABCDEFGHIJKLMNOP',
+    crystal_lich: 'ABCDEFGHIJKLMNOP',
+    forgemaw: 'ABCDEFGHIJKLMNOP',
+  };
+
   // Progression at the cap, every counter wide.
   sim.setPlayerLevel(MAX_LEVEL);
   meta.lifetimeXp = 999_999_999;
@@ -1980,6 +1992,19 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     const s3 = third.serializeCharacter(pid3) as CharacterState;
     expect(s3).toEqual(s2);
     expect(Object.keys(s3).sort()).toEqual(Object.keys(s2).sort());
+    expect(s2.buddies).toEqual({
+      owned: ['horse', 'crystal_lich', 'forgemaw'],
+      last: 'crystal_lich',
+      names: {
+        horse: 'ABCDEFGHIJKLMNOP',
+        crystal_lich: 'ABCDEFGHIJKLMNOP',
+        forgemaw: 'ABCDEFGHIJKLMNOP',
+      },
+    });
+    // The retained collection plus three maximum-length custom names, including
+    // its top-level key. Names add 101 bytes to the pre-naming collection.
+    const buddyCollectionBytes = Buffer.byteLength(JSON.stringify(s2.buddies), 'utf8') + 11;
+    expect(buddyCollectionBytes).toBe(179);
 
     // The professions block rides inside at its own ceiling: the same band the
     // professions arm pins, so the two measurements can never describe
@@ -2621,7 +2646,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // deed, on the v0.45.0 integration (the rework's own attribution: its 19
         // encounter deed ids, 66 item ids and 19 relics' reliquary rows).
         3089 +
-        41,
+        41 +
+        // Legacy whistle and charm discovery ids, plus the retained buddy collection.
+        706 +
+        buddyCollectionBytes,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2677,7 +2705,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // role fill's 75 ids (the +1,541 above).
       // Then -> 17,830 with membership item discovery (+155, measured above).
       // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: deedStats +1,448 and reliquary +993.
-      deedStats: 19278,
+      // The 36 legacy buddy item ids add 706 discovery bytes.
+      deedStats: 19984,
       reliquary: 12494,
     });
     // Removing field_kit AND the Bramblehide release content reproduces the
@@ -2721,7 +2750,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 238,436 -> 239,977 at the quest role fill (+1,541, the 75 ids).
       // Membership's eight discovered item ids remain here: +155 bytes (240,132).
       // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: +3,130 (240,132 -> 243,262).
-    ).toBe(243262);
+      // Retained buddy data adds 706 discovery bytes and 179 collection bytes.
+    ).toBe(244147);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2757,7 +2787,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // integration (+1,191, the balgathDelta above: the boss content, Balgath's
       // loot, and the muster weekly as a kill credit with no item of its own).
       // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: +3,130 (242,942 -> 246,072).
-    ).toBe(246072);
+      // Retained buddy data adds 706 discovery bytes and 179 collection bytes.
+    ).toBe(246957);
     const priorContent = withoutCrucibleContent(withoutReferral);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2884,8 +2915,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // RE-BASED with the five-dungeon rework (PR 4352) on the v0.45.0 integration:
     // 246,206 bytes = 243,076 + 3,089 + 41, attributed above. Floor at measurement
     // minus 380, edge at measurement plus one: 245826..246207.
-    expect(bytes, reMint).toBeGreaterThan(245826);
-    expect(bytes, reMint).toBeLessThan(246207);
+    // Buddy discovery and collection fields add 885 bytes; keep the 381-byte band.
+    expect(bytes, reMint).toBeGreaterThan(246711);
+    expect(bytes, reMint).toBeLessThan(247092);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was
