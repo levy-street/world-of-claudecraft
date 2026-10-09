@@ -4,6 +4,7 @@
 // arm is pinned here once; the grant-side behaviour rides
 // tests/item_tracking.test.ts.
 import { describe, expect, it } from 'vitest';
+import { sanitizeItemInstancePayloadOnLoad } from '../src/sim/item_instance_load';
 import {
   cloneItemProvenance,
   currentItemHolder,
@@ -158,6 +159,31 @@ describe('isLoadableItemProvenance (the atomic load bound)', () => {
     ['null transfers', { ...origin(), transfers: null }],
   ])('refuses %s', (_label, value) => {
     expect(isLoadableItemProvenance(value)).toBe(false);
+  });
+
+  it('keeps a canonical derivedFrom parent guid and drops the whole record on a malformed one', () => {
+    const parent = '9b2e7c1a-5d34-4f6e-8a1b-2c3d4e5f6071';
+    expect(isLoadableItemProvenance({ ...origin(), derivedFrom: parent })).toBe(true);
+    expect(isLoadableItemProvenance({ ...origin(), derivedFrom: HOST_GUID })).toBe(true);
+    for (const bad of [parent.toUpperCase(), 'not-a-guid', '', 42, null, `${parent}0`]) {
+      expect(isLoadableItemProvenance({ ...origin(), derivedFrom: bad }), JSON.stringify(bad)).toBe(
+        false,
+      );
+    }
+    // Through the real payload load bound: a valid parent rides through, a
+    // malformed one drops the provenance record whole while the guid stays.
+    const kept = sanitizeItemInstancePayloadOnLoad({
+      guid: HOST_GUID,
+      provenance: { ...origin(), derivedFrom: parent },
+    });
+    expect(kept.dropped).toEqual([]);
+    expect(kept.payload?.provenance?.derivedFrom).toBe(parent);
+    const dropped = sanitizeItemInstancePayloadOnLoad({
+      guid: HOST_GUID,
+      provenance: { ...origin(), derivedFrom: 'NOPE' },
+    });
+    expect(dropped.dropped).toEqual(['provenance']);
+    expect(dropped.payload).toEqual({ guid: HOST_GUID });
   });
 
   it('judges an owner record on its own', () => {

@@ -517,6 +517,8 @@ describe('i18n CLDR pluralization', () => {
       // The signpost guild board's live count line (guild board categories).
       'guildBoardShown',
       'guildMembers',
+      // The Item history prompt's rolled-off transfers line (item tracking).
+      'itemHistoryEarlierHidden',
       'playersMatching',
       'playersOnline',
       'playtimeDays',

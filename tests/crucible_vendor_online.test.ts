@@ -121,9 +121,22 @@ describe('crucible_buy over the GameServer wire', () => {
     broadcast(server);
     const client = bareClient(session.pid);
     (client as unknown as { applySnapshot(snap: unknown): void }).applySnapshot(lastSnap(fc.sent));
+    // The set piece is an epic one-per-slot copy, so it is minted tracked: the
+    // mirrored slot is the server's exact copy (same guid), carrying only the
+    // tracked identity on top of the plain one-count grant. The sigil stays a
+    // plain stack.
+    const serverPiece = server.sim
+      .meta(session.pid)
+      ?.inventory.find((slot) => slot.itemId === SET_PIECE);
+    const guid = serverPiece?.instance?.guid;
+    expect(guid).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
     expect(client.inventory).toEqual(
       expect.arrayContaining([
-        { itemId: SET_PIECE, count: 1 },
+        {
+          itemId: SET_PIECE,
+          count: 1,
+          instance: { guid, provenance: expect.objectContaining({ by: 'Redeemer' }) },
+        },
         { itemId: SIGIL, count: 1 },
       ]),
     );
