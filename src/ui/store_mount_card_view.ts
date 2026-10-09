@@ -21,7 +21,7 @@
 // own character before Buy, or wears an owned one. The button therefore stays
 // enabled whatever the row's state; the overlay decides the action.
 
-import { MOUNT_SKINS, mountSkinDef } from '../sim/content/mount_skins';
+import { isStoreMountSkinId, MOUNT_SKINS, mountSkinDef } from '../sim/content/mount_skins';
 import type { MountRarity } from '../sim/content/mounts';
 import { esc } from './esc';
 import { focusKeyAttr } from './focus_restore';
@@ -42,7 +42,7 @@ export function storeMountName(skinId: string): string {
 
 /** One card, or '' for a row the catalog does not declare. */
 export function storeMountCardHtml(row: StoreMountRow): string {
-  const skin = mountSkinDef(row.itemId);
+  const skin = isStoreMountSkinId(row.itemId) ? MOUNT_SKINS[row.itemId] : null;
   if (!skin) return '';
   const name = storeMountName(row.itemId);
   // The skin art through the store art seam (mountSkinArt), never a path
@@ -72,11 +72,11 @@ export function storeMountCardHtml(row: StoreMountRow): string {
 export function storeMountsSectionHtml(rows: readonly StoreMountRow[]): string {
   const byRarity = new Map<MountRarity, StoreMountRow[]>();
   for (const row of rows) {
-    const skin = mountSkinDef(row.itemId);
+    const skin = isStoreMountSkinId(row.itemId) ? MOUNT_SKINS[row.itemId] : null;
     if (!skin) continue;
-    const bucket = byRarity.get(MOUNT_SKINS[skin.id].rarity) ?? [];
+    const bucket = byRarity.get(skin.rarity) ?? [];
     bucket.push(row);
-    byRarity.set(MOUNT_SKINS[skin.id].rarity, bucket);
+    byRarity.set(skin.rarity, bucket);
   }
   return [...byRarity.entries()]
     .map(

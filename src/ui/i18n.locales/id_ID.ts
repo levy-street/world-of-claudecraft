@@ -4030,29 +4030,14 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.mountsPage.collectBody':
     'Di luar konter Marla, tali kekang ditemukan, bukan dibeli. Ia jatuh dari bos terakhir dungeon lima pemain dan raid pada mode heroik, serta dari penuntasan rift, tempat makin sulit rift yang kamu tuntaskan, makin langka tali kekang yang bisa ditinggalkannya. Semuanya sengaja dibuat langka dan tidak ada sesi yang menjaminnya, jadi cara yang bijak untuk memburu tunggangan adalah membawa buruan itu serta pada sesi yang toh sudah kamu jalani. Halaman ini tidak akan memberitahumu tunggangan mana tergantung di bos yang mana: bagian itu adalah milikmu untuk cari tahu sendiri.',
   'guide.mountsPage.collectHeading': 'Dari mana tunggangan yang lebih langka berasal',
-  'guide.mountsPage.firstBody':
-    'Valorsteed adalah satu-satunya tunggangan yang dijual di mana pun di dunia ini. Begitu kamu mempelajari Menunggang, Marla akan menjual Tali Kekang Valorsteed kepadamu seharga 10 emas, dan tali kekang itu menjadi milikmu untuk disimpan. Setiap tunggangan lain didapat di luar sana di dunia, sehingga kuda ini adalah tempat hampir setiap penunggang memulai.',
   'guide.mountsPage.firstHeading': 'Tunggangan pertamamu',
-  'guide.mountsPage.goodsBody':
-    'Tunggangan adalah sebuah item, yang menjadikannya sesuatu yang bisa digerakkan ekonomi. Kamu memiliki sebuah tunggangan selama tali kekangnya berada di tasmu atau di bankmu, meski tali kekang yang disimpan di bank tetap menjadikan tunggangan itu milikmu tanpa membiarkanmu menungganginya: untuk memanggil binatang itu kamu harus membawa tali kekangnya. Tali kekang milik pemain tidak pernah soulbound, sehingga ia bisa diperdagangkan, dikirim lewat surat, dan didaftarkan di Pasar Dunia seperti temuan lainnya, kecuali item itu sendiri menyatakan sebaliknya. Ada dua hal yang layak diketahui sebelum kamu melepaskannya: tidak ada penjaja yang akan pernah membeli kembali sepasang tali kekang, sehingga sebuah tunggangan adalah pembelian yang kamu simpan atau teruskan, bukan sesuatu yang bisa diuangkan, dan jika tali kekang itu meninggalkan tasmu dan bankmu sekaligus saat kamu sedang menungganginya, diperdagangkan, dikirim lewat surat, atau dijual di pasar, tunggangan itu ikut pergi bersamanya dan kamu diturunkan di tempat kamu berdiri.',
   'guide.mountsPage.goodsHeading': 'Tali kekang adalah barang biasa',
   'guide.mountsPage.heading': 'Tunggangan dan menunggang',
-  'guide.mountsPage.intro':
-    'Tunggangan adalah cara yang lebih cepat untuk melintasi dunia, dan itulah keseluruhannya. Kamu belajar menunggang di kandang, membeli tali kekang pertamamu, dan setiap jalan sesudahnya menjadi lebih pendek.',
-  'guide.mountsPage.learnBody':
-    'Menunggang adalah kecakapan yang kamu beli sekali saja, dan ia terbuka pada level {level}. Marla Hitchen, sang Kepala Kandang, menjaga Kandang Galecrest di perbukitan, dan ia menjual Pelatihan Menunggang seharga 80 emas. Pembelian tunggal itulah yang membuatmu bisa duduk di atas tunggangan sama sekali, dan ia tetap menjadi milikmu selamanya.\n\nBegitu kamu memilikinya, Marla punya misi untukmu: Pelajaran Menunggang Kuda. Ambil misi itu, ikuti petunjuk arah menuju kotak bercahaya di belakang gerbang start, dan tekan Mulai Balapan. Ia meminjamkanmu seekor Valorsteed latihan untuk pelajaran ini, sehingga pelajaran itu sendiri tidak membebanimu apa pun. Tunggangi lintasannya, selesaikan, dan kembalilah kepadanya untuk koin dan pengalamanmu. Kuda pinjaman itu kembali ke kandang sesudahnya, sehingga pelajaran itu mengajarkanmu cara duduk di pelana, bukan memberimu seekor kuda.',
   'guide.mountsPage.learnHeading': 'Belajar menunggang',
   'guide.mountsPage.raceBody':
     'Lintasan lompat rintangan di padok Marla terbuka untuk siapa saja, kapan saja, tidak hanya selama pelajaran berlangsung. Duduki sebuah tunggangan, berdirilah di kotak bercahaya di belakang gerbang, dan tekan Mulai Balapan. Sebuah hitungan mundur menahanmu tetap diam, lalu jam mulai berjalan: lewati ketujuh lompatan dan tunggangi kembali keluar melewati gerbang sebelum waktunya habis.\n\nSebuah lompatan hanya dihitung jika kamu benar-benar berada di udara melewati mistar, sehingga sekadar menerobos begitu saja tidak menghitung apa pun. Kamu boleh melewatinya dalam urutan apa pun dan dari sisi mana pun, dan satu yang terlewat bukan akhir dari segalanya: putar balik dan coba lagi. Mati, turun dari tunggangan, atau meninggalkan padok mengakhiri percobaan itu, begitu pula membiarkan waktunya habis, yang menurunkanmu dari pelana di tempat kamu berdiri; membatalkannya sendiri hanya menghentikan hitungan waktu. Tidak ada yang menghalangimu memulai lagi. Tidak ada biaya, tidak ada waktu tunggu, dan tidak ada hadiah selain waktu itu sendiri, dan berapa pun jumlah penunggang bisa menjalani lintasan itu sekaligus tanpa saling menghalangi.',
   'guide.mountsPage.raceHeading': 'Balapan kandang',
-  'guide.mountsPage.rideBody':
-    'Tidak ada jendela tunggangan dan tidak ada favorit yang perlu diatur, karena tali kekanglah tunggangannya. Gunakan satu tali kekang dari tasmu atau dari slot bilah aksi dan kamu menunggangi tunggangan itu. Memanggilnya makan waktu sesaat, panggilan singkat alih-alih instan, sehingga ia tidak akan menyelamatkanmu dari tarikan buruk. Turun dari tunggangan bersifat instan dan tidak pernah terhalang.\n\nGunakan tali kekang yang sedang kamu tunggangi dan kamu menyimpan tunggangan itu kembali. Gunakan tali kekang lain saat sedang menunggang dan kamu langsung berpindah ke tunggangan itu, tanpa ada yang perlu dipanggil di antaranya. Tombol Naiki / Turun, tombol backtick secara bawaan, hanya pernah menurunkanmu: itu jalan turun, bukan jalan naik. Satu pengecualiannya adalah pelajaran menunggang, tempat tombol yang sama memanggil kuda yang dipinjamkan Marla, karena kuda pinjaman tidak punya tali kekang untuk diklik. Di ponsel atau tablet, tombol Naiki di menu Lainnya bekerja dua arah, meski ia memanggil tali kekang pertama yang ada di tasmu alih-alih yang kamu pilih, jadi ketuk tali kekangnya sendiri saat kamu menginginkan tunggangan tertentu.',
   'guide.mountsPage.rideHeading': 'Naik dan turun dari tunggangan',
-  'guide.mountsPage.speedBody':
-    'Kecepatan adalah satu-satunya hal yang membedakan satu tunggangan dari yang lain. Valorsteed yang kamu beli dari Marla menetapkan kecepatan dasarnya, dan tunggangan yang kamu kumpulkan di dunia luar melaju di atasnya: makin langka tali kekangnya, makin cepat larinya, dalam beberapa langkah yang jelas alih-alih peningkatan yang mulus. Tidak ada tingkatan kedua Menunggang untuk dilatih dan tidak ada peningkatan untuk dibeli sesudahnya. Kamu membayar Menunggang satu kali, dan sejak saat itu tali kekang yang kamu pakai menentukan seberapa cepat kamu bepergian.',
-  'guide.mountsPage.speedHeading': 'Kecepatan dan tingkatan',
-  'guide.mountsPage.whatBody':
-    'Tunggangan adalah seekor binatang yang kamu tunggangi, dan yang diberikannya adalah kecepatan. Tanpa zirah, tanpa kerusakan, tanpa statistik: ia membawamu melintasi tanah lebih cepat, dan melompat sedikit lebih tinggi saat kamu melompat, dan itulah keseluruhan kesepakatannya. Setiap tunggangan dalam permainan ini adalah tunggangan darat, sehingga tidak ada yang terbang, dan tidak satu pun dari mereka berenang.',
   'guide.mountsPage.whatHeading': 'Apa itu tunggangan',
   'guide.mountsPage.whereBody':
     'Kandang Galecrest ditandai pada peta Puncak Angin, di perbukitan antara Tebing Curam dan Ladang Bangkai Kapal. Marla berdiri di samping kandang, menghadap arena balap.',
@@ -4089,8 +4074,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Rift adalah satu-satunya hal yang menanti hingga batas akhir itu sendiri. Ia merekah di berbagai penjuru alam ini menurut jadwalnya sendiri, berperingkat dari C sampai S, dan setiap kelompok di dunia ini berlomba menjadi yang menutup masing-masingnya. Papan Delve juga terus berjalan, dan tingkat Heroiknya layak dilirik lagi begitu perlengkapanmu sudah mengejar.',
   'guide.progression.journeyBodyCount':
     'Dunia ini adalah satu hamparan tanah yang menyatu, terdiri dari {zones} zona. Tiga di antaranya adalah jalur tempat kamu naik level, membentang dari selatan ke utara: kamu mulai di lembah hijau, melaju menembus rawa, dan berakhir di puncak tinggi yang dingin. Ikuti jejak misi dan tanah itu akan membawamu dari satu ke berikutnya. Sebuah pulau ada di lepas pantai lembah untuk level-level awal, dan sisa alam ini terbuka dari jalan yang sama, dibangun untuk karakter yang sudah menuntaskan pendakian itu.',
-  'guide.progression.ridingBody':
-    'Menunggang adalah salah satu hal yang menanti di ujung pendakian itu. Pada level {level} seorang kepala kandang akan mengajarkanmu kecakapan itu dengan bayaran emas yang tidak sedikit, dan sebuah pelajaran di lintasan latihan mengganjarmu dengan tali kekang pertamamu. Tunggangan sama sekali tidak memberikan kekuatan; ia hanya membuat dunia terasa lebih kecil, yang setelah berjalan jauh ke utara adalah imbalannya tersendiri.',
   'guide.progression.ridingTitle': 'Belajar menunggang',
   'guide.questsPage.availableBody':
     'Misi datang berantai. Sebagian besar hanya ditawarkan setelah kamu menyerahkan misi sebelumnya, dan banyak juga meminta level minimum, sehingga seorang NPC yang tidak punya apa-apa untukmu hari ini mungkin punya banyak setelah beberapa levelmu berikutnya atau begitu kamu menutup misi yang sedang kamu bawa. Beberapa punya syarat tersendiri, seperti Pelajaran Menunggang Kuda, yang hanya terbuka setelah kamu membeli kecakapan Menunggang. Misi kelompok menyatakannya di depan dengan mencantumkan berapa banyak pemain yang mereka sarankan kamu bawa. Sebagian tugas bisa diulang: kamu bisa mengambilnya lagi setelah masa tunggu, dan penanda di atas pemberinya memberitahumu kapan sebuah misi kembali tersedia.',
@@ -16150,8 +16133,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mountRace.toFinish': 'Kembali menunggang melewati gerbang lengkung!',
   'hudChrome.mountTraining.begin': 'Mulai Pelajaran',
   'hudChrome.mountTraining.mountPrompt': 'Tekan {key} untuk menaiki Valorsteed latihan.',
-  'hudChrome.mountTraining.ownedMountPrompt':
-    'Tali kekangmu ada di dalam tasmu. Gunakan untuk menunggang.',
   'hudChrome.mountTraining.returnToMarla':
     'Kembali ke Marla di kandang untuk membeli tali kekang Valorsteed-mu seharga 10 emas.',
   'hudChrome.mountTraining.ridePrompt':
@@ -16161,18 +16142,12 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.close': 'Tutup',
   'hudChrome.mounts.desc_aether_hover_cycle':
     'Sepeda magiteknologi bertenaga besar yang dirancang untuk pergerakan tempur cepat dan melayang rendah.',
-  'hudChrome.mounts.desc_grag_bear':
-    'Beruang tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.',
   'hudChrome.mounts.desc_shadowjump_toad':
     'Kodok raksasa masif berpijakan mantap, terlatih dalam lompatan bayangan secepat kilat yang mampu menjangkau medan apa pun.',
-  'hudChrome.mounts.desc_stalkglider_snail':
-    'Siput ulet berenergi tahan lama yang memberikan kecepatan perjalanan tambahan.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Griffin badai yang anggun, melangkah di tanah dengan cakar bersepatu rune, sayap terlipat rapat.',
   'hudChrome.mounts.desc_thunderstrut_gobbler':
     'Kalkun raksasa tetasan badai yang melenggak-lenggok turun dari Puncak yang Terjaga, ekornya terkembang bagai awan guntur.',
-  'hudChrome.mounts.desc_valorsteed':
-    'Kuda tunggangan tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.',
   'hudChrome.mounts.dismount': 'Turun',
   'hudChrome.mounts.emptyDropHint':
     'Tunggangan yang lebih langka dijatuhkan oleh bos dungeon heroik dan penyelesaian Rift.',
@@ -16195,7 +16170,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.selected': 'Terpilih',
   'hudChrome.mounts.spec_speed': '+{pct}% mobilitas ekstra',
   'hudChrome.mounts.title': 'Tunggangan',
-  'hudChrome.mounts.useToRide': 'Gunakan untuk memanggil tunggangan ini.',
   'hudChrome.unstuck.alreadyActive': 'Lepaskan Diri sedang menghitung mundur.',
   'hudChrome.unstuck.alreadySafe': 'Kamu sudah berada di posisi yang aman dan terjangkau.',
   'hudChrome.unstuck.busy': 'Selesaikan tindakanmu saat ini sebelum menggunakan Lepaskan Diri.',
@@ -18610,10 +18584,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.mechEmpty': 'Belum memiliki kroma Mecha Tempur.',
   'hudChrome.cosmetics.mechIntro':
     'Mecha Tempur menggantikan tubuh karakter ini. Satu kroma dipakai pada satu waktu.',
-  'hudChrome.cosmetics.mountsIntro':
-    'Skin tunggangan digambar di atas tunggangan yang dinaiki karakter ini. Skin tidak pernah mengubah kecepatan.',
-  'hudChrome.cosmetics.mountsNoMount':
-    'Miliki tunggangan terlebih dahulu: skin membutuhkan sesuatu untuk ditunggangi.',
   'hudChrome.cosmetics.owned': 'Dimiliki',
   'hudChrome.cosmetics.scopeAccount': 'Akun',
   'hudChrome.cosmetics.scopeCharacter': 'Karakter',

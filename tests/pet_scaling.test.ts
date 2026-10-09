@@ -129,16 +129,16 @@ describe('pet_scaling: heel speed', () => {
 
   it('outruns a mounted owner, which the old fixed floor did not', () => {
     // The bug: the floor was RUN_SPEED * 1.1 = 7.7 regardless of the owner, while
-    // the slowest mount puts a player at 7 * 1.6 = 11.2 yd/s.
-    const mounted = RUN_SPEED * 1.6;
+    // basic riding puts a player at 7 * 1.7 = 11.9 yd/s.
+    const mounted = RUN_SPEED * 1.7;
     const oldFixedFloor = RUN_SPEED * 1.1;
     expect(oldFixedFloor).toBeLessThan(mounted);
     expect(petHeelSpeed(8, mounted)).toBeGreaterThan(mounted);
     expect(petHeelSpeed(8, mounted)).toBeCloseTo(mounted * PET_CATCHUP_SPEED_MULT, 5);
   });
 
-  it('scales with the fastest mounts too', () => {
-    const fastest = RUN_SPEED * 1.8;
+  it('scales with advanced riding too', () => {
+    const fastest = RUN_SPEED * 2.1;
     expect(petHeelSpeed(8, fastest)).toBeGreaterThan(fastest);
   });
 
@@ -429,8 +429,12 @@ describe('pet_scaling: scope', () => {
   });
 });
 
-describe('pet_scaling: heeling a mounted owner', () => {
-  it('closes on a mounted owner instead of falling behind', () => {
+describe('pet_scaling: heeling a walking or mounted owner', () => {
+  it.each([
+    [0, 1],
+    [1, 1.7],
+    [2, 2.1],
+  ] as const)('closes on a rank %i owner instead of falling behind', (ridingTier, speedMult) => {
     const sim = new Sim({ seed: SEED, playerClass: 'hunter', noPlayer: true }) as AnySim;
     const pid = sim.addPlayer('hunter', 'Rider') as number;
     const owner = sim.entities.get(pid) as AnyEntity;
@@ -452,23 +456,25 @@ describe('pet_scaling: heeling a mounted owner', () => {
     pet.moveSpeed = 5.2;
     place(owner, 0, 0);
     place(pet, 0, -30); // well past the heel distance, well inside the warp range
-    // The rider must actually own the reins, or updateMountTransition force-dismounts
-    // them mid-tick and the owner is never really mounted.
-    sim.addItem('reins_valorsteed', 1, pid);
-    owner.mountKey = 'valorsteed';
+    const meta = sim.players.get(pid)!;
+    meta.ridingTrained = ridingTier > 0;
+    meta.ridingTier = ridingTier === 0 ? undefined : ridingTier;
+    owner.ridingTier = ridingTier;
+    owner.mountKey = ridingTier === 0 ? '' : 'valorsteed';
 
     const startDist = dist(pet.pos, owner.pos);
     const before = { ...pet.pos };
     sim.tick();
     const step = dist(before, pet.pos);
 
-    expect(sim.moveSpeedMult(owner)).toBeCloseTo(1.6, 5); // the mount really is up
+    expect(sim.moveSpeedMult(owner)).toBeCloseTo(speedMult, 5); // the intended movement mode is live
     // Old behavior stepped RUN_SPEED * 1.1 * DT = 0.385 yd per tick regardless of the
-    // mount. Tracking a 1.6x mount steps 7 * 1.6 * 1.1 * DT = 0.616 instead. Pinned
+    // mount. The current trained pace gets the same 10% catch-up margin. Pinned
     // to the real value, not merely "greater than 0.385", because the two are close
     // enough that a float-noise comparison would pass on the old code.
-    expect(step).toBeCloseTo(RUN_SPEED * 1.6 * PET_CATCHUP_SPEED_MULT * DT, 3);
-    expect(step).toBeGreaterThan(RUN_SPEED * 1.1 * DT * 1.5);
+    expect(step).toBeCloseTo(RUN_SPEED * speedMult * PET_CATCHUP_SPEED_MULT * DT, 3);
+    expect(step).toBeGreaterThan(RUN_SPEED * speedMult * DT);
+    if (ridingTier > 0) expect(step).toBeGreaterThan(RUN_SPEED * 1.1 * DT * 1.5);
     expect(dist(pet.pos, owner.pos)).toBeLessThan(startDist);
   });
 });

@@ -1412,7 +1412,7 @@ export function buyItem(
   // learnRiding, which owns every gate (already trained, level 20, the 80g fee,
   // trainer identity, range) and never puts an item in the bags.
   if (def.teachesRiding) {
-    learnRiding(ctx, npcId, pid);
+    learnRiding(ctx, npcId, pid, opts?.expectedRidingTier);
     return;
   }
   // Mount purchase gates (the stablemaster's reins): a riding-skill requirement

@@ -148,9 +148,9 @@ export function petOwnerScaling(owner: PetScalingOwner): PetOwnerScaling {
 
 /**
  * Heel speed for a pet catching up to its owner. The old floor was a fixed
- * `RUN_SPEED * 1.1` (7.7 yd/s), which a mount beat outright: mounts add 60 to 80
- * percent, putting a mounted player at 11.2 to 12.6 yd/s, so the pet fell behind
- * every time until the 60 yd teleport rescued it. Tracking the owner's ACTUAL
+ * `RUN_SPEED * 1.1` (7.7 yd/s), which a mount beat outright: riding training adds
+ * speed, so the pet fell behind until the 60 yd teleport rescued it.
+ * Tracking the owner's ACTUAL
  * speed keeps the pet with its hunter whatever the owner is riding, while a fast
  * beast still runs at its own higher speed.
  *

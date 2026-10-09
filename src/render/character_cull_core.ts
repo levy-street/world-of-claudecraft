@@ -44,7 +44,7 @@
 // DOM, no clocks, no randomness. Registered in RENDER_PURE_CORES
 // (tests/architecture.test.ts); tested by tests/character_cull_core.test.ts.
 
-import { MOUNTS } from '../sim/content/mounts';
+import { ridingMoveSpeedPct } from '../sim/riding_training';
 import { RUN_SPEED } from '../sim/types';
 import {
   createShadowVolumeBasis,
@@ -61,13 +61,10 @@ export const CHARACTER_CULL_CASTS = 2;
 /** Both bits: what an un-culled rig, and every rig under `?charcull=off`, gets. */
 export const CHARACTER_CULL_ALL = CHARACTER_CULL_DRAWS | CHARACTER_CULL_CASTS;
 
-/** The best mount's additive move-speed fraction, read off the content table. */
-const MAX_MOUNT_SPEED_PCT = Object.values(MOUNTS).reduce(
-  (best, mount) => (mount.moveSpeedPct > best ? mount.moveSpeedPct : best),
-  0,
-);
+/** The fastest trained riding tier, independent of cosmetic appearance. */
+const MAX_MOUNT_SPEED_PCT = ridingMoveSpeedPct(2);
 /**
- * Sustained travel speed on the best mount, yards/second. It is not an upper
+ * Sustained travel speed at advanced riding training, yards/second. It is not an upper
  * bound on displacement: `moveSpeedMult` adds speed buffs and travel forms on
  * top, and a charge or a blink beats any speed-derived number outright. Those
  * are covered by the drift term beside it and, for a real teleport, by the

@@ -2923,7 +2923,9 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
       sweep([UNMAPPED_TEMPLATE_ID, MIXED_TEMPLATE_ID, MIXED2_TEMPLATE_ID]),
     );
     expect(fixtures).toEqual({ extracted: 13, unmappedOffered: 9 });
-  });
+    // This exhaustive sweep creates the same fresh worlds as the claim sweep
+    // above. Give both the same headroom on a loaded CI shard.
+  }, 60_000);
 
   it('keeps every mixed template harvestable, so the gate is not a blanket refusal', () => {
     const mixedTemplates = () =>

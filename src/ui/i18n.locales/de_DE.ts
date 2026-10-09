@@ -4103,29 +4103,14 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.mountsPage.collectBody':
     'Jenseits von Marlas Tresen werden Zügel gefunden statt gekauft. Sie fallen von den letzten Bossen der Fünf-Spieler-Dungeons und des Schlachtzugs auf heroisch, sowie aus Riss-Bereinigungen, wobei ein schwererer bereinigter Riss seltenere Zügel hinterlassen kann. Sie sind absichtlich seltene Funde, und kein Durchgang verspricht einen, also besteht die entspannte Art, ein Reittier zu jagen, darin, die Jagd bei den Durchgängen mitzubringen, die du ohnehin gemacht hättest. Diese Seite verrät dir nicht, welches Reittier an welchem Boss hängt: Das herauszufinden bleibt dir überlassen.',
   'guide.mountsPage.collectHeading': 'Woher die selteneren Reittiere kommen',
-  'guide.mountsPage.firstBody':
-    'Das Valorross ist das einzige Reittier, das irgendwo in der Welt verkauft wird. Sobald du Reiten gelernt hast, verkauft dir Marla die Valorross-Zügel für 10 Gold, und diese Zügel gehören dir für immer. Jedes andere Reittier wird draußen in der Welt verdient, das Pferd ist also der Ausgangspunkt für fast jeden Reiter.',
   'guide.mountsPage.firstHeading': 'Dein erstes Reittier',
-  'guide.mountsPage.goodsBody':
-    'Ein Reittier ist ein Gegenstand, was es zu etwas macht, das die Wirtschaft bewegen kann. Du besitzt ein Reittier, solange seine Zügel in deinen Taschen oder deinem Tresor liegen, wobei im Tresor verstaute Zügel das Reittier zwar dein bleiben lassen, dich aber nicht reiten lassen: Um das Tier zu rufen, musst du die Zügel bei dir tragen. Spieler-Zügel tragen keine Seelenbindung, sie lassen sich also handeln, per Post verschicken und auf dem Weltmarkt einstellen wie jeder andere Fund, sofern der Gegenstand selbst nichts anderes vorschreibt. Zwei Dinge solltest du wissen, bevor du dich von einem trennst: Kein Händler kauft ein Paar Zügel je zurück, ein Reittier ist also ein Kauf, den du behältst oder weitergibst, statt ihn zu Geld zu machen, und verlassen die Zügel deine Taschen und deinen Tresor beide, während du reitest, sei es durch Handel, Versand oder Verkauf auf dem Markt, geht das Reittier mit ihnen, und du wirst dort abgesetzt, wo du stehst.',
   'guide.mountsPage.goodsHeading': 'Zügel sind gewöhnliche Waren',
   'guide.mountsPage.heading': 'Reittiere und Reiten',
-  'guide.mountsPage.intro':
-    'Ein Reittier ist ein schnellerer Weg durch die Welt, und das ist alles, was es ist. Du lernst das Reiten in den Ställen, kaufst dein erstes Paar Zügel, und jede Straße danach ist kürzer.',
-  'guide.mountsPage.learnBody':
-    'Reiten ist eine Fertigkeit, die du einmal kaufst, und sie öffnet sich auf Stufe {level}. Marla Hitchen, die Stallmeisterin, hält die Galecrest-Ställe draußen im Hügelland, und sie verkauft die Reitausbildung für 80 Gold. Dieser eine Kauf ist es, der dich überhaupt ein Reittier besteigen lässt, und er bleibt dir für immer erhalten.\n\nSobald du sie hast, hat Marla eine Quest für dich: Reitstunden. Nimm sie an, folge der Markierung zur leuchtenden Fläche hinter dem Startbogen, und drücke Rennen starten. Sie leiht dir für die Lektion ein Übungs-Valorross, die Lektion selbst kostet dich also nichts. Reite den Parcours, schließe ihn ab, und kehre zu ihr zurück für deine Münzen und Erfahrung. Das geliehene Ross geht danach zurück in den Stall, die Lektion lehrt dich also den Sitz im Sattel, statt dir ein Pferd zu schenken.',
   'guide.mountsPage.learnHeading': 'Reiten lernen',
   'guide.mountsPage.raceBody':
     'Der Springparcours in Marlas Koppel steht jedem offen, jederzeit, nicht nur während der Lektion. Besteige ein Reittier, stell dich auf die leuchtende Fläche hinter dem Bogen, und drücke Rennen starten. Ein Countdown hält dich still, dann läuft die Sanduhr: Nimm alle sieben Sprünge und reite durch den Bogen zurück nach draußen, bevor sie leerläuft.\n\nEin Sprung zählt nur, wenn du wirklich über der Stange in der Luft bist, ein einfaches Durchreiten zählt also nichts. Du kannst sie in beliebiger Reihenfolge und von beiden Seiten nehmen, und ein verpasster ist nicht das Ende der Welt: Dreh um und nimm ihn erneut. Sterben, Absitzen oder das Verlassen der Koppel beendet den Versuch, ebenso wie das Leerlaufen der Sanduhr, was dich aus dem Sattel dort absetzt, wo du stehst; brichst du selbst ab, hält das nur die Sanduhr an. Nichts hindert dich daran, gleich noch einmal zu beginnen. Es gibt keine Gebühr, keine Abklingzeit und keinen Preis außer der Zeit selbst, und beliebig viele Reiter können den Parcours gleichzeitig absolvieren, ohne sich gegenseitig zu stören.',
   'guide.mountsPage.raceHeading': 'Das Stallrennen',
-  'guide.mountsPage.rideBody':
-    'Es gibt kein Reittierfenster und keinen Favoriten zum Festlegen, denn die Zügel sind das Reittier. Benutze ein Paar Zügel aus deinen Taschen oder aus einem Aktionsleisten-Platz, und du reitest dieses Reittier. Das Herbeirufen dauert einen Moment, ein kurzer Ruf statt ein sofortiger, es wird dich also nicht vor einem schlechten Pull retten. Das Absitzen ist sofort und niemals blockiert.\n\nBenutze die Zügel, auf denen du bereits reitest, und du verstaust dieses Reittier. Benutze ein anderes Paar, während du beritten bist, und du wechselst direkt dorthin, ohne dass dazwischen etwas herbeigerufen wird. Die Taste zum Auf- und Absitzen, standardmäßig die Gravis-Taste (`), bringt dich immer nur herunter: Sie ist der Weg nach unten, nicht nach oben. Die eine Ausnahme ist die Reitstunde, wo dieselbe Taste das Ross ruft, das Marla dir leiht, da ein geliehenes Pferd keine Zügel zum Anklicken hat. Auf einem Smartphone oder Tablet wirkt die Schaltfläche Aufsitzen im Mehr-Menü in beide Richtungen, ruft dabei allerdings das erste Paar Zügel in deinen Taschen, statt eines, das du auswählst, tippe also die Zügel selbst an, wenn du ein bestimmtes Reittier willst.',
   'guide.mountsPage.rideHeading': 'Auf- und Absitzen',
-  'guide.mountsPage.speedBody':
-    'Geschwindigkeit ist das Einzige, was ein Reittier vom anderen unterscheidet. Das Valorross, das du von Marla kaufst, setzt das Grundtempo, und die Reittiere, die du draußen in der Welt sammelst, reiten darüber: Je seltener die Zügel, desto schneller der Ritt, in ein paar klaren Stufen statt einem sanften Übergang. Es gibt keinen zweiten Rang des Reitens zu erlernen und kein Upgrade, das du danach kaufen kannst. Du zahlst einmal für das Reiten, und von da an entscheiden die Zügel, die du benutzt hast, wie schnell du reist.',
-  'guide.mountsPage.speedHeading': 'Geschwindigkeit und Stufen',
-  'guide.mountsPage.whatBody':
-    'Ein Reittier ist ein Tier, das du reitest, und was es dir gibt, ist Geschwindigkeit. Keine Rüstung, kein Schaden, keine Werte: Es trägt dich schneller über den Boden und springt beim Sprung ein wenig höher, und das ist der ganze Handel. Jedes Reittier im Spiel ist ein Landreittier, es gibt also kein Fliegen, und keines von ihnen schwimmt.',
   'guide.mountsPage.whatHeading': 'Was ein Reittier ist',
   'guide.mountsPage.whereBody':
     'Die Galecrest-Ställe sind auf der Karte des Windkamms eingezeichnet, draußen im Hügelland zwischen dem Abbruch und den Wrackfeldern. Marla steht neben der Scheune, dem Rennhof zugewandt.',
@@ -4162,8 +4147,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Risse sind das Eine, das wirklich auf die Höchststufe wartet. Sie reißen draußen in den Reichen nach ihrem eigenen Zeitplan auf, eingestuft von C bis S, und jede Gruppe der Welt wetteifert darum, wer jeden von ihnen als Erster schließt. Auch die Tiefgang-Tafeln laufen weiter, und ihre schwerere Stufe ist einen erneuten Blick wert, sobald deine Ausrüstung aufgeholt hat.',
   'guide.progression.journeyBodyCount':
     'Die Welt ist ein einziges zusammenhängendes Land aus {zones} Gebieten. Drei davon sind die Straße, auf der du aufsteigst, von Süden nach Norden gereiht: Du beginnst im grünen Tal, kämpfst dich durch das Moor und endest in den kalten, hohen Gipfeln. Folge der Questspur, und das Land trägt dich von einem zum nächsten. Vor der Küste des Tals liegt eine Insel für die frühen Stufen, und der Rest der Reiche öffnet sich von derselben Straße aus, gebaut für Charaktere, die den Aufstieg bereits hinter sich haben.',
-  'guide.progression.ridingBody':
-    'Reiten ist eines der Dinge, die am Ende des Aufstiegs warten. Auf Stufe {level} lehrt dich eine Stallmeisterin die Fertigkeit für eine stattliche Summe Gold, und eine Lektion auf dem Übungsparcours bringt dir dein erstes Paar Zügel ein. Ein Reittier verleiht überhaupt keine Macht; es macht die Welt nur kleiner, was nach einem langen Marsch nach Norden seine eigene Art von Belohnung ist.',
   'guide.progression.ridingTitle': 'Reiten lernen',
   'guide.questsPage.availableBody':
     'Quests kommen in Ketten. Die meisten werden erst angeboten, sobald du die vorherige abgegeben hast, und viele verlangen zusätzlich eine Mindeststufe, ein NSC, der heute nichts für dich hat, kann also nach deinen nächsten paar Stufen oder sobald du die Quest abschließt, die du schon trägst, jede Menge haben. Ein paar haben eine eigene Bedingung, etwa die Reitstunden, die sich erst öffnen, nachdem du die Reitfertigkeit gekauft hast. Gruppenquests sagen das von vornherein, indem sie auflisten, wie viele Spieler sie empfehlen mitzubringen. Manche Aufgaben sind wiederholbar: Du kannst sie nach einer Wartezeit erneut annehmen, und die Markierung über dem Questgeber verrät dir, wann eine zurückgekehrt ist.',
@@ -13476,12 +13459,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_shadowjump_toad': 'Kama-Kage die Schattensprungkröte',
   'hudChrome.mounts.name_stormfeather_griffin': 'Himmelsgreif Sturmfeder',
   'hudChrome.mounts.name_thunderstrut_gobbler': 'Donnerstolz der Große Puter',
-  'hudChrome.mounts.desc_valorsteed':
-    'Ein robustes, trittsicheres Ross, das die Reisegeschwindigkeit erhöht.',
-  'hudChrome.mounts.desc_grag_bear':
-    'Ein robuster, trittsicherer Bär, der die Reisegeschwindigkeit erhöht.',
-  'hudChrome.mounts.desc_stalkglider_snail':
-    'Eine herzhafte, ausdauernde Schnecke, die die Reisegeschwindigkeit erhöht.',
   'hudChrome.mounts.desc_aether_hover_cycle':
     'Ein mächtiges Magitech-Rad für schnelles, bodennah schwebendes Kampfmanövrieren.',
   'hudChrome.mounts.desc_shadowjump_toad':
@@ -16461,14 +16438,11 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mountRace.toFinish': 'Reite zurück durch den Bogen!',
   'hudChrome.mountTraining.begin': 'Reitstunde beginnen',
   'hudChrome.mountTraining.mountPrompt': 'Drücke {key}, um das Übungs-Valorross zu besteigen.',
-  'hudChrome.mountTraining.ownedMountPrompt':
-    'Deine Zügel sind in deinen Taschen. Benutze sie, um zu reiten.',
   'hudChrome.mountTraining.returnToMarla':
     'Kehre zu Marla in den Ställen zurück, um deine Valorross-Zügel für 10g zu kaufen.',
   'hudChrome.mountTraining.ridePrompt':
     'Folge der leuchtenden Markierung zur Startlinie und drücke dann Rennen starten.',
   'hudChrome.mountTraining.success': 'Du hast das Valorross gezähmt.',
-  'hudChrome.mounts.useToRide': 'Benutzen, um dieses Reittier herbeizurufen.',
   'hudChrome.unstuck.alreadyActive': 'Befreien zählt bereits herunter.',
   'hudChrome.unstuck.alreadySafe':
     'Du befindest dich bereits an einer sicheren, erreichbaren Position.',
@@ -18781,10 +18755,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.mechEmpty': 'Noch keine Kampfmech-Chromas im Besitz.',
   'hudChrome.cosmetics.mechIntro':
     'Der Kampfmech ersetzt den Körper dieses Charakters. Es wird immer nur ein Chroma getragen.',
-  'hudChrome.cosmetics.mountsIntro':
-    'Ein Reittier-Skin liegt über dem Reittier, das dieser Charakter reitet. Er verändert niemals das Tempo.',
-  'hudChrome.cosmetics.mountsNoMount':
-    'Besitze zuerst ein Reittier: Ein Skin braucht etwas zum Reiten.',
   'hudChrome.cosmetics.owned': 'Im Besitz',
   'hudChrome.cosmetics.scopeAccount': 'Konto',
   'hudChrome.cosmetics.scopeCharacter': 'Charakter',

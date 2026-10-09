@@ -9,6 +9,7 @@
 
 import { describe, expect, it } from 'vitest';
 import {
+  MOUNT_KEYS,
   MOUNT_RACE_COURSE,
   MOUNT_RACE_START_PLATFORM,
   STABLE_PADDOCK,
@@ -16,6 +17,8 @@ import {
 import { BUILTIN_WORLD, NPCS, QUESTS } from '../src/sim/data';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
 import { MOUNT_TRAIN_FEE_COPPER } from '../src/sim/mounts_training';
+import { moveSpeedMult } from '../src/sim/player_motion';
+import { ADVANCED_RIDING_FEE_COPPER, BASIC_RIDING_FEE_COPPER } from '../src/sim/riding_training';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent, WorldContent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -35,6 +38,92 @@ const MOUNTS_TRAINING_TEST_WORLD: WorldContent = {
 const RIDING_LESSONS_QUEST_ID = 'q_riding_lessons';
 const makeSim = (seed = 1) =>
   new Sim({ seed, playerClass: 'warrior', autoEquip: true, world: MOUNTS_TRAINING_TEST_WORLD });
+
+describe('character riding ranks', () => {
+  for (const command of ['vendor', 'learn'] as const) {
+    it(`${command}: duplicate basic quotes buy only basic riding, then an explicit advanced quote buys advanced`, () => {
+      const sim = makeSim();
+      sim.setPlayerLevel(20);
+      standAtMarla(sim);
+      const meta = metaOf(sim);
+      const npcId = marlaOf(sim).id;
+      meta.copper = BASIC_RIDING_FEE_COPPER + ADVANCED_RIDING_FEE_COPPER;
+      const buy = (expectedRidingTier?: 0 | 1) =>
+        command === 'vendor'
+          ? sim.buyItem(npcId, 'riding_training', { expectedRidingTier })
+          : sim.learnRiding(npcId, expectedRidingTier);
+      buy(0);
+      buy(0);
+      buy(); // Old clients cannot silently upgrade a trained character.
+      expect(sim.ridingTrainingTier()).toBe(1);
+      expect(meta.copper).toBe(ADVANCED_RIDING_FEE_COPPER);
+      buy(1);
+      buy(1);
+      expect(sim.ridingTrainingTier()).toBe(2);
+      expect(meta.copper).toBe(0);
+    });
+  }
+  it('buys both ranks from the same trainer and applies the rank to every mount', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(20);
+    standAtMarla(sim);
+    const meta = metaOf(sim);
+    meta.copper = BASIC_RIDING_FEE_COPPER + ADVANCED_RIDING_FEE_COPPER;
+    sim.buyItem(marlaOf(sim).id, 'riding_training');
+    expect(sim.ridingTrainingTier()).toBe(1);
+    expect(meta.copper).toBe(ADVANCED_RIDING_FEE_COPPER);
+    for (const key of MOUNT_KEYS) {
+      sim.player.mountKey = key;
+      expect(moveSpeedMult(sim.player)).toBeCloseTo(1.7);
+    }
+    sim.buyItem(marlaOf(sim).id, 'riding_training', { expectedRidingTier: 1 });
+    expect(sim.tick()).toContainEqual(
+      expect.objectContaining({
+        type: 'log',
+        text: 'You have learned Advanced Riding. Your mount speed is increased by 110%.',
+      }),
+    );
+    expect(sim.ridingTrainingTier()).toBe(2);
+    expect(meta.copper).toBe(0);
+    for (const key of MOUNT_KEYS) {
+      sim.player.mountKey = key;
+      expect(moveSpeedMult(sim.player)).toBeCloseTo(2.1);
+    }
+    meta.copper = ADVANCED_RIDING_FEE_COPPER;
+    sim.learnRiding(marlaOf(sim).id, 1);
+    expect(meta.copper).toBe(ADVANCED_RIDING_FEE_COPPER);
+  });
+
+  it('refuses unaffordable advanced training and preserves basic riding', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(20);
+    standAtMarla(sim);
+    const meta = metaOf(sim);
+    meta.ridingTrained = true;
+    meta.copper = ADVANCED_RIDING_FEE_COPPER - 1;
+    sim.learnRiding(marlaOf(sim).id, 1);
+    expect(sim.ridingTrainingTier()).toBe(1);
+    expect(meta.copper).toBe(ADVANCED_RIDING_FEE_COPPER - 1);
+  });
+
+  it('restores advanced rank on relog and preserves old basic-training saves', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(20);
+    standAtMarla(sim);
+    const meta = metaOf(sim);
+    meta.ridingTrained = true;
+    meta.copper = ADVANCED_RIDING_FEE_COPPER;
+    sim.learnRiding(marlaOf(sim).id, 1);
+    const state = sim.serializeCharacter(sim.playerId)!;
+    expect(state.ridingTier).toBe(2);
+    const restored = makeSim();
+    const pid = restored.addPlayer('warrior', 'Advanced Rider', { state });
+    expect(restored.entities.get(pid)!.ridingTier).toBe(2);
+    const legacy = { ...state, ridingTier: undefined };
+    const legacyPid = restored.addPlayer('warrior', 'Basic Rider', { state: legacy });
+    expect(restored.entities.get(legacyPid)!.ridingTier).toBe(1);
+  });
+});
 
 function marlaOf(sim: Sim) {
   const marla = [...sim.entities.values()].find(

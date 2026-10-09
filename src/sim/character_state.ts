@@ -258,6 +258,7 @@ export interface CharacterState {
   mountTrainingFeePaid?: boolean;
   // Riding skill purchased from Marla (80g). Optional and absent until bought.
   ridingTrained?: boolean;
+  ridingTier?: 1 | 2;
   // PBE boost kit version applied (server/pbe_boost.ts); absent outside PBE.
   pbeBoostKit?: number;
   delveMarks?: number;

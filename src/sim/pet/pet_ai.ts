@@ -393,7 +393,7 @@ export function petFollow(ctx: SimContext, pet: Entity, owner: Entity): void {
   const routed = pet.petPath.length > 1;
   const aim = routed ? pet.petPath[0] : owner.pos;
   // Heel against the owner's ACTUAL speed, not a fixed RUN_SPEED floor: mounts add
-  // 60 to 80 percent, so the old 7.7 yd/s floor lost ground to every mounted owner
+  // trained speed, so the old 7.7 yd/s floor lost ground to every mounted owner
   // until the 60 yd teleport rescued the pet. moveSpeedMult(owner) already folds in
   // the mount, speed buffs, and slows; the pet's own multiplier still applies on top
   // so a snared pet is still snared.

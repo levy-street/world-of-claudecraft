@@ -3992,29 +3992,14 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.mountsPage.collectBody':
     'Ngoài quầy của Marla ra, dây cương là thứ được tìm thấy chứ không phải mua được. Chúng rơi ra từ trùm cuối của các hầm ngục năm người và của raid ở độ khó Anh Hùng, cũng như từ việc hoàn thành Rạn Nứt, nơi Rạn Nứt càng khó thì dây cương nó có thể để lại càng hiếm. Chúng vốn được thiết kế để là những món hiếm, và không lượt chơi nào hứa hẹn chắc chắn sẽ có, nên cách tử tế nhất để săn thú cưỡi là mang cuộc săn ấy theo cùng những lượt chơi bạn vốn đã đi. Trang này sẽ không cho bạn biết thú cưỡi nào treo trên trùm nào: phần đó là để bạn tự khám phá.',
   'guide.mountsPage.collectHeading': 'Những thú cưỡi hiếm hơn đến từ đâu',
-  'guide.mountsPage.firstBody':
-    'Valorsteed là thú cưỡi duy nhất được bán ở bất cứ đâu trong thế giới. Một khi bạn đã học Cưỡi Ngựa, Marla sẽ bán cho bạn Dây cương Valorsteed với giá 10 vàng, và dây cương đó là của bạn để giữ mãi. Mọi thú cưỡi khác đều phải kiếm được ngoài thế giới, nên con ngựa này là nơi gần như mọi kỵ sĩ đều bắt đầu.',
   'guide.mountsPage.firstHeading': 'Thú cưỡi đầu tiên của bạn',
-  'guide.mountsPage.goodsBody':
-    'Thú cưỡi là một vật phẩm, điều đó khiến nó là thứ mà nền kinh tế có thể lưu chuyển. Bạn sở hữu một thú cưỡi chừng nào dây cương của nó còn nằm trong túi đồ hoặc kho két của bạn, dù dây cương cất trong kho két vẫn giữ thú cưỡi là của bạn mà không cho bạn cưỡi nó: để gọi con thú, bạn phải đang mang theo dây cương. Dây cương của người chơi không mang Ràng Buộc Linh Hồn, nên chúng có thể trao đổi, gửi qua thư, và niêm yết trên Chợ Thế Giới như bất kỳ món đồ nào khác tìm được, trừ khi chính vật phẩm đó ghi rõ điều ngược lại. Có hai điều đáng biết trước khi bạn chia tay một con: không thương nhân nào mua lại một bộ dây cương, nên thú cưỡi là một món bạn mua để giữ hoặc nhượng lại chứ không phải để đổi ra tiền, và nếu dây cương rời khỏi cả túi đồ lẫn kho két của bạn trong lúc bạn đang cưỡi, bị trao đổi đi, gửi qua thư, hay bán trên chợ, thú cưỡi sẽ đi theo chúng và bạn bị đặt xuống ngay nơi bạn đang đứng.',
   'guide.mountsPage.goodsHeading': 'Dây cương là hàng hóa bình thường',
   'guide.mountsPage.heading': 'Thú cưỡi và cưỡi ngựa',
-  'guide.mountsPage.intro':
-    'Thú cưỡi là một cách nhanh hơn để băng qua thế giới, và đó là tất cả những gì nó là. Bạn học cưỡi ngựa tại chuồng ngựa, mua bộ dây cương đầu tiên của mình, và mọi con đường sau đó đều ngắn lại.',
-  'guide.mountsPage.learnBody':
-    'Cưỡi Ngựa là một kỹ năng bạn mua một lần, và nó mở ra ở cấp {level}. Marla Hitchen, Quản Mã, trông coi Chuồng Ngựa Galecrest ngoài vùng đồi trọc, và bà bán Huấn Luyện Cưỡi Ngựa với giá 80 vàng. Chỉ một lần mua đó là thứ cho phép bạn ngồi lên thú cưỡi, và nó ở lại với bạn mãi mãi.\n\nMột khi bạn đã có nó, Marla có một nhiệm vụ dành cho bạn: Bài Học Cưỡi Ngựa. Hãy nhận lấy, đi theo điểm đánh dấu đến ô vuông phát sáng sau cổng vòm xuất phát, và nhấn Bắt Đầu Đua. Bà cho bạn mượn một con Valorsteed huấn luyện để học, nên bản thân bài học không tốn của bạn gì cả. Cưỡi qua đường đua, hoàn thành nó, rồi quay lại gặp bà để nhận tiền vàng và kinh nghiệm. Con ngựa được mượn sẽ quay về chuồng sau đó, nên bài học dạy bạn cách ngồi vững trên yên chứ không trao cho bạn một con ngựa.',
   'guide.mountsPage.learnHeading': 'Học cưỡi ngựa',
   'guide.mountsPage.raceBody':
     'Đường đua vượt chướng ngại trong bãi quây của Marla mở cho bất kỳ ai, bất cứ lúc nào, không chỉ trong giờ học. Ngồi lên một thú cưỡi, đứng trên ô vuông phát sáng sau cổng vòm, và nhấn Bắt Đầu Đua. Một lượt đếm ngược giữ bạn đứng yên, rồi đồng hồ bắt đầu chạy: vượt qua cả bảy chướng ngại và cưỡi trở ra qua cổng vòm trước khi hết giờ.\n\nMột cú nhảy chỉ được tính nếu bạn thực sự ở trên không trung vượt qua thanh chắn, nên chạy xuyên qua dễ dàng sẽ không vượt qua được gì cả. Bạn có thể vượt các chướng ngại theo bất kỳ thứ tự nào và từ bên nào cũng được, và lỡ một cái cũng không phải là ngày tận thế: quay lại và vượt nó lần nữa. Chết, xuống thú, hoặc rời khỏi bãi quây sẽ kết thúc lượt thử, và để đồng hồ chạy hết giờ cũng vậy, việc đó sẽ đặt bạn xuống khỏi yên ngay nơi bạn đứng; tự mình hủy lượt thử chỉ đơn giản là dừng đồng hồ lại. Không gì ngăn được bạn bắt đầu một lượt khác. Không có phí, không thời gian hồi, và không phần thưởng nào ngoài chính thời gian đạt được, và bất kỳ số lượng kỵ sĩ nào cũng có thể chạy đường đua cùng lúc mà không vướng vào nhau.',
   'guide.mountsPage.raceHeading': 'Cuộc đua ở chuồng ngựa',
-  'guide.mountsPage.rideBody':
-    'Không có cửa sổ thú cưỡi và không có mục yêu thích nào để đặt, vì chính dây cương là thú cưỡi. Dùng một bộ dây cương từ túi đồ hoặc từ một ô trên thanh hành động và bạn sẽ cưỡi thú cưỡi đó. Triệu hồi mất một chút thời gian, một lượt gọi ngắn chứ không phải tức thì, nên nó sẽ không cứu bạn khỏi một cú kéo quái tồi tệ. Xuống thú thì tức thì và không bao giờ bị chặn.\n\nDùng chính bộ dây cương bạn đang cưỡi và bạn sẽ cất thú cưỡi đó đi. Dùng một bộ khác trong khi đang cưỡi và bạn sẽ đổi thẳng sang nó, không cần triệu hồi lại từ đầu ở giữa chừng. Phím Cưỡi Thú / Xuống Thú, mặc định là phím dấu huyền (`), chỉ luôn đưa bạn xuống: đó là lối xuống, không phải lối lên. Ngoại lệ duy nhất là bài học cưỡi ngựa, nơi chính phím đó gọi con ngựa Marla cho bạn mượn, vì một con ngựa mượn không có dây cương để nhấp vào. Trên điện thoại hoặc máy tính bảng, nút Thú Cưỡi trong khay Thêm hoạt động theo cả hai chiều, dù nó gọi bộ dây cương đầu tiên nằm trong túi đồ của bạn chứ không phải bộ bạn chọn, nên hãy chạm vào chính dây cương đó khi bạn muốn một thú cưỡi cụ thể.',
   'guide.mountsPage.rideHeading': 'Lên thú và xuống thú',
-  'guide.mountsPage.speedBody':
-    'Tốc độ là điều duy nhất phân biệt thú cưỡi này với thú cưỡi khác. Valorsteed bạn mua từ Marla đặt ra nhịp độ cơ bản, và những thú cưỡi bạn thu thập được ngoài thế giới cưỡi nhanh hơn thế: dây cương càng hiếm, chuyến đi càng nhanh, theo từng bậc rõ ràng chứ không phải trượt dần đều. Không có bậc Cưỡi Ngựa thứ hai để luyện và không có bản nâng cấp nào để mua sau đó. Bạn trả tiền cho Cưỡi Ngựa một lần, và từ đó trở đi, dây cương bạn dùng sẽ quyết định bạn di chuyển nhanh đến đâu.',
-  'guide.mountsPage.speedHeading': 'Tốc độ và các bậc',
-  'guide.mountsPage.whatBody':
-    'Thú cưỡi là một con thú bạn cưỡi lên, và thứ nó mang lại cho bạn là tốc độ. Không giáp, không sát thương, không chỉ số: nó chở bạn qua mặt đất nhanh hơn, và bật nhảy cao hơn một chút khi bạn nhảy, và đó là toàn bộ thỏa thuận. Mọi thú cưỡi trong trò chơi đều là thú cưỡi trên cạn, nên không có bay, và không con nào trong số chúng biết bơi.',
   'guide.mountsPage.whatHeading': 'Thú cưỡi là gì',
   'guide.mountsPage.whereBody':
     'Chuồng Ngựa Galecrest được đánh dấu trên bản đồ của Đỉnh Gió Lộng, ngoài vùng đồi trọc giữa Vách Đứng và Wreckfields. Marla đứng cạnh chuồng ngựa, quay mặt về phía sân đua.',
@@ -4051,8 +4036,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Rạn Nứt là thứ duy nhất chờ đợi ngay tại giới hạn cấp. Chúng xé toạc khắp vương quốc theo lịch trình riêng của mình, được xếp hạng từ C đến S, và mọi nhóm trong thế giới đều đua nhau để là người đóng được từng cái. Các bảng Hang Sâu cũng vẫn tiếp tục, và bậc khó hơn của chúng đáng để bạn ngó lại một khi trang bị của bạn đã bắt kịp.',
   'guide.progression.journeyBodyCount':
     'Thế giới là một vùng đất liền mạch gồm {zones} vùng. Ba trong số đó là con đường bạn lên cấp trên đó, trải dài từ nam lên bắc: bạn bắt đầu ở thung lũng xanh, tiến qua đầm lầy, và kết thúc ở những đỉnh núi cao lạnh giá. Hãy đi theo dấu vết nhiệm vụ và vùng đất sẽ đưa bạn từ nơi này sang nơi kế tiếp. Một hòn đảo nằm ngoài khơi thung lũng dành cho những cấp độ đầu, và phần còn lại của vương quốc mở ra từ cùng con đường đó, được dựng lên cho những nhân vật đã hoàn thành cuộc leo dốc.',
-  'guide.progression.ridingBody':
-    'Cưỡi Ngựa là một trong những thứ đang chờ ở cuối chặng leo dốc đó. Ở cấp {level}, một Quản Mã sẽ dạy bạn kỹ năng này với một khoản tiền vàng không nhỏ, và một bài học trên đường đua huấn luyện sẽ mang lại cho bạn bộ dây cương đầu tiên. Thú cưỡi không ban cho bạn chút sức mạnh nào cả; nó chỉ đơn giản làm thế giới nhỏ lại, và sau một chặng đường dài về phương bắc, đó tự nó đã là một phần thưởng.',
   'guide.progression.ridingTitle': 'Học cưỡi ngựa',
   'guide.questsPage.availableBody':
     'Nhiệm vụ đến theo chuỗi. Phần lớn chỉ được trao sau khi bạn đã trả xong nhiệm vụ trước đó trong chuỗi, và nhiều nhiệm vụ còn đòi một cấp độ tối thiểu, nên một NPC không có gì cho bạn hôm nay có thể có cả một loạt sau vài cấp độ tới, hoặc một khi bạn trả xong nhiệm vụ bạn đang mang theo. Một số ít có điều kiện riêng của mình, chẳng hạn như bài học cưỡi ngựa, thứ chỉ mở ra sau khi bạn đã mua kỹ năng Cưỡi Ngựa. Nhiệm vụ nhóm nói rõ điều đó ngay từ đầu bằng cách liệt kê số người chơi họ đề nghị bạn mang theo. Một số việc có thể lặp lại: bạn có thể nhận lại sau một khoảng chờ, và dấu hiệu trên đầu người giao sẽ cho bạn biết khi nào nó quay trở lại.',
@@ -16020,8 +16003,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mountRace.toFinish': 'Cưỡi trở lại qua cổng vòm!',
   'hudChrome.mountTraining.begin': 'Bắt Đầu Bài Học',
   'hudChrome.mountTraining.mountPrompt': 'Nhấn {key} để cưỡi Valorsteed huấn luyện.',
-  'hudChrome.mountTraining.ownedMountPrompt':
-    'Dây cương của bạn đang ở trong túi đồ. Hãy dùng để cưỡi.',
   'hudChrome.mountTraining.returnToMarla':
     'Quay lại gặp Marla tại chuồng ngựa để mua dây cương Valorsteed với giá 10 vàng.',
   'hudChrome.mountTraining.ridePrompt':
@@ -16031,18 +16012,12 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.close': 'Đóng',
   'hudChrome.mounts.desc_aether_hover_cycle':
     'Một cỗ xe phép thuật cơ khí mạnh mẽ, được thiết kế để di chuyển nhanh và lướt sát mặt đất trong chiến đấu.',
-  'hudChrome.mounts.desc_grag_bear':
-    'Một chú gấu khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.',
   'hudChrome.mounts.desc_shadowjump_toad':
     'Một con cóc khổng lồ, bước chân vững chãi, được huấn luyện những cú nhảy bóng tối nhanh như chớp có thể vượt qua mọi địa hình.',
-  'hudChrome.mounts.desc_stalkglider_snail':
-    'Một chú ốc sên bền bỉ, dẻo dai, giúp tăng tốc độ di chuyển.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Một con sư tử đầu chim bão uy nghi, rảo bước trên mặt đất bằng những móng vuốt được bọc rune, đôi cánh xếp gọn.',
   'hudChrome.mounts.desc_thunderstrut_gobbler':
     'Một con gà tây khổng lồ nở ra từ giông bão, sải bước xuống từ Đỉnh Tỉnh Thức, đuôi xòe rộng như đám mây giông.',
-  'hudChrome.mounts.desc_valorsteed':
-    'Một con chiến mã khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.',
   'hudChrome.mounts.dismount': 'Xuống Thú Cưỡi',
   'hudChrome.mounts.emptyDropHint':
     'Thú cưỡi hiếm hơn rơi ra từ trùm hầm ngục anh hùng và khi hoàn thành Rạn Nứt.',
@@ -16065,7 +16040,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.selected': 'Đã Chọn',
   'hudChrome.mounts.spec_speed': '+{pct}% tốc độ di chuyển',
   'hudChrome.mounts.title': 'Thú Cưỡi',
-  'hudChrome.mounts.useToRide': 'Sử dụng để triệu hồi thú cưỡi này.',
   'hudChrome.unstuck.alreadyActive': 'Thoát Kẹt đang đếm ngược rồi.',
   'hudChrome.unstuck.alreadySafe': 'Bạn đã ở một vị trí an toàn và có thể tiếp cận được.',
   'hudChrome.unstuck.busy': 'Hãy hoàn tất hành động hiện tại trước khi sử dụng Thoát Kẹt.',
@@ -18462,10 +18436,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.mechEmpty': 'Chưa sở hữu biến thể nào của Cỗ máy Chiến đấu.',
   'hudChrome.cosmetics.mechIntro':
     'Cỗ máy Chiến đấu thay thế cơ thể nhân vật này. Mỗi lần chỉ mặc một biến thể.',
-  'hudChrome.cosmetics.mountsIntro':
-    'Ngoại hình thú cưỡi phủ lên thú cưỡi mà nhân vật này đang cưỡi. Nó không bao giờ thay đổi tốc độ.',
-  'hudChrome.cosmetics.mountsNoMount':
-    'Trước hết hãy sở hữu một thú cưỡi: ngoại hình cần có thứ để cưỡi.',
   'hudChrome.cosmetics.owned': 'Đã sở hữu',
   'hudChrome.cosmetics.scopeAccount': 'Tài khoản',
   'hudChrome.cosmetics.scopeCharacter': 'Nhân vật',

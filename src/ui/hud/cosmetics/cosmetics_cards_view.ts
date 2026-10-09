@@ -8,6 +8,7 @@
 // one delegated listener. Every card carries its scope badges so a player can
 // always see whether a look is shared by the account or worn by this character.
 
+import { isStoreMountSkinId } from '../../../sim/content/mount_skins';
 import { WEAPON_SKINS } from '../../../sim/content/weapon_skins';
 import type { WeaponSkinType } from '../../../sim/types';
 import { localizeWeaponSkin, rarityLabel, weaponTypeLabel } from '../../armory_labels';
@@ -70,7 +71,7 @@ function mountCardHtml(card: MountSkinCard): string {
     ? `<span class="cos-state worn">${esc(t('hudChrome.cosmetics.worn'))}</span>`
     : card.owned
       ? `<span class="cos-state owned">${esc(t('hudChrome.cosmetics.owned'))}</span>`
-      : `<span class="cos-state store">${esc(t('hudChrome.cosmetics.storeOnly'))}</span>`;
+      : `<span class="cos-state store">${esc(t(isStoreMountSkinId(card.id) ? 'hudChrome.cosmetics.storeOnly' : 'hudChrome.cosmetics.notCollected'))}</span>`;
   const action =
     card.action === 'wear'
       ? actionButton('wear-mount', card.id, t('hudChrome.cosmetics.wear'))

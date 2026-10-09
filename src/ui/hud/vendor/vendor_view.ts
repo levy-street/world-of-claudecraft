@@ -17,6 +17,7 @@ import {
 import { resolveVendorRowGate, type VendorRowGate } from '../../../sim/content/vendor_row_gates';
 import type { FactionId } from '../../../sim/factions';
 import { junkSellableSlot } from '../../../sim/items';
+import { type RidingTier, ridingTrainingFee } from '../../../sim/riding_training';
 import type { InvSlot, ItemDef, ItemInstancePayload } from '../../../sim/types';
 import { bulkBuyQuantity, vendorCountForced } from '../../../sim/vendor_buy_stack';
 import { vendorStackSize } from '../../../sim/vendor_stack';
@@ -32,6 +33,7 @@ export type VendorMultiple = 1 | 5 | 10 | 'custom';
 export const VENDOR_MULTIPLES: readonly VendorMultiple[] = [1, 5, 10, 'custom'];
 
 export interface VendorGoodsRow {
+  ridingRank?: 1 | 2;
   itemId: string;
   item: ItemDef;
   /** Server-matching price for one purchase. Either component may be zero. */
@@ -96,6 +98,7 @@ export interface VendorPrice {
 }
 
 export interface VendorBalances {
+  ridingTier?: RidingTier;
   copper: number;
   honor: number;
   /** The viewer's gathering counters, for the advisory row gate.
@@ -171,6 +174,8 @@ export function buildVendorView(
   for (const itemId of vendorItemIds) {
     const item = items[itemId];
     if (!item) continue;
+    const ridingTier = balances.ridingTier ?? 0;
+    if (item.teachesRiding && ridingTier === 2) continue;
     const quantity = vendorStackSize(item);
     const gate = resolveVendorRowGate(itemId, balances.gatheringProficiency);
     const factionGate = resolveFactionVendorRowGate(itemId, balances.factions);
@@ -181,7 +186,9 @@ export function buildVendorView(
         }
       : undefined;
     const price: VendorPrice = {
-      copper: Math.max(0, item.buyValue ?? 0) * quantity,
+      copper: item.teachesRiding
+        ? ridingTrainingFee(ridingTier)
+        : Math.max(0, item.buyValue ?? 0) * quantity,
       honor: Math.max(0, Math.floor(item.priceHonor ?? 0)),
       ...(factionMarks ? { factionMarks } : {}),
     };
@@ -229,6 +236,7 @@ export function buildVendorView(
         : 0;
     const canAffordFaction = !factionMarks || playerFactionMarks >= factionMarks.amount;
     goods.push({
+      ...(item.teachesRiding ? { ridingRank: (ridingTier === 0 ? 1 : 2) as 1 | 2 } : {}),
       itemId,
       item,
       price,

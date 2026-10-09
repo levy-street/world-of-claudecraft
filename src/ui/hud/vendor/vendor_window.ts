@@ -13,6 +13,7 @@ import {
   factionDisplayName,
   STANDING_TIER_LABELS,
 } from '../../../sim/factions';
+import { ridingMoveSpeedPct } from '../../../sim/riding_training';
 import type { ItemInstancePayload } from '../../../sim/types';
 import type { VendorBuyOptions } from '../../../sim/vendor_buy_stack';
 import { currencyIconHtml } from '../../currency_art';
@@ -248,12 +249,20 @@ export function renderVendorWindow(
     const lockedByFaction = goods.requirementUnmet && !!goods.factionRequirement;
     row.disabled = lockedByFaction || (countBuy ? !countBuy.affordable : !goods.affordable);
     const price = countBuy ? formatLocalizedMoney(countBuy.copper) : goodsPriceText(goods.price);
-    const itemName = itemDisplayName(item);
+    const itemName = goods.ridingRank
+      ? t(goods.ridingRank === 1 ? 'itemUi.vendor.basicRiding' : 'itemUi.vendor.advancedRiding')
+      : itemDisplayName(item);
     const stack =
       quantity > 1
         ? ` ${t('itemUi.bags.stackCount', { count: formatNumber(quantity, { maximumFractionDigits: 0 }) })}`
         : '';
-    const requirement = goods.requirementUnmet ? requirementText(goods) : '';
+    const requirement = goods.ridingRank
+      ? t('itemUi.vendor.ridingSpeed', {
+          speed: formatNumber(ridingMoveSpeedPct(goods.ridingRank) * 100),
+        })
+      : goods.requirementUnmet
+        ? requirementText(goods)
+        : '';
     // Every row gets a buy aria-label (the purchase deny is retired, so the
     // promise is true of every row), and an aria-label REPLACES the button's
     // content as its accessible name: a requirement-unmet row must fold the
@@ -304,7 +313,9 @@ export function renderVendorWindow(
     // selection: a fixed multiple sends its count, 'custom' opens the
     // countFit-capped prompt (Q19), and 1x stays the plain buy.
     row.addEventListener('click', (ev) => {
-      if (ev.ctrlKey || ev.metaKey) {
+      if (goods.ridingRank) {
+        deps.onBuy(itemId, { expectedRidingTier: goods.ridingRank === 1 ? 0 : 1 });
+      } else if (ev.ctrlKey || ev.metaKey) {
         deps.onBuy(itemId, { bulk: true });
       } else if (countBuy) {
         deps.onBuy(itemId, { count: countBuy.count });
@@ -324,7 +335,7 @@ export function renderVendorWindow(
     deps.attachTooltip(
       row,
       () =>
-        `${deps.itemTooltip(item)}<div class="tt-sub">${esc(t('itemUi.tooltip.clickBuy'))}</div>`,
+        `${goods.ridingRank ? `<div class="tt-title">${esc(itemName)}</div><div class="tt-sub">${esc(requirement)}</div>` : deps.itemTooltip(item)}<div class="tt-sub">${esc(t('itemUi.tooltip.clickBuy'))}</div>`,
     );
     goodsGrid.appendChild(row);
     // A separate, always-visible tile (never a nested <button>, never hidden

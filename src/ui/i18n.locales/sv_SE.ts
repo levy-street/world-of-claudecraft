@@ -3986,29 +3986,14 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.mountsPage.collectBody':
     'Bortom Marlas disk hittas tyglar snarare än köps. De faller från de sista bossarna i fängelsehålorna för fem spelare och i raiden på heroiskt, och ur avklarade revor, där ju svårare reva du avslutar desto sällsyntare tyglar den kan lämna efter sig. De är sällsynta fynd med flit, och ingen omgång lovar en, så det snälla sättet att jaga ett riddjur är att ta jakten med på de omgångar du ändå skulle köra. Den här sidan avslöjar inte vilket riddjur som hänger på vilken boss: den delen är din att ta reda på.',
   'guide.mountsPage.collectHeading': 'Var de sällsyntare riddjuren kommer ifrån',
-  'guide.mountsPage.firstBody':
-    'Valorsteed är det enda riddjur som säljs någonstans i världen. Så snart du har lärt dig Ridning säljer Marla Tyglar till Valorsteed till dig för 10 guld, och de tyglarna är dina att behålla. Varje annat riddjur förtjänas ute i världen, så hästen är där nästan varje ryttare börjar.',
   'guide.mountsPage.firstHeading': 'Ditt första riddjur',
-  'guide.mountsPage.goodsBody':
-    'Ett riddjur är ett föremål, vilket gör det till något ekonomin kan flytta på. Du äger ett riddjur så länge dess tyglar ligger i dina väskor eller i din bank, även om bankförvarade tyglar håller riddjuret ditt utan att låta dig rida det: för att kalla på besten måste du bära tyglarna. Spelartyglar är aldrig själsbundna, så de handlas, skickas med post och listas på Världsmarknaden som vilket annat fynd som helst, om inte föremålet självt säger något annat. Två saker är värda att veta innan du skiljer dig från ett: ingen handlare köper någonsin tillbaka ett par tyglar, så ett riddjur är ett köp du behåller eller för vidare snarare än löser in, och om tyglarna lämnar både dina väskor och din bank medan du rider, handlas bort, skickas med post eller säljs på marknaden, följer riddjuret med dem och du sätts ner där du står.',
   'guide.mountsPage.goodsHeading': 'Tyglar är vanliga varor',
   'guide.mountsPage.heading': 'Riddjur och ridning',
-  'guide.mountsPage.intro':
-    'Ett riddjur är ett snabbare sätt att ta sig fram genom världen, och det är allt det är. Du lär dig rida vid stallet, köper ditt första par tyglar, och varje väg efter det blir kortare.',
-  'guide.mountsPage.learnBody':
-    'Ridning är en färdighet du köper en gång, och den öppnas vid nivå {level}. Marla Hitchen, stallmästaren, sköter Stormkammens stall ute bland kullarna, och hon säljer Ridträning för 80 guld. Det enda köpet är vad som över huvud taget låter dig sitta upp på ett riddjur, och det stannar hos dig för gott.\n\nNär du har det har Marla ett uppdrag åt dig: Ridlektioner. Ta det, följ markören till den glödande rutan bakom startbågen, och tryck på Starta loppet. Hon lånar dig en övnings-Valorsteed till lektionen, så själva lektionen kostar dig ingenting. Rid banan, avsluta den, och gå tillbaka till henne för ditt guld och din erfarenhet. Det lånade riddjuret går tillbaka till ladan efteråt, så lektionen lär dig sadeln snarare än ger dig en häst.',
   'guide.mountsPage.learnHeading': 'Att lära sig rida',
   'guide.mountsPage.raceBody':
     'Hoppbanan i Marlas hage står öppen för vem som helst, när som helst, inte bara under lektionen. Sitt upp på ett riddjur, stå på den glödande rutan bakom bågen, och tryck på Starta loppet. En nedräkning håller dig stilla, sedan börjar klockan gå: klara alla sju hoppen och rid tillbaka ut genom bågen innan tiden runnit ut.\n\nEtt hopp räknas bara om du verkligen är i luften över ribban, så en enkel genomridning klarar ingenting. Du får ta dem i vilken ordning som helst och från vilken sida som helst, och ett missat hopp är inte världens undergång: sväng tillbaka och ta det igen. Att dö, stiga av eller lämna hagen avslutar försöket, och det gör det också om klockan rinner ut, vilket sätter dig ur sadeln där du står; att avbryta själv stoppar bara klockan. Inget hindrar dig från att starta ett nytt försök. Det finns ingen avgift, ingen nedkylning och inget pris utöver tiden själv, och hur många ryttare som helst kan köra banan samtidigt utan att stå i vägen för varandra.',
   'guide.mountsPage.raceHeading': 'Stallets lopp',
-  'guide.mountsPage.rideBody':
-    'Det finns inget riddjursfönster och ingen favorit att ställa in, för tyglarna är riddjuret. Använd ett par tyglar från dina väskor eller från en plats i handlingsfältet så rider du det riddjuret. Att frammana tar en stund, ett kort kall snarare än ett omedelbart, så det räddar dig inte från en dålig pull. Att stiga av är omedelbart och blockeras aldrig.\n\nAnvänd tyglarna du redan rider och du ställer undan det riddjuret. Använd ett annat par medan du är beriden och du byter direkt till det, utan något att frammana emellan. Tangenten Sitt upp / Stig av, backquote-tangenten (`) som standard, får dig bara någonsin av: den är vägen ner, inte vägen upp. Det enda undantaget är ridlektionen, där samma tangent kallar på riddjuret Marla lånar dig, eftersom en lånad häst inte har några tyglar att klicka på. På en telefon eller surfplatta fungerar Sitt upp-knappen i Mer-menyn åt båda hållen, även om den kallar på det första paret tyglar som ligger i dina väskor snarare än ett du väljer, så tryck på tyglarna själva när du vill ha ett visst riddjur.',
   'guide.mountsPage.rideHeading': 'Att sitta upp och stiga av',
-  'guide.mountsPage.speedBody':
-    'Rörlighet är det enda som skiljer ett riddjur från ett annat. Valorsteed du köper av Marla sätter grundtempot, och riddjuren du samlar in ute i världen rider förbi det: ju sällsyntare tyglarna är, desto snabbare färd, i några tydliga steg snarare än en jämn glidning. Det finns ingen andra ridgrad att träna och ingen uppgradering att köpa efteråt. Du betalar för Ridning en gång, och därefter avgör tyglarna du använde hur snabbt du färdas.',
-  'guide.mountsPage.speedHeading': 'Rörlighet och nivåer',
-  'guide.mountsPage.whatBody':
-    'Ett riddjur är en best du rider, och det den ger dig är rörlighet. Ingen rustning, ingen skada, inga egenskaper: den bär dig över marken snabbare, och hoppar lite högre när du hoppar, och det är hela affären. Varje riddjur i spelet är marklevande, så det finns ingen flygning, och inget av dem simmar.',
   'guide.mountsPage.whatHeading': 'Vad ett riddjur är',
   'guide.mountsPage.whereBody':
     'Stormkammens stall är utmärkt på kartan över Stormkammen, ute bland kullarna mellan Branten och Vrakfälten. Marla står bredvid ladan, vänd mot tävlingsplanen.',
@@ -4045,8 +4030,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Revor är det enda som väntar på själva taket. De river upp sig ute i riket efter eget schema, rankade från C till S, och varje grupp i världen kapplöper om att vara den som stänger var och en av dem. Delvetavlorna fortsätter också, och deras svårare grad är värd en ny titt när din utrustning väl har hunnit ikapp.',
   'guide.progression.journeyBodyCount':
     'Världen är ett enda sammanhängande land av {zones} zoner. Tre av dem är vägen du levlar på, lagda från söder till norr: du börjar i den gröna dalen, tränger på genom träsket och avslutar i de kalla höga topparna. Följ uppdragsspåret så bär landet dig från den ena till den nästa. En ö ligger utanför dalens kust för de tidiga nivåerna, och resten av riket öppnas från samma väg, byggt för karaktärer som redan har klarat klättringen.',
-  'guide.progression.ridingBody':
-    'Ridning är en av sakerna som väntar vid slutet av klättringen. Vid nivå {level} lär en stallmästare dig färdigheten för en rejäl summa guld, och en lektion ute på träningsbanan ger dig ditt första par tyglar. Ett riddjur ger ingen kraft alls; det gör helt enkelt världen mindre, vilket efter en lång vandring norrut är sin egen sorts belöning.',
   'guide.progression.ridingTitle': 'Att lära sig rida',
   'guide.questsPage.availableBody':
     'Uppdrag kommer i kedjor. De flesta erbjuds bara sedan du har lämnat in det som kom före dem, och många kräver också en lägsta nivå, så en NPC som inte har något åt dig i dag kan ha gott om det efter dina nästa nivåer eller så snart du avslutar uppdraget du redan bär på. Ett fåtal har ett eget villkor, som ridlektionerna, vilka öppnas först sedan du har köpt ridfärdigheten. Gruppuppdrag säger det rakt ut i förväg genom att lista hur många spelare de föreslår att du tar med. Vissa uppdrag är repeterbara: du kan ta dem igen efter en väntetid, och markören över givaren talar om när ett har kommit tillbaka.',
@@ -16136,17 +16119,12 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.close': 'Stäng',
   'hudChrome.mounts.desc_aether_hover_cycle':
     'En kraftfull magitech-cykel designad för snabb, lågsvävande förflyttning i strid.',
-  'hudChrome.mounts.desc_grag_bear': 'En uthållig, säkerfotad björn som ger ökad reshastighet.',
   'hudChrome.mounts.desc_shadowjump_toad':
     'En massiv, säkerfotad jättepadda, tränad i blixtsnabba skuggsprång som täcker all terräng.',
-  'hudChrome.mounts.desc_stalkglider_snail':
-    'En robust, långsamt brinnande snigel som ger ökad reshastighet.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'En kunglig stormgrip som smyger fram på runskodda klor, med vingarna hopfällda.',
   'hudChrome.mounts.desc_thunderstrut_gobbler':
     'En kolossal stormkläckt kalkon som stoltserar ner från Den vaknande toppen, med stjärten spretande som ett åskmoln.',
-  'hudChrome.mounts.desc_valorsteed':
-    'En uthållig, säkerfotad stridshäst som ger ökad reshastighet.',
   'hudChrome.mounts.dismount': 'Stig av',
   'hudChrome.mounts.emptyDropHint':
     'Sällsyntare riddjur droppar från hjältemodiga fängelsehålebossar och avklarade revor.',
@@ -16169,12 +16147,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.selected': 'Vald',
   'hudChrome.mounts.spec_speed': '+{pct}% extra rörlighet',
   'hudChrome.mounts.title': 'Riddjur',
-  'hudChrome.mounts.useToRide': 'Använd för att frammana detta riddjur.',
   'hudChrome.mountTraining.begin': 'Börja lektionen',
   'hudChrome.mountTraining.mountPrompt':
     'Tryck på {key} för att sitta upp på övnings-Tapperhetshästen.',
-  'hudChrome.mountTraining.ownedMountPrompt':
-    'Dina tyglar finns i dina väskor. Använd dem för att rida.',
   'hudChrome.mountTraining.returnToMarla':
     'Återvänd till Marla vid stallet för att köpa dina Tapperhetshäst-tyglar för 10g.',
   'hudChrome.mountTraining.ridePrompt':
@@ -18374,10 +18349,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.mechEmpty': 'Du äger ännu inga färgvarianter för stridsmechen.',
   'hudChrome.cosmetics.mechIntro':
     'Stridsmechen ersätter den här karaktärens kropp. En färgvariant bärs åt gången.',
-  'hudChrome.cosmetics.mountsIntro':
-    'Ett riddjursskinn ritas över det riddjur som karaktären rider. Det ändrar aldrig farten.',
-  'hudChrome.cosmetics.mountsNoMount':
-    'Skaffa först ett riddjur: ett skinn behöver något att rida på.',
   'hudChrome.cosmetics.owned': 'Ägs',
   'hudChrome.cosmetics.scopeAccount': 'Konto',
   'hudChrome.cosmetics.scopeCharacter': 'Karaktär',

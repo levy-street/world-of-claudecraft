@@ -1,14 +1,9 @@
 // ---------------------------------------------------------------------------
 // Rideable ground mounts: the declarative catalog, shared host-agnostic data.
 //
-// Used by the authoritative Sim (level gates, the speed/block/crit hooks), the
-// renderer (key -> mount GLB visual), and the HUD Mounts window (rows render
-// their names/descriptions through the UI's own t() keys, keyed by MountKey).
-// It lives in sim/ so it carries no DOM/render imports and runs unchanged on
-// the server, offline, and headless.
-//
-// Every mount is a GROUND mount by design (no flying): the bonus only ever
-// scales normal ground/swim locomotion in player_motion.moveSpeedMult.
+// Cosmetic ground-mount appearances shared by sim ownership, rendering, and
+// the Cosmetics menu. Riding progression lives in riding_training.ts and
+// supplies speed independently of appearance or rarity.
 // ---------------------------------------------------------------------------
 
 export type MountKey =
@@ -31,19 +26,10 @@ export interface MountDef {
   /** Canonical English display name (the HUD localizes via hudChrome.mounts.*). */
   name: string;
   rarity: MountRarity;
-  /** Additive move-speed fraction while mounted (0.6 = +60% extra mobility). */
-  moveSpeedPct: number;
 }
 
-// Speed tiers: the purchasable horse is the 60% base, and the collectible or
-// developer-only specials tier above it at 70 / 75 / 80% by rarity. Speed is
-// the only stat a mount grants.
-//
-// There is NO per-mount level gate. It used to exist and never once fired: the
-// reins items carry no requiredLevel, the vendor path has its own hardcoded
-// level-20 buy gate, and every drop source is level-20 content, so a character
-// could not hold a mount before its gate anyway. The single real gate is
-// ridingTrained (purchased from Marla), enforced in src/sim/mounts.ts.
+// Rarity describes appearance and acquisition only. Riding training controls
+// every mount's speed; catalog entries carry no intrinsic gameplay stats.
 export const MOUNTS: Record<MountKey, MountDef> = {
   // The base mount: first in the catalog, the natural default pick, sold by the
   // stablemaster (the only purchasable mount). Level 20 to match the buy gate.
@@ -51,40 +37,35 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     key: 'valorsteed',
     name: 'Valorsteed',
     rarity: 'common',
-    moveSpeedPct: 0.6,
   },
-  // Uncommon tier (70%): the griffin and the toad. These are the five-man heroic
+  // Uncommon appearances: the griffin and the toad. These are the five-man heroic
   // drops, so they are the first specials most players collect.
   stormfeather_griffin: {
     key: 'stormfeather_griffin',
     name: 'Sky-Reach Stormfeather',
     rarity: 'uncommon',
-    moveSpeedPct: 0.7,
   },
   shadowjump_toad: {
     key: 'shadowjump_toad',
     name: 'Kama-Kage the Shadow-Jump Toad',
     rarity: 'uncommon',
-    moveSpeedPct: 0.7,
   },
-  // Rare tier (75%): the bear and the snail.
+  // Rare appearances: the bear and the snail.
   grag_bear: {
     key: 'grag_bear',
     name: 'Goliath Grag-Bear',
     rarity: 'rare',
-    moveSpeedPct: 0.75,
   },
   stalkglider_snail: {
     key: 'stalkglider_snail',
     name: 'Moss-Shell Stalk-Glider',
     rarity: 'rare',
-    moveSpeedPct: 0.75,
   },
   // There is deliberately no store mount here. Paid looks are MOUNT SKINS
   // (content/mount_skins.ts): account-wide cosmetics worn over whatever mount
   // the character rides, so real money never buys a catalog row, a reins item,
   // or a speed tier, the same line the weapon skins hold.
-  // Epic tier (80%): the hover-cycle and the gobbler come from Rift S clears,
+  // Epic appearances: the hover-cycle and the gobbler come from Rift S clears,
   // the Lanternback Troll from Treasure Caskets. The Terrorspark Groundshaker
   // is developer-only for now and has no player-facing acquisition. The tank stays LAST in the
   // catalog (the tests pin it as the tail, so a new player-facing mount lands
@@ -93,13 +74,11 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     key: 'aether_hover_cycle',
     name: 'Aether-Jouster Hover-Cycle',
     rarity: 'epic',
-    moveSpeedPct: 0.8,
   },
   thunderstrut_gobbler: {
     key: 'thunderstrut_gobbler',
     name: 'Thunderstrut the Grand Gobbler',
     rarity: 'epic',
-    moveSpeedPct: 0.8,
   },
   // The Drakemaw legendary: a saddle-broken brood raptor. Its reins
   // (content/drakelands.ts) currently have NO acquisition path; the broodlord
@@ -108,7 +87,6 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     key: 'drakemaw_raptor',
     name: 'Drakemaw Raptor',
     rarity: 'epic',
-    moveSpeedPct: 0.8,
   },
   // The Rift Watch's Champion standing mount (content/faction_vendors.ts):
   // Quartermaster Vaelen sells the reins in Drifthaven. The internal key stays
@@ -118,7 +96,6 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     key: 'avian_strider',
     name: 'Viridian Valestrider',
     rarity: 'epic',
-    moveSpeedPct: 0.8,
   },
   // A hill troll broken to the saddle by lamplighters: he carries an iron
   // throne strapped across his shoulders with a storm lantern hung off each
@@ -128,13 +105,11 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     key: 'lanternback_troll',
     name: 'Grumbol the Lanternback',
     rarity: 'epic',
-    moveSpeedPct: 0.8,
   },
   terrorspark_groundshaker: {
     key: 'terrorspark_groundshaker',
     name: 'Dreadspark Groundshaker',
     rarity: 'epic',
-    moveSpeedPct: 0.8,
   },
   // The Bonebound Rickshaw left this catalog with the v0.42.0 cosmetics
   // change: it is a mount SKIN now (content/mount_skins.ts, id rickshaw_mount),
@@ -159,10 +134,9 @@ export function isDeveloperMount(key: string): boolean {
 }
 
 /** The horse: the default stable pick and the fallback for every unknown/legacy
- *  persisted value. It is no longer free (a fresh player owns nothing): owning
- *  it means holding its reins item (reins_valorsteed), sold by the stablemaster.
- *  A persisted pick may name a mount the player does not own, which is harmless:
- *  toggleMount falls back to the first owned mount. */
+ *  persisted value. It is no longer free (a fresh player owns nothing): its collectible
+ *  appearance is unlocked by reins_valorsteed. The trained toggle uses this
+ *  neutral ride beneath any selected cosmetic, even without a reins item. */
 export const DEFAULT_MOUNT: MountKey = 'valorsteed';
 
 /** The steed the riding lesson lends the player. It is the same catalog mount
@@ -172,7 +146,7 @@ export const DEFAULT_MOUNT: MountKey = 'valorsteed';
 export const TRAINING_MOUNT_KEY: MountKey = 'valorsteed';
 
 export function mountDef(key: string): MountDef | null {
-  return (MOUNTS as Record<string, MountDef | undefined>)[key] ?? null;
+  return Object.hasOwn(MOUNTS, key) ? MOUNTS[key as MountKey] : null;
 }
 
 /** Coerce a persisted/wire string back to a valid catalog key ('' when unknown,
@@ -187,11 +161,6 @@ export function normalizeMountKey(key: string | undefined | null): MountKey | ''
 export function normalizeSelectedMount(key: string | undefined | null): MountKey {
   const normalized = normalizeMountKey(key);
   return normalized === '' ? DEFAULT_MOUNT : normalized;
-}
-
-/** Additive move-speed fraction of the active mount ('' : 0). */
-export function mountMoveSpeedPct(mountKey: string): number {
-  return mountKey ? (mountDef(mountKey)?.moveSpeedPct ?? 0) : 0;
 }
 
 // ---------------------------------------------------------------------------

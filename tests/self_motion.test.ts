@@ -266,6 +266,38 @@ class Lab {
 }
 
 describe('SelfMotionPredictor', () => {
+  it('refreshes riding training on the persistent actor when advanced training arrives', () => {
+    const lab = new Lab(100);
+    lab.self.mountKey = 'valorsteed';
+    lab.self.ridingTier = 1;
+    const referenceSelf = { ...lab.self, ridingTier: 2 as const };
+    const reference = new SelfMotionPredictor(SEED, lab.srv.riftCollisionToken);
+    const frame: SelfMotionFrame = {
+      enabled: true,
+      moveInput: mi(),
+      displayFacing: 0,
+      echoMs: 100,
+      jitterMs: 0,
+      alpha: 1,
+      frameDt: 0.05,
+      snapAgeMs: 0,
+      snapIntervalMs: SNAP_MS,
+      riftFloor: null,
+      delveRun: null,
+      delveSolids: [],
+    };
+    lab.predictor.step(lab.self, frame);
+    reference.step(referenceSelf, frame);
+    lab.self.ridingTier = 2;
+    frame.moveInput = mi({ forward: true });
+    lab.predictor.step(lab.self, frame);
+    reference.step(referenceSelf, frame);
+    const upgraded = lab.predictor.step(lab.self, frame);
+    const alreadyAdvanced = reference.step(referenceSelf, frame);
+    expect(upgraded).toEqual(alreadyAdvanced);
+    expect((upgraded?.z ?? 0) - lab.self.pos.z).toBeCloseTo(RUN_SPEED * 2.1 * 0.05);
+    expect(lab.self.pos).toEqual(lab.srv.player.pos);
+  });
   it('recognizes only the local completed-unstuck event as an authoritative discontinuity', () => {
     const completed = {
       type: 'unstuck',

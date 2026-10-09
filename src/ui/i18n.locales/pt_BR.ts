@@ -4060,29 +4060,14 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.mountsPage.collectBody':
     'Além do balcão de Marla, as rédeas são encontradas, não compradas. Elas caem dos últimos chefes das masmorras de cinco jogadores e do raide no heroico, e de fendas concluídas, onde quanto mais difícil a fenda que você termina, mais raras as rédeas que ela pode deixar para trás. São achados raros por design, e nenhuma tentativa garante uma, então o jeito tranquilo de caçar uma montaria é levar a caçada junto nas investidas que você já ia fazer de qualquer forma. Esta página não vai te contar qual montaria pertence a qual chefe: essa parte é sua para descobrir.',
   'guide.mountsPage.collectHeading': 'De onde vêm as montarias mais raras',
-  'guide.mountsPage.firstBody':
-    'O Corcel do Valor é a única montaria vendida em qualquer lugar do mundo. Assim que você tiver aprendido Equitação, Marla vai vender para você as Rédeas do Corcel do Valor por 10 ouro, e essas rédeas são suas para sempre. Toda outra montaria é conquistada mundo afora, então o cavalo é onde quase todos os cavaleiros começam.',
   'guide.mountsPage.firstHeading': 'Sua primeira montaria',
-  'guide.mountsPage.goodsBody':
-    'Uma montaria é um item, o que a torna algo que a economia pode movimentar. Você é dono de uma montaria enquanto suas rédeas estiverem nas suas bolsas ou no seu banco, embora rédeas guardadas no banco mantenham a montaria sua sem deixar você montá-la: para chamar o animal você precisa estar carregando as rédeas. Rédeas de jogador não trazem vínculo de alma, então elas são negociáveis, viajam pelo correio e entram no Mercado Mundial como qualquer outro achado, a menos que o próprio item diga o contrário. Duas coisas valem a pena saber antes de se desfazer de uma: nenhum mercador jamais recompra um conjunto de rédeas, então uma montaria é uma compra que você guarda ou repassa em vez de transformar em dinheiro, e se as rédeas saírem das suas bolsas e do seu banco ao mesmo tempo enquanto você está montado, seja por negociação, por correio ou por venda no mercado, a montaria vai junto e você é posto no chão onde estiver.',
   'guide.mountsPage.goodsHeading': 'As rédeas são mercadorias comuns',
   'guide.mountsPage.heading': 'Montarias e equitação',
-  'guide.mountsPage.intro':
-    'Uma montaria é uma forma mais rápida de atravessar o mundo, e é só isso que ela é. Você aprende a montar nos estábulos, compra seu primeiro conjunto de rédeas, e toda estrada depois disso fica mais curta.',
-  'guide.mountsPage.learnBody':
-    'Equitação é uma habilidade que você compra uma única vez, e ela se abre no nível {level}. Marla Hitchen, a cavalariça-mor, mantém os Estábulos de Galecrest lá nas colinas, e ela vende Treinamento de Equitação por 80 ouro. Essa única compra é o que permite montar em qualquer montaria, e ela fica com você para sempre.\n\nDepois de tê-la, Marla tem uma missão para você: Aulas de Equitação. Aceite-a, siga o marcador até o quadrado luminoso atrás do arco de largada, e pressione Iniciar Corrida. Ela empresta a você um Corcel do Valor de treinamento para a lição, então a lição em si não custa nada. Percorra o percurso, termine-o e volte até ela para receber suas moedas e experiência. O corcel emprestado volta para o celeiro depois, então a lição ensina a sela, não entrega um cavalo.',
   'guide.mountsPage.learnHeading': 'Aprendendo a montar',
   'guide.mountsPage.raceBody':
     'O percurso de salto no cercado de Marla está aberto para qualquer um, a qualquer hora, não só durante a lição. Monte, fique no quadrado luminoso atrás do arco e pressione Iniciar Corrida. Uma contagem regressiva te mantém parado, depois o relógio corre: supere todos os sete obstáculos e volte cavalgando pelo arco antes que o tempo acabe.\n\nUm salto só conta se você estiver genuinamente no ar sobre a barra, então um simples passar por baixo não conta nada. Você pode enfrentá-los em qualquer ordem e por qualquer lado, e errar um não é o fim do mundo: dê a volta e tente de novo. Morrer, desmontar ou deixar o cercado encerra a tentativa, assim como deixar o relógio zerar, o que te tira da sela onde você estiver; cancelar por conta própria apenas para o relógio. Nada te impede de começar outra. Não há taxa, tempo de recarga nem prêmio além do próprio tempo, e qualquer número de cavaleiros pode correr o percurso ao mesmo tempo sem atrapalhar uns aos outros.',
   'guide.mountsPage.raceHeading': 'A corrida dos estábulos',
-  'guide.mountsPage.rideBody':
-    'Não há janela de montarias nem favorita para definir, porque as rédeas são a montaria. Use um conjunto de rédeas das suas bolsas ou de um espaço da barra de ação e você monta naquela montaria. Invocar leva um instante, um chamado breve em vez de instantâneo, então isso não vai te salvar de um puxão ruim. Desmontar é instantâneo e nunca é impedido.\n\nUse as rédeas que você já está montando e você guarda aquela montaria. Use um conjunto diferente enquanto montado e você troca direto para ele, sem nada para invocar no meio do caminho. A tecla Montar / Desmontar, a tecla de crase por padrão, só serve para descer: é o caminho para baixo, não para cima. A única exceção é a aula de equitação, onde essa mesma tecla chama o corcel que Marla empresta, já que um cavalo emprestado não tem rédeas para clicar. Em um celular ou tablet, o botão Montar na bandeja Mais funciona nos dois sentidos, embora chame o primeiro conjunto de rédeas nas suas bolsas em vez de um que você escolha, então toque nas próprias rédeas quando quiser uma montaria específica.',
   'guide.mountsPage.rideHeading': 'Montando e desmontando',
-  'guide.mountsPage.speedBody':
-    'Velocidade é a única coisa que separa uma montaria da outra. O Corcel do Valor que você compra de Marla define o ritmo básico, e as montarias que você coleta mundo afora cavalgam acima dele: quanto mais raras as rédeas, mais rápida a montaria, em alguns degraus claros em vez de uma progressão suave. Não existe um segundo grau de Equitação para treinar nem um aprimoramento para comprar depois. Você paga por Equitação uma única vez, e a partir daí as rédeas que você usa decidem sua velocidade de viagem.',
-  'guide.mountsPage.speedHeading': 'Velocidade e níveis',
-  'guide.mountsPage.whatBody':
-    'Uma montaria é um animal que você cavalga, e o que ela te dá é velocidade. Sem armadura, sem dano, sem atributos: ela te carrega pelo chão mais rápido, e pula um pouco mais alto quando você salta, e isso é tudo o que o acordo oferece. Toda montaria do jogo é uma montaria terrestre, então não há voo, e nenhuma delas nada.',
   'guide.mountsPage.whatHeading': 'O que é uma montaria',
   'guide.mountsPage.whereBody':
     'Os Estábulos de Galecrest estão marcados no mapa de Galecrest, lá nas colinas entre o Despenhadeiro e os Campos dos Destroços. Marla fica ao lado do celeiro, de frente para o pátio de corrida.',
@@ -4119,8 +4104,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'As fendas são a única coisa que espera até o próprio limite de nível. Elas se abrem nos reinos na própria agenda, classificadas de C a S, e todos os grupos do mundo correm para ser quem fecha cada uma delas. Os quadros de incursão também continuam por aí, e a dificuldade mais alta deles vale outro olhar assim que seu equipamento tiver evoluído.',
   'guide.progression.journeyBodyCount':
     'O mundo é uma terra contínua de {zones} zonas. Três delas são a estrada em que você sobe de nível, dispostas de sul a norte: você começa no vale verdejante, avança pelo pântano e termina nos cumes altos e gélidos. Siga a trilha de missões e a terra carrega você de uma para a próxima. Uma ilha fica ao largo da costa do vale para os primeiros níveis, e o restante dos reinos se abre a partir dessa mesma estrada, construído para personagens que já fizeram a subida.',
-  'guide.progression.ridingBody':
-    'Equitação é uma das coisas que esperam no fim da subida. No nível {level}, uma cavalariça-mor ensina a habilidade por uma soma considerável de ouro, e uma aula no percurso de treinamento rende suas primeiras rédeas. Uma montaria não concede poder algum; ela simplesmente encolhe o mundo, o que, depois de uma longa caminhada rumo ao norte, é uma recompensa à sua maneira.',
   'guide.progression.ridingTitle': 'Aprendendo a montar',
   'guide.questsPage.availableBody':
     'As missões vêm em cadeias. A maioria só é oferecida depois que você entrega a anterior, e muitas também pedem um nível mínimo, então um NPC sem nada para você hoje pode ter bastante depois de mais alguns níveis ou assim que você concluir a missão que já está no seu registro. Algumas têm uma condição própria, como as Aulas de Equitação, que só abrem depois que você compra a habilidade de Equitação. Missões em grupo avisam isso de cara, listando quantos jogadores elas sugerem que você traga. Alguns trabalhos são repetíveis: você pode aceitá-los de novo depois de uma espera, e o marcador sobre quem os oferece avisa quando um deles voltou a ficar disponível.',
@@ -14334,12 +14317,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_shadowjump_toad': 'Kama-Kage, o Sapo Salta-Sombras',
   'hudChrome.mounts.name_stormfeather_griffin': 'Pluma-Tormenta Alcança-Céu',
   'hudChrome.mounts.name_thunderstrut_gobbler': 'Pavoneia-Trovões, o Grande Peru',
-  'hudChrome.mounts.desc_valorsteed':
-    'Um corcel resistente e de passo firme que aumenta a velocidade de viagem.',
-  'hudChrome.mounts.desc_grag_bear':
-    'Um urso resistente e de passo firme que aumenta a velocidade de viagem.',
-  'hudChrome.mounts.desc_stalkglider_snail':
-    'Um caracol valente e de queima lenta que aumenta a velocidade de viagem.',
   'hudChrome.mounts.desc_aether_hover_cycle':
     'Uma poderosa moto magitec projetada para travessias de combate rápidas e rente ao chão.',
   'hudChrome.mounts.desc_shadowjump_toad':
@@ -14353,7 +14330,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Alcance o nível 20 e faça aulas de montaria com a Cavalariça-mor Marla nos estábulos a oeste de Highwatch.',
   'hudChrome.mounts.emptyDropHint': 'Montarias mais raras caem de chefes de masmorra e raide.',
   'hudChrome.mounts.clickManage': 'Clique para escolher sua montaria',
-  'hudChrome.mounts.useToRide': 'Use para invocar esta montaria.',
   'guide.bestiary.flavor.sethrael_palecoil':
     'Uma serpente pálida como osso que desliza pelo fundo profundo do Glimmermere, guardiã silenciosa das águas que reivindicou para si. Nadadores que dividem o lago com ela raramente voltam à superfície.',
   'guide.combat.metersBody':
@@ -16439,10 +16415,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.mechEmpty': 'Nenhum croma de Mecha de Combate adquirido ainda.',
   'hudChrome.cosmetics.mechIntro':
     'O Mecha de Combate substitui o corpo deste personagem. Um croma é usado por vez.',
-  'hudChrome.cosmetics.mountsIntro':
-    'Uma aparência de montaria é desenhada sobre qualquer montaria deste personagem. Ela nunca altera a velocidade.',
-  'hudChrome.cosmetics.mountsNoMount':
-    'Adquira uma montaria primeiro: uma aparência precisa de algo para montar.',
   'hudChrome.cosmetics.owned': 'Adquirido',
   'hudChrome.cosmetics.scopeAccount': 'Conta',
   'hudChrome.cosmetics.scopeCharacter': 'Personagem',
@@ -16987,8 +16959,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mountTraining.begin': 'Iniciar Lição',
   'hudChrome.mountTraining.mountPrompt':
     'Pressione {key} para montar no Valorsteed de treinamento.',
-  'hudChrome.mountTraining.ownedMountPrompt':
-    'Suas rédeas estão em suas bolsas. Use-as para montar.',
   'hudChrome.mountTraining.returnToMarla':
     'Volte para Marla nos estábulos para comprar as rédeas do seu Valorsteed por 10g.',
   'hudChrome.mountTraining.ridePrompt':

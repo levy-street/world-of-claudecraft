@@ -5,7 +5,6 @@ import {
   type AccountFlair,
   type ChatSenderFlair,
   EMPTY_ACCOUNT_FLAIR,
-  hasStreamerLink,
   wireStreamerLinks,
 } from '../src/sim/account_flair';
 import type { AccountLedger } from '../src/sim/account_ledger';
@@ -15,6 +14,7 @@ import { wireParkedMana } from '../src/sim/combat/form_auto_unshift';
 import { rewindHealAmount } from '../src/sim/combat/rewind';
 import { DEEDS } from '../src/sim/content/deeds';
 import { isFinderListingTag, isFinderRole } from '../src/sim/content/dungeon_finder';
+import { mountDef } from '../src/sim/content/mounts';
 import { RELIQUARY_PAGES_BY_ID } from '../src/sim/content/reliquary';
 import { MECH_CHROMAS } from '../src/sim/content/skins';
 import {
@@ -112,6 +112,8 @@ import { ownedWeaponSkinLoadout } from './account_cosmetics_live';
 import { AccountCosmeticsService } from './account_cosmetics_service';
 import { reconcileAccountRelics, recordRelicFinds } from './account_ledger_records';
 import { AccountLedgerService } from './account_ledger_service';
+import type { AccountMountItemsRow } from './account_mount_items_core';
+import { createRealmMountItemsService } from './account_mount_items_runtime';
 import { type ActivityDetectDeps, detectActivityEvent } from './activity_detect';
 import { recordOnlineSample } from './admin_db';
 import { type AdminGuildBankView, adminGuildBankView } from './admin_guild_bank_view';
@@ -249,6 +251,7 @@ import {
   harvestBandForNode,
   harvestTierForNode,
 } from './economy_telemetry';
+import { identityFields } from './entity_identity_wire';
 import { isUpdateDue } from './entity_update_cadence';
 // Imported from the mirror modules DIRECTLY (not the ./steam or ./epic
 // barrels), the same way deeds_records imports onDeedRecorded: the barrels
@@ -256,7 +259,6 @@ import { isUpdateDue } from './entity_update_cadence';
 // every test that partial-mocks the db, the known overlay-mock breakage class.
 // Dual fan-out (D21): Steam and Epic reconcile independently.
 import { reconcileOnLogin as reconcileEpicOnLogin } from './epic/mirror';
-import { equippedInstanceWire } from './equipped_instance_wire';
 import { eventAnchor, shouldDeliverCombatEventToViewer } from './event_delivery';
 import { assembleEventsFrame, filterRoutableEvents, serializeEventFragments } from './event_frame';
 import { buildEventPidIndex, forEachSelectedEventIndex } from './event_pid_index';
@@ -402,7 +404,6 @@ import type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types'
 import { dispatchPerfectItemCommand } from './perfect_item_command';
 import { parsePerfectingSwapCommand } from './perfecting_swap_command';
 import { runPeriodicSaveFlush } from './periodic_save_flush';
-import { writePlayerIdentityWire } from './player_identity_wire';
 import { VaultGameServices, type VaultMailSaveCapture } from './vault_game_services';
 import { dispatchVehicleCommand } from './vehicle_command_wire';
 import { dispatchWeeklyRewardCommand } from './weekly_reward_open';
@@ -1256,107 +1257,6 @@ type RememberedChat =
     }
   | { channel: 'whisper'; target: string };
 
-// Identity fields rarely change, so they ride only in "full" records: on an
-// entity's first snapshot for a session and again whenever one of them
-// changes. The client treats their absence in a record as "unchanged".
-function identityFields(e: Entity): Record<string, unknown> {
-  const out: Record<string, unknown> = { k: e.kind, tid: e.templateId, nm: e.name, lv: e.level };
-  if (e.skinCatalog === 'mech') out.cat = 'mech';
-  if (e.skin) out.sk = e.skin;
-  // Active rideable mount ('' omitted). This identity field is intentionally
-  // distinct from the self-only persisted pick (`mntSel`): using `mnt` for both
-  // made the appended self delta overwrite the live riding state in JSON.
-  if (e.mountKey) out.mnt = e.mountKey;
-  if (e.mainhandItemId) out.mh = e.mainhandItemId; // equipped mainhand → held weapon model (render-only)
-  if (e.offhandItemId) out.oh = e.offhandItemId; // equipped offhand → held weapon model (render-only)
-  if (e.weaponSkinId) out.wsk = e.weaponSkinId; // active weapon-skin cosmetic (render-only, like mh)
-  if (e.mountSkinId) out.msk = e.mountSkinId; // worn mount-skin cosmetic (render-only, like wsk)
-  // Full worn set, for the inspect-another-player window. Players only and only
-  // when something is equipped; rides the identity record (first appearance +
-  // on change), never the per-tick dynamic fields. Render-only, like `mh`.
-  if (e.kind === 'player') {
-    // The authored modular look (`app`) is NOT built here. It is ~0.6 KB for a
-    // default look (1489 bytes at its hard bound, APPEARANCE_MAX_WIRE_BYTES)
-    // and changes at most once a session, and everything in this record is
-    // JSON.stringify'd once per entity per TICK (wireCacheFor), so composing it
-    // into the object would re-serialize half a kilobyte 20 times a second per
-    // online player to produce the same bytes. It is serialized once per entity
-    // instead (EntityWireCache.appJson) and spliced into the cached identity
-    // JSON; the self record picks it up through the `maybeRaw` delta channel in
-    // bcastSelf, which already exists for heavy, rarely-changing fields.
-    // appearanceWireJson() is the one place that string is minted.
-    const eq = e.equippedItems;
-    for (const _ in eq) {
-      out.eq = eq;
-      break;
-    }
-    // Per-slot ItemInstancePayloads of the worn set (masterwork/enchant rolls),
-    // for the inspect window (Professions 2.0). Same sparse rule as
-    // `eq` above: players only, only when at least one worn piece carries a
-    // payload, riding the identity record (wireCacheFor diffs the identity
-    // JSON, so an equip/unequip of an instanced piece re-emits automatically).
-    // Data minimization: only the inspect fields (signer, enchant, rolled,
-    // name, perfected, and a Riftbound band's rift record: its rank, upgrades,
-    // and gems, which the band tooltip's item level and rank lines read) leave
-    // the server; boundTo, charges, and the bindOnTrade arm are gameplay state
-    // no inspecting client needs and never ride this key. The pub allowlist
-    // below is what enforces this, so a new non-cosmetic ItemInstancePayload
-    // field is excluded by construction; the owner still sees their own
-    // payload in full via the self `inv` mirror. 2026-08-27: `name` (the
-    // player-chosen legendary name, Masterwrought phase 13) is the FIRST
-    // cosmetic JOIN since the rule was written. The visible Perfected marker
-    // also exposes loot quality; binding and custody stay private.
-    const eqi = equippedInstanceWire(e);
-    if (eqi) out.eqi = eqi;
-  }
-  if (e.holderTier) out.ht = e.holderTier; // $WOC holder-tier flair (cosmetic)
-  if (e.holderBalance) out.hb = Math.round(e.holderBalance); // exact $WOC, for inspect
-  if (e.discordTier) out.dt = e.discordTier; // Discord status-tier flair (cosmetic)
-  if (e.discordAvatar) out.dav = e.discordAvatar; // Discord PFP (linked indicator)
-  if (e.discordName) out.dnm = e.discordName; // Discord handle / nickname (nameplate)
-  if (e.discordJoined) out.dj = e.discordJoined; // Discord join epoch ms (member since)
-  if (e.discordRole) out.dr = e.discordRole; // top staff/special role key (name color + tag)
-  if (e.devTier) out.dvt = e.devTier; // developer-badge tier (cosmetic)
-  if (e.devMergedPrs) out.dvc = e.devMergedPrs; // merged-PR count, for inspect/card
-  if (e.githubLogin) out.dgl = e.githubLogin; // GitHub login (inspect readout + profile link)
-  // Curator standing (cosmetic): rank plus the character-scoped completion pair
-  // behind it, for the inspect card's Reliquary line and the rank-5 sigil.
-  // Sparse like the flair above: refreshCuratorStanding only stamps them for a
-  // ranked character, so an unranked player ships nothing and a full record
-  // with the keys absent resets the mirror. The pair NESTS under the rank so
-  // all-or-nothing is structural at the encoder, not a convention the
-  // refresher must remember.
-  if (e.curatorRank) {
-    out.crk = e.curatorRank; // Curator rank 1-5
-    if (e.relicsOwned) out.cro = e.relicsOwned; // character-scoped relics owned
-    // relicsTotal is the one player-INDEPENDENT number of the three: it is the
-    // character-scoped catalog size, so a client could derive it from its own
-    // content tables and never ask. It rides the wire anyway because a
-    // MIXED-VERSION client must not print a total that disagrees with the
-    // server's catalog: the denominator on the card is whatever the server counted
-    // when it stamped the pair, so an older or newer client shows the server's
-    // completion rather than a locally-derived one that quietly differs.
-    if (e.relicsTotal) out.crt = e.relicsTotal; // character-scoped relic total
-  }
-  if (e.aiAccount) out.ai = 1; // operator-set AI-operated mark (name prefix)
-  // Operator-applied Cheater tag. A bare flag, not the remaining budget: every
-  // nearby client needs to RENDER the tag, but only the wearer needs the
-  // countdown, and the wearer already has it on the mark's own aura.
-  if (e.cheaterMark) out.chm = 1;
-  // Official streamer's platform links (player menu). Already gated by
-  // wireStreamerLinks at the point they were set on the entity, so an account whose
-  // streamer flag is off has none here, whatever is stored against it.
-  if (e.streamerLinks && hasStreamerLink(e.streamerLinks)) out.slk = e.streamerLinks;
-  writePlayerIdentityWire(e, out); // guild, pledge, guild tier, deed title/border, spec
-  if (e.dungeonId) out.dgn = e.dungeonId;
-  if (e.riftTier) out.rt = e.riftTier; // ranked rift portal badge (render-only)
-  if (e.vaultRarity) out.vr = e.vaultRarity; // buried-hoard rarity (render-only)
-  if (e.objectItemId) out.obj = e.objectItemId;
-  if (e.scale !== 1) out.sc = e.scale;
-  if (e.color !== 0xffffff) out.c = e.color;
-  return out;
-}
-
 // Dynamic fields are re-sent whole in every full or lite record, so the
 // conditional ones keep their absent-means-unset semantics.
 function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> {
@@ -1510,6 +1410,12 @@ export class GameServer {
     sessions: () => this.clients.values(),
     resyncQuests: (session) => this.resyncQuests(session as ClientSession),
   });
+  private readonly mountItems = createRealmMountItemsService(
+    () => this.sim,
+    this.cosmetics,
+    () => this.backgroundDbGate,
+    (ms) => this.tickProfiler.add('mountItems', ms),
+  );
   private readonly ledger = new AccountLedgerService({
     sim: () => this.sim,
     sessions: () => this.clients.values(),
@@ -1667,6 +1573,7 @@ export class GameServer {
     'antibot',
     'broadcast',
     'bcastGrid',
+    'mountItems',
     'bcastSelf',
     'social',
     'saves',
@@ -3223,6 +3130,7 @@ export class GameServer {
     meta: RequestMetadata &
       Partial<AccountChatMuteStatus> & {
         accountCosmetics?: AccountCosmetics;
+        accountMountItems?: readonly AccountMountItemsRow[];
         // The account ledger loaded for this account (server/account_ledger_db.ts);
         // absent on the bare test join, which then fills a fresh ledger alone.
         accountLedger?: AccountLedger;
@@ -3329,7 +3237,10 @@ export class GameServer {
     // The worn mount skin rides the character save, ownership rides the
     // account: a saved skin the account does not own comes off here (never
     // healed into ownership; server/mount_skin_reconcile.ts).
-    if (!wornMountSkinAllowed(accountCosmetics, this.sim.meta(pid)?.mountSkinId)) {
+    if (
+      !wornMountSkinAllowed(accountCosmetics, this.sim.meta(pid)?.mountSkinId) &&
+      !mountDef(this.sim.meta(pid)?.mountSkinId ?? '')
+    ) {
       this.sim.setMountSkin(pid, null);
     }
     const sessionIp = meta.ip ?? '';
@@ -3482,6 +3393,7 @@ export class GameServer {
     if (session.jailed) this.teleportJailedSession(session);
     this.ipSessionCounts.set(sessionIp, (this.ipSessionCounts.get(sessionIp) ?? 0) + 1);
     this.clients.set(pid, session);
+    this.mountItems.join(session, meta.accountMountItems);
     this.sessionsByCharacterId.set(characterId, session);
     this.vault.onJoin(pid, characterId);
     this.peakOnline = Math.max(this.peakOnline, this.clients.size);
@@ -3855,6 +3767,7 @@ export class GameServer {
     // Release only the session binding. The account-keyed token state remains
     // cached until it has naturally refilled, so reconnect cannot reset it.
     session.bankVaultLedgerGuard.release();
+    this.mountItems.leave(session);
     this.clients.delete(session.pid);
     if (![...this.clients.values()].some((live) => live.accountId === session.accountId)) {
       this.generalChatQuota.forgetAccount(session.accountId);
@@ -3897,6 +3810,7 @@ export class GameServer {
     // otherwise teardown could race the durable guild and fee verdict.
     await session.guildCreateSettlement;
     await this.saveCharacterOnLeave(session);
+    this.mountItems.settledLeave(session.accountId, session.characterId);
     // Whatever book work this session still holds can never commit now: it has
     // no save left. Undo the part whose character half never landed, and
     // record the part whose character half did (an escrow deficit that ran out
@@ -6439,6 +6353,7 @@ export class GameServer {
         }
         break;
       case 'use':
+        this.mountItems.syncAccount(session);
         if (typeof msg.item === 'string') {
           // The bag index the client named, re-validated in the sim against ITS
           // OWN inventory: an unrecognized value reads as undefined (the legacy
@@ -6480,13 +6395,18 @@ export class GameServer {
         // The options bag third, pid fourth (the one explicit shape; see
         // Sim.buyItem). A non-number count is dropped like sell's, a hostile
         // number reaches the sim's sanitize and denies there.
-        if (typeof msg.npc === 'number' && typeof msg.item === 'string')
+        if (
+          typeof msg.npc === 'number' &&
+          typeof msg.item === 'string' &&
+          (msg.ridingTier === undefined || msg.ridingTier === 0 || msg.ridingTier === 1)
+        )
           sim.buyItem(
             msg.npc,
             msg.item,
             {
               count: typeof msg.count === 'number' ? msg.count : undefined,
               bulk: msg.bulk === true,
+              expectedRidingTier: msg.ridingTier ?? 0,
             },
             pid,
           );
@@ -6771,6 +6691,7 @@ export class GameServer {
       // Rideable mounts: the Sim re-validates everything (catalog key, level
       // gate, combat gate); the entity mirror + self `mnt` field carry the result.
       case 'mount_toggle':
+        this.mountItems.syncAccount(session);
         sim.toggleMountFor(pid);
         break;
       // Riding lesson: the Sim re-validates everything (level, range, quest
@@ -6791,8 +6712,12 @@ export class GameServer {
       // Riding skill purchase: player buys Riding from Marla for 80g. The Sim
       // re-validates NPC identity, range, level, and funds.
       case 'learn_riding':
-        if (typeof msg.npc === 'number' && Number.isInteger(msg.npc))
-          sim.learnRidingFor(msg.npc, pid);
+        if (
+          typeof msg.npc === 'number' &&
+          Number.isInteger(msg.npc) &&
+          (msg.ridingTier === undefined || msg.ridingTier === 0 || msg.ridingTier === 1)
+        )
+          sim.learnRidingFor(msg.npc, pid, msg.ridingTier ?? 0);
         break;
       // Show-jumping race: the Sim re-validates the glowing platform, lesson or
       // mount eligibility, and liveness before arming the countdown.
@@ -6821,6 +6746,7 @@ export class GameServer {
       // session's account cosmetics here; the Sim only validates the id.
       case 'change_mount_skin':
         if (!this.consumeCosmeticOp(session, receivedAtMs / 1000)) break;
+        this.mountItems.syncAccount(session);
         this.cosmetics.changeMountSkin(session, msg.skin);
         break;
       // Z-key sheathe toggle: cosmetic, no payload; the Sim owns the dead-gate
@@ -7926,6 +7852,10 @@ export class GameServer {
 
   private broadcastSnapshots(): void {
     if (this.clients.size === 0) return;
+    const mountItemsStarted = performance.now();
+    const mountItemsNow = Date.now();
+    for (const session of this.clients.values()) this.mountItems.probe(session, mountItemsNow);
+    this.tickProfiler.add('mountItems', performance.now() - mountItemsStarted);
     this.partyFrameGlobalsCache = null;
     this.partyFrameProjectionCache.beginBroadcast();
     const tick = this.sim.tickCount;

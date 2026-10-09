@@ -12,7 +12,7 @@ import {
   WATER_APPROACH_READS_PER_CALL,
   type WaterLevelAt,
 } from '../src/render/water_approach_core';
-import { MOUNTS } from '../src/sim/content/mounts';
+import { ridingMoveSpeedPct } from '../src/sim/riding_training';
 import { RUN_SPEED } from '../src/sim/types';
 import { waterBodies } from '../src/sim/world';
 import { stripComments } from './helpers/strip_comments';
@@ -22,7 +22,7 @@ const SEED = 7;
  *  budget sheds (the floor character_cull_core.ts sizes its lag margin on). The
  *  probe reads once per frame, so a slower frame rate shortens the lead. */
 const FPS_FLOOR = 20;
-const FASTEST = RUN_SPEED * (1 + Math.max(...Object.values(MOUNTS).map((m) => m.moveSpeedPct)));
+const FASTEST = RUN_SPEED * (1 + ridingMoveSpeedPct(2));
 
 function pond(cx: number, cz: number, radius: number): WaterLevelAt {
   return (x, z) => ((x - cx) ** 2 + (z - cz) ** 2 < radius * radius ? 0 : Number.NEGATIVE_INFINITY);
@@ -56,7 +56,7 @@ describe('water approach probe', () => {
   it('pins the radius, pitch, read budget and disc size', () => {
     expect(WATER_APPROACH_RADIUS).toBe(60);
     expect(WATER_APPROACH_PITCH).toBe(12);
-    expect(WATER_APPROACH_READS_PER_CALL).toBe(5);
+    expect(WATER_APPROACH_READS_PER_CALL).toBe(6);
     expect(WATER_APPROACH_DISC_POINTS).toBe(81);
   });
 

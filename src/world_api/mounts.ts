@@ -1,12 +1,8 @@
 import type { MountKey } from '../sim/content/mounts';
 
-// Rideable ground mounts. Reins are ITEMS: you ride by using the reins (bags or
-// an action-bar slot), which routes through useItem -> summonMountItem. There is
-// deliberately no "selected mount" and no picker. The catalog itself is sim
-// content (src/sim/content/mounts.ts); the live "riding X" state rides the entity
-// mirror (Entity.mountKey, synced in identity fields like skin), so the only read
-// here is the owned subset. Everything re-validates server-side (riding skill,
-// ownership, combat gate) in src/sim/mounts.ts.
+// Riding speed belongs to the character's training rank. Reins held in any
+// character's bags or bank grant account-wide cosmetic appearances, which are
+// selected in Cosmetics and revalidated server-side when ownership changes.
 export interface IWorldMounts {
   /** The owned subset of the catalog, in catalog order: any mount whose
    *  reins item sits in bags or bank (ownership travels with the item; reins
@@ -15,15 +11,16 @@ export interface IWorldMounts {
   /** Whether the player has purchased the riding skill from Marla (80g).
    *  Required before summoning any mount. */
   ridingTrained(): boolean;
-  /** Dismount if riding (instant, never gated). Does nothing when unmounted:
-   *  summoning a specific mount is an item use, not a keybind. The one exception
-   *  is an in-progress riding lesson, which lends the unowned training steed. */
+  /** Character riding rank: untrained, +70% speed, or +110% speed. */
+  ridingTrainingTier(): 0 | 1 | 2;
+  /** Dismount instantly if riding; otherwise summon the trained ride with the
+   *  selected cosmetic. An active lesson lends its training steed. */
   toggleMounted(): void;
-  /** Purchase the riding skill from Marla the stables trainer for 80 gold (800000
-   *  copper). One-time: once ridingTrained is true it never reverts. Requires the
+  /** Purchase the next riding rank from Marla: 80 gold for +70% speed, then
+   *  1000 gold for +110% speed. Training is permanent and per character. Requires the
    *  player to be level 20, alive, and standing near Marla. Emits an error toast on
    *  failure (not enough money, wrong NPC, wrong level). */
-  learnRiding(npcId: number): void;
+  learnRiding(npcId: number, expectedTier?: 0 | 1): void;
   /** Legacy start for a riding-lesson attempt at Stablemaster Marla, gating
    *  reins_valorsteed's q_riding_lessons quest reward. Current lesson completion
    *  comes from finishing the show-jumping race on the lent training Valorsteed.

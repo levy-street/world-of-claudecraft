@@ -12484,9 +12484,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_thunderstrut_gobbler': '雷霆阔步大火鸡',
   'hudChrome.mounts.name_terrorspark_groundshaker': '骇雷撼地者',
   'hudChrome.mounts.name_rickshaw_mount': '白骨人力车',
-  'hudChrome.mounts.desc_valorsteed': '一匹坚韧稳健的骏马，可提升旅行速度。',
-  'hudChrome.mounts.desc_grag_bear': '一头坚韧稳健的巨熊，可提升旅行速度。',
-  'hudChrome.mounts.desc_stalkglider_snail': '一只坚毅耐久的蜗牛，可提升旅行速度。',
+  'hudChrome.mounts.desc_valorsteed': '一匹坚韧稳健、配有皮革马鞍的骏马。',
+  'hudChrome.mounts.desc_grag_bear': '一头坚韧稳健、配有厚重鞍具的巨熊。',
+  'hudChrome.mounts.desc_stalkglider_snail': '一只坚毅耐久、背负苔藓外壳的蜗牛。',
   'hudChrome.mounts.desc_aether_hover_cycle':
     '一辆强大的魔导机车，专为快速贴地悬浮的战斗穿行而设计。',
   'hudChrome.mounts.desc_shadowjump_toad':
@@ -12504,8 +12504,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.emptyDropHint': '较稀有的坐骑由英雄地下城首领掉落或完成裂隙获得。',
   'hudChrome.mounts.clickManage': '点击选择坐骑',
   'hudChrome.mountTraining.mountPrompt': '按 {key} 键骑上训练用英勇战马。',
-  'hudChrome.mountTraining.ownedMountPrompt': '你的缰绳已在背包中，使用它即可骑乘。',
-  'hudChrome.mounts.useToRide': '使用以召唤该坐骑。',
+  'hudChrome.mountTraining.ownedMountPrompt': '在外观菜单中选择坐骑，然后使用骑乘／下骑来骑乘。',
+  'hudChrome.mounts.useToRide':
+    '使用以装备此外观并召唤坐骑。将此物品保留在任意角色的背包或银行中，即可让账号内所有角色使用该外观。骑术训练决定速度。',
   'hudChrome.mountTraining.ridePrompt': '跟随发光的标记前往起点线，然后点击开始比赛。',
   'hudChrome.mountTraining.begin': '开始课程',
   'hudChrome.mountTraining.success': '你已经驯服了英勇战马。',
@@ -15862,28 +15863,28 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '除了玛拉的柜台，缰绳是找来的，而不是买来的。它们出自五人地下城和团队副本英雄难度的最终首领，也出自裂隙的完成奖励，而你结束的裂隙越难，它可能留下的缰绳就越稀有。它们按设计就是稀有的收获，没有哪一趟必定给你一副，所以搜寻坐骑的稳妥办法，是把这份搜寻顺路带进你本来就要跑的副本里。本页不会告诉你哪只坐骑挂在哪个首领身上：那一部分留给你自己去弄明白。',
   'guide.mountsPage.collectHeading': '更稀有的坐骑从何而来',
   'guide.mountsPage.firstBody':
-    '英勇战马是全世界唯一一只出售的坐骑。学会骑术之后，玛拉会以 10 金把英勇战马的缰绳卖给你，那副缰绳从此归你所有。其余每一只坐骑都要在世界里赢来，所以几乎每位骑手都是从这匹马开始的。',
+    '学会骑术后，玛拉会以10金币出售英勇战马的缰绳。持有缰绳即可在外观菜单中为账号内所有角色解锁马匹外观。骑术训练已允许你不携带缰绳召唤坐骑；想换个样子时，可以选择马匹或其他已拥有的外观。',
   'guide.mountsPage.firstHeading': '你的第一只坐骑',
   'guide.mountsPage.goodsBody':
-    '坐骑是一件物品，因此它也是经济可以流转的东西。只要缰绳还在你的背包或银行里，这只坐骑就属于你；不过存进银行的缰绳只保住所有权，并不能让你骑：要召唤这头坐骑，你得把缰绳带在身上。玩家的缰绳不带灵魂绑定，因此除非物品本身另有说明，它们可以交易、可以邮寄，也可以像其他任何收获一样在世界市场上架。出手之前有两件事值得先知道：任何商人都不会回购一副缰绳，所以坐骑是一笔你要么留着、要么转手，却无法套现的购买；另外，如果缰绳在你骑乘时离手，坐骑会跟着一起走，而你会被就地放下。',
+    '只要任意角色的背包或个人银行中至少保留一件对应缰绳，账号内所有角色就能使用该收藏坐骑外观。交易、邮寄、上架、出售或以其他方式移走最后一件符合条件的物品，会从外观菜单中移除此项外观。正在使用它的骑乘者会恢复默认马匹外观，继续以训练决定的速度骑乘。\n\n除非物品另有说明，玩家缰绳可以交易、邮寄并在世界市场上架。马匹缰绳还可卖给商人，售价为10金币。其他缰绳保留各自的出售限制。商店坐骑皮肤是独立于缰绳物品的账号外观。',
   'guide.mountsPage.goodsHeading': '缰绳只是寻常货物',
   'guide.mountsPage.heading': '坐骑与骑乘',
   'guide.mountsPage.intro':
-    '坐骑是穿越世界的更快方式，仅此而已。你在马厩学会骑乘，买下第一副缰绳，此后每一条路都会变短。',
+    '选择坐骑外观，在马厩学习骑术，更快地穿越世界。训练决定速度，所有坐骑外观都只改变外观。',
   'guide.mountsPage.learnBody':
-    '骑术是一门只需买一次的技能，它在 {level} 级开启。马厩总管玛拉·希琴在丘陵上经营着疾风崖马厩，她出售骑术训练，价钱是 80 金。正是这一次购买让你得以骑上坐骑，而且它会永远伴着你。\n\n学会之后，玛拉还有一个任务给你：骑术课。接下它，跟着标记走到起始拱门后方那块发光的方砖上，然后按“开始比赛”。她会借给你一匹训练用英勇战马来上这堂课，所以课程本身分文不取。跑完赛道、完成它，再回到她那里领取你的金币和经验。借出的战马课后会回到马厩，所以这堂课教给你的是骑术本身，而不是白送你一匹马。',
+    '达到{level}级后即可学习骑术。玛拉·希钦马厩总管在盖尔克雷斯特马厩以80金币出售骑术训练。基础训练使骑乘移动速度提高{basicSpeed}%。学会后，玛拉还会以{advancedFee}金币出售高级骑术训练，将骑乘移动速度提升至提高{advancedSpeed}%。每个等级的训练仅属于学习它的角色。\n\n学会基础骑术后，接受玛拉的骑术课程任务，跟随标记前往起跑拱门后发光的方格。点击开始比赛，借用训练用的英勇战马。完成赛道后回来领取金币和经验。课程结束时，借来的马匹会返回马厩。',
   'guide.mountsPage.learnHeading': '学习骑乘',
   'guide.mountsPage.raceBody':
     '玛拉围场里的障碍赛道随时向任何人开放，并不只在上课时才能跑。骑上坐骑，站到拱门后方那块发光的方砖上，然后按“开始比赛”。倒计时会让你原地待命，接着计时开始：越过全部七道障碍，并在时间走完之前从拱门骑出去。\n\n只有当你确实凌空越过横杆时，这道障碍才算数，所以轻轻松松从旁边骑过去什么也清不掉。你可以按任意顺序、从任意一侧越过它们，漏掉一道也不是世界末日：绕回来再跳一次就是。死亡、下马或离开围场都会结束这次挑战，而没有什么拦着你再来一次。这里没有费用、没有冷却，除了成绩本身也没有奖品，而且任意多的骑手可以同时跑这条赛道，互不妨碍。',
   'guide.mountsPage.raceHeading': '马厩赛道',
   'guide.mountsPage.rideBody':
-    '这里没有坐骑窗口，也不用设定最爱的坐骑，因为缰绳就是坐骑。从背包里或从动作条格子上使用一副缰绳，你就骑上了那只坐骑。召唤需要一点时间，是一段短短的呼唤而非瞬发，所以它救不了你一次糟糕的拉怪。下马是瞬时的，而且从不会被阻止。\n\n再次使用你正骑着的那副缰绳，就会把这只坐骑收起来。骑乘时使用另一副缰绳，会直接换乘过去，中间不必再召唤一次。“骑乘 / 下骑”键（默认是反引号键）永远只负责让你下来：它是下马的路，不是上马的路。唯一的例外是骑术课，在那里同一个键会召唤玛拉借给你的战马，因为借来的马没有缰绳可点。在手机或平板上，“更多”托盘里的坐骑按钮两个方向都管用。',
+    '打开外观菜单，在坐骑页签选择外观。骑乘／下骑键（默认是反引号键）会召唤使用该外观的坐骑。移动端的骑乘按钮也有相同效果。召唤需要短暂引导，下骑则立即完成。骑乘时可以更换外观，骑术速度不会改变。\n\n也可从背包或动作栏使用缰绳，选用该外观并召唤坐骑。使用当前骑乘的外观会收起坐骑。存放在银行或其他角色身上的缰绳也能解锁相同外观，无需由骑乘者携带。',
   'guide.mountsPage.rideHeading': '上马与下马',
   'guide.mountsPage.speedBody':
-    '速度是坐骑之间唯一的差别。你从玛拉处买来的英勇战马定下了基础脚程，而你在世界里收集到的坐骑都跑得比它快：缰绳越稀有，骑起来越快，并且是分成几个清晰的档位，而不是平滑地往上滑。没有第二阶骑术可以训练，之后也没有升级可以购买。骑术你只付一次钱，从此以后，你用的是哪副缰绳，就决定了你走得多快。',
-  'guide.mountsPage.speedHeading': '速度与档位',
+    '基础骑术训练使骑乘移动速度提高{basicSpeed}%。高级骑术训练使其提高{advancedSpeed}%，玛拉的售价为{advancedFee}金币。所有坐骑外观的速度都由角色的训练等级决定，与稀有度和来源无关。商店皮肤也使用相同的训练速度。',
+  'guide.mountsPage.speedHeading': '骑乘速度与训练',
   'guide.mountsPage.whatBody':
-    '坐骑是你骑乘的野兽，而它给你的东西就是速度。没有护甲，没有伤害，没有属性：它带着你更快地掠过地面，跳跃时也蹦得高一点，这就是这笔交易的全部。游戏里的每一只坐骑都是地面坐骑，所以没有飞行，它们也都不会游泳。',
+    '坐骑是用于已习得骑术的装饰外观，不提供护甲、伤害或战斗属性。骑术训练提高地面旅行速度，骑乘时也能跳得更高。所有坐骑都在地面行动，无法游泳。',
   'guide.mountsPage.whatHeading': '坐骑是什么',
   'guide.mountsPage.whereBody':
     '疾风崖马厩标注在疾风崖的地图上，位于断崖与沉船滩之间的丘陵上。玛拉站在马厩旁，面朝赛场。',
@@ -15940,7 +15941,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '采集工具身上有一个插槽，而制作出来的护符正是嵌进去的东西。采集者储囊会为一次采集的产出多加一个单位；匠人之眼则提升它采上来之物的品级；匠人护符则以同样的方式多加两个单位。前两者是附魔的活计：Eastbrook的工坊宗师Tinker Gizzel会把它们传授给附魔技能达到 25 的附魔师。匠人护符则是工程学的活计，图样由掉落获得，需 100 技能制作；三者都在他的工坊里制作。\n\n新嵌入的护符在普通品质工具上带有 20 次充能，工具稀有度每高一阶再加 10 次，所以同一枚护符嵌在史诗采矿镐上时起始便是 50 次。只有当护符真正改变了结果时才会消耗一次充能，对它没能改善的采集绝不扣减；插槽还可以设成每次使用前询问，让护符一直等到你说“使用一次充能”为止。嵌入一枚新护符，会围绕你当时携带的工具把这个插槽重铸一遍，因此它填到的是那件工具所能容纳的量，而不是退回从前的某个高点；而一次什么都不会改变的重嵌会被挡回来，不会白白吃掉护符。\n\n充能用尽并不会毁掉护符：由工具的主人为插槽补充，每花一份奥术材料补 10 次充能；至于它要哪种材料，取决于你携带的工具与这个插槽历来被填过的最好工具之中更好的那件：普通或优秀工具用铃音之尘，精良工具用铃音精华，史诗工具用铃音碎片。把好工具留在银行并不会换来更便宜的补充，只会在同样价钱下更少；真正降到更便宜一档的老实办法，是带着较差的工具嵌入一枚新护符，把插槽在那里重铸。如果插槽的上限高过你当前工具能填到的量，补充会停在那件工具的上限处，并提醒你带上更好的那一件。若你正是署名这枚护符的制作者，补充只需一半材料；若你还专精该护符所属的行业（采集者储囊与匠人之眼属附魔，匠人护符属工程学），则更少；其他人一律付全价。补充是一段短读条，和这门手艺的其余部分一样。',
   'guide.professions.toolEffectsHeading': '工具效果',
   'guide.progression.ridingBody':
-    '骑术是攀登尽头等着你的东西之一。到了 {level} 级，一位马厩总管会用一笔相当可观的金币把这门技能教给你，而训练赛道上的一堂课会为你挣来第一副缰绳。坐骑不带来任何力量；它只是把世界变小了一些，而在向北长途跋涉之后，这本身就是一种奖赏。',
+    '达到{level}级后，马厩总管玛拉会收费教授基础骑术，之后还提供高级训练。训练决定骑乘速度。在外观菜单中选择坐骑外观；只要缰绳仍在任意角色的背包或银行中，收藏外观就会在账号内共享。',
   'guide.progression.ridingTitle': '学习骑乘',
   'guide.questsPage.availableBody':
     '任务是成串出现的。大多数任务要等你交掉前一个之后才会给出，许多还要求一个最低等级，所以今天没什么可给你的 NPC，等你再升几级、或者结掉手上正做的那个任务之后，也许就有一大堆了。少数任务另有自己的条件，比如骑术课，要买下骑术技能之后才会开启。组队任务会一上来就说明白，列出它建议你带上几名玩家。有些活计可以重复：等上一阵之后可以再接，而任务发布者头顶的标记会告诉你什么时候又轮回来了。',
@@ -17922,11 +17923,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.preview': '预览',
   'hudChrome.cosmetics.previewAria': '预览{name}',
   'hudChrome.cosmetics.cardAria': '{name}，{rarity}',
-  'hudChrome.cosmetics.mountsNoMount': '先拥有一匹坐骑：皮肤需要可骑乘的对象。',
+  'hudChrome.cosmetics.mountsNoMount': '向马厩总管玛拉学习骑术后，即可召唤坐骑。',
   'hudChrome.cosmetics.skinsEmpty': '尚未拥有武器皮肤。请访问 WOC 商店。',
   'hudChrome.cosmetics.skinsApplyHint': '装备一件{type}后即可应用此皮肤。',
   'hudChrome.cosmetics.mechEmpty': '尚未拥有战斗机甲配色。',
-  'hudChrome.cosmetics.mountsIntro': '坐骑皮肤会覆盖在此角色骑乘的任何坐骑上，绝不改变速度。',
+  'hudChrome.cosmetics.mountsIntro':
+    '在这里选择坐骑外观。骑术训练决定速度。将坐骑物品保留在任意角色的背包或银行中，即可让账号内所有角色使用该外观。',
   'hudChrome.cosmetics.mechIntro': '战斗机甲会替换此角色的身体。一次只能穿戴一种配色。',
   'hudChrome.auraTracks.mode': '开启',
   'hudChrome.auraTracks.row': '{aura} 对 {unit} 生效',
@@ -18644,4 +18646,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_balance.bonus2': '缠缚根须的施法时间缩短0.5秒。',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '施放缠缚根须后，你可以在移动中施法，并使移动速度提高20%，持续4秒。每20秒最多触发一次。',
+  'hudChrome.cosmetics.notCollected': '尚未收集',
+  'itemUi.vendor.basicRiding': '骑术训练',
+  'itemUi.vendor.advancedRiding': '高级骑术训练',
+  'itemUi.vendor.ridingSpeed': '骑乘时的移动速度提高{speed}%。适用于所有坐骑。',
 };

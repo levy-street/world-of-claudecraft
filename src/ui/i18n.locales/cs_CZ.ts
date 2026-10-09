@@ -3972,29 +3972,14 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.mountsPage.collectBody':
     'Mimo Marlin pult se otěže spíš nacházejí, než kupují. Padají z posledních bossů pětičlenných dungeonů a raidu ve hrdinském režimu, i z čištění trhlin, kde platí, že čím těžší trhlinu dokončíš, tím vzácnější otěže po sobě může nechat. Jsou to záměrně vzácné nálezy a žádný běh je negarantuje, takže nejlepší způsob, jak lovit jízdní zvíře, je nést ten lov s sebou na běhy, které bys dělal(a) tak jako tak. Tahle stránka ti neprozradí, které jízdní zvíře visí na kterém bossovi: to je na tobě, abys to zjistil(a).',
   'guide.mountsPage.collectHeading': 'Odkud pocházejí vzácnější jízdní zvířata',
-  'guide.mountsPage.firstBody':
-    'Valorsteed je jediné jízdní zvíře, které se dá koupit kdekoli ve světě. Jakmile se naučíš Jízdu, Marla ti prodá Otěže Valorsteeda za 10 zlatých, a ty otěže jsou navždy tvoje. Každé jiné jízdní zvíře se získává ven ve světě, takže tenhle kůň je místo, kde začíná skoro každý jezdec.',
   'guide.mountsPage.firstHeading': 'Tvé první jízdní zvíře',
-  'guide.mountsPage.goodsBody':
-    'Jízdní zvíře je předmět, což z něj dělá něco, s čím dokáže hýbat ekonomika. Jízdní zvíře vlastníš, dokud jeho otěže leží v tvých brašnách nebo v bance, i když otěže uložené v bance ti zvíře ponechají, aniž bys na něm mohl(a) jezdit: aby ses na bestii dostal(a), musíš otěže nosit u sebe. Hráčské otěže nenesou žádnou vazbu k duši, takže se obchodují, cestují poštou a vystavují na Světovém trhu jako každý jiný nález, pokud sám předmět neříká jinak. Než se otěží zbavíš, stojí za to znát dvě věci: žádný obchodník ti otěže nikdy nevykoupí zpátky, takže jízdní zvíře je nákup, který si necháš nebo předáš dál, ne že bys ho zpeněžil(a), a pokud otěže opustí tvé brašny i banku zároveň, ať už je vyměníš, pošleš poštou nebo prodáš na trhu, jízdní zvíře jde s nimi a ty jsi sesazen(a) tam, kde právě stojíš.',
   'guide.mountsPage.goodsHeading': 'Otěže jsou obyčejné zboží',
   'guide.mountsPage.heading': 'Jízdní zvířata a jízda',
-  'guide.mountsPage.intro':
-    'Jízdní zvíře je rychlejší způsob, jak se dostat po světě, a nic víc. Jízdu se naučíš ve stájích, koupíš si svůj první pár otěží a každá další cesta je pak kratší.',
-  'guide.mountsPage.learnBody':
-    'Jízda je dovednost, kterou si koupíš jen jednou, a otevírá se na úrovni {level}. Marla Hitchen, správkyně stájí, spravuje Stáje Vichrného hřebene na stráních, a prodává Jezdecký výcvik za 80 zlatých. Právě tenhle nákup je to, co ti vůbec dovolí sednout na jízdní zvíře, a zůstává s tebou navždy.\n\nJakmile ho máš, čeká na tebe u Marly úkol: Jezdecké lekce. Vezmi si ho, sleduj značku k zářícímu čtverci za startovním obloukem a stiskni Začít závod. Na lekci ti půjčí cvičného Valorsteeda, takže samotná lekce tě nic nestojí. Projeď parkur, dokonči ho a vrať se k ní pro mince a zkušenosti. Půjčené zvíře se pak vrátí zpátky do stáje, takže lekce tě naučí sedět v sedle, ne že bys dostal(a) koně.',
   'guide.mountsPage.learnHeading': 'Jak se naučit jezdit',
   'guide.mountsPage.raceBody':
     'Parkur v Marlině ohradě je otevřený komukoli a kdykoli, nejen během lekce. Nasedni na jízdní zvíře, postav se na zářící čtverec za obloukem a stiskni Začít závod. Odpočet tě chvíli podrží na místě, pak se spustí čas: přejeď všech sedm skoků a vrať se obloukem ven, než čas doběhne.\n\nSkok se počítá, jen když jsi opravdu ve vzduchu nad laťkou, takže obyčejné proježdění skrz nesplní nic. Skoky můžeš brát v libovolném pořadí a z kterékoli strany, a přeskočený skok není konec světa: vrať se a zkus ho znovu. Smrt, sesednutí nebo opuštění ohrady pokus ukončí, stejně jako dojetí času, které tě sesadí ze sedla tam, kde právě stojíš; vlastní zrušení pokusu čas jednoduše zastaví. Nic ti nebrání začít znovu. Není tu žádný poplatek, žádná doba obnovy a žádná odměna kromě samotného času, a parkur může běžet libovolný počet jezdců najednou, aniž by si překáželi.',
   'guide.mountsPage.raceHeading': 'Stájový závod',
-  'guide.mountsPage.rideBody':
-    'Neexistuje žádné okno jízdních zvířat ani oblíbená položka k nastavení, protože otěže jsou to jízdní zvíře. Použij otěže z brašen nebo ze slotu na akční liště a pojedeš na tom zvířeti. Přivolání chvíli trvá, je to krátké volání, ne okamžité, takže tě nezachrání před špatným pullem. Sesednutí je okamžité a nikdy zablokované.\n\nPoužij otěže, na kterých už jedeš, a to jízdní zvíře uklidíš. Použij jiné otěže, zatímco jsi v sedle, a rovnou na ně přesedneš, bez přivolávání mezitím. Klávesa Nasednout / Sesednout, ve výchozím nastavení klávesa s obráceným apostrofem, tě vždy jen sesadí: je to cesta dolů, ne nahoru. Jedinou výjimkou je jezdecká lekce, kde stejná klávesa přivolá oře, kterého ti půjčila Marla, protože půjčený kůň nemá otěže, na které by ses dalo kliknout. Na telefonu nebo tabletu funguje tlačítko Nasednout v nabídce Více oběma směry, i když přivolá první otěže ležící v tvých brašnách místo té, kterou by sis vybral(a), takže když chceš konkrétní jízdní zvíře, klepni přímo na jeho otěže.',
   'guide.mountsPage.rideHeading': 'Nasedání a sesedání',
-  'guide.mountsPage.speedBody':
-    'Rychlost je jediné, co odlišuje jedno jízdní zvíře od druhého. Valorsteed, kterého koupíš od Marly, nastavuje základní tempo, a jízdní zvířata, která posbíráš ve světě, jedou nad ním: čím vzácnější otěže, tím rychlejší jízda, v několika jasných stupních místo plynulého přechodu. Neexistuje žádný druhý stupeň Jízdy k natrénování ani žádné vylepšení, které bys pak koupil(a). Za Jízdu zaplatíš jen jednou a od té chvíle rozhodují o tom, jak rychle cestuješ, otěže, které používáš.',
-  'guide.mountsPage.speedHeading': 'Rychlost a stupně',
-  'guide.mountsPage.whatBody':
-    'Jízdní zvíře je bestie, na které jezdíš, a to, co ti dává, je rychlost. Žádná zbroj, žádné poškození, žádné statistiky: nese tě po zemi rychleji a při skoku vyskočíš o něco výš, a to je celá dohoda. Každé jízdní zvíře ve hře je pozemní, takže žádné létání neexistuje a žádné z nich neplave.',
   'guide.mountsPage.whatHeading': 'Co je jízdní zvíře',
   'guide.mountsPage.whereBody':
     'Stáje Vichrného hřebene jsou vyznačené na mapě Vichrného hřebene, na stráních mezi Srázem a Vrakovými poli. Marla stojí vedle stodoly, obrácená k závodní ohradě.',
@@ -4031,8 +4016,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Trhliny jsou jediná věc, která čeká až na vrchol. Otevírají se v říších podle vlastního rozvrhu, odstupňované od C po S, a každá skupina ve světě závodí o to, kdo tu kterou uzavře jako první. Tabule výprav běží dál taky a jejich vyšší obtížnost stojí za druhý pohled, jakmile tvá výbava dožene tempo.',
   'guide.progression.journeyBodyCount':
     'Svět je jedna souvislá země o {zones} zónách. Tři z nich tvoří cestu, po které stoupáš v úrovních, položenou od jihu k severu: začínáš v zeleném údolí, pokračuješ přes močál a končíš ve studených vysokých štítech. Sleduj stopu úkolů a země tě povede z jedné do druhé. U pobřeží údolí leží ostrov pro nízké úrovně a zbytek říší se otevírá podél téže cesty, stavěný pro postavy, které už výstup zvládly.',
-  'guide.progression.ridingBody':
-    'Jízda je jedna z věcí, které čekají na konci výstupu. Na úrovni {level} tě správkyně stájí naučí tuto dovednost za pěknou sumu zlata a lekce na cvičném parkuru ti vynese tvůj první pár otěží. Jízdní zvíře nedává vůbec žádnou sílu; jen zmenšuje svět, což je po dlouhé cestě na sever odměna sama o sobě.',
   'guide.progression.ridingTitle': 'Jak se naučit jezdit',
   'guide.questsPage.availableBody':
     'Úkoly přicházejí v řetězcích. Většina se nabízí, až když odevzdáš ten předchozí, a mnohé také chtějí minimální úroveň, takže NPC, které pro tebe dnes nemá nic, jich může mít spoustu po pár dalších úrovních nebo jakmile uzavřeš úkol, který už neseš. Pár jich má vlastní podmínku, třeba jezdecké lekce, které se otevřou, až si koupíš dovednost Jízdy. Skupinové úkoly to říkají hned na začátku tím, že uvedou, kolik hráčů doporučují přivést. Některé úkoly jsou opakovatelné: můžeš je vzít znovu po čekací době, a značka nad zadavatelem ti řekne, kdy se zase vrátí.',
@@ -16052,18 +16035,12 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.close': 'Zavřít',
   'hudChrome.mounts.desc_aether_hover_cycle':
     'Výkonné magitechnické kolo navržené pro rychlý, nízko se vznášející pohyb v boji.',
-  'hudChrome.mounts.desc_grag_bear':
-    'Otužilý, jistonohý medvěd poskytující zvýšenou rychlost cestování.',
   'hudChrome.mounts.desc_shadowjump_toad':
     'Mohutná, jistonohá obří ropucha, vycvičená v bleskurychlých stínových skocích, které zvládnou jakýkoli terén.',
-  'hudChrome.mounts.desc_stalkglider_snail':
-    'Statný, pomalu se pohybující plž poskytující zvýšenou rychlost cestování.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Vznešený bouřný gryf, který se plíží po zemi na rounami okovaných spárech, se složenými křídly.',
   'hudChrome.mounts.desc_thunderstrut_gobbler':
     'Kolosální krocan zrozený z bouře, který se hrdě prochází z Probouzejícího se vrcholu, s ocasem rozevřeným jako bouřkový mrak.',
-  'hudChrome.mounts.desc_valorsteed':
-    'Otužilý, jistonohý oř poskytující zvýšenou rychlost cestování.',
   'hudChrome.mounts.dismount': 'Sesednout',
   'hudChrome.mounts.emptyDropHint':
     'Vzácnější jízdní zvířata padají z hrdinských bossů žalářů a z dokončených trhlin.',
@@ -16086,10 +16063,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.selected': 'Vybráno',
   'hudChrome.mounts.spec_speed': '+{pct}% pohyblivosti navíc',
   'hudChrome.mounts.title': 'Jízdní zvířata',
-  'hudChrome.mounts.useToRide': 'Použij k přivolání tohoto jízdního zvířete.',
   'hudChrome.mountTraining.begin': 'Začít lekci',
   'hudChrome.mountTraining.mountPrompt': 'Stiskni {key} pro nasednutí na cvičného Udatného oře.',
-  'hudChrome.mountTraining.ownedMountPrompt': 'Tvé otěže jsou v tvých brašnách. Použij je k jízdě.',
   'hudChrome.mountTraining.returnToMarla':
     'Vrať se k Marle do stájí a kup si otěže Udatného oře za 10 zlatých.',
   'hudChrome.mountTraining.ridePrompt':
@@ -18267,10 +18242,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.mechEmpty': 'Zatím nevlastníš žádné barevné varianty bojového mecha.',
   'hudChrome.cosmetics.mechIntro':
     'Bojový mech nahrazuje tělo této postavy. Najednou lze nosit jednu barevnou variantu.',
-  'hudChrome.cosmetics.mountsIntro':
-    'Vzhled jezdeckého zvířete se vykreslí přes zvíře, na kterém tato postava jede. Nikdy nemění rychlost.',
-  'hudChrome.cosmetics.mountsNoMount':
-    'Nejprve si pořiď jezdecké zvíře, vzhled potřebuje něco, na čem se dá jezdit.',
   'hudChrome.cosmetics.owned': 'Vlastněno',
   'hudChrome.cosmetics.scopeAccount': 'Účet',
   'hudChrome.cosmetics.scopeCharacter': 'Postava',

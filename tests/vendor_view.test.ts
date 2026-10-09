@@ -5,6 +5,32 @@ import { buyPurchaseTotals } from '../src/sim/vendor_buy_stack';
 import { buildVendorView, sellJunkButtonState } from '../src/ui/hud/vendor/vendor_view';
 import { adoptedTrophyIds } from './helpers/adopted_trophy_ids';
 
+describe('riding service rank preview', () => {
+  it('offers the next rank at its actual fee and hides fully learned training', () => {
+    const balances = { copper: 10_000_000, honor: 0, gatheringProficiency: {} };
+    const basic = buildVendorView(['riding_training'], [], ITEMS, { ...balances, ridingTier: 0 });
+    expect(basic.goods[0].ridingRank).toBe(1);
+    expect(basic.goods[0].price.copper).toBe(800_000);
+    const advanced = buildVendorView(['riding_training'], [], ITEMS, {
+      ...balances,
+      ridingTier: 1,
+    });
+    expect(advanced.goods[0].ridingRank).toBe(2);
+    expect(advanced.goods[0].price.copper).toBe(10_000_000);
+    expect(advanced.goods[0].affordable).toBe(true);
+    expect(
+      buildVendorView(['riding_training'], [], ITEMS, {
+        ...balances,
+        ridingTier: 1,
+        copper: 9_999_999,
+      }).goods[0].affordable,
+    ).toBe(false);
+    expect(
+      buildVendorView(['riding_training'], [], ITEMS, { ...balances, ridingTier: 2 }).goods,
+    ).toEqual([]);
+  });
+});
+
 // Minimal ItemDef fixtures: buildVendorView only reads id / buyValue / sellValue.
 function item(
   id: string,

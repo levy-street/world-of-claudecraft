@@ -130,9 +130,13 @@ export class CosmeticsWindow {
     const c = w.accountCosmetics;
     return {
       tab: this.tab,
-      ownedMountSkins: c.mountSkinIds,
+      ownedMountSkins: [
+        ...c.mountSkinIds,
+        ...(c.collectibleMountSkinIds ?? []),
+        ...w.ownedMounts(),
+      ],
       wornMountSkin: p?.mountSkinId ?? null,
-      ownsAnyMount: w.ownedMounts().length > 0,
+      ownsAnyMount: true,
       weaponSkinIds: c.weaponSkinIds,
       weaponSkinLoadout: c.weaponSkinLoadout,
       applicableWeaponTypes: p

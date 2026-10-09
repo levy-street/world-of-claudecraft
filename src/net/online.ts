@@ -2680,6 +2680,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         e.level = w.lv;
         e.skin = w.sk ?? 0;
         e.mountKey = w.mnt ?? ''; // active rideable mount ('' dismounted); feeds speed + render
+        e.ridingTier = w.mntTier ?? 0;
         e.mainhandItemId = w.mh ?? null; // equipped mainhand → held weapon model (render-only)
         e.offhandItemId = w.oh ?? null; // equipped offhand → held weapon model (render-only)
         e.weaponSkinId = w.wsk ?? null; // active weapon-skin cosmetic (render-only)
@@ -3681,13 +3682,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     });
   }
   buyItem(npcId: number, itemId: string, opts?: VendorBuyOptions): void {
-    // `bulk` and `count` each ride the wire only when non-default (the
-    // craftItem `commission` idiom above): an ordinary buy stays
-    // byte-identical to the pre-#2374 message, and a count of 1 stays
-    // byte-identical to the bulk-era frame. The sender never emits both
-    // fields: bulk's two affordances and the count control row are separate
-    // surfaces, and the server's bulk-wins precedence only ever decides
-    // hand-crafted frames.
+    // Non-default quantity and the captured riding quote ride the command.
     //
     // Facet parity on a HOSTILE count (nothing in this client sends one; the
     // control row emits 5/10 and the prompt floors at 1): a finite non-1
@@ -3696,14 +3691,16 @@ export class ClientWorld extends ReconWireState implements IWorld {
     // ride JSON at all (NaN/Infinity serialize to null and would silently
     // buy 1), so it is dropped here, the one place it can be. Either way a
     // hostile count never becomes a purchase in either world.
+    const quote =
+      opts?.expectedRidingTier === undefined ? {} : { ridingTier: opts.expectedRidingTier };
     if (opts?.bulk === true) {
-      this.cmd({ cmd: 'buy', npc: npcId, item: itemId, bulk: true });
+      this.cmd({ cmd: 'buy', npc: npcId, item: itemId, bulk: true, ...quote });
     } else if (opts?.count !== undefined && opts.count !== 1) {
       if (Number.isFinite(opts.count)) {
-        this.cmd({ cmd: 'buy', npc: npcId, item: itemId, count: opts.count });
+        this.cmd({ cmd: 'buy', npc: npcId, item: itemId, count: opts.count, ...quote });
       }
     } else {
-      this.cmd({ cmd: 'buy', npc: npcId, item: itemId });
+      this.cmd({ cmd: 'buy', npc: npcId, item: itemId, ...quote });
     }
   }
   // `confirmEffectUse` (R40): the per-use consent for a 'prompt'-mode tool
@@ -3942,27 +3939,28 @@ export class ClientWorld extends ReconWireState implements IWorld {
   ferryView(): TransportFerryView | null {
     return clientFerryView(this);
   }
-  // --- IWorldMounts: collection + dismount. Summoning a specific mount is an
-  // item use, not a mount command, so nothing here sends one. The toggle stays
-  // authoritative because the server's combat gate can refuse it, and the active
-  // identity mirror (mnt) lands on the next snapshot either way. ---
+  // Mount appearance, training, and summon state mirror the authoritative snapshot.
   ownedMounts(): readonly MountKey[] {
     return this.selfOwnedMounts;
   }
   ridingTrained(): boolean {
     return this.selfRidingTrained;
   }
+  ridingTrainingTier(): 0 | 1 | 2 {
+    return this.player.ridingTier || (this.selfRidingTrained ? 1 : 0);
+  }
   toggleMounted(): void {
     this.cmd({ cmd: 'mount_toggle' });
   }
-  // --- riding skill purchase: server-authoritative; on success the snapshot
-  // delta (mntRtd=true) confirms the skill was granted. ---
-  learnRiding(npcId: number): void {
-    this.cmd({ cmd: 'learn_riding', npc: npcId });
+  // Training purchases are confirmed by the next authoritative snapshot.
+  learnRiding(npcId: number, expectedTier: 0 | 1 = 0): void {
+    this.cmd({
+      cmd: 'learn_riding',
+      npc: npcId,
+      ridingTier: expectedTier,
+    });
   }
-  // --- riding lesson: fully server-authoritative, no optimistic local nudge;
-  // feedback rides the mountTrain* events straight to the HUD (drainEvents), no
-  // mirrored state. ---
+  // Riding lesson feedback arrives through mountTrain* events.
   mountTrainBegin(): void {
     this.cmd({ cmd: 'mount_train_begin' });
   }

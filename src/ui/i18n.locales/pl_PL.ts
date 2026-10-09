@@ -4030,29 +4030,14 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.mountsPage.collectBody':
     'Poza ladą Marli wodze się znajduje, a nie kupuje. Spadają z ostatnich bossów lochów dla pięciu graczy i rajdu w trybie Heroicznym, a także z ukończeń Szczelin, gdzie im trudniejszą Szczelinę zamkniesz, tym rzadsze wodze może zostawić. Są rzadkimi znaleziskami z założenia i żaden przebieg ich nie gwarantuje, więc uczciwym sposobem polowania na wierzchowca jest zabranie tego polowania na wyprawy, które i tak planowałeś. Ta strona nie powie ci, który wierzchowiec wisi na którym bossie: to musisz odkryć sam.',
   'guide.mountsPage.collectHeading': 'Skąd biorą się rzadsze wierzchowce',
-  'guide.mountsPage.firstBody':
-    'Valorsteed to jedyny wierzchowiec sprzedawany gdziekolwiek w świecie. Gdy nauczysz się Jeździectwa, Marla sprzeda ci Wodze Valorsteeda za 10 złota, a te wodze zostają twoje na zawsze. Każdego innego wierzchowca zdobywa się w świecie, więc ten koń jest tym, od czego zaczyna niemal każdy jeździec.',
   'guide.mountsPage.firstHeading': 'Twój pierwszy wierzchowiec',
-  'guide.mountsPage.goodsBody':
-    'Wierzchowiec jest przedmiotem, co czyni go czymś, czym może poruszać gospodarka. Posiadasz wierzchowca, dopóki jego wodze leżą w twoich torbach albo w banku, choć wodze trzymane w banku wciąż są twoje, tylko nie pozwalają ci jeździć: żeby przywołać zwierzę, musisz nosić wodze przy sobie. Wodze zdobyte od gracza nie są z nikim związane, więc idą do wymiany, podróżują pocztą i trafiają na Rynek Świata jak każde inne znalezisko, chyba że sam przedmiot mówi inaczej. Zanim się ich pozbędziesz, warto znać dwie rzeczy: żaden kupiec nigdy nie odkupi zestawu wodzy, więc wierzchowiec to zakup, który zatrzymujesz albo przekazujesz dalej, a nie zamieniasz z powrotem na monety, a jeśli wodze znikną jednocześnie z twoich torb i z banku, bo akurat na nich jeździsz, wymieniasz je, wysyłasz pocztą albo sprzedajesz na rynku, wierzchowiec znika razem z nimi, a ty lądujesz tam, gdzie akurat stałeś.',
   'guide.mountsPage.goodsHeading': 'Wodze to zwykły towar',
   'guide.mountsPage.heading': 'Wierzchowce i jeździectwo',
-  'guide.mountsPage.intro':
-    'Wierzchowiec to szybszy sposób na pokonywanie świata i tylko tym jest. Jeździectwa uczysz się w stajni, kupujesz swój pierwszy zestaw wodzy, a każda droga od tej pory jest krótsza.',
-  'guide.mountsPage.learnBody':
-    'Jeździectwo to umiejętność, którą kupujesz raz, a otwiera się na poziomie {level}. Marla Hitchen, zarządczyni stajni, prowadzi Stajnie Wichrowego Grzbietu na wzgórzach, i sprzedaje Trening Jeździecki za 80 złota. Ten jeden zakup jest tym, co w ogóle pozwala ci dosiąść wierzchowca, i zostaje z tobą na zawsze.\n\nGdy już go masz, Marla ma dla ciebie zadanie: Lekcje jazdy konnej. Podejmij je, podążaj za znacznikiem do świecącego kwadratu za łukiem startowym i naciśnij Rozpocznij wyścig. Marla pożycza ci na tę lekcję treningowego Valorsteeda, więc sama lekcja nic cię nie kosztuje. Przejedź trasę, dokończ ją, a potem wróć do niej po swoje złoto i doświadczenie. Pożyczony rumak wraca potem do stajni, więc ta lekcja uczy cię trzymać się w siodle, a nie daje ci konia.',
   'guide.mountsPage.learnHeading': 'Nauka jazdy konnej',
   'guide.mountsPage.raceBody':
     'Parkur w zagrodzie Marli jest otwarty dla każdego i o każdej porze, nie tylko podczas lekcji. Dosiądź wierzchowca, stań na świecącym kwadracie za łukiem i naciśnij Rozpocznij wyścig. Odliczanie trzyma cię w miejscu, a potem rusza zegar: pokonaj wszystkie siedem przeszkód i wróć przez łuk, zanim czas się skończy.\n\nPrzeszkoda liczy się tylko wtedy, gdy naprawdę jesteś w powietrzu nad poprzeczką, więc zwykłe przejechanie pod spodem nic nie daje. Możesz brać je w dowolnej kolejności i z dowolnej strony, a pominięta przeszkoda to nie koniec świata: zawróć i spróbuj jeszcze raz. Śmierć, zsiadanie albo opuszczenie zagrody kończy próbę, podobnie jak upłynięcie czasu, co zrzuca cię z siodła tam, gdzie akurat jesteś; samodzielne anulowanie po prostu zatrzymuje zegar. Nic nie stoi na przeszkodzie, by zacząć od nowa. Nie ma tu opłaty, czasu odnowienia ani nagrody poza samym czasem, a dowolna liczba jeźdźców może jechać po torze naraz, nie wchodząc sobie w drogę.',
   'guide.mountsPage.raceHeading': 'Wyścig w stajniach',
-  'guide.mountsPage.rideBody':
-    'Nie ma okna wierzchowców ani ulubionego do ustawienia, bo to wodze są wierzchowcem. Użyj zestawu wodzy z torby albo z miejsca na pasku akcji, a dosiądziesz tego wierzchowca. Przywołanie trwa chwilę, to krótkie wezwanie, a nie natychmiastowe, więc nie uratuje cię przed nieudanym pociągnięciem. Zsiadanie jest natychmiastowe i nigdy nie jest blokowane.\n\nUżyj wodzy, na których już jedziesz, a odstawisz tego wierzchowca. Użyj innego zestawu, będąc już w siodle, a przesiądziesz się na niego bezpośrednio, bez żadnego przywoływania po drodze. Klawisz Dosiądź/Zsiądź, domyślnie klawisz z grawisem, zawsze tylko cię zsadza: to droga w dół, nie w górę. Jedynym wyjątkiem jest lekcja jazdy konnej, gdzie ten sam klawisz przywołuje rumaka pożyczonego przez Marlę, bo pożyczony koń nie ma wodzy do kliknięcia. Na telefonie albo tablecie przycisk Dosiądź w zasobniku Więcej działa w obie strony, choć przywołuje pierwszy zestaw wodzy leżący w twoich torbach, a nie ten, który wybierzesz, więc dotknij samych wodzy, gdy chcesz konkretnego wierzchowca.',
   'guide.mountsPage.rideHeading': 'Wsiadanie i zsiadanie',
-  'guide.mountsPage.speedBody':
-    'Prędkość to jedyna rzecz, która odróżnia jednego wierzchowca od drugiego. Valorsteed, którego kupujesz od Marli, ustala bazowe tempo, a wierzchowce zdobyte w świecie jeżdżą ponad nim: im rzadsze wodze, tym szybsza jazda, w kilku wyraźnych stopniach, a nie płynnym ślizgu. Nie ma drugiego stopnia Jeździectwa do wytrenowania ani ulepszenia do kupienia później. Za Jeździectwo płacisz raz, a od tej pory to wodze, których użyjesz, decydują, jak szybko podróżujesz.',
-  'guide.mountsPage.speedHeading': 'Prędkość i poziomy',
-  'guide.mountsPage.whatBody':
-    'Wierzchowiec to bestia, na której jeździsz, a to, co ci daje, to prędkość. Żadnego pancerza, żadnych obrażeń, żadnych statystyk: niesie cię po ziemi szybciej i pozwala skoczyć odrobinę wyżej, i to cała umowa. Każdy wierzchowiec w grze to wierzchowiec naziemny, więc nie ma latania, a żaden z nich nie pływa.',
   'guide.mountsPage.whatHeading': 'Czym jest wierzchowiec',
   'guide.mountsPage.whereBody':
     'Stajnie Wichrowego Grzbietu są zaznaczone na mapie Wichrowego Grzbietu, na wzgórzach między Urwiskiem a Polami Wraków. Marla stoi przy stodole, twarzą do placu wyścigowego.',
@@ -4089,8 +4074,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Szczeliny to jedyna rzecz, która czeka właśnie na limit poziomu. Rozdzierają się w krainach według własnego harmonogramu, rangowane od C do S, a każda grupa w świecie ściga się, by to ona zamknęła każdą z nich. Tablice Wypraw też nie zwalniają, a ich heroiczny poziom trudności zasługuje na kolejne spojrzenie, gdy twój ekwipunek już go dogoni.',
   'guide.progression.journeyBodyCount':
     'Świat to jedna ciągła kraina licząca {zones} stref. Trzy z nich to droga, po której zdobywasz poziomy, ułożona z południa na północ: zaczynasz w zielonej dolinie, przedzierasz się przez trzęsawisko i kończysz na zimnych, wysokich szczytach. Podążaj śladem zadań, a kraina poprowadzi cię od jednej do następnej. Przy wybrzeżu doliny leży wyspa na wczesne poziomy, a reszta krain otwiera się dalej wzdłuż tej samej drogi, zbudowana z myślą o postaciach, które już odbyły tę wspinaczkę.',
-  'guide.progression.ridingBody':
-    'Jeździectwo to jedna z rzeczy czekających na końcu tej wspinaczki. Na poziomie {level} zarządczyni stajni nauczy cię tej umiejętności za pokaźną sumę złota, a lekcja na torze treningowym da ci twój pierwszy zestaw wodzy. Wierzchowiec nie daje żadnej mocy; po prostu zmniejsza świat, co po długim marszu na północ jest nagrodą samą w sobie.',
   'guide.progression.ridingTitle': 'Nauka jazdy konnej',
   'guide.questsPage.availableBody':
     'Zadania układają się w łańcuchy. Większość otwiera się dopiero, gdy oddasz poprzednie w łańcuchu, a wiele wymaga też minimalnego poziomu, więc NPC, który dziś nie ma dla ciebie nic, może mieć mnóstwo zadań po kolejnych kilku poziomach albo gdy zamkniesz zadanie, które już nosisz. Kilka ma własny warunek, jak lekcje jazdy konnej, które otwierają się dopiero, gdy kupisz umiejętność jeździectwa. Zadania grupowe mówią o tym wprost, podając, ilu graczy sugerują zabrać ze sobą. Niektóre zlecenia są powtarzalne: możesz podjąć je ponownie po odczekaniu, a znacznik nad zleceniodawcą mówi ci, kiedy dane zadanie znów jest dostępne.',
@@ -16267,8 +16250,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mountRace.toFinish': 'Wróć przez łuk!',
   'hudChrome.mountTraining.begin': 'Rozpocznij lekcję',
   'hudChrome.mountTraining.mountPrompt': 'Naciśnij {key}, aby dosiąść treningowego Rumaka Męstwa.',
-  'hudChrome.mountTraining.ownedMountPrompt':
-    'Twoje wodze są w twoich torbach. Użyj ich, aby jeździć.',
   'hudChrome.mountTraining.returnToMarla':
     'Wróć do Marli w stajniach, aby kupić wodze Rumaka Męstwa za 10 złota.',
   'hudChrome.mountTraining.ridePrompt':
@@ -16278,18 +16259,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.close': 'Zamknij',
   'hudChrome.mounts.desc_aether_hover_cycle':
     'Potężny magitechniczny motocykl zaprojektowany do szybkiego, nisko unoszącego się przemieszczania w walce.',
-  'hudChrome.mounts.desc_grag_bear':
-    'Wytrzymały, pewny kroku niedźwiedź, który zapewnia zwiększoną prędkość podróżowania.',
   'hudChrome.mounts.desc_shadowjump_toad':
     'Ogromna, pewna kroku olbrzymia ropucha, wyszkolona w błyskawicznych, cienistych skokach, które pokonują każdy teren.',
-  'hudChrome.mounts.desc_stalkglider_snail':
-    'Krzepki, powoli, lecz niezmordowanie pełznący ślimak, który zapewnia zwiększoną prędkość podróżowania.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Dostojny gryf burzy, który skrada się po ziemi na szponach okutych runami, ze złożonymi skrzydłami.',
   'hudChrome.mounts.desc_thunderstrut_gobbler':
     'Kolosalny, wylęgły z burzy indyk, który dumnie kroczy z Przebudzonego Szczytu, z ogonem rozłożonym jak burzowa chmura.',
-  'hudChrome.mounts.desc_valorsteed':
-    'Wytrzymały, pewny kroku rumak, który zapewnia zwiększoną prędkość podróżowania.',
   'hudChrome.mounts.dismount': 'Zsiądź',
   'hudChrome.mounts.emptyDropHint':
     'Rzadsze wierzchowce wypadają z bossów lochów heroicznych i ukończeń Szczelin.',
@@ -16312,7 +16287,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.selected': 'Wybrano',
   'hudChrome.mounts.spec_speed': '+{pct}% dodatkowej mobilności',
   'hudChrome.mounts.title': 'Wierzchowce',
-  'hudChrome.mounts.useToRide': 'Użyj, aby przywołać tego wierzchowca.',
   'hudChrome.unstuck.alreadyActive': 'Wyzwolenie już odlicza czas.',
   'hudChrome.unstuck.alreadySafe': 'Już znajdujesz się w bezpiecznym, osiągalnym miejscu.',
   'hudChrome.unstuck.busy': 'Zakończ bieżącą czynność, zanim użyjesz Wyzwolenia.',
@@ -18525,10 +18499,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.mechEmpty': 'Nie posiadasz jeszcze żadnych kolorów Mecha bojowego.',
   'hudChrome.cosmetics.mechIntro':
     'Mech bojowy zastępuje ciało tej postaci. Można nosić jeden kolor naraz.',
-  'hudChrome.cosmetics.mountsIntro':
-    'Skórka wierzchowca jest rysowana na wierzch wierzchowca, na którym jedzie ta postać. Nigdy nie zmienia szybkości.',
-  'hudChrome.cosmetics.mountsNoMount':
-    'Najpierw zdobądź wierzchowca: skórka potrzebuje czegoś do jazdy.',
   'hudChrome.cosmetics.owned': 'Posiadane',
   'hudChrome.cosmetics.scopeAccount': 'Konto',
   'hudChrome.cosmetics.scopeCharacter': 'Postać',

@@ -1652,44 +1652,42 @@ export const guideStrings = {
   },
 
   // World / zones.
-  // Mounts & Riding: the riding lesson, summoning a mount, the speed tiers, and the
+  // Mounts & Riding: character training, account cosmetic collection, and the
   // show-jumping race at the stables.
   mountsPage: {
     // Mounts and riding. Curated prose, no generated roster: the content generator emits no
     // mount data, and a hand-typed list would drift and would have to name the two catalog
     // mounts with no player-facing acquisition path (src/sim/content/mounts.ts). Spoiler-safe:
-    // no move-speed percentages, no drop rates, no per-boss mount table, no race time budget.
-    // The plain gates a player is told in game (level 20, 80 gold, 10 gold) are published.
+    // No drop rates, per-boss mount tables, or race time budgets. Public training
+    // speeds and fees shown by the trainer are published from the live rules.
     heading: 'Mounts and riding',
     intro:
-      'A mount is a faster way across the world, and that is all it is. You learn to ride at the stables, buy your first set of reins, and every road after that is shorter.',
+      'Choose a mount appearance, learn riding at the stables, and travel faster across the world. Your training sets the pace; every mount appearance is cosmetic.',
     whatHeading: 'What a mount is',
     whatBody:
-      'A mount is a beast you ride, and what it gives you is speed. No armor, no damage, no stats: it carries you over the ground faster, and springs a little higher when you jump, and that is the whole of the bargain. Every mount in the game is a ground mount, so there is no flying, and none of them swim.',
+      'Mounts are cosmetic appearances worn over your trained ride. They grant no armor, damage, or combat stats. Riding training increases ground travel speed and mounted jumps clear more height. Every mount stays on the ground, and none can swim.',
     learnHeading: 'Learning to ride',
     // Two paragraphs (paras()): the 80g skill purchase first, then the quest, which is only
     // pickable after it (zone3.ts q_riding_lessons requiresRidingTrained). {level} is
     // formatNumber(MOUNT_TRAIN_MIN_LEVEL) from the page module.
     learnBody:
-      'Riding is a skill you buy once, and it opens at level {level}. Marla Hitchen, the stablemaster, keeps the Galecrest Stables out on the downs, and she sells Riding Training for 80 gold. That one purchase is what lets you sit a mount at all, and it stays with you for good.\n\nOnce you have it, Marla has a quest for you: Riding Lessons. Take it, follow the marker to the glowing square behind the start arch, and press Start Race. She lends you a training Valorsteed for the lesson, so the lesson itself costs you nothing. Ride the course, finish it, and go back to her for your coin and experience. The lent steed goes back in the barn afterward, so the lesson teaches you the seat rather than handing you a horse.',
+      "Riding opens at level {level}. Stablemaster Marla Hitchen sells Riding Training for 80 gold at the Galecrest Stables. Basic training grants {basicSpeed}% faster mounted movement. Once you have learned it, Marla also sells Advanced Riding Training for {advancedFee} gold, raising mounted movement to {advancedSpeed}% faster. Each rank belongs to the character who learns it.\n\nAfter learning basic riding, take Marla's Riding Lessons quest and follow the marker to the glowing square behind the start arch. Press Start Race to borrow the training Valorsteed. Finish the course and return for your coin and experience. The borrowed horse returns to the barn when the lesson ends.",
     whereHeading: 'Where to find her',
     whereBody:
       'The Galecrest Stables are marked on the map of The Galecrest, out on the downs between the Shear and the Wreckfields. Marla stands beside the barn, facing the race yard.',
     firstHeading: 'Your first mount',
     firstBody:
-      'The Valorsteed is the only mount sold anywhere in the world. Once you have learned Riding, Marla will sell you the Reins of the Valorsteed for 10 gold, and those reins are yours to keep. Every other mount is earned out in the world, so the horse is where nearly every rider starts.',
+      'Marla sells the Reins of the Valorsteed for 10 gold after you learn Riding. Holding the reins unlocks the horse appearance in Cosmetics for every character on your account. Riding training already lets you summon a mount without carrying reins, so choose the horse or another owned appearance when you want a different look.',
     rideHeading: 'Getting on and getting off',
-    // Two paragraphs. The keybind sentence is scoped to desktop on purpose: the shared toggle
-    // only ever dismounts (or calls the lesson steed), while the mobile More-tray button also
-    // summons through the reins item.
+    // Both desktop and mobile summon the trained ride wearing the selected cosmetic.
     rideBody:
-      'There is no mount window and no favorite to set, because the reins are the mount. Use a set of reins from your bags or from an action bar slot and you ride that mount. Summoning takes a moment, a short call rather than an instant one, so it will not save you from a bad pull. Getting off is instant and never blocked.\n\nUse the reins you are already riding and you put that mount away. Use a different set while mounted and you swap straight to it, with nothing to summon in between. The Mount and Dismount key, the backquote key by default, only ever gets you off: it is the way down, not the way up. The one exception is the riding lesson, where that same key calls the steed Marla lends you, since a borrowed horse has no reins to click. On a phone or tablet, the Mount button in the More tray works both ways, though it calls the first set of reins sitting in your bags rather than one you pick, so tap the reins themselves when you want a particular mount.',
+      'Open Cosmetics and choose an appearance on its Mounts tab. The Mount / Dismount key, the backquote key by default, summons your trained mount wearing that appearance. The mobile Mount button does the same. Summoning takes a short channel; getting off is instant. You can change the appearance while mounted without changing your riding speed.\n\nYou can also use reins from your bags or an action bar to select that appearance and summon. Using the appearance you are already riding puts the mount away. Banked or alternate-character reins unlock the same cosmetic without needing to be carried by the rider.',
     breaksHeading: 'What puts you back on your feet',
     breaksBody:
       'Water always wins. Ride into anything deep enough to swim in and you are down at once, because no ground mount swims, and dying drops you where you fall. You cannot call one while you are in combat, while you are dead or making your way back as a spirit, or at any point during a Thornhollow Fields match, which is fought on foot from the form-up to the final hold: if you were riding while you waited, being seated into the match puts you down with it. Walking into combat or into water partway through a summon cancels it as well.\n\nMost of what you do puts you down too. Swinging at something, starting a cast, harvesting a node, fishing, crafting, enchanting, salvaging, and recharging a profession tool all dismount you the moment you start, so expect to hop off at every vein. Calling a mount also drops any shapeshift form you are holding: you are never both shifted and mounted.',
-    speedHeading: 'Speed and tiers',
+    speedHeading: 'Riding speed and training',
     speedBody:
-      'Speed is the only thing that separates one mount from another. The Valorsteed you buy from Marla sets the base pace, and the mounts you collect out in the world ride above it: the rarer the reins, the quicker the ride, in a few clear steps rather than a smooth slide. There is no second rank of riding to train and no upgrade to buy afterward. You pay for Riding once, and from then on the reins you used decide how fast you travel.',
+      "Basic Riding Training gives {basicSpeed}% faster mounted movement. Advanced Riding Training gives {advancedSpeed}% faster mounted movement and costs {advancedFee} gold from Marla. Every mount appearance uses the same speed for the character's training rank, regardless of rarity or source. Store skins use that training speed too.",
     collectHeading: 'Where the rarer mounts come from',
     collectBody:
       "Beyond Marla's counter, reins are found rather than bought. They come off the last bosses of the five-player dungeons and the raid on heroic, and out of rift clears, where the harder the rift you finish the rarer the reins it can leave behind. They are rare finds by design and no run promises one, so the kind way to hunt a mount is to bring the hunt along on the runs you were making anyway. This page will not tell you which mount hangs on which boss: that part is yours to find out.",
@@ -1698,7 +1696,7 @@ export const guideStrings = {
       "The show-jumping course in Marla's paddock is open to anyone, any time, not only during the lesson. Sit a mount, stand on the glowing square behind the arch, and press Start Race. A countdown holds you still, then the clock runs: clear all seven jumps and ride back out through the arch before it runs down.\n\nA jump only counts if you are genuinely in the air over the bar, so an easy ride-through clears nothing. You may take them in any order and from either side, and a missed one is not the end of the world: circle back and take it again. Dying, getting off, or leaving the paddock ends the attempt, and so does letting the clock run out, which sets you down out of the saddle where you stand; cancelling it yourself just stops the clock. Nothing stops you starting another. There is no fee, no cooldown, and no prize beyond the time itself, and any number of riders can run the course at once without getting in each other's way.",
     goodsHeading: 'Reins are ordinary goods',
     goodsBody:
-      'A mount is an item, which makes it something the economy can move. You own a mount for as long as its reins sit in your bags or your bank, though banked reins keep the mount yours without letting you ride it: to call the beast you have to be carrying the reins. Player reins carry no soulbind, so they trade, travel by mail, and list on the World Market like any other find, unless the item itself says otherwise. Two things are worth knowing before you part with one: no merchant will ever buy a set of reins back, so a mount is a purchase you keep or pass on rather than cash out, and if the reins leave your bags and your bank both while you are riding, traded away, mailed off, or sold on the market, the mount goes with them and you are set down where you stand.',
+      "Collectible mount appearances remain available across your account while at least one matching reins item is in any character's bags or personal bank. Trading, mailing, listing, selling, or otherwise removing the last qualifying item removes the appearance from Cosmetics. A rider wearing it returns to the default horse appearance and stays mounted at their trained speed.\n\nPlayer reins can be traded, mailed, and listed on the World Market unless the item says otherwise. The horse reins can also be sold to a merchant for 10 gold. Other reins retain their own item sale restrictions. Store mount skins remain account cosmetics independent of reins items.",
   },
 
   worldPage: {
@@ -4046,7 +4044,7 @@ export const guideStrings = {
     // states in game. {level} = the riding requirement.
     ridingTitle: 'Learning to ride',
     ridingBody:
-      'Riding is one of the things waiting at the end of the climb. At level {level} a stablemaster will teach you the skill for a serious sum of gold, and a lesson out on the training course earns you your first set of reins. A mount grants no power at all; it simply makes the world smaller, which after a long walk north is its own kind of reward.',
+      "At level {level}, Stablemaster Marla teaches basic riding for gold and offers an advanced rank afterward. Training determines mounted speed. Choose your mount appearance in Cosmetics; collectible appearances are shared while their reins remain in any character's bags or bank.",
   },
 
   // Generic placeholder for sections still being written (build scaffolding).

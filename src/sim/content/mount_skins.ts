@@ -1,37 +1,17 @@
-// ---------------------------------------------------------------------------
-// Mount skins: account-wide cosmetic looks a player wears OVER whatever mount
-// they ride. Shared host-agnostic data (sim, server, renderer, HUD).
-//
-// A mount skin is NOT a mount. The ridden mount (Entity.mountKey, a reins item
-// the character owns) keeps its speed and summon rules. The skin only decides which mount visual the renderer draws and
-// which mount audio set plays, so real money buys a look and never a stat, the
-// same line the Season 1 Armory weapon skins hold (content/weapon_skins.ts).
-//
-// Ownership is ACCOUNT-wide (AccountCosmetics.mountSkinIds, mirrored from the
-// economy service's grant ledger into the rollback-safe
-// account_mount_cosmetics row). The WORN skin is per character
-// (PlayerMeta.mountSkinId, persisted in the character save, mirrored to
-// Entity.mountSkinId and the identity wire as `msk`), mirroring how the Combat
-// Mech chromas are owned by the account and worn by one character at a time.
-//
-// The skin id doubles as the economy SKU item id (kind 'skin', the same family
-// as weapon skins), so ids here must stay in lockstep with the service catalog.
-// `visualKey` names the render VISUALS entry (src/render/characters/manifest.ts)
-// and the mount visual spec (src/render/mount_visuals.ts MOUNT_SKIN_VISUAL_SPECS);
-// the sim never loads models, it carries the key so server and clients agree on
-// what everyone sees. Audio clips stay keyed by the skin id
-// (mount_run_<id>, mount_idle_<id>, the summon cue), see mountPresentationKey.
-//
-// Sim-pure data: no DOM, no server imports, safe for all three hosts.
-// ---------------------------------------------------------------------------
+// Account-wide mount appearances. Paid store grants are permanent and remain
+// in their own SKU catalog. Collectible skins are available only while a reins
+// item is held in an account character's bags or bank. Selection is per character;
+// all movement speed comes from riding training, never from a skin.
 
-import type { MountRarity } from './mounts';
+import { MOUNT_KEYS, MOUNTS, type MountKey, type MountRarity, mountDef } from './mounts';
 
-export type MountSkinId =
+export type StoreMountSkinId =
   | 'mech_bird'
   | 'chimeglass_tortoise'
   | 'rickshaw_mount'
   | 'goblin_rocket_sled';
+
+export type MountSkinId = StoreMountSkinId | MountKey;
 
 export interface MountSkinDef {
   /** Store SKU / economy-service item id (kind 'skin'). */
@@ -46,7 +26,7 @@ export interface MountSkinDef {
 }
 
 // Catalog order is store order: rarity tier, then declaration order.
-export const MOUNT_SKINS: Record<MountSkinId, MountSkinDef> = {
+export const MOUNT_SKINS: Record<StoreMountSkinId, MountSkinDef> = {
   // The Cluckwork Mech Bird: the first store cosmetic that was a rideable
   // mount (reins_mech_bird, kind 'item') before mount skins existed. Authored
   // rigid-servo clips, powered idle hum and engine take set under its own key.
@@ -101,14 +81,38 @@ export const MOUNT_SKINS: Record<MountSkinId, MountSkinDef> = {
 export const RETIRED_MOUNT_SKIN_IDS: readonly string[] = ['rallycart_rxt'];
 
 /** Catalog order (see MOUNT_SKINS). */
-export const MOUNT_SKIN_IDS = Object.keys(MOUNT_SKINS) as readonly MountSkinId[];
+export const MOUNT_SKIN_IDS = Object.keys(MOUNT_SKINS) as readonly StoreMountSkinId[];
 
-export function isMountSkinId(id: string): id is MountSkinId {
+/** Item-backed skins never join the paid SKU catalog. Their ownership is revocable. */
+export const COLLECTIBLE_MOUNT_SKINS = Object.fromEntries(
+  MOUNT_KEYS.map((id) => [
+    id,
+    {
+      id,
+      name: MOUNTS[id].name,
+      rarity: MOUNTS[id].rarity,
+      visualKey: `mount_${id}`,
+      season: 1,
+    },
+  ]),
+) as Record<MountKey, MountSkinDef>;
+
+export const ALL_MOUNT_SKIN_IDS: readonly MountSkinId[] = [...MOUNT_KEYS, ...MOUNT_SKIN_IDS];
+
+export function isStoreMountSkinId(id: string): id is StoreMountSkinId {
   return Object.hasOwn(MOUNT_SKINS, id);
 }
 
+export function isMountSkinId(id: string): id is MountSkinId {
+  return isStoreMountSkinId(id) || mountDef(id) !== null;
+}
+
 export function mountSkinDef(id: string): MountSkinDef | null {
-  return isMountSkinId(id) ? MOUNT_SKINS[id] : null;
+  return isStoreMountSkinId(id)
+    ? MOUNT_SKINS[id]
+    : mountDef(id)
+      ? COLLECTIBLE_MOUNT_SKINS[id as MountKey]
+      : null;
 }
 
 /** Coerce a persisted/wire value to a catalog skin id, or null when absent or

@@ -21,7 +21,6 @@ import { type Collider, isInstancedRegion, MANTLE_REACH, slopeGlueHeight } from 
 import { abilityCastSurvivesMovement, movementInputWouldMove } from './combat/cast_move_gate';
 import { isRooted, isStunned } from './combat/cc';
 import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
-import { mountMoveSpeedPct } from './content/mounts';
 import { guardAndReportPose } from './finite_pose_guard';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from './pathfind';
 import {
@@ -40,6 +39,7 @@ import {
   shoreStepOut,
   stepWaterLevel,
 } from './ride_height';
+import { ridingMoveSpeedPct } from './riding_training';
 import { GHOST_RUN_MULT } from './spirit';
 import {
   CAT_FORM_MOVE_MULT,
@@ -276,7 +276,7 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
   // every form, so in play the passive is 1 here). The whole expression is
   // slow * (max(buffs) * formPassive + mountPct + extraSpeedPct); slows still
   // bite multiplicatively.
-  if (e.mountKey) speed += mountMoveSpeedPct(e.mountKey);
+  if (e.mountKey) speed += ridingMoveSpeedPct(e.ridingTier);
   // Fiesta move-speed augments (only ever non-zero inside a Fiesta bout).
   if (extraSpeedPct) speed += extraSpeedPct;
   return slow * speed * cargo;

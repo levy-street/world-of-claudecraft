@@ -394,6 +394,7 @@ import {
 } from './mount_race';
 import {
   forceDismount as forceDismountImpl,
+  mountOwned,
   ownedMounts as ownedMountsImpl,
   setMountSkin as setMountSkinImpl,
   toggleMount as toggleMountImpl,
@@ -660,6 +661,11 @@ import { sanitizeRemovedZone1Content } from './removed_zone1_content';
 import type { ResolvedAbility } from './resolved_ability';
 import { freshCounters, type RewardCounters } from './reward_counters';
 import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
+import {
+  type RidingPlayerState,
+  restoreRidingTraining,
+  ridingTrainingTier as ridingTierOf,
+} from './riding_training';
 import { Rng } from './rng';
 import { resolveSavedPosExit } from './saved_pos_exit';
 import { persistedResource } from './serialize_resource';
@@ -1302,7 +1308,7 @@ export type JoinableChannel = (typeof JOINABLE_CHANNELS)[number];
 
 // Per-player progression and bags. The entity holds combat state; this holds
 // everything that belongs to the character sheet.
-export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState {
+export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState, RidingPlayerState {
   entityId: number;
   // Stable database character id when running on the server. Offline/sim-only
   // callers fall back to entityId for systems that need a rename-proof owner key.
@@ -1367,16 +1373,6 @@ export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState {
   // never persisted, and absent/false preserves the classic follow-through
   // default.
   stopAutoAttackOnTargetSwitch?: boolean;
-  // One-time riding-lesson fee (100g), charged when the first lesson race starts
-  // (or through the legacy mount_train_begin command). Optional so absent === false (pre-feature saves and a
-  // fresh character stay byte-equal): never explicitly set to false, only ever
-  // flipped true, mirroring the ridingTrained-omitted-while-false convention in
-  // serializeCharacter below.
-  mountTrainingFeePaid?: boolean;
-  // Riding skill purchased from Marla (80g). Optional and absent until bought,
-  // so pre-feature saves load cleanly as un-trained. Grandfathered: any save
-  // that had mountTrainingFeePaid=true gets ridingTrained=true on load.
-  ridingTrained?: boolean;
   // PBE boost kit version already applied to this character (server/
   // pbe_boost.ts, PBE_BOOST_ACCOUNTS=1 only). Optional and absent outside the
   // PBE so live saves round-trip byte-equal; the world-join top-up re-kits
@@ -3268,22 +3264,8 @@ export class Sim {
         healDisplayRoundedProficiency(meta.gatheringProficiency);
       }
       meta.mailWelcomed = s.mailWelcomed === true;
-      // Never explicitly set false: absent stays absent so a pre-feature save
-      // (or one where the fee was never charged) round-trips byte-equal.
-      if (s.mountTrainingFeePaid === true) meta.mountTrainingFeePaid = true;
-      // Grandfather: players who already paid the old 100g fee are riding-trained.
-      if (s.ridingTrained === true || s.mountTrainingFeePaid === true) meta.ridingTrained = true;
+      player.ridingTier = restoreRidingTraining(meta, s);
       if (typeof s.pbeBoostKit === 'number') meta.pbeBoostKit = s.pbeBoostKit;
-      // Grandfather: players who had q_riding_lessons active in a mid-quest save
-      // (state='active' or 'ready') but never received ridingTrained=true are
-      // riding-trained because accepting the quest proves they already paid
-      // the old lesson fee. Also covers done: questsDone.has('q_riding_lessons').
-      if (
-        !meta.ridingTrained &&
-        (meta.questLog.has('q_riding_lessons') || meta.questsDone.has('q_riding_lessons'))
-      ) {
-        meta.ridingTrained = true;
-      }
       meta.guildLetterSent = s.guildLetterSent === true;
       // Work-order cooldowns: clamp every stored availableAt to
       // tickCount + WORK_ORDER_CADENCE_TICKS so a tick-counter reset (fresh
@@ -3996,6 +3978,7 @@ export class Sim {
       ...(meta.mountTrainingFeePaid ? { mountTrainingFeePaid: true } : {}),
       // Absent until riding skill is purchased (back-compat).
       ...(meta.ridingTrained ? { ridingTrained: true } : {}),
+      ...(meta.ridingTier === 2 ? { ridingTier: 2 as const } : {}),
       // Absent outside the PBE (back-compat; server/pbe_boost.ts).
       ...(meta.pbeBoostKit !== undefined ? { pbeBoostKit: meta.pbeBoostKit } : {}),
       craftSkills: { ...meta.craftSkills },
@@ -4138,19 +4121,21 @@ export class Sim {
   ridingTrained(): boolean {
     return this.players.get(this.primaryId)?.ridingTrained === true;
   }
+  ridingTrainingTier(): 0 | 1 | 2 {
+    return ridingTierOf(this.players.get(this.primaryId));
+  }
   toggleMounted(): void {
     this.toggleMountFor(this.primaryId);
   }
 
-  /** Purchase the riding skill from Marla (80g). Server path; IWorld member rides
-   *  primaryId. Rules live in src/sim/mounts_training.ts. */
-  learnRidingFor(npcId: number, pid: number): void {
-    learnRidingImpl(this.ctx, npcId, pid);
+  /** Purchase a quoted riding rank through the authoritative training module. */
+  learnRidingFor(npcId: number, pid: number, expectedTier: 0 | 1 = 0): void {
+    learnRidingImpl(this.ctx, npcId, pid, expectedTier);
   }
 
   // --- IWorldMounts: learn riding ---
-  learnRiding(npcId: number): void {
-    this.learnRidingFor(npcId, this.primaryId);
+  learnRiding(npcId: number, expectedTier: 0 | 1 = 0): void {
+    this.learnRidingFor(npcId, this.primaryId, expectedTier);
   }
 
   /** Per-pid riding-lesson command surface (the server path); the IWorld member
@@ -4296,7 +4281,14 @@ export class Sim {
   }
 
   changeMountSkin(skinId: string | null): void {
-    if (skinId !== null && !this.accountCosmetics.mountSkinIds.includes(skinId)) return;
+    const meta = this.players.get(this.primaryId);
+    if (
+      skinId !== null &&
+      !this.accountCosmetics.mountSkinIds.includes(skinId) &&
+      !this.accountCosmetics.collectibleMountSkinIds?.includes(skinId) &&
+      !(meta && mountOwned(meta, skinId))
+    )
+      return;
     this.setMountSkin(this.primaryId, skinId);
   }
 

@@ -35,7 +35,6 @@ import {
   validateCrowdResetState,
 } from '../scripts/lib/perf_hitch_crowd_reset.mjs';
 import { isBlocked, moverHeight, resolveMovement } from '../src/sim/colliders.ts';
-import { MOUNTS } from '../src/sim/content/mounts.ts';
 import { MAX_AGGRO_RADIUS, MAX_WANDER_RADIUS } from '../src/sim/mob/aggro_ranges.ts';
 import {
   PLAYER_BODY_RADIUS,
@@ -44,6 +43,7 @@ import {
 } from '../src/sim/pathfind.ts';
 import { moveSpeedMult, stepPlayerMotion } from '../src/sim/player_motion.ts';
 import { rideSteepnessAt } from '../src/sim/ride_height.ts';
+import { ridingMoveSpeedPct } from '../src/sim/riding_training.ts';
 import { Sim } from '../src/sim/sim.ts';
 import { RUN_SPEED } from '../src/sim/types.ts';
 import { groundHeight, terrainHeight, waterLevelAt } from '../src/sim/world.ts';
@@ -265,14 +265,13 @@ describe('crowd-influx run reset', () => {
     }).toEqual({
       x: -113,
       z: 1413,
-      motionRadius: 50,
+      motionRadius: 54,
       startRadius: 9,
       moveIntervalMs: 250,
       moveSteps: 12,
       combatQuietMs: 6000,
     });
-    const fastestMountedSpeed =
-      RUN_SPEED * (1 + Math.max(...Object.values(MOUNTS).map((mount) => mount.moveSpeedPct)));
+    const fastestMountedSpeed = RUN_SPEED * (1 + ridingMoveSpeedPct(2));
     const maximumPathLength =
       fastestMountedSpeed *
       ((HITCH_CROWD_INFLUX_MOVE_INTERVAL_MS * HITCH_CROWD_INFLUX_MOVE_STEPS) / 1_000);
