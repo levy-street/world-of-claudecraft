@@ -38,6 +38,28 @@ vi.mock('../src/game/account_settings_sync', () => ({
 }));
 
 describe('account settings bootstrap', () => {
+  it('flushes before revoking account credentials and finishes logout after failures', async () => {
+    const { prepareAccountSettings, logoutAccountSettings } = await import(
+      '../src/account_settings_wiring'
+    );
+    const session = {
+      token: 'one',
+      base: '',
+      logout: vi.fn().mockRejectedValueOnce(new Error('offline')),
+    };
+    await prepareAccountSettings(session, 42);
+    mocks.flush.mockRejectedValueOnce(new Error('save unavailable'));
+    const finish = vi.fn();
+    await expect(logoutAccountSettings(session, finish)).resolves.toBeUndefined();
+    expect(session.logout).toHaveBeenCalledOnce();
+    expect(finish).toHaveBeenCalledOnce();
+    expect(mocks.flush.mock.invocationCallOrder[0]).toBeLessThan(
+      session.logout.mock.invocationCallOrder[0],
+    );
+    expect(session.logout.mock.invocationCallOrder[0]).toBeLessThan(
+      finish.mock.invocationCallOrder[0],
+    );
+  });
   beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
@@ -84,7 +106,7 @@ describe('account settings bootstrap', () => {
     expect(mocks.initialize).toHaveBeenCalledWith('desktop', 42, mocks.snapshot());
     expect(mocks.apply).toHaveBeenCalledWith(localStorage, { woc_settings: '{"cameraSpeed":2}' });
     expect(mocks.apply.mock.invocationCallOrder[0]).toBeLessThan(
-      mocks.sync.mock.invocationCallOrder[0],
+      mocks.sync.mock.invocationCallOrder[1],
     );
   });
 
@@ -97,7 +119,7 @@ describe('account settings bootstrap', () => {
     expect(mocks.status).toHaveBeenCalledTimes(2);
     expect(mocks.notice).toHaveBeenCalledTimes(2);
     expect(mocks.initialize).toHaveBeenLastCalledWith('desktop', 43, mocks.snapshot());
-    expect(mocks.stop).toHaveBeenCalledOnce();
+    expect(mocks.stop).toHaveBeenCalledTimes(3);
   });
 
   it('refuses stale initialization if the account changes during the server request', async () => {
@@ -155,5 +177,69 @@ describe('account settings bootstrap', () => {
     await expect(ensureAccountSettingsAcknowledged(session)).rejects.toThrow('offline');
     await ensureAccountSettingsAcknowledged(session);
     expect(mocks.status).toHaveBeenCalledTimes(2);
+  });
+
+  it('observes homepage locale edits after acknowledgement and overlays only those edits', async () => {
+    const { ensureAccountSettingsAcknowledged, prepareAccountSettings } = await import(
+      '../src/account_settings_wiring'
+    );
+    const session = { token: 'one', base: '' };
+    await ensureAccountSettingsAcknowledged(session);
+    expect(mocks.sync).toHaveBeenCalledWith(expect.objectContaining({ paused: true }));
+    const early = mocks.sync.mock.calls[0][0];
+    early.onChange('locale', 'es');
+    await prepareAccountSettings(session, 42);
+    expect(mocks.apply).toHaveBeenCalledWith(localStorage, {
+      woc_settings: '{"cameraSpeed":2}',
+      locale: 'es',
+    });
+    expect(mocks.flush).toHaveBeenCalledOnce();
+  });
+
+  it('keeps local preferences and pauses network sync when initialization fails after acknowledgement', async () => {
+    const { prepareAccountSettings, setAccountSettingsSaveErrorReporter } = await import(
+      '../src/account_settings_wiring'
+    );
+    const report = vi.fn();
+    setAccountSettingsSaveErrorReporter(report);
+    mocks.initialize.mockRejectedValueOnce(new Error('preferences unavailable'));
+    await expect(prepareAccountSettings({ token: 'one', base: '' }, 42)).resolves.toBeUndefined();
+    expect(mocks.apply).not.toHaveBeenCalled();
+    expect(mocks.stop).not.toHaveBeenCalled();
+    expect(report).toHaveBeenCalledOnce();
+  });
+
+  it('allows logout to continue when a pending save fails', async () => {
+    const { prepareAccountSettings, flushAccountSettings, setAccountSettingsSaveErrorReporter } =
+      await import('../src/account_settings_wiring');
+    setAccountSettingsSaveErrorReporter(vi.fn());
+    await prepareAccountSettings({ token: 'one', base: '' }, 42);
+    mocks.flush.mockRejectedValueOnce(new Error('offline'));
+    await expect(flushAccountSettings()).resolves.toBeUndefined();
+  });
+
+  it('keeps the initialized observer running when a recovery save fails', async () => {
+    const { prepareAccountSettings, setAccountSettingsSaveErrorReporter } = await import(
+      '../src/account_settings_wiring'
+    );
+    setAccountSettingsSaveErrorReporter(vi.fn());
+    mocks.pending.mockReturnValue({ woc_theme: 'pending-edit' });
+    mocks.flush.mockRejectedValueOnce(new Error('offline'));
+    await expect(prepareAccountSettings({ token: 'one', base: '' }, 42)).resolves.toBeUndefined();
+    expect(mocks.stop).toHaveBeenCalledOnce();
+    expect(localStorage.getItem('woc_account_settings_pending:1:desktop')).toContain(
+      'pending-edit',
+    );
+  });
+
+  it('does not let an error toast failure prevent the local fallback', async () => {
+    const { prepareAccountSettings, setAccountSettingsSaveErrorReporter } = await import(
+      '../src/account_settings_wiring'
+    );
+    setAccountSettingsSaveErrorReporter(() => {
+      throw new Error('toast unavailable');
+    });
+    mocks.initialize.mockRejectedValueOnce(new Error('preferences unavailable'));
+    await expect(prepareAccountSettings({ token: 'one', base: '' }, 42)).resolves.toBeUndefined();
   });
 });

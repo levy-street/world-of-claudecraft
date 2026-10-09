@@ -41,12 +41,26 @@ export function createAccountSettingsDb(
 ): AccountSettingsDb {
   return {
     acknowledged: (accountId) =>
-      bounded(
-        run,
-        async (query) =>
+      bounded(run, async (query) => {
+        if (
           (await query('SELECT 1 FROM account_settings_ack WHERE account_id = $1', [accountId]))
-            .rowCount === 1,
-      ),
+            .rowCount === 1
+        )
+          return true;
+        // New accounts have no character preferences to migrate. Persist this
+        // exemption before character creation, so their first character never
+        // triggers the migration notice. The existing characters_account index
+        // serves this account-scoped existence probe across all realms.
+        const exempt = await query(
+          `INSERT INTO account_settings_ack (account_id)
+      SELECT id FROM accounts WHERE id = $1
+      AND NOT EXISTS (SELECT 1 FROM characters WHERE account_id = $1)
+      ON CONFLICT (account_id) DO UPDATE SET account_id = EXCLUDED.account_id
+      RETURNING account_id`,
+          [accountId],
+        );
+        return exempt.rowCount === 1;
+      }),
     acknowledge: (accountId) =>
       bounded(run, async (query) => {
         await query(

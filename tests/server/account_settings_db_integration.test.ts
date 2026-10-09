@@ -25,6 +25,7 @@ describe.skipIf(!url)('durable account device preferences', () => {
       await query(
         'CREATE TABLE characters (id INT PRIMARY KEY, account_id INT NOT NULL REFERENCES accounts(id))',
       );
+      await query('CREATE INDEX characters_account ON characters(account_id)');
       await query('INSERT INTO accounts VALUES (1), (2)');
       await query('INSERT INTO characters VALUES (10, 1), (11, 1), (20, 2)');
       await query(ACCOUNT_SETTINGS_SCHEMA);
@@ -34,6 +35,21 @@ describe.skipIf(!url)('durable account device preferences', () => {
   afterAll(async () => {
     await pool.query(`DROP SCHEMA IF EXISTS ${schema} CASCADE`);
     await pool.end();
+  });
+  it('autoacknowledges a characterless account durably before its first character', async () => {
+    await run(2_000, (query) => query('INSERT INTO accounts VALUES (3)'));
+    expect(await Promise.all([db.acknowledged(3), db.acknowledged(3)])).toEqual([true, true]);
+    await run(2_000, (query) => query('INSERT INTO characters VALUES (30, 3)'));
+    expect(await db.acknowledged(3)).toBe(true);
+    expect(await db.initialize(3, 'desktop', 30, { woc_theme: 'fresh' })).toEqual({
+      woc_theme: 'fresh',
+    });
+    expect(await db.acknowledged(2)).toBe(false);
+    expect(await db.acknowledged(999)).toBe(false);
+    await run(2_000, async (query) => {
+      await query('DELETE FROM characters WHERE account_id = 3');
+      await query('DELETE FROM accounts WHERE id = 3');
+    });
   });
   it('requires acknowledgment and ownership before storing any profile', async () => {
     expect(await db.initialize(1, 'desktop', 10, {})).toBeNull();

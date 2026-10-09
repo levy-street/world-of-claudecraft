@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   ACCOUNT_SETTINGS_POLICY,
+  ACCOUNT_SETTINGS_PREAUTH_POLICY,
+  ACCOUNT_SETTINGS_SAVE_POLICY,
   configureAccountSettingsRuntime,
   resetAccountSettingsRateLimitsForTests,
   routes,
@@ -86,7 +88,8 @@ describe('account settings endpoints', () => {
     const lookupToken = vi.fn(async () => null);
     const auth = requireAccount({ scope: 'full', lookupToken });
     const request = fakeCtx({ headers: { authorization: `Bearer ${'a'.repeat(64)}` } });
-    for (let i = 0; i < 30; i++) await preauth(request, async () => {});
+    for (let i = 0; i < ACCOUNT_SETTINGS_PREAUTH_POLICY.limit; i++)
+      await preauth(request, async () => {});
     await expect(preauth(request, () => auth(request, async () => {}))).rejects.toMatchObject({
       status: 429,
     });
@@ -142,6 +145,24 @@ describe('account settings endpoints', () => {
     for (let i = 0; i < 30; i++) expect(ACCOUNT_SETTINGS_POLICY.tier1(request).allowed).toBe(true);
     for (let i = 0; i < 100; i++)
       expect(ACCOUNT_SETTINGS_POLICY.tier1(request).allowed).toBe(false);
+  });
+  it('allows a minute of debounced saves without spending the login budget', () => {
+    const request = ctx();
+    for (let i = 0; i < 80; i++)
+      expect(ACCOUNT_SETTINGS_SAVE_POLICY.tier1(request).allowed).toBe(true);
+    for (let i = 0; i < ACCOUNT_SETTINGS_POLICY.limit; i++)
+      expect(ACCOUNT_SETTINGS_POLICY.tier1(request).allowed).toBe(true);
+    expect(ACCOUNT_SETTINGS_POLICY.tier1(request).allowed).toBe(false);
+    for (let i = 80; i < ACCOUNT_SETTINGS_SAVE_POLICY.limit; i++)
+      expect(ACCOUNT_SETTINGS_SAVE_POLICY.tier1(request).allowed).toBe(true);
+    expect(ACCOUNT_SETTINGS_SAVE_POLICY.tier1(request).allowed).toBe(false);
+    expect(ACCOUNT_SETTINGS_PREAUTH_POLICY.limit).toBeGreaterThanOrEqual(
+      ACCOUNT_SETTINGS_POLICY.limit + ACCOUNT_SETTINGS_SAVE_POLICY.limit,
+    );
+    expect(routes.find((route) => route.path.endsWith('/save'))?.middleware?.[2]).toHaveProperty(
+      'rateLimitPolicyName',
+      ACCOUNT_SETTINGS_SAVE_POLICY.name,
+    );
   });
   it('status reads acknowledgment only and all routes mount auth before rate and body', async () => {
     const request = ctx();

@@ -1,6 +1,7 @@
 import {
   enterAccountRealmFlow,
   flushAccountSettings,
+  logoutAccountSettings,
   prepareAccountSettings,
   setAccountSettingsSaveErrorReporter,
 } from './account_settings_wiring';
@@ -5758,16 +5759,11 @@ function enterLoggedOutChrome(): void {
 }
 
 function logoutAccount(): void {
-  const finish = () => {
+  void logoutAccountSettings(api, () => {
     api.clearSession();
     clearPlayMarker();
     location.reload();
-  };
-  if (!api.token) {
-    finish();
-    return;
-  }
-  void api.logout().finally(finish);
+  });
 }
 
 const loggedOutModel = () =>
@@ -6692,8 +6688,8 @@ function syncCharselectEnterButton(): void {
 }
 
 async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Promise<void> {
-  if (hasBegunWorldEntry) return;
   stopShaderWarmup();
+  if (hasBegunWorldEntry) return;
   try {
     if (button) {
       button.disabled = true;

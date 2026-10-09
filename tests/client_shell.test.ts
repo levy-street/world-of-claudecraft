@@ -976,7 +976,11 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain('setAccountLoginChrome(true);');
     expect(mainTs).toContain('setAccountLoginChrome(false);');
     expect(mainTs).toContain('function logoutAccount(): void {');
-    expect(mainTs).toContain('void api.logout().finally(finish);');
+    const logoutSource = mainTs.slice(
+      mainTs.indexOf('function logoutAccount(): void {'),
+      mainTs.indexOf('const loggedOutModel'),
+    );
+    expect(logoutSource).toContain('void logoutAccountSettings(api, () => {');
     expect(mainTs).toContain('api.clearSession();');
     expect(mainTs).toContain("setupNavBtn($('#nav-btn-logout'), '#hero-view', logoutAccount);");
   });

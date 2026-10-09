@@ -727,7 +727,7 @@ function defaultTouchInterface(): boolean {
   }
 }
 
-function defaultBoolSetting(
+export function defaultBoolSetting(
   key: BoolSettingKey,
   values: Pick<GameSettings, 'interfaceMode'>,
 ): boolean {

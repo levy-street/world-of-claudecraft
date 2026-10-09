@@ -53,7 +53,7 @@ describe('account settings preference storage boundary', () => {
     expect(storage.getItem('ev_music_on')).toBeNull();
   });
 
-  it('rolls back a failed apply and refuses an oversized snapshot rather than losing fields', () => {
+  it('rolls back a failed apply and filters an oversized local value', () => {
     const storage = new MemoryStorage();
     storage.setItem('ev_music_on', '0');
     const original = storage.setItem.bind(storage);
@@ -66,11 +66,30 @@ describe('account settings preference storage boundary', () => {
     );
     expect(snapshotAccountSettings(storage)).toEqual({ ev_music_on: '0' });
     original('woc_settings', 'x'.repeat(40_000));
-    expect(() => snapshotAccountSettings(storage)).toThrow('exceed');
+    expect(snapshotAccountSettings(storage)).toEqual({ ev_music_on: '0' });
   });
 });
 
 describe('account settings save queue', () => {
+  it('clears an acknowledged legacy journal after stripping its machine fields', async () => {
+    const storage = new MemoryStorage();
+    const journalKey = 'woc_account_settings_pending:17:desktop';
+    storage.setItem(
+      journalKey,
+      JSON.stringify({ woc_settings: '{"graphicsPreset":4,"cameraSpeed":1}' }),
+    );
+    const pending = readPendingAccountSettings(storage, journalKey);
+    if (!pending) throw new Error('missing legacy pending profile');
+    const save = vi.fn().mockResolvedValue(undefined);
+    const sync = startAccountSettingsSync({ storage, save, journalKey, initialPending: pending });
+    try {
+      await sync.flush();
+      expect(save).toHaveBeenCalledWith({ woc_settings: '{"cameraSpeed":1}' }, false);
+      expect(storage.getItem(journalKey)).toBeNull();
+    } finally {
+      sync.stop();
+    }
+  });
   it('keeps same-origin tab profiles isolated while each saves with its own credential', async () => {
     const values = new Map<string, string>();
     const tabA = new MemoryStorage(values);
@@ -250,7 +269,7 @@ describe('account settings save queue', () => {
     storage.setItem('ev_music_on', '0');
     await vi.advanceTimersByTimeAsync(20_000);
     expect(save).toHaveBeenCalledTimes(4);
-    expect(onError).toHaveBeenCalledTimes(4);
+    expect(onError).toHaveBeenCalledTimes(1);
     save.mockResolvedValue(undefined);
     await sync.flush();
     expect(save.mock.calls[4][0]).toEqual({ ev_music_on: '0' });
@@ -274,6 +293,56 @@ describe('account settings save queue', () => {
     next.stop();
     reject(error);
     await expected;
-    expect(onError).toHaveBeenCalledTimes(4);
+    expect(onError).toHaveBeenCalledTimes(1);
+  });
+
+  it('captures login edits while paused without saving a premature profile', async () => {
+    vi.useFakeTimers();
+    const storage = new MemoryStorage();
+    storage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 1, cameraSpeed: 0.7 }));
+    const save = vi.fn();
+    const onChange = vi.fn();
+    const sync = startAccountSettingsSync({
+      storage,
+      save,
+      onChange,
+      paused: true,
+      journalKey: 'pending',
+    });
+    try {
+      storage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 4, cameraSpeed: 0.7 }));
+      expect(onChange).not.toHaveBeenCalled();
+      storage.setItem('locale', 'ja_JP');
+      storage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 4, cameraSpeed: 1 }));
+      await vi.advanceTimersByTimeAsync(20_000);
+      await sync.flush();
+      expect(onChange.mock.calls).toEqual([
+        ['locale', 'ja_JP', null],
+        ['woc_settings', '{"cameraSpeed":1}', '{"cameraSpeed":0.7}'],
+      ]);
+      expect(save).not.toHaveBeenCalled();
+      expect(storage.getItem('pending')).toBeNull();
+    } finally {
+      sync.stop();
+    }
+  });
+
+  it('reports one failed change once across retries, then reports the next change', async () => {
+    vi.useFakeTimers();
+    const storage = new MemoryStorage();
+    const onError = vi.fn();
+    const save = vi.fn().mockRejectedValue(new Error('offline'));
+    const sync = startAccountSettingsSync({ storage, save, onError });
+    try {
+      storage.setItem('ev_music_on', '0');
+      await vi.advanceTimersByTimeAsync(20_000);
+      expect(onError).toHaveBeenCalledTimes(1);
+      storage.setItem('ev_music_on', '1');
+      await vi.advanceTimersByTimeAsync(20_000);
+      expect(save).toHaveBeenCalledTimes(8);
+      expect(onError).toHaveBeenCalledTimes(2);
+    } finally {
+      sync.stop();
+    }
   });
 });

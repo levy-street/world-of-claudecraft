@@ -1432,7 +1432,8 @@ const MONOLITHS: MonolithRow[] = [
     // those release-line extractions. Release reconciliation: measured merged
     // tree at 11140 lines, preserving both extraction sets.
     // Account login chrome moved to its controller, paying for settings bootstrap wiring.
-    ceiling: 11136,
+    // Account logout now delegates its persistence and credential ordering to the bootstrap seam.
+    ceiling: 10955,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

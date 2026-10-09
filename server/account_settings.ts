@@ -18,35 +18,55 @@ export function configureAccountSettingsRuntime(runtime: AccountSettingsDb): voi
   db = runtime;
 }
 const attempts = new Map<string, number[]>();
-function attempt(key: string): RateLimitOutcome {
+export const ACCOUNT_SETTINGS_CONTROL_MAX_PER_MINUTE = 30;
+// The 750ms save debounce permits 80 saves/minute. Allow ten extra requests
+// for bounded retries, recovery and the logout flush, independently of login.
+export const ACCOUNT_SETTINGS_SAVE_MAX_PER_MINUTE = 90;
+export const ACCOUNT_SETTINGS_PREAUTH_MAX_PER_MINUTE =
+  ACCOUNT_SETTINGS_CONTROL_MAX_PER_MINUTE + ACCOUNT_SETTINGS_SAVE_MAX_PER_MINUTE;
+const ACCOUNT_SETTINGS_MAX_RATE_BUCKETS = 4_000;
+function attempt(key: string, limit: number): RateLimitOutcome {
   const now = rateLimitNow();
   const active = (attempts.get(key) ?? []).filter((time) => time > now - WINDOW_MS);
-  if (active.length <= 30) active.push(now);
+  if (active.length <= limit) active.push(now);
   attempts.set(key, active);
-  if (attempts.size > 4_000) {
+  if (attempts.size > ACCOUNT_SETTINGS_MAX_RATE_BUCKETS) {
     const oldest = attempts.keys().next().value;
     if (oldest !== undefined) attempts.delete(oldest);
   }
-  return windowedRateLimitOutcome(active.length, 30, active[0] ?? now, WINDOW_MS, now);
+  return windowedRateLimitOutcome(active.length, limit, active[0] ?? now, WINDOW_MS, now);
 }
-/** Fused account/IP budget, globally backed for cross-realm account authority. */
-export const ACCOUNT_SETTINGS_POLICY: RateLimitPolicy = {
-  name: 'account_settings',
-  keyClass: 'ip+account',
-  limit: 30,
-  windowSeconds: WINDOW_MS / 1000,
-  tier2: 'global',
-  tier1: (ctx) =>
-    mergeFusedOutcomes(attempt(`ip:${ctx.ip}`), attempt(`account:${ctxAccountId(ctx)}`)),
-};
+function authenticatedPolicy(name: string, limit: number): RateLimitPolicy {
+  return {
+    name,
+    keyClass: 'ip+account',
+    limit,
+    windowSeconds: WINDOW_MS / 1000,
+    tier2: 'global',
+    tier1: (ctx) =>
+      mergeFusedOutcomes(
+        attempt(`${name}:ip:${ctx.ip}`, limit),
+        attempt(`${name}:account:${ctxAccountId(ctx)}`, limit),
+      ),
+  };
+}
+/** Globally backed control and save budgets stay independent across realms. */
+export const ACCOUNT_SETTINGS_POLICY = authenticatedPolicy(
+  'account_settings',
+  ACCOUNT_SETTINGS_CONTROL_MAX_PER_MINUTE,
+);
+export const ACCOUNT_SETTINGS_SAVE_POLICY = authenticatedPolicy(
+  'account_settings_save',
+  ACCOUNT_SETTINGS_SAVE_MAX_PER_MINUTE,
+);
 /** Cheap IP gate precedes bearer database resolution; no tier-2 query here. */
 export const ACCOUNT_SETTINGS_PREAUTH_POLICY: RateLimitPolicy = {
   name: 'account_settings_pre_auth',
   keyClass: 'ip',
-  limit: 30,
+  limit: ACCOUNT_SETTINGS_PREAUTH_MAX_PER_MINUTE,
   windowSeconds: WINDOW_MS / 1000,
   tier2: 'none',
-  tier1: (ctx) => attempt('preauth:' + ctx.ip),
+  tier1: (ctx) => attempt(`preauth:${ctx.ip}`, ACCOUNT_SETTINGS_PREAUTH_MAX_PER_MINUTE),
 };
 export function resetAccountSettingsRateLimitsForTests(): void {
   attempts.clear();
@@ -97,6 +117,11 @@ const guards = [
   requireAccount({ scope: 'full' }),
   rateLimit(ACCOUNT_SETTINGS_POLICY),
 ];
+const saveGuards = [
+  rateLimit(ACCOUNT_SETTINGS_PREAUTH_POLICY),
+  requireAccount({ scope: 'full' }),
+  rateLimit(ACCOUNT_SETTINGS_SAVE_POLICY),
+];
 export const routes: RouteDef[] = [
   {
     method: 'GET',
@@ -123,7 +148,7 @@ export const routes: RouteDef[] = [
     method: 'POST',
     path: '/api/account/settings/save',
     surface: 'api',
-    middleware: [...guards, withBody(ACCOUNT_SETTINGS_MAX_BYTES + 1_024)],
+    middleware: [...saveGuards, withBody(ACCOUNT_SETTINGS_MAX_BYTES + 1_024)],
     handler: save,
   },
 ];

@@ -7390,7 +7390,6 @@
     bottom: auto;
     top: calc(100% + 4px);
   }
-  /* generic confirm dialog (prestige) */
   /* Account settings migration: a blocking modal in the confirm family.
      Fluid geometry and scrolling work in phone portrait and landscape. */
   .account-settings-notice-backdrop {
@@ -7446,6 +7445,7 @@
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }
+  /* generic confirm dialog (prestige) */
   #confirm-dialog {
     left: 50%;
     top: 50%;

@@ -1,3 +1,5 @@
+import { accountSettingsValue } from './account_settings_profile';
+
 /** Shared account preference wire contract. Gameplay and character progress never travel here. */
 export type DeviceType = 'desktop' | 'phone' | 'tablet';
 export type AccountSettingsEntries = Record<string, string>;
@@ -33,6 +35,13 @@ const KEYS = new Set([
   'woc_keyboard_legends',
   'woc_party_collapsed',
   'woc_homepage_music_muted',
+  'woc_bag_filter',
+  'woc_bank_filter',
+  'woc_crafting_tab',
+  'woc_guild_hide_offline',
+  'paladinDevotionAnchor',
+  'procOverlayAnchor',
+  'warlockDoomAnchor',
 ]);
 const PREFIXES = ['woc_hud_frame_', 'woc_target_auras_', 'woc_chat_'];
 export function isDeviceType(value: unknown): value is DeviceType {
@@ -57,7 +66,7 @@ export function validateAccountSettingsEntries(input: unknown): AccountSettingsE
     const value = (input as Record<string, unknown>)[key];
     if (!isAccountSettingsKey(key) || typeof value !== 'string' || value.length > 32_768)
       return null;
-    result[key] = value;
+    result[key] = accountSettingsValue(key, value);
   }
   return new TextEncoder().encode(JSON.stringify(result)).length <= ACCOUNT_SETTINGS_MAX_BYTES
     ? result
@@ -67,11 +76,12 @@ export function validateAccountSettingsEntries(input: unknown): AccountSettingsE
 export function sanitizeAccountSettingsEntries(input: unknown): AccountSettingsEntries {
   const result: AccountSettingsEntries = Object.create(null);
   if (input === null || typeof input !== 'object' || Array.isArray(input)) return result;
-  for (const key of Object.keys(input)) {
+  for (const key of Object.keys(input).sort()) {
     const value = (input as Record<string, unknown>)[key];
-    if (!isAccountSettingsKey(key) || typeof value !== 'string') continue;
-    const next = { ...result, [key]: value };
-    if (validateAccountSettingsEntries(next)) result[key] = value;
+    if (!isAccountSettingsKey(key) || typeof value !== 'string' || value.length > 32_768) continue;
+    const normalized = accountSettingsValue(key, value);
+    const next = { ...result, [key]: normalized };
+    if (validateAccountSettingsEntries(next)) result[key] = normalized;
   }
   return result;
 }

@@ -1,8 +1,12 @@
 import {
   type AccountSettingsEntries,
   isAccountSettingsKey,
+  sanitizeAccountSettingsEntries,
   validateAccountSettingsEntries,
 } from '../account_settings_contract';
+import { accountSettingsValue, mergeAccountGameSettings } from '../account_settings_profile';
+import { accountGameSettingsEqual } from './account_settings_comparison';
+import { keybindsStorageKey } from './keybinds';
 
 export function snapshotAccountSettings(
   storage: Storage,
@@ -17,19 +21,29 @@ export function snapshotAccountSettings(
     }
   }
   if (characterId !== undefined) {
-    const keybinds = storage.getItem(`woc_keybinds:char:${characterId}`);
+    const keybinds = storage.getItem(keybindsStorageKey(`char:${characterId}`));
     if (keybinds !== null) entries.woc_keybinds = keybinds;
   }
-  const validated = validateAccountSettingsEntries(entries);
-  if (!validated) throw new Error('local account settings exceed storage limits');
-  return validated;
+  return sanitizeAccountSettingsEntries(entries);
 }
 
 /** Replace only preferences. A failed write restores the prior snapshot before entry fails. */
 export function applyAccountSettings(storage: Storage, input: AccountSettingsEntries): void {
   const entries = validateAccountSettingsEntries(input);
   if (!entries) throw new Error('invalid account settings entries');
-  const previous = snapshotAccountSettings(storage);
+  const previous: AccountSettingsEntries = Object.create(null);
+  for (let i = 0; i < storage.length; i++) {
+    const key = storage.key(i);
+    if (key && isAccountSettingsKey(key)) {
+      const value = storage.getItem(key);
+      if (value !== null) previous[key] = value;
+    }
+  }
+  const mergedSettings = mergeAccountGameSettings(
+    previous.woc_settings ?? null,
+    entries.woc_settings ?? null,
+  );
+  if (mergedSettings !== null) entries.woc_settings = mergedSettings;
   const keys = new Set([...Object.keys(previous), ...Object.keys(entries)]);
   try {
     for (const key of keys) {
@@ -59,6 +73,9 @@ export interface AccountSettingsSyncOptions {
   /** Non-secret stable account ID and physical device family, never a credential. */
   journalKey?: string;
   initialPending?: AccountSettingsEntries;
+  /** Capture acknowledged login-screen edits before a profile has been initialized. */
+  paused?: boolean;
+  onChange?: (key: string | null, value: string | null, previousValue: string | null) => void;
 }
 
 export function readPendingAccountSettings(
@@ -95,12 +112,15 @@ export function startAccountSettingsSync(options: AccountSettingsSyncOptions): {
   let active: Promise<void> | null = null;
   let timer: ReturnType<typeof setTimeout> | undefined;
   let retries = 0;
+  let changeVersion = 0;
+  let reportedVersion = -1;
   const clearTimer = () => {
     clearTimeout(timer);
     timer = undefined;
   };
-  const report = (error: unknown) => {
-    if (!stopped) {
+  const report = (error: unknown, version = changeVersion) => {
+    if (!stopped && reportedVersion !== version) {
+      reportedVersion = version;
       try {
         onError?.(error);
       } catch {
@@ -117,14 +137,24 @@ export function startAccountSettingsSync(options: AccountSettingsSyncOptions): {
   const changed = (key: string | null, value: string | null = null) => {
     if (stopped) return;
     try {
+      const previousValue = key === null ? null : (profile[key] ?? null);
       const next: AccountSettingsEntries = key === null ? Object.create(null) : { ...profile };
       if (key !== null) {
         if (value === null) delete next[key];
-        else next[key] = value;
+        else next[key] = accountSettingsValue(key, value);
       }
-      const validated = validateAccountSettingsEntries(next);
-      if (!validated) throw new Error('local account settings exceed storage limits');
+      const validated = sanitizeAccountSettingsEntries(next);
+      if (
+        key === 'woc_settings' &&
+        value !== null &&
+        accountGameSettingsEqual(previousValue, validated[key] ?? null)
+      )
+        return;
+      if (JSON.stringify(validated) === JSON.stringify(profile)) return;
       profile = validated;
+      changeVersion++;
+      options.onChange?.(key, key === null ? null : (validated[key] ?? null), previousValue);
+      if (options.paused) return;
       pending = validated;
       if (options.journalKey) storage.setItem(options.journalKey, JSON.stringify(pending));
       retries = 0;
@@ -158,7 +188,7 @@ export function startAccountSettingsSync(options: AccountSettingsSyncOptions): {
 
   function flush(keepalive = false): Promise<void> {
     clearTimer();
-    if (stopped) return Promise.resolve();
+    if (stopped || options.paused) return Promise.resolve();
     // Every caller shares the entire drain, with no extra per-change waiters.
     // Unload cannot safely race an older request; the durable journal covers reload.
     if (active) return active;
@@ -167,6 +197,7 @@ export function startAccountSettingsSync(options: AccountSettingsSyncOptions): {
       .then(async () => {
         while (!stopped && pending) {
           const entries = pending;
+          const version = changeVersion;
           pending = null;
           try {
             await save(entries, keepalive);
@@ -175,13 +206,14 @@ export function startAccountSettingsSync(options: AccountSettingsSyncOptions): {
               !stopped &&
               options.journalKey &&
               !pending &&
-              storage.getItem(options.journalKey) === JSON.stringify(entries)
+              JSON.stringify(readPendingAccountSettings(storage, options.journalKey)) ===
+                JSON.stringify(entries)
             )
               storage.removeItem(options.journalKey);
           } catch (error) {
             if (!stopped) {
               pending ??= entries;
-              report(error);
+              report(error, version);
               if (++retries <= 3) schedule(1_000 * retries);
             }
             throw error;
@@ -201,7 +233,7 @@ export function startAccountSettingsSync(options: AccountSettingsSyncOptions): {
     void flush(true);
   };
   options.eventTarget?.addEventListener('pagehide', onPageHide);
-  if (pending) schedule(options.debounceMs ?? 750);
+  if (pending && !options.paused) schedule(options.debounceMs ?? 750);
   return {
     flush,
     stop() {
