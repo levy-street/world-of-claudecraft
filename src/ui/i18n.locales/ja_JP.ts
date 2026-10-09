@@ -15295,8 +15295,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemHistory.noTransfers': 'このアイテムは一度も持ち主が変わっていません。',
   'hudChrome.plurals.itemHistoryEarlierHidden.one': 'それ以前の {count} 件の譲渡は表示されません。',
   'hudChrome.plurals.itemHistoryEarlierHidden.few': 'それ以前の {count} 件の譲渡は表示されません。',
-  'hudChrome.plurals.itemHistoryEarlierHidden.many': 'それ以前の {count} 件の譲渡は表示されません。',
-  'hudChrome.plurals.itemHistoryEarlierHidden.other': 'それ以前の {count} 件の譲渡は表示されません。',
+  'hudChrome.plurals.itemHistoryEarlierHidden.many':
+    'それ以前の {count} 件の譲渡は表示されません。',
+  'hudChrome.plurals.itemHistoryEarlierHidden.other':
+    'それ以前の {count} 件の譲渡は表示されません。',
   'hudChrome.itemHistory.close': '閉じる',
   'devCommand.actions.kit.description':
     '指定したスペック向けのSanctum以前レベル20プリセットを装備します (バッグを先に)。装備品のみです。',
