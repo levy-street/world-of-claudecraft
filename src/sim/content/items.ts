@@ -381,7 +381,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     mount: 'valorsteed',
     quality: 'common',
     noDiscard: true,
-    sellValue: 25_000,
+    sellValue: 100_000, // Full refund for duplicate purchases before account-wide cosmetics.
     buyValue: 100_000, // 10 gold in copper
   },
   // Collectible mount (Morthen the Gravecaller, The Hollow Crypt). Owning the

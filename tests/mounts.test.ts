@@ -176,7 +176,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
         expect(item.noVendorSell).toBe(key !== 'valorsteed' ? true : undefined);
       }
       expect(item.noDiscard).toBe(true);
-      expect(item.sellValue).toBe(key === 'valorsteed' ? 25_000 : 0);
+      expect(item.sellValue).toBe(key === 'valorsteed' ? 100_000 : 0);
       // The item's name color matches the card's rarity tier.
       expect(item.quality).toBe(MOUNTS[key].rarity);
     }
@@ -765,7 +765,7 @@ describe('mount reins transfer (not soulbound: the collection trades hands)', ()
     );
   });
 
-  it('selling horse reins pays 2.5 gold and removes the cosmetic', () => {
+  it('selling horse reins refunds 10 gold and removes the cosmetic', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Seller');
     const marla = [...sim.entities.values()].find((e) => e.templateId === 'stablemaster_marla')!;
@@ -778,7 +778,7 @@ describe('mount reins transfer (not soulbound: the collection trades hands)', ()
     const before = sim.players.get(pid)!.copper;
     sellItem(sim.ctx, 'reins_valorsteed', 1, pid);
     expect(sim.countItem('reins_valorsteed', pid)).toBe(0);
-    expect(sim.players.get(pid)!.copper).toBe(before + 25_000);
+    expect(sim.players.get(pid)!.copper).toBe(before + 100_000);
     revalidateWindow(sim, pid);
     expect(player.mountSkinId).toBeNull();
   });
