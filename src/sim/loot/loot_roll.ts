@@ -25,6 +25,10 @@
 //  - producer (rollLoot): per template.loot entry, in array order -- exactly ONE
 //    ctx.rng.next() per rollGroup (partitioned across the group), then for non-group
 //    entries ctx.rng.chance(entry.chance) and, if entry.copper, ctx.rng.int(...).
+//    The class-lock gate (class_locked_drop.ts) reweights a group or drops a won row
+//    AFTER its draw, so the eligible classes never change THIS phase's draws. A
+//    withheld gear copy does skip its later quality draws (none today: the only
+//    locked drops are the non-equipment Crucible sigils).
 //    A `normalOnly` entry draws NOTHING on a heroic claim (loot_difficulty_gate.ts):
 //    the normal trace is unchanged, the heroic trace simply omits those draws.
 //  - quality: one tier draw per eligible copy, then enhanced allocation draws.
@@ -60,6 +64,7 @@ import type {
 } from '../types';
 import { cloneItemInstancePayload, dist2d, PARTY_XP_RANGE } from '../types';
 import { grantAwardedLootItem, grantOrHoldAwardedLoot } from './awarded_loot_hold';
+import { lootItemUsableByClasses, usableRollGroup } from './class_locked_drop';
 import { rollEnemyLootQuality } from './enemy_quality';
 import { heroicLootItemId } from './heroic_item';
 import { lootEntryRollsOnClaim } from './loot_difficulty_gate';
@@ -200,7 +205,7 @@ function effectiveItemLootStrategy(ctx: SimContext, itemId: string, mob: Entity)
 // legitimately produce nothing.
 export function pickRollGroupWinner(
   roll: number,
-  group: LootEntry[],
+  group: readonly LootEntry[],
   awardedItemIds: Set<string>,
 ): LootEntry | null {
   let cumulative = 0;
@@ -272,6 +277,13 @@ export function rollLoot(
   // Swap a base drop for its Heroic variant when the instance is heroic AND the
   // swap is an upgrade (raid epics, already item level 29, are left as-is).
   const heroicItem = (id: string): string => heroicLootItemId(id, heroicClaim);
+  // Class-lock gate (loot/class_locked_drop.ts): a soulbound, class-restricted
+  // drop only rolls when some loot-eligible class can use it. Draws NO rng, so
+  // the party's class mix never changes the table draws below. Read from
+  // `eligible` alone: it is the need/greed candidate list, and the tapper can
+  // sit outside it (out of range), so their class must not unlock a drop.
+  const eligibleClasses = new Set((eligible.length > 0 ? eligible : [meta]).map((m) => m.cls));
+  const usable = (id: string): boolean => lootItemUsableByClasses(id, eligibleClasses);
   for (const entry of template.loot) {
     // A Normal-only row is not part of a heroic kill at all: skipped BEFORE the
     // group bookkeeping, so a normalOnly group never draws its partition and the
@@ -283,7 +295,10 @@ export function rollLoot(
     if (entry.rollGroup) {
       if (rolledGroups.has(entry.rollGroup)) continue;
       rolledGroups.add(entry.rollGroup);
-      const group = template.loot.filter((l) => l.rollGroup === entry.rollGroup);
+      const group = usableRollGroup(
+        template.loot.filter((l) => l.rollGroup === entry.rollGroup),
+        (id) => usable(heroicItem(id)),
+      );
       const roll = ctx.rng.next();
       const winner = pickRollGroupWinner(roll, group, awardedItemIds);
       if (winner?.itemId) {
@@ -335,7 +350,8 @@ export function rollLoot(
         heroicClaim && entry.heroicCopper !== undefined ? entry.heroicCopper : entry.copper;
       copper += ctx.rng.int(Math.ceil(moneyBase * 0.6), Math.ceil(moneyBase * 1.4));
     }
-    if (entry.itemId) items.push({ itemId: heroicItem(entry.itemId), count: 1 });
+    if (entry.itemId && usable(heroicItem(entry.itemId)))
+      items.push({ itemId: heroicItem(entry.itemId), count: 1 });
   }
   // Heroic-only drops: when the mob's claimed instance is heroic and it has a
   // heroic drop table (the final bosses), roll those entries into the SAME
@@ -350,7 +366,10 @@ export function rollLoot(
         if (entry.rollGroup) {
           if (rolledGroups.has(entry.rollGroup)) continue;
           rolledGroups.add(entry.rollGroup);
-          const group = heroicEntries.filter((l) => l.rollGroup === entry.rollGroup);
+          const group = usableRollGroup(
+            heroicEntries.filter((l) => l.rollGroup === entry.rollGroup),
+            usable,
+          );
           const roll = ctx.rng.next();
           const winner = pickRollGroupWinner(roll, group, awardedItemIds);
           if (winner?.itemId) {
@@ -360,7 +379,7 @@ export function rollLoot(
           continue;
         }
         if (!ctx.rng.chance(entry.chance)) continue;
-        if (entry.itemId) items.push({ itemId: entry.itemId, count: 1 });
+        if (entry.itemId && usable(entry.itemId)) items.push({ itemId: entry.itemId, count: 1 });
       }
     }
   }

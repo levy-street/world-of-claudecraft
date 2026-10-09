@@ -29,9 +29,12 @@
 // universal mark, a sigil is class-locked, and the loot path does not gate
 // need/greed or FFA pickup on class, so a wrong-class looter must be able
 // to destroy the token or it wedges a bag slot forever (soulbound blocks
-// trade, mail, market, and sale). One sigil buys any one matching-slot set
-// piece for the holder's class at the Crucible Quartermaster
-// (CRUCIBLE_VENDOR_STOCK).
+// trade, mail, market, and sale). The roller does keep a sigil family off
+// the table when no loot-eligible class can redeem it
+// (loot/class_locked_drop.ts), so a dead sigil only reaches a wrong-class
+// looter when someone else in the raid could have used it. One sigil buys
+// any one matching-slot set piece for the holder's class at the Crucible
+// Quartermaster (CRUCIBLE_VENDOR_STOCK).
 //
 // Binding policy (PRs #3788 and #3789): the 15 sigils and the 145 sigil-redeemed
 // tier set pieces are soulbound, matching the tokens that buy them; the 41
