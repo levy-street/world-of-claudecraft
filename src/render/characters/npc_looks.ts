@@ -34,14 +34,15 @@
 //   never changes, so props are authored attaches, never weapon swaps.
 //
 // The quest escortees wear a look too, though the sim makes them MOBS so the
-// escort driver can walk them: MOB_LOOK_IDS below names each one, and nothing
-// else that is a mob ever wears a look.
+// escort driver can walk them, and so do the Mirefen muster's soldiers (friendly
+// mobs so they can fight Balgath beside the player): MOB_LOOK_IDS below names each
+// one, and nothing else that is a mob ever wears a look.
 //
 // tests/npc_looks.test.ts pins: every NpcDef id resolves to a look, every
 // authored value is one the look's own head type offers and survives
 // normalizeAppearance unchanged (a typo'd id would silently fall back to the
 // type's default face), no two NPCs share an appearance, and the mob-kind ids
-// that wear a look are exactly the escortees.
+// that wear a look are exactly the escortees and the muster's soldiers.
 
 import type { EntityKind, PlayerClass } from '../../sim/types';
 import {
@@ -66,7 +67,10 @@ export type NpcPropSet =
   | 'sword'
   | 'scythe'
   | 'knife'
-  | 'spear';
+  | 'spear'
+  | 'spear_shield'
+  | 'hammer_shield'
+  | 'mallet';
 
 export const NPC_PROP_SET_IDS: readonly NpcPropSet[] = [
   'none',
@@ -82,6 +86,9 @@ export const NPC_PROP_SET_IDS: readonly NpcPropSet[] = [
   'scythe',
   'knife',
   'spear',
+  'spear_shield',
+  'hammer_shield',
+  'mallet',
 ];
 
 /** The appearance fields a WOC body draws (the face builder's record). */
@@ -975,6 +982,75 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
       bodyScale: 0.98,
     },
     props: 'knife',
+  },
+  // The Mirefen muster around Balgath's crater (sim/content/mirefen_muster.ts): Fenbridge's
+  // soldiers dug in under the Foreman's eye. The commander is an NPC (he gives the
+  // muster's quests); the rest are friendly mobs, drawn through MOB_LOOK_IDS below. The
+  // muster's red rides their ember props.
+  // Muster Commander, the muster's leader: grey at the temples and steady.
+  muster_commander: {
+    cls: 'warrior',
+    app: {
+      gender: 'male',
+      ...head('swept', 'boxed', 'default', 'almond', 'aquiline', 'default'),
+      ...skin(26, 0.4, 0.5),
+      ...hair(30, 0.08, 0.62),
+      ...eyes(210, 0.3, 0.4),
+      bodyScale: 1.03,
+    },
+    props: 'sword_shield',
+  },
+  // Muster Footman: a young pikeman, spear and shield.
+  muster_footman: {
+    cls: 'warrior',
+    app: {
+      gender: 'male',
+      ...head('quiff', 'none', 'relaxed', 'almond', 'default', 'default'),
+      ...skin(28, 0.42, 0.52),
+      ...hair(30, 0.45, 0.22),
+      ...eyes(30, 0.35, 0.3),
+      bodyScale: 1.0,
+    },
+    props: 'spear_shield',
+  },
+  // Muster Sergeant: the line's old hand, sword and shield.
+  muster_sergeant: {
+    cls: 'warrior',
+    app: {
+      gender: 'male',
+      ...head('undercut', 'chinstrap', 'default', 'hooded', 'broad', 'default'),
+      ...skin(24, 0.45, 0.42),
+      ...hair(25, 0.25, 0.15),
+      ...eyes(200, 0.25, 0.35),
+      bodyScale: 1.04,
+    },
+    props: 'sword_shield',
+  },
+  // Muster Chaplain: the muster's paladin, hammer and shield.
+  muster_chaplain: {
+    cls: 'paladin',
+    app: {
+      gender: 'female',
+      ...head('crown', 'none', 'soft_arch', 'almond', 'soft', 'relaxed'),
+      ...skin(30, 0.35, 0.6),
+      ...hair(40, 0.55, 0.5),
+      ...eyes(120, 0.3, 0.35),
+      bodyScale: 0.99,
+    },
+    props: 'hammer_shield',
+  },
+  // Muster Drillmaster: bald, moustached and loud, his mallet for the Straw Foreman.
+  muster_drillmaster: {
+    cls: 'warrior',
+    app: {
+      gender: 'male',
+      ...head('bald', 'handlebar', 'relaxed', 'hooded', 'broad', 'default'),
+      ...skin(22, 0.5, 0.45),
+      ...hair(20, 0.35, 0.3),
+      ...eyes(25, 0.3, 0.25),
+      bodyScale: 1.05,
+    },
+    props: 'mallet',
   },
   // Provisioner Hale, Provisioner.
   provisioner_hale: {
@@ -2647,6 +2723,9 @@ export const NPC_OWN_BODY_IDS: ReadonlySet<string> = new Set(['cantor_laverock']
 function baseId(templateId: string): string {
   if (templateId === 'scout_maren_highwatch') return 'scout_maren';
   if (templateId === 'brother_halven_marsh') return 'brother_halven';
+  // The Muster Standard's soldiers (combat/balgath_trinkets.ts) are the camp's own.
+  if (templateId === 'guardian_muster_standard_spear') return 'muster_footman';
+  if (templateId === 'guardian_muster_standard_sword') return 'muster_sergeant';
   // Brother Aldric stands in every hub (`_fen`, `_highwatch`, `_raid`).
   if (templateId.startsWith('brother_aldric')) return 'brother_aldric';
   return templateId;
@@ -2660,12 +2739,20 @@ function baseId(templateId: string): string {
  *  row": one templateId can be an NPC and a mob at once (Sexton Marrow is the
  *  living sexton of Gibbetmere and, under the same id, an undead dungeon boss),
  *  and that mob keeps its mob body. tests/npc_looks.test.ts holds this set to
- *  the escortees the content ships. */
+ *  the escortees the content ships and the Mirefen muster's soldiers. */
 export const MOB_LOOK_IDS: ReadonlySet<string> = new Set([
   'fisher_bram',
   'apprentice_wren',
   'castaway_navigator',
   'gravedigger_mosley',
+  // The Mirefen muster's soldiers (friendly mobs: they fight Balgath), and the two the
+  // Muster Standard trinket raises from the same rows (baseId above).
+  'muster_footman',
+  'muster_sergeant',
+  'muster_chaplain',
+  'muster_drillmaster',
+  'guardian_muster_standard_spear',
+  'guardian_muster_standard_sword',
 ]);
 
 // Looks resolve once per templateId, alias ids included: the table is static, a

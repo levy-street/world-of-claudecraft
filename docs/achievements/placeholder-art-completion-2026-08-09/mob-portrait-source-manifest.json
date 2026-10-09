@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "bf9f43cc1dabf67977a96512498c2a90d164dc0656a53c8dc2847b516a185a17",
+  "rendererFingerprint": "9b439dd99e12900da2bc373385014c00d2ce9c63de11cdb80b2945ff69c1a96d",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "darwin",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6063673,
-      "sha256": "2675e6f7ee87d1986d73399c66b24f8dc16a6518acec848001d6f845e8493433",
+      "bytes": 6077940,
+      "sha256": "b0a98d9e13ef177a55dd408368b67d9fe97368604d3a79c6ab36dbb091c6ddb9",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 355,
+  "portraitCount": 358,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -1005,7 +1005,7 @@
       "output": {
         "path": "public/ui/mobs/broodsworn_thawcaller.webp",
         "bytes": 2336,
-        "sha256": "ccb9e18cacb23289a230b8e74db4d8dce0a547ea01f4a61fba5859df23441084"
+        "sha256": "e87af52f42f4e03a613bf6e60d7a9c3619eecb01ee6478d7ac1df7b68d13fc2b"
       }
     },
     {
@@ -1040,6 +1040,108 @@
         "path": "public/ui/mobs/brutok_skullsmasher.webp",
         "bytes": 2386,
         "sha256": "6620acb712b1c7288db5f8d6dae250df203bbca75abcc4b6f77d66b491cf44d0"
+      }
+    },
+    {
+      "id": "buddy_crystal_lich",
+      "family": "undead",
+      "finderEncounter": false,
+      "visualKey": "buddy_crystal_lich",
+      "renderSpec": {
+        "model": {
+          "url": "models/buddies/crystal_lich.glb",
+          "path": "public/models/buddies/crystal_lich.glb",
+          "bytes": 1086652,
+          "sha256": "3b059ea9fe433ec7d5fce385903eed788ff2ff0dbc77c76b8658c5adf19167c9"
+        },
+        "idle": "Idle",
+        "height": 0.9,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "62d798a79006a70007c8da0be74cc5a6ac011b57d96dcefbb9a10a7e67258b81",
+      "output": {
+        "path": "public/ui/mobs/buddy_crystal_lich.webp",
+        "bytes": 3242,
+        "sha256": "e7b4da74bfda399033c39c39823dc53c38b2d3eff5a97472df73d095395c8c0b"
+      }
+    },
+    {
+      "id": "buddy_forgemaw",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "buddy_forgemaw",
+      "renderSpec": {
+        "model": {
+          "url": "models/buddies/forgemaw.glb",
+          "path": "public/models/buddies/forgemaw.glb",
+          "bytes": 1766084,
+          "sha256": "e3260fb461e14bde99de7ade63cd8c5b08497722a19483cf6bf0bbf5160d6ca7"
+        },
+        "idle": "Idle",
+        "height": 0.85,
+        "yaw": 3.141592653589793,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "465e996767b89dc33af6a2d87c3773a3b8931817e92b2c0feb31fb587e4fdeda",
+      "output": {
+        "path": "public/ui/mobs/buddy_forgemaw.webp",
+        "bytes": 3700,
+        "sha256": "1d9600e8319d84f2fe1d22566b62bb1cf1e4279e10ba646067b1c1d234e0c900"
+      }
+    },
+    {
+      "id": "buddy_horse",
+      "family": "beast",
+      "finderEncounter": false,
+      "visualKey": "buddy_horse",
+      "renderSpec": {
+        "model": {
+          "url": "models/buddies/horse.glb",
+          "path": "public/models/buddies/horse.glb",
+          "bytes": 467316,
+          "sha256": "1ea4b23d96ab50168b6fdb3e942ff65b7ddc1338eb333fe7826846150951a74b"
+        },
+        "idle": "Idle",
+        "height": 0.75,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "75e2c0553ae6535d3f0cbc0b88afde542536d6fc9a0a5d98e35e60a6cbe2e0c7",
+      "output": {
+        "path": "public/ui/mobs/buddy_horse.webp",
+        "bytes": 2074,
+        "sha256": "6c520b72739a9950703ea26cb0be1ae9a3900bf8c166c4a2cbd4750230dd1ba0"
       }
     },
     {
@@ -6754,29 +6856,26 @@
       "id": "muster_chaplain",
       "family": "humanoid",
       "finderEncounter": false,
-      "visualKey": "npc_muster_chaplain",
+      "visualKey": "player_paladin_female",
       "renderSpec": {
         "model": {
-          "url": "models/chars/players/paladin.glb",
-          "path": "public/models/chars/players/paladin.glb",
-          "bytes": 448820,
-          "sha256": "6481234c2f3c95087a6fbcd81b4308986142ded6e02cf42036801355f0bdfa4c"
+          "url": "models/chars/players/woc/base_female.glb",
+          "path": "public/models/chars/players/woc/base_female.glb",
+          "bytes": 361116,
+          "sha256": "0607207379de015dcb63ca620c492566d6df85fa243ab9198c5214fa96ecaa11"
         },
         "idle": "Idle",
-        "height": 2.6,
+        "height": 2.8600000000000003,
         "yaw": null,
         "hover": null,
-        "show": [
-          "Paladin_Helmet",
-          "Paladin_Cape"
-        ],
+        "show": null,
         "attach": [
           {
             "asset": {
-              "url": "models/weapons/hammer_rare_b_ember.glb",
-              "path": "public/models/weapons/hammer_rare_b_ember.glb",
-              "bytes": 87016,
-              "sha256": "ce1b7d50068d3efe67d4198dde8d9ec61f469881a51d90922a6f55fbd304a505"
+              "url": "models/weapons/axe_1handed.glb",
+              "path": "public/models/weapons/axe_1handed.glb",
+              "bytes": 32372,
+              "sha256": "4dc41dbbdcc1b0fe604f9095fdc8fd61a61ec22dd2bcad346f496e3dc50d1852"
             },
             "bone": "handslot.r",
             "position": null,
@@ -6785,10 +6884,10 @@
           },
           {
             "asset": {
-              "url": "models/weapons/shield_badge.glb",
-              "path": "public/models/weapons/shield_badge.glb",
-              "bytes": 29948,
-              "sha256": "967e6b7548af1707f3f32d297e4937e3ea1ec97da4931fc40c57d9c9972fc8cb"
+              "url": "models/weapons/shield_square.glb",
+              "path": "public/models/weapons/shield_square.glb",
+              "bytes": 29960,
+              "sha256": "72b44c7882482f161b6aee28605ad2714d49b6b8f2e40763feae9e42eaa4c15b"
             },
             "bone": "handslot.l",
             "position": null,
@@ -6797,68 +6896,110 @@
           }
         ],
         "weaponFix": null,
-        "tintStrength": 0.25
+        "tintStrength": null,
+        "animations": [
+          {
+            "url": "models/chars/players/woc/anims_female.glb",
+            "path": "public/models/chars/players/woc/anims_female.glb",
+            "bytes": 682864,
+            "sha256": "c3fb145a09bfbbbf902097297aff9aca8ed5475aa16d9dbbf8b1819689f1e258"
+          }
+        ],
+        "armor": [
+          {
+            "url": "models/chars/players/woc/armor/female_paladin_medium.glb",
+            "path": "public/models/chars/players/woc/armor/female_paladin_medium.glb",
+            "bytes": 663108,
+            "sha256": "62ecc0cd238be90ba770ba30ca4469cc577db406f1ef4e2ef4f2c271a93d5f88"
+          }
+        ]
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#d8cdb0",
-        "strength": 0.25
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "9d729c99a3cbba2ede5b2650902c8508a448e9c3b6bcb9b7de8b72ab54e25a51",
+      "sourceFingerprint": "12bcd94b264a2b7e18079feaa82009d89011116bec787136d25e6d2bed2348be",
       "output": {
         "path": "public/ui/mobs/muster_chaplain.webp",
-        "bytes": 2208,
-        "sha256": "189fbcfccab23847d8e7e7ba1ad709a641c3622d0a931d7889a53f25a6261575"
+        "bytes": 3238,
+        "sha256": "0b8eebcec40eb331e3806e7dc854ebca22dab21c9288fdea2adec19002407dab"
       }
     },
     {
       "id": "muster_drillmaster",
       "family": "humanoid",
       "finderEncounter": false,
-      "visualKey": "npc_muster_drillmaster",
+      "visualKey": "player_warrior",
       "renderSpec": {
         "model": {
-          "url": "models/chars/players/knight.glb",
-          "path": "public/models/chars/players/knight.glb",
-          "bytes": 462916,
-          "sha256": "063f81b53c354eeb60bb7550067bf95229278576950766228e933ed703d14c72"
+          "url": "models/chars/players/woc/base_male.glb",
+          "path": "public/models/chars/players/woc/base_male.glb",
+          "bytes": 342888,
+          "sha256": "aa836571b31f2c4f6b4aa3f9162d013ae921169a471a60942c18542f75e55d77"
         },
-        "idle": "Drill_Rest",
-        "height": 2.6,
+        "idle": "Idle",
+        "height": 2.8600000000000003,
         "yaw": null,
         "hover": null,
-        "show": [
-          "Knight_Helmet"
-        ],
+        "show": null,
         "attach": [
           {
             "asset": {
-              "url": "models/weapons/muster_mallet.glb",
-              "path": "public/models/weapons/muster_mallet.glb",
-              "bytes": 15344,
-              "sha256": "9e1865d69d587893596410a4d7c9d2c04b7364fadd315f065c08dfbd5ee09433"
+              "url": "models/weapons/sword_1handed.glb",
+              "path": "public/models/weapons/sword_1handed.glb",
+              "bytes": 30608,
+              "sha256": "3105728b5d9d5636b45c28570a2a8dc7aee916899c47d141879c0e66c87edf4f"
             },
             "bone": "handslot.r",
+            "position": null,
+            "rotationY": null,
+            "gripRef": null
+          },
+          {
+            "asset": {
+              "url": "models/weapons/shield_round.glb",
+              "path": "public/models/weapons/shield_round.glb",
+              "bytes": 30432,
+              "sha256": "1f184eb71cf5f9bbbc8df984d9d049710c523daffb30d0f2955eb3a648dc86bb"
+            },
+            "bone": "handslot.l",
             "position": null,
             "rotationY": null,
             "gripRef": null
           }
         ],
         "weaponFix": null,
-        "tintStrength": 0.3
+        "tintStrength": null,
+        "animations": [
+          {
+            "url": "models/chars/players/woc/anims_male.glb",
+            "path": "public/models/chars/players/woc/anims_male.glb",
+            "bytes": 666128,
+            "sha256": "5058a87ff20deb937da00b7bccdb074385af111fa6bfaf5b4a4d9388da6904ea"
+          }
+        ],
+        "armor": [
+          {
+            "url": "models/chars/players/woc/armor/male_warrior_medium.glb",
+            "path": "public/models/chars/players/woc/armor/male_warrior_medium.glb",
+            "bytes": 787392,
+            "sha256": "63d567c6c41dcd68a234c76fcfdee257f7ee26d7ac0cc504d5cf993b1fda83eb"
+          }
+        ]
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#7f3a28",
-        "strength": 0.3
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "67de3bb62f8d1679528fb9a8d1ce06f4d809486da1aa5306d977a98dae7717cb",
+      "sourceFingerprint": "c450ebcf71d6101a4bfb911e3b63d99a939bc71f1d90220295b9c659be73eb4d",
       "output": {
         "path": "public/ui/mobs/muster_drillmaster.webp",
-        "bytes": 2210,
-        "sha256": "4fbc4ad19d8a5185d7aeee4e5e425bbbf600aadf216db001c57eed1938dc026c"
+        "bytes": 2524,
+        "sha256": "cc7d3701781958959abad5985307101619e2b66fa012f087e348c2b867f2b2f5"
       }
     },
     {
@@ -6899,28 +7040,26 @@
       "id": "muster_footman",
       "family": "humanoid",
       "finderEncounter": false,
-      "visualKey": "npc_muster_footman",
+      "visualKey": "player_warrior",
       "renderSpec": {
         "model": {
-          "url": "models/chars/players/knight.glb",
-          "path": "public/models/chars/players/knight.glb",
-          "bytes": 462916,
-          "sha256": "063f81b53c354eeb60bb7550067bf95229278576950766228e933ed703d14c72"
+          "url": "models/chars/players/woc/base_male.glb",
+          "path": "public/models/chars/players/woc/base_male.glb",
+          "bytes": 342888,
+          "sha256": "aa836571b31f2c4f6b4aa3f9162d013ae921169a471a60942c18542f75e55d77"
         },
         "idle": "Idle",
-        "height": 2.6,
+        "height": 2.8600000000000003,
         "yaw": null,
         "hover": null,
-        "show": [
-          "Knight_Helmet"
-        ],
+        "show": null,
         "attach": [
           {
             "asset": {
-              "url": "models/weapons/spear_rare_b_ember.glb",
-              "path": "public/models/weapons/spear_rare_b_ember.glb",
-              "bytes": 86516,
-              "sha256": "bb72cab8b03b3f3c9dc4f3b20ff08c61c260046c6d6508d7c1293ab9ab699011"
+              "url": "models/weapons/sword_1handed.glb",
+              "path": "public/models/weapons/sword_1handed.glb",
+              "bytes": 30608,
+              "sha256": "3105728b5d9d5636b45c28570a2a8dc7aee916899c47d141879c0e66c87edf4f"
             },
             "bone": "handslot.r",
             "position": null,
@@ -6941,41 +7080,54 @@
           }
         ],
         "weaponFix": null,
-        "tintStrength": 0.3
+        "tintStrength": null,
+        "animations": [
+          {
+            "url": "models/chars/players/woc/anims_male.glb",
+            "path": "public/models/chars/players/woc/anims_male.glb",
+            "bytes": 666128,
+            "sha256": "5058a87ff20deb937da00b7bccdb074385af111fa6bfaf5b4a4d9388da6904ea"
+          }
+        ],
+        "armor": [
+          {
+            "url": "models/chars/players/woc/armor/male_warrior_medium.glb",
+            "path": "public/models/chars/players/woc/armor/male_warrior_medium.glb",
+            "bytes": 787392,
+            "sha256": "63d567c6c41dcd68a234c76fcfdee257f7ee26d7ac0cc504d5cf993b1fda83eb"
+          }
+        ]
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#8a3b2e",
-        "strength": 0.3
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "016d1490ad15101f2c074393099bf882d1f5536a55e5eaf76200b4e1c32a9086",
+      "sourceFingerprint": "c450ebcf71d6101a4bfb911e3b63d99a939bc71f1d90220295b9c659be73eb4d",
       "output": {
         "path": "public/ui/mobs/muster_footman.webp",
-        "bytes": 2462,
-        "sha256": "023b8a6adf1fcf30fc91f8073a4733805035dc9cb66d7982d7f1f1c29a4da3a7"
+        "bytes": 2524,
+        "sha256": "cc7d3701781958959abad5985307101619e2b66fa012f087e348c2b867f2b2f5"
       }
     },
     {
       "id": "muster_sergeant",
       "family": "humanoid",
       "finderEncounter": false,
-      "visualKey": "npc_muster_sergeant",
+      "visualKey": "player_warrior",
       "renderSpec": {
         "model": {
-          "url": "models/chars/players/knight.glb",
-          "path": "public/models/chars/players/knight.glb",
-          "bytes": 462916,
-          "sha256": "063f81b53c354eeb60bb7550067bf95229278576950766228e933ed703d14c72"
+          "url": "models/chars/players/woc/base_male.glb",
+          "path": "public/models/chars/players/woc/base_male.glb",
+          "bytes": 342888,
+          "sha256": "aa836571b31f2c4f6b4aa3f9162d013ae921169a471a60942c18542f75e55d77"
         },
         "idle": "Idle",
-        "height": 2.6,
+        "height": 2.8600000000000003,
         "yaw": null,
         "hover": null,
-        "show": [
-          "Knight_Helmet",
-          "Knight_Cape"
-        ],
+        "show": null,
         "attach": [
           {
             "asset": {
@@ -6991,10 +7143,10 @@
           },
           {
             "asset": {
-              "url": "models/weapons/shield_square.glb",
-              "path": "public/models/weapons/shield_square.glb",
-              "bytes": 29960,
-              "sha256": "72b44c7882482f161b6aee28605ad2714d49b6b8f2e40763feae9e42eaa4c15b"
+              "url": "models/weapons/shield_round.glb",
+              "path": "public/models/weapons/shield_round.glb",
+              "bytes": 30432,
+              "sha256": "1f184eb71cf5f9bbbc8df984d9d049710c523daffb30d0f2955eb3a648dc86bb"
             },
             "bone": "handslot.l",
             "position": null,
@@ -7003,19 +7155,35 @@
           }
         ],
         "weaponFix": null,
-        "tintStrength": 0.3
+        "tintStrength": null,
+        "animations": [
+          {
+            "url": "models/chars/players/woc/anims_male.glb",
+            "path": "public/models/chars/players/woc/anims_male.glb",
+            "bytes": 666128,
+            "sha256": "5058a87ff20deb937da00b7bccdb074385af111fa6bfaf5b4a4d9388da6904ea"
+          }
+        ],
+        "armor": [
+          {
+            "url": "models/chars/players/woc/armor/male_warrior_medium.glb",
+            "path": "public/models/chars/players/woc/armor/male_warrior_medium.glb",
+            "bytes": 787392,
+            "sha256": "63d567c6c41dcd68a234c76fcfdee257f7ee26d7ac0cc504d5cf993b1fda83eb"
+          }
+        ]
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#7a2f25",
-        "strength": 0.3
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "c289a7d01b8196580fa71bfb32c39d7b86c40ed417b775b2ae2bb22d7565279c",
+      "sourceFingerprint": "c450ebcf71d6101a4bfb911e3b63d99a939bc71f1d90220295b9c659be73eb4d",
       "output": {
         "path": "public/ui/mobs/muster_sergeant.webp",
-        "bytes": 2098,
-        "sha256": "f11156fb5a37d916d525e254622e4ca8a58c6eb7ef921fdfe34c87bf828b004f"
+        "bytes": 2524,
+        "sha256": "cc7d3701781958959abad5985307101619e2b66fa012f087e348c2b867f2b2f5"
       }
     },
     {

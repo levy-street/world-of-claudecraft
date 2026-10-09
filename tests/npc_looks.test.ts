@@ -49,6 +49,15 @@ import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 
 const npc = (templateId: string): Entity => ({ kind: 'npc', templateId }) as unknown as Entity;
+/** The Mirefen muster's soldiers: friendly mobs on WOC bodies (npc_looks.ts MOB_LOOK_IDS). */
+const MUSTER_MOB_LOOKS = [
+  'muster_footman',
+  'muster_sergeant',
+  'muster_chaplain',
+  'muster_drillmaster',
+  'guardian_muster_standard_spear',
+  'guardian_muster_standard_sword',
+] as const;
 const roster = Object.entries(NPC_LOOKS) as [string, NpcLookDef][];
 
 const SLOT_FIELD: Record<WocHeadSlot, keyof NpcLookDef['app']> = {
@@ -99,6 +108,38 @@ describe('npc looks roster', () => {
   // draw as the townsfolk they are: each wears its roster row on the WOC body of its
   // class, exactly as an NPC does. The bodies are literals, so a row that changed class
   // or body type, or a dispatch that fell back to a stock rig, fails here.
+  it('draws the Mirefen muster soldiers on the class body their roster row names', () => {
+    const bodies: Record<string, string> = {
+      muster_footman: 'player_warrior',
+      muster_sergeant: 'player_warrior',
+      muster_chaplain: 'player_paladin_female',
+      muster_drillmaster: 'player_warrior',
+      // the Muster Standard's two soldiers wear the camp's footman and sergeant rows
+      guardian_muster_standard_spear: 'player_warrior',
+      guardian_muster_standard_sword: 'player_warrior',
+    };
+    expect(Object.keys(bodies).sort()).toEqual([...MUSTER_MOB_LOOKS].sort());
+    for (const id of MUSTER_MOB_LOOKS) {
+      const look = npcLookFor(id, 'mob');
+      expect(look, id).not.toBeNull();
+      const key = visualKeyFor({ kind: 'mob', templateId: id, family: 'humanoid' } as never);
+      expect(key, id).toBe(bodies[id]);
+      expect(VISUALS[key].wocCharacter?.fit, id).toBe(look?.app.gender);
+    }
+    expect(npcLookFor('guardian_muster_standard_spear', 'mob')).toBe(
+      npcLookFor('muster_footman', 'mob'),
+    );
+    expect(npcLookFor('guardian_muster_standard_sword', 'mob')).toBe(
+      npcLookFor('muster_sergeant', 'mob'),
+    );
+    expect(npcLookFor('muster_footman', 'mob')?.props).toBe('spear_shield');
+    expect(npcLookFor('muster_sergeant', 'mob')?.props).toBe('sword_shield');
+    expect(npcLookFor('muster_chaplain', 'mob')?.props).toBe('hammer_shield');
+    expect(npcLookFor('muster_drillmaster', 'mob')?.props).toBe('mallet');
+    // the Straw Foreman stays a straw dummy
+    expect(npcLookFor('muster_effigy', 'mob')).toBeNull();
+  });
+
   it('draws the mob-kind escortees on the class body their roster row names', () => {
     // every quest escortee (a world-quest caravan is a wagon, not a person)
     const escortees = Object.values(ESCORTS)
@@ -111,8 +152,9 @@ describe('npc looks roster', () => {
       'fisher_bram',
       'gravedigger_mosley',
     ]);
-    // the mob ids that wear a look are exactly those: none missed, none extra
-    expect([...MOB_LOOK_IDS].sort()).toEqual(escortees);
+    // the mob ids that wear a look are exactly those and the Mirefen muster's soldiers
+    // (pinned in the next case): none missed, none extra
+    expect([...MOB_LOOK_IDS].sort()).toEqual([...escortees, ...MUSTER_MOB_LOOKS].sort());
     const bodies: Record<string, string> = {
       apprentice_wren: 'player_mage_female',
       castaway_navigator: 'player_rogue',
@@ -288,6 +330,8 @@ describe('npc looks roster', () => {
 
   it('every NPC rides the WOC body of its class and body type', () => {
     for (const id of [...Object.keys(NPCS), ...Object.keys(NPC_LOOKS)]) {
+      // the own-body NPCs (Laverock) keep their authored body: pinned in their own case
+      if (NPC_OWN_BODY_IDS.has(id)) continue;
       const look = npcLookFor(id);
       expect(look, id).not.toBeNull();
       if (!look) continue;
@@ -359,6 +403,15 @@ describe('npc held props', () => {
       scythe: [{ url: `${W}/spear_rare_a_teal.glb`, bone: 'handslot.r' }],
       knife: [{ url: `${W}/whittler_s_knife.glb`, bone: 'handslot.r' }],
       spear: [{ url: `${W}/spear_rare_b_ember.glb`, bone: 'handslot.r' }],
+      spear_shield: [
+        { url: `${W}/spear_rare_b_ember.glb`, bone: 'handslot.r' },
+        { url: `${W}/shield_rare_b_ember.glb`, bone: 'handslot.l' },
+      ],
+      hammer_shield: [
+        { url: `${W}/hammer_rare_b_ember.glb`, bone: 'handslot.r' },
+        { url: `${W}/shield_rare_b_ember.glb`, bone: 'handslot.l' },
+      ],
+      mallet: [{ url: `${W}/muster_mallet.glb`, bone: 'handslot.r' }],
     });
   });
 
@@ -370,6 +423,8 @@ describe('npc held props', () => {
       'knotted_oak_stave',
       'notched_woodaxe',
       'whittler_s_knife',
+      // the Muster Drillmaster's own mallet (the muster effigy's asset set)
+      'muster_mallet',
     ]);
     for (const [propSet, attach] of Object.entries(NPC_PROP_ATTACH)) {
       for (const a of attach) {

@@ -6053,86 +6053,6 @@ export const VISUALS: Record<string, VisualDef> = {
     show: ['Knight_Helmet', 'Knight_Cape'],
     attach: [{ url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' }],
   },
-  // The Mirefen muster (src/sim/content/mirefen_muster.ts): Fenbridge's soldiers dug in
-  // around Balgath's crater. Shipped KayKit rigs and weapons only, dyed toward the muster's
-  // red by the entity tint. CombatIdle is `Block`, the shield raise both rigs ship, held
-  // on its raised last frame (combatIdleHold) rather than looped: the guard they raise
-  // once and hold while he is on them (the sim points their aggroTargetId at him).
-  npc_muster_footman: {
-    url: `${PLAYERS}/knight.glb`,
-    animUrls: [`${PLAYERS}/knight_hit_variety_anims.glb`],
-    height: HUMANOID_H,
-    clips: { ...kaykit(['1H_Melee_Attack_Chop']), combatIdle: 'Block', combatIdleHold: true },
-    show: ['Knight_Helmet'],
-    attach: [
-      // spear_a left with the character pack; the pack's NPC spear (NPC_PROP_ATTACH.spear).
-      { url: `${WEAPONS}/spear_rare_b_ember.glb`, bone: 'handslot.r' },
-      { url: `${WEAPONS}/shield_round.glb`, bone: 'handslot.l' },
-    ],
-    tint: 'entity',
-    tintStrength: 0.3,
-  },
-  npc_muster_sergeant: {
-    url: `${PLAYERS}/knight.glb`,
-    animUrls: [`${PLAYERS}/knight_hit_variety_anims.glb`],
-    height: HUMANOID_H,
-    clips: { ...kaykit(['1H_Melee_Attack_Chop']), combatIdle: 'Block', combatIdleHold: true },
-    show: ['Knight_Helmet', 'Knight_Cape'],
-    attach: [
-      { url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' },
-      { url: `${WEAPONS}/shield_square.glb`, bone: 'handslot.l' },
-    ],
-    tint: 'entity',
-    tintStrength: 0.3,
-  },
-  npc_muster_chaplain: {
-    url: `${PLAYERS}/paladin.glb`,
-    animUrls: [`${PLAYERS}/paladin_hit_variety_anims.glb`],
-    height: HUMANOID_H,
-    clips: { ...kaykit(['1H_Melee_Attack_Chop']), combatIdle: 'Block', combatIdleHold: true },
-    show: ['Paladin_Helmet', 'Paladin_Cape'],
-    attach: [
-      // hammer_a left with the character pack; the pack's NPC hammer (NPC_PROP_ATTACH.hammer).
-      { url: `${WEAPONS}/hammer_rare_b_ember.glb`, bone: 'handslot.r' },
-      { url: `${WEAPONS}/shield_badge.glb`, bone: 'handslot.l' },
-    ],
-    tint: 'entity',
-    tintStrength: 0.25,
-  },
-  // The drill yard's mallet man (content/mirefen_muster.ts muster_drillmaster): the footman's
-  // knight with the camp's big stake mallet instead of spear and shield. Between blows he
-  // leans on the planted mallet (Drill_Rest); while someone is braced on the lane his sim
-  // cue, a mob windup (muster_drill.ts), plays Drill_Pound at its authored speed, so the
-  // head meets the ground on the sim's strike frame (scripts/build_drillmaster_anims.mjs).
-  npc_muster_drillmaster: {
-    url: `${PLAYERS}/knight.glb`,
-    animUrls: [`${PLAYERS}/knight_hit_variety_anims.glb`, `${PLAYERS}/drillmaster_anims.glb`],
-    height: HUMANOID_H,
-    clips: {
-      ...kaykit(['2H_Melee_Attack_Chop'], 'Drill_Rest'),
-      attackByAbility: { muster_mallet_pound: 'Drill_Pound' },
-      attackTimeScaleByAbility: { muster_mallet_pound: 1 },
-      combatIdle: 'Block',
-      combatIdleHold: true,
-    },
-    show: ['Knight_Helmet'],
-    attach: [{ url: `${WEAPONS}/muster_mallet.glb`, bone: 'handslot.r' }],
-    tint: 'entity',
-    tintStrength: 0.3,
-  },
-  npc_muster_captain: {
-    url: `${PLAYERS}/knight.glb`,
-    animUrls: [`${PLAYERS}/knight_hit_variety_anims.glb`],
-    height: HUMANOID_H,
-    clips: { ...kaykit(['1H_Melee_Attack_Chop']), combatIdle: 'Block', combatIdleHold: true },
-    show: ['Knight_Cape'],
-    attach: [
-      { url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' },
-      { url: `${WEAPONS}/shield_badge.glb`, bone: 'handslot.l' },
-    ],
-    tint: 'entity',
-    tintStrength: 0.35,
-  },
   npc_mage: {
     url: `${PLAYERS}/mage.glb`,
     animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
@@ -7703,6 +7623,17 @@ export const NPC_PROP_ATTACH: Readonly<Record<NpcPropSet, readonly AttachDef[]>>
   scythe: [{ url: `${WEAPONS}/spear_rare_a_teal.glb`, bone: 'handslot.r' }],
   knife: [{ url: `${WEAPONS}/whittler_s_knife.glb`, bone: 'handslot.r' }],
   spear: [{ url: `${WEAPONS}/spear_rare_b_ember.glb`, bone: 'handslot.r' }],
+  // The Mirefen muster's arms, on the ember finish of its red: the footman's spear and the
+  // chaplain's hammer each with the ember shield, and the drillmaster's own mallet.
+  spear_shield: [
+    { url: `${WEAPONS}/spear_rare_b_ember.glb`, bone: 'handslot.r' },
+    { url: `${WEAPONS}/shield_rare_b_ember.glb`, bone: 'handslot.l' },
+  ],
+  hammer_shield: [
+    { url: `${WEAPONS}/hammer_rare_b_ember.glb`, bone: 'handslot.r' },
+    { url: `${WEAPONS}/shield_rare_b_ember.glb`, bone: 'handslot.l' },
+  ],
+  mallet: [{ url: `${WEAPONS}/muster_mallet.glb`, bone: 'handslot.r' }],
 };
 
 // One layout object per prop set, minted once: a stable identity for every
@@ -7811,10 +7742,6 @@ const MOB_KEYS: Record<string, string> = {
   guardian_stampede_0: 'greyjaw',
   guardian_stampede_1: 'mob_boar',
   guardian_stampede_2: 'mob_raptor',
-  // The Muster Standard's soldiers (combat/balgath_trinkets.ts), dressed exactly like the
-  // camp's: the footman's spear and round shield, the sergeant's sword and square shield.
-  guardian_muster_standard_spear: 'npc_muster_footman',
-  guardian_muster_standard_sword: 'npc_muster_sergeant',
   // The Fanglord's Whistle's spirit jaguar (a transient trinket guardian):
   // the jade spirit cat of wildheart_creature_looks.ts.
   guardian_fanglords_spirit_jaguar: 'wildheart_spirit_jaguar',
@@ -7960,11 +7887,8 @@ const MOB_KEYS: Record<string, string> = {
   // the "Spirit of X" adds reuse each character's crypt visual above. Without these
   // the ids fall through to FAMILY_KEYS.undead (skel_minion) and the whole court
   // renders as identical generic skeletons. See spawnNythraxisHeroicAdds.
-  // The Mirefen muster around Balgath's crater (VISUALS npc_muster_* above).
-  muster_footman: 'npc_muster_footman',
-  muster_sergeant: 'npc_muster_sergeant',
-  muster_chaplain: 'npc_muster_chaplain',
-  muster_drillmaster: 'npc_muster_drillmaster',
+  // The Mirefen muster's Straw Foreman. Its soldiers wear WOC class bodies
+  // (npc_looks.ts MOB_LOOK_IDS), so only the effigy keeps a mob visual here.
   muster_effigy: 'mob_muster_effigy',
   // The playable warrior moved to the WOC body; the vision keeps its knight look.
   vision_aldren_warrior: 'mob_vision_aldren',
@@ -8081,8 +8005,6 @@ const NPC_KEYS: Record<string, string> = {
   calligraphy_apprentice_1: 'npc_villager',
   calligraphy_apprentice_2: 'npc_villager',
   bursar_fernando: 'npc_fernando',
-  // The Mirefen muster's leader (an NPC since he gives the muster's quests).
-  muster_commander: 'npc_muster_captain',
   card_master: 'npc_villager_robed',
   marshal_redbrook: 'npc_knight',
   warden_fenwick: 'npc_knight',

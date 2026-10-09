@@ -14,11 +14,12 @@
 // Nobody is hurt, nobody is launched; only the beam feels it.
 //
 // Presentation rides the channels the fight already has: the windup is a `spellfx` windup
-// on the drillmaster (his Drill_Pound clip, scripts/build_drillmaster_anims.mjs, which
-// brings the mallet head down on the ground in front of him on the strike frame below),
-// and the landing is a `spellfxAt` nova where the head lands (the renderer's Balgath
-// ground layer kicks up a dust puff and a ground ring there, src/render/balgath_fx.ts, and
-// the HUD plays the thud). Between blows the rig's idle is Drill_Rest, the lean.
+// on the drillmaster (his class body's swing; the KayKit Drill_Pound clip,
+// scripts/build_drillmaster_anims.mjs, was retired when the muster moved onto the WOC
+// character bodies, and waits on a re-make for that rig), and the landing is a
+// `spellfxAt` nova where the head lands (the renderer's Balgath ground layer kicks up a
+// dust puff and a ground ring there, src/render/balgath_fx.ts, and the HUD plays the
+// thud). Between blows he stands in his class body's idle.
 //
 // State: the beat (next-due time, and whether a set is under way) lives on
 // MusterArmyState (Sim-owned, live view). Draws no rng: the beat is a fixed cadence on the

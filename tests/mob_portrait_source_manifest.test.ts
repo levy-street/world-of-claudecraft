@@ -106,7 +106,9 @@ describe('mob portrait source manifest', () => {
     // 276: plus the Mirefen world-boss branch's six (balgath_cyclops, muster_footman,
     // muster_chaplain, muster_sergeant, muster_drillmaster, muster_effigy).
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 354.
-    expect(liveIds).toHaveLength(354);
+    // + the account-wide buddy companions' three (buddy_crystal_lich, buddy_forgemaw,
+    // buddy_horse) merged onto the integration: 357.
+    expect(liveIds).toHaveLength(357);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);
