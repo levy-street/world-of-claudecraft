@@ -967,9 +967,20 @@ describe('client HTML shell', () => {
     expect(html).toContain('id="nav-btn-logout"');
     expect(html.indexOf('id="nav-btn-account"')).toBeLessThan(html.indexOf('id="nav-btn-logout"'));
     expect(html).toContain('data-i18n="nav.logout"');
-    expect(mainTs).toContain("const loggedInNavItems = ['#nav-item-account', '#nav-item-logout'];");
+    const loginChromeTs = readFileSync(
+      new URL('../src/ui/account_login_chrome_controller.ts', import.meta.url),
+      'utf8',
+    );
+    expect(loginChromeTs).toContain("for (const id of ['nav-item-account', 'nav-item-logout'])");
+    expect(loginChromeTs).toContain('if (item) item.hidden = !loggedIn;');
+    expect(mainTs).toContain('setAccountLoginChrome(true);');
+    expect(mainTs).toContain('setAccountLoginChrome(false);');
     expect(mainTs).toContain('function logoutAccount(): void {');
-    expect(mainTs).toContain('void api.logout().finally(finish);');
+    const logoutSource = mainTs.slice(
+      mainTs.indexOf('function logoutAccount(): void {'),
+      mainTs.indexOf('const loggedOutModel'),
+    );
+    expect(logoutSource).toContain('void logoutAccountSettings(api, () => {');
     expect(mainTs).toContain('api.clearSession();');
     expect(mainTs).toContain("setupNavBtn($('#nav-btn-logout'), '#hero-view', logoutAccount);");
   });

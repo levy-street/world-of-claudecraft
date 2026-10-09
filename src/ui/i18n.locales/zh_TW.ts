@@ -18662,4 +18662,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_balance.bonus2': '纏縛根鬚的施法時間縮短0.5秒。',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '施放纏縛根鬚後，你可以在移動中施法，並使移動速度提高20%，持續4秒。每20秒最多觸發一次。',
+  'hudChrome.accountSettingsNotice.title': '帳號設定',
+  'hudChrome.accountSettingsNotice.message':
+    '設定現已在整個帳號範圍內儲存。當您登入第一個角色時，該角色的設定將套用至您帳號下的所有角色。',
+  'hudChrome.accountSettingsNotice.understand': '我已了解',
+  'hudChrome.accountSettingsNotice.continue': '繼續',
+  'hudChrome.accountSettingsNotice.saving': '正在儲存確認...',
+  'hudChrome.accountSettingsNotice.failed': '無法儲存您的確認。請再試一次。',
 };

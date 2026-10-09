@@ -19978,4 +19978,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Время применения Хватких корней сокращается на 0,5 сек.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'После применения Хватких корней вы можете произносить заклинания на ходу, а ваша скорость передвижения повышается на 20% на 4 сек. Срабатывает не чаще одного раза в 20 сек.',
+  'hudChrome.accountSettingsNotice.title': 'Настройки учётной записи',
+  'hudChrome.accountSettingsNotice.message':
+    'Теперь настройки сохраняются для всей учётной записи. При первом входе в игру настройки выбранного персонажа будут применены ко всем персонажам вашей учётной записи.',
+  'hudChrome.accountSettingsNotice.understand': 'Я понимаю',
+  'hudChrome.accountSettingsNotice.continue': 'Продолжить',
+  'hudChrome.accountSettingsNotice.saving': 'Сохранение подтверждения...',
+  'hudChrome.accountSettingsNotice.failed':
+    'Не удалось сохранить подтверждение. Попробуйте ещё раз.',
 };

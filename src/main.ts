@@ -1,5 +1,13 @@
+import {
+  enterAccountRealmFlow,
+  flushAccountSettings,
+  logoutAccountSettings,
+  prepareAccountSettings,
+  setAccountSettingsSaveErrorReporter,
+} from './account_settings_wiring';
 import { applyFrameGeometrySetting } from './game/frame_geometry_settings';
 import { formatAbilityImbueDamage } from './ui/ability_imbue_text';
+import { setAccountLoginChrome } from './ui/account_login_chrome_controller';
 import { bindChatComposerFocusState, resetChatComposer } from './ui/chat_composer_focus_controller';
 import { dispatchCollectionAction } from './ui/collection_actions_core';
 import { createInterfaceVisibility } from './ui/interface_visibility';
@@ -1408,7 +1416,7 @@ async function startGame(
   const canvas = $('#game-canvas') as unknown as HTMLCanvasElement;
   const nameplates = $('#nameplates') as HTMLDivElement;
 
-  const keybinds = new Keybinds(keybindScope);
+  const keybinds = new Keybinds(online ? '' : keybindScope);
   // The Hide Interface toggle (Alt+Z by default): body.interface-hidden.
   const interfaceVisibility = createInterfaceVisibility(document.body);
   // UI theming: apply the persisted theme's CSS variables to :root, then keep a
@@ -2029,6 +2037,7 @@ async function startGame(
     },
   });
   mobileControls.start();
+  setAccountSettingsSaveErrorReporter((error) => hud.showError(userFacingApiError(error)));
   const syncOverlayDiagnostics = (): void => {
     syncCharacterOpenDiagnostics();
     syncQuestDialogOpenDiagnostics();
@@ -2901,10 +2910,13 @@ async function startGame(
     logout: () => {
       // Signal the server to leave immediately, skipping the linkdead grace, so
       // the character is not held in-world after a deliberate logout.
-      online?.sendLogout();
-      // A deliberate logout is not a resumable drop: forget the active session.
-      clearPlayMarker();
-      location.reload();
+      void flushAccountSettings()
+        .then(() => {
+          online?.sendLogout();
+          clearPlayMarker();
+          location.reload();
+        })
+        .catch((err) => hud.showError(userFacingApiError(err)));
     },
     captureKey: (cb) => input.captureNextKey(cb),
     settings,
@@ -5727,35 +5739,14 @@ const LAST_REALM_KEY = 'woc_last_realm';
 // the chosen realm). We remember the last realm and jump straight to its
 // characters, with a "Change Realm" button back to this list.
 async function enterRealmFlow(): Promise<void> {
-  const dir = await api.realms();
-  $('#realm-list-user').textContent = api.username ? `${api.username}` : '';
-  const remembered = localStorage.getItem(LAST_REALM_KEY);
-  const auto = dir.realms.find((r) => r.name === remembered);
-  if (auto) {
-    selectRealm(auto);
-    return;
-  }
-  showRealmList(dir);
+  await enterAccountRealmFlow(api, { selectRealm, showRealmList });
 }
 
 // ── Home-page account portal ("Account" nav tab) ────────────────────────────
 // The nav swaps Login/Register → Account once a session exists; the portal page
 // is a thin consumer of the pure account_portal.ts model + the REST Api.
-function loginNavItem(): HTMLElement | null {
-  return ($('#nav-btn-login') as HTMLElement).closest('.nav-item') as HTMLElement | null;
-}
-
-const loggedInNavItems = ['#nav-item-account', '#nav-item-logout'];
-
 function enterLoggedInChrome(): void {
-  // Entries that lack the homepage account/logout nav tabs (e.g. the focused
-  // play.html entry) won't have these <li>s; toggling them is a no-op there.
-  loggedInNavItems.forEach((sel) => {
-    const li = document.querySelector<HTMLElement>(sel);
-    if (li) li.hidden = false;
-  });
-  const li = loginNavItem();
-  if (li) li.hidden = true;
+  setAccountLoginChrome(true);
   // Becoming logged-in (fresh login OR restored session): pull Discord status so
   // the unlinked CTA banner can appear immediately, not only after opening the panel.
   void refreshDiscordStatus();
@@ -5764,28 +5755,15 @@ function enterLoggedInChrome(): void {
 function enterLoggedOutChrome(): void {
   // Leaving the logged-in state hides the Discord CTA + panel.
   setDiscordUiEnabled(false);
-  document.getElementById('discord-cta-banner')?.setAttribute('hidden', '');
-  const dw = document.getElementById('discord-window');
-  if (dw) dw.hidden = true;
-  loggedInNavItems.forEach((sel) => {
-    const li = document.querySelector<HTMLElement>(sel);
-    if (li) li.hidden = true;
-  });
-  const li = loginNavItem();
-  if (li) li.hidden = false;
+  setAccountLoginChrome(false);
 }
 
 function logoutAccount(): void {
-  const finish = () => {
+  void logoutAccountSettings(api, () => {
     api.clearSession();
     clearPlayMarker();
     location.reload();
-  };
-  if (!api.token) {
-    finish();
-    return;
-  }
-  void api.logout().finally(finish);
+  });
 }
 
 const loggedOutModel = () =>
@@ -6711,6 +6689,7 @@ function syncCharselectEnterButton(): void {
 
 async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Promise<void> {
   stopShaderWarmup();
+  if (hasBegunWorldEntry) return;
   try {
     if (button) {
       button.disabled = true;
@@ -6720,6 +6699,9 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
     audio.init();
     music.init();
     sfx.init();
+  } catch (err) {
+    $('#charselect-error').textContent = userFacingApiError(err);
+    return;
   } finally {
     if (!hasBegunWorldEntry && button) {
       button.disabled = false;
@@ -6755,7 +6737,15 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
     started = true;
     entryWatch.cancel();
     loadPhaseEnd('realm-connect');
-    void startGame(world, null, world, `char:${c.id}`, true);
+    void prepareAccountSettings(api, c.id)
+      .then(() => {
+        translatePage();
+        return startGame(world, null, world, `char:${c.id}`, true);
+      })
+      .catch((err) => {
+        world.close();
+        fatalOverlay(userFacingApiError(err));
+      });
   };
   enterLoadingState(t('loading.connectingRealm'));
 

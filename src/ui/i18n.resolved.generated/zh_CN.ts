@@ -347,6 +347,14 @@ export const zh_CN: EnTranslations = {
     }
   },
   "hudChrome": {
+    "accountSettingsNotice": {
+      "title": "账号设置",
+      "message": "设置现已在整个账号范围内保存。当您登录第一个角色时，该角色的设置将应用于您账号下的所有角色。",
+      "understand": "我已了解",
+      "continue": "继续",
+      "saving": "正在保存确认...",
+      "failed": "无法保存您的确认。请重试。"
+    },
     "framePresets": {
       "apply": "应用",
       "pickerLabel": "框架预设：{name}",

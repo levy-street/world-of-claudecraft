@@ -347,6 +347,14 @@ export const ja_JP: EnTranslations = {
     }
   },
   "hudChrome": {
+    "accountSettingsNotice": {
+      "title": "アカウント設定",
+      "message": "設定はアカウント全体で保存されるようになりました。最初にログインしたキャラクターの設定が、アカウント内のすべてのキャラクターに適用されます。",
+      "understand": "理解しました",
+      "continue": "続行",
+      "saving": "確認を保存しています...",
+      "failed": "確認を保存できませんでした。もう一度お試しください。"
+    },
     "framePresets": {
       "apply": "適用",
       "pickerLabel": "フレームプリセット：{name}",

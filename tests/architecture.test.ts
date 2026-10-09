@@ -734,6 +734,7 @@ const UI_PURE_CORES = [
   'src/ui/host_diag_view.ts',
   'src/ui/dpad_nav_core.ts',
   'src/game/graphics_rebuild_core.ts',
+  'src/game/account_settings_device_core.ts',
   'src/game/hoard_mechanic_audio_core.ts',
   'src/game/presentation_gate.ts',
   'src/game/stale_chrome_focus.ts',
@@ -2851,6 +2852,8 @@ const UI_DOM_MODULES = [
   'src/ui/hud/professions/profession_tutorial_window.ts',
   'src/ui/preview_stand_in.ts',
   'src/ui/prompt_dialog.ts',
+  'src/ui/account_settings_notice_controller.ts',
+  'src/ui/account_login_chrome_controller.ts',
   // The report window body moved whole out of hud.ts (the Phase 9b headroom
   // extraction); it paints #report-window and owns its listeners. Renamed to
   // the _window suffix by the 9b QA so the cold-painter sweep in

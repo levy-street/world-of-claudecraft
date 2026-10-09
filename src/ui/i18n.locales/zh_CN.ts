@@ -18644,4 +18644,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_balance.bonus2': '缠缚根须的施法时间缩短0.5秒。',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '施放缠缚根须后，你可以在移动中施法，并使移动速度提高20%，持续4秒。每20秒最多触发一次。',
+  'hudChrome.accountSettingsNotice.title': '账号设置',
+  'hudChrome.accountSettingsNotice.message':
+    '设置现已在整个账号范围内保存。当您登录第一个角色时，该角色的设置将应用于您账号下的所有角色。',
+  'hudChrome.accountSettingsNotice.understand': '我已了解',
+  'hudChrome.accountSettingsNotice.continue': '继续',
+  'hudChrome.accountSettingsNotice.saving': '正在保存确认...',
+  'hudChrome.accountSettingsNotice.failed': '无法保存您的确认。请重试。',
 };

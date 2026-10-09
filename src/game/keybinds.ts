@@ -4,8 +4,8 @@
 // action (primary + secondary, e.g. W and ArrowUp both Move Forward). Input
 // dispatches edge actions and polls held (movement) actions through this map;
 // the HUD renders the rebind menu and action-bar keycaps from it. Bindings
-// persist per character in localStorage (a fresh character seeds once from the
-// legacy account-wide blob; see KEY_PREFIX below). Pure (no DOM) so the
+// persist account-wide per device family online; offline profiles retain their
+// character scope (see KEY_PREFIX below). Pure (no DOM) so the
 // conflict/persistence logic is unit-testable.
 //
 // Escape is deliberately NOT a bindable action: it always opens/closes the
@@ -520,12 +520,12 @@ export const BIND_ACTIONS: BindAction[] = [
 
 const ACTION_BY_ID = new Map(BIND_ACTIONS.map((a) => [a.id, a]));
 export const BIND_CATEGORIES = [...new Set(BIND_ACTIONS.map((a) => a.category))];
-// Bindings persist per character. The legacy account-wide blob lives under the
-// bare prefix; a per-character profile lives under `${KEY_PREFIX}:${scope}` (the
-// online characterId, or `offline:<class>:<name>` offline). A fresh character
-// with no stored profile seeds from the legacy blob once, then diverges on its
-// first rebind. The legacy blob is read-only here and never overwritten.
+// Online account profiles use the bare key. Scoped offline profiles retain
+// their legacy seed, while old online character keys seed the first migration.
 const KEY_PREFIX = 'woc_keybinds';
+export function keybindsStorageKey(scope = ''): string {
+  return scope ? `${KEY_PREFIX}:${scope}` : KEY_PREFIX;
+}
 const SLOTS_PER_ACTION = 2; // primary + secondary
 // Marks a stored profile as already having run repairStoredBindings() at least
 // once, so the signature match in keybinds_repair.ts is genuinely one-time
@@ -778,7 +778,7 @@ export class Keybinds {
   private readonly storeKey: string;
 
   constructor(scope = '') {
-    this.storeKey = scope ? `${KEY_PREFIX}:${scope}` : KEY_PREFIX;
+    this.storeKey = keybindsStorageKey(scope);
     this.load();
   }
 

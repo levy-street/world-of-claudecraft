@@ -19600,4 +19600,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '옭아매는 뿌리의 시전 시간이 0.5초 감소합니다.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '옭아매는 뿌리를 시전하면 이동 중에도 시전할 수 있고 이동 속도가 4초 동안 20% 증가합니다. 20초에 한 번만 발동합니다.',
+  'hudChrome.accountSettingsNotice.title': '계정 설정',
+  'hudChrome.accountSettingsNotice.message':
+    '이제 설정이 계정 전체에 저장됩니다. 처음 로그인하는 캐릭터의 설정이 계정 내 모든 캐릭터에 적용됩니다.',
+  'hudChrome.accountSettingsNotice.understand': '이해했습니다',
+  'hudChrome.accountSettingsNotice.continue': '계속',
+  'hudChrome.accountSettingsNotice.saving': '확인 내용을 저장하는 중...',
+  'hudChrome.accountSettingsNotice.failed': '확인 내용을 저장하지 못했습니다. 다시 시도해 주세요.',
 };

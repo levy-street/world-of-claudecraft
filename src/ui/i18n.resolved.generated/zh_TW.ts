@@ -347,6 +347,14 @@ export const zh_TW: EnTranslations = {
     }
   },
   "hudChrome": {
+    "accountSettingsNotice": {
+      "title": "帳號設定",
+      "message": "設定現已在整個帳號範圍內儲存。當您登入第一個角色時，該角色的設定將套用至您帳號下的所有角色。",
+      "understand": "我已了解",
+      "continue": "繼續",
+      "saving": "正在儲存確認...",
+      "failed": "無法儲存您的確認。請再試一次。"
+    },
     "framePresets": {
       "apply": "套用",
       "pickerLabel": "框架預設：{name}",

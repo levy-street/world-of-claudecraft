@@ -114,6 +114,10 @@ const REGISTRY_ONLY_PATHS = new Set<string>([
   '/api/reliquary/rarity',
   '/api/deeds/broadcasts',
   '/api/discord/queue-pings',
+  '/api/account/settings',
+  '/api/account/settings/ack',
+  '/api/account/settings/initialize',
+  '/api/account/settings/save',
   '/api/characters/:id/deeds-recent',
   '/api/characters/:id/appearance-reroll',
   '/api/steam/link',
@@ -362,6 +366,10 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     // registry-only on the deeds broadcasts shape.
     { method: 'GET', path: '/api/discord/queue-pings' },
     { method: 'POST', path: '/api/discord/queue-pings' },
+    { method: 'GET', path: '/api/account/settings' },
+    { method: 'POST', path: '/api/account/settings/ack' },
+    { method: 'POST', path: '/api/account/settings/initialize' },
+    { method: 'POST', path: '/api/account/settings/save' },
     // The reliquary rarity read (server/reliquary.ts): registry-only on the
     // same terms as the deeds family, and it shares their cache and flight.
     { method: 'GET', path: '/api/reliquary/rarity' },

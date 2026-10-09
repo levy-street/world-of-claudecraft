@@ -347,6 +347,14 @@ export const en_CA: EnTranslations = {
     }
   },
   "hudChrome": {
+    "accountSettingsNotice": {
+      "title": "Account Settings",
+      "message": "Settings are now saved account wide. When you log in to your first character that character's settings will be applied across your account.",
+      "understand": "I understand",
+      "continue": "Continue",
+      "saving": "Saving acknowledgement...",
+      "failed": "Could not save your acknowledgement. Please try again."
+    },
     "framePresets": {
       "apply": "Apply",
       "pickerLabel": "Frame Presets: {name}",
