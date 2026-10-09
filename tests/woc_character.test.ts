@@ -103,9 +103,12 @@ const clipDuration = (json: GlbJson, name: string): number => {
   return Math.max(...anim.samplers.map((s) => json.accessors[s.input].max?.[0] ?? 0));
 };
 
-/** Every WOC class def, with its manifest. */
+/** Every WOC class def, with its manifest (the player bodies: the Tideglass Reflections
+ *  are mob copies of them). */
 const WOC_DEFS = Object.entries(VISUALS).flatMap(([key, def]) =>
-  def.wocCharacter ? [[key, def.wocCharacter] as [string, WocCharacterManifest]] : [],
+  key.startsWith('player_') && def.wocCharacter
+    ? [[key, def.wocCharacter] as [string, WocCharacterManifest]]
+    : [],
 );
 
 /** The 2026-09-24 animation rig (34 joints, in skin joint order): the handoff's bone names plus

@@ -208,12 +208,12 @@ describe('a body that follows real equipment', () => {
 });
 
 describe('a body that equips nothing', () => {
-  // The Nythraxis phase-2 court: mobs drawn on the knight, the mage body and the rogue body.
+  // The Nythraxis phase-2 court: mobs drawn on the warrior, the mage and the rogue bodies.
   // A mob has no weapon slot item, ever, and the class weapon in its hand is its look.
   it('keeps the class weapon it is drawn with', async () => {
     const { assets, VISUALS, rig, held } = await loadAssets();
     for (const [key, weapon] of [
-      ['mob_vision_aldren', 'sword_1handed'],
+      ['player_warrior', 'sword_1handed'],
       ['player_mage', 'staff'],
       ['player_rogue', 'dagger'],
     ] as const) {
@@ -284,7 +284,7 @@ describe('who follows real equipment in the world', () => {
       expect(createCharacterVisual(entity('mob', id)), id).not.toBeNull();
     }
     expect(built.map((b) => [b.key, b.opts?.bareWhenUnarmed ?? false])).toEqual([
-      ['mob_vision_aldren', false],
+      ['player_warrior', false],
       ['player_mage', false],
       ['player_rogue', false],
     ]);

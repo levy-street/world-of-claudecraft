@@ -59,7 +59,10 @@ describe('the env sheen scale', () => {
   });
 
   it('is set on every WOC body (both fits) and on nothing else', () => {
-    const woc = Object.entries(VISUALS).filter(([, def]) => def.wocCharacter);
+    // the player bodies (the Tideglass Reflections are copies of them, sheen included)
+    const woc = Object.entries(VISUALS).filter(
+      ([key, def]) => key.startsWith('player_') && def.wocCharacter,
+    );
     expect(woc.length).toBe(18);
     for (const [key, def] of woc) expect(def.envSheen, key).toBe(0.25);
     for (const [key, def] of Object.entries(VISUALS)) {

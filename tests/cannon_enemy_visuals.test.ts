@@ -89,10 +89,11 @@ describe('existing animated cannon enemy models', () => {
     const pool = new CannonEnemyVisuals();
     expect(actors.made).toHaveLength(51);
     expect([...new Set(actors.made.map((a) => a.key))]).toEqual([
-      'mob_bandit',
+      'player_rogue',
+      'player_hunter',
       'player_warrior',
-      'npc_knight',
-      'mob_bruiser',
+      'player_paladin',
+      'player_shaman',
     ]);
     // a crowd in the world: the armored actors' class body draws the crowd's armor detail
     for (const actor of actors.made) expect(actor.opts).toEqual({ wocArmorDetail: 'crowd' });

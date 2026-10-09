@@ -29,6 +29,7 @@ import { DT, dist2d, type Entity, LEASH_DISTANCE } from '../types';
 import { mobCombatProfile } from './combat_profile';
 import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './healer_channel';
 import { findNearbyAllies } from './nearby_allies';
+import { emitSummonRise } from './summon_rise';
 import { emitMobYell } from './yells';
 
 export function updateBossMechanics(ctx: SimContext, mob: Entity): void {
@@ -426,6 +427,8 @@ export function spawnBossAdds(ctx: SimContext, boss: Entity, mobId: string, coun
     // respawning at the eruption point, which is wherever the fight dragged.
     add.summonedAdd = true;
     ctx.addEntity(add);
+    // a summoned dead body climbs out of the ground as it lands (summon_rise.ts)
+    emitSummonRise(ctx, add);
     boss.summonedIds.push(add.id);
     inst?.mobIds.push(add.id);
     delveRun?.mobIds.push(add.id);

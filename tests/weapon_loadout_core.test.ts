@@ -219,7 +219,9 @@ function reachableClips(clips: ClipMap): string[] {
 
 describe('the two-hand loadout on the WOC bodies (2026-09-30: no two-hand stance)', () => {
   const has = () => true;
-  const WOC_KEYS = Object.keys(VISUALS).filter((key) => VISUALS[key].wocCharacter);
+  const WOC_KEYS = Object.keys(VISUALS).filter(
+    (key) => key.startsWith('player_') && VISUALS[key].wocCharacter,
+  );
 
   it('plays the one-hand clips out of combat: a two-hander is held in one fist like a one-hand sword', () => {
     for (const key of ['player_warrior', 'player_paladin', 'player_shaman'] as const) {

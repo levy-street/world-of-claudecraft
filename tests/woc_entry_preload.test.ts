@@ -135,6 +135,21 @@ describe('the WOC entry file sets (woc_entry_core.ts)', () => {
     expect([...wocEntryFits()].sort()).toEqual(['female', 'male']);
   });
 
+  // The Tideglass Colossus's Reflections are glass copies of each class's WOC body: the
+  // same manifest and files, so they need nothing entry does not already hold, and they are
+  // no player, so entry never prepares them.
+  it('keeps the class-body Reflections out of the entry set, on files it already holds', () => {
+    const critical = new Set([...wocEntryBodyUrls(), ...wocEntryHeadCoreUrls()]);
+    for (const cls of ALL_CLASSES) {
+      const key = `temple_reflection_${cls}`;
+      const def = VISUALS[key];
+      expect(def.wocCharacter, key).toBe(VISUALS[`player_${cls}`].wocCharacter);
+      expect(def.tint, key).toBe(0x7fb2ff);
+      expect(critical.has(def.url), key).toBe(true);
+      expect(wocVisualKeys(), key).not.toContain(key);
+    }
+  });
+
   it('awaits the minimum to draw any player: each fit base, library and head core', () => {
     // named here from the file helpers, never from the list under test
     const bodies = (['male', 'female'] as const).flatMap((fit) => [

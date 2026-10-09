@@ -9,12 +9,14 @@ import { worldQuestTraceMaterials } from './world_quest_trace_materials';
 
 // Conservative simultaneous occupancy at permanent grapeshot slow, pinned
 // against the wave schedule. Living actors take priority over cosmetic corpses.
+// Every kind rides a WOC class body in its default kit, a different class per
+// role so the wave reads at a glance.
 export const CANNON_ENEMY_LOOKS = {
-  infantry: { key: 'mob_bandit', capacity: 27, scale: 1 },
-  runner: { key: 'mob_bandit', capacity: 9, scale: 0.9 },
+  infantry: { key: 'player_rogue', capacity: 27, scale: 1 },
+  runner: { key: 'player_hunter', capacity: 9, scale: 0.9 },
   armored: { key: 'player_warrior', capacity: 12, scale: 1.15 },
-  commander: { key: 'npc_knight', capacity: 1, scale: 1.5 },
-  sapper: { key: 'mob_bruiser', capacity: 2, scale: 0.95 },
+  commander: { key: 'player_paladin', capacity: 1, scale: 1.5 },
+  sapper: { key: 'player_shaman', capacity: 2, scale: 0.95 },
 } as const;
 
 export class CannonEnemyVisuals {

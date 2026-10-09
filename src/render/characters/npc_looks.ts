@@ -35,14 +35,17 @@
 //
 // The quest escortees wear a look too, though the sim makes them MOBS so the
 // escort driver can walk them, and so do the Mirefen muster's soldiers (friendly
-// mobs so they can fight Balgath beside the player): MOB_LOOK_IDS below names each
-// one, and nothing else that is a mob ever wears a look.
+// mobs so they can fight Balgath beside the player), and so does every humanoid
+// enemy (the outlaws, the cults, the knights, the drowned): MOB_LOOK_IDS below
+// names each one, and nothing else that is a mob ever wears a look. The caravan
+// drivers wear a row too, asked for by the wagon that seats them.
 //
 // tests/npc_looks.test.ts pins: every NpcDef id resolves to a look, every
 // authored value is one the look's own head type offers and survives
 // normalizeAppearance unchanged (a typo'd id would silently fall back to the
 // type's default face), no two NPCs share an appearance, and the mob-kind ids
-// that wear a look are exactly the escortees and the muster's soldiers.
+// that wear a look are exactly the escortees, the muster's soldiers and the
+// humanoid enemies.
 
 import type { EntityKind, PlayerClass } from '../../sim/types';
 import {
@@ -70,7 +73,11 @@ export type NpcPropSet =
   | 'spear'
   | 'spear_shield'
   | 'hammer_shield'
-  | 'mallet';
+  | 'mallet'
+  | 'daggers'
+  | 'axe'
+  | 'dark_staff'
+  | 'wand';
 
 export const NPC_PROP_SET_IDS: readonly NpcPropSet[] = [
   'none',
@@ -89,6 +96,10 @@ export const NPC_PROP_SET_IDS: readonly NpcPropSet[] = [
   'spear_shield',
   'hammer_shield',
   'mallet',
+  'daggers',
+  'axe',
+  'dark_staff',
+  'wand',
 ];
 
 /** The appearance fields a WOC body draws (the face builder's record). */
@@ -2706,6 +2717,397 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     },
     props: 'sword',
   },
+  // --- the humanoid enemies -----------------------------------------------------
+  // Every humanoid mob the world fights or walks beside, moved off the KayKit chibi
+  // bodies (the hooded outlaw, the robed caster, the barbarian, the knight) onto the WOC
+  // class bodies, drawn through MOB_LOOK_IDS below. The class is the kit the mob wore
+  // before where one fits (the outlaw's hood a rogue, the barbarian a warrior), and the
+  // casters split by what they cast: the shadow cults warlocks, the healers and
+  // chanters priests. The drowned and the risen keep a living face with a dead colour:
+  // a grey-green or grey-violet pallor the creator's custom wheel reaches.
+  // The Vale's outlaws (zone1.ts): Mogger's crew and the road bandits.
+  // Vale Bandit: a road thief, sharp and underfed, a stud in his brow.
+  vale_bandit: {
+    cls: 'rogue',
+    app: {
+      gender: 'male',
+      ...head('undercut', 'chin', 'slim', 'hooded', 'broad', 'smirk', 'default', 'brow'),
+      ...skin(25, 0.45, 0.5),
+      ...hair(20, 0.4, 0.18),
+      ...eyes(30, 0.35, 0.28),
+      headShape: shape({ eyeSize: -0.3, eyeTilt: -0.4, browHeight: -0.4 }),
+      bodyScale: 0.99,
+    },
+    props: 'daggers',
+  },
+  // Mogger Lackey: one of the crew's thugs, a cudgel for his Skullthump.
+  mogger_lackey: {
+    cls: 'warrior',
+    app: {
+      gender: 'male',
+      ...head('mohawk', 'none', 'rounded', 'default', 'broad', 'full', 'large', 'lobes'),
+      ...skin(22, 0.48, 0.46),
+      ...hair(15, 0.55, 0.22),
+      ...eyes(35, 0.3, 0.25),
+      headShape: shape({ eyeSpacing: 0.45, eyeSize: -0.35, chinWidth: 0.85 }),
+      bodyScale: 0.96,
+    },
+    props: 'hammer',
+  },
+  // Mogger: the crew's boss, bald and bearded, a ring through his nose.
+  mogger: {
+    cls: 'warrior',
+    app: {
+      gender: 'male',
+      ...head('bald', 'long', 'default', 'hooded', 'broad', 'full', 'large', 'septum'),
+      ...skin(20, 0.5, 0.4),
+      ...hair(18, 0.5, 0.16),
+      ...eyes(20, 0.4, 0.22),
+      headShape: shape({ eyeSpacing: -0.4, eyeSize: -0.5, browHeight: -0.7, chinWidth: 1 }),
+      bodyScale: 1.05,
+    },
+    props: 'axe',
+  },
+  // Gorrak the Ruthless: a topknot, a boxed beard and a cold squint.
+  gorrak: {
+    cls: 'warrior',
+    app: {
+      gender: 'male',
+      ...head('topknot', 'boxed', 'arched', 'almond', 'aquiline', 'smirk', 'default', 'ears'),
+      ...skin(24, 0.42, 0.36),
+      ...hair(30, 0.2, 0.08),
+      ...eyes(10, 0.5, 0.3),
+      headShape: shape({ eyeSize: -0.2, eyeTilt: -0.8, browHeight: -0.5, chinWidth: 0.9 }),
+      bodyScale: 1.04,
+    },
+    props: 'axe',
+  },
+  // The Gravecaller cult and Sister Nhalia's mourners (zone2.ts).
+  // Gravecaller Cultist: a pale young zealot with violet eyes.
+  gravecaller_cultist: {
+    cls: 'warlock',
+    app: {
+      gender: 'male',
+      ...head('shoulder', 'goatee', 'arched', 'hooded', 'aquiline', 'default'),
+      ...skin(28, 0.25, 0.62),
+      ...hair(270, 0.15, 0.12),
+      ...eyes(280, 0.45, 0.4),
+      headShape: shape({ eyeSpacing: -0.3, eyeTilt: -0.6, browHeight: 0.4 }),
+      bodyScale: 1.0,
+    },
+    props: 'dark_staff',
+  },
+  // Gravecaller Summoner: crowned in a braid, pointed ears, a stud in her brow.
+  gravecaller_summoner: {
+    cls: 'warlock',
+    app: {
+      gender: 'female',
+      ...head('crown', 'none', 'straight', 'almond', 'soft', 'thin', 'pointed', 'brow'),
+      ...skin(30, 0.22, 0.66),
+      ...hair(285, 0.35, 0.16),
+      ...eyes(290, 0.55, 0.45),
+      headShape: shape({ eyeSize: 0.3, eyeTilt: -0.7, browHeight: -0.3, chinWidth: 0.45 }),
+      bodyScale: 0.97,
+    },
+    props: 'dark_staff',
+  },
+  // Gravecaller Mender: the cult's grey-bearded healer, his book open.
+  gravecaller_mender: {
+    cls: 'priest',
+    app: {
+      gender: 'male',
+      ...head('long', 'long', 'soft_arch', 'default', 'default', 'full'),
+      ...skin(26, 0.3, 0.58),
+      ...hair(30, 0.1, 0.55),
+      ...eyes(200, 0.2, 0.45),
+      headShape: shape({ eyeSpacing: 0.35, eyeSize: -0.4, browHeight: 0.6 }),
+      bodyScale: 1.02,
+    },
+    props: 'tome',
+  },
+  // Sister Nhalia: the keening priestess, a pale braid and wide grey-blue eyes.
+  sister_nhalia: {
+    cls: 'priest',
+    app: {
+      gender: 'female',
+      ...head('braid', 'none', 'soft_arch', 'hooded', 'default', 'narrow', 'default', 'nose'),
+      ...skin(32, 0.3, 0.7),
+      ...hair(40, 0.12, 0.7),
+      ...eyes(190, 0.5, 0.55),
+      headShape: shape({
+        eyeSpacing: -0.2,
+        eyeSize: 0.4,
+        eyeTilt: 0.5,
+        browHeight: 0.5,
+        chinWidth: 0.4,
+      }),
+      bodyScale: 1.03,
+    },
+    props: 'dark_staff',
+  },
+  // Nhalia Mourner: one of her grieving faithful, eyes cast down.
+  nhalia_mourner: {
+    cls: 'priest',
+    app: {
+      gender: 'female',
+      ...head('bob', 'none', 'relaxed', 'default', 'button', 'thin', 'round'),
+      ...skin(28, 0.32, 0.6),
+      ...hair(25, 0.3, 0.25),
+      ...eyes(210, 0.2, 0.4),
+      headShape: shape({ eyeSize: -0.2, eyeTilt: 0.9, browHeight: 0.8 }),
+      bodyScale: 0.96,
+    },
+    props: 'knife',
+  },
+  // Deacon Voss: silver haired and sly, green eyes over a profane book.
+  deacon_voss: {
+    cls: 'priest',
+    app: {
+      gender: 'male',
+      ...head('swept', 'chops', 'arched', 'almond', 'aquiline', 'smirk', 'pointed', 'brow'),
+      ...skin(26, 0.28, 0.55),
+      ...hair(220, 0.05, 0.7),
+      ...eyes(140, 0.5, 0.4),
+      headShape: shape({
+        eyeSpacing: -0.5,
+        eyeSize: -0.3,
+        eyeTilt: -0.9,
+        browHeight: -0.6,
+        chinWidth: 0.75,
+      }),
+      bodyScale: 1.04,
+    },
+    props: 'tome',
+  },
+  // The Broodsworn wyrm cult (zone3.ts): ember-eyed, dragon red in the hair.
+  // Broodsworn Zealot: a knife fighter with a ring through his lip.
+  wyrmcult_zealot: {
+    cls: 'rogue',
+    app: {
+      gender: 'male',
+      ...head('mohawk', 'chinstrap', 'slim', 'almond', 'default', 'smirk', 'pointed', 'lip'),
+      ...skin(18, 0.5, 0.42),
+      ...hair(5, 0.65, 0.25),
+      ...eyes(25, 0.75, 0.4),
+      headShape: shape({ eyeSize: 0.5, eyeTilt: -0.3, browHeight: -0.2 }),
+      bodyScale: 1.01,
+    },
+    props: 'daggers',
+  },
+  // Broodsworn Necromancer: wide set eyes and a thin moustache.
+  wyrmcult_necromancer: {
+    cls: 'warlock',
+    app: {
+      gender: 'male',
+      ...head(
+        'ponytail',
+        'moustache',
+        'arched',
+        'hooded',
+        'aquiline',
+        'default',
+        'default',
+        'ears',
+      ),
+      ...skin(22, 0.3, 0.48),
+      ...hair(15, 0.3, 0.1),
+      ...eyes(15, 0.7, 0.4),
+      headShape: shape({ eyeSpacing: 0.6, eyeTilt: -0.5, chinWidth: 0.5 }),
+      bodyScale: 0.98,
+    },
+    props: 'dark_staff',
+  },
+  // Threnos the First Voice: the cult's prophet, heavy browed, every piercing he could take.
+  threnos_first_voice: {
+    cls: 'warlock',
+    app: {
+      gender: 'male',
+      ...head('braid', 'long', 'rounded', 'hooded', 'broad', 'full', 'large', 'full'),
+      ...skin(16, 0.45, 0.35),
+      ...hair(8, 0.6, 0.2),
+      ...eyes(30, 0.85, 0.5),
+      headShape: shape({ eyeSize: -0.6, eyeTilt: -1, browHeight: -0.8, chinWidth: 0.95 }),
+      bodyScale: 1.05,
+    },
+    props: 'tome',
+  },
+  // The delves (delves/mobs.ts): the Reliquary's acolytes and the Drowned Litany.
+  // Gravecall Acolyte: a fresh-faced initiate with a wand.
+  reliquary_gravecall_acolyte: {
+    cls: 'warlock',
+    app: {
+      gender: 'male',
+      ...head('quiff', 'none', 'soft_arch', 'default', 'default', 'default', 'default', 'lobes'),
+      ...skin(29, 0.35, 0.6),
+      ...hair(35, 0.4, 0.3),
+      ...eyes(100, 0.3, 0.35),
+      headShape: shape({ eyeSpacing: -0.45, eyeSize: 0.35, chinWidth: 0.5 }),
+      bodyScale: 0.95,
+    },
+    props: 'wand',
+  },
+  // Drowned Cantor: a drowned chanter, grey-green and heavy lidded.
+  drowned_cantor: {
+    cls: 'priest',
+    app: {
+      gender: 'male',
+      ...head('long', 'none', 'relaxed', 'hooded', 'default', 'full'),
+      ...skin(170, 0.12, 0.6),
+      ...hair(160, 0.1, 0.35),
+      ...eyes(175, 0.35, 0.6),
+      headShape: shape({ eyeSize: -0.5, eyeTilt: 0.8, browHeight: 0.3, chinWidth: 0.3 }),
+      bodyScale: 1.01,
+    },
+    props: 'tome',
+  },
+  // Sister Nhalia, the Drowned Canticle: Sister Nhalia's own face, drowned.
+  sister_nhalia_drowned_canticle: {
+    cls: 'priest',
+    app: {
+      gender: 'female',
+      ...head('braid', 'none', 'soft_arch', 'hooded', 'default', 'narrow', 'default', 'nose'),
+      ...skin(175, 0.14, 0.62),
+      ...hair(170, 0.12, 0.6),
+      ...eyes(180, 0.6, 0.7),
+      headShape: shape({
+        eyeSpacing: -0.2,
+        eyeSize: 0.4,
+        eyeTilt: 0.5,
+        browHeight: 0.5,
+        chinWidth: 0.4,
+      }),
+      bodyScale: 1.03,
+    },
+    props: 'dark_staff',
+  },
+  // Edda Reedhand, Fenbridge's lantern-bearer (a friendly delve companion).
+  edda_reedhand: {
+    cls: 'druid',
+    app: {
+      gender: 'female',
+      ...head('twins', 'none', 'soft', 'almond', 'button', 'rounded', 'round', 'lobes'),
+      ...skin(25, 0.45, 0.66),
+      ...hair(28, 0.6, 0.35),
+      ...eyes(110, 0.4, 0.38),
+      headShape: shape({ eyeSize: 0.3, eyeTilt: 0.3, browHeight: 0.35, chinWidth: 0.55 }),
+      bodyScale: 0.97,
+    },
+    props: 'oak_stave',
+  },
+  // Acolyte Tessa: a young acolyte, a bright ponytail and a wand.
+  acolyte_tessa: {
+    cls: 'priest',
+    app: {
+      gender: 'female',
+      ...head('ponytail', 'none', 'straight', 'default', 'soft', 'cupids_bow'),
+      ...skin(27, 0.4, 0.7),
+      ...hair(30, 0.7, 0.45),
+      ...eyes(120, 0.45, 0.4),
+      headShape: shape({ eyeSpacing: 0.3, eyeSize: 0.45, chinWidth: 0.5 }),
+      bodyScale: 0.95,
+    },
+    props: 'wand',
+  },
+  // Pact Acolyte (the rifts, rift/mobs.ts): risen, a grey-violet pallor and lilac hair.
+  rift_pact_acolyte: {
+    cls: 'warlock',
+    app: {
+      gender: 'female',
+      ...head('undercut', 'none', 'rounded', 'hooded', 'soft', 'narrow', 'pointed', 'septum'),
+      ...skin(260, 0.1, 0.55),
+      ...hair(265, 0.2, 0.75),
+      ...eyes(275, 0.8, 0.55),
+      headShape: shape({ eyeSpacing: 0.2, eyeSize: -0.3, eyeTilt: -0.5, browHeight: -0.5 }),
+      bodyScale: 1.0,
+    },
+    props: 'wand',
+  },
+  // Crow Caller (the Hollow Crypt, hollow_crypt_trash.ts): raven haired, close set eyes.
+  crypt_crow_caller: {
+    cls: 'rogue',
+    app: {
+      gender: 'male',
+      ...head('shoulder', 'chops', 'slim', 'hooded', 'aquiline', 'default', 'default', 'brow'),
+      ...skin(24, 0.3, 0.5),
+      ...hair(240, 0.1, 0.07),
+      ...eyes(45, 0.6, 0.35),
+      headShape: shape({ eyeSpacing: -0.6, eyeSize: -0.4, eyeTilt: -0.6 }),
+      bodyScale: 1.0,
+    },
+    props: 'daggers',
+  },
+  // Dawnhold Knight (Evergarden, evergarden.ts): fair haired, square jawed, gold plate.
+  hedge_knight: {
+    cls: 'paladin',
+    app: {
+      gender: 'male',
+      ...head('swept', 'none', 'default', 'almond', 'default', 'default'),
+      ...skin(30, 0.4, 0.62),
+      ...hair(42, 0.6, 0.5),
+      ...eyes(205, 0.45, 0.5),
+      headShape: shape({ eyeSpacing: 0.25, browHeight: 0.35, chinWidth: 0.85 }),
+      bodyScale: 1.02,
+    },
+    props: 'sword_shield',
+  },
+  // The Wreck Warden (Galecrest, galecrest.ts): a drowned brute, weed in his beard.
+  the_wreck_warden: {
+    cls: 'warrior',
+    app: {
+      gender: 'male',
+      ...head('long', 'long', 'relaxed', 'hooded', 'broad', 'default', 'large'),
+      ...skin(165, 0.15, 0.5),
+      ...hair(150, 0.15, 0.3),
+      ...eyes(185, 0.6, 0.65),
+      headShape: shape({ eyeSize: -0.7, eyeTilt: 0.6, browHeight: -0.6, chinWidth: 1 }),
+      bodyScale: 1.05,
+    },
+    props: 'axe',
+  },
+  // The world-quest caravans' drivers (world_quest_caravan_driver.ts): the person on the
+  // wagon's bench, drawn by the wagon, never an entity of their own, so no kind asks.
+  // Tobin, the Eastbrook freight driver: a weathered carter with a moustache.
+  eastbrook_freight_caravan_driver: {
+    cls: 'rogue',
+    app: {
+      gender: 'male',
+      ...head('waves', 'moustache', 'relaxed', 'default', 'broad', 'default'),
+      ...skin(26, 0.48, 0.56),
+      ...hair(28, 0.45, 0.3),
+      ...eyes(30, 0.35, 0.3),
+      headShape: shape({ eyeSize: 0.2, browHeight: 0.45, chinWidth: 0.7 }),
+      bodyScale: 1.0,
+    },
+    props: 'none',
+  },
+  // Mira, the Willowfen remedy driver: a herbalist's robe and dark curls.
+  willowfen_remedy_caravan_driver: {
+    cls: 'mage',
+    app: {
+      gender: 'female',
+      ...head('curls', 'none', 'soft', 'default', 'soft', 'relaxed', 'default', 'lobes'),
+      ...skin(30, 0.38, 0.6),
+      ...hair(15, 0.5, 0.3),
+      ...eyes(110, 0.45, 0.35),
+      headShape: shape({ eyeSize: 0.25, eyeTilt: 0.4, chinWidth: 0.6 }),
+      bodyScale: 0.97,
+    },
+    props: 'none',
+  },
+  // Orin, the Frostveil supply driver: a mountain hauler, fair and bearded.
+  frostveil_supply_caravan_driver: {
+    cls: 'hunter',
+    app: {
+      gender: 'male',
+      ...head('shoulder', 'long', 'default', 'almond', 'default', 'full'),
+      ...skin(25, 0.4, 0.72),
+      ...hair(35, 0.3, 0.55),
+      ...eyes(200, 0.4, 0.45),
+      headShape: shape({ eyeSpacing: 0.4, eyeTilt: 0.25, chinWidth: 0.8 }),
+      bodyScale: 1.01,
+    },
+    props: 'none',
+  },
 };
 
 /**
@@ -2738,8 +3140,11 @@ function baseId(templateId: string): string {
  *  held props its row names. Named one by one on purpose, never "any mob with a
  *  row": one templateId can be an NPC and a mob at once (Sexton Marrow is the
  *  living sexton of Gibbetmere and, under the same id, an undead dungeon boss),
- *  and that mob keeps its mob body. tests/npc_looks.test.ts holds this set to
- *  the escortees the content ships and the Mirefen muster's soldiers. */
+ *  and that mob keeps its mob body. The Mirefen muster's soldiers wear theirs the
+ *  same way, and so does every humanoid enemy (the bandits, the cults, the
+ *  knights): a person drawn on a person's body. tests/npc_looks.test.ts holds this
+ *  set to the escortees the content ships, the muster's soldiers and the enemies
+ *  it names. */
 export const MOB_LOOK_IDS: ReadonlySet<string> = new Set([
   'fisher_bram',
   'apprentice_wren',
@@ -2753,6 +3158,29 @@ export const MOB_LOOK_IDS: ReadonlySet<string> = new Set([
   'muster_drillmaster',
   'guardian_muster_standard_spear',
   'guardian_muster_standard_sword',
+  // The humanoid enemies, and the two delve companions, that drew a KayKit chibi body.
+  'vale_bandit',
+  'mogger_lackey',
+  'mogger',
+  'gorrak',
+  'gravecaller_cultist',
+  'gravecaller_summoner',
+  'gravecaller_mender',
+  'sister_nhalia',
+  'nhalia_mourner',
+  'deacon_voss',
+  'wyrmcult_zealot',
+  'wyrmcult_necromancer',
+  'threnos_first_voice',
+  'reliquary_gravecall_acolyte',
+  'drowned_cantor',
+  'sister_nhalia_drowned_canticle',
+  'edda_reedhand',
+  'acolyte_tessa',
+  'rift_pact_acolyte',
+  'crypt_crow_caller',
+  'hedge_knight',
+  'the_wreck_warden',
 ]);
 
 // Looks resolve once per templateId, alias ids included: the table is static, a

@@ -220,3 +220,21 @@ export function createCharacterVisual(
     return null;
   }
 }
+
+/** A body that wears a roster look (npc_looks.ts) but is no entity of its own: the
+ *  driver a caravan's wagon seats. Built through createCharacterVisual as the NPC the
+ *  row describes (its class's WOC body, the look's face and size, the head bare, its
+ *  fixed props), so it is dressed exactly as the world dresses an NPC. Null for an id
+ *  with no row, or a body that failed to build (logged there). */
+export function createRosterLookVisual(lookId: string, color: number): CharacterVisual | null {
+  if (!npcLookFor(lookId)) return null;
+  const npc = {
+    kind: 'npc',
+    templateId: lookId,
+    color,
+    skin: 0,
+    mainhandItemId: null,
+    offhandItemId: null,
+  } as unknown as Entity;
+  return createCharacterVisual(npc);
+}
