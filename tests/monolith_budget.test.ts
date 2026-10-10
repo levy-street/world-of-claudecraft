@@ -1207,7 +1207,10 @@ const MONOLITHS: MonolithRow[] = [
     // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
-    ceiling: 11642,
+    // Down to 11634 with buff persistence: the sickness save fields moved into
+    // src/sim/aura_persist.ts's auraSaveFragment beside the new buff list, so
+    // the two save-time aura reads share one module. Exact count, zero slack.
+    ceiling: 11634,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

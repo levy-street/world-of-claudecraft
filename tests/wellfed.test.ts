@@ -6,7 +6,7 @@
 // an interrupted meal forfeits it, the ONE 'well_fed' aura id makes the
 // whole food family mutually exclusive (last eaten wins, dish or role plate
 // alike) while elixir_<kind> coexists because the ids can never collide, the
-// mint draws zero rng, and the aura is transient across save/load.
+// mint draws zero rng, and the aura persists across save/load.
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -496,24 +496,30 @@ describe('well fed: duration ticks down and the aura expires', () => {
   });
 });
 
-describe('well fed: transient across save and load', () => {
-  it('a live aura does not survive the serializeCharacter round trip', () => {
-    // Auras are transient by design: no persistence path serializes entity
-    // auras (serializeCharacter carries no auras key, only the two dedicated
-    // sickness timers), so a relog drops the buff like any temporary aura.
+describe('well fed: persists across save and load', () => {
+  it('a live aura survives the serializeCharacter round trip with its remaining time', () => {
+    // Buffs persist through a logout with their timers frozen while offline
+    // (src/sim/aura_persist.ts): the save carries the aura's remaining seconds
+    // and the reload resumes from exactly that remaining, self-sourced on the
+    // new entity so a fresh meal still replaces it.
     const { sim, pid, p } = playerWorld();
     eatToCompletion(sim, pid, p, 'eastbrook_glazed_carrots');
     expect(wellFedAuras(p).length).toBe(1);
+    const live = wellFedAuras(p)[0];
 
     const state = sim.serializeCharacter(pid)!;
     expect(state).toBeTruthy();
-    expect('auras' in (state as unknown as Record<string, unknown>)).toBe(false);
+    expect(state.auras?.map((a) => a.id)).toEqual([WELL_FED_AURA_ID]);
 
     const sim2 = new Sim({ seed: 43, playerClass: 'warrior', noPlayer: true });
     const pid2 = sim2.addPlayer('warrior', 'Restored', { state });
-    sim2.tick();
     const p2 = sim2.entities.get(pid2)! as Entity;
-    expect(wellFedAuras(p2), 'buff gone after the round trip').toEqual([]);
+    const restored = wellFedAuras(p2);
+    expect(restored.length, 'buff kept after the round trip').toBe(1);
+    expect(restored[0].kind).toBe(live.kind);
+    expect(restored[0].value).toBe(live.value);
+    expect(restored[0].remaining).toBeCloseTo(live.remaining, 2);
+    expect(restored[0].sourceId).toBe(pid2);
   });
 });
 

@@ -192,6 +192,9 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   'corpsePos',
   'resSickness',
   'unstuckSickness',
+  // Persisted buffs (src/sim/aura_persist.ts auraSaveFragment): bounded by
+  // MAX_PERSISTED_AURAS and absent while no buff is worn.
+  'auras',
   'equipment',
   'inventory',
   'bags',
