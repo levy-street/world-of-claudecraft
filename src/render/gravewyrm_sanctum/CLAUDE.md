@@ -15,7 +15,7 @@ The kit is the Blender kit `public/models/props/gravewyrm_sanctum_kit.glb`
 (`docs/design/dungeon-rework/kit/build_gravewyrm_sanctum_kit.py`, three slots: KitStone,
 KitGlow, KitGlass), the cirque the heightfield `gravewyrm_sanctum_mountains.glb`, the wyrm
 in the ice the frozen pose `gravewyrm_sanctum_korzul_frozen.glb` (the boss model's Frozen
-pose baked static). The creatures, their effects and the telegraphs are another package's
+pose, wings folded over his back, baked static). The creatures, their effects and the telegraphs are another package's
 (`../gravewyrm_sanctum_fx/`, `../characters/`).
 
 | Module | Role |

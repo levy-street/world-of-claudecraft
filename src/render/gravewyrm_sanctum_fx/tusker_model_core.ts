@@ -1,16 +1,16 @@
-// The Sledge Tusker's Blender body and its sledge, measured (the delivery's
-// integration notes, E:/woc/entregas/santuario/tusker NOTAS.md, and a posed
-// probe of the shipped GLBs): the facts the look
-// (characters/sanctum_creature_looks.ts), the sledge and body effects
-// (tusker_fx.ts) and the telegraph draw (sanctum_fx_core.ts) all key on, so
-// the dust lands on the model's own feet and the three braziers land on the
-// sim's three soulfire patches.
+// The Sledge Tusker's art-guide body (the designer's model guide: concept,
+// Tripo, a rig built for the mesh, every clip animated at 30 fps) and its
+// sledge (the Blender delivery's prop, E:/woc/entregas/santuario/tusker
+// NOTAS.md), measured: the facts the look (characters/sanctum_creature_looks.ts),
+// the sledge and body effects (tusker_fx.ts) and the telegraph draw
+// (sanctum_fx_core.ts) all key on, so the dust lands on the model's own feet
+// and the three braziers land on the sim's three soulfire patches.
 //
 // Model space: yards at the authored size, glTF axes: +Y up, the beast faces
 // +Z, its LEFT is +X; the origin is on the ground under the middle of its
-// barrel. Clip times are seconds in the shipped clips, which key their first
-// frame at 1/24 s (KEY_LEAD): every authored beat of the notes sits KEY_LEAD
-// later in the file.
+// barrel. The beast's clip times are seconds at 1x from its clips' first
+// frame; the sledge's clips (the delivery's) key their first frame at 1/24 s
+// (KEY_LEAD), so every beat of the sledge sits KEY_LEAD later in its file.
 //
 // Three-free, DOM-free, deterministic.
 
@@ -19,74 +19,82 @@ import { TUSKER_TUNING } from '../../sim/encounters/gravewyrm_sanctum/ids';
 /** The template's sim scale (sim/content/gravewyrm_sanctum.ts sledge_tusker). */
 export const TUSKER_SIM_SCALE = 2.8;
 
-/** In-game yards per model yard: the delivery is authored at its final size
- *  (7.76 yd to the dome, three times the 2.6 yd knight). */
+/** In-game yards per model yard: the body is authored at its final size
+ *  (7.44 yd to the hump, the soul lantern's post to 9.99). */
 export const TUSKER_DRAWN_SCALE = 1;
 
-/** The clips key their first frame one 24 fps frame in. */
+/** The sledge's clips key their first frame one 24 fps frame in. */
 export const KEY_LEAD = 1 / 24;
 
 export const TUSKER_MODEL = {
-  url: 'models/creatures/sledge_tusker.glb',
+  url: 'models/creatures/woc_sanctum_tusker.glb',
   /** The Idle pose's skinned bounds at 0.5 s (what prepareVisual samples),
-   *  lowest vertex (-0.02, the hitch bar) to the dome and hump (7.76). */
-  idleBoundsHeight: 7.78,
-  /** The top of the dome and the hump. */
-  headTop: 7.76,
+   *  the soles (0.005) to the soul lantern's cage (9.99). */
+  idleBoundsHeight: 9.985,
+  /** The top of the hump and the dome (the beast's own height). */
+  headTop: 7.44,
   /** The beast's own reach along its body: the tail tuft behind, the trunk
-   *  tip ahead and the tusk tips (with their iron caps) further still. */
-  tailBack: 6.35,
-  trunkTip: { x: 0.09, y: 1.32, z: 7.17 },
-  tuskTip: { x: 1.42, y: 4.95, z: 11.2 },
+   *  tip ahead and the tusk tips (their iron bands) further still, the right
+   *  tusk the longer (the mesh is a little lopsided: x is their spread). */
+  tailBack: 5.99,
+  trunkTip: { x: -0.27, y: 2.42, z: 4 },
+  tuskTip: { x: 2.51, y: 2.47, z: 6.13 },
   /** The half-width of the coat and the flanks. */
-  halfWidth: 2.6,
-  /** The pads at rest: forefeet and hind feet, |x| out to each side. */
-  foreFoot: { x: 1.6, z: 2.3 },
-  hindFoot: { x: 1.5, z: -2.45 },
-  /** The forehead and its burning sigil (the chamfron), and the collar's
-   *  soul lantern under the neck. */
-  head: { x: 0, y: 5.82, z: 4.95 },
-  lantern: { x: 0, y: 4.6, z: 4.1 },
-  /** The hitch ring the sledge's tongue hooks onto, behind the haunches. */
-  hitch: { x: 0, y: 2.75, z: -6.15 },
-  /** The gaits' reference speeds (the planted pads slide at these) and cycles. */
-  walkRef: 1.9,
+  halfWidth: 3,
+  /** The pads at rest: forefeet and hind feet, |x| out to each side (the
+   *  two sides' mean: the right feet stand 0.8 further out than the left). */
+  foreFoot: { x: 1.42, z: 2.36 },
+  hindFoot: { x: 1.28, z: -2.41 },
+  /** The forehead's riveted plate, and the soul lantern on its post over
+   *  the back (a little to its left). */
+  head: { x: 0, y: 5.83, z: 3.47 },
+  lantern: { x: 0.83, y: 8.52, z: -1.21 },
+  /** The hitch ring the sledge's tongue hooks onto, behind the haunches
+   *  (where the trace chains meet). */
+  hitch: { x: 0, y: 2.79, z: -6.15 },
+  /** The gaits' reference speeds (the planted pads slide at these) and
+   *  cycles: the hauling walk, and the amble its 6 yd/s chase runs at 1x. */
+  walkRef: 2.8,
   walkCycle: 2.2,
-  runRef: 5.6,
-  runCycle: 1,
+  runRef: 5.99,
+  runCycle: 1.4,
   /** Lying dead it rests on its left side, this far to its left. */
-  deathRollLeft: 2,
+  deathRollLeft: 1.47,
 } as const;
 
-/** The clips' beats (seconds in the shipped clips): where the effects fire. */
+/** The clips' beats (seconds at 1x): where the effects fire. Every blow and
+ *  bar lands at 1x, its weight before its speed. */
 export const TUSKER_CLIP = {
-  /** TuskSweep (2.9 authored, the 1.5 s bar): the wind-up to 1.4, the tusks
-   *  cross the front at 1.62 (the cone's hit and the throw), right to left,
-   *  the sweep ends at 1.8. */
-  sweepWindup: 1.4 + KEY_LEAD,
-  sweepCross: 1.62 + KEY_LEAD,
-  sweepEnd: 1.8 + KEY_LEAD,
-  /** TrampleWindup (the 2 s lane warning): the forefoot paws the ice at 0.55
-   *  and 1.05, the trumpet runs 1.3 to 1.8, the head is levelled at 2.0. */
-  paws: [0.55 + KEY_LEAD, 1.05 + KEY_LEAD],
-  trumpet: 1.3 + KEY_LEAD,
-  levelled: 2 + KEY_LEAD,
-  /** Charge: a 1 s loop at runRef (head low, tusks levelled). */
-  charge: 1 + KEY_LEAD,
-  /** Roar (the enrage): the trumpet peaks at 1.0, both forefeet slam at 1.75. */
-  roarPeak: 1 + KEY_LEAD,
-  roarSlam: 1.75 + KEY_LEAD,
-  roar: 2.6 + KEY_LEAD,
+  /** Attack (the gore, 1.5 s): reared back, driven down and through on frame
+   *  18. */
+  attackHit: 0.567,
+  /** TuskSweep (the 1.5 s bar): swung far round to its right to 1.4, the
+   *  tusks cross the front on the bar's end (the cone's hit and the throw),
+   *  right to left, the sweep spent by 1.73. */
+  sweepWindup: 1.4,
+  sweepCross: 1.5,
+  sweepEnd: 1.733,
+  /** TrampleWindup (the 2 s lane warning): the forefoot paws the ice at 0.53
+   *  and 1.0, the trumpet from 1.3, the head levelled on the bar's end. */
+  paws: [0.533, 1],
+  trumpet: 1.3,
+  levelled: 2,
+  /** Charge: a 1 s loop (head down, tusks levelled). */
+  charge: 1,
+  /** Roar (the enrage): the trumpet peaks at 1.0, both forefeet slam at 1.77. */
+  roarPeak: 1,
+  roarSlam: 1.767,
+  roar: 2.6,
   /** Unhitch (the pull): the trace hooks open at 0.9, the hitch bar hits the
-   *  ice at 1.35, the clip ends at 2.6. */
-  unhitchHooks: 0.9 + KEY_LEAD,
-  unhitchBar: 1.35 + KEY_LEAD,
-  unhitch: 2.6 + KEY_LEAD,
+   *  ice at 1.37, the clip ends at 2.6. */
+  unhitchHooks: 0.9,
+  unhitchBar: 1.367,
+  unhitch: 2.6,
   /** Death: the knees buckle at 1.0, the body hits the ice at 2.0, the head
    *  at 2.2, at rest from 2.8. */
-  deathKnees: 1 + KEY_LEAD,
-  deathBody: 2 + KEY_LEAD,
-  deathHead: 2.2 + KEY_LEAD,
+  deathKnees: 1,
+  deathBody: 2,
+  deathHead: 2.2,
 } as const;
 
 /** The sledge prop (models/creatures/sledge_tusker_sledge.glb): its origin on
@@ -216,7 +224,7 @@ export function tuskerFootPoint(foot: TuskerFoot): { x: number; z: number } {
 }
 
 /** The gaits' touchdowns as a share of the cycle (Walk: the hauling walk, a
- *  lateral sequence; Run and Charge: the loaded trot). */
+ *  lateral sequence; Run and Charge: the amble). */
 export const TUSKER_FOOTFALLS: Readonly<
   Record<'walk' | 'run', readonly { foot: TuskerFoot; phase: number }[]>
 > = {
@@ -228,9 +236,9 @@ export const TUSKER_FOOTFALLS: Readonly<
   ],
   run: [
     { foot: 'leftHind', phase: 0 },
-    { foot: 'rightFore', phase: 0.1 / TUSKER_MODEL.runCycle },
-    { foot: 'rightHind', phase: 0.5 / TUSKER_MODEL.runCycle },
-    { foot: 'leftFore', phase: 0.6 / TUSKER_MODEL.runCycle },
+    { foot: 'rightFore', phase: 0.14 / TUSKER_MODEL.runCycle },
+    { foot: 'rightHind', phase: 0.7 / TUSKER_MODEL.runCycle },
+    { foot: 'leftFore', phase: 0.84 / TUSKER_MODEL.runCycle },
   ],
 };
 

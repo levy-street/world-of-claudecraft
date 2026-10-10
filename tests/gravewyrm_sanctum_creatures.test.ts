@@ -133,23 +133,26 @@ describe('the shipped Sledge Tusker GLBs', () => {
 
   it('carries every clip the look and the fx name, at their authored lengths', () => {
     const want: Record<string, number> = {
-      Idle: 6,
+      Idle: 4,
       Walk: TUSKER_MODEL.walkCycle,
       Run: TUSKER_MODEL.runCycle,
-      Attack: 1.4,
-      TuskSweep: 2.9,
+      Attack: 1.5,
+      TuskSweep: 2.5,
       TrampleWindup: 2,
-      Charge: 1,
-      Roar: 2.6,
-      Unhitch: 2.6,
-      Hit: 0.7,
+      Charge: TUSKER_CLIP.charge,
+      Roar: TUSKER_CLIP.roar,
+      Unhitch: TUSKER_CLIP.unhitch,
+      Hit: 0.6,
       Death: 3.4,
     };
-    for (const [name, len] of Object.entries(want)) {
-      // The clips key their first frame one 24 fps frame in (within a frame:
-      // a length that is no whole number of frames rounds to the next).
-      expect(Math.abs(clipLength(beast, name) - (len + KEY_LEAD)), name).toBeLessThan(1 / 24);
-    }
+    // The beast's clips start on their first frame (30 fps, within half a frame).
+    for (const [name, len] of Object.entries(want))
+      expect(Math.abs(clipLength(beast, name) - len), name).toBeLessThan(1 / 60);
+    // Its beats sit inside their clips; the gore lands on frame 18.
+    expect(TUSKER_CLIP.attackHit).toBeCloseTo(17 / 30, 2);
+    expect(clipLength(beast, 'TuskSweep')).toBeGreaterThan(TUSKER_CLIP.sweepEnd);
+    expect(clipLength(beast, 'Death')).toBeGreaterThan(TUSKER_CLIP.deathHead);
+    // The sledge's clips (the delivery's) key their first frame one 24 fps frame in.
     for (const [name, len] of Object.entries({ Idle: 2, Haul: SLEDGE_MODEL.haulCycle, Tip: 2.6 })) {
       expect(Math.abs(clipLength(sledge, name) - (len + KEY_LEAD)), name).toBeLessThan(1 / 24);
     }
@@ -158,7 +161,7 @@ describe('the shipped Sledge Tusker GLBs', () => {
   it('keeps the trace chains a mesh of their own, and the sledge its bowl bones', () => {
     const named = (j: GlbJson) => new Set(j.nodes.map((n) => n.name));
     expect(beast.meshes.map((m) => m.name)).toEqual(['SledgeTusker', TUSKER_TRACES_NODE]);
-    for (const bone of ['Head', 'Hitch', 'Neck1', 'Trunk5', 'L_Hand', 'R_Foot'])
+    for (const bone of ['head', 'Hitch', 'neck', 'trunk.5', 'hand.l', 'foot.r', 'lantern'])
       expect(named(beast).has(bone), bone).toBe(true);
     for (let i = 1; i <= 3; i++) {
       expect(named(sledge).has(`Brazier${i}`)).toBe(true);
@@ -262,7 +265,7 @@ describe('the Tusker drawn at its authored size', () => {
     }
     expect(tuskerFootfallsBetween('walk', 3, 3, feet)).toBe(0);
     // A cycle carries it ref x cycle at its drawn size.
-    expect(tuskerStride('walk', TUSKER_SIM_SCALE)).toBeCloseTo(1.9 * 2.2, 9);
+    expect(tuskerStride('walk', TUSKER_SIM_SCALE)).toBeCloseTo(2.8 * 2.2, 9);
   });
 });
 

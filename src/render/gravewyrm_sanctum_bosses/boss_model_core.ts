@@ -1,10 +1,9 @@
 // The Gravewyrm Sanctum bosses' bodies, measured: the facts the looks
 // (characters/sanctum_boss_looks.ts) and the boss effects (sanctum_boss_fx.ts)
 // key on, so a chain leaves Korgath's own manacle and the breath leaves
-// Korzul's own jaws. Korgath and Velkhar are art-guide bodies (the designer's
-// model guide: concept, Tripo, a rig built for the mesh, every clip animated
-// at 30 fps); Korzul is the Blender body from his delivery notes
-// (E:/woc/entregas/santuario/korzul/NOTAS.md, 24 fps).
+// Korzul's own jaws. All three are art-guide bodies (the designer's model
+// guide: concept, Tripo, a rig built for the mesh, every clip animated at 30
+// fps).
 //
 // Model space: yards at the authored size, glTF axes: +Y up, the body faces
 // +Z, its LEFT is +X; the origin is on the ground under the body. All three
@@ -52,14 +51,17 @@ export const VELKHAR_BODY: BossBody = {
   walkRef: 2.05,
 };
 
-/** Korzul the Gravewyrm: withers 12.6 yd, the horns 21.6, 53.7 yd nose to tail. */
+/** Korzul the Gravewyrm: withers 9.6 yd, the horns 21.4, 34.4 yd nose to tail. */
 export const KORZUL_BODY: BossBody = {
-  url: 'models/creatures/sanctum_korzul.glb',
+  url: 'models/creatures/woc_sanctum_korzul.glb',
   simScale: 1.8,
   drawnScale: 1,
-  idleBoundsHeight: 21.85,
-  walkRef: 4.8,
+  idleBoundsHeight: 21.44,
+  walkRef: 3.45,
 };
+/** The planted feet's speed in his Run (the chase's bounding amble), at model
+ *  scale 1. */
+export const KORZUL_RUN_REF = 7.84;
 
 /** The def height (pivot to the Idle bounds' top at sim scale 1). */
 export function bossLookHeight(b: BossBody): number {
@@ -128,26 +130,38 @@ export const VELKHAR_CLIP = {
 /** The caged soul flame's centre over his feet at Idle. */
 export const VELKHAR_FLAME_Y = 4.45;
 
-/** Korzul's clip beats. */
+/** Korzul's clip beats (seconds at 1x). The bite and the claw land on frame
+ *  18 of their 1.5 s clips; every bar's blow lands on the bar's end, so every
+ *  clip plays at 1x: Break Free's ice bursts at 1.4 and the forefeet slam on
+ *  its 3 s bar's end, the breath leaves the jaws on its 2 s bar's end, the
+ *  tail on the sweep's, the downbeat on the gale's, the plunging fire pours to
+ *  the warning's end, the dive slams on the descent's, the takeoff climbs in
+ *  the sim's 1.8 s. */
 export const KORZUL_CLIP = {
+  biteHit: 0.567,
+  clawHit: 0.567,
   breakFreeBurst: 1.4,
-  breakFreeSlam: 2.9,
-  breakFreeLength: 4.42,
+  breakFreeSlam: 3.0,
+  breakFreeLength: 4.4,
   breathStart: 2.0,
   breathEnd: 3.4,
-  tailHit: 1.05,
-  galeGust: 1.1,
-  takeOffLift: 1.1,
+  tailHit: 1.2,
+  galeGust: 1.5,
+  takeOffLift: 0.567,
+  takeOffLength: 1.8,
   breathAirStart: 1.0,
-  breathAirEnd: 2.6,
-  landImpact: 1.2,
+  breathAirEnd: 3.0,
+  /** Break Free's drop onto the centre (the Land clip). */
+  landImpact: 1.4,
+  /** Crashing Descent's dive (the Descent clip). */
+  descentImpact: 3.0,
   infernoPulses: [2, 4, 6, 8] as readonly number[],
-  deathIceGives: 2.6,
+  deathIceGives: 1.533,
 } as const;
 /** The breath leaves his jaws this far ahead and up at Idle (model yards). */
-export const KORZUL_MOUTH_REST = { z: 23.2, y: 15.7 } as const;
+export const KORZUL_MOUTH_REST = { z: 7.9, y: 15.65 } as const;
 /** The heart-shard in his chest at Idle. */
-export const KORZUL_SHARD_REST = { z: 7.5, y: 8.15 } as const;
+export const KORZUL_SHARD_REST = { z: 5.46, y: 9.13 } as const;
 /** Every airborne clip carries its altitude: Root rides this high in the hover. */
 export const KORZUL_CLIP_FLY_HEIGHT = 6;
 
