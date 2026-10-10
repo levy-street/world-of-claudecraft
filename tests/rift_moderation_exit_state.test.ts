@@ -4,7 +4,7 @@
 // ClientWorld mirrors `riftFloor` from riftState events alone (no snapshot field),
 // and the world map and minimap both lead with `world.riftFloor`. The server's
 // moderation moves (/jail, the timed release and /unjail, the moderator jail
-// visit, spectate limbo) moved the entity directly, without the exit leaveRift
+// visit) moved the entity directly, without the exit leaveRift
 // sends, so a prisoner jailed from a rift kept the rift plan in the cage, and a
 // moderator who came back to a live floor never re-received it (no rift map, no
 // predicted rift collision). The moves now run through server/moderation_moves.ts:
@@ -241,26 +241,26 @@ describe('a moderator leaving a rift floor and coming back', () => {
     expect(back.map).not.toBe('overworld');
   });
 
-  it('spectate limbo sends the exit (even while spectating), /unspectate resends the floor', async () => {
+  it('camera-only spectate keeps the body on its floor, and /unspectate resends it', async () => {
     const { server, session, ws, entry } = riftServer('Watcher', true);
-    joined(server.join(fakeWs(), 2, 102, 'Suspect', 'rogue', null));
+    const target = joined(server.join(fakeWs(), 2, 102, 'Suspect', 'rogue', null));
+    const floor = { ...pos(server, session.pid) };
 
     command(server, session, '/spectate "Suspect"');
     await vi.waitFor(() => expect(session.spectating).not.toBeNull());
     step(server);
     const away = wireRiftStates(ws, session.pid);
-    expect(away.map((e) => e.active)).toEqual([false]);
-    expect(onlineMapModes([entry, ...away], pos(server, session.pid)).riftFloor).toBeNull();
+    expect(away).toEqual([]);
+    expect(pos(server, session.pid).x).toBeCloseTo(floor.x);
+    expect(pos(server, session.pid).z).toBeCloseTo(floor.z);
+    expect(onlineMapModes([], pos(server, target.pid)).riftFloor).toBeNull();
 
     command(server, session, '/unspectate');
     await vi.waitFor(() => expect(session.spectating).toBeNull());
     step(server);
     const all = wireRiftStates(ws, session.pid);
-    expect(all.map((e) => [e.active, e.instanceId])).toEqual([
-      [false, entry.instanceId],
-      [true, entry.instanceId],
-    ]);
-    expect(onlineMapModes([entry, ...all], pos(server, session.pid)).riftFloor).not.toBeNull();
+    expect(all.map((e) => [e.active, e.instanceId])).toEqual([[true, entry.instanceId]]);
+    expect(onlineMapModes(all, pos(server, session.pid)).riftFloor).not.toBeNull();
   });
 
   it('a floor freed during the visit returns the moderator to the rift exit spot', () => {
