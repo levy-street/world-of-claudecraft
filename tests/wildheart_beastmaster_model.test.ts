@@ -59,10 +59,13 @@ describe('the Fanglord Beastmaster', () => {
       BEASTMASTER_MODEL.idleTop - BEASTMASTER_MODEL.idleMin,
       9,
     );
-    expect(BEASTMASTER_MODEL.idleTop).toBeGreaterThan(JAGUAR_MODEL.idleBoundsHeight + 1);
-    // The boss effects (the bond cord, the bursts) ride his real height.
+    // A head over his jaguar's ears (its plumed headdress rises past them, to its withers' plumes).
+    expect(BEASTMASTER_MODEL.idleTop).toBeGreaterThan(JAGUAR_MODEL.bondAnchor.up + 1);
+    expect(BEASTMASTER_MODEL.idleTop).toBeGreaterThan(JAGUAR_MODEL.idleBoundsHeight);
+    // The boss effects (the bond cord, the bursts) ride his real height (his drawn bounds,
+    // a toe a hair under the ground).
     expect(bossBodyHeight(BEASTMASTER_ID, BEASTMASTER_SIM_SCALE)).toBeCloseTo(
-      BEASTMASTER_MODEL.idleTop,
+      BEASTMASTER_MODEL.idleTop - BEASTMASTER_MODEL.idleMin,
       6,
     );
   });

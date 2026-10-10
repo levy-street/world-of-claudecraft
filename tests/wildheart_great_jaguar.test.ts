@@ -95,11 +95,15 @@ describe('the Great Jaguar', () => {
     expect(c.castPlayOut).toContain('Pounce');
   });
 
-  it('the collar ring sits over the shoulders, the bond cord tied there', () => {
+  it('the collar ring rides the nape, the bond cord tied there', () => {
+    // The art-guide cat's plumed headdress sweeps back over its shoulders, so
+    // the collar's ring sits under it on the nape: over the jaws, behind the
+    // muzzle, ahead of the forelegs, under the plumes' top.
     const a = jaguarBondAnchor(JAGUAR_SIM_SCALE);
-    expect(a.up).toBeGreaterThan(JAGUAR_MODEL.withers);
-    expect(a.up).toBeLessThan(JAGUAR_MODEL.idleBoundsHeight);
-    expect(a.forward).toBeGreaterThan(0);
+    expect(a.up).toBeGreaterThan(JAGUAR_MODEL.mouth.up);
+    expect(a.up).toBeLessThan(JAGUAR_MODEL.withers);
+    expect(a.forward).toBeGreaterThan(JAGUAR_MODEL.forePaw.z);
+    expect(a.forward).toBeLessThan(JAGUAR_MODEL.mouth.forward);
   });
 
   it('the Whistle spirit is the jade variant, translucent and self-lit', () => {

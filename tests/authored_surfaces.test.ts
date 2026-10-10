@@ -91,7 +91,6 @@ const LEGACY_UNFLAGGED_DEFS = new Set([
   'mob_tolling_bell',
   'mob_training_dummy',
   'mob_wildheart_hexcaller',
-  'mob_wildheart_high_priest',
   'mob_wildheart_ravager',
   'mob_wildheart_stalker',
   'mob_yumi_cat',
@@ -322,8 +321,11 @@ const AUTHORED_ATLAS_DEFS = [
   'form_toad',
   // the Blender Sunbone Totem-Binder (scripts/assets/wildheart_totem_binder)
   'wildheart_totem_binder',
-  // the Fanglord Beastmaster's Blender body (scripts/assets/wildheart_beastmaster)
+  // the Fanglord Beastmaster's art-guide body (scripts/assets/specs/woc_basin_beastmaster.json)
   'mob_wildheart_beastmaster',
+  // Zulgar's art-guide body and the Great Jaguar's jade spirit (the Fanglord's Whistle pet)
+  'mob_wildheart_high_priest',
+  'wildheart_spirit_jaguar',
   'wildheart_sunbone_totem',
   // its Dread Totem (scripts/assets/wildheart_sunbone_totem, both Blender bodies)
   'wildheart_sunbone_dread_totem',

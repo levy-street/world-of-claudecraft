@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "d9a8b163aea6f2f3ebc4240d5ba5cc5b387127d4394d4719b2dd31fdfc0580d5",
+  "rendererFingerprint": "1b6d57b66106d3bf5c2fc7fc138ff0b61596bad60b14c2f23255b0fbceaaf5b6",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "darwin",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6079264,
-      "sha256": "0055c8e5c2dfb2004c4743f0dcd97bf1a7ca1b0c07e1798e32933a98434bd88c",
+      "bytes": 6079330,
+      "sha256": "892a92a14241adcc9b544d61e55ed319fd6bb06055980d184b30f7b29822cf8f",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -3326,13 +3326,13 @@
       "visualKey": "wildheart_fanglord_jaguar",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/wildheart_great_jaguar.glb",
-          "path": "public/models/creatures/wildheart_great_jaguar.glb",
-          "bytes": 2434800,
-          "sha256": "d5b816ebc91819c8a71a680fd6e793d54c45753d783aa11a4015fc25f48e5691"
+          "url": "models/creatures/woc_basin_jaguar.glb",
+          "path": "public/models/creatures/woc_basin_jaguar.glb",
+          "bytes": 2693604,
+          "sha256": "b6832bcde2698bc5f740cc0a1c0231e5bf65062f37da963f90015a7ff1b1b759"
         },
         "idle": "Idle",
-        "height": 1.9666666666666666,
+        "height": 2.580416666666667,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -3346,11 +3346,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "a93140612bf9138034df30c960c5b0457b717eba06bc8eb0165224b810e76fd4",
+      "sourceFingerprint": "9c5204350f137d1ba360689532069d791655042d4277302a4f2636ed1adecb15",
       "output": {
         "path": "public/ui/mobs/fanglord_jaguar.webp",
-        "bytes": 2714,
-        "sha256": "ee046b938511ad305f580a221b4841ee63e3f0253abf604a56214c114e469bcb"
+        "bytes": 3174,
+        "sha256": "f3e5387a6fa24357bc1601aa2d0138642905ea4d5518ba6c753c3ad2d4fcf9e6"
       }
     },
     {
@@ -11201,15 +11201,15 @@
       "visualKey": "wildheart_gorgebloom",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/wildheart_gorgebloom.glb",
-          "path": "public/models/creatures/wildheart_gorgebloom.glb",
-          "bytes": 2958724,
-          "sha256": "855fb2dbd103ffe0b36028dc250850d9eb9d4f875966057016947ba1ea167129"
+          "url": "models/creatures/woc_basin_gorgebloom.glb",
+          "path": "public/models/creatures/woc_basin_gorgebloom.glb",
+          "bytes": 1712648,
+          "sha256": "e6dc45bd9d2d10e2d648ca870a6ffd29adb1c1d77fc7a4087f1dd35c0db3d579"
         },
         "idle": "Idle",
-        "height": 5.213571428571429,
+        "height": 2.1789285714285715,
         "yaw": null,
-        "hover": -0.30178571428571427,
+        "hover": 0,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -11221,11 +11221,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "b53fdb29f7b13526ed5df71cce5d3d11599162b615817ffe217f80eea97cef53",
+      "sourceFingerprint": "2dd92492ba37899994e0594177ecaffc0d818341cf538f48639c56456260a63e",
       "output": {
         "path": "public/ui/mobs/the_gorgebloom.webp",
-        "bytes": 2150,
-        "sha256": "0eeee974114327ee30ba3d6acc18c0dcd5048ab624c9c97f3ad40e9b1ed69f44"
+        "bytes": 2120,
+        "sha256": "c4ddbe00b256121c4b04bb2bdab020541ba059220917f9abf59be60a561146e5"
       }
     },
     {
@@ -13686,15 +13686,15 @@
       "visualKey": "mob_wildheart_beastmaster",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/wildheart_beastmaster_blender.glb",
-          "path": "public/models/creatures/wildheart_beastmaster_blender.glb",
-          "bytes": 2569776,
-          "sha256": "8eba2421ee8b34c8c396243bcfb3cf8d9f432d42a125a93ddc2a2337beb2d25f"
+          "url": "models/creatures/woc_basin_beastmaster.glb",
+          "path": "public/models/creatures/woc_basin_beastmaster.glb",
+          "bytes": 2469708,
+          "sha256": "c0c25f54b29b546e1ff95e19b9c550b8426ab85e1a2e28ac485c21a52a31a587"
         },
         "idle": "Idle",
-        "height": 2.678723404255319,
+        "height": 2.8570212765957446,
         "yaw": null,
-        "hover": 0,
+        "hover": -0.017872340425531916,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -13706,11 +13706,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "03eb6f68b1fea7b4e263fde7cb5965a3f16f2bc6d309b22c8171f47001423659",
+      "sourceFingerprint": "ef48262c12da8221ee235061e7419b02e36889b1c310aa01414dd77d2987e5ea",
       "output": {
         "path": "public/ui/mobs/wildheart_beastmaster.webp",
-        "bytes": 3252,
-        "sha256": "2e5713d91da9817231d943a4230d6985ac17c5e47494f4d274fed94a1531bad9"
+        "bytes": 2666,
+        "sha256": "0b2111c82c30a6c62e0bd929983c8910c7de19add9892882db3af41ff3349c25"
       }
     },
     {
@@ -13754,31 +13754,31 @@
       "visualKey": "mob_wildheart_high_priest",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/wildheart_high_priest.glb",
-          "path": "public/models/creatures/wildheart_high_priest.glb",
-          "bytes": 1260468,
-          "sha256": "a43393cb43b91cecb5e4dc4d6f362c8e7b72b3e12ba5985051a5067350338511"
+          "url": "models/creatures/woc_basin_zulgar.glb",
+          "path": "public/models/creatures/woc_basin_zulgar.glb",
+          "bytes": 2331616,
+          "sha256": "b11ae16e0c4a1fad66685596ef1d972e65008492bc4ee7b6fbfb7e9e7c273859"
         },
         "idle": "Idle",
-        "height": 3.2,
-        "yaw": -1.5707963267948966,
-        "hover": null,
+        "height": 3.198928571428571,
+        "yaw": null,
+        "hover": -0.04857142857142858,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.03
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#566f45",
-        "strength": 0.03
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "119fe85f7e322bd33f8a8dfe2aa8447ca8ff6a9422ed7841d286bdda21cd85dd",
+      "sourceFingerprint": "2aab445dcb478c53be345095063b7ac105b724bbd3e65b5f5afecda5898aa5d7",
       "output": {
         "path": "public/ui/mobs/wildheart_high_priest.webp",
-        "bytes": 3528,
-        "sha256": "7c303aeb8232008a15d839a61a51de9f45f65c5a5e2b3e7c2ee64aa877ef17cc"
+        "bytes": 2924,
+        "sha256": "8aa7202edb3b67833d4a4ba98490d2d8782ccb01bd8f80ca91a7c33ccfd33519"
       }
     },
     {

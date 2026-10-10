@@ -1,4 +1,4 @@
-// The Gorgebloom's Blender body in game (src/render/wildheart_basin/
+// The Gorgebloom's art-guide body in game (src/render/wildheart_basin/
 // gorgebloom_model_core.ts and gorgebloom_fx_core.ts, src/render/characters/
 // wildheart_creature_looks.ts, turn_in_place_core.ts and glow_pulse_core.ts):
 // the shipped GLB carries every clip, bone anchor and glow map the look and the
@@ -141,12 +141,15 @@ function restWorld(name: string): V3 {
   }
   let p: V3 = [0, 0, 0];
   let q: Q = [0, 0, 0, 1];
+  let k = 1;
   for (const i of chain) {
     const n = json.nodes[i];
     const t = (n.translation ?? [0, 0, 0]) as V3;
     const r = qrot(q, t);
-    p = [p[0] + r[0], p[1] + r[1], p[2] + r[2]];
+    p = [p[0] + r[0] * k, p[1] + r[1] * k, p[2] + r[2] * k];
     q = qmul(q, (n.rotation ?? [0, 0, 0, 1]) as Q);
+    // The rig node carries the export's uniform scale (the bones are authored small).
+    k *= n.scale?.[0] ?? 1;
   }
   return p;
 }
@@ -181,11 +184,13 @@ describe('the shipped GLB', () => {
     expect(clipLength('Roar')).toBeGreaterThan(C.roarPeak);
   });
 
-  it('keys every clip from one frame in (the lead every beat carries)', () => {
+  it('keys every clip from its first frame at 0 (the beats are the clips own seconds)', () => {
     for (const a of json.animations) {
       const first = Math.min(...a.samplers.map((s) => json.accessors[s.input].min?.[0] ?? 0));
-      expect(first, a.name).toBeCloseTo(KEY_LEAD, 4);
+      expect(first, a.name).toBeCloseTo(0, 4);
     }
+    // The old 24 fps bodies' lead stays exported for the Lasher and the Basin trash.
+    expect(KEY_LEAD).toBeCloseTo(1 / 24, 9);
   });
 
   it('keeps the effect anchors as bones, where the notes measured them', () => {
@@ -219,7 +224,7 @@ describe('the shipped GLB', () => {
 
   it('one skinned body, its glow map on the one material, compressed inside its budget', () => {
     expect(json.skins).toHaveLength(1);
-    expect(json.skins[0].joints).toHaveLength(52);
+    expect(json.skins[0].joints).toHaveLength(60);
     expect(json.materials).toHaveLength(1);
     expect(json.materials[0].name).toBe('GorgebloomBody');
     expect(json.materials[0].emissiveTexture).toBeDefined();
@@ -232,7 +237,7 @@ describe('the shipped GLB', () => {
     for (const m of json.meshes)
       for (const p of m.primitives)
         if (p.indices !== undefined) tris += json.accessors[p.indices].count / 3;
-    expect(tris).toBe(50_318);
+    expect(tris).toBe(10_209);
     expect(statSync(GLB).size).toBeLessThan(3.2 * 1024 * 1024);
   });
 });
@@ -245,16 +250,19 @@ describe('the look and the model agree with the sim', () => {
     expect(def).toBe(WILDHEART_GORGEBLOOM_LOOK);
     expect(def.url).toBe(GORGEBLOOM_MODEL.url);
     expect(def.height).toBeCloseTo(gorgebloomLookHeight(), 6);
-    // One model yard per game yard: the bounds (roots to the raised petal) at
-    // its 2.8, the waterline on the pivot.
+    // One model yard per game yard: the bounds (the vines on the water to the
+    // raised back petal) at its 2.8, the waterline on the pivot.
     const k = GORGEBLOOM_SIM_SCALE;
     expect(def.height * k).toBeCloseTo(GORGEBLOOM_MODEL.idleTop - GORGEBLOOM_MODEL.idleMin, 6);
     expect((def.hover ?? 0) * k).toBeCloseTo(GORGEBLOOM_MODEL.idleMin, 6);
-    expect(gorgebloomLookHover()).toBeLessThan(0);
+    // The vines lie on the root pool's surface: the waterline is the pivot.
+    expect(gorgebloomLookHover()).toBeCloseTo(0, 9);
     expect(gorgebloomModelScale(k)).toBe(1);
-    // A three-storey house beside a 2.6 yd player, never toy-like.
+    // A flower the size of a house beside a 2.6 yd player, never toy-like: over
+    // two players tall and its vines across most of the pool.
     expect(bossBodyHeight(GORGEBLOOM_ID, k)).toBeCloseTo(GORGEBLOOM_MODEL.idleTop, 6);
-    expect(GORGEBLOOM_MODEL.idleTop).toBeGreaterThan(13);
+    expect(GORGEBLOOM_MODEL.idleTop).toBeGreaterThan(2 * 2.6);
+    expect(GORGEBLOOM_MODEL.rootCrown).toBeGreaterThan(GORGEBLOOM_MODEL.idleTop);
     // The sim's body radius sits inside its root crown (melee reaches the roots).
     expect(MOBS.the_gorgebloom.bodyRadius ?? 0).toBeLessThanOrEqual(GORGEBLOOM_MODEL.rootCrown);
     expect(def.clickRadius).toBeGreaterThanOrEqual(4);
@@ -350,7 +358,7 @@ describe('the effects leave the model', () => {
     const C = GORGEBLOOM_CLIP;
     expect(Math.abs(C.lashTipImpact.x)).toBeLessThan(BLOOM_TUNING.lashHalfWidth);
     const reach = lashImpactReach(GORGEBLOOM_SIM_SCALE);
-    expect(reach).toBeCloseTo(8.74, 6);
+    expect(reach).toBeCloseTo(8.39, 6);
     const stations = lashWaveStations(GORGEBLOOM_SIM_SCALE, []);
     expect(stations.length).toBeGreaterThanOrEqual(7);
     expect(stations[0]).toBeGreaterThan(reach);
