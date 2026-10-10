@@ -4711,6 +4711,9 @@ export const hudChromeStrings = {
     // that grid is a derived list, its squares hold no bag position, so honoring the drop
     // would move a stack the player never aimed at. Say so instead of doing nothing.
     reorderNeedsRecent: 'Clear the filter and sort by Recent to rearrange your bags',
+    // Refusal when a drag would move a locked stack, or drop onto one: a locked
+    // item is pinned to its bag slot (src/sim/inventory_order.ts isCellPinned).
+    reorderLocked: 'Locked items stay in their bag slot. Unlock it to move it.',
     // Accessible-name arm of the instanced-slot corner marker: the
     // visual tab is aria-hidden, so the per-copy flag rides the cell's label
     // (the tooltip on focus stays the detail surface).

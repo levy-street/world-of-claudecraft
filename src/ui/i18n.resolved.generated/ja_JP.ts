@@ -3660,6 +3660,7 @@ export const ja_JP: EnTranslations = {
       "dragEquipHint": "キャラクターにドラッグして装備",
       "dragDestroyHint": "世界へドラッグして破壊",
       "reorderNeedsRecent": "絞り込みを解除し並び順を「最近」にすると持ち物を並べ替えられます",
+      "reorderLocked": "ロック中のアイテムはバッグ内の位置に固定されます。移動するにはロックを解除してください。",
       "itemAriaInstanced": "{item}、数量 {count}、銘入りの品",
       "itemAriaEnchanted": "{item}、数量 {count}、エンチャント済みの品",
       "itemAriaBound": "{item}、数量 {count}、バインド済みの品",

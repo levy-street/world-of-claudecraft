@@ -56,6 +56,7 @@ import {
   bagItemAction,
   bagNoMatchKind,
   bagQualityKey,
+  bagReorderBlockedByLock,
   bagShiftLinks,
   bagSlotsLineKey,
   bagSortSignature,
@@ -1691,7 +1692,14 @@ export class BagsWindow {
       this.deps.showError(t('hudChrome.bags.reorderNeedsRecent'));
       return;
     }
-    this.deps.world().moveInventoryItem(from, to);
+    const world = this.deps.world();
+    // A locked stack is pinned to its cell on both ends of a drag; the sim
+    // refuses silently, so say why here instead of a drag that snaps back.
+    if (bagReorderBlockedByLock(world.inventory, world.bagCapacity, from, to)) {
+      this.deps.showError(t('hudChrome.bags.reorderLocked'));
+      return;
+    }
+    world.moveInventoryItem(from, to);
     audio.click();
     this.deps.hideTooltip();
     this.render();

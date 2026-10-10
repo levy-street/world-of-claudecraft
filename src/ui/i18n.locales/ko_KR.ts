@@ -8140,6 +8140,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.dragEquipHint': '캐릭터로 끌어다 놓아 장착',
   'hudChrome.bags.dragDestroyHint': '세계로 끌어내어 파괴',
   'hudChrome.bags.reorderNeedsRecent': '가방을 정리하려면 필터를 해제하고 최근 순으로 정렬하세요',
+  'hudChrome.bags.reorderLocked': '잠긴 아이템은 가방 칸에 고정됩니다. 옮기려면 잠금을 해제하세요.',
   'hudChrome.bags.filterGroupAria': '가방을 분류별로 필터링',
   'hudChrome.bags.filterAll': '전체',
   'hudChrome.bags.filterWeapon': '무기',

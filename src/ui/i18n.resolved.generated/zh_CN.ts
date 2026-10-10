@@ -3660,6 +3660,7 @@ export const zh_CN: EnTranslations = {
       "dragEquipHint": "拖到角色身上以装备",
       "dragDestroyHint": "拖出到世界中以销毁",
       "reorderNeedsRecent": "清除筛选并按“最近”排序即可整理背包",
+      "reorderLocked": "已锁定的物品会固定在其背包格中。请先解锁再移动。",
       "itemAriaInstanced": "{item}，数量 {count}，带工匠印记的物品",
       "itemAriaEnchanted": "{item}，数量 {count}，已附魔的副本",
       "itemAriaBound": "{item}，数量 {count}，已绑定的副本",

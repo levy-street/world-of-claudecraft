@@ -8313,6 +8313,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.dragDestroyHint': 'Перетащите в мир, чтобы уничтожить',
   'hudChrome.bags.reorderNeedsRecent':
     'Сбросьте фильтр и выберите сортировку «Недавние», чтобы менять порядок в сумках',
+  'hudChrome.bags.reorderLocked':
+    'Заблокированные предметы остаются в своей ячейке сумки. Чтобы переместить предмет, снимите блокировку.',
   'hudChrome.bags.filterGroupAria': 'Фильтровать сумки по категории',
   'hudChrome.bags.filterAll': 'Все',
   'hudChrome.bags.filterWeapon': 'Оружие',
