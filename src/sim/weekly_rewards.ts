@@ -27,7 +27,11 @@ import {
   weeklyLootSpecForClass,
 } from './weekly_loot_spec';
 import { weeklyChoiceExhausted } from './weekly_reward_availability';
-import { weeklyRewardFitsClass, weeklyRewardItemAllowed } from './weekly_reward_eligibility';
+import {
+  weeklyRewardFitsClass,
+  weeklyRewardItemAllowed,
+  weeklySavedRewardItemAllowed,
+} from './weekly_reward_eligibility';
 import { weeklyTableSource } from './weekly_reward_options';
 import {
   historicalWeeklyBossUnlocks,
@@ -188,7 +192,7 @@ export function sanitizeWeeklyRewards(
         }
         if (typeof choice.itemId !== 'string' || choice.itemId.length > 128) continue;
         const item = ITEMS[choice.itemId];
-        if (item && weeklyRewardItemAllowed(item, choice.pool))
+        if (item && weeklySavedRewardItemAllowed(item, choice.pool))
           choices.push({
             pool: choice.pool,
             ...tableFields,
@@ -428,7 +432,7 @@ function collectInstanceLoot(
   }
 }
 // Exact catalog shared by preview and claim. Each eligible item is equally likely;
-// Class locks are respected; sigils and raid-only Crucible cores also qualify.
+// Class locks are respected; raid-only Crucible cores also qualify.
 export function weeklyLootPool(
   pool: WeeklyPoolId,
   playerClass: PlayerClass,

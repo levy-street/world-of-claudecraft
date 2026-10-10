@@ -69,16 +69,9 @@ describe('weekly boss-table eligibility', () => {
         for (const bossId of [IGNIVAR_BOSS_ID, VARKHUL_BOSS_ID]) {
           const items = weeklyBossLootPool(bossId, pool, cls);
           expect(items.filter((id) => id === 'lastflame_core')).toHaveLength(1);
-          const group = ['warrior', 'druid', 'mage'].includes(cls)
-            ? 'anvil'
-            : ['paladin', 'hunter', 'priest'].includes(cls)
-              ? 'ember'
-              : 'tempest';
-          const slots = bossId === IGNIVAR_BOSS_ID ? ['shoulder', 'gloves'] : ['helmet', 'legs'];
-          if (pool === 'raid_heroic') slots.push('chest');
           expect(
             items.filter((id) => !['weapon', 'armor', 'held_offhand'].includes(ITEMS[id].kind)),
-          ).toEqual(['lastflame_core', ...slots.map((slot) => `sigil_${group}_${slot}`)].sort());
+          ).toEqual(['lastflame_core']);
         }
         expect(weeklyLootPool(pool, cls)).toContain('lastflame_core');
       }

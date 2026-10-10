@@ -4,7 +4,7 @@ import { trinketLootFitsClass } from './trinket_loot_eligibility';
 import type { ItemDef, PlayerClass } from './types';
 import type { WeeklyPoolId } from './weekly_rewards';
 
-/** Shared pool/save policy: equipment, authored sigils, and raid-only Crucible cores. */
+/** New rewards: equipment and raid-only Crucible cores. */
 export function weeklyRewardItemAllowed(
   item: ItemDef,
   pool: WeeklyPoolId,
@@ -19,14 +19,17 @@ export function weeklyRewardItemAllowed(
   );
 }
 
-/** Equipment and exact authored sigils; the core exception also needs a raid pool. */
-export function weeklyRewardKindAllowed(item: ItemDef): boolean {
+/** Preserve previously fixed sigils without admitting them to new reward pools. */
+export function weeklySavedRewardItemAllowed(item: ItemDef, pool: WeeklyPoolId): boolean {
   return (
-    item.kind === 'weapon' ||
-    item.kind === 'armor' ||
-    item.kind === 'held_offhand' ||
+    weeklyRewardItemAllowed(item, pool) ||
     (item.kind === 'tool' && Object.hasOwn(IGNIVAR_SIGIL_ITEMS, item.id))
   );
+}
+
+/** Equipment only; the core exception also needs a raid pool. */
+export function weeklyRewardKindAllowed(item: ItemDef): boolean {
+  return item.kind === 'weapon' || item.kind === 'armor' || item.kind === 'held_offhand';
 }
 
 /** Class and stat restrictions shared by vault catalogs and new authoritative rolls. */
