@@ -37,9 +37,10 @@ export function paintsOwnBreath(templateId: string): boolean {
  *  and 66). */
 export const DRAKE_JAWS_INHALE: CreatureAnchor = { forward: -0.2, up: 14.0 };
 export const DRAKE_JAWS_EXHALE: CreatureAnchor = { forward: 5.9, up: 3.0 };
-/** The Knellwyrm's jaws as it pours the same breath (its own Breath clip, frame
- *  70), at its authored size. */
-export const KNELLWYRM_JAWS_EXHALE: CreatureAnchor = { forward: 6.1, up: 4.4 };
+/** The Knellwyrm's mouth as it pours fire on the wing, its neck plunged (the
+ *  Strafe clip, frame 20: the Pyre Strafe run and the Knell's pour), over the
+ *  wyrm's own altitude at its authored size. */
+export const KNELLWYRM_JAWS_STRAFE: CreatureAnchor = { forward: 4.4, up: 6.8 };
 /** The gargoyle's head as it rears to shriek (Screech clip). */
 export const GARGOYLE_HEAD_SCREECH: CreatureAnchor = { forward: 1.44, up: 3.47 };
 

@@ -5083,8 +5083,8 @@ export const VISUALS: Record<string, VisualDef> = {
   // on its chest. Its template raises it a quarter again. It glides in from the sky
   // (the arrival bar), takes wing for its Pyre Strafe, flies the lane with its neck
   // plunged and jaws wide, and rears off its forefeet with its wings flung wide for
-  // Dread Bellow; the drake's strikes play to their bars (its own jaws:
-  // KNELLWYRM_JAWS_EXHALE). `height` is the idle's posed height half a second in.
+  // Dread Bellow; the drake's strikes play to their bars (its strafing jaws:
+  // KNELLWYRM_JAWS_STRAFE). `height` is the idle's posed height half a second in.
   mob_crypt_knellwyrm: {
     url: `${CREATURES}/woc_crypt_knellwyrm.glb`,
     authoredAtlas: true,

@@ -14,7 +14,7 @@ import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
 import {
   anchorWorld,
   DRAKE_JAWS_EXHALE,
-  KNELLWYRM_JAWS_EXHALE,
+  KNELLWYRM_JAWS_STRAFE,
 } from '../src/render/hollow_crypt/crypt_creature_fx_core';
 import { MOBS } from '../src/sim/data';
 import { ILVANE_DIRGE, ILVANE_TUNING } from '../src/sim/encounters/hollow_crypt/ilvane_ids';
@@ -173,21 +173,30 @@ describe('the Hollow Crypt boss bodies', () => {
     expect(Math.abs(sing - ILVANE_TUNING.dirgeCast)).toBeLessThan(1 / 30 + 1e-6);
   });
 
-  it('pours the breath from jaws over each wyrm cone, at its own scale', () => {
-    for (const [mob, jawsAnchor] of [
-      ['crypt_ossuary_drake', DRAKE_JAWS_EXHALE],
-      ['crypt_knellwyrm', KNELLWYRM_JAWS_EXHALE],
-    ] as const) {
-      const t = MOBS[mob];
-      const cone = t.breathCone;
-      expect(cone, mob).toBeDefined();
-      const jaws = anchorWorld(jawsAnchor, 0, 0, 0, 0, t.scale);
-      const reach = Math.hypot(jaws.x, jaws.z);
-      // ahead of the body, inside the cone's reach, and thrust low (under half the wyrm's
-      // drawn height) to pour onto the floor
-      expect(jaws.z, mob).toBeGreaterThan(0);
-      expect(reach, mob).toBeLessThan(cone?.range ?? 0);
-      expect(jaws.y, mob).toBeLessThan(0.5 * defOf(mob).height * t.scale);
+  it('pours the breath from the drake jaws over its cone, at its own scale', () => {
+    const t = MOBS.crypt_ossuary_drake;
+    const cone = t.breathCone;
+    expect(cone).toBeDefined();
+    const jaws = anchorWorld(DRAKE_JAWS_EXHALE, 0, 0, 0, 0, t.scale);
+    const reach = Math.hypot(jaws.x, jaws.z);
+    // ahead of the body, inside the cone's reach, and thrust low (under half the drake's
+    // drawn height) to pour onto the floor
+    expect(jaws.z).toBeGreaterThan(0);
+    expect(reach).toBeLessThan(cone?.range ?? 0);
+    expect(jaws.y).toBeLessThan(0.5 * defOf('crypt_ossuary_drake').height * t.scale);
+  });
+
+  it('pours the Knellwyrm fire on the wing from one pair of strafing jaws', () => {
+    const t = MOBS.crypt_knellwyrm;
+    const jaws = anchorWorld(KNELLWYRM_JAWS_STRAFE, 0, 0, 0, 0, t.scale);
+    // ahead of the body and inside its drawn height, the neck plunged
+    expect(jaws.z).toBeGreaterThan(0);
+    expect(jaws.y).toBeGreaterThan(0);
+    expect(jaws.y).toBeLessThan(defOf('crypt_knellwyrm').height * t.scale);
+    // the Pyre Strafe run and the Knell's pour both play Strafe and read the same anchor
+    for (const file of ['crypt_finale_fx.ts', 'knell_fx.ts']) {
+      const src = readFileSync(`src/render/hollow_crypt/${file}`, 'utf8');
+      expect(src, file).toMatch(/anchorWorld\(\s*KNELLWYRM_JAWS_STRAFE,/);
     }
   });
 
