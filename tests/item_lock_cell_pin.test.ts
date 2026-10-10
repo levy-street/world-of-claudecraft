@@ -125,6 +125,23 @@ describe('locking stamps the cell the stack sits in', () => {
     expect(cellOf(meta.inventory, capacity, SET_SWORD)).toBe(2);
   });
 
+  it('a no-op lock command stamps a legacy locked stack to its current cell', () => {
+    const { sim, meta } = makeSim();
+    meta.inventory.push(
+      { itemId: FILLER, count: 3 },
+      { itemId: FOOD, count: 2 },
+      { itemId: SET_SWORD, count: 1, instance: { locked: true } },
+    );
+    const capacity = bagCapacity(meta.bags);
+    expect(cellOf(meta.inventory, capacity, SET_SWORD)).toBe(2);
+    sim.setItemLocked(SET_SWORD, true, { slotIndex: 2 });
+    expect(meta.inventory[2]?.slot).toBe(2);
+
+    meta.inventory.splice(0, 1);
+    expect(cellOf(meta.inventory, capacity, FOOD)).toBe(0);
+    expect(cellOf(meta.inventory, capacity, SET_SWORD)).toBe(2);
+  });
+
   it('a drag through the sim command cannot move it', () => {
     const { sim, meta } = makeSim();
     meta.inventory.push({ itemId: FILLER, count: 3 }, { itemId: SET_SWORD, count: 1 });

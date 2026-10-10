@@ -155,7 +155,10 @@ export function setItemLocked(
   // flips the lock on an id-mate the player never clicked.
   const selected = selectedInventorySlot(meta.inventory, itemId, slotIndex, anchor);
   if (!selected) return { ok: false, itemId, locked, reason: 'not_held' };
-  if (isItemLocked(selected.instance) === locked) return { ok: true, itemId, locked };
+  if (isItemLocked(selected.instance) === locked) {
+    if (locked) pinStackToCurrentCell(meta.inventory, bagCapacity(meta.bags), selected);
+    return { ok: true, itemId, locked };
+  }
   if (!locked && selected.instance) {
     const { locked: _drop, ...rest } = selected.instance;
     selected.instance = Object.keys(rest).length > 0 ? rest : undefined;
