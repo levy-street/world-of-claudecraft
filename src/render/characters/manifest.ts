@@ -5026,21 +5026,22 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     selfIllumination: 0.15,
   },
-  // The Ossuary Drake (the art guide's model): a colossal skeletal wyvern standing
-  // on two digitigrade legs, its body pitched forward over them, the tail behind as
-  // its counterweight and its bat wings raised over its back. It flies its patrol
-  // (`Fly`: two downbeats and a long glide), cries as it breaks off (`SkyRoar`, the
-  // landing cue), glides down (`Glide`), lands (`Land`), stalks and runs on its
-  // hind legs, bites (never claws), and plays each strike to its bar: the breath
-  // inhales over the 2 s bar with the head reared and its exhale plays OUT after
-  // it, the jaws thrust low (crypt_creature_fx_core.ts DRAKE_JAWS_*); the tail
-  // sweeps and the wings buffet exactly at their bars' ends. Plain swings never cut
-  // those short. `height` is the idle's posed height half a second in.
+  // The Ossuary Drake (the art guide's model): a colossal skeletal dragon on four
+  // legs, an S-neck to a horned skull, soul fire caged in its ribs, its bat wings a
+  // separate pair raised over its back, centred on its chest so the jaws that pour
+  // the Barrowflame hang over the breath cone's apex. It flies its patrol (`Fly`:
+  // two downbeats and a long glide), cries as it breaks off (`SkyRoar`, the landing
+  // cue), glides down (`Glide`), lands (`Land`), walks in four beats and runs in a
+  // bounding gallop, bites (never claws), and plays each strike to its bar: the
+  // breath inhales over the 2 s bar with the head reared and its exhale plays OUT
+  // after it, the jaws thrust low (crypt_creature_fx_core.ts DRAKE_JAWS_*); the
+  // tail sweeps and the wings buffet exactly at their bars' ends. Plain swings never
+  // cut those short. `height` is the idle's posed height half a second in.
   mob_crypt_drake: {
     url: `${CREATURES}/woc_crypt_ossuary_drake.glb`,
     authoredAtlas: true,
     height: 13.63,
-    hover: -0.03,
+    hover: -0.034,
     flight: true,
     clips: {
       idle: 'Idle',
@@ -5070,19 +5071,20 @@ export const VISUALS: Record<string, VisualDef> = {
       flourish: 'Roar',
     },
     castPlayOutHoldsAttacks: true,
-    walkRef: 4.02,
-    runRef: 12.97,
+    walkRef: 3.04,
+    runRef: 13.2,
     selfIllumination: 0.12,
   },
 
   // The Knellwyrm (the art guide's model): the Ossuary Drake's charred kin, a
-  // horned bone wyvern with violet ghost fire through its ribs and spine, a funeral
-  // bell hung in its chest and a long spined tail, posed by the drake's clip set on
-  // its own skeleton. Its template raises it a quarter again. It glides in from the
-  // sky (the arrival bar), takes wing for its Pyre Strafe, flies the lane with its
-  // neck plunged and jaws wide, and rears up with its wings flung wide for Dread
-  // Bellow; the drake's strikes play to their bars (its own jaws:
-  // KNELLWYRM_JAWS_EXHALE). `height` is the idle's posed height half a second in.
+  // horned four-legged bone dragon with violet ghost fire through its ribs and
+  // spine, a funeral bell hung under its chest, its wings a separate pair, and a
+  // long spined tail, posed by the drake's clip set on its own skeleton and centred
+  // on its chest. Its template raises it a quarter again. It glides in from the sky
+  // (the arrival bar), takes wing for its Pyre Strafe, flies the lane with its neck
+  // plunged and jaws wide, and rears off its forefeet with its wings flung wide for
+  // Dread Bellow; the drake's strikes play to their bars (its strafing jaws:
+  // KNELLWYRM_JAWS_STRAFE). `height` is the idle's posed height half a second in.
   mob_crypt_knellwyrm: {
     url: `${CREATURES}/woc_crypt_knellwyrm.glb`,
     authoredAtlas: true,
@@ -5135,8 +5137,8 @@ export const VISUALS: Record<string, VisualDef> = {
       flourish: 'Roar',
     },
     castPlayOutHoldsAttacks: true,
-    walkRef: 6.03,
-    runRef: 19.4,
+    walkRef: 4.2,
+    runRef: 18.2,
     selfIllumination: 0.2,
   },
 
