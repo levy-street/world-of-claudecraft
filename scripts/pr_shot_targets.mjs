@@ -136,6 +136,82 @@ const targetAurasBelowSeed = async (page) => {
   );
 };
 
+/** The same setting ON, but the frame left on its STOCK seat (no persisted
+ *  position): the case a player report raised, where the below-frame strip
+ *  used to paint across the action bar. The epoch stamp keeps the one-shot
+ *  layout reset from running mid-capture; no position is written. */
+const targetAurasBelowStockSeed = async (page) => {
+  await lowGraphicsSeed(page);
+  await page.evaluateOnNewDocument(
+    `try { const k = 'woc_settings'; const s = JSON.parse(localStorage.getItem(k) || '{}'); s.targetAurasBelowFrame = true; s.showNameplateDots = true; localStorage.setItem(k, JSON.stringify(s)); localStorage.setItem('woc_layout_reset_epoch', '1'); localStorage.removeItem('woc_target_frame_pos'); } catch {}`,
+  );
+};
+
+/** Seeds the local player's own debuffs on the nearest hostile training dummy,
+ *  one of them a five-stack Armor Shear in the exact record shape the sim's
+ *  sunder effect applies (src/sim/combat/effect_dispatch.ts), stands the player
+ *  beside it and targets it. Seeded, not cast: the claims these shots carry
+ *  are about where the strip hangs and whether a stack count is drawn, never
+ *  about how the aura came to exist (the target-aura-side precedent). */
+async function stageStackedTargetDebuffs(page) {
+  const staged = await page.evaluate(() => {
+    const game = window.__game;
+    const sim = game?.sim;
+    const player = sim?.player;
+    if (!game || !sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+    const dummy = [...sim.entities.values()].find(
+      (e) => e.templateId === 'training_dummy' && !e.dead && e.hostile,
+    );
+    if (!dummy) return { ok: false, reason: 'hostile training dummy is unavailable' };
+    player.pos.x = dummy.pos.x - 4;
+    player.pos.y = dummy.pos.y;
+    player.pos.z = dummy.pos.z;
+    player.prevPos = { ...player.pos };
+    // Face plus x, straight at the dummy, with the chase camera on the same
+    // heading so its plate sits mid-frame.
+    player.facing = Math.PI / 2;
+    game.input.camYaw = player.facing;
+    game.input.camDist = 6;
+    sim.rebucket?.(player);
+    dummy.auras.length = 0;
+    const auras = [
+      ['sunder_armor', 'Armor Shear', 'sunder', 600, 40, 'physical', 5],
+      ['rend', 'Rend', 'dot', 120, 20, 'physical', undefined],
+      ['moonfire', 'Moonfire', 'dot', 120, 30, 'arcane', undefined],
+      ['crippling_poison', 'Crippling Poison', 'slow', 600, 50, 'nature', 2],
+    ];
+    for (const [id, name, kind, remaining, value, school, stacks] of auras) {
+      dummy.auras.push({
+        id,
+        name,
+        kind,
+        remaining,
+        duration: remaining,
+        value,
+        sourceId: player.id,
+        school,
+        ...(stacks === undefined ? {} : { stacks }),
+      });
+    }
+    sim.targetEntity(dummy.id, player.id);
+    return { ok: true, dummyId: dummy.id };
+  });
+  if (!staged.ok) throw new Error(staged.reason);
+  await waitForCurtainStreak(page);
+  await page.waitForFunction(
+    () => {
+      const strip = document.getElementById('tf-debuffs');
+      const frame = document.getElementById('target-frame');
+      if (!strip || !frame) return false;
+      return getComputedStyle(frame).display !== 'none' && strip.children.length > 0;
+    },
+    { timeout: 30000, polling: 200 },
+  );
+  await sweepOverlays(page, 4);
+  await wait(900);
+  return staged.dummyId;
+}
+
 const lowGraphicsSeed = async (page) => {
   await page.evaluateOnNewDocument(
     `try { const k = 'woc_settings'; const s = JSON.parse(localStorage.getItem(k) || '{}'); s.graphicsPreset = 1; s.graphicsDefaultApplied = true; localStorage.setItem(k, JSON.stringify(s)); } catch {}`,
@@ -3776,6 +3852,86 @@ export const TARGETS = [
         };
       });
       return { clip: region };
+    },
+  },
+  {
+    key: 'target-aura-stock-seat',
+    label:
+      'Target auras below the frame on the STOCK seat: the frame rises, the strip clears the hotbar',
+    when: ['ui/aura_bar_side'],
+    // Desktop only: the touch sheet pins its own seat and already hangs the
+    // strip below unconditionally (the target-aura-side mobile leg).
+    variants: [
+      {
+        key: 'desktop',
+        beforeLoad: targetAurasBelowStockSeed,
+        // The entry flow waits for its own #btn-offline, so DOMContentLoaded
+        // is enough; networkidle0 can stall on the shell's API polling when no
+        // local server is up.
+        navigationWaitUntil: 'domcontentloaded',
+      },
+    ],
+    async capture(page) {
+      await awaitWorldPainted(page);
+      await stageStackedTargetDebuffs(page);
+      // The player frame, the target frame, its strip and the action bar in one
+      // region, so the pair shows whether the strip lands on the hotbar.
+      const region = await page.evaluate(() => {
+        const boxes = ['player-frame', 'target-frame', 'tf-debuffs', 'actionbar']
+          .map((id) => document.getElementById(id))
+          .filter(Boolean)
+          .map((el) => el.getBoundingClientRect());
+        const pad = 16;
+        const x = Math.max(0, Math.min(...boxes.map((b) => b.left)) - pad);
+        const y = Math.max(0, Math.min(...boxes.map((b) => b.top)) - pad);
+        const right = Math.min(window.innerWidth, Math.max(...boxes.map((b) => b.right)) + pad);
+        const bottom = Math.min(window.innerHeight, Math.max(...boxes.map((b) => b.bottom)) + pad);
+        return { x, y, width: right - x, height: bottom - y };
+      });
+      return { clip: region };
+    },
+  },
+  {
+    key: 'nameplate-dot-stacks',
+    label: 'Nameplate dot row: a stacking debuff badges its stack count on the icon',
+    when: ['render/nameplate_dot_row.ts', 'render/nameplate_dots_core.ts'],
+    variants: [
+      {
+        key: 'desktop',
+        beforeLoad: targetAurasBelowStockSeed,
+        // The entry flow waits for its own #btn-offline, so DOMContentLoaded
+        // is enough; networkidle0 can stall on the shell's API polling when no
+        // local server is up.
+        navigationWaitUntil: 'domcontentloaded',
+      },
+    ],
+    async capture(page) {
+      await awaitWorldPainted(page);
+      const dummyId = await stageStackedTargetDebuffs(page);
+      // Crop around the dummy's plate: at chase distance the dot row is a few
+      // dozen pixels wide in a full frame, and the claim is about one corner.
+      const spot = await page.evaluate((id) => {
+        const r = window.__game?.renderer;
+        const v = r?.views?.get?.(id);
+        if (!r || !v) return null;
+        // The plate's dot row floats well above the head (measured at about
+        // 1.9 model heights at this chase distance), not at the head itself.
+        const p = v.group.position.clone();
+        p.y += (v.height ?? 2.3) * 1.9;
+        p.project(r.camera);
+        return {
+          x: (p.x * 0.5 + 0.5) * window.innerWidth,
+          y: (-p.y * 0.5 + 0.5) * window.innerHeight,
+          w: window.innerWidth,
+          h: window.innerHeight,
+        };
+      }, dummyId);
+      if (!spot) return {};
+      const width = Math.min(320, spot.w);
+      const height = Math.min(160, spot.h);
+      const x = Math.max(0, Math.min(spot.w - width, spot.x - width / 2));
+      const y = Math.max(0, Math.min(spot.h - height, spot.y - height / 2));
+      return { clip: { x, y, width, height } };
     },
   },
   {

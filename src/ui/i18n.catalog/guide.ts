@@ -588,7 +588,7 @@ export const guideStrings = {
     ifAuraBarBelowFrame:
       'Moves the buff row below your unit frame instead of above it. Only matters while buffs are on the player frame.',
     ifTargetAurasBelowFrame:
-      "Hangs the target frame's buff and debuff strip below the frame instead of above it, the classic layout. Off by default, since the stock target frame sits directly above the action bar; turn it on once you have moved the frame somewhere with room beneath it.",
+      "Hangs the target frame's buff and debuff strip below the frame, under the target's name and health bar, instead of above it: the classic layout. On its stock seat the target frame (with your cast bar and swing timers) rises by one strip row so the strip's first row clears the action bar; a frame you have moved stays where you put it.",
     ifAlwaysShowAllBuffs:
       'Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.',
     ifShowAuraCaster:

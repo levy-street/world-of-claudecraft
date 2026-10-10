@@ -1364,7 +1364,8 @@
     /* Distance from the bottom of #ui to the TOP of that stock seat: the 6px
        bottom-bar inset, the XP rail, the action row and its gap, the bar gap,
        then the docked player frame's 64px height, so the stock target frame
-       lands level with the player frame. */
+       lands level with the player frame (one aura strip row higher with
+       targetAurasBelowFrame, hud.css). */
     --unit-frame-seat-offset: calc(
       var(--xp-rail-h) +
       var(--socket-row-gap) +
@@ -1372,6 +1373,11 @@
       var(--unit-frame-bar-gap) +
       70px
     );
+    /* The stock pair's shared BOTTOM edge, measured from the bottom of #ui:
+       the seat offset above minus the docked player frame's 64px height. The
+       target seat anchors here when its aura strip hangs below the frame
+       (targetAurasBelowFrame), so the frame grows upward, not into the bar. */
+    --unit-frame-seat-floor: calc(var(--unit-frame-seat-offset) - 64px);
     /* The weekly emissary window (src/ui/weekly_quests_window.ts): its own
        violet-and-gilt palette, named here so the sheet holds no raw literal. */
     --wk-black: #000;
