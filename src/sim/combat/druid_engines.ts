@@ -346,12 +346,15 @@ export function druidEngineOnCast(
       breakMovementControl(ctx, player);
     }
     // Loping Stride is baseline: every form shift sprints, no talent check.
-    // Longstride only changes the two numbers (duration and cooldown).
+    // Longstride only changes the two numbers (duration and cooldown). A shift
+    // in the saddle (a mount-safe form, combat/forms.ts) does not sprint: the
+    // buff would stack onto the mount's speed on every toggle. The cooldown is
+    // left unspent, so the next shift on foot still sprints.
     const longstride = selectedRow(ctx, player, DRUID_TALENT_IDS.longstride);
     const strideDuration = longstride ? longstrideMetrics().duration : LOPING_STRIDE_DURATION;
     const strideIcd = longstride ? longstrideMetrics().icd : LOPING_STRIDE_ICD;
     if (!player.procState) player.procState = { counters: {}, icds: {} };
-    if (player.procState.icds[LOPING_STRIDE_ICD_KEY] === undefined) {
+    if (!player.mountKey && player.procState.icds[LOPING_STRIDE_ICD_KEY] === undefined) {
       player.procState.icds[LOPING_STRIDE_ICD_KEY] = strideIcd;
       ctx.applyAura(player, {
         id: 'loping_stride',

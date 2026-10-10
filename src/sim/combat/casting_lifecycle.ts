@@ -164,7 +164,11 @@ import {
   willAutoUnshift,
 } from './form_auto_unshift';
 import { formRequirementMet, hasFormRequirement, requiredForms } from './form_requirement';
-import { isActionLockingFormAuraKind, isResourceShiftFormAuraKind } from './forms';
+import {
+  isActionLockingFormAuraKind,
+  isMountSafeFormToggle,
+  isResourceShiftFormAuraKind,
+} from './forms';
 import {
   applyBrainFreezeOverride,
   brainFreezeBypassesCooldown,
@@ -1867,11 +1871,17 @@ export function castAbility(
   // BEFORE this cast's own effects resolve, so the stealth lands on a cat and
   // the rush leaves as a bear.
   applyDruidFormEntry(ctx, p, meta, ability.id);
-  // Auto-dismount when the player is mounted or mid-summon-channel and casts any ability.
-  if (p.mountKey !== '') forceDismount(ctx, p);
-  if (p.mountCastKey !== '') {
-    p.mountCastRemaining = 0;
-    p.mountCastKey = '';
+  // Auto-dismount when the player is mounted or mid-summon-channel and casts any
+  // ability. The one exception is a mount-safe form toggle (combat/forms.ts:
+  // Moonwing, Gloamveil): it only adorns the rider, so it neither dismounts nor
+  // cancels a summon in flight. Judged on the RESOLVED effects, so a press that
+  // also strikes or heals is a real cast and still dismounts.
+  if (!isMountSafeFormToggle(res)) {
+    if (p.mountKey !== '') forceDismount(ctx, p);
+    if (p.mountCastKey !== '') {
+      p.mountCastRemaining = 0;
+      p.mountCastKey = '';
+    }
   }
   // An instant slipping through a RUNNING cast (usableWhileCasting /
   // Flitstep) must not disturb that cast's aim: castTargetId/castAim belong
