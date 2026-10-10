@@ -128,8 +128,6 @@ export const DROWNED_FX: Readonly<Record<string, DrownedFxSpec>> = {
     chest: { side: 0.03, up: 2.51, fwd: 0.34 },
     eyes: { side: 0.2, up: 3.74, fwd: 0.79 },
   },
-  // The Gaol Turnkey: water off the hood, the key ring, the chain on his
-  // forearm and the lantern at his hip.
   // Knight-Commander Olen (the art guide's body, measured on its posed Idle):
   // water off the morion's brim all round, the tower shield's top and rim
   // carried at his side.
@@ -159,16 +157,20 @@ export const DROWNED_FX: Readonly<Record<string, DrownedFxSpec>> = {
     chest: { side: -0.02, up: 1.43, fwd: 0.44 },
     eyes: { side: -0.01, up: 1.63, fwd: 0.49 },
   },
+  // The Gaol Turnkey (the art guide's body, measured on its posed Idle): water
+  // off the hood's brow and crown, the ring of keys at his belt, the chain on
+  // his left forearm and the lantern's roof.
   gaol_turnkey: {
-    rawHeight: 4.677,
+    rawHeight: 1.933,
     drips: [
-      { side: 0.19, up: 4.28, fwd: 0.22 },
-      { side: -1.11, up: 1.56, fwd: 0.48 },
-      { side: 0.91, up: 1.77, fwd: 0.22 },
-      { side: 0.67, up: 2.08, fwd: 0.09 },
+      { side: 0.0, up: 1.7, fwd: 0.17 },
+      { side: -0.01, up: 1.9, fwd: 0.02 },
+      { side: 0.25, up: 0.89, fwd: 0.19 },
+      { side: 0.37, up: 1.12, fwd: 0.05 },
+      { side: 0.5, up: 0.72, fwd: 0.07 },
     ],
-    chest: { side: 0.06, up: 3.03, fwd: 0.5 },
-    eyes: { side: 0.17, up: 4.17, fwd: 0.19 },
+    chest: { side: 0.0, up: 1.3, fwd: 0.22 },
+    eyes: { side: 0.0, up: 1.75, fwd: 0.15 },
   },
   // The war mastiff: water off its jaws, the collar's ring and the snapped chain.
   bastion_warhound: {

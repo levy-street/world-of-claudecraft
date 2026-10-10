@@ -1,8 +1,14 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
+// The captain wears the art guide's body now; the sailor and the ship keep
+// the ghost-crew builds (scripts/assets/bastion_ghost_crew/).
+const FILES: Record<string, string> = { captain: 'woc_bastion_captain' };
+
 function asset(name: string, folder = 'creatures') {
-  const bytes = readFileSync(`public/models/${folder}/bastion_ghost_${name}.glb`);
+  const bytes = readFileSync(
+    `public/models/${folder}/${FILES[name] ?? `bastion_ghost_${name}`}.glb`,
+  );
   expect(bytes.toString('ascii', 0, 4)).toBe('glTF');
   expect(bytes.readUInt32LE(8)).toBe(bytes.length);
   return JSON.parse(bytes.toString('utf8', 20, 20 + bytes.readUInt32LE(12)));

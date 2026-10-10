@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "c316cae1233e2b5f01f7929e61a5dcc4d3141ddf2dfd7921b404a2160ab739c0",
+  "rendererFingerprint": "29fec8a40ff0a7397a934ca9fe6067705436cd8c88906b0322d7cc8f69a31db9",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "darwin",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6079192,
-      "sha256": "bdc11b630631ee4e26191bb2d3339ebc53fc7200a37040b739c6c9b72a1bf510",
+      "bytes": 6079209,
+      "sha256": "ad00e13b6d518e86b39d173aa2e32af3bfec19558c554ac06f50312773bed42c",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -3782,10 +3782,10 @@
       "visualKey": "bastion_turnkey",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/gaol_turnkey.glb",
-          "path": "public/models/creatures/gaol_turnkey.glb",
-          "bytes": 2684540,
-          "sha256": "0499f2be5653b49c35749684ac1cb7bbeadd56fff3ad08c17fc722edaa4d91a9"
+          "url": "models/creatures/woc_bastion_turnkey.glb",
+          "path": "public/models/creatures/woc_bastion_turnkey.glb",
+          "bytes": 1982764,
+          "sha256": "46c7f0fdeca973c85061ed0ddf782debe77ccdcf87fa2c3086da9a300e916e1b"
         },
         "idle": "Idle",
         "height": 6.4,
@@ -3802,11 +3802,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "25ad873fab2368b02a5a9bcc25d1a91a57e89e68f612cfb12588d0f7f7648014",
+      "sourceFingerprint": "0d0cf3ac9f8c6abd2b603cdeee4b501290e22ad3b6aa8d9c189c715276c2b6cf",
       "output": {
         "path": "public/ui/mobs/gaol_turnkey.webp",
-        "bytes": 1624,
-        "sha256": "c170c9dc7fbccaca4d84ce8e124583f60808db79208ea3a481fa75e0d73bb467"
+        "bytes": 1570,
+        "sha256": "c544124d8f358ef55ae10a12bda47ed6899ebf211dbb03ebf1e5c05e3fb10ee6"
       }
     },
     {
@@ -12735,10 +12735,10 @@
       "visualKey": "mob_turretback",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/bastion_ghost_captain.glb",
-          "path": "public/models/creatures/bastion_ghost_captain.glb",
-          "bytes": 2212432,
-          "sha256": "3965105de5c534565cef2f738b28e7706170182c3e527ba3af6241cdd800cb2f"
+          "url": "models/creatures/woc_bastion_captain.glb",
+          "path": "public/models/creatures/woc_bastion_captain.glb",
+          "bytes": 2293540,
+          "sha256": "e7acb3582fc1792c34e4465f2c9470c1afdbec67965a04c03c79a58861739cab"
         },
         "idle": "Idle",
         "height": 7.5,
@@ -12755,11 +12755,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "37350f0b78476aeea63b923dd96d4ad9d5674e96fdc3e6d78796bbfb3a6d5050",
+      "sourceFingerprint": "7d35ba61e122ed0a7600065e11a8958f1f11dbd18b6ffb5f95a745f02fc592b0",
       "output": {
         "path": "public/ui/mobs/turretback_hermit.webp",
-        "bytes": 2224,
-        "sha256": "217a809d01f71e6d3e565e32055ff62df44b01761ccad44fc10d05fd0417a552"
+        "bytes": 2512,
+        "sha256": "65d676687b9e37df38af9319c809e382258b6888ce01c4e412b77c1c8100ea7e"
       }
     },
     {

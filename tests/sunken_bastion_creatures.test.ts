@@ -10,8 +10,12 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
-import { BASTION_OPEN_CELLS_GESTURE } from '../src/render/sunken_bastion/bastion_creature_fx_core';
+import {
+  BASTION_OPEN_CELLS_GESTURE,
+  LANTERN_FLARE_DELAY,
+} from '../src/render/sunken_bastion/bastion_creature_fx_core';
 import { MOBS } from '../src/sim/data';
+import { GHOST_CAPTAIN_TUNING } from '../src/sim/encounters/sunken_bastion/ghost_captain_ids';
 import { BASTION_PIERCING_BOLT } from '../src/sim/mob/trash_kit/bastion_cast_ids';
 import type { Entity } from '../src/sim/types';
 
@@ -53,7 +57,7 @@ function referencedClips(key: string): string[] {
 const ROSTER: Record<string, { glb: string; unique: string[] }> = {
   barnacle_crawler: { glb: 'bastion_ghost_sailor.glb', unique: ['Attack2', 'Death', 'Cast'] },
   turretback_hermit: {
-    glb: 'bastion_ghost_captain.glb',
+    glb: 'woc_bastion_captain.glb',
     unique: ['Broadside', 'Anchor', 'Boarding', 'Death'],
   },
   bastion_warhound: {
@@ -65,7 +69,10 @@ const ROSTER: Record<string, { glb: string; unique: string[] }> = {
   fogbound_arbalest: { glb: 'drowned_arbalest.glb', unique: ['Aim', 'Shoot'] },
   drowned_sergeant: { glb: 'drowned_sergeant.glb', unique: ['Rally', 'CombatIdle'] },
   shackled_prisoner: { glb: 'drowned_prisoner.glb', unique: ['Attack', 'Attack2'] },
-  gaol_turnkey: { glb: 'gaol_turnkey.glb', unique: ['KeySwing', 'ChainLash', 'LanternRaise'] },
+  gaol_turnkey: {
+    glb: 'woc_bastion_turnkey.glb',
+    unique: ['KeySwing', 'ChainLash', 'LanternRaise', 'Cast'],
+  },
   mistweaver: { glb: 'mist_chanter.glb', unique: ['Ward', 'Cast'] },
   tidebound_acolyte: { glb: 'tidebound_acolyte.glb', unique: ['Mend'] },
 };
@@ -128,7 +135,7 @@ describe('the Sunken Bastion creature roster', () => {
 
   it('gives the Turnkey its own jailer body, never a player model', () => {
     const def = VISUALS[keyOf('gaol_turnkey')];
-    expect(def.url).toBe('models/creatures/gaol_turnkey.glb');
+    expect(def.url).toBe('models/creatures/woc_bastion_turnkey.glb');
     expect(def.url).not.toMatch(/chars\/players/);
     expect(def.attach ?? []).toEqual([]);
     expect(def.show ?? []).toEqual([]);
@@ -175,5 +182,82 @@ describe('the Sunken Bastion creature roster', () => {
     for (const mobId of [...Object.keys(ROSTER), 'bastion_revenant']) {
       expect(VISUALS[keyOf(mobId)].url).not.toContain('skeleton');
     }
+  });
+});
+
+interface GlbDoc {
+  nodes?: { name?: string; children?: number[] }[];
+  animations?: { name: string; samplers: { input: number }[] }[];
+  accessors?: { max?: number[] }[];
+}
+
+/** A clip's length in seconds (its samplers' last key time). */
+function clipSeconds(url: string, clip: string): number {
+  const doc = glbJson(url) as GlbDoc;
+  const anim = (doc.animations ?? []).find((a) => a.name === clip);
+  expect(anim, clip).toBeDefined();
+  return Math.max(...(anim?.samplers ?? []).map((s) => doc.accessors?.[s.input]?.max?.[0] ?? 0));
+}
+
+/** The name of the node that parents `name` in the GLB. */
+function parentOf(url: string, name: string): string | undefined {
+  const nodes = (glbJson(url) as GlbDoc).nodes ?? [];
+  const i = nodes.findIndex((n) => n.name === name);
+  return nodes.find((n) => (n.children ?? []).includes(i))?.name;
+}
+
+describe("the Gaol Turnkey on the art guide's body", () => {
+  const def = VISUALS[keyOf('gaol_turnkey')];
+
+  it('carries the great key and the lantern on their own bones in his fists', () => {
+    // Each prop rides a bone of its own under its hand, so it never turns in the
+    // fist and the lantern swings on its chain.
+    expect(parentOf(def.url, 'key')).toBe('hand.r');
+    expect(parentOf(def.url, 'lantern')).toBe('hand.l');
+  });
+
+  it('lands both blows on frame 18 of a 1.5 s swing played at 1x', () => {
+    // Weight before speed: a long coil and hang, the contact at 0.567 s (frame
+    // 18 at 30 fps), then the follow-through and a slow recovery.
+    expect(def.attackTimeScale).toBe(1);
+    for (const clip of ['KeySwing', 'ChainLash']) {
+      expect(def.clips.contacts?.[clip], clip).toEqual([0.567]);
+      expect(clipSeconds(def.url, clip), clip).toBeCloseTo(1.5, 2);
+    }
+  });
+
+  it('flares the lantern at the top of its raise, inside the clip', () => {
+    const raise = clipSeconds(def.url, 'LanternRaise');
+    // The top of the hoist is frame 12 (0.367 s), when the flare is lit.
+    expect(Math.abs(LANTERN_FLARE_DELAY - 11 / 30)).toBeLessThan(0.02);
+    expect(raise).toBeGreaterThan(LANTERN_FLARE_DELAY + 0.8);
+  });
+});
+
+describe("the Shipwreck Captain on the art guide's body", () => {
+  const def = VISUALS[keyOf('turretback_hermit')];
+
+  it('carries the cutlass on its own bone in his right fist', () => {
+    expect(parentOf(def.url, 'cutlass')).toBe('hand.r');
+  });
+
+  it('lands both blows on frame 18 of a 1.5 s swing played at 1x', () => {
+    expect(def.attackTimeScale).toBe(1);
+    for (const clip of ['Attack', 'Attack2']) {
+      expect(def.clips.contacts?.[clip], clip).toEqual([0.567]);
+      expect(clipSeconds(def.url, clip), clip).toBeCloseTo(1.5, 2);
+    }
+  });
+
+  it('plays each bar over exactly its warning, the blow at its end', () => {
+    // Played at 1x through castByAbility, so each clip spans its bar: the
+    // guns fire, the anchor flies and the crew boards as the clip ends.
+    const bars = {
+      Broadside: GHOST_CAPTAIN_TUNING.broadsideWarning,
+      Anchor: GHOST_CAPTAIN_TUNING.anchorWarning,
+      Boarding: GHOST_CAPTAIN_TUNING.boardingWarning,
+    };
+    for (const [clip, seconds] of Object.entries(bars))
+      expect(clipSeconds(def.url, clip), clip).toBeCloseTo(seconds, 3);
   });
 });
