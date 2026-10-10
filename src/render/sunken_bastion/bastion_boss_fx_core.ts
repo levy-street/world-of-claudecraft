@@ -336,10 +336,10 @@ export function revealGlow(prev: number, lit: boolean, dt: number): number {
   return Math.max(0, prev - REVEAL_FADE_PER_SEC * dt);
 }
 
-/** Vael's soul lantern at his hip (reaper.py REST['Lantern'], the bulb's
- *  middle), in model units over his feet: the real Vael's flare burns HERE,
- *  on the lantern, not on his chest. */
-export const VAEL_LANTERN = { side: 0.66, up: 2.6, fwd: 0.22 } as const;
+/** Vael's soul lantern held out on his left (the art guide's body, the cage's
+ *  middle half a second into Idle), in yards over his pivot at scale 1: the
+ *  real Vael's flare burns HERE, on the lantern, not on his chest. */
+export const VAEL_LANTERN = { side: 0.93, up: 2.68, fwd: 0.83 } as const;
 
 /** One Vael (or Fogbeacon lamp) candidate in view: its claim slot, whether
  *  his Fog Veil is up, and how far it stands from the local player. */

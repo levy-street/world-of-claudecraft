@@ -5353,21 +5353,18 @@ export const VISUALS: Record<string, VisualDef> = {
     selfIllumination: 0.16,
   },
 
-  // The Sunken Bastion's bosses (sim/encounters/sunken_bastion), each sculpted
-  // whole on the drowned kit. Knight-Commander Olen (scripts/assets/
-  // sunken_bastion_drowned/olen/): the officer his drowned garrison still serves,
-  // towering over it in fluted plate trimmed with tarnished brass, the Bastion's
-  // tower-over-waves in brass on his breast; a grand morion with a crest of
-  // faded crimson horsehair and a bevor up under the nose, sea light burning in
-  // the shadow of the brim; a commander's cloak torn to the calves, a great
-  // tower shield held by its upright grip (the sigil in brass, barnacles crusting
-  // its foot) and a broad longsword. He chops over the shield's rim, drives the
-  // shield in and reaps with a flat sweep (Attack3, his Reaping Arc); the
-  // Oathbound Charge's bar is OathCharge (stamp, the oath roared with the sword
-  // to the sky, down behind the shield), bar-locked so he launches on the bar's
-  // end into Run, the shield-first charge; Breached he reels in Stunned.
+  // The Sunken Bastion's bosses (sim/encounters/sunken_bastion). Knight-Commander
+  // Olen (the art guide's model, scripts/assets/specs/woc_bastion_olen.json): the
+  // officer his drowned garrison still serves, in fluted plate dark with rust and
+  // verdigris, a brass sunburst on his breast, a morion with a crimson horsehair
+  // crest and sea light in its eye slit, a navy cloak torn to the calves, a tower
+  // shield (the sunburst in brass) and a greatsword. Both props drive his arms and
+  // the shield rides its own Shield bone. His blows play at 1x with their weight
+  // before their speed and land on frame 18 (contacts): the chop over the shield's
+  // rim, the shield driven in, and the flat reaping sweep (Attack3, his Reaping
+  // Arc); Run is the shield-first charge, and Breached he reels in Stunned.
   bastion_olen: {
-    url: `${CREATURES}/knight_commander_olen.glb`,
+    url: `${CREATURES}/woc_bastion_olen.glb`,
     // Drawn over the sergeant (7.2) and the Turnkey (8.3) at his 1.2: about 8.9.
     height: 7.4,
     clips: {
@@ -5376,6 +5373,8 @@ export const VISUALS: Record<string, VisualDef> = {
       walk: 'Walk',
       run: 'Run',
       attack: ['Attack', 'Attack2', 'Attack3'],
+      // Each blow lands on frame 18 of its 1.5 s swing at 1x (30 fps).
+      contacts: { Attack: [0.567], Attack2: [0.567], Attack3: [0.567] },
       hit: ['Hit'],
       death: 'Death',
       stunned: 'Stunned',
@@ -5416,26 +5415,26 @@ export const VISUALS: Record<string, VisualDef> = {
         showNow: OLEN_SHIELD_HOME_GESTURE,
       },
     ],
-    walkRef: 2.5,
-    runRef: 9.93,
+    attackTimeScale: 1,
+    walkRef: 3.26,
+    runRef: 10.05,
     authoredAtlas: true,
     selfIllumination: 0.16,
   },
-  // Gaoler Ossick (scripts/assets/sunken_bastion_drowned/ossick/): the gaol's
-  // master, drowned in his own yard, sculpted whole on the drowned kit: a hulking
-  // hunched brute, the shoulders heaped up past his ears and crusted with
-  // barnacles, arms like mooring posts ending in his own snapped manacles, a
-  // bald drowned head caged in an iron brank with sea light behind the bands, a
-  // leather harness over the bare grey chest, a ship's anchor slung on his back
-  // on a chain over the shoulder, shackle pairs at his hip and an iron-bound
-  // cudgel. Every bar is bar-locked, its release on the bar's end and its
-  // follow-through played out: AnchorHurl takes the anchor off his back and
-  // hurls it one-handed (the slung anchor, its own mesh, stays hidden while his
-  // thrown one lies on a victim: bastion_gaol_fx.ts re-sends the gestures),
-  // ShackleHeave thrusts the cudgel through his belt and heaves the shackles in
-  // both fists, CudgelSlam brings the cudgel straight down.
+  // Gaoler Ossick (the art guide's model, scripts/assets/specs/woc_bastion_ossick.json):
+  // the gaol's master, drowned in his own yard, a hulking hunched brute, the
+  // shoulders heaped up past his ears and crusted with barnacles, arms like
+  // mooring posts ending in his own snapped manacles, a bald drowned head caged in
+  // an iron brank, a leather harness, a ship's anchor across his back, shackles at
+  // his hip and an iron-banded cudgel. His blows play at 1x with their weight
+  // before their speed and land on frame 18 (contacts). Every bar is bar-locked,
+  // its release on the bar's end and its follow-through played out: AnchorHurl
+  // takes the anchor off his back and hurls it overarm (the slung anchor, on its
+  // own OssickAnchorBack bone, stays hidden while his thrown one lies on a victim:
+  // bastion_gaol_fx.ts re-sends the gestures), ShackleHeave snatches the shackles
+  // off his hip and heaves them, CudgelSlam brings the cudgel down on the flags.
   bastion_ossick: {
-    url: `${CREATURES}/gaoler_ossick.glb`,
+    url: `${CREATURES}/woc_bastion_ossick.glb`,
     // Hunched, yet over the Turnkey (8.3) and Olen (8.9) at his 1.4: about 9.8.
     height: 7.0,
     clips: {
@@ -5443,6 +5442,8 @@ export const VISUALS: Record<string, VisualDef> = {
       walk: 'Walk',
       run: 'Run',
       attack: ['Attack', 'Attack2'],
+      // Each blow lands on frame 18 of its 1.5 s swing at 1x (30 fps).
+      contacts: { Attack: [0.567], Attack2: [0.567] },
       hit: ['Hit'],
       death: 'Death',
       cast: 'CudgelSlam',
@@ -5463,32 +5464,36 @@ export const VISUALS: Record<string, VisualDef> = {
         showNow: OSSICK_ANCHOR_HOME_GESTURE,
       },
     ],
-    walkRef: 2.74,
-    runRef: 9.37,
+    attackTimeScale: 1,
+    walkRef: 2.37,
+    runRef: 8.57,
     authoredAtlas: true,
     selfIllumination: 0.06,
   },
   // Vael the Fogbinder, Death itself, and his shadow copies wear ONE look (the
-  // veil hides him among them; only the Fogbeacon's beam tells them apart):
-  // the hooded skeletal reaper built in Blender (scripts/assets/
-  // sunken_bastion_creatures/reaper.py), a great scythe in hand, soul fire in
-  // his sockets, ribs and lantern, hovering a hand over the flags. The scythe
-  // is modelled in his right fist and never turns against it (the arms and
-  // body swing it; tests/vael_reaper.test.ts). Authored at size (`height` and
-  // `hover` are the build's IDLE_HEIGHT and MINZ half a second into Idle, the
-  // upright scythe's blade on top; the hood's peak about 6.5), drawn at the
-  // template's 1.35. The Shadow Crossing's bar sinks him through the floor
-  // (Vanish) and rises him out of the pool (Emerge); the sweep off the pool is
-  // his flourish, fired by the Reaping Scythe's cue.
+  // veil hides him among them; only the Fogbeacon's beam tells them apart): the
+  // art guide's hooded skeletal reaper (scripts/assets/specs/woc_bastion_vael.json),
+  // soul fire in his skull, a tattered grey-black shroud fraying into sea mist, the
+  // great scythe in his right fist and the caged soul lantern in his left. The
+  // scythe drives his arm and never turns against the fist (tests/vael_reaper.test.ts);
+  // both hands close on the snath at every heavy blow, and the blows play at 1x with
+  // their weight before their speed, landing on frame 18 (contacts). `height` is the
+  // idle's posed height half a second in (his hood's peak about 6.5, as before);
+  // `hover` floats his shroud's hem 0.4 over the flags, the scythe's butt resting in
+  // them. The Shadow Crossing's bar sinks him through the floor (Vanish) and rises
+  // him out of the pool (Emerge); the sweep off the pool is his flourish, fired by
+  // the Reaping Scythe's cue.
   bastion_vael: {
-    url: `${CREATURES}/vael_reaper.glb`,
-    height: 9.21,
-    hover: 0.406,
+    url: `${CREATURES}/woc_bastion_vael.glb`,
+    height: 7.357,
+    hover: -0.677,
     clips: {
       idle: 'Idle',
       walk: 'Walk',
       run: 'Run',
       attack: ['Attack', 'Attack2'],
+      // Each blow lands on frame 18 of its 1.5 s swing at 1x (30 fps).
+      contacts: { Attack: [0.567], Attack2: [0.567] },
       hit: ['Hit'],
       death: 'Death',
       cast: 'Cast',
@@ -5529,6 +5534,7 @@ export const VISUALS: Record<string, VisualDef> = {
       VAEL_INTRO_RISE,
       VAEL_SINK,
     ],
+    attackTimeScale: 1,
     authoredAtlas: true,
     selfIllumination: 0.06,
     clickRadius: 2.2,
