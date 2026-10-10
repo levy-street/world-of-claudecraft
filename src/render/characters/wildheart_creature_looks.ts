@@ -185,11 +185,12 @@ export const WILDHEART_GREAT_SAURIAN_LOOK: VisualDef = {
  *  turn in about 0.9 s, its Turn loop playing while it comes round. */
 export const GORGEBLOOM_TURN_RATE = 2;
 
-/** The Gorgebloom on an art-guide body (gorgebloom_model_core.ts): a rafflesia
- *  the size of a house, a fanged ring maw on a squat bulb in a cradle of five
- *  spotted petals, four pollen sacs on stalks, eight thorned vines across the
- *  pool and its prey's bones among them. Drawn at its authored size, 6.1 yd to
- *  the tip of its raised back petal at its 2.8, its waterline on the pivot.
+/** The Gorgebloom on an art-guide body (gorgebloom_model_core.ts): a fanged ring
+ *  maw in a bloom head ringed by a collar of five petals, on a tall thorned
+ *  stalk over six spotted petals lying on the water, four pollen sacs hanging
+ *  under the head and two thorned vines curling forward at its sides. Drawn at
+ *  its authored size, 13.75 yd to the top of its collar at its 2.8 (the height
+ *  of the body it replaced), its waterline on the pivot.
  *  The melee bite lands on frame 18 of its 1.5 s clip at 1x (contacts). All
  *  three bars land their blow (the spit, the slam, the bite) on the bar's end
  *  at 1x and finish as play-outs; Pollinate, Bloom Spit and the pull's roar
