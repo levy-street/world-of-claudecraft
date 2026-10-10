@@ -5004,6 +5004,9 @@ export const VISUALS: Record<string, VisualDef> = {
       cast: 'Screech',
       castByAbility: { [CRYPT_STONE_SHRIEK]: 'Screech' },
     },
+    // its stalk and lope, authored at 0.86 and 2.87 units a second, at its drawn size
+    walkRef: 5.1,
+    runRef: 17,
     selfIllumination: 0.18,
   },
   // The Carrion Crow is always on the wing: `hover` lifts it and its Death clip
