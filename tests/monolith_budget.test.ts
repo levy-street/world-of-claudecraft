@@ -553,8 +553,10 @@ const MONOLITHS: MonolithRow[] = [
     // Ferry announcement history moved to zone_announcement_core; the map
     // keeps tracking physical zone changes while notices wait for docking.
     // Exact merged count after #4413 composed with the current release batch.
-    // Tooltip event wiring moved into tooltip_binding.ts; keep zero headroom.
-    ceiling: 18007,
+    // Re-pinned at the v0.45.0 release batch after #4419's hover-tooltip
+    // options and #4433's mounted-form stride guard composed with the existing
+    // coordinator. Exact merged count after biome, zero slack.
+    ceiling: 18060,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1489,7 +1491,10 @@ const MONOLITHS: MonolithRow[] = [
     // those release-line extractions. Release reconciliation: measured merged
     // tree at 11140 lines, preserving both extraction sets.
     // Fatal screen DOM moved to fatal_overlay_controller for update recovery.
-    ceiling: 10961,
+    // Re-pinned at the v0.45.0 release batch after #4420's client-update
+    // recovery flow composed with the current entrypoint. Exact merged count
+    // after biome, zero slack.
+    ceiling: 10981,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
