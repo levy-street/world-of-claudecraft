@@ -17,6 +17,7 @@ import {
   DISSOLVE_SEC,
   dissolveLevels,
   MORTHEN_DEATH_LIFT,
+  MORTHEN_GROWTH,
   MORTHEN_HOVER,
   MORTHEN_MITRE_EYE,
   MORTHEN_REAP_SWEEP,
@@ -34,6 +35,7 @@ import {
   MORTHEN_TOLL,
   morthenAnchor,
   morthenBodyY,
+  morthenDrawScale,
   morthenEmitY,
   morthenStance,
   morthenStanceGesture,
@@ -91,28 +93,29 @@ describe('Morthen, the Lich Bishop: his own body', () => {
     expect(def.authoredAtlas).toBe(true);
   });
 
-  it('stands about three players tall and floats', () => {
+  it('stands as tall over the flags as the body he replaced, and floats', () => {
     const drawn = def.height * MOBS.morthen.scale;
     expect(drawn / PLAYER_HEIGHT).toBeGreaterThan(2.9);
-    // Even with his smoke funnel sunk, what stands over the floor towers. His
-    // mitre rises only a little over its eye, so with the eye held under the
-    // camera's 6 yd (below) about two and a half players stand over the flags.
-    expect(((def.height + (def.hover ?? 0)) * MOBS.morthen.scale) / PLAYER_HEIGHT).toBeGreaterThan(
-      2.6,
-    );
+    // Even with his smoke funnel sunk, what stands over the floor towers: the
+    // old body's 7.85 yd, three players (Reuben 2026-10-11: a remade boss keeps
+    // its height). The authored rig alone stood 6.88, so he is drawn grown.
+    expect((def.height + (def.hover ?? 0)) * MOBS.morthen.scale).toBeCloseTo(7.85, 1);
+    expect(def.height).toBeCloseTo(5.85 * MORTHEN_GROWTH, 9);
   });
 
   it('sinks his smoke funnel into the ring floor so his whole body reads from the camera', () => {
     // One constant drives the manifest's hover and every body anchor.
-    expect(def.hover).toBe(MORTHEN_HOVER);
+    expect(def.hover).toBeCloseTo(MORTHEN_HOVER * MORTHEN_GROWTH, 9);
     expect(MORTHEN_HOVER).toBeCloseTo(MORTHEN_REST_MINZ - MORTHEN_SINK, 9);
     expect(MORTHEN_RIG_Y).toBeCloseTo(-MORTHEN_SINK, 9);
     expect(MORTHEN_SINK).toBeGreaterThan(0.5);
-    const s = MOBS.morthen.scale;
-    // The burning eye under the mitre sits low enough for the default camera
-    // (well under the old 7 yd) and still well over a player's head.
+    // Every body anchor rides his grown size.
+    const s = morthenDrawScale(MOBS.morthen.scale);
+    expect(s).toBeCloseTo(MOBS.morthen.scale * MORTHEN_GROWTH, 9);
+    // The burning eye under the mitre sits under the old 7 yd for the default
+    // camera, and well over a player's head.
     const eye = morthenBodyY(0, MORTHEN_MITRE_EYE.y, s);
-    expect(eye).toBeLessThan(6);
+    expect(eye).toBeLessThan(7);
     expect(eye).toBeGreaterThan(PLAYER_HEIGHT * 1.6);
     // He still floats: the lowest tatter of his robe (rig 1.23 half a second
     // into Idle) clears the flags, the smoke's last wisps under it (their tops
@@ -126,7 +129,7 @@ describe('Morthen, the Lich Bishop: his own body', () => {
     expect(morthenEmitY(3, 0, s)).toBe(3);
     // His corpse is lifted by the very sink, so the folded vestments rest on the floor.
     expect(def.deathLift).toEqual(MORTHEN_DEATH_LIFT);
-    expect(MORTHEN_DEATH_LIFT.yards).toBe(MORTHEN_SINK);
+    expect(MORTHEN_DEATH_LIFT.yards).toBeCloseTo(MORTHEN_SINK * MORTHEN_GROWTH, 9);
     expect(MORTHEN_DEATH_LIFT.to).toBeGreaterThan(MORTHEN_DEATH_LIFT.from);
   });
 
@@ -278,7 +281,7 @@ describe('Morthen, the Lich Bishop: the souls circling him', () => {
         expect(p.y).toBeGreaterThan(3.2);
         expect(p.y).toBeLessThan(4.8);
         // drawn over the ring floor even with his funnel sunk into it
-        expect(morthenBodyY(0, p.y, MOBS.morthen.scale)).toBeGreaterThan(1);
+        expect(morthenBodyY(0, p.y, morthenDrawScale(MOBS.morthen.scale))).toBeGreaterThan(1);
       }
     }
   });

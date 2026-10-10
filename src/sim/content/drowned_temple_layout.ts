@@ -88,8 +88,9 @@ export const GREAT_CONCH = { x: 0, z: 40 } as const;
 /** The Hydra Pool: its rim, and the moon pool the heads rise from. */
 export const HYDRA_POOL = { x: 0, z: 92, r: 28, h: 6, poolR: 13, poolFloor: 5.3 } as const;
 /** The Mere Hydra's body under the pool (render: where its one model stands,
- *  facing the entrance, and how big). */
-export const HYDRA_BODY = { x: HYDRA_POOL.x, z: HYDRA_POOL.z + 5, scale: 1.15 } as const;
+ *  facing the entrance, and how big). Its scale stands the heads as tall over
+ *  the water as the body it replaced (about 16 yd at Idle). */
+export const HYDRA_BODY = { x: HYDRA_POOL.x, z: HYDRA_POOL.z + 5, scale: 1.28 } as const;
 /** Where each of the Mere Hydra's three heads rises in the pool: under the
  *  model's own heads (its left head is the one on its left, the east as it
  *  faces the entrance), so a head's click and its drawn neck agree. */

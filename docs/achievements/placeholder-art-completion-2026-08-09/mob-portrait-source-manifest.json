@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "a360561877518943b06b7ce4d073ba1e8e0806667acbdee4aef03577e96f9772",
+  "rendererFingerprint": "22de8303c152258aceac599051819b4f7062f84ec932311868b9f06d565405bb",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "darwin",
@@ -39,7 +39,7 @@
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
       "bytes": 6079620,
-      "sha256": "5dae297754b1d8ae7c295ee64510194de4471eb741fe8327d4d46ae1fd1e2359",
+      "sha256": "59a59d38815d9634fe53658dc46ba3b8eb1c4bd7cbd021e9df65fb100b8eb4d7",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -7126,9 +7126,9 @@
           "sha256": "e1053e68e530d1f4cd52fc7415b90b0930e7ba9601c44564af084713e0bfd209"
         },
         "idle": "Idle",
-        "height": 5.85,
+        "height": 6.668999999999999,
         "yaw": null,
-        "hover": -0.754,
+        "hover": -0.8595599999999999,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -7140,7 +7140,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "7e453a0ea2ef44ede22a1b1be333aa1a063b470f5c4f5035e71c2e416333b468",
+      "sourceFingerprint": "fa3bfa65cd40b3a9052bcb6765e30a847a50831d36b39bc96f28a73e0d5a7563",
       "output": {
         "path": "public/ui/mobs/morthen.webp",
         "bytes": 2144,
@@ -10663,7 +10663,7 @@
           "sha256": "fa2e9548ec35caaca0d713ebca8b8b6ff66f8001ba39287823db95f6bc32177a"
         },
         "idle": "Idle",
-        "height": 3.5660714285714286,
+        "height": 3.719450844854071,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -10677,7 +10677,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "ca89c1d6ba5d3f295556eeff631c4083bcf58d7d30ff73cd15a69e427efdf014",
+      "sourceFingerprint": "988761bd75f3366dcf33d388ea9e690a5937756bfc8c3cedf29ac580855332dd",
       "output": {
         "path": "public/ui/mobs/sledge_tusker.webp",
         "bytes": 2364,

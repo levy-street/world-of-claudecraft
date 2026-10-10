@@ -19,9 +19,10 @@ import { TUSKER_TUNING } from '../../sim/encounters/gravewyrm_sanctum/ids';
 /** The template's sim scale (sim/content/gravewyrm_sanctum.ts sledge_tusker). */
 export const TUSKER_SIM_SCALE = 2.8;
 
-/** In-game yards per model yard: the body is authored at its final size
- *  (7.44 yd to the hump, the soul lantern's post to 9.99). */
-export const TUSKER_DRAWN_SCALE = 1;
+/** In-game yards per model yard: the body is authored 7.44 yd to the hump and
+ *  drawn a little larger, so the hump stands 7.76 yd as on the body it
+ *  replaced (the soul lantern's post to 10.41). The sledge keeps its own size. */
+export const TUSKER_DRAWN_SCALE = 7.76 / 7.44;
 
 /** The sledge's clips key their first frame one 24 fps frame in. */
 export const KEY_LEAD = 1 / 24;
@@ -316,16 +317,18 @@ export function hitchPoint(
   );
 }
 
-/** The sledge hung rigidly behind a beast (the first frame, or a re-hitch). */
+/** The sledge hung rigidly behind a beast (the first frame, or a re-hitch):
+ *  its tongue's ring on the beast's hitch, which rides the beast's size while
+ *  the sledge keeps its own (SLEDGE_MODEL.behind at the authored size). */
 export function rigidSledge(
   pos: { x: number; z: number },
   facing: number,
   scale: number,
   out: SledgePose,
 ): SledgePose {
-  const k = tuskerModelScale(scale);
-  out.x = pos.x - Math.sin(facing) * SLEDGE_MODEL.behind * k;
-  out.z = pos.z - Math.cos(facing) * SLEDGE_MODEL.behind * k;
+  const back = sledgeTongue() - TUSKER_MODEL.hitch.z * tuskerModelScale(scale);
+  out.x = pos.x - Math.sin(facing) * back;
+  out.z = pos.z - Math.cos(facing) * back;
   out.yaw = facing;
   return out;
 }
@@ -351,8 +354,8 @@ export function trailSledge(
   scale: number,
   dt = 0,
 ): SledgePose {
-  const k = tuskerModelScale(scale);
-  const tongue = sledgeTongue() * k;
+  // The sledge is drawn at its own size: only the hitch rides the beast's.
+  const tongue = sledgeTongue();
   const h = hitchPoint(pos, facing, scale, { x: 0, z: 0 });
   let dx = h.x - pose.x;
   let dz = h.z - pose.z;

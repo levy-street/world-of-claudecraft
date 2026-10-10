@@ -56,6 +56,7 @@ import {
   type MorthenStance,
   morthenAnchor,
   morthenBodyY,
+  morthenDrawScale,
   morthenEmitY,
   morthenStance,
   morthenStanceGesture,
@@ -355,7 +356,7 @@ export class MorthenFx {
   }
 
   private toll(m: Entity): void {
-    const s = m.scale || 1;
+    const s = morthenDrawScale(m.scale);
     const b = morthenAnchor(m.pos, m.facing, s, BELL_RAISED);
     for (let i = 0; i < 3; i++)
       this.ring(b.x, b.y, b.z, 7 + i * 3.5, 0.7 + i * 0.12, 0xb8ff8a, i * 0.1);
@@ -387,7 +388,7 @@ export class MorthenFx {
 
   private swing(m: Entity): void {
     const t = this.trails.find((q) => !q.alive) ?? this.trails[0];
-    const s = m.scale || 1;
+    const s = morthenDrawScale(m.scale);
     t.alive = true;
     t.born = this.clock;
     const flip = this.swingCount++ % 2 === 1;
@@ -459,7 +460,7 @@ export class MorthenFx {
   }
 
   private stepBoss(m: Entity, dt: number): void {
-    const s = m.scale || 1;
+    const s = morthenDrawScale(m.scale);
     if (m.dead) {
       if (this.wasAlive) this.dissolveAt = this.clock;
       this.wasAlive = false;
@@ -686,7 +687,7 @@ export class MorthenFx {
 
   /** The unfolding's burst: ghost fire erupting round him, souls torn loose. */
   private unfoldBurst(m: Entity): void {
-    const s = m.scale || 1;
+    const s = morthenDrawScale(m.scale);
     const gy = this.groundY(m.pos.x, m.pos.z);
     const bell = morthenAnchor(m.pos, m.facing, s, { x: -0.3, y: 5.2, z: 1.0 });
     this.ring(m.pos.x, gy + 0.12, m.pos.z, 16, 0.9, 0xb8ff8a, 0);
@@ -770,7 +771,7 @@ export class MorthenFx {
 
   /** A staff blow lands: a ring where the bell strikes. */
   private strike(m: Entity): void {
-    const s = m.scale || 1;
+    const s = morthenDrawScale(m.scale);
     const p = morthenAnchor(m.pos, m.facing, s, { x: -0.2, y: 0, z: 3.2 });
     const gy = this.groundY(p.x, p.z);
     this.ring(p.x, gy + 0.15, p.z, 4.5, 0.45, 0xb8ff8a, 0);
@@ -891,7 +892,7 @@ export class MorthenFx {
       }
       // The arc rides the body while it cuts.
       if (m && !m.dead) {
-        const s = m.scale || 1;
+        const s = morthenDrawScale(m.scale);
         t.mesh.position.set(m.pos.x, morthenBodyY(m.pos.y, MORTHEN_SCYTHE_Y, s), m.pos.z);
       }
       t.mesh.visible = true;
