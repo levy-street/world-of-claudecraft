@@ -1,0 +1,28 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/sanctum_korgath_woc.glb",
+      "out": "models/creatures/woc_sanctum_korgath.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "Walk",
+        "ThresholdChargeLoop",
+        "Hit",
+        "HammerSlam",
+        "HammerSweep",
+        "Strain",
+        "Stomp",
+        "MaulArc",
+        "ChainFlail",
+        "ThresholdCharge",
+        "ForemansBellow",
+        "ChainBreak",
+        "ChainYank",
+        "Roar",
+        "Death"
+      ],
+      "maxTex": 1024
+    }
+  ]
+}

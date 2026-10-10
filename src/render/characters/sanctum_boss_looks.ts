@@ -1,7 +1,7 @@
 // The Gravewyrm Sanctum's three bosses (docs/design/dungeon-rework/
-// gravewyrm_sanctum.md section 6): Blender bodies authored at their in-game
-// size (E:/woc/entregas/santuario/{korgath,velkhar,korzul}), measured in
-// render/gravewyrm_sanctum_bosses/boss_model_core.ts. manifest.ts merges
+// gravewyrm_sanctum.md section 6): bodies drawn at their in-game size
+// (Korgath and Velkhar on art-guide bodies, Korzul from his Blender
+// delivery), measured in render/gravewyrm_sanctum_bosses/boss_model_core.ts. manifest.ts merges
 // SANCTUM_BOSS_LOOKS into VISUALS and SANCTUM_BOSS_MOB_KEYS into the mob key
 // map (each boss's shipped stand-in body is replaced under its own key).
 //
@@ -47,6 +47,7 @@ import {
   KORGATH_BROKEN_CHAIN_MESH,
   KORGATH_BROKEN_GESTURE,
   KORGATH_CLIP,
+  KORGATH_RUN_REF,
   KORGATH_RUNES_GESTURE,
   KORGATH_WHOLE_GESTURE,
   KORZUL_BODY,
@@ -156,6 +157,9 @@ export const SANCTUM_BOSS_LOOKS: Record<string, VisualDef> = {
       walk: 'Walk',
       run: 'ThresholdChargeLoop',
       attack: ['HammerSlam', 'HammerSweep'],
+      // Both blows land on frame 18 of their 1.5 s clips (1x): the coil, the
+      // hang at the top, his whole weight thrown after the maul.
+      contacts: { HammerSlam: [KORGATH_CLIP.slam], HammerSweep: [KORGATH_CLIP.sweep] },
       attackByAbility: {
         [KORGATH_CHAIN_BREAK]: 'ChainBreak',
         [KORGATH_RERIVETED]: 'ChainYank',
@@ -199,8 +203,8 @@ export const SANCTUM_BOSS_LOOKS: Record<string, VisualDef> = {
       deathFade: 2.5,
     },
     walkRef: KORGATH_BODY.walkRef * bossModelScale(KORGATH_BODY, KORGATH_BODY.simScale),
-    runRef: 11 * bossModelScale(KORGATH_BODY, KORGATH_BODY.simScale),
-    attackTimeScale: 1.15,
+    runRef: KORGATH_RUN_REF * bossModelScale(KORGATH_BODY, KORGATH_BODY.simScale),
+    attackTimeScale: 1,
     deathTimeScale: 1,
     authoredAtlas: true,
     selfIllumination: 0.04,
@@ -216,6 +220,8 @@ export const SANCTUM_BOSS_LOOKS: Record<string, VisualDef> = {
       walk: 'Walk',
       run: 'Walk',
       attack: ['Attack'],
+      // The staff's blow lands on frame 18 of its 1.5 s clip (1x).
+      contacts: { Attack: [VELKHAR_CLIP.attackLand] },
       attackByAbility: { [VELKHAR_THAW_GESTURE]: 'Thaw' },
       attackTimeScaleByAbility: { [VELKHAR_THAW_GESTURE]: 1 },
       hit: ['Hit'],
@@ -236,7 +242,7 @@ export const SANCTUM_BOSS_LOOKS: Record<string, VisualDef> = {
     oneShotsHoldAttacks: ['Thaw'],
     // The caged soul flame roars as he casts and gutters out as he dies.
     glowPulses: {
-      materials: ['VelkharSoulfire', 'VelkharFrostlight'],
+      materials: ['VelkharSoulfire'],
       pulses: [{ gesture: VELKHAR_FLAME_GESTURE, rise: 0.4, hold: 0.6, fall: 1.2, peak: 2.2 }],
       deathFade: 2,
     },
@@ -244,6 +250,7 @@ export const SANCTUM_BOSS_LOOKS: Record<string, VisualDef> = {
     runRef: VELKHAR_BODY.walkRef * bossModelScale(VELKHAR_BODY, VELKHAR_BODY.simScale),
     walkTimeScaleMax: 3,
     runTimeScaleMax: 3,
+    attackTimeScale: 1,
     deathTimeScale: 1,
     authoredAtlas: true,
     selfIllumination: 0.05,
