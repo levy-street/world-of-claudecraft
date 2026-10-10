@@ -2810,7 +2810,8 @@ export const pl_PL: EnTranslations = {
         "battlegroundAssist": "Asysta przy ciosie kończącym",
         "worldKill": "zabój światowy",
         "worldAssist": "asystowanie przy zabiciu światowym",
-        "hillHold": "utrzymywanie wzgórza"
+        "hillHold": "utrzymywanie wzgórza",
+        "worldQuest": "world quest"
       },
       "floatReasons": {
         "kill": "Zabójstwo",
@@ -2941,7 +2942,7 @@ export const pl_PL: EnTranslations = {
       "delveMark": "Znak Wyprawy",
       "wocToken": "Token WoC",
       "heroicMarkNote": "Lochowiska heroiczne. Wydaj w kwatermistrzu heroicznym",
-      "honorNote": "Pola Bitwy i Arena",
+      "honorNote": "Pola Bitwy, Arena i zadania światowe",
       "delveMarkNote": "Ukończone wyprawy",
       "wocTokenNote": "Saldo połączonego portfela",
       "walletNotLinked": "Brak połączonego portfela",

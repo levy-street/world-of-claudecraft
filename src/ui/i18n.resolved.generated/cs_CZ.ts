@@ -2810,7 +2810,8 @@ export const cs_CZ: EnTranslations = {
         "battlegroundAssist": "asistence u zabití",
         "worldKill": "světové zabití",
         "worldAssist": "asistence u světového zabití",
-        "hillHold": "držení kopce"
+        "hillHold": "držení kopce",
+        "worldQuest": "world quest"
       },
       "floatReasons": {
         "kill": "Zabití",
@@ -2941,7 +2942,7 @@ export const cs_CZ: EnTranslations = {
       "delveMark": "Výpravní žeton",
       "wocToken": "WoC Token",
       "heroicMarkNote": "Hrdinské dungeony . utrácej u hrdinského intendanta",
-      "honorNote": "Bitevní pole a aréna",
+      "honorNote": "Bitevní pole, aréna a světové úkoly",
       "delveMarkNote": "Dokončené výpravy",
       "wocTokenNote": "Zůstatek propojené peněženky",
       "walletNotLinked": "Žádná propojená peněženka",

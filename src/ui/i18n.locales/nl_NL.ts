@@ -508,7 +508,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.heroicMarkNote':
     'Heroïsche kerkers . besteed bij de heroïsche kwartiermeester',
   'hudChrome.currencies.honor': 'Eer',
-  'hudChrome.currencies.honorNote': 'Slagvelden en de arena',
+  'hudChrome.currencies.honorNote': 'Slagvelden, de arena en wereldquests',
   'hudChrome.currencies.intro':
     'Geen van deze nemen rugzakruimte in beslag. Munten blijven altijd in je rugzak.',
   'hudChrome.currencies.lifetime': 'Totaal {amount}',

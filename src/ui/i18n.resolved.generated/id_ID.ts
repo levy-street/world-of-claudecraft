@@ -2810,7 +2810,8 @@ export const id_ID: EnTranslations = {
         "battlegroundAssist": "Bantuan pukulan pamungkas",
         "worldKill": "pembunuhan dunia",
         "worldAssist": "membantu pembunuhan dunia",
-        "hillHold": "memegang bukit"
+        "hillHold": "memegang bukit",
+        "worldQuest": "world quest"
       },
       "floatReasons": {
         "kill": "Bunuh",
@@ -2941,7 +2942,7 @@ export const id_ID: EnTranslations = {
       "delveMark": "Merek Galian",
       "wocToken": "Token WoC",
       "heroicMarkNote": "Dungeon Heroik: belanjakan di kepala perlengkapan heroik",
-      "honorNote": "Medan Pertempuran dan arena",
+      "honorNote": "Medan Pertempuran, arena, dan Misi Dunia",
       "delveMarkNote": "Galian diselesaikan",
       "wocTokenNote": "Saldo dompet tertaut",
       "walletNotLinked": "Tidak ada dompet yang ditautkan",

@@ -503,7 +503,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factions': 'Faksi-faksi',
   'hudChrome.currencies.heroicMarkNote': 'Dungeon Heroik: belanjakan di kepala perlengkapan heroik',
   'hudChrome.currencies.honor': 'Kehormatan',
-  'hudChrome.currencies.honorNote': 'Medan Pertempuran dan arena',
+  'hudChrome.currencies.honorNote': 'Medan Pertempuran, arena, dan Misi Dunia',
   'hudChrome.currencies.intro':
     'Tidak satu pun dari ini menggunakan ruang tas. Koin tetap di tas seperti biasanya.',
   'hudChrome.currencies.lifetime': 'Seumur hidup {amount}',

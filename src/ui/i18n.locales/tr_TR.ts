@@ -495,7 +495,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factions': 'Fraksiyonlar',
   'hudChrome.currencies.heroicMarkNote': 'Kahramanlık zindanları . Kahramanlık idarecisinden harca',
   'hudChrome.currencies.honor': 'Onur',
-  'hudChrome.currencies.honorNote': 'Savaş alanları ve arena',
+  'hudChrome.currencies.honorNote': 'Savaş alanları, arena ve dünya görevleri',
   'hudChrome.currencies.intro':
     'Bunların hiçbiri çanta alanı kapmaz. Para her zaman çantanda kalır.',
   'hudChrome.currencies.lifetime': 'Yaşamboyu {amount}',

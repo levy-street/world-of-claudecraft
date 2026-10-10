@@ -16,6 +16,7 @@ import {
 } from '../../../sim/factions';
 import { isItemLevelEligible, itemInstanceLevel } from '../../../sim/item_level';
 import type { ItemDef, PlayerClass, WorldQuestDef } from '../../../sim/types';
+import { worldQuestHonorRewardForQuest } from '../../../sim/world_quest_honor_slots';
 import { worldQuestItemRewardForQuest } from '../../../sim/world_quest_item_slots';
 import { worldQuestCopperReward, worldQuestXpReward } from '../../../sim/world_quests';
 import { currencyImageUrl, factionEmblemImageUrl } from '../../currency_art';
@@ -135,7 +136,8 @@ function itemReward(itemId: string, count: number): WorldQuestTooltipItemReward 
 }
 
 /** The shared bundle every world quest pays (copper and XP), its fixed extra item
- *  if it has one, and the day's piece when this viewer has one coming. */
+ *  if it has one, the day's piece when this viewer has one coming, and the day's
+ *  Honor bonus when this quest is one of the cycle's Honor slots. */
 function bundleRewards(
   quest: WorldQuestDef,
   input: WorldQuestTooltipInput,
@@ -160,6 +162,18 @@ function bundleRewards(
     input.playerLevel,
   );
   if (dayItem) rewards.push(itemReward(dayItem, 1));
+  const honor = worldQuestHonorRewardForQuest(input.cycle, quest);
+  if (honor > 0)
+    rewards.push({
+      kind: 'currency',
+      currencyId: 'honor',
+      amount: honor,
+      text: t('hudChrome.worldQuestTooltip.currencyAmount', {
+        amount: whole(honor),
+        currency: t('hudChrome.currencies.honor'),
+      }),
+      iconUrl: currencyImageUrl('honor'),
+    });
   return rewards;
 }
 

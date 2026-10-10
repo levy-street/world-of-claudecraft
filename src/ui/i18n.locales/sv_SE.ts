@@ -496,7 +496,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factions': 'Fraktioner',
   'hudChrome.currencies.heroicMarkNote': 'Heroiska dungeons . spenderas på heroisk kvartermästare',
   'hudChrome.currencies.honor': 'Heder',
-  'hudChrome.currencies.honorNote': 'Slagfält och arena',
+  'hudChrome.currencies.honorNote': 'Slagfält, arena och världsuppdrag',
   'hudChrome.currencies.intro':
     'Ingen av dessa tar upp väskeutrymme. Mynt stannar i din väska som vanligt.',
   'hudChrome.currencies.lifetime': 'Livstid {amount}',

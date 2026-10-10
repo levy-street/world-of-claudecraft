@@ -529,7 +529,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.heroicMarkNote':
     "Donjons héroïques . à dépenser auprès de l'intendant héroïque",
   'hudChrome.currencies.honor': 'Honneur',
-  'hudChrome.currencies.honorNote': 'Champs de bataille et arène',
+  'hudChrome.currencies.honorNote': 'Champs de bataille, arène et quêtes mondiales',
   'hudChrome.currencies.intro':
     "Aucune de ces monnaies n'occupe de place dans vos sacs. Les pièces restent dans votre sac comme toujours.",
   'hudChrome.currencies.lifetime': 'À vie : {amount}',

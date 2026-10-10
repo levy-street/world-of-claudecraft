@@ -2810,7 +2810,8 @@ export const nl_NL: EnTranslations = {
         "battlegroundAssist": "hulp bij een fatale klap",
         "worldKill": "wereldkill",
         "worldAssist": "wereldkill geassisteerd",
-        "hillHold": "heuvelbeheersing"
+        "hillHold": "heuvelbeheersing",
+        "worldQuest": "world quest"
       },
       "floatReasons": {
         "kill": "Kill",
@@ -2941,7 +2942,7 @@ export const nl_NL: EnTranslations = {
       "delveMark": "Delve-embleem",
       "wocToken": "WoC-token",
       "heroicMarkNote": "Heroïsche kerkers . besteed bij de heroïsche kwartiermeester",
-      "honorNote": "Slagvelden en de arena",
+      "honorNote": "Slagvelden, de arena en wereldquests",
       "delveMarkNote": "Delves voltooid",
       "wocTokenNote": "Gekoppeld portefeuillesaldo",
       "walletNotLinked": "Geen portefeuille gekoppeld",

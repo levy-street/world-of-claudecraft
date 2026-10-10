@@ -2810,7 +2810,8 @@ export const de_DE: EnTranslations = {
         "battlegroundAssist": "Unterstützung beim Todesstoß",
         "worldKill": "Welt-Tötung",
         "worldAssist": "Welt-Tötung unterstützt",
-        "hillHold": "den Hügel gehalten"
+        "hillHold": "den Hügel gehalten",
+        "worldQuest": "world quest"
       },
       "floatReasons": {
         "kill": "Ausschaltung",
@@ -2941,7 +2942,7 @@ export const de_DE: EnTranslations = {
       "delveMark": "Tiefgang-Marke",
       "wocToken": "WoC-Token",
       "heroicMarkNote": "Heroische Dungeons . beim heroischen Quartiermeister ausgeben",
-      "honorNote": "Schlachtfelder und die Arena",
+      "honorNote": "Schlachtfelder, die Arena und Weltquests",
       "delveMarkNote": "Abgeschlossene Tiefgänge",
       "wocTokenNote": "Guthaben der verknüpften Wallet",
       "walletNotLinked": "Keine Wallet verknüpft",

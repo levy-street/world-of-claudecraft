@@ -754,6 +754,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.hillHold': '佔據山丘',
   'hudChrome.warfare.reasons.worldAssist': '世界擊殺助攻',
   'hudChrome.warfare.reasons.worldKill': '世界擊殺',
+  'hudChrome.warfare.reasons.worldQuest': '世界任務',
   'hudChrome.warfareShop.groupEntry': '戰爭賽季 1',
   'hudChrome.warfareShop.groupSeason2': '戰爭賽季 2：先鋒',
   'hudChrome.worldPvp.aidLine':
@@ -17748,7 +17749,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.delveMark': '探險印記',
   'hudChrome.currencies.wocToken': 'WoC 代幣',
   'hudChrome.currencies.heroicMarkNote': '英雄地下城 . 在英雄軍需官處兌換',
-  'hudChrome.currencies.honorNote': '戰場與競技場',
+  'hudChrome.currencies.honorNote': '戰場、競技場與世界任務',
   'hudChrome.currencies.delveMarkNote': '已完成的探險',
   'hudChrome.currencies.wocTokenNote': '已連結錢包的餘額',
   'hudChrome.currencies.walletNotLinked': '未連結錢包',

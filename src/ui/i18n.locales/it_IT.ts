@@ -527,7 +527,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factions': 'Fazioni',
   'hudChrome.currencies.heroicMarkNote': 'Dungeon eroici . spendi dal quartiermastro eroico',
   'hudChrome.currencies.honor': 'Onore',
-  'hudChrome.currencies.honorNote': 'Campi di battaglia e arena',
+  'hudChrome.currencies.honorNote': 'Campi di battaglia, arena e missioni mondiali',
   'hudChrome.currencies.intro':
     'Nessuna di queste occupa spazio nelle borse. Il denaro resta nella tua borsa come sempre.',
   'hudChrome.currencies.lifetime': 'Cumulativo: {amount}',

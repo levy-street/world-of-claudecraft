@@ -2810,7 +2810,8 @@ export const it_IT: EnTranslations = {
         "battlegroundAssist": "assistenza al colpo di grazia",
         "worldKill": "uccisione in PvP Mondiale",
         "worldAssist": "assistenza a un'uccisione in PvP Mondiale",
-        "hillHold": "controllo della collina"
+        "hillHold": "controllo della collina",
+        "worldQuest": "world quest"
       },
       "floatReasons": {
         "kill": "Uccisione",
@@ -2941,7 +2942,7 @@ export const it_IT: EnTranslations = {
       "delveMark": "Marchio dell'Incursione",
       "wocToken": "WoC Token",
       "heroicMarkNote": "Dungeon eroici . spendi dal quartiermastro eroico",
-      "honorNote": "Campi di battaglia e arena",
+      "honorNote": "Campi di battaglia, arena e missioni mondiali",
       "delveMarkNote": "Incursioni completate",
       "wocTokenNote": "Saldo del portafoglio collegato",
       "walletNotLinked": "Nessun portafoglio collegato",

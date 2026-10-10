@@ -2810,7 +2810,8 @@ export const ja_JP: EnTranslations = {
         "battlegroundAssist": "撃破アシスト",
         "worldKill": "ワールドPvP撃破",
         "worldAssist": "ワールドPvP撃破のアシスト",
-        "hillHold": "丘の保持"
+        "hillHold": "丘の保持",
+        "worldQuest": "ワールドクエスト"
       },
       "floatReasons": {
         "kill": "撃破",
@@ -2941,7 +2942,7 @@ export const ja_JP: EnTranslations = {
       "delveMark": "デルブの印",
       "wocToken": "WoCトークン",
       "heroicMarkNote": "ヒロイックダンジョン . ヒロイック補給官で使用",
-      "honorNote": "戦場とアリーナ",
+      "honorNote": "戦場、アリーナ、ワールドクエスト",
       "delveMarkNote": "完了したデルブ",
       "wocTokenNote": "連携済みウォレットの残高",
       "walletNotLinked": "ウォレット未連携",

@@ -2810,7 +2810,8 @@ export const ko_KR: EnTranslations = {
         "battlegroundAssist": "처치 도움",
         "worldKill": "월드 처치",
         "worldAssist": "월드 처치 도움",
-        "hillHold": "언덕 점거"
+        "hillHold": "언덕 점거",
+        "worldQuest": "전역 퀘스트"
       },
       "floatReasons": {
         "kill": "처치",
@@ -2941,7 +2942,7 @@ export const ko_KR: EnTranslations = {
       "delveMark": "델브 징표",
       "wocToken": "WoC 토큰",
       "heroicMarkNote": "영웅 던전 . 영웅 보급관에게서 사용",
-      "honorNote": "전장과 투기장",
+      "honorNote": "전장, 투기장, 전역 퀘스트",
       "delveMarkNote": "완료한 델브",
       "wocTokenNote": "연동된 지갑 잔액",
       "walletNotLinked": "연동된 지갑 없음",

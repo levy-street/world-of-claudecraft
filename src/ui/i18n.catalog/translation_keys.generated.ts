@@ -13895,6 +13895,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.warfare.reasons.hillHold'
   | 'hudChrome.warfare.reasons.worldAssist'
   | 'hudChrome.warfare.reasons.worldKill'
+  | 'hudChrome.warfare.reasons.worldQuest'
   | 'hudChrome.warfareShop.buyAria'
   | 'hudChrome.warfareShop.buyConfirmBody'
   | 'hudChrome.warfareShop.buyOwnedAria'

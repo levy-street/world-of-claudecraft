@@ -486,7 +486,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factions': 'Phe Phái',
   'hudChrome.currencies.heroicMarkNote': 'Hầm Ngục Anh Hùng - tiêu tại quản lý hậu cần Anh Hùng',
   'hudChrome.currencies.honor': 'Danh Dự',
-  'hudChrome.currencies.honorNote': 'Chiến Trường và Đấu Trường',
+  'hudChrome.currencies.honorNote': 'Chiến Trường, Đấu Trường và Nhiệm Vụ Thế Giới',
   'hudChrome.currencies.intro':
     'Không có cái nào chiếm chỗ túi. Tiền xu vẫn ở túi của bạn như mọi khi.',
   'hudChrome.currencies.lifetime': 'Trọn Đời {amount}',
