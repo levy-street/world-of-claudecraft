@@ -413,7 +413,11 @@ describe('character ClipMaps match the shipped GLBs', () => {
       // file's own hand list (requiredClipNames), so a slot registered only in
       // COVERED_CLIP_FIELDS (the escape hatch for non-clip fields) cannot slip past.
       const named = clipNamesInMap(def.clips);
-      expect(named.length).toBeGreaterThanOrEqual(requiredClipNames(def.clips).length);
+      // Distinct names on both sides: a clip a map names twice (an attack that is also a
+      // `contacts` key) is still one clip to bind.
+      expect(new Set(named).size, key).toBeGreaterThanOrEqual(
+        new Set(requiredClipNames(def.clips)).size,
+      );
       const unbound = named.filter((name) => !bound.has(name));
       expect(unbound, `${key}: clips the map names that visual.ts never binds`).toEqual([]);
     }
