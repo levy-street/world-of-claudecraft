@@ -296,6 +296,8 @@ const AUTHORED_ATLAS_DEFS = [
   'temple_moonspawn',
   // the Drowned Temple's Ice Wraith (a Tripo sculpt)
   'temple_ice_wraith',
+  // the Mere Hydra's one body, the art guide's model (its heads' look renders the portraits)
+  'temple_hydra_head',
   'sanctum_sledge_tusker',
   'sanctum_soul_brazier',
   // the Gravewyrm Sanctum trash's Blender bodies (sanctum_trash_looks.ts)

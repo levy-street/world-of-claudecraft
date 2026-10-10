@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "2607de02a937467706a8033737c5e9bdce87b3a592039e9b62ae1b77957d0147",
+  "rendererFingerprint": "e98c14e309a58824a55d8518c000ce4fe6919ece254acfbe2e14be6fe623d554",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "darwin",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6079236,
-      "sha256": "47606f5ce35bdc5e7f64d4733d9c5b8db4211d9630dc01988c8fba1ab47e8c23",
+      "bytes": 6079248,
+      "sha256": "e873ce52c9458857c8b9c59d91bfab68e274b4ba5636d0233ce6625cfedab340",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -6426,10 +6426,10 @@
       "visualKey": "temple_hydra_head",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/mere_hydra.glb",
-          "path": "public/models/creatures/mere_hydra.glb",
-          "bytes": 611092,
-          "sha256": "58bf0716d4d1de5ce8d7f6f97720acaa680f03276bfbbc46b9adcfa607bd1391"
+          "url": "models/creatures/woc_temple_hydra.glb",
+          "path": "public/models/creatures/woc_temple_hydra.glb",
+          "bytes": 2423872,
+          "sha256": "dd63627533ea9c61f664c4a2a575a74dbd2528292eb945a740735e7ef4bf82d2"
         },
         "idle": "Idle",
         "height": 14,
@@ -6446,11 +6446,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "79ba325a08f1fd4f4562ad13c9a1b4e56ccc5df51349ae827edf0bf0fa9773be",
+      "sourceFingerprint": "008f54876b7b9bd3813467e8b5362de4b6ba5f5d1b04f8ad455226b9cd115a1e",
       "output": {
         "path": "public/ui/mobs/mere_hydra_head_center.webp",
-        "bytes": 3496,
-        "sha256": "b3ff98f15cd0e6aac934e067a6490b6558422c3b92409e710c5966f83b1e4a37"
+        "bytes": 2764,
+        "sha256": "61d3fa8e16272387d871dbd5f52a8692992c44355ea76422d72017634b88fc38"
       }
     },
     {
@@ -6460,10 +6460,10 @@
       "visualKey": "temple_hydra_head",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/mere_hydra.glb",
-          "path": "public/models/creatures/mere_hydra.glb",
-          "bytes": 611092,
-          "sha256": "58bf0716d4d1de5ce8d7f6f97720acaa680f03276bfbbc46b9adcfa607bd1391"
+          "url": "models/creatures/woc_temple_hydra.glb",
+          "path": "public/models/creatures/woc_temple_hydra.glb",
+          "bytes": 2423872,
+          "sha256": "dd63627533ea9c61f664c4a2a575a74dbd2528292eb945a740735e7ef4bf82d2"
         },
         "idle": "Idle",
         "height": 14,
@@ -6480,11 +6480,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "79ba325a08f1fd4f4562ad13c9a1b4e56ccc5df51349ae827edf0bf0fa9773be",
+      "sourceFingerprint": "008f54876b7b9bd3813467e8b5362de4b6ba5f5d1b04f8ad455226b9cd115a1e",
       "output": {
         "path": "public/ui/mobs/mere_hydra_head_left.webp",
-        "bytes": 3496,
-        "sha256": "b3ff98f15cd0e6aac934e067a6490b6558422c3b92409e710c5966f83b1e4a37"
+        "bytes": 2764,
+        "sha256": "61d3fa8e16272387d871dbd5f52a8692992c44355ea76422d72017634b88fc38"
       }
     },
     {
@@ -6494,10 +6494,10 @@
       "visualKey": "temple_hydra_head",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/mere_hydra.glb",
-          "path": "public/models/creatures/mere_hydra.glb",
-          "bytes": 611092,
-          "sha256": "58bf0716d4d1de5ce8d7f6f97720acaa680f03276bfbbc46b9adcfa607bd1391"
+          "url": "models/creatures/woc_temple_hydra.glb",
+          "path": "public/models/creatures/woc_temple_hydra.glb",
+          "bytes": 2423872,
+          "sha256": "dd63627533ea9c61f664c4a2a575a74dbd2528292eb945a740735e7ef4bf82d2"
         },
         "idle": "Idle",
         "height": 14,
@@ -6514,11 +6514,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "79ba325a08f1fd4f4562ad13c9a1b4e56ccc5df51349ae827edf0bf0fa9773be",
+      "sourceFingerprint": "008f54876b7b9bd3813467e8b5362de4b6ba5f5d1b04f8ad455226b9cd115a1e",
       "output": {
         "path": "public/ui/mobs/mere_hydra_head_right.webp",
-        "bytes": 3496,
-        "sha256": "b3ff98f15cd0e6aac934e067a6490b6558422c3b92409e710c5966f83b1e4a37"
+        "bytes": 2764,
+        "sha256": "61d3fa8e16272387d871dbd5f52a8692992c44355ea76422d72017634b88fc38"
       }
     },
     {
