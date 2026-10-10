@@ -15,10 +15,10 @@
 /** The template's sim scale (sim/content/wildheart.ts the_gorgebloom). */
 export const GORGEBLOOM_SIM_SCALE = 2.8;
 
-/** In-game yards per model yard: drawn at its authored size, a rafflesia the
- *  size of a house: 6.1 yd to the tip of its raised back petal, its petals'
- *  edge 4.85 yd out (where the sim's 4.5 yd body lets melee reach it), its
- *  vines reaching nearly 8 yd across the pool. */
+/** In-game yards per model yard: drawn at its authored size, a carnivorous
+ *  bloom on a tall stalk: 13.75 yd to the top of its collar (the height of the
+ *  body it replaced), its six base petals out to 5.25 yd on the water (past
+ *  the sim's 4.5 yd body, where melee stands), its vines 7.35 yd out. */
 export const GORGEBLOOM_DRAWN_SCALE = 1;
 
 /** The old Blender bodies' clips (the Lasher, the Sprout and the Basin trash,
@@ -36,89 +36,91 @@ export interface ModelPoint {
 export const GORGEBLOOM_MODEL = {
   url: 'models/creatures/woc_basin_gorgebloom.glb',
   /** The Idle pose's skinned bounds (sampled where prepareVisual samples it,
-   *  0.5 s in): the vines lie on the waterline, the tip of the raised back
-   *  petal stands at 6.101. */
+   *  0.5 s in): the petals and vines lie on the waterline (0.008 over it),
+   *  the tip of the collar's top petal stands at 13.753. */
   idleMin: 0,
-  idleTop: 6.101,
+  idleTop: 13.753,
   /** The bulb's radius (the maw's ring) and the vines' reach round the origin. */
-  bulbRadius: 1.6,
-  rootCrown: 7.96,
+  bulbRadius: 1.7,
+  rootCrown: 7.35,
   /** The maw (MawAnchor's head) at rest, in the ring of teeth's centre. */
-  maw: { x: 0, y: 3.42, z: 1.06 },
-  /** The four pollen sacs (the TAILS of Sac_FL, Sac_FR, Sac_BL, Sac_BR) at rest. */
+  maw: { x: 0, y: 9.88, z: 2.725 },
+  /** The four pollen sacs (the TAILS of Sac_FL, Sac_FR, Sac_BL, Sac_BR: the
+   *  inner pair, then the outer) at rest, hanging under the head. */
   sacs: [
-    { x: 2.05, y: 3.77, z: 2.36 },
-    { x: -2.2, y: 3.76, z: 2.36 },
-    { x: 1.97, y: 4.97, z: -1.58 },
-    { x: -2.12, y: 4.96, z: -1.58 },
+    { x: 1.104, y: 5.962, z: 1.349 },
+    { x: -1.104, y: 5.962, z: 1.349 },
+    { x: 2.105, y: 5.962, z: 1.138 },
+    { x: -2.105, y: 5.962, z: 1.138 },
   ],
   /** The lash vine's club (LashTip) at rest, lying on the water to its right. */
-  lashTip: { x: -5.76, y: 0.89, z: 4.8 },
+  lashTip: { x: -6.269, y: 0.273, z: 3.884 },
 } as const;
 
 /** The clips' beats (seconds in the shipped clips) and where the anchors stand
  *  on them (sampled from the GLB). Every bar lands its blow on the bar's end
  *  (1.5 s bars, so the clips play at 1x), with its weight before its speed. */
 export const GORGEBLOOM_CLIP = {
-  /** SeedRain: the bulb swells and the petals curl shut through the bar,
-   *  trembling, the pods leave the maw on frame 46 (1.50, the maw thrust up),
-   *  held open to 1.63. */
+  /** SeedRain: the head swells and the collar curls shut through the bar,
+   *  trembling, then it throws its head back and the pods leave the maw on
+   *  frame 46 (1.50, the maw high and up), held open to 1.63. */
   seedSpit: 1.5,
-  seedMaw: { x: 0, y: 3.74, z: -0.01 },
+  seedMaw: { x: 0, y: 12.12, z: -1.08 },
   seedLength: 2.633,
-  /** Pollinate: the sacs swell to 0.40 and burst at 0.53 (their tails pulled
-   *  back in as they empty), a shudder to 1.1. */
+  /** Pollinate: the sacs swell to 0.40 and burst at 0.53 (swung out on their
+   *  stalks as they empty), a shudder to 1.1. */
   pollinateSwell: 0.4,
   pollinateBurst: 0.533,
   pollinateSacs: [
-    { x: 2.21, y: 3.84, z: 2.2 },
-    { x: -2.33, y: 3.83, z: 2.16 },
-    { x: 2.12, y: 4.0, z: -2.28 },
-    { x: -2.27, y: 3.99, z: -2.27 },
+    { x: 1.44, y: 6.439, z: 1.051 },
+    { x: -1.44, y: 6.439, z: 1.051 },
+    { x: 2.254, y: 6.448, z: 0.98 },
+    { x: -2.254, y: 6.448, z: 0.98 },
   ],
   pollinateLength: 1.833,
   /** VineLash: the right vine swells and rears up beside it (high by 1.17,
-   *  the club 6.9 yd up), cocks back at 1.37 and whips over to slam the lane
-   *  at 1.50: the club lands on the lane's centre line 8.39 yd ahead, the vine
-   *  lying flat behind it over the front petals; it lies there to 1.80 and is
-   *  dragged back by 2.6. */
+   *  the club 5.8 yd up), cocks back over its shoulder at 1.37 and whips over
+   *  to slam the lane at 1.50: the club lands 5.5 yd ahead, a yard off the
+   *  lane's centre line, the vine lying flat behind it across the front
+   *  petals; it lies there to 1.80 and is dragged back by 2.6. */
   lashHigh: 1.167,
-  lashHighTip: { x: -3.36, y: 6.89, z: 1.37 },
+  lashHighTip: { x: -3.763, y: 5.847, z: 2.416 },
   lashSlam: 1.5,
-  lashTipImpact: { x: 0, y: 1.08, z: 8.39 },
+  lashTipImpact: { x: -0.982, y: 0.497, z: 5.506 },
   /** Where the vine's root leaves the bloom on the slam (R_Vine2). */
-  lashVineRoot: { x: -0.7, y: 2.23, z: 1.39 },
+  lashVineRoot: { x: -3.315, y: 0.516, z: 0.295 },
   lashLiesUntil: 1.8,
   lashLength: 2.633,
-  /** Gorge: rears and gapes to 1.23 (the maw high and back), then the maw-bulb
-   *  strikes out of its petal cradle on its stalk and the bite lands on the
-   *  tank at 1.50 (the maw 4.2 yd ahead), shakes at 1.73 and 1.93, the swallow
-   *  at 2.2. */
+  /** Gorge: rears and gapes to 1.23 (the maw high and back), then the whole
+   *  stalk whips over and down and the bite lands on the tank at 1.50 (the
+   *  maw 4.4 yd ahead, 3.3 up), shakes at 1.73 and 1.93, lifts and swallows at
+   *  2.2. */
   gorgeGape: 1.233,
-  gorgeGapeMaw: { x: 0, y: 4.1, z: -0.33 },
+  gorgeGapeMaw: { x: 0, y: 11.927, z: -0.663 },
   gorgeBite: 1.5,
-  gorgeBiteMaw: { x: 0, y: 2.98, z: 4.21 },
+  gorgeBiteMaw: { x: 0, y: 3.322, z: 4.416 },
   gorgeShakes: [1.733, 1.933],
   gorgeSwallow: 2.2,
   gorgeLength: 2.733,
   /** BloomSpit: the recoil to 0.30, the glob leaves the maw at 0.43. */
   spitGlob: 0.433,
-  spitMaw: { x: 0, y: 3.21, z: 1.89 },
-  /** Attack: coiled back, the maw strikes out and snaps shut on frame 18
-   *  (0.567), a tearing shake after. 1.5 s at 1x. */
+  spitMaw: { x: 0, y: 8.251, z: 3.281 },
+  /** Attack: reared back and gaping, the stalk whips over and down and the
+   *  maw snaps shut on the tank on frame 18 (0.567, 4.5 yd ahead), a tearing
+   *  shake after. 1.5 s at 1x. */
   attackBite: 0.567,
-  /** Roar: the petals flare fully open at 0.80. */
+  /** Roar: the head thrown back, the collar flared fully open at 0.80. */
   roarPeak: 0.8,
-  roarMaw: { x: 0, y: 4.06, z: 0.14 },
-  /** Death: the shriek at 0.33, the wilt from 0.73 (the petals droop, the bulb
-   *  deflates), the bulb folds over at 2.23 and hits the water at 2.70 (its
-   *  maw face down 1.8 yd ahead), the petals lying flat on the water and the
-   *  sacs on them, still from 3.4. */
+  roarMaw: { x: 0, y: 11.918, z: 0.251 },
+  /** Death: the shriek at 0.33, the wilt from 0.73 (the collar goes limp, the
+   *  head shrinks), the stalk buckles and folds over by 2.23 and the head hits
+   *  the water at 2.70 (its maw face down 8.3 yd ahead), the stalk lying along
+   *  the water and the collar and sacs limp beside it, still from 3.4. */
   deathShriek: 0.333,
   deathWilt: 0.733,
   deathFold: 2.233,
   deathSplash: 2.7,
-  deathSplashAt: { x: 0, y: 0, z: 1.84 },
+  deathSplashAt: { x: -2.149, y: 0, z: 8.337 },
   deathRest: 3.4,
   deathLength: 4.233,
 } as const;

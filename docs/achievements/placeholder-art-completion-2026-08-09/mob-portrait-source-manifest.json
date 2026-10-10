@@ -11203,11 +11203,11 @@
         "model": {
           "url": "models/creatures/woc_basin_gorgebloom.glb",
           "path": "public/models/creatures/woc_basin_gorgebloom.glb",
-          "bytes": 1712648,
-          "sha256": "e6dc45bd9d2d10e2d648ca870a6ffd29adb1c1d77fc7a4087f1dd35c0db3d579"
+          "bytes": 1842816,
+          "sha256": "aeb406d319753d1bd0389cc18846a68b4a79a306635596d7ea0759b00dff243d"
         },
         "idle": "Idle",
-        "height": 2.1789285714285715,
+        "height": 4.911785714285714,
         "yaw": null,
         "hover": 0,
         "show": null,
@@ -11221,11 +11221,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "2dd92492ba37899994e0594177ecaffc0d818341cf538f48639c56456260a63e",
+      "sourceFingerprint": "759bff527f494fc096b0e719d010e0585832f1d65e3deba725a46f38aec0cf2d",
       "output": {
         "path": "public/ui/mobs/the_gorgebloom.webp",
-        "bytes": 2120,
-        "sha256": "c4ddbe00b256121c4b04bb2bdab020541ba059220917f9abf59be60a561146e5"
+        "bytes": 2200,
+        "sha256": "31239eb6ee6b8d52a1016c49fdff5d7771406ee27f66f96f404c7882c86cf92b"
       }
     },
     {

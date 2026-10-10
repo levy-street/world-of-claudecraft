@@ -206,8 +206,9 @@ describe('the shipped GLB', () => {
     expect(tip[0]).toBeCloseTo(GORGEBLOOM_MODEL.lashTip.x, 1);
     expect(tip[1]).toBeCloseTo(GORGEBLOOM_MODEL.lashTip.y, 1);
     expect(tip[2]).toBeCloseTo(GORGEBLOOM_MODEL.lashTip.z, 1);
-    // The lash vine is the RIGHT one (-x); the sacs' tails stand out past
-    // their heads, the front pair ahead and the back pair behind.
+    // The lash vine is the RIGHT one (-x); the sacs hang under the head, in
+    // front of the stalk, their tails below their heads, the outer pair (B)
+    // farther out than the inner (F).
     expect(tip[0]).toBeLessThan(0);
     for (const [bone, sac] of [
       ['Sac_FL', GORGEBLOOM_MODEL.sacs[0]],
@@ -217,14 +218,18 @@ describe('the shipped GLB', () => {
     ] as const) {
       const head = restWorld(bone);
       expect(Math.sign(head[0]), bone).toBe(Math.sign(sac.x));
-      expect(Math.sign(head[2]), bone).toBe(Math.sign(sac.z));
-      expect(Math.abs(sac.x), bone).toBeGreaterThan(Math.abs(head[0]));
+      expect(sac.z, bone).toBeGreaterThan(0);
+      expect(sac.y, bone).toBeLessThan(head[1]);
+      expect(sac.y, bone).toBeLessThan(GORGEBLOOM_MODEL.maw.y);
     }
+    expect(Math.abs(GORGEBLOOM_MODEL.sacs[2].x)).toBeGreaterThan(
+      Math.abs(GORGEBLOOM_MODEL.sacs[0].x),
+    );
   });
 
   it('one skinned body, its glow map on the one material, compressed inside its budget', () => {
     expect(json.skins).toHaveLength(1);
-    expect(json.skins[0].joints).toHaveLength(60);
+    expect(json.skins[0].joints).toHaveLength(54);
     expect(json.materials).toHaveLength(1);
     expect(json.materials[0].name).toBe('GorgebloomBody');
     expect(json.materials[0].emissiveTexture).toBeDefined();
@@ -237,7 +242,7 @@ describe('the shipped GLB', () => {
     for (const m of json.meshes)
       for (const p of m.primitives)
         if (p.indices !== undefined) tris += json.accessors[p.indices].count / 3;
-    expect(tris).toBe(10_209);
+    expect(tris).toBe(8_058);
     expect(statSync(GLB).size).toBeLessThan(3.2 * 1024 * 1024);
   });
 });
@@ -258,11 +263,12 @@ describe('the look and the model agree with the sim', () => {
     // The vines lie on the root pool's surface: the waterline is the pivot.
     expect(gorgebloomLookHover()).toBeCloseTo(0, 9);
     expect(gorgebloomModelScale(k)).toBe(1);
-    // A flower the size of a house beside a 2.6 yd player, never toy-like: over
-    // two players tall and its vines across most of the pool.
+    // A bloom towering over a 2.6 yd player, as tall as the body it replaced
+    // (13.75 yd: Reuben 2026-10-11, a remade boss keeps its height), its vines
+    // across the pool round it.
     expect(bossBodyHeight(GORGEBLOOM_ID, k)).toBeCloseTo(GORGEBLOOM_MODEL.idleTop, 6);
-    expect(GORGEBLOOM_MODEL.idleTop).toBeGreaterThan(2 * 2.6);
-    expect(GORGEBLOOM_MODEL.rootCrown).toBeGreaterThan(GORGEBLOOM_MODEL.idleTop);
+    expect(GORGEBLOOM_MODEL.idleTop).toBeCloseTo(13.75, 1);
+    expect(GORGEBLOOM_MODEL.rootCrown).toBeGreaterThan(2 * 2.6);
     // The sim's body radius sits inside its root crown (melee reaches the roots).
     expect(MOBS.the_gorgebloom.bodyRadius ?? 0).toBeLessThanOrEqual(GORGEBLOOM_MODEL.rootCrown);
     expect(def.clickRadius).toBeGreaterThanOrEqual(4);
@@ -358,7 +364,9 @@ describe('the effects leave the model', () => {
     const C = GORGEBLOOM_CLIP;
     expect(Math.abs(C.lashTipImpact.x)).toBeLessThan(BLOOM_TUNING.lashHalfWidth);
     const reach = lashImpactReach(GORGEBLOOM_SIM_SCALE);
-    expect(reach).toBeCloseTo(8.39, 6);
+    expect(reach).toBeCloseTo(5.506, 6);
+    // The club lands out past the sim's body, ahead of where melee stands.
+    expect(reach).toBeGreaterThan(MOBS.the_gorgebloom.bodyRadius ?? 0);
     const stations = lashWaveStations(GORGEBLOOM_SIM_SCALE, []);
     expect(stations.length).toBeGreaterThanOrEqual(7);
     expect(stations[0]).toBeGreaterThan(reach);

@@ -198,14 +198,24 @@ describe('the Basin bosses die lying on the floor', () => {
     expect(dead.hips.pos[0]).toBeCloseTo(SAURIAN_CLIP.deathRollLeft, 1);
   });
 
-  it('the Gorgebloom ends its Death wilted flat on the water, its maw face down', async () => {
+  it('the Gorgebloom ends its Death fallen flat on the water, its maw face down', async () => {
     const url = glb(GORGEBLOOM_MODEL.url);
-    const petals = ['FL', 'FR', 'L', 'R', 'B'].map((k) => `Petal_${k}2`);
+    const petals = ['F', 'FL', 'BL', 'B', 'BR', 'FR'].map((k) => `Petal_${k}2`);
+    const stalk = [1, 2, 3, 4, 5, 6, 7].map((i) => `Stalk${i}`);
+    const sacs = ['FL', 'FR', 'BL', 'BR'].map((k) => `Sac_${k}`);
     const dead = await posedNodes(url, 'Death', await clipLength(url, 'Death'), [
       'MawAnchor',
       ...petals,
+      ...stalk,
+      ...sacs,
     ]);
-    expect(dead.MawAnchor.pos[1]).toBeLessThan(0.1 * GORGEBLOOM_MODEL.idleTop);
-    for (const p of petals) expect(dead[p].pos[1], p).toBeLessThan(0.3 * GORGEBLOOM_MODEL.idleTop);
+    // Its 13.75 yd stalk lies along the water (every joint under 2 yd, resting on its leaf
+    // collars; standing, they run 3 to 11 yd up), the head face down at its end well out
+    // ahead, the petals and sacs on the water.
+    expect(dead.MawAnchor.pos[1]).toBeLessThan(1);
+    expect(dead.MawAnchor.pos[2]).toBeGreaterThan(6);
+    for (const b of stalk) expect(dead[b].pos[1], b).toBeLessThan(2);
+    for (const p of petals) expect(dead[p].pos[1], p).toBeLessThan(0.6);
+    for (const s of sacs) expect(dead[s].pos[1], s).toBeLessThan(1.5);
   });
 });
