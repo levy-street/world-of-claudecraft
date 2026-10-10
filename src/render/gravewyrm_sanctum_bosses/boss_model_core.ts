@@ -1,13 +1,15 @@
-// The Gravewyrm Sanctum bosses' Blender bodies, measured (their delivery
-// notes, E:/woc/entregas/santuario/{korgath,velkhar,korzul}/NOTAS.md): the
-// facts the looks (characters/sanctum_boss_looks.ts) and the boss effects
-// (sanctum_boss_fx.ts) key on, so a chain leaves Korgath's own manacle and
-// the breath leaves Korzul's own jaws.
+// The Gravewyrm Sanctum bosses' bodies, measured: the facts the looks
+// (characters/sanctum_boss_looks.ts) and the boss effects (sanctum_boss_fx.ts)
+// key on, so a chain leaves Korgath's own manacle and the breath leaves
+// Korzul's own jaws. Korgath and Velkhar are art-guide bodies (the designer's
+// model guide: concept, Tripo, a rig built for the mesh, every clip animated
+// at 30 fps); Korzul is the Blender body from his delivery notes
+// (E:/woc/entregas/santuario/korzul/NOTAS.md, 24 fps).
 //
 // Model space: yards at the authored size, glTF axes: +Y up, the body faces
 // +Z, its LEFT is +X; the origin is on the ground under the body. All three
-// were authored at their in-game size and are drawn at it (model scale 1 at
-// their template's sim scale). Clip times are seconds at 1x (24 fps).
+// are drawn at their authored size (model scale 1 at their template's sim
+// scale). Clip times are seconds at 1x.
 //
 // Three-free, DOM-free, deterministic.
 
@@ -30,20 +32,24 @@ export interface BossBody {
 /** Korgath the Bound: the Smith's foreman, a chained giant with a maul, 10.3 yd
  *  at Idle (four knights). */
 export const KORGATH_BODY: BossBody = {
-  url: 'models/creatures/sanctum_korgath.glb',
+  url: 'models/creatures/woc_sanctum_korgath.glb',
   simScale: 1.5,
   drawnScale: 1,
   idleBoundsHeight: 10.27,
-  walkRef: 3.5,
+  walkRef: 2.65,
 };
+/** The planted feet's speed in the charge's run loop (ThresholdChargeLoop), at
+ *  model scale 1. */
+export const KORGATH_RUN_REF = 15.84;
 
-/** Grand Necromancer Velkhar: 4.0 yd to the crown, the staff's finial 5.05. */
+/** Grand Necromancer Velkhar: the mitre and the staff's caged soul flame 5.06
+ *  yd at Idle. */
 export const VELKHAR_BODY: BossBody = {
-  url: 'models/creatures/sanctum_velkhar.glb',
+  url: 'models/creatures/woc_sanctum_velkhar.glb',
   simScale: 1.25,
   drawnScale: 1,
   idleBoundsHeight: 5.06,
-  walkRef: 1.11,
+  walkRef: 2.05,
 };
 
 /** Korzul the Gravewyrm: withers 12.6 yd, the horns 21.6, 53.7 yd nose to tail. */
@@ -70,19 +76,21 @@ export function contactRate(contact: number, bar: number): number {
   return bar > 0 ? contact / bar : 1;
 }
 
-/** Korgath's clip beats (contact frames, seconds at 1x). */
+/** Korgath's clip beats (contact frames, seconds at 1x). The blows land on
+ *  frame 18 of their 1.5 s clips; each bar's blow lands on the bar's end, so
+ *  every clip plays at 1x. */
 export const KORGATH_CLIP = {
-  slam: 1.3,
-  sweep: 1.05,
+  slam: 0.567,
+  sweep: 0.567,
   stomp: 1.5,
   strain: 2.0,
-  maulArc: 0.95,
+  maulArc: 1.6,
   chainFlail: 2.0,
   thresholdCharge: 2.0,
   bellow: 2.0,
-  chainBreakSnap: 0.25,
+  chainBreakSnap: 0.233,
   roarPeak: 0.7,
-  deathKnees: 1.55,
+  deathKnees: 0.967,
 } as const;
 
 /** Korgath's four harness anchor bones, by chain, and the broken-chain mesh a
@@ -102,22 +110,23 @@ export const KORGATH_BROKEN_CHAIN_MESH: Readonly<Partial<Record<SealTool, string
  *  +z ahead): the stand-in when the live rig is not drawn (the far bake). */
 export const KORGATH_ANCHOR_REST: Readonly<Record<SealTool, { x: number; y: number; z: number }>> =
   {
-    hammer: { x: -3.1, y: 4.6, z: 0.8 },
-    tongs: { x: 3.1, y: 4.6, z: 0.8 },
-    anvil: { x: -1.8, y: 0.95, z: -0.2 },
-    bellows: { x: 0, y: 8.95, z: -1.0 },
+    hammer: { x: -1.45, y: 5.78, z: 0.24 },
+    tongs: { x: 1.79, y: 5.73, z: 0.21 },
+    anvil: { x: -1.19, y: 1.09, z: -0.13 },
+    bellows: { x: 0, y: 8.94, z: -0.5 },
   };
 
-/** Velkhar's clip beats. */
+/** Velkhar's clip beats: the staff's blow lands on frame 18 of its 1.5 s
+ *  Attack; the trench and the volley leave on their bars' ends (1x). */
 export const VELKHAR_CLIP = {
-  castRelease: 0.85,
+  castRelease: 0.833,
   thawPull: 1.9,
-  trenchLaunch: 1.45,
-  volleyBurst: 1.0,
-  attackLand: 0.62,
+  trenchLaunch: 2.0,
+  volleyBurst: 1.5,
+  attackLand: 0.567,
 } as const;
-/** The soul flame's height over his feet at Idle (the StaffTip). */
-export const VELKHAR_FLAME_Y = 5.0;
+/** The caged soul flame's centre over his feet at Idle. */
+export const VELKHAR_FLAME_Y = 4.45;
 
 /** Korzul's clip beats. */
 export const KORZUL_CLIP = {

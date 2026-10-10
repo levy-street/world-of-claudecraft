@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "27dbb3f4e6319cd6ff786f00481cb99326fbf23c10818ee9472618aba1c00009",
+  "rendererFingerprint": "d9a8b163aea6f2f3ebc4240d5ba5cc5b387127d4394d4719b2dd31fdfc0580d5",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "darwin",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6079248,
-      "sha256": "0533c1a8f931c4170250e17f6219abe749ac9972dadf0c00f5893c00d080a027",
+      "bytes": 6079264,
+      "sha256": "0055c8e5c2dfb2004c4743f0dcd97bf1a7ca1b0c07e1798e32933a98434bd88c",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -4231,10 +4231,10 @@
       "visualKey": "sanctum_velkhar",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/sanctum_velkhar.glb",
-          "path": "public/models/creatures/sanctum_velkhar.glb",
-          "bytes": 2754456,
-          "sha256": "7bf7e4751af3318a78fcc33cf3ccf3ee21a45210a93fb90f61800a46a0b2ccb9"
+          "url": "models/creatures/woc_sanctum_velkhar.glb",
+          "path": "public/models/creatures/woc_sanctum_velkhar.glb",
+          "bytes": 2646648,
+          "sha256": "ba27029c673e8e37d85dcbeacf2f6b70e4b2294f6e80f67c03f908c3100cccba"
         },
         "idle": "Idle",
         "height": 4.048,
@@ -4251,11 +4251,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "9cc917fb26af40dc344725f963805b09f81ba1fd716f879a5d961d49d182da3b",
+      "sourceFingerprint": "0d025d0241491e32fb6b1840d5c3502dbd5448f18cbf5d779bd2798bad2137ad",
       "output": {
         "path": "public/ui/mobs/grand_necromancer_velkhar.webp",
-        "bytes": 2162,
-        "sha256": "6e2e024e93224fb18e69f9c0a87d2cdc16dc33d92146b1289d738a8af45cd2b3"
+        "bytes": 2526,
+        "sha256": "35e3ead00ebc49d431899bd03183b609373de73a202337ede4b8c055073aa460"
       }
     },
     {
@@ -6222,10 +6222,10 @@
       "visualKey": "sanctum_korgath",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/sanctum_korgath.glb",
-          "path": "public/models/creatures/sanctum_korgath.glb",
-          "bytes": 3587280,
-          "sha256": "a4cba148d1d52bd3c46df67f1761d743bbcea3d95d9827d55b17beaafc480255"
+          "url": "models/creatures/woc_sanctum_korgath.glb",
+          "path": "public/models/creatures/woc_sanctum_korgath.glb",
+          "bytes": 1509692,
+          "sha256": "d9b981b2662058dd4ed0cf91f6710332d68ce6cb59ab132d46270a3cfbf7152e"
         },
         "idle": "Idle",
         "height": 6.846666666666667,
@@ -6242,11 +6242,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "8851b569e25f335a030cf24d92bf540e9cd5a6dc93fcd6dc8d44351536e8d297",
+      "sourceFingerprint": "e6b9a25fa40f75928da885a4faced2ec52db0680022c5cc313c3f596fdc33ed8",
       "output": {
         "path": "public/ui/mobs/korgath_the_bound.webp",
         "bytes": 2942,
-        "sha256": "908b941a579f94859f0725c9794707b624c7514b5c7a661d210b98ef02eeb853"
+        "sha256": "4f422f089054678be7740ee797708428375584db870fad8fa5848c166df11535"
       }
     },
     {
@@ -10167,10 +10167,10 @@
       "visualKey": "sanctum_seal_shackle",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/sanctum_korgath.glb",
-          "path": "public/models/creatures/sanctum_korgath.glb",
-          "bytes": 3587280,
-          "sha256": "a4cba148d1d52bd3c46df67f1761d743bbcea3d95d9827d55b17beaafc480255"
+          "url": "models/creatures/woc_sanctum_korgath.glb",
+          "path": "public/models/creatures/woc_sanctum_korgath.glb",
+          "bytes": 1509692,
+          "sha256": "d9b981b2662058dd4ed0cf91f6710332d68ce6cb59ab132d46270a3cfbf7152e"
         },
         "idle": "Idle",
         "height": 2,
@@ -10187,11 +10187,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "f1c5d4752cb7960d5f8c5741c29611a3f1d360c559769a6fdad13b03a19ce545",
+      "sourceFingerprint": "7c2da89cc7d28036b17a79df8f8f900b3488c368cc1ffa7d19cb9a0bc29c7036",
       "output": {
         "path": "public/ui/mobs/sanctum_shackle_anvil.webp",
-        "bytes": 2998,
-        "sha256": "82e81a4591eafaf21791d432a8314038f152fefed0978e5ab7293c89847a43af"
+        "bytes": 3012,
+        "sha256": "55a2d9903295d63248969466567037b9b616704d8d985fc15a97842a8db45d40"
       }
     },
     {
@@ -10201,10 +10201,10 @@
       "visualKey": "sanctum_seal_shackle",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/sanctum_korgath.glb",
-          "path": "public/models/creatures/sanctum_korgath.glb",
-          "bytes": 3587280,
-          "sha256": "a4cba148d1d52bd3c46df67f1761d743bbcea3d95d9827d55b17beaafc480255"
+          "url": "models/creatures/woc_sanctum_korgath.glb",
+          "path": "public/models/creatures/woc_sanctum_korgath.glb",
+          "bytes": 1509692,
+          "sha256": "d9b981b2662058dd4ed0cf91f6710332d68ce6cb59ab132d46270a3cfbf7152e"
         },
         "idle": "Idle",
         "height": 2,
@@ -10221,11 +10221,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "f1c5d4752cb7960d5f8c5741c29611a3f1d360c559769a6fdad13b03a19ce545",
+      "sourceFingerprint": "7c2da89cc7d28036b17a79df8f8f900b3488c368cc1ffa7d19cb9a0bc29c7036",
       "output": {
         "path": "public/ui/mobs/sanctum_shackle_bellows.webp",
-        "bytes": 2998,
-        "sha256": "82e81a4591eafaf21791d432a8314038f152fefed0978e5ab7293c89847a43af"
+        "bytes": 3012,
+        "sha256": "55a2d9903295d63248969466567037b9b616704d8d985fc15a97842a8db45d40"
       }
     },
     {
@@ -10235,10 +10235,10 @@
       "visualKey": "sanctum_seal_shackle",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/sanctum_korgath.glb",
-          "path": "public/models/creatures/sanctum_korgath.glb",
-          "bytes": 3587280,
-          "sha256": "a4cba148d1d52bd3c46df67f1761d743bbcea3d95d9827d55b17beaafc480255"
+          "url": "models/creatures/woc_sanctum_korgath.glb",
+          "path": "public/models/creatures/woc_sanctum_korgath.glb",
+          "bytes": 1509692,
+          "sha256": "d9b981b2662058dd4ed0cf91f6710332d68ce6cb59ab132d46270a3cfbf7152e"
         },
         "idle": "Idle",
         "height": 2,
@@ -10255,11 +10255,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "f1c5d4752cb7960d5f8c5741c29611a3f1d360c559769a6fdad13b03a19ce545",
+      "sourceFingerprint": "7c2da89cc7d28036b17a79df8f8f900b3488c368cc1ffa7d19cb9a0bc29c7036",
       "output": {
         "path": "public/ui/mobs/sanctum_shackle_hammer.webp",
-        "bytes": 2998,
-        "sha256": "82e81a4591eafaf21791d432a8314038f152fefed0978e5ab7293c89847a43af"
+        "bytes": 3012,
+        "sha256": "55a2d9903295d63248969466567037b9b616704d8d985fc15a97842a8db45d40"
       }
     },
     {
@@ -10269,10 +10269,10 @@
       "visualKey": "sanctum_seal_shackle",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/sanctum_korgath.glb",
-          "path": "public/models/creatures/sanctum_korgath.glb",
-          "bytes": 3587280,
-          "sha256": "a4cba148d1d52bd3c46df67f1761d743bbcea3d95d9827d55b17beaafc480255"
+          "url": "models/creatures/woc_sanctum_korgath.glb",
+          "path": "public/models/creatures/woc_sanctum_korgath.glb",
+          "bytes": 1509692,
+          "sha256": "d9b981b2662058dd4ed0cf91f6710332d68ce6cb59ab132d46270a3cfbf7152e"
         },
         "idle": "Idle",
         "height": 2,
@@ -10289,11 +10289,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "f1c5d4752cb7960d5f8c5741c29611a3f1d360c559769a6fdad13b03a19ce545",
+      "sourceFingerprint": "7c2da89cc7d28036b17a79df8f8f900b3488c368cc1ffa7d19cb9a0bc29c7036",
       "output": {
         "path": "public/ui/mobs/sanctum_shackle_tongs.webp",
-        "bytes": 2998,
-        "sha256": "82e81a4591eafaf21791d432a8314038f152fefed0978e5ab7293c89847a43af"
+        "bytes": 3012,
+        "sha256": "55a2d9903295d63248969466567037b9b616704d8d985fc15a97842a8db45d40"
       }
     },
     {
