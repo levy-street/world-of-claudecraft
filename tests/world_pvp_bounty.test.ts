@@ -122,13 +122,15 @@ function streak(sim: Sim, killerPid: number, count: number): void {
 
 /** One more kill of `victimPid` by `killerPid`; returns what it paid. */
 function killAgain(sim: Sim, killerPid: number, victimPid: number) {
+  sim.lootCorpse(victimPid, killerPid);
   sim.meta(victimPid)!.copper = 10_000;
   const goldBefore = sim.meta(killerPid)!.copper;
   const honorBefore = sim.meta(killerPid)!.honor;
   revive(sim, victimPid);
   slay(sim, killerPid, victimPid);
+  const droppedGold = ent(sim, victimPid).loot?.copper ?? 0;
   return {
-    gold: sim.meta(killerPid)!.copper - goldBefore,
+    gold: sim.meta(killerPid)!.copper - goldBefore + droppedGold,
     honor: sim.meta(killerPid)!.honor - honorBefore,
   };
 }
@@ -414,7 +416,11 @@ describe('persistence', () => {
     const holder = flaggedFighter(sim, 'Aleph');
     streak(sim, holder, WORLD_PVP_BOUNTY_STREAK);
     const saved = sim.serializeCharacter(holder)!;
-    expect(saved.worldPvp).toEqual({ flagged: true, kills: WORLD_PVP_BOUNTY_STREAK });
+    expect(saved.worldPvp).toEqual({
+      flagged: true,
+      kills: WORLD_PVP_BOUNTY_STREAK,
+      rewardTicks: 5,
+    });
     expect(JSON.stringify(saved)).not.toContain('bounty');
     expect(JSON.stringify(saved)).not.toContain('streak');
   });
