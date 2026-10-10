@@ -35,7 +35,9 @@ describe('owned-class level 20 balance harness (DPS probes)', () => {
     const thundercall = runOwnedClassDpsProbe('thundercall', scenario, 29_903);
     const vespers = runOwnedClassDpsProbe('vespers', scenario, 29_903);
 
-    expect(vespers.dps).toBeGreaterThanOrEqual(thundercall.dps * 0.9);
+    // No floor against Thundercall since the v0.45.0 rotation fix: it was the
+    // mirror of the removed 1.1x Thundercall ceiling (owner decision 2026-10-07,
+    // tests/owned_class_balance_role_bands.test.ts).
     // Band widened for the stacked v0.29 rogue redesign (#2328): its shared
     // combat changes shift this pair a few percent; re-author when it lands.
     expect(vespers.dps).toBeLessThanOrEqual(thundercall.dps * 1.2);

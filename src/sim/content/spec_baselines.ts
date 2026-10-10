@@ -152,6 +152,10 @@ export const SPEC_BASELINES: SpecBaselineTable = {
         { ability: 'chain_lightning', castPct: LIGHTNING_MASTERY_CAST_PCT },
         { ability: 'earth_shock', dmgPct: 0.18, costPct: -0.15 },
         { ability: 'flame_shock', costPct: -0.2 },
+        // v0.45 rotation fix: Magma Burst takes Arc Bolt's discount. At full
+        // price the Cinder Jolt and Magma Burst loop ran out of Mana inside a
+        // 3 min fight and lost to Arc Bolt plus Earthen Jolt.
+        { ability: 'lava_burst', costPct: -0.35 },
       ],
     },
     enhancement: {

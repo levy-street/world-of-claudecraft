@@ -13830,7 +13830,7 @@ export const da_DK: EnTranslations = {
       },
       "thunder_reservoir": {
         "name": "Tordenreservoir",
-        "description": "Passiv: Lysbuelynet og Gaffellynet giver Torden, op til 5. Ved 5 Torden gør Jordstødet 125% mere skade eller Jordskælvet 100% mere, og derefter forbruges al Torden. (Tordenkald)"
+        "description": "Passiv: Lysbuelynet, Gaffellynet og Magma Burst giver Torden, op til 5. Ved 5 Torden gør Jordstødet 125% mere skade eller Jordskælvet 100% mere, og derefter forbruges al Torden. (Tordenkald)"
       },
       "lightning_overload": {
         "name": "Arc Overload",
@@ -13838,7 +13838,7 @@ export const da_DK: EnTranslations = {
       },
       "lava_burst": {
         "name": "Magma Burst",
-        "description": "Påfør {damage} Ildskade. Slår altid kritisk en mål som brænder med din Glødstød. Magma Bølge: hver Glødstød slag har 20% chance at nulstille denne nedtælling og gøre din næste Magma Burst inden 10 sek øjeblikkelig. Skade stiger med Stavekraft. (Tordenråb)"
+        "description": "Påfør {damage} Ildskade. Et træf giver 1 Torden. Slår altid kritisk en mål som brænder med din Glødstød. Et kritisk slag gør yderligere 24% af den normale skade. Magma Bølge: hver Glødstød slag har 20% chance at nulstille denne nedtælling og gøre din næste Magma Burst inden 10 sek øjeblikkelig. Skade stiger med Stavekraft. (Tordenråb)"
       },
       "thunderstorm": {
         "name": "Stormbryder",
@@ -13862,7 +13862,7 @@ export const da_DK: EnTranslations = {
       },
       "flame_shock": {
         "name": "Glødstød",
-        "description": "Volder {damage} Ildskade, derefter {overTime} Ildskade over 12 sek. Det første træf stiger med Besværgelseskraft."
+        "description": "Volder {damage} Ildskade, derefter {overTime} Ildskade over {duration} sek. Det første træf stiger med Besværgelseskraft."
       },
       "flametongue_weapon": {
         "name": "Bålbrand-Våben",
