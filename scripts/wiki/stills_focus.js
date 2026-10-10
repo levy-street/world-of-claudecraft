@@ -9,7 +9,7 @@
 // coloured back light for that model only.
 // Any model not listed renders exactly as before.
 export const STILL_FOCUS = {
-  'models/creatures/crypt_morthen_lich.glb': { bone: 'Head', radius: 0.33, lift: -0.24 },
+  'models/creatures/woc_crypt_morthen.glb': { bone: 'head', radius: 0.26, lift: -0.5, yaw: 0.6 },
   'models/creatures/gaol_turnkey.glb': { bone: 'Head', radius: 0.36, lift: -0.3 },
   // the Moonmantle Ray: a disc far wider than it is tall, framed on its crescent and pearl
   'models/creatures/temple_sentinel.glb': { bone: 'Head', radius: 0.26, lift: 0.12, yaw: 0.25 },

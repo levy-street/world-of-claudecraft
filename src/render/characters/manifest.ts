@@ -2433,6 +2433,9 @@ const MORTHEN_STAFF_CLIPS: ClipMap = {
   walk: 'Walk',
   run: 'Run',
   attack: ['StaffStrike', 'StaffStrike2'],
+  // The overhead smash and the backhand bash land on frame 17 of 30 fps clips; the
+  // flinch and the number wait for the crozier.
+  contacts: { StaffStrike: [0.533], StaffStrike2: [0.533] },
   attackByAbility: { [MORTHEN_TOLL]: 'BellToll' },
   attackTimeScaleByAbility: { [MORTHEN_TOLL]: 1 },
   hit: ['Hit'],
@@ -2453,9 +2456,11 @@ const MORTHEN_SCYTHE_CLIPS: ClipMap = {
   walk: 'ScytheWalk',
   run: 'ScytheRun',
   attack: ['ScytheSweep', 'ScytheSweep2'],
+  // Both reaps cross his front on frame 17 of 30 fps clips.
+  contacts: { ScytheSweep: [0.533], ScytheSweep2: [0.533] },
   // Reap the Unquiet: the bar winds the blade up (ScytheSummon, the scythe
   // raised over the souls), the landing brings it round in the flat sweep, fast
-  // (its cut at frame 14 lands about 0.3 s after the hit).
+  // (its cut across his front at frame 17 lands about 0.3 s after the hit).
   attackByAbility: { [MORTHEN_TOLL]: 'ScytheToll', [MORTHEN_REAP_SWEEP]: 'ScytheSweep' },
   attackTimeScaleByAbility: { [MORTHEN_TOLL]: 1, [MORTHEN_REAP_SWEEP]: 1.9 },
   hit: ['ScytheHit'],
@@ -4876,14 +4881,17 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 7.1,
     authoredAtlas: true,
   },
-  // Morthen, the Lich Bishop (the clip sets above): about three players tall
-  // at his template's 1.35, floating on his soul smoke, the smoke funnel sunk
-  // into the ring floor (morthen_fx_core.ts MORTHEN_HOVER) so his whole body
-  // and face read from the default camera; his corpse is lifted back onto the
-  // flags as he falls (MORTHEN_DEATH_LIFT).
+  // Morthen, the Lich Bishop (the art guide's model; the clip sets above): a
+  // spiked mitre with a green eye, a cope over an open ribcage of soul fire, belt
+  // charms, and a ring-headed crozier whose crest unfolds into the scythe. About
+  // two and a half players tall at his template's 1.35, floating on his soul
+  // smoke, the smoke funnel sunk into the ring floor (morthen_fx_core.ts
+  // MORTHEN_HOVER) so his whole body and face read from the default camera; his
+  // corpse is lifted back onto the flags as he falls (MORTHEN_DEATH_LIFT).
+  // `height` is the idle's posed height half a second in, smoke tip to mitre.
   crypt_morthen_lich: {
-    url: `${CREATURES}/crypt_morthen_lich.glb`,
-    height: 6.994,
+    url: `${CREATURES}/woc_crypt_morthen.glb`,
+    height: 5.85,
     hover: MORTHEN_HOVER,
     deathLift: MORTHEN_DEATH_LIFT,
     clips: MORTHEN_STAFF_CLIPS,

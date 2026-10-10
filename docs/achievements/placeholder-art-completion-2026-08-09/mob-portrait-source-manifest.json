@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "f16fb9b65cf1a335ce9237e92c0060e1c742b9009d6eff209dad7ec1ab0614de",
+  "rendererFingerprint": "2a608dfa24a64dc72fdb5209749ca2ecfc82eb3a0a769183f129285177008ecf",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "darwin",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6079176,
-      "sha256": "203a1baf6fb7ed270d099fcef38b400004c47ec973be2aa204a2562b82b1bc60",
+      "bytes": 6079182,
+      "sha256": "582f8f448ab2318564ce28fc3841a47a80526304f6b38149b75f1cdb98ee6d1f",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -7120,15 +7120,15 @@
       "visualKey": "crypt_morthen_lich",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/crypt_morthen_lich.glb",
-          "path": "public/models/creatures/crypt_morthen_lich.glb",
-          "bytes": 3366996,
-          "sha256": "71088e679c39b0a9b079ea3a2744fc54c26bf2af8eac2ac5d30a3e8c39532e07"
+          "url": "models/creatures/woc_crypt_morthen.glb",
+          "path": "public/models/creatures/woc_crypt_morthen.glb",
+          "bytes": 1451860,
+          "sha256": "e1053e68e530d1f4cd52fc7415b90b0930e7ba9601c44564af084713e0bfd209"
         },
         "idle": "Idle",
-        "height": 6.994,
+        "height": 5.85,
         "yaw": null,
-        "hover": -1.178,
+        "hover": -0.754,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -7140,11 +7140,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "b3ea439a1061f5eb3de36cb041b4f9f68c8945cc4234af5ba3d115fe8b3cbf26",
+      "sourceFingerprint": "7e453a0ea2ef44ede22a1b1be333aa1a063b470f5c4f5035e71c2e416333b468",
       "output": {
         "path": "public/ui/mobs/morthen.webp",
-        "bytes": 2334,
-        "sha256": "29fdc46094ed0227a9065234dc014b9e7e5fcb277d3edcc4db64cc99bd54bf1c"
+        "bytes": 2144,
+        "sha256": "98225956280185709ca8b6e3c547c23ca9d9e4c660bbdfab4b633d85a077b20c"
       }
     },
     {

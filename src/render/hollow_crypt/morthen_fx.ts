@@ -48,6 +48,7 @@ import {
   MORTHEN_RIBS,
   MORTHEN_SCYTHE_REACH,
   MORTHEN_SCYTHE_UNFOLD,
+  MORTHEN_SCYTHE_Y,
   MORTHEN_SMOKE_BASE,
   MORTHEN_SOUL_COUNT,
   MORTHEN_STANCE_REFRESH_SEC,
@@ -390,7 +391,7 @@ export class MorthenFx {
     t.alive = true;
     t.born = this.clock;
     const flip = this.swingCount++ % 2 === 1;
-    t.mesh.position.set(m.pos.x, morthenBodyY(m.pos.y, 3.3, s), m.pos.z);
+    t.mesh.position.set(m.pos.x, morthenBodyY(m.pos.y, MORTHEN_SCYTHE_Y, s), m.pos.z);
     t.mesh.scale.setScalar(MORTHEN_SCYTHE_REACH * s);
     // The flat sweep, then the rising diagonal reap brought down across him.
     t.mesh.rotation.set(0, m.facing, flip ? -0.5 : 0.12, 'YXZ');
@@ -891,7 +892,7 @@ export class MorthenFx {
       // The arc rides the body while it cuts.
       if (m && !m.dead) {
         const s = m.scale || 1;
-        t.mesh.position.set(m.pos.x, morthenBodyY(m.pos.y, 3.3, s), m.pos.z);
+        t.mesh.position.set(m.pos.x, morthenBodyY(m.pos.y, MORTHEN_SCYTHE_Y, s), m.pos.z);
       }
       t.mesh.visible = true;
       t.mat.uniforms.uHead.value = plan.head;
