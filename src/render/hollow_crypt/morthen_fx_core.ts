@@ -77,6 +77,17 @@ export const MORTHEN_HOVER = MORTHEN_REST_MINZ - MORTHEN_SINK;
  *  anchor below is measured in the rig's own frame and lifted by this. */
 export const MORTHEN_RIG_Y = MORTHEN_HOVER - MORTHEN_REST_MINZ;
 
+/** How much larger than his authored rig he is drawn, over his template scale:
+ *  grown so he stands as tall over the flags as the body he replaced (7.85 yd at
+ *  his 1.35; the authored rig alone stood 6.88), his mitre eye 6.8 yd up. */
+export const MORTHEN_GROWTH = 1.14;
+
+/** World yards per authored yard for a Morthen of template `scale`: what every
+ *  body anchor below is multiplied by. */
+export function morthenDrawScale(scale: number): number {
+  return (scale || 1) * MORTHEN_GROWTH;
+}
+
 /** The lowest an emitter on his body may sit over the floor under him (his
  *  smoke base is under the floor now: it boils out at the flags instead). */
 export function morthenEmitY(anchorY: number, floorY: number, scale: number): number {
@@ -133,8 +144,13 @@ export const STAFF_STRIKE_SEC = 0.42;
 export const DISSOLVE_SEC = 3.2;
 /** As he falls, the body is lifted back out of the floor by the sink, over
  *  this share of his Death clip (from the reel at frame 7 to the heap at
- *  frame 42 of 75), so the folded vestments come to rest ON the flags. */
-export const MORTHEN_DEATH_LIFT = { yards: MORTHEN_SINK, from: 0.1, to: 0.55 } as const;
+ *  frame 42 of 75), so the folded vestments come to rest ON the flags. In the
+ *  manifest's units (his authored yards grown by MORTHEN_GROWTH). */
+export const MORTHEN_DEATH_LIFT = {
+  yards: MORTHEN_SINK * MORTHEN_GROWTH,
+  from: 0.1,
+  to: 0.55,
+} as const;
 
 /** How far round its arc a swing's trail has cut `t` seconds after the hit
  *  (null before it starts and after it fades). `head` is the leading edge,

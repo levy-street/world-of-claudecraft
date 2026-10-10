@@ -187,24 +187,28 @@ describe('the shipped Sledge Tusker GLBs', () => {
   });
 });
 
-describe('the Tusker drawn at its authored size', () => {
-  it('stands about three players tall at its sim scale', () => {
+describe("the Tusker drawn at the old body's height", () => {
+  it('stands its hump as tall as the body it replaced, about three players', () => {
     expect(MOBS[SLEDGE_TUSKER_ID]?.scale).toBe(TUSKER_SIM_SCALE);
-    expect(TUSKER_DRAWN_SCALE).toBe(1);
+    // Reuben 2026-10-11: a remade boss keeps its height. The old body's hump
+    // stood 7.76 yd; the new one is authored 7.44, so it is drawn a little over.
+    const k = tuskerModelScale(TUSKER_SIM_SCALE);
+    expect(k).toBeCloseTo(TUSKER_DRAWN_SCALE, 9);
+    expect(TUSKER_MODEL.headTop * k).toBeCloseTo(7.76, 6);
     const drawn = tuskerLookHeight() * TUSKER_SIM_SCALE;
-    expect(drawn).toBeCloseTo(TUSKER_MODEL.idleBoundsHeight, 6);
+    expect(drawn).toBeCloseTo(TUSKER_MODEL.idleBoundsHeight * k, 6);
     expect(drawn / PLAYER).toBeGreaterThan(2.9);
     expect(SANCTUM_SLEDGE_TUSKER_LOOK.height).toBeCloseTo(tuskerLookHeight(), 9);
-    expect(tuskerModelScale(TUSKER_SIM_SCALE)).toBe(1);
   });
 
   it('reaches past its sim body: the tusks out to the sweep and the flanks to its radius', () => {
     const body = MOBS[SLEDGE_TUSKER_ID]?.bodyRadius ?? 0;
     expect(body).toBe(tuskerBodyRadius());
-    // The tusk tips stand inside the cone the sim tests (range + body)...
-    expect(TUSKER_MODEL.tuskTip.z).toBeLessThan(TUSKER_TUNING.sweepRange + body);
+    const k = tuskerModelScale(TUSKER_SIM_SCALE);
+    // The drawn tusk tips stand inside the cone the sim tests (range + body)...
+    expect(TUSKER_MODEL.tuskTip.z * k).toBeLessThan(TUSKER_TUNING.sweepRange + body);
     // ...and the coat is wider than the body radius' chord would leave bare.
-    expect(TUSKER_MODEL.halfWidth).toBeLessThan(body);
+    expect(TUSKER_MODEL.halfWidth * k).toBeLessThan(body);
   });
 
   it('lands each strike on its bar: the sweep crosses the cone and the head levels at the end', () => {
@@ -265,15 +269,20 @@ describe('the Tusker drawn at its authored size', () => {
     }
     expect(tuskerFootfallsBetween('walk', 3, 3, feet)).toBe(0);
     // A cycle carries it ref x cycle at its drawn size.
-    expect(tuskerStride('walk', TUSKER_SIM_SCALE)).toBeCloseTo(2.8 * 2.2, 9);
+    expect(tuskerStride('walk', TUSKER_SIM_SCALE)).toBeCloseTo(2.8 * 2.2 * TUSKER_DRAWN_SCALE, 9);
   });
 });
 
 describe('the sledge', () => {
-  it('hangs its origin 10.5 behind the beast, its tongue on the hitch ring', () => {
+  it('hangs its tongue on the hitch ring, the sledge at its own size behind the grown beast', () => {
     expect(sledgeTongue()).toBeCloseTo(4.35, 9);
-    const pose = rigidSledge({ x: 3, z: 4 }, Math.PI / 2, TUSKER_SIM_SCALE, { x: 0, z: 0, yaw: 0 });
-    expect(pose.x).toBeCloseTo(3 - SLEDGE_MODEL.behind, 9);
+    // At the authored size its origin hangs 10.5 behind.
+    expect(sledgeTongue() - TUSKER_MODEL.hitch.z).toBeCloseTo(SLEDGE_MODEL.behind, 9);
+    const beast = { x: 3, z: 4 };
+    const pose = rigidSledge(beast, Math.PI / 2, TUSKER_SIM_SCALE, { x: 0, z: 0, yaw: 0 });
+    const k = tuskerModelScale(TUSKER_SIM_SCALE);
+    const ring = modelToWorld(beast, Math.PI / 2, k, 0, TUSKER_MODEL.hitch.z, { x: 0, z: 0 });
+    expect(ring.x - pose.x).toBeCloseTo(sledgeTongue(), 9);
     expect(pose.z).toBeCloseTo(4, 9);
     expect(pose.yaw).toBe(Math.PI / 2);
   });
@@ -300,7 +309,8 @@ describe('the sledge', () => {
       trailSledge(pose, beast, Math.PI / 2, TUSKER_SIM_SCALE, 0.05);
     }
     expect(pose.yaw).toBeCloseTo(Math.PI / 2, 3);
-    const ring = modelToWorld(beast, Math.PI / 2, 1, 0, TUSKER_MODEL.hitch.z, { x: 0, z: 0 });
+    const k = tuskerModelScale(TUSKER_SIM_SCALE);
+    const ring = modelToWorld(beast, Math.PI / 2, k, 0, TUSKER_MODEL.hitch.z, { x: 0, z: 0 });
     expect(Math.hypot(ring.x - pose.x, ring.z - pose.z)).toBeCloseTo(sledgeTongue(), 6);
     // At rest behind it, a dragged sledge stands where the rigid one hangs.
     const rigid = rigidSledge(beast, Math.PI / 2, TUSKER_SIM_SCALE, { x: 0, z: 0, yaw: 0 });
@@ -366,7 +376,9 @@ describe('the sledge', () => {
 
   it('hauls in step with the walk and rests on its idle', () => {
     expect(haulRate(0, TUSKER_SIM_SCALE)).toBe(0);
-    expect(haulRate(TUSKER_MODEL.walkRef, TUSKER_SIM_SCALE)).toBeCloseTo(1, 9);
+    expect(
+      haulRate(TUSKER_MODEL.walkRef * tuskerModelScale(TUSKER_SIM_SCALE), TUSKER_SIM_SCALE),
+    ).toBeCloseTo(1, 9);
     expect(haulRate(50, TUSKER_SIM_SCALE)).toBe(2.2);
   });
 });

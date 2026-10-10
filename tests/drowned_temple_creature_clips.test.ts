@@ -19,6 +19,7 @@ import {
   templeMoonspawnRises,
   templeSentinelShellGesture,
 } from '../src/render/drowned_temple/temple_fx_core';
+import { HYDRA_BODY } from '../src/sim/content/drowned_temple_layout';
 import { MOBS } from '../src/sim/data';
 import {
   COLOSSUS_MOONLIGHT_LANCE,
@@ -54,6 +55,7 @@ import {
   TEMPLE_TRIDENT_SWEEP,
 } from '../src/sim/mob/trash_kit/temple_cast_ids';
 import { TEMPLE_CARAPACE_AURA } from '../src/sim/mob/trash_kit/temple_kit';
+import { clipLength, posedNodes } from './helpers/posed_glb';
 
 function clipsOf(path: string): string[] {
   const buf = readFileSync(path);
@@ -173,6 +175,22 @@ describe("the Mere Hydra: the art guide's three-necked body at the pool", () => 
     const src = readFileSync('src/render/drowned_temple/temple_hydra.ts', 'utf8');
     expect(src).toContain("MERE_HYDRA_URL = '/models/creatures/woc_temple_hydra.glb'");
     expect(VISUALS.temple_hydra_head.url.endsWith('/woc_temple_hydra.glb')).toBe(true);
+  });
+
+  it('stands its heads as tall over the water as the body it replaced', async () => {
+    // The old body's heads averaged 13.87 model yards over the water through
+    // its Idle at the pool's old 1.15, about 15.95 drawn (Reuben 2026-10-11: a
+    // remade boss keeps its height). Sampled through the new Idle at the pool's scale.
+    const len = await clipLength(path, 'Idle');
+    const heads = ['head_L', 'head_C', 'head_R'];
+    const ys: number[] = [];
+    for (const f of [0, 0.25, 0.5, 0.75]) {
+      const p = await posedNodes(path, 'Idle', len * f, heads);
+      for (const h of heads) ys.push(p[h].pos[1] * HYDRA_BODY.scale);
+    }
+    const mean = ys.reduce((a, b) => a + b, 0) / ys.length;
+    expect(mean).toBeGreaterThan(15.65);
+    expect(mean).toBeLessThan(16.25);
   });
 
   it('ships the seven whole-body clips the pool drives', () => {

@@ -173,6 +173,7 @@ import {
 } from '../hoard_boss_gestures_core';
 import {
   MORTHEN_DEATH_LIFT,
+  MORTHEN_GROWTH,
   MORTHEN_HOVER,
   MORTHEN_REAP_SWEEP,
   MORTHEN_SCYTHE_HELD,
@@ -4884,15 +4885,17 @@ export const VISUALS: Record<string, VisualDef> = {
   // Morthen, the Lich Bishop (the art guide's model; the clip sets above): a
   // spiked mitre with a green eye, a cope over an open ribcage of soul fire, belt
   // charms, and a ring-headed crozier whose crest unfolds into the scythe. About
-  // two and a half players tall at his template's 1.35, floating on his soul
+  // three players tall at his template's 1.35, floating on his soul
   // smoke, the smoke funnel sunk into the ring floor (morthen_fx_core.ts
   // MORTHEN_HOVER) so his whole body and face read from the default camera; his
   // corpse is lifted back onto the flags as he falls (MORTHEN_DEATH_LIFT).
-  // `height` is the idle's posed height half a second in, smoke tip to mitre.
+  // `height` is the idle's posed height half a second in, smoke tip to mitre
+  // (5.85 authored yards), grown by MORTHEN_GROWTH so he stands as tall as the
+  // body he replaced.
   crypt_morthen_lich: {
     url: `${CREATURES}/woc_crypt_morthen.glb`,
-    height: 5.85,
-    hover: MORTHEN_HOVER,
+    height: 5.85 * MORTHEN_GROWTH,
+    hover: MORTHEN_HOVER * MORTHEN_GROWTH,
     deathLift: MORTHEN_DEATH_LIFT,
     clips: MORTHEN_STAFF_CLIPS,
     phaseClips: {
