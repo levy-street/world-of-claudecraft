@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "504f80bdb0d6d27f0181b12f2739e57d6dd5cc885616127ea9dd3d7321c61c3c",
+  "rendererFingerprint": "a360561877518943b06b7ce4d073ba1e8e0806667acbdee4aef03577e96f9772",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "darwin",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6079614,
-      "sha256": "5daffe904d204cb7cfd8500e8a59521f778dc1a2d55eb89d57f4144a56d723e5",
+      "bytes": 6079620,
+      "sha256": "5dae297754b1d8ae7c295ee64510194de4471eb741fe8327d4d46ae1fd1e2359",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -1889,8 +1889,8 @@
         "model": {
           "url": "models/creatures/woc_crypt_knellwyrm.glb",
           "path": "public/models/creatures/woc_crypt_knellwyrm.glb",
-          "bytes": 2886212,
-          "sha256": "c99b28df05f66c6828dcf666f8fdc7a3b8f979b21910fb60d153868f5f396b41"
+          "bytes": 2947420,
+          "sha256": "4015085435db93196fa8c6681e374ddfd36d628f219eea35c58843928e2ba785"
         },
         "idle": "Idle",
         "height": 15.07,
@@ -1907,11 +1907,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "07f304171b8a5dba02b07700c9fd369b49ccd8963aea64ed4e20c41d3e8a7cc1",
+      "sourceFingerprint": "829decd5ed9e4130f82c985bf02ff20f8cdc9b5e51cd70b42bafae08a8b9a957",
       "output": {
         "path": "public/ui/mobs/crypt_knellwyrm.webp",
-        "bytes": 2324,
-        "sha256": "d2b45a212e510ca6021f9799a1d1e86d1033fc32e52914bc3776d4f39ba3f9ba"
+        "bytes": 2352,
+        "sha256": "4138dfc5fb179c9713dfa157f1b95e5acab4d6dabb4d170101bcd538b607fa13"
       }
     },
     {
@@ -1982,8 +1982,8 @@
         "model": {
           "url": "models/creatures/woc_crypt_ossuary_drake.glb",
           "path": "public/models/creatures/woc_crypt_ossuary_drake.glb",
-          "bytes": 2729204,
-          "sha256": "dc0d0dc32700ca671f550a781ce809ab41bc58a33cdb8607d48e135a4a8e31d3"
+          "bytes": 2775684,
+          "sha256": "8982d320f3cadcc34195064fbbb47bc2c814d9f07fbfa66d7fc2b4abcd59444f"
         },
         "idle": "Idle",
         "height": 13.63,
@@ -2000,11 +2000,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "7c471f1f3695322b00db735ab465831d4b74e72fe90e7538be4bc4a25c976ba1",
+      "sourceFingerprint": "c1639bfd5e482dd42b93ecc18466ab1f6da97dc38524b90c102cb1d0698907a4",
       "output": {
         "path": "public/ui/mobs/crypt_ossuary_drake.webp",
-        "bytes": 2216,
-        "sha256": "96850737c2fce6ecc806f892e26f50a1ae83a03166ee4b5fe6c752d9f818645e"
+        "bytes": 2296,
+        "sha256": "fa85c7ffa7c38b6e76d5a8c0246fa5f3a1cee4c7b713e7c445ea47e0f6342a38"
       }
     },
     {
@@ -3328,8 +3328,8 @@
         "model": {
           "url": "models/creatures/woc_basin_jaguar.glb",
           "path": "public/models/creatures/woc_basin_jaguar.glb",
-          "bytes": 2693604,
-          "sha256": "b6832bcde2698bc5f740cc0a1c0231e5bf65062f37da963f90015a7ff1b1b759"
+          "bytes": 2692960,
+          "sha256": "17a38b9469cb0a92d4e90af95c97869d6bde7c3c537d46e7e9f9bddf85ae6cfb"
         },
         "idle": "Idle",
         "height": 2.580416666666667,
@@ -3346,11 +3346,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "9c5204350f137d1ba360689532069d791655042d4277302a4f2636ed1adecb15",
+      "sourceFingerprint": "80dfe1e8a531fed14a233f82696bd69ac7eb4cd8cea1fbf6619dea58bef37dfe",
       "output": {
         "path": "public/ui/mobs/fanglord_jaguar.webp",
-        "bytes": 3174,
-        "sha256": "f3e5387a6fa24357bc1601aa2d0138642905ea4d5518ba6c753c3ad2d4fcf9e6"
+        "bytes": 3238,
+        "sha256": "2dd717df7fac14168a348789536662ae9425964494f35778a2ef6d55c8bf95a0"
       }
     },
     {
@@ -12737,8 +12737,8 @@
         "model": {
           "url": "models/creatures/woc_bastion_captain.glb",
           "path": "public/models/creatures/woc_bastion_captain.glb",
-          "bytes": 2293540,
-          "sha256": "e7acb3582fc1792c34e4465f2c9470c1afdbec67965a04c03c79a58861739cab"
+          "bytes": 2293076,
+          "sha256": "9f20fa42a64de79cd4ba38bf25655b35eb80ce5602f5cd89797f7a67da2c2b27"
         },
         "idle": "Idle",
         "height": 7.5,
@@ -12755,11 +12755,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "7d35ba61e122ed0a7600065e11a8958f1f11dbd18b6ffb5f95a745f02fc592b0",
+      "sourceFingerprint": "0f434264d9108da34ef64b94c985a79bcab9545f8d74b38d0de68d118391c924",
       "output": {
         "path": "public/ui/mobs/turretback_hermit.webp",
-        "bytes": 2512,
-        "sha256": "65d676687b9e37df38af9319c809e382258b6888ce01c4e412b77c1c8100ea7e"
+        "bytes": 2504,
+        "sha256": "040c8ed6e6c31467e6ee73a68714ee0e22755547f2d2ce24d75687482824a68b"
       }
     },
     {
