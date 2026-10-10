@@ -6159,8 +6159,9 @@ export const VISUALS: Record<string, VisualDef> = {
   // The Mere Hydra's three heads: bodyless targets (the click capsule stays),
   // the one Hydra model drawn at the pool by drowned_temple/temple_hydra.ts.
   temple_hydra_head: {
-    url: `${CREATURES}/mere_hydra.glb`,
+    url: `${CREATURES}/woc_temple_hydra.glb`,
     height: 14,
+    authoredAtlas: true,
     clips: {
       idle: 'Idle',
       walk: 'Idle',

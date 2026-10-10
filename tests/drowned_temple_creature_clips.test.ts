@@ -1,8 +1,8 @@
-// The Drowned Temple's sixth-pass bodies (src/render/characters/manifest.ts):
-// Ysolei is the Codex-built serpent, every one of her clips riding a real
-// mechanic; the Ice Wraith ships five clips, each mapped; the
-// Colossus walks on its own gait. Each row names its clips so a new body is a
-// manifest swap.
+// The Drowned Temple's bodies (src/render/characters/manifest.ts): Ysolei is
+// the art guide's serpent, every one of her clips riding a real mechanic; the
+// Mere Hydra's one body keeps the bones and clips the pool drives; the Ice
+// Wraith ships five clips, each mapped; the Colossus walks on its own gait.
+// Each row names its clips so a new body is a manifest swap.
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
@@ -163,6 +163,42 @@ describe("Ysolei: the art guide's serpent on every mechanic", () => {
     expect(parentOf(path, 'Mouth_VFX')).toBe('head');
     // The Undertow's channel plays out its crash after the 3 s bar.
     expect(clipSeconds(path, 'Undertow')).toBeGreaterThan(3);
+  });
+});
+
+describe("the Mere Hydra: the art guide's three-necked body at the pool", () => {
+  const path = 'public/models/creatures/woc_temple_hydra.glb';
+
+  it('is the body temple_hydra.ts draws and the heads click on', () => {
+    const src = readFileSync('src/render/drowned_temple/temple_hydra.ts', 'utf8');
+    expect(src).toContain("MERE_HYDRA_URL = '/models/creatures/woc_temple_hydra.glb'");
+    expect(VISUALS.temple_hydra_head.url.endsWith('/woc_temple_hydra.glb')).toBe(true);
+  });
+
+  it('ships the seven whole-body clips the pool drives', () => {
+    expect(clipsOf(path).sort()).toEqual(
+      ['Brine_Spit', 'Death', 'Emerge', 'Hit', 'Idle', 'Snap', 'Tide_Breath'].sort(),
+    );
+    // Snap answers a head's bite as it lands, so its strike comes early.
+    expect(clipSeconds(path, 'Snap')).toBeLessThan(1.25);
+  });
+
+  it('keeps the neck chains, the heads, jaws and breath sockets the fx key on', () => {
+    const names = new Set((glbJson(path).nodes ?? []).map((n) => n.name));
+    for (const s of ['L', 'C', 'R']) {
+      for (let i = 1; i <= 7; i++)
+        expect(names.has(`neck_${s}_0${i}`), `neck_${s}_0${i}`).toBe(true);
+      expect(parentOf(path, `head_${s}`)).toBe(`neck_${s}_07`);
+      expect(parentOf(path, `jaw_${s}`)).toBe(`head_${s}`);
+      expect(parentOf(path, `Socket_Breath_${s}`)).toBe(`head_${s}`);
+    }
+  });
+
+  it('carries vertex colours for the element tint on its necks', () => {
+    const prims = (glbJson(path).meshes ?? []).flatMap(
+      (m) => m.primitives as { attributes?: Record<string, number> }[],
+    );
+    expect(prims.some((p) => p.attributes?.COLOR_0 !== undefined)).toBe(true);
   });
 });
 

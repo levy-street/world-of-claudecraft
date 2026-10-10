@@ -1,7 +1,8 @@
-// The Mere Hydra's one body (the showpiece of the Hydra Pool): the Blender
-// model made with Sol (public/models/creatures/mere_hydra.glb; three necks, one
-// mound under the water, seven clips) drawn ONCE at the pool, while the three
-// head entities stay bodyless targets (manifest `bodyless`). Its clips follow
+// The Mere Hydra's one body (the showpiece of the Hydra Pool): the art guide's
+// model (public/models/creatures/woc_temple_hydra.glb; three scaled necks of
+// seven links each over a weed-hung mound under the water, the waterline at its
+// origin, seven clips) drawn ONCE at the pool, while the three head entities
+// stay bodyless targets (manifest `bodyless`). Its clips follow
 // the heads' state read from IWorld: it rises (Emerge) when pulled, the side
 // heads' Tide Breath bars play Tide_Breath, the centre head's spit plays
 // Brine_Spit, a head's bite plays Snap, and when a head falls its neck sinks
@@ -63,7 +64,7 @@ import {
   stepNeck,
 } from './temple_hydra_neck_core';
 import { tsunamiWarnProgress } from './temple_tsunami_core';
-export const MERE_HYDRA_URL = '/models/creatures/mere_hydra.glb';
+export const MERE_HYDRA_URL = '/models/creatures/woc_temple_hydra.glb';
 
 let source: THREE.Object3D | null = null;
 let clips: THREE.AnimationClip[] = [];
