@@ -133,10 +133,10 @@ export function faceChainEntries(): [number, number, number][] {
 
 // ---- the wyrm in the ice (the swap seam) --------------------------------------------
 
-/** The frozen Korzul (E:/woc/entregas/santuario/korzul, `korzul_frozen.glb`:
- *  the Frozen pose baked to plain meshes, glTF +Z his front, +X his left,
- *  origin on the ice under his body). Swap the model by changing the URL; a
- *  replacement in the same frame drops in. */
+/** The frozen Korzul (his art-guide body's Frozen pose, the wings folded hard
+ *  over his back and the skull curled to his left, baked to one plain mesh:
+ *  glTF +Z his front, +X his left, origin on the ice under his body). Swap the
+ *  model by changing the URL; a replacement in the same frame drops in. */
 export const FROZEN_WYRM_URL = '/models/props/gravewyrm_sanctum_korzul_frozen.glb';
 
 /**
@@ -147,7 +147,7 @@ export const FROZEN_WYRM_URL = '/models/props/gravewyrm_sanctum_korzul_frozen.gl
  * hundred yards thick and the coiled wyrm fills the hollow behind the shell
  * (the fighting Korzul on the lake keeps the model's own 1.0).
  */
-export const FROZEN_WYRM = { x: -6, y: 3, z: 278.5, yaw: Math.PI / 2, scale: 1.7 } as const;
+export const FROZEN_WYRM = { x: 8.4, y: 3, z: 275.9, yaw: Math.PI / 2, scale: 1.7 } as const;
 
 /** A point of the frozen model's own frame in the instance frame. */
 export function frozenToGame(lx: number, ly: number, lz: number): [number, number, number] {
@@ -164,9 +164,9 @@ export function frozenToGame(lx: number, ly: number, lz: number): [number, numbe
 
 /** Measured off the Frozen pose (model frame): the head's middle, his open
  *  eye (the left, toward the lake) and the shard in his sternum. */
-export const FROZEN_HEAD_LOCAL = [5, 15, 15] as const;
-export const FROZEN_EYE_LOCAL = [8, 15.4, 16.4] as const;
-export const FROZEN_HEART_LOCAL = [1, 9, 10] as const;
+export const FROZEN_HEAD_LOCAL = [3.5, 12.3, 6.5] as const;
+export const FROZEN_EYE_LOCAL = [4.1, 14.6, 6] as const;
+export const FROZEN_HEART_LOCAL = [0, 7.7, 5.4] as const;
 
 export const WYRM_HEAD = frozenToGame(...FROZEN_HEAD_LOCAL);
 export const WYRM_EYE = frozenToGame(...FROZEN_EYE_LOCAL);

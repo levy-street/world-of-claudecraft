@@ -1,6 +1,6 @@
 // The Gravewyrm Sanctum's creature looks (docs/design/dungeon-rework/
 // gravewyrm_sanctum.md section 5, the Ice Tomb of the Wyrm). The Sledge Tusker
-// wears its own Blender body (SANCTUM_SLEDGE_TUSKER_LOOK; its sledge is a
+// wears its own art-guide body (SANCTUM_SLEDGE_TUSKER_LOOK; its sledge is a
 // separate prop the fx module drives, gravewyrm_sanctum_fx/tusker_fx.ts). The
 // trash wear their own Blender bodies (sanctum_trash_looks.ts), each under
 // the visual key its re-tinted placeholder had, so the mob ids never moved.
@@ -64,15 +64,16 @@ export const BRAZIER_TOPPLED_GESTURE = 'sanctum_brazier_toppled';
 /** The trace chains and the hitch bar: their own mesh in the GLB. */
 export const TUSKER_TRACES_NODE = 'SledgeTuskerTraces';
 
-/** The Sledge Tusker (built in Blender, E:/woc/entregas/santuario/tusker): a
- *  shaggy mountain tusker as big as a house, rime in its coat, iron-capped
- *  tusks as long as a wagon, the cult's collar, chamfron and soul lantern; 40
- *  bones, eleven hand-keyed clips. Drawn at its authored size: 7.76 yd to the
- *  dome at its 2.8 (three players), 17.5 yd from the tail to the tusk tips.
- *  Both strikes are cast bars whose clips land on the bar's end (the tusks
- *  cross the cone, the head is levelled down the lane): bar-locked. The pull's
- *  Unhitch, the Charge and the enrage's Roar are gestures off the fx; the
- *  trace chains hide once the Unhitch has dropped them. */
+/** The Sledge Tusker (an art-guide body: concept, Tripo, a rig built for the
+ *  mesh, every clip animated at 30 fps): a war mammoth under a frosted coat,
+ *  riveted iron on its brow, banded tusks curling out, the soul lantern on a
+ *  post over its back. Drawn at its authored size: 7.44 yd to the hump at its
+ *  2.8 (three players), the lantern to 9.99, 12 yd from the tail to the tusk
+ *  tips. The gore lands on frame 18 of its 1.5 s clip and both strikes are
+ *  cast bars whose clips land on the bar's end at 1x (the tusks cross the
+ *  cone, the head is levelled down the lane). The pull's Unhitch, the Charge
+ *  and the enrage's Roar are gestures off the fx; the trace chains hide once
+ *  the Unhitch has dropped them. */
 export const SANCTUM_SLEDGE_TUSKER_LOOK: VisualDef = {
   url: TUSKER_MODEL.url,
   height: tuskerLookHeight(),
@@ -81,6 +82,7 @@ export const SANCTUM_SLEDGE_TUSKER_LOOK: VisualDef = {
     walk: 'Walk',
     run: 'Run',
     attack: ['Attack'],
+    contacts: { Attack: [TUSKER_CLIP.attackHit] },
     attackByAbility: {
       [TUSKER_UNHITCH_GESTURE]: 'Unhitch',
       [TUSKER_CHARGE_GESTURE]: 'Charge',
@@ -112,11 +114,11 @@ export const SANCTUM_SLEDGE_TUSKER_LOOK: VisualDef = {
       showNow: TUSKER_TRACES_ON_GESTURE,
     },
   ],
-  // The gaits at the drawn size: its 2.7 patrol hauls at about 1.4x the
-  // authored walk, its 6 chase trots at about 1.07x.
+  // The gaits at the drawn size: its 2.7 patrol hauls at about 0.96x the
+  // authored walk, its 6 chase ambles at 1x.
   walkRef: TUSKER_MODEL.walkRef * tuskerModelScale(TUSKER_SIM_SCALE),
   runRef: TUSKER_MODEL.runRef * tuskerModelScale(TUSKER_SIM_SCALE),
-  // The gore lands at 0.62 s; the death is timed off the clip at 1x.
+  // The gore lands at 0.567 s (contacts); the death is timed off the clip at 1x.
   attackTimeScale: 1,
   deathTimeScale: 1,
   authoredAtlas: true,

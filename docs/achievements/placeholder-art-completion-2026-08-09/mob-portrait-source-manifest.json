@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "1b6d57b66106d3bf5c2fc7fc138ff0b61596bad60b14c2f23255b0fbceaaf5b6",
+  "rendererFingerprint": "504f80bdb0d6d27f0181b12f2739e57d6dd5cc885616127ea9dd3d7321c61c3c",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "darwin",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6079330,
-      "sha256": "892a92a14241adcc9b544d61e55ed319fd6bb06055980d184b30f7b29822cf8f",
+      "bytes": 6079614,
+      "sha256": "5daffe904d204cb7cfd8500e8a59521f778dc1a2d55eb89d57f4144a56d723e5",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -4667,13 +4667,13 @@
       "visualKey": "wildheart_great_saurian",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/wildheart_great_saurian.glb",
-          "path": "public/models/creatures/wildheart_great_saurian.glb",
-          "bytes": 3512244,
-          "sha256": "0d326ddeafed68b63e848903be3c92b4d910bc25be998c82c977a14d329bfb8d"
+          "url": "models/creatures/woc_basin_saurian.glb",
+          "path": "public/models/creatures/woc_basin_saurian.glb",
+          "bytes": 1747280,
+          "sha256": "df68fa9ec1f7983b2bedf6dfcca26e643f3b6cbe6060280794e2b74be5e6f045"
         },
         "idle": "Idle",
-        "height": 4.375249999999999,
+        "height": 4.925,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -4687,11 +4687,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "f879d9f89d411a2ab333304e5686020f6e623fdd005abef09849e1e910192fab",
+      "sourceFingerprint": "15049fbedadf0e830f8ad8f80d7743536d1f97aa2dce4a2a402bdbc3c3817df1",
       "output": {
         "path": "public/ui/mobs/great_saurian.webp",
-        "bytes": 2478,
-        "sha256": "c3d42f5fdac76bd38afae4b344ef276d4cdee614950961ff563ea6834a8c05d2"
+        "bytes": 2836,
+        "sha256": "09a41c96fca081a8f21e7164a63ca419dba5f60a88e414ed1d8853035e71e822"
       }
     },
     {
@@ -6256,15 +6256,15 @@
       "visualKey": "sanctum_korzul",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/sanctum_korzul.glb",
-          "path": "public/models/creatures/sanctum_korzul.glb",
-          "bytes": 4516928,
-          "sha256": "abfb84bffa168999760e568dd95d1059d18d56fe42ab382cb6e302a277e4acb8"
+          "url": "models/creatures/woc_sanctum_korzul.glb",
+          "path": "public/models/creatures/woc_sanctum_korzul.glb",
+          "bytes": 2160604,
+          "sha256": "4534471d0a2fe58aacd45e832122bf163438e5e6a6a28f78e1c4474bf8c3b30b"
         },
         "idle": "Idle",
-        "height": 12.13888888888889,
+        "height": 11.911111111111111,
         "yaw": null,
-        "hover": -0.1388888888888889,
+        "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -6276,11 +6276,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "c0ee19f51cb70bd5a62a3475993d74c7573cc9793910db0efc456c4ef0de7c9f",
+      "sourceFingerprint": "8dd814cc7fa45453c74cfbca4a3edb0f6784395386672e639324232494d5f1a4",
       "output": {
         "path": "public/ui/mobs/korzul_the_gravewyrm.webp",
-        "bytes": 2350,
-        "sha256": "78bcd67ad380d273920a5da564f27392c19c917418a63fe3bcb7b1cf838a93f7"
+        "bytes": 2484,
+        "sha256": "4ccbe97e4b5515be79ae5fae1ceedc458040ed460e99571d2716163b6adb9848"
       }
     },
     {
@@ -10657,13 +10657,13 @@
       "visualKey": "sanctum_sledge_tusker",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/sledge_tusker.glb",
-          "path": "public/models/creatures/sledge_tusker.glb",
-          "bytes": 3163112,
-          "sha256": "67afc2947f55121e26305d741a23a028a5cf139b3ae6e3f0df9dbaaac6d6255d"
+          "url": "models/creatures/woc_sanctum_tusker.glb",
+          "path": "public/models/creatures/woc_sanctum_tusker.glb",
+          "bytes": 2713020,
+          "sha256": "fa2e9548ec35caaca0d713ebca8b8b6ff66f8001ba39287823db95f6bc32177a"
         },
         "idle": "Idle",
-        "height": 2.778571428571429,
+        "height": 3.5660714285714286,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -10677,11 +10677,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "abb3333470ee0203fe0d5cec9bef43bc123fa05c77a495a0a78e40618ef2bca4",
+      "sourceFingerprint": "ca89c1d6ba5d3f295556eeff631c4083bcf58d7d30ff73cd15a69e427efdf014",
       "output": {
         "path": "public/ui/mobs/sledge_tusker.webp",
-        "bytes": 2480,
-        "sha256": "e6bb442ca96c48d250563e3bfdefcf8893b6a7e84861f2b61a62b9a3818b9e3b"
+        "bytes": 2364,
+        "sha256": "26818b9863aa4a94ba209d3f1b289666eb681ed1997192d6d2937b4fcce13e86"
       }
     },
     {

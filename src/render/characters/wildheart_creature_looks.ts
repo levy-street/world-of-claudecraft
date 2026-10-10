@@ -123,15 +123,16 @@ import type { ClipMap, VisualDef } from './manifest';
 export const SAURIAN_HOWDAH_GONE_GESTURE = 'wildheart_saurian_howdah_gone';
 export const SAURIAN_HOWDAH_WHOLE_GESTURE = 'wildheart_saurian_howdah_whole';
 
-/** The Great Saurian (scripts/assets/wildheart_great_saurian, built in Blender):
- *  one sculpted skin with its Sunbone harness, the bamboo-and-bone howdah and
- *  its troll rider, eleven hand-keyed clips. 13.4 yd to the top of its head at
- *  its 3.2 (saurian_model_core.ts SAURIAN_DRAWN_SCALE), 27 yd nose to club.
- *  Both strikes are cast bars whose clips land on the bar's end (the tail
- *  crosses the cone at 1.00 s of its 1 s bar, the forefeet slam at 2.00 s of
- *  the 2 s bar), so they play at 1x and finish as play-outs; the howdah
- *  breaking and the enrage are gestures off their spellfx. The howdah and the
- *  rider are their own meshes: hidden once the break has played. */
+/** The Great Saurian (an art-guide body: concept, Tripo, a rig built for the
+ *  mesh, every clip animated at 30 fps): a long-necked ford beast under the
+ *  Sunbone's spiked howdah, its Hexcaller rider in it, eleven clips. 13.4 yd
+ *  to the top of its head at its 3.2 (saurian_model_core.ts, drawn at its
+ *  authored size). The swing lands on frame 18 of its 1.5 s clip, and both
+ *  strikes are cast bars whose clips land on the bar's end (the tail crosses
+ *  the cone at 1.00 s of its 1 s bar, the forefeet slam at 2.00 s of the 2 s
+ *  bar), so everything plays at 1x and the strikes finish as play-outs; the
+ *  howdah breaking and the enrage are gestures off their spellfx. The howdah
+ *  and the rider are their own meshes: hidden once the break has played. */
 export const WILDHEART_GREAT_SAURIAN_LOOK: VisualDef = {
   url: SAURIAN_MODEL.url,
   height: saurianLookHeight(),
@@ -140,6 +141,7 @@ export const WILDHEART_GREAT_SAURIAN_LOOK: VisualDef = {
     walk: 'Walk',
     run: 'Run',
     attack: ['Attack'],
+    contacts: { Attack: [SAURIAN_CLIP.attackHit] },
     attackByAbility: { [SAURIAN_HOWDAH_BREAK]: 'HowdahBreak', [SAURIAN_ENRAGE]: 'Enrage' },
     attackTimeScaleByAbility: { [SAURIAN_HOWDAH_BREAK]: 1, [SAURIAN_ENRAGE]: 1 },
     hit: ['Hit'],
@@ -165,13 +167,13 @@ export const WILDHEART_GREAT_SAURIAN_LOOK: VisualDef = {
     },
   ],
   // The gaits' reference speeds at the drawn size (the planted feet slide at
-  // 2.2 and 5.4 model yards a second): its 2.1 patrol wades at about 1.1x,
-  // its 6 chase ambles at 1.26x.
+  // 1.77 and 7.63 yards a second): its 2.1 patrol wades at about 1.2x, its 6
+  // chase ambles at about 0.8x.
   walkRef: SAURIAN_MODEL.walkRef * saurianModelScale(SAURIAN_SIM_SCALE),
   runRef: SAURIAN_MODEL.runRef * saurianModelScale(SAURIAN_SIM_SCALE),
-  // The swing lands its blow at 0.62 s; the death's splashes are timed off the
-  // clip at 1x (saurian_fx.ts).
-  attackTimeScale: 1.1,
+  // The swing lands its blow at 0.567 s (contacts); the death's splashes are
+  // timed off the clip at 1x (saurian_fx.ts).
+  attackTimeScale: 1,
   deathTimeScale: 1,
   authoredAtlas: true,
   // The widest override the click-capsule guard allows (2x CLICK_RADIUS_CAP,

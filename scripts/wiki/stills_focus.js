@@ -11,6 +11,9 @@
 export const STILL_FOCUS = {
   'models/creatures/woc_crypt_morthen.glb': { bone: 'head', radius: 0.26, lift: -0.5, yaw: 0.6 },
   'models/creatures/woc_bastion_turnkey.glb': { bone: 'head', radius: 0.36, lift: -0.3 },
+  // the Sledge Tusker: the soul lantern's post tops its bounds, so the top crop held only the
+  // hump; framed on its brow with the tusks curling below it, turned three-quarter
+  'models/creatures/woc_sanctum_tusker.glb': { bone: 'head', radius: 0.55, lift: -0.3, yaw: 1.1 },
   // the Moonmantle Ray: a disc far wider than it is tall, framed on its crescent and pearl
   'models/creatures/temple_sentinel.glb': { bone: 'Head', radius: 0.26, lift: 0.12, yaw: 0.25 },
   'models/creatures/woc_temple_ysolei.glb': {

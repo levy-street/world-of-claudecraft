@@ -1,58 +1,63 @@
-// The Great Saurian's Blender body, measured (scripts/assets/wildheart_great_saurian,
-// its delivery notes): the facts the look (characters/wildheart_creature_looks.ts),
-// the body effects (saurian_fx.ts) and the telegraph draw (basin_fx_core.ts
-// SAURIAN_DRAW) all key on, so the ford's splashes land on the model's own feet
-// and the howdah bursts where the model's howdah is.
+// The Great Saurian's art-guide body (the designer's model guide: concept,
+// Tripo, a rig built for the mesh, every clip animated at 30 fps), measured:
+// the facts the look (characters/wildheart_creature_looks.ts), the body effects
+// (saurian_fx.ts) and the telegraph draw (basin_fx_core.ts SAURIAN_DRAW) all
+// key on, so the ford's splashes land on the model's own feet and the howdah
+// bursts where the model's howdah is.
 //
 // Model space: yards at the authored size, glTF axes: +Y up, the creature
 // faces +Z, its LEFT is +X; the origin is on the ground under the middle of
-// its barrel. Clip times are seconds at 1x (24 fps authoring).
+// its barrel. Clip times are seconds at 1x.
 //
 // Three-free, DOM-free, deterministic.
 
 /** The template's sim scale (sim/content/wildheart.ts great_saurian). */
 export const SAURIAN_SIM_SCALE = 3.2;
 
-/** In-game yards per model yard: 0.88 draws the head 13.4 yd over the ford
- *  (about five players), the size the ford's telegraphs were laid out for. */
-export const SAURIAN_DRAWN_SCALE = 0.88;
+/** In-game yards per model yard: the body is authored at its final size, the
+ *  head 13.4 yd over the ford (about five players), the size the ford's
+ *  telegraphs were laid out for. */
+export const SAURIAN_DRAWN_SCALE = 1;
 
 export const SAURIAN_MODEL = {
-  url: 'models/creatures/wildheart_great_saurian.glb',
-  /** The Idle pose's skinned bounds, lowest vertex (-0.05) to the howdah's
-   *  banner poles (15.86): what prepareVisual normalizes to the def height. */
-  idleBoundsHeight: 15.91,
+  url: 'models/creatures/woc_basin_saurian.glb',
+  /** The Idle pose's skinned bounds, lowest vertex (0.001) to the howdah's
+   *  banner poles (15.76): what prepareVisual normalizes to the def height. */
+  idleBoundsHeight: 15.76,
   /** The top of the head (the creature's own height). */
-  headTop: 15.27,
+  headTop: 13.41,
   /** The howdah deck's top and its offset along the body (glTF z). */
-  deckTop: 11.15,
-  deckZ: 0.6,
+  deckTop: 9.73,
+  deckZ: -0.25,
   /** The tail root (the hips) behind the centre. */
-  hipsBack: 3.4,
+  hipsBack: 3.39,
   /** The feet at rest: forefeet and hind feet, |x| out to each side, z along. */
-  foreFoot: { x: 2.8, z: 3.3 },
-  hindFoot: { x: 2.75, z: -3.2 },
+  foreFoot: { x: 1.32, z: 1.9 },
+  hindFoot: { x: 1.32, z: -1.9 },
   /** The tail club's centre at rest: behind, and over the ground. */
-  club: { z: -16.8, y: 3.3 },
+  club: { z: -9.66, y: 5.3 },
   /** Where the clip's rider lands (behind the RIGHT flank: -x is its right). */
-  riderLand: { x: -6.2, z: -5.6 },
+  riderLand: { x: -5.5, z: -4.9 },
   /** The gaits' reference speeds (planted feet slide at these) and cycles. */
-  walkRef: 2.2,
-  walkCycle: 2.79,
-  runRef: 5.4,
-  runCycle: 1.29,
+  walkRef: 1.77,
+  walkCycle: 2.8,
+  runRef: 7.63,
+  runCycle: 1.3,
 } as const;
 
-/** The clips' contact beats (seconds at 1x): where the effects fire. */
+/** The clips' contact beats (seconds at 1x): where the effects fire. Every
+ *  blow and bar lands at 1x, its weight before its speed. */
 export const SAURIAN_CLIP = {
-  /** TailSwipe: windup to 0.72 (the 1 s bar), the tail crosses the rear cone
-   *  at 1.00 (the hit and the spray), the club whips past at 1.16. */
+  /** Attack (the 1.5 s swing): its blow lands on frame 18. */
+  attackHit: 0.567,
+  /** TailSwipe: wound round through the 1 s bar, the tail crosses the rear
+   *  cone on its end (the hit and the spray), the club whips past at 1.17. */
   tailHit: 1.0,
-  tailClub: 1.16,
-  /** Stomp: rears 0.45 to 1.74 (the 2 s bar), both forefeet slam at 2.00, the
-   *  body jolts at 2.12. */
+  tailClub: 1.167,
+  /** Stomp: rears through the 2 s bar, both forefeet slam on its end, the
+   *  body jolts at 2.13. */
   stompSlam: 2.0,
-  stompJolt: 2.12,
+  stompJolt: 2.133,
   /** HowdahBreak: rattle from 0.5, the burst at 0.90, pieces in the water
    *  1.4 to 1.9, the rider lands at 1.80 and is gone at 1.84, everything gone
    *  by 3.30. */
@@ -60,13 +65,13 @@ export const SAURIAN_CLIP = {
   howdahBurst: 0.9,
   riderLands: 1.8,
   howdahGone: 3.3,
-  /** Enrage: the stamps land at 0.85 (left fore) and 1.35 (right fore). */
-  enrageStamps: [0.85, 1.35],
-  /** Death: the body hits the water at 2.70, the neck at 2.85. */
+  /** Enrage: the stamps land at 0.87 (left fore) and 1.37 (right fore). */
+  enrageStamps: [0.867, 1.367],
+  /** Death: the body hits the water at 2.70, the neck at 2.83. */
   deathBody: 2.7,
-  deathNeck: 2.85,
+  deathNeck: 2.833,
   /** The corpse lies this far to its LEFT of the origin (model yards). */
-  deathRollLeft: 3.3,
+  deathRollLeft: 1.99,
 } as const;
 
 /** The def height (pivot to the Idle bounds' top at sim scale 1) that draws
@@ -119,7 +124,7 @@ export const SAURIAN_FOOTFALLS: Readonly<
     { foot: 'leftHind', phase: 0 },
     { foot: 'leftFore', phase: 0.7 / SAURIAN_MODEL.walkCycle },
     { foot: 'rightHind', phase: 1.4 / SAURIAN_MODEL.walkCycle },
-    { foot: 'rightFore', phase: 2.09 / SAURIAN_MODEL.walkCycle },
+    { foot: 'rightFore', phase: 2.1 / SAURIAN_MODEL.walkCycle },
   ],
   run: [
     { foot: 'leftHind', phase: 0 },

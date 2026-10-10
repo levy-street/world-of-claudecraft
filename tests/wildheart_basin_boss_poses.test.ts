@@ -1,8 +1,9 @@
 // What the Wildheart Basin bosses' art-guide clips DO, read from the shipped
 // GLBs: every blow lands on frame 18 of a 1.5 s clip at 1x (contacts), every
-// bar's blow on the bar's end at 1x, and each death ends lying on the floor
-// (Reuben 2026-10-11: a natural fall, nothing floating or kneeling in a heap),
-// the trolls' weapons dropped flat.
+// bar's blow on the bar's end at 1x, the Great Saurian's gaits play near 1x at
+// its sim speeds, and each death ends lying on the floor (Reuben 2026-10-11: a
+// natural fall, nothing floating or kneeling in a heap), the trolls' weapons
+// dropped flat.
 
 import { describe, expect, it } from 'vitest';
 import { VISUALS } from '../src/render/characters/manifest';
@@ -10,6 +11,7 @@ import {
   WILDHEART_BEASTMASTER_LOOK,
   WILDHEART_GORGEBLOOM_LOOK,
   WILDHEART_GREAT_JAGUAR_LOOK,
+  WILDHEART_GREAT_SAURIAN_LOOK,
   WILDHEART_ZULGAR_LOOK,
 } from '../src/render/characters/wildheart_creature_looks';
 import {
@@ -30,8 +32,18 @@ import {
 } from '../src/render/wildheart_basin/gorgebloom_model_core';
 import { JAGUAR_CLIP, JAGUAR_MODEL } from '../src/render/wildheart_basin/jaguar_model_core';
 import {
+  SAURIAN_CLIP,
+  SAURIAN_MODEL,
+  SAURIAN_SIM_SCALE,
+  saurianModelScale,
+} from '../src/render/wildheart_basin/saurian_model_core';
+import { MOBS } from '../src/sim/data';
+import {
   BEAST_PIT_QUAKE,
   BEAST_TUNING,
+  SAURIAN_STOMP,
+  SAURIAN_TAIL_SWIPE,
+  SAURIAN_TUNING,
   ZULGAR_PULSE,
   ZULGAR_SPIRIT_HUNT,
 } from '../src/sim/encounters/wildheart_basin/ids';
@@ -66,6 +78,12 @@ describe('the Basin bosses strike with their weight behind them', () => {
       url: GORGEBLOOM_MODEL.url,
       clips: ['Attack'],
     },
+    {
+      name: 'the Great Saurian',
+      def: WILDHEART_GREAT_SAURIAN_LOOK,
+      url: SAURIAN_MODEL.url,
+      clips: ['Attack'],
+    },
   ] as const;
   for (const b of blows) {
     it(`${b.name} lands each blow on frame 18 of a 1.5 s clip, at 1x`, async () => {
@@ -85,6 +103,7 @@ describe('the Basin bosses strike with their weight behind them', () => {
       JAGUAR_CLIP.biteClose,
       JAGUAR_CLIP.clawRake,
       GORGEBLOOM_CLIP.attackBite,
+      SAURIAN_CLIP.attackHit,
     ])
       expect(t).toBeCloseTo(FRAME_18, 3);
   });
@@ -101,6 +120,23 @@ describe('the Basin bosses strike with their weight behind them', () => {
     expect(z.castTimeScaleByAbility?.[ZULGAR_PULSE]).toBeCloseTo(1, 9);
     expect(z.castTimeScaleByAbility?.[ZULGAR_SPIRIT_HUNT]).toBeCloseTo(1, 9);
     for (const rate of [SEED_RAIN_RATE, VINE_LASH_RATE, GORGE_RATE]) expect(rate).toBeCloseTo(1, 9);
+    const sa = WILDHEART_GREAT_SAURIAN_LOOK.clips.castTimeScaleByAbility ?? {};
+    expect(sa[SAURIAN_TAIL_SWIPE]).toBe(1);
+    expect(sa[SAURIAN_STOMP]).toBe(1);
+    expect(SAURIAN_CLIP.tailHit).toBe(SAURIAN_TUNING.tailCast);
+    expect(SAURIAN_CLIP.stompSlam).toBe(SAURIAN_TUNING.stompCast);
+  });
+
+  it('the Great Saurian wades and ambles near its sim speeds, drawn at its authored size', () => {
+    expect(saurianModelScale(SAURIAN_SIM_SCALE)).toBe(1);
+    const def = WILDHEART_GREAT_SAURIAN_LOOK;
+    // Its 2.1 patrol wades and its chase (its move speed) ambles inside a fifth or so of 1x.
+    const walk = 2.1 / (def.walkRef ?? 1);
+    expect(walk).toBeGreaterThan(0.8);
+    expect(walk).toBeLessThan(1.25);
+    const run = (MOBS.great_saurian.moveSpeed ?? 0) / (def.runRef ?? 1);
+    expect(run).toBeGreaterThan(0.75);
+    expect(run).toBeLessThan(1.25);
   });
 
   it('Zulgar wears his own body and still vanishes for the Ambush', () => {
@@ -147,6 +183,19 @@ describe('the Basin bosses die lying on the floor', () => {
       Math.abs(run[1]) / Math.hypot(run[0], run[1], run[2]),
       'the body lies level',
     ).toBeLessThan(0.3);
+  });
+
+  it('the Great Saurian ends its Death rolled onto its side, the long neck on the water', async () => {
+    const url = glb(SAURIAN_MODEL.url);
+    const names = ['hips', 'chest', 'neck.2', 'head'];
+    const stand = await posedNodes(url, 'Idle', 0, names);
+    const dead = await posedNodes(url, 'Death', await clipLength(url, 'Death'), names);
+    for (const n of ['hips', 'chest'])
+      expect(dead[n].pos[1], n).toBeLessThan(0.45 * stand[n].pos[1]);
+    for (const n of ['neck.2', 'head'])
+      expect(dead[n].pos[1], n).toBeLessThan(0.2 * stand.head.pos[1]);
+    // Rolled onto its left (+x), where the death's splashes fall.
+    expect(dead.hips.pos[0]).toBeCloseTo(SAURIAN_CLIP.deathRollLeft, 1);
   });
 
   it('the Gorgebloom ends its Death wilted flat on the water, its maw face down', async () => {
