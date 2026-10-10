@@ -322,12 +322,12 @@ function sampleChannel(ch: GChannel, t: number): number[] {
   return v0.map((x, k) => x + (v1[k] - x) * u);
 }
 
-/** Every vertex's height (glTF y) with the clip sampled at `t`, by linear blend skinning. */
-function skinnedHeights(doc: Gltf, anim: GAnim, t: number): number[] {
+/** Every node's world matrix with the clip sampled at `t` (the rest pose with no clip). */
+function nodeWorlds(doc: Gltf, anim: GAnim | null, t: number): (n: GNode) => Matrix4 {
   const nodes = doc.getRoot().listNodes();
   const parentOf = new Map<GNode, GNode>();
   for (const n of nodes) for (const c of n.listChildren()) parentOf.set(c, n);
-  const chans = anim.listChannels();
+  const chans = anim ? anim.listChannels() : [];
   const local = new Map<GNode, Matrix4>();
   for (const n of nodes) {
     const get = (path: string, d: number[]) => {
@@ -356,6 +356,13 @@ function skinnedHeights(doc: Gltf, anim: GAnim, t: number): number[] {
     world.set(n, m);
     return m;
   };
+  return worldOf;
+}
+
+/** Every vertex's height (glTF y) with the clip sampled at `t`, by linear blend skinning. */
+function skinnedHeights(doc: Gltf, anim: GAnim, t: number): number[] {
+  const nodes = doc.getRoot().listNodes();
+  const worldOf = nodeWorlds(doc, anim, t);
   const skinNode = nodes.find((n) => n.getMesh() && n.getSkin()) as GNode;
   const skin = skinNode.getSkin() as NonNullable<ReturnType<GNode['getSkin']>>;
   const ibm = skin.getInverseBindMatrices() as GAcc;
@@ -396,8 +403,10 @@ describe('the Hollow Crypt boss corpses', () => {
   const CORPSES: [string, number, number][] = [
     ['crypt_ossuary_drake', 0.1, 0.35],
     ['crypt_knellwyrm', 0.1, 0.35],
-    ['crypt_chapel_gargoyle', 0.1, 0.3],
-    ['rimeweb', 0.05, 0.26],
+    // the gargoyle and the Lady settle INTO the floor (Reuben's second pass): their lowest
+    // twentieth sits under it, the middle low (0.21 and 0.21 before)
+    ['crypt_chapel_gargoyle', 0.005, 0.17],
+    ['rimeweb', 0.005, 0.09],
     ['cantor_ilvane', 0.06, 0.15],
     ['sexton_marrow', 0.015, 0.1],
   ];
@@ -425,4 +434,42 @@ describe('the Hollow Crypt boss corpses', () => {
       expect(mid / def.height, `${mob} middle`).toBeLessThan(midCeiling);
     });
   }
+});
+
+describe("Cantor Ilvane's backhand", () => {
+  // Reuben's second pass: Attack2 went "through his body the wrong way". The chest turned AWAY
+  // from the cocked claw, so the arm crossed inside her. A backhand coils toward the claw: it
+  // folds across in front of her chest, comes round in front of her on the contact frame and
+  // rakes out to her left. The wrist never comes back behind the front of her chest.
+  it('keeps the claw in front of her chest through the whole swing', async () => {
+    const doc = await readShipped(BODIES.cantor_ilvane);
+    const anim = doc
+      .getRoot()
+      .listAnimations()
+      .find((a) => a.getName() === 'Attack2') as GAnim;
+    const node = (name: string) =>
+      doc
+        .getRoot()
+        .listNodes()
+        .find((n) => n.getName() === name) as GNode;
+    const chest = node('chest');
+    const hand = node('hand.l');
+    const pos = new Vector3();
+    const scale = new Vector3();
+    const restRot = new Quaternion();
+    nodeWorlds(doc, null, 0)(chest).decompose(pos, restRot, scale);
+    const toRest = restRot.clone().invert();
+    let least = Number.POSITIVE_INFINITY;
+    for (let t = 0; t <= clipEnd(anim) + 1e-6; t += 1 / 30) {
+      const world = nodeWorlds(doc, anim, t);
+      const chestPos = new Vector3();
+      const chestRot = new Quaternion();
+      world(chest).decompose(chestPos, chestRot, scale);
+      // the model faces glTF +z at rest; carry that facing with the chest as it turns
+      const forward = new Vector3(0, 0, 1).applyQuaternion(toRest).applyQuaternion(chestRot);
+      const wrist = new Vector3().setFromMatrixPosition(world(hand));
+      least = Math.min(least, wrist.sub(chestPos).dot(forward));
+    }
+    expect(least).toBeGreaterThan(0.12);
+  });
 });
