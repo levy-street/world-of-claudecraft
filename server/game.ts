@@ -462,6 +462,7 @@ import {
 import type { Presence, PresenceStatus, SocialActor, SocialTransport } from './social';
 import { guildStampRankOf, SocialService } from './social';
 import { PgSocialDb } from './social_db';
+import { idleSpectatorBody } from './spectate_body';
 import { reconcileOnLogin as reconcileSteamOnLogin } from './steam/mirror';
 import {
   type StorageAppliedEffectDraft,
@@ -521,8 +522,6 @@ const TICK_HZ_HEAD_INTERVAL_S = 0.5;
 // cached wire fragments of despawned entities are swept once a minute
 const WIRE_CACHE_SWEEP_TICKS = 1200;
 const EVENT_RADIUS = 90;
-const SPECTATE_LIMBO_X = -10_000;
-const SPECTATE_LIMBO_Z = -10_000;
 const AUTOSAVE_SECONDS = 30;
 const SAVE_CONCURRENCY = 4;
 const LEAVE_SAVE_MAX_ATTEMPTS = 5;
@@ -1164,14 +1163,8 @@ export interface ClientSession
   pendingDeedRecords: string[];
   // The Reliquary twin (relicRecorded keys), same durability ordering and drain.
   pendingRelicRecords: string[];
-  spectating: {
-    characterId: number;
-    name: string;
-    savedPos: { x: number; y: number; z: number };
-    priorGm: boolean;
-    stowedPet: PetState | null;
-    riftExit?: RiftExitSpot | null;
-  } | null;
+  // The camera only: the body stays where it stands (server/spectate_body.ts).
+  spectating: { characterId: number; name: string } | null;
   jailed: JailState | null;
   jailVisit: {
     savedPos: { x: number; y: number; z: number };
@@ -2030,30 +2023,8 @@ export class GameServer {
       moderator.spectating.characterId = target.characterId;
       moderator.spectating.name = target.name;
     } else {
-      const savedPos = { ...moderatorEntity.pos };
-      const priorGm = !!moderatorEntity.gm;
-      const stowedPet = this.sim.stowPetForSpectate(moderator.pid);
-      const limbo = this.sim.groundPos(SPECTATE_LIMBO_X, SPECTATE_LIMBO_Z);
-      const riftExit = riftExitSpotAt(this.sim, moderatorEntity.pos);
-      leaveRiftForModeration(this.sim, moderator.pid, (ev) =>
-        this.send(moderator, { t: 'events', list: [ev] }),
-      );
-      cancelProfessionSessionOnDisplacement(this.sim.ctx, moderatorEntity);
-      moderatorEntity.pos = limbo;
-      moderatorEntity.prevPos = { ...limbo };
-      this.sim.grid.update(moderatorEntity);
-      this.sim.playerGrid.update(moderatorEntity);
-      this.sim.setGm(moderator.pid);
-      const meta = this.sim.meta(moderator.pid);
-      if (meta) Object.assign(meta.moveInput, emptyMoveInput());
-      moderator.spectating = {
-        characterId: target.characterId,
-        name: target.name,
-        savedPos,
-        priorGm,
-        stowedPet,
-        riftExit,
-      };
+      idleSpectatorBody(this.sim, moderatorEntity);
+      moderator.spectating = { characterId: target.characterId, name: target.name };
     }
 
     moderator.lastSent = {};
@@ -2084,21 +2055,9 @@ export class GameServer {
   }
 
   private exitSpectate(moderator: ClientSession, announce = true): void {
-    const state = moderator.spectating;
-    if (!state) {
+    if (!moderator.spectating) {
       if (announce) this.sendChatNotice(moderator, 'You are not spectating anyone.');
       return;
-    }
-    const moderatorEntity = this.sim.entities.get(moderator.pid);
-    if (moderatorEntity) {
-      cancelProfessionSessionOnDisplacement(this.sim.ctx, moderatorEntity);
-      const back = moderationReturnSpot(this.sim, moderator.pid, state.savedPos, state.riftExit);
-      moderatorEntity.pos = { ...back };
-      moderatorEntity.prevPos = { ...back };
-      this.sim.grid.update(moderatorEntity);
-      this.sim.playerGrid.update(moderatorEntity);
-      this.sim.setGm(moderator.pid, state.priorGm);
-      this.sim.restorePetAfterSpectate(moderator.pid, state.stowedPet);
     }
     moderator.spectating = null;
     moderator.lastSent = {};
@@ -2252,10 +2211,9 @@ export class GameServer {
   // dungeon). Resolved in order: an explicit dungeonId portal field, then a
   // delve position, then any other far-off instance-space x as a dungeon. A
   // failed lookup returns null so callers fall back to the overworld zone
-  // rather than ever surfacing a raw id. `pos` defaults to the entity's live
-  // position but callers pass a spectator's saved position so a spectating
-  // moderator reports where they really are, not the limbo they were parked in.
-  private instanceZoneName(e: Entity, pos: { x: number; z: number } = e.pos): string | null {
+  // rather than ever surfacing a raw id.
+  private instanceZoneName(e: Entity): string | null {
+    const pos = e.pos;
     if (e.dungeonId) return DUNGEONS[e.dungeonId]?.name ?? e.dungeonId;
     if (isDelvePos(pos.x)) return delveAt(pos.x)?.name ?? null;
     if (pos.x > DUNGEON_X_THRESHOLD) return dungeonAt(pos.x)?.name ?? null;
@@ -2269,8 +2227,8 @@ export class GameServer {
   private presenceOf(session: ClientSession): Presence {
     const e = this.sim.entities.get(session.pid);
     if (!e) return { zone: 'Unknown', status: 'online' };
-    const pos = session.spectating?.savedPos ?? e.pos;
-    const instanceZone = this.instanceZoneName(e, pos);
+    const pos = e.pos;
+    const instanceZone = this.instanceZoneName(e);
     let status: PresenceStatus = 'online';
     if (e.dead) status = 'dead';
     else if (instanceZone != null) status = 'dungeon';
@@ -7931,14 +7889,9 @@ export class GameServer {
     // fresh here, off the live Entity.pos, never cached across passes: the shared
     // per-cell query below is a strict superset of every per-viewer query ONLY
     // because Sim.tick's end-of-tick grid.refresh leaves buckets fresh, so an
-    // anchor's CURRENT cell is the right one to query. The one mutation reachable
-    // here is the vanished-spectate exitSpectate fallback, which re-buckets the
-    // moderator back to savedPos; hoisting it ahead of the shared-candidate build
-    // makes every co-located session see the moderator at savedPos this pass, a
-    // tick earlier than the old inline ordering (gameplay-neutral: a moderator
-    // leaving spectate limbo becomes visible to co-located viewers one tick
-    // sooner, never later, and it never changes combat, loot, interest, or what
-    // the spectated players see).
+    // anchor's CURRENT cell is the right one to query. The vanished-spectate
+    // exitSpectate fallback runs here too; it moves no entity (a spectator's
+    // body never leaves where it stands), so it cannot stale a bucket.
     const anchors: SnapshotAnchor[] = [];
     forEachGuarded(
       this.clients.values(),
@@ -8844,8 +8797,8 @@ export class GameServer {
       (mPid) => {
         const meta = this.sim.meta(mPid);
         const e = this.sim.entities.get(mPid);
-        const pos = this.clients.get(mPid)?.spectating?.savedPos ?? e?.pos;
-        if (!meta || !e || !pos) return null;
+        if (!meta || !e) return null;
+        const pos = e.pos;
         return {
           member: {
             pid: mPid,

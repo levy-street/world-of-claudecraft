@@ -122,8 +122,8 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
   persist, and (since the escrow write-path rider) the marketplace delivered save
   (`commitGrant` through custody's bounded `persistGrantSerialized`: in-slot serialize, a
   wait deadline that parks instead of blocking the sweep), and every write's blob carries
-  the session save fixups (`character_save_fixups.ts`: jail/spectate position, stowed pet,
-  the jail flag). The offline admin/boost writers (the rename and reclaim signer
+  the session save fixups (`character_save_fixups.ts`: jail and jail-visit position, the
+  visit's stowed pet, the jail flag; /spectate needs none, the body never moves). The offline admin/boost writers (the rename and reclaim signer
   sweeps, the PBE roster save, the clear-item-name strip) ride the lease-fenced
   `saveOfflineCharacterState` since masterwrought Phase 18, so no character-blob
   writer is unfenced: a live lease makes the write touch nothing, logged and

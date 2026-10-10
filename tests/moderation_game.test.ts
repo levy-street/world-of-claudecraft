@@ -659,9 +659,10 @@ describe('moderator spectate integration', () => {
     await vi.waitFor(() => expect(moderator.spectating).not.toBeNull());
 
     expect(moderator.spectating?.characterId).toBe(suspect.characterId);
-    expect(moderatorEntity.pos.x).toBe(-10_000);
-    expect(moderatorEntity.pos.z).toBe(-10_000);
-    expect(moderatorEntity.gm).toBe(true);
+    // Only the camera moves: the body stays where it stood, with its own GM
+    // flag (none here), so it is still in the world and still attackable.
+    expect(moderatorEntity.pos).toEqual(originalPos);
+    expect(!!moderatorEntity.gm).toBe(originalGm);
     expect(frames(moderatorWs)).toContainEqual({ t: 'spectate', name: 'Suspect' });
 
     moderatorWs.send.mockClear();
@@ -719,7 +720,7 @@ describe('moderator spectate integration', () => {
     expect(frames(moderatorWs)).toContainEqual({ t: 'spectate', name: null });
   });
 
-  it('switches targets without moving the saved return point', async () => {
+  it('switches targets without moving the body', async () => {
     const server = new GameServer();
     const moderator = joined(
       server.join(fakeWs(), 1, 101, 'Watcher', 'mage', null, false, {
@@ -733,13 +734,11 @@ describe('moderator spectate integration', () => {
 
     command(server, moderator, '/spectate First');
     await vi.waitFor(() => expect(moderator.spectating).not.toBeNull());
-    if (!moderator.spectating) throw new Error('spectate did not start');
-    const saved = { ...moderator.spectating.savedPos };
+    expect(server.sim.entities.get(moderator.pid)?.pos).toEqual(original);
     command(server, moderator, '/spectate Second');
     await vi.waitFor(() => expect(moderator.spectating?.characterId).toBe(second.characterId));
 
-    expect(moderator.spectating?.characterId).toBe(second.characterId);
-    expect(moderator.spectating?.savedPos).toEqual(saved);
+    expect(server.sim.entities.get(moderator.pid)?.pos).toEqual(original);
     command(server, moderator, '/unspectate');
     await vi.waitFor(() => expect(moderator.spectating).toBeNull());
     expect(server.sim.entities.get(moderator.pid)?.pos).toEqual(original);
@@ -774,7 +773,7 @@ describe('moderator spectate integration', () => {
     expect(server.sim.entities.get(regular.pid)?.pos).toEqual(original);
   });
 
-  it('saves the return position during spectate and restores a stowed pet', async () => {
+  it('keeps the pet out and saves the live body during spectate', async () => {
     const server = new GameServer();
     const seedPid = server.sim.addPlayer('hunter', 'Petseed');
     const state = server.sim.serializeCharacter(seedPid);
@@ -800,7 +799,9 @@ describe('moderator spectate integration', () => {
     expect(server.sim.petOf(moderator.pid, true)?.name).toBe('Tracker');
 
     command(server, moderator, '/spectate Pettarget');
-    await vi.waitFor(() => expect(server.sim.petOf(moderator.pid, true)).toBeNull());
+    await vi.waitFor(() => expect(moderator.spectating).not.toBeNull());
+    // The body never leaves, so neither does its pet.
+    expect(server.sim.petOf(moderator.pid, true)?.name).toBe('Tracker');
     await server.saveCharacter(moderator);
 
     const saved = vi
@@ -808,10 +809,11 @@ describe('moderator spectate integration', () => {
       .mock.calls.find(([characterId]) => characterId === moderator.characterId)?.[2];
     expect(saved?.pos).toEqual({ x: original.x, z: original.z });
     expect(saved?.pet?.name).toBe('Tracker');
-    expect(server.sim.entities.get(moderator.pid)?.pos.x).toBe(-10_000);
+    expect(server.sim.entities.get(moderator.pid)?.pos).toEqual(original);
 
     command(server, moderator, '/unspectate');
-    await vi.waitFor(() => expect(server.sim.petOf(moderator.pid, true)?.name).toBe('Tracker'));
+    await vi.waitFor(() => expect(moderator.spectating).toBeNull());
+    expect(server.sim.petOf(moderator.pid, true)?.name).toBe('Tracker');
   });
 
   // Regression for the /spectate talent-reset bug: the heavy self block
@@ -953,10 +955,10 @@ describe('server-side teleports end a live profession session', () => {
     expect(e.fishCastZoneId).toBe('');
   }
 
-  it('spectate entry and exit both cancel the moderator own session', async () => {
-    // The moderator is the displaced entity here: /spectate teleports THEM to
-    // limbo and /unspectate teleports them back, so a session of their own
-    // must end at both moves.
+  it('spectate entry cancels the moderator own session; exit leaves the body alone', async () => {
+    // /spectate idles the moderator's body where it stands (their movement
+    // input is dropped while spectating), so a session of their own ends on
+    // entry. /unspectate moves nothing, so it has nothing to tear down.
     const server = new GameServer();
     const moderatorWs = fakeWs();
     const targetWs = fakeWs();
@@ -975,12 +977,12 @@ describe('server-side teleports end a live profession session', () => {
     );
     expectEnded(modEntity);
 
-    assignSession(server, moderator.pid);
+    const before = { ...modEntity.pos };
     command(server, moderator, '/unspectate');
     await vi.waitFor(() =>
       expect(frames(moderatorWs)).toContainEqual({ t: 'spectate', name: null }),
     );
-    expectEnded(modEntity);
+    expect(modEntity.pos).toEqual(before);
   });
 
   it('the dev_teleport wire arm cancels a session (dev only)', () => {

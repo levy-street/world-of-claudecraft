@@ -682,9 +682,6 @@ describe('online unstuck command wiring', () => {
     spectator.session.spectating = {
       characterId: 2,
       name: 'Target',
-      savedPos: { x: 0, y: 0, z: 0 },
-      priorGm: false,
-      stowedPet: null,
     };
     send(server, spectator.session, { cmd: 'unstuck' });
     expect(unstuckEvents(spectator.sent)).toContainEqual({

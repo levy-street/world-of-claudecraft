@@ -1766,7 +1766,12 @@ const MONOLITHS: MonolithRow[] = [
     // Bank and vault commands share admission and save scheduling in
     // bank_storage_command. Combined merge measures 9816 lines, exact count
     // and zero slack.
-    ceiling: 9816,
+    // LOWERED 9816 -> 9769 after composing the spectate-body fix with this
+    // release candidate: /spectate stopped parking the moderator's body in
+    // limbo (the camera moves, the body stays in the world), retiring the
+    // saved position, GM toggle and pet stow while entry idle moved to
+    // server/spectate_body.ts. Exact count, zero slack.
+    ceiling: 9769,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
