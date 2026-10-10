@@ -31,6 +31,9 @@ import {
   SAURIAN_HOWDAH_BREAK,
   SAURIAN_STOMP,
   SAURIAN_TAIL_SWIPE,
+  ZULGAR_PULSE,
+  ZULGAR_SPIRIT_HUNT,
+  ZULGAR_TUNING,
 } from '../../sim/encounters/wildheart_basin/ids';
 import {
   WILDHEART_ENTANGLING_LASH,
@@ -51,6 +54,7 @@ import {
   trashCastSeconds,
 } from '../wildheart_basin/basin_trash_fx_core';
 import {
+  BEASTMASTER_CLIP,
   BEASTMASTER_MODEL,
   BEASTMASTER_SIM_SCALE,
   BINDER_MODEL,
@@ -69,6 +73,9 @@ import {
   TOTEM_SIM_SCALE,
   trashLookHeight,
   trashLookHover,
+  ZULGAR_CLIP,
+  ZULGAR_MODEL,
+  ZULGAR_SIM_SCALE,
 } from '../wildheart_basin/basin_trash_model_core';
 import {
   GORGE_RATE,
@@ -80,12 +87,14 @@ import {
   VINE_LASH_RATE,
 } from '../wildheart_basin/gorgebloom_fx_core';
 import {
+  GORGEBLOOM_CLIP,
   GORGEBLOOM_MODEL,
   gorgebloomLookHeight,
   gorgebloomLookHover,
 } from '../wildheart_basin/gorgebloom_model_core';
 import {
   heelPounceTimeScale,
+  JAGUAR_CLIP,
   JAGUAR_MODEL,
   JAGUAR_SIM_SCALE,
   jaguarLookHeight,
@@ -174,17 +183,17 @@ export const WILDHEART_GREAT_SAURIAN_LOOK: VisualDef = {
  *  turn in about 0.9 s, its Turn loop playing while it comes round. */
 export const GORGEBLOOM_TURN_RATE = 2;
 
-/** The Gorgebloom (scripts/assets/wildheart_gorgebloom, built in Blender): one
- *  sculpted skin, a bulb rooted in its pool, a five-petal rafflesia head with
- *  a toothed maw, four pollen sacs and four spiked vines, the troll prisoners'
- *  bones tangled in its roots. Drawn at its authored size, 13.75 yd to the top
- *  of its raised petal at its 2.8, its waterline on the pivot (the roots sink
- *  into the root pool on its dais). All three bars play from the bar's start
- *  at the rate that lands their contact frame (the spit, the slam, the bite)
- *  on the bar's last frame, and finish as play-outs; Pollinate, Bloom Spit and
- *  the pull's roar are gestures sent by gorgebloom_fx.ts. It never walks: it
- *  slews round to face its target, playing Turn while it comes round, and its
- *  gullet and sacs glow from its own emissive map (GORGEBLOOM_GLOW). */
+/** The Gorgebloom on an art-guide body (gorgebloom_model_core.ts): a rafflesia
+ *  the size of a house, a fanged ring maw on a squat bulb in a cradle of five
+ *  spotted petals, four pollen sacs on stalks, eight thorned vines across the
+ *  pool and its prey's bones among them. Drawn at its authored size, 6.1 yd to
+ *  the tip of its raised back petal at its 2.8, its waterline on the pivot.
+ *  The melee bite lands on frame 18 of its 1.5 s clip at 1x (contacts). All
+ *  three bars land their blow (the spit, the slam, the bite) on the bar's end
+ *  at 1x and finish as play-outs; Pollinate, Bloom Spit and the pull's roar
+ *  are gestures sent by gorgebloom_fx.ts. It never walks: it slews round to
+ *  face its target, its vines shuffling in the Turn loop, and its gullet and
+ *  sacs glow from its own emissive map (GORGEBLOOM_GLOW). */
 export const WILDHEART_GORGEBLOOM_LOOK: VisualDef = {
   url: GORGEBLOOM_MODEL.url,
   height: gorgebloomLookHeight(),
@@ -196,6 +205,7 @@ export const WILDHEART_GORGEBLOOM_LOOK: VisualDef = {
     run: 'Turn',
     turn: 'Turn',
     attack: ['Attack'],
+    contacts: { Attack: [GORGEBLOOM_CLIP.attackBite] },
     hit: ['Hit'],
     death: 'Death',
     cast: 'Roar',
@@ -227,8 +237,8 @@ export const WILDHEART_GORGEBLOOM_LOOK: VisualDef = {
   oneShotsHoldAttacks: ['Pollinate', 'BloomSpit', 'Roar'],
   turnRate: GORGEBLOOM_TURN_RATE,
   glowPulses: GORGEBLOOM_GLOW,
-  // The melee bite snaps shut at 0.54 s of the clip: a touch quick.
-  attackTimeScale: 1.2,
+  // The melee bite: coiled back, struck out, shut on frame 18 at 1x.
+  attackTimeScale: 1,
   // The death's splash and sink are timed off the clip at 1x (gorgebloom_fx.ts).
   deathTimeScale: 1,
   authoredAtlas: true,
@@ -420,14 +430,14 @@ export const WILDHEART_TOTEM_BINDER_LOOK: VisualDef = {
   clickRadius: 1.4,
 };
 
-/** The Fanglord Beastmaster (scripts/assets/wildheart_beastmaster, built in
- *  Blender on the Totem-Binder's troll body, bigger): a scarred jungle troll
- *  under a jaguar-head hood, the pelt hanging down his back as a cloak and its
- *  forelegs knotted across his chest, bone pauldrons, the Beastspear in his
- *  fist. 6.3 yd to the hood's ears at his 2.35, a head over his jaguar. The
- *  Beast Pit Quake plays Quake over its bar (the spear and his stamp strike the
- *  pit floor on its end); Call of the Hunt and Thickhide Ward play WarCry and
- *  Ward (gestures off their spellfx, basin_fx.ts). */
+/** The Fanglord Beastmaster on an art-guide body (basin_trash_model_core.ts
+ *  BEASTMASTER_MODEL): a scarred jungle troll under a jaguar-head hood, the
+ *  pelt hanging down his back as a cloak, bone pauldrons, the Beastspear held
+ *  point-up. 6.7 yd to the spear's point at his 2.35, a head over his jaguar.
+ *  His blows land on frame 18 of their 1.5 s clips at 1x (contacts). The Beast
+ *  Pit Quake plays Quake over its bar (the spear and his stamp strike the pit
+ *  floor on its end); Call of the Hunt and Thickhide Ward play WarCry and Ward
+ *  (gestures off their spellfx, basin_fx.ts). */
 export const WILDHEART_BEASTMASTER_LOOK: VisualDef = {
   url: BEASTMASTER_MODEL.url,
   height: trashLookHeight(BEASTMASTER_MODEL, BEASTMASTER_SIM_SCALE),
@@ -438,6 +448,10 @@ export const WILDHEART_BEASTMASTER_LOOK: VisualDef = {
     walk: 'Walk',
     run: 'Run',
     attack: ['Attack', 'Attack2'],
+    contacts: {
+      Attack: [BEASTMASTER_CLIP.attackHit],
+      Attack2: [BEASTMASTER_CLIP.attackHit],
+    },
     attackByAbility: { [BEAST_CALL_OF_THE_HUNT]: 'WarCry', [BEAST_THICKHIDE_WARD]: 'Ward' },
     attackTimeScaleByAbility: { [BEAST_CALL_OF_THE_HUNT]: 1, [BEAST_THICKHIDE_WARD]: 1 },
     hit: ['Hit'],
@@ -453,7 +467,7 @@ export const WILDHEART_BEASTMASTER_LOOK: VisualDef = {
   oneShotsHoldAttacks: ['WarCry', 'Ward'],
   walkRef: BEASTMASTER_MODEL.walkRef,
   runRef: BEASTMASTER_MODEL.runRef,
-  attackTimeScale: 1.1,
+  attackTimeScale: 1,
   deathTimeScale: 1,
   authoredAtlas: true,
   clickRadius: 1.8,
@@ -559,12 +573,53 @@ const TOAD_FORM_HEIGHT = 1.3;
 export const ZULGAR_HIDE_GESTURE = 'wildheart_zulgar_hide';
 export const ZULGAR_SHOW_GESTURE = 'wildheart_zulgar_show';
 
+/** Zulgar, Voice of the Basin on an art-guide body (basin_trash_model_core.ts
+ *  ZULGAR_MODEL): the masked jaguar priest, the sun staff upright at his side
+ *  out of the fight. His blows land on frame 18 of their 1.5 s clips at 1x
+ *  (contacts). The Wildheart Pulse and the Spirit of the Hunt land on their
+ *  1.5 s bars' ends at 1x (the staff driven into the loam; the spirit taking
+ *  him) and finish as play-outs. His whole model hides for the heroic Ambush. */
+export const WILDHEART_ZULGAR_LOOK: VisualDef = {
+  url: ZULGAR_MODEL.url,
+  height: trashLookHeight(ZULGAR_MODEL, ZULGAR_SIM_SCALE),
+  hover: trashLookHover(ZULGAR_MODEL, ZULGAR_SIM_SCALE),
+  clips: {
+    idle: 'Idle',
+    walk: 'Walk',
+    run: 'Run',
+    jump: 'Jump',
+    attack: ['Attack', 'Attack2'],
+    contacts: { Attack: [ZULGAR_CLIP.attackHit], Attack2: [ZULGAR_CLIP.attackHit] },
+    hit: ['Hit'],
+    death: 'Death',
+    cast: 'Pulse',
+    castByAbility: { [ZULGAR_PULSE]: 'Pulse', [ZULGAR_SPIRIT_HUNT]: 'SpiritHunt' },
+    castTimeScaleByAbility: {
+      [ZULGAR_PULSE]: ZULGAR_CLIP.pulseStrike / ZULGAR_TUNING.pulseCast,
+      [ZULGAR_SPIRIT_HUNT]: ZULGAR_CLIP.huntTaken / ZULGAR_TUNING.huntCast,
+    },
+    castPlayOut: ['Pulse', 'SpiritHunt'],
+  },
+  castPlayOutHoldsAttacks: true,
+  castClipSync: true,
+  meshToggles: [{ nodes: ['*'], hideNow: ZULGAR_HIDE_GESTURE, showNow: ZULGAR_SHOW_GESTURE }],
+  walkRef: ZULGAR_MODEL.walkRef,
+  runRef: ZULGAR_MODEL.runRef,
+  attackTimeScale: 1,
+  deathTimeScale: 1,
+  authoredAtlas: true,
+  clickRadius: 1.8,
+};
+
 /** The Great Jaguar's clips (both bodies: the Fanglord's and its jade spirit). */
 const GREAT_JAGUAR_CLIPS: ClipMap = {
   idle: 'Idle',
   walk: 'Walk',
   run: 'Run',
   attack: ['Bite', 'Claw'],
+  // Both land on frame 18 of their 1.5 s clips at 1x: drawn back, then the
+  // whole cat thrown after the jaws or the rake.
+  contacts: { Bite: [JAGUAR_CLIP.biteClose], Claw: [JAGUAR_CLIP.clawRake] },
   hit: ['Hit'],
   death: 'Death',
   // Stunned in a control window: the dazed loop, head hanging, legs splayed.
@@ -581,10 +636,10 @@ const GREAT_JAGUAR_CLIPS: ClipMap = {
   flourish: 'Roar',
 };
 
-/** The Fanglord's Great Jaguar (scripts/assets/wildheart_great_jaguar, built in
- *  Blender): one sculpted skin in gold with black rosettes, Sunbone war paint,
- *  bone ornaments and the collar's jade ring the Pack Bond ties to. Drawn at
- *  its authored size, 4.7 yd to its ears at its 2.4. */
+/** The Fanglord's Great Jaguar on an art-guide body (jaguar_model_core.ts): a
+ *  great cat in gold with black rosettes, Sunbone war paint, a jade collar the
+ *  Pack Bond ties to and a feathered headdress. Drawn at its authored size, 4.7
+ *  yd to its ears at its 2.4. */
 export const WILDHEART_GREAT_JAGUAR_LOOK: VisualDef = {
   url: JAGUAR_MODEL.url,
   height: jaguarLookHeight(),
@@ -592,7 +647,7 @@ export const WILDHEART_GREAT_JAGUAR_LOOK: VisualDef = {
   castPlayOutHoldsAttacks: true,
   walkRef: JAGUAR_MODEL.walkRef * jaguarModelScale(JAGUAR_SIM_SCALE),
   runRef: JAGUAR_MODEL.runRef * jaguarModelScale(JAGUAR_SIM_SCALE),
-  attackTimeScale: 1.15,
+  attackTimeScale: 1,
   deathTimeScale: 1,
   authoredAtlas: true,
   clickRadius: 1.8,
@@ -630,13 +685,8 @@ export function wildheartPlaceholderLooks(
     runRef: TOAD_MODEL.runRef * (TOAD_FORM_HEIGHT / (TOAD_MODEL.idleTop - TOAD_MODEL.idleMin)),
     authoredAtlas: true,
   };
-  // Zulgar keeps his shipped body; it learns to vanish for the Ambush.
-  const zulgar = visuals.mob_wildheart_high_priest;
-  if (zulgar)
-    out.mob_wildheart_high_priest = {
-      ...zulgar,
-      meshToggles: [{ nodes: ['*'], hideNow: ZULGAR_HIDE_GESTURE, showNow: ZULGAR_SHOW_GESTURE }],
-    };
+  // Zulgar trades his shipped body for his art-guide one.
+  out.mob_wildheart_high_priest = WILDHEART_ZULGAR_LOOK;
   // The Fanglord's Whistle's spirit jaguar (combat/wildheart_trinkets.ts): the
   // great cat's jade spirit body (translucent, its rosettes burning), at the
   // size the trinket's placeholder drew so a pet never walls off a fight.
@@ -649,7 +699,9 @@ export function wildheartPlaceholderLooks(
     castPlayOutHoldsAttacks: true,
     walkRef: JAGUAR_MODEL.walkRef * spiritScale,
     runRef: JAGUAR_MODEL.runRef * spiritScale,
-    attackTimeScale: 1.15,
+    attackTimeScale: 1,
+    // Its jade wash is the cat's own texture recoloured (the GLB's own map).
+    authoredAtlas: true,
     clickRadius: 1.4,
   };
   out.wildheart_totem_binder = WILDHEART_TOTEM_BINDER_LOOK;

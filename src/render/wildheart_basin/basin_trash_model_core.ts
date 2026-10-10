@@ -142,26 +142,59 @@ export const BINDER_CLIP = {
 /** The Fanglord Beastmaster's sim scale (sim/content/wildheart.ts). */
 export const BEASTMASTER_SIM_SCALE = 2.35;
 
-/** The Fanglord Beastmaster (scripts/assets/wildheart_beastmaster, the
- *  Binder's troll body built bigger, scaled 1.12 at the end): a scarred troll
- *  under a jaguar-head hood, the pelt for a cloak, the Beastspear in his fist. */
+/** The Fanglord Beastmaster on an art-guide body (the designer's model guide:
+ *  concept, Tripo, a rig built for the mesh, every clip animated at 30 fps): a
+ *  scarred troll under a jaguar-head hood, the pelt for a cloak, the Beastspear
+ *  held point-up in one hold. Drawn at its authored size. */
 export const BEASTMASTER_MODEL = {
-  url: 'models/creatures/wildheart_beastmaster_blender.glb',
-  /** The Idle pose's skinned bounds: the soles to the hood's ears. */
-  idleMin: 0,
-  idleTop: 6.295,
-  walkRef: 1.792,
-  runRef: 7.074,
+  url: 'models/creatures/woc_basin_beastmaster.glb',
+  /** The Idle pose's skinned bounds: the soles (a toe a hair under the
+   *  ground) to the spear's point. */
+  idleMin: -0.042,
+  idleTop: 6.672,
+  walkRef: 2.57,
+  runRef: 6.26,
 } as const;
 
 export const BEASTMASTER_CLIP = {
   /** Quake (the Beast Pit Quake's 1.5 s bar, played from its start at 1x):
-   *  the spear and his foot strike the pit floor at 1.50. */
+   *  the spear and his boot strike the pit floor at 1.50. */
   quakeStrike: 1.5,
   /** WarCry (Call of the Hunt, a gesture off its spellfx): the roar peaks at
-   *  0.50. Ward (Thickhide Ward): the spear points at his jaguar at 0.55. */
+   *  0.50. Ward (Thickhide Ward): the spear points at his jaguar at 0.533. */
   warCryPeak: 0.5,
-  wardPoint: 0.55,
+  wardPoint: 0.533,
+  /** Attack (the two-handed thrust) and Attack2 (the overhead chop): 1.5 s at
+   *  1x, the hit on frame 18. */
+  attackHit: 0.567,
+} as const;
+
+/** Zulgar, Voice of the Basin's sim scale (sim/content/wildheart.ts). */
+export const ZULGAR_SIM_SCALE = 2.8;
+
+/** Zulgar on an art-guide body (the designer's model guide): the masked
+ *  jaguar priest in feathers and bone, the sun staff held upright in one hold.
+ *  Drawn at the old look's size: the Idle bounds stand 8.96 yd at his 2.8. */
+export const ZULGAR_MODEL = {
+  url: 'models/creatures/woc_basin_zulgar.glb',
+  /** The Idle pose's skinned bounds: a hem a hair under the ground to the
+   *  sun on his staff. */
+  idleMin: -0.136,
+  idleTop: 8.821,
+  walkRef: 3.4,
+  runRef: 7.43,
+} as const;
+
+export const ZULGAR_CLIP = {
+  /** Attack (the sun brought down over his head) and Attack2 (swept flat
+   *  across): 1.5 s at 1x, the hit on frame 18. */
+  attackHit: 0.567,
+  /** Pulse (Wildheart Pulse, its 1.5 s bar): the staff's foot driven into the
+   *  loam on frame 46, as the ring goes. SpiritHunt (Spirit of the Hunt, its
+   *  1.5 s bar): arched back, arms flung wide as the jaguar spirit takes him on
+   *  frame 46. Both play at 1x. */
+  pulseStrike: 1.5,
+  huntTaken: 1.5,
 } as const;
 
 /** The Quake rate over the Beast Pit Quake bar (its strike on the bar's end). */
