@@ -4826,6 +4826,9 @@ export const VISUALS: Record<string, VisualDef> = {
       walk: 'Walk',
       run: 'Run',
       attack: ['Attack', 'Attack2'],
+      // The baton's chop and the claw's backhand land on frame 18 of a 1.5 s swing played
+      // at 1x (she rises and coils, hangs, then steps in); the flinch and the number wait.
+      contacts: { Attack: [0.567], Attack2: [0.567] },
       hit: ['Hit'],
       death: 'Death',
       cast: 'Conduct',
@@ -4842,6 +4845,7 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     // The Dirge follows its bar (normal or Crescendo); the organ loops while she plays.
     castClipSync: [ILVANE_DIRGE, ILVANE_UNBROKEN_DIRGE],
+    attackTimeScale: 1,
     walkRef: 1.97,
     runRef: 6.82,
     authoredAtlas: true,
@@ -4911,6 +4915,9 @@ export const VISUALS: Record<string, VisualDef> = {
       walk: 'Walk',
       run: 'Run',
       attack: ['Attack', 'Attack2'],
+      // Both claws strike on frame 18 of a 1.5 s swing played at 1x (the coiled windup
+      // hangs at its apex first); the flinch and the number wait for them.
+      contacts: { Attack: [0.567], Attack2: [0.567] },
       // Letting go (gently or not): the arms open.
       attackByAbility: { [LADY_EMBRACE_RELEASED]: 'Release', [LADY_EMBRACE_DROPPED]: 'Release' },
       hit: ['Hit'],
@@ -4930,6 +4937,7 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     // The scream and the reach follow their bars; the hold just loops.
     castClipSync: [LADY_BRIDES_LAMENT, LADY_BRIDAL_FREEZE, LADY_FROZEN_EMBRACE],
+    attackTimeScale: 1,
     authoredAtlas: true,
     selfIllumination: 0.3,
     clickRadius: 2.2,

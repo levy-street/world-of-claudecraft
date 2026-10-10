@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "cf546e6adb3f04d66efe00db3f6ca36309107f4c6efb6957785d0870768b89ad",
+  "rendererFingerprint": "f16fb9b65cf1a335ce9237e92c0060e1c742b9009d6eff209dad7ec1ab0614de",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "darwin",
@@ -39,7 +39,7 @@
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
       "bytes": 6079176,
-      "sha256": "c604622577c5577522d6c0e08f376d3cfcd54e1e0c144b9ea42c225d39e616be",
+      "sha256": "203a1baf6fb7ed270d099fcef38b400004c47ec973be2aa204a2562b82b1bc60",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -1237,8 +1237,8 @@
         "model": {
           "url": "models/creatures/woc_crypt_cantor_ilvane.glb",
           "path": "public/models/creatures/woc_crypt_cantor_ilvane.glb",
-          "bytes": 2119020,
-          "sha256": "d217ab288e6e74270cbe22e8f1c8954140684fefa2eb98715c4c422f61ab5883"
+          "bytes": 2130968,
+          "sha256": "30df5dcd43fea6882be5cb07e046cf0b20947ba689826ecac6345a332ca14b44"
         },
         "idle": "Idle",
         "height": 5.964,
@@ -1255,7 +1255,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "b7106a9dd1fb9b9f1c8257096bdef04f4d5703d5469457e23c8e4f4ea193d31c",
+      "sourceFingerprint": "82eec6e178e2dcc0ebed63979b7f081ff201489b5fe3ef98e2ca1f24aaf736a8",
       "output": {
         "path": "public/ui/mobs/cantor_ilvane.webp",
         "bytes": 2044,
@@ -1686,8 +1686,8 @@
         "model": {
           "url": "models/creatures/woc_crypt_gargoyle.glb",
           "path": "public/models/creatures/woc_crypt_gargoyle.glb",
-          "bytes": 2546916,
-          "sha256": "2070353481d53819140bdca0295e79150ae9e26a8fef9dad3f4aca4056958ff0"
+          "bytes": 2553440,
+          "sha256": "74e263a4a99f202406b25da1f8e1bd4df89f6e45ffd713d6420676cf0d96f4a9"
         },
         "idle": "Perch",
         "height": 5.81,
@@ -1704,7 +1704,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "28a1923aef245a5d34fba9bb414486675390c9822509906430bf015379611d94",
+      "sourceFingerprint": "2fdfd974d6b392c21fffc7b1bc5874f14a5d53223468cb739549f36168c23851",
       "output": {
         "path": "public/ui/mobs/crypt_chapel_gargoyle.webp",
         "bytes": 2644,
@@ -1889,8 +1889,8 @@
         "model": {
           "url": "models/creatures/woc_crypt_knellwyrm.glb",
           "path": "public/models/creatures/woc_crypt_knellwyrm.glb",
-          "bytes": 2877252,
-          "sha256": "7c09c53979c2e3a950f929b7f8695fda0bda7bf11dcb73f56bb2ae168ec24f4e"
+          "bytes": 2886212,
+          "sha256": "c99b28df05f66c6828dcf666f8fdc7a3b8f979b21910fb60d153868f5f396b41"
         },
         "idle": "Idle",
         "height": 15.07,
@@ -1907,7 +1907,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "26b6f56b645b59b90fe9851f0280b1371dd5faee6eb1805ae0aac4fcb5ee11e3",
+      "sourceFingerprint": "07f304171b8a5dba02b07700c9fd369b49ccd8963aea64ed4e20c41d3e8a7cc1",
       "output": {
         "path": "public/ui/mobs/crypt_knellwyrm.webp",
         "bytes": 2324,
@@ -1982,8 +1982,8 @@
         "model": {
           "url": "models/creatures/woc_crypt_ossuary_drake.glb",
           "path": "public/models/creatures/woc_crypt_ossuary_drake.glb",
-          "bytes": 2721320,
-          "sha256": "b0bb89572794e4dadce865f1d6fc148e62ab78556b381c3743d6837eec7bed22"
+          "bytes": 2729204,
+          "sha256": "dc0d0dc32700ca671f550a781ce809ab41bc58a33cdb8607d48e135a4a8e31d3"
         },
         "idle": "Idle",
         "height": 13.63,
@@ -2000,11 +2000,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "2fe811718b12ce32af1c63970e8e00adb426779eecd6a5fc44f41d24964c651b",
+      "sourceFingerprint": "7c471f1f3695322b00db735ab465831d4b74e72fe90e7538be4bc4a25c976ba1",
       "output": {
         "path": "public/ui/mobs/crypt_ossuary_drake.webp",
-        "bytes": 2240,
-        "sha256": "158ed77f19b6fe74323ba489e3d921e7143863b6944e8d5fbaf6dfc36b012b0e"
+        "bytes": 2216,
+        "sha256": "96850737c2fce6ecc806f892e26f50a1ae83a03166ee4b5fe6c752d9f818645e"
       }
     },
     {
@@ -9999,8 +9999,8 @@
         "model": {
           "url": "models/creatures/woc_crypt_lady_bonechill.glb",
           "path": "public/models/creatures/woc_crypt_lady_bonechill.glb",
-          "bytes": 1409828,
-          "sha256": "9931a1b9a65bc9658670d97420cebd0032ec7c3ebbfed09b3ec63e4d78dabe80"
+          "bytes": 1418664,
+          "sha256": "84e3cadb636e02a8739527e0a7ec14389a77c18d2bf7d48978909790fa969e57"
         },
         "idle": "Idle",
         "height": 6.749,
@@ -10017,7 +10017,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "6c877d91d499602bf1d40c4abefb2acda6a97a335ffb0d08da49059d8f146072",
+      "sourceFingerprint": "5d5fc6dab446536002be9859971e8ab351e336b6e5edc7960b57957882b5cc9e",
       "output": {
         "path": "public/ui/mobs/rimeweb.webp",
         "bytes": 2336,
@@ -10339,8 +10339,8 @@
         "model": {
           "url": "models/creatures/woc_crypt_sexton_marrow.glb",
           "path": "public/models/creatures/woc_crypt_sexton_marrow.glb",
-          "bytes": 2143268,
-          "sha256": "65438ff1d6f2fdaedf664aba377f3724799c2eceec1220ee9269be3f3fd9ca7b"
+          "bytes": 2145112,
+          "sha256": "c9a81eefca1f47bc903bec6da253168754eaea70eca0a6d1788775aebd90b14a"
         },
         "idle": "Idle",
         "height": 5.975,
@@ -10357,7 +10357,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "9633b4825a62a6b9a068460c589a4cd72c1196ec7cc2fffbf4cbb719cc2bf368",
+      "sourceFingerprint": "28ce99a0618177d4ec3efb19d3c678114a215db7f4613c278c5f7b4671400e2b",
       "output": {
         "path": "public/ui/mobs/sexton_marrow.webp",
         "bytes": 2060,

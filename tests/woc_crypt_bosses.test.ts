@@ -3,10 +3,14 @@
 // Bonechill, the Chapel Gargoyle, the Ossuary Drake, the Knellwyrm and the rime egg sacs. Each
 // mob template draws its own shipped GLB (never the old Blender build, never the spider the egg
 // sacs fell back to), every clip its ClipMap names ships in that GLB, each bar-locked clip is at
-// least as long as the bar the sim runs, the effects' jaw anchors stay over the breath cone, and
-// both dragons stand on four feet with their wings a separate pair.
+// least as long as the bar the sim runs, the effects' jaw anchors stay over the breath cone,
+// both dragons stand on four feet with their wings a separate pair, the Lady's and the Cantor's
+// blows land on their frame, and every boss corpse lies on the floor.
 
 import { readFileSync } from 'node:fs';
+import { NodeIO } from '@gltf-transform/core';
+import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
+import { MeshoptDecoder } from 'meshoptimizer';
 import { Matrix4, Quaternion, Vector3 } from 'three';
 import { describe, expect, it } from 'vitest';
 import { glbJsonChunk } from '../scripts/assets/lib/glb_texture_compression_core.mjs';
@@ -232,4 +236,193 @@ describe('the Hollow Crypt boss bodies', () => {
     const drake = defOf('crypt_ossuary_drake').height * MOBS.crypt_ossuary_drake.scale;
     expect(wyrm).toBeGreaterThan(drake * 1.2);
   });
+
+  it('lands the Lady and the Cantor blows on their frame, the swing played at 1x', () => {
+    for (const mob of ['rimeweb', 'cantor_ilvane']) {
+      const def = defOf(mob);
+      expect(def.attackTimeScale, mob).toBe(1);
+      const shipped = clipsOf(BODIES[mob]);
+      for (const clip of def.clips.attack) {
+        const contact = def.clips.contacts?.[clip]?.[0] ?? 0;
+        // a coiled windup first (over half a second), the blow well inside the clip
+        expect(contact, `${mob} ${clip}`).toBeGreaterThan(0.5);
+        expect(contact, `${mob} ${clip}`).toBeLessThan((shipped.get(clip) ?? 0) - 0.5);
+      }
+    }
+  });
+});
+
+// --- the corpses rest on the floor --------------------------------------------------------------
+// Each boss is skinned from its shipped GLB at the idle's measure time and at the Death clip's
+// last frame, and placed the way the game places it (assets.ts: `height` over the idle's posed
+// bounds, the idle's lowest vertex on the anchor, `hover` added). The old deaths each broke one of
+// these: the dragons hung on a wing tip nine yards up (their middle at 0.70 of their height), the
+// Lady and the Cantor lay propped on a gown panel and a hymnal (fifth percentile at 0.11 and 0.12
+// of their height), the gargoyle ended in a heap (middle 0.38), and the Sexton's back floated over
+// a flung hand (middle 0.16).
+
+interface Gltf {
+  getRoot(): {
+    listNodes(): GNode[];
+    listAnimations(): GAnim[];
+  };
+}
+interface GNode {
+  getName(): string;
+  getTranslation(): number[];
+  getRotation(): number[];
+  getScale(): number[];
+  listChildren(): GNode[];
+  getMesh(): { listPrimitives(): GPrim[] } | null;
+  getSkin(): { listJoints(): GNode[]; getInverseBindMatrices(): GAcc | null } | null;
+}
+interface GAcc {
+  getCount(): number;
+  getElement(i: number, out: number[]): number[];
+  getScalar(i: number): number;
+  getMax(out: number[]): number[];
+}
+interface GPrim {
+  getAttribute(name: string): GAcc | null;
+}
+interface GChannel {
+  getTargetNode(): GNode | null;
+  getTargetPath(): string | null;
+  getSampler(): { getInput(): GAcc; getOutput(): GAcc } | null;
+}
+interface GAnim {
+  getName(): string;
+  listChannels(): GChannel[];
+}
+
+async function readShipped(url: string): Promise<Gltf> {
+  await MeshoptDecoder.ready;
+  const io = new NodeIO()
+    .registerExtensions(ALL_EXTENSIONS)
+    .registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
+  return (await io.read(`public/${url}`)) as unknown as Gltf;
+}
+
+function sampleChannel(ch: GChannel, t: number): number[] {
+  const s = ch.getSampler();
+  if (!s) return [];
+  const input = s.getInput();
+  const output = s.getOutput();
+  const n = input.getCount();
+  let i = 0;
+  while (i < n - 1 && input.getScalar(i + 1) <= t + 1e-6) i++;
+  const v0 = output.getElement(i, []);
+  if (i >= n - 1) return v0;
+  const u = (t - input.getScalar(i)) / (input.getScalar(i + 1) - input.getScalar(i));
+  const v1 = output.getElement(i + 1, []);
+  if (ch.getTargetPath() === 'rotation') {
+    const q = new Quaternion().fromArray(v0).slerp(new Quaternion().fromArray(v1), u);
+    return q.toArray();
+  }
+  return v0.map((x, k) => x + (v1[k] - x) * u);
+}
+
+/** Every vertex's height (glTF y) with the clip sampled at `t`, by linear blend skinning. */
+function skinnedHeights(doc: Gltf, anim: GAnim, t: number): number[] {
+  const nodes = doc.getRoot().listNodes();
+  const parentOf = new Map<GNode, GNode>();
+  for (const n of nodes) for (const c of n.listChildren()) parentOf.set(c, n);
+  const chans = anim.listChannels();
+  const local = new Map<GNode, Matrix4>();
+  for (const n of nodes) {
+    const get = (path: string, d: number[]) => {
+      const ch = chans.find((c) => c.getTargetNode() === n && c.getTargetPath() === path);
+      return ch ? sampleChannel(ch, t) : d;
+    };
+    local.set(
+      n,
+      new Matrix4().compose(
+        new Vector3().fromArray(get('translation', n.getTranslation())),
+        new Quaternion().fromArray(get('rotation', n.getRotation())),
+        new Vector3().fromArray(get('scale', n.getScale())),
+      ),
+    );
+  }
+  const world = new Map<GNode, Matrix4>();
+  const worldOf = (n: GNode): Matrix4 => {
+    const known = world.get(n);
+    if (known) return known;
+    const p = parentOf.get(n);
+    const m = p
+      ? worldOf(p)
+          .clone()
+          .multiply(local.get(n) as Matrix4)
+      : (local.get(n) as Matrix4);
+    world.set(n, m);
+    return m;
+  };
+  const skinNode = nodes.find((n) => n.getMesh() && n.getSkin()) as GNode;
+  const skin = skinNode.getSkin() as NonNullable<ReturnType<GNode['getSkin']>>;
+  const ibm = skin.getInverseBindMatrices() as GAcc;
+  const jointMats = skin.listJoints().map((j, i) =>
+    worldOf(j)
+      .clone()
+      .multiply(new Matrix4().fromArray(ibm.getElement(i, []))),
+  );
+  const out: number[] = [];
+  const v = new Vector3();
+  const p = new Vector3();
+  for (const prim of (
+    skinNode.getMesh() as NonNullable<ReturnType<GNode['getMesh']>>
+  ).listPrimitives()) {
+    const pos = prim.getAttribute('POSITION') as GAcc;
+    const js = prim.getAttribute('JOINTS_0') as GAcc;
+    const ws = prim.getAttribute('WEIGHTS_0') as GAcc;
+    for (let i = 0; i < pos.getCount(); i++) {
+      v.fromArray(pos.getElement(i, []));
+      const ji = js.getElement(i, []);
+      const wi = ws.getElement(i, []);
+      let y = 0;
+      for (let k = 0; k < 4; k++) {
+        if (!wi[k]) continue;
+        y += wi[k] * p.copy(v).applyMatrix4(jointMats[ji[k]]).y;
+      }
+      out.push(y);
+    }
+  }
+  return out;
+}
+
+const clipEnd = (anim: GAnim) =>
+  Math.max(...anim.listChannels().map((c) => c.getSampler()?.getInput().getMax([])[0] ?? 0));
+
+describe('the Hollow Crypt boss corpses', () => {
+  // [mob, fifth-percentile ceiling, middle ceiling], each a fraction of the drawn height
+  const CORPSES: [string, number, number][] = [
+    ['crypt_ossuary_drake', 0.1, 0.35],
+    ['crypt_knellwyrm', 0.1, 0.35],
+    ['crypt_chapel_gargoyle', 0.1, 0.3],
+    ['rimeweb', 0.05, 0.26],
+    ['cantor_ilvane', 0.06, 0.15],
+    ['sexton_marrow', 0.015, 0.1],
+  ];
+  for (const [mob, p5Ceiling, midCeiling] of CORPSES) {
+    it(`lays the ${mob} corpse on the floor`, async () => {
+      const def = defOf(mob);
+      const doc = await readShipped(BODIES[mob]);
+      const anims = new Map(
+        doc
+          .getRoot()
+          .listAnimations()
+          .map((a) => [a.getName(), a]),
+      );
+      const idle = anims.get(def.clips.idle) as GAnim;
+      const death = anims.get(def.clips.death) as GAnim;
+      const idleYs = skinnedHeights(doc, idle, Math.min(0.5, clipEnd(idle) * 0.5));
+      const lo = Math.min(...idleYs);
+      const scale = def.height / (Math.max(...idleYs) - lo);
+      const drawn = skinnedHeights(doc, death, clipEnd(death))
+        .map((y) => (def.hover ?? 0) + scale * (y - lo))
+        .sort((a, b) => a - b);
+      const p5 = drawn[Math.floor(drawn.length * 0.05)];
+      const mid = drawn[Math.floor(drawn.length / 2)];
+      expect(p5 / def.height, `${mob} fifth percentile`).toBeLessThan(p5Ceiling);
+      expect(mid / def.height, `${mob} middle`).toBeLessThan(midCeiling);
+    });
+  }
 });
