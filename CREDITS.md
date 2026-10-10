@@ -90,6 +90,18 @@ than free, so ask before you rely on it.
 
 ## Models, textures, icons, and art
 
+### WoW human animation imports
+
+`public/models/chars/players/woc/wow_anims_male.glb` and `wow_anims_female.glb`
+contain retargeted motion from Mailer's [Human Male](https://steamcommunity.com/sharedfiles/filedetails/?id=1338373603)
+and [Human Female](https://steamcommunity.com/sharedfiles/filedetails/?id=1335166463)
+Garry's Mod Workshop packs. The uploader credits Blizzard Entertainment for the
+original resources. These animations are not covered by this repository's MIT
+license; no standalone redistribution license is recorded. The import excludes
+donor meshes, textures and addon code. Source hashes and rebuild instructions:
+`scripts/assets/wow_human/README.md`.
+
+
 | Assets | Author | Source | License | Redistribution |
 |---|---|---|---|---|
 | Character models + animations (knight, mage, rogue, barbarian, hooded rogue), weapons/shields | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Adventures-1.0 | CC0 1.0 | Yes |
