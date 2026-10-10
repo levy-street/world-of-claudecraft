@@ -21840,7 +21840,8 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     ],
     "animUrls": [
       "models/chars/players/woc/anims_male.glb",
-      "models/chars/players/woc/wow_anims_male.glb"
+      "models/chars/players/woc/wow_anims_male.glb",
+      "models/chars/players/woc/wow_autoattacks_male.glb"
     ],
     "armor": [
       "models/chars/players/woc/armor/male_warrior_medium.glb"
@@ -21862,7 +21863,8 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     ],
     "animUrls": [
       "models/chars/players/woc/anims_male.glb",
-      "models/chars/players/woc/wow_anims_male.glb"
+      "models/chars/players/woc/wow_anims_male.glb",
+      "models/chars/players/woc/wow_autoattacks_male.glb"
     ],
     "armor": [
       "models/chars/players/woc/armor/male_paladin_medium.glb"
@@ -21880,7 +21882,8 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     ],
     "animUrls": [
       "models/chars/players/woc/anims_male.glb",
-      "models/chars/players/woc/wow_anims_male.glb"
+      "models/chars/players/woc/wow_anims_male.glb",
+      "models/chars/players/woc/wow_autoattacks_male.glb"
     ],
     "armor": [
       "models/chars/players/woc/armor/male_hunter_medium.glb"
@@ -21902,7 +21905,8 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     ],
     "animUrls": [
       "models/chars/players/woc/anims_male.glb",
-      "models/chars/players/woc/wow_anims_male.glb"
+      "models/chars/players/woc/wow_anims_male.glb",
+      "models/chars/players/woc/wow_autoattacks_male.glb"
     ],
     "armor": [
       "models/chars/players/woc/armor/male_rogue_medium.glb"
@@ -21920,7 +21924,8 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     ],
     "animUrls": [
       "models/chars/players/woc/anims_male.glb",
-      "models/chars/players/woc/wow_anims_male.glb"
+      "models/chars/players/woc/wow_anims_male.glb",
+      "models/chars/players/woc/wow_autoattacks_male.glb"
     ],
     "armor": [
       "models/chars/players/woc/armor/male_priest_medium.glb"
@@ -21942,7 +21947,8 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     ],
     "animUrls": [
       "models/chars/players/woc/anims_male.glb",
-      "models/chars/players/woc/wow_anims_male.glb"
+      "models/chars/players/woc/wow_anims_male.glb",
+      "models/chars/players/woc/wow_autoattacks_male.glb"
     ],
     "armor": [
       "models/chars/players/woc/armor/male_shaman_medium.glb"
@@ -21960,7 +21966,8 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     ],
     "animUrls": [
       "models/chars/players/woc/anims_male.glb",
-      "models/chars/players/woc/wow_anims_male.glb"
+      "models/chars/players/woc/wow_anims_male.glb",
+      "models/chars/players/woc/wow_autoattacks_male.glb"
     ],
     "armor": [
       "models/chars/players/woc/armor/male_mage_medium.glb"
@@ -21983,7 +21990,8 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     ],
     "animUrls": [
       "models/chars/players/woc/anims_male.glb",
-      "models/chars/players/woc/wow_anims_male.glb"
+      "models/chars/players/woc/wow_anims_male.glb",
+      "models/chars/players/woc/wow_autoattacks_male.glb"
     ],
     "armor": [
       "models/chars/players/woc/armor/male_warlock_medium.glb"
@@ -22001,7 +22009,8 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     ],
     "animUrls": [
       "models/chars/players/woc/anims_male.glb",
-      "models/chars/players/woc/wow_anims_male.glb"
+      "models/chars/players/woc/wow_anims_male.glb",
+      "models/chars/players/woc/wow_autoattacks_male.glb"
     ],
     "armor": [
       "models/chars/players/woc/armor/male_druid_medium.glb"
@@ -22116,7 +22125,8 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     ],
     "animUrls": [
       "models/chars/players/woc/anims_female.glb",
-      "models/chars/players/woc/wow_anims_female.glb"
+      "models/chars/players/woc/wow_anims_female.glb",
+      "models/chars/players/woc/wow_autoattacks_female.glb"
     ],
     "armor": [
       "models/chars/players/woc/armor/female_warlock_medium.glb"

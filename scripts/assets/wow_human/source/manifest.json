@@ -1,0 +1,281 @@
+{
+  "tool": "https://github.com/Kruithne/wow.export",
+  "toolCommit": "c2fd7bde36a712be78a5da896c995b84fbfa2545",
+  "build": {
+    "Region": "us",
+    "BuildConfig": "2417084b8b041ee120d02d4adf31b0bc",
+    "CDNConfig": "ad00f88bc136373cdfe57c6bb796516b",
+    "KeyRing": "",
+    "BuildId": "70003",
+    "VersionsName": "1.15.9.70003",
+    "ProductConfig": "c9934edfc8f217a2e01c47e4deae8454",
+    "Product": "wow_classic_era"
+  },
+  "status": "Source skeletons only. Not retargeted to WOC and not deployed.",
+  "models": [
+    {
+      "sex": "male",
+      "fileDataID": 119940,
+      "modelName": "HumanMale",
+      "bones": 119,
+      "file": "human_male_autoattacks.glb",
+      "bytes": 536580,
+      "sha256": "10e5c5d1b0de2e15d162544e4f99513b4929e160dc47e1b265ed4c1423f78165",
+      "sourceSHA256": "60e1b5abae6d5620b80468935b452dba6bb3b8b74b27fb673c09e52096de6aee",
+      "clips": [
+        {
+          "name": "AttackUnarmed_0",
+          "id": 16,
+          "variation": 0,
+          "durationMs": 1000,
+          "channels": 54,
+          "keyframes": 875
+        },
+        {
+          "name": "AttackRifle_0",
+          "id": 49,
+          "variation": 0,
+          "durationMs": 1000,
+          "channels": 54,
+          "keyframes": 605
+        },
+        {
+          "name": "AttackThrown_0",
+          "id": 107,
+          "variation": 0,
+          "durationMs": 1000,
+          "channels": 54,
+          "keyframes": 841
+        },
+        {
+          "name": "AttackUnarmed_1",
+          "id": 16,
+          "variation": 1,
+          "durationMs": 1000,
+          "channels": 54,
+          "keyframes": 865
+        },
+        {
+          "name": "AttackBow_0",
+          "id": 46,
+          "variation": 0,
+          "durationMs": 1000,
+          "channels": 51,
+          "keyframes": 581
+        },
+        {
+          "name": "Attack1H_0",
+          "id": 17,
+          "variation": 0,
+          "durationMs": 1000,
+          "channels": 52,
+          "keyframes": 922
+        },
+        {
+          "name": "Attack1H_1",
+          "id": 17,
+          "variation": 1,
+          "durationMs": 1000,
+          "channels": 51,
+          "keyframes": 782
+        },
+        {
+          "name": "AttackOff_0",
+          "id": 87,
+          "variation": 0,
+          "durationMs": 1000,
+          "channels": 52,
+          "keyframes": 917
+        },
+        {
+          "name": "AttackOffPierce_0",
+          "id": 88,
+          "variation": 0,
+          "durationMs": 1000,
+          "channels": 53,
+          "keyframes": 957
+        },
+        {
+          "name": "Attack2HL_0",
+          "id": 19,
+          "variation": 0,
+          "durationMs": 1333,
+          "channels": 52,
+          "keyframes": 1185
+        },
+        {
+          "name": "Attack2HL_1",
+          "id": 19,
+          "variation": 1,
+          "durationMs": 1334,
+          "channels": 52,
+          "keyframes": 1183
+        },
+        {
+          "name": "Attack2H_0",
+          "id": 18,
+          "variation": 0,
+          "durationMs": 1333,
+          "channels": 54,
+          "keyframes": 1255
+        },
+        {
+          "name": "Attack2H_1",
+          "id": 18,
+          "variation": 1,
+          "durationMs": 1333,
+          "channels": 53,
+          "keyframes": 1159
+        },
+        {
+          "name": "Attack1HPierce_0",
+          "id": 85,
+          "variation": 0,
+          "durationMs": 1000,
+          "channels": 52,
+          "keyframes": 900
+        },
+        {
+          "name": "Attack2HL_2",
+          "id": 19,
+          "variation": 2,
+          "durationMs": 1500,
+          "channels": 52,
+          "keyframes": 1268
+        }
+      ]
+    },
+    {
+      "sex": "female",
+      "fileDataID": 119563,
+      "modelName": "HumanFemale",
+      "bones": 117,
+      "file": "human_female_autoattacks.glb",
+      "bytes": 441636,
+      "sha256": "f32710b10fc39854e50a23cf6d94b49f7800760baaa186146bb6a698f63919a0",
+      "sourceSHA256": "8e779c15684f8384f92606d347b930e7040519f862fb652fe012934561197061",
+      "clips": [
+        {
+          "name": "Attack1H_0",
+          "id": 17,
+          "variation": 0,
+          "durationMs": 1000,
+          "channels": 44,
+          "keyframes": 666
+        },
+        {
+          "name": "AttackUnarmed_0",
+          "id": 16,
+          "variation": 0,
+          "durationMs": 1000,
+          "channels": 46,
+          "keyframes": 835
+        },
+        {
+          "name": "Attack2HL_0",
+          "id": 19,
+          "variation": 0,
+          "durationMs": 1500,
+          "channels": 44,
+          "keyframes": 960
+        },
+        {
+          "name": "AttackThrown_0",
+          "id": 107,
+          "variation": 0,
+          "durationMs": 1000,
+          "channels": 47,
+          "keyframes": 694
+        },
+        {
+          "name": "AttackRifle_0",
+          "id": 49,
+          "variation": 0,
+          "durationMs": 1000,
+          "channels": 44,
+          "keyframes": 458
+        },
+        {
+          "name": "Attack1HPierce_0",
+          "id": 85,
+          "variation": 0,
+          "durationMs": 1000,
+          "channels": 44,
+          "keyframes": 680
+        },
+        {
+          "name": "AttackOffPierce_0",
+          "id": 88,
+          "variation": 0,
+          "durationMs": 1000,
+          "channels": 44,
+          "keyframes": 683
+        },
+        {
+          "name": "AttackOff_0",
+          "id": 87,
+          "variation": 0,
+          "durationMs": 1000,
+          "channels": 43,
+          "keyframes": 675
+        },
+        {
+          "name": "AttackUnarmed_1",
+          "id": 16,
+          "variation": 1,
+          "durationMs": 1000,
+          "channels": 45,
+          "keyframes": 745
+        },
+        {
+          "name": "AttackBow_0",
+          "id": 46,
+          "variation": 0,
+          "durationMs": 500,
+          "channels": 42,
+          "keyframes": 315
+        },
+        {
+          "name": "Attack1H_1",
+          "id": 17,
+          "variation": 1,
+          "durationMs": 1000,
+          "channels": 44,
+          "keyframes": 763
+        },
+        {
+          "name": "Attack2H_0",
+          "id": 18,
+          "variation": 0,
+          "durationMs": 1333,
+          "channels": 44,
+          "keyframes": 911
+        },
+        {
+          "name": "Attack2H_1",
+          "id": 18,
+          "variation": 1,
+          "durationMs": 1333,
+          "channels": 44,
+          "keyframes": 985
+        },
+        {
+          "name": "Attack2HL_1",
+          "id": 19,
+          "variation": 1,
+          "durationMs": 1500,
+          "channels": 44,
+          "keyframes": 946
+        },
+        {
+          "name": "Attack2HL_2",
+          "id": 19,
+          "variation": 2,
+          "durationMs": 1500,
+          "channels": 45,
+          "keyframes": 1150
+        }
+      ]
+    }
+  ]
+}

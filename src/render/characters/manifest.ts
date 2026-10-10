@@ -1,3 +1,4 @@
+import { wocAutoAttacksUrl } from './woc_autoattack_core';
 // Visual manifest: maps every sim identity (player class, mob template/family,
 // NPC id, druid/polymorph form) onto a rigged glTF asset + clip names + kit.
 // Pure data + dispatch — no three.js imports, no loading.
@@ -898,7 +899,7 @@ const WOC_ENV_SHEEN = 0.25;
 function wocBody(fit: WocFit): Pick<VisualDef, 'url' | 'animUrls' | 'lazyPreload'> {
   return {
     url: wocBaseUrl(fit),
-    animUrls: [wocAnimsUrl(fit), wocWowAnimsUrl(fit)],
+    animUrls: [wocAnimsUrl(fit), wocWowAnimsUrl(fit), wocAutoAttacksUrl(fit)],
     lazyPreload: true,
   };
 }

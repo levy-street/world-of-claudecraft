@@ -102,6 +102,12 @@ donor meshes, textures and addon code. Source hashes and rebuild instructions:
 `scripts/assets/wow_human/README.md`.
 
 
+The `wow_autoattacks_male.glb` and `wow_autoattacks_female.glb` libraries use
+Blizzard human attack sequences extracted from Classic Era 1.15.9.70003 with
+[wow.export](https://github.com/Kruithne/wow.export). The same redistribution
+limitations apply. Exporter revision, original file IDs and source hashes are in
+`scripts/assets/wow_human/source/manifest.json`.
+
 | Assets | Author | Source | License | Redistribution |
 |---|---|---|---|---|
 | Character models + animations (knight, mage, rogue, barbarian, hooded rogue), weapons/shields | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Adventures-1.0 | CC0 1.0 | Yes |

@@ -41,3 +41,34 @@ Recap: 36 OK, 11 changed, zero unreachable or failed. The detector stayed at
 `7a3b3e3f558b7ebc92dbdc7505bde2b9ff0a507e`. Public health and play page passed;
 both hashed public animation files matched the tested local bytes exactly.
 The follow-up browser setup correction changes tests only, not deployed code.
+
+## Classic autoattack follow-up : 2026-10-11
+
+Separate Classic Era human attack libraries now supply plain autoattacks on both
+fits. Each contains 15 retargeted source clips plus aligned dual-wield main,
+offhand and paired variants. Named abilities, wands and held-cast releases retain
+their existing paths. The libraries add 461,692 bytes to deferred entry loading.
+
+`autoattack-before.png` exercises the original one-hand strike through a named
+ability; `autoattack-after.png` exercises plain autoattack dispatch. Additional
+captures exercise dual-wield, staff, crossbow and resident bow-skin loadouts on
+the production controller, with male and female rigs shown side by side.
+
+- `node scripts/assets/wow_human/build_autoattacks.mjs`: passed; the final compressed
+  GLBs provide the contact timing table, and all paired/individual dual contacts align.
+- `npx vitest run tests/woc_autoattacks.test.ts --maxWorkers=1 --hookTimeout=60000`:
+  six passed, including both-fit shipped-asset/socket/finite-pose/contact checks and
+  same-frame dual timing regression.
+- The focused companion run passed 191 existing movement, character, export,
+  clipmap, T-pose repair and architecture tests. Its two new contact failures were
+  fixed by measuring compressed output and then passed in the command above.
+- `npx tsc --noEmit`, `npm run build`, scoped Biome and `git diff --check`: passed.
+- Production browser dispatch selects the new strikes for both fits; named cleave
+  retains its original strike, and the controller returns to the imported run.
+  Both hands return identical timing on same-frame dual attacks.
+- Selective gate passed generated-file freshness, malware scan and scoped changed
+  lint, then fell back to the full suite. That broad run was stopped; the known
+  unrelated `tests/professions_blob_growth.test.ts` failure was reproduced alone
+  (249,939 bytes against the 246,084 pin). Full gate is not green.
+- Focused frontend review completed; fixed bow selection, clean-checkout build
+  directory creation and dual contact alignment. No simulation rules changed.

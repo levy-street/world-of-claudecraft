@@ -15,3 +15,8 @@ WOC clips or their measured contact times with unrelated source gestures.
 Runtime mapping lives in `src/render/characters/woc_wow_animations.ts`.
 Tests: `tests/woc_wow_animations.test.mjs` and the existing character clip and
 entry-preload contracts. See README.md here for reproduction and provenance.
+
+Classic autoattacks now have a separate verified source under `source/` and build
+through `build_autoattacks.mjs` / `autoattack_retarget.mjs`. The Workshop limitation
+above does not apply to those Classic clips. Keep named ability and casting paths
+separate from the plain-autoattack selector, `woc_autoattack_core.ts`.

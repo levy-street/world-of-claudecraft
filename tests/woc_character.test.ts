@@ -28,6 +28,7 @@ import {
   wocArmorPackUrl,
   wocBaseUrl,
 } from '../src/render/characters/woc_armor_core';
+import { wocAutoAttacksUrl } from '../src/render/characters/woc_autoattack_core';
 import {
   WOC_PALADIN_FEMALE_MANIFEST,
   WOC_PALADIN_MANIFEST,
@@ -208,7 +209,11 @@ describe('the shipped WOC split files', () => {
       expect(manifest.fit, key).toBe(key.endsWith('_female') ? 'female' : 'male');
       expect(def.url, key).toBe(wocBaseUrl(manifest.fit));
       // Both libraries use this exact bind pose; no unretargeted donor may bind by name.
-      expect(def.animUrls, key).toEqual([wocAnimsUrl(manifest.fit), wocWowAnimsUrl(manifest.fit)]);
+      expect(def.animUrls, key).toEqual([
+        wocAnimsUrl(manifest.fit),
+        wocWowAnimsUrl(manifest.fit),
+        wocAutoAttacksUrl(manifest.fit),
+      ]);
       expect(def.lazyPreload, key).toBe(true);
       expect(def.authoredAtlas, key).toBe(true);
       expect(def.modular, key).toBeUndefined();
@@ -928,7 +933,11 @@ describe('the seven class equipment sets (2026-09-18) on the shared bodies', () 
         const key = fit === 'female' ? `player_${cls}_female` : `player_${cls}`;
         const def = VISUALS[key];
         expect(def.url, key).toBe(wocBaseUrl(fit));
-        expect(def.animUrls, key).toEqual([wocAnimsUrl(fit), wocWowAnimsUrl(fit)]);
+        expect(def.animUrls, key).toEqual([
+          wocAnimsUrl(fit),
+          wocWowAnimsUrl(fit),
+          wocAutoAttacksUrl(fit),
+        ]);
         const manifest = def.wocCharacter;
         expect(manifest, key).toBeDefined();
         if (!manifest) return;

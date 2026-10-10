@@ -44,3 +44,30 @@ their existing WOC clips because these packs do not supply matching replacements
 All nine player classes and both body fits receive the libraries. NPCs already
 using these same class definitions inherit them through the existing manifest.
 Both files join the deferred world-entry preload, not the launcher boot preload.
+
+## Classic autoattacks
+
+`node scripts/assets/wow_human/build_autoattacks.mjs` rebuilds the meshless
+`wow_autoattacks_male.glb` and `wow_autoattacks_female.glb` libraries and their
+`woc_autoattack_contacts.json` timing table. Committed `source/` inputs are the
+source-skeleton clips extracted with wow.export from Classic Era 1.15.9.70003,
+not Workshop animations. The source manifest records file IDs, hashes and the
+pinned exporter revision. The public archive.wow.tools mirror supplied the CASC
+files. These remain Blizzard-authored assets (see CREDITS.md).
+
+`autoattack_retarget.mjs` maps the separate male/female M2 skeletons onto the WOC
+bind poses, preserves limb lengths and socket transforms, and samples rotations
+at 60 Hz. M2Loader already converted the inputs to Y-up; unlike the Workshop
+models these use the same facing conversion for bind and animation. The two
+single-hand source strikes also provide the dual main/off clips; the combined
+clip uses the main strike's body and right arm plus the off strike's left arm.
+Dual-wield windups are aligned so separate and same-frame paired strikes use
+the same contact time. Contact times use the existing handslot +Y blade proxy
+within 15% to 70% of the swing, measured from the final compressed GLBs for
+each fit. The build rejects mismatched dual contacts.
+
+Runtime selection is `woc_autoattack_core.ts`. It only replaces plain autoattacks:
+ability overrides, wands and release from a held casting pose keep their existing
+path. Non-staff two-hand weapons keep the owner's existing single-fist handling;
+staves take the two-hand source strike. Ranged autos select bow or rifle by the
+displayed skin's handling. `clip_names.ts` registers these clips on each WOC rig.

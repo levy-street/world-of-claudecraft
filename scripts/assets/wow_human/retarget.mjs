@@ -98,8 +98,10 @@ export function worldPose(bones, tracks = {}, frame = 0) {
   return cache;
 }
 
-export function retargetClip(source, target, fit, clip) {
-  const pairs = PAIRS[fit];
+export function retargetClip(source, target, fit, clip, profile = {}) {
+  const pairs = profile.pairs ?? PAIRS[fit];
+  const bindAxis = profile.bindAxis ?? AXIS;
+  const animationAxis = profile.animationAxis ?? ANIM_AXIS;
   if (!pairs) throw new Error(`Unknown body fit: ${fit}`);
   const restS = worldPose(source.bones);
   const restT = worldPose(target);
@@ -112,13 +114,13 @@ export function retargetClip(source, target, fit, clip) {
     // Tiny pelvis helper offsets are not reliable anatomical aim axes.
     if (tip && name !== 'hips') {
       const td = restT.get(CHILD[name]).p.clone().sub(t.p).normalize();
-      const sd = restS.get(tip).p.clone().sub(s.p).applyQuaternion(AXIS).normalize();
+      const sd = restS.get(tip).p.clone().sub(s.p).applyQuaternion(bindAxis).normalize();
       match.premultiply(new Quaternion().setFromUnitVectors(td, sd));
     }
-    correction.set(name, s.q.clone().premultiply(AXIS).invert().multiply(match));
+    correction.set(name, s.q.clone().premultiply(bindAxis).invert().multiply(match));
   }
   const tracks = Object.fromEntries(target.map((b) => [b.name, { t: [], q: [] }]));
-  const sourceHip = restS.get(pairs.hips[0]).p.clone().applyQuaternion(AXIS);
+  const sourceHip = restS.get(pairs.hips[0]).p.clone().applyQuaternion(bindAxis);
   const targetHip = restT.get('hips').p;
   const scale = targetHip.y / sourceHip.y;
   for (let frame = 0; frame < clip.frames; frame++) {
@@ -132,11 +134,11 @@ export function retargetClip(source, target, fit, clip) {
         q = quat(b.q);
       const pair = pairs[b.name];
       if (pair) {
-        q.copy(sw.get(pair[0]).q).premultiply(ANIM_AXIS).multiply(correction.get(b.name));
+        q.copy(sw.get(pair[0]).q).premultiply(animationAxis).multiply(correction.get(b.name));
         q.premultiply(parent.q.clone().invert());
         if (b.name === 'hips') {
           p.copy(sw.get(pair[0]).p)
-            .applyQuaternion(ANIM_AXIS)
+            .applyQuaternion(animationAxis)
             .sub(sourceHip)
             .multiplyScalar(scale)
             .add(targetHip);

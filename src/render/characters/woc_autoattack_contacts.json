@@ -1,0 +1,98 @@
+{
+  "male": {
+    "WoW_AttackUnarmed_0": [
+      0.408
+    ],
+    "WoW_AttackUnarmed_1": [
+      0.425
+    ],
+    "WoW_Attack1H_0": [
+      0.458
+    ],
+    "WoW_Attack1H_1": [
+      0.625
+    ],
+    "WoW_AttackOff_0": [
+      0.558
+    ],
+    "WoW_AttackOffPierce_0": [
+      0.558
+    ],
+    "WoW_Attack2HL_0": [
+      0.525
+    ],
+    "WoW_Attack2HL_1": [
+      0.709
+    ],
+    "WoW_Attack2H_0": [
+      0.691
+    ],
+    "WoW_Attack2H_1": [
+      0.592
+    ],
+    "WoW_Attack1HPierce_0": [
+      0.325
+    ],
+    "WoW_Attack2HL_2": [
+      0.508
+    ],
+    "WoW_AutoDual#main": [
+      0.458
+    ],
+    "WoW_AutoDual#off": [
+      0.458
+    ],
+    "WoW_AutoDual": [
+      0.458,
+      0.458
+    ]
+  },
+  "female": {
+    "WoW_Attack1H_0": [
+      0.458
+    ],
+    "WoW_AttackUnarmed_0": [
+      0.442
+    ],
+    "WoW_Attack2HL_0": [
+      0.425
+    ],
+    "WoW_Attack1HPierce_0": [
+      0.392
+    ],
+    "WoW_AttackOffPierce_0": [
+      0.308
+    ],
+    "WoW_AttackOff_0": [
+      0.525
+    ],
+    "WoW_AttackUnarmed_1": [
+      0.275
+    ],
+    "WoW_Attack1H_1": [
+      0.542
+    ],
+    "WoW_Attack2H_0": [
+      0.725
+    ],
+    "WoW_Attack2H_1": [
+      0.542
+    ],
+    "WoW_Attack2HL_1": [
+      0.658
+    ],
+    "WoW_Attack2HL_2": [
+      0.475
+    ],
+    "WoW_AutoDual#main": [
+      0.458
+    ],
+    "WoW_AutoDual#off": [
+      0.458
+    ],
+    "WoW_AutoDual": [
+      0.458,
+      0.458
+    ]
+  }
+}
