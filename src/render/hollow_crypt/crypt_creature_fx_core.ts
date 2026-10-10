@@ -32,13 +32,14 @@ export function paintsOwnBreath(templateId: string): boolean {
 }
 
 /** Where the drake's jaws hang while it draws the fire up (the bar: the head
- *  reared high) and while it pours it out (the play-out: the jaws thrust low over
- *  the cone's apex), at its authored size (Breath clip, frames 56 and 66). */
-export const DRAKE_JAWS_INHALE: CreatureAnchor = { forward: 1.0, up: 14.5 };
-export const DRAKE_JAWS_EXHALE: CreatureAnchor = { forward: 5.7, up: 4.9 };
+ *  reared high over its chest) and while it pours it out (the play-out: the jaws
+ *  thrust low over the cone's apex), at its authored size (Breath clip, frames 56
+ *  and 66). */
+export const DRAKE_JAWS_INHALE: CreatureAnchor = { forward: -0.2, up: 14.0 };
+export const DRAKE_JAWS_EXHALE: CreatureAnchor = { forward: 5.9, up: 3.0 };
 /** The Knellwyrm's jaws as it pours the same breath (its own Breath clip, frame
- *  70: a lower, longer reach than the drake's), at its authored size. */
-export const KNELLWYRM_JAWS_EXHALE: CreatureAnchor = { forward: 6.5, up: 3.0 };
+ *  70), at its authored size. */
+export const KNELLWYRM_JAWS_EXHALE: CreatureAnchor = { forward: 6.1, up: 4.4 };
 /** The gargoyle's head as it rears to shriek (Screech clip). */
 export const GARGOYLE_HEAD_SCREECH: CreatureAnchor = { forward: 1.44, up: 3.47 };
 

@@ -1011,11 +1011,11 @@ export class CryptFinaleFx {
     }
     if (!wyrm || wyrm.castingAbility !== KNELLWYRM_STRAFE_RUN) return;
     // The run: fire poured from the jaws down onto the lane under and behind it
-    // (the Strafe clip's plunged jaws, 4.4 yd ahead and 4.5 up at authored size).
+    // (the Strafe clip's plunged jaws, 4.4 yd ahead and 5.9 up at authored size).
     const s = wyrm.scale || 1;
     const jx = wyrm.pos.x + Math.sin(wyrm.facing) * 4.4 * s;
     const jz = wyrm.pos.z + Math.cos(wyrm.facing) * 4.4 * s;
-    const jy = wyrm.pos.y + 4.5 * s;
+    const jy = wyrm.pos.y + 5.9 * s;
     const n = 260 * this.density * dt;
     for (let i = 0; i < Math.floor(n + this.rand()); i++) {
       const tx = jx + (this.rand() - 0.5) * 4;

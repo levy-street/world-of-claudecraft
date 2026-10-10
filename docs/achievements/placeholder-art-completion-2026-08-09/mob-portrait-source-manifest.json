@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "7830f90dff612641e3d143727094d03a212606a123a8327a2eb6d6ec4dc63e06",
+  "rendererFingerprint": "cf546e6adb3f04d66efe00db3f6ca36309107f4c6efb6957785d0870768b89ad",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "darwin",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6078994,
-      "sha256": "0966c67d64d0ba3f0be007967fd253fe2c6e1a774778ae0851e4d8d94897d26d",
+      "bytes": 6079176,
+      "sha256": "c604622577c5577522d6c0e08f376d3cfcd54e1e0c144b9ea42c225d39e616be",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -1889,8 +1889,8 @@
         "model": {
           "url": "models/creatures/woc_crypt_knellwyrm.glb",
           "path": "public/models/creatures/woc_crypt_knellwyrm.glb",
-          "bytes": 2651688,
-          "sha256": "3b60b0bc35ff1abc12b57d55c0967688c1a2a43cb741e8681b676efaf7b7af2a"
+          "bytes": 2877252,
+          "sha256": "7c09c53979c2e3a950f929b7f8695fda0bda7bf11dcb73f56bb2ae168ec24f4e"
         },
         "idle": "Idle",
         "height": 15.07,
@@ -1907,11 +1907,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "438f06ae97e129433e82d6910e6c3f2780e76b00c7d1a3a0e1c71f1b58ccb847",
+      "sourceFingerprint": "26b6f56b645b59b90fe9851f0280b1371dd5faee6eb1805ae0aac4fcb5ee11e3",
       "output": {
         "path": "public/ui/mobs/crypt_knellwyrm.webp",
-        "bytes": 2524,
-        "sha256": "2034a40f3d707524ad1444560710c4144128422980c51aac9b957a7cb5291799"
+        "bytes": 2324,
+        "sha256": "d2b45a212e510ca6021f9799a1d1e86d1033fc32e52914bc3776d4f39ba3f9ba"
       }
     },
     {
@@ -1982,13 +1982,13 @@
         "model": {
           "url": "models/creatures/woc_crypt_ossuary_drake.glb",
           "path": "public/models/creatures/woc_crypt_ossuary_drake.glb",
-          "bytes": 2604100,
-          "sha256": "cf53f6665ecd65acf25514374224308a1f6eb8c0995daef0ea30923a2b9560e6"
+          "bytes": 2721320,
+          "sha256": "b0bb89572794e4dadce865f1d6fc148e62ab78556b381c3743d6837eec7bed22"
         },
         "idle": "Idle",
         "height": 13.63,
         "yaw": null,
-        "hover": -0.03,
+        "hover": -0.034,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -2000,11 +2000,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "3ceeb01eeb43a0fa823c1f70b59c64fabeea88ed99bf077329b7b423155c399f",
+      "sourceFingerprint": "2fe811718b12ce32af1c63970e8e00adb426779eecd6a5fc44f41d24964c651b",
       "output": {
         "path": "public/ui/mobs/crypt_ossuary_drake.webp",
-        "bytes": 2196,
-        "sha256": "184c54c1a91fc717563de26fe39691501ff9ac97c991fa62dc8a530f869f78cd"
+        "bytes": 2240,
+        "sha256": "158ed77f19b6fe74323ba489e3d921e7143863b6944e8d5fbaf6dfc36b012b0e"
       }
     },
     {
