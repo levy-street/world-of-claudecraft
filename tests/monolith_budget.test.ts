@@ -1266,7 +1266,11 @@ const MONOLITHS: MonolithRow[] = [
     // already on this line composed with the weekly loot focus candidate; no
     // new sim logic lands in this resizable-map merge. Exact merged count, zero
     // slack.
-    ceiling: 11631,
+    // Down to 11629 with buff persistence composed on the release candidate:
+    // the sickness save fields moved into src/sim/aura_persist.ts's
+    // auraSaveFragment beside the new buff list, while the candidate's
+    // rift-safe corpse save path remains in sim.ts. Exact count, zero slack.
+    ceiling: 11629,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

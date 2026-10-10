@@ -83,12 +83,10 @@ export function unstuckSicknessDuration(level: number): number {
 // combat/fire_mage.ts), the operator-applied Cheater mark (src/sim/moderation/),
 // encounter-owned unbreakable control, and FLASK auras (Aura.flask, the alchemy
 // apex consumable): a flask survives DEATH, which is what makes it worth
-// carrying instead of the elixir of the same stat. Death only. Auras are
-// session state and are not persisted, so a flask does NOT survive a deliberate
-// logout, a linkdead grace that runs out (server/linkdead.ts holds a dropped
-// session in-world for its grace window, so an ordinary reconnect inside it
-// KEEPS the flask), or a realm restart; that is a deferred schema decision, not
-// an oversight here. While dead the timer pauses with every other aura
+// carrying instead of the elixir of the same stat. (A logout, a linkdead grace
+// that runs out, or a realm restart is not a wipe: buffs persist through those
+// with their timers frozen, see aura_persist.ts, the flask included, Well Fed
+// too.) While dead the timer pauses with every other aura
 // (updateAuras early-returns for a dead entity), so a death effectively extends
 // a flask by the time spent dead. None may be shed by dying; the encounter script remains
 // responsible for releasing its own control. Every other aura clears, Well Fed
