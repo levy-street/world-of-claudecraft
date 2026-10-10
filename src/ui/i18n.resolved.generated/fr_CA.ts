@@ -2774,7 +2774,8 @@ export const fr_CA: EnTranslations = {
         "battlegroundAssist": "coup fatal assisté",
         "worldKill": "élimination en monde ouvert",
         "worldAssist": "élimination en monde ouvert assistée",
-        "hillHold": "colline tenue"
+        "hillHold": "colline tenue",
+        "worldQuest": "world quest"
       },
       "floatReasons": {
         "kill": "Élimination",
@@ -2898,7 +2899,7 @@ export const fr_CA: EnTranslations = {
       "delveMark": "Marque de plongée",
       "wocToken": "Jeton WoC",
       "heroicMarkNote": "Donjons héroïques . à dépenser auprès de l'intendant héroïque",
-      "honorNote": "Champs de bataille et arène",
+      "honorNote": "Champs de bataille, arène et quêtes mondiales",
       "delveMarkNote": "Plongées terminées",
       "wocTokenNote": "Solde du portefeuille lié",
       "walletNotLinked": "Aucun portefeuille lié",

@@ -2774,7 +2774,8 @@ export const es: EnTranslations = {
         "battlegroundAssist": "golpe de gracia asistido",
         "worldKill": "muerte en el mundo abierto",
         "worldAssist": "muerte en el mundo abierto asistida",
-        "hillHold": "manteniendo la colina"
+        "hillHold": "manteniendo la colina",
+        "worldQuest": "world quest"
       },
       "floatReasons": {
         "kill": "Baja",
@@ -2898,7 +2899,7 @@ export const es: EnTranslations = {
       "delveMark": "Marca de expedición",
       "wocToken": "WoC Token",
       "heroicMarkNote": "Mazmorras heroicas . gástala con el intendente heroico",
-      "honorNote": "Campos de batalla y la arena",
+      "honorNote": "Campos de batalla, la arena y misiones de mundo",
       "delveMarkNote": "Expediciones completadas",
       "wocTokenNote": "Saldo de la cartera vinculada",
       "walletNotLinked": "Ninguna cartera vinculada",

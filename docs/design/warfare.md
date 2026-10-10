@@ -337,6 +337,13 @@ Phase 1 starts with these owner-selected values:
   against a routine 120, a ratio of 1.33x.
 - Killing blow 10, assist 4 (`BATTLEGROUND_KILL_HONOR`,
   `BATTLEGROUND_ASSIST_HONOR`).
+- The day's Honor world quests: two of the rotating world quests each realm
+  cycle pay a flat 150 Honor on completion (`WORLD_QUEST_HONOR_REWARD`,
+  `WORLD_QUEST_HONOR_SLOTS_PER_CYCLE`, `src/sim/world_quest_honor_slots.ts`).
+  The same two for the whole realm, re-picked at the realm reset with the rest
+  of the rotation, and shown on the world map hover. Owner tuning: a PvE head
+  start toward Warfare gear for players who have not queued yet, capped at 300
+  Honor a day per character since a world quest completes once per cycle.
 
 Every Thornhollow Fields award above was DOUBLED on 2026-09-25 (owner tuning,
 alongside King of the Hill's ramp) so Warfare Season 2 gear is a goal of weeks,

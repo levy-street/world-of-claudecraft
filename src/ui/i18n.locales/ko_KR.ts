@@ -767,6 +767,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.hillHold': '언덕 점거',
   'hudChrome.warfare.reasons.worldAssist': '월드 처치 도움',
   'hudChrome.warfare.reasons.worldKill': '월드 처치',
+  'hudChrome.warfare.reasons.worldQuest': '전역 퀘스트',
   'hudChrome.warfareShop.groupEntry': '워페어 시즌 1',
   'hudChrome.warfareShop.groupSeason2': '워페어 시즌 2: 선봉대',
   'hudChrome.worldPvp.aidLine':
@@ -18536,7 +18537,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.delveMark': '델브 징표',
   'hudChrome.currencies.wocToken': 'WoC 토큰',
   'hudChrome.currencies.heroicMarkNote': '영웅 던전 . 영웅 보급관에게서 사용',
-  'hudChrome.currencies.honorNote': '전장과 투기장',
+  'hudChrome.currencies.honorNote': '전장, 투기장, 전역 퀘스트',
   'hudChrome.currencies.delveMarkNote': '완료한 델브',
   'hudChrome.currencies.wocTokenNote': '연동된 지갑 잔액',
   'hudChrome.currencies.walletNotLinked': '연동된 지갑 없음',

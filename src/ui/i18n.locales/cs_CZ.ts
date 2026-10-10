@@ -495,7 +495,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factions': 'Frakce',
   'hudChrome.currencies.heroicMarkNote': 'Hrdinské dungeony . utrácej u hrdinského intendanta',
   'hudChrome.currencies.honor': 'Čest',
-  'hudChrome.currencies.honorNote': 'Bitevní pole a aréna',
+  'hudChrome.currencies.honorNote': 'Bitevní pole, aréna a světové úkoly',
   'hudChrome.currencies.intro':
     'Žádná z nich nezabírá místo v brašně. Mince zůstávají v brašně jako obvykle.',
   'hudChrome.currencies.lifetime': 'Získáno celkem: {amount}',

@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.warfare.reasons.worldQuest"
+  ],
+  "es_ES": [
+    "hudChrome.warfare.reasons.worldQuest"
+  ],
+  "fr_FR": [
+    "hudChrome.warfare.reasons.worldQuest"
+  ],
+  "fr_CA": [
+    "hudChrome.warfare.reasons.worldQuest"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.warfare.reasons.worldQuest"
+  ],
+  "de_DE": [
+    "hudChrome.warfare.reasons.worldQuest"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.warfare.reasons.worldQuest"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.warfare.reasons.worldQuest"
+  ],
+  "nl_NL": [
+    "hudChrome.warfare.reasons.worldQuest"
+  ],
+  "pl_PL": [
+    "hudChrome.warfare.reasons.worldQuest"
+  ],
+  "id_ID": [
+    "hudChrome.warfare.reasons.worldQuest"
+  ],
+  "tr_TR": [
+    "hudChrome.warfare.reasons.worldQuest"
+  ],
+  "sv_SE": [
+    "hudChrome.warfare.reasons.worldQuest"
+  ],
+  "vi_VN": [
+    "hudChrome.warfare.reasons.worldQuest"
+  ],
+  "da_DK": [
+    "hudChrome.warfare.reasons.worldQuest"
+  ]
 };

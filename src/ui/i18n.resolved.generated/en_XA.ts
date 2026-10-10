@@ -2774,7 +2774,8 @@ export const en_XA: EnTranslations = {
         "battlegroundAssist": "[ķíļļíñĝ ƀļóŵ áššíšţéð]",
         "worldKill": "[ŵóŕļð ķíļļ]",
         "worldAssist": "[ŵóŕļð ķíļļ áššíšţéð]",
-        "hillHold": "[ĥóļðíñĝ ţĥé ĥíļļ]"
+        "hillHold": "[ĥóļðíñĝ ţĥé ĥíļļ]",
+        "worldQuest": "[ŵóŕļð ɋúéšţ]"
       },
       "floatReasons": {
         "kill": "[Ķíļļ]",
@@ -2898,7 +2899,7 @@ export const en_XA: EnTranslations = {
       "delveMark": "[Ðéļʋé Ɱáŕķ]",
       "wocToken": "[ŴóÇ Ţóķéñ]",
       "heroicMarkNote": "[Ĥéŕóíç ðúñĝéóñš . šþéñð áţ ţĥé ĥéŕóíç ɋúáŕţéŕɱášţéŕ]",
-      "honorNote": "[Ɓáţţļéĝŕóúñðš áñð ţĥé áŕéñá]",
+      "honorNote": "[Ɓáţţļéĝŕóúñðš, ţĥé áŕéñá, áñð ŵóŕļð ɋúéšţš]",
       "delveMarkNote": "[Ðéļʋéš çóɱþļéţéð]",
       "wocTokenNote": "[Ļíñķéð ŵáļļéţ ƀáļáñçé]",
       "walletNotLinked": "[Ñó ŵáļļéţ ļíñķéð]",

@@ -786,6 +786,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.hillHold': 'Удержание холма',
   'hudChrome.warfare.reasons.worldAssist': 'Помощь в мировом убийстве',
   'hudChrome.warfare.reasons.worldKill': 'Мировое убийство',
+  'hudChrome.warfare.reasons.worldQuest': 'локальное задание',
   'hudChrome.warfareShop.groupEntry': 'Боевой сезон 1',
   'hudChrome.warfareShop.groupSeason2': 'Боевой сезон 2: Авангард',
   'hudChrome.worldPvp.aidLine':
@@ -18896,7 +18897,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.wocToken': 'Токен WoC',
   'hudChrome.currencies.heroicMarkNote':
     'Героические подземелья . тратится у героического интенданта',
-  'hudChrome.currencies.honorNote': 'Поля боя и арена',
+  'hudChrome.currencies.honorNote': 'Поля боя, арена и локальные задания',
   'hudChrome.currencies.delveMarkNote': 'Пройденные вылазки',
   'hudChrome.currencies.wocTokenNote': 'Баланс привязанного кошелька',
   'hudChrome.currencies.walletNotLinked': 'Кошелёк не привязан',

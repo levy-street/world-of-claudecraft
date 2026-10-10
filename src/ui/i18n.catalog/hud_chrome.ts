@@ -3350,6 +3350,8 @@ export const hudChromeStrings = {
       worldKill: 'world kill',
       worldAssist: 'world kill assisted',
       hillHold: 'holding the hill',
+      // The day's Honor world quests (src/sim/world_quest_honor_slots.ts).
+      worldQuest: 'world quest',
     },
     // Short labels for the floating text over your own character. Kept apart from
     // `reasons` above, which are mid-sentence fragments for the chat line.
@@ -3536,7 +3538,9 @@ export const hudChromeStrings = {
     delveMark: 'Delve Mark',
     wocToken: 'WoC Token',
     heroicMarkNote: 'Heroic dungeons . spend at the heroic quartermaster',
-    honorNote: 'Battlegrounds and the arena',
+    // Every Honor source a player can reach, the day's Honor world quests
+    // included (src/sim/world_quest_honor_slots.ts).
+    honorNote: 'Battlegrounds, the arena, and world quests',
     delveMarkNote: 'Delves completed',
     wocTokenNote: 'Linked wallet balance',
     walletNotLinked: 'No wallet linked',

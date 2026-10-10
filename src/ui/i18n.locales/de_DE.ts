@@ -524,7 +524,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.heroicMarkNote':
     'Heroische Dungeons . beim heroischen Quartiermeister ausgeben',
   'hudChrome.currencies.honor': 'Ehre',
-  'hudChrome.currencies.honorNote': 'Schlachtfelder und die Arena',
+  'hudChrome.currencies.honorNote': 'Schlachtfelder, die Arena und Weltquests',
   'hudChrome.currencies.intro':
     'Keine davon belegt Taschenplatz. Münze bleibt wie gewohnt in deiner Tasche.',
   'hudChrome.currencies.lifetime': 'Insgesamt {amount}',

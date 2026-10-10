@@ -497,7 +497,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factions': 'Fraktioner',
   'hudChrome.currencies.heroicMarkNote': 'Heroiske fangehuse, brug hos den heroiske kvartermester',
   'hudChrome.currencies.honor': 'Heder',
-  'hudChrome.currencies.honorNote': 'Slagmarker og arenaen',
+  'hudChrome.currencies.honorNote': 'Slagmarker, arenaen og verdensopgaver',
   'hudChrome.currencies.intro':
     'Ingen af disse tager plads i din rygsæk. Mønter bliver som altid i din rygsæk.',
   'hudChrome.currencies.lifetime': 'Levetid {amount}',

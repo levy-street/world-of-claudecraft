@@ -500,7 +500,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factions': 'Frakcje',
   'hudChrome.currencies.heroicMarkNote': 'Lochowiska heroiczne. Wydaj w kwatermistrzu heroicznym',
   'hudChrome.currencies.honor': 'Honor',
-  'hudChrome.currencies.honorNote': 'Pola Bitwy i Arena',
+  'hudChrome.currencies.honorNote': 'Pola Bitwy, Arena i zadania światowe',
   'hudChrome.currencies.intro':
     'Żadne z nich nie zajmuje miejsca w plecaku. Monety zostają w plecaku jak zawsze.',
   'hudChrome.currencies.lifetime': 'Całkowicie {amount}',

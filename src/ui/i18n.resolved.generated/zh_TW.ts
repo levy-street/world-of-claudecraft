@@ -2774,7 +2774,8 @@ export const zh_TW: EnTranslations = {
         "battlegroundAssist": "助攻擊殺",
         "worldKill": "世界擊殺",
         "worldAssist": "世界擊殺助攻",
-        "hillHold": "佔據山丘"
+        "hillHold": "佔據山丘",
+        "worldQuest": "世界任務"
       },
       "floatReasons": {
         "kill": "擊殺",
@@ -2898,7 +2899,7 @@ export const zh_TW: EnTranslations = {
       "delveMark": "探險印記",
       "wocToken": "WoC 代幣",
       "heroicMarkNote": "英雄地下城 . 在英雄軍需官處兌換",
-      "honorNote": "戰場與競技場",
+      "honorNote": "戰場、競技場與世界任務",
       "delveMarkNote": "已完成的探險",
       "wocTokenNote": "已連結錢包的餘額",
       "walletNotLinked": "未連結錢包",

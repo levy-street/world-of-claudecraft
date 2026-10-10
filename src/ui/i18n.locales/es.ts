@@ -603,7 +603,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factions': 'Facciones',
   'hudChrome.currencies.heroicMarkNote': 'Mazmorras heroicas . gástala con el intendente heroico',
   'hudChrome.currencies.honor': 'Honor',
-  'hudChrome.currencies.honorNote': 'Campos de batalla y la arena',
+  'hudChrome.currencies.honorNote': 'Campos de batalla, la arena y misiones de mundo',
   'hudChrome.currencies.intro':
     'Ninguna de estas ocupa espacio en las bolsas. Las monedas siguen en tu bolsa como siempre.',
   'hudChrome.currencies.lifetime': 'Total histórico {amount}',
