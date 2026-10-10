@@ -11166,6 +11166,10 @@ export const da_DK: EnTranslations = {
     "selectClass": "Vælg venligst en klasse.",
     "pickClass": "Vælg en klasse.",
     "returnToLogin": "Tilbage til Login",
+    "searchUpdates": "Search for updates",
+    "noUpdateFound": "No update found. Try again shortly.",
+    "updateUnavailable": "Update through your game store or download the latest client.",
+    "updateSearchFailed": "Could not check for updates. Please try again.",
     "api": {
       "tooManyAttempts": "For mange forsøg. Vent et minut og prøv igen.",
       "usernameShape": "Brugernavnet skal være på 3-24 tegn og bruge bogstaver, cifre eller understregning.",

@@ -11166,6 +11166,10 @@ export const zh_CN: EnTranslations = {
     "selectClass": "请选择一个职业。",
     "pickClass": "选择一个职业。",
     "returnToLogin": "返回登录",
+    "searchUpdates": "搜索更新",
+    "noUpdateFound": "未找到更新。请稍后再试。",
+    "updateUnavailable": "请通过游戏商店更新，或下载最新客户端。",
+    "updateSearchFailed": "无法检查更新。请重试。",
     "api": {
       "tooManyAttempts": "尝试次数过多。请等待一分钟后重试。",
       "usernameShape": "用户名必须为 3-24 个字符，并使用字母、数字或下划线。",

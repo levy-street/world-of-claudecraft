@@ -18752,4 +18752,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.letters.world_quest_reward.body':
     '你獲得這份世界任務獎勵時背包已滿，所以渡鴉把它送到了這裡。騰出空間後，可在任意渡鴉石柱領取。\n\n- 渡鴉郵局',
   'questUi.logs.worldQuestRewardMailed': '你的背包已滿。獎勵已寄送到你的郵箱：{items}。',
+  'errors.searchUpdates': '搜尋更新',
+  'errors.noUpdateFound': '未找到更新。請稍後再試。',
+  'errors.updateUnavailable': '請透過遊戲商店更新，或下載最新用戶端。',
+  'errors.updateSearchFailed': '無法檢查更新。請重試。',
 };

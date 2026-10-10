@@ -11166,6 +11166,10 @@ export const tr_TR: EnTranslations = {
     "selectClass": "Lütfen bir sınıf seçin.",
     "pickClass": "Bir sınıf seçin.",
     "returnToLogin": "Girişe Dön",
+    "searchUpdates": "Search for updates",
+    "noUpdateFound": "No update found. Try again shortly.",
+    "updateUnavailable": "Update through your game store or download the latest client.",
+    "updateSearchFailed": "Could not check for updates. Please try again.",
     "api": {
       "tooManyAttempts": "Çok fazla deneme. Bir dakika bekleyip tekrar deneyin.",
       "usernameShape": "Kullanıcı adı 3-24 karakter olmalı ve harf, rakam veya alt çizgi kullanmalıdır.",

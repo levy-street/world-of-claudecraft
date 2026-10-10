@@ -11,6 +11,7 @@ import { MOBILE_CHAT_REPLY_CLASS, START_SCREEN_OPEN_CLASS } from './ui/root_stat
 // styles both game entries; admin/guide use their own entries and inline CSS.
 import './styles/index.css';
 import { captureFirstTouch, registerAttributionPayload } from './attribution';
+import { installClientUpdate, searchClientUpdates } from './client_update_search';
 import { markEntryTightMode } from './device_memory_hint';
 import { startDiscordLogin } from './discord_login_start';
 import {
@@ -504,6 +505,7 @@ import { classDisplayName, tEntity } from './ui/entity_i18n';
 import { showEntryGuardBanner } from './ui/entry_guard_banner';
 import { refreshEpicLinkStatus, wireEpicLink } from './ui/epic_link';
 import { esc } from './ui/esc';
+import { showFatalOverlay } from './ui/fatal_overlay_controller';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
 import {
   attachGatherNodeHoverTooltip,
@@ -844,7 +846,8 @@ const otaUpdateGate = installOtaUpdateGate({
     hide: hideOtaUpdateOverlay,
   },
   isInWorld: () => document.body.classList.contains('game-active'),
-  onFatalRecoveryFailed: () => fatalOverlay(userFacingApiError(ONLINE_WORLD_INCOMPATIBLE_MESSAGE)),
+  onFatalRecoveryFailed: () =>
+    fatalOverlay(userFacingApiError(ONLINE_WORLD_INCOMPATIBLE_MESSAGE), { searchUpdates: true }),
 });
 preventMobileZoom();
 syncPhoneTouchClass();
@@ -6643,7 +6646,7 @@ async function refreshCharacters(): Promise<void> {
 
 function fatalOverlay(
   message: string,
-  opts?: { keepResumeMarker?: boolean; buttonLabel?: string },
+  opts?: { keepResumeMarker?: boolean; buttonLabel?: string; searchUpdates?: boolean },
 ): void {
   // A fatal overlay is a terminal client state whose only exit is a reload, so
   // clearing the resume marker HERE covers every present and future caller: the
@@ -6653,19 +6656,11 @@ function fatalOverlay(
   // clearing would erase THAT session's marker, so the caller opts out.
   if (!opts?.keepResumeMarker) clearPlayMarker();
   hideLoadingScreen(); // its art would bleed through the translucent backdrop
-  if (document.getElementById('disconnect-overlay')) return; // first reason wins
-  const el = document.createElement('div');
-  el.id = 'disconnect-overlay';
-  el.className = 'fatal-overlay';
-  const messageEl = document.createElement('div');
-  messageEl.textContent = message;
-  el.appendChild(messageEl);
-  const btn = document.createElement('button');
-  btn.className = 'btn';
-  btn.textContent = opts?.buttonLabel ?? t('errors.returnToLogin');
-  btn.addEventListener('click', () => location.reload());
-  el.appendChild(btn);
-  document.body.appendChild(el);
+  showFatalOverlay(message, {
+    buttonLabel: opts?.buttonLabel,
+    searchUpdates: opts?.searchUpdates ? () => searchClientUpdates(__APP_VERSION__) : undefined,
+    installUpdate: installClientUpdate,
+  });
 }
 
 // Take over a character that is still online in another session, then enter on
@@ -6818,6 +6813,7 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
     // in resume_play.ts keeps this tab from looping on the overlay forever.
     fatalOverlay(userFacingApiError(reason), {
       keepResumeMarker: reason === RECONNECT_CONFLICT_ERROR,
+      searchUpdates: reason === ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
     });
   };
   // an unexpected drop is not fatal: the server holds the character in-world

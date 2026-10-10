@@ -2879,6 +2879,7 @@ const UI_DOM_MODULES = [
   'src/ui/realm_builder_popup.ts',
   'src/ui/options_window.ts',
   'src/ui/ota_update_overlay.ts',
+  'src/ui/fatal_overlay_controller.ts',
   'src/ui/perf_metrics_sampler.ts',
   'src/ui/perf_nudge_toast.ts',
   'src/ui/perf_ornament_svg.ts',

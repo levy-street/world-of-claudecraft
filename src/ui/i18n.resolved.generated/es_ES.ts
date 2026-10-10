@@ -11166,6 +11166,10 @@ export const es_ES: EnTranslations = {
     "selectClass": "Selecciona una clase.",
     "pickClass": "Elige una clase.",
     "returnToLogin": "Volver al inicio de sesión",
+    "searchUpdates": "Search for updates",
+    "noUpdateFound": "No update found. Try again shortly.",
+    "updateUnavailable": "Update through your game store or download the latest client.",
+    "updateSearchFailed": "Could not check for updates. Please try again.",
     "api": {
       "tooManyAttempts": "Demasiados intentos. Espera un minuto y vuelve a intentarlo.",
       "usernameShape": "El usuario debe tener 3-24 caracteres y usar letras, dígitos o guion bajo.",

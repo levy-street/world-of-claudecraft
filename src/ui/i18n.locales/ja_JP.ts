@@ -19712,4 +19712,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'このワールドクエストの報酬を獲得したとき、バッグがいっぱいでした。そのため、カラスがここまで届けました。空きを作ってから、どのワタリガラスの石柱でも受け取れます。\n\n- カラス便',
   'questUi.logs.worldQuestRewardMailed':
     'バッグがいっぱいです。報酬はメールボックスに送られました: {items}。',
+  'errors.searchUpdates': '更新を検索',
+  'errors.noUpdateFound': '更新が見つかりませんでした。しばらくしてから再試行してください。',
+  'errors.updateUnavailable':
+    'ゲームストアで更新するか、最新のクライアントをダウンロードしてください。',
+  'errors.updateSearchFailed': '更新を確認できませんでした。もう一度お試しください。',
 };

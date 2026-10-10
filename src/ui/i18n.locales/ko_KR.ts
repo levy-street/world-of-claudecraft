@@ -19689,4 +19689,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이 전역 퀘스트 보상을 획득했을 때 가방이 가득 차 있어서 까마귀가 이곳으로 배달했습니다. 공간을 비운 뒤 아무 까마귀 석주에서나 받으세요.\n\n- 까마귀 우편국',
   'questUi.logs.worldQuestRewardMailed':
     '가방이 가득 찼습니다. 보상이 우편함으로 발송되었습니다: {items}.',
+  'errors.searchUpdates': '업데이트 검색',
+  'errors.noUpdateFound': '업데이트를 찾지 못했습니다. 잠시 후 다시 시도하세요.',
+  'errors.updateUnavailable': '게임 스토어에서 업데이트하거나 최신 클라이언트를 다운로드하세요.',
+  'errors.updateSearchFailed': '업데이트를 확인할 수 없습니다. 다시 시도하세요.',
 };
