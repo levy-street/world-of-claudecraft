@@ -22,7 +22,7 @@ export function restoreCharacterStorage(
   // save sanitizes to the empty locked vault): restoreVaultStateOnLoad owns the
   // whole-record replacement AND its vaultWireRev bump (the rationale sits there).
   vaultMod.restoreVaultStateOnLoad(meta, s.vault, droppedInstanceJunk, playerId);
-  meta.weeklyRewards = weeklyMod.sanitizeWeeklyRewards(s.weeklyRewards);
+  meta.weeklyRewards = weeklyMod.sanitizeWeeklyRewards(s.weeklyRewards, false, meta.cls);
 }
 
 export function savedCharacterStorage(
@@ -36,7 +36,7 @@ export function savedCharacterStorage(
     // to appear here, but an optional one would compile unpersisted; add it by hand.
     vault: vaultMod.savedVaultState(meta.vault),
     ...(meta.weeklyRewards
-      ? { weeklyRewards: weeklyMod.sanitizeWeeklyRewards(meta.weeklyRewards) }
+      ? { weeklyRewards: weeklyMod.sanitizeWeeklyRewards(meta.weeklyRewards, false, meta.cls) }
       : {}),
   };
 }

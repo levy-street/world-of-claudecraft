@@ -36,7 +36,15 @@ export function appendWeeklyLootCategory(
     group.append(title, rule);
     if (!pool.tables.length) {
       const empty = document.createElement('p');
-      empty.textContent = t('hudChrome.weeklyRewards.noLevelLoot');
+      empty.textContent = t(
+        pool.emptyReason === 'focus'
+          ? 'hudChrome.weeklyRewards.noFocusedLoot'
+          : pool.emptyReason === 'level'
+            ? 'hudChrome.weeklyRewards.noLevelLoot'
+            : pool.emptyReason === 'exhausted'
+              ? 'hudChrome.weeklyRewards.tablesExhausted'
+              : 'hudChrome.weeklyRewards.noTables',
+      );
       group.append(empty);
     }
     for (const table of pool.tables) {

@@ -15,6 +15,17 @@
 // deferred rebuild once the drag concludes.
 
 import { describe, expect, it, vi } from 'vitest';
+
+// Drag lifetime is a DOM contract; portrait GLB loading must not outlive the
+// happy-dom fixture and reject after teardown (the char_window.test.ts seam).
+vi.mock('../src/ui/portrait_chip', () => ({
+  hydratePortraits: () => undefined,
+  isComposedPortraitKey: () => false,
+  modularLookFor: () => null,
+  onPortraitUpdate: () => undefined,
+  portraitChipHtml: () => '',
+}));
+
 import { CharWindow, type CharWindowDeps } from '../src/ui/char_window';
 import { ItemDragState } from '../src/ui/item_drag_state';
 

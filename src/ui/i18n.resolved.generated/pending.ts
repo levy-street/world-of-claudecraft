@@ -9,25 +9,160 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.weeklyRewards.allClassGear",
+    "hudChrome.weeklyRewards.lootFocus",
+    "hudChrome.weeklyRewards.lootFocusHelp",
+    "hudChrome.weeklyRewards.mixedRole",
+    "hudChrome.weeklyRewards.noFocusedLoot",
+    "hudChrome.weeklyRewards.rolledFocus",
+    "hudChrome.weeklyRewards.specRole"
+  ],
+  "es_ES": [
+    "hudChrome.weeklyRewards.allClassGear",
+    "hudChrome.weeklyRewards.lootFocus",
+    "hudChrome.weeklyRewards.lootFocusHelp",
+    "hudChrome.weeklyRewards.mixedRole",
+    "hudChrome.weeklyRewards.noFocusedLoot",
+    "hudChrome.weeklyRewards.rolledFocus",
+    "hudChrome.weeklyRewards.specRole"
+  ],
+  "fr_FR": [
+    "hudChrome.weeklyRewards.allClassGear",
+    "hudChrome.weeklyRewards.lootFocus",
+    "hudChrome.weeklyRewards.lootFocusHelp",
+    "hudChrome.weeklyRewards.mixedRole",
+    "hudChrome.weeklyRewards.noFocusedLoot",
+    "hudChrome.weeklyRewards.rolledFocus",
+    "hudChrome.weeklyRewards.specRole"
+  ],
+  "fr_CA": [
+    "hudChrome.weeklyRewards.allClassGear",
+    "hudChrome.weeklyRewards.lootFocus",
+    "hudChrome.weeklyRewards.lootFocusHelp",
+    "hudChrome.weeklyRewards.mixedRole",
+    "hudChrome.weeklyRewards.noFocusedLoot",
+    "hudChrome.weeklyRewards.rolledFocus",
+    "hudChrome.weeklyRewards.specRole"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "hudChrome.weeklyRewards.allClassGear",
+    "hudChrome.weeklyRewards.lootFocus",
+    "hudChrome.weeklyRewards.lootFocusHelp",
+    "hudChrome.weeklyRewards.mixedRole",
+    "hudChrome.weeklyRewards.noFocusedLoot",
+    "hudChrome.weeklyRewards.rolledFocus",
+    "hudChrome.weeklyRewards.specRole"
+  ],
+  "de_DE": [
+    "hudChrome.weeklyRewards.allClassGear",
+    "hudChrome.weeklyRewards.lootFocus",
+    "hudChrome.weeklyRewards.lootFocusHelp",
+    "hudChrome.weeklyRewards.mixedRole",
+    "hudChrome.weeklyRewards.noFocusedLoot",
+    "hudChrome.weeklyRewards.rolledFocus",
+    "hudChrome.weeklyRewards.specRole"
+  ],
+  "zh_CN": [
+    "hudChrome.weeklyRewards.mixedRole",
+    "hudChrome.weeklyRewards.specRole"
+  ],
+  "zh_TW": [
+    "hudChrome.weeklyRewards.mixedRole",
+    "hudChrome.weeklyRewards.specRole"
+  ],
+  "ko_KR": [
+    "hudChrome.weeklyRewards.mixedRole",
+    "hudChrome.weeklyRewards.specRole"
+  ],
+  "ja_JP": [
+    "hudChrome.weeklyRewards.mixedRole",
+    "hudChrome.weeklyRewards.specRole"
+  ],
+  "pt_BR": [
+    "hudChrome.weeklyRewards.allClassGear",
+    "hudChrome.weeklyRewards.lootFocus",
+    "hudChrome.weeklyRewards.lootFocusHelp",
+    "hudChrome.weeklyRewards.mixedRole",
+    "hudChrome.weeklyRewards.noFocusedLoot",
+    "hudChrome.weeklyRewards.rolledFocus",
+    "hudChrome.weeklyRewards.specRole"
+  ],
+  "ru_RU": [
+    "hudChrome.weeklyRewards.mixedRole",
+    "hudChrome.weeklyRewards.specRole"
+  ],
+  "cs_CZ": [
+    "hudChrome.weeklyRewards.allClassGear",
+    "hudChrome.weeklyRewards.lootFocus",
+    "hudChrome.weeklyRewards.lootFocusHelp",
+    "hudChrome.weeklyRewards.mixedRole",
+    "hudChrome.weeklyRewards.noFocusedLoot",
+    "hudChrome.weeklyRewards.rolledFocus",
+    "hudChrome.weeklyRewards.specRole"
+  ],
+  "nl_NL": [
+    "hudChrome.weeklyRewards.allClassGear",
+    "hudChrome.weeklyRewards.lootFocus",
+    "hudChrome.weeklyRewards.lootFocusHelp",
+    "hudChrome.weeklyRewards.mixedRole",
+    "hudChrome.weeklyRewards.noFocusedLoot",
+    "hudChrome.weeklyRewards.rolledFocus",
+    "hudChrome.weeklyRewards.specRole"
+  ],
+  "pl_PL": [
+    "hudChrome.weeklyRewards.allClassGear",
+    "hudChrome.weeklyRewards.lootFocus",
+    "hudChrome.weeklyRewards.lootFocusHelp",
+    "hudChrome.weeklyRewards.mixedRole",
+    "hudChrome.weeklyRewards.noFocusedLoot",
+    "hudChrome.weeklyRewards.rolledFocus",
+    "hudChrome.weeklyRewards.specRole"
+  ],
+  "id_ID": [
+    "hudChrome.weeklyRewards.allClassGear",
+    "hudChrome.weeklyRewards.lootFocus",
+    "hudChrome.weeklyRewards.lootFocusHelp",
+    "hudChrome.weeklyRewards.mixedRole",
+    "hudChrome.weeklyRewards.noFocusedLoot",
+    "hudChrome.weeklyRewards.rolledFocus",
+    "hudChrome.weeklyRewards.specRole"
+  ],
+  "tr_TR": [
+    "hudChrome.weeklyRewards.allClassGear",
+    "hudChrome.weeklyRewards.lootFocus",
+    "hudChrome.weeklyRewards.lootFocusHelp",
+    "hudChrome.weeklyRewards.mixedRole",
+    "hudChrome.weeklyRewards.noFocusedLoot",
+    "hudChrome.weeklyRewards.rolledFocus",
+    "hudChrome.weeklyRewards.specRole"
+  ],
+  "sv_SE": [
+    "hudChrome.weeklyRewards.allClassGear",
+    "hudChrome.weeklyRewards.lootFocus",
+    "hudChrome.weeklyRewards.lootFocusHelp",
+    "hudChrome.weeklyRewards.mixedRole",
+    "hudChrome.weeklyRewards.noFocusedLoot",
+    "hudChrome.weeklyRewards.rolledFocus",
+    "hudChrome.weeklyRewards.specRole"
+  ],
+  "vi_VN": [
+    "hudChrome.weeklyRewards.allClassGear",
+    "hudChrome.weeklyRewards.lootFocus",
+    "hudChrome.weeklyRewards.lootFocusHelp",
+    "hudChrome.weeklyRewards.mixedRole",
+    "hudChrome.weeklyRewards.noFocusedLoot",
+    "hudChrome.weeklyRewards.rolledFocus",
+    "hudChrome.weeklyRewards.specRole"
+  ],
+  "da_DK": [
+    "hudChrome.weeklyRewards.allClassGear",
+    "hudChrome.weeklyRewards.lootFocus",
+    "hudChrome.weeklyRewards.lootFocusHelp",
+    "hudChrome.weeklyRewards.mixedRole",
+    "hudChrome.weeklyRewards.noFocusedLoot",
+    "hudChrome.weeklyRewards.rolledFocus",
+    "hudChrome.weeklyRewards.specRole"
+  ]
 };

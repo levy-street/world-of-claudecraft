@@ -937,6 +937,7 @@ export const COMMAND_NAMES = [
   // Guild custom ranks (docs/prd/guild-custom-ranks.md): the Guild Master
   // replaces the guild's rank ladder (titles, order, permissions).
   'guild_set_ranks',
+  'weekly_loot_spec',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -1032,6 +1033,7 @@ export type WorldFacet =
 export const COMMAND_FACETS = {
   weekly_reward_claim: 'IWorldBank',
   weekly_reward_open: 'IWorldBank',
+  weekly_loot_spec: 'IWorldBank',
   // IWorldCombat: ability casts, auto-attack, spirit release.
   cast: 'IWorldCombat',
   castSlot: 'IWorldCombat',

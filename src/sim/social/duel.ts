@@ -275,6 +275,16 @@ export function duelFor(ctx: SimContext, pid: number): DuelState | null {
   return duel && duel.endedTick === undefined ? duel : null;
 }
 
+export function duelInfoFor(
+  ctx: SimContext,
+  pid: number,
+): import('../../world_api').DuelInfo | null {
+  const d = duelFor(ctx, pid);
+  if (!d) return null;
+  const otherPid = d.a === pid ? d.b : d.a;
+  return { otherPid, otherName: ctx.players.get(otherPid)?.name ?? '?', state: d.state };
+}
+
 /**
  * True when `opponent` just ended a duel against `recipient` on THIS very
  * tick. A duel that ends still lingers in `ctx.duels` (see the comment on

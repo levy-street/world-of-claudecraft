@@ -1069,6 +1069,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.selectedTable': 'テーブルを{count}件選択中',
   'hudChrome.weeklyRewards.selectedTables': 'テーブルを{count}件選択中',
   'hudChrome.weeklyRewards.noLevelLoot': '現在のレベルで対象となる戦利品はありません。',
+  'hudChrome.weeklyRewards.lootFocus': '戦利品の専門分野',
+  'hudChrome.weeklyRewards.allClassGear': 'クラスの全装備',
+  'hudChrome.weeklyRewards.lootFocusHelp': '未開封の宝庫にのみ適用されます。',
+  'hudChrome.weeklyRewards.noFocusedLoot':
+    '対象の戦利品がありません。他の専門分野を選んでください。',
+  'hudChrome.weeklyRewards.rolledFocus': '抽選時の専門分野：{focus}',
   'hudChrome.weeklyRewards.tableItem': 'アイテム{count}個',
   'hudChrome.weeklyRewards.tableItemCount': 'アイテム{count}個',
   'hudChrome.weeklyRewards.previouslyRolled': '抽選済みの報酬',

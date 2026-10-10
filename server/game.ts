@@ -135,13 +135,14 @@ import {
   bankLedgerSaveEffects,
   createBankLedgerSessionJournal,
 } from './bank_ledger_session';
+import { dispatchBankStorageCommand } from './bank_storage_command';
 import {
   type BankVaultLedgerGuardCoordinator,
   type BankVaultLedgerGuardRuntime,
   createBankVaultLedgerGuardCoordinator,
   resolveBankVaultLedgerMaxAccountStates,
 } from './bank_vault_ledger_guard';
-import { dispatchBankCommand, emitBankSelfKeys, emitGuildAndWeeklySelfKeys } from './bank_wire';
+import { emitBankSelfKeys, emitGuildAndWeeklySelfKeys } from './bank_wire';
 import { reportBgOutcomes } from './battleground_telemetry';
 import type {
   BotDetector,
@@ -473,7 +474,7 @@ import { ferryDeckWire, transportHeadJson } from './transport_head';
 import { maybeTrackDay7Retained, trackLevelMilestoneCapi } from './ua_capi';
 import { recordUnstuckEvent } from './unstuck_records';
 import { buildVarkhulPortalReplayBatch, varkhulPortalReplayFrame } from './varkhul_portal_replay';
-import { dispatchVaultCommand, emitVaultSelfKeys } from './vault_wire';
+import { emitVaultSelfKeys } from './vault_wire';
 import {
   buildWhoRosterEntries,
   canShowInWho,
@@ -7631,37 +7632,18 @@ export class GameServer {
       case 'bank_unlock_socket':
       case 'bank_socket_bag':
       case 'bank_unsocket_bag':
-        dispatchBankCommand(
-          sim,
-          session,
-          command,
-          msg,
-          pid,
-          session.bankVaultLedgerGuard.admission,
-        );
-        if (bankLedgerJournalNeedsSave(session.bankLedgerJournal.outbox)) {
-          this.scheduleBankLedgerHighWaterSave(session);
-        }
-        break;
-      case 'weekly_reward_open':
-      case 'weekly_reward_claim':
-        void dispatchWeeklyRewardCommand(this, session, command, msg);
-        break;
       case 'vault_deposit':
       case 'vault_withdraw':
       case 'vault_deposit_all':
       case 'vault_buy_upgrade':
-        dispatchVaultCommand(
-          sim,
-          session,
-          command,
-          msg,
-          pid,
-          session.bankVaultLedgerGuard.admission,
+        dispatchBankStorageCommand(sim, session, command, msg, () =>
+          this.scheduleBankLedgerHighWaterSave(session),
         );
-        if (bankLedgerJournalNeedsSave(session.bankLedgerJournal.outbox)) {
-          this.scheduleBankLedgerHighWaterSave(session);
-        }
+        break;
+      case 'weekly_reward_open':
+      case 'weekly_reward_claim':
+      case 'weekly_loot_spec':
+        void dispatchWeeklyRewardCommand(this, session, command, msg);
         break;
       // Guild Bank: the five officer-plus book mutations, dispatched by
       // server/guild_bank_wire.ts (shape checks) through runGuildBankOp

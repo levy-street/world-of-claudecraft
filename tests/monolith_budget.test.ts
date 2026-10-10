@@ -1207,7 +1207,8 @@ const MONOLITHS: MonolithRow[] = [
     // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
     // with the branch's): exact count measured on the MERGED working tree
     // (wc -l after biome), never reconciled by arithmetic. Zero slack.
-    ceiling: 11642,
+    // Weekly loot focus: duel projection moves behind its existing SimContext seam.
+    ceiling: 11636,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1689,7 +1690,8 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 9827 and the
     // branch 9965; the two sides' additions compose to 9840 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 9840,
+    // Bank and vault commands share admission and save scheduling in bank_storage_command.
+    ceiling: 9822,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1868,7 +1870,8 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 5354 and the
     // branch 5426; the two sides' additions compose to 5356 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 5356,
+    // Weekly Vault self-decode joins the bank_snapshot_wire owner-only cohort.
+    ceiling: 5354,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

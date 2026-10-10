@@ -7,7 +7,8 @@ import { RAID_MIN_PLAYERS } from './item_level';
 import { heroicLootItemId } from './loot/heroic_item';
 import type { PlayerMeta } from './sim';
 import type { PlayerClass } from './types';
-import { weeklyRewardFitsClass } from './weekly_reward_eligibility';
+import { weeklyLootSpecFitsItem } from './weekly_loot_spec';
+import { weeklyRewardFitsClass, weeklyRewardItemAllowed } from './weekly_reward_eligibility';
 import type { WeeklyChoice, WeeklyPoolId, WeeklyVaultBatch } from './weekly_rewards';
 
 /** Highest recorded clear: 1 normal, 2 heroic (also unlocks normal loot). */
@@ -78,7 +79,12 @@ export function needsWeeklyBossTable(pool: WeeklyPoolId): boolean {
   );
 }
 
-export function weeklyBossLootPool(bossId: string, pool: WeeklyPoolId, cls: PlayerClass): string[] {
+export function weeklyBossLootPool(
+  bossId: string,
+  pool: WeeklyPoolId,
+  cls: PlayerClass,
+  lootSpec?: string,
+): string[] {
   const table = weeklyBossTable(bossId);
   if (!table || !needsWeeklyBossTable(pool) || !pool.startsWith(table.category)) return [];
   const heroic = pool.endsWith('_heroic');
@@ -96,9 +102,9 @@ export function weeklyBossLootPool(bossId: string, pool: WeeklyPoolId, cls: Play
       const item = ITEMS[id];
       return (
         item &&
-        ['weapon', 'armor', 'held_offhand'].includes(item.kind) &&
-        (item.quality === 'uncommon' || item.quality === 'rare' || item.quality === 'epic') &&
-        weeklyRewardFitsClass(cls, item)
+        weeklyRewardItemAllowed(item, pool) &&
+        weeklyRewardFitsClass(cls, item) &&
+        weeklyLootSpecFitsItem(cls, lootSpec, item)
       );
     })
     .sort();
@@ -109,13 +115,14 @@ export function weeklyAvailableBossTables(
   batch: WeeklyVaultBatch,
   choice: WeeklyChoice,
   cls: PlayerClass,
+  lootSpec?: string,
 ) {
   const tier = choice.pool.endsWith('_heroic') ? 2 : 1;
   const reserved = new Set(batch.choices.map((candidate) => candidate.itemId));
   return WEEKLY_BOSS_TABLES.filter(
     (table) => (batch.bossUnlocks?.[table.bossId] ?? 0) >= tier,
   ).flatMap((table) => {
-    const items = weeklyBossLootPool(table.bossId, choice.pool, cls).filter(
+    const items = weeklyBossLootPool(table.bossId, choice.pool, cls, lootSpec).filter(
       (id) => !reserved.has(id),
     );
     return items.length ? [{ ...table, items }] : [];
@@ -127,6 +134,7 @@ export function weeklyBossChoiceExhausted(
   batch: WeeklyVaultBatch,
   choice: WeeklyChoice,
   cls: PlayerClass,
+  lootSpec?: string,
 ): boolean {
   return (
     !!batch.bossUnlocks &&
@@ -134,6 +142,6 @@ export function weeklyBossChoiceExhausted(
     !choice.itemId &&
     !choice.fixed &&
     !choice.opening &&
-    !weeklyAvailableBossTables(batch, choice, cls).length
+    !weeklyAvailableBossTables(batch, choice, cls, lootSpec).length
   );
 }

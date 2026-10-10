@@ -12,6 +12,7 @@ import { esc } from './esc';
 import { captureFocusKey, FOCUS_KEY_ATTR, findFocusKey } from './focus_restore';
 import { formatDateTime, formatNumber, t } from './i18n';
 import type { PainterHostPresentation } from './painter_host';
+import { weeklyLootSpecLabel } from './weekly_reward_loot_focus_controller';
 import { appendWeeklyRewardTablePicker } from './weekly_reward_table_picker_controller';
 import { showWeeklyRewardsReadyPrompt } from './weekly_rewards_ready_prompt';
 import {
@@ -26,6 +27,7 @@ const OPEN_ACK_WAIT_MS = 2000;
 export class WeeklyRewardClaimController {
   private owner: IWorld | null = null;
   private batchKey = '';
+  private commandKey = '';
   private started = false;
   private revealed = new Set<number>();
   private tableSelections = new Map<number, string[]>();
@@ -108,7 +110,13 @@ export class WeeklyRewardClaimController {
     const available =
       availability ??
       batch.choices.map((choice) =>
-        weeklyRewardAvailability(batch, choice, world.cfg.playerClass, info.playerLevel),
+        weeklyRewardAvailability(
+          batch,
+          choice,
+          world.cfg.playerClass,
+          info.playerLevel,
+          info.state.lootSpec,
+        ),
       );
     return (
       !!batch &&
@@ -133,16 +141,27 @@ export class WeeklyRewardClaimController {
     const availability =
       batch && info
         ? batch.choices.map((choice) =>
-            weeklyRewardAvailability(batch, choice, world.cfg.playerClass, info.playerLevel),
+            weeklyRewardAvailability(
+              batch,
+              choice,
+              world.cfg.playerClass,
+              info.playerLevel,
+              info.state.lootSpec,
+            ),
           )
         : [];
     const key = this.identity();
-    if (world !== this.owner || key !== this.batchKey) {
+    // Preference revisions invalidate callbacks, but keep this week's reveal flow.
+    const batchKey = batch ? String(batch.resetAtMs) : '';
+    if (world !== this.owner || batchKey !== this.batchKey) {
       this.resetFlow();
       this.revealed.clear();
       this.owner = world;
-      this.batchKey = key;
+      this.batchKey = batchKey;
     }
+    // An acknowledged focus change rejects submissions carrying the old token.
+    if (key !== this.commandKey) this.submitted = false;
+    this.commandKey = key;
     if (!world.weeklyRewardInfo?.canClaim) this.resetFlow();
     if (batch) {
       for (const [index, choice] of batch.choices.entries()) {
@@ -286,11 +305,13 @@ export class WeeklyRewardClaimController {
           if (availability[index].exhausted) {
             const message = document.createElement('span');
             message.textContent = t(
-              availability[index].reason === 'level'
-                ? 'hudChrome.weeklyRewards.noLevelLoot'
-                : availability[index].reason === 'exhausted'
-                  ? 'hudChrome.weeklyRewards.tablesExhausted'
-                  : 'hudChrome.weeklyRewards.noTables',
+              availability[index].reason === 'focus'
+                ? 'hudChrome.weeklyRewards.noFocusedLoot'
+                : availability[index].reason === 'level'
+                  ? 'hudChrome.weeklyRewards.noLevelLoot'
+                  : availability[index].reason === 'exhausted'
+                    ? 'hudChrome.weeklyRewards.tablesExhausted'
+                    : 'hudChrome.weeklyRewards.noTables',
             );
             footer.replaceChildren(message);
             tile.classList.add('weekly-table-exhausted');
@@ -309,6 +330,14 @@ export class WeeklyRewardClaimController {
           });
           this.disposers.push(picker.dispose);
           const item = choice.opened && choice.itemId ? ITEMS[choice.itemId] : undefined;
+          if (item) {
+            const focus = document.createElement('span');
+            focus.className = 'weekly-rolled-focus';
+            focus.textContent = t('hudChrome.weeklyRewards.rolledFocus', {
+              focus: weeklyLootSpecLabel(world.cfg.playerClass, choice.lootSpec),
+            });
+            footer.append(focus);
+          }
           let revealProgress = this.revealProgress.get(index);
           if (!revealProgress) {
             revealProgress = {};
@@ -351,7 +380,14 @@ export class WeeklyRewardClaimController {
                 index,
                 setTimeout(() => {
                   this.awaitingOpen.delete(index);
-                  if (this.current(key)) this.repaint?.();
+                  // A focus acknowledgement can advance the command token while
+                  // this rejected open is still waiting. Re-enable its current tile.
+                  if (
+                    this.owner === world &&
+                    this.deps.world() === world &&
+                    this.batch()?.resetAtMs === batch.resetAtMs
+                  )
+                    this.repaint?.();
                 }, OPEN_ACK_WAIT_MS),
               );
               const table = picker.selected();

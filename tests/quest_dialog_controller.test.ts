@@ -1,6 +1,17 @@
 // @vitest-environment happy-dom
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+// The real craft-name helper is re-exported by char_window. Isolate its portrait
+// renderer dependency so this quest DOM suite cannot start background GLB loads.
+vi.mock('../src/ui/portrait_chip', () => ({
+  hydratePortraits: () => undefined,
+  isComposedPortraitKey: () => false,
+  modularLookFor: () => null,
+  onPortraitUpdate: () => undefined,
+  portraitChipHtml: () => '',
+}));
+
 import {
   INVESTIGATION_CLUES,
   INVESTIGATION_NPC_IDS,

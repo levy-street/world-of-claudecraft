@@ -2,7 +2,7 @@ import type { MaterialComposition } from '../sim/material_sources';
 import type { MaterialStackSelection } from '../sim/material_stack_selection';
 import { resolveInitialActionBarLayout } from './action_bar_restore';
 import { materialStorageTransferPayload } from './material_storage_command';
-import { decodeWeeklyRewardInfo, sendWeekly, type WeeklyRewardInfo } from './weekly_rewards_wire';
+import { sendWeekly, type WeeklyRewardInfo } from './weekly_rewards_wire';
 
 // Online play: REST auth client + WebSocket world mirror.
 
@@ -3248,13 +3248,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
       // market / mail / world PvP self-decode (W0a-covered, delta-omitted): the
       // sibling module owns the cohort and its adopt-by-reference contract. ---
       applySocialSelfWire(this, s);
-      // The four owner-only bank/vault self keys (`bank`, `vault`, `cvault`,
-      // `bpsl`): all delta-omitted, strictly decoded and applied by the sibling
-      // module, where the delta contract, the by-reference adoption rationale,
-      // and each key's malformed policy (vault clears, the rest retain) live.
+      // Owner-only storage and Weekly Vault mirrors share the delta decoder.
       applyBankSelfWire(this, s);
-      if (s.weeklyRewards !== undefined)
-        this.weeklyRewardInfo = decodeWeeklyRewardInfo(s.weeklyRewards);
       applyGuildBankSelfWire(this, s, () => this.guildBankLogMirror.reset());
       // --- IWorldDeeds / IWorldReliquary / account-ledger self-decode
       // (`deeds`/`dstats`/`reliq`/`acct` heavy-gated, `renown`/`atitle`/
@@ -4670,6 +4665,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   openWeeklyReward(choice: string, table?: string | readonly string[]): void {
     sendWeekly(this.weeklyRewardInfo, choice, 'open', (m) => this.cmd(m), table);
+  }
+  setWeeklyLootSpec(spec: string | null): void {
+    this.cmd({ cmd: 'weekly_loot_spec', spec });
   }
   vaultBuyUpgrade(): void {
     this.cmd({ cmd: 'vault_buy_upgrade' });

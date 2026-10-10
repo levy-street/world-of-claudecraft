@@ -2927,6 +2927,7 @@ const UI_DOM_MODULES = [
   'src/ui/weekly_reward_claim_controller.ts',
   'src/ui/weekly_reward_table_picker_controller.ts',
   'src/ui/weekly_reward_loot_catalog_controller.ts',
+  'src/ui/weekly_reward_loot_focus_controller.ts',
   'src/ui/weekly_rewards_ready_prompt.ts',
   'src/ui/weekly_vault_reveal_controller.ts',
   'src/ui/wiki_link.ts',

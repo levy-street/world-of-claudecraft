@@ -13,6 +13,19 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+
+// Keep the real event handler and localization, but isolate Hud's renderer
+// imports as in chat_hud_client_seam.test.ts. Portrait module initialization
+// otherwise starts GLB loads that can reject after happy-dom teardown.
+vi.mock('../src/render/characters', () => ({ CharacterPreview: class {} }));
+vi.mock('../src/render/characters/assets', () => ({ preloadMechAssets: vi.fn() }));
+vi.mock('../src/render/characters/portrait', () => ({
+  onPortraitsReady: vi.fn(),
+  onPortraitUpdate: vi.fn(),
+  playerPortraitDataUrl: vi.fn(),
+  visualPortraitDataUrl: vi.fn(),
+}));
+
 import { audio } from '../src/game/audio';
 import { ARCHETYPE_PAIR_TARGETS } from '../src/sim/professions/archetype';
 import { archetypeTitleText } from '../src/ui/char_window';

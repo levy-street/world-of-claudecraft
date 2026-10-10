@@ -9,6 +9,7 @@ import { formatNumber, t } from './i18n';
 import type { PainterHostPresentation } from './painter_host';
 import { WeeklyRewardClaimController } from './weekly_reward_claim_controller';
 import { appendWeeklyLootCategory } from './weekly_reward_loot_catalog_controller';
+import { appendWeeklyLootFocus } from './weekly_reward_loot_focus_controller';
 import { buildWeeklyRewardsView, weeklyCountdown } from './weekly_rewards_view';
 
 export const WEEKLY_TAB_ID = 'weekly-rewards-tab';
@@ -133,6 +134,7 @@ export class WeeklyRewardsTab {
     });
     const toolbar = document.createElement('div');
     toolbar.className = 'weekly-vault-toolbar';
+    appendWeeklyLootFocus(toolbar, world);
     toolbar.appendChild(lootButton);
     panel.append(toolbar, allPools);
     const status = document.createElement('p');

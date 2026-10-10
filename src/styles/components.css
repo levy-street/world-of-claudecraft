@@ -23171,7 +23171,31 @@
   }
   .weekly-vault-toolbar {
     display: flex;
-    justify-content: flex-end;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+  }
+  .weekly-loot-focus {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-sm);
+    min-width: 0;
+    flex: 1 1 280px;
+  }
+  .weekly-loot-focus .ui-input {
+    min-width: 0;
+    max-width: 100%;
+    min-height: 44px;
+    flex: 1 1 180px;
+  }
+  .weekly-loot-focus-help {
+    flex-basis: 100%;
+    font-size: 12px;
+  }
+  .weekly-rolled-focus {
+    font-size: 12px;
   }
   .weekly-possible-loot-button {
     min-height: 44px;
@@ -24398,19 +24422,13 @@
     .weekly-reset strong {
       font-size: 16px;
     }
-    .weekly-vault-toolbar {
-      position: absolute;
-      right: 18px;
-      top: 118px;
-      z-index: 2;
-    }
     .weekly-possible-loot-button {
       min-height: 30px;
       padding: 4px 12px;
       font-size: 12px;
     }
     .weekly-choice-status {
-      padding: 3px 165px 3px 0;
+      padding: 3px 0;
       font-size: 12px;
       min-height: 30px;
     }

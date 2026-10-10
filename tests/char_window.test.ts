@@ -3,6 +3,19 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+
+// Exercise the character-window DOM, not WebGL portrait capture. Real portrait
+// imports start GLB loads that can outlive happy-dom and reject in Three's
+// FileLoader after its ProgressEvent global has been removed during teardown.
+// Keep this renderer boundary inert, as in inspect_window.test.ts.
+vi.mock('../src/ui/portrait_chip', () => ({
+  hydratePortraits: () => undefined,
+  isComposedPortraitKey: () => false,
+  modularLookFor: () => null,
+  onPortraitUpdate: () => undefined,
+  portraitChipHtml: () => '',
+}));
+
 import { CRAFT_RING } from '../src/sim/content/professions';
 import { ITEMS } from '../src/sim/data';
 import { itemCopyPin } from '../src/sim/item_copy_ref';

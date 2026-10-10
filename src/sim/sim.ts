@@ -10685,10 +10685,7 @@ export class Sim {
   }
 
   get duelInfo(): import('../world_api').DuelInfo | null {
-    const d = this.duelFor(this.primaryId);
-    if (!d) return null;
-    const otherPid = d.a === this.primaryId ? d.b : d.a;
-    return { otherPid, otherName: this.players.get(otherPid)?.name ?? '?', state: d.state };
+    return duelMod.duelInfoFor(this.ctx, this.primaryId);
   }
 
   get arenaInfo(): import('../world_api').ArenaInfo | null {
@@ -10757,6 +10754,9 @@ export class Sim {
   }
   openWeeklyReward(choice: string, table?: string | readonly string[], pid?: number): void {
     weeklyMod.openWeeklyReward(this.ctx, choice, table, pid);
+  }
+  setWeeklyLootSpec(spec: string | null, pid?: number): void {
+    weeklyMod.setWeeklyLootSpec(this.ctx, spec, pid);
   }
   get vaultInfo(): import('../world_api').VaultInfo | null {
     return this.primaryId === -1 ? null : this.vaultInfoFor(this.primaryId);

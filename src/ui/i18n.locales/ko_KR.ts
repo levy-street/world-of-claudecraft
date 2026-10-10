@@ -1066,6 +1066,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.selectedTable': '전리품 목록 {count}개 선택됨',
   'hudChrome.weeklyRewards.selectedTables': '전리품 목록 {count}개 선택됨',
   'hudChrome.weeklyRewards.noLevelLoot': '현재 레벨에 맞는 전리품이 없습니다.',
+  'hudChrome.weeklyRewards.lootFocus': '전리품 전문화',
+  'hudChrome.weeklyRewards.allClassGear': '직업의 모든 장비',
+  'hudChrome.weeklyRewards.lootFocusHelp': '열지 않은 보관함에만 적용됩니다.',
+  'hudChrome.weeklyRewards.noFocusedLoot':
+    '조건에 맞는 전리품이 없습니다. 다른 전문화를 선택하세요.',
+  'hudChrome.weeklyRewards.rolledFocus': '추첨 당시 전문화: {focus}',
   'hudChrome.weeklyRewards.tableItem': '아이템 {count}개',
   'hudChrome.weeklyRewards.tableItemCount': '아이템 {count}개',
   'hudChrome.weeklyRewards.previouslyRolled': '이미 추첨된 보상',
