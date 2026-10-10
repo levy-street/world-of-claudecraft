@@ -48,8 +48,6 @@ import type { Entity } from '../types';
 import { TICK_RATE } from '../types';
 import { grantHonor } from './honor';
 import { updatePvpVitality } from './vitality';
-import { updateWorldPvpRewards, worldPvpRewardPause } from './world_pvp_rewards';
-import { sanitizeWorldPvpRewardTicks } from './world_pvp_rewards_rules';
 import {
   announceWorldPvpBountyCollected,
   clearWorldPvpBounty,
@@ -58,6 +56,8 @@ import {
   noticeWorldPvpBountyLapsed,
 } from './world_pvp_bounty';
 import { worldPvpBountyHolderMultiplier, worldPvpKillHonorPool } from './world_pvp_bounty_rules';
+import { updateWorldPvpRewards, worldPvpRewardPause } from './world_pvp_rewards';
+import { sanitizeWorldPvpRewardTicks } from './world_pvp_rewards_rules';
 import {
   WORLD_PVP_ASSIST_WINDOW,
   WORLD_PVP_DISARM_SECONDS,
