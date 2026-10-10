@@ -354,7 +354,13 @@ export function druidEngineOnCast(
     const strideDuration = longstride ? longstrideMetrics().duration : LOPING_STRIDE_DURATION;
     const strideIcd = longstride ? longstrideMetrics().icd : LOPING_STRIDE_ICD;
     if (!player.procState) player.procState = { counters: {}, icds: {} };
-    if (!player.mountKey && player.procState.icds[LOPING_STRIDE_ICD_KEY] === undefined) {
+    const mountSummonInFlight =
+      (player.mountCastRemaining ?? 0) > 0 && (player.mountCastKey ?? '') !== '';
+    if (
+      !player.mountKey &&
+      !mountSummonInFlight &&
+      player.procState.icds[LOPING_STRIDE_ICD_KEY] === undefined
+    ) {
       player.procState.icds[LOPING_STRIDE_ICD_KEY] = strideIcd;
       ctx.applyAura(player, {
         id: 'loping_stride',

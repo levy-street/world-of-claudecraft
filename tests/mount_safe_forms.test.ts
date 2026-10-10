@@ -162,10 +162,13 @@ describe('Moonwing Form in the saddle', () => {
     cast(sim, e, 'moonkin_form');
     expect(e.mountCastKey).toBe(MOUNT);
     expect((e.mountCastRemaining ?? 0) > 0).toBe(true);
+    expect(hasLopingStride(e)).toBe(false);
+    expect(e.procState?.icds.dru_loping_stride).toBeUndefined();
 
     finishSummon(sim, e);
     expect(e.mountKey).toBe(MOUNT);
     expect(inForm(e, 'form_moonkin')).toBe(true);
+    expect(moveSpeedMult(e)).toBeCloseTo(1 + MOUNTS.valorsteed.moveSpeedPct);
   });
 
   it('Cat Form still dismounts the rider', () => {
