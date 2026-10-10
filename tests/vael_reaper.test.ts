@@ -1,8 +1,10 @@
-// Vael the Fogbinder as Death (scripts/assets/sunken_bastion_creatures/reaper.py):
-// the great scythe is held, never spun. It is modelled IN the right fist and
-// parented to Hand.R, so every swing is carried by the shoulder, the elbow, the
-// spine and the floating body; the off hand closes round the snath for the heavy
-// blows. These pins decode the shipped GLB the way the game loads it (meshopt).
+// Vael the Fogbinder as Death (the art guide's model, scripts/assets/specs/
+// woc_bastion_vael.json): the great scythe is held, never spun. It is modelled IN
+// the right fist and its `scythe` bone is parented to hand.r, so every swing is
+// carried by the shoulder, the elbow, the spine and the floating body; the off hand
+// closes round the snath for the heavy blows. These pins decode the shipped GLB the
+// way the game loads it (meshopt). Lengths are in the GLB's own units (the body
+// stands about 1.8 tall in them; 3.68 yards a unit at his manifest height).
 
 import { readFileSync } from 'node:fs';
 import { type Node as GltfNode, NodeIO } from '@gltf-transform/core';
@@ -31,8 +33,8 @@ import {
 } from '../src/sim/encounters/sunken_bastion/ids';
 import type { Entity } from '../src/sim/types';
 
-const GLB = 'public/models/creatures/vael_reaper.glb';
-const FPS = 24;
+const GLB = 'public/models/creatures/woc_bastion_vael.glb';
+const FPS = 30;
 
 async function readGlb() {
   await MeshoptDecoder.ready;
@@ -122,11 +124,11 @@ function worldAt(doc: Doc, clipName: string, t: number): Map<GltfNode, THREE.Mat
  *  positive toward the blade). */
 function offHandOnShaft(doc: Doc, clip: string, t: number): { off: number; along: number } {
   const w = worldAt(doc, clip, t);
-  const scythe = w.get(node(doc, 'Scythe'));
-  const hand = w.get(node(doc, 'Hand.L'));
+  const scythe = w.get(node(doc, 'scythe'));
+  const hand = w.get(node(doc, 'hand.l'));
   if (!scythe || !hand) throw new Error('missing bones');
   const grip = new THREE.Vector3().setFromMatrixPosition(scythe);
-  // A bone's own +Y runs head to tail: the Scythe bone runs up the shaft.
+  // A bone's own +Y runs head to tail: the scythe bone runs up the shaft.
   const axis = new THREE.Vector3(0, 1, 0).transformDirection(scythe);
   const wrist = new THREE.Vector3().setFromMatrixPosition(hand);
   const rel = wrist.sub(grip);
@@ -138,8 +140,8 @@ function offHandOnShaft(doc: Doc, clip: string, t: number): { off: number; along
 const def = VISUALS[visualKeyFor({ kind: 'mob', templateId: 'vael_the_mistcaller' } as Entity)];
 
 describe('Vael, Death itself: his body and clips', () => {
-  it('draws the Blender reaper for Vael and for his shadow copies alike', () => {
-    expect(def.url).toBe('models/creatures/vael_reaper.glb');
+  it("draws the art guide's reaper for Vael and for his shadow copies alike", () => {
+    expect(def.url).toBe('models/creatures/woc_bastion_vael.glb');
     expect(visualKeyFor({ kind: 'mob', templateId: 'vael_fog_shade' } as Entity)).toBe(
       visualKeyFor({ kind: 'mob', templateId: 'vael_the_mistcaller' } as Entity),
     );
@@ -192,12 +194,12 @@ describe('Vael, Death itself: his body and clips', () => {
 });
 
 describe('Vael, Death itself: the scythe stays in his fist', () => {
-  // A Scythe bone that turns against Hand.R is the weapon swinging on its own
+  // A scythe bone that turns against hand.r is the weapon swinging on its own
   // against the hand and arm. Every key of every clip must hold the rest turn.
   it('never turns the scythe against the hand, in any clip', async () => {
     const doc = await readGlb();
-    const scythe = node(doc, 'Scythe');
-    expect(scythe.getParentNode()?.getName()).toBe('Hand.R');
+    const scythe = node(doc, 'scythe');
+    expect(scythe.getParentNode()?.getName()).toBe('hand.r');
     const rest = scythe.getRotation();
     const clips = doc.getRoot().listAnimations();
     expect(clips.length).toBeGreaterThanOrEqual(12);
@@ -224,23 +226,23 @@ describe('Vael, Death itself: the scythe stays in his fist', () => {
     // the contact beats: the sweep's cut, the chop, the flourish off the pool,
     // and the wind-up he rises out of the pool with
     for (const [clip, frame] of [
-      ['Attack', 13],
-      ['Attack2', 15],
+      ['Attack', 18],
+      ['Attack2', 18],
       ['ScytheSweep', 4],
-      ['Emerge', 15],
+      ['Emerge', 20],
     ] as const) {
       const { off, along } = offHandOnShaft(doc, clip, (frame - 1) / FPS);
-      expect(off, `${clip} wrist off the shaft`).toBeLessThan(0.45);
-      // the off hand rides the snath below the right fist, above the pommel
-      expect(along, `${clip} grip along the shaft`).toBeLessThan(-0.6);
-      expect(along, `${clip} grip along the shaft`).toBeGreaterThan(-1.7);
+      expect(off, `${clip} wrist off the shaft`).toBeLessThan(0.12);
+      // the off hand rides the snath below the right fist, above the butt
+      expect(along, `${clip} grip along the shaft`).toBeLessThan(-0.16);
+      expect(along, `${clip} grip along the shaft`).toBeGreaterThan(-0.9);
     }
   });
 
   it('leaves the off hand free while he holds the scythe at rest', async () => {
     const doc = await readGlb();
     const { off } = offHandOnShaft(doc, 'Idle', 0.5);
-    expect(off).toBeGreaterThan(1.0);
+    expect(off).toBeGreaterThan(0.27);
   });
 });
 

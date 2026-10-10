@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "2a608dfa24a64dc72fdb5209749ca2ecfc82eb3a0a769183f129285177008ecf",
+  "rendererFingerprint": "c316cae1233e2b5f01f7929e61a5dcc4d3141ddf2dfd7921b404a2160ab739c0",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "darwin",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6079182,
-      "sha256": "582f8f448ab2318564ce28fc3841a47a80526304f6b38149b75f1cdb98ee6d1f",
+      "bytes": 6079192,
+      "sha256": "bdc11b630631ee4e26191bb2d3339ebc53fc7200a37040b739c6c9b72a1bf510",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -3816,10 +3816,10 @@
       "visualKey": "bastion_ossick",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/gaoler_ossick.glb",
-          "path": "public/models/creatures/gaoler_ossick.glb",
-          "bytes": 3007028,
-          "sha256": "cc565b647613cabb093b2e344ce3fe98fbc123b9c50955e40a5f63de0cfef689"
+          "url": "models/creatures/woc_bastion_ossick.glb",
+          "path": "public/models/creatures/woc_bastion_ossick.glb",
+          "bytes": 2453388,
+          "sha256": "4c89d76a72ee3005b88a61b669c7b823c1432b18a75e22a278e77bc35b496a91"
         },
         "idle": "Idle",
         "height": 7,
@@ -3836,11 +3836,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "c4a48914b7d4099141403a59b769412ecfe166b6f204e6dcb8ed30283d90f15a",
+      "sourceFingerprint": "cb4e760b9f5d0bdd9041fff0deba7c0202ceaa1747f444562d99a161daba2d06",
       "output": {
         "path": "public/ui/mobs/gaoler_ossick.webp",
-        "bytes": 2360,
-        "sha256": "d951e15145fbc0d388b82506cc6690ca6bbb04d69255cb333df560182d5cf1a8"
+        "bytes": 2272,
+        "sha256": "f3ea0e589fefb7e7fe327227125de0656e13a022d7780eaa134d1b57276ef569"
       }
     },
     {
@@ -6188,10 +6188,10 @@
       "visualKey": "bastion_olen",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/knight_commander_olen.glb",
-          "path": "public/models/creatures/knight_commander_olen.glb",
-          "bytes": 3375088,
-          "sha256": "197e7e234cc275964473dbfd1aa9d78f8e94e22197eae2592fd3afe072ce4602"
+          "url": "models/creatures/woc_bastion_olen.glb",
+          "path": "public/models/creatures/woc_bastion_olen.glb",
+          "bytes": 2419124,
+          "sha256": "da6dcf6180bc37bd09f2cd811c09625a36e0ec30d053c8ce67ca144f10d952fe"
         },
         "idle": "Idle",
         "height": 7.4,
@@ -6208,11 +6208,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "541b9e0f7c6cb5f816994a114dcae9eb9ccc6d8cc8ed20ff76deb15e4c672f42",
+      "sourceFingerprint": "353b9ed8d658078ac40b919e124d0b465b21d9cf903c9f5076cab49af7666a5d",
       "output": {
         "path": "public/ui/mobs/knight_commander_olen.webp",
-        "bytes": 2362,
-        "sha256": "92813c3a1559c50aca0bbd01f1974076b4ccb230facfc5ac7b4ed8c33ef83ab1"
+        "bytes": 2428,
+        "sha256": "af15244de4b41bbea13424633d8f351b50c6316fb419d6a266f4534e2051bd47"
       }
     },
     {
@@ -12769,15 +12769,15 @@
       "visualKey": "bastion_vael",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/vael_reaper.glb",
-          "path": "public/models/creatures/vael_reaper.glb",
-          "bytes": 2112176,
-          "sha256": "1418e5200072668d6cb324edc35a6230cc753447e3a5e983974485ebd1e92d3f"
+          "url": "models/creatures/woc_bastion_vael.glb",
+          "path": "public/models/creatures/woc_bastion_vael.glb",
+          "bytes": 2119476,
+          "sha256": "743e4a34ac9848397ffbaefdef5ee7add16dbeb3b07f398d212754bfb5fb71f6"
         },
         "idle": "Idle",
-        "height": 9.21,
+        "height": 7.357,
         "yaw": null,
-        "hover": 0.406,
+        "hover": -0.677,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -12789,11 +12789,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "bc28feec43652168c035bd2cb0a3eab5d1459f0a5f0c18891e76ca4070df5ae8",
+      "sourceFingerprint": "3697e765187c6feab0604cd8d7c8fca06717bfccbc41434099ed0e055a927e87",
       "output": {
         "path": "public/ui/mobs/vael_fog_shade.webp",
-        "bytes": 1688,
-        "sha256": "78752010e3e92565421f5f153c02c5ba62332e40c67d08997fe020097c532d20"
+        "bytes": 2026,
+        "sha256": "a7cc6465d7e8b5bc349954b2c531eb53932a3394f26831be3875853935e04bbe"
       }
     },
     {
@@ -12803,15 +12803,15 @@
       "visualKey": "bastion_vael",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/vael_reaper.glb",
-          "path": "public/models/creatures/vael_reaper.glb",
-          "bytes": 2112176,
-          "sha256": "1418e5200072668d6cb324edc35a6230cc753447e3a5e983974485ebd1e92d3f"
+          "url": "models/creatures/woc_bastion_vael.glb",
+          "path": "public/models/creatures/woc_bastion_vael.glb",
+          "bytes": 2119476,
+          "sha256": "743e4a34ac9848397ffbaefdef5ee7add16dbeb3b07f398d212754bfb5fb71f6"
         },
         "idle": "Idle",
-        "height": 9.21,
+        "height": 7.357,
         "yaw": null,
-        "hover": 0.406,
+        "hover": -0.677,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -12823,11 +12823,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "bc28feec43652168c035bd2cb0a3eab5d1459f0a5f0c18891e76ca4070df5ae8",
+      "sourceFingerprint": "3697e765187c6feab0604cd8d7c8fca06717bfccbc41434099ed0e055a927e87",
       "output": {
         "path": "public/ui/mobs/vael_the_mistcaller.webp",
-        "bytes": 1688,
-        "sha256": "78752010e3e92565421f5f153c02c5ba62332e40c67d08997fe020097c532d20"
+        "bytes": 2026,
+        "sha256": "a7cc6465d7e8b5bc349954b2c531eb53932a3394f26831be3875853935e04bbe"
       }
     },
     {

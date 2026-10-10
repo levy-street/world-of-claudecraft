@@ -73,7 +73,7 @@ describe('Knight-Commander Olen', () => {
 
   it('wears his own sculpted body with every clip he plays', () => {
     expect(key).toBe('bastion_olen');
-    expect(def.url).toBe('models/creatures/knight_commander_olen.glb');
+    expect(def.url).toBe('models/creatures/woc_bastion_olen.glb');
     expect(def.url).not.toMatch(/skeleton/);
     expect(def.animUrls ?? []).toEqual([]);
     expect(def.attach ?? []).toEqual([]);
@@ -149,7 +149,7 @@ describe('Gaoler Ossick', () => {
 
   it('wears his own sculpted body with every clip he plays', () => {
     expect(key).toBe('bastion_ossick');
-    expect(def.url).toBe('models/creatures/gaoler_ossick.glb');
+    expect(def.url).toBe('models/creatures/woc_bastion_ossick.glb');
     expect(def.url).not.toMatch(/skeleton/);
     expect(def.animUrls ?? []).toEqual([]);
     expect(def.weaponFix ?? []).toEqual([]);

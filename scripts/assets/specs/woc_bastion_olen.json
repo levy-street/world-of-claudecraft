@@ -1,0 +1,28 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/bastion_olen_woc.glb",
+      "out": "models/creatures/woc_bastion_olen.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "CombatIdle",
+        "Walk",
+        "Run",
+        "Attack",
+        "Attack2",
+        "Attack3",
+        "Hit",
+        "Death",
+        "Stunned",
+        "Judgement",
+        "Consecrate",
+        "ShieldThrow",
+        "ShieldCatch",
+        "OathKneel",
+        "OathVigil"
+      ],
+      "maxTex": 1024
+    }
+  ]
+}
