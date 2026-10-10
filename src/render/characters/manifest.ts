@@ -5362,7 +5362,10 @@ export const VISUALS: Record<string, VisualDef> = {
   // the shield rides its own Shield bone. His blows play at 1x with their weight
   // before their speed and land on frame 18 (contacts): the chop over the shield's
   // rim, the shield driven in, and the flat reaping sweep (Attack3, his Reaping
-  // Arc); Run is the shield-first charge, and Breached he reels in Stunned.
+  // Arc); Run is the shield-first charge, and Breached he reels in Stunned. Out
+  // of the fight he carries the greatsword shouldered, standing or walking (one
+  // hold, so it never flips); dying he lets the sword and the shield go, goes to
+  // his knees and falls face down, both lying flat beside him.
   bastion_olen: {
     url: `${CREATURES}/woc_bastion_olen.glb`,
     // Drawn over the sergeant (7.2) and the Turnkey (8.3) at his 1.2: about 8.9.
@@ -5433,6 +5436,9 @@ export const VISUALS: Record<string, VisualDef> = {
   // own OssickAnchorBack bone, stays hidden while his thrown one lies on a victim:
   // bastion_gaol_fx.ts re-sends the gestures), ShackleHeave snatches the shackles
   // off his hip and heaves them, CudgelSlam brings the cudgel down on the flags.
+  // The cudgel rides his shoulder standing as on the walk (one hold in every
+  // clip); dying he goes to his knees and falls on his face, the cudgel let go
+  // and lying beside him.
   bastion_ossick: {
     url: `${CREATURES}/woc_bastion_ossick.glb`,
     // Hunched, yet over the Turnkey (8.3) and Olen (8.9) at his 1.4: about 9.8.
@@ -5482,7 +5488,8 @@ export const VISUALS: Record<string, VisualDef> = {
   // `hover` floats his shroud's hem 0.4 over the flags, the scythe's butt resting in
   // them. The Shadow Crossing's bar sinks him through the floor (Vanish) and rises
   // him out of the pool (Emerge); the sweep off the pool is his flourish, fired by
-  // the Reaping Scythe's cue.
+  // the Reaping Scythe's cue. Dying he lets the scythe and the lantern go, sits
+  // back hard and falls flat on his back, the shroud spread on the flags.
   bastion_vael: {
     url: `${CREATURES}/woc_bastion_vael.glb`,
     height: 7.357,

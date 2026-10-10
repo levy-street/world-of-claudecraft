@@ -193,9 +193,14 @@ describe('Vael, Death itself: his body and clips', () => {
   });
 });
 
+/** His Death holds the scythe through frame 6 and lets it go on frame 7 (seconds at 30 fps). */
+const DEATH_LETS_GO = 5 / 30;
+
 describe('Vael, Death itself: the scythe stays in his fist', () => {
   // A scythe bone that turns against hand.r is the weapon swinging on its own
-  // against the hand and arm. Every key of every clip must hold the rest turn.
+  // against the hand and arm. Every key of every clip must hold the rest turn,
+  // save his Death once the scythe slips from his fist on frame 7 (it falls and
+  // lies flat beside him: tests/sunken_bastion_boss_poses.test.ts).
   it('never turns the scythe against the hand, in any clip', async () => {
     const doc = await readGlb();
     const scythe = node(doc, 'scythe');
@@ -208,8 +213,10 @@ describe('Vael, Death itself: the scythe stays in his fist', () => {
       for (const ch of clip.listChannels()) {
         if (ch.getTargetNode() !== scythe || ch.getTargetPath() !== 'rotation') continue;
         const out = ch.getSampler()?.getOutput();
-        if (!out) continue;
+        const times = ch.getSampler()?.getInput();
+        if (!out || !times) continue;
         for (let i = 0; i < out.getCount(); i++) {
+          if (clip.getName() === 'Death' && times.getElement(i, [])[0] > DEATH_LETS_GO) continue;
           const q = out.getElement(i, []);
           const len = Math.hypot(q[0], q[1], q[2], q[3]);
           const unit = q.map((v) => v / len);
