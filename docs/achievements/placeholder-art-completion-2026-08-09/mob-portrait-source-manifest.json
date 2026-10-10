@@ -1237,8 +1237,8 @@
         "model": {
           "url": "models/creatures/woc_crypt_cantor_ilvane.glb",
           "path": "public/models/creatures/woc_crypt_cantor_ilvane.glb",
-          "bytes": 2130968,
-          "sha256": "30df5dcd43fea6882be5cb07e046cf0b20947ba689826ecac6345a332ca14b44"
+          "bytes": 2132556,
+          "sha256": "8cf96f0bb8d6e4cac8e6f2fda28610c8f0be2fa25bcdb9dd4a8ee93d137ad2d4"
         },
         "idle": "Idle",
         "height": 5.964,
@@ -1255,7 +1255,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "82eec6e178e2dcc0ebed63979b7f081ff201489b5fe3ef98e2ca1f24aaf736a8",
+      "sourceFingerprint": "7b18828055c1c298f925b6cba11cea666d9db7d4f23f3e07439a72e8d452b08f",
       "output": {
         "path": "public/ui/mobs/cantor_ilvane.webp",
         "bytes": 2044,
@@ -1686,8 +1686,8 @@
         "model": {
           "url": "models/creatures/woc_crypt_gargoyle.glb",
           "path": "public/models/creatures/woc_crypt_gargoyle.glb",
-          "bytes": 2553440,
-          "sha256": "74e263a4a99f202406b25da1f8e1bd4df89f6e45ffd713d6420676cf0d96f4a9"
+          "bytes": 2553476,
+          "sha256": "b16cd028d44d3ec1e6c03c2cfd93e26efbb321a08aee25f5e6cb174c54b1b22f"
         },
         "idle": "Perch",
         "height": 5.81,
@@ -1704,7 +1704,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "2fdfd974d6b392c21fffc7b1bc5874f14a5d53223468cb739549f36168c23851",
+      "sourceFingerprint": "25f51e18f23094395d5b30ca864c156be0d930b4b4c17ef24d56927043741ed2",
       "output": {
         "path": "public/ui/mobs/crypt_chapel_gargoyle.webp",
         "bytes": 2644,
@@ -9999,8 +9999,8 @@
         "model": {
           "url": "models/creatures/woc_crypt_lady_bonechill.glb",
           "path": "public/models/creatures/woc_crypt_lady_bonechill.glb",
-          "bytes": 1418664,
-          "sha256": "84e3cadb636e02a8739527e0a7ec14389a77c18d2bf7d48978909790fa969e57"
+          "bytes": 1418492,
+          "sha256": "8cea55c607de19032b3176ef77f32b442b018629123aadab332795147c06506d"
         },
         "idle": "Idle",
         "height": 6.749,
@@ -10017,7 +10017,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "5d5fc6dab446536002be9859971e8ab351e336b6e5edc7960b57957882b5cc9e",
+      "sourceFingerprint": "b3ce339fa8e420e705ae15006eb0b81a0a91e4b9ce47814f02969a2833c2ac3e",
       "output": {
         "path": "public/ui/mobs/rimeweb.webp",
         "bytes": 2336,
