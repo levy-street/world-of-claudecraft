@@ -2150,6 +2150,7 @@ export const sv_SE: EnTranslations = {
       }
     },
     "options": {
+      "spellTooltipOnHover": "Spell Tooltips on Hover",
       "clickMoveLeft": "Vänsterklick",
       "clickMoveRight": "Högerklick",
       "version": "v{version} ({build})",

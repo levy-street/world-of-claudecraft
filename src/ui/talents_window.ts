@@ -298,7 +298,11 @@ export class TalentsWindow {
       for (const exEl of Array.from(panel.querySelectorAll<HTMLElement>('.ts-ex'))) {
         const id = exEl.dataset.ability ?? '';
         exEl.setAttribute('aria-label', signatureName(id));
-        this.deps.attachTooltip(exEl, () => this.deps.abilityTooltip(id) ?? esc(signatureName(id)));
+        this.deps.attachTooltip(
+          exEl,
+          () => this.deps.abilityTooltip(id) ?? esc(signatureName(id)),
+          () => true,
+        );
       }
       // Every panel gets a View talents button: it commits the spec if needed and
       // jumps to the Choices tab. The selected spec's button reads as primary.

@@ -15,7 +15,7 @@ import { svgIcon } from './ui_icons';
 export interface DeathRecapDialogDeps {
   root?: () => HTMLElement | null;
   getLatestRecap(): DeathRecapRecord | null;
-  attachTooltip(el: HTMLElement, html: () => string): void;
+  attachTooltip(el: HTMLElement, html: () => string, isSpell?: () => boolean): void;
   hideTooltip(): void;
   previewResolvedAbility?(id: string): ResolvedAbility | null;
   abilityTooltip?(res: ResolvedAbility): string;
@@ -201,7 +201,11 @@ export class DeathRecapDialog {
       const idx = Number.parseInt(cardEl.dataset.cardIndex ?? '-1', 10);
       const card = cards[idx];
       if (!card) return;
-      this.deps.attachTooltip(cardEl, () => this.generateCardTooltip(card));
+      this.deps.attachTooltip(
+        cardEl,
+        () => this.generateCardTooltip(card),
+        () => !!card.abilityId,
+      );
     });
   }
 

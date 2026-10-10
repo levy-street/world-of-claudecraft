@@ -2150,6 +2150,7 @@ export const vi_VN: EnTranslations = {
       }
     },
     "options": {
+      "spellTooltipOnHover": "Spell Tooltips on Hover",
       "clickMoveLeft": "Nhấp Trái",
       "clickMoveRight": "Nhấp Phải",
       "version": "phiên bản {version} ({build})",

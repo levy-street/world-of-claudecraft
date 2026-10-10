@@ -553,7 +553,8 @@ const MONOLITHS: MonolithRow[] = [
     // Ferry announcement history moved to zone_announcement_core; the map
     // keeps tracking physical zone changes while notices wait for docking.
     // Exact merged count after #4413 composed with the current release batch.
-    ceiling: 18146,
+    // Tooltip event wiring moved into tooltip_binding.ts; keep zero headroom.
+    ceiling: 18007,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

@@ -2150,6 +2150,7 @@ export const zh_CN: EnTranslations = {
       }
     },
     "options": {
+      "spellTooltipOnHover": "悬停时显示法术提示",
       "clickMoveLeft": "左键",
       "clickMoveRight": "右键",
       "version": "v{version}（{build}）",

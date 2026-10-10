@@ -2459,6 +2459,7 @@ export const hudChromeStrings = {
     },
   },
   options: {
+    spellTooltipOnHover: 'Spell Tooltips on Hover',
     clickMoveLeft: 'Left Click',
     clickMoveRight: 'Right Click',
     // Running client version + build id, shown as small secondary text at the foot

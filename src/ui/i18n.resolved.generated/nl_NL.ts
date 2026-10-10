@@ -2150,6 +2150,7 @@ export const nl_NL: EnTranslations = {
       }
     },
     "options": {
+      "spellTooltipOnHover": "Spell Tooltips on Hover",
       "clickMoveLeft": "Linkermuisklik",
       "clickMoveRight": "Rechtermuisklik",
       "version": "v{version} ({build})",

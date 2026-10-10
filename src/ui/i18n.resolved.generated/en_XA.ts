@@ -2150,6 +2150,7 @@ export const en_XA: EnTranslations = {
       }
     },
     "options": {
+      "spellTooltipOnHover": "[Šþéļļ Ţóóļţíþš óñ Ĥóʋéŕ]",
       "clickMoveLeft": "[Ļéƒţ Çļíçķ]",
       "clickMoveRight": "[Ŕíĝĥţ Çļíçķ]",
       "version": "[ʋ{version} ({build})]",

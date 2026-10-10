@@ -2150,6 +2150,7 @@ export const it_IT: EnTranslations = {
       }
     },
     "options": {
+      "spellTooltipOnHover": "Spell Tooltips on Hover",
       "clickMoveLeft": "Clic sinistro",
       "clickMoveRight": "Clic destro",
       "version": "v{version} ({build})",

@@ -431,6 +431,8 @@ export const BOOL_SETTINGS = {
   // separate detailed target-aura panel. Off by default so the tooltip stays
   // uncluttered until a player opts in.
   showAuraCaster: { def: false },
+  // Mouse hover only; keyboard focus and touch inspection stay available.
+  spellTooltipOnHover: { def: true },
   // on by default: Clique-style mouseover casting. Pressing an action-bar key
   // for a friendly (heal/buff) ability while the cursor is over a party frame
   // casts it on the hovered member without touching the current target (read

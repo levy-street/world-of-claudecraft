@@ -2150,6 +2150,7 @@ export const id_ID: EnTranslations = {
       }
     },
     "options": {
+      "spellTooltipOnHover": "Spell Tooltips on Hover",
       "clickMoveLeft": "Klik Kiri",
       "clickMoveRight": "Klik Kanan",
       "version": "v{version} ({build})",

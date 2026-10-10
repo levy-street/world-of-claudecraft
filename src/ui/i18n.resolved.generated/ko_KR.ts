@@ -2150,6 +2150,7 @@ export const ko_KR: EnTranslations = {
       }
     },
     "options": {
+      "spellTooltipOnHover": "마우스를 올리면 주문 툴팁 표시",
       "clickMoveLeft": "왼쪽 클릭",
       "clickMoveRight": "오른쪽 클릭",
       "version": "v{version} ({build})",

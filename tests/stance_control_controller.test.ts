@@ -243,7 +243,8 @@ describe('StanceBarController chooses the shape', () => {
     expect(buttons[0].classList.contains('is-on')).toBe(true);
     expect(buttons[0].querySelector('.ui-socket-art')).not.toBeNull();
     expect(buttons[0].getAttribute('aria-pressed')).toBe('true');
-    expect(buttons[0].title).toBe(`name:${STANCES[0]}`);
+    expect(buttons[0].getAttribute('aria-label')).toBe(`name:${STANCES[0]}`);
+    expect(buttons[0].hasAttribute('title')).toBe(false);
     buttons[1].click();
     expect(rig.casts).toEqual([STANCES[1]]);
   });

@@ -2681,6 +2681,7 @@ const UI_DOM_MODULES = [
   // Mints the "restoring graphics" status line and toggles it on the context
   // restore hold's edges.
   'src/ui/graphics_restore_note_controller.ts',
+  'src/ui/tooltip_binding.ts',
   'src/ui/error_toast_controller.ts',
   'src/ui/boot_splash.ts',
   'src/ui/frame_presets_live.ts',

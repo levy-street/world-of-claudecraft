@@ -155,7 +155,6 @@ export class StanceBarController {
       btn.className = BUTTON_CLASS;
       if (slot.active) btn.classList.add(ACTIVE_CLASS, 'is-on');
       btn.setAttribute(ARIA_PRESSED_ATTR, slot.active ? 'true' : 'false');
-      btn.title = name;
       btn.setAttribute('aria-label', name);
       const icon = document.createElement('span');
       icon.className = ICON_CLASS;

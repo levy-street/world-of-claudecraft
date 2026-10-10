@@ -311,6 +311,24 @@ describe('Settings', () => {
     expect(b.get('mouseCamera')).toBe(true);
   });
 
+  it('defaults spell hover tooltips on and persists disabling them across reloads', () => {
+    const s = new Settings();
+    expect(s.get('spellTooltipOnHover')).toBe(true);
+    s.set('spellTooltipOnHover', false);
+    expect(new Settings().get('spellTooltipOnHover')).toBe(false);
+  });
+
+  it('enables spell hover tooltips for older settings and restores their default on reset', () => {
+    localStorage.setItem('woc_settings', JSON.stringify({ cameraSpeed: 0.5 }));
+    const s = new Settings();
+    expect(s.get('spellTooltipOnHover')).toBe(true);
+    s.set('spellTooltipOnHover', false);
+    s.reset(['spellTooltipOnHover']);
+    expect(s.get('spellTooltipOnHover')).toBe(true);
+    expect(new Settings().get('spellTooltipOnHover')).toBe(true);
+    expect(s.get('cameraSpeed')).toBe(0.5);
+  });
+
   it('defaults left-handed touch off and persists it across instances', () => {
     const a = new Settings();
     expect(a.get('leftHandedTouch')).toBe(false);

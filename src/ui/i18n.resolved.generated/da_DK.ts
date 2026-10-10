@@ -2150,6 +2150,7 @@ export const da_DK: EnTranslations = {
       }
     },
     "options": {
+      "spellTooltipOnHover": "Spell Tooltips on Hover",
       "clickMoveLeft": "Venstreklik",
       "clickMoveRight": "Højreklik",
       "version": "v{version} ({build})",

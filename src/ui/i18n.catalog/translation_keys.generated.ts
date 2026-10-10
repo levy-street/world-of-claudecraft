@@ -12316,6 +12316,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.options.showWalletOnCharacterScreen'
   | 'hudChrome.options.showWalletOnPlayerCard'
   | 'hudChrome.options.spellEffects'
+  | 'hudChrome.options.spellTooltipOnHover'
   | 'hudChrome.options.startAttackOnAbility'
   | 'hudChrome.options.stickyTarget'
   | 'hudChrome.options.stopAutoAttackOnTargetSwitch'
