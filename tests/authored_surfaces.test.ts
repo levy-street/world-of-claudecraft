@@ -227,12 +227,13 @@ const AUTHORED_ATLAS_DEFS = [
   'bastion_drowned_anchor',
   'bastion_turnkey',
   'crypt_morthen_lich',
-  // the Hollow Crypt's Blender Sexton Marrow (the skeletal gravedigger)
+  // the Hollow Crypt's bosses on the art guide's models: Sexton Marrow (the skeletal
+  // gravedigger), the Lady of the Bonechill (the frozen bride's ghost), Cantor Ilvane
+  // (the skeletal choir mistress), and the rime egg sacs the Lady's spiders hatch from
   'crypt_skel_sexton',
-  // the Hollow Crypt's Lady of the Bonechill (the frozen bride's ghost)
   'crypt_lady_bonechill',
-  // the Hollow Crypt's Blender Cantor Ilvane (the skeletal choir mistress)
   'crypt_skel_cantor',
+  'crypt_rime_egg_sac',
   // the art guide's skeleton minion (Tripo P2, rigged in Blender) on its three keys
   'skel_minion',
   'delve_skel_wraith',

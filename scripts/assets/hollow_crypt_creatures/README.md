@@ -1,5 +1,12 @@
 # Hollow Crypt creatures
 
+> Superseded for the Chapel Gargoyle, the Ossuary Drake, the Knellwyrm, Sexton Marrow,
+> Cantor Ilvane and the Lady of the Bonechill: each now ships the art guide's model
+> (concept, Tripo P2, a skeleton and every clip built in Blender), as
+> `public/models/creatures/woc_crypt_*.glb` from `scripts/assets/specs/woc_crypt_*.json`.
+> The builds below are kept for the Carrion Crow, Morthen and as reference; their
+> output GLBs for the replaced creatures are no longer in the repo.
+
 The Chapel Gargoyle, the Carrion Crow and the Ossuary Drake of the Hollow Crypt
 trash (`src/sim/content/hollow_crypt_trash.ts`), modelled, rigged and animated in
 Blender from code, in the chunky KayKit style of the rest of the cast:

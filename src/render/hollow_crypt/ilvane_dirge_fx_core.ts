@@ -27,8 +27,9 @@ export const DIRGE_RADIUS = ILVANE_TUNING.dirgeRadius;
 export const DIRGE_WAVE_SECONDS = 0.6;
 export const DIRGE_WAVE_LINGER = 1.1;
 
-/** Height (yd over her floor) of her voice: the beams and the burst leave it. */
-export const DIRGE_VOICE_Y = 3.1;
+/** Height (yd over her floor) of her voice, at her heart where the song rises
+ *  (the Sing clip's chest at its peak): the beams and the burst leave it. */
+export const DIRGE_VOICE_Y = 4.4;
 
 export interface DirgeSwell {
   /** The aura's radius and height round her (yd). */

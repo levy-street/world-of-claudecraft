@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "5c486a09aa68dc419d2953c01f35909a5ab63881521da6ae2cd2fb2cebd70958",
+  "rendererFingerprint": "7830f90dff612641e3d143727094d03a212606a123a8327a2eb6d6ec4dc63e06",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "darwin",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6078964,
-      "sha256": "c7cf0842fb9749f17c47e9fe23d90cdbab686b3a0be623ad3fae4841add6939a",
+      "bytes": 6078994,
+      "sha256": "0966c67d64d0ba3f0be007967fd253fe2c6e1a774778ae0851e4d8d94897d26d",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -1235,15 +1235,15 @@
       "visualKey": "crypt_skel_cantor",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/crypt_cantor_ilvane.glb",
-          "path": "public/models/creatures/crypt_cantor_ilvane.glb",
-          "bytes": 3040532,
-          "sha256": "6965eaae050feb4a39082a39b5142df7aa25b5e13bcc4f994aeceb011a7cc04a"
+          "url": "models/creatures/woc_crypt_cantor_ilvane.glb",
+          "path": "public/models/creatures/woc_crypt_cantor_ilvane.glb",
+          "bytes": 2119020,
+          "sha256": "d217ab288e6e74270cbe22e8f1c8954140684fefa2eb98715c4c422f61ab5883"
         },
         "idle": "Idle",
         "height": 5.964,
         "yaw": null,
-        "hover": null,
+        "hover": -0.206,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -1255,11 +1255,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "0d18a35c34ebb6ae7c0a9db8d3ba73eaa3f74ccbd3c2925942ac4641ad372d88",
+      "sourceFingerprint": "b7106a9dd1fb9b9f1c8257096bdef04f4d5703d5469457e23c8e4f4ea193d31c",
       "output": {
         "path": "public/ui/mobs/cantor_ilvane.webp",
-        "bytes": 2778,
-        "sha256": "c14cf720973cffbbf1f562f58f1a77fbecf50dad6a9c2103f52571cbdfdbf03b"
+        "bytes": 2044,
+        "sha256": "e8d0b12bedd489038d143b9bf34484b56d597b5bd2295c1e843734b3c05bbb2e"
       }
     },
     {
@@ -1684,15 +1684,15 @@
       "visualKey": "mob_crypt_gargoyle",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/crypt_gargoyle.glb",
-          "path": "public/models/creatures/crypt_gargoyle.glb",
-          "bytes": 1982324,
-          "sha256": "6ce1811d4c3a86180074ce40ebf61734318077a732d5b7f440510820ad76387a"
+          "url": "models/creatures/woc_crypt_gargoyle.glb",
+          "path": "public/models/creatures/woc_crypt_gargoyle.glb",
+          "bytes": 2546916,
+          "sha256": "2070353481d53819140bdca0295e79150ae9e26a8fef9dad3f4aca4056958ff0"
         },
         "idle": "Perch",
         "height": 5.81,
         "yaw": null,
-        "hover": -0.22,
+        "hover": 0.043,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -1704,11 +1704,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "7d01f5eeca2cf6b4c9e5d2725d2337f6b642df6f9a3a586f925678b11730f5f4",
+      "sourceFingerprint": "28a1923aef245a5d34fba9bb414486675390c9822509906430bf015379611d94",
       "output": {
         "path": "public/ui/mobs/crypt_chapel_gargoyle.webp",
-        "bytes": 2136,
-        "sha256": "6c8d406b24dc11c6e24de64ddc9025051d8f4b158403b0b12c29b93a93fd756b"
+        "bytes": 2644,
+        "sha256": "9dcdde8035b36ffbcc4529f18ce5620b3f374d9086e844e5c60a1c6756073a21"
       }
     },
     {
@@ -1887,15 +1887,15 @@
       "visualKey": "mob_crypt_knellwyrm",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/crypt_knellwyrm.glb",
-          "path": "public/models/creatures/crypt_knellwyrm.glb",
-          "bytes": 2513888,
-          "sha256": "82514cd4fc812833e767011bf7cb9ddc2fab17cd0d1802558a9d96491340ae8e"
+          "url": "models/creatures/woc_crypt_knellwyrm.glb",
+          "path": "public/models/creatures/woc_crypt_knellwyrm.glb",
+          "bytes": 2651688,
+          "sha256": "3b60b0bc35ff1abc12b57d55c0967688c1a2a43cb741e8681b676efaf7b7af2a"
         },
         "idle": "Idle",
         "height": 15.07,
         "yaw": null,
-        "hover": -0.19,
+        "hover": 0,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -1907,11 +1907,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "4e69ad0929fdf136a39722950b6fb85b81741db3e9b6428bcf3f85de1ef74134",
+      "sourceFingerprint": "438f06ae97e129433e82d6910e6c3f2780e76b00c7d1a3a0e1c71f1b58ccb847",
       "output": {
         "path": "public/ui/mobs/crypt_knellwyrm.webp",
-        "bytes": 2394,
-        "sha256": "303fca978a0494e9e3f8bedc756efca8e7f50e2449cd801bf15b4b0608c6574a"
+        "bytes": 2524,
+        "sha256": "2034a40f3d707524ad1444560710c4144128422980c51aac9b957a7cb5291799"
       }
     },
     {
@@ -1980,15 +1980,15 @@
       "visualKey": "mob_crypt_drake",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/crypt_drake.glb",
-          "path": "public/models/creatures/crypt_drake.glb",
-          "bytes": 2424492,
-          "sha256": "9521ffb529f0262d40aedb2c30a2dad3fdaa2767ba9c534861705c60f68e0607"
+          "url": "models/creatures/woc_crypt_ossuary_drake.glb",
+          "path": "public/models/creatures/woc_crypt_ossuary_drake.glb",
+          "bytes": 2604100,
+          "sha256": "cf53f6665ecd65acf25514374224308a1f6eb8c0995daef0ea30923a2b9560e6"
         },
         "idle": "Idle",
         "height": 13.63,
         "yaw": null,
-        "hover": -0.19,
+        "hover": -0.03,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -2000,11 +2000,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "8fa4864c8760f8e11b5ecaa98a1ba0d491581f1734dde3d5861a0ac448c3d381",
+      "sourceFingerprint": "3ceeb01eeb43a0fa823c1f70b59c64fabeea88ed99bf077329b7b423155c399f",
       "output": {
         "path": "public/ui/mobs/crypt_ossuary_drake.webp",
-        "bytes": 2578,
-        "sha256": "7aada61df46bdc235fa9c8c4f185b053782e88676ce2525c204277395c36b094"
+        "bytes": 2196,
+        "sha256": "184c54c1a91fc717563de26fe39691501ff9ac97c991fa62dc8a530f869f78cd"
       }
     },
     {
@@ -9892,34 +9892,34 @@
       "id": "rime_egg_sac",
       "family": "spider",
       "finderEncounter": false,
-      "visualKey": "mob_spider",
+      "visualKey": "crypt_rime_egg_sac",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/spider.glb",
-          "path": "public/models/creatures/spider.glb",
-          "bytes": 130436,
-          "sha256": "5becf8b6510f0620ff473becc29c6567f7ae32fc1bd9f42e0b647599aa6ed6de"
+          "url": "models/creatures/woc_crypt_rime_egg_sac.glb",
+          "path": "public/models/creatures/woc_crypt_rime_egg_sac.glb",
+          "bytes": 2029940,
+          "sha256": "0230798c51b379cb2e2ba97bd19f0c6cdb6edb6c82bfe28337eed3d7ad28126c"
         },
-        "idle": "Spider_Idle",
-        "height": 1.4,
+        "idle": "Idle",
+        "height": 2.2,
         "yaw": null,
         "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.35
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#cfe3f0",
-        "strength": 0.35
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "707a31fb8e4fba4ba73865807c324f791b9271ede1a1a0a01fcd4306dea1ab5b",
+      "sourceFingerprint": "b4e2bc26eea7e8f4ea2fca6af57abb6113f3a0dc7efe537316224f627ccdb51b",
       "output": {
         "path": "public/ui/mobs/rime_egg_sac.webp",
-        "bytes": 1742,
-        "sha256": "1dc21e23d28d14de6a42c1bda3f197b80e1ea5d96789d3f3cbcddc5ead2e0bbc"
+        "bytes": 2020,
+        "sha256": "4494a7917222ede6e4bf6b8b036416f0dbcbfce28f35f473b7e415ac42d6f0d9"
       }
     },
     {
@@ -9997,10 +9997,10 @@
       "visualKey": "crypt_lady_bonechill",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/crypt_lady_bonechill.glb",
-          "path": "public/models/creatures/crypt_lady_bonechill.glb",
-          "bytes": 2790900,
-          "sha256": "ded31e9ecd95dcf092ed07464e7f787e8fd82bec0629e5454bf31518e1bb71cf"
+          "url": "models/creatures/woc_crypt_lady_bonechill.glb",
+          "path": "public/models/creatures/woc_crypt_lady_bonechill.glb",
+          "bytes": 1409828,
+          "sha256": "9931a1b9a65bc9658670d97420cebd0032ec7c3ebbfed09b3ec63e4d78dabe80"
         },
         "idle": "Idle",
         "height": 6.749,
@@ -10017,11 +10017,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "47d8bfcfeaf1babf8b8777f4b411aeb3280d8a5d4fdb84fe5dc1fbadfa7fe25f",
+      "sourceFingerprint": "6c877d91d499602bf1d40c4abefb2acda6a97a335ffb0d08da49059d8f146072",
       "output": {
         "path": "public/ui/mobs/rimeweb.webp",
-        "bytes": 2088,
-        "sha256": "081953c34264317a160bb563a41a785e7d0765d26e4cfaa21d1b3dd488d8110f"
+        "bytes": 2336,
+        "sha256": "6d20fb466925bf428b41be6ee81a14d4ce5473d7777e9c278b22e7aa2e3e1d19"
       }
     },
     {
@@ -10337,15 +10337,15 @@
       "visualKey": "crypt_skel_sexton",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/crypt_sexton_marrow.glb",
-          "path": "public/models/creatures/crypt_sexton_marrow.glb",
-          "bytes": 2998000,
-          "sha256": "0267ad5663dae8b2afbed02321e5cd2572a82de664b183086cd21799771b3870"
+          "url": "models/creatures/woc_crypt_sexton_marrow.glb",
+          "path": "public/models/creatures/woc_crypt_sexton_marrow.glb",
+          "bytes": 2143268,
+          "sha256": "65438ff1d6f2fdaedf664aba377f3724799c2eceec1220ee9269be3f3fd9ca7b"
         },
         "idle": "Idle",
-        "height": 5.783,
+        "height": 5.975,
         "yaw": null,
-        "hover": -0.038,
+        "hover": -0.56,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -10357,11 +10357,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "246ce277297008e314821b4dee303f3fdca1f540ea3cdee0e1dfee86146ecadd",
+      "sourceFingerprint": "9633b4825a62a6b9a068460c589a4cd72c1196ec7cc2fffbf4cbb719cc2bf368",
       "output": {
         "path": "public/ui/mobs/sexton_marrow.webp",
-        "bytes": 2380,
-        "sha256": "a1064e5a0b6ea955fbc3e0b2af195b8c0c5e3b3b2607e889f4df97deee8e0914"
+        "bytes": 2060,
+        "sha256": "aca0f0670c310b6ff08c806c37417db1c94e42afc36addc0699200ea2d407f64"
       }
     },
     {

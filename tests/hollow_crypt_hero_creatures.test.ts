@@ -330,7 +330,7 @@ describe('the hero creatures on screen', () => {
       };
       return (json.animations ?? []).map((a) => a.name);
     };
-    expect(names('public/models/creatures/crypt_drake.glb')).toEqual(
+    expect(names('public/models/creatures/woc_crypt_ossuary_drake.glb')).toEqual(
       expect.arrayContaining([
         'Idle',
         'Walk',
@@ -349,7 +349,7 @@ describe('the hero creatures on screen', () => {
         'Death',
       ]),
     );
-    expect(names('public/models/creatures/crypt_gargoyle.glb')).toEqual(
+    expect(names('public/models/creatures/woc_crypt_gargoyle.glb')).toEqual(
       expect.arrayContaining([
         'Perch',
         'Ready',
@@ -481,7 +481,7 @@ describe('Ossuary Drake: the Barrowflame reads as fire, never ice', () => {
 
 describe('the Knellwyrm: its own body and its own moves', () => {
   it('ships the drake set plus TakeWing, Strafe and Bellow, mapped to its mechanics', () => {
-    const buf = readFileSync('public/models/creatures/crypt_knellwyrm.glb');
+    const buf = readFileSync('public/models/creatures/woc_crypt_knellwyrm.glb');
     const len = buf.readUInt32LE(12);
     const json = JSON.parse(buf.subarray(20, 20 + len).toString('utf8')) as {
       animations?: { name: string }[];

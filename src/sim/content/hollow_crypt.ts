@@ -95,6 +95,7 @@ export const HOLLOW_CRYPT_MOBS: Record<string, MobTemplate> = {
       chainDelay: 0.3,
       proximityRadius: 4,
       hatchMobId: 'rimeweb_hatchling',
+      burstSchool: 'frost',
     },
   },
   // The hatchlings pounce the soft targets (healer or damage dealer first).

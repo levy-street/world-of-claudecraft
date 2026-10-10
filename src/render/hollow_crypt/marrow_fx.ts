@@ -622,9 +622,9 @@ export class MarrowFx implements CryptBossPainter {
     if (ringing && this.ringStart < 0) this.ringStart = h.clock();
     if (!ringing) this.ringStart = -1;
     const pull = ringing ? ropePull(h.clock() - this.ringStart) : 0;
-    // The rope's foot rides his fists as he hauls (the BellRing clip's wrists:
-    // about 5.25 yd up at the top of a pull, 4.0 at the bottom).
-    const foot = gy + 4.0 + (1 - pull) * 1.25;
+    // The rope's foot rides his fists as he hauls (the BellRing clip's lower fist:
+    // about 6.3 yd up at the top of a pull, 4.2 at the bottom).
+    const foot = gy + 4.2 + (1 - pull) * 2.1;
     const top = gy + BELL_MOUTH_OVER_YARD;
     this.rope.position.set(x, foot, z);
     this.rope.scale.set(1, top - foot, 1);
@@ -677,7 +677,7 @@ export class MarrowFx implements CryptBossPainter {
       const u = h.rand();
       h.glow.emit(h.clock(), {
         x: marrow.pos.x + (t.pos.x - marrow.pos.x) * u,
-        y: gy + 3.6 + (ty + 1.6 - gy - 3.6) * u,
+        y: gy + 4.3 + (ty + 1.6 - gy - 4.3) * u,
         z: marrow.pos.z + (t.pos.z - marrow.pos.z) * u,
         vx: 0,
         vy: 0.3,
