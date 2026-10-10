@@ -122,6 +122,20 @@ ratings.
   income"; tests: `tests/world_pvp.test.ts`, `tests/world_pvp_rules.test.ts`,
   `tests/world_pvp_zones.test.ts`, `tests/world_pvp_server_dispatch.test.ts`,
   and the matcher round trip in `tests/world_pvp_view.test.ts`.
+- `world_pvp_bounty_rules.ts` owns the World PvP bounty PURE rules: the streak
+  that earns one (`WORLD_PVP_BOUNTY_STREAK`), the doubled pool a holder's death
+  pays (`worldPvpKillHonorPool`) and the holder's own per-victim honor curve
+  (`worldPvpBountyHolderMultiplier` over `WORLD_PVP_BOUNTY_HOLDER_DR`). No ctx,
+  no rng, no clock. `world_pvp_bounty.ts` owns the SYSTEM half: the streak and
+  the bounty on `PlayerMeta.worldPvp` (session-only, never persisted),
+  `Entity.bounty` as the display mirror written ONLY there (the `bty` entity
+  wire bit, `server/entity_status_wire.ts` / `src/net/entity_status_wire.ts`),
+  and the realm and holder notices the client matcher re-localizes (the
+  `worldPvp.bounty*` rows in `src/ui/sim_i18n.ts`). Its two callers are
+  `world_pvp.ts`'s death hook (any death ends a bounty; a paid kill builds a
+  flagged contributor's streak) and its disarm pass (the flag dropping ends
+  it). Numbers: `docs/design/warfare.md`, "World PvP bounties"; tests:
+  `tests/world_pvp_bounty.test.ts`.
 - `warfare_quartermaster.ts` spawns Warmarshal Draven Kole, the Highwatch
   WARFARE honor vendor, under his RESERVED entity id
   (`WARFARE_QUARTERMASTER_ENTITY_ID`, `1_000_000_002`, the singleton band

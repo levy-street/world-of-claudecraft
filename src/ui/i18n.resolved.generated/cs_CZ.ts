@@ -4236,6 +4236,7 @@ export const cs_CZ: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "PRYČ",
       "pvpTag": "PvP",
+      "bountyTag": "Bounty",
       "cheaterTag": "< Podvodník >",
       "pledgeTag": "Přísaha cechu {guild}",
       "npcRoleTag": "<{role}>",

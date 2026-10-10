@@ -4236,6 +4236,7 @@ export const ja_JP: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "退席",
       "pvpTag": "PvP",
+      "bountyTag": "賞金首",
       "cheaterTag": "< チーター >",
       "pledgeTag": "{guild}への誓約者",
       "npcRoleTag": "<{role}>",

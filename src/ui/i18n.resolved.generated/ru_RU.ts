@@ -4236,6 +4236,7 @@ export const ru_RU: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "pvpTag": "PvP",
+      "bountyTag": "Розыск",
       "cheaterTag": "< Читер >",
       "pledgeTag": "Присяга: {guild}",
       "npcRoleTag": "<{role}>",

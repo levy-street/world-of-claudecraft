@@ -767,6 +767,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.windowScale': 'Масштаб окна',
   'hudChrome.meters.windowScaleDesc': 'Увеличивает или уменьшает общий масштаб счётчика.',
   'hudChrome.nameplate.pvpTag': 'PvP',
+  'hudChrome.nameplate.bountyTag': 'Розыск',
   'hudChrome.options.frameRateCapSixty': '60',
   'hudChrome.options.frameRateCapThirty': '30',
   'hudChrome.options.gfxGhostFade': 'Просвечивание препятствий',

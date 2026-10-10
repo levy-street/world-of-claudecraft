@@ -4236,6 +4236,7 @@ export const zh_TW: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "暫離",
       "pvpTag": "PvP",
+      "bountyTag": "懸賞",
       "cheaterTag": "< 作弊者 >",
       "pledgeTag": "{guild}的宣誓者",
       "npcRoleTag": "<{role}>",

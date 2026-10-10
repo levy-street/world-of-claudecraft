@@ -252,6 +252,7 @@ import {
   harvestBandForNode,
   harvestTierForNode,
 } from './economy_telemetry';
+import { writeEntityStatusWire } from './entity_status_wire';
 import { isUpdateDue } from './entity_update_cadence';
 // Imported from the mirror modules DIRECTLY (not the ./steam or ./epic
 // barrels), the same way deeds_records imports onDeedRecorded: the barrels
@@ -1389,8 +1390,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   if (e.ghost) out.gh = 1; // released spirit (ghost form); renders translucent
   if (e.lootable) out.loot = 1;
   if (e.hostile) out.h = 1;
-  if (e.afk) out.ak = 1; // /afk display bit: other clients tag the nameplate + presence dot
-  if (e.pvpFlag) out.pvp = 1; // /pvp flag bit: nameplate + target-frame hostility colour
+  writeEntityStatusWire(e, out); // the /afk, /pvp and bounty display bits
   // The target frame's resource bar: type + current/max, sent only for entities
   // that HAVE a resource (players and caster mobs; a resource-less wolf omits all
   // three and the frame hides its bar). The rounded res keeps an idle entity's

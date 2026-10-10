@@ -752,6 +752,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.windowScale': 'ウィンドウのスケール',
   'hudChrome.meters.windowScaleDesc': 'メーター全体のスケールを拡大・縮小します。',
   'hudChrome.nameplate.pvpTag': 'PvP',
+  'hudChrome.nameplate.bountyTag': '賞金首',
   'hudChrome.options.frameRateCapSixty': '60',
   'hudChrome.options.frameRateCapThirty': '30',
   'hudChrome.options.gfxGhostFade': 'カメラゴースト',

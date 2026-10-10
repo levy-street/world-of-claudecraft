@@ -726,6 +726,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.windowScale': '窗口缩放',
   'hudChrome.meters.windowScaleDesc': '增大或减小统计窗口的整体缩放。',
   'hudChrome.nameplate.pvpTag': 'PvP',
+  'hudChrome.nameplate.bountyTag': '悬赏',
   'hudChrome.options.frameRateCapSixty': '60',
   'hudChrome.options.frameRateCapThirty': '30',
   'hudChrome.options.gfxGhostFade': '遮挡渐隐',

@@ -727,6 +727,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.windowScale': '視窗縮放',
   'hudChrome.meters.windowScaleDesc': '增加或減少統計面板的整體縮放比例。',
   'hudChrome.nameplate.pvpTag': 'PvP',
+  'hudChrome.nameplate.bountyTag': '懸賞',
   'hudChrome.options.frameRateCapSixty': '60',
   'hudChrome.options.frameRateCapThirty': '30',
   'hudChrome.options.gfxGhostFade': '鏡頭穿透淡出',

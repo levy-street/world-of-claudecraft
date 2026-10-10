@@ -5617,6 +5617,10 @@ export const hudChromeStrings = {
     afkTag: 'AFK',
     // The World PvP flag tag, same bracket convention as afkTag.
     pvpTag: 'PvP',
+    // The World PvP bounty tag (src/sim/pvp/world_pvp_bounty.ts), same bracket
+    // convention: the non-colour read of the blood-red bounty name tag. Wordy
+    // (M16), so the five non-Latin fills ship in this same change.
+    bountyTag: 'Bounty',
     // The operator-applied Cheater sanction (src/sim/moderation/), resolved for
     // the nameplate and the target frame through src/ui/cheater_tag.ts. Unlike
     // afkTag the brackets are part of the VALUE, so a locale that punctuates a

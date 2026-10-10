@@ -605,6 +605,55 @@ and nothing here draws rng, so the offline Sim, the server and the headless env
 resolve every kill identically (`tests/world_pvp.test.ts`,
 `tests/world_pvp_rules.test.ts`, `tests/world_pvp_zones.test.ts`).
 
+## World PvP bounties
+
+A hot streak in the open world earns a price on its owner's head
+(`src/sim/pvp/world_pvp_bounty.ts`, rules in `world_pvp_bounty_rules.ts`): the
+King of the Hill's "worth taking" incentive, carried off the hill to every
+flagged player, so playing with the flag up pays more and so does hunting the
+players who do.
+
+- Earning one: a FLAGGED player paid for `WORLD_PVP_BOUNTY_STREAK` (5) world
+  kills in a row without dying earns a bounty. Any kill that actually PAID the
+  contributor counts, the killing blow or an assist; a kill that paid nothing (a
+  grey kill, a fully decayed repeat, an assist whose share of a large group's
+  split floors to zero) counts for nothing, which keeps the streak honest
+  against camping and zerg-farming. An assist credited after the contributor
+  already died never restarts the streak their own death ended.
+  The realm is told whose head carries one, and the holder is told what it
+  means. Every player can carry a bounty at the same time: it is a mark a
+  streak earns for itself, never a single realm prize that passes between
+  players.
+- The mark: the holder's whole name tag (the name row with its tags, the
+  guild or pledge line and the deed title) paints blood red on every client
+  (`Entity.bounty`, the `bty` bit of the entity wire, painted by
+  `src/render/nameplate_tag_fill_core.ts`), darker than the hostile-name red so
+  the two never read alike, and the name carries a `<Bounty>` tag as the
+  non-colour cue (forced colours and colour blindness both flatten the red).
+  The chips that mean something else keep their own colour (the AI chip, the
+  Cheater sanction, the badges).
+- The holder's own kills: the per-victim curve is `WORLD_PVP_BOUNTY_HOLDER_DR`
+  (1.5, 1, 0.5, then 0) instead of `HONOR_REPEAT_DR` (1, 0.5, 0.25, then 0), so
+  a solo holder is paid 15, then 10, then 5 honor for the first three kills of
+  one victim inside the hour where an ordinary player gets 10, 5 and 2 (owner
+  spec). The fourth still pays nothing. Gold stays on the ordinary curve: a
+  bounty never raises what a victim's purse is charged.
+- Killing a holder: the honor pool of that kill is doubled
+  (`WORLD_PVP_BOUNTY_KILL_HONOR_MULT`, 2: 20 instead of 10), split among the
+  contributors exactly like the ordinary pool, and the realm is told who
+  collected the bounty (the killing blow when it was paid, else the first paid
+  assist; a kill that paid nobody collects nothing and only tells the holder it
+  lapsed). The bounty does not pass to the killer. A holder who kills a holder
+  takes both rules at once: a solo kill pays floor(20 x 1.5) = 30.
+- Ending one: any death ends the streak and the bounty, a world kill or not, and
+  so does the flag coming down (a holder can never step out of reach and keep
+  the better curve). A lapse that was not a world kill tells only the holder.
+- Session-only: the streak and the bounty live on `PlayerMeta.worldPvp` beside
+  the flag but are never persisted, so a relog ends a streak the way a death
+  does (which only ever costs the holder). No rng, sim clock only
+  (`tests/world_pvp_bounty.test.ts`, `tests/nameplate_bounty.test.ts`,
+  `tests/entity_status_wire.test.ts`).
+
 ## King of the Hill
 
 Once every `HILL_WINDOW_SECONDS` (three hours) a hill rises somewhere in one of

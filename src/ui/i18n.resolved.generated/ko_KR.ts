@@ -4236,6 +4236,7 @@ export const ko_KR: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "자리비움",
       "pvpTag": "PvP",
+      "bountyTag": "현상금",
       "cheaterTag": "< 부정행위자 >",
       "pledgeTag": "{guild} 서약자",
       "npcRoleTag": "<{role}>",

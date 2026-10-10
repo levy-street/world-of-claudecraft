@@ -12123,6 +12123,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.mounts.title'
   | 'hudChrome.mounts.useToRide'
   | 'hudChrome.nameplate.afkTag'
+  | 'hudChrome.nameplate.bountyTag'
   | 'hudChrome.nameplate.cheaterTag'
   | 'hudChrome.nameplate.mobEliteLevel'
   | 'hudChrome.nameplate.mobLevel'

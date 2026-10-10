@@ -1592,8 +1592,8 @@ export function handleDeath(
     ctx.bgOnPlayerDeath(e, killer);
     // World PvP: a flagged player's death in the open world moves the gold
     // stake and pays the honor pool to everyone who worked for the kill. Pure
-    // ledger arithmetic on the sim clock, zero rng; a no-op for every death
-    // that was not a flagged player's at a flagged player's hands.
+    // ledger arithmetic on the sim clock, zero rng. Every other death only
+    // ends the victim's kill streak and any bounty it earned.
     worldPvpOnPlayerDeath(ctx, e, killer);
     for (const m of ctx.entities.values()) {
       if (m.kind === 'mob' && !m.dead && m.aggroTargetId === e.id && m.aiState !== 'dead') {

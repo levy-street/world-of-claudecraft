@@ -4236,6 +4236,7 @@ export const da_DK: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "pvpTag": "PvP",
+      "bountyTag": "Bounty",
       "cheaterTag": "< Snyder >",
       "pledgeTag": "Løfte til {guild}",
       "npcRoleTag": "<{role}>",

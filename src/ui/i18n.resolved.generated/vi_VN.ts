@@ -4236,6 +4236,7 @@ export const vi_VN: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "VắngMặt",
       "pvpTag": "PvP",
+      "bountyTag": "Bounty",
       "cheaterTag": "< Kẻ Gian Lận >",
       "pledgeTag": "Trung Thành Với {guild}",
       "npcRoleTag": "<{role}>",

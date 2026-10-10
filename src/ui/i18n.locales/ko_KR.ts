@@ -748,6 +748,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.windowScale': '창 크기',
   'hudChrome.meters.windowScaleDesc': '측정기 전체 크기를 늘리거나 줄입니다.',
   'hudChrome.nameplate.pvpTag': 'PvP',
+  'hudChrome.nameplate.bountyTag': '현상금',
   'hudChrome.options.frameRateCapSixty': '60',
   'hudChrome.options.frameRateCapThirty': '30',
   'hudChrome.options.gfxGhostFade': '카메라 투과',

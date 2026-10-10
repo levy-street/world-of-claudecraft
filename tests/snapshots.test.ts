@@ -6088,6 +6088,8 @@ function dirtyEveryDeltaField(): {
   // World PvP: the wpvp self readout (meta) and the pvp entity bit (entity).
   meta.worldPvp = { flagged: true, disarmAt: null, kills: 2, deaths: 1 };
   sim.entities.get(lp)!.pvpFlag = true;
+  // World PvP bounty: the bty entity bit (server/entity_status_wire.ts).
+  sim.entities.get(lp)!.bounty = true;
   // King of the Hill: a hill stands (in a free-for-all zone the leader is not
   // in), so the hill self readout rides the snapshot.
   spawnHillNow(sim.ctx);
@@ -6578,6 +6580,7 @@ describe('full self-state snapshot delta fixture', () => {
       enabled: true,
     });
     expect(client.player.pvpFlag).toBe(true);
+    expect(client.player.bounty).toBe(true); // bty -> e.bounty (entity_status_wire.ts)
     // hill -> hillInfo (social_self_wire.ts): the standing hill from the
     // leader's seat (outside its zone, so the live fields are zero; the
     // fixture leader is ungrouped, so counts as a group of one).

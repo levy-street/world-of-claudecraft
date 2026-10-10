@@ -4236,6 +4236,7 @@ export const it_IT: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "pvpTag": "PvP",
+      "bountyTag": "Bounty",
       "cheaterTag": "< Baro >",
       "pledgeTag": "Giuramento a {guild}",
       "npcRoleTag": "<{role}>",
