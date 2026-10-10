@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from 'vitest';
-import { assetsReady } from '../../src/render/assets/preload';
+import { assetsReady, beginDeferredPreloads } from '../../src/render/assets/preload';
 import type { AnimState } from '../../src/render/characters/anim_state';
 import { prepareVisual } from '../../src/render/characters/assets';
 import { CharacterVisual } from '../../src/render/characters/visual';
@@ -21,6 +21,8 @@ const IDLE: AnimState = {
 
 describe('Shardpike real asset and mixer dispatch', () => {
   beforeAll(async () => {
+    // Match world entry: player bodies and their donor clips are deferred.
+    beginDeferredPreloads();
     await assetsReady();
   }, 60_000);
   it.each(['player_warrior', 'player_mage', 'player_priest', 'player_rogue'])(

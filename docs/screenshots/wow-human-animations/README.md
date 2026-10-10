@@ -14,6 +14,8 @@ origin/feature/v045-integration at 0eb25c44e96:
 - `npx vitest run tests/woc_wow_animations.test.mjs tests/woc_character.test.ts tests/woc_entry_preload.test.ts tests/character_clipmaps.test.ts tests/character_tpose_repair.test.ts --maxWorkers=2 --hookTimeout=30000` : 105 passed. Increased hook timeout accommodates concurrent work on this machine.
 - `npx tsc --noEmit` : passed.
 - `npm run build` : passed, including localization, guide and media generation.
+- `npm run test:browser -- tests/browser/shardpike_throw.browser.test.ts`: four passed after matching its setup to the real deferred world-entry preload.
+- Architecture and localization guard tests: 163 passed, three skipped.
 - Explicit Biome checks of changed/new JavaScript and TypeScript : passed.
 - `GATE_SELECT_BASE=origin/feature/v045-integration node scripts/gate_select.mjs`: generated-file freshness and malware scan pass. The fallback full suite failed the unrelated `professions_blob_growth.test.ts` save-size assertion (249,939 versus pinned 246,084 bytes). Stopped that broad run after the failure and reproduced it alone. No simulation or persistence files changed. Full gate is not green.
 
@@ -32,3 +34,10 @@ regression caught and eliminated 30 Hz resampling distortion.
 
 Shipping libraries contain 36 clips per fit: 341,388 male bytes and 355,936
 female bytes. Twelve source clips are selected; combat and casting remain WOC.
+
+Dev deployment completed at game revision `691952a908cd57730abc12a0c5014646444921dc`
+through clean woc-deploy main `03e65acad5975576bc6390046d7ecd383b45c1c2`.
+Recap: 36 OK, 11 changed, zero unreachable or failed. The detector stayed at
+`7a3b3e3f558b7ebc92dbdc7505bde2b9ff0a507e`. Public health and play page passed;
+both hashed public animation files matched the tested local bytes exactly.
+The follow-up browser setup correction changes tests only, not deployed code.
