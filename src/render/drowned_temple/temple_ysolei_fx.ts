@@ -1,5 +1,5 @@
-// Ysolei's effects on the Moon Altar (the Codex-built serpent,
-// public/models/creatures/temple_ysolei.glb), composed by temple_fx.ts:
+// Ysolei's effects on the Moon Altar (the art guide's serpent,
+// public/models/creatures/woc_temple_ysolei.glb), composed by temple_fx.ts:
 //  - Lunar Tide: moonlight gathers in her open jaws (her Mouth_VFX bone) over
 //    the 1.5 s bar, then a ring wave of freezing lagoon water bursts out to its
 //    13 yd edge, a foaming wall with ice shards flung off its crest;
@@ -339,16 +339,16 @@ export class TempleYsoleiFx {
   }
 
   /** Where her jaws are: the live bone when the rig is up, else an anchor
-   *  (her bind pose's mouth: 17.85 up and 5.3 ahead, at native scale). */
+   *  (her Idle's mouth: 17.0 up and 12.9 ahead, at native scale). */
   private mouthAt(b: EntityView): THREE.Vector3 {
     if (this.mouth?.parent) {
       this.mouth.getWorldPosition(this.mouthPos);
       if (Number.isFinite(this.mouthPos.y)) return this.mouthPos;
     }
     return this.mouthPos.set(
-      b.pos.x + Math.sin(b.facing) * 5.3,
-      b.pos.y + 17.85,
-      b.pos.z + Math.cos(b.facing) * 5.3,
+      b.pos.x + Math.sin(b.facing) * 12.9,
+      b.pos.y + 17.0,
+      b.pos.z + Math.cos(b.facing) * 12.9,
     );
   }
 
