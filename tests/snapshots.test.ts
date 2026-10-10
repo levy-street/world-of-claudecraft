@@ -8206,9 +8206,6 @@ describe('entity-anchored world event scoping', () => {
     spectator.spectating = {
       characterId: winner.characterId,
       name: 'Winner',
-      savedPos: { ...server.sim.entities.get(spectator.pid)!.pos },
-      priorGm: false,
-      stowedPet: null,
     };
     winnerSocket.sent.length = 0;
     sameSocket.sent.length = 0;
