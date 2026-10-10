@@ -49,25 +49,18 @@ already fixed in the same week's vaults, including hidden or pending-save reward
 Each remaining eligible item has equal probability within its pool. A later week
 can roll the same item again. Existing saved rewards stay unchanged, including
 duplicates rolled before this rule. Equipment must be usable by the character's class.
-Legendary chase drops, quest items and non-equipment other than the authored
-Crucible redemption sigils and Core of the Last Flame are excluded. The core
-remains confined to Normal and Heroic Ignivar/Varkhul raid rewards and fits every
-class and specialization. Other materials, recipes and tools remain excluded.
+Legendary chase drops, quest items and non-equipment other than Core of the Last
+Flame are excluded. The core remains confined to Normal and Heroic
+Ignivar/Varkhul raid rewards and fits every class and specialization. Crucible
+redemption sigils, other materials, recipes and tools are excluded from all new
+rolls and possible-loot lists.
 
-Crucible sigils use their existing class groups: Anvil for Warrior, Druid and Mage;
-Ember for Paladin, Hunter and Priest; Tempest for Shaman, Rogue and Warlock. Every
-specialization of an eligible class can redeem its group's sigil, so loot focus
-retains these tokens. They keep their existing boss sources: Ignivar supplies
-shoulder and glove sigils, Varkhul supplies helmet and leg sigils, and Heroic
-versions of either boss additionally supply chest sigils. Level limits, boss
-unlocks and weekly duplicate reservations still apply. This is an explicit sigil
-allowlist, not permission for other tools, recipes or crafting materials.
-
-The shared saved-ledger and client decoder accept these sigils and raid cores too. Deploy the
-server and client update together and refresh older clients before claiming sigil
-rewards. Older code rejects these fixed non-equipment choices during decoding or save loading;
-rolling back requires preserving affected weekly ledgers before an older server
-can load and resave them.
+Previously fixed sigil rewards remain visible and claimable through save/load and
+client decoding, including rewards awaiting their first reveal. This compatibility
+allowlist does not make sigils eligible for new rolls. Deploy updated clients and
+servers together: older code rejects fixed sigil/core choices during decoding or
+save loading. Rolling back requires preserving affected weekly ledgers before an
+older server can load and resave them.
 
 New rolls and possible-loot lists share class stat restrictions. Warrior, Rogue
 and Hunter exclude any equipment granting Intellect, Spell Power or Healing Power,

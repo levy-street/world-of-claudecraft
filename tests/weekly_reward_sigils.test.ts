@@ -4,10 +4,12 @@ import { IGNIVAR_SIGIL_ITEMS } from '../src/sim/content/ignivar_loot';
 import { TALENTS } from '../src/sim/content/talents';
 import { BUILTIN_WORLD, ITEMS, NPCS } from '../src/sim/data';
 import { VARKHUL_BOSS_ID } from '../src/sim/ignivar_raid_ids';
-import { requiredLevelFor } from '../src/sim/item_level_req';
 import { Sim } from '../src/sim/sim';
 import { IGNIVAR_BOSS_ID, type PlayerClass } from '../src/sim/types';
-import { weeklyRewardKindAllowed } from '../src/sim/weekly_reward_eligibility';
+import {
+  weeklyRewardKindAllowed,
+  weeklySavedRewardItemAllowed,
+} from '../src/sim/weekly_reward_eligibility';
 import { weeklyRewardTableOptions } from '../src/sim/weekly_reward_options';
 import { weeklyBossLootPool } from '../src/sim/weekly_reward_tables';
 import {
@@ -16,7 +18,6 @@ import {
   prepareWeeklyRewardOpen,
   sanitizeWeeklyRewards,
   WEEKLY_KEEPER_ID,
-  type WeeklyVaultBatch,
   weeklyLootPool,
   weeklyRewardInfoFor,
 } from '../src/sim/weekly_rewards';
@@ -33,35 +34,47 @@ const GROUPS: readonly [PlayerClass, string][] = [
   ['warlock', 'tempest'],
 ];
 const sigils = (ids: string[]) => ids.filter((id) => id.startsWith('sigil_')).sort();
-const expected = (group: string, slots: string[]) =>
-  slots.map((slot) => `sigil_${group}_${slot}`).sort();
-
+const LEGACY_SIGILS = [
+  'sigil_anvil_chest',
+  'sigil_anvil_gloves',
+  'sigil_anvil_helmet',
+  'sigil_anvil_legs',
+  'sigil_anvil_shoulder',
+  'sigil_ember_chest',
+  'sigil_ember_gloves',
+  'sigil_ember_helmet',
+  'sigil_ember_legs',
+  'sigil_ember_shoulder',
+  'sigil_tempest_chest',
+  'sigil_tempest_gloves',
+  'sigil_tempest_helmet',
+  'sigil_tempest_legs',
+  'sigil_tempest_shoulder',
+];
 describe('Weekly Vault redemption sigils', () => {
-  it('requires exact authored sigil membership rather than allowing arbitrary tools or sigil prefixes', () => {
+  it('excludes sigils from new rewards and only preserves exact authored sigils in saved rewards', () => {
     const template = ITEMS.sigil_anvil_chest;
-    expect(weeklyRewardKindAllowed(template)).toBe(true);
+    if (template.kind !== 'tool') throw new Error('Expected a tool sigil fixture');
+    expect(weeklyRewardKindAllowed(template)).toBe(false);
+    expect(weeklySavedRewardItemAllowed(template, 'raid')).toBe(true);
+    expect(weeklySavedRewardItemAllowed(template, 'pvp')).toBe(false);
+    expect(weeklySavedRewardItemAllowed({ ...template, kind: 'junk' }, 'raid')).toBe(false);
     for (const id of ['sigil_unknown_chest', '__proto__', 'constructor']) {
       expect(weeklyRewardKindAllowed({ ...template, id })).toBe(false);
+      expect(weeklySavedRewardItemAllowed({ ...template, id }, 'raid')).toBe(false);
     }
   });
-  it.each(GROUPS)('admits only the %s sigil group across every loot focus', (cls, group) => {
+  it.each(GROUPS)('excludes sigils for %s across every loot focus while retaining cores', (cls) => {
     for (const spec of [undefined, ...TALENTS[cls].specs.map((s) => s.id)]) {
       for (const heroic of [false, true]) {
         const pool = heroic ? 'raid_heroic' : 'raid';
-        const chest = heroic ? ['chest'] : [];
         for (const boss of [IGNIVAR_BOSS_ID, VARKHUL_BOSS_ID]) {
           expect(weeklyBossLootPool(boss, pool, cls, spec)).toContain('lastflame_core');
         }
         expect(weeklyLootPool(pool, cls, [0, 2, 2], spec)).toContain('lastflame_core');
-        expect(sigils(weeklyBossLootPool(IGNIVAR_BOSS_ID, pool, cls, spec))).toEqual(
-          expected(group, ['shoulder', 'gloves', ...chest]),
-        );
-        expect(sigils(weeklyBossLootPool(VARKHUL_BOSS_ID, pool, cls, spec))).toEqual(
-          expected(group, ['helmet', 'legs', ...chest]),
-        );
-        expect(sigils(weeklyLootPool(pool, cls, [0, 2, 2], spec))).toEqual(
-          expected(group, ['shoulder', 'gloves', 'helmet', 'legs', ...chest]),
-        );
+        expect(sigils(weeklyBossLootPool(IGNIVAR_BOSS_ID, pool, cls, spec))).toEqual([]);
+        expect(sigils(weeklyBossLootPool(VARKHUL_BOSS_ID, pool, cls, spec))).toEqual([]);
+        expect(sigils(weeklyLootPool(pool, cls, [0, 2, 2], spec))).toEqual([]);
       }
       for (const pool of ['world', 'pvp', 'dungeon', 'dungeon_heroic'] as const) {
         expect(sigils(weeklyLootPool(pool, cls, undefined, spec))).toEqual([]);
@@ -69,29 +82,52 @@ describe('Weekly Vault redemption sigils', () => {
     }
   });
 
-  it('keeps source unlocks, level limits, and weekly duplicate reservations for sigils', () => {
-    const batch: WeeklyVaultBatch = {
-      resetAtMs: 1000,
-      bossUnlocks: { [IGNIVAR_BOSS_ID]: 2 },
-      choices: [{ pool: 'raid_heroic' }],
-    };
-    const options = (level = 20) =>
-      weeklyRewardTableOptions(batch, batch.choices[0], 'mage', level, 'fire');
-    expect(options().map((t) => t.id)).toEqual([IGNIVAR_BOSS_ID]);
-    expect(sigils(options()[0].items)).toEqual(expected('anvil', ['shoulder', 'gloves', 'chest']));
-    const id = 'sigil_anvil_gloves';
-    const level = requiredLevelFor(ITEMS[id]) - 3;
-    expect(options(level).flatMap((t) => t.items)).toContain(id);
-    expect(options(level - 1).flatMap((t) => t.items)).not.toContain(id);
-    batch.choices.push({ pool: 'raid', itemId: id });
-    expect(options().flatMap((t) => t.items)).not.toContain(id);
-    batch.bossUnlocks![IGNIVAR_BOSS_ID] = 1;
-    expect(options()).toEqual([]);
+  it('omits sigils from previewed candidates and authoritative new rolls', () => {
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'mage',
+      lockoutNowMs: () => 2000,
+      weeklyRaidResetMs: () => 604800000,
+    });
+    sim.player.level = 20;
+    const keeper = [...sim.entities.values()].find((e) => e.templateId === WEEKLY_KEEPER_ID)!;
+    sim.player.pos = { ...keeper.pos };
+    const state = emptyWeeklyRewards(604800000);
+    state.lootSpec = 'fire';
+    state.vaults = [
+      {
+        resetAtMs: 1000,
+        bossUnlocks: { [IGNIVAR_BOSS_ID]: 2 },
+        choices: [{ pool: 'raid_heroic' }],
+      },
+    ];
+    sim.players.get(sim.playerId)!.weeklyRewards = state;
+    const candidates = weeklyRewardTableOptions(
+      state.vaults[0],
+      state.vaults[0].choices[0],
+      'mage',
+      20,
+      'fire',
+    )[0].items;
+    expect(candidates).toContain('lastflame_core');
+    expect(sigils(candidates)).toEqual([]);
+    const pick = vi.spyOn(sim.ctx.rng, 'pick').mockImplementation((items) => {
+      expect(items).toEqual(candidates);
+      expect(sigils(items as string[])).toEqual([]);
+      return items[0];
+    });
+    const opening = prepareWeeklyRewardOpen(sim.ctx, '1000:0', sim.playerId, undefined, [
+      IGNIVAR_BOSS_ID,
+    ])!;
+    expect(opening.itemId).toBe(candidates[0]);
+    expect(pick).toHaveBeenCalledTimes(1);
+    finishWeeklyRewardOpen(opening, true);
+    pick.mockRestore();
   });
 
   it('preserves all authored sigils through saved and public ledgers while excluding other non-equipment', () => {
-    expect(Object.keys(IGNIVAR_SIGIL_ITEMS)).toHaveLength(15);
-    for (const id of Object.keys(IGNIVAR_SIGIL_ITEMS)) {
+    expect(Object.keys(IGNIVAR_SIGIL_ITEMS).sort()).toEqual(LEGACY_SIGILS);
+    for (const id of LEGACY_SIGILS) {
       const state = emptyWeeklyRewards(604800000);
       state.vaults = [
         { resetAtMs: 1000, choices: [{ pool: 'raid_heroic', itemId: id, opened: true }] },
@@ -103,6 +139,11 @@ describe('Weekly Vault redemption sigils', () => {
         ).toBe(id);
       }
     }
+    const pvpSigilState = emptyWeeklyRewards(604800000);
+    pvpSigilState.vaults = [
+      { resetAtMs: 1000, choices: [{ pool: 'pvp', itemId: 'sigil_anvil_chest', opened: true }] },
+    ];
+    expect(sanitizeWeeklyRewards(pvpSigilState)?.vaults).toEqual([]);
     const excluded = [
       'forgefathers_ember',
       'pattern_crucible_tank_mail',
@@ -119,7 +160,7 @@ describe('Weekly Vault redemption sigils', () => {
     }
   });
 
-  it('rolls a previewed sigil, retains it after save failure and reload, and grants one on claim', () => {
+  it('retains a previously fixed sigil after save failure and reload and grants one on claim', () => {
     const sim = new Sim({
       seed: 42,
       noPlayer: true,
@@ -146,23 +187,19 @@ describe('Weekly Vault redemption sigils', () => {
       {
         resetAtMs: 1000,
         bossUnlocks: { [IGNIVAR_BOSS_ID]: 2 },
-        choices: [{ pool: 'raid_heroic' }],
+        choices: [
+          {
+            pool: 'raid_heroic',
+            itemId: 'sigil_anvil_chest',
+            tableId: IGNIVAR_BOSS_ID,
+            lootSpec: 'fire',
+          },
+        ],
       },
     ];
     meta.weeklyRewards = state;
     const id = 'sigil_anvil_chest';
-    const candidates = weeklyRewardTableOptions(
-      state.vaults[0],
-      state.vaults[0].choices[0],
-      'mage',
-      20,
-      'fire',
-    )[0].items;
-    expect(candidates).toContain(id);
-    const pick = vi.spyOn(sim.ctx.rng, 'pick').mockImplementation((items) => {
-      expect(items).toEqual(candidates);
-      return items[items.indexOf(id)];
-    });
+    const pick = vi.spyOn(sim.ctx.rng, 'pick');
     const opening = prepareWeeklyRewardOpen(sim.ctx, '1000:0', pid, undefined, [IGNIVAR_BOSS_ID])!;
     expect(opening.itemId).toBe(id);
     const pendingSaved = sim.serializeCharacter(pid)!;
@@ -179,7 +216,7 @@ describe('Weekly Vault redemption sigils', () => {
     ).toBeUndefined();
     const retry = prepareWeeklyRewardOpen(sim.ctx, '1000:0', pid, undefined, [IGNIVAR_BOSS_ID])!;
     expect(retry.itemId).toBe(id);
-    expect(pick).toHaveBeenCalledTimes(1);
+    expect(pick).not.toHaveBeenCalled();
     finishWeeklyRewardOpen(retry, true);
     expect(
       decodeWeeklyRewardInfo(weeklyRewardInfoFor(sim.ctx, pid))!.state.vaults[0].choices[0].itemId,
