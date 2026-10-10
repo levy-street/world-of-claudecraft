@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "29fec8a40ff0a7397a934ca9fe6067705436cd8c88906b0322d7cc8f69a31db9",
+  "rendererFingerprint": "2607de02a937467706a8033737c5e9bdce87b3a592039e9b62ae1b77957d0147",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "darwin",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6079209,
-      "sha256": "ad00e13b6d518e86b39d173aa2e32af3bfec19558c554ac06f50312773bed42c",
+      "bytes": 6079236,
+      "sha256": "47606f5ce35bdc5e7f64d4733d9c5b8db4211d9630dc01988c8fba1ab47e8c23",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -1412,10 +1412,10 @@
       "visualKey": "temple_selthe",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/temple_selthe.glb",
-          "path": "public/models/creatures/temple_selthe.glb",
-          "bytes": 3651184,
-          "sha256": "d3fb538d4b73a7963013d0aa356352c20e63867957512e21281e0e0876127ecb"
+          "url": "models/creatures/woc_temple_selthe.glb",
+          "path": "public/models/creatures/woc_temple_selthe.glb",
+          "bytes": 2620132,
+          "sha256": "42d8a6171ac8c3dca9581a6a3de474350cb24342e23ae8041492936754cd3abe"
         },
         "idle": "Idle",
         "height": 7.83,
@@ -1432,11 +1432,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "01c787c5ef48a45d1673b315a0d3db62b92f2defd0a5d6c38ebae6813734f6f8",
+      "sourceFingerprint": "e4951038a5e6b9256e8c63a29f06c675e62cdd4114086dd20706a8d5f657a17f",
       "output": {
         "path": "public/ui/mobs/choirmother_selthe.webp",
-        "bytes": 3580,
-        "sha256": "73e287aa6ed923415b45a6539d66115e3e15f27d18b667e8e102f37ac8d3895b"
+        "bytes": 2456,
+        "sha256": "27040aa6a3bdb5879d9229f2aef9e244f0ad0d0b8de46e4014edb0812d44930d"
       }
     },
     {
@@ -11691,10 +11691,10 @@
       "visualKey": "temple_colossus",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/temple_colossus.glb",
-          "path": "public/models/creatures/temple_colossus.glb",
-          "bytes": 2853232,
-          "sha256": "513ebec51de376ea81c05faba0e35ce7fcac75d15e0e163a6011581e608db9ec"
+          "url": "models/creatures/woc_temple_colossus.glb",
+          "path": "public/models/creatures/woc_temple_colossus.glb",
+          "bytes": 2531840,
+          "sha256": "061a040e8c3d00e6da350c790c39c21cd1c4ad15abcbb0c715efee0b617245cc"
         },
         "idle": "Idle",
         "height": 7.59090909090909,
@@ -11711,11 +11711,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "80bb3a30af1023bc99b5db42c2236b0e4eb418f9291dc1fe7499e5f9ecd07664",
+      "sourceFingerprint": "93e1b78c4437d9625bd74ffa1619122b026940e77ede857d849e25559a4be15f",
       "output": {
         "path": "public/ui/mobs/tideglass_colossus.webp",
-        "bytes": 4264,
-        "sha256": "b894ba810dde570fece52e03913a94fe33b94443cf262593b589ce10d2bb8c71"
+        "bytes": 3220,
+        "sha256": "53ee6bd28ce826c8bd14a5ee12ed6ada8f3c85e1691c87898ee6ee831f0008b4"
       }
     },
     {
@@ -14217,15 +14217,15 @@
       "visualKey": "temple_ysolei",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/temple_ysolei.glb",
-          "path": "public/models/creatures/temple_ysolei.glb",
-          "bytes": 1281756,
-          "sha256": "904fe12f2feb02cef59f82abf0d8519ab7f93e6206e7f4a740877e1d241e64d8"
+          "url": "models/creatures/woc_temple_ysolei.glb",
+          "path": "public/models/creatures/woc_temple_ysolei.glb",
+          "bytes": 2577972,
+          "sha256": "ccd143da5c1382445ea2bd89c647e8e52a6df3e51fea3d52d7e419769b9f6a0e"
         },
         "idle": "Idle",
         "height": 9.588,
         "yaw": null,
-        "hover": -0.1356,
+        "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
@@ -14237,11 +14237,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "9195d03436ee50cc7728522e57e7c1ae052fad3f630e287ed2acefbb28d3e8d4",
+      "sourceFingerprint": "46fdf9e5d339577f764aa0f8a37c3cc0c02b9a6a303e80c8aa2e7e69a8abe7e2",
       "output": {
         "path": "public/ui/mobs/ysolei.webp",
-        "bytes": 3464,
-        "sha256": "dcd2d129d22db33c8cbcef4e9da17580cb0291d0c13b9dbc3dbe9616135d7f26"
+        "bytes": 2934,
+        "sha256": "bb1abecbbf16af1e27d9f3ec9fd966e1e55ac9cbecc4be07ad59133341672182"
       }
     },
     {

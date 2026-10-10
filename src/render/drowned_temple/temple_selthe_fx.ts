@@ -42,9 +42,10 @@ import { GLOW_FRAG, PARTICLE_VERT, ParticlePool } from '../hollow_crypt/crypt_fx
 const COLLAPSED = 1e-4;
 const SCAN_SEC = 0.5;
 /** Her hands at a cast: this high over her pool and this far ahead (her
- *  drawn 9 yd body; the clips hold the hands about chest height). */
+ *  drawn 9 yd body; the art guide's Bolt holds the orb 5.4 up and 2.0 ahead
+ *  through its bar, the aria's palms reach on to 3 ahead). */
 const HAND_UP = 5.4;
-const HAND_AHEAD = 1.7;
+const HAND_AHEAD = 2.2;
 /** A player's chest over their feet. */
 const CHEST = 1.3;
 /** A bolt's flight time (seconds): fast, it lands with its damage. */

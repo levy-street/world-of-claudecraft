@@ -13,10 +13,10 @@ export const STILL_FOCUS = {
   'models/creatures/woc_bastion_turnkey.glb': { bone: 'head', radius: 0.36, lift: -0.3 },
   // the Moonmantle Ray: a disc far wider than it is tall, framed on its crescent and pearl
   'models/creatures/temple_sentinel.glb': { bone: 'Head', radius: 0.26, lift: 0.12, yaw: 0.25 },
-  'models/creatures/temple_ysolei.glb': {
-    bone: 'Head',
-    radius: 0.17,
-    lift: -0.4,
+  'models/creatures/woc_temple_ysolei.glb': {
+    bone: 'head',
+    radius: 0.2,
+    lift: 0.15,
     yaw: 0.8,
     rim: { color: 0xbfd8ff, intensity: 2.6, from: [-3, 4, -5] },
   },

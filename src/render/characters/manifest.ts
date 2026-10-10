@@ -5988,33 +5988,33 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true,
     selfIllumination: 0.1,
   },
-  // The bosses. Choirmother Selthe (choirmother_selthe; scripts/assets/
-  // drowned_temple_creatures/selthe_matriarch/): the siren matriarch, built
-  // on the Moonlit Siren's skeleton but broad and heavy in the game's
-  // stylized way (round two: a deep ribcage, strong shoulders and arms, a
-  // thicker coil, a larger head with a heavy scowling brow, glowing slit
-  // eyes, two small fangs and the lionfish's violet bars across her face,
-  // arms and flanks), a vast lionfish fan opening
-  // behind her like the pipes of an organ (silver rays, pearl tips, sheer
-  // turquoise to violet fins), her tail coiled in the pool of moonlit water
-  // she rides, the golden Great Conch on her chest, a jaw that drops too far
-  // when she sings. Sea-Song (1.5 s bar) plays SeaSong: arms wide, head back,
-  // the mouth wide, the fan shivering, the song on the bar's end. She is a
-  // caster and never swings her hands: Moonwater Bolt (2.0 s bar) plays Bolt,
-  // water gathered at her shoulder and flung on the bar's end; Mere Surge
-  // (3.0 s bar) plays Surge, sinking into the pool and hurling the wave on the
-  // bar's end; the Drowning Aria (a 5 s channel) loops Beam, both arms thrust
-  // at her target. The bolt and the surge finish their follow-through. Her old
-  // Slap and claw swings stay in the file, unplayed. The Chorus and Solo marks
-  // arrive as windup cues and play Chorus (the conch raised and blown, the fan
-  // folding in) and Solo (one arm raised,
-  // the fan flung wide). Dying, the fan folds and she sinks into her pool,
-  // leaving the conch glowing on the floor. Drawn 9.0 at her 1.15.
+  // The bosses. Choirmother Selthe (choirmother_selthe; the art guide's model,
+  // scripts/assets/specs/woc_temple_selthe.json): the siren matriarch, a pale
+  // woman's body to the waist under a long dark mane and a pearl circlet,
+  // kelp hanging from her forearms, and below the waist a violet serpent's
+  // tail that falls to the floor and runs back along it to its fluke; a vast
+  // silver lionfish fan opens behind her head. Her tail's bend stays planted
+  // on the floor while she leans and rears over it. Sea-Song (1.5 s bar)
+  // plays SeaSong: arms wide, head back, the fan flaring and shivering, the
+  // song on the bar's end. She is a caster and never swings her hands:
+  // Moonwater Bolt (2.0 s bar) plays Bolt, the water orb held before her
+  // chest through the bar, drawn back and flung on its end; Mere Surge (3.0 s
+  // bar) plays Surge, sinking low to gather the pool and hurling the wave up
+  // and out on the bar's end; the Drowning Aria (a 5 s channel) loops Beam,
+  // both palms thrust at her target. The bolt and the surge finish their
+  // follow-through. Her claws (Attack, Attack2) keep their weight should she
+  // ever swing them. The Chorus and Solo marks arrive as windup cues and play
+  // Chorus (her hands to her mouth, the fan folding in, then flung open) and
+  // Solo (her right arm raised, the fan flung wide). Dying, she rears up, the
+  // fan folds, and she slumps forward over her coils onto the floor. Drawn
+  // 9.0 at her 1.15.
   temple_selthe: {
-    url: `${CREATURES}/temple_selthe.glb`,
+    url: `${CREATURES}/woc_temple_selthe.glb`,
     height: 7.83,
     clips: {
       ...TEMPLE_CLIPS,
+      // Each claw lands on frame 18 of its 1.5 s swing at 1x (30 fps).
+      contacts: { Attack: [0.567], Attack2: [0.567] },
       castByAbility: {
         [SELTHE_SEA_SONG]: 'SeaSong',
         [SELTHE_MOONWATER_BOLT]: 'Bolt',
@@ -6038,33 +6038,33 @@ export const VISUALS: Record<string, VisualDef> = {
     castClipSync: [SELTHE_SEA_SONG, SELTHE_MOONWATER_BOLT, SELTHE_MERE_SURGE],
     castPlayOutHoldsAttacks: true,
     authoredAtlas: true,
-    selfIllumination: 0.06,
+    selfIllumination: 0.16,
   },
-  // The Tideglass Colossus (tideglass_colossus; scripts/assets/
-  // drowned_temple_creatures/colossus_tideglass/, recut in round two): a giant
-  // of hard sea-glass, every block of it a cut gem (the builder's gem.py: flat
-  // facets and sharp edges, each facet its own depth of teal, a bright rim on
-  // every edge), the light inside it breaking out of the seams between the
-  // blocks and along a few long fractures, pointed violet spires bursting from
-  // its shoulders, spine, elbows and knees, a low scowling head with two
-  // slanting slits of light under a crown of crystal horns, silver bands with
-  // moons, and in its chest, in a nacre-lined socket held by a silver crescent
-  // ringed with pearls, the prism: the cut gem of silver and violet that casts
-  // the Reflections. It walks its foe down (Walk, Run). Prism Flare (2.0 s
-  // bar) plays Flare: arms flung wide, the prism blazing on the bar's end.
-  // Moonlight Lance (2.0 s bar) plays Lance: the prism levelled along its
-  // pointing arm. Resonant Slam (1.5 s bar) plays Slam: both fists into the
-  // floor and a ring of broken crystal. Heroic's Reflection swap arrives as a
-  // windup cue: PrismPulse. Dying, it kneels, topples and breaks into crystal
-  // over a pool of water. Its body keeps the old 15-unit scale under the
-  // template's 2.2 (its long reach); the pointed spires now rise past it, so
-  // the drawn bounds are 16.7. The env boost matches its Reflections' glass:
-  // the temple's dim environment runs across its glossy facets.
+  // The Tideglass Colossus (tideglass_colossus; the art guide's model,
+  // scripts/assets/specs/woc_temple_colossus.json): a giant of teal sea-glass
+  // in cracked crystal plate, violet crystal spires bursting from its
+  // shoulders and crown, kelp and silver chains hanging from it, and in its
+  // chest the violet prism that casts the Reflections. It walks its foe down
+  // (Walk, Run). Its blows play at 1x with their weight before their speed and
+  // land on frame 18 (contacts): Attack a right haymaker wound back from
+  // behind its shoulder, Attack2 both fists raised over its crown and
+  // hammered down. Its bars land on their ends (clip-synced): Prism Flare
+  // (2.0 s) plays Flare, the fists gathered at the prism and flung wide as it
+  // blazes; Moonlight Lance (2.0 s) plays Lance, the right arm levelled at its
+  // foe with the left hand on the prism; Resonant Slam (1.5 s) plays Slam,
+  // both fists raised and driven into the floor. Heroic's Reflection swap
+  // arrives as a windup cue: PrismPulse, the chest thrust out. Dying, it
+  // staggers, its knees go and it topples onto its back, the prism to the sky
+  // for the moonbridge's beam. Drawn 16.7 at the template's 2.2 (its long
+  // reach). The env boost matches its Reflections' glass: the temple's dim
+  // environment runs across its glossy facets.
   temple_colossus: {
-    url: `${CREATURES}/temple_colossus.glb`,
+    url: `${CREATURES}/woc_temple_colossus.glb`,
     height: 16.7 / 2.2,
     clips: {
       ...TEMPLE_CLIPS,
+      // Each blow lands on frame 18 of its 1.5 s swing at 1x (30 fps).
+      contacts: { Attack: [0.567], Attack2: [0.567] },
       castByAbility: {
         [COLOSSUS_PRISM_FLARE]: 'Flare',
         [COLOSSUS_MOONLIGHT_LANCE]: 'Lance',
@@ -6079,11 +6079,11 @@ export const VISUALS: Record<string, VisualDef> = {
       attackTimeScaleByAbility: { [COLOSSUS_PRISM_FLARE]: 1 },
     },
     attackTimeScale: 1,
-    walkRef: 1.4,
-    runRef: 3.48,
+    walkRef: 6.33,
+    runRef: 16.68,
     castClipSync: true,
     authoredAtlas: true,
-    selfIllumination: 0.06,
+    selfIllumination: 0.12,
     envMapIntensity: 2.2,
   },
   // The Moonspawn (moonspawn; scripts/assets/drowned_temple_creatures/
@@ -6105,22 +6105,27 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true,
     selfIllumination: 0.1,
   },
-  // Ysolei, Avatar of the Drowned Moon: the colossal lunar sea-serpent built
-  // in Blender by Codex (sources on the codex/ysolei branch; original work, no
-  // donor assets), coiled on the Moon Altar. Native scale is kept: her raised
-  // head stands about seven players tall. Her Idle measures 23.97 native units
-  // (the halo's top to the coil's underside, 0.34 under her pivot), so at the
-  // template's 2.5 scale the height is 23.97 / 2.5 and the hover sinks the
-  // coil's underside back under the floor. Authored PBR materials (no atlas,
-  // no tint). Each clip rides a real cast bar: Lunar_Tide (1.5 s charge, then
-  // the wave), Undertow (the 3 s channel, jaws wide; the crash plays out),
-  // Summon (Moonspawn Call), Enrage (Drowned Wrath); Bite and Tail_Sweep are
-  // her swings, Rise her flourish on a reset, and she is stationary.
+  // Ysolei, Avatar of the Drowned Moon (the art guide's model, scripts/assets/
+  // specs/woc_temple_ysolei.json): the colossal lunar sea-serpent, a long
+  // spined body lying along the Moon Altar on two great fore-flippers, a neck
+  // rising to a beaked dragon's head hung with kelp, the moon's silver halo
+  // behind it turning slowly, and a broad fluke. Her raised head stands about
+  // seven players tall: drawn 23.97 at the template's 2.5, her flippers on the
+  // floor. Each clip rides a real cast bar: Lunar_Tide (1.5 s charge, her jaws
+  // to the sky, then the head slammed down as the wave goes), Undertow (the
+  // 3 s channel, jaws wide and low; the crash plays out), Summon (Moonspawn
+  // Call), Enrage (Drowned Wrath). Bite (reared back, then struck down to the
+  // floor) and Tail_Sweep (wound to one side, whipped round the other) are her
+  // swings, played at 1x with their weight before their speed and landing on
+  // frame 18 (contacts); Rise is her flourish on a reset, and she is
+  // stationary. Dying, her flippers give way and she falls on her belly, her
+  // neck, head and tail laid along the floor.
   temple_ysolei: {
-    url: `${CREATURES}/temple_ysolei.glb`,
+    url: `${CREATURES}/woc_temple_ysolei.glb`,
     height: 23.97 / 2.5,
-    hover: -0.339 / 2.5,
     authoredAtlas: true,
+    selfIllumination: 0.12,
+    attackTimeScale: 1,
     // The widest override the click-capsule guard allows (2x CLICK_RADIUS_CAP,
     // tests/nythraxis_bone_spike_model.test.ts): wider swallows the raid's clicks.
     clickRadius: 4.4,
@@ -6129,6 +6134,8 @@ export const VISUALS: Record<string, VisualDef> = {
       walk: 'Idle',
       run: 'Idle',
       attack: ['Bite', 'Tail_Sweep'],
+      // Each swing lands on frame 18 of its 1.5 s clip at 1x (30 fps).
+      contacts: { Bite: [0.567], Tail_Sweep: [0.567] },
       hit: ['Hit'],
       death: 'Death',
       cast: 'Summon',
