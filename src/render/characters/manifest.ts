@@ -5623,19 +5623,20 @@ export const VISUALS: Record<string, VisualDef> = {
     authoredAtlas: true,
     selfIllumination: 0.1,
   },
-  // The Gaol Turnkey: the drowned jailer, sculpted whole on the drowned kit
-  // (scripts/assets/sunken_bastion_drowned/turnkey/): a vast bloated body,
-  // bare swollen arms crusted with barnacles, a studded leather jerkin and a
-  // long apron, an executioner's leather hood with sea light in its eye holes,
-  // an iron collar and its snapped chain, the great ring of keys in his right
-  // fist, a chain wound on his left forearm and the gaol's lantern at his hip.
-  // He flails the ring overhead and down (KeySwing) and lashes the chain off
-  // his forearm (ChainLash); opening the cells he takes the lantern off his
-  // hip and hoists it high, rattling the keys (LanternRaise, played from the
-  // lantern flare in sunken_bastion/bastion_creature_fx.ts at the top of the
-  // raise); the Iron Cage's bar is the ring held up and shaken (Cast).
+  // The Gaol Turnkey (the art guide's model, scripts/assets/specs/woc_bastion_turnkey.json):
+  // the drowned jailer, a vast bloated body in a studded leather jerkin and a
+  // long ragged apron, an executioner's leather hood with sea light in its eye
+  // holes, the gaol's great iron key in his right fist, the gaol's lantern on
+  // its chain in his left and the ring of cell keys at his belt. His blows play
+  // at 1x with their weight before their speed and land on frame 18
+  // (contacts): KeySwing hauls the key up over his shoulder and smashes it down
+  // like a club, ChainLash whirls the lantern back on its chain and lashes it
+  // across his front. Opening the cells he hoists the lantern high
+  // (LanternRaise, played from the lantern flare in
+  // sunken_bastion/bastion_creature_fx.ts at the top of the raise); the Iron
+  // Cage's bar is the key thrust out and turned in an unseen lock (Cast).
   bastion_turnkey: {
-    url: `${CREATURES}/gaol_turnkey.glb`,
+    url: `${CREATURES}/woc_bastion_turnkey.glb`,
     // The gaol's miniboss: drawn at a boss's size (about 8.3 at its 1.3),
     // over three players tall.
     height: 6.4,
@@ -5644,14 +5645,17 @@ export const VISUALS: Record<string, VisualDef> = {
       walk: 'Walk',
       run: 'Run',
       attack: ['KeySwing', 'ChainLash'],
+      // Each blow lands on frame 18 of its 1.5 s swing at 1x (30 fps).
+      contacts: { KeySwing: [0.567], ChainLash: [0.567] },
       attackByAbility: { [BASTION_OPEN_CELLS_GESTURE]: 'LanternRaise' },
       attackTimeScaleByAbility: { [BASTION_OPEN_CELLS_GESTURE]: 1 },
       hit: ['Hit'],
       death: 'Death',
       cast: 'Cast',
     },
-    walkRef: 2.17,
-    runRef: 6.65,
+    attackTimeScale: 1,
+    walkRef: 2.89,
+    runRef: 8.76,
     authoredAtlas: true,
     selfIllumination: 0.14,
   },
@@ -5690,10 +5694,18 @@ export const VISUALS: Record<string, VisualDef> = {
     clickRadius: 1.8,
   },
 
-  // Shipwreck Captain: authored naval apparition, with gestures timed to the
-  // authoritative encounter bars. Stable key preserves existing consumers.
+  // Shipwreck Captain (the art guide's model, scripts/assets/specs/woc_bastion_captain.json):
+  // a drowned naval captain's apparition, a skull under a weed-hung tricorn, a
+  // rotted greatcoat with epaulettes and chains, a cutlass in his right fist
+  // and, below the coat, a tail of translucent soul-stuff (the GhostWisps
+  // material) where his legs were. He hovers; his blows play at 1x with their
+  // weight before their speed and land on frame 18 (contacts): Attack rises
+  // with the cutlass and cleaves down as he surges at the victim, Attack2 draws
+  // it back and lunges through in a thrust. His bars end on their blows,
+  // timed to the authoritative encounter bars (Broadside 2.4 s, Anchor and
+  // Boarding 2 s). Stable key preserves existing consumers.
   mob_turretback: {
-    url: `${CREATURES}/bastion_ghost_captain.glb`,
+    url: `${CREATURES}/woc_bastion_captain.glb`,
     height: 7.5,
     hover: 0.3,
     clips: {
@@ -5701,6 +5713,8 @@ export const VISUALS: Record<string, VisualDef> = {
       walk: 'Walk',
       run: 'Run',
       attack: ['Attack', 'Attack2'],
+      // Each blow lands on frame 18 of its 1.5 s swing at 1x (30 fps).
+      contacts: { Attack: [0.567], Attack2: [0.567] },
       hit: ['Hit'],
       death: 'Death',
       cast: 'Cast',
@@ -5715,6 +5729,7 @@ export const VISUALS: Record<string, VisualDef> = {
         [GHOST_CAPTAIN_BOARDING]: 1,
       },
     },
+    attackTimeScale: 1,
     authoredAtlas: true,
     selfIllumination: 0.2,
     deathTimeScale: 1,
