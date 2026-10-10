@@ -3,9 +3,11 @@
 // Bonechill, the Chapel Gargoyle, the Ossuary Drake, the Knellwyrm and the rime egg sacs. Each
 // mob template draws its own shipped GLB (never the old Blender build, never the spider the egg
 // sacs fell back to), every clip its ClipMap names ships in that GLB, each bar-locked clip is at
-// least as long as the bar the sim runs, and the effects' jaw anchors stay over the breath cone.
+// least as long as the bar the sim runs, the effects' jaw anchors stay over the breath cone, and
+// both dragons stand on four feet with their wings a separate pair.
 
 import { readFileSync } from 'node:fs';
+import { Matrix4, Quaternion, Vector3 } from 'three';
 import { describe, expect, it } from 'vitest';
 import { glbJsonChunk } from '../scripts/assets/lib/glb_texture_compression_core.mjs';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
@@ -51,6 +53,47 @@ function clipsOf(url: string): Map<string, number> {
     const end = Math.max(...a.samplers.map((s) => json.accessors[s.input].max?.[0] ?? 0));
     out.set(a.name, end);
   }
+  return out;
+}
+
+interface GltfNode {
+  name?: string;
+  children?: number[];
+  translation?: number[];
+  rotation?: number[];
+  scale?: number[];
+}
+
+interface RestJoint {
+  pos: Vector3;
+  /** The joint's ancestors, its parent first. */
+  chain: string[];
+}
+
+/** Each node's rest position in the model's own space (y up, +z forward), by name. */
+function restJoints(url: string): Map<string, RestJoint> {
+  const { nodes } = glbJsonChunk(readFileSync(`public/${url}`)) as { nodes: GltfNode[] };
+  const parentOf = new Map<number, number>();
+  nodes.forEach((n, i) => {
+    for (const c of n.children ?? []) parentOf.set(c, i);
+  });
+  const out = new Map<string, RestJoint>();
+  nodes.forEach((n, i) => {
+    const world = new Matrix4();
+    const chain: string[] = [];
+    for (let at: number | undefined = i; at !== undefined; at = parentOf.get(at)) {
+      const a = nodes[at];
+      world.premultiply(
+        new Matrix4().compose(
+          new Vector3().fromArray(a.translation ?? [0, 0, 0]),
+          new Quaternion().fromArray(a.rotation ?? [0, 0, 0, 1]),
+          new Vector3().fromArray(a.scale ?? [1, 1, 1]),
+        ),
+      );
+      if (at !== i) chain.push(a.name ?? '');
+    }
+    out.set(n.name ?? '', { pos: new Vector3().setFromMatrixPosition(world), chain });
+  });
   return out;
 }
 
@@ -145,6 +188,33 @@ describe('the Hollow Crypt boss bodies', () => {
       expect(jaws.z, mob).toBeGreaterThan(0);
       expect(reach, mob).toBeLessThan(cone?.range ?? 0);
       expect(jaws.y, mob).toBeLessThan(0.5 * defOf(mob).height * t.scale);
+    }
+  });
+
+  it('stands each dragon on four feet, its wings a separate pair off the chest', () => {
+    for (const mob of ['crypt_ossuary_drake', 'crypt_knellwyrm']) {
+      const joints = restJoints(BODIES[mob]);
+      const at = (name: string): RestJoint => {
+        const joint = joints.get(name);
+        expect(joint, `${mob}: ${name}`).toBeDefined();
+        return joint as RestJoint;
+      };
+      const head = at('head').pos.y;
+      for (const side of ['l', 'r']) {
+        const fore = at(`fingers.${side}`).pos;
+        const hind = at(`toes.${side}`).pos;
+        // both feet planted on the floor, the forefoot well ahead of the hind
+        expect(fore.y, `${mob} forefoot ${side}`).toBeLessThan(0.1 * head);
+        expect(hind.y, `${mob} hind foot ${side}`).toBeLessThan(0.1 * head);
+        expect(fore.z - hind.z, `${mob} stance ${side}`).toBeGreaterThan(0.25 * head);
+        // the wing hangs off the chest, never off a leg
+        const wing = at(`wing.1.${side}`).chain;
+        expect(wing[0], `${mob} wing ${side}`).toBe('chest');
+        expect(
+          wing.filter((b) => /arm|hand|leg|foot/.test(b)),
+          `${mob} wing ${side}`,
+        ).toEqual([]);
+      }
     }
   });
 
