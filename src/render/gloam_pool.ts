@@ -18,7 +18,7 @@
 // so a pool appearing or a wake stain dropping mints no material.
 
 import * as THREE from 'three';
-import { floorVfxRenderOrder } from './floor_vfx_layer';
+import { floorVfxLayerTopOrder } from './floor_vfx_layer';
 import {
   createGloamFloor,
   createGloamWake,
@@ -46,14 +46,15 @@ import { setRenderCategory } from './renderer_diagnostics';
 const WAKE_CELLS = 6;
 const RING_CELLS = 18;
 /**
- * The pool and its wake take a rung of the player band no other module's
- * normal-blended floor piece uses, and the ring the one above: a stain that
- * DARKENS must not share a rung with an additive glow, or the pair would swap
- * which one covers the other as the camera orbits. Every encounter telegraph
- * still paints over both.
+ * Every stain (the pool, its wake, the entry ring) sits on the top rung of the
+ * GROUND band, which nothing else uses: over the world's own marks, and under
+ * every player-band and encounter-band piece. The pool is near-black and
+ * normal-blended, so anything it painted over would be hidden: a Consecration,
+ * a Ring of Frost, a meteor's footprint are ground a player reacts to, and all
+ * of them paint over it from here. Nothing shares the rung, so the order
+ * against every other floor piece is fixed, whatever the camera does.
  */
-const POOL_STEP = 7;
-const RING_STEP = 8;
+const FLOOR_ORDER = floorVfxLayerTopOrder('ground');
 
 const VERTEX_SHADER = /* glsl */ `
   attribute float aFade;
@@ -179,7 +180,6 @@ function makeStain(
   size: number,
   cells: number,
   seed: number,
-  step: number,
 ): Stain {
   const geometry = new THREE.PlaneGeometry(size, size, cells, cells);
   geometry.rotateX(-Math.PI / 2);
@@ -193,7 +193,7 @@ function makeStain(
     size * Math.SQRT1_2 + GLOAM_BREAK_HEIGHT + 0.2,
   );
   const mesh = new THREE.Mesh(geometry, material);
-  mesh.renderOrder = floorVfxRenderOrder('player', step);
+  mesh.renderOrder = FLOOR_ORDER;
   mesh.visible = false;
   setRenderCategory(mesh, 'vfx');
   const stain: Stain = {
@@ -219,9 +219,9 @@ function makeStain(
 /** A hidden stain on each floor material, so a compile of the field's root
  *  links both programs with the mesh shape the live stains draw. */
 export function buildGloamFloorStandIns(materials: GloamFloorMaterials): THREE.Mesh[] {
-  const pool = makeStain(materials.pool, 1, 1, 0, POOL_STEP).mesh;
+  const pool = makeStain(materials.pool, 1, 1, 0).mesh;
   pool.name = 'gloam_pool:stand-in';
-  const ring = makeStain(materials.ring, 1, 1, 0, RING_STEP).mesh;
+  const ring = makeStain(materials.ring, 1, 1, 0).mesh;
   ring.name = 'gloam_ring:stand-in';
   return [pool, ring];
 }
@@ -289,7 +289,7 @@ export class GloamPool {
     private readonly materials: GloamFloorMaterials,
     cells: number,
   ) {
-    this.pool = makeStain(materials.pool, GLOAM_POOL_SIZE, cells, 1.7, POOL_STEP);
+    this.pool = makeStain(materials.pool, GLOAM_POOL_SIZE, cells, 1.7);
     this.pool.mesh.name = 'gloam_pool';
     parent.add(this.pool.mesh);
   }
@@ -406,20 +406,14 @@ export class GloamPool {
   }
 
   private makeRing(): Stain {
-    const ring = makeStain(this.materials.ring, GLOAM_RING_SIZE, RING_CELLS, 3.1, RING_STEP);
+    const ring = makeStain(this.materials.ring, GLOAM_RING_SIZE, RING_CELLS, 3.1);
     ring.mesh.name = 'gloam_ring';
     this.parent.add(ring.mesh);
     return ring;
   }
 
   private makeWake(index: number): Stain {
-    const stain = makeStain(
-      this.materials.pool,
-      GLOAM_WAKE_SIZE,
-      WAKE_CELLS,
-      index * 2.3 + 0.4,
-      POOL_STEP,
-    );
+    const stain = makeStain(this.materials.pool, GLOAM_WAKE_SIZE, WAKE_CELLS, index * 2.3 + 0.4);
     stain.mesh.name = 'gloam_wake';
     this.parent.add(stain.mesh);
     return stain;

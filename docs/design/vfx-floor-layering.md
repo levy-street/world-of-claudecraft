@@ -35,7 +35,7 @@ and a step is clamped so it can never cross into the band above.
 
 | Band | What lands here |
 |---|---|
-| `ground` | The world's own marks: blob shadows, mob night glow, torch and brazier pools, scorch decals, the King of the Hill circle. |
+| `ground` | The world's own marks: blob shadows, mob night glow, torch and brazier pools, scorch decals, the King of the Hill circle. Its top rung is the dark pool a Shadow priest lays under itself (see below). |
 | `player` | Class ability ground VFX: buff auras, dissolve decals, shock rings, consecration, runes, meteor footprints, trap rings. |
 | `encounter` | Boss and encounter mechanics: telegraphs, soak zones, hazard fields, death zones, sigils, markers. |
 | `reticle` | The player's own ground aim guide. Additive, so it brightens what lies under it and never hides a telegraph. The click-to-move marker and the AoE landing flash are normal-blended, so they ride the top rung of the `player` band instead. |
@@ -69,12 +69,29 @@ changes nothing a player can see. A new normal-blended floor piece in the
 player band should take a rung no other module's normal-blended floor piece
 uses; check the neighbours before picking one.
 
-The Shadow priest's pool (`src/render/gloam_pool.ts`) is the worked case. It is
-normal-blended and it DARKENS, so on a shared rung it would swap with an additive
-glow which of the two covers the other. Its pool and wake take one rung and its
-entry ring the next, both above every other module's stack and below the top
-rung the click marker and the AoE landing flash use, so the order against any
-other player effect is fixed and every encounter telegraph still paints over it.
+The Shadow priest's pool (`src/render/gloam_pool.ts`) is the worked case of a
+normal-blended piece, and of why "which band" comes before "which rung". It is
+near-black and nearly opaque, so whatever it paints over is hidden, not tinted.
+A Consecration, a Ring of Frost, a frost nova's rooted ground and a meteor's
+footprint are player-band pieces another player has to see and react to, so a
+priest standing in one must never cover it: the pool cannot sit anywhere in the
+`player` band above them, however free the rung. It is not an ability's ground
+effect either. It is the stain a character lays under itself, the same kind of
+mark as a blob shadow, so it rides the `ground` band.
+
+It takes the band's TOP rung (`floorVfxLayerTopOrder('ground')`), alone. Over
+every rung the world's marks use, so on plain ground it reads exactly as it did,
+over a torch pool or a scorch decal included. Under the whole `player` and
+`encounter` bands, so every ability and every telegraph paints over the dark.
+And shared with nothing, because a tie between a dark normal-blended stain and
+an additive glow is not colour-invariant: three falls back to depth on a tie,
+and one of the two orders hides the glow. The ground band was one order short of
+the player band for exactly this rung (its span was widened by that one order,
+which nothing else had). The pool, its wake and its entry ring all sit on it:
+three pieces of one module in one dark colour, where a flip changes nothing but
+which dark is on top. `tests/floor_vfx_layer.test.ts` pins that no other module
+asks for the top ground rung or names a step that reaches it, and that every
+other ground step is a literal the sweep can read.
 
 ## Rules for a floor module
 

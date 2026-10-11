@@ -13,7 +13,11 @@ import {
   GLOAM_CUE_STILL,
 } from '../src/render/characters/gloam_climb_core';
 import { CHARACTER_LOD_RANGE_SQ } from '../src/render/crowd_lod';
-import { floorVfxLayerOf } from '../src/render/floor_vfx_layer';
+import {
+  floorVfxLayerOf,
+  floorVfxLayerTopOrder,
+  floorVfxRenderOrder,
+} from '../src/render/floor_vfx_layer';
 import { gfxInternalsForTest } from '../src/render/gfx';
 import { type GloamCloudHost, GloamField } from '../src/render/gloam_field';
 import { GLOAM_WEARER_LINGER, type GloamTier } from '../src/render/gloam_field_core';
@@ -423,7 +427,7 @@ describe('GloamField: the cost of the floor', () => {
 });
 
 describe('GloamField: the scene it builds', () => {
-  it('puts every floor piece in the player band, on leaves, clear of the other modules', () => {
+  it('puts every floor piece on the top ground rung, on leaves, under every player effect', () => {
     onTier('high');
     const { scene, field, bodies } = rig();
     for (let i = 0; i < 40; i++) {
@@ -439,14 +443,24 @@ describe('GloamField: the scene it builds', () => {
         return;
       }
       if (object.name.startsWith('gloam_') && object.name !== 'gloam_smoke') {
-        expect(floorVfxLayerOf(object.renderOrder)).toBe('player');
+        expect(floorVfxLayerOf(object.renderOrder)).toBe('ground');
         orders.set(object.name.replace(':stand-in', ''), object.renderOrder);
       }
     });
     expect([...orders.keys()].sort()).toEqual(['gloam_pool', 'gloam_ring', 'gloam_wake']);
-    // The ring paints over the pool and its wake, which share a rung.
-    expect(orders.get('gloam_wake')).toBe(orders.get('gloam_pool'));
-    expect(orders.get('gloam_ring')).toBe((orders.get('gloam_pool') as number) + 1);
+    // One rung for all three: the top of the ground band, which is the literal
+    // order 9, one under the lowest rung a player effect can take. A near-black
+    // stain that painted over a Consecration, a Ring of Frost or a meteor's
+    // footprint would hide ground a player reacts to.
+    for (const order of orders.values()) {
+      expect(order).toBe(9);
+      expect(order).toBe(floorVfxLayerTopOrder('ground'));
+      expect(order).toBeLessThan(floorVfxRenderOrder('player', 0));
+      expect(order).toBeLessThan(floorVfxRenderOrder('encounter', 0));
+    }
+    // Over every rung the world's own marks use (blob shadows, torch pools,
+    // scorch decals), so plain ground reads as it did.
+    expect(floorVfxLayerTopOrder('ground')).toBeGreaterThan(floorVfxRenderOrder('ground', 7));
     field.dispose();
   });
 
