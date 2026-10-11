@@ -1,0 +1,604 @@
+import { describe, expect, it, vi } from 'vitest';
+
+// Mock the db layer so importing server/game needs no Postgres, mirroring
+// tests/mounts.test.ts.
+vi.mock('../server/db', () => ({
+  pool: { query: vi.fn(async () => ({ rows: [] })) },
+  saveCharacterState: vi.fn(async () => {}),
+  openPlaySession: vi.fn(async () => 1),
+  touchCharacterLogin: vi.fn(async () => {}),
+  closePlaySession: vi.fn(async () => {}),
+  insertChatLogs: vi.fn(async () => {}),
+  walletForAccount: vi.fn(async () => null),
+  markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+}));
+
+import {
+  attachPendingBuddy,
+  buddyItemId,
+  buddyOwned,
+  equipBuddyCosmetic,
+  grantBuddy,
+  grantBuddyCosmetic,
+  ownedBuddies,
+  restoreBuddyCollection,
+  revealPendingBuddies,
+  serializeBuddyCollection,
+  summonBuddy,
+  toggleBuddy,
+  useBuddyCosmeticToken,
+  useBuddyToken,
+} from '../src/sim/buddies';
+import { BUDDIES, BUDDY_KEYS, buddyDef, normalizeBuddyKey } from '../src/sim/content/buddies';
+import { BUDDY_COSMETICS } from '../src/sim/content/buddy_cosmetics';
+import { buddyTemplateId } from '../src/sim/content/buddy_mobs';
+import { MOBS } from '../src/sim/data';
+import { createMob } from '../src/sim/entity';
+import { useItem } from '../src/sim/items';
+import {
+  BUDDY_FOLLOW_BACK,
+  BUDDY_FOLLOW_RIGHT,
+  buddyFollowTarget,
+  buddyOf,
+  isBuddyMob,
+} from '../src/sim/pet/buddy_ai';
+import { BUDDY_LOOT_RANGE, buddyLootTarget } from '../src/sim/pet/buddy_autoloot';
+import { petOf } from '../src/sim/pet/pet_commands';
+import { Sim } from '../src/sim/sim';
+import { dist2d, type Entity, INTERACT_RANGE, type SimEvent, type Vec3 } from '../src/sim/types';
+import { VENDOR_TEST_WORLD } from './sim_shared';
+
+function makeWorld() {
+  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: VENDOR_TEST_WORLD });
+}
+
+function join(sim: Sim): number {
+  const pid = sim.addPlayer('warrior', 'Owner');
+  sim.tick();
+  return pid;
+}
+
+function drain(sim: Sim, type: SimEvent['type']): SimEvent[] {
+  return sim.tick().filter((ev) => ev.type === type);
+}
+
+describe('buddy catalog', () => {
+  it('every BuddyDef.key matches its own record key', () => {
+    for (const [key, def] of Object.entries(BUDDIES)) expect(def.key).toBe(key);
+  });
+
+  it('every catalog buddy has exactly one grant token, and it names the buddy back', () => {
+    for (const key of BUDDY_KEYS) {
+      const itemId = buddyItemId(key);
+      expect(itemId, `${key} has no whistle token`).not.toBeNull();
+    }
+  });
+
+  it('buddyDef/normalizeBuddyKey resolve known ids and reject unknown ones', () => {
+    expect(buddyDef('horse')?.name).toBe('Horse');
+    expect(buddyDef('not_a_buddy')).toBeNull();
+    expect(normalizeBuddyKey('sapling')).toBe('sapling');
+    expect(normalizeBuddyKey('not_a_buddy')).toBe('');
+    expect(normalizeBuddyKey(null)).toBe('');
+    expect(normalizeBuddyKey(undefined)).toBe('');
+  });
+
+  it('every cosmetic names a catalog buddy', () => {
+    for (const [id, def] of Object.entries(BUDDY_COSMETICS)) {
+      expect(def.id).toBe(id);
+      expect(buddyDef(def.buddy), `${id} -> ${def.buddy}`).not.toBeNull();
+    }
+  });
+});
+
+describe('buddy ownership: a per-character collection flag, never an item', () => {
+  it('a fresh player owns nothing; a grant attaches the companion in catalog order', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    const meta = sim.players.get(pid)!;
+    expect(ownedBuddies(meta)).toEqual([]);
+    expect(buddyOwned(meta, 'horse')).toBe(false);
+
+    expect(grantBuddy(sim.ctx, pid, 'sapling')).toBe(true);
+    expect(grantBuddy(sim.ctx, pid, 'horse')).toBe(true);
+    expect(ownedBuddies(meta)).toEqual(['horse', 'sapling']); // catalog order
+    expect(buddyOwned(meta, 'horse')).toBe(true);
+  });
+
+  it('a whistle in the bags does NOT own the buddy any more', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    const meta = sim.players.get(pid)!;
+    sim.addItem('whistle_horse', 1, pid);
+    expect(buddyOwned(meta, 'horse')).toBe(false);
+    meta.bank.inventory.push({ itemId: 'whistle_sapling', count: 1 });
+    expect(buddyOwned(meta, 'sapling')).toBe(false);
+  });
+
+  it('a grant is idempotent, announces once, and summons the companion', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    const meta = sim.players.get(pid)!;
+    const before = meta.wireRev;
+    expect(grantBuddy(sim.ctx, pid, 'horse')).toBe(true);
+    expect(grantBuddy(sim.ctx, pid, 'horse')).toBe(false);
+    expect(meta.wireRev).toBe(before + 1);
+    const revealed = drain(sim, 'buddyRevealed');
+    expect(revealed).toHaveLength(1);
+    expect(revealed[0]).toMatchObject({ type: 'buddyRevealed', pid, key: 'horse' });
+    expect(sim.entities.get(pid)!.buddyKey).toBe('horse');
+    expect(buddyOf(sim.ctx, pid)?.templateId).toBe(buddyTemplateId('horse'));
+  });
+
+  it('unknown keys are never owned or granted', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    const meta = sim.players.get(pid)!;
+    expect(grantBuddy(sim.ctx, pid, 'not_a_buddy')).toBe(false);
+    expect(buddyOwned(meta, 'not_a_buddy')).toBe(false);
+  });
+});
+
+describe('grant tokens: a whistle attaches the companion and is consumed', () => {
+  it('using the whistle grants the buddy and removes the token', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    const meta = sim.players.get(pid)!;
+    sim.addItem('whistle_horse', 1, pid);
+    useItem(sim.ctx, 'whistle_horse', pid);
+    expect(buddyOwned(meta, 'horse')).toBe(true);
+    expect(meta.inventory.some((s) => s.itemId === 'whistle_horse')).toBe(false);
+    expect(sim.entities.get(pid)!.buddyKey).toBe('horse');
+  });
+
+  it('a duplicate token is refused and NOT consumed', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    const meta = sim.players.get(pid)!;
+    grantBuddy(sim.ctx, pid, 'horse');
+    sim.tick();
+    sim.addItem('whistle_horse', 1, pid);
+    expect(useBuddyToken(sim.ctx, pid, 'whistle_horse')).toBe(false);
+    expect(meta.inventory.some((s) => s.itemId === 'whistle_horse')).toBe(true);
+    const errors = drain(sim, 'error');
+    expect(
+      errors.some((ev) => 'text' in ev && ev.text === 'You already have that companion.'),
+    ).toBe(true);
+  });
+
+  it('a retired cosmetic charm is refused without consumption or an unlock', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    const meta = sim.players.get(pid)!;
+    sim.addItem('charm_stag_gilded', 1, pid);
+    useItem(sim.ctx, 'charm_stag_gilded', pid);
+    expect(meta.buddies.cosmetics.size).toBe(0);
+    expect(useBuddyCosmeticToken(sim.ctx, pid, 'charm_stag_gilded')).toBe(false);
+    expect(sim.countItem('charm_stag_gilded', pid)).toBe(1);
+  });
+});
+
+describe('summonBuddy: pick a collected buddy, pick it again to dismiss', () => {
+  it('summons an owned buddy instantly, with no channel', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    grantBuddy(sim.ctx, pid, 'horse');
+    toggleBuddy(sim.ctx, pid);
+    expect(summonBuddy(sim.ctx, pid, 'horse')).toBe(true);
+    expect(sim.entities.get(pid)!.buddyKey).toBe('horse');
+  });
+
+  it('summoning the active buddy dismisses it', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    grantBuddy(sim.ctx, pid, 'horse');
+    expect(summonBuddy(sim.ctx, pid, 'horse')).toBe(true);
+    expect(sim.entities.get(pid)!.buddyKey).toBe('');
+  });
+
+  it('swapping straight to a different owned buddy is instant, no dismiss step', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    grantBuddy(sim.ctx, pid, 'horse');
+    grantBuddy(sim.ctx, pid, 'sapling');
+    summonBuddy(sim.ctx, pid, 'horse');
+    expect(summonBuddy(sim.ctx, pid, 'sapling')).toBe(true);
+    expect(sim.entities.get(pid)!.buddyKey).toBe('sapling');
+  });
+
+  it('refuses an uncollected buddy with the collection refusal, and leaves the current one', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    expect(summonBuddy(sim.ctx, pid, 'horse')).toBe(false);
+    expect(sim.entities.get(pid)!.buddyKey).toBe('');
+    const errors = drain(sim, 'error');
+    expect(
+      errors.some((ev) => 'text' in ev && ev.text === "You haven't collected that companion."),
+    ).toBe(true);
+  });
+
+  it('an unknown catalog key is refused', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    expect(summonBuddy(sim.ctx, pid, 'not_a_buddy')).toBe(false);
+  });
+});
+
+describe('toggleBuddy: dismiss, or bring the last summoned one back', () => {
+  it('dismisses the active buddy, then re-summons the same one', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    grantBuddy(sim.ctx, pid, 'horse');
+    expect(toggleBuddy(sim.ctx, pid)).toBe(true);
+    expect(sim.entities.get(pid)!.buddyKey).toBe('');
+    expect(toggleBuddy(sim.ctx, pid)).toBe(true);
+    expect(sim.entities.get(pid)!.buddyKey).toBe('horse');
+  });
+
+  it('does nothing with nothing collected', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    expect(toggleBuddy(sim.ctx, pid)).toBe(false);
+    expect(sim.entities.get(pid)!.buddyKey).toBe('');
+  });
+});
+
+describe('cosmetics: unlock, wear, and the dye on the follower', () => {
+  it('unlocks once, announces once, and refuses an unknown id', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    expect(grantBuddyCosmetic(sim.ctx, pid, 'crystal_lich_frostbound')).toBe(true);
+    expect(grantBuddyCosmetic(sim.ctx, pid, 'crystal_lich_frostbound')).toBe(false);
+    expect(grantBuddyCosmetic(sim.ctx, pid, 'no_such_look')).toBe(false);
+    const unlocked = drain(sim, 'buddyCosmeticUnlocked');
+    expect(unlocked).toHaveLength(1);
+    expect(unlocked[0]).toMatchObject({ pid, cosmeticId: 'crystal_lich_frostbound' });
+  });
+
+  it('wears a look only on a collected buddy it was authored for, and only when unlocked', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    const meta = sim.players.get(pid)!;
+    // Not collected yet.
+    grantBuddyCosmetic(sim.ctx, pid, 'crystal_lich_frostbound');
+    expect(equipBuddyCosmetic(sim.ctx, pid, 'crystal_lich', 'crystal_lich_frostbound')).toBe(false);
+    grantBuddy(sim.ctx, pid, 'crystal_lich');
+    grantBuddy(sim.ctx, pid, 'sapling');
+    // Wrong buddy for the look.
+    expect(equipBuddyCosmetic(sim.ctx, pid, 'sapling', 'crystal_lich_frostbound')).toBe(false);
+    // Not unlocked.
+    expect(equipBuddyCosmetic(sim.ctx, pid, 'crystal_lich', 'crystal_lich_voltaic')).toBe(false);
+    expect(equipBuddyCosmetic(sim.ctx, pid, 'crystal_lich', 'crystal_lich_frostbound')).toBe(true);
+    expect(meta.buddies.equipped.get('crystal_lich')).toBe('crystal_lich_frostbound');
+    expect(equipBuddyCosmetic(sim.ctx, pid, 'crystal_lich', null)).toBe(true);
+    expect(meta.buddies.equipped.has('crystal_lich')).toBe(false);
+    expect(equipBuddyCosmetic(sim.ctx, pid, 'crystal_lich', null)).toBe(false);
+  });
+
+  it('the worn look re-spawns the live follower with the cosmetic dye as its color', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    grantBuddy(sim.ctx, pid, 'crystal_lich');
+    grantBuddyCosmetic(sim.ctx, pid, 'crystal_lich_frostbound');
+    const plain = buddyOf(sim.ctx, pid)!;
+    expect(plain.color).toBe(MOBS[buddyTemplateId('crystal_lich')].color);
+    equipBuddyCosmetic(sim.ctx, pid, 'crystal_lich', 'crystal_lich_frostbound');
+    const dyed = buddyOf(sim.ctx, pid)!;
+    expect(dyed.id).not.toBe(plain.id);
+    expect(dyed.color).toBe(BUDDY_COSMETICS.crystal_lich_frostbound.tint);
+    equipBuddyCosmetic(sim.ctx, pid, 'crystal_lich', null);
+    expect(buddyOf(sim.ctx, pid)!.color).toBe(MOBS[buddyTemplateId('crystal_lich')].color);
+  });
+});
+
+describe('pending companions: the boss-roll win before its reveal', () => {
+  it('attaches once with a presence line, and a reveal makes it owned and summoned', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    const meta = sim.players.get(pid)!;
+    expect(attachPendingBuddy(sim.ctx, pid, 'crystal_lich', 'world', { x: 1, z: 2 })).toBe(true);
+    expect(attachPendingBuddy(sim.ctx, pid, 'crystal_lich', 'world', { x: 1, z: 2 })).toBe(false);
+    expect(meta.buddies.pending).toEqual([{ key: 'crystal_lich', source: 'world', x: 1, z: 2 }]);
+    expect(buddyOwned(meta, 'crystal_lich')).toBe(false);
+    const presence = drain(sim, 'buddyPresence');
+    expect(presence).toHaveLength(1);
+    expect(presence[0]).toMatchObject({ pid, key: 'crystal_lich' });
+
+    expect(revealPendingBuddies(sim.ctx, pid, () => false)).toEqual([]);
+    expect(revealPendingBuddies(sim.ctx, pid)).toEqual(['crystal_lich']);
+    expect(meta.buddies.pending).toEqual([]);
+    expect(buddyOwned(meta, 'crystal_lich')).toBe(true);
+    expect(sim.entities.get(pid)!.buddyKey).toBe('crystal_lich');
+    expect(drain(sim, 'buddyRevealed')).toHaveLength(1);
+  });
+
+  it('an owned companion never goes pending again', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    grantBuddy(sim.ctx, pid, 'crystal_lich');
+    expect(attachPendingBuddy(sim.ctx, pid, 'crystal_lich', 'instance', { x: 0, z: 0 })).toBe(
+      false,
+    );
+  });
+});
+
+describe('persistence: the collection round-trips through the character save', () => {
+  it('serializes absent while empty, and restores exactly what was saved', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    const meta = sim.players.get(pid)!;
+    expect(serializeBuddyCollection(meta.buddies)).toBeNull();
+    grantBuddy(sim.ctx, pid, 'crystal_lich');
+    grantBuddyCosmetic(sim.ctx, pid, 'crystal_lich_frostbound');
+    equipBuddyCosmetic(sim.ctx, pid, 'crystal_lich', 'crystal_lich_frostbound');
+    attachPendingBuddy(sim.ctx, pid, 'forgemaw', 'instance', { x: 3, z: 4 });
+    const saved = serializeBuddyCollection(meta.buddies)!;
+    expect(saved).toEqual({
+      owned: ['crystal_lich'],
+      cosmetics: ['crystal_lich_frostbound'],
+      equipped: { crystal_lich: 'crystal_lich_frostbound' },
+      pending: [{ key: 'forgemaw', source: 'instance', x: 3, z: 4 }],
+      last: 'crystal_lich',
+    });
+    const restored = restoreBuddyCollection(JSON.parse(JSON.stringify(saved)));
+    expect([...restored.owned]).toEqual(['crystal_lich']);
+    expect([...restored.cosmetics]).toEqual(['crystal_lich_frostbound']);
+    expect(restored.equipped.get('crystal_lich')).toBe('crystal_lich_frostbound');
+    expect(restored.pending).toEqual([{ key: 'forgemaw', source: 'instance', x: 3, z: 4 }]);
+    expect(restored.last).toBe('crystal_lich');
+  });
+
+  it('drops ids the catalog no longer carries, and a worn look that no longer fits', () => {
+    const restored = restoreBuddyCollection({
+      owned: ['crystal_lich', 'retired_buddy'],
+      cosmetics: ['crystal_lich_frostbound', 'no_such_look'],
+      equipped: { crystal_lich: 'no_such_look', sapling: 'forgemaw_ashen' },
+      pending: [
+        { key: 'crystal_lich', source: 'world' },
+        { key: 'gone', source: 'world' },
+      ],
+      last: 'retired_buddy',
+    });
+    expect([...restored.owned]).toEqual(['crystal_lich']);
+    expect([...restored.cosmetics]).toEqual(['crystal_lich_frostbound']);
+    expect(restored.equipped.size).toBe(0);
+    // An owned companion is never also pending.
+    expect(restored.pending).toEqual([]);
+    expect(restored.last).toBe('');
+  });
+
+  it('rides Sim.serializeCharacter and comes back through addPlayer', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    grantBuddy(sim.ctx, pid, 'crystal_lich');
+    grantBuddyCosmetic(sim.ctx, pid, 'crystal_lich_frostbound');
+    const state = sim.serializeCharacter(pid)!;
+    expect(state.buddies).toEqual({
+      owned: ['crystal_lich'],
+      cosmetics: ['crystal_lich_frostbound'],
+      last: 'crystal_lich',
+    });
+    const again = makeWorld();
+    const pid2 = again.addPlayer('warrior', 'Owner', { state });
+    again.tick();
+    expect(again.ownedBuddiesFor(pid2)).toEqual(['crystal_lich']);
+    expect(again.ownedBuddyCosmeticsFor(pid2)).toEqual(['crystal_lich_frostbound']);
+  });
+});
+
+describe('IWorldBuddies facade (offline Sim)', () => {
+  it('the collection reads and the two commands ride the primary player', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', world: VENDOR_TEST_WORLD });
+    sim.tick();
+    const pid = sim.player.id;
+    grantBuddy(sim.ctx, pid, 'crystal_lich');
+    grantBuddyCosmetic(sim.ctx, pid, 'crystal_lich_frostbound');
+    expect(sim.ownedBuddies()).toEqual(['crystal_lich']);
+    expect(sim.ownedBuddyCosmetics()).toEqual(['crystal_lich_frostbound']);
+    expect(sim.pendingBuddies()).toEqual([]);
+    sim.equipBuddyCosmetic('crystal_lich', 'crystal_lich_frostbound');
+    expect(sim.equippedBuddyCosmetics()).toEqual({ crystal_lich: 'crystal_lich_frostbound' });
+    sim.toggleBuddy();
+    expect(sim.entities.get(pid)!.buddyKey).toBe('');
+    sim.summonBuddy('crystal_lich');
+    expect(sim.entities.get(pid)!.buddyKey).toBe('crystal_lich');
+  });
+});
+
+describe('buddy entity: real, server-simulated, heels like a hunter pet', () => {
+  it('spawns a real owned, non-hostile mob entity on summon', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    grantBuddy(sim.ctx, pid, 'horse');
+    const buddy = buddyOf(sim.ctx, pid);
+    expect(buddy).not.toBeNull();
+    expect(buddy!.kind).toBe('mob');
+    expect(buddy!.ownerId).toBe(pid);
+    expect(buddy!.hostile).toBe(false);
+    expect(buddy!.templateId).toBe(buddyTemplateId('horse'));
+    expect(isBuddyMob(buddy!)).toBe(true);
+  });
+
+  it('dismissing despawns the entity, not just the flag', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    grantBuddy(sim.ctx, pid, 'horse');
+    const buddy = buddyOf(sim.ctx, pid)!;
+    summonBuddy(sim.ctx, pid, 'horse');
+    expect(buddyOf(sim.ctx, pid)).toBeNull();
+    expect(sim.entities.has(buddy.id)).toBe(false);
+  });
+
+  it('swapping to a different buddy despawns the old entity and spawns the new one', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    grantBuddy(sim.ctx, pid, 'horse');
+    grantBuddy(sim.ctx, pid, 'sapling');
+    summonBuddy(sim.ctx, pid, 'horse');
+    const first = buddyOf(sim.ctx, pid)!;
+    summonBuddy(sim.ctx, pid, 'sapling');
+    const second = buddyOf(sim.ctx, pid)!;
+    expect(second.id).not.toBe(first.id);
+    expect(sim.entities.has(first.id)).toBe(false);
+    expect(second.templateId).toBe(buddyTemplateId('sapling'));
+  });
+
+  it('heels back onto its right-and-back offset after the owner walks away', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    grantBuddy(sim.ctx, pid, 'horse');
+    const owner = sim.entities.get(pid)!;
+    owner.pos.x += 20;
+    for (let i = 0; i < 120; i++) sim.tick();
+    const buddy = buddyOf(sim.ctx, pid)!;
+    const sinF = Math.sin(owner.facing);
+    const cosF = Math.cos(owner.facing);
+    const targetX = owner.pos.x - BUDDY_FOLLOW_RIGHT * cosF - BUDDY_FOLLOW_BACK * sinF;
+    const targetZ = owner.pos.z + BUDDY_FOLLOW_RIGHT * sinF - BUDDY_FOLLOW_BACK * cosF;
+    const dx = buddy.pos.x - targetX;
+    const dz = buddy.pos.z - targetZ;
+    expect(Math.sqrt(dx * dx + dz * dz)).toBeLessThan(3.6);
+    expect(Math.hypot(targetX - owner.pos.x, targetZ - owner.pos.z)).toBeGreaterThan(1);
+  });
+
+  it('never registers as the owner’s combat pet (petOf stays null)', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    grantBuddy(sim.ctx, pid, 'horse');
+    expect(petOf(sim.ctx, pid)).toBeNull();
+  });
+});
+
+// Buddy autoloot (2026-09-08 owner request): the toggle on the buddy's own
+// target-frame menu sends the buddy out to loot the OWNER'S OWN corpses inside
+// BUDDY_LOOT_RANGE and bring the loot back to the owner's bags. The rules that
+// matter are the ownership rule ("no otros": never a stranger's corpse, never
+// even a party-mate's tap) and the leash rule (range measured from the OWNER,
+// so the buddy cannot be baited off across the map).
+describe('buddy autoloot', () => {
+  // A dead, lootable wolf at `pos`, tapped by `tappedBy` (null = untapped).
+  function corpseAt(sim: Sim, id: number, pos: Vec3, tappedBy: number | null): Entity {
+    const template = MOBS.forest_wolf;
+    const mob = createMob(id, template, template.maxLevel, { ...pos });
+    mob.dead = true;
+    mob.aiState = 'dead';
+    mob.corpseTimer = 9999;
+    mob.respawnTimer = 9999;
+    mob.lootable = true;
+    mob.tappedById = tappedBy;
+    mob.loot = { copper: 0, items: [{ itemId: 'wolf_fang', count: 1 }] };
+    sim.ctx.addEntity(mob);
+    return mob;
+  }
+
+  function summonHorse(sim: Sim, pid: number): Entity {
+    grantBuddy(sim.ctx, pid, 'horse');
+    return buddyOf(sim.ctx, pid)!;
+  }
+
+  it('is off until the menu arms it, and the toggle survives a re-summon', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    expect(sim.entities.get(pid)!.buddyAutoloot).toBe(false);
+    sim.setBuddyAutolootFor(pid, true);
+    expect(sim.entities.get(pid)!.buddyAutoloot).toBe(true);
+    summonHorse(sim, pid);
+    toggleBuddy(sim.ctx, pid);
+    // Dismissing the buddy is not "disable autoloot": the preference is the
+    // player's, not the individual follower's.
+    expect(sim.entities.get(pid)!.buddyAutoloot).toBe(true);
+    sim.setBuddyAutolootFor(pid, false);
+    expect(sim.entities.get(pid)!.buddyAutoloot).toBe(false);
+  });
+
+  it('walks to the owner’s own corpse and loots it into the OWNER’s bags', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    const owner = sim.entities.get(pid)!;
+    const buddy = summonHorse(sim, pid);
+    const corpse = corpseAt(
+      sim,
+      90001,
+      { x: owner.pos.x + 15, y: owner.pos.y, z: owner.pos.z },
+      pid,
+    );
+    sim.setBuddyAutolootFor(pid, true);
+    const before = sim.countItem('wolf_fang', pid);
+    for (let i = 0; i < 200 && sim.entities.get(corpse.id)?.loot; i++) sim.tick();
+    // The loot is the owner's; the buddy carries nothing of its own.
+    expect(sim.countItem('wolf_fang', pid)).toBe(before + 1);
+    expect(corpse.loot).toBeNull();
+    // And it was the BUDDY that made the trip, not the owner.
+    expect(dist2d(buddy.pos, corpse.pos)).toBeLessThanOrEqual(INTERACT_RANGE);
+    expect(dist2d(owner.pos, corpse.pos)).toBeGreaterThan(INTERACT_RANGE);
+  });
+
+  it('heels home again once there is nothing left to fetch', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    const owner = sim.entities.get(pid)!;
+    const buddy = summonHorse(sim, pid);
+    corpseAt(sim, 90002, { x: owner.pos.x + 12, y: owner.pos.y, z: owner.pos.z }, pid);
+    sim.setBuddyAutolootFor(pid, true);
+    for (let i = 0; i < 400; i++) sim.tick();
+    const target = buddyFollowTarget(owner);
+    expect(dist2d(buddy.pos, target)).toBeLessThan(3.6);
+  });
+
+  it('never touches a corpse that is not the owner’s, even armed and in range', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    const stranger = sim.addPlayer('warrior', 'Stranger');
+    const owner = sim.entities.get(pid)!;
+    const buddy = summonHorse(sim, pid);
+    const corpse = corpseAt(
+      sim,
+      90003,
+      { x: owner.pos.x + 10, y: owner.pos.y, z: owner.pos.z },
+      stranger,
+    );
+    sim.setBuddyAutolootFor(pid, true);
+    for (let i = 0; i < 200; i++) sim.tick();
+    expect(corpse.loot?.items[0]?.count).toBe(1);
+    expect(sim.countItem('wolf_fang', pid)).toBe(0);
+    // It did not even set out: it is still standing on its heel offset.
+    expect(dist2d(buddy.pos, buddyFollowTarget(owner))).toBeLessThan(3.6);
+    expect(buddyLootTarget(sim.ctx, owner)).toBeNull();
+  });
+
+  it('ignores an owned corpse beyond BUDDY_LOOT_RANGE of the OWNER', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    const owner = sim.entities.get(pid)!;
+    summonHorse(sim, pid);
+    const far = corpseAt(
+      sim,
+      90004,
+      { x: owner.pos.x + BUDDY_LOOT_RANGE + 10, y: owner.pos.y, z: owner.pos.z },
+      pid,
+    );
+    sim.setBuddyAutolootFor(pid, true);
+    expect(buddyLootTarget(sim.ctx, owner)).toBeNull();
+    // Walk the owner close enough and the same corpse becomes the errand.
+    owner.pos.x = far.pos.x - 10;
+    sim.ctx.rebucket(owner);
+    expect(buddyLootTarget(sim.ctx, owner)?.id).toBe(far.id);
+  });
+
+  it('stays home while the toggle is off, however close the owner’s corpse is', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    const owner = sim.entities.get(pid)!;
+    const buddy = summonHorse(sim, pid);
+    const corpse = corpseAt(
+      sim,
+      90005,
+      { x: owner.pos.x + 8, y: owner.pos.y, z: owner.pos.z },
+      pid,
+    );
+    for (let i = 0; i < 200; i++) sim.tick();
+    expect(corpse.loot?.items[0]?.count).toBe(1);
+    expect(dist2d(buddy.pos, buddyFollowTarget(owner))).toBeLessThan(3.6);
+  });
+});
