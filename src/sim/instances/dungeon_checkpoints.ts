@@ -3,10 +3,11 @@
 // the arena can be walked to. No saved state, tick work, or rng draws.
 import { isBlocked } from '../colliders';
 import { DUNGEON_CHECKPOINTS, type DungeonCheckpoint } from '../content/dungeon_checkpoints';
-import { DUNGEONS, instanceOrigin } from '../data';
+import { DUNGEONS, instanceOrigin, MOBS } from '../data';
 import { MAX_AGGRO_RADIUS, MAX_WANDER_RADIUS } from '../mob/aggro_ranges';
-import { PATROL_REJOIN_DISTANCE } from '../mob/patrol';
+import { PATROL_REJOIN_DISTANCE, patrolFlierAloft } from '../mob/patrol';
 import { projectOntoLoop } from '../mob/patrol_route';
+import { isTrivialTo } from '../mob/targeting';
 import { PLAYER_BODY_RADIUS } from '../pathfind';
 import { isClearOfRiftEntry, RIFT_ENTRY_CLEAR_RADIUS } from '../rift/entry_clearance';
 import type { InstanceSlot } from '../sim';
@@ -21,9 +22,19 @@ import { dungeonGateState } from './dungeon_gates';
  */
 const PATROL_LOOP_CLEAR_RADIUS = MAX_AGGRO_RADIUS + PATROL_REJOIN_DISTANCE;
 
-/** A living mob nobody owns: every one of them is taken for a threat. */
-function standsWild(mob: Entity): boolean {
-  return mob.kind === 'mob' && !mob.dead && mob.ownerId === null;
+/**
+ * Could this mob pull `player` standing still? The idle aggro scan of
+ * mob/locomotion.ts runs for every living mob its dispatcher leaves hostile, and
+ * skips a player the mob is trivial to. So: hostile to them by the one
+ * isHostileTo rule (a scripted, caged or tamed body is not),
+ * or a flying patrol waiting on the wing, which reads non-hostile until it is
+ * pulled and still scans from up there (the hostile-or-aloft rule
+ * mob/dungeon_pack_aggro.ts applies to a pack pull), and not trivial to them.
+ */
+function canPullOnArrival(ctx: SimContext, mob: Entity, player: Entity): boolean {
+  if (mob.kind !== 'mob' || mob.dead) return false;
+  if (!ctx.isHostileTo(player, mob) && !patrolFlierAloft(mob)) return false;
+  return !(MOBS[mob.templateId] && isTrivialTo(mob, player));
 }
 
 /** Is every gate on the way in to `checkpoint` open in this claim, right now? */
@@ -51,7 +62,7 @@ function routeOpen(
  *   any body    standing inside the ceiling right now refuses the point,
  *               whatever its home or loop.
  */
-function mobsThreaten(ctx: SimContext, inst: InstanceSlot, pos: Vec3): boolean {
+function mobsThreaten(ctx: SimContext, inst: InstanceSlot, player: Entity, pos: Vec3): boolean {
   // The entity grid, as the idle aggro scan reads the player grid: it holds
   // every entity, rostered to the claim or not, bucketed at the end of the last
   // tick, and the answer is a plain "is there one", so visit order cannot matter.
@@ -62,7 +73,7 @@ function mobsThreaten(ctx: SimContext, inst: InstanceSlot, pos: Vec3): boolean {
       pos.z,
       RIFT_ENTRY_CLEAR_RADIUS + MAX_WANDER_RADIUS,
       (mob) =>
-        standsWild(mob) &&
+        canPullOnArrival(ctx, mob, player) &&
         (dist2d(mob.pos, pos) < MAX_AGGRO_RADIUS ||
           (!patrolLoop(mob) && !isClearOfRiftEntry(pos, mob.spawnPos.x, mob.spawnPos.z))),
     )
@@ -71,7 +82,7 @@ function mobsThreaten(ctx: SimContext, inst: InstanceSlot, pos: Vec3): boolean {
   for (const id of inst.mobIds) {
     const mob = ctx.entities.get(id);
     const loop = mob && patrolLoop(mob);
-    if (!mob || !loop || !standsWild(mob)) continue;
+    if (!mob || !loop || !canPullOnArrival(ctx, mob, player)) continue;
     if (projectOntoLoop(loop, pos.x, pos.z).d < PATROL_LOOP_CLEAR_RADIUS) return true;
   }
   return false;
@@ -131,7 +142,7 @@ export function dungeonReentryPoint(
     const pos = ctx.groundPos(origin.x + checkpoint.pos.x, origin.z + checkpoint.pos.z);
     if (isBlocked(ctx.cfg.seed, pos.x, pos.z, PLAYER_BODY_RADIUS)) continue;
     if (
-      mobsThreaten(ctx, inst, pos) ||
+      mobsThreaten(ctx, inst, player, pos) ||
       ctx.groundAoEs.some(
         (area) => area.remaining > 0 && dist2d(area.pos, pos) <= area.radius + PLAYER_BODY_RADIUS,
       )

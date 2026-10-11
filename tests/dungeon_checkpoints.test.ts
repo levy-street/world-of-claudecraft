@@ -851,6 +851,89 @@ describe('dungeon death checkpoints: arrival clearance', () => {
     }
     expectLocal(sim, pid, inst, 0, 107);
   });
+
+  it('a Chorister that outlives Cantor still guards the loft', () => {
+    const { sim, pid, inst, player } = setup();
+    earn(sim, inst, ...LOFT_BOSSES);
+    killPacks(sim, inst, 'q1', 'q2');
+    // Cantor's death leaves her two Choristers standing: ordinary hostile elites
+    // of her pack, idle at the rail 10.6 yd from the loft's point.
+    const choristers = packMobs(sim, inst, ['ilvane']);
+    expect(choristers.map((mob) => mob.templateId)).toEqual([
+      'hollow_chorister',
+      'hollow_chorister',
+    ]);
+    const loft = localOf(inst, 0, 162);
+    for (const mob of choristers) {
+      expect(mob.hostile).toBe(true);
+      expect(mob.aiState).toBe('idle');
+      expect(gap(mob.pos, loft)).toBeLessThan(11);
+    }
+    release(sim, pid);
+    expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual({ x: 80, z: 112 });
+    // They are a real threat to the point, not a stale body: a living player of
+    // their own level who stands on it is pulled at once.
+    const visitor = sim.addPlayer('warrior', 'Visitor');
+    sim.setPlayerLevel(8, visitor);
+    const body = sim.entities.get(visitor)!;
+    standAt(sim, body, loft.x, loft.z);
+    for (let i = 0; i < 20 * 2; i++) sim.tick();
+    expect(choristers.some((mob) => mob.aggroTargetId === visitor)).toBe(true);
+  });
+
+  it('counts only the mobs that can pull the arriving player', () => {
+    const { sim, pid, inst, player } = setup();
+    earn(sim, inst, 'sexton_marrow');
+    release(sim, pid);
+    const at = localOf(inst, -82, 116);
+    const yard = { x: -82, z: 116 };
+    const door = DUNGEONS[inst.dungeonId].entry;
+    const prop = createMob(
+      sim.ctx.nextId++,
+      MOBS.crypt_shambler,
+      8,
+      sim.ctx.groundPos(at.x + 4, at.z),
+    );
+    sim.ctx.addEntity(prop);
+    expect(MOBS.crypt_shambler.elite).toBe(true);
+    expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual(door);
+    // An inert, non-hostile body (a candle, a cage, a scripted entrance) pulls nobody.
+    prop.hostile = false;
+    expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual(yard);
+    // A flying patrol on the wing is not hostile either, and it still stoops on
+    // whoever it sees.
+    prop.dungeonPatrol = { points: [{ x: at.x + 4, z: at.z }], offset: 0, pace: 0.4, flightY: 40 };
+    expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual(door);
+    prop.dungeonPatrol = undefined;
+    expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual(yard);
+    // Somebody's pet is nobody's threat, hostile flag or not.
+    prop.hostile = true;
+    prop.ownerId = pid;
+    expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual(yard);
+    prop.ownerId = null;
+    expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual(door);
+    prop.hostile = false;
+    // Ordinary (non-elite) trash counts while the arrival is near its level...
+    expect(MOBS.rime_egg_sac.elite).toBeFalsy();
+    const plain = createMob(
+      sim.ctx.nextId++,
+      MOBS.rime_egg_sac,
+      8,
+      sim.ctx.groundPos(at.x - 4, at.z),
+    );
+    sim.ctx.addEntity(plain);
+    expect(player.level).toBeLessThan(10);
+    expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual(door);
+    // ...and never aggroes on sight once it is trivial to them.
+    sim.setPlayerLevel(20, pid);
+    expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual(yard);
+    // An elite does, at any level.
+    prop.hostile = true;
+    expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual(door);
+    // A dead one does not.
+    handleDeath(sim.ctx, prop, null);
+    expect(dungeonReentryPoint(sim.ctx, inst, player)).toEqual(yard);
+  });
 });
 
 describe('dungeon death checkpoints: the table', () => {
